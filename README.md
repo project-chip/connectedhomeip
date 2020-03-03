@@ -47,3 +47,7 @@ file for more information.
 # License
 
 CHIP is released under the [Apache 2.0 license](./LICENSE) Please read more details therein
+
+# CLA
+
+Individual CLA signed and collected by CLA assisstant
