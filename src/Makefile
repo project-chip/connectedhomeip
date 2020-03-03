@@ -1,6 +1,6 @@
 TOPTARGETS := all clean run_tests
 
-SUBDIRS = lwip
+SUBDIRS = lwip support system
 
 $(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
