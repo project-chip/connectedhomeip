@@ -22,7 +22,9 @@ Currently these are the requirements to becoming a member of the [Project-CHIP R
 Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip/connectedhomeip.git)
 * Must be a member of the Zigbee Alliance CHIP TSG Working Group
 * Have signed the Zigbee CHIP WG CLA
-* Agree to the code of conduct
+* Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
+* Agree to the [License](./LICENSE)
+
 
 ## Bugs
 
