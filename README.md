@@ -21,13 +21,15 @@ The CHIP repository is structured as follows:
 
 | File / Folder | Contents |
 |----|----|
-| `actions/` |  GitHub Actions related to this project |
 | `build/` | Build system support content |
 | `BUILDING.md` | More detailed information on configuring and building CHIP for different targets |
 | `CODE_OF_CONDUCT.md` | Code of Conduct for CHIP, and contributions to it |
 | `CONTRIBUTING.md` | Guidelines for contributing to CHIP |
 | `CONTRIBUTORS.md` | Contributors to CHIP |
 | `docs/` | Documentation |
+| `integrations/` |  Third party integrations related to this project |
+| `integrations/github/` |  GitHub integrations related to this project |
+| `integrations/github/actions` |  GitHub actions related to this project |
 | `images/` | Images |
 | `LICENSE` | CHIP License file (Apache 2.0) |
 | `README.md` | This file |
