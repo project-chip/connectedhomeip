@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This header file includes common private definitions for the Weave system layer.
+ *      This header file includes common private definitions for the CHIP system layer.
  */
 
 #ifndef SYSTEMLAYERPRIVATE_H
@@ -29,7 +28,7 @@
 //
 // Common definitions for the LwIP configuration
 //
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include "lwip/init.h"
 #include "lwip/stats.h"
@@ -43,6 +42,6 @@
 #endif // !defined(MEMP_STATS_GET)
 #endif // LWIP_VERSION_MAJOR
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #endif // defined(SYSTEMLAYERPRIVATE_H)

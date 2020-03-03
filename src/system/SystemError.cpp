@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@
 /**
  *    @file
  *      This file contains free functions for mapping OS and LwIP
- *      stack-specific errors into Weave System Layer-specific errors
+ *      stack-specific errors into CHIP System Layer-specific errors
  *      and for converting those mapped errors into descriptive
  *      error strings.
  */
@@ -33,69 +32,68 @@
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/err.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 #include <string.h>
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
 #include <support/ErrorStr.h>
 #include <support/NLDLLUtil.h>
 
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
 /**
- *  @def WEAVE_SYSTEM_POSIX_ERROR_MIN
+ *  @def CHIP_SYSTEM_POSIX_ERROR_MIN
  *
  *  @brief
- *      This defines the base or minimum Weave System Layer error number range, when passing through errors from an underlying
+ *      This defines the base or minimum CHIP System Layer error number range, when passing through errors from an underlying
  *      POSIX layer.
  */
-#define WEAVE_SYSTEM_POSIX_ERROR_MIN 2000
+#define CHIP_SYSTEM_POSIX_ERROR_MIN 2000
 
 /**
- *  @def WEAVE_SYSTEM_POSIX_ERROR_MAX
+ *  @def CHIP_SYSTEM_POSIX_ERROR_MAX
  *
  *  @brief
- *      This defines the base or maximum Weave System Layer error number range, when passing through errors from an underlying
+ *      This defines the base or maximum CHIP System Layer error number range, when passing through errors from an underlying
  *      POSIX layer.
  */
-#define WEAVE_SYSTEM_POSIX_ERROR_MAX 2999
+#define CHIP_SYSTEM_POSIX_ERROR_MAX 2999
 
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
 
 /**
- *  @def WEAVE_SYSTEM_LWIP_ERROR_MIN
+ *  @def CHIP_SYSTEM_LWIP_ERROR_MIN
  *
  *  @brief
- *      This defines the base or minimum Weave System Layer error number range, when passing through errors from an underlying LWIP
+ *      This defines the base or minimum CHIP System Layer error number range, when passing through errors from an underlying LWIP
  *      stack.
  */
-#ifndef WEAVE_SYSTEM_LWIP_ERROR_MIN
-#define WEAVE_SYSTEM_LWIP_ERROR_MIN 3000
-#endif // WEAVE_SYSTEM_LWIP_ERROR_MIN
+#ifndef CHIP_SYSTEM_LWIP_ERROR_MIN
+#define CHIP_SYSTEM_LWIP_ERROR_MIN 3000
+#endif // CHIP_SYSTEM_LWIP_ERROR_MIN
 
 /**
- *  @def WEAVE_SYSTEM_LWIP_ERROR_MAX
+ *  @def CHIP_SYSTEM_LWIP_ERROR_MAX
  *
  *  @brief
- *      This defines the base or maximum Weave System Layer error number range, when passing through errors from an underlying LWIP
+ *      This defines the base or maximum CHIP System Layer error number range, when passing through errors from an underlying LWIP
  *      layer.
  */
-#ifndef WEAVE_SYSTEM_LWIP_ERROR_MAX
-#define WEAVE_SYSTEM_LWIP_ERROR_MAX 3999
-#endif // WEAVE_SYSTEM_LWIP_ERROR_MAX
+#ifndef CHIP_SYSTEM_LWIP_ERROR_MAX
+#define CHIP_SYSTEM_LWIP_ERROR_MAX 3999
+#endif // CHIP_SYSTEM_LWIP_ERROR_MAX
 
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 /**
@@ -128,33 +126,33 @@ bool FormatSystemLayerError(char * buf, uint16_t bufSize, int32_t err)
 {
     const char * desc = NULL;
 
-    if (err < WEAVE_SYSTEM_ERROR_MIN || err > WEAVE_SYSTEM_ERROR_MAX)
+    if (err < CHIP_SYSTEM_ERROR_MIN || err > CHIP_SYSTEM_ERROR_MAX)
     {
         return false;
     }
 
-#if !WEAVE_CONFIG_SHORT_ERROR_STR
+#if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err)
     {
-    case WEAVE_SYSTEM_ERROR_NOT_IMPLEMENTED                     : desc = "Not implemented"; break;
-    case WEAVE_SYSTEM_ERROR_NOT_SUPPORTED                       : desc = "Not supported"; break;
-    case WEAVE_SYSTEM_ERROR_BAD_ARGS                            : desc = "Bad arguments"; break;
-    case WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE                    : desc = "Unexpected state"; break;
-    case WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT                    : desc = "Unexpected event"; break;
-    case WEAVE_SYSTEM_ERROR_NO_MEMORY                           : desc = "No memory"; break;
-    case WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED                : desc = "Real time not synchronized"; break;
-    case WEAVE_SYSTEM_ERROR_ACCESS_DENIED                       : desc = "Access denied"; break;
+    case CHIP_SYSTEM_ERROR_NOT_IMPLEMENTED                     : desc = "Not implemented"; break;
+    case CHIP_SYSTEM_ERROR_NOT_SUPPORTED                       : desc = "Not supported"; break;
+    case CHIP_SYSTEM_ERROR_BAD_ARGS                            : desc = "Bad arguments"; break;
+    case CHIP_SYSTEM_ERROR_UNEXPECTED_STATE                    : desc = "Unexpected state"; break;
+    case CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT                    : desc = "Unexpected event"; break;
+    case CHIP_SYSTEM_ERROR_NO_MEMORY                           : desc = "No memory"; break;
+    case CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED                : desc = "Real time not synchronized"; break;
+    case CHIP_SYSTEM_ERROR_ACCESS_DENIED                       : desc = "Access denied"; break;
     }
-#endif // !WEAVE_CONFIG_SHORT_ERROR_STR
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
-    nl::FormatError(buf, bufSize, "Sys", err, desc);
+    chip::FormatError(buf, bufSize, "Sys", err, desc);
 
     return true;
 }
 
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 /**
- * This implements a mapping function for Weave System Layer errors that allows mapping integers in the number space of the
+ * This implements a mapping function for CHIP System Layer errors that allows mapping integers in the number space of the
  * underlying POSIX network and OS stack errors into a platform- or system-specific range. Error codes beyond those currently
  * defined by POSIX or the ISO C/C++ standards are mapped similar to the standard ones.
  *
@@ -164,7 +162,7 @@ bool FormatSystemLayerError(char * buf, uint16_t bufSize, int32_t err)
  */
 NL_DLL_EXPORT Error MapErrorPOSIX(int aError)
 {
-    return (aError == 0 ? WEAVE_SYSTEM_NO_ERROR : WEAVE_SYSTEM_POSIX_ERROR_MIN + aError);
+    return (aError == 0 ? CHIP_SYSTEM_NO_ERROR : CHIP_SYSTEM_POSIX_ERROR_MIN + aError);
 }
 
 /**
@@ -177,12 +175,12 @@ NL_DLL_EXPORT Error MapErrorPOSIX(int aError)
  */
 NL_DLL_EXPORT const char *DescribeErrorPOSIX(Error aError)
 {
-    const int lError = (aError - WEAVE_SYSTEM_POSIX_ERROR_MIN);
+    const int lError = (aError - CHIP_SYSTEM_POSIX_ERROR_MIN);
     return strerror(lError);
 }
 
 /**
- * This implements an introspection function for Weave System Layer errors that allows the caller to determine whether the
+ * This implements an introspection function for CHIP System Layer errors that allows the caller to determine whether the
  * specified error is an internal, underlying OS error.
  *
  *  @param[in] err  The mapped error to determine whether it is an OS error.
@@ -191,10 +189,10 @@ NL_DLL_EXPORT const char *DescribeErrorPOSIX(Error aError)
  */
 NL_DLL_EXPORT bool IsErrorPOSIX(Error aError)
 {
-    return (aError >= WEAVE_SYSTEM_POSIX_ERROR_MIN && aError <= WEAVE_SYSTEM_POSIX_ERROR_MAX);
+    return (aError >= CHIP_SYSTEM_POSIX_ERROR_MIN && aError <= CHIP_SYSTEM_POSIX_ERROR_MAX);
 }
 
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
 /**
  * Register a text error formatter for POSIX errors.
@@ -229,7 +227,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
     if (IsErrorPOSIX(sysErr))
     {
         const char * desc =
-#if WEAVE_CONFIG_SHORT_ERROR_STR
+#if CHIP_CONFIG_SHORT_ERROR_STR
                 NULL;
 #else
                 DescribeErrorPOSIX(sysErr);
@@ -243,11 +241,11 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
     }
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
 
 /**
- * This implements a mapping function for Weave System Layer errors that allows mapping underlying LwIP network stack errors into a
+ * This implements a mapping function for CHIP System Layer errors that allows mapping underlying LwIP network stack errors into a
  * platform- or system-specific range.
  *
  *  @param[in] e  The LwIP error to map.
@@ -257,7 +255,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
  */
 NL_DLL_EXPORT Error MapErrorLwIP(err_t aError)
 {
-    return (aError == ERR_OK ? WEAVE_SYSTEM_NO_ERROR : WEAVE_SYSTEM_LWIP_ERROR_MIN - aError);
+    return (aError == ERR_OK ? CHIP_SYSTEM_NO_ERROR : CHIP_SYSTEM_LWIP_ERROR_MIN - aError);
 }
 
 /**
@@ -271,7 +269,7 @@ NL_DLL_EXPORT Error MapErrorLwIP(err_t aError)
  */
 NL_DLL_EXPORT const char* DescribeErrorLwIP(Error aError)
 {
-    const err_t lError = -((aError) - WEAVE_SYSTEM_LWIP_ERROR_MIN);
+    const err_t lError = -((aError) - CHIP_SYSTEM_LWIP_ERROR_MIN);
 
     // If we are not compiling with LWIP_DEBUG asserted, the unmapped
     // local value may go unused.
@@ -282,7 +280,7 @@ NL_DLL_EXPORT const char* DescribeErrorLwIP(Error aError)
 }
 
 /**
- * This implements an introspection function for Weave System Layer errors that
+ * This implements an introspection function for CHIP System Layer errors that
  * allows the caller to determine whether the specified error is an
  * internal, underlying LwIP error.
  *
@@ -293,10 +291,10 @@ NL_DLL_EXPORT const char* DescribeErrorLwIP(Error aError)
  */
 NL_DLL_EXPORT bool IsErrorLwIP(Error aError)
 {
-    return (aError >= WEAVE_SYSTEM_LWIP_ERROR_MIN && aError <= WEAVE_SYSTEM_LWIP_ERROR_MAX);
+    return (aError >= CHIP_SYSTEM_LWIP_ERROR_MIN && aError <= CHIP_SYSTEM_LWIP_ERROR_MAX);
 }
 
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
 
 /**
  * Register a text error formatter for LwIP errors.
@@ -326,17 +324,17 @@ void RegisterLwIPErrorFormatter(void)
  */
 bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err)
 {
-    const Weave::System::Error sysErr = static_cast<Weave::System::Error>(err);
+    const chip::System::Error sysErr = static_cast<chip::System::Error>(err);
 
     if (IsErrorLwIP(sysErr))
     {
         const char * desc =
-#if WEAVE_CONFIG_SHORT_ERROR_STR
+#if CHIP_CONFIG_SHORT_ERROR_STR
                 NULL;
 #else
                 DescribeErrorLwIP(sysErr);
 #endif
-        nl::FormatError(buf, bufSize, "LwIP", err, desc);
+        chip::FormatError(buf, bufSize, "LwIP", err, desc);
         return true;
     }
     else
@@ -345,9 +343,8 @@ bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err)
     }
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip

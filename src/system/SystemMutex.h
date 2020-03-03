@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,20 +32,19 @@
 
 #include <support/NLDLLUtil.h>
 
-#if !WEAVE_SYSTEM_CONFIG_NO_LOCKING
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#if WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 #include <FreeRTOS.h>
 #include <task.h>
 #include <semphr.h>
-#endif // WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 /**
@@ -71,17 +69,17 @@ public:
     void Unlock(void);  /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */
 
 private:
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_mutex_t mPOSIXMutex;
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#if WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 #if (configSUPPORT_STATIC_ALLOCATION == 1)
     StaticSemaphore_t mFreeRTOSSemaphoreObj;
 #endif // (configSUPPORT_STATIC_ALLOCATION == 1)
     volatile SemaphoreHandle_t mFreeRTOSSemaphore;
     volatile int mInitialized;
-#endif // WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
     Mutex(const Mutex&)             /* = delete */;
     Mutex& operator =(const Mutex&) /* = delete */;
@@ -95,7 +93,7 @@ inline Mutex::~Mutex(void)
 {
 }
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 inline void Mutex::Lock(void)
 {
     pthread_mutex_lock(&this->mPOSIXMutex);
@@ -105,19 +103,18 @@ inline void Mutex::Unlock(void)
 {
     pthread_mutex_unlock(&this->mPOSIXMutex);
 }
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#if WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 inline void Mutex::Unlock(void)
 {
     xSemaphoreGive(this->mFreeRTOSSemaphore);
 }
-#endif // WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // !WEAVE_SYSTEM_CONFIG_NO_LOCKING
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 #endif // defined(SYSTEMMUTEX_H)

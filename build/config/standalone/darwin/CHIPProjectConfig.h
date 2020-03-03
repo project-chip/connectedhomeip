@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,13 +16,13 @@
  */
 /**
  *    @file
- *      Alternate Weave project configuration for building standalone without OpenSSL.
+ *      Alternate CHIP project configuration for building standalone without OpenSSL.
  *
  */
-#ifndef WEAVEPROJECTCONFIG_OSX_H
-#define WEAVEPROJECTCONFIG_OSX_H
+#ifndef CHIPPROJECTCONFIG_OSX_H
+#define CHIPPROJECTCONFIG_OSX_H
 
-#include "../WeaveProjectConfig.h"
+#include "../CHIPProjectConfig.h"
 #define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT 0
 
-#endif /* WEAVEPROJECTCONFIG_H */
+#endif /* CHIPPROJECTCONFIG_H */
