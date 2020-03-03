@@ -1,0 +1,21 @@
+name: "Clang Pull Request Tidy"
+description: "clang-lint"
+inputs:
+  files_added:
+    description: "JSON list of files added"
+    required: false
+  files_modified:
+    description: "JSON list of files modified"
+    required: false
+  clang_arguments:
+    description: "Additional arguments to clang-tidy"
+    required: false
+outputs:
+  clang-result:
+    description: "Clang results path"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+branding:
+  color: "blue"
+  icon: "shield"
