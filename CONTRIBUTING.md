@@ -196,7 +196,20 @@ your development branch and update.
 
 #### Code reviews
 
-All submissions, including submissions by project members, require review. 
+All submissions, including submissions by project members, require 3 reviews to be accepted from different member companies.
+
+#### Merge Requirements
+
+* At least 3 review approvals each from different member companies
+* [GitHub Workflows](../.github/workflows) pass 
+* [Certification Tests](tests/certification/README.md) pass 
+* [Unit Tests](tests/unit/README.md) pass
+* [Fuzz Tests](tests/fuzz/README.md) pass
+* [Integration Tests](tests/integration/README.md) pass
+* Linting passes
+* Code style passes
+
+**When can I merge?** After these have been satisfied, any reviewer, or the originator can merge the PR into master.
 
 ### Documentation
 
