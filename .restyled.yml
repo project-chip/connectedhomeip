@@ -1,0 +1,24 @@
+---
+image: restyled/restyler-clang-format:v9.0.0
+command:
+  - clang-format
+  - "-i"
+arguments: []
+include:
+  - "**/*.c"
+  - "**/*.cc"
+  - "**/*.cpp"
+  - "**/*.cxx"
+  - "**/*.c++"
+  - "**/*.C"
+  - "**/*.cs"
+  - "**/*.h"
+  - "**/*.hh"
+  - "**/*.hpp"
+  - "**/*.hxx"
+  - "**/*.h++"
+  - "**/*.H"
+  - "**/*.java"
+  - "**/*.js"
+  - "**/*.m"
+interpreters: []
