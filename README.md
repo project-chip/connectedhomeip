@@ -12,8 +12,8 @@ Additional build information can also be found in [BUILDING.md](./BUILDING.md).
 # Need help?
 
 There are numerous avenues for CHIP support:
-* Bugs and feature requests — [submit to the Issue Tracker](https://github.com/project-chip/connectedhomeip/issues)
-* Stack Overflow — [post questions using the chip tag](http://stackoverflow.com/questions/tagged/chip)
+* Bugs and feature requests [submit to the Issue Tracker](https://github.com/project-chip/connectedhomeip/issues)
+* Stack Overflow [post questions using the chip tag](http://stackoverflow.com/questions/tagged/chip)
 
 # Directory Structure
 

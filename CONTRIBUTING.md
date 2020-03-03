@@ -8,8 +8,21 @@ community, and agree by submitting the patch that your contributions are license
 [Apache 2.0 license](./LICENSE.md).
 
 Before submitting the pull request, please make sure you have tested your changes and that they follow the project
-[guidelines for contributing code](./docs/contribution_guidelines.md).
+[guidelines for contributing code](./docs/CONTRIBUTION_GUIDELINES.md).
 
+
+## Becoming a Member
+
+Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip/connectedhomeip.git)
+* Must be a member of the Zigbee Alliance CHIP TSG Working Group
+* Have signed the Zigbee CHIP WG CLA
+
+## Becoming a Contributor
+
+Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip/connectedhomeip.git)
+* Must be a member of the Zigbee Alliance CHIP TSG Working Group
+* Have signed the Zigbee CHIP WG CLA
+* Agree to the code of conduct
 
 ## Bugs
 
