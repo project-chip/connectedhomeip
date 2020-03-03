@@ -1,0 +1,23 @@
+name: Tidy
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get changed files
+        id: get-changed-files
+        uses: futuratrepadeira/changed-files@v3.0.0
+        with:
+          repo-token: ${{ github.token }}
+      - name: clang-tidy
+        uses: ./actions/clang-tidy
+        id: clang-tidy
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CLANG_ARGUMENTS: "-checks=-*,clang-analyzer-*,-clang-analyzer-cplusplus* -- -Isrc/includes"
+          FILES_MODIFIED: ${{ steps.get-changed-files.outputs.files_updated }}
+          FILES_ADDED: ${{ steps.get-changed-files.outputs.files_created }}
