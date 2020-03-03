@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,15 +17,15 @@
 
 /**
  *    @file
- *      Weave::System project configuration for standalone builds on Linux and OS X.
+ *      chip::System project configuration for standalone builds on Linux and OS X.
  *
  */
 #ifndef SYSTEMPROJECTCONFIG_H
 #define SYSTEMPROJECTCONFIG_H
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-// Uncomment this for larger buffers (e.g. to support a bigger WEAVE_CONFIG_TUNNEL_INTERFACE_MTU).
-//#define WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX 9050
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+// Uncomment this for larger buffers (e.g. to support a bigger CHIP_CONFIG_TUNNEL_INTERFACE_MTU).
+//#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX 9050
 #endif
 
 #endif /* SYSTEMPROJECTCONFIG_H */

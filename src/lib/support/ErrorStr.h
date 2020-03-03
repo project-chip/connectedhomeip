@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@
 /**
  *    @file
  *      This file defines functions to translate error codes and status reports
- *      used throughout the Weave package into human-readable strings.
+ *      used throughout the CHIP package into human-readable strings.
  *
  */
 
@@ -30,7 +29,7 @@
 
 #include <support/NLDLLUtil.h>
 
-namespace nl {
+namespace chip {
 
 struct ErrorFormatter
 {
@@ -46,6 +45,6 @@ extern void FormatError(char * buf, uint16_t bufSize, const char * subsys, int32
 
 extern const char * StatusReportStr(uint32_t profileId, uint16_t statusCode);
 
-} // namespace nl
+} // namespace chip
 
 #endif /* ERRORSTR_H_ */

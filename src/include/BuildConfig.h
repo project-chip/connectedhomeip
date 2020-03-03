@@ -1,38 +1,38 @@
 /* src/include/BuildConfig.h.  Generated from BuildConfig.h.in by configure.  */
 /* src/include/BuildConfig.h.in.  Generated from configure.ac by autoheader.  */
 
-#ifndef WEAVE_BUILD_CONFIG_H
-#define WEAVE_BUILD_CONFIG_H
+#ifndef CHIP_BUILD_CONFIG_H
+#define CHIP_BUILD_CONFIG_H
 
 /* Path to BLE platform config header file */
 /* #undef BLE_PLATFORM_CONFIG_INCLUDE */
 
-/* Path to Weave BLE Layer platform config header file */
+/* Path to CHIP BLE Layer platform config header file */
 #define BLE_PROJECT_CONFIG_INCLUDE <BleProjectConfig.h>
 
 /* Define to 1 if you want to enable WoBle over bluez. */
 #define CONFIG_BLE_PLATFORM_BLUEZ 0
 
-/* Define to 1 if you want to use the OpenWeave Device Layer. */
+/* Define to 1 if you want to use the CHIP Device Layer. */
 #define CONFIG_DEVICE_LAYER 0
 
-/* Define to 1 if you want to use Weave with a system that supports
+/* Define to 1 if you want to use CHIP with a system that supports
    callback-based vcbprintf */
 #define CONFIG_HAVE_VCBPRINTF 0
 
-/* Define to 1 if you want to use Weave with a system that supports
+/* Define to 1 if you want to use CHIP with a system that supports
    callback-based vcbprintf */
 #define CONFIG_HAVE_VSNPRINTF_EX 0
 
-/* Define to 1 if you want to use Weave with the Bluetooth Low Energy network
+/* Define to 1 if you want to use CHIP with the Bluetooth Low Energy network
    stack. */
 #define CONFIG_NETWORK_LAYER_BLE 1
 
-/* Define to 1 if you want to use Weave with the Internet Protocol network
+/* Define to 1 if you want to use CHIP with the Internet Protocol network
    stack. */
 #define CONFIG_NETWORK_LAYER_INET 1
 
-/* Weave target network stack(s) */
+/* CHIP target network stack(s) */
 #define CONFIG_TARGET_NETWORKS "sockets"
 
 /* Define to 1 if your C++ compiler doesn't accept -c and -o together. */
@@ -329,31 +329,31 @@
 /* Define to 1 for enabling UDP Endpoint */
 #define INET_CONFIG_ENABLE_UDP_ENDPOINT 1
 
-/* Weave target inet network endpoint(s) */
+/* CHIP target inet network endpoint(s) */
 #define INET_ENDPOINTS "all"
 
 /* Path to Inet Layer platform config header file */
 /* #undef INET_PLATFORM_CONFIG_INCLUDE */
 
-/* Path to Weave Inet Layer platform config header file */
+/* Path to CHIP Inet Layer platform config header file */
 /* #undef INET_PROJECT_CONFIG_INCLUDE */
 
-/* Define to 1 if you want to use Weave with the inet dns resolver. */
+/* Define to 1 if you want to use CHIP with the inet dns resolver. */
 #define INET_WANT_ENDPOINT_DNS 1
 
-/* Define to 1 if you want to use Weave with the inet raw endpoint. */
+/* Define to 1 if you want to use CHIP with the inet raw endpoint. */
 #define INET_WANT_ENDPOINT_RAW 1
 
-/* Define to 1 if you want to use Weave with the inet tcp endpoint. */
+/* Define to 1 if you want to use CHIP with the inet tcp endpoint. */
 #define INET_WANT_ENDPOINT_TCP 1
 
-/* Define to 1 if you want to use Weave with the inet tun endpoint. */
+/* Define to 1 if you want to use CHIP with the inet tun endpoint. */
 #define INET_WANT_ENDPOINT_TUN 0
 
-/* Define to 1 if you want to use Weave with the inet udp endpoint. */
+/* Define to 1 if you want to use CHIP with the inet udp endpoint. */
 #define INET_WANT_ENDPOINT_UDP 1
 
-/* Define to 1 if you want to use Weave with IPv4. */
+/* Define to 1 if you want to use CHIP with IPv4. */
 #define INET_WANT_IPV4 1
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
@@ -363,19 +363,19 @@
 /* #undef NO_MINUS_C_MINUS_O */
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "weave.support@nestlabs.com"
+#define PACKAGE_BUGREPORT "support@chipsupport.tbd"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "Weave"
+#define PACKAGE_NAME "CHIP"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "Weave gea435d2c"
+#define PACKAGE_STRING "CHIP gea435d2c"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "weave"
+#define PACKAGE_TARNAME "chip"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL "https://developer.nest.com/"
+#define PACKAGE_URL "https://tbd.developer.chip.com/"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "gea435d2c"
@@ -393,7 +393,7 @@
 /* Path to System Layer platform config header file */
 /* #undef SYSTEM_PLATFORM_CONFIG_INCLUDE */
 
-/* Path to Weave System Layer platform config header file */
+/* Path to CHIP System Layer platform config header file */
 #define SYSTEM_PROJECT_CONFIG_INCLUDE <SystemProjectConfig.h>
 
 /* Path to WARM platform config header file */
@@ -403,92 +403,92 @@
 /* #undef WARM_PROJECT_CONFIG_INCLUDE */
 
 /* Define custom schema directory */
-/* #undef WEAVE_CONFIG_CUSTOM_BUILTIN_SCHEMA_INCLUDE */
+/* #undef CHIP_CONFIG_CUSTOM_BUILTIN_SCHEMA_INCLUDE */
 
 /* Define to 1 to use the legacy WDM profile. */
-#define WEAVE_CONFIG_LEGACY_WDM 1
+#define CHIP_CONFIG_LEGACY_WDM 1
 
-/* Define to 1 for enabling Weave Tunnel failover */
-/* #undef WEAVE_CONFIG_TUNNEL_FAILOVER_SUPPORTED */
+/* Define to 1 for enabling CHIP Tunnel failover */
+/* #undef CHIP_CONFIG_TUNNEL_FAILOVER_SUPPORTED */
 
-/* Target platform name for OpenWeave Device Layer. */
-#define WEAVE_DEVICE_LAYER_TARGET NONE
+/* Target platform name for CHIP Device Layer. */
+#define CHIP_DEVICE_LAYER_TARGET NONE
 
-/* Define to 1 if you want to build the OpenWeave Device Layer for Silicon
+/* Define to 1 if you want to build the CHIP Device Layer for Silicon
    Labs EFR32 platforms. */
-#define WEAVE_DEVICE_LAYER_TARGET_EFR32 0
+#define CHIP_DEVICE_LAYER_TARGET_EFR32 0
 
-/* Define to 1 if you want to build the OpenWeave Device Layer for the
+/* Define to 1 if you want to build the CHIP Device Layer for the
    Espressif ESP32. */
-#define WEAVE_DEVICE_LAYER_TARGET_ESP32 0
+#define CHIP_DEVICE_LAYER_TARGET_ESP32 0
 
-/* Define to 1 if you want to build the OpenWeave Device Layer for Nordic
+/* Define to 1 if you want to build the CHIP Device Layer for Nordic
    nRF5* platforms. */
-#define WEAVE_DEVICE_LAYER_TARGET_NRF5 0
+#define CHIP_DEVICE_LAYER_TARGET_NRF5 0
 
-/* Path to Weave Device Layer platform config header file */
-/* #undef WEAVE_DEVICE_PLATFORM_CONFIG_INCLUDE */
+/* Path to CHIP Device Layer platform config header file */
+/* #undef CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE */
 
-/* Path to Weave Device Layer platform config header file */
-/* #undef WEAVE_DEVICE_PROJECT_CONFIG_INCLUDE */
+/* Path to CHIP Device Layer platform config header file */
+/* #undef CHIP_DEVICE_PROJECT_CONFIG_INCLUDE */
 
 /* Define to 1 if you want to enable WoBle Control Path and Throughput Test.
    */
-#define WEAVE_ENABLE_WOBLE_TEST 0
+#define CHIP_ENABLE_WOBLE_TEST 0
 
 /* Define to 1 if support for fuzzing enabled */
-/* #undef WEAVE_FUZZING_ENABLED */
+/* #undef CHIP_FUZZING_ENABLED */
 
-/* Weave logging style */
-#define WEAVE_LOGGING_STYLE stdio
+/* CHIP logging style */
+#define CHIP_LOGGING_STYLE stdio
 
-/* Define to 1 if you want to use Weave with the Android logging system */
-#define WEAVE_LOGGING_STYLE_ANDROID 0
+/* Define to 1 if you want to use CHIP with the Android logging system */
+#define CHIP_LOGGING_STYLE_ANDROID 0
 
-/* Define to 1 if you want to use Weave with an external (i.e. platform- and
+/* Define to 1 if you want to use CHIP with an external (i.e. platform- and
    integrator-defined) logging system */
-#define WEAVE_LOGGING_STYLE_EXTERNAL 0
+#define CHIP_LOGGING_STYLE_EXTERNAL 0
 
-/* Define to 1 if you want to use Weave with a C Standard I/O Library-based
+/* Define to 1 if you want to use CHIP with a C Standard I/O Library-based
    logging system */
-#define WEAVE_LOGGING_STYLE_STDIO 1
+#define CHIP_LOGGING_STYLE_STDIO 1
 
-/* Define to 1 if you want to use Weave with a C Standard I/O Library-based
+/* Define to 1 if you want to use CHIP with a C Standard I/O Library-based
    logging system,but override, at link-time an external (i.e. platform- and
    integrator-defined) logging system */
-#define WEAVE_LOGGING_STYLE_STDIO_WEAK 0
+#define CHIP_LOGGING_STYLE_STDIO_WEAK 0
 
-/* Define to 1 if you want to use Weave with a C Standard I/O Library-based
+/* Define to 1 if you want to use CHIP with a C Standard I/O Library-based
    logging system with timestamped log entries */
-#define WEAVE_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS 0
+#define CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS 0
 
-/* Path to Weave platform config header file */
-/* #undef WEAVE_PLATFORM_CONFIG_INCLUDE */
+/* Path to CHIP platform config header file */
+/* #undef CHIP_PLATFORM_CONFIG_INCLUDE */
 
-/* Path to Weave Core platform config header file */
-#define WEAVE_PROJECT_CONFIG_INCLUDE <WeaveProjectConfig.h>
+/* Path to CHIP Core platform config header file */
+#define CHIP_PROJECT_CONFIG_INCLUDE <CHIPProjectConfig.h>
 
-/* Define to 1 if you want to use LwIP with Weave System Layer. */
-#define WEAVE_SYSTEM_CONFIG_USE_LWIP 0
+/* Define to 1 if you want to use LwIP with CHIP System Layer. */
+#define CHIP_SYSTEM_CONFIG_USE_LWIP 0
 
-/* Define to 1 if you want to use BSD sockets with Weave System Layer. */
-#define WEAVE_SYSTEM_CONFIG_USE_SOCKETS 1
+/* Define to 1 if you want to use BSD sockets with CHIP System Layer. */
+#define CHIP_SYSTEM_CONFIG_USE_SOCKETS 1
 
-/* Weave target style */
-#define WEAVE_TARGET_STYLE unix
+/* CHIP target style */
+#define CHIP_TARGET_STYLE unix
 
-/* Define to 1 if you want to use Weave with an embedded (i.e. non-Unix-based)
+/* Define to 1 if you want to use CHIP with an embedded (i.e. non-Unix-based)
    system */
-#define WEAVE_TARGET_STYLE_EMBEDDED 0
+#define CHIP_TARGET_STYLE_EMBEDDED 0
 
-/* Define to 1 if you want to use Weave with a Unix-based system */
-#define WEAVE_TARGET_STYLE_UNIX 1
+/* Define to 1 if you want to use CHIP with a Unix-based system */
+#define CHIP_TARGET_STYLE_UNIX 1
 
-/* Define to 1 to build Weave with nlFaultInjection features */
-#define WEAVE_WITH_NLFAULTINJECTION 1
+/* Define to 1 to build CHIP with nlFaultInjection features */
+#define CHIP_WITH_NLFAULTINJECTION 1
 
-/* Define to 1 to build Weave with OpenSSL features */
-#define WEAVE_WITH_OPENSSL 1
+/* Define to 1 to build CHIP with OpenSSL features */
+#define CHIP_WITH_OPENSSL 1
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
@@ -537,4 +537,4 @@
    such a type exists and the standard includes do not define it. */
 /* #undef uint8_t */
 
-#endif // WEAVE_BUILD_CONFIG_H
+#endif // CHIP_BUILD_CONFIG_H

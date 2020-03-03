@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,13 +27,12 @@
 // Include common private header
 #include "SystemLayerPrivate.h"
 
-#if !WEAVE_SYSTEM_CONFIG_NO_LOCKING
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 // Include system headers
 #include <errno.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 /**
@@ -42,12 +40,12 @@ namespace System {
  *
  *  @param[inout]   aThis   A zero-initialized object.
  *
- *  @retval         #WEAVE_SYSTEM_NO_ERROR                  The mutual exclusion lock is ready to use.
- *  @retval         #WEAVE_SYSTEM_ERROR_NO_MEMORY           Insufficient system memory to allocate the mutual exclusion lock.
- *  @retval         #WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE    An unexpected system error encountered during initialization.
+ *  @retval         #CHIP_SYSTEM_NO_ERROR                  The mutual exclusion lock is ready to use.
+ *  @retval         #CHIP_SYSTEM_ERROR_NO_MEMORY           Insufficient system memory to allocate the mutual exclusion lock.
+ *  @retval         #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE    An unexpected system error encountered during initialization.
  */
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 NL_DLL_EXPORT Error Mutex::Init(Mutex& aThis)
 {
     int lSysError = pthread_mutex_init(&aThis.mPOSIXMutex, NULL);
@@ -56,23 +54,23 @@ NL_DLL_EXPORT Error Mutex::Init(Mutex& aThis)
     switch (lSysError)
     {
     case 0:
-        lError = WEAVE_SYSTEM_NO_ERROR;
+        lError = CHIP_SYSTEM_NO_ERROR;
         break;
 
     case ENOMEM:
-        lError = WEAVE_SYSTEM_ERROR_NO_MEMORY;
+        lError = CHIP_SYSTEM_ERROR_NO_MEMORY;
         break;
 
     default:
-        lError = WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE;
+        lError = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
         break;
     }
 
     return lError;
 }
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#if WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 NL_DLL_EXPORT Error Mutex::Init(Mutex& aThis)
 {
 restart:
@@ -87,7 +85,7 @@ restart:
         {
             aThis.mInitialized = 0;
 
-            return WEAVE_SYSTEM_ERROR_NO_MEMORY;
+            return CHIP_SYSTEM_ERROR_NO_MEMORY;
         }
     } else {
         while (aThis.mFreeRTOSSemaphore == NULL)
@@ -101,17 +99,16 @@ restart:
         }
     }
 
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 NL_DLL_EXPORT void Mutex::Lock(void)
 {
     xSemaphoreTake(this->mFreeRTOSSemaphore, portMAX_DELAY);
 }
-#endif // WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // !WEAVE_SYSTEM_CONFIG_NO_LOCKING
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
