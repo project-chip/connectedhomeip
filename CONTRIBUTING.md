@@ -8,7 +8,22 @@ community, and agree by submitting the patch that your contributions are license
 [Apache 2.0 license](./LICENSE.md).
 
 Before submitting the pull request, please make sure you have tested your changes and that they follow the project
-[guidelines for contributing code](./docs/contribution_guidelines.md).
+[guidelines for contributing code](./docs/CONTRIBUTION_GUIDELINES.md).
+
+
+## Becoming a Member
+
+Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip/connectedhomeip.git)
+* Must be a member of the Zigbee Alliance CHIP TSG Working Group
+* Have signed the Zigbee CHIP WG CLA
+
+## Becoming a Contributor
+
+Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip/connectedhomeip.git)
+* Must be a member of the Zigbee Alliance CHIP TSG Working Group
+* Have signed the Zigbee CHIP WG CLA
+* Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
+* Agree to the [License](./LICENSE)
 
 
 ## Bugs
@@ -159,17 +174,19 @@ CHIP considers there to be a few different types of pull requests:
 - Linting passes
 - Code style passes
 
+### Review Requirements
 Each type of change has unique additional requirements, here's a table of those:
+
 | Type | Reviewer Requirements | New Unit Tests | New Certification Tests | New Fuzz Tests | New Integration Tests |
 |----|----|----|----|----|----|
-| Trivial bug fix | | | | | |
-| Small Bug fix |  | | | | | |
-| Bug Fix |  | | | | | |
-| Significiant Change |  | | | | | |
-| Feature |  | | | | | |
-| Architecture Change |  | | | | | |
+| Trivial bug fix | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Small Bug fix | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Bug Fix | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Significiant Change | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Feature | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Architecture Change | 3 [approved reviewers](./REVIEWERS.md) | | | | |
 
-
+Note: Where multiple reviewers are required, each reviewer must be from a different member company.
 
 #### Submit Pull Request
 
@@ -179,9 +196,18 @@ button. If you need to make any adjustments to your pull request, just push the
 updates to GitHub. Your pull request will automatically track the changes on
 your development branch and update.
 
-#### Code reviews
+#### Merge Requirements
 
-All submissions, including submissions by project members, require review. 
+* Passes [Review Requirements](#review-requirements)
+* [GitHub Workflows](../.github/workflows) pass 
+* [Certification Tests](tests/certification/README.md) pass 
+* [Unit Tests](tests/unit/README.md) pass
+* [Fuzz Tests](tests/fuzz/README.md) pass
+* [Integration Tests](tests/integration/README.md) pass
+* Linting passes
+* Code style passes
+
+**When can I merge?** After these have been satisfied, any reviewer, or the originator can merge the PR into master.
 
 ### Documentation
 
