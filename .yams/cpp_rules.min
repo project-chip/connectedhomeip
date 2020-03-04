@@ -1,3 +1,4 @@
+_@=@
 Common_C_Flags = -DHAVE_CONFIG_H -g -O2
 
 Module_C_Flags += $(Common_C_Flags) $(Module_Includes)
@@ -28,54 +29,66 @@ ifdef CLANG_FORMAT
 	CLANG_FORMAT += -style=Chromium -i
 endif
 
+
 GCOV := $(shell command -v gcov 2> /dev/null)
 
+ifdef GCOV
+        GCOV_FLAGS=-fprofile-arcs -ftest-coverage
+endif
+
 %.o: %.c
-	@$(CC) $(Module_C_Flags) -c $< -o $@
+	$(_@)$(CC) $(Module_C_Flags) -c $< -o $@
 ifdef CPPCHECK
-	@$(CPPCHECK) $(Module_Includes) $<
+	$(_@)$(CPPCHECK) $(Module_Includes) $<
 endif
 	@echo "CC  <=  $<"
 
 %.o: %.cpp
-	@$(CXX) $(Module_C_Flags) -c $< -o $@
+	$(_@)$(CXX) $(Module_C_Flags) -c $< -o $@
 ifdef CPPCHECK
-	@$(CPPCHECK) $(Module_Includes) $<
+	$(_@)$(CPPCHECK) $(Module_Includes) $<
 endif
 	@echo "CXX  <=  $<"
 
 $(Test_Dir)/%_q: $(Test_Dir)/%.c
 ifdef CLANG_FORMAT
-	@$(CLANG_FORMAT) $<
+	$(_@)$(CLANG_FORMAT) $<
 endif
-	@$(CC) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) -fprofile-arcs -ftest-coverage
+	$(_@)$(CC) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) $(GCOV_FLAGS)
 ifdef CPPCHECK
-	@$(CPPCHECK) $(Module_Test_Includes) $($(*F)_Inc_FLAGS) $<
+	$(_@)$(CPPCHECK) $(Module_Test_Includes) $($(*F)_Inc_FLAGS) $<
+endif
+ifdef GCOV
+	$(_@)mv $(*F).gc* $(Test_Dir)
 endif
 	@echo "Building tests <=  $<"
 
 $(Test_Dir)/%_q: $(Test_Dir)/%.cpp
 ifdef CLANG_FORMAT
-	@$(CLANG_FORMAT) $<
+	$(_@)$(CLANG_FORMAT) $<
 endif
-	@$(CXX) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) -fprofile-arcs -ftest-coverage
+	$(_@)$(CXX) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) $(GCOV_FLAGS)
 ifdef CPPCHECK
-	@$(CPPCHECK) $(Module_Test_Includes) $($(*F)_Inc_FLAGS) $<
+	$(_@)$(CPPCHECK) $(Module_Test_Includes) $($(*F)_Inc_FLAGS) $<
+endif
+ifdef GCOV
+	$(_@)mv $(*F).gc* $(Test_Dir)
 endif
 	@echo "Building tests <=  $<"
 
 run_tests: $(Tests_C_Exe) $(Tests_CPP_Exe)
 	@echo "Running tests <=  $<"
-	@$(foreach f,$^,$(VALGRIND) ./$(f);)
+	$(_@)$(foreach f,$^,$(VALGRIND) ./$(f);)
 ifneq ($(and $(GCOV),$(Tests_C_Files)),)
-	@$(GCOV) $(notdir $(Tests_C_Files))
+	$(_@)$(GCOV) $(notdir $(Tests_C_Files))
 endif
 ifneq ($(and $(GCOV),$(Tests_CPP_Files)),)
-	@$(GCOV) $(notdir $(Tests_CPP_Files))
+	$(_@)$(GCOV) $(notdir $(Tests_CPP_Files))
 endif
 
 my_clean:
-	@rm -f $(C_Objects) $(CPP_Objects)
-	@rm -f *.gcda *.gcno *.gcov
-	@rm -f $(Tests_C_Exe) $(Tests_CPP_Exe) $(Test_Dir)/*.gcda $(Test_Dir)/*.gcno $(Test_Dir)/*.gcov
-	@rm -rf $(Test_Dir)/*.dSYM
+	$(_@)rm -f $(C_Objects) $(CPP_Objects)
+	$(_@)rm -f *.gcda *.gcno *.gcov
+	$(_@)rm -f $(Tests_C_Exe) $(Tests_CPP_Exe) $(Test_Dir)/*.gcda $(Test_Dir)/*.gcno $(Test_Dir)/*.gcov
+	$(_@)rm -rf $(Test_Dir)/*.dSYM
+
