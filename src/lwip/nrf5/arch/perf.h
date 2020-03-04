@@ -1,6 +1,5 @@
 /*
- *    Copyright (c) 2018-2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,10 +23,10 @@
  *
  */
 
-#ifndef NL_LWIP_FREERTOS_ARCH_PERF_H
-#define NL_LWIP_FREERTOS_ARCH_PERF_H
+#ifndef CHIP_LWIP_FREERTOS_ARCH_PERF_H
+#define CHIP_LWIP_FREERTOS_ARCH_PERF_H
 
 #define PERF_START
 #define PERF_STOP(s)
 
-#endif /* NL_LWIP_FREERTOS_ARCH_PERF_H */
+#endif /* CHIP_LWIP_FREERTOS_ARCH_PERF_H */

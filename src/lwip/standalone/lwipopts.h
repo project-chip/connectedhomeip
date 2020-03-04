@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    Copyright (c) 2014-2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -47,7 +45,7 @@
  * MEM_SIZE: specify bigger memory size to pass LwIP-internal unit tests
  * (only needed when building tests)
  */
-#ifdef NL_WEAVE_WITH_TESTS
+#ifdef CHIP_WITH_TESTS
 #define MEM_SIZE                       (16000)
 #endif
 

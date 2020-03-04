@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef NL_LWIP_FREERTOS_ARCH_CC_H
-#define NL_LWIP_FREERTOS_ARCH_CC_H
+#ifndef CHIP_LWIP_FREERTOS_ARCH_CC_H
+#define CHIP_LWIP_FREERTOS_ARCH_CC_H
 
 #include <errno.h>
 #include <malloc.h>
@@ -71,4 +71,4 @@ extern uint8_t __attribute__((section(".bss.lwip_SYS_TIMEOUT"))) memp_memory_SYS
 }
 #endif
 
-#endif /* NL_LWIP_FREERTOS_ARCH_CC_H */
+#endif /* CHIP_LWIP_FREERTOS_ARCH_CC_H */

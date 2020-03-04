@@ -1,6 +1,5 @@
 /*
- *    Copyright (c) 2018-2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,8 +20,8 @@
  *
  */
 
-#ifndef NL_LWIP_FREERTOS_ARCH_SYS_ARCH_H
-#define NL_LWIP_FREERTOS_ARCH_SYS_ARCH_H
+#ifndef CHIP_LWIP_FREERTOS_ARCH_SYS_ARCH_H
+#define CHIP_LWIP_FREERTOS_ARCH_SYS_ARCH_H
 
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -57,4 +56,4 @@ typedef UBaseType_t sys_prot_t;
 #define sys_profile_interval_set_pbuf_highwatermark(...)
 
 
-#endif /* NL_LWIP_FREERTOS_ARCH_SYS_ARCH_H */
+#endif /* CHIP_LWIP_FREERTOS_ARCH_SYS_ARCH_H */
