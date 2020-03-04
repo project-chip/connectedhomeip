@@ -1,6 +1,6 @@
 # Connected Home over IP
 
-![C/C++ CI](https://github.com/SalixSepulcralis/connectedhomeip/workflows/World%20Build/badge.svg)
+![C/C++ CI](https://github.com/project-chip/connectedhomeip/workflows/World%20Build/badge.svg)
 <img src="images/logo.svg" width="200px" align="right">
 
 # Getting started with CHIP
