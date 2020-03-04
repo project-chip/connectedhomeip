@@ -1,6 +1,5 @@
 /*
- *    Copyright (c) 2018-2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,8 +23,8 @@
  *
  */
 
-#ifndef NL_LWIP_FREERTOS_ARCH_CC_H
-#define NL_LWIP_FREERTOS_ARCH_CC_H
+#ifndef CHIP_LWIP_FREERTOS_ARCH_CC_H
+#define CHIP_LWIP_FREERTOS_ARCH_CC_H
 
 #include <errno.h>
 #include <malloc.h>
@@ -89,4 +88,4 @@ extern uint8_t __attribute__((section(".bss.lwip_SYS_TIMEOUT"))) memp_memory_SYS
 }
 #endif
 
-#endif /* NL_LWIP_FREERTOS_ARCH_CC_H */
+#endif /* CHIP_LWIP_FREERTOS_ARCH_CC_H */

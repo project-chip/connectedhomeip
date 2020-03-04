@@ -1,8 +1,7 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
- *
+ *    <COPYRIGHT>
+ * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -87,7 +86,7 @@
 #define LWIP_ND6_MAX_NEIGHBOR_ADVERTISEMENT (0)
 #define LWIP_ND6_TCP_REACHABILITY_HINTS (0)
 
-#ifdef OPENWEAVE_CONFIG_EFR32MG21_PBUF_POOLS
+#ifdef CHIP_CONFIG_EFR32MG21_PBUF_POOLS
 #define MEMP_SEPARATE_POOLS (1)
 #define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
 #define MEMP_USE_CUSTOM_POOLS (0)
