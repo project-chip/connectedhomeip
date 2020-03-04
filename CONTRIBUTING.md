@@ -174,17 +174,19 @@ CHIP considers there to be a few different types of pull requests:
 - Linting passes
 - Code style passes
 
+### Review Requirements
 Each type of change has unique additional requirements, here's a table of those:
+
 | Type | Reviewer Requirements | New Unit Tests | New Certification Tests | New Fuzz Tests | New Integration Tests |
 |----|----|----|----|----|----|
-| Trivial bug fix | | | | | |
-| Small Bug fix |  | | | | | |
-| Bug Fix |  | | | | | |
-| Significiant Change |  | | | | | |
-| Feature |  | | | | | |
-| Architecture Change |  | | | | | |
+| Trivial bug fix | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Small Bug fix | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Bug Fix | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Significiant Change | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Feature | 3 [approved reviewers](./REVIEWERS.md) | | | | |
+| Architecture Change | 3 [approved reviewers](./REVIEWERS.md) | | | | |
 
-
+Note: Where multiple reviewers are required, each reviewer must be from a different member company.
 
 #### Submit Pull Request
 
@@ -194,13 +196,9 @@ button. If you need to make any adjustments to your pull request, just push the
 updates to GitHub. Your pull request will automatically track the changes on
 your development branch and update.
 
-#### Code reviews
-
-All submissions, including submissions by project members, require 3 reviews to be accepted from different member companies.
-
 #### Merge Requirements
 
-* At least 3 review approvals each from different member companies
+* Passes [Review Requirements](#review-requirements)
 * [GitHub Workflows](../.github/workflows) pass 
 * [Certification Tests](tests/certification/README.md) pass 
 * [Unit Tests](tests/unit/README.md) pass
