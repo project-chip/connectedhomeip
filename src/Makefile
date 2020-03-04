@@ -1,0 +1,9 @@
+TOPTARGETS := all clean run_tests
+
+SUBDIRS = lwip
+
+$(TOPTARGETS): $(SUBDIRS)
+$(SUBDIRS):
+		$(MAKE) -C $@ $(MAKECMDGOALS)
+
+.PHONY: $(TOPTARGETS) $(SUBDIRS)
