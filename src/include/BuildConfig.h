@@ -7,9 +7,6 @@
 /* Path to BLE platform config header file */
 /* #undef BLE_PLATFORM_CONFIG_INCLUDE */
 
-/* Path to CHIP BLE Layer platform config header file */
-#define BLE_PROJECT_CONFIG_INCLUDE <BleProjectConfig.h>
-
 /* Define to 1 if you want to enable WoBle over bluez. */
 #define CONFIG_BLE_PLATFORM_BLUEZ 0
 
