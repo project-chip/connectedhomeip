@@ -30,7 +30,7 @@
 // Include dependent headers
 #include <SystemError.h>
 
-#include <support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
@@ -57,7 +57,7 @@ namespace System {
  *      storage duration and uninitialized memory. Use \c Init method to initialize. The copy/move operators are not provided.
  *
  */
-class NL_DLL_EXPORT Mutex
+class DLL_EXPORT Mutex
 {
 public:
     Mutex(void);
