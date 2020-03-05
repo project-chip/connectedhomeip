@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 
-#include <support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
 namespace chip {
 

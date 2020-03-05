@@ -41,7 +41,7 @@
 #endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
 #include <support/ErrorStr.h>
-#include <support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
@@ -160,7 +160,7 @@ bool FormatSystemLayerError(char * buf, uint16_t bufSize, int32_t err)
  *
  *  @return The mapped POSIX network or OS error.
  */
-NL_DLL_EXPORT Error MapErrorPOSIX(int aError)
+DLL_EXPORT Error MapErrorPOSIX(int aError)
 {
     return (aError == 0 ? CHIP_SYSTEM_NO_ERROR : CHIP_SYSTEM_POSIX_ERROR_MIN + aError);
 }
@@ -173,7 +173,7 @@ NL_DLL_EXPORT Error MapErrorPOSIX(int aError)
  *
  *  @return A NULL-terminated, OS-specific descriptive C string describing the error.
  */
-NL_DLL_EXPORT const char *DescribeErrorPOSIX(Error aError)
+DLL_EXPORT const char *DescribeErrorPOSIX(Error aError)
 {
     const int lError = (aError - CHIP_SYSTEM_POSIX_ERROR_MIN);
     return strerror(lError);
@@ -187,7 +187,7 @@ NL_DLL_EXPORT const char *DescribeErrorPOSIX(Error aError)
  *
  *  @return True if the specified error is an OS error; otherwise, false.
  */
-NL_DLL_EXPORT bool IsErrorPOSIX(Error aError)
+DLL_EXPORT bool IsErrorPOSIX(Error aError)
 {
     return (aError >= CHIP_SYSTEM_POSIX_ERROR_MIN && aError <= CHIP_SYSTEM_POSIX_ERROR_MAX);
 }
@@ -253,7 +253,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
  *  @return The mapped LwIP network or OS error.
  *
  */
-NL_DLL_EXPORT Error MapErrorLwIP(err_t aError)
+DLL_EXPORT Error MapErrorLwIP(err_t aError)
 {
     return (aError == ERR_OK ? CHIP_SYSTEM_NO_ERROR : CHIP_SYSTEM_LWIP_ERROR_MIN - aError);
 }
@@ -267,7 +267,7 @@ NL_DLL_EXPORT Error MapErrorLwIP(err_t aError)
  *  @return A NULL-terminated, LwIP-specific descriptive C string describing the error.
  *
  */
-NL_DLL_EXPORT const char* DescribeErrorLwIP(Error aError)
+DLL_EXPORT const char* DescribeErrorLwIP(Error aError)
 {
     const err_t lError = -((aError) - CHIP_SYSTEM_LWIP_ERROR_MIN);
 
@@ -289,7 +289,7 @@ NL_DLL_EXPORT const char* DescribeErrorLwIP(Error aError)
  *  @return True if the specified error is a LwIP error; otherwise, false.
  *
  */
-NL_DLL_EXPORT bool IsErrorLwIP(Error aError)
+DLL_EXPORT bool IsErrorLwIP(Error aError)
 {
     return (aError >= CHIP_SYSTEM_LWIP_ERROR_MIN && aError <= CHIP_SYSTEM_LWIP_ERROR_MAX);
 }

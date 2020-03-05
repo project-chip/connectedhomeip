@@ -46,7 +46,7 @@ namespace System {
  */
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-NL_DLL_EXPORT Error Mutex::Init(Mutex& aThis)
+DLL_EXPORT Error Mutex::Init(Mutex& aThis)
 {
     int lSysError = pthread_mutex_init(&aThis.mPOSIXMutex, NULL);
     Error lError;
@@ -71,7 +71,7 @@ NL_DLL_EXPORT Error Mutex::Init(Mutex& aThis)
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-NL_DLL_EXPORT Error Mutex::Init(Mutex& aThis)
+DLL_EXPORT Error Mutex::Init(Mutex& aThis)
 {
 restart:
     if (__sync_bool_compare_and_swap(&aThis.mInitialized, 0, 1))
@@ -102,7 +102,7 @@ restart:
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-NL_DLL_EXPORT void Mutex::Lock(void)
+DLL_EXPORT void Mutex::Lock(void)
 {
     xSemaphoreTake(this->mFreeRTOSSemaphore, portMAX_DELAY);
 }
