@@ -26,16 +26,15 @@
 #define SYSTEMTIME_H
 
 // Include configuration headers
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
 // Include dependent headers
-#include <Weave/Support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
-#include <SystemLayer/SystemError.h>
+#include <SystemError.h>
 
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 enum {
@@ -130,12 +129,12 @@ extern uint64_t GetClock_MonotonicHiRes(void);
  * rate of least at whole seconds (values of 1,000,000), but may tick faster.
  *
  * On those platforms that are capable of tracking real time, GetClock_RealTime() must return the
- * error WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED whenever the system is unsynchronized with real time.
+ * error CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED whenever the system is unsynchronized with real time.
  *
  * Platforms that are incapable of tracking real time should not implement the GetClock_RealTime()
  * function, thereby forcing link-time failures of features that depend on access to real time.
  * Alternatively, such platforms may supply an implementation of GetClock_RealTime() that returns
- * the error WEAVE_SYSTEM_ERROR_NOT_SUPPORTED.
+ * the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
  *
  * This function is expected to be thread-safe on any platform that employs threading.
  *
@@ -145,11 +144,11 @@ extern uint64_t GetClock_MonotonicHiRes(void);
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to microseconds.
  *
- * @retval #WEAVE_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
+ * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
  *                                      If the platform is capable of tracking real time, but is
  *                                      is currently unsynchronized.
- * @retval #WEAVE_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
  *                                      If the platform is incapable of tracking real time.
  */
 extern Error GetClock_RealTime(uint64_t & curTime);
@@ -170,11 +169,11 @@ extern Error GetClock_RealTime(uint64_t & curTime);
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to milliseconds.
  *
- * @retval #WEAVE_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
+ * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
  *                                      If the platform is capable of tracking real time, but is
  *                                      is currently unsynchronized.
- * @retval #WEAVE_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
  *                                      If the platform is incapable of tracking real time.
  */
 extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
@@ -190,13 +189,13 @@ extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
  * seconds.
  *
  * On platforms that support tracking real time, the SetClock_RealTime() function must return the error
- * WEAVE_SYSTEM_ERROR_ACCESS_DENIED if the calling application does not have the privilege to set the
+ * CHIP_SYSTEM_ERROR_ACCESS_DENIED if the calling application does not have the privilege to set the
  * current time.
  *
  * Platforms that are incapable of tracking real time, or do not offer the ability to set real time,
  * should not implement the SetClock_RealTime() function, thereby forcing link-time failures of features
  * that depend on setting real time.  Alternatively, such platforms may supply an implementation of
- * SetClock_RealTime() that returns the error WEAVE_SYSTEM_ERROR_NOT_SUPPORTED.
+ * SetClock_RealTime() that returns the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
  *
  * This function is expected to be thread-safe on any platform that employs threading.
  *
@@ -206,10 +205,10 @@ extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
  *
  * @param[in] newCurTime                The new current time, expressed as Unix time scaled to microseconds.
  *
- * @retval #WEAVE_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #WEAVE_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
  *                                      If the platform is incapable of tracking real time.
- * @retval #WEAVE_SYSTEM_ERROR_ACCESS_DENIED
+ * @retval #CHIP_SYSTEM_ERROR_ACCESS_DENIED
  *                                      If the calling application does not have the privilege to set the
  *                                      current time.
  */
@@ -218,7 +217,6 @@ extern Error SetClock_RealTime(uint64_t newCurTime);
 } // namespace Layer
 } // namespace Platform
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // SYSTEMTIME_H

@@ -3,7 +3,7 @@ Test_Dir = tests
 
 .PHONY: all clean run_tests
 
-all: libsystem.a run_tests
+all: libSystemLayer.a run_tests
 
 include $(TOP_DIR)/.yams/cpp_rules.min
 
@@ -18,12 +18,13 @@ Module_Test_Includes = $(Module_Includes)
 CPP_Files = \
 	SystemMutex.cpp \
 	SystemError.cpp \
+	SystemClock.cpp
 
-libsystem.a: $(CPP_Objects)
+libSystemLayer.a: $(CPP_Objects)
 	ar rvs $@ $^
 	@echo "LINK =>  $@"
 
 tests_FLAGS = -lpthread
 
 clean: my_clean
-	@rm -f libsystem.a *.gcda *.gcno *.gcov
+	@rm -f libSystemLayer.a *.gcda *.gcno *.gcov

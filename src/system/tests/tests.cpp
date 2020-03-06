@@ -6,9 +6,18 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "SystemClock.cpp"
 #include "SystemMutex.cpp"
 
 using namespace chip::System;
+
+namespace chip {
+namespace System {
+Error MapErrorPOSIX(int aError) {
+  return (aError == 0 ? CHIP_SYSTEM_NO_ERROR : aError);
+}
+}  // namespace System
+}  // namespace chip
 
 void SystemMutex_test() {
   printf("---Running Test--- %s\n", __FUNCTION__);
@@ -19,8 +28,15 @@ void SystemMutex_test() {
   mLock.Unlock();
 }
 
+void SystemClock_basic_test() {
+  printf("---Running Test--- %s\n", __FUNCTION__);
+  uint64_t time = Platform::Layer::GetClock_Monotonic();
+  assert(time);
+}
+
 int main() {
   printf("---Running Test--- tests from %s\n", __FILE__);
   SystemMutex_test();
+  SystemClock_basic_test();
   return 0;
 }

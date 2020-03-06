@@ -33,40 +33,40 @@
 #endif // __STDC_CONSTANT_MACROS
 
 #include <stdint.h>
+#include <stdlib.h>
 
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
-#include <SystemLayer/SystemClock.h>
-#include <Weave/Support/CodeUtils.h>
-#include <SystemLayer/SystemError.h>
+#include <SystemClock.h>
+// #include <support/CodeUtils.h>
+#include <SystemError.h>
 #include "SystemLayerPrivate.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 #include <time.h>
 #if !(HAVE_CLOCK_GETTIME)
 #include <sys/time.h>
 #endif
 #include <errno.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/sys.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 namespace Platform {
 namespace Layer {
 
 // -------------------- Default Get/SetClock Functions for POSIX Systems --------------------
 
-#if WEAVE_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
 #if !HAVE_CLOCK_GETTIME && !HAVE_GETTIMEOFDAY
-#error "WEAVE_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS requires either clock_gettime() or gettimeofday()"
+#error "CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS requires either clock_gettime() or gettimeofday()"
 #endif
 
 #if HAVE_CLOCK_GETTIME
@@ -85,12 +85,14 @@ uint64_t GetClock_Monotonic(void)
 #if HAVE_CLOCK_GETTIME
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
-    VerifyOrDie(res == 0);
+    // TODO: use assert library when available
+    if (res) { abort(); }
     return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
 #else // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
-    VerifyOrDie(res == 0);
+    // TODO: use assert library when available
+    if (res) { abort(); }
     return (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
 #endif // HAVE_CLOCK_GETTIME
 }
@@ -105,7 +107,8 @@ uint64_t GetClock_MonotonicHiRes(void)
 #if HAVE_CLOCK_GETTIME && defined(MONOTONIC_RAW_CLOCK_ID)
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_RAW_CLOCK_ID, &ts);
-    VerifyOrDie(res == 0);
+    // TODO: use assert library when available
+    if (res) { abort(); }
     return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
 #else // HAVE_CLOCK_GETTIME
     return GetClock_Monotonic();
@@ -121,12 +124,12 @@ Error GetClock_RealTime(uint64_t & curTime)
     {
         return MapErrorPOSIX(errno);
     }
-    if (ts.tv_sec < WEAVE_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    if (ts.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 #else // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
@@ -134,12 +137,12 @@ Error GetClock_RealTime(uint64_t & curTime)
     {
         return MapErrorPOSIX(errno);
     }
-    if (tv.tv_sec < WEAVE_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 #endif // HAVE_CLOCK_GETTIME
 }
 
@@ -161,9 +164,9 @@ Error SetClock_RealTime(uint64_t newCurTime)
     int res = clock_settime(CLOCK_REALTIME, &ts);
     if (res != 0)
     {
-        return (errno == EPERM) ? WEAVE_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
+        return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
     }
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 #else // HAVE_CLOCK_SETTIME
     struct timeval tv;
     tv.tv_sec = static_cast<time_t>(newCurTime / UINT64_C(1000000));
@@ -171,20 +174,20 @@ Error SetClock_RealTime(uint64_t newCurTime)
     int res = settimeofday(&tv, NULL);
     if (res != 0)
     {
-        return (errno == EPERM) ? WEAVE_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
+        return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
     }
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 #endif // HAVE_CLOCK_SETTIME
 }
 
 #endif // HAVE_CLOCK_SETTIME || HAVE_SETTIMEOFDAY
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
 
 // -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
+#if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
 uint64_t GetClock_Monotonic(void)
 {
@@ -238,25 +241,24 @@ uint64_t GetClock_MonotonicHiRes(void)
 
 Error GetClock_RealTime(uint64_t & curTime)
 {
-    return WEAVE_SYSTEM_ERROR_NOT_SUPPORTED;
+    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
 }
 
 Error GetClock_RealTimeMS(uint64_t & curTime)
 {
-    return WEAVE_SYSTEM_ERROR_NOT_SUPPORTED;
+    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
 }
 
 Error SetClock_RealTime(uint64_t newCurTime)
 {
-    return WEAVE_SYSTEM_ERROR_NOT_SUPPORTED;
+    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
 } // namespace Layer
 } // namespace Platform
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+#endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
