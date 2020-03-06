@@ -71,7 +71,7 @@ ifneq ($(and $(GCOV),$(Tests_C_Files)),)
 	@$(GCOV) $(notdir $(Tests_C_Files))
 endif
 ifneq ($(and $(GCOV),$(Tests_CPP_Files)),)
-	@$(GCOV) $(notdir $(Tests_C_Files))
+	@$(GCOV) $(notdir $(Tests_CPP_Files))
 endif
 
 my_clean:
