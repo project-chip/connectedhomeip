@@ -1,0 +1,12 @@
+[submodule "third_party/nlio"]
+	path = third_party/nlio
+	url = https://github.com/nestlabs/nlio.git
+	branch = master
+[submodule "third_party/nlassert"]
+	path = third_party/nlassert
+	url = https://github.com/nestlabs/nlassert.git
+	branch = master
+[submodule "third_party/nlunit-test"]
+	path = third_party/nlunit-test
+	url = https://github.com/nestlabs/nlunit-test.git
+	branch = master
