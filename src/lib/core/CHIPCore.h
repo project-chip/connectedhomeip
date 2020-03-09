@@ -26,7 +26,7 @@
 #define CHIPCORE_H_
 
 #include "core/CHIPConfig.h"
-
+/*
 #include <SystemLayer/SystemLayer.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -34,22 +34,23 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #include <InetLayer/InetLayer.h>
-
+*/
 //Currently only used on Sapphire
 #define CHIP_CORE_IDENTITY           "chip-core"
 #define CHIP_CORE_PREFIX             CHIP_CORE_IDENTITY ": "
 
 namespace chip {
-
+/*
 #if CONFIG_NETWORK_LAYER_BLE
 using namespace ::Ble;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 using namespace ::Inet;
-
+*/
 }
 
 #include "core/CHIPError.h"
+/*
 #include "core/CHIPKeyIds.h"
 #include "core/CHIPFabricState.h"
 #include "core/CHIPMessageLayer.h"
@@ -57,5 +58,5 @@ using namespace ::Inet;
 #include "core/CHIPExchangeMgr.h"
 #include "core/CHIPSecurityMgr.h"
 #include "core/CHIPGlobals.h"
-
+*/
 #endif /* CHIPCORE_H_ */

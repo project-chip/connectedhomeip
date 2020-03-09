@@ -26,7 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "Support/DLLUtil.h"
+#include "support/DLLUtil.h"
 #include "core/CHIPCore.h"
 #include "support/CodeUtils.h"
 #include "CHIPLogging.h"
@@ -191,7 +191,7 @@ uint8_t gLogFilter = kLogCategory_Max;
 #define __CHIP_LOGGING_LINK_ATTRIBUTE
 #endif
 
-CHIP_DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t category, const char *msg, ...)
+DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t category, const char *msg, ...)
 {
     va_list v;
 
@@ -227,7 +227,7 @@ CHIP_DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t c
 }
 #endif /* !CHIP_LOGGING_STYLE_EXTERNAL */
 
-CHIP_DLL_EXPORT uint8_t GetLogFilter()
+DLL_EXPORT uint8_t GetLogFilter()
 {
 #if CHIP_LOG_FILTERING
     return gLogFilter;
@@ -236,7 +236,7 @@ CHIP_DLL_EXPORT uint8_t GetLogFilter()
 #endif
 }
 
-CHIP_DLL_EXPORT void SetLogFilter(uint8_t category)
+DLL_EXPORT void SetLogFilter(uint8_t category)
 {
 #if CHIP_LOG_FILTERING
     gLogFilter = category;

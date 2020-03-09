@@ -20,7 +20,10 @@
  *      This file contains functions for working with CHIP errors.
  */
 
+#include <stddef.h>
+
 #include "core/CHIPCore.h"
+#include "support/ErrorStr.h"
 
 namespace chip {
 
