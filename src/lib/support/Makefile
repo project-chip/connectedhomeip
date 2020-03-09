@@ -10,7 +10,8 @@ include $(TOP_DIR)/.yams/cpp_rules.min
 Module_Includes = 	\
 	-I. \
 	-I$(TOP_DIR)/src/include \
-	-I$(TOP_DIR)/src/lib/ \
+	-I$(TOP_DIR)/src/lib \
+	-I$(TOP_DIR)/src/lib/core \
 	-I$(TOP_DIR)/src/system \
 	-I$(TOP_DIR)/build/config/standalone/ \
 	-I$(TOP_DIR)/third_party/nlassert/repo/include
