@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,14 +18,14 @@
 /**
  *    @file
  *      This file is the master "umbrella" include file for the core
- *      Weave library.
+ *      chip library.
  *
  */
 
-#ifndef WEAVECORE_H_
-#define WEAVECORE_H_
+#ifndef CHIPCORE_H_
+#define CHIPCORE_H_
 
-#include <Weave/Core/WeaveConfig.h>
+#include "core/CHIPConfig.h"
 
 #include <SystemLayer/SystemLayer.h>
 
@@ -37,28 +36,26 @@
 #include <InetLayer/InetLayer.h>
 
 //Currently only used on Sapphire
-#define NL_WEAVE_CORE_IDENTITY           "weave-core"
-#define NL_WEAVE_CORE_PREFIX             NL_WEAVE_CORE_IDENTITY ": "
+#define CHIP_CORE_IDENTITY           "chip-core"
+#define CHIP_CORE_PREFIX             CHIP_CORE_IDENTITY ": "
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 #if CONFIG_NETWORK_LAYER_BLE
-using namespace ::nl::Ble;
+using namespace ::Ble;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-using namespace ::nl::Inet;
+using namespace ::Inet;
 
 }
-}
 
-#include <Weave/Core/WeaveError.h>
-#include <Weave/Core/WeaveKeyIds.h>
-#include <Weave/Core/WeaveFabricState.h>
-#include <Weave/Core/WeaveMessageLayer.h>
-#include <Weave/Core/WeaveBinding.h>
-#include <Weave/Core/WeaveExchangeMgr.h>
-#include <Weave/Core/WeaveSecurityMgr.h>
-#include <Weave/Core/WeaveGlobals.h>
+#include "core/CHIPError.h"
+#include "core/CHIPKeyIds.h"
+#include "core/CHIPFabricState.h"
+#include "core/CHIPMessageLayer.h"
+#include "core/CHIPBinding.h"
+#include "core/CHIPExchangeMgr.h"
+#include "core/CHIPSecurityMgr.h"
+#include "core/CHIPGlobals.h"
 
-#endif /* WEAVECORE_H_ */
+#endif /* CHIPCORE_H_ */

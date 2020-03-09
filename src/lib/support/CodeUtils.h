@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,47 +26,47 @@
 #ifndef CODEUTILS_H_
 #define CODEUTILS_H_
 
-#include <Weave/Core/WeaveError.h>
-#include <Weave/Support/ErrorStr.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include "core/CHIPError.h"
+#include "support/ErrorStr.h"
+#include "support/logging/CHIPLogging.h"
 
 /**
- *  @name Weave-specific nlassert.h Overrides
+ *  @name chip-specific nlassert.h Overrides
  *
  *  @{
  *
  */
 
 /**
- *  @def NL_ASSERT_ABORT()
+ *  @def CHIP_ASSERT_ABORT()
  *
  *  @brief
- *    This implements a Weave-specific override for #NL_ASSERT_ABORT *
+ *    This implements a chip-specific override for #CHIP_ASSERT_ABORT *
  *    from nlassert.h.
  *
  */
-#if !defined(NL_ASSERT_ABORT)
-#define NL_ASSERT_ABORT()                                              \
-    WeaveDie()
+#if !defined(CHIP_ASSERT_ABORT)
+#define CHIP_ASSERT_ABORT()                                              \
+    chipDie()
 #endif
 
 /**
- *  @def NL_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)
+ *  @def CHIP_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)
  *
  *  @brief
- *    This implements a Weave-specific override for \c NL_ASSERT_LOG
+ *    This implements a chip-specific override for \c CHIP_ASSERT_LOG
  *    from nlassert.h.
  *
  *  @param[in]  aPrefix     A pointer to a NULL-terminated C string printed
  *                          at the beginning of the logged assertion
  *                          message. Typically this is and should be
- *                          \c NL_ASSERT_PREFIX_STRING.
+ *                          \c CHIP_ASSERT_PREFIX_STRING.
  *  @param[in]  aName       A pointer to a NULL-terminated C string printed
  *                          following @a aPrefix that indicates what
  *                          module, program, application or subsystem
  *                          the assertion occurred in Typically this
  *                          is and should be
- *                          \c NL_ASSERT_COMPONENT_STRING.
+ *                          \c CHIP_ASSERT_COMPONENT_STRING.
  *  @param[in]  aCondition  A pointer to a NULL-terminated C string indicating
  *                          the expression that evaluated to false in
  *                          the assertion. Typically this is a
@@ -91,12 +90,12 @@
  *                          further describing the assertion failure.
  *
  */
-#if !defined(NL_ASSERT_LOG)
-#define NL_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)         \
+#if !defined(CHIP_ASSERT_LOG)
+#define CHIP_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)         \
     do                                                                                    \
     {                                                                                     \
-        WeaveLogError(NotSpecified,                                                       \
-                      NL_ASSERT_LOG_FORMAT_DEFAULT,                                       \
+        chipLogError(NotSpecified,                                                       \
+                      CHIP_ASSERT_LOG_FORMAT_DEFAULT,                                       \
                       aPrefix,                                                            \
                       (((aName) == 0) || (*(aName) == '\0')) ? "" : aName,                \
                       (((aName) == 0) || (*(aName) == '\0')) ? "" : ": ",                 \
@@ -109,14 +108,13 @@
 #endif
 
 /**
- *  @} Weave-specific nlassert.h Overrides
+ *  @} chip-specific nlassert.h Overrides
  *
  */
 
 #include <nlassert.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 // Generic min() and max() functions
 //
@@ -140,8 +138,7 @@ max(const _T &a, const _T &b)
     return a;
 }
 
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 /**
  *  @def IgnoreUnusedVariable(aVariable)
@@ -166,15 +163,15 @@ max(const _T &a, const _T &b)
  *
  *  @brief
  *    This checks for the specified status, which is expected to
- *    commonly be successful (WEAVE_NO_ERROR), and branches to
+ *    commonly be successful (CHIP_NO_ERROR), and branches to
  *    the local label 'exit' if the status is unsuccessful.
  *
  *  Example Usage:
  *
  *  @code
- *  WEAVE_ERROR TryHard()
+ *  CHIP_ERROR TryHard()
  *  {
- *      WEAVE_ERROR err;
+ *      CHIP_ERROR err;
  *
  *      err = TrySomething();
  *      SuccessOrExit(err);
@@ -191,7 +188,7 @@ max(const _T &a, const _T &b)
  *
  */
 #define SuccessOrExit(aStatus)                                         \
-    nlEXPECT((aStatus) == WEAVE_NO_ERROR, exit)
+    nlEXPECT((aStatus) == CHIP_NO_ERROR, exit)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)
@@ -204,12 +201,12 @@ max(const _T &a, const _T &b)
  *  Example Usage:
  *
  *  @code
- *  WEAVE_ERROR MakeBuffer(const uint8_t *& buf)
+ *  CHIP_ERROR MakeBuffer(const uint8_t *& buf)
  *  {
- *      WEAVE_ERROR err = WEAVE_NO_ERROR;
+ *      CHIP_ERROR err = CHIP_NO_ERROR;
  *
  *      buf = (uint8_t *)malloc(1024);
- *      VerifyOrExit(buf != NULL, err = WEAVE_ERROR_NO_MEMORY);
+ *      VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
  *
  *      memset(buf, 0, 1024);
  *
@@ -240,15 +237,15 @@ max(const _T &a, const _T &b)
  *  Example Usage:
  *
  *  @code
- *  WEAVE_ERROR ReadAll(Reader& reader)
+ *  CHIP_ERROR ReadAll(Reader& reader)
  *  {
- *      WEAVE_ERROR err;
+ *      CHIP_ERROR err;
  *
  *      while (true)
  *      {
  *          err = reader.ReadNext();
- *          if (err == WEAVE_ERROR_AT_END)
- *              ExitNow(err = WEAVE_NO_ERROR);
+ *          if (err == CHIP_ERROR_AT_END)
+ *              ExitNow(err = CHIP_NO_ERROR);
  *          SuccessOrExit(err);
  *          DoSomething();
  *      }
@@ -273,30 +270,30 @@ max(const _T &a, const _T &b)
  *    This is invoked when a #VerifyOrDie or #VerifyOrDieWithMsg
  *    assertion expression evaluates to false.
  *
- *    Developers may override and customize this by defining #WeaveDie
+ *    Developers may override and customize this by defining #chipDie
  *    before CodeUtils.h is included by the preprocessor.
  *
  *  Example Usage:
  *
  *  @code
- *  WeaveDie();
+ *  chipDie();
  *  @endcode
  *
  */
-#ifndef WeaveDie
-extern "C" void WeaveDie(void) __attribute((noreturn));
+#ifndef chipDie
+extern "C" void chipDie(void) __attribute((noreturn));
 
-inline void WeaveDie(void)
+inline void chipDie(void)
 {
-    WeaveLogError(NotSpecified, "WeaveDie WeaveDie WeaveDie");
+    chipLogError(NotSpecified, "chipDie chipDie chipDie");
 
     while (true)
     {
-        // NL_ASSERT_ABORT is redefined to be WeaveDie, so not useful here.
+        // CHIP_ASSERT_ABORT is redefined to be chipDie, so not useful here.
         abort();
     }
 }
-#endif // WeaveDie
+#endif // chipDie
 
 /**
  *  @def VerifyOrDie(aCondition)
@@ -319,7 +316,7 @@ inline void WeaveDie(void)
  *  @param[in]  aCondition  A Boolean expression to be evaluated.
  *
  *  @sa #VerifyOrDieWithMsg
- *  @sa #WeaveDie
+ *  @sa #chipDie
  *
  */
 #define VerifyOrDie(aCondition)                                        \
@@ -344,7 +341,7 @@ inline void WeaveDie(void)
  *  @endcode
  *
  *  @param[in]  aCondition  A Boolean expression to be evaluated.
- *  @param[in]  aModule     A Weave LogModule short-hand mnemonic identifing
+ *  @param[in]  aModule     A chip LogModule short-hand mnemonic identifing
  *                          the logical section of code that is a
  *                          source the logged message.
  *  @param[in]  aMessage    A pointer to a NULL-terminated C string with
@@ -356,11 +353,11 @@ inline void WeaveDie(void)
  *                          aMessage.
  *
  *  @sa #VerifyOrDie
- *  @sa #WeaveDie
+ *  @sa #chipDie
  *
  */
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)         \
-    nlABORT_ACTION(aCondition, WeaveLogDetail(aModule, aMessage, ## __VA_ARGS__))
+    nlABORT_ACTION(aCondition, chipLogDetail(aModule, aMessage, ## __VA_ARGS__))
 
 /**
  * @def ArraySize(aArray)
