@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,49 +18,48 @@
 /**
  *    @file
  *      This file defines macros, constants, and interfaces for a
- *      platform-independent logging interface for the Weave SDK.
+ *      platform-independent logging interface for the chip SDK.
  *
- *      Weave SDK clients may choose, at compile time, among Android,
+ *      chip SDK clients may choose, at compile time, among Android,
  *      C Standard I/O, or external (platform- and integrator-defined)
  *      logging style implementations that will be invoked when any of
  *      the following preprocessor symbols are asserted:
  *
- *         - #WEAVE_ERROR_LOGGING
- *         - #WEAVE_PROGRESS_LOGGING
- *         - #WEAVE_DETAIL_LOGGING
+ *         - #CHIP_ERROR_LOGGING
+ *         - #CHIP_PROGRESS_LOGGING
+ *         - #CHIP_DETAIL_LOGGING
  *
  */
 
-#ifndef WEAVELOGGING_H_
-#define WEAVELOGGING_H_
+#ifndef CHIPLOGGING_H_
+#define CHIPLOGGING_H_
 
 #include <stdint.h>
 
-#include <Weave/Core/WeaveConfig.h>
+#include "core/CHIPConfig.h"
 
 /**
- *   @namespace nl::Weave::Logging
+ *   @namespace chip::Logging
  *
  *   @brief
- *     This namespace includes all interfaces within Weave for shared
+ *     This namespace includes all interfaces within chip for shared
  *     logging support.
  *
  *     The interfaces include macros, constants, and functions for a
- *     platform-independent logging interface for the Weave SDK.
+ *     platform-independent logging interface for the chip SDK.
  *
- *     Weave SDK clients may choose, at compile time, among Android,
+ *     chip SDK clients may choose, at compile time, among Android,
  *     C Standard I/O, or external (platform- and integrator-defined)
  *     logging style implementations that will be invoked when any of
  *     the following preprocessor symbols are asserted:
  *
- *        - #WEAVE_ERROR_LOGGING
- *        - #WEAVE_PROGRESS_LOGGING
- *        - #WEAVE_DETAIL_LOGGING
+ *        - #CHIP_ERROR_LOGGING
+ *        - #CHIP_PROGRESS_LOGGING
+ *        - #CHIP_DETAIL_LOGGING
  *
  */
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace Logging {
 
 /**
@@ -72,7 +70,7 @@ namespace Logging {
  *    messages.
  *
  *  @note If you add modules or rearrange this list you must update the
- *        ModuleNames tables in WeaveLogging.cpp.
+ *        ModuleNames tables in chipLogging.cpp.
  *
  */
 enum LogModule
@@ -102,9 +100,9 @@ enum LogModule
     kLogModule_TokenPairing,
     kLogModule_HeatLink,
     kLogModule_TimeService,
-    kLogModule_WeaveTunnel,
+    kLogModule_chipTunnel,
     kLogModule_Heartbeat,
-    kLogModule_WeaveSystemLayer,
+    kLogModule_chipSystemLayer,
     kLogModule_DropcamLegacyPairing,
     kLogModule_EventLogging,
     kLogModule_Support,
@@ -190,116 +188,116 @@ extern void Log(uint8_t module, uint8_t category, const char *msg, ...);
 extern uint8_t GetLogFilter(void);
 extern void SetLogFilter(uint8_t category);
 
-#ifndef WEAVE_ERROR_LOGGING
-#define WEAVE_ERROR_LOGGING 1
+#ifndef CHIP_ERROR_LOGGING
+#define CHIP_ERROR_LOGGING 1
 #endif
 
-#ifndef WEAVE_LOG_FILTERING
-#define WEAVE_LOG_FILTERING 1
+#ifndef CHIP_LOG_FILTERING
+#define CHIP_LOG_FILTERING 1
 #endif
 
-#if WEAVE_ERROR_LOGGING
+#if CHIP_ERROR_LOGGING
 /**
- * @def WeaveLogError(MOD, MSG, ...)
+ * @def chipLogError(MOD, MSG, ...)
  *
  * @brief
- *   Log a Weave message for the specified module in the 'Error'
+ *   Log a chip message for the specified module in the 'Error'
  *   category.
  *
  */
-#ifndef WeaveLogError
-#define WeaveLogError(MOD, MSG, ...) nl::Weave::Logging::Log( nl::Weave::Logging::kLogModule_##MOD , nl::Weave::Logging::kLogCategory_Error, MSG, ## __VA_ARGS__)
+#ifndef chipLogError
+#define chipLogError(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Error, MSG, ## __VA_ARGS__)
 #endif
 #else
-#define WeaveLogError(MOD, MSG, ...)
+#define chipLogError(MOD, MSG, ...)
 #endif
 
-#ifndef WEAVE_PROGRESS_LOGGING
-#define WEAVE_PROGRESS_LOGGING 1
+#ifndef CHIP_PROGRESS_LOGGING
+#define CHIP_PROGRESS_LOGGING 1
 #endif
 
-#if WEAVE_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING
 /**
- * @def WeaveLogProgress(MOD, MSG, ...)
+ * @def chipLogProgress(MOD, MSG, ...)
  *
  * @brief
- *   Log a Weave message for the specified module in the 'Progress'
+ *   Log a chip message for the specified module in the 'Progress'
  *   category.
  *
  */
-#ifndef WeaveLogProgress
-#define WeaveLogProgress(MOD, MSG, ...) nl::Weave::Logging::Log( nl::Weave::Logging::kLogModule_##MOD , nl::Weave::Logging::kLogCategory_Progress, MSG, ## __VA_ARGS__)
+#ifndef chipLogProgress
+#define chipLogProgress(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Progress, MSG, ## __VA_ARGS__)
 #endif
 #else
-#define WeaveLogProgress(MOD, MSG, ...)
+#define chipLogProgress(MOD, MSG, ...)
 #endif
 
 
-#ifndef WEAVE_DETAIL_LOGGING
-#define WEAVE_DETAIL_LOGGING 1
+#ifndef CHIP_DETAIL_LOGGING
+#define CHIP_DETAIL_LOGGING 1
 #endif
 
-#if WEAVE_DETAIL_LOGGING
+#if CHIP_DETAIL_LOGGING
 /**
- * @def WeaveLogDetail(MOD, MSG, ...)
+ * @def chipLogDetail(MOD, MSG, ...)
  *
  * @brief
- *   Log a Weave message for the specified module in the 'Detail'
+ *   Log a chip message for the specified module in the 'Detail'
  *   category.
  *
  */
-#ifndef WeaveLogDetail
-#define WeaveLogDetail(MOD, MSG, ...) nl::Weave::Logging::Log( nl::Weave::Logging::kLogModule_##MOD , nl::Weave::Logging::kLogCategory_Detail, MSG, ## __VA_ARGS__)
+#ifndef chipLogDetail
+#define chipLogDetail(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Detail, MSG, ## __VA_ARGS__)
 #endif
 #else
-#define WeaveLogDetail(MOD, MSG, ...)
+#define chipLogDetail(MOD, MSG, ...)
 #endif
 
-#ifndef WEAVE_RETAIN_LOGGING
-#define WEAVE_RETAIN_LOGGING WEAVE_PROGRESS_LOGGING
-#define WeaveLogRetain(MOD, MSG, ...) WeaveLogProgress(MOD, MSG, ## __VA_ARGS__)
+#ifndef CHIP_RETAIN_LOGGING
+#define CHIP_RETAIN_LOGGING CHIP_PROGRESS_LOGGING
+#define chipLogRetain(MOD, MSG, ...) chipLogProgress(MOD, MSG, ## __VA_ARGS__)
 #endif
 
-#if WEAVE_RETAIN_LOGGING
+#if CHIP_RETAIN_LOGGING
 /**
- * @def WeaveLogRetain(MOD, MSG, ...)
+ * @def chipLogRetain(MOD, MSG, ...)
  *
  * @brief
- *   Log a Weave message for the specified module in the 'Retain'
+ *   Log a chip message for the specified module in the 'Retain'
  *   category. This is used for IE testing.
- *   If the product has not defined WEAVE_RETAIN_LOGGING, it defaults to the same as WeaveLogProgress
+ *   If the product has not defined CHIP_RETAIN_LOGGING, it defaults to the same as chipLogProgress
  *
  */
-#ifndef WeaveLogRetain
-#define WeaveLogRetain(MOD, MSG, ...) nl::Weave::Logging::Log( nl::Weave::Logging::kLogModule_##MOD , nl::Weave::Logging::kLogCategory_Retain, MSG, ## __VA_ARGS__)
+#ifndef chipLogRetain
+#define chipLogRetain(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Retain, MSG, ## __VA_ARGS__)
 #endif
 
-#else // #if WEAVE_RETAIN_LOGGING
-#ifdef WeaveLogRetain
-// This is to ensure that WeaveLogRetain is null if
-// the product has defined WEAVE_RETAIN_LOGGING to 0 itself
-#undef WeaveLogRetain
+#else // #if CHIP_RETAIN_LOGGING
+#ifdef chipLogRetain
+// This is to ensure that chipLogRetain is null if
+// the product has defined CHIP_RETAIN_LOGGING to 0 itself
+#undef chipLogRetain
 #endif
-#define WeaveLogRetain(MOD, MSG, ...)
-#endif // #if WEAVE_RETAIN_LOGGING
+#define chipLogRetain(MOD, MSG, ...)
+#endif // #if CHIP_RETAIN_LOGGING
 
 
-#if WEAVE_ERROR_LOGGING || WEAVE_PROGRESS_LOGGING || WEAVE_DETAIL_LOGGING || WEAVE_RETAIN_LOGGING
-#define _WEAVE_USE_LOGGING 1
+#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_RETAIN_LOGGING
+#define _CHIP_USE_LOGGING 1
 #else
-#define _WEAVE_USE_LOGGING 0
-#endif /* WEAVE_ERROR_LOGGING || WEAVE_PROGRESS_LOGGING || WEAVE_DETAIL_LOGGING || WEAVE_RETAIN_LOGGING */
+#define _CHIP_USE_LOGGING 0
+#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_RETAIN_LOGGING */
 
-#if _WEAVE_USE_LOGGING
+#if _CHIP_USE_LOGGING
 
-#define nlWeaveLoggingWeavePrefixLen 6
-#define nlWeaveLoggingModuleNameLen 3
-#define nlWeaveLoggingMessageSeparatorLen 2
-#define nlWeaveLoggingMessageTrailerLen 2
-#define nlWeaveLoggingTotalMessagePadding (nlWeaveLoggingWeavePrefixLen + \
-                                           nlWeaveLoggingModuleNameLen + \
-                                           nlWeaveLoggingMessageSeparatorLen + \
-                                           nlWeaveLoggingMessageTrailerLen)
+#define chipLoggingchipPrefixLen 6
+#define chipLoggingModuleNameLen 3
+#define chipLoggingMessageSeparatorLen 2
+#define chipLoggingMessageTrailerLen 2
+#define chipLoggingTotalMessagePadding (chipLoggingchipPrefixLen + \
+                                           chipLoggingModuleNameLen + \
+                                           chipLoggingMessageSeparatorLen + \
+                                           chipLoggingMessageTrailerLen)
 
 extern void GetMessageWithPrefix(char *buf, uint8_t bufSize, uint8_t module, const char *msg);
 extern void GetModuleName(char *buf, uint8_t module);
@@ -317,24 +315,24 @@ static inline void GetModuleName(char *buf, uint8_t module)
     return;
 }
 
-#endif // _WEAVE_USE_LOGGING
+#endif // _CHIP_USE_LOGGING
 
-#if WEAVE_LOG_FILTERING
+#if CHIP_LOG_FILTERING
 
 extern uint8_t gLogFilter;
 
 #define IsCategoryEnabled(CAT) ((CAT) <= gLogFilter)
 
-#else // WEAVE_LOG_FILTERING
+#else // CHIP_LOG_FILTERING
 
 #define IsCategoryEnabled(CAT) (true)
 
-#endif // WEAVE_LOG_FILTERING
+#endif // CHIP_LOG_FILTERING
 
 
 
 /**
- *  @def WeaveLogIfFalse(aCondition)
+ *  @def chipLogIfFalse(aCondition)
  *
  *  @brief
  *    This checks for the specified condition, which is expected to
@@ -343,119 +341,118 @@ extern uint8_t gLogFilter;
  *
  *  @note
  *    Evaluation of @a aCondition is always done, but logging is only enabled when
- *    #WEAVE_CONFIG_ENABLE_CONDITION_LOGGING is enabled. This can be turned on or
+ *    #CHIP_CONFIG_ENABLE_CONDITION_LOGGING is enabled. This can be turned on or
  *    off for each compilation unit by enabling or disabling, as desired,
- *    #WEAVE_CONFIG_ENABLE_CONDITION_LOGGING before WeaveLogging.h is included by
+ *    #CHIP_CONFIG_ENABLE_CONDITION_LOGGING before chipLogging.h is included by
  *    the preprocessor.
  *
  *  Example Usage:
  *
  *  @code
- *  #define WEAVE_CONFIG_ENABLE_CONDITION_LOGGING 1
+ *  #define CHIP_CONFIG_ENABLE_CONDITION_LOGGING 1
  *
- *  #include <Weave/Support/Logging/WeaveLogging.h>
+ *  #include <chip/Support/Logging/chipLogging.h>
  *
  *  ...
  *
  *  void foo(void)
  *  {
- *      WEAVE_ERROR err = WEAVE_NO_ERROR;
+ *      CHIP_ERROR err = CHIP_NO_ERROR;
  *
  *      ...
  *
  *  exit:
- *      WeaveLogIfFalse(WEAVE_END_OF_TLV == err);
+ *      chipLogIfFalse(CHIP_END_OF_TLV == err);
  *  }
  *  @endcode
  *
  *  @param[in]  aCondition     A Boolean expression to be evaluated.
  *
- *  @sa WEAVE_CONFIG_ENABLE_TRACE_ON_CHECK_FAILURE
+ *  @sa CHIP_CONFIG_ENABLE_TRACE_ON_CHECK_FAILURE
  *
  */
 
-#if WEAVE_CONFIG_ENABLE_CONDITION_LOGGING && !defined(WeaveLogIfFalse)
+#if CHIP_CONFIG_ENABLE_CONDITION_LOGGING && !defined(chipLogIfFalse)
 
-#define WeaveLogIfFalse(aCondition)                                                     \
+#define chipLogIfFalse(aCondition)                                                     \
 do                                                                                      \
 {                                                                                       \
     if (!(aCondition))                                                                  \
     {                                                                                   \
-        WeaveLogError(NotSpecified, "Condition Failed (%s) at %s:%d",                   \
+        chipLogError(NotSpecified, "Condition Failed (%s) at %s:%d",                   \
             #aCondition, __FILE__, __LINE__);                                           \
     }                                                                                   \
 } while (0)
 
-#else // WEAVE_CONFIG_ENABLE_CONDITION_LOGGING
+#else // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
-#define WeaveLogIfFalse(aCondition) \
+#define chipLogIfFalse(aCondition) \
     IgnoreUnusedVariable(aCondition)
 
-#endif // WEAVE_CONFIG_ENABLE_CONDITION_LOGGING
+#endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
 
 /**
- *  @def WeaveLogFunctError(aErr)
+ *  @def chipLogFunctError(aErr)
  *
  *  @brief
- *    If the given error value (@a aErr) is not successful (!= WEAVE_NO_ERROR),
+ *    If the given error value (@a aErr) is not successful (!= CHIP_NO_ERROR),
  *    the method logs the file name, line number, and the error code.
  *
  *  @note
  *    Evaluation of @a aErr is always done, but logging is only enabled when
- *    #WEAVE_CONFIG_ENABLE_FUNCT_ERROR_LOGGING is enabled. This can be turned
+ *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING is enabled. This can be turned
  *    on or off for each compilation unit by enabling or disabling, as desired,
- *    #WEAVE_CONFIG_ENABLE_FUNCT_ERROR_LOGGING before WeaveLogging.h is included
+ *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING before chipLogging.h is included
  *    by the preprocessor.
  *
  *  Example Usage:
  *
  *  @code
- *  #define WEAVE_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
+ *  #define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
  *
- *  #include <Weave/Support/Logging/WeaveLogging.h>
+ *  #include <chip/Support/Logging/chipLogging.h>
  *
  *  ...
  *
  *  void foo(void)
  *  {
- *      WEAVE_ERROR err = WEAVE_NO_ERROR;
+ *      CHIP_ERROR err = CHIP_NO_ERROR;
  *
  *      ...
  *
  *  exit:
- *      WeaveLogFunctError(err);
+ *      chipLogFunctError(err);
  *  }
  *  @endcode
  *
- *  @param[in]  aErr     A scalar status to be evaluated against WEAVE_NO_ERROR.
+ *  @param[in]  aErr     A scalar status to be evaluated against CHIP_NO_ERROR.
  *
- *  @sa #WEAVE_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
+ *  @sa #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
  *
  */
 
-#if WEAVE_CONFIG_ENABLE_FUNCT_ERROR_LOGGING && !defined(WeaveLogFunctError)
+#if CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING && !defined(chipLogFunctError)
 
-#define WeaveLogFunctError(aErr)                                                           \
+#define chipLogFunctError(aErr)                                                           \
 do                                                                                         \
 {                                                                                          \
-    if ((aErr) != WEAVE_NO_ERROR)                                                          \
+    if ((aErr) != CHIP_NO_ERROR)                                                          \
     {                                                                                      \
-        WeaveLogError(NotSpecified, "%s at %s:%d", nl::ErrorStr(aErr), __FILE__, __LINE__);\
+        chipLogError(NotSpecified, "%s at %s:%d", ErrorStr(aErr), __FILE__, __LINE__);\
     }                                                                                      \
 } while (0)
 
-#else // WEAVE_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
+#else // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 
-#define WeaveLogFunctError(aErr) \
+#define chipLogFunctError(aErr) \
     IgnoreUnusedVariable(aErr)
 
-#endif // WEAVE_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
+#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 
 
 
 } // namespace Logging
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif /* WEAVELOGGING_H_ */
+#endif /* CHIPLOGGING_H_ */
