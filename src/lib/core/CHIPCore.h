@@ -25,7 +25,7 @@
 #ifndef CHIPCORE_H_
 #define CHIPCORE_H_
 
-#include "core/CHIPConfig.h"
+#include <core/CHIPConfig.h>
 /*
 #include <SystemLayer/SystemLayer.h>
 
@@ -35,7 +35,6 @@
 
 #include <InetLayer/InetLayer.h>
 */
-//Currently only used on Sapphire
 #define CHIP_CORE_IDENTITY           "chip-core"
 #define CHIP_CORE_PREFIX             CHIP_CORE_IDENTITY ": "
 
@@ -49,7 +48,7 @@ using namespace ::Inet;
 */
 }
 
-#include "core/CHIPError.h"
+#include <core/CHIPError.h>
 /*
 #include "core/CHIPKeyIds.h"
 #include "core/CHIPFabricState.h"

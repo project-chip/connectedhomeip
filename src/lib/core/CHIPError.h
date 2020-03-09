@@ -31,7 +31,7 @@
 #ifndef CHIP_ERROR_H
 #define CHIP_ERROR_H
 
-#include "CHIPConfig.h"
+#include <CHIPConfig.h>
 // clang-format off
 
 /**
