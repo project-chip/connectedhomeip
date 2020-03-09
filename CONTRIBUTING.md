@@ -16,7 +16,7 @@ Before submitting the pull request, please make sure you have tested your change
 Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip/connectedhomeip.git)
 * Must be a member of the Zigbee Alliance CHIP TSG Working Group
 * Have signed the Zigbee CHIP WG CLA
-* Have signed up as a Tiger team member in one of the follow roles: Lead, Spec Writer, Developer (or exception granted)
+* Have signed up as a Tiger team member in one of the follow roles: Lead, Spec Writer, Developer (or exception granted), Code Approvers, or Support Staff
 * Have approval from your company's official approver
 
 ## Becoming a Contributor
@@ -26,7 +26,7 @@ Currently these are the requirements to becoming a member of the [Project-CHIP R
 * Have signed the Zigbee CHIP WG CLA
 * Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
 * Agree to the [License](./LICENSE)
-* Have signed up as a Tiger team member in one of the follow roles: Lead, Spec Writer, Developer (or exception granted)
+* Have signed up as a Tiger team member in one of the follow roles: Lead, Spec Writer, Developer (or exception granted), Code Approvers, or Support Staff
 * Have approval from your company's official approver
 
 ## Bugs
