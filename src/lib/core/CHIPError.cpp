@@ -22,8 +22,8 @@
 
 #include <stddef.h>
 
-#include "core/CHIPCore.h"
-#include "support/ErrorStr.h"
+#include <core/CHIPCore.h>
+#include <support/ErrorStr.h>
 
 namespace chip {
 

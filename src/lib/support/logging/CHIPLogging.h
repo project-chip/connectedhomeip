@@ -36,7 +36,7 @@
 
 #include <stdint.h>
 
-#include "core/CHIPConfig.h"
+#include <core/CHIPConfig.h>
 
 /**
  *   @namespace chip::Logging
@@ -98,12 +98,10 @@ enum LogModule
     kLogModule_ServiceProvisioning,
     kLogModule_SoftwareUpdate,
     kLogModule_TokenPairing,
-    kLogModule_HeatLink,
     kLogModule_TimeService,
     kLogModule_chipTunnel,
     kLogModule_Heartbeat,
     kLogModule_chipSystemLayer,
-    kLogModule_DropcamLegacyPairing,
     kLogModule_EventLogging,
     kLogModule_Support,
 

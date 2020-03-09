@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 #include "support/DLLUtil.h"
-#include "core/CHIPCore.h"
+#include <core/CHIPCore.h>
 #include "support/CodeUtils.h"
 #include "CHIPLogging.h"
 
@@ -77,12 +77,10 @@ static const char ModuleNames[] =
     "SP\0"  // ServiceProvisioning
     "SWU"   // SoftwareUpdate
     "TP\0"  // TokenPairing
-    "HL\0"  // HeatLink
     "TS\0"  // TimeServices
     "WT\0"  // chipTunnel
     "HB\0"  // Heartbeat
     "WSL"   // chipSystemLayer
-    "DLP"   // DropcamLegacyPairing
     "EVL"   // Event Logging
     "SPT"   // Support
     ;
