@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines the nl::Weave::System::PacketBuffer class,
+ *      This file defines the chip::System::PacketBuffer class,
  *      which provides the mechanisms for manipulating packets of *
  *      octet-serialized data.
  */
@@ -27,27 +26,26 @@
 #define SYSTEMPACKETBUFFER_H
 
 // Include configuration header
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
 // Include dependent headers
 #include <stddef.h>
 
-#include <Weave/Support/NLDLLUtil.h>
+#include "support/DLLUtil.h"
 
-#include <SystemLayer/SystemAlignSize.h>
-#include <SystemLayer/SystemError.h>
+#include "system/SystemAlignSize.h"
+#include <system/SystemError.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/pbuf.h>
 #include <lwip/mem.h>
 #include <lwip/memp.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
-#if !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP
 struct pbuf
 {
     struct pbuf* next;
@@ -55,11 +53,11 @@ struct pbuf
     uint16_t tot_len;
     uint16_t len;
     uint16_t ref;
-#if WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
     uint16_t alloc_size;
-#endif // WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
 };
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**    @class PacketBuffer
  *
@@ -68,31 +66,31 @@ struct pbuf
  *      context of a data communications network, like Bluetooth or the Internet protocol.
  *
  *      In LwIP-based environments, this class is built on top of the pbuf structure defined in that library. In the absence of
- *      LwIP, Weave provides either a malloc-based implementation, or a pool-based implementation that closely approximates the
+ *      LwIP, chip provides either a malloc-based implementation, or a pool-based implementation that closely approximates the
  *      memory challenges of deeply embedded devices.
  *
  *      The PacketBuffer class, like many similar structures used in layered network stacks, provide a mechanism to reserve space
  *      for protocol headers at each layer of a configurable communication stack.  For details, see `PacketBuffer::New()` as well
  *      as LwIP documentation.
  *
- *      PacketBuffer objects are reference-counted, and the prevailing usage mode within Weave is "fire-and-forget".  As the packet
+ *      PacketBuffer objects are reference-counted, and the prevailing usage mode within chip is "fire-and-forget".  As the packet
  *      (and its underlying PacketBuffer object) is dispatched through various protocol layers, the successful upcall or downcall
  *      between layers implies ownership transfer, and the callee is responsible for freeing the buffer.  On failure of a
  *      cross-layer call, the responsibilty for freeing the buffer rests with the caller.
  *
  *      New objects of PacketBuffer class are initialized at the beginning of an allocation of memory obtained from the underlying
  *      environment, e.g. from LwIP pbuf target pools, from the standard C library heap, from an internal buffer pool. In the
- *      simple case, the size of the data buffer is #WEAVE_SYSTEM_PACKETBUFFER_SIZE. A composer is provided that permits usage of
+ *      simple case, the size of the data buffer is #CHIP_SYSTEM_PACKETBUFFER_SIZE. A composer is provided that permits usage of
  *      data buffers of other sizes.
  *
  *      PacketBuffer objects may be chained to accomodate larger payloads.  Chaining, however, is not transparent, and users of the
  *      class must explicitly decide to support chaining.  Examples of classes written with chaining support are as follows:
  *
- *          @ref nl::Weave::WeaveTLVReader
- *          @ref nl::Weave::WeaveTLVWriter
+ *          @ref chip::chipTLVReader
+ *          @ref chip::chipTLVWriter
  *
  */
-class NL_DLL_EXPORT PacketBuffer : private pbuf
+class DLL_EXPORT PacketBuffer : private pbuf
 {
 public:
     size_t AllocSize(void) const;
@@ -134,38 +132,37 @@ public:
     static PacketBuffer* FreeHead(PacketBuffer* aPacket);
 
 private:
-#if !WEAVE_SYSTEM_CONFIG_USE_LWIP && WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
     static PacketBuffer* sFreeList;
 
     static PacketBuffer* BuildFreeList(void);
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP && WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
     void Clear(void);
 };
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 // Sizing definitions
 
 /**
- * @def WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE
+ * @def CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE
  *
  *  The effective size of the packet buffer structure.
  *
  *  TODO: This is an implementation details that does not need to be public and should be moved to the source file.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-#define WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf))
-#else // WEAVE_SYSTEM_CONFIG_USE_LWIP
-#define WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE WEAVE_SYSTEM_ALIGN_SIZE(sizeof(::nl::Weave::System::PacketBuffer), 4)
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#define CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf))
+#else // CHIP_SYSTEM_CONFIG_USE_LWIP
+#define CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::PacketBuffer), 4)
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 
 /**
- * @def WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
+ * @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
  *
  *  See SystemConfig.h for full description. This is defined in here specifically for LwIP platform to preserve backwards
  *  compatibility.
@@ -173,36 +170,35 @@ private:
  *  TODO: This is an implementation details that does not need to be public and should be moved to the source file.
  *
  */
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-#define WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX (LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE)
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX (LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE)
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
- * @def WEAVE_SYSTEM_PACKETBUFFER_SIZE
+ * @def CHIP_SYSTEM_PACKETBUFFER_SIZE
  *
  *  The memory footprint of a PacketBuffer object, computed from max capacity size and the size of the packet buffer structure.
  *
  *  TODO: This is an implementation details that does not need to be public and should be moved to the source file.
  */
 
-#define WEAVE_SYSTEM_PACKETBUFFER_SIZE (WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX + WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE)
+#define CHIP_SYSTEM_PACKETBUFFER_SIZE (CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE)
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 //
-// Pool allocation for PacketBuffer objects (toll-free bridged with LwIP pbuf allocator if WEAVE_SYSTEM_CONFIG_USE_LWIP)
+// Pool allocation for PacketBuffer objects (toll-free bridged with LwIP pbuf allocator if CHIP_SYSTEM_CONFIG_USE_LWIP)
 //
-#if !WEAVE_SYSTEM_CONFIG_USE_LWIP && WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
 typedef union
 {
     PacketBuffer Header;
-    uint8_t Block[WEAVE_SYSTEM_PACKETBUFFER_SIZE];
+    uint8_t Block[CHIP_SYSTEM_PACKETBUFFER_SIZE];
 } BufferPoolElement;
 
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP && WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
 /**
  * Return the size of the allocation including the reserved and payload data spaces but not including space
@@ -214,28 +210,27 @@ typedef union
  */
 inline size_t PacketBuffer::AllocSize(void) const
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
     // Temporary workaround for custom pbufs by assuming size to be PBUF_POOL_BUFSIZE
     if (this->flags & PBUF_FLAG_IS_CUSTOM)
-        return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+        return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
     else
-        return LWIP_MEM_ALIGN_SIZE(memp_sizes[this->pool]) - WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+        return LWIP_MEM_ALIGN_SIZE(memp_sizes[this->pool]) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
 #else // !LWIP_PBUF_FROM_CUSTOM_POOLS
-    return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
 #endif // !LWIP_PBUF_FROM_CUSTOM_POOLS
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
     return static_cast<size_t>(this->alloc_size);
-#else // WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
+#else // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
     extern BufferPoolElement gDummyBufferPoolElement;
-    return sizeof(gDummyBufferPoolElement.Block) - WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE;
-#endif // WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+    return sizeof(gDummyBufferPoolElement.Block) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // defined(SYSTEMPACKETBUFFER_H)
