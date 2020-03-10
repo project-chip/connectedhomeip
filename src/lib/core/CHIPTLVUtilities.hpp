@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef WEAVETLVUTILITIES_HPP
-#define WEAVETLVUTILITIES_HPP
+#ifndef CHIPTLVUTILITIES_HPP
+#define CHIPTLVUTILITIES_HPP
 
 #include <stddef.h>
 #include <stdint.h>
@@ -31,12 +31,12 @@
 #include <CHIPError.h>
 #include <CHIPTLV.h>
 
-namespace CHIP {
+namespace chip {
 
 namespace TLV {
 
 /**
- *   @namespace CHIP::TLV::Utilities
+ *   @namespace chip::TLV::Utilities
  *
  *   @brief
  *     This namespace includes types and utility interfaces for managing and
@@ -45,23 +45,23 @@ namespace TLV {
  */
 namespace Utilities {
 
-typedef WEAVE_ERROR (*IterateHandler)(const TLVReader &aReader, size_t aDepth, void *aContext);
+typedef CHIP_ERROR (*IterateHandler)(const TLVReader &aReader, size_t aDepth, void *aContext);
 
-extern WEAVE_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext);
-extern WEAVE_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext, const bool aRecurse);
+extern CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext);
+extern CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext, const bool aRecurse);
 
-extern WEAVE_ERROR Count(const TLVReader &aReader, size_t &aCount);
-extern WEAVE_ERROR Count(const TLVReader &aReader, size_t &aCount, const bool aRecurse);
+extern CHIP_ERROR Count(const TLVReader &aReader, size_t &aCount);
+extern CHIP_ERROR Count(const TLVReader &aReader, size_t &aCount, const bool aRecurse);
 
-extern WEAVE_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult);
-extern WEAVE_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult, const bool aRecurse);
+extern CHIP_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult);
+extern CHIP_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult, const bool aRecurse);
 
-extern WEAVE_ERROR Find(const TLVReader &aReader, IterateHandler aHandler, void *aContext, TLVReader &aResult);
-extern WEAVE_ERROR Find(const TLVReader &aReader, IterateHandler aHandler, void *aContext, TLVReader &aResult, const bool aRecurse);
+extern CHIP_ERROR Find(const TLVReader &aReader, IterateHandler aHandler, void *aContext, TLVReader &aResult);
+extern CHIP_ERROR Find(const TLVReader &aReader, IterateHandler aHandler, void *aContext, TLVReader &aResult, const bool aRecurse);
 } // namespace Utilities
 
 } // namespace TLV
 
-} // namespace CHIP
+} // namespace chip
 
-#endif // WEAVETLVUTILITIES_HPP
+#endif // CHIPTLVUTILITIES_HPP

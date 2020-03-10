@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef WEAVETLVDEBUG_HPP
-#define WEAVETLVDEBUG_HPP
+#ifndef CHIPTLVDEBUG_HPP
+#define CHIPTLVDEBUG_HPP
 
 #include <stddef.h>
 #include <stdint.h>
@@ -31,12 +31,12 @@
 #include <CHIPError.h>
 #include <CHIPTLV.h>
 
-namespace CHIP {
+namespace chip {
 
 namespace TLV {
 
 /**
- *   @namespace CHIP::TLV::Debug
+ *   @namespace chip::TLV::Debug
  *
  *   @brief
  *     This namespace includes types and interfaces for debugging and
@@ -56,16 +56,16 @@ extern const char *DecodeType(const TLVType aType);
 
 extern const char *DecodeTagControl(const TLVTagControl aTagControl);
 
-extern WEAVE_ERROR DumpIterator(DumpWriter aWriter, const TLVReader &aReader);
+extern CHIP_ERROR DumpIterator(DumpWriter aWriter, const TLVReader &aReader);
 
-extern WEAVE_ERROR DumpHandler(const TLVReader &aReader, size_t aDepth, void *aContext);
+extern CHIP_ERROR DumpHandler(const TLVReader &aReader, size_t aDepth, void *aContext);
 
-extern WEAVE_ERROR Dump(const TLVReader &aReader, DumpWriter aWriter);
+extern CHIP_ERROR Dump(const TLVReader &aReader, DumpWriter aWriter);
 
 } // namespace Debug
 
 } // namespace TLV
 
-} // namespace CHIP
+} // namespace chip
 
-#endif // WEAVETLVDEBUG_HPP
+#endif // CHIPTLVDEBUG_HPP
