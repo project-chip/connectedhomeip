@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,28 +18,28 @@
 /**
  *    @file
  *      This file defines objects that provide an abstraction layer between a
- *      platform's Bluetooth Low Energy (BLE) implementation and the Weave
+ *      platform's Bluetooth Low Energy (BLE) implementation and the chip
  *      stack.
  *
  *      The BleLayer obect accepts BLE data and control input from the
  *      application via a functional interface. It performs the fragmentation
- *      and reassembly required to transmit Weave message via a BLE GATT
- *      characteristic interface, and drives incoming messages up the Weave
+ *      and reassembly required to transmit chip message via a BLE GATT
+ *      characteristic interface, and drives incoming messages up the chip
  *      stack.
  *
  *      During initialization, the BleLayer object requires a pointer to the
  *      platform's implementation of the BleAdapter object. This object is
- *      defined but not implemented by the Weave stack, and provides the
+ *      defined but not implemented by the chip stack, and provides the
  *      BleLayer with a functional interface to drive outgoing GATT
  *      characteristic writes and indications. It also provides a mechanism
- *      for Weave to inform the application when it has finished using a given
- *      BLE connection, i.e., when the WeaveConnection object wrapping this
+ *      for chip to inform the application when it has finished using a given
+ *      BLE connection, i.e., when the chipConnection object wrapping this
  *      connection has closed.
  *
- *      To enable Weave over BLE for a new platform, the application developer
+ *      To enable chip over BLE for a new platform, the application developer
  *      must implement the BleAdapter class for their platform, pass it to the
  *      BleLayer on startup, pass a pointer to this BleLayer to their instance
- *      of WeaveMessageLayer, and ensure that the application calls the
+ *      of chipMessageLayer, and ensure that the application calls the
  *      necessary BleLayer functions to drive BLE data and control input up the
  *      stack.
  */
@@ -53,36 +52,36 @@
 #endif
 #include <stdint.h>
 
-#include <BleLayer/BleConfig.h>
+#include <ble/BleConfig.h>
 
-#include <SystemLayer/SystemLayer.h>
-#include <SystemLayer/SystemPacketBuffer.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
 
-#include <BleLayer/BlePlatformDelegate.h>
-#include <BleLayer/BleApplicationDelegate.h>
-#include <BleLayer/BleUUID.h>
-#include <BleLayer/BleError.h>
+#include <ble/BlePlatformDelegate.h>
+#include <ble/BleApplicationDelegate.h>
+#include <ble/BleUUID.h>
+#include <ble/BleError.h>
 
 #if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#include <InetLayer/InetLayer.h>
+#include <inet/InetLayer.h>
 #endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
-using ::nl::Weave::System::PacketBuffer;
+using ::chip::System::PacketBuffer;
 
 /**
  *  @def NUM_SUPPORTED_PROTOCOL_VERSIONS
  *
  *  Number of unsigned 4-bit representations of supported transport protocol
- *  versions encapsulated in a BleTransportCapabilitiesRequest. Defined by Weave
+ *  versions encapsulated in a BleTransportCapabilitiesRequest. Defined by chip
  *  over BLE protocol specification.
  */
 #define NUM_SUPPORTED_PROTOCOL_VERSIONS     8
-/// Version(s) of the Nest BLE Transport Protocol that this stack supports.
-#define NL_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V2
-#define NL_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V3
+/// Version(s) of the CHIP BLE Transport Protocol that this stack supports.
+#define CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V2
+#define CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V3
 
 /// Forward declarations.
 class BleLayer;
@@ -95,7 +94,7 @@ typedef enum
     kBleRole_Peripheral = 1
 } BleRole;
 
-/// Enum defining versions of Weave over BLE transport protocol.
+/// Enum defining versions of chip over BLE transport protocol.
 typedef enum
 {
     kBleTransportProtocolVersion_None = 0,
@@ -203,34 +202,34 @@ public:
  *  @brief
  *    This class provides an interface for a single thread to drive data
  *    either up the stack via the BleLayer platform interface functions,
- *    or down the stack via a WeaveConnection object associated with a
+ *    or down the stack via a chipConnection object associated with a
  *    BLEEndPoint.
  *
- *    There are two ways to associate a WeaveConnection (defined by the
- *    WeaveMessageLayer) with a BLE connection:
+ *    There are two ways to associate a chipConnection (defined by the
+ *    chipMessageLayer) with a BLE connection:
  *
  *    First, the application can passively receive an incoming BLE connection
  *    and hand the platform-specific BLE_CONNECTION_OBJECT that this receipt
  *    generates to BleLayer via the corresponding platform interface function.
  *    This causes BleLayer to wrap the BLE_CONNECTION_OBJECT in a BLEEndPoint,
- *    and notify WeaveMessageLayer that a new BLE conneciotn has been received.
+ *    and notify chipMessageLayer that a new BLE conneciotn has been received.
  *    The message layer then wraps the new BLEEndPoint object in a
- *    WeaveConnection, and hands this object to the application via the message
+ *    chipConnection, and hands this object to the application via the message
  *    layer's OnConnectionReceived callback.
  *
  *    Second, the application can actively form an outgoing BLE connection, e.g.,
- *    by connecting to a BLE peripheral. It then creates a new WeaveConnection
- *    via the WeaveMessageLayer, assigns an authentication type to this
+ *    by connecting to a BLE peripheral. It then creates a new chipConnection
+ *    via the chipMessageLayer, assigns an authentication type to this
  *    connection, and binds it to the BLE_CONNECTION_OBJECT for the new BLE
- *    connection via WeaveConnection::ConnectBle. This function then
- *    establishes the secure session type specified by the WeaveConnection's
+ *    connection via chipConnection::ConnectBle. This function then
+ *    establishes the secure session type specified by the chipConnection's
  *    authentication type member variable.
  *
  */
-class NL_DLL_EXPORT BleLayer
+class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     friend class WoBleTest;
 #endif
 
@@ -245,14 +244,14 @@ public:
     void * mAppState;
 
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
-    BleConnectionReceivedFunct OnWeaveBleConnectReceived;
+    BleConnectionReceivedFunct OnchipBleConnectReceived;
 
 public:
     // Public functions:
     BleLayer(void);
 
     BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate,
-                   Weave::System::Layer * systemLayer);
+                   chip::System::Layer * systemLayer);
 
 #if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
     BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate, Inet::InetLayer * inetLayer);
@@ -262,7 +261,7 @@ public:
 
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
-    nl::Weave::System::Error ScheduleWork(nl::Weave::System::Layer::TimerCompleteFunct aComplete, void* aAppState)
+    chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void* aAppState)
     {
         return mSystemLayer->ScheduleWork(aComplete, aAppState);
     }
@@ -270,82 +269,82 @@ public:
     /**< Platform interface functions:
 
      *   Calling conventions:
-     *     Weave takes ownership of PacketBuffers received through these functions,
+     *     chip takes ownership of PacketBuffers received through these functions,
      *     and will free them or pass ownership up the stack.
      *
      *     Beyond each call, no guarantees are provided as to the lifetime of UUID arguments.
      *
-     *     A 'true' return value means the Weave stack successfully handled the
-     *     corresponding message or state indication. 'false' means the Weave stack either
-     *     failed or chose not to handle this. In case of 'false,' the Weave stack will not
+     *     A 'true' return value means the chip stack successfully handled the
+     *     corresponding message or state indication. 'false' means the chip stack either
+     *     failed or chose not to handle this. In case of 'false,' the chip stack will not
      *     have freed or taken ownership of any PacketBuffer arguments. This contract allows the
-     *     platform to pass BLE events to Weave without needing to know which characteristics
-     *     Weave cares about.
+     *     platform to pass BLE events to chip without needing to know which characteristics
+     *     chip cares about.
 
-     *     Platform must call this function when a GATT subscription has been established to any Weave service
+     *     Platform must call this function when a GATT subscription has been established to any chip service
      *     charateristic.
      *
-     *     If this function returns true, Weave has accepted the BLE connection and wrapped it
-     *     in a WeaveConnection object. If Weave accepts a BLE connection, the platform MUST
-     *     notify Weave if the subscription is canceled or the underlying BLE connection is
-     *     closed, or the associated WeaveConnection will never be closed or freed. */
-    bool HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId);
+     *     If this function returns true, chip has accepted the BLE connection and wrapped it
+     *     in a chipConnection object. If chip accepts a BLE connection, the platform MUST
+     *     notify chip if the subscription is canceled or the underlying BLE connection is
+     *     closed, or the associated chipConnection will never be closed or freed. */
+    bool HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
 
     /// Call when a GATT subscribe request succeeds.
-    bool HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId);
+    bool HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
 
-    /**< Platform must call this function when a GATT unsubscribe is requested on any Weave
-     *   service charateristic, that is, when an existing GATT subscription on a Weave service
+    /**< Platform must call this function when a GATT unsubscribe is requested on any chip
+     *   service charateristic, that is, when an existing GATT subscription on a chip service
      *   characteristic is canceled. */
-    bool HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId);
+    bool HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
 
     /// Call when a GATT unsubscribe request succeeds.
-    bool HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId);
+    bool HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
 
     /// Call when a GATT write request is received.
-    bool HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId,
+    bool HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId,
                              PacketBuffer * pBuf);
 
     /// Call when a GATT indication is received.
-    bool HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId,
+    bool HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId,
                                   PacketBuffer * pBuf);
 
     /// Call when an outstanding GATT write request receives a positive receipt confirmation.
-    bool HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId);
+    bool HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
 
     /// Call when an oustanding GATT indication receives a positive receipt confirmation.
-    bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId);
+    bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
 
     /// Call when a GATT read request is received.
-    bool HandleReadReceived(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const WeaveBleUUID * svcId,
-                            const WeaveBleUUID * charId);
+    bool HandleReadReceived(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const chipBleUUID * svcId,
+                            const chipBleUUID * charId);
 
     /**< Platform must call this function when any previous operation undertaken by the BleLayer via BleAdapter
      *   fails, such as a characteristic write request or subscribe attempt, or when a BLE connection is closed.
      *
-     *   In most cases, this will prompt Weave to close the associated WeaveConnection and notify that platform that
+     *   In most cases, this will prompt chip to close the associated chipConnection and notify that platform that
      *   it has abandoned the underlying BLE connection.
      *
-     *   NOTE: if the application explicitly closes a BLE connection with an associated WeaveConnection such that
-     *   the BLE connection close will not generate an upcall to Weave, HandleConnectionError must be called with
-     *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this WeaveConnection and its end point object. */
+     *   NOTE: if the application explicitly closes a BLE connection with an associated chipConnection such that
+     *   the BLE connection close will not generate an upcall to chip, HandleConnectionError must be called with
+     *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this chipConnection and its end point object. */
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, BLE_ERROR err);
 
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     BLEEndPoint * mTestBleEndPoint;
 #endif
 
 private:
     // Private data members:
 
-    // UUID of Weave service characteristic used for central writes.
-    static const WeaveBleUUID WEAVE_BLE_CHAR_1_ID;
-    // UUID of Weave service characteristic used for peripheral indications.
-    static const WeaveBleUUID WEAVE_BLE_CHAR_2_ID;
+    // UUID of chip service characteristic used for central writes.
+    static const chipBleUUID CHIP_BLE_CHAR_1_ID;
+    // UUID of chip service characteristic used for peripheral indications.
+    static const chipBleUUID CHIP_BLE_CHAR_2_ID;
 
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
-    Weave::System::Layer * mSystemLayer;
+    chip::System::Layer * mSystemLayer;
 
 private:
     // Private functions:
@@ -366,7 +365,7 @@ inline BLE_ERROR BleLayer::Init(BlePlatformDelegate * aPlatformDelegate, BleAppl
 #endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 #include "BLEEndPoint.h"
 

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +19,7 @@
 
 #include <stdint.h>
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
 // Type to represent 128-bit BLE UUIDs. 16-bit short UUIDs may be combined with
@@ -30,14 +29,14 @@ namespace Ble {
 typedef struct
 {
     uint8_t bytes[16];
-} WeaveBleUUID;
+} chipBleUUID;
 
-// UUID of Nest Weave BLE service. Exposed for use in scan filter.
-extern const WeaveBleUUID WEAVE_BLE_SVC_ID;
+// UUID of CHIP BLE service. Exposed for use in scan filter.
+extern const chipBleUUID CHIP_BLE_SVC_ID;
 
-bool UUIDsMatch(const WeaveBleUUID * idOne, const WeaveBleUUID * idTwo);
+bool UUIDsMatch(const chipBleUUID * idOne, const chipBleUUID * idTwo);
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 #endif /* BLEUUID_H_ */

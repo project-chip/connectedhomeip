@@ -32,8 +32,8 @@ nl_BleLayer_sources                                       = \
     @top_builddir@/src/ble/BleError.cpp                     \
     $(NULL)
 
-if WEAVE_ENABLE_WOBLE_TEST
+if CHIP_ENABLE_WOBLE_TEST
 nl_BleLayer_sources                                      += \
     @top_builddir@/src/device-manager/WoBleTest.cpp         \
     $(NULL)
-endif # WEAVE_ENABLE_WOBLE_TEST
+endif # CHIP_ENABLE_WOBLE_TEST

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,9 +17,9 @@
 
 /**
  *    @file
- *      This file defines types and an object for the Weave over
+ *      This file defines types and an object for the chip over
  *      Bluetooth Low Energy (WoBLE) byte-stream, connection-oriented
- *      adaptation of Weave for point-to-point Bluetooth Low Energy
+ *      adaptation of chip for point-to-point Bluetooth Low Energy
  *      (BLE) links.
  *
  */
@@ -35,20 +34,20 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <BleLayer/BleConfig.h>
-#include <BleLayer/BleError.h>
-#include <SystemLayer/SystemPacketBuffer.h>
-#include <Weave/Support/FlagUtils.hpp>
+#include <ble/BleConfig.h>
+#include <ble/BleError.h>
+#include <system/SystemPacketBuffer.h>
+#include <support/FlagUtils.hpp>
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
-using ::nl::Weave::System::PacketBuffer;
+using ::chip::System::PacketBuffer;
 
 typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in WoBle::IsValidAck and
                                   // BLEEndPoint::AdjustReceiveWindow.
 
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
 class BLEEndPoint;
 #endif
 
@@ -61,7 +60,7 @@ typedef enum
 
 class WoBle
 {
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     friend class BLEEndPoint;
 #endif
 
@@ -81,7 +80,7 @@ public:
         kHeaderFlag_ContinueMessage = 0x02,
         kHeaderFlag_EndMessage      = 0x04,
         kHeaderFlag_FragmentAck     = 0x08,
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
         kHeaderFlag_CommandMessage = 0x10,
 #endif
     }; // Masks for BTP fragment header flag bits.
@@ -112,7 +111,7 @@ public:
 
     inline State_t RxState(void) { return mRxState; }
     inline State_t TxState(void) { return mTxState; }
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     inline PacketType_t SetTxPacketType(PacketType_t type) { return (mTxPacketType = type); };
     inline PacketType_t SetRxPacketType(PacketType_t type) { return (mRxPacketType = type); };
     inline PacketType_t TxPacketType() { return mTxPacketType; };
@@ -134,7 +133,7 @@ public:
         p->SetStart(p->Start() + sizeof(type));
         return type;
     };
-#endif // WEAVE_ENABLE_WOBLE_TEST
+#endif // CHIP_ENABLE_WOBLE_TEST
 
     bool HasUnackedData(void) const;
 
@@ -153,7 +152,7 @@ public:
 
 private:
     // Private data members:
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     PacketType_t mTxPacketType;
     PacketType_t mRxPacketType;
     SequenceNumber_t mTxPacketSeq;
@@ -189,6 +188,6 @@ private:
 };
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 #endif /* WOBLE_H_ */

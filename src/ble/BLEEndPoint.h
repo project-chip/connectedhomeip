@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +19,7 @@
  *    @file
  *      This file defines a Bluetooth Low Energy (BLE) connection
  *      endpoint abstraction for the byte-streaming,
- *      connection-oriented Weave over Bluetooth Low Energy (WoBLE)
+ *      connection-oriented chip over Bluetooth Low Energy (WoBLE)
  *      Bluetooth Transport Protocol (BTP).
  *
  */
@@ -32,14 +31,14 @@
 
 #include <BleLayer/BleLayer.h>
 #include <BleLayer/WoBle.h>
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
 #include <BleLayer/WoBleTest.h>
 #endif
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
-using ::nl::Weave::System::PacketBuffer;
+using ::chip::System::PacketBuffer;
 
 enum
 {
@@ -50,15 +49,15 @@ enum
 // Forward declarations
 class BleLayer;
 class BleEndPointPool;
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
 class WoBleTest;
 #endif
 
-class NL_DLL_EXPORT BLEEndPoint : public BleLayerObject
+class DLL_EXPORT BLEEndPoint : public BleLayerObject
 {
     friend class BleLayer;
     friend class BleEndPointPool;
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     friend class WoBleTest;
 #endif
 
@@ -74,7 +73,7 @@ public:
         kState_Connected  = 3,
         kState_Closing    = 4,
         kState_Closed     = 5
-    } mState; // [READ-ONLY] End point connection state. Refers to state of Weave over
+    } mState; // [READ-ONLY] End point connection state. Refers to state of chip over
               // BLE transport protocol connection, not of underlying BLE connection.
 
     // Public function pointers:
@@ -87,7 +86,7 @@ public:
     typedef void (*OnConnectionClosedFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
     OnConnectionClosedFunct OnConnectionClosed;
 
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBuffer * msg);
     OnCommandReceivedFunct OnCommandReceived;
     inline void SetOnCommandReceivedCB(OnCommandReceivedFunct cb) { OnCommandReceived = cb; };
@@ -126,7 +125,7 @@ private:
         kTimerState_AckReceivedTimerRunning       = 0x04, // Ack received timer running due to unacked sent fragment.
         kTimerState_SendAckTimerRunning           = 0x08, // Send ack timer running; indicates pending ack to send.
         kTimerState_UnsubscribeTimerRunning       = 0x10, // Unsubscribe completion timer running.
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
         kTimerState_UnderTestTimerRunnung = 0x80 // running throughput Tx test
 #endif
     };
@@ -153,8 +152,8 @@ private:
     SequenceNumber_t mLocalReceiveWindowSize;
     SequenceNumber_t mRemoteReceiveWindowSize;
     SequenceNumber_t mReceiveWindowMaxSize;
-#if WEAVE_ENABLE_WOBLE_TEST
-    nl::Weave::System::Mutex mTxQueueMutex; // For MT-safe Tx queuing
+#if CHIP_ENABLE_WOBLE_TEST
+    chip::System::Mutex mTxQueueMutex; // For MT-safe Tx queuing
 #endif
 
 private:
@@ -205,11 +204,11 @@ private:
     void StopUnsubscribeTimer(void);       // Stop unsubscribe timer.
 
     // Timer expired callbacks:
-    static void HandleConnectTimeout(Weave::System::Layer * systemLayer, void * appState, Weave::System::Error err);
-    static void HandleReceiveConnectionTimeout(Weave::System::Layer * systemLayer, void * appState, Weave::System::Error err);
-    static void HandleAckReceivedTimeout(Weave::System::Layer * systemLayer, void * appState, Weave::System::Error err);
-    static void HandleSendAckTimeout(Weave::System::Layer * systemLayer, void * appState, Weave::System::Error err);
-    static void HandleUnsubscribeTimeout(Weave::System::Layer * systemLayer, void * appState, Weave::System::Error err);
+    static void HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
+    static void HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
+    static void HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
+    static void HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
+    static void HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err);
 
     // Close functions:
     void DoCloseCallback(uint8_t state, uint8_t flags, BLE_ERROR err);
@@ -219,7 +218,7 @@ private:
     void FreeWoBle(void);
 
     // Mutex lock on Tx queue. Used only in WoBle test build for now.
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     inline void QueueTxLock() { mTxQueueMutex.Lock(); };
     inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); };
 #else
@@ -230,6 +229,6 @@ private:
 };
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 #endif /* BLEENDPOINT_H_ */
