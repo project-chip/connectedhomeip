@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,14 +26,13 @@
 #if INET_CONFIG_TEST
 
 
-namespace nl {
 namespace Inet {
 namespace FaultInjection {
 
-static nl::FaultInjection::Record sFaultRecordArray[kFault_NumItems];
-static class nl::FaultInjection::Manager sInetFaultInMgr;
-static const nl::FaultInjection::Name sManagerName = "Inet";
-static const nl::FaultInjection::Name sFaultNames[] = {
+static FaultInjection::Record sFaultRecordArray[kFault_NumItems];
+static class FaultInjection::Manager sInetFaultInMgr;
+static const FaultInjection::Name sManagerName = "Inet";
+static const FaultInjection::Name sFaultNames[] = {
     "DNSResolverNew",
     "Send",
     "SendNonCritical",
@@ -44,7 +42,7 @@ static const nl::FaultInjection::Name sFaultNames[] = {
 /**
  * Get the singleton FaultInjection::Manager for Inet faults
  */
-nl::FaultInjection::Manager &GetManager(void)
+FaultInjection::Manager &GetManager(void)
 {
     if (0 == sInetFaultInMgr.GetNumFaults())
     {
@@ -58,6 +56,5 @@ nl::FaultInjection::Manager &GetManager(void)
 
 } // namespace FaultInjection
 } // namespace Inet
-} // namespace nl
 
 #endif // INET_CONFIG_TEST

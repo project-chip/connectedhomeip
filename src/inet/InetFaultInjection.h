@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,17 +23,16 @@
 #ifndef INET_FAULT_INJECTION_H_
 #define INET_FAULT_INJECTION_H_
 
-#include <InetLayer/InetConfig.h>
+#include "InetConfig.h"
 
 #if INET_CONFIG_TEST
 
 #include <nlfaultinjection.hpp>
 
-#include <Weave/Support/NLDLLUtil.h>
+#include "support/DLLUtil.h"
 
-#include <SystemLayer/SystemFaultInjection.h>
+#include "system/SystemFaultInjection.h"
 
-namespace nl {
 namespace Inet {
 namespace FaultInjection {
 
@@ -53,11 +51,10 @@ typedef enum
     kFault_NumItems,
 } InetFaultInjectionID;
 
-NL_DLL_EXPORT nl::FaultInjection::Manager &GetManager(void);
+DLL_EXPORT FaultInjection::Manager &GetManager(void);
 
 } // namespace FaultInjection
 } // namespace Inet
-} // namespace nl
 
 /**
  * Execute the statements included if the Inet fault is
@@ -67,7 +64,7 @@ NL_DLL_EXPORT nl::FaultInjection::Manager &GetManager(void);
  * @param[in] aStatements   Statements to be executed if the fault is enabled.
  */
 #define INET_FAULT_INJECT( aFaultID, aStatement ) \
-        nlFAULT_INJECT(nl::Inet::FaultInjection::GetManager(), aFaultID, aStatement)
+        nlFAULT_INJECT(Inet::FaultInjection::GetManager(), aFaultID, aStatement)
 
 #else // INET_CONFIG_TEST
 
