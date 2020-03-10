@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,14 +18,14 @@
 /**
  *    @file
  *      This file defines default compile-time configuration constants
- *      for the Nest BleLayer, a Bluetooth Low Energy communications
+ *      for the CHIP BleLayer, a Bluetooth Low Energy communications
  *      abstraction layer.
  *
  *      Package integrators that wish to override these values should
  *      either use preprocessor definitions or create a project-
  *      specific BleProjectConfig.h header and then assert
  *      HAVE_BLEPROJECTCONFIG_H via the package configuration tool
- *      via --with-weave-ble-project-includes=DIR where DIR is the
+ *      via --with-chip-ble-project-includes=DIR where DIR is the
  *      directory that contains the header.
  *
  *  NOTE WELL: On some platforms, this header is included by C-language programs.
@@ -36,13 +35,13 @@
 #ifndef BLECONFIG_H_
 #define BLECONFIG_H_
 
-#include <SystemLayer/SystemConfig.h>
+#include <system/SystemConfig.h>
 
 /* Include a project-specific configuration file, if defined.
  *
- * An application or module that incorporates Weave can define a project configuration
+ * An application or module that incorporates chip can define a project configuration
  * file to override standard BLE Layer configuration with application-specific values.
- * The project config file is typically located outside the OpenWeave source tree,
+ * The project config file is typically located outside the Openchip source tree,
  * alongside the source code for the application.
  */
 #ifdef BLE_PROJECT_CONFIG_INCLUDE
@@ -52,9 +51,9 @@
 /* Include a platform-specific configuration file, if defined.
  *
  * A platform configuration file contains overrides to standard BLE Layer configuration
- * that are specific to the platform or OS on which Weave is running.  It is typically
- * provided as apart of an adaptation layer that adapts OpenWeave to the target
- * environment.  This adaptation layer may be included in the OpenWeave source tree
+ * that are specific to the platform or OS on which chip is running.  It is typically
+ * provided as apart of an adaptation layer that adapts Openchip to the target
+ * environment.  This adaptation layer may be included in the Openchip source tree
  * itself or implemented externally.
  */
 #ifdef BLE_PLATFORM_CONFIG_INCLUDE
@@ -68,7 +67,7 @@
  *
  *  @brief
  *    This boolean configuration option is (1) if the obsolescent interfaces
- *    of the BLE layer that now reside elsewhere, for example, in the Weave System
+ *    of the BLE layer that now reside elsewhere, for example, in the chip System
  *    Layer or the INET layer, are aliased for transitional purposes.
  *
  */
@@ -77,9 +76,9 @@
 #endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 #if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#if !WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#error "REQUIRED: if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES then WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES!"
-#endif // !WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#if !CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#error "REQUIRED: if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES then CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES!"
+#endif // !CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 #include <InetLayer/InetBuffer.h>
 #endif // BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
@@ -98,7 +97,7 @@
 #endif // BLE_LAYER_NUM_BLE_ENDPOINTS
 
 #if (BLE_LAYER_NUM_BLE_ENDPOINTS < 1)
-#error "BLE_LAYER_NUM_BLE_ENDPOINTS must be greater than 0. configure options may be used to disable Weave over BLE."
+#error "BLE_LAYER_NUM_BLE_ENDPOINTS must be greater than 0. configure options may be used to disable chip over BLE."
 #endif
 
 /**
@@ -249,6 +248,6 @@
 
 // clang-format on
 
-#include <Weave/Core/WeaveConfig.h>
+#include <core/CHIPConfig.h>
 
 #endif /* BLECONFIG_H_ */

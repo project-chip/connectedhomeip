@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,50 +17,50 @@
 
 /**
  *    @file
- *      This file implements types and an object for the Weave over
+ *      This file implements types and an object for the chip over
  *      Bluetooth Low Energy (WoBLE) byte-stream, connection-oriented
- *      adaptation of Weave for point-to-point Bluetooth Low Energy
+ *      adaptation of chip for point-to-point Bluetooth Low Energy
  *      (BLE) links.
  *
  */
 
-#include <BleLayer/BleConfig.h>
+#include <ble/BleConfig.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 
-#include <BleLayer/WoBle.h>
-#if WEAVE_ENABLE_WOBLE_TEST
-#include <BleLayer/WoBleTest.h>
+#include <ble/WoBle.h>
+#if CHIP_ENABLE_WOBLE_TEST
+#include <ble/WoBleTest.h>
 #endif
 
-#include <Weave/Support/logging/WeaveLogging.h>
-#include <Weave/Support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
 
 // Define below to enable extremely verbose BLE-specific debug logging.
-#undef NL_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
+#undef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
 
-#ifdef NL_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
-#define WeaveLogDebugBtpEngine(MOD, MSG, ...) WeaveLogError(MOD, MSG, ##__VA_ARGS__)
+#ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
+#define chipLogDebugBtpEngine(MOD, MSG, ...) chipLogError(MOD, MSG, ##__VA_ARGS__)
 #else
-#define WeaveLogDebugBtpEngine(MOD, MSG, ...)
+#define chipLogDebugBtpEngine(MOD, MSG, ...)
 #endif
 
-#define NL_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE 1 // Size in bytes of enocded BTP fragment header flag bits
-#define NL_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE 1 // Size in bytes of encoded BTP sequence number
-#define NL_BLE_TRANSFER_PROTOCOL_ACK_SIZE 1          // Size in bytes of encoded BTP fragment acknowledgement number
-#define NL_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE 2      // Size in byte of encoded BTP total fragmented message length
+#define CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE 1 // Size in bytes of enocded BTP fragment header flag bits
+#define CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE 1 // Size in bytes of encoded BTP sequence number
+#define CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE 1          // Size in bytes of encoded BTP fragment acknowledgement number
+#define CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE 2      // Size in byte of encoded BTP total fragmented message length
 
-#define NL_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE                                                                                   \
-    (NL_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + NL_BLE_TRANSFER_PROTOCOL_ACK_SIZE + NL_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE + \
-     NL_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE)
+#define CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE                                                                                   \
+    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE + \
+     CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE)
 
-#define NL_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE                                                                      \
-    (NL_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + NL_BLE_TRANSFER_PROTOCOL_ACK_SIZE + NL_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
+#define CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE                                                                      \
+    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
 
-#define NL_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE                                                                        \
-    (NL_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + NL_BLE_TRANSFER_PROTOCOL_ACK_SIZE + NL_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
+#define CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE                                                                        \
+    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
 static inline void IncSeqNum(SequenceNumber_t & a_seq_num)
@@ -78,12 +77,12 @@ static inline bool DidReceiveData(uint8_t rx_flags)
 
 static void PrintBufDebug(PacketBuffer * buf)
 {
-#ifdef NL_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
+#ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
     uint8_t * b = buf->Start();
 
     for (int i = 0; i < buf->DataLength(); i++)
     {
-        WeaveLogError(Ble, "\t%02x", b[i]);
+        chipLogError(Ble, "\t%02x", b[i]);
     }
 #endif
 }
@@ -108,7 +107,7 @@ BLE_ERROR WoBle::Init(void * an_app_state, bool expect_first_ack)
     mTxPacketCount         = 0;
     mTxNewestUnackedSeqNum = 0;
     mTxOldestUnackedSeqNum = 0;
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     mTxPacketType = kType_Data; // Default WoBle Data packet
     mRxPacketType = kType_Data; // Default WoBle Data packet
 #endif
@@ -166,13 +165,13 @@ bool WoBle::HasUnackedData() const
 
 bool WoBle::IsValidAck(SequenceNumber_t ack_num) const
 {
-    WeaveLogDebugBtpEngine(Ble, "entered IsValidAck, ack = %u, oldest = %u, newest = %u", ack_num, mTxOldestUnackedSeqNum,
+    chipLogDebugBtpEngine(Ble, "entered IsValidAck, ack = %u, oldest = %u, newest = %u", ack_num, mTxOldestUnackedSeqNum,
                            mTxNewestUnackedSeqNum);
 
     // Return false if not awaiting any ack.
     if (!mExpectingAck)
     {
-        WeaveLogDebugBtpEngine(Ble, "unexpected ack is invalid");
+        chipLogDebugBtpEngine(Ble, "unexpected ack is invalid");
         return false;
     }
 
@@ -192,7 +191,7 @@ BLE_ERROR WoBle::HandleAckReceived(SequenceNumber_t ack_num)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
-    WeaveLogDebugBtpEngine(Ble, "entered HandleAckReceived, ack_num = %u", ack_num);
+    chipLogDebugBtpEngine(Ble, "entered HandleAckReceived, ack_num = %u", ack_num);
 
     // Ensure ack_num falls within range of ack values we're expecting.
     VerifyOrExit(IsValidAck(ack_num), err = BLE_ERROR_INVALID_ACK);
@@ -223,10 +222,10 @@ BLE_ERROR WoBle::EncodeStandAloneAck(PacketBuffer * data)
     uint8_t * characteristic;
 
     // Ensure enough headroom exists for the lower BLE layers.
-    VerifyOrExit(data->EnsureReservedSize(WEAVE_CONFIG_BLE_PKT_RESERVED_SIZE), err = BLE_ERROR_NO_MEMORY);
+    VerifyOrExit(data->EnsureReservedSize(CHIP_CONFIG_BLE_PKT_RESERVED_SIZE), err = BLE_ERROR_NO_MEMORY);
 
     // Ensure enough space for standalone ack payload.
-    VerifyOrExit(data->MaxDataLength() >= NL_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE, err = BLE_ERROR_NO_MEMORY);
+    VerifyOrExit(data->MaxDataLength() >= CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE, err = BLE_ERROR_NO_MEMORY);
     characteristic = data->Start();
 
     // Since there's no preexisting message payload, we can write BTP header without adjusting data start pointer.
@@ -234,13 +233,13 @@ BLE_ERROR WoBle::EncodeStandAloneAck(PacketBuffer * data)
 
     // Acknowledge most recently received sequence number.
     characteristic[1] = GetAndRecordRxAckSeqNum();
-    WeaveLogDebugBtpEngine(Ble, "===> encoded stand-alone ack = %u", characteristic[1]);
+    chipLogDebugBtpEngine(Ble, "===> encoded stand-alone ack = %u", characteristic[1]);
 
     // Include sequence number for stand-alone ack itself.
     characteristic[2] = GetAndIncrementNextTxSeqNum();
 
     // Set ack payload data length.
-    data->SetDataLength(NL_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE);
+    data->SetDataLength(CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE);
 
 exit:
     return err;
@@ -272,7 +271,7 @@ BLE_ERROR WoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumbe
 
     // Get header flags, always in first byte.
     rx_flags = characteristic[cursor++];
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     if (GetFlag(rx_flags, kHeaderFlag_CommandMessage))
         SetRxPacketType(kType_Control);
     else
@@ -311,9 +310,9 @@ BLE_ERROR WoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumbe
 
     // Truncate the incoming fragment length by the mRxFragmentSize as the negotiated
     // mRxFragnentSize may be smaller than the characteristic size.
-    data->SetDataLength(nl::Weave::min(data->DataLength(), mRxFragmentSize));
+    data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
 
-    WeaveLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
+    chipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
     PrintBufDebug(data);
 
     if (mRxState == kState_Idle)
@@ -352,7 +351,7 @@ BLE_ERROR WoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumbe
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
         data = NULL;
 
-        // For now, limit WoBle message size to max length of 1 pbuf, as we do for Weave messages sent via IP.
+        // For now, limit WoBle message size to max length of 1 pbuf, as we do for chip messages sent via IP.
         // TODO add support for WoBle messages longer than 1 pbuf
         VerifyOrExit(mRxBuf->Next() == NULL, err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
     }
@@ -386,14 +385,14 @@ exit:
         mRxState = kState_Error;
 
         // Dump protocol engine state, plus header flags and received data length.
-        WeaveLogError(Ble, "HandleCharacteristicReceived failed, err = %d, rx_flags = %u", err, rx_flags);
+        chipLogError(Ble, "HandleCharacteristicReceived failed, err = %d, rx_flags = %u", err, rx_flags);
         if (didReceiveAck)
         {
-            WeaveLogError(Ble, "With rx'd ack = %u", receivedAck);
+            chipLogError(Ble, "With rx'd ack = %u", receivedAck);
         }
         if (mRxBuf != NULL)
         {
-            WeaveLogError(Ble, "With rx buf data length = %u", mRxBuf->DataLength());
+            chipLogError(Ble, "With rx buf data length = %u", mRxBuf->DataLength());
         }
         LogState();
 
@@ -442,7 +441,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
     if (send_ack && !HasUnackedData())
     {
-        WeaveLogError(Ble, "HandleCharacteristicSend: send_ack true, but nothing to acknowledge.");
+        chipLogError(Ble, "HandleCharacteristicSend: send_ack true, but nothing to acknowledge.");
         return false;
     }
 
@@ -457,18 +456,18 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
         mTxState  = kState_InProgress;
         mTxLength = mTxBuf->DataLength();
 
-        WeaveLogDebugBtpEngine(Ble, ">>> WoBle preparing to send whole message:");
+        chipLogDebugBtpEngine(Ble, ">>> WoBle preparing to send whole message:");
         PrintBufDebug(data);
 
         // Determine fragment header size.
-        uint8_t header_size = send_ack ? NL_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE
-                                       : (NL_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE - NL_BLE_TRANSFER_PROTOCOL_ACK_SIZE);
+        uint8_t header_size = send_ack ? CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE
+                                       : (CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE - CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE);
 
         // Ensure enough headroom exists for the BTP header, and any headroom needed by the lower BLE layers.
-        if (!mTxBuf->EnsureReservedSize(header_size + WEAVE_CONFIG_BLE_PKT_RESERVED_SIZE))
+        if (!mTxBuf->EnsureReservedSize(header_size + CHIP_CONFIG_BLE_PKT_RESERVED_SIZE))
         {
             // handle error
-            WeaveLogError(Ble, "HandleCharacteristicSend: not enough headroom");
+            chipLogError(Ble, "HandleCharacteristicSend: not enough headroom");
             mTxState = kState_Error;
             mTxBuf   = NULL; // Avoid double-free after assignment above, as caller frees data on error.
 
@@ -483,7 +482,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
         characteristic[0] = kHeaderFlag_StartMessage;
 
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
         if (TxPacketType() == kType_Control)
             SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
 #endif
@@ -492,7 +491,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
         {
             SetFlag(characteristic[0], kHeaderFlag_FragmentAck, true);
             characteristic[cursor++] = GetAndRecordRxAckSeqNum();
-            WeaveLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
+            chipLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
         }
 
         characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
@@ -513,7 +512,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
             mTxLength -= mTxFragmentSize - cursor;
         }
 
-        WeaveLogDebugBtpEngine(Ble, ">>> WoBle preparing to send first fragment:");
+        chipLogDebugBtpEngine(Ble, ">>> WoBle preparing to send first fragment:");
         PrintBufDebug(data);
     }
     else if (mTxState == kState_InProgress)
@@ -529,14 +528,14 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
         // prepend header
         characteristic -= send_ack
-            ? NL_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE
-            : (NL_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE - NL_BLE_TRANSFER_PROTOCOL_ACK_SIZE);
+            ? CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE
+            : (CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE - CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE);
         mTxBuf->SetStart(characteristic);
         uint8_t cursor = 1; // first position past header flags byte
 
         characteristic[0] = kHeaderFlag_ContinueMessage;
 
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
         if (TxPacketType() == kType_Control)
             SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
 #endif
@@ -545,7 +544,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
         {
             SetFlag(characteristic[0], kHeaderFlag_FragmentAck, true);
             characteristic[cursor++] = GetAndRecordRxAckSeqNum();
-            WeaveLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
+            chipLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
         }
 
         characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
@@ -564,7 +563,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
             mTxLength -= mTxFragmentSize - cursor;
         }
 
-        WeaveLogDebugBtpEngine(Ble, ">>> WoBle preparing to send additional fragment:");
+        chipLogDebugBtpEngine(Ble, ">>> WoBle preparing to send additional fragment:");
         PrintBufDebug(mTxBuf);
     }
     else
@@ -596,35 +595,35 @@ bool WoBle::ClearTxPacket()
 
 void WoBle::LogState() const
 {
-    WeaveLogError(Ble, "mAppState: %p", mAppState);
+    chipLogError(Ble, "mAppState: %p", mAppState);
 
-    WeaveLogError(Ble, "mRxFragmentSize: %d", mRxFragmentSize);
-    WeaveLogError(Ble, "mRxState: %d", mRxState);
-    WeaveLogError(Ble, "mRxBuf: %p", mRxBuf);
-    WeaveLogError(Ble, "mRxNextSeqNum: %d", mRxNextSeqNum);
-    WeaveLogError(Ble, "mRxNewestUnackedSeqNum: %d", mRxNewestUnackedSeqNum);
-    WeaveLogError(Ble, "mRxOldestUnackedSeqNum: %d", mRxOldestUnackedSeqNum);
-    WeaveLogError(Ble, "mRxCharCount: %d", mRxCharCount);
-    WeaveLogError(Ble, "mRxPacketCount: %d", mRxPacketCount);
+    chipLogError(Ble, "mRxFragmentSize: %d", mRxFragmentSize);
+    chipLogError(Ble, "mRxState: %d", mRxState);
+    chipLogError(Ble, "mRxBuf: %p", mRxBuf);
+    chipLogError(Ble, "mRxNextSeqNum: %d", mRxNextSeqNum);
+    chipLogError(Ble, "mRxNewestUnackedSeqNum: %d", mRxNewestUnackedSeqNum);
+    chipLogError(Ble, "mRxOldestUnackedSeqNum: %d", mRxOldestUnackedSeqNum);
+    chipLogError(Ble, "mRxCharCount: %d", mRxCharCount);
+    chipLogError(Ble, "mRxPacketCount: %d", mRxPacketCount);
 
-    WeaveLogError(Ble, "mTxFragmentSize: %d", mTxFragmentSize);
-    WeaveLogError(Ble, "mTxState: %d", mTxState);
-    WeaveLogError(Ble, "mTxBuf: %p", mTxBuf);
-    WeaveLogError(Ble, "mTxNextSeqNum: %d", mTxNextSeqNum);
-    WeaveLogError(Ble, "mTxNewestUnackedSeqNum: %d", mTxNewestUnackedSeqNum);
-    WeaveLogError(Ble, "mTxOldestUnackedSeqNum: %d", mTxOldestUnackedSeqNum);
-    WeaveLogError(Ble, "mTxCharCount: %d", mTxCharCount);
-    WeaveLogError(Ble, "mTxPacketCount: %d", mTxPacketCount);
+    chipLogError(Ble, "mTxFragmentSize: %d", mTxFragmentSize);
+    chipLogError(Ble, "mTxState: %d", mTxState);
+    chipLogError(Ble, "mTxBuf: %p", mTxBuf);
+    chipLogError(Ble, "mTxNextSeqNum: %d", mTxNextSeqNum);
+    chipLogError(Ble, "mTxNewestUnackedSeqNum: %d", mTxNewestUnackedSeqNum);
+    chipLogError(Ble, "mTxOldestUnackedSeqNum: %d", mTxOldestUnackedSeqNum);
+    chipLogError(Ble, "mTxCharCount: %d", mTxCharCount);
+    chipLogError(Ble, "mTxPacketCount: %d", mTxPacketCount);
 }
 
 void WoBle::LogStateDebug() const
 {
-#ifdef NL_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
+#ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
     LogState();
 #endif
 }
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 #endif /* CONFIG_NETWORK_LAYER_BLE */

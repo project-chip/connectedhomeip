@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,29 +19,29 @@
  *    @file
  *      This file is an umbrella header for the Ble library, a
  *      portable Bluetooth Low Energy (BLE), also known as Bluetooth
- *      Smart, layer for transporting Weave over a BLE connection.
+ *      Smart, layer for transporting chip over a BLE connection.
  *
  */
 
-#ifndef NL_BLE_H
-#define NL_BLE_H
+#ifndef CHIP_BLE_H
+#define CHIP_BLE_H
 
-#include <BleLayer/BleApplicationDelegate.h>
-#include <BleLayer/BleConfig.h>
-#include <BleLayer/BLEEndPoint.h>
-#include <BleLayer/BleError.h>
-#include <BleLayer/Ble.h>
-#include <BleLayer/BleLayer.h>
-#include <BleLayer/BlePlatformDelegate.h>
-#include <BleLayer/BleUUID.h>
-#include <BleLayer/WoBle.h>
+#include <ble/BleApplicationDelegate.h>
+#include <ble/BleConfig.h>
+#include <ble/BLEEndPoint.h>
+#include <ble/BleError.h>
+#include <ble/Ble.h>
+#include <ble/BleLayer.h>
+#include <ble/BlePlatformDelegate.h>
+#include <ble/BleUUID.h>
+#include <ble/WoBle.h>
 
 /**
- *   @namespace nl::Ble
+ *   @namespace Ble
  *
  *   @brief
- *     This namespace includes all interfaces within Weave for
+ *     This namespace includes all interfaces within chip for
  *     Bluetooth Low Energy (BLE), also known as Bluetooth Smart.
  */
 
-#endif // NL_BLE_H
+#endif // CHIP_BLE_H

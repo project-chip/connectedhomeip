@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,14 +23,14 @@
 
 #include "BleUUID.h"
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
-const WeaveBleUUID WEAVE_BLE_SVC_ID = { { // 0000FEAF-0000-1000-8000-00805F9B34FB
+const chipBleUUID CHIP_BLE_SVC_ID = { { // 0000FEAF-0000-1000-8000-00805F9B34FB
                                           0x00, 0x00, 0xFE, 0xAF, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34,
                                           0xFB } };
 
-bool UUIDsMatch(const WeaveBleUUID * idOne, const WeaveBleUUID * idTwo)
+bool UUIDsMatch(const chipBleUUID * idOne, const chipBleUUID * idTwo)
 {
     if ((idOne == NULL) || (idTwo == NULL))
     {
@@ -41,6 +40,6 @@ bool UUIDsMatch(const WeaveBleUUID * idOne, const WeaveBleUUID * idTwo)
 }
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 #endif /* CONFIG_NETWORK_LAYER_BLE */

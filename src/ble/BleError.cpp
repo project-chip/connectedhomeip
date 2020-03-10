@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,16 +22,16 @@
 
 #include <stddef.h>
 
-#include <BleLayer/BleConfig.h>
+#include <ble/BleConfig.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 
-#include <BleLayer/BleLayer.h>
-#include <BleLayer/BleError.h>
+#include <ble/BleLayer.h>
+#include <ble/BleError.h>
 
-#include <Weave/Support/ErrorStr.h>
+#include <support/ErrorStr.h>
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
 /**
@@ -58,13 +57,13 @@ bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err)
         return false;
     }
 
-#if !WEAVE_CONFIG_SHORT_ERROR_STR
+#if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err)
     {
     case BLE_ERROR_BAD_ARGS                                     : desc = "Bad arguments"; break;
     case BLE_ERROR_INCORRECT_STATE                              : desc = "Incorrect state"; break;
     case BLE_ERROR_NO_ENDPOINTS                                 : desc = "No more BLE endpoints"; break;
-    case BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK              : desc = "No Weave over BLE connection received callback set"; break;
+    case BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK              : desc = "No chip over BLE connection received callback set"; break;
     case BLE_ERROR_CENTRAL_UNSUBSCRIBED                         : desc = "BLE central unsubscribed"; break;
     case BLE_ERROR_GATT_SUBSCRIBE_FAILED                        : desc = "GATT subscribe operation failed"; break;
     case BLE_ERROR_GATT_UNSUBSCRIBE_FAILED                      : desc = "GATT unsubscribe operation failed"; break;
@@ -75,7 +74,7 @@ bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err)
     case BLE_ERROR_REMOTE_DEVICE_DISCONNECTED                   : desc = "Remote device closed BLE connection"; break;
     case BLE_ERROR_APP_CLOSED_CONNECTION                        : desc = "Application closed BLE connection"; break;
     case BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG                     : desc = "Outbound message too big"; break;
-    case BLE_ERROR_NOT_WEAVE_DEVICE                             : desc = "BLE device doesn't seem to support Weave"; break;
+    case BLE_ERROR_NOT_CHIP_DEVICE                             : desc = "BLE device doesn't seem to support chip"; break;
     case BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS               : desc = "Incompatible BLE transport protocol versions"; break;
     case BLE_ERROR_NO_MEMORY                                    : desc = "No memory"; break;
     case BLE_ERROR_MESSAGE_INCOMPLETE                           : desc = "Message incomplete"; break;
@@ -94,7 +93,7 @@ bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err)
     case BLE_ERROR_REASSEMBLER_INCORRECT_STATE                  : desc = "BLE message reassembler received packet in incorrect state"; break;
     case BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG                     : desc = "Message received by BLE message reassembler was too large"; break;
     }
-#endif // !WEAVE_CONFIG_SHORT_ERROR_STR
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
     FormatError(buf, bufSize, "Ble", err, desc);
 
@@ -102,6 +101,6 @@ bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err)
 }
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 #endif // CONFIG_NETWORK_LAYER_BLE

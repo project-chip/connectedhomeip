@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,52 +18,52 @@
 /**
  *    @file
  *      This file implements objects which provide an abstraction layer between
- *      a platform's Bluetooth Low Energy (BLE) implementation and the Weave
+ *      a platform's Bluetooth Low Energy (BLE) implementation and the chip
  *      stack.
  *
  *      The BleLayer obect accepts BLE data and control input from the
  *      application via a functional interface. It performs the fragmentation
- *      and reassembly required to transmit Weave message via a BLE GATT
- *      characteristic interface, and drives incoming messages up the Weave
+ *      and reassembly required to transmit chip message via a BLE GATT
+ *      characteristic interface, and drives incoming messages up the chip
  *      stack.
  *
  *      During initialization, the BleLayer object requires a pointer to the
  *      platform's implementation of the BlePlatformDelegate and
  *      BleApplicationDelegate objects.
  *
- *      The BlePlatformDelegate provides the Weave stack with an interface
+ *      The BlePlatformDelegate provides the chip stack with an interface
  *      by which to form and cancel GATT subscriptions, read and write
  *      GATT characteristic values, send GATT characteristic notifications,
  *      respond to GATT read requests, and close BLE connections.
  *
- *      The BleApplicationDelegate provides a mechanism for Weave to inform
+ *      The BleApplicationDelegate provides a mechanism for chip to inform
  *      the application when it has finished using a given BLE connection,
- *      i.e when the WeaveConnection object wrapping this connection has
+ *      i.e when the chipConnection object wrapping this connection has
  *      closed. This allows the application to either close the BLE connection
- *      or continue to keep it open for non-Weave purposes.
+ *      or continue to keep it open for non-chip purposes.
  *
- *      To enable Weave over BLE for a new platform, the application developer
+ *      To enable chip over BLE for a new platform, the application developer
  *      must provide an implementation for both delegates, provides points to
  *      instances of these delegates on startup, and ensure that the
  *      application calls the necessary BleLayer functions when appropriate to
  *      drive BLE data and control input up the stack.
  */
 
-#include <BleLayer/BleConfig.h>
+#include <ble/BleConfig.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 
 #include <string.h>
 
-#include <BleLayer/BlePlatformDelegate.h>
-#include <BleLayer/BleApplicationDelegate.h>
-#include <BleLayer/BleLayer.h>
-#include <BleLayer/BleUUID.h>
-#include <BleLayer/BLEEndPoint.h>
+#include <ble/BlePlatformDelegate.h>
+#include <ble/BleApplicationDelegate.h>
+#include <ble/BleLayer.h>
+#include <ble/BleUUID.h>
+#include <ble/BLEEndPoint.h>
 
-#include <Weave/Core/WeaveEncoding.h>
-#include <Weave/Support/logging/WeaveLogging.h>
-#include <Weave/Support/CodeUtils.h>
+#include <core/CHIPEncoding.h>
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
 
 // clang-format off
 
@@ -92,7 +91,7 @@
 
 // clang-format on
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
 class BleEndPointPool
@@ -157,17 +156,17 @@ static BleEndPointPool sBLEEndPointPool;
 
 // UUIDs used internally by BleLayer:
 
-const WeaveBleUUID BleLayer::WEAVE_BLE_CHAR_1_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D11
+const chipBleUUID BleLayer::CHIP_BLE_CHAR_1_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D11
                                                        0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
                                                        0x9F, 0x9D, 0x11 } };
 
-const WeaveBleUUID BleLayer::WEAVE_BLE_CHAR_2_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D12
+const chipBleUUID BleLayer::CHIP_BLE_CHAR_2_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D12
                                                        0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
                                                        0x9F, 0x9D, 0x12 } };
 
 void BleLayerObject::Release()
 {
-    // Decrement the ref count.  When it reaches zero, NULL out the pointer to the Weave::System::Layer
+    // Decrement the ref count.  When it reaches zero, NULL out the pointer to the chip::System::Layer
     // object. This effectively declared the object free and ready for re-allocation.
     mRefCount--;
     if (mRefCount == 0)
@@ -207,16 +206,16 @@ BLE_ERROR BleTransportCapabilitiesRequestMessage::Encode(PacketBuffer * msgBuf) 
     // Verify we can write the fixed-length request without running into the end of the buffer.
     VerifyOrExit(msgBuf->MaxDataLength() >= CAPABILITIES_REQUEST_LEN, err = BLE_ERROR_NO_MEMORY);
 
-    nl::Weave::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
-    nl::Weave::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
+    chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
+    chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
 
     for (int i = 0; i < CAPABILITIES_REQUEST_SUPPORTED_VERSIONS_LEN; i++)
     {
-        nl::Weave::Encoding::Write8(p, mSupportedProtocolVersions[i]);
+        chip::Encoding::Write8(p, mSupportedProtocolVersions[i]);
     }
 
-    nl::Weave::Encoding::LittleEndian::Write16(p, mMtu);
-    nl::Weave::Encoding::Write8(p, mWindowSize);
+    chip::Encoding::LittleEndian::Write16(p, mMtu);
+    chip::Encoding::Write8(p, mWindowSize);
 
     msgBuf->SetDataLength(CAPABILITIES_REQUEST_LEN);
 
@@ -232,16 +231,16 @@ BLE_ERROR BleTransportCapabilitiesRequestMessage::Decode(const PacketBuffer & ms
     // Verify we can read the fixed-length request without running into the end of the buffer.
     VerifyOrExit(msgBuf.DataLength() >= CAPABILITIES_REQUEST_LEN, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
-    VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_1 == nl::Weave::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
-    VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_2 == nl::Weave::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
+    VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
+    VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
 
     for (int i = 0; i < CAPABILITIES_REQUEST_SUPPORTED_VERSIONS_LEN; i++)
     {
-        msg.mSupportedProtocolVersions[i] = nl::Weave::Encoding::Read8(p);
+        msg.mSupportedProtocolVersions[i] = chip::Encoding::Read8(p);
     }
 
-    msg.mMtu        = nl::Weave::Encoding::LittleEndian::Read16(p);
-    msg.mWindowSize = nl::Weave::Encoding::Read8(p);
+    msg.mMtu        = chip::Encoding::LittleEndian::Read16(p);
+    msg.mWindowSize = chip::Encoding::Read8(p);
 
 exit:
     return err;
@@ -257,12 +256,12 @@ BLE_ERROR BleTransportCapabilitiesResponseMessage::Encode(PacketBuffer * msgBuf)
     // Verify we can write the fixed-length request without running into the end of the buffer.
     VerifyOrExit(msgBuf->MaxDataLength() >= CAPABILITIES_RESPONSE_LEN, err = BLE_ERROR_NO_MEMORY);
 
-    nl::Weave::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
-    nl::Weave::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
+    chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_1);
+    chip::Encoding::Write8(p, CAPABILITIES_MSG_CHECK_BYTE_2);
 
-    nl::Weave::Encoding::Write8(p, mSelectedProtocolVersion);
-    nl::Weave::Encoding::LittleEndian::Write16(p, mFragmentSize);
-    nl::Weave::Encoding::Write8(p, mWindowSize);
+    chip::Encoding::Write8(p, mSelectedProtocolVersion);
+    chip::Encoding::LittleEndian::Write16(p, mFragmentSize);
+    chip::Encoding::Write8(p, mWindowSize);
 
     msgBuf->SetDataLength(CAPABILITIES_RESPONSE_LEN);
 
@@ -279,12 +278,12 @@ BLE_ERROR BleTransportCapabilitiesResponseMessage::Decode(const PacketBuffer & m
     // Verify we can read the fixed-length response without running into the end of the buffer.
     VerifyOrExit(msgBuf.DataLength() >= CAPABILITIES_RESPONSE_LEN, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
-    VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_1 == nl::Weave::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
-    VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_2 == nl::Weave::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
+    VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
+    VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
 
-    msg.mSelectedProtocolVersion = nl::Weave::Encoding::Read8(p);
-    msg.mFragmentSize            = nl::Weave::Encoding::LittleEndian::Read16(p);
-    msg.mWindowSize              = nl::Weave::Encoding::Read8(p);
+    msg.mSelectedProtocolVersion = chip::Encoding::Read8(p);
+    msg.mFragmentSize            = chip::Encoding::LittleEndian::Read16(p);
+    msg.mWindowSize              = chip::Encoding::Read8(p);
 
 exit:
     return err;
@@ -298,7 +297,7 @@ BleLayer::BleLayer()
 }
 
 BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate,
-                         Weave::System::Layer * systemLayer)
+                         chip::System::Layer * systemLayer)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
@@ -321,7 +320,7 @@ BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationD
 
     mState = kState_Initialized;
 
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     mTestBleEndPoint = NULL;
 #endif
 
@@ -377,20 +376,20 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
     *retEndPoint = sBLEEndPointPool.GetFree();
     if (*retEndPoint == NULL)
     {
-        WeaveLogError(Ble, "%s endpoint pool FULL", "Ble");
+        chipLogError(Ble, "%s endpoint pool FULL", "Ble");
         return BLE_ERROR_NO_ENDPOINTS;
     }
 
     (*retEndPoint)->Init(this, connObj, role, autoClose);
 
-#if WEAVE_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_WOBLE_TEST
     mTestBleEndPoint = *retEndPoint;
 #endif
 
     return BLE_NO_ERROR;
 }
 
-// Handle remote central's initiation of Weave over BLE protocol handshake.
+// Handle remote central's initiation of chip over BLE protocol handshake.
 BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, PacketBuffer * pBuf)
 {
     BLE_ERROR err             = BLE_NO_ERROR;
@@ -417,31 +416,31 @@ exit:
     // if the application decides to keep the BLE connection open.
     if (newEndPoint == NULL)
     {
-        mApplicationDelegate->NotifyWeaveConnectionClosed(connObj);
+        mApplicationDelegate->NotifychipConnectionClosed(connObj);
     }
 
     if (err != BLE_NO_ERROR)
     {
-        WeaveLogError(Ble, "HandleWeaveConnectionReceived failed, err = %d", err);
+        chipLogError(Ble, "HandlechipConnectionReceived failed, err = %d", err);
     }
 
     return err;
 }
 
-bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId,
+bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId,
                                    PacketBuffer * pBuf)
 {
-    if (!UUIDsMatch(&WEAVE_BLE_SVC_ID, svcId))
+    if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
-        WeaveLogError(Ble, "ble write rcvd on unknown svc id");
+        chipLogError(Ble, "ble write rcvd on unknown svc id");
         ExitNow();
     }
 
-    if (UUIDsMatch(&WEAVE_BLE_CHAR_1_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_1_ID, charId))
     {
         if (pBuf == NULL)
         {
-            WeaveLogError(Ble, "rcvd null ble write");
+            chipLogError(Ble, "rcvd null ble write");
             ExitNow();
         }
 
@@ -454,7 +453,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBle
             pBuf             = NULL;
             if (status != BLE_NO_ERROR)
             {
-                WeaveLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
+                chipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
             }
         }
         else
@@ -463,13 +462,13 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBle
             pBuf             = NULL;
             if (status != BLE_NO_ERROR)
             {
-                WeaveLogError(Ble, "failed handle new Weave BLE connection, status = %d", status);
+                chipLogError(Ble, "failed handle new chip BLE connection, status = %d", status);
             }
         }
     }
     else
     {
-        WeaveLogError(Ble, "ble write rcvd on unknown char");
+        chipLogError(Ble, "ble write rcvd on unknown char");
     }
 
 exit:
@@ -481,19 +480,19 @@ exit:
     return true;
 }
 
-bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId,
+bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId,
                                         PacketBuffer * pBuf)
 {
-    if (!UUIDsMatch(&WEAVE_BLE_SVC_ID, svcId))
+    if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
         return false;
     }
 
-    if (UUIDsMatch(&WEAVE_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
     {
         if (pBuf == NULL)
         {
-            WeaveLogError(Ble, "rcvd null ble indication");
+            chipLogError(Ble, "rcvd null ble indication");
             ExitNow();
         }
 
@@ -506,17 +505,17 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const Wea
             pBuf             = NULL;
             if (status != BLE_NO_ERROR)
             {
-                WeaveLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
+                chipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
             }
         }
         else
         {
-            WeaveLogDetail(Ble, "no endpoint for rcvd indication");
+            chipLogDetail(Ble, "no endpoint for rcvd indication");
         }
     }
     else
     {
-        WeaveLogError(Ble, "ble ind rcvd on unknown char");
+        chipLogError(Ble, "ble ind rcvd on unknown char");
     }
 
 exit:
@@ -528,39 +527,39 @@ exit:
     return true;
 }
 
-bool BleLayer::HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId)
+bool BleLayer::HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
 {
-    if (!UUIDsMatch(&WEAVE_BLE_SVC_ID, svcId))
+    if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
         return false;
     }
 
-    if (UUIDsMatch(&WEAVE_BLE_CHAR_1_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_1_ID, charId))
     {
         HandleAckReceived(connObj);
     }
     else
     {
-        WeaveLogError(Ble, "ble write con rcvd on unknown char");
+        chipLogError(Ble, "ble write con rcvd on unknown char");
     }
 
     return true;
 }
 
-bool BleLayer::HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId)
+bool BleLayer::HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
 {
-    if (!UUIDsMatch(&WEAVE_BLE_SVC_ID, svcId))
+    if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
         return false;
     }
 
-    if (UUIDsMatch(&WEAVE_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
     {
         HandleAckReceived(connObj);
     }
     else
     {
-        WeaveLogError(Ble, "ble ind con rcvd on unknown char");
+        chipLogError(Ble, "ble ind con rcvd on unknown char");
     }
 
     return true;
@@ -577,23 +576,23 @@ void BleLayer::HandleAckReceived(BLE_CONNECTION_OBJECT connObj)
 
         if (status != BLE_NO_ERROR)
         {
-            WeaveLogError(Ble, "endpoint conf recvd failed, err = %d", status);
+            chipLogError(Ble, "endpoint conf recvd failed, err = %d", status);
         }
     }
     else
     {
-        WeaveLogError(Ble, "no endpoint for BLE sent data ack");
+        chipLogError(Ble, "no endpoint for BLE sent data ack");
     }
 }
 
-bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId)
+bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
 {
-    if (!UUIDsMatch(&WEAVE_BLE_SVC_ID, svcId))
+    if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
         return false;
     }
 
-    if (UUIDsMatch(&WEAVE_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
     {
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
@@ -604,21 +603,21 @@ bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const Weav
         }
         else
         {
-            WeaveLogError(Ble, "no endpoint for sub recvd");
+            chipLogError(Ble, "no endpoint for sub recvd");
         }
     }
 
     return true;
 }
 
-bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId)
+bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
 {
-    if (!UUIDsMatch(&WEAVE_BLE_SVC_ID, svcId))
+    if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
         return false;
     }
 
-    if (UUIDsMatch(&WEAVE_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
     {
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
@@ -628,21 +627,21 @@ bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const Weav
         }
         else
         {
-            WeaveLogError(Ble, "no endpoint for sub complete");
+            chipLogError(Ble, "no endpoint for sub complete");
         }
     }
 
     return true;
 }
 
-bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId)
+bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
 {
-    if (!UUIDsMatch(&WEAVE_BLE_SVC_ID, svcId))
+    if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
         return false;
     }
 
-    if (UUIDsMatch(&WEAVE_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
     {
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
@@ -653,21 +652,21 @@ bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const We
         }
         else
         {
-            WeaveLogError(Ble, "no endpoint for unsub recvd");
+            chipLogError(Ble, "no endpoint for unsub recvd");
         }
     }
 
     return true;
 }
 
-bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const WeaveBleUUID * svcId, const WeaveBleUUID * charId)
+bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
 {
-    if (!UUIDsMatch(&WEAVE_BLE_SVC_ID, svcId))
+    if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
         return false;
     }
 
-    if (UUIDsMatch(&WEAVE_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
     {
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
@@ -678,7 +677,7 @@ bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const We
         }
         else
         {
-            WeaveLogError(Ble, "no endpoint for unsub complete");
+            chipLogError(Ble, "no endpoint for unsub complete");
         }
     }
 
@@ -718,8 +717,8 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
         uint8_t version = reqMsg.mSupportedProtocolVersions[(i / 2)];
         version         = (version >> shift_width) & 0x0F; // Grab just the nibble we want.
 
-        if ((version >= NL_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION) &&
-            (version <= NL_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION) && (version > retVersion))
+        if ((version >= CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION) &&
+            (version <= CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION) && (version > retVersion))
         {
             retVersion = static_cast<BleTransportProtocolVersion>(version);
         }
@@ -733,6 +732,6 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
 }
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 #endif /* CONFIG_NETWORK_LAYER_BLE */

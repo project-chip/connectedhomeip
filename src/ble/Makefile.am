@@ -33,11 +33,11 @@ libBleLayer_a_CPPFLAGS              = \
     $(LWIP_CPPFLAGS)                  \
     $(NULL)
 
-if WEAVE_ENABLE_WOBLE_TEST
+if CHIP_ENABLE_WOBLE_TEST
 libBleLayer_a_CPPFLAGS             += \
     -I$(top_srcdir)/src/device-manager\
     $(NULL)
-endif # WEAVE_ENABLE_WOBLE_TEST
+endif # CHIP_ENABLE_WOBLE_TEST
 
 libBleLayer_a_SOURCES               = $(nl_BleLayer_sources)
 

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines constants for the Nest BleLayer subsystem.
+ *      This file defines constants for the CHIP BleLayer subsystem.
  *
  *      Error types, ranges, and mappings overrides may be made by
  *      defining the appropriate BLE_CONFIG_* or _BLE_CONFIG_*
@@ -234,14 +233,14 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
 #define BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG                 _BLE_ERROR(14)
 
 /**
- *  @def BLE_ERROR_NOT_WEAVE_DEVICE
+ *  @def BLE_ERROR_NOT_CHIP_DEVICE
  *
  *  @brief
  *    A BLE peripheral device did not expose the General Attribute Profile
  *    (GATT) service required by the Bluetooth Transport Protocol (BTP).
  *
  */
-#define BLE_ERROR_NOT_WEAVE_DEVICE                         _BLE_ERROR(15)
+#define BLE_ERROR_NOT_CHIP_DEVICE                         _BLE_ERROR(15)
 
 /**
  *  @def BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS
@@ -417,14 +416,14 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
 
 // clang-format on
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
 extern void RegisterBleLayerErrorFormatter(void);
 extern bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err);
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
 
 #endif /* BLEERROR_H_ */

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,31 +17,31 @@
 
 /**
  *    @file
- *          Definitions for Weave BLE service advertisement data.
+ *          Definitions for chip BLE service advertisement data.
  */
 
-#ifndef WEAVE_BLE_SERVICE_DATA_H
-#define WEAVE_BLE_SERVICE_DATA_H
+#ifndef CHIP_BLE_SERVICE_DATA_H
+#define CHIP_BLE_SERVICE_DATA_H
 
-namespace nl {
+namespace chip {
 namespace Ble {
 
 /**
- * Weave data block types that may appear with Weave BLE service advertisement data.
+ * chip data block types that may appear with chip BLE service advertisement data.
  */
-enum WeaveBLEServiceDataType
+enum chipBLEServiceDataType
 {
-    kWeaveBLEServiceDataType_DeviceIdentificationInfo       = 0x01,
-    kWeaveBLEServiceDataType_TokenIdentificationInfo        = 0x02,
+    kchipBLEServiceDataType_DeviceIdentificationInfo       = 0x01,
+    kchipBLEServiceDataType_TokenIdentificationInfo        = 0x02,
 };
 
 /**
- * Weave BLE Device Identification Information Block
+ * chip BLE Device Identification Information Block
  *
  * Defines the over-the-air encoded format of the device identification information block that appears
- * within Weave BLE service advertisement data.
+ * within chip BLE service advertisement data.
  */
-struct WeaveBLEDeviceIdentificationInfo
+struct chipBLEDeviceIdentificationInfo
 {
     enum
     {
@@ -69,43 +68,43 @@ struct WeaveBLEDeviceIdentificationInfo
     {
         memset(this, 0, sizeof(*this));
         BlockLen = sizeof(*this) - sizeof(BlockLen); // size of all fields EXCEPT BlockLen
-        BlockType = kWeaveBLEServiceDataType_DeviceIdentificationInfo;
+        BlockType = kchipBLEServiceDataType_DeviceIdentificationInfo;
         MajorVersion = kMajorVersion;
         MinorVersion = kMinorVersion;
     }
 
     uint16_t GetVendorId(void)
     {
-        return nl::Weave::Encoding::LittleEndian::Get16(DeviceVendorId);
+        return chip::Encoding::LittleEndian::Get16(DeviceVendorId);
     }
 
     void SetVendorId(uint16_t vendorId)
     {
-        nl::Weave::Encoding::LittleEndian::Put16(DeviceVendorId, vendorId);
+        chip::Encoding::LittleEndian::Put16(DeviceVendorId, vendorId);
     }
 
     uint16_t GetProductId(void)
     {
-        return nl::Weave::Encoding::LittleEndian::Get16(DeviceProductId);
+        return chip::Encoding::LittleEndian::Get16(DeviceProductId);
     }
 
     void SetProductId(uint16_t productId)
     {
-        nl::Weave::Encoding::LittleEndian::Put16(DeviceProductId, productId);
+        chip::Encoding::LittleEndian::Put16(DeviceProductId, productId);
     }
 
     uint64_t GetDeviceId(void)
     {
-        return nl::Weave::Encoding::LittleEndian::Get64(DeviceId);
+        return chip::Encoding::LittleEndian::Get64(DeviceId);
     }
 
     void SetDeviceId(uint64_t deviceId)
     {
-        nl::Weave::Encoding::LittleEndian::Put64(DeviceId, deviceId);
+        chip::Encoding::LittleEndian::Put64(DeviceId, deviceId);
     }
 } __attribute__((packed));
 
 } /* namespace Ble */
-} /* namespace nl */
+} /* namespace chip */
 
-#endif // WEAVE_BLE_SERVICE_DATA_H
+#endif // CHIP_BLE_SERVICE_DATA_H
