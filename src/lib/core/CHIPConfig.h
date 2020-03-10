@@ -617,7 +617,7 @@
  *    RNG implementation options:
  *
  *      * #CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM
- *      * #CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG
+ *      * #CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
  *      * #CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
  *
  *    Note that these options are mutually exclusive and only one of
@@ -634,7 +634,7 @@
  *    implementation of the chip Random Number Generator.
  *
  *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG and
+ *        #CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG and
  *        #CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL.
  *
  */
@@ -643,7 +643,7 @@
 #endif // CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM
 
 /**
- *  @def CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG
+ *  @def CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
  *
  *  @brief
  *    Enable (1) or disable (0) support for a chip-provided
@@ -656,9 +656,9 @@
  *        #CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL.
  *
  */
-#ifndef CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG
-#define CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG            0
-#endif // CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG
+#ifndef CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
+#define CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG            0
+#endif // CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
 
 /**
  *  @def CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
@@ -669,7 +669,7 @@
  *
  *  @note This configuration is mutual exclusive with
  *        #CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM and
- *        #CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG.
+ *        #CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG.
  *
  */
 #ifndef CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
@@ -680,9 +680,9 @@
  *  @}
  */
 
-#if ((CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM + CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG + CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL) != 1)
-#error "Please assert exactly one of CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM, CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG, or CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL."
-#endif // ((CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM + CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG + CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL) != 1)
+#if ((CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM + CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG + CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL) != 1)
+#error "Please assert exactly one of CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM, CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG, or CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL."
+#endif // ((CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM + CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG + CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL) != 1)
 
 
 /**
@@ -692,7 +692,7 @@
  *    Enable (1) or disable (0) a function for seeding the DRBG with
  *    entropy from the /dev/(u)random device.
  *
- *  @note When enabled along with #CHIP_CONFIG_RNG_IMPLEMENTATION_NESTDRBG
+ *  @note When enabled along with #CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
  *        this function becomes the default seeding function for the DRBG if
  *        another isn't specified at initialization time.
  *
@@ -2270,7 +2270,7 @@
  *    Enable (1) or disable (0) support for the depricated
  *    version of AddNetwork() message in the Network Provisioning
  *    profile.
- *    This option should be enabled to support pairing with Nest
+ *    This option should be enabled to support pairing with CHIP
  *    legacy devices that don't have latest SW.
  *
  */
@@ -2285,7 +2285,7 @@
  *    Enable (1) or disable (0) the exclusive use of the depricated
  *    version of AddNetwork() message in the Network Provisioning
  *    profile.
- *    This option should be enabled when exclusively pairing with Nest
+ *    This option should be enabled when exclusively pairing with CHIP
  *    legacy devices that don't have latest SW.
  *    This option requires that
  *    CHIP_CONFIG_SUPPORT_LEGACY_ADD_NETWORK_MESSAGE is enabled.
