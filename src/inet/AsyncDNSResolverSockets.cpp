@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,16 +24,15 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Weave/Support/CodeUtils.h>
-#include <Weave/Support/logging/WeaveLogging.h>
-#include <InetLayer/InetLayer.h>
+#include "support/CodeUtils.h"
+#include "support/logging/CHIPLogging.h"
+#include "InetLayer.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
-#include <InetLayer/AsyncDNSResolverSockets.h>
+#include "AsyncDNSResolverSockets.h"
 
-namespace nl {
 namespace Inet {
 
 /**
@@ -96,7 +94,7 @@ INET_ERROR AsyncDNSResolverSockets::Shutdown(void)
 
     AsyncMutexUnlock();
 
-    // Have the Weave thread join the thread pool for asynchronous DNS resolution.
+    // Have the chip thread join the thread pool for asynchronous DNS resolution.
     for (int i = 0; i < INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT; i++)
     {
         pthreadErr = pthread_join(mAsyncDNSThreadHandle[i], NULL);
@@ -216,7 +214,7 @@ INET_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver **outResolver)
         VerifyOrDie(pthreadErr == 0);
     }
 
-    WeaveLogDetail(Inet, "Async DNS worker thread woke up.");
+    chipLogDetail(Inet, "Async DNS worker thread woke up.");
 
     // on shutdown, return NULL. Otherwise, pop the head of the DNS request queue
     if (mInet->State != InetLayer::kState_Initialized)
@@ -298,7 +296,7 @@ void AsyncDNSResolverSockets::Resolve(DNSResolver &resolver)
 }
 
 /* Event handler function for asynchronous DNS notification */
-void  AsyncDNSResolverSockets::DNSResultEventHandler (Weave::System::Layer* aLayer, void* aAppState, Weave::System::Error aError)
+void  AsyncDNSResolverSockets::DNSResultEventHandler (chip::System::Layer* aLayer, void* aAppState, chip::System::Error aError)
 {
     DNSResolver *resolver = static_cast<DNSResolver *>(aAppState);
 
@@ -308,12 +306,12 @@ void  AsyncDNSResolverSockets::DNSResultEventHandler (Weave::System::Layer* aLay
     }
 }
 
-void AsyncDNSResolverSockets::NotifyWeaveThread(DNSResolver *resolver)
+void AsyncDNSResolverSockets::NotifychipThread(DNSResolver *resolver)
 {
-    // Post work item via Timer Event for the Weave thread
-    Weave::System::Layer& lSystemLayer = resolver->SystemLayer();
+    // Post work item via Timer Event for the chip thread
+    chip::System::Layer& lSystemLayer = resolver->SystemLayer();
 
-    WeaveLogDetail(Inet, "Posting DNS completion event to Weave thread.");
+    chipLogDetail(Inet, "Posting DNS completion event to chip thread.");
     lSystemLayer.ScheduleWork(AsyncDNSResolverSockets::DNSResultEventHandler, resolver);
 }
 
@@ -340,11 +338,11 @@ void *AsyncDNSResolverSockets::AsyncDNSThreadRun(void *args)
             asyncResolver->Resolve(*request);
         }
 
-        asyncResolver->NotifyWeaveThread(request);
+        asyncResolver->NotifychipThread(request);
     }
 
 exit:
-    WeaveLogDetail(Inet, "Async DNS worker thread exiting.");
+    chipLogDetail(Inet, "Async DNS worker thread exiting.");
     return NULL;
 }
 
@@ -365,6 +363,5 @@ void AsyncDNSResolverSockets::AsyncMutexUnlock(void)
 }
 
 } // namespace Inet
-} // namespace nl
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,20 +24,19 @@
 #ifndef _ASYNC_DNS_SOCKETS_H_
 #define _ASYNC_DNS_SOCKETS_H_
 
-#include <InetLayer/IPAddress.h>
-#include <InetLayer/InetError.h>
+#include "IPAddress.h"
+#include "InetError.h"
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
-#include <InetLayer/DNSResolver.h>
+#include "DNSResolver.h"
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #include <netdb.h>
 #include <pthread.h>
 #include <semaphore.h>
 
-namespace nl {
 namespace Inet {
 
 /**
@@ -75,7 +73,7 @@ private:
     volatile DNSResolver    *mAsyncDNSQueueHead; /* The head of the asynchronous DNSResolver object queue. */
     volatile DNSResolver    *mAsyncDNSQueueTail; /* The tail of the asynchronous DNSResolver object queue. */
     InetLayer               *mInet;              /* The pointer to the InetLayer. */
-    static void             DNSResultEventHandler(Weave::System::Layer* aLayer, void* aAppState, Weave::System::Error aError); /* Timer event handler function for asynchronous DNS notification */
+    static void             DNSResultEventHandler(chip::System::Layer* aLayer, void* aAppState, chip::System::Error aError); /* Timer event handler function for asynchronous DNS notification */
 
     INET_ERROR DequeueRequest(DNSResolver **outResolver);
 
@@ -87,7 +85,7 @@ private:
 
     static void *AsyncDNSThreadRun(void *args);
 
-    static void NotifyWeaveThread(DNSResolver *resolver);
+    static void NotifychipThread(DNSResolver *resolver);
 
     void AsyncMutexLock(void);
 
@@ -95,8 +93,7 @@ private:
 };
 
 } // namespace Inet
-} // namespace nl
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #endif // !defined(_ASYNC_DNS_SOCKETS_H_)

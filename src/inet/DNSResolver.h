@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,15 +25,14 @@
 #ifndef DNSRESOLVER_H
 #define DNSRESOLVER_H
 
-#include <InetLayer/IPAddress.h>
-#include <InetLayer/InetError.h>
-#include <InetLayer/InetLayerBasis.h>
+#include "IPAddress.h"
+#include "InetError.h"
+#include "InetLayerBasis.h"
 
 #define NL_DNS_HOSTNAME_MAX_LEN      (253)
 
 struct addrinfo;
 
-namespace nl {
 namespace Inet {
 
 class InetLayer;
@@ -77,7 +75,7 @@ class DNSResolver: public InetLayerBasis
 private:
     friend class InetLayer;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     friend class AsyncDNSResolverSockets;
 
@@ -89,7 +87,7 @@ private:
         kState_Complete                      = 3, ///<Used to indicate that the DNS resolution on the DNSResolver object is complete.
         kState_Canceled                      = 4, ///<Used to indicate that the DNS resolution on the DNSResolver has been canceled.
     } DNSResolverState;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
     /**
@@ -106,7 +104,7 @@ private:
      */
     typedef void (*OnResolveCompleteFunct)(void *appState, INET_ERROR err, uint8_t addrCount, IPAddress *addrArray);
 
-    static Weave::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> sPool;
+    static chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> sPool;
 
     /**
      *  A pointer to the callback function when a DNS request is complete.
@@ -133,7 +131,7 @@ private:
      */
     uint8_t DNSOptions;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     void InitAddrInfoHints(struct addrinfo & hints);
     INET_ERROR ProcessGetAddrInfoResult(int returnCode, struct addrinfo * results);
@@ -155,24 +153,23 @@ private:
 
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     INET_ERROR Resolve(const char *hostName, uint16_t hostNameLen, uint8_t options,
             uint8_t maxAddrs, IPAddress *addrArray,
             OnResolveCompleteFunct onComplete, void *appState);
     INET_ERROR Cancel(void);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     void HandleResolveComplete(void);
 #if LWIP_VERSION_MAJOR > 1
     static void LwIPHandleResolveComplete(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
 #else // LWIP_VERSION_MAJOR <= 1
     static void LwIPHandleResolveComplete(const char *name, ip_addr_t *ipaddr, void *callback_arg);
 #endif // LWIP_VERSION_MAJOR <= 1
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 };
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(DNSRESOLVER_H_)

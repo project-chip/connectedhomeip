@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,15 +22,15 @@
  *
  */
 
-#include <InetLayer/InetLayer.h>
-#include <InetLayer/DNSResolver.h>
-#include <InetLayer/InetLayerEvents.h>
+#include "InetLayer.h"
+#include "DNSResolver.h"
+#include "InetLayerEvents.h"
 
-#include <Weave/Support/CodeUtils.h>
+#include "support/CodeUtils.h"
 
 #include <string.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
 #include <lwip/dns.h>
 #include <lwip/tcpip.h>
@@ -39,18 +38,17 @@
 #if LWIP_VERSION_MAJOR < 2
 #define LWIP_DNS_FOUND_CALLBACK_TYPE    dns_found_callback
 #endif // LWIP_VERSION_MAJOR < 2
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <netdb.h>
 #include <errno.h>
 #include <stdlib.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-namespace nl {
 namespace Inet {
 
-Weave::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> DNSResolver::sPool;
+chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> DNSResolver::sPool;
 
 /**
  *  This method revolves a host name into a list of IP addresses.
@@ -92,10 +90,10 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
 {
     INET_ERROR res = INET_NO_ERROR;
 
-#if !WEAVE_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
+#if !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
     Release();
     return INET_ERROR_NOT_IMPLEMENTED;
-#endif // !WEAVE_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
+#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
 
     uint8_t addrFamilyOption = (options & kDNSOption_AddrFamily_Mask);
     uint8_t optionFlags = (options & kDNSOption_Flags_Mask);
@@ -112,7 +110,7 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
         return INET_ERROR_BAD_ARGS;
     }
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS || (WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
 
     // TODO: Eliminate the need for a local buffer when running on LwIP by changing
     // the LwIP DNS interface to support non-nul terminated strings.
@@ -129,7 +127,7 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
     DNSOptions = options;
     OnComplete = onComplete;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 
@@ -152,7 +150,7 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
         lwipAddrType = LWIP_DNS_ADDRTYPE_IPV6_IPV4;
         break;
     default:
-        WeaveDie();
+        chipDie();
     }
 #else // INET_CONFIG_ENABLE_IPV4
     lwipAddrType = LWIP_DNS_ADDRTYPE_IPV6;
@@ -188,7 +186,7 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
 
     if (lwipErr == ERR_OK)
     {
-        Weave::System::Layer& lSystemLayer = SystemLayer();
+        chip::System::Layer& lSystemLayer = SystemLayer();
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         AddrArray[0] = IPAddress::FromLwIPAddr(lwipAddr);
@@ -201,15 +199,15 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
     }
     else if (lwipErr != ERR_INPROGRESS)
     {
-        res = Weave::System::MapErrorLwIP(lwipErr);
+        res = chip::System::MapErrorLwIP(lwipErr);
         Release();
     }
 
     return res;
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     struct addrinfo gaiHints;
     struct addrinfo * gaiResults = NULL;
@@ -233,8 +231,8 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
 
     return INET_NO_ERROR;
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS || (WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
 }
 
 
@@ -246,7 +244,7 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
  */
 INET_ERROR DNSResolver::Cancel()
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // NOTE: LwIP does not support canceling DNS requests that are in progress.  As a consequence,
     // we can't release the DNSResolver object until LwIP calls us back (because LwIP retains a
@@ -271,9 +269,9 @@ INET_ERROR DNSResolver::Cancel()
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     // NOTE: DNS lookups can be canceled only when using the asynchronous mode.
 
@@ -284,12 +282,12 @@ INET_ERROR DNSResolver::Cancel()
     inet.mAsyncDNSResolver.Cancel(*this);
 
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return INET_NO_ERROR;
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  *  This method is called by InetLayer on success, failure, or timeout of a
@@ -328,7 +326,7 @@ void DNSResolver::LwIPHandleResolveComplete(const char *name, ip_addr_t *ipaddr,
 
     if (resolver != NULL)
     {
-        Weave::System::Layer& lSystemLayer = resolver->SystemLayer();
+        chip::System::Layer& lSystemLayer = resolver->SystemLayer();
 
         // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
         if (resolver->OnComplete != NULL && ipaddr != NULL)
@@ -345,9 +343,9 @@ void DNSResolver::LwIPHandleResolveComplete(const char *name, ip_addr_t *ipaddr,
     }
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 void DNSResolver::InitAddrInfoHints(struct addrinfo & hints)
 {
@@ -412,7 +410,7 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
             secondaryFamily = AF_INET;
             break;
         default:
-            WeaveDie();
+            chipDie();
         }
 
         // Determine the number of addresses of each family present in the results.
@@ -430,7 +428,7 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
         // when attempting to communicate with the host.
         if (numAddrs > MaxAddrs && MaxAddrs > 1 && numPrimaryAddrs > 0 && numSecondaryAddrs > 0)
         {
-            numPrimaryAddrs = ::nl::Weave::min(numPrimaryAddrs, (uint8_t)(MaxAddrs - 1));
+            numPrimaryAddrs = ::chip::min(numPrimaryAddrs, (uint8_t)(MaxAddrs - 1));
         }
 
         // Copy the primary addresses into the beginning of the application's output array,
@@ -480,7 +478,7 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
             err = INET_ERROR_DNS_TRY_AGAIN;
             break;
         case EAI_SYSTEM:
-            err = Weave::System::MapErrorPOSIX(errno);
+            err = chip::System::MapErrorPOSIX(errno);
             break;
         default:
             err = INET_ERROR_DNS_NO_RECOVERY;
@@ -539,7 +537,6 @@ void DNSResolver::HandleAsyncResolveComplete(void)
     Release();
 }
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
-} // namespace nl
