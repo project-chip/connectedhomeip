@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This header file defines the <tt>nl::Inet::IPEndPointBasis</tt>
+ *      This header file defines the <tt>Inet::IPEndPointBasis</tt>
  *      class, an intermediate, non-instantiable basis class
  *      supporting other IP-based end points.
  *
@@ -27,16 +26,15 @@
 #ifndef IPENDPOINTBASIS_H
 #define IPENDPOINTBASIS_H
 
-#include <InetLayer/EndPointBasis.h>
+#include "EndPointBasis.h"
 
-#include <SystemLayer/SystemPacketBuffer.h>
+#include "system/SystemPacketBuffer.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
 #include <lwip/netif.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
 namespace Inet {
 
 class InetLayer;
@@ -49,7 +47,7 @@ class IPPacketInfo;
  *        endpoints.
  *
  */
-class NL_DLL_EXPORT IPEndPointBasis : public EndPointBasis
+class DLL_EXPORT IPEndPointBasis : public EndPointBasis
 {
     friend class InetLayer;
 
@@ -98,7 +96,7 @@ public:
      *  member to process message text reception events on \c endPoint where
      *  \c msg is the message text received from the sender at \c senderAddr.
      */
-    typedef void (*OnMessageReceivedFunct)(IPEndPointBasis *endPoint, Weave::System::PacketBuffer *msg, const IPPacketInfo *pktInfo);
+    typedef void (*OnMessageReceivedFunct)(IPEndPointBasis *endPoint, chip::System::PacketBuffer *msg, const IPPacketInfo *pktInfo);
 
     /** The endpoint's message reception event handling function delegate. */
     OnMessageReceivedFunct OnMessageReceived;
@@ -126,27 +124,27 @@ public:
 protected:
     void Init(InetLayer *aInetLayer);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
     static struct netif *FindNetifFromInterfaceId(InterfaceId aInterfaceId);
 
 protected:
-    void HandleDataReceived(Weave::System::PacketBuffer *aBuffer);
+    void HandleDataReceived(chip::System::PacketBuffer *aBuffer);
 
-    static IPPacketInfo *GetPacketInfo(Weave::System::PacketBuffer *buf);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+    static IPPacketInfo *GetPacketInfo(chip::System::PacketBuffer *buf);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 protected:
     InterfaceId mBoundIntfId;
 
     INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, InterfaceId aInterfaceId);
     INET_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
-    INET_ERROR SendMsg(const IPPacketInfo *aPktInfo, Weave::System::PacketBuffer *aBuffer, uint16_t aSendFlags);
+    INET_ERROR SendMsg(const IPPacketInfo *aPktInfo, chip::System::PacketBuffer *aBuffer, uint16_t aSendFlags);
     INET_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
     SocketEvents PrepareIO(void);
     void HandlePendingIO(uint16_t aPort);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 private:
     IPEndPointBasis(void);                     // not defined
@@ -154,7 +152,7 @@ private:
     ~IPEndPointBasis(void);                    // not defined
 };
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 inline struct netif *IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
 {
@@ -173,10 +171,9 @@ inline struct netif *IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInte
     return (lRetval);
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(IPENDPOINT_H)
