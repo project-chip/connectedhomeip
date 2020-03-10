@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,8 +30,8 @@
  *
  */
 
-#ifndef _WEAVEENCODING_H
-#define _WEAVEENCODING_H
+#ifndef _CHIPENCODING_H
+#define _CHIPENCODING_H
 
 #include <stdint.h>
 
@@ -40,11 +39,10 @@
 #include <nlio.hpp>
 #include <nlio-byteorder.hpp>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 /**
- *  @namespace nl::Weave::Encoding
+ *  @namespace chip::Encoding
  *
  *  This namespace provides functions for:
  *
@@ -154,7 +152,7 @@ inline uint8_t  Read8(const uint8_t *& p)       { return nl::IO::Read8((const vo
 inline void     Write8(uint8_t *& p, uint8_t v) { *p++ = v; }
 
 /**
- *  @namespace nl::Weave::Encoding::LittleEndian
+ *  @namespace chip::Encoding::LittleEndian
  *
  *  This namespace provides functions for:
  *
@@ -468,7 +466,7 @@ inline void Write64(uint8_t *& p, uint64_t v)   { Put64(p, v); p += sizeof(uint6
 
 
 /**
- *  @namespace nl::Weave::Encoding::BigEndian
+ *  @namespace chip::Encoding::BigEndian
  *
  *  This namespace provides functions for:
  *
@@ -785,7 +783,6 @@ inline void Write64(uint8_t *& p, uint64_t v)   { Put64(p, v); p += sizeof(uint6
 
 
 } //Encoding
-} //Weave
-} //nl
+} //chip
 
-#endif // _WEAVEENCODING_H
+#endif // _CHIPENCODING_H
