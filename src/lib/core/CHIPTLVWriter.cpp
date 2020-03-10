@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This file implements an encoder for the Weave TLV (Tag-Length-Value) encoding format.
+ *      This file implements an encoder for the CHIP TLV (Tag-Length-Value) encoding format.
  *
  */
 
@@ -28,16 +27,15 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#include <Weave/Core/WeaveCore.h>
-#include <Weave/Core/WeaveEncoding.h>
-#include <Weave/Core/WeaveTLV.h>
-#include <Weave/Support/CodeUtils.h>
+#include <CHIPCore.h>
+#include <CHIPEncoding.h>
+#include <CHIPTLV.h>
+#include <support/CodeUtils.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace TLV {
 
-using namespace nl::Weave::Encoding;
+using namespace chip::Encoding;
 
 
 /**
@@ -66,7 +64,7 @@ using namespace nl::Weave::Encoding;
  */
 
 /**
- * @typedef WEAVE_ERROR (*TLVWriter::GetNewBufferFunct)(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen)
+ * @typedef CHIP_ERROR (*TLVWriter::GetNewBufferFunct)(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen)
  *
  * A function that supplies new output buffer space to a TLVWriter.
  *
@@ -91,8 +89,8 @@ using namespace nl::Weave::Encoding;
  *                                  current buffer.  On exit, @p bufLen is expected to contain the maximum
  *                                  number of bytes that can be written to the new output buffer.
  *
- * @retval #WEAVE_NO_ERROR          If the function was able to supply more buffer space for the writer.
- * @retval other                    Other Weave or platform-specific error codes indicating that an error
+ * @retval #CHIP_NO_ERROR          If the function was able to supply more buffer space for the writer.
+ * @retval other                    Other CHIP or platform-specific error codes indicating that an error
  *                                  occurred preventing the function from producing additional buffer
  *                                  space.
  *
@@ -105,7 +103,7 @@ using namespace nl::Weave::Encoding;
  *
  * A TLVWriter object will call the GetNewBuffer function whenever an attempt is made to write data
  * that exceeds the size of the current output buffer.  If set to NULL (the default value), the
- * writer will return a WEAVE_ERROR_NO_MEMORY if the output data overflows the current buffer.
+ * writer will return a CHIP_ERROR_NO_MEMORY if the output data overflows the current buffer.
  *
  * GetNewBuffer can be set by an application at any time, but is typically set when the writer
  * is initialized.
@@ -115,7 +113,7 @@ using namespace nl::Weave::Encoding;
  */
 
 /**
- * @typedef WEAVE_ERROR (*TLVWriter::FinalizeBufferFunct)(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart, uint32_t bufLen)
+ * @typedef CHIP_ERROR (*TLVWriter::FinalizeBufferFunct)(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart, uint32_t bufLen)
  *
  * A function used to perform finalization of the output from a TLVWriter object.
  *
@@ -130,8 +128,8 @@ using namespace nl::Weave::Encoding;
  * @param[in,out]   bufStart        A pointer to the beginning of the current (and final) output buffer.
  * @param[in,out]   bufLen          The number of bytes contained in the buffer pointed to by @p bufStart.
  *
- * @retval #WEAVE_NO_ERROR          If finalization was successful.
- * @retval other                    Other Weave or platform-specific error codes indicating that an error
+ * @retval #CHIP_NO_ERROR          If finalization was successful.
+ * @retval other                    Other CHIP or platform-specific error codes indicating that an error
  *                                  occurred during finalization.
  *
  */
@@ -225,7 +223,7 @@ void TLVWriter::Init(PacketBuffer *buf, uint32_t maxLen)
  * @param[in]   allowDiscontiguousBuffers
  *                      If true, write data to a chain of PacketBuffers, allocating new buffers as
  *                      needed to store the data written.  If false, writing will fail with
- *                      WEAVE_ERROR_BUFFER_TOO_SMALL if the written data exceeds the space available
+ *                      CHIP_ERROR_BUFFER_TOO_SMALL if the written data exceeds the space available
  *                      in the initial output buffer.
  *
  */
@@ -261,18 +259,18 @@ uint32_t TLVWriter::GetLengthWritten()
  * Finalize() can only be called when there are no container writers open for the current writer.
  * (See @p OpenContainer()).
  *
- * @retval #WEAVE_NO_ERROR      If the encoding was finalized successfully.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the encoding was finalized successfully.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              FinalizeBuffer() function.
  */
-WEAVE_ERROR TLVWriter::Finalize()
+CHIP_ERROR TLVWriter::Finalize()
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (IsContainerOpen())
-        return WEAVE_ERROR_TLV_CONTAINER_OPEN;
+        return CHIP_ERROR_TLV_CONTAINER_OPEN;
     if (FinalizeBuffer != NULL)
         err = FinalizeBuffer(*this, mBufHandle, mBufStart, mWritePoint - mBufStart);
     return err;
@@ -287,24 +285,24 @@ WEAVE_ERROR TLVWriter::Finalize()
  *                              ContextTag() or CommonTag().
  * @param[in]   v               The value to be encoded.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::PutBoolean(uint64_t tag, bool v)
+CHIP_ERROR TLVWriter::PutBoolean(uint64_t tag, bool v)
 {
     return WriteElementHead((v) ? kTLVElementType_BooleanTrue : kTLVElementType_BooleanFalse, tag, 0);
 }
@@ -318,24 +316,24 @@ WEAVE_ERROR TLVWriter::PutBoolean(uint64_t tag, bool v)
  *                              ContextTag() or CommonTag().
  * @param[in]   v               The value to be encoded.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
 {
     return Put(tag, static_cast<uint64_t>(v));
 }
@@ -353,24 +351,24 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
  *                              number of bytes necessary to represent the value.  Note: Applications
  *                              are strongly encouraged to set this parameter to false.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt8, tag, v);
@@ -379,17 +377,17 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint16_t v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, uint16_t v)
 {
     return Put(tag, static_cast<uint64_t>(v));
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint16_t v, bool preserveSize)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, uint16_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt16, tag, v);
@@ -398,17 +396,17 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint16_t v, bool preserveSize)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint32_t v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, uint32_t v)
 {
     return Put(tag, static_cast<uint64_t>(v));
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint32_t v, bool preserveSize)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, uint32_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt32, tag, v);
@@ -417,9 +415,9 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint32_t v, bool preserveSize)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint64_t v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, uint64_t v)
 {
     TLVElementType elemType;
     if (v <= UINT8_MAX)
@@ -434,9 +432,9 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint64_t v)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, uint8_t v, bool preserveSize)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint64_t v, bool preserveSize)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, uint64_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_UInt64, tag, v);
@@ -453,24 +451,24 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, uint64_t v, bool preserveSize)
  *                              ContextTag() or CommonTag().
  * @param[in]   v               The value to be encoded.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
 {
     return Put(tag, static_cast<int64_t>(v));
 }
@@ -488,24 +486,24 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
  *                              number of bytes necessary to represent the value.  Note: Applications
  *                              are strongly encouraged to set this parameter to false.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int8, tag, v);
@@ -514,17 +512,17 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, int16_t v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, int16_t v)
 {
     return Put(tag, static_cast<int64_t>(v));
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, int16_t v, bool preserveSize)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, int16_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int16, tag, v);
@@ -533,17 +531,17 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, int16_t v, bool preserveSize)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, int32_t v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v)
 {
     return Put(tag, static_cast<int64_t>(v));
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, int32_t v, bool preserveSize)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int32, tag, v);
@@ -552,9 +550,9 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, int32_t v, bool preserveSize)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, int64_t v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v)
 {
     TLVElementType elemType;
     if (v >= INT8_MIN && v <= INT8_MAX)
@@ -569,9 +567,9 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, int64_t v)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
 {
     if (preserveSize)
         return WriteElementHead(kTLVElementType_Int64, tag, v);
@@ -580,9 +578,9 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
 }
 
 /**
- * @overload WEAVE_ERROR TLVWriter::Put(uint64_t tag, double v)
+ * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, float v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, float v)
 {
     union
     {
@@ -602,24 +600,24 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, float v)
  *                              ContextTag() or CommonTag().
  * @param[in]   v               The value to be encoded.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::Put(uint64_t tag, double v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
 {
     union
     {
@@ -640,24 +638,24 @@ WEAVE_ERROR TLVWriter::Put(uint64_t tag, double v)
  * @param[in]   buf             A pointer to a buffer containing the bytes string to be encoded.
  * @param[in]   len             The number of bytes to be encoded.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t *buf, uint32_t len)
+CHIP_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t *buf, uint32_t len)
 {
     return WriteElementWithData(kTLVType_ByteString, tag, (const uint8_t *) buf, len);
 }
@@ -671,24 +669,24 @@ WEAVE_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t *buf, uint32_t len)
  *                              ContextTag() or CommonTag().
  * @param[in]   buf             A pointer to the null-terminated UTF-8 string to be encoded.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::PutString(uint64_t tag, const char *buf)
+CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char *buf)
 {
     return PutString(tag, buf, strlen(buf));
 }
@@ -703,24 +701,24 @@ WEAVE_ERROR TLVWriter::PutString(uint64_t tag, const char *buf)
  * @param[in]   buf             A pointer to the UTF-8 string to be encoded.
  * @param[in]   len             The length (in bytes) of the string to be encoded.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::PutString(uint64_t tag, const char *buf, uint32_t len)
+CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char *buf, uint32_t len)
 {
     return WriteElementWithData(kTLVType_UTF8String, tag, (const uint8_t *) buf, len);
 }
@@ -766,15 +764,15 @@ WEAVE_ERROR TLVWriter::PutString(uint64_t tag, const char *buf, uint32_t len)
  * @param[in] ... A list of arguments to be formatted in the output value
  *                according to fmt.
  *
- * @retval #WEAVE_NO_ERROR  If the method succeeded.
+ * @retval #CHIP_NO_ERROR  If the method succeeded.
  *
  * @retval other If underlying calls to TLVWriter methods --
  *               `WriteElementHead` or `GetNewBuffer` -- failed, their
  *               error is immediately forwarded up the call stack.
  */
-WEAVE_ERROR TLVWriter::PutStringF(uint64_t tag, const char *fmt, ...)
+CHIP_ERROR TLVWriter::PutStringF(uint64_t tag, const char *fmt, ...)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     va_list ap;
 
     va_start(ap, fmt);
@@ -792,7 +790,7 @@ WEAVE_ERROR TLVWriter::PutStringF(uint64_t tag, const char *fmt, ...)
 // emits a single character.  The callback performs a function
 // identical to putchar.
 
-void TLVWriter::WeaveTLVWriterPutcharCB(uint8_t c, void *appState)
+void TLVWriter::CHIPTLVWriterPutcharCB(uint8_t c, void *appState)
 {
     TLVWriter *w = static_cast<TLVWriter *>(appState);
     w->WriteData(&c, sizeof(c));
@@ -840,17 +838,17 @@ void TLVWriter::WeaveTLVWriterPutcharCB(uint8_t c, void *appState)
  * @param[in] ap A list of arguments to be formatted in the output value
  *                according to fmt.
  *
- * @retval #WEAVE_NO_ERROR  If the method succeeded.
+ * @retval #CHIP_NO_ERROR  If the method succeeded.
  *
  * @retval other If underlying calls to TLVWriter methods --
  *               `WriteElementHead` or `GetNewBuffer` -- failed, their
  *               error is immediately forwarded up the call stack.
  */
-WEAVE_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
+CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
 {
     va_list aq;
     size_t dataLen;
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLVFieldSize lenFieldSize;
 #if CONFIG_HAVE_VSNPRINTF_EX
     size_t skipLen;
@@ -887,7 +885,7 @@ WEAVE_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
     err = WriteElementHead((TLVElementType) (kTLVType_UTF8String | lenFieldSize), tag, dataLen);
     SuccessOrExit(err);
 
-    VerifyOrExit((mLenWritten + dataLen) <= mMaxLen, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit((mLenWritten + dataLen) <= mMaxLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // write data
 #if CONFIG_HAVE_VSNPRINTF_EX
@@ -909,7 +907,7 @@ WEAVE_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
         mLenWritten += writtenBytes;
         if (skipLen < dataLen)
         {
-            VerifyOrExit(GetNewBuffer != NULL, err = WEAVE_ERROR_NO_MEMORY);
+            VerifyOrExit(GetNewBuffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
             if (FinalizeBuffer != NULL)
             {
@@ -929,14 +927,14 @@ WEAVE_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
 
     va_copy(aq, ap);
 
-    vcbprintf(WeaveTLVWriterPutcharCB, this, dataLen, fmt, aq);
+    vcbprintf(CHIPTLVWriterPutcharCB, this, dataLen, fmt, aq);
 
     va_end(aq);
 
 #elif HAVE_MALLOC
 
     tmpBuf = static_cast<char*>(malloc(dataLen+1));
-    VerifyOrExit(tmpBuf != NULL, err = WEAVE_ERROR_NO_MEMORY);
+    VerifyOrExit(tmpBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     va_copy(aq, ap);
 
@@ -975,24 +973,24 @@ exit:
  *                              constructed with one of the tag definition functions ProfileTag(),
  *                              ContextTag() or CommonTag().
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::PutNull(uint64_t tag)
+CHIP_ERROR TLVWriter::PutNull(uint64_t tag)
 {
     return WriteElementHead(kTLVElementType_Null, tag, 0);
 }
@@ -1013,34 +1011,34 @@ WEAVE_ERROR TLVWriter::PutNull(uint64_t tag)
  * @param[in]   reader          A reference to a TLVReader object identifying a pre-encoded TLV
  *                              element that should be copied.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE
  *                              If the supplied reader is not positioned on an element.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN
+ * @retval #CHIP_ERROR_TLV_UNDERRUN
  *                              If the underlying TLV encoding associated with the supplied reader ended
  *                              prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                              If the supplied reader encountered an invalid or unsupported TLV element
  *                              type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the supplied reader encountered a TLV tag in an invalid context,
  *                              or if the supplied tag is invalid or inappropriate in the context in
  *                              which the new container is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions, or by the GetNextBuffer()
  *                              function associated with the reader object.
  *
  */
-WEAVE_ERROR TLVWriter::CopyElement(TLVReader& reader)
+CHIP_ERROR TLVWriter::CopyElement(TLVReader& reader)
 {
     return CopyElement(reader.GetTag(), reader);
 }
@@ -1065,47 +1063,47 @@ WEAVE_ERROR TLVWriter::CopyElement(TLVReader& reader)
  * @param[in]   reader          A reference to a TLVReader object identifying a pre-encoded TLV
  *                              element whose type and value should be copied.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE
  *                              If the supplied reader is not positioned on an element.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN
+ * @retval #CHIP_ERROR_TLV_UNDERRUN
  *                              If the underlying TLV encoding associated with the supplied reader ended
  *                              prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                              If the supplied reader encountered an invalid or unsupported TLV element
  *                              type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the supplied reader encountered a TLV tag in an invalid context,
  *                              or if the supplied tag is invalid or inappropriate in the context in
  *                              which the new container is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions, or by the GetNextBuffer()
  *                              function associated with the reader object.
  *
  */
 
 
-const size_t kWeaveTLVCopyChunkSize = 16;
+const size_t kCHIPTLVCopyChunkSize = 16;
 
-WEAVE_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader& reader)
+CHIP_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader& reader)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLVElementType elemType = reader.ElementType();
     uint64_t elemLenOrVal = reader.mElemLenOrVal;
     TLVReader readerHelper; // used to figure out the length of the element and read data of the element
     uint32_t copyDataLen;
-    uint8_t chunk[kWeaveTLVCopyChunkSize];
+    uint8_t chunk[kCHIPTLVCopyChunkSize];
 
-    VerifyOrExit(elemType != kTLVElementType_NotSpecified && elemType != kTLVElementType_EndOfContainer, err = WEAVE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(elemType != kTLVElementType_NotSpecified && elemType != kTLVElementType_EndOfContainer, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the helper
     readerHelper.Init(reader);
@@ -1124,7 +1122,7 @@ WEAVE_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader& reader)
 
     while (copyDataLen > 0)
     {
-        uint32_t chunkSize = copyDataLen > kWeaveTLVCopyChunkSize ? kWeaveTLVCopyChunkSize : copyDataLen;
+        uint32_t chunkSize = copyDataLen > kCHIPTLVCopyChunkSize ? kCHIPTLVCopyChunkSize : copyDataLen;
         err = readerHelper.ReadData(chunk, chunkSize);
         SuccessOrExit(err);
 
@@ -1170,39 +1168,39 @@ exit:
  *                              writing the members of the new container element. Any data
  *                              associated with the supplied object is overwritten.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE
  *                              If the value specified for containerType is incorrect.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWriter& containerWriter)
+CHIP_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWriter& containerWriter)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(TLVTypeIsContainer(containerType), err = WEAVE_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(TLVTypeIsContainer(containerType), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     if (IsCloseContainerReserved())
     {
-        VerifyOrExit(mMaxLen >= kEndOfContainerMarkerSize, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(mMaxLen >= kEndOfContainerMarkerSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
         mMaxLen -= kEndOfContainerMarkerSize;
     }
     err = WriteElementHead((TLVElementType) containerType, tag, 0);
 
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         // undo the space reservation, as the container is not actually open
         if (IsCloseContainerReserved())
@@ -1245,30 +1243,30 @@ exit:
  * @param[in] containerWriter   A reference to the TLVWriter object that was supplied to the
  *                              OpenContainer() method.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE
  *                              If the supplied container writer is not in the correct state.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If another container writer has been opened on the supplied
  *                              container writer and not yet closed.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If completing the encoding of the container would exceed the
  *                              limit on the maximum number of bytes specified when the writer
  *                              was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack
  *                              of memory.
- * @retval other                Other Weave or platform-specific errors returned by the
+ * @retval other                Other CHIP or platform-specific errors returned by the
  *                              configured GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::CloseContainer(TLVWriter& containerWriter)
+CHIP_ERROR TLVWriter::CloseContainer(TLVWriter& containerWriter)
 {
     if (!TLVTypeIsContainer(containerWriter.mContainerType))
-        return WEAVE_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
 
     if (containerWriter.IsContainerOpen())
-        return WEAVE_ERROR_TLV_CONTAINER_OPEN;
+        return CHIP_ERROR_TLV_CONTAINER_OPEN;
 
     mBufHandle = containerWriter.mBufHandle;
     mBufStart = containerWriter.mBufStart;
@@ -1309,39 +1307,39 @@ WEAVE_ERROR TLVWriter::CloseContainer(TLVWriter& containerWriter)
  *                              A reference to a TLVType value that will receive the context of the
  *                              writer.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE
  *                              If the value specified for containerType is incorrect.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::StartContainer(uint64_t tag, TLVType containerType, TLVType& outerContainerType)
+CHIP_ERROR TLVWriter::StartContainer(uint64_t tag, TLVType containerType, TLVType& outerContainerType)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(TLVTypeIsContainer(containerType), err = WEAVE_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(TLVTypeIsContainer(containerType), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     if (IsCloseContainerReserved())
     {
-        VerifyOrExit(mMaxLen >= kEndOfContainerMarkerSize, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(mMaxLen >= kEndOfContainerMarkerSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
         mMaxLen -= kEndOfContainerMarkerSize;
     }
 
     err = WriteElementHead((TLVElementType) containerType, tag, 0);
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         // undo the space reservation, as the container is not actually open
         if (IsCloseContainerReserved())
@@ -1376,26 +1374,26 @@ exit:
  * @param[in] outerContainerType
  *                              The TLVType value that was returned by the StartContainer() method.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE
  *                              If a corresponding StartContainer() call was not made.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
+CHIP_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
 {
     if (!TLVTypeIsContainer(mContainerType))
-        return WEAVE_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
 
     mContainerType = outerContainerType;
 
@@ -1426,32 +1424,32 @@ WEAVE_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
  *                              will become the members of the new container.
  * @param[in]   dataLen         The number of bytes in the @p data buffer.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE
  *                              If the value specified for containerType is incorrect.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the specified tag value is invalid or inappropriate in the context
  *                              in which the value is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-WEAVE_ERROR TLVWriter::PutPreEncodedContainer(uint64_t tag, TLVType containerType, const uint8_t *data, uint32_t dataLen)
+CHIP_ERROR TLVWriter::PutPreEncodedContainer(uint64_t tag, TLVType containerType, const uint8_t *data, uint32_t dataLen)
 {
     if (!TLVTypeIsContainer(containerType))
-        return WEAVE_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
 
-    WEAVE_ERROR err = WriteElementHead((TLVElementType)containerType, tag, 0);
-    if (err != WEAVE_NO_ERROR)
+    CHIP_ERROR err = WriteElementHead((TLVElementType)containerType, tag, 0);
+    if (err != CHIP_NO_ERROR)
         return err;
 
     return WriteData(data, dataLen);
@@ -1473,34 +1471,34 @@ WEAVE_ERROR TLVWriter::PutPreEncodedContainer(uint64_t tag, TLVType containerTyp
  * @param[in]   container       A reference to a TLVReader object identifying the pre-encoded TLV
  *                              container to be copied.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE
  *                              If the supplied reader is not positioned on a container element.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN
+ * @retval #CHIP_ERROR_TLV_UNDERRUN
  *                              If the underlying TLV encoding associated with the supplied reader ended
  *                              prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                              If the supplied reader encountered an invalid or unsupported TLV element
  *                              type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the supplied reader encountered a TLV tag in an invalid context,
  *                              or if the tag associated with the source container is invalid or
  *                              inappropriate in the context in which the new container is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions, or by the GetNextBuffer()
  *                              function associated with the reader object.
  *
  */
-WEAVE_ERROR TLVWriter::CopyContainer(TLVReader& container)
+CHIP_ERROR TLVWriter::CopyContainer(TLVReader& container)
 {
     return CopyContainer(container.GetTag(), container);
 }
@@ -1528,50 +1526,50 @@ WEAVE_ERROR TLVWriter::CopyContainer(TLVReader& container)
  * @param[in]   container       A reference to a TLVReader object identifying a pre-encoded TLV
  *                              container whose type and members should be copied.
  *
- * @retval #WEAVE_NO_ERROR      If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE
+ * @retval #CHIP_NO_ERROR      If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE
  *                              If the supplied reader is not positioned on a container element.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                              If a container writer has been opened on the current writer and not
  *                              yet closed.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN
+ * @retval #CHIP_ERROR_TLV_UNDERRUN
  *                              If the underlying TLV encoding associated with the supplied reader ended
  *                              prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                              If the supplied reader encountered an invalid or unsupported TLV element
  *                              type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                              If the supplied reader encountered a TLV tag in an invalid context,
  *                              or if the supplied tag is invalid or inappropriate in the context in
  *                              which the new container is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                              If writing the value would exceed the limit on the maximum number of
  *                              bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                              If an attempt to allocate an output buffer failed due to lack of
  *                              memory.
- * @retval other                Other Weave or platform-specific errors returned by the configured
+ * @retval other                Other CHIP or platform-specific errors returned by the configured
  *                              GetNewBuffer() or FinalizeBuffer() functions, or by the GetNextBuffer()
  *                              function associated with the reader object.
  *
  */
-WEAVE_ERROR TLVWriter::CopyContainer(uint64_t tag, TLVReader& container)
+CHIP_ERROR TLVWriter::CopyContainer(uint64_t tag, TLVReader& container)
 {
     // NOTE: This function MUST be used with a TVLReader that is reading from a contiguous buffer.
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     TLVType containerType, outerContainerType;
     const uint8_t *containerStart;
 
     containerType = container.GetType();
 
     err = container.EnterContainer(outerContainerType);
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
         return err;
 
     containerStart = container.GetReadPoint();
 
     err = container.ExitContainer(outerContainerType);
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
         return err;
 
     return PutPreEncodedContainer(tag, containerType, containerStart, container.GetReadPoint() - containerStart);
@@ -1597,32 +1595,32 @@ WEAVE_ERROR TLVWriter::CopyContainer(uint64_t tag, TLVReader& container)
  *                                  should be copied.
  * @param[in] encodedContainerLen   The length in bytes of the pre-encoded container.
  *
- * @retval #WEAVE_NO_ERROR          If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_CONTAINER_OPEN
+ * @retval #CHIP_NO_ERROR          If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
  *                                  If a container writer has been opened on the current writer and not
  *                                  yet closed.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN
+ * @retval #CHIP_ERROR_TLV_UNDERRUN
  *                                  If the encoded container ended prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                  If the encoded container contained an invalid or unsupported TLV element type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG
  *                                  If the encoded container contained a TLV tag in an invalid context,
  *                                  or if the supplied tag is invalid or inappropriate in the context in
  *                                  which the new container is being written.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                                  If writing the value would exceed the limit on the maximum number of
  *                                  bytes specified when the writer was initialized.
- * @retval #WEAVE_ERROR_NO_MEMORY
+ * @retval #CHIP_ERROR_NO_MEMORY
  *                                  If an attempt to allocate an output buffer failed due to lack of
  *                                  memory.
- * @retval other                    Other Weave or platform-specific errors returned by the configured
+ * @retval other                    Other CHIP or platform-specific errors returned by the configured
  *                                  GetNewBuffer() or FinalizeBuffer() functions, or by the GetNextBuffer()
  *                                  function associated with the reader object.
  *
  */
-WEAVE_ERROR TLVWriter::CopyContainer(uint64_t tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen)
+CHIP_ERROR TLVWriter::CopyContainer(uint64_t tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     TLVReader reader;
 
     reader.Init(encodedContainer, encodedContainerLen);
@@ -1652,13 +1650,13 @@ TLVType TLVWriter::GetContainerType() const
     return mContainerType;
 }
 
-WEAVE_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, uint64_t lenOrVal)
+CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, uint64_t lenOrVal)
 {
     uint8_t *p;
     uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
 
     if (IsContainerOpen())
-        return WEAVE_ERROR_TLV_CONTAINER_OPEN;
+        return CHIP_ERROR_TLV_CONTAINER_OPEN;
 
     uint32_t tagNum = TagNumFromTag(tag);
 
@@ -1672,7 +1670,7 @@ WEAVE_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, u
         if (tagNum < 256)
         {
             if (mContainerType != kTLVType_Structure && mContainerType != kTLVType_Path)
-                return WEAVE_ERROR_INVALID_TLV_TAG;
+                return CHIP_ERROR_INVALID_TLV_TAG;
 
             Write8(p, kTLVTagControl_ContextSpecific | elemType);
             Write8(p, (uint8_t) tagNum);
@@ -1681,7 +1679,7 @@ WEAVE_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, u
         {
             if (elemType != kTLVElementType_EndOfContainer && mContainerType != kTLVType_NotSpecified
                     && mContainerType != kTLVType_Array)
-                return WEAVE_ERROR_INVALID_TLV_TAG;
+                return CHIP_ERROR_INVALID_TLV_TAG;
 
             Write8(p, kTLVTagControl_Anonymous | elemType);
         }
@@ -1692,7 +1690,7 @@ WEAVE_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, u
 
         if (mContainerType != kTLVType_NotSpecified && mContainerType != kTLVType_Structure
                 && mContainerType != kTLVType_Path)
-            return WEAVE_ERROR_INVALID_TLV_TAG;
+            return CHIP_ERROR_INVALID_TLV_TAG;
 
         if (profileId == kCommonProfileId)
         {
@@ -1766,13 +1764,13 @@ WEAVE_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, u
         mWritePoint = p;
         mRemainingLen -= len;
         mLenWritten += len;
-        return WEAVE_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
     else
         return WriteData(stagingBuf, p - stagingBuf);
 }
 
-WEAVE_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uint8_t *data, uint32_t dataLen)
+CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uint8_t *data, uint32_t dataLen)
 {
     TLVFieldSize lenFieldSize;
 
@@ -1783,24 +1781,24 @@ WEAVE_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const ui
     else
         lenFieldSize = kTLVFieldSize_4Byte;
 
-    WEAVE_ERROR err = WriteElementHead((TLVElementType) (type | lenFieldSize), tag, dataLen);
-    if (err != WEAVE_NO_ERROR)
+    CHIP_ERROR err = WriteElementHead((TLVElementType) (type | lenFieldSize), tag, dataLen);
+    if (err != CHIP_NO_ERROR)
         return err;
 
     return WriteData(data, dataLen);
 }
 
-WEAVE_ERROR TLVWriter::WriteData(const uint8_t *p, uint32_t len)
+CHIP_ERROR TLVWriter::WriteData(const uint8_t *p, uint32_t len)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit((mLenWritten + len) <= mMaxLen, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit((mLenWritten + len) <= mMaxLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     while (len > 0)
     {
         if (mRemainingLen == 0)
         {
-            VerifyOrExit(GetNewBuffer != NULL, err = WEAVE_ERROR_NO_MEMORY);
+            VerifyOrExit(GetNewBuffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
             if (FinalizeBuffer != NULL)
             {
@@ -1846,7 +1844,7 @@ exit:
  * See the GetNewBufferFunct type definition for additional information on the API of the
  * GetNewPacketBuffer() function.
  */
-WEAVE_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen)
+CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen)
 {
     PacketBuffer *buf = (PacketBuffer *) bufHandle;
 
@@ -1870,7 +1868,7 @@ WEAVE_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter& writer, uintptr_t& bufHandl
         bufLen = 0;
     }
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -1883,16 +1881,15 @@ WEAVE_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter& writer, uintptr_t& bufHandl
  * See the FinalizeBufferFunct type definition for additional information on the API of the
  * FinalizePacketBuffer() function.
  */
-WEAVE_ERROR TLVWriter::FinalizePacketBuffer(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart, uint32_t dataLen)
+CHIP_ERROR TLVWriter::FinalizePacketBuffer(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart, uint32_t dataLen)
 {
     PacketBuffer *buf = (PacketBuffer *) bufHandle;
     uint8_t * endPtr = bufStart + dataLen;
 
     buf->SetDataLength(endPtr - buf->Start());
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace TLV
-} // namespace Weave
-} // namespace nl
+} // namespace chip

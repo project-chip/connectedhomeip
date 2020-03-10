@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,22 +17,21 @@
 
 /**
  *    @file
- *      This file implements a parser for the Weave TLV (Tag-Length-Value) encoding format.
+ *      This file implements a parser for the CHIP TLV (Tag-Length-Value) encoding format.
  *
  */
 
 #include <stdlib.h>
 
-#include <Weave/Core/WeaveCore.h>
-#include <Weave/Core/WeaveEncoding.h>
-#include <Weave/Core/WeaveTLV.h>
-#include <Weave/Support/CodeUtils.h>
+#include <CHIPCore.h>
+#include <CHIPEncoding.h>
+#include <CHIPTLV.h>
+#include <support/CodeUtils.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace TLV {
 
-using namespace nl::Weave::Encoding;
+using namespace chip::Encoding;
 
 static const uint8_t sTagSizes[] = { 0, 1, 2, 4, 2, 4, 6, 8 };
 
@@ -83,7 +81,7 @@ static const uint8_t sTagSizes[] = { 0, 1, 2, 4, 2, 4, 6, 8 };
  * on the context of the application or protocol being spoken.
  *
  * If an implicitly-encoded tag is encountered while @p ImplicitProfileId is set to
- * kProfileIdNotSpecified, the reader will return a #WEAVE_ERROR_UNKNOWN_IMPLICIT_TLV_TAG error.
+ * kProfileIdNotSpecified, the reader will return a #CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG error.
  */
 
 /**
@@ -93,7 +91,7 @@ static const uint8_t sTagSizes[] = { 0, 1, 2, 4, 2, 4, 6, 8 };
  */
 
 /**
- * @typedef WEAVE_ERROR (*TLVReader::GetNextBufferFunct)(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart, uint32_t& bufLen)
+ * @typedef CHIP_ERROR (*TLVReader::GetNextBufferFunct)(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart, uint32_t& bufLen)
  *
  * A function that can be used to retrieve additional TLV data to be parsed.
  *
@@ -116,9 +114,9 @@ static const uint8_t sTagSizes[] = { 0, 1, 2, 4, 2, 4, 6, 8 };
  *                                  input TLV data has been reached, the function should set this value
  *                                  to 0.
  *
- * @retval #WEAVE_NO_ERROR          If the function successfully produced more TLV data, or the end of
+ * @retval #CHIP_NO_ERROR          If the function successfully produced more TLV data, or the end of
  *                                  the input data was reached (@p bufLen should be set to 0 in this case).
- * @retval other                    Other Weave or platform-specific error codes indicating that an error
+ * @retval other                    Other CHIP or platform-specific error codes indicating that an error
  *                                  occurred preventing the function from producing the requested data.
  *
  */
@@ -336,12 +334,12 @@ uint32_t TLVReader::GetLength() const
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV boolean type, or the
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV boolean type, or the
  *                                      reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(bool& v)
+CHIP_ERROR TLVReader::Get(bool& v)
 {
     TLVElementType elemType = ElementType();
     if (elemType == kTLVElementType_BooleanFalse)
@@ -349,8 +347,8 @@ WEAVE_ERROR TLVReader::Get(bool& v)
     else if (elemType == kTLVElementType_BooleanTrue)
         v = true;
     else
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
-    return WEAVE_NO_ERROR;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -361,15 +359,15 @@ WEAVE_ERROR TLVReader::Get(bool& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
  *                                      unsigned), or the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(int8_t& v)
+CHIP_ERROR TLVReader::Get(int8_t& v)
 {
     uint64_t v64 = 0;
-    WEAVE_ERROR err = Get(v64);
+    CHIP_ERROR err = Get(v64);
     v = v64;
     return err;
 }
@@ -382,15 +380,15 @@ WEAVE_ERROR TLVReader::Get(int8_t& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
  *                                      unsigned), or the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(int16_t& v)
+CHIP_ERROR TLVReader::Get(int16_t& v)
 {
     uint64_t v64 = 0;
-    WEAVE_ERROR err = Get(v64);
+    CHIP_ERROR err = Get(v64);
     v = v64;
     return err;
 }
@@ -403,15 +401,15 @@ WEAVE_ERROR TLVReader::Get(int16_t& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
  *                                      unsigned), or the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(int32_t& v)
+CHIP_ERROR TLVReader::Get(int32_t& v)
 {
     uint64_t v64 = 0;
-    WEAVE_ERROR err = Get(v64);
+    CHIP_ERROR err = Get(v64);
     v = v64;
     return err;
 }
@@ -424,15 +422,15 @@ WEAVE_ERROR TLVReader::Get(int32_t& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
  *                                      unsigned), or the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(int64_t& v)
+CHIP_ERROR TLVReader::Get(int64_t& v)
 {
     uint64_t v64 = 0;
-    WEAVE_ERROR err = Get(v64);
+    CHIP_ERROR err = Get(v64);
     v = v64;
     return err;
 }
@@ -446,15 +444,15 @@ WEAVE_ERROR TLVReader::Get(int64_t& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
  *                                      unsigned), or the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(uint8_t& v)
+CHIP_ERROR TLVReader::Get(uint8_t& v)
 {
     uint64_t v64 = 0;
-    WEAVE_ERROR err = Get(v64);
+    CHIP_ERROR err = Get(v64);
     v = v64;
     return err;
 }
@@ -468,15 +466,15 @@ WEAVE_ERROR TLVReader::Get(uint8_t& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
  *                                      unsigned), or the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(uint16_t& v)
+CHIP_ERROR TLVReader::Get(uint16_t& v)
 {
     uint64_t v64 = 0;
-    WEAVE_ERROR err = Get(v64);
+    CHIP_ERROR err = Get(v64);
     v = v64;
     return err;
 }
@@ -490,15 +488,15 @@ WEAVE_ERROR TLVReader::Get(uint16_t& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
                                         unsigned), or the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(uint32_t& v)
+CHIP_ERROR TLVReader::Get(uint32_t& v)
 {
     uint64_t v64 = 0;
-    WEAVE_ERROR err = Get(v64);
+    CHIP_ERROR err = Get(v64);
     v = v64;
     return err;
 }
@@ -510,12 +508,12 @@ WEAVE_ERROR TLVReader::Get(uint32_t& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV integer type (signed or
  *                                      unsigned), or the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(uint64_t& v)
+CHIP_ERROR TLVReader::Get(uint64_t& v)
 {
     switch (ElementType())
     {
@@ -536,9 +534,9 @@ WEAVE_ERROR TLVReader::Get(uint64_t& v)
         v = mElemLenOrVal;
         break;
     default:
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
     }
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -546,12 +544,12 @@ WEAVE_ERROR TLVReader::Get(uint64_t& v)
  *
  * @param[out]  v                       Receives the value associated with current TLV element.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV floating point type, or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV floating point type, or
  *                                      the reader is not positioned on an element.
  *
  */
-WEAVE_ERROR TLVReader::Get(double& v)
+CHIP_ERROR TLVReader::Get(double& v)
 {
     switch (ElementType())
     {
@@ -578,9 +576,9 @@ WEAVE_ERROR TLVReader::Get(double& v)
         break;
     }
     default:
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
     }
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -593,33 +591,33 @@ WEAVE_ERROR TLVReader::Get(double& v)
  * @param[in]  buf                      A pointer to a buffer to receive the string data.
  * @param[in]  bufSize                  The size in bytes of the buffer pointed to by @p buf.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or
  *                                      the reader is not positioned on an element.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                                      If the supplied buffer is too small to hold the data associated
  *                                      with the current element.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::GetBytes(uint8_t *buf, uint32_t bufSize)
+CHIP_ERROR TLVReader::GetBytes(uint8_t *buf, uint32_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
 
     if (mElemLenOrVal > bufSize)
-        return WEAVE_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
 
-    WEAVE_ERROR err = ReadData(buf, (uint32_t) mElemLenOrVal);
-    if (err != WEAVE_NO_ERROR)
+    CHIP_ERROR err = ReadData(buf, (uint32_t) mElemLenOrVal);
+    if (err != CHIP_NO_ERROR)
         return err;
 
     mElemLenOrVal = 0;
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -632,25 +630,25 @@ WEAVE_ERROR TLVReader::GetBytes(uint8_t *buf, uint32_t bufSize)
  * @param[in]  buf                      A pointer to a buffer to receive the byte string data.
  * @param[in]  bufSize                  The size in bytes of the buffer pointed to by @p buf.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or
  *                                      the reader is not positioned on an element.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
  *                                      If the supplied buffer is too small to hold the data associated
  *                                      with the current element.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::GetString(char *buf, uint32_t bufSize)
+CHIP_ERROR TLVReader::GetString(char *buf, uint32_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
 
     if ((mElemLenOrVal + 1) > bufSize)
-        return WEAVE_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
 
     buf[mElemLenOrVal] = 0;
 
@@ -671,30 +669,30 @@ WEAVE_ERROR TLVReader::GetString(char *buf, uint32_t bufSize)
  * @param[out] dataLen                  A reference to storage for the size, in bytes, of @p buf on
  *                                      success.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or
  *                                      the reader is not positioned on an element.
- * @retval #WEAVE_ERROR_NO_MEMORY       If memory could not be allocated for the output buffer.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE
+ * @retval #CHIP_ERROR_NO_MEMORY       If memory could not be allocated for the output buffer.
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
  *                                      If the target platform does not support malloc() and free().
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer
  *                                      is non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t& dataLen)
+CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t& dataLen)
 {
 #if HAVE_MALLOC && HAVE_FREE
     if (!TLVTypeIsString(ElementType()))
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
 
     buf = (uint8_t *) malloc(mElemLenOrVal);
     if (buf == NULL)
-        return WEAVE_ERROR_NO_MEMORY;
+        return CHIP_ERROR_NO_MEMORY;
 
-    WEAVE_ERROR err = ReadData(buf, (uint32_t) mElemLenOrVal);
-    if (err != WEAVE_NO_ERROR)
+    CHIP_ERROR err = ReadData(buf, (uint32_t) mElemLenOrVal);
+    if (err != CHIP_NO_ERROR)
     {
         free(buf);
         return err;
@@ -703,9 +701,9 @@ WEAVE_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t& dataLen)
     dataLen = mElemLenOrVal;
     mElemLenOrVal = 0;
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 #else
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // HAVE_MALLOC && HAVE_FREE
 }
 
@@ -720,30 +718,30 @@ WEAVE_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t& dataLen)
  * @param[out] buf                      A reference to a pointer to which a heap-allocated buffer of
  *                                      will be assigned on success.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or
  *                                      the reader is not positioned on an element.
- * @retval #WEAVE_ERROR_NO_MEMORY       If memory could not be allocated for the output buffer.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE
+ * @retval #CHIP_ERROR_NO_MEMORY       If memory could not be allocated for the output buffer.
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
  *                                      If the target platform does not support malloc() and free().
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer
  *                                      is non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::DupString(char *& buf)
+CHIP_ERROR TLVReader::DupString(char *& buf)
 {
 #if HAVE_MALLOC && HAVE_FREE
     if (!TLVTypeIsString(ElementType()))
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
 
     buf = (char *) malloc(mElemLenOrVal + 1);
     if (buf == NULL)
-        return WEAVE_ERROR_NO_MEMORY;
+        return CHIP_ERROR_NO_MEMORY;
 
-    WEAVE_ERROR err = ReadData((uint8_t *) buf, (uint32_t) mElemLenOrVal);
-    if (err != WEAVE_NO_ERROR)
+    CHIP_ERROR err = ReadData((uint8_t *) buf, (uint32_t) mElemLenOrVal);
+    if (err != CHIP_NO_ERROR)
     {
         free(buf);
         return err;
@@ -754,7 +752,7 @@ WEAVE_ERROR TLVReader::DupString(char *& buf)
 
     return err;
 #else
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // HAVE_MALLOC && HAVE_FREE
 }
 
@@ -763,32 +761,32 @@ WEAVE_ERROR TLVReader::DupString(char *& buf)
  *
  * This method returns a direct pointer the encoded string value within the underlying input buffer.
  * To succeed, the method requires that the entirety of the string value be present in a single buffer.
- * Otherwise the method returns #WEAVE_ERROR_TLV_UNDERRUN.  This makes the method of limited use when
+ * Otherwise the method returns #CHIP_ERROR_TLV_UNDERRUN.  This makes the method of limited use when
  * reading data from multiple discontiguous buffers.
  *
  * @param[out] data                     A reference to a const pointer that will receive a pointer to
  *                                      the underlying string data.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or the
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV byte or UTF8 string, or the
  *                                      reader is not positioned on an element.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely or the value
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely or the value
  *                                      of the current string element is not contained within a single
  *                                      contiguous buffer.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
+CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     if (!TLVTypeIsString(ElementType()))
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    err = EnsureData(WEAVE_ERROR_TLV_UNDERRUN);
-    if (err != WEAVE_NO_ERROR)
+    err = EnsureData(CHIP_ERROR_TLV_UNDERRUN);
+    if (err != CHIP_NO_ERROR)
         return err;
 
     uint32_t remainingLen = mBufEnd - mReadPoint;
@@ -796,11 +794,11 @@ WEAVE_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
     // Verify that the entirety of the data is available in the buffer.
     // Note that this may not be possible if the reader is reading from a chain of buffers.
     if (remainingLen < (uint32_t)mElemLenOrVal)
-        return WEAVE_ERROR_TLV_UNDERRUN;
+        return CHIP_ERROR_TLV_UNDERRUN;
 
     data = mReadPoint;
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -815,7 +813,7 @@ WEAVE_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
  *
  * When the OpenContainer() method returns, the container reader is positioned immediately before the
  * first member of the container. Calling Next() on the container reader will advance through the members
- * of the collection until the end is reached, at which point the reader will return WEAVE_END_OF_TLV.
+ * of the collection until the end is reached, at which point the reader will return CHIP_END_OF_TLV.
  *
  * While the container reader is open, applications must not make calls on or otherwise alter the state
  * of the parent reader.  Once an application has finished using the container reader it must close it
@@ -837,15 +835,15 @@ WEAVE_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
  *                                      reading the members of the current container element. Any data
  *                                      associated with the supplied object is overwritten.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE If the current element is not positioned on a container element.
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE If the current element is not positioned on a container element.
  *
  */
-WEAVE_ERROR TLVReader::OpenContainer(TLVReader& containerReader)
+CHIP_ERROR TLVReader::OpenContainer(TLVReader& containerReader)
 {
     TLVElementType elemType = ElementType();
     if (!TLVTypeIsContainer(elemType))
-        return WEAVE_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
 
     containerReader.mBufHandle = mBufHandle;
     containerReader.mReadPoint = mReadPoint;
@@ -861,7 +859,7 @@ WEAVE_ERROR TLVReader::OpenContainer(TLVReader& containerReader)
 
     SetContainerOpen(true);
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -883,32 +881,32 @@ WEAVE_ERROR TLVReader::OpenContainer(TLVReader& containerReader)
  * @param[in] containerReader           A reference to the TLVReader object that was supplied to the
  *                                      OpenContainer() method.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE If OpenContainer() has not been called on the reader, or if
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE If OpenContainer() has not been called on the reader, or if
  *                                      the container reader does not match the one passed to the
  *                                      OpenContainer() method.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                      If the reader encountered an invalid or unsupported TLV
  *                                      element type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::CloseContainer(TLVReader& containerReader)
+CHIP_ERROR TLVReader::CloseContainer(TLVReader& containerReader)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     if (!IsContainerOpen())
-        return WEAVE_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
 
     if ((TLVElementType) containerReader.mContainerType != ElementType())
-        return WEAVE_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
 
     err = containerReader.SkipToEndOfContainer();
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
         return err;
 
     mBufHandle = containerReader.mBufHandle;
@@ -918,7 +916,7 @@ WEAVE_ERROR TLVReader::CloseContainer(TLVReader& containerReader)
     mMaxLen = containerReader.mMaxLen;
     ClearElementState();
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -934,7 +932,7 @@ WEAVE_ERROR TLVReader::CloseContainer(TLVReader& containerReader)
  *
  * When the EnterContainer() method returns, the reader is positioned immediately @em before the
  * first member of the container. Repeatedly calling Next() will advance the reader through the members
- * of the collection until the end is reached, at which point the reader will return WEAVE_END_OF_TLV.
+ * of the collection until the end is reached, at which point the reader will return CHIP_END_OF_TLV.
  *
  * Once the application has finished reading a container it can continue reading the elements after
  * the container by calling the ExitContainer() method.
@@ -942,15 +940,15 @@ WEAVE_ERROR TLVReader::CloseContainer(TLVReader& containerReader)
  * @param[out] outerContainerType       A reference to a TLVType value that will receive the context
  *                                      of the reader.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE If the current element is not positioned on a container element.
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE If the current element is not positioned on a container element.
  *
  */
-WEAVE_ERROR TLVReader::EnterContainer(TLVType& outerContainerType)
+CHIP_ERROR TLVReader::EnterContainer(TLVType& outerContainerType)
 {
     TLVElementType elemType = ElementType();
     if (!TLVTypeIsContainer(elemType))
-        return WEAVE_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
 
     outerContainerType = mContainerType;
     mContainerType = (TLVType) elemType;
@@ -958,7 +956,7 @@ WEAVE_ERROR TLVReader::EnterContainer(TLVType& outerContainerType)
     ClearElementState();
     SetContainerOpen(false);
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -984,31 +982,31 @@ WEAVE_ERROR TLVReader::EnterContainer(TLVType& outerContainerType)
  *
  * @param[in] outerContainerType        The TLVType value that was returned by the EnterContainer() method.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE If OpenContainer() has not been called on the reader, or if
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE If OpenContainer() has not been called on the reader, or if
  *                                      the container reader does not match the one passed to the
  *                                      OpenContainer() method.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                      If the reader encountered an invalid or unsupported TLV element type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::ExitContainer(TLVType outerContainerType)
+CHIP_ERROR TLVReader::ExitContainer(TLVType outerContainerType)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = SkipToEndOfContainer();
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
         return err;
 
     mContainerType = outerContainerType;
     ClearElementState();
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -1016,31 +1014,31 @@ WEAVE_ERROR TLVReader::ExitContainer(TLVType outerContainerType)
  *
  * The VerifyEndOfContainer() method verifies that there are no further TLV elements to be read
  * within the current TLV container.  This is a convenience method that is equivalent to calling
- * Next() and checking for a return value of WEAVE_END_OF_TLV.
+ * Next() and checking for a return value of CHIP_END_OF_TLV.
  *
  * @note When there are more TLV elements in the collection, this method will change the position
  * of the reader.
  *
- * @retval #WEAVE_NO_ERROR              If there are no further TLV elements to be read.
- * @retval #WEAVE_ERROR_UNEXPECTED_TLV_ELEMENT
+ * @retval #CHIP_NO_ERROR              If there are no further TLV elements to be read.
+ * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
  *                                      If another TLV element was found in the collection.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                      If the reader encountered an invalid or unsupported TLV element
  *                                      type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::VerifyEndOfContainer()
+CHIP_ERROR TLVReader::VerifyEndOfContainer()
 {
-    WEAVE_ERROR err = Next();
-    if (err == WEAVE_END_OF_TLV)
-        return WEAVE_NO_ERROR;
-    if (err == WEAVE_NO_ERROR)
-        return WEAVE_ERROR_UNEXPECTED_TLV_ELEMENT;
+    CHIP_ERROR err = Next();
+    if (err == CHIP_END_OF_TLV)
+        return CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+        return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
     return err;
 }
 
@@ -1074,41 +1072,41 @@ TLVType TLVReader::GetContainerType() const
  * after the container.
  *
  * When there are no further elements within a particular containment context the Next() method will
- * return a #WEAVE_END_OF_TLV error and the position of the reader will remain unchanged.
+ * return a #CHIP_END_OF_TLV error and the position of the reader will remain unchanged.
  *
- * @retval #WEAVE_NO_ERROR              If the reader was successfully positioned on a new element.
- * @retval #WEAVE_END_OF_TLV            If no further elements are available.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element.
+ * @retval #CHIP_END_OF_TLV            If no further elements are available.
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                      If the reader encountered an invalid or unsupported TLV element
  *                                      type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
- * @retval #WEAVE_ERROR_UNKNOWN_IMPLICIT_TLV_TAG
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
+ * @retval #CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG
  *                                      If the reader encountered a implicitly-encoded TLV tag for which
  *                                      the corresponding profile id is unknown.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::Next()
+CHIP_ERROR TLVReader::Next()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     TLVElementType elemType = ElementType();
 
     err = Skip();
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
         return err;
 
     err = ReadElement();
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
         return err;
 
     elemType = ElementType();
     if (elemType == kTLVElementType_EndOfContainer)
-        return WEAVE_END_OF_TLV;
+        return CHIP_END_OF_TLV;
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -1122,33 +1120,33 @@ WEAVE_ERROR TLVReader::Next()
  * @param[in] expectedType              The expected data type for the next element.
  * @param[in] expectedTag               The expected tag for the next element.
  *
- * @retval #WEAVE_NO_ERROR              If the reader was successfully positioned on a new element.
- * @retval #WEAVE_END_OF_TLV            If no further elements are available.
- * @retval #WEAVE_ERROR_WRONG_TLV_TYPE  If the type of the new element does not match the value
+ * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element.
+ * @retval #CHIP_END_OF_TLV            If no further elements are available.
+ * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the type of the new element does not match the value
  *                                      of the @p expectedType argument.
- * @retval #WEAVE_ERROR_UNEXPECTED_TLV_ELEMENT
+ * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
  *                                      If the tag associated with the new element does not match the
  *                                      value of the @p expectedTag argument.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                      If the reader encountered an invalid or unsupported TLV
  *                                      element type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::Next(TLVType expectedType, uint64_t expectedTag)
+CHIP_ERROR TLVReader::Next(TLVType expectedType, uint64_t expectedTag)
 {
-    WEAVE_ERROR err = Next();
-    if (err != WEAVE_NO_ERROR)
+    CHIP_ERROR err = Next();
+    if (err != CHIP_NO_ERROR)
         return err;
     if (GetType() != expectedType)
-        return WEAVE_ERROR_WRONG_TLV_TYPE;
+        return CHIP_ERROR_WRONG_TLV_TYPE;
     if (mElemTag != expectedTag)
-        return WEAVE_ERROR_UNEXPECTED_TLV_ELEMENT;
-    return WEAVE_NO_ERROR;
+        return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -1160,47 +1158,47 @@ WEAVE_ERROR TLVReader::Next(TLVType expectedType, uint64_t expectedTag)
  * container will be skipped.  If the reader is not positioned on any element, its position remains
  * unchanged.
  *
- * @retval #WEAVE_NO_ERROR              If the reader was successfully positioned on a new element.
- * @retval #WEAVE_END_OF_TLV            If no further elements are available.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element.
+ * @retval #CHIP_END_OF_TLV            If no further elements are available.
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                      If the reader encountered an invalid or unsupported TLV
  *                                      element type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  *
  */
-WEAVE_ERROR TLVReader::Skip()
+CHIP_ERROR TLVReader::Skip()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     TLVElementType elemType = ElementType();
 
     if (elemType == kTLVElementType_EndOfContainer)
-        return WEAVE_END_OF_TLV;
+        return CHIP_END_OF_TLV;
 
     if (TLVTypeIsContainer(elemType))
     {
         TLVType outerContainerType;
         err = EnterContainer(outerContainerType);
-        if (err != WEAVE_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
             return err;
         err = ExitContainer(outerContainerType);
-        if (err != WEAVE_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
             return err;
     }
 
     else
     {
         err = SkipData();
-        if (err != WEAVE_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
             return err;
 
         ClearElementState();
     }
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -1219,30 +1217,30 @@ void TLVReader::ClearElementState(void)
  * Skip any data contained in the current TLV by reading over it without
  * a destination buffer.
  *
- * @retval #WEAVE_NO_ERROR              If the reader was successfully positioned at the end of the
+ * @retval #CHIP_NO_ERROR              If the reader was successfully positioned at the end of the
  *                                      data.
- * @retval other                        Other Weave or platform error codes returned by the configured
+ * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  */
-WEAVE_ERROR TLVReader::SkipData(void)
+CHIP_ERROR TLVReader::SkipData(void)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLVElementType elemType = ElementType();
 
     if (TLVTypeHasLength(elemType))
     {
         err = ReadData(NULL, mElemLenOrVal);
-        if (err != WEAVE_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
             return err;
     }
 
     return err;
 }
 
-WEAVE_ERROR TLVReader::SkipToEndOfContainer()
+CHIP_ERROR TLVReader::SkipToEndOfContainer()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     TLVType outerContainerType = mContainerType;
     uint32_t nestLevel = 0;
 
@@ -1259,7 +1257,7 @@ WEAVE_ERROR TLVReader::SkipToEndOfContainer()
         if (elemType == kTLVElementType_EndOfContainer)
         {
             if (nestLevel == 0)
-                return WEAVE_NO_ERROR;
+                return CHIP_NO_ERROR;
 
             nestLevel--;
             mContainerType = (nestLevel == 0) ? outerContainerType : kTLVType_UnknownContainer;
@@ -1272,25 +1270,25 @@ WEAVE_ERROR TLVReader::SkipToEndOfContainer()
         }
 
         err = SkipData();
-        if (err != WEAVE_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
             return err;
 
         err = ReadElement();
-        if (err != WEAVE_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
             return err;
     }
 }
 
-WEAVE_ERROR TLVReader::ReadElement()
+CHIP_ERROR TLVReader::ReadElement()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
     const uint8_t *p;
     TLVElementType elemType;
 
-    // Make sure we have input data. Return WEAVE_END_OF_TLV if no more data is available.
-    err = EnsureData(WEAVE_END_OF_TLV);
-    if (err != WEAVE_NO_ERROR)
+    // Make sure we have input data. Return CHIP_END_OF_TLV if no more data is available.
+    err = EnsureData(CHIP_END_OF_TLV);
+    if (err != CHIP_NO_ERROR)
         return err;
 
     // Get the element's control byte.
@@ -1299,7 +1297,7 @@ WEAVE_ERROR TLVReader::ReadElement()
     // Extract the element type from the control byte. Fail if it's invalid.
     elemType = ElementType();
     if (!IsValidTLVType(elemType))
-        return WEAVE_ERROR_INVALID_TLV_ELEMENT;
+        return CHIP_ERROR_INVALID_TLV_ELEMENT;
 
     // Extract the tag control from the control byte.
     TLVTagControl tagControl = (TLVTagControl)(mControlByte & kTLVTagControlMask);
@@ -1322,7 +1320,7 @@ WEAVE_ERROR TLVReader::ReadElement()
     if (elemHeadBytes > (mBufEnd - mReadPoint))
     {
         err = ReadData(stagingBuf, elemHeadBytes);
-        if (err != WEAVE_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
             return err;
         p = stagingBuf;
     }
@@ -1362,38 +1360,38 @@ WEAVE_ERROR TLVReader::ReadElement()
     return VerifyElement();
 }
 
-WEAVE_ERROR TLVReader::VerifyElement()
+CHIP_ERROR TLVReader::VerifyElement()
 {
     if (ElementType() == kTLVElementType_EndOfContainer)
     {
         if (mContainerType == kTLVType_NotSpecified)
-            return WEAVE_ERROR_INVALID_TLV_ELEMENT;
+            return CHIP_ERROR_INVALID_TLV_ELEMENT;
         if (mElemTag != AnonymousTag)
-            return WEAVE_ERROR_INVALID_TLV_TAG;
+            return CHIP_ERROR_INVALID_TLV_TAG;
     }
     else
     {
         if (mElemTag == UnknownImplicitTag)
-            return WEAVE_ERROR_UNKNOWN_IMPLICIT_TLV_TAG;
+            return CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG;
         switch (mContainerType)
         {
         case kTLVType_NotSpecified:
             if (IsContextTag(mElemTag))
-                return WEAVE_ERROR_INVALID_TLV_TAG;
+                return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_Structure:
         case kTLVType_Path:
             if (mElemTag == AnonymousTag)
-                return WEAVE_ERROR_INVALID_TLV_TAG;
+                return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_Array:
             if (mElemTag != AnonymousTag)
-                return WEAVE_ERROR_INVALID_TLV_TAG;
+                return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_UnknownContainer:
             break;
         default:
-            return WEAVE_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
     }
 
@@ -1409,10 +1407,10 @@ WEAVE_ERROR TLVReader::VerifyElement()
     {
         uint32_t overallLenRemaining = mMaxLen - mLenRead;
         if (overallLenRemaining < (uint32_t)mElemLenOrVal)
-            return WEAVE_ERROR_TLV_UNDERRUN;
+            return CHIP_ERROR_TLV_UNDERRUN;
     }
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 uint64_t TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
@@ -1450,14 +1448,14 @@ uint64_t TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
     }
 }
 
-WEAVE_ERROR TLVReader::ReadData(uint8_t *buf, uint32_t len)
+CHIP_ERROR TLVReader::ReadData(uint8_t *buf, uint32_t len)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     while (len > 0)
     {
-        err = EnsureData(WEAVE_ERROR_TLV_UNDERRUN);
-        if (err != WEAVE_NO_ERROR)
+        err = EnsureData(CHIP_ERROR_TLV_UNDERRUN);
+        if (err != CHIP_NO_ERROR)
             return err;
 
         uint32_t remainingLen = mBufEnd - mReadPoint;
@@ -1476,12 +1474,12 @@ WEAVE_ERROR TLVReader::ReadData(uint8_t *buf, uint32_t len)
         len -= readLen;
     }
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-WEAVE_ERROR TLVReader::EnsureData(WEAVE_ERROR noDataErr)
+CHIP_ERROR TLVReader::EnsureData(CHIP_ERROR noDataErr)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     if (mReadPoint == mBufEnd)
     {
@@ -1493,7 +1491,7 @@ WEAVE_ERROR TLVReader::EnsureData(WEAVE_ERROR noDataErr)
 
         uint32_t bufLen;
         err = GetNextBuffer(*this, mBufHandle, mReadPoint, bufLen);
-        if (err != WEAVE_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
             return err;
         if (bufLen == 0)
             return noDataErr;
@@ -1507,15 +1505,15 @@ WEAVE_ERROR TLVReader::EnsureData(WEAVE_ERROR noDataErr)
         mBufEnd = mReadPoint + bufLen;
     }
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
  * This is a private method used to compute the length of a TLV element head.
  */
-WEAVE_ERROR TLVReader::GetElementHeadLength(uint8_t& elemHeadBytes) const
+CHIP_ERROR TLVReader::GetElementHeadLength(uint8_t& elemHeadBytes) const
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t tagBytes;
     uint8_t valOrLenBytes;
     TLVTagControl tagControl;
@@ -1523,7 +1521,7 @@ WEAVE_ERROR TLVReader::GetElementHeadLength(uint8_t& elemHeadBytes) const
     TLVElementType elemType = ElementType();
 
     // Verify element is of valid TLVType.
-    VerifyOrExit(IsValidTLVType(elemType), err = WEAVE_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrExit(IsValidTLVType(elemType), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     // Extract the tag control from the control byte.
     tagControl = (TLVTagControl)(mControlByte & kTLVTagControlMask);
@@ -1558,7 +1556,7 @@ TLVElementType TLVReader::ElementType() const
         return (TLVElementType) (mControlByte & kTLVTypeMask);
 }
 
-WEAVE_ERROR TLVReader::GetNextPacketBuffer(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart,
+CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart,
         uint32_t& bufLen)
 {
     PacketBuffer *& buf = (PacketBuffer *&) bufHandle;
@@ -1576,9 +1574,8 @@ WEAVE_ERROR TLVReader::GetNextPacketBuffer(TLVReader& reader, uintptr_t& bufHand
         bufLen = 0;
     }
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace TLV
-} // namespace Weave
-} // namespace nl
+} // namespace chip

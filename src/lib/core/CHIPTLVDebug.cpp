@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@
 /**
  *    @file
  *      This file implements interfaces for debugging and logging
- *      Weave TLV.
+ *      CHIP TLV.
  *
  */
 
@@ -31,15 +30,13 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include <Weave/Core/WeaveTLV.h>
-#include <Weave/Core/WeaveTLVDebug.hpp>
-#include <Weave/Core/WeaveTLVUtilities.hpp>
-#include <Weave/Support/CodeUtils.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include <CHIPTLV.h>
+#include <CHIPTLVDebug.hpp>
+#include <CHIPTLVUtilities.hpp>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
-namespace nl {
-
-namespace Weave {
+namespace chip {
 
 namespace TLV {
 
@@ -63,7 +60,7 @@ static void DumpHandler(DumpWriter aWriter, const char *aIndent, const TLVReader
     const uint64_t      tag         = aReader.GetTag();
     const uint32_t      len         = aReader.GetLength();
     const uint8_t       *strbuf     = NULL;
-    WEAVE_ERROR         err         = WEAVE_NO_ERROR;
+    CHIP_ERROR         err         = CHIP_NO_ERROR;
     TLVReader           temp;
     TLVTagControl       tagControl;
 
@@ -114,40 +111,40 @@ static void DumpHandler(DumpWriter aWriter, const char *aIndent, const TLVReader
         case kTLVType_SignedInteger:
             int64_t sVal;
             err = temp.Get(sVal);
-            VerifyOrExit(err == WEAVE_NO_ERROR, aWriter("Error in kTLVType_SignedInteger"));
+            VerifyOrExit(err == CHIP_NO_ERROR, aWriter("Error in kTLVType_SignedInteger"));
             aWriter("%" PRIi64, sVal);
             break;
 
         case kTLVType_UnsignedInteger:
             uint64_t uVal;
             err = temp.Get(uVal);
-            VerifyOrExit(err == WEAVE_NO_ERROR, aWriter("Error in kTLVType_UnsignedInteger"));
+            VerifyOrExit(err == CHIP_NO_ERROR, aWriter("Error in kTLVType_UnsignedInteger"));
             aWriter("%" PRIu64, uVal);
             break;
 
         case kTLVType_Boolean:
             bool bVal;
             err = temp.Get(bVal);
-            VerifyOrExit(err == WEAVE_NO_ERROR, aWriter("Error in kTLVType_Boolean"));
+            VerifyOrExit(err == CHIP_NO_ERROR, aWriter("Error in kTLVType_Boolean"));
             aWriter("%s", bVal ? "true" : "false");
             break;
 
         case kTLVType_FloatingPointNumber:
             double fpVal;
             err = temp.Get(fpVal);
-            VerifyOrExit(err == WEAVE_NO_ERROR, aWriter("Error in kTLVType_FloatingPointNumber"));
+            VerifyOrExit(err == CHIP_NO_ERROR, aWriter("Error in kTLVType_FloatingPointNumber"));
             aWriter("%lf", fpVal);
             break;
 
         case kTLVType_UTF8String:
             err = temp.GetDataPtr(strbuf);
-            VerifyOrExit(err == WEAVE_NO_ERROR, aWriter("Error in kTLVType_UTF8String"));
+            VerifyOrExit(err == CHIP_NO_ERROR, aWriter("Error in kTLVType_UTF8String"));
             aWriter("\"%-.*s\"", static_cast<int>(len), strbuf);
             break;
 
         case kTLVType_ByteString:
             err = temp.GetDataPtr(strbuf);
-            VerifyOrExit(err == WEAVE_NO_ERROR, aWriter("Error in kTLVType_ByteString"));
+            VerifyOrExit(err == CHIP_NO_ERROR, aWriter("Error in kTLVType_ByteString"));
             aWriter("%p\n", strbuf);
             break;
 
@@ -306,14 +303,14 @@ const char *DecodeType(const TLVType aType)
  *  @param[in]     aReader   A read-only reference to the TLV reader containing
  *                           the TLV data to log.
  *
- *  @retval  #WEAVE_NO_ERROR  Unconditionally.
+ *  @retval  #CHIP_NO_ERROR  Unconditionally.
  *
  */
-WEAVE_ERROR DumpIterator(DumpWriter aWriter, const TLVReader &aReader)
+CHIP_ERROR DumpIterator(DumpWriter aWriter, const TLVReader &aReader)
 {
     const char *   tabs    = "";
     const size_t   depth   = 0;
-    WEAVE_ERROR    retval  = WEAVE_NO_ERROR;
+    CHIP_ERROR    retval  = CHIP_NO_ERROR;
 
     DumpHandler(aWriter, tabs, aReader, depth);
 
@@ -328,23 +325,23 @@ WEAVE_ERROR DumpIterator(DumpWriter aWriter, const TLVReader &aReader)
  *  @param[in]     aDepth    The current depth into the TLV data.
  *  @param[inout]  aContext  A pointer to the handler-specific context.
  *
- *  @retval  #WEAVE_NO_ERROR                On success.
+ *  @retval  #CHIP_NO_ERROR                On success.
  *
- *  @retval  #WEAVE_ERROR_INVALID_ARGUMENT  If aContext is NULL or if
+ *  @retval  #CHIP_ERROR_INVALID_ARGUMENT  If aContext is NULL or if
  *                                          aContext->mWriter is NULL.
  *
  */
-WEAVE_ERROR DumpHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
+CHIP_ERROR DumpHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
 {
     static const char   indent[] = "    ";
-    WEAVE_ERROR         retval = WEAVE_NO_ERROR;
+    CHIP_ERROR         retval = CHIP_NO_ERROR;
     DumpContext *       context;
 
-    VerifyOrExit(aContext != NULL, retval = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aContext != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     context = static_cast<DumpContext *>(aContext);
 
-    VerifyOrExit(context->mWriter != NULL, retval = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(context->mWriter != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     DumpHandler(context->mWriter,
                 indent,
@@ -364,14 +361,14 @@ WEAVE_ERROR DumpHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
  *
  *  @param[in]     aWriter          A dump writer to log the TLV data of the TLV reader.
  *
- *  @retval  #WEAVE_NO_ERROR        On success.
+ *  @retval  #CHIP_NO_ERROR        On success.
  *
  */
-WEAVE_ERROR Dump(const TLVReader &aReader, DumpWriter aWriter)
+CHIP_ERROR Dump(const TLVReader &aReader, DumpWriter aWriter)
 {
     void *         context     = NULL;
     DumpContext    dumpContext = { aWriter, context };
-    WEAVE_ERROR    retval;
+    CHIP_ERROR    retval;
 
     retval = Utilities::Iterate(aReader, DumpHandler, &dumpContext);
 
@@ -382,6 +379,4 @@ WEAVE_ERROR Dump(const TLVReader &aReader, DumpWriter aWriter)
 
 } // namespace TLV
 
-} // namespace Weave
-
-} // namespace nl
+} // namespace chip

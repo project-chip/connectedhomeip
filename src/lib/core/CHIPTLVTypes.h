@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,15 +17,14 @@
 
 /**
  *    @file
- *      This file contains definitions for working with Weave TLV types.
+ *      This file contains definitions for working with CHIP TLV types.
  *
  */
 
-#ifndef WEAVETLVTYPES_H_
-#define WEAVETLVTYPES_H_
+#ifndef CHIPTLVTYPES_H_
+#define CHIPTLVTYPES_H_
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace TLV {
 
 /**
@@ -164,9 +162,7 @@ inline uint8_t TLVFieldSizeToBytes(TLVFieldSize fieldSize)
 }
 
 } // namespace TLV
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
-
-#endif /* WEAVETLVTYPES_H_ */
+#endif /* CHIPTLVTYPES_H_ */

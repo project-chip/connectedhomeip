@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@
 /**
  *    @file
  *      This file defines types and interfaces for debugging and
- *      logging Weave TLV.
+ *      logging CHIP TLV.
  *
  */
 
@@ -29,21 +28,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <Weave/Core/WeaveError.h>
-#include <Weave/Core/WeaveTLV.h>
+#include <CHIPError.h>
+#include <CHIPTLV.h>
 
-namespace nl {
-
-namespace Weave {
+namespace CHIP {
 
 namespace TLV {
 
 /**
- *   @namespace nl::Weave::TLV::Debug
+ *   @namespace CHIP::TLV::Debug
  *
  *   @brief
  *     This namespace includes types and interfaces for debugging and
- *     logging Weave TLV.
+ *     logging CHIP TLV.
  *
  */
 namespace Debug {
@@ -69,8 +66,6 @@ extern WEAVE_ERROR Dump(const TLVReader &aReader, DumpWriter aWriter);
 
 } // namespace TLV
 
-} // namespace Weave
-
-} // namespace nl
+} // namespace CHIP
 
 #endif // WEAVETLVDEBUG_HPP

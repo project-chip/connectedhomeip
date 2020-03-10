@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,26 +17,25 @@
 
 /**
  *    @file
- *      This file contains definitions for working with Weave TLV tags.
+ *      This file contains definitions for working with CHIP TLV tags.
  *
  */
 
-#ifndef WEAVETLVTAGS_H_
-#define WEAVETLVTAGS_H_
+#ifndef CHIPTLVTAGS_H_
+#define CHIPTLVTAGS_H_
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace TLV {
 
 enum TLVCommonProfiles
 {
     /**
      * Used to indicate the absence of a profile id in a variable or member.
-     * This is essentially the same as kWeaveProfile_NotSpecified defined in WeaveProfiles.h
+     * This is essentially the same as kCHIPProfile_NotSpecified defined in CHIPProfiles.h
      */
     kProfileIdNotSpecified                      = 0xFFFFFFFF,
 
-    // TODO: Replace with nl::Weave::Profiles::kWeaveProfile_Common
+    // TODO: Replace with chip::Profiles::kCHIPProfile_Common
     kCommonProfileId                            = 0
 };
 
@@ -184,7 +182,6 @@ inline bool IsContextTag(uint64_t tag) { return (tag & kProfileIdMask) == kSpeci
 inline bool IsSpecialTag(uint64_t tag) { return (tag & kProfileIdMask) == kSpecialTagMarker; }
 
 } // namespace TLV
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif /* WEAVETLVTAGS_H_ */
+#endif /* CHIPTLVTAGS_H_ */
