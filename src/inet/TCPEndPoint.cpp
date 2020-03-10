@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This file implements the <tt>nl::Inet::TCPEndPoint</tt> class,
+ *      This file implements the <tt>Inet::TCPEndPoint</tt> class,
  *      where the Nest Inet Layer encapsulates methods for interacting
  *      with TCP transport endpoints (SOCK_DGRAM sockets on Linux and
  *      BSD-derived systems) or LwIP TCP protocol control blocks, as
@@ -35,21 +34,21 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <SystemLayer/SystemFaultInjection.h>
+#include "system/SystemFaultInjection.h"
 
-#include <InetLayer/TCPEndPoint.h>
-#include <InetLayer/InetLayer.h>
-#include <InetLayer/InetFaultInjection.h>
+#include "TCPEndPoint.h"
+#include "InetLayer.h"
+#include "InetFaultInjection.h"
 
-#include <Weave/Support/CodeUtils.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include "support/CodeUtils.h"
+#include "support/logging/CHIPLogging.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcp.h>
 #include <lwip/tcpip.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <net/if.h>
@@ -58,7 +57,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <netinet/tcp.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #include "arpa-inet-compatibility.h"
 
@@ -91,7 +90,7 @@
  * which is necessary to ensure that initial SYN and SYN-ACK packets are
  * retransmitted during the 3-way handshake.
  */
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 namespace {
 
 void nil_tcpip_callback(void * _aContext)
@@ -103,14 +102,13 @@ err_t start_tcp_timers(void)
 }
 
 } // anonymous namespace
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
 namespace Inet {
 
-using Weave::System::PacketBuffer;
+using chip::System::PacketBuffer;
 
-Weave::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPoint::sPool;
+chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPoint::sPool;
 
 INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t port, bool reuseAddr)
 {
@@ -122,7 +120,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
     if (addr != IPAddress::Any && addr.Type() != kIPAddressType_Any && addr.Type() != addrType)
         return INET_ERROR_WRONG_ADDRESS_TYPE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -157,20 +155,20 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 #endif // INET_CONFIG_ENABLE_IPV4
         else
             res = INET_ERROR_WRONG_ADDRESS_TYPE;
-        res = Weave::System::MapErrorLwIP(tcp_bind(mTCP, &ipAddr, port));
+        res = chip::System::MapErrorLwIP(tcp_bind(mTCP, &ipAddr, port));
 
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 
         if (addrType == kIPAddressType_IPv6)
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
-            res = Weave::System::MapErrorLwIP(tcp_bind_ip6(mTCP, &ipv6Addr, port));
+            res = chip::System::MapErrorLwIP(tcp_bind_ip6(mTCP, &ipv6Addr, port));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == kIPAddressType_IPv4)
         {
             ip_addr_t ipv4Addr = addr.ToIPv4();
-            res = Weave::System::MapErrorLwIP(tcp_bind(mTCP, &ipv4Addr, port));
+            res = chip::System::MapErrorLwIP(tcp_bind(mTCP, &ipv4Addr, port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -182,9 +180,9 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     res = GetSocket(addrType);
 
@@ -195,18 +193,18 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
 #ifdef SO_REUSEPORT
         // Enable SO_REUSEPORT.  This permits coexistence between an
-        // untargetted Weave client and other services that listen on
-        // a Weave port on a specific address (such as a Weave client
+        // untargetted chip client and other services that listen on
+        // a chip port on a specific address (such as a chip client
         // with TARGETTED_LISTEN or TCP proxying services).  Note that
         // one of the costs of this implementation is the
         // non-deterministic connection dispatch when multple clients
         // listen on the address wih the same degreee of selectivity,
-        // e.g. two untargetted-listen Weave clients, or two
-        // targetted-listen Weave clients with the same node id.
+        // e.g. two untargetted-listen chip clients, or two
+        // targetted-listen chip clients with the same node id.
 
         if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &n, sizeof(n)) != 0)
         {
-            WeaveLogError(Inet, "SO_REUSEPORT: %d", errno);
+            chipLogError(Inet, "SO_REUSEPORT: %d", errno);
         }
 #endif // defined(SO_REUSEPORT)
 
@@ -225,7 +223,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
             sa.sin6_scope_id = 0;
 
             if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
-                res = Weave::System::MapErrorPOSIX(errno);
+                res = chip::System::MapErrorPOSIX(errno);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == kIPAddressType_IPv4)
@@ -237,14 +235,14 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
             sa.sin_addr = addr.ToIPv4();
 
             if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
-                res = Weave::System::MapErrorPOSIX(errno);
+                res = chip::System::MapErrorPOSIX(errno);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
             res = INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (res == INET_NO_ERROR)
         State = kState_Bound;
@@ -256,14 +254,14 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
 {
     INET_ERROR res = INET_NO_ERROR;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-    Weave::System::Layer& lSystemLayer = SystemLayer();
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    chip::System::Layer& lSystemLayer = SystemLayer();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (State != kState_Bound)
         return INET_ERROR_INCORRECT_STATE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Start listening for incoming connections.
     mTCP = tcp_listen(mTCP);
@@ -273,17 +271,17 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
     tcp_accept(mTCP, LwIPHandleIncomingConnection);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (listen(mSocket, backlog) != 0)
-        res = Weave::System::MapErrorPOSIX(errno);
+        res = chip::System::MapErrorPOSIX(errno);
 
     // Wake the thread calling select so that it recognizes the new socket.
     lSystemLayer.WakeSelect();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (res == INET_NO_ERROR)
     {
@@ -300,16 +298,16 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
 {
     INET_ERROR res = INET_NO_ERROR;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-    Weave::System::Layer& lSystemLayer = SystemLayer();
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    chip::System::Layer& lSystemLayer = SystemLayer();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (State != kState_Ready && State != kState_Bound)
         return INET_ERROR_INCORRECT_STATE;
 
     IPAddressType addrType = addr.Type();
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // LwIP does not provides an API for initiating a TCP connection via a specific interface.
     // As a work-around, if the destination is an IPv6 link-local address, we bind the PCB
@@ -344,18 +342,18 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t lwipAddr = addr.ToLwIPAddr();
-        res = Weave::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
+        res = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
         if (addrType == kIPAddressType_IPv6)
         {
             ip6_addr_t lwipAddr = addr.ToIPv6();
-            res = Weave::System::MapErrorLwIP(tcp_connect_ip6(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
+            res = chip::System::MapErrorLwIP(tcp_connect_ip6(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == kIPAddressType_IPv4)
         {
             ip_addr_t lwipAddr = addr.ToIPv4();
-            res = Weave::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
+            res = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -378,9 +376,9 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     res = GetSocket(addrType);
     if (res != INET_NO_ERROR)
@@ -411,13 +409,13 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
                 return res;
 
             // Attempt to bind to the interface using SO_BINDTODEVICE which requires privileged access.
-            // If the permission is denied(EACCES) because Weave is running in a context
+            // If the permission is denied(EACCES) because chip is running in a context
             // that does not have privileged access, choose a source address on the
             // interface to bind the connetion to.
             int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, (void *)&ifr, sizeof(ifr));
             if (r < 0 && errno != EACCES)
             {
-                return res = Weave::System::MapErrorPOSIX(errno);
+                return res = chip::System::MapErrorPOSIX(errno);
             }
 
             if (r < 0)
@@ -483,7 +481,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
 
     if (conRes == -1 && errno != EINPROGRESS)
     {
-        res = Weave::System::MapErrorPOSIX(errno);
+        res = chip::System::MapErrorPOSIX(errno);
         DoClose(res, true);
         return res;
     }
@@ -504,7 +502,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     // Wake the thread calling select so that it recognizes the new socket.
     lSystemLayer.WakeSelect();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     StartConnectTimerIfSet();
 
@@ -528,7 +526,7 @@ void TCPEndPoint::StartConnectTimerIfSet(void)
 {
     if (mConnectTimeoutMsecs > 0)
     {
-        Weave::System::Layer& lSystemLayer = SystemLayer();
+        chip::System::Layer& lSystemLayer = SystemLayer();
 
         lSystemLayer.StartTimer(mConnectTimeoutMsecs, TCPConnectTimeoutHandler, this);
     }
@@ -536,12 +534,12 @@ void TCPEndPoint::StartConnectTimerIfSet(void)
 
 void TCPEndPoint::StopConnectTimer(void)
 {
-    Weave::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer& lSystemLayer = SystemLayer();
 
     lSystemLayer.CancelTimer(TCPConnectTimeoutHandler, this);
 }
 
-void TCPEndPoint::TCPConnectTimeoutHandler(Weave::System::Layer* aSystemLayer, void* aAppState, Weave::System::Error aError)
+void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError)
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
 
@@ -559,7 +557,7 @@ INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress *retAddr, uint16_t *retPort) const
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -584,9 +582,9 @@ INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress *retAddr, uint16_t *retPort) const
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     union
     {
@@ -598,7 +596,7 @@ INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress *retAddr, uint16_t *retPort) const
     socklen_t saLen = sizeof(sa);
 
     if (getpeername(mSocket, &sa.any, &saLen) != 0)
-        return Weave::System::MapErrorPOSIX(errno);
+        return chip::System::MapErrorPOSIX(errno);
 
     if (sa.any.sa_family == AF_INET6)
     {
@@ -615,7 +613,7 @@ INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress *retAddr, uint16_t *retPort) const
     else
         return INET_ERROR_INCORRECT_STATE;
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return res;
 }
@@ -627,7 +625,7 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress *retAddr, uint16_t *retPort)
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -652,9 +650,9 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress *retAddr, uint16_t *retPort)
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     union
     {
@@ -669,7 +667,7 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress *retAddr, uint16_t *retPort)
     socklen_t saLen = sizeof(sa);
 
     if (getsockname(mSocket, &sa.any, &saLen) != 0)
-        return Weave::System::MapErrorPOSIX(errno);
+        return chip::System::MapErrorPOSIX(errno);
 
     if (sa.any.sa_family == AF_INET6)
     {
@@ -686,7 +684,7 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress *retAddr, uint16_t *retPort)
     else
         return INET_ERROR_INCORRECT_STATE;
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return res;
 }
@@ -706,7 +704,7 @@ INET_ERROR TCPEndPoint::Send(PacketBuffer *data, bool push)
     else
         mSendQueue->AddToEnd(data);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (mUnsentQueue == NULL)
     {
@@ -724,7 +722,7 @@ INET_ERROR TCPEndPoint::Send(PacketBuffer *data, bool push)
     }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (push)
         res = DriveSending();
@@ -739,21 +737,21 @@ void TCPEndPoint::DisableReceive()
 
 void TCPEndPoint::EnableReceive()
 {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-    Weave::System::Layer& lSystemLayer = SystemLayer();
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    chip::System::Layer& lSystemLayer = SystemLayer();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     ReceiveEnabled = true;
 
     DriveReceiving();
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // Wake the thread calling select so that it can include the socket
     // in the select read fd_set.
     lSystemLayer.WakeSelect();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
 /**
@@ -772,7 +770,7 @@ INET_ERROR TCPEndPoint::EnableNoDelay(void)
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
@@ -784,9 +782,9 @@ INET_ERROR TCPEndPoint::EnableNoDelay(void)
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     {
         int val;
 
@@ -794,11 +792,11 @@ INET_ERROR TCPEndPoint::EnableNoDelay(void)
         // Disable TCP Nagle buffering by setting TCP_NODELAY socket option to true
         val = 1;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_NODELAY, &val, sizeof(val)) != 0)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
 #endif // defined(TCP_NODELAY)
     }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return res;
 }
@@ -832,7 +830,7 @@ INET_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if LWIP_TCP_KEEPALIVE
 
@@ -865,34 +863,34 @@ INET_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
 
 #endif // LWIP_TCP_KEEPALIVE
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     {
         int val;
 
         // Set the idle interval
         val = interval;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_IDLE_INTERVAL_OPT_NAME, &val, sizeof(val)) != 0)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
 
         // Set the probe retransmission interval.
         val = interval;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPINTVL, &val, sizeof(val)) != 0)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
 
         // Set the probe timeout count
         val = timeoutCount;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPCNT, &val, sizeof(val)) != 0)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
 
         // Enable keepalives for the connection.
         val = 1; // enable
         if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
     }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return res;
 }
@@ -916,7 +914,7 @@ INET_ERROR TCPEndPoint::DisableKeepAlive()
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if LWIP_TCP_KEEPALIVE
 
@@ -940,9 +938,9 @@ INET_ERROR TCPEndPoint::DisableKeepAlive()
 
 #endif // LWIP_TCP_KEEPALIVE
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     {
         int val;
@@ -950,10 +948,10 @@ INET_ERROR TCPEndPoint::DisableKeepAlive()
         // Disable keepalives on the connection.
         val = 0; // disable
         if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
     }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return res;
 }
@@ -994,22 +992,22 @@ INET_ERROR TCPEndPoint::SetUserTimeout(uint32_t userTimeoutMillis)
 
 #else // !INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if defined(TCP_USER_TIMEOUT)
         // Set the user timeout
         uint32_t val = userTimeoutMillis;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_USER_TIMEOUT, &val, sizeof(val)) != 0)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
 #else // TCP_USER_TIMEOUT
     res = INET_ERROR_NOT_IMPLEMENTED;
 #endif // defined(TCP_USER_TIMEOUT)
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     res = INET_ERROR_NOT_IMPLEMENTED;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #endif // !INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
@@ -1023,7 +1021,7 @@ INET_ERROR TCPEndPoint::AckReceive(uint16_t len)
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -1036,13 +1034,13 @@ INET_ERROR TCPEndPoint::AckReceive(uint16_t len)
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // nothing to do for sockets case
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return res;
 }
@@ -1156,7 +1154,7 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
-        Weave::System::Layer& lSystemLayer = SystemLayer();
+        chip::System::Layer& lSystemLayer = SystemLayer();
 
         lSystemLayer.StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, InetLayer::HandleTCPInactivityTimer, &lInetLayer);
     }
@@ -1191,12 +1189,12 @@ void TCPEndPoint::Init(InetLayer *inetLayer)
     OnTCPSendIdleChanged = NULL;
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     mBytesWrittenSinceLastProbe = 0;
 
     mLastTCPKernelSendQueueLen = 0;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 }
@@ -1205,7 +1203,7 @@ INET_ERROR TCPEndPoint::DriveSending()
 {
     INET_ERROR err = INET_NO_ERROR;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -1254,20 +1252,20 @@ INET_ERROR TCPEndPoint::DriveSending()
                 lwipErr = tcp_write(mTCP, sendData, sendLen, (canSend) ? TCP_WRITE_FLAG_MORE : 0);
                 if (lwipErr != ERR_OK)
                 {
-                    err = Weave::System::MapErrorLwIP(lwipErr);
+                    err = chip::System::MapErrorLwIP(lwipErr);
                     break;
                 }
             } while (canSend);
 
             // Call LwIP to send the queued data.
-            INET_FAULT_INJECT(FaultInjection::kFault_Send, err = Weave::System::MapErrorLwIP(ERR_RTE));
+            INET_FAULT_INJECT(FaultInjection::kFault_Send, err = chip::System::MapErrorLwIP(ERR_RTE));
 
             if (err == INET_NO_ERROR)
             {
                 lwipErr = tcp_output(mTCP);
 
                 if (lwipErr != ERR_OK)
-                    err = Weave::System::MapErrorLwIP(lwipErr);
+                    err = chip::System::MapErrorLwIP(lwipErr);
             }
         }
 
@@ -1278,7 +1276,7 @@ INET_ERROR TCPEndPoint::DriveSending()
             {
                 lwipErr = tcp_shutdown(mTCP, 0, 1);
                 if (lwipErr != ERR_OK)
-                    err = Weave::System::MapErrorLwIP(lwipErr);
+                    err = chip::System::MapErrorLwIP(lwipErr);
             }
         }
     }
@@ -1289,9 +1287,9 @@ INET_ERROR TCPEndPoint::DriveSending()
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #ifdef MSG_NOSIGNAL
     const int sendFlags = MSG_NOSIGNAL;
@@ -1302,7 +1300,7 @@ INET_ERROR TCPEndPoint::DriveSending()
     // Pretend send() fails in the while loop below
     INET_FAULT_INJECT(FaultInjection::kFault_Send,
                       {
-                          err = Weave::System::MapErrorPOSIX(EIO);
+                          err = chip::System::MapErrorPOSIX(EIO);
                           DoClose(err, false);
                           return err;
                       });
@@ -1316,7 +1314,7 @@ INET_ERROR TCPEndPoint::DriveSending()
         if (lenSent == -1)
         {
             if (errno != EAGAIN && errno != EWOULDBLOCK)
-                err = (errno == EPIPE) ? INET_ERROR_PEER_DISCONNECTED : Weave::System::MapErrorPOSIX(errno);
+                err = (errno == EPIPE) ? INET_ERROR_PEER_DISCONNECTED : chip::System::MapErrorPOSIX(errno);
             break;
         }
 
@@ -1374,16 +1372,16 @@ INET_ERROR TCPEndPoint::DriveSending()
         if (State == kState_SendShutdown && mSendQueue == NULL)
         {
             if (shutdown(mSocket, SHUT_WR) != 0)
-                err = Weave::System::MapErrorPOSIX(errno);
+                err = chip::System::MapErrorPOSIX(errno);
         }
     }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (err != INET_NO_ERROR)
         DoClose(err, false);
 
-    WEAVE_SYSTEM_FAULT_INJECT_ASYNC_EVENT();
+    CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT();
 
     return err;
 }
@@ -1430,9 +1428,9 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
 {
     int             oldState        = State;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     struct linger   lingerStruct;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // If in one of the connected states (Connected, LocalShutdown, PeerShutdown or Closing)
     // AND this is a graceful close (i.e. not prompted by an error)
@@ -1452,7 +1450,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
     if (State == oldState)
         return INET_NO_ERROR;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -1519,9 +1517,9 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // If the socket hasn't been closed already...
     if (mSocket != INET_INVALID_SOCKET_FD)
@@ -1532,7 +1530,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
         if (State == kState_Closed ||
             (State == kState_Closing && mSendQueue == NULL))
         {
-            Weave::System::Layer& lSystemLayer = SystemLayer();
+            chip::System::Layer& lSystemLayer = SystemLayer();
 
             // If aborting the connection, ensure we send a TCP RST.
             if (IsConnected(oldState) && err != INET_NO_ERROR)
@@ -1541,11 +1539,11 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
                 lingerStruct.l_linger = 0;
 
                 if (setsockopt(mSocket, SOL_SOCKET, SO_LINGER, &lingerStruct, sizeof(lingerStruct)) != 0)
-                    WeaveLogError(Inet, "SO_LINGER: %d", errno);
+                    chipLogError(Inet, "SO_LINGER: %d", errno);
             }
 
             if (close(mSocket) != 0 && err == INET_NO_ERROR)
-                err = Weave::System::MapErrorPOSIX(errno);
+                err = chip::System::MapErrorPOSIX(errno);
             mSocket = INET_INVALID_SOCKET_FD;
 
             // Wake the thread calling select so that it recognizes the socket is closed.
@@ -1556,7 +1554,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
     // Clear any results from select() that indicate pending I/O for the socket.
     mPendingIO.Clear();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     // Stop the TCP UserTimeout timer if it is running.
@@ -1596,11 +1594,11 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
         //
         if (oldState != kState_Ready && oldState != kState_Bound)
         {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
             DeferredFree(kReleaseDeferralErrorTactic_Ignore);
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
             Release();
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
         }
     }
 
@@ -1608,7 +1606,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
 }
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-void TCPEndPoint::TCPUserTimeoutHandler(Weave::System::Layer* aSystemLayer, void* aAppState, Weave::System::Error aError)
+void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError)
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
 
@@ -1617,7 +1615,7 @@ void TCPEndPoint::TCPUserTimeoutHandler(Weave::System::Layer* aSystemLayer, void
     // Set the timer running flag to false
     tcpEndPoint->mUserTimeoutTimerRunning = false;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR err = INET_NO_ERROR;
     bool isProgressing = false;
     err = tcpEndPoint->CheckConnectionProgress(isProgressing);
@@ -1677,20 +1675,20 @@ exit:
 
         tcpEndPoint->DoClose(err, false);
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Close Connection as we have timed out and there is still
     // data not sent out successfully.
 
     tcpEndPoint->DoClose(INET_ERROR_TCP_USER_TIMEOUT, false);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 }
 
 void TCPEndPoint::ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut)
 {
-    Weave::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer& lSystemLayer = SystemLayer();
 
     lSystemLayer.StartTimer(aTimeOut, TCPUserTimeoutHandler, this);
 }
@@ -1700,7 +1698,7 @@ void TCPEndPoint::SetTCPSendIdleAndNotifyChange(bool aIsTCPSendIdle)
 {
     if (mIsTCPSendIdle != aIsTCPSendIdle)
     {
-        WeaveLogDetail(Inet, "TCP con send channel idle state changed : %s", aIsTCPSendIdle ? "false->true" : "true->false");
+        chipLogDetail(Inet, "TCP con send channel idle state changed : %s", aIsTCPSendIdle ? "false->true" : "true->false");
 
         // Set the current Idle state
         mIsTCPSendIdle = aIsTCPSendIdle;
@@ -1734,7 +1732,7 @@ void TCPEndPoint::StartTCPUserTimeoutTimer()
 
 void TCPEndPoint::StopTCPUserTimeoutTimer()
 {
-    Weave::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer& lSystemLayer = SystemLayer();
 
     lSystemLayer.CancelTimer(TCPUserTimeoutHandler, this);
 
@@ -1750,7 +1748,7 @@ void TCPEndPoint::RestartTCPUserTimeoutTimer()
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 INET_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
 {
@@ -1987,7 +1985,7 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void *arg, struct tcp_pcb *tpcb, er
     {
         INET_ERROR              conErr;
         TCPEndPoint*            ep              = static_cast<TCPEndPoint*>(arg);
-        Weave::System::Layer&   lSystemLayer    = ep->SystemLayer();
+        chip::System::Layer&   lSystemLayer    = ep->SystemLayer();
 
         if (lwipErr == ERR_OK)
         {
@@ -1997,7 +1995,7 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void *arg, struct tcp_pcb *tpcb, er
         }
 
         // Post callback to HandleConnectComplete.
-        conErr = Weave::System::MapErrorLwIP(lwipErr);
+        conErr = chip::System::MapErrorLwIP(lwipErr);
         if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPConnectComplete, (uintptr_t)conErr) != INET_NO_ERROR)
             res = ERR_ABRT;
     }
@@ -2012,13 +2010,13 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void *arg, struct tcp_pcb *tpcb, er
 
 err_t TCPEndPoint::LwIPHandleIncomingConnection(void *arg, struct tcp_pcb *tpcb, err_t lwipErr)
 {
-    INET_ERROR err = Weave::System::MapErrorLwIP(lwipErr);
+    INET_ERROR err = chip::System::MapErrorLwIP(lwipErr);
 
     if (arg != NULL)
     {
         TCPEndPoint*            listenEP        = static_cast<TCPEndPoint*>(arg);
         TCPEndPoint*            conEP           = NULL;
-        Weave::System::Layer&   lSystemLayer    = listenEP->SystemLayer();
+        chip::System::Layer&   lSystemLayer    = listenEP->SystemLayer();
 
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
         tcp_accepted(listenEP->mTCP);
@@ -2092,7 +2090,7 @@ err_t TCPEndPoint::LwIPHandleDataReceived(void *arg, struct tcp_pcb *tpcb, struc
     if (arg != NULL)
     {
         TCPEndPoint* ep = static_cast<TCPEndPoint*>(arg);
-        Weave::System::Layer& lSystemLayer = ep->SystemLayer();
+        chip::System::Layer& lSystemLayer = ep->SystemLayer();
 
         // Post callback to HandleDataReceived.
         if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPDataReceived, (uintptr_t)p) != INET_NO_ERROR)
@@ -2114,7 +2112,7 @@ err_t TCPEndPoint::LwIPHandleDataSent(void *arg, struct tcp_pcb *tpcb, u16_t len
     if (arg != NULL)
     {
         TCPEndPoint* ep = static_cast<TCPEndPoint*>(arg);
-        Weave::System::Layer& lSystemLayer = ep->SystemLayer();
+        chip::System::Layer& lSystemLayer = ep->SystemLayer();
 
         // Post callback to HandleDataReceived.
         if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPDataSent, (uintptr_t)len) != INET_NO_ERROR)
@@ -2134,7 +2132,7 @@ void TCPEndPoint::LwIPHandleError(void *arg, err_t lwipErr)
     if (arg != NULL)
     {
         TCPEndPoint* ep = static_cast<TCPEndPoint*>(arg);
-        Weave::System::Layer& lSystemLayer = ep->SystemLayer();
+        chip::System::Layer& lSystemLayer = ep->SystemLayer();
 
         // At this point LwIP has already freed the PCB.  Since the thread that owns the TCPEndPoint may
         // try to use the PCB before it receives the TCPError event posted below, we set the PCB to NULL
@@ -2145,14 +2143,14 @@ void TCPEndPoint::LwIPHandleError(void *arg, err_t lwipErr)
         ep->mLwIPEndPointType = kLwIPEndPointType_Unknown;
 
         // Post callback to HandleError.
-        INET_ERROR err = Weave::System::MapErrorLwIP(lwipErr);
+        INET_ERROR err = chip::System::MapErrorLwIP(lwipErr);
         lSystemLayer.PostEvent(*ep, kInetEvent_TCPError, (uintptr_t)err);
     }
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intf)
 {
@@ -2232,7 +2230,7 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
             return INET_ERROR_WRONG_ADDRESS_TYPE;
         mSocket = ::socket(family, SOCK_STREAM | SOCK_FLAGS, 0);
         if (mSocket == -1)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
         mAddrType = addrType;
 
         // If creating an IPv6 socket, tell the kernel that it will be IPv6 only.  This makes it
@@ -2253,7 +2251,7 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
             int res = setsockopt(mSocket, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
             if (res != 0)
             {
-                WeaveLogError(Inet, "SO_NOSIGPIPE: %d", errno);
+                chipLogError(Inet, "SO_NOSIGPIPE: %d", errno);
             }
         }
 #endif // defined(SO_NOSIGPIPE)
@@ -2308,7 +2306,7 @@ void TCPEndPoint::HandlePendingIO()
             socklen_t optLen = sizeof(osConRes);
             if (getsockopt(mSocket, SOL_SOCKET, SO_ERROR, &osConRes, &optLen) != 0)
                 osConRes = errno;
-            INET_ERROR conRes = Weave::System::MapErrorPOSIX(osConRes);
+            INET_ERROR conRes = chip::System::MapErrorPOSIX(osConRes);
 
             // Process the connection result.
             HandleConnectComplete(conRes);
@@ -2414,12 +2412,12 @@ void TCPEndPoint::ReceiveData()
             // and instead we expect that the read flags will get
             // reset correctly upon a subsequent return from the
             // select call.
-            WeaveLogError(Inet, "recv: EAGAIN, will retry");
+            chipLogError(Inet, "recv: EAGAIN, will retry");
 
             return;
         }
 
-        DoClose(Weave::System::MapErrorPOSIX(systemErrno), false);
+        DoClose(chip::System::MapErrorPOSIX(systemErrno), false);
     }
 
     else
@@ -2485,7 +2483,7 @@ void TCPEndPoint::HandleIncomingConnection()
     // Accept the new connection.
     int conSocket = accept(mSocket, &sa.any, &saLen);
     if (conSocket == -1)
-        err = Weave::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
 
     // If there's no callback available, fail with an error.
     if (err == INET_NO_ERROR && OnConnectionReceived == NULL)
@@ -2565,7 +2563,7 @@ INET_ERROR TCPEndPoint::CheckConnectionProgress(bool &isProgressing)
 
    if (ioctl(mSocket, TIOCOUTQ, &currPendingBytes) < 0)
    {
-       ExitNow(err = Weave::System::MapErrorPOSIX(errno));
+       ExitNow(err = chip::System::MapErrorPOSIX(errno));
    }
 
    if ((currPendingBytes != 0) &&
@@ -2594,7 +2592,6 @@ exit:
 }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
-} // namespace nl

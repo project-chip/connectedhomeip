@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This header file defines the <tt>nl::Inet::TCPEndPoint</tt>
+ *      This header file defines the <tt>Inet::TCPEndPoint</tt>
  *      class, where the Nest Inet Layer encapsulates methods for
  *      interacting with TCP transport endpoints (SOCK_DGRAM sockets
  *      on Linux and BSD-derived systems) or LwIP TCP protocol
@@ -28,12 +27,11 @@
 #ifndef TCPENDPOINT_H
 #define TCPENDPOINT_H
 
-#include <InetLayer/EndPointBasis.h>
-#include <InetLayer/IPAddress.h>
+#include "EndPointBasis.h"
+#include "IPAddress.h"
 
-#include <SystemLayer/SystemPacketBuffer.h>
+#include "system/SystemPacketBuffer.h"
 
-namespace nl {
 namespace Inet {
 
 class InetLayer;
@@ -46,7 +44,7 @@ class InetLayer;
  *  endpoints (SOCK_STREAM sockets on Linux and BSD-derived systems) or LwIP
  *  TCP protocol control blocks, as the system is configured accordingly.
  */
-class NL_DLL_EXPORT TCPEndPoint : public EndPointBasis
+class DLL_EXPORT TCPEndPoint : public EndPointBasis
 {
     friend class InetLayer;
 
@@ -194,10 +192,10 @@ public:
      * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
      *
      * @details
-     *  The <tt>Weave::System::PacketBuffer::Free</tt> method is called on the \c data argument
+     *  The <tt>chip::System::PacketBuffer::Free</tt> method is called on the \c data argument
      *  regardless of whether the transmission is successful or failed.
      */
-    INET_ERROR Send(Weave::System::PacketBuffer *data, bool push = true);
+    INET_ERROR Send(chip::System::PacketBuffer *data, bool push = true);
 
     /**
      * @brief   Disable reception.
@@ -305,12 +303,12 @@ public:
      *  This method may only be called by data reception event handlers to
      *  put an unacknowledged portion of data back on the receive queue. The
      *  operational semantics are undefined if the caller is outside the scope
-     *  of a data reception event handler, \c data is not the \c Weave::System::PacketBuffer
+     *  of a data reception event handler, \c data is not the \c chip::System::PacketBuffer
      *  provided to the handler, or \c data does not contain the unacknowledged
      *  portion remaining after the bytes acknowledged by a prior call to the
      *  <tt>AckReceive(uint16_t len)</tt> method.
      */
-    INET_ERROR PutBackReceivedData(Weave::System::PacketBuffer *data);
+    INET_ERROR PutBackReceivedData(chip::System::PacketBuffer *data);
 
     /**
      * @brief   Extract the length of the data awaiting first transmit.
@@ -431,7 +429,7 @@ public:
      *  the \c AckReceive method. The \c Free method on the data buffer must
      *  also be invoked unless the \c PutBackReceivedData is used instead.
      */
-    typedef void (*OnDataReceivedFunct)(TCPEndPoint *endPoint, Weave::System::PacketBuffer *data);
+    typedef void (*OnDataReceivedFunct)(TCPEndPoint *endPoint, chip::System::PacketBuffer *data);
 
     /**
      * The endpoint's message text reception event handling function delegate.
@@ -549,10 +547,10 @@ public:
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
 private:
-    static Weave::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
+    static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 
-    Weave::System::PacketBuffer *mRcvQueue;
-    Weave::System::PacketBuffer *mSendQueue;
+    chip::System::PacketBuffer *mRcvQueue;
+    chip::System::PacketBuffer *mSendQueue;
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
     uint16_t mIdleTimeout;                              // in units of INET_TCP_IDLE_CHECK_INTERVAL; zero means no timeout
     uint16_t mRemainingIdleTime;                        // in units of INET_TCP_IDLE_CHECK_INTERVAL
@@ -578,7 +576,7 @@ private:
 
     bool mUserTimeoutTimerRunning;                      // Indicates whether the TCP UserTimeout timer has been started.
 
-    static void TCPUserTimeoutHandler(Weave::System::Layer* aSystemLayer, void* aAppState, Weave::System::Error aError);
+    static void TCPUserTimeoutHandler(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError);
 
     void StartTCPUserTimeoutTimer(void);
 
@@ -592,14 +590,14 @@ private:
     uint16_t MaxTCPSendQueuePolls(void);
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     uint32_t mBytesWrittenSinceLastProbe;               // This counts the number of bytes written on the TCP socket since the
                                                         // last probe into the TCP outqueue was made.
 
     uint32_t mLastTCPKernelSendQueueLen;                // This is the measured size(in bytes) of the kernel TCP send queue
                                                         // at the end of the last user timeout window.
     INET_ERROR CheckConnectionProgress(bool &IsProgressing);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
@@ -615,18 +613,18 @@ private:
     INET_ERROR DoClose(INET_ERROR err, bool suppressCallback);
     static bool IsConnected(int state);
 
-    static void TCPConnectTimeoutHandler(Weave::System::Layer* aSystemLayer, void* aAppState, Weave::System::Error aError);
+    static void TCPConnectTimeoutHandler(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError);
 
     void StartConnectTimerIfSet(void);
     void StopConnectTimer(void);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-    Weave::System::PacketBuffer *mUnsentQueue;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    chip::System::PacketBuffer *mUnsentQueue;
     uint16_t mUnsentOffset;
 
     INET_ERROR GetPCB(IPAddressType addrType);
     void HandleDataSent(uint16_t len);
-    void HandleDataReceived(Weave::System::PacketBuffer *buf);
+    void HandleDataReceived(chip::System::PacketBuffer *buf);
     void HandleIncomingConnection(TCPEndPoint *pcb);
     void HandleError(INET_ERROR err);
 
@@ -636,16 +634,16 @@ private:
     static err_t LwIPHandleDataSent(void *arg, struct tcp_pcb *tpcb, u16_t len);
     static void LwIPHandleError(void *arg, err_t err);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
     SocketEvents PrepareIO(void);
     void HandlePendingIO(void);
     void ReceiveData(void);
     void HandleIncomingConnection(void);
     INET_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intf);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 };
 
@@ -678,6 +676,5 @@ inline void TCPEndPoint::MarkActive(void)
 }
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(TCPENDPOINT_H)
