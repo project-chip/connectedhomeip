@@ -86,7 +86,7 @@ private:
 
     static void *AsyncDNSThreadRun(void *args);
 
-    static void NotifychipThread(DNSResolver *resolver);
+    static void NotifyChipThread(DNSResolver *resolver);
 
     void AsyncMutexLock(void);
 

@@ -307,7 +307,7 @@ void  AsyncDNSResolverSockets::DNSResultEventHandler (chip::System::Layer* aLaye
     }
 }
 
-void AsyncDNSResolverSockets::NotifychipThread(DNSResolver *resolver)
+void AsyncDNSResolverSockets::NotifyChipThread(DNSResolver *resolver)
 {
     // Post work item via Timer Event for the chip thread
     chip::System::Layer& lSystemLayer = resolver->SystemLayer();
@@ -339,7 +339,7 @@ void *AsyncDNSResolverSockets::AsyncDNSThreadRun(void *args)
             asyncResolver->Resolve(*request);
         }
 
-        asyncResolver->NotifychipThread(request);
+        asyncResolver->NotifyChipThread(request);
     }
 
 exit:
