@@ -58,9 +58,6 @@ endif
 ifdef CPPCHECK
 	$(_@)$(CPPCHECK) $(Module_Test_Includes) $($(*F)_Inc_FLAGS) $<
 endif
-ifdef GCOV
-	$(_@)mv $(*F).gc* $(Test_Dir)
-endif
 	@echo "Building tests <=  $<"
 
 $(Test_Dir)/%_q: $(Test_Dir)/%.cpp
@@ -70,9 +67,6 @@ endif
 	$(_@)$(CXX) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) $(GCOV_FLAGS)
 ifdef CPPCHECK
 	$(_@)$(CPPCHECK) $(Module_Test_Includes) $($(*F)_Inc_FLAGS) $<
-endif
-ifdef GCOV
-	$(_@)mv $(*F).gc* $(Test_Dir)
 endif
 	@echo "Building tests <=  $<"
 
