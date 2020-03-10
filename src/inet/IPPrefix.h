@@ -32,6 +32,7 @@
 #define CHIP_INET_IPV6_DEFAULT_PREFIX_LEN               (64)
 #define CHIP_INET_IPV6_MAX_PREFIX_LEN                   (128)
 
+namespace chip {
 namespace Inet {
 
 /**
@@ -117,5 +118,6 @@ public:
 };
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(IPPREFIX_H)

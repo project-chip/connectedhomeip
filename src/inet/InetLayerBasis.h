@@ -35,6 +35,7 @@
 #include <sys/select.h>
 #endif
 
+namespace chip {
 namespace Inet {
 
 //--- Forward declaration of InetLayer singleton class
@@ -217,5 +218,6 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(INETLAYERBASIS_H)

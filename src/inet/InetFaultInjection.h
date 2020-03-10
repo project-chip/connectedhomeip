@@ -33,6 +33,7 @@
 
 #include "system/SystemFaultInjection.h"
 
+namespace chip {
 namespace Inet {
 namespace FaultInjection {
 
@@ -55,6 +56,7 @@ DLL_EXPORT FaultInjection::Manager &GetManager(void);
 
 } // namespace FaultInjection
 } // namespace Inet
+} // namespace chip
 
 /**
  * Execute the statements included if the Inet fault is

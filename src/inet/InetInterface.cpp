@@ -58,6 +58,7 @@
 #endif // !defined(__ANDROID__)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+namespace chip {
 namespace Inet {
 
 
@@ -918,3 +919,4 @@ uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen)
 }
 
 } // namespace Inet
+} // namespace chip

@@ -30,6 +30,7 @@
 
 extern void FormatError(char * buf, uint16_t bufSize, const char * subsys, int32_t err, const char * desc);
 
+namespace chip {
 namespace Inet {
 
 /**
@@ -107,3 +108,4 @@ bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err)
 }
 
 } // namespace Inet
+} // namespace chip

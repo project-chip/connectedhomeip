@@ -85,6 +85,7 @@ struct LwIPInetEvent
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
+namespace chip {
 namespace Inet {
 
 void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot &aSnapshot)
@@ -1868,3 +1869,4 @@ INET_ERROR StartTimer(Inet::InetLayer* aInetLayer, void* aContext, uint32_t aMil
 #endif // !INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
 
 } // namespace Inet
+} // namespace chip

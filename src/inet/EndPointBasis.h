@@ -49,6 +49,7 @@ struct netif;
 #endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+namespace chip {
 namespace Inet {
 
 /**
@@ -166,5 +167,6 @@ inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErr
 
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(ENDPOINTBASIS_H)

@@ -38,6 +38,7 @@
 
 #include "arpa-inet-compatibility.h"
 
+namespace chip {
 namespace Inet {
 
 using chip::System::PacketBuffer;
@@ -808,3 +809,4 @@ void TunEndPoint::HandlePendingIO ()
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
+} // namespace chip

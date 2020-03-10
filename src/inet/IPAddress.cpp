@@ -36,6 +36,7 @@
 
 #include "arpa-inet-compatibility.h"
 
+namespace chip {
 namespace Inet {
 
 IPAddress IPAddress::Any;
@@ -474,3 +475,4 @@ IPAddress IPAddress::MakeIPv4Broadcast(void)
 
 
 } // namespace Inet
+} // namespace chip

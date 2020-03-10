@@ -69,6 +69,7 @@ typedef ip_addr_t ip4_addr_t;
 typedef u8_t lwip_ip_addr_type;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
 
+namespace chip {
 namespace Inet {
 
 /**
@@ -659,5 +660,6 @@ public:
 };
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(IPADDRESS_H)

@@ -26,6 +26,7 @@
 #if INET_CONFIG_TEST
 
 
+namespace chip {
 namespace Inet {
 namespace FaultInjection {
 
@@ -56,5 +57,6 @@ FaultInjection::Manager &GetManager(void)
 
 } // namespace FaultInjection
 } // namespace Inet
+} // namespace chip
 
 #endif // INET_CONFIG_TEST

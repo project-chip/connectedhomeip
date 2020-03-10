@@ -108,6 +108,7 @@
 
 #endif // INET_CONFIG_MAX_DROPPABLE_EVENTS
 
+namespace chip {
 namespace Inet {
 
 // Forward Declarations
@@ -451,5 +452,6 @@ extern INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringLen, con
 extern INET_ERROR ParseHostPortAndInterface(const char *aString, uint16_t aStringLen, const char *&aHost, uint16_t &aHostLen, uint16_t &aPort, const char *&aInterface, uint16_t &aInterfaceLen);
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(INETLAYER_H)

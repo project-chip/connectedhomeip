@@ -60,6 +60,7 @@
  */
 #define INET_MICROSECONDS_PER_SECOND        chip::System::kTimerFactor_micro_per_unit
 
+namespace chip {
 namespace Inet {
 
 class InetLayer;
@@ -86,6 +87,7 @@ inline InetTimer::Time InetTimer::GetTimeMillis(void)
 }
 
 } // namespace Inet
+} // namespace chip
 
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 #endif // !defined(INETTIMER_H)

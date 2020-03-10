@@ -24,6 +24,7 @@
 
 #include "InetLayerBasis.h"
 
+namespace chip {
 namespace Inet {
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -88,3 +89,4 @@ SocketEvents SocketEvents::FromFDs(int socket, fd_set *readfds, fd_set *writefds
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
+} // namespace chip

@@ -26,6 +26,7 @@
 
 #include "InetLayer.h"
 
+namespace chip {
 namespace Inet {
 
 void EndPointBasis::InitEndPointBasis(InetLayer& aInetLayer, void* aAppState)
@@ -43,3 +44,4 @@ void EndPointBasis::InitEndPointBasis(InetLayer& aInetLayer, void* aAppState)
 }
 
 } // namespace Inet
+} // namespace chip

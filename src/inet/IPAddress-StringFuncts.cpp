@@ -34,6 +34,7 @@
 #include <arpa/inet.h>
 #endif
 
+namespace chip {
 namespace Inet {
 
 char *IPAddress::ToString(char *buf, uint32_t bufSize) const
@@ -130,3 +131,4 @@ bool IPAddress::FromString(const char *str, size_t strLen, IPAddress& output)
 
 
 } // namespace Inet
+} // namespace chip

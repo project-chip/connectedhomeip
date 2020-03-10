@@ -35,6 +35,7 @@
 #include <lwip/netif.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+namespace chip {
 namespace Inet {
 
 class InetLayer;
@@ -175,5 +176,6 @@ inline struct netif *IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInte
 
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(IPENDPOINT_H)
