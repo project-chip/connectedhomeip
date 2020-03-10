@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,26 +17,25 @@
 
 /**
  *    @file
- *      Implementation of the fault-injection utilities for Weave.
+ *      Implementation of the fault-injection utilities for chip.
  */
 
 #include <string.h>
 #include <nlassert.h>
 
-#include <Weave/Support/WeaveFaultInjection.h>
+#include <support/CHIPFaultInjection.h>
 
-#if WEAVE_CONFIG_TEST
+#if CHIP_CONFIG_TEST
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace FaultInjection {
 
-static nl::FaultInjection::Record sFaultRecordArray[kFault_NumItems];
+static FaultInjection::Record sFaultRecordArray[kFault_NumItems];
 static int32_t sFault_WDMNotificationSize_Arguments[1];
 static int32_t sFault_FuzzExchangeHeader_Arguments[1];
-static class nl::FaultInjection::Manager sWeaveFaultInMgr;
-static const nl::FaultInjection::Name sManagerName = "Weave";
-static const nl::FaultInjection::Name sFaultNames[] = {
+static class FaultInjection::Manager schipFaultInMgr;
+static const FaultInjection::Name sManagerName = "chip";
+static const FaultInjection::Name sFaultNames[] = {
     "AllocExchangeContext",
     "DropIncomingUDPMsg",
     "DropOutgoingUDPMsg",
@@ -45,17 +43,17 @@ static const nl::FaultInjection::Name sFaultNames[] = {
     "SendAlarm",
     "HandleAlarm",
     "FuzzExchangeHeaderTx",
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     "WRMDoubleTx",
     "WRMSendError",
-#endif // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     "BDXBadBlockCounter",
     "BDXAllocTransfer",
-#if WEAVE_CONFIG_ENABLE_SERVICE_DIRECTORY
+#if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     "SMConnectRequestNew",
     "SMLookup",
     "SMCacheReplaceEntryError",
-#endif // WEAVE_CONFIG_ENABLE_SERVICE_DIRECTORY
+#endif // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     "WDMTraitInstanceNew",
     "WDMSubscriptionHandlerNew",
     "WDMSubscriptionClientNew",
@@ -76,10 +74,10 @@ static const nl::FaultInjection::Name sFaultNames[] = {
     "WDMTreatNotifyAsCancel",
     "CASEKeyConfirm",
     "SecMgrBusy",
-#if WEAVE_CONFIG_ENABLE_TUNNELING
+#if CHIP_CONFIG_ENABLE_TUNNELING
     "TunnelQueueFull",
     "TunnelPacketDropByPolicy",
-#endif // WEAVE_CONFIG_ENABLE_TUNNELING
+#endif // CHIP_CONFIG_ENABLE_TUNNELING
 #if CONFIG_NETWORK_LAYER_BLE
     "WOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -89,11 +87,11 @@ static const nl::FaultInjection::Name sFaultNames[] = {
 /**
  * Get the singleton FaultInjection::Manager for Inet faults
  */
-nl::FaultInjection::Manager &GetManager(void)
+FaultInjection::Manager &GetManager(void)
 {
-    if (0 == sWeaveFaultInMgr.GetNumFaults())
+    if (0 == schipFaultInMgr.GetNumFaults())
     {
-        sWeaveFaultInMgr.Init(kFault_NumItems,
+        schipFaultInMgr.Init(kFault_NumItems,
                               sFaultRecordArray,
                               sManagerName,
                               sFaultNames);
@@ -108,19 +106,19 @@ nl::FaultInjection::Manager &GetManager(void)
             static_cast<uint8_t>(sizeof(sFault_FuzzExchangeHeader_Arguments)/sizeof(sFault_FuzzExchangeHeader_Arguments[0]));
 
     }
-    return sWeaveFaultInMgr;
+    return schipFaultInMgr;
 }
 
 /**
- * Fuzz a byte of a Weave Exchange Header
+ * Fuzz a byte of a chip Exchange Header
  *
  * @param[in] p     Pointer to the encoded Exchange Header
- * @param[in] arg   An index from 0 to (WEAVE_FAULT_INJECTION_NUM_FUZZ_VALUES * 5 -1)
+ * @param[in] arg   An index from 0 to (CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES * 5 -1)
  *                  that specifies the byte to be corrupted and the value to use.
  */
-NL_DLL_EXPORT void FuzzExchangeHeader(uint8_t *p, int32_t arg)
+DLL_EXPORT void FuzzExchangeHeader(uint8_t *p, int32_t arg)
 {
-    // Weave is little endian; this function alters the
+    // chip is little endian; this function alters the
     // least significant byte of the header fields.
     const uint8_t offsets[] = {
         0, // flags and version
@@ -129,17 +127,16 @@ NL_DLL_EXPORT void FuzzExchangeHeader(uint8_t *p, int32_t arg)
         4, // ProfileId
         8  // AckMsgId
     };
-    const uint8_t values[WEAVE_FAULT_INJECTION_NUM_FUZZ_VALUES] = { 0x1, 0x2, 0xFF };
+    const uint8_t values[CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES] = { 0x1, 0x2, 0xFF };
     size_t offsetIndex = 0;
     size_t valueIndex = 0;
     size_t numOffsets = sizeof(offsets)/sizeof(offsets[0]);
     offsetIndex = arg % (numOffsets);
-    valueIndex = (arg / numOffsets) % WEAVE_FAULT_INJECTION_NUM_FUZZ_VALUES;
+    valueIndex = (arg / numOffsets) % CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES;
     p[offsetIndex] ^= values[valueIndex];
 }
 
 } // namespace FaultInjection
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_CONFIG_TEST
+#endif // CHIP_CONFIG_TEST

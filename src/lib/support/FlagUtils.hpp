@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,12 +22,12 @@
  *
  */
 
-#ifndef NL_WEAVE_SUPPORT_FLAGUTILS_HPP
-#define NL_WEAVE_SUPPORT_FLAGUTILS_HPP
+#ifndef CHIP_CHIP_SUPPORT_FLAGUTILS_HPP
+#define CHIP_CHIP_SUPPORT_FLAGUTILS_HPP
 
 #include <stdint.h>
 
-namespace nl {
+namespace chip {
 
 template<typename FlagsT, typename FlagT>
 inline bool GetFlag(const FlagsT& inFlags, const FlagT inFlag)
@@ -61,6 +60,6 @@ inline void SetFlag(FlagsT& inFlags, const FlagT inFlag, const bool inValue)
     }
 }
 
-}; // namespace nl
+}; // namespace chip
 
-#endif // NL_WEAVE_SUPPORT_FLAGUTILS_HPP
+#endif // CHIP_CHIP_SUPPORT_FLAGUTILS_HPP
