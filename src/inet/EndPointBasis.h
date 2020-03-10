@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,17 +24,17 @@
 #ifndef ENDPOINTBASIS_H
 #define ENDPOINTBASIS_H
 
-#include <InetLayer/InetConfig.h>
-#include <InetLayer/InetError.h>
-#include <InetLayer/IANAConstants.h>
-#include <InetLayer/InetLayerBasis.h>
-#include <InetLayer/InetLayerEvents.h>
-#include <InetLayer/InetInterface.h>
+#include "InetConfig.h"
+#include "InetError.h"
+#include "IANAConstants.h"
+#include "InetLayerBasis.h"
+#include "InetLayerEvents.h"
+#include "InetInterface.h"
 
-#include <Weave/Support/NLDLLUtil.h>
+#include "support/DLLUtil.h"
 
 //--- Declaration of LWIP protocol control buffer structure names
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
 struct raw_pcb;
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
@@ -48,9 +47,8 @@ struct tcp_pcb;
 #if INET_CONFIG_ENABLE_TUN_ENDPOINT
 struct netif;
 #endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
 namespace Inet {
 
 /**
@@ -58,7 +56,7 @@ namespace Inet {
  *
  * @brief Basis of internet transport endpoint classes
  */
-class NL_DLL_EXPORT EndPointBasis : public InetLayerBasis
+class DLL_EXPORT EndPointBasis : public InetLayerBasis
 {
 public:
     /** Common state codes */
@@ -66,12 +64,12 @@ public:
         kBasisState_Closed = 0      /**< Encapsulated descriptor is not valid. */
     };
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     /** Test whether endpoint is a POSIX socket */
     bool IsSocketsEndPoint(void) const;
 #endif
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     /** Test whether endpoint is a LwIP protocol control buffer */
     bool IsLWIPEndPoint(void) const;
 #endif
@@ -80,13 +78,13 @@ public:
     bool IsOpenEndPoint(void) const;
 
 protected:
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     int mSocket;                    /**< Encapsulated socket descriptor. */
     IPAddressType mAddrType;        /**< Protocol family, i.e. IPv4 or IPv6. */
     SocketEvents mPendingIO;        /**< Socket event masks */
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     /** Encapsulated LwIP protocol control block */
     union
     {
@@ -117,45 +115,45 @@ protected:
 
     uint8_t mLwIPEndPointType;
 
-    void DeferredFree(Weave::System::Object::ReleaseDeferralErrorTactic aTactic);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+    void DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     void InitEndPointBasis(InetLayer& aInetLayer, void* aAppState = NULL);
 };
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 inline bool EndPointBasis::IsSocketsEndPoint(void) const
 {
     return mSocket >= 0;
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 inline bool EndPointBasis::IsLWIPEndPoint(void) const
 {
     return mVoid != NULL;
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 inline bool EndPointBasis::IsOpenEndPoint(void) const
 {
     bool lResult = false;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     lResult = (lResult || IsLWIPEndPoint());
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     lResult = (lResult || IsSocketsEndPoint());
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return lResult;
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-inline void EndPointBasis::DeferredFree(Weave::System::Object::ReleaseDeferralErrorTactic aTactic)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic)
 {
-    if (!WEAVE_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
+    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
     {
         DeferredRelease(aTactic);
     }
@@ -164,10 +162,9 @@ inline void EndPointBasis::DeferredFree(Weave::System::Object::ReleaseDeferralEr
         Release();
     }
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(ENDPOINTBASIS_H)

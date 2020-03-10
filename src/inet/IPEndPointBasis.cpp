@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This header file implements the <tt>nl::Inet::IPEndPointBasis</tt>
+ *      This header file implements the <tt>Inet::IPEndPointBasis</tt>
  *      class, an intermediate, non-instantiable basis class
  *      supporting other IP-based end points.
  *
@@ -27,17 +26,17 @@
 // define to ensure we have the IPV6_PKTINFO
 #define __APPLE_USE_RFC_3542
 
-#include <InetLayer/IPEndPointBasis.h>
+#include "IPEndPointBasis.h"
 
 #include <string.h>
 
-#include <InetLayer/EndPointBasis.h>
-#include <InetLayer/InetInterface.h>
-#include <InetLayer/InetLayer.h>
+#include "EndPointBasis.h"
+#include "InetInterface.h"
+#include "InetLayer.h"
 
-#include <Weave/Support/CodeUtils.h>
+#include "support/CodeUtils.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
 #include <lwip/igmp.h>
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -47,9 +46,9 @@
 #include <lwip/netif.h>
 #include <lwip/raw.h>
 #include <lwip/udp.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/socket.h>
 #include <errno.h>
 #include <unistd.h>
@@ -82,23 +81,22 @@
 #else
 #error "Neither IPV6_DROP_MEMBERSHIP nor IPV6_LEAVE_GROUP are defined which are required for generalized IPv6 multicast group support."
 #endif // !defined(IPV6_DROP_MEMBERSHIP) && defined(IPV6_LEAVE_GROUP)
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-namespace nl {
 namespace Inet {
 
-using Weave::System::PacketBuffer;
+using chip::System::PacketBuffer;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 union PeerSockAddr
 {
     sockaddr     any;
     sockaddr_in  in;
     sockaddr_in6 in6;
 };
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
 #define LWIP_IPV4_ADDR_T           ip4_addr_t
 #define IPV4_TO_LWIPADDR(aAddress) (aAddress).ToIPv4()
@@ -111,7 +109,7 @@ union PeerSockAddr
 #else
 #define HAVE_LWIP_MULTICAST_LOOP 1
 #endif // !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) || !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 static INET_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress &aAddress)
 {
@@ -128,7 +126,7 @@ exit:
     return (lRetval);
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
 #if LWIP_IPV4 && LWIP_IGMP
 static INET_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress &aAddress, err_t (*aMethod)(struct netif *, const LWIP_IPV4_ADDR_T *))
@@ -153,7 +151,7 @@ static INET_ERROR LwIPIPv4JoinLeaveMulticastGroup(InterfaceId aInterfaceId, cons
         break;
 
     default:
-        lRetval = Weave::System::MapErrorLwIP(lStatus);
+        lRetval = chip::System::MapErrorLwIP(lStatus);
         break;
 
     }
@@ -187,7 +185,7 @@ static INET_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, cons
         break;
 
     default:
-        lRetval = Weave::System::MapErrorLwIP(lStatus);
+        lRetval = chip::System::MapErrorLwIP(lStatus);
         break;
 
     }
@@ -196,9 +194,9 @@ exit:
     return (lRetval);
 }
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 static INET_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int aProtocol, int aOption)
 {
     INET_ERROR    lRetval = INET_NO_ERROR;
@@ -206,7 +204,7 @@ static INET_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int a
     unsigned int  lValue = aLoopback;
 
     lStatus = setsockopt(aSocket, aProtocol, aOption, &lValue, sizeof (lValue));
-    VerifyOrExit(lStatus == 0, lRetval = Weave::System::MapErrorPOSIX(errno));
+    VerifyOrExit(lStatus == 0, lRetval = chip::System::MapErrorPOSIX(errno));
 
 exit:
     return (lRetval);
@@ -268,7 +266,7 @@ static INET_ERROR SocketsIPv4JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
     lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();
 
     lRetval = setsockopt(aSocket, IPPROTO_IP, aCommand, &lMulticastRequest, sizeof (lMulticastRequest));
-    VerifyOrExit(lRetval == 0, lRetval = Weave::System::MapErrorPOSIX(errno));
+    VerifyOrExit(lRetval == 0, lRetval = chip::System::MapErrorPOSIX(errno));
 
 exit:
     return (lRetval);
@@ -286,12 +284,12 @@ static INET_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
     lMulticastRequest.ipv6mr_multiaddr = aAddress.ToIPv6();
 
     lRetval = setsockopt(aSocket, IPPROTO_IPV6, aCommand, &lMulticastRequest, sizeof (lMulticastRequest));
-    VerifyOrExit(lRetval == 0, lRetval = Weave::System::MapErrorPOSIX(errno));
+    VerifyOrExit(lRetval == 0, lRetval = chip::System::MapErrorPOSIX(errno));
 
 exit:
     return (lRetval);
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  *  @brief Set whether IP multicast traffic should be looped back.
@@ -314,8 +312,8 @@ INET_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
 {
     INET_ERROR          lRetval = INET_ERROR_NOT_IMPLEMENTED;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP || WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !HAVE_LWIP_MULTICAST_LOOP
 #pragma message "\n \
 The version of LwIP appears older than that required for multicast loopback support.\n \
@@ -371,15 +369,15 @@ Please upgrade your version of LwIP for SetMulticastLoopback support."
 
     lRetval = INET_NO_ERROR;
 #endif // !HAVE_LWIP_MULTICAST_LOOP
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     lRetval = SocketsSetMulticastLoopback(mSocket, aIPVersion, aLoopback);
     SuccessOrExit(lRetval);
 
 exit:
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP || WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return (lRetval);
 }
 
@@ -415,7 +413,7 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
     const IPAddressType lAddrType = aAddress.Type();
     INET_ERROR          lRetval = INET_ERROR_NOT_IMPLEMENTED;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP || WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     lRetval = CheckMulticastGroupArgs(aInterfaceId, aAddress);
     SuccessOrExit(lRetval);
 
@@ -425,7 +423,7 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 #if INET_CONFIG_ENABLE_IPV4
     case kIPAddressType_IPv4:
         {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV4 && LWIP_IGMP
             lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_joingroup_netif);
 #else // LWIP_IPV4 && LWIP_IGMP
@@ -434,19 +432,19 @@ Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulti
             lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV4 && LWIP_IGMP
             SuccessOrExit(lRetval);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
             lRetval = SocketsIPv4JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, IP_ADD_MEMBERSHIP);
             SuccessOrExit(lRetval);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
         }
         break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
     case kIPAddressType_IPv6:
         {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
             lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_joingroup_netif);
 #else // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
@@ -455,12 +453,12 @@ Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastG
             lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
             SuccessOrExit(lRetval);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
             lRetval = SocketsIPv6JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, INET_IPV6_ADD_MEMBERSHIP);
             SuccessOrExit(lRetval);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
         }
         break;
 
@@ -470,7 +468,7 @@ Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastG
     }
 
 exit:
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP || WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return (lRetval);
 }
 
@@ -506,7 +504,7 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
     const IPAddressType lAddrType = aAddress.Type();
     INET_ERROR          lRetval = INET_ERROR_NOT_IMPLEMENTED;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP || WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     lRetval = CheckMulticastGroupArgs(aInterfaceId, aAddress);
     SuccessOrExit(lRetval);
 
@@ -516,7 +514,7 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
 #if INET_CONFIG_ENABLE_IPV4
     case kIPAddressType_IPv4:
         {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV4 && LWIP_IGMP
             lRetval = LwIPIPv4JoinLeaveMulticastGroup(aInterfaceId, aAddress, igmp_leavegroup_netif);
 #else // LWIP_IPV4 && LWIP_IGMP
@@ -525,19 +523,19 @@ Please enable LWIP_IPV4 and LWIP_IGMP for IPv4 JoinMulticastGroup and LeaveMulti
             lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV4 && LWIP_IGMP
             SuccessOrExit(lRetval);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
             lRetval = SocketsIPv4JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, IP_DROP_MEMBERSHIP);
             SuccessOrExit(lRetval);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
         }
         break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
     case kIPAddressType_IPv6:
         {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
             lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_leavegroup_netif);
 #else // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
@@ -546,12 +544,12 @@ Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastG
             lRetval = INET_ERROR_NOT_SUPPORTED;
 #endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
             SuccessOrExit(lRetval);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
             lRetval = SocketsIPv6JoinLeaveMulticastGroup(mSocket, aInterfaceId, aAddress, INET_IPV6_DROP_MEMBERSHIP);
             SuccessOrExit(lRetval);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
         }
         break;
 
@@ -561,7 +559,7 @@ Please enable LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6 for IPv6 JoinMulticastG
     }
 
 exit:
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP || WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return (lRetval);
 }
 
@@ -569,12 +567,12 @@ void IPEndPointBasis::Init(InetLayer *aInetLayer)
 {
     InitEndPointBasis(*aInetLayer);
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     mBoundIntfId = INET_NULL_INTERFACEID;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 void IPEndPointBasis::HandleDataReceived(PacketBuffer *aBuffer)
 {
     if ((mState == kState_Listening) && (OnMessageReceived != NULL))
@@ -645,9 +643,9 @@ IPPacketInfo *IPEndPointBasis::GetPacketInfo(PacketBuffer *aBuffer)
  done:
     return (lPacketInfo);
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, InterfaceId aInterfaceId)
 {
     INET_ERROR lRetval = INET_NO_ERROR;
@@ -665,7 +663,7 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
         sa.sin6_scope_id = aInterfaceId;
 
         if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof (sa)) != 0)
-            lRetval = Weave::System::MapErrorPOSIX(errno);
+            lRetval = chip::System::MapErrorPOSIX(errno);
 
         // Instruct the kernel that any messages to multicast destinations should be
         // sent down the interface specified by the caller.
@@ -694,7 +692,7 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
         sa.sin_addr   = aAddress.ToIPv4();
 
         if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof (sa)) != 0)
-            lRetval = Weave::System::MapErrorPOSIX(errno);
+            lRetval = chip::System::MapErrorPOSIX(errno);
 
         // Instruct the kernel that any messages to multicast destinations should be
         // sent down the interface to which the specified IPv4 address is bound.
@@ -731,7 +729,7 @@ INET_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
         //Stop interface-based filtering.
         if (setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, "", 0) == -1)
         {
-            lRetval = Weave::System::MapErrorPOSIX(errno);
+            lRetval = chip::System::MapErrorPOSIX(errno);
         }
     }
     else
@@ -741,12 +739,12 @@ INET_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
 
         if (if_indextoname(aInterfaceId, lInterfaceName) == NULL)
         {
-            lRetval = Weave::System::MapErrorPOSIX(errno);
+            lRetval = chip::System::MapErrorPOSIX(errno);
         }
 
         if (lRetval == INET_NO_ERROR && setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, lInterfaceName, strlen(lInterfaceName)) == -1)
         {
-            lRetval = Weave::System::MapErrorPOSIX(errno);
+            lRetval = chip::System::MapErrorPOSIX(errno);
         }
     }
 
@@ -760,7 +758,7 @@ INET_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
     return (lRetval);
 }
 
-INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo *aPktInfo, Weave::System::PacketBuffer *aBuffer, uint16_t aSendFlags)
+INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo *aPktInfo, chip::System::PacketBuffer *aBuffer, uint16_t aSendFlags)
 {
     INET_ERROR     res = INET_NO_ERROR;
     PeerSockAddr   peerSockAddr;
@@ -875,7 +873,7 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo *aPktInfo, Weave::System:
     {
         const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
         if (lenSent == -1)
-            res = Weave::System::MapErrorPOSIX(errno);
+            res = chip::System::MapErrorPOSIX(errno);
         else if (lenSent != aBuffer->DataLength())
             res = INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED;
     }
@@ -911,12 +909,12 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 
         mSocket = ::socket(family, aType, aProtocol);
         if (mSocket == -1)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
 
         mAddrType = aAddressType;
 
         // NOTE WELL: the errors returned by setsockopt() here are not
-        // returned as Inet layer Weave::System::MapErrorPOSIX(errno)
+        // returned as Inet layer chip::System::MapErrorPOSIX(errno)
         // codes because they are normally expected to fail on some
         // platforms where the socket option code is defined in the
         // header files but not [yet] implemented. Certainly, there is
@@ -931,7 +929,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
         res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT,  (void*)&one, sizeof (one));
         if (res != 0)
         {
-            WeaveLogError(Inet, "SO_REUSEPORT failed: %d", errno);
+            chipLogError(Inet, "SO_REUSEPORT failed: %d", errno);
         }
 #endif // defined(SO_REUSEPORT)
 
@@ -945,7 +943,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, (void *) &one, sizeof (one));
             if (res != 0)
             {
-                WeaveLogError(Inet, "IPV6_V6ONLY failed: %d", errno);
+                chipLogError(Inet, "IPV6_V6ONLY failed: %d", errno);
             }
         }
 #endif // defined(IPV6_V6ONLY)
@@ -957,7 +955,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
             res = setsockopt(mSocket, IPPROTO_IP, IP_PKTINFO, (void *) &one, sizeof (one));
             if (res != 0)
             {
-                WeaveLogError(Inet, "IP_PKTINFO failed: %d", errno);
+                chipLogError(Inet, "IP_PKTINFO failed: %d", errno);
             }
         }
 #endif // defined(IP_PKTINFO)
@@ -969,7 +967,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVPKTINFO, (void *) &one, sizeof (one));
             if (res != 0)
             {
-                WeaveLogError(Inet, "IPV6_PKTINFO failed: %d", errno);
+                chipLogError(Inet, "IPV6_PKTINFO failed: %d", errno);
             }
         }
 #endif // defined(IPV6_RECVPKTINFO)
@@ -983,7 +981,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
             res = setsockopt(mSocket, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof (one));
             if (res != 0)
             {
-                WeaveLogError(Inet, "SO_NOSIGPIPE failed: %d", errno);
+                chipLogError(Inet, "SO_NOSIGPIPE failed: %d", errno);
             }
         }
 #endif // defined(SO_NOSIGPIPE)
@@ -1043,7 +1041,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
         if (rcvLen < 0)
         {
-            lStatus = Weave::System::MapErrorPOSIX(errno);
+            lStatus = chip::System::MapErrorPOSIX(errno);
         }
         else if (rcvLen > lBuffer->AvailableDataLength())
         {
@@ -1112,14 +1110,13 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     {
         PacketBuffer::Free(lBuffer);
         if (OnReceiveError != NULL
-            && lStatus != Weave::System::MapErrorPOSIX(EAGAIN)
+            && lStatus != chip::System::MapErrorPOSIX(EAGAIN)
            )
             OnReceiveError(this, lStatus, NULL);
     }
 
     return;
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
-} // namespace nl

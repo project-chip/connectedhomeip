@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,26 +22,24 @@
  *      in the Inet layer, i.e. TCP, UDP, Raw and Tun.
  */
 
-#include <InetLayer/EndPointBasis.h>
+#include "EndPointBasis.h"
 
-#include <InetLayer/InetLayer.h>
+#include "InetLayer.h"
 
-namespace nl {
 namespace Inet {
 
 void EndPointBasis::InitEndPointBasis(InetLayer& aInetLayer, void* aAppState)
 {
     InitInetLayerBasis(aInetLayer, aAppState);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     mLwIPEndPointType = kLwIPEndPointType_Unknown;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     mSocket = INET_INVALID_SOCKET_FD;
     mPendingIO.Clear();
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
 } // namespace Inet
-} // namespace nl
