@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,20 +28,20 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <Weave/Support/CodeUtils.h>
-#include <Weave/Support/NLDLLUtil.h>
+#include "support/CodeUtils.h"
+#include "support/DLLUtil.h"
 
-#include <InetLayer/InetLayer.h>
-#include <InetLayer/InetLayerEvents.h>
-#include <InetLayer/IPPrefix.h>
+#include "InetLayer.h"
+#include "InetLayerEvents.h"
+#include "IPPrefix.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
 #include <lwip/sys.h>
 #include <lwip/netif.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -58,9 +56,8 @@
 #else // !defined(__ANDROID__)
 #include <ifaddrs.h>
 #endif // !defined(__ANDROID__)
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-namespace nl {
 namespace Inet {
 
 
@@ -80,26 +77,26 @@ namespace Inet {
  *     at \c nameBuf. The name of the unspecified network interface is the empty
  *     string.
  */
-NL_DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char *nameBuf, size_t nameBufSize)
+DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char *nameBuf, size_t nameBufSize)
 {
     if (intfId != INET_NULL_INTERFACEID)
     {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         int status = snprintf(nameBuf, nameBufSize, "%c%c%d", intfId->name[0], intfId->name[1], intfId->num);
         if (status >= static_cast<int>(nameBufSize))
             return INET_ERROR_NO_MEMORY;
         return INET_NO_ERROR;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         char intfName[IF_NAMESIZE];
         if (if_indextoname(intfId, intfName) == NULL)
-            return Weave::System::MapErrorPOSIX(errno);
+            return chip::System::MapErrorPOSIX(errno);
         if (strlen(intfName) >= nameBufSize)
             return INET_ERROR_NO_MEMORY;
         strcpy(nameBuf, intfName);
         return INET_NO_ERROR;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
     }
     else
     {
@@ -127,9 +124,9 @@ NL_DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char *nameBuf, siz
  *     \c INET_NO_ERROR. It should be initialized with \c INET_NULL_INTERFACEID
  *     before calling this function.
  */
-NL_DLL_EXPORT INET_ERROR InterfaceNameToId(const char *intfName, InterfaceId& intfId)
+DLL_EXPORT INET_ERROR InterfaceNameToId(const char *intfName, InterfaceId& intfId)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (strlen(intfName) < 3)
         return INET_ERROR_UNKNOWN_INTERFACE;
     char *parseEnd;
@@ -151,18 +148,18 @@ NL_DLL_EXPORT INET_ERROR InterfaceNameToId(const char *intfName, InterfaceId& in
     }
     intfId = INET_NULL_INTERFACEID;
     return INET_ERROR_UNKNOWN_INTERFACE;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     intfId = if_nametoindex(intfName);
     if (intfId == 0)
-        return (errno == ENXIO) ? INET_ERROR_UNKNOWN_INTERFACE : Weave::System::MapErrorPOSIX(errno);
+        return (errno == ENXIO) ? INET_ERROR_UNKNOWN_INTERFACE : chip::System::MapErrorPOSIX(errno);
     return INET_NO_ERROR;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 static int sIOCTLSocket = -1;
 
@@ -211,7 +208,7 @@ void CloseIOCTLSocket(void)
     }
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 
 /**
@@ -224,7 +221,7 @@ void CloseIOCTLSocket(void)
  *     this constructor may allocate resources recycled by the destructor.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 InterfaceIterator::InterfaceIterator(void)
 {
@@ -234,7 +231,7 @@ InterfaceIterator::InterfaceIterator(void)
     mIntfFlagsCached = 0;
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  * @fn      InterfaceIterator::~InterfaceIterator(void)
@@ -245,7 +242,7 @@ InterfaceIterator::InterfaceIterator(void)
  *     Recycles any resources allocated by the constructor.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 InterfaceIterator::~InterfaceIterator(void)
 {
@@ -256,7 +253,7 @@ InterfaceIterator::~InterfaceIterator(void)
     }
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  * @fn      bool InterfaceIterator::HasCurrent(void)
@@ -267,7 +264,7 @@ InterfaceIterator::~InterfaceIterator(void)
  *          \c false if positioned beyond the end of the interface list.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 bool InterfaceIterator::HasCurrent(void)
 {
@@ -276,7 +273,7 @@ bool InterfaceIterator::HasCurrent(void)
         : Next();
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  * @fn      bool InterfaceIterator::Next(void)
@@ -300,7 +297,7 @@ bool InterfaceIterator::HasCurrent(void)
  */
 bool InterfaceIterator::Next(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (mIntfArray == NULL)
     {
@@ -314,9 +311,9 @@ bool InterfaceIterator::Next(void)
     }
     return (mIntfArray != NULL && mIntfArray[mCurIntf].if_index != 0);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -342,7 +339,7 @@ bool InterfaceIterator::Next(void)
 
     return mCurNetif != NULL;
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -354,7 +351,7 @@ bool InterfaceIterator::Next(void)
  * @retval  id                      the current network interface id.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 InterfaceId InterfaceIterator::GetInterfaceId(void)
 {
@@ -363,7 +360,7 @@ InterfaceId InterfaceIterator::GetInterfaceId(void)
         : INET_NULL_INTERFACEID;
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 
 /**
@@ -389,15 +386,15 @@ INET_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSiz
 
     VerifyOrExit(HasCurrent(), err = INET_ERROR_INCORRECT_STATE);
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     VerifyOrExit(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, err = INET_ERROR_NO_MEMORY);
     strncpy(nameBuf, mIntfArray[mCurIntf].if_name, nameBufSize);
     err = INET_NO_ERROR;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-    err = ::nl::Inet::GetInterfaceName(mCurNetif, nameBuf, nameBufSize);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    err = ::Inet::GetInterfaceName(mCurNetif, nameBuf, nameBufSize);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 exit:
     return err;
@@ -411,13 +408,13 @@ exit:
  */
 bool InterfaceIterator::IsUp(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return (GetFlags() & IFF_UP) != 0;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     return HasCurrent() && netif_is_up(mCurNetif);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -428,18 +425,18 @@ bool InterfaceIterator::IsUp(void)
  */
 bool InterfaceIterator::SupportsMulticast(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return (GetFlags() & IFF_MULTICAST) != 0;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     return HasCurrent() &&
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         (mCurNetif->flags & (NETIF_FLAG_IGMP | NETIF_FLAG_MLD6 | NETIF_FLAG_BROADCAST)) != 0;
 #else
         (mCurNetif->flags & NETIF_FLAG_POINTTOPOINT) == 0;
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -450,13 +447,13 @@ bool InterfaceIterator::SupportsMulticast(void)
  */
 bool InterfaceIterator::HasBroadcastAddress(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return (GetFlags() & IFF_BROADCAST) != 0;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     return HasCurrent() && (mCurNetif->flags & NETIF_FLAG_BROADCAST) != 0;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -465,7 +462,7 @@ bool InterfaceIterator::HasBroadcastAddress(void)
  * @brief   Returns the ifr_flags value for the current interface.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 short InterfaceIterator::GetFlags(void)
 {
@@ -487,7 +484,7 @@ short InterfaceIterator::GetFlags(void)
     return mIntfFlags;
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  * @fn      InterfaceAddressIterator::InterfaceAddressIterator(void)
@@ -499,7 +496,7 @@ short InterfaceIterator::GetFlags(void)
  *     this constructor may allocate resources recycled by the destructor.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 InterfaceAddressIterator::InterfaceAddressIterator(void)
 {
@@ -507,7 +504,7 @@ InterfaceAddressIterator::InterfaceAddressIterator(void)
     mCurAddr = NULL;
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 
 /**
@@ -519,7 +516,7 @@ InterfaceAddressIterator::InterfaceAddressIterator(void)
  *  Recycles any resources allocated by the constructor.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 InterfaceAddressIterator::~InterfaceAddressIterator(void)
 {
@@ -530,7 +527,7 @@ InterfaceAddressIterator::~InterfaceAddressIterator(void)
     }
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  * @fn      bool InterfaceIterator::HasCurrent(void)
@@ -542,17 +539,17 @@ InterfaceAddressIterator::~InterfaceAddressIterator(void)
  */
 bool InterfaceAddressIterator::HasCurrent(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return (mAddrsList != NULL) ? (mCurAddr != NULL) : Next();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     return mIntfIter.HasCurrent() && ((mCurAddrIndex != kBeforeStartIndex) || Next());
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -573,7 +570,7 @@ bool InterfaceAddressIterator::HasCurrent(void)
  */
 bool InterfaceAddressIterator::Next(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     while (true)
     {
@@ -607,9 +604,9 @@ bool InterfaceAddressIterator::Next(void)
         }
     }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     mCurAddrIndex++;
 
@@ -642,7 +639,7 @@ bool InterfaceAddressIterator::Next(void)
 
     return false;
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -657,11 +654,11 @@ IPAddress InterfaceAddressIterator::GetAddress(void)
 {
     if (HasCurrent())
     {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         return IPAddress::FromSockAddr(*mCurAddr->ifa_addr);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         struct netif * curIntf = mIntfIter.GetInterfaceId();
 
         if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
@@ -674,7 +671,7 @@ IPAddress InterfaceAddressIterator::GetAddress(void)
             return IPAddress::FromIPv4(*netif_ip4_addr(curIntf));
         }
 #endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     }
 
     return IPAddress::Any;
@@ -701,7 +698,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength(void)
 {
     if (HasCurrent())
     {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     	if (mCurAddr->ifa_addr->sa_family == AF_INET6)
     	{
     		struct sockaddr_in6& netmask = *(struct sockaddr_in6 *)(mCurAddr->ifa_netmask);
@@ -712,9 +709,9 @@ uint8_t InterfaceAddressIterator::GetPrefixLength(void)
     		struct sockaddr_in& netmask = *(struct sockaddr_in *)(mCurAddr->ifa_netmask);
     		return NetmaskToPrefixLength((const uint8_t *)&netmask.sin_addr.s_addr, 4);
     	}
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
         {
             return 64;
@@ -726,7 +723,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength(void)
             return NetmaskToPrefixLength((const uint8_t *)netif_ip4_netmask(curIntf), 4);
         }
 #endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     }
     return 0;
 }
@@ -744,13 +741,13 @@ InterfaceId InterfaceAddressIterator::GetInterfaceId(void)
 {
     if (HasCurrent())
     {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         return if_nametoindex(mCurAddr->ifa_name);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         return mIntfIter.GetInterfaceId();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     }
     return INET_NULL_INTERFACEID;
 }
@@ -781,15 +778,15 @@ INET_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nam
 
     VerifyOrExit(HasCurrent(), err = INET_ERROR_INCORRECT_STATE);
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     VerifyOrExit(strlen(mCurAddr->ifa_name) < nameBufSize, err = INET_ERROR_NO_MEMORY);
     strncpy(nameBuf, mCurAddr->ifa_name, nameBufSize);
     err = INET_NO_ERROR;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     err = mIntfIter.GetInterfaceName(nameBuf, nameBufSize);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 exit:
     return err;
@@ -808,13 +805,13 @@ bool InterfaceAddressIterator::IsUp(void)
 {
     if (HasCurrent())
     {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         return (mCurAddr->ifa_flags & IFF_UP) != 0;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         return mIntfIter.IsUp();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     }
     return false;
 }
@@ -832,13 +829,13 @@ bool InterfaceAddressIterator::SupportsMulticast(void)
 {
     if (HasCurrent())
     {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         return (mCurAddr->ifa_flags & IFF_MULTICAST) != 0;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         return mIntfIter.SupportsMulticast();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     }
     return false;
 }
@@ -856,13 +853,13 @@ bool InterfaceAddressIterator::HasBroadcastAddress(void)
 {
     if (HasCurrent())
     {
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     	return (mCurAddr->ifa_flags & IFF_BROADCAST) != 0;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     	return mIntfIter.HasBroadcastAddress();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     }
     return false;
 }
@@ -921,4 +918,3 @@ uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen)
 }
 
 } // namespace Inet
-} // namespace nl

@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +17,7 @@
 
 /**
  * @file
- *  This file defines the <tt>nl::Inet::InterfaceId</tt> type alias and related
+ *  This file defines the <tt>Inet::InterfaceId</tt> type alias and related
  *  classes for iterating on the list of system network interfaces and the list
  *  of system interface addresses.
  */
@@ -30,19 +28,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <Weave/Support/NLDLLUtil.h>
-#include <InetLayer/IPAddress.h>
+#include "support/DLLUtil.h"
+#include "IPAddress.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/netif.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 struct if_nameindex;
 struct ifaddrs;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-namespace nl {
 namespace Inet {
 
 class IPAddress;
@@ -64,13 +61,13 @@ class IPPrefix;
  *  term "interface indicator" refers to values of this type alias.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 typedef struct netif *InterfaceId;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 typedef unsigned InterfaceId;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 
 /**
@@ -85,13 +82,13 @@ typedef unsigned InterfaceId;
  *  varies depending on context.
  */
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #define INET_NULL_INTERFACEID NULL
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define INET_NULL_INTERFACEID 0
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 
 /**
@@ -144,18 +141,18 @@ public:
     bool HasBroadcastAddress(void);
 
 protected:
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     struct netif * mCurNetif;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     struct if_nameindex  * mIntfArray;
     size_t mCurIntf;
     short mIntfFlags;
     bool mIntfFlagsCached;
 
     short GetFlags(void);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 
 /**
@@ -180,7 +177,7 @@ protected:
  *  associated with the current address is removed, in which case iteration may
  *  end prematurely.
  */
-class NL_DLL_EXPORT InterfaceAddressIterator
+class DLL_EXPORT InterfaceAddressIterator
 {
 public:
     InterfaceAddressIterator(void);
@@ -200,7 +197,7 @@ public:
     bool HasBroadcastAddress(void);
 
 private:
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     enum
     {
         kBeforeStartIndex = -1
@@ -208,16 +205,16 @@ private:
 
     InterfaceIterator mIntfIter;
     int mCurAddrIndex;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     struct ifaddrs * mAddrsList;
     struct ifaddrs * mCurAddr;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 inline InterfaceIterator::InterfaceIterator(void)
 {
@@ -247,7 +244,7 @@ inline InterfaceAddressIterator::~InterfaceAddressIterator(void)
 {
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 
 /**
@@ -275,6 +272,5 @@ inline uint8_t InterfaceAddressIterator::GetIPv6PrefixLength(void)
 }
 
 } // namespace Inet
-} // namespace nl
 
 #endif /* INETINTERFACE_H */
