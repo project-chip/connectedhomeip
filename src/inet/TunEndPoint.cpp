@@ -34,6 +34,7 @@
 #include <stdio.h>
 
 #include <core/CHIPEncoding.h>
+#include <core/CHIPTunnelConfig.h>
 #include <support/CodeUtils.h>
 
 #include "arpa-inet-compatibility.h"
@@ -671,17 +672,21 @@ INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
 
     memset(&ifr, 0, sizeof(ifr));
 
+#if HAVE_LINUX_IF_TUN_H
     ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
+#endif
 
     if (*intfName)
     {
         strncpy(ifr.ifr_name, intfName, sizeof(ifr.ifr_name) - 1);
     }
 
+#if HAVE_LINUX_IF_TUN_H
     if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0)
     {
         ExitNow(ret = chip::System::MapErrorPOSIX(errno));
     }
+#endif
 
     //Verify name
     memset(&ifr, 0, sizeof(ifr));
@@ -724,7 +729,11 @@ void TunEndPoint::TunDevClose (void)
 int TunEndPoint::TunGetInterface (int fd,
                                   struct ::ifreq *ifr)
 {
+#if HAVE_LINUX_IF_TUN_H
     return ioctl(fd, TUNGETIFF, (void*)ifr);
+#else
+    return -1;
+#endif
 }
 
 /* Read packets from TUN device in Linux */

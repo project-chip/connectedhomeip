@@ -37,7 +37,8 @@ CPP_Files = \
 	InetUtils.cpp \
 	IPAddress.cpp \
 	InetInterface.cpp \
-	RawEndPoint.cpp
+	RawEndPoint.cpp \
+	TunEndPoint.cpp
 
 libnet.a: $(CPP_Objects)
 	ar rvs $@ $^
