@@ -66,7 +66,7 @@ template<class T, unsigned int N> class ObjectPool;
  *      back to the pool for reallocation. There is no destructor available. Subclasses must be designed to ensure that all
  *      encapsulated resources are released when the final retention is released and the object is recycled.
  *
- *      While this class is defined as concrete, in conformance with Nest C++ style, it should be regarded as abstract.
+ *      While this class is defined as concrete, it should be regarded as abstract.
  */
 class DLL_EXPORT Object
 {
