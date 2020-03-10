@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@
 /**
  *    @file
  *      This file defines the member functions and private data for
- *      the nl::Weave::System::PacketBuffer class, which provides the
+ *      the chip::System::PacketBuffer class, which provides the
  *      mechanisms for manipulating packets of octet-serialized
  *      data.
  */
@@ -31,52 +30,50 @@
 #include <stdint.h>
 
 // Include module header
-#include <SystemLayer/SystemPacketBuffer.h>
+#include <system/SystemPacketBuffer.h>
 
 // Include common private header
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <SystemLayer/SystemMutex.h>
-#include <SystemLayer/SystemFaultInjection.h>
+#include <system/SystemMutex.h>
+#include <system/SystemFaultInjection.h>
 
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/pbuf.h>
 #include <lwip/mem.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#include <Weave/Support/logging/WeaveLogging.h>
-#include <Weave/Support/crypto/WeaveCrypto.h>
-#include <Weave/Support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
 
-#include <SystemLayer/SystemStats.h>
+#include <system/SystemStats.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 //
-// Pool allocation for PacketBuffer objects (toll-free bridged with LwIP pbuf allocator if WEAVE_SYSTEM_CONFIG_USE_LWIP)
+// Pool allocation for PacketBuffer objects (toll-free bridged with LwIP pbuf allocator if CHIP_SYSTEM_CONFIG_USE_LWIP)
 //
-#if !WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
-static BufferPoolElement sBufferPool[WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC];
+static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC];
 
 PacketBuffer* PacketBuffer::sFreeList = PacketBuffer::BuildFreeList();
 
-#if !WEAVE_SYSTEM_CONFIG_NO_LOCKING
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 static Mutex sBufferPoolMutex;
 
 #define LOCK_BUF_POOL()     do { sBufferPoolMutex.Lock(); } while (0)
 #define UNLOCK_BUF_POOL()   do { sBufferPoolMutex.Unlock(); } while (0)
-#endif // !WEAVE_SYSTEM_CONFIG_NO_LOCKING
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-#endif // WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
 #ifndef LOCK_BUF_POOL
 #define LOCK_BUF_POOL()     do { } while (0)
@@ -86,7 +83,7 @@ static Mutex sBufferPoolMutex;
 #define UNLOCK_BUF_POOL()   do { } while (0)
 #endif // !defined(UNLOCK_BUF_POOL)
 
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  * Get pointer to start of data in buffer.
@@ -111,7 +108,7 @@ uint8_t* PacketBuffer::Start() const
  */
 void PacketBuffer::SetStart(uint8_t* aNewStart)
 {
-    uint8_t* const kStart = reinterpret_cast<uint8_t*>(this) + WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    uint8_t* const kStart = reinterpret_cast<uint8_t*>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
     uint8_t* const kEnd = kStart + this->AllocSize();
 
     if (aNewStart < kStart)
@@ -187,7 +184,7 @@ uint16_t PacketBuffer::TotalLength() const
  */
 uint16_t PacketBuffer::MaxDataLength() const
 {
-    const uint8_t* const kStart = reinterpret_cast<const uint8_t*>(this) + WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    const uint8_t* const kStart = reinterpret_cast<const uint8_t*>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
     const ptrdiff_t kDelta = static_cast<uint8_t*>(this->payload) - kStart;
     return static_cast<uint16_t>(this->AllocSize() - kDelta);
 }
@@ -210,7 +207,7 @@ uint16_t PacketBuffer::AvailableDataLength() const
 uint16_t PacketBuffer::ReservedSize() const
 {
     const ptrdiff_t kDelta = static_cast<uint8_t*>(this->payload) - reinterpret_cast<const uint8_t*>(this);
-    return static_cast<uint16_t>(kDelta - WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE);
+    return static_cast<uint16_t>(kDelta - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
 }
 
 /**
@@ -224,9 +221,9 @@ uint16_t PacketBuffer::ReservedSize() const
  */
 void PacketBuffer::AddToEnd(PacketBuffer* aPacket)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_cat(this, aPacket);
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
     PacketBuffer* lCursor = this;
 
     while (true)
@@ -240,7 +237,7 @@ void PacketBuffer::AddToEnd(PacketBuffer* aPacket)
 
         lCursor = static_cast<PacketBuffer*>(lCursor->next);
     }
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -269,7 +266,7 @@ PacketBuffer* PacketBuffer::DetachTail()
  */
 void PacketBuffer::CompactHead()
 {
-    uint8_t* const kStart = reinterpret_cast<uint8_t*>(this) + WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    uint8_t* const kStart = reinterpret_cast<uint8_t*>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
 
     if (this->payload != kStart)
     {
@@ -282,7 +279,7 @@ void PacketBuffer::CompactHead()
     while (lAvailLength > 0 && this->next != NULL)
     {
         PacketBuffer& lNextPacket = *static_cast<PacketBuffer*>(this->next);
-        VerifyOrDieWithMsg(lNextPacket.ref == 1, WeaveSystemLayer, "next buffer %p is not exclusive to this chain", &lNextPacket);
+        VerifyOrDieWithMsg(lNextPacket.ref == 1, chipSystemLayer, "next buffer %p is not exclusive to this chain", &lNextPacket);
 
         uint16_t lMoveLength = lNextPacket.len;
         if (lMoveLength > lAvailLength)
@@ -417,13 +414,13 @@ PacketBuffer* PacketBuffer::Next() const
  */
 void PacketBuffer::AddRef()
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_ref(this);
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
     LOCK_BUF_POOL();
     ++this->ref;
     UNLOCK_BUF_POOL();
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -439,25 +436,25 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t 
 {
     const size_t lReservedSize = static_cast<size_t>(aReservedSize);
     const size_t lAllocSize = lReservedSize + aAvailableSize;
-    const size_t lBlockSize = WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
+    const size_t lBlockSize = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
     PacketBuffer* lPacket;
 
-    WEAVE_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return NULL);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return NULL);
 
-    if (lAllocSize > WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
+    if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
     {
-        WeaveLogError(WeaveSystemLayer, "PacketBuffer: allocation too large.");
+        chipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
         return NULL;
     }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     lPacket = static_cast<PacketBuffer*>(pbuf_alloc(PBUF_RAW, lBlockSize, PBUF_POOL));
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
     static_cast<void>(lBlockSize);
 
@@ -467,38 +464,38 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t 
     if (lPacket != NULL)
     {
         sFreeList = static_cast<PacketBuffer*>(lPacket->next);
-        SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kSystemLayer_NumPacketBufs);
+        SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
     }
 
     UNLOCK_BUF_POOL();
 
-#else // !WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#else // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
     lPacket = reinterpret_cast<PacketBuffer*>(malloc(lBlockSize));
-    SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kSystemLayer_NumPacketBufs);
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
-#endif // !WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (lPacket == NULL)
     {
-        WeaveLogError(WeaveSystemLayer, "PacketBuffer: pool EMPTY.");
+        chipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
         return NULL;
     }
 
-    lPacket->payload = reinterpret_cast<uint8_t*>(lPacket) + WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE + lReservedSize;
+    lPacket->payload = reinterpret_cast<uint8_t*>(lPacket) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lReservedSize;
     lPacket->len = lPacket->tot_len = 0;
     lPacket->next = NULL;
     lPacket->ref = 1;
-#if WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
     lPacket->alloc_size = lAllocSize;
-#endif // WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
 
     return lPacket;
 }
 
 /**
- * Allocates a PacketBuffer with default reserved size (#WEAVE_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload for headers,
+ * Allocates a PacketBuffer with default reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload for headers,
  * and at least \c aAllocSize bytes of space for additional data after the initial cursor pointer.
  *
  * This usage is most appropriate when allocating a PacketBuffer for an application-layer message.
@@ -509,14 +506,14 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t 
  */
 PacketBuffer* PacketBuffer::NewWithAvailableSize(size_t aAvailableSize)
 {
-    return PacketBuffer::NewWithAvailableSize(WEAVE_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, aAvailableSize);
+    return PacketBuffer::NewWithAvailableSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, aAvailableSize);
 }
 
 /**
  * Allocates a single PacketBuffer of maximum total size with a specific header reserve size.
  *
  *  The parameter passed in is the size reserved prior to the payload to accomodate packet headers from different stack layers,
- *  __not__ the overall size of the buffer to allocate. The size of the buffer #WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
+ *  __not__ the overall size of the buffer to allocate. The size of the buffer #CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
  *  and not, specified in the call.
  *
  * - `PacketBuffer::New(0)` : when called in this fashion, the buffer will be returned without any header reserved, consequently
@@ -533,21 +530,21 @@ PacketBuffer* PacketBuffer::New(uint16_t aReservedSize)
     const size_t lReservedSize = static_cast<size_t>(aReservedSize);
 
     const size_t lAvailableSize =
-        lReservedSize < WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX ? WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - lReservedSize : 0;
+        lReservedSize < CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX ? CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - lReservedSize : 0;
 
     return PacketBuffer::NewWithAvailableSize(aReservedSize, lAvailableSize);
 }
 
 /**
- * Allocates a single PacketBuffer of default max size (#WEAVE_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX) with default reserved size
- * (#WEAVE_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload.
+ * Allocates a single PacketBuffer of default max size (#CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX) with default reserved size
+ * (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload.
  *
- * The reserved size (#WEAVE_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) is large enough to hold transport layer headers as well as headers required by
- * \c WeaveMessageLayer and \c WeaveExchangeLayer.
+ * The reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) is large enough to hold transport layer headers as well as headers required by
+ * \c chipMessageLayer and \c chipExchangeLayer.
  */
 PacketBuffer* PacketBuffer::New(void)
 {
-    return PacketBuffer::New(WEAVE_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
+    return PacketBuffer::New(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 }
 
 /**
@@ -561,7 +558,7 @@ PacketBuffer* PacketBuffer::New(void)
  */
 void PacketBuffer::Free(PacketBuffer* aPacket)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (aPacket != NULL)
     {
@@ -570,7 +567,7 @@ void PacketBuffer::Free(PacketBuffer* aPacket)
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
     }
 
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
     LOCK_BUF_POOL();
 
@@ -578,19 +575,19 @@ void PacketBuffer::Free(PacketBuffer* aPacket)
     {
         PacketBuffer* lNextPacket = static_cast<PacketBuffer*>(aPacket->next);
 
-        VerifyOrDieWithMsg(aPacket->ref > 0, WeaveSystemLayer, "SystemPacketBuffer::Free: aPacket->ref = 0");
+        VerifyOrDieWithMsg(aPacket->ref > 0, chipSystemLayer, "SystemPacketBuffer::Free: aPacket->ref = 0");
 
         aPacket->ref--;
         if (aPacket->ref == 0)
         {
-            SYSTEM_STATS_DECREMENT(nl::Weave::System::Stats::kSystemLayer_NumPacketBufs);
+            SYSTEM_STATS_DECREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
             aPacket->Clear();
-#if WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
             aPacket->next = sFreeList;
             sFreeList = aPacket;
-#else // !WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#else // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
             free(aPacket);
-#endif // !WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
             aPacket = lNextPacket;
         }
         else
@@ -601,7 +598,7 @@ void PacketBuffer::Free(PacketBuffer* aPacket)
 
     UNLOCK_BUF_POOL();
 
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -611,12 +608,11 @@ void PacketBuffer::Free(PacketBuffer* aPacket)
  */
 void PacketBuffer::Clear(void)
 {
-    nl::Weave::Crypto::ClearSecretData(reinterpret_cast<uint8_t*>(this) + WEAVE_SYSTEM_PACKETBUFFER_HEADER_SIZE, this->AllocSize());
     tot_len = 0;
     len = 0;
-#if WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
     alloc_size = 0;
-#endif // WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
 }
 
 /**
@@ -648,25 +644,25 @@ PacketBuffer* PacketBuffer::FreeHead(PacketBuffer* aPacket)
 PacketBuffer* PacketBuffer::RightSize(PacketBuffer *aPacket)
 {
     PacketBuffer *lNewPacket = aPacket;
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
     lNewPacket =  static_cast<PacketBuffer *>(pbuf_rightsize((struct pbuf *)aPacket, -1));
     if (lNewPacket != aPacket)
     {
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
-        WeaveLogProgress(WeaveSystemLayer, "PacketBuffer: RightSize Copied");
+        chipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
     }
 #endif
     return lNewPacket;
 }
 
-#if !WEAVE_SYSTEM_CONFIG_USE_LWIP && WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
 PacketBuffer* PacketBuffer::BuildFreeList()
 {
     PacketBuffer* lHead = NULL;
 
-    for (int i = 0; i < WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC; i++)
+    for (int i = 0; i < CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC; i++)
     {
         PacketBuffer* lCursor = &sBufferPool[i].Header;
         lCursor->next = lHead;
@@ -679,8 +675,7 @@ PacketBuffer* PacketBuffer::BuildFreeList()
     return lHead;
 }
 
-#endif //  !WEAVE_SYSTEM_CONFIG_USE_LWIP && WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#endif //  !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
