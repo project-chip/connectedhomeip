@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,21 +17,20 @@
 
 /**
  *    @file
- *      This file implements an updating encoder for the Weave TLV
+ *      This file implements an updating encoder for the CHIP TLV
  *      (Tag-Length-Value) encoding format.
  *
  */
 
-#include <Weave/Core/WeaveCore.h>
-#include <Weave/Core/WeaveEncoding.h>
-#include <Weave/Core/WeaveTLV.h>
-#include <Weave/Support/CodeUtils.h>
+#include <CHIPCore.h>
+#include <CHIPEncoding.h>
+#include <CHIPTLV.h>
+#include <support/CodeUtils.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace TLV {
 
-using namespace nl::Weave::Encoding;
+using namespace chip::Encoding;
 
 /**
  * Initialize a TLVUpdater object to edit a single input buffer.
@@ -48,19 +46,19 @@ using namespace nl::Weave::Encoding;
  * @param[in]   dataLen The length of the TLV data in the buffer.
  * @param[in]   maxLen  The total length of the buffer.
  *
- * @retval #WEAVE_NO_ERROR                  If the method succeeded.
- * @retval #WEAVE_ERROR_INVALID_ARGUMENT    If the buffer address is invalid.
- * @retval #WEAVE_ERROR_BUFFER_TOO_SMALL    If the buffer is too small.
+ * @retval #CHIP_NO_ERROR                  If the method succeeded.
+ * @retval #CHIP_ERROR_INVALID_ARGUMENT    If the buffer address is invalid.
+ * @retval #CHIP_ERROR_BUFFER_TOO_SMALL    If the buffer is too small.
  *
  */
-WEAVE_ERROR TLVUpdater::Init(uint8_t *buf, uint32_t dataLen, uint32_t maxLen)
+CHIP_ERROR TLVUpdater::Init(uint8_t *buf, uint32_t dataLen, uint32_t maxLen)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     uint32_t freeLen;
 
-    VerifyOrExit(buf != NULL, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(buf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(maxLen >= dataLen, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(maxLen >= dataLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // memmove the buffer data to end of the buffer
     freeLen = maxLen - dataLen;
@@ -103,23 +101,23 @@ exit:
  * @param[in]       freeLen     The length of free space (in bytes) available
  *                              in the pre-encoded data buffer.
  *
- * @retval #WEAVE_NO_ERROR                  If the method succeeded.
- * @retval #WEAVE_ERROR_INVALID_ARGUMENT    If the buffer address is invalid.
- * @retval #WEAVE_ERROR_NOT_IMPLEMENTED     If reader was initialized on a chain
+ * @retval #CHIP_NO_ERROR                  If the method succeeded.
+ * @retval #CHIP_ERROR_INVALID_ARGUMENT    If the buffer address is invalid.
+ * @retval #CHIP_ERROR_NOT_IMPLEMENTED     If reader was initialized on a chain
  *                                          of buffers.
  */
-WEAVE_ERROR TLVUpdater::Init(TLVReader& aReader, uint32_t freeLen)
+CHIP_ERROR TLVUpdater::Init(TLVReader& aReader, uint32_t freeLen)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t *buf = const_cast<uint8_t *>(aReader.GetReadPoint());
     uint32_t remainingDataLen = aReader.GetRemainingLength();
     uint32_t readDataLen = aReader.GetLengthRead();
 
     // TLVUpdater does not support chain of buffers yet
-    VerifyOrExit(aReader.mBufHandle == 0, err = WEAVE_ERROR_NOT_IMPLEMENTED);
+    VerifyOrExit(aReader.mBufHandle == 0, err = CHIP_ERROR_NOT_IMPLEMENTED);
 
     // TLVReader should point to a non-NULL buffer
-    VerifyOrExit(buf != NULL, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(buf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If reader is already on an element, reset it to start of element
     if (aReader.ElementType() != kTLVElementType_NotSpecified)
@@ -216,7 +214,7 @@ void TLVUpdater::SetImplicitProfileId(uint32_t profileId)
  * container.
  *
  * When there are no further elements within a particular containment context
- * the Next() method will return a #WEAVE_END_OF_TLV error and the position of
+ * the Next() method will return a #CHIP_END_OF_TLV error and the position of
  * the reader will remain unchanged.
  *
  * @note The Next() method implicitly skips the current element. Hence, the
@@ -232,20 +230,20 @@ void TLVUpdater::SetImplicitProfileId(uint32_t profileId)
  * fixed schemas and know where the container end is cannot just add new
  * elements at the end, because the TLVUpdater writer's state will not reflect
  * the correct free space available for the Put() operation. Hence, applications
- * must call Next() (and possibly also test for WEAVE_END_OF_TLV) before adding
+ * must call Next() (and possibly also test for CHIP_END_OF_TLV) before adding
  * elements at the end of a container.
  *
- * @retval #WEAVE_NO_ERROR              If the TLVUpdater reader was
+ * @retval #CHIP_NO_ERROR              If the TLVUpdater reader was
  *                                      successfully positioned on a new
  *                                      element.
- * @retval other                        Returns the Weave or platform error
+ * @retval other                        Returns the CHIP or platform error
  *                                      codes returned by the TLVReader::Skip()
  *                                      and TLVReader::Next() method.
  *
  */
-WEAVE_ERROR TLVUpdater::Next()
+CHIP_ERROR TLVUpdater::Next()
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Skip current element if the reader is already positioned on an element
     err = mUpdaterReader.Skip();
@@ -272,29 +270,29 @@ exit:
  * container will be copied. If the reader is not positioned on any element,
  * nothing changes on calling this method.
  *
- * @retval #WEAVE_NO_ERROR              If the TLVUpdater reader was
+ * @retval #CHIP_NO_ERROR              If the TLVUpdater reader was
  *                                      successfully positioned on a new
  *                                      element.
- * @retval #WEAVE_END_OF_TLV            If the TLVUpdater's reader is pointing
+ * @retval #CHIP_END_OF_TLV            If the TLVUpdater's reader is pointing
  *                                      to end of container.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                      If the TLVIpdater's reader is not
  *                                      positioned on a valid TLV element.
  * @retval other                        Returns other error codes returned by
  *                                      TLVReader::Skip() method.
  *
  */
-WEAVE_ERROR TLVUpdater::Move()
+CHIP_ERROR TLVUpdater::Move()
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     const uint8_t *elementEnd;
     uint32_t copyLen;
 
     VerifyOrExit((mUpdaterReader.mControlByte & kTLVTypeMask) != kTLVElementType_EndOfContainer,
-                 err = WEAVE_END_OF_TLV);
+                 err = CHIP_END_OF_TLV);
 
     VerifyOrExit(mUpdaterReader.GetType() != kTLVType_NotSpecified,
-                 err = WEAVE_ERROR_INVALID_TLV_ELEMENT);
+                 err = CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     // Skip to the end of the element
     err = mUpdaterReader.Skip();
@@ -377,7 +375,7 @@ void TLVUpdater::MoveUntilEnd()
  * When the EnterContainer() method returns, the updater is positioned
  * immediately @em before the first member of the container. Repeatedly calling
  * Next() will advance the updater through the members of the collection until
- * the end is reached, at which point the updater will return WEAVE_END_OF_TLV.
+ * the end is reached, at which point the updater will return CHIP_END_OF_TLV.
  *
  * Once the application has finished reading a container it can continue reading
  * the elements after the container by calling the ExitContainer() method.
@@ -388,21 +386,21 @@ void TLVUpdater::MoveUntilEnd()
  * @param[out] outerContainerType       A reference to a TLVType value that will
  *                                      receive the context of the updater.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_INCORRECT_STATE If the TLVUpdater reader is not
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_INCORRECT_STATE If the TLVUpdater reader is not
  *                                      positioned on a container element.
- * @retval other                        Any other Weave or platform error code
+ * @retval other                        Any other CHIP or platform error code
  *                                      returned by TLVWriter::StartContainer()
  *                                      or TLVReader::EnterContainer().
  *
  */
-WEAVE_ERROR TLVUpdater::EnterContainer(TLVType& outerContainerType)
+CHIP_ERROR TLVUpdater::EnterContainer(TLVType& outerContainerType)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLVType containerType;
 
     VerifyOrExit(TLVTypeIsContainer(mUpdaterReader.mControlByte & kTLVTypeMask),
-                 err = WEAVE_ERROR_INCORRECT_STATE);
+                 err = CHIP_ERROR_INCORRECT_STATE);
 
     // Change the updater state
     AdjustInternalWriterFreeSpace();
@@ -451,22 +449,22 @@ exit:
  * @param[in] outerContainerType        The TLVType value that was returned by
  *                                      the EnterContainer() method.
  *
- * @retval #WEAVE_NO_ERROR              If the method succeeded.
- * @retval #WEAVE_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended
+ * @retval #CHIP_NO_ERROR              If the method succeeded.
+ * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended
  *                                      prematurely.
- * @retval #WEAVE_ERROR_INVALID_TLV_ELEMENT
+ * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
  *                                      If the updater encountered an invalid or
  *                                      unsupported TLV element type.
- * @retval #WEAVE_ERROR_INVALID_TLV_TAG If the updater encountered a TLV tag in
+ * @retval #CHIP_ERROR_INVALID_TLV_TAG If the updater encountered a TLV tag in
  *                                      an invalid context.
- * @retval other                        Any other Weave or platform error code
+ * @retval other                        Any other CHIP or platform error code
  *                                      returned by TLVWriter::EndContainer() or
  *                                      TLVReader::ExitContainer().
  *
  */
-WEAVE_ERROR TLVUpdater::ExitContainer(TLVType outerContainerType)
+CHIP_ERROR TLVUpdater::ExitContainer(TLVType outerContainerType)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = mUpdaterReader.ExitContainer(outerContainerType);
     SuccessOrExit(err);
@@ -501,5 +499,4 @@ void TLVUpdater::AdjustInternalWriterFreeSpace()
 }
 
 } // namespace TLV
-} // namespace Weave
-} // namespace nl
+} // namespace chip

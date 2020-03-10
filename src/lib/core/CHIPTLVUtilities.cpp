@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,17 +18,15 @@
 /**
  *    @file
  *      This file implements utility interfaces for managing and
- *      working with Weave TLV.
+ *      working with CHIP TLV.
  *
  */
 
-#include <Weave/Core/WeaveTLVDebug.hpp>
-#include <Weave/Core/WeaveTLVUtilities.hpp>
-#include <Weave/Support/CodeUtils.h>
+#include <CHIPTLVDebug.hpp>
+#include <CHIPTLVUtilities.hpp>
+#include <support/CodeUtils.h>
 
-namespace nl {
-
-namespace Weave {
+namespace chip {
 
 namespace TLV {
 
@@ -43,7 +40,7 @@ struct FindContext {
 /**
  *  Iterate through the TLV data referenced by @a aReader and invoke @a aHandler
  *  for each visited TLV element in the context of @a aContext.
- *  The iteration is aborted if @a aHandler returns anything other than #WEAVE_NO_ERROR
+ *  The iteration is aborted if @a aHandler returns anything other than #CHIP_NO_ERROR
  *
  *  @param[in]     aReader      A reference to the TLV reader containing the TLV
  *                              data to iterate.
@@ -55,14 +52,14 @@ struct FindContext {
  *                              any encountered arrays or structures should be
  *                              descended into.
  *
- *  @retval  #WEAVE_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
+ *  @retval  #CHIP_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
  *                              or to the end of a TLV container.
  *
- *  @retval  The last value returned by @a aHandler, if different than #WEAVE_NO_ERROR
+ *  @retval  The last value returned by @a aHandler, if different than #CHIP_NO_ERROR
  */
-static WEAVE_ERROR Iterate(TLVReader &aReader, size_t aDepth, IterateHandler aHandler, void *aContext, bool aRecurse)
+static CHIP_ERROR Iterate(TLVReader &aReader, size_t aDepth, IterateHandler aHandler, void *aContext, bool aRecurse)
 {
-    WEAVE_ERROR retval = WEAVE_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     if (aReader.GetType() == kTLVType_NotSpecified)
     {
@@ -85,13 +82,13 @@ static WEAVE_ERROR Iterate(TLVReader &aReader, size_t aDepth, IterateHandler aHa
             SuccessOrExit(retval);
 
             retval = Iterate(aReader, aDepth + 1, aHandler, aContext, aRecurse);
-            if (retval != WEAVE_END_OF_TLV)
+            if (retval != CHIP_END_OF_TLV)
                 SuccessOrExit(retval);
 
             retval = aReader.ExitContainer(containerType);
             SuccessOrExit(retval);
         }
-    } while ((retval = aReader.Next()) == WEAVE_NO_ERROR);
+    } while ((retval = aReader.Next()) == CHIP_NO_ERROR);
 
 exit:
     return retval;
@@ -100,7 +97,7 @@ exit:
 /**
  *  Iterate through the TLV data referenced by @a aReader and invoke @a aHandler
  *  for each visited TLV element in the context of @a aContext.
- *  The iteration is aborted if @a aHandler returns anything other than #WEAVE_NO_ERROR
+ *  The iteration is aborted if @a aHandler returns anything other than #CHIP_NO_ERROR
  *
  *  @param[in]     aReader      A reference to the TLV reader containing the TLV
  *                              data to iterate.
@@ -108,18 +105,18 @@ exit:
  *                              being visited.
  *  @param[inout]  aContext     An optional pointer to caller-provided context data.
  *
- *  @retval  #WEAVE_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
+ *  @retval  #CHIP_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
  *                              or to the end of a TLV container.
  *
- *  @retval  #WEAVE_ERROR_INVALID_ARGUMENT  If @a aHandler is NULL.
+ *  @retval  #CHIP_ERROR_INVALID_ARGUMENT  If @a aHandler is NULL.
  *
- *  @retval  The last value returned by @a aHandler, if different than #WEAVE_NO_ERROR
+ *  @retval  The last value returned by @a aHandler, if different than #CHIP_NO_ERROR
  *
  */
-WEAVE_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext)
+CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext)
 {
     const bool  recurse = true;
-    WEAVE_ERROR retval;
+    CHIP_ERROR retval;
 
     retval = Iterate(aReader, aHandler, aContext, recurse);
 
@@ -129,7 +126,7 @@ WEAVE_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aCo
 /**
  *  Iterate through the TLV data referenced by @a aReader and invoke @a aHandler
  *  for each visited TLV element in the context of @a aContext.
- *  The iteration is aborted if @a aHandler returns anything other than #WEAVE_NO_ERROR
+ *  The iteration is aborted if @a aHandler returns anything other than #CHIP_NO_ERROR
  *
  *  @param[in]     aReader      A reference to the TLV reader containing the TLV
  *                              data to iterate.
@@ -140,21 +137,21 @@ WEAVE_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aCo
  *                              any encountered arrays or structures should be
  *                              descended into.
  *
- *  @retval  #WEAVE_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
+ *  @retval  #CHIP_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
  *                              or to the end of a TLV container.
  *
- *  @retval  #WEAVE_ERROR_INVALID_ARGUMENT  If @a aHandler is NULL.
+ *  @retval  #CHIP_ERROR_INVALID_ARGUMENT  If @a aHandler is NULL.
  *
- *  @retval  The last value returned by @a aHandler, if different than #WEAVE_NO_ERROR
+ *  @retval  The last value returned by @a aHandler, if different than #CHIP_NO_ERROR
  *
  */
-WEAVE_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext, const bool aRecurse)
+CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext, const bool aRecurse)
 {
     const size_t depth  = 0;
     TLVReader    temp;
-    WEAVE_ERROR  retval = WEAVE_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR  retval = CHIP_ERROR_NOT_IMPLEMENTED;
 
-    VerifyOrExit(aHandler != NULL, retval = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aHandler != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     temp.Init(aReader);
 
@@ -173,16 +170,16 @@ WEAVE_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aCo
  *  @param[inout]  aContext     A pointer to the handler-specific context which
  *                              is a pointer to storage for the count value.
  *
- *  @retval  #WEAVE_NO_ERROR                On success.
+ *  @retval  #CHIP_NO_ERROR                On success.
  *
- *  @retval  #WEAVE_ERROR_INVALID_ARGUMENT  If @a aContext is NULL.
+ *  @retval  #CHIP_ERROR_INVALID_ARGUMENT  If @a aContext is NULL.
  *
  */
-static WEAVE_ERROR CountHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
+static CHIP_ERROR CountHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
 {
-    WEAVE_ERROR retval = WEAVE_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(aContext != NULL, retval = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aContext != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     *static_cast<size_t *>(aContext) += 1;
 
@@ -201,13 +198,13 @@ static WEAVE_ERROR CountHandler(const TLVReader &aReader, size_t aDepth, void *a
  *                              and is set to the number of elements counted on
  *                              success.
  *
- *  @retval  #WEAVE_NO_ERROR    On success.
+ *  @retval  #CHIP_NO_ERROR    On success.
  *
  */
-WEAVE_ERROR Count(const TLVReader &aReader, size_t &aCount)
+CHIP_ERROR Count(const TLVReader &aReader, size_t &aCount)
 {
     const bool  recurse = true;
-    WEAVE_ERROR retval;
+    CHIP_ERROR retval;
 
     retval = Count(aReader, aCount, recurse);
 
@@ -228,19 +225,19 @@ WEAVE_ERROR Count(const TLVReader &aReader, size_t &aCount)
  *                              any encountered arrays or structures should be
  *                              descended into.
  *
- *  @retval  #WEAVE_NO_ERROR    On success.
+ *  @retval  #CHIP_NO_ERROR    On success.
  *
  */
-WEAVE_ERROR Count(const TLVReader &aReader, size_t &aCount, const bool aRecurse)
+CHIP_ERROR Count(const TLVReader &aReader, size_t &aCount, const bool aRecurse)
 {
-    WEAVE_ERROR retval;
+    CHIP_ERROR retval;
 
     aCount = 0;
 
     retval = Iterate(aReader, CountHandler, &aCount, aRecurse);
 
-    if (retval == WEAVE_END_OF_TLV)
-        retval = WEAVE_NO_ERROR;
+    if (retval == CHIP_END_OF_TLV)
+        retval = CHIP_NO_ERROR;
 
     return retval;
 }
@@ -253,25 +250,25 @@ WEAVE_ERROR Count(const TLVReader &aReader, size_t &aCount, const bool aRecurse)
  *  @param[in]     aDepth       The current depth into the TLV data.
  *  @param[inout]  aContext     A pointer to the handler-specific context.
  *
- *  @retval  #WEAVE_NO_ERROR                On success.
+ *  @retval  #CHIP_NO_ERROR                On success.
  *
- *  @retval  #WEAVE_ERROR_INVALID_ARGUMENT  If @a aContext is NULL.
+ *  @retval  #CHIP_ERROR_INVALID_ARGUMENT  If @a aContext is NULL.
  *
- *  @retval  #WEAVE_ERROR_MAX               If the specified tag is found.
+ *  @retval  #CHIP_ERROR_MAX               If the specified tag is found.
  *
  */
-static WEAVE_ERROR FindHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
+static CHIP_ERROR FindHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
 {
     const FindContext * theContext = static_cast<const FindContext *>(aContext);
-    WEAVE_ERROR         retval     = WEAVE_NO_ERROR;
+    CHIP_ERROR         retval     = CHIP_NO_ERROR;
 
-    VerifyOrExit(aContext != NULL, retval = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aContext != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (theContext->mTag == aReader.GetTag())
     {
         theContext->mReader.Init(aReader);
         // terminate the iteration when the specified tag is found
-        retval = WEAVE_ERROR_MAX;
+        retval = CHIP_ERROR_MAX;
     }
 
  exit:
@@ -288,15 +285,15 @@ static WEAVE_ERROR FindHandler(const TLVReader &aReader, size_t aDepth, void *aC
  *                              will be positioned at the specified tag
  *                              on success.
  *
- *  @retval  #WEAVE_NO_ERROR                    On success.
+ *  @retval  #CHIP_NO_ERROR                    On success.
  *
- *  @retval  #WEAVE_ERROR_TLV_TAG_NOT_FOUND     If the specified tag @a aTag was not found.
+ *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified tag @a aTag was not found.
  *
  */
-WEAVE_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult)
+CHIP_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult)
 {
     const bool  recurse = true;
-    WEAVE_ERROR retval;
+    CHIP_ERROR retval;
 
     retval = Find(aReader, aTag, aResult, recurse);
 
@@ -317,22 +314,22 @@ WEAVE_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aRes
  *                              any encountered arrays or structures should be
  *                              descended into.
  *
- *  @retval  #WEAVE_NO_ERROR                    On success.
+ *  @retval  #CHIP_NO_ERROR                    On success.
  *
- *  @retval  #WEAVE_ERROR_TLV_TAG_NOT_FOUND     If the specified tag @a aTag was not found.
+ *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified tag @a aTag was not found.
  *
  */
-WEAVE_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult, const bool aRecurse)
+CHIP_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult, const bool aRecurse)
 {
     FindContext theContext = { aTag, aResult };
-    WEAVE_ERROR retval;
+    CHIP_ERROR retval;
 
     retval = Iterate(aReader, FindHandler, &theContext, aRecurse);
 
-    if (retval == WEAVE_ERROR_MAX)
-        retval = WEAVE_NO_ERROR;
+    if (retval == CHIP_ERROR_MAX)
+        retval = CHIP_NO_ERROR;
     else
-        retval = WEAVE_ERROR_TLV_TAG_NOT_FOUND;
+        retval = CHIP_ERROR_TLV_TAG_NOT_FOUND;
 
     return retval;
 }
@@ -352,14 +349,14 @@ FindPredicateContext::FindPredicateContext(TLVReader &inReader, IterateHandler i
 {
 }
 
-static WEAVE_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth, void *aContext)
+static CHIP_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth, void *aContext)
 {
     FindPredicateContext *theContext = static_cast<FindPredicateContext *>(aContext);
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = theContext->mHandler(aReader, aDepth, theContext->mContext);
 
-    if (err == WEAVE_ERROR_MAX)
+    if (err == CHIP_ERROR_MAX)
         theContext->mResult.Init(aReader);
 
     return err;
@@ -368,8 +365,8 @@ static WEAVE_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth
 /**
  *  Search for the first element matching the predicate within the TLV reader
  *  descending into arrays or structures. The @a aPredicate is applied
- *  to each visited TLV element; the @a aPredicate shall return #WEAVE_ERROR_MAX
- *  for the matching elements, #WEAVE_NO_ERROR for non-matching elements, and any
+ *  to each visited TLV element; the @a aPredicate shall return #CHIP_ERROR_MAX
+ *  for the matching elements, #CHIP_NO_ERROR for non-matching elements, and any
  *  other value to terminate the search.
  *
  *  @param[in] aReader     A read-only reference to the TLV reader in which to find the
@@ -377,8 +374,8 @@ static WEAVE_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth
  *  @param[in] aPredicate  A predicate to be applied to each TLV element.  To
  *                         support the code reuse, aPredicate has the
  *                         IterateHandler type.  The return value of aPredicate
- *                         controls the search: a #WEAVE_ERROR_MAX signals that
- *                         desired element has been found, #WEAVE_NO_ERROR
+ *                         controls the search: a #CHIP_ERROR_MAX signals that
+ *                         desired element has been found, #CHIP_NO_ERROR
  *                         signals that the desired element has not been found,
  *                         and all other values signal that the saerch should be
  *                         terminated.
@@ -387,12 +384,12 @@ static WEAVE_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth
  *  @param[out] aResult    A reference to storage to a TLV reader which
  *                         will be positioned at the specified tag
  *                         on success.
- *  @retval  #WEAVE_NO_ERROR                    On success.
+ *  @retval  #CHIP_NO_ERROR                    On success.
  *
- *  @retval  #WEAVE_ERROR_TLV_TAG_NOT_FOUND     If the specified @a aPredicate did not locate the specified element
+ *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified @a aPredicate did not locate the specified element
  *
  */
-WEAVE_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aContext, TLVReader &aResult)
+CHIP_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aContext, TLVReader &aResult)
 {
     const bool  recurse = true;
     return Find(aReader, aPredicate, aContext, aResult, recurse);
@@ -401,8 +398,8 @@ WEAVE_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aCon
 /**
  *  Search for the first element matching the predicate within the TLV reader
  *  optionally descending into arrays or structures. The @a aPredicate is applied
- *  to each visited TLV element; the @a aPredicate shall return #WEAVE_ERROR_MAX
- *  for the matching elements, #WEAVE_NO_ERROR for non-matching elements, and any
+ *  to each visited TLV element; the @a aPredicate shall return #CHIP_ERROR_MAX
+ *  for the matching elements, #CHIP_NO_ERROR for non-matching elements, and any
  *  other value to terminate the search.
  *
  *  @param[in] aReader     A read-only reference to the TLV reader in which to find the
@@ -410,8 +407,8 @@ WEAVE_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aCon
  *  @param[in] aPredicate  A predicate to be applied to each TLV element.  To
  *                         support the code reuse, aPredicate has the
  *                         @a IterateHandler type.  The return value of aPredicate
- *                         controls the search: a #WEAVE_ERROR_MAX signals that
- *                         desired element has been found, #WEAVE_NO_ERROR
+ *                         controls the search: a #CHIP_ERROR_MAX signals that
+ *                         desired element has been found, #CHIP_NO_ERROR
  *                         signals that the desired element has not been found,
  *                         and all other values signal that the saerch should be
  *                         terminated.
@@ -423,22 +420,22 @@ WEAVE_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aCon
  *                         encountered arrays or structures should be descended
  *                         into.
  *
- *  @retval  #WEAVE_NO_ERROR                    On success.
+ *  @retval  #CHIP_NO_ERROR                    On success.
  *
- *  @retval  #WEAVE_ERROR_TLV_TAG_NOT_FOUND     If the specified @a aPredicate did not locate the specified element
+ *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified @a aPredicate did not locate the specified element
  *
  */
-WEAVE_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aContext, TLVReader &aResult, const bool aRecurse)
+CHIP_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aContext, TLVReader &aResult, const bool aRecurse)
 {
-    WEAVE_ERROR retval;
+    CHIP_ERROR retval;
     FindPredicateContext theContext(aResult, aPredicate, aContext);
 
     retval = Iterate(aReader, FindPredicateHandler, &theContext, aRecurse);
 
-    if (retval == WEAVE_ERROR_MAX)
-        retval = WEAVE_NO_ERROR;
+    if (retval == CHIP_ERROR_MAX)
+        retval = CHIP_NO_ERROR;
     else
-        retval = WEAVE_ERROR_TLV_TAG_NOT_FOUND;
+        retval = CHIP_ERROR_TLV_TAG_NOT_FOUND;
 
     return retval;
 }
@@ -447,6 +444,4 @@ WEAVE_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aCon
 
 } // namespace TLV
 
-} // namespace Weave
-
-} // namespace nl
+} // namespace chip
