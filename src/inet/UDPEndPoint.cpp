@@ -30,12 +30,12 @@
 #include <string.h>
 
 #include "UDPEndPoint.h"
-#include "InetLayer.h"
+#include <InetLayer.h>
 #include "InetFaultInjection.h"
-#include "system/SystemFaultInjection.h"
+#include <system/SystemFaultInjection.h>
 
-#include "support/CodeUtils.h"
-#include "support/logging/CHIPLogging.h"
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/udp.h>

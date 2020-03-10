@@ -23,15 +23,15 @@
 #ifndef INET_FAULT_INJECTION_H_
 #define INET_FAULT_INJECTION_H_
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 
 #if INET_CONFIG_TEST
 
 #include <nlfaultinjection.hpp>
 
-#include "support/DLLUtil.h"
+#include <support/DLLUtil.h>
 
-#include "system/SystemFaultInjection.h"
+#include <system/SystemFaultInjection.h>
 
 namespace chip {
 namespace Inet {

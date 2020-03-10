@@ -30,9 +30,9 @@
 #ifndef INETERROR_H
 #define INETERROR_H
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 
-#include "system/SystemError.h"
+#include <system/SystemError.h>
 
 // clang-format off
 

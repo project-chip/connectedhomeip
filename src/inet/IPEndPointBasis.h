@@ -26,9 +26,9 @@
 #ifndef IPENDPOINTBASIS_H
 #define IPENDPOINTBASIS_H
 
-#include "EndPointBasis.h"
+#include <EndPointBasis.h>
 
-#include "system/SystemPacketBuffer.h"
+#include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>

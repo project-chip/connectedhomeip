@@ -25,12 +25,12 @@
 #ifndef INET_H
 #define INET_H
 
-#include "InetConfig.h"
-#include "InetError.h"
-#include "InetInterface.h"
-#include "InetLayerEvents.h"
-#include "InetLayer.h"
-#include "IPAddress.h"
+#include <InetConfig.h>
+#include <InetError.h>
+#include <InetInterface.h>
+#include <InetLayerEvents.h>
+#include <InetLayer.h>
+#include <IPAddress.h>
 #include "IPPrefix.h"
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
@@ -39,7 +39,7 @@
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
-#include "DNSResolver.h"
+#include <DNSResolver.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT

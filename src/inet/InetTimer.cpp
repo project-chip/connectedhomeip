@@ -22,7 +22,7 @@
  *
  */
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 #include "InetTimer.h"

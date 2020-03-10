@@ -24,14 +24,14 @@
 #ifndef ENDPOINTBASIS_H
 #define ENDPOINTBASIS_H
 
-#include "InetConfig.h"
-#include "InetError.h"
+#include <InetConfig.h>
+#include <InetError.h>
 #include "IANAConstants.h"
 #include "InetLayerBasis.h"
-#include "InetLayerEvents.h"
-#include "InetInterface.h"
+#include <InetLayerEvents.h>
+#include <InetInterface.h>
 
-#include "support/DLLUtil.h"
+#include <support/DLLUtil.h>
 
 //--- Declaration of LWIP protocol control buffer structure names
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

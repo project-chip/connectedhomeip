@@ -22,9 +22,9 @@
  *      in the Inet layer, i.e. TCP, UDP, Raw and Tun.
  */
 
-#include "EndPointBasis.h"
+#include <EndPointBasis.h>
 
-#include "InetLayer.h"
+#include <InetLayer.h>
 
 namespace chip {
 namespace Inet {

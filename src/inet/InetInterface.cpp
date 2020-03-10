@@ -28,11 +28,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "support/CodeUtils.h"
-#include "support/DLLUtil.h"
+#include <support/CodeUtils.h>
+#include <support/DLLUtil.h>
 
-#include "InetLayer.h"
-#include "InetLayerEvents.h"
+#include <InetLayer.h>
+#include <InetLayerEvents.h>
 #include "IPPrefix.h"
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

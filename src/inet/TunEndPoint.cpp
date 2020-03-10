@@ -28,13 +28,13 @@
 #endif
 
 #include "TunEndPoint.h"
-#include "InetLayer.h"
+#include <InetLayer.h>
 
 #include <string.h>
 #include <stdio.h>
 
-#include "core/CHIPEncoding.h"
-#include "support/CodeUtils.h"
+#include <core/CHIPEncoding.h>
+#include <support/CodeUtils.h>
 
 #include "arpa-inet-compatibility.h"
 

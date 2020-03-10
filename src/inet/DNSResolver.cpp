@@ -22,11 +22,11 @@
  *
  */
 
-#include "InetLayer.h"
-#include "DNSResolver.h"
-#include "InetLayerEvents.h"
+#include <InetLayer.h>
+#include <DNSResolver.h>
+#include <InetLayerEvents.h>
 
-#include "support/CodeUtils.h"
+#include <support/CodeUtils.h>
 
 #include <string.h>
 

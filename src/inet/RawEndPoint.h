@@ -28,9 +28,9 @@
 #define RAWENDPOINT_H
 
 #include "IPEndPointBasis.h"
-#include "IPAddress.h"
+#include <IPAddress.h>
 
-#include "system/SystemPacketBuffer.h"
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace Inet {

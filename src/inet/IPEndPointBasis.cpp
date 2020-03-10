@@ -30,11 +30,11 @@
 
 #include <string.h>
 
-#include "EndPointBasis.h"
-#include "InetInterface.h"
-#include "InetLayer.h"
+#include <EndPointBasis.h>
+#include <InetInterface.h>
+#include <InetLayer.h>
 
-#include "support/CodeUtils.h"
+#include <support/CodeUtils.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4

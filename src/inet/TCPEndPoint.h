@@ -27,10 +27,10 @@
 #ifndef TCPENDPOINT_H
 #define TCPENDPOINT_H
 
-#include "EndPointBasis.h"
-#include "IPAddress.h"
+#include <EndPointBasis.h>
+#include <IPAddress.h>
 
-#include "system/SystemPacketBuffer.h"
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace Inet {
