@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,8 +22,8 @@
  *
  */
 
-#include <InetLayer/InetConfig.h>
+#include "InetConfig.h"
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#include <InetLayer/InetTimer.h>
+#include "InetTimer.h"
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES

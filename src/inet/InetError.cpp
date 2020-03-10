@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,17 +22,14 @@
 
 #include <stddef.h>
 
-#include <InetLayer/Inet.h>
-#include <InetLayer/InetError.h>
+#include "Inet.h"
+#include <InetError.h>
 
-#include <Weave/Support/ErrorStr.h>
+#include "support/ErrorStr.h"
 
 
-namespace nl {
 extern void FormatError(char * buf, uint16_t bufSize, const char * subsys, int32_t err, const char * desc);
-}
 
-namespace nl {
 namespace Inet {
 
 /**
@@ -41,7 +37,7 @@ namespace Inet {
  */
 void RegisterInetLayerErrorFormatter(void)
 {
-    static ErrorFormatter sInetLayerErrorFormatter =
+    static chip::ErrorFormatter sInetLayerErrorFormatter =
     {
         FormatInetLayerError,
         NULL
@@ -71,7 +67,7 @@ bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err)
         return false;
     }
 
-#if !WEAVE_CONFIG_SHORT_ERROR_STR
+#if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err)
     {
     case INET_ERROR_WRONG_ADDRESS_TYPE                          : desc = "Wrong address type"; break;
@@ -103,12 +99,11 @@ bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err)
     case INET_ERROR_TCP_CONNECT_TIMEOUT                         : desc = "TCP Connect Timeout"; break;
     case INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE                : desc = "Incompatible IP address type"; break;
     }
-#endif // !WEAVE_CONFIG_SHORT_ERROR_STR
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
-    nl::FormatError(buf, bufSize, "Inet", err, desc);
+    FormatError(buf, bufSize, "Inet", err, desc);
 
     return true;
 }
 
 } // namespace Inet
-} // namespace nl

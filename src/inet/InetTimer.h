@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,42 +25,41 @@
 #ifndef INETTIMER_H
 #define INETTIMER_H
 
-#include <InetLayer/InetConfig.h>
+#include "InetConfig.h"
 
 #if !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-#error "#include <InetLayer/InetTimer.h> // while !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES."
+#error "#include "InetTimer.h" // while !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES."
 
 #else // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#include <SystemLayer/SystemTimer.h>
+#include "system/SystemTimer.h"
 
 /**
  *  Number of nanoseconds in a microsecond
  */
 
-#define INET_NANOSECONDS_PER_MICROSECOND    nl::Weave::System::kTimerFactor_nano_per_micro
+#define INET_NANOSECONDS_PER_MICROSECOND    chip::System::kTimerFactor_nano_per_micro
 
 /**
  *  Number of nanoseconds in a millisecond
  */
-#define INET_NANOSECONDS_PER_MILLISECOND    nl::Weave::System::kTimerFactor_nano_per_milli
+#define INET_NANOSECONDS_PER_MILLISECOND    chip::System::kTimerFactor_nano_per_milli
 
 /**
  *  Number of microseconds in a millisecond
  */
-#define INET_MICROSECONDS_PER_MILLISECOND   nl::Weave::System::kTimerFactor_micro_per_milli
+#define INET_MICROSECONDS_PER_MILLISECOND   chip::System::kTimerFactor_micro_per_milli
 
 /**
  *  Number of milliseconds in a second
  */
-#define INET_MILLISECONDS_PER_SECOND        nl::Weave::System::kTimerFactor_milli_per_unit
+#define INET_MILLISECONDS_PER_SECOND        chip::System::kTimerFactor_milli_per_unit
 
 /**
  *  Number of microseconds in a second
  */
-#define INET_MICROSECONDS_PER_SECOND        nl::Weave::System::kTimerFactor_micro_per_unit
+#define INET_MICROSECONDS_PER_SECOND        chip::System::kTimerFactor_micro_per_unit
 
-namespace nl {
 namespace Inet {
 
 class InetLayer;
@@ -75,7 +73,7 @@ class InetTimer
     InetTimer& operator =(const InetTimer&);
 
 public:
-    typedef Weave::System::Timer::Epoch Time;
+    typedef chip::System::Timer::Epoch Time;
 
     static Time GetTimeMillis(void);
 
@@ -84,11 +82,10 @@ protected:
 
 inline InetTimer::Time InetTimer::GetTimeMillis(void)
 {
-    return Weave::System::Timer::GetCurrentEpoch();
+    return chip::System::Timer::GetCurrentEpoch();
 }
 
 } // namespace Inet
-} // namespace nl
 
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 #endif // !defined(INETTIMER_H)

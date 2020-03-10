@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,15 +18,15 @@
 #ifndef ARPA_INET_COMPATIBILITY_H
 #define ARPA_INET_COMPATIBILITY_H
 
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <arpa/inet.h>
 
-#else // !WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 // NOTE WELL: when LWIP_VERSION_MAJOR == 1, LWIP_PREFIX_BYTEORDER_FUNCS instead of LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <lwip/def.h>
 #include <lwip/opt.h>
@@ -39,7 +38,7 @@
 #define ntohl(x) lwip_ntohl(x)
 #endif // (defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS) || defined(LWIP_PREFIX_BYTEORDER_FUNCS))
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
-#endif // !WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #endif // !defined(ARPA_INET_COMPATIBILITY_H)

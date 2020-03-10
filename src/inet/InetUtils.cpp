@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,11 +25,10 @@
 
 #include <string.h>
 
-#include <Weave/Support/NLDLLUtil.h>
+#include "support/DLLUtil.h"
 
-#include <InetLayer/InetLayer.h>
+#include "InetLayer.h"
 
-namespace nl {
 namespace Inet {
 
 /**
@@ -65,7 +63,7 @@ namespace Inet {
  *  @return  #INET_NO_ERROR                  On success.
  *
  */
-NL_DLL_EXPORT INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringLen, const char *&aHost, uint16_t &aHostLen, uint16_t &aPort)
+DLL_EXPORT INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringLen, const char *&aHost, uint16_t &aHostLen, uint16_t &aPort)
 {
     const char *end = aString + aStringLen;
     const char *p;
@@ -185,7 +183,7 @@ NL_DLL_EXPORT INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringL
  *  @return  #INET_NO_ERROR                  On success.
  *
  */
-NL_DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char *aString, uint16_t aStringLen,
+DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char *aString, uint16_t aStringLen,
                                                    const char *&aHost, uint16_t &aHostLen,
                                                    uint16_t &aPort,
                                                    const char *&aInterface, uint16_t &aInterfaceLen)
@@ -213,4 +211,3 @@ NL_DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char *aString, uint16_t
 }
 
 } // namespace Inet
-} // namespace nl
