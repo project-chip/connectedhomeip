@@ -32,6 +32,7 @@
 
 #include "system/SystemPacketBuffer.h"
 
+namespace chip {
 namespace Inet {
 
 class InetLayer;
@@ -676,5 +677,6 @@ inline void TCPEndPoint::MarkActive(void)
 }
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(TCPENDPOINT_H)

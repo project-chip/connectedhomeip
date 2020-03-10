@@ -27,6 +27,7 @@
 #ifndef IANACONSTANTS_H
 #define IANACONSTANTS_H
 
+namespace chip {
 namespace Inet {
 
 /**
@@ -110,5 +111,6 @@ enum IPV6MulticastGroup
 };
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(IANACONSTANTS_H)

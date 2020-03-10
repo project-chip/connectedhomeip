@@ -104,6 +104,7 @@ err_t start_tcp_timers(void)
 } // anonymous namespace
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+namespace chip {
 namespace Inet {
 
 using chip::System::PacketBuffer;
@@ -2595,3 +2596,4 @@ exit:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
+} // namespace chip

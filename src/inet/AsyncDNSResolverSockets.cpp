@@ -33,6 +33,7 @@
 
 #include "AsyncDNSResolverSockets.h"
 
+namespace chip {
 namespace Inet {
 
 /**
@@ -363,5 +364,6 @@ void AsyncDNSResolverSockets::AsyncMutexUnlock(void)
 }
 
 } // namespace Inet
+} // namespace chip
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

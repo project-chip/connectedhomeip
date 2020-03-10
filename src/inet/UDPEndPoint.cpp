@@ -63,6 +63,7 @@
 #define SOCK_FLAGS 0
 #endif
 
+namespace chip {
 namespace Inet {
 
 using chip::System::PacketBuffer;
@@ -930,3 +931,4 @@ void UDPEndPoint::HandlePendingIO(void)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
+} // namespace chip

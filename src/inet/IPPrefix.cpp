@@ -28,6 +28,7 @@
 #include "IPPrefix.h"
 #include "core/CHIPEncoding.h"
 
+namespace chip {
 namespace Inet {
 
 IPPrefix IPPrefix::Zero;
@@ -79,3 +80,4 @@ bool IPPrefix::MatchAddress(const IPAddress& addr) const
 }
 
 } // namespace Inet
+} // namespace chip

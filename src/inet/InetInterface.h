@@ -40,6 +40,7 @@ struct if_nameindex;
 struct ifaddrs;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+namespace chip {
 namespace Inet {
 
 class IPAddress;
@@ -272,5 +273,6 @@ inline uint8_t InterfaceAddressIterator::GetIPv6PrefixLength(void)
 }
 
 } // namespace Inet
+} // namespace chip
 
 #endif /* INETINTERFACE_H */

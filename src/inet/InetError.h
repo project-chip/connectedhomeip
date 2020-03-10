@@ -368,12 +368,14 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
 
 // clang-format on
 
+namespace chip {
 namespace Inet {
 
 extern void RegisterInetLayerErrorFormatter(void);
 extern bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err);
 
 } // namespace Inet
+} // namespace chip
 
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES

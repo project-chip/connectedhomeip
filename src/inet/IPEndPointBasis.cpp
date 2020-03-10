@@ -83,6 +83,7 @@
 #endif // !defined(IPV6_DROP_MEMBERSHIP) && defined(IPV6_LEAVE_GROUP)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+namespace chip {
 namespace Inet {
 
 using chip::System::PacketBuffer;
@@ -1120,3 +1121,4 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
+} // namespace chip

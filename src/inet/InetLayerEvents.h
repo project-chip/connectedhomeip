@@ -31,6 +31,7 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
+namespace chip {
 namespace Inet {
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
@@ -83,6 +84,7 @@ static inline bool INET_IsInetEvent(chip::System::EventType aType)
 }
 
 } // namespace Inet
+} // namespace chip
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // !defined(INETLAYEREVENTS_H)

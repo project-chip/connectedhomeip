@@ -34,6 +34,7 @@
 #else // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 #include "system/SystemPacketBuffer.h"
 
+namespace chip {
 namespace Inet {
 
 typedef chip::System::PacketBuffer InetBuffer;
@@ -43,6 +44,7 @@ struct pbuf : public chip::System::pbuf { };
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Inet
+} // namespace chip
 
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 #endif // !defined(INETBUFFER_H)

@@ -46,6 +46,7 @@
 #include <stdlib.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+namespace chip {
 namespace Inet {
 
 chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> DNSResolver::sPool;
@@ -540,3 +541,4 @@ void DNSResolver::HandleAsyncResolveComplete(void)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
+} // namespace chip

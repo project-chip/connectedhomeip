@@ -80,6 +80,7 @@
 #define NL_SOCK_CLOEXEC 0
 #endif
 
+namespace chip {
 namespace Inet {
 
 class InetLayer;
@@ -235,5 +236,6 @@ private:
 };
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(TUNENDPOINT_H)

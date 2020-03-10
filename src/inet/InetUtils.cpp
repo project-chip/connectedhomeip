@@ -29,6 +29,7 @@
 
 #include "InetLayer.h"
 
+namespace chip {
 namespace Inet {
 
 /**
@@ -211,3 +212,4 @@ DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char *aString, uint16_t aS
 }
 
 } // namespace Inet
+} // namespace chip

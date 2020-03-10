@@ -32,6 +32,7 @@
 
 #include "system/SystemPacketBuffer.h"
 
+namespace chip {
 namespace Inet {
 
 class InetLayer;
@@ -111,5 +112,6 @@ private:
 };
 
 } // namespace Inet
+} // namespace chip
 
 #endif // !defined(RAWENDPOINT_H)
