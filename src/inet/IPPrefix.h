@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@
 /**
  *    @file
  *      This file defines the concrete class
- *      <tt>nl::Inet::IPPrefix</tt>, which comprise two member fields:
+ *      <tt>Inet::IPPrefix</tt>, which comprise two member fields:
  *      a) a IP address and b) a length field. The Nest Inet Layer
  *      uses objects of this class to represent Internet protocol
  *      address prefixes of both IPv4 and IPv6 address families.
@@ -28,12 +27,11 @@
 #ifndef IPPREFIX_H
 #define IPPREFIX_H
 
-#include <InetLayer/IPAddress.h>
+#include "IPAddress.h"
 
-#define NL_INET_IPV6_DEFAULT_PREFIX_LEN               (64)
-#define NL_INET_IPV6_MAX_PREFIX_LEN                   (128)
+#define CHIP_INET_IPV6_DEFAULT_PREFIX_LEN               (64)
+#define CHIP_INET_IPV6_MAX_PREFIX_LEN                   (128)
 
-namespace nl {
 namespace Inet {
 
 /**
@@ -119,6 +117,5 @@ public:
 };
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(IPPREFIX_H)

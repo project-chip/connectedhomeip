@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    Copyright (c) 2013-2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +17,7 @@
 
 /**
  *    @file
- *      This file implements the class <tt>nl::Inet::IPAddress</tt> and
+ *      This file implements the class <tt>Inet::IPAddress</tt> and
  *      related enumerated constants. The Nest Inet Layer uses objects
  *      of this class to represent Internet protocol addresses of both
  *      IPv4 and IPv6 address families. (IPv4 addresses are stored
@@ -33,12 +31,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <Weave/Core/WeaveEncoding.h>
-#include <InetLayer/InetLayer.h>
+#include "core/CHIPEncoding.h"
+#include "InetLayer.h"
 
 #include "arpa-inet-compatibility.h"
 
-namespace nl {
 namespace Inet {
 
 IPAddress IPAddress::Any;
@@ -66,7 +63,7 @@ IPAddress & IPAddress::operator=(const IPAddress& other)
     return *this;
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 ip_addr_t IPAddress::ToLwIPAddr(void) const
@@ -176,9 +173,9 @@ IPAddress IPAddress::FromIPv6(const ip6_addr_t &ipv6Addr)
     return ipAddr;
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if INET_CONFIG_ENABLE_IPV4
 struct in_addr IPAddress::ToIPv4() const
@@ -237,7 +234,7 @@ IPAddress IPAddress::FromSockAddr(const struct sockaddr& sockaddr)
     return Any;
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 // Is address an IPv4 address encoded in IPv6 format?
 bool IPAddress::IsIPv4() const
@@ -477,4 +474,3 @@ IPAddress IPAddress::MakeIPv4Broadcast(void)
 
 
 } // namespace Inet
-} // namespace nl
