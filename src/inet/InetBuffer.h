@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,26 +25,24 @@
 #ifndef INETBUFFER_H
 #define INETBUFFER_H
 
-#include <InetLayer/InetConfig.h>
+#include "InetConfig.h"
 
 #if !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-#error "#include <InetLayer/InetBuffer.h> // while !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES."
+#error "#include "InetBuffer.h" // while !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES."
 
 #else // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#include <SystemLayer/SystemPacketBuffer.h>
+#include "system/SystemPacketBuffer.h"
 
-namespace nl {
 namespace Inet {
 
-typedef Weave::System::PacketBuffer InetBuffer;
+typedef chip::System::PacketBuffer InetBuffer;
 
-#if !WEAVE_SYSTEM_CONFIG_USE_LWIP
-struct pbuf : public Weave::System::pbuf { };
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP
+struct pbuf : public chip::System::pbuf { };
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Inet
-} // namespace nl
 
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 #endif // !defined(INETBUFFER_H)

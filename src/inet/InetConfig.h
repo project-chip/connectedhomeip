@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,33 +36,33 @@
 #define INETCONFIG_H
 
 /*--- Include configuration headers ---*/
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
 /*
- * If the WEAVE_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION option is not applicable, then the "InetProjectConfig.h"
+ * If the CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION option is not applicable, then the "InetProjectConfig.h"
  * header was not included by <SystemLayer/SystemConfig.h> and therefore it must be included here.
  */
-#if !WEAVE_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
+#if !CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
 
 /* Include a project-specific configuration file, if defined.
  *
- * An application or module that incorporates Weave can define a project configuration
+ * An application or module that incorporates chip can define a project configuration
  * file to override standard Inet Layer configuration with application-specific values.
- * The project config file is typically located outside the OpenWeave source tree,
+ * The project config file is typically located outside the Openchip source tree,
  * alongside the source code for the application.
  */
 #ifdef INET_PROJECT_CONFIG_INCLUDE
 #include INET_PROJECT_CONFIG_INCLUDE
 #endif // INET_PROJECT_CONFIG_INCLUDE
 
-#endif // !WEAVE_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
+#endif // !CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
 
 /* Include a platform-specific configuration file, if defined.
  *
  * A platform configuration file contains overrides to standard Inet Layer configuration
- * that are specific to the platform or OS on which Weave is running.  It is typically
- * provided as apart of an adaptation layer that adapts OpenWeave to the target
- * environment.  This adaptation layer may be included in the OpenWeave source tree
+ * that are specific to the platform or OS on which chip is running.  It is typically
+ * provided as apart of an adaptation layer that adapts Openchip to the target
+ * environment.  This adaptation layer may be included in the Openchip source tree
  * itself or implemented externally.
  */
 #ifdef INET_PLATFORM_CONFIG_INCLUDE
@@ -77,7 +76,7 @@
  *
  *  @brief
  *    This boolean configuration option is (1) if the obsolescent interfaces
- *    of the INET layer that now reside elsewhere, for example, in the Weave System
+ *    of the INET layer that now reside elsewhere, for example, in the chip System
  *    Layer are aliased for transitional purposes.
  *
  */
@@ -85,16 +84,16 @@
 #define INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES          0
 #endif //  INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES && !WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#error "REQUIRED: if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES then WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES!"
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES && !WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES && !CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#error "REQUIRED: if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES then CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES!"
+#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES && !CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 /**
  *  @def INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE
  *
  *  @brief
  *    The maximum space required for IPv6 and UDP headers.
- *    Useful when ensuring a Weave message will not exceed a UDP MTU.
+ *    Useful when ensuring a chip message will not exceed a UDP MTU.
  *
  */
 #ifndef INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE
@@ -109,11 +108,11 @@
  *    InetLayer subsystem.
  *
  *  @note
- *    By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_ERROR_TYPE.
+ *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_ERROR_TYPE.
  *
  */
 #ifndef INET_CONFIG_ERROR_TYPE
-#define INET_CONFIG_ERROR_TYPE                              WEAVE_SYSTEM_CONFIG_ERROR_TYPE
+#define INET_CONFIG_ERROR_TYPE                              CHIP_SYSTEM_CONFIG_ERROR_TYPE
 #endif // !defined(INET_CONFIG_ERROR_TYPE)
 
 /**
@@ -123,11 +122,11 @@
  *    This defines the InetLayer error code for no error or success.
  *
  *  @note
- *    By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_NO_ERROR.
+ *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_NO_ERROR.
  *
  */
 #ifndef INET_CONFIG_NO_ERROR
-#define INET_CONFIG_NO_ERROR                                WEAVE_SYSTEM_CONFIG_NO_ERROR
+#define INET_CONFIG_NO_ERROR                                CHIP_SYSTEM_CONFIG_NO_ERROR
 #endif // !defined(INET_CONFIG_NO_ERROR)
 
 /**
@@ -391,7 +390,7 @@
  *  @def INET_CONFIG_EVENT_RESERVED
  *
  *  @brief
- *      This defines the first number in the default Weave System Layer event code space reserved for use by the Inet Layer.
+ *      This defines the first number in the default chip System Layer event code space reserved for use by the Inet Layer.
  *      Event codes used by each layer must not overlap.
  */
 #ifndef INET_CONFIG_EVENT_RESERVED
@@ -406,11 +405,11 @@
  *    mapping such event types into a platform- or system-specific range.
  *
  *  @note
- *    By default, this definition is a copy of _WEAVE_SYSTEM_CONFIG_LWIP_EVENT.
+ *    By default, this definition is a copy of _CHIP_SYSTEM_CONFIG_LWIP_EVENT.
  *
  */
 #ifndef _INET_CONFIG_EVENT
-#define _INET_CONFIG_EVENT(e)                               _WEAVE_SYSTEM_CONFIG_LWIP_EVENT(INET_CONFIG_EVENT_RESERVED + (e))
+#define _INET_CONFIG_EVENT(e)                               _CHIP_SYSTEM_CONFIG_LWIP_EVENT(INET_CONFIG_EVENT_RESERVED + (e))
 #endif // _INET_CONFIG_EVENT
 
 /*
@@ -426,10 +425,10 @@
  *      Use LwIP.
  *
  *  @note
- *      By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_USE_LWIP.
+ *      By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_USE_LWIP.
  */
 #ifndef INET_LWIP
-#define INET_LWIP                                           WEAVE_SYSTEM_CONFIG_USE_LWIP
+#define INET_LWIP                                           CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // !defined(INET_LWIP)
 
 /**
@@ -439,10 +438,10 @@
  *      Use BSD sockets.
  *
  *  @note
- *      By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_USE_SOCKETS.
+ *      By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_USE_SOCKETS.
  */
 #ifndef INET_SOCKETS
-#define INET_SOCKETS                                        WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#define INET_SOCKETS                                        CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #endif // !defined(INET_SOCKETS)
 
 /**
@@ -456,11 +455,11 @@
  *    host, this value should be left at its default.
  *
  *  @note
- *    By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_POSIX_LOCKING.
+ *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_POSIX_LOCKING.
  *
  */
 #ifndef INET_CONFIG_POSIX_LOCKING
-#define INET_CONFIG_POSIX_LOCKING                           WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#define INET_CONFIG_POSIX_LOCKING                           CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #endif // !defined(INET_CONFIG_POSIX_LOCKING)
 
 /**
@@ -476,11 +475,11 @@
  *    threads and BSD sockets, this should also be deasserted (0).
  *
  *  @note
- *    By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING.
+ *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING.
  *
  */
 #ifndef INET_CONFIG_FREERTOS_LOCKING
-#define INET_CONFIG_FREERTOS_LOCKING                        WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#define INET_CONFIG_FREERTOS_LOCKING                        CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 #endif // !defined(INET_CONFIG_FREERTOS_LOCKING)
 
 /**
@@ -504,11 +503,11 @@
  *     an integral type.
  *
  *  @note
- *     By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_LWIP_EVENT_TYPE.
+ *     By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE.
  *
  */
 #ifndef INET_CONFIG_EVENT_TYPE
-#define INET_CONFIG_EVENT_TYPE                              WEAVE_SYSTEM_CONFIG_LWIP_EVENT_TYPE
+#define INET_CONFIG_EVENT_TYPE                              CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE
 #endif // INET_CONFIG_EVENT_TYPE
 
 /**
@@ -522,11 +521,11 @@
  *     const pointer or reference are appropriate.
  *
  *  @note
- *     By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE.
+ *     By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE.
  *
  */
 #ifndef INET_CONFIG_EVENT_OBJECT_TYPE
-#define INET_CONFIG_EVENT_OBJECT_TYPE                       WEAVE_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE
+#define INET_CONFIG_EVENT_OBJECT_TYPE                       CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE
 #endif // INET_CONFIG_EVENT_OBJECT_TYPE
 
 /**
@@ -540,11 +539,11 @@
  *    allocation using malloc.
  *
  * @note
- *    By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC.
+ *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC.
  *
  */
 #ifndef INET_CONFIG_NUM_BUFS
-#define INET_CONFIG_NUM_BUFS                                WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+#define INET_CONFIG_NUM_BUFS                                CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 #endif // INET_CONFIG_NUM_BUFS
 
 /**
@@ -554,11 +553,11 @@
  *    This is the total number of available timers.
  *
  *  @note
- *    By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_NUM_TIMERS.
+ *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_NUM_TIMERS.
  *
  */
 #ifndef INET_CONFIG_NUM_TIMERS
-#define INET_CONFIG_NUM_TIMERS                              WEAVE_SYSTEM_CONFIG_NUM_TIMERS
+#define INET_CONFIG_NUM_TIMERS                              CHIP_SYSTEM_CONFIG_NUM_TIMERS
 #endif // INET_CONFIG_NUM_TIMERS
 
 /**
@@ -570,11 +569,11 @@
  *  message text.
  *
  * @note
- *    By default, this parameter is a copy of WEAVE_SYSTEM_CONFIG_HEADER_RESERVE_SIZE.
+ *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE.
  *
  */
 #ifndef INET_CONFIG_HEADER_RESERVE_SIZE
-#define INET_CONFIG_HEADER_RESERVE_SIZE                     WEAVE_SYSTEM_CONFIG_HEADER_RESERVE_SIZE
+#define INET_CONFIG_HEADER_RESERVE_SIZE                     CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE
 #endif // INET_CONFIG_HEADER_RESERVE_SIZE
 
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES

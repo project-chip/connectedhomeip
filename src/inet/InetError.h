@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,9 +30,9 @@
 #ifndef INETERROR_H
 #define INETERROR_H
 
-#include <InetLayer/InetConfig.h>
+#include "InetConfig.h"
 
-#include <SystemLayer/SystemError.h>
+#include "system/SystemError.h"
 
 // clang-format off
 
@@ -369,14 +368,12 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
 
 // clang-format on
 
-namespace nl {
 namespace Inet {
 
 extern void RegisterInetLayerErrorFormatter(void);
 extern bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err);
 
 } // namespace Inet
-} // namespace nl
 
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
@@ -409,7 +406,7 @@ extern bool INET_IsOSError(INET_ERROR err);
  */
 static inline INET_ERROR INET_MapOSError(int e)
 {
-    return static_cast<INET_ERROR>(::nl::Weave::System::MapErrorPOSIX(e));
+    return static_cast<INET_ERROR>(::chip::System::MapErrorPOSIX(e));
 }
 
 /**
@@ -425,7 +422,7 @@ static inline INET_ERROR INET_MapOSError(int e)
  */
 static inline const char *INET_DescribeOSError(INET_ERROR err)
 {
-    return ::nl::Weave::System::DescribeErrorPOSIX(err);
+    return ::chip::System::DescribeErrorPOSIX(err);
 }
 
 /**
@@ -441,13 +438,13 @@ static inline const char *INET_DescribeOSError(INET_ERROR err)
  */
 static inline bool INET_IsOSError(INET_ERROR err)
 {
-    return ::nl::Weave::System::IsErrorPOSIX(err);
+    return ::chip::System::IsErrorPOSIX(err);
 }
 
 #endif // !defined(__cplusplus)
 #endif // !INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
 
 extern INET_ERROR INET_MapLwIPError(err_t e);
@@ -470,7 +467,7 @@ extern bool INET_IsLwIPError(INET_ERROR err);
  */
 static inline INET_ERROR INET_MapLwIPError(err_t e)
 {
-    return static_cast<INET_ERROR>(::nl::Weave::System::MapErrorLwIP(e));
+    return static_cast<INET_ERROR>(::chip::System::MapErrorLwIP(e));
 }
 
 /**
@@ -486,7 +483,7 @@ static inline INET_ERROR INET_MapLwIPError(err_t e)
  */
 static inline const char *INET_DescribeLwIPError(INET_ERROR err)
 {
-    return ::nl::Weave::System::DescribeErrorLwIP(err);
+    return ::chip::System::DescribeErrorLwIP(err);
 }
 
 /**
@@ -502,12 +499,12 @@ static inline const char *INET_DescribeLwIPError(INET_ERROR err)
  */
 static inline bool INET_IsLwIPError(INET_ERROR err)
 {
-    return ::nl::Weave::System::IsErrorLwIP(err);
+    return ::chip::System::IsErrorLwIP(err);
 }
 
 #endif // !defined(__cplusplus)
 #endif // !INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  *  @}
