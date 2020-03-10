@@ -12,7 +12,7 @@
 
 void TapInterface_Init_test1() {
   printf("---Running Test--- %s\n", __FUNCTION__);
-  //assert(TapInterface_Init(NULL, NULL, NULL) == ERR_ARG);
+  // assert(TapInterface_Init(NULL, NULL, NULL) == ERR_ARG);
 }
 
 int main() {
