@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,25 +20,21 @@
  *      Header file for the fault-injection utilities for Inet.
  */
 
-#ifndef WEAVE_FAULT_INJECTION_H_
-#define WEAVE_FAULT_INJECTION_H_
+#ifndef CHIP_FAULT_INJECTION_H_
+#define CHIP_FAULT_INJECTION_H_
 
-#include <Weave/Core/WeaveConfig.h>
-#include <Weave/Core/WeaveWRMPConfig.h>
-#include <Weave/Core/WeaveBDXConfig.h>
-#include <Weave/Core/WeaveEventLoggingConfig.h>
-#include <Weave/Core/WeaveTimeConfig.h>
-#include <Weave/Core/WeaveTunnelConfig.h>
-#include <Weave/Core/WeaveWRMPConfig.h>
+#include <core/CHIPConfig.h>
+#include <core/CHIPEventLoggingConfig.h>
+#include <core/CHIPTimeConfig.h>
+#include <core/CHIPTunnelConfig.h>
 
-#if WEAVE_CONFIG_TEST
+#if CHIP_CONFIG_TEST
 
 #include <nlfaultinjection.hpp>
 
-#include <Weave/Support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace FaultInjection {
 
 /**
@@ -53,24 +48,24 @@ typedef enum
 {
     kFault_AllocExchangeContext,                /**< Fail the allocation of an ExchangeContext */
     kFault_DropIncomingUDPMsg,                  /**< Drop an incoming UDP message without any processing */
-    kFault_DropOutgoingUDPMsg,                  /**< Drop an outgoing UDP message at the Weave Message layer */
+    kFault_DropOutgoingUDPMsg,                  /**< Drop an outgoing UDP message at the chip Message layer */
     kFault_AllocBinding,                        /**< Fail the allocation of a Binding */
     kFault_SendAlarm,                           /**< Fail to send an alarm message */
     kFault_HandleAlarm,                         /**< Fail to handle an alarm message */
-    kFault_FuzzExchangeHeaderTx,                /**< Fuzz a Weave Exchange Header after it has been encoded into the packet buffer;
+    kFault_FuzzExchangeHeaderTx,                /**< Fuzz a chip Exchange Header after it has been encoded into the packet buffer;
                                                      when the fault is enabled, it expects an integer argument, which is an index into
                                                      a table of modifications that can be applied to the header. @see FuzzExchangeHeader */
-#if WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     kFault_WRMDoubleTx,                         /**< Force WRMP to transmit the outgoing message twice */
     kFault_WRMSendError,                        /**< Fail a transmission in WRMP as if the max number of retransmission has been exceeded */
-#endif // WEAVE_CONFIG_ENABLE_RELIABLE_MESSAGING
+#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     kFault_BDXBadBlockCounter,                  /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,                    /**< Fail the allocation of a BDXTransfer object */
-#if WEAVE_CONFIG_ENABLE_SERVICE_DIRECTORY
-    kFault_ServiceManager_ConnectRequestNew,    /**< Fail the allocation of a WeaveServiceManager::ConnectRequest */
+#if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
+    kFault_ServiceManager_ConnectRequestNew,    /**< Fail the allocation of a chipServiceManager::ConnectRequest */
     kFault_ServiceManager_Lookup,               /**< Fail the lookup of an endpoint id */
     kFault_ServiceDirectoryReplaceError,        /**< Fail the replacement of a ServiceDirectory entry */
-#endif // WEAVE_CONFIG_ENABLE_SERVICE_DIRECTORY
+#endif // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     kFault_WDM_TraitInstanceNew,                /**< Fail the allocation of a WDM TraitInstanceInfo object */
     kFault_WDM_SubscriptionHandlerNew,          /**< Fail the allocation of a WDM SubscriptionHandler object */
     kFault_WDM_SubscriptionClientNew,           /**< Fail the allocation of a WDM SubscriptionClient object */
@@ -92,59 +87,58 @@ typedef enum
     kFault_WDM_UpdateResponseBusy,              /**< Inject a status code busy in the StatusList */
     kFault_WDM_PathStoreFull,                   /**< Inject a WDM_PATH_STORE_FULL error */
     kFault_WDM_TreatNotifyAsCancel,             /**< Process a Notify request as a CancelSubscription request */
-    kFault_CASEKeyConfirm,                      /**< Trigger a WEAVE_ERROR_KEY_CONFIRMATION_FAILED error in WeaveCASEEngine */
-    kFault_SecMgrBusy,                          /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
-#if WEAVE_CONFIG_ENABLE_TUNNELING
-    kFault_TunnelQueueFull,                     /**< Trigger a WEAVE_ERROR_TUNNEL_SERVICE_QUEUE_FULL when enqueueing a packet in the Tunnel queue */
+    kFault_CASEKeyConfirm,                      /**< Trigger a CHIP_ERROR_KEY_CONFIRMATION_FAILED error in chipCASEEngine */
+    kFault_SecMgrBusy,                          /**< Trigger a CHIP_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
+#if CHIP_CONFIG_ENABLE_TUNNELING
+    kFault_TunnelQueueFull,                     /**< Trigger a CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL when enqueueing a packet in the Tunnel queue */
     kFault_TunnelPacketDropByPolicy,            /**< Trigger an explicit drop of the packet as if done by an application policy */
-#endif // WEAVE_CONFIG_ENABLE_TUNNELING
+#endif // CHIP_CONFIG_ENABLE_TUNNELING
 #if CONFIG_NETWORK_LAYER_BLE
-    kFault_WOBLESend,                           /**< Inject a GATT error when sending the first fragment of a Weave message over BLE */
+    kFault_WOBLESend,                           /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif // CONFIG_NETWORK_LAYER_BLE
     kFault_NumItems,
 } Id;
 
-NL_DLL_EXPORT nl::FaultInjection::Manager &GetManager(void);
+DLL_EXPORT FaultInjection::Manager &GetManager(void);
 
 /**
- * The number of ways in which Weave Fault Injection fuzzers can
+ * The number of ways in which chip Fault Injection fuzzers can
  * alter a byte in a payload.
  */
-#define WEAVE_FAULT_INJECTION_NUM_FUZZ_VALUES 3
+#define CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES 3
 
-NL_DLL_EXPORT void FuzzExchangeHeader(uint8_t *p, int32_t arg);
+DLL_EXPORT void FuzzExchangeHeader(uint8_t *p, int32_t arg);
 
 } // namespace FaultInjection
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 /**
- * Execute the statements included if the Weave fault is
+ * Execute the statements included if the chip fault is
  * to be injected.
  *
- * @param[in] aFaultID      A Weave fault-injection id
+ * @param[in] aFaultID      A chip fault-injection id
  * @param[in] aStatements   Statements to be executed if the fault is enabled.
  */
-#define WEAVE_FAULT_INJECT( aFaultID, aStatements ) \
-        nlFAULT_INJECT(nl::Weave::FaultInjection::GetManager(), aFaultID, aStatements)
+#define CHIP_FAULT_INJECT( aFaultID, aStatements ) \
+        nlFAULT_INJECT(chip::FaultInjection::GetManager(), aFaultID, aStatements)
 
 /**
- * Execute the statements included if the Weave fault is
+ * Execute the statements included if the chip fault is
  * to be injected. Also, if there are no arguments stored in the
  * fault, save aMaxArg into the record so it can be printed out
  * to the debug log by a callback installed on purpose.
  *
- * @param[in] aFaultID      A Weave fault-injection id
+ * @param[in] aFaultID      A chip fault-injection id
  * @param[in] aMaxArg       The max value accepted as argument by the statements to be injected
  * @param[in] aProtectedStatements   Statements to be executed if the fault is enabled while holding the
  *                          Manager's lock
  * @param[in] aUnprotectedStatements   Statements to be executed if the fault is enabled without holding the
  *                          Manager's lock
  */
-#define WEAVE_FAULT_INJECT_MAX_ARG( aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements ) \
+#define CHIP_FAULT_INJECT_MAX_ARG( aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements ) \
     do { \
-        nl::FaultInjection::Manager &mgr = nl::Weave::FaultInjection::GetManager(); \
-        const nl::FaultInjection::Record *records = mgr.GetFaultRecords(); \
+        FaultInjection::Manager &mgr = chip::FaultInjection::GetManager(); \
+        const FaultInjection::Record *records = mgr.GetFaultRecords(); \
         if (records[aFaultID].mNumArguments == 0) \
         { \
             int32_t arg = aMaxArg; \
@@ -154,29 +148,29 @@ NL_DLL_EXPORT void FuzzExchangeHeader(uint8_t *p, int32_t arg);
     } while (0)
 
 /**
- * Execute the statements included if the Weave fault is
+ * Execute the statements included if the chip fault is
  * to be injected.
  *
- * @param[in] aFaultID      A Weave fault-injection id
+ * @param[in] aFaultID      A chip fault-injection id
  * @param[in] aProtectedStatements   Statements to be executed if the fault is enabled while holding the
  *                          Manager's lock
  * @param[in] aUnprotectedStatements   Statements to be executed if the fault is enabled without holding the
  *                          Manager's lock
  */
-#define WEAVE_FAULT_INJECT_WITH_ARGS( aFaultID, aProtectedStatements, aUnprotectedStatements ) \
-        nlFAULT_INJECT_WITH_ARGS(nl::Weave::FaultInjection::GetManager(), aFaultID,  \
+#define CHIP_FAULT_INJECT_WITH_ARGS( aFaultID, aProtectedStatements, aUnprotectedStatements ) \
+        nlFAULT_INJECT_WITH_ARGS(chip::FaultInjection::GetManager(), aFaultID,  \
                                  aProtectedStatements, aUnprotectedStatements );
 
-#define WEAVE_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS 4
-#define WEAVE_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP 5
+#define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS 4
+#define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP 5
 
-#else // WEAVE_CONFIG_TEST
+#else // CHIP_CONFIG_TEST
 
-#define WEAVE_FAULT_INJECT( aFaultID, aStatements )
-#define WEAVE_FAULT_INJECT_WITH_ARGS( aFaultID, aProtectedStatements, aUnprotectedStatements )
-#define WEAVE_FAULT_INJECT_MAX_ARG( aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements )
+#define CHIP_FAULT_INJECT( aFaultID, aStatements )
+#define CHIP_FAULT_INJECT_WITH_ARGS( aFaultID, aProtectedStatements, aUnprotectedStatements )
+#define CHIP_FAULT_INJECT_MAX_ARG( aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements )
 
-#endif // WEAVE_CONFIG_TEST
+#endif // CHIP_CONFIG_TEST
 
 
-#endif // WEAVE_FAULT_INJECTION_H_
+#endif // CHIP_FAULT_INJECTION_H_
