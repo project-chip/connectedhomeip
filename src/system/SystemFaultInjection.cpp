@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,30 +17,29 @@
 
 /**
  *    @file
- *      Implementation of the fault-injection utilities for Weave System Layer.
+ *      Implementation of the fault-injection utilities for CHIP System Layer.
  */
 
 #include <string.h>
 #include <nlassert.h>
-#include <SystemLayer/SystemFaultInjection.h>
+#include <SystemFaultInjection.h>
 
-#if WEAVE_SYSTEM_CONFIG_TEST
+#if CHIP_SYSTEM_CONFIG_TEST
 
 #include "SystemLayerPrivate.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 namespace FaultInjection {
 
-using ::nl::FaultInjection::Record;
-using ::nl::FaultInjection::Manager;
-using ::nl::FaultInjection::Name;
+using ::FaultInjection::Record;
+using ::FaultInjection::Manager;
+using ::FaultInjection::Name;
 
 static Record sFaultRecordArray[kFault_NumberOfFaultIdentifiers];
 static Manager sManager;
 static int32_t sFault_AsyncEvent_Arguments[1];
-static const Name sManagerName = "WeaveSys";
+static const Name sManagerName = "CHIPSys";
 static const Name sFaultNames[] = {
     "PacketBufferNew",
     "TimeoutImmediate",
@@ -72,7 +70,7 @@ Manager& GetManager(void)
 void InjectAsyncEvent(void)
 {
     int32_t numEventsAvailable = 0;
-    nl::Weave::System::FaultInjection::Id faultID = kFault_AsyncEvent;
+    chip::System::FaultInjection::Id faultID = kFault_AsyncEvent;
 
     if (sGetNumEventsAvailable)
     {
@@ -80,8 +78,8 @@ void InjectAsyncEvent(void)
 
         if (numEventsAvailable)
         {
-            nl::FaultInjection::Manager &mgr = nl::Weave::System::FaultInjection::GetManager();
-            const nl::FaultInjection::Record *record = &(mgr.GetFaultRecords()[faultID]);
+            FaultInjection::Manager &mgr = chip::System::FaultInjection::GetManager();
+            const FaultInjection::Record *record = &(mgr.GetFaultRecords()[faultID]);
 
             if (record->mNumArguments == 0)
             {
@@ -117,7 +115,6 @@ void SetAsyncEventCallbacks(int32_t (*aGetNumEventsAvailable)(void), void (*aInj
 
 } // namespace FaultInjection
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_SYSTEM_CONFIG_TEST
+#endif // CHIP_SYSTEM_CONFIG_TEST

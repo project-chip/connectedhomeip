@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,26 +17,25 @@
 
 /**
  *    @file
- *      Header file for the fault-injection utilities for Weave System Layer.
+ *      Header file for the fault-injection utilities for CHIP System Layer.
  */
 
 #ifndef SYSTEMFAULTINJECTION_H
 #define SYSTEMFAULTINJECTION_H
 
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
-#if WEAVE_SYSTEM_CONFIG_TEST
+#if CHIP_SYSTEM_CONFIG_TEST
 
 #include <nlfaultinjection.hpp>
 
-#include <Weave/Support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 namespace FaultInjection {
 
-using ::nl::FaultInjection::Manager;
+using ::FaultInjection::Manager;
 
 /**
  * @brief   Fault injection points
@@ -52,11 +50,11 @@ typedef enum
     kFault_TimeoutImmediate,            /**< Override the timeout value of a timer being started with 0 */
     kFault_AsyncEvent,                  /**< Inject asynchronous events; when the fault is enabled, it expects
                                              one integer argument, which is passed to application to signal the event
-                                             to be injected; @see WEAVE_SYSTEM_FAULT_INJECT_ASYNC_EVENT */
+                                             to be injected; @see CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT */
     kFault_NumberOfFaultIdentifiers,
 } Id;
 
-NL_DLL_EXPORT Manager& GetManager(void);
+DLL_EXPORT Manager& GetManager(void);
 
 /**
  * Callback to the application that returns how many asynchronous events the application could
@@ -76,24 +74,23 @@ typedef void (*InjectAsyncEventCb)(int32_t aEventIndex);
 
 /**
  * Store the GetNumEventsAvailableCb and InjectAsyncEventCb callbacks used by
- * @see WEAVE_SYSTEM_FAULT_INJECT_ASYNC_EVENT
+ * @see CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT
  *
  * @param[in] aGetNumEventsAvailable    A GetNumEventsAvailableCb
  * @param[in] aInjectAsyncEvent         An InjectAsyncEventCb
  *
  */
-NL_DLL_EXPORT void SetAsyncEventCallbacks(GetNumEventsAvailableCb aGetNumEventsAvailable, InjectAsyncEventCb aInjectAsyncEvent);
+DLL_EXPORT void SetAsyncEventCallbacks(GetNumEventsAvailableCb aGetNumEventsAvailable, InjectAsyncEventCb aInjectAsyncEvent);
 
 /**
- * @see WEAVE_SYSTEM_FAULT_INJECT_ASYNC_EVENT
+ * @see CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT
  */
-NL_DLL_EXPORT void InjectAsyncEvent(void);
+DLL_EXPORT void InjectAsyncEvent(void);
 
 
 } // namespace FaultInjection
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 /**
  * Execute the statements included if the System fault is
@@ -102,8 +99,8 @@ NL_DLL_EXPORT void InjectAsyncEvent(void);
  * @param[in] aFaultID      A System fault-injection id
  * @param[in] aStatements   Statements to be executed if the fault is enabled.
  */
-#define WEAVE_SYSTEM_FAULT_INJECT(aFaultId, aStatement) \
-        nlFAULT_INJECT(::nl::Weave::System::FaultInjection::GetManager(), aFaultId, aStatement)
+#define CHIP_SYSTEM_FAULT_INJECT(aFaultId, aStatement) \
+        nlFAULT_INJECT(::chip::System::FaultInjection::GetManager(), aFaultId, aStatement)
 
 /**
  * This macro implements the injection of asynchronous events.
@@ -117,18 +114,18 @@ NL_DLL_EXPORT void InjectAsyncEvent(void);
  * the macro stores the return value of GetNumEventsAvailableCb into the Records arguments,
  * so that the application can log it from a callback installed into the fault.
  */
-#define WEAVE_SYSTEM_FAULT_INJECT_ASYNC_EVENT() \
+#define CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT() \
     do { \
-        nl::Weave::System::FaultInjection::InjectAsyncEvent(); \
+        chip::System::FaultInjection::InjectAsyncEvent(); \
     } while (0)
 
 
-#else // WEAVE_SYSTEM_CONFIG_TEST
+#else // CHIP_SYSTEM_CONFIG_TEST
 
-#define WEAVE_SYSTEM_FAULT_INJECT(aFaultId, aStatement)
+#define CHIP_SYSTEM_FAULT_INJECT(aFaultId, aStatement)
 
-#define WEAVE_SYSTEM_FAULT_INJECT_ASYNC_EVENT()
+#define CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT()
 
-#endif // WEAVE_SYSTEM_CONFIG_TEST
+#endif // CHIP_SYSTEM_CONFIG_TEST
 
 #endif // SYSTEMFAULTINJECTION_H

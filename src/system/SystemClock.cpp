@@ -39,7 +39,7 @@
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
 #include <SystemClock.h>
-// #include <support/CodeUtils.h>
+#include <support/CodeUtils.h>
 #include <SystemError.h>
 #include "SystemLayerPrivate.h"
 
@@ -84,14 +84,12 @@ uint64_t GetClock_Monotonic(void)
 #if HAVE_CLOCK_GETTIME
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
-    // TODO: use assert library when available
-    if (res) { abort(); }
+    VerifyOrDie(res == 0);
     return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
 #else // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
-    // TODO: use assert library when available
-    if (res) { abort(); }
+    VerifyOrDie(res == 0);
     return (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
 #endif // HAVE_CLOCK_GETTIME
 }
@@ -106,8 +104,7 @@ uint64_t GetClock_MonotonicHiRes(void)
 #if HAVE_CLOCK_GETTIME && defined(MONOTONIC_RAW_CLOCK_ID)
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_RAW_CLOCK_ID, &ts);
-    // TODO: use assert library when available
-    if (res) { abort(); }
+    VerifyOrDie(res == 0);
     return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
 #else // HAVE_CLOCK_GETTIME
     return GetClock_Monotonic();

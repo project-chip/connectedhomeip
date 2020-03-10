@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines the nl::Weave::System::Timer class and its
+ *      This file defines the chip::System::Timer class and its
  *      related types used for representing an in-progress one-shot
  *      timer.
  */
@@ -27,30 +26,29 @@
 #define SYSTEMTIMER_H
 
 // Include configuration headers
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
 // Include dependent headers
-#include <Weave/Support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
-#include <SystemLayer/SystemClock.h>
-#include <SystemLayer/SystemError.h>
-#include <SystemLayer/SystemObject.h>
-#include <SystemLayer/SystemStats.h>
+#include <SystemClock.h>
+#include <SystemError.h>
+#include <SystemObject.h>
+#include <SystemStats.h>
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-namespace nl {
+namespace chip {
 namespace Inet {
 
 class InetLayer;
 
 } // namespace Inet
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 class Layer;
@@ -59,12 +57,12 @@ class Layer;
  * @class Timer
  *
  * @brief
- *  This is an internal class to Weave System Layer, used to represent an in-progress one-shot timer. There is no real public
+ *  This is an internal class to CHIP System Layer, used to represent an in-progress one-shot timer. There is no real public
  *  interface available for the application layer. The static public methods used to acquire current system time are intended for
  *  internal use.
  *
  */
-class NL_DLL_EXPORT Timer : public Object
+class DLL_EXPORT Timer : public Object
 {
     friend class Layer;
 
@@ -85,35 +83,35 @@ public:
     Error Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void* aAppState);
     Error Cancel(void);
 
-    static void GetStatistics(nl::Weave::System::Stats::count_t& aNumInUse, nl::Weave::System::Stats::count_t& aHighWatermark);
+    static void GetStatistics(chip::System::Stats::count_t& aNumInUse, chip::System::Stats::count_t& aHighWatermark);
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
     void AttachInetLayer(Inet::InetLayer& aInetLayer, void* aOnCompleteInetLayer, void* aAppStateInetLayer);
     Inet::InetLayer* InetLayer(void) const;
     void* OnCompleteInetLayer(void) const;
     void* AppStateInetLayer(void) const;
-#endif // WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 private:
-    static ObjectPool<Timer, WEAVE_SYSTEM_CONFIG_NUM_TIMERS> sPool;
+    static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
 
     Epoch mAwakenEpoch;
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
     Inet::InetLayer* mInetLayer;
     void* mOnCompleteInetLayer;
     void* mAppStateInetLayer;
-#endif // WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
     void HandleComplete(void);
 
     Error ScheduleWork(OnCompleteFunct aOnComplete, void* aAppState);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     Timer *mNextTimer;
 
     static Error HandleExpiredTimers(Layer& aLayer);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Not defined
     Timer(const Timer&);
@@ -121,13 +119,13 @@ private:
 };
 
 
-inline void Timer::GetStatistics(nl::Weave::System::Stats::count_t& aNumInUse,
-                                 nl::Weave::System::Stats::count_t& aHighWatermark)
+inline void Timer::GetStatistics(chip::System::Stats::count_t& aNumInUse,
+                                 chip::System::Stats::count_t& aHighWatermark)
 {
     sPool.GetStatistics(aNumInUse, aHighWatermark);
 }
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 inline void Timer::AttachInetLayer(Inet::InetLayer& aInetLayer, void* aOnCompleteInetLayer, void* aAppStateInetLayer)
 {
     this->mInetLayer = &aInetLayer;
@@ -149,10 +147,9 @@ inline void* Timer::AppStateInetLayer(void) const
 {
     return this->mAppStateInetLayer;
 }
-#endif // WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // defined(SYSTEMTIMER_H)

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,33 +20,32 @@
  *      This file contains declarations of the following classes and
  *      templates:
  *
- *        - class nl::Weave::System::Object
- *        - template<typename ALIGN, size_t SIZE> union nl::Weave::System::ObjectArena
- *        - template<class T, unsigned int N> class nl::Weave::System::ObjectPool
+ *        - class chip::System::Object
+ *        - template<typename ALIGN, size_t SIZE> union chip::System::ObjectArena
+ *        - template<class T, unsigned int N> class chip::System::ObjectPool
  */
 
 #ifndef SYSTEMOBJECT_H
 #define SYSTEMOBJECT_H
 
 // Include configuration headers
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
 // Include dependent headers
 #include <stddef.h>
 #include <stdint.h>
 #include <unistd.h>
 
-#include <Weave/Support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
-#include <SystemLayer/SystemError.h>
-#include <SystemLayer/SystemStats.h>
+#include <SystemError.h>
+#include <SystemStats.h>
 
 #ifndef SYSTEM_OBJECT_HWM_TEST_HOOK
 #define SYSTEM_OBJECT_HWM_TEST_HOOK()
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 // Forward class and class template declarations
@@ -70,7 +68,7 @@ template<class T, unsigned int N> class ObjectPool;
  *
  *      While this class is defined as concrete, in conformance with Nest C++ style, it should be regarded as abstract.
  */
-class NL_DLL_EXPORT Object
+class DLL_EXPORT Object
 {
     template<class T, unsigned int N> friend class ObjectPool;
 
@@ -83,7 +81,7 @@ public:
     Layer& SystemLayer(void) const;
 
 protected:
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     /**< What to do when DeferredRelease fails to post a kEvent_ReleaseObj. */
     enum ReleaseDeferralErrorTactic
     {
@@ -93,7 +91,7 @@ protected:
     };
 
     void DeferredRelease(ReleaseDeferralErrorTactic aTactic);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
     Object(void);
@@ -127,7 +125,7 @@ inline bool Object::IsRetained(const Layer& aLayer) const
 
 /**
  *  @brief
- *      Increments the reference count for the Weave System Layer object. The object is assumed to be live.
+ *      Increments the reference count for the CHIP System Layer object. The object is assumed to be live.
  */
 inline void Object::Retain(void)
 {
@@ -136,7 +134,7 @@ inline void Object::Retain(void)
 
 /**
  *  @brief
- *      Returns a reference to the Weave System Layer object provided when the object was initially retained from its corresponding
+ *      Returns a reference to the CHIP System Layer object provided when the object was initially retained from its corresponding
  *      object pool instance. The object is assumed to be live.
  */
 inline Layer& Object::SystemLayer(void) const
@@ -182,14 +180,14 @@ public:
 
     T* Get(const Layer& aLayer, size_t aIndex);
     T* TryCreate(Layer& aLayer);
-    void GetStatistics(nl::Weave::System::Stats::count_t& aNumInUse, nl::Weave::System::Stats::count_t& aHighWatermark);
+    void GetStatistics(chip::System::Stats::count_t& aNumInUse, chip::System::Stats::count_t& aHighWatermark);
 
 private:
     friend class TestObject;
 
     ObjectArena<void*, N * sizeof(T)> mArena;
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int& aNumInUse);
     void UpdateHighWatermark(const unsigned int& aCandidate);
     volatile unsigned int mHighWatermark;
@@ -232,7 +230,7 @@ inline T* ObjectPool<T, N>::TryCreate(Layer& aLayer)
 {
     T* lReturn = NULL;
     unsigned int lIndex;
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     unsigned int lNumInUse = 0;
 #endif
 
@@ -248,7 +246,7 @@ inline T* ObjectPool<T, N>::TryCreate(Layer& aLayer)
         }
     }
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     if (lReturn != NULL)
     {
         lIndex++;
@@ -266,7 +264,7 @@ inline T* ObjectPool<T, N>::TryCreate(Layer& aLayer)
     return lReturn;
 }
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 template<class T, unsigned int N>
 inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int& aCandidate)
 {
@@ -309,35 +307,34 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
 
     aNumInUse += count;
 }
-#endif // WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 
 
 template<class T, unsigned int N>
-inline void ObjectPool<T, N>::GetStatistics(nl::Weave::System::Stats::count_t& aNumInUse,
-                                            nl::Weave::System::Stats::count_t& aHighWatermark)
+inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t& aNumInUse,
+                                            chip::System::Stats::count_t& aHighWatermark)
 {
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     unsigned int lNumInUse;
     unsigned int lHighWatermark;
 
     GetNumObjectsInUse(0, lNumInUse);
     lHighWatermark = mHighWatermark;
 
-    if (lNumInUse > WEAVE_SYS_STATS_COUNT_MAX)
+    if (lNumInUse > CHIP_SYS_STATS_COUNT_MAX)
     {
-        lNumInUse = WEAVE_SYS_STATS_COUNT_MAX;
+        lNumInUse = CHIP_SYS_STATS_COUNT_MAX;
     }
-    if (lHighWatermark > WEAVE_SYS_STATS_COUNT_MAX)
+    if (lHighWatermark > CHIP_SYS_STATS_COUNT_MAX)
     {
-        lHighWatermark = WEAVE_SYS_STATS_COUNT_MAX;
+        lHighWatermark = CHIP_SYS_STATS_COUNT_MAX;
     }
-    aNumInUse = static_cast<nl::Weave::System::Stats::count_t>(lNumInUse);
-    aHighWatermark = static_cast<nl::Weave::System::Stats::count_t>(lHighWatermark);
+    aNumInUse = static_cast<chip::System::Stats::count_t>(lNumInUse);
+    aHighWatermark = static_cast<chip::System::Stats::count_t>(lHighWatermark);
 #endif
 }
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // defined(SYSTEMOBJECT_H)

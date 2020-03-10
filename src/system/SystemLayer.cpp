@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,56 +17,55 @@
 
 /**
  *    @file
- *      This file contains definitions of the nl::Weave::System::Layer
+ *      This file contains definitions of the chip::System::Layer
  *      class methods and related data and functions.
  */
 
 // Include module header
-#include <SystemLayer/SystemLayer.h>
+#include <SystemLayer.h>
 
 // Include common private header
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <SystemLayer/SystemClock.h>
-#include <SystemLayer/SystemTimer.h>
+#include <SystemClock.h>
+#include <SystemTimer.h>
 
-// Include additional Weave headers
-#include <Weave/Support/logging/WeaveLogging.h>
+// Include additional CHIP headers
+#include <support/logging/CHIPLogging.h>
 
-#include <Weave/Support/NLDLLUtil.h>
-#include <Weave/Support/CodeUtils.h>
+#include <support/DLLUtil.h>
+#include <support/CodeUtils.h>
 
 // Include system and language headers
 #include <stddef.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
 #include <lwip/err.h>
 #include <lwip/sys.h>
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL
 #define PTHREAD_NULL 0
 #endif // PTHREAD_NULL
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 bool LwIPEventHandlerDelegate::IsInitialized() const
 {
     return this->mFunction != NULL;
@@ -84,61 +82,61 @@ void LwIPEventHandlerDelegate::Prepend(const LwIPEventHandlerDelegate*& aDelegat
     this->mNextDelegate = aDelegateList;
     aDelegateList = this;
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 Layer::Layer()
   : mLayerState(kLayerState_NotInitialized),
     mContext(NULL), mPlatformData(NULL)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sSystemEventHandlerDelegate.IsInitialized())
         sSystemEventHandlerDelegate.Init(HandleSystemLayerEvent);
 
     this->mEventDelegateList = NULL;
     this->mTimerList = NULL;
     this->mTimerComplete = false;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     this->mWakePipeIn = 0;
     this->mWakePipeOut = 0;
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mHandleSelectThread = PTHREAD_NULL;
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
 Error Layer::Init(void* aContext)
 {
     Error lReturn;
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     int lPipeFDs[2];
     int lOSReturn, lFlags;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     RegisterSystemLayerErrorFormatter();
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     RegisterPOSIXErrorFormatter();
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     RegisterLwIPErrorFormatter();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (this->mLayerState != kLayerState_NotInitialized)
-        return WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE;
+        return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
 
     lReturn = Platform::Layer::WillInit(*this, aContext);
     SuccessOrExit(lReturn);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     this->AddEventHandlerDelegate(sSystemEventHandlerDelegate);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Create a Unix pipe to allow an arbitrary thread to wake the thread in the select loop.
     lOSReturn = ::pipe(lPipeFDs);
-    VerifyOrExit(lOSReturn == 0, lReturn = nl::Weave::System::MapErrorPOSIX(errno));
+    VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
 
     this->mWakePipeIn = lPipeFDs[0];
     this->mWakePipeOut = lPipeFDs[1];
@@ -146,12 +144,12 @@ Error Layer::Init(void* aContext)
     // Enable non-blocking mode for both ends of the pipe.
     lFlags = ::fcntl(this->mWakePipeIn, F_GETFL, 0);
     lOSReturn = ::fcntl(this->mWakePipeIn, F_SETFL, lFlags | O_NONBLOCK);
-    VerifyOrExit(lOSReturn == 0, lReturn = nl::Weave::System::MapErrorPOSIX(errno));
+    VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
 
     lFlags = ::fcntl(this->mWakePipeOut, F_GETFL, 0);
     lOSReturn = ::fcntl(this->mWakePipeOut, F_SETFL, lFlags | O_NONBLOCK);
-    VerifyOrExit(lOSReturn == 0, lReturn = nl::Weave::System::MapErrorPOSIX(errno));
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+    VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     this->mLayerState = kLayerState_Initialized;
     this->mContext = aContext;
@@ -167,13 +165,13 @@ Error Layer::Shutdown()
     void* lContext;
 
     if (this->mLayerState == kLayerState_NotInitialized)
-        return WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE;
+        return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
 
     lContext = this->mContext;
     lReturn = Platform::Layer::WillShutdown(*this, lContext);
     SuccessOrExit(lReturn);
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if (this->mWakePipeOut != -1)
     {
         ::close(this->mWakePipeOut);
@@ -227,18 +225,18 @@ Error Layer::NewTimer(Timer*& aTimerPtr)
     Timer* lTimer = NULL;
 
     if (this->State() != kLayerState_Initialized)
-        return WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE;
+        return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
 
     lTimer = Timer::sPool.TryCreate(*this);
     aTimerPtr = lTimer;
 
     if (lTimer == NULL)
     {
-        WeaveLogError(WeaveSystemLayer, "Timer pool EMPTY");
-        return WEAVE_SYSTEM_ERROR_NO_MEMORY;
+        chipLogError(chipSystemLayer, "Timer pool EMPTY");
+        return CHIP_SYSTEM_ERROR_NO_MEMORY;
     }
 
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 /**
@@ -254,8 +252,8 @@ Error Layer::NewTimer(Timer*& aTimerPtr)
 *   @param[in]  aComplete     A pointer to the function called when timer expires.
 *   @param[in]  aAppState     A pointer to the application state object used when timer expires.
 *
-*   @return WEAVE_SYSTEM_NO_ERROR On success.
-*   @return WEAVE_SYSTEM_ERROR_NO_MEMORY If a timer cannot be allocated.
+*   @return CHIP_SYSTEM_NO_ERROR On success.
+*   @return CHIP_SYSTEM_ERROR_NO_MEMORY If a timer cannot be allocated.
 *   @return Other Value indicating timer failed to start.
 *
 */
@@ -269,7 +267,7 @@ Error Layer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, vo
     SuccessOrExit(lReturn);
 
     lReturn = lTimer->Start(aMilliseconds, aComplete, aAppState);
-    if (lReturn != WEAVE_SYSTEM_NO_ERROR)
+    if (lReturn != CHIP_SYSTEM_NO_ERROR)
     {
         lTimer->Release();
     }
@@ -308,8 +306,8 @@ void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void* aAppState)
     }
 }
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-void Layer::CancelAllMatchingInetTimers(nl::Inet::InetLayer& aInetLayer, void* aOnCompleteInetLayer, void* aAppState)
+#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+void Layer::CancelAllMatchingInetTimers(Inet::InetLayer& aInetLayer, void* aOnCompleteInetLayer, void* aAppState)
 {
     for (size_t i = 0; i < Timer::sPool.Size(); ++i)
     {
@@ -323,12 +321,12 @@ void Layer::CancelAllMatchingInetTimers(nl::Inet::InetLayer& aInetLayer, void* a
         }
     }
 }
-#endif // WEAVE_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 /**
  * @brief
  *   Schedules a function with a signature identical to
- *   `TimerCompleteFunct` to be run as soon as possible on the Weave
+ *   `TimerCompleteFunct` to be run as soon as possible on the CHIP
  *   thread.
  *
  * @note
@@ -341,7 +339,7 @@ void Layer::CancelAllMatchingInetTimers(nl::Inet::InetLayer& aInetLayer, void* a
  *   any thread.  Additionally, whereas the `SystemTimer` API permits
  *   the invocation of the already expired handler in line,
  *   `ScheduleWork` guarantees that the handler function will be
- *   called only after the current Weave event completes.
+ *   called only after the current CHIP event completes.
  *
  * @param[in] aComplete A pointer to a callback function to be called
  *                      when this timer fires.
@@ -349,13 +347,13 @@ void Layer::CancelAllMatchingInetTimers(nl::Inet::InetLayer& aInetLayer, void* a
  * @param[in] aAppState A pointer to an application state object to be
  *                      passed to the callback function as argument.
  *
- * @retval WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE If the SystemLayer has
+ * @retval CHIP_SYSTEM_ERROR_UNEXPECTED_STATE If the SystemLayer has
  *                      not been initialized.
  *
- * @retval WEAVE_SYSTEM_ERROR_NO_MEMORY If the SystemLayer cannot
+ * @retval CHIP_SYSTEM_ERROR_NO_MEMORY If the SystemLayer cannot
  *                      allocate a new timer.
  *
- * @retval WEAVE_SYSTEM_NO_ERROR On success.
+ * @retval CHIP_SYSTEM_NO_ERROR On success.
  */
 Error Layer::ScheduleWork(TimerCompleteFunct aComplete, void* aAppState)
 {
@@ -366,7 +364,7 @@ Error Layer::ScheduleWork(TimerCompleteFunct aComplete, void* aAppState)
     SuccessOrExit(lReturn);
 
     lReturn = lTimer->ScheduleWork(aComplete, aAppState);
-    if (lReturn != WEAVE_SYSTEM_NO_ERROR)
+    if (lReturn != CHIP_SYSTEM_NO_ERROR)
     {
         lTimer->Release();
     }
@@ -459,21 +457,21 @@ uint64_t Layer::GetClock_MonotonicHiRes(void)
  * whole seconds (values of 1,000,000), but on some platforms may tick faster.
  *
  * If the underlying platform is capable of tracking real time, but the system is currently
- * unsynchronized, GetClock_RealTime() will return the error WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED.
+ * unsynchronized, GetClock_RealTime() will return the error CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED.
  *
  * On platforms that are incapable of tracking real time, the GetClock_RealTime() method may be absent,
  * resulting a link error for any application that references it.  Alternatively, such platforms may
- * supply an implementation of GetClock_RealTime() that always returns the error WEAVE_SYSTEM_ERROR_NOT_SUPPORTED.
+ * supply an implementation of GetClock_RealTime() that always returns the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
  *
  * This function is guaranteed to be thread-safe on any platform that employs threading.
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to microseconds.
  *
- * @retval #WEAVE_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
+ * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
  *                                      If the platform is capable of tracking real time, but is
  *                                      is currently unsynchronized.
- * @retval #WEAVE_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
  *                                      If the platform is incapable of tracking real time.
  */
 Error Layer::GetClock_RealTime(uint64_t & curTime)
@@ -491,21 +489,21 @@ Error Layer::GetClock_RealTime(uint64_t & curTime)
  * whole seconds (values of 1,000,000), but on some platforms may tick faster.
  *
  * If the underlying platform is capable of tracking real time, but the system is currently
- * unsynchronized, GetClock_RealTimeMS() will return the error WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED.
+ * unsynchronized, GetClock_RealTimeMS() will return the error CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED.
  *
  * On platforms that are incapable of tracking real time, the GetClock_RealTimeMS() method may be absent,
  * resulting a link error for any application that references it.  Alternatively, such platforms may
- * supply an implementation of GetClock_RealTimeMS() that always returns the error WEAVE_SYSTEM_ERROR_NOT_SUPPORTED.
+ * supply an implementation of GetClock_RealTimeMS() that always returns the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
  *
  * This function is guaranteed to be thread-safe on any platform that employs threading.
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to milliseconds.
  *
- * @retval #WEAVE_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #WEAVE_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
+ * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
  *                                      If the platform is capable of tracking real time, but is
  *                                      is currently unsynchronized.
- * @retval #WEAVE_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
  *                                      If the platform is incapable of tracking real time.
  */
 Error Layer::GetClock_RealTimeMS(uint64_t & curTimeMS)
@@ -526,21 +524,21 @@ Error Layer::GetClock_RealTimeMS(uint64_t & curTimeMS)
  *
  * Some platforms may restrict which applications or processes can set real time.  If the caller is
  * not permitted to change real time, the SetClock_RealTime() function will return the error
- * WEAVE_SYSTEM_ERROR_ACCESS_DENIED.
+ * CHIP_SYSTEM_ERROR_ACCESS_DENIED.
  *
  * On platforms that are incapable of tracking real time, or do not offer the ability to set real time,
  * the SetClock_RealTime() function may be absent, resulting a link error for any application that
  * references it.  Alternatively, such platforms may supply an implementation of SetClock_RealTime()
- * that always returns the error WEAVE_SYSTEM_ERROR_NOT_SUPPORTED.
+ * that always returns the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
  *
  * This function is guaranteed to be thread-safe on any platform that employs threading.
  *
  * @param[in] newCurTime                The new current time, expressed as Unix time scaled to microseconds.
  *
- * @retval #WEAVE_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #WEAVE_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
  *                                      If the platform is incapable of tracking real time.
- * @retval #WEAVE_SYSTEM_ERROR_ACCESS_DENIED
+ * @retval #CHIP_SYSTEM_ERROR_ACCESS_DENIED
  *                                      If the calling application does not have the privilege to set the
  *                                      current time.
  */
@@ -550,7 +548,7 @@ Error Layer::SetClock_RealTime(uint64_t newCurTime)
     return Platform::Layer::SetClock_RealTime(newCurTime);
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  *  Prepare the sets of file descriptors for @p select() to work with.
@@ -623,9 +621,9 @@ void Layer::HandleSelectResult(int aSetSize, fd_set* aReadSet, fd_set* aWriteSet
     if (aSetSize < 0)
         return;
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     lThreadSelf = pthread_self();
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     if (aSetSize > 0)
     {
@@ -644,9 +642,9 @@ void Layer::HandleSelectResult(int aSetSize, fd_set* aReadSet, fd_set* aWriteSet
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mHandleSelectThread = lThreadSelf;
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     for (size_t i = 0; i < Timer::sPool.Size(); i++)
     {
@@ -658,9 +656,9 @@ void Layer::HandleSelectResult(int aSetSize, fd_set* aReadSet, fd_set* aWriteSet
         }
     }
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mHandleSelectThread = PTHREAD_NULL;
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 }
 
 /**
@@ -678,12 +676,12 @@ void Layer::WakeSelect()
     if (this->State() != kLayerState_Initialized)
         return;
 
-#if WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     if (pthread_equal(this->mHandleSelectThread, pthread_self()))
     {
         return;
     }
-#endif // WEAVE_SYSTEM_CONFIG_POSIX_LOCKING
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Write a single byte to the wake pipe to wake up the select call.
     const uint8_t kByte = 0;
@@ -691,21 +689,21 @@ void Layer::WakeSelect()
     static_cast<void>(kIOResult);
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 LwIPEventHandlerDelegate Layer::sSystemEventHandlerDelegate;
 
 /**
  * This is the dispatch handler for system layer events.
  *
- *  @param[inout]   aTarget     A pointer to the Weave System Layer object making the post request.
+ *  @param[inout]   aTarget     A pointer to the CHIP System Layer object making the post request.
  *  @param[in]      aEventType  The type of event to post.
  *  @param[inout]   aArgument   The argument associated with the event to post.
  */
 Error Layer::HandleSystemLayerEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument)
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
 ;
 
     // Dispatch logic specific to the event type
@@ -720,7 +718,7 @@ Error Layer::HandleSystemLayerEvent(Object& aTarget, EventType aEventType, uintp
         break;
 
     default:
-        lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT;
+        lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT;
         break;
     }
 
@@ -732,16 +730,16 @@ Error Layer::HandleSystemLayerEvent(Object& aTarget, EventType aEventType, uintp
  *
  *  @param[in]  aDelegate   An uninitialied LwIP event handler delegate structure
  *
- *  @retval     WEAVE_SYSTEM_NO_ERROR          On success.
- *  @retval     WEAVE_SYSTEM_ERROR_BAD_ARGS    If the function pointer contained in aDelegate is NULL
+ *  @retval     CHIP_SYSTEM_NO_ERROR          On success.
+ *  @retval     CHIP_SYSTEM_ERROR_BAD_ARGS    If the function pointer contained in aDelegate is NULL
  */
 Error Layer::AddEventHandlerDelegate(LwIPEventHandlerDelegate& aDelegate)
 {
     Error lReturn;
 
-    VerifyOrExit(aDelegate.mFunction != NULL, lReturn = WEAVE_SYSTEM_ERROR_BAD_ARGS);
+    VerifyOrExit(aDelegate.mFunction != NULL, lReturn = CHIP_SYSTEM_ERROR_BAD_ARGS);
     aDelegate.Prepend(this->mEventDelegateList);
-    lReturn = WEAVE_SYSTEM_NO_ERROR;
+    lReturn = CHIP_SYSTEM_NO_ERROR;
 
 exit:
     return lReturn;
@@ -750,28 +748,28 @@ exit:
 /**
  * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event queue.
  *
- *  @param[inout]   aTarget     A pointer to the Weave System Layer object making the post request.
+ *  @param[inout]   aTarget     A pointer to the CHIP System Layer object making the post request.
  *  @param[in]      aEventType  The type of event to post.
  *  @param[inout]   aArgument   The argument associated with the event to post.
  *
- *  @retval    WEAVE_SYSTEM_NO_ERROR                   On success.
- *  @retval    WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE     If the state of the Layer object is incorrect.
- *  @retval    WEAVE_SYSTEM_ERROR_NO_MEMORY            If the event queue is already full.
+ *  @retval    CHIP_SYSTEM_NO_ERROR                   On success.
+ *  @retval    CHIP_SYSTEM_ERROR_UNEXPECTED_STATE     If the state of the Layer object is incorrect.
+ *  @retval    CHIP_SYSTEM_ERROR_NO_MEMORY            If the event queue is already full.
  *  @retval    other Platform-specific errors generated indicating the reason for failure.
  */
 Error Layer::PostEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument)
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
-    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE);
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
+    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     // Sanity check that this instance and the target layer haven't been "crossed".
-    VerifyOrDieWithMsg(aTarget.IsRetained(*this), WeaveSystemLayer, "wrong poster! [target %p != this %p]",
+    VerifyOrDieWithMsg(aTarget.IsRetained(*this), chipSystemLayer, "wrong poster! [target %p != this %p]",
         &(aTarget.SystemLayer()), this);
 
     lReturn = Platform::Layer::PostEvent(*this, this->mContext, aTarget, aEventType, aArgument);
-    if (lReturn != WEAVE_SYSTEM_NO_ERROR)
+    if (lReturn != CHIP_SYSTEM_NO_ERROR)
     {
-        WeaveLogError(WeaveSystemLayer, "Failed to queue Weave System Layer event (type %d): %s", aEventType, ErrorStr(lReturn));
+        chipLogError(chipSystemLayer, "Failed to queue CHIP System Layer event (type %d): %s", aEventType, ErrorStr(lReturn));
     }
     SuccessOrExit(lReturn);
 
@@ -783,12 +781,12 @@ exit:
  * This is a syntactic wrapper around a platform-specific hook that effects an event loop, waiting on a queue that services this
  * instance, pulling events off of that queue, and then dispatching them for handling.
  *
- *  @return #WEAVE_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
+ *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
 Error Layer::DispatchEvents()
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
-    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE);
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
+    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     lReturn = Platform::Layer::DispatchEvents(*this, this->mContext);
     SuccessOrExit(lReturn);
@@ -805,12 +803,12 @@ Error Layer::DispatchEvents()
  *
  *  @param[in]  aEvent  The platform-specific event object to dispatch for handling.
  *
- * @return WEAVE_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
+ * @return CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
 Error Layer::DispatchEvent(Event aEvent)
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
-    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE);
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
+    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     lReturn = Platform::Layer::DispatchEvent(*this, this->mContext, aEvent);
     SuccessOrExit(lReturn);
@@ -820,41 +818,41 @@ Error Layer::DispatchEvent(Event aEvent)
 }
 
 /**
- * This implements the actual dispatch and handling of a Weave System Layer event.
+ * This implements the actual dispatch and handling of a CHIP System Layer event.
  *
  *  @param[inout]   aTarget     A reference to the layer object to which the event is targeted.
  *  @param[in]      aEventType  The event / message type to handle.
  *  @param[in]      aArgument   The argument associated with the event / message.
  *
- *  @retval   WEAVE_SYSTEM_NO_ERROR                On success.
- *  @retval   WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the InetLayer object is incorrect.
- *  @retval   WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT  If the event type is unrecognized.
+ *  @retval   CHIP_SYSTEM_NO_ERROR                On success.
+ *  @retval   CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the InetLayer object is incorrect.
+ *  @retval   CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT  If the event type is unrecognized.
  */
 Error Layer::HandleEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument)
 {
     const LwIPEventHandlerDelegate* lEventDelegate;
     Error lReturn;
-    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE);
+    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     // Sanity check that this instance and the target layer haven't been "crossed".
-    VerifyOrDieWithMsg(aTarget.IsRetained(*this), WeaveSystemLayer, "wrong handler! [target %p != this %p]",
+    VerifyOrDieWithMsg(aTarget.IsRetained(*this), chipSystemLayer, "wrong handler! [target %p != this %p]",
         &(aTarget.SystemLayer()), this);
 
-    lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT;
+    lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT;
     lEventDelegate = this->mEventDelegateList;
 
     // Prevent the target object from being freed while dispatching the event.
     aTarget.Retain();
 
-    while (lReturn == WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT && lEventDelegate != NULL)
+    while (lReturn == CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT && lEventDelegate != NULL)
     {
         lReturn = lEventDelegate->mFunction(aTarget, aEventType, aArgument);
         lEventDelegate = lEventDelegate->mNextDelegate;
     }
 
-    if (lReturn == WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT)
+    if (lReturn == CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT)
     {
-        WeaveLogError(WeaveSystemLayer, "Unexpected event type %d", aEventType);
+        chipLogError(chipSystemLayer, "Unexpected event type %d", aEventType);
     }
 
     /*
@@ -871,18 +869,18 @@ Error Layer::HandleEvent(Object& aTarget, EventType aEventType, uintptr_t aArgum
  * Start the platform timer with specified millsecond duration.
  *
  *  @brief
- *      Calls the Platform specific API to start a platform timer. This API is called by the nl::Weave::System::Timer class when
+ *      Calls the Platform specific API to start a platform timer. This API is called by the chip::System::Timer class when
  *      one or more timers are active and require deferred execution.
  *
  *  @param[in]  aDelayMilliseconds  The timer duration in milliseconds.
  *
- *  @return WEAVE_SYSTEM_NO_ERROR on success, error code otherwise.
+ *  @return CHIP_SYSTEM_NO_ERROR on success, error code otherwise.
  *
  */
 Error Layer::StartPlatformTimer(uint32_t aDelayMilliseconds)
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
-    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE);
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
+    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     lReturn = Platform::Layer::StartTimer(*this, this->mContext, aDelayMilliseconds);
     SuccessOrExit(lReturn);
@@ -895,16 +893,16 @@ Error Layer::StartPlatformTimer(uint32_t aDelayMilliseconds)
  * Handle the platform timer expiration event.
  *
  *  @brief
- *      Calls nl::Weave::System::Timer::HandleExpiredTimers to handle any expired timers.  It is assumed that this API is called
- *      only while on the thread which owns the Weave System Layer object.
+ *      Calls chip::System::Timer::HandleExpiredTimers to handle any expired timers.  It is assumed that this API is called
+ *      only while on the thread which owns the CHIP System Layer object.
  *
- *  @return WEAVE_SYSTEM_NO_ERROR on success, error code otherwise.
+ *  @return CHIP_SYSTEM_NO_ERROR on success, error code otherwise.
  *
  */
 Error Layer::HandlePlatformTimer()
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
-    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE);
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
+    VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     lReturn = Timer::HandleExpiredTimers(*this);
     SuccessOrExit(lReturn);
@@ -912,12 +910,12 @@ Error Layer::HandlePlatformTimer()
  exit:
     return lReturn;
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
 
-// MARK: Weave System Layer platform- and system-specific functions for LwIP-native eventing.
+// MARK: CHIP System Layer platform- and system-specific functions for LwIP-native eventing.
 struct LwIPEvent
 {
     EventType   Type;
@@ -925,63 +923,63 @@ struct LwIPEvent
     uintptr_t   Argument;
 };
 
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace Platform {
 namespace Layer {
 
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
 
 /**
- * This is a platform-specific Weave System Layer pre-initialization hook. This may be overridden by assserting the preprocessor
- * definition, #WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
+ * This is a platform-specific CHIP System Layer pre-initialization hook. This may be overridden by assserting the preprocessor
+ * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
- *  @param[inout]  aLayer    A reference to the Weave System Layer instance being initialized.
+ *  @param[inout]  aLayer    A reference to the CHIP System Layer instance being initialized.
  *
  *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
- *  @return #WEAVE_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
+ *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  *      Returning non-successful status will abort initialization.
  */
-NL_DLL_EXPORT Error WillInit(Layer& aLayer, void* aContext)
+DLL_EXPORT Error WillInit(Layer& aLayer, void* aContext)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
 
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 /**
- * This is a platform-specific Weave System Layer pre-shutdown hook. This may be overridden by assserting the preprocessor
- * definition, #WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
+ * This is a platform-specific CHIP System Layer pre-shutdown hook. This may be overridden by assserting the preprocessor
+ * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
- *  @param[inout]  aLayer    A pointer to the Weave System Layer instance being shutdown.
+ *  @param[inout]  aLayer    A pointer to the CHIP System Layer instance being shutdown.
  *
  *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
  *
- *  @return #WEAVE_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
+ *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
  */
-NL_DLL_EXPORT Error WillShutdown(Layer& aLayer, void* aContext)
+DLL_EXPORT Error WillShutdown(Layer& aLayer, void* aContext)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
 
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 /**
- * This is a platform-specific Weave System Layer post-initialization hook. This may be overridden by assserting the preprocessor
- * definition, #WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
+ * This is a platform-specific CHIP System Layer post-initialization hook. This may be overridden by assserting the preprocessor
+ * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
- *  @param[inout]  aLayer    A reference to the Weave System Layer instance being initialized.
+ *  @param[inout]  aLayer    A reference to the CHIP System Layer instance being initialized.
  *
  *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
- *  @param[in]     anError   The overall status being returned via the Weave System Layer ::Init method.
+ *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Init method.
  */
-NL_DLL_EXPORT void DidInit(Layer& aLayer, void* aContext, Error aStatus)
+DLL_EXPORT void DidInit(Layer& aLayer, void* aContext, Error aStatus)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
@@ -989,35 +987,35 @@ NL_DLL_EXPORT void DidInit(Layer& aLayer, void* aContext, Error aStatus)
 }
 
 /**
- * This is a platform-specific Weave System Layer pre-shutdown hook. This may be overridden by assserting the preprocessor
- * definition, #WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
+ * This is a platform-specific CHIP System Layer pre-shutdown hook. This may be overridden by assserting the preprocessor
+ * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
- *  @param[inout]  aLayer    A reference to the Weave System Layer instance being shutdown.
+ *  @param[inout]  aLayer    A reference to the CHIP System Layer instance being shutdown.
  *
  *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
  *
- *  @param[in]     anError   The overall status being returned via the Weave System Layer ::Shutdown method.
+ *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Shutdown method.
  *
- *  @return #WEAVE_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
+ *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
  */
-NL_DLL_EXPORT void DidShutdown(Layer& aLayer, void* aContext, Error aStatus)
+DLL_EXPORT void DidShutdown(Layer& aLayer, void* aContext, Error aStatus)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
     static_cast<void>(aStatus);
 }
 
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
 
-using nl::Weave::System::LwIPEvent;
+using chip::System::LwIPEvent;
 
 /**
  *  This is a platform-specific event / message post hook. This may be overridden by assserting the preprocessor definition,
- *  #WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
+ *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
  *
  *  This posts an event / message of the specified type with the provided argument to this instance's platform-specific event /
  *  message queue.
@@ -1029,33 +1027,33 @@ using nl::Weave::System::LwIPEvent;
  *
  *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
- *  @param[inout]  aTarget   A pointer to the Weave System Layer object making the post request.
+ *  @param[inout]  aTarget   A pointer to the CHIP System Layer object making the post request.
  *
  *  @param[in]     aType     The type of event to post.
  *
  *  @param[inout]  anArg     The argument associated with the event to post.
  *
- *  @return #WEAVE_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
+ *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
-NL_DLL_EXPORT Error PostEvent(Layer& aLayer, void* aContext, Object& aTarget, EventType aType, uintptr_t aArgument)
+DLL_EXPORT Error PostEvent(Layer& aLayer, void* aContext, Object& aTarget, EventType aType, uintptr_t aArgument)
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
     sys_mbox_t lSysMbox;
     LwIPEvent* ev;
     err_t lLwIPError;
 
-    VerifyOrExit(aContext != NULL, lReturn = WEAVE_SYSTEM_ERROR_BAD_ARGS);
+    VerifyOrExit(aContext != NULL, lReturn = CHIP_SYSTEM_ERROR_BAD_ARGS);
     lSysMbox = reinterpret_cast<sys_mbox_t>(aContext);
 
     ev = new LwIPEvent;
-    VerifyOrExit(ev != NULL, lReturn = WEAVE_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(ev != NULL, lReturn = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     ev->Type = aType;
     ev->Target = &aTarget;
     ev->Argument = aArgument;
 
     lLwIPError = sys_mbox_trypost(&lSysMbox, ev);
-    VerifyOrExit(lLwIPError == ERR_OK, delete ev; lReturn = nl::Weave::System::MapErrorLwIP(lLwIPError));
+    VerifyOrExit(lLwIPError == ERR_OK, delete ev; lReturn = chip::System::MapErrorLwIP(lLwIPError));
 
  exit:
     return lReturn;
@@ -1063,7 +1061,7 @@ NL_DLL_EXPORT Error PostEvent(Layer& aLayer, void* aContext, Object& aTarget, Ev
 
 /**
  *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
+ *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
  *
  *  This effects an event loop, waiting on a queue that services this instance, pulling events off of that queue, and then
  *  dispatching them for handling.
@@ -1075,30 +1073,30 @@ NL_DLL_EXPORT Error PostEvent(Layer& aLayer, void* aContext, Object& aTarget, Ev
  *
  *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
- *  @retval   #WEAVE_SYSTEM_ERROR_BAD_ARGS          If #aLayer or #aContext is NULL.
- *  @retval   #WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the Weave System Layer object is unexpected.
- *  @retval   #WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT  If an event type is unrecognized.
- *  @retval   #WEAVE_SYSTEM_NO_ERROR                On success.
+ *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If #aLayer or #aContext is NULL.
+ *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the CHIP System Layer object is unexpected.
+ *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT  If an event type is unrecognized.
+ *  @retval   #CHIP_SYSTEM_NO_ERROR                On success.
  */
-NL_DLL_EXPORT Error DispatchEvents(Layer& aLayer, void* aContext)
+DLL_EXPORT Error DispatchEvents(Layer& aLayer, void* aContext)
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
     err_t lLwIPError;
     sys_mbox_t lSysMbox;
     void* lVoidPointer;
     const LwIPEvent* lEvent;
 
     // Sanity check the context / queue.
-    VerifyOrExit(aContext != NULL, lReturn = WEAVE_SYSTEM_ERROR_BAD_ARGS);
+    VerifyOrExit(aContext != NULL, lReturn = CHIP_SYSTEM_ERROR_BAD_ARGS);
     lSysMbox = reinterpret_cast<sys_mbox_t>(aContext);
 
     while (true)
     {
         lLwIPError = sys_arch_mbox_tryfetch(&lSysMbox, &lVoidPointer);
-        VerifyOrExit(lLwIPError == ERR_OK, lReturn = nl::Weave::System::MapErrorLwIP(lLwIPError));
+        VerifyOrExit(lLwIPError == ERR_OK, lReturn = chip::System::MapErrorLwIP(lLwIPError));
 
         lEvent = static_cast<const LwIPEvent*>(lVoidPointer);
-        VerifyOrExit(lEvent != NULL && lEvent->Target != NULL, lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT);
+        VerifyOrExit(lEvent != NULL && lEvent->Target != NULL, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
 
         lReturn = aLayer.HandleEvent(*lEvent->Target, lEvent->Type, lEvent->Argument);
         delete lEvent;
@@ -1112,9 +1110,9 @@ NL_DLL_EXPORT Error DispatchEvents(Layer& aLayer, void* aContext)
 
 /**
  *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
+ *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
  *
- *  This dispatches the specified event for handling, unmarshalling the type and arguments from the event for hand off to Weave
+ *  This dispatches the specified event for handling, unmarshalling the type and arguments from the event for hand off to CHIP
  *  System Layer::HandleEvent for the actual dispatch.
  *
  *  @note
@@ -1124,20 +1122,20 @@ NL_DLL_EXPORT Error DispatchEvents(Layer& aLayer, void* aContext)
  *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *  @param[in]     anEvent   The platform-specific event object to dispatch for handling.
  *
- *  @retval   #WEAVE_SYSTEM_ERROR_BAD_ARGS          If #aLayer or the event target is NULL.
- *  @retval   #WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT  If the event type is unrecognized.
- *  @retval   #WEAVE_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the Weave System Layer object is unexpected.
- *  @retval   #WEAVE_SYSTEM_NO_ERROR                On success.
+ *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If #aLayer or the event target is NULL.
+ *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT  If the event type is unrecognized.
+ *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the CHIP System Layer object is unexpected.
+ *  @retval   #CHIP_SYSTEM_NO_ERROR                On success.
  */
-NL_DLL_EXPORT Error DispatchEvent(Layer& aLayer, void* aContext, Event aEvent)
+DLL_EXPORT Error DispatchEvent(Layer& aLayer, void* aContext, Event aEvent)
 {
     const EventType type = aEvent->Type;
     Object* target = aEvent->Target;
     const uint32_t data = aEvent->Argument;
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
 
     // Sanity check the target object.
-    VerifyOrExit(target != NULL, lReturn = WEAVE_SYSTEM_ERROR_BAD_ARGS);
+    VerifyOrExit(target != NULL, lReturn = CHIP_SYSTEM_ERROR_BAD_ARGS);
 
     // Handle the event.
     lReturn = aLayer.HandleEvent(*target, type, data);
@@ -1149,7 +1147,7 @@ NL_DLL_EXPORT Error DispatchEvent(Layer& aLayer, void* aContext, Event aEvent)
 
 /**
  *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
+ *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
  *
  *  @note
  *    This is an implementation for LwIP.
@@ -1158,11 +1156,11 @@ NL_DLL_EXPORT Error DispatchEvent(Layer& aLayer, void* aContext, Event aEvent)
  *  @param[inout]  aContext             Platform-specific context data passed to the layer initialization method, ::Init.
  *  @param[in]     aMilliseconds        The number of milliseconds to set for the timer.
  *
- *  @retval   #WEAVE_SYSTEM_NO_ERROR    Always succeeds unless overridden.
+ *  @retval   #CHIP_SYSTEM_NO_ERROR    Always succeeds unless overridden.
  */
-NL_DLL_EXPORT Error StartTimer(Layer& aLayer, void* aContext, uint32_t aMilliseconds)
+DLL_EXPORT Error StartTimer(Layer& aLayer, void* aContext, uint32_t aMilliseconds)
 {
-    Error lReturn = WEAVE_SYSTEM_NO_ERROR;
+    Error lReturn = CHIP_SYSTEM_NO_ERROR;
 
     // At the moment there is no need to do anything for standalone weave + LWIP.
     // the Task will periodically call HandleTimer which will process any expired
@@ -1174,11 +1172,10 @@ NL_DLL_EXPORT Error StartTimer(Layer& aLayer, void* aContext, uint32_t aMillisec
     return lReturn;
 }
 
-#endif // !WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Layer
 } // namespace Platform
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip

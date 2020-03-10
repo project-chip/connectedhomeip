@@ -27,7 +27,7 @@
 
 #include <core/CHIPConfig.h>
 /*
-#include <SystemLayer/SystemLayer.h>
+#include <SystemLayer.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <BleLayer/BleLayer.h>

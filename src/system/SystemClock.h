@@ -63,7 +63,7 @@ namespace Layer {
  * This function is expected to be thread-safe on any platform that employs threading.
  *
  * @note
- *   This function is reserved for internal use by the Weave System Layer.  Users of the Weave System
+ *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
  *   Layer should call System::Layer::GetClock_Monotonic().
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
@@ -85,7 +85,7 @@ extern uint64_t GetClock_Monotonic(void);
  * This function is expected to be thread-safe on any platform that employs threading.
  *
  * @note
- *   This function is reserved for internal use by the Weave System Layer.  Users of the Weave System
+ *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
  *   Layer should call System::Layer::GetClock_MonotonicMS().
  *
  * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
@@ -111,7 +111,7 @@ extern uint64_t GetClock_MonotonicMS(void);
  * This function is expected to be thread-safe on any platform that employs threading.
  *
  * @note
- *   This function is reserved for internal use by the Weave System Layer.  Users of the Weave System
+ *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
  *   Layer should call System::Layer::GetClock_MonotonicHiRes().
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
@@ -138,7 +138,7 @@ extern uint64_t GetClock_MonotonicHiRes(void);
  * This function is expected to be thread-safe on any platform that employs threading.
  *
  * @note
- *   This function is reserved for internal use by the Weave System Layer.  Users of the Weave System
+ *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
  *   Layer should call System::Layer::GetClock_RealTime().
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to microseconds.
@@ -163,7 +163,7 @@ extern Error GetClock_RealTime(uint64_t & curTime);
  * See the documentation for GetClock_RealTime() for details on the expected behavior.
  *
  * @note
- *   This function is reserved for internal use by the Weave System Layer.  Users of the Weave System
+ *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
  *   Layer should call System::Layer::GetClock_RealTimeMS().
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to milliseconds.
@@ -181,7 +181,7 @@ extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
  * @brief
  *   Platform-specific function for setting the current real (civil) time.
  *
- * Weave calls this function to set the local platform's notion of current real time.  The new current
+ * CHIP calls this function to set the local platform's notion of current real time.  The new current
  * time is expressed as a Unix time value scaled to microseconds.
  *
  * Once set, underlying platform clock is expected to track real time with a granularity of at least whole
@@ -199,7 +199,7 @@ extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
  * This function is expected to be thread-safe on any platform that employs threading.
  *
  * @note
- *   This function is reserved for internal use by the Weave System Layer.  Users of the Weave System
+ *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
  *   Layer should call System::Layer::GetClock_RealTimeMS().
  *
  * @param[in] newCurTime                The new current time, expressed as Unix time scaled to microseconds.
