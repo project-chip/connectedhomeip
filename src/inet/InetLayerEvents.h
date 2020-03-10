@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,13 +25,12 @@
 #ifndef INETLAYEREVENTS_H
 #define INETLAYEREVENTS_H
 
-#include <InetLayer/InetConfig.h>
+#include "InetConfig.h"
 
-#include <SystemLayer/SystemEvent.h>
+#include "system/SystemEvent.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
 namespace Inet {
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
@@ -66,26 +64,25 @@ enum
     kInetEvent_TCPError                 = _INET_CONFIG_EVENT(4),    /**< The event for an error on a TCP connection */
     kInetEvent_UDPDataReceived          = _INET_CONFIG_EVENT(5),    /**< The event for data reception over UDP */
     kInetEvent_DNSResolveComplete       = _INET_CONFIG_EVENT(6),    /**< The event for DNS name resolution completion */
-    kInetEvent_TunDataReceived          = _INET_CONFIG_EVENT(7),    /**< The event for data reception over a Weave tunnel */
+    kInetEvent_TunDataReceived          = _INET_CONFIG_EVENT(7),    /**< The event for data reception over a chip tunnel */
     kInetEvent_RawDataReceived          = _INET_CONFIG_EVENT(8)     /**< The event for data reception over an InetLayer raw endpoint */
 };
 
 /**
  *  Check to verify if a System::EventType is a valid Inet layer event type.
  *
- *  @param[in]  aType  A Weave System Layer event type.
+ *  @param[in]  aType  A chip System Layer event type.
  *
  *  @return true if it falls within the enumerated range; otherwise, false.
  *
  */
-static inline bool INET_IsInetEvent(Weave::System::EventType aType)
+static inline bool INET_IsInetEvent(chip::System::EventType aType)
 {
     return (aType >= kInetEvent_TCPConnectComplete &&
             aType <= kInetEvent_RawDataReceived);
 }
 
 } // namespace Inet
-} // namespace nl
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // !defined(INETLAYEREVENTS_H)

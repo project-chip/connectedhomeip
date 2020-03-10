@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,23 +44,22 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <InetLayer/InetLayer.h>
-#include <InetLayer/InetFaultInjection.h>
+#include "InetLayer.h"
+#include "InetFaultInjection.h"
+#include "system/SystemTimer.h"
 
-#include <SystemLayer/SystemTimer.h>
-
-#include <Weave/Support/CodeUtils.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include "support/CodeUtils.h"
+#include "support/logging/CHIPLogging.h"
 
 #include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/sys.h>
 #include <lwip/netif.h>
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <unistd.h>
 #include <fcntl.h>
 #include <net/if.h>
@@ -70,47 +68,46 @@
 #else
 #include <ifaddrs.h>
 #endif // __ANDROID__
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
 
 // MARK: InetLayer platform- and system-specific functions for LwIP-native eventing.
 
 struct LwIPInetEvent
 {
-    nl::Inet::InetEventType     Type;
-    nl::Inet::InetLayerBasis*   Target;
+    Inet::InetEventType     Type;
+    Inet::InetLayerBasis*   Target;
     uintptr_t                   Arg;
 };
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-namespace nl {
 namespace Inet {
 
-void InetLayer::UpdateSnapshot(nl::Weave::System::Stats::Snapshot &aSnapshot)
+void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot &aSnapshot)
 {
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
-    DNSResolver::sPool.GetStatistics(aSnapshot.mResourcesInUse[nl::Weave::System::Stats::kInetLayer_NumDNSResolvers],
-                                     aSnapshot.mHighWatermarks[nl::Weave::System::Stats::kInetLayer_NumDNSResolvers]);
+    DNSResolver::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumDNSResolvers],
+                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumDNSResolvers]);
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    TCPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[nl::Weave::System::Stats::kInetLayer_NumTCPEps],
-                                     aSnapshot.mHighWatermarks[nl::Weave::System::Stats::kInetLayer_NumTCPEps]);
+    TCPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumTCPEps],
+                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumTCPEps]);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    UDPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[nl::Weave::System::Stats::kInetLayer_NumUDPEps],
-                                     aSnapshot.mHighWatermarks[nl::Weave::System::Stats::kInetLayer_NumUDPEps]);
+    UDPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumUDPEps],
+                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumUDPEps]);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[nl::Weave::System::Stats::kInetLayer_NumRawEps],
-                                     aSnapshot.mHighWatermarks[nl::Weave::System::Stats::kInetLayer_NumRawEps]);
+    RawEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumRawEps],
+                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumRawEps]);
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #if INET_CONFIG_ENABLE_TUN_ENDPOINT
-    TunEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[nl::Weave::System::Stats::kInetLayer_NumTunEps],
-                                     aSnapshot.mHighWatermarks[nl::Weave::System::Stats::kInetLayer_NumTunEps]);
+    TunEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumTunEps],
+                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumTunEps]);
 #endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 }
 
@@ -129,19 +126,19 @@ InetLayer::InetLayer(void)
 {
     State = kState_NotInitialized;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sInetEventHandlerDelegate.IsInitialized())
         sInetEventHandlerDelegate.Init(HandleInetLayerEvent);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-Weave::System::LwIPEventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+chip::System::LwIPEventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if INET_CONFIG_MAX_DROPPABLE_EVENTS && WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_NO_LOCKING
+#if CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 INET_ERROR InetLayer::InitQueueLimiter(void)
 {
@@ -167,7 +164,7 @@ void InetLayer::DroppableEventDequeued(void)
     __sync_add_and_fetch(&mDroppableEvents, -1);
 }
 
-#elif WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#elif CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
 INET_ERROR InetLayer::InitQueueLimiter(void)
 {
@@ -200,13 +197,13 @@ void InetLayer::DroppableEventDequeued(void)
     xSemaphoreGive(mDroppableEvents);
 }
 
-#else // !WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
+#else // !CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
 INET_ERROR InetLayer::InitQueueLimiter(void)
 {
     if (sem_init(&mDroppableEvents, 0, INET_CONFIG_MAX_DROPPABLE_EVENTS) != 0)
     {
-        return Weave::System::MapErrorPOSIX(errno);
+        return chip::System::MapErrorPOSIX(errno);
     }
     return INET_NO_ERROR;
 }
@@ -231,8 +228,8 @@ void InetLayer::DroppableEventDequeued(void)
     sem_post(&mDroppableEvents);
 }
 
-#endif // !WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING
-#endif // INET_CONFIG_MAX_DROPPABLE_EVENTS && WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+#endif // INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  *  This is the InetLayer explicit initializer. This must be called
@@ -250,7 +247,7 @@ void InetLayer::DroppableEventDequeued(void)
  *  hooks to effect platform-specific customizations or data extensions
  *  to InetLayer.
  *
- *  @param[in]  aSystemLayer  A required instance of the Weave System Layer
+ *  @param[in]  aSystemLayer  A required instance of the chip System Layer
  *                            already successfully initialized.
  *
  *  @param[in]  aContext  An optional context argument which will be passed
@@ -267,7 +264,7 @@ void InetLayer::DroppableEventDequeued(void)
  *  @retval   #INET_NO_ERROR                     On success.
  *
  */
-INET_ERROR InetLayer::Init(Weave::System::Layer& aSystemLayer, void *aContext)
+INET_ERROR InetLayer::Init(chip::System::Layer& aSystemLayer, void *aContext)
 {
     INET_ERROR err = INET_NO_ERROR;
 
@@ -296,23 +293,23 @@ INET_ERROR InetLayer::Init(Weave::System::Layer& aSystemLayer, void *aContext)
     mSystemLayer = &aSystemLayer;
     mContext = aContext;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     err = InitQueueLimiter();
     SuccessOrExit(err);
 
     mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
     err = mAsyncDNSResolver.Init(this);
     SuccessOrExit(err);
 
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
  exit:
     Platform::InetLayer::DidInit(this, mContext, err);
@@ -354,11 +351,11 @@ INET_ERROR InetLayer::Shutdown(void)
             }
         }
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
         err = mAsyncDNSResolver.Shutdown();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
@@ -480,12 +477,12 @@ bool InetLayer::IsIdleTimerRunning(void)
 INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress *llAddr)
 {
     INET_ERROR err = INET_NO_ERROR;
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !LWIP_IPV6
     err = INET_ERROR_NOT_IMPLEMENTED;
     goto out;
 #endif //!LWIP_IPV6
-#endif //WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif //CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if ( llAddr == NULL )
     {
@@ -493,7 +490,7 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress *llAddr)
         goto out;
     }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     for (struct netif *intf = netif_list; intf != NULL; intf = intf->next)
     {
         if ( (link != NULL) && (link != intf) )    continue;
@@ -510,9 +507,9 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress *llAddr)
             break;
         }
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     struct ifaddrs *ifaddr;
     int rv;
     rv = getifaddrs(&ifaddr);
@@ -543,7 +540,7 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress *llAddr)
     {
         err = INET_ERROR_ADDRESS_NOT_FOUND;
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 out:
     return err;
@@ -581,12 +578,12 @@ INET_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEnd
     *retEndPoint = RawEndPoint::sPool.TryCreate(*mSystemLayer);
     if (*retEndPoint != NULL)
     {
-        (*retEndPoint)->nl::Inet::RawEndPoint::Init(this, ipVer, ipProto);
-        SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kInetLayer_NumRawEps);
+        (*retEndPoint)->Inet::RawEndPoint::Init(this, ipVer, ipProto);
+        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumRawEps);
     }
     else
     {
-        WeaveLogError(Inet, "%s endpoint pool FULL", "Raw");
+        chipLogError(Inet, "%s endpoint pool FULL", "Raw");
         err = INET_ERROR_NO_ENDPOINTS;
     }
 
@@ -624,11 +621,11 @@ INET_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint **retEndPoint)
     if (*retEndPoint != NULL)
     {
         (*retEndPoint)->Init(this);
-        SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kInetLayer_NumTCPEps);
+        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTCPEps);
     }
     else
     {
-        WeaveLogError(Inet, "%s endpoint pool FULL", "TCP");
+        chipLogError(Inet, "%s endpoint pool FULL", "TCP");
         err = INET_ERROR_NO_ENDPOINTS;
     }
 
@@ -666,11 +663,11 @@ INET_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint **retEndPoint)
     if (*retEndPoint != NULL)
     {
         (*retEndPoint)->Init(this);
-        SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kInetLayer_NumUDPEps);
+        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumUDPEps);
     }
     else
     {
-        WeaveLogError(Inet, "%s endpoint pool FULL", "UDP");
+        chipLogError(Inet, "%s endpoint pool FULL", "UDP");
         err = INET_ERROR_NO_ENDPOINTS;
     }
 
@@ -708,11 +705,11 @@ INET_ERROR InetLayer::NewTunEndPoint(TunEndPoint **retEndPoint)
     if (*retEndPoint != NULL)
     {
         (*retEndPoint)->Init(this);
-        SYSTEM_STATS_INCREMENT(nl::Weave::System::Stats::kInetLayer_NumTunEps);
+        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTunEps);
     }
     else
     {
-        WeaveLogError(Inet, "%s endpoint pool FULL", "Tun");
+        chipLogError(Inet, "%s endpoint pool FULL", "Tun");
         err = INET_ERROR_NO_ENDPOINTS;
     }
 
@@ -886,7 +883,7 @@ INET_ERROR InetLayer::ResolveHostAddress(const char *hostName, uint16_t hostName
     }
     else
     {
-        WeaveLogError(Inet, "%s resolver pool FULL", "DNS");
+        chipLogError(Inet, "%s resolver pool FULL", "DNS");
         ExitNow(err = INET_ERROR_NO_MEMORY);
     }
 
@@ -922,7 +919,7 @@ INET_ERROR InetLayer::ResolveHostAddress(const char *hostName, uint16_t hostName
     // - resolver->Resolve() (in case of synchronous resolving)
     // - the event handlers (in case of LwIP)
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
     err = mAsyncDNSResolver.PrepareDNSResolver(*resolver, hostName, hostNameLen, options,
                                                maxAddrs, addrArray, onComplete, appState);
@@ -930,7 +927,7 @@ INET_ERROR InetLayer::ResolveHostAddress(const char *hostName, uint16_t hostName
 
     mAsyncDNSResolver.EnqueueRequest(*resolver);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
 #if !INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     err = resolver->Resolve(hostName, hostNameLen, options, maxAddrs, addrArray, onComplete, appState);
@@ -985,12 +982,12 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
             continue;
         }
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
         if (lResolver->mState == DNSResolver::kState_Canceled)
         {
             continue;
         }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
         lResolver->Cancel();
         break;
@@ -1000,9 +997,9 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-static void SystemTimerComplete(Weave::System::Layer* aLayer, void* aAppState, Weave::System::Error aError)
+static void SystemTimerComplete(chip::System::Layer* aLayer, void* aAppState, chip::System::Error aError)
 {
-    Weave::System::Timer& lTimer = *reinterpret_cast<Weave::System::Timer*>(aAppState);
+    chip::System::Timer& lTimer = *reinterpret_cast<chip::System::Timer*>(aAppState);
     InetLayer& lInetLayer = *lTimer.InetLayer();
     InetLayer::TimerCompleteFunct lComplete = reinterpret_cast<InetLayer::TimerCompleteFunct>(lTimer.OnCompleteInetLayer());
     void* lAppState = lTimer.AppStateInetLayer();
@@ -1043,7 +1040,7 @@ INET_ERROR InetLayer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aCom
         return INET_ERROR_INCORRECT_STATE;
     }
 
-    Weave::System::Timer* lTimer;
+    chip::System::Timer* lTimer;
 
     lReturn = mSystemLayer->NewTimer(lTimer);
     SuccessOrExit(lReturn);
@@ -1052,7 +1049,7 @@ INET_ERROR InetLayer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aCom
 
     lReturn = lTimer->Start(aMilliseconds, SystemTimerComplete, lTimer);
 
-    if (lReturn != WEAVE_SYSTEM_NO_ERROR)
+    if (lReturn != CHIP_SYSTEM_NO_ERROR)
     {
         lTimer->Cancel();
     }
@@ -1060,8 +1057,8 @@ INET_ERROR InetLayer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aCom
 exit:
     switch (lReturn)
     {
-    case WEAVE_SYSTEM_ERROR_NO_MEMORY: lReturn = INET_ERROR_NO_MEMORY; break;
-    case WEAVE_SYSTEM_NO_ERROR: lReturn = INET_NO_ERROR; break;
+    case CHIP_SYSTEM_ERROR_NO_MEMORY: lReturn = INET_ERROR_NO_MEMORY; break;
+    case CHIP_SYSTEM_NO_ERROR: lReturn = INET_NO_ERROR; break;
     }
 
     return lReturn;
@@ -1160,7 +1157,7 @@ bool InetLayer::MatchLocalIPv6Subnet(const IPAddress& addr)
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-void InetLayer::HandleTCPInactivityTimer(Weave::System::Layer* aSystemLayer, void* aAppState, Weave::System::Error aError)
+void InetLayer::HandleTCPInactivityTimer(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError)
 {
     InetLayer& lInetLayer = *reinterpret_cast<InetLayer*>(aAppState);
     bool lTimerRequired = lInetLayer.IsIdleTimerRunning();
@@ -1191,14 +1188,14 @@ void InetLayer::HandleTCPInactivityTimer(Weave::System::Layer* aSystemLayer, voi
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-Weave::System::Error InetLayer::HandleInetLayerEvent(Weave::System::Object& aTarget, Weave::System::EventType aEventType,
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object& aTarget, chip::System::EventType aEventType,
     uintptr_t aArgument)
 {
-    Weave::System::Error lReturn = WEAVE_SYSTEM_NO_ERROR;
+    chip::System::Error lReturn = CHIP_SYSTEM_NO_ERROR;
     InetLayerBasis& lBasis = static_cast<InetLayerBasis&>(aTarget);
 
-    VerifyOrExit(INET_IsInetEvent(aEventType), lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT);
+    VerifyOrExit(INET_IsInetEvent(aEventType), lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
 
     // Dispatch the event according to its type.
     switch (aEventType)
@@ -1213,7 +1210,7 @@ Weave::System::Error InetLayer::HandleInetLayerEvent(Weave::System::Object& aTar
         break;
 
     case kInetEvent_TCPDataReceived:
-        static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<Weave::System::PacketBuffer*>(aArgument));
+        static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<chip::System::PacketBuffer*>(aArgument));
         break;
 
     case kInetEvent_TCPDataSent:
@@ -1227,19 +1224,19 @@ Weave::System::Error InetLayer::HandleInetLayerEvent(Weave::System::Object& aTar
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     case kInetEvent_RawDataReceived:
-        static_cast<RawEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<Weave::System::PacketBuffer*>(aArgument));
+        static_cast<RawEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<chip::System::PacketBuffer*>(aArgument));
         break;
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     case kInetEvent_UDPDataReceived:
-        static_cast<UDPEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<Weave::System::PacketBuffer*>(aArgument));
+        static_cast<UDPEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<chip::System::PacketBuffer*>(aArgument));
         break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TUN_ENDPOINT
     case kInetEvent_TunDataReceived:
-        static_cast<TunEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<Weave::System::PacketBuffer*>(aArgument));
+        static_cast<TunEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<chip::System::PacketBuffer*>(aArgument));
         break;
 #endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
 
@@ -1250,7 +1247,7 @@ Weave::System::Error InetLayer::HandleInetLayerEvent(Weave::System::Object& aTar
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     default:
-        lReturn = WEAVE_SYSTEM_ERROR_UNEXPECTED_EVENT;
+        lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT;
         ExitNow();
     }
 
@@ -1292,14 +1289,14 @@ exit:
  */
 INET_ERROR InetLayer::PostEvent(InetLayerBasis *target, InetEventType type, uintptr_t arg)
 {
-    Weave::System::Layer& lSystemLayer = *mSystemLayer;
+    chip::System::Layer& lSystemLayer = *mSystemLayer;
     INET_ERROR retval = INET_NO_ERROR;
 
     VerifyOrExit(State == kState_Initialized, retval = INET_ERROR_INCORRECT_STATE);
     VerifyOrExit(target != NULL, retval = INET_ERROR_BAD_ARGS);
 
     {
-        Weave::System::Layer& lTargetSystemLayer = target->SystemLayer();
+        chip::System::Layer& lTargetSystemLayer = target->SystemLayer();
 
         VerifyOrDieWithMsg(target->IsRetained(lSystemLayer), Inet, "wrong system layer! [target %p != instance %p]",
             &lTargetSystemLayer, &lSystemLayer);
@@ -1316,14 +1313,14 @@ INET_ERROR InetLayer::PostEvent(InetLayerBasis *target, InetEventType type, uint
 
     if (IsDroppableEvent(type) && !CanEnqueueDroppableEvent())
     {
-        WeaveLogProgress(Inet, "Dropping incoming packet (type %d)", (int)type);
+        chipLogProgress(Inet, "Dropping incoming packet (type %d)", (int)type);
         ExitNow(retval = INET_ERROR_NO_MEMORY);
     }
 
     retval = Platform::InetLayer::PostEvent(this, mContext, target, type, arg);
     if (retval != INET_NO_ERROR)
     {
-        WeaveLogError(Inet, "Failed to queue InetLayer event (type %d): %s", (int)type, ErrorStr(retval));
+        chipLogError(Inet, "Failed to queue InetLayer event (type %d): %s", (int)type, ErrorStr(retval));
     }
     SuccessOrExit(retval);
 
@@ -1359,7 +1356,7 @@ INET_ERROR InetLayer::DispatchEvents(void)
  *
  *  @brief
  *    Calls the Platform specific API to start a platform timer.
- *    This API is called by the Weave::System::Timer class when one or more
+ *    This API is called by the chip::System::Timer class when one or more
  *    system timers are active and require deferred execution.
  *
  *  @param[in]  inDurMS  The timer duration in milliseconds.
@@ -1383,7 +1380,7 @@ INET_ERROR InetLayer::StartPlatformTimer(uint32_t inDurMS)
  *  Handle the platform timer expiration event.
  *
  *  @brief
- *    Calls Weave::System::Timer::HandleExpiredTimers to handle any expired
+ *    Calls chip::System::Timer::HandleExpiredTimers to handle any expired
  *    system timers.  It is assumed that this API is called only while
  *    on the thread which owns the InetLayer object.
  *
@@ -1393,7 +1390,7 @@ INET_ERROR InetLayer::StartPlatformTimer(uint32_t inDurMS)
 INET_ERROR InetLayer::HandlePlatformTimer(void)
 {
     INET_ERROR lReturn;
-    Weave::System::Error lSystemError;
+    chip::System::Error lSystemError;
 
     VerifyOrExit(State == kState_Initialized, lReturn = INET_ERROR_INCORRECT_STATE);
 
@@ -1405,9 +1402,9 @@ INET_ERROR InetLayer::HandlePlatformTimer(void)
 }
 
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 /**
  *  Prepare the sets of file descriptors for @p select() to work with.
  *
@@ -1609,7 +1606,7 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set *readfds, fd_set *write
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  *  Reset the members of the IPPacketInfo object.
@@ -1649,7 +1646,7 @@ namespace InetLayer {
  *         status will abort initialization.
  *
  */
-NL_DLL_EXPORT INET_ERROR WillInit(Inet::InetLayer *aLayer, void *aContext)
+DLL_EXPORT INET_ERROR WillInit(Inet::InetLayer *aLayer, void *aContext)
 {
     (void)aLayer;
     (void)aContext;
@@ -1672,7 +1669,7 @@ NL_DLL_EXPORT INET_ERROR WillInit(Inet::InetLayer *aLayer, void *aContext)
  *                          InetLayer ::Init method.
  *
  */
-NL_DLL_EXPORT void DidInit(Inet::InetLayer *aLayer, void *aContext, INET_ERROR anError)
+DLL_EXPORT void DidInit(Inet::InetLayer *aLayer, void *aContext, INET_ERROR anError)
 {
     (void)aLayer;
     (void)aContext;
@@ -1697,7 +1694,7 @@ NL_DLL_EXPORT void DidInit(Inet::InetLayer *aLayer, void *aContext, INET_ERROR a
  *         status will abort shutdown.
  *
  */
-NL_DLL_EXPORT INET_ERROR WillShutdown(Inet::InetLayer *aLayer, void *aContext)
+DLL_EXPORT INET_ERROR WillShutdown(Inet::InetLayer *aLayer, void *aContext)
 {
     (void)aLayer;
     (void)aContext;
@@ -1720,7 +1717,7 @@ NL_DLL_EXPORT INET_ERROR WillShutdown(Inet::InetLayer *aLayer, void *aContext)
  *                          InetLayer ::Shutdown method.
  *
  */
-NL_DLL_EXPORT void DidShutdown(Inet::InetLayer *aLayer, void *aContext, INET_ERROR anError)
+DLL_EXPORT void DidShutdown(Inet::InetLayer *aLayer, void *aContext, INET_ERROR anError)
 {
     (void)aLayer;
     (void)aContext;
@@ -1730,7 +1727,7 @@ NL_DLL_EXPORT void DidShutdown(Inet::InetLayer *aLayer, void *aContext, INET_ERR
 }
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
 /**
  *  This is a platform-specific event / message post hook. This may be
  *  overridden by assserting the preprocessor definition,
@@ -1763,9 +1760,9 @@ NL_DLL_EXPORT void DidShutdown(Inet::InetLayer *aLayer, void *aContext, INET_ERR
 INET_ERROR PostEvent(Inet::InetLayer* aInetLayer, void* aContext, InetLayerBasis* aTarget, InetEventType aEventType,
     uintptr_t aArgument)
 {
-    Weave::System::Layer& lSystemLayer = *aInetLayer->mSystemLayer;
-    Weave::System::Object& lObject = *aTarget;
-    Weave::System::Error lReturn = Weave::System::Platform::Layer::PostEvent(lSystemLayer, aContext, lObject, aEventType,
+    chip::System::Layer& lSystemLayer = *aInetLayer->mSystemLayer;
+    chip::System::Object& lObject = *aTarget;
+    chip::System::Error lReturn = chip::System::Platform::Layer::PostEvent(lSystemLayer, aContext, lObject, aEventType,
         aArgument);
 
     return static_cast<INET_ERROR>(lReturn);
@@ -1798,8 +1795,8 @@ INET_ERROR PostEvent(Inet::InetLayer* aInetLayer, void* aContext, InetLayerBasis
  */
 INET_ERROR DispatchEvents(Inet::InetLayer* aInetLayer, void* aContext)
 {
-    Weave::System::Layer& lSystemLayer = *aInetLayer->mSystemLayer;
-    Weave::System::Error lReturn = Weave::System::Platform::Layer::DispatchEvents(lSystemLayer, aContext);
+    chip::System::Layer& lSystemLayer = *aInetLayer->mSystemLayer;
+    chip::System::Error lReturn = chip::System::Platform::Layer::DispatchEvents(lSystemLayer, aContext);
 
     return static_cast<INET_ERROR>(lReturn);
 }
@@ -1835,8 +1832,8 @@ INET_ERROR DispatchEvents(Inet::InetLayer* aInetLayer, void* aContext)
  */
 INET_ERROR DispatchEvent(Inet::InetLayer* aInetLayer, void* aContext, InetEvent aEvent)
 {
-    Weave::System::Layer& lSystemLayer = *aInetLayer->mSystemLayer;
-    Weave::System::Error lReturn = Weave::System::Platform::Layer::DispatchEvent(lSystemLayer, aContext, aEvent);
+    chip::System::Layer& lSystemLayer = *aInetLayer->mSystemLayer;
+    chip::System::Error lReturn = chip::System::Platform::Layer::DispatchEvent(lSystemLayer, aContext, aEvent);
 
     return static_cast<INET_ERROR>(lReturn);
 }
@@ -1856,13 +1853,13 @@ INET_ERROR DispatchEvent(Inet::InetLayer* aInetLayer, void* aContext, InetEvent 
  */
 INET_ERROR StartTimer(Inet::InetLayer* aInetLayer, void* aContext, uint32_t aMilliseconds)
 {
-    Weave::System::Layer& lSystemLayer = *aInetLayer->mSystemLayer;
-    Weave::System::Error lReturn = Weave::System::Platform::Layer::StartTimer(lSystemLayer, aContext, aMilliseconds);
+    chip::System::Layer& lSystemLayer = *aInetLayer->mSystemLayer;
+    chip::System::Error lReturn = chip::System::Platform::Layer::StartTimer(lSystemLayer, aContext, aMilliseconds);
 
     return static_cast<INET_ERROR>(lReturn);
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 } // namespace InetLayer
@@ -1871,4 +1868,3 @@ INET_ERROR StartTimer(Inet::InetLayer* aInetLayer, void* aContext, uint32_t aMil
 #endif // !INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
 
 } // namespace Inet
-} // namespace nl

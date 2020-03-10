@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,17 +25,16 @@
 #ifndef INETLAYERBASIS_H
 #define INETLAYERBASIS_H
 
-#include <InetLayer/InetConfig.h>
+#include "InetConfig.h"
 
-#include <Weave/Support/NLDLLUtil.h>
-#include <SystemLayer/SystemObject.h>
+#include "support/DLLUtil.h"
+#include "system/SystemObject.h"
 #include <stdint.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/select.h>
 #endif
 
-namespace nl {
 namespace Inet {
 
 //--- Forward declaration of InetLayer singleton class
@@ -50,7 +48,7 @@ class InetLayer;
  *    InetLayer object.
  *
  */
-class InetLayerBasis : public Weave::System::Object
+class InetLayerBasis : public chip::System::Object
 {
 public:
     InetLayer& Layer(void) const;
@@ -97,7 +95,7 @@ inline void InetLayerBasis::InitInetLayerBasis(InetLayer& aInetLayer, void* aApp
 typedef InetLayerBasis InetLayerObject;
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  *  @class SocketEvents
@@ -216,9 +214,8 @@ public:
  */
 #define INET_INVALID_SOCKET_FD (-1)
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(INETLAYERBASIS_H)

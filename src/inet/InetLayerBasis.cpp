@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,12 +22,11 @@
  *      the pending or resulting I/O events on a socket.
  */
 
-#include <InetLayer/InetLayerBasis.h>
+#include "InetLayerBasis.h"
 
-namespace nl {
 namespace Inet {
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 /**
  *  Sets the bit for the specified file descriptor in the given sets of file descriptors.
  *
@@ -87,7 +85,6 @@ SocketEvents SocketEvents::FromFDs(int socket, fd_set *readfds, fd_set *writefds
 
     return res;
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
-} // namespace nl
