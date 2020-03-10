@@ -18,7 +18,7 @@ Module_Includes = 	\
 
 Module_Test_Includes = $(Module_Includes)
 
-CPP_Files = logging/CHIPLogging.cpp
+CPP_Files = logging/CHIPLogging.cpp CHIPFaultInjection.cpp
 
 libsupport.a: $(CPP_Objects)
 	ar rvs $@ $^
