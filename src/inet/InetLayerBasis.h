@@ -25,10 +25,10 @@
 #ifndef INETLAYERBASIS_H
 #define INETLAYERBASIS_H
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 
-#include "support/DLLUtil.h"
-#include "system/SystemObject.h"
+#include <support/DLLUtil.h>
+#include <system/SystemObject.h>
 #include <stdint.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

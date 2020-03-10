@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "InetLayer.h"
+#include <InetLayer.h>
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <arpa/inet.h>

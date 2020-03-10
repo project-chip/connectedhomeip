@@ -29,9 +29,9 @@
 
 #include <stdint.h>
 
-#include "support/DLLUtil.h"
+#include <support/DLLUtil.h>
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 #include "IANAConstants.h"
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

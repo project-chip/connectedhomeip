@@ -25,14 +25,14 @@
 #ifndef INETBUFFER_H
 #define INETBUFFER_H
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 
 #if !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-#error "#include "InetBuffer.h" // while !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES."
+#error "#include <InetBuffer.h> // while !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES."
 
 #else // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#include "system/SystemPacketBuffer.h"
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace Inet {

@@ -25,11 +25,11 @@
 #ifndef TUNENDPOINT_H
 #define TUNENDPOINT_H
 
-#include "EndPointBasis.h"
-#include "IPAddress.h"
+#include <EndPointBasis.h>
+#include <IPAddress.h>
 #include "IPPrefix.h"
 
-#include "system/SystemPacketBuffer.h"
+#include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include "lwip/netif.h"

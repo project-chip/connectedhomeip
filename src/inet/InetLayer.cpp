@@ -44,12 +44,12 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "InetLayer.h"
+#include <InetLayer.h>
 #include "InetFaultInjection.h"
-#include "system/SystemTimer.h"
+#include <system/SystemTimer.h>
 
-#include "support/CodeUtils.h"
-#include "support/logging/CHIPLogging.h"
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 #include <errno.h>
 #include <stddef.h>

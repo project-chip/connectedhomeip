@@ -31,8 +31,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "core/CHIPEncoding.h"
-#include "InetLayer.h"
+#include <core/CHIPEncoding.h>
+#include <InetLayer.h>
 
 #include "arpa-inet-compatibility.h"
 

@@ -25,14 +25,14 @@
 #ifndef INETTIMER_H
 #define INETTIMER_H
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 
 #if !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-#error "#include "InetTimer.h" // while !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES."
+#error "#include <InetTimer.h> // while !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES."
 
 #else // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#include "system/SystemTimer.h"
+#include <system/SystemTimer.h>
 
 /**
  *  Number of nanoseconds in a microsecond

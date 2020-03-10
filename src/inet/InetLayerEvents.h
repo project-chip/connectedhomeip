@@ -25,9 +25,9 @@
 #ifndef INETLAYEREVENTS_H
 #define INETLAYEREVENTS_H
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 
-#include "system/SystemEvent.h"
+#include <system/SystemEvent.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 

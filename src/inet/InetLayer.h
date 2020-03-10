@@ -49,23 +49,23 @@
 
 #include <stdint.h>
 
-#include "InetConfig.h"
+#include <InetConfig.h>
 
-#include "system/SystemLayer.h"
-#include "system/SystemStats.h"
+#include <system/SystemLayer.h>
+#include <system/SystemStats.h>
 
-#include "support/DLLUtil.h"
+#include <support/DLLUtil.h>
 
 #include "IANAConstants.h"
-#include "InetError.h"
-#include "IPAddress.h"
+#include <InetError.h>
+#include <IPAddress.h>
 #include "IPPrefix.h"
-#include "InetInterface.h"
+#include <InetInterface.h>
 #include "InetLayerBasis.h"
-#include "InetLayerEvents.h"
+#include <InetLayerEvents.h>
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
-#include "DNSResolver.h"
+#include <DNSResolver.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT

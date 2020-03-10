@@ -26,7 +26,7 @@
  */
 
 #include "IPPrefix.h"
-#include "core/CHIPEncoding.h"
+#include <core/CHIPEncoding.h>
 
 namespace chip {
 namespace Inet {

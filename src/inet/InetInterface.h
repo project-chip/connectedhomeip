@@ -28,8 +28,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "support/DLLUtil.h"
-#include "IPAddress.h"
+#include <support/DLLUtil.h>
+#include <IPAddress.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/netif.h>
