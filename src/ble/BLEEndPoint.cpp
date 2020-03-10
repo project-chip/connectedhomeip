@@ -472,7 +472,7 @@ void BLEEndPoint::ReleaseBleConnection()
         else
         {
             chipLogProgress(Ble, "Releasing end point's BLE connection back to application.");
-            mBle->mApplicationDelegate->NotifychipConnectionClosed(mConnObj);
+            mBle->mApplicationDelegate->NotifyChipConnectionClosed(mConnObj);
         }
 
         // Never release the same BLE connection twice.

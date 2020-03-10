@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <BleLayer/BleConfig.h>
+#include <ble/BleConfig.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 

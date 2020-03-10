@@ -27,12 +27,12 @@
 #ifndef BLEENDPOINT_H_
 #define BLEENDPOINT_H_
 
-#include <SystemLayer/SystemMutex.h>
+#include <system/SystemMutex.h>
 
-#include <BleLayer/BleLayer.h>
-#include <BleLayer/WoBle.h>
+#include <ble/BleLayer.h>
+#include <ble/WoBle.h>
 #if CHIP_ENABLE_WOBLE_TEST
-#include <BleLayer/WoBleTest.h>
+#include <ble/WoBleTest.h>
 #endif
 
 namespace chip {
