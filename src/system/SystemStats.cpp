@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,29 +17,29 @@
 
 /**
  * @file
- *  This file implements the Weave API to collect statistics
- *  on the state of Weave, Inet and System resources
+ *  This file implements the CHIP API to collect statistics
+ *  on the state of CHIP, Inet and System resources
  */
 
-// Include module header
-#include <SystemLayer/SystemStats.h>
 
 // Include common private header
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <SystemLayer/SystemTimer.h>
+#include <SystemTimer.h>
+
+// Include module header
+#include <SystemStats.h>
 
 #include <string.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 namespace Stats {
 
-static const Label sStatsStrings[nl::Weave::System::Stats::kNumEntries] =
+static const Label sStatsStrings[chip::System::Stats::kNumEntries] =
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
 #define LWIP_PBUF_MEMPOOL(name, num, payload, desc) "SystemLayer_Num" desc,
 #include "lwippools.h"
 #undef LWIP_PBUF_MEMPOOL
@@ -67,7 +66,7 @@ static const Label sStatsStrings[nl::Weave::System::Stats::kNumEntries] =
     "ExchangeMgr_NumUMHandlersInUse",
     "ExchangeMgr_NumBindings",
     "MessageLayer_NumConnectionsInUse",
-#if WEAVE_CONFIG_ENABLE_SERVICE_DIRECTORY
+#if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     "ServiceMgr_NumRequestsInUse",
 #endif
 
@@ -84,16 +83,16 @@ static const Label sStatsStrings[nl::Weave::System::Stats::kNumEntries] =
     "WDM_NumCommands",
 #endif
 
-#if WEAVE_CONFIG_LEGACY_WDM
+#if CHIP_CONFIG_LEGACY_WDM
     "WDMLegacy_NumViewInUse",
-#if WEAVE_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
+#if CHIP_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
     "WDMLegacy_NumSubscribeInUse",
     "WDMLegacy_NumCancelInUse",
-#endif // WEAVE_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
+#endif // CHIP_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
     "WDMLegacy_NumUpdateInUse",
     "WDMLegacy_NumBindingsInUse",
     "WDMLegacy_NumTransactions",
-#endif // WEAVE_CONFIG_LEGACY_WDM
+#endif // CHIP_CONFIG_LEGACY_WDM
 
 };
 
@@ -120,7 +119,7 @@ void UpdateSnapshot(Snapshot &aSnapshot)
     memcpy(&aSnapshot.mResourcesInUse, &sResourcesInUse, sizeof(aSnapshot.mResourcesInUse));
     memcpy(&aSnapshot.mHighWatermarks, &sHighWatermarks, sizeof(aSnapshot.mHighWatermarks));
 
-    nl::Weave::System::Timer::GetStatistics(aSnapshot.mResourcesInUse[kSystemLayer_NumTimers],
+    chip::System::Timer::GetStatistics(aSnapshot.mResourcesInUse[kSystemLayer_NumTimers],
                                             aSnapshot.mHighWatermarks[kSystemLayer_NumTimers]);
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
@@ -145,7 +144,7 @@ bool Difference(Snapshot &result, Snapshot &after, Snapshot &before)
     return leak;
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 void UpdateLwipPbufCounts(void)
 {
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
@@ -154,23 +153,22 @@ void UpdateLwipPbufCounts(void)
 
     while (lwip_pool_idx <= PBUF_CUSTOM_POOL_IDX_START)
     {
-        nl::Weave::System::Stats::GetResourcesInUse()[system_idx] = MEMP_STATS_GET(used, lwip_pool_idx);
-        nl::Weave::System::Stats::GetHighWatermarks()[system_idx] = MEMP_STATS_GET(max, lwip_pool_idx);
+        chip::System::Stats::GetResourcesInUse()[system_idx] = MEMP_STATS_GET(used, lwip_pool_idx);
+        chip::System::Stats::GetHighWatermarks()[system_idx] = MEMP_STATS_GET(max, lwip_pool_idx);
         lwip_pool_idx++;
         system_idx++;
     }
 
 #else // LWIP_PBUF_FROM_CUSTOM_POOLS
 
-    nl::Weave::System::Stats::GetResourcesInUse()[kSystemLayer_NumPacketBufs] = MEMP_STATS_GET(used, MEMP_PBUF_POOL);
-    nl::Weave::System::Stats::GetHighWatermarks()[kSystemLayer_NumPacketBufs] = MEMP_STATS_GET(max, MEMP_PBUF_POOL);
+    chip::System::Stats::GetResourcesInUse()[kSystemLayer_NumPacketBufs] = MEMP_STATS_GET(used, MEMP_PBUF_POOL);
+    chip::System::Stats::GetHighWatermarks()[kSystemLayer_NumPacketBufs] = MEMP_STATS_GET(max, MEMP_PBUF_POOL);
 
 #endif // LWIP_PBUF_FROM_CUSTOM_POOLS
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 
 
 } // namespace Stats
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip

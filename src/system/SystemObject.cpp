@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,33 +18,33 @@
 /**
  *    @file
  *      This file contains definitions of member functions for class
- *      nl::Weave::System::Object.
+ *      chip::System::Object.
  */
 
 // Include module header
-#include <SystemLayer/SystemObject.h>
+#include <SystemObject.h>
 
 // Include common private header
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <SystemLayer/SystemLayer.h>
-#include <Weave/Support/CodeUtils.h>
+#include <SystemLayer.h>
+#include <support/CodeUtils.h>
 
 // Include local headers
 #include <stddef.h>
 #include <string.h>
+#include <stdlib.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 /**
  *  @brief
- *      Decrements the reference count for the Weave System Layer object. Recycles the object back into the pool if the reference
+ *      Decrements the reference count for the CHIP System Layer object. Recycles the object back into the pool if the reference
  *      count is decremented to zero. No destructor is invoked.
  */
-NL_DLL_EXPORT void Object::Release(void)
+DLL_EXPORT void Object::Release(void)
 {
     unsigned int oldCount = __sync_fetch_and_sub(&this->mRefCount, 1);
 
@@ -56,11 +55,11 @@ NL_DLL_EXPORT void Object::Release(void)
     }
     else if (oldCount == 0)
     {
-        WeaveDie();
+        abort();
     }
 }
 
-NL_DLL_EXPORT bool Object::TryCreate(Layer& aLayer, size_t aOctets)
+DLL_EXPORT bool Object::TryCreate(Layer& aLayer, size_t aOctets)
 {
     bool lReturn = false;
 
@@ -77,13 +76,13 @@ NL_DLL_EXPORT bool Object::TryCreate(Layer& aLayer, size_t aOctets)
     return lReturn;
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 void Object::DeferredRelease(Object::ReleaseDeferralErrorTactic aTactic)
 {
     Layer& lSystemLayer = *this->mSystemLayer;
-    Error lError = lSystemLayer.PostEvent(*this, Weave::System::kEvent_ReleaseObj, 0);
+    Error lError = lSystemLayer.PostEvent(*this, chip::System::kEvent_ReleaseObj, 0);
 
-    if (lError != WEAVE_SYSTEM_NO_ERROR)
+    if (lError != CHIP_SYSTEM_NO_ERROR)
     {
         switch (aTactic)
         {
@@ -95,14 +94,13 @@ void Object::DeferredRelease(Object::ReleaseDeferralErrorTactic aTactic)
             break;
 
         case kReleaseDeferralErrorTactic_Die:
-            VerifyOrDieWithMsg(false, WeaveSystemLayer, "Object::DeferredRelease %p->PostEvent failed err(%d)", &lSystemLayer,
+            VerifyOrDieWithMsg(false, chipSystemLayer, "Object::DeferredRelease %p->PostEvent failed err(%d)", &lSystemLayer,
                 static_cast<int>(lError));
             break;
         }
     }
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip

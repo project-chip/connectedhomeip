@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,19 +18,18 @@
 /**
  *    @file
  *      This file enumerates and defines the different types of events
- *      generated at the Weave System Layer.
+ *      generated at the CHIP System Layer.
  */
 
 #ifndef SYSTEMEVENT_H
 #define SYSTEMEVENT_H
 
 // Include headers
-#include <SystemLayer/SystemConfig.h>
+#include <SystemConfig.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
 /**
@@ -41,7 +39,7 @@ namespace System {
  *  This is defined to a platform- or system-specific type.
  *
  */
-typedef WEAVE_SYSTEM_CONFIG_LWIP_EVENT_TYPE EventType;
+typedef CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE EventType;
 
 /**
  *  @typedef Event
@@ -50,7 +48,7 @@ typedef WEAVE_SYSTEM_CONFIG_LWIP_EVENT_TYPE EventType;
  *  This is defined to a platform- or system-specific type.
  *
  */
-typedef WEAVE_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE Event;
+typedef CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE Event;
 
 /**
 *   The Inet layer event type definitions.
@@ -58,14 +56,14 @@ typedef WEAVE_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE Event;
 */
 enum
 {
-    kEvent_ReleaseObj   = _WEAVE_SYSTEM_CONFIG_LWIP_EVENT(0), /**< The event for the drop of a SystemLayer object */
-    kEvent_ScheduleWork = _WEAVE_SYSTEM_CONFIG_LWIP_EVENT(1), /**< The event for scheduling work on the System Layer's thread. */
+    kEvent_ReleaseObj   = _CHIP_SYSTEM_CONFIG_LWIP_EVENT(0), /**< The event for the drop of a SystemLayer object */
+    kEvent_ScheduleWork = _CHIP_SYSTEM_CONFIG_LWIP_EVENT(1), /**< The event for scheduling work on the System Layer's thread. */
 };
 
 /**
  *  Check to verify if an EventType is a valid one.
  *
- *  @param[in]  aEventType  Weave System Layer event type.
+ *  @param[in]  aEventType  CHIP System Layer event type.
  *
  *  @return true if it falls within the enumerated range; otherwise, false.
  */
@@ -75,8 +73,7 @@ static inline bool IsEventOfType(EventType aType)
 }
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // defined(SYSTEMEVENT_H)

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,12 +18,12 @@
 /**
  *    @file
  *      This file defines the member functions and private data for
- *      the nl::Weave::System::Timer class, which is used for
+ *      the chip::System::Timer class, which is used for
  *      representing an in-progress one-shot timer.
  */
 
 // Include module header
-#include <SystemLayer/SystemTimer.h>
+#include <SystemTimer.h>
 
 // Include common private header
 #include "SystemLayerPrivate.h"
@@ -32,11 +31,11 @@
 // Include local headers
 #include <string.h>
 
-#include <SystemLayer/SystemError.h>
-#include <SystemLayer/SystemLayer.h>
-#include <SystemLayer/SystemFaultInjection.h>
+#include <SystemError.h>
+#include <SystemLayer.h>
+#include <SystemFaultInjection.h>
 
-#include <Weave/Support/CodeUtils.h>
+#include <support/CodeUtils.h>
 
 /*******************************************************************************
  * Timer state
@@ -72,11 +71,10 @@
  *******************************************************************************
  */
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 
-ObjectPool<Timer, WEAVE_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
+ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
 
 /**
  *  This method returns the current epoch, corrected by system sleep with the system timescale, in milliseconds.
@@ -120,25 +118,25 @@ bool Timer::IsEarlierEpoch(const Timer::Epoch &inFirst, const Timer::Epoch &inSe
  *  @param[in]  aOnComplete          A pointer to the callback function when this timer fires
  *  @param[in]  aAppState            An arbitrary pointer to be passed into onComplete when this timer fires
  *
- *  @retval #WEAVE_SYSTEM_NO_ERROR Unconditionally.
+ *  @retval #CHIP_SYSTEM_NO_ERROR Unconditionally.
  *
  */
 Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void* aAppState)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     Layer& lLayer = this->SystemLayer();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    WEAVE_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, aDelayMilliseconds = 0);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, aDelayMilliseconds = 0);
 
     this->AppState = aAppState;
     this->mAwakenEpoch = Timer::GetCurrentEpoch() + static_cast<Epoch>(aDelayMilliseconds);
     if (!__sync_bool_compare_and_swap(&this->OnComplete, NULL, aOnComplete))
     {
-        WeaveDie();
+        chipDie();
     }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // add to the sorted list of timers. Earliest timer appears first.
     if (lLayer.mTimerList == NULL ||
         this->IsEarlierEpoch(this->mAwakenEpoch, lLayer.mTimerList->mAwakenEpoch))
@@ -172,29 +170,29 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
         this->mNextTimer = lTimer->mNextTimer;
         lTimer->mNextTimer = this;
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void* aAppState)
 {
-    Error err = WEAVE_SYSTEM_NO_ERROR;
+    Error err = CHIP_SYSTEM_NO_ERROR;
     Layer& lLayer = this->SystemLayer();
 
     this->AppState = aAppState;
     this->mAwakenEpoch = Timer::GetCurrentEpoch();
     if (!__sync_bool_compare_and_swap(&this->OnComplete, NULL, aOnComplete))
     {
-        WeaveDie();
+        chipDie();
     }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
-    err = lLayer.PostEvent(*this, Weave::System::kEvent_ScheduleWork, 0);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    err = lLayer.PostEvent(*this, chip::System::kEvent_ScheduleWork, 0);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     lLayer.WakeSelect();
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return err;
 }
@@ -202,13 +200,13 @@ Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void* aAppState)
 /**
  *  This method de-initializes the timer object, and prevents this timer from firing if it hasn't done so.
  *
- *  @retval #WEAVE_SYSTEM_NO_ERROR Unconditionally.
+ *  @retval #CHIP_SYSTEM_NO_ERROR Unconditionally.
  */
 Error Timer::Cancel()
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     Layer& lLayer = this->SystemLayer();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     OnCompleteFunct lOnComplete = this->OnComplete;
 
     // Check if the timer is armed
@@ -219,7 +217,7 @@ Error Timer::Cancel()
     // Since this thread changed the state of OnComplete, release the timer.
     this->AppState = NULL;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (lLayer.mTimerList)
     {
         if (this == lLayer.mTimerList)
@@ -244,11 +242,11 @@ Error Timer::Cancel()
 
         this->mNextTimer = NULL;
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     this->Release();
 exit:
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 /**
@@ -272,13 +270,13 @@ void Timer::HandleComplete()
 
     // Invoke the app's callback, if it's still valid.
     if (lOnComplete != NULL)
-        lOnComplete(&lLayer, lAppState, WEAVE_SYSTEM_NO_ERROR);
+        lOnComplete(&lLayer, lAppState, CHIP_SYSTEM_NO_ERROR);
 
 exit:
     return;
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /**
  * Completes any timers that have expired.
  *
@@ -290,7 +288,7 @@ exit:
  *  @note
  *      It's harmless if this API gets called and there are no expired timers.
  *
- *  @return WEAVE_SYSTEM_NO_ERROR on success, error code otherwise.
+ *  @return CHIP_SYSTEM_NO_ERROR on success, error code otherwise.
  *
  */
 Error Timer::HandleExpiredTimers(Layer& aLayer)
@@ -345,10 +343,9 @@ Error Timer::HandleExpiredTimers(Layer& aLayer)
         }
     }
 
-    return WEAVE_SYSTEM_NO_ERROR;
+    return CHIP_SYSTEM_NO_ERROR;
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,8 +17,8 @@
 
 /**
  * @file
- *  This file declares the Weave API to collect statistics
- *  on the state of Weave, Inet and System resources
+ *  This file declares the CHIP API to collect statistics
+ *  on the state of CHIP, Inet and System resources
  */
 
 #ifndef SYSTEMSTATS_H
@@ -31,25 +30,24 @@
 #include <stdint.h>
 
 // Include configuration headers
-#include <Weave/Core/WeaveConfig.h>
+#include <CHIPConfig.h>
 
 // Include dependent headers
-#include <Weave/Support/NLDLLUtil.h>
+#include <support/DLLUtil.h>
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/opt.h>
 #include <lwip/pbuf.h>
 #include <lwip/mem.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 namespace Stats {
 
 enum
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
 #define LWIP_PBUF_MEMPOOL(name, num, payload, desc) kSystemLayer_Num##name,
 #include "lwippools.h"
 #undef LWIP_PBUF_MEMPOOL
@@ -76,7 +74,7 @@ enum
     kExchangeMgr_NumUMHandlers,
     kExchangeMgr_NumBindings,
     kMessageLayer_NumConnections,
-#if WEAVE_CONFIG_ENABLE_SERVICE_DIRECTORY
+#if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     kServiceMgr_NumRequests,
 #endif
 #if WDM_ENABLE_SUBSCRIPTION_PUBLISHER
@@ -92,24 +90,24 @@ enum
     kWDM_NumCommands,
 #endif
 
-#if WEAVE_CONFIG_LEGACY_WDM
+#if CHIP_CONFIG_LEGACY_WDM
     kWDMLegacy_NumViews,
-#if WEAVE_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
+#if CHIP_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
     kWDMLegacy_NumSubscribes,
     kWDMLegacy_NumCancels,
-#endif // WEAVE_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
+#endif // CHIP_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
     kWDMLegacy_NumUpdates,
     kWDMLegacy_NumBindings,
     kWDMLegacy_NumTransactions,
-#endif // WEAVE_CONFIG_LEGACY_WDM
+#endif // CHIP_CONFIG_LEGACY_WDM
 
 
     kNumEntries
 };
 
 typedef int8_t count_t;
-#define PRI_WEAVE_SYS_STATS_COUNT PRId8
-#define WEAVE_SYS_STATS_COUNT_MAX INT8_MAX
+#define PRI_CHIP_SYS_STATS_COUNT PRId8
+#define CHIP_SYS_STATS_COUNT_MAX INT8_MAX
 
 extern count_t ResourcesInUse[kNumEntries];
 extern count_t HighWatermarks[kNumEntries];
@@ -127,7 +125,7 @@ void UpdateSnapshot(Snapshot &aSnapshot);
 count_t *GetResourcesInUse(void);
 count_t *GetHighWatermarks(void);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 void UpdateLwipPbufCounts(void);
 #endif
 
@@ -136,55 +134,54 @@ const Label *GetStrings(void);
 
 } // namespace Stats
 } // namespace System
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#if WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 
 #define SYSTEM_STATS_INCREMENT(entry) \
     do { \
-        nl::Weave::System::Stats::count_t new_value = ++(nl::Weave::System::Stats::GetResourcesInUse()[entry]); \
-        if (nl::Weave::System::Stats::GetHighWatermarks()[entry] < new_value) \
+        chip::System::Stats::count_t new_value = ++(chip::System::Stats::GetResourcesInUse()[entry]); \
+        if (chip::System::Stats::GetHighWatermarks()[entry] < new_value) \
         { \
-            nl::Weave::System::Stats::GetHighWatermarks()[entry] = new_value; \
+            chip::System::Stats::GetHighWatermarks()[entry] = new_value; \
         } \
     } while (0);
 
 #define SYSTEM_STATS_DECREMENT(entry) \
     do { \
-        nl::Weave::System::Stats::GetResourcesInUse()[entry]--; \
+        chip::System::Stats::GetResourcesInUse()[entry]--; \
     } while (0);
 
 #define SYSTEM_STATS_DECREMENT_BY_N(entry, count) \
     do { \
-        nl::Weave::System::Stats::GetResourcesInUse()[entry] -= (count); \
+        chip::System::Stats::GetResourcesInUse()[entry] -= (count); \
     } while (0);
 
 #define SYSTEM_STATS_SET(entry, count) \
     do { \
-        nl::Weave::System::Stats::count_t new_value = nl::Weave::System::Stats::GetResourcesInUse()[entry] = (count); \
-        if (nl::Weave::System::Stats::GetHighWatermarks()[entry] < new_value) \
+        chip::System::Stats::count_t new_value = chip::System::Stats::GetResourcesInUse()[entry] = (count); \
+        if (chip::System::Stats::GetHighWatermarks()[entry] < new_value) \
         { \
-            nl::Weave::System::Stats::GetHighWatermarks()[entry] = new_value; \
+            chip::System::Stats::GetHighWatermarks()[entry] = new_value; \
         } \
     } while (0);
 
 #define SYSTEM_STATS_RESET(entry) \
     do { \
-        nl::Weave::System::Stats::GetResourcesInUse()[entry] = 0; \
+        chip::System::Stats::GetResourcesInUse()[entry] = 0; \
     } while (0);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 #define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS() \
     do { \
-        nl::Weave::System::Stats::UpdateLwipPbufCounts(); \
+        chip::System::Stats::UpdateLwipPbufCounts(); \
     } while (0);
-#else // WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+#else // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 #define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS()
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 
 
-#else // WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#else // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 
 #define SYSTEM_STATS_INCREMENT(entry)
 
@@ -196,6 +193,6 @@ const Label *GetStrings(void);
 
 #define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS()
 
-#endif // WEAVE_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 
 #endif // defined(SYSTEMSTATS_H)
