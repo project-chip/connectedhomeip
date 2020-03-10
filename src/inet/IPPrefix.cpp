@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,17 +18,16 @@
 /**
  *    @file
  *      This file implements the concrete class
- *      <tt>nl::Inet::IPPrefix</tt>, which comprise two member fields:
+ *      <tt>Inet::IPPrefix</tt>, which comprise two member fields:
  *      a) a IP address and b) a length field. The Nest Inet Layer
  *      uses objects of this class to represent Internet protocol
  *      address prefixes of both IPv4 and IPv6 address families.
  *
  */
 
-#include <InetLayer/IPPrefix.h>
-#include <Weave/Core/WeaveEncoding.h>
+#include "IPPrefix.h"
+#include "core/CHIPEncoding.h"
 
-namespace nl {
 namespace Inet {
 
 IPPrefix IPPrefix::Zero;
@@ -76,9 +74,8 @@ bool IPPrefix::MatchAddress(const IPAddress& addr) const
     if (l == 0)
         return true;
 
-    uint32_t mask = nl::Weave::Encoding::BigEndian::HostSwap32(0xFFFFFFFF << (32 - l));
+    uint32_t mask = chip::Encoding::BigEndian::HostSwap32(0xFFFFFFFF << (32 - l));
     return (IPAddr.Addr[i] & mask) == (addr.Addr[i] & mask);
 }
 
 } // namespace Inet
-} // namespace nl

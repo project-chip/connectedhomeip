@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@
 /**
  *    @file
  *      This file implements the human-readable string formatting and
- *      parsing methods from class <tt>nl::Inet::IPAddress</tt>.
+ *      parsing methods from class <tt>Inet::IPAddress</tt>.
  *
  */
 
@@ -29,18 +28,17 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <InetLayer/InetLayer.h>
+#include "InetLayer.h"
 
-#if !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <arpa/inet.h>
 #endif
 
-namespace nl {
 namespace Inet {
 
 char *IPAddress::ToString(char *buf, uint32_t bufSize) const
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
@@ -58,7 +56,7 @@ char *IPAddress::ToString(char *buf, uint32_t bufSize) const
         ip6_addr_t ip6_addr = ToIPv6();
         ip6addr_ntoa_r(&ip6_addr, buf, (int)bufSize);
     }
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
@@ -69,7 +67,7 @@ char *IPAddress::ToString(char *buf, uint32_t bufSize) const
     {
         buf = (char *)inet_ntop(AF_INET6, (const void *) Addr, buf, bufSize);
     }
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
     return buf;
 }
@@ -79,7 +77,7 @@ bool IPAddress::FromString(const char *str, IPAddress& output)
 #if INET_CONFIG_ENABLE_IPV4
     if (strchr(str, ':') == NULL)
     {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip4_addr_t ipv4Addr;
         if (!ip4addr_aton(str, &ipv4Addr))
@@ -89,25 +87,25 @@ bool IPAddress::FromString(const char *str, IPAddress& output)
         if (!ipaddr_aton(str, &ipv4Addr))
             return false;
 #endif // LWIP_VERSION_MAJOR <= 1
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
         struct in_addr ipv4Addr;
         if (inet_pton(AF_INET, str, &ipv4Addr) < 1)
             return false;
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
         output = FromIPv4(ipv4Addr);
     }
     else
 #endif // INET_CONFIG_ENABLE_IPV4
     {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ipv6Addr;
         if (!ip6addr_aton(str, &ipv6Addr))
             return false;
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
         struct in6_addr ipv6Addr;
         if (inet_pton(AF_INET6, str, &ipv6Addr) < 1)
             return false;
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
         output = FromIPv6(ipv6Addr);
     }
 
@@ -132,4 +130,3 @@ bool IPAddress::FromString(const char *str, size_t strLen, IPAddress& output)
 
 
 } // namespace Inet
-} // namespace nl

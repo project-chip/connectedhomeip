@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    Copyright (c) 2013-2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines the class <tt>nl::Inet::IPAddress</tt> and
+ *      This file defines the class <tt>Inet::IPAddress</tt> and
  *      related enumerated constants. The Nest Inet Layer uses objects
  *      of this class to represent Internet protocol addresses of both
  *      IPv4 and IPv6 address families. (IPv4 addresses are stored
@@ -31,24 +29,24 @@
 
 #include <stdint.h>
 
-#include <Weave/Support/NLDLLUtil.h>
+#include "support/DLLUtil.h"
 
-#include <InetLayer/InetConfig.h>
-#include <InetLayer/IANAConstants.h>
+#include "InetConfig.h"
+#include "IANAConstants.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
 #include <lwip/ip_addr.h>
 #if INET_CONFIG_ENABLE_IPV4
 #include <lwip/ip4_addr.h>
 #endif // INET_CONFIG_ENABLE_IPV4
 #include <lwip/inet.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/socket.h>
 #include <netinet/in.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #define NL_INET_IPV6_ADDR_LEN_IN_BYTES               (16)
 #define NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES        (14)
@@ -63,15 +61,14 @@
  *  type alias is provided even when the LwIP version is earlier than 2.0.0 so as to prepare
  *  for the import of the new logic.
  */
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && INET_CONFIG_ENABLE_IPV4 && LWIP_VERSION_MAJOR < 2 && LWIP_VERSION_MINOR < 5
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && INET_CONFIG_ENABLE_IPV4 && LWIP_VERSION_MAJOR < 2 && LWIP_VERSION_MINOR < 5
 typedef ip_addr_t ip4_addr_t;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP && INET_CONFIG_ENABLE_IPV4 && LWIP_VERSION_MAJOR < 2 && LWIP_VERSION_MINOR < 5
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && INET_CONFIG_ENABLE_IPV4 && LWIP_VERSION_MAJOR < 2 && LWIP_VERSION_MINOR < 5
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
 typedef u8_t lwip_ip_addr_type;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
 
-namespace nl {
 namespace Inet {
 
 /**
@@ -124,7 +121,7 @@ typedef enum
  *  The Nest Inet Layer uses objects of this class to represent Internet
  *  protocol addresses (independent of protocol version).
  */
-class NL_DLL_EXPORT IPAddress
+class DLL_EXPORT IPAddress
 {
 public:
 
@@ -480,7 +477,7 @@ public:
      * @overload     static IPAddress FromIPv6(const ip6_addr_t &addr)
      */
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     /**
@@ -529,9 +526,9 @@ public:
     static IPAddress FromIPv4(const ip4_addr_t &addr);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     struct in6_addr ToIPv6(void) const;
     static IPAddress FromIPv6(const struct in6_addr &addr);
@@ -552,7 +549,7 @@ public:
      */
     static IPAddress FromSockAddr(const struct sockaddr& sockaddr);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     /**
      * @brief   Construct an IPv6 unique-local address (ULA) from its parts.
@@ -662,6 +659,5 @@ public:
 };
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(IPADDRESS_H)

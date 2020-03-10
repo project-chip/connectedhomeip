@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2015-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +27,6 @@
 #ifndef IANACONSTANTS_H
 #define IANACONSTANTS_H
 
-namespace nl {
 namespace Inet {
 
 /**
@@ -112,6 +110,5 @@ enum IPV6MulticastGroup
 };
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(IANACONSTANTS_H)
