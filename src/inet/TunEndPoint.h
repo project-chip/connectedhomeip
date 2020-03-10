@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,30 +17,30 @@
 
 /**
  * @file
- *  This header file defines the <tt>nl::Inet::TunEndPoint</tt> class, where
- *  the Nest Inet Layer encapsulates its foundational logic for the Weave
+ *  This header file defines the <tt>Inet::TunEndPoint</tt> class, where
+ *  the Nest Inet Layer encapsulates its foundational logic for the chip
  *  tunneling agent.
  */
 
 #ifndef TUNENDPOINT_H
 #define TUNENDPOINT_H
 
-#include <InetLayer/EndPointBasis.h>
-#include <InetLayer/IPAddress.h>
-#include <InetLayer/IPPrefix.h>
+#include "EndPointBasis.h"
+#include "IPAddress.h"
+#include "IPPrefix.h"
 
-#include <SystemLayer/SystemPacketBuffer.h>
+#include "system/SystemPacketBuffer.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include "lwip/netif.h"
 #include <lwip/ip_addr.h>
 #include <lwip/ip.h>
 #include <lwip/tcpip.h>
 #include <lwip/ip6.h>
 #include <lwip/ip6_route_table.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <net/if.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -62,7 +61,7 @@
 #if HAVE_LINUX_IPV6_ROUTE_H
 #include <linux/ipv6_route.h>
 #endif // HAVE_LINUX_IPV6_ROUTE_H
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /** Define portable flags for closing file descriptor upon
  * inheritance by an external sub-process. This is only a
@@ -81,7 +80,6 @@
 #define NL_SOCK_CLOEXEC 0
 #endif
 
-namespace nl {
 namespace Inet {
 
 class InetLayer;
@@ -93,9 +91,9 @@ class IPPacketInfo;
  * @details
  *  Nest Inet Layer encapsulates methods for interacting on both POSIX systems
  *  and LwIP systems with an IP-in-IP tunneling mechanism for supporting the
- *  Weave tunnel agent.
+ *  chip tunnel agent.
  */
-class NL_DLL_EXPORT TunEndPoint: public EndPointBasis
+class DLL_EXPORT TunEndPoint: public EndPointBasis
 {
     friend class InetLayer;
 
@@ -132,18 +130,18 @@ public:
 
     void Init(InetLayer *inetLayer);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     INET_ERROR Open(void);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR Open(const char *intfName);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     /** Close the tunnel and release handle on the object. */
     void Free(void);
 
-    INET_ERROR Send(Weave::System::PacketBuffer *message);
+    INET_ERROR Send(chip::System::PacketBuffer *message);
 
     bool IsInterfaceUp(void) const;
 
@@ -159,9 +157,9 @@ public:
      *  packet from the tunnel.
      *
      * @param[in] endPoint        A pointer to the TunEndPoint object.
-     * @param[in] message         A pointer to the Weave::System::PacketBuffer message object.
+     * @param[in] message         A pointer to the chip::System::PacketBuffer message object.
      */
-    typedef void (*OnPacketReceivedFunct)(TunEndPoint *endPoint, Weave::System::PacketBuffer *message);
+    typedef void (*OnPacketReceivedFunct)(TunEndPoint *endPoint, chip::System::PacketBuffer *message);
 
     /** The endpoint's packet receive event handler delegate. */
     OnPacketReceivedFunct OnPacketReceived;
@@ -187,22 +185,22 @@ private:
     TunEndPoint(const TunEndPoint&);                    // not defined
     ~TunEndPoint(void);                                 // not defined
 
-    static Weave::System::ObjectPool<TunEndPoint, INET_CONFIG_NUM_TUN_ENDPOINTS> sPool;
+    static chip::System::ObjectPool<TunEndPoint, INET_CONFIG_NUM_TUN_ENDPOINTS> sPool;
 
     /** Close the tunnel. */
     void Close(void);
 
     // Function that performs some sanity tests for IPv6 packets.
-    INET_ERROR CheckV6Sanity(Weave::System::PacketBuffer *message);
+    INET_ERROR CheckV6Sanity(chip::System::PacketBuffer *message);
     // Function for sending the IPv6 packets over Linux sockets or LwIP.
-    INET_ERROR TunDevSendMessage(Weave::System::PacketBuffer *msg);
+    INET_ERROR TunDevSendMessage(chip::System::PacketBuffer *msg);
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Network interface structure holding the tunnel interface in LwIP.
     struct netif mTunNetIf;
 
     INET_ERROR TunDevOpen(void);
-    void HandleDataReceived(Weave::System::PacketBuffer *msg);
+    void HandleDataReceived(chip::System::PacketBuffer *msg);
 
     static err_t LwIPPostToInetEventQ(struct netif *netif, struct pbuf *p);
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
@@ -219,24 +217,23 @@ private:
 #endif // LWIP_IPV6
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
     static err_t TunInterfaceNetifInit(struct netif *netif);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     //Tunnel interface name
     char tunIntfName[IFNAMSIZ];
 
     INET_ERROR TunDevOpen(const char *interfaceName);
     void TunDevClose(void);
-    INET_ERROR TunDevRead(Weave::System::PacketBuffer *msg);
+    INET_ERROR TunDevRead(chip::System::PacketBuffer *msg);
     static int TunGetInterface(int fd, struct ::ifreq *ifr);
 
     SocketEvents PrepareIO(void);
     void HandlePendingIO(void);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 };
 
 } // namespace Inet
-} // namespace nl
 
 #endif // !defined(TUNENDPOINT_H)

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,25 +27,24 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <InetLayer/TunEndPoint.h>
-#include <InetLayer/InetLayer.h>
+#include "TunEndPoint.h"
+#include "InetLayer.h"
 
 #include <string.h>
 #include <stdio.h>
 
-#include <Weave/Core/WeaveEncoding.h>
-#include <Weave/Support/CodeUtils.h>
+#include "core/CHIPEncoding.h"
+#include "support/CodeUtils.h"
 
 #include "arpa-inet-compatibility.h"
 
-namespace nl {
 namespace Inet {
 
-using Weave::System::PacketBuffer;
+using chip::System::PacketBuffer;
 
-Weave::System::ObjectPool<TunEndPoint, INET_CONFIG_NUM_TUN_ENDPOINTS> TunEndPoint::sPool;
+chip::System::ObjectPool<TunEndPoint, INET_CONFIG_NUM_TUN_ENDPOINTS> TunEndPoint::sPool;
 
-using namespace nl::Weave::Encoding;
+using namespace chip::Encoding;
 
 /**
  * Initialize the Tunnel EndPoint object.
@@ -75,17 +73,17 @@ void TunEndPoint::Init(InetLayer *inetLayer)
  *
  * @return INET_NO_ERROR on success, else a corresponding INET mapped OS error.
  */
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 INET_ERROR TunEndPoint::Open (void)
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 INET_ERROR TunEndPoint::Open (const char *intfName)
-#endif //WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif //CHIP_SYSTEM_CONFIG_USE_SOCKETS
 {
     INET_ERROR err = INET_NO_ERROR;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     struct netif *tNetif = NULL;
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -97,9 +95,9 @@ INET_ERROR TunEndPoint::Open (const char *intfName)
 
     VerifyOrExit(tNetif != NULL, err = INET_ERROR_INTERFACE_INIT_FAILURE);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     //Create the tunnel device
     err = TunDevOpen(intfName);
@@ -107,7 +105,7 @@ INET_ERROR TunEndPoint::Open (const char *intfName)
 
     printf("Opened tunnel device: %s\n", intfName);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (err == INET_NO_ERROR)
         mState = kState_Open;
@@ -127,13 +125,13 @@ void TunEndPoint::Close (void)
     {
 
         // For LwIP, we do not remove the netif as it would have
-        // an impact on the interface iterator in Weave which
+        // an impact on the interface iterator in chip which
         // might lose reference to a particular netif index that
         // it might be holding on to.
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         if (mSocket >= 0)
         {
-            Weave::System::Layer& lSystemLayer = SystemLayer();
+            chip::System::Layer& lSystemLayer = SystemLayer();
 
             // Wake the thread calling select so that it recognizes the socket is closed.
             lSystemLayer.WakeSelect();
@@ -143,7 +141,7 @@ void TunEndPoint::Close (void)
         // Clear any results from select() that indicate pending I/O for the socket.
         mPendingIO.Clear();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
         mState = kState_Closed;
     }
 }
@@ -157,11 +155,11 @@ void TunEndPoint::Free()
 {
     Close();
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     DeferredFree(kReleaseDeferralErrorTactic_Release);
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
     Release();
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -170,7 +168,7 @@ void TunEndPoint::Free()
  * @note
  *  This method performs a couple of minimal sanity checks on the packet to
  *  be sure it is IP version 6 then dispatches it for encapsulation in a
- *  Weave tunneling message.
+ *  chip tunneling message.
  *
  * @param[in]   message     the IPv6 packet to send.
  *
@@ -203,7 +201,7 @@ bool TunEndPoint::IsInterfaceUp (void) const
 {
     bool ret = false;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
@@ -213,9 +211,9 @@ bool TunEndPoint::IsInterfaceUp (void) const
     UNLOCK_TCPIP_CORE();
 
     ExitNow();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     int sockfd = INET_INVALID_SOCKET_FD;
     struct ::ifreq ifr;
 
@@ -241,15 +239,15 @@ bool TunEndPoint::IsInterfaceUp (void) const
 
     ret = ((ifr.ifr_flags & IFF_UP) == IFF_UP);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 exit:
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if (sockfd >= 0)
     {
         close(sockfd);
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return ret;
 }
@@ -264,7 +262,7 @@ INET_ERROR TunEndPoint::InterfaceUp (void)
 {
     INET_ERROR err = INET_NO_ERROR;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
@@ -274,9 +272,9 @@ INET_ERROR TunEndPoint::InterfaceUp (void)
     UNLOCK_TCPIP_CORE();
 
     ExitNow();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     int sockfd = INET_INVALID_SOCKET_FD;
     struct ::ifreq ifr;
 
@@ -285,44 +283,44 @@ INET_ERROR TunEndPoint::InterfaceUp (void)
     //Get interface
     if (TunGetInterface(mSocket, &ifr) < 0)
     {
-        ExitNow(err = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
     sockfd = socket(AF_INET6, SOCK_DGRAM | NL_SOCK_CLOEXEC, IPPROTO_IP);
     if (sockfd < 0)
     {
-        ExitNow(err = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
     //Get interface flags
     if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
     {
-        ExitNow(err = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
     //Set flag to activate interface
     ifr.ifr_flags |= (IFF_UP | IFF_RUNNING);
     if (ioctl(sockfd, SIOCSIFFLAGS, &ifr) < 0)
     {
-        err = Weave::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
     }
 
     //Set the MTU
-    ifr.ifr_mtu = WEAVE_CONFIG_TUNNEL_INTERFACE_MTU;
+    ifr.ifr_mtu = CHIP_CONFIG_TUNNEL_INTERFACE_MTU;
     if (ioctl(sockfd, SIOCSIFMTU, &ifr) < 0)
     {
-        ExitNow(err = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 exit:
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if (sockfd >= 0)
     {
         close(sockfd);
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return err;
 }
@@ -336,12 +334,12 @@ exit:
 INET_ERROR TunEndPoint::InterfaceDown (void)
 {
     INET_ERROR err = INET_NO_ERROR;
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     int sockfd = INET_INVALID_SOCKET_FD;
     struct ::ifreq ifr;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
@@ -354,44 +352,44 @@ INET_ERROR TunEndPoint::InterfaceDown (void)
     UNLOCK_TCPIP_CORE();
 
     ExitNow();
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     memset(&ifr, 0, sizeof(ifr));
 
     //Get interface
     if (TunGetInterface(mSocket, &ifr) < 0)
     {
-        ExitNow(err = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
     sockfd = socket(AF_INET6, SOCK_DGRAM | NL_SOCK_CLOEXEC, IPPROTO_IP);
     if (sockfd < 0)
     {
-        ExitNow(err = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
     //Get interface flags
     if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
     {
-        ExitNow(err = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
     //Set flag to deactivate interface
     ifr.ifr_flags &= ~(IFF_UP);
     if (ioctl(sockfd, SIOCSIFFLAGS, &ifr) < 0)
     {
-        err = Weave::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 exit:
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if (sockfd >= 0)
     {
         close(sockfd);
     }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return err;
 }
@@ -403,11 +401,11 @@ exit:
  */
 InterfaceId TunEndPoint::GetTunnelInterfaceId(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     return &mTunNetIf;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR err = INET_NO_ERROR;
     InterfaceId tunIntfId = INET_NULL_INTERFACEID;
     const char *tunIntfPtr = &tunIntfName[0];
@@ -419,10 +417,10 @@ InterfaceId TunEndPoint::GetTunnelInterfaceId(void)
     }
 
     return tunIntfId;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /* Function for sending the IPv6 packets over LwIP */
 INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer *msg)
 {
@@ -443,15 +441,15 @@ INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer *msg)
     if ((err = tcpip_input(p, &mTunNetIf)) != ERR_OK)
     {
         LWIP_DEBUGF(NETIF_DEBUG, ("tunNetif_input: IP input error\n"));
-        ExitNow(ret = Weave::System::MapErrorLwIP(err));
+        ExitNow(ret = chip::System::MapErrorLwIP(err));
     }
 
 exit:
     return (ret);
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 /* Function for sending the IPv6 packets over Linux sockets */
 INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer *msg)
 {
@@ -467,7 +465,7 @@ INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer *msg)
     lenSent = write(mSocket, p, msg->DataLength());
     if (lenSent < 0)
     {
-       ExitNow(ret = Weave::System::MapErrorPOSIX(errno));
+       ExitNow(ret = chip::System::MapErrorPOSIX(errno));
     }
     else if (lenSent < msg->DataLength())
     {
@@ -482,7 +480,7 @@ exit:
 
     return (ret);
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /* Function that performs some basic sanity checks for IPv6 packets */
 INET_ERROR TunEndPoint::CheckV6Sanity (PacketBuffer *msg)
@@ -498,13 +496,13 @@ INET_ERROR TunEndPoint::CheckV6Sanity (PacketBuffer *msg)
     VerifyOrExit(ip6hdr != NULL, err = INET_ERROR_BAD_ARGS);
 
     //Do some IPv6 sanity checks
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (IP6H_V(ip6hdr) != 6)
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     if ((ip6hdr->ip6_vfc >> 4) != 6)
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
     {
         ExitNow(err = INET_ERROR_NOT_SUPPORTED);
     }
@@ -514,7 +512,7 @@ exit:
     return err;
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /* Handler to send received packet to upper layer callback */
 void TunEndPoint::HandleDataReceived (PacketBuffer *msg)
 {
@@ -548,11 +546,11 @@ err_t TunEndPoint::LwIPPostToInetEventQ (struct netif *netif, struct pbuf *p)
     err_t                   lwipErr         = ERR_OK;
     INET_ERROR              err             = INET_NO_ERROR;
     TunEndPoint*            ep              = static_cast<TunEndPoint *>(netif->state);
-    Weave::System::Layer&   lSystemLayer    = ep->SystemLayer();
+    chip::System::Layer&   lSystemLayer    = ep->SystemLayer();
     PacketBuffer*           buf             = PacketBuffer::NewWithAvailableSize(p->tot_len);
 
-    // Starting off with a reserved size of the default WEAVE_SYSTEM_CONFIG_HEADER_RESERVE_SIZE
-    // which allows for adding the Weave header and the underlying transport and IP headers
+    // Starting off with a reserved size of the default CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE
+    // which allows for adding the chip header and the underlying transport and IP headers
     // encapsulating this tunneled packet.
 
     VerifyOrExit(buf != NULL, lwipErr = ERR_MEM);
@@ -638,7 +636,7 @@ err_t TunEndPoint::TunInterfaceNetifInit (struct netif *netif)
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
     netif->linkoutput = NULL;
 
-    netif->mtu = WEAVE_CONFIG_TUNNEL_INTERFACE_MTU;
+    netif->mtu = CHIP_CONFIG_TUNNEL_INTERFACE_MTU;
 
     netif->hwaddr_len = 6;
     memset(netif->hwaddr, 0, NETIF_MAX_HWADDR_LEN);
@@ -652,9 +650,9 @@ err_t TunEndPoint::TunInterfaceNetifInit (struct netif *netif)
     return ERR_OK;
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 /* Open a tun device in linux */
 INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
 {
@@ -664,7 +662,7 @@ INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
 
     if ((fd = open(INET_CONFIG_TUNNEL_DEVICE_NAME, O_RDWR | NL_O_CLOEXEC)) < 0)
     {
-        ExitNow(ret = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(ret = chip::System::MapErrorPOSIX(errno));
     }
 
     //Keep copy of open device fd
@@ -681,14 +679,14 @@ INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
 
     if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0)
     {
-        ExitNow(ret = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(ret = chip::System::MapErrorPOSIX(errno));
     }
 
     //Verify name
     memset(&ifr, 0, sizeof(ifr));
     if (TunGetInterface(fd, &ifr) < 0)
     {
-        ExitNow(ret = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(ret = chip::System::MapErrorPOSIX(errno));
     }
 
     if (ifr.ifr_name[0] != '\0')
@@ -698,7 +696,7 @@ INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
     }
     else
     {
-        ExitNow(ret = Weave::System::MapErrorPOSIX(errno));
+        ExitNow(ret = chip::System::MapErrorPOSIX(errno));
     }
 
 exit:
@@ -739,7 +737,7 @@ INET_ERROR TunEndPoint::TunDevRead (PacketBuffer *msg)
     rcvLen = read(mSocket, p, msg->AvailableDataLength());
     if (rcvLen < 0)
     {
-        err = Weave::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
     }
     else if (rcvLen > msg->AvailableDataLength())
     {
@@ -807,7 +805,6 @@ void TunEndPoint::HandlePendingIO ()
     mPendingIO.Clear();
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
-} // namespace nl

@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Google LLC.
- *    Copyright (c) 2013-2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +17,7 @@
 
 /**
  *    @file
- *      This file implements the <tt>nl::Inet::UDPEndPoint</tt>
+ *      This file implements the <tt>Inet::UDPEndPoint</tt>
  *      class, where the Nest Inet Layer encapsulates methods for
  *      interacting with UDP transport endpoints (SOCK_DGRAM sockets
  *      on Linux and BSD-derived systems) or LwIP UDP protocol
@@ -31,21 +29,21 @@
 
 #include <string.h>
 
-#include <InetLayer/UDPEndPoint.h>
-#include <InetLayer/InetLayer.h>
-#include <InetLayer/InetFaultInjection.h>
-#include <SystemLayer/SystemFaultInjection.h>
+#include "UDPEndPoint.h"
+#include "InetLayer.h"
+#include "InetFaultInjection.h"
+#include "system/SystemFaultInjection.h"
 
-#include <Weave/Support/CodeUtils.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include "support/CodeUtils.h"
+#include "support/logging/CHIPLogging.h"
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/udp.h>
 #include <lwip/tcpip.h>
 #include <lwip/ip.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/select.h>
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -54,7 +52,7 @@
 #include <unistd.h>
 #include <net/if.h>
 #include <netinet/in.h>
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #include "arpa-inet-compatibility.h"
 
@@ -65,14 +63,13 @@
 #define SOCK_FLAGS 0
 #endif
 
-namespace nl {
 namespace Inet {
 
-using Weave::System::PacketBuffer;
+using chip::System::PacketBuffer;
 
-Weave::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint::sPool;
+chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint::sPool;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /*
  * Note that for LwIP InterfaceId is already defined to be 'struct
  * netif'; consequently, some of the checking performed here could
@@ -114,7 +111,7 @@ static INET_ERROR LwIPBindInterface(struct udp_pcb *aUDP, InterfaceId intfId)
 
     return res;
 }
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  * @brief   Bind the endpoint to an interface IP address.
@@ -163,7 +160,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
         goto exit;
     }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -180,18 +177,18 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
         lwip_ip_addr_type lType = IPAddress::ToLwIPAddrType(addrType);
         IP_SET_TYPE_VAL(ipAddr, lType);
 #endif // INET_CONFIG_ENABLE_IPV4
-        res = Weave::System::MapErrorLwIP(udp_bind(mUDP, &ipAddr, port));
+        res = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipAddr, port));
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
         if (addrType == kIPAddressType_IPv6)
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
-            res = Weave::System::MapErrorLwIP(udp_bind_ip6(mUDP, &ipv6Addr, port));
+            res = chip::System::MapErrorLwIP(udp_bind_ip6(mUDP, &ipv6Addr, port));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == kIPAddressType_IPv4)
         {
             ip4_addr_t ipv4Addr = addr.ToIPv4();
-            res = Weave::System::MapErrorLwIP(udp_bind(mUDP, &ipv4Addr, port));
+            res = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipv4Addr, port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -209,9 +206,9 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
     SuccessOrExit(res);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // Make sure we have the appropriate type of socket.
     res = GetSocket(addrType);
@@ -247,7 +244,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
         }
     }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (res == INET_NO_ERROR)
     {
@@ -277,9 +274,9 @@ INET_ERROR UDPEndPoint::Listen(void)
 {
     INET_ERROR res = INET_NO_ERROR;
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
-    Weave::System::Layer& lSystemLayer = SystemLayer();
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    chip::System::Layer& lSystemLayer = SystemLayer();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (mState == kState_Listening)
     {
@@ -293,7 +290,7 @@ INET_ERROR UDPEndPoint::Listen(void)
         goto exit;
     }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -310,14 +307,14 @@ INET_ERROR UDPEndPoint::Listen(void)
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // Wake the thread calling select so that it starts selecting on the new socket.
     lSystemLayer.WakeSelect();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (res == INET_NO_ERROR)
     {
@@ -342,7 +339,7 @@ void UDPEndPoint::Close(void)
 {
     if (mState != kState_Closed)
     {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
         // Lock LwIP stack
         LOCK_TCPIP_CORE();
@@ -359,13 +356,13 @@ void UDPEndPoint::Close(void)
         // Unlock LwIP stack
         UNLOCK_TCPIP_CORE();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
         if (mSocket != INET_INVALID_SOCKET_FD)
         {
-            Weave::System::Layer& lSystemLayer = SystemLayer();
+            chip::System::Layer& lSystemLayer = SystemLayer();
 
             // Wake the thread calling select so that it recognizes the socket is closed.
             lSystemLayer.WakeSelect();
@@ -377,7 +374,7 @@ void UDPEndPoint::Close(void)
         // Clear any results from select() that indicate pending I/O for the socket.
         mPendingIO.Clear();
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
         mState = kState_Closed;
     }
@@ -398,17 +395,17 @@ void UDPEndPoint::Free(void)
 {
     Close();
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     DeferredFree(kReleaseDeferralErrorTactic_Die);
-#else // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
     Release();
-#endif // !WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
-INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, Weave::System::PacketBuffer *msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, chip::System::PacketBuffer *msg, uint16_t sendFlags)
 {
     return SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags);
 }
@@ -448,11 +445,11 @@ INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, Weave::System::Pac
  *      transmit option flags encoded in \c sendFlags.
  *
  *      Where <tt>(sendFlags & kSendFlag_RetainBuffer) != 0</tt>, calls
- *      <tt>Weave::System::PacketBuffer::Free</tt> on behalf of the caller, otherwise this
+ *      <tt>chip::System::PacketBuffer::Free</tt> on behalf of the caller, otherwise this
  *      method deep-copies \c msg into a fresh object, and queues that for
  *      transmission, leaving the original \c msg available after return.
  */
-INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, Weave::System::PacketBuffer *msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer *msg, uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
     pktInfo.Clear();
@@ -496,7 +493,7 @@ INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId
  *      given address will be used as the source of the UDP message.
  *
  *      Where <tt>(sendFlags & kSendFlag_RetainBuffer) != 0</tt>, calls
- *      <tt>Weave::System::PacketBuffer::Free</tt> on behalf of the caller, otherwise this
+ *      <tt>chip::System::PacketBuffer::Free</tt> on behalf of the caller, otherwise this
  *      method deep-copies \c msg into a fresh object, and queues that for
  *      transmission, leaving the original \c msg available after return.
  */
@@ -516,7 +513,7 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
             return INET_ERROR_NO_MEMORY;
             );
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (sendFlags & kSendFlag_RetainBuffer)
     {
@@ -638,16 +635,16 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 
         if (lwipErr != ERR_OK)
-            res = Weave::System::MapErrorLwIP(lwipErr);
+            res = chip::System::MapErrorLwIP(lwipErr);
     }
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
     PacketBuffer::Free(msg);
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // Make sure we have the appropriate type of socket based on the
     // destination address.
@@ -659,10 +656,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
 
     if ((sendFlags & kSendFlag_RetainBuffer) == 0)
         PacketBuffer::Free(msg);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 exit:
-    WEAVE_SYSTEM_FAULT_INJECT_ASYNC_EVENT();
+    CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT();
 
     return res;
 }
@@ -696,7 +693,7 @@ INET_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId
     if (mState != kState_Ready && mState != kState_Bound)
         return INET_ERROR_INCORRECT_STATE;
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     //A lock is required because the LwIP thread may be referring to intf_filter,
     //while this code running in the Inet application is potentially modifying it.
@@ -713,16 +710,16 @@ INET_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId
 
     SuccessOrExit(err);
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Make sure we have the appropriate type of socket.
     err = GetSocket(addrType);
     SuccessOrExit(err);
 
     err = IPEndPointBasis::BindInterface(addrType, intfId);
     SuccessOrExit(err);
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (err == INET_NO_ERROR)
     {
@@ -745,31 +742,31 @@ void UDPEndPoint::Init(InetLayer *inetLayer)
  */
 InterfaceId UDPEndPoint::GetBoundInterface(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if HAVE_LWIP_UDP_BIND_NETIF
     return netif_get_by_index(mUDP->netif_idx);
 #else
     return mUDP->intf_filter;
 #endif
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return mBoundIntfId;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
 uint16_t UDPEndPoint::GetBoundPort(void)
 {
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     return mUDP->local_port;
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return mBoundPort;
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
-#if WEAVE_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 void UDPEndPoint::HandleDataReceived(PacketBuffer *msg)
 {
@@ -812,7 +809,7 @@ INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
         // Fail if the system has run out of PCBs.
         if (mUDP == NULL)
         {
-            WeaveLogError(Inet, "Unable to allocate UDP PCB");
+            chipLogError(Inet, "Unable to allocate UDP PCB");
             ExitNow(err = INET_ERROR_NO_MEMORY);
         }
 
@@ -864,7 +861,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void *arg, struct udp_pcb *pcb, struct p
 {
     UDPEndPoint*            ep              = static_cast<UDPEndPoint*>(arg);
     PacketBuffer*           buf             = reinterpret_cast<PacketBuffer*>(static_cast<void*>(p));
-    Weave::System::Layer&   lSystemLayer    = ep->SystemLayer();
+    chip::System::Layer&   lSystemLayer    = ep->SystemLayer();
     IPPacketInfo*           pktInfo     = NULL;
 
     pktInfo = GetPacketInfo(buf);
@@ -897,9 +894,9 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void *arg, struct udp_pcb *pcb, struct p
         PacketBuffer::Free(buf);
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 INET_ERROR UDPEndPoint::GetSocket(IPAddressType aAddressType)
 {
     INET_ERROR lRetval = INET_NO_ERROR;
@@ -930,7 +927,6 @@ void UDPEndPoint::HandlePendingIO(void)
     mPendingIO.Clear();
 }
 
-#endif // WEAVE_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
-} // namespace nl
