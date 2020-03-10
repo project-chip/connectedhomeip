@@ -1,6 +1,6 @@
 TOPTARGETS := all clean run_tests
 
-SUBDIRS = lwip system
+SUBDIRS = lwip system chip-core/setup-payload
 
 $(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
