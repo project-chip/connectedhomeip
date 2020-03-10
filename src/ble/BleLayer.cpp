@@ -416,7 +416,7 @@ exit:
     // if the application decides to keep the BLE connection open.
     if (newEndPoint == NULL)
     {
-        mApplicationDelegate->NotifychipConnectionClosed(connObj);
+        mApplicationDelegate->NotifyChipConnectionClosed(connObj);
     }
 
     if (err != BLE_NO_ERROR)
