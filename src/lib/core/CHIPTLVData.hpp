@@ -26,8 +26,8 @@
  */
 
 
-#ifndef WEAVETLVDATA_H_
-#define WEAVETLVDATA_H_
+#ifndef CHIPTLVDATA_H_
+#define CHIPTLVDATA_H_
 
 #include <stdint.h>
 #include <CHIPTLV.h>
@@ -395,4 +395,4 @@
 #define CHIPTLV_BYTE_STRING_8ByteLength(TagSpec, StringLength, ...) \
     CHIP::TLV::kTLVElementType_ByteString_8ByteLength | TagSpec, CHIPTLV_Serialize64((uint64_t)(StringLength)), ## __VA_ARGS__
 
-#endif /* WEAVETLVDATA_H_ */
+#endif /* CHIPTLVDATA_H_ */

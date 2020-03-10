@@ -27,6 +27,7 @@
 #include <CHIPEncoding.h>
 #include <CHIPTLV.h>
 #include <support/CodeUtils.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace TLV {
