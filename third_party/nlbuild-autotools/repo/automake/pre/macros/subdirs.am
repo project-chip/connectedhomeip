@@ -1,0 +1,78 @@
+#
+#    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file defines automake variables and macros common to all
+#      other automake headers and files for invoking make in a list
+#      of subdirectories with a list of target goals.
+#
+
+#
+# nl-make-subdirs-with-dirs-and-goals <subdirectories> <goals>
+#
+# This iteratively invokes make with the provided target goals in each
+# subdirectory specified.
+#
+#   subdirectories  A space-delimited list of subdirectories in which to
+#                   invoke make with the provided target goals.
+#
+#   goals           A space-delimited list of target goals to
+#                   attempt to make in each specified subdirectory.
+#
+define nl-make-subdirs-with-dirs-and-goals
++$(AM_V_at)for subdir in $(1); do \
+    echo "Making $(2) in $${subdir}"; \
+    $(MAKE) -C "$${subdir}" $(AM_MAKEFLAGS) $(2) \
+    || exit 1; \
+done
+endef # nl-make-subdirs-with-dirs-and-goals
+
+#
+# nl-make-subdirs-with-dirs <subdirectories>
+#
+# This iteratively invokes make with the target goals defined in
+# MAKECMDGOALS in each subdirectory specified.
+#
+#   subdirectories  A space-delimited list of subdirectories in which to
+#                   invoke make with the provided target goals.
+#
+define nl-make-subdirs-with-dirs
+$(call nl-make-subdirs-with-dirs-and-goals,$(1),$(MAKECMDGOALS))
+endef # nl-make-subdirs-with-dirs
+
+#
+# nl-make-subdirs-with-goals <goals>
+#
+# This iteratively invokes make with the provided target goals in the
+# subdirectories defined in SUBDIRS.
+#
+#   goals           A space-delimited list of target goals to
+#                   attempt to make in SUBDIRS.
+#
+define nl-make-subdirs-with-goals
+$(call nl-make-subdirs-with-dirs-and-goals,$(SUBDIRS),$(1))
+endef # nl-make-subdirs-with-goals
+
+#
+# nl-make-subdirs
+#
+# This iteratively invokes make with the target goals defined in
+# MAKECMDGOALS in the subdirectories defined in SUBDIRS.
+#
+define nl-make-subdirs
+$(call nl-make-subdirs-with-dirs-and-goals,$(SUBDIRS),$(MAKECMDGOALS))
+endef # nl-make-subdirs

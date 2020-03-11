@@ -1,0 +1,45 @@
+#
+#
+#    <COPYRIGHT>
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file is the GNU automake template for the CHIP BleLayer
+#      library.
+#
+
+include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
+
+include BleLayer.am
+
+lib_LIBRARIES                       = libBleLayer.a
+
+libBleLayer_a_CPPFLAGS              = \
+    -I$(top_srcdir)/src               \
+    -I$(top_srcdir)/src/include       \
+    -I$(top_srcdir)/src/lib           \
+    -I$(top_srcdir)/src/lib/core      \
+    -I$(top_srcdir)/src/system        \
+    $(LWIP_CPPFLAGS)                  \
+    $(NULL)
+
+libBleLayer_a_SOURCES               = $(chip_BleLayer_sources)
+
+libBleLayer_adir                    = $(includedir)/ble
+
+dist_libBleLayer_a_HEADERS          = $(chip_BleLayer_headers)
+
+include $(abs_top_nlbuild_autotools_dir)/automake/post.am
