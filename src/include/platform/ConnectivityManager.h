@@ -24,6 +24,8 @@
 #ifndef CONNECTIVITY_MANAGER_H
 #define CONNECTIVITY_MANAGER_H
 
+#include <core/CHIPError.h>
+
 namespace chip {
 namespace DeviceLayer {
 

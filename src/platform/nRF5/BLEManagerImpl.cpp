@@ -516,12 +516,18 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     gapAdvParams.properties.type =
         connectable ? BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED : BLE_GAP_ADV_TYPE_NONCONNECTABLE_SCANNABLE_UNDIRECTED;
 
-    // Advertise in fast mode if not fully provisioned and there are no CHIPoBLE connections, or
-    // if the application has expressly requested fast advertising.
+// Advertise in fast mode if not fully provisioned and there are no CHIPoBLE connections, or
+// if the application has expressly requested fast advertising.
+
+// TODO: Fix when ConfigurationMgr implemented.
+#if 1
+    gapAdvParams.interval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL;
+#else
     gapAdvParams.interval =
         ((numCHIPoBLECons == 0 && !ConfigurationMgr().IsFullyProvisioned()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
         ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
         : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
+#endif
 
 #if CHIP_PROGRESS_LOGGING
 
@@ -635,8 +641,11 @@ CHIP_ERROR BLEManagerImpl::EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData
 
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
+    // TODO(): Add back when ConfigurationManager fixed.
+#if 0
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     SuccessOrExit(err);
+#endif
 
     // Form the contents of the scan response packet.
     memset(&serviceData, 0, sizeof(serviceData));
