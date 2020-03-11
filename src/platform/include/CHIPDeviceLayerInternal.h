@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019-2020 Google LLC.
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,11 +15,10 @@
  *    limitations under the License.
  */
 
-#ifndef WEAVE_DEVICE_INTERNAL_H
-#define WEAVE_DEVICE_INTERNAL_H
+#ifndef CHIP_DEVICE_INTERNAL_H
+#define CHIP_DEVICE_INTERNAL_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace Logging {
 
 enum
@@ -30,19 +27,17 @@ enum
 };
 
 } // namespace Logging
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#include <Weave/DeviceLayer/WeaveDeviceLayer.h>
+#include <platform/CHIPDeviceLayer.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 extern const char * const TAG;
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 extern const uint64_t TestDeviceId;
 extern const uint8_t TestDeviceCert[];
 extern const uint8_t TestDeviceIntermediateCACert[];
@@ -50,11 +45,10 @@ extern const uint8_t TestDevicePrivateKey[];
 extern const uint16_t TestDeviceCertLength;
 extern const uint16_t TestDeviceIntermediateCACertLength;
 extern const uint16_t TestDevicePrivateKeyLength;
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_INTERNAL_H
+#endif // CHIP_DEVICE_INTERNAL_H

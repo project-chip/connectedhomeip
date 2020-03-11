@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,15 +17,14 @@
 
 /**
  *    @file
- *          Defines events used by the Weave Device Layer to signal actions
+ *          Defines events used by the chip Device Layer to signal actions
  *          or changes in device state.
  */
 
-#ifndef WEAVE_DEVICE_EVENT_H
-#define WEAVE_DEVICE_EVENT_H
+#ifndef CHIP_DEVICE_EVENT_H
+#define CHIP_DEVICE_EVENT_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 namespace DeviceEventType {
@@ -66,7 +64,7 @@ enum EventTypeRanges
     /**
      * Internal Event Range
      *
-     * Denotes a range of event types that are internal to the Weave Device Layer.  Events in this
+     * Denotes a range of event types that are internal to the chip Device Layer.  Events in this
      * range a generic to all platforms.
      */
     kRange_Internal                     = 0,
@@ -74,7 +72,7 @@ enum EventTypeRanges
     /**
      * Internal, Platform-specific Event Range
      *
-     * Denotes a range of platform-specific event types that are internal to the Weave Device Layer.
+     * Denotes a range of platform-specific event types that are internal to the chip Device Layer.
      */
     kRange_InternalPlatformSpecific     = kFlag_IsPlatformSpecific,
 };
@@ -116,28 +114,28 @@ enum PublicEventTypes
     /**
      * Service Tunnel State Change
      *
-     * Signals a change in connectivity of the device's IP tunnel to a Weave-enabled service.
+     * Signals a change in connectivity of the device's IP tunnel to a chip-enabled service.
      */
     kServiceTunnelStateChange,
 
     /**
      * Service Connectivity Change
      *
-     * Signals a change in the device's ability to communicate with a Weave-enabled service.
+     * Signals a change in the device's ability to communicate with a chip-enabled service.
      */
     kServiceConnectivityChange,
 
     /**
      * Service Subscription State Change
      *
-     * Signals a change in the device's WDM subscription state with a Weave-enabled service.
+     * Signals a change in the device's WDM subscription state with a chip-enabled service.
      */
     kServiceSubscriptionStateChange,
 
     /**
      * Fabric Membership Change
      *
-     * Signals a change in the device's membership in a Weave fabric.
+     * Signals a change in the device's membership in a chip fabric.
      */
     kFabricMembershipChange,
 
@@ -191,7 +189,7 @@ enum PublicEventTypes
     kThreadInterfaceStateChange,
 
     /**
-     * Weave-over-BLE (WoBLE) Advertising Change
+     * chip-over-BLE (WoBLE) Advertising Change
      *
      * Signals that the state of WoBLE advertising has changed.
      */
@@ -201,7 +199,7 @@ enum PublicEventTypes
 /**
  * Internal Event Types
  *
- * Enumerates event types that are internal to the Weave Device Layer, but common across
+ * Enumerates event types that are internal to the chip Device Layer, but common across
  * all platforms.
  */
 enum InternalEventTypes
@@ -209,7 +207,7 @@ enum InternalEventTypes
     kEventTypeNotSet                    = kRange_Internal,
     kNoOp,
     kCallWorkFunct,
-    kWeaveSystemLayerEvent,
+    kchipSystemLayerEvent,
     kWoBLESubscribe,
     kWoBLEUnsubscribe,
     kWoBLEWriteReceived,
@@ -224,7 +222,7 @@ static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
 /**
  * Connectivity Change
  *
- * Describes a change in some aspect of connectivity associated with a Weave device.
+ * Describes a change in some aspect of connectivity associated with a chip device.
  */
 enum ConnectivityChange
 {
@@ -236,7 +234,7 @@ enum ConnectivityChange
 /**
  * Activity Change
  *
- * Describes a change in some activity associated with a Weave device.
+ * Describes a change in some activity associated with a chip device.
  */
 enum ActivityChange
 {
@@ -261,38 +259,36 @@ inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
 typedef void (*AsyncWorkFunct)(intptr_t arg);
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 /* Include a header file containing platform-specific event definitions.
  */
-#ifdef EXTERNAL_WEAVEDEVICEPLATFORMEVENT_HEADER
-#include EXTERNAL_WEAVEDEVICEPLATFORMEVENT_HEADER
+#ifdef EXTERNAL_CHIPDEVICEPLATFORMEVENT_HEADER
+#include EXTERNAL_CHIPDEVICEPLATFORMEVENT_HEADER
 #else
-#define WEAVEDEVICEPLATFORMEVENT_HEADER <Weave/DeviceLayer/WEAVE_DEVICE_LAYER_TARGET/WeaveDevicePlatformEvent.h>
-#include WEAVEDEVICEPLATFORMEVENT_HEADER
+#define CHIPDEVICEPLATFORMEVENT_HEADER <chip/DeviceLayer/CHIP_DEVICE_LAYER_TARGET/chipDevicePlatformEvent.h>
+#include CHIPDEVICEPLATFORMEVENT_HEADER
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 /**
- * Represents a Weave Device Layer event.
+ * Represents a chip Device Layer event.
  */
-struct WeaveDeviceEvent final
+struct chipDeviceEvent final
 {
     uint16_t Type;
 
     union
     {
-        WeaveDevicePlatformEvent Platform;
+        chipDevicePlatformEvent Platform;
         struct
         {
-            ::nl::Weave::System::EventType Type;
-            ::nl::Weave::System::Object * Target;
+            ::chip::System::EventType Type;
+            ::chip::System::Object * Target;
             uintptr_t Argument;
-        } WeaveSystemLayerEvent;
+        } chipSystemLayerEvent;
         struct
         {
             AsyncWorkFunct WorkFunct;
@@ -357,7 +353,7 @@ struct WeaveDeviceEvent final
             uint64_t PeerNodeId;
             uint16_t SessionKeyId;
             uint8_t EncType;
-            ::nl::Weave::WeaveAuthMode AuthMode;
+            ::chip::chipAuthMode AuthMode;
             bool IsCommissioner;
         } SessionEstablished;
         struct
@@ -380,7 +376,7 @@ struct WeaveDeviceEvent final
         struct
         {
             BLE_CONNECTION_OBJECT ConId;
-            WEAVE_ERROR Reason;
+            CHIP_ERROR Reason;
         } WoBLEConnectionError;
         struct
         {
@@ -407,7 +403,6 @@ struct WeaveDeviceEvent final
 };
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_EVENT_H
+#endif // CHIP_DEVICE_EVENT_H
