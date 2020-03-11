@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,36 +17,33 @@
 
 /**
  *    @file
- *      Defines the Weave Device Layer TimeSyncManager object.
+ *      Defines the chip Device Layer TimeSyncManager object.
  *
  */
 
 #ifndef TIME_SYNC_MANAGER_H
 #define TIME_SYNC_MANAGER_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace Profiles {
 namespace StatusReporting {
 class StatusReport;
 }
 }
 }
-}
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
 namespace Internal {
-extern WEAVE_ERROR InitServiceDirectoryManager(void);
+extern CHIP_ERROR InitServiceDirectoryManager(void);
 template<class> class GenericPlatformManagerImpl;
 template<class> class GenericPlatformManagerImpl_FreeRTOS;
 }
 
 /**
- * Manages time synchronization for Weave Devices.
+ * Manages time synchronization for chip Devices.
  */
 class TimeSyncManager final
 {
@@ -65,7 +61,7 @@ public:
     };
 
     TimeSyncMode GetMode();
-    WEAVE_ERROR SetMode(TimeSyncMode newMode);
+    CHIP_ERROR SetMode(TimeSyncMode newMode);
 
     uint32_t GetSyncInterval();
     void SetSyncInterval(uint32_t intervalSec);
@@ -79,14 +75,14 @@ private:
     friend class PlatformManagerImpl;
     template<class> friend class Internal::GenericPlatformManagerImpl;
     template<class> friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
-    friend WEAVE_ERROR Internal::InitServiceDirectoryManager();
+    friend CHIP_ERROR Internal::InitServiceDirectoryManager();
     friend TimeSyncManager & TimeSyncMgr(void);
 
     static TimeSyncManager sInstance;
 
-    WEAVE_ERROR Init();
-    void OnPlatformEvent(const WeaveDeviceEvent * event);
-#if WEAVE_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
+    CHIP_ERROR Init();
+    void OnPlatformEvent(const chipDeviceEvent * event);
+#if CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
     static void MarkServiceDirRequestStart();
     static void ProcessServiceDirTimeData(uint64_t timeQueryReceiptMsec, uint32_t timeProcessMsec);
 #endif
@@ -94,11 +90,11 @@ private:
     // ===== Private members for use by this class only.
 
     uint64_t mLastSyncTimeMS; // in monotonic time
-#if WEAVE_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
+#if CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
     uint64_t mServiceDirTimeSyncStartUS;
 #endif
-#if WEAVE_DEVICE_CONFIG_ENABLE_WEAVE_TIME_SERVICE_TIME_SYNC
-    ::nl::Weave::Binding * mTimeSyncBinding;
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
+    ::chip::Binding * mTimeSyncBinding;
 #endif
     uint32_t mSyncIntervalSec;
     TimeSyncMode mMode;
@@ -106,15 +102,15 @@ private:
     void DriveTimeSync();
     void CancelTimeSync();
     void ApplySynchronizedTime(uint64_t syncedRealTimeUS);
-    void TimeSyncFailed(WEAVE_ERROR reason, nl::Weave::Profiles::StatusReporting::StatusReport * statusReport);
+    void TimeSyncFailed(CHIP_ERROR reason, chip::Profiles::StatusReporting::StatusReport * statusReport);
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_WEAVE_TIME_SERVICE_TIME_SYNC
-    static void TimeServiceSync_HandleBindingEvent(void * appState, ::nl::Weave::Binding::EventType event,
-            const ::nl::Weave::Binding::InEventParam & inParam, ::nl::Weave::Binding::OutEventParam & outParam);
-    static void TimeServiceSync_HandleSyncComplete(void * context, WEAVE_ERROR result, int64_t syncedRealTimeUS);
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
+    static void TimeServiceSync_HandleBindingEvent(void * appState, ::chip::Binding::EventType event,
+            const ::chip::Binding::InEventParam & inParam, ::chip::Binding::OutEventParam & outParam);
+    static void TimeServiceSync_HandleSyncComplete(void * context, CHIP_ERROR result, int64_t syncedRealTimeUS);
 #endif
 
-    static void DriveTimeSync(::nl::Weave::System::Layer * layer, void * appState, ::nl::Weave::System::Error err);
+    static void DriveTimeSync(::chip::System::Layer * layer, void * appState, ::chip::System::Error err);
 
 protected:
 
@@ -147,7 +143,6 @@ inline TimeSyncManager & TimeSyncMgr(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // TIME_SYNC_MANAGER_H
