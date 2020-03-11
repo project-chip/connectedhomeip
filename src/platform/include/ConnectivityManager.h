@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,8 +23,7 @@
 #ifndef CONNECTIVITY_MANAGER_H
 #define CONNECTIVITY_MANAGER_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 namespace Internal {
@@ -38,11 +36,11 @@ template<class> class GenericPlatformManagerImpl_FreeRTOS;
 class ConnectivityManagerImpl;
 
 /**
- * Provides control of network connectivity for a Weave device.
+ * Provides control of network connectivity for a chip device.
  */
 class ConnectivityManager
 {
-    using ImplClass = ::nl::Weave::DeviceLayer::ConnectivityManagerImpl;
+    using ImplClass = ::chip::DeviceLayer::ConnectivityManagerImpl;
 
 public:
 
@@ -101,19 +99,19 @@ public:
 
     // WiFi station methods
     WiFiStationMode GetWiFiStationMode(void);
-    WEAVE_ERROR SetWiFiStationMode(WiFiStationMode val);
+    CHIP_ERROR SetWiFiStationMode(WiFiStationMode val);
     bool IsWiFiStationEnabled(void);
     bool IsWiFiStationApplicationControlled(void);
     bool IsWiFiStationConnected(void);
     uint32_t GetWiFiStationReconnectIntervalMS(void);
-    WEAVE_ERROR SetWiFiStationReconnectIntervalMS(uint32_t val);
+    CHIP_ERROR SetWiFiStationReconnectIntervalMS(uint32_t val);
     bool IsWiFiStationProvisioned(void);
     void ClearWiFiStationProvision(void);
-    WEAVE_ERROR GetAndLogWifiStatsCounters(void);
+    CHIP_ERROR GetAndLogWifiStatsCounters(void);
 
     // WiFi AP methods
     WiFiAPMode GetWiFiAPMode(void);
-    WEAVE_ERROR SetWiFiAPMode(WiFiAPMode val);
+    CHIP_ERROR SetWiFiAPMode(WiFiAPMode val);
     bool IsWiFiAPActive(void);
     bool IsWiFiAPApplicationControlled(void);
     void DemandStartWiFiAP(void);
@@ -124,13 +122,13 @@ public:
 
     // Thread Methods
     ThreadMode GetThreadMode(void);
-    WEAVE_ERROR SetThreadMode(ThreadMode val);
+    CHIP_ERROR SetThreadMode(ThreadMode val);
     bool IsThreadEnabled(void);
     bool IsThreadApplicationControlled(void);
     ThreadDeviceType GetThreadDeviceType(void);
-    WEAVE_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
+    CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
     void GetThreadPollingConfig(ThreadPollingConfig & pollingConfig);
-    WEAVE_ERROR SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig);
+    CHIP_ERROR SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig);
     bool IsThreadAttached(void);
     bool IsThreadProvisioned(void);
     void ClearThreadProvision(void);
@@ -142,7 +140,7 @@ public:
 
     // Service tunnel methods
     ServiceTunnelMode GetServiceTunnelMode(void);
-    WEAVE_ERROR SetServiceTunnelMode(ServiceTunnelMode val);
+    CHIP_ERROR SetServiceTunnelMode(ServiceTunnelMode val);
     bool IsServiceTunnelConnected(void);
     bool IsServiceTunnelRestricted(void);
     bool HaveServiceConnectivityViaTunnel(void);
@@ -152,14 +150,14 @@ public:
 
     // WoBLE service methods
     WoBLEServiceMode GetWoBLEServiceMode(void);
-    WEAVE_ERROR SetWoBLEServiceMode(WoBLEServiceMode val);
+    CHIP_ERROR SetWoBLEServiceMode(WoBLEServiceMode val);
     bool IsBLEAdvertisingEnabled(void);
-    WEAVE_ERROR SetBLEAdvertisingEnabled(bool val);
+    CHIP_ERROR SetBLEAdvertisingEnabled(bool val);
     bool IsBLEFastAdvertisingEnabled(void);
-    WEAVE_ERROR SetBLEFastAdvertisingEnabled(bool val);
+    CHIP_ERROR SetBLEFastAdvertisingEnabled(bool val);
     bool IsBLEAdvertising(void);
-    WEAVE_ERROR GetBLEDeviceName(char * buf, size_t bufSize);
-    WEAVE_ERROR SetBLEDeviceName(const char * deviceName);
+    CHIP_ERROR GetBLEDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR SetBLEDeviceName(const char * deviceName);
     uint16_t NumBLEConnections(void);
 
     // User selected mode methods
@@ -184,8 +182,8 @@ private:
     friend class Internal::NetworkProvisioningServerImpl;
     template<class> friend class Internal::GenericNetworkProvisioningServerImpl;
 
-    WEAVE_ERROR Init(void);
-    void OnPlatformEvent(const WeaveDeviceEvent * event);
+    CHIP_ERROR Init(void);
+    void OnPlatformEvent(const chipDeviceEvent * event);
     bool CanStartWiFiScan(void);
     void OnWiFiScanDone(void);
     void OnWiFiStationProvisionChange(void);
@@ -208,11 +206,11 @@ protected:
 struct ConnectivityManager::ThreadPollingConfig
 {
     uint32_t ActivePollingIntervalMS;                   /**< Interval at which the device polls its parent Thread router when
-                                                             when there are active Weave exchanges in progress. Only meaningful
+                                                             when there are active chip exchanges in progress. Only meaningful
                                                              when the device is acting as a sleepy end node. */
 
     uint32_t InactivePollingIntervalMS;                 /**< Interval at which the device polls its parent Thread router when
-                                                             when there are NO active Weave exchanges in progress. Only meaningful
+                                                             when there are NO active chip exchanges in progress. Only meaningful
                                                              when the device is acting as a sleepy end node. */
 
     void Clear() { memset(this, 0, sizeof(*this)); }
@@ -222,7 +220,7 @@ struct ConnectivityManager::ThreadPollingConfig
 /**
  * Returns a reference to the public interface of the ConnectivityManager singleton object.
  *
- * Weave applications should use this to access features of the ConnectivityManager object
+ * chip applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
 extern ConnectivityManager & ConnectivityMgr(void);
@@ -230,14 +228,13 @@ extern ConnectivityManager & ConnectivityMgr(void);
 /**
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
- * Weave applications can use this to gain access to features of the ConnectivityManager
+ * chip applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the selected platform.
  */
 extern ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
 /* Include a header file containing the implementation of the ConfigurationManager
@@ -246,13 +243,13 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 #ifdef EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
 #include EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
 #else
-#define CONNECTIVITYMANAGERIMPL_HEADER <Weave/DeviceLayer/WEAVE_DEVICE_LAYER_TARGET/ConnectivityManagerImpl.h>
+#define CONNECTIVITYMANAGERIMPL_HEADER <chip/DeviceLayer/CHIP_DEVICE_LAYER_TARGET/ConnectivityManagerImpl.h>
 #include CONNECTIVITYMANAGERIMPL_HEADER
 #endif
 
 
-namespace nl {
-namespace Weave {
+namespace chip {
+namespace chip {
 namespace DeviceLayer {
 
 inline ConnectivityManager::WiFiStationMode ConnectivityManager::GetWiFiStationMode(void)
@@ -260,7 +257,7 @@ inline ConnectivityManager::WiFiStationMode ConnectivityManager::GetWiFiStationM
     return static_cast<ImplClass*>(this)->_GetWiFiStationMode();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetWiFiStationMode(WiFiStationMode val)
+inline CHIP_ERROR ConnectivityManager::SetWiFiStationMode(WiFiStationMode val)
 {
     return static_cast<ImplClass*>(this)->_SetWiFiStationMode(val);
 }
@@ -285,7 +282,7 @@ inline uint32_t ConnectivityManager::GetWiFiStationReconnectIntervalMS(void)
     return static_cast<ImplClass*>(this)->_GetWiFiStationReconnectIntervalMS();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetWiFiStationReconnectIntervalMS(uint32_t val)
+inline CHIP_ERROR ConnectivityManager::SetWiFiStationReconnectIntervalMS(uint32_t val)
 {
     return static_cast<ImplClass*>(this)->_SetWiFiStationReconnectIntervalMS(val);
 }
@@ -305,7 +302,7 @@ inline ConnectivityManager::WiFiAPMode ConnectivityManager::GetWiFiAPMode(void)
     return static_cast<ImplClass*>(this)->_GetWiFiAPMode();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetWiFiAPMode(WiFiAPMode val)
+inline CHIP_ERROR ConnectivityManager::SetWiFiAPMode(WiFiAPMode val)
 {
     return static_cast<ImplClass*>(this)->_SetWiFiAPMode(val);
 }
@@ -345,7 +342,7 @@ inline void ConnectivityManager::SetWiFiAPIdleTimeoutMS(uint32_t val)
     static_cast<ImplClass*>(this)->_SetWiFiAPIdleTimeoutMS(val);
 }
 
-inline WEAVE_ERROR ConnectivityManager::GetAndLogWifiStatsCounters(void)
+inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters(void)
 {
     return static_cast<ImplClass*>(this)->_GetAndLogWifiStatsCounters();
 }
@@ -370,7 +367,7 @@ inline ConnectivityManager::ServiceTunnelMode ConnectivityManager::GetServiceTun
     return static_cast<ImplClass*>(this)->_GetServiceTunnelMode();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetServiceTunnelMode(ServiceTunnelMode val)
+inline CHIP_ERROR ConnectivityManager::SetServiceTunnelMode(ServiceTunnelMode val)
 {
     return static_cast<ImplClass*>(this)->_SetServiceTunnelMode(val);
 }
@@ -395,7 +392,7 @@ inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode(void)
     return static_cast<ImplClass*>(this)->_GetThreadMode();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetThreadMode(ThreadMode val)
+inline CHIP_ERROR ConnectivityManager::SetThreadMode(ThreadMode val)
 {
     return static_cast<ImplClass*>(this)->_SetThreadMode(val);
 }
@@ -415,7 +412,7 @@ inline ConnectivityManager::ThreadDeviceType ConnectivityManager::GetThreadDevic
     return static_cast<ImplClass*>(this)->_GetThreadDeviceType();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetThreadDeviceType(ThreadDeviceType deviceType)
+inline CHIP_ERROR ConnectivityManager::SetThreadDeviceType(ThreadDeviceType deviceType)
 {
     return static_cast<ImplClass*>(this)->_SetThreadDeviceType(deviceType);
 }
@@ -425,7 +422,7 @@ inline void ConnectivityManager::GetThreadPollingConfig(ThreadPollingConfig & po
     return static_cast<ImplClass*>(this)->_GetThreadPollingConfig(pollingConfig);
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR ConnectivityManager::SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig)
 {
     return static_cast<ImplClass*>(this)->_SetThreadPollingConfig(pollingConfig);
 }
@@ -455,7 +452,7 @@ inline ConnectivityManager::WoBLEServiceMode ConnectivityManager::GetWoBLEServic
     return static_cast<ImplClass*>(this)->_GetWoBLEServiceMode();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetWoBLEServiceMode(WoBLEServiceMode val)
+inline CHIP_ERROR ConnectivityManager::SetWoBLEServiceMode(WoBLEServiceMode val)
 {
     return static_cast<ImplClass*>(this)->_SetWoBLEServiceMode(val);
 }
@@ -465,7 +462,7 @@ inline bool ConnectivityManager::IsBLEAdvertisingEnabled(void)
     return static_cast<ImplClass*>(this)->_IsBLEAdvertisingEnabled();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetBLEAdvertisingEnabled(bool val)
+inline CHIP_ERROR ConnectivityManager::SetBLEAdvertisingEnabled(bool val)
 {
     return static_cast<ImplClass*>(this)->_SetBLEAdvertisingEnabled(val);
 }
@@ -475,7 +472,7 @@ inline bool ConnectivityManager::IsBLEFastAdvertisingEnabled(void)
     return static_cast<ImplClass*>(this)->_IsBLEFastAdvertisingEnabled();
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetBLEFastAdvertisingEnabled(bool val)
+inline CHIP_ERROR ConnectivityManager::SetBLEFastAdvertisingEnabled(bool val)
 {
     return static_cast<ImplClass*>(this)->_SetBLEFastAdvertisingEnabled(val);
 }
@@ -485,12 +482,12 @@ inline bool ConnectivityManager::IsBLEAdvertising(void)
     return static_cast<ImplClass*>(this)->_IsBLEAdvertising();
 }
 
-inline WEAVE_ERROR ConnectivityManager::GetBLEDeviceName(char * buf, size_t bufSize)
+inline CHIP_ERROR ConnectivityManager::GetBLEDeviceName(char * buf, size_t bufSize)
 {
     return static_cast<ImplClass*>(this)->_GetBLEDeviceName(buf, bufSize);
 }
 
-inline WEAVE_ERROR ConnectivityManager::SetBLEDeviceName(const char * deviceName)
+inline CHIP_ERROR ConnectivityManager::SetBLEDeviceName(const char * deviceName)
 {
     return static_cast<ImplClass*>(this)->_SetBLEDeviceName(deviceName);
 }
@@ -540,12 +537,12 @@ inline const char * ConnectivityManager::WoBLEServiceModeToStr(WoBLEServiceMode 
     return ImplClass::_WoBLEServiceModeToStr(mode);
 }
 
-inline WEAVE_ERROR ConnectivityManager::Init(void)
+inline CHIP_ERROR ConnectivityManager::Init(void)
 {
     return static_cast<ImplClass*>(this)->_Init();
 }
 
-inline void ConnectivityManager::OnPlatformEvent(const WeaveDeviceEvent * event)
+inline void ConnectivityManager::OnPlatformEvent(const chipDeviceEvent * event)
 {
     static_cast<ImplClass*>(this)->_OnPlatformEvent(event);
 }
@@ -566,7 +563,7 @@ inline void ConnectivityManager::OnWiFiStationProvisionChange(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
+} // namespace chip
 
 #endif // CONNECTIVITY_MANAGER_H
