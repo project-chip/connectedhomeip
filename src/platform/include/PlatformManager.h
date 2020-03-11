@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,10 +23,9 @@
 #ifndef PLATFORM_MANAGER_H
 #define PLATFORM_MANAGER_H
 
-#include <Weave/DeviceLayer/WeaveDeviceEvent.h>
+#include <platform/CHIPDeviceEvent.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 namespace Platform {
 namespace Layer {
@@ -62,28 +60,28 @@ template<class> class GenericThreadStackManagerImpl_OpenThread_LwIP;
 
 
 /**
- * Provides features for initializing and interacting with the Weave network
- * stack on a Weave-enabled device.
+ * Provides features for initializing and interacting with the chip network
+ * stack on a chip-enabled device.
  */
 class PlatformManager
 {
-    using ImplClass = ::nl::Weave::DeviceLayer::PlatformManagerImpl;
+    using ImplClass = ::chip::DeviceLayer::PlatformManagerImpl;
 
 public:
 
     // ===== Members that define the public interface of the PlatformManager
 
-    typedef void (*EventHandlerFunct)(const WeaveDeviceEvent * event, intptr_t arg);
+    typedef void (*EventHandlerFunct)(const chipDeviceEvent * event, intptr_t arg);
 
-    WEAVE_ERROR InitWeaveStack();
-    WEAVE_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
+    CHIP_ERROR InitchipStack();
+    CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
     void RunEventLoop(void);
-    WEAVE_ERROR StartEventLoopTask(void);
-    void LockWeaveStack(void);
-    bool TryLockWeaveStack(void);
-    void UnlockWeaveStack(void);
+    CHIP_ERROR StartEventLoopTask(void);
+    void LockchipStack(void);
+    bool TryLockchipStack(void);
+    void UnlockchipStack(void);
 
 private:
 
@@ -104,14 +102,14 @@ private:
     template<class> friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template<class> friend class Internal::GenericConfigurationManagerImpl;
     // Parentheses used to fix clang parsing issue with these declarations
-    friend ::nl::Weave::System::Error (::nl::Weave::System::Platform::Layer::PostEvent(::nl::Weave::System::Layer & aLayer, void * aContext, ::nl::Weave::System::Object & aTarget, ::nl::Weave::System::EventType aType, uintptr_t aArgument));
-    friend ::nl::Weave::System::Error (::nl::Weave::System::Platform::Layer::DispatchEvents(::nl::Weave::System::Layer & aLayer, void * aContext));
-    friend ::nl::Weave::System::Error (::nl::Weave::System::Platform::Layer::DispatchEvent(::nl::Weave::System::Layer & aLayer, void * aContext, ::nl::Weave::System::Event aEvent));
-    friend ::nl::Weave::System::Error (::nl::Weave::System::Platform::Layer::StartTimer(::nl::Weave::System::Layer & aLayer, void * aContext, uint32_t aMilliseconds));
+    friend ::chip::System::Error (::chip::System::Platform::Layer::PostEvent(::chip::System::Layer & aLayer, void * aContext, ::chip::System::Object & aTarget, ::chip::System::EventType aType, uintptr_t aArgument));
+    friend ::chip::System::Error (::chip::System::Platform::Layer::DispatchEvents(::chip::System::Layer & aLayer, void * aContext));
+    friend ::chip::System::Error (::chip::System::Platform::Layer::DispatchEvent(::chip::System::Layer & aLayer, void * aContext, ::chip::System::Event aEvent));
+    friend ::chip::System::Error (::chip::System::Platform::Layer::StartTimer(::chip::System::Layer & aLayer, void * aContext, uint32_t aMilliseconds));
 
-    void PostEvent(const WeaveDeviceEvent * event);
-    void DispatchEvent(const WeaveDeviceEvent * event);
-    WEAVE_ERROR StartWeaveTimer(uint32_t durationMS);
+    void PostEvent(const chipDeviceEvent * event);
+    void DispatchEvent(const chipDeviceEvent * event);
+    CHIP_ERROR StartchipTimer(uint32_t durationMS);
 
 protected:
 
@@ -128,7 +126,7 @@ protected:
 /**
  * Returns the public interface of the PlatformManager singleton object.
  *
- * Weave applications should use this to access features of the PlatformManager object
+ * chip applications should use this to access features of the PlatformManager object
  * that are common to all platforms.
  */
 extern PlatformManager & PlatformMgr(void);
@@ -136,14 +134,13 @@ extern PlatformManager & PlatformMgr(void);
 /**
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
- * Weave applications can use this to gain access to features of the PlatformManager
+ * chip applications can use this to gain access to features of the PlatformManager
  * that are specific to the selected platform.
  */
 extern PlatformManagerImpl & PlatformMgrImpl(void);
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 /* Include a header file containing the implementation of the ConfigurationManager
  * object for the selected platform.
@@ -151,20 +148,20 @@ extern PlatformManagerImpl & PlatformMgrImpl(void);
 #ifdef EXTERNAL_PLATFORMMANAGERIMPL_HEADER
 #include EXTERNAL_PLATFORMMANAGERIMPL_HEADER
 #else
-#define PLATFORMMANAGERIMPL_HEADER <Weave/DeviceLayer/WEAVE_DEVICE_LAYER_TARGET/PlatformManagerImpl.h>
+#define PLATFORMMANAGERIMPL_HEADER <chip/DeviceLayer/CHIP_DEVICE_LAYER_TARGET/PlatformManagerImpl.h>
 #include PLATFORMMANAGERIMPL_HEADER
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
+namespace chip {
 namespace DeviceLayer {
 
-inline WEAVE_ERROR PlatformManager::InitWeaveStack()
+inline CHIP_ERROR PlatformManager::InitchipStack()
 {
-    return static_cast<ImplClass*>(this)->_InitWeaveStack();
+    return static_cast<ImplClass*>(this)->_InitchipStack();
 }
 
-inline WEAVE_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, intptr_t arg)
+inline CHIP_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, intptr_t arg)
 {
     return static_cast<ImplClass*>(this)->_AddEventHandler(handler, arg);
 }
@@ -184,44 +181,44 @@ inline void PlatformManager::RunEventLoop(void)
     static_cast<ImplClass*>(this)->_RunEventLoop();
 }
 
-inline WEAVE_ERROR PlatformManager::StartEventLoopTask(void)
+inline CHIP_ERROR PlatformManager::StartEventLoopTask(void)
 {
     return static_cast<ImplClass*>(this)->_StartEventLoopTask();
 }
 
-inline void PlatformManager::LockWeaveStack(void)
+inline void PlatformManager::LockchipStack(void)
 {
-    static_cast<ImplClass*>(this)->_LockWeaveStack();
+    static_cast<ImplClass*>(this)->_LockchipStack();
 }
 
-inline bool PlatformManager::TryLockWeaveStack(void)
+inline bool PlatformManager::TryLockchipStack(void)
 {
-    return static_cast<ImplClass*>(this)->_TryLockWeaveStack();
+    return static_cast<ImplClass*>(this)->_TryLockchipStack();
 }
 
-inline void PlatformManager::UnlockWeaveStack(void)
+inline void PlatformManager::UnlockchipStack(void)
 {
-    static_cast<ImplClass*>(this)->_UnlockWeaveStack();
+    static_cast<ImplClass*>(this)->_UnlockchipStack();
 }
 
-inline void PlatformManager::PostEvent(const WeaveDeviceEvent * event)
+inline void PlatformManager::PostEvent(const chipDeviceEvent * event)
 {
     static_cast<ImplClass*>(this)->_PostEvent(event);
 }
 
-inline void PlatformManager::DispatchEvent(const WeaveDeviceEvent * event)
+inline void PlatformManager::DispatchEvent(const chipDeviceEvent * event)
 {
     static_cast<ImplClass*>(this)->_DispatchEvent(event);
 }
 
-inline WEAVE_ERROR PlatformManager::StartWeaveTimer(uint32_t durationMS)
+inline CHIP_ERROR PlatformManager::StartchipTimer(uint32_t durationMS)
 {
-    return static_cast<ImplClass*>(this)->_StartWeaveTimer(durationMS);
+    return static_cast<ImplClass*>(this)->_StartchipTimer(durationMS);
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
+} // namespace chip
 
 
 
