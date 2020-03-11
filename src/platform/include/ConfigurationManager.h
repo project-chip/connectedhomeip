@@ -23,9 +23,9 @@
 #ifndef CONFIGURATION_MANAGER_H
 #define CONFIGURATION_MANAGER_H
 
-#include <chip/Support/platform/PersistedStorage.h>
-#include <chip/Profiles/device-description/DeviceDescription.h>
-#include <chip/Profiles/network-provisioning/NetworkProvisioning.h>
+#include <support/platform/PersistedStorage.h>
+#include <profiles/device-description/DeviceDescription.h>
+#include <profiles/network-provisioning/NetworkProvisioning.h>
 
 namespace chip
 namespace Ble {
