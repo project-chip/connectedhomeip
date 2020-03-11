@@ -37,6 +37,12 @@ The CHIP repository is structured as follows:
 | `tests/` | Tests for CHIP |
 | `tools/` | Tools needed to work with the CHIP repo, as well as develop in the repository |
 
+# Third Party Tools
+
+Some tools and utilities are dependent on third party tools, such as Docker.
+
+[Docker](https://www.docker.com) provides a convenient way to run cross platform commands, using containers. Install stable version of [Docker Desktop](https://www.docker.com/products/docker-desktop) relevant to your native OS (MacOS or Windows). Once installed, you can run docker commands from the shell/terminal.
+
 # Contributing
 
 We would love for you to contribute to CHIP and help make it even
