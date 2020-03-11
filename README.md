@@ -41,7 +41,7 @@ The CHIP repository is structured as follows:
 
 Some tools and utilities are dependent on third party tools, such as Docker.
 
-[Docker](https://www.docker.com) provides a convenient way to run cross platform commands, using containers. Install stable version of [Docker Desktop](https://www.docker.com/products/docker-desktop) relevant to your native OS (MacOS or Windows). Once installed, you can run docker commands from the shell/terminal.
+[Docker](https://www.docker.com) is an excellent way to have stable build environments that don't pollute the host OS. It is also much easier to maintain stability across multiple host environments. Install stable version of [Docker Desktop](https://www.docker.com/products/docker-desktop) relevant to your native OS (MacOS or Windows). Once installed, you can run docker commands from the shell/terminal.
 
 # Contributing
 
