@@ -7,7 +7,7 @@ all: libsupport.a run_tests
 
 include $(TOP_DIR)/.yams/cpp_rules.min
 
-Module_Includes = 	\
+Module_Includes = \
 	-I. \
 	-I$(TOP_DIR)/src/include \
 	-I$(TOP_DIR)/src/lib \
