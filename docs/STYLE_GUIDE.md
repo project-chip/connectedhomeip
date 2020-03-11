@@ -118,6 +118,7 @@ Instead, do this:
 Use backticks for `inline code`. This includes file paths and file or binary names.
 
 
+
 Supported keywords:
 
 Keyword | Description
