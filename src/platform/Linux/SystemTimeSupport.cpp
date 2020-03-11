@@ -28,6 +28,7 @@
 #include <support/logging/CHIPLogging.h>
 
 #include <chrono>
+#include <errno.h>
 #include <inttypes.h>
 #include <sys/time.h>
 

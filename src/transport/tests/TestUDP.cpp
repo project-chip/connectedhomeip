@@ -140,10 +140,12 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+#if INET_CONFIG_ENABLE_IPV4
 void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
 {
     CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv4);
 }
+#endif
 
 void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
 {
@@ -217,10 +219,12 @@ void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
+#if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("Simple Init Test IPV4",   CheckSimpleInitTest4),
-    NL_TEST_DEF("Simple Init Test IPV6",   CheckSimpleInitTest6),
-
     NL_TEST_DEF("Message Self Test IPV4",  CheckMessageTest4),
+#endif
+
+    NL_TEST_DEF("Simple Init Test IPV6",   CheckSimpleInitTest6),
     NL_TEST_DEF("Message Self Test IPV6",  CheckMessageTest6),
 
     NL_TEST_SENTINEL()
