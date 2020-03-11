@@ -20,6 +20,19 @@ configure
 src/include/BuildConfig.h.in
 src/include/BuildConfig.h.in~
 
+# CMake
+**/cmake-build-debug
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/CMakeFiles/
+**/CTestTestfile.cmake
+DartConfiguration.tcl
+
+.ninja_deps
+.ninja_log
+build.ninja
+rules.ninja
+
 # Repos stuff
 .repos-warning-stamp
 

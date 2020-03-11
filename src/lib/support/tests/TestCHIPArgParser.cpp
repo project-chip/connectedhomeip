@@ -19,6 +19,10 @@
 
 #include "TestSupport.h"
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE // enable vasprintf
+#endif
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
