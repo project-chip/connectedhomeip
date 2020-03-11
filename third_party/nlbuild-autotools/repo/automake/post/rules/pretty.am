@@ -1,0 +1,79 @@
+#
+#    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file is the automake footer for all coding style-related
+#      targets and rules.
+#
+#      The recursive target 'pretty', invoked against '$(PRETTY_SUBDIRS)', 
+#      is intended to reformat a collection of source files, defined by 
+#      '$(PRETTY_FILES)' using the program '$(PRETTY)' with the arguments 
+#      '$(PRETTY_ARGS)'.
+#
+#      The recursive target 'pretty-check' (and its alias 'lint'),
+#      invoked against '$(PRETTY_SUBDIRS)', is intended to only check 
+#      but NOT reformat a collection of source files, defined by
+#      '$(PRETTY_FILES)' using the program '$(PRETTY_CHECK)' with the
+#      arguments '$(PRETTY_CHECK_ARGS)'.
+#
+#      This represents the minimum integration with GNU autotools
+#      (automake inparticular) such that 'make pretty' and 'make
+#      pretty-check' may be invoked at the top of the tree and all 
+#      the prerequisites occur such that it executes successfully 
+#      with no intervening make target invocations. '$(BUILT_SOURCES)' 
+#      are the key automake-specific dependencies to ensure that happens.
+#
+
+# nl-make-pretty <TERSE OUTPUT COMMAND> <COMMAND> <COMMAND ARGUMENTS> <PATHS>
+#
+# This function iterates over PATHS, invoking COMMAND with
+# COMMAND ARGUEMENTS on each file. If a non-verbose make has been
+# requested TERSE OUTPUT COMMAND is emitted to standard output.
+
+define nl-make-pretty
+$(AM_V_at)for file in $(4); do \
+    $(1) \
+    if test -f $${file}; then d=; else d=$(srcdir)/; fi; \
+    $(2) $(3) $${d}$${file} \
+    || exit 1; \
+done
+endef
+
+.PHONY: pretty pretty-recursive pretty-check pretty-check-recursive lint
+
+pretty: pretty-recursive
+
+pretty pretty-check: $(BUILT_SOURCES)
+
+# Map the build action 'lint' to the more vernacular 'pretty-check'.
+
+lint: pretty-check
+
+pretty-check: pretty-check-recursive
+
+pretty-recursive pretty-check-recursive:
+	$(call nl-make-subdirs-with-dirs,$(PRETTY_SUBDIRS))
+
+pretty: $(PRETTY_FILES)
+ifneq ($(PRETTY),)
+	$(call nl-make-pretty,$(AM_V_PRETTY),$(PRETTY),$(PRETTY_ARGS),$(filter-out $(@)-recursive,$(PRETTY_FILES)))
+endif
+
+pretty-check: $(PRETTY_FILES)
+ifneq ($(PRETTY_CHECK),)
+	$(call nl-make-pretty,$(AM_V_PRETTY_CHECK),$(PRETTY_CHECK),$(PRETTY_CHECK_ARGS),$(filter-out $(@)-recursive,$(PRETTY_FILES)))
+endif

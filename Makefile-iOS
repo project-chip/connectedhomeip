@@ -1,0 +1,548 @@
+#
+#    <COPYRIGHT>
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file implements a glue makefile for building the Chip SDK
+#      for iOS devices and simulators for multiple architectures.
+#
+
+# Don't allow this top-level makefile's targets to be built in parallel.
+
+.NOTPARALLEL:
+
+DEBUG                                                  ?= 0
+ENABLE_TARGETED_LISTEN                                 ?= 0
+OPENSSL_DIR                                            ?= internal
+
+xc-find-sdk                                             = $(shell xcrun --sdk $(1) --show-sdk-path)
+xc-find-tool                                            = $(shell xcrun -find $(1))
+xc-find-sdk-platform                                    = $(shell xcrun --sdk $(1) --show-sdk-platform-path)
+xc-find-sdk-version                                     = $(shell xcrun --sdk $(1) --show-sdk-version)
+
+IOS_SIMULATOR_SDK                                      := $(call xc-find-sdk,iphonesimulator)
+IOS_DEVICE_SDK                                         := $(call xc-find-sdk,iphoneos)
+IOS_SIMULATOR_CROSS_TOP                                := $(call xc-find-sdk-platform,iphonesimulator)/Developer
+IOS_DEVICE_CROSS_TOP                                   := $(call xc-find-sdk-platform,iphoneos)/Developer
+IOS_SIMULATOR_CROSS_SDK                                := iPhoneSimulator$(call xc-find-sdk-version,iphonesimulator).sdk
+IOS_DEVICE_CROSS_SDK                                   := iPhoneOS$(call xc-find-sdk-version,iphoneos).sdk
+
+AR                                                     := $(call xc-find-tool,ar)
+AS                                                     := $(call xc-find-tool,as)
+CLANG                                                  := $(call xc-find-tool,clang)
+CC                                                     := $(CLANG)
+CXX                                                    := $(CLANG)
+OBJC                                                   := $(CLANG)
+OBJCXX                                                 := $(CLANG)
+CPP                                                    := $(CC) -E
+LIPO                                                   := $(call xc-find-tool,lipo)
+NM                                                     := $(call xc-find-tool,nm)
+RANLIB                                                 := $(call xc-find-tool,ranlib)
+STRIP                                                  := $(call xc-find-tool,strip)
+
+ifeq ($(DEBUG),1)
+DEFINES                                                 = -DDEBUG=$(DEBUG) -UNDEBUG -g
+else
+DEFINES                                                 = -DNDEBUG=1 -UDEBUG
+endif
+
+configure_OPTIONS                                       = --with-openssl=$(OPENSSL_DIR)
+
+DEFINES                                                += \
+    -DCHIP_CONFIG_ENABLE_TARGETED_LISTEN=$(ENABLE_TARGETED_LISTEN) \
+    -DCHIP_PROGRESS_LOGGING=$(DEBUG) \
+    -DCHIP_ERROR_LOGGING=$(DEBUG) \
+    -DCHIP_DETAIL_LOGGING=$(DEBUG) \
+    -DCHIP_SYSTEM_CONFIG_NUM_BUFS=0 \
+    -DINET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT=0 \
+    -DBLE_LAYER_NUM_BLE_ENDPOINTS=4
+
+ARCHFLAGS                                               = -arch $(ARCH)
+
+IOS_MIN_VERSION_FLAG                                    = -miphoneos-version-min=8.0
+
+CoreFoundationHeaderDir                                 = System/Library/Frameworks/CoreFoundation.framework/Headers
+
+COMMON_CPPFLAGS                                         = $(ARCHFLAGS) -isysroot $(IOS_SDK) $(IOS_MIN_VERSION_FLAG) $(DEFINES) -I$(IOS_SDK)/$(CoreFoundationHeaderDir)
+
+CPPFLAGS                                                = $(COMMON_CPPFLAGS)
+CFLAGS                                                  = $(CPPFLAGS)
+CXXFLAGS                                                = $(CFLAGS)
+OBJCFLAGS                                               = $(CFLAGS)
+OBJCXXFLAGS                                             = $(CXXFLAGS) $(OBJCFLAGS)
+LDFLAGS                                                 = $(ARCHFLAGS)
+
+ECHO                                                   := @echo
+MAKE                                                   := make
+MKDIR_P                                                := mkdir -p
+LN_S                                                   := ln -s
+RM_F                                                   := rm -f
+SETFILE_A_B                                            := SetFile -a B
+
+INSTALL                                                := /usr/bin/install
+INSTALLFLAGS                                           := -p
+
+TopSourceDir                                           := $(dir $(shell readlink $(firstword $(MAKEFILE_LIST))))
+AbsTopSourceDir                                        := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
+BuildPath                                               = build
+TopBuildDir                                             = $(BuildPath)
+AbsTopBuildDir                                          = $(PWD)/$(TopBuildDir)
+
+ResultPath                                              = output
+TopResultDir                                            = $(ResultPath)
+AbsTopResultDir                                                 = $(PWD)/$(TopResultDir)
+
+TargetTupleStem                                         = apple-darwin
+TargetTuple                                             = $(TargetTupleStem)-ios
+
+ARCHS                                                   = arm64 armv7 armv7s i386 x86_64
+
+TopTargetLibDir                                         = $(TopResultDir)/$(if $(1),$(1)-,)$(TargetTuple)/lib
+
+#
+#  Framework specific variables
+#
+
+DynamicLibName                                          = Chip
+DynamicLib                                              = $(Framework)/$(DynamicLibName)
+
+FrameworkName                                           = $(DynamicLibName).framework
+Framework                                               = $(TopTargetLibDir)/$(FrameworkName)
+
+DynamicLibSourceFiles                                   = $(TopTargetLibDir)/libChip.a
+
+FrameworkHeaderDirName                                  = Headers
+FrameworkModulesDirName                                 = Modules
+FrameworkPlistName                                      = Info.plist
+FrameworkModuleMapName                                  = module.modulemap
+
+FrameworkHeaderDir                                      = $(Framework)/$(FrameworkHeaderDirName)
+FrameworkModulesDir                                     = $(Framework)/$(FrameworkModulesDirName)
+FrameworkPlist                                          = $(Framework)/$(FrameworkPlistName)
+FrameworkModuleMap                                      = $(Framework)/$(FrameworkModulesDirName)/$(FrameworkModuleMapName)
+
+FRAMEWORK_ARCHFLAGS                                     = $(addprefix -arch ,$(ARCHS))
+FRAMEWORK_FLAGS                                         = \
+        $(FRAMEWORK_ARCHFLAGS) \
+        $(IOS_MIN_VERSION_FLAG) \
+        $(FRAMEWORK_ARCHFLAGS) \
+        -isysroot $(IOS_DEVICE_SDK) \
+        -I$(IOS_DEVICE_SDK)/$(CoreFoundationHeaders) \
+        -fpic \
+        -lc++ \
+        -framework Foundation \
+        -framework CoreBluetooth \
+        -Xlinker -all_load \
+        -undefined dynamic_lookup \
+        -dynamiclib \
+        -current_version 1.0 \
+        -compatibility_version 1.0 \
+        -install_name @rpath/Chip.framework/Chip \
+        -o $(Framework)/Chip
+
+RootIncludePath                                         = $(TopResultDir)/include
+ChipDeviceManagerIncludePath                            = $(RootIncludePath)
+
+FrameworkInfoPlist                                      = \
+        <?xml version ="1.0" encoding="UTF-8"?> \
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"> \
+        <plist version ="1.0"> \
+        <dict> \
+        <key>CFBundleDevelopmentRegion</key> \
+        <string>en</string> \
+        <key>CFBundleExecutable</key> \
+        <string>Chip</string> \
+        <key>CFBundleIdentifier</key> \
+        <string>com.nestlabs.chip</string> \
+        <key>CFBundleInfoDictionaryVersion</key> \
+        <string>6.0</string> \
+        <key>CFBundleName</key> \
+        <string>Chip</string> \
+        <key>CFBundlePackageType</key> \
+        <string>FMWK</string> \
+        <key>CFBundleShortVersionString</key> \
+        <string>1.0</string> \
+        <key>CFBundleSignature</key> \
+        <string>????</string> \
+        <key>CFBundleVersion</key> \
+        <string>1.0</string> \
+        <key>NSPrincipalClass</key> \
+        <string></string> \
+        <key>CFBundleSupportedPlatforms</key> \
+        <array> \
+                <string>iPhoneOS</string> \
+        </array> \
+        <key>UIDeviceFamily</key> \
+        <array> \
+                <integer>1</integer> \
+                <integer>2</integer> \
+        </array> \
+        <key>MinimumOSVersion</key> \
+        <string>8.0</string> \
+        </dict> \
+        </plist>
+
+ModuleMap                                               = \
+        framework module $(DynamicLibName) {\n\
+                umbrella \"Headers\"\n\
+                export *\n\
+        }
+
+ifndef BuildJobs
+BuildJobs := $(shell getconf _NPROCESSORS_ONLN)
+endif
+JOBSFLAG := -j$(BuildJobs)
+
+#
+# automake files
+#
+AMFILES = src/system/SystemLayer.am			\
+	src/system/Makefile.am				\
+	src/lib/core/CoreLayer.am			\
+	src/lib/support/SupportLayer.am			\
+	src/lib/support/Makefile.am			\
+	src/lib/Makefile.am				\
+	src/inet/InetLayer.am				\
+	src/inet/Makefile.am				\
+	src/ble/BleLayer.am				\
+	src/ble/Makefile.am				\
+	src/lwip/Makefile.am				\
+	src/Makefile.am					\
+	third_party/Makefile.am				\
+	Makefile.am					\
+	configure.ac					\
+	$(NULL)
+
+#
+# configure-arch <arch>
+#
+# Configure the Chip SDK for the specified architecture.
+#
+#   arch - The architecture to configure.
+#
+# NOTE: The i386 linker check for the option -exported_symbols_list fails
+#       because the autotool macro was written poorly so as to not account
+#       for cross-compiling. We know for a fact that Apple's toolchain supports
+#       -exported_symbols_list, so we force the result with:
+#
+#         lt_cv_ld_exported_symbols_list=yes
+#
+#       below.
+#
+# NOTE: iOS SDKs starting at 10 seem to have issues with clock_gettime,
+#       declaring the interface in time.h but not making the symbol
+#       available in libSystem.dylib, resulting in a runtime crash. For
+#       now, suppress use of clock_gettime on iOS by overriding
+#       configure and asserting:
+#
+#         ac_cv_func_clock_gettime=no
+#         ac_cv_have_decl_clock_gettime=no
+#
+#       below.
+#
+define configure-arch
+$(ECHO) "  CONFIG   $(1)-$(TargetTuple)..."
+(cd $(BuildPath)/$(1)-$(TargetTuple) && $(AbsTopSourceDir)/configure \
+CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)" OBJC="$(OBJC)" OBJCXX="$(OBJCXX)" AR="$(AR)" RANLIB="$(RANLIB)" NM="$(NM)" STRIP="$(STRIP)" \
+INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
+CPPFLAGS="$(CPPFLAGS)" \
+CFLAGS="$(CFLAGS)" \
+CXXFLAGS="$(CXXFLAGS)" \
+OBJCFLAGS="$(OBJCFLAGS)" \
+OBJCXXFLAGS="$(OBJCXXFLAGS)" \
+LDFLAGS="$(LDFLAGS)" \
+CROSS_TOP="$($(1)_arch_CROSS_TOP)" \
+CROSS_SDK="$($(1)_arch_CROSS_SDK)" \
+lt_cv_ld_exported_symbols_list=yes \
+ac_cv_func_clock_gettime=no \
+ac_cv_have_decl_clock_gettime=no \
+--build=$(shell $(AbsTopSourceDir)/third_party/nlbuild-autotools/repo/autoconf/config.guess) \
+--host=$($(1)_arch_AUTOTOOLS)-$(TargetTupleStem) \
+--target=$($(1)_arch_AUTOTOOLS)-$(TargetTupleStem) \
+--prefix=/ \
+--exec-prefix=/$(1)-$(TargetTuple) \
+--with-chip-project-includes=$(AbsTopSourceDir)/build/config/ios \
+--with-logging-style=external \
+--enable-cocoa \
+--disable-docs \
+--disable-java \
+--disable-python \
+--disable-shared \
+--disable-tests \
+--disable-tools \
+$(configure_OPTIONS))
+endef # configure-arch
+
+#
+# build-arch <arch>
+#
+# Build the Chip SDK intermediate build products for the specified
+# architecture.
+#
+#   arch - The architecture to build.
+#
+define build-arch
+$(ECHO) "  BUILD    $(1)-$(TargetTuple)"
+$(MAKE) $(JOBSFLAG) -C $(BuildPath)/$(1)-$(TargetTuple) --no-print-directory \
+all
+endef # build-arch
+
+#
+# stage-arch <arch>
+#
+# Stage (install) the Chip SDK final build products for the specified
+# architecture.
+#
+#   arch - The architecture to stage.
+#
+define stage-arch
+$(ECHO) "  STAGE    $(1)-$(TargetTuple)"
+$(MAKE) $(JOBSFLAG) -C $(BuildPath)/$(1)-$(TargetTuple) --no-print-directory \
+DESTDIR=$(AbsTopResultDir) \
+install
+endef # stage-arch
+
+#
+# pretty-arch <arch>
+#
+# Prettyify the Chip SDK source code for the specified architecture.
+#
+#   arch - The architecture to prettify.
+#
+define pretty-arch
+$(ECHO) "  PRETTY   $(1)"
+$(MAKE) $(JOBSFLAG) -C $(BuildPath)/$(1)-$(TargetTuple) --no-print-directory \
+pretty
+endef # pretty-arch
+
+#
+# pretty-check-arch <arch>
+#
+# Pretty-check (lint) the Chip SDK source code for the specified
+# architecture.
+#
+#   arch - The architecture to pretty-check (lint).
+#
+define pretty-check-arch
+$(ECHO) "  PRETTY   $(1)"
+$(MAKE) $(JOBSFLAG) -C $(BuildPath)/$(1)-$(TargetTuple) --no-print-directory \
+pretty-check
+endef # pretty-check-arch
+
+#
+# combine-archs <target stem> { <target arch> ... } <input name> <output name>
+#
+# Combine several target architecture input objects or archives into a
+# single multi-architecture output object or archive.
+#
+#   target stem    - The target tuple stem (e.g. apple-darwin).
+#   target arch(s) - The target architecture(s) (e.g. armv7).
+#   input name     - The target library input name (e.g. libChip.a).
+#   output name    - The target library output name (e.g. libNLChipWrapper.a).
+#
+define combine-archs
+$(ECHO) "  LIPO     $(TopResultDir)/$(1)/lib/$(4)"
+$(LIPO) $(foreach arch,$(2),$(call TopTargetLibDir,$(arch))/$(3)) \
+	-create -output $(call TopTargetLibDir,)/$(4)
+endef # combine-archs
+
+#
+# ARCH_template <arch>
+#
+# Define macros, targets and rules to configure, build, and stage the
+# Chip SDK for a single architecture.
+#
+#   arch - The architecture to instantiate the template for.
+#
+define ARCH_template
+CONFIGURE_TARGETS    += configure-$(1)
+BUILD_TARGETS        += do-build-$(1)
+STAGE_TARGETS        += stage-$(1)
+PRETTY_TARGETS       += pretty-$(1)
+PRETTY_CHECK_TARGETS += pretty-check-$(1)
+BUILD_DIRS           += $(BuildPath)/$(1)-$(TargetTuple)
+DIRECTORIES          += $(BuildPath)/$(1)-$(TargetTuple)
+
+configure-$(1): ARCH=$(1)
+configure-$(1): IOS_SDK=$$($(1)_arch_IOS_SDK)
+configure-$(1): CROSS_SDK=$$($(1)_arch_CROSS_SDK)
+configure-$(1): CROSS_TOP=$$($(1)_arch_CROSS_TOP)
+
+configure-$(1): Makefile.in $(BuildPath)/$(1)-$(TargetTuple)/config.status
+
+$(BuildPath)/$(1)-$(TargetTuple)/config.status: | $(BuildPath)/$(1)-$(TargetTuple)
+	$$(call configure-arch,$(1))
+
+do-build-$(1): configure-$(1)
+
+do-build-$(1):
+	$$(call build-arch,$(1))
+
+stage-$(1): do-build-$(1)
+
+stage-$(1): | $(TopResultDir)
+	$$(call stage-arch,$(1))
+
+pretty-$(1): configure-$(1)
+	$$(call pretty-arch,$(1))
+
+lint-$(1) pretty-check-$(1): configure-$(1)
+	$$(call pretty-check-arch,$(1))
+
+$(1): stage-$(1)
+endef # ARCH_template
+
+.DEFAULT_GOAL := all
+
+all: stage
+
+#
+# ARM64
+#
+arm64_arch_IOS_SDK    = $(IOS_DEVICE_SDK)
+arm64_arch_AUTOTOOLS  = aarch64
+arm64_arch_CROSS_TOP  = $(IOS_DEVICE_CROSS_TOP)
+arm64_arch_CROSS_SDK  = $(IOS_DEVICE_CROSS_SDK)
+
+#
+# ARMV7
+#
+
+armv7_arch_IOS_SDK    = $(IOS_DEVICE_SDK)
+armv7_arch_AUTOTOOLS  = $(ARCH)
+armv7_arch_CROSS_TOP  = $(IOS_DEVICE_CROSS_TOP)
+armv7_arch_CROSS_SDK  = $(IOS_DEVICE_CROSS_SDK)
+
+#
+# ARMV7s
+#
+
+armv7s_arch_IOS_SDK   = $(IOS_DEVICE_SDK)
+armv7s_arch_AUTOTOOLS = $(ARCH)
+armv7s_arch_CROSS_TOP = $(IOS_DEVICE_CROSS_TOP)
+armv7s_arch_CROSS_SDK = $(IOS_DEVICE_CROSS_SDK)
+
+#
+# i386
+#
+
+i386_arch_IOS_SDK     = $(IOS_SIMULATOR_SDK)
+i386_arch_AUTOTOOLS   = $(ARCH)
+i386_arch_CROSS_TOP   = $(IOS_SIMULATOR_CROSS_TOP)
+i386_arch_CROSS_SDK   = $(IOS_SIMULATOR_CROSS_SDK)
+
+#
+# x86_64
+#
+
+x86_64_arch_IOS_SDK     = $(IOS_SIMULATOR_SDK)
+x86_64_arch_AUTOTOOLS   = $(ARCH)
+x86_64_arch_CROSS_TOP   = $(IOS_SIMULATOR_CROSS_TOP)
+x86_64_arch_CROSS_SDK   = $(IOS_SIMULATOR_CROSS_SDK)
+
+# Instantiate an architecture-specific build template for each target
+# architecture.
+
+$(foreach arch,$(ARCHS),$(eval $(call ARCH_template,$(arch))))
+
+#
+# Common / Finalization
+#
+
+.PHONY : configure build check coverage stage pretty lint pretty-check clean help
+
+Makefile.in: $(AMFILES)
+	$(ECHO) "BOOTSTRAP"
+	@./bootstrap
+
+configure: $(CONFIGURE_TARGETS)
+
+build: $(BUILD_TARGETS)
+
+stage-combine: $(STAGE_TARGETS)
+
+pretty: $(PRETTY_TARGETS)
+
+lint pretty-check: $(PRETTY_CHECK_TARGETS)
+
+stage: stage-combine | $(TopResultDir)/$(TargetTuple)/lib
+	$(call combine-archs,$(TargetTupleStemIOS),$(ARCHS),libChip.a,libChip.a)
+
+$(Framework): $(DynamicLib) $(FrameworkHeaderDir) $(FrameworkModulesDir) $(FrameworkModuleMap) $(FrameworkPlist)
+	$(ECHO) "  Setting bundle attribute on  \"$(@)\"..."
+	@$(SETFILE_A_B) $@
+
+$(DynamicLib): stage
+	$(ECHO) "  Creating framework dir: $(Framework)"
+	@$(MKDIR_P) $(Framework)
+	$(ECHO) "  Re-packaging static libraries into dynamic framework"
+	@$(CLANG) $(FRAMEWORK_FLAGS) $(DynamicLibSourceFiles)
+
+$(FrameworkPlist):
+	$(ECHO) "  Generating Info.plist"
+	@$(ECHO) "$(FrameworkInfoPlist)" > $(FrameworkPlist)
+
+$(FrameworkHeaderDir):
+	$(ECHO) "  Creating framework header dir: $(FrameworkHeaderDir)"
+	@$(MKDIR_P) $(FrameworkHeaderDir)
+	$(ECHO) "  Embedding headers in framework"
+	@cp $(addprefix $(ChipDeviceManagerIncludePath)/,*) $(FrameworkHeaderDir)
+
+$(FrameworkModulesDir):
+	$(ECHO) "  Creating framework modules dir: $(FrameworkModulesDir)"
+	@$(MKDIR_P) $(FrameworkModulesDir)
+
+$(FrameworkModuleMap): $(FrameworkModulesDir)
+	$(ECHO) "  Generating module map"
+	@$(ECHO) "$(ModuleMap)" > $(FrameworkModuleMap)
+
+DIRECTORIES     = $(TopResultDir) $(TopResultDir)/$(TargetTuple)/lib $(BUILD_DIRS)
+
+CLEAN_DIRS      = $(TopResultDir) $(BUILD_DIRS)
+
+all: $(Framework)
+
+$(DIRECTORIES):
+	$(ECHO) "  MKDIR    $@"
+	@$(MKDIR_P) "$@"
+
+clean:
+	$(ECHO) "  CLEAN"
+	@$(RM_F) -r $(CLEAN_DIRS)
+
+help:
+	$(ECHO) "Simply type 'make -f $(firstword $(MAKEFILE_LIST))' to build Chip for iOS for the following "
+	$(ECHO) "architectures: "
+	$(ECHO) ""
+	$(ECHO) "    $(ARCHS)"
+	$(ECHO) ""
+	$(ECHO) "To build only a particular architecture, specify: "
+	$(ECHO) ""
+	$(ECHO) "    make -f $(firstword $(MAKEFILE_LIST)) <architecture>"
+	$(ECHO) ""
+	$(ECHO) "You may want or need to override the following make variables either on the "
+	$(ECHO) "command line or in the environment: "
+	$(ECHO) ""
+	$(ECHO) "  DEBUG                   Enable Chip debug code and logging (default: '$(DEBUG)')."
+	$(ECHO) "  ENABLE_TARGETED_LISTEN  Enable Chip support for listening on particular "
+	$(ECHO) "                          addresses or interfaces. This allows testing multiple "
+	$(ECHO) "                          instances of the Chip stack running on a single host "
+	$(ECHO) "                          '(default: $(ENABLE_TARGETED_LISTEN)')."
+	$(ECHO) "  OPENSSL_DIR             Specify an alternate OpenSSL installation (default: "
+	$(ECHO) "                          '$(OPENSSL_DIR)'). For example, if OpenSSL libraries are "
+	$(ECHO) "                          in /usr/lib and headers in /usr/include, specify "
+	$(ECHO) "                          OPENSSL_DIR=/usr."

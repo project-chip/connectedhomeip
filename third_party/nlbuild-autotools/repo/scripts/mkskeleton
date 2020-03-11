@@ -1,0 +1,239 @@
+#!/bin/bash
+
+#
+#    Copyright 2015-2018 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file is a convenience script that will create a skeleton
+#      build layout using the nlbuild-autotools package.
+#
+
+YEAR=`date "+%Y"`
+NAME=""
+DESCRIPTION=""
+DIR=""
+VERSION="1.0"
+verbose=1
+
+#
+# usage
+#
+# Display program usage.
+#
+usage() {
+    name=`basename $0`
+
+    echo "Usage: ${name} [ options ]"
+
+    if [ $1 -ne 0 ]; then
+        echo "Try '${name} -h' for more information."
+    fi
+
+    if [ $1 -ne 1 ]; then
+        echo ""
+        echo "  -h, --help                  Print this help, then exit."
+        echo "  -I DIR                      Specify directory DIR as the root of the "
+        echo "                              nlbuild-autotools repository."
+        echo "  -v, --verbose               Verbosely report mkskeleton progress (default: yes)."
+        echo "  --package-description DESC  Specify description DESC as a the "
+        echo "                              package description."
+        echo "  --package-name NAME         Specify name NAME as the package name."
+        echo "  --package-version VERSION   Specify version VERSION as the initial "
+        echo "                              version for the package (default: ${VERSION})."
+        echo "  --package-year YEAR         Specify year YEAR as the creation "
+        echo "                              year for the package (default: ${YEAR})."
+        echo "  -q, --quiet                 Do not verbosely report mkskeleton progress (default: no)."
+
+        echo ""
+    fi
+
+    exit $1
+}
+
+#
+# log
+#
+log() {
+    if [ ! -z ${verbose} ] && [ ${verbose} -eq 1 ]; then
+        echo $*
+    fi
+}
+
+transform() {
+    local from="${1}"
+    local to="${2}"
+
+    sed                                                   \
+        -e "s,\@NLBUILD_AUTOTOOLS_STEM\@,${DIR},g"        \
+        -e "s,\@PACKAGE_DESCRIPTION\@,${DESCRIPTION},g"   \
+        -e "s,\@PACKAGE_SHORT_LOWER\@,${LOWER},g"         \
+        -e "s,\@PACKAGE_SHORT_UPPER\@,${UPPER},g"         \
+        -e "s,\@PACKAGE_YEAR\@,${YEAR},g"                 \
+        < "${from}" > "${to}"
+}
+
+populate() {
+    local nlbuild="${1}"
+    local perm=${2}
+    local file="${3}"
+    local directory="${4}"
+    local stem="${file%.*}"
+    local extension="${file##*.}"
+    local from
+    local to
+
+    if [ -r "${nlbuild}/examples/${file}" ]; then
+        from="${nlbuild}/examples/${file}"
+
+    elif [ -r "${nlbuild}/examples/${stem}-${directory}.${extension}" ]; then
+        from="${nlbuild}/examples/${stem}-${directory}.${extension}"
+
+    elif [ "${directory}" = "." ] && [ -r "${nlbuild}/examples/${stem}-toplevel.${extension}" ]; then
+        from="${nlbuild}/examples/${stem}-toplevel.${extension}"
+
+    else
+        echo "Cannot find an example file \"${file}\" for directory \"${directory}\"."
+        exit 1
+
+    fi
+
+    to="${directory}/${file}"
+
+    log "Creating \"${to}\"..."
+
+    transform "${from}" "${to}"
+
+    if [ $? = 0 ]; then
+        chmod ${perm} "${to}"
+    fi
+}
+
+#
+# link
+#
+link() {
+    local nlbuild="${1}"
+    local perm=${2}
+    local source="${3}"
+    local directory="${4}"
+    local from="${nlbuild}/scripts/${source}"
+    local to="${directory}/${source}"
+
+    log "Creating \"${to}\"..."
+
+    ln -sf "${from}" "${to}"
+}
+
+# Parse out any command line options
+
+while [ ${#} -gt 0 ]; do
+    if [ ${1} == "-h" ] || [ ${1} == "--help" ]; then
+        usage 0
+
+    elif [ ${1} == "-I" ]; then
+        DIR="${2}"
+        shift 2
+
+    elif [ ${1} == "--package-description" ]; then
+        DESCRIPTION="${2}"
+        shift 2
+
+    elif [ ${1} == "--package-name" ]; then
+        NAME="${2}"
+        shift 2
+
+        UPPER="`echo ${NAME} | tr '[[:lower:]]' '[[:upper:]]'`"
+        LOWER="`echo ${NAME} | tr '[[:upper:]]' '[[:lower:]]'`"
+
+    elif [ ${1} == "--package-version" ]; then
+        VERSION="${2}"
+        shift 2
+
+    elif [ ${1} == "--package-year" ]; then
+        YEAR="${2}"
+        shift 2
+
+    elif [ ${1} == "-q" ] || [ ${1} == "--quiet" ]; then
+        verbose=0
+        shift 1
+
+    elif [ ${1} == "-v" ] || [ ${1} == "--verbose" ]; then
+        verbose=1
+        shift 1
+
+    else
+        usage 1
+
+    fi
+done
+
+# Sanity check the command line arguments
+
+if [ -z "${DIR}" ]; then
+    echo "$0: No -I option specified. Please provide the location of the nlbuild-autotools directory."
+    exit 1
+
+fi
+
+if [ -z "${DESCRIPTION}" ]; then
+    echo "$0: Please provide a package description via --package-description."
+    exit 1
+fi
+
+if [ -z "${NAME}" ]; then
+    echo "$0: Please provide a package name via --package-name."
+    exit 1
+fi
+
+if [ -z "${VERSION}" ]; then
+    echo "$0: Please provide a package default version via --package-version."
+    exit 1
+fi
+
+if [ -z "${YEAR}" ]; then
+    echo "$0: Please provide a package creation year via --package-year."
+    exit 1
+fi
+
+# Create the skeleton directories
+
+DIRS="doc third_party include src tests"
+
+for dir in ${DIRS}; do
+    log "Creating \"${dir}\"..."
+    mkdir -p "${dir}"
+done
+
+# Populate the skeleton directories
+
+populate "${DIR}" 664 configure.ac        .
+populate "${DIR}" 775 bootstrap           .
+populate "${DIR}" 664 repos.conf          .
+populate "${DIR}" 664 Makefile.am         .
+populate "${DIR}" 664 Makefile-bootstrap  .
+populate "${DIR}" 664 Makefile.am         doc
+populate "${DIR}" 664 Doxyfile.in         doc
+populate "${DIR}" 664 Makefile.am         third_party 
+populate "${DIR}" 664 Makefile.am         src
+populate "${DIR}" 664 Makefile.am         tests
+link     "${DIR}" 775 bootstrap-configure .
+
+# Create the default package version
+
+log "Creating default version ${VERSION}..."
+
+echo "${VERSION}" > ".default-version"

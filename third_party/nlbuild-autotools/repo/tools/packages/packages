@@ -1,0 +1,6 @@
+m4
+autoconf
+automake
+libtool
+make
+coreutils

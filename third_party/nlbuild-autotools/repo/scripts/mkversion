@@ -1,0 +1,245 @@
+#!/bin/bash
+
+#
+#    Copyright 2011-2016 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file attempts to find and generate a package version
+#      including, if necessary, the number of commits from the last
+#      GIT tag and the current GIT hash corresponding to HEAD for the
+#      current branch.
+#
+#      This is largely cobbled together from similar scripts in other
+#      packages that are maintained in GIT (linux, u-boot, parted, etc.).
+#
+#      This can produce version information such as:
+#
+#        1.0.1
+#        1.0.1-dirty
+#        1.0.1-00032-gab50dbb
+#        1.0.1-00032-gab50dbb-dirty
+#
+
+# Constants
+
+ROOTDIR=${PREFIX}/
+
+BINDIR=${ROOTDIR}bin
+DATADIR=${ROOTDIR}share
+DEVICEDIR=${ROOTDIR}dev
+CONFDIR=${ROOTDIR}etc
+LIBDIR=${ROOTDIR}lib
+LIBEXECDIR=${ROOTDIR}libexec
+VARDIR=${ROOTDIR}var
+LOGDIR=${VARDIR}/log
+MANDIR=${ROOTDIR}man
+SBINDIR=${ROOTDIR}sbin
+
+USRDIR=${ROOTDIR}usr
+USRBINDIR=${USRDIR}/bin
+USRDATADIR=${USRDIR}/share
+USRLIBDIR=${USRDIR}/lib
+USRLIBEXECDIR=${USRDIR}/libexec
+USRSBINDIR=${USRDIR}/sbin
+
+AWK=${USRBINDIR}/awk
+BASENAME=${USRBINDIR}/basename
+CAT=${BINDIR}/cat
+ECHO="${BINDIR}/echo"
+NULL=${DEVICEDIR}/null
+PRINTF=${USRBINDIR}/printf
+RM=${BINDIR}/rm
+SED=${BINDIR}/sed
+
+VERSION=""
+
+#
+# usage <status>
+#
+# Description:
+#   This routine prints out the proper command line usage for this
+#   program and then exits with the specified status.
+#
+# Input(s):
+#   status - Exit status to exit the program with.
+#
+# Returns:
+#   This subroutine does not return.
+#
+usage() {
+	local name=`${BASENAME} ${0}`
+
+	${ECHO} "Usage: ${name} [options] [ <project root> ]"
+
+	if [ ${1} -ne 0 ]; then
+		${ECHO} "Try '${name} -h' for more information."
+	fi
+
+	if [ ${1} -ne 1 ]; then
+${CAT} << EOF
+  -b, --build-version=VERSION  Specify VERSION as the build version to generate
+                               extra build information against.
+  -h, --help                   Print this help, then exit.
+EOF
+	fi
+
+	exit ${1}
+}
+
+#
+# gitversion <string> <directory> <version>
+#
+# Description:
+#   This routine prints out any GIT version information appended to the
+#   end of the package version, including the number of commits from
+#   the last GIT tag and the current GIT hash corresponding to HEAD
+#   for the current branch.
+#
+# Input(s):
+#   string    - The current version string which may be empty.
+#   directory - The current directory.
+#   version   - The optional current package version.
+#
+# Returns:
+#   N/A
+#
+gitversion() {
+	local string="${1}"
+	local dir="${2}"
+	local version="${3}"
+	local head
+	local exact
+	local dtag
+	local gitversion
+
+	# Retrieve the shortened, unique GIT hash associated with the
+	# 'HEAD' GIT object
+
+	head=`test -d .git && git rev-parse --verify --short HEAD 2> ${NULL}`
+
+	# If we found a hash, we are actually in a GIT repository; continue.
+
+	if [ -n "${head}" ]; then
+	    	# Check to see if we have a position in GIT that is
+	    	# exactly at an existing tag (e.g. 1.0.2). If we are,
+	    	# just use it and add a dirty qualifier. Otherwise,
+	    	# work through the logic to determine how far off the
+	    	# tag the tree is.
+
+	    	exact="`git describe --exact-match 2> ${NULL}`"
+
+		if [ -z "${exact}" ] || [ -n "${version}" ] && [ "${version}" != "${exact}" ]; then
+			dtag="`git describe 2> ${NULL}`"
+
+			# If we are n commits away from a tag, then
+			# print n and a shortened version of the
+			# hash. Otherwise, just print the hash.
+			#
+			# If we are at an exact version, then there
+			# won't be a delta or a hash, just use the
+			# exact tag.
+
+			if [ -n "${dtag}" ]; then
+				if [ "${dtag}" == "${exact}" ]; then
+					gitversion="${dtag}"
+				else
+					gitversion=`${PRINTF} "${dtag}" | ${AWK} -F '-' '{printf("%s-%05d-%s", $(NF-2),$(NF-1),$(NF))}' 2> ${NULL}`
+				fi
+
+			else
+				gitversion=`${PRINTF} "g${head}"`
+
+			fi
+
+                else
+			gitversion="${exact}"
+
+		fi
+
+		# Update the index if we are in a writable directory
+		# so that we can successfully check for a dirty (has
+		# uncommitted changes or unresolved merges) tree.
+
+		if [ -w "${dir}" ]; then
+			git update-index --refresh --unmerged > ${NULL}
+		fi
+
+		# Now check for such a dirty tree and add to the "string"
+		# if we found one.
+
+		if git diff-index --name-only HEAD | read dummy; then
+		    	if [ -n "${gitversion}" ]; then
+				gitversion="${gitversion}-dirty"
+			else
+				gitversion="dirty"
+			fi
+    		fi
+
+	else
+		gitversion="${version}"
+
+	fi
+
+	if [ -n "${string}" ] && [ -n "${gitversion}" ]; then
+		string="${string}-${gitversion}"
+	else
+		string="${gitversion}"
+	fi
+
+	${PRINTF} "${string}"
+}
+
+#
+# Main Program Body
+#
+
+while [ ${#} -gt 0 ]; do
+    	if [ ${1:0:1} == "-" ]; then
+		if [ "${1}" == "-h" ] || [ "${1}" == "--help" ]; then
+			usage 0
+
+		elif [ "${1}" == "-b" ] || [ "${1}" == "--build-version" ]; then
+			version="${2}"
+			shift 2
+
+		else
+		    	${ECHO} "Unknown argument '${1}'."
+			usage 1
+
+		fi
+
+	else
+		break
+
+	fi
+done
+
+if [ ${#} -gt 1 ]; then
+	usage 1
+elif [ ${#} -eq 1 ]; then
+	tree="${1}"
+else
+	tree="."
+fi
+
+if [ "${tree}" != "." ]; then
+	cd "${tree}"
+fi
+
+VERSION="`gitversion \"${VERSION}\" . ${version}`"
+
+${PRINTF} "${VERSION}"
