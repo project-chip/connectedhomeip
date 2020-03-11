@@ -27,7 +27,7 @@
 #include <profiles/device-description/DeviceDescription.h>
 #include <profiles/network-provisioning/NetworkProvisioning.h>
 
-namespace chip
+namespace chip {
 namespace Ble {
 struct ChipBLEDeviceIdentificationInfo;
 }
@@ -197,7 +197,6 @@ extern ConfigurationManagerImpl & ConfigurationMgrImpl(void);
 #include CONFIGURATIONMANAGERIMPL_HEADER
 #endif
 
-namespace chip {
 namespace chip {
 namespace DeviceLayer {
 
@@ -535,7 +534,6 @@ inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool v
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 } // namespace DeviceLayer
-} // namespace chip
 } // namespace chip
 
 #endif // CONFIGURATION_MANAGER_H

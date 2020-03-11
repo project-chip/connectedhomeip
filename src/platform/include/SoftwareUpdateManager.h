@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,22 +23,21 @@
 #ifndef SOFTWARE_UPDATE_MANAGER_H
 #define SOFTWARE_UPDATE_MANAGER_H
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <Weave/Profiles/software-update/SoftwareUpdateProfile.h>
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
+#include <profiles/software-update/SoftwareUpdateProfile.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 class SoftwareUpdateManagerImpl;
 
 class SoftwareUpdateManager
 {
-    typedef ::nl::Weave::TLV::TLVWriter TLVWriter;
-    typedef ::nl::Weave::Profiles::SoftwareUpdate::UpdatePriority UpdatePriority;
-    typedef ::nl::Weave::Profiles::SoftwareUpdate::UpdateCondition UpdateCondition;
+    typedef ::chip::TLV::TLVWriter TLVWriter;
+    typedef ::chip::Profiles::SoftwareUpdate::UpdatePriority UpdatePriority;
+    typedef ::chip::Profiles::SoftwareUpdate::UpdateCondition UpdateCondition;
 
     using ImplClass = SoftwareUpdateManagerImpl;
 
@@ -142,8 +140,8 @@ public:
          *
          *  The application must signal completion of the prepare operation by calling the
          *  \c PrepareImageStorageComplete() method.  It may do this within the event callback
-         *  itself, or at a later time.  If called from a task other than the Weave task,
-         *  the caller must hold the Weave stack lock.
+         *  itself, or at a later time.  If called from a task other than the chip task,
+         *  the caller must hold the chip stack lock.
          *
          *  The application can choose to ignore the PrepareImageStorage event by passing it
          *  to the default event handler.  If this is done, the system automatically proceeds
@@ -245,7 +243,7 @@ public:
     {
         /**
          *  Ignore the download completely. A kEvent_Finished API event callback will
-         *  be generated with error WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_CANCELLED if
+         *  be generated with error CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_CANCELLED if
          *  this option is selected and the retry logic will not be invoked.
          */
         kAction_Ignore,
@@ -296,12 +294,12 @@ public:
     typedef void (*EventCallback)(void *apAppState, EventType aEvent, const InEventParam& aInParam, OutEventParam& aOutParam);
     typedef void (*RetryPolicyCallback)(void *aAppState, RetryParam& aRetryParam, uint32_t& aOutIntervalMsec);
 
-    WEAVE_ERROR Abort(void);
-    WEAVE_ERROR CheckNow(void);
-    WEAVE_ERROR ImageInstallComplete(WEAVE_ERROR aError);
-    WEAVE_ERROR PrepareImageStorageComplete(WEAVE_ERROR aError);
-    WEAVE_ERROR SetEventCallback(void * const aAppState, const EventCallback aEventCallback);
-    WEAVE_ERROR SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs);
+    CHIP_ERROR Abort(void);
+    CHIP_ERROR CheckNow(void);
+    CHIP_ERROR ImageInstallComplete(CHIP_ERROR aError);
+    CHIP_ERROR PrepareImageStorageComplete(CHIP_ERROR aError);
+    CHIP_ERROR SetEventCallback(void * const aAppState, const EventCallback aEventCallback);
+    CHIP_ERROR SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs);
 
     bool IsInProgress(void);
 
@@ -319,7 +317,7 @@ private:
     // friend class SoftwareUpdateManagerImpl;
     template<class> friend class Internal::GenericPlatformManagerImpl;
 
-    WEAVE_ERROR Init(void);
+    CHIP_ERROR Init(void);
 
 protected:
 
@@ -336,7 +334,7 @@ protected:
 /**
  * Returns a reference to the public interface of the SoftwareUpdateManager singleton object.
  *
- * Weave application should use this to access features of the SoftwareUpdateManager object
+ * chip application should use this to access features of the SoftwareUpdateManager object
  * that are common to all platforms.
  */
 extern SoftwareUpdateManager & SoftwareUpdateMgr(void);
@@ -344,14 +342,13 @@ extern SoftwareUpdateManager & SoftwareUpdateMgr(void);
 /**
  * Returns the platform-specific implementation of the SoftwareUpdateManager singleton object.
  *
- * Weave applications can use this to gain access to features of the SoftwareUpdateManager
+ * chip applications can use this to gain access to features of the SoftwareUpdateManager
  * that are specific to the selected platform.
  */
 extern SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl(void);
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 /* Include a header file containing the implementation of the SoftwareUpdateManager
  * object for the selected platform.
@@ -359,12 +356,11 @@ extern SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl(void);
 #ifdef EXTERNAL_SOFTWAREUPDATEMANAGERIMPL_HEADER
 #include EXTERNAL_SOFTWAREUPDATEMANAGERIMPL_HEADER
 #else
-#define SOFTWAREUPDATEMANAGERIMPL_HEADER <Weave/DeviceLayer/WEAVE_DEVICE_LAYER_TARGET/SoftwareUpdateManagerImpl.h>
+#define SOFTWAREUPDATEMANAGERIMPL_HEADER <chip/DeviceLayer/CHIP_DEVICE_LAYER_TARGET/SoftwareUpdateManagerImpl.h>
 #include SOFTWAREUPDATEMANAGERIMPL_HEADER
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 union SoftwareUpdateManager::InEventParam
@@ -379,7 +375,7 @@ union SoftwareUpdateManager::InEventParam
 
     struct
     {
-        WEAVE_ERROR Error;
+        CHIP_ERROR Error;
         Profiles::StatusReporting::StatusReport *StatusReport;
     } QueryPrepareFailed;
 
@@ -418,7 +414,7 @@ union SoftwareUpdateManager::InEventParam
 
     struct
     {
-        WEAVE_ERROR Error;
+        CHIP_ERROR Error;
         Profiles::StatusReporting::StatusReport *StatusReport;
     } Finished;
 };
@@ -432,12 +428,12 @@ union SoftwareUpdateManager::OutEventParam
     {
         const char *PackageSpecification;
         const char *DesiredLocale;
-        WEAVE_ERROR Error;
+        CHIP_ERROR Error;
     } PrepareQuery;
 
     struct
     {
-        WEAVE_ERROR Error;
+        CHIP_ERROR Error;
     } PrepareQuery_Metadata;
 
     struct
@@ -452,31 +448,31 @@ union SoftwareUpdateManager::OutEventParam
 
     struct
     {
-        WEAVE_ERROR Error;
+        CHIP_ERROR Error;
     } StoreImageBlock;
 
     struct
     {
-        WEAVE_ERROR Error;
+        CHIP_ERROR Error;
     } ComputeImageIntegrity;
 };
 
-inline WEAVE_ERROR SoftwareUpdateManager::Init(void)
+inline CHIP_ERROR SoftwareUpdateManager::Init(void)
 {
     return static_cast<ImplClass*>(this)->_Init();
 }
 
-inline WEAVE_ERROR SoftwareUpdateManager::CheckNow(void)
+inline CHIP_ERROR SoftwareUpdateManager::CheckNow(void)
 {
     return static_cast<ImplClass*>(this)->_CheckNow();
 }
 
-inline WEAVE_ERROR SoftwareUpdateManager::ImageInstallComplete(WEAVE_ERROR aError)
+inline CHIP_ERROR SoftwareUpdateManager::ImageInstallComplete(CHIP_ERROR aError)
 {
     return static_cast<ImplClass*>(this)->_ImageInstallComplete(aError);
 }
 
-inline WEAVE_ERROR SoftwareUpdateManager::PrepareImageStorageComplete(WEAVE_ERROR aError)
+inline CHIP_ERROR SoftwareUpdateManager::PrepareImageStorageComplete(CHIP_ERROR aError)
 {
     return static_cast<ImplClass*>(this)->_PrepareImageStorageComplete(aError);
 }
@@ -486,7 +482,7 @@ inline SoftwareUpdateManager::State SoftwareUpdateManager::GetState(void)
     return static_cast<ImplClass*>(this)->_GetState();
 }
 
-inline WEAVE_ERROR SoftwareUpdateManager::Abort(void)
+inline CHIP_ERROR SoftwareUpdateManager::Abort(void)
 {
     return static_cast<ImplClass*>(this)->_Abort();
 }
@@ -496,7 +492,7 @@ inline bool SoftwareUpdateManager::IsInProgress(void)
     return static_cast<ImplClass*>(this)->_IsInProgress();
 }
 
-inline WEAVE_ERROR SoftwareUpdateManager::SetQueryIntervalWindow(uint32_t aMinRangeSecs, uint32_t aMaxRangeSecs)
+inline CHIP_ERROR SoftwareUpdateManager::SetQueryIntervalWindow(uint32_t aMinRangeSecs, uint32_t aMaxRangeSecs)
 {
     return static_cast<ImplClass*>(this)->_SetQueryIntervalWindow(aMinRangeSecs, aMaxRangeSecs);
 }
@@ -506,7 +502,7 @@ inline void SoftwareUpdateManager::SetRetryPolicyCallback(const RetryPolicyCallb
     static_cast<ImplClass*>(this)->_SetRetryPolicyCallback(aRetryPolicyCallback);
 }
 
-inline WEAVE_ERROR SoftwareUpdateManager::SetEventCallback(void * const aAppState, const EventCallback aEventCallback)
+inline CHIP_ERROR SoftwareUpdateManager::SetEventCallback(void * const aAppState, const EventCallback aEventCallback)
 {
     return static_cast<ImplClass*>(this)->_SetEventCallback(aAppState, aEventCallback);
 }
@@ -519,8 +515,7 @@ inline void SoftwareUpdateManager::DefaultEventHandler(void *apAppState, EventTy
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #endif // SOFTWARE_UPDATE_MANAGER_H
