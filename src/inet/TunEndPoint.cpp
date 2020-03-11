@@ -40,6 +40,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#if INET_WANT_ENDPOINT_TUN
+
 namespace chip {
 namespace Inet {
 
@@ -821,3 +823,5 @@ void TunEndPoint::HandlePendingIO()
 
 } // namespace Inet
 } // namespace chip
+
+#endif // INET_WANT_ENDPOINT_TUN

@@ -1,0 +1,23 @@
+environment:
+    BUILD_TYPE: cmake-ninja
+executor: cmake-ninja
+steps:
+    - checkout
+    - run:
+        name: Prepare third_party repos
+        command: make -f Makefile-bootstrap repos
+    - run:
+        name: Cmake/ninja build of standalone host build
+        command: |
+            cmake -B build/standalone -GNinja
+            ninja -C build/standalone check
+    - run:
+        name: Cmake/ninja build of Linux embedded (x86)
+        command: |
+            cmake -B build/linux -GNinja -DCHIP_PLATFORM=linux
+            ninja -C build/linux check
+    - run:
+        name: Cmake/ninja build of Nordic nRF52840
+        command: |
+            cmake -B build/nrf52840 -GNinja -DCHIP_PLATFORM=nrf52840
+            ninja -C build/nrf52840
