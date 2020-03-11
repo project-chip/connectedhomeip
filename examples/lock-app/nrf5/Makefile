@@ -17,7 +17,7 @@
 #   limitations under the License.
 #
 
-# 
+#
 #   @file
 #         Makefile for building the CHIP nRF52840 Lock Example Application.
 #
