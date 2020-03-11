@@ -118,6 +118,9 @@ Instead, do this:
 Use backticks for `inline code`. This includes file paths and file or binary names.
 
 
+### Makefiles
+
+Use `tabs` only where strictly necessary. For example, Avoid using tabs to align line breaks.
 
 Supported keywords:
 
