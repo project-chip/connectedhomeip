@@ -32,6 +32,8 @@
 
 #include <string.h>
 
+#if INET_WANT_ENDPOINT_DNS
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/dns.h>
 #include <lwip/init.h>
@@ -535,3 +537,5 @@ void DNSResolver::HandleAsyncResolveComplete(void)
 
 } // namespace Inet
 } // namespace chip
+
+#endif // INET_WANT_ENDPOINT_DNS

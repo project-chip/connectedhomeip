@@ -1,0 +1,42 @@
+name: CMake Builds
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    build:
+        name: CMake Build
+
+        strategy:
+            matrix:
+                type: [standalone, linux-embedded, nrf52840]
+        env:
+            BUILD_TYPE: ${{ matrix.type }}
+
+        runs-on: ubuntu-latest
+
+        container:
+          image: connectedhomeip/chip-build-nrf-platform:0.3.0
+          volumes:
+              - "/tmp/bloat_reports:/tmp/bloat_reports"
+              - "/tmp/output_binaries:/tmp/output_binaries"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                 submodules: true
+            - name: Build
+              run: |
+                  case $BUILD_TYPE in
+                     "standalone") CMAKE_ARGS='';;
+                     "linux-embedded") CMAKE_ARGS='-DCHIP_PLATFORM=linux';;
+                     "nrf52840") CMAKE_ARGS='-DCHIP_PLATFORM=nrf52840';;
+                     *) ;;
+                  esac
+
+                  cmake -B out/$BUILD_TYPE -GNinja $CMAKE_ARGS
+                  ninja -C out/$BUILD_TYPE
+            - name: Test
+              run: ninja -C out/$BUILD_TYPE check

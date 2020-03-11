@@ -15,7 +15,57 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Cmake Ninja",
+            "command": "scripts/build/cmake_ninja.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Cmake Ninja Test",
+            "command": "scripts/build/cmake_ninja_test.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Cmake Ninja Clean",
+            "command": "scripts/build/cmake_ninja_clean.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "GN Build",
@@ -43,7 +93,9 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Verify coding style conformance",
@@ -51,7 +103,9 @@
             "command": "scripts/helpers/code_style_check.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Run Unit and Functional Tests",
@@ -59,7 +113,9 @@
             "command": "scripts/tests/all_tests.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Run Distribution Generation",
@@ -67,7 +123,9 @@
             "command": "scripts/build/distribution_check.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Run Code Coverage",
@@ -75,7 +133,9 @@
             "command": "scripts/tools/codecoverage.sh; code -r build/default/src/chip.info/index.html",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Clean",
@@ -83,21 +143,27 @@
             "command": "scripts/helpers/clean.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Bootstrap",
             "type": "shell",
             "command": "scripts/build/bootstrap.sh",
             "group": "none",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Clean Tree",
             "type": "shell",
             "command": "scripts/helpers/clean_tree.sh",
             "group": "none",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Run Setup Payload Tests",
@@ -105,7 +171,9 @@
             "command": "scripts/tests/setup_payload_tests.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Build QRCode Payload Tests",
@@ -113,14 +181,18 @@
             "command": "scripts/tests/qrcode_payload_tests.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Build & Run Crypto Tests",
             "type": "shell",
             "command": "scripts/tests/crypt_tests.sh",
             "group": "none",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Build nRF5 Lock App",
@@ -128,14 +200,18 @@
             "command": "scripts/examples/nrf_lock_app.sh",
             "group": "none",
             "dependsOn": "Clean Tree",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Build openSSL crypto Tests",
             "type": "shell",
             "command": "scripts/tests/openssl_tests.sh",
             "group": "none",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Build ESP32 Echo Example",
@@ -143,7 +219,9 @@
             "command": "scripts/examples/esp_echo_app.sh",
             "group": "none",
             "dependsOn": "Clean Tree",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Build Standalone Echo Client",
@@ -151,7 +229,9 @@
             "command": "scripts/examples/standalone_echo_client.sh",
             "group": "none",
             "dependsOn": "Clean Tree",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Build Standalone Shell",
@@ -159,7 +239,9 @@
             "command": "scripts/examples/standalone_shell.sh",
             "group": "none",
             "dependsOn": "Clean Tree",
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }

@@ -53,6 +53,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/dns.h>
 #include <lwip/init.h>
+#include <lwip/ip6_route_table.h>
 #include <lwip/netif.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
@@ -169,11 +170,14 @@ static void ExitOnSIGUSR1Handler(int signum)
 // We set a hook to exit when we receive SIGUSR1, SIGTERM or SIGHUP
 void SetSIGUSR1Handler(void)
 {
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     SetSignalHandler(ExitOnSIGUSR1Handler);
+#endif
 }
 
 void SetSignalHandler(SignalHandler handler)
 {
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     struct sigaction sa;
     int signals[] = { SIGUSR1 };
     size_t i;
@@ -189,6 +193,7 @@ void SetSignalHandler(SignalHandler handler)
             exit(1);
         }
     }
+#endif
 }
 
 void InitSystemLayer()
