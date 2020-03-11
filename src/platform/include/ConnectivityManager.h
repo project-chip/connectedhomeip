@@ -249,7 +249,6 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
 
 namespace chip {
-namespace chip {
 namespace DeviceLayer {
 
 inline ConnectivityManager::WiFiStationMode ConnectivityManager::GetWiFiStationMode(void)
@@ -563,7 +562,6 @@ inline void ConnectivityManager::OnWiFiStationProvisionChange(void)
 }
 
 } // namespace DeviceLayer
-} // namespace chip
 } // namespace chip
 
 #endif // CONNECTIVITY_MANAGER_H

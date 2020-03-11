@@ -153,7 +153,6 @@ extern PlatformManagerImpl & PlatformMgrImpl(void);
 #endif
 
 namespace chip {
-namespace chip {
 namespace DeviceLayer {
 
 inline CHIP_ERROR PlatformManager::InitchipStack()
@@ -217,7 +216,6 @@ inline CHIP_ERROR PlatformManager::StartchipTimer(uint32_t durationMS)
 }
 
 } // namespace DeviceLayer
-} // namespace chip
 } // namespace chip
 
 
