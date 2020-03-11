@@ -118,6 +118,8 @@ _Static_assert ((PBUF_CUSTOM_POOL_IDX_START > PBUF_CUSTOM_POOL_IDX_END), "PBUF_C
 #define MEMP_PBUF_POOL_HIGHWATERMARK(type) (type)
 #endif
 
+#define sys_profile_interval_set_pbuf_highwatermark(...)
+
 #if MEMP_SANITY_CHECK && !MEMP_MEM_MALLOC
 /**
  * Check that memp-lists don't form a circle, using "Floyd's cycle-finding algorithm".
