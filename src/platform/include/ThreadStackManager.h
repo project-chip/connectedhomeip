@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,8 +23,7 @@
 #ifndef THREAD_STACK_MANAGER_H
 #define THREAD_STACK_MANAGER_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -46,7 +44,7 @@ template<class> class GenericNetworkProvisioningServerImpl;
 
 /**
  * Provides features for initializing and interacting with the Thread stack on
- * a Weave-enabled device.
+ * a chip-enabled device.
  */
 class ThreadStackManager
 {
@@ -56,17 +54,17 @@ public:
 
     // ===== Members that define the public interface of the ThreadStackManager
 
-    WEAVE_ERROR InitThreadStack(void);
+    CHIP_ERROR InitThreadStack(void);
     void ProcessThreadActivity(void);
-    WEAVE_ERROR StartThreadTask(void);
+    CHIP_ERROR StartThreadTask(void);
     void LockThreadStack(void);
     bool TryLockThreadStack(void);
     void UnlockThreadStack(void);
     bool HaveRouteToAddress(const IPAddress & destAddr);
-    WEAVE_ERROR GetAndLogThreadStatsCounters(void);
-    WEAVE_ERROR GetAndLogThreadTopologyMinimal(void);
-    WEAVE_ERROR GetAndLogThreadTopologyFull(void);
-    WEAVE_ERROR GetPrimary802154MACAddress(uint8_t *buf);
+    CHIP_ERROR GetAndLogThreadStatsCounters(void);
+    CHIP_ERROR GetAndLogThreadTopologyMinimal(void);
+    CHIP_ERROR GetAndLogThreadTopologyFull(void);
+    CHIP_ERROR GetPrimary802154MACAddress(uint8_t *buf);
 
 private:
 
@@ -85,18 +83,18 @@ private:
     template<class> friend class Internal::GenericThreadStackManagerImpl_FreeRTOS;
     template<class> friend class Internal::GenericNetworkProvisioningServerImpl;
 
-    void OnPlatformEvent(const WeaveDeviceEvent * event);
+    void OnPlatformEvent(const chipDeviceEvent * event);
     bool IsThreadEnabled(void);
-    WEAVE_ERROR SetThreadEnabled(bool val);
+    CHIP_ERROR SetThreadEnabled(bool val);
     bool IsThreadProvisioned(void);
     bool IsThreadAttached(void);
-    WEAVE_ERROR GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
-    WEAVE_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
+    CHIP_ERROR GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
+    CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
     void ClearThreadProvision(void);
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType(void);
-    WEAVE_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
+    CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
     void GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-    WEAVE_ERROR SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+    CHIP_ERROR SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
     bool HaveMeshConnectivity(void);
     void OnMessageLayerActivityChanged(bool messageLayerIsActive);
     void OnWoBLEAdvertisingStart(void);
@@ -117,7 +115,7 @@ protected:
 /**
  * Returns the public interface of the ThreadStackManager singleton object.
  *
- * Weave applications should use this to access features of the ThreadStackManager object
+ * chip applications should use this to access features of the ThreadStackManager object
  * that are common to all platforms.
  */
 extern ThreadStackManager & ThreadStackMgr(void);
@@ -125,14 +123,13 @@ extern ThreadStackManager & ThreadStackMgr(void);
 /**
  * Returns the platform-specific implementation of the ThreadStackManager singleton object.
  *
- * Weave applications can use this to gain access to features of the ThreadStackManager
+ * chip applications can use this to gain access to features of the ThreadStackManager
  * that are specific to the selected platform.
  */
 extern ThreadStackManagerImpl & ThreadStackMgrImpl(void);
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 /* Include a header file containing the implementation of the ThreadStackManager
  * object for the selected platform.
@@ -140,15 +137,14 @@ extern ThreadStackManagerImpl & ThreadStackMgrImpl(void);
 #ifdef EXTERNAL_THREADSTACKMANAGERIMPL_HEADER
 #include EXTERNAL_THREADSTACKMANAGERIMPL_HEADER
 #else
-#define THREADSTACKMANAGERIMPL_HEADER <Weave/DeviceLayer/WEAVE_DEVICE_LAYER_TARGET/ThreadStackManagerImpl.h>
+#define THREADSTACKMANAGERIMPL_HEADER <chip/DeviceLayer/CHIP_DEVICE_LAYER_TARGET/ThreadStackManagerImpl.h>
 #include THREADSTACKMANAGERIMPL_HEADER
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
-inline WEAVE_ERROR ThreadStackManager::InitThreadStack()
+inline CHIP_ERROR ThreadStackManager::InitThreadStack()
 {
     return static_cast<ImplClass*>(this)->_InitThreadStack();
 }
@@ -158,7 +154,7 @@ inline void ThreadStackManager::ProcessThreadActivity()
     static_cast<ImplClass*>(this)->_ProcessThreadActivity();
 }
 
-inline WEAVE_ERROR ThreadStackManager::StartThreadTask()
+inline CHIP_ERROR ThreadStackManager::StartThreadTask()
 {
     return static_cast<ImplClass*>(this)->_StartThreadTask();
 }
@@ -186,7 +182,7 @@ inline bool ThreadStackManager::HaveRouteToAddress(const IPAddress & destAddr)
     return static_cast<ImplClass*>(this)->_HaveRouteToAddress(destAddr);
 }
 
-inline void ThreadStackManager::OnPlatformEvent(const WeaveDeviceEvent * event)
+inline void ThreadStackManager::OnPlatformEvent(const chipDeviceEvent * event)
 {
     static_cast<ImplClass*>(this)->_OnPlatformEvent(event);
 }
@@ -196,7 +192,7 @@ inline bool ThreadStackManager::IsThreadEnabled(void)
     return static_cast<ImplClass*>(this)->_IsThreadEnabled();
 }
 
-inline WEAVE_ERROR ThreadStackManager::SetThreadEnabled(bool val)
+inline CHIP_ERROR ThreadStackManager::SetThreadEnabled(bool val)
 {
     return static_cast<ImplClass*>(this)->_SetThreadEnabled(val);
 }
@@ -211,12 +207,12 @@ inline bool ThreadStackManager::IsThreadAttached(void)
     return static_cast<ImplClass*>(this)->_IsThreadAttached();
 }
 
-inline WEAVE_ERROR ThreadStackManager::GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
+inline CHIP_ERROR ThreadStackManager::GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
 {
     return static_cast<ImplClass*>(this)->_GetThreadProvision(netInfo, includeCredentials);
 }
 
-inline WEAVE_ERROR ThreadStackManager::SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo)
+inline CHIP_ERROR ThreadStackManager::SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo)
 {
     return static_cast<ImplClass*>(this)->_SetThreadProvision(netInfo);
 }
@@ -231,7 +227,7 @@ inline ConnectivityManager::ThreadDeviceType ThreadStackManager::GetThreadDevice
     return static_cast<ImplClass*>(this)->_GetThreadDeviceType();
 }
 
-inline WEAVE_ERROR ThreadStackManager::SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
+inline CHIP_ERROR ThreadStackManager::SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
     return static_cast<ImplClass*>(this)->_SetThreadDeviceType(deviceType);
 }
@@ -241,7 +237,7 @@ inline void ThreadStackManager::GetThreadPollingConfig(ConnectivityManager::Thre
     static_cast<ImplClass*>(this)->_GetThreadPollingConfig(pollingConfig);
 }
 
-inline WEAVE_ERROR ThreadStackManager::SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR ThreadStackManager::SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     return static_cast<ImplClass*>(this)->_SetThreadPollingConfig(pollingConfig);
 }
@@ -266,28 +262,27 @@ inline void ThreadStackManager::OnWoBLEAdvertisingStop(void)
     static_cast<ImplClass*>(this)->_OnWoBLEAdvertisingStop();
 }
 
-inline WEAVE_ERROR ThreadStackManager::GetAndLogThreadStatsCounters(void)
+inline CHIP_ERROR ThreadStackManager::GetAndLogThreadStatsCounters(void)
 {
     return static_cast<ImplClass*>(this)->_GetAndLogThreadStatsCounters();
 }
 
-inline WEAVE_ERROR ThreadStackManager::GetAndLogThreadTopologyMinimal(void)
+inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyMinimal(void)
 {
     return static_cast<ImplClass*>(this)->_GetAndLogThreadTopologyMinimal();
 }
 
-inline WEAVE_ERROR ThreadStackManager::GetAndLogThreadTopologyFull(void)
+inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyFull(void)
 {
     return static_cast<ImplClass*>(this)->_GetAndLogThreadTopologyFull();
 }
 
-inline WEAVE_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
+inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass*>(this)->_GetPrimary802154MACAddress(buf);
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // THREAD_STACK_MANAGER_H
