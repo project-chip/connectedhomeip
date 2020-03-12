@@ -1,0 +1,17 @@
+name: shellcheck
+
+on: [pull_request]
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: shellcheck
+        id: shellcheck
+        uses: ludeeus/actions-shellcheck@0.1.0
+        with:
+          repo-token: ${{ github.token }}
+        env:
+          EXCLUDE_DIRS: third_party
