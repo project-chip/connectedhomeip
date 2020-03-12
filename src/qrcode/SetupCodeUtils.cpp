@@ -23,50 +23,27 @@
 
 #include "SetupCodeUtils.h"
 
-#include <map>
 #include <string>
 
 using namespace std;
 
 namespace chip {
 
-map <int, char> base45CharacterMap()
+char base45CharacterSet[45] =
 {
-    map <int, char> characterMap;
-    // Special characters
-    characterMap[36] = ' ';
-    characterMap[37] = '$';
-    characterMap[38] = '%';
-    characterMap[39] = '*';
-    characterMap[40] = '+';
-    characterMap[41] = '-';
-    characterMap[42] = '.';
-    characterMap[43] = '/';
-    characterMap[44] = ':';
-
-    return characterMap;
-}
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+    'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '$', '%', '*',
+    '+', '-', '.', '/', ':'
+};
 
 string base45EncodedString(uint64_t input, size_t minLength)
 {
-    static std::map<int, char> BS45_CHARS = base45CharacterMap();
     string result;
     int radix = 45;
     do {
-        int remainder = input % radix;
-        char base45char;
-        if (remainder >= 0 && remainder <= 9) {
-            // Numbers
-            base45char = '0' + remainder;
-        }
-        else if (remainder >= 10 && remainder <= 35) {
-            // Uppercase Characters
-            base45char = 'A' + (remainder - 10);
-        }
-        else {
-            // Special Characters
-            base45char = BS45_CHARS[remainder];
-        }
+        char base45char = base45CharacterSet[input % radix];
         result += base45char;
         input = input / radix;
     } while (input != 0);
