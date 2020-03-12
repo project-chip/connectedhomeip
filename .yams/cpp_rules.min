@@ -19,11 +19,6 @@ ifdef VALGRIND
 	VALGRIND += --leak-check=yes -q
 endif
 
-CPPCHECK := $(shell command -v cppcheck 2> /dev/null)
-ifdef CPPCHECK
-	CPPCHECK += -q --error-exitcode=1
-endif
-
 CLANG_FORMAT := $(shell command -v clang-format 2> /dev/null)
 ifdef CLANG_FORMAT
 	CLANG_FORMAT += -style=Chromium -i
@@ -38,16 +33,10 @@ endif
 
 %.o: %.c
 	$(_@)$(CC) $(Module_C_Flags) -c $< -o $@
-ifdef CPPCHECK
-	$(_@)$(CPPCHECK) $(Module_Includes) $<
-endif
 	@echo "CC  <=  $<"
 
 %.o: %.cpp
 	$(_@)$(CXX) $(Module_C_Flags) -c $< -o $@
-ifdef CPPCHECK
-	$(_@)$(CPPCHECK) $(Module_Includes) $<
-endif
 	@echo "CXX  <=  $<"
 
 $(Test_Dir)/%_q: $(Test_Dir)/%.c
@@ -55,9 +44,6 @@ ifdef CLANG_FORMAT
 	$(_@)$(CLANG_FORMAT) $<
 endif
 	$(_@)$(CC) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) $(GCOV_FLAGS)
-ifdef CPPCHECK
-	$(_@)$(CPPCHECK) $(Module_Test_Includes) $($(*F)_Inc_FLAGS) $<
-endif
 	@echo "Building tests <=  $<"
 
 $(Test_Dir)/%_q: $(Test_Dir)/%.cpp
@@ -65,9 +51,6 @@ ifdef CLANG_FORMAT
 	$(_@)$(CLANG_FORMAT) $<
 endif
 	$(_@)$(CXX) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) $(GCOV_FLAGS)
-ifdef CPPCHECK
-	$(_@)$(CPPCHECK) $(Module_Test_Includes) $($(*F)_Inc_FLAGS) $<
-endif
 	@echo "Building tests <=  $<"
 
 run_tests: $(Tests_C_Exe) $(Tests_CPP_Exe)
