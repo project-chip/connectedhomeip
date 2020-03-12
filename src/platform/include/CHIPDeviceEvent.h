@@ -207,7 +207,7 @@ enum InternalEventTypes
     kEventTypeNotSet                    = kRange_Internal,
     kNoOp,
     kCallWorkFunct,
-    kchipSystemLayerEvent,
+    kChipSystemLayerEvent,
     kWoBLESubscribe,
     kWoBLEUnsubscribe,
     kWoBLEWriteReceived,
@@ -276,19 +276,19 @@ namespace DeviceLayer {
 /**
  * Represents a chip Device Layer event.
  */
-struct chipDeviceEvent final
+struct ChipDeviceEvent final
 {
     uint16_t Type;
 
     union
     {
-        chipDevicePlatformEvent Platform;
+        ChipDevicePlatformEvent Platform;
         struct
         {
             ::chip::System::EventType Type;
             ::chip::System::Object * Target;
             uintptr_t Argument;
-        } chipSystemLayerEvent;
+        } ChipSystemLayerEvent;
         struct
         {
             AsyncWorkFunct WorkFunct;
@@ -353,7 +353,7 @@ struct chipDeviceEvent final
             uint64_t PeerNodeId;
             uint16_t SessionKeyId;
             uint8_t EncType;
-            ::chip::chipAuthMode AuthMode;
+            ::chip::ChipAuthMode AuthMode;
             bool IsCommissioner;
         } SessionEstablished;
         struct

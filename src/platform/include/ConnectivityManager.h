@@ -183,7 +183,7 @@ private:
     template<class> friend class Internal::GenericNetworkProvisioningServerImpl;
 
     CHIP_ERROR Init(void);
-    void OnPlatformEvent(const chipDeviceEvent * event);
+    void OnPlatformEvent(const ChipDeviceEvent * event);
     bool CanStartWiFiScan(void);
     void OnWiFiScanDone(void);
     void OnWiFiStationProvisionChange(void);
@@ -541,7 +541,7 @@ inline CHIP_ERROR ConnectivityManager::Init(void)
     return static_cast<ImplClass*>(this)->_Init();
 }
 
-inline void ConnectivityManager::OnPlatformEvent(const chipDeviceEvent * event)
+inline void ConnectivityManager::OnPlatformEvent(const ChipDeviceEvent * event)
 {
     static_cast<ImplClass*>(this)->_OnPlatformEvent(event);
 }

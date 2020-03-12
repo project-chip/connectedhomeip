@@ -83,7 +83,7 @@ private:
     template<class> friend class Internal::GenericThreadStackManagerImpl_FreeRTOS;
     template<class> friend class Internal::GenericNetworkProvisioningServerImpl;
 
-    void OnPlatformEvent(const chipDeviceEvent * event);
+    void OnPlatformEvent(const ChipDeviceEvent * event);
     bool IsThreadEnabled(void);
     CHIP_ERROR SetThreadEnabled(bool val);
     bool IsThreadProvisioned(void);
