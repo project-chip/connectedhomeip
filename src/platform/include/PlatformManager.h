@@ -71,17 +71,17 @@ public:
 
     // ===== Members that define the public interface of the PlatformManager
 
-    typedef void (*EventHandlerFunct)(const chipDeviceEvent * event, intptr_t arg);
+    typedef void (*EventHandlerFunct)(const ChipDeviceEvent * event, intptr_t arg);
 
-    CHIP_ERROR InitchipStack();
+    CHIP_ERROR InitChipStack();
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
     void RunEventLoop(void);
     CHIP_ERROR StartEventLoopTask(void);
-    void LockchipStack(void);
-    bool TryLockchipStack(void);
-    void UnlockchipStack(void);
+    void LockChipStack(void);
+    bool TryLockChipStack(void);
+    void UnlockChipStack(void);
 
 private:
 
@@ -107,9 +107,9 @@ private:
     friend ::chip::System::Error (::chip::System::Platform::Layer::DispatchEvent(::chip::System::Layer & aLayer, void * aContext, ::chip::System::Event aEvent));
     friend ::chip::System::Error (::chip::System::Platform::Layer::StartTimer(::chip::System::Layer & aLayer, void * aContext, uint32_t aMilliseconds));
 
-    void PostEvent(const chipDeviceEvent * event);
-    void DispatchEvent(const chipDeviceEvent * event);
-    CHIP_ERROR StartchipTimer(uint32_t durationMS);
+    void PostEvent(const ChipDeviceEvent * event);
+    void DispatchEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR StartChipTimer(uint32_t durationMS);
 
 protected:
 

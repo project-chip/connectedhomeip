@@ -50,7 +50,7 @@ class NetworkProvisioningServer;
  */
 class ConfigurationManager
 {
-    using chipDeviceDescriptor = ::chip::Profiles::DeviceDescription::chipDeviceDescriptor;
+    using ChipDeviceDescriptor = ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor;
 
 public:
 
@@ -59,8 +59,8 @@ public:
     enum
     {
         kMaxPairingCodeLength = 15,
-        kMaxSerialNumberLength = chipDeviceDescriptor::kMaxSerialNumberLength,
-        kMaxFirmwareRevisionLength = chipDeviceDescriptor::kMaxSoftwareVersionLength,
+        kMaxSerialNumberLength = ChipDeviceDescriptor::kMaxSerialNumberLength,
+        kMaxFirmwareRevisionLength = ChipDeviceDescriptor::kMaxSoftwareVersionLength,
     };
 
     CHIP_ERROR GetVendorId(uint16_t & vendorId);
@@ -109,13 +109,13 @@ public:
     CHIP_ERROR StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
     CHIP_ERROR StorePairedAccountId(const char * accountId, size_t accountIdLen);
 
-    CHIP_ERROR GetDeviceDescriptor(chipDeviceDescriptor & deviceDesc);
+    CHIP_ERROR GetDeviceDescriptor(ChipDeviceDescriptor & deviceDesc);
     CHIP_ERROR GetDeviceDescriptorTLV(uint8_t * buf, size_t bufSize, size_t & encodedLen);
     CHIP_ERROR GetQRCodeString(char * buf, size_t bufSize);
 
     CHIP_ERROR GetWiFiAPSSID(char * buf, size_t bufSize);
 
-    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::chipBLEDeviceIdentificationInfo & deviceIdInfo);
+    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
 
     bool IsServiceProvisioned();
     bool IsPairedToAccount();
@@ -144,7 +144,7 @@ private:
     using ImplClass = ConfigurationManagerImpl;
 
     CHIP_ERROR Init();
-    CHIP_ERROR ConfigurechipStack();
+    CHIP_ERROR ConfigureChipStack();
     ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * GetGroupKeyStore();
     bool CanFactoryReset();
     CHIP_ERROR GetFailSafeArmed(bool & val);

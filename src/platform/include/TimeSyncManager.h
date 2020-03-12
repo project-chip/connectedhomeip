@@ -81,7 +81,7 @@ private:
     static TimeSyncManager sInstance;
 
     CHIP_ERROR Init();
-    void OnPlatformEvent(const chipDeviceEvent * event);
+    void OnPlatformEvent(const ChipDeviceEvent * event);
 #if CHIP_DEVICE_CONFIG_ENABLE_SERVICE_DIRECTORY_TIME_SYNC
     static void MarkServiceDirRequestStart();
     static void ProcessServiceDirTimeData(uint64_t timeQueryReceiptMsec, uint32_t timeProcessMsec);
