@@ -2,9 +2,6 @@
 Language:        Cpp
 BasedOnStyle: WebKit
 ---
-Language:        C
-BasedOnStyle: WebKit
----
 Language:        ObjC
 BasedOnStyle: WebKit
 ...
