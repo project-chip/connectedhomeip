@@ -56,7 +56,7 @@
  * The name of the chip task.
  */
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_NAME
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_NAME "WEAVE"
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_NAME "CHIP"
 #endif
 
 /**
