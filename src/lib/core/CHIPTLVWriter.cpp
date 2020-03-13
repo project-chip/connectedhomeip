@@ -38,7 +38,6 @@ namespace TLV {
 
 using namespace chip::Encoding;
 
-
 /**
  * @var uint32_t TLVWriter::ImplicitProfileId
  *
@@ -65,7 +64,8 @@ using namespace chip::Encoding;
  */
 
 /**
- * @typedef CHIP_ERROR (*TLVWriter::GetNewBufferFunct)(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen)
+ * @typedef CHIP_ERROR (*TLVWriter::GetNewBufferFunct)(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t&
+ * bufLen)
  *
  * A function that supplies new output buffer space to a TLVWriter.
  *
@@ -159,21 +159,20 @@ using namespace chip::Encoding;
  * @param[in]   maxLen  The maximum number of bytes that should be written to the output buffer.
  *
  */
-__attribute__((noinline))
-void TLVWriter::Init(uint8_t *buf, uint32_t maxLen)
+__attribute__((noinline)) void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
 {
     mBufHandle = 0;
     mBufStart = mWritePoint = buf;
-    mRemainingLen = maxLen;
-    mLenWritten = 0;
-    mMaxLen = maxLen;
-    mContainerType = kTLVType_NotSpecified;
+    mRemainingLen           = maxLen;
+    mLenWritten             = 0;
+    mMaxLen                 = maxLen;
+    mContainerType          = kTLVType_NotSpecified;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
 
     ImplicitProfileId = kProfileIdNotSpecified;
-    GetNewBuffer = NULL;
-    FinalizeBuffer = NULL;
+    GetNewBuffer      = NULL;
+    FinalizeBuffer    = NULL;
 }
 
 /**
@@ -189,22 +188,22 @@ void TLVWriter::Init(uint8_t *buf, uint32_t maxLen)
  * @param[in]   maxLen  The maximum number of bytes that should be written to the output buffer.
  *
  */
-void TLVWriter::Init(PacketBuffer *buf, uint32_t maxLen)
+void TLVWriter::Init(PacketBuffer * buf, uint32_t maxLen)
 {
     mBufHandle = (uintptr_t) buf;
     mBufStart = mWritePoint = buf->Start() + buf->DataLength();
-    mRemainingLen = buf->AvailableDataLength();
+    mRemainingLen           = buf->AvailableDataLength();
     if (mRemainingLen > maxLen)
         mRemainingLen = maxLen;
-    mLenWritten = 0;
-    mMaxLen = maxLen;
+    mLenWritten    = 0;
+    mMaxLen        = maxLen;
     mContainerType = kTLVType_NotSpecified;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
 
     ImplicitProfileId = kProfileIdNotSpecified;
-    GetNewBuffer = NULL;
-    FinalizeBuffer = FinalizePacketBuffer;
+    GetNewBuffer      = NULL;
+    FinalizeBuffer    = FinalizePacketBuffer;
 }
 
 /**
@@ -228,7 +227,7 @@ void TLVWriter::Init(PacketBuffer *buf, uint32_t maxLen)
  *                      in the initial output buffer.
  *
  */
-void TLVWriter::Init(PacketBuffer *buf, uint32_t maxLen, bool allowDiscontiguousBuffers)
+void TLVWriter::Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguousBuffers)
 {
     Init(buf, maxLen);
 
@@ -656,7 +655,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-CHIP_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t *buf, uint32_t len)
+CHIP_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len)
 {
     return WriteElementWithData(kTLVType_ByteString, tag, (const uint8_t *) buf, len);
 }
@@ -687,7 +686,7 @@ CHIP_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t *buf, uint32_t len)
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char *buf)
+CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char * buf)
 {
     return PutString(tag, buf, strlen(buf));
 }
@@ -719,7 +718,7 @@ CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char *buf)
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char *buf, uint32_t len)
+CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char * buf, uint32_t len)
 {
     return WriteElementWithData(kTLVType_UTF8String, tag, (const uint8_t *) buf, len);
 }
@@ -771,7 +770,7 @@ CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char *buf, uint32_t len)
  *               `WriteElementHead` or `GetNewBuffer` -- failed, their
  *               error is immediately forwarded up the call stack.
  */
-CHIP_ERROR TLVWriter::PutStringF(uint64_t tag, const char *fmt, ...)
+CHIP_ERROR TLVWriter::PutStringF(uint64_t tag, const char * fmt, ...)
 {
     CHIP_ERROR err;
     va_list ap;
@@ -785,15 +784,14 @@ CHIP_ERROR TLVWriter::PutStringF(uint64_t tag, const char *fmt, ...)
     return err;
 }
 
-
 #if CONFIG_HAVE_VCBPRINTF
 // We have a variant of the printf function that takes a callback that
 // emits a single character.  The callback performs a function
 // identical to putchar.
 
-void TLVWriter::CHIPTLVWriterPutcharCB(uint8_t c, void *appState)
+void TLVWriter::CHIPTLVWriterPutcharCB(uint8_t c, void * appState)
 {
-    TLVWriter *w = static_cast<TLVWriter *>(appState);
+    TLVWriter * w = static_cast<TLVWriter *>(appState);
     w->WriteData(&c, sizeof(c));
 }
 #endif
@@ -845,7 +843,7 @@ void TLVWriter::CHIPTLVWriterPutcharCB(uint8_t c, void *appState)
  *               `WriteElementHead` or `GetNewBuffer` -- failed, their
  *               error is immediately forwarded up the call stack.
  */
-CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
+CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 {
     va_list aq;
     size_t dataLen;
@@ -856,7 +854,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
     size_t writtenBytes;
 #elif CONFIG_HAVE_VCBPRINTF
 #elif HAVE_MALLOC
-    char *tmpBuf;
+    char * tmpBuf;
 #else
     size_t maxLen;
 #endif
@@ -877,13 +875,15 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
     // no facilities for splitting the stream across multiple buffers,
     // just write however much fits in the current buffer.
     // assume conservative tag length at this time (8 bytes)
-    maxLen =  mRemainingLen - (1 + 8 + (1 << static_cast<uint8_t>(lenFieldSize)) + 1); // 1 : control byte, 8 : tag length, stringLen + 1 for null termination
+    maxLen = mRemainingLen -
+        (1 + 8 + (1 << static_cast<uint8_t>(lenFieldSize)) +
+         1); // 1 : control byte, 8 : tag length, stringLen + 1 for null termination
     if (maxLen < dataLen)
         dataLen = maxLen;
 #endif
 
     // write length.
-    err = WriteElementHead((TLVElementType) (kTLVType_UTF8String | lenFieldSize), tag, dataLen);
+    err = WriteElementHead((TLVElementType)(kTLVType_UTF8String | lenFieldSize), tag, dataLen);
     SuccessOrExit(err);
 
     VerifyOrExit((mLenWritten + dataLen) <= mMaxLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -897,11 +897,11 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
     {
         va_copy(aq, ap);
 
-        vsnprintf_ex(reinterpret_cast<char*>(mWritePoint), mRemainingLen, skipLen, fmt, aq);
+        vsnprintf_ex(reinterpret_cast<char *>(mWritePoint), mRemainingLen, skipLen, fmt, aq);
 
         va_end(aq);
 
-        writtenBytes = (mRemainingLen >= (dataLen-skipLen))? dataLen-skipLen : mRemainingLen;
+        writtenBytes = (mRemainingLen >= (dataLen - skipLen)) ? dataLen - skipLen : mRemainingLen;
         skipLen += writtenBytes;
         mWritePoint += writtenBytes;
         mRemainingLen -= writtenBytes;
@@ -924,7 +924,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
 
     } while (skipLen < dataLen);
 
-#elif   CONFIG_HAVE_VCBPRINTF
+#elif CONFIG_HAVE_VCBPRINTF
 
     va_copy(aq, ap);
 
@@ -934,23 +934,23 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char *fmt, va_list ap)
 
 #elif HAVE_MALLOC
 
-    tmpBuf = static_cast<char*>(malloc(dataLen+1));
+    tmpBuf = static_cast<char *>(malloc(dataLen + 1));
     VerifyOrExit(tmpBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     va_copy(aq, ap);
 
-    vsnprintf(tmpBuf, dataLen+1, fmt, aq);
+    vsnprintf(tmpBuf, dataLen + 1, fmt, aq);
 
     va_end(aq);
 
-    err = WriteData(reinterpret_cast<uint8_t*>(tmpBuf), dataLen);
+    err = WriteData(reinterpret_cast<uint8_t *>(tmpBuf), dataLen);
     free(tmpBuf);
 
 #else // CONFIG_HAVE_VSNPRINTF_EX
 
     va_copy(aq, ap);
 
-    vsnprintf(reinterpret_cast<char *>(mWritePoint), dataLen+1, fmt, aq);
+    vsnprintf(reinterpret_cast<char *>(mWritePoint), dataLen + 1, fmt, aq);
 
     va_end(aq);
 
@@ -964,7 +964,6 @@ exit:
 
     return err;
 }
-
 
 /**
  * Encodes a TLV null value.
@@ -1039,7 +1038,7 @@ CHIP_ERROR TLVWriter::PutNull(uint64_t tag)
  *                              function associated with the reader object.
  *
  */
-CHIP_ERROR TLVWriter::CopyElement(TLVReader& reader)
+CHIP_ERROR TLVWriter::CopyElement(TLVReader & reader)
 {
     return CopyElement(reader.GetTag(), reader);
 }
@@ -1092,19 +1091,19 @@ CHIP_ERROR TLVWriter::CopyElement(TLVReader& reader)
  *
  */
 
-
 const size_t kCHIPTLVCopyChunkSize = 16;
 
-CHIP_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader& reader)
+CHIP_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     TLVElementType elemType = reader.ElementType();
-    uint64_t elemLenOrVal = reader.mElemLenOrVal;
+    uint64_t elemLenOrVal   = reader.mElemLenOrVal;
     TLVReader readerHelper; // used to figure out the length of the element and read data of the element
     uint32_t copyDataLen;
     uint8_t chunk[kCHIPTLVCopyChunkSize];
 
-    VerifyOrExit(elemType != kTLVElementType_NotSpecified && elemType != kTLVElementType_EndOfContainer, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(elemType != kTLVElementType_NotSpecified && elemType != kTLVElementType_EndOfContainer,
+                 err = CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the helper
     readerHelper.Init(reader);
@@ -1124,7 +1123,7 @@ CHIP_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader& reader)
     while (copyDataLen > 0)
     {
         uint32_t chunkSize = copyDataLen > kCHIPTLVCopyChunkSize ? kCHIPTLVCopyChunkSize : copyDataLen;
-        err = readerHelper.ReadData(chunk, chunkSize);
+        err                = readerHelper.ReadData(chunk, chunkSize);
         SuccessOrExit(err);
 
         err = WriteData(chunk, chunkSize);
@@ -1135,7 +1134,6 @@ CHIP_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader& reader)
 
 exit:
     return err;
-
 }
 
 /**
@@ -1188,7 +1186,7 @@ exit:
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-CHIP_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWriter& containerWriter)
+CHIP_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWriter & containerWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1210,18 +1208,18 @@ CHIP_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWrit
         ExitNow();
     }
 
-    containerWriter.mBufHandle = mBufHandle;
-    containerWriter.mBufStart = mBufStart;
-    containerWriter.mWritePoint = mWritePoint;
-    containerWriter.mRemainingLen = mRemainingLen;
-    containerWriter.mLenWritten = 0;
-    containerWriter.mMaxLen = mMaxLen - mLenWritten;
+    containerWriter.mBufHandle     = mBufHandle;
+    containerWriter.mBufStart      = mBufStart;
+    containerWriter.mWritePoint    = mWritePoint;
+    containerWriter.mRemainingLen  = mRemainingLen;
+    containerWriter.mLenWritten    = 0;
+    containerWriter.mMaxLen        = mMaxLen - mLenWritten;
     containerWriter.mContainerType = containerType;
     containerWriter.SetContainerOpen(false);
     containerWriter.SetCloseContainerReserved(IsCloseContainerReserved());
     containerWriter.ImplicitProfileId = ImplicitProfileId;
-    containerWriter.GetNewBuffer = GetNewBuffer;
-    containerWriter.FinalizeBuffer = FinalizeBuffer;
+    containerWriter.GetNewBuffer      = GetNewBuffer;
+    containerWriter.FinalizeBuffer    = FinalizeBuffer;
 
     SetContainerOpen(true);
 
@@ -1261,7 +1259,7 @@ exit:
  *                              configured GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-CHIP_ERROR TLVWriter::CloseContainer(TLVWriter& containerWriter)
+CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
 {
     if (!TLVTypeIsContainer(containerWriter.mContainerType))
         return CHIP_ERROR_INCORRECT_STATE;
@@ -1269,9 +1267,9 @@ CHIP_ERROR TLVWriter::CloseContainer(TLVWriter& containerWriter)
     if (containerWriter.IsContainerOpen())
         return CHIP_ERROR_TLV_CONTAINER_OPEN;
 
-    mBufHandle = containerWriter.mBufHandle;
-    mBufStart = containerWriter.mBufStart;
-    mWritePoint = containerWriter.mWritePoint;
+    mBufHandle    = containerWriter.mBufHandle;
+    mBufStart     = containerWriter.mBufStart;
+    mWritePoint   = containerWriter.mWritePoint;
     mRemainingLen = containerWriter.mRemainingLen;
     mLenWritten += containerWriter.mLenWritten;
 
@@ -1327,7 +1325,7 @@ CHIP_ERROR TLVWriter::CloseContainer(TLVWriter& containerWriter)
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-CHIP_ERROR TLVWriter::StartContainer(uint64_t tag, TLVType containerType, TLVType& outerContainerType)
+CHIP_ERROR TLVWriter::StartContainer(uint64_t tag, TLVType containerType, TLVType & outerContainerType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1349,7 +1347,7 @@ CHIP_ERROR TLVWriter::StartContainer(uint64_t tag, TLVType containerType, TLVTyp
         ExitNow();
     }
     outerContainerType = mContainerType;
-    mContainerType = containerType;
+    mContainerType     = containerType;
 
     SetContainerOpen(false);
 
@@ -1444,12 +1442,12 @@ CHIP_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
  *                              GetNewBuffer() or FinalizeBuffer() functions.
  *
  */
-CHIP_ERROR TLVWriter::PutPreEncodedContainer(uint64_t tag, TLVType containerType, const uint8_t *data, uint32_t dataLen)
+CHIP_ERROR TLVWriter::PutPreEncodedContainer(uint64_t tag, TLVType containerType, const uint8_t * data, uint32_t dataLen)
 {
     if (!TLVTypeIsContainer(containerType))
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    CHIP_ERROR err = WriteElementHead((TLVElementType)containerType, tag, 0);
+    CHIP_ERROR err = WriteElementHead((TLVElementType) containerType, tag, 0);
     if (err != CHIP_NO_ERROR)
         return err;
 
@@ -1499,7 +1497,7 @@ CHIP_ERROR TLVWriter::PutPreEncodedContainer(uint64_t tag, TLVType containerType
  *                              function associated with the reader object.
  *
  */
-CHIP_ERROR TLVWriter::CopyContainer(TLVReader& container)
+CHIP_ERROR TLVWriter::CopyContainer(TLVReader & container)
 {
     return CopyContainer(container.GetTag(), container);
 }
@@ -1554,12 +1552,12 @@ CHIP_ERROR TLVWriter::CopyContainer(TLVReader& container)
  *                              function associated with the reader object.
  *
  */
-CHIP_ERROR TLVWriter::CopyContainer(uint64_t tag, TLVReader& container)
+CHIP_ERROR TLVWriter::CopyContainer(uint64_t tag, TLVReader & container)
 {
     // NOTE: This function MUST be used with a TVLReader that is reading from a contiguous buffer.
     CHIP_ERROR err;
     TLVType containerType, outerContainerType;
-    const uint8_t *containerStart;
+    const uint8_t * containerStart;
 
     containerType = container.GetType();
 
@@ -1653,7 +1651,7 @@ TLVType TLVWriter::GetContainerType() const
 
 CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, uint64_t lenOrVal)
 {
-    uint8_t *p;
+    uint8_t * p;
     uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
 
     if (IsContainerOpen())
@@ -1678,8 +1676,8 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         }
         else
         {
-            if (elemType != kTLVElementType_EndOfContainer && mContainerType != kTLVType_NotSpecified
-                    && mContainerType != kTLVType_Array)
+            if (elemType != kTLVElementType_EndOfContainer && mContainerType != kTLVType_NotSpecified &&
+                mContainerType != kTLVType_Array)
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
             Write8(p, kTLVTagControl_Anonymous | elemType);
@@ -1689,8 +1687,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
     {
         uint32_t profileId = ProfileIdFromTag(tag);
 
-        if (mContainerType != kTLVType_NotSpecified && mContainerType != kTLVType_Structure
-                && mContainerType != kTLVType_Path)
+        if (mContainerType != kTLVType_NotSpecified && mContainerType != kTLVType_Structure && mContainerType != kTLVType_Path)
             return CHIP_ERROR_INVALID_TLV_TAG;
 
         if (profileId == kCommonProfileId)
@@ -1721,7 +1718,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         }
         else
         {
-            uint16_t vendorId = (uint16_t) (profileId >> 16);
+            uint16_t vendorId   = (uint16_t)(profileId >> 16);
             uint16_t profileNum = (uint16_t) profileId;
 
             if (tagNum < 65536)
@@ -1762,7 +1759,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
     if ((mRemainingLen >= sizeof(stagingBuf)) && (mMaxLen >= sizeof(stagingBuf)))
     {
         uint32_t len = p - mWritePoint;
-        mWritePoint = p;
+        mWritePoint  = p;
         mRemainingLen -= len;
         mLenWritten += len;
         return CHIP_NO_ERROR;
@@ -1771,7 +1768,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         return WriteData(stagingBuf, p - stagingBuf);
 }
 
-CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uint8_t *data, uint32_t dataLen)
+CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uint8_t * data, uint32_t dataLen)
 {
     TLVFieldSize lenFieldSize;
 
@@ -1782,14 +1779,14 @@ CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uin
     else
         lenFieldSize = kTLVFieldSize_4Byte;
 
-    CHIP_ERROR err = WriteElementHead((TLVElementType) (type | lenFieldSize), tag, dataLen);
+    CHIP_ERROR err = WriteElementHead((TLVElementType)(type | lenFieldSize), tag, dataLen);
     if (err != CHIP_NO_ERROR)
         return err;
 
     return WriteData(data, dataLen);
 }
 
-CHIP_ERROR TLVWriter::WriteData(const uint8_t *p, uint32_t len)
+CHIP_ERROR TLVWriter::WriteData(const uint8_t * p, uint32_t len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1845,11 +1842,11 @@ exit:
  * See the GetNewBufferFunct type definition for additional information on the API of the
  * GetNewPacketBuffer() function.
  */
-CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen)
+CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen)
 {
-    PacketBuffer *buf = (PacketBuffer *) bufHandle;
+    PacketBuffer * buf = (PacketBuffer *) bufHandle;
 
-    PacketBuffer *newBuf = buf->Next();
+    PacketBuffer * newBuf = buf->Next();
     if (newBuf == NULL)
     {
         newBuf = PacketBuffer::New(0);
@@ -1860,13 +1857,13 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter& writer, uintptr_t& bufHandle
     if (newBuf != NULL)
     {
         bufHandle = (uintptr_t) newBuf;
-        bufStart = newBuf->Start();
-        bufLen = newBuf->MaxDataLength();
+        bufStart  = newBuf->Start();
+        bufLen    = newBuf->MaxDataLength();
     }
     else
     {
         bufStart = NULL;
-        bufLen = 0;
+        bufLen   = 0;
     }
 
     return CHIP_NO_ERROR;
@@ -1882,10 +1879,10 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter& writer, uintptr_t& bufHandle
  * See the FinalizeBufferFunct type definition for additional information on the API of the
  * FinalizePacketBuffer() function.
  */
-CHIP_ERROR TLVWriter::FinalizePacketBuffer(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart, uint32_t dataLen)
+CHIP_ERROR TLVWriter::FinalizePacketBuffer(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t dataLen)
 {
-    PacketBuffer *buf = (PacketBuffer *) bufHandle;
-    uint8_t * endPtr = bufStart + dataLen;
+    PacketBuffer * buf = (PacketBuffer *) bufHandle;
+    uint8_t * endPtr   = bufStart + dataLen;
 
     buf->SetDataLength(endPtr - buf->Start());
 

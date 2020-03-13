@@ -93,8 +93,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 namespace {
 
-void nil_tcpip_callback(void * _aContext)
-{ }
+void nil_tcpip_callback(void * _aContext) {}
 
 err_t start_tcp_timers(void)
 {
@@ -163,13 +162,13 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
         if (addrType == kIPAddressType_IPv6)
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
-            res = chip::System::MapErrorLwIP(tcp_bind_ip6(mTCP, &ipv6Addr, port));
+            res                 = chip::System::MapErrorLwIP(tcp_bind_ip6(mTCP, &ipv6Addr, port));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == kIPAddressType_IPv4)
         {
             ip_addr_t ipv4Addr = addr.ToIPv4();
-            res = chip::System::MapErrorLwIP(tcp_bind(mTCP, &ipv4Addr, port));
+            res                = chip::System::MapErrorLwIP(tcp_bind(mTCP, &ipv4Addr, port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -208,7 +207,6 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
             chipLogError(Inet, "SO_REUSEPORT: %d", errno);
         }
 #endif // defined(SO_REUSEPORT)
-
     }
 
     if (res == INET_NO_ERROR)
@@ -217,10 +215,10 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
         {
             struct sockaddr_in6 sa;
             memset(&sa, 0, sizeof(sa));
-            sa.sin6_family = AF_INET6;
-            sa.sin6_port = htons(port);
+            sa.sin6_family   = AF_INET6;
+            sa.sin6_port     = htons(port);
             sa.sin6_flowinfo = 0;
-            sa.sin6_addr = addr.ToIPv6();
+            sa.sin6_addr     = addr.ToIPv6();
             sa.sin6_scope_id = 0;
 
             if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
@@ -232,8 +230,8 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
             struct sockaddr_in sa;
             memset(&sa, 0, sizeof(sa));
             sa.sin_family = AF_INET;
-            sa.sin_port = htons(port);
-            sa.sin_addr = addr.ToIPv4();
+            sa.sin_port   = htons(port);
+            sa.sin_addr   = addr.ToIPv4();
 
             if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
                 res = chip::System::MapErrorPOSIX(errno);
@@ -256,7 +254,7 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
     INET_ERROR res = INET_NO_ERROR;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    chip::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer & lSystemLayer = SystemLayer();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (State != kState_Bound)
@@ -265,7 +263,7 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Start listening for incoming connections.
-    mTCP = tcp_listen(mTCP);
+    mTCP              = tcp_listen(mTCP);
     mLwIPEndPointType = kLwIPEndPointType_TCP;
 
     tcp_arg(mTCP, this);
@@ -300,7 +298,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     INET_ERROR res = INET_NO_ERROR;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    chip::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer & lSystemLayer = SystemLayer();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (State != kState_Ready && State != kState_Bound)
@@ -317,7 +315,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     if (intf != INET_NULL_INTERFACEID)
     {
         IPAddress intfLLAddr;
-        InetLayer& lInetLayer = Layer();
+        InetLayer & lInetLayer = Layer();
 
         if (!addr.IsIPv6LinkLocal() || State == kState_Bound)
             return INET_ERROR_NOT_IMPLEMENTED;
@@ -343,18 +341,18 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t lwipAddr = addr.ToLwIPAddr();
-        res = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
+        res                = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
         if (addrType == kIPAddressType_IPv6)
         {
             ip6_addr_t lwipAddr = addr.ToIPv6();
-            res = chip::System::MapErrorLwIP(tcp_connect_ip6(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
+            res                 = chip::System::MapErrorLwIP(tcp_connect_ip6(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == kIPAddressType_IPv4)
         {
             ip_addr_t lwipAddr = addr.ToIPv4();
-            res = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
+            res                = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -413,7 +411,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
             // If the permission is denied(EACCES) because chip is running in a context
             // that does not have privileged access, choose a source address on the
             // interface to bind the connetion to.
-            int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, (void *)&ifr, sizeof(ifr));
+            int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, (void *) &ifr, sizeof(ifr));
             if (r < 0 && errno != EACCES)
             {
                 return res = chip::System::MapErrorPOSIX(errno);
@@ -442,37 +440,37 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
     int flags = fcntl(mSocket, F_GETFL, 0);
     fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
 
-    int sockaddrsize = 0;
-    const sockaddr *sockaddrptr = NULL;
+    int sockaddrsize             = 0;
+    const sockaddr * sockaddrptr = NULL;
 
     union
     {
-        sockaddr        any;
-        sockaddr_in6    in6;
+        sockaddr any;
+        sockaddr_in6 in6;
 #if INET_CONFIG_ENABLE_IPV4
-        sockaddr_in     in;
+        sockaddr_in in;
 #endif // INET_CONFIG_ENABLE_IPV4
     } sa;
     memset(&sa, 0, sizeof(sa));
 
     if (addrType == kIPAddressType_IPv6)
     {
-        sa.in6.sin6_family = AF_INET6;
-        sa.in6.sin6_port = htons(port);
+        sa.in6.sin6_family   = AF_INET6;
+        sa.in6.sin6_port     = htons(port);
         sa.in6.sin6_flowinfo = 0;
-        sa.in6.sin6_addr = addr.ToIPv6();
+        sa.in6.sin6_addr     = addr.ToIPv6();
         sa.in6.sin6_scope_id = intf;
-        sockaddrsize = sizeof(sockaddr_in6);
-        sockaddrptr = (const sockaddr *) &sa.in6;
+        sockaddrsize         = sizeof(sockaddr_in6);
+        sockaddrptr          = (const sockaddr *) &sa.in6;
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (addrType == kIPAddressType_IPv4)
     {
         sa.in.sin_family = AF_INET;
-        sa.in.sin_port = htons(port);
-        sa.in.sin_addr = addr.ToIPv4();
-        sockaddrsize = sizeof(sockaddr_in);
-        sockaddrptr = (const sockaddr *) &sa.in;
+        sa.in.sin_port   = htons(port);
+        sa.in.sin_addr   = addr.ToIPv4();
+        sockaddrsize     = sizeof(sockaddr_in);
+        sockaddrptr      = (const sockaddr *) &sa.in;
     }
 #endif // INET_CONFIG_ENABLE_IPV4
     else
@@ -527,7 +525,7 @@ void TCPEndPoint::StartConnectTimerIfSet(void)
 {
     if (mConnectTimeoutMsecs > 0)
     {
-        chip::System::Layer& lSystemLayer = SystemLayer();
+        chip::System::Layer & lSystemLayer = SystemLayer();
 
         lSystemLayer.StartTimer(mConnectTimeoutMsecs, TCPConnectTimeoutHandler, this);
     }
@@ -535,12 +533,12 @@ void TCPEndPoint::StartConnectTimerIfSet(void)
 
 void TCPEndPoint::StopConnectTimer(void)
 {
-    chip::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer & lSystemLayer = SystemLayer();
 
     lSystemLayer.CancelTimer(TCPConnectTimeoutHandler, this);
 }
 
-void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError)
+void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError)
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
 
@@ -551,7 +549,7 @@ void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer* aSystemLayer, vo
     tcpEndPoint->DoClose(INET_ERROR_TCP_CONNECT_TIMEOUT, false);
 }
 
-INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress *retAddr, uint16_t *retPort) const
+INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -572,8 +570,8 @@ INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress *retAddr, uint16_t *retPort) const
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 #if INET_CONFIG_ENABLE_IPV4
         *retAddr = PCB_ISIPV6(mTCP) ? IPAddress::FromIPv6(mTCP->remote_ip.ip6) : IPAddress::FromIPv4(mTCP->remote_ip.ip4);
-#else // !INET_CONFIG_ENABLE_IPV4
-        *retAddr = IPAddress::FromIPv6(mTCP->remote_ip.ip6);
+#else  // !INET_CONFIG_ENABLE_IPV4
+        *retAddr                    = IPAddress::FromIPv6(mTCP->remote_ip.ip6);
 #endif // !INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
     }
@@ -619,7 +617,7 @@ INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress *retAddr, uint16_t *retPort) const
     return res;
 }
 
-INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress *retAddr, uint16_t *retPort)
+INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -640,8 +638,8 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress *retAddr, uint16_t *retPort)
 #else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 #if INET_CONFIG_ENABLE_IPV4
         *retAddr = PCB_ISIPV6(mTCP) ? IPAddress::FromIPv6(mTCP->local_ip.ip6) : IPAddress::FromIPv4(mTCP->local_ip.ip4);
-#else // !INET_CONFIG_ENABLE_IPV4
-        *retAddr = IPAddress::FromIPv6(mTCP->local_ip.ip6);
+#else  // !INET_CONFIG_ENABLE_IPV4
+        *retAddr                    = IPAddress::FromIPv6(mTCP->local_ip.ip6);
 #endif // !INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
     }
@@ -657,10 +655,10 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress *retAddr, uint16_t *retPort)
 
     union
     {
-        sockaddr        any;
-        sockaddr_in6    in6;
+        sockaddr any;
+        sockaddr_in6 in6;
 #if INET_CONFIG_ENABLE_IPV4
-        sockaddr_in     in;
+        sockaddr_in in;
 #endif // INET_CONFIG_ENABLE_IPV4
     } sa;
 
@@ -690,7 +688,7 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress *retAddr, uint16_t *retPort)
     return res;
 }
 
-INET_ERROR TCPEndPoint::Send(PacketBuffer *data, bool push)
+INET_ERROR TCPEndPoint::Send(PacketBuffer * data, bool push)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -709,7 +707,7 @@ INET_ERROR TCPEndPoint::Send(PacketBuffer *data, bool push)
 
     if (mUnsentQueue == NULL)
     {
-        mUnsentQueue = data;
+        mUnsentQueue  = data;
         mUnsentOffset = 0;
     }
 
@@ -739,7 +737,7 @@ void TCPEndPoint::DisableReceive()
 void TCPEndPoint::EnableReceive()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    chip::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer & lSystemLayer = SystemLayer();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     ReceiveEnabled = true;
@@ -841,10 +839,10 @@ INET_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
     if (mTCP != NULL)
     {
         // Set the idle interval
-        mTCP->keep_idle = (uint32_t)interval * 1000;
+        mTCP->keep_idle = (uint32_t) interval * 1000;
 
         // Set the probe retransmission interval.
-        mTCP->keep_intvl = (uint32_t)interval * 1000;
+        mTCP->keep_intvl = (uint32_t) interval * 1000;
 
         // Set the probe timeout count
         mTCP->keep_cnt = timeoutCount;
@@ -996,11 +994,11 @@ INET_ERROR TCPEndPoint::SetUserTimeout(uint32_t userTimeoutMillis)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if defined(TCP_USER_TIMEOUT)
-        // Set the user timeout
-        uint32_t val = userTimeoutMillis;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_USER_TIMEOUT, &val, sizeof(val)) != 0)
-            return chip::System::MapErrorPOSIX(errno);
-#else // TCP_USER_TIMEOUT
+    // Set the user timeout
+    uint32_t val = userTimeoutMillis;
+    if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_USER_TIMEOUT, &val, sizeof(val)) != 0)
+        return chip::System::MapErrorPOSIX(errno);
+#else  // TCP_USER_TIMEOUT
     res = INET_ERROR_NOT_IMPLEMENTED;
 #endif // defined(TCP_USER_TIMEOUT)
 
@@ -1046,7 +1044,7 @@ INET_ERROR TCPEndPoint::AckReceive(uint16_t len)
     return res;
 }
 
-INET_ERROR TCPEndPoint::PutBackReceivedData(PacketBuffer *data)
+INET_ERROR TCPEndPoint::PutBackReceivedData(PacketBuffer * data)
 {
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
@@ -1101,8 +1099,8 @@ INET_ERROR TCPEndPoint::Close()
 
     // Suppress closing callbacks, since the application explicitly called Close().
     OnConnectionClosed = NULL;
-    OnPeerClose = NULL;
-    OnConnectComplete = NULL;
+    OnPeerClose        = NULL;
+    OnConnectComplete  = NULL;
 
     // Perform a graceful close.
     return DoClose(INET_NO_ERROR, true);
@@ -1112,8 +1110,8 @@ void TCPEndPoint::Abort()
 {
     // Suppress closing callbacks, since the application explicitly called Abort().
     OnConnectionClosed = NULL;
-    OnPeerClose = NULL;
-    OnConnectComplete = NULL;
+    OnPeerClose        = NULL;
+    OnConnectComplete  = NULL;
 
     DoClose(INET_ERROR_CONNECTION_ABORTED, true);
 }
@@ -1123,13 +1121,13 @@ void TCPEndPoint::Free()
     INET_ERROR err;
 
     // Ensure no callbacks to the app after this point.
-    OnAcceptError = NULL;
-    OnConnectComplete = NULL;
+    OnAcceptError        = NULL;
+    OnConnectComplete    = NULL;
     OnConnectionReceived = NULL;
-    OnConnectionClosed = NULL;
-    OnPeerClose = NULL;
-    OnDataReceived = NULL;
-    OnDataSent = NULL;
+    OnConnectionClosed   = NULL;
+    OnPeerClose          = NULL;
+    OnDataReceived       = NULL;
+    OnDataSent           = NULL;
 
     // Ensure the end point is Closed or Closing.
     err = Close();
@@ -1146,7 +1144,7 @@ void TCPEndPoint::Free()
 void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 {
     uint32_t newIdleTimeout = (timeoutMS + (INET_TCP_IDLE_CHECK_INTERVAL - 1)) / INET_TCP_IDLE_CHECK_INTERVAL;
-    InetLayer& lInetLayer = Layer();
+    InetLayer & lInetLayer  = Layer();
     bool isIdleTimerRunning = lInetLayer.IsIdleTimerRunning();
 
     if (newIdleTimeout > UINT16_MAX)
@@ -1155,7 +1153,7 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
-        chip::System::Layer& lSystemLayer = SystemLayer();
+        chip::System::Layer & lSystemLayer = SystemLayer();
 
         lSystemLayer.StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, InetLayer::HandleTCPInactivityTimer, &lInetLayer);
     }
@@ -1167,7 +1165,7 @@ bool TCPEndPoint::IsConnected(int state)
     return state == kState_Connected || state == kState_SendShutdown || state == kState_ReceiveShutdown || state == kState_Closing;
 }
 
-void TCPEndPoint::Init(InetLayer *inetLayer)
+void TCPEndPoint::Init(InetLayer * inetLayer)
 {
     InitEndPointBasis(*inetLayer);
     ReceiveEnabled = true;
@@ -1227,7 +1225,7 @@ INET_ERROR TCPEndPoint::DriveSending()
                 uint16_t bufDataLen = mUnsentQueue->DataLength();
 
                 // Get a pointer to the start of unsent data within the first buffer on the unsent queue.
-                uint8_t *sendData = mUnsentQueue->Start() + mUnsentOffset;
+                uint8_t * sendData = mUnsentQueue->Start() + mUnsentOffset;
 
                 // Determine the amount of data to send from the current buffer.
                 uint16_t sendLen = bufDataLen - mUnsentOffset;
@@ -1239,7 +1237,7 @@ INET_ERROR TCPEndPoint::DriveSending()
                 mUnsentOffset += sendLen;
                 if (mUnsentOffset == bufDataLen)
                 {
-                    mUnsentQueue = mUnsentQueue->Next();
+                    mUnsentQueue  = mUnsentQueue->Next();
                     mUnsentOffset = 0;
                 }
 
@@ -1299,12 +1297,11 @@ INET_ERROR TCPEndPoint::DriveSending()
 #endif
 
     // Pretend send() fails in the while loop below
-    INET_FAULT_INJECT(FaultInjection::kFault_Send,
-                      {
-                          err = chip::System::MapErrorPOSIX(EIO);
-                          DoClose(err, false);
-                          return err;
-                      });
+    INET_FAULT_INJECT(FaultInjection::kFault_Send, {
+        err = chip::System::MapErrorPOSIX(EIO);
+        DoClose(err, false);
+        return err;
+    });
 
     while (mSendQueue != NULL)
     {
@@ -1393,8 +1390,8 @@ void TCPEndPoint::DriveReceiving()
     // with the entire receive queue.
     if (mRcvQueue != NULL && ReceiveEnabled && OnDataReceived != NULL)
     {
-        PacketBuffer *rcvQueue = mRcvQueue;
-        mRcvQueue = NULL;
+        PacketBuffer * rcvQueue = mRcvQueue;
+        mRcvQueue               = NULL;
         OnDataReceived(this, rcvQueue);
     }
 
@@ -1427,10 +1424,10 @@ void TCPEndPoint::HandleConnectComplete(INET_ERROR err)
 
 INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
 {
-    int             oldState        = State;
+    int oldState = State;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    struct linger   lingerStruct;
+    struct linger lingerStruct;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // If in one of the connected states (Connected, LocalShutdown, PeerShutdown or Closing)
@@ -1498,7 +1495,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
 
                 // Discard the reference to the PCB to ensure there is no further interaction with it
                 // after this point.
-                mTCP = NULL;
+                mTCP              = NULL;
                 mLwIPEndPointType = kLwIPEndPointType_Unknown;
             }
         }
@@ -1510,7 +1507,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
 
             // Discard the reference to the PCB to ensure there is no further interaction with it
             // after this point.
-            mTCP = NULL;
+            mTCP              = NULL;
             mLwIPEndPointType = kLwIPEndPointType_Unknown;
         }
     }
@@ -1528,15 +1525,14 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
         // If entering the Closed state
         // OR if entering the Closing state, and there's no unsent data in the send queue
         // THEN close the socket.
-        if (State == kState_Closed ||
-            (State == kState_Closing && mSendQueue == NULL))
+        if (State == kState_Closed || (State == kState_Closing && mSendQueue == NULL))
         {
-            chip::System::Layer& lSystemLayer = SystemLayer();
+            chip::System::Layer & lSystemLayer = SystemLayer();
 
             // If aborting the connection, ensure we send a TCP RST.
             if (IsConnected(oldState) && err != INET_NO_ERROR)
             {
-                lingerStruct.l_onoff = 1;
+                lingerStruct.l_onoff  = 1;
                 lingerStruct.l_linger = 0;
 
                 if (setsockopt(mSocket, SOL_SOCKET, SO_LINGER, &lingerStruct, sizeof(lingerStruct)) != 0)
@@ -1579,8 +1575,8 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
                 if (OnConnectComplete != NULL)
                     OnConnectComplete(this, err);
             }
-            else if ((oldState == kState_Connected || oldState == kState_SendShutdown ||
-                      oldState == kState_ReceiveShutdown || oldState == kState_Closing) &&
+            else if ((oldState == kState_Connected || oldState == kState_SendShutdown || oldState == kState_ReceiveShutdown ||
+                      oldState == kState_Closing) &&
                      OnConnectionClosed != NULL)
                 OnConnectionClosed(this, err);
         }
@@ -1597,7 +1593,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
         {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
             DeferredFree(kReleaseDeferralErrorTactic_Ignore);
-#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
             Release();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
         }
@@ -1607,7 +1603,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
 }
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError)
+void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError)
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
 
@@ -1617,9 +1613,9 @@ void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer* aSystemLayer, void*
     tcpEndPoint->mUserTimeoutTimerRunning = false;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    INET_ERROR err = INET_NO_ERROR;
+    INET_ERROR err     = INET_NO_ERROR;
     bool isProgressing = false;
-    err = tcpEndPoint->CheckConnectionProgress(isProgressing);
+    err                = tcpEndPoint->CheckConnectionProgress(isProgressing);
     SuccessOrExit(err);
 
     if (tcpEndPoint->mLastTCPKernelSendQueueLen == 0)
@@ -1654,8 +1650,7 @@ void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer* aSystemLayer, void*
 
             tcpEndPoint->mTCPSendQueueRemainingPollCount--;
 
-            VerifyOrExit(tcpEndPoint->mTCPSendQueueRemainingPollCount != 0,
-                         err = INET_ERROR_TCP_USER_TIMEOUT);
+            VerifyOrExit(tcpEndPoint->mTCPSendQueueRemainingPollCount != 0, err = INET_ERROR_TCP_USER_TIMEOUT);
 
             // Restart timer to poll again
 
@@ -1684,12 +1679,11 @@ exit:
 
     tcpEndPoint->DoClose(INET_ERROR_TCP_USER_TIMEOUT, false);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 }
 
 void TCPEndPoint::ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut)
 {
-    chip::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer & lSystemLayer = SystemLayer();
 
     lSystemLayer.StartTimer(aTimeOut, TCPUserTimeoutHandler, this);
 }
@@ -1717,7 +1711,7 @@ void TCPEndPoint::StartTCPUserTimeoutTimer()
     uint32_t timeOut = mUserTimeoutMillis;
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    //Set timeout to the poll interval
+    // Set timeout to the poll interval
 
     timeOut = mTCPSendQueuePollPeriodMillis;
 
@@ -1733,7 +1727,7 @@ void TCPEndPoint::StartTCPUserTimeoutTimer()
 
 void TCPEndPoint::StopTCPUserTimeoutTimer()
 {
-    chip::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer & lSystemLayer = SystemLayer();
 
     lSystemLayer.CancelTimer(TCPUserTimeoutHandler, this);
 
@@ -1827,7 +1821,7 @@ INET_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
     {
 #if INET_CONFIG_ENABLE_IPV4
         const IPAddressType pcbType = PCB_ISIPV6(mTCP) ? kIPAddressType_IPv6 : kIPAddressType_IPv4;
-#else // !INET_CONFIG_ENABLE_IPV4
+#else  // !INET_CONFIG_ENABLE_IPV4
         const IPAddressType pcbType = kIPAddressType_IPv6;
 #endif // !INET_CONFIG_ENABLE_IPV4
         if (addrType != pcbType)
@@ -1889,7 +1883,7 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
     }
 }
 
-void TCPEndPoint::HandleDataReceived(PacketBuffer *buf)
+void TCPEndPoint::HandleDataReceived(PacketBuffer * buf)
 {
     // Only receive new data while in the Connected or SendShutdown states.
     if (State == kState_Connected || State == kState_SendShutdown)
@@ -1911,7 +1905,8 @@ void TCPEndPoint::HandleDataReceived(PacketBuffer *buf)
         }
 
         // Otherwise buf == NULL means the other side closed the connection, so ...
-        else {
+        else
+        {
 
             // If in the Connected state and the app has provided an OnPeerClose callback,
             // enter the ReceiveShutdown state.  Providing an OnPeerClose callback allows
@@ -1935,7 +1930,7 @@ void TCPEndPoint::HandleDataReceived(PacketBuffer *buf)
         PacketBuffer::Free(buf);
 }
 
-void TCPEndPoint::HandleIncomingConnection(TCPEndPoint *conEP)
+void TCPEndPoint::HandleIncomingConnection(TCPEndPoint * conEP)
 {
     INET_ERROR err = INET_NO_ERROR;
     IPAddress peerAddr;
@@ -1978,15 +1973,15 @@ void TCPEndPoint::HandleError(INET_ERROR err)
         DoClose(err, false);
 }
 
-err_t TCPEndPoint::LwIPHandleConnectComplete(void *arg, struct tcp_pcb *tpcb, err_t lwipErr)
+err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr)
 {
     err_t res = ERR_OK;
 
     if (arg != NULL)
     {
-        INET_ERROR              conErr;
-        TCPEndPoint*            ep              = static_cast<TCPEndPoint*>(arg);
-        chip::System::Layer&   lSystemLayer    = ep->SystemLayer();
+        INET_ERROR conErr;
+        TCPEndPoint * ep                   = static_cast<TCPEndPoint *>(arg);
+        chip::System::Layer & lSystemLayer = ep->SystemLayer();
 
         if (lwipErr == ERR_OK)
         {
@@ -1997,7 +1992,7 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void *arg, struct tcp_pcb *tpcb, er
 
         // Post callback to HandleConnectComplete.
         conErr = chip::System::MapErrorLwIP(lwipErr);
-        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPConnectComplete, (uintptr_t)conErr) != INET_NO_ERROR)
+        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPConnectComplete, (uintptr_t) conErr) != INET_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2009,15 +2004,15 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void *arg, struct tcp_pcb *tpcb, er
     return res;
 }
 
-err_t TCPEndPoint::LwIPHandleIncomingConnection(void *arg, struct tcp_pcb *tpcb, err_t lwipErr)
+err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpcb, err_t lwipErr)
 {
     INET_ERROR err = chip::System::MapErrorLwIP(lwipErr);
 
     if (arg != NULL)
     {
-        TCPEndPoint*            listenEP        = static_cast<TCPEndPoint*>(arg);
-        TCPEndPoint*            conEP           = NULL;
-        chip::System::Layer&   lSystemLayer    = listenEP->SystemLayer();
+        TCPEndPoint * listenEP             = static_cast<TCPEndPoint *>(arg);
+        TCPEndPoint * conEP                = NULL;
+        chip::System::Layer & lSystemLayer = listenEP->SystemLayer();
 
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
         tcp_accepted(listenEP->mTCP);
@@ -2031,7 +2026,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void *arg, struct tcp_pcb *tpcb,
         //
         if (err == INET_NO_ERROR)
         {
-            InetLayer& lInetLayer = listenEP->Layer();
+            InetLayer & lInetLayer = listenEP->Layer();
 
             err = lInetLayer.NewTCPEndPoint(&conEP);
         }
@@ -2046,8 +2041,8 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void *arg, struct tcp_pcb *tpcb,
         if (err == INET_NO_ERROR)
         {
             // Put the new end point into the Connected state.
-            conEP->State = kState_Connected;
-            conEP->mTCP = tpcb;
+            conEP->State             = kState_Connected;
+            conEP->mTCP              = tpcb;
             conEP->mLwIPEndPointType = kLwIPEndPointType_TCP;
             conEP->Retain();
 
@@ -2058,17 +2053,17 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void *arg, struct tcp_pcb *tpcb,
             tcp_err(tpcb, LwIPHandleError);
 
             // Post a callback to the HandleConnectionReceived() function, passing it the new end point.
-            if (lSystemLayer.PostEvent(*listenEP, kInetEvent_TCPConnectionReceived, (uintptr_t)conEP) != INET_NO_ERROR)
+            if (lSystemLayer.PostEvent(*listenEP, kInetEvent_TCPConnectionReceived, (uintptr_t) conEP) != INET_NO_ERROR)
             {
                 err = INET_ERROR_CONNECTION_ABORTED;
                 conEP->Release(); // for the Retain() above
-                conEP->Release();// for the Retain() in NewTCPEndPoint()
+                conEP->Release(); // for the Retain() in NewTCPEndPoint()
             }
         }
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
-            lSystemLayer.PostEvent(*listenEP, kInetEvent_TCPError, (uintptr_t)err);
+            lSystemLayer.PostEvent(*listenEP, kInetEvent_TCPError, (uintptr_t) err);
     }
     else
         err = INET_ERROR_CONNECTION_ABORTED;
@@ -2084,17 +2079,17 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void *arg, struct tcp_pcb *tpcb,
     }
 }
 
-err_t TCPEndPoint::LwIPHandleDataReceived(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
+err_t TCPEndPoint::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, struct pbuf * p, err_t err)
 {
     err_t res = ERR_OK;
 
     if (arg != NULL)
     {
-        TCPEndPoint* ep = static_cast<TCPEndPoint*>(arg);
-        chip::System::Layer& lSystemLayer = ep->SystemLayer();
+        TCPEndPoint * ep                   = static_cast<TCPEndPoint *>(arg);
+        chip::System::Layer & lSystemLayer = ep->SystemLayer();
 
         // Post callback to HandleDataReceived.
-        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPDataReceived, (uintptr_t)p) != INET_NO_ERROR)
+        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPDataReceived, (uintptr_t) p) != INET_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2106,17 +2101,17 @@ err_t TCPEndPoint::LwIPHandleDataReceived(void *arg, struct tcp_pcb *tpcb, struc
     return res;
 }
 
-err_t TCPEndPoint::LwIPHandleDataSent(void *arg, struct tcp_pcb *tpcb, u16_t len)
+err_t TCPEndPoint::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t len)
 {
     err_t res = ERR_OK;
 
     if (arg != NULL)
     {
-        TCPEndPoint* ep = static_cast<TCPEndPoint*>(arg);
-        chip::System::Layer& lSystemLayer = ep->SystemLayer();
+        TCPEndPoint * ep                   = static_cast<TCPEndPoint *>(arg);
+        chip::System::Layer & lSystemLayer = ep->SystemLayer();
 
         // Post callback to HandleDataReceived.
-        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPDataSent, (uintptr_t)len) != INET_NO_ERROR)
+        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPDataSent, (uintptr_t) len) != INET_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2128,24 +2123,24 @@ err_t TCPEndPoint::LwIPHandleDataSent(void *arg, struct tcp_pcb *tpcb, u16_t len
     return res;
 }
 
-void TCPEndPoint::LwIPHandleError(void *arg, err_t lwipErr)
+void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
 {
     if (arg != NULL)
     {
-        TCPEndPoint* ep = static_cast<TCPEndPoint*>(arg);
-        chip::System::Layer& lSystemLayer = ep->SystemLayer();
+        TCPEndPoint * ep                   = static_cast<TCPEndPoint *>(arg);
+        chip::System::Layer & lSystemLayer = ep->SystemLayer();
 
         // At this point LwIP has already freed the PCB.  Since the thread that owns the TCPEndPoint may
         // try to use the PCB before it receives the TCPError event posted below, we set the PCB to NULL
         // as a means to signal the other thread that the connection has been aborted.  The implication
         // of this is that the mTCP field is shared state between the two threads and thus must only be
         // accessed with the LwIP lock held.
-        ep->mTCP = NULL;
+        ep->mTCP              = NULL;
         ep->mLwIPEndPointType = kLwIPEndPointType_Unknown;
 
         // Post callback to HandleError.
         INET_ERROR err = chip::System::MapErrorLwIP(lwipErr);
-        lSystemLayer.PostEvent(*ep, kInetEvent_TCPError, (uintptr_t)err);
+        lSystemLayer.PostEvent(*ep, kInetEvent_TCPError, (uintptr_t) err);
     }
 }
 
@@ -2162,20 +2157,20 @@ INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
     // and use that address as the source address for that connection. This is
     // done in the event that directly binding the connection to the target
     // interface is not allowed due to insufficient privileges.
-    IPAddress curAddr = IPAddress::Any;
+    IPAddress curAddr     = IPAddress::Any;
     InterfaceId curIntfId = INET_NULL_INTERFACEID;
-    bool ipAddrFound = false;
+    bool ipAddrFound      = false;
 
     VerifyOrExit(State != kState_Bound, err = INET_ERROR_NOT_SUPPORTED);
 
     for (InterfaceAddressIterator addrIter; addrIter.HasCurrent(); addrIter.Next())
     {
-        curAddr = addrIter.GetAddress();
+        curAddr   = addrIter.GetAddress();
         curIntfId = addrIter.GetInterface();
 
         if (curIntfId == intf)
         {
-        // Search for an IPv4 address on the TargetInterface
+            // Search for an IPv4 address on the TargetInterface
 
 #if INET_CONFIG_ENABLE_IPV4
             if (addrType == kIPAddressType_IPv4)
@@ -2184,7 +2179,7 @@ INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
                 {
                     // Bind to the IPv4 address of the TargetInterface
                     ipAddrFound = true;
-                    err = Bind(kIPAddressType_IPv4, curAddr, 0, true);
+                    err         = Bind(kIPAddressType_IPv4, curAddr, 0, true);
                     SuccessOrExit(err);
 
                     break;
@@ -2195,13 +2190,12 @@ INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
             {
                 // Select an IPv6 address on the interface that is not
                 // a link local or a multicast address.
-                //TODO: Define a proper IPv6GlobalUnicast address checker.
-                if (!curAddr.IsIPv4() && !curAddr.IsIPv6LinkLocal() &&
-                    !curAddr.IsMulticast())
+                // TODO: Define a proper IPv6GlobalUnicast address checker.
+                if (!curAddr.IsIPv4() && !curAddr.IsIPv6LinkLocal() && !curAddr.IsMulticast())
                 {
                     // Bind to the IPv6 address of the TargetInterface
                     ipAddrFound = true;
-                    err = Bind(kIPAddressType_IPv6, curAddr, 0, true);
+                    err         = Bind(kIPAddressType_IPv6, curAddr, 0, true);
                     SuccessOrExit(err);
 
                     break;
@@ -2323,7 +2317,8 @@ void TCPEndPoint::HandlePendingIO()
 
         // If in a state were receiving is allowed, and the app is ready to receive data, and data is ready
         // on the socket, receive inbound data from the connection.
-        if ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != NULL && mPendingIO.IsReadable())
+        if ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != NULL &&
+            mPendingIO.IsReadable())
             ReceiveData();
     }
 
@@ -2334,7 +2329,7 @@ void TCPEndPoint::HandlePendingIO()
 
 void TCPEndPoint::ReceiveData()
 {
-    PacketBuffer *rcvBuf;
+    PacketBuffer * rcvBuf;
     bool isNewBuf = true;
 
     if (mRcvQueue == NULL)
@@ -2342,7 +2337,7 @@ void TCPEndPoint::ReceiveData()
     else
     {
         rcvBuf = mRcvQueue;
-        for (PacketBuffer *nextBuf = rcvBuf->Next(); nextBuf != NULL; rcvBuf = nextBuf, nextBuf = nextBuf->Next())
+        for (PacketBuffer * nextBuf = rcvBuf->Next(); nextBuf != NULL; rcvBuf = nextBuf, nextBuf = nextBuf->Next())
             ;
 
         if (rcvBuf->AvailableDataLength() == 0)
@@ -2467,8 +2462,8 @@ void TCPEndPoint::ReceiveData()
 
 void TCPEndPoint::HandleIncomingConnection()
 {
-    INET_ERROR err = INET_NO_ERROR;
-    TCPEndPoint *conEP = NULL;
+    INET_ERROR err      = INET_NO_ERROR;
+    TCPEndPoint * conEP = NULL;
     IPAddress peerAddr;
     uint16_t peerPort;
 
@@ -2512,7 +2507,7 @@ void TCPEndPoint::HandleIncomingConnection()
     // Attempt to allocate an end point object.
     if (err == INET_NO_ERROR)
     {
-        InetLayer& lInetLayer = Layer();
+        InetLayer & lInetLayer = Layer();
 
         err = lInetLayer.NewTCPEndPoint(&conEP);
     }
@@ -2521,11 +2516,11 @@ void TCPEndPoint::HandleIncomingConnection()
     if (err == INET_NO_ERROR)
     {
         // Put the new end point into the Connected state.
-        conEP->State = kState_Connected;
+        conEP->State   = kState_Connected;
         conEP->mSocket = conSocket;
 #if INET_CONFIG_ENABLE_IPV4
         conEP->mAddrType = (sa.any.sa_family == AF_INET6) ? kIPAddressType_IPv6 : kIPAddressType_IPv4;
-#else // !INET_CONFIG_ENABLE_IPV4
+#else  // !INET_CONFIG_ENABLE_IPV4
         conEP->mAddrType = kIPAddressType_IPv6;
 #endif // !INET_CONFIG_ENABLE_IPV4
         conEP->Retain();
@@ -2555,41 +2550,41 @@ void TCPEndPoint::HandleIncomingConnection()
  *  This function probes the TCP output queue and checks if data is successfully
  *  being transferred to the other end.
  */
-INET_ERROR TCPEndPoint::CheckConnectionProgress(bool &isProgressing)
+INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 {
-   INET_ERROR err = INET_NO_ERROR;
-   int currPendingBytes = 0;
+    INET_ERROR err       = INET_NO_ERROR;
+    int currPendingBytes = 0;
 
-   // Fetch the bytes pending successful transmission in the TCP out queue.
+    // Fetch the bytes pending successful transmission in the TCP out queue.
 
-   if (ioctl(mSocket, TIOCOUTQ, &currPendingBytes) < 0)
-   {
-       ExitNow(err = chip::System::MapErrorPOSIX(errno));
-   }
+    if (ioctl(mSocket, TIOCOUTQ, &currPendingBytes) < 0)
+    {
+        ExitNow(err = chip::System::MapErrorPOSIX(errno));
+    }
 
-   if ((currPendingBytes != 0) &&
-       (mBytesWrittenSinceLastProbe + mLastTCPKernelSendQueueLen == static_cast<uint32_t>(currPendingBytes)))
-   {
-       // No progress has been made
+    if ((currPendingBytes != 0) &&
+        (mBytesWrittenSinceLastProbe + mLastTCPKernelSendQueueLen == static_cast<uint32_t>(currPendingBytes)))
+    {
+        // No progress has been made
 
-       isProgressing = false;
-   }
-   else
-   {
-       // Data is flowing successfully
+        isProgressing = false;
+    }
+    else
+    {
+        // Data is flowing successfully
 
-       isProgressing = true;
-   }
+        isProgressing = true;
+    }
 
-   // Reset the value of the bytes written since the last probe into the tcp
-   // outqueue was made and update the last tcp outqueue sample.
+    // Reset the value of the bytes written since the last probe into the tcp
+    // outqueue was made and update the last tcp outqueue sample.
 
-   mBytesWrittenSinceLastProbe = 0;
+    mBytesWrittenSinceLastProbe = 0;
 
-   mLastTCPKernelSendQueueLen = currPendingBytes;
+    mLastTCPKernelSendQueueLen = currPendingBytes;
 
 exit:
-   return err;
+    return err;
 }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 

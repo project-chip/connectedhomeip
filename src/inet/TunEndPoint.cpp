@@ -59,7 +59,7 @@ using namespace chip::Encoding;
  *                            created the Tunnel EndPoint.
  *
  */
-void TunEndPoint::Init(InetLayer *inetLayer)
+void TunEndPoint::Init(InetLayer * inetLayer)
 {
     InitEndPointBasis(*inetLayer);
 }
@@ -76,17 +76,17 @@ void TunEndPoint::Init(InetLayer *inetLayer)
  * @return INET_NO_ERROR on success, else a corresponding INET mapped OS error.
  */
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-INET_ERROR TunEndPoint::Open (void)
+INET_ERROR TunEndPoint::Open(void)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-INET_ERROR TunEndPoint::Open (const char *intfName)
-#endif //CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    INET_ERROR TunEndPoint::Open(const char * intfName)
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 {
     INET_ERROR err = INET_NO_ERROR;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    struct netif *tNetif = NULL;
+    struct netif * tNetif = NULL;
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
@@ -101,7 +101,7 @@ INET_ERROR TunEndPoint::Open (const char *intfName)
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    //Create the tunnel device
+    // Create the tunnel device
     err = TunDevOpen(intfName);
     SuccessOrExit(err);
 
@@ -121,7 +121,7 @@ exit:
  * Close the tunnel pseudo interface device.
  *
  */
-void TunEndPoint::Close (void)
+void TunEndPoint::Close(void)
 {
     if (mState != kState_Closed)
     {
@@ -133,7 +133,7 @@ void TunEndPoint::Close (void)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         if (mSocket >= 0)
         {
-            chip::System::Layer& lSystemLayer = SystemLayer();
+            chip::System::Layer & lSystemLayer = SystemLayer();
 
             // Wake the thread calling select so that it recognizes the socket is closed.
             lSystemLayer.WakeSelect();
@@ -159,7 +159,7 @@ void TunEndPoint::Free()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     DeferredFree(kReleaseDeferralErrorTactic_Release);
-#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
     Release();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
@@ -179,7 +179,7 @@ void TunEndPoint::Free()
  * @retval  INET_ERROR_BAD_ARGS         \c message is a \c NULL pointer
  *
  */
-INET_ERROR TunEndPoint::Send (PacketBuffer *msg)
+INET_ERROR TunEndPoint::Send(PacketBuffer * msg)
 {
     INET_ERROR ret = INET_NO_ERROR;
 
@@ -199,7 +199,7 @@ INET_ERROR TunEndPoint::Send (PacketBuffer *msg)
  * @returns \c true if the tunnel interface is active,
  *          otherwise \c false.
  */
-bool TunEndPoint::IsInterfaceUp (void) const
+bool TunEndPoint::IsInterfaceUp(void) const
 {
     bool ret = false;
 
@@ -221,7 +221,7 @@ bool TunEndPoint::IsInterfaceUp (void) const
 
     memset(&ifr, 0, sizeof(ifr));
 
-    //Get interface
+    // Get interface
     if (TunGetInterface(mSocket, &ifr) < 0)
     {
         ExitNow();
@@ -233,7 +233,7 @@ bool TunEndPoint::IsInterfaceUp (void) const
         ExitNow();
     }
 
-    //Get interface flags
+    // Get interface flags
     if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
     {
         ExitNow();
@@ -260,7 +260,7 @@ exit:
  * @retval  INET_NO_ERROR           success: tunnel interface is activated.
  * @retval  other                   another system or platform error
  */
-INET_ERROR TunEndPoint::InterfaceUp (void)
+INET_ERROR TunEndPoint::InterfaceUp(void)
 {
     INET_ERROR err = INET_NO_ERROR;
 
@@ -282,7 +282,7 @@ INET_ERROR TunEndPoint::InterfaceUp (void)
 
     memset(&ifr, 0, sizeof(ifr));
 
-    //Get interface
+    // Get interface
     if (TunGetInterface(mSocket, &ifr) < 0)
     {
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
@@ -294,20 +294,20 @@ INET_ERROR TunEndPoint::InterfaceUp (void)
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
-    //Get interface flags
+    // Get interface flags
     if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
     {
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
-    //Set flag to activate interface
+    // Set flag to activate interface
     ifr.ifr_flags |= (IFF_UP | IFF_RUNNING);
     if (ioctl(sockfd, SIOCSIFFLAGS, &ifr) < 0)
     {
         err = chip::System::MapErrorPOSIX(errno);
     }
 
-    //Set the MTU
+    // Set the MTU
     ifr.ifr_mtu = CHIP_CONFIG_TUNNEL_INTERFACE_MTU;
     if (ioctl(sockfd, SIOCSIFMTU, &ifr) < 0)
     {
@@ -333,7 +333,7 @@ exit:
  * @retval  INET_NO_ERROR           success: tunnel interface is deactivated.
  * @retval  other                   another system or platform error
  */
-INET_ERROR TunEndPoint::InterfaceDown (void)
+INET_ERROR TunEndPoint::InterfaceDown(void)
 {
     INET_ERROR err = INET_NO_ERROR;
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -345,7 +345,7 @@ INET_ERROR TunEndPoint::InterfaceDown (void)
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
-    //Remove the link local address from the netif
+    // Remove the link local address from the netif
     memset(&(mTunNetIf.ip6_addr[0]), 0, sizeof(ip6_addr_t));
 
     netif_set_down(&mTunNetIf);
@@ -359,7 +359,7 @@ INET_ERROR TunEndPoint::InterfaceDown (void)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     memset(&ifr, 0, sizeof(ifr));
 
-    //Get interface
+    // Get interface
     if (TunGetInterface(mSocket, &ifr) < 0)
     {
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
@@ -371,13 +371,13 @@ INET_ERROR TunEndPoint::InterfaceDown (void)
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
-    //Get interface flags
+    // Get interface flags
     if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
     {
         ExitNow(err = chip::System::MapErrorPOSIX(errno));
     }
 
-    //Set flag to deactivate interface
+    // Set flag to deactivate interface
     ifr.ifr_flags &= ~(IFF_UP);
     if (ioctl(sockfd, SIOCSIFFLAGS, &ifr) < 0)
     {
@@ -408,9 +408,9 @@ InterfaceId TunEndPoint::GetTunnelInterfaceId(void)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    INET_ERROR err = INET_NO_ERROR;
-    InterfaceId tunIntfId = INET_NULL_INTERFACEID;
-    const char *tunIntfPtr = &tunIntfName[0];
+    INET_ERROR err          = INET_NO_ERROR;
+    InterfaceId tunIntfId   = INET_NULL_INTERFACEID;
+    const char * tunIntfPtr = &tunIntfName[0];
 
     err = InterfaceNameToId(tunIntfPtr, tunIntfId);
     if (err != INET_NO_ERROR)
@@ -424,21 +424,21 @@ InterfaceId TunEndPoint::GetTunnelInterfaceId(void)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 /* Function for sending the IPv6 packets over LwIP */
-INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer *msg)
+INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer * msg)
 {
-    INET_ERROR ret = INET_NO_ERROR;
-    struct pbuf *p = NULL;
-    err_t  err = ERR_OK;
+    INET_ERROR ret  = INET_NO_ERROR;
+    struct pbuf * p = NULL;
+    err_t err       = ERR_OK;
 
     // no packet could be read, silently ignore this
     VerifyOrExit(msg != NULL, ret = INET_ERROR_BAD_ARGS);
 
-    p = (struct pbuf *)msg;
+    p = (struct pbuf *) msg;
 
-    //Call the input function for the netif object in LWIP.
-    //This essentially creates a TCP_IP msg and puts into
-    //the mbox message queue for processing by the TCP/IP
-    //stack.
+    // Call the input function for the netif object in LWIP.
+    // This essentially creates a TCP_IP msg and puts into
+    // the mbox message queue for processing by the TCP/IP
+    // stack.
 
     if ((err = tcpip_input(p, &mTunNetIf)) != ERR_OK)
     {
@@ -453,11 +453,11 @@ exit:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 /* Function for sending the IPv6 packets over Linux sockets */
-INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer *msg)
+INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer * msg)
 {
-    INET_ERROR ret = INET_NO_ERROR;
+    INET_ERROR ret  = INET_NO_ERROR;
     ssize_t lenSent = 0;
-    uint8_t *p = NULL;
+    uint8_t * p     = NULL;
 
     // no packet could be read, silently ignore this
     VerifyOrExit(msg != NULL, ret = INET_ERROR_BAD_ARGS);
@@ -467,7 +467,7 @@ INET_ERROR TunEndPoint::TunDevSendMessage(PacketBuffer *msg)
     lenSent = write(mSocket, p, msg->DataLength());
     if (lenSent < 0)
     {
-       ExitNow(ret = chip::System::MapErrorPOSIX(errno));
+        ExitNow(ret = chip::System::MapErrorPOSIX(errno));
     }
     else if (lenSent < msg->DataLength())
     {
@@ -485,29 +485,29 @@ exit:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /* Function that performs some basic sanity checks for IPv6 packets */
-INET_ERROR TunEndPoint::CheckV6Sanity (PacketBuffer *msg)
+INET_ERROR TunEndPoint::CheckV6Sanity(PacketBuffer * msg)
 {
-    INET_ERROR err = INET_NO_ERROR;
-    uint8_t *p     = NULL;
-    struct ip6_hdr *ip6hdr = NULL;
+    INET_ERROR err          = INET_NO_ERROR;
+    uint8_t * p             = NULL;
+    struct ip6_hdr * ip6hdr = NULL;
 
     p = msg->Start();
 
-    ip6hdr = (struct ip6_hdr *)p;
+    ip6hdr = (struct ip6_hdr *) p;
 
     VerifyOrExit(ip6hdr != NULL, err = INET_ERROR_BAD_ARGS);
 
-    //Do some IPv6 sanity checks
+    // Do some IPv6 sanity checks
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (IP6H_V(ip6hdr) != 6)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if ((ip6hdr->ip6_vfc >> 4) != 6)
+        if ((ip6hdr->ip6_vfc >> 4) != 6)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    {
-        ExitNow(err = INET_ERROR_NOT_SUPPORTED);
-    }
+        {
+            ExitNow(err = INET_ERROR_NOT_SUPPORTED);
+        }
 
 exit:
 
@@ -516,7 +516,7 @@ exit:
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 /* Handler to send received packet to upper layer callback */
-void TunEndPoint::HandleDataReceived (PacketBuffer *msg)
+void TunEndPoint::HandleDataReceived(PacketBuffer * msg)
 {
     INET_ERROR err = INET_NO_ERROR;
     if (mState == kState_Open && OnPacketReceived != NULL)
@@ -543,13 +543,13 @@ void TunEndPoint::HandleDataReceived (PacketBuffer *msg)
 }
 
 /* Post an event to the Inet layer event queue from LwIP */
-err_t TunEndPoint::LwIPPostToInetEventQ (struct netif *netif, struct pbuf *p)
+err_t TunEndPoint::LwIPPostToInetEventQ(struct netif * netif, struct pbuf * p)
 {
-    err_t                   lwipErr         = ERR_OK;
-    INET_ERROR              err             = INET_NO_ERROR;
-    TunEndPoint*            ep              = static_cast<TunEndPoint *>(netif->state);
-    chip::System::Layer&   lSystemLayer    = ep->SystemLayer();
-    PacketBuffer*           buf             = PacketBuffer::NewWithAvailableSize(p->tot_len);
+    err_t lwipErr                      = ERR_OK;
+    INET_ERROR err                     = INET_NO_ERROR;
+    TunEndPoint * ep                   = static_cast<TunEndPoint *>(netif->state);
+    chip::System::Layer & lSystemLayer = ep->SystemLayer();
+    PacketBuffer * buf                 = PacketBuffer::NewWithAvailableSize(p->tot_len);
 
     // Starting off with a reserved size of the default CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE
     // which allows for adding the chip header and the underlying transport and IP headers
@@ -562,10 +562,10 @@ err_t TunEndPoint::LwIPPostToInetEventQ (struct netif *netif, struct pbuf *p)
     // Make a pbuf alloc and copy to post to Inetlayer queue because LwIP would free the
     // passed pbuf as it made a down-call to send it out the tunnel netif.
 
-    lwipErr = pbuf_copy((struct pbuf *)buf, p);
-    VerifyOrExit(lwipErr == ERR_OK, (void)lwipErr);
+    lwipErr = pbuf_copy((struct pbuf *) buf, p);
+    VerifyOrExit(lwipErr == ERR_OK, (void) lwipErr);
 
-    err = lSystemLayer.PostEvent(*ep, kInetEvent_TunDataReceived, (uintptr_t)buf);
+    err = lSystemLayer.PostEvent(*ep, kInetEvent_TunDataReceived, (uintptr_t) buf);
     VerifyOrExit(err == INET_NO_ERROR, lwipErr = ERR_MEM);
 
     buf = NULL;
@@ -582,7 +582,7 @@ exit:
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 #if LWIP_IPV4
 /* Output handler for netif */
-err_t TunEndPoint::LwIPOutputIPv4(struct netif *netif, struct pbuf *p, const ip4_addr_t *addr)
+err_t TunEndPoint::LwIPOutputIPv4(struct netif * netif, struct pbuf * p, const ip4_addr_t * addr)
 {
     LWIP_UNUSED_ARG(addr);
 
@@ -592,16 +592,16 @@ err_t TunEndPoint::LwIPOutputIPv4(struct netif *netif, struct pbuf *p, const ip4
 
 #if LWIP_IPV6
 /* Output handler for netif */
-err_t TunEndPoint::LwIPOutputIPv6(struct netif *netif, struct pbuf *p, const ip6_addr_t *addr)
+err_t TunEndPoint::LwIPOutputIPv6(struct netif * netif, struct pbuf * p, const ip6_addr_t * addr)
 {
     LWIP_UNUSED_ARG(addr);
 
     return LwIPPostToInetEventQ(netif, p);
 }
 #endif // LWIP_IPV4
-#else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
+#else  // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
 /* Receive message in LwIP */
-err_t TunEndPoint::LwIPReceiveTunMessage (struct netif *netif, struct pbuf *p, ip4_addr_t *addr)
+err_t TunEndPoint::LwIPReceiveTunMessage(struct netif * netif, struct pbuf * p, ip4_addr_t * addr)
 {
     LWIP_UNUSED_ARG(addr);
 
@@ -609,7 +609,7 @@ err_t TunEndPoint::LwIPReceiveTunMessage (struct netif *netif, struct pbuf *p, i
 }
 
 #if LWIP_IPV6
-err_t TunEndPoint::LwIPReceiveTunV6Message (struct netif *netif, struct pbuf *p, ip6_addr_t *addr)
+err_t TunEndPoint::LwIPReceiveTunV6Message(struct netif * netif, struct pbuf * p, ip6_addr_t * addr)
 {
     LWIP_UNUSED_ARG(addr);
 
@@ -619,7 +619,7 @@ err_t TunEndPoint::LwIPReceiveTunV6Message (struct netif *netif, struct pbuf *p,
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
 
 /* Initialize the LwIP tunnel netif interface */
-err_t TunEndPoint::TunInterfaceNetifInit (struct netif *netif)
+err_t TunEndPoint::TunInterfaceNetifInit(struct netif * netif)
 {
     netif->name[0] = 't';
     netif->name[1] = 'n';
@@ -630,8 +630,8 @@ err_t TunEndPoint::TunInterfaceNetifInit (struct netif *netif)
 #if LWIP_IPV6
     netif->output_ip6 = LwIPOutputIPv6;
 #endif /* LWIP_IPV6 */
-#else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
-    netif->output = LwIPReceiveTunMessage;
+#else  // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
+    netif->output     = LwIPReceiveTunMessage;
 #if LWIP_IPV6
     netif->output_ip6 = LwIPReceiveTunV6Message;
 #endif /* LWIP_IPV6 */
@@ -656,10 +656,10 @@ err_t TunEndPoint::TunInterfaceNetifInit (struct netif *netif)
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 /* Open a tun device in linux */
-INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
+INET_ERROR TunEndPoint::TunDevOpen(const char * intfName)
 {
     struct ::ifreq ifr;
-    int fd = INET_INVALID_SOCKET_FD;
+    int fd         = INET_INVALID_SOCKET_FD;
     INET_ERROR ret = INET_NO_ERROR;
 
     if ((fd = open(INET_CONFIG_TUNNEL_DEVICE_NAME, O_RDWR | NL_O_CLOEXEC)) < 0)
@@ -667,7 +667,7 @@ INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
         ExitNow(ret = chip::System::MapErrorPOSIX(errno));
     }
 
-    //Keep copy of open device fd
+    // Keep copy of open device fd
     mSocket = fd;
 
     memset(&ifr, 0, sizeof(ifr));
@@ -688,7 +688,7 @@ INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
     }
 #endif
 
-    //Verify name
+    // Verify name
     memset(&ifr, 0, sizeof(ifr));
     if (TunGetInterface(fd, &ifr) < 0)
     {
@@ -697,7 +697,7 @@ INET_ERROR TunEndPoint::TunDevOpen (const char *intfName)
 
     if (ifr.ifr_name[0] != '\0')
     {
-        //Keep member copy of interface name and Id
+        // Keep member copy of interface name and Id
         strncpy(tunIntfName, ifr.ifr_name, sizeof(tunIntfName) - 1);
     }
     else
@@ -716,7 +716,7 @@ exit:
 }
 
 /* Close a tun device */
-void TunEndPoint::TunDevClose (void)
+void TunEndPoint::TunDevClose(void)
 {
     if (mSocket >= 0)
     {
@@ -726,23 +726,22 @@ void TunEndPoint::TunDevClose (void)
 }
 
 /* Get the tun device interface in Linux */
-int TunEndPoint::TunGetInterface (int fd,
-                                  struct ::ifreq *ifr)
+int TunEndPoint::TunGetInterface(int fd, struct ::ifreq * ifr)
 {
 #if HAVE_LINUX_IF_TUN_H
-    return ioctl(fd, TUNGETIFF, (void*)ifr);
+    return ioctl(fd, TUNGETIFF, (void *) ifr);
 #else
     return -1;
 #endif
 }
 
 /* Read packets from TUN device in Linux */
-INET_ERROR TunEndPoint::TunDevRead (PacketBuffer *msg)
+INET_ERROR TunEndPoint::TunDevRead(PacketBuffer * msg)
 {
     ssize_t rcvLen;
     INET_ERROR err = INET_NO_ERROR;
-    uint8_t *p = NULL;
-    p = msg->Start();
+    uint8_t * p    = NULL;
+    p              = msg->Start();
 
     rcvLen = read(mSocket, p, msg->AvailableDataLength());
     if (rcvLen < 0)
@@ -755,14 +754,14 @@ INET_ERROR TunEndPoint::TunDevRead (PacketBuffer *msg)
     }
     else
     {
-        msg->SetDataLength((uint16_t)rcvLen);
+        msg->SetDataLength((uint16_t) rcvLen);
     }
 
     return err;
 }
 
 /* Prepare socket for reading */
-SocketEvents TunEndPoint::PrepareIO ()
+SocketEvents TunEndPoint::PrepareIO()
 {
     SocketEvents res;
 
@@ -775,18 +774,18 @@ SocketEvents TunEndPoint::PrepareIO ()
 }
 
 /* Read from the Tun device in Linux and pass up to upper layer callback */
-void TunEndPoint::HandlePendingIO ()
+void TunEndPoint::HandlePendingIO()
 {
     INET_ERROR err = INET_NO_ERROR;
 
     if (mState == kState_Open && OnPacketReceived != NULL && mPendingIO.IsReadable())
     {
 
-        PacketBuffer *buf = PacketBuffer::New(0);
+        PacketBuffer * buf = PacketBuffer::New(0);
 
         if (buf != NULL)
         {
-            //Read data from Tun Device
+            // Read data from Tun Device
             err = TunDevRead(buf);
             if (err == INET_NO_ERROR)
             {

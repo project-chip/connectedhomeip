@@ -25,32 +25,27 @@
 
 #if INET_CONFIG_TEST
 
-
 namespace chip {
 namespace Inet {
 namespace FaultInjection {
 
 static FaultInjection::Record sFaultRecordArray[kFault_NumItems];
 static class FaultInjection::Manager sInetFaultInMgr;
-static const FaultInjection::Name sManagerName = "Inet";
+static const FaultInjection::Name sManagerName  = "Inet";
 static const FaultInjection::Name sFaultNames[] = {
     "DNSResolverNew",
     "Send",
     "SendNonCritical",
 };
 
-
 /**
  * Get the singleton FaultInjection::Manager for Inet faults
  */
-FaultInjection::Manager &GetManager(void)
+FaultInjection::Manager & GetManager(void)
 {
     if (0 == sInetFaultInMgr.GetNumFaults())
     {
-        sInetFaultInMgr.Init(kFault_NumItems,
-                             sFaultRecordArray,
-                             sManagerName,
-                             sFaultNames);
+        sInetFaultInMgr.Init(kFault_NumItems, sFaultRecordArray, sManagerName, sFaultNames);
     }
     return sInetFaultInMgr;
 }

@@ -32,9 +32,10 @@ namespace TLV {
 
 namespace Utilities {
 
-struct FindContext {
+struct FindContext
+{
     const uint64_t & mTag;
-    TLVReader &      mReader;
+    TLVReader & mReader;
 };
 
 /**
@@ -57,7 +58,7 @@ struct FindContext {
  *
  *  @retval  The last value returned by @a aHandler, if different than #CHIP_NO_ERROR
  */
-static CHIP_ERROR Iterate(TLVReader &aReader, size_t aDepth, IterateHandler aHandler, void *aContext, bool aRecurse)
+static CHIP_ERROR Iterate(TLVReader & aReader, size_t aDepth, IterateHandler aHandler, void * aContext, bool aRecurse)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
@@ -113,9 +114,9 @@ exit:
  *  @retval  The last value returned by @a aHandler, if different than #CHIP_NO_ERROR
  *
  */
-CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext)
+CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aContext)
 {
-    const bool  recurse = true;
+    const bool recurse = true;
     CHIP_ERROR retval;
 
     retval = Iterate(aReader, aHandler, aContext, recurse);
@@ -145,11 +146,11 @@ CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aCon
  *  @retval  The last value returned by @a aHandler, if different than #CHIP_NO_ERROR
  *
  */
-CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aContext, const bool aRecurse)
+CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aContext, const bool aRecurse)
 {
-    const size_t depth  = 0;
-    TLVReader    temp;
-    CHIP_ERROR  retval = CHIP_ERROR_NOT_IMPLEMENTED;
+    const size_t depth = 0;
+    TLVReader temp;
+    CHIP_ERROR retval = CHIP_ERROR_NOT_IMPLEMENTED;
 
     VerifyOrExit(aHandler != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -157,7 +158,7 @@ CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aCon
 
     retval = Iterate(temp, depth, aHandler, aContext, aRecurse);
 
- exit:
+exit:
     return retval;
 }
 
@@ -175,7 +176,7 @@ CHIP_ERROR Iterate(const TLVReader &aReader, IterateHandler aHandler, void *aCon
  *  @retval  #CHIP_ERROR_INVALID_ARGUMENT  If @a aContext is NULL.
  *
  */
-static CHIP_ERROR CountHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
+static CHIP_ERROR CountHandler(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
@@ -183,7 +184,7 @@ static CHIP_ERROR CountHandler(const TLVReader &aReader, size_t aDepth, void *aC
 
     *static_cast<size_t *>(aContext) += 1;
 
- exit:
+exit:
     return retval;
 }
 
@@ -201,9 +202,9 @@ static CHIP_ERROR CountHandler(const TLVReader &aReader, size_t aDepth, void *aC
  *  @retval  #CHIP_NO_ERROR    On success.
  *
  */
-CHIP_ERROR Count(const TLVReader &aReader, size_t &aCount)
+CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount)
 {
-    const bool  recurse = true;
+    const bool recurse = true;
     CHIP_ERROR retval;
 
     retval = Count(aReader, aCount, recurse);
@@ -228,7 +229,7 @@ CHIP_ERROR Count(const TLVReader &aReader, size_t &aCount)
  *  @retval  #CHIP_NO_ERROR    On success.
  *
  */
-CHIP_ERROR Count(const TLVReader &aReader, size_t &aCount, const bool aRecurse)
+CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount, const bool aRecurse)
 {
     CHIP_ERROR retval;
 
@@ -257,10 +258,10 @@ CHIP_ERROR Count(const TLVReader &aReader, size_t &aCount, const bool aRecurse)
  *  @retval  #CHIP_ERROR_MAX               If the specified tag is found.
  *
  */
-static CHIP_ERROR FindHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
+static CHIP_ERROR FindHandler(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
     const FindContext * theContext = static_cast<const FindContext *>(aContext);
-    CHIP_ERROR         retval     = CHIP_NO_ERROR;
+    CHIP_ERROR retval              = CHIP_NO_ERROR;
 
     VerifyOrExit(aContext != NULL, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -271,7 +272,7 @@ static CHIP_ERROR FindHandler(const TLVReader &aReader, size_t aDepth, void *aCo
         retval = CHIP_ERROR_MAX;
     }
 
- exit:
+exit:
     return retval;
 }
 
@@ -290,9 +291,9 @@ static CHIP_ERROR FindHandler(const TLVReader &aReader, size_t aDepth, void *aCo
  *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified tag @a aTag was not found.
  *
  */
-CHIP_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult)
+CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult)
 {
-    const bool  recurse = true;
+    const bool recurse = true;
     CHIP_ERROR retval;
 
     retval = Find(aReader, aTag, aResult, recurse);
@@ -319,7 +320,7 @@ CHIP_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResu
  *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified tag @a aTag was not found.
  *
  */
-CHIP_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResult, const bool aRecurse)
+CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult, const bool aRecurse)
 {
     FindContext theContext = { aTag, aResult };
     CHIP_ERROR retval;
@@ -336,22 +337,19 @@ CHIP_ERROR Find(const TLVReader &aReader, const uint64_t &aTag, TLVReader &aResu
 
 struct FindPredicateContext
 {
-    TLVReader &mResult;
+    TLVReader & mResult;
     IterateHandler mHandler;
     void * mContext;
-    FindPredicateContext(TLVReader &inReader, IterateHandler inHandler, void *inContext);
+    FindPredicateContext(TLVReader & inReader, IterateHandler inHandler, void * inContext);
 };
 
-FindPredicateContext::FindPredicateContext(TLVReader &inReader, IterateHandler inHandler, void *inContext) :
-        mResult(inReader),
-        mHandler(inHandler),
-        mContext(inContext)
-{
-}
+FindPredicateContext::FindPredicateContext(TLVReader & inReader, IterateHandler inHandler, void * inContext) :
+    mResult(inReader), mHandler(inHandler), mContext(inContext)
+{}
 
-static CHIP_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth, void *aContext)
+static CHIP_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
-    FindPredicateContext *theContext = static_cast<FindPredicateContext *>(aContext);
+    FindPredicateContext * theContext = static_cast<FindPredicateContext *>(aContext);
     CHIP_ERROR err;
 
     err = theContext->mHandler(aReader, aDepth, theContext->mContext);
@@ -389,9 +387,9 @@ static CHIP_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth,
  *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified @a aPredicate did not locate the specified element
  *
  */
-CHIP_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aContext, TLVReader &aResult)
+CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aPredicate, void * aContext, TLVReader & aResult)
 {
-    const bool  recurse = true;
+    const bool recurse = true;
     return Find(aReader, aPredicate, aContext, aResult, recurse);
 }
 
@@ -425,7 +423,7 @@ CHIP_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aCont
  *  @retval  #CHIP_ERROR_TLV_TAG_NOT_FOUND     If the specified @a aPredicate did not locate the specified element
  *
  */
-CHIP_ERROR Find(const TLVReader &aReader, IterateHandler aPredicate, void *aContext, TLVReader &aResult, const bool aRecurse)
+CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aPredicate, void * aContext, TLVReader & aResult, const bool aRecurse)
 {
     CHIP_ERROR retval;
     FindPredicateContext theContext(aResult, aPredicate, aContext);

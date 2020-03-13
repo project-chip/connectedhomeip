@@ -54,35 +54,34 @@ namespace Logging {
  *       necessary.
  *
  */
-static const char ModuleNames[] =
-    "-\0\0" // None
-    "IN\0"  // Inet
-    "BLE"   // BLE
-    "ML\0"  // MessageLayer
-    "SM\0"  // SecurityManager
-    "EM\0"  // ExchangeManager
-    "TLV"   // TLV
-    "ASN"   // ASN1
-    "CR\0"  // Crypto
-    "DM\0"  // DeviceManager
-    "AL\0"  // Alarm
-    "BDX"   // BulkDataTransfer
-    "DMG"   // DataManagement
-    "DC\0"  // DeviceControl
-    "DD\0"  // DeviceDescription
-    "ECH"   // Echo
-    "FP\0"  // FabricProvisioning
-    "NP\0"  // NetworkProvisioning
-    "SD\0"  // ServiceDirectory
-    "SP\0"  // ServiceProvisioning
-    "SWU"   // SoftwareUpdate
-    "TP\0"  // TokenPairing
-    "TS\0"  // TimeServices
-    "WT\0"  // chipTunnel
-    "HB\0"  // Heartbeat
-    "WSL"   // chipSystemLayer
-    "EVL"   // Event Logging
-    "SPT"   // Support
+static const char ModuleNames[] = "-\0\0" // None
+                                  "IN\0"  // Inet
+                                  "BLE"   // BLE
+                                  "ML\0"  // MessageLayer
+                                  "SM\0"  // SecurityManager
+                                  "EM\0"  // ExchangeManager
+                                  "TLV"   // TLV
+                                  "ASN"   // ASN1
+                                  "CR\0"  // Crypto
+                                  "DM\0"  // DeviceManager
+                                  "AL\0"  // Alarm
+                                  "BDX"   // BulkDataTransfer
+                                  "DMG"   // DataManagement
+                                  "DC\0"  // DeviceControl
+                                  "DD\0"  // DeviceDescription
+                                  "ECH"   // Echo
+                                  "FP\0"  // FabricProvisioning
+                                  "NP\0"  // NetworkProvisioning
+                                  "SD\0"  // ServiceDirectory
+                                  "SP\0"  // ServiceProvisioning
+                                  "SWU"   // SoftwareUpdate
+                                  "TP\0"  // TokenPairing
+                                  "TS\0"  // TimeServices
+                                  "WT\0"  // chipTunnel
+                                  "HB\0"  // Heartbeat
+                                  "WSL"   // chipSystemLayer
+                                  "EVL"   // Event Logging
+                                  "SPT"   // Support
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chipLoggingModuleNameLen)
@@ -91,14 +90,14 @@ static const char ModuleNames[] =
 #define chipPrefixSeparator ": "
 #define chipMessageTrailer "\n"
 
-void GetModuleName(char *buf, uint8_t module)
+void GetModuleName(char * buf, uint8_t module)
 {
-    const char *moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * chipLoggingModuleNameLen : 0);
+    const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * chipLoggingModuleNameLen : 0);
     memcpy(buf, moduleNamePtr, chipLoggingModuleNameLen);
     buf[chipLoggingModuleNameLen] = 0;
 }
 
-void GetMessageWithPrefix(char *buf, uint8_t bufSize, uint8_t module, const char *msg)
+void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg)
 {
     char moduleName[chipLoggingModuleNameLen + 1];
 
@@ -113,7 +112,7 @@ void PrintMessagePrefix(uint8_t module)
 
 #if CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
     struct timeval tv;
-    struct tm* time_ptr;
+    struct tm * time_ptr;
     char detailed_time[30];
     int64_t milliseconds;
     int status;
@@ -189,7 +188,7 @@ uint8_t gLogFilter = kLogCategory_Max;
 #define __CHIP_LOGGING_LINK_ATTRIBUTE
 #endif
 
-DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t category, const char *msg, ...)
+DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t category, const char * msg, ...)
 {
     va_list v;
 
@@ -218,7 +217,6 @@ DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t catego
 #error "Undefined platform-specific implementation for non-externnal chip logging style!"
 
 #endif /* CHIP_LOGGING_STYLE_ANDROID */
-
     }
 
     va_end(v);

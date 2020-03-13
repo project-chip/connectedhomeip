@@ -29,7 +29,7 @@
 namespace chip {
 namespace Inet {
 
-void EndPointBasis::InitEndPointBasis(InetLayer& aInetLayer, void* aAppState)
+void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 {
     InitInetLayerBasis(aInetLayer, aAppState);
 

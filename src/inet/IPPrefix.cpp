@@ -35,24 +35,20 @@ IPPrefix IPPrefix::Zero;
 
 bool IPPrefix::IsZero() const
 {
-    return  IPAddr.Addr[0] == 0 &&
-            IPAddr.Addr[1] == 0 &&
-            IPAddr.Addr[2] == 0 &&
-            IPAddr.Addr[3] == 0 &&
-            Length == 0;
+    return IPAddr.Addr[0] == 0 && IPAddr.Addr[1] == 0 && IPAddr.Addr[2] == 0 && IPAddr.Addr[3] == 0 && Length == 0;
 }
 
-bool IPPrefix::operator==(const IPPrefix& other) const
+bool IPPrefix::operator==(const IPPrefix & other) const
 {
     return IPAddr == other.IPAddr && Length == other.Length;
 }
 
-bool IPPrefix::operator!=(const IPPrefix& other) const
+bool IPPrefix::operator!=(const IPPrefix & other) const
 {
     return IPAddr != other.IPAddr || Length != other.Length;
 }
 
-IPPrefix & IPPrefix::operator=(const IPPrefix& other)
+IPPrefix & IPPrefix::operator=(const IPPrefix & other)
 {
     if (this != &other)
     {
@@ -63,7 +59,7 @@ IPPrefix & IPPrefix::operator=(const IPPrefix& other)
     return *this;
 }
 
-bool IPPrefix::MatchAddress(const IPAddress& addr) const
+bool IPPrefix::MatchAddress(const IPAddress & addr) const
 {
     uint8_t l = (Length <= 128) ? Length : 128;
     int i;
