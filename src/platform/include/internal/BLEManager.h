@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,21 +24,20 @@
 #ifndef BLE_MANAGER_H
 #define BLE_MANAGER_H
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WOBLE
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 class BLEManagerImpl;
 
 /**
- * Provides control over WoBLE services and connectivity for a Weave device.
+ * Provides control over WoBLE services and connectivity for a chip device.
  *
  * BLEManager defines the abstract interface of a singleton object that provides
- * control over WoBLE services and connectivity for a Weave device.  BLEManager
- * is an internal object that is used by other components with the Weave Device
+ * control over WoBLE services and connectivity for a chip device.  BLEManager
+ * is an internal object that is used by other components with the chip Device
  * Layer, but is not directly accessible to the application.
  */
 class BLEManager
@@ -52,19 +50,19 @@ public:
 
     using WoBLEServiceMode = ConnectivityManager::WoBLEServiceMode;
 
-    WEAVE_ERROR Init(void);
+    CHIP_ERROR Init(void);
     WoBLEServiceMode GetWoBLEServiceMode(void);
-    WEAVE_ERROR SetWoBLEServiceMode(WoBLEServiceMode val);
+    CHIP_ERROR SetWoBLEServiceMode(WoBLEServiceMode val);
     bool IsAdvertisingEnabled(void);
-    WEAVE_ERROR SetAdvertisingEnabled(bool val);
+    CHIP_ERROR SetAdvertisingEnabled(bool val);
     bool IsFastAdvertisingEnabled(void);
-    WEAVE_ERROR SetFastAdvertisingEnabled(bool val);
+    CHIP_ERROR SetFastAdvertisingEnabled(bool val);
     bool IsAdvertising(void);
-    WEAVE_ERROR GetDeviceName(char * buf, size_t bufSize);
-    WEAVE_ERROR SetDeviceName(const char * deviceName);
+    CHIP_ERROR GetDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR SetDeviceName(const char * deviceName);
     uint16_t NumConnections(void);
-    void OnPlatformEvent(const WeaveDeviceEvent * event);
-    ::nl::Ble::BleLayer * GetBleLayer(void) const;
+    void OnPlatformEvent(const chipDeviceEvent * event);
+    ::Ble::BleLayer * GetBleLayer(void) const;
 
 protected:
 
@@ -89,15 +87,14 @@ extern BLEManager & BLEMgr(void);
 /**
  * Returns the platform-specific implementation of the BLEManager singleton object.
  *
- * Weave applications can use this to gain access to features of the BLEManager
+ * chip applications can use this to gain access to features of the BLEManager
  * that are specific to the selected platform.
  */
 extern BLEManagerImpl & BLEMgrImpl(void);
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 /* Include a header file containing the implementation of the BLEManager
  * object for the selected platform.
@@ -105,16 +102,15 @@ extern BLEManagerImpl & BLEMgrImpl(void);
 #ifdef EXTERNAL_BLEMANAGERIMPL_HEADER
 #include EXTERNAL_BLEMANAGERIMPL_HEADER
 #else
-#define BLEMANAGERIMPL_HEADER <Weave/DeviceLayer/WEAVE_DEVICE_LAYER_TARGET/BLEManagerImpl.h>
+#define BLEMANAGERIMPL_HEADER <CHIP_DEVICE_LAYER_TARGET/BLEManagerImpl.h>
 #include BLEMANAGERIMPL_HEADER
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-inline WEAVE_ERROR BLEManager::Init(void)
+inline CHIP_ERROR BLEManager::Init(void)
 {
     return static_cast<ImplClass*>(this)->_Init();
 }
@@ -124,7 +120,7 @@ inline BLEManager::WoBLEServiceMode BLEManager::GetWoBLEServiceMode(void)
     return static_cast<ImplClass*>(this)->_GetWoBLEServiceMode();
 }
 
-inline WEAVE_ERROR BLEManager::SetWoBLEServiceMode(WoBLEServiceMode val)
+inline CHIP_ERROR BLEManager::SetWoBLEServiceMode(WoBLEServiceMode val)
 {
     return static_cast<ImplClass*>(this)->_SetWoBLEServiceMode(val);
 }
@@ -134,7 +130,7 @@ inline bool BLEManager::IsAdvertisingEnabled(void)
     return static_cast<ImplClass*>(this)->_IsAdvertisingEnabled();
 }
 
-inline WEAVE_ERROR BLEManager::SetAdvertisingEnabled(bool val)
+inline CHIP_ERROR BLEManager::SetAdvertisingEnabled(bool val)
 {
     return static_cast<ImplClass*>(this)->_SetAdvertisingEnabled(val);
 }
@@ -144,7 +140,7 @@ inline bool BLEManager::IsFastAdvertisingEnabled(void)
     return static_cast<ImplClass*>(this)->_IsFastAdvertisingEnabled();
 }
 
-inline WEAVE_ERROR BLEManager::SetFastAdvertisingEnabled(bool val)
+inline CHIP_ERROR BLEManager::SetFastAdvertisingEnabled(bool val)
 {
     return static_cast<ImplClass*>(this)->_SetFastAdvertisingEnabled(val);
 }
@@ -154,12 +150,12 @@ inline bool BLEManager::IsAdvertising(void)
     return static_cast<ImplClass*>(this)->_IsAdvertising();
 }
 
-inline WEAVE_ERROR BLEManager::GetDeviceName(char * buf, size_t bufSize)
+inline CHIP_ERROR BLEManager::GetDeviceName(char * buf, size_t bufSize)
 {
     return static_cast<ImplClass*>(this)->_GetDeviceName(buf, bufSize);
 }
 
-inline WEAVE_ERROR BLEManager::SetDeviceName(const char * deviceName)
+inline CHIP_ERROR BLEManager::SetDeviceName(const char * deviceName)
 {
     return static_cast<ImplClass*>(this)->_SetDeviceName(deviceName);
 }
@@ -169,22 +165,21 @@ inline uint16_t BLEManager::NumConnections(void)
     return static_cast<ImplClass*>(this)->_NumConnections();
 }
 
-inline void BLEManager::OnPlatformEvent(const WeaveDeviceEvent * event)
+inline void BLEManager::OnPlatformEvent(const chipDeviceEvent * event)
 {
     static_cast<ImplClass*>(this)->_OnPlatformEvent(event);
 }
 
-inline ::nl::Ble::BleLayer * BLEManager::GetBleLayer(void) const
+inline ::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 {
     return static_cast<const ImplClass*>(this)->_GetBleLayer();
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WOBLE
 
 #endif // BLE_MANAGER_H
 
