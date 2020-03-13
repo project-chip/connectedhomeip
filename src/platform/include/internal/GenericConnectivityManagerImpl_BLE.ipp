@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,11 +24,10 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_IPP
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_IPP
 
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_BLE.h>
+#include <internal/GenericConnectivityManagerImpl_BLE.h>
 
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -54,8 +52,7 @@ const char * GenericConnectivityManagerImpl_BLE<ImplClass>::_WoBLEServiceModeToS
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
 #endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_IPP

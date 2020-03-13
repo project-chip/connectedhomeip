@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,8 +24,7 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_TUNNEL_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_TUNNEL_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -56,7 +54,7 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::ServiceTunnelMode _GetServiceTunnelMode(void);
-    WEAVE_ERROR _SetServiceTunnelMode(ConnectivityManager::ServiceTunnelMode val);
+    CHIP_ERROR _SetServiceTunnelMode(ConnectivityManager::ServiceTunnelMode val);
     bool _IsServiceTunnelConnected(void);
     bool _IsServiceTunnelRestricted(void);
     bool _HaveServiceConnectivityViaTunnel(void);
@@ -74,9 +72,9 @@ inline ConnectivityManager::ServiceTunnelMode GenericConnectivityManagerImpl_NoT
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_SetServiceTunnelMode(ConnectivityManager::ServiceTunnelMode val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_SetServiceTunnelMode(ConnectivityManager::ServiceTunnelMode val)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
@@ -106,7 +104,6 @@ inline const char * GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_Service
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_TUNNEL_H

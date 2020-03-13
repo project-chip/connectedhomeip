@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,8 +24,7 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_BLE_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_BLE_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -56,13 +54,13 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::WoBLEServiceMode _GetWoBLEServiceMode(void);
-    WEAVE_ERROR _SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val);
+    CHIP_ERROR _SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled(void);
-    WEAVE_ERROR _SetBLEAdvertisingEnabled(bool val);
+    CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
     bool _IsBLEFastAdvertisingEnabled(void);
-    WEAVE_ERROR _SetBLEFastAdvertisingEnabled(bool val);
-    WEAVE_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
-    WEAVE_ERROR _SetBLEDeviceName(const char * deviceName);
+    CHIP_ERROR _SetBLEFastAdvertisingEnabled(bool val);
+    CHIP_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR _SetBLEDeviceName(const char * deviceName);
     uint16_t _NumBLEConnections(void);
     static const char * _WoBLEServiceModeToStr(ConnectivityManager::WoBLEServiceMode mode);
 
@@ -78,9 +76,9 @@ inline ConnectivityManager::WoBLEServiceMode GenericConnectivityManagerImpl_NoBL
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
@@ -90,9 +88,9 @@ inline bool GenericConnectivityManagerImpl_NoBLE<ImplClass>::_IsBLEAdvertisingEn
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEAdvertisingEnabled(bool val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEAdvertisingEnabled(bool val)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
@@ -102,21 +100,21 @@ inline bool GenericConnectivityManagerImpl_NoBLE<ImplClass>::_IsBLEFastAdvertisi
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetBLEDeviceName(char * buf, size_t bufSize)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetBLEDeviceName(char * buf, size_t bufSize)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEDeviceName(const char * deviceName)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEDeviceName(const char * deviceName)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
@@ -133,7 +131,6 @@ inline const char * GenericConnectivityManagerImpl_NoBLE<ImplClass>::_WoBLEServi
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_BLE_H
