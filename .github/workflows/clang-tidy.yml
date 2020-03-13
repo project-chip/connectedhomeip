@@ -3,7 +3,7 @@ name: Tidy
 on: [pull_request]
 
 jobs:
-  build:
+  clang-tidy:
     runs-on: ubuntu-latest
 
     steps:
