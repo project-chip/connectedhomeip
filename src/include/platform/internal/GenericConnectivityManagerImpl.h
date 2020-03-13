@@ -24,7 +24,7 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_H
 
-#include <internal/DeviceDescriptionServer.h>
+#include <platform/internal/DeviceDescriptionServer.h>
 
 
 namespace chip {

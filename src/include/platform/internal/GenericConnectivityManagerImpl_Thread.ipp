@@ -24,8 +24,8 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_IPP
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_IPP
 
-#include <internal/ChipDeviceLayerInternal.h>
-#include <internal/GenericConnectivityManagerImpl_Thread.h>
+#include <platform/internal/ChipDeviceLayerInternal.h>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
 
 namespace chip {
 namespace DeviceLayer {
