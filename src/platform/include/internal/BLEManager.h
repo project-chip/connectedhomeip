@@ -24,7 +24,7 @@
 #ifndef BLE_MANAGER_H
 #define BLE_MANAGER_H
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 namespace chip {
 namespace DeviceLayer {
@@ -33,10 +33,10 @@ namespace Internal {
 class BLEManagerImpl;
 
 /**
- * Provides control over WoBLE services and connectivity for a chip device.
+ * Provides control over CHIPoBLE services and connectivity for a chip device.
  *
  * BLEManager defines the abstract interface of a singleton object that provides
- * control over WoBLE services and connectivity for a chip device.  BLEManager
+ * control over CHIPoBLE services and connectivity for a chip device.  BLEManager
  * is an internal object that is used by other components with the chip Device
  * Layer, but is not directly accessible to the application.
  */
@@ -48,11 +48,11 @@ public:
 
     // ===== Members that define the internal interface of the BLEManager
 
-    using WoBLEServiceMode = ConnectivityManager::WoBLEServiceMode;
+    using CHIPoBLEServiceMode = ConnectivityManager::CHIPoBLEServiceMode;
 
     CHIP_ERROR Init(void);
-    WoBLEServiceMode GetWoBLEServiceMode(void);
-    CHIP_ERROR SetWoBLEServiceMode(WoBLEServiceMode val);
+    CHIPoBLEServiceMode GetCHIPoBLEServiceMode(void);
+    CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsAdvertisingEnabled(void);
     CHIP_ERROR SetAdvertisingEnabled(bool val);
     bool IsFastAdvertisingEnabled(void);
@@ -115,14 +115,14 @@ inline CHIP_ERROR BLEManager::Init(void)
     return static_cast<ImplClass*>(this)->_Init();
 }
 
-inline BLEManager::WoBLEServiceMode BLEManager::GetWoBLEServiceMode(void)
+inline BLEManager::CHIPoBLEServiceMode BLEManager::GetCHIPoBLEServiceMode(void)
 {
-    return static_cast<ImplClass*>(this)->_GetWoBLEServiceMode();
+    return static_cast<ImplClass*>(this)->_GetCHIPoBLEServiceMode();
 }
 
-inline CHIP_ERROR BLEManager::SetWoBLEServiceMode(WoBLEServiceMode val)
+inline CHIP_ERROR BLEManager::SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
-    return static_cast<ImplClass*>(this)->_SetWoBLEServiceMode(val);
+    return static_cast<ImplClass*>(this)->_SetCHIPoBLEServiceMode(val);
 }
 
 inline bool BLEManager::IsAdvertisingEnabled(void)
@@ -179,7 +179,7 @@ inline ::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WOBLE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #endif // BLE_MANAGER_H
 

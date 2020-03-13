@@ -35,15 +35,15 @@ namespace Internal {
 template class GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>;
 
 template<class ImplClass>
-const char * GenericConnectivityManagerImpl_BLE<ImplClass>::_WoBLEServiceModeToStr(ConnectivityManager::WoBLEServiceMode mode)
+const char * GenericConnectivityManagerImpl_BLE<ImplClass>::_CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode)
 {
     switch (mode)
     {
-    case ConnectivityManager::kWoBLEServiceMode_NotSupported:
+    case ConnectivityManager::kCHIPoBLEServiceMode_NotSupported:
         return "NotSupported";
-    case ConnectivityManager::kWoBLEServiceMode_Enabled:
+    case ConnectivityManager::kCHIPoBLEServiceMode_Enabled:
         return "Disabled";
-    case ConnectivityManager::kWoBLEServiceMode_Disabled:
+    case ConnectivityManager::kCHIPoBLEServiceMode_Disabled:
         return "Enabled";
     default:
         return "(unknown)";

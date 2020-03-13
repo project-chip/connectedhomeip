@@ -195,13 +195,13 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  */
 
 /**
- *  @def BLE_ERROR_WOBLE_PROTOCOL_ABORT
+ *  @def BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT
  *
  *  @brief
  *    A BLE Transport Protocol (BTP) error was encountered.
  *
  */
-#define BLE_ERROR_WOBLE_PROTOCOL_ABORT                     _BLE_ERROR(11)
+#define BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT                     _BLE_ERROR(11)
 
 /**
  *  @def BLE_ERROR_REMOTE_DEVICE_DISCONNECTED

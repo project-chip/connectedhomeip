@@ -7,7 +7,7 @@
 /* Path to BLE platform config header file */
 /* #undef BLE_PLATFORM_CONFIG_INCLUDE */
 
-/* Define to 1 if you want to enable WoBle over bluez. */
+/* Define to 1 if you want to enable CHIPoBle over bluez. */
 #define CONFIG_BLE_PLATFORM_BLUEZ 0
 
 /* Define to 1 if you want to use the CHIP Device Layer. */
@@ -426,9 +426,9 @@
 /* Path to CHIP Device Layer platform config header file */
 /* #undef CHIP_DEVICE_PROJECT_CONFIG_INCLUDE */
 
-/* Define to 1 if you want to enable WoBle Control Path and Throughput Test.
+/* Define to 1 if you want to enable CHIPoBle Control Path and Throughput Test.
    */
-#define CHIP_ENABLE_WOBLE_TEST 0
+#define CHIP_ENABLE_CHIPOBLE_TEST 0
 
 /* Define to 1 if support for fuzzing enabled */
 /* #undef CHIP_FUZZING_ENABLED */

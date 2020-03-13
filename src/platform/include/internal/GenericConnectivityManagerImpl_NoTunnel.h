@@ -40,7 +40,7 @@ namespace Internal {
  * For example:
  *
  * ```
- * if (ConnectivityMgr().GetServiceTunnelMode() != ConnectivityManager::kWoBLEServiceMode_NotSupported)
+ * if (ConnectivityMgr().GetServiceTunnelMode() != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
  * {
  *     // ... do something on devices that support service tunnels ...
  * }
