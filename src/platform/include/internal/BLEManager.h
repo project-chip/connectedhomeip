@@ -61,7 +61,7 @@ public:
     CHIP_ERROR GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR SetDeviceName(const char * deviceName);
     uint16_t NumConnections(void);
-    void OnPlatformEvent(const chipDeviceEvent * event);
+    void OnPlatformEvent(const ChipDeviceEvent * event);
     ::Ble::BleLayer * GetBleLayer(void) const;
 
 protected:
@@ -165,7 +165,7 @@ inline uint16_t BLEManager::NumConnections(void)
     return static_cast<ImplClass*>(this)->_NumConnections();
 }
 
-inline void BLEManager::OnPlatformEvent(const chipDeviceEvent * event)
+inline void BLEManager::OnPlatformEvent(const ChipDeviceEvent * event)
 {
     static_cast<ImplClass*>(this)->_OnPlatformEvent(event);
 }
