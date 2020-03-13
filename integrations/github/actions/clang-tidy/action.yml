@@ -1,5 +1,5 @@
 name: "Clang Pull Request Tidy"
-description: "clang-lint"
+description: "clang-tidy"
 inputs:
   files_added:
     description: "JSON list of files added"
