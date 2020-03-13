@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,10 +24,9 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_H
 
-#include <Weave/DeviceLayer/internal/BLEManager.h>
+#include <internal/BLEManager.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 class ConnectivityManagerImpl;
@@ -56,14 +54,14 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::WoBLEServiceMode _GetWoBLEServiceMode(void);
-    WEAVE_ERROR _SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val);
+    CHIP_ERROR _SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled(void);
-    WEAVE_ERROR _SetBLEAdvertisingEnabled(bool val);
+    CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
     bool _IsBLEFastAdvertisingEnabled(void);
-    WEAVE_ERROR _SetBLEFastAdvertisingEnabled(bool val);
+    CHIP_ERROR _SetBLEFastAdvertisingEnabled(bool val);
     bool _IsBLEAdvertising(void);
-    WEAVE_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
-    WEAVE_ERROR _SetBLEDeviceName(const char * deviceName);
+    CHIP_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR _SetBLEDeviceName(const char * deviceName);
     uint16_t _NumBLEConnections(void);
     static const char * _WoBLEServiceModeToStr(ConnectivityManager::WoBLEServiceMode mode);
 
@@ -82,7 +80,7 @@ inline ConnectivityManager::WoBLEServiceMode GenericConnectivityManagerImpl_BLE<
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val)
 {
     return BLEMgr().SetWoBLEServiceMode(val);
 }
@@ -94,7 +92,7 @@ inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertisingEnab
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEAdvertisingEnabled(bool val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEAdvertisingEnabled(bool val)
 {
     return BLEMgr().SetAdvertisingEnabled(val);
 }
@@ -106,7 +104,7 @@ inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEFastAdvertising
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
 {
     return BLEMgr().SetFastAdvertisingEnabled(val);
 }
@@ -118,13 +116,13 @@ inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertising(voi
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_GetBLEDeviceName(char * buf, size_t bufSize)
+inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_GetBLEDeviceName(char * buf, size_t bufSize)
 {
     return BLEMgr().GetDeviceName(buf, bufSize);
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEDeviceName(const char * deviceName)
+inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEDeviceName(const char * deviceName)
 {
     return BLEMgr().SetDeviceName(deviceName);
 }
@@ -137,7 +135,6 @@ inline uint16_t GenericConnectivityManagerImpl_BLE<ImplClass>::_NumBLEConnection
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_H

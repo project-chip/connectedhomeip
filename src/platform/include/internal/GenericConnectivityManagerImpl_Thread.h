@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,10 +24,9 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_H
 
-#include <Weave/DeviceLayer/ThreadStackManager.h>
+#include <ThreadStackManager.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 class ConnectivityManagerImpl;
@@ -55,15 +53,15 @@ protected:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     void _Init(void);
-    void _OnPlatformEvent(const WeaveDeviceEvent * event);
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
     ConnectivityManager::ThreadMode _GetThreadMode(void);
-    WEAVE_ERROR _SetThreadMode(ConnectivityManager::ThreadMode val);
+    CHIP_ERROR _SetThreadMode(ConnectivityManager::ThreadMode val);
     bool _IsThreadEnabled(void);
     bool _IsThreadApplicationControlled(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
-    WEAVE_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
+    CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
     void _GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-    WEAVE_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+    CHIP_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
     bool _IsThreadAttached(void);
     bool _IsThreadProvisioned(void);
     void _ClearThreadProvision(void);
@@ -134,7 +132,7 @@ inline ConnectivityManager::ThreadDeviceType GenericConnectivityManagerImpl_Thre
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
     return ThreadStackMgrImpl().SetThreadDeviceType(deviceType);
 }
@@ -146,7 +144,7 @@ inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadPollingC
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     return ThreadStackMgrImpl().SetThreadPollingConfig(pollingConfig);
 }
@@ -159,7 +157,6 @@ inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnec
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_H

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,8 +24,7 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -56,16 +54,16 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::WiFiStationMode _GetWiFiStationMode(void);
-    WEAVE_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
+    CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
     bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationApplicationControlled(void);
     bool _IsWiFiStationConnected(void);
     uint32_t _GetWiFiStationReconnectIntervalMS(void);
-    WEAVE_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
     ConnectivityManager::WiFiAPMode _GetWiFiAPMode(void);
-    WEAVE_ERROR _SetWiFiAPMode(ConnectivityManager::WiFiAPMode val);
+    CHIP_ERROR _SetWiFiAPMode(ConnectivityManager::WiFiAPMode val);
     bool _IsWiFiAPActive(void);
     bool _IsWiFiAPApplicationControlled(void);
     void _DemandStartWiFiAP(void);
@@ -73,7 +71,7 @@ public:
     void _MaintainOnDemandWiFiAP(void);
     uint32_t _GetWiFiAPIdleTimeoutMS(void);
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
-    WEAVE_ERROR _GetAndLogWifiStatsCounters(void);
+    CHIP_ERROR _GetAndLogWifiStatsCounters(void);
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
@@ -92,9 +90,9 @@ inline ConnectivityManager::WiFiStationMode GenericConnectivityManagerImpl_NoWiF
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
@@ -116,9 +114,9 @@ inline uint32_t GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetWiFiStatio
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiStationReconnectIntervalMS(uint32_t val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiStationReconnectIntervalMS(uint32_t val)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
@@ -139,9 +137,9 @@ inline ConnectivityManager::WiFiAPMode GenericConnectivityManagerImpl_NoWiFi<Imp
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiAPMode(ConnectivityManager::WiFiAPMode val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiAPMode(ConnectivityManager::WiFiAPMode val)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
@@ -183,9 +181,9 @@ inline void GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetWiFiAPIdleTime
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetAndLogWifiStatsCounters(void)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetAndLogWifiStatsCounters(void)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
@@ -219,7 +217,6 @@ inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPMod
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H

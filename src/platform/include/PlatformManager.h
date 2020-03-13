@@ -23,7 +23,7 @@
 #ifndef PLATFORM_MANAGER_H
 #define PLATFORM_MANAGER_H
 
-#include <platform/CHIPDeviceEvent.h>
+#include <CHIPDeviceEvent.h>
 
 namespace chip {
 namespace System {

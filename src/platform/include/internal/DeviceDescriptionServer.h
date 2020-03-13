@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,34 +23,33 @@
 #ifndef DEVICE_DESCRIPTION_SERVER_H
 #define DEVICE_DESCRIPTION_SERVER_H
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Profiles/device-description/DeviceDescription.h>
+#include <internal/ChipDeviceLayerInternal.h>
+#include <profiles/device-description/DeviceDescription.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Implements the Weave Device Description profile for a Weave device.
+ * Implements the chip Device Description profile for a chip device.
  */
 class DeviceDescriptionServer final
-    : public ::nl::Weave::Profiles::DeviceDescription::DeviceDescriptionServer
+    : public ::chip::Profiles::DeviceDescription::DeviceDescriptionServer
 {
-    typedef ::nl::Weave::Profiles::DeviceDescription::DeviceDescriptionServer ServerBaseClass;
+    typedef ::chip::Profiles::DeviceDescription::DeviceDescriptionServer ServerBaseClass;
 
 public:
 
     // ===== Members for internal use by other Device Layer components.
 
-    WEAVE_ERROR Init();
+    CHIP_ERROR Init();
 
     bool IsUserSelectedModeActive(void);
     void SetUserSelectedMode(bool val);
     uint16_t GetUserSelectedModeTimeout(void);
     void SetUserSelectedModeTimeout(uint16_t val);
 
-    void OnPlatformEvent(const WeaveDeviceEvent * event);
+    void OnPlatformEvent(const ChipDeviceEvent * event);
 
 private:
 
@@ -72,8 +70,8 @@ private:
     uint16_t mUserSelectedModeTimeoutSec;
 
     static void HandleIdentifyRequest(void *appState, uint64_t nodeId, const IPAddress& nodeAddr,
-            const ::nl::Weave::Profiles::DeviceDescription::IdentifyRequestMessage& reqMsg, bool& sendResp,
-            ::nl::Weave::Profiles::DeviceDescription::IdentifyResponseMessage& respMsg);
+            const ::chip::Profiles::DeviceDescription::IdentifyRequestMessage& reqMsg, bool& sendResp,
+            ::chip::Profiles::DeviceDescription::IdentifyResponseMessage& respMsg);
 
 protected:
 
@@ -97,8 +95,7 @@ inline DeviceDescriptionServer & DeviceDescriptionSvr(void)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
 #endif // DEVICE_DESCRIPTION_SERVER_H

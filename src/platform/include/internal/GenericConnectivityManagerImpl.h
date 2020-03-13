@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,11 +24,10 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_H
 
-#include <Weave/DeviceLayer/internal/DeviceDescriptionServer.h>
+#include <internal/DeviceDescriptionServer.h>
 
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -85,7 +83,6 @@ inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeo
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_H
