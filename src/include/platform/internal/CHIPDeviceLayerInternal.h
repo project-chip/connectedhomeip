@@ -29,7 +29,7 @@ enum
 } // namespace Logging
 } // namespace chip
 
-#include <CHIPDeviceLayer.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace DeviceLayer {
