@@ -53,7 +53,7 @@ endif
 	$(_@)$(CXX) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) $(GCOV_FLAGS)
 	@echo "Building tests <=  $<"
 
-run_tests: $(Tests_C_Exe) $(Tests_CPP_Exe)
+check: $(Tests_C_Exe) $(Tests_CPP_Exe)
 	@echo "Running tests <=  $<"
 	$(_@)$(foreach f,$^,$(VALGRIND) ./$(f);)
 ifneq ($(and $(GCOV),$(Tests_C_Files)),)
