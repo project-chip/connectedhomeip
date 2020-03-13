@@ -18,6 +18,6 @@ jobs:
         id: clang-tidy
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          CLANG_ARGUMENTS: "-checks=-*,clang-analyzer-*,-clang-analyzer-cplusplus* -- -Isrc/includes"
+          CLANG_TIDY_ARGUMENTS: "-checks=-*,clang-analyzer-*,-clang-analyzer-cplusplus* -- -Isrc/includes"
           FILES_MODIFIED: ${{ steps.get-changed-files.outputs.files_updated }}
           FILES_ADDED: ${{ steps.get-changed-files.outputs.files_created }}
