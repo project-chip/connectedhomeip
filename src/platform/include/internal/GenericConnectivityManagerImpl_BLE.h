@@ -53,8 +53,8 @@ public:
 
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
-    ConnectivityManager::WoBLEServiceMode _GetWoBLEServiceMode(void);
-    CHIP_ERROR _SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val);
+    ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
+    CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled(void);
     CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
     bool _IsBLEFastAdvertisingEnabled(void);
@@ -63,7 +63,7 @@ public:
     CHIP_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetBLEDeviceName(const char * deviceName);
     uint16_t _NumBLEConnections(void);
-    static const char * _WoBLEServiceModeToStr(ConnectivityManager::WoBLEServiceMode mode);
+    static const char * _CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode);
 
 private:
 
@@ -74,15 +74,15 @@ private:
 extern template class GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>;
 
 template<class ImplClass>
-inline ConnectivityManager::WoBLEServiceMode GenericConnectivityManagerImpl_BLE<ImplClass>::_GetWoBLEServiceMode(void)
+inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_BLE<ImplClass>::_GetCHIPoBLEServiceMode(void)
 {
-    return BLEMgr().GetWoBLEServiceMode();
+    return BLEMgr().GetCHIPoBLEServiceMode();
 }
 
 template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
 {
-    return BLEMgr().SetWoBLEServiceMode(val);
+    return BLEMgr().SetCHIPoBLEServiceMode(val);
 }
 
 template<class ImplClass>

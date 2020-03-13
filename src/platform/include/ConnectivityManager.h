@@ -79,11 +79,11 @@ public:
         kServiceTunnelMode_Enabled                  = 2,
     };
 
-    enum WoBLEServiceMode
+    enum CHIPoBLEServiceMode
     {
-        kWoBLEServiceMode_NotSupported              = 0,
-        kWoBLEServiceMode_Enabled                   = 1,
-        kWoBLEServiceMode_Disabled                  = 2,
+        kCHIPoBLEServiceMode_NotSupported              = 0,
+        kCHIPoBLEServiceMode_Enabled                   = 1,
+        kCHIPoBLEServiceMode_Disabled                  = 2,
     };
 
     enum ThreadDeviceType
@@ -148,9 +148,9 @@ public:
     // Service connectivity methods
     bool HaveServiceConnectivity(void);
 
-    // WoBLE service methods
-    WoBLEServiceMode GetWoBLEServiceMode(void);
-    CHIP_ERROR SetWoBLEServiceMode(WoBLEServiceMode val);
+    // CHIPoBLE service methods
+    CHIPoBLEServiceMode GetCHIPoBLEServiceMode(void);
+    CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsBLEAdvertisingEnabled(void);
     CHIP_ERROR SetBLEAdvertisingEnabled(bool val);
     bool IsBLEFastAdvertisingEnabled(void);
@@ -170,7 +170,7 @@ public:
     static const char * WiFiStationModeToStr(WiFiStationMode mode);
     static const char * WiFiAPModeToStr(WiFiAPMode mode);
     static const char * ServiceTunnelModeToStr(ServiceTunnelMode mode);
-    static const char * WoBLEServiceModeToStr(WoBLEServiceMode mode);
+    static const char * CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode);
 
 private:
 
@@ -446,14 +446,14 @@ inline bool ConnectivityManager::HaveServiceConnectivityViaThread(void)
     return static_cast<ImplClass*>(this)->_HaveServiceConnectivityViaThread();
 }
 
-inline ConnectivityManager::WoBLEServiceMode ConnectivityManager::GetWoBLEServiceMode(void)
+inline ConnectivityManager::CHIPoBLEServiceMode ConnectivityManager::GetCHIPoBLEServiceMode(void)
 {
-    return static_cast<ImplClass*>(this)->_GetWoBLEServiceMode();
+    return static_cast<ImplClass*>(this)->_GetCHIPoBLEServiceMode();
 }
 
-inline CHIP_ERROR ConnectivityManager::SetWoBLEServiceMode(WoBLEServiceMode val)
+inline CHIP_ERROR ConnectivityManager::SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
-    return static_cast<ImplClass*>(this)->_SetWoBLEServiceMode(val);
+    return static_cast<ImplClass*>(this)->_SetCHIPoBLEServiceMode(val);
 }
 
 inline bool ConnectivityManager::IsBLEAdvertisingEnabled(void)
@@ -531,9 +531,9 @@ inline const char * ConnectivityManager::ServiceTunnelModeToStr(ServiceTunnelMod
     return ImplClass::_ServiceTunnelModeToStr(mode);
 }
 
-inline const char * ConnectivityManager::WoBLEServiceModeToStr(WoBLEServiceMode mode)
+inline const char * ConnectivityManager::CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode)
 {
-    return ImplClass::_WoBLEServiceModeToStr(mode);
+    return ImplClass::_CHIPoBLEServiceModeToStr(mode);
 }
 
 inline CHIP_ERROR ConnectivityManager::Init(void)

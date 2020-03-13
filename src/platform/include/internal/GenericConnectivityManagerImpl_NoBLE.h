@@ -40,9 +40,9 @@ namespace Internal {
  * For example:
  *
  * ```
- * if (ConnectivityMgr().GetWoBLEServiceMode() != ConnectivityManager::kWoBLEServiceMode_NotSupported)
+ * if (ConnectivityMgr().GetCHIPoBLEServiceMode() != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
  * {
- *     // ... do something on devices that support WoBLE ...
+ *     // ... do something on devices that support CHIPoBLE ...
  * }
  * ```
  */
@@ -53,8 +53,8 @@ public:
 
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
-    ConnectivityManager::WoBLEServiceMode _GetWoBLEServiceMode(void);
-    CHIP_ERROR _SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val);
+    ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
+    CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled(void);
     CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
     bool _IsBLEFastAdvertisingEnabled(void);
@@ -62,7 +62,7 @@ public:
     CHIP_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetBLEDeviceName(const char * deviceName);
     uint16_t _NumBLEConnections(void);
-    static const char * _WoBLEServiceModeToStr(ConnectivityManager::WoBLEServiceMode mode);
+    static const char * _CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode);
 
 private:
 
@@ -70,13 +70,13 @@ private:
 };
 
 template<class ImplClass>
-inline ConnectivityManager::WoBLEServiceMode GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetWoBLEServiceMode(void)
+inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetCHIPoBLEServiceMode(void)
 {
-    return ConnectivityManager::kWoBLEServiceMode_NotSupported;
+    return ConnectivityManager::kCHIPoBLEServiceMode_NotSupported;
 }
 
 template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetWoBLEServiceMode(ConnectivityManager::WoBLEServiceMode val)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -124,7 +124,7 @@ inline uint16_t GenericConnectivityManagerImpl_NoBLE<ImplClass>::_NumBLEConnecti
 }
 
 template<class ImplClass>
-inline const char * GenericConnectivityManagerImpl_NoBLE<ImplClass>::_WoBLEServiceModeToStr(ConnectivityManager::WoBLEServiceMode mode)
+inline const char * GenericConnectivityManagerImpl_NoBLE<ImplClass>::_CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode)
 {
     return NULL;
 }

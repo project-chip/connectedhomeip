@@ -313,35 +313,35 @@
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME "ap"
 #endif
 
-// -------------------- BLE/WoBLE Configuration --------------------
+// -------------------- BLE/CHIPoBLE Configuration --------------------
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_WOBLE
+ * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
- * Enable support for chip-over-BLE (WoBLE).
+ * Enable support for chip-over-BLE (CHIPoBLE).
  */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_WOBLE
-#define CHIP_DEVICE_CONFIG_ENABLE_WOBLE 1
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SINGLE_WOBLE_CONNECTION
+ * CHIP_DEVICE_CONFIG_SINGLE_CHIPOBLE_CONNECTION
  *
- * Limit support for chip-over-BLE (WoBLE) to a single connection.
- * When set, WoBLE advertisements will stop while a WoBLE connection is active.
+ * Limit support for chip-over-BLE (CHIPoBLE) to a single connection.
+ * When set, CHIPoBLE advertisements will stop while a CHIPoBLE connection is active.
  */
-#ifndef CHIP_DEVICE_CONFIG_WOBLE_SINGLE_CONNECTION
-#define CHIP_DEVICE_CONFIG_WOBLE_SINGLE_CONNECTION 0
+#ifndef CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION
+#define CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION 0
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_WOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
+ * CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
  *
- * Automatically disable WoBLE advertising when the device transitions to a fully
+ * Automatically disable CHIPoBLE advertising when the device transitions to a fully
  * provisioned state.
  */
-#ifndef CHIP_DEVICE_CONFIG_WOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-#define CHIP_DEVICE_CONFIG_WOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED 0
+#ifndef CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
+#define CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED 0
 #endif
 
 /**
@@ -351,7 +351,7 @@
  * consists of the final two bytes of the device's chip node id in hex.
  *
  * NOTE: The device layer limits the total length of a device name to 16 characters.
- * However, due to other data sent in WoBLE advertise packets, the device name
+ * However, due to other data sent in CHIPoBLE advertise packets, the device name
  * may need to be shorter.
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX

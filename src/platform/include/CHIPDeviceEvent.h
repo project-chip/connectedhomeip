@@ -168,11 +168,11 @@ enum PublicEventTypes
     kSessionEstablished,
 
     /**
-     * WoBLE Connection Established
+     * CHIPoBLE Connection Established
      *
-     * Signals that an external entity has established a new WoBLE connection with the device.
+     * Signals that an external entity has established a new CHIPoBLE connection with the device.
      */
-    kWoBLEConnectionEstablished,
+    kCHIPoBLEConnectionEstablished,
 
     /**
      * Thread State Change
@@ -189,11 +189,11 @@ enum PublicEventTypes
     kThreadInterfaceStateChange,
 
     /**
-     * chip-over-BLE (WoBLE) Advertising Change
+     * chip-over-BLE (CHIPoBLE) Advertising Change
      *
-     * Signals that the state of WoBLE advertising has changed.
+     * Signals that the state of CHIPoBLE advertising has changed.
      */
-    kWoBLEAdvertisingChange,
+    kCHIPoBLEAdvertisingChange,
 };
 
 /**
@@ -208,11 +208,11 @@ enum InternalEventTypes
     kNoOp,
     kCallWorkFunct,
     kChipSystemLayerEvent,
-    kWoBLESubscribe,
-    kWoBLEUnsubscribe,
-    kWoBLEWriteReceived,
-    kWoBLEIndicateConfirm,
-    kWoBLEConnectionError,
+    kCHIPoBLESubscribe,
+    kCHIPoBLEUnsubscribe,
+    kCHIPoBLEWriteReceived,
+    kCHIPoBLEIndicateConfirm,
+    kCHIPoBLEConnectionError,
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -359,25 +359,25 @@ struct ChipDeviceEvent final
         struct
         {
             BLE_CONNECTION_OBJECT ConId;
-        } WoBLESubscribe;
+        } CHIPoBLESubscribe;
         struct
         {
             BLE_CONNECTION_OBJECT ConId;
-        } WoBLEUnsubscribe;
+        } CHIPoBLEUnsubscribe;
         struct
         {
             BLE_CONNECTION_OBJECT ConId;
             PacketBuffer * Data;
-        } WoBLEWriteReceived;
+        } CHIPoBLEWriteReceived;
         struct
         {
             BLE_CONNECTION_OBJECT ConId;
-        } WoBLEIndicateConfirm;
+        } CHIPoBLEIndicateConfirm;
         struct
         {
             BLE_CONNECTION_OBJECT ConId;
             CHIP_ERROR Reason;
-        } WoBLEConnectionError;
+        } CHIPoBLEConnectionError;
         struct
         {
             bool RoleChanged : 1;
@@ -392,7 +392,7 @@ struct ChipDeviceEvent final
         struct
         {
             ActivityChange Result;
-        } WoBLEAdvertisingChange;
+        } CHIPoBLEAdvertisingChange;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

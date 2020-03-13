@@ -86,7 +86,7 @@ bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err)
     case BLE_ERROR_NOT_IMPLEMENTED:
         desc = "Not implemented";
         break;
-    case BLE_ERROR_WOBLE_PROTOCOL_ABORT:
+    case BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT:
         desc = "BLE transport protocol fired abort";
         break;
     case BLE_ERROR_REMOTE_DEVICE_DISCONNECTED:

@@ -19,7 +19,6 @@
 #define CHIP_DEVICE_H
 
 #include <core/CHIPCore.h>
-// #include <core/CHIPGlobals.h>
 #include <CHIPDeviceConfig.h>
 #include <CHIPDeviceError.h>
 #include <GeneralUtils.h>
@@ -39,12 +38,6 @@ namespace chip {
 namespace DeviceLayer {
 
 struct chipDeviceEvent;
-/*
-using chip::FabricState;
-using chip::MessageLayer;
-using chip::ExchangeMgr;
-using chip::SecurityMgr;
-*/
 extern chip::System::Layer SystemLayer;
 extern Inet::InetLayer InetLayer;
 
