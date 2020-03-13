@@ -1,3 +1,4 @@
+
 _@=@
 Common_C_Flags = -DHAVE_CONFIG_H -g -O2
 
@@ -21,9 +22,13 @@ endif
 
 CLANG_FORMAT := $(shell command -v clang-format 2> /dev/null)
 ifdef CLANG_FORMAT
-	CLANG_FORMAT += -style=Chromium -i
+	CLANG_FORMAT += -i
 endif
 
+CLANG_TIDY := $(shell command -v clang-tidy 2> /dev/null)
+ifdef CLANG_TIDY
+	CLANG_TIDY += -checks=-*,clang-analyzer-*,-clang-analyzer-cplusplus*
+endif
 
 GCOV := $(shell command -v gcov 2> /dev/null)
 
@@ -31,12 +36,28 @@ ifdef GCOV
         GCOV_FLAGS=-fprofile-arcs -ftest-coverage
 endif
 
+# search up in the tree from where the makefile lives for overrides, other definitions
+__updirs=$(if $1,$(if $2,$(if $(subst /,,$(abspath $2)),$(or $(wildcard $2$1),$(call __updirs,$1,$2../))),$(call __updirs,$1,./)))
+-include $(call __updirs,.yams.min)
+
 %.o: %.c
+ifdef CLANG_FORMAT
+	$(_@)$(CLANG_FORMAT) $<
+endif
 	$(_@)$(CC) $(Module_C_Flags) -c $< -o $@
+ifdef CLANG_TIDY
+	$(_@)$(CLANG_TIDY)  $< -- $(Module_C_Flags)
+endif
 	@echo "CC  <=  $<"
 
 %.o: %.cpp
+ifdef CLANG_FORMAT
+	$(_@)$(CLANG_FORMAT) $<
+endif
 	$(_@)$(CXX) $(Module_C_Flags) -c $< -o $@
+ifdef CLANG_TIDY
+	$(_@)$(CLANG_TIDY) $< -- $(Module_C_Flags)
+endif
 	@echo "CXX  <=  $<"
 
 $(Test_Dir)/%_q: $(Test_Dir)/%.c
@@ -44,6 +65,9 @@ ifdef CLANG_FORMAT
 	$(_@)$(CLANG_FORMAT) $<
 endif
 	$(_@)$(CC) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) $(GCOV_FLAGS)
+ifdef CLANG_TIDY
+	$(_@)$(CLANG_TIDY) $< -- $(Module_Test_C_Flags)
+endif
 	@echo "Building tests <=  $<"
 
 $(Test_Dir)/%_q: $(Test_Dir)/%.cpp
@@ -51,6 +75,9 @@ ifdef CLANG_FORMAT
 	$(_@)$(CLANG_FORMAT) $<
 endif
 	$(_@)$(CXX) $< -o $@ $(Module_Test_C_Flags) -L/usr/local/lib $($(*F)_FLAGS) $(GCOV_FLAGS)
+ifdef CLANG_TIDY
+	$(_@)$(CLANG_TIDY) $< -- $(Module_Test_C_Flags)
+endif
 	@echo "Building tests <=  $<"
 
 run_tests: $(Tests_C_Exe) $(Tests_CPP_Exe)
@@ -68,4 +95,8 @@ my_clean:
 	$(_@)rm -f *.gcda *.gcno *.gcov
 	$(_@)rm -f $(Tests_C_Exe) $(Tests_CPP_Exe) $(Test_Dir)/*.gcda $(Test_Dir)/*.gcno $(Test_Dir)/*.gcov
 	$(_@)rm -rf $(Test_Dir)/*.dSYM
+
+.PHONY: _DEBUG_%
+_DEBUG_%:
+	@echo $*='"$($(*))"'
 

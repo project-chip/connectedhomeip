@@ -1,0 +1,27 @@
+
+VALGRIND := $(shell command -v valgrind 2> /dev/null)
+
+ifdef VALGRIND
+	VALGRIND += --leak-check=yes -q
+endif
+
+CPPCHECK := $(shell command -v cppcheck 2> /dev/null)
+ifdef CPPCHECK
+	CPPCHECK += -q --error-exitcode=1
+endif
+
+CLANG_FORMAT := $(shell command -v clang-format 2> /dev/null)
+ifdef CLANG_FORMAT
+	CLANG_FORMAT += -i
+endif
+
+CLANG_TIDY := $(shell command -v clang-tidy 2> /dev/null)
+ifdef CLANG_TIDY
+	CLANG_TIDY += -checks=-*,clang-analyzer-*,-clang-analyzer-cplusplus*
+endif
+
+GCOV := $(shell command -v gcov 2> /dev/null)
+
+ifdef GCOV
+        GCOV_FLAGS=-fprofile-arcs -ftest-coverage
+endif
