@@ -34,7 +34,7 @@ static FaultInjection::Record sFaultRecordArray[kFault_NumItems];
 static int32_t sFault_WDMNotificationSize_Arguments[1];
 static int32_t sFault_FuzzExchangeHeader_Arguments[1];
 static class FaultInjection::Manager schipFaultInMgr;
-static const FaultInjection::Name sManagerName = "chip";
+static const FaultInjection::Name sManagerName  = "chip";
 static const FaultInjection::Name sFaultNames[] = {
     "AllocExchangeContext",
     "DropIncomingUDPMsg",
@@ -83,28 +83,23 @@ static const FaultInjection::Name sFaultNames[] = {
 #endif // CONFIG_NETWORK_LAYER_BLE
 };
 
-
 /**
  * Get the singleton FaultInjection::Manager for Inet faults
  */
-FaultInjection::Manager &GetManager(void)
+FaultInjection::Manager & GetManager(void)
 {
     if (0 == schipFaultInMgr.GetNumFaults())
     {
-        schipFaultInMgr.Init(kFault_NumItems,
-                              sFaultRecordArray,
-                              sManagerName,
-                              sFaultNames);
+        schipFaultInMgr.Init(kFault_NumItems, sFaultRecordArray, sManagerName, sFaultNames);
         memset(&sFault_WDMNotificationSize_Arguments, 0, sizeof(sFault_WDMNotificationSize_Arguments));
         sFaultRecordArray[kFault_WDM_NotificationSize].mArguments = sFault_WDMNotificationSize_Arguments;
         sFaultRecordArray[kFault_WDM_NotificationSize].mLengthOfArguments =
-            static_cast<uint8_t>(sizeof(sFault_WDMNotificationSize_Arguments)/sizeof(sFault_WDMNotificationSize_Arguments[0]));
+            static_cast<uint8_t>(sizeof(sFault_WDMNotificationSize_Arguments) / sizeof(sFault_WDMNotificationSize_Arguments[0]));
 
         memset(&sFault_FuzzExchangeHeader_Arguments, 0, sizeof(sFault_FuzzExchangeHeader_Arguments));
         sFaultRecordArray[kFault_FuzzExchangeHeaderTx].mArguments = sFault_FuzzExchangeHeader_Arguments;
         sFaultRecordArray[kFault_FuzzExchangeHeaderTx].mLengthOfArguments =
-            static_cast<uint8_t>(sizeof(sFault_FuzzExchangeHeader_Arguments)/sizeof(sFault_FuzzExchangeHeader_Arguments[0]));
-
+            static_cast<uint8_t>(sizeof(sFault_FuzzExchangeHeader_Arguments) / sizeof(sFault_FuzzExchangeHeader_Arguments[0]));
     }
     return schipFaultInMgr;
 }
@@ -116,7 +111,7 @@ FaultInjection::Manager &GetManager(void)
  * @param[in] arg   An index from 0 to (CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES * 5 -1)
  *                  that specifies the byte to be corrupted and the value to use.
  */
-DLL_EXPORT void FuzzExchangeHeader(uint8_t *p, int32_t arg)
+DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg)
 {
     // chip is little endian; this function alters the
     // least significant byte of the header fields.
@@ -128,11 +123,11 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t *p, int32_t arg)
         8  // AckMsgId
     };
     const uint8_t values[CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES] = { 0x1, 0x2, 0xFF };
-    size_t offsetIndex = 0;
-    size_t valueIndex = 0;
-    size_t numOffsets = sizeof(offsets)/sizeof(offsets[0]);
-    offsetIndex = arg % (numOffsets);
-    valueIndex = (arg / numOffsets) % CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES;
+    size_t offsetIndex                                         = 0;
+    size_t valueIndex                                          = 0;
+    size_t numOffsets                                          = sizeof(offsets) / sizeof(offsets[0]);
+    offsetIndex                                                = arg % (numOffsets);
+    valueIndex                                                 = (arg / numOffsets) % CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES;
     p[offsetIndex] ^= values[valueIndex];
 }
 

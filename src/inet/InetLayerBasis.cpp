@@ -42,7 +42,7 @@ namespace Inet {
  *  @param[in]    exceptfds  A pointer to the set of file descriptors with errors.
  *
  */
-void SocketEvents::SetFDs(int socket, int& nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds)
+void SocketEvents::SetFDs(int socket, int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds)
 {
     if (socket != INET_INVALID_SOCKET_FD)
     {
@@ -70,7 +70,7 @@ void SocketEvents::SetFDs(int socket, int& nfds, fd_set *readfds, fd_set *writef
  *  @param[in]    exceptfds  A pointer to the set of file descriptors with errors.
  *
  */
-SocketEvents SocketEvents::FromFDs(int socket, fd_set *readfds, fd_set *writefds, fd_set *exceptfds)
+SocketEvents SocketEvents::FromFDs(int socket, fd_set * readfds, fd_set * writefds, fd_set * exceptfds)
 {
     SocketEvents res;
 

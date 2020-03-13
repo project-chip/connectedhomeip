@@ -64,23 +64,37 @@ namespace System {
 
 static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC];
 
-PacketBuffer* PacketBuffer::sFreeList = PacketBuffer::BuildFreeList();
+PacketBuffer * PacketBuffer::sFreeList = PacketBuffer::BuildFreeList();
 
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 static Mutex sBufferPoolMutex;
 
-#define LOCK_BUF_POOL()     do { sBufferPoolMutex.Lock(); } while (0)
-#define UNLOCK_BUF_POOL()   do { sBufferPoolMutex.Unlock(); } while (0)
+#define LOCK_BUF_POOL()                                                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        sBufferPoolMutex.Lock();                                                                                                   \
+    } while (0)
+#define UNLOCK_BUF_POOL()                                                                                                          \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        sBufferPoolMutex.Unlock();                                                                                                 \
+    } while (0)
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 #endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
 #ifndef LOCK_BUF_POOL
-#define LOCK_BUF_POOL()     do { } while (0)
+#define LOCK_BUF_POOL()                                                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
 #endif // !defined(LOCK_BUF_POOL)
 
 #ifndef UNLOCK_BUF_POOL
-#define UNLOCK_BUF_POOL()   do { } while (0)
+#define UNLOCK_BUF_POOL()                                                                                                          \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
 #endif // !defined(UNLOCK_BUF_POOL)
 
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -90,9 +104,9 @@ static Mutex sBufferPoolMutex;
  *
  *  @return pointer to the start of data.
  */
-uint8_t* PacketBuffer::Start() const
+uint8_t * PacketBuffer::Start() const
 {
-    return static_cast<uint8_t*>(this->payload);
+    return static_cast<uint8_t *>(this->payload);
 }
 
 /**
@@ -106,21 +120,21 @@ uint8_t* PacketBuffer::Start() const
  *  @param[in] aNewStart - A pointer to where the new payload should start.  newStart will be adjusted internally to fall within
  *      the boundaries of the first buffer in the PacketBuffer chain.
  */
-void PacketBuffer::SetStart(uint8_t* aNewStart)
+void PacketBuffer::SetStart(uint8_t * aNewStart)
 {
-    uint8_t* const kStart = reinterpret_cast<uint8_t*>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
-    uint8_t* const kEnd = kStart + this->AllocSize();
+    uint8_t * const kStart = reinterpret_cast<uint8_t *>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    uint8_t * const kEnd   = kStart + this->AllocSize();
 
     if (aNewStart < kStart)
         aNewStart = kStart;
     else if (aNewStart > kEnd)
         aNewStart = kEnd;
 
-    ptrdiff_t lDelta = aNewStart - static_cast<uint8_t*>(this->payload);
+    ptrdiff_t lDelta = aNewStart - static_cast<uint8_t *>(this->payload);
     if (lDelta > this->len)
         lDelta = this->len;
 
-    this->len = static_cast<uint16_t>(static_cast<ptrdiff_t>(this->len) - lDelta);
+    this->len     = static_cast<uint16_t>(static_cast<ptrdiff_t>(this->len) - lDelta);
     this->tot_len = static_cast<uint16_t>(static_cast<ptrdiff_t>(this->tot_len) - lDelta);
     this->payload = aNewStart;
 }
@@ -148,7 +162,7 @@ uint16_t PacketBuffer::DataLength() const
  *  @param[inout] aChainHead - the head of the buffer chain the current buffer belongs to.  May be NULL if the current buffer is
  *      the head of the buffer chain.
  */
-void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer* aChainHead)
+void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
 {
     const uint16_t kMaxDataLen = this->MaxDataLength();
 
@@ -157,13 +171,13 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer* aChainHead)
 
     ptrdiff_t lDelta = static_cast<ptrdiff_t>(aNewLen) - static_cast<ptrdiff_t>(this->len);
 
-    this->len = aNewLen;
-    this->tot_len = (uint16_t) (this->tot_len + lDelta);
+    this->len     = aNewLen;
+    this->tot_len = (uint16_t)(this->tot_len + lDelta);
 
     while (aChainHead != NULL && aChainHead != this)
     {
         aChainHead->tot_len = static_cast<uint16_t>(aChainHead->tot_len + lDelta);
-        aChainHead = static_cast<PacketBuffer*>(aChainHead->next);
+        aChainHead          = static_cast<PacketBuffer *>(aChainHead->next);
     }
 }
 
@@ -184,8 +198,8 @@ uint16_t PacketBuffer::TotalLength() const
  */
 uint16_t PacketBuffer::MaxDataLength() const
 {
-    const uint8_t* const kStart = reinterpret_cast<const uint8_t*>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
-    const ptrdiff_t kDelta = static_cast<uint8_t*>(this->payload) - kStart;
+    const uint8_t * const kStart = reinterpret_cast<const uint8_t *>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    const ptrdiff_t kDelta       = static_cast<uint8_t *>(this->payload) - kStart;
     return static_cast<uint16_t>(this->AllocSize() - kDelta);
 }
 
@@ -206,7 +220,7 @@ uint16_t PacketBuffer::AvailableDataLength() const
  */
 uint16_t PacketBuffer::ReservedSize() const
 {
-    const ptrdiff_t kDelta = static_cast<uint8_t*>(this->payload) - reinterpret_cast<const uint8_t*>(this);
+    const ptrdiff_t kDelta = static_cast<uint8_t *>(this->payload) - reinterpret_cast<const uint8_t *>(this);
     return static_cast<uint16_t>(kDelta - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE);
 }
 
@@ -219,12 +233,12 @@ uint16_t PacketBuffer::ReservedSize() const
  *
  * @param[in] aPacket - the packet buffer to be added to the end of the current chain.
  */
-void PacketBuffer::AddToEnd(PacketBuffer* aPacket)
+void PacketBuffer::AddToEnd(PacketBuffer * aPacket)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_cat(this, aPacket);
-#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
-    PacketBuffer* lCursor = this;
+#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
+    PacketBuffer * lCursor = this;
 
     while (true)
     {
@@ -235,7 +249,7 @@ void PacketBuffer::AddToEnd(PacketBuffer* aPacket)
             break;
         }
 
-        lCursor = static_cast<PacketBuffer*>(lCursor->next);
+        lCursor = static_cast<PacketBuffer *>(lCursor->next);
     }
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
@@ -246,11 +260,11 @@ void PacketBuffer::AddToEnd(PacketBuffer* aPacket)
  *
  *  @return the tail of the current buffer chain or NULL if the current buffer is the only buffer in the chain.
  */
-PacketBuffer* PacketBuffer::DetachTail()
+PacketBuffer * PacketBuffer::DetachTail()
 {
-    PacketBuffer& lReturn = *static_cast<PacketBuffer*>(this->next);
+    PacketBuffer & lReturn = *static_cast<PacketBuffer *>(this->next);
 
-    this->next = NULL;
+    this->next    = NULL;
     this->tot_len = this->len;
 
     return &lReturn;
@@ -266,7 +280,7 @@ PacketBuffer* PacketBuffer::DetachTail()
  */
 void PacketBuffer::CompactHead()
 {
-    uint8_t* const kStart = reinterpret_cast<uint8_t*>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
+    uint8_t * const kStart = reinterpret_cast<uint8_t *>(this) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
 
     if (this->payload != kStart)
     {
@@ -278,14 +292,14 @@ void PacketBuffer::CompactHead()
 
     while (lAvailLength > 0 && this->next != NULL)
     {
-        PacketBuffer& lNextPacket = *static_cast<PacketBuffer*>(this->next);
+        PacketBuffer & lNextPacket = *static_cast<PacketBuffer *>(this->next);
         VerifyOrDieWithMsg(lNextPacket.ref == 1, chipSystemLayer, "next buffer %p is not exclusive to this chain", &lNextPacket);
 
         uint16_t lMoveLength = lNextPacket.len;
         if (lMoveLength > lAvailLength)
             lMoveLength = lAvailLength;
 
-        memcpy(static_cast<uint8_t*>(this->payload) + this->len, lNextPacket.payload, lMoveLength);
+        memcpy(static_cast<uint8_t *>(this->payload) + this->len, lNextPacket.payload, lMoveLength);
 
         lNextPacket.payload = (uint8_t *) lNextPacket.payload + lMoveLength;
         this->len += lMoveLength;
@@ -310,7 +324,7 @@ void PacketBuffer::ConsumeHead(uint16_t aConsumeLength)
 {
     if (aConsumeLength > this->len)
         aConsumeLength = this->len;
-    this->payload = static_cast<uint8_t*>(this->payload) + aConsumeLength;
+    this->payload = static_cast<uint8_t *>(this->payload) + aConsumeLength;
     this->len -= aConsumeLength;
     this->tot_len -= aConsumeLength;
 }
@@ -326,9 +340,9 @@ void PacketBuffer::ConsumeHead(uint16_t aConsumeLength)
  *
  *  @return the first buffer from the current chain that contains any remaining data.  If no data remains, a NULL is returned.
  */
-PacketBuffer* PacketBuffer::Consume(uint16_t aConsumeLength)
+PacketBuffer * PacketBuffer::Consume(uint16_t aConsumeLength)
 {
-    PacketBuffer* lPacket = this;
+    PacketBuffer * lPacket = this;
 
     while (lPacket != NULL && aConsumeLength > 0)
     {
@@ -369,8 +383,8 @@ bool PacketBuffer::EnsureReservedSize(uint16_t aReservedSize)
         return false;
 
     const uint16_t kMoveLength = aReservedSize - kCurrentReservedSize;
-    memmove(static_cast<uint8_t*>(this->payload) + kMoveLength, this->payload, this->len);
-    payload = static_cast<uint8_t*>(this->payload) + kMoveLength;
+    memmove(static_cast<uint8_t *>(this->payload) + kMoveLength, this->payload, this->len);
+    payload = static_cast<uint8_t *>(this->payload) + kMoveLength;
 
     return true;
 }
@@ -404,9 +418,9 @@ bool PacketBuffer::AlignPayload(uint16_t aAlignBytes)
  *
  *  @return a pointer to the next buffer in the chain.  \c NULL is returned when there is no buffers in the chain.
  */
-PacketBuffer* PacketBuffer::Next() const
+PacketBuffer * PacketBuffer::Next() const
 {
-    return static_cast<PacketBuffer*>(this->next);
+    return static_cast<PacketBuffer *>(this->next);
 }
 
 /**
@@ -416,7 +430,7 @@ void PacketBuffer::AddRef()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_ref(this);
-#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
     LOCK_BUF_POOL();
     ++this->ref;
     UNLOCK_BUF_POOL();
@@ -432,12 +446,12 @@ void PacketBuffer::AddRef()
  *
  *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c NULL.
  */
-PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t aAvailableSize)
+PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t aAvailableSize)
 {
     const size_t lReservedSize = static_cast<size_t>(aReservedSize);
-    const size_t lAllocSize = lReservedSize + aAvailableSize;
-    const size_t lBlockSize = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
-    PacketBuffer* lPacket;
+    const size_t lAllocSize    = lReservedSize + aAvailableSize;
+    const size_t lBlockSize    = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
+    PacketBuffer * lPacket;
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return NULL);
 
@@ -449,7 +463,7 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t 
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    lPacket = static_cast<PacketBuffer*>(pbuf_alloc(PBUF_RAW, lBlockSize, PBUF_POOL));
+    lPacket = static_cast<PacketBuffer *>(pbuf_alloc(PBUF_RAW, lBlockSize, PBUF_POOL));
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
@@ -463,7 +477,7 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t 
     lPacket = sFreeList;
     if (lPacket != NULL)
     {
-        sFreeList = static_cast<PacketBuffer*>(lPacket->next);
+        sFreeList = static_cast<PacketBuffer *>(lPacket->next);
         SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
     }
 
@@ -471,7 +485,7 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t 
 
 #else // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
-    lPacket = reinterpret_cast<PacketBuffer*>(malloc(lBlockSize));
+    lPacket = reinterpret_cast<PacketBuffer *>(malloc(lBlockSize));
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kSystemLayer_NumPacketBufs);
 
 #endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
@@ -483,10 +497,10 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t 
         return NULL;
     }
 
-    lPacket->payload = reinterpret_cast<uint8_t*>(lPacket) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lReservedSize;
+    lPacket->payload = reinterpret_cast<uint8_t *>(lPacket) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lReservedSize;
     lPacket->len = lPacket->tot_len = 0;
-    lPacket->next = NULL;
-    lPacket->ref = 1;
+    lPacket->next                   = NULL;
+    lPacket->ref                    = 1;
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
     lPacket->alloc_size = lAllocSize;
 #endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
@@ -504,7 +518,7 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t 
  *
  *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c NULL. *
  */
-PacketBuffer* PacketBuffer::NewWithAvailableSize(size_t aAvailableSize)
+PacketBuffer * PacketBuffer::NewWithAvailableSize(size_t aAvailableSize)
 {
     return PacketBuffer::NewWithAvailableSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, aAvailableSize);
 }
@@ -525,12 +539,13 @@ PacketBuffer* PacketBuffer::NewWithAvailableSize(size_t aAvailableSize)
  *
  *  @return On success, a pointer to the PacketBuffer, on failure \c NULL.
  */
-PacketBuffer* PacketBuffer::New(uint16_t aReservedSize)
+PacketBuffer * PacketBuffer::New(uint16_t aReservedSize)
 {
     const size_t lReservedSize = static_cast<size_t>(aReservedSize);
 
-    const size_t lAvailableSize =
-        lReservedSize < CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX ? CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - lReservedSize : 0;
+    const size_t lAvailableSize = lReservedSize < CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
+        ? CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX - lReservedSize
+        : 0;
 
     return PacketBuffer::NewWithAvailableSize(aReservedSize, lAvailableSize);
 }
@@ -539,10 +554,10 @@ PacketBuffer* PacketBuffer::New(uint16_t aReservedSize)
  * Allocates a single PacketBuffer of default max size (#CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX) with default reserved size
  * (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload.
  *
- * The reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) is large enough to hold transport layer headers as well as headers required by
- * \c chipMessageLayer and \c chipExchangeLayer.
+ * The reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) is large enough to hold transport layer headers as well as headers
+ * required by \c chipMessageLayer and \c chipExchangeLayer.
  */
-PacketBuffer* PacketBuffer::New(void)
+PacketBuffer * PacketBuffer::New(void)
 {
     return PacketBuffer::New(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 }
@@ -556,7 +571,7 @@ PacketBuffer* PacketBuffer::New(void)
  *
  *  @param[in] aPacket - packet buffer to be freed.
  */
-void PacketBuffer::Free(PacketBuffer* aPacket)
+void PacketBuffer::Free(PacketBuffer * aPacket)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -573,7 +588,7 @@ void PacketBuffer::Free(PacketBuffer* aPacket)
 
     while (aPacket != NULL)
     {
-        PacketBuffer* lNextPacket = static_cast<PacketBuffer*>(aPacket->next);
+        PacketBuffer * lNextPacket = static_cast<PacketBuffer *>(aPacket->next);
 
         VerifyOrDieWithMsg(aPacket->ref > 0, chipSystemLayer, "SystemPacketBuffer::Free: aPacket->ref = 0");
 
@@ -584,11 +599,11 @@ void PacketBuffer::Free(PacketBuffer* aPacket)
             aPacket->Clear();
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
             aPacket->next = sFreeList;
-            sFreeList = aPacket;
-#else // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+            sFreeList     = aPacket;
+#else  // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
             free(aPacket);
 #endif // !CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
-            aPacket = lNextPacket;
+            aPacket       = lNextPacket;
         }
         else
         {
@@ -609,7 +624,7 @@ void PacketBuffer::Free(PacketBuffer* aPacket)
 void PacketBuffer::Clear(void)
 {
     tot_len = 0;
-    len = 0;
+    len     = 0;
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
     alloc_size = 0;
 #endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
@@ -625,10 +640,10 @@ void PacketBuffer::Clear(void)
  *
  *  @return packet buffer chain consisting of the tail of the input buffer (may be \c NULL).
  */
-PacketBuffer* PacketBuffer::FreeHead(PacketBuffer* aPacket)
+PacketBuffer * PacketBuffer::FreeHead(PacketBuffer * aPacket)
 {
-    PacketBuffer* lNextPacket = static_cast<PacketBuffer*>(aPacket->next);
-    aPacket->next = NULL;
+    PacketBuffer * lNextPacket = static_cast<PacketBuffer *>(aPacket->next);
+    aPacket->next              = NULL;
     PacketBuffer::Free(aPacket);
     return lNextPacket;
 }
@@ -641,11 +656,11 @@ PacketBuffer* PacketBuffer::FreeHead(PacketBuffer* aPacket)
  *
  *  @return new packet buffer or the original buffer
  */
-PacketBuffer* PacketBuffer::RightSize(PacketBuffer *aPacket)
+PacketBuffer * PacketBuffer::RightSize(PacketBuffer * aPacket)
 {
-    PacketBuffer *lNewPacket = aPacket;
+    PacketBuffer * lNewPacket = aPacket;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
-    lNewPacket =  static_cast<PacketBuffer *>(pbuf_rightsize((struct pbuf *)aPacket, -1));
+    lNewPacket = static_cast<PacketBuffer *>(pbuf_rightsize((struct pbuf *) aPacket, -1));
     if (lNewPacket != aPacket)
     {
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
@@ -658,16 +673,16 @@ PacketBuffer* PacketBuffer::RightSize(PacketBuffer *aPacket)
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
-PacketBuffer* PacketBuffer::BuildFreeList()
+PacketBuffer * PacketBuffer::BuildFreeList()
 {
-    PacketBuffer* lHead = NULL;
+    PacketBuffer * lHead = NULL;
 
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC; i++)
     {
-        PacketBuffer* lCursor = &sBufferPool[i].Header;
-        lCursor->next = lHead;
-        lCursor->ref = 0;
-        lHead = lCursor;
+        PacketBuffer * lCursor = &sBufferPool[i].Header;
+        lCursor->next          = lHead;
+        lCursor->ref           = 0;
+        lHead                  = lCursor;
     }
 
     Mutex::Init(sBufferPoolMutex);

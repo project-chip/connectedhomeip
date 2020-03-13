@@ -64,10 +64,11 @@ namespace Inet {
  *  @return  #INET_NO_ERROR                  On success.
  *
  */
-DLL_EXPORT INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringLen, const char *&aHost, uint16_t &aHostLen, uint16_t &aPort)
+DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
+                                       uint16_t & aPort)
 {
-    const char *end = aString + aStringLen;
-    const char *p;
+    const char * end = aString + aStringLen;
+    const char * p;
 
     if (aStringLen == 0)
         return INET_ERROR_INVALID_HOST_NAME;
@@ -78,12 +79,12 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringLen,
     if (*aString == '[')
     {
         // Search for the end bracket.
-        p = (const char *)memchr(aString, ']', aStringLen);
+        p = (const char *) memchr(aString, ']', aStringLen);
         if (p == NULL)
             return INET_ERROR_INVALID_HOST_NAME;
 
         // Return the IPv6 address.
-        aHost = aString + 1;
+        aHost    = aString + 1;
         aHostLen = p - aHost;
 
         // Skip the end bracket.
@@ -94,7 +95,7 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringLen,
     else
     {
         // Search for a colon.
-        p = (const char *)memchr(aString, ':', aStringLen);
+        p = (const char *) memchr(aString, ':', aStringLen);
 
         // If the string contains no colons, then it is a host name or
         // IPv4 address without a port.
@@ -105,7 +106,7 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringLen,
             p = end;
 
         // Return the host/address portion.
-        aHost = aString;
+        aHost    = aString;
         aHostLen = p - aString;
     }
 
@@ -184,14 +185,12 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char *aString, uint16_t aStringLen,
  *  @return  #INET_NO_ERROR                  On success.
  *
  */
-DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char *aString, uint16_t aStringLen,
-                                                   const char *&aHost, uint16_t &aHostLen,
-                                                   uint16_t &aPort,
-                                                   const char *&aInterface, uint16_t &aInterfaceLen)
+DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
+                                                uint16_t & aPort, const char *& aInterface, uint16_t & aInterfaceLen)
 {
-    const char *end = aString + aStringLen;
+    const char * end = aString + aStringLen;
 
-    aInterface = NULL;
+    aInterface    = NULL;
     aInterfaceLen = 0;
 
     for (uint16_t i = 1; i < aStringLen; i++)
@@ -199,7 +198,7 @@ DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char *aString, uint16_t aS
         char ch = *(end - i);
         if (ch == '%')
         {
-            aInterface = end - i + 1;
+            aInterface    = end - i + 1;
             aInterfaceLen = i - 1;
             aStringLen -= i;
             break;

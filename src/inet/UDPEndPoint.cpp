@@ -80,34 +80,34 @@ chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint
  *   udp_bind_netif(aUDP, intfId);
  *
  */
-static INET_ERROR LwIPBindInterface(struct udp_pcb *aUDP, InterfaceId intfId)
+static INET_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
 {
     INET_ERROR res = INET_NO_ERROR;
 
 #if HAVE_LWIP_UDP_BIND_NETIF
-        if (!IsInterfaceIdPresent(intfId))
-            udp_bind_netif(aUDP, NULL);
-        else
-        {
-            struct netif *netifp = IPEndPointBasis::FindNetifFromInterfaceId(intfId);
+    if (!IsInterfaceIdPresent(intfId))
+        udp_bind_netif(aUDP, NULL);
+    else
+    {
+        struct netif * netifp = IPEndPointBasis::FindNetifFromInterfaceId(intfId);
 
-            if (netifp == NULL)
-                res = INET_ERROR_UNKNOWN_INTERFACE;
-            else
-                udp_bind_netif(aUDP, netifp);
-        }
+        if (netifp == NULL)
+            res = INET_ERROR_UNKNOWN_INTERFACE;
+        else
+            udp_bind_netif(aUDP, netifp);
+    }
 #else
-        if (!IsInterfaceIdPresent(intfId))
-            aUDP->intf_filter = NULL;
-        else
-        {
-            struct netif *netifp = IPEndPointBasis::FindNetifFromInterfaceId(intfId);
+    if (!IsInterfaceIdPresent(intfId))
+        aUDP->intf_filter = NULL;
+    else
+    {
+        struct netif * netifp = IPEndPointBasis::FindNetifFromInterfaceId(intfId);
 
-            if (netifp == NULL)
-                res = INET_ERROR_UNKNOWN_INTERFACE;
-            else
-                aUDP->intf_filter = netifp;
-        }
+        if (netifp == NULL)
+            res = INET_ERROR_UNKNOWN_INTERFACE;
+        else
+            aUDP->intf_filter = netifp;
+    }
 #endif // HAVE_LWIP_UDP_BIND_NETIF
 
     return res;
@@ -150,7 +150,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
     INET_ERROR res = INET_NO_ERROR;
 
     if (mState != kState_Ready && mState != kState_Bound)
-	{
+    {
         res = INET_ERROR_INCORRECT_STATE;
         goto exit;
     }
@@ -183,13 +183,13 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
         if (addrType == kIPAddressType_IPv6)
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
-            res = chip::System::MapErrorLwIP(udp_bind_ip6(mUDP, &ipv6Addr, port));
+            res                 = chip::System::MapErrorLwIP(udp_bind_ip6(mUDP, &ipv6Addr, port));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == kIPAddressType_IPv4)
         {
             ip4_addr_t ipv4Addr = addr.ToIPv4();
-            res = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipv4Addr, port));
+            res                 = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipv4Addr, port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -218,7 +218,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
     res = IPEndPointBasis::Bind(addrType, addr, port, intfId);
     SuccessOrExit(res);
 
-    mBoundPort = port;
+    mBoundPort   = port;
     mBoundIntfId = intfId;
 
     // If an ephemeral port was requested, retrieve the actual bound port.
@@ -226,8 +226,8 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
     {
         union
         {
-            struct sockaddr     any;
-            struct sockaddr_in  in;
+            struct sockaddr any;
+            struct sockaddr_in in;
             struct sockaddr_in6 in6;
         } boundAddr;
         socklen_t boundAddrLen = sizeof(boundAddr);
@@ -276,7 +276,7 @@ INET_ERROR UDPEndPoint::Listen(void)
     INET_ERROR res = INET_NO_ERROR;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    chip::System::Layer& lSystemLayer = SystemLayer();
+    chip::System::Layer & lSystemLayer = SystemLayer();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (mState == kState_Listening)
@@ -298,7 +298,7 @@ INET_ERROR UDPEndPoint::Listen(void)
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     udp_recv(mUDP, LwIPReceiveUDPMessage, this);
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
+#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
     if (PCB_ISIPV6(mUDP))
         udp_recv_ip6(mUDP, LwIPReceiveUDPMessage, this);
     else
@@ -322,7 +322,7 @@ INET_ERROR UDPEndPoint::Listen(void)
         mState = kState_Listening;
     }
 
- exit:
+exit:
     return res;
 }
 
@@ -350,7 +350,7 @@ void UDPEndPoint::Close(void)
         if (mUDP != NULL)
         {
             udp_remove(mUDP);
-            mUDP = NULL;
+            mUDP              = NULL;
             mLwIPEndPointType = kLwIPEndPointType_Unknown;
         }
 
@@ -363,7 +363,7 @@ void UDPEndPoint::Close(void)
 
         if (mSocket != INET_INVALID_SOCKET_FD)
         {
-            chip::System::Layer& lSystemLayer = SystemLayer();
+            chip::System::Layer & lSystemLayer = SystemLayer();
 
             // Wake the thread calling select so that it recognizes the socket is closed.
             lSystemLayer.WakeSelect();
@@ -398,7 +398,7 @@ void UDPEndPoint::Free(void)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     DeferredFree(kReleaseDeferralErrorTactic_Die);
-#else // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
     Release();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
@@ -406,7 +406,7 @@ void UDPEndPoint::Free(void)
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
-INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, chip::System::PacketBuffer *msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags)
 {
     return SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags);
 }
@@ -450,13 +450,14 @@ INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, chip::System::Pack
  *      method deep-copies \c msg into a fresh object, and queues that for
  *      transmission, leaving the original \c msg available after return.
  */
-INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer *msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
+                               uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
     pktInfo.Clear();
     pktInfo.DestAddress = addr;
-    pktInfo.DestPort = port;
-    pktInfo.Interface = intfId;
+    pktInfo.DestPort    = port;
+    pktInfo.Interface   = intfId;
     return SendMsg(&pktInfo, msg, sendFlags);
 }
 
@@ -498,21 +499,16 @@ INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId
  *      method deep-copies \c msg into a fresh object, and queues that for
  *      transmission, leaving the original \c msg available after return.
  */
-INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg, uint16_t sendFlags)
 {
-    INET_ERROR res = INET_NO_ERROR;
+    INET_ERROR res             = INET_NO_ERROR;
     const IPAddress & destAddr = pktInfo->DestAddress;
 
-    INET_FAULT_INJECT(FaultInjection::kFault_Send,
-            if ((sendFlags & kSendFlag_RetainBuffer) == 0)
-                PacketBuffer::Free(msg);
-            return INET_ERROR_UNKNOWN_INTERFACE;
-            );
+    INET_FAULT_INJECT(FaultInjection::kFault_Send, if ((sendFlags & kSendFlag_RetainBuffer) == 0) PacketBuffer::Free(msg);
+                      return INET_ERROR_UNKNOWN_INTERFACE;);
     INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical,
-            if ((sendFlags & kSendFlag_RetainBuffer) == 0)
-                PacketBuffer::Free(msg);
-            return INET_ERROR_NO_MEMORY;
-            );
+                      if ((sendFlags & kSendFlag_RetainBuffer) == 0) PacketBuffer::Free(msg);
+                      return INET_ERROR_NO_MEMORY;);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -540,7 +536,7 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
         //   static_cast.  JIRA WEAV-811 is filed to track the
         //   re-architecting of the memory management.
 
-        pbuf *msgCopy = pbuf_alloc(PBUF_TRANSPORT, 0, PBUF_RAM);
+        pbuf * msgCopy = pbuf_alloc(PBUF_TRANSPORT, 0, PBUF_RAM);
 
         if (msgCopy == NULL)
         {
@@ -548,7 +544,7 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
         }
 
         pbuf_chain(msgCopy, (pbuf *) msg);
-        msg = (PacketBuffer *)msgCopy;
+        msg = (PacketBuffer *) msgCopy;
     }
 
     // Lock LwIP stack
@@ -565,14 +561,14 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
     // This results in LwIP using the given address being as the source address for the generated
     // packet, as if the PCB had been bound to that address.
     {
-        err_t lwipErr = ERR_VAL;
-        const IPAddress & srcAddr = pktInfo->SrcAddress;
-        const uint16_t & destPort = pktInfo->DestPort;
+        err_t lwipErr              = ERR_VAL;
+        const IPAddress & srcAddr  = pktInfo->SrcAddress;
+        const uint16_t & destPort  = pktInfo->DestPort;
         const InterfaceId & intfId = pktInfo->Interface;
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 
-        ip_addr_t lwipSrcAddr = srcAddr.ToLwIPAddr();
+        ip_addr_t lwipSrcAddr  = srcAddr.ToLwIPAddr();
         ip_addr_t lwipDestAddr = destAddr.ToLwIPAddr();
 
         ip_addr_t boundAddr;
@@ -584,9 +580,9 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
         }
 
         if (intfId != INET_NULL_INTERFACEID)
-            lwipErr = udp_sendto_if(mUDP, (pbuf *)msg, &lwipDestAddr, destPort, intfId);
+            lwipErr = udp_sendto_if(mUDP, (pbuf *) msg, &lwipDestAddr, destPort, intfId);
         else
-            lwipErr = udp_sendto(mUDP, (pbuf *)msg, &lwipDestAddr, destPort);
+            lwipErr = udp_sendto(mUDP, (pbuf *) msg, &lwipDestAddr, destPort);
 
         ip_addr_copy(mUDP->local_ip, boundAddr);
 
@@ -597,25 +593,25 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
 
         if (PCB_ISIPV6(mUDP))
         {
-            ip6_addr_t lwipSrcAddr = srcAddr.ToIPv6();
+            ip6_addr_t lwipSrcAddr  = srcAddr.ToIPv6();
             ip6_addr_t lwipDestAddr = destAddr.ToIPv6();
 
             if (!ip6_addr_isany(&lwipSrcAddr))
             {
-            	ipX_addr_copy(mUDP->local_ip, *ip6_2_ipX(&lwipSrcAddr));
+                ipX_addr_copy(mUDP->local_ip, *ip6_2_ipX(&lwipSrcAddr));
             }
 
             if (intfId != INET_NULL_INTERFACEID)
-                lwipErr = udp_sendto_if_ip6(mUDP, (pbuf *)msg, &lwipDestAddr, destPort, intfId);
+                lwipErr = udp_sendto_if_ip6(mUDP, (pbuf *) msg, &lwipDestAddr, destPort, intfId);
             else
-                lwipErr = udp_sendto_ip6(mUDP, (pbuf *)msg, &lwipDestAddr, destPort);
+                lwipErr = udp_sendto_ip6(mUDP, (pbuf *) msg, &lwipDestAddr, destPort);
         }
 
 #if INET_CONFIG_ENABLE_IPV4
 
         else
         {
-            ip4_addr_t lwipSrcAddr = srcAddr.ToIPv4();
+            ip4_addr_t lwipSrcAddr  = srcAddr.ToIPv4();
             ip4_addr_t lwipDestAddr = destAddr.ToIPv4();
             ipX_addr_t boundAddr;
 
@@ -625,9 +621,9 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo *pktInfo, PacketBuffer *msg, 
             }
 
             if (intfId != INET_NULL_INTERFACEID)
-                lwipErr = udp_sendto_if(mUDP, (pbuf *)msg, &lwipDestAddr, destPort, intfId);
+                lwipErr = udp_sendto_if(mUDP, (pbuf *) msg, &lwipDestAddr, destPort, intfId);
             else
-                lwipErr = udp_sendto(mUDP, (pbuf *)msg, &lwipDestAddr, destPort);
+                lwipErr = udp_sendto(mUDP, (pbuf *) msg, &lwipDestAddr, destPort);
         }
 
         ipX_addr_copy(mUDP->local_ip, boundAddr);
@@ -696,9 +692,9 @@ INET_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    //A lock is required because the LwIP thread may be referring to intf_filter,
-    //while this code running in the Inet application is potentially modifying it.
-    //NOTE: this only supports LwIP interfaces whose number is no bigger than 9.
+    // A lock is required because the LwIP thread may be referring to intf_filter,
+    // while this code running in the Inet application is potentially modifying it.
+    // NOTE: this only supports LwIP interfaces whose number is no bigger than 9.
     LOCK_TCPIP_CORE();
 
     // Make sure we have the appropriate type of PCB.
@@ -731,7 +727,7 @@ exit:
     return err;
 }
 
-void UDPEndPoint::Init(InetLayer *inetLayer)
+void UDPEndPoint::Init(InetLayer * inetLayer)
 {
     IPEndPointBasis::Init(inetLayer);
 }
@@ -769,7 +765,7 @@ uint16_t UDPEndPoint::GetBoundPort(void)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void UDPEndPoint::HandleDataReceived(PacketBuffer *msg)
+void UDPEndPoint::HandleDataReceived(PacketBuffer * msg)
 {
     IPEndPointBasis::HandleDataReceived(msg);
 }
@@ -788,7 +784,7 @@ INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
         {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
             mUDP = udp_new_ip_type(IPADDR_TYPE_V6);
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
+#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
             mUDP = udp_new_ip6();
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
         }
@@ -797,7 +793,7 @@ INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
         {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
             mUDP = udp_new_ip_type(IPADDR_TYPE_V4);
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
+#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
             mUDP = udp_new();
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
         }
@@ -841,7 +837,7 @@ INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
 #if INET_CONFIG_ENABLE_IPV4
         pcbAddrType = PCB_ISIPV6(mUDP) ? kIPAddressType_IPv6 : kIPAddressType_IPv4;
-#else // !INET_CONFIG_ENABLE_IPV4
+#else  // !INET_CONFIG_ENABLE_IPV4
         pcbAddrType = kIPAddressType_IPv6;
 #endif // !INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
@@ -855,26 +851,26 @@ exit:
 }
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-void UDPEndPoint::LwIPReceiveUDPMessage(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port)
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-void UDPEndPoint::LwIPReceiveUDPMessage(void *arg, struct udp_pcb *pcb, struct pbuf *p, ip_addr_t *addr, u16_t port)
+void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port)
+#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
+void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
-    UDPEndPoint*            ep              = static_cast<UDPEndPoint*>(arg);
-    PacketBuffer*           buf             = reinterpret_cast<PacketBuffer*>(static_cast<void*>(p));
-    chip::System::Layer&   lSystemLayer    = ep->SystemLayer();
-    IPPacketInfo*           pktInfo     = NULL;
+    UDPEndPoint * ep                   = static_cast<UDPEndPoint *>(arg);
+    PacketBuffer * buf                 = reinterpret_cast<PacketBuffer *>(static_cast<void *>(p));
+    chip::System::Layer & lSystemLayer = ep->SystemLayer();
+    IPPacketInfo * pktInfo             = NULL;
 
     pktInfo = GetPacketInfo(buf);
     if (pktInfo != NULL)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        pktInfo->SrcAddress = IPAddress::FromLwIPAddr(*addr);
+        pktInfo->SrcAddress  = IPAddress::FromLwIPAddr(*addr);
         pktInfo->DestAddress = IPAddress::FromLwIPAddr(*ip_current_dest_addr());
 #else // LWIP_VERSION_MAJOR <= 1
         if (PCB_ISIPV6(pcb))
         {
-            pktInfo->SrcAddress = IPAddress::FromIPv6(*(ip6_addr_t *)addr);
+            pktInfo->SrcAddress = IPAddress::FromIPv6(*(ip6_addr_t *) addr);
             pktInfo->DestAddress = IPAddress::FromIPv6(*ip6_current_dest_addr());
         }
 #if INET_CONFIG_ENABLE_IPV4
@@ -887,11 +883,11 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void *arg, struct udp_pcb *pcb, struct p
 #endif // LWIP_VERSION_MAJOR <= 1
 
         pktInfo->Interface = ip_current_netif();
-        pktInfo->SrcPort = port;
-        pktInfo->DestPort = pcb->local_port;
+        pktInfo->SrcPort   = port;
+        pktInfo->DestPort  = pcb->local_port;
     }
 
-    if (lSystemLayer.PostEvent(*ep, kInetEvent_UDPDataReceived, (uintptr_t)buf) != INET_NO_ERROR)
+    if (lSystemLayer.PostEvent(*ep, kInetEvent_UDPDataReceived, (uintptr_t) buf) != INET_NO_ERROR)
         PacketBuffer::Free(buf);
 }
 
@@ -900,8 +896,8 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void *arg, struct udp_pcb *pcb, struct p
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 INET_ERROR UDPEndPoint::GetSocket(IPAddressType aAddressType)
 {
-    INET_ERROR lRetval = INET_NO_ERROR;
-    const int lType = (SOCK_DGRAM | SOCK_FLAGS);
+    INET_ERROR lRetval  = INET_NO_ERROR;
+    const int lType     = (SOCK_DGRAM | SOCK_FLAGS);
     const int lProtocol = 0;
 
     lRetval = IPEndPointBasis::GetSocket(aAddressType, lType, lProtocol);

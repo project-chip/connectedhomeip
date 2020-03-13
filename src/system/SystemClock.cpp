@@ -86,7 +86,7 @@ uint64_t GetClock_Monotonic(void)
     int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
     VerifyOrDie(res == 0);
     return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
-#else // HAVE_CLOCK_GETTIME
+#else  // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
     VerifyOrDie(res == 0);
@@ -106,7 +106,7 @@ uint64_t GetClock_MonotonicHiRes(void)
     int res = clock_gettime(MONOTONIC_RAW_CLOCK_ID, &ts);
     VerifyOrDie(res == 0);
     return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
-#else // HAVE_CLOCK_GETTIME
+#else  // HAVE_CLOCK_GETTIME
     return GetClock_Monotonic();
 #endif // HAVE_CLOCK_GETTIME
 }
@@ -126,7 +126,7 @@ Error GetClock_RealTime(uint64_t & curTime)
     }
     curTime = (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
     return CHIP_SYSTEM_NO_ERROR;
-#else // HAVE_CLOCK_GETTIME
+#else  // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
     if (res != 0)
@@ -145,7 +145,7 @@ Error GetClock_RealTime(uint64_t & curTime)
 Error GetClock_RealTimeMS(uint64_t & curTime)
 {
     Error err = GetClock_RealTime(curTime);
-    curTime = curTime / 1000;
+    curTime   = curTime / 1000;
     return err;
 }
 
@@ -155,19 +155,19 @@ Error SetClock_RealTime(uint64_t newCurTime)
 {
 #if HAVE_CLOCK_SETTIME
     struct timespec ts;
-    ts.tv_sec = static_cast<time_t>(newCurTime / UINT64_C(1000000));
+    ts.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
     ts.tv_nsec = static_cast<long>(newCurTime % UINT64_C(1000000)) * 1000;
-    int res = clock_settime(CLOCK_REALTIME, &ts);
+    int res    = clock_settime(CLOCK_REALTIME, &ts);
     if (res != 0)
     {
         return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
     }
     return CHIP_SYSTEM_NO_ERROR;
-#else // HAVE_CLOCK_SETTIME
+#else  // HAVE_CLOCK_SETTIME
     struct timeval tv;
-    tv.tv_sec = static_cast<time_t>(newCurTime / UINT64_C(1000000));
+    tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
     tv.tv_usec = static_cast<long>(newCurTime % UINT64_C(1000000));
-    int res = settimeofday(&tv, NULL);
+    int res    = settimeofday(&tv, NULL);
     if (res != 0)
     {
         return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
@@ -180,7 +180,6 @@ Error SetClock_RealTime(uint64_t newCurTime)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
-
 // -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
@@ -192,9 +191,9 @@ uint64_t GetClock_Monotonic(void)
 
 uint64_t GetClock_MonotonicMS(void)
 {
-    static volatile uint64_t overflow = 0;
-    static volatile u32_t lastSample = 0;
-    static volatile uint8_t lock = 0;
+    static volatile uint64_t overflow        = 0;
+    static volatile u32_t lastSample         = 0;
+    static volatile uint8_t lock             = 0;
     static const uint64_t kOverflowIncrement = static_cast<uint64_t>(0x100000000);
 
     uint64_t overflowSample;
@@ -211,7 +210,7 @@ uint64_t GetClock_MonotonicMS(void)
             overflow += kOverflowIncrement;
         }
 
-        lastSample = sample;
+        lastSample     = sample;
         overflowSample = overflow;
 
         __sync_bool_compare_and_swap(&lock, 1, 0);
@@ -224,7 +223,7 @@ uint64_t GetClock_MonotonicMS(void)
         // To fix this race requires a platform api that can be used to
         // protect critical sections.
         overflowSample = overflow;
-        sample = sys_now();
+        sample         = sys_now();
     }
 
     return static_cast<uint64_t>(overflowSample | static_cast<uint64_t>(sample));

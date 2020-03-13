@@ -46,7 +46,7 @@ namespace System {
  */
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-DLL_EXPORT Error Mutex::Init(Mutex& aThis)
+DLL_EXPORT Error Mutex::Init(Mutex & aThis)
 {
     int lSysError = pthread_mutex_init(&aThis.mPOSIXMutex, NULL);
     Error lError;
@@ -71,7 +71,7 @@ DLL_EXPORT Error Mutex::Init(Mutex& aThis)
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-DLL_EXPORT Error Mutex::Init(Mutex& aThis)
+DLL_EXPORT Error Mutex::Init(Mutex & aThis)
 {
 restart:
     if (__sync_bool_compare_and_swap(&aThis.mInitialized, 0, 1))
@@ -87,7 +87,9 @@ restart:
 
             return CHIP_SYSTEM_ERROR_NO_MEMORY;
         }
-    } else {
+    }
+    else
+    {
         while (aThis.mFreeRTOSSemaphore == NULL)
         {
             vTaskDelay(1);

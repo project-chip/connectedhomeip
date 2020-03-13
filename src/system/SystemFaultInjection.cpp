@@ -32,14 +32,14 @@ namespace chip {
 namespace System {
 namespace FaultInjection {
 
-using ::FaultInjection::Record;
 using ::FaultInjection::Manager;
 using ::FaultInjection::Name;
+using ::FaultInjection::Record;
 
 static Record sFaultRecordArray[kFault_NumberOfFaultIdentifiers];
 static Manager sManager;
 static int32_t sFault_AsyncEvent_Arguments[1];
-static const Name sManagerName = "CHIPSys";
+static const Name sManagerName  = "CHIPSys";
 static const Name sFaultNames[] = {
     "PacketBufferNew",
     "TimeoutImmediate",
@@ -49,19 +49,16 @@ static const Name sFaultNames[] = {
 static int32_t (*sGetNumEventsAvailable)(void);
 static void (*sInjectAsyncEvent)(int32_t index);
 
-Manager& GetManager(void)
+Manager & GetManager(void)
 {
     if (0 == sManager.GetNumFaults())
     {
-        sManager.Init(kFault_NumberOfFaultIdentifiers,
-                      sFaultRecordArray,
-                      sManagerName,
-                      sFaultNames);
+        sManager.Init(kFault_NumberOfFaultIdentifiers, sFaultRecordArray, sManagerName, sFaultNames);
 
         memset(&sFault_AsyncEvent_Arguments, 0, sizeof(sFault_AsyncEvent_Arguments));
         sFaultRecordArray[kFault_AsyncEvent].mArguments = sFault_AsyncEvent_Arguments;
         sFaultRecordArray[kFault_AsyncEvent].mLengthOfArguments =
-            static_cast<uint16_t>(sizeof(sFault_AsyncEvent_Arguments)/sizeof(sFault_AsyncEvent_Arguments[0]));
+            static_cast<uint16_t>(sizeof(sFault_AsyncEvent_Arguments) / sizeof(sFault_AsyncEvent_Arguments[0]));
     }
 
     return sManager;
@@ -69,7 +66,7 @@ Manager& GetManager(void)
 
 void InjectAsyncEvent(void)
 {
-    int32_t numEventsAvailable = 0;
+    int32_t numEventsAvailable               = 0;
     chip::System::FaultInjection::Id faultID = kFault_AsyncEvent;
 
     if (sGetNumEventsAvailable)
@@ -78,8 +75,8 @@ void InjectAsyncEvent(void)
 
         if (numEventsAvailable)
         {
-            FaultInjection::Manager &mgr = chip::System::FaultInjection::GetManager();
-            const FaultInjection::Record *record = &(mgr.GetFaultRecords()[faultID]);
+            FaultInjection::Manager & mgr         = chip::System::FaultInjection::GetManager();
+            const FaultInjection::Record * record = &(mgr.GetFaultRecords()[faultID]);
 
             if (record->mNumArguments == 0)
             {
@@ -88,20 +85,13 @@ void InjectAsyncEvent(void)
                 mgr.StoreArgsAtFault(faultID, 1, &maxEventIndex);
             }
 
-            nlFAULT_INJECT_WITH_ARGS(mgr, faultID,
-                                    // Code executed with the Manager's lock:
-                                        int32_t index = 0;
-                                        if (numFaultArgs > 0)
-                                        {
-                                            index = faultArgs[0];
-                                        }
-                                    ,
-                                    // Code executed without the Manager's lock:
-                                        if (sInjectAsyncEvent)
-                                        {
-                                            sInjectAsyncEvent(index);
-                                        }
-                                    );
+            nlFAULT_INJECT_WITH_ARGS(
+                mgr, faultID,
+                // Code executed with the Manager's lock:
+                int32_t index = 0;
+                if (numFaultArgs > 0) { index = faultArgs[0]; },
+                // Code executed without the Manager's lock:
+                if (sInjectAsyncEvent) { sInjectAsyncEvent(index); });
         }
     }
 }
@@ -109,9 +99,8 @@ void InjectAsyncEvent(void)
 void SetAsyncEventCallbacks(int32_t (*aGetNumEventsAvailable)(void), void (*aInjectAsyncEvent)(int32_t index))
 {
     sGetNumEventsAvailable = aGetNumEventsAvailable;
-    sInjectAsyncEvent = aInjectAsyncEvent;
+    sInjectAsyncEvent      = aInjectAsyncEvent;
 }
-
 
 } // namespace FaultInjection
 } // namespace System
