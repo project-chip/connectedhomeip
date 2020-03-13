@@ -3,7 +3,7 @@ Test_Dir = tests
 
 .PHONY: all
 
-all: liblwip.a run_tests
+all: liblwip.a check
 
 include $(TOP_DIR)/.yams/cpp_rules.min
 
