@@ -243,7 +243,7 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 #ifdef EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
 #include EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER
 #else
-#define CONNECTIVITYMANAGERIMPL_HEADER <chip/DeviceLayer/CHIP_DEVICE_LAYER_TARGET/ConnectivityManagerImpl.h>
+#define CONNECTIVITYMANAGERIMPL_HEADER <ConnectivityManagerImpl.h>
 #include CONNECTIVITYMANAGERIMPL_HEADER
 #endif
 
