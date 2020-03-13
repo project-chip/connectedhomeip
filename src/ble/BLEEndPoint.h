@@ -31,9 +31,9 @@
 #include <system/SystemMutex.h>
 
 #include <ble/BleLayer.h>
-#include <ble/CHIPoBle.h>
-#if CHIP_ENABLE_CHIPOBLE_TEST
-#include <ble/CHIPoBleTest.h>
+#include <ble/BtpEngine.h>
+#if CHIP_ENABLE_BTP_TEST
+#include <ble/BtpEngineTest.h>
 #endif
 
 namespace chip {
@@ -50,16 +50,16 @@ enum
 // Forward declarations
 class BleLayer;
 class BleEndPointPool;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-class CHIPoBleTest;
+#if CHIP_ENABLE_BTP_TEST
+class BtpEngineTest;
 #endif
 
 class DLL_EXPORT BLEEndPoint : public BleLayerObject
 {
     friend class BleLayer;
     friend class BleEndPointPool;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    friend class CHIPoBleTest;
+#if CHIP_ENABLE_BTP_TEST
+    friend class BtpEngineTest;
 #endif
 
 public:
@@ -87,11 +87,11 @@ public:
     typedef void (*OnConnectionClosedFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
     OnConnectionClosedFunct OnConnectionClosed;
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
     typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBuffer * msg);
     OnCommandReceivedFunct OnCommandReceived;
     inline void SetOnCommandReceivedCB(OnCommandReceivedFunct cb) { OnCommandReceived = cb; };
-    CHIPoBleTest mCHIPoBleTest;
+    BtpEngineTest mBtpEngineTest;
     inline void SetTxWindowSize(uint8_t size) { mRemoteReceiveWindowSize = size; };
     inline void SetRxWindowSize(uint8_t size) { mReceiveWindowMaxSize = size; };
 #endif
@@ -126,7 +126,7 @@ private:
         kTimerState_AckReceivedTimerRunning       = 0x04, // Ack received timer running due to unacked sent fragment.
         kTimerState_SendAckTimerRunning           = 0x08, // Send ack timer running; indicates pending ack to send.
         kTimerState_UnsubscribeTimerRunning       = 0x10, // Unsubscribe completion timer running.
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
         kTimerState_UnderTestTimerRunnung = 0x80 // running throughput Tx test
 #endif
     };
@@ -136,7 +136,7 @@ private:
     // modify the state of the underlying BLE connection.
     BLE_CONNECTION_OBJECT mConnObj;
 
-    // Queue of outgoing messages to send when current CHIPoBle transmission completes.
+    // Queue of outgoing messages to send when current BtpEngine transmission completes.
     //
     // Re-used during connection setup to cache capabilities request and response payloads; payloads are freed when
     // connection is established.
@@ -146,14 +146,14 @@ private:
     // progress.
     PacketBuffer * mAckToSend;
 
-    CHIPoBle mCHIPoBle;
+    BtpEngine mBtpEngine;
     BleRole mRole;
     uint8_t mConnStateFlags;
     uint8_t mTimerStateFlags;
     SequenceNumber_t mLocalReceiveWindowSize;
     SequenceNumber_t mRemoteReceiveWindowSize;
     SequenceNumber_t mReceiveWindowMaxSize;
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
     chip::System::Mutex mTxQueueMutex; // For MT-safe Tx queuing
 #endif
 
@@ -216,10 +216,10 @@ private:
     void FinalizeClose(uint8_t state, uint8_t flags, BLE_ERROR err);
     void ReleaseBleConnection(void);
     void Free(void);
-    void FreeCHIPoBle(void);
+    void FreeBtpEngine(void);
 
-    // Mutex lock on Tx queue. Used only in CHIPoBle test build for now.
-#if CHIP_ENABLE_CHIPOBLE_TEST
+    // Mutex lock on Tx queue. Used only in BtpEngine test build for now.
+#if CHIP_ENABLE_BTP_TEST
     inline void QueueTxLock() { mTxQueueMutex.Lock(); };
     inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); };
 #else

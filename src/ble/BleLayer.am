@@ -29,7 +29,7 @@ CHIP_BUILD_BLE_LAYER_SOURCE_FILES                         = \
     @top_builddir@/src/ble/BleLayer.cpp                     \
     @top_builddir@/src/ble/BleUUID.cpp                      \
     @top_builddir@/src/ble/BLEEndPoint.cpp                  \
-    @top_builddir@/src/ble/CHIPoBle.cpp                     \
+    @top_builddir@/src/ble/BtpEngine.cpp                     \
     $(NULL)
 
 CHIP_BUILD_BLE_LAYER_HEADER_FILES                         = \
@@ -42,5 +42,5 @@ CHIP_BUILD_BLE_LAYER_HEADER_FILES                         = \
     BleLayer.h                                              \
     BlePlatformDelegate.h                                   \
     BleUUID.h                                               \
-    CHIPoBle.h                                              \
+    BtpEngine.h                                              \
     $(NULL)

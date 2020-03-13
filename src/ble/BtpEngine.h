@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef CHIPOBLE_H_
-#define CHIPOBLE_H_
+#ifndef BTP_ENGINE_H_
+#define BTP_ENGINE_H_
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -46,10 +46,10 @@ namespace Ble {
 
 using ::chip::System::PacketBuffer;
 
-typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in CHIPoBle::IsValidAck and
+typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in BtpEngine::IsValidAck and
                                   // BLEEndPoint::AdjustReceiveWindow.
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
 class BLEEndPoint;
 #endif
 
@@ -58,11 +58,11 @@ typedef enum
 {
     kType_Data    = 0, // Default 0 for data
     kType_Control = 1,
-} PacketType_t; // CHIPoBle packet types
+} PacketType_t; // BtpEngine packet types
 
-class CHIPoBle
+class BtpEngine
 {
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
     friend class BLEEndPoint;
 #endif
 
@@ -82,7 +82,7 @@ public:
         kHeaderFlag_ContinueMessage = 0x02,
         kHeaderFlag_EndMessage      = 0x04,
         kHeaderFlag_FragmentAck     = 0x08,
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
         kHeaderFlag_CommandMessage = 0x10,
 #endif
     }; // Masks for BTP fragment header flag bits.
@@ -92,8 +92,8 @@ public:
 
 public:
     // Public functions:
-    CHIPoBle(void){};
-    ~CHIPoBle(void){};
+    BtpEngine(void){};
+    ~BtpEngine(void){};
 
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 
@@ -113,7 +113,7 @@ public:
 
     inline State_t RxState(void) { return mRxState; }
     inline State_t TxState(void) { return mTxState; }
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
     inline PacketType_t SetTxPacketType(PacketType_t type) { return (mTxPacketType = type); };
     inline PacketType_t SetRxPacketType(PacketType_t type) { return (mRxPacketType = type); };
     inline PacketType_t TxPacketType() { return mTxPacketType; };
@@ -135,7 +135,7 @@ public:
         p->SetStart(p->Start() + sizeof(type));
         return type;
     };
-#endif // CHIP_ENABLE_CHIPOBLE_TEST
+#endif // CHIP_ENABLE_BTP_TEST
 
     bool HasUnackedData(void) const;
 
@@ -154,7 +154,7 @@ public:
 
 private:
     // Private data members:
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
     PacketType_t mTxPacketType;
     PacketType_t mRxPacketType;
     SequenceNumber_t mTxPacketSeq;
@@ -192,4 +192,4 @@ private:
 } /* namespace Ble */
 } /* namespace chip */
 
-#endif /* CHIPOBLE_H_ */
+#endif /* BTP_ENGINE_H_ */

@@ -18,10 +18,10 @@
 
 /**
  *    @file
- *      This file implements types and an object for the chip over
- *      Bluetooth Low Energy (CHIPoBLE) byte-stream, connection-oriented
- *      adaptation of chip for point-to-point Bluetooth Low Energy
- *      (BLE) links.
+ *      This module implements encode, decode, fragmentation and reassembly of
+ *      Bluetooth Transport Layer (BTP) packet types for transport of a
+ *      CHIP-over-Bluetooth Low Energy (CHIPoBLE) byte-stream over point-to-point
+ *      Bluetooth Low Energy (BLE) links.
  *
  */
 
@@ -29,9 +29,9 @@
 
 #if CONFIG_NETWORK_LAYER_BLE
 
-#include <ble/CHIPoBle.h>
-#if CHIP_ENABLE_CHIPOBLE_TEST
-#include <ble/CHIPoBleTest.h>
+#include <ble/BtpEngine.h>
+#if CHIP_ENABLE_BTP_TEST
+#include <ble/BtpEngineTest.h>
 #endif
 
 #include <support/logging/CHIPLogging.h>
@@ -73,8 +73,8 @@ static inline void IncSeqNum(SequenceNumber_t & a_seq_num)
 
 static inline bool DidReceiveData(uint8_t rx_flags)
 {
-    return (GetFlag(rx_flags, CHIPoBle::kHeaderFlag_StartMessage) || GetFlag(rx_flags, CHIPoBle::kHeaderFlag_ContinueMessage) ||
-            GetFlag(rx_flags, CHIPoBle::kHeaderFlag_EndMessage));
+    return (GetFlag(rx_flags, BtpEngine::kHeaderFlag_StartMessage) || GetFlag(rx_flags, BtpEngine::kHeaderFlag_ContinueMessage) ||
+            GetFlag(rx_flags, BtpEngine::kHeaderFlag_EndMessage));
 }
 
 static void PrintBufDebug(PacketBuffer * buf)
@@ -89,10 +89,10 @@ static void PrintBufDebug(PacketBuffer * buf)
 #endif
 }
 
-const uint16_t CHIPoBle::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
-const uint16_t CHIPoBle::sMaxFragmentSize     = 128; // Size of write and indication characteristics
+const uint16_t BtpEngine::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
+const uint16_t BtpEngine::sMaxFragmentSize     = 128; // Size of write and indication characteristics
 
-BLE_ERROR CHIPoBle::Init(void * an_app_state, bool expect_first_ack)
+BLE_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
 {
     mAppState              = an_app_state;
     mRxState               = kState_Idle;
@@ -109,9 +109,9 @@ BLE_ERROR CHIPoBle::Init(void * an_app_state, bool expect_first_ack)
     mTxPacketCount         = 0;
     mTxNewestUnackedSeqNum = 0;
     mTxOldestUnackedSeqNum = 0;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    mTxPacketType = kType_Data; // Default CHIPoBle Data packet
-    mRxPacketType = kType_Data; // Default CHIPoBle Data packet
+#if CHIP_ENABLE_BTP_TEST
+    mTxPacketType = kType_Data; // Default BtpEngine Data packet
+    mRxPacketType = kType_Data; // Default BtpEngine Data packet
 #endif
 
     if (expect_first_ack)
@@ -130,7 +130,7 @@ BLE_ERROR CHIPoBle::Init(void * an_app_state, bool expect_first_ack)
     return BLE_NO_ERROR;
 }
 
-SequenceNumber_t CHIPoBle::GetAndIncrementNextTxSeqNum()
+SequenceNumber_t BtpEngine::GetAndIncrementNextTxSeqNum()
 {
     SequenceNumber_t ret = mTxNextSeqNum;
 
@@ -150,7 +150,7 @@ SequenceNumber_t CHIPoBle::GetAndIncrementNextTxSeqNum()
     return ret;
 }
 
-SequenceNumber_t CHIPoBle::GetAndRecordRxAckSeqNum()
+SequenceNumber_t BtpEngine::GetAndRecordRxAckSeqNum()
 {
     SequenceNumber_t ret = mRxNewestUnackedSeqNum;
 
@@ -160,12 +160,12 @@ SequenceNumber_t CHIPoBle::GetAndRecordRxAckSeqNum()
     return ret;
 }
 
-bool CHIPoBle::HasUnackedData() const
+bool BtpEngine::HasUnackedData() const
 {
     return (mRxOldestUnackedSeqNum != mRxNextSeqNum);
 }
 
-bool CHIPoBle::IsValidAck(SequenceNumber_t ack_num) const
+bool BtpEngine::IsValidAck(SequenceNumber_t ack_num) const
 {
     ChipLogDebugBtpEngine(Ble, "entered IsValidAck, ack = %u, oldest = %u, newest = %u", ack_num, mTxOldestUnackedSeqNum,
                           mTxNewestUnackedSeqNum);
@@ -189,7 +189,7 @@ bool CHIPoBle::IsValidAck(SequenceNumber_t ack_num) const
     }
 }
 
-BLE_ERROR CHIPoBle::HandleAckReceived(SequenceNumber_t ack_num)
+BLE_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
@@ -218,7 +218,7 @@ exit:
 
 // Calling convention:
 //   EncodeStandAloneAck may only be called if data arg is commited for immediate, synchronous subsequent transmission.
-BLE_ERROR CHIPoBle::EncodeStandAloneAck(PacketBuffer * data)
+BLE_ERROR BtpEngine::EncodeStandAloneAck(PacketBuffer * data)
 {
     BLE_ERROR err = BLE_NO_ERROR;
     uint8_t * characteristic;
@@ -248,9 +248,9 @@ exit:
 }
 
 // Calling convention:
-//   CHIPoBle does not retain ownership of reassembled messages, layer above needs to free when done.
+//   BtpEngine does not retain ownership of reassembled messages, layer above needs to free when done.
 //
-//   CHIPoBle does not reset itself on error. Upper layer should free outbound message and inbound reassembly buffers
+//   BtpEngine does not reset itself on error. Upper layer should free outbound message and inbound reassembly buffers
 //   if there is a problem.
 
 // HandleCharacteristicReceived():
@@ -260,7 +260,7 @@ exit:
 //   function returns.
 //
 //   Upper layer must immediately clean up and reinitialize protocol engine if returned err != BLE_NO_ERROR.
-BLE_ERROR CHIPoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumber_t & receivedAck, bool & didReceiveAck)
+BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumber_t & receivedAck, bool & didReceiveAck)
 {
     BLE_ERROR err            = BLE_NO_ERROR;
     uint8_t rx_flags         = 0;
@@ -273,7 +273,7 @@ BLE_ERROR CHIPoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNu
 
     // Get header flags, always in first byte.
     rx_flags = characteristic[cursor++];
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
     if (GetFlag(rx_flags, kHeaderFlag_CommandMessage))
         SetRxPacketType(kType_Control);
     else
@@ -353,8 +353,8 @@ BLE_ERROR CHIPoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNu
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
         data = NULL;
 
-        // For now, limit CHIPoBle message size to max length of 1 pbuf, as we do for chip messages sent via IP.
-        // TODO add support for CHIPoBle messages longer than 1 pbuf
+        // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
+        // TODO add support for BtpEngine messages longer than 1 pbuf
         VerifyOrExit(mRxBuf->Next() == NULL, err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
     }
     else
@@ -415,12 +415,12 @@ exit:
     return err;
 }
 
-PacketBuffer * CHIPoBle::RxPacket()
+PacketBuffer * BtpEngine::RxPacket()
 {
     return mRxBuf;
 }
 
-bool CHIPoBle::ClearRxPacket()
+bool BtpEngine::ClearRxPacket()
 {
     if (mRxState == kState_Complete)
     {
@@ -436,7 +436,7 @@ bool CHIPoBle::ClearRxPacket()
 // Calling convention:
 //   May only be called if data arg is commited for immediate, synchronous subsequent transmission.
 //   Returns false on error. Caller must free data arg on error.
-bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
+bool BtpEngine::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 {
     uint8_t * characteristic;
     mTxCharCount++;
@@ -484,7 +484,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
         characteristic[0] = kHeaderFlag_StartMessage;
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
         if (TxPacketType() == kType_Control)
             SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
 #endif
@@ -537,7 +537,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
         characteristic[0] = kHeaderFlag_ContinueMessage;
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
+#if CHIP_ENABLE_BTP_TEST
         if (TxPacketType() == kType_Control)
             SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
 #endif
@@ -577,12 +577,12 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
     return true;
 }
 
-PacketBuffer * CHIPoBle::TxPacket()
+PacketBuffer * BtpEngine::TxPacket()
 {
     return mTxBuf;
 }
 
-bool CHIPoBle::ClearTxPacket()
+bool BtpEngine::ClearTxPacket()
 {
     if (mTxState == kState_Complete)
     {
@@ -595,7 +595,7 @@ bool CHIPoBle::ClearTxPacket()
     return false;
 }
 
-void CHIPoBle::LogState() const
+void BtpEngine::LogState() const
 {
     ChipLogError(Ble, "mAppState: %p", mAppState);
 
@@ -618,7 +618,7 @@ void CHIPoBle::LogState() const
     ChipLogError(Ble, "mTxPacketCount: %d", mTxPacketCount);
 }
 
-void CHIPoBle::LogStateDebug() const
+void BtpEngine::LogStateDebug() const
 {
 #ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
     LogState();

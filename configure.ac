@@ -821,13 +821,13 @@ AC_ARG_ENABLE(chipoble-test,
     ],
     [enable_chipoble_test=no])
 AC_MSG_RESULT(${enable_chipoble_test})
-AM_CONDITIONAL([CHIP_ENABLE_BTP_CODEC_TEST], [test "${enable_chipoble_test}" = "yes"])
+AM_CONDITIONAL([CHIP_ENABLE_BTP_TEST], [test "${enable_chipoble_test}" = "yes"])
 if test "${enable_chipoble_test}" = "yes"; then
-    CHIP_ENABLE_BTP_CODEC_TEST=1
+    CHIP_ENABLE_BTP_TEST=1
 else
-    CHIP_ENABLE_BTP_CODEC_TEST=0
+    CHIP_ENABLE_BTP_TEST=0
 fi
-AC_DEFINE_UNQUOTED([CHIP_ENABLE_BTP_CODEC_TEST],[${CHIP_ENABLE_BTP_CODEC_TEST}],[Define to 1 if you want to enable CHIPoBle Control Path and Throughput Test.])
+AC_DEFINE_UNQUOTED([CHIP_ENABLE_BTP_TEST],[${CHIP_ENABLE_BTP_TEST}],[Define to 1 if you want to enable CHIPoBle Control Path and Throughput Test.])
 #
 # Documentation
 #
