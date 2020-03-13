@@ -19,7 +19,7 @@
  *    @file
  *      This file implements a Bluetooth Low Energy (BLE) connection
  *      endpoint abstraction for the byte-streaming,
- *      connection-oriented chip over Bluetooth Low Energy (WoBLE)
+ *      connection-oriented chip over Bluetooth Low Energy (CHIPoBLE)
  *      Bluetooth Transport Protocol (BTP).
  *
  */
@@ -41,9 +41,9 @@
 
 #include <ble/BLEEndPoint.h>
 #include <ble/BleLayer.h>
-#include <ble/WoBle.h>
-#if CHIP_ENABLE_WOBLE_TEST
-#include "WoBleTest.h"
+#include <ble/CHIPoBle.h>
+#if CHIP_ENABLE_CHIPOBLE_TEST
+#include "CHIPoBleTest.h"
 #endif
 
 // clang-format off
@@ -221,8 +221,8 @@ void BLEEndPoint::HandleSubscribeReceived()
     VerifyOrExit(mSendQueue != NULL, err = BLE_ERROR_INCORRECT_STATE);
 
     // Send BTP capabilities response to peripheral via GATT indication.
-#if CHIP_ENABLE_WOBLE_TEST
-    VerifyOrExit(mWoBle.PopPacketTag(mSendQueue) == kType_Data, err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
+#if CHIP_ENABLE_CHIPOBLE_TEST
+    VerifyOrExit(mCHIPoBle.PopPacketTag(mSendQueue) == kType_Data, err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 #endif
     if (!SendIndication(mSendQueue))
     {
@@ -306,7 +306,7 @@ void BLEEndPoint::Abort()
     OnConnectComplete  = NULL;
     OnConnectionClosed = NULL;
     OnMessageReceived  = NULL;
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     OnCommandReceived = NULL;
 #endif
 
@@ -319,7 +319,7 @@ void BLEEndPoint::Close()
     OnConnectComplete  = NULL;
     OnConnectionClosed = NULL;
     OnMessageReceived  = NULL;
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     OnCommandReceived = NULL;
 #endif
 
@@ -346,7 +346,7 @@ void BLEEndPoint::DoClose(uint8_t flags, BLE_ERROR err)
         }
 
         // If transmit buffer is empty or a transmission abort was specified...
-        if (mWoBle.TxState() == WoBle::kState_Idle || (flags & kBleCloseFlag_AbortTransmission))
+        if (mCHIPoBle.TxState() == CHIPoBle::kState_Idle || (flags & kBleCloseFlag_AbortTransmission))
         {
             FinalizeClose(oldState, flags, err);
         }
@@ -354,8 +354,8 @@ void BLEEndPoint::DoClose(uint8_t flags, BLE_ERROR err)
         {
             // Wait for send queue and fragmenter's tx buffer to become empty, to ensure all pending messages have been
             // sent. Only free end point and tell platform it can throw away the underlying BLE connection once all
-            // pending messages have been sent and acknowledged by the remote WoBLE stack, or once the remote stack
-            // closes the WoBLE connection.
+            // pending messages have been sent and acknowledged by the remote CHIPoBLE stack, or once the remote stack
+            // closes the CHIPoBLE connection.
             //
             // In so doing, BLEEndPoint attempts to emulate the level of reliability afforded by TCPEndPoint and TCP
             // sockets in general with a typical default SO_LINGER option. That said, there is no hard guarantee that
@@ -381,9 +381,9 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
     mSendQueue = NULL;
     QueueTxUnlock();
 
-#if CHIP_ENABLE_WOBLE_TEST
-    PacketBuffer::Free(mWoBleTest.mCommandReceiveQueue);
-    mWoBleTest.mCommandReceiveQueue = NULL;
+#if CHIP_ENABLE_CHIPOBLE_TEST
+    PacketBuffer::Free(mCHIPoBleTest.mCommandReceiveQueue);
+    mCHIPoBleTest.mCommandReceiveQueue = NULL;
 #endif
 
     // Fire application's close callback if we haven't already, and it's not suppressed.
@@ -411,7 +411,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
             // we're really sure the unsubscribe request has been sent.
             if (!mBle->mPlatformDelegate->UnsubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_2_ID))
             {
-                chipLogError(Ble, "WoBle unsub failed");
+                chipLogError(Ble, "CHIPoBle unsub failed");
 
                 // If unsubscribe fails, release BLE connection and free end point immediately.
                 Free();
@@ -488,7 +488,7 @@ void BLEEndPoint::Free()
     ReleaseBleConnection();
 
     // Clear fragmentation and reassembly engine's Tx and Rx buffers. Counters will be reset by next engine init.
-    FreeWoBle();
+    FreeCHIPoBle();
 
     // Clear pending ack buffer, if any.
     PacketBuffer::Free(mAckToSend);
@@ -499,8 +499,8 @@ void BLEEndPoint::Free()
     StopAckReceivedTimer();
     StopSendAckTimer();
     StopUnsubscribeTimer();
-#if CHIP_ENABLE_WOBLE_TEST
-    mWoBleTest.StopTestTimer();
+#if CHIP_ENABLE_CHIPOBLE_TEST
+    mCHIPoBleTest.StopTestTimer();
     // Clear callback
     OnCommandReceived = NULL;
 #endif
@@ -517,18 +517,18 @@ void BLEEndPoint::Free()
     Release();
 }
 
-void BLEEndPoint::FreeWoBle()
+void BLEEndPoint::FreeCHIPoBle()
 {
     PacketBuffer * buf;
 
     // Free transmit disassembly buffer
-    buf = mWoBle.TxPacket();
-    mWoBle.ClearTxPacket();
+    buf = mCHIPoBle.TxPacket();
+    mCHIPoBle.ClearTxPacket();
     PacketBuffer::Free(buf);
 
     // Free receive reassembly buffer
-    buf = mWoBle.RxPacket();
-    mWoBle.ClearRxPacket();
+    buf = mCHIPoBle.RxPacket();
+    mCHIPoBle.ClearRxPacket();
     PacketBuffer::Free(buf);
 }
 
@@ -555,24 +555,24 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     // If central, periperal's handshake indication 'ack's write sent by central to kick off the BTP handshake.
     expectInitialAck = (role == kBleRole_Peripheral);
 
-    err = mWoBle.Init(this, expectInitialAck);
+    err = mCHIPoBle.Init(this, expectInitialAck);
     if (err != BLE_NO_ERROR)
     {
-        chipLogError(Ble, "WoBle init failed");
+        chipLogError(Ble, "CHIPoBle init failed");
         ExitNow();
     }
 
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     err = (BLE_ERROR) mTxQueueMutex.Init(mTxQueueMutex);
     if (err != BLE_NO_ERROR)
     {
         chipLogError(Ble, "%s: Mutex init failed", __FUNCTION__);
         ExitNow();
     }
-    err = mWoBleTest.Init(this);
+    err = mCHIPoBleTest.Init(this);
     if (err != BLE_NO_ERROR)
     {
-        chipLogError(Ble, "WoBleTest init failed");
+        chipLogError(Ble, "CHIPoBleTest init failed");
         ExitNow();
     }
 #endif
@@ -643,9 +643,9 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBuffer * buf)
  */
 void BLEEndPoint::QueueTx(PacketBuffer * data, PacketType_t type)
 {
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     chipLogDebugBleEndPoint(Ble, "%s: data->%p, type %d, len %d", __FUNCTION__, data, type, data->DataLength());
-    mWoBle.PushPacketTag(data, type);
+    mCHIPoBle.PushPacketTag(data, type);
 #endif
 
     QueueTxLock();
@@ -728,7 +728,7 @@ bool BLEEndPoint::PrepareNextFragment(PacketBuffer * data, bool & sentAck)
         sentAck = false;
     }
 
-    return mWoBle.HandleCharacteristicSend(data, sentAck);
+    return mCHIPoBle.HandleCharacteristicSend(data, sentAck);
 }
 
 BLE_ERROR BLEEndPoint::SendNextMessage()
@@ -738,7 +738,7 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
 
     // Get the first queued packet to send
     QueueTxLock();
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     // Return if tx queue is empty
     // Note: DetachTail() does not check an empty queue
     if (mSendQueue == NULL)
@@ -752,19 +752,19 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
     mSendQueue          = mSendQueue->DetachTail();
     QueueTxUnlock();
 
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     // Get and consume the packet tag in message buffer
-    PacketType_t type = mWoBle.PopPacketTag(data);
-    mWoBle.SetTxPacketType(type);
-    mWoBleTest.DoTxTiming(data, WOBLE_TX_START);
+    PacketType_t type = mCHIPoBle.PopPacketTag(data);
+    mCHIPoBle.SetTxPacketType(type);
+    mCHIPoBleTest.DoTxTiming(data, CHIPOBLE_TX_START);
 #endif
 
     // Hand whole message payload to the fragmenter.
-    VerifyOrExit(PrepareNextFragment(data, sentAck), err = BLE_ERROR_WOBLE_PROTOCOL_ABORT);
+    VerifyOrExit(PrepareNextFragment(data, sentAck), err = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT);
     data = NULL; // Ownership passed to fragmenter's tx buf on PrepareNextFragment success.
 
     // Send first message fragment over the air.
-    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_WOBLESend, {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_CHIPOBLESend, {
         if (mRole == kBleRole_Central)
         {
             err = BLE_ERROR_GATT_WRITE_FAILED;
@@ -775,7 +775,7 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
         }
         ExitNow();
     });
-    err = SendCharacteristic(mWoBle.TxPacket());
+    err = SendCharacteristic(mCHIPoBle.TxPacket());
     SuccessOrExit(err);
 
     if (sentAck)
@@ -806,13 +806,13 @@ BLE_ERROR BLEEndPoint::ContinueMessageSend()
     {
         // Log BTP error
         chipLogError(Ble, "btp fragmenter error on send!");
-        mWoBle.LogState();
+        mCHIPoBle.LogState();
 
-        err = BLE_ERROR_WOBLE_PROTOCOL_ABORT;
+        err = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
         ExitNow();
     }
 
-    err = SendCharacteristic(mWoBle.TxPacket());
+    err = SendCharacteristic(mCHIPoBle.TxPacket());
     SuccessOrExit(err);
 
     if (sentAck)
@@ -929,7 +929,7 @@ BLE_ERROR BLEEndPoint::HandleFragmentConfirmationReceived()
     // the stand-alone ack, and also the case where a window size < the immediate ack threshold was detected in
     // Receive(), but the stand-alone ack was deferred due to a pending outbound message fragment.
     if (mLocalReceiveWindowSize <= BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD &&
-        !(mSendQueue != NULL || mWoBle.TxState() == WoBle::kState_InProgress))
+        !(mSendQueue != NULL || mCHIPoBle.TxState() == CHIPoBle::kState_InProgress))
     {
         err = DriveStandAloneAck(); // Encode stand-alone ack and drive sending.
         SuccessOrExit(err);
@@ -996,7 +996,7 @@ BLE_ERROR BLEEndPoint::DoSendStandAloneAck()
     chipLogDebugBleEndPoint(Ble, "entered DoSendStandAloneAck; sending stand-alone ack");
 
     // Encode and transmit stand-alone ack.
-    mWoBle.EncodeStandAloneAck(mAckToSend);
+    mCHIPoBle.EncodeStandAloneAck(mAckToSend);
     BLE_ERROR err = SendCharacteristic(mAckToSend);
     SuccessOrExit(err);
 
@@ -1055,7 +1055,7 @@ BLE_ERROR BLEEndPoint::DriveSending()
         err = DoSendStandAloneAck();
         SuccessOrExit(err);
     }
-    else if (mWoBle.TxState() == WoBle::kState_Idle) // Else send next message fragment, if any.
+    else if (mCHIPoBle.TxState() == CHIPoBle::kState_Idle) // Else send next message fragment, if any.
     {
         // Fragmenter's idle, let's see what's in the send queue...
         if (mSendQueue != NULL)
@@ -1069,20 +1069,20 @@ BLE_ERROR BLEEndPoint::DriveSending()
             // Nothing to send!
         }
     }
-    else if (mWoBle.TxState() == WoBle::kState_InProgress)
+    else if (mCHIPoBle.TxState() == CHIPoBle::kState_InProgress)
     {
         // Send next fragment of message currently held by fragmenter.
         err = ContinueMessageSend();
         SuccessOrExit(err);
     }
-    else if (mWoBle.TxState() == WoBle::kState_Complete)
+    else if (mCHIPoBle.TxState() == CHIPoBle::kState_Complete)
     {
         // Clear fragmenter's pointer to sent message buffer and reset its Tx state.
-        PacketBuffer * sentBuf = mWoBle.TxPacket();
-#if CHIP_ENABLE_WOBLE_TEST
-        mWoBleTest.DoTxTiming(sentBuf, WOBLE_TX_DONE);
-#endif // CHIP_ENABLE_WOBLE_TEST
-        mWoBle.ClearTxPacket();
+        PacketBuffer * sentBuf = mCHIPoBle.TxPacket();
+#if CHIP_ENABLE_CHIPOBLE_TEST
+        mCHIPoBleTest.DoTxTiming(sentBuf, CHIPOBLE_TX_DONE);
+#endif // CHIP_ENABLE_CHIPOBLE_TEST
+        mCHIPoBle.ClearTxPacket();
 
         // Free sent buffer.
         PacketBuffer::Free(sentBuf);
@@ -1094,7 +1094,7 @@ BLE_ERROR BLEEndPoint::DriveSending()
             err = SendNextMessage();
             SuccessOrExit(err);
         }
-        else if (mState == kState_Closing && !mWoBle.ExpectingAck()) // and mSendQueue is NULL, per above...
+        else if (mState == kState_Closing && !mCHIPoBle.ExpectingAck()) // and mSendQueue is NULL, per above...
         {
             // If end point closing, got last ack, and got out-of-order confirmation for last send, finalize close.
             FinalizeClose(mState, kBleCloseFlag_SuppressCallback, BLE_NO_ERROR);
@@ -1142,12 +1142,12 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
     if (mtu > 0) // If one or both device knows connection's MTU...
     {
         resp.mFragmentSize =
-            chip::min(static_cast<uint16_t>(mtu - 3), WoBle::sMaxFragmentSize); // Reserve 3 bytes of MTU for ATT header.
+            chip::min(static_cast<uint16_t>(mtu - 3), CHIPoBle::sMaxFragmentSize); // Reserve 3 bytes of MTU for ATT header.
     }
     else // Else, if neither device knows MTU...
     {
-        chipLogProgress(Ble, "cannot determine ATT MTU; selecting default fragment size = %u", WoBle::sDefaultFragmentSize);
-        resp.mFragmentSize = WoBle::sDefaultFragmentSize;
+        chipLogProgress(Ble, "cannot determine ATT MTU; selecting default fragment size = %u", CHIPoBle::sDefaultFragmentSize);
+        resp.mFragmentSize = CHIPoBle::sDefaultFragmentSize;
     }
 
     // Select local and remote max receive window size based on local resources available for both incoming writes AND
@@ -1174,15 +1174,15 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
              (resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V2))
     {
         // Set Rx and Tx fragment sizes to the same value
-        mWoBle.SetRxFragmentSize(resp.mFragmentSize);
-        mWoBle.SetTxFragmentSize(resp.mFragmentSize);
+        mCHIPoBle.SetRxFragmentSize(resp.mFragmentSize);
+        mCHIPoBle.SetTxFragmentSize(resp.mFragmentSize);
     }
     else // resp.SelectedProtocolVersion >= kBleTransportProtocolVersion_V3
     {
         // This is the peripheral, so set Rx fragment size, and leave Tx at default
-        mWoBle.SetRxFragmentSize(resp.mFragmentSize);
+        mCHIPoBle.SetRxFragmentSize(resp.mFragmentSize);
     }
-    chipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mWoBle.GetRxFragmentSize(), mWoBle.GetTxFragmentSize());
+    chipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mCHIPoBle.GetRxFragmentSize(), mCHIPoBle.GetTxFragmentSize());
 
     err = resp.Encode(responseBuf);
     SuccessOrExit(err);
@@ -1232,21 +1232,21 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBuffer * data)
         ExitNow();
     }
 
-    // Set fragment size as minimum of (reported ATT MTU, WoBLE characteristic size)
-    resp.mFragmentSize = chip::min(resp.mFragmentSize, WoBle::sMaxFragmentSize);
+    // Set fragment size as minimum of (reported ATT MTU, CHIPoBLE characteristic size)
+    resp.mFragmentSize = chip::min(resp.mFragmentSize, CHIPoBle::sMaxFragmentSize);
 
     if ((resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V1) ||
         (resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V2))
     {
-        mWoBle.SetRxFragmentSize(resp.mFragmentSize);
-        mWoBle.SetTxFragmentSize(resp.mFragmentSize);
+        mCHIPoBle.SetRxFragmentSize(resp.mFragmentSize);
+        mCHIPoBle.SetTxFragmentSize(resp.mFragmentSize);
     }
     else // resp.SelectedProtocolVersion >= kBleTransportProtocolVersion_V3
     {
         // This is the central, so set Tx fragement size, and leave Rx at default.
-        mWoBle.SetTxFragmentSize(resp.mFragmentSize);
+        mCHIPoBle.SetTxFragmentSize(resp.mFragmentSize);
     }
-    chipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mWoBle.GetRxFragmentSize(), mWoBle.GetTxFragmentSize());
+    chipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mCHIPoBle.GetRxFragmentSize(), mCHIPoBle.GetTxFragmentSize());
 
     // Select local and remote max receive window size based on local resources available for both incoming indications
     // AND GATT confirmations.
@@ -1313,14 +1313,14 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
     uint8_t closeFlags           = kBleCloseFlag_AbortTransmission;
     bool didReceiveAck           = false;
 
-#if CHIP_ENABLE_WOBLE_TEST
-    if (mWoBle.IsCommandPacket(data))
+#if CHIP_ENABLE_CHIPOBLE_TEST
+    if (mCHIPoBle.IsCommandPacket(data))
     {
         chipLogDebugBleEndPoint(Ble, "%s: Received Control frame: Flags %x", __FUNCTION__, *(data->Start()));
     }
     else
 #endif
-    { // This is a special handling on the first Woble data packet, the CapabilitiesRequest.
+    { // This is a special handling on the first CHIPoBLE data packet, the CapabilitiesRequest.
         // Suppress error logging if peer's send overlaps with our unsubscribe on final close.
         if (IsUnsubscribePending())
         {
@@ -1377,15 +1377,15 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         ExitNow();
     }
 
-    chipLogDebugBleEndPoint(Ble, "woble about to rx characteristic, state before:");
-    mWoBle.LogStateDebug();
+    chipLogDebugBleEndPoint(Ble, "CHIPoBLE about to rx characteristic, state before:");
+    mCHIPoBle.LogStateDebug();
 
     // Pass received packet into BTP protocol engine.
-    err  = mWoBle.HandleCharacteristicReceived(data, receivedAck, didReceiveAck);
+    err  = mCHIPoBle.HandleCharacteristicReceived(data, receivedAck, didReceiveAck);
     data = NULL; // Buffer consumed by protocol engine; either freed or added to message reassembly area.
 
-    chipLogDebugBleEndPoint(Ble, "woble rx'd characteristic, state after:");
-    mWoBle.LogStateDebug();
+    chipLogDebugBleEndPoint(Ble, "CHIPoBLE rx'd characteristic, state after:");
+    mCHIPoBle.LogStateDebug();
 
     SuccessOrExit(err);
 
@@ -1399,12 +1399,12 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         chipLogDebugBleEndPoint(Ble, "got btp ack = %u", receivedAck);
 
         // If ack was rx'd for neweset unacked sent fragment, stop ack received timer.
-        if (!mWoBle.ExpectingAck())
+        if (!mCHIPoBle.ExpectingAck())
         {
             chipLogDebugBleEndPoint(Ble, "got ack for last outstanding fragment");
             StopAckReceivedTimer();
 
-            if (mState == kState_Closing && mSendQueue == NULL && mWoBle.TxState() == WoBle::kState_Idle)
+            if (mState == kState_Closing && mSendQueue == NULL && mCHIPoBle.TxState() == CHIPoBle::kState_Idle)
             {
                 // If end point closing, got confirmation for last send, and waiting for last ack, finalize close.
                 FinalizeClose(mState, kBleCloseFlag_SuppressCallback, BLE_NO_ERROR);
@@ -1420,12 +1420,12 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
 
         chipLogDebugBleEndPoint(Ble, "about to adjust remote rx window; got ack num = %u, newest unacked sent seq num = %u, \
                 old window size = %u, max window size = %u",
-                                receivedAck, mWoBle.GetNewestUnackedSentSequenceNumber(), mRemoteReceiveWindowSize,
+                                receivedAck, mCHIPoBle.GetNewestUnackedSentSequenceNumber(), mRemoteReceiveWindowSize,
                                 mReceiveWindowMaxSize);
 
         // Open remote device's receive window according to sequence number it just acknowledged.
         mRemoteReceiveWindowSize =
-            AdjustRemoteReceiveWindow(receivedAck, mReceiveWindowMaxSize, mWoBle.GetNewestUnackedSentSequenceNumber());
+            AdjustRemoteReceiveWindow(receivedAck, mReceiveWindowMaxSize, mCHIPoBle.GetNewestUnackedSentSequenceNumber());
 
         chipLogDebugBleEndPoint(Ble, "adjusted remote rx window, new size = %u", mRemoteReceiveWindowSize);
 
@@ -1447,7 +1447,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
     //
     // If any GATT operation is in flight that is NOT a stand-alone ack, the window size will be checked against
     // this threshold again when the GATT operation is confirmed.
-    if (mWoBle.HasUnackedData())
+    if (mCHIPoBle.HasUnackedData())
     {
         if (mLocalReceiveWindowSize <= BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD &&
             !GetFlag(mConnStateFlags, kConnState_GattOperationInFlight))
@@ -1467,22 +1467,22 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
     }
 
     // If we've reassembled a whole message...
-    if (mWoBle.RxState() == WoBle::kState_Complete)
+    if (mCHIPoBle.RxState() == CHIPoBle::kState_Complete)
     {
         // Take ownership of message PacketBuffer
-        PacketBuffer * full_packet = mWoBle.RxPacket();
-        mWoBle.ClearRxPacket();
+        PacketBuffer * full_packet = mCHIPoBle.RxPacket();
+        mCHIPoBle.ClearRxPacket();
 
         chipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
 
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
         // If we have a control message received callback, and end point is not closing...
-        if (mWoBle.RxPacketType() == kType_Control && OnCommandReceived && mState != kState_Closing)
+        if (mCHIPoBle.RxPacketType() == kType_Control && OnCommandReceived && mState != kState_Closing)
         {
             chipLogDebugBleEndPoint(Ble, "%s: calling OnCommandReceived, seq# %u, len = %u, type %u", __FUNCTION__, receivedAck,
-                                    full_packet->DataLength(), mWoBle.RxPacketType());
+                                    full_packet->DataLength(), mCHIPoBle.RxPacketType());
             // Pass received control message up the stack.
-            mWoBle.SetRxPacketSeq(receivedAck);
+            mCHIPoBle.SetRxPacketSeq(receivedAck);
             OnCommandReceived(this, full_packet);
         }
         else
@@ -1700,7 +1700,7 @@ void BLEEndPoint::HandleAckReceivedTimeout(chip::System::Layer * systemLayer, vo
     if (GetFlag(ep->mTimerStateFlags, kTimerState_AckReceivedTimerRunning))
     {
         chipLogError(Ble, "ack recv timeout, closing ep %p", ep);
-        ep->mWoBle.LogStateDebug();
+        ep->mCHIPoBle.LogStateDebug();
         SetFlag(ep->mTimerStateFlags, kTimerState_AckReceivedTimerRunning, false);
         ep->DoClose(kBleCloseFlag_AbortTransmission, BLE_ERROR_FRAGMENT_ACK_TIMED_OUT);
     }

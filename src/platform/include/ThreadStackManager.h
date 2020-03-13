@@ -97,8 +97,8 @@ private:
     CHIP_ERROR SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
     bool HaveMeshConnectivity(void);
     void OnMessageLayerActivityChanged(bool messageLayerIsActive);
-    void OnWoBLEAdvertisingStart(void);
-    void OnWoBLEAdvertisingStop(void);
+    void OnCHIPoBLEAdvertisingStart(void);
+    void OnCHIPoBLEAdvertisingStop(void);
 
 protected:
 
@@ -137,7 +137,7 @@ extern ThreadStackManagerImpl & ThreadStackMgrImpl(void);
 #ifdef EXTERNAL_THREADSTACKMANAGERIMPL_HEADER
 #include EXTERNAL_THREADSTACKMANAGERIMPL_HEADER
 #else
-#define THREADSTACKMANAGERIMPL_HEADER <chip/DeviceLayer/CHIP_DEVICE_LAYER_TARGET/ThreadStackManagerImpl.h>
+#define THREADSTACKMANAGERIMPL_HEADER <CHIP_DEVICE_LAYER_TARGET/ThreadStackManagerImpl.h>
 #include THREADSTACKMANAGERIMPL_HEADER
 #endif
 
@@ -252,14 +252,14 @@ inline void ThreadStackManager::OnMessageLayerActivityChanged(bool messageLayerI
     return static_cast<ImplClass*>(this)->_OnMessageLayerActivityChanged(messageLayerIsActive);
 }
 
-inline void ThreadStackManager::OnWoBLEAdvertisingStart(void)
+inline void ThreadStackManager::OnCHIPoBLEAdvertisingStart(void)
 {
-    static_cast<ImplClass*>(this)->_OnWoBLEAdvertisingStart();
+    static_cast<ImplClass*>(this)->_OnCHIPoBLEAdvertisingStart();
 }
 
-inline void ThreadStackManager::OnWoBLEAdvertisingStop(void)
+inline void ThreadStackManager::OnCHIPoBLEAdvertisingStop(void)
 {
-    static_cast<ImplClass*>(this)->_OnWoBLEAdvertisingStop();
+    static_cast<ImplClass*>(this)->_OnCHIPoBLEAdvertisingStop();
 }
 
 inline CHIP_ERROR ThreadStackManager::GetAndLogThreadStatsCounters(void)

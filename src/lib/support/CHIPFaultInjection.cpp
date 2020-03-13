@@ -79,7 +79,7 @@ static const FaultInjection::Name sFaultNames[] = {
     "TunnelPacketDropByPolicy",
 #endif // CHIP_CONFIG_ENABLE_TUNNELING
 #if CONFIG_NETWORK_LAYER_BLE
-    "WOBLESend",
+    "CHIPOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE
 };
 

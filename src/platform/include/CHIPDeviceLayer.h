@@ -19,32 +19,25 @@
 #define CHIP_DEVICE_H
 
 #include <core/CHIPCore.h>
-#include <core/CHIPGlobals.h>
-#include <platform/CHIPDeviceConfig.h>
-#include <platform/CHIPDeviceError.h>
-#include <platform/GeneralUtils.h>
+#include <CHIPDeviceConfig.h>
+#include <CHIPDeviceError.h>
+#include <GeneralUtils.h>
 #include <ble/BleLayer.h>
-#include <platform/PlatformManager.h>
-#include <platform/ConfigurationManager.h>
-#include <platform/ConnectivityManager.h>
+#include <PlatformManager.h>
+#include <ConfigurationManager.h>
+#include <ConnectivityManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#include <platform/SoftwareUpdateManager.h>
+#include <SoftwareUpdateManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#include <platform/TimeSyncManager.h>
+#include <TimeSyncManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/ThreadStackManager.h>
+#include <ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 namespace chip {
 namespace DeviceLayer {
 
 struct chipDeviceEvent;
-
-using chip::FabricState;
-using chip::MessageLayer;
-using chip::ExchangeMgr;
-using chip::SecurityMgr;
-
 extern chip::System::Layer SystemLayer;
 extern Inet::InetLayer InetLayer;
 
