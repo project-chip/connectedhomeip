@@ -1,9 +1,9 @@
 TOP_DIR = ../../..
 Test_Dir = tests
 
-.PHONY: all clean run_tests
+.PHONY: all clean check
 
-all: libcore.a run_tests
+all: libcore.a check
 
 include $(TOP_DIR)/.yams/cpp_rules.min
 
