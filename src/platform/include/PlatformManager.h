@@ -23,7 +23,7 @@
 #ifndef PLATFORM_MANAGER_H
 #define PLATFORM_MANAGER_H
 
-#include <platform/CHIPDeviceEvent.h>
+#include <CHIPDeviceEvent.h>
 
 namespace chip {
 namespace System {
@@ -148,7 +148,7 @@ extern PlatformManagerImpl & PlatformMgrImpl(void);
 #ifdef EXTERNAL_PLATFORMMANAGERIMPL_HEADER
 #include EXTERNAL_PLATFORMMANAGERIMPL_HEADER
 #else
-#define PLATFORMMANAGERIMPL_HEADER <chip/DeviceLayer/CHIP_DEVICE_LAYER_TARGET/PlatformManagerImpl.h>
+#define PLATFORMMANAGERIMPL_HEADER <CHIP_DEVICE_LAYER_TARGET/PlatformManagerImpl.h>
 #include PLATFORMMANAGERIMPL_HEADER
 #endif
 

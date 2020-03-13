@@ -25,7 +25,7 @@ CPP_Files = \
 	BleError.cpp \
 	BleLayer.cpp \
 	BleUUID.cpp \
-	WoBle.cpp
+	CHIPoBle.cpp
 
 libble.a: $(CPP_Objects)
 	ar rvs $@ $^
