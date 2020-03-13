@@ -1,0 +1,91 @@
+/*
+ *
+ *    Copyright (c) 2019 Nest Labs, Inc.
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *          Provides an generic implementation of ConnectivityManager features
+ *          for use on various platforms.
+ */
+
+#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_H
+#define GENERIC_CONNECTIVITY_MANAGER_IMPL_H
+
+#include <Weave/DeviceLayer/internal/DeviceDescriptionServer.h>
+
+
+namespace nl {
+namespace Weave {
+namespace DeviceLayer {
+namespace Internal {
+
+/**
+ * Provides a generic implementation of ConnectivityManager features that works on multiple platforms.
+ *
+ * This template contains implementations of select features from the ConnectivityManager abstract
+ * interface that are suitable for use on all platforms.  It is intended to be inherited (directly
+ * or indirectly) by the ConfigurationManagerImpl class, which also appears as the template's ImplClass
+ * parameter.
+ */
+template<class ImplClass>
+class GenericConnectivityManagerImpl
+{
+public:
+
+    // ===== Methods that implement the ConnectivityManager abstract interface.
+
+    bool _IsUserSelectedModeActive(void);
+    void _SetUserSelectedMode(bool val);
+    uint16_t _GetUserSelectedModeTimeout(void);
+    void _SetUserSelectedModeTimeout(uint16_t val);
+
+private:
+
+    ImplClass * Impl() { return static_cast<ImplClass *>(this); }
+};
+
+template<class ImplClass>
+inline bool GenericConnectivityManagerImpl<ImplClass>::_IsUserSelectedModeActive(void)
+{
+    return DeviceDescriptionSvr().IsUserSelectedModeActive();
+}
+
+template<class ImplClass>
+inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedMode(bool val)
+{
+    DeviceDescriptionSvr().SetUserSelectedMode(val);
+}
+
+template<class ImplClass>
+inline uint16_t GenericConnectivityManagerImpl<ImplClass>::_GetUserSelectedModeTimeout(void)
+{
+    return DeviceDescriptionSvr().GetUserSelectedModeTimeout();
+}
+
+template<class ImplClass>
+inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeout(uint16_t val)
+{
+    DeviceDescriptionSvr().SetUserSelectedModeTimeout(val);
+}
+
+
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace Weave
+} // namespace nl
+
+#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_H
