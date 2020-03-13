@@ -51,7 +51,7 @@ using namespace chip::Encoding;
  * @retval #CHIP_ERROR_BUFFER_TOO_SMALL    If the buffer is too small.
  *
  */
-CHIP_ERROR TLVUpdater::Init(uint8_t *buf, uint32_t dataLen, uint32_t maxLen)
+CHIP_ERROR TLVUpdater::Init(uint8_t * buf, uint32_t dataLen, uint32_t maxLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint32_t freeLen;
@@ -106,12 +106,12 @@ exit:
  * @retval #CHIP_ERROR_NOT_IMPLEMENTED     If reader was initialized on a chain
  *                                          of buffers.
  */
-CHIP_ERROR TLVUpdater::Init(TLVReader& aReader, uint32_t freeLen)
+CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t *buf = const_cast<uint8_t *>(aReader.GetReadPoint());
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    uint8_t * buf             = const_cast<uint8_t *>(aReader.GetReadPoint());
     uint32_t remainingDataLen = aReader.GetRemainingLength();
-    uint32_t readDataLen = aReader.GetLengthRead();
+    uint32_t readDataLen      = aReader.GetLengthRead();
 
     // TLVUpdater does not support chain of buffers yet
     VerifyOrExit(aReader.mBufHandle == 0, err = CHIP_ERROR_NOT_IMPLEMENTED);
@@ -136,35 +136,35 @@ CHIP_ERROR TLVUpdater::Init(TLVReader& aReader, uint32_t freeLen)
     memmove(buf + freeLen, buf, remainingDataLen);
 
     // Initialize the internal reader object
-    mUpdaterReader.mBufHandle = 0;
-    mUpdaterReader.mReadPoint = buf + freeLen;
-    mUpdaterReader.mBufEnd = buf + freeLen + remainingDataLen;
-    mUpdaterReader.mLenRead = readDataLen;
-    mUpdaterReader.mMaxLen = aReader.mMaxLen;
-    mUpdaterReader.mControlByte = kTLVControlByte_NotSpecified;
-    mUpdaterReader.mElemTag = AnonymousTag;
-    mUpdaterReader.mElemLenOrVal = 0;
+    mUpdaterReader.mBufHandle     = 0;
+    mUpdaterReader.mReadPoint     = buf + freeLen;
+    mUpdaterReader.mBufEnd        = buf + freeLen + remainingDataLen;
+    mUpdaterReader.mLenRead       = readDataLen;
+    mUpdaterReader.mMaxLen        = aReader.mMaxLen;
+    mUpdaterReader.mControlByte   = kTLVControlByte_NotSpecified;
+    mUpdaterReader.mElemTag       = AnonymousTag;
+    mUpdaterReader.mElemLenOrVal  = 0;
     mUpdaterReader.mContainerType = aReader.mContainerType;
     mUpdaterReader.SetContainerOpen(false);
 
     mUpdaterReader.ImplicitProfileId = aReader.ImplicitProfileId;
-    mUpdaterReader.AppData = aReader.AppData;
-    mUpdaterReader.GetNextBuffer = NULL;
+    mUpdaterReader.AppData           = aReader.AppData;
+    mUpdaterReader.GetNextBuffer     = NULL;
 
     // Initialize the internal writer object
-    mUpdaterWriter.mBufHandle = 0;
-    mUpdaterWriter.mBufStart = buf - readDataLen;
-    mUpdaterWriter.mWritePoint = buf;
-    mUpdaterWriter.mRemainingLen = freeLen;
-    mUpdaterWriter.mLenWritten = readDataLen;
-    mUpdaterWriter.mMaxLen = readDataLen + freeLen;
+    mUpdaterWriter.mBufHandle     = 0;
+    mUpdaterWriter.mBufStart      = buf - readDataLen;
+    mUpdaterWriter.mWritePoint    = buf;
+    mUpdaterWriter.mRemainingLen  = freeLen;
+    mUpdaterWriter.mLenWritten    = readDataLen;
+    mUpdaterWriter.mMaxLen        = readDataLen + freeLen;
     mUpdaterWriter.mContainerType = aReader.mContainerType;
     mUpdaterWriter.SetContainerOpen(false);
     mUpdaterWriter.SetCloseContainerReserved(false);
 
     mUpdaterWriter.ImplicitProfileId = aReader.ImplicitProfileId;
-    mUpdaterWriter.GetNewBuffer = NULL;
-    mUpdaterWriter.FinalizeBuffer = NULL;
+    mUpdaterWriter.GetNewBuffer      = NULL;
+    mUpdaterWriter.FinalizeBuffer    = NULL;
 
     // Cache element start address for internal use
     mElementStartAddr = buf + freeLen;
@@ -285,14 +285,12 @@ exit:
 CHIP_ERROR TLVUpdater::Move()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    const uint8_t *elementEnd;
+    const uint8_t * elementEnd;
     uint32_t copyLen;
 
-    VerifyOrExit((mUpdaterReader.mControlByte & kTLVTypeMask) != kTLVElementType_EndOfContainer,
-                 err = CHIP_END_OF_TLV);
+    VerifyOrExit((mUpdaterReader.mControlByte & kTLVTypeMask) != kTLVElementType_EndOfContainer, err = CHIP_END_OF_TLV);
 
-    VerifyOrExit(mUpdaterReader.GetType() != kTLVType_NotSpecified,
-                 err = CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrExit(mUpdaterReader.GetType() != kTLVType_NotSpecified, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     // Skip to the end of the element
     err = mUpdaterReader.Skip();
@@ -333,8 +331,7 @@ exit:
  */
 void TLVUpdater::MoveUntilEnd()
 {
-    const uint8_t *buffEnd = mUpdaterReader.GetReadPoint() +
-                                mUpdaterReader.GetRemainingLength();
+    const uint8_t * buffEnd = mUpdaterReader.GetReadPoint() + mUpdaterReader.GetRemainingLength();
 
     uint32_t copyLen = buffEnd - mElementStartAddr;
 
@@ -351,9 +348,9 @@ void TLVUpdater::MoveUntilEnd()
     mUpdaterWriter.SetCloseContainerReserved(false);
     mUpdaterReader.mReadPoint += copyLen;
     mUpdaterReader.mLenRead += copyLen;
-    mUpdaterReader.mControlByte = kTLVControlByte_NotSpecified;
-    mUpdaterReader.mElemTag = AnonymousTag;
-    mUpdaterReader.mElemLenOrVal = 0;
+    mUpdaterReader.mControlByte   = kTLVControlByte_NotSpecified;
+    mUpdaterReader.mElemTag       = AnonymousTag;
+    mUpdaterReader.mElemLenOrVal  = 0;
     mUpdaterReader.mContainerType = kTLVType_NotSpecified;
     mUpdaterReader.SetContainerOpen(false);
 }
@@ -394,20 +391,17 @@ void TLVUpdater::MoveUntilEnd()
  *                                      or TLVReader::EnterContainer().
  *
  */
-CHIP_ERROR TLVUpdater::EnterContainer(TLVType& outerContainerType)
+CHIP_ERROR TLVUpdater::EnterContainer(TLVType & outerContainerType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVType containerType;
 
-    VerifyOrExit(TLVTypeIsContainer(mUpdaterReader.mControlByte & kTLVTypeMask),
-                 err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(TLVTypeIsContainer(mUpdaterReader.mControlByte & kTLVTypeMask), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Change the updater state
     AdjustInternalWriterFreeSpace();
 
-    err = mUpdaterWriter.StartContainer(mUpdaterReader.GetTag(),
-                                      mUpdaterReader.GetType(),
-                                      containerType);
+    err = mUpdaterWriter.StartContainer(mUpdaterReader.GetTag(), mUpdaterReader.GetType(), containerType);
     SuccessOrExit(err);
 
     err = mUpdaterReader.EnterContainer(containerType);
@@ -485,7 +479,7 @@ exit:
  */
 void TLVUpdater::AdjustInternalWriterFreeSpace()
 {
-    const uint8_t *nextElementStart = mUpdaterReader.mReadPoint;
+    const uint8_t * nextElementStart = mUpdaterReader.mReadPoint;
 
     if (nextElementStart != mElementStartAddr)
     {

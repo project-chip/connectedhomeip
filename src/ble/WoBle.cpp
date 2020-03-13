@@ -50,15 +50,17 @@
 #define CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE 1          // Size in bytes of encoded BTP fragment acknowledgement number
 #define CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE 2      // Size in byte of encoded BTP total fragmented message length
 
-#define CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE                                                                                   \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE + \
-     CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE)
+#define CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE                                                                                 \
+    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
+     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE)
 
-#define CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE                                                                      \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
+#define CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE                                                                    \
+    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
+     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
 
-#define CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE                                                                        \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
+#define CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE                                                                      \
+    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
+     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
 
 namespace chip {
 namespace Ble {
@@ -70,8 +72,7 @@ static inline void IncSeqNum(SequenceNumber_t & a_seq_num)
 
 static inline bool DidReceiveData(uint8_t rx_flags)
 {
-    return (GetFlag(rx_flags, WoBle::kHeaderFlag_StartMessage) ||
-            GetFlag(rx_flags, WoBle::kHeaderFlag_ContinueMessage) ||
+    return (GetFlag(rx_flags, WoBle::kHeaderFlag_StartMessage) || GetFlag(rx_flags, WoBle::kHeaderFlag_ContinueMessage) ||
             GetFlag(rx_flags, WoBle::kHeaderFlag_EndMessage));
 }
 
@@ -166,7 +167,7 @@ bool WoBle::HasUnackedData() const
 bool WoBle::IsValidAck(SequenceNumber_t ack_num) const
 {
     chipLogDebugBtpEngine(Ble, "entered IsValidAck, ack = %u, oldest = %u, newest = %u", ack_num, mTxOldestUnackedSeqNum,
-                           mTxNewestUnackedSeqNum);
+                          mTxNewestUnackedSeqNum);
 
     // Return false if not awaiting any ack.
     if (!mExpectingAck)

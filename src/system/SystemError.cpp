@@ -101,11 +101,7 @@ namespace System {
  */
 void RegisterSystemLayerErrorFormatter(void)
 {
-    static ErrorFormatter sSystemLayerErrorFormatter =
-    {
-        FormatSystemLayerError,
-        NULL
-    };
+    static ErrorFormatter sSystemLayerErrorFormatter = { FormatSystemLayerError, NULL };
 
     RegisterErrorFormatter(&sSystemLayerErrorFormatter);
 }
@@ -134,14 +130,30 @@ bool FormatSystemLayerError(char * buf, uint16_t bufSize, int32_t err)
 #if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err)
     {
-    case CHIP_SYSTEM_ERROR_NOT_IMPLEMENTED                     : desc = "Not implemented"; break;
-    case CHIP_SYSTEM_ERROR_NOT_SUPPORTED                       : desc = "Not supported"; break;
-    case CHIP_SYSTEM_ERROR_BAD_ARGS                            : desc = "Bad arguments"; break;
-    case CHIP_SYSTEM_ERROR_UNEXPECTED_STATE                    : desc = "Unexpected state"; break;
-    case CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT                    : desc = "Unexpected event"; break;
-    case CHIP_SYSTEM_ERROR_NO_MEMORY                           : desc = "No memory"; break;
-    case CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED                : desc = "Real time not synchronized"; break;
-    case CHIP_SYSTEM_ERROR_ACCESS_DENIED                       : desc = "Access denied"; break;
+    case CHIP_SYSTEM_ERROR_NOT_IMPLEMENTED:
+        desc = "Not implemented";
+        break;
+    case CHIP_SYSTEM_ERROR_NOT_SUPPORTED:
+        desc = "Not supported";
+        break;
+    case CHIP_SYSTEM_ERROR_BAD_ARGS:
+        desc = "Bad arguments";
+        break;
+    case CHIP_SYSTEM_ERROR_UNEXPECTED_STATE:
+        desc = "Unexpected state";
+        break;
+    case CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT:
+        desc = "Unexpected event";
+        break;
+    case CHIP_SYSTEM_ERROR_NO_MEMORY:
+        desc = "No memory";
+        break;
+    case CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED:
+        desc = "Real time not synchronized";
+        break;
+    case CHIP_SYSTEM_ERROR_ACCESS_DENIED:
+        desc = "Access denied";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
@@ -173,7 +185,7 @@ DLL_EXPORT Error MapErrorPOSIX(int aError)
  *
  *  @return A NULL-terminated, OS-specific descriptive C string describing the error.
  */
-DLL_EXPORT const char *DescribeErrorPOSIX(Error aError)
+DLL_EXPORT const char * DescribeErrorPOSIX(Error aError)
 {
     const int lError = (aError - CHIP_SYSTEM_POSIX_ERROR_MIN);
     return strerror(lError);
@@ -199,11 +211,7 @@ DLL_EXPORT bool IsErrorPOSIX(Error aError)
  */
 void RegisterPOSIXErrorFormatter(void)
 {
-    static ErrorFormatter sPOSIXErrorFormatter =
-    {
-        FormatPOSIXError,
-        NULL
-    };
+    static ErrorFormatter sPOSIXErrorFormatter = { FormatPOSIXError, NULL };
 
     RegisterErrorFormatter(&sPOSIXErrorFormatter);
 }
@@ -228,9 +236,9 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
     {
         const char * desc =
 #if CHIP_CONFIG_SHORT_ERROR_STR
-                NULL;
+            NULL;
 #else
-                DescribeErrorPOSIX(sysErr);
+            DescribeErrorPOSIX(sysErr);
 #endif
         FormatError(buf, bufSize, "OS", err, desc);
         return true;
@@ -267,14 +275,14 @@ DLL_EXPORT Error MapErrorLwIP(err_t aError)
  *  @return A NULL-terminated, LwIP-specific descriptive C string describing the error.
  *
  */
-DLL_EXPORT const char* DescribeErrorLwIP(Error aError)
+DLL_EXPORT const char * DescribeErrorLwIP(Error aError)
 {
-    const err_t lError = -((aError) - CHIP_SYSTEM_LWIP_ERROR_MIN);
+    const err_t lError = -((aError) -CHIP_SYSTEM_LWIP_ERROR_MIN);
 
     // If we are not compiling with LWIP_DEBUG asserted, the unmapped
     // local value may go unused.
 
-    (void)lError;
+    (void) lError;
 
     return lwip_strerr(lError);
 }
@@ -301,11 +309,7 @@ DLL_EXPORT bool IsErrorLwIP(Error aError)
  */
 void RegisterLwIPErrorFormatter(void)
 {
-    static ErrorFormatter sLwIPErrorFormatter =
-    {
-        FormatLwIPError,
-        NULL
-    };
+    static ErrorFormatter sLwIPErrorFormatter = { FormatLwIPError, NULL };
 
     RegisterErrorFormatter(&sLwIPErrorFormatter);
 }
@@ -330,9 +334,9 @@ bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err)
     {
         const char * desc =
 #if CHIP_CONFIG_SHORT_ERROR_STR
-                NULL;
+            NULL;
 #else
-                DescribeErrorLwIP(sysErr);
+            DescribeErrorLwIP(sysErr);
 #endif
         chip::FormatError(buf, bufSize, "LwIP", err, desc);
         return true;
@@ -344,7 +348,6 @@ bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err)
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 
 } // namespace System
 } // namespace chip

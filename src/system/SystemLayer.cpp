@@ -73,32 +73,30 @@ bool LwIPEventHandlerDelegate::IsInitialized() const
 
 void LwIPEventHandlerDelegate::Init(LwIPEventHandlerFunction aFunction)
 {
-    this->mFunction         = aFunction;
-    this->mNextDelegate     = NULL;
+    this->mFunction     = aFunction;
+    this->mNextDelegate = NULL;
 }
 
-void LwIPEventHandlerDelegate::Prepend(const LwIPEventHandlerDelegate*& aDelegateList)
+void LwIPEventHandlerDelegate::Prepend(const LwIPEventHandlerDelegate *& aDelegateList)
 {
     this->mNextDelegate = aDelegateList;
-    aDelegateList = this;
+    aDelegateList       = this;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-Layer::Layer()
-  : mLayerState(kLayerState_NotInitialized),
-    mContext(NULL), mPlatformData(NULL)
+Layer::Layer() : mLayerState(kLayerState_NotInitialized), mContext(NULL), mPlatformData(NULL)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!sSystemEventHandlerDelegate.IsInitialized())
         sSystemEventHandlerDelegate.Init(HandleSystemLayerEvent);
 
     this->mEventDelegateList = NULL;
-    this->mTimerList = NULL;
-    this->mTimerComplete = false;
+    this->mTimerList         = NULL;
+    this->mTimerComplete     = false;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    this->mWakePipeIn = 0;
+    this->mWakePipeIn  = 0;
     this->mWakePipeOut = 0;
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -107,7 +105,7 @@ Layer::Layer()
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
-Error Layer::Init(void* aContext)
+Error Layer::Init(void * aContext)
 {
     Error lReturn;
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -138,21 +136,21 @@ Error Layer::Init(void* aContext)
     lOSReturn = ::pipe(lPipeFDs);
     VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
 
-    this->mWakePipeIn = lPipeFDs[0];
+    this->mWakePipeIn  = lPipeFDs[0];
     this->mWakePipeOut = lPipeFDs[1];
 
     // Enable non-blocking mode for both ends of the pipe.
-    lFlags = ::fcntl(this->mWakePipeIn, F_GETFL, 0);
+    lFlags    = ::fcntl(this->mWakePipeIn, F_GETFL, 0);
     lOSReturn = ::fcntl(this->mWakePipeIn, F_SETFL, lFlags | O_NONBLOCK);
     VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
 
-    lFlags = ::fcntl(this->mWakePipeOut, F_GETFL, 0);
+    lFlags    = ::fcntl(this->mWakePipeOut, F_GETFL, 0);
     lOSReturn = ::fcntl(this->mWakePipeOut, F_SETFL, lFlags | O_NONBLOCK);
     VerifyOrExit(lOSReturn == 0, lReturn = chip::System::MapErrorPOSIX(errno));
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     this->mLayerState = kLayerState_Initialized;
-    this->mContext = aContext;
+    this->mContext    = aContext;
 
 exit:
     Platform::Layer::DidInit(*this, aContext, lReturn);
@@ -162,13 +160,13 @@ exit:
 Error Layer::Shutdown()
 {
     Error lReturn;
-    void* lContext;
+    void * lContext;
 
     if (this->mLayerState == kLayerState_NotInitialized)
         return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
 
     lContext = this->mContext;
-    lReturn = Platform::Layer::WillShutdown(*this, lContext);
+    lReturn  = Platform::Layer::WillShutdown(*this, lContext);
     SuccessOrExit(lReturn);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -176,13 +174,13 @@ Error Layer::Shutdown()
     {
         ::close(this->mWakePipeOut);
         this->mWakePipeOut = -1;
-        this->mWakePipeIn = -1;
+        this->mWakePipeIn  = -1;
     }
 #endif
 
     for (size_t i = 0; i < Timer::sPool.Size(); ++i)
     {
-        Timer* lTimer = Timer::sPool.Get(*this, i);
+        Timer * lTimer = Timer::sPool.Get(*this, i);
 
         if (lTimer != NULL)
         {
@@ -190,7 +188,7 @@ Error Layer::Shutdown()
         }
     }
 
-    this->mContext = NULL;
+    this->mContext    = NULL;
     this->mLayerState = kLayerState_NotInitialized;
 
 exit:
@@ -203,7 +201,7 @@ exit:
  *
  * @return Client-specific platform data, if is has been previously set; otherwise, NULL.
  */
-void* Layer::GetPlatformData() const
+void * Layer::GetPlatformData() const
 {
     return this->mPlatformData;
 }
@@ -215,19 +213,19 @@ void* Layer::GetPlatformData() const
  * @param[in]  aPlatformData  The client-specific platform data to set.
  *
  */
-void Layer::SetPlatformData(void* aPlatformData)
+void Layer::SetPlatformData(void * aPlatformData)
 {
     this->mPlatformData = aPlatformData;
 }
 
-Error Layer::NewTimer(Timer*& aTimerPtr)
+Error Layer::NewTimer(Timer *& aTimerPtr)
 {
-    Timer* lTimer = NULL;
+    Timer * lTimer = NULL;
 
     if (this->State() != kLayerState_Initialized)
         return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
 
-    lTimer = Timer::sPool.TryCreate(*this);
+    lTimer    = Timer::sPool.TryCreate(*this);
     aTimerPtr = lTimer;
 
     if (lTimer == NULL)
@@ -240,27 +238,27 @@ Error Layer::NewTimer(Timer*& aTimerPtr)
 }
 
 /**
-* @brief
-*   This method starts a one-shot timer.
-*
-*   @note
-*       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
-*       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
-*       the currently-running timer will first be cancelled.
-*
-*   @param[in]  aMilliseconds Expiration time in milliseconds.
-*   @param[in]  aComplete     A pointer to the function called when timer expires.
-*   @param[in]  aAppState     A pointer to the application state object used when timer expires.
-*
-*   @return CHIP_SYSTEM_NO_ERROR On success.
-*   @return CHIP_SYSTEM_ERROR_NO_MEMORY If a timer cannot be allocated.
-*   @return Other Value indicating timer failed to start.
-*
-*/
-Error Layer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void* aAppState)
+ * @brief
+ *   This method starts a one-shot timer.
+ *
+ *   @note
+ *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
+ *       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
+ *       the currently-running timer will first be cancelled.
+ *
+ *   @param[in]  aMilliseconds Expiration time in milliseconds.
+ *   @param[in]  aComplete     A pointer to the function called when timer expires.
+ *   @param[in]  aAppState     A pointer to the application state object used when timer expires.
+ *
+ *   @return CHIP_SYSTEM_NO_ERROR On success.
+ *   @return CHIP_SYSTEM_ERROR_NO_MEMORY If a timer cannot be allocated.
+ *   @return Other Value indicating timer failed to start.
+ *
+ */
+Error Layer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState)
 {
     Error lReturn;
-    Timer* lTimer;
+    Timer * lTimer;
 
     this->CancelTimer(aComplete, aAppState);
     lReturn = this->NewTimer(lTimer);
@@ -277,26 +275,26 @@ exit:
 }
 
 /**
-* @brief
-*   This method cancels a one-shot timer, started earlier through @p StartTimer().
-*
-*   @note
-*       The cancellation could fail silently in two different ways. If the timer specified by the combination of the callback
-*       function and application state object couldn't be found, cancellation could fail. If the timer has fired, but not yet
-*       removed from memory, cancellation could also fail.
-*
-*   @param[in]  aOnComplete   A pointer to the callback function used in calling @p StartTimer().
-*   @param[in]  aAppState     A pointer to the application state object used in calling @p StartTimer().
-*
-*/
-void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void* aAppState)
+ * @brief
+ *   This method cancels a one-shot timer, started earlier through @p StartTimer().
+ *
+ *   @note
+ *       The cancellation could fail silently in two different ways. If the timer specified by the combination of the callback
+ *       function and application state object couldn't be found, cancellation could fail. If the timer has fired, but not yet
+ *       removed from memory, cancellation could also fail.
+ *
+ *   @param[in]  aOnComplete   A pointer to the callback function used in calling @p StartTimer().
+ *   @param[in]  aAppState     A pointer to the application state object used in calling @p StartTimer().
+ *
+ */
+void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void * aAppState)
 {
     if (this->State() != kLayerState_Initialized)
         return;
 
     for (size_t i = 0; i < Timer::sPool.Size(); ++i)
     {
-        Timer* lTimer = Timer::sPool.Get(*this, i);
+        Timer * lTimer = Timer::sPool.Get(*this, i);
 
         if (lTimer != NULL && lTimer->OnComplete == aOnComplete && lTimer->AppState == aAppState)
         {
@@ -307,11 +305,11 @@ void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void* aAppState)
 }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-void Layer::CancelAllMatchingInetTimers(Inet::InetLayer& aInetLayer, void* aOnCompleteInetLayer, void* aAppState)
+void Layer::CancelAllMatchingInetTimers(Inet::InetLayer & aInetLayer, void * aOnCompleteInetLayer, void * aAppState)
 {
     for (size_t i = 0; i < Timer::sPool.Size(); ++i)
     {
-        Timer* lTimer = Timer::sPool.Get(*this, i);
+        Timer * lTimer = Timer::sPool.Get(*this, i);
 
         if (lTimer != NULL && lTimer->mInetLayer == &aInetLayer && lTimer->mOnCompleteInetLayer == aOnCompleteInetLayer &&
             lTimer->mAppStateInetLayer == aAppState)
@@ -355,10 +353,10 @@ void Layer::CancelAllMatchingInetTimers(Inet::InetLayer& aInetLayer, void* aOnCo
  *
  * @retval CHIP_SYSTEM_NO_ERROR On success.
  */
-Error Layer::ScheduleWork(TimerCompleteFunct aComplete, void* aAppState)
+Error Layer::ScheduleWork(TimerCompleteFunct aComplete, void * aAppState)
 {
     Error lReturn;
-    Timer* lTimer;
+    Timer * lTimer;
 
     lReturn = this->NewTimer(lTimer);
     SuccessOrExit(lReturn);
@@ -559,7 +557,8 @@ Error Layer::SetClock_RealTime(uint64_t newCurTime)
  *  @param[in]  aExceptionSet   A pointer to the set of file descriptors with errors.
  *  @param[in]  aSleepTime      A reference to the maximum sleep time.
  */
-void Layer::PrepareSelect(int& aSetSize, fd_set* aReadSet, fd_set* aWriteSet, fd_set* aExceptionSet, struct timeval& aSleepTime)
+void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet,
+                          struct timeval & aSleepTime)
 {
     if (this->State() != kLayerState_Initialized)
         return;
@@ -574,7 +573,7 @@ void Layer::PrepareSelect(int& aSetSize, fd_set* aReadSet, fd_set* aWriteSet, fd
 
     for (size_t i = 0; i < Timer::sPool.Size(); i++)
     {
-        Timer* lTimer = Timer::sPool.Get(*this, i);
+        Timer * lTimer = Timer::sPool.Get(*this, i);
 
         if (lTimer != NULL)
         {
@@ -590,8 +589,8 @@ void Layer::PrepareSelect(int& aSetSize, fd_set* aReadSet, fd_set* aWriteSet, fd
     }
 
     const Timer::Epoch kSleepTime = lAwakenEpoch - kCurrentEpoch;
-    aSleepTime.tv_sec = kSleepTime / 1000;
-    aSleepTime.tv_usec = (kSleepTime % 1000) * 1000;
+    aSleepTime.tv_sec             = kSleepTime / 1000;
+    aSleepTime.tv_usec            = (kSleepTime % 1000) * 1000;
 }
 
 /**
@@ -611,7 +610,7 @@ void Layer::PrepareSelect(int& aSetSize, fd_set* aReadSet, fd_set* aWriteSet, fd
  *  @param[in]    aExceptionSet     A pointer to the set of file descriptors with errors.
  *
  */
-void Layer::HandleSelectResult(int aSetSize, fd_set* aReadSet, fd_set* aWriteSet, fd_set* aExceptionSet)
+void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet)
 {
     pthread_t lThreadSelf;
 
@@ -633,7 +632,7 @@ void Layer::HandleSelectResult(int aSetSize, fd_set* aReadSet, fd_set* aWriteSet
             while (true)
             {
                 uint8_t lBytes[128];
-                int lTmp = ::read(this->mWakePipeIn, static_cast<void*>(lBytes), sizeof(lBytes));
+                int lTmp = ::read(this->mWakePipeIn, static_cast<void *>(lBytes), sizeof(lBytes));
                 if (lTmp < static_cast<int>(sizeof(lBytes)))
                     break;
             }
@@ -648,7 +647,7 @@ void Layer::HandleSelectResult(int aSetSize, fd_set* aReadSet, fd_set* aWriteSet
 
     for (size_t i = 0; i < Timer::sPool.Size(); i++)
     {
-        Timer* lTimer = Timer::sPool.Get(*this, i);
+        Timer * lTimer = Timer::sPool.Get(*this, i);
 
         if (lTimer != NULL && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
         {
@@ -684,7 +683,7 @@ void Layer::WakeSelect()
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Write a single byte to the wake pipe to wake up the select call.
-    const uint8_t kByte = 0;
+    const uint8_t kByte     = 0;
     const ssize_t kIOResult = ::write(this->mWakePipeOut, &kByte, 1);
     static_cast<void>(kIOResult);
 }
@@ -701,10 +700,10 @@ LwIPEventHandlerDelegate Layer::sSystemEventHandlerDelegate;
  *  @param[in]      aEventType  The type of event to post.
  *  @param[inout]   aArgument   The argument associated with the event to post.
  */
-Error Layer::HandleSystemLayerEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument)
+Error Layer::HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
     Error lReturn = CHIP_SYSTEM_NO_ERROR;
-;
+    ;
 
     // Dispatch logic specific to the event type
     switch (aEventType)
@@ -714,7 +713,7 @@ Error Layer::HandleSystemLayerEvent(Object& aTarget, EventType aEventType, uintp
         break;
 
     case kEvent_ScheduleWork:
-        static_cast<Timer&>(aTarget).HandleComplete();
+        static_cast<Timer &>(aTarget).HandleComplete();
         break;
 
     default:
@@ -733,7 +732,7 @@ Error Layer::HandleSystemLayerEvent(Object& aTarget, EventType aEventType, uintp
  *  @retval     CHIP_SYSTEM_NO_ERROR          On success.
  *  @retval     CHIP_SYSTEM_ERROR_BAD_ARGS    If the function pointer contained in aDelegate is NULL
  */
-Error Layer::AddEventHandlerDelegate(LwIPEventHandlerDelegate& aDelegate)
+Error Layer::AddEventHandlerDelegate(LwIPEventHandlerDelegate & aDelegate)
 {
     Error lReturn;
 
@@ -757,14 +756,14 @@ exit:
  *  @retval    CHIP_SYSTEM_ERROR_NO_MEMORY            If the event queue is already full.
  *  @retval    other Platform-specific errors generated indicating the reason for failure.
  */
-Error Layer::PostEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument)
+Error Layer::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
     Error lReturn = CHIP_SYSTEM_NO_ERROR;
     VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     // Sanity check that this instance and the target layer haven't been "crossed".
-    VerifyOrDieWithMsg(aTarget.IsRetained(*this), chipSystemLayer, "wrong poster! [target %p != this %p]",
-        &(aTarget.SystemLayer()), this);
+    VerifyOrDieWithMsg(aTarget.IsRetained(*this), chipSystemLayer, "wrong poster! [target %p != this %p]", &(aTarget.SystemLayer()),
+                       this);
 
     lReturn = Platform::Layer::PostEvent(*this, this->mContext, aTarget, aEventType, aArgument);
     if (lReturn != CHIP_SYSTEM_NO_ERROR)
@@ -791,7 +790,7 @@ Error Layer::DispatchEvents()
     lReturn = Platform::Layer::DispatchEvents(*this, this->mContext);
     SuccessOrExit(lReturn);
 
- exit:
+exit:
     return lReturn;
 }
 
@@ -813,7 +812,7 @@ Error Layer::DispatchEvent(Event aEvent)
     lReturn = Platform::Layer::DispatchEvent(*this, this->mContext, aEvent);
     SuccessOrExit(lReturn);
 
- exit:
+exit:
     return lReturn;
 }
 
@@ -828,17 +827,17 @@ Error Layer::DispatchEvent(Event aEvent)
  *  @retval   CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the InetLayer object is incorrect.
  *  @retval   CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT  If the event type is unrecognized.
  */
-Error Layer::HandleEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument)
+Error Layer::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
-    const LwIPEventHandlerDelegate* lEventDelegate;
+    const LwIPEventHandlerDelegate * lEventDelegate;
     Error lReturn;
     VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
     // Sanity check that this instance and the target layer haven't been "crossed".
     VerifyOrDieWithMsg(aTarget.IsRetained(*this), chipSystemLayer, "wrong handler! [target %p != this %p]",
-        &(aTarget.SystemLayer()), this);
+                       &(aTarget.SystemLayer()), this);
 
-    lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT;
+    lReturn        = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT;
     lEventDelegate = this->mEventDelegateList;
 
     // Prevent the target object from being freed while dispatching the event.
@@ -846,7 +845,7 @@ Error Layer::HandleEvent(Object& aTarget, EventType aEventType, uintptr_t aArgum
 
     while (lReturn == CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT && lEventDelegate != NULL)
     {
-        lReturn = lEventDelegate->mFunction(aTarget, aEventType, aArgument);
+        lReturn        = lEventDelegate->mFunction(aTarget, aEventType, aArgument);
         lEventDelegate = lEventDelegate->mNextDelegate;
     }
 
@@ -861,7 +860,7 @@ Error Layer::HandleEvent(Object& aTarget, EventType aEventType, uintptr_t aArgum
       */
     aTarget.Release();
 
- exit:
+exit:
     return lReturn;
 }
 
@@ -885,7 +884,7 @@ Error Layer::StartPlatformTimer(uint32_t aDelayMilliseconds)
     lReturn = Platform::Layer::StartTimer(*this, this->mContext, aDelayMilliseconds);
     SuccessOrExit(lReturn);
 
- exit:
+exit:
     return lReturn;
 }
 
@@ -907,7 +906,7 @@ Error Layer::HandlePlatformTimer()
     lReturn = Timer::HandleExpiredTimers(*this);
     SuccessOrExit(lReturn);
 
- exit:
+exit:
     return lReturn;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -918,9 +917,9 @@ Error Layer::HandlePlatformTimer()
 // MARK: CHIP System Layer platform- and system-specific functions for LwIP-native eventing.
 struct LwIPEvent
 {
-    EventType   Type;
-    Object*     Target;
-    uintptr_t   Argument;
+    EventType Type;
+    Object * Target;
+    uintptr_t Argument;
 };
 
 #endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
@@ -942,7 +941,7 @@ namespace Layer {
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  *      Returning non-successful status will abort initialization.
  */
-DLL_EXPORT Error WillInit(Layer& aLayer, void* aContext)
+DLL_EXPORT Error WillInit(Layer & aLayer, void * aContext)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
@@ -961,7 +960,7 @@ DLL_EXPORT Error WillInit(Layer& aLayer, void* aContext)
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
  */
-DLL_EXPORT Error WillShutdown(Layer& aLayer, void* aContext)
+DLL_EXPORT Error WillShutdown(Layer & aLayer, void * aContext)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
@@ -979,7 +978,7 @@ DLL_EXPORT Error WillShutdown(Layer& aLayer, void* aContext)
  *
  *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Init method.
  */
-DLL_EXPORT void DidInit(Layer& aLayer, void* aContext, Error aStatus)
+DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, Error aStatus)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
@@ -999,7 +998,7 @@ DLL_EXPORT void DidInit(Layer& aLayer, void* aContext, Error aStatus)
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
  */
-DLL_EXPORT void DidShutdown(Layer& aLayer, void* aContext, Error aStatus)
+DLL_EXPORT void DidShutdown(Layer & aLayer, void * aContext, Error aStatus)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
@@ -1035,11 +1034,11 @@ using chip::System::LwIPEvent;
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
-DLL_EXPORT Error PostEvent(Layer& aLayer, void* aContext, Object& aTarget, EventType aType, uintptr_t aArgument)
+DLL_EXPORT Error PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType, uintptr_t aArgument)
 {
     Error lReturn = CHIP_SYSTEM_NO_ERROR;
     sys_mbox_t lSysMbox;
-    LwIPEvent* ev;
+    LwIPEvent * ev;
     err_t lLwIPError;
 
     VerifyOrExit(aContext != NULL, lReturn = CHIP_SYSTEM_ERROR_BAD_ARGS);
@@ -1048,14 +1047,14 @@ DLL_EXPORT Error PostEvent(Layer& aLayer, void* aContext, Object& aTarget, Event
     ev = new LwIPEvent;
     VerifyOrExit(ev != NULL, lReturn = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-    ev->Type = aType;
-    ev->Target = &aTarget;
+    ev->Type     = aType;
+    ev->Target   = &aTarget;
     ev->Argument = aArgument;
 
     lLwIPError = sys_mbox_trypost(&lSysMbox, ev);
     VerifyOrExit(lLwIPError == ERR_OK, delete ev; lReturn = chip::System::MapErrorLwIP(lLwIPError));
 
- exit:
+exit:
     return lReturn;
 }
 
@@ -1078,13 +1077,13 @@ DLL_EXPORT Error PostEvent(Layer& aLayer, void* aContext, Object& aTarget, Event
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT  If an event type is unrecognized.
  *  @retval   #CHIP_SYSTEM_NO_ERROR                On success.
  */
-DLL_EXPORT Error DispatchEvents(Layer& aLayer, void* aContext)
+DLL_EXPORT Error DispatchEvents(Layer & aLayer, void * aContext)
 {
     Error lReturn = CHIP_SYSTEM_NO_ERROR;
     err_t lLwIPError;
     sys_mbox_t lSysMbox;
-    void* lVoidPointer;
-    const LwIPEvent* lEvent;
+    void * lVoidPointer;
+    const LwIPEvent * lEvent;
 
     // Sanity check the context / queue.
     VerifyOrExit(aContext != NULL, lReturn = CHIP_SYSTEM_ERROR_BAD_ARGS);
@@ -1095,7 +1094,7 @@ DLL_EXPORT Error DispatchEvents(Layer& aLayer, void* aContext)
         lLwIPError = sys_arch_mbox_tryfetch(&lSysMbox, &lVoidPointer);
         VerifyOrExit(lLwIPError == ERR_OK, lReturn = chip::System::MapErrorLwIP(lLwIPError));
 
-        lEvent = static_cast<const LwIPEvent*>(lVoidPointer);
+        lEvent = static_cast<const LwIPEvent *>(lVoidPointer);
         VerifyOrExit(lEvent != NULL && lEvent->Target != NULL, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
 
         lReturn = aLayer.HandleEvent(*lEvent->Target, lEvent->Type, lEvent->Argument);
@@ -1104,7 +1103,7 @@ DLL_EXPORT Error DispatchEvents(Layer& aLayer, void* aContext)
         SuccessOrExit(lReturn);
     }
 
- exit:
+exit:
     return lReturn;
 }
 
@@ -1127,12 +1126,12 @@ DLL_EXPORT Error DispatchEvents(Layer& aLayer, void* aContext)
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the CHIP System Layer object is unexpected.
  *  @retval   #CHIP_SYSTEM_NO_ERROR                On success.
  */
-DLL_EXPORT Error DispatchEvent(Layer& aLayer, void* aContext, Event aEvent)
+DLL_EXPORT Error DispatchEvent(Layer & aLayer, void * aContext, Event aEvent)
 {
     const EventType type = aEvent->Type;
-    Object* target = aEvent->Target;
-    const uint32_t data = aEvent->Argument;
-    Error lReturn = CHIP_SYSTEM_NO_ERROR;
+    Object * target      = aEvent->Target;
+    const uint32_t data  = aEvent->Argument;
+    Error lReturn        = CHIP_SYSTEM_NO_ERROR;
 
     // Sanity check the target object.
     VerifyOrExit(target != NULL, lReturn = CHIP_SYSTEM_ERROR_BAD_ARGS);
@@ -1141,7 +1140,7 @@ DLL_EXPORT Error DispatchEvent(Layer& aLayer, void* aContext, Event aEvent)
     lReturn = aLayer.HandleEvent(*target, type, data);
     SuccessOrExit(lReturn);
 
- exit:
+exit:
     return lReturn;
 }
 
@@ -1158,7 +1157,7 @@ DLL_EXPORT Error DispatchEvent(Layer& aLayer, void* aContext, Event aEvent)
  *
  *  @retval   #CHIP_SYSTEM_NO_ERROR    Always succeeds unless overridden.
  */
-DLL_EXPORT Error StartTimer(Layer& aLayer, void* aContext, uint32_t aMilliseconds)
+DLL_EXPORT Error StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds)
 {
     Error lReturn = CHIP_SYSTEM_NO_ERROR;
 

@@ -764,17 +764,17 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
     data = NULL; // Ownership passed to fragmenter's tx buf on PrepareNextFragment success.
 
     // Send first message fragment over the air.
-    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_WOBLESend,
-            {
-                if (mRole == kBleRole_Central)
-                {
-                    err = BLE_ERROR_GATT_WRITE_FAILED;
-                } else {
-                    err = BLE_ERROR_GATT_INDICATE_FAILED;
-                }
-                ExitNow();
-            }
-            );
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_WOBLESend, {
+        if (mRole == kBleRole_Central)
+        {
+            err = BLE_ERROR_GATT_WRITE_FAILED;
+        }
+        else
+        {
+            err = BLE_ERROR_GATT_INDICATE_FAILED;
+        }
+        ExitNow();
+    });
     err = SendCharacteristic(mWoBle.TxPacket());
     SuccessOrExit(err);
 
@@ -929,7 +929,7 @@ BLE_ERROR BLEEndPoint::HandleFragmentConfirmationReceived()
     // the stand-alone ack, and also the case where a window size < the immediate ack threshold was detected in
     // Receive(), but the stand-alone ack was deferred due to a pending outbound message fragment.
     if (mLocalReceiveWindowSize <= BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD &&
-        !(mSendQueue != NULL || mWoBle.TxState() == WoBle::kState_InProgress) )
+        !(mSendQueue != NULL || mWoBle.TxState() == WoBle::kState_InProgress))
     {
         err = DriveStandAloneAck(); // Encode stand-alone ack and drive sending.
         SuccessOrExit(err);
@@ -1167,7 +1167,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
         // If BLE transport protocol versions incompatible, prepare to close connection after subscription has been
         // received and capabilities response has been sent.
         chipLogError(Ble, "incompatible BTP versions; peripheral expected between %d and %d",
-                      CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);
+                     CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);
         mState = kState_Aborting;
     }
     else if ((resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V1) ||
@@ -1223,7 +1223,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBuffer * data)
     VerifyOrExit(resp.mFragmentSize > 0, err = BLE_ERROR_INVALID_FRAGMENT_SIZE);
 
     chipLogProgress(Ble, "peripheral chose BTP version %d; central expected between %d and %d", resp.mSelectedProtocolVersion,
-                     CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);
+                    CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);
 
     if ((resp.mSelectedProtocolVersion < CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION) ||
         (resp.mSelectedProtocolVersion > CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION))
@@ -1420,8 +1420,8 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
 
         chipLogDebugBleEndPoint(Ble, "about to adjust remote rx window; got ack num = %u, newest unacked sent seq num = %u, \
                 old window size = %u, max window size = %u",
-                                 receivedAck, mWoBle.GetNewestUnackedSentSequenceNumber(), mRemoteReceiveWindowSize,
-                                 mReceiveWindowMaxSize);
+                                receivedAck, mWoBle.GetNewestUnackedSentSequenceNumber(), mRemoteReceiveWindowSize,
+                                mReceiveWindowMaxSize);
 
         // Open remote device's receive window according to sequence number it just acknowledged.
         mRemoteReceiveWindowSize =
@@ -1480,7 +1480,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         if (mWoBle.RxPacketType() == kType_Control && OnCommandReceived && mState != kState_Closing)
         {
             chipLogDebugBleEndPoint(Ble, "%s: calling OnCommandReceived, seq# %u, len = %u, type %u", __FUNCTION__, receivedAck,
-                                     full_packet->DataLength(), mWoBle.RxPacketType());
+                                    full_packet->DataLength(), mWoBle.RxPacketType());
             // Pass received control message up the stack.
             mWoBle.SetRxPacketSeq(receivedAck);
             OnCommandReceived(this, full_packet);
