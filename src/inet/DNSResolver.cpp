@@ -36,7 +36,7 @@
 #include <lwip/tcpip.h>
 
 #if LWIP_VERSION_MAJOR < 2
-#define LWIP_DNS_FOUND_CALLBACK_TYPE    dns_found_callback
+#define LWIP_DNS_FOUND_CALLBACK_TYPE dns_found_callback
 #endif // LWIP_VERSION_MAJOR < 2
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -85,9 +85,8 @@ chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> DNSResolver
  *                                          resolver implementation.
  *
  */
-INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint8_t options,
-        uint8_t maxAddrs, IPAddress *addrArray,
-        DNSResolver::OnResolveCompleteFunct onComplete, void *appState)
+INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
+                                IPAddress * addrArray, DNSResolver::OnResolveCompleteFunct onComplete, void * appState)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -97,13 +96,11 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
 
     uint8_t addrFamilyOption = (options & kDNSOption_AddrFamily_Mask);
-    uint8_t optionFlags = (options & kDNSOption_Flags_Mask);
+    uint8_t optionFlags      = (options & kDNSOption_Flags_Mask);
 
     // Check that the supplied options are valid.
-    if ((addrFamilyOption != kDNSOption_AddrFamily_Any &&
-         addrFamilyOption != kDNSOption_AddrFamily_IPv4Only &&
-         addrFamilyOption != kDNSOption_AddrFamily_IPv4Preferred &&
-         addrFamilyOption != kDNSOption_AddrFamily_IPv6Only &&
+    if ((addrFamilyOption != kDNSOption_AddrFamily_Any && addrFamilyOption != kDNSOption_AddrFamily_IPv4Only &&
+         addrFamilyOption != kDNSOption_AddrFamily_IPv4Preferred && addrFamilyOption != kDNSOption_AddrFamily_IPv6Only &&
          addrFamilyOption != kDNSOption_AddrFamily_IPv6Preferred) ||
         (optionFlags & ~kDNSOption_ValidFlags) != 0)
     {
@@ -121,10 +118,10 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
     memcpy(hostNameBuf, hostName, hostNameLen);
     hostNameBuf[hostNameLen] = 0;
 
-    AppState = appState;
-    AddrArray = addrArray;
-    MaxAddrs = maxAddrs;
-    NumAddrs = 0;
+    AppState   = appState;
+    AddrArray  = addrArray;
+    MaxAddrs   = maxAddrs;
+    NumAddrs   = 0;
     DNSOptions = options;
     OnComplete = onComplete;
 
@@ -153,7 +150,7 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
     default:
         chipDie();
     }
-#else // INET_CONFIG_ENABLE_IPV4
+#else  // INET_CONFIG_ENABLE_IPV4
     lwipAddrType = LWIP_DNS_ADDRTYPE_IPV6;
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -177,9 +174,9 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
 
     err_t lwipErr =
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-            dns_gethostbyname_addrtype(hostNameBuf, &lwipAddr, lwipCallback, this, lwipAddrType);
+        dns_gethostbyname_addrtype(hostNameBuf, &lwipAddr, lwipCallback, this, lwipAddrType);
 #else
-            dns_gethostbyname(hostNameBuf, &lwipAddr, lwipCallback, this);
+        dns_gethostbyname(hostNameBuf, &lwipAddr, lwipCallback, this);
 #endif
 
     // Unlock LwIP stack
@@ -187,7 +184,7 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
 
     if (lwipErr == ERR_OK)
     {
-        chip::System::Layer& lSystemLayer = SystemLayer();
+        chip::System::Layer & lSystemLayer = SystemLayer();
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         AddrArray[0] = IPAddress::FromLwIPAddr(lwipAddr);
@@ -236,7 +233,6 @@ INET_ERROR DNSResolver::Resolve(const char *hostName, uint16_t hostNameLen, uint
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
 }
 
-
 /**
  *  This method cancels DNS requests that are in progress.
  *
@@ -263,9 +259,9 @@ INET_ERROR DNSResolver::Cancel()
 
     // Signal that the request has been canceled by clearing the state of the resolver object.
     OnComplete = NULL;
-    AddrArray = NULL;
-    MaxAddrs = 0;
-    NumAddrs = 0;
+    AddrArray  = NULL;
+    MaxAddrs   = 0;
+    NumAddrs   = 0;
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
@@ -276,10 +272,10 @@ INET_ERROR DNSResolver::Cancel()
 #if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     // NOTE: DNS lookups can be canceled only when using the asynchronous mode.
 
-    InetLayer& inet = Layer();
+    InetLayer & inet = Layer();
 
     OnComplete = NULL;
-    AppState = NULL;
+    AppState   = NULL;
     inet.mAsyncDNSResolver.Cancel(*this);
 
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
@@ -305,7 +301,6 @@ void DNSResolver::HandleResolveComplete()
     Release();
 }
 
-
 /**
  *  This method is called by LwIP network stack on success, failure, or timeout
  *  of a DNS request.
@@ -318,16 +313,16 @@ void DNSResolver::HandleResolveComplete()
  *
  */
 #if LWIP_VERSION_MAJOR > 1
-void DNSResolver::LwIPHandleResolveComplete(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
-#else // LWIP_VERSION_MAJOR <= 1
-void DNSResolver::LwIPHandleResolveComplete(const char *name, ip_addr_t *ipaddr, void *callback_arg)
+void DNSResolver::LwIPHandleResolveComplete(const char * name, const ip_addr_t * ipaddr, void * callback_arg)
+#else  // LWIP_VERSION_MAJOR <= 1
+void DNSResolver::LwIPHandleResolveComplete(const char * name, ip_addr_t * ipaddr, void * callback_arg)
 #endif // LWIP_VERSION_MAJOR <= 1
 {
-    DNSResolver *resolver = (DNSResolver *)callback_arg;
+    DNSResolver * resolver = (DNSResolver *) callback_arg;
 
     if (resolver != NULL)
     {
-        chip::System::Layer& lSystemLayer = resolver->SystemLayer();
+        chip::System::Layer & lSystemLayer = resolver->SystemLayer();
 
         // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
         if (resolver->OnComplete != NULL && ipaddr != NULL)
@@ -366,7 +361,7 @@ void DNSResolver::InitAddrInfoHints(struct addrinfo & hints)
     {
         hints.ai_family = AF_UNSPEC;
     }
-#else // INET_CONFIG_ENABLE_IPV4
+#else  // INET_CONFIG_ENABLE_IPV4
     hints.ai_family = AF_INET6;
 #endif // INET_CONFIG_ENABLE_IPV4
     hints.ai_flags = AI_ADDRCONFIG;
@@ -391,23 +386,23 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
         switch (addrFamilyOption)
         {
         case kDNSOption_AddrFamily_Any:
-            primaryFamily = AF_UNSPEC;
+            primaryFamily   = AF_UNSPEC;
             secondaryFamily = AF_UNSPEC;
             break;
         case kDNSOption_AddrFamily_IPv4Only:
-            primaryFamily = AF_INET;
+            primaryFamily   = AF_INET;
             secondaryFamily = AF_UNSPEC;
             break;
         case kDNSOption_AddrFamily_IPv4Preferred:
-            primaryFamily = AF_INET;
+            primaryFamily   = AF_INET;
             secondaryFamily = AF_INET6;
             break;
         case kDNSOption_AddrFamily_IPv6Only:
-            primaryFamily = AF_INET6;
+            primaryFamily   = AF_INET6;
             secondaryFamily = AF_UNSPEC;
             break;
         case kDNSOption_AddrFamily_IPv6Preferred:
-            primaryFamily = AF_INET6;
+            primaryFamily   = AF_INET6;
             secondaryFamily = AF_INET;
             break;
         default:
@@ -417,9 +412,9 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
         // Determine the number of addresses of each family present in the results.
         // In the case of the secondary address family, only count these if they are
         // to be returned in the results.
-        uint8_t numPrimaryAddrs = CountAddresses(primaryFamily, results);
+        uint8_t numPrimaryAddrs   = CountAddresses(primaryFamily, results);
         uint8_t numSecondaryAddrs = (secondaryFamily != AF_UNSPEC) ? CountAddresses(secondaryFamily, results) : 0;
-        uint8_t numAddrs = numPrimaryAddrs + numSecondaryAddrs;
+        uint8_t numAddrs          = numPrimaryAddrs + numSecondaryAddrs;
 
         // If the total number of addresses to be returned exceeds the application
         // specified max, ensure that at least 1 address from the secondary family
@@ -496,9 +491,7 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
 
 void DNSResolver::CopyAddresses(int family, uint8_t count, const struct addrinfo * addrs)
 {
-    for (const struct addrinfo *addr = addrs;
-         addr != NULL && NumAddrs < MaxAddrs && count > 0;
-         addr = addr->ai_next)
+    for (const struct addrinfo * addr = addrs; addr != NULL && NumAddrs < MaxAddrs && count > 0; addr = addr->ai_next)
     {
         if (family == AF_UNSPEC || addr->ai_addr->sa_family == family)
         {
@@ -512,9 +505,7 @@ uint8_t DNSResolver::CountAddresses(int family, const struct addrinfo * addrs)
 {
     uint8_t count = 0;
 
-    for (const struct addrinfo *addr = addrs;
-         addr != NULL && count < UINT8_MAX;
-         addr = addr->ai_next)
+    for (const struct addrinfo * addr = addrs; addr != NULL && count < UINT8_MAX; addr = addr->ai_next)
     {
         if (family == AF_UNSPEC || addr->ai_addr->sa_family == family)
         {
