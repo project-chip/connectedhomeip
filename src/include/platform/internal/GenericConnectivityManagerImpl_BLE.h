@@ -24,7 +24,7 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_H
 
-#include <internal/BLEManager.h>
+#include <platform/internal/BLEManager.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -24,7 +24,7 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_IPP
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_IPP
 
-#include <internal/GenericConnectivityManagerImpl_BLE.h>
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 
 
 namespace chip {

@@ -26,7 +26,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
 #include <profiles/software-update/SoftwareUpdateProfile.h>
-#include <internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -356,7 +356,7 @@ extern SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl(void);
 #ifdef EXTERNAL_SOFTWAREUPDATEMANAGERIMPL_HEADER
 #include EXTERNAL_SOFTWAREUPDATEMANAGERIMPL_HEADER
 #else
-#define SOFTWAREUPDATEMANAGERIMPL_HEADER <SoftwareUpdateManagerImpl.h>
+#define SOFTWAREUPDATEMANAGERIMPL_HEADER <platform/SoftwareUpdateManagerImpl.h>
 #include SOFTWAREUPDATEMANAGERIMPL_HEADER
 #endif
 

@@ -19,19 +19,19 @@
 #define CHIP_DEVICE_H
 
 #include <core/CHIPCore.h>
-#include <CHIPDeviceConfig.h>
-#include <CHIPDeviceError.h>
-#include <GeneralUtils.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceError.h>
+#include <platform/GeneralUtils.h>
 #include <ble/BleLayer.h>
-#include <PlatformManager.h>
-#include <ConfigurationManager.h>
-#include <ConnectivityManager.h>
+#include <platform/PlatformManager.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/ConnectivityManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#include <SoftwareUpdateManager.h>
+#include <platform/SoftwareUpdateManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#include <TimeSyncManager.h>
+#include <platform/TimeSyncManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <ThreadStackManager.h>
+#include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 namespace chip {

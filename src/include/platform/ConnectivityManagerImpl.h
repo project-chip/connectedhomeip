@@ -18,20 +18,20 @@
 #ifndef CONNECTIVITY_MANAGER_IMPL_H
 #define CONNECTIVITY_MANAGER_IMPL_H
 
-#include <ConnectivityManager.h>
-#include <internal/GenericConnectivityManagerImpl.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/GenericConnectivityManagerImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <internal/GenericConnectivityManagerImpl_BLE.h>
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
-#include <internal/GenericConnectivityManagerImpl_NoBLE.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <internal/GenericConnectivityManagerImpl_Thread.h>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
 #else
-#include <internal/GenericConnectivityManagerImpl_NoThread.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-#include <internal/GenericConnectivityManagerImpl_NoWiFi.h>
-#include <internal/GenericConnectivityManagerImpl_NoTunnel.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoTunnel.h>
 #include <support/FlagUtils.hpp>
 
 namespace chip {
