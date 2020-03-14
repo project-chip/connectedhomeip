@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file implements types and an object for the chip over
- *      Bluetooth Low Energy (WoBLE) byte-stream, connection-oriented
+ *      Bluetooth Low Energy (CHIPoBLE) byte-stream, connection-oriented
  *      adaptation of chip for point-to-point Bluetooth Low Energy
  *      (BLE) links.
  *
@@ -28,9 +28,9 @@
 
 #if CONFIG_NETWORK_LAYER_BLE
 
-#include <ble/WoBle.h>
-#if CHIP_ENABLE_WOBLE_TEST
-#include <ble/WoBleTest.h>
+#include <ble/CHIPoBLE.h>
+#if CHIP_ENABLE_CHIPOBLE_TEST
+#include <ble/CHIPoBLETest.h>
 #endif
 
 #include <support/logging/CHIPLogging.h>
@@ -70,9 +70,9 @@ static inline void IncSeqNum(SequenceNumber_t & a_seq_num)
 
 static inline bool DidReceiveData(uint8_t rx_flags)
 {
-    return (GetFlag(rx_flags, WoBle::kHeaderFlag_StartMessage) ||
-            GetFlag(rx_flags, WoBle::kHeaderFlag_ContinueMessage) ||
-            GetFlag(rx_flags, WoBle::kHeaderFlag_EndMessage));
+    return (GetFlag(rx_flags, CHIPoBLE::kHeaderFlag_StartMessage) ||
+            GetFlag(rx_flags, CHIPoBLE::kHeaderFlag_ContinueMessage) ||
+            GetFlag(rx_flags, CHIPoBLE::kHeaderFlag_EndMessage));
 }
 
 static void PrintBufDebug(PacketBuffer * buf)
@@ -87,10 +87,10 @@ static void PrintBufDebug(PacketBuffer * buf)
 #endif
 }
 
-const uint16_t WoBle::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
-const uint16_t WoBle::sMaxFragmentSize     = 128; // Size of write and indication characteristics
+const uint16_t CHIPoBLE::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
+const uint16_t CHIPoBLE::sMaxFragmentSize     = 128; // Size of write and indication characteristics
 
-BLE_ERROR WoBle::Init(void * an_app_state, bool expect_first_ack)
+BLE_ERROR CHIPoBLE::Init(void * an_app_state, bool expect_first_ack)
 {
     mAppState              = an_app_state;
     mRxState               = kState_Idle;
@@ -107,9 +107,9 @@ BLE_ERROR WoBle::Init(void * an_app_state, bool expect_first_ack)
     mTxPacketCount         = 0;
     mTxNewestUnackedSeqNum = 0;
     mTxOldestUnackedSeqNum = 0;
-#if CHIP_ENABLE_WOBLE_TEST
-    mTxPacketType = kType_Data; // Default WoBle Data packet
-    mRxPacketType = kType_Data; // Default WoBle Data packet
+#if CHIP_ENABLE_CHIPOBLE_TEST
+    mTxPacketType = kType_Data; // Default CHIPoBLE Data packet
+    mRxPacketType = kType_Data; // Default CHIPoBLE Data packet
 #endif
 
     if (expect_first_ack)
@@ -128,7 +128,7 @@ BLE_ERROR WoBle::Init(void * an_app_state, bool expect_first_ack)
     return BLE_NO_ERROR;
 }
 
-SequenceNumber_t WoBle::GetAndIncrementNextTxSeqNum()
+SequenceNumber_t CHIPoBLE::GetAndIncrementNextTxSeqNum()
 {
     SequenceNumber_t ret = mTxNextSeqNum;
 
@@ -148,7 +148,7 @@ SequenceNumber_t WoBle::GetAndIncrementNextTxSeqNum()
     return ret;
 }
 
-SequenceNumber_t WoBle::GetAndRecordRxAckSeqNum()
+SequenceNumber_t CHIPoBLE::GetAndRecordRxAckSeqNum()
 {
     SequenceNumber_t ret = mRxNewestUnackedSeqNum;
 
@@ -158,12 +158,12 @@ SequenceNumber_t WoBle::GetAndRecordRxAckSeqNum()
     return ret;
 }
 
-bool WoBle::HasUnackedData() const
+bool CHIPoBLE::HasUnackedData() const
 {
     return (mRxOldestUnackedSeqNum != mRxNextSeqNum);
 }
 
-bool WoBle::IsValidAck(SequenceNumber_t ack_num) const
+bool CHIPoBLE::IsValidAck(SequenceNumber_t ack_num) const
 {
     chipLogDebugBtpEngine(Ble, "entered IsValidAck, ack = %u, oldest = %u, newest = %u", ack_num, mTxOldestUnackedSeqNum,
                            mTxNewestUnackedSeqNum);
@@ -187,7 +187,7 @@ bool WoBle::IsValidAck(SequenceNumber_t ack_num) const
     }
 }
 
-BLE_ERROR WoBle::HandleAckReceived(SequenceNumber_t ack_num)
+BLE_ERROR CHIPoBLE::HandleAckReceived(SequenceNumber_t ack_num)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
@@ -216,7 +216,7 @@ exit:
 
 // Calling convention:
 //   EncodeStandAloneAck may only be called if data arg is commited for immediate, synchronous subsequent transmission.
-BLE_ERROR WoBle::EncodeStandAloneAck(PacketBuffer * data)
+BLE_ERROR CHIPoBLE::EncodeStandAloneAck(PacketBuffer * data)
 {
     BLE_ERROR err = BLE_NO_ERROR;
     uint8_t * characteristic;
@@ -246,9 +246,9 @@ exit:
 }
 
 // Calling convention:
-//   WoBle does not retain ownership of reassembled messages, layer above needs to free when done.
+//   CHIPoBLE does not retain ownership of reassembled messages, layer above needs to free when done.
 //
-//   WoBle does not reset itself on error. Upper layer should free outbound message and inbound reassembly buffers
+//   CHIPoBLE does not reset itself on error. Upper layer should free outbound message and inbound reassembly buffers
 //   if there is a problem.
 
 // HandleCharacteristicReceived():
@@ -258,7 +258,7 @@ exit:
 //   function returns.
 //
 //   Upper layer must immediately clean up and reinitialize protocol engine if returned err != BLE_NO_ERROR.
-BLE_ERROR WoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumber_t & receivedAck, bool & didReceiveAck)
+BLE_ERROR CHIPoBLE::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumber_t & receivedAck, bool & didReceiveAck)
 {
     BLE_ERROR err            = BLE_NO_ERROR;
     uint8_t rx_flags         = 0;
@@ -271,7 +271,7 @@ BLE_ERROR WoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumbe
 
     // Get header flags, always in first byte.
     rx_flags = characteristic[cursor++];
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     if (GetFlag(rx_flags, kHeaderFlag_CommandMessage))
         SetRxPacketType(kType_Control);
     else
@@ -351,8 +351,8 @@ BLE_ERROR WoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumbe
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
         data = NULL;
 
-        // For now, limit WoBle message size to max length of 1 pbuf, as we do for chip messages sent via IP.
-        // TODO add support for WoBle messages longer than 1 pbuf
+        // For now, limit CHIPoBLE message size to max length of 1 pbuf, as we do for chip messages sent via IP.
+        // TODO add support for CHIPoBLE messages longer than 1 pbuf
         VerifyOrExit(mRxBuf->Next() == NULL, err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
     }
     else
@@ -413,12 +413,12 @@ exit:
     return err;
 }
 
-PacketBuffer * WoBle::RxPacket()
+PacketBuffer * CHIPoBLE::RxPacket()
 {
     return mRxBuf;
 }
 
-bool WoBle::ClearRxPacket()
+bool CHIPoBLE::ClearRxPacket()
 {
     if (mRxState == kState_Complete)
     {
@@ -434,7 +434,7 @@ bool WoBle::ClearRxPacket()
 // Calling convention:
 //   May only be called if data arg is commited for immediate, synchronous subsequent transmission.
 //   Returns false on error. Caller must free data arg on error.
-bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
+bool CHIPoBLE::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 {
     uint8_t * characteristic;
     mTxCharCount++;
@@ -456,7 +456,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
         mTxState  = kState_InProgress;
         mTxLength = mTxBuf->DataLength();
 
-        chipLogDebugBtpEngine(Ble, ">>> WoBle preparing to send whole message:");
+        chipLogDebugBtpEngine(Ble, ">>> CHIPoBLE preparing to send whole message:");
         PrintBufDebug(data);
 
         // Determine fragment header size.
@@ -482,7 +482,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
         characteristic[0] = kHeaderFlag_StartMessage;
 
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
         if (TxPacketType() == kType_Control)
             SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
 #endif
@@ -512,7 +512,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
             mTxLength -= mTxFragmentSize - cursor;
         }
 
-        chipLogDebugBtpEngine(Ble, ">>> WoBle preparing to send first fragment:");
+        chipLogDebugBtpEngine(Ble, ">>> CHIPoBLE preparing to send first fragment:");
         PrintBufDebug(data);
     }
     else if (mTxState == kState_InProgress)
@@ -535,7 +535,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
         characteristic[0] = kHeaderFlag_ContinueMessage;
 
-#if CHIP_ENABLE_WOBLE_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
         if (TxPacketType() == kType_Control)
             SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
 #endif
@@ -563,7 +563,7 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
             mTxLength -= mTxFragmentSize - cursor;
         }
 
-        chipLogDebugBtpEngine(Ble, ">>> WoBle preparing to send additional fragment:");
+        chipLogDebugBtpEngine(Ble, ">>> CHIPoBLE preparing to send additional fragment:");
         PrintBufDebug(mTxBuf);
     }
     else
@@ -575,12 +575,12 @@ bool WoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
     return true;
 }
 
-PacketBuffer * WoBle::TxPacket()
+PacketBuffer * CHIPoBLE::TxPacket()
 {
     return mTxBuf;
 }
 
-bool WoBle::ClearTxPacket()
+bool CHIPoBLE::ClearTxPacket()
 {
     if (mTxState == kState_Complete)
     {
@@ -593,7 +593,7 @@ bool WoBle::ClearTxPacket()
     return false;
 }
 
-void WoBle::LogState() const
+void CHIPoBLE::LogState() const
 {
     chipLogError(Ble, "mAppState: %p", mAppState);
 
@@ -616,7 +616,7 @@ void WoBle::LogState() const
     chipLogError(Ble, "mTxPacketCount: %d", mTxPacketCount);
 }
 
-void WoBle::LogStateDebug() const
+void CHIPoBLE::LogStateDebug() const
 {
 #ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
     LogState();

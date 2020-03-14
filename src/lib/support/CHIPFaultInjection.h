@@ -94,7 +94,7 @@ typedef enum
     kFault_TunnelPacketDropByPolicy,            /**< Trigger an explicit drop of the packet as if done by an application policy */
 #endif // CHIP_CONFIG_ENABLE_TUNNELING
 #if CONFIG_NETWORK_LAYER_BLE
-    kFault_WOBLESend,                           /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
+    kFault_CHIPoBLESend,                        /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif // CONFIG_NETWORK_LAYER_BLE
     kFault_NumItems,
 } Id;

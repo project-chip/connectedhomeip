@@ -97,8 +97,8 @@ private:
     CHIP_ERROR SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
     bool HaveMeshConnectivity(void);
     void OnMessageLayerActivityChanged(bool messageLayerIsActive);
-    void OnWoBLEAdvertisingStart(void);
-    void OnWoBLEAdvertisingStop(void);
+    void OnCHIPoBLEAdvertisingStart(void);
+    void OnCHIPoBLEAdvertisingStop(void);
 
 protected:
 
@@ -252,14 +252,14 @@ inline void ThreadStackManager::OnMessageLayerActivityChanged(bool messageLayerI
     return static_cast<ImplClass*>(this)->_OnMessageLayerActivityChanged(messageLayerIsActive);
 }
 
-inline void ThreadStackManager::OnWoBLEAdvertisingStart(void)
+inline void ThreadStackManager::OnCHIPoBLEAdvertisingStart(void)
 {
-    static_cast<ImplClass*>(this)->_OnWoBLEAdvertisingStart();
+    static_cast<ImplClass*>(this)->_OnCHIPoBLEAdvertisingStart();
 }
 
-inline void ThreadStackManager::OnWoBLEAdvertisingStop(void)
+inline void ThreadStackManager::OnCHIPoBLEAdvertisingStop(void)
 {
-    static_cast<ImplClass*>(this)->_OnWoBLEAdvertisingStop();
+    static_cast<ImplClass*>(this)->_OnCHIPoBLEAdvertisingStop();
 }
 
 inline CHIP_ERROR ThreadStackManager::GetAndLogThreadStatsCounters(void)

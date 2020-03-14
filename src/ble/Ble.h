@@ -34,7 +34,7 @@
 #include <ble/BleLayer.h>
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
-#include <ble/WoBle.h>
+#include <ble/CHIPoBLE.h>
 
 /**
  *   @namespace Ble

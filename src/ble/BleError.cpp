@@ -70,7 +70,7 @@ bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err)
     case BLE_ERROR_GATT_WRITE_FAILED                            : desc = "GATT write characteristic operation failed"; break;
     case BLE_ERROR_GATT_INDICATE_FAILED                         : desc = "GATT indicate characteristic operation failed"; break;
     case BLE_ERROR_NOT_IMPLEMENTED                              : desc = "Not implemented"; break;
-    case BLE_ERROR_WOBLE_PROTOCOL_ABORT                         : desc = "BLE transport protocol fired abort"; break;
+    case BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT                         : desc = "BLE transport protocol fired abort"; break;
     case BLE_ERROR_REMOTE_DEVICE_DISCONNECTED                   : desc = "Remote device closed BLE connection"; break;
     case BLE_ERROR_APP_CLOSED_CONNECTION                        : desc = "Application closed BLE connection"; break;
     case BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG                     : desc = "Outbound message too big"; break;
