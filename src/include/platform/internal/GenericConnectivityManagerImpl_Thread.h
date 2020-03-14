@@ -24,7 +24,7 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_H
 
-#include <ThreadStackManager.h>
+#include <platform/ThreadStackManager.h>
 
 namespace chip {
 namespace DeviceLayer {
