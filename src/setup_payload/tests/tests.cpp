@@ -83,6 +83,42 @@ void testBitsetLen()
     assert(kTotalPayloadDataSizeInBits % 8 == 0);
 }
 
+void testSetupPayloadVerify()
+{
+    printf("---Running Test--- %s\n", __FUNCTION__);
+    SetupPayload payload;
+
+    payload.version               = 5;
+    payload.vendorID              = 12;
+    payload.productID             = 1;
+    payload.requiresCustomFlow    = 0;
+    payload.rendezvousInformation = 1;
+    payload.discriminator         = 128;
+    payload.setUpPINCode          = 2048;
+
+    assert(payload.isValid());
+
+    // test invalid version
+    SetupPayload test_payload = payload;
+    test_payload.version      = 2 << kVersionFieldLengthInBits;
+    assert(!test_payload.isValid());
+
+    // test invalid rendezvousInformation
+    test_payload                       = payload;
+    test_payload.rendezvousInformation = 3;
+    assert(!test_payload.isValid());
+
+    // test invalid discriminator
+    test_payload               = payload;
+    test_payload.discriminator = 2 << kPayloadDiscriminatorFieldLengthInBits;
+    assert(!test_payload.isValid());
+
+    // test invalid stetup PIN
+    test_payload              = payload;
+    test_payload.setUpPINCode = 2 << kSetupPINCodeFieldLengthInBits;
+    assert(!test_payload.isValid());
+}
+
 int main(int argc, char ** argv)
 {
     printf("---Running Test--- tests from %s\n", __FILE__);
@@ -90,4 +126,5 @@ int main(int argc, char ** argv)
     testPayloadByteArrayRep();
     testPayloadBase45Rep();
     testBase45Encoding();
+    testSetupPayloadVerify();
 }

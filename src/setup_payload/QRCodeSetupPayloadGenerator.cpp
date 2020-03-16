@@ -40,6 +40,10 @@ void QRCodeSetupPayloadGenerator::resetBitSet()
 // Populates numberOfBits starting from LSB of input into mPayloadBits
 void QRCodeSetupPayloadGenerator::populateInteger(uint64_t input, size_t numberOfBits)
 {
+    if (mPayloadBitsIndex < numberOfBits || input >= 1 << numberOfBits)
+    {
+        abort();
+    }
     mPayloadBitsIndex -= numberOfBits;
     int currentIndex = mPayloadBitsIndex;
 
