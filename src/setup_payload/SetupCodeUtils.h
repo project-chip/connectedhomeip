@@ -24,6 +24,7 @@
 #define _SETUP_CODE_UTILS_H_
 
 #include <string>
+#include <stdint.h>
 
 using namespace std;
 
