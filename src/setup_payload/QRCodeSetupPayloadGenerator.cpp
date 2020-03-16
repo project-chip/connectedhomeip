@@ -28,6 +28,8 @@
 #include <iostream>
 #include <vector>
 
+#include <stdlib.h>
+
 using namespace chip;
 using namespace std;
 
