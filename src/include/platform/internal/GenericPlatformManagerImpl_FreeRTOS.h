@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +25,7 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_H
 #define GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_H
 
-#include <Weave/DeviceLayer/internal/GenericPlatformManagerImpl.h>
+#include <platform/internal/GenericPlatformManagerImpl.h>
 
 #if defined(ESP_PLATFORM)
 #include "freertos/FreeRTOS.h"
@@ -40,8 +39,7 @@
 #include "queue.h"
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -61,25 +59,25 @@ protected:
 
     TimeOut_t mNextTimerBaseTime;
     TickType_t mNextTimerDurationTicks;
-    SemaphoreHandle_t mWeaveStackLock;
-    QueueHandle_t mWeaveEventQueue;
+    SemaphoreHandle_t mChipStackLock;
+    QueueHandle_t mChipEventQueue;
     TaskHandle_t mEventLoopTask;
-    bool mWeaveTimerActive;
+    bool mChipTimerActive;
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    WEAVE_ERROR _InitWeaveStack();
-    void _LockWeaveStack(void);
-    bool _TryLockWeaveStack(void);
-    void _UnlockWeaveStack(void);
-    void _PostEvent(const WeaveDeviceEvent * event);
+    CHIP_ERROR _InitChipStack();
+    void _LockChipStack(void);
+    bool _TryLockChipStack(void);
+    void _UnlockChipStack(void);
+    void _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop(void);
-    WEAVE_ERROR _StartEventLoopTask(void);
-    WEAVE_ERROR _StartWeaveTimer(uint32_t durationMS);
+    CHIP_ERROR _StartEventLoopTask(void);
+    CHIP_ERROR _StartChipTimer(uint32_t durationMS);
 
     // ===== Methods available to the implementation subclass.
 
-    void PostEventFromISR(const WeaveDeviceEvent * event, BaseType_t & yieldRequired);
+    void PostEventFromISR(const ChipDeviceEvent * event, BaseType_t & yieldRequired);
 
 private:
 
@@ -95,7 +93,6 @@ extern template class GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_H
