@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,17 +24,16 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_IPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_IPP
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/PlatformManager.h>
-#include <Weave/DeviceLayer/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/PlatformManager.h>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_FreeRTOS<> template inherits.
-#include <Weave/DeviceLayer/internal/GenericPlatformManagerImpl.ipp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -43,31 +41,31 @@ namespace Internal {
 template class GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 
 template<class ImplClass>
-WEAVE_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitWeaveStack(void)
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = 0;
     mEventLoopTask = NULL;
-    mWeaveTimerActive = false;
+    mChipTimerActive = false;
 
-    mWeaveStackLock = xSemaphoreCreateMutex();
-    if (mWeaveStackLock == NULL)
+    mChipStackLock = xSemaphoreCreateMutex();
+    if (mChipStackLock == NULL)
     {
-        WeaveLogError(DeviceLayer, "Failed to create Weave stack lock");
-        ExitNow(err = WEAVE_ERROR_NO_MEMORY);
+        ChipLogError(DeviceLayer, "Failed to create chip stack lock");
+        ExitNow(err = CHIP_ERROR_NO_MEMORY);
     }
 
-    mWeaveEventQueue = xQueueCreate(WEAVE_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(WeaveDeviceEvent));
-    if (mWeaveEventQueue == NULL)
+    mChipEventQueue = xQueueCreate(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent));
+    if (mChipEventQueue == NULL)
     {
-        WeaveLogError(DeviceLayer, "Failed to allocate Weave event queue");
-        ExitNow(err = WEAVE_ERROR_NO_MEMORY);
+        ChipLogError(DeviceLayer, "Failed to allocate chip event queue");
+        ExitNow(err = CHIP_ERROR_NO_MEMORY);
     }
 
-    // Call up to the base class _InitWeaveStack() to perform the bulk of the initialization.
-    err = GenericPlatformManagerImpl<ImplClass>::_InitWeaveStack();
+    // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
+    err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
 
 exit:
@@ -75,31 +73,31 @@ exit:
 }
 
 template<class ImplClass>
-void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_LockWeaveStack(void)
+void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_LockChipStack(void)
 {
-    xSemaphoreTake(mWeaveStackLock, portMAX_DELAY);
+    xSemaphoreTake(mChipStackLock, portMAX_DELAY);
 }
 
 template<class ImplClass>
-bool GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_TryLockWeaveStack(void)
+bool GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_TryLockChipStack(void)
 {
-    return xSemaphoreTake(mWeaveStackLock, 0) == pdTRUE;
+    return xSemaphoreTake(mChipStackLock, 0) == pdTRUE;
 }
 
 template<class ImplClass>
-void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockWeaveStack(void)
+void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockChipStack(void)
 {
-    xSemaphoreGive(mWeaveStackLock);
+    xSemaphoreGive(mChipStackLock);
 }
 
 template<class ImplClass>
-void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const WeaveDeviceEvent * event)
+void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    if (mWeaveEventQueue != NULL)
+    if (mChipEventQueue != NULL)
     {
-        if (!xQueueSend(mWeaveEventQueue, event, 1))
+        if (!xQueueSend(mChipEventQueue, event, 1))
         {
-            WeaveLogError(DeviceLayer, "Failed to post event to Weave Platform event queue");
+            ChipLogError(DeviceLayer, "Failed to post event to chip Platform event queue");
         }
     }
 }
@@ -107,39 +105,39 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const WeaveDevic
 template<class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
 {
-    WEAVE_ERROR err;
-    WeaveDeviceEvent event;
+    CHIP_ERROR err;
+    ChipDeviceEvent event;
 
     VerifyOrDie(mEventLoopTask == NULL);
 
     // Capture the task handle.
     mEventLoopTask = xTaskGetCurrentTaskHandle();
 
-    // Lock the Weave stack.
-    Impl()->LockWeaveStack();
+    // Lock the chip stack.
+    Impl()->LockChipStack();
 
     while (true)
     {
         TickType_t waitTime;
 
-        // If one or more Weave timers are active...
-        if (mWeaveTimerActive)
+        // If one or more chip timers are active...
+        if (mChipTimerActive)
         {
             // Adjust the base time and remaining duration for the next scheduled timer based on the
             // amount of time that has elapsed since it was started.
             // IF the timer's expiration time has already arrived...
             if (xTaskCheckForTimeOut(&mNextTimerBaseTime, &mNextTimerDurationTicks) == pdTRUE)
             {
-                // Reset the 'timer active' flag.  This will be set to true again by _StartWeaveTimer()
+                // Reset the 'timer active' flag.  This will be set to true again by _StartChipTimer()
                 // if there are further timers beyond the expired one that are still active.
-                mWeaveTimerActive = false;
+                mChipTimerActive = false;
 
                 // Call into the system layer to dispatch the callback functions for all timers
                 // that have expired.
                 err = SystemLayer.HandlePlatformTimer();
-                if (err != WEAVE_SYSTEM_NO_ERROR)
+                if (err != CHIP_SYSTEM_NO_ERROR)
                 {
-                    WeaveLogError(DeviceLayer, "Error handling Weave timers: %s", ErrorStr(err));
+                    ChipLogError(DeviceLayer, "Error handling chip timers: %s", ErrorStr(err));
                 }
 
                 // When processing the event queue below, do not wait if the queue is empty.  Instead
@@ -155,20 +153,20 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
             }
         }
 
-        // Otherwise no Weave timers are active, so wait indefinitely for an event to arrive on the event
+        // Otherwise no chip timers are active, so wait indefinitely for an event to arrive on the event
         // queue.
         else
         {
             waitTime = portMAX_DELAY;
         }
 
-        // Unlock the Weave stack, allowing other threads to enter Weave while the event loop thread is sleeping.
-        Impl()->UnlockWeaveStack();
+        // Unlock the chip stack, allowing other threads to enter chip while the event loop thread is sleeping.
+        Impl()->UnlockChipStack();
 
-        BaseType_t eventReceived = xQueueReceive(mWeaveEventQueue, &event, waitTime);
+        BaseType_t eventReceived = xQueueReceive(mChipEventQueue, &event, waitTime);
 
-        // Lock the Weave stack.
-        Impl()->LockWeaveStack();
+        // Lock the chip stack.
+        Impl()->LockChipStack();
 
         // If an event was received, dispatch it.  Continue receiving events from the queue and
         // dispatching them until the queue is empty.
@@ -176,37 +174,37 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
         {
             Impl()->DispatchEvent(&event);
 
-            eventReceived = xQueueReceive(mWeaveEventQueue, &event, 0);
+            eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
         }
     }
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartEventLoopTask(void)
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartEventLoopTask(void)
 {
     BaseType_t res;
 
     res = xTaskCreate(EventLoopTaskMain,
-                WEAVE_DEVICE_CONFIG_WEAVE_TASK_NAME,
-                WEAVE_DEVICE_CONFIG_WEAVE_TASK_STACK_SIZE / sizeof(StackType_t),
+                CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
+                CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t),
                 this,
-                WEAVE_DEVICE_CONFIG_WEAVE_TASK_PRIORITY,
+                CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY,
                 NULL);
 
-    return (res == pdPASS) ? WEAVE_NO_ERROR : WEAVE_ERROR_NO_MEMORY;
+    return (res == pdPASS) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
 template<class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * arg)
 {
-    WeaveLogDetail(DeviceLayer, "Weave task running");
+    ChipLogDetail(DeviceLayer, "chip task running");
     static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass>*>(arg)->Impl()->RunEventLoop();
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartWeaveTimer(uint32_t aMilliseconds)
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
 {
-    mWeaveTimerActive = true;
+    mChipTimerActive = true;
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = pdMS_TO_TICKS(aMilliseconds);
 
@@ -215,31 +213,30 @@ WEAVE_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartWeaveTimer(uin
     // to the event queue.
     if (xTaskGetCurrentTaskHandle() != mEventLoopTask)
     {
-        WeaveDeviceEvent event;
+        ChipDeviceEvent event;
         event.Type = DeviceEventType::kNoOp;
         Impl()->PostEvent(&event);
     }
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 template<class ImplClass>
-void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const WeaveDeviceEvent * event, BaseType_t & yieldRequired)
+void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const ChipDeviceEvent * event, BaseType_t & yieldRequired)
 {
     yieldRequired = pdFALSE;
 
-    if (mWeaveEventQueue != NULL)
+    if (mChipEventQueue != NULL)
     {
-        if (!xQueueSendFromISR(mWeaveEventQueue, event, &yieldRequired))
+        if (!xQueueSendFromISR(mChipEventQueue, event, &yieldRequired))
         {
-            WeaveLogError(DeviceLayer, "Failed to post event to Weave Platform event queue");
+            ChipLogError(DeviceLayer, "Failed to post event to chip Platform event queue");
         }
     }
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_IPP

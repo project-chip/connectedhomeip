@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,26 +17,24 @@
 
 /**
  *    @file
- *      Defines the Weave Device Layer Event Logging functions.
+ *      Defines the chip Device Layer Event Logging functions.
  *
  */
 
 #ifndef EVENT_LOGGING_H
 #define EVENT_LOGGING_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 /**
  * Defines the event logging resources and initializes event logging management subsystem.
  */
-extern WEAVE_ERROR InitWeaveEventLogging(void);
+extern CHIP_ERROR InitChipEventLogging(void);
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // EVENT_LOGGING_H
