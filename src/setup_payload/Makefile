@@ -17,6 +17,7 @@ Module_Test_Includes = $(Module_Includes)
 
 CPP_Files = \
 	SetupCodeUtils.cpp \
+	SetupPayload.cpp \
 	QRCodeSetupPayloadGenerator.cpp \
 
 libqr.a: $(CPP_Objects)

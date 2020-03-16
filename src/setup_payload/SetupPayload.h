@@ -29,6 +29,25 @@
 
 namespace chip {
 
+const int kVersionFieldLengthInBits = 3;
+const int kVendorIDFieldLengthInBits = 16;
+const int kProductIDFieldLengthInBits = 16;
+const int kCustomFlowRequiredFieldLengthInBits = 1;
+const int kRendezvousInfoFieldLengthInBits = 8;
+const int kPayloadDiscriminatorFieldLengthInBits = 8;
+const int kSetupPINCodeFieldLengthInBits = 27;
+const int kReservedFieldLengthInBits = 1;
+
+const int kTotalPayloadDataSizeInBits = (  kVersionFieldLengthInBits + \
+                                           kVendorIDFieldLengthInBits + \
+                                           kProductIDFieldLengthInBits + \
+                                           kCustomFlowRequiredFieldLengthInBits + \
+                                           kRendezvousInfoFieldLengthInBits + \
+                                           kPayloadDiscriminatorFieldLengthInBits + \
+                                           kSetupPINCodeFieldLengthInBits + \
+                                           kReservedFieldLengthInBits
+                                        );
+
 class SetupPayload
 {
     public:
@@ -39,6 +58,9 @@ class SetupPayload
         uint16_t rendezvousInformation;
         uint16_t discriminator;
         uint32_t setUpPINCode;
+
+        // Test that the Setup Payload is within expected value ranges
+        bool isValid();
 };
 
 }; // namespace chip

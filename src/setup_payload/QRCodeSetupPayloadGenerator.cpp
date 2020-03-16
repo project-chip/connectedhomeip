@@ -40,8 +40,6 @@ void QRCodeSetupPayloadGenerator::resetBitSet()
 // Populates numberOfBits starting from LSB of input into mPayloadBits
 void QRCodeSetupPayloadGenerator::populateInteger(uint64_t input, size_t numberOfBits)
 {
-    int numberOfBitsModified = 0;
-
     mPayloadBitsIndex -= numberOfBits;
     int currentIndex = mPayloadBitsIndex;
 
@@ -110,8 +108,12 @@ void QRCodeSetupPayloadGenerator::generateBitSet()
 
 string QRCodeSetupPayloadGenerator::payloadBinaryRepresentation()
 {
-    generateBitSet();
-    return mPayloadBits.to_string();
+    if (mPayload.isValid())
+    {
+        generateBitSet();
+        return mPayloadBits.to_string();
+    }
+    return string();
 }
 
 // This function assumes bits.size() % 8 == 0
@@ -166,12 +168,16 @@ vector<uint16_t> arrayFromBits(bitset<kTotalPayloadDataSizeInBits> bits)
 
 string QRCodeSetupPayloadGenerator::payloadBase45Representation()
 {
-    generateBitSet();
-    vector<uint16_t> integerArray = arrayFromBits(mPayloadBits);
-    string result;
-    for (int idx = 0; idx < integerArray.size(); idx++)
+    if (mPayload.isValid())
     {
-        result += base45EncodedString(integerArray[idx], 3);
+        generateBitSet();
+        vector<uint16_t> integerArray = arrayFromBits(mPayloadBits);
+        string result;
+        for (int idx = 0; idx < integerArray.size(); idx++)
+        {
+            result += base45EncodedString(integerArray[idx], 3);
+        }
+        return result;
     }
-    return result;
+    return string();
 }
