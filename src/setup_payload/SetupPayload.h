@@ -28,7 +28,7 @@
 #include <stdint.h>
 
 namespace chip {
-
+// TODO this shuould point to the spec
 const int kVersionFieldLengthInBits = 3;
 const int kVendorIDFieldLengthInBits = 16;
 const int kProductIDFieldLengthInBits = 16;
