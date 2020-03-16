@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,15 +27,14 @@
 
 #include "FibonacciUtils.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 uint32_t GetFibonacciForIndex(uint32_t inIndex)
 {
-    uint32_t  retval = 0;
-    uint32_t  tmp;
-    uint32_t  vals[2];
-    uint32_t  index = 0;
+    uint32_t retval = 0;
+    uint32_t tmp;
+    uint32_t vals[2];
+    uint32_t index = 0;
 
     vals[0] = 0;
     vals[1] = 1;
@@ -49,10 +47,10 @@ uint32_t GetFibonacciForIndex(uint32_t inIndex)
     {
         for (index = 2; index <= inIndex; index++)
         {
-             tmp = vals[0] + vals[1];
+            tmp = vals[0] + vals[1];
 
-             vals[0] = vals[1];
-             vals[1] = tmp;
+            vals[0] = vals[1];
+            vals[1] = tmp;
         }
 
         retval = tmp;
@@ -61,5 +59,4 @@ uint32_t GetFibonacciForIndex(uint32_t inIndex)
     return retval;
 }
 
-} // namespace Weave
-} // namespace nl
+} // namespace chip

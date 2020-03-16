@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +21,7 @@
  *
  *  @note These utility functions do not generate cryptographically strong
  *        random number. To get cryptographically strong random data use
- *        nl::Weave::Platform::Security::GetSecureRandomData().
+ *        chip::Platform::Security::GetSecureRandomData().
  *
  */
 
@@ -36,8 +35,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 /**
  *  @def NORMALIZED_RAND_RANGE(reqRange)
@@ -65,8 +63,7 @@ uint64_t GetRandU64()
 {
     // rand() returns int, which is always smaller than the size of uint64_t
     // and rand() cannot be used directly to generate random uint64_t number.
-    return static_cast<uint64_t>(GetRandU32()) ^
-          (static_cast<uint64_t>(GetRandU32()) << (sizeof(uint32_t) * CHAR_BIT));
+    return static_cast<uint64_t>(GetRandU32()) ^ (static_cast<uint64_t>(GetRandU32()) << (sizeof(uint32_t) * CHAR_BIT));
 }
 
 uint32_t GetRandU32()
@@ -76,18 +73,17 @@ uint32_t GetRandU32()
 #if RAND_MAX == UINT32_MAX
     return static_cast<uint32_t>(rand());
 #else
-    return static_cast<uint32_t>(GetRandU16()) ^
-          (static_cast<uint32_t>(GetRandU16()) << (sizeof(uint16_t) * CHAR_BIT));
+    return static_cast<uint32_t>(GetRandU16()) ^ (static_cast<uint32_t>(GetRandU16()) << (sizeof(uint16_t) * CHAR_BIT));
 #endif
 }
 
 uint16_t GetRandU16()
 {
 #if RAND_MAX >= UINT16_MAX
- #if (RAND_MAX == INT_MAX) || (RAND_MAX == NORMALIZED_RAND_RANGE(UINT16_MAX))
+#if (RAND_MAX == INT_MAX) || (RAND_MAX == NORMALIZED_RAND_RANGE(UINT16_MAX))
     // rand() random output range normalization is not needed.
     return static_cast<uint16_t>(rand());
- #else
+#else
     // Otherwise, Normilize the output range of rand() and reject rand() outputs outside of that range.
     while (true)
     {
@@ -95,10 +91,9 @@ uint16_t GetRandU16()
         if (r < NORMALIZED_RAND_RANGE(UINT16_MAX))
             return static_cast<uint16_t>(r);
     }
- #endif
+#endif
 #else
-    return static_cast<uint16_t>(GetRandU8()) ^
-          (static_cast<uint16_t>(GetRandU8()) << CHAR_BIT);
+    return static_cast<uint16_t>(GetRandU8()) ^ (static_cast<uint16_t>(GetRandU8()) << CHAR_BIT);
 #endif
 }
 
@@ -118,5 +113,4 @@ uint8_t GetRandU8()
 #endif
 }
 
-} // namespace Weave
-} // namespace nl
+} // namespace chip
