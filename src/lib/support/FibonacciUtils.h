@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,8 +25,7 @@
 #ifndef FIBONACCIUTILS_H_
 #define FIBONACCIUTILS_H_
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 /**
  *  This function generates 32-bit Fibonacci number
@@ -38,7 +36,6 @@ namespace Weave {
  */
 extern uint32_t GetFibonacciForIndex(uint32_t index);
 
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif /* FIBONACCIUTILS_H_ */

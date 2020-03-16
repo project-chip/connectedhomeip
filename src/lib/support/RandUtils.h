@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,15 +21,14 @@
  *
  *  @note These utility functions do not generate cryptographically strong
  *        random number. To get cryptographically strong random data use
- *        nl::Weave::Platform::Security::GetSecureRandomData().
+ *        chip::Platform::Security::GetSecureRandomData().
  *
  */
 
 #ifndef RANDUTILS_H_
 #define RANDUTILS_H_
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 /**
  *  This function generates 64-bit unsigned random number.
@@ -64,7 +62,6 @@ extern uint16_t GetRandU16(void);
  */
 extern uint8_t GetRandU8(void);
 
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif /* RANDUTILS_H_ */
