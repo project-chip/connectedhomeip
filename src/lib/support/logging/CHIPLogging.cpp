@@ -50,7 +50,7 @@ namespace Logging {
  *
  * NOTE: The names must be in the order defined in the LogModule
  *       enumeration. Each name must be a fixed number of characters
- *       long (chipLoggingModuleNameLen) padded with nulls as
+ *       long (ChipLoggingModuleNameLen) padded with nulls as
  *       necessary.
  *
  */
@@ -84,7 +84,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SPT"   // Support
     ;
 
-#define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chipLoggingModuleNameLen)
+#define ModuleNamesCount ((sizeof(ModuleNames) - 1) / ChipLoggingModuleNameLen)
 
 #define chipPrefix "CHIP:"
 #define chipPrefixSeparator ": "
@@ -92,14 +92,14 @@ static const char ModuleNames[] = "-\0\0" // None
 
 void GetModuleName(char * buf, uint8_t module)
 {
-    const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * chipLoggingModuleNameLen : 0);
-    memcpy(buf, moduleNamePtr, chipLoggingModuleNameLen);
-    buf[chipLoggingModuleNameLen] = 0;
+    const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * ChipLoggingModuleNameLen : 0);
+    memcpy(buf, moduleNamePtr, ChipLoggingModuleNameLen);
+    buf[ChipLoggingModuleNameLen] = 0;
 }
 
 void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg)
 {
-    char moduleName[chipLoggingModuleNameLen + 1];
+    char moduleName[ChipLoggingModuleNameLen + 1];
 
     GetModuleName(moduleName, module);
     snprintf(buf, bufSize, chipPrefix "%s" chipPrefixSeparator "%s" chipMessageTrailer, moduleName, msg);
@@ -107,7 +107,7 @@ void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const cha
 
 void PrintMessagePrefix(uint8_t module)
 {
-    char moduleName[chipLoggingModuleNameLen + 1];
+    char moduleName[ChipLoggingModuleNameLen + 1];
     GetModuleName(moduleName, module);
 
 #if CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
@@ -199,7 +199,7 @@ DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t catego
 
 #if CHIP_LOGGING_STYLE_ANDROID
 
-        char moduleName[chipLoggingModuleNameLen + 1];
+        char moduleName[ChipLoggingModuleNameLen + 1];
         GetModuleName(moduleName, module);
 
         int priority = (category == kLogCategory_Error) ? ANDROID_LOG_ERROR : ANDROID_LOG_DEBUG;
