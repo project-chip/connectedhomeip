@@ -1,9 +1,9 @@
 TOP_DIR = ../..
 Test_Dir = tests
 
-.PHONY: all clean run_tests
+.PHONY: all clean check
 
-all: run_tests
+all: libqr.a check
 
 include $(TOP_DIR)/.yams/cpp_rules.min
 
@@ -17,12 +17,12 @@ Module_Test_Includes = $(Module_Includes)
 
 CPP_Files = \
 	SetupCodeUtils.cpp \
-	SetupPayloadGenerator.cpp \
+	QRCodeSetupPayloadGenerator.cpp \
 
 libqr.a: $(CPP_Objects)
 	ar rvs $@ $^
 	@echo "LINK =>  $@"
 
 clean: my_clean
-	@rm -f $(LIB_NAME) *.gcda *.gcno *.gcov
+	@rm -f libqr.a *.gcda *.gcno *.gcov
 
