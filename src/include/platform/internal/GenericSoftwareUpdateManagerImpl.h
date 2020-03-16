@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,12 +24,11 @@
 #ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_H
 #define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_H
 
-// #if WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+// #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <Weave/DeviceLayer/SoftwareUpdateManager.h>
+#include <platform/SoftwareUpdateManager.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -45,7 +43,7 @@ namespace Internal {
 template<class ImplClass>
 class GenericSoftwareUpdateManagerImpl
 {
-    using StatusReport = ::nl::Weave::Profiles::StatusReporting::StatusReport;
+    using StatusReport = ::chip::Profiles::StatusReporting::StatusReport;
 
 protected:
     // ===== Methods that implement the SoftwareUpdateManager abstract interface.
@@ -59,23 +57,23 @@ protected:
                              const SoftwareUpdateManager::InEventParam& aInParam,
                              SoftwareUpdateManager::OutEventParam& aOutParam);
 
-    WEAVE_ERROR _Abort(void);
-    WEAVE_ERROR _CheckNow(void);
-    WEAVE_ERROR _PrepareImageStorageComplete(WEAVE_ERROR aError);
-    WEAVE_ERROR _ImageInstallComplete(WEAVE_ERROR aError);
-    WEAVE_ERROR _SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs);
-    WEAVE_ERROR _SetEventCallback(void * const aAppState, const SoftwareUpdateManager::EventCallback aEventCallback);
+    CHIP_ERROR _Abort(void);
+    CHIP_ERROR _CheckNow(void);
+    CHIP_ERROR _PrepareImageStorageComplete(CHIP_ERROR aError);
+    CHIP_ERROR _ImageInstallComplete(CHIP_ERROR aError);
+    CHIP_ERROR _SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs);
+    CHIP_ERROR _SetEventCallback(void * const aAppState, const SoftwareUpdateManager::EventCallback aEventCallback);
 
     // ===== Members for use by the implementation subclass.
 
     void DoInit();
     void DownloadComplete(void);
-    void SoftwareUpdateFailed(WEAVE_ERROR aError, StatusReport * aStatusReport);
-    void SoftwareUpdateFinished(WEAVE_ERROR aError);
+    void SoftwareUpdateFailed(CHIP_ERROR aError, StatusReport * aStatusReport);
+    void SoftwareUpdateFinished(CHIP_ERROR aError);
 
-    WEAVE_ERROR InstallImage(void);
-    WEAVE_ERROR StoreImageBlock(uint32_t aLength, uint8_t *aData);
-    WEAVE_ERROR GetIntegrityTypeList(::nl::Weave::Profiles::SoftwareUpdate::IntegrityTypeList * aIntegrityTypeList);
+    CHIP_ERROR InstallImage(void);
+    CHIP_ERROR StoreImageBlock(uint32_t aLength, uint8_t *aData);
+    CHIP_ERROR GetIntegrityTypeList(::chip::Profiles::SoftwareUpdate::IntegrityTypeList * aIntegrityTypeList);
 
 private:
     // ===== Private members reserved for use by this class only.
@@ -91,26 +89,26 @@ private:
     void StartImageInstall(void);
     void PrepareImageStorage(void);
 
-    WEAVE_ERROR PrepareQuery(void);
+    CHIP_ERROR PrepareQuery(void);
 
     uint32_t GetNextWaitTimeInterval(void);
     uint32_t ComputeNextScheduledWaitTimeInterval(void);
 
     static void PrepareBinding(intptr_t arg);
     static void StartDownload(intptr_t arg);
-    static void HandleHoldOffTimerExpired(::nl::Weave::System::Layer * aLayer,
+    static void HandleHoldOffTimerExpired(::chip::System::Layer * aLayer,
                                           void * aAppState,
-                                          ::nl::Weave::System::Error aError);
-    static void HandleServiceBindingEvent(void * appState, ::nl::Weave::Binding::EventType eventType,
-                                          const ::nl::Weave::Binding::InEventParam & inParam,
-                                          ::nl::Weave::Binding::OutEventParam & outParam);
+                                          ::chip::System::Error aError);
+    static void HandleServiceBindingEvent(void * appState, ::chip::Binding::EventType eventType,
+                                          const ::chip::Binding::InEventParam & inParam,
+                                          ::chip::Binding::OutEventParam & outParam);
     static void HandleResponse(ExchangeContext * ec,
                                const IPPacketInfo * pktInfo,
-                               const WeaveMessageInfo * msgInfo,
+                               const ChipMessageInfo * msgInfo,
                                uint32_t profileId,
                                uint8_t msgType,
                                PacketBuffer * payload);
-    static void OnKeyError(ExchangeContext *aEc, WEAVE_ERROR aKeyError);
+    static void OnKeyError(ExchangeContext *aEc, CHIP_ERROR aKeyError);
     static void OnResponseTimeout(ExchangeContext * aEC);
     static void DefaultRetryPolicyCallback(void * const aAppState,
                                            SoftwareUpdateManager::RetryParam & aRetryParam,
@@ -122,8 +120,8 @@ private:
 
     void * mAppState;
 
-    char mURI[WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN];
-    ::nl::Weave::Profiles::SoftwareUpdate::IntegritySpec mIntegritySpec;
+    char mURI[CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN];
+    ::chip::Profiles::SoftwareUpdate::IntegritySpec mIntegritySpec;
 
     SoftwareUpdateManager::EventCallback mEventHandlerCallback;
     SoftwareUpdateManager::RetryPolicyCallback mRetryPolicyCallback;
@@ -154,8 +152,7 @@ extern template class Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateM
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-// #endif // WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+// #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_H

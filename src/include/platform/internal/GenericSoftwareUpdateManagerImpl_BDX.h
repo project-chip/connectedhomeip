@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,11 +24,10 @@
 #ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_H
 #define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_H
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Profiles/bulk-data-transfer/Development/BulkDataTransfer.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <profiles/bulk-data-transfer/Development/BulkDataTransfer.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 class SoftwareUpdateManagerImpl;
@@ -48,40 +46,40 @@ namespace Internal {
 template<class ImplClass>
 class GenericSoftwareUpdateManagerImpl_BDX
 {
-    using BDXTransfer = ::nl::Weave::Profiles::BulkDataTransfer::BDXTransfer;
-    using BDXNode = ::nl::Weave::Profiles::BulkDataTransfer::BdxNode;
-    using ReceiveAccept = ::nl::Weave::Profiles::BulkDataTransfer::ReceiveAccept;
+    using BDXTransfer = ::chip::Profiles::BulkDataTransfer::BDXTransfer;
+    using BDXNode = ::chip::Profiles::BulkDataTransfer::BdxNode;
+    using ReceiveAccept = ::chip::Profiles::BulkDataTransfer::ReceiveAccept;
 
 protected:
     // ===== Members for use by the implementation subclass.
 
-    WEAVE_ERROR DoInit(void);
-    WEAVE_ERROR StartImageDownload(char *aURI, uint64_t aStartOffset);
-    WEAVE_ERROR GetUpdateSchemeList(::nl::Weave::Profiles::SoftwareUpdate::UpdateSchemeList * aUpdateSchemeList);
+    CHIP_ERROR DoInit(void);
+    CHIP_ERROR StartImageDownload(char *aURI, uint64_t aStartOffset);
+    CHIP_ERROR GetUpdateSchemeList(::chip::Profiles::SoftwareUpdate::UpdateSchemeList * aUpdateSchemeList);
     void AbortDownload(void);
 
 private:
     // ===== Private members reserved for use by this class only.
 
-    WEAVE_ERROR PrepareBinding(void);
-    WEAVE_ERROR StartDownload(void);
+    CHIP_ERROR PrepareBinding(void);
+    CHIP_ERROR StartDownload(void);
     void ResetState(void);
 
     static void BlockReceiveHandler(BDXTransfer * aXfer, uint64_t alength, uint8_t * aDataBlock,
                                     bool aIsLastBlock);
-    static void ErrorHandler(BDXTransfer * aXfer, WEAVE_ERROR anErrorCode);
-    static WEAVE_ERROR ReceiveAcceptHandler(BDXTransfer * aXfer, ReceiveAccept * aEeceiveAcceptMsg);
-    static void ReceiveRejectHandler(BDXTransfer * aXfer, nl::Weave::StatusReport * aReport);
-    static void XferErrorHandler(BDXTransfer * aXfer, ::nl::Weave::StatusReport * aXferError);
+    static void ErrorHandler(BDXTransfer * aXfer, CHIP_ERROR anErrorCode);
+    static CHIP_ERROR ReceiveAcceptHandler(BDXTransfer * aXfer, ReceiveAccept * aEeceiveAcceptMsg);
+    static void ReceiveRejectHandler(BDXTransfer * aXfer, chip::StatusReport * aReport);
+    static void XferErrorHandler(BDXTransfer * aXfer, ::chip::StatusReport * aXferError);
     static void XferDoneHandler(BDXTransfer * aXfer);
 
-    static void HandleBindingEvent(void * apAppState, ::nl::Weave::Binding::EventType aEvent,
-                                   const ::nl::Weave::Binding::InEventParam & aInParam,
-                                   ::nl::Weave::Binding::OutEventParam & aOutParam);
+    static void HandleBindingEvent(void * apAppState, ::chip::Binding::EventType aEvent,
+                                   const ::chip::Binding::InEventParam & aInParam,
+                                   ::chip::Binding::OutEventParam & aOutParam);
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
-    ::nl::Weave::Binding * mBinding;
+    ::chip::Binding * mBinding;
     char * mURI;
 
     BDXNode mBDXClient;
@@ -95,7 +93,6 @@ extern template class GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManager
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_H
