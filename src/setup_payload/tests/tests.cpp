@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+#include "SetupPayload.cpp"
 #include "SetupCodeUtils.cpp"
 #include "SetupPayload.h"
 #include "QRCodeSetupPayloadGenerator.cpp"

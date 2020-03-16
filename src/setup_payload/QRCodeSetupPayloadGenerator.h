@@ -33,58 +33,37 @@
 #include <string>
 using namespace std;
 
-#ifndef _SETUP_PAYLOAD_GENERATOR_
-#define _SETUP_PAYLOAD_GENERATOR_
-
-const int kVersionFieldLengthInBits = 3;
-const int kVendorIDFieldLengthInBits = 16;
-const int kProductIDFieldLengthInBits = 16;
-const int kCustomFlowRequiredFieldLengthInBits = 1;
-const int kRendezvousInfoFieldLengthInBits = 8;
-const int kPayloadDiscriminatorFieldLengthInBits = 8;
-const int kSetupPINCodeFieldLengthInBits = 27;
-const int kReservedFieldLengthInBits = 1;
-
-
-const int kTotalPayloadDataSizeInBits = (  kVersionFieldLengthInBits + \
-                                           kVendorIDFieldLengthInBits + \
-                                           kProductIDFieldLengthInBits + \
-                                           kCustomFlowRequiredFieldLengthInBits +
-                                           kRendezvousInfoFieldLengthInBits + \
-                                           kPayloadDiscriminatorFieldLengthInBits + \
-                                           kSetupPINCodeFieldLengthInBits + \
-                                           kReservedFieldLengthInBits
-                                        );
+#ifndef _QR_CODE_SETUP_PAYLOAD_GENERATOR_
+#define _QR_CODE_SETUP_PAYLOAD_GENERATOR_
 
 namespace chip {
 
 class QRCodeSetupPayloadGenerator
 {
-    private:
-        bitset <kTotalPayloadDataSizeInBits> mPayloadBits;
-        SetupPayload mPayload;
-        // points to the current index within the bitset
-        int mPayloadBitsIndex;
+private:
+    bitset<kTotalPayloadDataSizeInBits> mPayloadBits;
+    SetupPayload mPayload;
+    // points to the current index within the bitset
+    int mPayloadBitsIndex;
 
-        void populateInteger(uint64_t input, size_t numberOfBits);
-        void populateVersion();
-        void populateVendorID();
-        void populateProductID();
-        void populateCustomFlowRequiredField();
-        void populateRendezvousInfo();
-        void populateDiscriminator();
-        void populateSetupPIN();
-        void populateReservedField();
-        void resetBitSet();
-        void generateBitSet();
+    void populateInteger(uint64_t input, size_t numberOfBits);
+    void populateVersion();
+    void populateVendorID();
+    void populateProductID();
+    void populateCustomFlowRequiredField();
+    void populateRendezvousInfo();
+    void populateDiscriminator();
+    void populateSetupPIN();
+    void populateReservedField();
+    void resetBitSet();
+    void generateBitSet();
 
-    public:
-        string payloadBinaryRepresentation();
-        string payloadBase45Representation();
-        QRCodeSetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload) {};
-
+public:
+    string payloadBinaryRepresentation();
+    string payloadBase45Representation();
+    QRCodeSetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload){};
 };
 
 }; // namespace chip
 
-#endif /* _SETUP_PAYLOAD_GENERATOR_ */
+#endif /* _QR_CODE_SETUP_PAYLOAD_GENERATOR_ */
