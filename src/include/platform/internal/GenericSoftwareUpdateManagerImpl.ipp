@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,34 +24,28 @@
 #ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_IPP
 #define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_IPP
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <Weave/Core/WeaveCore.h>
-#include <Weave/DeviceLayer/PlatformManager.h>
-#include <Weave/DeviceLayer/ConnectivityManager.h>
-#include <Weave/DeviceLayer/SoftwareUpdateManager.h>
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/internal/GenericSoftwareUpdateManagerImpl.h>
+#include <core/CHIPCore.h>
+#include <platform/PlatformManager.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/SoftwareUpdateManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/GenericSoftwareUpdateManagerImpl.h>
 
-#include <Weave/Support/FibonacciUtils.h>
-#include <Weave/Support/RandUtils.h>
-#include <Weave/Support/TraitEventUtils.h>
+#include <support/FibonacciUtils.h>
+#include <support/RandUtils.h>
 
-#include <nest/trait/firmware/SoftwareUpdateTrait.h>
-
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-using namespace ::nl::Weave;
-using namespace ::nl::Weave::TLV;
-using namespace ::nl::Weave::Profiles;
-using namespace ::nl::Weave::Profiles::Common;
-using namespace ::nl::Weave::Profiles::DataManagement;
-using namespace ::nl::Weave::Profiles::SoftwareUpdate;
-using namespace ::Schema::Nest::Trait::Firmware;
-using namespace ::Schema::Nest::Trait::Firmware::SoftwareUpdateTrait;
+using namespace ::chip;
+using namespace ::chip::TLV;
+using namespace ::chip::Profiles;
+using namespace ::chip::Profiles::Common;
+using namespace ::chip::Profiles::DataManagement;
+using namespace ::chip::Profiles::SoftwareUpdate;
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>;
@@ -75,10 +68,10 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DoInit()
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_SetEventCallback(void * const aAppState,
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_SetEventCallback(void * const aAppState,
                                                                    const SoftwareUpdateManager::EventCallback aEventCallback)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     mAppState = aAppState;
     mEventHandlerCallback = aEventCallback;
@@ -86,7 +79,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_SetEventCallback(void 
 #if DEBUG
     /* Verify that the application's event callback function correctly calls the default handler.
      *
-     * NOTE: If your code receives WEAVE_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED it means that the event handler
+     * NOTE: If your code receives CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED it means that the event handler
      * function you supplied for the software update manager does not properly call SoftwareUpdateManager::DefaultEventHandler
      * for unrecognized/unhandled events.
      */
@@ -97,7 +90,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_SetEventCallback(void 
         inParam.Source = &SoftwareUpdateMgrImpl();
         outParam.Clear();
         mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_DefaultCheck, inParam, outParam);
-        VerifyOrExit(outParam.DefaultHandlerCalled, err = WEAVE_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED);
+        VerifyOrExit(outParam.DefaultHandlerCalled, err = CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED);
     }
 
 exit:
@@ -116,38 +109,38 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::_SetRetryPolicyCallback(const 
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareBinding(intptr_t arg)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     self->Cleanup();
 
     if (!ConnectivityMgr().HaveServiceConnectivity())
     {
-        WeaveLogProgress(DeviceLayer, "Software Update Check: No service connectivity");
-        ExitNow(err = WEAVE_ERROR_NOT_CONNECTED);
+        ChipLogProgress(DeviceLayer, "Software Update Check: No service connectivity");
+        ExitNow(err = CHIP_ERROR_NOT_CONNECTED);
     }
 
     self->mBinding = ExchangeMgr.NewBinding(HandleServiceBindingEvent, NULL);
-    VerifyOrExit(self->mBinding != NULL, err = WEAVE_ERROR_NO_MEMORY);
+    VerifyOrExit(self->mBinding != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     err = self->mBinding->BeginConfiguration()
-            .Target_ServiceEndpoint(WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_ENDPOINT_ID)
+            .Target_ServiceEndpoint(CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_ENDPOINT_ID)
             .Transport_UDP_WRM()
-            .Exchange_ResponseTimeoutMsec(WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_RESPOSNE_TIMEOUT)
+            .Exchange_ResponseTimeoutMsec(CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_RESPOSNE_TIMEOUT)
             .Security_SharedCASESession()
             .PrepareBinding();
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         self->Impl()->SoftwareUpdateFailed(err, NULL);
     }
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ImageQuery imageQuery;
     TLVWriter writer;
@@ -178,7 +171,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     err = ConfigurationMgr().GetFirmwareRevision(firmwareRev, sizeof(firmwareRev), firmwareRevLen);
     SuccessOrExit(err);
 
-    nl::NullifyAllEventFields(&ev);
+    NullifyAllEventFields(&ev);
     evOptions.relatedEventID = mEventId;
     ev.currentSwVersion = firmwareRev;
     ev.vendorId = imageQuery.productSpec.vendorId;
@@ -197,10 +190,10 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
 
     outParam.PrepareQuery.PackageSpecification = NULL;
     outParam.PrepareQuery.DesiredLocale = NULL;
-    outParam.PrepareQuery.Error = WEAVE_NO_ERROR;
+    outParam.PrepareQuery.Error = CHIP_NO_ERROR;
 
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_PrepareQuery, inParam, outParam);
-    VerifyOrExit(mState == SoftwareUpdateManager::kState_PrepareQuery, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+    VerifyOrExit(mState == SoftwareUpdateManager::kState_PrepareQuery, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
     // Check for a preparation error returned by the application
     err = outParam.PrepareQuery.Error;
@@ -209,7 +202,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     err = imageQuery.version.init((uint8_t) firmwareRevLen, firmwareRev);
     SuccessOrExit(err);
 
-    // Locale is an optional field in the weave software update protocol. If one is not provided by the application,
+    // Locale is an optional field in the chip software update protocol. If one is not provided by the application,
     // then skip over and move to the next field.
     if (outParam.PrepareQuery.DesiredLocale != NULL)
     {
@@ -220,7 +213,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
         ev.SetLocalePresent();
     }
 
-    // Package specification is an option field in the weave software update protocol. If one is not
+    // Package specification is an option field in the chip software update protocol. If one is not
     // provided by the application, skip and move to the next field.
     if (outParam.PrepareQuery.PackageSpecification != NULL)
     {
@@ -230,7 +223,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
 
     // Allocate a buffer to hold the image query.
     mImageQueryPacketBuffer = PacketBuffer::New();
-    VerifyOrExit(mImageQueryPacketBuffer != NULL, err = WEAVE_ERROR_NO_MEMORY);
+    VerifyOrExit(mImageQueryPacketBuffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     err = imageQuery.pack(mImageQueryPacketBuffer);
     SuccessOrExit(err);
@@ -244,11 +237,11 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     outParam.Clear();
 
     inParam.PrepareQuery_Metadata.MetaDataWriter = &writer;
-    outParam.PrepareQuery_Metadata.Error = WEAVE_NO_ERROR;
+    outParam.PrepareQuery_Metadata.Error = CHIP_NO_ERROR;
 
     // Call EventHandler Callback to allow application to write meta-data.
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_PrepareQuery_Metadata, inParam, outParam);
-    VerifyOrExit(mState == SoftwareUpdateManager::kState_PrepareQuery, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+    VerifyOrExit(mState == SoftwareUpdateManager::kState_PrepareQuery, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
     // Check for a preparation error returned by the application
     err = outParam.PrepareQuery_Metadata.Error;
@@ -259,18 +252,18 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
 
     writer.Finalize();
 
-    nl::LogEvent(&ev, evOptions);
+    LogEvent(&ev, evOptions);
 
 exit:
     return err;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_CheckNow(void)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_CheckNow(void)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mEventHandlerCallback != NULL, err = WEAVE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mEventHandlerCallback != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (!Impl()->IsInProgress())
     {
@@ -284,7 +277,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_CheckNow(void)
             SoftwareUpdateStartEvent ev;
             EventOptions evOptions(true);
             ev.trigger = START_TRIGGER_USER_INITIATED;
-            mEventId = nl::LogEvent(&ev, evOptions);
+            mEventId = LogEvent(&ev, evOptions);
         }
 
         DriveState(SoftwareUpdateManager::kState_PrepareQuery);
@@ -324,7 +317,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::GetEventState(int32_t& aEventS
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(WEAVE_ERROR aError,
+void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(CHIP_ERROR aError,
                                                                        Profiles::StatusReporting::StatusReport * aStatusReport)
 {
     SoftwareUpdateManager::InEventParam inParam;
@@ -333,11 +326,11 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(WEAVE_ERR
     inParam.Clear();
     outParam.Clear();
 
-    if (aError == WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
+    if (aError == CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
     {
         /*
          *  No need to do anything since an abort by the application would have already
-         *  called SoftwareUpdateFinished with WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED error
+         *  called SoftwareUpdateFinished with CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED error
          *  and moved to Idle state.
          */
         ExitNow();
@@ -349,7 +342,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(WEAVE_ERR
     {
         FailureEvent ev;
         EventOptions evOptions(true);
-        nl::NullifyAllEventFields(&ev);
+        NullifyAllEventFields(&ev);
         GetEventState(ev.state);
         evOptions.relatedEventID = mEventId;
 
@@ -367,7 +360,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(WEAVE_ERR
             ev.SetRemoteStatusCodeNull();
         }
 
-        nl::LogEvent(&ev, evOptions);
+        LogEvent(&ev, evOptions);
     }
 
     if (mState == SoftwareUpdateManager::kState_PrepareQuery)
@@ -390,7 +383,7 @@ exit:
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFinished(WEAVE_ERROR aError)
+void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFinished(CHIP_ERROR aError)
 {
     SoftwareUpdateManager::InEventParam inParam;
     SoftwareUpdateManager::OutEventParam outParam;
@@ -401,29 +394,29 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFinished(WEAVE_E
     mShouldRetry = false;
     mRetryCounter = 0;
 
-    if (aError == WEAVE_ERROR_NO_SW_UPDATE_AVAILABLE)
+    if (aError == CHIP_ERROR_NO_SW_UPDATE_AVAILABLE)
     {
         /* Log a Query Finish event with null fields
          * as per the software update trait schema to indicate no update available.
          */
         QueryFinishEvent ev;
         EventOptions evOptions(true);
-        nl::NullifyAllEventFields(&ev);
+        NullifyAllEventFields(&ev);
         evOptions.relatedEventID = mEventId;
-        nl::LogEvent(&ev, evOptions);
+        LogEvent(&ev, evOptions);
     }
-    else if (aError != WEAVE_NO_ERROR)
+    else if (aError != CHIP_NO_ERROR)
     {
         /* Log a Failure event to indicate that software update finished
          * because of an error.
          */
         FailureEvent ev;
         EventOptions evOptions(true);
-        nl::NullifyAllEventFields(&ev);
+        NullifyAllEventFields(&ev);
         GetEventState(ev.state);
         evOptions.relatedEventID = mEventId;
         ev.platformReturnCode = aError;
-        nl::LogEvent(&ev, evOptions);
+        LogEvent(&ev, evOptions);
     }
 
     inParam.Finished.Error = aError;
@@ -444,7 +437,7 @@ bool GenericSoftwareUpdateManagerImpl<ImplClass>::_IsInProgress(void)
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::SendQuery(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     SoftwareUpdateManager::InEventParam  inParam;
     SoftwareUpdateManager::OutEventParam outParam;
@@ -459,17 +452,17 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SendQuery(void)
     mExchangeCtx->OnKeyError        = OnKeyError;
 
     // Send the query
-    err =  mExchangeCtx->SendMessage(kWeaveProfile_SWU,
+    err =  mExchangeCtx->SendMessage(kChipProfile_SWU,
                                      kMsgType_ImageQuery,
                                      mImageQueryPacketBuffer,
                                      ExchangeContext::kSendFlag_ExpectResponse | ExchangeContext::kSendFlag_RequestAck);
     SuccessOrExit(err);
 
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_QuerySent, inParam, outParam);
-    VerifyOrExit(mState == SoftwareUpdateManager::kState_Query, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+    VerifyOrExit(mState == SoftwareUpdateManager::kState_Query, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         Impl()->SoftwareUpdateFailed(err, NULL);
     }
@@ -479,18 +472,18 @@ template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::OnResponseTimeout(ExchangeContext * aEC)
 {
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
-    self->Impl()->SoftwareUpdateFailed(WEAVE_ERROR_TIMEOUT, NULL);
+    self->Impl()->SoftwareUpdateFailed(CHIP_ERROR_TIMEOUT, NULL);
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::OnKeyError(ExchangeContext *aEc, WEAVE_ERROR aKeyError)
+void GenericSoftwareUpdateManagerImpl<ImplClass>::OnKeyError(ExchangeContext *aEc, CHIP_ERROR aKeyError)
 {
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
     self->Impl()->SoftwareUpdateFailed(aKeyError, NULL);
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleResponse(ExchangeContext * ec, const IPPacketInfo * pktInfo, const WeaveMessageInfo * msgInfo,
+void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleResponse(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
                                                                  uint32_t profileId, uint8_t msgType, PacketBuffer * payload)
 {
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
@@ -503,17 +496,17 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleResponse(ExchangeContext
     self->mExchangeCtx = NULL;
 
     // We expect to receive one of two possible responses:
-    // 1. An ImageQueryResponse message under the weave software update profile indicating
+    // 1. An ImageQueryResponse message under the chip software update profile indicating
     //    an update might be available or
     // 2. A StatusReport indicating no software update available or a problem with the query.
     //
     // NOTE: the Handle* methods are responsible for releasing the buffer.
     //
-    if (profileId == kWeaveProfile_SWU && msgType == kMsgType_ImageQueryResponse)
+    if (profileId == kChipProfile_SWU && msgType == kMsgType_ImageQueryResponse)
     {
         self->HandleImageQueryResponse(payload);
     }
-    else if (profileId == kWeaveProfile_Common && msgType == kMsgType_StatusReport)
+    else if (profileId == kChipProfile_Common && msgType == kMsgType_StatusReport)
     {
         self->HandleStatusReport(payload);
     }
@@ -521,28 +514,28 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleResponse(ExchangeContext
     {
         // If any other message type is received, fail with an error.
         PacketBuffer::Free(payload);
-        self->Impl()->SoftwareUpdateFailed(WEAVE_ERROR_INVALID_MESSAGE_TYPE, NULL);
+        self->Impl()->SoftwareUpdateFailed(CHIP_ERROR_INVALID_MESSAGE_TYPE, NULL);
     }
 }
 
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleStatusReport(PacketBuffer * payload)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     StatusReport statusReport;
 
     // Parse the status report to uncover the underlying errors.
     err = StatusReport::parse(payload, statusReport);
 
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         PacketBuffer::Free(payload);
         Impl()->SoftwareUpdateFailed(err, NULL);
     }
-    else if ((statusReport.mProfileId == kWeaveProfile_SWU) && (statusReport.mStatusCode == kStatus_NoUpdateAvailable))
+    else if ((statusReport.mProfileId == kChipProfile_SWU) && (statusReport.mStatusCode == kStatus_NoUpdateAvailable))
     {
         PacketBuffer::Free(payload);
-        Impl()->SoftwareUpdateFinished(WEAVE_ERROR_NO_SW_UPDATE_AVAILABLE);
+        Impl()->SoftwareUpdateFinished(CHIP_ERROR_NO_SW_UPDATE_AVAILABLE);
     }
     else
     {
@@ -555,7 +548,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleStatusReport(PacketBuffe
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(PacketBuffer * payload)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     SoftwareUpdateManager::InEventParam inParam;
     SoftwareUpdateManager::OutEventParam outParam;
     char versionString[ConfigurationManager::kMaxFirmwareRevisionLength+1];
@@ -568,10 +561,10 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
         SuccessOrExit(err);
 
         // Copy URI and version string since the original payload will be freed after this.
-        VerifyOrExit(imageQueryResponse.uri.theLength < WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(imageQueryResponse.uri.theLength < CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN, err = CHIP_ERROR_BUFFER_TOO_SMALL);
         strncpy(mURI, imageQueryResponse.uri.theString, imageQueryResponse.uri.theLength);
         mURI[imageQueryResponse.uri.theLength] = 0;
-        VerifyOrExit(imageQueryResponse.versionSpec.theLength < ArraySize(versionString), err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(imageQueryResponse.versionSpec.theLength < ArraySize(versionString), err = CHIP_ERROR_BUFFER_TOO_SMALL);
         strncpy(versionString, imageQueryResponse.versionSpec.theString, imageQueryResponse.versionSpec.theLength);
         versionString[imageQueryResponse.versionSpec.theLength] = 0;
 
@@ -594,13 +587,13 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
     {
         QueryFinishEvent ev;
         EventOptions evOptions(true);
-        nl::NullifyAllEventFields(&ev);
+        NullifyAllEventFields(&ev);
         evOptions.relatedEventID = mEventId;
         ev.imageUrl = mURI;
         ev.imageVersion = versionString;
         ev.SetImageUrlPresent();
         ev.SetImageVersionPresent();
-        nl::LogEvent(&ev, evOptions);
+        LogEvent(&ev, evOptions);
     }
 
     // Set DownloadNow as the default option. Application can override during event callback
@@ -613,12 +606,12 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
     switch (outParam.SoftwareUpdateAvailable.Action)
     {
     case SoftwareUpdateManager::kAction_Ignore:
-        Impl()->SoftwareUpdateFinished(WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED);
+        Impl()->SoftwareUpdateFinished(CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED);
         break;
 
     case SoftwareUpdateManager::kAction_DownloadLater:
         // TODO: Support DownloadLater SoftwareUpdateAvailable action
-        ExitNow(err = WEAVE_ERROR_NOT_IMPLEMENTED);
+        ExitNow(err = CHIP_ERROR_NOT_IMPLEMENTED);
         break;
 
     case SoftwareUpdateManager::kAction_ApplicationManaged:
@@ -639,7 +632,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
             inParam.FetchPartialImageInfo.URI = mURI;
             outParam.FetchPartialImageInfo.PartialImageLen = 0;
             mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_FetchPartialImageInfo, inParam, outParam);
-            VerifyOrExit(mState == SoftwareUpdateManager::kState_Query, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+            VerifyOrExit(mState == SoftwareUpdateManager::kState_Query, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
             // If some part of the desired image has already been downloaded...
             if (outParam.FetchPartialImageInfo.PartialImageLen != 0)
@@ -663,22 +656,22 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
         break;
 
     default:
-        ExitNow(err = WEAVE_ERROR_INVALID_ARGUMENT);
+        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
         break;
     }
 
 exit:
     PacketBuffer::Free(payload);
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         Impl()->SoftwareUpdateFailed(err, NULL);
     }
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleHoldOffTimerExpired(::nl::Weave::System::Layer * aLayer,
+void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleHoldOffTimerExpired(::chip::System::Layer * aLayer,
                                                                             void * aAppState,
-                                                                            ::nl::Weave::System::Error aError)
+                                                                            ::chip::System::Error aError)
 {
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
@@ -686,7 +679,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleHoldOffTimerExpired(::nl
         SoftwareUpdateStartEvent ev;
         EventOptions evOptions(true);
         ev.trigger = START_TRIGGER_SCHEDULED;
-        self->mEventId = nl::LogEvent(&ev, evOptions);
+        self->mEventId = LogEvent(&ev, evOptions);
     }
 
     self->DriveState(SoftwareUpdateManager::kState_PrepareQuery);
@@ -766,15 +759,15 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mEventHandlerCallback != NULL, err = WEAVE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mEventHandlerCallback != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (aMaxWaitTimeMs == 0)
     {
-        WeaveLogProgress(DeviceLayer, "Scheduled Software Update Check Disabled");
+        ChipLogProgress(DeviceLayer, "Scheduled Software Update Check Disabled");
         mScheduledCheckEnabled = false;
     }
     else
@@ -816,7 +809,7 @@ uint32_t GenericSoftwareUpdateManagerImpl<ImplClass>::GetNextWaitTimeInterval()
         }
         else
         {
-            WeaveLogProgress(DeviceLayer, "Retrying Software Update Check in %ums RetryCounter: %u", timeOutMsecs, mRetryCounter);
+            ChipLogProgress(DeviceLayer, "Retrying Software Update Check in %ums RetryCounter: %u", timeOutMsecs, mRetryCounter);
         }
     }
     else
@@ -832,7 +825,7 @@ uint32_t GenericSoftwareUpdateManagerImpl<ImplClass>::ComputeNextScheduledWaitTi
 {
     uint32_t timeOutMsecs = (mMinWaitTimeMs + (GetRandU32() % (mMaxWaitTimeMs - mMinWaitTimeMs)));
 
-    WeaveLogProgress(DeviceLayer, "Next Scheduled Software Update Check in %ums", timeOutMsecs);
+    ChipLogProgress(DeviceLayer, "Next Scheduled Software Update Check in %ums", timeOutMsecs);
 
     return timeOutMsecs;
 }
@@ -848,28 +841,28 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::_DefaultEventHandler(void *apA
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleServiceBindingEvent(void * appState, ::nl::Weave::Binding::EventType eventType,
-    const ::nl::Weave::Binding::InEventParam & aInParam, ::nl::Weave::Binding::OutEventParam & aOutParam)
+void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleServiceBindingEvent(void * appState, ::chip::Binding::EventType eventType,
+    const ::chip::Binding::InEventParam & aInParam, ::chip::Binding::OutEventParam & aOutParam)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     StatusReport *statusReport = NULL;
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     switch (eventType)
     {
-        case nl::Weave::Binding::kEvent_PrepareFailed:
-            WeaveLogProgress(DeviceLayer, "Failed to prepare Software Update binding: %s", ErrorStr(aInParam.PrepareFailed.Reason));
+        case chip::Binding::kEvent_PrepareFailed:
+            ChipLogProgress(DeviceLayer, "Failed to prepare Software Update binding: %s", ErrorStr(aInParam.PrepareFailed.Reason));
             statusReport = aInParam.PrepareFailed.StatusReport;
             err = aInParam.PrepareFailed.Reason;
             break;
 
-        case nl::Weave::Binding::kEvent_BindingFailed:
-            WeaveLogProgress(DeviceLayer, "Software Update binding failed: %s", ErrorStr(aInParam.BindingFailed.Reason));
+        case chip::Binding::kEvent_BindingFailed:
+            ChipLogProgress(DeviceLayer, "Software Update binding failed: %s", ErrorStr(aInParam.BindingFailed.Reason));
             err = aInParam.PrepareFailed.Reason;
             break;
 
-        case nl::Weave::Binding::kEvent_BindingReady:
-            WeaveLogProgress(DeviceLayer, "Software Update binding ready");
+        case chip::Binding::kEvent_BindingReady:
+            ChipLogProgress(DeviceLayer, "Software Update binding ready");
 
             err = self->mBinding->NewExchangeContext(self->mExchangeCtx);
             SuccessOrExit(err);
@@ -884,11 +877,11 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleServiceBindingEvent(void
             break;
 
         default:
-            nl::Weave::Binding::DefaultEventHandler(appState, eventType, aInParam, aOutParam);
+            chip::Binding::DefaultEventHandler(appState, eventType, aInParam, aOutParam);
     }
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         if (self->mBinding != NULL)
         {
@@ -901,9 +894,9 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::StoreImageBlock(uint32_t aLength, uint8_t *aData)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::StoreImageBlock(uint32_t aLength, uint8_t *aData)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     SoftwareUpdateManager::InEventParam inParam;
     SoftwareUpdateManager::OutEventParam outParam;
@@ -913,13 +906,13 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::StoreImageBlock(uint32_
 
     inParam.StoreImageBlock.DataBlockLen = aLength;
     inParam.StoreImageBlock.DataBlock = aData;
-    outParam.StoreImageBlock.Error = WEAVE_NO_ERROR;
+    outParam.StoreImageBlock.Error = CHIP_NO_ERROR;
 
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_StoreImageBlock, inParam, outParam);
-    VerifyOrExit(mState == SoftwareUpdateManager::kState_Download, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+    VerifyOrExit(mState == SoftwareUpdateManager::kState_Download, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
     // Fail if the application didn't handle the StoreImageBlock event.
-    VerifyOrExit(!outParam.DefaultHandlerCalled, err = WEAVE_ERROR_NOT_IMPLEMENTED);
+    VerifyOrExit(!outParam.DefaultHandlerCalled, err = CHIP_ERROR_NOT_IMPLEMENTED);
 
     // Check if the application returned an error while storing an image block.
     err = outParam.StoreImageBlock.Error;
@@ -947,14 +940,14 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareImageStorage(void)
     // download state.
     if (outParam.DefaultHandlerCalled)
     {
-        Impl()->PrepareImageStorageComplete(WEAVE_NO_ERROR);
+        Impl()->PrepareImageStorageComplete(CHIP_NO_ERROR);
     }
 }
 
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::StartDownload(intptr_t arg)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     SoftwareUpdateManager::InEventParam inParam;
@@ -964,7 +957,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::StartDownload(intptr_t arg)
     outParam.Clear();
 
     self->mEventHandlerCallback(self->mAppState, SoftwareUpdateManager::kEvent_StartImageDownload, inParam, outParam);
-    VerifyOrExit(self->mState == SoftwareUpdateManager::kState_Download, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+    VerifyOrExit(self->mState == SoftwareUpdateManager::kState_Download, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
     err = self->Impl()->StartImageDownload(self->mURI, self->mStartOffset);
     SuccessOrExit(err);
@@ -972,17 +965,17 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::StartDownload(intptr_t arg)
     {
         DownloadStartEvent ev;
         EventOptions evOptions(true);
-        nl::NullifyAllEventFields(&ev);
+        NullifyAllEventFields(&ev);
         evOptions.relatedEventID = self->mEventId;
         ev.imageUrl = self->mURI;
         ev.offset = self->mStartOffset;
         ev.SetImageUrlPresent();
         ev.SetOffsetPresent();
-        nl::LogEvent(&ev, evOptions);
+        LogEvent(&ev, evOptions);
     }
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         self->Impl()->SoftwareUpdateFailed(err, NULL);
     }
@@ -993,9 +986,9 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DownloadComplete()
 {
     DownloadFinishEvent ev;
     EventOptions evOptions(true);
-    nl::NullifyAllEventFields(&ev);
+    NullifyAllEventFields(&ev);
     evOptions.relatedEventID = mEventId;
-    nl::LogEvent(&ev, evOptions);
+    LogEvent(&ev, evOptions);
 
     // Download is complete. Check Image Integrity.
     CheckImageIntegrity();
@@ -1004,7 +997,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DownloadComplete()
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::CheckImageIntegrity(void)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int result = 0;
     uint8_t typeLength = 0;
 
@@ -1035,19 +1028,19 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::CheckImageIntegrity(void)
     inParam.ComputeImageIntegrity.IntegrityType = mIntegritySpec.type;
     inParam.ComputeImageIntegrity.IntegrityValueBuf = computedIntegrityValue;
     inParam.ComputeImageIntegrity.IntegrityValueBufLen = typeLength;
-    outParam.ComputeImageIntegrity.Error = WEAVE_NO_ERROR;
+    outParam.ComputeImageIntegrity.Error = CHIP_NO_ERROR;
 
     // Request the application to compute an integrity check value for the stored image.
     // Fail if the application returns an error.
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_ComputeImageIntegrity, inParam, outParam);
-    VerifyOrExit(mState == SoftwareUpdateManager::kState_Download, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+    VerifyOrExit(mState == SoftwareUpdateManager::kState_Download, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
     err = outParam.ComputeImageIntegrity.Error;
     SuccessOrExit(err);
 
     // Verify the computed integrity value matches the expected value given
     // in the SoftwareUpdate:ImageQueryResponse.
     result = memcmp(computedIntegrityValue, mIntegritySpec.value, typeLength);
-    VerifyOrExit(result == 0, err = WEAVE_ERROR_INTEGRITY_CHECK_FAILED);
+    VerifyOrExit(result == 0, err = CHIP_ERROR_INTEGRITY_CHECK_FAILED);
 
     // Given that the integrity check succeeded, allow future software update attempts
     // to restart an interrupted download.  This turns off the defensive mechanism enabled
@@ -1058,13 +1051,13 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::CheckImageIntegrity(void)
     inParam.Clear();
     outParam.Clear();
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_ReadyToInstall, inParam, outParam);
-    VerifyOrExit(mState == SoftwareUpdateManager::kState_Download, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+    VerifyOrExit(mState == SoftwareUpdateManager::kState_Download, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
     // Advance to the install state.
     DriveState(SoftwareUpdateManager::kState_Install);
 
 exit:
-    if (err != WEAVE_NO_ERROR && err != WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
     {
         /* Since image integrity validation failed, request the application to reset
          * the persisted image state. This will make sure the image is downloaded from
@@ -1073,7 +1066,7 @@ exit:
         inParam.Clear();
         outParam.Clear();
         mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_ResetPartialImageInfo, inParam, outParam);
-        err = (mState == SoftwareUpdateManager::kState_Download) ? WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED : err;
+        err = (mState == SoftwareUpdateManager::kState_Download) ? CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED : err;
 
         // Arrange to ignore any partial image on the next software update attempt.
         // This is a defensive measure against an infinite software update loop in the
@@ -1088,7 +1081,7 @@ exit:
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::StartImageInstall(void)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     SoftwareUpdateManager::InEventParam inParam;
     SoftwareUpdateManager::OutEventParam outParam;
@@ -1097,7 +1090,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::StartImageInstall(void)
     outParam.Clear();
 
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_StartInstallImage, inParam, outParam);
-    VerifyOrExit(mState == SoftwareUpdateManager::kState_Install, err = WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+    VerifyOrExit(mState == SoftwareUpdateManager::kState_Install, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
     {
         /* Log an Install Start Event to indicate that software update
@@ -1109,25 +1102,25 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::StartImageInstall(void)
          */
         InstallStartEvent ev;
         EventOptions evOptions(true);
-        nl::NullifyAllEventFields(&ev);
+        NullifyAllEventFields(&ev);
         evOptions.relatedEventID = mEventId;
-        nl::LogEvent(&ev, evOptions);
+        LogEvent(&ev, evOptions);
     }
 
     err = Impl()->InstallImage();
-    if (err == WEAVE_ERROR_NOT_IMPLEMENTED)
+    if (err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
         /*
          * Since the platform does not provide a way to install the image, it is uptp
          * the application to do the install and call ImageInstallComplete API
          * to mark completion of image installation.
          */
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         Impl()->SoftwareUpdateFailed(err, NULL);
     }
@@ -1151,13 +1144,13 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::Cleanup(void)
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_Abort(void)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_Abort(void)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (mState == SoftwareUpdateManager::kState_Idle || mState == SoftwareUpdateManager::kState_ScheduledHoldoff)
     {
-        err = WEAVE_ERROR_INCORRECT_STATE;
+        err = CHIP_ERROR_INCORRECT_STATE;
     }
     else
     {
@@ -1168,7 +1161,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_Abort(void)
 
         Cleanup();
 
-        Impl()->SoftwareUpdateFinished(WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
+        Impl()->SoftwareUpdateFinished(CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
     }
 
     return err;
@@ -1191,21 +1184,21 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(voi
     uint32_t waitTimeInMsec    = 0;
     uint32_t minWaitTimeInMsec = 0;
 
-    if (aRetryParam.NumRetries <= WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_RETRIES)
+    if (aRetryParam.NumRetries <= CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_RETRIES)
     {
         fibonacciNum      = GetFibonacciForIndex(aRetryParam.NumRetries);
-        maxWaitTimeInMsec = fibonacciNum * WEAVE_DEVICE_CONFIG_SWU_WAIT_TIME_MULTIPLIER_MS;
+        maxWaitTimeInMsec = fibonacciNum * CHIP_DEVICE_CONFIG_SWU_WAIT_TIME_MULTIPLIER_MS;
 
-        if (self->mScheduledCheckEnabled && WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS > self->mMinWaitTimeMs)
+        if (self->mScheduledCheckEnabled && CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS > self->mMinWaitTimeMs)
         {
             waitTimeInMsec = 0;
             maxWaitTimeInMsec = 0;
         }
         else
         {
-            if (maxWaitTimeInMsec > WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS)
+            if (maxWaitTimeInMsec > CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS)
             {
-                maxWaitTimeInMsec = WEAVE_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS;
+                maxWaitTimeInMsec = CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS;
             }
         }
     }
@@ -1216,10 +1209,10 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(voi
 
     if (maxWaitTimeInMsec != 0)
     {
-        minWaitTimeInMsec = (WEAVE_DEVICE_CONFIG_SWU_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP * maxWaitTimeInMsec) / 100;
+        minWaitTimeInMsec = (CHIP_DEVICE_CONFIG_SWU_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP * maxWaitTimeInMsec) / 100;
         waitTimeInMsec    = minWaitTimeInMsec + (GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
 
-        WeaveLogDetail(DeviceLayer,
+        ChipLogDetail(DeviceLayer,
                "Computing swu retry policy: attempts %" PRIu32 ", max wait time %" PRIu32 " ms, selected wait time %" PRIu32
                " ms",
                aRetryParam.NumRetries, maxWaitTimeInMsec, waitTimeInMsec);
@@ -1231,16 +1224,16 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(voi
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_PrepareImageStorageComplete(WEAVE_ERROR aError)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_PrepareImageStorageComplete(CHIP_ERROR aError)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Fail if called in the wrong state.
-    VerifyOrExit(mState == SoftwareUpdateManager::kState_PrepareImageStorage, err = WEAVE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == SoftwareUpdateManager::kState_PrepareImageStorage, err = CHIP_ERROR_INCORRECT_STATE);
 
     // If the application completed the prepare process successfully, advance to the Download state.
     // Otherwise, fail the software update attempt.
-    if (aError == WEAVE_NO_ERROR)
+    if (aError == CHIP_NO_ERROR)
     {
         DriveState(SoftwareUpdateManager::kState_Download);
     }
@@ -1254,9 +1247,9 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_ImageInstallComplete(WEAVE_ERROR aError)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_ImageInstallComplete(CHIP_ERROR aError)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (mState == SoftwareUpdateManager::kState_ApplicationManaged || mState == SoftwareUpdateManager::kState_Install)
     {
@@ -1264,31 +1257,30 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_ImageInstallComplete(W
     }
     else
     {
-        err = WEAVE_ERROR_INCORRECT_STATE;
+        err = CHIP_ERROR_INCORRECT_STATE;
     }
 
     return err;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::GetIntegrityTypeList(::nl::Weave::Profiles::SoftwareUpdate::IntegrityTypeList * aIntegrityTypeList)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::GetIntegrityTypeList(::chip::Profiles::SoftwareUpdate::IntegrityTypeList * aIntegrityTypeList)
 {
     uint8_t supportedTypes[] = { Profiles::SoftwareUpdate::kIntegrityType_SHA256 };
     aIntegrityTypeList->init(ArraySize(supportedTypes), supportedTypes);
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::InstallImage(void)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::InstallImage(void)
 {
-    return WEAVE_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_IPP

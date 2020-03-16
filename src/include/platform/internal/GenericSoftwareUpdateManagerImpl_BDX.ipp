@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,31 +24,30 @@
 #ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_IPP
 #define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_IPP
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <Weave/Core/WeaveCore.h>
-#include <Weave/DeviceLayer/PlatformManager.h>
-#include <Weave/DeviceLayer/SoftwareUpdateManager.h>
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.h>
+#include <core/CHIPCore.h>
+#include <platform/PlatformManager.h>
+#include <platform/SoftwareUpdateManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-using namespace ::nl::Weave::TLV;
-using namespace ::nl::Weave::Profiles;
-using namespace ::nl::Weave::Profiles::Common;
-using namespace ::nl::Weave::Profiles::BulkDataTransfer;
+using namespace ::chip::TLV;
+using namespace ::chip::Profiles;
+using namespace ::chip::Profiles::Common;
+using namespace ::chip::Profiles::BulkDataTransfer;
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManagerImpl>;
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::DoInit(void)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::DoInit(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     mBinding = NULL;
     mURI = NULL;
@@ -62,22 +60,22 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::DoInit(void)
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartImageDownload(char *aURI, uint64_t aStartOffset)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartImageDownload(char *aURI, uint64_t aStartOffset)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-    VerifyOrExit(aURI != NULL, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aURI != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mURI = aURI;
     mStartOffset = aStartOffset;
 
     mBinding = ExchangeMgr.NewBinding(HandleBindingEvent, NULL);
-    VerifyOrExit(mBinding != NULL, err = WEAVE_ERROR_NO_MEMORY);
+    VerifyOrExit(mBinding != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     err = mBinding->BeginConfiguration()
-            .Target_ServiceEndpoint(WEAVE_DEVICE_CONFIG_FILE_DOWNLOAD_ENDPOINT_ID)
+            .Target_ServiceEndpoint(CHIP_DEVICE_CONFIG_FILE_DOWNLOAD_ENDPOINT_ID)
             .Transport_UDP_WRM()
-            .Exchange_ResponseTimeoutMsec(WEAVE_DEVICE_CONFIG_FILE_DOWNLOAD_RESPOSNE_TIMEOUT)
+            .Exchange_ResponseTimeoutMsec(CHIP_DEVICE_CONFIG_FILE_DOWNLOAD_RESPOSNE_TIMEOUT)
             .Security_SharedCASESession()
             .PrepareBinding();
 
@@ -86,9 +84,9 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartDownload(void)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartDownload(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     ReferencedString uri;
     uri.init((uint16_t)strlen(mURI), mURI);
@@ -104,7 +102,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartDownload(void)
         ErrorHandler,
     };
 
-    VerifyOrExit(mBDXTransfer == NULL, err = WEAVE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mBDXTransfer == NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = mBDXClient.NewTransfer(mBinding, handlers, uri, this, mBDXTransfer);
     SuccessOrExit(err);
@@ -120,7 +118,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartDownload(void)
      * at this point and hence the remainder of the file starting from the offset
      * mentioned above is expected to be downloaded in the transfer.
      */
-    mBDXTransfer->mMaxBlockSize = WEAVE_DEVICE_CONFIG_SWU_BDX_BLOCK_SIZE;
+    mBDXTransfer->mMaxBlockSize = CHIP_DEVICE_CONFIG_SWU_BDX_BLOCK_SIZE;
     mBDXTransfer->mStartOffset  = mStartOffset;
     mBDXTransfer->mLength       = 0;
 
@@ -128,7 +126,7 @@ WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartDownload(void)
     SuccessOrExit(err);
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ResetState();
     }
@@ -136,9 +134,9 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ReceiveAcceptHandler(BDXTransfer * aXfer, ReceiveAccept * aReceiveAcceptMsg)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ReceiveAcceptHandler(BDXTransfer * aXfer, ReceiveAccept * aReceiveAcceptMsg)
 {
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 template<class ImplClass>
@@ -155,28 +153,28 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ReceiveRejectHandler(BDXTr
     // of this implementation, it means that file download is complete since the end of file has already been
     // reached.
     //
-    if (aReport->mProfileId == kWeaveProfile_BDX && aReport->mStatusCode == kStatus_LengthMismatch)
+    if (aReport->mProfileId == kChipProfile_BDX && aReport->mStatusCode == kStatus_LengthMismatch)
     {
         self->Impl()->DownloadComplete();
     }
     else
     {
-        self->Impl()->SoftwareUpdateFailed(WEAVE_ERROR_STATUS_REPORT_RECEIVED, aReport);
+        self->Impl()->SoftwareUpdateFailed(CHIP_ERROR_STATUS_REPORT_RECEIVED, aReport);
     }
 }
 
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::BlockReceiveHandler(BDXTransfer * xfr, uint64_t aLength, uint8_t * aDataBlock, bool aIsLastBlock)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     err = self->Impl()->StoreImageBlock(aLength, aDataBlock);
-    if (err == WEAVE_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
+    if (err == CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
     {
         return ;
     }
-    else if (err != WEAVE_NO_ERROR)
+    else if (err != CHIP_NO_ERROR)
     {
         self->ResetState();
         self->Impl()->SoftwareUpdateFailed(err, NULL);
@@ -189,7 +187,7 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::XferErrorHandler(BDXTransf
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     self->ResetState();
-    self->Impl()->SoftwareUpdateFailed(WEAVE_ERROR_STATUS_REPORT_RECEIVED, aReport);
+    self->Impl()->SoftwareUpdateFailed(CHIP_ERROR_STATUS_REPORT_RECEIVED, aReport);
 }
 
 template<class ImplClass>
@@ -202,7 +200,7 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::XferDoneHandler(BDXTransfe
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ErrorHandler(BDXTransfer * aXfer, WEAVE_ERROR aErrorCode)
+void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ErrorHandler(BDXTransfer * aXfer, CHIP_ERROR aErrorCode)
 {
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
@@ -211,41 +209,41 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ErrorHandler(BDXTransfer *
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::HandleBindingEvent(void * appState, ::nl::Weave::Binding::EventType aEvent,
-    const ::nl::Weave::Binding::InEventParam & aInParam, ::nl::Weave::Binding::OutEventParam & aOutParam)
+void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::HandleBindingEvent(void * appState, ::chip::Binding::EventType aEvent,
+    const ::chip::Binding::InEventParam & aInParam, ::chip::Binding::OutEventParam & aOutParam)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     StatusReport *statusReport = NULL;
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     switch (aEvent)
     {
-        case nl::Weave::Binding::kEvent_PrepareFailed:
-            WeaveLogProgress(DeviceLayer, "Failed to prepare Software Update BDX binding: %s",
-                    (aInParam.PrepareFailed.Reason == WEAVE_ERROR_STATUS_REPORT_RECEIVED)
-                    ? nl::StatusReportStr(aInParam.PrepareFailed.StatusReport->mProfileId,
+        case chip::Binding::kEvent_PrepareFailed:
+            ChipLogProgress(DeviceLayer, "Failed to prepare Software Update BDX binding: %s",
+                    (aInParam.PrepareFailed.Reason == CHIP_ERROR_STATUS_REPORT_RECEIVED)
+                    ? StatusReportStr(aInParam.PrepareFailed.StatusReport->mProfileId,
                                           aInParam.PrepareFailed.StatusReport->mStatusCode)
-                    : nl::ErrorStr(aInParam.PrepareFailed.Reason));
+                    : ErrorStr(aInParam.PrepareFailed.Reason));
             statusReport = aInParam.PrepareFailed.StatusReport;
             err = aInParam.PrepareFailed.Reason;
             break;
 
-        case nl::Weave::Binding::kEvent_BindingFailed:
-            WeaveLogProgress(DeviceLayer, "Software Update BDX binding failed: %s",
-                    nl::ErrorStr(aInParam.BindingFailed.Reason));
+        case chip::Binding::kEvent_BindingFailed:
+            ChipLogProgress(DeviceLayer, "Software Update BDX binding failed: %s",
+                    ErrorStr(aInParam.BindingFailed.Reason));
             err = aInParam.PrepareFailed.Reason;
             break;
 
-        case nl::Weave::Binding::kEvent_BindingReady:
-            WeaveLogProgress(DeviceLayer, "Software Update BDX binding ready");
+        case chip::Binding::kEvent_BindingReady:
+            ChipLogProgress(DeviceLayer, "Software Update BDX binding ready");
             err = self->StartDownload();
             break;
 
         default:
-            nl::Weave::Binding::DefaultEventHandler(appState, aEvent, aInParam, aOutParam);
+            chip::Binding::DefaultEventHandler(appState, aEvent, aInParam, aOutParam);
     }
 
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         self->ResetState();
         self->Impl()->SoftwareUpdateFailed(err, statusReport);
@@ -276,18 +274,17 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ResetState(void)
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::GetUpdateSchemeList(::nl::Weave::Profiles::SoftwareUpdate::UpdateSchemeList * aUpdateSchemeList)
+CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::GetUpdateSchemeList(::chip::Profiles::SoftwareUpdate::UpdateSchemeList * aUpdateSchemeList)
 {
     uint8_t supportedSchemes[] = { Profiles::SoftwareUpdate::kUpdateScheme_BDX };
     aUpdateSchemeList->init(ArraySize(supportedSchemes), supportedSchemes);
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_IPP
