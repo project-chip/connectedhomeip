@@ -1861,7 +1861,7 @@
  *
  *  @brief
  *    If asserted (1), enable logging of errors at function exit via the
- *    chipLogFunctError() macro.
+ *    ChipLogFunctError() macro.
  */
 #ifndef CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 #define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 0
@@ -1873,7 +1873,7 @@
  *
  *  @brief
  *    If asserted (1), enable logging of failed conditions via the
- *    chipLogIfFalse() macro.
+ *    ChipLogIfFalse() macro.
  */
 #ifndef CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 #define CHIP_CONFIG_ENABLE_CONDITION_LOGGING 0

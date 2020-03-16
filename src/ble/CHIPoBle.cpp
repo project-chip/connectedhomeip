@@ -40,9 +40,9 @@
 #undef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
 
 #ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
-#define chipLogDebugBtpEngine(MOD, MSG, ...) chipLogError(MOD, MSG, ##__VA_ARGS__)
+#define ChipLogDebugBtpEngine(MOD, MSG, ...) ChipLogError(MOD, MSG, ##__VA_ARGS__)
 #else
-#define chipLogDebugBtpEngine(MOD, MSG, ...)
+#define ChipLogDebugBtpEngine(MOD, MSG, ...)
 #endif
 
 #define CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE 1 // Size in bytes of enocded BTP fragment header flag bits
@@ -83,7 +83,7 @@ static void PrintBufDebug(PacketBuffer * buf)
 
     for (int i = 0; i < buf->DataLength(); i++)
     {
-        chipLogError(Ble, "\t%02x", b[i]);
+        ChipLogError(Ble, "\t%02x", b[i]);
     }
 #endif
 }
@@ -166,13 +166,13 @@ bool CHIPoBle::HasUnackedData() const
 
 bool CHIPoBle::IsValidAck(SequenceNumber_t ack_num) const
 {
-    chipLogDebugBtpEngine(Ble, "entered IsValidAck, ack = %u, oldest = %u, newest = %u", ack_num, mTxOldestUnackedSeqNum,
+    ChipLogDebugBtpEngine(Ble, "entered IsValidAck, ack = %u, oldest = %u, newest = %u", ack_num, mTxOldestUnackedSeqNum,
                           mTxNewestUnackedSeqNum);
 
     // Return false if not awaiting any ack.
     if (!mExpectingAck)
     {
-        chipLogDebugBtpEngine(Ble, "unexpected ack is invalid");
+        ChipLogDebugBtpEngine(Ble, "unexpected ack is invalid");
         return false;
     }
 
@@ -192,7 +192,7 @@ BLE_ERROR CHIPoBle::HandleAckReceived(SequenceNumber_t ack_num)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
-    chipLogDebugBtpEngine(Ble, "entered HandleAckReceived, ack_num = %u", ack_num);
+    ChipLogDebugBtpEngine(Ble, "entered HandleAckReceived, ack_num = %u", ack_num);
 
     // Ensure ack_num falls within range of ack values we're expecting.
     VerifyOrExit(IsValidAck(ack_num), err = BLE_ERROR_INVALID_ACK);
@@ -234,7 +234,7 @@ BLE_ERROR CHIPoBle::EncodeStandAloneAck(PacketBuffer * data)
 
     // Acknowledge most recently received sequence number.
     characteristic[1] = GetAndRecordRxAckSeqNum();
-    chipLogDebugBtpEngine(Ble, "===> encoded stand-alone ack = %u", characteristic[1]);
+    ChipLogDebugBtpEngine(Ble, "===> encoded stand-alone ack = %u", characteristic[1]);
 
     // Include sequence number for stand-alone ack itself.
     characteristic[2] = GetAndIncrementNextTxSeqNum();
@@ -313,7 +313,7 @@ BLE_ERROR CHIPoBle::HandleCharacteristicReceived(PacketBuffer * data, SequenceNu
     // mRxFragnentSize may be smaller than the characteristic size.
     data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
 
-    chipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
+    ChipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
     PrintBufDebug(data);
 
     if (mRxState == kState_Idle)
@@ -386,14 +386,14 @@ exit:
         mRxState = kState_Error;
 
         // Dump protocol engine state, plus header flags and received data length.
-        chipLogError(Ble, "HandleCharacteristicReceived failed, err = %d, rx_flags = %u", err, rx_flags);
+        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %d, rx_flags = %u", err, rx_flags);
         if (didReceiveAck)
         {
-            chipLogError(Ble, "With rx'd ack = %u", receivedAck);
+            ChipLogError(Ble, "With rx'd ack = %u", receivedAck);
         }
         if (mRxBuf != NULL)
         {
-            chipLogError(Ble, "With rx buf data length = %u", mRxBuf->DataLength());
+            ChipLogError(Ble, "With rx buf data length = %u", mRxBuf->DataLength());
         }
         LogState();
 
@@ -442,7 +442,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
     if (send_ack && !HasUnackedData())
     {
-        chipLogError(Ble, "HandleCharacteristicSend: send_ack true, but nothing to acknowledge.");
+        ChipLogError(Ble, "HandleCharacteristicSend: send_ack true, but nothing to acknowledge.");
         return false;
     }
 
@@ -457,7 +457,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
         mTxState  = kState_InProgress;
         mTxLength = mTxBuf->DataLength();
 
-        chipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
+        ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
         PrintBufDebug(data);
 
         // Determine fragment header size.
@@ -468,7 +468,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
         if (!mTxBuf->EnsureReservedSize(header_size + CHIP_CONFIG_BLE_PKT_RESERVED_SIZE))
         {
             // handle error
-            chipLogError(Ble, "HandleCharacteristicSend: not enough headroom");
+            ChipLogError(Ble, "HandleCharacteristicSend: not enough headroom");
             mTxState = kState_Error;
             mTxBuf   = NULL; // Avoid double-free after assignment above, as caller frees data on error.
 
@@ -492,7 +492,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
         {
             SetFlag(characteristic[0], kHeaderFlag_FragmentAck, true);
             characteristic[cursor++] = GetAndRecordRxAckSeqNum();
-            chipLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
+            ChipLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
         }
 
         characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
@@ -513,7 +513,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
             mTxLength -= mTxFragmentSize - cursor;
         }
 
-        chipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
+        ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
         PrintBufDebug(data);
     }
     else if (mTxState == kState_InProgress)
@@ -545,7 +545,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
         {
             SetFlag(characteristic[0], kHeaderFlag_FragmentAck, true);
             characteristic[cursor++] = GetAndRecordRxAckSeqNum();
-            chipLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
+            ChipLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
         }
 
         characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
@@ -564,7 +564,7 @@ bool CHIPoBle::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
             mTxLength -= mTxFragmentSize - cursor;
         }
 
-        chipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send additional fragment:");
+        ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send additional fragment:");
         PrintBufDebug(mTxBuf);
     }
     else
@@ -596,25 +596,25 @@ bool CHIPoBle::ClearTxPacket()
 
 void CHIPoBle::LogState() const
 {
-    chipLogError(Ble, "mAppState: %p", mAppState);
+    ChipLogError(Ble, "mAppState: %p", mAppState);
 
-    chipLogError(Ble, "mRxFragmentSize: %d", mRxFragmentSize);
-    chipLogError(Ble, "mRxState: %d", mRxState);
-    chipLogError(Ble, "mRxBuf: %p", mRxBuf);
-    chipLogError(Ble, "mRxNextSeqNum: %d", mRxNextSeqNum);
-    chipLogError(Ble, "mRxNewestUnackedSeqNum: %d", mRxNewestUnackedSeqNum);
-    chipLogError(Ble, "mRxOldestUnackedSeqNum: %d", mRxOldestUnackedSeqNum);
-    chipLogError(Ble, "mRxCharCount: %d", mRxCharCount);
-    chipLogError(Ble, "mRxPacketCount: %d", mRxPacketCount);
+    ChipLogError(Ble, "mRxFragmentSize: %d", mRxFragmentSize);
+    ChipLogError(Ble, "mRxState: %d", mRxState);
+    ChipLogError(Ble, "mRxBuf: %p", mRxBuf);
+    ChipLogError(Ble, "mRxNextSeqNum: %d", mRxNextSeqNum);
+    ChipLogError(Ble, "mRxNewestUnackedSeqNum: %d", mRxNewestUnackedSeqNum);
+    ChipLogError(Ble, "mRxOldestUnackedSeqNum: %d", mRxOldestUnackedSeqNum);
+    ChipLogError(Ble, "mRxCharCount: %d", mRxCharCount);
+    ChipLogError(Ble, "mRxPacketCount: %d", mRxPacketCount);
 
-    chipLogError(Ble, "mTxFragmentSize: %d", mTxFragmentSize);
-    chipLogError(Ble, "mTxState: %d", mTxState);
-    chipLogError(Ble, "mTxBuf: %p", mTxBuf);
-    chipLogError(Ble, "mTxNextSeqNum: %d", mTxNextSeqNum);
-    chipLogError(Ble, "mTxNewestUnackedSeqNum: %d", mTxNewestUnackedSeqNum);
-    chipLogError(Ble, "mTxOldestUnackedSeqNum: %d", mTxOldestUnackedSeqNum);
-    chipLogError(Ble, "mTxCharCount: %d", mTxCharCount);
-    chipLogError(Ble, "mTxPacketCount: %d", mTxPacketCount);
+    ChipLogError(Ble, "mTxFragmentSize: %d", mTxFragmentSize);
+    ChipLogError(Ble, "mTxState: %d", mTxState);
+    ChipLogError(Ble, "mTxBuf: %p", mTxBuf);
+    ChipLogError(Ble, "mTxNextSeqNum: %d", mTxNextSeqNum);
+    ChipLogError(Ble, "mTxNewestUnackedSeqNum: %d", mTxNewestUnackedSeqNum);
+    ChipLogError(Ble, "mTxOldestUnackedSeqNum: %d", mTxOldestUnackedSeqNum);
+    ChipLogError(Ble, "mTxCharCount: %d", mTxCharCount);
+    ChipLogError(Ble, "mTxPacketCount: %d", mTxPacketCount);
 }
 
 void CHIPoBle::LogStateDebug() const

@@ -457,7 +457,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
 
     if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
     {
-        chipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
+        ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
         return NULL;
     }
 
@@ -493,7 +493,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, size_t
 
     if (lPacket == NULL)
     {
-        chipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
+        ChipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
         return NULL;
     }
 
@@ -665,7 +665,7 @@ PacketBuffer * PacketBuffer::RightSize(PacketBuffer * aPacket)
     {
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
-        chipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
+        ChipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
     }
 #endif
     return lNewPacket;

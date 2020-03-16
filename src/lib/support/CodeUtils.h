@@ -94,7 +94,7 @@
 #define CHIP_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)         \
     do                                                                                    \
     {                                                                                     \
-        chipLogError(NotSpecified,                                                       \
+        ChipLogError(NotSpecified,                                                       \
                       CHIP_ASSERT_LOG_FORMAT_DEFAULT,                                       \
                       aPrefix,                                                            \
                       (((aName) == 0) || (*(aName) == '\0')) ? "" : aName,                \
@@ -285,7 +285,7 @@ extern "C" void chipDie(void) __attribute((noreturn));
 
 inline void chipDie(void)
 {
-    chipLogError(NotSpecified, "chipDie chipDie chipDie");
+    ChipLogError(NotSpecified, "chipDie chipDie chipDie");
 
     while (true)
     {
@@ -357,7 +357,7 @@ inline void chipDie(void)
  *
  */
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)         \
-    nlABORT_ACTION(aCondition, chipLogDetail(aModule, aMessage, ## __VA_ARGS__))
+    nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ## __VA_ARGS__))
 
 /**
  * @def ArraySize(aArray)

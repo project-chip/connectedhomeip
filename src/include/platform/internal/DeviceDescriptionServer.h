@@ -23,7 +23,7 @@
 #ifndef DEVICE_DESCRIPTION_SERVER_H
 #define DEVICE_DESCRIPTION_SERVER_H
 
-#include <platform/internal/ChipDeviceLayerInternal.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <profiles/device-description/DeviceDescription.h>
 
 namespace chip {

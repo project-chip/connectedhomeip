@@ -587,7 +587,7 @@ INET_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEnd
     }
     else
     {
-        chipLogError(Inet, "%s endpoint pool FULL", "Raw");
+        ChipLogError(Inet, "%s endpoint pool FULL", "Raw");
         err = INET_ERROR_NO_ENDPOINTS;
     }
 
@@ -629,7 +629,7 @@ INET_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
     }
     else
     {
-        chipLogError(Inet, "%s endpoint pool FULL", "TCP");
+        ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
         err = INET_ERROR_NO_ENDPOINTS;
     }
 
@@ -671,7 +671,7 @@ INET_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
     }
     else
     {
-        chipLogError(Inet, "%s endpoint pool FULL", "UDP");
+        ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
         err = INET_ERROR_NO_ENDPOINTS;
     }
 
@@ -713,7 +713,7 @@ INET_ERROR InetLayer::NewTunEndPoint(TunEndPoint ** retEndPoint)
     }
     else
     {
-        chipLogError(Inet, "%s endpoint pool FULL", "Tun");
+        ChipLogError(Inet, "%s endpoint pool FULL", "Tun");
         err = INET_ERROR_NO_ENDPOINTS;
     }
 
@@ -883,7 +883,7 @@ INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
     }
     else
     {
-        chipLogError(Inet, "%s resolver pool FULL", "DNS");
+        ChipLogError(Inet, "%s resolver pool FULL", "DNS");
         ExitNow(err = INET_ERROR_NO_MEMORY);
     }
 
@@ -1321,14 +1321,14 @@ INET_ERROR InetLayer::PostEvent(InetLayerBasis * target, InetEventType type, uin
 
     if (IsDroppableEvent(type) && !CanEnqueueDroppableEvent())
     {
-        chipLogProgress(Inet, "Dropping incoming packet (type %d)", (int) type);
+        ChipLogProgress(Inet, "Dropping incoming packet (type %d)", (int) type);
         ExitNow(retval = INET_ERROR_NO_MEMORY);
     }
 
     retval = Platform::InetLayer::PostEvent(this, mContext, target, type, arg);
     if (retval != INET_NO_ERROR)
     {
-        chipLogError(Inet, "Failed to queue InetLayer event (type %d): %s", (int) type, ErrorStr(retval));
+        ChipLogError(Inet, "Failed to queue InetLayer event (type %d): %s", (int) type, ErrorStr(retval));
     }
     SuccessOrExit(retval);
 

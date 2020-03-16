@@ -930,7 +930,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
         res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, (void *) &one, sizeof(one));
         if (res != 0)
         {
-            chipLogError(Inet, "SO_REUSEPORT failed: %d", errno);
+            ChipLogError(Inet, "SO_REUSEPORT failed: %d", errno);
         }
 #endif // defined(SO_REUSEPORT)
 
@@ -944,7 +944,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, (void *) &one, sizeof(one));
             if (res != 0)
             {
-                chipLogError(Inet, "IPV6_V6ONLY failed: %d", errno);
+                ChipLogError(Inet, "IPV6_V6ONLY failed: %d", errno);
             }
         }
 #endif // defined(IPV6_V6ONLY)
@@ -956,7 +956,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
             res = setsockopt(mSocket, IPPROTO_IP, IP_PKTINFO, (void *) &one, sizeof(one));
             if (res != 0)
             {
-                chipLogError(Inet, "IP_PKTINFO failed: %d", errno);
+                ChipLogError(Inet, "IP_PKTINFO failed: %d", errno);
             }
         }
 #endif // defined(IP_PKTINFO)
@@ -968,7 +968,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
             res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVPKTINFO, (void *) &one, sizeof(one));
             if (res != 0)
             {
-                chipLogError(Inet, "IPV6_PKTINFO failed: %d", errno);
+                ChipLogError(Inet, "IPV6_PKTINFO failed: %d", errno);
             }
         }
 #endif // defined(IPV6_RECVPKTINFO)
@@ -982,7 +982,7 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
             res = setsockopt(mSocket, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
             if (res != 0)
             {
-                chipLogError(Inet, "SO_NOSIGPIPE failed: %d", errno);
+                ChipLogError(Inet, "SO_NOSIGPIPE failed: %d", errno);
             }
         }
 #endif // defined(SO_NOSIGPIPE)

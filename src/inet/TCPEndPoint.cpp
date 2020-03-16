@@ -204,7 +204,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
         if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &n, sizeof(n)) != 0)
         {
-            chipLogError(Inet, "SO_REUSEPORT: %d", errno);
+            ChipLogError(Inet, "SO_REUSEPORT: %d", errno);
         }
 #endif // defined(SO_REUSEPORT)
     }
@@ -1536,7 +1536,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
                 lingerStruct.l_linger = 0;
 
                 if (setsockopt(mSocket, SOL_SOCKET, SO_LINGER, &lingerStruct, sizeof(lingerStruct)) != 0)
-                    chipLogError(Inet, "SO_LINGER: %d", errno);
+                    ChipLogError(Inet, "SO_LINGER: %d", errno);
             }
 
             if (close(mSocket) != 0 && err == INET_NO_ERROR)
@@ -1693,7 +1693,7 @@ void TCPEndPoint::SetTCPSendIdleAndNotifyChange(bool aIsTCPSendIdle)
 {
     if (mIsTCPSendIdle != aIsTCPSendIdle)
     {
-        chipLogDetail(Inet, "TCP con send channel idle state changed : %s", aIsTCPSendIdle ? "false->true" : "true->false");
+        ChipLogDetail(Inet, "TCP con send channel idle state changed : %s", aIsTCPSendIdle ? "false->true" : "true->false");
 
         // Set the current Idle state
         mIsTCPSendIdle = aIsTCPSendIdle;
@@ -2246,7 +2246,7 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
             int res = setsockopt(mSocket, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
             if (res != 0)
             {
-                chipLogError(Inet, "SO_NOSIGPIPE: %d", errno);
+                ChipLogError(Inet, "SO_NOSIGPIPE: %d", errno);
             }
         }
 #endif // defined(SO_NOSIGPIPE)
@@ -2408,7 +2408,7 @@ void TCPEndPoint::ReceiveData()
             // and instead we expect that the read flags will get
             // reset correctly upon a subsequent return from the
             // select call.
-            chipLogError(Inet, "recv: EAGAIN, will retry");
+            ChipLogError(Inet, "recv: EAGAIN, will retry");
 
             return;
         }
