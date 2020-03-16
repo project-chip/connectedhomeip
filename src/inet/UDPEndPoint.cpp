@@ -806,7 +806,7 @@ INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
         // Fail if the system has run out of PCBs.
         if (mUDP == NULL)
         {
-            chipLogError(Inet, "Unable to allocate UDP PCB");
+            ChipLogError(Inet, "Unable to allocate UDP PCB");
             ExitNow(err = INET_ERROR_NO_MEMORY);
         }
 

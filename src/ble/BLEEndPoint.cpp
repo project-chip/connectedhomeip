@@ -52,9 +52,9 @@
 #undef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED
 
 #ifdef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED
-#define chipLogDebugBleEndPoint(MOD, MSG, ...) chipLogError(MOD, MSG, ## __VA_ARGS__)
+#define ChipLogDebugBleEndPoint(MOD, MSG, ...) ChipLogError(MOD, MSG, ## __VA_ARGS__)
 #else
-#define chipLogDebugBleEndPoint(MOD, MSG, ...)
+#define ChipLogDebugBleEndPoint(MOD, MSG, ...)
 #endif
 
 /**
@@ -193,7 +193,7 @@ BLE_ERROR BLEEndPoint::HandleReceiveConnectionComplete()
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
-    chipLogDebugBleEndPoint(Ble, "entered HandleReceiveConnectionComplete");
+    ChipLogDebugBleEndPoint(Ble, "entered HandleReceiveConnectionComplete");
     mState = kState_Connected;
 
     // Cancel receive connection timer.
@@ -232,20 +232,20 @@ void BLEEndPoint::HandleSubscribeReceived()
         mSendQueue = NULL;
         QueueTxUnlock();
 
-        chipLogError(Ble, "cap resp ind failed");
+        ChipLogError(Ble, "cap resp ind failed");
         err = BLE_ERROR_GATT_INDICATE_FAILED;
         ExitNow();
     }
 
     // Shrink remote receive window counter by 1, since we've sent an indication which requires acknowledgement.
     mRemoteReceiveWindowSize -= 1;
-    chipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
+    ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
 
     // Start ack recvd timer for handshake indication.
     err = StartAckReceivedTimer();
     SuccessOrExit(err);
 
-    chipLogDebugBleEndPoint(Ble, "got subscribe, sent indication w/ capabilities response");
+    ChipLogDebugBleEndPoint(Ble, "got subscribe, sent indication w/ capabilities response");
 
     // If SendIndication returns true, mSendQueue is freed on indication confirmation, or on close in case of
     // connection error.
@@ -273,7 +273,7 @@ exit:
 
 void BLEEndPoint::HandleSubscribeComplete()
 {
-    chipLogProgress(Ble, "subscribe complete, ep = %p", this);
+    ChipLogProgress(Ble, "subscribe complete, ep = %p", this);
     SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, false);
 
     BLE_ERROR err = DriveSending();
@@ -411,7 +411,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
             // we're really sure the unsubscribe request has been sent.
             if (!mBle->mPlatformDelegate->UnsubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_2_ID))
             {
-                chipLogError(Ble, "CHIPoBle unsub failed");
+                ChipLogError(Ble, "CHIPoBle unsub failed");
 
                 // If unsubscribe fails, release BLE connection and free end point immediately.
                 Free();
@@ -466,12 +466,12 @@ void BLEEndPoint::ReleaseBleConnection()
     {
         if (GetFlag(mConnStateFlags, kConnState_AutoClose))
         {
-            chipLogProgress(Ble, "Auto-closing end point's BLE connection.");
+            ChipLogProgress(Ble, "Auto-closing end point's BLE connection.");
             mBle->mPlatformDelegate->CloseConnection(mConnObj);
         }
         else
         {
-            chipLogProgress(Ble, "Releasing end point's BLE connection back to application.");
+            ChipLogProgress(Ble, "Releasing end point's BLE connection back to application.");
             mBle->mApplicationDelegate->NotifyChipConnectionClosed(mConnObj);
         }
 
@@ -558,7 +558,7 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     err = mCHIPoBle.Init(this, expectInitialAck);
     if (err != BLE_NO_ERROR)
     {
-        chipLogError(Ble, "CHIPoBle init failed");
+        ChipLogError(Ble, "CHIPoBle init failed");
         ExitNow();
     }
 
@@ -566,13 +566,13 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     err = (BLE_ERROR) mTxQueueMutex.Init(mTxQueueMutex);
     if (err != BLE_NO_ERROR)
     {
-        chipLogError(Ble, "%s: Mutex init failed", __FUNCTION__);
+        ChipLogError(Ble, "%s: Mutex init failed", __FUNCTION__);
         ExitNow();
     }
     err = mCHIPoBleTest.Init(this);
     if (err != BLE_NO_ERROR)
     {
-        chipLogError(Ble, "CHIPoBleTest init failed");
+        ChipLogError(Ble, "CHIPoBleTest init failed");
         ExitNow();
     }
 #endif
@@ -593,7 +593,7 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     mSendQueue               = NULL;
     mAckToSend               = NULL;
 
-    chipLogDebugBleEndPoint(Ble, "initialized local rx window, size = %u", mLocalReceiveWindowSize);
+    ChipLogDebugBleEndPoint(Ble, "initialized local rx window, size = %u", mLocalReceiveWindowSize);
 
     // End point is ready to connect or receive a connection.
     mState = kState_Ready;
@@ -616,7 +616,7 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBuffer * buf)
         {
             // Write succeeded, so shrink remote receive window counter by 1.
             mRemoteReceiveWindowSize -= 1;
-            chipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
+            ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
         }
     }
     else // (mRole == kBleRole_Peripheral), verified on Init
@@ -629,7 +629,7 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBuffer * buf)
         {
             // Indication succeeded, so shrink remote receive window counter by 1.
             mRemoteReceiveWindowSize -= 1;
-            chipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
+            ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
         }
     }
 
@@ -644,7 +644,7 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBuffer * buf)
 void BLEEndPoint::QueueTx(PacketBuffer * data, PacketType_t type)
 {
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    chipLogDebugBleEndPoint(Ble, "%s: data->%p, type %d, len %d", __FUNCTION__, data, type, data->DataLength());
+    ChipLogDebugBleEndPoint(Ble, "%s: data->%p, type %d, len %d", __FUNCTION__, data, type, data->DataLength());
     mCHIPoBle.PushPacketTag(data, type);
 #endif
 
@@ -653,12 +653,12 @@ void BLEEndPoint::QueueTx(PacketBuffer * data, PacketType_t type)
     if (mSendQueue == NULL)
     {
         mSendQueue = data;
-        chipLogDebugBleEndPoint(Ble, "%s: Set data as new mSendQueue %p, type %d", __FUNCTION__, mSendQueue, type);
+        ChipLogDebugBleEndPoint(Ble, "%s: Set data as new mSendQueue %p, type %d", __FUNCTION__, mSendQueue, type);
     }
     else
     {
         mSendQueue->AddToEnd(data);
-        chipLogDebugBleEndPoint(Ble, "%s: Append data to mSendQueue %p, type %d", __FUNCTION__, mSendQueue, type);
+        ChipLogDebugBleEndPoint(Ble, "%s: Append data to mSendQueue %p, type %d", __FUNCTION__, mSendQueue, type);
     }
 
     QueueTxUnlock();
@@ -666,7 +666,7 @@ void BLEEndPoint::QueueTx(PacketBuffer * data, PacketType_t type)
 
 BLE_ERROR BLEEndPoint::Send(PacketBuffer * data)
 {
-    chipLogDebugBleEndPoint(Ble, "entered Send");
+    ChipLogDebugBleEndPoint(Ble, "entered Send");
 
     BLE_ERROR err = BLE_NO_ERROR;
 
@@ -695,7 +695,7 @@ BLE_ERROR BLEEndPoint::Send(PacketBuffer * data)
     SuccessOrExit(err);
 
 exit:
-    chipLogDebugBleEndPoint(Ble, "exiting Send");
+    ChipLogDebugBleEndPoint(Ble, "exiting Send");
 
     if (data != NULL)
     {
@@ -717,7 +717,7 @@ bool BLEEndPoint::PrepareNextFragment(PacketBuffer * data, bool & sentAck)
     {
         // Reset local receive window counter.
         mLocalReceiveWindowSize = mReceiveWindowMaxSize;
-        chipLogDebugBleEndPoint(Ble, "reset local rx window on piggyback ack tx, size = %u", mLocalReceiveWindowSize);
+        ChipLogDebugBleEndPoint(Ble, "reset local rx window on piggyback ack tx, size = %u", mLocalReceiveWindowSize);
 
         // Tell caller AND fragmenter we have an ack to piggyback.
         sentAck = true;
@@ -805,7 +805,7 @@ BLE_ERROR BLEEndPoint::ContinueMessageSend()
     if (!PrepareNextFragment(NULL, sentAck))
     {
         // Log BTP error
-        chipLogError(Ble, "btp fragmenter error on send!");
+        ChipLogError(Ble, "btp fragmenter error on send!");
         mCHIPoBle.LogState();
 
         err = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
@@ -831,7 +831,7 @@ exit:
 
 BLE_ERROR BLEEndPoint::HandleHandshakeConfirmationReceived()
 {
-    chipLogDebugBleEndPoint(Ble, "entered HandleHandshakeConfirmationReceived");
+    ChipLogDebugBleEndPoint(Ble, "entered HandleHandshakeConfirmationReceived");
 
     BLE_ERROR err      = BLE_NO_ERROR;
     uint8_t closeFlags = kBleCloseFlag_AbortTransmission;
@@ -856,7 +856,7 @@ BLE_ERROR BLEEndPoint::HandleHandshakeConfirmationReceived()
     }
     else // (mRole == kBleRole_Peripheral), verified on Init
     {
-        chipLogDebugBleEndPoint(Ble, "got peripheral handshake indication confirmation");
+        ChipLogDebugBleEndPoint(Ble, "got peripheral handshake indication confirmation");
 
         if (mState == kState_Connected) // If we accepted BTP connection...
         {
@@ -884,7 +884,7 @@ BLE_ERROR BLEEndPoint::HandleHandshakeConfirmationReceived()
     }
 
 exit:
-    chipLogDebugBleEndPoint(Ble, "exiting HandleHandshakeConfirmationReceived");
+    ChipLogDebugBleEndPoint(Ble, "exiting HandleHandshakeConfirmationReceived");
 
     if (err != BLE_NO_ERROR)
     {
@@ -898,12 +898,12 @@ BLE_ERROR BLEEndPoint::HandleFragmentConfirmationReceived()
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
-    chipLogDebugBleEndPoint(Ble, "entered HandleFragmentConfirmationReceived");
+    ChipLogDebugBleEndPoint(Ble, "entered HandleFragmentConfirmationReceived");
 
     // Suppress error logging if GATT confirmation overlaps with unsubscribe on final close.
     if (IsUnsubscribePending())
     {
-        chipLogDebugBleEndPoint(Ble, "send conf rx'd while unsubscribe in flight");
+        ChipLogDebugBleEndPoint(Ble, "send conf rx'd while unsubscribe in flight");
         ExitNow();
     }
 
@@ -951,7 +951,7 @@ exit:
 
 BLE_ERROR BLEEndPoint::HandleGattSendConfirmationReceived()
 {
-    chipLogDebugBleEndPoint(Ble, "entered HandleGattSendConfirmationReceived");
+    ChipLogDebugBleEndPoint(Ble, "entered HandleGattSendConfirmationReceived");
 
     // Mark outstanding GATT operation as finished.
     SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, false);
@@ -993,7 +993,7 @@ exit:
 
 BLE_ERROR BLEEndPoint::DoSendStandAloneAck()
 {
-    chipLogDebugBleEndPoint(Ble, "entered DoSendStandAloneAck; sending stand-alone ack");
+    ChipLogDebugBleEndPoint(Ble, "entered DoSendStandAloneAck; sending stand-alone ack");
 
     // Encode and transmit stand-alone ack.
     mCHIPoBle.EncodeStandAloneAck(mAckToSend);
@@ -1002,7 +1002,7 @@ BLE_ERROR BLEEndPoint::DoSendStandAloneAck()
 
     // Reset local receive window counter.
     mLocalReceiveWindowSize = mReceiveWindowMaxSize;
-    chipLogDebugBleEndPoint(Ble, "reset local rx window on stand-alone ack tx, size = %u", mLocalReceiveWindowSize);
+    ChipLogDebugBleEndPoint(Ble, "reset local rx window on stand-alone ack tx, size = %u", mLocalReceiveWindowSize);
 
     SetFlag(mConnStateFlags, kConnState_StandAloneAckInFlight, true);
 
@@ -1018,7 +1018,7 @@ BLE_ERROR BLEEndPoint::DriveSending()
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
-    chipLogDebugBleEndPoint(Ble, "entered DriveSending");
+    ChipLogDebugBleEndPoint(Ble, "entered DriveSending");
 
     // If receiver's window is almost closed and we don't have an ack to send, OR we do have an ack to send but
     // receiver's window is completely empty, OR another GATT operation is in flight, awaiting confirmation...
@@ -1030,17 +1030,17 @@ BLE_ERROR BLEEndPoint::DriveSending()
         if (mRemoteReceiveWindowSize <= BTP_WINDOW_NO_ACK_SEND_THRESHOLD &&
             !GetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning) && mAckToSend == NULL)
         {
-            chipLogDebugBleEndPoint(Ble, "NO SEND: receive window almost closed, and no ack to send");
+            ChipLogDebugBleEndPoint(Ble, "NO SEND: receive window almost closed, and no ack to send");
         }
 
         if (mRemoteReceiveWindowSize == 0)
         {
-            chipLogDebugBleEndPoint(Ble, "NO SEND: remote receive window closed");
+            ChipLogDebugBleEndPoint(Ble, "NO SEND: remote receive window closed");
         }
 
         if (GetFlag(mConnStateFlags, kConnState_GattOperationInFlight))
         {
-            chipLogDebugBleEndPoint(Ble, "NO SEND: Gatt op in flight");
+            ChipLogDebugBleEndPoint(Ble, "NO SEND: Gatt op in flight");
         }
 #endif
 
@@ -1146,7 +1146,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
     }
     else // Else, if neither device knows MTU...
     {
-        chipLogProgress(Ble, "cannot determine ATT MTU; selecting default fragment size = %u", CHIPoBle::sDefaultFragmentSize);
+        ChipLogProgress(Ble, "cannot determine ATT MTU; selecting default fragment size = %u", CHIPoBle::sDefaultFragmentSize);
         resp.mFragmentSize = CHIPoBle::sDefaultFragmentSize;
     }
 
@@ -1156,17 +1156,17 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
         chip::min(req.mWindowSize, static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE));
     resp.mWindowSize = mReceiveWindowMaxSize;
 
-    chipLogProgress(Ble, "local and remote recv window sizes = %u", resp.mWindowSize);
+    ChipLogProgress(Ble, "local and remote recv window sizes = %u", resp.mWindowSize);
 
     // Select BLE transport protocol version from those supported by central, or none if no supported version found.
     resp.mSelectedProtocolVersion = BleLayer::GetHighestSupportedProtocolVersion(req);
-    chipLogProgress(Ble, "selected BTP version %d", resp.mSelectedProtocolVersion);
+    ChipLogProgress(Ble, "selected BTP version %d", resp.mSelectedProtocolVersion);
 
     if (resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_None)
     {
         // If BLE transport protocol versions incompatible, prepare to close connection after subscription has been
         // received and capabilities response has been sent.
-        chipLogError(Ble, "incompatible BTP versions; peripheral expected between %d and %d",
+        ChipLogError(Ble, "incompatible BTP versions; peripheral expected between %d and %d",
                      CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);
         mState = kState_Aborting;
     }
@@ -1182,7 +1182,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
         // This is the peripheral, so set Rx fragment size, and leave Tx at default
         mCHIPoBle.SetRxFragmentSize(resp.mFragmentSize);
     }
-    chipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mCHIPoBle.GetRxFragmentSize(), mCHIPoBle.GetTxFragmentSize());
+    ChipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mCHIPoBle.GetRxFragmentSize(), mCHIPoBle.GetTxFragmentSize());
 
     err = resp.Encode(responseBuf);
     SuccessOrExit(err);
@@ -1222,7 +1222,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBuffer * data)
 
     VerifyOrExit(resp.mFragmentSize > 0, err = BLE_ERROR_INVALID_FRAGMENT_SIZE);
 
-    chipLogProgress(Ble, "peripheral chose BTP version %d; central expected between %d and %d", resp.mSelectedProtocolVersion,
+    ChipLogProgress(Ble, "peripheral chose BTP version %d; central expected between %d and %d", resp.mSelectedProtocolVersion,
                     CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);
 
     if ((resp.mSelectedProtocolVersion < CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION) ||
@@ -1246,17 +1246,17 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBuffer * data)
         // This is the central, so set Tx fragement size, and leave Rx at default.
         mCHIPoBle.SetTxFragmentSize(resp.mFragmentSize);
     }
-    chipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mCHIPoBle.GetRxFragmentSize(), mCHIPoBle.GetTxFragmentSize());
+    ChipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mCHIPoBle.GetRxFragmentSize(), mCHIPoBle.GetTxFragmentSize());
 
     // Select local and remote max receive window size based on local resources available for both incoming indications
     // AND GATT confirmations.
     mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize = resp.mWindowSize;
 
-    chipLogProgress(Ble, "local and remote recv window size = %u", resp.mWindowSize);
+    ChipLogProgress(Ble, "local and remote recv window size = %u", resp.mWindowSize);
 
     // Shrink local receive window counter by 1, since connect handshake indication requires acknowledgement.
     mLocalReceiveWindowSize -= 1;
-    chipLogDebugBleEndPoint(Ble, "decremented local rx window, new size = %u", mLocalReceiveWindowSize);
+    ChipLogDebugBleEndPoint(Ble, "decremented local rx window, new size = %u", mLocalReceiveWindowSize);
 
     // Send ack for connection handshake indication when timer expires. Sequence numbers always start at 0,
     // and the reassembler's "last received seq num" is initialized to 0 and updated when new fragments are
@@ -1307,7 +1307,7 @@ SequenceNumber_t BLEEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t lastRec
 
 BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
 {
-    chipLogDebugBleEndPoint(Ble, "+++++++++++++++++++++ entered receive");
+    ChipLogDebugBleEndPoint(Ble, "+++++++++++++++++++++ entered receive");
     BLE_ERROR err                = BLE_NO_ERROR;
     SequenceNumber_t receivedAck = 0;
     uint8_t closeFlags           = kBleCloseFlag_AbortTransmission;
@@ -1316,7 +1316,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
 #if CHIP_ENABLE_CHIPOBLE_TEST
     if (mCHIPoBle.IsCommandPacket(data))
     {
-        chipLogDebugBleEndPoint(Ble, "%s: Received Control frame: Flags %x", __FUNCTION__, *(data->Start()));
+        ChipLogDebugBleEndPoint(Ble, "%s: Received Control frame: Flags %x", __FUNCTION__, *(data->Start()));
     }
     else
 #endif
@@ -1324,7 +1324,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         // Suppress error logging if peer's send overlaps with our unsubscribe on final close.
         if (IsUnsubscribePending())
         {
-            chipLogDebugBleEndPoint(Ble, "characteristic rx'd while unsubscribe in flight");
+            ChipLogDebugBleEndPoint(Ble, "characteristic rx'd while unsubscribe in flight");
             ExitNow();
         }
 
@@ -1365,43 +1365,43 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         }
     } // End handling the CapabilitiesRequest
 
-    chipLogDebugBleEndPoint(Ble, "prepared to rx post-handshake btp packet");
+    ChipLogDebugBleEndPoint(Ble, "prepared to rx post-handshake btp packet");
 
     // We've received a post-handshake BTP packet.
     // Ensure end point's in the right state before continuing.
     if (!IsConnected(mState))
     {
-        chipLogError(Ble, "ep rx'd packet in bad state");
+        ChipLogError(Ble, "ep rx'd packet in bad state");
         err = BLE_ERROR_INCORRECT_STATE;
 
         ExitNow();
     }
 
-    chipLogDebugBleEndPoint(Ble, "CHIPoBLE about to rx characteristic, state before:");
+    ChipLogDebugBleEndPoint(Ble, "CHIPoBLE about to rx characteristic, state before:");
     mCHIPoBle.LogStateDebug();
 
     // Pass received packet into BTP protocol engine.
     err  = mCHIPoBle.HandleCharacteristicReceived(data, receivedAck, didReceiveAck);
     data = NULL; // Buffer consumed by protocol engine; either freed or added to message reassembly area.
 
-    chipLogDebugBleEndPoint(Ble, "CHIPoBLE rx'd characteristic, state after:");
+    ChipLogDebugBleEndPoint(Ble, "CHIPoBLE rx'd characteristic, state after:");
     mCHIPoBle.LogStateDebug();
 
     SuccessOrExit(err);
 
     // Protocol engine accepted the fragment, so shrink local receive window counter by 1.
     mLocalReceiveWindowSize -= 1;
-    chipLogDebugBleEndPoint(Ble, "decremented local rx window, new size = %u", mLocalReceiveWindowSize);
+    ChipLogDebugBleEndPoint(Ble, "decremented local rx window, new size = %u", mLocalReceiveWindowSize);
 
     // Respond to received ack, if any.
     if (didReceiveAck)
     {
-        chipLogDebugBleEndPoint(Ble, "got btp ack = %u", receivedAck);
+        ChipLogDebugBleEndPoint(Ble, "got btp ack = %u", receivedAck);
 
         // If ack was rx'd for neweset unacked sent fragment, stop ack received timer.
         if (!mCHIPoBle.ExpectingAck())
         {
-            chipLogDebugBleEndPoint(Ble, "got ack for last outstanding fragment");
+            ChipLogDebugBleEndPoint(Ble, "got ack for last outstanding fragment");
             StopAckReceivedTimer();
 
             if (mState == kState_Closing && mSendQueue == NULL && mCHIPoBle.TxState() == CHIPoBle::kState_Idle)
@@ -1413,12 +1413,12 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         }
         else // Else there are still sent fragments for which acks are expected, so restart ack received timer.
         {
-            chipLogDebugBleEndPoint(Ble, "still expecting ack(s), restarting timer...");
+            ChipLogDebugBleEndPoint(Ble, "still expecting ack(s), restarting timer...");
             err = RestartAckReceivedTimer();
             SuccessOrExit(err);
         }
 
-        chipLogDebugBleEndPoint(Ble, "about to adjust remote rx window; got ack num = %u, newest unacked sent seq num = %u, \
+        ChipLogDebugBleEndPoint(Ble, "about to adjust remote rx window; got ack num = %u, newest unacked sent seq num = %u, \
                 old window size = %u, max window size = %u",
                                 receivedAck, mCHIPoBle.GetNewestUnackedSentSequenceNumber(), mRemoteReceiveWindowSize,
                                 mReceiveWindowMaxSize);
@@ -1427,7 +1427,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         mRemoteReceiveWindowSize =
             AdjustRemoteReceiveWindow(receivedAck, mReceiveWindowMaxSize, mCHIPoBle.GetNewestUnackedSentSequenceNumber());
 
-        chipLogDebugBleEndPoint(Ble, "adjusted remote rx window, new size = %u", mRemoteReceiveWindowSize);
+        ChipLogDebugBleEndPoint(Ble, "adjusted remote rx window, new size = %u", mRemoteReceiveWindowSize);
 
         // Restart message transmission if it was previously paused due to window exhaustion.
         err = DriveSending();
@@ -1452,13 +1452,13 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         if (mLocalReceiveWindowSize <= BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD &&
             !GetFlag(mConnStateFlags, kConnState_GattOperationInFlight))
         {
-            chipLogDebugBleEndPoint(Ble, "sending immediate ack");
+            ChipLogDebugBleEndPoint(Ble, "sending immediate ack");
             err = DriveStandAloneAck();
             SuccessOrExit(err);
         }
         else
         {
-            chipLogDebugBleEndPoint(Ble, "starting send-ack timer");
+            ChipLogDebugBleEndPoint(Ble, "starting send-ack timer");
 
             // Send ack when timer expires.
             err = StartSendAckTimer();
@@ -1473,13 +1473,13 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         PacketBuffer * full_packet = mCHIPoBle.RxPacket();
         mCHIPoBle.ClearRxPacket();
 
-        chipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
+        ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
         // If we have a control message received callback, and end point is not closing...
         if (mCHIPoBle.RxPacketType() == kType_Control && OnCommandReceived && mState != kState_Closing)
         {
-            chipLogDebugBleEndPoint(Ble, "%s: calling OnCommandReceived, seq# %u, len = %u, type %u", __FUNCTION__, receivedAck,
+            ChipLogDebugBleEndPoint(Ble, "%s: calling OnCommandReceived, seq# %u, len = %u, type %u", __FUNCTION__, receivedAck,
                                     full_packet->DataLength(), mCHIPoBle.RxPacketType());
             // Pass received control message up the stack.
             mCHIPoBle.SetRxPacketSeq(receivedAck);
@@ -1603,11 +1603,11 @@ BLE_ERROR BLEEndPoint::StartSendAckTimer()
     BLE_ERROR err = BLE_NO_ERROR;
     chip::System::Error timerErr;
 
-    chipLogDebugBleEndPoint(Ble, "entered StartSendAckTimer");
+    ChipLogDebugBleEndPoint(Ble, "entered StartSendAckTimer");
 
     if (!GetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning))
     {
-        chipLogDebugBleEndPoint(Ble, "starting new SendAckTimer");
+        ChipLogDebugBleEndPoint(Ble, "starting new SendAckTimer");
         timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_SEND_TIMEOUT_MS, HandleSendAckTimeout, this);
         VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
 
@@ -1673,7 +1673,7 @@ void BLEEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, void *
     // Check for event-based timer race condition.
     if (GetFlag(ep->mTimerStateFlags, kTimerState_ConnectTimerRunning))
     {
-        chipLogError(Ble, "connect handshake timed out, closing ep %p", ep);
+        ChipLogError(Ble, "connect handshake timed out, closing ep %p", ep);
         SetFlag(ep->mTimerStateFlags, kTimerState_ConnectTimerRunning, false);
         ep->DoClose(kBleCloseFlag_AbortTransmission, BLE_ERROR_CONNECT_TIMED_OUT);
     }
@@ -1686,7 +1686,7 @@ void BLEEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * systemLay
     // Check for event-based timer race condition.
     if (GetFlag(ep->mTimerStateFlags, kTimerState_ReceiveConnectionTimerRunning))
     {
-        chipLogError(Ble, "receive handshake timed out, closing ep %p", ep);
+        ChipLogError(Ble, "receive handshake timed out, closing ep %p", ep);
         SetFlag(ep->mTimerStateFlags, kTimerState_ReceiveConnectionTimerRunning, false);
         ep->DoClose(kBleCloseFlag_SuppressCallback | kBleCloseFlag_AbortTransmission, BLE_ERROR_RECEIVE_TIMED_OUT);
     }
@@ -1699,7 +1699,7 @@ void BLEEndPoint::HandleAckReceivedTimeout(chip::System::Layer * systemLayer, vo
     // Check for event-based timer race condition.
     if (GetFlag(ep->mTimerStateFlags, kTimerState_AckReceivedTimerRunning))
     {
-        chipLogError(Ble, "ack recv timeout, closing ep %p", ep);
+        ChipLogError(Ble, "ack recv timeout, closing ep %p", ep);
         ep->mCHIPoBle.LogStateDebug();
         SetFlag(ep->mTimerStateFlags, kTimerState_AckReceivedTimerRunning, false);
         ep->DoClose(kBleCloseFlag_AbortTransmission, BLE_ERROR_FRAGMENT_ACK_TIMED_OUT);
@@ -1735,7 +1735,7 @@ void BLEEndPoint::HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, vo
     // Check for event-based timer race condition.
     if (GetFlag(ep->mTimerStateFlags, kTimerState_UnsubscribeTimerRunning))
     {
-        chipLogError(Ble, "unsubscribe timed out, ble ep %p", ep);
+        ChipLogError(Ble, "unsubscribe timed out, ble ep %p", ep);
         SetFlag(ep->mTimerStateFlags, kTimerState_UnsubscribeTimerRunning, false);
         ep->HandleUnsubscribeComplete();
     }
