@@ -1,4 +1,4 @@
-name: shellcheck
+name: Shellcheck
 
 on: [pull_request]
 
@@ -11,7 +11,5 @@ jobs:
       - name: shellcheck
         id: shellcheck
         uses: ludeeus/actions-shellcheck@0.1.0
-        with:
-          repo-token: ${{ github.token }}
         env:
           EXCLUDE_DIRS: third_party
