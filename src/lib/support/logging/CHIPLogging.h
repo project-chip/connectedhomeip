@@ -70,7 +70,7 @@ namespace Logging {
  *    messages.
  *
  *  @note If you add modules or rearrange this list you must update the
- *        ModuleNames tables in chipLogging.cpp.
+ *        ModuleNames tables in ChipLogging.cpp.
  *
  */
 enum LogModule
@@ -196,18 +196,18 @@ extern void SetLogFilter(uint8_t category);
 
 #if CHIP_ERROR_LOGGING
 /**
- * @def chipLogError(MOD, MSG, ...)
+ * @def ChipLogError(MOD, MSG, ...)
  *
  * @brief
  *   Log a chip message for the specified module in the 'Error'
  *   category.
  *
  */
-#ifndef chipLogError
-#define chipLogError(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Error, MSG, ## __VA_ARGS__)
+#ifndef ChipLogError
+#define ChipLogError(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Error, MSG, ## __VA_ARGS__)
 #endif
 #else
-#define chipLogError(MOD, MSG, ...)
+#define ChipLogError(MOD, MSG, ...)
 #endif
 
 #ifndef CHIP_PROGRESS_LOGGING
@@ -216,18 +216,18 @@ extern void SetLogFilter(uint8_t category);
 
 #if CHIP_PROGRESS_LOGGING
 /**
- * @def chipLogProgress(MOD, MSG, ...)
+ * @def ChipLogProgress(MOD, MSG, ...)
  *
  * @brief
  *   Log a chip message for the specified module in the 'Progress'
  *   category.
  *
  */
-#ifndef chipLogProgress
-#define chipLogProgress(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Progress, MSG, ## __VA_ARGS__)
+#ifndef ChipLogProgress
+#define ChipLogProgress(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Progress, MSG, ## __VA_ARGS__)
 #endif
 #else
-#define chipLogProgress(MOD, MSG, ...)
+#define ChipLogProgress(MOD, MSG, ...)
 #endif
 
 
@@ -237,46 +237,46 @@ extern void SetLogFilter(uint8_t category);
 
 #if CHIP_DETAIL_LOGGING
 /**
- * @def chipLogDetail(MOD, MSG, ...)
+ * @def ChipLogDetail(MOD, MSG, ...)
  *
  * @brief
  *   Log a chip message for the specified module in the 'Detail'
  *   category.
  *
  */
-#ifndef chipLogDetail
-#define chipLogDetail(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Detail, MSG, ## __VA_ARGS__)
+#ifndef ChipLogDetail
+#define ChipLogDetail(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Detail, MSG, ## __VA_ARGS__)
 #endif
 #else
-#define chipLogDetail(MOD, MSG, ...)
+#define ChipLogDetail(MOD, MSG, ...)
 #endif
 
 #ifndef CHIP_RETAIN_LOGGING
 #define CHIP_RETAIN_LOGGING CHIP_PROGRESS_LOGGING
-#define chipLogRetain(MOD, MSG, ...) chipLogProgress(MOD, MSG, ## __VA_ARGS__)
+#define ChipLogRetain(MOD, MSG, ...) ChipLogProgress(MOD, MSG, ## __VA_ARGS__)
 #endif
 
 #if CHIP_RETAIN_LOGGING
 /**
- * @def chipLogRetain(MOD, MSG, ...)
+ * @def ChipLogRetain(MOD, MSG, ...)
  *
  * @brief
  *   Log a chip message for the specified module in the 'Retain'
  *   category. This is used for IE testing.
- *   If the product has not defined CHIP_RETAIN_LOGGING, it defaults to the same as chipLogProgress
+ *   If the product has not defined CHIP_RETAIN_LOGGING, it defaults to the same as ChipLogProgress
  *
  */
-#ifndef chipLogRetain
-#define chipLogRetain(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Retain, MSG, ## __VA_ARGS__)
+#ifndef ChipLogRetain
+#define ChipLogRetain(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Retain, MSG, ## __VA_ARGS__)
 #endif
 
 #else // #if CHIP_RETAIN_LOGGING
-#ifdef chipLogRetain
-// This is to ensure that chipLogRetain is null if
+#ifdef ChipLogRetain
+// This is to ensure that ChipLogRetain is null if
 // the product has defined CHIP_RETAIN_LOGGING to 0 itself
-#undef chipLogRetain
+#undef ChipLogRetain
 #endif
-#define chipLogRetain(MOD, MSG, ...)
+#define ChipLogRetain(MOD, MSG, ...)
 #endif // #if CHIP_RETAIN_LOGGING
 
 
@@ -288,14 +288,14 @@ extern void SetLogFilter(uint8_t category);
 
 #if _CHIP_USE_LOGGING
 
-#define chipLoggingchipPrefixLen 6
-#define chipLoggingModuleNameLen 3
-#define chipLoggingMessageSeparatorLen 2
-#define chipLoggingMessageTrailerLen 2
-#define chipLoggingTotalMessagePadding (chipLoggingchipPrefixLen + \
-                                           chipLoggingModuleNameLen + \
-                                           chipLoggingMessageSeparatorLen + \
-                                           chipLoggingMessageTrailerLen)
+#define ChipLoggingchipPrefixLen 6
+#define ChipLoggingModuleNameLen 3
+#define ChipLoggingMessageSeparatorLen 2
+#define ChipLoggingMessageTrailerLen 2
+#define ChipLoggingTotalMessagePadding (ChipLoggingchipPrefixLen + \
+                                           ChipLoggingModuleNameLen + \
+                                           ChipLoggingMessageSeparatorLen + \
+                                           ChipLoggingMessageTrailerLen)
 
 extern void GetMessageWithPrefix(char *buf, uint8_t bufSize, uint8_t module, const char *msg);
 extern void GetModuleName(char *buf, uint8_t module);
@@ -330,7 +330,7 @@ extern uint8_t gLogFilter;
 
 
 /**
- *  @def chipLogIfFalse(aCondition)
+ *  @def ChipLogIfFalse(aCondition)
  *
  *  @brief
  *    This checks for the specified condition, which is expected to
@@ -341,7 +341,7 @@ extern uint8_t gLogFilter;
  *    Evaluation of @a aCondition is always done, but logging is only enabled when
  *    #CHIP_CONFIG_ENABLE_CONDITION_LOGGING is enabled. This can be turned on or
  *    off for each compilation unit by enabling or disabling, as desired,
- *    #CHIP_CONFIG_ENABLE_CONDITION_LOGGING before chipLogging.h is included by
+ *    #CHIP_CONFIG_ENABLE_CONDITION_LOGGING before ChipLogging.h is included by
  *    the preprocessor.
  *
  *  Example Usage:
@@ -349,7 +349,7 @@ extern uint8_t gLogFilter;
  *  @code
  *  #define CHIP_CONFIG_ENABLE_CONDITION_LOGGING 1
  *
- *  #include <chip/Support/Logging/chipLogging.h>
+ *  #include <chip/Support/Logging/ChipLogging.h>
  *
  *  ...
  *
@@ -360,7 +360,7 @@ extern uint8_t gLogFilter;
  *      ...
  *
  *  exit:
- *      chipLogIfFalse(CHIP_END_OF_TLV == err);
+ *      ChipLogIfFalse(CHIP_END_OF_TLV == err);
  *  }
  *  @endcode
  *
@@ -370,28 +370,28 @@ extern uint8_t gLogFilter;
  *
  */
 
-#if CHIP_CONFIG_ENABLE_CONDITION_LOGGING && !defined(chipLogIfFalse)
+#if CHIP_CONFIG_ENABLE_CONDITION_LOGGING && !defined(ChipLogIfFalse)
 
-#define chipLogIfFalse(aCondition)                                                     \
+#define ChipLogIfFalse(aCondition)                                                     \
 do                                                                                      \
 {                                                                                       \
     if (!(aCondition))                                                                  \
     {                                                                                   \
-        chipLogError(NotSpecified, "Condition Failed (%s) at %s:%d",                   \
+        ChipLogError(NotSpecified, "Condition Failed (%s) at %s:%d",                   \
             #aCondition, __FILE__, __LINE__);                                           \
     }                                                                                   \
 } while (0)
 
 #else // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
-#define chipLogIfFalse(aCondition) \
+#define ChipLogIfFalse(aCondition) \
     IgnoreUnusedVariable(aCondition)
 
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
 
 /**
- *  @def chipLogFunctError(aErr)
+ *  @def ChipLogFunctError(aErr)
  *
  *  @brief
  *    If the given error value (@a aErr) is not successful (!= CHIP_NO_ERROR),
@@ -401,7 +401,7 @@ do                                                                              
  *    Evaluation of @a aErr is always done, but logging is only enabled when
  *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING is enabled. This can be turned
  *    on or off for each compilation unit by enabling or disabling, as desired,
- *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING before chipLogging.h is included
+ *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING before ChipLogging.h is included
  *    by the preprocessor.
  *
  *  Example Usage:
@@ -409,7 +409,7 @@ do                                                                              
  *  @code
  *  #define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
  *
- *  #include <chip/Support/Logging/chipLogging.h>
+ *  #include <chip/Support/Logging/ChipLogging.h>
  *
  *  ...
  *
@@ -420,7 +420,7 @@ do                                                                              
  *      ...
  *
  *  exit:
- *      chipLogFunctError(err);
+ *      ChipLogFunctError(err);
  *  }
  *  @endcode
  *
@@ -430,20 +430,20 @@ do                                                                              
  *
  */
 
-#if CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING && !defined(chipLogFunctError)
+#if CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING && !defined(ChipLogFunctError)
 
-#define chipLogFunctError(aErr)                                                           \
+#define ChipLogFunctError(aErr)                                                           \
 do                                                                                         \
 {                                                                                          \
     if ((aErr) != CHIP_NO_ERROR)                                                          \
     {                                                                                      \
-        chipLogError(NotSpecified, "%s at %s:%d", ErrorStr(aErr), __FILE__, __LINE__);\
+        ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(aErr), __FILE__, __LINE__);\
     }                                                                                      \
 } while (0)
 
 #else // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 
-#define chipLogFunctError(aErr) \
+#define ChipLogFunctError(aErr) \
     IgnoreUnusedVariable(aErr)
 
 #endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING

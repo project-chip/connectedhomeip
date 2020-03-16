@@ -230,7 +230,7 @@ Error Layer::NewTimer(Timer *& aTimerPtr)
 
     if (lTimer == NULL)
     {
-        chipLogError(chipSystemLayer, "Timer pool EMPTY");
+        ChipLogError(chipSystemLayer, "Timer pool EMPTY");
         return CHIP_SYSTEM_ERROR_NO_MEMORY;
     }
 
@@ -768,7 +768,7 @@ Error Layer::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgume
     lReturn = Platform::Layer::PostEvent(*this, this->mContext, aTarget, aEventType, aArgument);
     if (lReturn != CHIP_SYSTEM_NO_ERROR)
     {
-        chipLogError(chipSystemLayer, "Failed to queue CHIP System Layer event (type %d): %s", aEventType, ErrorStr(lReturn));
+        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer event (type %d): %s", aEventType, ErrorStr(lReturn));
     }
     SuccessOrExit(lReturn);
 
@@ -851,7 +851,7 @@ Error Layer::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgu
 
     if (lReturn == CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT)
     {
-        chipLogError(chipSystemLayer, "Unexpected event type %d", aEventType);
+        ChipLogError(chipSystemLayer, "Unexpected event type %d", aEventType);
     }
 
     /*

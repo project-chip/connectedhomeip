@@ -915,7 +915,7 @@ INET_ERROR RawEndPoint::GetPCB(IPAddressType addrType)
 
         if (mRaw == NULL)
         {
-            chipLogError(Inet, "raw_new_ip_type failed");
+            ChipLogError(Inet, "raw_new_ip_type failed");
             lRetval = INET_ERROR_NO_MEMORY;
             goto exit;
         }
@@ -967,7 +967,7 @@ INET_ERROR RawEndPoint::GetPCB(IPAddressType addrType)
 
         if (mRaw == NULL)
         {
-            chipLogError(Inet, "raw_new failed");
+            ChipLogError(Inet, "raw_new failed");
             lRetval = INET_ERROR_NO_MEMORY;
             goto exit;
         }

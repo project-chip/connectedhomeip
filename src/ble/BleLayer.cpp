@@ -376,7 +376,7 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
     *retEndPoint = sBLEEndPointPool.GetFree();
     if (*retEndPoint == NULL)
     {
-        chipLogError(Ble, "%s endpoint pool FULL", "Ble");
+        ChipLogError(Ble, "%s endpoint pool FULL", "Ble");
         return BLE_ERROR_NO_ENDPOINTS;
     }
 
@@ -421,7 +421,7 @@ exit:
 
     if (err != BLE_NO_ERROR)
     {
-        chipLogError(Ble, "HandlechipConnectionReceived failed, err = %d", err);
+        ChipLogError(Ble, "HandlechipConnectionReceived failed, err = %d", err);
     }
 
     return err;
@@ -432,7 +432,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const chipBleU
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
-        chipLogError(Ble, "ble write rcvd on unknown svc id");
+        ChipLogError(Ble, "ble write rcvd on unknown svc id");
         ExitNow();
     }
 
@@ -440,7 +440,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const chipBleU
     {
         if (pBuf == NULL)
         {
-            chipLogError(Ble, "rcvd null ble write");
+            ChipLogError(Ble, "rcvd null ble write");
             ExitNow();
         }
 
@@ -453,7 +453,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const chipBleU
             pBuf             = NULL;
             if (status != BLE_NO_ERROR)
             {
-                chipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
+                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
             }
         }
         else
@@ -462,13 +462,13 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const chipBleU
             pBuf             = NULL;
             if (status != BLE_NO_ERROR)
             {
-                chipLogError(Ble, "failed handle new chip BLE connection, status = %d", status);
+                ChipLogError(Ble, "failed handle new chip BLE connection, status = %d", status);
             }
         }
     }
     else
     {
-        chipLogError(Ble, "ble write rcvd on unknown char");
+        ChipLogError(Ble, "ble write rcvd on unknown char");
     }
 
 exit:
@@ -492,7 +492,7 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const chi
     {
         if (pBuf == NULL)
         {
-            chipLogError(Ble, "rcvd null ble indication");
+            ChipLogError(Ble, "rcvd null ble indication");
             ExitNow();
         }
 
@@ -505,17 +505,17 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const chi
             pBuf             = NULL;
             if (status != BLE_NO_ERROR)
             {
-                chipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
+                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
             }
         }
         else
         {
-            chipLogDetail(Ble, "no endpoint for rcvd indication");
+            ChipLogDetail(Ble, "no endpoint for rcvd indication");
         }
     }
     else
     {
-        chipLogError(Ble, "ble ind rcvd on unknown char");
+        ChipLogError(Ble, "ble ind rcvd on unknown char");
     }
 
 exit:
@@ -540,7 +540,7 @@ bool BleLayer::HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const chip
     }
     else
     {
-        chipLogError(Ble, "ble write con rcvd on unknown char");
+        ChipLogError(Ble, "ble write con rcvd on unknown char");
     }
 
     return true;
@@ -559,7 +559,7 @@ bool BleLayer::HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const
     }
     else
     {
-        chipLogError(Ble, "ble ind con rcvd on unknown char");
+        ChipLogError(Ble, "ble ind con rcvd on unknown char");
     }
 
     return true;
@@ -576,12 +576,12 @@ void BleLayer::HandleAckReceived(BLE_CONNECTION_OBJECT connObj)
 
         if (status != BLE_NO_ERROR)
         {
-            chipLogError(Ble, "endpoint conf recvd failed, err = %d", status);
+            ChipLogError(Ble, "endpoint conf recvd failed, err = %d", status);
         }
     }
     else
     {
-        chipLogError(Ble, "no endpoint for BLE sent data ack");
+        ChipLogError(Ble, "no endpoint for BLE sent data ack");
     }
 }
 
@@ -603,7 +603,7 @@ bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chip
         }
         else
         {
-            chipLogError(Ble, "no endpoint for sub recvd");
+            ChipLogError(Ble, "no endpoint for sub recvd");
         }
     }
 
@@ -627,7 +627,7 @@ bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chip
         }
         else
         {
-            chipLogError(Ble, "no endpoint for sub complete");
+            ChipLogError(Ble, "no endpoint for sub complete");
         }
     }
 
@@ -652,7 +652,7 @@ bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ch
         }
         else
         {
-            chipLogError(Ble, "no endpoint for unsub recvd");
+            ChipLogError(Ble, "no endpoint for unsub recvd");
         }
     }
 
@@ -677,7 +677,7 @@ bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ch
         }
         else
         {
-            chipLogError(Ble, "no endpoint for unsub complete");
+            ChipLogError(Ble, "no endpoint for unsub complete");
         }
     }
 

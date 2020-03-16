@@ -214,7 +214,7 @@ INET_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
         VerifyOrDie(pthreadErr == 0);
     }
 
-    chipLogDetail(Inet, "Async DNS worker thread woke up.");
+    ChipLogDetail(Inet, "Async DNS worker thread woke up.");
 
     // on shutdown, return NULL. Otherwise, pop the head of the DNS request queue
     if (mInet->State != InetLayer::kState_Initialized)
@@ -312,7 +312,7 @@ void AsyncDNSResolverSockets::NotifyChipThread(DNSResolver * resolver)
     // Post work item via Timer Event for the chip thread
     chip::System::Layer & lSystemLayer = resolver->SystemLayer();
 
-    chipLogDetail(Inet, "Posting DNS completion event to chip thread.");
+    ChipLogDetail(Inet, "Posting DNS completion event to chip thread.");
     lSystemLayer.ScheduleWork(AsyncDNSResolverSockets::DNSResultEventHandler, resolver);
 }
 
@@ -343,7 +343,7 @@ void * AsyncDNSResolverSockets::AsyncDNSThreadRun(void * args)
     }
 
 exit:
-    chipLogDetail(Inet, "Async DNS worker thread exiting.");
+    ChipLogDetail(Inet, "Async DNS worker thread exiting.");
     return NULL;
 }
 
