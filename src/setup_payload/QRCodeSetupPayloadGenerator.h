@@ -58,7 +58,7 @@ const int kTotalPayloadDataSizeInBits = (  kVersionFieldLengthInBits + \
 
 namespace chip {
 
-class SetupPayloadGenerator
+class QRCodeSetupPayloadGenerator
 {
     private:
         bitset <kTotalPayloadDataSizeInBits> mPayloadBits;
@@ -71,7 +71,7 @@ class SetupPayloadGenerator
         void populateVendorID();
         void populateProductID();
         void populateCustomFlowRequiredField();
-        void populateRendezVousInfo();
+        void populateRendezvousInfo();
         void populateDiscriminator();
         void populateSetupPIN();
         void populateReservedField();
@@ -81,7 +81,7 @@ class SetupPayloadGenerator
     public:
         string payloadBinaryRepresentation();
         string payloadBase45Representation();
-        SetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload) {};
+        QRCodeSetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload) {};
 
 };
 

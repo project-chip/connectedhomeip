@@ -29,26 +29,23 @@ using namespace std;
 
 namespace chip {
 
-char base45CharacterSet[45] =
-{
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-    'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '$', '%', '*',
-    '+', '-', '.', '/', ':'
-};
+char base45CharacterSet[45] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+                                'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                                'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '$', '%', '*', '+', '-', '.', '/', ':' };
 
 string base45EncodedString(uint64_t input, size_t minLength)
 {
     string result;
     int radix = 45;
-    do {
+    do
+    {
         char base45char = base45CharacterSet[input % radix];
         result += base45char;
         input = input / radix;
     } while (input != 0);
 
-    while (result.length() < minLength) {
+    while (result.length() < minLength)
+    {
         result.append("0");
     }
 
