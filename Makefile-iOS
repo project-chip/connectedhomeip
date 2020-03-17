@@ -210,22 +210,22 @@ JOBSFLAG := -j$(BuildJobs)
 #
 # automake files
 #
-AMFILES = src/system/SystemLayer.am			\
-	src/system/Makefile.am				\
-	src/lib/core/CoreLayer.am			\
-	src/lib/support/SupportLayer.am			\
-	src/lib/support/Makefile.am			\
-	src/lib/Makefile.am				\
-	src/inet/InetLayer.am				\
-	src/inet/Makefile.am				\
-	src/ble/BleLayer.am				\
-	src/ble/Makefile.am				\
-	src/lwip/Makefile.am				\
-	src/Makefile.am					\
-	third_party/Makefile.am				\
-	Makefile.am					\
-	configure.ac					\
-	$(NULL)
+AMFILES =                                                \
+    src/system/SystemLayer.am                            \
+    src/system/Makefile.am                               \
+    src/lib/core/CoreLayer.am                            \
+    src/lib/support/SupportLayer.am                      \
+    src/lib/Makefile.am                                  \
+    src/inet/InetLayer.am                                \
+    src/inet/Makefile.am                                 \
+    src/ble/BleLayer.am                                  \
+    src/ble/Makefile.am                                  \
+    src/lwip/Makefile.am                                 \
+    src/Makefile.am                                      \
+    third_party/Makefile.am                              \
+    Makefile.am                                          \
+    configure.ac                                         \
+    $(NULL)
 
 #
 # configure-arch <arch>

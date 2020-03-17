@@ -22,16 +22,16 @@
 #      must be anchored relative to the top build directory.
 #
 
-chip_SupportLayer_headers                                 = \
+CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                     = \
+    support/CHIPFaultInjection.cpp                          \
+    support/logging/CHIPLogging.cpp                         \
+    $(NULL)
+
+CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
     support/CHIPFaultInjection.h                            \
     support/CodeUtils.h                                     \
     support/DLLUtil.h                                       \
     support/ErrorStr.h                                      \
     support/FlagUtils.hpp                                   \
     support/logging/CHIPLogging.h                           \
-    $(NULL)
-
-chip_SupportLayer_sources                                 = \
-    support/CHIPFaultInjection.cpp                          \
-    support/logging/CHIPLogging.cpp                         \
     $(NULL)

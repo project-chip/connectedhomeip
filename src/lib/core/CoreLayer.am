@@ -23,16 +23,16 @@
 #      must be anchored relative to the top build directory.
 #
 
-chip_CoreLayer_sources                                    = \
-    @top_builddir@/src/lib/core/CHIPError.cpp               \
-    @top_builddir@/src/lib/core/CHIPTLVDebug.cpp            \
-    @top_builddir@/src/lib/core/CHIPTLVReader.cpp           \
-    @top_builddir@/src/lib/core/CHIPTLVUtilities.cpp        \
-    @top_builddir@/src/lib/core/CHIPTLVWriter.cpp           \
-    @top_builddir@/src/lib/core/CHIPTLVUpdater.cpp          \
+CHIP_BUILD_CORE_LAYER_SOURCE_FILES                        = \
+    core/CHIPError.cpp                                      \
+    core/CHIPTLVDebug.cpp                                   \
+    core/CHIPTLVReader.cpp                                  \
+    core/CHIPTLVUtilities.cpp                               \
+    core/CHIPTLVWriter.cpp                                  \
+    core/CHIPTLVUpdater.cpp                                 \
     $(NULL)
 
-chip_CoreLayer_headers                                    = \
+CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
     core/CHIPConfig.h                                       \
     core/CHIPCore.h                                         \
     core/CHIPEncoding.h                                     \
