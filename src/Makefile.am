@@ -30,6 +30,7 @@ DIST_SUBDIRS                      = \
     inet                            \
     lib                             \
     lwip                            \
+    setup_payload                   \
     system                          \
     $(NULL)
 
@@ -39,6 +40,7 @@ SUBDIRS                           = \
     inet                            \
     lib                             \
     lwip                            \
+    setup_payload                   \
     system                          \
     $(NULL)
 
