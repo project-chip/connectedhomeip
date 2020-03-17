@@ -1,3 +1,10 @@
+1.6.17 (2020-03-17)
+
+        * Avoid potential disagreement among srcdir and abs_srcdir for
+          bootstrap scripts.
+
+        * Address shellcheck warnings.
+
 1.6.16 (2020-01-23)
 
         * Allow absolute paths in PRETTY_FILES.
