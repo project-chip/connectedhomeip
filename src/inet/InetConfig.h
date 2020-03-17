@@ -25,7 +25,7 @@
  *      either use preprocessor definitions or create a project-
  *      specific InetProjectConfig.h header and then assert
  *      HAVE_INETPROJECTCONFIG_H via the package configuration tool
- *      via --with-weave-inet-project-includes=DIR where DIR is the
+ *      via --with-chip-inet-project-includes=DIR where DIR is the
  *      directory that contains the header.
  *
  *  NOTE WELL: On some platforms, this header is included by C-language programs.

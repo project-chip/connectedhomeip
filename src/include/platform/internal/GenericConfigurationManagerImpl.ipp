@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019-2020 Google LLC.
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,17 +24,16 @@
 #ifndef GENERIC_CONFIGURATION_MANAGER_IMPL_IPP
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_IPP
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/internal/GenericConfigurationManagerImpl.h>
-#include <BleLayer/WeaveBleServiceData.h>
-#include <Weave/Support/Base64.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <ble/CHIPBleServiceData.h>
+#include <support/Base64.h>
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
-#include <Weave/DeviceLayer/ThreadStackManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/ThreadStackManager.h>
 #endif
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -44,7 +41,7 @@ namespace Internal {
 template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
 {
     mFlags = 0;
 
@@ -55,95 +52,95 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
     SetFlag(mFlags, kFlag_IsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId));
     SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureWeaveStack()
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     size_t pairingCodeLen;
 
     static char sPairingCodeBuf[ConfigurationManager::kMaxPairingCodeLength + 1];
 
-    // Configure the Weave FabricState object with the local node id.
+    // Configure the CHIP FabricState object with the local node id.
     err = Impl()->_GetDeviceId(FabricState.LocalNodeId);
     SuccessOrExit(err);
 
     // Configure the FabricState object with the pairing code string, if present.
     err = Impl()->_GetPairingCode(sPairingCodeBuf, sizeof(sPairingCodeBuf), pairingCodeLen);
-    if (err != WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         SuccessOrExit(err);
         FabricState.PairingCode = sPairingCodeBuf;
     }
 
-    // If the device is a member of a Weave fabric, configure the FabricState object with the fabric id.
+    // If the device is a member of a CHIP fabric, configure the FabricState object with the fabric id.
     err = Impl()->_GetFabricId(FabricState.FabricId);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         FabricState.FabricId = kFabricIdNotSpecified;
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
     // Configure the FabricState object with a reference to the GroupKeyStore object.
     FabricState.GroupKeyStore = Impl()->_GetGroupKeyStore();
 
-#if WEAVE_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING
 
     Impl()->LogDeviceConfig();
 
-#if WEAVE_DEVICE_CONFIG_LOG_PROVISIONING_HASH
+#if CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
     {
         uint8_t provHash[Platform::Security::SHA256::kHashLength];
         char provHashBase64[BASE64_ENCODED_LEN(sizeof(provHash)) + 1];
         err = Impl()->_ComputeProvisioningHash(provHash, sizeof(provHash));
-        if (err == WEAVE_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
             Base64Encode(provHash, sizeof(provHash), provHashBase64);
             provHashBase64[sizeof(provHashBase64) - 1] = '\0';
-            WeaveLogProgress(DeviceLayer, "Nest Provisioning Hash: %s", provHashBase64);
+            ChipLogProgress(DeviceLayer, "CHIP Provisioning Hash: %s", provHashBase64);
         }
         else
         {
-            WeaveLogError(DeviceLayer, "Error generating Nest Provisioning Hash: %s", nl::ErrorStr(err));
-            err = WEAVE_NO_ERROR;
+            ChipLogError(DeviceLayer, "Error generating CHIP Provisioning Hash: %s", chip::ErrorStr(err));
+            err = CHIP_NO_ERROR;
         }
     }
-#endif // WEAVE_DEVICE_CONFIG_LOG_PROVISIONING_HASH
+#endif // CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
 
-#endif // WEAVE_PROGRESS_LOGGING
+#endif // CHIP_PROGRESS_LOGGING
 
 exit:
     return err;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen)
 {
-#ifdef WEAVE_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-    if (WEAVE_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION[0] != 0)
+#ifdef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+    if (CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION[0] != 0)
     {
-        outLen = min(bufSize, sizeof(WEAVE_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION) - 1);
-        memcpy(buf, WEAVE_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION, outLen);
-        return WEAVE_NO_ERROR;
+        outLen = min(bufSize, sizeof(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION) - 1);
+        memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION, outLen);
+        return CHIP_NO_ERROR;
     }
     else
-#endif // WEAVE_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+#endif // CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
     {
         outLen = 0;
-        return WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
         uint8_t & hour, uint8_t & minute, uint8_t & second)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Allow build time to be overridden by compile-time config (e.g. WEAVE_DEVICE_CONFIG_FIRMWARE_BUILD_TIME).
+    // TODO: Allow build time to be overridden by compile-time config (e.g. CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME).
 
     err = ParseCompilerDateStr(__DATE__, year, month, dayOfMonth);
     SuccessOrExit(err);
@@ -156,17 +153,17 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceId(uint64_t & deviceId)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceId(uint64_t & deviceId)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = Impl()->ReadConfigValue(ImplClass::kConfigKey_MfrDeviceId, deviceId);
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         deviceId = TestDeviceId;
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
 #endif
 
@@ -174,27 +171,27 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceId
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceId(uint64_t deviceId)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceId(uint64_t deviceId)
 {
     return Impl()->WriteConfigValue(ImplClass::kConfigKey_MfrDeviceId, deviceId);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
-#ifdef WEAVE_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
-    if (WEAVE_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER[0] != 0 && err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+#ifdef CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
+    if (CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrExit(sizeof(WEAVE_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) <= bufSize, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, WEAVE_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER, sizeof(WEAVE_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER));
-        serialNumLen = sizeof(WEAVE_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) - 1;
-        WeaveLogProgress(DeviceLayer, "Serial Number not found; using default: %s", WEAVE_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER);
-        err = WEAVE_NO_ERROR;
+        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER));
+        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) - 1;
+        ChipProgress(DeviceLayer, "Serial Number not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER);
+        err = CHIP_NO_ERROR;
     }
-#endif // WEAVE_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
+#endif // CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
     SuccessOrExit(err);
 
 exit:
@@ -202,50 +199,50 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSerialNumber(const char * serialNum, size_t serialNumLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
     return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_SerialNum, serialNum, serialNumLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    return WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimaryWiFiMACAddress(const uint8_t * buf)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimaryWiFiMACAddress(const uint8_t * buf)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimary802154MACAddress(uint8_t * buf)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPrimary802154MACAddress(uint8_t * buf)
 {
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     return ThreadStackManager().GetPrimary802154MACAddress(buf);
 #else
-    return WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimary802154MACAddress(const uint8_t * buf)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimary802154MACAddress(const uint8_t * buf)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevision(uint16_t & productRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevision(uint16_t & productRev)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint32_t val;
 
     err = Impl()->ReadConfigValue(ImplClass::kConfigKey_ProductRevision, val);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        productRev = (uint16_t)WEAVE_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION;
-        err = WEAVE_NO_ERROR;
+        productRev = (uint16_t)CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION;
+        err = CHIP_NO_ERROR;
     }
     else
     {
@@ -256,15 +253,15 @@ inline WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevisi
 }
 
 template<class ImplClass>
-inline WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreProductRevision(uint16_t productRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreProductRevision(uint16_t productRev)
 {
     return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, (uint32_t)productRev);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturingDate(uint16_t& year, uint8_t& month, uint8_t& dayOfMonth)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturingDate(uint16_t& year, uint8_t& month, uint8_t& dayOfMonth)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     enum {
         kDateStringLength = 10 // YYYY-MM-DD
     };
@@ -275,51 +272,51 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturingDate(ui
     err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
     SuccessOrExit(err);
 
-    VerifyOrExit(dateLen == kDateStringLength, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     year = strtoul(dateStr, &parseEnd, 10);
-    VerifyOrExit(parseEnd == dateStr + 4, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(parseEnd == dateStr + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     month = strtoul(dateStr + 5, &parseEnd, 10);
-    VerifyOrExit(parseEnd == dateStr + 7, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(parseEnd == dateStr + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     dayOfMonth = strtoul(dateStr + 8, &parseEnd, 10);
-    VerifyOrExit(parseEnd == dateStr + 10, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(parseEnd == dateStr + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
-    if (err != WEAVE_NO_ERROR && err != WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        WeaveLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
+        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
     }
     return err;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen)
 {
     return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_ManufacturingDate, mfgDate, mfgDateLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = Impl()->ReadConfigValueBin(ImplClass::kConfigKey_MfrDeviceCert, buf, bufSize, certLen);
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         certLen = TestDeviceCertLength;
-        VerifyOrExit(buf != NULL, err = WEAVE_NO_ERROR);
-        VerifyOrExit(TestDeviceCertLength <= bufSize, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
-        WeaveLogProgress(DeviceLayer, "Device certificate not found; using default");
+        VerifyOrExit(buf != NULL, err = CHIP_NO_ERROR);
+        VerifyOrExit(TestDeviceCertLength <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        ChipLogProgress(DeviceLayer, "Device certificate not found; using default");
         memcpy(buf, TestDeviceCert, TestDeviceCertLength);
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 
     SuccessOrExit(err);
 
@@ -328,31 +325,31 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_MfrDeviceCert, cert, certLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = Impl()->ReadConfigValueBin(ImplClass::kConfigKey_MfrDeviceICACerts, buf, bufSize, certsLen);
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         certsLen = TestDeviceIntermediateCACertLength;
-        VerifyOrExit(buf != NULL, err = WEAVE_NO_ERROR);
-        VerifyOrExit(TestDeviceIntermediateCACertLength <= bufSize, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
-        WeaveLogProgress(DeviceLayer, "Device certificate not found; using default");
+        VerifyOrExit(buf != NULL, err = CHIP_NO_ERROR);
+        VerifyOrExit(TestDeviceIntermediateCACertLength <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        ChipLogProgress(DeviceLayer, "Device certificate not found; using default");
         memcpy(buf, TestDeviceIntermediateCACert, TestDeviceIntermediateCACertLength);
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 
     SuccessOrExit(err);
 
@@ -361,31 +358,31 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_MfrDeviceICACerts, certs, certsLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = Impl()->ReadConfigValueBin(ImplClass::kConfigKey_MfrDevicePrivateKey, buf, bufSize, keyLen);
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         keyLen = TestDevicePrivateKeyLength;
-        VerifyOrExit(buf != NULL, err = WEAVE_NO_ERROR);
-        VerifyOrExit(TestDevicePrivateKeyLength <= bufSize, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
-        WeaveLogProgress(DeviceLayer, "Device private key not found; using default");
+        VerifyOrExit(buf != NULL, err = CHIP_NO_ERROR);
+        VerifyOrExit(TestDevicePrivateKeyLength <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        ChipLogProgress(DeviceLayer, "Device private key not found; using default");
         memcpy(buf, TestDevicePrivateKey, TestDevicePrivateKeyLength);
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 
     SuccessOrExit(err);
 
@@ -394,17 +391,17 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_MfrDevicePrivateKey, key, keyLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceId(uint64_t & deviceId)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceId(uint64_t & deviceId)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
     if (!UseManufacturerCredentialsAsOperational())
     {
         err = Impl()->ReadConfigValue(ImplClass::kConfigKey_OperationalDeviceId, deviceId);
@@ -419,11 +416,11 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceId(uint64_t & 
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
     if (!UseManufacturerCredentialsAsOperational())
     {
         err = Impl()->ReadConfigValueBin(ImplClass::kConfigKey_OperationalDeviceCert, buf, bufSize, certLen);
@@ -438,11 +435,11 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceCertificate(ui
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
     if (!UseManufacturerCredentialsAsOperational())
     {
         err = Impl()->ReadConfigValueBin(ImplClass::kConfigKey_OperationalDeviceICACerts, buf, bufSize, certsLen);
@@ -457,11 +454,11 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceIntermediateCA
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
     if (!UseManufacturerCredentialsAsOperational())
     {
         err = Impl()->ReadConfigValueBin(ImplClass::kConfigKey_OperationalDevicePrivateKey, buf, bufSize, keyLen);
@@ -475,34 +472,34 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDevicePrivateKey(uin
     return err;
 }
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceId(uint64_t deviceId)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceId(uint64_t deviceId)
 {
     return Impl()->WriteConfigValue(ImplClass::kConfigKey_OperationalDeviceId, deviceId);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceCertificate(const uint8_t * cert, size_t certLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceCertificate(const uint8_t * cert, size_t certLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_OperationalDeviceCert, cert, certLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_OperationalDeviceICACerts, certs, certsLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDevicePrivateKey(const uint8_t * key, size_t keyLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreDevicePrivateKey(const uint8_t * key, size_t keyLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_OperationalDevicePrivateKey, key, keyLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceCredentials(void)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceCredentials(void)
 {
     Impl()->ClearConfigValue(ImplClass::kConfigKey_OperationalDeviceId);
     Impl()->ClearConfigValue(ImplClass::kConfigKey_OperationalDeviceCert);
@@ -511,19 +508,19 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearOperationalDeviceC
 
     ClearFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned);
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 template<class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_OperationalDeviceCredentialsProvisioned()
 {
-    return ::nl::GetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned);
+    return ::chip::GetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned);
 }
 
 template<class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::UseManufacturerCredentialsAsOperational()
 {
-    return ::nl::GetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational);
+    return ::chip::GetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational);
 }
 
 template<class ImplClass>
@@ -532,24 +529,24 @@ void GenericConfigurationManagerImpl<ImplClass>::_UseManufacturerCredentialsAsOp
     SetFlag(mFlags, kFlag_UseManufacturerCredentialsAsOperational, val);
 }
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairingCode(char * buf, size_t bufSize, size_t & pairingCodeLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairingCode(char * buf, size_t bufSize, size_t & pairingCodeLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_PairingCode, buf, bufSize, pairingCodeLen);
-#ifdef WEAVE_DEVICE_CONFIG_USE_TEST_PAIRING_CODE
-    if (WEAVE_DEVICE_CONFIG_USE_TEST_PAIRING_CODE[0] != 0 && err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+#ifdef CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE
+    if (CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrExit(sizeof(WEAVE_DEVICE_CONFIG_USE_TEST_PAIRING_CODE) <= bufSize, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, WEAVE_DEVICE_CONFIG_USE_TEST_PAIRING_CODE, sizeof(WEAVE_DEVICE_CONFIG_USE_TEST_PAIRING_CODE));
-        pairingCodeLen = sizeof(WEAVE_DEVICE_CONFIG_USE_TEST_PAIRING_CODE) - 1;
-        WeaveLogProgress(DeviceLayer, "Pairing code not found; using default: %s", WEAVE_DEVICE_CONFIG_USE_TEST_PAIRING_CODE);
-        err = WEAVE_NO_ERROR;
+        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE, sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE));
+        pairingCodeLen = sizeof(CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE) - 1;
+        ChipLogProgress(DeviceLayer, "Pairing code not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE);
+        err = CHIP_NO_ERROR;
     }
-#endif // WEAVE_DEVICE_CONFIG_USE_TEST_PAIRING_CODE
+#endif // CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE
     SuccessOrExit(err);
 
 exit:
@@ -557,21 +554,21 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairingCode(const char * pairingCode, size_t pairingCodeLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairingCode(const char * pairingCode, size_t pairingCodeLen)
 {
     return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairingCode, pairingCode, pairingCodeLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFabricId(uint64_t & fabricId)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFabricId(uint64_t & fabricId)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFabricId(uint64_t fabricId)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFabricId(uint64_t fabricId)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (fabricId != kFabricIdNotSpecified)
     {
@@ -591,33 +588,33 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceId(uint64_t & serviceId)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceId(uint64_t & serviceId)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_ServiceId, serviceId);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen)
 {
     return Impl()->ReadConfigValueBin(ImplClass::kConfigKey_ServiceConfig, buf, bufSize, serviceConfigLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_ServiceConfig, serviceConfig, serviceConfigLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen)
 {
     return Impl()->ReadConfigValueStr(ImplClass::kConfigKey_PairedAccountId, buf, bufSize, accountIdLen);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairedAccountId(const char * accountId, size_t accountIdLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePairedAccountId(const char * accountId, size_t accountIdLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = Impl()->WriteConfigValueStr(ImplClass::kConfigKey_PairedAccountId, accountId, accountIdLen);
     SuccessOrExit(err);
@@ -629,11 +626,11 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceProvisioningData(uint64_t serviceId,
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceProvisioningData(uint64_t serviceId,
         const uint8_t * serviceConfig, size_t serviceConfigLen,
         const char * accountId, size_t accountIdLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     err = Impl()->WriteConfigValue(ImplClass::kConfigKey_ServiceId, serviceId);
     SuccessOrExit(err);
@@ -648,7 +645,7 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceProvisionin
     SetFlag(mFlags, kFlag_IsPairedToAccount, (accountId != NULL && accountIdLen != 0));
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceId);
         Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceConfig);
@@ -660,7 +657,7 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioningData()
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioningData()
 {
     Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceId);
     Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceConfig);
@@ -672,7 +669,7 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisionin
     // the account pairing state.
     if (_IsPairedToAccount())
     {
-        WeaveDeviceEvent event;
+        ChipDeviceEvent event;
         event.Type = DeviceEventType::kAccountPairingChange;
         event.AccountPairingChange.IsPairedToAccount = false;
         PlatformMgr().PostEvent(&event);
@@ -682,7 +679,7 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisionin
     // the service provisioning state.
     if (_IsServiceProvisioned())
     {
-        WeaveDeviceEvent event;
+        ChipDeviceEvent event;
         event.Type = DeviceEventType::kServiceProvisioningChange;
         event.ServiceProvisioningChange.IsServiceProvisioned = false;
         event.ServiceProvisioningChange.ServiceConfigUpdated = false;
@@ -692,25 +689,25 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisionin
     ClearFlag(mFlags, kFlag_IsServiceProvisioned);
     ClearFlag(mFlags, kFlag_IsPairedToAccount);
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFailSafeArmed(bool & val)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFailSafeArmed(bool & val)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_FailSafeArmed, val);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_SetFailSafeArmed(bool val)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_SetFailSafeArmed(bool val)
 {
     return Impl()->WriteConfigValue(ImplClass::kConfigKey_FailSafeArmed, val);
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceDescriptor(::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor & deviceDesc)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceDescriptor(::chip::Profiles::DeviceDescription::ChipDeviceDescriptor & deviceDesc)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     size_t outLen;
 
     deviceDesc.Clear();
@@ -729,44 +726,44 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceDescriptor(::n
     SuccessOrExit(err);
 
     err = Impl()->_GetManufacturingDate(deviceDesc.ManufacturingDate.Year, deviceDesc.ManufacturingDate.Month, deviceDesc.ManufacturingDate.Day);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
     err = Impl()->_GetPrimaryWiFiMACAddress(deviceDesc.PrimaryWiFiMACAddress);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND || err == WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
     err = Impl()->_GetPrimary802154MACAddress(deviceDesc.Primary802154MACAddress);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND || err == WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
     err = Impl()->_GetWiFiAPSSID(deviceDesc.RendezvousWiFiESSID, sizeof(deviceDesc.RendezvousWiFiESSID));
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND || err == WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
     err = Impl()->_GetSerialNumber(deviceDesc.SerialNumber, sizeof(deviceDesc.SerialNumber), outLen);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND || err == WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
     err = Impl()->_GetFirmwareRevision(deviceDesc.SoftwareVersion, sizeof(deviceDesc.SoftwareVersion), outLen);
-    if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND || err == WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        err = WEAVE_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
@@ -775,17 +772,17 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceDescriptorTLV(uint8_t * buf, size_t bufSize, size_t & encodedLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceDescriptorTLV(uint8_t * buf, size_t bufSize, size_t & encodedLen)
 {
-    WEAVE_ERROR err;
-    ::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor deviceDesc;
+    CHIP_ERROR err;
+    ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor deviceDesc;
 
     err = Impl()->_GetDeviceDescriptor(deviceDesc);
     SuccessOrExit(err);
 
     {
         uint32_t tmp = 0;
-        err = ::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor::EncodeTLV(deviceDesc, buf, (uint32_t)bufSize, tmp);
+        err = ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor::EncodeTLV(deviceDesc, buf, (uint32_t)bufSize, tmp);
         SuccessOrExit(err);
         encodedLen = tmp;
     }
@@ -795,19 +792,19 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetQRCodeString(char * buf, size_t bufSize)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetQRCodeString(char * buf, size_t bufSize)
 {
-    WEAVE_ERROR err;
-    ::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor deviceDesc;
+    CHIP_ERROR err;
+    ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor deviceDesc;
     uint32_t encodedLen;
 
     err = Impl()->_GetDeviceDescriptor(deviceDesc);
     SuccessOrExit(err);
 
-    strncpy(deviceDesc.PairingCode, FabricState.PairingCode, ::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor::kMaxPairingCodeLength);
-    deviceDesc.PairingCode[::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor::kMaxPairingCodeLength] = 0;
+    strncpy(deviceDesc.PairingCode, FabricState.PairingCode, ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor::kMaxPairingCodeLength);
+    deviceDesc.PairingCode[::chip::Profiles::DeviceDescription::ChipDeviceDescriptor::kMaxPairingCodeLength] = 0;
 
-    err = ::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor::EncodeText(deviceDesc, buf, (uint32_t)bufSize, encodedLen);
+    err = ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor::EncodeText(deviceDesc, buf, (uint32_t)bufSize, encodedLen);
     SuccessOrExit(err);
 
 exit:
@@ -815,36 +812,36 @@ exit:
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetWiFiAPSSID(char * buf, size_t bufSize)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetWiFiAPSSID(char * buf, size_t bufSize)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-#ifdef WEAVE_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
+#ifdef CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
 
     uint8_t mac[6];
 
-    VerifyOrExit(bufSize >= sizeof(WEAVE_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX) + 4, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(bufSize >= sizeof(CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX) + 4, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     err = Impl()->_GetPrimaryWiFiMACAddress(mac);
     SuccessOrExit(err);
 
-    snprintf(buf, bufSize, "%s%02X%02X", WEAVE_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, mac[4], mac[5]);
+    snprintf(buf, bufSize, "%s%02X%02X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, mac[4], mac[5]);
     buf[bufSize - 1] = 0;
 
-#else // WEAVE_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
+#else // CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
 
-    ExitNow(err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND);
+    ExitNow(err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
-#endif // WEAVE_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
+#endif // CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
 
 exit:
     return err;
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble::WeaveBLEDeviceIdentificationInfo & deviceIdInfo)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint16_t id;
 
     deviceIdInfo.Init();
@@ -860,8 +857,8 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificat
     deviceIdInfo.SetDeviceId(FabricState.LocalNodeId);
 
     deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount()
-        ? Ble::WeaveBLEDeviceIdentificationInfo::kPairingStatus_Paired
-        : Ble::WeaveBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
+        ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
+        : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
 
 exit:
     return err;
@@ -870,63 +867,63 @@ exit:
 template<class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsServiceProvisioned()
 {
-    return ::nl::GetFlag(mFlags, kFlag_IsServiceProvisioned);
+    return ::chip::GetFlag(mFlags, kFlag_IsServiceProvisioned);
 }
 
 template<class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsMemberOfFabric()
 {
-    return ::nl::GetFlag(mFlags, kFlag_IsMemberOfFabric);
+    return ::chip::GetFlag(mFlags, kFlag_IsMemberOfFabric);
 }
 
 template<class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsPairedToAccount()
 {
-    return ::nl::GetFlag(mFlags, kFlag_IsPairedToAccount);
+    return ::chip::GetFlag(mFlags, kFlag_IsPairedToAccount);
 }
 
 template<class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 {
     return
-#if WEAVE_DEVICE_CONFIG_ENABLE_WIFI_STATION
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
             ConnectivityMgr().IsWiFiStationProvisioned() &&
 #endif
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
             ConnectivityMgr().IsThreadProvisioned() &&
 #endif
-#if !WEAVE_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING
+#if !CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING
             Impl()->IsPairedToAccount() &&
 #endif
-#if WEAVE_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
             (!UseManufacturerCredentialsAsOperational() && _OperationalDeviceCredentialsProvisioned()) &&
 #endif
             Impl()->IsMemberOfFabric();
 }
 
 template<class ImplClass>
-WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
 {
     using HashAlgo = Platform::Security::SHA256;
 
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     HashAlgo hash;
     uint8_t * dataBuf = NULL;
     size_t dataBufSize;
     constexpr uint16_t kLenFieldLen = 4; // 4 hex characters
 
-    VerifyOrExit(hashBufSize >= HashAlgo::kHashLength, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(hashBufSize >= HashAlgo::kHashLength, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Compute a hash of the device's provisioning data.  The generated hash value confirms to the form
-    // described in the Nest Weave: Factory Provisioning Specification.
+    // described in the CHIP Chip: Factory Provisioning Specification.
     //
-    // A Nest provisioning hash is a SHA-256 hash of an ASCII string with the following format:
+    // A CHIP provisioning hash is a SHA-256 hash of an ASCII string with the following format:
     //
     //     DDDDddddddddddddddddCCCCcccc…ccccIIIIiiii…iiiiKKKKkkkk…kkkkPPPPpppppp
     //
     // Where:
-    //     dddddddddddddddd is the Weave node id for the device, encoded as a string of 16 uppercase hex digits.
-    //     cccc…cccc is the device Weave certificate, in base-64 format.
+    //     dddddddddddddddd is the Chip node id for the device, encoded as a string of 16 uppercase hex digits.
+    //     cccc…cccc is the device Chip certificate, in base-64 format.
     //     iiii…iiii is the device intermediate CA certificates, in base-64 format (if provisioned).
     //     kkkk…kkkk is the device private key, in base-64 format.
     //     pppppp is the device pairing code, as ASCII characters.
@@ -965,7 +962,7 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash
         // the private key).
         dataBufSize = certLen;
         dataBuf = (uint8_t *)Platform::Security::MemoryAlloc(dataBufSize);
-        VerifyOrExit(dataBuf != NULL, err = WEAVE_ERROR_NO_MEMORY);
+        VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         // Read the certificate.
         err = Impl()->_GetManufacturerDeviceCertificate(dataBuf, certLen, certLen);
@@ -992,7 +989,7 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash
 
             dataBufSize = certsLen;
             dataBuf = (uint8_t *)Platform::Security::MemoryAlloc(dataBufSize);
-            VerifyOrExit(dataBuf != NULL, err = WEAVE_ERROR_NO_MEMORY);
+            VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
         }
 
         // Read the device intermediate CA certificates.
@@ -1028,10 +1025,10 @@ WEAVE_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash
         size_t pairingCodeLen;
 
         err = Impl()->_GetPairingCode(pairingCode, sizeof(pairingCode), pairingCodeLen);
-        if (err == WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND)
+        if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
         {
             pairingCodeLen = 0;
-            err = WEAVE_NO_ERROR;
+            err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
 
@@ -1076,83 +1073,82 @@ void GenericConfigurationManagerImpl<ImplClass>::HashLengthAndBase64Value(Platfo
     }
 }
 
-#if WEAVE_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING
 
 template<class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-    WeaveLogProgress(DeviceLayer, "Device Configuration:");
+    ChipLogProgress(DeviceLayer, "Device Configuration:");
 
-    WeaveLogProgress(DeviceLayer, "  Device Id: %016" PRIX64, FabricState.LocalNodeId);
+    ChipLogProgress(DeviceLayer, "  Device Id: %016" PRIX64, FabricState.LocalNodeId);
 
     {
         char serialNum[ConfigurationManager::kMaxSerialNumberLength + 1];
         size_t serialNumLen;
         err = Impl()->_GetSerialNumber(serialNum, sizeof(serialNum), serialNumLen);
-        WeaveLogProgress(DeviceLayer, "  Serial Number: %s", (err == WEAVE_NO_ERROR) ? serialNum : "(not set)");
+        ChipLogProgress(DeviceLayer, "  Serial Number: %s", (err == CHIP_NO_ERROR) ? serialNum : "(not set)");
     }
 
     {
         uint16_t vendorId;
-        if (Impl()->_GetVendorId(vendorId) != WEAVE_NO_ERROR)
+        if (Impl()->_GetVendorId(vendorId) != CHIP_NO_ERROR)
         {
             vendorId = 0;
         }
-        WeaveLogProgress(DeviceLayer, "  Vendor Id: %" PRIu16 " (0x%" PRIX16 ")%s",
-                vendorId, vendorId, (vendorId == kWeaveVendor_NestLabs) ? " (Nest)" : "");
+        ChipLogProgress(DeviceLayer, "  Vendor Id: %" PRIu16 " (0x%" PRIX16 ")%s",
+                vendorId, vendorId, (vendorId == kChipVendor_CHIPLabs) ? " (CHIP)" : "");
     }
 
     {
         uint16_t productId;
-        if (Impl()->_GetProductId(productId) != WEAVE_NO_ERROR)
+        if (Impl()->_GetProductId(productId) != CHIP_NO_ERROR)
         {
             productId = 0;
         }
-        WeaveLogProgress(DeviceLayer, "  Product Id: %" PRIu16 " (0x%" PRIX16 ")", productId, productId);
+        ChipLogProgress(DeviceLayer, "  Product Id: %" PRIu16 " (0x%" PRIX16 ")", productId, productId);
     }
 
     {
         uint16_t productRev;
-        if (Impl()->_GetProductRevision(productRev) != WEAVE_NO_ERROR)
+        if (Impl()->_GetProductRevision(productRev) != CHIP_NO_ERROR)
         {
             productRev = 0;
         }
-        WeaveLogProgress(DeviceLayer, "  Product Revision: %" PRIu16, productRev);
+        ChipLogProgress(DeviceLayer, "  Product Revision: %" PRIu16, productRev);
     }
 
     {
         uint16_t year;
         uint8_t month, dayOfMonth;
         err = Impl()->_GetManufacturingDate(year, month, dayOfMonth);
-        if (err == WEAVE_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            WeaveLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
         }
         else
         {
-            WeaveLogProgress(DeviceLayer, "  Manufacturing Date: (not set)");
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: (not set)");
         }
     }
 
     if (FabricState.FabricId != kFabricIdNotSpecified)
     {
-        WeaveLogProgress(DeviceLayer, "  Fabric Id: %016" PRIX64, FabricState.FabricId);
+        ChipLogProgress(DeviceLayer, "  Fabric Id: %016" PRIX64, FabricState.FabricId);
     }
     else
     {
-        WeaveLogProgress(DeviceLayer, "  Fabric Id: (none)");
+        ChipLogProgress(DeviceLayer, "  Fabric Id: (none)");
     }
 
-    WeaveLogProgress(DeviceLayer, "  Pairing Code: %s", (FabricState.PairingCode != NULL) ? FabricState.PairingCode : "(none)");
+    ChipLogProgress(DeviceLayer, "  Pairing Code: %s", (FabricState.PairingCode != NULL) ? FabricState.PairingCode : "(none)");
 }
 
-#endif // WEAVE_PROGRESS_LOGGING
+#endif // CHIP_PROGRESS_LOGGING
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // GENERIC_CONFIGURATION_MANAGER_IMPL_IPP
