@@ -117,7 +117,7 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
     if (FabricState.FabricId != kFabricIdNotSpecified)
     {
         const uint64_t fabricGlobalId = ChipFabricIdToIPv6GlobalId(FabricState.FabricId);
-        IPAddress serviceAddr = IPAddress::MakeULA(fabricGlobalId, nl::chip::kChipSubnetId_Service, 1);
+        IPAddress serviceAddr = IPAddress::MakeULA(fabricGlobalId, chip::kChipSubnetId_Service, 1);
         haveServiceConnectivity = ThreadStackMgr().HaveRouteToAddress(serviceAddr);
     }
 
