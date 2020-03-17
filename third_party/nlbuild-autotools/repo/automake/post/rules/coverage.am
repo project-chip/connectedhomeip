@@ -1,0 +1,71 @@
+#
+#    Copyright 2018 Google LLC. All Rights Reserved.
+#    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file is the automake footer for all code-coverage related
+#      targets and rules.
+#
+#      This represents the minimum integration with GNU autotools
+#      (automake in particular) such that 'make coverage' may be invoked
+#      at the top of the tree and all the prerequisites occur such
+#      that it executes successfully with no intervening make target
+#      invocations. The 'check-am' and '$(BUILT_SOURCES)' are the key
+#      automake-specific dependencies to ensure that happens.
+#
+#      This defines the following make targets:
+#
+#        coverage:
+#          Execute local and recursive coverage targets across the
+#          project sub-tree at the current invocation point.
+#
+#          This target is intended to be user-visibile and -invoked.
+#
+#        coverage-local:
+#          Execute local coverage targets at the current invocation point.
+#
+#          This target is intended to be user-visibile and -invoked.
+#
+#        coverage-recursive:
+#          Recursively execute the 'coverage' target across the
+#          project sub-tree at the current invocation point.
+#
+#          This target is NOT intended to be user-visibile and -invoked.
+#
+#        check-local:
+#          Alias for the 'check-am' target. Execute local check
+#          targets at the current invocation point. Local coverage targets
+#          may depend on this to ensure local tests are made before
+#          coverage targets are made.
+#
+#          This target is intended to be user-visibile and -invoked.
+#
+
+.PHONY: coverage coverage-recursive coverage-local check-local
+
+check-local: check-am
+
+coverage: coverage-local
+
+coverage: coverage-recursive
+
+coverage: check-am
+
+coverage: $(BUILT_SOURCES)
+
+coverage-recursive:
+	$(nl-make-subdirs)

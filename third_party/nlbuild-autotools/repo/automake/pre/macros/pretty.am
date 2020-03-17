@@ -1,0 +1,52 @@
+#
+#    Copyright 2016 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file defines automake variables for performing coding
+#      style formatting and checking.
+#
+
+AM_V_PRETTY          = $(am__v_PRETTY_$(V))
+am__v_PRETTY_        = $(am__v_PRETTY_$(AM_DEFAULT_VERBOSITY))
+am__v_PRETTY_0       = echo "  PRETTY   $${file}";
+am__v_PRETTY_1       = 
+
+AM_V_PRETTY_CHECK    = $(am__v_PRETTY_CHECK_$(V))
+am__v_PRETTY_CHECK_  = $(am__v_PRETTY_CHECK_$(AM_DEFAULT_VERBOSITY))
+am__v_PRETTY_CHECK_0 = echo "  PRETTY   $${file}";
+am__v_PRETTY_CHECK_1 = 
+
+# PRETTY_FILES
+#
+# This defines the collection of files against which the PRETTY and
+# PRETTY_CHECK profiles will be invoked for the 'pretty' and
+# 'pretty-check' targets, respectively.
+#
+# This defaults to SOURCES and HEADERS and may be overriden or
+# appended to.
+
+PRETTY_FILES    ?= $(SOURCES) $(HEADERS)
+
+# PRETTY_SUBDIRS
+#
+# This defines the subdirectories for which the recursive 'pretty' and
+# 'pretty-check' targets will run against.
+#
+# This defaults to SUBDIRS and may be overridden or appended to.
+
+PRETTY_SUBDIRS  ?= $(SUBDIRS)
+

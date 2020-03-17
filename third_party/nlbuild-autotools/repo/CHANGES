@@ -1,0 +1,240 @@
+1.6.16 (2020-01-23)
+
+        * Allow absolute paths in PRETTY_FILES.
+
+1.6.15 (2019-12-06)
+
+        * Remove redundant libtool m4 libraries.
+
+1.6.14 (2019-07-16)
+
+        * Update MANIFEST to ensure that 'make dist' works correctly.
+
+1.6.13 (2019-07-16)
+
+        * Update coreutils to a newer version s.t. they build cleanly
+          on linux systems with GLIBC 2.28 or newer.  Remove the strip
+          from install libraries to allow coreutils to be installed on
+          Mac OS systems.
+	
+1.6.12 (2019-06-11)
+
+        * install-headers target now depends on BUILT_SOURCES to
+          enable installation of generated headers
+
+1.6.11 (2019-05-23)
+
+        * Changed the bootstrap shebang from sh to bash to address a
+          bashism that arrived at 1.6.10.
+
+1.6.10 (2019-05-02)
+
+        * Added additional up-front checks to the bootstrap script to
+          ensure required executables are available.
+
+1.6.9 (2019-04-30)
+
+        * Now that both automake and pure make headers and footers are
+          co-mingled, address an issues in which the .DEFAULT_GOAL
+          specifications in the repos.mak footer were conflicting with
+          makefiles that wanted a different default goal by moving
+          those .DEFAULT_GOAL specifications to Makefile-bootstrap.
+
+1.6.8 (2019-04-29)
+
+        * Downgraded m4 from 1.4.17 to 1.4.5 since 1.4.5 seems to be the
+          last version of m4 that does not abort on invocation in the m4
+          *rintf and friends compatibility and portability library.
+
+        * Leverage both automake and pure make headers and footers by
+          including the latter in the former.
+
+        * Reworked how verbose progress is handled to simplify
+          specification of progress macros.
+
+        * Rebased several automake header macros implementations on their
+          pure make equivalents.
+
+1.6.7 (2019-04-26)
+
+        * Addressed issues with NL_FILTERED_CANONICAL in which the desired
+          content to be filtered was not filtering correctly and in which
+          the desired filtered canonical variables were not emitted in
+          makefiles.
+
+1.6.6 (2019-04-09)
+
+        * Added code coverage support for clang, which uses a link flag
+          --coverage instead of linking to a library(-lgov) as gcc does
+          for code coverage functions.
+
+1.6.5 (2018-11-19)
+
+        * Addressed an issue in which the failure to make the 'repos-warning'
+          target order-only caused dependent repo paths to be repeatedly
+          and unnecessarily remade which, in turn, caused git operations
+          and the configuration or build to fail.
+
+1.6.4 (2018-11-14)
+
+        * Added support for pulling down remote package dependencies using
+          git clone (default) or git submodule depending on the setting of
+          pull.method in repos.conf.
+
+1.6.3 (2018-10-19)
+
+        * Added support for coverage-local and check-local targets. Added
+          documentation for all coverage-related targets.
+
+1.6.2 (2018-10-09)
+
+        * Take a different approach to version flapping against 'make
+          distcheck' by leaving VERSION_FILE as an immediate (:=) variable
+          and instead creating a two-level <PACKAGE>_VERSION variable, the
+          first of which is set from VERSION_FILE by default at make
+          recursion level zero (0).
+
+1.6.1 (2018-09-26)
+
+        * Address an issue with VERSION_FILE on clean source code control
+          clones or unarchived distribution in which 'make dist' or
+          'make distcheck' fail. VERSION_FILE should be and is
+          intentionally a deferred (=) rather than an immediate (:=)
+          variable to ensure late evaluation AFTER .local-version MAY
+          be created rather than when the makefile containing it is
+          parsed.
+
+1.6.0 (2018-09-19)
+
+        * Added support to repos.conf for a 'commit' key such that a
+          hash or tag other than HEAD for a given repository and
+          branch may be synchronized and checked out.
+
+        * Made a minor change to the 'bootstrap' script such that it emits
+          the actual action commands that will be executed when the verbose
+          flag is asserted.
+
+1.5.3 (2018-09-14)
+
+        * Address a number of issues with building the prepackaged GNU
+          autotools subset included in nlbuild-autotools for Ubuntu
+          Bionic.
+
+          - Fixed "Unescaped left brace in regex is deprecated" that
+            was formerly a warning in Perl 5.22 and is now a hard error
+            in Perl 5.26.
+
+          - Address new glibc glob interface changes by upgrading from
+            make-3.82 to make-4.1 and applying relevant Ubuntu Bionic
+            patches.
+
+        * Add support to the package 'build' script to find and apply
+          patches for the above.
+
+1.5.2 (2018-04-26)
+
+        * Since the '--name-only' option only appears in git-2.6 and later
+          and there are production systems using git version as old as
+          git-1.9, do not use '--name-only' when processing 'repos.conf'.
+
+1.5.1 (2018-04-20)
+
+        * Addressed a number of typos and grammatical errors in comments
+          and help output.
+
+1.5.0 (2018-04-19)
+
+        * Added support for pulling down remote package dependencies
+          using git submodule.
+
+        * Addressed an issue in which nl_enable_coverage.m4 did not work
+          correctly on some Linux distributions by specifying coverage
+          libraries under LIBS rather than LDFLAGS.
+
+1.4.4 (2018-02-06)
+
+        * Addressed an issue where 'mkskeleton' failed while trying to
+          generate "third_party/Makefile.am".
+
+1.4.3 (2018-02-01)
+
+        * Addressed an issue with NL_{SAVE,RESTORE}_WERROR in which
+          -Werror=<specific> was not handled.
+
+1.4.2 (2017-06-20)
+
+	* Addressed an issue with the 'make coverage' target where certain
+	  make versions may have sensitivites to trailing slashes in order-
+	  only targets.
+
+1.4.1 (2017-06-19)
+
+	* Refactored m4 and autotools auxilliary files to ensure that 
+	  third-party content remains under third_party/....
+	* Addressed issues with generating distributions on Mac OS X 
+	  where GNU software, including wget, is not available in PATH.
+	* Addressed issue with missing files in MANIFEST.
+
+1.4 (2017-06-15)
+
+	* Remove package archives and prebuilt in-package binaries.
+	* Ensure that GNU tool build process is completely self-sufficient
+	  and has no dependencies on installed host binaries.	
+	* Add support for generating versioned core and prebuilt package binary
+	  distributions.
+	* Ensure that 'bootstrap' can work with either prebuilt in-package
+	  binaries or with installed host binaries.
+	
+1.3.1 (2017-05-10)
+
+	* Specify the correct m4 URL.
+
+1.3 (2016-12-05)
+
+	* Added the support for detection of supported C++ version.
+
+1.2.2 (2016-08-29)
+
+	* Use the arguments passed, as designed and intended, to
+	  NL_PROG_LNDIR rather than hard-coded values for the GNU cp
+	  fallback.
+
+1.2.1 (2016-07-13)
+
+	* Make the 'pretty' and 'pretty-check' targets dependent on
+	  $(PRETTY_FILES) and then iterate on a filtered version of $(^) so
+	  that make's VPATH engine can be leveraged to find sources and
+	  headers that are not in directly stat-able paths listed in
+	  $(PRETTY_FILES).
+
+1.2 (2016-06-01)
+
+	* Added support for coding style formatting and checking targets.
+
+1.1.2 (2016-03-19)
+
+	* Improve the code coverage generation process to cover an entire
+	  project's source.
+
+1.1.1 (2015-12-10)
+
+	* Properly handle package optionality when using pkg-config to
+	  detect external packages.
+
+1.1 (2015-11-10)
+
+	* Added support for a recursive 'install-headers' target to allow
+	  packages that wish to leverage it to install their public headers
+	  and only their public headers to DESTDIR on 'make install-headers'
+	  without performing any additional build actions.
+
+1.0.1 (2015-10-27)
+
+	* Refactored NL_WITH_PACKAGE into NL_WITH_REQUIRED_EXTERNAL_PACKAGE,
+	  NL_WITH_OPTIONAL_EXTERNAL_PACKAGE, NL_WITH_REQUIRED_INTERNAL_PACKAGE,
+	  and NL_WITH_OPTIONAL_INTERNAL_PACKAGE.
+
+1.0 (2015-03-19)
+
+        * Initial revision with GNU m4 1.4.17, autoconf 2.68, automake 1.14.1,
+          libtool 2.4.2, make 3.82, and coreutils 8.21.

@@ -28,7 +28,7 @@
 #include <core/CHIPTimeConfig.h>
 #include <core/CHIPTunnelConfig.h>
 
-#if CHIP_CONFIG_TEST
+#if CHIP_CONFIG_TEST && CHIP_CONFIG_FAULT_INJECTION
 
 #include <nlfaultinjection.hpp>
 

@@ -1,0 +1,116 @@
+#
+#    Copyright 2019 Google LLC. All Rights Reserved.
+#    Copyright 2017-2018 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file is the makefile for inlining optional and required
+#      third-party packages as package-internal copies and for providing
+#      convenience targets for bootstrapping the GNU autotools-based build
+#      system used by this package.
+#
+#      If your package has dependent git repositories that you might
+#      otherwise be inclined to subtree in, you can define a
+#      "repos.conf" file at the top of your project that enumerates
+#      the repositories, the branch thereof, and where to put it in
+#      your project. An example is shown below:
+#
+#        [submodule "nlassert"]
+#            path = third_party/nlassert/repo
+#            url = git@github.com:nestlabs/nlassert.git
+#            branch = master
+#            update = none
+#        [submodule "nlunit-test"]
+#            path = third_party/nlunit-test/repo
+#            url = git@github.com:nestlabs/nlunit-test.git
+#            branch = master
+#            commit = 561a155bb7257e54198cf5496f74ed5bc41cf85f
+#            update = none
+#
+
+ThisMakefile                     := $(firstword $(MAKEFILE_LIST))
+
+builddir                         ?= .
+abs_builddir                     ?= $(realpath $(builddir))
+top_builddir                     ?= $(builddir)
+abs_top_builddir                 ?= $(realpath $(top_builddir))
+srcdir                           ?= $(dir $(realpath $(ThisMakefile)))
+abs_srcdir                       ?= $(realpath $(srcdir))
+top_srcdir                       ?= $(srcdir)
+abs_top_srcdir                   ?= $(realpath $(top_srcdir))
+
+nlbuild_autotools_stem           ?= @NLBUILD_AUTOTOOLS_STEM@
+abs_top_nlbuild_autotools_dir    ?= $(abs_top_srcdir)/$(nlbuild_autotools_stem)
+
+include $(abs_top_nlbuild_autotools_dir)/make/pre.mak
+include $(abs_top_nlbuild_autotools_dir)/make/host/tools/bootstrap.mak
+
+# If repos have been defined, create them as the default target goal;
+# otherwise, default to help.
+
+ifneq ($(REPOS),)
+.DEFAULT_GOAL                    := repos
+else
+.DEFAULT_GOAL                    := help
+endif # REPOS
+
+#
+# Add any project-specific bootstrap help commands to this
+# 'help-hook' target.
+#
+# These commands will be executed AFTER the core bootstrap 'help'
+# target commands.
+#
+help-hook:
+
+#
+# Add any project-specific bootstrap help commands to this
+# 'help-bootstrap-hook' target.
+#
+# These commands will be executed AFTER the core bootstrap 'help' and
+# 'help-bootstrap' target commands.
+#
+help-bootstrap-hook:
+
+#
+# Add any project-specific bootstrap help commands to this
+# 'help-repos-hook' target.
+#
+# These commands will be executed AFTER the core bootstrap 'help' and
+# 'help-repos' target commands.
+#
+help-repos-hook:
+
+#
+# Add any project-specific bootstrap repos commands to this
+# 'repos-hook' target.
+#
+# These commands will be executed AFTER the core bootstrap 'repos'
+# target commands.
+#
+repos-hook:
+
+#
+# Add any project-specific bootstrap repos commands to this
+# 'clean-repos-hook' target.
+#
+# These commands will be executed BEFORE the core bootstrap 'clean-repos'
+# target commands.
+#
+clean-repos-hook:
+
+include $(abs_top_nlbuild_autotools_dir)/make/post.mak
+include $(abs_top_nlbuild_autotools_dir)/make/post/rules/bootstrap.mak

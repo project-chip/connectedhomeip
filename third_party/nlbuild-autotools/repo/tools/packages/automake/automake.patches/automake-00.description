@@ -1,0 +1,10 @@
+2016-04-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+    automake: port to Perl 5.22 and later
+
+    Without this change, Perl 5.22 complains "Unescaped left brace in
+    regex is deprecated" and this is planned to become a hard error in
+    Perl 5.26.  See:
+    http://search.cpan.org/dist/perl-5.22.0/pod/perldelta.pod#A_literal_%22{%22_should_now_be_escaped_in_a_pattern
+    * bin/automake.in (substitute_ac_subst_variables): Escape left brace.
+

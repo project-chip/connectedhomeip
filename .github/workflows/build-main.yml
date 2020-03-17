@@ -10,4 +10,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run Build
-        run: make
+        run: ./bootstrap && make -f Makefile-Standalone distcheck

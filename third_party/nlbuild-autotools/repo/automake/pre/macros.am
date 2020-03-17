@@ -1,0 +1,77 @@
+#
+#    Copyright 2019 Google LLC. All Rights Reserved.
+#    Copyright 2014-2016 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file defines automake macros common to all other automake
+#      headers and files.
+#
+
+include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/constants.am
+include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/paths.am
+include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/pretty.am
+include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/verbosity.am
+include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/coverage.am
+include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/subdirs.am
+
+#
+# create-directory
+#
+# Create the directory with the name of the $(@) variable.
+#
+define create-directory
+$(call nl-create-dir,$(@))
+endef # create-directory
+
+#
+# create-link
+#
+# Create the symbolic link with the source of the $(<) variable and
+# the destination of the $(@) variable.
+#
+define create-link
+$(call nl-create-link)
+endef # create-link
+
+#
+# check-file <macro suffix>
+#
+# Check whether a file, referenced by the $(@) variable, should be
+# updated / regenerated based on its dependencies, referenced by the
+# $(<) variable by running the make macro check-file-<macro suffix>.
+#
+# The $(<) is passed as the first argument if the macro wants to process
+# it and the prospective new output file, which the macro MUST
+# generate, as the second.
+#
+# This macro will ensure that any required parent directories are created
+# prior to invoking check-file-<macro suffix>.
+#
+# This macro is similar to and inspired by that from Linux Kbuild and
+# elsewhere.
+#
+#   <macro suffix> - The name, suffixed to "check-file-", which indicates
+#                    the make macro to invoke.
+#
+#
+define check-file
+$(call nl-check-file-with-subroutine,check-file,$(1))
+endef # check-file
+
+
+
+

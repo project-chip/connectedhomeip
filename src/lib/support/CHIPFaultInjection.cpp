@@ -25,7 +25,7 @@
 
 #include <support/CHIPFaultInjection.h>
 
-#if CHIP_CONFIG_TEST
+#if CHIP_CONFIG_TEST && CHIP_CONFIG_FAULT_INJECTION
 
 namespace chip {
 namespace FaultInjection {
