@@ -23,8 +23,11 @@
 #
 
 CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                     = \
+    support/Base64.cpp                                      \
     support/CHIPFaultInjection.cpp                          \
     support/logging/CHIPLogging.cpp                         \
+    support/FibonacciUtils.cpp                              \
+    support/RandUtils.cpp                                   \
     $(NULL)
 
 CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
@@ -32,7 +35,9 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
     support/CodeUtils.h                                     \
     support/DLLUtil.h                                       \
     support/ErrorStr.h                                      \
+    support/FibonacciUtils.h                                \
     support/FlagUtils.hpp                                   \
     support/logging/CHIPLogging.h                           \
     support/Base64.h                                        \
+    support/RandUtils.h                                     \
     $(NULL)
