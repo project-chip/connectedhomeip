@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file implements the <tt>Inet::TCPEndPoint</tt> class,
- *      where the Nest Inet Layer encapsulates methods for interacting
+ *      where the CHIP Inet Layer encapsulates methods for interacting
  *      with TCP transport endpoints (SOCK_DGRAM sockets on Linux and
  *      BSD-derived systems) or LwIP TCP protocol control blocks, as
  *      the system is configured accordingly.

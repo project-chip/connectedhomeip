@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file implements the class <tt>Inet::IPAddress</tt> and
- *      related enumerated constants. The Nest Inet Layer uses objects
+ *      related enumerated constants. The CHIP Inet Layer uses objects
  *      of this class to represent Internet protocol addresses of both
  *      IPv4 and IPv6 address families. (IPv4 addresses are stored
  *      internally in the V4COMPAT format, reserved for that purpose.)

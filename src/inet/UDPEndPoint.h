@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This header file defines the <tt>Inet::UDPEndPoint</tt>
- *      class, where the Nest Inet Layer encapsulates methods for
+ *      class, where the CHIP Inet Layer encapsulates methods for
  *      interacting with UDP transport endpoints (SOCK_DGRAM sockets
  *      on Linux and BSD-derived systems) or LwIP UDP protocol
  *      control blocks, as the system is configured accordingly.
@@ -42,7 +42,7 @@ class IPPacketInfo;
  * @brief   Objects of this class represent UDP transport endpoints.
  *
  * @details
- *  Nest Inet Layer encapsulates methods for interacting with UDP transport
+ *  CHIP Inet Layer encapsulates methods for interacting with UDP transport
  *  endpoints (SOCK_DGRAM sockets on Linux and BSD-derived systems) or LwIP
  *  UDP protocol control blocks, as the system is configured accordingly.
  */

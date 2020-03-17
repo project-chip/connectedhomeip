@@ -18,7 +18,7 @@
 /**
  * @file
  *  This header file defines the <tt>Inet::TunEndPoint</tt> class, where
- *  the Nest Inet Layer encapsulates its foundational logic for the chip
+ *  the CHIP Inet Layer encapsulates its foundational logic for the chip
  *  tunneling agent.
  */
 
@@ -90,7 +90,7 @@ class IPPacketInfo;
  * @brief   Objects of this class represent tunnel interfaces.
  *
  * @details
- *  Nest Inet Layer encapsulates methods for interacting on both POSIX systems
+ *  CHIP Inet Layer encapsulates methods for interacting on both POSIX systems
  *  and LwIP systems with an IP-in-IP tunneling mechanism for supporting the
  *  chip tunnel agent.
  */

@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file defines the class <tt>Inet::IPAddress</tt> and
- *      related enumerated constants. The Nest Inet Layer uses objects
+ *      related enumerated constants. The CHIP Inet Layer uses objects
  *      of this class to represent Internet protocol addresses of both
  *      IPv4 and IPv6 address families. (IPv4 addresses are stored
  *      internally in the V4COMPAT format, reserved for that purpose.)
@@ -119,7 +119,7 @@ typedef enum
  * @brief   Internet protocol address
  *
  * @details
- *  The Nest Inet Layer uses objects of this class to represent Internet
+ *  The CHIP Inet Layer uses objects of this class to represent Internet
  *  protocol addresses (independent of protocol version).
  */
 class DLL_EXPORT IPAddress
@@ -654,7 +654,7 @@ public:
      *
      * @details
      *  This object is used as a constant for equivalence comparisons. It must
-     *  not be modified by users of the Nest Inet Layer.
+     *  not be modified by users of the CHIP Inet Layer.
      */
     static IPAddress Any;
 };
