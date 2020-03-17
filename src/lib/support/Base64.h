@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +24,7 @@
 #ifndef BASE64_H_
 #define BASE64_H_
 
-namespace nl {
+namespace chip {
 
 typedef char (*Base64ValToCharFunct)(uint8_t val);
 typedef uint8_t (*Base64CharToValFunct)(uint8_t c);
@@ -78,6 +77,6 @@ extern uint32_t Base64Decode32(const char *in, uint32_t inLen, uint8_t *out, Bas
 #define BASE64_MAX_DECODED_LEN(LEN) ((LEN) * 3 / 4)
 
 
-} // namespace nl
+} // namespace chip
 
 #endif /* BASE64_H_ */

@@ -34,4 +34,5 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
     support/ErrorStr.h                                      \
     support/FlagUtils.hpp                                   \
     support/logging/CHIPLogging.h                           \
+    support/Base64.h                                        \
     $(NULL)
