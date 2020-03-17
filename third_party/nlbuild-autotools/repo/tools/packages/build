@@ -1,0 +1,566 @@
+#!/bin/sh
+
+#
+#    Copyright 2014-2018 Nest Labs Inc. All Rights Reserved.
+#    Copyright 2018 Google LLC. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file is a convenience script for building, for the current
+#      build host system, the minimal, core set of GNU autotools on
+#      which other projects' build systems depend.
+#
+
+EXTENSIONS="tar.gz tar.xz"
+
+VERBOSE=0
+
+stem=tools/packages
+abs_srcdir=`pwd`
+abs_top_srcdir=`echo ${abs_srcdir} | sed -e s,/${stem},,g`
+
+abs_top_hostdir="${abs_top_srcdir}/tools/host"
+
+#
+# usage
+#
+# Display program usage.
+#
+usage() {
+    name=`basename ${0}`
+
+    echo "Usage: ${name} [ options ] [ -- <package> ... ]"
+
+    if [ $1 -ne 0 ]; then
+        echo "Try '${name} -h' for more information."
+    fi
+
+    if [ $1 -ne 1 ]; then
+        echo ""
+        echo "  --arch ARCH      Build the package for ARCH host architecture."
+        echo "  -h, --help       Print this help, then exit."
+        echo "  --builddir DIR   Build the packages in DIR."
+        echo "  --destdir DIR    Install the built tools to directory DIR."
+        echo "  --srcdir DIR     Find package, version, and URL metadata in DIR."
+        echo "  -v, --verbose    Enable verbose output."
+        echo ""
+    fi
+
+    exit $1
+}
+
+#
+# error <...>
+#
+# Display to standard error the specified arguments
+#
+error() {
+    echo "${*}" >&2
+}
+
+#
+# verbose <...>
+#
+# Display to standard error the specified arguments
+#
+verbose() {
+    echo "${*}" >&2
+}
+
+#
+# separator
+#
+# Display to standard error a log separator.
+#
+separator() {
+    verbose "--------------------------------------------------------------------------------"
+}
+
+#
+# trailer
+#
+# Display to standard error a log trailer.
+#
+trailer() {
+    verbose "================================================================================"
+}
+
+#
+# banner <message ...>
+#
+# Display to standard error a log banner with a message.
+#
+banner() {
+    trailer
+
+    verbose "${*}"
+}
+
+#
+# subbanner <message ...>
+#
+# Display to standard error a log subbanner with a message.
+#
+subbanner() {
+    separator
+
+    verbose "${*}"
+}
+
+#
+# find_archive <subdir> <package> <extensions...>
+#
+# Attempt to find the specified package archive in the provided
+# subdirectory matching one of the specified extensions.
+#
+find_archive() {
+    local subdir="${1}"
+    local package="${2}"
+    local archive
+
+    shift 2
+
+    for extension in ${*}; do
+        local maybe_archive="${subdir}/${package}.${extension}"
+
+        verbose "  FIND     ${maybe_archive}"
+
+        if [ -r "${maybe_archive}" ]; then
+            archive="${maybe_archive}"
+            break
+        fi
+    done
+
+    echo "${archive}"
+}
+
+#
+# find_versioned_or_nonversioned_archive <subdir> <package> <version> <extensions...>
+#
+# Attempt to find the specified version-qualified or non-qualified
+# package archive in the provided subdirectory matching one of the
+# specified extensions.
+#
+find_versioned_or_nonverioned_archive() {
+    local subdir="${1}"
+    local package="${2}"
+    local version="${3}"
+    local fqpackage="${package}-${version}"
+    local archive
+
+    shift 3
+
+    archive="`find_archive ${subdir} ${fqpackage} ${*}`"
+
+    if [ -z "${archive}" ]; then
+        archive="`find_archive ${subdir} ${package} ${*}`"
+    fi
+
+    echo "${archive}"
+}
+
+#
+# fetch_url_with_command <fetchdir> <url> <command ...>
+#
+# Attempt to fetch the specified URL to the provided directory with
+# the provided command.
+#
+fetch_url_with_command() {
+    local fetchdir="${1}"
+    local url="${2}"
+    local executable="`which ${3}`"
+    local curdir="`pwd`"
+    local status=1
+
+    shift 2
+    
+    if [ -x "${executable}" ]; then
+        cd "${fetchdir}"
+        
+            verbose "  `echo ${1} | tr '[[:lower:]]' '[[:upper:]]'`     ${url}"
+
+            ${*} "${url}"
+
+            status=${?}
+
+            if [ ${?} -ne 0 ]; then
+                    error "Failed to fetch ${url} with ${1}."
+            fi
+
+        cd "${curdir}"
+    fi
+    
+    return ${status}
+}
+
+#
+# fetch_url <fetchdir> <url>
+#
+# Attempt to fetch the specified URL to the provided directory with
+# either wget or curl.
+#
+fetch_url() {
+    local fetchdir="${1}"
+    local url="${2}"
+
+    # Try to fetch the package using wget or curl
+
+    fetch_url_with_command "${fetchdir}" "${url}" wget --tries 4 --no-check-certificate --quiet ||
+        fetch_url_with_command "${fetchdir}" "${url}" curl --retry 4 --insecure --silent --remote-name
+}
+
+#
+# fetch_package <finddir> <fetchdir> <package> <version> <url>
+#
+# Attempt to fetch the specified package version to <fetchdir>, if a
+# local archive does not already exist in <finddir> or <fetchdir>,
+# from the provided URL.
+#
+fetch_package() {
+    local finddir="${1}"
+    local fetchdir="${2}"
+    local package="${3}"
+    local version="${4}"
+    local url="${5}"
+    local fqpackage="${package}-${version}"
+
+    # Check whether a local archive already exists in <finddir> or <fetchdir>.
+
+    archive="`find_versioned_or_nonverioned_archive ${finddir} ${package} ${version} ${EXTENSIONS}`"
+
+    if [ -z "${archive}" ]; then
+        archive="`find_versioned_or_nonverioned_archive ${fetchdir} ${package} ${version} ${EXTENSIONS}`"
+    fi
+
+    # If no archive was found, attempt to fetch it.
+
+    if [ -z "${archive}" ]; then
+        verbose "  FETCH    ${url}"
+
+        fetch_url "${fetchdir}" "${url}"
+
+    else
+        error "No, found ${archive} locally."
+
+    fi
+}
+
+#
+# removetmp
+#
+# Remove temporary files and directories used during the run of this
+# script.
+#
+removetmp() {
+    if [ -O "${LIBTOOLIZE}" ]; then
+        rm -f "${LIBTOOLIZE}"
+    fi
+    if [ -n "${AUTOM4TE_CFG}" ]; then
+        rm -f "${AUTOM4TE_CFG}"
+    fi
+}
+
+#
+# patch_directory <directory> <patch arguments> <patch file> [ ... ]
+#
+# Patch the specified directory by applying the provided patched files
+# using the specified patch arguments. The specified patch files may
+# be uncompressed or compressed with any of bz2, gz, xz, compress, or
+# zip.
+#
+patch_directory() {
+    local directory="${1}"
+    local patchargs="${2}"
+
+    shift 2
+
+    verbose "  PATCH    ${directory}"
+
+    for patch in "${*}"; do
+        verbose "  PATCH    ${patch}"
+
+        extension=`echo "${patch}" | awk -F . '{if (NF > 1) {print $$NF}}'`;
+
+        case "${extension}" in
+
+            bz2)
+                uncompressor="bunzip2 -c"
+                ;;
+
+            gz)
+                uncompressor="gunzip -c"
+                ;;
+
+            xz)
+                uncompressor="xz -d -c"
+                ;;
+
+            Z)
+                uncompressor="uncompress -c"
+                ;;
+
+            zip)
+                uncompressor="unzip -p"
+                ;;
+
+            *)
+                uncompressor="cat"
+                ;;
+
+        esac
+
+        ${uncompressor} "${patch}" | patch ${patchargs} -d "${directory}" || exit 1;
+
+    done
+}
+
+#
+# build_package <package> <version> <host> <patchdir> <archivedir> <builddir> <destdir>
+#
+# Build the specified package version for <host> in <builddir> from
+# the archive found in <archivedir>, after applying the patches in
+# <patchdir> (if any), and install it into the specified destination
+# directory, <destdir>.
+#
+build_package() {
+    local package="${1}"
+    local version="${2}"
+    local host="${3}"
+    local patchdir="${4}"
+    local archivedir="${5}"
+    local builddir="${6}"
+    local destdir="${7}"
+    local fqpackage="${package}-${version}"
+    local curdir=`pwd`
+    local archive
+
+    verbose "  CHECK    ${package}"
+
+    archive="`find_versioned_or_nonverioned_archive ${archivedir} ${package} ${version} ${EXTENSIONS}`"
+
+    if [ -z "${archive}" ]; then
+        error "Could not find an archive for ${package}."
+        exit 1
+    fi
+
+    if [ ! -d "${archivedir}/${fqpackage}" ]; then
+        verbose "  TAR      ${archive}"
+        tar --directory "${archivedir}" -xf "${archive}" || exit ${?}
+    fi
+
+    # If necessary, patch the expanded package.
+
+    if [ -d "${patchdir}" ]; then
+	patch_directory "${archivedir}/${fqpackage}" "-s -p1" ${patchdir}/*.patch*
+    fi
+
+    # If possible, attempt to be self-sufficient, relying on GNU autotools
+    # executables installed along with the SDK itself.
+
+    if [ -d "${destdir}/${host}/bin" ]; then
+        export PATH="${destdir}/${host}/bin:${PATH}"
+    fi
+
+    if [ -d "${destdir}/bin" ]; then
+        export PATH="${destdir}/bin:${PATH}"
+    fi
+
+    export ACLOCAL=`which aclocal`
+    export AUTOCONF="`which autoconf`"
+    export AUTOHEADER="`which autoheader`"
+    export AUTOM4TE="`which autom4te`"
+    export AUTOMAKE="`which automake`"
+    export LIBTOOLIZE="`which libtoolize || which glibtoolize`"
+    export M4=`which m4`
+
+    # Establish, if necessary, some SDK-specific directories needed to
+    # override various paths in GNU autotools that otherwise expect to be
+    # absolute (e.g. /usr/share, etc.).
+
+    if [ -d "${destdir}/share" ]; then
+        if [ -d "${destdir}/share/autoconf" ]; then
+            export AC_MACRODIR="${destdir}/share/autoconf"
+
+            export autom4te_perllibdir="${destdir}/share/autoconf"
+        fi
+
+        if [ -d "${destdir}/share/automake-1.14" ]; then
+            export PERL5LIB="${destdir}/share/automake-1.14:${PERL5LIB}"
+        fi
+    fi
+
+    trap "removetmp" 1 2 3 9 15
+
+    #
+    # Generate any temporary files that need to be patched at run time
+    # with the location of the SDK tree, including:
+    #
+    #   -  The autom4te configuration file
+    #   -  The libtoolize executable script
+    #
+
+    if [ -r "${destdir}/share/autoconf/autom4te.cfg" ]; then
+        export AUTOM4TE_CFG="${destdir}/autom4te.cfg"
+
+        sed -e "s,//share/autoconf,${destdir}/share/autoconf,g" < "${destdir}/share/autoconf/autom4te.cfg" > "${AUTOM4TE_CFG}"
+    fi
+
+    if [ -r "${destdir}/${host}/bin/libtoolize" ]; then
+        export LIBTOOLIZE="${destdir}/libtoolize"
+
+        sed -e "s,//share/libtool,${destdir}/share/libtool,g" -e "s,//share/aclocal,${destdir}/share/aclocal,g" < "${destdir}/${host}/bin/libtoolize" > "${LIBTOOLIZE}"
+
+        chmod 775 "${LIBTOOLIZE}"
+    fi
+
+    # Configure the package
+
+    if [ ${VERBOSE} -gt 0 ]; then
+        CONFIGURE_FLAGS=""
+    else
+        CONFIGURE_FLAGS="--quiet"
+    fi
+
+    verbose "  CONFIG   ${package}"
+
+    cd "${builddir}"
+
+        ${archivedir}/${fqpackage}/configure ${CONFIGURE_FLAGS} --prefix=/ --exec-prefix=/${host} || exit ${?}
+
+    cd "${curdir}"
+
+    # Build the package
+
+    verbose "  MAKE     ${package}"
+
+    make V=${VERBOSE} -C "${builddir}" all || exit ${?}
+
+    # Install / stage the package
+
+    verbose "  INSTALL  ${package}"
+
+    make V=${VERBOSE} -C "${builddir}" DESTDIR="${destdir}" install || exit ${?}
+
+    # Remove any temporary files created.
+
+    removetmp
+}
+
+# Parse out any command line options
+
+while [ ${#} -gt 0 ]; do
+    case ${1} in
+        --arch)
+            ARCH=${2}
+            shift 2
+            ;;
+
+        -h|--help)
+            usage 0
+            ;;
+
+        --builddir)
+            BUILDDIR=${2}
+            shift 2
+            ;;
+
+        --destdir)
+            DESTDIR=${2}
+            shift 2
+            ;;
+
+        --srcdir)
+            SRCDIR=${2}
+            shift 2
+            ;;
+
+        -v|--verbose)
+            $((VERBOSE++))
+            shift 1
+            ;;
+
+        --)
+            shift 1
+            break
+            ;;
+
+        *)
+            usage 1
+            ;;
+    esac
+done
+
+# If the architecture is not specified, fail.
+
+if [ -z "${ARCH}" ]; then
+    error "The host architecture was not specified via --arch."
+
+    usage 1
+fi
+
+# If the --builddir option wasn't specified, then provide a default.
+
+if [ -z "${BUILDDIR}" ]; then
+    BUILDDIR="`pwd`"
+fi
+
+# If the --destdir option wasn't specified, then provide a default.
+
+if [ -z "${DESTDIR}" ]; then
+    DESTDIR=${abs_top_hostdir}
+fi
+
+# If the --srcdir option wasn't specified, then provide a default.
+
+if [ -z "${SRCDIR}" ]; then
+    SRCDIR="`pwd`"
+fi
+
+# Determine what packages to build
+
+if [ ${#} -gt 0 ]; then
+    PACKAGES="${*}"
+
+else
+    PACKAGES="`cat ${SRCDIR}/packages`"
+
+fi
+
+# Build each package
+
+banner "Building GNU autotools for ${ARCH}..."
+
+for package in ${PACKAGES}; do
+    url="`cat ${SRCDIR}/${package}/${package}.url`"
+    version="`cat ${SRCDIR}/${package}/${package}.version`"
+    patchdir="${SRCDIR}/${package}/${package}.patches"
+
+    # Fetch, if necessary, the package from the canonical source location.
+
+    subbanner "  CHECK    ${package}"
+
+    fetch_package "${SRCDIR}/${package}" "${BUILDDIR}" "${package}" "${version}" "${url}"
+
+    # Build and install the package.
+
+    verbose "  MKDIR    ${BUILDDIR}/build/${ARCH}/${package}-${version}"
+
+    mkdir -p "${BUILDDIR}/build/${ARCH}/${package}-${version}" || exit ${?}
+
+    build_package "${package}" "${version}" "${ARCH}" "${patchdir}" "${BUILDDIR}" "${BUILDDIR}/build/${ARCH}/${package}-${version}" "${DESTDIR}"
+done
+
+trailer

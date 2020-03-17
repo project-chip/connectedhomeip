@@ -25,7 +25,7 @@
 
 #include <SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_TEST
+#if CHIP_SYSTEM_CONFIG_TEST && CHIP_CONFIG_FAULT_INJECTION
 
 #include <nlfaultinjection.hpp>
 

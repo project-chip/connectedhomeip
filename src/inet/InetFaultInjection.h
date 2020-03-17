@@ -25,7 +25,7 @@
 
 #include <InetConfig.h>
 
-#if INET_CONFIG_TEST
+#if INET_CONFIG_TEST && CHIP_CONFIG_FAULT_INJECTION
 
 #include <nlfaultinjection.hpp>
 

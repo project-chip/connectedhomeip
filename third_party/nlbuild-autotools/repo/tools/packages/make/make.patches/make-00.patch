@@ -1,0 +1,442 @@
+--- make-dfsg-4.1.orig/ar.c
++++ make-dfsg-4.1/ar.c
+@@ -68,25 +68,39 @@
+ 
+ /* This function is called by 'ar_scan' to find which member to look at.  */
+ 
++struct member_date_lookup
++{
++  const char *name;
++  time_t *member_date;
++};
++
+ /* ARGSUSED */
+ static long int
+ ar_member_date_1 (int desc UNUSED, const char *mem, int truncated,
+                   long int hdrpos UNUSED, long int datapos UNUSED,
+                   long int size UNUSED, long int date,
+                   int uid UNUSED, int gid UNUSED, int mode UNUSED,
+-                  const void *name)
++                  const void *data)
+ {
+-  return ar_name_equal (name, mem, truncated) ? date : 0;
++  const struct member_date_lookup *lookup_data = data;
++  if (ar_name_equal (lookup_data->name, mem, truncated))
++    {
++      *lookup_data->member_date = date;
++      return 1;
++    }
++  return 0;
+ }
+ 
+-/* Return the modtime of NAME.  */
++/* Read the modtime of NAME in MEMBER_DATE.
++   Returns 1 if NAME exists, 0 otherwise.  */
+ 
+-time_t
+-ar_member_date (const char *name)
++int
++ar_member_date (const char *name, time_t *member_date)
+ {
+   char *arname;
+   char *memname;
+-  long int val;
++  int found;
++  struct member_date_lookup lookup_data;
+ 
+   ar_parse_name (name, &arname, &memname);
+ 
+@@ -107,11 +121,14 @@
+       (void) f_mtime (arfile, 0);
+   }
+ 
+-  val = ar_scan (arname, ar_member_date_1, memname);
++  lookup_data.name = memname;
++  lookup_data.member_date = member_date;
++  found = ar_scan (arname, ar_member_date_1, &lookup_data);
+ 
+   free (arname);
+ 
+-  return (val <= 0 ? (time_t) -1 : (time_t) val);
++  /* return 0 (not found) if the archive does not exist or has invalid format. */
++  return (found == 1) ? 1 : 0;
+ }
+ 
+ /* Set the archive-member NAME's modtime to now.  */
+--- make-dfsg-4.1.orig/commands.c
++++ make-dfsg-4.1/commands.c
+@@ -622,7 +622,10 @@
+       time_t file_date = (file->last_mtime == NONEXISTENT_MTIME
+                           ? (time_t) -1
+                           : (time_t) FILE_TIMESTAMP_S (file->last_mtime));
+-      if (ar_member_date (file->name) != file_date)
++      time_t member_date = NONEXISTENT_MTIME;
++      int found;
++      found = ar_member_date (file->name, &member_date);
++      if (found && member_date != file_date)
+         {
+           if (on_behalf_of)
+             OSS (error, NILF,
+--- make-dfsg-4.1.orig/configure
++++ make-dfsg-4.1/configure
+@@ -11060,10 +11061,9 @@
+ #include <glob.h>
+ #include <fnmatch.h>
+ 
+-#define GLOB_INTERFACE_VERSION 1
+ #if !defined _LIBC && defined __GNU_LIBRARY__ && __GNU_LIBRARY__ > 1
+ # include <gnu-versions.h>
+-# if _GNU_GLOB_INTERFACE_VERSION == GLOB_INTERFACE_VERSION
++# if _GNU_GLOB_INTERFACE_VERSION == 1 || _GNU_GLOB_INTERFACE_VERSION == 2
+    gnu glob
+ # endif
+ #endif],
+--- make-dfsg-4.1.orig/dir.c
++++ make-dfsg-4.1/dir.c
+@@ -748,8 +748,11 @@
+   const char *slash;
+ 
+ #ifndef NO_ARCHIVES
+-  if (ar_name (name))
+-    return ar_member_date (name) != (time_t) -1;
++  {
++    time_t member_date;
++    if (ar_name (name))
++      return ar_member_date (name, &member_date);
++  }
+ #endif
+ 
+ #ifdef VMS
+@@ -1212,15 +1215,40 @@
+ }
+ #endif
+ 
++/* Similarly for lstat.  */
++#if !defined(lstat) && !defined(WINDOWS32) || defined(VMS)
++# ifndef VMS
++#  ifndef HAVE_SYS_STAT_H
++int lstat (const char *path, struct stat *sbuf);
++#  endif
++# else
++    /* We are done with the fake lstat.  Go back to the real lstat */
++#   ifdef lstat
++#     undef lstat
++#   endif
++# endif
++# define local_lstat lstat
++#elif defined(WINDOWS32)
++/* Windows doesn't support lstat().  */
++# define local_lstat local_stat
++#else
++static int
++local_lstat (const char *path, struct stat *buf)
++{
++  int e;
++  EINTRLOOP (e, lstat (path, buf));
++  return e;
++}
++#endif
++
+ void
+ dir_setup_glob (glob_t *gl)
+ {
+   gl->gl_opendir = open_dirstream;
+   gl->gl_readdir = read_dirstream;
+   gl->gl_closedir = free;
++  gl->gl_lstat = local_lstat;
+   gl->gl_stat = local_stat;
+-  /* We don't bother setting gl_lstat, since glob never calls it.
+-     The slot is only there for compatibility with 4.4 BSD.  */
+ }
+ 
+ void
+--- make-dfsg-4.1.orig/job.c
++++ make-dfsg-4.1/job.c
+@@ -27,6 +27,14 @@
+ 
+ #include <string.h>
+ 
++#if defined (HAVE_LINUX_BINFMTS_H) && defined (HAVE_SYS_USER_H)
++#include <sys/user.h>
++#include <linux/binfmts.h>
++#endif
++#ifndef PAGE_SIZE
++# define PAGE_SIZE (sysconf(_SC_PAGESIZE))
++#endif
++
+ /* Default shell to use.  */
+ #ifdef WINDOWS32
+ #include <windows.h>
+@@ -824,8 +832,6 @@
+           break;
+         }
+ 
+-      child_failed = exit_sig != 0 || exit_code != 0;
+-
+       /* Search for a child matching the deceased one.  */
+       lastc = 0;
+       for (c = children; c != 0; lastc = c, c = c->next)
+@@ -837,6 +843,15 @@
+            Ignore it; it was inherited from our invoker.  */
+         continue;
+ 
++      /* Determine the failure status: 0 for success, 1 for updating target in
++         question mode, 2 for anything else.  */
++      if (exit_sig == 0 && exit_code == 0)
++        child_failed = MAKE_SUCCESS;
++      else if (exit_sig == 0 && exit_code == 1 && question_flag && c->recursive)
++        child_failed = MAKE_TROUBLE;
++      else
++        child_failed = MAKE_FAILURE;
++
+       DB (DB_JOBS, (child_failed
+                     ? _("Reaping losing child %p PID %s %s\n")
+                     : _("Reaping winning child %p PID %s %s\n"),
+@@ -872,10 +887,10 @@
+              delete non-precious targets, and abort.  */
+           static int delete_on_error = -1;
+ 
+-          if (!dontcare)
++          if (!dontcare && child_failed == MAKE_FAILURE)
+             child_error (c, exit_code, exit_sig, coredump, 0);
+ 
+-          c->file->update_status = us_failed;
++          c->file->update_status = child_failed == MAKE_FAILURE ? us_failed : us_question;
+           if (delete_on_error == -1)
+             {
+               struct file *f = lookup_file (".DELETE_ON_ERROR");
+@@ -987,7 +1002,7 @@
+       if (!err && child_failed && !dontcare && !keep_going_flag &&
+           /* fatal_error_signal will die with the right signal.  */
+           !handling_fatal_signal)
+-        die (MAKE_FAILURE);
++        die (child_failed);
+ 
+       /* Only block for one child.  */
+       block = 0;
+@@ -1189,14 +1204,15 @@
+       ++p;
+     }
+ 
++  child->recursive = ((flags & COMMANDS_RECURSE) != 0);
++
+   /* Update the file's command flags with any new ones we found.  We only
+      keep the COMMANDS_RECURSE setting.  Even this isn't 100% correct; we are
+      now marking more commands recursive than should be in the case of
+      multiline define/endef scripts where only one line is marked "+".  In
+      order to really fix this, we'll have to keep a lines_flags for every
+      actual line, after expansion.  */
+-  child->file->cmds->lines_flags[child->command_line - 1]
+-    |= flags & COMMANDS_RECURSE;
++  child->file->cmds->lines_flags[child->command_line - 1] |= flags & COMMANDS_RECURSE;
+ 
+   /* POSIX requires that a recipe prefix after a backslash-newline should
+      be ignored.  Remove it now so the output is correct.  */
+@@ -3115,6 +3131,7 @@
+ #ifdef WINDOWS32
+     char *command_ptr = NULL; /* used for batch_mode_shell mode */
+ #endif
++    char *args_ptr;
+ 
+ # ifdef __EMX__ /* is this necessary? */
+     if (!unixy_shell && shellflags)
+@@ -3280,8 +3297,17 @@
+         return new_argv;
+       }
+ 
++#ifdef MAX_ARG_STRLEN
++    static char eval_line[] = "eval\\ \\\"set\\ x\\;\\ shift\\;\\ ";
++#define ARG_NUMBER_DIGITS 5
++#define EVAL_LEN (sizeof(eval_line)-1 + shell_len + 4                   \
++                  + (7 + ARG_NUMBER_DIGITS) * 2 * line_len / (MAX_ARG_STRLEN - 2))
++#else
++#define EVAL_LEN 0
++#endif
++
+     new_line = xmalloc ((shell_len*2) + 1 + sflags_len + 1
+-                        + (line_len*2) + 1);
++                        + (line_len*2) + 1 + EVAL_LEN);
+     ap = new_line;
+     /* Copy SHELL, escaping any characters special to the shell.  If
+        we don't escape them, construct_command_argv_internal will
+@@ -3301,6 +3327,30 @@
+ #ifdef WINDOWS32
+     command_ptr = ap;
+ #endif
++
++#if !defined (WINDOWS32) && defined (MAX_ARG_STRLEN)
++    if (unixy_shell && line_len > MAX_ARG_STRLEN)
++      {
++       unsigned j;
++       memcpy (ap, eval_line, sizeof (eval_line) - 1);
++       ap += sizeof (eval_line) - 1;
++       for (j = 1; j <= 2 * line_len / (MAX_ARG_STRLEN - 2); j++)
++         ap += sprintf (ap, "\\$\\{%u\\}", j);
++       *ap++ = '\\';
++       *ap++ = '"';
++       *ap++ = ' ';
++       /* Copy only the first word of SHELL to $0.  */
++       for (p = shell; *p != '\0'; ++p)
++         {
++           if (isspace ((unsigned char)*p))
++             break;
++           *ap++ = *p;
++         }
++       *ap++ = ' ';
++      }
++#endif
++    args_ptr = ap;
++
+     for (p = line; *p != '\0'; ++p)
+       {
+         if (restp != NULL && *p == '\n')
+@@ -3348,6 +3398,13 @@
+           }
+ #endif
+         *ap++ = *p;
++#if !defined (WINDOWS32) && defined (MAX_ARG_STRLEN)
++       if (unixy_shell && line_len > MAX_ARG_STRLEN && (ap - args_ptr > MAX_ARG_STRLEN - 2))
++         {
++           *ap++ = ' ';
++           args_ptr = ap;
++         }
++#endif
+       }
+     if (ap == new_line + shell_len + sflags_len + 2)
+       {
+--- make-dfsg-4.1.orig/job.h
++++ make-dfsg-4.1/job.h
+@@ -108,6 +108,7 @@
+     unsigned int  noerror:1;    /* Nonzero if commands contained a '-'.  */
+     unsigned int  good_stdin:1; /* Nonzero if this child has a good stdin.  */
+     unsigned int  deleted:1;    /* Nonzero if targets have been deleted.  */
++    unsigned int  recursive:1;  /* Nonzero for recursive command ('+' etc.)  */
+     unsigned int  dontcare:1;   /* Saved dontcare flag.  */
+   };
+ 
+--- make-dfsg-4.1.orig/main.c
++++ make-dfsg-4.1/main.c
+@@ -1401,13 +1401,18 @@
+ #ifdef HAVE_ISATTY
+     if (isatty (fileno (stdout)))
+       if (! lookup_variable (STRING_SIZE_TUPLE ("MAKE_TERMOUT")))
+-        define_variable_cname ("MAKE_TERMOUT", TTYNAME (fileno (stdout)),
+-                               o_default, 0)->export = v_export;
+-
++        {
++          const char *tty = TTYNAME (fileno (stdout));
++          define_variable_cname ("MAKE_TERMOUT", tty ? tty : DEFAULT_TTYNAME,
++                                 o_default, 0)->export = v_export;
++        }
+     if (isatty (fileno (stderr)))
+       if (! lookup_variable (STRING_SIZE_TUPLE ("MAKE_TERMERR")))
+-        define_variable_cname ("MAKE_TERMERR", TTYNAME (fileno (stderr)),
+-                               o_default, 0)->export = v_export;
++        {
++          const char *tty = TTYNAME (fileno (stderr));
++          define_variable_cname ("MAKE_TERMERR", tty ? tty : DEFAULT_TTYNAME,
++                                 o_default, 0)->export = v_export;
++        }
+ #endif
+ 
+   /* Reset in case the switches changed our minds.  */
+@@ -2418,6 +2423,11 @@
+             exit (WIFEXITED(r) ? WEXITSTATUS(r) : EXIT_FAILURE);
+           }
+ #else
++#ifdef SET_STACK_SIZE
++          /* Reset limits, if necessary.  */
++          if (stack_limit.rlim_cur)
++            setrlimit (RLIMIT_STACK, &stack_limit);
++#endif
+           exec_command ((char **)nargv, environ);
+ #endif
+           free (aargv);
+--- make-dfsg-4.1.orig/makeint.h
++++ make-dfsg-4.1/makeint.h
+@@ -424,10 +424,11 @@
+ /* The number of bytes needed to represent the largest integer as a string.  */
+ #define INTSTR_LENGTH         CSTRLEN ("18446744073709551616")
+ 
++#define DEFAULT_TTYNAME "true"
+ #ifdef HAVE_TTYNAME
+ # define TTYNAME(_f) ttyname (_f)
+ #else
+-# define TTYNAME(_f) "true"
++# define TTYNAME(_f) DEFAULT_TTYNAME
+ #endif
+ 
+ 
+@@ -478,7 +479,7 @@
+ int ar_name (const char *);
+ void ar_parse_name (const char *, char **, char **);
+ int ar_touch (const char *);
+-time_t ar_member_date (const char *);
++int ar_member_date (const char *, time_t *);
+ 
+ typedef long int (*ar_member_func_t) (int desc, const char *mem, int truncated,
+                                       long int hdrpos, long int datapos,
+--- make-dfsg-4.1.orig/remake.c
++++ make-dfsg-4.1/remake.c
+@@ -1259,6 +1259,7 @@
+ 
+       char *arname, *memname;
+       struct file *arfile;
++      int found;
+       time_t member_date;
+ 
+       /* Find the archive's name.  */
+@@ -1306,10 +1307,15 @@
+         /* The archive doesn't exist, so its members don't exist either.  */
+         return NONEXISTENT_MTIME;
+ 
+-      member_date = ar_member_date (file->hname);
+-      mtime = (member_date == (time_t) -1
+-               ? NONEXISTENT_MTIME
+-               : file_timestamp_cons (file->hname, member_date, 0));
++      found = ar_member_date (file->hname, &member_date);
++      if (found && member_date == (time_t) 0)
++        {
++              OSS (error, NILF,
++                   _("Warning: Archive '%s' seems to have been created in deterministic mode. '%s' will always be updated. Please consider passing the U flag to ar to avoid the problem."),
++                   arfile->name, memname);
++
++        }
++      mtime = found ? file_timestamp_cons (file->hname, member_date, 0) : NONEXISTENT_MTIME;
+     }
+   else
+ #endif
+@@ -1548,9 +1554,11 @@
+ {
+   static const char *dirs[] =
+     {
++#ifdef MULTIARCH_DIRS
++      MULTIARCH_DIRS
++#endif
+ #ifndef _AMIGA
+       "/lib",
+-      "/usr/lib",
+ #endif
+ #if defined(WINDOWS32) && !defined(LIBDIR)
+ /*
+@@ -1559,7 +1567,19 @@
+  */
+ #define LIBDIR "."
+ #endif
+-      LIBDIR,                   /* Defined by configuration.  */
++      LIBDIR,			/* Defined by configuration.  */
++#ifndef _AMIGA
++/*
++ * In the Debian binaries, PREFIX is /usr and thus this searches /lib,
++ * /usr/lib and /usr/lib again and therefore misses any libraries that
++ * are not packaged and were installed by the site admin.  The ideal
++ * behaviour would be to have the search path set by a Makefile
++ * variable (other than the VPATH blunt object) but even absent that,
++ * it would be more useful if it looked in /usr/local/lib even though
++ * make itself hasn't been installed in the /usr/local tree -- manoj
++ */
++      "/usr/local/lib",
++#endif
+       0
+     };
+ 

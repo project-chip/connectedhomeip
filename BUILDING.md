@@ -1,15 +1,24 @@
 ## Build Documentation
 
-Currently using simple GNU makefiles on Linux or MacOS (Tested on MacOS and Ubuntu 18.04).
+The CHIP build system uses GNU autotools and helper makefiles to build
+various platform images on Linux or MacOS.
 
-Run:
+Tested on:
+    - MacOS
+    - Ubuntu 18.04
 
-```
-$ make all
-```
 
-Assuming you have all the required tools installed, this will tidy, format, and run code
-coverage on the entire tree.  Tests are built into the make system.
+Build system features:
+    - Package management: 'make dist' and 'make distcheck'
+    - Cross-platform handling: (Linux, Darwin, iOS, Android, embedded arm, etc.)
+    - Multiple compiler support: clang, GCC
+    - Integrates automated testing framework: 'make check'
+    - Code style enforcement: 'make pretty' and 'make pretty-check' integration with clang-format
+
+Assuming you have all the required tools installed, the system will build the code,
+build a distribution, tidy, format, run tests, and run code coverage on the entire tree.  
+Tests are built into the make system.
+
 
 ### Tool Prerequisites
 
@@ -17,7 +26,71 @@ To take advantage of all the current capabilities of the make system, you'll wan
 
 * Bash 4.0 or greater
 * GNU make
+* GNU automake
 * C and C++ compilers
 * clang-tidy
 * clang-format
 * gcov
+
+### Autotools Build Preparation
+
+```
+# Initial preparation
+git clean -fdx
+./bootstrap
+
+make -f Makefile-Standalone
+```
+
+### Build Standalone (Native Linux or MacOS)
+
+```
+make -f Makefile-Standalone
+```
+
+### Build Custom configuration
+
+```
+# From top of clean tree
+./bootstrap
+
+mkdir out
+cd out
+../configure
+
+# Build libraries
+make
+
+# Build distribution
+make dist
+
+# Build and check distribution
+make distcheck
+
+# Run tests
+make check
+
+# Verify coding style conformance
+make pretty-check
+```
+
+### Build iOS
+
+Install XCode and XQuarz.
+
+```
+make -f Makefile-iOS
+```
+
+### Build Android
+
+Install Android Studio, Java, and NDK.
+
+```
+# Update these paths based on your environment and version of the tools (MacOS examples):
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-12.0.1.jdk/Contents/Home
+export ANDROID_HOME=~/Library/Android/sdk
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.0.6113669
+
+make -f Makefile-Android
+```

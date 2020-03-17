@@ -1,0 +1,107 @@
+#
+#    Copyright 2016 Nest Labs Inc. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#    Description:
+#      This file is the GNU automake template for the @PACKAGE_DESCRIPTION@
+#      unit tests.
+#
+
+include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
+
+#
+# Local headers to build against and distribute but not to install
+# since they are not part of the package.
+#
+noinst_HEADERS                                 = \
+    @PACKAGE_SHORT_LOWER@-test.h                 \
+    $(NULL)
+
+#
+# Other files we do want to distribute with the package.
+#
+EXTRA_DIST                                     = \
+    $(NULL)
+
+if @PACKAGE_SHORT_UPPER@_BUILD_TESTS
+# C preprocessor option flags that will apply to all compiled objects in this
+# makefile.
+
+AM_CPPFLAGS                                    = \
+    -I$(top_srcdir)/include                      \
+    $(NULL)
+
+COMMON_LDADD                                   = \
+    -L${top_builddir}/src -l@PACKAGE_SHORT_LOWER@
+    $(NULL)
+
+# Test applications that should be run when the 'check' target is run.
+
+check_PROGRAMS                                 = \
+    @PACKAGE_SHORT_LOWER@-test                   \
+    @PACKAGE_SHORT_LOWER@-test-cxx               \
+    $(NULL)
+
+# Test applications and scripts that should be built and run when the
+# 'check' target is run.
+
+TESTS                                          = \
+    $(check_PROGRAMS)                            \
+    $(NULL)
+
+# The additional environment variables and their values that will be
+# made available to all programs and scripts in TESTS.
+
+TESTS_ENVIRONMENT                              = \
+    $(NULL)
+
+# Source, compiler, and linker options for test programs.
+
+@PACKAGE_SHORT_LOWER@_test_LDADD               = $(COMMON_LDADD)
+@PACKAGE_SHORT_LOWER@_test_SOURCES             = @PACKAGE_SHORT_LOWER@-test.c                 
+
+@PACKAGE_SHORT_LOWER@_test_cxx_LDADD           = $(COMMON_LDADD)
+@PACKAGE_SHORT_LOWER@_test_cxx_SOURCES         = @PACKAGE_SHORT_LOWER@-test-cxx.cpp           
+
+if @PACKAGE_SHORT_UPPER@_BUILD_COVERAGE
+CLEANFILES                                     = $(wildcard *.gcda *.gcno)
+
+if @PACKAGE_SHORT_UPPER@_BUILD_COVERAGE_REPORTS
+# The bundle should positively be qualified with the absolute build
+# path. Otherwise, VPATH will get auto-prefixed to it if there is
+# already such a directory in the non-colocated source tree.
+
+@PACKAGE_SHORT_UPPER@_COVERAGE_BUNDLE                           = ${abs_builddir}/${PACKAGE}${NL_COVERAGE_BUNDLE_SUFFIX}
+@PACKAGE_SHORT_UPPER@_COVERAGE_INFO                             = ${@PACKAGE_SHORT_UPPER@_COVERAGE_BUNDLE}/${PACKAGE}${NL_COVERAGE_INFO_SUFFIX}
+
+$(@PACKAGE_SHORT_UPPER@_COVERAGE_BUNDLE):
+	$(call create-directory)
+
+$(@PACKAGE_SHORT_UPPER@_COVERAGE_INFO): check-local | $(@PACKAGE_SHORT_UPPER@_COVERAGE_BUNDLE)
+	$(call generate-coverage-report,${top_builddir})
+
+coverage-local: $(@PACKAGE_SHORT_UPPER@_COVERAGE_INFO)
+
+clean-local: clean-local-coverage
+
+.PHONY: clean-local-coverage
+clean-local-coverage:
+	-$(AM_V_at)rm -rf $(@PACKAGE_SHORT_UPPER@_COVERAGE_BUNDLE)
+endif # @PACKAGE_SHORT_UPPER@_BUILD_COVERAGE_REPORTS
+endif # @PACKAGE_SHORT_UPPER@_BUILD_COVERAGE
+endif # @PACKAGE_SHORT_UPPER@_BUILD_TESTS
+
+include $(abs_top_nlbuild_autotools_dir)/automake/post.am
