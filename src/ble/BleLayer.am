@@ -23,7 +23,7 @@
 #      must be anchored relative to the top build directory.
 #
 
-chip_BleLayer_sources                                     = \
+CHIP_BUILD_BLE_LAYER_SOURCE_FILES                         = \
     @top_builddir@/src/ble/BleError.cpp                     \
     @top_builddir@/src/ble/BleLayer.cpp                     \
     @top_builddir@/src/ble/BleUUID.cpp                      \
@@ -31,15 +31,15 @@ chip_BleLayer_sources                                     = \
     @top_builddir@/src/ble/CHIPoBle.cpp                     \
     $(NULL)
 
-chip_BleLayer_headers = \
-    CHIPBleServiceData.h \
-    BLEEndPoint.h \
-    Ble.h \
-    BleApplicationDelegate.h \
-    BleConfig.h \
-    BleError.h \
-    BleLayer.h \
-    BlePlatformDelegate.h \
-    BleUUID.h \
-    CHIPoBle.h \
+CHIP_BUILD_BLE_LAYER_HEADER_FILES                         = \
+    CHIPBleServiceData.h                                    \
+    BLEEndPoint.h                                           \
+    Ble.h                                                   \
+    BleApplicationDelegate.h                                \
+    BleConfig.h                                             \
+    BleError.h                                              \
+    BleLayer.h                                              \
+    BlePlatformDelegate.h                                   \
+    BleUUID.h                                               \
+    CHIPoBle.h                                              \
     $(NULL)

@@ -41,10 +41,10 @@ libSystemLayer_a_CPPFLAGS         = \
     $(NULL)
 
 
-libSystemLayer_a_SOURCES          = $(chip_SystemLayer_sources)
+libSystemLayer_a_SOURCES          = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
 
 libSystemLayer_adir               = $(includedir)/system
 
-dist_libSystemLayer_a_HEADERS     = $(chip_SystemLayer_headers)
+dist_libSystemLayer_a_HEADERS     = $(CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

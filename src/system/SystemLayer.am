@@ -21,7 +21,7 @@
 #       relative to the top build directory.
 #
 
-chip_SystemLayer_sources                              = \
+CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES                  = \
     @top_builddir@/src/system/SystemClock.cpp           \
     @top_builddir@/src/system/SystemError.cpp           \
     @top_builddir@/src/system/SystemLayer.cpp           \
@@ -32,17 +32,17 @@ chip_SystemLayer_sources                              = \
     @top_builddir@/src/system/SystemStats.cpp           \
     $(NULL)
 
-chip_SystemLayer_headers                              = \
-    SystemAlignSize.h         \
-    SystemClock.h             \
-    SystemConfig.h            \
-    SystemError.h             \
-    SystemEvent.h             \
-    SystemFaultInjection.h    \
-    SystemStats.h             \
-    SystemLayer.h             \
-    SystemMutex.h             \
-    SystemObject.h            \
-    SystemTimer.h             \
-    SystemPacketBuffer.h      \
+CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES                  = \
+    SystemAlignSize.h                                   \
+    SystemClock.h                                       \
+    SystemConfig.h                                      \
+    SystemError.h                                       \
+    SystemEvent.h                                       \
+    SystemFaultInjection.h                              \
+    SystemStats.h                                       \
+    SystemLayer.h                                       \
+    SystemMutex.h                                       \
+    SystemObject.h                                      \
+    SystemTimer.h                                       \
+    SystemPacketBuffer.h                                \
     $(NULL)

@@ -42,11 +42,11 @@ libInetLayer_a_CPPFLAGS             = \
     $(SOCKETS_CPPFLAGS)               \
     $(NULL)
 
-libInetLayer_a_SOURCES              = $(chip_InetLayer_sources)
+libInetLayer_a_SOURCES              = $(CHIP_BUILD_INET_LAYER_SOURCE_FILES)
 
 libInetLayer_adir                   = $(includedir)/inet
 
-dist_libInetLayer_a_HEADERS         = $(chip_InetLayer_headers)
+dist_libInetLayer_a_HEADERS         = $(CHIP_BUILD_INET_LAYER_HEADER_FILES)
 
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

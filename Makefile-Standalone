@@ -225,7 +225,6 @@ JOBSFLAG := -j$(BuildJobs)
 #
 AMFILES =                               \
 	src/system/Makefile.am              \
-	src/lib/support/Makefile.am         \
 	src/lib/Makefile.am                 \
 	src/inet/Makefile.am                \
 	src/ble/Makefile.am                 \

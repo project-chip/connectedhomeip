@@ -42,17 +42,17 @@ libCHIP_a_CPPFLAGS                  =                         \
     $(SOCKETS_CPPFLAGS)                                       \
     $(NULL)
 
-libCHIP_a_SOURCES                   = $(chip_SystemLayer_sources)
-libCHIP_a_SOURCES                  += $(chip_InetLayer_sources)
-libCHIP_a_SOURCES                  += $(chip_CoreLayer_sources)
-libCHIP_a_SOURCES                  += $(chip_SupportLayer_sources)
+libCHIP_a_SOURCES                   = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
+libCHIP_a_SOURCES                  += $(CHIP_BUILD_INET_LAYER_SOURCE_FILES)
+libCHIP_a_SOURCES                  += $(CHIP_BUILD_CORE_LAYER_SOURCE_FILES)
+libCHIP_a_SOURCES                  += $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
 
 if CONFIG_NETWORK_LAYER_BLE
-libCHIP_a_SOURCES                  += $(chip_BleLayer_sources)
+libCHIP_a_SOURCES                  += $(CHIP_BUILD_BLE_LAYER_SOURCE_FILES)
 endif # CONFIG_NETWORK_LAYER_BLE
 
-libCHIP_adir                        = $(includedir)/lib/core
-dist_libCHIP_a_HEADERS              = $(chip_CoreLayer_headers)
-dist_libCHIP_a_HEADERS             += $(chip_SupportLayer_headers)
+EXTRA_DIST                          =                         \
+    $(CHIP_BUILD_CORE_LAYER_HEADER_FILES)                     \
+    $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

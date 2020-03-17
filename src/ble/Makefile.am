@@ -36,10 +36,10 @@ libBleLayer_a_CPPFLAGS              = \
     $(LWIP_CPPFLAGS)                  \
     $(NULL)
 
-libBleLayer_a_SOURCES               = $(chip_BleLayer_sources)
+libBleLayer_a_SOURCES               = $(CHIP_BUILD_BLE_LAYER_SOURCE_FILES)
 
 libBleLayer_adir                    = $(includedir)/ble
 
-dist_libBleLayer_a_HEADERS          = $(chip_BleLayer_headers)
+dist_libBleLayer_a_HEADERS          = $(CHIP_BUILD_BLE_LAYER_HEADER_FILES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
