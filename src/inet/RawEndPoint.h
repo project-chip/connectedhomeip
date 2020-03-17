@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This header file defines the <tt>Inet::RawEndPoint</tt>
- *      class, where the Nest Inet Layer encapsulates methods for
+ *      class, where the CHIP Inet Layer encapsulates methods for
  *      interacting with IP network endpoints (SOCK_RAW sockets
  *      on Linux and BSD-derived systems) or LwIP raw protocol
  *      control blocks, as the system is configured accordingly.
@@ -42,7 +42,7 @@ class IPPacketInfo;
  * @brief   Objects of this class represent raw IP network endpoints.
  *
  * @details
- *  Nest Inet Layer encapsulates methods for interacting with IP network
+ *  CHIP Inet Layer encapsulates methods for interacting with IP network
  *  endpoints (SOCK_RAW sockets on Linux and BSD-derived systems) or LwIP
  *  raw protocol control blocks, as the system is configured accordingly.
  */

@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file defines default compile-time configuration constants
- *      for the Nest InetLayer, an Internet Protocol communications
+ *      for the CHIP InetLayer, an Internet Protocol communications
  *      abstraction layer.
  *
  *      Package integrators that wish to override these values should

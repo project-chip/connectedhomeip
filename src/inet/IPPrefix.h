@@ -19,7 +19,7 @@
  *    @file
  *      This file defines the concrete class
  *      <tt>Inet::IPPrefix</tt>, which comprise two member fields:
- *      a) a IP address and b) a length field. The Nest Inet Layer
+ *      a) a IP address and b) a length field. The CHIP Inet Layer
  *      uses objects of this class to represent Internet protocol
  *      address prefixes of both IPv4 and IPv6 address families.
  */
