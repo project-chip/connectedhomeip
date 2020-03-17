@@ -1161,7 +1161,7 @@ DLL_EXPORT Error StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseco
 {
     Error lReturn = CHIP_SYSTEM_NO_ERROR;
 
-    // At the moment there is no need to do anything for standalone chip + LWIP.
+    // At the moment there is no need to do anything for standalone CHIP + LWIP.
     // the Task will periodically call HandleTimer which will process any expired
     // timers.
     static_cast<void>(aLayer);
