@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,7 +29,7 @@
 
 #include "Base64.h"
 
-namespace nl {
+namespace chip {
 
 // Convert a value in the range 0..63 to its equivalent base64 character.
 // Return '=' for any value >= 64.
@@ -110,9 +109,9 @@ static uint8_t Base64URLCharToVal(uint8_t c)
     return UINT8_MAX;
 }
 
-uint16_t Base64Encode(const uint8_t *in, uint16_t inLen, char *out, Base64ValToCharFunct valToCharFunct)
+uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out, Base64ValToCharFunct valToCharFunct)
 {
-    char *outStart = out;
+    char * outStart = out;
 
     while (inLen > 0)
     {
@@ -125,13 +124,13 @@ uint16_t Base64Encode(const uint8_t *in, uint16_t inLen, char *out, Base64ValToC
         if (inLen > 0)
         {
             val2 |= *in >> 4;
-            val3 =  (*in << 2) & 0x3F;
+            val3 = (*in << 2) & 0x3F;
             in++;
             inLen--;
             if (inLen > 0)
             {
                 val3 |= *in >> 6;
-                val4  = *in & 0x3F;
+                val4 = *in & 0x3F;
                 in++;
                 inLen--;
             }
@@ -150,28 +149,31 @@ uint16_t Base64Encode(const uint8_t *in, uint16_t inLen, char *out, Base64ValToC
     return out - outStart;
 }
 
-uint16_t Base64Encode(const uint8_t *in, uint16_t inLen, char *out)
+uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out)
 {
     return Base64Encode(in, inLen, out, Base64ValToChar);
 }
 
-uint16_t Base64URLEncode(const uint8_t *in, uint16_t inLen, char *out)
+uint16_t Base64URLEncode(const uint8_t * in, uint16_t inLen, char * out)
 {
     return Base64Encode(in, inLen, out, Base64URLValToChar);
 }
 
-uint32_t Base64Encode32(const uint8_t *in, uint32_t inLen, char *out, Base64ValToCharFunct valToCharFunct)
+uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out, Base64ValToCharFunct valToCharFunct)
 {
     uint32_t outLen = 0;
 
     // Maximum number of input bytes to convert to base-64 in a single call to Base64Encode.
     // Number is the largest multiple of 3 bytes where the resulting number of base-64 characters
     // fits within a uint16_t.
-    enum { kMaxConvert = (UINT16_MAX / 4) * 3 };
+    enum
+    {
+        kMaxConvert = (UINT16_MAX / 4) * 3
+    };
 
     while (true)
     {
-        uint16_t inChunkLen = (inLen > kMaxConvert) ? (uint16_t)kMaxConvert : (uint16_t)inLen;
+        uint16_t inChunkLen = (inLen > kMaxConvert) ? (uint16_t) kMaxConvert : (uint16_t) inLen;
 
         uint16_t outChunkLen = Base64Encode(in, inChunkLen, out, valToCharFunct);
 
@@ -188,14 +190,14 @@ uint32_t Base64Encode32(const uint8_t *in, uint32_t inLen, char *out, Base64ValT
     return outLen;
 }
 
-uint32_t Base64Encode32(const uint8_t *in, uint32_t inLen, char *out)
+uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out)
 {
     return Base64Encode32(in, inLen, out, Base64ValToChar);
 }
 
-uint16_t Base64Decode(const char *in, uint16_t inLen, uint8_t *out, Base64CharToValFunct charToValFunct)
+uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out, Base64CharToValFunct charToValFunct)
 {
-    uint8_t *outStart = out;
+    uint8_t * outStart = out;
 
     // isgraph() returns false for space and ctrl chars
     while (inLen > 0 && isgraph(*in))
@@ -241,27 +243,30 @@ fail:
     return UINT16_MAX;
 }
 
-uint16_t Base64Decode(const char *in, uint16_t inLen, uint8_t *out)
+uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out)
 {
     return Base64Decode(in, inLen, out, Base64CharToVal);
 }
 
-uint16_t Base64URLDecode(const char *in, uint16_t inLen, uint8_t *out)
+uint16_t Base64URLDecode(const char * in, uint16_t inLen, uint8_t * out)
 {
     return Base64Decode(in, inLen, out, Base64URLCharToVal);
 }
 
-uint32_t Base64Decode32(const char *in, uint32_t inLen, uint8_t *out, Base64CharToValFunct charToValFunct)
+uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, Base64CharToValFunct charToValFunct)
 {
     uint32_t outLen = 0;
 
     // Maximum number of base-64 characters to convert in a single call to Base64Decode.
     // Number is the largest multiple of 4 characters that fits in a uint16_t.
-    enum { kMaxConvert = (UINT16_MAX / 4) * 4 };
+    enum
+    {
+        kMaxConvert = (UINT16_MAX / 4) * 4
+    };
 
     while (true)
     {
-        uint16_t inChunkLen = (inLen > kMaxConvert) ? (uint16_t)kMaxConvert : (uint16_t)inLen;
+        uint16_t inChunkLen = (inLen > kMaxConvert) ? (uint16_t) kMaxConvert : (uint16_t) inLen;
 
         uint16_t outChunkLen = Base64Decode(in, inChunkLen, out, charToValFunct);
         if (outChunkLen == UINT16_MAX)
@@ -280,30 +285,28 @@ uint32_t Base64Decode32(const char *in, uint32_t inLen, uint8_t *out, Base64Char
     return outLen;
 }
 
-uint32_t Base64Decode32(const char *in, uint32_t inLen, uint8_t *out)
+uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out)
 {
     return Base64Decode32(in, inLen, out, Base64CharToVal);
 }
 
-
-} // namespace nl
+} // namespace chip
 
 #ifdef TEST
 
 #include <string.h>
 #include <stdio.h>
 
-void TestBase64(const char *test, bool base64URL=false)
+void TestBase64(const char * test, bool base64URL = false)
 {
     uint8_t buf[256];
     char buf2[256];
     uint16_t len;
 
-    strcpy((char *)buf, test);
+    strcpy((char *) buf, test);
 
-    len = (base64URL)
-          ? nl::Base64URLDecode((char *)buf, strlen((char *)buf), buf)
-          : nl::Base64Decode((char *)buf, strlen((char *)buf), buf);
+    len = (base64URL) ? nl::Base64URLDecode((char *) buf, strlen((char *) buf), buf)
+                      : nl::Base64Decode((char *) buf, strlen((char *) buf), buf);
     printf("%s: ", test);
     if (len != UINT16_MAX)
     {
@@ -311,9 +314,7 @@ void TestBase64(const char *test, bool base64URL=false)
         for (uint16_t i = 0; i < len; i++)
             printf("%c", buf[i]);
 
-        len = (base64URL)
-              ? nl::Base64URLEncode(buf, len, buf2)
-              : nl::Base64Encode(buf, len, buf2);
+        len = (base64URL) ? nl::Base64URLEncode(buf, len, buf2) : nl::Base64Encode(buf, len, buf2);
         printf(" (%d) ", len);
         for (uint16_t i = 0; i < len; i++)
             printf("%c", buf2[i]);
@@ -323,7 +324,7 @@ void TestBase64(const char *test, bool base64URL=false)
     printf("\n");
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
     TestBase64("");
     TestBase64("Zg==");
