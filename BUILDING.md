@@ -1,6 +1,6 @@
 ## Build Documentation
 
-The CHIP build system uses GNU autotools and helper makefiles to build
+The CHIP build system uses GNU autotools to build
 various platform images on Linux or MacOS.
 
 Tested on:
@@ -94,3 +94,38 @@ export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.0.6113669
 
 make -f Makefile-Android
 ```
+
+## Maintaining CHIP
+
+If you want to maintain, enhance, extend, or otherwise modify CHIP, it
+is likely you will need to change its build system, based on GNU
+autotools, in some circumstances.
+
+After any change to the CHIP build system, including any *Makefile.am*
+files or the *configure.ac* file, you must run the `bootstrap` or
+`bootstrap-configure` (which runs both `bootstrap` and `configure` in
+one shot) script to update the build system.
+
+### Dependencies
+
+Due to its leverage of GNU autotools, if you want to modify or
+otherwise maintain the CHIP build system, the following
+additional packages are required and are invoked by `bootstrap`:
+
+  * autoconf
+  * automake
+  * libtool
+
+#### Linux
+
+On Debian-based Linux distributions such as Ubuntu, these dependencies
+can be satisfied with the following:
+
+    % sudo apt-get install autoconf automake libtool
+
+#### Mac OS X
+
+On Mac OS X, these dependencies can be installed and satisfied using
+[Brew](https://brew.sh/):
+
+    % brew install autoconf automake libtool
