@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,16 +24,11 @@
 #ifndef CONFIGURATION_MANAGER_IMPL_H
 #define CONFIGURATION_MANAGER_IMPL_H
 
-#include <Weave/DeviceLayer/internal/GenericConfigurationManagerImpl.h>
-#include <Weave/DeviceLayer/nRF5/nRF5Config.h>
+#include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <platform/nRF5/nRF5Config.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
-
-namespace Internal {
-class NetworkProvisioningServerImpl;
-}
 
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the nRF52 platform.
@@ -56,20 +50,19 @@ private:
 
     // ===== Members that implement the ConfigurationManager public interface.
 
-    WEAVE_ERROR _Init(void);
-    WEAVE_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
-    WEAVE_ERROR _GetDeviceDescriptor(::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor & deviceDesc);
-    ::nl::Weave::Profiles::Security::AppKeys::GroupKeyStoreBase * _GetGroupKeyStore(void);
+    CHIP_ERROR _Init(void);
+    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
+    CHIP_ERROR _GetDeviceDescriptor(::chip::Profiles::DeviceDescription::ChipDeviceDescriptor & deviceDesc);
+    ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * _GetGroupKeyStore(void);
     bool _CanFactoryReset(void);
     void _InitiateFactoryReset(void);
-    WEAVE_ERROR _ReadPersistedStorageValue(::nl::Weave::Platform::PersistedStorage::Key key, uint32_t & value);
-    WEAVE_ERROR _WritePersistedStorageValue(::nl::Weave::Platform::PersistedStorage::Key key, uint32_t value);
+    CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
+    CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
     // ===== Members for internal use by the following friends.
 
-    friend class Internal::NetworkProvisioningServerImpl;
     friend ConfigurationManager & ConfigurationMgr(void);
     friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
 
@@ -83,7 +76,7 @@ private:
 /**
  * Returns the public interface of the ConfigurationManager singleton object.
  *
- * Weave applications should use this to access features of the ConfigurationManager object
+ * chip applications should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
  */
 inline ConfigurationManager & ConfigurationMgr(void)
@@ -94,7 +87,7 @@ inline ConfigurationManager & ConfigurationMgr(void)
 /**
  * Returns the platform-specific implementation of the ConfigurationManager singleton object.
  *
- * Weave applications can use this to gain access to features of the ConfigurationManager
+ * chip applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the ESP32 platform.
  */
 inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
@@ -102,13 +95,12 @@ inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
     return ConfigurationManagerImpl::sInstance;
 }
 
-inline WEAVE_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
+inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // CONFIGURATION_MANAGER_IMPL_H

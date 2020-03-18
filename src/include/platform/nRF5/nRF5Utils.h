@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,8 +23,7 @@
 #ifndef NRF5_UTILS_H
 #define NRF5_UTILS_H
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -34,8 +32,7 @@ bool FormatNRFError(char * buf, uint16_t bufSize, int32_t err);
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
 #endif // NRF5_UTILS_H

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,28 +17,25 @@
 
 /**
  *    @file
- *          Defines platform-specific event types and data for the Weave
+ *          Defines platform-specific event types and data for the chip
  *          Device Layer on nRF52 platforms using the Nordic nRF5 SDK.
  */
 
-#ifndef WEAVE_DEVICE_PLATFORM_EVENT_H
-#define WEAVE_DEVICE_PLATFORM_EVENT_H
+#ifndef CHIP_DEVICE_PLATFORM_EVENT_H
+#define CHIP_DEVICE_PLATFORM_EVENT_H
 
-#include <Weave/DeviceLayer/WeaveDeviceEvent.h>
+#include <platform/CHIPDeviceEvent.h>
 
 #include "ble.h"
 #include "nrf_ble_gatt.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace System {
 class PacketBuffer;
 }
 }
-}
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 namespace DeviceEventType {
@@ -53,13 +49,13 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates nRF52 platform-specific event types that are internal to the Weave Device Layer.
+ * Enumerates nRF52 platform-specific event types that are internal to the chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
     kSoftDeviceBLEEvent                     = kRange_InternalPlatformSpecific,
-    kWoBLERXCharWriteEvent,
-    kWoBLEOutOfBuffersEvent,
+    kCHIPoBLERXCharWriteEvent,
+    kCHIPoBLEOutOfBuffersEvent,
 };
 
 } // namespace DeviceEventType
@@ -67,7 +63,7 @@ enum InternalPlatformSpecificEventTypes
 /**
  * Represents platform-specific event information for Nordic nRF52 platforms.
  */
-struct WeaveDevicePlatformEvent final
+struct ChipDevicePlatformEvent final
 {
     union
     {
@@ -80,14 +76,13 @@ struct WeaveDevicePlatformEvent final
         {
             uint16_t ConId;
             ble_gatts_evt_write_t WriteArgs;
-            ::nl::Weave::System::PacketBuffer * Data;
+            ::chip::System::PacketBuffer * Data;
         } RXCharWriteEvent;
     };
 };
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
-#endif // WEAVE_DEVICE_PLATFORM_EVENT_H
+#endif // CHIP_DEVICE_PLATFORM_EVENT_H
