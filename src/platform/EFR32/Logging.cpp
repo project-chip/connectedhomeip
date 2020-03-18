@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *          Provides implementations for the OpenWeave and LwIP logging
+ *          Provides implementations for the OpenChip and LwIP logging
  *          functions on Silicon Labs EFR32 platforms.
  *
  *          Logging should be initialized by a call to efr32LogInit().  A
@@ -30,8 +29,8 @@
 
 #include <stdio.h>
 #include <retargetserial.h>
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/logging/CHIPLogging.h>
 #include <task.h>
 #include <queue.h>
 
@@ -60,13 +59,9 @@
 #define LOG_EFR32 "<efr32 > "
 
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
-#include <openthread/platform/logging.h>
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
-
-using namespace ::nl::Weave;
-using namespace ::nl::Weave::DeviceLayer;
-using namespace ::nl::Weave::DeviceLayer::Internal;
+using namespace ::chip::Chip;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
 
 static bool          sLogInitialized = false;
 static uint8_t       sLogBuffer[LOG_RTT_BUFFER_SIZE];
@@ -75,13 +70,13 @@ static uint8_t       sLogBuffer[LOG_RTT_BUFFER_SIZE];
  * Print a log message to RTT
  */
 static void PrintLog(const char *msg)
-{    
+{
 #if EFR32_LOG_ENABLED
     if (sLogInitialized)
     {
         size_t sz;
         sz = strlen(msg);
-        SEGGER_RTT_WriteNoLock(0, msg, sz);        
+        SEGGER_RTT_WriteNoLock(0, msg, sz);
 
         const char *newline = "\r\n";
         sz = strlen(newline);
@@ -113,7 +108,7 @@ extern "C" void efr32Log(const char *aFormat, ...)
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     strcpy(formattedMsg, LOG_EFR32);
     size_t prefixLen = strlen(formattedMsg);
@@ -134,24 +129,23 @@ namespace {
 
 void GetModuleName(char *buf, uint8_t module)
 {
-    if (module == ::nl::Weave::Logging::kLogModule_DeviceLayer)
+    if (module == ::chip::Logging::kLogModule_DeviceLayer)
     {
         memcpy(buf, "DL", 3);
     }
     else
     {
-        ::nl::Weave::Logging::GetModuleName(buf, module);
+        ::chip::Logging::GetModuleName(buf, module);
     }
 }
 
 } // unnamed namespace
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 /**
- * Called whenever a log message is emitted by Weave or LwIP.
+ * Called whenever a log message is emitted by Chip or LwIP.
  *
  * This function is intended be overridden by the application to, e.g.,
  * schedule output of queued log entries.
@@ -161,28 +155,26 @@ void __attribute__((weak)) OnLogOutput(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace Logging {
 
 /**
- * OpenWeave log output function.
+ * OpenChip log output function.
  */
 void Log(uint8_t module, uint8_t category, const char *aFormat, ...)
 {
     va_list    v;
 
     va_start(v, aFormat);
-#if EFR32_LOG_ENABLED && _WEAVE_USE_LOGGING
+#if EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
     if (IsCategoryEnabled(category))
     {
-        char   formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        char   formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t formattedMsgLen;
 
-        constexpr size_t maxPrefixLen = nlWeaveLoggingModuleNameLen + 3;
+        constexpr size_t maxPrefixLen = nlChipLoggingModuleNameLen + 3;
         static_assert(sizeof(formattedMsg) > maxPrefixLen);
 
         switch (category)
@@ -215,19 +207,19 @@ void Log(uint8_t module, uint8_t category, const char *aFormat, ...)
         {
             formattedMsg[sizeof formattedMsg - 1] = '\0';
         }
-        
+
         PrintLog(formattedMsg);
     }
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
-#endif // EFR32_LOG_ENABLED && _WEAVE_USE_LOGGING
+#endif // EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
     va_end(v);
 }
 
 } // namespace Logging
-} // namespace Weave
-} // namespace nl
+} // namespace chip
+
 
 /**
  * LwIP log output function.
@@ -238,7 +230,7 @@ extern "C" void LwIPLog(const char *aFormat, ...)
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     strcpy(formattedMsg, LOG_LWIP);
     size_t prefixLen = strlen(formattedMsg);
@@ -259,7 +251,7 @@ extern "C" void LwIPLog(const char *aFormat, ...)
 /**
  * Platform logging function for OpenThread
  */
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
 {
     IgnoreUnusedVariable(aLogRegion);
@@ -267,7 +259,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     if (sLogInitialized)
     {
@@ -309,7 +301,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 #endif // EFR32_LOG_ENABLED
     va_end(v);
 }
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if HARD_FAULT_LOG_ENABLE && EFR32_LOG_ENABLED
 

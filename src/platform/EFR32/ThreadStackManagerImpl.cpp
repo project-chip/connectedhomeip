@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,29 +23,28 @@
  *
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/ThreadStackManager.h>
-#include <Weave/DeviceLayer/OpenThread/OpenThreadUtils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
 
-#include <Weave/DeviceLayer/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.ipp>
-#include <Weave/DeviceLayer/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.ipp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.ipp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.ipp>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
-using namespace ::nl::Weave::DeviceLayer::Internal;
+using namespace ::chip::DeviceLayer::Internal;
 
 ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
-WEAVE_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
+CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
     return InitThreadStack(NULL);
 }
 
-WEAVE_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance *otInst)
+CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance *otInst)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
@@ -64,10 +62,9 @@ bool ThreadStackManagerImpl::IsInitialized()
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-using namespace ::nl::Weave::DeviceLayer;
+using namespace ::chip::DeviceLayer;
 
 /**
  * Glue function called directly by the OpenThread stack when tasklet processing work

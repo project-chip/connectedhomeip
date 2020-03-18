@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,10 +24,9 @@
 #ifndef PLATFORM_MANAGER_IMPL_H
 #define PLATFORM_MANAGER_IMPL_H
 
-#include <Weave/DeviceLayer/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <platform/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 /**
@@ -53,7 +51,7 @@ public:
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    WEAVE_ERROR _InitWeaveStack(void);
+    CHIP_ERROR _InitChipStack(void);
 
     // ===== Members for internal use by the following friends.
 
@@ -69,7 +67,7 @@ private:
 /**
  * Returns the public interface of the PlatformManager singleton object.
  *
- * Weave applications should use this to access features of the PlatformManager object
+ * Chip applications should use this to access features of the PlatformManager object
  * that are common to all platforms.
  */
 inline PlatformManager &PlatformMgr(void)
@@ -80,7 +78,7 @@ inline PlatformManager &PlatformMgr(void)
 /**
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
- * Weave applications can use this to gain access to features of the PlatformManager
+ * Chip applications can use this to gain access to features of the PlatformManager
  * that are specific to the ESP32 platform.
  */
 inline PlatformManagerImpl &PlatformMgrImpl(void)
@@ -89,7 +87,6 @@ inline PlatformManagerImpl &PlatformMgrImpl(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // PLATFORM_MANAGER_IMPL_H

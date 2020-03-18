@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +21,7 @@
 
 #include "rtos_gecko.h"
 #include "gecko_configuration.h"
-#include <Weave/DeviceLayer/EFR32/freertos_bluetooth.h>
+#include <platform/EFR32/freertos_bluetooth.h>
 
 #ifdef CONFIGURATION_HEADER
 #include CONFIGURATION_HEADER
