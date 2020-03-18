@@ -207,7 +207,7 @@ fi
 # Establish some key directories
 
 srcdir="$(dirname "${0}")"
-abs_srcdir="$(cd "{$srcdir}" && pwd)"
+abs_srcdir="$(cd "${srcdir}" && pwd)"
 abs_top_srcdir="${abs_srcdir}"
 
 abs_top_hostdir="${nlbuild_autotools_dir}/tools/host"

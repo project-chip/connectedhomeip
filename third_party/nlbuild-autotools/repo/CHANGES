@@ -1,3 +1,7 @@
+1.6.18 (2020-03-18)
+
+        * Address a typo in bootstrap scripts introduced in 1.6.17.
+
 1.6.17 (2020-03-17)
 
         * Avoid potential disagreement among srcdir and abs_srcdir for

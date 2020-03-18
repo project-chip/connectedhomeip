@@ -31,7 +31,7 @@ nlbuild_autotools_stem="third_party/nlbuild-autotools/repo"
 # Establish some key directories
 
 srcdir="$(dirname "${0}")"
-abs_srcdir="$(cd "{$srcdir}" && pwd)"
+abs_srcdir="$(cd "${srcdir}" && pwd)"
 abs_top_srcdir="${abs_srcdir}"
 
 exec "${srcdir}/${nlbuild_autotools_stem}/scripts/bootstrap" -I "${abs_top_srcdir}/${nlbuild_autotools_stem}" "${@}"
