@@ -121,11 +121,11 @@ additional packages are required and are invoked by `bootstrap`:
 On Debian-based Linux distributions such as Ubuntu, these dependencies
 can be satisfied with the following:
 
-    % sudo apt-get install autoconf automake libtool
+    % sudo apt-get install autoconf automake libtool clang-format-9
 
 #### Mac OS X
 
 On Mac OS X, these dependencies can be installed and satisfied using
 [Brew](https://brew.sh/):
 
-    % brew install autoconf automake libtool
+    % brew install autoconf automake libtool llvm@9
