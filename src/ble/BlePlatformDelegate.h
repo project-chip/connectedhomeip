@@ -25,6 +25,7 @@
 #define BLEPLATFORMDELEGATE_H_
 
 #include <ble/BleConfig.h>
+
 #include <ble/BleUUID.h>
 
 #include <system/SystemPacketBuffer.h>

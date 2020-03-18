@@ -25,6 +25,7 @@
 #define ENDPOINTBASIS_H
 
 #include <InetConfig.h>
+
 #include <InetError.h>
 #include "IANAConstants.h"
 #include "InetLayerBasis.h"
