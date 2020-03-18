@@ -2,7 +2,7 @@
 
 The following is a quick overview of the nRF5 adaptation of CHIP.  Most of this code will have parallels in any new adaptation.
 
-(All file names are relative to `openweave-core/src/adaptations/device-layer/...`).
+(All file names are relative to `connectedhomeip/src/...`).
 
 `include/platform/nRF5/PlatformManagerImpl.h`<br>`nRF5/PlatformManagerImpl.cpp`
 
@@ -37,15 +37,15 @@ The following is a quick overview of the nRF5 adaptation of CHIP.  Most of this 
 - Maps CHIP's BLE interface abstractions (BleLayer, BlePlatformDelegate, BleApplicationDelegate) onto the platform's native BLE services
 - Implements chip-compatible BLE advertising.
 
-`nRF5/Entropy.cpp`
+`platform/nRF5/Entropy.cpp`
 
 - Implements interface to platform entropy source
 
-`nRF5/Logging.cpp`
+`platform/nRF5/Logging.cpp`
 
 - Adaption of chip debug logging to platform logging facility.
 
-`nRF5/NRF5Config.cpp`
+`platform/nRF5/NRF5Config.cpp`
 
 - Implements low-level read/write of persistent configuration values
 - Class API specifically designed to work in conjunction with the GenericConfigurationManagerImpl<> class.
