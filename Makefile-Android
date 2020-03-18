@@ -16,7 +16,7 @@
 
 #
 #    Description:
-#      This file implements a glue makefile for building the Weave SDK
+#      This file implements a glue makefile for building the CHIP SDK
 #      for Android devices and simulators for multiple architectures.
 #
 #      This was largely directed and inspired by two Android NDK
@@ -127,7 +127,7 @@ JOBSFLAG := -j$(BuildJobs)
 
 
 #
-# Common Weave configure options
+# Common CHIP configure options
 #
 
 CONFIGURE_OPTIONS               = --disable-cocoa \
@@ -235,7 +235,7 @@ AMFILES =                               \
 #
 # configure-action <abi>
 #
-# Steps to configure the Weave SDK for a specific Android ABI.
+# Steps to configure the CHIP SDK for a specific Android ABI.
 #
 #   abi - The target ABI.
 #
@@ -265,7 +265,7 @@ endef # configure-action
 #
 # build-action <abi>
 #
-# Steps to generate the Weave SDK intermediate build products for the specified Android ABI.
+# Steps to generate the CHIP SDK intermediate build products for the specified Android ABI.
 #
 #   abi - The target ABI.
 #
@@ -277,7 +277,7 @@ endef # build-action
 #
 # stage-action <abi>
 #
-# Steps to stage (install) the Weave SDK final build products for the specified
+# Steps to stage (install) the CHIP SDK final build products for the specified
 # specified Android ABI.
 #
 #   abi - The target ABI.
@@ -290,7 +290,7 @@ endef # stage-action
 #
 # pretty-action <abi>
 #
-# Steps to pretty-ify the Weave SDK source code for the specified Android ABI.
+# Steps to pretty-ify the CHIP SDK source code for the specified Android ABI.
 #
 #   abi - The target ABI.
 #
@@ -302,7 +302,7 @@ endef # pretty-action
 #
 # pretty-check-action <abi>
 #
-# Steps to pretty-check (lint) the Weave SDK source code for the specified
+# Steps to pretty-check (lint) the CHIP SDK source code for the specified
 # Android ABI.
 #
 #   abi - The target ABI.
@@ -315,7 +315,7 @@ endef # pretty-check-action
 #
 # clean-action <abi>
 #
-# Steps to clean (delete) the Weave SDK final build products for the specified
+# Steps to clean (delete) the CHIP SDK final build products for the specified
 # specified Android ABI.
 #
 #   abi - The target ABI.
@@ -329,7 +329,7 @@ endef # clean-action
 # ABI_template <abi>
 #
 # Define macros, targets and rules to configure, build, and stage the
-# Weave SDK for a single Android ABI.
+# CHIP SDK for a single Android ABI.
 #
 #   abi - The architecture to instantiate the template for.
 #
@@ -443,7 +443,7 @@ $(TopResultDir) $(BUILD_DIRS):
 
 help:
 	$(ECHO) ""
-	$(ECHO) "Type 'make -f $(firstword $(MAKEFILE_LIST))' to build Weave for Android for the following" 
+	$(ECHO) "Type 'make -f $(firstword $(MAKEFILE_LIST))' to build CHIP for Android for the following" 
 	$(ECHO) "API level and ABIs: "
 	$(ECHO) ""
 	$(ECHO) "    API Level $(ANDROID_API)"
@@ -457,11 +457,11 @@ help:
 	$(ECHO) "You may want or need to override the following make variables either on the "
 	$(ECHO) "command line or in the environment: "
 	$(ECHO) ""
-	$(ECHO) "  DEBUG                   Enable Weave debug code and logging (default: $(DEBUG))."
+	$(ECHO) "  DEBUG                   Enable CHIP debug code and logging (default: $(DEBUG))."
 	$(ECHO) ""
-	$(ECHO) "  ENABLE_TARGETED_LISTEN  Enable Weave support for listening on particular "
+	$(ECHO) "  ENABLE_TARGETED_LISTEN  Enable CHIP support for listening on particular "
 	$(ECHO) "                          addresses or interfaces. This allows testing multiple "
-	$(ECHO) "                          instances of the Weave stack running on a single host "
+	$(ECHO) "                          instances of the CHIP stack running on a single host "
 	$(ECHO) "                          (default: $(ENABLE_TARGETED_LISTEN))."
 	$(ECHO) ""
 	$(ECHO) "  JAVA_HOME               Directory in which the Java runtime is located."
