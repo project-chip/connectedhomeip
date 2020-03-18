@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the OpenWeave Inet
+ *          Platform-specific configuration overrides for the Openchip Inet
  *          Layer on nRF52 platforms using the Nordic nRF5 SDK.
  *
  */

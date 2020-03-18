@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019-2020 Google LLC.
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,12 +26,11 @@
 
 #include <functional>
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "fds.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -67,63 +64,63 @@ public:
     static constexpr uint16_t kFDSRecordKeyMin                  = 0x0001; /**< Minimum value that can be used for a FDS record key (per Nordic SDK) */
     static constexpr uint16_t kFDSRecordKeyMax                  = 0xBFFF; /**< Maximum value that can be used for a FDS record key (per Nordic SDK) */
 
-    // FDS file ids used by the OpenWeave Device Layer
-    static constexpr uint16_t kFileId_WeaveFactory              = 0x235A; /**< FDS file containing persistent config values set at manufacturing time.
+    // FDS file ids used by the Openchip Device Layer
+    static constexpr uint16_t kFileId_ChipFactory              = 0x235A; /**< FDS file containing persistent config values set at manufacturing time.
                                                                            *   Retained during factory reset. */
-    static constexpr uint16_t kFileId_WeaveConfig               = 0x235B; /**< FDS file containing dynamic config values set at runtime.
+    static constexpr uint16_t kFileId_ChipConfig               = 0x235B; /**< FDS file containing dynamic config values set at runtime.
                                                                            *   Cleared during factory reset. */
-    static constexpr uint16_t kFileId_WeaveCounter              = 0x235C; /**< FDS file containing dynamic counter values set at runtime.
+    static constexpr uint16_t kFileId_ChipCounter              = 0x235C; /**< FDS file containing dynamic counter values set at runtime.
                                                                            *   Retained during factory reset. */
 
     // API data type used to represent the combination of a FDS file id and record key.
     using Key = uint32_t;
 
     // Key definitions for well-known configuration values.
-    static constexpr Key kConfigKey_SerialNum                   = NRF5ConfigKey(kFileId_WeaveFactory, 0x0001);
-    static constexpr Key kConfigKey_MfrDeviceId                 = NRF5ConfigKey(kFileId_WeaveFactory, 0x0002);
-    static constexpr Key kConfigKey_MfrDeviceCert               = NRF5ConfigKey(kFileId_WeaveFactory, 0x0003);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey         = NRF5ConfigKey(kFileId_WeaveFactory, 0x0004);
-    static constexpr Key kConfigKey_ManufacturingDate           = NRF5ConfigKey(kFileId_WeaveFactory, 0x0005);
-    static constexpr Key kConfigKey_PairingCode                 = NRF5ConfigKey(kFileId_WeaveFactory, 0x0006);
-    static constexpr Key kConfigKey_FabricId                    = NRF5ConfigKey(kFileId_WeaveConfig,  0x0007);
-    static constexpr Key kConfigKey_ServiceConfig               = NRF5ConfigKey(kFileId_WeaveConfig,  0x0008);
-    static constexpr Key kConfigKey_PairedAccountId             = NRF5ConfigKey(kFileId_WeaveConfig,  0x0009);
-    static constexpr Key kConfigKey_ServiceId                   = NRF5ConfigKey(kFileId_WeaveConfig,  0x000A);
-    static constexpr Key kConfigKey_FabricSecret                = NRF5ConfigKey(kFileId_WeaveConfig,  0x000B);
-    static constexpr Key kConfigKey_LastUsedEpochKeyId          = NRF5ConfigKey(kFileId_WeaveConfig,  0x000C);
-    static constexpr Key kConfigKey_FailSafeArmed               = NRF5ConfigKey(kFileId_WeaveConfig,  0x000D);
-    static constexpr Key kConfigKey_GroupKey                    = NRF5ConfigKey(kFileId_WeaveConfig,  0x000E);
-    static constexpr Key kConfigKey_ProductRevision             = NRF5ConfigKey(kFileId_WeaveFactory, 0x000F);
-    static constexpr Key kConfigKey_MfrDeviceICACerts           = NRF5ConfigKey(kFileId_WeaveFactory, 0x0010);
-    static constexpr Key kConfigKey_OperationalDeviceId         = NRF5ConfigKey(kFileId_WeaveConfig,  0x0011);
-    static constexpr Key kConfigKey_OperationalDeviceCert       = NRF5ConfigKey(kFileId_WeaveConfig,  0x0012);
-    static constexpr Key kConfigKey_OperationalDeviceICACerts   = NRF5ConfigKey(kFileId_WeaveConfig,  0x0013);
-    static constexpr Key kConfigKey_OperationalDevicePrivateKey = NRF5ConfigKey(kFileId_WeaveConfig,  0x0014);
+    static constexpr Key kConfigKey_SerialNum                   = NRF5ConfigKey(kFileId_ChipFactory, 0x0001);
+    static constexpr Key kConfigKey_MfrDeviceId                 = NRF5ConfigKey(kFileId_ChipFactory, 0x0002);
+    static constexpr Key kConfigKey_MfrDeviceCert               = NRF5ConfigKey(kFileId_ChipFactory, 0x0003);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey         = NRF5ConfigKey(kFileId_ChipFactory, 0x0004);
+    static constexpr Key kConfigKey_ManufacturingDate           = NRF5ConfigKey(kFileId_ChipFactory, 0x0005);
+    static constexpr Key kConfigKey_PairingCode                 = NRF5ConfigKey(kFileId_ChipFactory, 0x0006);
+    static constexpr Key kConfigKey_FabricId                    = NRF5ConfigKey(kFileId_ChipConfig,  0x0007);
+    static constexpr Key kConfigKey_ServiceConfig               = NRF5ConfigKey(kFileId_ChipConfig,  0x0008);
+    static constexpr Key kConfigKey_PairedAccountId             = NRF5ConfigKey(kFileId_ChipConfig,  0x0009);
+    static constexpr Key kConfigKey_ServiceId                   = NRF5ConfigKey(kFileId_ChipConfig,  0x000A);
+    static constexpr Key kConfigKey_FabricSecret                = NRF5ConfigKey(kFileId_ChipConfig,  0x000B);
+    static constexpr Key kConfigKey_LastUsedEpochKeyId          = NRF5ConfigKey(kFileId_ChipConfig,  0x000C);
+    static constexpr Key kConfigKey_FailSafeArmed               = NRF5ConfigKey(kFileId_ChipConfig,  0x000D);
+    static constexpr Key kConfigKey_GroupKey                    = NRF5ConfigKey(kFileId_ChipConfig,  0x000E);
+    static constexpr Key kConfigKey_ProductRevision             = NRF5ConfigKey(kFileId_ChipFactory, 0x000F);
+    static constexpr Key kConfigKey_MfrDeviceICACerts           = NRF5ConfigKey(kFileId_ChipFactory, 0x0010);
+    static constexpr Key kConfigKey_OperationalDeviceId         = NRF5ConfigKey(kFileId_ChipConfig,  0x0011);
+    static constexpr Key kConfigKey_OperationalDeviceCert       = NRF5ConfigKey(kFileId_ChipConfig,  0x0012);
+    static constexpr Key kConfigKey_OperationalDeviceICACerts   = NRF5ConfigKey(kFileId_ChipConfig,  0x0013);
+    static constexpr Key kConfigKey_OperationalDevicePrivateKey = NRF5ConfigKey(kFileId_ChipConfig,  0x0014);
 
-    // Range of FDS record keys used to store Weave persisted counter values.
+    // Range of FDS record keys used to store chip persisted counter values.
     static constexpr uint16_t kPersistedCounterRecordKeyBase    = kFDSRecordKeyMin;
-                                                                          /**< Base record key for records containing Weave persisted counter values.
-                                                                           *   The Weave counter id is added to this value to form the FDS record key.*/
+                                                                          /**< Base record key for records containing chip persisted counter values.
+                                                                           *   The chip counter id is added to this value to form the FDS record key.*/
     static constexpr uint16_t kPersistedCounterRecordKeyMax     = kFDSRecordKeyMax;
-                                                                          /**< Max record key for records containing Weave persisted counter values. */
+                                                                          /**< Max record key for records containing chip persisted counter values. */
 
-    static WEAVE_ERROR Init(void);
+    static CHIP_ERROR Init(void);
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
-    static WEAVE_ERROR ReadConfigValue(Key key, bool & val);
-    static WEAVE_ERROR ReadConfigValue(Key key, uint32_t & val);
-    static WEAVE_ERROR ReadConfigValue(Key key, uint64_t & val);
-    static WEAVE_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
-    static WEAVE_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
-    static WEAVE_ERROR WriteConfigValue(Key key, bool val);
-    static WEAVE_ERROR WriteConfigValue(Key key, uint32_t val);
-    static WEAVE_ERROR WriteConfigValue(Key key, uint64_t val);
-    static WEAVE_ERROR WriteConfigValueStr(Key key, const char * str);
-    static WEAVE_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
-    static WEAVE_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
-    static WEAVE_ERROR ClearConfigValue(Key key);
+    static CHIP_ERROR ReadConfigValue(Key key, bool & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
+    static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR WriteConfigValue(Key key, bool val);
+    static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
+    static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
+    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
+    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
+    static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
+    static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
-    static WEAVE_ERROR FactoryResetConfig(void);
+    static CHIP_ERROR FactoryResetConfig(void);
 
     static void RunConfigUnitTest(void);
 
@@ -155,7 +152,7 @@ protected:
         inline FDSAsyncOp(uint8_t opType) : OpType(opType) { }
     };
 
-    using ForEachRecordFunct = std::function<WEAVE_ERROR(const fds_flash_record_t & rec, bool & deleteRec)>;
+    using ForEachRecordFunct = std::function<CHIP_ERROR(const fds_flash_record_t & rec, bool & deleteRec)>;
 
     static constexpr uint16_t kFDSWordSize = 4;
 
@@ -164,14 +161,14 @@ protected:
 
     static constexpr uint16_t GetFileId(uint32_t key);
     static constexpr uint16_t GetRecordKey(uint32_t key);
-    static WEAVE_ERROR OpenRecord(NRF5Config::Key key, fds_record_desc_t & recDesc, fds_flash_record_t & rec);
-    static WEAVE_ERROR ForEachRecord(uint16_t fileId, uint16_t recordKey, ForEachRecordFunct funct);
-    static WEAVE_ERROR DoAsyncFDSOp(FDSAsyncOp & asyncOp);
+    static CHIP_ERROR OpenRecord(NRF5Config::Key key, fds_record_desc_t & recDesc, fds_flash_record_t & rec);
+    static CHIP_ERROR ForEachRecord(uint16_t fileId, uint16_t recordKey, ForEachRecordFunct funct);
+    static CHIP_ERROR DoAsyncFDSOp(FDSAsyncOp & asyncOp);
     static constexpr uint16_t FDSWords(size_t s);
 
 private:
     static void HandleFDSEvent(const fds_evt_t * fdsEvent);
-    static WEAVE_ERROR MapFDSError(ret_code_t fdsRes);
+    static CHIP_ERROR MapFDSError(ret_code_t fdsRes);
 };
 
 /**
@@ -200,7 +197,6 @@ inline constexpr uint16_t NRF5Config::FDSWords(size_t s)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // NRF5_CONFIG_H
