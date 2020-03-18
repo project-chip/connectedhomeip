@@ -21,6 +21,9 @@ The CHIP repository is structured as follows:
 
 | File / Folder | Contents |
 |----|----|
+| `.default-version` | Default CHIP version if none is available via source code control tags, `.dist-version`, or `.local-version`.|
+| `bootstrap` | GNU autotools bootstrap script for the CHIP build system. |
+| `bootstrap-configure` | Convenience script that will bootstrap the CHIP build system, via `bootstrap`, and invoke `configure`.|
 | `build/` | Build system support content |
 | `BUILDING.md` | More detailed information on configuring and building CHIP for different targets |
 | `CODE_OF_CONDUCT.md` | Code of Conduct for CHIP, and contributions to it |
@@ -32,9 +35,13 @@ The CHIP repository is structured as follows:
 | `integrations/github/actions` |  GitHub actions related to this project |
 | `images/` | Images |
 | `LICENSE` | CHIP License file (Apache 2.0) |
+| `Makefile-Android` | Convenience makefile for building CHIP against Android.|
+| `Makefile-iOS` | Convenience makefile for building CHIP against iOS.|
+| `Makefile-Standalone` | Convenience makefile for building CHIP as a standalone package on desktop and server systems. |
 | `README.md` | This file |
 | `src/` | Implementation of CHIP|
 | `tests/` | Tests for CHIP |
+| `third_party/` | Third-party code used by CHIP.|
 | `tools/` | Tools needed to work with the CHIP repo, as well as develop in the repository |
 
 # Third Party Tools
