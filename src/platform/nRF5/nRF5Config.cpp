@@ -1,8 +1,6 @@
 /*
  *
- *    Copyright (c) 2019-2020 Google LLC.
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,10 +23,10 @@
 
 #include <atomic>
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/nRF5/nRF5Config.h>
-#include <Weave/Core/WeaveEncoding.h>
-#include <Weave/DeviceLayer/internal/testing/ConfigUnitTest.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/nRF5/nRF5Config.h>
+#include <core/CHIPEncoding.h>
+#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"
 #include "semphr.h"
@@ -36,22 +34,21 @@
 #include "fds.h"
 #include "mem_manager.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 NRF5Config::FDSAsyncOp * volatile NRF5Config::sActiveAsyncOp;
 SemaphoreHandle_t NRF5Config::sAsyncOpCompletionSem;
 
-WEAVE_ERROR NRF5Config::Init()
+CHIP_ERROR NRF5Config::Init()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     ret_code_t fdsRes;
 
     // Create a semaphore to signal the completion of async FDS operations.
     sAsyncOpCompletionSem = xSemaphoreCreateBinary();
-    VerifyOrExit(sAsyncOpCompletionSem != NULL, err = WEAVE_ERROR_NO_MEMORY);
+    VerifyOrExit(sAsyncOpCompletionSem != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Register an FDS event handler.
     fdsRes = fds_register(HandleFDSEvent);
@@ -68,9 +65,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::ReadConfigValue(Key key, bool & val)
+CHIP_ERROR NRF5Config::ReadConfigValue(Key key, bool & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     fds_record_desc_t recDesc;
     fds_flash_record_t rec;
     uint32_t wordVal;
@@ -80,7 +77,7 @@ WEAVE_ERROR NRF5Config::ReadConfigValue(Key key, bool & val)
     SuccessOrExit(err);
     needClose = true;
 
-    VerifyOrExit(rec.p_header->length_words == 1, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(rec.p_header->length_words == 1, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     wordVal = Encoding::LittleEndian::Get32((const uint8_t *)rec.p_data);
     val = (wordVal != 0);
@@ -93,9 +90,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::ReadConfigValue(Key key, uint32_t & val)
+CHIP_ERROR NRF5Config::ReadConfigValue(Key key, uint32_t & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     fds_record_desc_t recDesc;
     fds_flash_record_t rec;
     bool needClose = false;
@@ -104,7 +101,7 @@ WEAVE_ERROR NRF5Config::ReadConfigValue(Key key, uint32_t & val)
     SuccessOrExit(err);
     needClose = true;
 
-    VerifyOrExit(rec.p_header->length_words == 1, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(rec.p_header->length_words == 1, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     val = Encoding::LittleEndian::Get32((const uint8_t *)rec.p_data);
 
@@ -116,9 +113,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::ReadConfigValue(Key key, uint64_t & val)
+CHIP_ERROR NRF5Config::ReadConfigValue(Key key, uint64_t & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     fds_record_desc_t recDesc;
     fds_flash_record_t rec;
     bool needClose = false;
@@ -127,7 +124,7 @@ WEAVE_ERROR NRF5Config::ReadConfigValue(Key key, uint64_t & val)
     SuccessOrExit(err);
     needClose = true;
 
-    VerifyOrExit(rec.p_header->length_words == 2, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(rec.p_header->length_words == 2, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     val = Encoding::LittleEndian::Get64((const uint8_t *)rec.p_data);
 
@@ -139,9 +136,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR NRF5Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     fds_flash_record_t rec;
     fds_record_desc_t recDesc;
     bool needClose = false;
@@ -152,7 +149,7 @@ WEAVE_ERROR NRF5Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     needClose = true;
 
     strEnd = (const uint8_t *)memchr(rec.p_data, 0, rec.p_header->length_words * kFDSWordSize);
-    VerifyOrExit(strEnd != NULL, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(strEnd != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     outLen = strEnd - (const uint8_t *)rec.p_data;
 
@@ -161,7 +158,7 @@ WEAVE_ERROR NRF5Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 
     if (buf != NULL)
     {
-        VerifyOrExit(bufSize > outLen, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(bufSize > outLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
         memcpy(buf, rec.p_data, outLen + 1);
     }
@@ -174,9 +171,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR NRF5Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     fds_flash_record_t rec;
     fds_record_desc_t recDesc;
     bool needClose = false;
@@ -185,19 +182,19 @@ WEAVE_ERROR NRF5Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
     SuccessOrExit(err);
     needClose = true;
 
-    VerifyOrExit(rec.p_header->length_words >= 1, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(rec.p_header->length_words >= 1, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // First two bytes are length.
     outLen = Encoding::LittleEndian::Get16((const uint8_t *)rec.p_data);
 
-    VerifyOrExit((rec.p_header->length_words * kFDSWordSize) >= (outLen + 2), err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((rec.p_header->length_words * kFDSWordSize) >= (outLen + 2), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // NOTE: the caller is allowed to pass NULL for buf to query the length of the stored
     // value.
 
     if (buf != NULL)
     {
-        VerifyOrExit(bufSize >= outLen, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(bufSize >= outLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
         memcpy(buf, ((const uint8_t *)rec.p_data) + 2, outLen);
     }
@@ -210,9 +207,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::WriteConfigValue(Key key, bool val)
+CHIP_ERROR NRF5Config::WriteConfigValue(Key key, bool val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint32_t storedVal = (val) ? 1 : 0;
 
     FDSAsyncOp addOrUpdateOp(FDSAsyncOp::kAddOrUpdateRecord);
@@ -224,15 +221,15 @@ WEAVE_ERROR NRF5Config::WriteConfigValue(Key key, bool val)
     err = DoAsyncFDSOp(addOrUpdateOp);
     SuccessOrExit(err);
 
-    WeaveLogProgress(DeviceLayer, "FDS set: %04" PRIX16 "/%04" PRIX16 " = %s", GetFileId(key), GetRecordKey(key), val ? "true" : "false");
+    ChipLogProgress(DeviceLayer, "FDS set: %04" PRIX16 "/%04" PRIX16 " = %s", GetFileId(key), GetRecordKey(key), val ? "true" : "false");
 
 exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::WriteConfigValue(Key key, uint32_t val)
+CHIP_ERROR NRF5Config::WriteConfigValue(Key key, uint32_t val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     FDSAsyncOp addOrUpdateOp(FDSAsyncOp::kAddOrUpdateRecord);
     addOrUpdateOp.FileId = GetFileId(key);
@@ -243,15 +240,15 @@ WEAVE_ERROR NRF5Config::WriteConfigValue(Key key, uint32_t val)
     err = DoAsyncFDSOp(addOrUpdateOp);
     SuccessOrExit(err);
 
-    WeaveLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = %" PRIu32 " (0x%" PRIX32 ")", GetFileId(key), GetRecordKey(key), val, val);
+    ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = %" PRIu32 " (0x%" PRIX32 ")", GetFileId(key), GetRecordKey(key), val, val);
 
 exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::WriteConfigValue(Key key, uint64_t val)
+CHIP_ERROR NRF5Config::WriteConfigValue(Key key, uint64_t val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     FDSAsyncOp addOrUpdateOp(FDSAsyncOp::kAddOrUpdateRecord);
     addOrUpdateOp.FileId = GetFileId(key);
@@ -262,20 +259,20 @@ WEAVE_ERROR NRF5Config::WriteConfigValue(Key key, uint64_t val)
     err = DoAsyncFDSOp(addOrUpdateOp);
     SuccessOrExit(err);
 
-    WeaveLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = %" PRIu64 " (0x%" PRIX64 ")", GetFileId(key), GetRecordKey(key), val, val);
+    ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = %" PRIu64 " (0x%" PRIX64 ")", GetFileId(key), GetRecordKey(key), val, val);
 
 exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str)
+CHIP_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str)
 {
     return WriteConfigValueStr(key, str, (str != NULL) ? strlen(str) : 0);
 }
 
-WEAVE_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
+CHIP_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint8_t * storedVal = NULL;
 
     if (str != NULL)
@@ -283,7 +280,7 @@ WEAVE_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str, size_t st
         uint32_t storedValWords = FDSWords(strLen + 1);
 
         storedVal = (uint8_t *)nrf_malloc(storedValWords * kFDSWordSize);
-        VerifyOrExit(storedVal != NULL, err = WEAVE_ERROR_NO_MEMORY);
+        VerifyOrExit(storedVal != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         memcpy(storedVal, str, strLen);
         storedVal[strLen] = 0;
@@ -297,7 +294,7 @@ WEAVE_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str, size_t st
         err = DoAsyncFDSOp(addOrUpdateOp);
         SuccessOrExit(err);
 
-        WeaveLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = \"%s\"", GetFileId(key), GetRecordKey(key), (const char *)storedVal);
+        ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = \"%s\"", GetFileId(key), GetRecordKey(key), (const char *)storedVal);
     }
 
     else
@@ -314,9 +311,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR NRF5Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     uint8_t * storedVal = NULL;
 
     if (data != NULL)
@@ -324,7 +321,7 @@ WEAVE_ERROR NRF5Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
         uint32_t storedValWords = FDSWords(dataLen + 2);
 
         storedVal = (uint8_t *)nrf_malloc(storedValWords * kFDSWordSize);
-        VerifyOrExit(storedVal != NULL, err = WEAVE_ERROR_NO_MEMORY);
+        VerifyOrExit(storedVal != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         // First two bytes encode the length.
         Encoding::LittleEndian::Put16(storedVal, (uint16_t)dataLen);
@@ -340,7 +337,7 @@ WEAVE_ERROR NRF5Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
         err = DoAsyncFDSOp(addOrUpdateOp);
         SuccessOrExit(err);
 
-        WeaveLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = (blob length %" PRId32 ")", GetFileId(key), GetRecordKey(key), dataLen);
+        ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = (blob length %" PRId32 ")", GetFileId(key), GetRecordKey(key), dataLen);
     }
 
     else
@@ -357,9 +354,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::ClearConfigValue(Key key)
+CHIP_ERROR NRF5Config::ClearConfigValue(Key key)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     FDSAsyncOp delOp(FDSAsyncOp::kDeleteRecordByKey);
     delOp.FileId = GetFileId(key);
@@ -368,7 +365,7 @@ WEAVE_ERROR NRF5Config::ClearConfigValue(Key key)
     err = DoAsyncFDSOp(delOp);
     SuccessOrExit(err);
 
-    WeaveLogProgress(DeviceLayer, "FDS delete: 0x%04" PRIX16 "/0x%04" PRIX16, GetFileId(key), GetRecordKey(key));
+    ChipLogProgress(DeviceLayer, "FDS delete: 0x%04" PRIX16 "/0x%04" PRIX16, GetFileId(key), GetRecordKey(key));
 
 exit:
     return err;
@@ -388,17 +385,17 @@ bool NRF5Config::ConfigValueExists(Key key)
     return fdsRes == FDS_SUCCESS;
 }
 
-WEAVE_ERROR NRF5Config::FactoryResetConfig(void)
+CHIP_ERROR NRF5Config::FactoryResetConfig(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-    // Delete the WeaveConfig file and all records its contains.
+    // Delete the chipConfig file and all records its contains.
     {
         FDSAsyncOp delOp(FDSAsyncOp::kDeleteFile);
-        delOp.FileId = kFileId_WeaveConfig;
+        delOp.FileId = kFileId_ChipConfig;
         err = DoAsyncFDSOp(delOp);
         SuccessOrExit(err);
-        WeaveLogProgress(DeviceLayer, "FDS delete file: 0x%04" PRIX16, kFileId_WeaveConfig);
+        ChipLogProgress(DeviceLayer, "FDS delete file: 0x%04" PRIX16, kFileId_ChipConfig);
     }
 
     // Force a GC
@@ -412,21 +409,21 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::MapFDSError(ret_code_t fdsRes)
+CHIP_ERROR NRF5Config::MapFDSError(ret_code_t fdsRes)
 {
-    return (fdsRes == FDS_SUCCESS) ? WEAVE_NO_ERROR : WEAVE_DEVICE_CONFIG_NRF5_FDS_ERROR_MIN + fdsRes;
+    return (fdsRes == FDS_SUCCESS) ? CHIP_NO_ERROR : CHIP_DEVICE_CONFIG_NRF5_FDS_ERROR_MIN + fdsRes;
 }
 
-WEAVE_ERROR NRF5Config::OpenRecord(NRF5Config::Key key, fds_record_desc_t & recDesc, fds_flash_record_t & rec)
+CHIP_ERROR NRF5Config::OpenRecord(NRF5Config::Key key, fds_record_desc_t & recDesc, fds_flash_record_t & rec)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     ret_code_t fdsRes;
     fds_find_token_t findToken;
 
     // Search for the requested record.  Return "CONFIG_NOT_FOUND" if it doesn't exist.
     memset(&findToken, 0, sizeof(findToken));
     fdsRes = fds_record_find(NRF5Config::GetFileId(key), NRF5Config::GetRecordKey(key), &recDesc, &findToken);
-    err = (fdsRes == FDS_ERR_NOT_FOUND) ? WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND : MapFDSError(fdsRes);
+    err = (fdsRes == FDS_ERR_NOT_FOUND) ? CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND : MapFDSError(fdsRes);
     SuccessOrExit(err);
 
     // Open the record for reading.
@@ -438,9 +435,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::ForEachRecord(uint16_t fileId, uint16_t recordKey, ForEachRecordFunct funct)
+CHIP_ERROR NRF5Config::ForEachRecord(uint16_t fileId, uint16_t recordKey, ForEachRecordFunct funct)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;;
+    CHIP_ERROR err = CHIP_NO_ERROR;;
     ret_code_t fdsRes;
     fds_find_token_t findToken;
     fds_record_desc_t recDesc;
@@ -498,9 +495,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR NRF5Config::DoAsyncFDSOp(FDSAsyncOp & asyncOp)
+CHIP_ERROR NRF5Config::DoAsyncFDSOp(FDSAsyncOp & asyncOp)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     ret_code_t fdsRes;
     fds_record_t rec;
     bool gcPerformed = false;
@@ -561,7 +558,7 @@ WEAVE_ERROR NRF5Config::DoAsyncFDSOp(FDSAsyncOp & asyncOp)
             // If performing a kDeleteRecordByKey and no matching record was found, simply return success.
             if (!existingRecFound)
             {
-                ExitNow(err = WEAVE_NO_ERROR);
+                ExitNow(err = CHIP_NO_ERROR);
             }
             // fall through...
         case FDSAsyncOp::kDeleteRecord:
@@ -579,7 +576,7 @@ WEAVE_ERROR NRF5Config::DoAsyncFDSOp(FDSAsyncOp & asyncOp)
             fdsRes = FDS_SUCCESS;
             break;
         default:
-            WeaveDie();
+            ChipDie();
         }
 
         // If the operation was queued successfully, wait for it to complete and retrieve the result.
@@ -607,7 +604,7 @@ WEAVE_ERROR NRF5Config::DoAsyncFDSOp(FDSAsyncOp & asyncOp)
         // Return immediately if the operation completed successfully.
         if (fdsRes == FDS_SUCCESS)
         {
-            ExitNow(err = WEAVE_NO_ERROR);
+            ExitNow(err = CHIP_NO_ERROR);
         }
 
         // If the operation failed for lack of flash space...
@@ -619,7 +616,7 @@ WEAVE_ERROR NRF5Config::DoAsyncFDSOp(FDSAsyncOp & asyncOp)
                 ExitNow(err = MapFDSError(fdsRes));
             }
 
-            WeaveLogProgress(DeviceLayer, "Initiating FDS GC to recover space");
+            ChipLogProgress(DeviceLayer, "Initiating FDS GC to recover space");
 
             // Request a garbage collection cycle and wait for it to complete.
             FDSAsyncOp gcOp(FDSAsyncOp::kGC);
@@ -715,7 +712,7 @@ void NRF5Config::HandleFDSEvent(const fds_evt_t * fdsEvent)
     // Mark the operation as complete.
     sActiveAsyncOp = NULL;
 
-    // Signal the Weave thread that the operation has completed.
+    // Signal the chip thread that the operation has completed.
 #if defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
 
     // When using the Nodic SoftDevice, HandleFDSEvent() is called in a SoftDevice interrupt
@@ -739,10 +736,10 @@ void NRF5Config::HandleFDSEvent(const fds_evt_t * fdsEvent)
 
 void NRF5Config::RunConfigUnitTest()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     // Run common unit test
-    ::nl::Weave::DeviceLayer::Internal::RunConfigUnitTest<NRF5Config>();
+    ::chip::DeviceLayer::Internal::RunConfigUnitTest<NRF5Config>();
 
     // NRF Config Test 1 -- Force GC
     {
@@ -771,13 +768,13 @@ void NRF5Config::RunConfigUnitTest()
         for (int i = 0; i < 100; i++)
         {
             err = WriteConfigValueBin(kConfigKey_MfrDeviceCert, kTestData, sizeof(kTestData));
-            VerifyOrDie(err == WEAVE_NO_ERROR);
+            VerifyOrDie(err == CHIP_NO_ERROR);
 
             vTaskDelay(pdMS_TO_TICKS(50));
         }
 
         err = ReadConfigValueBin(kConfigKey_MfrDeviceCert, buf, sizeof(buf), dataLen);
-        VerifyOrDie(err == WEAVE_NO_ERROR);
+        VerifyOrDie(err == CHIP_NO_ERROR);
 
         VerifyOrDie(dataLen == sizeof(kTestData));
         VerifyOrDie(memcmp(buf, kTestData, dataLen) == 0);
@@ -788,5 +785,4 @@ void NRF5Config::RunConfigUnitTest()
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

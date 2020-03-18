@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,24 +17,24 @@
 
 /**
  *    @file
- *          Provides implementations for the Weave entropy sourcing functions
+ *          Provides implementations for the chip entropy sourcing functions
  *          on the Nordic nRF52 platforms.
  */
 
 //
 // !!!TEMPORARY CODE!!!
 //
-// The following code is a temporary implementation of the OpenWeave Entropy APIs
+// The following code is a temporary implementation of the CHIP Entropy APIs
 // that has been specially designed to work around the lack of thread-safety in the
 // Nordic port of OpenThread.
 //
 // In Nordic's OpenThread platform implementation, the code assumes it has exclusive
 // access to the underlying entropy source.  In a multi-threaded environment such as
-// an OpenWeave application this precludes code running in other threads from directly
+// an CHIP application this precludes code running in other threads from directly
 // sourcing entropy.
 //
 // To work around this, the code here acquires the OpenThread stack lock before interacting
-// with the entropy source, effectively blocking all OpenThread activity until OpenWeave
+// with the entropy source, effectively blocking all OpenThread activity until CHIP
 // has acquired its entropy. Because the entropy is being fed into a DRBG, which then feeds
 // the application, this should happen extremely rarely.
 //
@@ -43,8 +42,8 @@
 // provided by Nordic.
 //
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Support/crypto/WeaveRNG.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/crypto/CHIPRNG.h>
 
 #if SOFTDEVICE_PRESENT
 #include <nrf_soc.h>
@@ -52,22 +51,20 @@
 #include <openthread/platform/random.h>
 #endif
 
-using namespace ::nl;
-using namespace ::nl::Weave;
+using namespace ::chip;
 
-#if !WEAVE_CONFIG_RNG_IMPLEMENTATION_NESTDRBG
-#error "Nest DRBG implementation must be enabled on nRF5 platforms"
-#endif // !WEAVE_CONFIG_RNG_IMPLEMENTATION_NESTDRBG
+#if !CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
+#error "CHIP DRBG implementation must be enabled on nRF5 platforms"
+#endif // !CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 /**
  * Retrieve entropy from the underlying RNG source.
  *
- * This function is called by the Nest DRBG to acquire entropy.
+ * This function is called by the CHIP DRBG to acquire entropy.
  */
 int GetEntropy_nRF5(uint8_t * buf, size_t count)
 {
@@ -77,12 +74,12 @@ int GetEntropy_nRF5(uint8_t * buf, size_t count)
 
     // If OpenThread is active, acquire the stack lock to prevent the
     // OpenThread task from interacting with the entropy source.
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ThreadStackManagerImpl::IsInitialized())
     {
         ThreadStackMgr().LockThreadStack();
     }
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if SOFTDEVICE_PRESENT
 
@@ -125,21 +122,21 @@ int GetEntropy_nRF5(uint8_t * buf, size_t count)
 
 #endif // SOFTDEVICE_PRESENT
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ThreadStackManagerImpl::IsInitialized())
     {
         ThreadStackMgr().UnlockThreadStack();
     }
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     return res;
 }
 
-WEAVE_ERROR InitEntropy()
+CHIP_ERROR InitEntropy()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
-    // Initialize the Nest DRBG.
+    // Initialize the CHIP DRBG.
     err = Platform::Security::InitSecureRandomDataSource(GetEntropy_nRF5, 64, NULL, 0);
     SuccessOrExit(err);
 
@@ -152,14 +149,13 @@ WEAVE_ERROR InitEntropy()
     }
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        WeaveLogError(Crypto, "InitEntropy() failed: 0x%08" PRIX32, err);
+        ChipLogError(Crypto, "InitEntropy() failed: 0x%08" PRIX32, err);
     }
     return err;
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

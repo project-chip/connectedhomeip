@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,11 +20,10 @@
  *          Utilities for working with the Nordic nRF5 SDK.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/nRF5/nRF5Utils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/nRF5/nRF5Utils.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -59,12 +57,12 @@ bool FormatNRFError(char * buf, uint16_t bufSize, int32_t err)
 {
     const char * subsys = NULL;
 
-    if (err >= WEAVE_DEVICE_CONFIG_NRF5_ERROR_MIN && err <= WEAVE_DEVICE_CONFIG_NRF5_ERROR_MAX)
+    if (err >= CHIP_DEVICE_CONFIG_NRF5_ERROR_MIN && err <= CHIP_DEVICE_CONFIG_NRF5_ERROR_MAX)
     {
         subsys = "nRF";
     }
 
-    else if (err >= WEAVE_DEVICE_CONFIG_NRF5_FDS_ERROR_MIN && err <= WEAVE_DEVICE_CONFIG_NRF5_FDS_ERROR_MAX)
+    else if (err >= CHIP_DEVICE_CONFIG_NRF5_FDS_ERROR_MIN && err <= CHIP_DEVICE_CONFIG_NRF5_FDS_ERROR_MAX)
     {
         subsys = "nRF-FDS";
     }
@@ -74,7 +72,7 @@ bool FormatNRFError(char * buf, uint16_t bufSize, int32_t err)
         return false;
     }
 
-    nl::FormatError(buf, bufSize, subsys, err, NULL);
+    FormatError(buf, bufSize, subsys, err, NULL);
 
     return true;
 }
@@ -82,6 +80,5 @@ bool FormatNRFError(char * buf, uint16_t bufSize, int32_t err)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
