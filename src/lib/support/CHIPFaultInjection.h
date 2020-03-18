@@ -28,7 +28,7 @@
 #include <core/CHIPTimeConfig.h>
 #include <core/CHIPTunnelConfig.h>
 
-#if CHIP_CONFIG_TEST && CHIP_CONFIG_FAULT_INJECTION
+#if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 
 #include <nlfaultinjection.hpp>
 
@@ -99,7 +99,7 @@ typedef enum
     kFault_NumItems,
 } Id;
 
-DLL_EXPORT FaultInjection::Manager &GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager &GetManager(void);
 
 /**
  * The number of ways in which chip Fault Injection fuzzers can

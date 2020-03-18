@@ -32,6 +32,10 @@ CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES                  = \
     @top_builddir@/src/system/SystemStats.cpp           \
     $(NULL)
 
+if CHIP_WITH_NLFAULTINJECTION
+CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES += @top_builddir@/src/system/SystemFaultInjection.cpp
+endif # CHIP_WITH_NLFAULTINJECTION
+
 CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES                  = \
     SystemAlignSize.h                                   \
     SystemClock.h                                       \

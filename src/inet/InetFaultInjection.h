@@ -25,7 +25,7 @@
 
 #include <InetConfig.h>
 
-#if INET_CONFIG_TEST && CHIP_CONFIG_FAULT_INJECTION
+#if INET_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 
 #include <nlfaultinjection.hpp>
 
@@ -52,7 +52,7 @@ typedef enum
     kFault_NumItems,
 } InetFaultInjectionID;
 
-DLL_EXPORT FaultInjection::Manager &GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager &GetManager(void);
 
 } // namespace FaultInjection
 } // namespace Inet

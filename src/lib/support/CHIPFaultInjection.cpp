@@ -25,17 +25,17 @@
 
 #include <support/CHIPFaultInjection.h>
 
-#if CHIP_CONFIG_TEST && CHIP_CONFIG_FAULT_INJECTION
+#if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 
 namespace chip {
 namespace FaultInjection {
 
-static FaultInjection::Record sFaultRecordArray[kFault_NumItems];
+static nl::FaultInjection::Record sFaultRecordArray[kFault_NumItems];
 static int32_t sFault_WDMNotificationSize_Arguments[1];
 static int32_t sFault_FuzzExchangeHeader_Arguments[1];
-static class FaultInjection::Manager schipFaultInMgr;
-static const FaultInjection::Name sManagerName  = "chip";
-static const FaultInjection::Name sFaultNames[] = {
+static class nl::FaultInjection::Manager schipFaultInMgr;
+static const nl::FaultInjection::Name sManagerName  = "chip";
+static const nl::FaultInjection::Name sFaultNames[] = {
     "AllocExchangeContext",
     "DropIncomingUDPMsg",
     "DropOutgoingUDPMsg",
@@ -86,7 +86,7 @@ static const FaultInjection::Name sFaultNames[] = {
 /**
  * Get the singleton FaultInjection::Manager for Inet faults
  */
-FaultInjection::Manager & GetManager(void)
+nl::FaultInjection::Manager & GetManager(void)
 {
     if (0 == schipFaultInMgr.GetNumFaults())
     {
