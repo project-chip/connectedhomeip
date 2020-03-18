@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-#    Copyright 2019 Google LLC. All Rights Reserved.
+#    Copyright 2019-2020 Google LLC. All Rights Reserved.
 #    Copyright 2014-2017 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,15 +29,15 @@
 # Display program usage.
 #
 usage() {
-    name=`basename $0`
+    name="$(basename "${0}")"
 
     echo "Usage: ${name} [ options ] [ -w <what> ]"
 
-    if [ $1 -ne 0 ]; then
+    if [ "${1}" -ne 0 ]; then
         echo "Try '${name} -h' for more information."
     fi
 
-    if [ $1 -ne 1 ]; then
+    if [ "${1}" -ne 1 ]; then
         echo ""
         echo "  -h, --help       Print this help, then exit."
         echo "  -I DIR           Specify directory DIR as the root of the "
@@ -49,7 +49,7 @@ usage() {
         echo ""
     fi
 
-    exit $1
+    exit "${1}"
 }
 
 #
@@ -68,32 +68,39 @@ check_required_executable() {
     if [ -z "${path}" ]; then
         echo "${stem} could not be found."
 
-        eval "${output}"="no"
+        eval "${output}=no"
 
         return 1
     elif [ ! -e "${path}" ] || [ ! -x "${path}" ]; then
         stem="${stem} at '${path}'"
 
-        if [ ! -e ${path} ]; then
+        if [ ! -e "${path}" ]; then
             echo "${stem} does not exist."
-        elif [ ! -x ${path} ]; then
+        elif [ ! -x "${path}" ]; then
             echo "${stem} is not executable."
         fi
 
         echo "Please ensure '${name}' is available in PATH."
 
-	eval "${output}"="no"
+	eval "${output}=no"
 
         return 1
     fi
 
-    eval "${output}"="yes"
+    eval "${output}=yes"
 
     return 0
 }
 
 check_required_executables()
 {
+    local have_aclocal
+    local have_autoconf
+    local have_autoheader
+    local have_automake
+    local have_libtoolize
+    local have_m4
+
     check_required_executable ACLOCAL aclocal have_aclocal
     check_required_executable AUTOCONF autoconf have_autoconf
     check_required_executable AUTOHEADER autoheader have_autoheader
@@ -199,8 +206,8 @@ fi
 
 # Establish some key directories
 
-srcdir=`dirname ${0}`
-abs_srcdir=`pwd`
+srcdir="$(dirname "${0}")"
+abs_srcdir="$(cd "${srcdir}" && pwd)"
 abs_top_srcdir="${abs_srcdir}"
 
 abs_top_hostdir="${nlbuild_autotools_dir}/tools/host"
@@ -209,7 +216,7 @@ abs_top_hostdir="${nlbuild_autotools_dir}/tools/host"
 # any trailing version number information typically included on Darwin
 # / Mac OS X.
 
-host=`${nlbuild_autotools_dir}/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$//g'`
+host="$("${nlbuild_autotools_dir}/third_party/autoconf/config.guess" | sed -e 's/[[:digit:].]*$//g')"
 
 # If possible, attempt to be self-sufficient, relying on GNU autotools
 # executables installed along with the SDK itself.
@@ -222,13 +229,21 @@ if [ -d "${abs_top_hostdir}/bin" ]; then
     export PATH="${abs_top_hostdir}/bin:${PATH}"
 fi
 
-export ACLOCAL=`which aclocal`
-export AUTOCONF="`which autoconf`"
-export AUTOHEADER="`which autoheader`"
-export AUTOM4TE="`which autom4te`"
-export AUTOMAKE="`which automake`"
-export LIBTOOLIZE="`which libtoolize || which glibtoolize`"
-export M4=`which m4`
+ACLOCAL="$(command -v aclocal)"
+AUTOCONF="$(command -v autoconf)"
+AUTOHEADER="$(command -v autoheader)"
+AUTOM4TE="$(command -v autom4te)"
+AUTOMAKE="$(command -v automake)"
+LIBTOOLIZE="$(command -v libtoolize || command -v glibtoolize)"
+M4="$(command -v m4)"
+
+export ACLOCAL
+export AUTOCONF
+export AUTOHEADER
+export AUTOM4TE
+export AUTOMAKE
+export LIBTOOLIZE
+export M4
 
 # Establish, if necessary, some SDK-specific directories needed to
 # override various paths in GNU autotools that otherwise expect to be
@@ -261,9 +276,9 @@ fi
 # overridden. Consequently, we create temporary, local versions of
 # these, patched up with SDK-specific paths.
 
-BOOTSTRAP_TMPDIR="`mktemp -d /tmp/tmp.bootstrapXXXXXX`"
+BOOTSTRAP_TMPDIR="$(mktemp -d /tmp/tmp.bootstrapXXXXXX)"
 
-trap "removetmp" 1 2 3 9 15
+trap "removetmp" 1 2 3 15
 
 #
 # Generate any temporary files that need to be patched at run time
