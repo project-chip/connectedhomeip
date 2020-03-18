@@ -37,6 +37,7 @@ libCHIP_a_CPPFLAGS                  =                         \
     -I$(top_srcdir)/src/inet                                  \
     -I$(top_srcdir)/src/lib                                   \
     -I$(top_srcdir)/src/lib/core                              \
+    -I$(top_srcdir)/src/lib/support                           \
     -I$(top_srcdir)/src/system                                \
     $(LWIP_CPPFLAGS)                                          \
     $(SOCKETS_CPPFLAGS)                                       \
