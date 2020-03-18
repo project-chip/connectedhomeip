@@ -41,3 +41,7 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
     support/Base64.h                                        \
     support/RandUtils.h                                     \
     $(NULL)
+
+if CHIP_WITH_NLFAULTINJECTION
+CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES += @top_builddir@/src/lib/support/CHIPFaultInjection.cpp
+endif # CHIP_WITH_NLFAULTINJECTION

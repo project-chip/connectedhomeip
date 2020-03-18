@@ -32,9 +32,9 @@ namespace chip {
 namespace System {
 namespace FaultInjection {
 
-using ::FaultInjection::Manager;
-using ::FaultInjection::Name;
-using ::FaultInjection::Record;
+using nl::FaultInjection::Manager;
+using nl::FaultInjection::Name;
+using nl::FaultInjection::Record;
 
 static Record sFaultRecordArray[kFault_NumberOfFaultIdentifiers];
 static Manager sManager;

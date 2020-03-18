@@ -25,7 +25,7 @@
 
 #include <SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_TEST && CHIP_CONFIG_FAULT_INJECTION
+#if CHIP_SYSTEM_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 
 #include <nlfaultinjection.hpp>
 
@@ -35,7 +35,7 @@ namespace chip {
 namespace System {
 namespace FaultInjection {
 
-using ::FaultInjection::Manager;
+using nl::FaultInjection::Manager;
 
 /**
  * @brief   Fault injection points
@@ -54,7 +54,7 @@ typedef enum
     kFault_NumberOfFaultIdentifiers,
 } Id;
 
-DLL_EXPORT Manager& GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager& GetManager(void);
 
 /**
  * Callback to the application that returns how many asynchronous events the application could
