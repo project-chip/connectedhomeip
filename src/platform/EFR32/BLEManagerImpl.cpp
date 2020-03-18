@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,37 +21,36 @@
  *          for the Silicon Labs EFR32 platforms.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/internal/BLEManager.h>
-#include <BleLayer/WeaveBleServiceData.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/BLEManager.h>
+#include <BleLayer/CHIPBleServiceData.h>
 #include <new>
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WOBLE
 
-#include <Weave/DeviceLayer/EFR32/freertos_bluetooth.h>
+#include <platform/EFR32/freertos_bluetooth.h>
 #include "rtos_gecko.h"
 
-using namespace ::nl;
-using namespace ::nl::Ble;
+using namespace ::chip;
+using namespace ::chip::Ble;
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 namespace {
 
-#define WEAVE_ADV_DATA_TYPE_FLAGS 0x01
-#define WEAVE_ADV_DATA_TYPE_UUID 0x03
-#define WEAVE_ADV_DATA_TYPE_NAME 0x09
-#define WEAVE_ADV_DATA_TYPE_SERVICE_DATA 0x16
+#define CHIP_ADV_DATA_TYPE_FLAGS 0x01
+#define CHIP_ADV_DATA_TYPE_UUID 0x03
+#define CHIP_ADV_DATA_TYPE_NAME 0x09
+#define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
 
-#define WEAVE_ADV_DATA_FLAGS 0x06
-#define WEAVE_ADV_WOBLE_SERVICE_HANDLE 0
+#define CHIP_ADV_DATA_FLAGS 0x06
+#define CHIP_ADV_WOBLE_SERVICE_HANDLE 0
 
-#define WEAVE_ADV_DATA 0
-#define WEAVE_ADV_SCAN_RESPONSE_DATA 1
-#define WEAVE_ADV_SHORT_UUID_LEN 2
+#define CHIP_ADV_DATA 0
+#define CHIP_ADV_SCAN_RESPONSE_DATA 1
+#define CHIP_ADV_SHORT_UUID_LEN 2
 
 #define MAX_RESPONSE_DATA_LEN 31
 #define MAX_ADV_DATA_LEN 31
@@ -72,9 +70,9 @@ static gecko_configuration_t config;
 const uint8_t      UUID_WoBLEService[]      = {0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                      0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00};
 const uint8_t      ShortUUID_WoBLEService[] = {0xAF, 0xFE};
-const WeaveBleUUID WeaveUUID_WoBLEChar_RX   = {
+const ChipBleUUID ChipUUID_WoBLEChar_RX   = {
     {0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x11}};
-const WeaveBleUUID WeaveUUID_WoBLEChar_TX = {
+const ChipBleUUID ChipUUID_WoBLEChar_TX = {
     {0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x12}};
 
 } // namespace
@@ -125,12 +123,12 @@ static void initBleConfig(void)
     config.mbedtls.dev_number = 0;
 }
 
-WEAVE_ERROR BLEManagerImpl::_Init()
+CHIP_ERROR BLEManagerImpl::_Init()
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     errorcode_t ret;
 
-    // Initialize the Weave BleLayer.
+    // Initialize the Chip BleLayer.
     err = BleLayer::Init(this, this, &SystemLayer);
     SuccessOrExit(err);
 
@@ -141,18 +139,18 @@ WEAVE_ERROR BLEManagerImpl::_Init()
     initBleConfig();
 
     // Start Bluetooth Link Layer and stack tasks
-    ret = bluetooth_start(WEAVE_DEVICE_CONFIG_BLE_LL_TASK_PRIORITY, WEAVE_DEVICE_CONFIG_BLE_STACK_TASK_PRIORITY,
-                          initialize_bluetooth); 
+    ret = bluetooth_start(CHIP_DEVICE_CONFIG_BLE_LL_TASK_PRIORITY, CHIP_DEVICE_CONFIG_BLE_STACK_TASK_PRIORITY,
+                          initialize_bluetooth);
 
     VerifyOrExit(ret == bg_err_success, err = MapBLEError(ret));
 
     // Create the Bluetooth Application task
     xTaskCreate(bluetoothStackEventHandler,            /* Function that implements the task. */
-                WEAVE_DEVICE_CONFIG_BLE_APP_TASK_NAME, /* Text name for the task. */
-                WEAVE_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE /
+                CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME, /* Text name for the task. */
+                CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE /
                     sizeof(StackType_t),                   /* Number of indexes in the xStack array. */
                 this,                                      /* Parameter passed into the task. */
-                WEAVE_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY, /* Priority at which the task is created. */
+                CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY, /* Priority at which the task is created. */
                 NULL);                                     /* Variable to hold the task's data structure. */
 
     mFlags = kFlag_AdvertisingEnabled;
@@ -195,9 +193,9 @@ void BLEManagerImpl::bluetoothStackEventHandler(void *p_arg)
             flags &= ~BLUETOOTH_EVENT_FLAG_EVT_WAITING;
             xEventGroupClearBits(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_EVT_WAITING);
 
-            // As this is running in a separate thread, we need to block Weave from operating,
+            // As this is running in a separate thread, we need to block Chip from operating,
             // until the events are handled.
-            PlatformMgr().LockWeaveStack();
+            PlatformMgr().LockChipStack();
 
             // handle bluetooth events
             switch (BGLIB_MSG_ID(bluetooth_evt->header))
@@ -265,24 +263,24 @@ void BLEManagerImpl::bluetoothStackEventHandler(void *p_arg)
             break;
 
             default:
-                WeaveLogProgress(DeviceLayer, "evt_UNKNOWN id = %08x", BGLIB_MSG_ID(bluetooth_evt->header));
+                ChipLogProgress(DeviceLayer, "evt_UNKNOWN id = %08x", BGLIB_MSG_ID(bluetooth_evt->header));
                 break;
             }
         }
 
-        PlatformMgr().UnlockWeaveStack();
+        PlatformMgr().UnlockChipStack();
 
         flags = vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_EVT_HANDLED, NULL);
     }
 }
 
-WEAVE_ERROR BLEManagerImpl::_SetWoBLEServiceMode(WoBLEServiceMode val)
+CHIP_ERROR BLEManagerImpl::_SetWoBLEServiceMode(WoBLEServiceMode val)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(val != ConnectivityManager::kWoBLEServiceMode_NotSupported, err = WEAVE_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(val != ConnectivityManager::kWoBLEServiceMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mServiceMode != ConnectivityManager::kWoBLEServiceMode_NotSupported,
-                 err = WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE);
+                 err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (val != mServiceMode)
     {
@@ -294,12 +292,12 @@ exit:
     return err;
 }
 
-WEAVE_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mServiceMode != ConnectivityManager::kWoBLEServiceMode_NotSupported,
-                 err = WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE);
+                 err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
     {
@@ -311,12 +309,12 @@ exit:
     return err;
 }
 
-WEAVE_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mServiceMode == ConnectivityManager::kWoBLEServiceMode_NotSupported,
-                 err = WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE);
+                 err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (GetFlag(mFlags, kFlag_FastAdvertisingEnabled) != val)
     {
@@ -328,50 +326,50 @@ exit:
     return err;
 }
 
-WEAVE_ERROR BLEManagerImpl::_GetDeviceName(char *buf, size_t bufSize)
+CHIP_ERROR BLEManagerImpl::_GetDeviceName(char *buf, size_t bufSize)
 {
     if (strlen(mDeviceName) >= bufSize)
     {
-        return WEAVE_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     strcpy(buf, mDeviceName);
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-WEAVE_ERROR BLEManagerImpl::_SetDeviceName(const char *deviceName)
+CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char *deviceName)
 {
     if (mServiceMode == ConnectivityManager::kWoBLEServiceMode_NotSupported)
     {
-        return WEAVE_ERROR_UNSUPPORTED_WEAVE_FEATURE;
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
     if (deviceName != NULL && deviceName[0] != 0)
     {
         if (strlen(deviceName) >= kMaxDeviceNameLength)
         {
-            return WEAVE_ERROR_INVALID_ARGUMENT;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         strcpy(mDeviceName, deviceName);
         SetFlag(mFlags, kFlag_DeviceNameSet, true);
-        WeaveLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
+        ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
         gecko_cmd_gatt_server_write_attribute_value(gattdb_device_name, 0, strlen(deviceName), (uint8_t *)deviceName);
     }
     else
     {
         mDeviceName[0] = 0;
     }
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::_OnPlatformEvent(const WeaveDeviceEvent *event)
+void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent *event)
 {
     switch (event->Type)
     {
     case DeviceEventType::kWoBLESubscribe:
     {
-        WeaveDeviceEvent connEstEvent;
+        ChipDeviceEvent connEstEvent;
 
-        WeaveLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLESubscribe");
-        HandleSubscribeReceived(event->WoBLESubscribe.ConId, &WEAVE_BLE_SVC_ID, &WeaveUUID_WoBLEChar_TX);
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLESubscribe");
+        HandleSubscribeReceived(event->WoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_WoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kWoBLEConnectionEstablished;
         PlatformMgr().PostEvent(&connEstEvent);
     }
@@ -379,71 +377,71 @@ void BLEManagerImpl::_OnPlatformEvent(const WeaveDeviceEvent *event)
 
     case DeviceEventType::kWoBLEUnsubscribe:
     {
-        WeaveLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEUnsubscribe");
-        HandleUnsubscribeReceived(event->WoBLEUnsubscribe.ConId, &WEAVE_BLE_SVC_ID, &WeaveUUID_WoBLEChar_TX);
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEUnsubscribe");
+        HandleUnsubscribeReceived(event->WoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_WoBLEChar_TX);
     }
     break;
 
     case DeviceEventType::kWoBLEWriteReceived:
     {
-        WeaveLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEWriteReceived");
-        HandleWriteReceived(event->WoBLEWriteReceived.ConId, &WEAVE_BLE_SVC_ID, &WeaveUUID_WoBLEChar_RX,
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEWriteReceived");
+        HandleWriteReceived(event->WoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_WoBLEChar_RX,
                             event->WoBLEWriteReceived.Data);
     }
     break;
 
     case DeviceEventType::kWoBLEConnectionError:
     {
-        WeaveLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEConnectionError");
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEConnectionError");
         HandleConnectionError(event->WoBLEConnectionError.ConId, event->WoBLEConnectionError.Reason);
     }
     break;
 
     case DeviceEventType::kWoBLEIndicateConfirm:
     {
-        WeaveLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEIndicateConfirm");
-        HandleIndicationConfirmation(event->WoBLEIndicateConfirm.ConId, &WEAVE_BLE_SVC_ID, &WeaveUUID_WoBLEChar_TX);
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEIndicateConfirm");
+        HandleIndicationConfirmation(event->WoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_WoBLEChar_TX);
     }
     break;
 
     default:
-        WeaveLogProgress(DeviceLayer, "_OnPlatformEvent default:  event->Type = %d", event->Type);
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent default:  event->Type = %d", event->Type);
         break;
     }
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId,
-                                             const WeaveBleUUID *  svcId,
-                                             const WeaveBleUUID *  charId)
+                                             const ChipBleUUID *  svcId,
+                                             const ChipBleUUID *  charId)
 {
-    WeaveLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
     return false;
 }
 
 bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId,
-                                               const WeaveBleUUID *  svcId,
-                                               const WeaveBleUUID *  charId)
+                                               const ChipBleUUID *  svcId,
+                                               const ChipBleUUID *  charId)
 {
-    WeaveLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
     return false;
 }
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
-    WEAVE_ERROR                          err = WEAVE_NO_ERROR;
+    CHIP_ERROR                          err = CHIP_NO_ERROR;
     gecko_msg_le_connection_close_rsp_t *rsp;
 
-    WeaveLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
+    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
 
     rsp = gecko_cmd_le_connection_close(conId);
     err = MapBLEError(rsp->result);
 
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        WeaveLogError(DeviceLayer, "gecko_cmd_le_connection_close() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "gecko_cmd_le_connection_close() failed: %s", ErrorStr(err));
     }
 
-    return (err == WEAVE_NO_ERROR);
+    return (err == CHIP_NO_ERROR);
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -453,18 +451,18 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId,
-                                    const WeaveBleUUID *  svcId,
-                                    const WeaveBleUUID *  charId,
+                                    const ChipBleUUID *  svcId,
+                                    const ChipBleUUID *  charId,
                                     PacketBuffer *        data)
 {
-    WEAVE_ERROR                                                   err      = WEAVE_NO_ERROR;
+    CHIP_ERROR                                                   err      = CHIP_NO_ERROR;
     WoBLEConState *                                               conState = GetConnectionState(conId);
     gecko_msg_gatt_server_send_characteristic_notification_rsp_t *rsp;
-    uint16_t cId         = (UUIDsMatch(&WeaveUUID_WoBLEChar_RX, charId) ? gattdb_WoBLEChar_Rx : gattdb_WoBLEChar_Tx);
+    uint16_t cId         = (UUIDsMatch(&ChipUUID_WoBLEChar_RX, charId) ? gattdb_WoBLEChar_Rx : gattdb_WoBLEChar_Tx);
     uint8_t  timerHandle = GetTimerHandle(conId, true);
 
-    VerifyOrExit(((conState != NULL) && (conState->subscribed != 0)), err = WEAVE_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(timerHandle != kMaxConnections, err = WEAVE_ERROR_NO_MEMORY);
+    VerifyOrExit(((conState != NULL) && (conState->subscribed != 0)), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(timerHandle != kMaxConnections, err = CHIP_ERROR_NO_MEMORY);
 
     // start timer for light indication confirmation
     gecko_cmd_hardware_set_soft_timer(TIMER_S_2_TIMERTICK(1), timerHandle, true);
@@ -475,62 +473,62 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId,
 
 exit:
     PacketBuffer::Free(data);
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        WeaveLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
         return false;
     }
     return true;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId,
-                                      const WeaveBleUUID *  svcId,
-                                      const WeaveBleUUID *  charId,
+                                      const ChipBleUUID *  svcId,
+                                      const ChipBleUUID *  charId,
                                       PacketBuffer *        pBuf)
 {
-    WeaveLogProgress(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId,
-                                     const WeaveBleUUID *  svcId,
-                                     const WeaveBleUUID *  charId,
+                                     const ChipBleUUID *  svcId,
+                                     const ChipBleUUID *  charId,
                                      PacketBuffer *        pBuf)
 {
-    WeaveLogProgress(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
     return false;
 }
 
 bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT    conId,
                                       BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const WeaveBleUUID *     svcId,
-                                      const WeaveBleUUID *     charId)
+                                      const ChipBleUUID *     svcId,
+                                      const ChipBleUUID *     charId)
 {
-    WeaveLogProgress(DeviceLayer, "BLEManagerImpl::SendReadResponse() not supported");
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadResponse() not supported");
     return false;
 }
 
-void BLEManagerImpl::NotifyWeaveConnectionClosed(BLE_CONNECTION_OBJECT conId)
+void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     // Nothing to do
 }
 
-WEAVE_ERROR BLEManagerImpl::MapBLEError(int bleErr)
+CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
-    WEAVE_ERROR err;
-    
+    CHIP_ERROR err;
+
     if (bleErr == bg_err_success) {
-      err = WEAVE_NO_ERROR;
+      err = CHIP_NO_ERROR;
     } else {
-       err = (WEAVE_ERROR) bleErr + WEAVE_DEVICE_CONFIG_EFR32_BLE_ERROR_MIN;
+       err = (CHIP_ERROR) bleErr + CHIP_DEVICE_CONFIG_EFR32_BLE_ERROR_MIN;
     }
 
-    return err; 
+    return err;
 }
 
 void BLEManagerImpl::DriveBLEState(void)
 {
-    WEAVE_ERROR err = WEAVE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized
     VerifyOrExit(GetFlag(mFlags, kFlag_EFRBLEStackInitialized), /* */);
@@ -555,18 +553,18 @@ void BLEManagerImpl::DriveBLEState(void)
     }
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        WeaveLogError(DeviceLayer, "Disabling WoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling WoBLE service due to error: %s", ErrorStr(err));
         mServiceMode = ConnectivityManager::kWoBLEServiceMode_Disabled;
     }
 }
 
-WEAVE_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
+CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     struct gecko_msg_le_gap_bt5_set_adv_data_rsp_t *setAdvDataRsp;
-    WeaveBLEDeviceIdentificationInfo                mDeviceIdInfo;
-    WEAVE_ERROR                                     err;
+    ChipBLEDeviceIdentificationInfo                mDeviceIdInfo;
+    CHIP_ERROR                                     err;
     uint8_t                                         responseData[MAX_RESPONSE_DATA_LEN];
     uint8_t                                         advData[MAX_ADV_DATA_LEN];
     uint8_t                                         index               = 0;
@@ -581,7 +579,7 @@ WEAVE_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     if (!GetFlag(mFlags, kFlag_DeviceNameSet))
     {
-        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, WEAVE_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,
+        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,
                  (uint32_t)FabricState.LocalNodeId);
 
         mDeviceName[kMaxDeviceNameLength] = 0;
@@ -594,40 +592,40 @@ WEAVE_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     index                 = 0;
     responseData[index++] = 0x02;                      // length
-    responseData[index++] = WEAVE_ADV_DATA_TYPE_FLAGS; // AD type : flags
-    responseData[index++] = WEAVE_ADV_DATA_FLAGS;      // AD value
+    responseData[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
+    responseData[index++] = CHIP_ADV_DATA_FLAGS;      // AD value
 
     responseData[index++] = mDeviceNameLength + 1;                // length
-    responseData[index++] = WEAVE_ADV_DATA_TYPE_NAME;             // AD type : name
+    responseData[index++] = CHIP_ADV_DATA_TYPE_NAME;             // AD type : name
     memcpy(&responseData[index], mDeviceName, mDeviceNameLength); // AD value
     index += mDeviceNameLength;
 
-    responseData[index++] = WEAVE_ADV_SHORT_UUID_LEN + 1; // AD length
-    responseData[index++] = WEAVE_ADV_DATA_TYPE_UUID;     // AD type : uuid
+    responseData[index++] = CHIP_ADV_SHORT_UUID_LEN + 1; // AD length
+    responseData[index++] = CHIP_ADV_DATA_TYPE_UUID;     // AD type : uuid
     responseData[index++] = ShortUUID_WoBLEService[0];    // AD value
     responseData[index++] = ShortUUID_WoBLEService[1];
 
-    setAdvDataRsp = gecko_cmd_le_gap_bt5_set_adv_data(WEAVE_ADV_WOBLE_SERVICE_HANDLE, WEAVE_ADV_SCAN_RESPONSE_DATA,
+    setAdvDataRsp = gecko_cmd_le_gap_bt5_set_adv_data(CHIP_ADV_WOBLE_SERVICE_HANDLE, CHIP_ADV_SCAN_RESPONSE_DATA,
                                                       index, (uint8_t *)&responseData);
 
     if (setAdvDataRsp->result != 0)
     {
         err = MapBLEError(setAdvDataRsp->result);
-        WeaveLogError(DeviceLayer, "gecko_cmd_le_gap_bt5_set_adv_data() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "gecko_cmd_le_gap_bt5_set_adv_data() failed: %s", ErrorStr(err));
         ExitNow();
     }
 
     index = 0;
 
-    advData[index++] = mDeviceIdInfoLength + WEAVE_ADV_SHORT_UUID_LEN + 1; // AD length
-    advData[index++] = WEAVE_ADV_DATA_TYPE_SERVICE_DATA;                   // AD type : Service Data
+    advData[index++] = mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1; // AD length
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                   // AD type : Service Data
     advData[index++] = ShortUUID_WoBLEService[0];                          // AD value
     advData[index++] = ShortUUID_WoBLEService[1];
     memcpy(&advData[index], (void *)&mDeviceIdInfo, mDeviceIdInfoLength); // AD value
     index += mDeviceIdInfoLength;
 
     setAdvDataRsp =
-        gecko_cmd_le_gap_bt5_set_adv_data(WEAVE_ADV_WOBLE_SERVICE_HANDLE, WEAVE_ADV_DATA, index, (uint8_t *)&advData);
+        gecko_cmd_le_gap_bt5_set_adv_data(CHIP_ADV_WOBLE_SERVICE_HANDLE, CHIP_ADV_DATA, index, (uint8_t *)&advData);
 
     err = MapBLEError(setAdvDataRsp->result);
 
@@ -635,9 +633,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR BLEManagerImpl::StartAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    WEAVE_ERROR                                      err;
+    CHIP_ERROR                                      err;
     struct gecko_msg_le_gap_start_advertising_rsp_t *startAdvRsp;
     uint32_t                                         interval_min;
     uint32_t                                         interval_max;
@@ -652,12 +650,12 @@ WEAVE_ERROR BLEManagerImpl::StartAdvertising(void)
 
     interval_min = interval_max = ((numConnectionss == 0 && !ConfigurationMgr().IsPairedToAccount()) ||
                                    GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
-                                      ? WEAVE_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
-                                      : WEAVE_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
+                                      ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
+                                      : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
 
-    gecko_cmd_le_gap_set_advertise_timing(WEAVE_ADV_WOBLE_SERVICE_HANDLE, interval_min, interval_max, 0, 0);
+    gecko_cmd_le_gap_set_advertise_timing(CHIP_ADV_WOBLE_SERVICE_HANDLE, interval_min, interval_max, 0, 0);
 
-    startAdvRsp = gecko_cmd_le_gap_start_advertising(WEAVE_ADV_WOBLE_SERVICE_HANDLE, le_gap_user_data, connectableAdv);
+    startAdvRsp = gecko_cmd_le_gap_start_advertising(CHIP_ADV_WOBLE_SERVICE_HANDLE, le_gap_user_data, connectableAdv);
 
     err = MapBLEError(startAdvRsp->result);
 
@@ -665,9 +663,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR BLEManagerImpl::StopAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
-    WEAVE_ERROR                              err = WEAVE_NO_ERROR;
+    CHIP_ERROR                              err = CHIP_NO_ERROR;
     gecko_msg_le_gap_stop_advertising_rsp_t *rsp;
 
     if (GetFlag(mFlags, kFlag_Advertising))
@@ -675,7 +673,7 @@ WEAVE_ERROR BLEManagerImpl::StopAdvertising(void)
         ClearFlag(mFlags, kFlag_Advertising);
         ClearFlag(mFlags, kFlag_RestartAdvertising);
 
-        rsp = gecko_cmd_le_gap_stop_advertising(WEAVE_ADV_WOBLE_SERVICE_HANDLE);
+        rsp = gecko_cmd_le_gap_stop_advertising(CHIP_ADV_WOBLE_SERVICE_HANDLE);
         err = MapBLEError(rsp->result);
         SuccessOrExit(err);
     }
@@ -703,7 +701,7 @@ void BLEManagerImpl::HandleConnectEvent(volatile struct gecko_cmd_packet *evt)
     uint8_t                                      connHandle    = conn_evt->connection;
     uint8_t                                      bondingHandle = conn_evt->bonding;
 
-    WeaveLogProgress(DeviceLayer, "Connect Event for handle : %d", connHandle);
+    ChipLogProgress(DeviceLayer, "Connect Event for handle : %d", connHandle);
 
     AddConnection(connHandle, bondingHandle);
 
@@ -716,11 +714,11 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile struct gecko_cmd_packet
     struct gecko_msg_le_connection_closed_evt_t *conn_evt = (struct gecko_msg_le_connection_closed_evt_t *)&(evt->data);
     uint8_t                                      connHandle = conn_evt->connection;
 
-    WeaveLogProgress(DeviceLayer, "Disconnect Event for handle : %d", connHandle);
+    ChipLogProgress(DeviceLayer, "Disconnect Event for handle : %d", connHandle);
 
     if (RemoveConnection(connHandle))
     {
-        WeaveDeviceEvent event;
+        ChipDeviceEvent event;
         event.Type                       = DeviceEventType::kWoBLEConnectionError;
         event.WoBLEConnectionError.ConId = connHandle;
 
@@ -741,7 +739,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile struct gecko_cmd_packet
             break;
         }
 
-        WeaveLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", connHandle, conn_evt->reason);
+        ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", connHandle, conn_evt->reason);
 
         PlatformMgr().PostEvent(&event);
 
@@ -757,7 +755,7 @@ void BLEManagerImpl::HandleWriteEvent(volatile struct gecko_cmd_packet *evt)
     struct gecko_msg_gatt_server_read_attribute_type_rsp_t *rsp;
     uint16_t attribute = evt->data.evt_gatt_server_user_write_request.characteristic;
 
-    WeaveLogProgress(DeviceLayer, "Char Write Req, char : %d", attribute);
+    ChipLogProgress(DeviceLayer, "Char Write Req, char : %d", attribute);
 
     if (gattdb_WoBLEChar_Rx == attribute)
     {
@@ -767,19 +765,19 @@ void BLEManagerImpl::HandleWriteEvent(volatile struct gecko_cmd_packet *evt)
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet *evt)
 {
-    WEAVE_ERROR      err = WEAVE_NO_ERROR;
+    CHIP_ERROR      err = CHIP_NO_ERROR;
     WoBLEConState *  bleConnState;
     bool             indicationsEnabled;
-    WeaveDeviceEvent event;
+    ChipDeviceEvent event;
 
     bleConnState = GetConnectionState(evt->data.evt_gatt_server_user_write_request.connection);
 
-    VerifyOrExit(bleConnState != NULL, err = WEAVE_ERROR_NO_MEMORY);
+    VerifyOrExit(bleConnState != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Determine if the client is enabling or disabling indications.
     indicationsEnabled = (evt->data.evt_gatt_server_characteristic_status.client_config_flags == gatt_indication);
 
-    WeaveLogProgress(DeviceLayer, "WoBLE %s received", indicationsEnabled ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "WoBLE %s received", indicationsEnabled ? "subscribe" : "unsubscribe");
 
     if (indicationsEnabled)
     {
@@ -787,7 +785,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet *evt
         if (!bleConnState->subscribed)
         {
             bleConnState->subscribed = 1;
-            // Post an event to the Weave queue to process either a WoBLE Subscribe or Unsubscribe based on
+            // Post an event to the Chip queue to process either a WoBLE Subscribe or Unsubscribe based on
             // whether the client is enabling or disabling indications.
             {
                 event.Type                 = DeviceEventType::kWoBLESubscribe;
@@ -805,33 +803,33 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet *evt
     }
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        WeaveLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
     }
 }
 
 void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet *evt)
 {
-    WEAVE_ERROR   err = WEAVE_NO_ERROR;
+    CHIP_ERROR   err = CHIP_NO_ERROR;
     PacketBuffer *buf;
     uint16_t      writeLen = evt->data.evt_gatt_server_user_write_request.value.len;
     uint8_t *     data     = (uint8_t *)evt->data.evt_gatt_server_user_write_request.value.data;
 
     // Copy the data to a PacketBuffer.
     buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != NULL, err = WEAVE_ERROR_NO_MEMORY);
-    VerifyOrExit(buf->AvailableDataLength() >= writeLen, err = WEAVE_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(buf->AvailableDataLength() >= writeLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), data, writeLen);
     buf->SetDataLength(writeLen);
 
-    WeaveLogDetail(DeviceLayer,
+    ChipLogDetail(DeviceLayer,
                    "Write request/command received for WoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
                    evt->data.evt_gatt_server_user_write_request.connection, buf->DataLength());
 
-    // Post an event to the Weave queue to deliver the data into the Weave stack.
+    // Post an event to the Chip queue to deliver the data into the Chip stack.
     {
-        WeaveDeviceEvent event;
+        ChipDeviceEvent event;
         event.Type                     = DeviceEventType::kWoBLEWriteReceived;
         event.WoBLEWriteReceived.ConId = evt->data.evt_gatt_server_user_write_request.connection;
         event.WoBLEWriteReceived.Data  = buf;
@@ -840,25 +838,25 @@ void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet *evt)
     }
 
 exit:
-    if (err != WEAVE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        WeaveLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
     }
     PacketBuffer::Free(buf);
 }
 
 void BLEManagerImpl::HandleTxConfirmationEvent(volatile struct gecko_cmd_packet *evt)
 {
-    WeaveDeviceEvent event;
+    ChipDeviceEvent event;
     uint8_t          timerHandle = sInstance.GetTimerHandle(evt->data.evt_gatt_server_characteristic_status.connection);
 
-    WeaveLogProgress(DeviceLayer, "Tx Confirmation received");
+    ChipLogProgress(DeviceLayer, "Tx Confirmation received");
 
     // stop indication confirmation timer
 
     if (timerHandle < kMaxConnections)
     {
-        WeaveLogProgress(DeviceLayer, " stop soft timer");
+        ChipLogProgress(DeviceLayer, " stop soft timer");
         gecko_cmd_hardware_set_soft_timer(0, timerHandle, false);
     }
 
@@ -873,8 +871,8 @@ void BLEManagerImpl::HandleSoftTimerEvent(volatile struct gecko_cmd_packet *evt)
     // If we receive a callback for unknown timer handle ignore this.
     if (evt->data.evt_hardware_soft_timer.handle < kMaxConnections)
     {
-        WeaveLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent WOBLE_PROTOCOL_ABORT");
-        WeaveDeviceEvent event;
+        ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent WOBLE_PROTOCOL_ABORT");
+        ChipDeviceEvent event;
         event.Type                       = DeviceEventType::kWoBLEConnectionError;
         event.WoBLEConnectionError.ConId = mIndConfId[evt->data.evt_hardware_soft_timer.handle];
         sInstance.mIndConfId[evt->data.evt_hardware_soft_timer.handle] = kUnusedIndex;
@@ -937,7 +935,7 @@ BLEManagerImpl::WoBLEConState *BLEManagerImpl::GetConnectionState(uint8_t connec
             return &mBleConnections[freeIndex];
         }
 
-        WeaveLogError(DeviceLayer, "Failed to allocate WoBLEConState");
+        ChipLogError(DeviceLayer, "Failed to allocate WoBLEConState");
     }
 
     return NULL;
@@ -968,7 +966,7 @@ uint8_t BLEManagerImpl::GetTimerHandle(uint8_t connectionHandle, bool allocate)
     }
     else
     {
-        WeaveLogError(DeviceLayer, "Failed to Save Conn Handle for indication");
+        ChipLogError(DeviceLayer, "Failed to Save Conn Handle for indication");
     }
 
     return freeIndex;
@@ -981,6 +979,5 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+} // namespace chip
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WOBLE

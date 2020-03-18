@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,28 +15,27 @@
  *    limitations under the License.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/internal/NetworkProvisioningServer.h>
-#include <Weave/DeviceLayer/internal/DeviceNetworkInfo.h>
-#include <Weave/Core/WeaveTLV.h>
-#include <Weave/Profiles/WeaveProfiles.h>
-#include <Weave/Profiles/common/CommonProfile.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/NetworkProvisioningServer.h>
+#include <platform/internal/DeviceNetworkInfo.h>
+#include <core/CHIPTLV.h>
+#include <platform/Profiles/CHIPProfiles.h>
+#include <platform/Profiles/common/CommonProfile.h>
 
-#include <Weave/DeviceLayer/internal/GenericNetworkProvisioningServerImpl.ipp>
+#include <platform/internal/GenericNetworkProvisioningServerImpl.ipp>
 
-namespace nl {
-namespace Weave {
+
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 NetworkProvisioningServerImpl NetworkProvisioningServerImpl::sInstance;
 
-WEAVE_ERROR NetworkProvisioningServerImpl::_Init(void)
+CHIP_ERROR NetworkProvisioningServerImpl::_Init(void)
 {
     return GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>::DoInit();
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

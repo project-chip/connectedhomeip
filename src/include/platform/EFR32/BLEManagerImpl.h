@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,14 +24,13 @@
 #ifndef BLE_MANAGER_IMPL_H
 #define BLE_MANAGER_IMPL_H
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WOBLE
 
 #include "bg_types.h"
 #include "rtos_gecko.h"
 #include "gatt_db.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -40,7 +38,7 @@ namespace Internal {
  * Concrete implementation of the NetworkProvisioningServer singleton object for the EFR32 platforms.
  */
 class BLEManagerImpl final : public BLEManager,
-                             private ::nl::Ble::BleLayer,
+                             private ::chip::Ble::BleLayer,
                              private BlePlatformDelegate,
                              private BleApplicationDelegate
 {
@@ -50,50 +48,50 @@ class BLEManagerImpl final : public BLEManager,
 
     // ===== Members that implement the BLEManager internal interface.
 
-    WEAVE_ERROR          _Init(void);
+    CHIP_ERROR          _Init(void);
     WoBLEServiceMode     _GetWoBLEServiceMode(void);
-    WEAVE_ERROR          _SetWoBLEServiceMode(WoBLEServiceMode val);
+    CHIP_ERROR          _SetWoBLEServiceMode(WoBLEServiceMode val);
     bool                 _IsAdvertisingEnabled(void);
-    WEAVE_ERROR          _SetAdvertisingEnabled(bool val);
+    CHIP_ERROR          _SetAdvertisingEnabled(bool val);
     bool                 _IsFastAdvertisingEnabled(void);
-    WEAVE_ERROR          _SetFastAdvertisingEnabled(bool val);
+    CHIP_ERROR          _SetFastAdvertisingEnabled(bool val);
     bool                 _IsAdvertising(void);
-    WEAVE_ERROR          _GetDeviceName(char *buf, size_t bufSize);
-    WEAVE_ERROR          _SetDeviceName(const char *deviceName);
+    CHIP_ERROR          _GetDeviceName(char *buf, size_t bufSize);
+    CHIP_ERROR          _SetDeviceName(const char *deviceName);
     uint16_t             _NumConnections(void);
-    void                 _OnPlatformEvent(const WeaveDeviceEvent *event);
-    ::nl::Ble::BleLayer *_GetBleLayer(void) const;
+    void                 _OnPlatformEvent(const ChipDeviceEvent *event);
+    ::chip::Ble::BleLayer *_GetBleLayer(void) const;
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
     bool     SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId,
-                                     const WeaveBleUUID *  svcId,
-                                     const WeaveBleUUID *  charId) override;
+                                     const ChipBleUUID *  svcId,
+                                     const ChipBleUUID *  charId) override;
     bool     UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId,
-                                       const WeaveBleUUID *  svcId,
-                                       const WeaveBleUUID *  charId) override;
+                                       const ChipBleUUID *  svcId,
+                                       const ChipBleUUID *  charId) override;
     bool     CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
     bool     SendIndication(BLE_CONNECTION_OBJECT conId,
-                            const WeaveBleUUID *  svcId,
-                            const WeaveBleUUID *  charId,
+                            const ChipBleUUID *  svcId,
+                            const ChipBleUUID *  charId,
                             PacketBuffer *        pBuf) override;
     bool     SendWriteRequest(BLE_CONNECTION_OBJECT conId,
-                              const WeaveBleUUID *  svcId,
-                              const WeaveBleUUID *  charId,
+                              const ChipBleUUID *  svcId,
+                              const ChipBleUUID *  charId,
                               PacketBuffer *        pBuf) override;
     bool     SendReadRequest(BLE_CONNECTION_OBJECT conId,
-                             const WeaveBleUUID *  svcId,
-                             const WeaveBleUUID *  charId,
+                             const ChipBleUUID *  svcId,
+                             const ChipBleUUID *  charId,
                              PacketBuffer *        pBuf) override;
     bool     SendReadResponse(BLE_CONNECTION_OBJECT    conId,
                               BLE_READ_REQUEST_CONTEXT requestContext,
-                              const WeaveBleUUID *     svcId,
-                              const WeaveBleUUID *     charId) override;
+                              const ChipBleUUID *     svcId,
+                              const ChipBleUUID *     charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
-    void NotifyWeaveConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
 
     // ===== Members for internal use by the following friends.
 
@@ -138,11 +136,11 @@ class BLEManagerImpl final : public BLEManager,
     uint16_t         mFlags;
     char             mDeviceName[kMaxDeviceNameLength + 1];
 
-    WEAVE_ERROR    MapBLEError(int bleErr);
+    CHIP_ERROR    MapBLEError(int bleErr);
     void           DriveBLEState(void);
-    WEAVE_ERROR    ConfigureAdvertisingData(void);
-    WEAVE_ERROR    StartAdvertising(void);
-    WEAVE_ERROR    StopAdvertising(void);
+    CHIP_ERROR    ConfigureAdvertisingData(void);
+    CHIP_ERROR    StartAdvertising(void);
+    CHIP_ERROR    StopAdvertising(void);
     void           UpdateMtu(volatile struct gecko_cmd_packet *evt);
     void           HandleBootEvent(void);
     void           HandleConnectEvent(volatile struct gecko_cmd_packet *evt);
@@ -182,7 +180,7 @@ inline BLEManagerImpl &BLEMgrImpl(void)
     return BLEManagerImpl::sInstance;
 }
 
-inline ::nl::Ble::BleLayer *BLEManagerImpl::_GetBleLayer() const
+inline ::chip::Ble::BleLayer *BLEManagerImpl::_GetBleLayer() const
 {
     return (BleLayer *)(this);
 }
@@ -204,9 +202,8 @@ inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WOBLE
 
 #endif // BLE_MANAGER_IMPL_H

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,10 +18,9 @@
 #ifndef NETWORK_PROVISIONING_SERVER_IMPL_H
 #define NETWORK_PROVISIONING_SERVER_IMPL_H
 
-#include <Weave/DeviceLayer/internal/GenericNetworkProvisioningServerImpl.h>
+#include <platform/internal/GenericNetworkProvisioningServerImpl.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -45,11 +43,11 @@ class NetworkProvisioningServerImpl final
 private:
     // ===== Members that implement the NetworkProvisioningServer public interface.
 
-    WEAVE_ERROR _Init(void);
+    CHIP_ERROR _Init(void);
 
     // ===== Members for internal use by the following friends.
 
-    friend ::nl::Weave::DeviceLayer::Internal::NetworkProvisioningServer &NetworkProvisioningSvr(void);
+    friend ::chip::DeviceLayer::Internal::NetworkProvisioningServer &NetworkProvisioningSvr(void);
     friend NetworkProvisioningServerImpl &                                NetworkProvisioningSvrImpl(void);
 
     static NetworkProvisioningServerImpl sInstance;
@@ -79,7 +77,6 @@ inline NetworkProvisioningServerImpl &NetworkProvisioningSvrImpl(void)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // NETWORK_PROVISIONING_SERVER_IMPL_H
