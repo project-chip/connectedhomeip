@@ -1401,6 +1401,75 @@ AC_SUBST(NLASSERT_SUBDIRS, [${maybe_nlassert_dirstem}])
 AM_CONDITIONAL([CHIP_WITH_NLASSERT_INTERNAL], [test "${nl_with_nlassert}" = "internal"])
 
 #
+# Nlfaultinjection
+#
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [Nlfaultinjection],
+    [NLFAULTINJECTION],
+    [nlfaultinjection],
+    [-lnlfaultinjection],
+    [
+        # At this point, the internal nlfaultinjection package will be neither
+        # configured nor built, so the normal checks we undertake for an
+        # external package cannot be run here. Simply set the appropriate
+        # variables and trust all will be well.
+
+        NLFAULTINJECTION_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlfaultinjection/repo/include"
+        NLFAULTINJECTION_LDFLAGS="-L${ac_pwd}/third_party/nlfaultinjection/repo/src"
+        NLFAULTINJECTION_LIBS="-lnlfaultinjection"
+    ],
+    [
+        # Check for required nlfaultinjection headers.
+
+        AC_LANG_PUSH([C++])
+        AC_CHECK_HEADERS([nlfaultinjection.hpp],
+        [],
+        [
+            AC_MSG_ERROR(The nlfaultinjection header "$ac_header" is required but cannot be found.)
+        ])
+        AC_LANG_POP([C++])
+    ]
+)
+
+# Depending on whether nlfaultinjection has been configured for an internal
+# location, its directory stem within this package needs to be set
+# accordingly. In addition, if the location is internal, then we need
+# to attempt to pull it down using the bootstrap makefile.
+
+if test "${nl_with_nlfaultinjection}" = "internal"; then
+    maybe_nlfaultinjection_dirstem="nlfaultinjection/repo"
+    nlfaultinjection_dirstem="third_party/${maybe_nlfaultinjection_dirstem}"
+
+    AC_MSG_NOTICE([attempting to create internal ${nlfaultinjection_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${nlfaultinjection_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${nlfaultinjection_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
+else
+    maybe_nlfaultinjection_dirstem=""
+fi
+
+AC_SUBST(NLFAULTINJECTION_SUBDIRS, [${maybe_nlfaultinjection_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_NLFAULTINJECTION], [test "${nl_with_nlfaultinjection}" != "no"])
+AM_CONDITIONAL([CHIP_WITH_NLFAULTINJECTION_INTERNAL], [test "${nl_with_nlfaultinjection}" = "internal"])
+
+if test "${nl_with_nlfaultinjection}" = "no"; then
+    AC_DEFINE([CHIP_WITH_NLFAULTINJECTION], [0], [Define to 1 to build CHIP with nlFaultInjection features])
+else
+    AC_DEFINE([CHIP_WITH_NLFAULTINJECTION], [1], [Define to 1 to build CHIP with nlFaultInjection features])
+fi
+
+if test "${nl_cv_build_tests}" = "yes"; then
+    if test "${nl_with_nlfaultinjection}" = "no"; then
+        AC_MSG_ERROR(CHIP tests require nlfaultinjection.)
+    fi
+fi
+
+
+#
 # Nlunit-test
 #
 
@@ -1717,6 +1786,10 @@ fi
 
 if test "${nl_with_nlassert}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlassert/repo])
+fi
+
+if test "${nl_with_nlfaultinjection}" = "internal"; then
+AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
 fi
 
 #
