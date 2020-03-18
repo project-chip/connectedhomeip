@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,20 +17,20 @@
 
 /**
  *    @file
- *          Provides implementations for the OpenWeave and LwIP logging functions
+ *          Provides implementations for the CHIP and LwIP logging functions
  *          on Nordic nRF52 platforms.
  */
 
-#define NRF_LOG_MODULE_NAME weave
+#define NRF_LOG_MODULE_NAME chip
 
 #include "nrf_log.h"
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/logging/CHIPLogging.h>
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 // If deferred logging is NOT enabled, do bother calling the nRF5 SDK nrf_log_push() function.
 #if !NRF_LOG_DEFERRED
@@ -39,32 +38,31 @@
 #define NRF_LOG_PUSH(x) (x)
 #endif
 
-using namespace ::nl::Weave;
-using namespace ::nl::Weave::DeviceLayer;
-using namespace ::nl::Weave::DeviceLayer::Internal;
+using namespace ::chip;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
 
 void GetModuleName(char *buf, uint8_t module)
 {
-    if (module == ::nl::Weave::Logging::kLogModule_DeviceLayer)
+    if (module == ::chip::Logging::kLogModule_DeviceLayer)
     {
         memcpy(buf, "DL", 3);
     }
     else
     {
-        ::nl::Weave::Logging::GetModuleName(buf, module);
+        ::chip::Logging::GetModuleName(buf, module);
     }
 }
 
 } // unnamed namespace
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 /**
- * Called whenever a log message is emitted by Weave or LwIP.
+ * Called whenever a log message is emitted by chip or LwIP.
  *
  * This function is intended be overridden by the application to, e.g.,
  * schedule output of queued log entries.
@@ -74,18 +72,16 @@ void __attribute__((weak)) OnLogOutput(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
 NRF_LOG_MODULE_REGISTER();
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace Logging {
 
 /**
- * OpenWeave log output function.
+ * Openchip log output function.
  */
 void Log(uint8_t module, uint8_t category, const char *msg, ...)
 {
@@ -101,10 +97,10 @@ void Log(uint8_t module, uint8_t category, const char *msg, ...)
     if (IsCategoryEnabled(category))
     {
         {
-            char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+            char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
             size_t prefixLen;
 
-            constexpr size_t maxPrefixLen = nlWeaveLoggingModuleNameLen + 3;
+            constexpr size_t maxPrefixLen = ChipLoggingModuleNameLen + 3;
             static_assert(sizeof(formattedMsg) > maxPrefixLen);
 
             // Form the log prefix, e.g. "[DL] "
@@ -143,8 +139,7 @@ void Log(uint8_t module, uint8_t category, const char *msg, ...)
 }
 
 } // namespace Logging
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 
 #undef NRF_LOG_MODULE_NAME
@@ -163,7 +158,7 @@ void LwIPLog(const char *msg, ...)
 
 #if NRF_LOG_ENABLED
     {
-        char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
         // Append the log message.
         size_t len = vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
@@ -186,7 +181,7 @@ void LwIPLog(const char *msg, ...)
     va_end(v);
 }
 
-#if WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #undef NRF_LOG_MODULE_NAME
 #define NRF_LOG_MODULE_NAME thread
@@ -204,7 +199,7 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
 
 #if NRF_LOG_ENABLED
     {
-        char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
         // Append the log message.
         vsnprintf(formattedMsg, sizeof(formattedMsg), aFormat, v);
@@ -236,4 +231,4 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
     va_end(v);
 }
 
-#endif // WEAVE_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,22 +21,21 @@
  *          for nRF52 platforms using the Nordic nRF5 SDK.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/PlatformManager.h>
-#include <Weave/DeviceLayer/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.ipp>
-#include <Weave/DeviceLayer/nRF5/nRF5Utils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/PlatformManager.h>
+#include <platform/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/nRF5/nRF5Utils.h>
 
 #include <lwip/tcpip.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-WEAVE_ERROR PlatformManagerImpl::_InitWeaveStack(void)
+CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
 
     // Arrange for nRF5 SDK errors to be translated to text.
     Internal::RegisterNRFErrorFormatter();
@@ -49,9 +47,9 @@ WEAVE_ERROR PlatformManagerImpl::_InitWeaveStack(void)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
 
-    // Call _InitWeaveStack() on the generic implementation base class
+    // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitWeaveStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
 exit:
@@ -59,5 +57,4 @@ exit:
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
