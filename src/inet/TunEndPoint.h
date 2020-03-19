@@ -94,12 +94,11 @@ class IPPacketInfo;
  *  and LwIP systems with an IP-in-IP tunneling mechanism for supporting the
  *  chip tunnel agent.
  */
-class DLL_EXPORT TunEndPoint: public EndPointBasis
+class DLL_EXPORT TunEndPoint : public EndPointBasis
 {
     friend class InetLayer;
 
 public:
-
     /**
      * @brief   Basic dynamic state of the underlying tunnel.
      *
@@ -109,8 +108,8 @@ public:
      */
     enum
     {
-        kState_Open                   = 0,
-        kState_Closed                 = 1
+        kState_Open   = 0,
+        kState_Closed = 1
     } mState;
 
     /**
@@ -122,27 +121,27 @@ public:
      */
     typedef enum RouteOp
     {
-        kRouteTunIntf_Add             = 0,  /**< Add route for a prefix. */
-        kRouteTunIntf_Del             = 1   /**< Remove route for a prefix. */
+        kRouteTunIntf_Add = 0, /**< Add route for a prefix. */
+        kRouteTunIntf_Del = 1  /**< Remove route for a prefix. */
     } RouteOp;
 
     /** Pointer to application-specific state object. */
-    void *mAppState;
+    void * mAppState;
 
-    void Init(InetLayer *inetLayer);
+    void Init(InetLayer * inetLayer);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     INET_ERROR Open(void);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    INET_ERROR Open(const char *intfName);
+    INET_ERROR Open(const char * intfName);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     /** Close the tunnel and release handle on the object. */
     void Free(void);
 
-    INET_ERROR Send(chip::System::PacketBuffer *message);
+    INET_ERROR Send(chip::System::PacketBuffer * message);
 
     bool IsInterfaceUp(void) const;
 
@@ -160,7 +159,7 @@ public:
      * @param[in] endPoint        A pointer to the TunEndPoint object.
      * @param[in] message         A pointer to the chip::System::PacketBuffer message object.
      */
-    typedef void (*OnPacketReceivedFunct)(TunEndPoint *endPoint, chip::System::PacketBuffer *message);
+    typedef void (*OnPacketReceivedFunct)(TunEndPoint * endPoint, chip::System::PacketBuffer * message);
 
     /** The endpoint's packet receive event handler delegate. */
     OnPacketReceivedFunct OnPacketReceived;
@@ -175,16 +174,15 @@ public:
      * @param[in] endPoint      The TunEndPoint object.
      * @param[in] err           Error code reported.
      */
-    typedef void (*OnReceiveErrorFunct)(TunEndPoint *endPoint, INET_ERROR err);
+    typedef void (*OnReceiveErrorFunct)(TunEndPoint * endPoint, INET_ERROR err);
     OnReceiveErrorFunct OnReceiveError;
 
     InterfaceId GetTunnelInterfaceId(void);
 
 private:
-
-    TunEndPoint(void);                                  // not defined
-    TunEndPoint(const TunEndPoint&);                    // not defined
-    ~TunEndPoint(void);                                 // not defined
+    TunEndPoint(void);                // not defined
+    TunEndPoint(const TunEndPoint &); // not defined
+    ~TunEndPoint(void);               // not defined
 
     static chip::System::ObjectPool<TunEndPoint, INET_CONFIG_NUM_TUN_ENDPOINTS> sPool;
 
@@ -192,47 +190,46 @@ private:
     void Close(void);
 
     // Function that performs some sanity tests for IPv6 packets.
-    INET_ERROR CheckV6Sanity(chip::System::PacketBuffer *message);
+    INET_ERROR CheckV6Sanity(chip::System::PacketBuffer * message);
     // Function for sending the IPv6 packets over Linux sockets or LwIP.
-    INET_ERROR TunDevSendMessage(chip::System::PacketBuffer *msg);
+    INET_ERROR TunDevSendMessage(chip::System::PacketBuffer * msg);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Network interface structure holding the tunnel interface in LwIP.
     struct netif mTunNetIf;
 
     INET_ERROR TunDevOpen(void);
-    void HandleDataReceived(chip::System::PacketBuffer *msg);
+    void HandleDataReceived(chip::System::PacketBuffer * msg);
 
-    static err_t LwIPPostToInetEventQ(struct netif *netif, struct pbuf *p);
+    static err_t LwIPPostToInetEventQ(struct netif * netif, struct pbuf * p);
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 #if LWIP_IPV4
-    static err_t LwIPOutputIPv4(struct netif *netif, struct pbuf *p, const ip4_addr_t *addr);
+    static err_t LwIPOutputIPv4(struct netif * netif, struct pbuf * p, const ip4_addr_t * addr);
 #endif // LWIP_IPV4
 #if LWIP_IPV6
-    static err_t LwIPOutputIPv6(struct netif *netif, struct pbuf *p, const ip6_addr_t *addr);
+    static err_t LwIPOutputIPv6(struct netif * netif, struct pbuf * p, const ip6_addr_t * addr);
 #endif // LWIP_IPV6
-#else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
-    static err_t LwIPReceiveTunMessage(struct netif *netif, struct pbuf *p, ip4_addr_t *addr);
+#else  // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
+    static err_t LwIPReceiveTunMessage(struct netif * netif, struct pbuf * p, ip4_addr_t * addr);
 #if LWIP_IPV6
-    static err_t LwIPReceiveTunV6Message(struct netif *netif, struct pbuf *p, ip6_addr_t *addr);
+    static err_t LwIPReceiveTunV6Message(struct netif * netif, struct pbuf * p, ip6_addr_t * addr);
 #endif // LWIP_IPV6
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
-    static err_t TunInterfaceNetifInit(struct netif *netif);
+    static err_t TunInterfaceNetifInit(struct netif * netif);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    //Tunnel interface name
+    // Tunnel interface name
     char tunIntfName[IFNAMSIZ];
 
-    INET_ERROR TunDevOpen(const char *interfaceName);
+    INET_ERROR TunDevOpen(const char * interfaceName);
     void TunDevClose(void);
-    INET_ERROR TunDevRead(chip::System::PacketBuffer *msg);
-    static int TunGetInterface(int fd, struct ::ifreq *ifr);
+    INET_ERROR TunDevRead(chip::System::PacketBuffer * msg);
+    static int TunGetInterface(int fd, struct ::ifreq * ifr);
 
     SocketEvents PrepareIO(void);
     void HandlePendingIO(void);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 };
 
 } // namespace Inet

@@ -31,8 +31,8 @@ namespace Ble {
  */
 enum chipBLEServiceDataType
 {
-    kchipBLEServiceDataType_DeviceIdentificationInfo       = 0x01,
-    kchipBLEServiceDataType_TokenIdentificationInfo        = 0x02,
+    kchipBLEServiceDataType_DeviceIdentificationInfo = 0x01,
+    kchipBLEServiceDataType_TokenIdentificationInfo  = 0x02,
 };
 
 /**
@@ -45,8 +45,8 @@ struct chipBLEDeviceIdentificationInfo
 {
     enum
     {
-        kMajorVersion           = 0,
-        kMinorVersion           = 1,
+        kMajorVersion = 0,
+        kMinorVersion = 1,
     };
 
     enum
@@ -67,41 +67,23 @@ struct chipBLEDeviceIdentificationInfo
     void Init()
     {
         memset(this, 0, sizeof(*this));
-        BlockLen = sizeof(*this) - sizeof(BlockLen); // size of all fields EXCEPT BlockLen
-        BlockType = kchipBLEServiceDataType_DeviceIdentificationInfo;
+        BlockLen     = sizeof(*this) - sizeof(BlockLen); // size of all fields EXCEPT BlockLen
+        BlockType    = kchipBLEServiceDataType_DeviceIdentificationInfo;
         MajorVersion = kMajorVersion;
         MinorVersion = kMinorVersion;
     }
 
-    uint16_t GetVendorId(void)
-    {
-        return chip::Encoding::LittleEndian::Get16(DeviceVendorId);
-    }
+    uint16_t GetVendorId(void) { return chip::Encoding::LittleEndian::Get16(DeviceVendorId); }
 
-    void SetVendorId(uint16_t vendorId)
-    {
-        chip::Encoding::LittleEndian::Put16(DeviceVendorId, vendorId);
-    }
+    void SetVendorId(uint16_t vendorId) { chip::Encoding::LittleEndian::Put16(DeviceVendorId, vendorId); }
 
-    uint16_t GetProductId(void)
-    {
-        return chip::Encoding::LittleEndian::Get16(DeviceProductId);
-    }
+    uint16_t GetProductId(void) { return chip::Encoding::LittleEndian::Get16(DeviceProductId); }
 
-    void SetProductId(uint16_t productId)
-    {
-        chip::Encoding::LittleEndian::Put16(DeviceProductId, productId);
-    }
+    void SetProductId(uint16_t productId) { chip::Encoding::LittleEndian::Put16(DeviceProductId, productId); }
 
-    uint64_t GetDeviceId(void)
-    {
-        return chip::Encoding::LittleEndian::Get64(DeviceId);
-    }
+    uint64_t GetDeviceId(void) { return chip::Encoding::LittleEndian::Get64(DeviceId); }
 
-    void SetDeviceId(uint64_t deviceId)
-    {
-        chip::Encoding::LittleEndian::Put64(DeviceId, deviceId);
-    }
+    void SetDeviceId(uint64_t deviceId) { chip::Encoding::LittleEndian::Put64(DeviceId, deviceId); }
 } __attribute__((packed));
 
 } /* namespace Ble */

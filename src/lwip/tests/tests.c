@@ -29,13 +29,15 @@
 
 //#include "standalone/TapInterface.c"
 
-void TapInterface_Init_test1() {
-  printf("---Running Test--- %s\n", __FUNCTION__);
-  // assert(TapInterface_Init(NULL, NULL, NULL) == ERR_ARG);
+void TapInterface_Init_test1()
+{
+    printf("---Running Test--- %s\n", __FUNCTION__);
+    // assert(TapInterface_Init(NULL, NULL, NULL) == ERR_ARG);
 }
 
-int main() {
-  printf("---Running Test--- tests from %s\n", __FILE__);
-  TapInterface_Init_test1();
-  return 0;
+int main()
+{
+    printf("---Running Test--- tests from %s\n", __FILE__);
+    TapInterface_Init_test1();
+    return 0;
 }

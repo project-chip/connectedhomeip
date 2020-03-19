@@ -18,8 +18,9 @@
 #ifndef CHIP_DEVICE_H
 #define CHIP_DEVICE_H
 
-#include <core/CHIPCore.h>
 #include <platform/CHIPDeviceConfig.h>
+
+#include <core/CHIPCore.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/GeneralUtils.h>
 #include <ble/BleLayer.h>

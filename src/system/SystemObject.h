@@ -50,7 +50,8 @@ namespace System {
 
 // Forward class and class template declarations
 class Layer;
-template<class T, unsigned int N> class ObjectPool;
+template <class T, unsigned int N>
+class ObjectPool;
 
 /**
  *  @class Object
@@ -70,24 +71,25 @@ template<class T, unsigned int N> class ObjectPool;
  */
 class DLL_EXPORT Object
 {
-    template<class T, unsigned int N> friend class ObjectPool;
+    template <class T, unsigned int N>
+    friend class ObjectPool;
 
 public:
     /** Test whether this object is retained by \c aLayer. Concurrency safe. */
-    bool IsRetained(const Layer& aLayer) const;
+    bool IsRetained(const Layer & aLayer) const;
 
     void Retain(void);
     void Release(void);
-    Layer& SystemLayer(void) const;
+    Layer & SystemLayer(void) const;
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /**< What to do when DeferredRelease fails to post a kEvent_ReleaseObj. */
     enum ReleaseDeferralErrorTactic
     {
-        kReleaseDeferralErrorTactic_Ignore,     /**< No action. */
-        kReleaseDeferralErrorTactic_Release,    /**< Release immediately. */
-        kReleaseDeferralErrorTactic_Die,        /**< Die with message. */
+        kReleaseDeferralErrorTactic_Ignore,  /**< No action. */
+        kReleaseDeferralErrorTactic_Release, /**< Release immediately. */
+        kReleaseDeferralErrorTactic_Die,     /**< Die with message. */
     };
 
     void DeferredRelease(ReleaseDeferralErrorTactic aTactic);
@@ -96,17 +98,17 @@ protected:
 private:
     Object(void);
     ~Object(void);
-    Object(const Object&)               /* = delete */;
-    Object& operator =(const Object&)   /* = delete */;
+    Object(const Object &) /* = delete */;
+    Object & operator=(const Object &) /* = delete */;
 
-    Layer* volatile mSystemLayer;   /**< Pointer to the layer object that owns this object. */
-    unsigned int mRefCount;         /**< Count of remaining calls to Release before object is dead. */
+    Layer * volatile mSystemLayer; /**< Pointer to the layer object that owns this object. */
+    unsigned int mRefCount;        /**< Count of remaining calls to Release before object is dead. */
 
     /** If not already retained, attempt initial retention of this object for \c aLayer and zero up to \c aOctets. */
-    bool TryCreate(Layer& aLayer, size_t aOctets);
+    bool TryCreate(Layer & aLayer, size_t aOctets);
 
 public:
-    void* AppState;                 /**< Generic pointer to app-specific data associated with the object. */
+    void * AppState; /**< Generic pointer to app-specific data associated with the object. */
 };
 
 /**
@@ -118,7 +120,7 @@ public:
  *      cannot have previously retained the object for \c aLayer. If it returns \c true, then the logic using \c aLayer is
  *      responsible for ensuring concurrency safety for this object.
  */
-inline bool Object::IsRetained(const Layer& aLayer) const
+inline bool Object::IsRetained(const Layer & aLayer) const
 {
     return this->mSystemLayer == &aLayer;
 }
@@ -137,20 +139,16 @@ inline void Object::Retain(void)
  *      Returns a reference to the CHIP System Layer object provided when the object was initially retained from its corresponding
  *      object pool instance. The object is assumed to be live.
  */
-inline Layer& Object::SystemLayer(void) const
+inline Layer & Object::SystemLayer(void) const
 {
     return *this->mSystemLayer;
 }
 
 /** Deleted. */
-inline Object::Object(void)
-{
-}
+inline Object::Object(void) {}
 
 /** Deleted. */
-inline Object::~Object(void)
-{
-}
+inline Object::~Object(void) {}
 
 /**
  *  @brief
@@ -159,8 +157,9 @@ inline Object::~Object(void)
  *  @tparam     ALIGN   a typename with the alignment properties for the block.
  *  @tparam     SIZE    a constant size of the block in bytes.
  */
-template<typename ALIGN, size_t SIZE>
-union ObjectArena {
+template <typename ALIGN, size_t SIZE>
+union ObjectArena
+{
     uint8_t uMemory[SIZE];
     ALIGN uAlign;
 };
@@ -172,24 +171,24 @@ union ObjectArena {
  *  @tparam     T   a subclass of Object to be allocated from the arena.
  *  @tparam     N   a positive integer number of objects of class T to allocate from the arena.
  */
-template<class T, unsigned int N>
+template <class T, unsigned int N>
 class ObjectPool
 {
 public:
     static size_t Size(void);
 
-    T* Get(const Layer& aLayer, size_t aIndex);
-    T* TryCreate(Layer& aLayer);
-    void GetStatistics(chip::System::Stats::count_t& aNumInUse, chip::System::Stats::count_t& aHighWatermark);
+    T * Get(const Layer & aLayer, size_t aIndex);
+    T * TryCreate(Layer & aLayer);
+    void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
 private:
     friend class TestObject;
 
-    ObjectArena<void*, N * sizeof(T)> mArena;
+    ObjectArena<void *, N * sizeof(T)> mArena;
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int& aNumInUse);
-    void UpdateHighWatermark(const unsigned int& aCandidate);
+    void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse);
+    void UpdateHighWatermark(const unsigned int & aCandidate);
     volatile unsigned int mHighWatermark;
 #endif
 };
@@ -198,7 +197,7 @@ private:
  *  @brief
  *      Returns the number of objects that can be simultaneously retained from a pool.
  */
-template<class T, unsigned int N>
+template <class T, unsigned int N>
 inline size_t ObjectPool<T, N>::Size(void)
 {
     return N;
@@ -208,15 +207,15 @@ inline size_t ObjectPool<T, N>::Size(void)
  *  @brief
  *      Returns a pointer the object at \c aIndex or \c NULL if the object is not retained by \c aLayer.
  */
-template<class T, unsigned int N>
-inline T* ObjectPool<T, N>::Get(const Layer& aLayer, size_t aIndex)
+template <class T, unsigned int N>
+inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
 {
-    T* lReturn = NULL;
+    T * lReturn = NULL;
 
     if (aIndex < N)
-        lReturn = &reinterpret_cast<T*>(mArena.uMemory)[aIndex];
+        lReturn = &reinterpret_cast<T *>(mArena.uMemory)[aIndex];
 
-    (void) static_cast<Object*>(lReturn);   /* In C++-11, this would be a static_assert that T inherits Object. */
+    (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
 
     return (lReturn != NULL) && lReturn->IsRetained(aLayer) ? lReturn : NULL;
 }
@@ -225,10 +224,10 @@ inline T* ObjectPool<T, N>::Get(const Layer& aLayer, size_t aIndex)
  *  @brief
  *      Tries to initially retain the first object in the pool that is not retained by any layer.
  */
-template<class T, unsigned int N>
-inline T* ObjectPool<T, N>::TryCreate(Layer& aLayer)
+template <class T, unsigned int N>
+inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
 {
-    T* lReturn = NULL;
+    T * lReturn = NULL;
     unsigned int lIndex;
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     unsigned int lNumInUse = 0;
@@ -236,8 +235,7 @@ inline T* ObjectPool<T, N>::TryCreate(Layer& aLayer)
 
     for (lIndex = 0; lIndex < N; ++lIndex)
     {
-        T& lObject = reinterpret_cast<T*>(mArena.uMemory)[lIndex];
-
+        T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
 
         if (lObject.TryCreate(aLayer, sizeof(T)))
         {
@@ -265,15 +263,15 @@ inline T* ObjectPool<T, N>::TryCreate(Layer& aLayer)
 }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-template<class T, unsigned int N>
-inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int& aCandidate)
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int & aCandidate)
 {
     unsigned int lTmp;
 
     while (aCandidate > (lTmp = mHighWatermark))
     {
         SYSTEM_OBJECT_HWM_TEST_HOOK();
-        (void)__sync_bool_compare_and_swap(&mHighWatermark, lTmp, aCandidate);
+        (void) __sync_bool_compare_and_swap(&mHighWatermark, lTmp, aCandidate);
     }
 }
 
@@ -285,14 +283,14 @@ inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int& aCandidate
  * @param[in/out] aNumInUse    The number of objects in use. If aStartIndex is not 0,
  *                             the function adds to the counter without resetting it first.
  */
-template<class T, unsigned int N>
-inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsigned int& aNumInUse)
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse)
 {
     unsigned int count = 0;
 
     for (unsigned int lIndex = aStartIndex; lIndex < N; ++lIndex)
     {
-        T& lObject = reinterpret_cast<T*>(mArena.uMemory)[lIndex];
+        T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
 
         if (lObject.mSystemLayer != NULL)
         {
@@ -309,10 +307,8 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
 }
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 
-
-template<class T, unsigned int N>
-inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t& aNumInUse,
-                                            chip::System::Stats::count_t& aHighWatermark)
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
 {
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     unsigned int lNumInUse;
@@ -329,7 +325,7 @@ inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t& aNumIn
     {
         lHighWatermark = CHIP_SYS_STATS_COUNT_MAX;
     }
-    aNumInUse = static_cast<chip::System::Stats::count_t>(lNumInUse);
+    aNumInUse      = static_cast<chip::System::Stats::count_t>(lNumInUse);
     aHighWatermark = static_cast<chip::System::Stats::count_t>(lHighWatermark);
 #endif
 }

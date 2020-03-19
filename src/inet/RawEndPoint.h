@@ -58,7 +58,7 @@ public:
      *  While this field is a mutable class variable, it is an invariant of the
      *  class that it not be modified.
      */
-    IPVersion IPVer;   // This data member is read-only
+    IPVersion IPVer; // This data member is read-only
 
     /**
      * @brief   version of the Internet Control Message Protocol (ICMP)
@@ -74,33 +74,33 @@ public:
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intf);
     InterfaceId GetBoundInterface(void);
     INET_ERROR Listen(void);
-    INET_ERROR SendTo(IPAddress addr, chip::System::PacketBuffer *msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(IPAddress addr, InterfaceId intfId, chip::System::PacketBuffer *msg, uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo *pktInfo, chip::System::PacketBuffer *msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(IPAddress addr, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(IPAddress addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     INET_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
     void Close(void);
     void Free(void);
 
 private:
-    RawEndPoint(void);                          // not defined
-    RawEndPoint(const RawEndPoint&);            // not defined
-    ~RawEndPoint(void);                         // not defined
+    RawEndPoint(void);                // not defined
+    RawEndPoint(const RawEndPoint &); // not defined
+    ~RawEndPoint(void);               // not defined
 
     static chip::System::ObjectPool<RawEndPoint, INET_CONFIG_NUM_RAW_ENDPOINTS> sPool;
 
-    void Init(InetLayer *inetLayer, IPVersion ipVer, IPProtocol ipProto);
+    void Init(InetLayer * inetLayer, IPVersion ipVer, IPProtocol ipProto);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     uint8_t NumICMPTypes;
-    const uint8_t *ICMPTypes;
+    const uint8_t * ICMPTypes;
 
-    void HandleDataReceived(chip::System::PacketBuffer *msg);
+    void HandleDataReceived(chip::System::PacketBuffer * msg);
     INET_ERROR GetPCB(IPAddressType addrType);
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-    static u8_t LwIPReceiveRawMessage(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_addr_t *addr);
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-    static u8_t LwIPReceiveRawMessage(void *arg, struct raw_pcb *pcb, struct pbuf *p, ip_addr_t *addr);
+    static u8_t LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct pbuf * p, const ip_addr_t * addr);
+#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
+    static u8_t LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct pbuf * p, ip_addr_t * addr);
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 

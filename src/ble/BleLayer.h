@@ -78,7 +78,7 @@ using ::chip::System::PacketBuffer;
  *  versions encapsulated in a BleTransportCapabilitiesRequest. Defined by chip
  *  over BLE protocol specification.
  */
-#define NUM_SUPPORTED_PROTOCOL_VERSIONS     8
+#define NUM_SUPPORTED_PROTOCOL_VERSIONS 8
 /// Version(s) of the CHIP BLE Transport Protocol that this stack supports.
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V2
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V3
@@ -250,8 +250,7 @@ public:
     // Public functions:
     BleLayer(void);
 
-    BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate,
-                   chip::System::Layer * systemLayer);
+    BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
 
 #if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
     BLE_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate, Inet::InetLayer * inetLayer);
@@ -261,7 +260,7 @@ public:
 
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
-    chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void* aAppState)
+    chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void * aAppState)
     {
         return mSystemLayer->ScheduleWork(aComplete, aAppState);
     }

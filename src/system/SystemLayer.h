@@ -75,17 +75,17 @@ using ::chip::System::Layer;
 using ::chip::System::Object;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-extern Error WillInit(Layer& aLayer, void* aContext);
-extern Error WillShutdown(Layer& aLayer, void* aContext);
+extern Error WillInit(Layer & aLayer, void * aContext);
+extern Error WillShutdown(Layer & aLayer, void * aContext);
 
-extern void DidInit(Layer& aLayer, void* aContext, Error aStatus);
-extern void DidShutdown(Layer& aLayer, void* aContext, Error aStatus);
+extern void DidInit(Layer & aLayer, void * aContext, Error aStatus);
+extern void DidShutdown(Layer & aLayer, void * aContext, Error aStatus);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-extern Error PostEvent(Layer& aLayer, void* aContext, Object& aTarget, EventType aType, uintptr_t aArgument);
-extern Error DispatchEvents(Layer& aLayer, void* aContext);
-extern Error DispatchEvent(Layer& aLayer, void* aContext, Event aEvent);
-extern Error StartTimer(Layer& aLayer, void* aContext, uint32_t aMilliseconds);
+extern Error PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType, uintptr_t aArgument);
+extern Error DispatchEvents(Layer & aLayer, void * aContext);
+extern Error DispatchEvent(Layer & aLayer, void * aContext, Event aEvent);
+extern Error StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Layer
@@ -98,12 +98,12 @@ extern Error StartTimer(Layer& aLayer, void* aContext, uint32_t aMilliseconds);
  */
 enum LayerState
 {
-    kLayerState_NotInitialized = 0,  /**< Not initialized state. */
-    kLayerState_Initialized = 1      /**< Initialized state. */
+    kLayerState_NotInitialized = 0, /**< Not initialized state. */
+    kLayerState_Initialized    = 1  /**< Initialized state. */
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-typedef Error (*LwIPEventHandlerFunction)(Object& aTarget, EventType aEventType, uintptr_t aArgument);
+typedef Error (*LwIPEventHandlerFunction)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
 
 class LwIPEventHandlerDelegate
 {
@@ -112,11 +112,11 @@ class LwIPEventHandlerDelegate
 public:
     bool IsInitialized(void) const;
     void Init(LwIPEventHandlerFunction aFunction);
-    void Prepend(const LwIPEventHandlerDelegate*& aDelegateList);
+    void Prepend(const LwIPEventHandlerDelegate *& aDelegateList);
 
 private:
     LwIPEventHandlerFunction mFunction;
-    const LwIPEventHandlerDelegate* mNextDelegate;
+    const LwIPEventHandlerDelegate * mNextDelegate;
 };
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -137,37 +137,37 @@ class DLL_EXPORT Layer
 public:
     Layer(void);
 
-    Error Init(void* aContext);
+    Error Init(void * aContext);
     Error Shutdown(void);
 
-    void *GetPlatformData(void) const;
-    void SetPlatformData(void *aPlatformData);
+    void * GetPlatformData(void) const;
+    void SetPlatformData(void * aPlatformData);
 
     LayerState State(void) const;
 
-    Error NewTimer(Timer*& aTimerPtr);
+    Error NewTimer(Timer *& aTimerPtr);
 
-    typedef void (*TimerCompleteFunct)(Layer* aLayer, void* aAppState, Error aError);
-    Error StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void* aAppState);
-    void CancelTimer(TimerCompleteFunct aOnComplete, void* aAppState);
+    typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
+    Error StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);
+    void CancelTimer(TimerCompleteFunct aOnComplete, void * aAppState);
 
-    Error ScheduleWork(TimerCompleteFunct aComplete, void* aAppState);
+    Error ScheduleWork(TimerCompleteFunct aComplete, void * aAppState);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    void PrepareSelect(int& aSetSize, fd_set* aReadSet, fd_set* aWriteSet, fd_set* aExceptionSet, struct timeval& aSleepTime);
-    void HandleSelectResult(int aSetSize, fd_set* aReadSet, fd_set* aWriteSet, fd_set* aExceptionSet);
+    void PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet, struct timeval & aSleepTime);
+    void HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet);
     void WakeSelect(void);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    typedef Error (*EventHandler)(Object& aTarget, EventType aEventType, uintptr_t aArgument);
-    Error AddEventHandlerDelegate(LwIPEventHandlerDelegate& aDelegate);
+    typedef Error (*EventHandler)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
+    Error AddEventHandlerDelegate(LwIPEventHandlerDelegate & aDelegate);
 
     // Event Handling
-    Error PostEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument);
+    Error PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
     Error DispatchEvents(void);
     Error DispatchEvent(Event aEvent);
-    Error HandleEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument);
+    Error HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
 
     // Timer Management
     Error HandlePlatformTimer(void);
@@ -182,14 +182,14 @@ public:
 
 private:
     LayerState mLayerState;
-    void* mContext;
-    void* mPlatformData;
+    void * mContext;
+    void * mPlatformData;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static LwIPEventHandlerDelegate sSystemEventHandlerDelegate;
 
-    const LwIPEventHandlerDelegate* mEventDelegateList;
-    Timer* mTimerList;
+    const LwIPEventHandlerDelegate * mEventDelegateList;
+    Timer * mTimerList;
     bool mTimerComplete;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -203,25 +203,26 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static Error HandleSystemLayerEvent(Object& aTarget, EventType aEventType, uintptr_t aArgument);
+    static Error HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
 
     Error StartPlatformTimer(uint32_t aDelayMilliseconds);
 
-    friend Error Platform::Layer::PostEvent(Layer& aLayer, void* aContext, Object& aTarget, EventType aType, uintptr_t aArgument);
-    friend Error Platform::Layer::DispatchEvents(Layer& aLayer, void* aContext);
-    friend Error Platform::Layer::DispatchEvent(Layer& aLayer, void* aContext, Event aEvent);
-    friend Error Platform::Layer::StartTimer(Layer& aLayer, void* aContext, uint32_t aMilliseconds);
+    friend Error Platform::Layer::PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType,
+                                            uintptr_t aArgument);
+    friend Error Platform::Layer::DispatchEvents(Layer & aLayer, void * aContext);
+    friend Error Platform::Layer::DispatchEvent(Layer & aLayer, void * aContext, Event aEvent);
+    friend Error Platform::Layer::StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Copy and assignment NOT DEFINED
-    Layer(const Layer&);
-    Layer& operator =(const Layer&);
+    Layer(const Layer &);
+    Layer & operator=(const Layer &);
 
     friend class Timer;
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
     friend class Inet::InetLayer;
-    void CancelAllMatchingInetTimers(Inet::InetLayer& aInetLayer, void* aOnCompleteInetLayer, void* aAppState);
+    void CancelAllMatchingInetTimers(Inet::InetLayer & aInetLayer, void * aOnCompleteInetLayer, void * aAppState);
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 };
 

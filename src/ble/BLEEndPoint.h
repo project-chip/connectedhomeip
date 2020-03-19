@@ -222,8 +222,8 @@ private:
     inline void QueueTxLock() { mTxQueueMutex.Lock(); };
     inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); };
 #else
-    inline void QueueTxLock() { };
-    inline void QueueTxUnlock() { };
+    inline void QueueTxLock(){};
+    inline void QueueTxUnlock(){};
 #endif
     void QueueTx(PacketBuffer * data, PacketType_t type);
 };

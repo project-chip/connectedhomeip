@@ -377,7 +377,6 @@ extern bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err);
 } // namespace Inet
 } // namespace chip
 
-
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 /**
@@ -389,7 +388,7 @@ extern bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err);
 #if INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
 
 extern INET_ERROR INET_MapOSError(int e);
-extern const char *INET_DescribeOSError(INET_ERROR err);
+extern const char * INET_DescribeOSError(INET_ERROR err);
 extern bool INET_IsOSError(INET_ERROR err);
 
 #else // !INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
@@ -422,7 +421,7 @@ static inline INET_ERROR INET_MapOSError(int e)
  *         describing the error.
  *
  */
-static inline const char *INET_DescribeOSError(INET_ERROR err)
+static inline const char * INET_DescribeOSError(INET_ERROR err)
 {
     return ::chip::System::DescribeErrorPOSIX(err);
 }
@@ -450,7 +449,7 @@ static inline bool INET_IsOSError(INET_ERROR err)
 #if INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
 
 extern INET_ERROR INET_MapLwIPError(err_t e);
-extern const char *INET_DescribeLwIPError(INET_ERROR err);
+extern const char * INET_DescribeLwIPError(INET_ERROR err);
 extern bool INET_IsLwIPError(INET_ERROR err);
 
 #else // !INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
@@ -483,7 +482,7 @@ static inline INET_ERROR INET_MapLwIPError(err_t e)
  *         describing the error.
  *
  */
-static inline const char *INET_DescribeLwIPError(INET_ERROR err)
+static inline const char * INET_DescribeLwIPError(INET_ERROR err)
 {
     return ::chip::System::DescribeErrorLwIP(err);
 }

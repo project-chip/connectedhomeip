@@ -53,20 +53,20 @@ typedef INET_CONFIG_EVENT_OBJECT_TYPE InetEvent;
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 /**
-*   The Inet layer event type definitions.
-*
-*/
+ *   The Inet layer event type definitions.
+ *
+ */
 enum
 {
-    kInetEvent_TCPConnectComplete       = _INET_CONFIG_EVENT(0),    /**< The event for TCP connection completion */
-    kInetEvent_TCPConnectionReceived    = _INET_CONFIG_EVENT(1),    /**< The event for TCP connection reception */
-    kInetEvent_TCPDataReceived          = _INET_CONFIG_EVENT(2),    /**< The event for data reception over a TCP connection */
-    kInetEvent_TCPDataSent              = _INET_CONFIG_EVENT(3),    /**< The event for data transmission over a TCP connection */
-    kInetEvent_TCPError                 = _INET_CONFIG_EVENT(4),    /**< The event for an error on a TCP connection */
-    kInetEvent_UDPDataReceived          = _INET_CONFIG_EVENT(5),    /**< The event for data reception over UDP */
-    kInetEvent_DNSResolveComplete       = _INET_CONFIG_EVENT(6),    /**< The event for DNS name resolution completion */
-    kInetEvent_TunDataReceived          = _INET_CONFIG_EVENT(7),    /**< The event for data reception over a chip tunnel */
-    kInetEvent_RawDataReceived          = _INET_CONFIG_EVENT(8)     /**< The event for data reception over an InetLayer raw endpoint */
+    kInetEvent_TCPConnectComplete    = _INET_CONFIG_EVENT(0), /**< The event for TCP connection completion */
+    kInetEvent_TCPConnectionReceived = _INET_CONFIG_EVENT(1), /**< The event for TCP connection reception */
+    kInetEvent_TCPDataReceived       = _INET_CONFIG_EVENT(2), /**< The event for data reception over a TCP connection */
+    kInetEvent_TCPDataSent           = _INET_CONFIG_EVENT(3), /**< The event for data transmission over a TCP connection */
+    kInetEvent_TCPError              = _INET_CONFIG_EVENT(4), /**< The event for an error on a TCP connection */
+    kInetEvent_UDPDataReceived       = _INET_CONFIG_EVENT(5), /**< The event for data reception over UDP */
+    kInetEvent_DNSResolveComplete    = _INET_CONFIG_EVENT(6), /**< The event for DNS name resolution completion */
+    kInetEvent_TunDataReceived       = _INET_CONFIG_EVENT(7), /**< The event for data reception over a chip tunnel */
+    kInetEvent_RawDataReceived       = _INET_CONFIG_EVENT(8)  /**< The event for data reception over an InetLayer raw endpoint */
 };
 
 /**
@@ -79,8 +79,7 @@ enum
  */
 static inline bool INET_IsInetEvent(chip::System::EventType aType)
 {
-    return (aType >= kInetEvent_TCPConnectComplete &&
-            aType <= kInetEvent_RawDataReceived);
+    return (aType >= kInetEvent_TCPConnectComplete && aType <= kInetEvent_RawDataReceived);
 }
 
 } // namespace Inet

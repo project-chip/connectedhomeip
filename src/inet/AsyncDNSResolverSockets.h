@@ -53,40 +53,42 @@ class AsyncDNSResolverSockets
 {
     friend class InetLayer;
     friend class DNSResolver;
+
 public:
+    INET_ERROR EnqueueRequest(DNSResolver & resolver);
 
-    INET_ERROR EnqueueRequest(DNSResolver &resolver);
+    INET_ERROR Init(InetLayer * inet);
 
-    INET_ERROR Init(InetLayer *inet);
-
-    INET_ERROR Cancel(DNSResolver &resolver);
+    INET_ERROR Cancel(DNSResolver & resolver);
 
     INET_ERROR Shutdown(void);
 
-    INET_ERROR PrepareDNSResolver(DNSResolver &resolver, const char *hostName, uint16_t hostNameLen,
-                                  uint8_t options, uint8_t maxAddrs, IPAddress *addrArray,
-                                  DNSResolver::OnResolveCompleteFunct onComplete, void *appState);
+    INET_ERROR PrepareDNSResolver(DNSResolver & resolver, const char * hostName, uint16_t hostNameLen, uint8_t options,
+                                  uint8_t maxAddrs, IPAddress * addrArray, DNSResolver::OnResolveCompleteFunct onComplete,
+                                  void * appState);
 
 private:
-    pthread_t               mAsyncDNSThreadHandle[INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT];
-    pthread_mutex_t         mAsyncDNSMutex;      /* Mutex for accessing the DNSResolver queue. */
-    pthread_cond_t          mAsyncDNSCondVar;    /* Condition Variable for thread synchronization. */
-    volatile DNSResolver    *mAsyncDNSQueueHead; /* The head of the asynchronous DNSResolver object queue. */
-    volatile DNSResolver    *mAsyncDNSQueueTail; /* The tail of the asynchronous DNSResolver object queue. */
-    InetLayer               *mInet;              /* The pointer to the InetLayer. */
-    static void             DNSResultEventHandler(chip::System::Layer* aLayer, void* aAppState, chip::System::Error aError); /* Timer event handler function for asynchronous DNS notification */
+    pthread_t mAsyncDNSThreadHandle[INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT];
+    pthread_mutex_t mAsyncDNSMutex;            /* Mutex for accessing the DNSResolver queue. */
+    pthread_cond_t mAsyncDNSCondVar;           /* Condition Variable for thread synchronization. */
+    volatile DNSResolver * mAsyncDNSQueueHead; /* The head of the asynchronous DNSResolver object queue. */
+    volatile DNSResolver * mAsyncDNSQueueTail; /* The tail of the asynchronous DNSResolver object queue. */
+    InetLayer * mInet;                         /* The pointer to the InetLayer. */
+    static void
+    DNSResultEventHandler(chip::System::Layer * aLayer, void * aAppState,
+                          chip::System::Error aError); /* Timer event handler function for asynchronous DNS notification */
 
-    INET_ERROR DequeueRequest(DNSResolver **outResolver);
+    INET_ERROR DequeueRequest(DNSResolver ** outResolver);
 
     bool ShouldThreadShutdown(void);
 
-    void Resolve(DNSResolver &resolver);
+    void Resolve(DNSResolver & resolver);
 
-    void UpdateDNSResult(DNSResolver &resolver, struct addrinfo *lookupRes);
+    void UpdateDNSResult(DNSResolver & resolver, struct addrinfo * lookupRes);
 
-    static void *AsyncDNSThreadRun(void *args);
+    static void * AsyncDNSThreadRun(void * args);
 
-    static void NotifyChipThread(DNSResolver *resolver);
+    static void NotifyChipThread(DNSResolver * resolver);
 
     void AsyncMutexLock(void);
 
