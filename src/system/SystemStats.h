@@ -101,7 +101,6 @@ enum
     kWDMLegacy_NumTransactions,
 #endif // CHIP_CONFIG_LEGACY_WDM
 
-
     kNumEntries
 };
 
@@ -115,22 +114,21 @@ extern count_t HighWatermarks[kNumEntries];
 class Snapshot
 {
 public:
-
     count_t mResourcesInUse[kNumEntries];
     count_t mHighWatermarks[kNumEntries];
 };
 
-bool Difference(Snapshot &result, Snapshot &after, Snapshot &before);
-void UpdateSnapshot(Snapshot &aSnapshot);
-count_t *GetResourcesInUse(void);
-count_t *GetHighWatermarks(void);
+bool Difference(Snapshot & result, Snapshot & after, Snapshot & before);
+void UpdateSnapshot(Snapshot & aSnapshot);
+count_t * GetResourcesInUse(void);
+count_t * GetHighWatermarks(void);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 void UpdateLwipPbufCounts(void);
 #endif
 
-typedef const char *Label;
-const Label *GetStrings(void);
+typedef const char * Label;
+const Label * GetStrings(void);
 
 } // namespace Stats
 } // namespace System
@@ -138,48 +136,53 @@ const Label *GetStrings(void);
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 
-#define SYSTEM_STATS_INCREMENT(entry) \
-    do { \
-        chip::System::Stats::count_t new_value = ++(chip::System::Stats::GetResourcesInUse()[entry]); \
-        if (chip::System::Stats::GetHighWatermarks()[entry] < new_value) \
-        { \
-            chip::System::Stats::GetHighWatermarks()[entry] = new_value; \
-        } \
+#define SYSTEM_STATS_INCREMENT(entry)                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chip::System::Stats::count_t new_value = ++(chip::System::Stats::GetResourcesInUse()[entry]);                              \
+        if (chip::System::Stats::GetHighWatermarks()[entry] < new_value)                                                           \
+        {                                                                                                                          \
+            chip::System::Stats::GetHighWatermarks()[entry] = new_value;                                                           \
+        }                                                                                                                          \
     } while (0);
 
-#define SYSTEM_STATS_DECREMENT(entry) \
-    do { \
-        chip::System::Stats::GetResourcesInUse()[entry]--; \
+#define SYSTEM_STATS_DECREMENT(entry)                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chip::System::Stats::GetResourcesInUse()[entry]--;                                                                         \
     } while (0);
 
-#define SYSTEM_STATS_DECREMENT_BY_N(entry, count) \
-    do { \
-        chip::System::Stats::GetResourcesInUse()[entry] -= (count); \
+#define SYSTEM_STATS_DECREMENT_BY_N(entry, count)                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chip::System::Stats::GetResourcesInUse()[entry] -= (count);                                                                \
     } while (0);
 
-#define SYSTEM_STATS_SET(entry, count) \
-    do { \
-        chip::System::Stats::count_t new_value = chip::System::Stats::GetResourcesInUse()[entry] = (count); \
-        if (chip::System::Stats::GetHighWatermarks()[entry] < new_value) \
-        { \
-            chip::System::Stats::GetHighWatermarks()[entry] = new_value; \
-        } \
+#define SYSTEM_STATS_SET(entry, count)                                                                                             \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chip::System::Stats::count_t new_value = chip::System::Stats::GetResourcesInUse()[entry] = (count);                        \
+        if (chip::System::Stats::GetHighWatermarks()[entry] < new_value)                                                           \
+        {                                                                                                                          \
+            chip::System::Stats::GetHighWatermarks()[entry] = new_value;                                                           \
+        }                                                                                                                          \
     } while (0);
 
-#define SYSTEM_STATS_RESET(entry) \
-    do { \
-        chip::System::Stats::GetResourcesInUse()[entry] = 0; \
+#define SYSTEM_STATS_RESET(entry)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chip::System::Stats::GetResourcesInUse()[entry] = 0;                                                                       \
     } while (0);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
-#define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS() \
-    do { \
-        chip::System::Stats::UpdateLwipPbufCounts(); \
+#define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS()                                                                                     \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chip::System::Stats::UpdateLwipPbufCounts();                                                                               \
     } while (0);
 #else // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 #define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS()
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
-
 
 #else // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 

@@ -165,9 +165,7 @@
  *  @}
  */
 
-
 #ifdef __cplusplus
-
 
 namespace chip {
 namespace System {
@@ -183,7 +181,7 @@ extern void RegisterSystemLayerErrorFormatter(void);
 extern bool FormatSystemLayerError(char * buf, uint16_t bufSize, int32_t err);
 
 extern Error MapErrorPOSIX(int code);
-extern const char* DescribeErrorPOSIX(Error code);
+extern const char * DescribeErrorPOSIX(Error code);
 extern bool IsErrorPOSIX(Error code);
 extern void RegisterPOSIXErrorFormatter(void);
 extern bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err);
@@ -191,7 +189,7 @@ extern bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 extern Error MapErrorLwIP(err_t code);
-extern const char* DescribeErrorLwIP(Error code);
+extern const char * DescribeErrorLwIP(Error code);
 extern bool IsErrorLwIP(Error code);
 extern void RegisterLwIPErrorFormatter(void);
 extern bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err);

@@ -70,17 +70,19 @@ public:
      *  now closed" that existed previously in the \c kState_Ready and
      *  \c kState_Closed states.
      */
-    enum {
-        kState_Ready        = kBasisState_Closed,   /**< Endpoint initialized, but not open. */
-        kState_Bound        = 1,                    /**< Endpoint bound, but not listening. */
-        kState_Listening    = 2,                    /**< Endpoint receiving datagrams. */
-        kState_Closed       = 3                     /**< Endpoint closed, ready for release. */
+    enum
+    {
+        kState_Ready     = kBasisState_Closed, /**< Endpoint initialized, but not open. */
+        kState_Bound     = 1,                  /**< Endpoint bound, but not listening. */
+        kState_Listening = 2,                  /**< Endpoint receiving datagrams. */
+        kState_Closed    = 3                   /**< Endpoint closed, ready for release. */
     } mState;
 
     /**
      * @brief   Transmit option flags for the \c SendMsg method.
      */
-    enum {
+    enum
+    {
         /** Do not destructively queue the message directly. Queue a copy. */
         kSendFlag_RetainBuffer = 0x0040
     };
@@ -97,7 +99,8 @@ public:
      *  member to process message text reception events on \c endPoint where
      *  \c msg is the message text received from the sender at \c senderAddr.
      */
-    typedef void (*OnMessageReceivedFunct)(IPEndPointBasis *endPoint, chip::System::PacketBuffer *msg, const IPPacketInfo *pktInfo);
+    typedef void (*OnMessageReceivedFunct)(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg,
+                                           const IPPacketInfo * pktInfo);
 
     /** The endpoint's message reception event handling function delegate. */
     OnMessageReceivedFunct OnMessageReceived;
@@ -113,26 +116,26 @@ public:
      *  member to process reception error events on \c endPoint. The \c err
      *  argument provides specific detail about the type of the error.
      */
-    typedef void (*OnReceiveErrorFunct)(IPEndPointBasis *endPoint, INET_ERROR err, const IPPacketInfo *pktInfo);
+    typedef void (*OnReceiveErrorFunct)(IPEndPointBasis * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo);
 
     /** The endpoint's receive error event handling function delegate. */
     OnReceiveErrorFunct OnReceiveError;
 
     INET_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback);
-    INET_ERROR JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress &aAddress);
-    INET_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress &aAddress);
+    INET_ERROR JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
+    INET_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
 
 protected:
-    void Init(InetLayer *aInetLayer);
+    void Init(InetLayer * aInetLayer);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
-    static struct netif *FindNetifFromInterfaceId(InterfaceId aInterfaceId);
+    static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
 
 protected:
-    void HandleDataReceived(chip::System::PacketBuffer *aBuffer);
+    void HandleDataReceived(chip::System::PacketBuffer * aBuffer);
 
-    static IPPacketInfo *GetPacketInfo(chip::System::PacketBuffer *buf);
+    static IPPacketInfo * GetPacketInfo(chip::System::PacketBuffer * buf);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -141,23 +144,23 @@ protected:
 
     INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, InterfaceId aInterfaceId);
     INET_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
-    INET_ERROR SendMsg(const IPPacketInfo *aPktInfo, chip::System::PacketBuffer *aBuffer, uint16_t aSendFlags);
+    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
     INET_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
     SocketEvents PrepareIO(void);
     void HandlePendingIO(uint16_t aPort);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 private:
-    IPEndPointBasis(void);                     // not defined
-    IPEndPointBasis(const IPEndPointBasis &);  // not defined
-    ~IPEndPointBasis(void);                    // not defined
+    IPEndPointBasis(void);                    // not defined
+    IPEndPointBasis(const IPEndPointBasis &); // not defined
+    ~IPEndPointBasis(void);                   // not defined
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-inline struct netif *IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
+inline struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
 {
-    struct netif *lRetval = NULL;
+    struct netif * lRetval = NULL;
 
 #if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
     NETIF_FOREACH(lRetval)
@@ -165,15 +168,15 @@ inline struct netif *IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInte
         if (lRetval == aInterfaceId)
             break;
     }
-#else // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
-    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next);
+#else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
+    for (lRetval = netif_list; lRetval != NULL && lRetval != aInterfaceId; lRetval = lRetval->next)
+        ;
 #endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
 
     return (lRetval);
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 
 } // namespace Inet
 } // namespace chip
