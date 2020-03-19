@@ -41,6 +41,11 @@
 *_q*
 
 # Build System
+.deps
+.dirstamp
+.local-version
+Makefile
+Makefile.in
 aclocal.m4
 autom4te.cache
 build/autoconf/compile
@@ -59,5 +64,4 @@ build/autoconf/test-driver
 config.log
 config.status
 configure
-Makefile.in
 src/include/BuildConfig.h.in
