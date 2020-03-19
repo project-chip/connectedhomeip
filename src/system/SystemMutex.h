@@ -52,9 +52,10 @@ namespace System {
  *
  *  @brief
  *      This class represents a simple mutual exclusion lock used on platforms with preemptively scheduled multi-threaded
- *      programming environments, for example, POSIX threads and FreeRTOS. The lock is non-recursive, and may not be used in a
- * hardware interrupt context. The constructor and destructor are defined as null functions to facilitate using objects with \c
- * static storage duration and uninitialized memory. Use \c Init method to initialize. The copy/move operators are not provided.
+ *      programming environments, for example, POSIX threads and FreeRTOS. The lock is non-recursive, and may not be used
+ *      in a hardware interrupt context. The constructor and destructor are defined as null functions to facilitate using
+ *      objects with \c static storage duration and uninitialized memory. Use \c Init method to initialize. The copy/move
+ *      operators are not provided.
  *
  */
 class DLL_EXPORT Mutex
