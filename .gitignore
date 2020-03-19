@@ -56,8 +56,12 @@ build/autoconf/m4/ltversion.m4
 build/autoconf/m4/lt~obsolete.m4
 build/autoconf/missing
 build/autoconf/test-driver
+.deps
+.dirstamp
+.local-version
 config.log
 config.status
 configure
+Makefile
 Makefile.in
 src/include/BuildConfig.h.in
