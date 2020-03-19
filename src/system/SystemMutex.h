@@ -52,9 +52,9 @@ namespace System {
  *
  *  @brief
  *      This class represents a simple mutual exclusion lock used on platforms with preemptively scheduled multi-threaded
- *      programming environments, for example, POSIX threads and FreeRTOS. The lock is non-recursive, and may not be used in a hardware
- *      interrupt context. The constructor and destructor are defined as null functions to facilitate using objects with \c static
- *      storage duration and uninitialized memory. Use \c Init method to initialize. The copy/move operators are not provided.
+ *      programming environments, for example, POSIX threads and FreeRTOS. The lock is non-recursive, and may not be used in a
+ * hardware interrupt context. The constructor and destructor are defined as null functions to facilitate using objects with \c
+ * static storage duration and uninitialized memory. Use \c Init method to initialize. The copy/move operators are not provided.
  *
  */
 class DLL_EXPORT Mutex
@@ -63,10 +63,10 @@ public:
     Mutex(void);
     ~Mutex(void);
 
-    static Error Init(Mutex& aMutex);
+    static Error Init(Mutex & aMutex);
 
-    void Lock(void);    /**< Acquire the mutual exclusion lock, blocking the current thread indefinitely if necessary. */
-    void Unlock(void);  /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */
+    void Lock(void);   /**< Acquire the mutual exclusion lock, blocking the current thread indefinitely if necessary. */
+    void Unlock(void); /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */
 
 private:
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -81,17 +81,13 @@ private:
     volatile int mInitialized;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
-    Mutex(const Mutex&)             /* = delete */;
-    Mutex& operator =(const Mutex&) /* = delete */;
+    Mutex(const Mutex &) /* = delete */;
+    Mutex & operator=(const Mutex &) /* = delete */;
 };
 
-inline Mutex::Mutex(void)
-{
-}
+inline Mutex::Mutex(void) {}
 
-inline Mutex::~Mutex(void)
-{
-}
+inline Mutex::~Mutex(void) {}
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 inline void Mutex::Lock(void)

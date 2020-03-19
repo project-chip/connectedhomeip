@@ -46,7 +46,6 @@ namespace Inet {
 class IPAddress;
 class IPPrefix;
 
-
 /**
  * @typedef     InterfaceId
  *
@@ -63,13 +62,12 @@ class IPPrefix;
  */
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-typedef struct netif *InterfaceId;
+typedef struct netif * InterfaceId;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 typedef unsigned InterfaceId;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 
 /**
  * @def     INET_NULL_INTERFACEID
@@ -91,7 +89,6 @@ typedef unsigned InterfaceId;
 #define INET_NULL_INTERFACEID 0
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-
 /**
  * @brief   Test \c ID for inequivalence with \c INET_NULL_INTERFACEID
  *
@@ -101,8 +98,8 @@ typedef unsigned InterfaceId;
  */
 #define IsInterfaceIdPresent(intfId) ((intfId) != INET_NULL_INTERFACEID)
 
-extern INET_ERROR GetInterfaceName(InterfaceId intfId, char *nameBuf, size_t nameBufSize);
-extern INET_ERROR InterfaceNameToId(const char *intfName, InterfaceId& intfId);
+extern INET_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize);
+extern INET_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId);
 extern uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen);
 
 /**
@@ -147,7 +144,7 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    struct if_nameindex  * mIntfArray;
+    struct if_nameindex * mIntfArray;
     size_t mCurIntf;
     short mIntfFlags;
     bool mIntfFlagsCached;
@@ -214,7 +211,6 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 inline InterfaceIterator::InterfaceIterator(void)
@@ -222,9 +218,7 @@ inline InterfaceIterator::InterfaceIterator(void)
     mCurNetif = netif_list;
 }
 
-inline InterfaceIterator::~InterfaceIterator(void)
-{
-}
+inline InterfaceIterator::~InterfaceIterator(void) {}
 
 inline bool InterfaceIterator::HasCurrent(void)
 {
@@ -238,15 +232,12 @@ inline InterfaceId InterfaceIterator::GetInterfaceId(void)
 
 inline InterfaceAddressIterator::InterfaceAddressIterator(void)
 {
-	mCurAddrIndex = kBeforeStartIndex;
+    mCurAddrIndex = kBeforeStartIndex;
 }
 
-inline InterfaceAddressIterator::~InterfaceAddressIterator(void)
-{
-}
+inline InterfaceAddressIterator::~InterfaceAddressIterator(void) {}
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 
 /**
  * @brief    Deprecated alias for \c GetInterfaceId(void)
@@ -269,7 +260,7 @@ inline InterfaceId InterfaceAddressIterator::GetInterface(void)
  */
 inline uint8_t InterfaceAddressIterator::GetIPv6PrefixLength(void)
 {
-	return GetPrefixLength();
+    return GetPrefixLength();
 }
 
 } // namespace Inet

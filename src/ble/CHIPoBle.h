@@ -91,8 +91,8 @@ public:
 
 public:
     // Public functions:
-    CHIPoBle(void) { };
-    ~CHIPoBle(void) { };
+    CHIPoBle(void){};
+    ~CHIPoBle(void){};
 
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 

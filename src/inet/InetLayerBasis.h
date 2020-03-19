@@ -52,20 +52,20 @@ class InetLayer;
 class InetLayerBasis : public chip::System::Object
 {
 public:
-    InetLayer& Layer(void) const;
-    bool IsCreatedByInetLayer(const InetLayer& aInetLayer) const;
+    InetLayer & Layer(void) const;
+    bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const;
 
 protected:
-    void InitInetLayerBasis(InetLayer& aInetLayer, void* aAppState = NULL);
+    void InitInetLayerBasis(InetLayer & aInetLayer, void * aAppState = NULL);
 
 private:
-    InetLayer* mInetLayer;  /**< Pointer to the InetLayer object that owns this object. */
+    InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */
 };
 
 /**
  *  Returns a reference to the Inet layer object that owns this basis object.
  */
-inline InetLayer& InetLayerBasis::Layer(void) const
+inline InetLayer & InetLayerBasis::Layer(void) const
 {
     return *mInetLayer;
 }
@@ -81,14 +81,14 @@ inline InetLayer& InetLayerBasis::Layer(void) const
  *      Does not check whether the object is actually obtained by the system layer instance associated with the INET layer
  *      instance. It merely tests whether \c aInetLayer is the INET layer instance that was provided to \c InitInetLayerBasis.
  */
-inline bool InetLayerBasis::IsCreatedByInetLayer(const InetLayer& aInetLayer) const
+inline bool InetLayerBasis::IsCreatedByInetLayer(const InetLayer & aInetLayer) const
 {
     return mInetLayer == &aInetLayer;
 }
 
-inline void InetLayerBasis::InitInetLayerBasis(InetLayer& aInetLayer, void* aAppState)
+inline void InetLayerBasis::InitInetLayerBasis(InetLayer & aInetLayer, void * aAppState)
 {
-    AppState = aAppState;
+    AppState   = aAppState;
     mInetLayer = &aInetLayer;
 }
 
@@ -110,24 +110,24 @@ class SocketEvents
 public:
     enum
     {
-        kRead    = 0x01,        /**< Bit flag indicating if there is a read event on a socket. */
-        kWrite   = 0x02,        /**< Bit flag indicating if there is a write event on a socket. */
-        kError   = 0x04,        /**< Bit flag indicating if there is an error event on a socket. */
+        kRead  = 0x01, /**< Bit flag indicating if there is a read event on a socket. */
+        kWrite = 0x02, /**< Bit flag indicating if there is a write event on a socket. */
+        kError = 0x04, /**< Bit flag indicating if there is an error event on a socket. */
     };
 
-    int Value;                  /**< Contains the bit flags for the socket event. */
+    int Value; /**< Contains the bit flags for the socket event. */
 
     /**
      *  Constructor for the SocketEvents class.
      *
      */
-    SocketEvents()              { Value = 0; }
+    SocketEvents() { Value = 0; }
 
     /**
      *  Copy constructor for the SocketEvents class.
      *
      */
-    SocketEvents(const SocketEvents& other) { Value = other.Value; }
+    SocketEvents(const SocketEvents & other) { Value = other.Value; }
 
     /**
      *  Check if any of the bit flags for the socket events are set.
@@ -135,7 +135,7 @@ public:
      *  @return true if set, otherwise false.
      *
      */
-    bool IsSet() const          { return Value != 0; }
+    bool IsSet() const { return Value != 0; }
 
     /**
      *  Check if the bit flags indicate that the socket is readable.
@@ -143,7 +143,7 @@ public:
      *  @return true if socket is readable, otherwise false.
      *
      */
-    bool IsReadable() const     { return (Value & kRead) != 0; }
+    bool IsReadable() const { return (Value & kRead) != 0; }
 
     /**
      *  Check if the bit flags indicate that the socket is writable.
@@ -151,7 +151,7 @@ public:
      *  @return true if socket is writable, otherwise false.
      *
      */
-    bool IsWriteable() const    { return (Value & kWrite) != 0; }
+    bool IsWriteable() const { return (Value & kWrite) != 0; }
 
     /**
      *  Check if the bit flags indicate that the socket has an error.
@@ -159,52 +159,52 @@ public:
      *  @return true if socket has an error, otherwise false.
      *
      */
-    bool IsError() const        { return (Value & kError) != 0; }
+    bool IsError() const { return (Value & kError) != 0; }
 
     /**
      *  Set the read bit flag for the socket.
      *
      */
-    void SetRead()              { Value |= kRead; }
+    void SetRead() { Value |= kRead; }
 
     /**
      *  Set the write bit flag for the socket.
      *
      */
-    void SetWrite()             { Value |= kWrite; }
+    void SetWrite() { Value |= kWrite; }
 
     /**
      *  Set the error bit flag for the socket.
      *
      */
-    void SetError()             { Value |= kError; }
+    void SetError() { Value |= kError; }
 
     /**
      *  Clear the bit flags for the socket.
      *
      */
-    void Clear()                { Value = 0; }
+    void Clear() { Value = 0; }
 
     /**
      *  Clear the read bit flag for the socket.
      *
      */
-    void ClearRead()            { Value &= ~kRead; }
+    void ClearRead() { Value &= ~kRead; }
 
     /**
      *  Clear the write bit flag for the socket.
      *
      */
-    void ClearWrite()           { Value &= ~kWrite; }
+    void ClearWrite() { Value &= ~kWrite; }
 
     /**
      *  Clear the error bit flag for the socket.
      *
      */
-    void ClearError()           { Value &= ~kError; }
+    void ClearError() { Value &= ~kError; }
 
-    void SetFDs(int socket, int& nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds);
-    static SocketEvents FromFDs(int socket, fd_set *readfds, fd_set *writefds, fd_set *exceptfds);
+    void SetFDs(int socket, int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds);
+    static SocketEvents FromFDs(int socket, fd_set * readfds, fd_set * writefds, fd_set * exceptfds);
 };
 
 /**

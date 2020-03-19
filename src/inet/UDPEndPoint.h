@@ -46,7 +46,7 @@ class IPPacketInfo;
  *  endpoints (SOCK_DGRAM sockets on Linux and BSD-derived systems) or LwIP
  *  UDP protocol control blocks, as the system is configured accordingly.
  */
- class DLL_EXPORT UDPEndPoint : public IPEndPointBasis
+class DLL_EXPORT UDPEndPoint : public IPEndPointBasis
 {
     friend class InetLayer;
 
@@ -56,28 +56,28 @@ public:
     InterfaceId GetBoundInterface(void);
     uint16_t GetBoundPort(void);
     INET_ERROR Listen(void);
-    INET_ERROR SendTo(IPAddress addr, uint16_t port, chip::System::PacketBuffer *msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer *msg, uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo *pktInfo, chip::System::PacketBuffer *msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(IPAddress addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     void Close(void);
     void Free(void);
 
 private:
-    UDPEndPoint(void);                                  // not defined
-    UDPEndPoint(const UDPEndPoint&);                    // not defined
-    ~UDPEndPoint(void);                                 // not defined
+    UDPEndPoint(void);                // not defined
+    UDPEndPoint(const UDPEndPoint &); // not defined
+    ~UDPEndPoint(void);               // not defined
 
     static chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
 
-    void Init(InetLayer *inetLayer);
+    void Init(InetLayer * inetLayer);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    void HandleDataReceived(chip::System::PacketBuffer *msg);
+    void HandleDataReceived(chip::System::PacketBuffer * msg);
     INET_ERROR GetPCB(IPAddressType addrType4);
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-    static void LwIPReceiveUDPMessage(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port);
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-    static void LwIPReceiveUDPMessage(void *arg, struct udp_pcb *pcb, struct pbuf *p, ip_addr_t *addr, u16_t port);
+    static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);
+#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
+    static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port);
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
