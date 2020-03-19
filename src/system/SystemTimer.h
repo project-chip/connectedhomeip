@@ -75,21 +75,21 @@ public:
     typedef uint64_t Epoch;
 
     static Epoch GetCurrentEpoch(void);
-    static bool IsEarlierEpoch(const Epoch &first, const Epoch &second);
+    static bool IsEarlierEpoch(const Epoch & first, const Epoch & second);
 
-    typedef void (*OnCompleteFunct)(Layer* aLayer, void* aAppState, Error aError);
+    typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
     OnCompleteFunct OnComplete;
 
-    Error Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void* aAppState);
+    Error Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState);
     Error Cancel(void);
 
-    static void GetStatistics(chip::System::Stats::count_t& aNumInUse, chip::System::Stats::count_t& aHighWatermark);
+    static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    void AttachInetLayer(Inet::InetLayer& aInetLayer, void* aOnCompleteInetLayer, void* aAppStateInetLayer);
-    Inet::InetLayer* InetLayer(void) const;
-    void* OnCompleteInetLayer(void) const;
-    void* AppStateInetLayer(void) const;
+    void AttachInetLayer(Inet::InetLayer & aInetLayer, void * aOnCompleteInetLayer, void * aAppStateInetLayer);
+    Inet::InetLayer * InetLayer(void) const;
+    void * OnCompleteInetLayer(void) const;
+    void * AppStateInetLayer(void) const;
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 private:
@@ -98,52 +98,50 @@ private:
     Epoch mAwakenEpoch;
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    Inet::InetLayer* mInetLayer;
-    void* mOnCompleteInetLayer;
-    void* mAppStateInetLayer;
+    Inet::InetLayer * mInetLayer;
+    void * mOnCompleteInetLayer;
+    void * mAppStateInetLayer;
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
     void HandleComplete(void);
 
-    Error ScheduleWork(OnCompleteFunct aOnComplete, void* aAppState);
+    Error ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    Timer *mNextTimer;
+    Timer * mNextTimer;
 
-    static Error HandleExpiredTimers(Layer& aLayer);
+    static Error HandleExpiredTimers(Layer & aLayer);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Not defined
-    Timer(const Timer&);
-    Timer& operator =(const Timer&);
+    Timer(const Timer &);
+    Timer & operator=(const Timer &);
 };
 
-
-inline void Timer::GetStatistics(chip::System::Stats::count_t& aNumInUse,
-                                 chip::System::Stats::count_t& aHighWatermark)
+inline void Timer::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
 {
     sPool.GetStatistics(aNumInUse, aHighWatermark);
 }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-inline void Timer::AttachInetLayer(Inet::InetLayer& aInetLayer, void* aOnCompleteInetLayer, void* aAppStateInetLayer)
+inline void Timer::AttachInetLayer(Inet::InetLayer & aInetLayer, void * aOnCompleteInetLayer, void * aAppStateInetLayer)
 {
-    this->mInetLayer = &aInetLayer;
+    this->mInetLayer           = &aInetLayer;
     this->mOnCompleteInetLayer = aOnCompleteInetLayer;
-    this->mAppStateInetLayer = aAppStateInetLayer;
+    this->mAppStateInetLayer   = aAppStateInetLayer;
 }
 
-inline Inet::InetLayer* Timer::InetLayer(void) const
+inline Inet::InetLayer * Timer::InetLayer(void) const
 {
     return this->mInetLayer;
 }
 
-inline void* Timer::OnCompleteInetLayer(void) const
+inline void * Timer::OnCompleteInetLayer(void) const
 {
     return this->mOnCompleteInetLayer;
 }
 
-inline void* Timer::AppStateInetLayer(void) const
+inline void * Timer::AppStateInetLayer(void) const
 {
     return this->mAppStateInetLayer;
 }

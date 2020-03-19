@@ -51,9 +51,9 @@ typedef CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE EventType;
 typedef CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE Event;
 
 /**
-*   The Inet layer event type definitions.
-*
-*/
+ *   The Inet layer event type definitions.
+ *
+ */
 enum
 {
     kEvent_ReleaseObj   = _CHIP_SYSTEM_CONFIG_LWIP_EVENT(0), /**< The event for the drop of a SystemLayer object */

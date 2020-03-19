@@ -425,5 +425,4 @@ extern bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err);
 } /* namespace Ble */
 } /* namespace chip */
 
-
 #endif /* BLEERROR_H_ */

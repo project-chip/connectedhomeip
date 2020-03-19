@@ -25,6 +25,7 @@
 #define BLEPLATFORMDELEGATE_H_
 
 #include <ble/BleConfig.h>
+
 #include <ble/BleUUID.h>
 
 #include <system/SystemPacketBuffer.h>
@@ -42,8 +43,7 @@ public:
     // Following APIs must be implemented by platform:
 
     // Subscribe to updates and indications on the specfied characteristic
-    virtual bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId,
-                                         const chipBleUUID * charId) = 0;
+    virtual bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId) = 0;
 
     // Unsubscribe from updates and indications on the specified characteristic
     virtual bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId,
@@ -86,8 +86,8 @@ public:
                                  PacketBuffer * pBuf) = 0;
 
     // Send response to remote host's GATT chacteristic read response
-    virtual bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
-                                  const chipBleUUID * svcId, const chipBleUUID * charId) = 0;
+    virtual bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const chipBleUUID * svcId,
+                                  const chipBleUUID * charId) = 0;
 };
 
 } /* namespace Ble */

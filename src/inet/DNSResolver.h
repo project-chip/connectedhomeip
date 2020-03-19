@@ -29,7 +29,7 @@
 #include <InetError.h>
 #include "InetLayerBasis.h"
 
-#define NL_DNS_HOSTNAME_MAX_LEN      (253)
+#define NL_DNS_HOSTNAME_MAX_LEN (253)
 
 struct addrinfo;
 
@@ -43,24 +43,23 @@ class InetLayer;
  */
 enum DNSOptions
 {
-    kDNSOption_AddrFamily_Mask            = 0x07, ///< Bits within a DNSOptions integer value representing the desired address family.
-    kDNSOption_Flags_Mask                 = 0xF8, ///< Bits within a DNSOptions integer value reserved for flags.
+    kDNSOption_AddrFamily_Mask = 0x07, ///< Bits within a DNSOptions integer value representing the desired address family.
+    kDNSOption_Flags_Mask      = 0xF8, ///< Bits within a DNSOptions integer value reserved for flags.
 
     // Address Family Choices
-    kDNSOption_AddrFamily_Any             = 0x00, ///< Return IPv4 and/or IPv6 addresses in the order returned by the nameserver.
+    kDNSOption_AddrFamily_Any = 0x00, ///< Return IPv4 and/or IPv6 addresses in the order returned by the nameserver.
 #if INET_CONFIG_ENABLE_IPV4
-    kDNSOption_AddrFamily_IPv4Only        = 0x01, ///< Return only IPv4 addresses.
-    kDNSOption_AddrFamily_IPv4Preferred   = 0x02, ///< Return IPv4 and/or IPv6 addresses, with IPv4 addresses listed first.
+    kDNSOption_AddrFamily_IPv4Only      = 0x01, ///< Return only IPv4 addresses.
+    kDNSOption_AddrFamily_IPv4Preferred = 0x02, ///< Return IPv4 and/or IPv6 addresses, with IPv4 addresses listed first.
 #endif
-    kDNSOption_AddrFamily_IPv6Only        = 0x03, ///< Return only IPv6 addresses.
-    kDNSOption_AddrFamily_IPv6Preferred   = 0x04, ///< Return IPv4 and/or IPv6 addresses, with IPv6 addresses listed first.
+    kDNSOption_AddrFamily_IPv6Only      = 0x03, ///< Return only IPv6 addresses.
+    kDNSOption_AddrFamily_IPv6Preferred = 0x04, ///< Return IPv4 and/or IPv6 addresses, with IPv6 addresses listed first.
 
     // NOTE: At present there are no DNSOption flags define.
-    kDNSOption_ValidFlags                 = 0,    ///< Set of all valid DNSOption flags.
+    kDNSOption_ValidFlags = 0, ///< Set of all valid DNSOption flags.
 
-    kDNSOption_Default                    = kDNSOption_AddrFamily_Any
+    kDNSOption_Default = kDNSOption_AddrFamily_Any
 };
-
 
 /**
  *  @class DNSResolver
@@ -71,7 +70,7 @@ enum DNSOptions
  *    interface available for the application layer.
  *
  */
-class DNSResolver: public InetLayerBasis
+class DNSResolver : public InetLayerBasis
 {
 private:
     friend class InetLayer;
@@ -81,12 +80,11 @@ private:
     friend class AsyncDNSResolverSockets;
 
     /// States of the DNSResolver object with respect to hostname resolution.
-    typedef enum DNSResolverState
-    {
-        kState_Unused                        = 0, ///<Used to indicate that the DNSResolver object is not used.
-        kState_Active                        = 2, ///<Used to indicate that a DNS resolution is being performed on the DNSResolver object.
-        kState_Complete                      = 3, ///<Used to indicate that the DNS resolution on the DNSResolver object is complete.
-        kState_Canceled                      = 4, ///<Used to indicate that the DNS resolution on the DNSResolver has been canceled.
+    typedef enum DNSResolverState{
+        kState_Unused   = 0, ///< Used to indicate that the DNSResolver object is not used.
+        kState_Active   = 2, ///< Used to indicate that a DNS resolution is being performed on the DNSResolver object.
+        kState_Complete = 3, ///< Used to indicate that the DNS resolution on the DNSResolver object is complete.
+        kState_Canceled = 4, ///< Used to indicate that the DNS resolution on the DNSResolver has been canceled.
     } DNSResolverState;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
@@ -103,7 +101,7 @@ private:
      *  Provide a function of this type to the \c Resolve method to process
      *  completion events.
      */
-    typedef void (*OnResolveCompleteFunct)(void *appState, INET_ERROR err, uint8_t addrCount, IPAddress *addrArray);
+    typedef void (*OnResolveCompleteFunct)(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
 
     static chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> sPool;
 
@@ -115,7 +113,7 @@ private:
     /**
      *  A pointer to the DNS table that stores a list of resolved addresses.
      */
-    IPAddress *AddrArray;
+    IPAddress * AddrArray;
 
     /**
      *  The maximum number of addresses that could be stored in the DNS table.
@@ -146,7 +144,7 @@ private:
 
     INET_ERROR asyncDNSResolveResult;
     /* The next DNSResolver object in the asynchronous DNS resolution queue. */
-    DNSResolver *pNextAsyncDNSResolver;
+    DNSResolver * pNextAsyncDNSResolver;
 
     DNSResolverState mState;
 
@@ -156,17 +154,16 @@ private:
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    INET_ERROR Resolve(const char *hostName, uint16_t hostNameLen, uint8_t options,
-            uint8_t maxAddrs, IPAddress *addrArray,
-            OnResolveCompleteFunct onComplete, void *appState);
+    INET_ERROR Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs, IPAddress * addrArray,
+                       OnResolveCompleteFunct onComplete, void * appState);
     INET_ERROR Cancel(void);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     void HandleResolveComplete(void);
 #if LWIP_VERSION_MAJOR > 1
-    static void LwIPHandleResolveComplete(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
-#else // LWIP_VERSION_MAJOR <= 1
-    static void LwIPHandleResolveComplete(const char *name, ip_addr_t *ipaddr, void *callback_arg);
+    static void LwIPHandleResolveComplete(const char * name, const ip_addr_t * ipaddr, void * callback_arg);
+#else  // LWIP_VERSION_MAJOR <= 1
+    static void LwIPHandleResolveComplete(const char * name, ip_addr_t * ipaddr, void * callback_arg);
 #endif // LWIP_VERSION_MAJOR <= 1
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 };

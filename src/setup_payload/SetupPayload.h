@@ -21,7 +21,6 @@
  *      data enumerated from a byte stream
  */
 
-
 #ifndef _SETUP_PAYLOAD_H_
 #define _SETUP_PAYLOAD_H_
 
@@ -29,38 +28,33 @@
 
 namespace chip {
 // TODO this shuould point to the spec
-const int kVersionFieldLengthInBits = 3;
-const int kVendorIDFieldLengthInBits = 16;
-const int kProductIDFieldLengthInBits = 16;
-const int kCustomFlowRequiredFieldLengthInBits = 1;
-const int kRendezvousInfoFieldLengthInBits = 8;
+const int kVersionFieldLengthInBits              = 3;
+const int kVendorIDFieldLengthInBits             = 16;
+const int kProductIDFieldLengthInBits            = 16;
+const int kCustomFlowRequiredFieldLengthInBits   = 1;
+const int kRendezvousInfoFieldLengthInBits       = 8;
 const int kPayloadDiscriminatorFieldLengthInBits = 8;
-const int kSetupPINCodeFieldLengthInBits = 27;
-const int kReservedFieldLengthInBits = 1;
+const int kSetupPINCodeFieldLengthInBits         = 27;
+const int kReservedFieldLengthInBits             = 1;
 
-const int kTotalPayloadDataSizeInBits = (  kVersionFieldLengthInBits + \
-                                           kVendorIDFieldLengthInBits + \
-                                           kProductIDFieldLengthInBits + \
-                                           kCustomFlowRequiredFieldLengthInBits + \
-                                           kRendezvousInfoFieldLengthInBits + \
-                                           kPayloadDiscriminatorFieldLengthInBits + \
-                                           kSetupPINCodeFieldLengthInBits + \
-                                           kReservedFieldLengthInBits
-                                        );
+const int kTotalPayloadDataSizeInBits =
+    (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits + kCustomFlowRequiredFieldLengthInBits +
+     kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits + kSetupPINCodeFieldLengthInBits +
+     kReservedFieldLengthInBits);
 
 class SetupPayload
 {
-    public:
-        uint8_t version;
-        uint16_t vendorID;
-        uint16_t productID;
-        uint8_t requiresCustomFlow;
-        uint16_t rendezvousInformation;
-        uint16_t discriminator;
-        uint32_t setUpPINCode;
+public:
+    uint8_t version;
+    uint16_t vendorID;
+    uint16_t productID;
+    uint8_t requiresCustomFlow;
+    uint16_t rendezvousInformation;
+    uint16_t discriminator;
+    uint32_t setUpPINCode;
 
-        // Test that the Setup Payload is within expected value ranges
-        bool isValid();
+    // Test that the Setup Payload is within expected value ranges
+    bool isValid();
 };
 
 }; // namespace chip

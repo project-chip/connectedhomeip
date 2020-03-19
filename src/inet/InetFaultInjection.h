@@ -46,13 +46,13 @@ namespace FaultInjection {
  */
 typedef enum
 {
-    kFault_DNSResolverNew,             /**< Fail the allocation of a DNSResolver object */
-    kFault_Send,                       /**< Fail sending a message over TCP or UDP */
-    kFault_SendNonCritical,            /**< Fail sending a UDP message returning an error considered non-critical by WRMP */
+    kFault_DNSResolverNew,  /**< Fail the allocation of a DNSResolver object */
+    kFault_Send,            /**< Fail sending a message over TCP or UDP */
+    kFault_SendNonCritical, /**< Fail sending a UDP message returning an error considered non-critical by WRMP */
     kFault_NumItems,
 } InetFaultInjectionID;
 
-DLL_EXPORT nl::FaultInjection::Manager &GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager & GetManager(void);
 
 } // namespace FaultInjection
 } // namespace Inet
@@ -65,14 +65,12 @@ DLL_EXPORT nl::FaultInjection::Manager &GetManager(void);
  * @param[in] aFaultID      An Inet fault-injection id
  * @param[in] aStatements   Statements to be executed if the fault is enabled.
  */
-#define INET_FAULT_INJECT( aFaultID, aStatement ) \
-        nlFAULT_INJECT(Inet::FaultInjection::GetManager(), aFaultID, aStatement)
+#define INET_FAULT_INJECT(aFaultID, aStatement) nlFAULT_INJECT(Inet::FaultInjection::GetManager(), aFaultID, aStatement)
 
 #else // INET_CONFIG_TEST
 
-#define INET_FAULT_INJECT( aFaultID, aStatement )
+#define INET_FAULT_INJECT(aFaultID, aStatement)
 
 #endif // INET_CONFIG_TEST
-
 
 #endif // INET_FAULT_INJECTION_H_

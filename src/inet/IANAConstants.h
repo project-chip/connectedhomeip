@@ -38,10 +38,10 @@ namespace Inet {
  */
 typedef enum
 {
-    kIPVersion_6 = 6,          /**< IPv6 */
+    kIPVersion_6 = 6, /**< IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
-    kIPVersion_4 = 4,          /**< IPv4 */
-#endif // INET_CONFIG_ENABLE_IPV4
+    kIPVersion_4 = 4, /**< IPv4 */
+#endif                // INET_CONFIG_ENABLE_IPV4
 } IPVersion;
 
 /**
@@ -52,10 +52,10 @@ typedef enum
  */
 typedef enum
 {
-    kIPProtocol_ICMPv6 = 58,   /**< ICMPv6 */
+    kIPProtocol_ICMPv6 = 58, /**< ICMPv6 */
 #if INET_CONFIG_ENABLE_IPV4
-    kIPProtocol_ICMPv4 = 1,    /**< ICMPv4 */
-#endif // INET_CONFIG_ENABLE_IPV4
+    kIPProtocol_ICMPv4 = 1, /**< ICMPv4 */
+#endif                      // INET_CONFIG_ENABLE_IPV4
 } IPProtocol;
 
 /**
@@ -70,30 +70,30 @@ typedef enum
 typedef enum
 {
     /** Interface-local scope. */
-    kIPv6MulticastScope_Interface       = 1,
+    kIPv6MulticastScope_Interface = 1,
 
     /** Link-local scope. */
-    kIPv6MulticastScope_Link            = 2,
+    kIPv6MulticastScope_Link = 2,
 
 #if INET_CONFIG_ENABLE_IPV4
     /** Realm-local ("IPv4") scope. */
-    kIPv6MulticastScope_IPv4            = 3,
-#else // !INET_CONFIG_ENABLE_IPV4
+    kIPv6MulticastScope_IPv4 = 3,
+#else  // !INET_CONFIG_ENABLE_IPV4
     /** Realm-local scope. */
-    kIPv6MulticastScope_Realm           = 3,
+    kIPv6MulticastScope_Realm = 3,
 #endif // !INET_CONFIG_ENABLE_IPV4
 
     /** Realm-local scope. */
-    kIPv6MulticastScope_Admin           = 4,
+    kIPv6MulticastScope_Admin = 4,
 
     /** Realm-local scope. */
-    kIPv6MulticastScope_Site            = 5,
+    kIPv6MulticastScope_Site = 5,
 
     /** Organization-local scope. */
-    kIPv6MulticastScope_Organization    = 8,
+    kIPv6MulticastScope_Organization = 8,
 
     /** Global scope. */
-    kIPv6MulticastScope_Global          = 14
+    kIPv6MulticastScope_Global = 14
 } IPv6MulticastScope;
 
 /**
@@ -106,8 +106,8 @@ typedef enum
  */
 enum IPV6MulticastGroup
 {
-    kIPV6MulticastGroup_AllNodes        = 1,    /** RFC 4291 */
-    kIPV6MulticastGroup_AllRouters      = 2     /** RFC 4291 */
+    kIPV6MulticastGroup_AllNodes   = 1, /** RFC 4291 */
+    kIPV6MulticastGroup_AllRouters = 2  /** RFC 4291 */
 };
 
 } // namespace Inet

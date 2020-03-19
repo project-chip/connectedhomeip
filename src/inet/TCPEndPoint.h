@@ -66,16 +66,17 @@ public:
      *  existing \c kState_Closed exists to identify separately the distinction between "not opened yet" and "previously opened now
      *  closed" that existed previously in the \c kState_Ready and \c kState_Closed states.
      */
-    enum {
-        kState_Ready            = kBasisState_Closed,   /**< Endpoint initialized, but not bound. */
-        kState_Bound            = 1,                    /**< Endpoint bound, but not listening. */
-        kState_Listening        = 2,                    /**< Endpoint receiving connections. */
-        kState_Connecting       = 3,                    /**< Endpoint attempting to connect. */
-        kState_Connected        = 4,                    /**< Endpoint connected, ready for tx/rx. */
-        kState_SendShutdown     = 5,                    /**< Endpoint initiated its half-close. */
-        kState_ReceiveShutdown  = 6,                    /**< Endpoint responded to half-close. */
-        kState_Closing          = 7,                    /**< Endpoint closing bidirectionally. */
-        kState_Closed           = 8                     /**< Endpoint closed, ready for release. */
+    enum
+    {
+        kState_Ready           = kBasisState_Closed, /**< Endpoint initialized, but not bound. */
+        kState_Bound           = 1,                  /**< Endpoint bound, but not listening. */
+        kState_Listening       = 2,                  /**< Endpoint receiving connections. */
+        kState_Connecting      = 3,                  /**< Endpoint attempting to connect. */
+        kState_Connected       = 4,                  /**< Endpoint connected, ready for tx/rx. */
+        kState_SendShutdown    = 5,                  /**< Endpoint initiated its half-close. */
+        kState_ReceiveShutdown = 6,                  /**< Endpoint responded to half-close. */
+        kState_Closing         = 7,                  /**< Endpoint closing bidirectionally. */
+        kState_Closed          = 8                   /**< Endpoint closed, ready for release. */
     } State;
 
     /**
@@ -166,7 +167,7 @@ public:
      * @details
      *  Do not use \c NULL pointer values for either argument.
      */
-    INET_ERROR GetPeerInfo(IPAddress *retAddr, uint16_t *retPort) const;
+    INET_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const;
 
     /**
      * @brief   Extract IP address and TCP port of local endpoint.
@@ -181,7 +182,7 @@ public:
      * @details
      *  Do not use \c NULL pointer values for either argument.
      */
-    INET_ERROR GetLocalInfo(IPAddress *retAddr, uint16_t *retPort);
+    INET_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort);
 
     /**
      * @brief   Send message text on TCP connection.
@@ -196,7 +197,7 @@ public:
      *  The <tt>chip::System::PacketBuffer::Free</tt> method is called on the \c data argument
      *  regardless of whether the transmission is successful or failed.
      */
-    INET_ERROR Send(chip::System::PacketBuffer *data, bool push = true);
+    INET_ERROR Send(chip::System::PacketBuffer * data, bool push = true);
 
     /**
      * @brief   Disable reception.
@@ -309,7 +310,7 @@ public:
      *  portion remaining after the bytes acknowledged by a prior call to the
      *  <tt>AckReceive(uint16_t len)</tt> method.
      */
-    INET_ERROR PutBackReceivedData(chip::System::PacketBuffer *data);
+    INET_ERROR PutBackReceivedData(chip::System::PacketBuffer * data);
 
     /**
      * @brief   Extract the length of the data awaiting first transmit.
@@ -407,7 +408,7 @@ public:
      *  member to process connection establishment events on \c endPoint. The
      *  \c err argument distinguishes successful connections from failures.
      */
-    typedef void (*OnConnectCompleteFunct)(TCPEndPoint *endPoint, INET_ERROR err);
+    typedef void (*OnConnectCompleteFunct)(TCPEndPoint * endPoint, INET_ERROR err);
 
     /**
      * The endpoint's connection establishment event handling function
@@ -430,7 +431,7 @@ public:
      *  the \c AckReceive method. The \c Free method on the data buffer must
      *  also be invoked unless the \c PutBackReceivedData is used instead.
      */
-    typedef void (*OnDataReceivedFunct)(TCPEndPoint *endPoint, chip::System::PacketBuffer *data);
+    typedef void (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBuffer * data);
 
     /**
      * The endpoint's message text reception event handling function delegate.
@@ -449,7 +450,7 @@ public:
      *  is the length of the message text added to the TCP transmit window,
      *  which are eligible for sending by the underlying network stack.
      */
-    typedef void (*OnDataSentFunct)(TCPEndPoint *endPoint, uint16_t len);
+    typedef void (*OnDataSentFunct)(TCPEndPoint * endPoint, uint16_t len);
 
     /**
      * The endpoint's message text transmission event handling function
@@ -468,7 +469,7 @@ public:
      *  member to process connection termination events on \c endPoint. The
      *  \c err argument distinguishes successful terminations from failures.
      */
-    typedef void (*OnConnectionClosedFunct)(TCPEndPoint *endPoint, INET_ERROR err);
+    typedef void (*OnConnectionClosedFunct)(TCPEndPoint * endPoint, INET_ERROR err);
 
     /** The endpoint's close event handling function delegate. */
     OnConnectionClosedFunct OnConnectionClosed;
@@ -482,7 +483,7 @@ public:
      *  Provide a function of this type to the \c OnPeerClose delegate member
      *  to process connection termination events on \c endPoint.
      */
-    typedef void (*OnPeerCloseFunct)(TCPEndPoint *endPoint);
+    typedef void (*OnPeerCloseFunct)(TCPEndPoint * endPoint);
 
     /** The endpoint's half-close receive event handling function delegate. */
     OnPeerCloseFunct OnPeerClose;
@@ -501,8 +502,8 @@ public:
      *  The newly received endpoint \c conEndPoint is located at IP address
      *  \c peerAddr and TCP port \c peerPort.
      */
-    typedef void (*OnConnectionReceivedFunct)(TCPEndPoint *listeningEndPoint, TCPEndPoint *conEndPoint,
-            const IPAddress &peerAddr, uint16_t peerPort);
+    typedef void (*OnConnectionReceivedFunct)(TCPEndPoint * listeningEndPoint, TCPEndPoint * conEndPoint,
+                                              const IPAddress & peerAddr, uint16_t peerPort);
 
     /** The endpoint's connection receive event handling function delegate. */
     OnConnectionReceivedFunct OnConnectionReceived;
@@ -518,7 +519,7 @@ public:
      *  member to process connection acceptance error events on \c endPoint. The
      *  \c err argument provides specific detail about the type of the error.
      */
-    typedef void (*OnAcceptErrorFunct)(TCPEndPoint *endPoint, INET_ERROR err);
+    typedef void (*OnAcceptErrorFunct)(TCPEndPoint * endPoint, INET_ERROR err);
 
     /**
      * The endpoint's connection acceptance event handling function delegate.
@@ -538,7 +539,7 @@ public:
      *  member to process the event of the send channel of the TCPEndPoint
      *  changing state between being idle and not idle.
      */
-    typedef void (*OnTCPSendIdleChangedFunct)(TCPEndPoint *endPoint, bool isIdle);
+    typedef void (*OnTCPSendIdleChangedFunct)(TCPEndPoint * endPoint, bool isIdle);
 
     /** The event handling function delegate of the endpoint signaling when the
      *  idleness of the TCP connection's send channel changes. This is utilized
@@ -550,34 +551,34 @@ public:
 private:
     static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 
-    chip::System::PacketBuffer *mRcvQueue;
-    chip::System::PacketBuffer *mSendQueue;
+    chip::System::PacketBuffer * mRcvQueue;
+    chip::System::PacketBuffer * mSendQueue;
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
-    uint16_t mIdleTimeout;                              // in units of INET_TCP_IDLE_CHECK_INTERVAL; zero means no timeout
-    uint16_t mRemainingIdleTime;                        // in units of INET_TCP_IDLE_CHECK_INTERVAL
-#endif // INET_TCP_IDLE_CHECK_INTERVAL > 0
+    uint16_t mIdleTimeout;       // in units of INET_TCP_IDLE_CHECK_INTERVAL; zero means no timeout
+    uint16_t mRemainingIdleTime; // in units of INET_TCP_IDLE_CHECK_INTERVAL
+#endif                           // INET_TCP_IDLE_CHECK_INTERVAL > 0
 
-    uint32_t mConnectTimeoutMsecs;                      // This is the timeout to wait for a Connect call to succeed or
-                                                        // return an error; zero means use system defaults.
+    uint32_t mConnectTimeoutMsecs; // This is the timeout to wait for a Connect call to succeed or
+                                   // return an error; zero means use system defaults.
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    uint32_t mUserTimeoutMillis;                        // The configured TCP user timeout value in milliseconds.
-                                                        // If 0, assume not set.
+    uint32_t mUserTimeoutMillis; // The configured TCP user timeout value in milliseconds.
+                                 // If 0, assume not set.
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    bool mIsTCPSendIdle;                                // Indicates whether the send channel of the TCPEndPoint is Idle.
+    bool mIsTCPSendIdle; // Indicates whether the send channel of the TCPEndPoint is Idle.
 
-    uint16_t mTCPSendQueueRemainingPollCount;           // The current remaining number of TCP SendQueue polls before
-                                                        // the TCP User timeout period is reached.
+    uint16_t mTCPSendQueueRemainingPollCount; // The current remaining number of TCP SendQueue polls before
+                                              // the TCP User timeout period is reached.
 
-    uint32_t mTCPSendQueuePollPeriodMillis;             // The configured period of active polling of the TCP
-                                                        // SendQueue. If 0, assume not set.
+    uint32_t mTCPSendQueuePollPeriodMillis; // The configured period of active polling of the TCP
+                                            // SendQueue. If 0, assume not set.
     void SetTCPSendIdleAndNotifyChange(bool aIsSendIdle);
 
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
-    bool mUserTimeoutTimerRunning;                      // Indicates whether the TCP UserTimeout timer has been started.
+    bool mUserTimeoutTimerRunning; // Indicates whether the TCP UserTimeout timer has been started.
 
-    static void TCPUserTimeoutHandler(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError);
+    static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
 
     void StartTCPUserTimeoutTimer(void);
 
@@ -592,21 +593,21 @@ private:
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    uint32_t mBytesWrittenSinceLastProbe;               // This counts the number of bytes written on the TCP socket since the
-                                                        // last probe into the TCP outqueue was made.
+    uint32_t mBytesWrittenSinceLastProbe; // This counts the number of bytes written on the TCP socket since the
+                                          // last probe into the TCP outqueue was made.
 
-    uint32_t mLastTCPKernelSendQueueLen;                // This is the measured size(in bytes) of the kernel TCP send queue
-                                                        // at the end of the last user timeout window.
-    INET_ERROR CheckConnectionProgress(bool &IsProgressing);
+    uint32_t mLastTCPKernelSendQueueLen; // This is the measured size(in bytes) of the kernel TCP send queue
+                                         // at the end of the last user timeout window.
+    INET_ERROR CheckConnectionProgress(bool & IsProgressing);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-    TCPEndPoint(void);                                  // not defined
-    TCPEndPoint(const TCPEndPoint&);                    // not defined
-    ~TCPEndPoint(void);                                 // not defined
+    TCPEndPoint(void);                // not defined
+    TCPEndPoint(const TCPEndPoint &); // not defined
+    ~TCPEndPoint(void);               // not defined
 
-    void Init(InetLayer *inetLayer);
+    void Init(InetLayer * inetLayer);
     INET_ERROR DriveSending(void);
     void DriveReceiving(void);
     void HandleConnectComplete(INET_ERROR err);
@@ -614,26 +615,26 @@ private:
     INET_ERROR DoClose(INET_ERROR err, bool suppressCallback);
     static bool IsConnected(int state);
 
-    static void TCPConnectTimeoutHandler(chip::System::Layer* aSystemLayer, void* aAppState, chip::System::Error aError);
+    static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
 
     void StartConnectTimerIfSet(void);
     void StopConnectTimer(void);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    chip::System::PacketBuffer *mUnsentQueue;
+    chip::System::PacketBuffer * mUnsentQueue;
     uint16_t mUnsentOffset;
 
     INET_ERROR GetPCB(IPAddressType addrType);
     void HandleDataSent(uint16_t len);
-    void HandleDataReceived(chip::System::PacketBuffer *buf);
-    void HandleIncomingConnection(TCPEndPoint *pcb);
+    void HandleDataReceived(chip::System::PacketBuffer * buf);
+    void HandleIncomingConnection(TCPEndPoint * pcb);
     void HandleError(INET_ERROR err);
 
-    static err_t LwIPHandleConnectComplete(void *arg, struct tcp_pcb *tpcb, err_t lwipErr);
-    static err_t LwIPHandleIncomingConnection(void *arg, struct tcp_pcb *tcpConPCB, err_t lwipErr);
-    static err_t LwIPHandleDataReceived(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
-    static err_t LwIPHandleDataSent(void *arg, struct tcp_pcb *tpcb, u16_t len);
-    static void LwIPHandleError(void *arg, err_t err);
+    static err_t LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr);
+    static err_t LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tcpConPCB, err_t lwipErr);
+    static err_t LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, struct pbuf * p, err_t err);
+    static err_t LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t len);
+    static void LwIPHandleError(void * arg, err_t err);
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -645,7 +646,6 @@ private:
     void HandleIncomingConnection(void);
     INET_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intf);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 };
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS && INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
@@ -654,8 +654,7 @@ inline uint16_t TCPEndPoint::MaxTCPSendQueuePolls(void)
     // If the UserTimeout is configured less than or equal to the poll interval,
     // return 1 to poll at least once instead of returning zero and timing out
     // immediately.
-    return  (mUserTimeoutMillis > mTCPSendQueuePollPeriodMillis) ?
-             (mUserTimeoutMillis / mTCPSendQueuePollPeriodMillis) : 1;
+    return (mUserTimeoutMillis > mTCPSendQueuePollPeriodMillis) ? (mUserTimeoutMillis / mTCPSendQueuePollPeriodMillis) : 1;
 }
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS && INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 

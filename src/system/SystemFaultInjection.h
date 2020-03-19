@@ -46,15 +46,15 @@ using nl::FaultInjection::Manager;
  */
 typedef enum
 {
-    kFault_PacketBufferNew,             /**< Fail the allocation of a PacketBuffer */
-    kFault_TimeoutImmediate,            /**< Override the timeout value of a timer being started with 0 */
-    kFault_AsyncEvent,                  /**< Inject asynchronous events; when the fault is enabled, it expects
-                                             one integer argument, which is passed to application to signal the event
-                                             to be injected; @see CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT */
+    kFault_PacketBufferNew,  /**< Fail the allocation of a PacketBuffer */
+    kFault_TimeoutImmediate, /**< Override the timeout value of a timer being started with 0 */
+    kFault_AsyncEvent,       /**< Inject asynchronous events; when the fault is enabled, it expects
+                                  one integer argument, which is passed to application to signal the event
+                                  to be injected; @see CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT */
     kFault_NumberOfFaultIdentifiers,
 } Id;
 
-DLL_EXPORT nl::FaultInjection::Manager& GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager & GetManager(void);
 
 /**
  * Callback to the application that returns how many asynchronous events the application could
@@ -87,7 +87,6 @@ DLL_EXPORT void SetAsyncEventCallbacks(GetNumEventsAvailableCb aGetNumEventsAvai
  */
 DLL_EXPORT void InjectAsyncEvent(void);
 
-
 } // namespace FaultInjection
 } // namespace System
 } // namespace chip
@@ -99,8 +98,8 @@ DLL_EXPORT void InjectAsyncEvent(void);
  * @param[in] aFaultID      A System fault-injection id
  * @param[in] aStatements   Statements to be executed if the fault is enabled.
  */
-#define CHIP_SYSTEM_FAULT_INJECT(aFaultId, aStatement) \
-        nlFAULT_INJECT(::chip::System::FaultInjection::GetManager(), aFaultId, aStatement)
+#define CHIP_SYSTEM_FAULT_INJECT(aFaultId, aStatement)                                                                             \
+    nlFAULT_INJECT(::chip::System::FaultInjection::GetManager(), aFaultId, aStatement)
 
 /**
  * This macro implements the injection of asynchronous events.
@@ -114,11 +113,11 @@ DLL_EXPORT void InjectAsyncEvent(void);
  * the macro stores the return value of GetNumEventsAvailableCb into the Records arguments,
  * so that the application can log it from a callback installed into the fault.
  */
-#define CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT() \
-    do { \
-        chip::System::FaultInjection::InjectAsyncEvent(); \
+#define CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT()                                                                                     \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chip::System::FaultInjection::InjectAsyncEvent();                                                                          \
     } while (0)
-
 
 #else // CHIP_SYSTEM_CONFIG_TEST
 

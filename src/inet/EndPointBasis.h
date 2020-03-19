@@ -25,6 +25,7 @@
 #define ENDPOINTBASIS_H
 
 #include <InetConfig.h>
+
 #include <InetError.h>
 #include "IANAConstants.h"
 #include "InetLayerBasis.h"
@@ -61,8 +62,9 @@ class DLL_EXPORT EndPointBasis : public InetLayerBasis
 {
 public:
     /** Common state codes */
-    enum {
-        kBasisState_Closed = 0      /**< Encapsulated descriptor is not valid. */
+    enum
+    {
+        kBasisState_Closed = 0 /**< Encapsulated descriptor is not valid. */
     };
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -80,38 +82,38 @@ public:
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    int mSocket;                    /**< Encapsulated socket descriptor. */
-    IPAddressType mAddrType;        /**< Protocol family, i.e. IPv4 or IPv6. */
-    SocketEvents mPendingIO;        /**< Socket event masks */
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    int mSocket;             /**< Encapsulated socket descriptor. */
+    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
+    SocketEvents mPendingIO; /**< Socket event masks */
+#endif                       // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /** Encapsulated LwIP protocol control block */
     union
     {
-        const void* mVoid;          /**< An untyped protocol control buffer reference */
+        const void * mVoid; /**< An untyped protocol control buffer reference */
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        raw_pcb* mRaw;              /**< Raw network interface protocol control */
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+        raw_pcb * mRaw; /**< Raw network interface protocol control */
+#endif                  // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        udp_pcb* mUDP;              /**< User datagram protocol (UDP) control */
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
+        udp_pcb * mUDP; /**< User datagram protocol (UDP) control */
+#endif                  // INET_CONFIG_ENABLE_UDP_ENDPOINT
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        tcp_pcb* mTCP;              /**< Transmission control protocol (TCP) control */
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+        tcp_pcb * mTCP; /**< Transmission control protocol (TCP) control */
+#endif                  // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #if INET_CONFIG_ENABLE_TUN_ENDPOINT
-        netif* mNetIf;              /**< Tunnel interface control */
-#endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
+        netif * mNetIf; /**< Tunnel interface control */
+#endif                  // INET_CONFIG_ENABLE_TUN_ENDPOINT
     };
 
     enum
     {
         kLwIPEndPointType_Unknown = 0,
 
-        kLwIPEndPointType_Raw     = 1,
-        kLwIPEndPointType_UDP     = 2,
-        kLwIPEndPointType_UCP     = 3,
-        kLwIPEndPointType_TCP     = 4
+        kLwIPEndPointType_Raw = 1,
+        kLwIPEndPointType_UDP = 2,
+        kLwIPEndPointType_UCP = 3,
+        kLwIPEndPointType_TCP = 4
     };
 
     uint8_t mLwIPEndPointType;
@@ -119,7 +121,7 @@ protected:
     void DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    void InitEndPointBasis(InetLayer& aInetLayer, void* aAppState = NULL);
+    void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = NULL);
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -164,7 +166,6 @@ inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErr
     }
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 
 } // namespace Inet
 } // namespace chip
