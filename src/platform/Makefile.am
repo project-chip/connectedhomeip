@@ -93,6 +93,26 @@ libDeviceLayer_a_SOURCES               +=       \
 
 endif # CHIP_DEVICE_LAYER_TARGET_NRF5
 
+if CHIP_DEVICE_LAYER_TARGET_EFR32
+
+libDeviceLayer_a_SOURCES               +=       \
+    EFR32/BLEManagerImpl.cpp                    \
+    EFR32/freertos_bluetooth.c                  \
+    EFR32/gatt_db.c                             \
+    EFR32/ConfigurationManagerImpl.cpp          \
+    EFR32/PlatformManagerImpl.cpp               \
+    EFR32/ConnectivityManagerImpl.cpp           \
+    EFR32/NetworkProvisioningServerImpl.cpp     \
+    EFR32/ThreadStackManagerImpl.cpp            \
+    EFR32/GroupKeyStoreImpl.cpp                 \
+    EFR32/EFR32Config.cpp                       \
+    EFR32/Entropy.cpp                           \
+    EFR32/Logging.cpp                           \
+    EFR32/SoftwareUpdateManagerImpl.cpp         \
+    $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_EFR32
+
 endif # CONFIG_DEVICE_LAYER
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
