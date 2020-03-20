@@ -1,6 +1,5 @@
 #
-#   Copyright (c) 2019 Google LLC.
-#   All rights reserved.
+#   <COPYRIGHT>
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -23,7 +22,7 @@
 
 #
 #   This makefile is primarily intended to support building the
-#   OpenWeave example applications on Nordic platforms.  However
+#   CHIP example applications on Nordic platforms.  However
 #   external developers should feel free to use it if they find
 #   it useful.
 #
@@ -34,11 +33,11 @@
 #   
 #       PROJECT_ROOT = $(realpath .)
 #
-#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/openweave-core/build/nrf5
+#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/build/nrf5
 #       
 #       include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
 #       
-#       APP := openweave-nrf52840-bringup
+#       APP := chip-nrf52840-bringup
 #       
 #       SRCS = \
 #           $(PROJECT_ROOT)/main.cpp \
