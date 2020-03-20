@@ -19,7 +19,7 @@
  *    @file
  *      This file defines a Bluetooth Low Energy (BLE) connection
  *      endpoint abstraction for the byte-streaming,
- *      connection-oriented chip over Bluetooth Low Energy (CHIPoBLE)
+ *      connection-oriented CHIP over Bluetooth Low Energy (CHIPoBLE)
  *      Bluetooth Transport Protocol (BTP).
  *
  */
@@ -73,7 +73,7 @@ public:
         kState_Connected  = 3,
         kState_Closing    = 4,
         kState_Closed     = 5
-    } mState; // [READ-ONLY] End point connection state. Refers to state of chip over
+    } mState; // [READ-ONLY] End point connection state. Refers to state of CHIP over
               // BLE transport protocol connection, not of underlying BLE connection.
 
     // Public function pointers:

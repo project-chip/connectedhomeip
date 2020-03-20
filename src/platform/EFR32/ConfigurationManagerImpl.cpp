@@ -37,7 +37,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
 
-// Singleton instance of Chip Group Key Store.
+// Singleton instance of CHIP Group Key Store.
 GroupKeyStoreImpl gGroupKeyStore;
 
 } // unnamed namespace
@@ -104,7 +104,7 @@ CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(
     ::chip::Platform::PersistedStorage::Key persistedStorageKey,
     uint32_t &                                   value)
 {
-    // This method reads Chip Persisted Counter type nvm3 objects.
+    // This method reads CHIP Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
@@ -123,7 +123,7 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(
     ::chip::Platform::PersistedStorage::Key persistedStorageKey,
     uint32_t                                     value)
 {
-    // This method reads Chip Persisted Counter type nvm3 objects.
+    // This method reads CHIP Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 

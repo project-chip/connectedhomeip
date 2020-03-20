@@ -128,7 +128,7 @@ void TunEndPoint::Close(void)
     {
 
         // For LwIP, we do not remove the netif as it would have
-        // an impact on the interface iterator in chip which
+        // an impact on the interface iterator in CHIP which
         // might lose reference to a particular netif index that
         // it might be holding on to.
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -171,7 +171,7 @@ void TunEndPoint::Free()
  * @note
  *  This method performs a couple of minimal sanity checks on the packet to
  *  be sure it is IP version 6 then dispatches it for encapsulation in a
- *  chip tunneling message.
+ *  CHIP tunneling message.
  *
  * @param[in]   message     the IPv6 packet to send.
  *
@@ -553,7 +553,7 @@ err_t TunEndPoint::LwIPPostToInetEventQ(struct netif * netif, struct pbuf * p)
     PacketBuffer * buf                 = PacketBuffer::NewWithAvailableSize(p->tot_len);
 
     // Starting off with a reserved size of the default CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE
-    // which allows for adding the chip header and the underlying transport and IP headers
+    // which allows for adding the CHIP header and the underlying transport and IP headers
     // encapsulating this tunneled packet.
 
     VerifyOrExit(buf != NULL, lwipErr = ERR_MEM);

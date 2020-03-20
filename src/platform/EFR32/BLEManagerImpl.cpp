@@ -128,7 +128,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err;
     errorcode_t ret;
 
-    // Initialize the Chip BleLayer.
+    // Initialize the CHIP BleLayer.
     err = BleLayer::Init(this, this, &SystemLayer);
     SuccessOrExit(err);
 
@@ -193,7 +193,7 @@ void BLEManagerImpl::bluetoothStackEventHandler(void *p_arg)
             flags &= ~BLUETOOTH_EVENT_FLAG_EVT_WAITING;
             xEventGroupClearBits(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_EVT_WAITING);
 
-            // As this is running in a separate thread, we need to block Chip from operating,
+            // As this is running in a separate thread, we need to block CHIP from operating,
             // until the events are handled.
             PlatformMgr().LockChipStack();
 
@@ -785,7 +785,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet *evt
         if (!bleConnState->subscribed)
         {
             bleConnState->subscribed = 1;
-            // Post an event to the Chip queue to process either a WoBLE Subscribe or Unsubscribe based on
+            // Post an event to the CHIP queue to process either a WoBLE Subscribe or Unsubscribe based on
             // whether the client is enabling or disabling indications.
             {
                 event.Type                 = DeviceEventType::kWoBLESubscribe;
@@ -827,7 +827,7 @@ void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet *evt)
                    "Write request/command received for WoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
                    evt->data.evt_gatt_server_user_write_request.connection, buf->DataLength());
 
-    // Post an event to the Chip queue to deliver the data into the Chip stack.
+    // Post an event to the CHIP queue to deliver the data into the CHIP stack.
     {
         ChipDeviceEvent event;
         event.Type                     = DeviceEventType::kWoBLEWriteReceived;

@@ -389,7 +389,7 @@ endef # ABI_template
 
 .PHONY : all configure build stage check pretty lint pretty-check clean env-check help
 
-# Instantiate an ABI-specific set of rules to build chip for each target ABI.
+# Instantiate an ABI-specific set of rules to build CHIP for each target ABI.
 $(foreach abi,$(ANDROID_ABI),$(eval $(call ABI_template,$(abi))))
 
 all: stage

@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Provides an implementation of the chip GroupKeyStore interface
+ *          Provides an implementation of the CHIP GroupKeyStore interface
  *          for platforms based on the Nordic nRF5 SDK.
  */
 
@@ -44,7 +44,7 @@ CHIP_ERROR GroupKeyStoreImpl::RetrieveGroupKey(uint32_t keyId, ChipGroupKey & ke
                   uint32_t curKeyId;
                   CHIP_ERROR err2 = CHIP_NO_ERROR;
 
-                  // Decode the chip key id for the current key.
+                  // Decode the CHIP key id for the current key.
                   err2 = DecodeGroupKeyId((const uint8_t *)rec.p_data, rec.p_header->length_words * kFDSWordSize, curKeyId);
                   SuccessOrExit(err2);
 
@@ -158,7 +158,7 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKey(uint32_t keyId)
                   uint32_t curKeyId;
                   CHIP_ERROR err2;
 
-                  // Decode the chip key id for the current group key.
+                  // Decode the CHIP key id for the current group key.
                   err2 = DecodeGroupKeyId((const uint8_t *)rec.p_data, rec.p_header->length_words * kFDSWordSize, curKeyId);
                   SuccessOrExit(err2);
 
@@ -191,7 +191,7 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKeysOfAType(uint32_t keyType)
                   uint32_t curKeyId;
                   CHIP_ERROR err2;
 
-                  // Decode the chip key id for the current group key.
+                  // Decode the CHIP key id for the current group key.
                   err2 = DecodeGroupKeyId((const uint8_t *)rec.p_data, rec.p_header->length_words * kFDSWordSize, curKeyId);
                   SuccessOrExit(err2);
 
@@ -228,7 +228,7 @@ CHIP_ERROR GroupKeyStoreImpl::EnumerateGroupKeys(uint32_t keyType, uint32_t * ke
                   uint32_t curKeyId;
                   CHIP_ERROR err2 = CHIP_NO_ERROR;
 
-                  // Decode the chip key id for the current key.
+                  // Decode the CHIP key id for the current key.
                   err2 = DecodeGroupKeyId((const uint8_t *)rec.p_data, rec.p_header->length_words * kFDSWordSize, curKeyId);
                   SuccessOrExit(err2);
 

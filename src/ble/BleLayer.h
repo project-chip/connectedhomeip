@@ -18,25 +18,25 @@
 /**
  *    @file
  *      This file defines objects that provide an abstraction layer between a
- *      platform's Bluetooth Low Energy (BLE) implementation and the chip
+ *      platform's Bluetooth Low Energy (BLE) implementation and the CHIP
  *      stack.
  *
  *      The BleLayer obect accepts BLE data and control input from the
  *      application via a functional interface. It performs the fragmentation
- *      and reassembly required to transmit chip message via a BLE GATT
- *      characteristic interface, and drives incoming messages up the chip
+ *      and reassembly required to transmit CHIP message via a BLE GATT
+ *      characteristic interface, and drives incoming messages up the CHIP
  *      stack.
  *
  *      During initialization, the BleLayer object requires a pointer to the
  *      platform's implementation of the BleAdapter object. This object is
- *      defined but not implemented by the chip stack, and provides the
+ *      defined but not implemented by the CHIP stack, and provides the
  *      BleLayer with a functional interface to drive outgoing GATT
  *      characteristic writes and indications. It also provides a mechanism
- *      for chip to inform the application when it has finished using a given
+ *      for CHIP to inform the application when it has finished using a given
  *      BLE connection, i.e., when the chipConnection object wrapping this
  *      connection has closed.
  *
- *      To enable chip over BLE for a new platform, the application developer
+ *      To enable CHIP over BLE for a new platform, the application developer
  *      must implement the BleAdapter class for their platform, pass it to the
  *      BleLayer on startup, pass a pointer to this BleLayer to their instance
  *      of chipMessageLayer, and ensure that the application calls the
@@ -75,7 +75,7 @@ using ::chip::System::PacketBuffer;
  *  @def NUM_SUPPORTED_PROTOCOL_VERSIONS
  *
  *  Number of unsigned 4-bit representations of supported transport protocol
- *  versions encapsulated in a BleTransportCapabilitiesRequest. Defined by chip
+ *  versions encapsulated in a BleTransportCapabilitiesRequest. Defined by CHIP
  *  over BLE protocol specification.
  */
 #define NUM_SUPPORTED_PROTOCOL_VERSIONS 8
@@ -94,7 +94,7 @@ typedef enum
     kBleRole_Peripheral = 1
 } BleRole;
 
-/// Enum defining versions of chip over BLE transport protocol.
+/// Enum defining versions of CHIP over BLE transport protocol.
 typedef enum
 {
     kBleTransportProtocolVersion_None = 0,
@@ -244,7 +244,7 @@ public:
     void * mAppState;
 
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
-    BleConnectionReceivedFunct OnchipBleConnectReceived;
+    BleConnectionReceivedFunct OnChipBleConnectReceived;
 
 public:
     // Public functions:
@@ -268,64 +268,64 @@ public:
     /**< Platform interface functions:
 
      *   Calling conventions:
-     *     chip takes ownership of PacketBuffers received through these functions,
+     *     CHIP takes ownership of PacketBuffers received through these functions,
      *     and will free them or pass ownership up the stack.
      *
      *     Beyond each call, no guarantees are provided as to the lifetime of UUID arguments.
      *
-     *     A 'true' return value means the chip stack successfully handled the
-     *     corresponding message or state indication. 'false' means the chip stack either
-     *     failed or chose not to handle this. In case of 'false,' the chip stack will not
+     *     A 'true' return value means the CHIP stack successfully handled the
+     *     corresponding message or state indication. 'false' means the CHIP stack either
+     *     failed or chose not to handle this. In case of 'false,' the CHIP stack will not
      *     have freed or taken ownership of any PacketBuffer arguments. This contract allows the
-     *     platform to pass BLE events to chip without needing to know which characteristics
-     *     chip cares about.
+     *     platform to pass BLE events to CHIP without needing to know which characteristics
+     *     CHIP cares about.
 
-     *     Platform must call this function when a GATT subscription has been established to any chip service
+     *     Platform must call this function when a GATT subscription has been established to any CHIP service
      *     charateristic.
      *
-     *     If this function returns true, chip has accepted the BLE connection and wrapped it
-     *     in a chipConnection object. If chip accepts a BLE connection, the platform MUST
-     *     notify chip if the subscription is canceled or the underlying BLE connection is
+     *     If this function returns true, CHIP has accepted the BLE connection and wrapped it
+     *     in a chipConnection object. If CHIP accepts a BLE connection, the platform MUST
+     *     notify CHIP if the subscription is canceled or the underlying BLE connection is
      *     closed, or the associated chipConnection will never be closed or freed. */
-    bool HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
+    bool HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
     /// Call when a GATT subscribe request succeeds.
-    bool HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
+    bool HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
-    /**< Platform must call this function when a GATT unsubscribe is requested on any chip
-     *   service charateristic, that is, when an existing GATT subscription on a chip service
+    /**< Platform must call this function when a GATT unsubscribe is requested on any CHIP
+     *   service charateristic, that is, when an existing GATT subscription on a CHIP service
      *   characteristic is canceled. */
-    bool HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
+    bool HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
     /// Call when a GATT unsubscribe request succeeds.
-    bool HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
+    bool HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
     /// Call when a GATT write request is received.
-    bool HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId,
+    bool HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                              PacketBuffer * pBuf);
 
     /// Call when a GATT indication is received.
-    bool HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId,
+    bool HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                   PacketBuffer * pBuf);
 
     /// Call when an outstanding GATT write request receives a positive receipt confirmation.
-    bool HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
+    bool HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
     /// Call when an oustanding GATT indication receives a positive receipt confirmation.
-    bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId);
+    bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
     /// Call when a GATT read request is received.
-    bool HandleReadReceived(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const chipBleUUID * svcId,
-                            const chipBleUUID * charId);
+    bool HandleReadReceived(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
+                            const ChipBleUUID * charId);
 
     /**< Platform must call this function when any previous operation undertaken by the BleLayer via BleAdapter
      *   fails, such as a characteristic write request or subscribe attempt, or when a BLE connection is closed.
      *
-     *   In most cases, this will prompt chip to close the associated chipConnection and notify that platform that
+     *   In most cases, this will prompt CHIP to close the associated chipConnection and notify that platform that
      *   it has abandoned the underlying BLE connection.
      *
      *   NOTE: if the application explicitly closes a BLE connection with an associated chipConnection such that
-     *   the BLE connection close will not generate an upcall to chip, HandleConnectionError must be called with
+     *   the BLE connection close will not generate an upcall to CHIP, HandleConnectionError must be called with
      *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this chipConnection and its end point object. */
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, BLE_ERROR err);
 
@@ -336,10 +336,10 @@ public:
 private:
     // Private data members:
 
-    // UUID of chip service characteristic used for central writes.
-    static const chipBleUUID CHIP_BLE_CHAR_1_ID;
-    // UUID of chip service characteristic used for peripheral indications.
-    static const chipBleUUID CHIP_BLE_CHAR_2_ID;
+    // UUID of CHIP service characteristic used for central writes.
+    static const ChipBleUUID CHIP_BLE_CHAR_1_ID;
+    // UUID of CHIP service characteristic used for peripheral indications.
+    static const ChipBleUUID CHIP_BLE_CHAR_2_ID;
 
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;

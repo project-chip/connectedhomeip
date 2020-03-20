@@ -93,7 +93,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
         mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
     }
 
-    // Initialize the chip BleLayer.
+    // Initialize the CHIP BleLayer.
     err = BleLayer::Init(this, this, &SystemLayer);
     SuccessOrExit(err);
 
@@ -394,7 +394,7 @@ void BLEManagerImpl::DriveBLEState(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Perform any initialization actions that must occur after the chip task is running.
+    // Perform any initialization actions that must occur after the CHIP task is running.
     if (!GetFlag(mFlags, kFlag_AsyncInitCompleted))
     {
         SetFlag(mFlags, kFlag_AsyncInitCompleted);
@@ -520,7 +520,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
 #endif // CHIP_PROGRESS_LOGGING
 
-    // Configure an "advertising set" in the BLE soft device with the data and parameters for chip advertising.
+    // Configure an "advertising set" in the BLE soft device with the data and parameters for CHIP advertising.
     // If the advertising set doesn't exist, this call will create it and return its handle.
     err = sd_ble_gap_adv_set_configure(&mAdvHandle, &gapAdvData, &gapAdvParams);
     if (err != CHIP_NO_ERROR)
@@ -619,7 +619,7 @@ CHIP_ERROR BLEManagerImpl::EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData
     err = ble_advdata_encode(&advData, mAdvDataBuf, &gapAdvData.adv_data.len);
     SuccessOrExit(err);
 
-    // Initialize the chip BLE Device Identification Information block that will be sent as payload
+    // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     SuccessOrExit(err);
@@ -764,7 +764,7 @@ void BLEManagerImpl::SoftDeviceBLEEventCallback(const ble_evt_t * bleEvent, void
             memcpy(buf->Start(), bleEvent->evt.gatts_evt.params.write.data, valLen);
             buf->SetDataLength(valLen);
 
-            // Arrange to post a CHIPoBLERXWriteEvent event to the chip queue.
+            // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
             event.Type = DeviceEventType::kCHIPoBLERXCharWriteEvent;
             event.Platform.RXCharWriteEvent.ConId = bleEvent->evt.gatts_evt.conn_handle;
             event.Platform.RXCharWriteEvent.WriteArgs = bleEvent->evt.gatts_evt.params.write;
@@ -783,10 +783,10 @@ void BLEManagerImpl::SoftDeviceBLEEventCallback(const ble_evt_t * bleEvent, void
         // Ignore any events that are larger than a particular size.
         //
         // With the exception of GATT write events to the CHIPoBLE RX characteristic, which are handled above,
-        // all BLE events that chip is interested are of a limited size, roughly equal to sizeof(ble_evt_t)
+        // all BLE events that CHIP is interested are of a limited size, roughly equal to sizeof(ble_evt_t)
         // plus a couple of bytes of payload data.  Any event that is larger than this size and not handled
         // above must represent an event related to some *other* user of the BLE SoftDevice and therefore
-        // can be safely ignored by chip.
+        // can be safely ignored by CHIP.
         VerifyOrExit(bleEvent->header.evt_len <= sizeof(event.Platform.SoftDeviceBLEEvent), /**/);
 
         // Ignore any write event for anything *other* than the CHIPoBLE TX CCCD value.
@@ -798,7 +798,7 @@ void BLEManagerImpl::SoftDeviceBLEEventCallback(const ble_evt_t * bleEvent, void
         memcpy(&event.Platform.SoftDeviceBLEEvent.EventData, bleEvent, bleEvent->header.evt_len);
     }
 
-    // Post the event to the chip queue.
+    // Post the event to the CHIP queue.
 #if (NRF_SDH_DISPATCH_MODEL == NRF_SDH_DISPATCH_MODEL_INTERRUPT)
     BaseType_t yieldRequired;
     PlatformMgrImpl().PostEventFromISR(&event, yieldRequired);

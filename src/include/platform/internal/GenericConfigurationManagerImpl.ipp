@@ -922,8 +922,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
     //     DDDDddddddddddddddddCCCCcccc…ccccIIIIiiii…iiiiKKKKkkkk…kkkkPPPPpppppp
     //
     // Where:
-    //     dddddddddddddddd is the Chip node id for the device, encoded as a string of 16 uppercase hex digits.
-    //     cccc…cccc is the device Chip certificate, in base-64 format.
+    //     dddddddddddddddd is the CHIP node id for the device, encoded as a string of 16 uppercase hex digits.
+    //     cccc…cccc is the device CHIP certificate, in base-64 format.
     //     iiii…iiii is the device intermediate CA certificates, in base-64 format (if provisioned).
     //     kkkk…kkkk is the device private key, in base-64 format.
     //     pppppp is the device pairing code, as ASCII characters.

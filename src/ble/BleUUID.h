@@ -29,12 +29,12 @@ namespace Ble {
 typedef struct
 {
     uint8_t bytes[16];
-} chipBleUUID;
+} ChipBleUUID;
 
 // UUID of CHIP BLE service. Exposed for use in scan filter.
-extern const chipBleUUID CHIP_BLE_SVC_ID;
+extern const ChipBleUUID CHIP_BLE_SVC_ID;
 
-bool UUIDsMatch(const chipBleUUID * idOne, const chipBleUUID * idTwo);
+bool UUIDsMatch(const ChipBleUUID * idOne, const ChipBleUUID * idTwo);
 
 } /* namespace Ble */
 } /* namespace chip */

@@ -64,7 +64,7 @@ public:
     static constexpr uint16_t kFDSRecordKeyMin                  = 0x0001; /**< Minimum value that can be used for a FDS record key (per Nordic SDK) */
     static constexpr uint16_t kFDSRecordKeyMax                  = 0xBFFF; /**< Maximum value that can be used for a FDS record key (per Nordic SDK) */
 
-    // FDS file ids used by the Openchip Device Layer
+    // FDS file ids used by the CHIP Device Layer
     static constexpr uint16_t kFileId_ChipFactory              = 0x235A; /**< FDS file containing persistent config values set at manufacturing time.
                                                                            *   Retained during factory reset. */
     static constexpr uint16_t kFileId_ChipConfig               = 0x235B; /**< FDS file containing dynamic config values set at runtime.
@@ -97,12 +97,12 @@ public:
     static constexpr Key kConfigKey_OperationalDeviceICACerts   = NRF5ConfigKey(kFileId_ChipConfig,  0x0013);
     static constexpr Key kConfigKey_OperationalDevicePrivateKey = NRF5ConfigKey(kFileId_ChipConfig,  0x0014);
 
-    // Range of FDS record keys used to store chip persisted counter values.
+    // Range of FDS record keys used to store CHIP persisted counter values.
     static constexpr uint16_t kPersistedCounterRecordKeyBase    = kFDSRecordKeyMin;
-                                                                          /**< Base record key for records containing chip persisted counter values.
-                                                                           *   The chip counter id is added to this value to form the FDS record key.*/
+                                                                          /**< Base record key for records containing CHIP persisted counter values.
+                                                                           *   The CHIP counter id is added to this value to form the FDS record key.*/
     static constexpr uint16_t kPersistedCounterRecordKeyMax     = kFDSRecordKeyMax;
-                                                                          /**< Max record key for records containing chip persisted counter values. */
+                                                                          /**< Max record key for records containing CHIP persisted counter values. */
 
     static CHIP_ERROR Init(void);
 
