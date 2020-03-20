@@ -186,10 +186,10 @@ fetch_url_with_command() {
     local status=1
 
     shift 2
-    
+
     if [ -x "${executable}" ]; then
         cd "${fetchdir}"
-        
+
             verbose "  `echo ${1} | tr '[[:lower:]]' '[[:upper:]]'`     ${url}"
 
             ${*} "${url}"
@@ -202,7 +202,7 @@ fetch_url_with_command() {
 
         cd "${curdir}"
     fi
-    
+
     return ${status}
 }
 
@@ -274,6 +274,17 @@ removetmp() {
 }
 
 #
+# file_extension
+#
+# Returns a filename's extension, if any.
+#
+file_extension() {
+    ext=${1##*.}
+    [[ $ext != $1 ]] || ext=
+    echo $ext
+}
+
+#
 # patch_directory <directory> <patch arguments> <patch file> [ ... ]
 #
 # Patch the specified directory by applying the provided patched files
@@ -292,9 +303,7 @@ patch_directory() {
     for patch in "${*}"; do
         verbose "  PATCH    ${patch}"
 
-        extension=`echo "${patch}" | awk -F . '{if (NF > 1) {print $$NF}}'`;
-
-        case "${extension}" in
+        case $(file_extension "${patch}") in
 
             bz2)
                 uncompressor="bunzip2 -c"
@@ -364,7 +373,7 @@ build_package() {
     # If necessary, patch the expanded package.
 
     if [ -d "${patchdir}" ]; then
-	patch_directory "${archivedir}/${fqpackage}" "-s -p1" ${patchdir}/*.patch*
+        patch_directory "${archivedir}/${fqpackage}" "-s -p1" ${patchdir}/*.patch*
     fi
 
     # If possible, attempt to be self-sufficient, relying on GNU autotools

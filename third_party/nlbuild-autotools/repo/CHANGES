@@ -1,3 +1,8 @@
+1.6.19 (2020-03-18)
+
+        * Fix awk invocation error in tools/packages/build triggered by
+          'make tools'.
+
 1.6.18 (2020-03-18)
 
         * Address a typo in bootstrap scripts introduced in 1.6.17.
