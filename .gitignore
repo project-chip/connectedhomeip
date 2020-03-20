@@ -64,4 +64,5 @@ build/autoconf/test-driver
 config.log
 config.status
 configure
+src/include/BuildConfig.h
 src/include/BuildConfig.h.in
