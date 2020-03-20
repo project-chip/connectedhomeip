@@ -193,14 +193,14 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
 #ifdef SO_REUSEPORT
         // Enable SO_REUSEPORT.  This permits coexistence between an
-        // untargetted chip client and other services that listen on
-        // a chip port on a specific address (such as a chip client
+        // untargetted CHIP client and other services that listen on
+        // a CHIP port on a specific address (such as a CHIP client
         // with TARGETTED_LISTEN or TCP proxying services).  Note that
         // one of the costs of this implementation is the
         // non-deterministic connection dispatch when multple clients
         // listen on the address wih the same degreee of selectivity,
-        // e.g. two untargetted-listen chip clients, or two
-        // targetted-listen chip clients with the same node id.
+        // e.g. two untargetted-listen CHIP clients, or two
+        // targetted-listen CHIP clients with the same node id.
 
         if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &n, sizeof(n)) != 0)
         {
@@ -408,7 +408,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intf)
                 return res;
 
             // Attempt to bind to the interface using SO_BINDTODEVICE which requires privileged access.
-            // If the permission is denied(EACCES) because chip is running in a context
+            // If the permission is denied(EACCES) because CHIP is running in a context
             // that does not have privileged access, choose a source address on the
             // interface to bind the connetion to.
             int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, (void *) &ifr, sizeof(ifr));

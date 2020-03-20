@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for OpenChip on
+ *          Platform-specific configuration overrides for CHIP on
  *          Silcon Labs EFR32 platforms.
  */
 
@@ -61,7 +61,7 @@
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS 0
 #define CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM 0
 
-// FIXME: EFR32 set to MBED-TLS (But this is third-party repo in OpenChip, not SDK)
+// FIXME: EFR32 set to MBED-TLS (But this is third-party repo in CHIP, not SDK)
 
 #define CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL 0
 #define CHIP_CONFIG_AES_IMPLEMENTATION_AESNI 0

@@ -35,8 +35,8 @@ namespace Ble {
 class DLL_EXPORT BleApplicationDelegate
 {
 public:
-    // chip calls this function once it closes the last BLEEndPoint associated with a BLE given connection object.
-    // A call to this function means chip no longer cares about the state of the given BLE connection.
+    // CHIP calls this function once it closes the last BLEEndPoint associated with a BLE given connection object.
+    // A call to this function means CHIP no longer cares about the state of the given BLE connection.
     // The application can use this callback to e.g. close the underlying BLE conection if it is no longer needed,
     // decrement the connection's refcount if it has one, or perform any other sort of cleanup as desired.
     virtual void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) = 0;

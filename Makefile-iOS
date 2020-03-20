@@ -16,7 +16,7 @@
 
 #
 #    Description:
-#      This file implements a glue makefile for building the Chip SDK
+#      This file implements a glue makefile for building the CHIP SDK
 #      for iOS devices and simulators for multiple architectures.
 #
 
@@ -230,7 +230,7 @@ AMFILES =                                                \
 #
 # configure-arch <arch>
 #
-# Configure the Chip SDK for the specified architecture.
+# Configure the CHIP SDK for the specified architecture.
 #
 #   arch - The architecture to configure.
 #
@@ -290,7 +290,7 @@ endef # configure-arch
 #
 # build-arch <arch>
 #
-# Build the Chip SDK intermediate build products for the specified
+# Build the CHIP SDK intermediate build products for the specified
 # architecture.
 #
 #   arch - The architecture to build.
@@ -304,7 +304,7 @@ endef # build-arch
 #
 # stage-arch <arch>
 #
-# Stage (install) the Chip SDK final build products for the specified
+# Stage (install) the CHIP SDK final build products for the specified
 # architecture.
 #
 #   arch - The architecture to stage.
@@ -319,7 +319,7 @@ endef # stage-arch
 #
 # pretty-arch <arch>
 #
-# Prettyify the Chip SDK source code for the specified architecture.
+# Prettyify the CHIP SDK source code for the specified architecture.
 #
 #   arch - The architecture to prettify.
 #
@@ -332,7 +332,7 @@ endef # pretty-arch
 #
 # pretty-check-arch <arch>
 #
-# Pretty-check (lint) the Chip SDK source code for the specified
+# Pretty-check (lint) the CHIP SDK source code for the specified
 # architecture.
 #
 #   arch - The architecture to pretty-check (lint).
@@ -364,7 +364,7 @@ endef # combine-archs
 # ARCH_template <arch>
 #
 # Define macros, targets and rules to configure, build, and stage the
-# Chip SDK for a single architecture.
+# CHIP SDK for a single architecture.
 #
 #   arch - The architecture to instantiate the template for.
 #
@@ -525,7 +525,7 @@ clean:
 	@$(RM_F) -r $(CLEAN_DIRS)
 
 help:
-	$(ECHO) "Simply type 'make -f $(firstword $(MAKEFILE_LIST))' to build Chip for iOS for the following "
+	$(ECHO) "Simply type 'make -f $(firstword $(MAKEFILE_LIST))' to build CHIP for iOS for the following "
 	$(ECHO) "architectures: "
 	$(ECHO) ""
 	$(ECHO) "    $(ARCHS)"
@@ -537,10 +537,10 @@ help:
 	$(ECHO) "You may want or need to override the following make variables either on the "
 	$(ECHO) "command line or in the environment: "
 	$(ECHO) ""
-	$(ECHO) "  DEBUG                   Enable Chip debug code and logging (default: '$(DEBUG)')."
-	$(ECHO) "  ENABLE_TARGETED_LISTEN  Enable Chip support for listening on particular "
+	$(ECHO) "  DEBUG                   Enable CHIP debug code and logging (default: '$(DEBUG)')."
+	$(ECHO) "  ENABLE_TARGETED_LISTEN  Enable CHIP support for listening on particular "
 	$(ECHO) "                          addresses or interfaces. This allows testing multiple "
-	$(ECHO) "                          instances of the Chip stack running on a single host "
+	$(ECHO) "                          instances of the CHIP stack running on a single host "
 	$(ECHO) "                          '(default: $(ENABLE_TARGETED_LISTEN)')."
 	$(ECHO) "  OPENSSL_DIR             Specify an alternate OpenSSL installation (default: "
 	$(ECHO) "                          '$(OPENSSL_DIR)'). For example, if OpenSSL libraries are "

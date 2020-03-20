@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the OpenChip BLE
+ *          Platform-specific configuration overrides for the CHIP BLE
  *          Layer on EFR32 platforms using the Silicon Labs SDK.
  *
  */

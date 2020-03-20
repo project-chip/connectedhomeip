@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Provides an implementation of the Chip GroupKeyStore interface
+ *          Provides an implementation of the CHIP GroupKeyStore interface
  *          for platforms based on the Silicon Labs SDK.
  */
 
@@ -47,7 +47,7 @@ CHIP_ERROR GroupKeyStoreImpl::RetrieveGroupKey(uint32_t keyId, ChipGroupKey &key
                             // Read the nvm3 obj binary data data into the buffer.
                             err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
 
-                            // Decode the Chip key id for the current key.
+                            // Decode the CHIP key id for the current key.
                             err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
                             SuccessOrExit(err2);
 
@@ -176,7 +176,7 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKey(uint32_t keyId)
                             err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
                             SuccessOrExit(err2);
 
-                            // Decode the Chip key id for the current group key.
+                            // Decode the CHIP key id for the current group key.
                             err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
                             SuccessOrExit(err2);
 
@@ -226,7 +226,7 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKeysOfAType(uint32_t keyType)
                             err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
                             SuccessOrExit(err2);
 
-                            // Decode the Chip key id for the current group key.
+                            // Decode the CHIP key id for the current group key.
                             err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
                             SuccessOrExit(err2);
 
@@ -266,7 +266,7 @@ CHIP_ERROR GroupKeyStoreImpl::EnumerateGroupKeys(uint32_t  keyType,
             err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
             SuccessOrExit(err2);
 
-            // Decode the Chip key id for the current group key.
+            // Decode the CHIP key id for the current group key.
             err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
             SuccessOrExit(err2);
 
