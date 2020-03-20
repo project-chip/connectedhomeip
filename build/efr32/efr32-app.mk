@@ -1,6 +1,5 @@
 #
-#   Copyright (c) 2019 Google LLC.
-#   All rights reserved.
+#   <COPYRIGHT>
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -23,7 +22,7 @@
 
 #
 #   This makefile is primarily intended to support building the
-#   OpenWeave example applications on Silicon Labs platforms.  However
+#   CHIP example applications on Silicon Labs platforms.  However
 #   external developers should feel free to use it if they find
 #   it useful.
 #
@@ -31,32 +30,30 @@
 #   in a project-specific Makefile, define make variables describing
 #   the application and how it should be built, and then call the
 #   GenerateBuildRules function.  E.g.:
-#   
+#
 #       PROJECT_ROOT = $(realpath .)
 #
-#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/openweave-core/build/efr32
-#       
+#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/build/efr32
+#
 #       include $(BUILD_SUPPORT_DIR)/efr32-app.mk
-#       include $(BUILD_SUPPORT_DIR)/efr32-openweave.mk
-#       include $(BUILD_SUPPORT_DIR)/efr32-openthread.mk
-#       include $(BUILD_SUPPORT_DIR)/efr32-freertos.mk
-#       
-#       APP := openweave-efr32-bringup
-#       
+#       include $(BUILD_SUPPORT_DIR)/efr32-chip.mk
+#
+#       APP := chip-efr32-bringup
+#
 #       SRCS = \
 #           $(PROJECT_ROOT)/main.cpp \
 #           ...
-#        
+#
 #       INC_DIRS = \
 #           $(PROJECT_ROOT) \
 #           ...
-#       
+#
 #       LIBS = \
 #           ...
-#       
+#
 #       DEFINES = \
 #           ...
-#       
+#
 #       $(call GenerateBuildRules)
 #
 
@@ -134,8 +131,9 @@ EXTRA_SRCS += \
     $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/crypto_sha.c                   \
     $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/shax.c                         \
     $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/crypto_management.c
-    
+
 STD_INC_DIRS += \
+    $(CHIP_ROOT)/src/include/platform/EFR32                                                 \
     $(OPENTHREAD_ROOT)/output/include                                                       \
     $(OPENTHREAD_ROOT)/src/core/                                                            \
     $(OPENTHREAD_ROOT)/third_party/jlink/SEGGER_RTT_V640/RTT                                \
@@ -175,7 +173,6 @@ STD_INC_DIRS += \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/plugin/pa-conversions                         \
     $(EFR32_SDK_ROOT)/util/plugin/plugin-common/fem-control                                 \
     $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/include                            \
-    $(OPENWEAVE_ROOT)/src/adaptations/device-layer/include/Weave/DeviceLayer/EFR32          \
     $(OPENTHREAD_ROOT)/examples/platforms/$(EFR32FAMILY)/                                   \
     $(OPENTHREAD_ROOT)/examples/platforms/$(EFR32FAMILY)/$(BOARD_LC)                        \
     $(OPENTHREAD_ROOT)/examples/platforms/$(EFR32FAMILY)/crypto
@@ -236,10 +233,10 @@ STD_CFLAGS = \
     -fno-strict-aliasing \
     -fshort-enums \
     --specs=nosys.specs
-    
+
 MBEDTLS_FLAGS = \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config.h"' \
-    -DMBEDTLS_USER_CONFIG_FILE='"efr32-weave-mbedtls-config.h"'
+    -DMBEDTLS_USER_CONFIG_FILE='"efr32-chip-mbedtls-config.h"'
 
 STD_CXXFLAGS = \
     -fno-rtti \
@@ -358,7 +355,7 @@ VERBOSE ?= 0
 
 ifeq ($(VERBOSE),1)
   NO_ECHO :=
-  HDR_PREFIX := ==================== 
+  HDR_PREFIX := ====================
 else
   NO_ECHO := @
   HDR_PREFIX :=
@@ -371,7 +368,7 @@ DEBUG_FLAGS = -g0
 endif
 
 ifeq ($(OPT),1)
-OPT_FLAGS = -Os 
+OPT_FLAGS = -Os
 else
 OPT_FLAGS = -Og
 endif
@@ -383,7 +380,7 @@ endif
 
 # Convert source file name to object file name
 define ObjFileName
-$(OBJS_DIR)/$(notdir $1).o 
+$(OBJS_DIR)/$(notdir $1).o
 endef
 
 # Convert source file name to dependency file name
@@ -484,7 +481,7 @@ include $$(wildcard $(DEPS_DIR)/*.d)
 
 endef
 
-# Generates late-bound rule for building an object file from a C file 
+# Generates late-bound rule for building an object file from a C file
 define CCRule
 $(call DepFileName,$1) : ;
 $(call ObjFileName,$1): $1 $(call DepFileName,$1) | $(OBJS_DIR) $(DEPS_DIR) $(STD_COMPILE_PREREQUISITES)
@@ -494,7 +491,7 @@ $(call ObjFileName,$1): $1 $(call DepFileName,$1) | $(OBJS_DIR) $(DEPS_DIR) $(ST
 $(NL)
 endef
 
-# Generates late-bound rule for building an object file from a C++ file 
+# Generates late-bound rule for building an object file from a C++ file
 define CXXRule
 $(call DepFileName,$1) : ;
 $(call ObjFileName,$1): $1 $(call DepFileName,$1) | $(OBJS_DIR) $(DEPS_DIR) $(STD_COMPILE_PREREQUISITES)
@@ -504,7 +501,7 @@ $(call ObjFileName,$1): $1 $(call DepFileName,$1) | $(OBJS_DIR) $(DEPS_DIR) $(ST
 $(NL)
 endef
 
-# Generates late-bound rule for building an object file from an assembly file 
+# Generates late-bound rule for building an object file from an assembly file
 define ASRule
 $(call ObjFileName,$1): $1 | $(OBJS_DIR) $(STD_COMPILE_PREREQUISITES)
 	@echo "$$(HDR_PREFIX)AS $1"
@@ -533,22 +530,22 @@ endef
 # Desciptions of make targets
 define TargetHelp
   all                   Build the $(APP) application.
-  
+
   clean                 Clean all build outputs.
-  
+
   flash                 Build and flash the application onto the device.
-  
+
   flash-app             Flash the application onto the device without building
                         it first.
-  
+
   erase                 Wipe the device's flash memory.
-  
+
   help                  Print this help message.
 endef
 
 # Desciptions of build options
 define OptionHelp
-  BOARD=board           Build image for a particular module. 
+  BOARD=board           Build image for a particular module.
                         Supported boards are BRD4161A, BRD4166A, BRD4170A, BRD4304A and BRD4180A.
 
   SERIALNO=serial       Serial number of board to flash or erase when multiple
@@ -558,7 +555,7 @@ define OptionHelp
                         information.
 
   OPT=[1|0]             Build the application with optimization.
- 
+
   VERBOSE=[1|0]         Show commands as they are being executed.
 endef
 
