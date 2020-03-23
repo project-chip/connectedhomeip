@@ -35,11 +35,11 @@ Projects are collections of issues, pull requests, and notes intended to capture
 larger efforts that don't fit in issues, have multiple-subsystems involved, or
 may span multiple milestones.  When constructing a new project, it's
 nevertheless important to think in terms of something that will eventually have
-an end, a definite scope.
+an end, i.e. a definite scope.
 
 ### Branches, releases, and general development flow
 
-Master should always be CHIPs best branch.  Releease branches, once cut, are
+Master should always be CHIPs best branch.  Release branches, once cut, are
 closed for any feature work.  Software fixes for release branches must first
-land on master unless demonstrablly infeasible.
+land on master unless demonstrably infeasible.
 
