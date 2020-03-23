@@ -68,6 +68,9 @@ lib_LIBRARIES                           = libDeviceLayer.a
 
 libDeviceLayer_a_CPPFLAGS               = \
     -I$(top_srcdir)/src/include           \
+    -I$(top_srcdir)/src/lib               \
+    -I$(top_srcdir)/src/system            \
+    -I$(top_srcdir)/src                   \
     $(LWIP_CPPFLAGS)                      \
     $(SOCKETS_CPPFLAGS)                   \
     $(NULL)
