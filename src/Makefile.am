@@ -22,6 +22,15 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+MAYBE_PLATFORM_SUBDIRS          = \
+    $(NULL)
+
+if CONFIG_DEVICE_LAYER
+MAYBE_PLATFORM_SUBDIRS         += \
+    platform                      \
+    $(NULL)
+endif # CONFIG_DEVICE_LAYER
+
 # Always package (e.g. for 'make dist') these subdirectories.
 
 DIST_SUBDIRS                      = \
@@ -31,6 +40,7 @@ DIST_SUBDIRS                      = \
     lwip                            \
     setup_payload                   \
     system                          \
+    $(MAYBE_PLATFORM_SUBDIRS)       \
     $(NULL)
 
 # Always build (e.g. for 'make all') these subdirectories.
@@ -41,6 +51,7 @@ SUBDIRS                           = \
     lwip                            \
     setup_payload                   \
     system                          \
+    $(MAYBE_PLATFORM_SUBDIRS)       \
     $(NULL)
 
 if CONFIG_NETWORK_LAYER_BLE
