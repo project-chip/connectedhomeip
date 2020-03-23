@@ -691,7 +691,7 @@ if test "${enable_java}" = "yes" ; then
     if test "x${JNI_INCLUDE_DIRS}" = "x" ; then
         AC_JNI_INCLUDE_DIR
     fi
-    
+
     if test "x${JNI_INCLUDE_DIRS}" != "x" ; then
         for dir in ${JNI_INCLUDE_DIRS} ; do
             JNI_CPPFLAGS="${JNI_CPPFLAGS} -I${dir}"
@@ -723,7 +723,7 @@ AC_MSG_CHECKING([whether to build profile instances of programs and libraries])
 AC_ARG_ENABLE(profile,
     [AS_HELP_STRING([--disable-profile],[Disable the generation of profile instances @<:@default=yes@:>@.])],
     [
-        case "${enableval}" in 
+        case "${enableval}" in
 
         no|yes)
             build_profile=${enableval}
@@ -781,7 +781,7 @@ AC_MSG_CHECKING([whether to build tools])
 AC_ARG_ENABLE(tools,
     [AS_HELP_STRING([--disable-tools],[Disable building of tools @<:@default=no@:>@.])],
     [
-        case "${enableval}" in 
+        case "${enableval}" in
 
         no|yes)
             build_tools=${enableval}
@@ -805,7 +805,7 @@ AC_MSG_CHECKING([whether to build CHIPoBLE Test])
 AC_ARG_ENABLE(chipoble-test,
     [AS_HELP_STRING([--enable-chipoble-test],[Enable CHIPoBLE Test @<:@default=no@:>@.])],
     [
-        case "${enableval}" in 
+        case "${enableval}" in
 
         no|yes)
             enable_chipoble_test=${enableval}
@@ -978,22 +978,22 @@ AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRF5],[${CHIP_DEVICE_LAYER_TARGET_N
 
 if test "${CONFIG_DEVICE_LAYER}" = 1; then
     AC_DEFINE_UNQUOTED([BLE_PLATFORM_CONFIG_INCLUDE],
-                       [<Chip/DeviceLayer/${CHIP_DEVICE_LAYER_TARGET}/BlePlatformConfig.h>],
+                       [<platform/${CHIP_DEVICE_LAYER_TARGET}/BlePlatformConfig.h>],
                        [Path to BLE platform config header file])
-    AC_DEFINE_UNQUOTED([INET_PLATFORM_CONFIG_INCLUDE],  
-                       [<Chip/DeviceLayer/${CHIP_DEVICE_LAYER_TARGET}/InetPlatformConfig.h>],
+    AC_DEFINE_UNQUOTED([INET_PLATFORM_CONFIG_INCLUDE],
+                       [<platform/${CHIP_DEVICE_LAYER_TARGET}/InetPlatformConfig.h>],
                        [Path to Inet Layer platform config header file])
     AC_DEFINE_UNQUOTED([SYSTEM_PLATFORM_CONFIG_INCLUDE],
-                       [<Chip/DeviceLayer/${CHIP_DEVICE_LAYER_TARGET}/SystemPlatformConfig.h>],
+                       [<platform/${CHIP_DEVICE_LAYER_TARGET}/SystemPlatformConfig.h>],
                        [Path to System Layer platform config header file])
     AC_DEFINE_UNQUOTED([WARM_PLATFORM_CONFIG_INCLUDE],
-                       [<Chip/DeviceLayer/${CHIP_DEVICE_LAYER_TARGET}/WarmPlatformConfig.h>],
+                       [<platform/${CHIP_DEVICE_LAYER_TARGET}/WarmPlatformConfig.h>],
                        [Path to WARM platform config header file])
     AC_DEFINE_UNQUOTED([CHIP_PLATFORM_CONFIG_INCLUDE],
-                       [<Chip/DeviceLayer/${CHIP_DEVICE_LAYER_TARGET}/ChipPlatformConfig.h>],
+                       [<platform/${CHIP_DEVICE_LAYER_TARGET}/CHIPPlatformConfig.h>],
                        [Path to CHIP platform config header file])
     AC_DEFINE_UNQUOTED([CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE],
-                       [<Chip/DeviceLayer/${CHIP_DEVICE_LAYER_TARGET}/ChipDevicePlatformConfig.h>], 
+                       [<platform/${CHIP_DEVICE_LAYER_TARGET}/CHIPDevicePlatformConfig.h>],
                        [Path to CHIP Device Layer platform config header file])
 fi
 
@@ -1062,7 +1062,7 @@ if test ${CONFIG_NETWORK_LAYER_INET} = 1; then
     AC_ARG_ENABLE(ipv4,
         [AS_HELP_STRING([--disable-ipv4],[Disable the inclusion of IPv4 networking @<:@default=yes@:>@.])],
         [
-            case "${enableval}" in 
+            case "${enableval}" in
 
             no|yes)
                 enable_ivp4=${enableval}
@@ -1185,9 +1185,9 @@ if test ${CONFIG_NETWORK_LAYER_INET} = 1; then
         AC_MSG_RESULT([no])
         ])
         AC_CHECK_TYPES(struct in6_rtmsg, [AC_SUBST(HAVE_IN6_RTMSG, [1])],[],[#include<net/route.h>])
-        if [[[ "${CHIP_SYSTEM_CONFIG_USE_LWIP}" -eq 0 ]]] && 
+        if [[[ "${CHIP_SYSTEM_CONFIG_USE_LWIP}" -eq 0 ]]] &&
                 [[[ "${HAVE_LINUX_IF_TUN_H}" -eq 0 || "${HAVE_IN6_RTMSG}" -eq 0 ]]]; then
-            AC_MSG_NOTICE([Tun EndPoint cannot be enabled for current target 
+            AC_MSG_NOTICE([Tun EndPoint cannot be enabled for current target
                 CHIP_SYSTEM_CONFIG_USE_LWIP=$CHIP_SYSTEM_CONFIG_USE_LWIP, HAVE_LINUX_IF_TUN_H=$HAVE_LINUX_IF_TUN_H,
                 HAVE_IN6_RTMSG=$HAVE_IN6_RTMSG])
             INET_WANT_ENDPOINT_TUN=0
@@ -1678,7 +1678,7 @@ if test "${ac_no_link}" != "yes"; then
         ]])],
         [AC_DEFINE([HAVE_CLOCK_SETTIME], [1], [Define to 1 if you have the `clock_settime' function.]) AC_MSG_RESULT([yes])],
         [AC_MSG_RESULT([no])]
-    ) 
+    )
 
     # Note that different platforms have different APIs for monotonic timer with sleep time compensation.
     # CLOCK_BOOTTIME is available in later versions of linux and Android
