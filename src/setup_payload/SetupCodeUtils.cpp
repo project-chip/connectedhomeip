@@ -71,16 +71,9 @@ string base45Encode(const uint8_t * buf, size_t buf_len)
     return result;
 }
 
-vector<uint8_t> base45Decode(string base45)
+static inline int decodeChar(char c, uint8_t & value)
 {
-    // not long enough, there are always at least 2
-    //  base45 characters
-    if (base45.length() < kBase45ChunkLen - 1)
-    {
-        return vector<uint8_t>();
-    }
     static const int kBogus = 255;
-#define DECODE_FAIL(c, v) ((c) < ' ' || (c) > 'Z' || ((v) = decodes[(c) - ' ']) == kBogus)
     // map of base45 charater to numeric value
     // subtract 32 from the charater, then index into this array, if possible
     const uint8_t decodes[] = {
@@ -144,13 +137,34 @@ vector<uint8_t> base45Decode(string base45)
         34,     // 'Y', =89
         35,     // 'Z', =90
     };
+    if (c < ' ' || c > 'Z')
+    {
+        return 1;
+    }
+    uint8_t v = decodes[c - ' '];
+    if (v == kBogus)
+    {
+        return 2;
+    }
+    value = v;
+    return 0;
+}
+
+vector<uint8_t> base45Decode(string base45)
+{
+    // not long enough, there are always at least 2
+    //  base45 characters
+    if (base45.length() < kBase45ChunkLen - 1)
+    {
+        return vector<uint8_t>();
+    }
     vector<uint8_t> result;
 
     for (int i = 0; base45.length() - i >= kBase45ChunkLen; i += kBase45ChunkLen)
     {
         uint8_t v0 = 0, v1 = 0, v2 = 0;
 
-        if (DECODE_FAIL(base45[i], v0) || DECODE_FAIL(base45[i + 1], v1) || DECODE_FAIL(base45[i + 2], v2))
+        if (decodeChar(base45[i], v0) || decodeChar(base45[i + 1], v1) || decodeChar(base45[i + 2], v2))
         {
             return vector<uint8_t>();
         }
@@ -165,7 +179,7 @@ vector<uint8_t> base45Decode(string base45)
         int i      = base45.length() - (kBase45ChunkLen - 1);
         uint8_t v0 = 0, v1 = 0;
 
-        if (DECODE_FAIL(base45[i], v0) || DECODE_FAIL(base45[i + 1], v1))
+        if (decodeChar(base45[i], v0) || decodeChar(base45[i + 1], v1))
         {
             return vector<uint8_t>();
         }

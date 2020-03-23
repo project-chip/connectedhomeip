@@ -78,7 +78,7 @@ string QRCodeSetupPayloadGenerator::payloadBinaryRepresentation()
         string binary;
         for (int i = sizeof(bits) / sizeof(bits[0]) - 1; i >= 0; i--)
         {
-            for (int j = 1 << 8; j != 0;)
+            for (unsigned j = 1 << 8; j != 0;)
             {
                 j >>= 1;
                 binary += bits[i] & j ? "1" : "0";
