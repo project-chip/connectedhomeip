@@ -4,16 +4,16 @@ The CHIP build system uses GNU autotools to build
 various platform images on Linux or MacOS.
 
 Tested on:
-    - MacOS
-    - Ubuntu 18.04
+* MacOS
+* Ubuntu 18.04
 
 
 Build system features:
-    - Package management: 'make dist' and 'make distcheck'
-    - Cross-platform handling: (Linux, Darwin, iOS, Android, embedded arm, etc.)
-    - Multiple compiler support: clang, GCC
-    - Integrates automated testing framework: 'make check'
-    - Code style enforcement: 'make pretty' and 'make pretty-check' integration with clang-format
+* Package management: 'make dist' and 'make distcheck'
+* Cross-platform handling: (Linux, Darwin, iOS, Android, embedded arm, etc.)
+* Multiple compiler support: clang, GCC
+* Integrates automated testing framework: 'make check'
+* Code style enforcement: 'make pretty' and 'make pretty-check' integration with clang-format
 
 Assuming you have all the required tools installed, the system will build the code,
 build a distribution, tidy, format, run tests, and run code coverage on the entire tree.  
@@ -32,7 +32,7 @@ To take advantage of all the current capabilities of the make system, you'll wan
 * gcov
 
 
-#### Linux
+#### How to install tool prerequisites on Linux
 
 On Debian-based Linux distributions such as Ubuntu, these dependencies
 can be satisfied with the following:
@@ -42,9 +42,9 @@ sudo apt-get install make autoconf automake libtool
 sudo apt-get install clang-format-9
 ```
 
-#### Mac OS X
+#### How to install tool prerequisites on macOS
 
-On Mac OS X, these dependencies can be installed and satisfied using
+On macOS, these dependencies can be installed and satisfied using
 [Brew](https://brew.sh/):
 
 ```
