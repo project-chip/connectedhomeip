@@ -1809,6 +1809,7 @@ src/setup_payload/Makefile
 src/setup_payload/tests/Makefile
 src/inet/Makefile
 src/lib/Makefile
+src/platform/Makefile
 ])
 
 #
