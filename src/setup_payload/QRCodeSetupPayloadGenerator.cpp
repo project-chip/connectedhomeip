@@ -71,7 +71,7 @@ string QRCodeSetupPayloadGenerator::payloadBinaryRepresentation()
 {
     if (mPayload.isValid())
     {
-        uint8_t bits[kTotalPayloadDataSizeInBits / 8] = { 0 };
+        uint8_t bits[kTotalPayloadDataSizeInBytes] = { 0 };
 
         generateBitSet(mPayload, bits);
 
@@ -93,7 +93,7 @@ string QRCodeSetupPayloadGenerator::payloadBase45Representation()
 {
     if (mPayload.isValid())
     {
-        uint8_t bits[kTotalPayloadDataSizeInBits / 8] = { 0 };
+        uint8_t bits[kTotalPayloadDataSizeInBytes] = { 0 };
 
         generateBitSet(mPayload, bits);
 
