@@ -133,7 +133,6 @@ STD_INC_DIRS += \
     $(CHIP_OUTPUT_DIR)/include \
     $(CHIP_OUTPUT_DIR)/src/include \
     $(CHIP_ROOT)/src/include \
-    $(CHIP_ROOT)/src/adaptations/device-layer/trait-support \
     $(CHIP_ROOT)/third_party/lwip/repo/lwip/src/include \
     $(CHIP_ROOT)/src/lwip \
 	$(CHIP_ROOT)/src/lwip/nrf5 \
