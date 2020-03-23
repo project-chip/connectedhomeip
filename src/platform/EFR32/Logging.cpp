@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Provides implementations for the OpenChip and LwIP logging
+ *          Provides implementations for the CHIP and LwIP logging
  *          functions on Silicon Labs EFR32 platforms.
  *
  *          Logging should be initialized by a call to efr32LogInit().  A
@@ -161,7 +161,7 @@ namespace chip {
 namespace Logging {
 
 /**
- * OpenChip log output function.
+ * CHIP log output function.
  */
 void Log(uint8_t module, uint8_t category, const char *aFormat, ...)
 {

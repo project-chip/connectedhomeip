@@ -46,7 +46,7 @@ namespace Internal {
     static nvm3_CacheEntry_t name##_cache[cacheSize];                   \
     static uint8_t           name##_nvm[nvmSize] SL_ATTRIBUTE_SECTION(STRINGIZE(name##_section))
 
-// Local version of SDK macro (allows Chip to configure the maximum nvm3 object size and headroom).
+// Local version of SDK macro (allows CHIP to configure the maximum nvm3 object size and headroom).
 #define CHIP_NVM3_DEFINE_SECTION_INIT_DATA(name, maxObjectSize, repackHeadroom) \
     static nvm3_Init_t name = {                                                  \
         (nvm3_HalPtr_t)name##_nvm,                                               \
@@ -514,7 +514,7 @@ CHIP_ERROR EFR32Config::FactoryResetConfig(void)
 
     CHIP_ERROR err;
 
-    // Iterate over all the Chip Config nvm3 records and delete each one...
+    // Iterate over all the CHIP Config nvm3 records and delete each one...
     err = ForEachRecord(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig, false,
                         [](const Key &nvm3Key, const size_t &length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
@@ -609,7 +609,7 @@ exit:
 
 bool EFR32Config::ValidConfigKey(Key key)
 {
-    // Returns true if the key is in the valid Chip Config nvm3 key range.
+    // Returns true if the key is in the valid CHIP Config nvm3 key range.
 
     if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_ChipCounter))
     {

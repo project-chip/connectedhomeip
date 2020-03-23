@@ -712,7 +712,7 @@ void NRF5Config::HandleFDSEvent(const fds_evt_t * fdsEvent)
     // Mark the operation as complete.
     sActiveAsyncOp = NULL;
 
-    // Signal the chip thread that the operation has completed.
+    // Signal the CHIP thread that the operation has completed.
 #if defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
 
     // When using the Nodic SoftDevice, HandleFDSEvent() is called in a SoftDevice interrupt

@@ -15,7 +15,7 @@
 #
 
 #    Description:
-#      This file implements a glue makefile for building the Chip SDK
+#      This file implements a glue makefile for building the CHIP SDK
 #      for standalone desktop or server build host systems.
 #
 #      This is strictly a convenience makefile. Such systems can
@@ -103,9 +103,9 @@ endif
 # The variable OPENSSL can be used to override the above logic and specify a particular root
 # directory in which to find the OpenSSL headers and libraries.
 #
-# Setting OPENSSL=no or NO_OPENSSL=1 will cause OpenChip to be built without OpenSSL.  Note that
+# Setting OPENSSL=no or NO_OPENSSL=1 will cause CHIP to be built without OpenSSL.  Note that
 # building without OpenSSL automatically suppresses the building of various command line tools that
-# have a hard dependency on OpenSSL (e.g. the chip tool).
+# have a hard dependency on OpenSSL (e.g. the CHIP tool).
 
 ifeq ($(NO_OPENSSL),1)
 OPENSSL                         = no
@@ -238,7 +238,7 @@ AMFILES =                               \
 #
 # configure-arch <target>
 #
-# Configure the Chip SDK for the specified target.
+# Configure the CHIP SDK for the specified target.
 #
 #   target - The target to configure.
 #
@@ -255,7 +255,7 @@ endef # configure-target
 #
 # build-target <target>
 #
-# Build the Chip SDK intermediate build products for the specified
+# Build the CHIP SDK intermediate build products for the specified
 # target.
 #
 #   target - The target to build.
@@ -269,7 +269,7 @@ endef # build-target
 #
 # check-target <target>
 #
-# Check (run unit tests) the Chip SDK for the specified target.
+# Check (run unit tests) the CHIP SDK for the specified target.
 #
 #   target - The target to check.
 #
@@ -295,7 +295,7 @@ endef # distcheck-target
 #
 # coverage-target <target>
 #
-# Generate code coverage from unit tests for the Chip SDK for the
+# Generate code coverage from unit tests for the CHIP SDK for the
 # specified target.
 #
 #   target - The target to generate code coverage for.
@@ -309,7 +309,7 @@ endef # coverage-target
 #
 # stage-target <target>
 #
-# Stage (install) the Chip SDK final build products for the specified
+# Stage (install) the CHIP SDK final build products for the specified
 # target.
 #
 #   target - The target to stage.
@@ -324,7 +324,7 @@ endef # stage-target
 #
 # pretty-target <target>
 #
-# Prettyify the Chip SDK source code for the specified target.
+# Prettyify the CHIP SDK source code for the specified target.
 #
 #   target - The target to prettify.
 #
@@ -337,7 +337,7 @@ endef # pretty-target
 #
 # pretty-check-target <target>
 #
-# Pretty-check (lint) the Chip SDK source code for the specified
+# Pretty-check (lint) the CHIP SDK source code for the specified
 # target.
 #
 #   target - The target to pretty-check (lint).
@@ -352,7 +352,7 @@ endef # pretty-check-target
 # TARGET_template <target>
 #
 # Define macros, targets and rules to configure, build, and stage the
-# Chip SDK for a single target.
+# CHIP SDK for a single target.
 #
 #   target - The target to instantiate the template for.
 #
@@ -464,7 +464,7 @@ help:
 
 export HelpText
 define HelpText
-Simply type 'make -f $(firstword $(MAKEFILE_LIST))' to build Chip for the following 
+Simply type 'make -f $(firstword $(MAKEFILE_LIST))' to build CHIP for the following
 target:
 
     $(TargetTuple)
@@ -472,7 +472,7 @@ target:
 You may want or need to override the following make variables either on the 
 command line or in the environment: 
 
-  DEBUG=[1|0]             Enable/disable Chip debug code and logging (default: '$(DEBUG)').
+  DEBUG=[1|0]             Enable/disable CHIP debug code and logging (default: '$(DEBUG)').
 
   COVERAGE=[1|0]          Enable/disable generation of code coverage information 
                           (default: '$(COVERAGE)').
@@ -489,16 +489,16 @@ command line or in the environment:
                           include and lib subdirectories containing the necessary header 
                           and libraries. 
 
-  OPENSSL=internal        Build the internal copy of OpenSSL as part of the OpenChip
+  OPENSSL=internal        Build the internal copy of OpenSSL as part of the CHIP
                           build.
 
   OPENSSL=no              Build an alternate configuration that does not depend
   NO_OPENSSL=1            on the use of OpenSSL (default: '$(NO_OPENSSL)'.  Note
                           that the various command line tools that depend on
-                          OpenSSL (e.g., the chip tool) will not be built in
+                          OpenSSL (e.g., the CHIP tool) will not be built in
                           this configuration.
 
-  TUNNEL_FAILOVER=[1|0]   Enable/disabled support for redundant VPN to the Chip service 
+  TUNNEL_FAILOVER=[1|0]   Enable/disabled support for redundant VPN to the CHIP service
                           (default: '$(TUNNEL_FAILOVER)').
 
   I686TARGET=[1|0]        Enable/disable building a 32-bit target.  Requires a properly

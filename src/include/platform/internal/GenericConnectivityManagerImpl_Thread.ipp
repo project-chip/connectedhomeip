@@ -104,15 +104,15 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
 {
     bool haveServiceConnectivity = false;
 
-    // Evaluate whether there is connectivity to the chip service subnet via the Thread network.
+    // Evaluate whether there is connectivity to the CHIP service subnet via the Thread network.
     //
     // If the device is a member of a fabric, then service connectivity is assessed by checking if the
-    // local Thread stack has a route to the chip service subnet.  This route will typically be a /48
-    // chip ULA route that has been advertised by one or more chip border router devices in the Thread
-    // network.  If no such route exists, then it is likely that there are no functioning chip border
+    // local Thread stack has a route to the CHIP service subnet.  This route will typically be a /48
+    // CHIP ULA route that has been advertised by one or more CHIP border router devices in the Thread
+    // network.  If no such route exists, then it is likely that there are no functioning CHIP border
     // routers, and thus no route to the service via Thread.
     //
-    // If the device is NOT a member of a fabric, then there can be no chip service connectivity via Thread.
+    // If the device is NOT a member of a fabric, then there can be no CHIP service connectivity via Thread.
     //
     if (FabricState.FabricId != kFabricIdNotSpecified)
     {

@@ -202,7 +202,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     err = imageQuery.version.init((uint8_t) firmwareRevLen, firmwareRev);
     SuccessOrExit(err);
 
-    // Locale is an optional field in the chip software update protocol. If one is not provided by the application,
+    // Locale is an optional field in the CHIP software update protocol. If one is not provided by the application,
     // then skip over and move to the next field.
     if (outParam.PrepareQuery.DesiredLocale != NULL)
     {
@@ -213,7 +213,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
         ev.SetLocalePresent();
     }
 
-    // Package specification is an option field in the chip software update protocol. If one is not
+    // Package specification is an option field in the CHIP software update protocol. If one is not
     // provided by the application, skip and move to the next field.
     if (outParam.PrepareQuery.PackageSpecification != NULL)
     {
@@ -496,7 +496,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleResponse(ExchangeContext
     self->mExchangeCtx = NULL;
 
     // We expect to receive one of two possible responses:
-    // 1. An ImageQueryResponse message under the chip software update profile indicating
+    // 1. An ImageQueryResponse message under the CHIP software update profile indicating
     //    an update might be available or
     // 2. A StatusReport indicating no software update available or a problem with the query.
     //

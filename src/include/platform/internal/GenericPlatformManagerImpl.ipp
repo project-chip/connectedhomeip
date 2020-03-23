@@ -51,7 +51,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     // Arrange for Device Layer errors to be translated to text.
     RegisterDeviceLayerErrorFormatter();
 
-    // Initialize the source used by chip to get secure random data.
+    // Initialize the source used by CHIP to get secure random data.
     err = InitEntropy();
     SuccessOrExit(err);
 
@@ -63,7 +63,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     }
     SuccessOrExit(err);
 
-    // Initialize the chip system layer.
+    // Initialize the CHIP system layer.
     new (&SystemLayer) System::Layer();
     err = SystemLayer.Init(NULL);
     if (err != CHIP_SYSTEM_NO_ERROR)
@@ -72,7 +72,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     }
     SuccessOrExit(err);
 
-    // Initialize the chip Inet layer.
+    // Initialize the CHIP Inet layer.
     new (&InetLayer) Inet::InetLayer();
     err = InetLayer.Init(SystemLayer, NULL);
     if (err != INET_NO_ERROR)
@@ -93,7 +93,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
 #endif
     }
 
-    // Perform dynamic configuration of the core chip objects based on stored settings.
+    // Perform dynamic configuration of the core CHIP objects based on stored settings.
     //
     // NB: In general, initialization of Device Layer objects should happen *after* this call
     // as their initialization methods may rely on the proper initialization of the core
@@ -124,7 +124,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     }
     SuccessOrExit(err);
 
-    // Initialize chip Event Logging.
+    // Initialize CHIP Event Logging.
     err = InitChipEventLogging();
     if (err != CHIP_NO_ERROR)
     {
@@ -228,7 +228,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         break;
 
     case DeviceEventType::kChipSystemLayerEvent:
-        // If the event is a chip System or Inet Layer event, deliver it to the SystemLayer event handler.
+        // If the event is a CHIP System or Inet Layer event, deliver it to the SystemLayer event handler.
         Impl()->DispatchEventToSystemLayer(event);
         break;
 
@@ -272,7 +272,7 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const Chi
                                   event->ChipSystemLayerEvent.Argument);
     if (err != CHIP_SYSTEM_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Error handling chip System Layer event (type %d): %s",
+        ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s",
                 event->Type, ErrorStr(err));
     }
 }
