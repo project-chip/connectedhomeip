@@ -17,7 +17,13 @@
 
 /**
  *    @file
- *      This file implements converting an array of butes into a Base45 String
+ *      This file implements converting an array of bytes into a Base45 String and
+ *       the reverse.
+ *
+ *      The encoding chosen is: treat every 2 bytes of input data as a little-endian
+ *        uint16_t, then div and mod hat into 3 base45 characters, with the least-significant
+ *        encoding bits in the first character of the resulting string.  If an odd
+ *        number of bytes is encoded, 2 characters are used to encode the last byte.
  *
  */
 
@@ -67,72 +73,72 @@ vector<uint8_t> base45Decode(string base45)
     {
         return vector<uint8_t>();
     }
-#define BOGUS 255
+    static const int kBogus = 255;
+#define DECODE_FAIL(c, v) ((c) < ' ' || (c) > 'Z' || ((v) = decodes[(c) - ' ']) == kBogus)
+
     // subtract 32 from the charater, then index into this array, if possible
     const uint8_t decodes[] = {
-        36,    // ' ', =32
-        BOGUS, // '!', =33
-        BOGUS, // '"', =34
-        BOGUS, // '#', =35
-        37,    // '$', =36
-        38,    // '%', =37
-        BOGUS, // '&', =38
-        BOGUS, // ''', =39
-        BOGUS, // '(', =40
-        BOGUS, // ')', =41
-        39,    // '*', =42
-        40,    // '+', =43
-        BOGUS, // ',', =44
-        41,    // '-', =45
-        42,    // '.', =46
-        43,    // '/', =47
-        0,     // '0', =48
-        1,     // '1', =49
-        2,     // '2', =50
-        3,     // '3', =51
-        4,     // '4', =52
-        5,     // '5', =53
-        6,     // '6', =54
-        7,     // '7', =55
-        8,     // '8', =56
-        9,     // '9', =57
-        44,    // ':', =58
-        BOGUS, // ';', =59
-        BOGUS, // '<', =50
-        BOGUS, // '=', =61
-        BOGUS, // '>', =62
-        BOGUS, // '?', =63
-        BOGUS, // '@', =64
-        10,    // 'A', =65
-        11,    // 'B', =66
-        12,    // 'C', =67
-        13,    // 'D', =68
-        14,    // 'E', =69
-        15,    // 'F', =70
-        16,    // 'G', =71
-        17,    // 'H', =72
-        18,    // 'I', =73
-        19,    // 'J', =74
-        20,    // 'K', =75
-        21,    // 'L', =76
-        22,    // 'M', =77
-        23,    // 'N', =78
-        24,    // 'O', =79
-        25,    // 'P', =80
-        26,    // 'Q', =81
-        27,    // 'R', =82
-        28,    // 'S', =83
-        29,    // 'T', =84
-        30,    // 'U', =85
-        31,    // 'V', =86
-        32,    // 'W', =87
-        33,    // 'X', =88
-        34,    // 'Y', =89
-        35,    // 'Z', =90
+        36,     // ' ', =32
+        kBogus, // '!', =33
+        kBogus, // '"', =34
+        kBogus, // '#', =35
+        37,     // '$', =36
+        38,     // '%', =37
+        kBogus, // '&', =38
+        kBogus, // ''', =39
+        kBogus, // '(', =40
+        kBogus, // ')', =41
+        39,     // '*', =42
+        40,     // '+', =43
+        kBogus, // ',', =44
+        41,     // '-', =45
+        42,     // '.', =46
+        43,     // '/', =47
+        0,      // '0', =48
+        1,      // '1', =49
+        2,      // '2', =50
+        3,      // '3', =51
+        4,      // '4', =52
+        5,      // '5', =53
+        6,      // '6', =54
+        7,      // '7', =55
+        8,      // '8', =56
+        9,      // '9', =57
+        44,     // ':', =58
+        kBogus, // ';', =59
+        kBogus, // '<', =50
+        kBogus, // '=', =61
+        kBogus, // '>', =62
+        kBogus, // '?', =63
+        kBogus, // '@', =64
+        10,     // 'A', =65
+        11,     // 'B', =66
+        12,     // 'C', =67
+        13,     // 'D', =68
+        14,     // 'E', =69
+        15,     // 'F', =70
+        16,     // 'G', =71
+        17,     // 'H', =72
+        18,     // 'I', =73
+        19,     // 'J', =74
+        20,     // 'K', =75
+        21,     // 'L', =76
+        22,     // 'M', =77
+        23,     // 'N', =78
+        24,     // 'O', =79
+        25,     // 'P', =80
+        26,     // 'Q', =81
+        27,     // 'R', =82
+        28,     // 'S', =83
+        29,     // 'T', =84
+        30,     // 'U', =85
+        31,     // 'V', =86
+        32,     // 'W', =87
+        33,     // 'X', =88
+        34,     // 'Y', =89
+        35,     // 'Z', =90
     };
     vector<uint8_t> result;
-
-#define DECODE_FAIL(c, v) ((c) < ' ' || (c) > 'Z' || ((v) = decodes[(c) - ' ']) == BOGUS)
 
     for (int i = 0; base45.length() - i >= 3; i += 3)
     {
@@ -145,13 +151,14 @@ vector<uint8_t> base45Decode(string base45)
 
         uint16_t value = v0 + v1 * 45 + v2 * 45 * 45;
 
-        result.push_back(value & 255);
-        result.push_back(value / 255);
+        result.push_back(value % 256);
+        result.push_back(value / 256);
     }
     if (base45.length() % 3 == 2)
     {
         int i      = base45.length() - 2;
         uint8_t v0 = 0, v1 = 0;
+
         if (DECODE_FAIL(base45[i], v0) || DECODE_FAIL(base45[i + 1], v1))
         {
             return vector<uint8_t>();
