@@ -1,3 +1,0 @@
-# don't tidy or format third_party lwip
-CLANG_FORMAT=
-CLANG_TIDY=
