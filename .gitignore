@@ -1,67 +1,29 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
 
 # VS Code Configs
 *.vscode
-
-# Test and Coverage Files
-*.gcno
-*.gcda
-*.gcov
-*_q*
 
 # Build System
 .deps
 .dirstamp
 .local-version
-Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
-build/autoconf/compile
-build/autoconf/config.guess
-build/autoconf/config.sub
-build/autoconf/depcomp
-build/autoconf/install-sh
-build/autoconf/ltmain.sh
-build/autoconf/m4/libtool.m4
-build/autoconf/m4/ltoptions.m4
-build/autoconf/m4/ltsugar.m4
-build/autoconf/m4/ltversion.m4
-build/autoconf/m4/lt~obsolete.m4
-build/autoconf/missing
-build/autoconf/test-driver
+build/*
+!build/autoconf/m4/nl_with_lwip.m4
+!build/config/standalone/CHIPProjectConfig.h
+!build/config/standalone/SystemProjectConfig.h
+!build/config/standalone/darwin/CHIPProjectConfig.h
+!build/config/standalone/no-openssl/CHIPProjectConfig.h
 config.log
 config.status
 configure
 src/include/BuildConfig.h.in
+
+
+# Repos stuff
+.repos-warning-stamp
+third_party/nlassert/
+third_party/nlfaultinjection/
+third_party/nlio/
+third_party/nlunit-test/
