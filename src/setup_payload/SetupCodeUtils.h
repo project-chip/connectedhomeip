@@ -23,14 +23,16 @@
 #ifndef _SETUP_CODE_UTILS_H_
 #define _SETUP_CODE_UTILS_H_
 
-#include <string>
 #include <stdint.h>
+#include <string>
+#include <vector>
 
 using namespace std;
 
 namespace chip {
 
-std::string base45EncodedString(uint64_t input, size_t minLength);
+vector<uint8_t> base45Decode(string base45);
+string base45Encode(const uint8_t * buf, size_t buf_len);
 
 } // namespace chip
 
