@@ -26,7 +26,6 @@
 #include "SetupCodeUtils.h"
 
 #include <iostream>
-
 #include <stdlib.h>
 
 using namespace chip;
