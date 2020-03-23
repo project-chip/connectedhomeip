@@ -386,7 +386,7 @@ INET_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSiz
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    err = ::Inet::GetInterfaceName(mCurNetif, nameBuf, nameBufSize);
+    err = ::chip::Inet::GetInterfaceName(mCurNetif, nameBuf, nameBufSize);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 exit:
