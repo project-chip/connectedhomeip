@@ -32,7 +32,7 @@ using namespace chip;
 using namespace std;
 
 // Populates numberOfBits starting from LSB of input into bits, which is assumed to be zero-initialized
-void populateBits(uint8_t * bits, int & offset, uint64_t input, size_t numberOfBits)
+static void populateBits(uint8_t * bits, int & offset, uint64_t input, size_t numberOfBits)
 {
     if (offset + numberOfBits > kTotalPayloadDataSizeInBits || input >= 1 << numberOfBits)
     {
@@ -52,7 +52,7 @@ void populateBits(uint8_t * bits, int & offset, uint64_t input, size_t numberOfB
     }
 }
 
-void generateBitSet(SetupPayload & payload, uint8_t * bits)
+static void generateBitSet(SetupPayload & payload, uint8_t * bits)
 {
     int offset = 0;
 
