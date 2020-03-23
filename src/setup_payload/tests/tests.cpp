@@ -23,7 +23,6 @@
 
 #include "SetupPayload.cpp"
 #include "SetupCodeUtils.cpp"
-#include "SetupPayload.h"
 #include "QRCodeSetupPayloadGenerator.cpp"
 
 using namespace chip;
@@ -92,6 +91,9 @@ int testBase45()
         hello_world += (char) decoded[_];
     }
     surprises += EXPECT_EQ(hello_world, "Hello World!");
+
+    // short input
+    surprises += EXPECT_EQ(base45Decode("A0").size(), 1);
 
     // empty == empty
     surprises += EXPECT_EQ(base45Decode("").size(), 0);
@@ -165,6 +167,5 @@ int testSetupPayloadVerify()
 
 int main(int argc, char ** argv)
 {
-    printf("---Running Test--- tests from %s\n", __FILE__);
     return testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase45Rep() + testBase45() + testSetupPayloadVerify();
 }
