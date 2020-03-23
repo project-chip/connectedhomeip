@@ -53,14 +53,14 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     mChipStackLock = xSemaphoreCreateMutex();
     if (mChipStackLock == NULL)
     {
-        ChipLogError(DeviceLayer, "Failed to create chip stack lock");
+        ChipLogError(DeviceLayer, "Failed to create CHIP stack lock");
         ExitNow(err = CHIP_ERROR_NO_MEMORY);
     }
 
     mChipEventQueue = xQueueCreate(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent));
     if (mChipEventQueue == NULL)
     {
-        ChipLogError(DeviceLayer, "Failed to allocate chip event queue");
+        ChipLogError(DeviceLayer, "Failed to allocate CHIP event queue");
         ExitNow(err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -97,7 +97,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDevice
     {
         if (!xQueueSend(mChipEventQueue, event, 1))
         {
-            ChipLogError(DeviceLayer, "Failed to post event to chip Platform event queue");
+            ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         }
     }
 }
@@ -113,14 +113,14 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
     // Capture the task handle.
     mEventLoopTask = xTaskGetCurrentTaskHandle();
 
-    // Lock the chip stack.
+    // Lock the CHIP stack.
     Impl()->LockChipStack();
 
     while (true)
     {
         TickType_t waitTime;
 
-        // If one or more chip timers are active...
+        // If one or more CHIP timers are active...
         if (mChipTimerActive)
         {
             // Adjust the base time and remaining duration for the next scheduled timer based on the
@@ -137,7 +137,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
                 err = SystemLayer.HandlePlatformTimer();
                 if (err != CHIP_SYSTEM_NO_ERROR)
                 {
-                    ChipLogError(DeviceLayer, "Error handling chip timers: %s", ErrorStr(err));
+                    ChipLogError(DeviceLayer, "Error handling CHIP timers: %s", ErrorStr(err));
                 }
 
                 // When processing the event queue below, do not wait if the queue is empty.  Instead
@@ -153,19 +153,19 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
             }
         }
 
-        // Otherwise no chip timers are active, so wait indefinitely for an event to arrive on the event
+        // Otherwise no CHIP timers are active, so wait indefinitely for an event to arrive on the event
         // queue.
         else
         {
             waitTime = portMAX_DELAY;
         }
 
-        // Unlock the chip stack, allowing other threads to enter chip while the event loop thread is sleeping.
+        // Unlock the CHIP stack, allowing other threads to enter CHIP while the event loop thread is sleeping.
         Impl()->UnlockChipStack();
 
         BaseType_t eventReceived = xQueueReceive(mChipEventQueue, &event, waitTime);
 
-        // Lock the chip stack.
+        // Lock the CHIP stack.
         Impl()->LockChipStack();
 
         // If an event was received, dispatch it.  Continue receiving events from the queue and
@@ -197,7 +197,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartEventLoopTask(v
 template<class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * arg)
 {
-    ChipLogDetail(DeviceLayer, "chip task running");
+    ChipLogDetail(DeviceLayer, "CHIP task running");
     static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass>*>(arg)->Impl()->RunEventLoop();
 }
 
@@ -230,7 +230,7 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
     {
         if (!xQueueSendFromISR(mChipEventQueue, event, &yieldRequired))
         {
-            ChipLogError(DeviceLayer, "Failed to post event to chip Platform event queue");
+            ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         }
     }
 }

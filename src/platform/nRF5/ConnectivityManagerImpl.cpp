@@ -65,7 +65,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
-    // Initialize the chip Addressing and Routing Module.
+    // Initialize the CHIP Addressing and Routing Module.
     err = Warm::Init(FabricState);
     SuccessOrExit(err);
 

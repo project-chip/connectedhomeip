@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the OpenChip System
+ *          Platform-specific configuration overrides for the CHIP System
  *          Layer on Silcon Labs EFR32 Platforms.
  *
  */

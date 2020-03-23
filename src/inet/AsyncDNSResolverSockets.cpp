@@ -95,7 +95,7 @@ INET_ERROR AsyncDNSResolverSockets::Shutdown(void)
 
     AsyncMutexUnlock();
 
-    // Have the chip thread join the thread pool for asynchronous DNS resolution.
+    // Have the CHIP thread join the thread pool for asynchronous DNS resolution.
     for (int i = 0; i < INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT; i++)
     {
         pthreadErr = pthread_join(mAsyncDNSThreadHandle[i], NULL);
@@ -309,10 +309,10 @@ void AsyncDNSResolverSockets::DNSResultEventHandler(chip::System::Layer * aLayer
 
 void AsyncDNSResolverSockets::NotifyChipThread(DNSResolver * resolver)
 {
-    // Post work item via Timer Event for the chip thread
+    // Post work item via Timer Event for the CHIP thread
     chip::System::Layer & lSystemLayer = resolver->SystemLayer();
 
-    ChipLogDetail(Inet, "Posting DNS completion event to chip thread.");
+    ChipLogDetail(Inet, "Posting DNS completion event to CHIP thread.");
     lSystemLayer.ScheduleWork(AsyncDNSResolverSockets::DNSResultEventHandler, resolver);
 }
 

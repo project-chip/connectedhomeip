@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Implementation of the fault-injection utilities for chip.
+ *      Implementation of the fault-injection utilities for CHIP.
  */
 
 #include <string.h>
@@ -33,7 +33,7 @@ namespace FaultInjection {
 static nl::FaultInjection::Record sFaultRecordArray[kFault_NumItems];
 static int32_t sFault_WDMNotificationSize_Arguments[1];
 static int32_t sFault_FuzzExchangeHeader_Arguments[1];
-static class nl::FaultInjection::Manager schipFaultInMgr;
+static class nl::FaultInjection::Manager sChipFaultInMgr;
 static const nl::FaultInjection::Name sManagerName  = "chip";
 static const nl::FaultInjection::Name sFaultNames[] = {
     "AllocExchangeContext",
@@ -88,9 +88,9 @@ static const nl::FaultInjection::Name sFaultNames[] = {
  */
 nl::FaultInjection::Manager & GetManager(void)
 {
-    if (0 == schipFaultInMgr.GetNumFaults())
+    if (0 == sChipFaultInMgr.GetNumFaults())
     {
-        schipFaultInMgr.Init(kFault_NumItems, sFaultRecordArray, sManagerName, sFaultNames);
+        sChipFaultInMgr.Init(kFault_NumItems, sFaultRecordArray, sManagerName, sFaultNames);
         memset(&sFault_WDMNotificationSize_Arguments, 0, sizeof(sFault_WDMNotificationSize_Arguments));
         sFaultRecordArray[kFault_WDM_NotificationSize].mArguments = sFault_WDMNotificationSize_Arguments;
         sFaultRecordArray[kFault_WDM_NotificationSize].mLengthOfArguments =
@@ -101,11 +101,11 @@ nl::FaultInjection::Manager & GetManager(void)
         sFaultRecordArray[kFault_FuzzExchangeHeaderTx].mLengthOfArguments =
             static_cast<uint8_t>(sizeof(sFault_FuzzExchangeHeader_Arguments) / sizeof(sFault_FuzzExchangeHeader_Arguments[0]));
     }
-    return schipFaultInMgr;
+    return sChipFaultInMgr;
 }
 
 /**
- * Fuzz a byte of a chip Exchange Header
+ * Fuzz a byte of a CHIP Exchange Header
  *
  * @param[in] p     Pointer to the encoded Exchange Header
  * @param[in] arg   An index from 0 to (CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES * 5 -1)
@@ -113,7 +113,7 @@ nl::FaultInjection::Manager & GetManager(void)
  */
 DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg)
 {
-    // chip is little endian; this function alters the
+    // CHIP is little endian; this function alters the
     // least significant byte of the header fields.
     const uint8_t offsets[] = {
         0, // flags and version

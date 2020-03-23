@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the OpenChip Inet
+ *          Platform-specific configuration overrides for the CHIP Inet
  *          Layer on EFR32 platforms using the Silicon Labs SDK.
  *
  */

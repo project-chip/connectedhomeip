@@ -19,7 +19,7 @@
  *    @file
  *      This file implements a Bluetooth Low Energy (BLE) connection
  *      endpoint abstraction for the byte-streaming,
- *      connection-oriented chip over Bluetooth Low Energy (CHIPoBLE)
+ *      connection-oriented CHIP over Bluetooth Low Energy (CHIPoBLE)
  *      Bluetooth Transport Protocol (BTP).
  *
  */
@@ -201,10 +201,10 @@ BLE_ERROR BLEEndPoint::HandleReceiveConnectionComplete()
     StopReceiveConnectionTimer();
 
     // We've successfully completed the BLE transport protocol handshake, so let the application know we're open for business.
-    if (mBle->OnchipBleConnectReceived != NULL)
+    if (mBle->OnChipBleConnectReceived != NULL)
     {
         // Indicate BLE transport protocol connection received to next-higher layer.
-        mBle->OnchipBleConnectReceived(this);
+        mBle->OnChipBleConnectReceived(this);
     }
     else
     {
@@ -484,7 +484,7 @@ void BLEEndPoint::ReleaseBleConnection()
 void BLEEndPoint::Free()
 {
     // Release BLE connection. Will close connection if AutoClose enabled for this end point. Otherwise, informs
-    // application that chip is done with this BLE connection, and application makes decision about whether to close
+    // application that CHIP is done with this BLE connection, and application makes decision about whether to close
     // and clean up or retain connection.
     ReleaseBleConnection();
 
@@ -1517,7 +1517,7 @@ exit:
 
 bool BLEEndPoint::SendWrite(PacketBuffer * buf)
 {
-    // Add reference to message fragment for duration of platform's GATT write attempt. chip retains partial
+    // Add reference to message fragment for duration of platform's GATT write attempt. CHIP retains partial
     // ownership of message fragment's PacketBuffer, since this is the same buffer as that of the whole message, just
     // with a fragmenter-modified payload offset and data length. Buffer must be decref'd (i.e. PacketBuffer::Free'd) by
     // platform when BLE GATT operation completes.
@@ -1530,7 +1530,7 @@ bool BLEEndPoint::SendWrite(PacketBuffer * buf)
 
 bool BLEEndPoint::SendIndication(PacketBuffer * buf)
 {
-    // Add reference to message fragment for duration of platform's GATT indication attempt. chip retains partial
+    // Add reference to message fragment for duration of platform's GATT indication attempt. CHIP retains partial
     // ownership of message fragment's PacketBuffer, since this is the same buffer as that of the whole message, just
     // with a fragmenter-modified payload offset and data length. Buffer must be decref'd (i.e. PacketBuffer::Free'd) by
     // platform when BLE GATT operation completes.

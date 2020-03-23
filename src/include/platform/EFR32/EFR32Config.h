@@ -64,7 +64,7 @@ public:
 
     using Key = uint32_t;
 
-    // NVM3 key base offsets used by the OpenChip Device Layer.
+    // NVM3 key base offsets used by the CHIP Device Layer.
     static constexpr uint8_t kChipFactory_KeyBase =
         0xA2; // Persistent config values set at manufacturing time. Retained during factory reset.
     static constexpr uint8_t kChipConfig_KeyBase =
@@ -81,7 +81,7 @@ public:
     static constexpr Key kConfigKey_ManufacturingDate    = EFR32ConfigKey(kChipFactory_KeyBase, 0x04);
     static constexpr Key kConfigKey_PairingCode          = EFR32ConfigKey(kChipFactory_KeyBase, 0x05);
     static constexpr Key kConfigKey_MfrDeviceICACerts    = EFR32ConfigKey(kChipFactory_KeyBase, 0x06);
-    // Chip Config Keys
+    // CHIP Config Keys
     static constexpr Key kConfigKey_FabricId             = EFR32ConfigKey(kChipConfig_KeyBase, 0x00);
     static constexpr Key kConfigKey_ServiceConfig        = EFR32ConfigKey(kChipConfig_KeyBase, 0x01);
     static constexpr Key kConfigKey_PairedAccountId      = EFR32ConfigKey(kChipConfig_KeyBase, 0x02);

@@ -18,31 +18,31 @@
 /**
  *    @file
  *      This file implements objects which provide an abstraction layer between
- *      a platform's Bluetooth Low Energy (BLE) implementation and the chip
+ *      a platform's Bluetooth Low Energy (BLE) implementation and the CHIP
  *      stack.
  *
  *      The BleLayer obect accepts BLE data and control input from the
  *      application via a functional interface. It performs the fragmentation
- *      and reassembly required to transmit chip message via a BLE GATT
- *      characteristic interface, and drives incoming messages up the chip
+ *      and reassembly required to transmit CHIP message via a BLE GATT
+ *      characteristic interface, and drives incoming messages up the CHIP
  *      stack.
  *
  *      During initialization, the BleLayer object requires a pointer to the
  *      platform's implementation of the BlePlatformDelegate and
  *      BleApplicationDelegate objects.
  *
- *      The BlePlatformDelegate provides the chip stack with an interface
+ *      The BlePlatformDelegate provides the CHIP stack with an interface
  *      by which to form and cancel GATT subscriptions, read and write
  *      GATT characteristic values, send GATT characteristic notifications,
  *      respond to GATT read requests, and close BLE connections.
  *
- *      The BleApplicationDelegate provides a mechanism for chip to inform
+ *      The BleApplicationDelegate provides a mechanism for CHIP to inform
  *      the application when it has finished using a given BLE connection,
  *      i.e when the chipConnection object wrapping this connection has
  *      closed. This allows the application to either close the BLE connection
- *      or continue to keep it open for non-chip purposes.
+ *      or continue to keep it open for non-CHIP purposes.
  *
- *      To enable chip over BLE for a new platform, the application developer
+ *      To enable CHIP over BLE for a new platform, the application developer
  *      must provide an implementation for both delegates, provides points to
  *      instances of these delegates on startup, and ensure that the
  *      application calls the necessary BleLayer functions when appropriate to
@@ -156,11 +156,11 @@ static BleEndPointPool sBLEEndPointPool;
 
 // UUIDs used internally by BleLayer:
 
-const chipBleUUID BleLayer::CHIP_BLE_CHAR_1_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D11
+const ChipBleUUID BleLayer::CHIP_BLE_CHAR_1_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D11
                                                      0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
                                                      0x9F, 0x9D, 0x11 } };
 
-const chipBleUUID BleLayer::CHIP_BLE_CHAR_2_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D12
+const ChipBleUUID BleLayer::CHIP_BLE_CHAR_2_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D12
                                                      0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
                                                      0x9F, 0x9D, 0x12 } };
 
@@ -389,7 +389,7 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
     return BLE_NO_ERROR;
 }
 
-// Handle remote central's initiation of chip over BLE protocol handshake.
+// Handle remote central's initiation of CHIP over BLE protocol handshake.
 BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, PacketBuffer * pBuf)
 {
     BLE_ERROR err             = BLE_NO_ERROR;
@@ -421,13 +421,13 @@ exit:
 
     if (err != BLE_NO_ERROR)
     {
-        ChipLogError(Ble, "HandlechipConnectionReceived failed, err = %d", err);
+        ChipLogError(Ble, "HandleChipConnectionReceived failed, err = %d", err);
     }
 
     return err;
 }
 
-bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId,
+bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                    PacketBuffer * pBuf)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
@@ -480,7 +480,7 @@ exit:
     return true;
 }
 
-bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId,
+bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                         PacketBuffer * pBuf)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
@@ -527,7 +527,7 @@ exit:
     return true;
 }
 
-bool BleLayer::HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
+bool BleLayer::HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
@@ -546,7 +546,7 @@ bool BleLayer::HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const chip
     return true;
 }
 
-bool BleLayer::HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
+bool BleLayer::HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
@@ -585,7 +585,7 @@ void BleLayer::HandleAckReceived(BLE_CONNECTION_OBJECT connObj)
     }
 }
 
-bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
+bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
@@ -610,7 +610,7 @@ bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chip
     return true;
 }
 
-bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
+bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
@@ -634,7 +634,7 @@ bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chip
     return true;
 }
 
-bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
+bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
@@ -659,7 +659,7 @@ bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ch
     return true;
 }
 
-bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const chipBleUUID * svcId, const chipBleUUID * charId)
+bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {

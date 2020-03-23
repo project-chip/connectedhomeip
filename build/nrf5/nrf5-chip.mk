@@ -16,13 +16,13 @@
 
 #
 #   @file
-#         Component makefile for incorporating Chip into an nRF5
+#         Component makefile for incorporating CHIP into an nRF5
 #         application.
 #
 
 #
 #   This makefile is intended to work in conjunction with the nrf5-app.mk
-#   makefile to build the Chip example applications on Nordic platforms. 
+#   makefile to build the CHIP example applications on Nordic platforms.
 #   nRF5 applications should include this file in their top level Makefile
 #   after including nrf5-app.mk.  E.g.:
 #
@@ -48,24 +48,24 @@
 # General settings
 # ==================================================
 
-# Location of Chip source tree
+# Location of CHIP source tree
 CHIP_ROOT ?= $(PROJECT_ROOT)/third_party/connectedhomeip
 
-# Archtecture for which Chip will be built.
+# Archtecture for which CHIP will be built.
 CHIP_HOST_ARCH := armv7-unknown-linux-gnu
 
-# Directory into which the Chip build system will place its output. 	
+# Directory into which the CHIP build system will place its output.
 CHIP_OUTPUT_DIR = $(OUTPUT_DIR)/chip
 
 # An optional file containing application-specific configuration overrides.
 CHIP_PROJECT_CONFIG = $(wildcard $(PROJECT_ROOT)/CHIPProjectConfig.h)
 
-# Architcture on which Chip is being built.
+# Architcture on which CHIP is being built.
 CHIP_BUILD_ARCH = $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
 
 
 # ==================================================
-# Compilation flags specific to building Chip
+# Compilation flags specific to building CHIP
 # ==================================================
 
 CHIP_CPPFLAGS = $(STD_CFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $(OPT_FLAGS) $(DEFINE_FLAGS) $(INC_FLAGS) 
@@ -82,7 +82,7 @@ DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst \,\\,$(1
 
 
 # ==================================================
-# Chip configuration options
+# CHIP configuration options
 # ==================================================
 
 CHIP_CONFIGURE_OPTIONS = \
@@ -125,10 +125,10 @@ endif
 
 # ==================================================
 # Adjustments to standard build settings to 
-#   incorporate Chip
+#   incorporate CHIP
 # ==================================================
 
-# Add Chip-specific paths to the standard include directories.
+# Add CHIP-specific paths to the standard include directories.
 STD_INC_DIRS += \
     $(CHIP_OUTPUT_DIR)/include \
     $(CHIP_OUTPUT_DIR)/src/include \
@@ -139,10 +139,10 @@ STD_INC_DIRS += \
 	$(CHIP_ROOT)/src/lwip/nrf5 \
 	$(CHIP_ROOT)/src/lwip/freertos
 
-# Add the location of Chip libraries to application link action.
+# Add the location of CHIP libraries to application link action.
 STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib
 
-# Add Chip libraries to standard libraries list. 
+# Add CHIP libraries to standard libraries list.
 STD_LIBS += \
     -lDeviceLayer \
 	-lInetLayer \
@@ -150,12 +150,12 @@ STD_LIBS += \
 	-lSystemLayer \
 	-llwip
 
-# Add the appropriate Chip target as a prerequisite to all application
-# compilation targets to ensure that Chip gets built and its header
+# Add the appropriate CHIP target as a prerequisite to all application
+# compilation targets to ensure that CHIP gets built and its header
 # files installed prior to compiling any dependent source files.
 STD_COMPILE_PREREQUISITES += install-chip
 
-# Add the Chip libraries as prerequisites for linking the application.
+# Add the CHIP libraries as prerequisites for linking the application.
 STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libDeviceLayer.a \
 	$(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
@@ -165,14 +165,14 @@ STD_LINK_PREREQUISITES += \
 
 
 # ==================================================
-# Late-bound build rules for Chip
+# Late-bound build rules for CHIP
 # ==================================================
 
 # Add ChipBuildRules to the list of late-bound build rules that
 # will be evaluated when GenerateBuildRules is called. 
 LATE_BOUND_RULES += ChipBuildRules
 
-# Rules for configuring, building and installing Chip.
+# Rules for configuring, building and installing CHIP.
 define ChipBuildRules
 
 .PHONY : config-chip .check-config-chip build-chip install-chip clean-chip
@@ -216,19 +216,19 @@ endef
 
 
 # ==================================================
-# Chip-specific help definitions
+# CHIP-specific help definitions
 # ==================================================
 
 define TargetHelp +=
 
 
-  config-chip          Run the Chip configure script.
+  config-chip          Run the CHIP configure script.
   
-  build-chip           Build the Chip libraries.
+  build-chip           Build the CHIP libraries.
   
-  install-chip         Install Chip libraries and headers in 
+  install-chip         Install CHIP libraries and headers in
                         build output directory for use by application.
   
-  clean-chip           Clean all build outputs produced by the Chip
+  clean-chip           Clean all build outputs produced by the CHIP
                         build process.
 endef
