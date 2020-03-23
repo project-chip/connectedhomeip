@@ -34,9 +34,10 @@ using namespace std;
 // Populates numberOfBits starting from LSB of input into bits, which is assumed to be zero-initialized
 static void populateBits(uint8_t * bits, int & offset, uint64_t input, size_t numberOfBits)
 {
+    // do nothing in the case where we've overflowed. should never happen
     if (offset + numberOfBits > kTotalPayloadDataSizeInBits || input >= 1 << numberOfBits)
     {
-        abort();
+        return;
     }
 
     int index = offset;

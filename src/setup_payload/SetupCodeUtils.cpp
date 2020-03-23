@@ -33,6 +33,8 @@ using namespace std;
 
 namespace chip {
 
+static const int kBase45ChunkLen = 3;
+
 string base45Encode(const uint8_t * buf, size_t buf_len)
 {
     const char codes[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
@@ -42,11 +44,13 @@ string base45Encode(const uint8_t * buf, size_t buf_len)
     string result;
     int radix = sizeof(codes) / sizeof(codes[0]);
 
+    // eat little-endian uint16_ts from the byte array
+    // encode as 3 base45 characters
     while (buf_len >= 2)
     {
         int next = buf[0] + buf[1] * 256;
 
-        for (int _ = 0; _ < 3; _++)
+        for (int _ = 0; _ < kBase45ChunkLen; _++)
         {
             result += codes[next % radix];
             next /= radix;
@@ -54,10 +58,11 @@ string base45Encode(const uint8_t * buf, size_t buf_len)
         buf += 2;
         buf_len -= 2;
     }
+    // handle leftover byte, if any
     if (buf_len != 0)
     {
         int next = buf[0];
-        for (int _ = 0; _ < 2; _++)
+        for (int _ = 0; _ < kBase45ChunkLen - 1; _++)
         {
             result += codes[next % radix];
             next /= radix;
@@ -68,14 +73,15 @@ string base45Encode(const uint8_t * buf, size_t buf_len)
 
 vector<uint8_t> base45Decode(string base45)
 {
-    // not long enough
-    if (base45.length() < 2)
+    // not long enough, there are always at least 2
+    //  base45 characters
+    if (base45.length() < kBase45ChunkLen - 1)
     {
         return vector<uint8_t>();
     }
     static const int kBogus = 255;
 #define DECODE_FAIL(c, v) ((c) < ' ' || (c) > 'Z' || ((v) = decodes[(c) - ' ']) == kBogus)
-
+    // map of base45 charater to numeric value
     // subtract 32 from the charater, then index into this array, if possible
     const uint8_t decodes[] = {
         36,     // ' ', =32
@@ -140,7 +146,7 @@ vector<uint8_t> base45Decode(string base45)
     };
     vector<uint8_t> result;
 
-    for (int i = 0; base45.length() - i >= 3; i += 3)
+    for (int i = 0; base45.length() - i >= kBase45ChunkLen; i += kBase45ChunkLen)
     {
         uint8_t v0 = 0, v1 = 0, v2 = 0;
 
@@ -154,9 +160,9 @@ vector<uint8_t> base45Decode(string base45)
         result.push_back(value % 256);
         result.push_back(value / 256);
     }
-    if (base45.length() % 3 == 2)
+    if (base45.length() % kBase45ChunkLen == kBase45ChunkLen - 1)
     {
-        int i      = base45.length() - 2;
+        int i      = base45.length() - (kBase45ChunkLen - 1);
         uint8_t v0 = 0, v1 = 0;
 
         if (DECODE_FAIL(base45[i], v0) || DECODE_FAIL(base45[i + 1], v1))

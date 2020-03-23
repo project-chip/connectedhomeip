@@ -30,12 +30,9 @@ lib_LIBRARIES              = libQrCode.a
 libQrCode_adir             = $(includedir)/setup_payload
 
 libQrCode_a_CPPFLAGS                                      = \
-    -I$(top_srcdir)/src                                     \
-    -I$(top_srcdir)/src/include                             \
-    -I$(top_srcdir)/src/setup_payload                       \
     $(NULL)
 
-libQrCode_a_SOURCES =                                       \
+libQrCode_a_SOURCES                                       = \
     QRCodeSetupPayloadGenerator.cpp                         \
     SetupCodeUtils.cpp                                      \
     SetupPayload.cpp                                        \
