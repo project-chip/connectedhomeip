@@ -22,30 +22,49 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-MAYBE_PLATFORM_SUBDIRS          = \
+
+BLE_SUBDIRS                       = \
+    ble                             \
+    $(NULL)
+
+MAYBE_BLE_SUBDIRS                 = \
+    $(NULL)
+
+if CONFIG_NETWORK_LAYER_BLE
+MAYBE_BLE_SUBDIRS                += \
+    $(BLE_SUBDIRS)                  \
+    $(NULL)
+endif # CONFIG_NETWORK_LAYER_BLE
+
+PLATFORM_SUBDIRS                  = \
+    platform                        \
+    $(NULL)
+
+MAYBE_PLATFORM_SUBDIRS            = \
     $(NULL)
 
 if CONFIG_DEVICE_LAYER
-MAYBE_PLATFORM_SUBDIRS         += \
-    platform                      \
+MAYBE_PLATFORM_SUBDIRS           += \
+    $(PLATFORM_SUBDIRS)             \
     $(NULL)
 endif # CONFIG_DEVICE_LAYER
 
 # Always package (e.g. for 'make dist') these subdirectories.
 
 DIST_SUBDIRS                      = \
-    ble                             \
+    $(BLE_SUBDIRS)                  \
     inet                            \
     lib                             \
     lwip                            \
     setup_payload                   \
     system                          \
-    $(MAYBE_PLATFORM_SUBDIRS)       \
+    $(PLATFORM_SUBDIRS)             \
     $(NULL)
 
 # Always build (e.g. for 'make all') these subdirectories.
 
 SUBDIRS                           = \
+    $(MAYBE_BLE_SUBDIRS)            \
     inet                            \
     lib                             \
     lwip                            \
@@ -53,11 +72,5 @@ SUBDIRS                           = \
     system                          \
     $(MAYBE_PLATFORM_SUBDIRS)       \
     $(NULL)
-
-if CONFIG_NETWORK_LAYER_BLE
-SUBDIRS                          += \
-    ble                             \
-    $(NULL)
-endif # CONFIG_NETWORK_LAYER_BLE
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
