@@ -25,9 +25,9 @@
 #ifndef DNSRESOLVER_H
 #define DNSRESOLVER_H
 
-#include <IPAddress.h>
-#include <InetError.h>
-#include "InetLayerBasis.h"
+#include <inet/IPAddress.h>
+#include <inet/InetError.h>
+#include "inet/InetLayerBasis.h"
 
 #define NL_DNS_HOSTNAME_MAX_LEN (253)
 

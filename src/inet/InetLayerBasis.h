@@ -25,7 +25,7 @@
 #ifndef INETLAYERBASIS_H
 #define INETLAYERBASIS_H
 
-#include <InetConfig.h>
+#include <inet/InetConfig.h>
 
 #include <support/DLLUtil.h>
 #include <system/SystemObject.h>

@@ -30,7 +30,7 @@
 #include <stdint.h>
 
 // Include configuration headers
-#include <CHIPConfig.h>
+#include <core/CHIPConfig.h>
 
 // Include dependent headers
 #include <support/DLLUtil.h>

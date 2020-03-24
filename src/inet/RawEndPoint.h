@@ -27,8 +27,8 @@
 #ifndef RAWENDPOINT_H
 #define RAWENDPOINT_H
 
-#include "IPEndPointBasis.h"
-#include <IPAddress.h>
+#include "inet/IPEndPointBasis.h"
+#include <inet/IPAddress.h>
 
 #include <system/SystemPacketBuffer.h>
 
