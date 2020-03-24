@@ -27,8 +27,8 @@
 #ifndef TCPENDPOINT_H
 #define TCPENDPOINT_H
 
-#include <EndPointBasis.h>
-#include <IPAddress.h>
+#include <inet/EndPointBasis.h>
+#include <inet/IPAddress.h>
 
 #include <system/SystemPacketBuffer.h>
 

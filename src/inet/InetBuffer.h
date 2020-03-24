@@ -25,7 +25,7 @@
 #ifndef INETBUFFER_H
 #define INETBUFFER_H
 
-#include <InetConfig.h>
+#include <inet/InetConfig.h>
 
 #if !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
