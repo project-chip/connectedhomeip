@@ -29,7 +29,6 @@ SoftwareUpdateManagerImpl SoftwareUpdateManagerImpl::sInstance;
 
 CHIP_ERROR SoftwareUpdateManagerImpl::_Init(void)
 {
-    //Internal::GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManagerImpl>::DoInit();
     Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>::DoInit();
 
     return CHIP_NO_ERROR;

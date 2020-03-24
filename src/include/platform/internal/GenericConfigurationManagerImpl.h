@@ -130,8 +130,6 @@ private:
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
-    // static void HashLengthAndBase64Value(Platform::Security::SHA256 & hash, const uint8_t * val, uint16_t valLen);
-
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
     bool UseManufacturerCredentialsAsOperational();
 #endif

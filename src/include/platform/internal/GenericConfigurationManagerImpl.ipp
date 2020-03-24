@@ -705,23 +705,6 @@ template<class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetQRCodeString(char * buf, size_t bufSize)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
-/*  Commented out for time being, until we have Device Description service
-    CHIP_ERROR err;
-    ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor deviceDesc;
-    uint32_t encodedLen;
-
-    err = Impl()->_GetDeviceDescriptor(deviceDesc);
-    SuccessOrExit(err);
-
-    strncpy(deviceDesc.PairingCode, FabricState.PairingCode, ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor::kMaxPairingCodeLength);
-    deviceDesc.PairingCode[::chip::Profiles::DeviceDescription::ChipDeviceDescriptor::kMaxPairingCodeLength] = 0;
-
-    err = ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor::EncodeText(deviceDesc, buf, (uint32_t)bufSize, encodedLen);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-*/
 }
 
 template<class ImplClass>
@@ -880,9 +863,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // Read the certificate.
         err = Impl()->_GetManufacturerDeviceCertificate(dataBuf, certLen, certLen);
         SuccessOrExit(err);
-
-        // Hash the length and value of the device certificate in base-64 form.
-        // HashLengthAndBase64Value(hash, dataBuf, (uint16_t)certLen);
     }
 
     // Hash the device intermediate CA certificates
@@ -908,9 +888,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // Read the device intermediate CA certificates.
         err = Impl()->_GetManufacturerDeviceIntermediateCACerts(dataBuf, certsLen, certsLen);
         SuccessOrExit(err);
-
-        // Hash the length and value of the device intermediate CA certificates in base-64 form.
-        // HashLengthAndBase64Value(hash, dataBuf, (uint16_t)certsLen);
     }
 
     // Hash the device private key
@@ -926,9 +903,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // unlikely event that this is not the case.)
         err = Impl()->_GetManufacturerDevicePrivateKey(dataBuf, dataBufSize, keyLen);
         SuccessOrExit(err);
-
-        // Hash the length and value of the private key in base-64 form.
-        // HashLengthAndBase64Value(hash, dataBuf, (uint16_t)keyLen);
     }
 
     // Hash the device pairing code.  If the device does not have a pairing code, hash a zero-length value.
@@ -961,31 +935,7 @@ exit:
     }
     return err;
 }
-/*
-template<class ImplClass>
-void GenericConfigurationManagerImpl<ImplClass>::HashLengthAndBase64Value(Platform::Security::SHA256 & hash, const uint8_t * val, uint16_t valLen)
-{
-    constexpr uint16_t kInputBufSize = 80;
-    static_assert(kInputBufSize > 0 && kInputBufSize % 4 == 0, "kInputBufSize must be a positive multiple of 4");
-    char inputBuf[kInputBufSize];
-    constexpr uint16_t kMaxChunkLen = BASE64_MAX_DECODED_LEN(kInputBufSize);
 
-    // Hash the length of the base-64 value as 4 hex digits.
-    snprintf(inputBuf, sizeof(inputBuf), "%04" PRIX16, (uint16_t)BASE64_ENCODED_LEN(valLen));
-    hash.AddData((uint8_t *)inputBuf, 4);
-
-    // Repeatedly encode and hash chunks of the value in base-64 format.
-    while (valLen > 0)
-    {
-        uint16_t chunkLen = (valLen > kMaxChunkLen) ? kMaxChunkLen : valLen;
-        uint16_t encodedLen = Base64Encode(val, chunkLen, inputBuf);
-        inputBuf[encodedLen] = 0;
-        hash.AddData((uint8_t *)inputBuf, encodedLen);
-        val += chunkLen;
-        valLen -= chunkLen;
-    }
-}
-*/
 #if CHIP_PROGRESS_LOGGING
 
 template<class ImplClass>
