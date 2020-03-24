@@ -24,11 +24,11 @@
 #ifndef _ASYNC_DNS_SOCKETS_H_
 #define _ASYNC_DNS_SOCKETS_H_
 
-#include <IPAddress.h>
-#include <InetError.h>
+#include <inet/IPAddress.h>
+#include <inet/InetError.h>
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
-#include <DNSResolver.h>
+#include <inet/DNSResolver.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

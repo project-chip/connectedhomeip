@@ -24,13 +24,13 @@
 #ifndef ENDPOINTBASIS_H
 #define ENDPOINTBASIS_H
 
-#include <InetConfig.h>
+#include <inet/InetConfig.h>
 
-#include <InetError.h>
-#include "IANAConstants.h"
-#include "InetLayerBasis.h"
-#include <InetLayerEvents.h>
-#include <InetInterface.h>
+#include <inet/InetError.h>
+#include "inet/IANAConstants.h"
+#include "inet/InetLayerBasis.h"
+#include <inet/InetLayerEvents.h>
+#include <inet/InetInterface.h>
 
 #include <support/DLLUtil.h>
 

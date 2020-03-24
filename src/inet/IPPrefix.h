@@ -27,7 +27,7 @@
 #ifndef IPPREFIX_H
 #define IPPREFIX_H
 
-#include <IPAddress.h>
+#include <inet/IPAddress.h>
 
 #define CHIP_INET_IPV6_DEFAULT_PREFIX_LEN (64)
 #define CHIP_INET_IPV6_MAX_PREFIX_LEN (128)
