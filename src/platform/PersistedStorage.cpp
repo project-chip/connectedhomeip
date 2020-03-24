@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,28 +21,26 @@
  *          APIs.  This implementation is common across all platforms.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/ConfigurationManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/ConfigurationManager.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace Platform {
 namespace PersistedStorage {
 
-using namespace ::nl::Weave::DeviceLayer;
+using namespace ::chip::DeviceLayer;
 
-WEAVE_ERROR Read(Key key, uint32_t & value)
+CHIP_ERROR Read(Key key, uint32_t & value)
 {
     return ConfigurationMgr().ReadPersistedStorageValue(key, value);
 }
 
-WEAVE_ERROR Write(Key key, uint32_t value)
+CHIP_ERROR Write(Key key, uint32_t value)
 {
     return ConfigurationMgr().WritePersistedStorageValue(key, value);
 }
 
 } // PersistedStorage
 } // Platform
-} // Weave
-} // nl
+} // chip
 
