@@ -6,7 +6,6 @@
 # replacements.
 #
 
-# shellcheck disable=SC2120
 die() {
     echo " *** ERROR: $*"
     exit 1
@@ -19,9 +18,6 @@ die() {
 
 for arg; do true; done
 file=$arg
-[[ -n "$(tail -c1 "$file")" ]] && {
-    echo " *** ERROR: Missing EOF newline: $file"
-    exit 1
-}
+[[ -z $(tail -c1 "$file") ]] || die "Missing EOF newline: $file"
 
 exit 0

@@ -2,7 +2,6 @@
 
 CLANG_FORMAT_VERSION="clang-format version 9.0"
 
-# shellcheck disable=SC2120
 die() {
     echo " *** ERROR: $*"
     exit 1
@@ -15,11 +14,11 @@ elif command -v clang-format > /dev/null; then
         "$CLANG_FORMAT_VERSION"*)
             ;;
         *)
-            die "$(clang-format --version); clang-format 9.0 required"
+            die "$(clang-format --version); \"$CLANG_FORMAT_VERSION\" required"
             ;;
     esac
 else
-    die "clang-format 9.0 required"
+    die "$CLANG_FORMAT_VERSION required"
 fi
 
 clang-format "$@" || die "format failed"
@@ -38,7 +37,7 @@ done
 file=$arg
 
 [[ $REPLACE != yes ]] || {
-    [[ -n "$(tail -c1 "$file")" ]] && echo >> "$file"
+    [[ -z $(tail -c1 "$file") ]] || echo >> "$file"
 }
 
 exit 0
