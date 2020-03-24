@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Provides implementations for the OpenWeave persistent storage
+ *          Provides implementations for the CHIP persistent storage
  *          APIs.  This implementation is common across all platforms.
  */
 
