@@ -23,7 +23,7 @@
 #ifndef CONFIGURATION_MANAGER_H
 #define CONFIGURATION_MANAGER_H
 
-#include <support/platform/PersistedStorage.h>
+#include <platform/PersistedStorage.h>
 #include <profiles/device-description/DeviceDescription.h>
 #include <profiles/network-provisioning/NetworkProvisioning.h>
 

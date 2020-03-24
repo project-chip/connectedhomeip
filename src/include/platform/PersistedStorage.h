@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,15 +26,14 @@
 #ifndef PERSISTED_STORAGE_H
 #define PERSISTED_STORAGE_H
 
-#include <Weave/Core/WeaveError.h>
-#include <Weave/Core/WeaveConfig.h>
+#include <core/CHIPError.h>
+#include <core/CHIPConfig.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace Platform {
 namespace PersistedStorage {
 
-typedef WEAVE_CONFIG_PERSISTED_STORAGE_KEY_TYPE Key;
+typedef CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE Key;
 
 /**
  *  @brief
@@ -45,13 +43,13 @@ typedef WEAVE_CONFIG_PERSISTED_STORAGE_KEY_TYPE Key;
  *  @param[in]    aKey      A key to a persistently-stored value.
  *  @param[inout] aValue    A reference to an integer value.
  *
- *  @return WEAVE_ERROR_INVALID_ARGUMENT if aKey is NULL
- *          WEAVE_ERROR_INVALID_STRING_LENGTH if aKey exceeds
- *                  WEAVE_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH
- *          WEAVE_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if aKey does not exist
- *          WEAVE_NO_ERROR otherwise
+ *  @return CHIP_ERROR_INVALID_ARGUMENT if aKey is NULL
+ *          CHIP_ERROR_INVALID_STRING_LENGTH if aKey exceeds
+ *                  CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH
+ *          CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if aKey does not exist
+ *          CHIP_NO_ERROR otherwise
  */
-WEAVE_ERROR Read(Key aKey, uint32_t &aValue);
+CHIP_ERROR Read(Key aKey, uint32_t &aValue);
 
 /**
  *  @brief
@@ -63,16 +61,15 @@ WEAVE_ERROR Read(Key aKey, uint32_t &aValue);
  *  @param[in] aKey      A key to a persistently-stored value.
  *  @param[in] aValue    The value.
  *
- *  @return WEAVE_ERROR_INVALID_ARGUMENT if aKey is NULL
- *          WEAVE_ERROR_INVALID_STRING_LENGTH if aKey exceeds
- *                  WEAVE_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH
- *          WEAVE_NO_ERROR otherwise
+ *  @return CHIP_ERROR_INVALID_ARGUMENT if aKey is NULL
+ *          CHIP_ERROR_INVALID_STRING_LENGTH if aKey exceeds
+ *                  CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH
+ *          CHIP_NO_ERROR otherwise
  */
-WEAVE_ERROR Write(Key aKey, uint32_t aValue);
+CHIP_ERROR Write(Key aKey, uint32_t aValue);
 
 } // PersistedStorage
 } // Platform
-} // Weave
-} // nl
+} // chip
 
 #endif // PERSISTED_STORAGE_H
