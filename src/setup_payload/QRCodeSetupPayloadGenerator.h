@@ -41,22 +41,7 @@ namespace chip {
 class QRCodeSetupPayloadGenerator
 {
 private:
-    bitset<kTotalPayloadDataSizeInBits> mPayloadBits;
     SetupPayload mPayload;
-    // points to the current index within the bitset
-    int mPayloadBitsIndex;
-
-    void populateInteger(uint64_t input, size_t numberOfBits);
-    void populateVersion();
-    void populateVendorID();
-    void populateProductID();
-    void populateCustomFlowRequiredField();
-    void populateRendezvousInfo();
-    void populateDiscriminator();
-    void populateSetupPIN();
-    void populateReservedField();
-    void resetBitSet();
-    void generateBitSet();
 
 public:
     string payloadBinaryRepresentation();
