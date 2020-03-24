@@ -23,10 +23,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/ConfigurationManager.h>
-#include <core/CHIPKeyIds.h>
 #include <core/CHIPVendorIdentifiers.hpp>
-#include <platform/Profiles/security/CHIPApplicationKeys.h>
-#include <platform/nRF5/GroupKeyStoreImpl.h>
 #include <platform/nRF5/nRF5Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
@@ -34,11 +31,12 @@
 #include <platform/internal/FactoryProvisioning.ipp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
+
 namespace chip {
 namespace DeviceLayer {
 
-using namespace ::chip::Profiles::Security::AppKeys;
-using namespace ::chip::Profiles::DeviceDescription;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
@@ -91,23 +89,6 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
 
 exit:
     return err;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::_GetDeviceDescriptor(::chip::Profiles::DeviceDescription::ChipDeviceDescriptor & deviceDesc)
-{
-    CHIP_ERROR err;
-
-    // Call the generic version of _GetDeviceDescriptor() supplied by the base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_GetDeviceDescriptor(deviceDesc);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * ConfigurationManagerImpl::_GetGroupKeyStore()
-{
-    return &gGroupKeyStore;
 }
 
 bool ConfigurationManagerImpl::_CanFactoryReset()

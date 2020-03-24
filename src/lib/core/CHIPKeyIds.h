@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,37 +17,36 @@
 
 /**
  *    @file
- *      This file defines constant enumerations for all Weave key types,
+ *      This file defines constant enumerations for all CHIP key types,
  *      key flags, key ID fields, and helper API functions.
  *
  */
 
-#ifndef WEAVEKEYS_H_
-#define WEAVEKEYS_H_
+#ifndef CHIPKEYS_H_
+#define CHIPKEYS_H_
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 /**
- *  @class WeaveKeyId
+ *  @class ChipKeyId
  *
  *  @brief
- *    The definition of the Weave Key identifier. This class contains
+ *    The definition of the CHIP Key identifier. This class contains
  *    key types, key flags, key ID fields definition, and API functions.
  *
  */
-class WeaveKeyId
+class ChipKeyId
 {
 private:
     /**
      * @brief
-     *   Private Weave key ID fields, flags, and types.
+     *   Private CHIP key ID fields, flags, and types.
      */
     enum
     {
-        kMask_KeyFlags                                      = 0xF0000000,  /**< Weave key flag field mask. */
-        kMask_KeyType                                       = 0x0FFFF000,  /**< Weave key type field mask. */
-        kMask_KeyNumber                                     = 0x00000FFF,  /**< Weave key number field mask. */
+        kMask_KeyFlags                                      = 0xF0000000,  /**< CHIP key flag field mask. */
+        kMask_KeyType                                       = 0x0FFFF000,  /**< CHIP key type field mask. */
+        kMask_KeyNumber                                     = 0x00000FFF,  /**< CHIP key number field mask. */
         kMask_RootKeyNumber                                 = 0x00000C00,  /**< Application group root key number field mask. */
         kMask_EpochKeyNumber                                = 0x00000380,  /**< Application group epoch key number field mask. */
         kMask_GroupLocalNumber                              = 0x0000007F,  /**< Application group local number field mask. */
@@ -66,19 +64,19 @@ private:
 public:
     /**
      * @brief
-     *   Public Weave key ID fields, flags, and types.
+     *   Public CHIP key ID fields, flags, and types.
      */
     enum
     {
         /**
-         * @brief  Weave key types used for Weave message encryption.
+         * @brief  CHIP key types used for CHIP message encryption.
          *
          * @note  16 (out of 32) most significant bits of the message encryption key
          *        type should be zero because only 16 least significant bits of the ID
-         *        are encoded in the Weave message.
+         *        are encoded in the CHIP message.
          *  @{
          */
-        kType_None                                          = 0x00000000,  /**< Weave message is unencrypted. */
+        kType_None                                          = 0x00000000,  /**< CHIP message is unencrypted. */
         kType_General                                       = 0x00001000,  /**< General key type. */
         kType_Session                                       = 0x00002000,  /**< Session key type. */
         kType_AppStaticKey                                  = 0x00004000,  /**< Application static key type. */
@@ -87,10 +85,10 @@ public:
         /** @} */
 
         /**
-         * @brief  Weave key types (other than Weave message encryption types).
+         * @brief  CHIP key types (other than CHIP message encryption types).
          *
          * @note  16 (out of 32) most significant bits of these types cannot be all zeros,
-         *        because these values are reserved for the Weave message encryption keys only.
+         *        because these values are reserved for the CHIP message encryption keys only.
          *  @{
          */
 
@@ -109,12 +107,12 @@ public:
         /** @} */
 
         /**
-         * @brief  Weave global key IDs.
+         * @brief  CHIP global key IDs.
          *  @{
          */
-        /** Unspecified Weave key ID. */
+        /** Unspecified CHIP key ID. */
         kNone                                               = kType_None | 0x0000,
-        /** Weave fabric secret ID. */
+        /** CHIP fabric secret ID. */
         kFabricSecret                                       = kType_General | 0x0001,
         /** Fabric root key ID. */
         kFabricRootKey                                      = kType_AppRootKey | (0 << kShift_RootKeyNumber),
@@ -137,9 +135,9 @@ public:
     };
 
     /**
-     *  Get Weave key type of the specified key ID.
+     *  Get CHIP key type of the specified key ID.
      *
-     *  @param[in]   keyId     Weave key identifier.
+     *  @param[in]   keyId     CHIP key identifier.
      *  @return                type of the key ID.
      *
      */
@@ -151,7 +149,7 @@ public:
     /**
      *  Determine whether the specified key ID is of a general type.
      *
-     *  @param[in]   keyId     Weave key identifier.
+     *  @param[in]   keyId     CHIP key identifier.
      *  @return      true      if the keyId has General type.
      *
      */
@@ -163,7 +161,7 @@ public:
     /**
      *  Determine whether the specified key ID is of a session type.
      *
-     *  @param[in]   keyId     Weave key identifier.
+     *  @param[in]   keyId     CHIP key identifier.
      *  @return      true      if the keyId of a session type.
      *
      */
@@ -175,7 +173,7 @@ public:
     /**
      *  Determine whether the specified key ID is of an application static type.
      *
-     *  @param[in]   keyId     Weave key identifier.
+     *  @param[in]   keyId     CHIP key identifier.
      *  @return      true      if the keyId of an application static type.
      *
      */
@@ -187,7 +185,7 @@ public:
     /**
      *  Determine whether the specified key ID is of an application rotating type.
      *
-     *  @param[in]   keyId     Weave key identifier.
+     *  @param[in]   keyId     CHIP key identifier.
      *  @return      true      if the keyId of an application rotating type.
      *
      */
@@ -201,7 +199,7 @@ public:
     /**
      *  Determine whether the specified key ID is of an application root key type.
      *
-     *  @param[in]   keyId     Weave key identifier.
+     *  @param[in]   keyId     CHIP key identifier.
      *  @return      true      if the keyId of an application root key type.
      *
      */
@@ -213,7 +211,7 @@ public:
     /**
      *  Determine whether the specified key ID is of an application epoch key type.
      *
-     *  @param[in]   keyId     Weave key identifier.
+     *  @param[in]   keyId     CHIP key identifier.
      *  @return      true      if the keyId of an application epoch key type.
      *
      */
@@ -225,7 +223,7 @@ public:
     /**
      *  Determine whether the specified key ID is of an application group master key type.
      *
-     *  @param[in]       keyId     Weave key identifier.
+     *  @param[in]       keyId     CHIP key identifier.
      *  @return  true      if the keyId of an application group master key type.
      *
      */
@@ -261,7 +259,7 @@ public:
     /**
      *  Get application group root key ID that was used to derive specified application key.
      *
-     *  @param[in]   keyId     Weave application group key identifier.
+     *  @param[in]   keyId     CHIP application group key identifier.
      *  @return      root key ID.
      *
      */
@@ -273,7 +271,7 @@ public:
     /**
      *  Get application group epoch key ID that was used to derive specified application key.
      *
-     *  @param[in]   keyId     Weave application group key identifier.
+     *  @param[in]   keyId     CHIP application group key identifier.
      *  @return      epoch key ID.
      *
      */
@@ -285,7 +283,7 @@ public:
     /**
      *  Get application group master key ID that was used to derive specified application key.
      *
-     *  @param[in]   keyId     Weave application group key identifier.
+     *  @param[in]   keyId     CHIP application group key identifier.
      *  @return      application group master key ID.
      *
      */
@@ -297,7 +295,7 @@ public:
     /**
      *  Get application group root key number that was used to derive specified application key.
      *
-     *  @param[in]   keyId     Weave application group key identifier.
+     *  @param[in]   keyId     CHIP application group key identifier.
      *  @return      root key number.
      *
      */
@@ -309,7 +307,7 @@ public:
     /**
      *  Get application group epoch key number that was used to derive specified application key.
      *
-     *  @param[in]   keyId     Weave application group key identifier.
+     *  @param[in]   keyId     CHIP application group key identifier.
      *  @return      epoch key number.
      *
      */
@@ -321,7 +319,7 @@ public:
     /**
      *  Get application group local number that was used to derive specified application key.
      *
-     *  @param[in]   keyId     Weave application group key identifier.
+     *  @param[in]   keyId     CHIP application group key identifier.
      *  @return      application group local number.
      *
      */
@@ -381,7 +379,7 @@ public:
     /**
      *  Determine whether the specified application group key ID incorporates epoch key.
      *
-     *  @param[in]   keyId     Weave application group key identifier.
+     *  @param[in]   keyId     CHIP application group key identifier.
      *  @return      true      if the keyId incorporates epoch key.
      *
      */
@@ -409,7 +407,6 @@ public:
     static const char *DescribeKey(uint32_t keyId);
 };
 
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-#endif /* WEAVEKEYS_H_ */
+#endif /* CHIPKEYS_H_ */

@@ -23,7 +23,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/PlatformManager.h>
-#include <platform/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/nRF5/nRF5Utils.h>
 
 #include <lwip/tcpip.h>

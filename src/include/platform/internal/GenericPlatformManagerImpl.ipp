@@ -32,6 +32,9 @@
 #include <platform/internal/BLEManager.h>
 #include <new>
 
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -80,18 +83,6 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
     }
     SuccessOrExit(err);
-
-    {
-        ChipMessageLayer::InitContext initContext;
-        initContext.systemLayer = &SystemLayer;
-        initContext.inet = &InetLayer;
-        initContext.listenTCP = true;
-        initContext.listenUDP = true;
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-        initContext.ble = BLEMgr().GetBleLayer();
-        initContext.listenBLE = true;
-#endif
-    }
 
     // Perform dynamic configuration of the core CHIP objects based on stored settings.
     //
@@ -300,32 +291,6 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToApplication(const Chi
          eventHandler = eventHandler->Next)
     {
         eventHandler->Handler(event, eventHandler->Arg);
-    }
-}
-
-template<class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::HandleSessionEstablished(ChipSecurityManager * sm, ChipConnection * con, void * reqState, uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType)
-{
-    // Get the auth mode for the newly established session key.
-    ChipSessionKey * sessionKey;
-    FabricState.GetSessionKey(sessionKeyId, peerNodeId, sessionKey);
-    ChipAuthMode authMode = (sessionKey != NULL) ? sessionKey->AuthMode : (ChipAuthMode)kChipAuthMode_NotSpecified;
-
-    // Post a SessionEstablished event for the new session.  If a PASE session is established
-    // using the device's pairing code, presume that this is a commissioner and set the
-    // IsCommissioner flag as a convenience to the application.
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kSessionEstablished;
-    event.SessionEstablished.PeerNodeId = peerNodeId;
-    event.SessionEstablished.SessionKeyId = sessionKeyId;
-    event.SessionEstablished.EncType = encType;
-    event.SessionEstablished.AuthMode = authMode;
-    event.SessionEstablished.IsCommissioner = (authMode == kChipAuthMode_PASE_PairingCode);
-    PlatformMgr().PostEvent(&event);
-
-    if (event.SessionEstablished.IsCommissioner)
-    {
-        ChipLogProgress(DeviceLayer, "Commissioner session established");
     }
 }
 

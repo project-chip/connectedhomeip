@@ -30,6 +30,7 @@ CHIP_BUILD_CORE_LAYER_SOURCE_FILES                        = \
     core/CHIPTLVUtilities.cpp                               \
     core/CHIPTLVWriter.cpp                                  \
     core/CHIPTLVUpdater.cpp                                 \
+    core/CHIPKeyIds.cpp                                     \
     $(NULL)
 
 CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
@@ -46,4 +47,5 @@ CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
     core/CHIPTLVUtilities.hpp                               \
     core/CHIPTimeConfig.h                                   \
     core/CHIPTunnelConfig.h                                 \
+    core/CHIPKeyIds.h                                       \
     $(NULL)

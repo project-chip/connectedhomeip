@@ -23,6 +23,8 @@
 #ifndef CHIP_BLE_SERVICE_DATA_H
 #define CHIP_BLE_SERVICE_DATA_H
 
+#include <core/CHIPEncoding.h>
+
 namespace chip {
 namespace Ble {
 
@@ -41,7 +43,7 @@ enum chipBLEServiceDataType
  * Defines the over-the-air encoded format of the device identification information block that appears
  * within chip BLE service advertisement data.
  */
-struct chipBLEDeviceIdentificationInfo
+struct ChipBLEDeviceIdentificationInfo
 {
     enum
     {

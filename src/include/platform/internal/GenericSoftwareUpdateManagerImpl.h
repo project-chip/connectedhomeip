@@ -32,6 +32,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+using namespace chip::Inet;
+
 /**
  * Provides a generic implementation of Software Update Manager features that works on multiple platforms.
  *
@@ -43,7 +45,6 @@ namespace Internal {
 template<class ImplClass>
 class GenericSoftwareUpdateManagerImpl
 {
-    using StatusReport = ::chip::Profiles::StatusReporting::StatusReport;
 
 protected:
     // ===== Methods that implement the SoftwareUpdateManager abstract interface.
@@ -68,13 +69,10 @@ protected:
 
     void DoInit();
     void DownloadComplete(void);
-    void SoftwareUpdateFailed(CHIP_ERROR aError, StatusReport * aStatusReport);
     void SoftwareUpdateFinished(CHIP_ERROR aError);
 
     CHIP_ERROR InstallImage(void);
     CHIP_ERROR StoreImageBlock(uint32_t aLength, uint8_t *aData);
-    CHIP_ERROR GetIntegrityTypeList(::chip::Profiles::SoftwareUpdate::IntegrityTypeList * aIntegrityTypeList);
-
 private:
     // ===== Private members reserved for use by this class only.
 
@@ -84,7 +82,6 @@ private:
     void DriveState(SoftwareUpdateManager::State aNextState);
     void GetEventState(int32_t& aEventState);
     void HandleImageQueryResponse(PacketBuffer * aPayload);
-    void HandleStatusReport(PacketBuffer * aPayload);
     void SendQuery(void);
     void StartImageInstall(void);
     void PrepareImageStorage(void);
@@ -99,17 +96,6 @@ private:
     static void HandleHoldOffTimerExpired(::chip::System::Layer * aLayer,
                                           void * aAppState,
                                           ::chip::System::Error aError);
-    static void HandleServiceBindingEvent(void * appState, ::chip::Binding::EventType eventType,
-                                          const ::chip::Binding::InEventParam & inParam,
-                                          ::chip::Binding::OutEventParam & outParam);
-    static void HandleResponse(ExchangeContext * ec,
-                               const IPPacketInfo * pktInfo,
-                               const ChipMessageInfo * msgInfo,
-                               uint32_t profileId,
-                               uint8_t msgType,
-                               PacketBuffer * payload);
-    static void OnKeyError(ExchangeContext *aEc, CHIP_ERROR aKeyError);
-    static void OnResponseTimeout(ExchangeContext * aEC);
     static void DefaultRetryPolicyCallback(void * const aAppState,
                                            SoftwareUpdateManager::RetryParam & aRetryParam,
                                            uint32_t & aOutIntervalMsec);
@@ -121,7 +107,6 @@ private:
     void * mAppState;
 
     char mURI[CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN];
-    ::chip::Profiles::SoftwareUpdate::IntegritySpec mIntegritySpec;
 
     SoftwareUpdateManager::EventCallback mEventHandlerCallback;
     SoftwareUpdateManager::RetryPolicyCallback mRetryPolicyCallback;
@@ -140,9 +125,6 @@ private:
     uint32_t mEventId;
 
     uint16_t mRetryCounter;
-
-    Binding * mBinding;
-    ExchangeContext * mExchangeCtx;
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
