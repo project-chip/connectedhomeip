@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,26 +17,25 @@
 
 /**
  *    @file
- *      This file implements Weave key types helper functions.
+ *      This file implements CHIP key types helper functions.
  *
  */
 
-#include <Weave/Core/WeaveCore.h>
-#include "WeaveKeyIds.h"
-#include <Weave/Support/CodeUtils.h>
+#include <core/CHIPCore.h>
+#include "CHIPKeyIds.h"
+#include <support/CodeUtils.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 
 /**
  *  Determine whether the specified key ID belongs to one of the application
  *  group key types (static or rotating).
  *
- *  @param[in]   keyId     Weave key identifier.
+ *  @param[in]   keyId     CHIP key identifier.
  *  @return      true      if the keyId is of rotating or static key type.
  *
  */
-bool WeaveKeyId::IsAppGroupKey(uint32_t keyId)
+bool ChipKeyId::IsAppGroupKey(uint32_t keyId)
 {
     return IsAppStaticKey(keyId) || IsAppRotatingKey(keyId);
 }
@@ -45,11 +43,11 @@ bool WeaveKeyId::IsAppGroupKey(uint32_t keyId)
 /**
  *  Determine whether the specified application group key ID uses "current" epoch key.
  *
- *  @param[in]   keyId     Weave application group key identifier.
+ *  @param[in]   keyId     CHIP application group key identifier.
  *  @return      true      if the keyId indicates usage of the current epoch key.
  *
  */
-bool WeaveKeyId::UsesCurrentEpochKey(uint32_t keyId)
+bool ChipKeyId::UsesCurrentEpochKey(uint32_t keyId)
 {
     return IncorporatesEpochKey(keyId) && ((keyId & kFlag_UseCurrentEpochKey) != 0);
 }
@@ -57,11 +55,11 @@ bool WeaveKeyId::UsesCurrentEpochKey(uint32_t keyId)
 /**
  *  Determine whether the specified application group key ID incorporates root key.
  *
- *  @param[in]   keyId     Weave application group key identifier.
+ *  @param[in]   keyId     CHIP application group key identifier.
  *  @return      true      if the keyId incorporates root key.
  *
  */
-bool WeaveKeyId::IncorporatesRootKey(uint32_t keyId)
+bool ChipKeyId::IncorporatesRootKey(uint32_t keyId)
 {
     uint32_t keyType = GetType(keyId);
     return keyType == kType_AppStaticKey ||
@@ -73,11 +71,11 @@ bool WeaveKeyId::IncorporatesRootKey(uint32_t keyId)
 /**
  *  Determine whether the specified application group key ID incorporates group master key.
  *
- *  @param[in]   keyId     Weave application group key identifier.
+ *  @param[in]   keyId     CHIP application group key identifier.
  *  @return      true      if the keyId incorporates group master key.
  *
  */
-bool WeaveKeyId::IncorporatesAppGroupMasterKey(uint32_t keyId)
+bool ChipKeyId::IncorporatesAppGroupMasterKey(uint32_t keyId)
 {
     uint32_t keyType = GetType(keyId);
     return keyType == kType_AppStaticKey ||
@@ -98,7 +96,7 @@ bool WeaveKeyId::IncorporatesAppGroupMasterKey(uint32_t keyId)
  *  @return      application group key ID.
  *
  */
-uint32_t WeaveKeyId::MakeAppKeyId(uint32_t keyType, uint32_t rootKeyId, uint32_t epochKeyId,
+uint32_t ChipKeyId::MakeAppKeyId(uint32_t keyType, uint32_t rootKeyId, uint32_t epochKeyId,
                                   uint32_t appGroupMasterKeyId, bool useCurrentEpochKey)
 {
     return (keyType |
@@ -117,7 +115,7 @@ uint32_t WeaveKeyId::MakeAppKeyId(uint32_t keyType, uint32_t rootKeyId, uint32_t
  *  @return      application intermediate key ID.
  *
  */
-uint32_t WeaveKeyId::MakeAppIntermediateKeyId(uint32_t rootKeyId, uint32_t epochKeyId, bool useCurrentEpochKey)
+uint32_t ChipKeyId::MakeAppIntermediateKeyId(uint32_t rootKeyId, uint32_t epochKeyId, bool useCurrentEpochKey)
 {
     return MakeAppKeyId(kType_AppIntermediateKey, rootKeyId, epochKeyId, kNone, useCurrentEpochKey);
 }
@@ -134,7 +132,7 @@ uint32_t WeaveKeyId::MakeAppIntermediateKeyId(uint32_t rootKeyId, uint32_t epoch
  *  @return      application rotating key ID.
  *
  */
-uint32_t WeaveKeyId::MakeAppRotatingKeyId(uint32_t rootKeyId, uint32_t epochKeyId,
+uint32_t ChipKeyId::MakeAppRotatingKeyId(uint32_t rootKeyId, uint32_t epochKeyId,
                                           uint32_t appGroupMasterKeyId, bool useCurrentEpochKey)
 {
     return MakeAppKeyId(kType_AppRotatingKey, rootKeyId, epochKeyId, appGroupMasterKeyId, useCurrentEpochKey);
@@ -149,7 +147,7 @@ uint32_t WeaveKeyId::MakeAppRotatingKeyId(uint32_t rootKeyId, uint32_t epochKeyI
  *  @return      application static key ID.
  *
  */
-uint32_t WeaveKeyId::MakeAppStaticKeyId(uint32_t rootKeyId, uint32_t appGroupMasterKeyId)
+uint32_t ChipKeyId::MakeAppStaticKeyId(uint32_t rootKeyId, uint32_t appGroupMasterKeyId)
 {
     return MakeAppKeyId(kType_AppStaticKey, rootKeyId, kNone, appGroupMasterKeyId, false);
 }
@@ -161,7 +159,7 @@ uint32_t WeaveKeyId::MakeAppStaticKeyId(uint32_t rootKeyId, uint32_t appGroupMas
  *  @return      application static key ID.
  *
  */
-uint32_t WeaveKeyId::ConvertToStaticAppKeyId(uint32_t keyId)
+uint32_t ChipKeyId::ConvertToStaticAppKeyId(uint32_t keyId)
 {
     return MakeAppStaticKeyId(GetRootKeyId(keyId), GetAppGroupMasterKeyId(keyId));
 }
@@ -175,7 +173,7 @@ uint32_t WeaveKeyId::ConvertToStaticAppKeyId(uint32_t keyId)
  *  @return      application key ID.
  *
  */
-uint32_t WeaveKeyId::UpdateEpochKeyId(uint32_t keyId, uint32_t epochKeyId)
+uint32_t ChipKeyId::UpdateEpochKeyId(uint32_t keyId, uint32_t epochKeyId)
 {
     return (keyId & ~(kFlag_UseCurrentEpochKey | kMask_EpochKeyNumber)) |
            (epochKeyId & kMask_EpochKeyNumber);
@@ -184,11 +182,11 @@ uint32_t WeaveKeyId::UpdateEpochKeyId(uint32_t keyId, uint32_t epochKeyId)
 /**
  *  Determine whether key identifier has valid (legal) value.
  *
- *  @param[in]   keyId                 Weave key ID.
+ *  @param[in]   keyId                 CHIP key ID.
  *  @return      true                  if key ID value is valid.
  *
  */
-bool WeaveKeyId::IsValidKeyId(uint32_t keyId)
+bool ChipKeyId::IsValidKeyId(uint32_t keyId)
 {
     bool retval;
     int usedBits = kMask_KeyType;
@@ -253,15 +251,15 @@ exit:
 }
 
 /**
- *  Determine whether a given key ID identifies a key that is suitable for Weave message encryption.
+ *  Determine whether a given key ID identifies a key that is suitable for CHIP message encryption.
  *
- *  @param[in]   keyId                 Weave key ID.
+ *  @param[in]   keyId                 CHIP key ID.
  *  @param[in]   allowLogicalKeys      Specifies whether logical keys IDs (such as the "current" rotating key)
  *                                     should be considered suitable for message encryption.
- *  @return      true                  If the identified key can be used to encrypt Weave messages.
+ *  @return      true                  If the identified key can be used to encrypt CHIP messages.
  *
  */
-bool WeaveKeyId::IsMessageEncryptionKeyId(uint32_t keyId, bool allowLogicalKeys)
+bool ChipKeyId::IsMessageEncryptionKeyId(uint32_t keyId, bool allowLogicalKeys)
 {
     switch (GetType(keyId))
     {
@@ -284,7 +282,7 @@ bool WeaveKeyId::IsMessageEncryptionKeyId(uint32_t keyId, bool allowLogicalKeys)
  *
  *  @return                            True if the keys IDs represent the same key.
  */
-bool WeaveKeyId::IsSameKeyOrGroup(uint32_t keyId1, uint32_t keyId2)
+bool ChipKeyId::IsSameKeyOrGroup(uint32_t keyId1, uint32_t keyId2)
 {
     enum { kIgnoreEpochMask = ~(kMask_EpochKeyNumber | kFlag_UseCurrentEpochKey) };
 
@@ -302,15 +300,15 @@ bool WeaveKeyId::IsSameKeyOrGroup(uint32_t keyId1, uint32_t keyId2)
 }
 
 /**
- *  Decode a Weave key identifier with a descriptive string.
+ *  Decode a CHIP key identifier with a descriptive string.
  *
- *  @param[in]   keyId     Weave key ID to decode and for which to return
+ *  @param[in]   keyId     CHIP key ID to decode and for which to return
  *                         a descriptive string.
  *
  *  @return  A pointer to a NULL-terminated string describing the specified key ID.
  *
  */
-const char *WeaveKeyId::DescribeKey(uint32_t keyId)
+const char *ChipKeyId::DescribeKey(uint32_t keyId)
 {
     const char *retval;
 
@@ -372,5 +370,4 @@ const char *WeaveKeyId::DescribeKey(uint32_t keyId)
     return retval;
 }
 
-} // namespace Weave
-} // namespace nl
+} // namespace chip

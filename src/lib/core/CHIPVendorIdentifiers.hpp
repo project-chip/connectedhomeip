@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines Weave vendor identifiers.
+ *      This file defines chip vendor identifiers.
  *
  *      Vendor identifiers are assigned and administered by CHIP.
  *

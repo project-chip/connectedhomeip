@@ -36,16 +36,18 @@
 #include <support/FibonacciUtils.h>
 #include <support/RandUtils.h>
 
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 using namespace ::chip;
 using namespace ::chip::TLV;
-using namespace ::chip::Profiles;
-using namespace ::chip::Profiles::Common;
-using namespace ::chip::Profiles::DataManagement;
-using namespace ::chip::Profiles::SoftwareUpdate;
+
+#define LogEvent(...)
+#define NullifyAllEventFields(...)
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>;
@@ -119,16 +121,6 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareBinding(intptr_t arg)
         ChipLogProgress(DeviceLayer, "Software Update Check: No service connectivity");
         ExitNow(err = CHIP_ERROR_NOT_CONNECTED);
     }
-
-    self->mBinding = ExchangeMgr.NewBinding(HandleServiceBindingEvent, NULL);
-    VerifyOrExit(self->mBinding != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-    err = self->mBinding->BeginConfiguration()
-            .Target_ServiceEndpoint(CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_ENDPOINT_ID)
-            .Transport_UDP_WRM()
-            .Exchange_ResponseTimeoutMsec(CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_RESPOSNE_TIMEOUT)
-            .Security_SharedCASESession()
-            .PrepareBinding();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -317,8 +309,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::GetEventState(int32_t& aEventS
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(CHIP_ERROR aError,
-                                                                       Profiles::StatusReporting::StatusReport * aStatusReport)
+void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(CHIP_ERROR aError)
 {
     SoftwareUpdateManager::InEventParam inParam;
     SoftwareUpdateManager::OutEventParam outParam;
@@ -349,16 +340,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(CHIP_ERRO
         ev.platformReturnCode = aError;
         ev.SetPrimaryStatusCodeNull();
 
-        if (aStatusReport)
-        {
-            ev. SetRemoteStatusCodePresent();
-            ev.remoteStatusCode.profileId = aStatusReport->mProfileId;
-            ev.remoteStatusCode.statusCode = aStatusReport->mStatusCode;
-        }
-        else
-        {
-            ev.SetRemoteStatusCodeNull();
-        }
+        ev.SetRemoteStatusCodeNull();
 
         LogEvent(&ev, evOptions);
     }
@@ -366,13 +348,11 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(CHIP_ERRO
     if (mState == SoftwareUpdateManager::kState_PrepareQuery)
     {
         inParam.QueryPrepareFailed.Error = aError;
-        inParam.QueryPrepareFailed.StatusReport = aStatusReport;
         mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_QueryPrepareFailed, inParam, outParam);
     }
     else
     {
         inParam.Finished.Error = aError;
-        inParam.Finished.StatusReport = aStatusReport;
         mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_Finished, inParam, outParam);
     }
 
@@ -445,19 +425,6 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SendQuery(void)
     inParam.Clear();
     outParam.Clear();
 
-    // Configure the context
-    mExchangeCtx->AppState          = this;
-    mExchangeCtx->OnMessageReceived = HandleResponse;
-    mExchangeCtx->OnResponseTimeout = OnResponseTimeout;
-    mExchangeCtx->OnKeyError        = OnKeyError;
-
-    // Send the query
-    err =  mExchangeCtx->SendMessage(kChipProfile_SWU,
-                                     kMsgType_ImageQuery,
-                                     mImageQueryPacketBuffer,
-                                     ExchangeContext::kSendFlag_ExpectResponse | ExchangeContext::kSendFlag_RequestAck);
-    SuccessOrExit(err);
-
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_QuerySent, inParam, outParam);
     VerifyOrExit(mState == SoftwareUpdateManager::kState_Query, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
 
@@ -465,56 +432,6 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         Impl()->SoftwareUpdateFailed(err, NULL);
-    }
-}
-
-template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::OnResponseTimeout(ExchangeContext * aEC)
-{
-    GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
-    self->Impl()->SoftwareUpdateFailed(CHIP_ERROR_TIMEOUT, NULL);
-}
-
-template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::OnKeyError(ExchangeContext *aEc, CHIP_ERROR aKeyError)
-{
-    GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
-    self->Impl()->SoftwareUpdateFailed(aKeyError, NULL);
-}
-
-template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleResponse(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                                                 uint32_t profileId, uint8_t msgType, PacketBuffer * payload)
-{
-    GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
-
-    VerifyOrDie(ec == self->mExchangeCtx);
-
-    // Close the exchange.  When using WRM, this will force an standalone-ACK to be
-    // sent immediately.
-    self->mExchangeCtx->Close();
-    self->mExchangeCtx = NULL;
-
-    // We expect to receive one of two possible responses:
-    // 1. An ImageQueryResponse message under the CHIP software update profile indicating
-    //    an update might be available or
-    // 2. A StatusReport indicating no software update available or a problem with the query.
-    //
-    // NOTE: the Handle* methods are responsible for releasing the buffer.
-    //
-    if (profileId == kChipProfile_SWU && msgType == kMsgType_ImageQueryResponse)
-    {
-        self->HandleImageQueryResponse(payload);
-    }
-    else if (profileId == kChipProfile_Common && msgType == kMsgType_StatusReport)
-    {
-        self->HandleStatusReport(payload);
-    }
-    else
-    {
-        // If any other message type is received, fail with an error.
-        PacketBuffer::Free(payload);
-        self->Impl()->SoftwareUpdateFailed(CHIP_ERROR_INVALID_MESSAGE_TYPE, NULL);
     }
 }
 
@@ -841,59 +758,6 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::_DefaultEventHandler(void *apA
 }
 
 template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleServiceBindingEvent(void * appState, ::chip::Binding::EventType eventType,
-    const ::chip::Binding::InEventParam & aInParam, ::chip::Binding::OutEventParam & aOutParam)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusReport *statusReport = NULL;
-    GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
-
-    switch (eventType)
-    {
-        case chip::Binding::kEvent_PrepareFailed:
-            ChipLogProgress(DeviceLayer, "Failed to prepare Software Update binding: %s", ErrorStr(aInParam.PrepareFailed.Reason));
-            statusReport = aInParam.PrepareFailed.StatusReport;
-            err = aInParam.PrepareFailed.Reason;
-            break;
-
-        case chip::Binding::kEvent_BindingFailed:
-            ChipLogProgress(DeviceLayer, "Software Update binding failed: %s", ErrorStr(aInParam.BindingFailed.Reason));
-            err = aInParam.PrepareFailed.Reason;
-            break;
-
-        case chip::Binding::kEvent_BindingReady:
-            ChipLogProgress(DeviceLayer, "Software Update binding ready");
-
-            err = self->mBinding->NewExchangeContext(self->mExchangeCtx);
-            SuccessOrExit(err);
-
-            self->mBinding->Release();
-            self->mBinding = NULL;
-
-            err = self->PrepareQuery();
-            SuccessOrExit(err);
-
-            self->DriveState(SoftwareUpdateManager::kState_Query);
-            break;
-
-        default:
-            chip::Binding::DefaultEventHandler(appState, eventType, aInParam, aOutParam);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        if (self->mBinding != NULL)
-        {
-            self->mBinding->Release();
-            self->mBinding = NULL;
-        }
-
-        self->Impl()->SoftwareUpdateFailed(err, statusReport);
-    }
-}
-
-template<class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::StoreImageBlock(uint32_t aLength, uint8_t *aData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1129,18 +993,6 @@ exit:
 template<class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::Cleanup(void)
 {
-    if (mBinding)
-    {
-        mBinding->Close();
-        mBinding = NULL;
-    }
-
-    // Shutdown the exchange if its active
-    if (mExchangeCtx)
-    {
-        mExchangeCtx->Abort();
-        mExchangeCtx = NULL;
-    }
 }
 
 template<class ImplClass>
@@ -1261,15 +1113,6 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_ImageInstallComplete(CH
     }
 
     return err;
-}
-
-template<class ImplClass>
-CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::GetIntegrityTypeList(::chip::Profiles::SoftwareUpdate::IntegrityTypeList * aIntegrityTypeList)
-{
-    uint8_t supportedTypes[] = { Profiles::SoftwareUpdate::kIntegrityType_SHA256 };
-    aIntegrityTypeList->init(ArraySize(supportedTypes), supportedTypes);
-
-    return CHIP_NO_ERROR;
 }
 
 template<class ImplClass>

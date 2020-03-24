@@ -96,11 +96,10 @@ public:
     CHIP_ERROR _ClearServiceProvisioningData();
     CHIP_ERROR _GetFailSafeArmed(bool & val);
     CHIP_ERROR _SetFailSafeArmed(bool val);
-    CHIP_ERROR _GetDeviceDescriptor(::chip::Profiles::DeviceDescription::ChipeviceDescriptor & deviceDesc);
-    CHIP_ERROR _GetDeviceDescriptorTLV(uint8_t * buf, size_t bufSize, size_t & encodedLen);
     CHIP_ERROR _GetQRCodeString(char * buf, size_t bufSize);
     CHIP_ERROR _GetWiFiAPSSID(char * buf, size_t bufSize);
     CHIP_ERROR _GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
+    CHIP_ERROR _ConfigureChipStack();
     bool _IsServiceProvisioned();
     bool _IsMemberOfFabric();
     bool _IsPairedToAccount();
@@ -131,7 +130,7 @@ private:
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
-    static void HashLengthAndBase64Value(Platform::Security::SHA256 & hash, const uint8_t * val, uint16_t valLen);
+    // static void HashLengthAndBase64Value(Platform::Security::SHA256 & hash, const uint8_t * val, uint16_t valLen);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
     bool UseManufacturerCredentialsAsOperational();

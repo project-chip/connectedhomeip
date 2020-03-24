@@ -24,9 +24,6 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_H
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_H
 
-#include <platform/internal/DeviceDescriptionServer.h>
-
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -59,25 +56,25 @@ private:
 template<class ImplClass>
 inline bool GenericConnectivityManagerImpl<ImplClass>::_IsUserSelectedModeActive(void)
 {
-    return DeviceDescriptionSvr().IsUserSelectedModeActive();
+    return false; //DeviceDescriptionSvr().IsUserSelectedModeActive();
 }
 
 template<class ImplClass>
 inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedMode(bool val)
 {
-    DeviceDescriptionSvr().SetUserSelectedMode(val);
+    //DeviceDescriptionSvr().SetUserSelectedMode(val);
 }
 
 template<class ImplClass>
 inline uint16_t GenericConnectivityManagerImpl<ImplClass>::_GetUserSelectedModeTimeout(void)
 {
-    return DeviceDescriptionSvr().GetUserSelectedModeTimeout();
+    return 0; //DeviceDescriptionSvr().GetUserSelectedModeTimeout();
 }
 
 template<class ImplClass>
 inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeout(uint16_t val)
 {
-    DeviceDescriptionSvr().SetUserSelectedModeTimeout(val);
+    //DeviceDescriptionSvr().SetUserSelectedModeTimeout(val);
 }
 
 
