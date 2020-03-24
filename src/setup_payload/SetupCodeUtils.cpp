@@ -21,7 +21,7 @@
  *       the reverse.
  *
  *      The encoding chosen is: treat every 2 bytes of input data as a little-endian
- *        uint16_t, then div and mod hat into 3 base45 characters, with the least-significant
+ *        uint16_t, then div and mod that into 3 base45 characters, with the least-significant
  *        encoding bits in the first character of the resulting string.  If an odd
  *        number of bytes is encoded, 2 characters are used to encode the last byte.
  *
