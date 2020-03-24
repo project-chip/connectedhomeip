@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2014-2017 Nest Labs, Inc.
- *    All rights reserved.
+ *    <COPYRIGHT>
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,33 +19,25 @@
  *    @file
  *      This file defines Weave vendor identifiers.
  *
- *      Vendor identifiers are assigned and administered by Nest Labs.
+ *      Vendor identifiers are assigned and administered by CHIP.
  *
  */
 
-#ifndef WEAVE_VENDOR_IDENTIFIERS_HPP
-#define WEAVE_VENDOR_IDENTIFIERS_HPP
+#ifndef CHIP_VENDOR_IDENTIFIERS_HPP
+#define CHIP_VENDOR_IDENTIFIERS_HPP
 
-namespace nl {
-
-namespace Weave {
+namespace chip {
 
 //
-// Weave Vendor Identifiers (16 bits max)
+// CHIP Vendor Identifiers (16 bits max)
 //
 
-enum WeaveVendorId
+enum ChipVendorId
 {
-    kWeaveVendor_Common                         = 0x0000,
-    kWeaveVendor_NestLabs                       = 0x235A,
-    kWeaveVendor_Yale                           = 0xE727,
-    kWeaveVendor_Google                         = 0xE100,
-
-    kWeaveVendor_NotSpecified                   = 0xFFFF
+    kChipVendor_Common                         = 0x0000,
+    kChipVendor_NotSpecified                   = 0xFFFF
 };
 
-}; // namespace Weave
+}; // namespace chip
 
-}; // namespace nl
-
-#endif // WEAVE_VENDOR_IDENTIFIERS_HPP
+#endif // CHIP_VENDOR_IDENTIFIERS_HPP
