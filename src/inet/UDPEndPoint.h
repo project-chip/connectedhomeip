@@ -27,8 +27,8 @@
 #ifndef UDPENDPOINT_H
 #define UDPENDPOINT_H
 
-#include "IPEndPointBasis.h"
-#include <IPAddress.h>
+#include "inet/IPEndPointBasis.h"
+#include <inet/IPAddress.h>
 
 #include <system/SystemPacketBuffer.h>
 

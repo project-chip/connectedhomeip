@@ -25,9 +25,9 @@
 #ifndef TUNENDPOINT_H
 #define TUNENDPOINT_H
 
-#include <EndPointBasis.h>
-#include <IPAddress.h>
-#include "IPPrefix.h"
+#include <inet/EndPointBasis.h>
+#include <inet/IPAddress.h>
+#include "inet/IPPrefix.h"
 
 #include <system/SystemPacketBuffer.h>
 

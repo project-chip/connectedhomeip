@@ -25,7 +25,7 @@
 #ifndef INETLAYEREVENTS_H
 #define INETLAYEREVENTS_H
 
-#include <InetConfig.h>
+#include <inet/InetConfig.h>
 
 #include <system/SystemEvent.h>
 
