@@ -25,20 +25,18 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <profiles/software-update/SoftwareUpdateProfile.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <core/CHIPTLV.h>
 
 namespace chip {
 namespace DeviceLayer {
+
+using namespace chip::TLV;
 
 class SoftwareUpdateManagerImpl;
 
 class SoftwareUpdateManager
 {
-    typedef ::chip::TLV::TLVWriter TLVWriter;
-    typedef ::chip::Profiles::SoftwareUpdate::UpdatePriority UpdatePriority;
-    typedef ::chip::Profiles::SoftwareUpdate::UpdateCondition UpdateCondition;
-
     using ImplClass = SoftwareUpdateManagerImpl;
 
 
@@ -363,6 +361,8 @@ extern SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl(void);
 namespace chip {
 namespace DeviceLayer {
 
+using namespace chip::TLV;
+
 union SoftwareUpdateManager::InEventParam
 {
     void Clear(void) { memset(this, 0, sizeof(*this)); }
@@ -376,13 +376,10 @@ union SoftwareUpdateManager::InEventParam
     struct
     {
         CHIP_ERROR Error;
-        Profiles::StatusReporting::StatusReport *StatusReport;
     } QueryPrepareFailed;
 
     struct
     {
-        UpdatePriority Priority;
-        UpdateCondition Condition;
         uint8_t IntegrityType;
         const char *URI;
         const char *Version;
@@ -415,7 +412,6 @@ union SoftwareUpdateManager::InEventParam
     struct
     {
         CHIP_ERROR Error;
-        Profiles::StatusReporting::StatusReport *StatusReport;
     } Finished;
 };
 

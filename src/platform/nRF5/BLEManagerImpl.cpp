@@ -24,6 +24,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/BLEManager.h>
 #include <ble/CHIPBleServiceData.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 #include <new>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -39,7 +41,7 @@
 #define NRF_LOG_MODULE_NAME chip
 #include "nrf_log.h"
 
-using namespace ::Ble;
+using namespace chip::Ble;
 
 namespace chip {
 namespace DeviceLayer {
@@ -77,6 +79,9 @@ exit:
 
 
 BLEManagerImpl BLEManagerImpl::sInstance;
+#ifndef CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
+#define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
+#endif // CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
@@ -245,7 +250,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
     {
         snprintf(devNameBuf, sizeof(devNameBuf), "%s%04" PRIX32,
                  CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,
-                 (uint32_t)FabricState.LocalNodeId);
+                 (uint32_t)0);
         devNameBuf[kMaxDeviceNameLength] = 0;
     }
 
@@ -441,6 +446,10 @@ exit:
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
+
+#ifndef CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
+#define CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG 1
+#endif // CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {

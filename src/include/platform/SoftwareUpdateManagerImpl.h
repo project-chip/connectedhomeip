@@ -21,7 +21,6 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
 #include <platform/internal/GenericSoftwareUpdateManagerImpl.h>
-#include <platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -32,8 +31,7 @@ namespace DeviceLayer {
  */
 class SoftwareUpdateManagerImpl final
     : public SoftwareUpdateManager,
-      public Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>,
-      public Internal::GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManagerImpl>
+      public Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>
 {
     // Allow the SoftwareUpdateManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -42,10 +40,6 @@ class SoftwareUpdateManagerImpl final
     // Allow the GenericSoftwareUpdateManagerImpl base class to access helper methods
     // and types defined on this class.
     friend class Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>;
-
-    // Allow the GenericSoftwareUpdateManagerImpl_BDX base class to access helper methods
-    // and types defined on this class.
-    friend class Internal::GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManagerImpl>;
 
 public:
 

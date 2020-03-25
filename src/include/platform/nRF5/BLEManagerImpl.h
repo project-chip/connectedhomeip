@@ -33,12 +33,14 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+using namespace chip::Ble;
+
 /**
  * Concrete implementation of the NetworkProvisioningServer singleton object for the nRF5 platforms.
  */
 class BLEManagerImpl final
     : public BLEManager,
-      private ::Ble::BleLayer,
+      private BleLayer,
       private BlePlatformDelegate,
       private BleApplicationDelegate
 {
@@ -69,7 +71,7 @@ private:
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    ::Ble::BleLayer * _GetBleLayer(void) const;
+    BleLayer * _GetBleLayer(void) const;
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -172,7 +174,7 @@ inline void BLEManagerImpl::SetAdvertisingHandle(uint8_t handle)
     mAdvHandle = handle;
 }
 
-inline ::Ble::BleLayer * BLEManagerImpl::_GetBleLayer() const
+inline BleLayer * BLEManagerImpl::_GetBleLayer() const
 {
     return (BleLayer *)(this);
 }

@@ -71,19 +71,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_GetDeviceDescriptor(
-    ::chip::Profiles::DeviceDescription::ChipDeviceDescriptor &deviceDesc)
-{
-    CHIP_ERROR err;
-
-    // Call the generic version of _GetDeviceDescriptor() supplied by the base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_GetDeviceDescriptor(deviceDesc);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
 ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase *ConfigurationManagerImpl::_GetGroupKeyStore()
 {
     return &gGroupKeyStore;
