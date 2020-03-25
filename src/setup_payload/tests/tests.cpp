@@ -86,7 +86,7 @@ int testBase45()
 
     vector<uint8_t> decoded = base45Decode("8 C VDN44I3E.VD/94");
     string hello_world;
-    for (int _ = 0; _ < decoded.size(); _++)
+    for (unsigned _ = 0; _ < decoded.size(); _++)
     {
         hello_world += (char) decoded[_];
     }
