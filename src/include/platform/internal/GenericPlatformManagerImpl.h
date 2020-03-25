@@ -63,8 +63,6 @@ protected:
     void DispatchEventToSystemLayer(const ChipDeviceEvent * event);
     void DispatchEventToDeviceLayer(const ChipDeviceEvent * event);
     void DispatchEventToApplication(const ChipDeviceEvent * event);
-    static void HandleSessionEstablished(ChipSecurityManager * sm, ChipConnection * con,
-            void * reqState, uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType);
     static void HandleMessageLayerActivityChanged(bool messageLayerIsActive);
 
 private:

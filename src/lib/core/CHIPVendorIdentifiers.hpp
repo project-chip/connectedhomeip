@@ -15,26 +15,29 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file defines chip vendor identifiers.
+ *
+ *      Vendor identifiers are assigned and administered by CHIP.
+ *
+ */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-
-#include <platform/internal/GenericSoftwareUpdateManagerImpl.ipp>
+#ifndef CHIP_VENDOR_IDENTIFIERS_HPP
+#define CHIP_VENDOR_IDENTIFIERS_HPP
 
 namespace chip {
-namespace DeviceLayer {
 
-SoftwareUpdateManagerImpl SoftwareUpdateManagerImpl::sInstance;
+//
+// CHIP Vendor Identifiers (16 bits max)
+//
 
-CHIP_ERROR SoftwareUpdateManagerImpl::_Init(void)
+enum ChipVendorId
 {
-    Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>::DoInit();
+    kChipVendor_Common                         = 0x0000,
+    kChipVendor_NotSpecified                   = 0xFFFF
+};
 
-    return CHIP_NO_ERROR;
-}
+}; // namespace chip
 
-} // namespace DeviceLayer
-} // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
+#endif // CHIP_VENDOR_IDENTIFIERS_HPP

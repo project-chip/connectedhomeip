@@ -22,11 +22,16 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/nRF5/nRF5Utils.h>
+#include <support/ErrorStr.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+#define CHIP_DEVICE_CONFIG_NRF5_ERROR_MIN 1
+#define CHIP_DEVICE_CONFIG_NRF5_ERROR_MAX 1000000
+#define CHIP_DEVICE_CONFIG_NRF5_FDS_ERROR_MIN 10000000
+#define CHIP_DEVICE_CONFIG_NRF5_FDS_ERROR_MAX 10000999
 /**
  * Register a text error formatter for nRF SDK errors.
  */

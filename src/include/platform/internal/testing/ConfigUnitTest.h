@@ -19,6 +19,7 @@
 #define CHIP_DEVICE_CONFIG_UNIT_TEST_H
 
 #include <core/CHIPCore.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

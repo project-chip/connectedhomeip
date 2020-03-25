@@ -31,9 +31,9 @@
 #include <stdarg.h>
 
 #include <support/DLLUtil.h>
-#include <CHIPError.h>
-#include "CHIPTLVTags.h"
-#include "CHIPTLVTypes.h"
+#include <core/CHIPError.h>
+#include "core/CHIPTLVTags.h"
+#include "core/CHIPTLVTypes.h"
 
 // forward declaration of the PacketBuffer class used within the header.
 namespace chip {
