@@ -25,6 +25,8 @@
 #ifndef CHIP_DEVICE_CONFIG_H
 #define CHIP_DEVICE_CONFIG_H
 
+#include <core/CHIPConfig.h>
+
 /* Include a project-specific configuration file, if defined.
  *
  * An application or module that incorporates the chip Device Layer can define a project

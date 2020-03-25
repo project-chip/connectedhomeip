@@ -37,6 +37,19 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/nRF5/nRF5Config.h \
     @top_srcdir@/src/include/platform/nRF5/CHIPDevicePlatformConfig.h \
     @top_srcdir@/src/include/platform/nRF5/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/include/platform/EFR32/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/include/platform/EFR32/GroupKeyStoreImpl.h \
+    @top_srcdir@/src/include/platform/EFR32/efr32-chip-mbedtls-config.h \
+    @top_srcdir@/src/include/platform/EFR32/EFR32Config.h \
+    @top_srcdir@/src/include/platform/EFR32/gatt_db.h \
+    @top_srcdir@/src/include/platform/EFR32/freertos_bluetooth.h \
+    @top_srcdir@/src/include/platform/EFR32/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/include/platform/EFR32/BLEManagerImpl.h \
+    @top_srcdir@/src/include/platform/EFR32/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/include/platform/EFR32/PlatformManagerImpl.h \
+    @top_srcdir@/src/include/platform/EFR32/SoftwareUpdateManagerImpl.h \
+    @top_srcdir@/src/include/platform/EFR32/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/include/platform/EFR32/NetworkProvisioningServerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp \
     @top_srcdir@/src/include/platform/GeneralUtils.h \
@@ -94,13 +107,8 @@ libDeviceLayer_a_SOURCES               +=       \
     EFR32/gatt_db.c                             \
     EFR32/PlatformManagerImpl.cpp               \
     EFR32/ConnectivityManagerImpl.cpp           \
-    EFR32/NetworkProvisioningServerImpl.cpp     \
-    EFR32/ThreadStackManagerImpl.cpp            \
-    EFR32/GroupKeyStoreImpl.cpp                 \
     EFR32/EFR32Config.cpp                       \
-    EFR32/Entropy.cpp                           \
     EFR32/Logging.cpp                           \
-    EFR32/SoftwareUpdateManagerImpl.cpp         \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_EFR32

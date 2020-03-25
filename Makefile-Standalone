@@ -184,7 +184,7 @@ else
 configure_OPTIONS              +=
 endif
 
-# If the user has woble over bluez peripheral, alter the configuration options
+# If the user has chipoble over bluez peripheral, alter the configuration options
 # accordingly.
 ifeq ($(BLUEZ),1)
 configure_OPTIONS              += --enable-experimental --enable-deprecated --enable-testing --enable-tools --disable-systemd --enable-debug
@@ -211,8 +211,8 @@ ifeq ($(LONG_TESTS),1)
 configure_OPTIONS               += --enable-long-tests=yes
 endif
 
-ifeq ($(ENABLE_WOBLE_TEST),1)
-configure_OPTIONS               += --enable-woble-test=yes
+ifeq ($(ENABLE_CHIPOBLE_TEST),1)
+configure_OPTIONS               += --enable-chipoble-test=yes
 endif
 
 ifndef BuildJobs
