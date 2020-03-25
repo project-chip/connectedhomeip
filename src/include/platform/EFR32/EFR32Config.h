@@ -26,7 +26,7 @@
 
 #include <functional>
 
-#include <suport/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"

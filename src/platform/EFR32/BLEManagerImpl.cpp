@@ -23,10 +23,12 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/BLEManager.h>
-#include <BleLayer/CHIPBleServiceData.h>
+#include <ble/CHIPBleServiceData.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 #include <new>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <platform/EFR32/freertos_bluetooth.h>
 #include "rtos_gecko.h"
@@ -46,7 +48,7 @@ namespace {
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
 
 #define CHIP_ADV_DATA_FLAGS 0x06
-#define CHIP_ADV_WOBLE_SERVICE_HANDLE 0
+#define CHIP_ADV_CHIPOBLE_SERVICE_HANDLE 0
 
 #define CHIP_ADV_DATA 0
 #define CHIP_ADV_SCAN_RESPONSE_DATA 1
@@ -67,12 +69,12 @@ uint8_t bluetooth_stack_heap[DEFAULT_BLUETOOTH_HEAP(BLE_LAYER_NUM_BLE_ENDPOINTS)
  * details on each parameter) */
 static gecko_configuration_t config;
 
-const uint8_t      UUID_WoBLEService[]      = {0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
+const uint8_t      UUID_CHIPoBLEService[]      = {0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                      0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00};
-const uint8_t      ShortUUID_WoBLEService[] = {0xAF, 0xFE};
-const ChipBleUUID ChipUUID_WoBLEChar_RX   = {
+const uint8_t      ShortUUID_CHIPoBLEService[] = {0xAF, 0xFE};
+const ChipBleUUID ChipUUID_CHIPoBLEChar_RX   = {
     {0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x11}};
-const ChipBleUUID ChipUUID_WoBLEChar_TX = {
+const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = {
     {0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x12}};
 
 } // namespace
@@ -134,7 +136,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     memset(mBleConnections, 0, sizeof(mBleConnections));
     memset(mIndConfId, kUnusedIndex, sizeof(mIndConfId));
-    mServiceMode = ConnectivityManager::kWoBLEServiceMode_Enabled;
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     initBleConfig();
 
@@ -246,7 +248,7 @@ void BLEManagerImpl::bluetoothStackEventHandler(void *p_arg)
                     sInstance.HandleTxConfirmationEvent(bluetooth_evt);
                 }
                 else if ((bluetooth_evt->data.evt_gatt_server_characteristic_status.characteristic ==
-                          gattdb_WoBLEChar_Tx) &&
+                          gattdb_CHIPoBLEChar_Tx) &&
                          (bluetooth_evt->data.evt_gatt_server_characteristic_status.status_flags ==
                           gatt_server_client_config))
                 {
@@ -274,12 +276,12 @@ void BLEManagerImpl::bluetoothStackEventHandler(void *p_arg)
     }
 }
 
-CHIP_ERROR BLEManagerImpl::_SetWoBLEServiceMode(WoBLEServiceMode val)
+CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(val != ConnectivityManager::kWoBLEServiceMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mServiceMode != ConnectivityManager::kWoBLEServiceMode_NotSupported,
+    VerifyOrExit(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
                  err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (val != mServiceMode)
@@ -296,7 +298,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mServiceMode != ConnectivityManager::kWoBLEServiceMode_NotSupported,
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
                  err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
@@ -313,7 +315,7 @@ CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mServiceMode == ConnectivityManager::kWoBLEServiceMode_NotSupported,
+    VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
                  err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (GetFlag(mFlags, kFlag_FastAdvertisingEnabled) != val)
@@ -338,7 +340,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char *buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char *deviceName)
 {
-    if (mServiceMode == ConnectivityManager::kWoBLEServiceMode_NotSupported)
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
@@ -364,43 +366,43 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent *event)
 {
     switch (event->Type)
     {
-    case DeviceEventType::kWoBLESubscribe:
+    case DeviceEventType::kCHIPoBLESubscribe:
     {
         ChipDeviceEvent connEstEvent;
 
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLESubscribe");
-        HandleSubscribeReceived(event->WoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_WoBLEChar_TX);
-        connEstEvent.Type = DeviceEventType::kWoBLEConnectionEstablished;
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
         PlatformMgr().PostEvent(&connEstEvent);
     }
     break;
 
-    case DeviceEventType::kWoBLEUnsubscribe:
+    case DeviceEventType::kCHIPoBLEUnsubscribe:
     {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEUnsubscribe");
-        HandleUnsubscribeReceived(event->WoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_WoBLEChar_TX);
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
     }
     break;
 
-    case DeviceEventType::kWoBLEWriteReceived:
+    case DeviceEventType::kCHIPoBLEWriteReceived:
     {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEWriteReceived");
-        HandleWriteReceived(event->WoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_WoBLEChar_RX,
-                            event->WoBLEWriteReceived.Data);
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEWriteReceived");
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+                            event->CHIPoBLEWriteReceived.Data);
     }
     break;
 
-    case DeviceEventType::kWoBLEConnectionError:
+    case DeviceEventType::kCHIPoBLEConnectionError:
     {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEConnectionError");
-        HandleConnectionError(event->WoBLEConnectionError.ConId, event->WoBLEConnectionError.Reason);
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEConnectionError");
+        HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
     }
     break;
 
-    case DeviceEventType::kWoBLEIndicateConfirm:
+    case DeviceEventType::kCHIPoBLEIndicateConfirm:
     {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kWoBLEIndicateConfirm");
-        HandleIndicationConfirmation(event->WoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_WoBLEChar_TX);
+        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
     }
     break;
 
@@ -446,7 +448,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    WoBLEConState *conState = const_cast<BLEManagerImpl *>(this)->GetConnectionState(conId);
+    CHIPoBLEConState *conState = const_cast<BLEManagerImpl *>(this)->GetConnectionState(conId);
     return (conState != NULL) ? conState->mtu : 0;
 }
 
@@ -456,9 +458,9 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId,
                                     PacketBuffer *        data)
 {
     CHIP_ERROR                                                   err      = CHIP_NO_ERROR;
-    WoBLEConState *                                               conState = GetConnectionState(conId);
+    CHIPoBLEConState *                                               conState = GetConnectionState(conId);
     gecko_msg_gatt_server_send_characteristic_notification_rsp_t *rsp;
-    uint16_t cId         = (UUIDsMatch(&ChipUUID_WoBLEChar_RX, charId) ? gattdb_WoBLEChar_Rx : gattdb_WoBLEChar_Tx);
+    uint16_t cId         = (UUIDsMatch(&ChipUUID_CHIPoBLEChar_RX, charId) ? gattdb_CHIPoBLEChar_Rx : gattdb_CHIPoBLEChar_Tx);
     uint8_t  timerHandle = GetTimerHandle(conId, true);
 
     VerifyOrExit(((conState != NULL) && (conState->subscribed != 0)), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -534,7 +536,7 @@ void BLEManagerImpl::DriveBLEState(void)
     VerifyOrExit(GetFlag(mFlags, kFlag_EFRBLEStackInitialized), /* */);
 
     // Start advertising if needed...
-    if (mServiceMode == ConnectivityManager::kWoBLEServiceMode_Enabled && GetFlag(mFlags, kFlag_AdvertisingEnabled))
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && GetFlag(mFlags, kFlag_AdvertisingEnabled))
     {
         // Start/re-start advertising if not already started, or if there is a pending change
         // to the advertising configuration.
@@ -555,8 +557,8 @@ void BLEManagerImpl::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling WoBLE service due to error: %s", ErrorStr(err));
-        mServiceMode = ConnectivityManager::kWoBLEServiceMode_Disabled;
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
 
@@ -580,7 +582,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     if (!GetFlag(mFlags, kFlag_DeviceNameSet))
     {
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,
-                 (uint32_t)FabricState.LocalNodeId);
+                 (uint32_t)0);
 
         mDeviceName[kMaxDeviceNameLength] = 0;
 
@@ -602,10 +604,10 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     responseData[index++] = CHIP_ADV_SHORT_UUID_LEN + 1; // AD length
     responseData[index++] = CHIP_ADV_DATA_TYPE_UUID;     // AD type : uuid
-    responseData[index++] = ShortUUID_WoBLEService[0];    // AD value
-    responseData[index++] = ShortUUID_WoBLEService[1];
+    responseData[index++] = ShortUUID_CHIPoBLEService[0];    // AD value
+    responseData[index++] = ShortUUID_CHIPoBLEService[1];
 
-    setAdvDataRsp = gecko_cmd_le_gap_bt5_set_adv_data(CHIP_ADV_WOBLE_SERVICE_HANDLE, CHIP_ADV_SCAN_RESPONSE_DATA,
+    setAdvDataRsp = gecko_cmd_le_gap_bt5_set_adv_data(CHIP_ADV_CHIPOBLE_SERVICE_HANDLE, CHIP_ADV_SCAN_RESPONSE_DATA,
                                                       index, (uint8_t *)&responseData);
 
     if (setAdvDataRsp->result != 0)
@@ -619,13 +621,13 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     advData[index++] = mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1; // AD length
     advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                   // AD type : Service Data
-    advData[index++] = ShortUUID_WoBLEService[0];                          // AD value
-    advData[index++] = ShortUUID_WoBLEService[1];
+    advData[index++] = ShortUUID_CHIPoBLEService[0];                          // AD value
+    advData[index++] = ShortUUID_CHIPoBLEService[1];
     memcpy(&advData[index], (void *)&mDeviceIdInfo, mDeviceIdInfoLength); // AD value
     index += mDeviceIdInfoLength;
 
     setAdvDataRsp =
-        gecko_cmd_le_gap_bt5_set_adv_data(CHIP_ADV_WOBLE_SERVICE_HANDLE, CHIP_ADV_DATA, index, (uint8_t *)&advData);
+        gecko_cmd_le_gap_bt5_set_adv_data(CHIP_ADV_CHIPOBLE_SERVICE_HANDLE, CHIP_ADV_DATA, index, (uint8_t *)&advData);
 
     err = MapBLEError(setAdvDataRsp->result);
 
@@ -653,9 +655,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
                                       ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
                                       : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
 
-    gecko_cmd_le_gap_set_advertise_timing(CHIP_ADV_WOBLE_SERVICE_HANDLE, interval_min, interval_max, 0, 0);
+    gecko_cmd_le_gap_set_advertise_timing(CHIP_ADV_CHIPOBLE_SERVICE_HANDLE, interval_min, interval_max, 0, 0);
 
-    startAdvRsp = gecko_cmd_le_gap_start_advertising(CHIP_ADV_WOBLE_SERVICE_HANDLE, le_gap_user_data, connectableAdv);
+    startAdvRsp = gecko_cmd_le_gap_start_advertising(CHIP_ADV_CHIPOBLE_SERVICE_HANDLE, le_gap_user_data, connectableAdv);
 
     err = MapBLEError(startAdvRsp->result);
 
@@ -673,7 +675,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         ClearFlag(mFlags, kFlag_Advertising);
         ClearFlag(mFlags, kFlag_RestartAdvertising);
 
-        rsp = gecko_cmd_le_gap_stop_advertising(CHIP_ADV_WOBLE_SERVICE_HANDLE);
+        rsp = gecko_cmd_le_gap_stop_advertising(CHIP_ADV_CHIPOBLE_SERVICE_HANDLE);
         err = MapBLEError(rsp->result);
         SuccessOrExit(err);
     }
@@ -684,7 +686,7 @@ exit:
 
 void BLEManagerImpl::UpdateMtu(volatile struct gecko_cmd_packet *evt)
 {
-    WoBLEConState *bleConnState = GetConnectionState(evt->data.evt_gatt_mtu_exchanged.connection);
+    CHIPoBLEConState *bleConnState = GetConnectionState(evt->data.evt_gatt_mtu_exchanged.connection);
     bleConnState->mtu           = evt->data.evt_gatt_mtu_exchanged.mtu;
     ;
 }
@@ -719,23 +721,23 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile struct gecko_cmd_packet
     if (RemoveConnection(connHandle))
     {
         ChipDeviceEvent event;
-        event.Type                       = DeviceEventType::kWoBLEConnectionError;
-        event.WoBLEConnectionError.ConId = connHandle;
+        event.Type                       = DeviceEventType::kCHIPoBLEConnectionError;
+        event.CHIPoBLEConnectionError.ConId = connHandle;
 
         switch (conn_evt->reason)
         {
         case bg_err_bt_remote_user_terminated:
         case bg_err_bt_remote_device_terminated_connection_due_to_low_resources:
         case bg_err_bt_remote_powering_off:
-            event.WoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
+            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
             break;
 
         case bg_err_bt_connection_terminated_by_local_host:
-            event.WoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
+            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
             break;
 
         default:
-            event.WoBLEConnectionError.Reason = BLE_ERROR_WOBLE_PROTOCOL_ABORT;
+            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
             break;
         }
 
@@ -757,7 +759,7 @@ void BLEManagerImpl::HandleWriteEvent(volatile struct gecko_cmd_packet *evt)
 
     ChipLogProgress(DeviceLayer, "Char Write Req, char : %d", attribute);
 
-    if (gattdb_WoBLEChar_Rx == attribute)
+    if (gattdb_CHIPoBLEChar_Rx == attribute)
     {
         HandleRXCharWrite(evt);
     }
@@ -766,7 +768,7 @@ void BLEManagerImpl::HandleWriteEvent(volatile struct gecko_cmd_packet *evt)
 void BLEManagerImpl::HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet *evt)
 {
     CHIP_ERROR      err = CHIP_NO_ERROR;
-    WoBLEConState *  bleConnState;
+    CHIPoBLEConState *  bleConnState;
     bool             indicationsEnabled;
     ChipDeviceEvent event;
 
@@ -777,7 +779,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet *evt
     // Determine if the client is enabling or disabling indications.
     indicationsEnabled = (evt->data.evt_gatt_server_characteristic_status.client_config_flags == gatt_indication);
 
-    ChipLogProgress(DeviceLayer, "WoBLE %s received", indicationsEnabled ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", indicationsEnabled ? "subscribe" : "unsubscribe");
 
     if (indicationsEnabled)
     {
@@ -785,11 +787,11 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet *evt
         if (!bleConnState->subscribed)
         {
             bleConnState->subscribed = 1;
-            // Post an event to the CHIP queue to process either a WoBLE Subscribe or Unsubscribe based on
+            // Post an event to the CHIP queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
             // whether the client is enabling or disabling indications.
             {
-                event.Type                 = DeviceEventType::kWoBLESubscribe;
-                event.WoBLESubscribe.ConId = evt->data.evt_gatt_server_user_write_request.connection;
+                event.Type                 = DeviceEventType::kCHIPoBLESubscribe;
+                event.CHIPoBLESubscribe.ConId = evt->data.evt_gatt_server_user_write_request.connection;
                 PlatformMgr().PostEvent(&event);
             }
         }
@@ -797,8 +799,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile struct gecko_cmd_packet *evt
     else
     {
         bleConnState->subscribed   = 0;
-        event.Type                 = DeviceEventType::kWoBLEUnsubscribe;
-        event.WoBLESubscribe.ConId = evt->data.evt_gatt_server_user_write_request.connection;
+        event.Type                 = DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.CHIPoBLESubscribe.ConId = evt->data.evt_gatt_server_user_write_request.connection;
         PlatformMgr().PostEvent(&event);
     }
 
@@ -824,15 +826,15 @@ void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet *evt)
     buf->SetDataLength(writeLen);
 
     ChipLogDetail(DeviceLayer,
-                   "Write request/command received for WoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
+                   "Write request/command received for CHIPoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
                    evt->data.evt_gatt_server_user_write_request.connection, buf->DataLength());
 
     // Post an event to the CHIP queue to deliver the data into the CHIP stack.
     {
         ChipDeviceEvent event;
-        event.Type                     = DeviceEventType::kWoBLEWriteReceived;
-        event.WoBLEWriteReceived.ConId = evt->data.evt_gatt_server_user_write_request.connection;
-        event.WoBLEWriteReceived.Data  = buf;
+        event.Type                     = DeviceEventType::kCHIPoBLEWriteReceived;
+        event.CHIPoBLEWriteReceived.ConId = evt->data.evt_gatt_server_user_write_request.connection;
+        event.CHIPoBLEWriteReceived.Data  = buf;
         PlatformMgr().PostEvent(&event);
         buf = NULL;
     }
@@ -860,8 +862,8 @@ void BLEManagerImpl::HandleTxConfirmationEvent(volatile struct gecko_cmd_packet 
         gecko_cmd_hardware_set_soft_timer(0, timerHandle, false);
     }
 
-    event.Type                       = DeviceEventType::kWoBLEIndicateConfirm;
-    event.WoBLEIndicateConfirm.ConId = evt->data.evt_gatt_server_characteristic_status.connection;
+    event.Type                       = DeviceEventType::kCHIPoBLEIndicateConfirm;
+    event.CHIPoBLEIndicateConfirm.ConId = evt->data.evt_gatt_server_characteristic_status.connection;
     PlatformMgr().PostEvent(&event);
 }
 
@@ -871,24 +873,24 @@ void BLEManagerImpl::HandleSoftTimerEvent(volatile struct gecko_cmd_packet *evt)
     // If we receive a callback for unknown timer handle ignore this.
     if (evt->data.evt_hardware_soft_timer.handle < kMaxConnections)
     {
-        ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent WOBLE_PROTOCOL_ABORT");
+        ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
         ChipDeviceEvent event;
-        event.Type                       = DeviceEventType::kWoBLEConnectionError;
-        event.WoBLEConnectionError.ConId = mIndConfId[evt->data.evt_hardware_soft_timer.handle];
+        event.Type                       = DeviceEventType::kCHIPoBLEConnectionError;
+        event.CHIPoBLEConnectionError.ConId = mIndConfId[evt->data.evt_hardware_soft_timer.handle];
         sInstance.mIndConfId[evt->data.evt_hardware_soft_timer.handle] = kUnusedIndex;
-        event.WoBLEConnectionError.Reason                              = BLE_ERROR_WOBLE_PROTOCOL_ABORT;
+        event.CHIPoBLEConnectionError.Reason                              = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
         PlatformMgr().PostEvent(&event);
     }
 }
 
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
 {
-    WoBLEConState *bleConnState = GetConnectionState(connectionHandle, true);
+    CHIPoBLEConState *bleConnState = GetConnectionState(connectionHandle, true);
     bool           status       = false;
 
     if (bleConnState != NULL)
     {
-        memset(bleConnState, 0, sizeof(WoBLEConState));
+        memset(bleConnState, 0, sizeof(CHIPoBLEConState));
         status = true;
     }
 
@@ -897,18 +899,18 @@ bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
 
 void BLEManagerImpl::AddConnection(uint8_t connectionHandle, uint8_t bondingHandle)
 {
-    WoBLEConState *bleConnState = GetConnectionState(connectionHandle, true);
+    CHIPoBLEConState *bleConnState = GetConnectionState(connectionHandle, true);
 
     if (bleConnState != NULL)
     {
-        memset(bleConnState, 0, sizeof(WoBLEConState));
+        memset(bleConnState, 0, sizeof(CHIPoBLEConState));
         bleConnState->allocated        = 1;
         bleConnState->connectionHandle = connectionHandle;
         bleConnState->bondingHandle    = bondingHandle;
     }
 }
 
-BLEManagerImpl::WoBLEConState *BLEManagerImpl::GetConnectionState(uint8_t connectionHandle, bool allocate)
+BLEManagerImpl::CHIPoBLEConState *BLEManagerImpl::GetConnectionState(uint8_t connectionHandle, bool allocate)
 {
     uint8_t freeIndex = kMaxConnections;
 
@@ -935,7 +937,7 @@ BLEManagerImpl::WoBLEConState *BLEManagerImpl::GetConnectionState(uint8_t connec
             return &mBleConnections[freeIndex];
         }
 
-        ChipLogError(DeviceLayer, "Failed to allocate WoBLEConState");
+        ChipLogError(DeviceLayer, "Failed to allocate CHIPoBLEConState");
     }
 
     return NULL;
@@ -980,4 +982,4 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WOBLE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
