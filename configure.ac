@@ -825,7 +825,7 @@ if test "${enable_chipoble_test}" = "yes"; then
 else
     CHIP_ENABLE_BTP_CODEC_TEST=0
 fi
-AC_DEFINE_UNQUOTED([CHIP_ENABLE_BTP_CODEC_TEST],[${CHIP_ENABLE_BTP_CODEC_TEST}],[Define to 1 if you want to enable WoBle Control Path and Throughput Test.])
+AC_DEFINE_UNQUOTED([CHIP_ENABLE_BTP_CODEC_TEST],[${CHIP_ENABLE_BTP_CODEC_TEST}],[Define to 1 if you want to enable CHIPoBle Control Path and Throughput Test.])
 #
 # Documentation
 #

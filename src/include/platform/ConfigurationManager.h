@@ -130,7 +130,7 @@ private:
     friend CHIP_ERROR ::chip::Platform::PersistedStorage::Read(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     friend CHIP_ERROR ::chip::Platform::PersistedStorage::Write(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 
-    using ImplClass = ConfigurationManagerImpl;
+    using ImplClass = ::chip::DeviceLayer::ConfigurationManagerImpl;
 
     CHIP_ERROR Init();
     CHIP_ERROR ConfigureChipStack();

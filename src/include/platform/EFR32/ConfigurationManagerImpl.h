@@ -54,9 +54,8 @@ private:
 
     CHIP_ERROR _Init(void);
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t *buf);
-    ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase *_GetGroupKeyStore(void);
-    bool                                                         _CanFactoryReset(void);
-    void                                                         _InitiateFactoryReset(void);
+    bool _CanFactoryReset(void);
+    void _InitiateFactoryReset(void);
     CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t &value);
     CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 

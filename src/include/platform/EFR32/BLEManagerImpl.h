@@ -24,7 +24,7 @@
 #ifndef BLE_MANAGER_IMPL_H
 #define BLE_MANAGER_IMPL_H
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "bg_types.h"
 #include "rtos_gecko.h"
@@ -34,11 +34,13 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+using namespace chip::Ble;
+
 /**
  * Concrete implementation of the NetworkProvisioningServer singleton object for the EFR32 platforms.
  */
 class BLEManagerImpl final : public BLEManager,
-                             private ::chip::Ble::BleLayer,
+                             private BleLayer,
                              private BlePlatformDelegate,
                              private BleApplicationDelegate
 {
@@ -49,8 +51,8 @@ class BLEManagerImpl final : public BLEManager,
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR          _Init(void);
-    WoBLEServiceMode     _GetWoBLEServiceMode(void);
-    CHIP_ERROR          _SetWoBLEServiceMode(WoBLEServiceMode val);
+    CHIPoBLEServiceMode     _GetCHIPoBLEServiceMode(void);
+    CHIP_ERROR          _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool                 _IsAdvertisingEnabled(void);
     CHIP_ERROR          _SetAdvertisingEnabled(bool val);
     bool                 _IsFastAdvertisingEnabled(void);
@@ -60,7 +62,7 @@ class BLEManagerImpl final : public BLEManager,
     CHIP_ERROR          _SetDeviceName(const char *deviceName);
     uint16_t             _NumConnections(void);
     void                 _OnPlatformEvent(const ChipDeviceEvent *event);
-    ::chip::Ble::BleLayer *_GetBleLayer(void) const;
+    BleLayer            *_GetBleLayer(void) const;
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -119,7 +121,7 @@ class BLEManagerImpl final : public BLEManager,
         kUnusedIndex         = 0xFF,
     };
 
-    struct WoBLEConState
+    struct CHIPoBLEConState
     {
         bd_addr  address;
         uint16_t mtu : 10;
@@ -130,9 +132,9 @@ class BLEManagerImpl final : public BLEManager,
         uint8_t  bondingHandle;
     };
 
-    WoBLEConState    mBleConnections[kMaxConnections];
+    CHIPoBLEConState    mBleConnections[kMaxConnections];
     uint8_t          mIndConfId[kMaxConnections];
-    WoBLEServiceMode mServiceMode;
+    CHIPoBLEServiceMode mServiceMode;
     uint16_t         mFlags;
     char             mDeviceName[kMaxDeviceNameLength + 1];
 
@@ -152,7 +154,7 @@ class BLEManagerImpl final : public BLEManager,
     void           HandleSoftTimerEvent(volatile struct gecko_cmd_packet *evt);
     bool           RemoveConnection(uint8_t connectionHandle);
     void           AddConnection(uint8_t connectionHandle, uint8_t bondingHandle);
-    WoBLEConState *GetConnectionState(uint8_t conId, bool allocate = false);
+    CHIPoBLEConState *GetConnectionState(uint8_t conId, bool allocate = false);
     uint8_t        GetTimerHandle(uint8_t connectionHandle, bool allocate = false);
     static void    DriveBLEState(intptr_t arg);
     static void    bluetoothStackEventHandler(void *p_arg);
@@ -180,12 +182,12 @@ inline BLEManagerImpl &BLEMgrImpl(void)
     return BLEManagerImpl::sInstance;
 }
 
-inline ::chip::Ble::BleLayer *BLEManagerImpl::_GetBleLayer() const
+inline BleLayer *BLEManagerImpl::_GetBleLayer() const
 {
     return (BleLayer *)(this);
 }
 
-inline BLEManager::WoBLEServiceMode BLEManagerImpl::_GetWoBLEServiceMode(void)
+inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
 {
     return mServiceMode;
 }
@@ -204,6 +206,6 @@ inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WOBLE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #endif // BLE_MANAGER_IMPL_H

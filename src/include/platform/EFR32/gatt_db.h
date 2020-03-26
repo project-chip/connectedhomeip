@@ -31,8 +31,8 @@ extern const struct bg_gattdb_def bg_gattdb_data;
 #define gattdb_client_support_features 8
 #define gattdb_device_name 11
 #define gattdb_ota_control 23
-#define gattdb_WoBLEChar_Rx 26
-#define gattdb_WoBLEChar_Tx 28
+#define gattdb_CHIPoBLEChar_Rx 26
+#define gattdb_CHIPoBLEChar_Tx 28
 
 #if __cplusplus
 }
