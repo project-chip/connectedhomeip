@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 
-# 
+#
 #   @file
 #         Common makefile definitions for building applications based
 #         on the Silicon Labs EFR32 SDK.
@@ -74,9 +74,6 @@ endif
 ifndef FREERTOS_ROOT
 $(error ENVIRONMENT ERROR: FREERTOS_ROOT not set)
 endif
-ifndef OPENTHREAD_ROOT
-$(error ENVIRONMENT ERROR: OPENTHREAD_ROOT not set)
-endif
 
 
 
@@ -121,16 +118,6 @@ EXTRA_SRCS += \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/src/nvm3_default.c                                \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/src/nvm3_hal_flash.c                              \
     $(EFR32_SDK_ROOT)/platform/emdrv/sleep/src/sleep.c                                      \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/library/ecp.c                                \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/library/ecdh.c                               \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/library/sha1.c                               \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/library/sha256.c                             \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/crypto_aes.c                   \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/crypto_ble.c                   \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/crypto_ecp.c                   \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/crypto_sha.c                   \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/shax.c                         \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/crypto_management.c
 
 STD_INC_DIRS += \
     $(CHIP_ROOT)/src/include/platform/EFR32                                                 \
@@ -178,9 +165,6 @@ STD_INC_DIRS += \
     $(OPENTHREAD_ROOT)/examples/platforms/$(EFR32FAMILY)/crypto
 
 ifeq ($(EFR32FAMILY), efr32mg12)
-EXTRA_SRCS += \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/src/trng.c
-
 STD_INC_DIRS += \
     $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG12_$(BOARD)/config                                \
     $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Include                        \
@@ -259,8 +243,6 @@ STD_LDFLAGS = \
     -ffunction-sections \
     -Wl,--gc-sections \
     -specs=nosys.specs \
-    $(foreach dir,$(LINKER_SCRIPT_INC_DIRS),-L$(dir)) \
-    -T$(LINKER_SCRIPT)
 
 ifeq ($(EFR32FAMILY), efr32mg21)
 STD_LDFLAGS += \
@@ -270,7 +252,6 @@ endif
 STD_LIBS = \
     -lc \
     -lstdc++ \
-    -lfreertos \
     -lnosys \
     -lm
 
@@ -292,28 +273,12 @@ endif
 STD_DEFINES = \
     __STARTUP_CLEAR_BSS \
     $(MCU)
-    
-STD_COMPILE_PREREQUISITES =
 
-STD_LINK_PREREQUISITES += $(OUTPUT_DIR)/freertos/libfreertos.a
+STD_COMPILE_PREREQUISITES =
 
 DEFINE_FLAGS = $(foreach def,$(STD_DEFINES) $(DEFINES),-D$(def))
 
 INC_FLAGS = $(foreach dir,$(INC_DIRS) $(STD_INC_DIRS),-I$(dir))
-
-
-# Default EFR32 linker script defines a section at top of Flash for NVM3 support.
-ifeq ($(EFR32FAMILY), efr32mg12)
-ifndef LINKER_SCRIPT
-LINKER_SCRIPT = $(APP)-MG12P.ld
-endif
-else
-ifeq ($(EFR32FAMILY), efr32mg21)
-ifndef LINKER_SCRIPT
-LINKER_SCRIPT = $(APP)-MG21.ld
-endif
-endif
-endif
 
 LINKER_SCRIPT_INC_DIRS = $(PROJECT_ROOT) $(OUTPUT_DIR)/freertos
 

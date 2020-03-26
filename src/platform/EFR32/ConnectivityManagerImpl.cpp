@@ -17,13 +17,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/NetworkProvisioningServer.h>
-#include <platform/internal/DeviceNetworkInfo.h>
-#include <platform/internal/ServiceTunnelAgent.h>
 #include <platform/internal/BLEManager.h>
-#include <platform/Profiles/CHIPProfiles.h>
-#include <platform/Profiles/common/CommonProfile.h>
-#include <warm/Warm.h>
 
 #include <lwip/ip_addr.h>
 #include <lwip/netif.h>
@@ -32,8 +26,11 @@
 
 #include <new>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WOBLE
-#include <DeviceLayer/internal/GenericConnectivityManagerImpl_BLE.ipp>
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -41,14 +38,8 @@
 #endif
 
 using namespace ::chip;
-using namespace ::chip::Chip;
 using namespace ::chip::TLV;
-using namespace ::chip::Profiles::Common;
-using namespace ::chip::Profiles::NetworkProvisioning;
 using namespace ::chip::DeviceLayer::Internal;
-
-using Profiles::kChipProfile_Common;
-using Profiles::kChipProfile_NetworkProvisioning;
 
 namespace chip {
 namespace DeviceLayer {
@@ -63,9 +54,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
-
-    // Initialize the Chip Addressing and Routing Module.
-    err = Warm::Init(FabricState);
     SuccessOrExit(err);
 
 exit:

@@ -170,7 +170,7 @@ inline void BLEManager::OnPlatformEvent(const ChipDeviceEvent * event)
     static_cast<ImplClass*>(this)->_OnPlatformEvent(event);
 }
 
-inline BleLayer * BLEManager::GetBleLayer(void) const
+inline chip::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 {
     return static_cast<const ImplClass*>(this)->_GetBleLayer();
 }
