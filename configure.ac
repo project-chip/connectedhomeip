@@ -977,7 +977,6 @@ AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRF5],    [test "${CHIP_DEVICE_LAYER_TA
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRF5],[${CHIP_DEVICE_LAYER_TARGET_NRF5}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF5* platforms.])
 
 if test "${CONFIG_DEVICE_LAYER}" = 1; then
-AC_MSG_CHECKING([target network])
     AC_DEFINE_UNQUOTED([BLE_PLATFORM_CONFIG_INCLUDE],
                        [<platform/${CHIP_DEVICE_LAYER_TARGET}/BlePlatformConfig.h>],
                        [Path to BLE platform config header file])
