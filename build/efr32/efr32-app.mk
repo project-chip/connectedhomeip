@@ -74,9 +74,6 @@ endif
 ifndef FREERTOS_ROOT
 $(error ENVIRONMENT ERROR: FREERTOS_ROOT not set)
 endif
-# ifndef OPENTHREAD_ROOT
-# $(error ENVIRONMENT ERROR: OPENTHREAD_ROOT not set)
-# endif
 
 
 
