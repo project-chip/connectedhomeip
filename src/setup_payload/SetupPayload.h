@@ -25,6 +25,9 @@
 #define _SETUP_PAYLOAD_H_
 
 #include <stdint.h>
+#include <string>
+
+using namespace std;
 
 namespace chip {
 // TODO this shuould point to the spec
@@ -55,7 +58,11 @@ public:
     uint32_t setUpPINCode;
 
     // Test that the Setup Payload is within expected value ranges
+    SetupPayload() :
+        version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(0), discriminator(0), setUpPINCode(0){};
+    
     bool isValid();
+    bool operator==(const SetupPayload& input);
 };
 
 }; // namespace chip

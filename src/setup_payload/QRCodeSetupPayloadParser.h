@@ -17,26 +17,26 @@
 
 /**
  *    @file
- *      Utility header to encode an input into a Base45 String
+ *      This file describes a QRCode Setup Payload parser based on the
+ *      CHIP specification.
  */
 
-#ifndef _SETUP_CODE_UTILS_H_
-#define _SETUP_CODE_UTILS_H_
+#include "SetupPayload.h"
 
-#include <core/CHIPError.h>
-
-#include <stdint.h>
 #include <string>
-#include <vector>
-
 using namespace std;
 
-namespace chip {
-// returns CHIP_NO_ERROR on successful decode
-CHIP_ERROR base45Decode(string base45, vector<uint8_t> & out);
-string base45Encode(const uint8_t * buf, size_t buf_len);
+namespace chip
+{
 
+class QRCodeSetupPayloadParser 
+{
+    private:
+        string mBase45StringRepresentation;
 
-} // namespace chip
+    public:
+        QRCodeSetupPayloadParser(string base45Representation) : mBase45StringRepresentation(base45Representation){};
+        SetupPayload payload();
+};
 
-#endif /* _SETUP_CODE_UTILS_H_ */
+}; // namespace chip
