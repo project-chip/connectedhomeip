@@ -75,10 +75,10 @@ configure_OPTIONS               = CPPFLAGS="-maes"
 endif
 
 # NOTE: Mac OS SDKs generated on OS X Sierra (or higher) seem to have trouble
-#       running on El Capitan (or earlier) due to issues with clock_gettime:
-#       declaring the interface in time.h but not making the symbol
-#       available in libSystem.dylib, resulting in a runtime crash. For
-#       now, suppress use of clock_getttime on OS X by overriding
+#       running on El Capitan (or earlier) due to issues with clock_gettime: 
+#       declaring the interface in time.h but not making the symbol 
+#       available in libSystem.dylib, resulting in a runtime crash. For 
+#       now, suppress use of clock_getttime on OS X by overriding 
 #       configure and asserting:
 #
 #         ac_cv_func_clock_gettime=no
@@ -158,7 +158,7 @@ endif
 ifeq ($(DEBUG),1)
 configure_OPTIONS              += --enable-debug --enable-optimization=no
 else
-configure_OPTIONS              +=
+configure_OPTIONS              += 
 endif
 
 # Disable docs generation
@@ -469,25 +469,25 @@ target:
 
     $(TargetTuple)
 
-You may want or need to override the following make variables either on the
-command line or in the environment:
+You may want or need to override the following make variables either on the 
+command line or in the environment: 
 
   DEBUG=[1|0]             Enable/disable CHIP debug code and logging (default: '$(DEBUG)').
 
-  COVERAGE=[1|0]          Enable/disable generation of code coverage information
+  COVERAGE=[1|0]          Enable/disable generation of code coverage information 
                           (default: '$(COVERAGE)').
 
   TIMESTAMP=[1|0]         Enable/disable logging module timestamp output (default: '$(TIMESTAMP)').
 
-  USE_LWIP=[1|0]          Build the standalone configuration against the LwIP
+  USE_LWIP=[1|0]          Build the standalone configuration against the LwIP 
                           library rather than against sockets (default '$(USE_LWIP)').
 
-  BLUEZ=[1|0]             Enable support for BLE peripheral using BlueZ bindings
+  BLUEZ=[1|0]             Enable support for BLE peripheral using BlueZ bindings 
 
-  OPENSSL=<dir>           Use the prebuilt version of OpenSSL located in the given
-                          directory. Note that the directory is expected to contain
-                          include and lib subdirectories containing the necessary header
-                          and libraries.
+  OPENSSL=<dir>           Use the prebuilt version of OpenSSL located in the given 
+                          directory. Note that the directory is expected to contain 
+                          include and lib subdirectories containing the necessary header 
+                          and libraries. 
 
   OPENSSL=internal        Build the internal copy of OpenSSL as part of the CHIP
                           build.
