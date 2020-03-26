@@ -40,7 +40,7 @@ important to think in terms of something that will eventually have
 an end, i.e. a definite scope.
 2. To categorize issues, denote broader efforts without a definite time scope. 
 These projects might reflect or show burndown or percent complete, but are mostly 
-used to view where effort is going.  These projects' names are prefaced with 
+used to view where effort is going.
 
 Issues can belong to any number of projects, but should generally only belong to 
 one of the task-tracking projects (the first type).
