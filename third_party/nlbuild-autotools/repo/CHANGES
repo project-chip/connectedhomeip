@@ -1,3 +1,11 @@
+1.6.20 (2020-03-26)
+
+        * Ensure that several scripts that use bashisms specify bash
+          for the shebang. Additionally, invoke bash through env to
+          maximize downrev shell compatibility.
+
+        * Add tools/host/... to .gitignore.
+
 1.6.19 (2020-03-18)
 
         * Fix awk invocation error in tools/packages/build triggered by
