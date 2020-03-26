@@ -24,7 +24,8 @@ In CHIP parlance, a milestone is simply an expected due date or release.
 Date-based milestones start with an "M" and have the form M3, M3.2, M4,
 etc. corresponding to the number of months since January 1, 2020, and generally
 mean the last Friday of that month.  E.g. M1 corresponds to EOB January 24,
-2020.
+2020.  The Morrow milestone is a special milestone that means "unprioritized" or 
+"unscheduled" or "unscoped".
 
 The form of the names of release-based milestone names are TBD, and may have
 flexible or changing dates.
