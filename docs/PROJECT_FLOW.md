@@ -33,9 +33,17 @@ flexible or changing dates.
 
 Projects are collections of issues, pull requests, and notes intended to capture
 larger efforts that don't fit in issues, have multiple-subsystems involved, or
-may span multiple milestones.  When constructing a new project, it's
-nevertheless important to think in terms of something that will eventually have
+may span multiple milestones.  We use projects 2 ways:
+
+1. To track burn down on a larger task.  When constructing such a project, it's
+important to think in terms of something that will eventually have
 an end, i.e. a definite scope.
+2. To categorize issues, denote broader efforts without a definite time scope. 
+These projects might reflect or show burndown or percent complete, but are mostly 
+used to view where effort is going.
+
+Issues can belong to any number of projects, but should generally only belong to 
+one of the task-tracking projects (the first type).
 
 ### Branches, releases, and general development flow
 
