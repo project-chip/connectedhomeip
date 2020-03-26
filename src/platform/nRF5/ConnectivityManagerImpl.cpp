@@ -29,7 +29,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
