@@ -32,3 +32,5 @@ docker build -t "$ORG/$IMAGE:$VERSION" .
     docker push "$ORG"/"$IMAGE":latest
   }
 }
+
+exit 0
