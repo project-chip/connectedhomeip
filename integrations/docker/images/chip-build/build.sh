@@ -8,22 +8,22 @@ die() {
     exit 1
 }
 
-# fix me, should be "projectchip" or "zigbee" or something,
-#   since docker.io doesn't allow hyphens
-ORG=rwalkerapple
+# FIX ME, should be "projectchip" or "zigbee" or something,
+#   (docker.io doesn't allow hyphens)
+ORG=${DOCKER_BUILD_ORG:-rwalkerapple}
 
 # directory name is
-IMAGE=$(basename "$(pwd)")
+IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 
 # version
-VERSION=$(cat version)
+VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
 docker build -t "$ORG/$IMAGE:$VERSION" .
 
 [[ ${*/--latest//} != "${*}" ]] && {
-  docker tag "$ORG"/"$IMAGE":latest "$ORG"/"$IMAGE":"$VERSION"
+  docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
 }
 
 [[ ${*/--push//} != "${*}" ]] && {
