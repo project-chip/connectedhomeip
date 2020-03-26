@@ -35,7 +35,7 @@ using namespace std;
 static void populateBits(uint8_t * bits, int & offset, uint64_t input, size_t numberOfBits)
 {
     // do nothing in the case where we've overflowed. should never happen
-    if (offset + numberOfBits > kTotalPayloadDataSizeInBits || input >= 1 << numberOfBits)
+    if (offset + numberOfBits > kTotalPayloadDataSizeInBits || input >= 1u << numberOfBits)
     {
         return;
     }
