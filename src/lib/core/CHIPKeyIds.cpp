@@ -62,10 +62,8 @@ bool ChipKeyId::UsesCurrentEpochKey(uint32_t keyId)
 bool ChipKeyId::IncorporatesRootKey(uint32_t keyId)
 {
     uint32_t keyType = GetType(keyId);
-    return keyType == kType_AppStaticKey ||
-           keyType == kType_AppRotatingKey ||
-           keyType == kType_AppRootKey ||
-           keyType == kType_AppIntermediateKey;
+    return keyType == kType_AppStaticKey || keyType == kType_AppRotatingKey || keyType == kType_AppRootKey ||
+        keyType == kType_AppIntermediateKey;
 }
 
 /**
@@ -78,9 +76,7 @@ bool ChipKeyId::IncorporatesRootKey(uint32_t keyId)
 bool ChipKeyId::IncorporatesAppGroupMasterKey(uint32_t keyId)
 {
     uint32_t keyType = GetType(keyId);
-    return keyType == kType_AppStaticKey ||
-           keyType == kType_AppRotatingKey ||
-           keyType == kType_AppGroupMasterKey;
+    return keyType == kType_AppStaticKey || keyType == kType_AppRotatingKey || keyType == kType_AppGroupMasterKey;
 }
 
 /**
@@ -96,12 +92,10 @@ bool ChipKeyId::IncorporatesAppGroupMasterKey(uint32_t keyId)
  *  @return      application group key ID.
  *
  */
-uint32_t ChipKeyId::MakeAppKeyId(uint32_t keyType, uint32_t rootKeyId, uint32_t epochKeyId,
-                                  uint32_t appGroupMasterKeyId, bool useCurrentEpochKey)
+uint32_t ChipKeyId::MakeAppKeyId(uint32_t keyType, uint32_t rootKeyId, uint32_t epochKeyId, uint32_t appGroupMasterKeyId,
+                                 bool useCurrentEpochKey)
 {
-    return (keyType |
-            (rootKeyId & kMask_RootKeyNumber) |
-            (appGroupMasterKeyId & kMask_GroupLocalNumber) |
+    return (keyType | (rootKeyId & kMask_RootKeyNumber) | (appGroupMasterKeyId & kMask_GroupLocalNumber) |
             (useCurrentEpochKey ? kFlag_UseCurrentEpochKey : (epochKeyId & kMask_EpochKeyNumber)));
 }
 
@@ -132,8 +126,8 @@ uint32_t ChipKeyId::MakeAppIntermediateKeyId(uint32_t rootKeyId, uint32_t epochK
  *  @return      application rotating key ID.
  *
  */
-uint32_t ChipKeyId::MakeAppRotatingKeyId(uint32_t rootKeyId, uint32_t epochKeyId,
-                                          uint32_t appGroupMasterKeyId, bool useCurrentEpochKey)
+uint32_t ChipKeyId::MakeAppRotatingKeyId(uint32_t rootKeyId, uint32_t epochKeyId, uint32_t appGroupMasterKeyId,
+                                         bool useCurrentEpochKey)
 {
     return MakeAppKeyId(kType_AppRotatingKey, rootKeyId, epochKeyId, appGroupMasterKeyId, useCurrentEpochKey);
 }
@@ -175,8 +169,7 @@ uint32_t ChipKeyId::ConvertToStaticAppKeyId(uint32_t keyId)
  */
 uint32_t ChipKeyId::UpdateEpochKeyId(uint32_t keyId, uint32_t epochKeyId)
 {
-    return (keyId & ~(kFlag_UseCurrentEpochKey | kMask_EpochKeyNumber)) |
-           (epochKeyId & kMask_EpochKeyNumber);
+    return (keyId & ~(kFlag_UseCurrentEpochKey | kMask_EpochKeyNumber)) | (epochKeyId & kMask_EpochKeyNumber);
 }
 
 /**
@@ -191,7 +184,8 @@ bool ChipKeyId::IsValidKeyId(uint32_t keyId)
     bool retval;
     int usedBits = kMask_KeyType;
 
-    switch (GetType(keyId)) {
+    switch (GetType(keyId))
+    {
     case kType_None:
         ExitNow(retval = false);
     case kType_General:
@@ -199,13 +193,10 @@ bool ChipKeyId::IsValidKeyId(uint32_t keyId)
         usedBits |= kMask_KeyNumber;
         break;
     case kType_AppStaticKey:
-        usedBits |= kMask_RootKeyNumber |
-                    kMask_GroupLocalNumber;
+        usedBits |= kMask_RootKeyNumber | kMask_GroupLocalNumber;
         break;
     case kType_AppRotatingKey:
-        usedBits |= kFlag_UseCurrentEpochKey |
-                    kMask_RootKeyNumber |
-                    kMask_GroupLocalNumber;
+        usedBits |= kFlag_UseCurrentEpochKey | kMask_RootKeyNumber | kMask_GroupLocalNumber;
         if (!UsesCurrentEpochKey(keyId))
         {
             usedBits |= kMask_EpochKeyNumber;
@@ -215,8 +206,7 @@ bool ChipKeyId::IsValidKeyId(uint32_t keyId)
         usedBits |= kMask_RootKeyNumber;
         break;
     case kType_AppIntermediateKey:
-        usedBits |= kFlag_UseCurrentEpochKey |
-                    kMask_RootKeyNumber;
+        usedBits |= kFlag_UseCurrentEpochKey | kMask_RootKeyNumber;
         if (!UsesCurrentEpochKey(keyId))
         {
             usedBits |= kMask_EpochKeyNumber;
@@ -239,9 +229,7 @@ bool ChipKeyId::IsValidKeyId(uint32_t keyId)
     if (IncorporatesRootKey(keyId))
     {
         int rootKeyId = GetRootKeyId(keyId);
-        VerifyOrExit(rootKeyId == kFabricRootKey ||
-                     rootKeyId == kClientRootKey ||
-                     rootKeyId == kServiceRootKey, retval = false);
+        VerifyOrExit(rootKeyId == kFabricRootKey || rootKeyId == kClientRootKey || rootKeyId == kServiceRootKey, retval = false);
     }
 
     retval = (keyId & ~usedBits) == 0;
@@ -284,7 +272,10 @@ bool ChipKeyId::IsMessageEncryptionKeyId(uint32_t keyId, bool allowLogicalKeys)
  */
 bool ChipKeyId::IsSameKeyOrGroup(uint32_t keyId1, uint32_t keyId2)
 {
-    enum { kIgnoreEpochMask = ~(kMask_EpochKeyNumber | kFlag_UseCurrentEpochKey) };
+    enum
+    {
+        kIgnoreEpochMask = ~(kMask_EpochKeyNumber | kFlag_UseCurrentEpochKey)
+    };
 
     // If the key ids are identical then they represent the same key.
     if (keyId1 == keyId2)
@@ -308,9 +299,9 @@ bool ChipKeyId::IsSameKeyOrGroup(uint32_t keyId1, uint32_t keyId2)
  *  @return  A pointer to a NULL-terminated string describing the specified key ID.
  *
  */
-const char *ChipKeyId::DescribeKey(uint32_t keyId)
+const char * ChipKeyId::DescribeKey(uint32_t keyId)
 {
-    const char *retval;
+    const char * retval;
 
     switch (GetType(keyId))
     {
