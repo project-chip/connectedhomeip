@@ -1,4 +1,4 @@
-The following individuals can be chosen as, and act as reviewers on any PR
+The following individuals can be chosen as, and act as required reviewers on any PR
 
 | Name | Company |
 |----|----|
