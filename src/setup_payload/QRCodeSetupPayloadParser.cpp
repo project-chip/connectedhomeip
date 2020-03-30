@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    <COPYRIGHT>
  *
@@ -34,7 +34,8 @@ using namespace std;
 static uint64_t readBits(vector <uint8_t> buf, int &index, size_t numberOfBitsToRead)
 {
     uint64_t dest = 0;
-    if (index + numberOfBitsToRead > buf.size() * 8 || numberOfBitsToRead > 64) {
+    if (index + numberOfBitsToRead > buf.size() * 8 || numberOfBitsToRead > sizeof(uint64_t) * 8)
+    {
         fprintf(stderr, "Error parsing QR code. startIndex %d numberOfBitsToLoad %zu buf_len %zu ", index, numberOfBitsToRead,
                 buf.size());
         return 0;

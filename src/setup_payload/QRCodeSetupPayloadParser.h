@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    <COPYRIGHT>
  *
@@ -29,6 +29,10 @@ using namespace std;
 namespace chip
 {
 
+/**
+ * @class QRCodeSetupPayloadParser
+ * A class that can be used to convert a base45 encoded payload to a SetupPayload object
+ * */
 class QRCodeSetupPayloadParser 
 {
     private:
