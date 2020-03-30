@@ -23,6 +23,8 @@
 #ifndef _SETUP_CODE_UTILS_H_
 #define _SETUP_CODE_UTILS_H_
 
+#include <core/CHIPError.h>
+
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -30,8 +32,8 @@
 using namespace std;
 
 namespace chip {
-
-vector<uint8_t> base45Decode(string base45);
+// returns CHIP_NO_ERROR on successful decode
+CHIP_ERROR base45Decode(string base45, vector<uint8_t> & out);
 string base45Encode(const uint8_t * buf, size_t buf_len);
 
 } // namespace chip

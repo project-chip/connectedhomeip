@@ -30,6 +30,8 @@ lib_LIBRARIES              = libQrCode.a
 libQrCode_adir             = $(includedir)/setup_payload
 
 libQrCode_a_CPPFLAGS                                      = \
+    -I$(top_srcdir)/src/lib                                 \
+    -I$(top_srcdir)/src/system                              \
     $(NULL)
 
 libQrCode_a_SOURCES                                       = \

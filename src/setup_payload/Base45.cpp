@@ -71,7 +71,7 @@ string base45Encode(const uint8_t * buf, size_t buf_len)
     return result;
 }
 
-static inline int decodeChar(char c, uint8_t & value)
+static inline CHIP_ERROR decodeChar(char c, uint8_t & value)
 {
     static const int kBogus = 255;
     // map of base45 charater to numeric value
@@ -139,56 +139,71 @@ static inline int decodeChar(char c, uint8_t & value)
     };
     if (c < ' ' || c > 'Z')
     {
-        return 1;
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
     }
     uint8_t v = decodes[c - ' '];
     if (v == kBogus)
     {
-        return 2;
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
     }
     value = v;
     return 0;
 }
 
-vector<uint8_t> base45Decode(string base45)
+CHIP_ERROR base45Decode(string base45, vector<uint8_t> & result)
 {
     // not long enough, there are always at least 2
     //  base45 characters
-    if (base45.length() < kBase45ChunkLen - 1)
+    if (base45.length() % kBase45ChunkLen == 1)
     {
-        return vector<uint8_t>();
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
     }
-    vector<uint8_t> result;
+    result.clear();
 
     for (int i = 0; base45.length() - i >= kBase45ChunkLen; i += kBase45ChunkLen)
     {
-        uint8_t v0 = 0, v1 = 0, v2 = 0;
+        uint16_t value = 0;
 
-        if (decodeChar(base45[i], v0) || decodeChar(base45[i + 1], v1) || decodeChar(base45[i + 2], v2))
+        for (int iv = i + (kBase45ChunkLen - 1); iv >= i; iv--)
         {
-            return vector<uint8_t>();
-        }
+            uint8_t v;
+            CHIP_ERROR err = decodeChar(base45[iv], v);
 
-        uint16_t value = v0 + v1 * 45 + v2 * 45 * 45;
+            if (err != CHIP_NO_ERROR)
+            {
+                return err;
+            }
+
+            value *= 45;
+            value += v;
+        }
 
         result.push_back(value % 256);
         result.push_back(value / 256);
     }
     if (base45.length() % kBase45ChunkLen == kBase45ChunkLen - 1)
     {
-        int i      = base45.length() - (kBase45ChunkLen - 1);
-        uint8_t v0 = 0, v1 = 0;
+        int i          = base45.length() - (kBase45ChunkLen - 1);
+        uint16_t value = 0;
 
-        if (decodeChar(base45[i], v0) || decodeChar(base45[i + 1], v1))
+        for (int iv = i + (kBase45ChunkLen - 2); iv >= i; iv--)
         {
-            return vector<uint8_t>();
+            uint8_t v;
+            CHIP_ERROR err = decodeChar(base45[iv], v);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                return err;
+            }
+
+            value *= 45;
+            value += v;
         }
 
-        uint8_t value = v0 + v1 * 45;
-
-        result.push_back(value);
+        result.push_back(value % 256);
+        result.push_back(value / 256);
     }
-    return result;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

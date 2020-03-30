@@ -84,7 +84,9 @@ int testBase45()
 
     surprises += EXPECT_EQ(base45Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1), "8 C VDN44I3E.VD/94");
 
-    vector<uint8_t> decoded = base45Decode("8 C VDN44I3E.VD/94");
+    vector<uint8_t> decoded = vector<uint8_t>();
+    surprises += EXPECT_EQ(base45Decode("8 C VDN44I3E.VD/94", decoded), CHIP_NO_ERROR);
+
     string hello_world;
     for (size_t _ = 0; _ < decoded.size(); _++)
     {
@@ -93,32 +95,35 @@ int testBase45()
     surprises += EXPECT_EQ(hello_world, "Hello World!");
 
     // short input
-    surprises += EXPECT_EQ(base45Decode("A0").size(), 1);
+    surprises += EXPECT_EQ(base45Decode("A0", decoded), CHIP_NO_ERROR);
+    surprises += EXPECT_EQ(decoded.size(), 2);
 
     // empty == empty
-    surprises += EXPECT_EQ(base45Decode("").size(), 0);
+    surprises += EXPECT_EQ(base45Decode("", decoded), CHIP_NO_ERROR);
+    surprises += EXPECT_EQ(decoded.size(), 0);
     // too short
-    surprises += EXPECT_EQ(base45Decode("A").size(), 0);
+    surprises += EXPECT_EQ(base45Decode("A", decoded), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
     // outside valid chars
-    surprises += EXPECT_EQ(base45Decode("0\x1").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("\x10").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("[0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("0[").size(), 0);
+    surprises += EXPECT_EQ(base45Decode("0\001", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("\0010", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("[0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("0[", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     // BOGUS chars
-    surprises += EXPECT_EQ(base45Decode("!0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("\"0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("#0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("&0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("'0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("(0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode(")0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode(",0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode(";0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("<0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("=0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode(">0").size(), 0);
-    surprises += EXPECT_EQ(base45Decode("@0").size(), 0);
+    surprises += EXPECT_EQ(base45Decode("!0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("\"0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("#0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("&0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("'0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("(0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode(")0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode(",0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode(";0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("<0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("=0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode(">0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base45Decode("@0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     return surprises;
 }
