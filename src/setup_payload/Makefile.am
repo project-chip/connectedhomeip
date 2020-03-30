@@ -34,14 +34,14 @@ libQrCode_a_CPPFLAGS                                      = \
 
 libQrCode_a_SOURCES                                       = \
     QRCodeSetupPayloadGenerator.cpp                         \
-    SetupCodeUtils.cpp                                      \
     SetupPayload.cpp                                        \
-    $(NULL)
+    Base45.cpp                                              \
+   $(NULL)
 
 dist_libQrCode_a_HEADERS                                 = \
     QRCodeSetupPayloadGenerator.h                          \
-    SetupCodeUtils.h                                       \
     SetupPayload.h                                         \
+    Base45.h                                               \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
