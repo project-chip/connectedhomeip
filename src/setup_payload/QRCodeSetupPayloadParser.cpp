@@ -22,7 +22,7 @@
  */
 
 #include "QRCodeSetupPayloadParser.h"
-#include "SetupCodeUtils.h"
+#include "Base45.h"
 
 #include <iostream>
 #include <vector>
