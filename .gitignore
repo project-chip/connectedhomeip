@@ -9,6 +9,7 @@
 Makefile.in
 aclocal.m4
 autom4te.cache
+output/
 build/*
 !build/autoconf/m4/nl_with_lwip.m4
 !build/config/standalone/CHIPProjectConfig.h
