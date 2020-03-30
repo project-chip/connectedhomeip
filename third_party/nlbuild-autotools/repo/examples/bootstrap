@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 #
+#    Copyright 2020 nlbuild-autotools Authors. All Rights Reserved.
 #    Copyright 2020 Google LLC. All Rights Reserved.
 #    Copyright 2016 Nest Labs Inc. All Rights Reserved.
 #
@@ -8,7 +9,7 @@
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,11 +29,6 @@
 
 nlbuild_autotools_stem="third_party/nlbuild-autotools/repo"
 
-# Establish some key directories
+abs_srcdir=$(cd $(dirname "${0}") && pwd)
 
-srcdir="$(dirname "${0}")"
-abs_srcdir="$(cd "${srcdir}" && pwd)"
-abs_top_srcdir="${abs_srcdir}"
-
-exec "${srcdir}/${nlbuild_autotools_stem}/scripts/bootstrap" -I "${abs_top_srcdir}/${nlbuild_autotools_stem}" "${@}"
-
+(cd "${abs_srcdir}" && exec "${abs_srcdir}/${nlbuild_autotools_stem}/scripts/bootstrap" -I "${abs_srcdir}/${nlbuild_autotools_stem}" "${@}")
