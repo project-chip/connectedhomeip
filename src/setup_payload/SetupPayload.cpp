@@ -48,22 +48,19 @@ bool SetupPayload::isValid()
         return false;
     }
 
-    if (version == 0 && rendezvousInformation == 0 && discriminator == 0 && setUpPINCode == 0) {
+    if (version == 0 && rendezvousInformation == 0 && discriminator == 0 && setUpPINCode == 0)
+    {
         return false;
     }
-    
+
     return true;
 }
 
-bool SetupPayload::operator==(const SetupPayload& input)
+bool SetupPayload::operator==(const SetupPayload & input)
 {
-    return this->version == input.version && \
-           this->vendorID == input.vendorID && \
-           this->productID == input.productID && \
-           this->requiresCustomFlow == input.requiresCustomFlow && \
-           this->rendezvousInformation == input.rendezvousInformation && \
-           this->discriminator == input.discriminator && \
-           this->setUpPINCode == input.setUpPINCode;
+    return this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
+        this->requiresCustomFlow == input.requiresCustomFlow && this->rendezvousInformation == input.rendezvousInformation &&
+        this->discriminator == input.discriminator && this->setUpPINCode == input.setUpPINCode;
 }
 
 } // namespace chip

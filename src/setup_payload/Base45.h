@@ -36,7 +36,6 @@ namespace chip {
 CHIP_ERROR base45Decode(string base45, vector<uint8_t> & out);
 string base45Encode(const uint8_t * buf, size_t buf_len);
 
-
 } // namespace chip
 
 #endif /* _SETUP_CODE_UTILS_H_ */

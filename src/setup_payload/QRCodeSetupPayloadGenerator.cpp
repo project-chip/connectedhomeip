@@ -87,7 +87,8 @@ string QRCodeSetupPayloadGenerator::payloadBinaryRepresentation()
         }
         return binary;
     }
-    else {
+    else
+    {
         fprintf(stderr, "\nFailed encoding invalid payload\n");
         return string();
     }
@@ -103,7 +104,8 @@ string QRCodeSetupPayloadGenerator::payloadBase45Representation()
 
         return base45Encode(bits, sizeof(bits) / sizeof(bits[0]));
     }
-    else {
+    else
+    {
         fprintf(stderr, "\nFailed encoding invalid payload\n");
         return string();
     }

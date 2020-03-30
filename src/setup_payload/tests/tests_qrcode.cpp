@@ -195,10 +195,10 @@ int testPayloadEquality()
     payload.setUpPINCode          = 2048;
 
     SetupPayload equalPayload;
-    equalPayload.version                 = 5;
+    equalPayload.version               = 5;
     equalPayload.vendorID              = 12;
     equalPayload.productID             = 1;
-    equalPayload.requiresCustomFlow      = 0;
+    equalPayload.requiresCustomFlow    = 0;
     equalPayload.rendezvousInformation = 1;
     equalPayload.discriminator         = 128;
     equalPayload.setUpPINCode          = 2048;
@@ -244,10 +244,8 @@ int testQRCodeToPayloadGeneration()
     payload.discriminator         = 233;
     payload.setUpPINCode          = 5221133;
 
-    
     QRCodeSetupPayloadGenerator generator(payload);
     string base45Rep = generator.payloadBase45Representation();
-    
 
     QRCodeSetupPayloadParser parser(base45Rep);
     SetupPayload resultingPayload = parser.payload();
