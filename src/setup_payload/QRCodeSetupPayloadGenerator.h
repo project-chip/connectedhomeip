@@ -29,6 +29,7 @@
 
 #include "SetupPayload.h"
 
+#include <bitset>
 #include <string>
 using namespace std;
 

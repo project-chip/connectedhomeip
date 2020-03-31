@@ -70,7 +70,7 @@ TESTS_ENVIRONMENT                              = \
 # Source, compiler, and linker options for test programs.
 
 TestQrCode_LDADD                               = $(COMMON_LDADD)
-TestQrCode_SOURCES                             = tests_qrcode.cpp
+TestQrCode_SOURCES                             = tests.cpp
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)
