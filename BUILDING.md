@@ -78,7 +78,7 @@ mkdir build/<CONFIG>
 cd build/<CONFIG>
 ../../configure <CONFIG ARGUMENTS>
 ```
-Where `<CONFIG>` is something that describes what configuration (as described by `<CONFIG ARGUMENTS>`
+Where `<CONFIG>` is something that describes what configuration (as described by `<CONFIG ARGUMENTS>`)
 of the tree you're planning to build, or simply `out` if you're not feeling creative.
 ```
 
