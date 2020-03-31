@@ -37,6 +37,7 @@ static void populateBits(uint8_t * bits, int & offset, uint64_t input, size_t nu
     // do nothing in the case where we've overflowed. should never happen
     if (offset + numberOfBits > kTotalPayloadDataSizeInBits || input >= 1u << numberOfBits)
     {
+        fprintf(stderr, "Overflow while trying to generate a QR Code. Bailing.");
         return;
     }
 
@@ -86,7 +87,11 @@ string QRCodeSetupPayloadGenerator::payloadBinaryRepresentation()
         }
         return binary;
     }
-    return string();
+    else
+    {
+        fprintf(stderr, "\nFailed encoding invalid payload\n");
+        return string();
+    }
 }
 
 string QRCodeSetupPayloadGenerator::payloadBase45Representation()
@@ -99,5 +104,9 @@ string QRCodeSetupPayloadGenerator::payloadBase45Representation()
 
         return base45Encode(bits, sizeof(bits) / sizeof(bits[0]));
     }
-    return string();
+    else
+    {
+        fprintf(stderr, "\nFailed encoding invalid payload\n");
+        return string();
+    }
 }
