@@ -24,11 +24,13 @@
 #include "SetupPayload.cpp"
 #include "Base45.cpp"
 #include "QRCodeSetupPayloadGenerator.cpp"
+#include "QRCodeSetupPayloadParser.cpp"
 
 using namespace chip;
 using namespace std;
 
-#define EXPECT_EQ(x, y) ((x) != (y)) ? cerr << __FILE__ << ":" << __LINE__ << ":error EXPECT_EQ(" << x << ", " << y << ")\n", 1 : 0
+#define EXPECT_EQ(x, y)                                                                                                            \
+    ((x) != (y)) ? cerr << endl << __FILE__ << ":" << __LINE__ << ":error EXPECT_EQ(" << x << ", " << y << ")\n", 1 : 0
 
 int testPayloadByteArrayRep()
 {
@@ -154,7 +156,7 @@ int testSetupPayloadVerify()
 
     // test invalid rendezvousInformation
     test_payload                       = payload;
-    test_payload.rendezvousInformation = 3;
+    test_payload.rendezvousInformation = 512;
     surprises += EXPECT_EQ(test_payload.isValid(), false);
 
     // test invalid discriminator
@@ -170,7 +172,114 @@ int testSetupPayloadVerify()
     return surprises;
 }
 
+int testInvalidQRCodePayload_WrongCharacterSet()
+{
+    int surprises        = 0;
+    string invalidString = "adas12AA";
+
+    QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(invalidString);
+    SetupPayload payload;
+    CHIP_ERROR err = parser.populatePayload(payload);
+    bool didFail   = err != CHIP_NO_ERROR;
+    surprises      = EXPECT_EQ(didFail, true);
+    surprises      = EXPECT_EQ(payload.isValid(), false);
+    return surprises;
+}
+
+int testInvalidQRCodePayload_WrongLength()
+{
+    int surprises                   = 0;
+    string invalidString            = "AA12";
+    QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(invalidString);
+    SetupPayload payload;
+    CHIP_ERROR err = parser.populatePayload(payload);
+    bool didFail   = err != CHIP_NO_ERROR;
+    surprises      = EXPECT_EQ(didFail, true);
+    surprises      = EXPECT_EQ(payload.isValid(), false);
+    return surprises;
+}
+
+int testPayloadEquality()
+{
+    SetupPayload payload;
+
+    payload.version               = 5;
+    payload.vendorID              = 12;
+    payload.productID             = 1;
+    payload.requiresCustomFlow    = 0;
+    payload.rendezvousInformation = 1;
+    payload.discriminator         = 128;
+    payload.setUpPINCode          = 2048;
+
+    SetupPayload equalPayload;
+    equalPayload.version               = 5;
+    equalPayload.vendorID              = 12;
+    equalPayload.productID             = 1;
+    equalPayload.requiresCustomFlow    = 0;
+    equalPayload.rendezvousInformation = 1;
+    equalPayload.discriminator         = 128;
+    equalPayload.setUpPINCode          = 2048;
+
+    bool result = payload == equalPayload;
+    return EXPECT_EQ(result, true);
+}
+
+int testPayloadInEquality()
+{
+    SetupPayload payload;
+
+    payload.version               = 5;
+    payload.vendorID              = 12;
+    payload.productID             = 1;
+    payload.requiresCustomFlow    = 0;
+    payload.rendezvousInformation = 1;
+    payload.discriminator         = 128;
+    payload.setUpPINCode          = 2048;
+
+    SetupPayload unequalPayload;
+    unequalPayload.version               = 5;
+    unequalPayload.vendorID              = 12;
+    unequalPayload.productID             = 1;
+    unequalPayload.requiresCustomFlow    = 0;
+    unequalPayload.rendezvousInformation = 1;
+    unequalPayload.discriminator         = 28;
+    unequalPayload.setUpPINCode          = 121233;
+
+    bool result = payload == unequalPayload;
+    return EXPECT_EQ(result, false);
+}
+
+int testQRCodeToPayloadGeneration()
+{
+    int surprises = 0;
+    SetupPayload payload;
+    payload.version               = 3;
+    payload.vendorID              = 100;
+    payload.productID             = 12;
+    payload.requiresCustomFlow    = 1;
+    payload.rendezvousInformation = 4;
+    payload.discriminator         = 233;
+    payload.setUpPINCode          = 5221133;
+
+    QRCodeSetupPayloadGenerator generator(payload);
+    string base45Rep = generator.payloadBase45Representation();
+
+    SetupPayload resultingPayload;
+    QRCodeSetupPayloadParser parser(base45Rep);
+
+    CHIP_ERROR err  = parser.populatePayload(resultingPayload);
+    bool didSucceed = err == CHIP_NO_ERROR;
+    surprises       = EXPECT_EQ(didSucceed, true);
+    surprises       = EXPECT_EQ(resultingPayload.isValid(), true);
+
+    bool result = payload == resultingPayload;
+    surprises += EXPECT_EQ(result, true);
+    return surprises;
+}
+
 int main(int argc, char ** argv)
 {
-    return testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase45Rep() + testBase45() + testSetupPayloadVerify();
+    return testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase45Rep() + testBase45() + testSetupPayloadVerify() +
+        testPayloadEquality() + testPayloadInEquality() + testQRCodeToPayloadGeneration() +
+        testInvalidQRCodePayload_WrongCharacterSet() + testInvalidQRCodePayload_WrongLength();
 }

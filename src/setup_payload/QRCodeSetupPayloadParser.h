@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    <COPYRIGHT>
  *
@@ -17,37 +17,30 @@
 
 /**
  *    @file
- *      This file describes a QRCode Setup Payload generator based on the
+ *      This file describes a QRCode Setup Payload parser based on the
  *      CHIP specification.
- *
- *      The encoding of the binary data to a base45 string is as follows:
- *      - Every 2 bytes (16 bits) of binary source data are encoded to 3
- *        characters of the Base-45 alphabet.
- *      - If an odd number of bytes are to be encoded, the remaining
- *        single byte is encoded to 2 characters of the Base-45 alphabet.
  */
 
 #include "SetupPayload.h"
 
+#include <core/CHIPError.h>
 #include <string>
 using namespace std;
 
-#ifndef _QR_CODE_SETUP_PAYLOAD_GENERATOR_
-#define _QR_CODE_SETUP_PAYLOAD_GENERATOR_
-
 namespace chip {
 
-class QRCodeSetupPayloadGenerator
+/**
+ * @class QRCodeSetupPayloadParser
+ * A class that can be used to convert a base45 encoded payload to a SetupPayload object
+ * */
+class QRCodeSetupPayloadParser
 {
 private:
-    SetupPayload mPayload;
+    string mBase45Representation;
 
 public:
-    string payloadBinaryRepresentation();
-    string payloadBase45Representation();
-    QRCodeSetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload){};
+    QRCodeSetupPayloadParser(string base45Representation) : mBase45Representation(base45Representation){};
+    CHIP_ERROR populatePayload(SetupPayload & outPayload);
 };
 
 }; // namespace chip
-
-#endif /* _QR_CODE_SETUP_PAYLOAD_GENERATOR_ */
