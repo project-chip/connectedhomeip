@@ -29,7 +29,8 @@
 using namespace chip;
 using namespace std;
 
-#define EXPECT_EQ(x, y) ((x) != (y)) ? cerr << __FILE__ << ":" << __LINE__ << ":error EXPECT_EQ(" << x << ", " << y << ")\n", 1 : 0
+#define EXPECT_EQ(x, y)                                                                                                            \
+    ((x) != (y)) ? cerr << endl << __FILE__ << ":" << __LINE__ << ":error EXPECT_EQ(" << x << ", " << y << ")\n", 1 : 0
 
 int testPayloadByteArrayRep()
 {
@@ -173,12 +174,15 @@ int testSetupPayloadVerify()
 
 int testInvalidQRCodePayload_WrongCharacterSet()
 {
-    int surprises                   = 0;
-    string invalidString            = "adas12AA";
-    QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(invalidString);
-    SetupPayload payload            = parser.payload();
+    int surprises        = 0;
+    string invalidString = "adas12AA";
 
-    surprises = EXPECT_EQ(payload.isValid(), false);
+    QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(invalidString);
+    SetupPayload payload;
+    CHIP_ERROR err = parser.populatePayload(payload);
+    bool didFail   = err != CHIP_NO_ERROR;
+    surprises      = EXPECT_EQ(didFail, true);
+    surprises      = EXPECT_EQ(payload.isValid(), false);
     return surprises;
 }
 
@@ -187,9 +191,11 @@ int testInvalidQRCodePayload_WrongLength()
     int surprises                   = 0;
     string invalidString            = "AA12";
     QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(invalidString);
-    SetupPayload payload            = parser.payload();
-
-    surprises = EXPECT_EQ(payload.isValid(), false);
+    SetupPayload payload;
+    CHIP_ERROR err = parser.populatePayload(payload);
+    bool didFail   = err != CHIP_NO_ERROR;
+    surprises      = EXPECT_EQ(didFail, true);
+    surprises      = EXPECT_EQ(payload.isValid(), false);
     return surprises;
 }
 
@@ -258,8 +264,13 @@ int testQRCodeToPayloadGeneration()
     QRCodeSetupPayloadGenerator generator(payload);
     string base45Rep = generator.payloadBase45Representation();
 
+    SetupPayload resultingPayload;
     QRCodeSetupPayloadParser parser(base45Rep);
-    SetupPayload resultingPayload = parser.payload();
+
+    CHIP_ERROR err  = parser.populatePayload(resultingPayload);
+    bool didSucceed = err == CHIP_NO_ERROR;
+    surprises       = EXPECT_EQ(didSucceed, true);
+    surprises       = EXPECT_EQ(resultingPayload.isValid(), true);
 
     bool result = payload == resultingPayload;
     surprises += EXPECT_EQ(result, true);

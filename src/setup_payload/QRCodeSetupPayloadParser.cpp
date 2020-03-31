@@ -24,6 +24,7 @@
 #include "QRCodeSetupPayloadParser.h"
 #include "Base45.h"
 
+#include <core/CHIPError.h>
 #include <iostream>
 #include <vector>
 
@@ -31,14 +32,14 @@ using namespace chip;
 using namespace std;
 
 // Populate numberOfBits into dest from buf starting at startIndex
-static uint64_t readBits(vector<uint8_t> buf, int & index, size_t numberOfBitsToRead)
+static CHIP_ERROR readBits(vector<uint8_t> buf, int & index, uint64_t & dest, size_t numberOfBitsToRead)
 {
-    uint64_t dest = 0;
+    dest = 0;
     if (index + numberOfBitsToRead > buf.size() * 8 || numberOfBitsToRead > sizeof(uint64_t) * 8)
     {
         fprintf(stderr, "Error parsing QR code. startIndex %d numberOfBitsToLoad %zu buf_len %zu ", index, numberOfBitsToRead,
                 buf.size());
-        return 0;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     int currentIndex = index;
@@ -51,30 +52,72 @@ static uint64_t readBits(vector<uint8_t> buf, int & index, size_t numberOfBitsTo
         currentIndex++;
     }
     index += numberOfBitsToRead;
-    return dest;
+    return CHIP_NO_ERROR;
 }
 
-SetupPayload QRCodeSetupPayloadParser::payload()
+CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
     vector<uint8_t> buf = vector<uint8_t>();
 
-    if (CHIP_NO_ERROR != base45Decode(mBase45StringRepresentation, buf))
+    CHIP_ERROR result = base45Decode(mBase45Representation, buf);
+
+    if (CHIP_NO_ERROR != result)
     {
         fprintf(stderr, "Decoding of base45 string failed");
-        return SetupPayload();
+        return result;
     }
 
-    SetupPayload payload;
-
     int indexToReadFrom = 0;
+    uint64_t dest;
 
-    payload.version               = readBits(buf, indexToReadFrom, kVersionFieldLengthInBits);
-    payload.vendorID              = readBits(buf, indexToReadFrom, kVendorIDFieldLengthInBits);
-    payload.productID             = readBits(buf, indexToReadFrom, kProductIDFieldLengthInBits);
-    payload.requiresCustomFlow    = readBits(buf, indexToReadFrom, kCustomFlowRequiredFieldLengthInBits);
-    payload.rendezvousInformation = readBits(buf, indexToReadFrom, kRendezvousInfoFieldLengthInBits);
-    payload.discriminator         = readBits(buf, indexToReadFrom, kPayloadDiscriminatorFieldLengthInBits);
-    payload.setUpPINCode          = readBits(buf, indexToReadFrom, kSetupPINCodeFieldLengthInBits);
+    result = readBits(buf, indexToReadFrom, dest, kVersionFieldLengthInBits);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+    outPayload.version = dest;
 
-    return payload;
+    result = readBits(buf, indexToReadFrom, dest, kVendorIDFieldLengthInBits);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+    outPayload.vendorID = dest;
+
+    result = readBits(buf, indexToReadFrom, dest, kProductIDFieldLengthInBits);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+    outPayload.productID = dest;
+
+    result = readBits(buf, indexToReadFrom, dest, kCustomFlowRequiredFieldLengthInBits);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+    outPayload.requiresCustomFlow = dest;
+
+    result = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+    outPayload.rendezvousInformation = dest;
+
+    result = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+    outPayload.discriminator = dest;
+
+    result = readBits(buf, indexToReadFrom, dest, kSetupPINCodeFieldLengthInBits);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+    outPayload.setUpPINCode = dest;
+
+    return result;
 }

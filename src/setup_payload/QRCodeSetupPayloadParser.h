@@ -23,24 +23,24 @@
 
 #include "SetupPayload.h"
 
+#include <core/CHIPError.h>
 #include <string>
 using namespace std;
 
-namespace chip
-{
+namespace chip {
 
 /**
  * @class QRCodeSetupPayloadParser
  * A class that can be used to convert a base45 encoded payload to a SetupPayload object
  * */
-class QRCodeSetupPayloadParser 
+class QRCodeSetupPayloadParser
 {
-    private:
-        string mBase45StringRepresentation;
+private:
+    string mBase45Representation;
 
-    public:
-        QRCodeSetupPayloadParser(string base45Representation) : mBase45StringRepresentation(base45Representation){};
-        SetupPayload payload();
+public:
+    QRCodeSetupPayloadParser(string base45Representation) : mBase45Representation(base45Representation){};
+    CHIP_ERROR populatePayload(SetupPayload & outPayload);
 };
 
 }; // namespace chip
