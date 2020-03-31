@@ -29,14 +29,11 @@
 
 #include "Base45.h"
 
-#include <iostream>
-
 using namespace std;
 
 namespace chip {
 
 static const int kBase45ChunkLen = 3;
-static const int kBytesChunkLen  = 2;
 
 string base45Encode(const uint8_t * buf, size_t buf_len)
 {
@@ -49,8 +46,7 @@ string base45Encode(const uint8_t * buf, size_t buf_len)
 
     // eat little-endian uint16_ts from the byte array
     // encode as 3 base45 characters
-
-    while (buf_len >= kBytesChunkLen)
+    while (buf_len >= 2)
     {
         int next = buf[0] + buf[1] * 256;
 
@@ -59,8 +55,8 @@ string base45Encode(const uint8_t * buf, size_t buf_len)
             result += codes[next % radix];
             next /= radix;
         }
-        buf += kBytesChunkLen;
-        buf_len -= kBytesChunkLen;
+        buf += 2;
+        buf_len -= 2;
     }
     // handle leftover byte, if any
     if (buf_len != 0)
@@ -160,7 +156,6 @@ CHIP_ERROR base45Decode(string base45, vector<uint8_t> & result)
     //  base45 characters
     if (base45.length() % kBase45ChunkLen == 1)
     {
-        fprintf(stderr, "\nFailed decoding base45. Input was too short. %lu", base45.length());
         return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
     }
     result.clear();
