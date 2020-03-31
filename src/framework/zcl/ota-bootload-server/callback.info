@@ -1,0 +1,64 @@
+#include PLATFORM_HEADER
+#include CONFIGURATION_HEADER
+#include EMBER_AF_API_STACK
+#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CORE
+
+/**************************************************************************//**
+ * Get the information needed to send an ImageNotify command.
+ *
+ * @param address Address to which to send the ImageNotify command
+ * @param fileSpec The OTA file specification data contained in the ImageNotify
+ *                 command payload. See OTA specification for more details.
+ * @return `true` if the ImageNotify command should be sent, `false` otherwise.
+ *
+ * @note If `false` is returned, then the ImageNotify command will be
+ *       rescheduled to be sent at a later time.
+ *****************************************************************************/
+bool emberZclOtaBootloadServerGetImageNotifyInfoCallback(EmberIpv6Address *address,
+                                                         EmberZclOtaBootloadFileSpec_t *fileSpec)
+{
+  return false;
+}
+
+/**************************************************************************//**
+ * Get the next OTA file to send in response to a QueryNextImage command.
+ *
+ * @param currentFileSpec The current file spec from the QueryNextImage command
+ * @param nextFileSpec The next file spec to be downloaded by the client
+ * @return One of the following ::EmberZclStatus_t values.
+ * - @ref EMBER_ZCL_STATUS_SUCCESS if the server should tell the client to start
+ *        downloading the OTA file described by the nextFileSpec data
+ * - @ref EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE if there is no image available for
+ *        the client to download
+ * - @ref EMBER_ZCL_STATUS_NOT_AUTHORIZED if the client is not authorized to
+ *        download the next image
+ *****************************************************************************/
+EmberZclStatus_t emberZclOtaBootloadServerGetNextImageCallback(const EmberIpv6Address *source,
+                                                               const EmberZclOtaBootloadFileSpec_t *currentFileSpec,
+                                                               EmberZclOtaBootloadFileSpec_t *nextFileSpec)
+{
+  return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE;
+}
+
+/**************************************************************************//**
+ * Get the status to send to an OTA client after a download has completed.
+ *
+ * @param source The source address of the OTA client that has completed a
+ *               download
+ * @param fileSpec The file specification of the OTA file that the client has
+ *                 downloaded
+ * @param status The status reported by the client upon completing the download
+ * @return The time at which the client should upgrade to the newly downloaded
+ *         image.
+ *
+ * @note This callback is called regardless of whether or not the client
+ *       completed the download successfully. If the status parameter is not
+ *       equal to ::EMBER_ZCL_STATUS_SUCCESS, then the server will not tell
+ *       the client to proceed with the upgrade.
+ *****************************************************************************/
+uint32_t emberZclOtaBootloadServerUpgradeEndRequestCallback(const EmberIpv6Address *source,
+                                                            const EmberZclOtaBootloadFileSpec_t *fileSpec,
+                                                            EmberZclStatus_t status)
+{
+  return 0;
+}
