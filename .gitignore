@@ -22,9 +22,6 @@ config.status
 configure
 src/include/BuildConfig.h
 src/include/BuildConfig.h.in
-libtool
-src/include/stamp-h1
-Makefile
 
 
 # Repos stuff
