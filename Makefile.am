@@ -1,5 +1,5 @@
 #
-#    <COPYRIGHT>
+#    Copyright (c) 2020 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ AM_MAKEFLAGS                             = --no-print-directory
 SUBDIRS                                  = \
     third_party                            \
     src                                    \
+    tests                                  \
     $(NULL)
 
 PRETTY_SUBDIRS                           = \
