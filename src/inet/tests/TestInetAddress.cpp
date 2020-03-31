@@ -33,7 +33,7 @@
 #include <lwip/ip_addr.h>
 
 #if LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
-#define htonl(x)    lwip_htonl(x)
+#define htonl(x) lwip_htonl(x)
 #endif
 
 #else
@@ -50,6 +50,7 @@ using namespace chip::Inet;
 
 // Preprocessor Defintions
 
+// clang-format off
 #define LLA_PREFIX             0xfe800000
 #define ULA_PREFIX             0xfd000000
 #define MCAST_PREFIX           0xff000000
@@ -59,6 +60,7 @@ using namespace chip::Inet;
 #define ULA_UP_24_BIT_MASK     0xffffff0000
 #define ULA_LO_16_BIT_MASK     0x000000ffff
 #define NUM_FIELDS_IN_ADDR     sizeof (IPAddress) / sizeof (uint32_t)
+// clang-format on
 
 // Type Defintions
 
@@ -66,6 +68,8 @@ using namespace chip::Inet;
 
 enum
 {
+    // clang-format off
+
     kTestIsIPv4             = true,
     kTestIsIPv6             = false,
 
@@ -86,56 +90,62 @@ enum
 
     kTestIsIPv6LLA          = true,
     kTestIsNotIPv6LLA       = false
+
+    // clang-format on
 };
 
-struct IPAddressContext {
-    uint32_t               mAddrQuartets[4];
-    const IPAddressType    mAddrType;
-    const char *           mAddrString;
+struct IPAddressContext
+{
+    uint32_t mAddrQuartets[4];
+    const IPAddressType mAddrType;
+    const char * mAddrString;
 };
 
 typedef const struct IPAddressContext * IPAddressContextIterator;
 
-struct IPAddressContextRange {
+struct IPAddressContextRange
+{
     IPAddressContextIterator mBegin;
     IPAddressContextIterator mEnd;
 };
 
 struct IPAddressExpandedContext
 {
-    IPAddressContext       mAddr;
-    bool                   isIPv4;
-    bool                   isIPv4Multicast;
-    bool                   isIPv4Broadcast;
-    bool                   isMulticast;
-    bool                   isIPv6Multicast;
-    bool                   isIPv6ULA;
-    bool                   isIPv6LLA;
+    IPAddressContext mAddr;
+    bool isIPv4;
+    bool isIPv4Multicast;
+    bool isIPv4Broadcast;
+    bool isMulticast;
+    bool isIPv6Multicast;
+    bool isIPv6ULA;
+    bool isIPv6LLA;
 
-    uint64_t               global;
-    uint16_t               subnet;
-    uint64_t               interface;
+    uint64_t global;
+    uint16_t subnet;
+    uint64_t interface;
 };
 
 typedef const struct IPAddressExpandedContext * IPAddressExpandedContextIterator;
 
-struct IPAddressExpandedContextRange {
+struct IPAddressExpandedContextRange
+{
     IPAddressExpandedContextIterator mBegin;
     IPAddressExpandedContextIterator mEnd;
 };
 
 struct TestContext
 {
-    const IPAddressContextRange          mIPv6WellKnownMulticastContextRange;
-    const IPAddressContextRange          mIPv6TransientMulticastContextRange;
-    const IPAddressContextRange          mIPv6PrefixMulticastContextRange;
-    const IPAddressExpandedContextRange  mIPAddressExpandedContextRange;
+    const IPAddressContextRange mIPv6WellKnownMulticastContextRange;
+    const IPAddressContextRange mIPv6TransientMulticastContextRange;
+    const IPAddressContextRange mIPv6PrefixMulticastContextRange;
+    const IPAddressExpandedContextRange mIPAddressExpandedContextRange;
 };
-
 
 // Global Variables
 
-static const IPv6MulticastScope sIPv6MulticastScopes[NUM_MCAST_SCOPES] = {
+// clang-format off
+static const IPv6MulticastScope sIPv6MulticastScopes[NUM_MCAST_SCOPES] =
+{
     kIPv6MulticastScope_Interface,
     kIPv6MulticastScope_Link,
 #if INET_CONFIG_ENABLE_IPV4
@@ -156,7 +166,8 @@ static const IPV6MulticastGroup sIPv6WellKnownMulticastGroups[NUM_MCAST_GROUPS] 
 
 // Test input data.
 
-static const struct IPAddressExpandedContext sIPAddressContext[] = {
+static const struct IPAddressExpandedContext sIPAddressContext[] =
+{
     {
          { { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, kIPAddressType_Any,
         "::" },
@@ -503,6 +514,7 @@ static const struct IPAddressExpandedContext sIPAddressContext[] = {
     }
 #endif // INET_CONFIG_ENABLE_IPV4
 };
+// clang-format on
 
 static const IPAddressContext sIPv6WellKnownMulticastContext[] = {
     // Well-known
@@ -596,11 +608,12 @@ static const IPAddressContext sIPv6PrefixMulticastContext[] = {
     { { 0xff3e0040, 0x66643dfb, 0xafa4385b, 0xafff5258 }, kIPAddressType_IPv6, "ff3e:40:6664:3dfb:afa4:385b:afff:5258" }
 };
 
-static const size_t kIPv6WellKnownMulticastTestElements = sizeof (sIPv6WellKnownMulticastContext) / sizeof (struct IPAddressContext);
-static const size_t kIPv6TransientMulticastTestElements = sizeof (sIPv6TransientMulticastContext) / sizeof (struct IPAddressContext);
-static const size_t kIPv6PrefixMulticastTestElements    = sizeof (sIPv6PrefixMulticastContext) / sizeof (struct IPAddressContext);
-static const size_t kIPAddressTestElements              = sizeof (sIPAddressContext) / sizeof (struct IPAddressExpandedContext);
+static const size_t kIPv6WellKnownMulticastTestElements = sizeof(sIPv6WellKnownMulticastContext) / sizeof(struct IPAddressContext);
+static const size_t kIPv6TransientMulticastTestElements = sizeof(sIPv6TransientMulticastContext) / sizeof(struct IPAddressContext);
+static const size_t kIPv6PrefixMulticastTestElements    = sizeof(sIPv6PrefixMulticastContext) / sizeof(struct IPAddressContext);
+static const size_t kIPAddressTestElements              = sizeof(sIPAddressContext) / sizeof(struct IPAddressExpandedContext);
 
+// clang-format off
 static const TestContext sTestContext = {
     {
         &sIPv6WellKnownMulticastContext[0],
@@ -619,14 +632,14 @@ static const TestContext sTestContext = {
         &sIPAddressContext[kIPAddressTestElements]
     }
 };
-
+// clang-format on
 
 // Utility functions.
 
 /**
  *   Load input test directly into IPAddress.
  */
-static void SetupIPAddress(IPAddress& addr, const struct IPAddressExpandedContext *inContext)
+static void SetupIPAddress(IPAddress & addr, const struct IPAddressExpandedContext * inContext)
 {
     for (size_t i = 0; i < NUM_FIELDS_IN_ADDR; i++)
     {
@@ -637,12 +650,13 @@ static void SetupIPAddress(IPAddress& addr, const struct IPAddressExpandedContex
 /**
  *   Zero out IP address.
  */
-static void ClearIPAddress(IPAddress& addr)
+static void ClearIPAddress(IPAddress & addr)
 {
     addr = IPAddress::Any;
 }
 
-static void CheckAddressQuartet(nlTestSuite *inSuite, const uint32_t &inFirstAddressQuartet, const uint32_t &inSecondAddressQuartet, const size_t &inWhich)
+static void CheckAddressQuartet(nlTestSuite * inSuite, const uint32_t & inFirstAddressQuartet,
+                                const uint32_t & inSecondAddressQuartet, const size_t & inWhich)
 {
     const bool lResult = (inFirstAddressQuartet == inSecondAddressQuartet);
 
@@ -650,16 +664,18 @@ static void CheckAddressQuartet(nlTestSuite *inSuite, const uint32_t &inFirstAdd
 
     if (lResult != true)
     {
-        fprintf(stdout, "Address quartet %zu mismatch: actual 0x%08x, expected: 0x%08x\n", inWhich, inFirstAddressQuartet, inSecondAddressQuartet);
+        fprintf(stdout, "Address quartet %zu mismatch: actual 0x%08x, expected: 0x%08x\n", inWhich, inFirstAddressQuartet,
+                inSecondAddressQuartet);
     }
 }
 
-static void CheckAddressQuartet(nlTestSuite *inSuite, const IPAddressContext &inContext, const IPAddress &inAddress, const size_t &inWhich)
+static void CheckAddressQuartet(nlTestSuite * inSuite, const IPAddressContext & inContext, const IPAddress & inAddress,
+                                const size_t & inWhich)
 {
     CheckAddressQuartet(inSuite, inAddress.Addr[inWhich], htonl(inContext.mAddrQuartets[inWhich]), inWhich);
 }
 
-static void CheckAddressQuartets(nlTestSuite *inSuite, const IPAddress &inFirstAddress, const IPAddress &inSecondAddress)
+static void CheckAddressQuartets(nlTestSuite * inSuite, const IPAddress & inFirstAddress, const IPAddress & inSecondAddress)
 {
     for (size_t i = 0; i < 4; i++)
     {
@@ -667,7 +683,7 @@ static void CheckAddressQuartets(nlTestSuite *inSuite, const IPAddress &inFirstA
     }
 }
 
-static void CheckAddressQuartets(nlTestSuite *inSuite, const IPAddressContext &inContext, const IPAddress &inAddress)
+static void CheckAddressQuartets(nlTestSuite * inSuite, const IPAddressContext & inContext, const IPAddress & inAddress)
 {
     for (size_t i = 0; i < 4; i++)
     {
@@ -675,7 +691,7 @@ static void CheckAddressQuartets(nlTestSuite *inSuite, const IPAddressContext &i
     }
 }
 
-static void CheckAddressString(nlTestSuite *inSuite, const char *inActual, const char *inExpected)
+static void CheckAddressString(nlTestSuite * inSuite, const char * inActual, const char * inExpected)
 {
     const int lResult = strcasecmp(inActual, inExpected);
 
@@ -683,16 +699,15 @@ static void CheckAddressString(nlTestSuite *inSuite, const char *inActual, const
 
     if (lResult != 0)
     {
-        fprintf(stdout, "Address format mismatch: actual %s, expected %s\n",
-                inActual, inExpected);
+        fprintf(stdout, "Address format mismatch: actual %s, expected %s\n", inActual, inExpected);
     }
 }
 
-static void CheckAddress(nlTestSuite *inSuite, const IPAddressContext &inContext, const IPAddress &inAddress)
+static void CheckAddress(nlTestSuite * inSuite, const IPAddressContext & inContext, const IPAddress & inAddress)
 {
-    char       lAddressBuffer[INET6_ADDRSTRLEN];
-    IPAddress  lParsedAddress;
-    int        lResult;
+    char lAddressBuffer[INET6_ADDRSTRLEN];
+    IPAddress lParsedAddress;
+    int lResult;
 
     // Compare the address quartets to their control values.
 
@@ -713,22 +728,20 @@ static void CheckAddress(nlTestSuite *inSuite, const IPAddressContext &inContext
 
     if (lResult != true)
     {
-        fprintf(stdout, "Address parse mismatch for %s\n",
-                inContext.mAddrString);
+        fprintf(stdout, "Address parse mismatch for %s\n", inContext.mAddrString);
     }
 }
 
 // Test functions invoked from the suite.
 
-
 /**
  *  Test IP address conversion from a string.
  */
-static void CheckFromString(nlTestSuite *inSuite, void *inContext)
+static void CheckFromString(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -755,13 +768,13 @@ static void CheckFromString(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IP address conversion to a string.
  */
-static void CheckToString(nlTestSuite *inSuite, void *inContext)
+static void CheckToString(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
-    char                              lAddressBuffer[INET6_ADDRSTRLEN];
-    IPAddress                         lAddress;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
+    char lAddressBuffer[INET6_ADDRSTRLEN];
+    IPAddress lAddress;
 
     while (lCurrent != lEnd)
     {
@@ -778,11 +791,11 @@ static void CheckToString(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test correct identification of IPv6 ULA addresses.
  */
-static void CheckIsIPv6ULA(nlTestSuite *inSuite, void *inContext)
+static void CheckIsIPv6ULA(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -799,11 +812,11 @@ static void CheckIsIPv6ULA(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test correct identification of IPv6 Link Local addresses.
  */
-static void CheckIsIPv6LLA(nlTestSuite *inSuite, void *inContext)
+static void CheckIsIPv6LLA(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -820,11 +833,11 @@ static void CheckIsIPv6LLA(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test correct identification of IPv6 multicast addresses.
  */
-static void CheckIsIPv6Multicast(nlTestSuite *inSuite, void *inContext)
+static void CheckIsIPv6Multicast(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -841,11 +854,11 @@ static void CheckIsIPv6Multicast(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test correct identification of multicast addresses.
  */
-static void CheckIsMulticast(nlTestSuite *inSuite, void *inContext)
+static void CheckIsMulticast(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -862,17 +875,17 @@ static void CheckIsMulticast(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IPAddress equal operator.
  */
-static void CheckOperatorEqual(nlTestSuite *inSuite, void *inContext)
+static void CheckOperatorEqual(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lFirstCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lFirstEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext            = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lFirstCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lFirstEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lFirstCurrent != lFirstEnd)
     {
-        IPAddressExpandedContextIterator  lSecondCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-        IPAddressExpandedContextIterator  lSecondEnd = lContext->mIPAddressExpandedContextRange.mEnd;
-        IPAddress                         test_addr_1;
+        IPAddressExpandedContextIterator lSecondCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+        IPAddressExpandedContextIterator lSecondEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
+        IPAddress test_addr_1;
 
         SetupIPAddress(test_addr_1, lFirstCurrent);
 
@@ -901,17 +914,17 @@ static void CheckOperatorEqual(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IPAddress not-equal operator.
  */
-static void CheckOperatorNotEqual(nlTestSuite *inSuite, void *inContext)
+static void CheckOperatorNotEqual(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lFirstCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lFirstEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext            = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lFirstCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lFirstEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lFirstCurrent != lFirstEnd)
     {
-        IPAddressExpandedContextIterator  lSecondCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-        IPAddressExpandedContextIterator  lSecondEnd = lContext->mIPAddressExpandedContextRange.mEnd;
-        IPAddress                         test_addr_1;
+        IPAddressExpandedContextIterator lSecondCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+        IPAddressExpandedContextIterator lSecondEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
+        IPAddress test_addr_1;
 
         SetupIPAddress(test_addr_1, lFirstCurrent);
 
@@ -940,16 +953,16 @@ static void CheckOperatorNotEqual(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IPAddress assign operator.
  */
-static void CheckOperatorAssign(nlTestSuite *inSuite, void *inContext)
+static void CheckOperatorAssign(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lFirstCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lFirstEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext            = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lFirstCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lFirstEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lFirstCurrent != lFirstEnd)
     {
-        IPAddressExpandedContextIterator  lSecondCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-        IPAddressExpandedContextIterator  lSecondEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+        IPAddressExpandedContextIterator lSecondCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+        IPAddressExpandedContextIterator lSecondEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
         while (lSecondCurrent != lSecondEnd)
         {
@@ -973,11 +986,11 @@ static void CheckOperatorAssign(nlTestSuite *inSuite, void *inContext)
 /**
  *   Test IPAddress v6 conversion to native representation.
  */
-static void CheckToIPv6(nlTestSuite *inSuite, void *inContext)
+static void CheckToIPv6(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -993,10 +1006,10 @@ static void CheckToIPv6(nlTestSuite *inSuite, void *inContext)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ip_addr_1, ip_addr_2;
-        ip_addr_1 = *(ip6_addr_t *)addr;
+        ip_addr_1 = *(ip6_addr_t *) addr;
 #else
         struct in6_addr ip_addr_1, ip_addr_2;
-        ip_addr_1 = *(struct in6_addr *)addr;
+        ip_addr_1 = *(struct in6_addr *) addr;
 #endif
         ip_addr_2 = test_addr.ToIPv6();
 
@@ -1009,11 +1022,11 @@ static void CheckToIPv6(nlTestSuite *inSuite, void *inContext)
 /**
  *   Test native IPv6 conversion into IPAddress.
  */
-static void CheckFromIPv6(nlTestSuite *inSuite, void *inContext)
+static void CheckFromIPv6(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1030,10 +1043,10 @@ static void CheckFromIPv6(nlTestSuite *inSuite, void *inContext)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ip_addr;
-        ip_addr = *(ip6_addr_t *)addr;
+        ip_addr = *(ip6_addr_t *) addr;
 #else
         struct in6_addr ip_addr;
-        ip_addr = *(struct in6_addr *)addr;
+        ip_addr = *(struct in6_addr *) addr;
 #endif
         test_addr_2 = IPAddress::FromIPv6(ip_addr);
 
@@ -1047,11 +1060,11 @@ static void CheckFromIPv6(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test correct identification of IPv4 addresses.
  */
-static void CheckIsIPv4(nlTestSuite *inSuite, void *inContext)
+static void CheckIsIPv4(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1068,11 +1081,11 @@ static void CheckIsIPv4(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test correct identification of IPv4 multicast addresses.
  */
-static void CheckIsIPv4Multicast(nlTestSuite *inSuite, void *inContext)
+static void CheckIsIPv4Multicast(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1089,11 +1102,11 @@ static void CheckIsIPv4Multicast(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test correct identification of IPv4 broadcast addresses.
  */
-static void CheckIsIPv4Broadcast(nlTestSuite *inSuite, void *inContext)
+static void CheckIsIPv4Broadcast(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1110,11 +1123,11 @@ static void CheckIsIPv4Broadcast(nlTestSuite *inSuite, void *inContext)
 /**
  *   Test IPAddress v4 conversion to native representation.
  */
-static void CheckToIPv4(nlTestSuite *inSuite, void *inContext)
+static void CheckToIPv4(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1142,11 +1155,11 @@ static void CheckToIPv4(nlTestSuite *inSuite, void *inContext)
 /**
  *   Test native IPv4 conversion into IPAddress.
  */
-static void CheckFromIPv4(nlTestSuite *inSuite, void *inContext)
+static void CheckFromIPv4(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1161,11 +1174,11 @@ static void CheckFromIPv4(nlTestSuite *inSuite, void *inContext)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip4_addr_t ip_addr;
-        ip_addr.addr = htonl(lCurrent->mAddr.mAddrQuartets[3]);
+        ip_addr.addr        = htonl(lCurrent->mAddr.mAddrQuartets[3]);
         test_addr_1.Addr[2] = lwip_htonl(0xffff);
 #else
         struct in_addr ip_addr;
-        ip_addr.s_addr = htonl(lCurrent->mAddr.mAddrQuartets[3]);
+        ip_addr.s_addr      = htonl(lCurrent->mAddr.mAddrQuartets[3]);
         test_addr_1.Addr[2] = htonl(0xffff);
 #endif
         test_addr_2 = IPAddress::FromIPv4(ip_addr);
@@ -1180,15 +1193,15 @@ static void CheckFromIPv4(nlTestSuite *inSuite, void *inContext)
 /**
  *   Test IPAddress address conversion from socket.
  */
-static void CheckFromSocket(nlTestSuite *inSuite, void *inContext)
+static void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    (void)inSuite;
+    (void) inSuite;
     // This test is only supported for non LWIP stack.
 #else // INET_LWIP
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1214,7 +1227,7 @@ static void CheckFromSocket(nlTestSuite *inSuite, void *inContext)
             memset(&sock_v4, 0, sizeof(struct sockaddr_in));
             sock_v4.sin_family = AF_INET;
             memcpy(&sock_v4.sin_addr.s_addr, &addr[3], sizeof(struct in_addr));
-            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &)sock_v4);
+            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &) sock_v4);
             break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -1222,14 +1235,14 @@ static void CheckFromSocket(nlTestSuite *inSuite, void *inContext)
             memset(&sock_v6, 0, sizeof(struct sockaddr_in6));
             sock_v6.sin6_family = AF_INET6;
             memcpy(&sock_v6.sin6_addr.s6_addr, addr, sizeof(struct in6_addr));
-            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &)sock_v6);
+            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &) sock_v6);
             break;
 
         case kIPAddressType_Any:
             memset(&sock_v6, 0, sizeof(struct sockaddr_in6));
             sock_v6.sin6_family = 0;
             memcpy(&sock_v6.sin6_addr.s6_addr, addr, sizeof(struct in6_addr));
-            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &)sock_v6);
+            test_addr_2 = IPAddress::FromSockAddr((struct sockaddr &) sock_v6);
             break;
 
         default:
@@ -1246,11 +1259,11 @@ static void CheckFromSocket(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IP address type.
  */
-static void CheckType(nlTestSuite *inSuite, void *inContext)
+static void CheckType(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1267,10 +1280,10 @@ static void CheckType(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test the Any address global.
  */
-static void CheckAnyAddress(nlTestSuite *inSuite, void *inContext)
+static void CheckAnyAddress(nlTestSuite * inSuite, void * inContext)
 {
     const IPAddress test_addr = IPAddress::Any;
-    IPAddressType test_type = test_addr.Type();
+    IPAddressType test_type   = test_addr.Type();
 
     NL_TEST_ASSERT(inSuite, test_type == kIPAddressType_Any);
 }
@@ -1278,11 +1291,11 @@ static void CheckAnyAddress(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IP address interface ID.
  */
-static void CheckInterface(nlTestSuite *inSuite, void *inContext)
+static void CheckInterface(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1299,11 +1312,11 @@ static void CheckInterface(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IP address subnet.
  */
-static void CheckSubnet(nlTestSuite *inSuite, void *inContext)
+static void CheckSubnet(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1320,11 +1333,11 @@ static void CheckSubnet(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IP address global ID.
  */
-static void CheckGlobal(nlTestSuite *inSuite, void *inContext)
+static void CheckGlobal(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1341,16 +1354,16 @@ static void CheckGlobal(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test address encoding with chip::Encoding.
  */
-static void CheckEncoding(nlTestSuite *inSuite, void *inContext)
+static void CheckEncoding(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
         IPAddress test_addr;
-        uint8_t *p;
+        uint8_t * p;
         uint8_t buffer[NUM_BYTES_IN_IPV6];
 
         SetupIPAddress(test_addr, lCurrent);
@@ -1388,17 +1401,17 @@ static void CheckEncoding(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test address decoding with chip::Decoding.
  */
-static void CheckDecoding(nlTestSuite *inSuite, void *inContext)
+static void CheckDecoding(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
         IPAddress test_addr_1, test_addr_2;
         uint8_t buffer[NUM_BYTES_IN_IPV6];
-        const uint8_t *p;
+        const uint8_t * p;
         uint8_t b;
 
         SetupIPAddress(test_addr_1, lCurrent);
@@ -1423,17 +1436,17 @@ static void CheckDecoding(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test address symmetricity of encoding and decoding with chip::(De/En)code.
  */
-static void CheckEcodeDecodeSymmetricity(nlTestSuite *inSuite, void *inContext)
+static void CheckEcodeDecodeSymmetricity(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
         IPAddress test_addr_1, test_addr_2;
         uint8_t buffer[NUM_BYTES_IN_IPV6];
-        uint8_t *p;
+        uint8_t * p;
 
         SetupIPAddress(test_addr_1, lCurrent);
         ClearIPAddress(test_addr_2);
@@ -1459,26 +1472,23 @@ static void CheckEcodeDecodeSymmetricity(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test assembling ULA address.
  */
-static void CheckMakeULA(nlTestSuite *inSuite, void *inContext)
+static void CheckMakeULA(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
         IPAddress test_addr;
 
         // Call MakeULA function that we test.
-        test_addr = IPAddress::MakeULA(lCurrent->global, lCurrent->subnet,
-            lCurrent->interface);
+        test_addr = IPAddress::MakeULA(lCurrent->global, lCurrent->subnet, lCurrent->interface);
 
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[0] ==
-                htonl(ULA_PREFIX | (lCurrent->global & ULA_UP_24_BIT_MASK) >> 16));
-        NL_TEST_ASSERT(inSuite,    test_addr.Addr[1] ==
-                htonl((lCurrent->global & ULA_LO_16_BIT_MASK) << 16 | lCurrent->subnet));
-        NL_TEST_ASSERT(inSuite,    test_addr.Addr[2] == htonl(lCurrent->interface >> 32));
-        NL_TEST_ASSERT(inSuite,    test_addr.Addr[3] == htonl(lCurrent->interface));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[0] == htonl(ULA_PREFIX | (lCurrent->global & ULA_UP_24_BIT_MASK) >> 16));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[1] == htonl((lCurrent->global & ULA_LO_16_BIT_MASK) << 16 | lCurrent->subnet));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(lCurrent->interface >> 32));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(lCurrent->interface));
 
         ++lCurrent;
     }
@@ -1487,11 +1497,11 @@ static void CheckMakeULA(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test assembling LLA address.
  */
-static void CheckMakeLLA(nlTestSuite *inSuite, void *inContext)
+static void CheckMakeLLA(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
 
     while (lCurrent != lEnd)
     {
@@ -1509,14 +1519,14 @@ static void CheckMakeLLA(nlTestSuite *inSuite, void *inContext)
     }
 }
 
-static void CheckMakeIPv6WellKnownMulticast(nlTestSuite *inSuite, void *inContext)
+static void CheckMakeIPv6WellKnownMulticast(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *  lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressContextIterator    lCurrent = lContext->mIPv6WellKnownMulticastContextRange.mBegin;
-    IPAddressContextIterator    lEnd = lContext->mIPv6WellKnownMulticastContextRange.mEnd;
-    size_t                      lGroupIndex;
-    size_t                      lScopeIndex;
-    IPAddress                   lAddress;
+    const struct TestContext * lContext = static_cast<const struct TestContext *>(inContext);
+    IPAddressContextIterator lCurrent   = lContext->mIPv6WellKnownMulticastContextRange.mBegin;
+    IPAddressContextIterator lEnd       = lContext->mIPv6WellKnownMulticastContextRange.mEnd;
+    size_t lGroupIndex;
+    size_t lScopeIndex;
+    IPAddress lAddress;
 
     if (lCurrent != lEnd)
     {
@@ -1524,9 +1534,8 @@ static void CheckMakeIPv6WellKnownMulticast(nlTestSuite *inSuite, void *inContex
         {
             for (lScopeIndex = 0; lScopeIndex < NUM_MCAST_SCOPES && (lCurrent != lEnd); lScopeIndex++)
             {
-                const IPv6MulticastScope  lScope = sIPv6MulticastScopes[lScopeIndex];
-                const IPV6MulticastGroup  lGroup = sIPv6WellKnownMulticastGroups[lGroupIndex];
-
+                const IPv6MulticastScope lScope = sIPv6MulticastScopes[lScopeIndex];
+                const IPV6MulticastGroup lGroup = sIPv6WellKnownMulticastGroups[lGroupIndex];
 
                 lAddress = IPAddress::MakeIPv6WellKnownMulticast(lScope, lGroup);
 
@@ -1538,14 +1547,14 @@ static void CheckMakeIPv6WellKnownMulticast(nlTestSuite *inSuite, void *inContex
     }
 }
 
-static void CheckMakeIPv6TransientMulticast(nlTestSuite *inSuite, void *inContext)
+static void CheckMakeIPv6TransientMulticast(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *  lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressContextIterator    lCurrent = lContext->mIPv6TransientMulticastContextRange.mBegin;
-    IPAddressContextIterator    lEnd = lContext->mIPv6TransientMulticastContextRange.mEnd;
-    const uint8_t               lFlags = 0;
-    size_t                      lScopeIndex;
-    IPAddress                   lAddress;
+    const struct TestContext * lContext = static_cast<const struct TestContext *>(inContext);
+    IPAddressContextIterator lCurrent   = lContext->mIPv6TransientMulticastContextRange.mBegin;
+    IPAddressContextIterator lEnd       = lContext->mIPv6TransientMulticastContextRange.mEnd;
+    const uint8_t lFlags                = 0;
+    size_t lScopeIndex;
+    IPAddress lAddress;
 
     if (lCurrent != lEnd)
     {
@@ -1553,10 +1562,9 @@ static void CheckMakeIPv6TransientMulticast(nlTestSuite *inSuite, void *inContex
 
         for (lScopeIndex = 0; lScopeIndex < NUM_MCAST_SCOPES && (lCurrent != lEnd); lScopeIndex++)
         {
-            const IPv6MulticastScope  lScope = sIPv6MulticastScopes[lScopeIndex];
-            const uint8_t             lGroup[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES] =
-                { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
+            const IPv6MulticastScope lScope                             = sIPv6MulticastScopes[lScopeIndex];
+            const uint8_t lGroup[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                                            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
 
             lAddress = IPAddress::MakeIPv6TransientMulticast(lFlags, lScope, lGroup);
 
@@ -1569,10 +1577,9 @@ static void CheckMakeIPv6TransientMulticast(nlTestSuite *inSuite, void *inContex
 
         for (lScopeIndex = 0; lScopeIndex < NUM_MCAST_SCOPES && (lCurrent != lEnd); lScopeIndex++)
         {
-            const IPv6MulticastScope  lScope = sIPv6MulticastScopes[lScopeIndex];
-            const uint8_t             lGroup[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES] =
-                { 0xd5, 0xd6, 0x2b, 0xa2, 0x78, 0x47, 0x64,
-                  0x52, 0x58, 0x7a, 0xc9, 0x55, 0x0b, 0x5a };
+            const IPv6MulticastScope lScope                             = sIPv6MulticastScopes[lScopeIndex];
+            const uint8_t lGroup[NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES] = { 0xd5, 0xd6, 0x2b, 0xa2, 0x78, 0x47, 0x64,
+                                                                            0x52, 0x58, 0x7a, 0xc9, 0x55, 0x0b, 0x5a };
 
             lAddress = IPAddress::MakeIPv6TransientMulticast(lFlags, lScope, lGroup);
 
@@ -1583,16 +1590,16 @@ static void CheckMakeIPv6TransientMulticast(nlTestSuite *inSuite, void *inContex
     }
 }
 
-static void CheckMakeIPv6PrefixMulticast(nlTestSuite *inSuite, void *inContext)
+static void CheckMakeIPv6PrefixMulticast(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *  lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressContextIterator    lCurrent = lContext->mIPv6PrefixMulticastContextRange.mBegin;
-    IPAddressContextIterator    lEnd = lContext->mIPv6PrefixMulticastContextRange.mEnd;
-    uint8_t                     lPrefixLength;
-    uint64_t                    lPrefix;
-    uint32_t                    lGroup;
-    size_t                      lScopeIndex;
-    IPAddress                   lAddress;
+    const struct TestContext * lContext = static_cast<const struct TestContext *>(inContext);
+    IPAddressContextIterator lCurrent   = lContext->mIPv6PrefixMulticastContextRange.mBegin;
+    IPAddressContextIterator lEnd       = lContext->mIPv6PrefixMulticastContextRange.mEnd;
+    uint8_t lPrefixLength;
+    uint64_t lPrefix;
+    uint32_t lGroup;
+    size_t lScopeIndex;
+    IPAddress lAddress;
 
     if (lCurrent != lEnd)
     {
@@ -1604,7 +1611,7 @@ static void CheckMakeIPv6PrefixMulticast(nlTestSuite *inSuite, void *inContext)
 
         for (lScopeIndex = 0; lScopeIndex < NUM_MCAST_SCOPES && (lCurrent != lEnd); lScopeIndex++)
         {
-            const IPv6MulticastScope  lScope = sIPv6MulticastScopes[lScopeIndex];
+            const IPv6MulticastScope lScope = sIPv6MulticastScopes[lScopeIndex];
 
             lAddress = IPAddress::MakeIPv6PrefixMulticast(lScope, lPrefixLength, lPrefix, lGroup);
 
@@ -1621,7 +1628,7 @@ static void CheckMakeIPv6PrefixMulticast(nlTestSuite *inSuite, void *inContext)
 
         for (lScopeIndex = 0; lScopeIndex < NUM_MCAST_SCOPES && (lCurrent != lEnd); lScopeIndex++)
         {
-            const IPv6MulticastScope  lScope = sIPv6MulticastScopes[lScopeIndex];
+            const IPv6MulticastScope lScope = sIPv6MulticastScopes[lScopeIndex];
 
             lAddress = IPAddress::MakeIPv6PrefixMulticast(lScope, lPrefixLength, lPrefix, lGroup);
 
@@ -1638,7 +1645,7 @@ static void CheckMakeIPv6PrefixMulticast(nlTestSuite *inSuite, void *inContext)
 
         for (lScopeIndex = 0; lScopeIndex < NUM_MCAST_SCOPES && (lCurrent != lEnd); lScopeIndex++)
         {
-            const IPv6MulticastScope  lScope = sIPv6MulticastScopes[lScopeIndex];
+            const IPv6MulticastScope lScope = sIPv6MulticastScopes[lScopeIndex];
 
             lAddress = IPAddress::MakeIPv6PrefixMulticast(lScope, lPrefixLength, lPrefix, lGroup);
 
@@ -1655,7 +1662,7 @@ static void CheckMakeIPv6PrefixMulticast(nlTestSuite *inSuite, void *inContext)
 
         for (lScopeIndex = 0; lScopeIndex < NUM_MCAST_SCOPES && (lCurrent != lEnd); lScopeIndex++)
         {
-            const IPv6MulticastScope  lScope = sIPv6MulticastScopes[lScopeIndex];
+            const IPv6MulticastScope lScope = sIPv6MulticastScopes[lScopeIndex];
 
             lAddress = IPAddress::MakeIPv6PrefixMulticast(lScope, lPrefixLength, lPrefix, lGroup);
 
@@ -1669,12 +1676,12 @@ static void CheckMakeIPv6PrefixMulticast(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test IPPrefix.
  */
-static void CheckIPPrefix(nlTestSuite *inSuite, void *inContext)
+static void CheckIPPrefix(nlTestSuite * inSuite, void * inContext)
 {
-    const struct TestContext *        lContext = static_cast<const struct TestContext *>(inContext);
-    IPAddressExpandedContextIterator  lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
-    IPAddressExpandedContextIterator  lEnd = lContext->mIPAddressExpandedContextRange.mEnd;
-    size_t                            i = 0;
+    const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
+    IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
+    IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
+    size_t i                                  = 0;
 
     while (lCurrent != lEnd)
     {
@@ -1685,7 +1692,7 @@ static void CheckIPPrefix(nlTestSuite *inSuite, void *inContext)
 
         ipprefix_1.IPAddr = test_addr_1;
         ipprefix_1.Length = 128 - (i++ % 128);
-        ipprefix_2 = ipprefix_1;
+        ipprefix_2        = ipprefix_1;
 
         NL_TEST_ASSERT(inSuite, !ipprefix_1.IsZero());
         NL_TEST_ASSERT(inSuite, !ipprefix_2.IsZero());
@@ -1701,7 +1708,10 @@ static void CheckIPPrefix(nlTestSuite *inSuite, void *inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
+
+// clang-format off
+static const nlTest sTests[] =
+{
     NL_TEST_DEF("Address Type",                                CheckType),
     NL_TEST_DEF("Any Address Global",                          CheckAnyAddress),
     NL_TEST_DEF("Address Encoding (Writing)",                  CheckEncoding),
@@ -1737,11 +1747,12 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("IPPrefix test",                               CheckIPPrefix),
     NL_TEST_SENTINEL()
 };
+// clang-format on
 
 /**
  *  Set up the test suite.
  */
-static int TestSetup(void *inContext)
+static int TestSetup(void * inContext)
 {
     return (SUCCESS);
 }
@@ -1749,19 +1760,21 @@ static int TestSetup(void *inContext)
 /**
  *  Tear down the test suite.
  */
-static int TestTeardown(void *inContext)
+static int TestTeardown(void * inContext)
 {
     return (SUCCESS);
 }
 
 int main(void)
 {
+    // clang-format off
     nlTestSuite theSuite = {
         "inet-address",
         &sTests[0],
         TestSetup,
         TestTeardown
     };
+    // clang-format on
 
     // Generate machine-readable, comma-separated value (CSV) output.
     nl_test_set_output_style(OUTPUT_CSV);
