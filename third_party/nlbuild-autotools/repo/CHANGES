@@ -1,3 +1,9 @@
+1.6.21 (2020-03-30)
+
+        * Allow examples/bootstrap may be run from anywhere.
+
+        * Added AUTHORS.md.
+
 1.6.20 (2020-03-26)
 
         * Ensure that several scripts that use bashisms specify bash
