@@ -22,6 +22,7 @@
  */
 
 #include "SetupPayload.h"
+#include <math.h>
 
 namespace chip {
 
@@ -31,15 +32,18 @@ namespace chip {
 // `requiresCustomFlow` is not checked since it is a bool
 bool SetupPayload::isValid()
 {
-    if (version >= 1 << kVersionFieldLengthInBits)
+    if (!isManualPayloadSetup && version >= 1 << kVersionFieldLengthInBits)
     {
         return false;
     }
-    if (rendezvousInformation >= 1 << kRendezvousInfoFieldLengthInBits)
+    if (!isManualPayloadSetup && rendezvousInformation >= 1 << kRendezvousInfoFieldLengthInBits)
     {
         return false;
     }
-    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
+    if (isManualPayloadSetup && discriminator >= 1 << kManualSetupDiscriminatorFieldLengthInBits)
+    {
+        return false;
+    } else if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
     {
         return false;
     }
@@ -61,6 +65,28 @@ bool SetupPayload::operator==(const SetupPayload & input)
     return this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
         this->requiresCustomFlow == input.requiresCustomFlow && this->rendezvousInformation == input.rendezvousInformation &&
         this->discriminator == input.discriminator && this->setUpPINCode == input.setUpPINCode;
+}
+
+
+size_t SetupPayload::manualSetupShortCodeCharLength()
+{
+    size_t numBits = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
+    return ceil(log10(pow(2, numBits)));
+}
+
+size_t SetupPayload::manualSetupLongCodeCharLength()
+{
+    return manualSetupShortCodeCharLength() + manualSetupVendorIdCharLength() + manualSetupProductIdCharLength();
+}
+
+size_t SetupPayload::manualSetupVendorIdCharLength()
+{
+    return ceil(log10(pow(2, kVendorIDFieldLengthInBits)));
+}
+
+size_t SetupPayload::manualSetupProductIdCharLength()
+{
+    return ceil(log10(pow(2, kProductIDFieldLengthInBits)));
 }
 
 } // namespace chip

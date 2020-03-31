@@ -37,6 +37,7 @@ const int kProductIDFieldLengthInBits            = 16;
 const int kCustomFlowRequiredFieldLengthInBits   = 1;
 const int kRendezvousInfoFieldLengthInBits       = 8;
 const int kPayloadDiscriminatorFieldLengthInBits = 8;
+const int kManualSetupDiscriminatorFieldLengthInBits    = 4;
 const int kSetupPINCodeFieldLengthInBits         = 27;
 const int kReservedFieldLengthInBits             = 1;
 
@@ -56,6 +57,7 @@ public:
     uint16_t rendezvousInformation;
     uint16_t discriminator;
     uint32_t setUpPINCode;
+    bool isManualPayloadSetup = false;
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :
@@ -63,6 +65,11 @@ public:
 
     bool isValid();
     bool operator==(const SetupPayload & input);
+
+    static size_t manualSetupShortCodeCharLength();
+    static size_t manualSetupLongCodeCharLength();
+    static size_t manualSetupVendorIdCharLength();
+    static size_t manualSetupProductIdCharLength();
 };
 
 }; // namespace chip
