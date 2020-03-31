@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Main",
+            "type": "shell",
+            "command": "make -f Makefile-Standalone",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Bootstrap",
+            "type": "shell",
+            "command": "git clean -fdx && ./bootstrap-configure",
+            "group": "none"
+        }
+    ]
+}

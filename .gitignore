@@ -1,6 +1,7 @@
 
 # VS Code Configs
-*.vscode
+.vscode/*
+!.vscode/tasks.json
 
 # Build System
 .deps
@@ -28,3 +29,9 @@ third_party/nlassert/
 third_party/nlfaultinjection/
 third_party/nlio/
 third_party/nlunit-test/
+
+# Build
+output/*
+libtool
+src/include/stamp-h1
+Makefile
