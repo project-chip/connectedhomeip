@@ -38,12 +38,14 @@ libQrCode_a_SOURCES                                       = \
     QRCodeSetupPayloadGenerator.cpp                         \
     SetupPayload.cpp                                        \
     Base45.cpp                                              \
+    QRCodeSetupPayloadParser.cpp                            \       
    $(NULL)
 
 dist_libQrCode_a_HEADERS                                 = \
     QRCodeSetupPayloadGenerator.h                          \
     SetupPayload.h                                         \
     Base45.h                                               \
+    QRCodeSetupPayloadParser.h                             \        
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
