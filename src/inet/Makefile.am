@@ -1,5 +1,5 @@
 #
-#    <COPYRIGHT>
+#    Copyright (c) 2020 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@
 #
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
+
+SUBDIRS                             = \
+    tests                             \
+    $(NULL)
 
 include InetLayer.am
 
@@ -48,5 +52,6 @@ libInetLayer_adir                   = $(includedir)/inet
 
 dist_libInetLayer_a_HEADERS         = $(CHIP_BUILD_INET_LAYER_HEADER_FILES)
 
+$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

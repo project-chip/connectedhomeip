@@ -36,7 +36,7 @@
 #define INETCONFIG_H
 
 /*--- Include configuration headers ---*/
-#include <SystemConfig.h>
+#include <system/SystemConfig.h>
 
 /*
  * If the CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION option is not applicable, then the "InetProjectConfig.h"
