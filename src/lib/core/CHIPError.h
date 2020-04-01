@@ -1741,6 +1741,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 
 namespace chip {
 
+extern void RegisterCHIPLayerErrorFormatter(void);
 extern bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err);
 
 } // namespace chip
