@@ -30,26 +30,26 @@
 
 namespace chip {
 
-template<typename FlagsT, typename FlagT>
-inline bool GetFlag(const FlagsT& inFlags, const FlagT inFlag)
+template <typename FlagsT, typename FlagT>
+inline bool GetFlag(const FlagsT & inFlags, const FlagT inFlag)
 {
     return (inFlags & static_cast<FlagsT>(inFlag)) != 0;
 }
 
-template<typename FlagsT, typename FlagT>
-inline void ClearFlag(FlagsT& inFlags, const FlagT inFlag)
+template <typename FlagsT, typename FlagT>
+inline void ClearFlag(FlagsT & inFlags, const FlagT inFlag)
 {
-    inFlags &= ~ static_cast<FlagsT>(inFlag);
+    inFlags &= ~static_cast<FlagsT>(inFlag);
 }
 
-template<typename FlagsT, typename FlagT>
-inline void SetFlag(FlagsT& inFlags, const FlagT inFlag)
+template <typename FlagsT, typename FlagT>
+inline void SetFlag(FlagsT & inFlags, const FlagT inFlag)
 {
     inFlags |= static_cast<FlagsT>(inFlag);
 }
 
-template<typename FlagsT, typename FlagT>
-inline void SetFlag(FlagsT& inFlags, const FlagT inFlag, const bool inValue)
+template <typename FlagsT, typename FlagT>
+inline void SetFlag(FlagsT & inFlags, const FlagT inFlag, const bool inValue)
 {
     if (inValue)
     {

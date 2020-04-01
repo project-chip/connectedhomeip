@@ -76,7 +76,7 @@ namespace Logging {
  */
 enum LogModule
 {
-    kLogModule_NotSpecified         = 0,
+    kLogModule_NotSpecified = 0,
 
     kLogModule_Inet,
     kLogModule_Ble,
@@ -124,7 +124,7 @@ enum LogCategory
      *   that no messages should be logged.
      *
      */
-    kLogCategory_None           = 0,
+    kLogCategory_None = 0,
 
     /*!<
      *   Indicates a category of log message that describes an unexpected
@@ -142,7 +142,7 @@ enum LogCategory
      *   messages.
      *
      */
-    kLogCategory_Error          = 1,
+    kLogCategory_Error = 1,
 
     /*!<
      *   Indicates a category of log message that describes an event
@@ -160,7 +160,7 @@ enum LogCategory
      *   requested resource types, error numbers, etc.).
      *
      */
-    kLogCategory_Progress       = 2,
+    kLogCategory_Progress = 2,
 
     /*!<
      *   Indicates a category of log message that describes detailed
@@ -171,19 +171,19 @@ enum LogCategory
      *   kLogCategory_Progress categories.
      *
      */
-    kLogCategory_Detail         = 3,
+    kLogCategory_Detail = 3,
 
     /*!<
      *   Indicates a category of log message that describes information
      *   needed by IE and QA teams for automated testing.
      *
      */
-    kLogCategory_Retain         = 4,
+    kLogCategory_Retain = 4,
 
-    kLogCategory_Max            = kLogCategory_Retain
+    kLogCategory_Max = kLogCategory_Retain
 };
 
-extern void Log(uint8_t module, uint8_t category, const char *msg, ...);
+extern void Log(uint8_t module, uint8_t category, const char * msg, ...);
 extern uint8_t GetLogFilter(void);
 extern void SetLogFilter(uint8_t category);
 
@@ -205,7 +205,8 @@ extern void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogError
-#define ChipLogError(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Error, MSG, ## __VA_ARGS__)
+#define ChipLogError(MOD, MSG, ...)                                                                                                \
+    chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Error, MSG, ##__VA_ARGS__)
 #endif
 #else
 #define ChipLogError(MOD, MSG, ...)
@@ -225,12 +226,12 @@ extern void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogProgress
-#define ChipLogProgress(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Progress, MSG, ## __VA_ARGS__)
+#define ChipLogProgress(MOD, MSG, ...)                                                                                             \
+    chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Progress, MSG, ##__VA_ARGS__)
 #endif
 #else
 #define ChipLogProgress(MOD, MSG, ...)
 #endif
-
 
 #ifndef CHIP_DETAIL_LOGGING
 #define CHIP_DETAIL_LOGGING 1
@@ -246,7 +247,8 @@ extern void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogDetail
-#define ChipLogDetail(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Detail, MSG, ## __VA_ARGS__)
+#define ChipLogDetail(MOD, MSG, ...)                                                                                               \
+    chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Detail, MSG, ##__VA_ARGS__)
 #endif
 #else
 #define ChipLogDetail(MOD, MSG, ...)
@@ -254,7 +256,7 @@ extern void SetLogFilter(uint8_t category);
 
 #ifndef CHIP_RETAIN_LOGGING
 #define CHIP_RETAIN_LOGGING CHIP_PROGRESS_LOGGING
-#define ChipLogRetain(MOD, MSG, ...) ChipLogProgress(MOD, MSG, ## __VA_ARGS__)
+#define ChipLogRetain(MOD, MSG, ...) ChipLogProgress(MOD, MSG, ##__VA_ARGS__)
 #endif
 
 #if CHIP_RETAIN_LOGGING
@@ -268,7 +270,8 @@ extern void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogRetain
-#define ChipLogRetain(MOD, MSG, ...) chip::Logging::Log( chip::Logging::kLogModule_##MOD , chip::Logging::kLogCategory_Retain, MSG, ## __VA_ARGS__)
+#define ChipLogRetain(MOD, MSG, ...)                                                                                               \
+    chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Retain, MSG, ##__VA_ARGS__)
 #endif
 
 #else // #if CHIP_RETAIN_LOGGING
@@ -279,7 +282,6 @@ extern void SetLogFilter(uint8_t category);
 #endif
 #define ChipLogRetain(MOD, MSG, ...)
 #endif // #if CHIP_RETAIN_LOGGING
-
 
 #if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_RETAIN_LOGGING
 #define _CHIP_USE_LOGGING 1
@@ -293,23 +295,21 @@ extern void SetLogFilter(uint8_t category);
 #define ChipLoggingModuleNameLen 3
 #define ChipLoggingMessageSeparatorLen 2
 #define ChipLoggingMessageTrailerLen 2
-#define ChipLoggingTotalMessagePadding (ChipLoggingchipPrefixLen + \
-                                           ChipLoggingModuleNameLen + \
-                                           ChipLoggingMessageSeparatorLen + \
-                                           ChipLoggingMessageTrailerLen)
+#define ChipLoggingTotalMessagePadding                                                                                             \
+    (ChipLoggingchipPrefixLen + ChipLoggingModuleNameLen + ChipLoggingMessageSeparatorLen + ChipLoggingMessageTrailerLen)
 
-extern void GetMessageWithPrefix(char *buf, uint8_t bufSize, uint8_t module, const char *msg);
-extern void GetModuleName(char *buf, uint8_t module);
+extern void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
+extern void GetModuleName(char * buf, uint8_t module);
 void PrintMessagePrefix(uint8_t module);
 
 #else
 
-static inline void GetMessageWithPrefix(char *buf, uint8_t bufSize, uint8_t module, const char *msg)
+static inline void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg)
 {
     return;
 }
 
-static inline void GetModuleName(char *buf, uint8_t module)
+static inline void GetModuleName(char * buf, uint8_t module)
 {
     return;
 }
@@ -327,8 +327,6 @@ extern uint8_t gLogFilter;
 #define IsCategoryEnabled(CAT) (true)
 
 #endif // CHIP_LOG_FILTERING
-
-
 
 /**
  *  @def ChipLogIfFalse(aCondition)
@@ -373,23 +371,20 @@ extern uint8_t gLogFilter;
 
 #if CHIP_CONFIG_ENABLE_CONDITION_LOGGING && !defined(ChipLogIfFalse)
 
-#define ChipLogIfFalse(aCondition)                                                     \
-do                                                                                      \
-{                                                                                       \
-    if (!(aCondition))                                                                  \
-    {                                                                                   \
-        ChipLogError(NotSpecified, "Condition Failed (%s) at %s:%d",                   \
-            #aCondition, __FILE__, __LINE__);                                           \
-    }                                                                                   \
-} while (0)
+#define ChipLogIfFalse(aCondition)                                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(aCondition))                                                                                                         \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "Condition Failed (%s) at %s:%d", #aCondition, __FILE__, __LINE__);                         \
+        }                                                                                                                          \
+    } while (0)
 
 #else // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
-#define ChipLogIfFalse(aCondition) \
-    IgnoreUnusedVariable(aCondition)
+#define ChipLogIfFalse(aCondition) IgnoreUnusedVariable(aCondition)
 
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
-
 
 /**
  *  @def ChipLogFunctError(aErr)
@@ -433,23 +428,20 @@ do                                                                              
 
 #if CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING && !defined(ChipLogFunctError)
 
-#define ChipLogFunctError(aErr)                                                           \
-do                                                                                         \
-{                                                                                          \
-    if ((aErr) != CHIP_NO_ERROR)                                                          \
-    {                                                                                      \
-        ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(aErr), __FILE__, __LINE__);\
-    }                                                                                      \
-} while (0)
+#define ChipLogFunctError(aErr)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if ((aErr) != CHIP_NO_ERROR)                                                                                               \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(aErr), __FILE__, __LINE__);                                         \
+        }                                                                                                                          \
+    } while (0)
 
 #else // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 
-#define ChipLogFunctError(aErr) \
-    IgnoreUnusedVariable(aErr)
+#define ChipLogFunctError(aErr) IgnoreUnusedVariable(aErr)
 
 #endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
-
 
 } // namespace Logging
 } // namespace chip

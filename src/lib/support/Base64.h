@@ -38,9 +38,9 @@ typedef uint8_t (*Base64CharToValFunct)(uint8_t c);
 // Output buffer must be at least (inLen + 2) / 3 * 4 bytes long.
 // Input and output buffers CANNOT overlap.
 //
-extern uint16_t Base64Encode(const uint8_t *in, uint16_t inLen, char *out);
-extern uint16_t Base64URLEncode(const uint8_t *in, uint16_t inLen, char *out);
-extern uint16_t Base64Encode(const uint8_t *in, uint16_t inLen, char *out, Base64ValToCharFunct valToCharFunct);
+extern uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out);
+extern uint16_t Base64URLEncode(const uint8_t * in, uint16_t inLen, char * out);
+extern uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out, Base64ValToCharFunct valToCharFunct);
 
 // Decode a base64 string to bytes.
 //
@@ -50,18 +50,18 @@ extern uint16_t Base64Encode(const uint8_t *in, uint16_t inLen, char *out, Base6
 //   may be shorter than this due to padding.
 // Supports decode in place by setting out pointer equal to in.
 //
-extern uint16_t Base64Decode(const char *in, uint16_t inLen, uint8_t *out);
-extern uint16_t Base64URLDecode(const char *in, uint16_t inLen, uint8_t *out);
-extern uint16_t Base64Decode(const char *in, uint16_t inLen, uint8_t *out, Base64CharToValFunct charToValFunct);
+extern uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out);
+extern uint16_t Base64URLDecode(const char * in, uint16_t inLen, uint8_t * out);
+extern uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out, Base64CharToValFunct charToValFunct);
 
 // Encode/decode functions that take/return 32-bit lengths.
 //
 // Similar to the above functions, except Base64Decode32() returns UINT32_MAX if the input cannot be decoded.
 //
-extern uint32_t Base64Encode32(const uint8_t *in, uint32_t inLen, char *out);
-extern uint32_t Base64Encode32(const uint8_t *in, uint32_t inLen, char *out, Base64ValToCharFunct valToCharFunct);
-extern uint32_t Base64Decode32(const char *in, uint32_t inLen, uint8_t *out);
-extern uint32_t Base64Decode32(const char *in, uint32_t inLen, uint8_t *out, Base64CharToValFunct charToValFunct);
+extern uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out);
+extern uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out, Base64ValToCharFunct valToCharFunct);
+extern uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out);
+extern uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, Base64CharToValFunct charToValFunct);
 
 /** Computes the base-64 encoded length for a given input length.
  *
@@ -75,8 +75,7 @@ extern uint32_t Base64Decode32(const char *in, uint32_t inLen, uint8_t *out, Bas
  *
  * NOTE: The actual decoded length may be smaller than this due to padding.
  */
-#define BASE64_MAX_DECODED_LEN(LEN) ((LEN) * 3 / 4)
-
+#define BASE64_MAX_DECODED_LEN(LEN) ((LEN) *3 / 4)
 
 } // namespace chip
 
