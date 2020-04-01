@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         
+        
         {
             "name": "QRCode Tests",
             "type": "cppdbg",
@@ -17,6 +18,27 @@
             "externalConsole": false,
             "MIMode": "gdb",
             "preLaunchTask": "QRCode Tests",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+
+        {
+            "name": "CHIP crypto Tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/x86_64-unknown-linux-gnu/src/crypto/tests/TestCrypto",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "CHIP crypto Tests",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

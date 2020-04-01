@@ -148,6 +148,12 @@ make[1]: Entering directory 'src/system'
 ar: `u' modifier ignored since `D' is the default (see `U')
 make[1]: Leaving directory 'src/system'
 ```
+- [x] **Add new source folder**
+Add the folder to `src/`
+Update `src/Makefile.am` to add the folder
+Update `AC_CONFIG_FILES` in `configure.ac`
+
+And then build as needed.
 
 - [x] **Clean out entire source tree**
 

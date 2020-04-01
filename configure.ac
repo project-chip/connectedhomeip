@@ -1866,6 +1866,8 @@ third_party/Makefile
 third_party/lwip/Makefile
 src/Makefile
 src/ble/Makefile
+src/crypto/Makefile
+src/crypto/tests/Makefile
 src/lwip/Makefile
 src/lwip/tests/Makefile
 src/system/Makefile
