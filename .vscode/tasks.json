@@ -45,6 +45,12 @@
             "type": "shell",
             "command": "git clean -xdf",
             "group": "none"
+        },
+        {
+            "label": "QRCode Tests",
+            "type": "shell",
+            "command": "make -C build/x86_64-unknown-linux-gnu/src/setup_payload/ check",
+            "group": "none"
         }
     ]
 }
