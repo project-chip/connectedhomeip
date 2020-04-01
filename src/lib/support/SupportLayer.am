@@ -26,6 +26,7 @@ CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                     = \
     support/Base64.cpp                                      \
     support/CHIPFaultInjection.cpp                          \
     support/logging/CHIPLogging.cpp                         \
+    support/ErrorStr.cpp                                    \
     support/FibonacciUtils.cpp                              \
     support/RandUtils.cpp                                   \
     $(NULL)
