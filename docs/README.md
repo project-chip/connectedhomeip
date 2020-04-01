@@ -14,3 +14,9 @@
 * Documentation about style is documented in [the style guide](./STYLE_GUIDE.md)
 * Additional documentation about more specific files are in the [style folder](./style/)
 
+## Third Party Tools
+
+Some tools and utilities are dependent on third party tools, such as Docker.
+
+[Docker](https://www.docker.com) is an excellent way to have stable build environments that don't pollute the host OS. It is also much easier to maintain stability across multiple host environments. Install stable version of [Docker Desktop](https://www.docker.com/products/docker-desktop) relevant to your native OS (MacOS or Windows). Once installed, you can run docker commands from the shell/terminal.
+

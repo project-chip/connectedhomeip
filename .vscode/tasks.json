@@ -11,31 +11,43 @@
             }
         },
         {
-            "label": "Pretty",
+            "label": "Auto-enforce coding style",
+            "type": "shell",
+            "command": "make -f Makefile-Standalone pretty-check",
+            "group": "none"
+        },
+        {
+            "label": "Verify coding style conformance",
             "type": "shell",
             "command": "make -f Makefile-Standalone pretty",
             "group": "none"
         },
         {
-            "label": "Test & Check",
+            "label": "Run Unit and Functional Tests",
             "type": "shell",
             "command": "make -f Makefile-Standalone check",
             "group": "none"
         },
         {
-            "label": "Dist Check",
+            "label": "Run Distribution Generation",
             "type": "shell",
             "command": "make -f Makefile-Standalone distcheck",
             "group": "none"
         },
         {
-            "label": "Clean",
+            "label": "Run Code Coverage",
+            "type": "shell",
+            "command": "make -f Makefile-Standalone coverage",
+            "group": "none"
+        },
+        {
+            "label": "Clean build",
             "type": "shell",
             "command": "make -f Makefile-Standalone clean",
             "group": "none"
         },
         {
-            "label": "Bootstrap",
+            "label": "Bootstrap the source tree",
             "type": "shell",
             "command": "./bootstrap",
             "group": "none"

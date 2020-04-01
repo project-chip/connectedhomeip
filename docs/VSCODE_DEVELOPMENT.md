@@ -31,3 +31,22 @@ Tested on:
 Located in the [tasks json](../.vscode/tasks.json) file you'll find a list of tasks that can be run from the "Run Task..." command.
 Example tasks are "Clean", "Run Pretty Check"
 
+Developers are encouraged to add tasks to the [tasks json](../.vscode/tasks.json) over time to make sure everyone is using the same base configuration and build. 
+
+### Current base tasks are listed here
+* Main Build - Full build and test of the tree
+* Auto-enforce coding style
+* Verify coding style conformance
+* Run Unit and Functional Tests
+* Run Distribution Generation - Build and check distribution, running all functional and unit tests
+* Run Code Coverage (via 'make coverage')
+* Clean build - Full clean build and test of the tree
+* Bootstrap the source tree - On a clean tree, pull in the third party dependencies required
+* Clean Tree - Full (and destructive) git clean of the tree
+
+## Launch Tasks
+
+Located in the [launch json](../.vscode/launch.json) file you'll find a list of build & run jobs that can be run from the "Run" tab and start a run or debug session.
+
+Developers are encouraged to add tasks to the [launch json](../.vscode/launch.json) over time to make sure everyone is using the same base debuging setup. 
+
