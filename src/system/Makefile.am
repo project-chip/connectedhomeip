@@ -16,36 +16,42 @@
 #
 
 #
-#   Description:
-#       This file is the GNU automake template for the CHIP system layer.
+#    Description:
+#      This file is the GNU automake template for the CHIP system layer
+#      library.
+#
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 include SystemLayer.am
 
-SUBDIRS                           = tests
-
-EXTRA_DIST                        = \
-    SystemLayerPrivate.h            \
+SUBDIRS                             = \
+    tests                             \
     $(NULL)
 
-lib_LIBRARIES                     = libSystemLayer.a
 
-libSystemLayer_a_CPPFLAGS         = \
-    -I$(top_srcdir)/src             \
-    -I$(top_srcdir)/src/include     \
-    -I$(top_srcdir)/src/system      \
-    -I$(top_srcdir)/src/lib         \
-    -I$(top_srcdir)/src/lib/core    \
-    $(LWIP_CPPFLAGS)                \
-    $(SOCKETS_CPPFLAGS)             \
+EXTRA_DIST                          = \
+    SystemLayerPrivate.h              \
     $(NULL)
 
+lib_LIBRARIES                       = libSystemLayer.a
+
+libSystemLayer_a_CPPFLAGS           = \
+    -I$(top_srcdir)/src               \
+    -I$(top_srcdir)/src/include       \
+    -I$(top_srcdir)/src/system        \
+    -I$(top_srcdir)/src/lib           \
+    -I$(top_srcdir)/src/lib/core      \
+    $(LWIP_CPPFLAGS)                  \
+    $(SOCKETS_CPPFLAGS)               \
+    $(NULL)
 
 libSystemLayer_a_SOURCES          = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
 
 libSystemLayer_adir               = $(includedir)/system
 
 dist_libSystemLayer_a_HEADERS     = $(CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES)
+
+$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
