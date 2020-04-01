@@ -63,7 +63,6 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     if (CHIP_NO_ERROR != result)
     {
-        fprintf(stderr, "Decoding of base45 string failed");
         return result;
     }
 

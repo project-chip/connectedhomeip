@@ -160,7 +160,6 @@ CHIP_ERROR base45Decode(string base45, vector<uint8_t> & result)
     //  base45 characters
     if (base45.length() % kBase45ChunkLen == 1)
     {
-        fprintf(stderr, "\nFailed decoding base45. Input was too short. %lu", base45.length());
         return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
     }
     result.clear();

@@ -279,7 +279,16 @@ int testQRCodeToPayloadGeneration()
 
 int main(int argc, char ** argv)
 {
-    return testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase45Rep() + testBase45() + testSetupPayloadVerify() +
+    int result = testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase45Rep() + testBase45() + testSetupPayloadVerify() +
         testPayloadEquality() + testPayloadInEquality() + testQRCodeToPayloadGeneration() +
         testInvalidQRCodePayload_WrongCharacterSet() + testInvalidQRCodePayload_WrongLength();
+    if (result == 0)
+    {
+        printf("\n** All QRCode tests pass **\n");
+    }
+    else
+    {
+        printf("\n**== QRCode tests FAILED ==**\n");
+    }
+    return result;
 }
