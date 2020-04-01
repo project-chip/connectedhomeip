@@ -53,7 +53,7 @@
 using chip::ErrorStr;
 using namespace chip::System;
 
-static void ServiceEvents(Layer& aLayer, ::timeval& aSleepTime)
+static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     fd_set readFDs, writeFDs, exceptFDs;
@@ -93,48 +93,47 @@ static void ServiceEvents(Layer& aLayer, ::timeval& aSleepTime)
 
 // Test input vector format.
 
-
-struct TestContext {
-    Layer* mLayer;
-    nlTestSuite* mTestSuite;
+struct TestContext
+{
+    Layer * mLayer;
+    nlTestSuite * mTestSuite;
 };
 
 // Test input data.
-
 
 static struct TestContext sContext;
 
 static volatile bool sOverflowTestDone;
 
-void HandleTimer0Failed(Layer* inetLayer, void* aState, Error aError)
+void HandleTimer0Failed(Layer * inetLayer, void * aState, Error aError)
 {
-    TestContext& lContext = *static_cast<TestContext*>(aState);
+    TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, false);
     sOverflowTestDone = true;
 }
 
-void HandleTimer1Failed(Layer* inetLayer, void* aState, Error aError)
+void HandleTimer1Failed(Layer * inetLayer, void * aState, Error aError)
 {
-    TestContext& lContext = *static_cast<TestContext*>(aState);
+    TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, false);
     sOverflowTestDone = true;
 }
 
-void HandleTimer10Success(Layer* inetLayer, void* aState, Error aError)
+void HandleTimer10Success(Layer * inetLayer, void * aState, Error aError)
 {
-    TestContext& lContext = *static_cast<TestContext*>(aState);
+    TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, true);
     sOverflowTestDone = true;
 }
 
-static void CheckOverflow(nlTestSuite* inSuite, void* aContext)
+static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 {
     uint32_t timeout_overflow_0ms = 652835029;
     uint32_t timeout_overflow_1ms = 1958505088;
-    uint32_t timeout_10ms = 10;
+    uint32_t timeout_10ms         = 10;
 
-    TestContext& lContext = *static_cast<TestContext*>(aContext);
-    Layer& lSys = *lContext.mLayer;
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
+    Layer & lSys           = *lContext.mLayer;
 
     sOverflowTestDone = false;
 
@@ -145,7 +144,7 @@ static void CheckOverflow(nlTestSuite* inSuite, void* aContext)
     while (!sOverflowTestDone)
     {
         struct timeval sleepTime;
-        sleepTime.tv_sec = 0;
+        sleepTime.tv_sec  = 0;
         sleepTime.tv_usec = 1000; // 1 ms tick
         ServiceEvents(lSys, sleepTime);
     }
@@ -155,13 +154,12 @@ static void CheckOverflow(nlTestSuite* inSuite, void* aContext)
     lSys.CancelTimer(HandleTimer10Success, aContext);
 }
 
-static uint32_t sNumTimersHandled = 0;
+static uint32_t sNumTimersHandled    = 0;
 static const uint32_t MAX_NUM_TIMERS = 1000;
 
-
-void HandleGreedyTimer(Layer *aLayer, void * aState, Error aError)
+void HandleGreedyTimer(Layer * aLayer, void * aState, Error aError)
 {
-    TestContext& lContext = *static_cast<TestContext*>(aState);
+    TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, sNumTimersHandled < MAX_NUM_TIMERS);
 
     if (sNumTimersHandled >= MAX_NUM_TIMERS)
@@ -170,58 +168,61 @@ void HandleGreedyTimer(Layer *aLayer, void * aState, Error aError)
     }
 
     aLayer->StartTimer(0, HandleGreedyTimer, aState);
-    sNumTimersHandled ++;
-
+    sNumTimersHandled++;
 }
 
-static void CheckStarvation(nlTestSuite* inSuite, void* aContext)
+static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
 {
-    TestContext& lContext = *static_cast<TestContext*>(aContext);
-    Layer& lSys = *lContext.mLayer;
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
+    Layer & lSys           = *lContext.mLayer;
     struct timeval sleepTime;
 
     lSys.StartTimer(0, HandleGreedyTimer, aContext);
 
-    sleepTime.tv_sec = 0;
+    sleepTime.tv_sec  = 0;
     sleepTime.tv_usec = 1000; // 1 ms tick
     ServiceEvents(lSys, sleepTime);
 }
 
-
 // Test Suite
-
 
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
+// clang-format off
+static const nlTest sTests[] =
+{
     NL_TEST_DEF("Timer::TestOverflow",             CheckOverflow),
     NL_TEST_DEF("Timer::TestTimerStarvation",      CheckStarvation),
     NL_TEST_SENTINEL()
 };
+// clang-format on
 
-static int TestSetup(void* aContext);
-static int TestTeardown(void* aContext);
+static int TestSetup(void * aContext);
+static int TestTeardown(void * aContext);
 
-static nlTestSuite kTheSuite = {
+// clang-format off
+static nlTestSuite kTheSuite =
+{
     "chip-system-timer",
     &sTests[0],
     TestSetup,
     TestTeardown
 };
+// clang-format on
 
 /**
  *  Set up the test suite.
  */
-static int TestSetup(void* aContext)
+static int TestSetup(void * aContext)
 {
     static Layer sLayer;
 
-    TestContext& lContext = *reinterpret_cast<TestContext*>(aContext);
-    void* lLayerContext = NULL;
+    TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
+    void * lLayerContext   = NULL;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static sys_mbox* sLwIPEventQueue = NULL;
+    static sys_mbox * sLwIPEventQueue = NULL;
 
     sys_mbox_new(&sLwIPEventQueue, 100);
     tcpip_init(NULL, NULL);
@@ -230,7 +231,7 @@ static int TestSetup(void* aContext)
 
     sLayer.Init(lLayerContext);
 
-    lContext.mLayer = &sLayer;
+    lContext.mLayer     = &sLayer;
     lContext.mTestSuite = &kTheSuite;
 
     return (SUCCESS);
@@ -240,9 +241,9 @@ static int TestSetup(void* aContext)
  *  Tear down the test suite.
  *  Free memory reserved at TestSetup.
  */
-static int TestTeardown(void* aContext)
+static int TestTeardown(void * aContext)
 {
-    TestContext& lContext = *reinterpret_cast<TestContext*>(aContext);
+    TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
 
     lContext.mLayer->Shutdown();
 
@@ -253,7 +254,7 @@ static int TestTeardown(void* aContext)
     return (SUCCESS);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
     // Generate machine-readable, comma-separated value (CSV) output.
     nl_test_set_output_style(OUTPUT_CSV);
