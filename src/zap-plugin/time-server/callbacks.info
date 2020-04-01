@@ -1,0 +1,38 @@
+#include PLATFORM_HEADER
+
+/** @brief Initialises the Time Server
+ *
+ * This function is called from the time server during its initialisation.
+ *
+ * @param endpointId The endpoint that holds the time server Ver.: always
+ *
+ * @return FALSE if the application is not handling the Time Server initialisation.
+ */
+bool emberZclClusterTimeServerInitCallback(EmberZclEndpointId_t endpointId)
+{
+  return FALSE;
+}
+
+/** @brief Handle the Time Server tick
+ *
+ * This function is called when the Time Server tick event expires.
+ *
+ * @param endpointId The endpoint that holds the time server Ver.: always
+ *
+ * @return FALSE if the application is not handling the Time Server tick.
+ */
+bool emberZclClusterTimeServerTickCallback(EmberZclEndpointId_t endpointId)
+{
+  return FALSE;
+}
+
+/** @brief Calls the user to get the real time
+ *
+ * The user is able to provide the real time to the server through
+ * this call back.
+ *
+ */
+uint32_t emberZclClusterTimeServerGetCurrentTimeCallback(void)
+{
+  return 0;
+}
