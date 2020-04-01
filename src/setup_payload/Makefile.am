@@ -48,4 +48,6 @@ dist_libQrCode_a_HEADERS                                 = \
     QRCodeSetupPayloadParser.h                             \        
     $(NULL)
 
+$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
+
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
