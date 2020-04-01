@@ -2,7 +2,7 @@
 
 [Visual Studio Code](https://code.visualstudio.com/) is a great and simple IDE that can be used to build & develop with for CHIP. 
 
-CHIP supports the docker / remote container workflow in Visual Studio Code, and has an container environment setup automatically. You can read more about this workflow [here](https://code.visualstudio.com/docs/remote/containers).
+CHIP supports the docker / remote container workflow in Visual Studio Code, and has a container environment setup automatically. You can read more about this workflow [here](https://code.visualstudio.com/docs/remote/containers).
 
 Tested on:
 * MacOS
