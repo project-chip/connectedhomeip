@@ -1,6 +1,6 @@
 /*
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -47,14 +47,20 @@ bool SetupPayload::isValid()
     {
         return false;
     }
-    // make sure the rendezvousInformation only uses allowed values
-    // i.e it must be > 0 and set to 1 or a power of 2.
-    uint16_t rezInfo = rendezvousInformation;
-    if (rezInfo == 0 || (rezInfo != 1 && (rezInfo & (rezInfo - 1)) != 0))
+
+    if (version == 0 && rendezvousInformation == 0 && discriminator == 0 && setUpPINCode == 0)
     {
         return false;
     }
+
     return true;
+}
+
+bool SetupPayload::operator==(const SetupPayload & input)
+{
+    return this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
+        this->requiresCustomFlow == input.requiresCustomFlow && this->rendezvousInformation == input.rendezvousInformation &&
+        this->discriminator == input.discriminator && this->setUpPINCode == input.setUpPINCode;
 }
 
 } // namespace chip

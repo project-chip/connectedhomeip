@@ -3,6 +3,8 @@
 
 #
 #    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2018-2019 Google LLC
+#    Copyright (c) 2014-2018 Nest Labs, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -1811,6 +1813,7 @@ src/inet/Makefile
 src/inet/tests/Makefile
 src/lib/Makefile
 src/platform/Makefile
+tests/Makefile
 ])
 
 #

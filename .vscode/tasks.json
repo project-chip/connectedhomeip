@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Main Build",
+            "type": "shell",
+            "command": "make -f Makefile-Standalone",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Pretty",
+            "type": "shell",
+            "command": "make -f Makefile-Standalone pretty",
+            "group": "none"
+        },
+        {
+            "label": "Test & Check",
+            "type": "shell",
+            "command": "make -f Makefile-Standalone check",
+            "group": "none"
+        },
+        {
+            "label": "Dist Check",
+            "type": "shell",
+            "command": "make -f Makefile-Standalone distcheck",
+            "group": "none"
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make -f Makefile-Standalone clean",
+            "group": "none"
+        },
+        {
+            "label": "Bootstrap",
+            "type": "shell",
+            "command": "./bootstrap",
+            "group": "none"
+        },
+        {
+            "label": "Clean Tree",
+            "type": "shell",
+            "command": "git clean -xdf",
+            "group": "none"
+        }
+    ]
+}

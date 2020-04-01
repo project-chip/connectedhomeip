@@ -1,5 +1,5 @@
 #
-#    <COPYRIGHT>
+#    Copyright (c) 2020 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ TESTS_ENVIRONMENT                              = \
 # Source, compiler, and linker options for test programs.
 
 TestQrCode_LDADD                               = $(COMMON_LDADD)
-TestQrCode_SOURCES                             = tests.cpp
+TestQrCode_SOURCES                             = tests_qrcode.cpp
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)

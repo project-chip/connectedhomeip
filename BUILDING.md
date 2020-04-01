@@ -40,6 +40,7 @@ can be satisfied with the following:
 ```
 sudo apt-get install make autoconf automake libtool
 sudo apt-get install clang-format-9
+sudo apt-get install lcov
 ```
 
 #### How to install tool prerequisites on macOS
@@ -50,22 +51,33 @@ On macOS, these dependencies can be installed and satisfied using
 ```
 brew install make autoconf automake libtool
 brew install llvm@9
+brew install lcov
 ```
 
 ### Autotools Build Preparation
 
+Before running any other build command, the `./bootstrap` command must be run from the top-level.
+
 ```
 # Initial preparation
-git clean -fdx
+./bootstrap
+```
+
+### Build Standalone (Native Linux or MacOS)
+
+This will build all sources, libraries, and tests for the given platform:
+
+```
+# From top of clean tree
 ./bootstrap
 
 make -f Makefile-Standalone
 ```
 
-### Build Standalone (Native Linux or MacOS)
+The helper Makefile-<platform> will automatically run configure the using a default set of parameters, and allow custom override parameters to be passed via environment variables. An example of this follows:
 
 ```
-make -f Makefile-Standalone
+TESTS=1 DEBUG=1 COVERAGE=1 make -f Makefile-Standalone
 ```
 
 ### Build Custom configuration
@@ -74,24 +86,82 @@ make -f Makefile-Standalone
 # From top of clean tree
 ./bootstrap
 
-mkdir out
-cd out
-../configure
+mkdir build/<CONFIG>
+cd build/<CONFIG>
+../../configure <CONFIG ARGUMENTS>
+```
+Where `<CONFIG>` is something that describes what configuration (as described by `<CONFIG ARGUMENTS>`)
+of the tree you're planning to build, or simply `out` if you're not feeling creative.
 
-# Build libraries
+- [x] **Build all source, libraries, and tests**
+```
 make
+```
 
-# Build distribution
+- [x] **Build distribution**
+```
 make dist
+```
 
-# Build and check distribution
+- [x] **Build and check distribution, running all functional and unit tests**
+```
 make distcheck
+```
 
-# Run tests
+- [x] **Run tests**
+```
 make check
+```
 
-# Verify coding style conformance
+- [x] **Verify coding style conformance**
+```
 make pretty-check
+```
+
+- [x] **Auto-enforce coding style**
+```
+make pretty
+```
+
+- [x] **Build just one module in a subdirectory**
+
+Either enter the desired subdirectory directly and run `make` or pass the desired subdirectory to `make -C`.
+
+```
+$ make -C src/system
+
+Making all in tests
+make[1]: Entering directory 'src/system/tests'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory 'src/system/tests'
+make[1]: Entering directory 'src/system'
+  CXX      ../../src/system/libSystemLayer_a-SystemClock.o
+  CXX      ../../src/system/libSystemLayer_a-SystemError.o
+  CXX      ../../src/system/libSystemLayer_a-SystemLayer.o
+  CXX      ../../src/system/libSystemLayer_a-SystemMutex.o
+  CXX      ../../src/system/libSystemLayer_a-SystemObject.o
+  CXX      ../../src/system/libSystemLayer_a-SystemTimer.o
+  CXX      ../../src/system/libSystemLayer_a-SystemPacketBuffer.o
+  CXX      ../../src/system/libSystemLayer_a-SystemStats.o
+  CXX      ../../src/system/libSystemLayer_a-SystemFaultInjection.o
+  AR       libSystemLayer.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+make[1]: Leaving directory 'src/system'
+```
+
+- [x] **Clean out entire source tree**
+
+This will clear out all build artifacts, including those created by `./bootstrap`.
+
+```
+make distclean
+```
+
+If the source has been pulled using `git clone` the following command can also be used to clear out all build artifacts:
+
+```
+# To clean all intermediate build files from the tree
+git clean -fdx
 ```
 
 ### Build iOS

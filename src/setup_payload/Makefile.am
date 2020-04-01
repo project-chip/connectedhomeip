@@ -1,6 +1,6 @@
 #
 #
-#    <COPYRIGHT>
+#    Copyright (c) 2020 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -38,12 +38,14 @@ libQrCode_a_SOURCES                                       = \
     QRCodeSetupPayloadGenerator.cpp                         \
     SetupPayload.cpp                                        \
     Base45.cpp                                              \
+    QRCodeSetupPayloadParser.cpp                            \       
    $(NULL)
 
 dist_libQrCode_a_HEADERS                                 = \
     QRCodeSetupPayloadGenerator.h                          \
     SetupPayload.h                                         \
     Base45.h                                               \
+    QRCodeSetupPayloadParser.h                             \        
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
