@@ -1,0 +1,41 @@
+;; find out where I am, i.e. ToT, call that "//"
+(defvar // (or (and load-file-name
+                    (file-name-directory load-file-name))
+               default-directory)) ; default-directory useful for debugging
+;(message (concat "//: " //))
+
+;; builds a path below ToT
+(defun // (&rest paths)
+  (expand-file-name (or
+                     (mapconcat 'identity paths "/") ".")
+                    (or //
+                        default-directory)))
+
+;(message (concat "(//): " (//)))
+;(message (concat "(// \"foo\"): " (// "foo")))
+
+;; //build knows (and hides) the system config
+(defun //build (&rest paths)
+  (apply #'// (append (list "build" system-configuration) paths)))
+;(message (concat "(//build)" (//build)))
+;(message (concat "(//build foo bar baz) " (//build "hi" "foo" "bar" "baz")))
+
+;; convenience variable instead of function
+(defvar //build (//build))
+;(message (concat "//build" //build))
+
+; what a monster
+(setq-default
+ compile-command
+ (let ((//bootstrap (// "bootstrap")) ; shorten these
+       (//configure (// "configure"))
+       (//build/config.status (//build "config.status")))
+   (concat
+    "if [[ ! -f " //build/config.status " ]] # checks if configured\n"
+    "then "
+    //bootstrap " && mkdir -p " //build "\n"
+    "(cd " //build " && " //configure " --enable-debug) # run configure in //build\n"
+    "else\n"
+    //bootstrap " -w make # update Makefile.ins\n"
+    "fi\n"
+    "make -C " //build " check")))
