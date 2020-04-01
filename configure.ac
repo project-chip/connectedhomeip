@@ -2,6 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 #
+#    Copyright (c) 2020 Project CHIP Authors
 #    Copyright (c) 2018-2019 Google LLC
 #    Copyright (c) 2014-2018 Nest Labs, Inc.
 #
@@ -1809,6 +1810,7 @@ src/system/tests/Makefile
 src/setup_payload/Makefile
 src/setup_payload/tests/Makefile
 src/inet/Makefile
+src/inet/tests/Makefile
 src/lib/Makefile
 src/platform/Makefile
 tests/Makefile
