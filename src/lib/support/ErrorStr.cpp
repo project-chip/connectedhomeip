@@ -63,9 +63,7 @@ DLL_EXPORT const char * ErrorStr(int32_t err)
 
     // Search the registered error formatter for one that will format the given
     // error code.
-    for (const ErrorFormatter * errFormatter = sErrorFormatterList;
-         errFormatter != NULL;
-         errFormatter = errFormatter->Next)
+    for (const ErrorFormatter * errFormatter = sErrorFormatterList; errFormatter != NULL; errFormatter = errFormatter->Next)
     {
         if (errFormatter->FormatError(sErrorStr, sizeof(sErrorStr), err))
         {
@@ -91,9 +89,8 @@ DLL_EXPORT const char * ErrorStr(int32_t err)
 DLL_EXPORT void RegisterErrorFormatter(ErrorFormatter * errFormatter)
 {
     // Do nothing if a formatter with the same format function is already in the list.
-    for (const ErrorFormatter * existingFormatter = sErrorFormatterList;
-         existingFormatter != NULL;
-         existingFormatter = existingFormatter->Next)
+    for (const ErrorFormatter * existingFormatter = sErrorFormatterList; existingFormatter != NULL;
+         existingFormatter                        = existingFormatter->Next)
     {
         if (existingFormatter->FormatError == errFormatter->FormatError)
         {
@@ -102,10 +99,9 @@ DLL_EXPORT void RegisterErrorFormatter(ErrorFormatter * errFormatter)
     }
 
     // Add the formatter to the global list.
-    errFormatter->Next = sErrorFormatterList;
+    errFormatter->Next  = sErrorFormatterList;
     sErrorFormatterList = errFormatter;
 }
-
 
 #if !CHIP_CONFIG_CUSTOM_ERROR_FORMATTER
 
@@ -128,11 +124,11 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, i
 
     if (subsys == NULL)
     {
-        (void)snprintf(buf, bufSize, "Error " CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, err);
+        (void) snprintf(buf, bufSize, "Error " CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, err);
     }
     else
     {
-        (void)snprintf(buf, bufSize, "Error %s:" CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, subsys, err);
+        (void) snprintf(buf, bufSize, "Error %s:" CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, subsys, err);
     }
 
 #else // CHIP_CONFIG_SHORT_ERROR_STR
@@ -144,11 +140,11 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, i
         len = snprintf(buf, bufSize, "%s ", subsys);
     }
 
-    len += snprintf(buf + len, bufSize - len, "Error %" PRId32 " (0x%08" PRIX32 ")", err, (uint32_t)err);
+    len += snprintf(buf + len, bufSize - len, "Error %" PRId32 " (0x%08" PRIX32 ")", err, (uint32_t) err);
 
     if (desc != NULL)
     {
-        (void)snprintf(buf + len, bufSize - len, ": %s", desc);
+        (void) snprintf(buf + len, bufSize - len, ": %s", desc);
     }
 
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
