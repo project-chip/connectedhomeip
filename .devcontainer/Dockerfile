@@ -20,7 +20,9 @@ RUN apt-get -fy install git vim emacs sudo \
     clang-format-9 \
     clang-tidy-9 \
     lcov \
-    shellcheck
+    shellcheck \
+    gcc-multilib \
+    libfftw3-dev
 
 RUN groupadd --gid $USER_GID $USERNAME
 RUN useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME
