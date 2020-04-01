@@ -279,7 +279,7 @@ int testQRCodeToPayloadGeneration()
 
 int main(int argc, char ** argv)
 {
-    bool result = testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase45Rep() + testBase45() + testSetupPayloadVerify() +
+    int result = testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase45Rep() + testBase45() + testSetupPayloadVerify() +
         testPayloadEquality() + testPayloadInEquality() + testQRCodeToPayloadGeneration() +
         testInvalidQRCodePayload_WrongCharacterSet() + testInvalidQRCodePayload_WrongLength();
     if (result == 0)
