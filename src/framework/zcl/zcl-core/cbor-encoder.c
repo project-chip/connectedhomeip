@@ -1,24 +1,12 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_ZCL_CORE
 
 // When true, the map/array "...Indefinite..." API functions will instead
 // produce encodings with definite lengths. This is the default mode.
@@ -47,7 +35,7 @@ static uint32_t addCborHeader(CborState *state, uint8_t type, uint32_t length)
     *finger++ = LOW_BYTE(length);
   } else {
     *finger++ = type | CBOR_4_BYTE_LENGTH;
-    emberStoreHighLowInt32u(finger, length);
+    chipStoreHighLowInt32u(finger, length);
     finger += 4;
   }
 
@@ -123,15 +111,15 @@ bool emCborZclipOutOfRangeValue(uint8_t type,
   bool     skip = false;
 
   switch (type) {
-    case EMBER_ZCLIP_TYPE_BOOLEAN:
-    case EMBER_ZCLIP_TYPE_MISC:
+    case CHIP_ZCLIP_TYPE_BOOLEAN:
+    case CHIP_ZCLIP_TYPE_MISC:
       value = *((uint8_t *) valueLoc);
       if (value == 0xff) {
         skip = true;
       }
       break;
 
-    case EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER:
+    case CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER:
       value = emFetchInt32uValue(valueLoc, valueLength);
       switch (valueLength) {
         case 1:
@@ -148,7 +136,7 @@ bool emCborZclipOutOfRangeValue(uint8_t type,
       }
       break;
 
-    case EMBER_ZCLIP_TYPE_INTEGER:
+    case CHIP_ZCLIP_TYPE_INTEGER:
       value = emFetchInt32uValue(valueLoc, valueLength);
       switch (valueLength) {
         case 1:
@@ -165,37 +153,37 @@ bool emCborZclipOutOfRangeValue(uint8_t type,
       }
       break;
 
-    case EMBER_ZCLIP_TYPE_BINARY: {
-      EmberZclStringType_t *ezst = (EmberZclStringType_t *)((void *)valueLoc);
+    case CHIP_ZCLIP_TYPE_BINARY: {
+      ChipZclStringType_t *ezst = (ChipZclStringType_t *)((void *)valueLoc);
 
       if (ezst->ptr == NULL || ezst->length == 0) {
         skip = true;
       }
     }
     break;
-    case EMBER_ZCLIP_TYPE_FIXED_LENGTH_BINARY:
-    case EMBER_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_BINARY:
+    case CHIP_ZCLIP_TYPE_FIXED_LENGTH_BINARY:
+    case CHIP_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_BINARY:
       // Currently not used in TLVs
       break;
 
-    case EMBER_ZCLIP_TYPE_STRING:
-    case EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING:
+    case CHIP_ZCLIP_TYPE_STRING:
+    case CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING:
       if (valueLoc == NULL ||  strlen((const char *) valueLoc) == 0) {
         skip = true;
       }
       break;
-    case EMBER_ZCLIP_TYPE_UINT8_LENGTH_STRING: {
-      EmberZclStringType_t *ezst = (EmberZclStringType_t *)((void *)valueLoc);
+    case CHIP_ZCLIP_TYPE_UINT8_LENGTH_STRING: {
+      ChipZclStringType_t *ezst = (ChipZclStringType_t *)((void *)valueLoc);
       if (ezst->ptr == NULL || ezst->length == 0) {
         skip = true;
       }
       break;
     }
 
-    case EMBER_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_STRING:
-    case EMBER_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_BINARY:
-    case EMBER_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_STRING:
-    case EMBER_ZCLIP_TYPE_UINT16_LENGTH_STRING:
+    case CHIP_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_STRING:
+    case CHIP_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_BINARY:
+    case CHIP_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_STRING:
+    case CHIP_ZCLIP_TYPE_UINT16_LENGTH_STRING:
       // Currently not used in TLVs
       break;
     default:
@@ -218,7 +206,7 @@ bool emCborEncodeValue(CborState *state,
   }
 
   switch (type) {
-    case EMBER_ZCLIP_TYPE_BOOLEAN:
+    case CHIP_ZCLIP_TYPE_BOOLEAN:
       if (state->finger < state->end) {
         *state->finger++ = (*((uint8_t *) valueLoc) != 0
                             ? CBOR_TRUE
@@ -227,20 +215,20 @@ bool emCborEncodeValue(CborState *state,
       }
       break;
 
-    case EMBER_ZCLIP_TYPE_MISC:
+    case CHIP_ZCLIP_TYPE_MISC:
       if (state->finger < state->end) {
         *state->finger++ = *((uint8_t *) valueLoc);
         appendedLen = -1;
       }
       break;
 
-    case EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER:
+    case CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER:
       appendedLen = addCborHeader(state,
                                   CBOR_UNSIGNED,
                                   emFetchInt32uValue(valueLoc, valueLength));
       break;
 
-    case EMBER_ZCLIP_TYPE_INTEGER: {
+    case CHIP_ZCLIP_TYPE_INTEGER: {
       int32_t n = emFetchInt32sValue(valueLoc, valueLength);
       if (n < 0) {
         appendedLen = addCborHeader(state, CBOR_NEGATIVE, -1 - n);
@@ -250,43 +238,43 @@ bool emCborEncodeValue(CborState *state,
       break;
     }
 
-    case EMBER_ZCLIP_TYPE_BINARY: {
-      EmberZclStringType_t *ezst = (EmberZclStringType_t *)((void *)valueLoc);
+    case CHIP_ZCLIP_TYPE_BINARY: {
+      ChipZclStringType_t *ezst = (ChipZclStringType_t *)((void *)valueLoc);
       appendedLen = appendBytes(state, CBOR_BYTES, ezst->ptr, ezst->length);
       break;
     }
 
-    case EMBER_ZCLIP_TYPE_FIXED_LENGTH_BINARY:
+    case CHIP_ZCLIP_TYPE_FIXED_LENGTH_BINARY:
       appendedLen = appendBytes(state, CBOR_BYTES, valueLoc, valueLength);
       break;
 
-    case EMBER_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_BINARY: {
+    case CHIP_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_BINARY: {
       uint8_t *buffer = (uint8_t *)((void *)valueLoc);
-      appendedLen = appendBytes(state, CBOR_BYTES, &buffer[1], emberZclStringLength(buffer));
+      appendedLen = appendBytes(state, CBOR_BYTES, &buffer[1], chipZclStringLength(buffer));
       break;
     }
 
-    case EMBER_ZCLIP_TYPE_STRING:
-    case EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING: {
+    case CHIP_ZCLIP_TYPE_STRING:
+    case CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING: {
       appendedLen = appendBytes(state, CBOR_TEXT, valueLoc, strlen((const char *) valueLoc));
       break;
     }
 
-    case EMBER_ZCLIP_TYPE_UINT8_LENGTH_STRING: {
-      EmberZclStringType_t *ezst = (EmberZclStringType_t *)((void *)valueLoc);
+    case CHIP_ZCLIP_TYPE_UINT8_LENGTH_STRING: {
+      ChipZclStringType_t *ezst = (ChipZclStringType_t *)((void *)valueLoc);
       appendedLen = appendBytes(state, CBOR_TEXT, ezst->ptr, ezst->length);
       break;
     }
 
-    case EMBER_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_STRING: {
+    case CHIP_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_STRING: {
       uint8_t *buffer = (uint8_t *)((void *)valueLoc);
-      appendedLen = appendBytes(state, CBOR_TEXT, &buffer[1], emberZclStringLength(buffer));
+      appendedLen = appendBytes(state, CBOR_TEXT, &buffer[1], chipZclStringLength(buffer));
       break;
     }
 
-    case EMBER_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_BINARY:
-    case EMBER_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_STRING:
-    case EMBER_ZCLIP_TYPE_UINT16_LENGTH_STRING: {
+    case CHIP_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_BINARY:
+    case CHIP_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_STRING:
+    case CHIP_ZCLIP_TYPE_UINT16_LENGTH_STRING: {
       // TODO: Handle long ZigBee strings.
       appendedLen = 0;
       break;
@@ -346,7 +334,7 @@ bool emCborEncodeStruct(CborState *state,
 
       int32_t tag = -(fieldData.tlvTag + 1);    // ZCLIP uses -(tlvTag + 1) as the key
       emCborEncodeValue(state,
-                        EMBER_ZCLIP_TYPE_INTEGER,
+                        CHIP_ZCLIP_TYPE_INTEGER,
                         sizeof(tag),
                         (const uint8_t *)&tag);
     } else {
@@ -354,7 +342,7 @@ bool emCborEncodeStruct(CborState *state,
         emCborEncodeKey(state, i);
       } else {
         emCborEncodeValue(state,
-                          EMBER_ZCLIP_TYPE_STRING,
+                          CHIP_ZCLIP_TYPE_STRING,
                           0,     // value length - unused
                           (const uint8_t *)fieldData.name);
       }
@@ -581,7 +569,7 @@ static bool peekOrReadCborHeaderLength(CborState *state,
     *result = HIGH_LOW_TO_INT(finger[0], finger[1]);
     finger += 2;
   } else {
-    *result = emberFetchHighLowInt32u(finger);
+    *result = chipFetchHighLowInt32u(finger);
     finger += 4;
   }
 
@@ -623,11 +611,11 @@ static uint8_t zclipTypeToCborType[] = {
 };
 
 // returns whether read is successful.
-static EmZclCoreCborValueReadStatus_t realReadCborValue(CborState *state, ZclipFieldData *fieldData, uint8_t *valueLocation)
+static ChZclCoreCborValueReadStatus_t realReadCborValue(CborState *state, ZclipFieldData *fieldData, uint8_t *valueLocation)
 {
   if (state->finger == NULL
       || state->end <= state->finger) {
-    return EM_ZCL_CORE_CBOR_VALUE_READ_ERROR;
+    return CH_ZCL_CORE_CBOR_VALUE_READ_ERROR;
   }
 
   uint8_t b0 = *state->finger++;
@@ -635,116 +623,116 @@ static EmZclCoreCborValueReadStatus_t realReadCborValue(CborState *state, ZclipF
   uint32_t length = 0;
 
   // The maximum type we can handle.
-  if (EMBER_ZCLIP_START_MARKER <= fieldData->valueType) {
-    return EM_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE;
+  if (CHIP_ZCLIP_START_MARKER <= fieldData->valueType) {
+    return CH_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE;
   }
   uint8_t cborType = zclipTypeToCborType[fieldData->valueType];
 
-  if (fieldData->valueType == EMBER_ZCLIP_TYPE_BOOLEAN) {
+  if (fieldData->valueType == CHIP_ZCLIP_TYPE_BOOLEAN) {
     if (b0 == CBOR_TRUE || b0 == CBOR_FALSE) {
       *valueLocation = (b0 == CBOR_TRUE);
-      return EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
+      return CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
     } else {
-      return EM_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE;
+      return CH_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE;
     }
-  } else if (fieldData->valueType == EMBER_ZCLIP_TYPE_MISC) {
+  } else if (fieldData->valueType == CHIP_ZCLIP_TYPE_MISC) {
     if (b0 & CBOR_MISC) {
       *valueLocation = b0;
-      return EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
+      return CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
     } else {
-      return EM_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE;
+      return CH_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE;
     }
   } else if (!readCborHeaderLength(state, b0, &length)) {
-    return EM_ZCL_CORE_CBOR_VALUE_READ_ERROR;
+    return CH_ZCL_CORE_CBOR_VALUE_READ_ERROR;
   } else if (!(((b0 & CBOR_TYPE_MASK) == cborType)
-               || (fieldData->valueType == EMBER_ZCLIP_TYPE_INTEGER
+               || (fieldData->valueType == CHIP_ZCLIP_TYPE_INTEGER
                    && (b0 & CBOR_TYPE_MASK) == CBOR_NEGATIVE))) {
-    return EM_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE;
+    return CH_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE;
   } else if ((cborType == CBOR_BYTES
               || cborType == CBOR_TEXT)
              && (state->end - state->finger) < length) {
-    return EM_ZCL_CORE_CBOR_VALUE_READ_ERROR;
+    return CH_ZCL_CORE_CBOR_VALUE_READ_ERROR;
   } else {
     switch (fieldData->valueType) {
-      case EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER:
+      case CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER:
         if ((length & uintMasks[fieldData->valueSize - 1]) == length) {
           emStoreInt32uValue(valueLocation, length, fieldData->valueSize);  // (length==the decoded value).
-          return EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
         } else {
-          return EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
         }
 
-      case EMBER_ZCLIP_TYPE_INTEGER:
+      case CHIP_ZCLIP_TYPE_INTEGER:
         if ((length & (uintMasks[fieldData->valueSize - 1] >> 1)) == length) {
           emStoreInt32uValue(valueLocation,
                              ((b0 & CBOR_TYPE_MASK) == CBOR_UNSIGNED
                               ? length
                               : -1 - (int32_t) length),
                              fieldData->valueSize);
-          return EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
         } else {
-          return EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
         }
-      case EMBER_ZCLIP_TYPE_BINARY:     // Same max length as strings.
-      case EMBER_ZCLIP_TYPE_UINT8_LENGTH_STRING:
-        if (length <= EMBER_ZCL_STRING_LENGTH_MAX) {
-          EmberZclStringType_t *ezst =
-            (EmberZclStringType_t *) ((void *) valueLocation);
+      case CHIP_ZCLIP_TYPE_BINARY:     // Same max length as strings.
+      case CHIP_ZCLIP_TYPE_UINT8_LENGTH_STRING:
+        if (length <= CHIP_ZCL_STRING_LENGTH_MAX) {
+          ChipZclStringType_t *ezst =
+            (ChipZclStringType_t *) ((void *) valueLocation);
           ezst->ptr = state->finger;
           ezst->length = length;
           state->finger += length;
-          return EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
         } else {
-          return EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
         }
 
-      case EMBER_ZCLIP_TYPE_FIXED_LENGTH_BINARY:
+      case CHIP_ZCLIP_TYPE_FIXED_LENGTH_BINARY:
         if (length == fieldData->valueSize) {
           MEMCOPY(valueLocation, state->finger, length);
           state->finger += length;
-          return EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
         } else if (length < fieldData->valueSize) {
-          return EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_SMALL;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_SMALL;
         } else {
-          return EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
         }
 
-      case EMBER_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_BINARY:
-      case EMBER_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_STRING:
-        if (length <= EMBER_ZCL_STRING_LENGTH_MAX) {
+      case CHIP_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_BINARY:
+      case CHIP_ZCLIP_TYPE_UINT8_LENGTH_PREFIXED_STRING:
+        if (length <= CHIP_ZCL_STRING_LENGTH_MAX) {
           uint8_t *buffer = (uint8_t *) ((void *) valueLocation);
           buffer[0] = length;
           MEMCOPY(&buffer[1], state->finger, length);
           state->finger += length;
-          return EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
         } else {
-          return EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
         }
 
-      case EMBER_ZCLIP_TYPE_STRING:
-      case EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING:
+      case CHIP_ZCLIP_TYPE_STRING:
+      case CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING:
         if (length + 1 <= fieldData->valueSize) {
           MEMCOPY(valueLocation, state->finger, length);
           valueLocation[length] = 0;
           state->finger += length;
-          return EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS;
         } else {
-          return EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
+          return CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE;
         }
 
-      case EMBER_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_BINARY:
-      case EMBER_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_STRING:
-      case EMBER_ZCLIP_TYPE_UINT16_LENGTH_STRING:
+      case CHIP_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_BINARY:
+      case CHIP_ZCLIP_TYPE_UINT16_LENGTH_PREFIXED_STRING:
+      case CHIP_ZCLIP_TYPE_UINT16_LENGTH_STRING:
         // TODO: Handle long ZigBee strings.
-        return EM_ZCL_CORE_CBOR_VALUE_READ_NOT_SUPPORTED;
+        return CH_ZCL_CORE_CBOR_VALUE_READ_NOT_SUPPORTED;
 
       default:
-        return EM_ZCL_CORE_CBOR_VALUE_READ_ERROR;
+        return CH_ZCL_CORE_CBOR_VALUE_READ_ERROR;
     }
   }
 }
 
-static EmZclCoreCborValueReadStatus_t readCborValue(CborState *state,
+static ChZclCoreCborValueReadStatus_t readCborValue(CborState *state,
                                                     ZclipFieldData *fieldData,
                                                     uint8_t *valueLocation)
 {
@@ -796,12 +784,12 @@ static bool cborDecodeStruct(CborState *state,
     int32_t keyTlv = 0;
     if (type == CBOR_UNSIGNED) {
       emCborDecodeValue(state,
-                        EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                        CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                         sizeof(keyIndex),
                         (uint8_t *)&keyIndex);
     } else if (type == CBOR_NEGATIVE) {
       emCborDecodeValue(state,
-                        EMBER_ZCLIP_TYPE_INTEGER,
+                        CHIP_ZCLIP_TYPE_INTEGER,
                         sizeof(keyTlv),
                         (uint8_t *)&keyTlv);
 
@@ -813,7 +801,7 @@ static bool cborDecodeStruct(CborState *state,
       }
     } else if (type == CBOR_TEXT) {
       emCborDecodeValue(state,
-                        EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING,
+                        CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING,
                         sizeof(keyName),
                         keyName);
     } else {
@@ -849,7 +837,7 @@ static bool cborDecodeStruct(CborState *state,
       if (!fieldData.isArray) {
         // Decode a single (i.e. non-array) field value.
         if (readCborValue(state, &fieldData, valueLoc)
-            != EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS) {
+            != CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS) {
           return false;
         }
       } else {
@@ -938,7 +926,7 @@ uint16_t emCborDecodeFieldArrayIntoBuffer(CborArray *cborArray,
       break;  // found end of indeterminate length cbor array.
     }
     if (readCborValue(&state, &cborArray->fieldData, valueLoc)
-        != EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS) {
+        != CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS) {
       return 0;
     }
     valueLoc += bufferValueSize;
@@ -1027,7 +1015,7 @@ uint16_t emCborDecodeKey(CborState *state)
 {
   uint16_t key;
   if (emCborDecodeValue(state,
-                        EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                        CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                         2,
                         (uint8_t *) &key)) {
     return key;
@@ -1042,14 +1030,14 @@ bool emCborDecodeValue(CborState *state,
                        uint8_t *valueLoc)
 {
   if (decrementCount(state)  != SEQUENCE_NOT_DONE) {
-    state->readStatus = EM_ZCL_CORE_CBOR_VALUE_READ_ERROR;
+    state->readStatus = CH_ZCL_CORE_CBOR_VALUE_READ_ERROR;
     return false;
   } else {
     ZclipFieldData fieldData;
     fieldData.valueType = valueType;
     fieldData.valueSize = valueSize;
 
-    if (readCborValue(state, &fieldData, valueLoc) == EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS) {
+    if (readCborValue(state, &fieldData, valueLoc) == CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS) {
       return true;
     } else {
       return false;

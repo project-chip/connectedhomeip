@@ -8,7 +8,7 @@
  *
  * @return FALSE if the application is not handling the Time Server initialisation.
  */
-bool emberZclClusterTimeServerInitCallback(EmberZclEndpointId_t endpointId)
+bool chipZclClusterTimeServerInitCallback(ChipZclEndpointId_t endpointId)
 {
   return FALSE;
 }
@@ -21,7 +21,7 @@ bool emberZclClusterTimeServerInitCallback(EmberZclEndpointId_t endpointId)
  *
  * @return FALSE if the application is not handling the Time Server tick.
  */
-bool emberZclClusterTimeServerTickCallback(EmberZclEndpointId_t endpointId)
+bool chipZclClusterTimeServerTickCallback(ChipZclEndpointId_t endpointId)
 {
   return FALSE;
 }
@@ -32,7 +32,7 @@ bool emberZclClusterTimeServerTickCallback(EmberZclEndpointId_t endpointId)
  * this call back.
  *
  */
-uint32_t emberZclClusterTimeServerGetCurrentTimeCallback(void)
+uint32_t chipZclClusterTimeServerGetCurrentTimeCallback(void)
 {
   return 0;
 }

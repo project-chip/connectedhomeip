@@ -1,59 +1,47 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
 #include "thread-bookkeeping.h"
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 
 typedef struct {
-  EmberZclReportingConfigurationId_t reportingConfigurationId;
-  uint8_t uri[EMBER_ZCL_URI_MAX_LENGTH];
+  ChipZclReportingConfigurationId_t reportingConfigurationId;
+  uint8_t uri[CHIP_ZCL_URI_MAX_LENGTH];
   uint32_t timestamp;
   uint8_t bindingId;
 } Notification_t;
-#define EMBER_ZCLIP_STRUCT Notification_t
+#define CHIP_ZCLIP_STRUCT Notification_t
 static const ZclipStructSpec notificationSpec[] = {
-  EMBER_ZCLIP_OBJECT(sizeof(EMBER_ZCLIP_STRUCT),
+  CHIP_ZCLIP_OBJECT(sizeof(CHIP_ZCLIP_STRUCT),
                      4,     // fieldCount
                      NULL), // names
-  EMBER_ZCLIP_FIELD_NAMED_MANDATORY(EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING, uri, "u"),
-  EMBER_ZCLIP_FIELD_NAMED_MANDATORY(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, reportingConfigurationId, "r"),
-  EMBER_ZCLIP_FIELD_NAMED_MANDATORY(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, bindingId, "b"),
-  EMBER_ZCLIP_FIELD_NAMED(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, timestamp, "t"),
+  CHIP_ZCLIP_FIELD_NAMED_MANDATORY(CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING, uri, "u"),
+  CHIP_ZCLIP_FIELD_NAMED_MANDATORY(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, reportingConfigurationId, "r"),
+  CHIP_ZCLIP_FIELD_NAMED_MANDATORY(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, bindingId, "b"),
+  CHIP_ZCLIP_FIELD_NAMED(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, timestamp, "t"),
 };
-#undef EMBER_ZCLIP_STRUCT
+#undef CHIP_ZCLIP_STRUCT
 
 static bool findAttributeMap(CborState *state);
 static bool getNextAttributeKeyValue(CborState *state,
-                                     const EmberZclClusterSpec_t *clusterSpec,
-                                     const EmZclAttributeEntry_t **attribute,
+                                     const ChipZclClusterSpec_t *clusterSpec,
+                                     const ChZclAttributeEntry_t **attribute,
                                      uint8_t *buffer,
-                                     const EmberCoapRequestInfo *info);
-static EmberStatus notify(const EmZclContext_t *context, CborState *state, void *data);
+                                     const ChipCoapRequestInfo *info);
+static ChipStatus notify(const ChZclContext_t *context, CborState *state, void *data);
 
 // zcl/e/XX/<cluster>/n:
 // zcl/g/XXXX/<cluster>/n:
 //   POST: report notification.
 //   OTHER: not allowed.
-void emZclUriClusterNotificationHandler(EmZclContext_t *context)
+void chZclUriClusterNotificationHandler(ChZclContext_t *context)
 {
   Notification_t notification = {
-    .reportingConfigurationId = EMBER_ZCL_REPORTING_CONFIGURATION_NULL,
+    .reportingConfigurationId = CHIP_ZCL_REPORTING_CONFIGURATION_NULL,
     .uri = { 0 },
     .timestamp = 0,
     .bindingId = 0,
@@ -62,44 +50,44 @@ void emZclUriClusterNotificationHandler(EmZclContext_t *context)
                              context->payloadLength,
                              notificationSpec,
                              &notification)) {
-    emZclRespond400BadRequest(context->info);
+    chZclRespond400BadRequest(context->info);
     return;
   }
 
-  EmberZclClusterSpec_t clusterSpec;
-  emberZclReverseClusterSpec(&context->clusterSpec, &clusterSpec);
-  uint8_t buffer[EMBER_ZCL_ATTRIBUTE_MAX_SIZE];
-  EmberZclNotificationContext_t notificationContext = {
+  ChipZclClusterSpec_t clusterSpec;
+  chipZclReverseClusterSpec(&context->clusterSpec, &clusterSpec);
+  uint8_t buffer[CHIP_ZCL_ATTRIBUTE_MAX_SIZE];
+  ChipZclNotificationContext_t notificationContext = {
     .remoteAddress = context->info->remoteAddress,
-    .sourceEndpointId = EMBER_ZCL_ENDPOINT_NULL, // filled in later
+    .sourceEndpointId = CHIP_ZCL_ENDPOINT_NULL, // filled in later
     .sourceReportingConfigurationId = notification.reportingConfigurationId,
     .sourceTimestamp = notification.timestamp,
     .groupId = context->groupId,
     .endpointId = context->endpoint->endpointId,
     .clusterSpec = &clusterSpec,
-    .attributeId = EMBER_ZCL_ATTRIBUTE_NULL, // filled in later
+    .attributeId = CHIP_ZCL_ATTRIBUTE_NULL, // filled in later
     .buffer = buffer,
     .bufferLength = 0, // filled in later
   };
 
   // TODO: This verifies the URI up to the cluster.  It does not verify that
   // the URI path ends in /a.
-  EmberZclBindingEntry_t source;
-  if (emZclUriToBindingEntry(notification.uri, &source, true)
+  ChipZclBindingEntry_t source;
+  if (chZclUriToBindingEntry(notification.uri, &source, true)
       && (source.destination.application.type
-          == EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT)
-      && emberZclAreClusterSpecsEqual(&clusterSpec, &source.clusterSpec)) {
+          == CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT)
+      && chipZclAreClusterSpecsEqual(&clusterSpec, &source.clusterSpec)) {
     notificationContext.sourceEndpointId
       = source.destination.application.data.endpointId;
   } else {
-    emZclRespond400BadRequest(context->info);
+    chZclRespond400BadRequest(context->info);
     return;
   }
 
   CborState state;
   emCborDecodeStart(&state, context->payload, context->payloadLength);
   if (findAttributeMap(&state)) {
-    const EmZclAttributeEntry_t *attribute;
+    const ChZclAttributeEntry_t *attribute;
     notificationContext.buffer = buffer;
     while (getNextAttributeKeyValue(&state,
                                     notificationContext.clusterSpec,
@@ -108,13 +96,13 @@ void emZclUriClusterNotificationHandler(EmZclContext_t *context)
                                     context->info)) {
       notificationContext.attributeId = attribute->attributeId;
       notificationContext.bufferLength = attribute->size;
-      emZclMultiEndpointDispatch(context,
+      chZclMultiEndpointDispatch(context,
                                  notify,
                                  &state,
                                  &notificationContext);
     }
   } else {
-    emZclRespond400BadRequest(context->info);
+    chZclRespond400BadRequest(context->info);
   }
 }
 
@@ -126,7 +114,7 @@ static bool findAttributeMap(CborState *state)
       if (type == CBOR_TEXT) {
         uint8_t key[2]; // "a" plus a NUL
         if (emCborDecodeValue(state,
-                              EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING,
+                              CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING,
                               sizeof(key),
                               key)
             && strcmp((const char *)key, "a") == 0) {
@@ -151,23 +139,23 @@ static bool findAttributeMap(CborState *state)
 
 // TODO: This could probably be used in the over-the-air write handler.
 static bool getNextAttributeKeyValue(CborState *state,
-                                     const EmberZclClusterSpec_t *clusterSpec,
-                                     const EmZclAttributeEntry_t **attribute,
+                                     const ChipZclClusterSpec_t *clusterSpec,
+                                     const ChZclAttributeEntry_t **attribute,
                                      uint8_t *buffer,
-                                     const EmberCoapRequestInfo *info)
+                                     const ChipCoapRequestInfo *info)
 {
   while (true) {
     uint8_t type = emCborDecodePeek(state, NULL);
     if (type == CBOR_UNSIGNED) {
-      EmberZclAttributeId_t attributeId;
+      ChipZclAttributeId_t attributeId;
       if (!emCborDecodeValue(state,
-                             EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                             CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                              sizeof(attributeId),
                              (uint8_t *)&attributeId)) {
         break;
       }
 
-      *attribute = emZclFindAttribute(clusterSpec,
+      *attribute = chZclFindAttribute(clusterSpec,
                                       attributeId,
                                       true); // include remote
       if (*attribute != NULL
@@ -180,7 +168,7 @@ static bool getNextAttributeKeyValue(CborState *state,
         break;
       }
     } else if (type == CBOR_BREAK) {
-      emZclRespond204Changed(info);
+      chZclRespond204Changed(info);
       return false;
     } else if (!emCborDecodeSkipValue(state)
                || !emCborDecodeSkipValue(state)) {
@@ -188,18 +176,18 @@ static bool getNextAttributeKeyValue(CborState *state,
     }
   }
 
-  emZclRespond400BadRequest(info);
+  chZclRespond400BadRequest(info);
   return false;
 }
 
-static EmberStatus notify(const EmZclContext_t *context, CborState *state, void *data)
+static ChipStatus notify(const ChZclContext_t *context, CborState *state, void *data)
 {
-  EmberZclNotificationContext_t *notificationContext = data;
+  ChipZclNotificationContext_t *notificationContext = data;
   notificationContext->endpointId = context->endpoint->endpointId;
-  emZclNotification(notificationContext,
+  chZclNotification(notificationContext,
                     notificationContext->clusterSpec,
                     notificationContext->attributeId,
                     notificationContext->buffer,
                     notificationContext->bufferLength);
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }

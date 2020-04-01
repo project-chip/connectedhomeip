@@ -1,30 +1,18 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
-#define EMBER_AF_API_STACK "stack/include/ember.h"
+#define CHIP_AF_API_STACK "stack/include/chip.h"
 
 #include PLATFORM_HEADER
-#include "core/ember-stack.h"
+#include "core/chip-stack.h"
 #include "zclip-struct.h"
 #include "cbor.h"
 #include "zcl-core-types.h"
 #include "zcl-core.h"
 
-#define USE_STUB_emberVerifyEcdsaSignature
+#define USE_STUB_chipVerifyEcdsaSignature
 #define USE_STUB_emSha256Hash
 #include "stack/ip/stubs.c"
 
@@ -35,7 +23,7 @@
 // to be the audience string received in the token
 // No payload link implies that all clusters are allowed
 typedef struct {
-  EmberZclUid_t remoteUid; // the uid of the client that own the token.
+  ChipZclUid_t remoteUid; // the uid of the client that own the token.
 } RemoteTokenData_t;
 
 typedef struct {
@@ -44,28 +32,28 @@ typedef struct {
   uint16_t length;           // length of the token
   uint16_t audienceOffset;   // offset of the 'aud' string
   uint16_t audienceLength;   // length of the 'aud' string
-  EmberZclUid_t confUid;     // the uid of the client that own the token.
+  ChipZclUid_t confUid;     // the uid of the client that own the token.
 } TokenData_t;
 
 extern bool emDecodeAccessToken(TokenData_t *token);
 
 extern int16_t checkUidAccess(const uint8_t *accessString,
                               uint16_t accessStringLength,
-                              EmberZclUid_t *targetUid,
+                              ChipZclUid_t *targetUid,
                               uint8_t *clusterBuf,
                               uint16_t clusterBufLength);
 
 extern bool checkClusterAccess(const uint8_t *accessString,
                                uint16_t accessStringLength,
-                               const EmberZclClusterSpec_t *clusterSpec,
-                               EmberZclDeviceId_t deviceId,
+                               const ChipZclClusterSpec_t *clusterSpec,
+                               ChipZclDeviceId_t deviceId,
                                uint8_t accessType);
 
 extern bool emCacheConfiguredToken(const uint8_t *tokenBytes, uint16_t tokenLength);
 
-extern int8_t checkResourceAccess(EmberZclUid_t *targetUid,
+extern int8_t checkResourceAccess(ChipZclUid_t *targetUid,
                                   const RemoteTokenData_t *tokenData,
-                                  const EmberZclClusterSpec_t *clusterSpec,
+                                  const ChipZclClusterSpec_t *clusterSpec,
                                   int8_t accessType,
                                   uint16_t mask);
 
@@ -133,7 +121,7 @@ static const uint8_t tokenX509_3[] = {
 };
 
 // The owning UID in tokenX509_1, tokenX509_2, tokenX509_3.
-static const EmberZclUid_t uidX509 = {
+static const ChipZclUid_t uidX509 = {
   {
     0x90, 0xE3, 0x73, 0x21, 0x60, 0x4C, 0x9B, 0x6F,
     0x68, 0xAE, 0xF6, 0x45, 0x9F, 0x05, 0x5B, 0x1D,
@@ -160,7 +148,7 @@ static const uint8_t tokenRpk1[] = {
 };
 
 // The owning UID in tokenRpk1.
-static const EmberZclUid_t rpk1Uid = {
+static const ChipZclUid_t rpk1Uid = {
   {
     0xD4, 0x96, 0x17, 0xA9, 0x54, 0xA1, 0x70, 0x22,
     0xAD, 0x78, 0x9F, 0xF5, 0x69, 0x53, 0x30, 0xC6,
@@ -170,7 +158,7 @@ static const EmberZclUid_t rpk1Uid = {
 };
 
 // The UID in scope of tokenX509_2.
-EmberZclUid_t emZclUid = {
+ChipZclUid_t chZclUid = {
   {
     0xAA, 0x6D, 0xE6, 0x39, 0xBF, 0x12, 0xBA, 0x83,
     0x75, 0x13, 0x90, 0x12, 0x58, 0xF8, 0x26, 0x03,
@@ -179,18 +167,18 @@ EmberZclUid_t emZclUid = {
   }
 };
 
-EmberZclUid_t emRemoteUid;
+ChipZclUid_t emRemoteUid;
 
 extern Buffer remoteTokens;
-extern bool emZclUseAccessControl;
+extern bool chZclUseAccessControl;
 
 //----------------------------------------------------------------
 // Stubs for zcl-core-access.c: TODO: clean up
 
-EmberStatus emberZclRespondWithPath(const EmberCoapRequestInfo *requestInfo,
-                                    EmberCoapCode code,
+ChipStatus chipZclRespondWithPath(const ChipCoapRequestInfo *requestInfo,
+                                    ChipCoapCode code,
                                     const uint8_t *path,
-                                    const EmberCoapOption *options,
+                                    const ChipCoapOption *options,
                                     uint8_t numberOfOptions,
                                     const uint8_t *payload,
                                     uint16_t payloadLength)
@@ -198,36 +186,36 @@ EmberStatus emberZclRespondWithPath(const EmberCoapRequestInfo *requestInfo,
   return 0;
 }
 
-bool emberDtlsTransmitHandler(const uint8_t *payload,
+bool chipDtlsTransmitHandler(const uint8_t *payload,
                               uint16_t payloadLength,
-                              const EmberIpv6Address *localAddress,
+                              const ChipIpv6Address *localAddress,
                               uint16_t localPort,
-                              const EmberIpv6Address *remoteAddress,
+                              const ChipIpv6Address *remoteAddress,
                               uint16_t remotePort,
                               void *transmitHandlerData)
 {
   return 0;
 }
 
-EmberStatus emberZclDtlsManagerGetUidBySessionId(const uint8_t sessionId,
-                                                 EmberZclUid_t *remoteUid)
+ChipStatus chipZclDtlsManagerGetUidBySessionId(const uint8_t sessionId,
+                                                 ChipZclUid_t *remoteUid)
 {
   // assume we have session 1 open with uidX509
   if (sessionId == 1) {
     *remoteUid = uidX509;
-    return EMBER_SUCCESS;
+    return CHIP_SUCCESS;
   }
-  return EMBER_ERR_FATAL;
+  return CHIP_ERR_FATAL;
 }
 
 //----------------------------------------------------------------
 // Stubs for zcl-core-uri.c:
 
-bool emberIpv6StringToAddress(const uint8_t *src, EmberIpv6Address *dst)
+bool chipIpv6StringToAddress(const uint8_t *src, ChipIpv6Address *dst)
 {
   return false;
 }
-bool emberIpv6AddressToString(const EmberIpv6Address *src,
+bool chipIpv6AddressToString(const ChipIpv6Address *src,
                               uint8_t *dst,
                               size_t dstSize)
 {
@@ -252,27 +240,27 @@ extern bool emHexStringToInt(const uint8_t *chars,
 
 static void protectedResourceTest(void)
 {
-  EmberZclClusterSpec_t clusterSpec;
-  clusterSpec.role = EMBER_ZCL_ROLE_SERVER;
-  clusterSpec.manufacturerCode = EMBER_ZCL_MANUFACTURER_CODE_NULL;
+  ChipZclClusterSpec_t clusterSpec;
+  clusterSpec.role = CHIP_ZCL_ROLE_SERVER;
+  clusterSpec.manufacturerCode = CHIP_ZCL_MANUFACTURER_CODE_NULL;
 
-  clusterSpec.id = 0x0000; // EMBER_ZCL_CLUSTER_BASIC
-  assert(emZclIsProtectedResource(&clusterSpec, 'c'));
-  assert(emZclIsProtectedResource(&clusterSpec, 'r'));
-  assert(emZclIsProtectedResource(&clusterSpec, 'b'));
-  assert(emZclIsProtectedResource(&clusterSpec, 'a'));
+  clusterSpec.id = 0x0000; // CHIP_ZCL_CLUSTER_BASIC
+  assert(chZclIsProtectedResource(&clusterSpec, 'c'));
+  assert(chZclIsProtectedResource(&clusterSpec, 'r'));
+  assert(chZclIsProtectedResource(&clusterSpec, 'b'));
+  assert(chZclIsProtectedResource(&clusterSpec, 'a'));
 
-  clusterSpec.id = 0x2000; // EMBER_ZCL_CLUSTER_OTA_BOOTLOAD
-  assert(emZclIsProtectedResource(&clusterSpec, 'c'));
-  assert(emZclIsProtectedResource(&clusterSpec, 'r'));
-  assert(emZclIsProtectedResource(&clusterSpec, 'b'));
-  assert(emZclIsProtectedResource(&clusterSpec, 'a'));
+  clusterSpec.id = 0x2000; // CHIP_ZCL_CLUSTER_OTA_BOOTLOAD
+  assert(chZclIsProtectedResource(&clusterSpec, 'c'));
+  assert(chZclIsProtectedResource(&clusterSpec, 'r'));
+  assert(chZclIsProtectedResource(&clusterSpec, 'b'));
+  assert(chZclIsProtectedResource(&clusterSpec, 'a'));
 
-  clusterSpec.id = 0x0003; // EMBER_ZCL_CLUSTER_IDENTIFY
-  assert(!emZclIsProtectedResource(&clusterSpec, 'c'));
-  assert(!emZclIsProtectedResource(&clusterSpec, 'r'));
-  assert(!emZclIsProtectedResource(&clusterSpec, 'b'));
-  assert(!emZclIsProtectedResource(&clusterSpec, 'a'));
+  clusterSpec.id = 0x0003; // CHIP_ZCL_CLUSTER_IDENTIFY
+  assert(!chZclIsProtectedResource(&clusterSpec, 'c'));
+  assert(!chZclIsProtectedResource(&clusterSpec, 'r'));
+  assert(!chZclIsProtectedResource(&clusterSpec, 'b'));
+  assert(!chZclIsProtectedResource(&clusterSpec, 'a'));
 }
 
 static void extractBinaryTokenTest(void)
@@ -282,41 +270,41 @@ static void extractBinaryTokenTest(void)
       "XQk1tMjlvcnZaRm53VmJIYUVLOVlvRDI1cjJaX29uc01LRXFIa4GDQEBYQB8R-C"
       "MKK3Trp6B58AecOZyjOxpW0MOO0bwqgvGsz4WPa7_uFhvC4v6PC8mduQO_GUbPt"
       "i9ACQDBRepIr_MgPyA";
-  char payload[EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN];
+  char payload[CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN];
   uint16_t outputSize = 0;
-  uint8_t output[EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN];
+  uint8_t output[CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN];
   CborState state;
 
   // encode CBOR map e.g. {19:"tokenX509_1_base64url"}
-  emCborEncodeMapStart(&state, payload, EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN, 1);
+  emCborEncodeMapStart(&state, payload, CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN, 1);
   assert(emCborEncodeMapEntry(&state,
-                              EM_ZCL_ACCESS_TOKEN_KEY,
-                              EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING,
+                              CH_ZCL_ACCESS_TOKEN_KEY,
+                              CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING,
                               sizeof(tokenX509_1_base64url),
                               (uint8_t *)tokenX509_1_base64url));
   // printBuffer(payload, state.finger - state.start);
 
   // decode CBOR map - check that outputSize can hold the decoded payload
   emCborDecodeStart(&state, payload, emCborEncodeSize(&state));
-  assert(!emZclExtractBinaryAccessToken(&state, output, &outputSize)); // fail as outputSize=0
+  assert(!chZclExtractBinaryAccessToken(&state, output, &outputSize)); // fail as outputSize=0
 
   // decode CBOR map - after fixing outputSize to the size of output array
   emCborDecodeStart(&state, payload, emCborEncodeSize(&state));
-  outputSize = EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN;
-  assert(emZclExtractBinaryAccessToken(&state, output, &outputSize)); // success as outputSize can hold output
+  outputSize = CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN;
+  assert(chZclExtractBinaryAccessToken(&state, output, &outputSize)); // success as outputSize can hold output
   assert(memcmp(output, tokenX509_1, outputSize) == 0); // extracted actual binary token
 
   // encode CBOR map with wrong key e.g. {2:"tokenX509_1_base64url"}
-  emCborEncodeMapStart(&state, payload, EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN, 1);
+  emCborEncodeMapStart(&state, payload, CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN, 1);
   assert(emCborEncodeMapEntry(&state,
                               2,
-                              EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING,
+                              CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING,
                               sizeof(tokenX509_1_base64url),
                               (uint8_t *)tokenX509_1_base64url));
   // decode CBOR map - using wrong access token key (2)
   emCborDecodeStart(&state, payload, emCborEncodeSize(&state));
-  outputSize = EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN;
-  assert(!emZclExtractBinaryAccessToken(&state, output, &outputSize)); // fail as wrong key (2)
+  outputSize = CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN;
+  assert(!chZclExtractBinaryAccessToken(&state, output, &outputSize)); // fail as wrong key (2)
 }
 
 static void parseTest(void)
@@ -332,51 +320,51 @@ static void parseTest(void)
   memcpy(foo, token.bytes + token.audienceOffset, token.audienceLength);
   foo[token.audienceLength] = 0;
   // fprintf(stderr, "[aud: '%s']\n", foo);
-  EmberZclClusterSpec_t clusterSpec;
-  clusterSpec.role = EMBER_ZCL_ROLE_SERVER;
-  clusterSpec.manufacturerCode = EMBER_ZCL_MANUFACTURER_CODE_NULL;
+  ChipZclClusterSpec_t clusterSpec;
+  clusterSpec.role = CHIP_ZCL_ROLE_SERVER;
+  clusterSpec.manufacturerCode = CHIP_ZCL_MANUFACTURER_CODE_NULL;
   clusterSpec.id = 0;
   assert(checkUidAccess(token.bytes + token.audienceOffset,
                         token.audienceLength,
-                        &emZclUid,
+                        &chZclUid,
                         NULL,
                         0)
          == 5); // the length of the 'aud' string in the token
   assert(checkClusterAccess(token.bytes + token.audienceOffset,
                             token.audienceLength,
                             &clusterSpec,
-                            EMBER_ZCL_DEVICE_ID_NULL,
+                            CHIP_ZCL_DEVICE_ID_NULL,
                             'c'));
   clusterSpec.id = 1;
   assert(!checkClusterAccess(token.bytes + token.audienceOffset,
                              token.audienceLength,
                              &clusterSpec,
-                             EMBER_ZCL_DEVICE_ID_NULL,
+                             CHIP_ZCL_DEVICE_ID_NULL,
                              'c'));
 }
 
 static void localTokenTest(void)
 {
-  memcpy(&emRemoteUid, &rpk1Uid, sizeof(EmberZclUid_t));
+  memcpy(&emRemoteUid, &rpk1Uid, sizeof(ChipZclUid_t));
 
   Buffer tokenBuffer = emAllocateBuffer(sizeof(RemoteTokenData_t));
   RemoteTokenData_t *token = (RemoteTokenData_t *)emGetBufferPointer(tokenBuffer);
   memset(token, 0, sizeof(RemoteTokenData_t));
-  memcpy(&token->remoteUid, &emRemoteUid, sizeof(EmberZclUid_t));
+  memcpy(&token->remoteUid, &emRemoteUid, sizeof(ChipZclUid_t));
 
-  EmberZclClusterSpec_t clusterSpec;
-  clusterSpec.role = EMBER_ZCL_ROLE_SERVER;
-  clusterSpec.manufacturerCode = EMBER_ZCL_MANUFACTURER_CODE_NULL;
+  ChipZclClusterSpec_t clusterSpec;
+  clusterSpec.role = CHIP_ZCL_ROLE_SERVER;
+  clusterSpec.manufacturerCode = CHIP_ZCL_MANUFACTURER_CODE_NULL;
 
   clusterSpec.id = 1;
   assert(checkResourceAccess(&emRemoteUid, NULL, &clusterSpec, 'c', 0x1) == -2);  // -2 == unprotected access (dtls session not required)
 
   clusterSpec.id = 0;
-  assert(checkResourceAccess(&emZclUid, token, &clusterSpec, 'c', 0xFFFF) == -1);
+  assert(checkResourceAccess(&chZclUid, token, &clusterSpec, 'c', 0xFFFF) == -1);
   assert(emCacheConfiguredToken(tokenRpk1, sizeof(tokenRpk1)));
-  assert(checkResourceAccess(&emZclUid, token, &clusterSpec, 'c', 0x0) == -1);
-  assert(checkResourceAccess(&emZclUid, token, &clusterSpec, 'c', 0x2) == -1);
-  assert(checkResourceAccess(&emZclUid, token, &clusterSpec, 'c', 0x1) == 0);
+  assert(checkResourceAccess(&chZclUid, token, &clusterSpec, 'c', 0x0) == -1);
+  assert(checkResourceAccess(&chZclUid, token, &clusterSpec, 'c', 0x2) == -1);
+  assert(checkResourceAccess(&chZclUid, token, &clusterSpec, 'c', 0x1) == 0);
   assert(checkResourceAccess(&emRemoteUid, token, &clusterSpec, 'c', 0x1) == -1);
 }
 
@@ -387,13 +375,13 @@ static void receivedTokenTest(void)
   Buffer queueBuffer;
   Buffer clusterBuffer;
   for (i = 0; i < 2; i++) {
-    assert(emZclAddIncomingToken(&uidX509,
+    assert(chZclAddIncomingToken(&uidX509,
                                  tokenX509_1,
                                  sizeof(tokenX509_1)));
     assert(emBufferQueueLength(&remoteTokens) == 1);
     queueBuffer = emBufferQueueHead(&remoteTokens);
     assert(queueBuffer != NULL_BUFFER);
-    assert(memcmp(emGetBufferPointer(queueBuffer), &uidX509, sizeof(EmberZclUid_t)) == 0);
+    assert(memcmp(emGetBufferPointer(queueBuffer), &uidX509, sizeof(ChipZclUid_t)) == 0);
     clusterBuffer = emGetPayloadLink(queueBuffer);
     assert(clusterBuffer != NULL_BUFFER);
     assert(emGetBufferLength(clusterBuffer) == 5);
@@ -401,43 +389,43 @@ static void receivedTokenTest(void)
   }
 
   uint8_t sessionId = 1; // we assume this is open with uidX509
-  EmberZclClusterSpec_t clusterSpec;
-  clusterSpec.role = EMBER_ZCL_ROLE_SERVER;
-  clusterSpec.manufacturerCode = EMBER_ZCL_MANUFACTURER_CODE_NULL;
+  ChipZclClusterSpec_t clusterSpec;
+  clusterSpec.role = CHIP_ZCL_ROLE_SERVER;
+  clusterSpec.manufacturerCode = CHIP_ZCL_MANUFACTURER_CODE_NULL;
   clusterSpec.id = 0x0000;
 
   // restricted resource - access token grants access
-  assert(emZclAllowRemoteAccess(sessionId,
+  assert(chZclAllowRemoteAccess(sessionId,
                                 &clusterSpec,
-                                EMBER_ZCL_DEVICE_ID_NULL,
-                                'c') == EMBER_ZCL_STATUS_SUCCESS);
+                                CHIP_ZCL_DEVICE_ID_NULL,
+                                'c') == CHIP_ZCL_STATUS_SUCCESS);
 
   // restricted resource - access token does not grant access
-  assert(emZclAllowRemoteAccess(sessionId,
+  assert(chZclAllowRemoteAccess(sessionId,
                                 &clusterSpec,
-                                EMBER_ZCL_DEVICE_ID_NULL,
-                                'a') == EMBER_ZCL_STATUS_FORBIDDEN);
+                                CHIP_ZCL_DEVICE_ID_NULL,
+                                'a') == CHIP_ZCL_STATUS_FORBIDDEN);
 
   // restricted resource - access token does not grant access
   clusterSpec.id = 0x2000;
-  assert(emZclAllowRemoteAccess(sessionId,
+  assert(chZclAllowRemoteAccess(sessionId,
                                 &clusterSpec,
-                                EMBER_ZCL_DEVICE_ID_NULL,
-                                'a') == EMBER_ZCL_STATUS_FORBIDDEN);
+                                CHIP_ZCL_DEVICE_ID_NULL,
+                                'a') == CHIP_ZCL_STATUS_FORBIDDEN);
 
   // restricted resource - access token grants access but wrong DTLS session used
-  assert(emZclAllowRemoteAccess(0,
+  assert(chZclAllowRemoteAccess(0,
                                 &clusterSpec,
-                                EMBER_ZCL_DEVICE_ID_NULL,
-                                'c') == EMBER_ZCL_STATUS_FAILURE);
+                                CHIP_ZCL_DEVICE_ID_NULL,
+                                'c') == CHIP_ZCL_STATUS_FAILURE);
 
   // add token - check that it was added to the head of the queue
-  assert(emZclAddIncomingToken(&uidX509,
+  assert(chZclAddIncomingToken(&uidX509,
                                tokenX509_2,
                                sizeof(tokenX509_2)));
   assert(emBufferQueueLength(&remoteTokens) == 2);
   queueBuffer = emBufferQueueHead(&remoteTokens);
-  assert(memcmp(emGetBufferPointer(queueBuffer), &uidX509, sizeof(EmberZclUid_t)) == 0);
+  assert(memcmp(emGetBufferPointer(queueBuffer), &uidX509, sizeof(ChipZclUid_t)) == 0);
   assert(queueBuffer != NULL_BUFFER);
   clusterBuffer = emGetPayloadLink(queueBuffer);
   assert(clusterBuffer == NULL_BUFFER); // grants access to everything
@@ -446,12 +434,12 @@ static void receivedTokenTest(void)
 
   // add token - check that it was added to the head of the queue
   //             check that oldest item is removed from queue, as max capacity is 2
-  assert(emZclAddIncomingToken(&uidX509,
+  assert(chZclAddIncomingToken(&uidX509,
                                tokenX509_3,
                                sizeof(tokenX509_3)));
   assert(emBufferQueueLength(&remoteTokens) == 2);
   queueBuffer = emBufferQueueHead(&remoteTokens);
-  assert(memcmp(emGetBufferPointer(queueBuffer), &uidX509, sizeof(EmberZclUid_t)) == 0);
+  assert(memcmp(emGetBufferPointer(queueBuffer), &uidX509, sizeof(ChipZclUid_t)) == 0);
   assert(queueBuffer != NULL_BUFFER);
   clusterBuffer = emGetPayloadLink(queueBuffer);
   assert(clusterBuffer != NULL_BUFFER);
@@ -459,7 +447,7 @@ static void receivedTokenTest(void)
   assert(memcmp(emGetBufferPointer(clusterBuffer), "d.102 ", 6) == 0);
   // move pointer to second item in queue and check that it was the previously added one
   queueBuffer = emBufferQueueNext(&remoteTokens, queueBuffer);
-  assert(memcmp(emGetBufferPointer(queueBuffer), &uidX509, sizeof(EmberZclUid_t)) == 0);
+  assert(memcmp(emGetBufferPointer(queueBuffer), &uidX509, sizeof(ChipZclUid_t)) == 0);
   assert(queueBuffer != NULL_BUFFER);
   clusterBuffer = emGetPayloadLink(queueBuffer);
   assert(clusterBuffer == NULL_BUFFER);
@@ -470,35 +458,35 @@ static void receivedTokenTest(void)
   assert(queueBuffer == NULL_BUFFER);
 
   // adding token with incorrect UID should fail
-  assert(!emZclAddIncomingToken(&emZclUid,
+  assert(!chZclAddIncomingToken(&chZclUid,
                                 tokenX509_1,
                                 sizeof(tokenX509_1)));
-  assert(!emZclAddIncomingToken(&emZclUid,
+  assert(!chZclAddIncomingToken(&chZclUid,
                                 tokenX509_2,
                                 sizeof(tokenX509_2)));
-  assert(!emZclAddIncomingToken(&emZclUid,
+  assert(!chZclAddIncomingToken(&chZclUid,
                                 tokenX509_3,
                                 sizeof(tokenX509_3)));
   assert(emBufferQueueLength(&remoteTokens) == 2);
 
   // restricted resources - tokenX509_2 grants access to everything
   clusterSpec.id = 0x0000;
-  assert(emZclAllowRemoteAccess(sessionId,
+  assert(chZclAllowRemoteAccess(sessionId,
                                 &clusterSpec,
-                                EMBER_ZCL_DEVICE_ID_NULL,
-                                'a') == EMBER_ZCL_STATUS_SUCCESS);
+                                CHIP_ZCL_DEVICE_ID_NULL,
+                                'a') == CHIP_ZCL_STATUS_SUCCESS);
   clusterSpec.id = 0x2000;
-  assert(emZclAllowRemoteAccess(sessionId,
+  assert(chZclAllowRemoteAccess(sessionId,
                                 &clusterSpec,
-                                EMBER_ZCL_DEVICE_ID_NULL,
-                                'c') == EMBER_ZCL_STATUS_SUCCESS);
+                                CHIP_ZCL_DEVICE_ID_NULL,
+                                'c') == CHIP_ZCL_STATUS_SUCCESS);
 }
 
-const EmZclEndpointEntry_t emZclEndpointTable[] = {
+const ChZclEndpointEntry_t chZclEndpointTable[] = {
   { 0, 0, NULL }
 };
 
-const size_t emZclEndpointCount = 1;
+const size_t chZclEndpointCount = 1;
 
 int main(int argc, char *argv[])
 {
@@ -506,7 +494,7 @@ int main(int argc, char *argv[])
 
   emInitializeBuffers();
 
-  emZclUseAccessControl = ZCL_ACCESS_CONTROL_ON;
+  chZclUseAccessControl = ZCL_ACCESS_CONTROL_ON;
   protectedResourceTest();
   extractBinaryTokenTest();
   parseTest();

@@ -1,32 +1,20 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_BUFFER_MANAGEMENT
-#include EMBER_AF_API_EVENT_QUEUE
-#include EMBER_AF_API_HAL
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_BUFFER_MANAGEMENT
+#include CHIP_AF_API_EVENT_QUEUE
+#include CHIP_AF_API_HAL
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_ZCL_CORE_WELL_KNOWN
-#include EMBER_AF_API_ZCL_CORE_DTLS_MANAGER
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE_WELL_KNOWN
+#include CHIP_AF_API_ZCL_CORE_DTLS_MANAGER
 
 // TODO: Use an appropriate timeout.
 #define DISCOVERY_TIMEOUT_MS   1500
@@ -39,10 +27,10 @@
 // data.
 typedef struct {
   Event event;
-  EmberZclCoapEndpoint_t destination;
-  EmberIpv6Address remoteAddress;
-  EmberCoapCode code;
-  EmberCoapResponseHandler handler;
+  ChipZclCoapEndpoint_t destination;
+  ChipIpv6Address remoteAddress;
+  ChipCoapCode code;
+  ChipCoapResponseHandler handler;
   size_t uriPathLength; // includes NUL terminator
   uint16_t payloadLength;
   uint16_t applicationDataLength;
@@ -52,32 +40,32 @@ typedef struct {
   //uint8_t applicationData[applicationDataLength];
 } MessageEvent;
 
-static bool discoverAddress(const EmberZclCoapEndpoint_t *destination);
-static void uidDiscoveryResponseHandler(EmberCoapStatus status,
-                                        EmberCoapCode code,
-                                        EmberCoapReadOptions *options,
+static bool discoverAddress(const ChipZclCoapEndpoint_t *destination);
+static void uidDiscoveryResponseHandler(ChipCoapStatus status,
+                                        ChipCoapCode code,
+                                        ChipCoapReadOptions *options,
                                         uint8_t *payload,
                                         uint16_t payloadLength,
-                                        EmberCoapResponseInfo *info);
+                                        ChipCoapResponseInfo *info);
 static bool validateUidDiscoveryResponse(const uint8_t *payload,
                                          uint16_t payloadLength,
-                                         EmberZclUid_t *uid);
-static void defaultCoapResponseHandler(EmberCoapStatus status,
-                                       EmberCoapCode code,
-                                       EmberCoapReadOptions *options,
+                                         ChipZclUid_t *uid);
+static void defaultCoapResponseHandler(ChipCoapStatus status,
+                                       ChipCoapCode code,
+                                       ChipCoapReadOptions *options,
                                        uint8_t *payload,
                                        uint16_t payloadLength,
-                                       EmberCoapResponseInfo *info);
+                                       ChipCoapResponseInfo *info);
 static void eventHandler(MessageEvent *event);
 static void eventMarker(MessageEvent *event);
 static bool destinationPredicate(MessageEvent *event,
-                                 const EmberZclUid_t *uid);
-static void uidResolutionHandler(EmberCoapStatus status,
-                                 EmberCoapCode code,
-                                 EmberCoapReadOptions *options,
+                                 const ChipZclUid_t *uid);
+static void uidResolutionHandler(ChipCoapStatus status,
+                                 ChipCoapCode code,
+                                 ChipCoapReadOptions *options,
                                  uint8_t *payload,
                                  uint16_t payloadLength,
-                                 EmberCoapResponseInfo *info);
+                                 ChipCoapResponseInfo *info);
 
 void coapSendDtlsConnectionReturnHandle(uint8_t sessionId);
 
@@ -89,24 +77,24 @@ static EventActions actions = {
   .name = "zcl core messaging"
 };
 
-EmberStatus emZclSend(const EmberZclCoapEndpoint_t *destination,
-                      EmberCoapCode code,
+ChipStatus chZclSend(const ChipZclCoapEndpoint_t *destination,
+                      ChipCoapCode code,
                       const uint8_t *uriPath,
                       const uint8_t *payload,
                       uint16_t payloadLength,
-                      EmberCoapResponseHandler handler,
+                      ChipCoapResponseHandler handler,
                       void *applicationData,
                       uint16_t applicationDataLength,
                       bool skipCoapTxRetry)
 {
-  EmberCoapOption emZclSendOptions[] = {
-    { EMBER_COAP_OPTION_CONTENT_FORMAT, NULL, 1, EMBER_COAP_CONTENT_FORMAT_CBOR, },
+  ChipCoapOption chZclSendOptions[] = {
+    { CHIP_COAP_OPTION_CONTENT_FORMAT, NULL, 1, CHIP_COAP_CONTENT_FORMAT_CBOR, },
   };
-  return emZclSendWithOptions(destination,
+  return chZclSendWithOptions(destination,
                               code,
                               uriPath,
-                              emZclSendOptions,
-                              COUNTOF(emZclSendOptions),
+                              chZclSendOptions,
+                              COUNTOF(chZclSendOptions),
                               payload,
                               payloadLength,
                               handler,
@@ -115,21 +103,21 @@ EmberStatus emZclSend(const EmberZclCoapEndpoint_t *destination,
                               skipCoapTxRetry);
 }
 
-EmberStatus emberZclRequestBlock(const EmberZclCoapEndpoint_t *destination,
+ChipStatus chipZclRequestBlock(const ChipZclCoapEndpoint_t *destination,
                                  const uint8_t *uriPath,
-                                 EmberCoapBlockOption *block2Option,
-                                 EmberCoapResponseHandler responseHandler)
+                                 ChipCoapBlockOption *block2Option,
+                                 ChipCoapResponseHandler responseHandler)
 {
-  EmberCoapOption sendOptions[1];
+  ChipCoapOption sendOptions[1];
 
-  emberInitCoapOption(sendOptions,
-                      EMBER_COAP_OPTION_BLOCK2,
-                      emberBlockOptionValue(false,
+  chipInitCoapOption(sendOptions,
+                      CHIP_COAP_OPTION_BLOCK2,
+                      chipBlockOptionValue(false,
                                             block2Option->logSize,
                                             block2Option->number));
 
-  return emZclSendWithOptions(destination,
-                              EMBER_COAP_CODE_GET,
+  return chZclSendWithOptions(destination,
+                              CHIP_COAP_CODE_GET,
                               uriPath,
                               sendOptions,
                               COUNTOF(sendOptions),
@@ -141,26 +129,26 @@ EmberStatus emberZclRequestBlock(const EmberZclCoapEndpoint_t *destination,
                               false);
 }
 
-EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
-                                 EmberCoapCode code,
+ChipStatus chZclSendWithOptions(const ChipZclCoapEndpoint_t *destination,
+                                 ChipCoapCode code,
                                  const uint8_t *uriPath,
-                                 const EmberCoapOption options[],
+                                 const ChipCoapOption options[],
                                  uint16_t optionsLength,
                                  const uint8_t *payload,
                                  uint16_t payloadLength,
-                                 EmberCoapResponseHandler handler,
+                                 ChipCoapResponseHandler handler,
                                  void *applicationData,
                                  uint16_t applicationDataLength,
                                  bool skipCoapTxRetry)
 {
-  EmberIpv6Address remoteAddressBuf;
-  const EmberIpv6Address *remoteAddress = NULL;
+  ChipIpv6Address remoteAddressBuf;
+  const ChipIpv6Address *remoteAddress = NULL;
   bool createEvent = false;
   bool haveCachedUid = false;
   bool openDtls = false;
   bool discoveryNeeded = false;
 
-  EmberCoapSendInfo info = {
+  ChipCoapSendInfo info = {
     .nonConfirmed = false,
     .skipCoapTxRetry = false, // We only want this set to true when UID needs resolution
 
@@ -179,17 +167,17 @@ EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
     .transmitHandler = NULL // unused
   };
 
-  uint8_t sessionId = EMBER_NULL_SESSION_ID;
-  if (destination->flags & EMBER_ZCL_HAVE_UID_FLAG) {
-    sessionId = emberZclDtlsManagerGetSessionIdByUid(&destination->uid, destination->port);
-  } else if (destination->flags & EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
-    sessionId = emberZclDtlsManagerGetSessionIdByAddress(&destination->address, destination->port);
+  uint8_t sessionId = CHIP_NULL_SESSION_ID;
+  if (destination->flags & CHIP_ZCL_HAVE_UID_FLAG) {
+    sessionId = chipZclDtlsManagerGetSessionIdByUid(&destination->uid, destination->port);
+  } else if (destination->flags & CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
+    sessionId = chipZclDtlsManagerGetSessionIdByAddress(&destination->address, destination->port);
   }
 
-  if (sessionId != EMBER_NULL_SESSION_ID) { // use secure session if available
-    info.localPort = EMBER_COAP_SECURE_PORT;
+  if (sessionId != CHIP_NULL_SESSION_ID) { // use secure session if available
+    info.localPort = CHIP_COAP_SECURE_PORT;
     info.transmitHandlerData = (void *) (uint32_t) sessionId;
-    info.transmitHandler = &emberDtlsTransmitHandler;
+    info.transmitHandler = &chipDtlsTransmitHandler;
   }
 
   // The following logic works in one of the three following ways:
@@ -203,10 +191,10 @@ EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
   //
   // 3. If we have not gotten an IPv6 address or UID we will run address discovery, and create an event
   // to make sure this occurs. Then we will send to the new address once it has been discovered.
-  if (destination->flags & EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
+  if (destination->flags & CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
     // use the IPv6 address
     remoteAddress = &destination->address;
-  } else if (emZclCacheGet(&destination->uid, &remoteAddressBuf)) {
+  } else if (chZclCacheGet(&destination->uid, &remoteAddressBuf)) {
     remoteAddress = &remoteAddressBuf;
     if (skipCoapTxRetry) {
       info.skipCoapTxRetry = true;
@@ -217,25 +205,25 @@ EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
     createEvent = true;
     discoveryNeeded = true;
   } else {
-    emberAfPluginZclCorePrintln("Unable to lookup remoteAddress");
-    return EMBER_ERR_FATAL;
+    chipAfPluginZclCorePrintln("Unable to lookup remoteAddress");
+    return CHIP_ERR_FATAL;
   }
 
   // If DTLS session is not found try to open one
-  if ((destination->flags & EMBER_ZCL_USE_COAPS_FLAG)
-      && sessionId == EMBER_NULL_SESSION_ID
+  if ((destination->flags & CHIP_ZCL_USE_COAPS_FLAG)
+      && sessionId == CHIP_NULL_SESSION_ID
       && !discoveryNeeded) {
     // If IPv6 address was not resolved the execution shouldn't get here
-    if (((destination->flags & EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG) == 0) && (remoteAddress == NULL)) {
+    if (((destination->flags & CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG) == 0) && (remoteAddress == NULL)) {
       assert(0);
     }
 
     // If we got here as a result of a callback from "open DTLS connection" smth went wrong.
-    if (destination->flags & EMBER_ZCL_AVOID_NEW_DTLS_SESSION) {
-      return EMBER_ERR_FATAL;
+    if (destination->flags & CHIP_ZCL_AVOID_NEW_DTLS_SESSION) {
+      return CHIP_ERR_FATAL;
     }
 
-    emberAfPluginZclCorePrintln("Opening a DTLS session ");
+    chipAfPluginZclCorePrintln("Opening a DTLS session ");
     openDtls = true;
     createEvent = true;
   }
@@ -247,8 +235,8 @@ EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
                                      + payloadLength
                                      + applicationDataLength);
     if (buffer == NULL_BUFFER) {
-      emberAfPluginZclCorePrintln("Need more RAM (have: %u, need: %u)", emBufferBytesRemaining(), sizeof(MessageEvent) + uriPathLength + payloadLength + applicationDataLength);
-      return EMBER_NO_BUFFERS;
+      chipAfPluginZclCorePrintln("Need more RAM (have: %u, need: %u)", emBufferBytesRemaining(), sizeof(MessageEvent) + uriPathLength + payloadLength + applicationDataLength);
+      return CHIP_NO_BUFFERS;
     }
     uint8_t *finger = emGetBufferPointer(buffer);
     MessageEvent *event = (MessageEvent *)(void *)finger;
@@ -256,7 +244,7 @@ EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
     event->event.next = NULL;
     event->event.timeToExecute = 0;
     event->destination = *destination;
-    MEMSET(&event->remoteAddress, 0, sizeof(EmberIpv6Address)); // filled in later
+    MEMSET(&event->remoteAddress, 0, sizeof(ChipIpv6Address)); // filled in later
     event->code = code;
     event->handler = handler;
     event->uriPathLength = uriPathLength;
@@ -271,22 +259,22 @@ EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
     event->skipCoapTxRetry = skipCoapTxRetry;
 
     if (openDtls) {
-      event->destination.flags = destination->flags | EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG;
-      emberEventSetDelayMs((Event *)event, OPEN_DTLS_SESSION_TIMEOUT_MS);
-      emberZclDtlsManagerGetConnection(&destination->address,
+      event->destination.flags = destination->flags | CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG;
+      chipEventSetDelayMs((Event *)event, OPEN_DTLS_SESSION_TIMEOUT_MS);
+      chipZclDtlsManagerGetConnection(&destination->address,
                                        destination->port,
-                                       EMBER_DTLS_MODE_CERT,
+                                       CHIP_DTLS_MODE_CERT,
                                        coapSendDtlsConnectionReturnHandle);
-      return EMBER_SUCCESS;
+      return CHIP_SUCCESS;
     }
 
     if (haveCachedUid) {
-      MEMCOPY(&event->remoteAddress, remoteAddress, sizeof(EmberIpv6Address));
-      emberEventSetDelayMs((Event *)event, UID_RESOLUTION_TIMEOUT_MS); // Set UID Resolution timeout.
+      MEMCOPY(&event->remoteAddress, remoteAddress, sizeof(ChipIpv6Address));
+      chipEventSetDelayMs((Event *)event, UID_RESOLUTION_TIMEOUT_MS); // Set UID Resolution timeout.
       if (event->skipCoapTxRetry && event->handler == NULL) {
         event->handler = uidResolutionHandler;
       }
-      return emberCoapSend(remoteAddress,
+      return chipCoapSend(remoteAddress,
                            code,
                            uriPath,
                            payload,
@@ -295,11 +283,11 @@ EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
                            &info);
     }
     // If we arent doing DTLS or UID Resolution, run UID discovery
-    emberEventSetDelayMs((Event *)event, DISCOVERY_TIMEOUT_MS); // Set address discovery timeout.
-    return EMBER_SUCCESS;
+    chipEventSetDelayMs((Event *)event, DISCOVERY_TIMEOUT_MS); // Set address discovery timeout.
+    return CHIP_SUCCESS;
   }
 
-  return emberCoapSend(remoteAddress,
+  return chipCoapSend(remoteAddress,
                        code,
                        uriPath,
                        payload,
@@ -310,32 +298,32 @@ EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
                        &info);
 }
 
-static bool coapSendDtlsEventPredicate(MessageEvent *event, const EmberZclCoapEndpoint_t *destination)
+static bool coapSendDtlsEventPredicate(MessageEvent *event, const ChipZclCoapEndpoint_t *destination)
 {
-  if (event->destination.flags & EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
-    return ((MEMCOMPARE(&destination->address, &event->destination.address, sizeof(EmberIpv6Address)) == 0)
+  if (event->destination.flags & CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
+    return ((MEMCOMPARE(&destination->address, &event->destination.address, sizeof(ChipIpv6Address)) == 0)
             && (MEMCOMPARE(&destination->port, &event->destination.port, sizeof(uint16_t)) == 0));
   } else {
     return false;
   }
 }
 
-// Callback from DTLS connection creation triggered by emZclSendWithOptions()
+// Callback from DTLS connection creation triggered by chZclSendWithOptions()
 void coapSendDtlsConnectionReturnHandle(uint8_t sessionId)
 {
-  EmberZclCoapEndpoint_t destination;
+  ChipZclCoapEndpoint_t destination;
 
-  if (emberZclDtlsManagerGetAddressBySessionId(sessionId, &destination.address) != EMBER_SUCCESS) {
-    emberAfPluginZclCorePrintln("Remote address retrieval failure");
+  if (chipZclDtlsManagerGetAddressBySessionId(sessionId, &destination.address) != CHIP_SUCCESS) {
+    chipAfPluginZclCorePrintln("Remote address retrieval failure");
     return;
   }
 
-  if (emberZclDtlsManagerGetPortBySessionId(sessionId, &destination.port) != EMBER_SUCCESS) {
-    emberAfPluginZclCorePrintln("Remote port retrieval failure");
+  if (chipZclDtlsManagerGetPortBySessionId(sessionId, &destination.port) != CHIP_SUCCESS) {
+    chipAfPluginZclCorePrintln("Remote port retrieval failure");
     return;
   }
 
-  MessageEvent *event = (MessageEvent *)emberFindAllEvents(&emAppEventQueue, &actions, (EventPredicate)coapSendDtlsEventPredicate, (void *)&destination);
+  MessageEvent *event = (MessageEvent *)chipFindAllEvents(&emAppEventQueue, &actions, (EventPredicate)coapSendDtlsEventPredicate, (void *)&destination);
 
   while (event != NULL) {
     uint8_t *finger = (uint8_t *) event;
@@ -347,12 +335,12 @@ void coapSendDtlsConnectionReturnHandle(uint8_t sessionId)
     uint8_t *applicationData = finger;
     //finger += event->applicationDataLength;
 
-    // As an extra insurance against an infinite loop EMBER_ZCL_AVOID_NEW_DTLS_SESSION flag
-    // will prevent emZclSendWithOptions() from openining a new DTLS session for this packet
-    destination.flags = EMBER_ZCL_USE_COAPS_FLAG
-                        | EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG | EMBER_ZCL_AVOID_NEW_DTLS_SESSION;
+    // As an extra insurance against an infinite loop CHIP_ZCL_AVOID_NEW_DTLS_SESSION flag
+    // will prevent chZclSendWithOptions() from openining a new DTLS session for this packet
+    destination.flags = CHIP_ZCL_USE_COAPS_FLAG
+                        | CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG | CHIP_ZCL_AVOID_NEW_DTLS_SESSION;
 
-    emZclSend(&destination,
+    chZclSend(&destination,
               event->code,
               uriPath,
               payload,
@@ -368,33 +356,33 @@ void coapSendDtlsConnectionReturnHandle(uint8_t sessionId)
   }
 }
 
-static bool discoverAddress(const EmberZclCoapEndpoint_t *destination)
+static bool discoverAddress(const ChipZclCoapEndpoint_t *destination)
 {
-  if (destination->flags & EMBER_ZCL_HAVE_UID_FLAG) {
-    return (emberZclDiscByUid(&destination->uid,
-                              EMBER_ZCL_UID_BITS, // discovery matches all uid bits.
+  if (destination->flags & CHIP_ZCL_HAVE_UID_FLAG) {
+    return (chipZclDiscByUid(&destination->uid,
+                              CHIP_ZCL_UID_BITS, // discovery matches all uid bits.
                               uidDiscoveryResponseHandler));
   }
   //TODO Other discovery types here?
   return false;
 }
 
-static void uidDiscoveryResponseHandler(EmberCoapStatus status,
-                                        EmberCoapCode code,
-                                        EmberCoapReadOptions *options,
+static void uidDiscoveryResponseHandler(ChipCoapStatus status,
+                                        ChipCoapCode code,
+                                        ChipCoapReadOptions *options,
                                         uint8_t *payload,
                                         uint16_t payloadLength,
-                                        EmberCoapResponseInfo *info)
+                                        ChipCoapResponseInfo *info)
 {
-  if (status == EMBER_COAP_MESSAGE_RESPONSE) {
-    EmberZclUid_t uid;
+  if (status == CHIP_COAP_MESSAGE_RESPONSE) {
+    ChipZclUid_t uid;
     if (validateUidDiscoveryResponse(payload,
                                      payloadLength,
                                      &uid)) {
-      emZclCacheAdd(&uid, &info->remoteAddress, NULL);
+      chZclCacheAdd(&uid, &info->remoteAddress, NULL);
       // Find and send any buffered messages with a matching uid destination.
       MessageEvent *event
-        = (MessageEvent *)emberFindAllEvents(&emAppEventQueue,
+        = (MessageEvent *)chipFindAllEvents(&emAppEventQueue,
                                              &actions,
                                              (EventPredicate)destinationPredicate,
                                              (void *)&uid);
@@ -408,15 +396,15 @@ static void uidDiscoveryResponseHandler(EmberCoapStatus status,
         uint8_t *applicationData = finger;
         //finger += event->applicationDataLength;
 
-        EmberZclCoapEndpoint_t destination;
+        ChipZclCoapEndpoint_t destination;
         // Use secure session if that's what the original packet required.
-        destination.flags = (event->destination.flags & EMBER_ZCL_USE_COAPS_FLAG) | EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG;
+        destination.flags = (event->destination.flags & CHIP_ZCL_USE_COAPS_FLAG) | CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG;
         MEMCOPY(&destination.address,
                 &info->remoteAddress,
-                sizeof(EmberIpv6Address));
+                sizeof(ChipIpv6Address));
         destination.port = event->destination.port;
 
-        emZclSend(&destination,
+        chZclSend(&destination,
                   event->code,
                   uriPath,
                   payload,
@@ -436,24 +424,24 @@ static void uidDiscoveryResponseHandler(EmberCoapStatus status,
 
 static bool validateUidDiscoveryResponse(const uint8_t *payload,
                                          uint16_t payloadLength,
-                                         EmberZclUid_t *uid)
+                                         ChipZclUid_t *uid)
 {
   // Checks that uid discovery response payload contains a valid UID uri.
 
-  uint16_t uidPrefixLen = strlen(EM_ZCL_URI_QUERY_UID_SHA_256);
+  uint16_t uidPrefixLen = strlen(CH_ZCL_URI_QUERY_UID_SHA_256);
 
-  if (payloadLength >= uidPrefixLen + EMBER_ZCL_UID_BASE64URL_LENGTH) {
+  if (payloadLength >= uidPrefixLen + CHIP_ZCL_UID_BASE64URL_LENGTH) {
     for (uint16_t i = 0; i < (payloadLength - uidPrefixLen); ++i) {
-      if (MEMCOMPARE(&payload[i], EM_ZCL_URI_QUERY_UID_SHA_256, uidPrefixLen) == 0) {
+      if (MEMCOMPARE(&payload[i], CH_ZCL_URI_QUERY_UID_SHA_256, uidPrefixLen) == 0) {
         // Found the uid prefix, set ptr to start of the uidB64u string.
         uint8_t *uidB64u = (uint8_t *)&payload[i] + uidPrefixLen;
 
         uint16_t uidBits;
-        if (!emZclBase64UrlToUid(uidB64u,
-                                 EMBER_ZCL_UID_BASE64URL_LENGTH,
+        if (!chZclBase64UrlToUid(uidB64u,
+                                 CHIP_ZCL_UID_BASE64URL_LENGTH,
                                  uid,
                                  &uidBits)
-            || (uidBits != EMBER_ZCL_UID_BITS)) {
+            || (uidBits != CHIP_ZCL_UID_BITS)) {
           return false;
         }
         return true;
@@ -463,20 +451,20 @@ static bool validateUidDiscoveryResponse(const uint8_t *payload,
   return false;
 }
 
-static void uidResolutionHandler(EmberCoapStatus status,
-                                 EmberCoapCode code,
-                                 EmberCoapReadOptions *options,
+static void uidResolutionHandler(ChipCoapStatus status,
+                                 ChipCoapCode code,
+                                 ChipCoapReadOptions *options,
                                  uint8_t *payload,
                                  uint16_t payloadLength,
-                                 EmberCoapResponseInfo *info)
+                                 ChipCoapResponseInfo *info)
 {
   // We want to either clear the address and send the discovery again or
   // cancel the event
-  if (status == EMBER_COAP_MESSAGE_TIMED_OUT) {
-    emberAfPluginZclCorePrintln("The UID message has timed out. Remove and send again");
-    emZclCacheRemoveAllByIpv6Prefix(&info->remoteAddress, EMBER_IPV6_BITS);
-  } else if (status == EMBER_COAP_MESSAGE_RESPONSE) {
-    emberAfPluginZclCorePrintln("UID Resolved sucessfully");
+  if (status == CHIP_COAP_MESSAGE_TIMED_OUT) {
+    chipAfPluginZclCorePrintln("The UID message has timed out. Remove and send again");
+    chZclCacheRemoveAllByIpv6Prefix(&info->remoteAddress, CHIP_IPV6_BITS);
+  } else if (status == CHIP_COAP_MESSAGE_RESPONSE) {
+    chipAfPluginZclCorePrintln("UID Resolved sucessfully");
     // In this case, we just allow the cancelled events to die
     // since we do not need to redo UID resolution.
   }
@@ -486,21 +474,21 @@ static void uidResolutionHandler(EmberCoapStatus status,
 // needs to be rediscovered, so we remove any key pointing to that address in
 // our cache.  The next attempt to send to one of those keys will result in a
 // rediscovery.
-void emZclCoapStatusHandler(EmberCoapStatus status, EmberCoapResponseInfo *info)
+void chZclCoapStatusHandler(ChipCoapStatus status, ChipCoapResponseInfo *info)
 {
-  if (status == EMBER_COAP_MESSAGE_TIMED_OUT) {
-    emZclCacheRemoveAllByIpv6Prefix(&info->remoteAddress, EMBER_IPV6_BITS);
+  if (status == CHIP_COAP_MESSAGE_TIMED_OUT) {
+    chZclCacheRemoveAllByIpv6Prefix(&info->remoteAddress, CHIP_IPV6_BITS);
   }
 }
 
-static void defaultCoapResponseHandler(EmberCoapStatus status,
-                                       EmberCoapCode code,
-                                       EmberCoapReadOptions *options,
+static void defaultCoapResponseHandler(ChipCoapStatus status,
+                                       ChipCoapCode code,
+                                       ChipCoapReadOptions *options,
                                        uint8_t *payload,
                                        uint16_t payloadLength,
-                                       EmberCoapResponseInfo *info)
+                                       ChipCoapResponseInfo *info)
 {
-  emZclCoapStatusHandler(status, info);
+  chZclCoapStatusHandler(status, info);
 }
 
 static void eventHandler(MessageEvent *event)
@@ -515,13 +503,13 @@ static void eventHandler(MessageEvent *event)
     //const uint8_t *payload = (event->payloadLength == 0 ? NULL : finger);
     finger += event->payloadLength;
     //finger += event->applicationDataLength;
-    EmberCoapResponseInfo info;
+    ChipCoapResponseInfo info;
     info.applicationData = (uint8_t *) finger;
     info.applicationDataLength = event->applicationDataLength;
-    emZclCacheRemoveAllByIpv6Prefix(&event->remoteAddress, EMBER_IPV6_BITS);
-    (*event->handler)(EMBER_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT,
-                      EMBER_COAP_CODE_EMPTY,
-                      NULL, // EmberCoapReadOptions
+    chZclCacheRemoveAllByIpv6Prefix(&event->remoteAddress, CHIP_IPV6_BITS);
+    (*event->handler)(CHIP_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT,
+                      CHIP_COAP_CODE_EMPTY,
+                      NULL, // ChipCoapReadOptions
                       NULL, // payload
                       0,    // payload length
                       &info);
@@ -534,13 +522,13 @@ static void eventHandler(MessageEvent *event)
       finger += event->payloadLength;
       uint8_t *applicationData = finger;
 
-      EmberZclCoapEndpoint_t destination;
-      destination.flags = EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG;
+      ChipZclCoapEndpoint_t destination;
+      destination.flags = CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG;
       MEMCOPY(&destination.address,
               &info.remoteAddress,
-              sizeof(EmberIpv6Address));
+              sizeof(ChipIpv6Address));
       destination.port = event->destination.port;
-      emZclSend(&destination,
+      chZclSend(&destination,
                 event->code,
                 uriPath,
                 payload,
@@ -558,28 +546,28 @@ static void eventMarker(MessageEvent *event)
 }
 
 static bool destinationPredicate(MessageEvent *event,
-                                 const EmberZclUid_t *uid)
+                                 const ChipZclUid_t *uid)
 {
-  if (event->destination.flags & EMBER_ZCL_HAVE_UID_FLAG) {
+  if (event->destination.flags & CHIP_ZCL_HAVE_UID_FLAG) {
     return (MEMCOMPARE(uid,
                        &event->destination.uid,
-                       sizeof(EmberZclUid_t)) == 0);
+                       sizeof(ChipZclUid_t)) == 0);
   }
   return false;
 }
 
 typedef struct {
-  EmberZclMessageStatus_t status;
+  ChipZclMessageStatus_t status;
   const uint8_t * const name;
 } ZclMessageStatusEntry;
 static const ZclMessageStatusEntry statusTable[] = {
-  { EMBER_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT, (const uint8_t *)"DISCOVERY TIMEOUT", },
-  { EMBER_ZCL_MESSAGE_STATUS_COAP_TIMEOUT, (const uint8_t *)"COAP TIMEOUT", },
-  { EMBER_ZCL_MESSAGE_STATUS_COAP_ACK, (const uint8_t *)"COAP ACK", },
-  { EMBER_ZCL_MESSAGE_STATUS_COAP_RESET, (const uint8_t *)"COAP RESET", },
-  { EMBER_ZCL_MESSAGE_STATUS_COAP_RESPONSE, (const uint8_t *)"COAP RESPONSE", },
+  { CHIP_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT, (const uint8_t *)"DISCOVERY TIMEOUT", },
+  { CHIP_ZCL_MESSAGE_STATUS_COAP_TIMEOUT, (const uint8_t *)"COAP TIMEOUT", },
+  { CHIP_ZCL_MESSAGE_STATUS_COAP_ACK, (const uint8_t *)"COAP ACK", },
+  { CHIP_ZCL_MESSAGE_STATUS_COAP_RESET, (const uint8_t *)"COAP RESET", },
+  { CHIP_ZCL_MESSAGE_STATUS_COAP_RESPONSE, (const uint8_t *)"COAP RESPONSE", },
 };
-const uint8_t *emZclGetMessageStatusName(EmberZclMessageStatus_t status)
+const uint8_t *chZclGetMessageStatusName(ChipZclMessageStatus_t status)
 {
   for (size_t i = 0; i < COUNTOF(statusTable); i++) {
     if (status == statusTable[i].status) {

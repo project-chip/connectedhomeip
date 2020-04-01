@@ -1,29 +1,17 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_BULB_PWM_DRIVER
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_BULB_PWM_DRIVER
 
 void emLedDimPwmInitHandler(void);
-void emLedDimPwmPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                           const EmberZclClusterSpec_t *clusterSpec,
-                                           EmberZclAttributeId_t attributeId,
+void emLedDimPwmPostAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                           const ChipZclClusterSpec_t *clusterSpec,
+                                           ChipZclAttributeId_t attributeId,
                                            const void *buffer,
                                            size_t bufferLength);
 
@@ -31,16 +19,16 @@ static bool onOff = 1;
 static uint8_t expectedLevel = 0xff;
 static uint16_t expectedPwmOutput;
 
-const EmberZclClusterSpec_t emberZclClusterLevelControlServerSpec = {
-  EMBER_ZCL_ROLE_CLIENT,
-  EMBER_ZCL_MANUFACTURER_CODE_NULL,
-  EMBER_ZCL_CLUSTER_LEVEL_CONTROL,
+const ChipZclClusterSpec_t chipZclClusterLevelControlServerSpec = {
+  CHIP_ZCL_ROLE_CLIENT,
+  CHIP_ZCL_MANUFACTURER_CODE_NULL,
+  CHIP_ZCL_CLUSTER_LEVEL_CONTROL,
 };
 
-const EmberZclClusterSpec_t emberZclClusterOnOffServerSpec = {
-  EMBER_ZCL_ROLE_CLIENT,
-  EMBER_ZCL_MANUFACTURER_CODE_NULL,
-  EMBER_ZCL_CLUSTER_ON_OFF,
+const ChipZclClusterSpec_t chipZclClusterOnOffServerSpec = {
+  CHIP_ZCL_ROLE_CLIENT,
+  CHIP_ZCL_MANUFACTURER_CODE_NULL,
+  CHIP_ZCL_CLUSTER_ON_OFF,
 };
 
 uint8_t levelValues[] = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130,
@@ -50,14 +38,14 @@ uint16_t pwmValues1[] = { 0, 285, 501, 718, 936, 1152, 1369, 1586, 1802, 2019, 2
                           2670, 2887, 3104, 3320, 3538, 3755, 3971, 4188, 4405, 4621,
                           4838, 5056, 5273, 5489, 6000 };
 
-EmberZclEndpointId_t emberZclEndpointIndexToId(EmberZclEndpointIndex_t index,
-                                               const EmberZclClusterSpec_t *clusterSpec)
+ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index,
+                                               const ChipZclClusterSpec_t *clusterSpec)
 {
   return 1;
 }
 
-bool emberZclAreClusterSpecsEqual(const EmberZclClusterSpec_t *s1,
-                                  const EmberZclClusterSpec_t *s2)
+bool chipZclAreClusterSpecsEqual(const ChipZclClusterSpec_t *s1,
+                                  const ChipZclClusterSpec_t *s2)
 {
   return (s1->role == s2->role
           && s1->manufacturerCode == s2->manufacturerCode
@@ -96,7 +84,7 @@ static void driveTest(void)
   expectedLevel = 20;
   expectedPwmOutput = 501;
   emLedDimPwmPostAttributeChangeHandler(1,
-                                        &emberZclClusterLevelControlServerSpec,
+                                        &chipZclClusterLevelControlServerSpec,
                                         0,
                                         dummy,
                                         sizeof(dummySize));
@@ -104,7 +92,7 @@ static void driveTest(void)
   expectedLevel = 30;
   expectedPwmOutput = 718;
   emLedDimPwmPostAttributeChangeHandler(1,
-                                        &emberZclClusterOnOffServerSpec,
+                                        &chipZclClusterOnOffServerSpec,
                                         0,
                                         dummy,
                                         sizeof(dummySize));
@@ -146,15 +134,15 @@ uint16_t halBulbPwmDriverTicksPerPeriod(void)
   return 6000;
 }
 
-EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
-                                       const EmberZclClusterSpec_t *clusterSpec,
-                                       EmberZclAttributeId_t attributeId,
+ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId,
+                                       const ChipZclClusterSpec_t *clusterSpec,
+                                       ChipZclAttributeId_t attributeId,
                                        void *buffer,
                                        size_t bufferLength)
 {
-  if (emberZclAreClusterSpecsEqual(&emberZclClusterOnOffServerSpec, clusterSpec)) {
+  if (chipZclAreClusterSpecsEqual(&chipZclClusterOnOffServerSpec, clusterSpec)) {
     switch (attributeId) {
-      case EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF:
+      case CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF:
         *(bool *)buffer = onOff;
         break;
       default:
@@ -162,10 +150,10 @@ EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
         assert(false);
         break;
     }
-  } else if (emberZclAreClusterSpecsEqual(&emberZclClusterLevelControlServerSpec,
+  } else if (chipZclAreClusterSpecsEqual(&chipZclClusterLevelControlServerSpec,
                                           clusterSpec)) {
     switch (attributeId) {
-      case EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL:
+      case CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL:
         *(uint8_t *)buffer = expectedLevel;
         break;
       default:
@@ -178,5 +166,5 @@ EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
     assert(false);
   }
 
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }

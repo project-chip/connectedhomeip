@@ -1,42 +1,30 @@
 /***************************************************************************//**
  * @file
  * @brief ZCL Core API
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #ifndef ZCL_CORE_H
 #define ZCL_CORE_H
 
 #include PLATFORM_HEADER
-#include EMBER_AF_API_STACK
+#include CHIP_AF_API_STACK
 #include "zclip-struct.h"
 #include "cbor.h"
 #include "zcl-core-types.h"
 
-#ifndef EMBER_SCRIPTED_TEST
+#ifndef CHIP_SCRIPTED_TEST
   #include "thread-zclip.h"
 #endif
 
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #else
-  #define emberAfPluginZclCorePrint(...)
-  #define emberAfPluginZclCorePrintln(...)
-  #define emberAfPluginZclCoreFlush()
-  #define emberAfPluginZclCoreDebugExec(x)
-  #define emberAfPluginZclCorePrintBuffer(buffer, len, withSpace)
-  #define emberAfPluginZclCorePrintString(buffer)
+  #define chipAfPluginZclCorePrint(...)
+  #define chipAfPluginZclCorePrintln(...)
+  #define chipAfPluginZclCoreFlush()
+  #define chipAfPluginZclCoreDebugExec(x)
+  #define chipAfPluginZclCorePrintBuffer(buffer, len, withSpace)
+  #define chipAfPluginZclCorePrintString(buffer)
 #endif
 
 /**
@@ -77,31 +65,31 @@
 // Addresses.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-extern EmberZclUid_t emZclUid;
+extern ChipZclUid_t chZclUid;
 
 // Commonly used IPv6 addresses
-extern const EmberIpv6Address emberZclAllThreadNodes;
+extern const ChipIpv6Address chipZclAllThreadNodes;
 
-size_t emZclCacheGetEntryCount(void);
-bool emZclCacheAdd(const EmberZclUid_t *key,
-                   const EmberIpv6Address *value,
-                   EmZclCacheIndex_t *index);
-bool emZclCacheGet(const EmberZclUid_t *key,
-                   EmberIpv6Address *value);
-bool emZclCacheGetByIndex(EmZclCacheIndex_t index,
-                          EmberZclUid_t *key,
-                          EmberIpv6Address *value);
-bool emZclCacheGetFirstKeyForValue(const EmberIpv6Address *value,
-                                   EmberZclUid_t *key);
-bool emZclCacheGetIndex(const EmberZclUid_t *key,
-                        EmZclCacheIndex_t *index);
-bool emZclCacheRemove(const EmberZclUid_t *key);
-bool emZclCacheRemoveByIndex(EmZclCacheIndex_t index);
-void emZclCacheRemoveAll(void);
-size_t emZclCacheRemoveAllByValue(const EmberIpv6Address *value);
-size_t emZclCacheRemoveAllByIpv6Prefix(const EmberIpv6Address *prefix,
+size_t chZclCacheGetEntryCount(void);
+bool chZclCacheAdd(const ChipZclUid_t *key,
+                   const ChipIpv6Address *value,
+                   ChZclCacheIndex_t *index);
+bool chZclCacheGet(const ChipZclUid_t *key,
+                   ChipIpv6Address *value);
+bool chZclCacheGetByIndex(ChZclCacheIndex_t index,
+                          ChipZclUid_t *key,
+                          ChipIpv6Address *value);
+bool chZclCacheGetFirstKeyForValue(const ChipIpv6Address *value,
+                                   ChipZclUid_t *key);
+bool chZclCacheGetIndex(const ChipZclUid_t *key,
+                        ChZclCacheIndex_t *index);
+bool chZclCacheRemove(const ChipZclUid_t *key);
+bool chZclCacheRemoveByIndex(ChZclCacheIndex_t index);
+void chZclCacheRemoveAll(void);
+size_t chZclCacheRemoveAllByValue(const ChipIpv6Address *value);
+size_t chZclCacheRemoveAllByIpv6Prefix(const ChipIpv6Address *prefix,
                                        uint8_t prefixLengthInBits);
-void emZclCacheScan(const void *criteria, EmZclCacheScanPredicate match);
+void chZclCacheScan(const void *criteria, ChZclCacheScanPredicate match);
 #endif
 
 // -----------------------------------------------------------------------------
@@ -120,7 +108,7 @@ void emZclCacheScan(const void *criteria, EmZclCacheScanPredicate match);
  *
  * @param endpointId An endpoint identifier
  * @param clusterSpec A cluster specification or NULL
- * @return An endpoint index or @ref EMBER_ZCL_ENDPOINT_INDEX_NULL if no match
+ * @return An endpoint index or @ref CHIP_ZCL_ENDPOINT_INDEX_NULL if no match
  *         is found.
  *
  * This function searches the endpoint table and returns the endpoint index for the entry
@@ -134,10 +122,10 @@ void emZclCacheScan(const void *criteria, EmZclCacheScanPredicate match);
  *       for a given endpoint identifier may be different for different
  *       clusters.
  *
- * @sa emberZclEndpointIndexToId()
+ * @sa chipZclEndpointIndexToId()
  *****************************************************************************/
-EmberZclEndpointIndex_t emberZclEndpointIdToIndex(EmberZclEndpointId_t endpointId,
-                                                  const EmberZclClusterSpec_t *clusterSpec);
+ChipZclEndpointIndex_t chipZclEndpointIdToIndex(ChipZclEndpointId_t endpointId,
+                                                  const ChipZclClusterSpec_t *clusterSpec);
 
 /**************************************************************************//**
  * This function finds the endpoint identifier for the specified endpoint index and
@@ -145,7 +133,7 @@ EmberZclEndpointIndex_t emberZclEndpointIdToIndex(EmberZclEndpointId_t endpointI
  *
  * @param index An endpoint index
  * @param clusterSpec A cluster specification or NULL
- * @return An endpoint identifier or @ref EMBER_ZCL_ENDPOINT_NULL if no match
+ * @return An endpoint identifier or @ref CHIP_ZCL_ENDPOINT_NULL if no match
  *         is found.
  *
  * This function searches the endpoint table and returns the endpoint identifier for the entry
@@ -159,23 +147,23 @@ EmberZclEndpointIndex_t emberZclEndpointIdToIndex(EmberZclEndpointId_t endpointI
  *       for a given endpoint identifier may be different for different
  *       clusters.
  *
- * @sa emberZclEndpointIdToIndex()
+ * @sa chipZclEndpointIdToIndex()
  *****************************************************************************/
-EmberZclEndpointId_t emberZclEndpointIndexToId(EmberZclEndpointIndex_t index,
-                                               const EmberZclClusterSpec_t *clusterSpec);
+ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index,
+                                               const ChipZclClusterSpec_t *clusterSpec);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-extern const EmZclEndpointEntry_t emZclEndpointTable[];
-extern const size_t emZclEndpointCount;
-const EmZclEndpointEntry_t *emZclFindEndpoint(EmberZclEndpointId_t endpointId);
-bool emZclEndpointHasCluster(EmberZclEndpointId_t endpointId,
-                             const EmberZclClusterSpec_t *clusterSpec);
-EmberZclStatus_t emZclMultiEndpointDispatch(const EmZclContext_t *context,
-                                            EmZclMultiEndpointHandler handler,
+extern const ChZclEndpointEntry_t chZclEndpointTable[];
+extern const size_t chZclEndpointCount;
+const ChZclEndpointEntry_t *chZclFindEndpoint(ChipZclEndpointId_t endpointId);
+bool chZclEndpointHasCluster(ChipZclEndpointId_t endpointId,
+                             const ChipZclClusterSpec_t *clusterSpec);
+ChipZclStatus_t chZclMultiEndpointDispatch(const ChZclContext_t *context,
+                                            ChZclMultiEndpointHandler handler,
                                             CborState *state,
                                             void *data);
-void emZclUriEndpointHandler(EmZclContext_t *context);
-void emZclUriEndpointIdHandler(EmZclContext_t *context);
+void chZclUriEndpointHandler(ChZclContext_t *context);
+void chZclUriEndpointIdHandler(ChZclContext_t *context);
 #endif
 
 /** @} end addtogroup */
@@ -191,17 +179,17 @@ void emZclUriEndpointIdHandler(EmZclContext_t *context);
  */
 
 /**************************************************************************//**
- * This function determines if an endpoint is a member of a group.
+ * This function determines if an endpoint is a mchip of a group.
  *
  * @param endpointId An endpoint identifier
  * @param groupId A group identifier
- * @return `true` if the endpoint is a member of the group, `false` otherwise.
+ * @return `true` if the endpoint is a mchip of the group, `false` otherwise.
  *****************************************************************************/
-bool emberZclIsEndpointInGroup(EmberZclEndpointId_t endpointId,
-                               EmberZclGroupId_t groupId);
+bool chipZclIsEndpointInGroup(ChipZclEndpointId_t endpointId,
+                               ChipZclGroupId_t groupId);
 
 /**************************************************************************//**
- * This function returns TRUE if the supplied endpoint is a member of the group
+ * This function returns TRUE if the supplied endpoint is a mchip of the group
  * and the supplied address is associated with the group. The following addresses
  * are automatically considered associated with any group:
  *  - Any unicast IPv6 address
@@ -213,12 +201,12 @@ bool emberZclIsEndpointInGroup(EmberZclEndpointId_t endpointId,
  * @param endpointId An endpoint identifier
  * @param dstAddr IPv6 address to be checked
  * @param groupId A group identifier
- * @return `true` if the endpoint is a member of the group and the address is associated
+ * @return `true` if the endpoint is a mchip of the group and the address is associated
  *        with the group, `false` otherwise.
  *****************************************************************************/
-bool emberZclIsEndpointAndAddrInGroup(EmberZclEndpointId_t endpointId,
-                                      const EmberIpv6Address *dstAddr,
-                                      EmberZclGroupId_t groupId);
+bool chipZclIsEndpointAndAddrInGroup(ChipZclEndpointId_t endpointId,
+                                      const ChipIpv6Address *dstAddr,
+                                      ChipZclGroupId_t groupId);
 
 /**************************************************************************//**
  * This function returns TRUE if the supplied address is associated with one of
@@ -227,7 +215,7 @@ bool emberZclIsEndpointAndAddrInGroup(EmberZclEndpointId_t endpointId,
  * @return `true` if the address is associated with one of the groups, `false`
  *          otherwise.
  *****************************************************************************/
-bool emberZclIsAddressGroupMulticast(const EmberIpv6Address *dstAddr);
+bool chipZclIsAddressGroupMulticast(const ChipIpv6Address *dstAddr);
 
 /**************************************************************************//**
  * This function gets a group name and its length.
@@ -239,8 +227,8 @@ bool emberZclIsAddressGroupMulticast(const EmberIpv6Address *dstAddr);
  * @return `true` if group name was retrieved successfully, `false` otherwise.
  *
  *****************************************************************************/
-bool emberZclGetGroupName(EmberZclEndpointId_t endpointId,
-                          EmberZclGroupId_t groupId,
+bool chipZclGetGroupName(ChipZclEndpointId_t endpointId,
+                          ChipZclGroupId_t groupId,
                           uint8_t *groupName,
                           uint8_t *groupNameLength);
 
@@ -258,21 +246,21 @@ bool emberZclGetGroupName(EmberZclEndpointId_t endpointId,
  *        parameter passed to the "Add Group" command: based on the assignment mode
  *        this could be the full address, flag bits or NULL.
  * @param groupUdpPort UDP port number that group should be listening on, zero value
- *        means the group will listen on EMBER_COAP_PORT and EMBER_COAP_SECURE_PORT.
+ *        means the group will listen on CHIP_COAP_PORT and CHIP_COAP_SECURE_PORT.
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the endpoint was added to the group
- * - @ref EMBER_ZCL_STATUS_DUPLICATE_EXISTS if the endpoint is already a member
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the endpoint was added to the group
+ * - @ref CHIP_ZCL_STATUS_DUPLICATE_EXISTS if the endpoint is already a mchip
  *   of the group
- * - @ref EMBER_ZCL_STATUS_INSUFFICIENT_SPACE if there is no capacity to store
+ * - @ref CHIP_ZCL_STATUS_INSUFFICIENT_SPACE if there is no capacity to store
  *   the endpoint/group association
- * - @ref EMBER_ZCL_STATUS_FAILURE if groupId is @ref EMBER_ZCL_GROUP_ALL_ENDPOINTS,
- *   or if groupId is not a value between @ref EMBER_ZCL_GROUP_MIN and
- *   @ref EMBER_ZCL_GROUP_MAX inclusive, or if groupNameLength is greater than
- *   @ref EMBER_ZCL_MAX_GROUP_NAME_LENGTH, or if groupNameLength is non-zero and
+ * - @ref CHIP_ZCL_STATUS_FAILURE if groupId is @ref CHIP_ZCL_GROUP_ALL_ENDPOINTS,
+ *   or if groupId is not a value between @ref CHIP_ZCL_GROUP_MIN and
+ *   @ref CHIP_ZCL_GROUP_MAX inclusive, or if groupNameLength is greater than
+ *   @ref CHIP_ZCL_MAX_GROUP_NAME_LENGTH, or if groupNameLength is non-zero and
  *   groupName is NULL
  *****************************************************************************/
-EmberZclStatus_t emberZclAddEndpointToGroup(EmberZclEndpointId_t endpointId,
-                                            EmberZclGroupId_t groupId,
+ChipZclStatus_t chipZclAddEndpointToGroup(ChipZclEndpointId_t endpointId,
+                                            ChipZclGroupId_t groupId,
                                             const uint8_t *groupName,
                                             uint8_t groupNameLength,
                                             uint8_t assignmentMode,
@@ -284,61 +272,61 @@ EmberZclStatus_t emberZclAddEndpointToGroup(EmberZclEndpointId_t endpointId,
  * @param endpointId An endpoint identifier
  * @param groupId A group identifier
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the endpoint was removed from the group
- * - @ref EMBER_ZCL_STATUS_NOT_FOUND if the endpoint is not a member of the group
- * - @ref EMBER_ZCL_STATUS_INVALID_FIELD if the groupId is not a value between
- *   @ref EMBER_ZCL_GROUP_MIN and @ref EMBER_ZCL_GROUP_MAX inclusive
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the endpoint was removed from the group
+ * - @ref CHIP_ZCL_STATUS_NOT_FOUND if the endpoint is not a mchip of the group
+ * - @ref CHIP_ZCL_STATUS_INVALID_FIELD if the groupId is not a value between
+ *   @ref CHIP_ZCL_GROUP_MIN and @ref CHIP_ZCL_GROUP_MAX inclusive
  *****************************************************************************/
-EmberZclStatus_t emberZclRemoveEndpointFromGroup(EmberZclEndpointId_t endpointId,
-                                                 EmberZclGroupId_t groupId);
+ChipZclStatus_t chipZclRemoveEndpointFromGroup(ChipZclEndpointId_t endpointId,
+                                                 ChipZclGroupId_t groupId);
 
 /**************************************************************************//**
  * This function removes an endpoint from all groups to which it belongs.
  *
  * @param endpointId An endpoint identifier
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the endpoint was removed from one
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the endpoint was removed from one
  *   or more groups
- * - @ref EMBER_ZCL_STATUS_NOT_FOUND if the endpoint is not a member of
+ * - @ref CHIP_ZCL_STATUS_NOT_FOUND if the endpoint is not a mchip of
  *   any group
  *   (other than the all-endpoints group)
  *****************************************************************************/
-EmberZclStatus_t emberZclRemoveEndpointFromAllGroups(EmberZclEndpointId_t endpointId);
+ChipZclStatus_t chipZclRemoveEndpointFromAllGroups(ChipZclEndpointId_t endpointId);
 
 /**************************************************************************//**
  * This function removes a group.
  *
  * @param groupId A group identifier
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the group was removed
- * - @ref EMBER_ZCL_STATUS_NOT_FOUND if the group does not exist
- * - @ref EMBER_ZCL_STATUS_INVALID_FIELD if the groupId is not a value between
- *   @ref EMBER_ZCL_GROUP_MIN and @ref EMBER_ZCL_GROUP_MAX inclusive
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the group was removed
+ * - @ref CHIP_ZCL_STATUS_NOT_FOUND if the group does not exist
+ * - @ref CHIP_ZCL_STATUS_INVALID_FIELD if the groupId is not a value between
+ *   @ref CHIP_ZCL_GROUP_MIN and @ref CHIP_ZCL_GROUP_MAX inclusive
  *****************************************************************************/
-EmberZclStatus_t emberZclRemoveGroup(EmberZclGroupId_t groupId);
+ChipZclStatus_t chipZclRemoveGroup(ChipZclGroupId_t groupId);
 
 /**************************************************************************//**
  * This function removes all groups.
  *
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if all groups were removed (other than the
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if all groups were removed (other than the
  *   all-endpoints group)
- * - @ref EMBER_ZCL_STATUS_NOT_FOUND if no groups exist (other than the
+ * - @ref CHIP_ZCL_STATUS_NOT_FOUND if no groups exist (other than the
  *   all-endpoints group)
  *****************************************************************************/
-EmberZclStatus_t emberZclRemoveAllGroups(void);
+ChipZclStatus_t chipZclRemoveAllGroups(void);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-bool emZclHasGroup(EmberZclGroupId_t groupId);
-size_t emZclGetGroupsCapacity(void);
-void emZclUriGroupHandler(EmZclContext_t *context);
-void emZclUriGroupIdHandler(EmZclContext_t *context);
-void emZclInsertGroupIdIntoSortedList(const EmberZclGroupId_t groupId,
-                                      EmberZclGroupId_t * const pgroups,
+bool chZclHasGroup(ChipZclGroupId_t groupId);
+size_t chZclGetGroupsCapacity(void);
+void chZclUriGroupHandler(ChZclContext_t *context);
+void chZclUriGroupIdHandler(ChZclContext_t *context);
+void chZclInsertGroupIdIntoSortedList(const ChipZclGroupId_t groupId,
+                                      ChipZclGroupId_t * const pgroups,
                                       uint16_t * const pcount,
                                       const uint16_t maxEntries);
-void emZclReregisterAllMcastAddresses(void);
-void emZclBuildGroupMcastAddress(const EmberZclGroupEntry_t *entry, uint8_t *addressBytes);
+void chZclReregisterAllMcastAddresses(void);
+void chZclBuildGroupMcastAddress(const ChipZclGroupEntry_t *entry, uint8_t *addressBytes);
 #endif
 
 /** @} end addtogroup */
@@ -357,9 +345,9 @@ void emZclBuildGroupMcastAddress(const EmberZclGroupEntry_t *entry, uint8_t *add
  * This function puts a device in EZ-Mode for a fixed-duration.
  *
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if EZ-Mode started successfully
- * - @ref EMBER_ERR_FATAL if the multicast address is invalid
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if EZ-Mode started successfully
+ * - @ref CHIP_ERR_FATAL if the multicast address is invalid
+ * - @ref ::ChipStatus with failure reason otherwise
  *
  * Each time EZ-Mode is invoked, the device extends the window by the same
  * fixed duration. During the window, devices perform EZ-Mode finding and
@@ -370,7 +358,7 @@ void emZclBuildGroupMcastAddress(const EmberZclGroupEntry_t *entry, uint8_t *add
  * extended due to subsequent invocations, the device listens on the EZ-Mode
  * multicast address and processes EZ-Mode requests.
  *****************************************************************************/
-EmberStatus emberZclStartEzMode(void);
+ChipStatus chipZclStartEzMode(void);
 
 /**************************************************************************//**
  * This function stops EZ-Mode.
@@ -378,20 +366,20 @@ EmberStatus emberZclStartEzMode(void);
  * The device ignores all EZ-Mode requests and stops listening on the EZ-Mode
  * multicast address.
  *****************************************************************************/
-void emberZclStopEzMode(void);
+void chipZclStopEzMode(void);
 
 /**************************************************************************//**
  * This function checks whether EZ-Mode is currently active.
  *
  * @return `true` if EZ-Mode is active, `false` otherwise.
  *****************************************************************************/
-bool emberZclEzModeIsActive(void);
+bool chipZclEzModeIsActive(void);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-const EmZclCommandEntry_t *emZclManagementFindCommand(EmberZclCommandId_t commandId);
-void emZclManagementHandler(EmZclContext_t *context);
-void emZclManagementCommandHandler(EmZclContext_t *context);
-void emZclManagementCommandIdHandler(EmZclContext_t *context);
+const ChZclCommandEntry_t *chZclManagementFindCommand(ChipZclCommandId_t commandId);
+void chZclManagementHandler(ChZclContext_t *context);
+void chZclManagementCommandHandler(ChZclContext_t *context);
+void chZclManagementCommandIdHandler(ChZclContext_t *context);
 #endif
 
 /** @} end addtogroup */
@@ -413,15 +401,15 @@ void emZclManagementCommandIdHandler(EmZclContext_t *context);
  * @param s2 A cluster specification to be compared
  * @return
  * - @ref `0` if both cluster specifications are equal
- * - @ref `-1` if `s1`'s ::EmberZclRole_t is not equal to `s2`'s ::EmberZclRole_t
- *   and `s1`'s role is ::EMBER_ZCL_ROLE_CLIENT
- * - @ref `1` if `s1`'s ::EmberZclRole_t is not equal to `s2`'s ::EmberZclRole_t
- *   and `s1`'s role is ::EMBER_ZCL_ROLE_SERVER
- * - @ref difference between ::EmberZclManufacturerCode_t of `s1` and
- *   `s2`, or difference between ::EmberZclClusterId_t of `s1` and `s2`
+ * - @ref `-1` if `s1`'s ::ChipZclRole_t is not equal to `s2`'s ::ChipZclRole_t
+ *   and `s1`'s role is ::CHIP_ZCL_ROLE_CLIENT
+ * - @ref `1` if `s1`'s ::ChipZclRole_t is not equal to `s2`'s ::ChipZclRole_t
+ *   and `s1`'s role is ::CHIP_ZCL_ROLE_SERVER
+ * - @ref difference between ::ChipZclManufacturerCode_t of `s1` and
+ *   `s2`, or difference between ::ChipZclClusterId_t of `s1` and `s2`
  *****************************************************************************/
-int32_t emberZclCompareClusterSpec(const EmberZclClusterSpec_t *s1,
-                                   const EmberZclClusterSpec_t *s2);
+int32_t chipZclCompareClusterSpec(const ChipZclClusterSpec_t *s1,
+                                   const ChipZclClusterSpec_t *s2);
 
 /**************************************************************************//**
  * This function compares two cluster specifications.
@@ -430,8 +418,8 @@ int32_t emberZclCompareClusterSpec(const EmberZclClusterSpec_t *s1,
  * @param s2 A cluster specification to be compared
  * @return `true` if both cluster specifications are equal, `false` otherwise.
  *****************************************************************************/
-bool emberZclAreClusterSpecsEqual(const EmberZclClusterSpec_t *s1,
-                                  const EmberZclClusterSpec_t *s2);
+bool chipZclAreClusterSpecsEqual(const ChipZclClusterSpec_t *s1,
+                                  const ChipZclClusterSpec_t *s2);
 
 /**************************************************************************//**
  * This function reverses cluster specifications.
@@ -439,12 +427,12 @@ bool emberZclAreClusterSpecsEqual(const EmberZclClusterSpec_t *s1,
  * @param s1 A cluster specification used for reversing
  * @param s2 A cluster specification to be reversed
  *
- * This function changes ::EmberZclRole_t of `s2` to be opposite of `s1`. It
- * also sets ::EmberZclManufacturerCode_t and ::EmberZclClusterId_t of `s2`
+ * This function changes ::ChipZclRole_t of `s2` to be opposite of `s1`. It
+ * also sets ::ChipZclManufacturerCode_t and ::ChipZclClusterId_t of `s2`
  * to be the same as `s1`.
  *****************************************************************************/
-void emberZclReverseClusterSpec(const EmberZclClusterSpec_t *s1,
-                                EmberZclClusterSpec_t *s2);
+void chipZclReverseClusterSpec(const ChipZclClusterSpec_t *s1,
+                                ChipZclClusterSpec_t *s2);
 
 /** @} end addtogroup */
 
@@ -463,10 +451,10 @@ void emberZclReverseClusterSpec(const EmberZclClusterSpec_t *s1,
  *
  * @param endpointId An endpoint identifier
  *
- * @note ::emberZclPostAttributeChangeCallback is triggered after each attribute
+ * @note ::chipZclPostAttributeChangeCallback is triggered after each attribute
  *       is changed.
  *****************************************************************************/
-void emberZclResetAttributes(EmberZclEndpointId_t endpointId);
+void chipZclResetAttributes(ChipZclEndpointId_t endpointId);
 
 /**************************************************************************//**
  * This function reads the value of an attibute.
@@ -477,19 +465,19 @@ void emberZclResetAttributes(EmberZclEndpointId_t endpointId);
  * @param buffer A buffer to read the attribute into
  * @param bufferLength Length of the read buffer
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the attribute was read successfully
- * - @ref EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE if the attribute is remote or
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the attribute was read successfully
+ * - @ref CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE if the attribute is remote or
  *   if the attribute is not supported on a specified endpoint
- * - @ref EMBER_ZCL_STATUS_INSUFFICIENT_SPACE if not enough space is available in
+ * - @ref CHIP_ZCL_STATUS_INSUFFICIENT_SPACE if not enough space is available in
  *   the passed buffer to store the attribute value
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * @note ::emberZclReadExternalAttributeCallback is triggered if attribute
+ * @note ::chipZclReadExternalAttributeCallback is triggered if attribute
  *       is externally stored. If so, the result of that call is returned.
  *****************************************************************************/
-EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
-                                       const EmberZclClusterSpec_t *clusterSpec,
-                                       EmberZclAttributeId_t attributeId,
+ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId,
+                                       const ChipZclClusterSpec_t *clusterSpec,
+                                       ChipZclAttributeId_t attributeId,
                                        void *buffer,
                                        size_t bufferLength);
 
@@ -502,24 +490,24 @@ EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
  * @param buffer A buffer to write the attribute from
  * @param bufferLength Length of the write buffer
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the attribute was written successfully
- * - @ref EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE if the attribute is remote or
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the attribute was written successfully
+ * - @ref CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE if the attribute is remote or
  *   if the attribute is not supported on a specified endpoint
- * - @ref EMBER_ZCL_STATUS_INSUFFICIENT_SPACE if not enough space is available in
+ * - @ref CHIP_ZCL_STATUS_INSUFFICIENT_SPACE if not enough space is available in
  *   the attribute table to store the attribute value
- * - @ref EMBER_ZCL_STATUS_INVALID_VALUE if the attribute value is invalid
- * - @ref EMBER_ZCL_STATUS_FAILURE if ::emberZclPreAttributeChangeCallback
+ * - @ref CHIP_ZCL_STATUS_INVALID_VALUE if the attribute value is invalid
+ * - @ref CHIP_ZCL_STATUS_FAILURE if ::chipZclPreAttributeChangeCallback
  *   returned `false`
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * @note ::emberZclWriteExternalAttributeCallback is triggered if the attribute
+ * @note ::chipZclWriteExternalAttributeCallback is triggered if the attribute
  *       is externally stored. If so, the result of that call is returned.
- * @note ::emberZclPostAttributeChangeCallback is triggered after the attribute
+ * @note ::chipZclPostAttributeChangeCallback is triggered after the attribute
  *       is successfully changed.
  *****************************************************************************/
-EmberZclStatus_t emberZclWriteAttribute(EmberZclEndpointId_t endpointId,
-                                        const EmberZclClusterSpec_t *clusterSpec,
-                                        EmberZclAttributeId_t attributeId,
+ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId,
+                                        const ChipZclClusterSpec_t *clusterSpec,
+                                        ChipZclAttributeId_t attributeId,
                                         const void *buffer,
                                         size_t bufferLength);
 
@@ -532,17 +520,17 @@ EmberZclStatus_t emberZclWriteAttribute(EmberZclEndpointId_t endpointId,
  * @param buffer A buffer to write the attribute from
  * @param bufferLength Length of the write buffer
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the function call was successful
- * - @ref EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE if the attribute is not
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the function call was successful
+ * - @ref CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE if the attribute is not
  *   external or if the attribute is not supported on a specified endpoint
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * @note ::emberZclPostAttributeChangeCallback is triggered for a successful
+ * @note ::chipZclPostAttributeChangeCallback is triggered for a successful
  *       call to this function.
  *****************************************************************************/
-EmberZclStatus_t emberZclExternalAttributeChanged(EmberZclEndpointId_t endpointId,
-                                                  const EmberZclClusterSpec_t *clusterSpec,
-                                                  EmberZclAttributeId_t attributeId,
+ChipZclStatus_t chipZclExternalAttributeChanged(ChipZclEndpointId_t endpointId,
+                                                  const ChipZclClusterSpec_t *clusterSpec,
+                                                  ChipZclAttributeId_t attributeId,
                                                   const void *buffer,
                                                   size_t bufferLength);
 
@@ -552,20 +540,20 @@ EmberZclStatus_t emberZclExternalAttributeChanged(EmberZclEndpointId_t endpointI
  * @param destination A location to read the attribute from
  * @param clusterSpec A cluster specification of the attribute
  * @param attributeIds An array of attribute IDs to read
- * @param attributeIdsCount A total count of ::EmberZclAttributeId_t elements in a
+ * @param attributeIdsCount A total count of ::ChipZclAttributeId_t elements in a
  * passed array
  * @param handler callback that is triggered for a response
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * @sa EmberZclReadAttributeResponseHandler()
+ * @sa ChipZclReadAttributeResponseHandler()
  *****************************************************************************/
-EmberStatus emberZclSendAttributeRead(const EmberZclDestination_t *destination,
-                                      const EmberZclClusterSpec_t *clusterSpec,
-                                      const EmberZclAttributeId_t *attributeIds,
+ChipStatus chipZclSendAttributeRead(const ChipZclDestination_t *destination,
+                                      const ChipZclClusterSpec_t *clusterSpec,
+                                      const ChipZclAttributeId_t *attributeIds,
                                       size_t attributeIdsCount,
-                                      const EmberZclReadAttributeResponseHandler handler);
+                                      const ChipZclReadAttributeResponseHandler handler);
 
 /**************************************************************************//**
  * This function sends an attribute write command to a specified destination.
@@ -573,95 +561,95 @@ EmberStatus emberZclSendAttributeRead(const EmberZclDestination_t *destination,
  * @param destination A location to write the attribute to
  * @param clusterSpec A cluster specification of the attribute
  * @param attributeWriteData An array containing write data for attributes
- * @param attributeWriteDataCount A total count of ::EmberZclAttributeWriteData_t
+ * @param attributeWriteDataCount A total count of ::ChipZclAttributeWriteData_t
  * elements in a passed array
  * @param handler A callback that is triggered for a response
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * @sa EmberZclWriteAttributeResponseHandler()
+ * @sa ChipZclWriteAttributeResponseHandler()
  *****************************************************************************/
-EmberStatus emberZclSendAttributeWrite(const EmberZclDestination_t *destination,
-                                       const EmberZclClusterSpec_t *clusterSpec,
-                                       const EmberZclAttributeWriteData_t *attributeWriteData,
+ChipStatus chipZclSendAttributeWrite(const ChipZclDestination_t *destination,
+                                       const ChipZclClusterSpec_t *clusterSpec,
+                                       const ChipZclAttributeWriteData_t *attributeWriteData,
                                        size_t attributeWriteDataCount,
-                                       const EmberZclWriteAttributeResponseHandler handler);
+                                       const ChipZclWriteAttributeResponseHandler handler);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-extern const uint8_t emZclAttributeDefaultMinMaxData[];
-extern const size_t emZclAttributeDefaultMinMaxLookupTable[];
-extern const EmZclAttributeEntry_t emZclAttributeTable[];
-#define emZclIsAttributeLocal(attribute)                      \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_STORAGE_MASK) \
-   != EM_ZCL_ATTRIBUTE_STORAGE_NONE)
-#define emZclIsAttributeRemote(attribute)                     \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_STORAGE_MASK) \
-   == EM_ZCL_ATTRIBUTE_STORAGE_NONE)
-#define emZclIsAttributeExternal(attribute)                        \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_STORAGE_TYPE_MASK) \
-   == EM_ZCL_ATTRIBUTE_STORAGE_TYPE_EXTERNAL)
-#define emZclIsAttributeTokenized(attribute)                       \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_STORAGE_TYPE_MASK) \
-   == EM_ZCL_ATTRIBUTE_STORAGE_TYPE_TOKEN)
-#define emZclIsAttributeSingleton(attribute)                            \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_STORAGE_SINGLETON_MASK) \
-   == EM_ZCL_ATTRIBUTE_STORAGE_SINGLETON_MASK)
-#define emZclIsAttributeReadable(attribute)                      \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_ACCESS_READABLE) \
-   == EM_ZCL_ATTRIBUTE_ACCESS_READABLE)
-#define emZclIsAttributeWritable(attribute)                      \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_ACCESS_WRITABLE) \
-   == EM_ZCL_ATTRIBUTE_ACCESS_WRITABLE)
-#define emZclIsAttributeReportable(attribute)                      \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_ACCESS_REPORTABLE) \
-   == EM_ZCL_ATTRIBUTE_ACCESS_REPORTABLE)
-#define emZclIsAttributeBounded(attribute)                    \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_DATA_BOUNDED) \
-   == EM_ZCL_ATTRIBUTE_DATA_BOUNDED)
-#define emZclIsAttributeAnalog(attribute)                    \
-  (READBITS((attribute)->mask, EM_ZCL_ATTRIBUTE_DATA_ANALOG) \
-   == EM_ZCL_ATTRIBUTE_DATA_ANALOG)
-const EmZclAttributeEntry_t *emZclFindAttribute(const EmberZclClusterSpec_t *clusterSpec,
-                                                EmberZclAttributeId_t attributeId,
+extern const uint8_t chZclAttributeDefaultMinMaxData[];
+extern const size_t chZclAttributeDefaultMinMaxLookupTable[];
+extern const ChZclAttributeEntry_t chZclAttributeTable[];
+#define chZclIsAttributeLocal(attribute)                      \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_STORAGE_MASK) \
+   != CH_ZCL_ATTRIBUTE_STORAGE_NONE)
+#define chZclIsAttributeRemote(attribute)                     \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_STORAGE_MASK) \
+   == CH_ZCL_ATTRIBUTE_STORAGE_NONE)
+#define chZclIsAttributeExternal(attribute)                        \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_STORAGE_TYPE_MASK) \
+   == CH_ZCL_ATTRIBUTE_STORAGE_TYPE_EXTERNAL)
+#define chZclIsAttributeTokenized(attribute)                       \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_STORAGE_TYPE_MASK) \
+   == CH_ZCL_ATTRIBUTE_STORAGE_TYPE_TOKEN)
+#define chZclIsAttributeSingleton(attribute)                            \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_STORAGE_SINGLETON_MASK) \
+   == CH_ZCL_ATTRIBUTE_STORAGE_SINGLETON_MASK)
+#define chZclIsAttributeReadable(attribute)                      \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_ACCESS_READABLE) \
+   == CH_ZCL_ATTRIBUTE_ACCESS_READABLE)
+#define chZclIsAttributeWritable(attribute)                      \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_ACCESS_WRITABLE) \
+   == CH_ZCL_ATTRIBUTE_ACCESS_WRITABLE)
+#define chZclIsAttributeReportable(attribute)                      \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_ACCESS_REPORTABLE) \
+   == CH_ZCL_ATTRIBUTE_ACCESS_REPORTABLE)
+#define chZclIsAttributeBounded(attribute)                    \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_DATA_BOUNDED) \
+   == CH_ZCL_ATTRIBUTE_DATA_BOUNDED)
+#define chZclIsAttributeAnalog(attribute)                    \
+  (READBITS((attribute)->mask, CH_ZCL_ATTRIBUTE_DATA_ANALOG) \
+   == CH_ZCL_ATTRIBUTE_DATA_ANALOG)
+const ChZclAttributeEntry_t *chZclFindAttribute(const ChipZclClusterSpec_t *clusterSpec,
+                                                ChipZclAttributeId_t attributeId,
                                                 bool includeRemote);
-EmberZclStatus_t emZclReadAttributeEntry(EmberZclEndpointId_t endpointId,
-                                         const EmZclAttributeEntry_t *attribute,
+ChipZclStatus_t chZclReadAttributeEntry(ChipZclEndpointId_t endpointId,
+                                         const ChZclAttributeEntry_t *attribute,
                                          void *buffer,
                                          size_t bufferLength);
-EmberZclStatus_t emZclWriteAttributeEntry(EmberZclEndpointId_t endpointId,
-                                          const EmZclAttributeEntry_t *attribute,
+ChipZclStatus_t chZclWriteAttributeEntry(ChipZclEndpointId_t endpointId,
+                                          const ChZclAttributeEntry_t *attribute,
                                           const void *buffer,
                                           size_t bufferLength,
                                           bool enableUpdate);
-size_t emZclAttributeSize(const EmZclAttributeEntry_t *attribute,
+size_t chZclAttributeSize(const ChZclAttributeEntry_t *attribute,
                           const void *data);
-bool emZclReadEncodeAttributeKeyValue(CborState *state,
-                                      EmberZclEndpointId_t endpointId,
-                                      const EmZclAttributeEntry_t *attribute,
+bool chZclReadEncodeAttributeKeyValue(CborState *state,
+                                      ChipZclEndpointId_t endpointId,
+                                      const ChZclAttributeEntry_t *attribute,
                                       void *buffer,
                                       size_t bufferLength);
-bool emZclAttributeUriMetadataQueryParse(EmZclContext_t *context,
+bool chZclAttributeUriMetadataQueryParse(ChZclContext_t *context,
                                          void *data,
                                          uint8_t depth);
-bool emZclAttributeUriQueryFilterParse(EmZclContext_t *context,
+bool chZclAttributeUriQueryFilterParse(ChZclContext_t *context,
                                        void *data,
                                        uint8_t depth);
-bool emZclAttributeUriQueryUndividedParse(EmZclContext_t *context,
+bool chZclAttributeUriQueryUndividedParse(ChZclContext_t *context,
                                           void *data,
                                           uint8_t depth);
-void emZclUriClusterAttributeHandler(EmZclContext_t *context);
-void emZclUriClusterAttributeIdHandler(EmZclContext_t *context);
-bool emZclGetAbsDifference(uint8_t *bufferA,
+void chZclUriClusterAttributeHandler(ChZclContext_t *context);
+void chZclUriClusterAttributeIdHandler(ChZclContext_t *context);
+bool chZclGetAbsDifference(uint8_t *bufferA,
                            uint8_t *bufferB,
                            uint8_t *diffBuffer,
                            size_t size);
-void emZclSignExtendAttributeBuffer(uint8_t *outBuffer,
+void chZclSignExtendAttributeBuffer(uint8_t *outBuffer,
                                     size_t outBufferLength,
                                     const uint8_t *inBuffer,
                                     size_t inBufferLength,
                                     uint8_t attributeType);
-uint8_t emZclDirectBufferedZclipType(uint8_t zclipType);
+uint8_t chZclDirectBufferedZclipType(uint8_t zclipType);
 #endif
 
 /** @} end addtogroup */
@@ -684,7 +672,7 @@ uint8_t emZclDirectBufferedZclipType(uint8_t zclipType);
  * - @ref `true` if binding exists
  * - @ref `false` if binding does not exist
  *****************************************************************************/
-bool emberZclHasBinding(EmberZclBindingId_t bindingId);
+bool chipZclHasBinding(ChipZclBindingId_t bindingId);
 
 /**************************************************************************//**
  * This function gets a specified binding.
@@ -695,8 +683,8 @@ bool emberZclHasBinding(EmberZclBindingId_t bindingId);
  * - @ref `true` if binding was retrieved successfully
  * - @ref `false` if binding was not retrieved successfully
  *****************************************************************************/
-bool emberZclGetBinding(EmberZclBindingId_t bindingId,
-                        EmberZclBindingEntry_t *entry);
+bool chipZclGetBinding(ChipZclBindingId_t bindingId,
+                        ChipZclBindingEntry_t *entry);
 
 /**************************************************************************//**
  * This function sets a specified binding.
@@ -707,8 +695,8 @@ bool emberZclGetBinding(EmberZclBindingId_t bindingId,
  * - @ref `true` if binding was set successfully
  * - @ref `false` if binding was not set successfully
  *****************************************************************************/
-bool emberZclSetBinding(EmberZclBindingId_t bindingId,
-                        const EmberZclBindingEntry_t *entry);
+bool chipZclSetBinding(ChipZclBindingId_t bindingId,
+                        const ChipZclBindingEntry_t *entry);
 
 /**************************************************************************//**
  * This function adds a given entry to the binding table.
@@ -716,13 +704,13 @@ bool emberZclSetBinding(EmberZclBindingId_t bindingId,
  * @param entry A binding entry to add to the table
  * @return
  * - @ref A binding identifier of entry if it was added successfully
- * - @ref EMBER_ZCL_BINDING_NULL if entry was not added successfully
+ * - @ref CHIP_ZCL_BINDING_NULL if entry was not added successfully
  *
  * This function checks the binding table for duplicates. If a duplicate is
  * found, a binding identifier of the previous entry is used. Otherwise, a new one is
  * allocated. This function also validates contents of the given binding entry.
  *****************************************************************************/
-EmberZclBindingId_t emberZclAddBinding(const EmberZclBindingEntry_t *entry);
+ChipZclBindingId_t chipZclAddBinding(const ChipZclBindingEntry_t *entry);
 
 /**************************************************************************//**
  * This function removes a specified entry from the binding table.
@@ -732,7 +720,7 @@ EmberZclBindingId_t emberZclAddBinding(const EmberZclBindingEntry_t *entry);
  * - @ref `true` if an entry was removed successfully
  * - @ref `false` if an entry was not removed successfully
  *****************************************************************************/
-bool emberZclRemoveBinding(EmberZclBindingId_t bindingId);
+bool chipZclRemoveBinding(ChipZclBindingId_t bindingId);
 
 /**************************************************************************//**
  * This function removes all entries from the binding table.
@@ -741,7 +729,7 @@ bool emberZclRemoveBinding(EmberZclBindingId_t bindingId);
  * - @ref `true` if all entries were removed successfully
  * - @ref `false` if all entries were not removed successfully
  *****************************************************************************/
-bool emberZclRemoveAllBindings(void);
+bool chipZclRemoveAllBindings(void);
 
 /**************************************************************************//**
  * This function sends a command to a specified destination to add a binding.
@@ -750,14 +738,14 @@ bool emberZclRemoveAllBindings(void);
  * @param entry A binding entry to add to destination's binding table
  * @param handler A callback that is triggered for a response
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * @sa EmberZclBindingResponseHandler()
+ * @sa ChipZclBindingResponseHandler()
  *****************************************************************************/
-EmberStatus emberZclSendAddBinding(const EmberZclDestination_t *destination,
-                                   const EmberZclBindingEntry_t *entry,
-                                   const EmberZclBindingResponseHandler handler);
+ChipStatus chipZclSendAddBinding(const ChipZclDestination_t *destination,
+                                   const ChipZclBindingEntry_t *entry,
+                                   const ChipZclBindingResponseHandler handler);
 
 /**************************************************************************//**
  * This function sends a command to a specified destination to update a binding.
@@ -767,15 +755,15 @@ EmberStatus emberZclSendAddBinding(const EmberZclDestination_t *destination,
  * @param bindingId A binding identifier to update in destination's binding table
  * @param handler A callback that is triggered for a response
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * @sa EmberZclBindingResponseHandler()
+ * @sa ChipZclBindingResponseHandler()
  *****************************************************************************/
-EmberStatus emberZclSendUpdateBinding(const EmberZclDestination_t *destination,
-                                      const EmberZclBindingEntry_t *entry,
-                                      EmberZclBindingId_t bindingId,
-                                      const EmberZclBindingResponseHandler handler);
+ChipStatus chipZclSendUpdateBinding(const ChipZclDestination_t *destination,
+                                      const ChipZclBindingEntry_t *entry,
+                                      ChipZclBindingId_t bindingId,
+                                      const ChipZclBindingResponseHandler handler);
 
 /**************************************************************************//**
  * This function sends a command to a specified destination to remove a binding.
@@ -785,15 +773,15 @@ EmberStatus emberZclSendUpdateBinding(const EmberZclDestination_t *destination,
  * @param bindingId Binding identifier to remove from destination's binding table
  * @param handler callback that is triggered for response
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * @sa EmberZclBindingResponseHandler()
+ * @sa ChipZclBindingResponseHandler()
  *****************************************************************************/
-EmberStatus emberZclSendRemoveBinding(const EmberZclDestination_t *destination,
-                                      const EmberZclClusterSpec_t *clusterSpec,
-                                      EmberZclBindingId_t bindingId,
-                                      const EmberZclBindingResponseHandler handler);
+ChipStatus chipZclSendRemoveBinding(const ChipZclDestination_t *destination,
+                                      const ChipZclClusterSpec_t *clusterSpec,
+                                      ChipZclBindingId_t bindingId,
+                                      const ChipZclBindingResponseHandler handler);
 
 /**************************************************************************//**
  * This function gets destination from specified matching binding
@@ -806,20 +794,20 @@ EmberStatus emberZclSendRemoveBinding(const EmberZclDestination_t *destination,
  * - @ref `true` if matching binding was found
  * - @ref `false` if matching binding was not found
  *
- * @sa EmberZclGetDestinationFromBinding()
+ * @sa ChipZclGetDestinationFromBinding()
  *****************************************************************************/
-bool emberZclGetDestinationFromBinding(const EmberZclClusterSpec_t *clusterSpec,
-                                       EmberZclBindingId_t *bindingIdx,
-                                       EmberZclDestination_t *destination);
+bool chipZclGetDestinationFromBinding(const ChipZclClusterSpec_t *clusterSpec,
+                                       ChipZclBindingId_t *bindingIdx,
+                                       ChipZclDestination_t *destination);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-size_t emZclGetBindingCount(void);
-bool emZclHasBinding(const EmZclContext_t *context,
-                     EmberZclBindingId_t bindingId);
-void emZclUriClusterBindingHandler(EmZclContext_t *context);
-void emZclUriClusterBindingIdHandler(EmZclContext_t *context);
-void emZclReadDestinationFromBinding(const EmberZclBindingEntry_t *binding,
-                                     EmberZclDestination_t *destination);
+size_t chZclGetBindingCount(void);
+bool chZclHasBinding(const ChZclContext_t *context,
+                     ChipZclBindingId_t bindingId);
+void chZclUriClusterBindingHandler(ChZclContext_t *context);
+void chZclUriClusterBindingIdHandler(ChZclContext_t *context);
+void chZclReadDestinationFromBinding(const ChipZclBindingEntry_t *binding,
+                                     ChipZclDestination_t *destination);
 #endif
 
 /** @} end addtogroup */
@@ -840,30 +828,30 @@ void emZclReadDestinationFromBinding(const EmberZclBindingEntry_t *binding,
  * @param context A command context for the response
  * @param status A status to respond with
  * @return
- * - @ref EMBER_ZCL_STATUS_SUCCESS if response was sent successfully
- * - @ref EMBER_ZCL_STATUS_ACTION_DENIED if response to a multicast command
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if response was sent successfully
+ * - @ref CHIP_ZCL_STATUS_ACTION_DENIED if response to a multicast command
+ * - @ref ::ChipStatus with failure reason otherwise
  *****************************************************************************/
-EmberStatus emberZclSendDefaultResponse(const EmberZclCommandContext_t *context,
-                                        EmberZclStatus_t status);
+ChipStatus chipZclSendDefaultResponse(const ChipZclCommandContext_t *context,
+                                        ChipZclStatus_t status);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-extern const EmZclCommandEntry_t emZclCommandTable[];
-extern const size_t emZclCommandCount;
-const EmZclCommandEntry_t *emZclFindCommand(const EmberZclClusterSpec_t *clusterSpec,
-                                            EmberZclCommandId_t commandId);
-EmberStatus emZclSendCommandRequest(const EmberZclDestination_t *destination,
-                                    const EmberZclClusterSpec_t *clusterSpec,
-                                    EmberZclCommandId_t commandId,
+extern const ChZclCommandEntry_t chZclCommandTable[];
+extern const size_t chZclCommandCount;
+const ChZclCommandEntry_t *chZclFindCommand(const ChipZclClusterSpec_t *clusterSpec,
+                                            ChipZclCommandId_t commandId);
+ChipStatus chZclSendCommandRequest(const ChipZclDestination_t *destination,
+                                    const ChipZclClusterSpec_t *clusterSpec,
+                                    ChipZclCommandId_t commandId,
                                     const void *request,
                                     const ZclipStructSpec *requestSpec,
                                     const ZclipStructSpec *responseSpec,
-                                    const EmZclResponseHandler handler);
-EmberStatus emZclSendCommandResponse(const EmberZclCommandContext_t *context,
+                                    const ChZclResponseHandler handler);
+ChipStatus chZclSendCommandResponse(const ChipZclCommandContext_t *context,
                                      const void *response,
                                      const ZclipStructSpec *responseSpec);
-void emZclUriClusterCommandHandler(EmZclContext_t *context);
-void emZclUriClusterCommandIdHandler(EmZclContext_t *context);
+void chZclUriClusterCommandHandler(ChZclContext_t *context);
+void chZclUriClusterCommandIdHandler(ChZclContext_t *context);
 #endif
 
 /** @} end addtogroup */
@@ -880,12 +868,12 @@ void emZclUriClusterCommandIdHandler(EmZclContext_t *context);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-bool emZclHasReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                    const EmberZclClusterSpec_t *clusterSpec,
-                                    EmberZclReportingConfigurationId_t reportingConfigurationId);
-void emZclUriClusterNotificationHandler(EmZclContext_t *context);
-void emZclUriClusterReportingConfigurationHandler(EmZclContext_t *context);
-void emZclUriClusterReportingConfigurationIdHandler(EmZclContext_t *context);
+bool chZclHasReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                    const ChipZclClusterSpec_t *clusterSpec,
+                                    ChipZclReportingConfigurationId_t reportingConfigurationId);
+void chZclUriClusterNotificationHandler(ChZclContext_t *context);
+void chZclUriClusterReportingConfigurationHandler(ChZclContext_t *context);
+void chZclUriClusterReportingConfigurationIdHandler(ChZclContext_t *context);
 
 #endif
 
@@ -894,7 +882,7 @@ void emZclUriClusterReportingConfigurationIdHandler(EmZclContext_t *context);
  * 2. Default configurations for each endpoint/clusterSpec are restored
  * to their initial values and saved to nv.
  */
-void emberZclReportingConfigurationsFactoryReset(EmberZclEndpointId_t endpointId);
+void chipZclReportingConfigurationsFactoryReset(ChipZclEndpointId_t endpointId);
 
 /** @} end addtogroup */
 
@@ -914,7 +902,7 @@ void emberZclReportingConfigurationsFactoryReset(EmberZclEndpointId_t endpointId
  * @param buffer string pointer
  * @return length of string
  *****************************************************************************/
-uint8_t emberZclStringLength(const uint8_t *buffer);
+uint8_t chipZclStringLength(const uint8_t *buffer);
 
 /**************************************************************************//**
  * This function returns the size of a given string including overhead and data.
@@ -922,7 +910,7 @@ uint8_t emberZclStringLength(const uint8_t *buffer);
  * @param buffer string pointer
  * @return size of string
  *****************************************************************************/
-uint8_t emberZclStringSize(const uint8_t *buffer);
+uint8_t chipZclStringSize(const uint8_t *buffer);
 
 /**************************************************************************//**
  * This function returns the length of the octet or character data in a given long string.
@@ -930,7 +918,7 @@ uint8_t emberZclStringSize(const uint8_t *buffer);
  * @param buffer string pointer
  * @return length of string
  *****************************************************************************/
-uint16_t emberZclLongStringLength(const uint8_t *buffer);
+uint16_t chipZclLongStringLength(const uint8_t *buffer);
 
 /**************************************************************************//**
  * This function returns the size of a given long string including overhead and data.
@@ -938,202 +926,202 @@ uint16_t emberZclLongStringLength(const uint8_t *buffer);
  * @param buffer string pointer
  * @return size of string
  *****************************************************************************/
-uint16_t emberZclLongStringSize(const uint8_t *buffer);
+uint16_t chipZclLongStringSize(const uint8_t *buffer);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 #define emIsMulticastAddress(ipAddress) ((ipAddress)[0] == 0xFF)
 
-const uint8_t *emZclGetMessageStatusName(EmberZclMessageStatus_t status);
+const uint8_t *chZclGetMessageStatusName(ChipZclMessageStatus_t status);
 
 // URI segment matching functions
-bool emZclUriPathStringMatch       (EmZclContext_t *context, void *castString, uint8_t depth);
-bool emZclUriQueryStringPrefixMatch(EmZclContext_t *context, void *castString, uint8_t depth);
+bool chZclUriPathStringMatch       (ChZclContext_t *context, void *castString, uint8_t depth);
+bool chZclUriQueryStringPrefixMatch(ChZclContext_t *context, void *castString, uint8_t depth);
 
-// If a response handler is supplied it must call emZclCoapStatusHandler()
+// If a response handler is supplied it must call chZclCoapStatusHandler()
 // with the status and response info.  This is so that the system can detect
 // broken UID<->address associations.
-EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
-                                 EmberCoapCode code,
+ChipStatus chZclSendWithOptions(const ChipZclCoapEndpoint_t *destination,
+                                 ChipCoapCode code,
                                  const uint8_t *uri,
-                                 const EmberCoapOption options[],
+                                 const ChipCoapOption options[],
                                  uint16_t optionsLength,
                                  const uint8_t *payload,
                                  uint16_t payloadLength,
-                                 EmberCoapResponseHandler handler,
+                                 ChipCoapResponseHandler handler,
                                  void *applicationData,
                                  uint16_t applicationDataLength,
                                  bool skipRetryEvent);
-EmberStatus emZclSend(const EmberZclCoapEndpoint_t *destination,
-                      EmberCoapCode code,
+ChipStatus chZclSend(const ChipZclCoapEndpoint_t *destination,
+                      ChipCoapCode code,
                       const uint8_t *uri,
                       const uint8_t *payload,
                       uint16_t payloadLength,
-                      EmberCoapResponseHandler handler,
+                      ChipCoapResponseHandler handler,
                       void *applicationData,
                       uint16_t applicationDataLength,
                       bool skipRetryEvent);
-EmberStatus emberZclRequestBlock(const EmberZclCoapEndpoint_t *destination,
+ChipStatus chipZclRequestBlock(const ChipZclCoapEndpoint_t *destination,
                                  const uint8_t *uriPath,
-                                 EmberCoapBlockOption *block2Option,
-                                 EmberCoapResponseHandler responseHandler);
+                                 ChipCoapBlockOption *block2Option,
+                                 ChipCoapResponseHandler responseHandler);
 
-void emZclCoapStatusHandler(EmberCoapStatus status, EmberCoapResponseInfo *info);
+void chZclCoapStatusHandler(ChipCoapStatus status, ChipCoapResponseInfo *info);
 
-EmberStatus emberZclRespondWithPath(const EmberCoapRequestInfo *requestInfo,
-                                    EmberCoapCode code,
+ChipStatus chipZclRespondWithPath(const ChipCoapRequestInfo *requestInfo,
+                                    ChipCoapCode code,
                                     const uint8_t *path,
-                                    const EmberCoapOption *options,
+                                    const ChipCoapOption *options,
                                     uint8_t numberOfOptions,
                                     const uint8_t *payload,
                                     uint16_t payloadLength);
-#define emberZclRespondWithCode(info, code) \
-  (emberZclRespondWithPath((info), (code), NULL, NULL, 0, NULL, 0))
-#define emberZclRespondWithPayload(info, code, payload, payloadLength) \
-  (emberZclRespondWithPath((info), (code), NULL, NULL, 0, (payload), (payloadLength)))
-#define emberZclRespond(info, code, opts, count, pay, len) \
-  (emberZclRespondWithPath((info), (code), NULL, (opts), (count), (pay), (len)))
+#define chipZclRespondWithCode(info, code) \
+  (chipZclRespondWithPath((info), (code), NULL, NULL, 0, NULL, 0))
+#define chipZclRespondWithPayload(info, code, payload, payloadLength) \
+  (chipZclRespondWithPath((info), (code), NULL, NULL, 0, (payload), (payloadLength)))
+#define chipZclRespond(info, code, opts, count, pay, len) \
+  (chipZclRespondWithPath((info), (code), NULL, (opts), (count), (pay), (len)))
 
-#define emberZclRespondCborState(info, code, locationPath, state) \
-  (emberZclRespondCborPayload((info), (code), (locationPath), (state)->start, emCborEncodeSize(state)))
-EmberStatus emberZclRespondCborPayload(const EmberCoapRequestInfo *info,
-                                       EmberCoapCode code,
+#define chipZclRespondCborState(info, code, locationPath, state) \
+  (chipZclRespondCborPayload((info), (code), (locationPath), (state)->start, emCborEncodeSize(state)))
+ChipStatus chipZclRespondCborPayload(const ChipCoapRequestInfo *info,
+                                       ChipCoapCode code,
                                        const uint8_t *locationPath,
                                        const uint8_t *payload,
                                        uint16_t payloadLength);
-#define emZclRespondCborPayloadWithOptions(info, code, options, optionsLength, payload, payloadLength) \
-  (emberZclRespondWithPath(info, code, NULL, options, optionsLength, payload, payloadLength))
-EmberStatus emberZclRespondLinkFormatPayload(const EmberCoapRequestInfo *info,
-                                             EmberCoapCode code,
+#define chZclRespondCborPayloadWithOptions(info, code, options, optionsLength, payload, payloadLength) \
+  (chipZclRespondWithPath(info, code, NULL, options, optionsLength, payload, payloadLength))
+ChipStatus chipZclRespondLinkFormatPayload(const ChipCoapRequestInfo *info,
+                                             ChipCoapCode code,
                                              const uint8_t *payload,
                                              uint16_t payloadLength,
-                                             EmberCoapContentFormatType contentFormatType);
-EmberStatus emberZclRespondWithStatus(const EmberCoapRequestInfo *info,
-                                      EmberCoapCode code,
-                                      EmberZclStatus_t status);
-bool emZclEncodeDefaultResponse(CborState *state,
-                                EmberZclStatus_t status);
+                                             ChipCoapContentFormatType contentFormatType);
+ChipStatus chipZclRespondWithStatus(const ChipCoapRequestInfo *info,
+                                      ChipCoapCode code,
+                                      ChipZclStatus_t status);
+bool chZclEncodeDefaultResponse(CborState *state,
+                                ChipZclStatus_t status);
 
-#define emZclRespond201Created(info, locationPath) \
-  (emberZclRespondWithPath(info, EMBER_COAP_CODE_201_CREATED, locationPath, NULL, 0, NULL, 0))
-#define emZclRespond201CreatedCborState(info, locationPath, state) \
-  (emberZclRespondCborState(info, EMBER_COAP_CODE_201_CREATED, locationPath, state))
-#define emZclRespond202Deleted(info) \
-  (emberZclRespondWithStatus(info, EMBER_COAP_CODE_202_DELETED, EMBER_SUCCESS))
-#define emZclRespond204Changed(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_204_CHANGED))
-#define emZclRespond204ChangedWithStatus(info, status) \
-  (emberZclRespondWithStatus(info, EMBER_COAP_CODE_204_CHANGED, status))
-#define emZclRespond204ChangedCborState(info, state) \
-  (emberZclRespondCborState(info, EMBER_COAP_CODE_204_CHANGED, NULL, state))
-#define emZclRespond204ChangedWithPath(info, locationPath) \
-  (emberZclRespondWithPath((info), EMBER_COAP_CODE_204_CHANGED, locationPath, NULL, 0, NULL, 0))
-#define emZclRespond205ContentCbor(info, payload, payloadLength) \
-  (emberZclRespondCborPayload(info, EMBER_COAP_CODE_205_CONTENT, NULL, payload, payloadLength))
-#define emZclRespond205ContentCborState(info, state) \
-  (emberZclRespondCborState(info, EMBER_COAP_CODE_205_CONTENT, NULL, state))
-#define emZclRespond205ContentLinkFormat(info, payload, payloadLength, contentFormat) \
-  (emberZclRespondLinkFormatPayload(info, EMBER_COAP_CODE_205_CONTENT, payload, payloadLength, contentFormat))
-#define emZclRespond205ContentCborWithOptions(info, options, optionsLength, payload, payloadLength) \
-  (emZclRespondCborPayloadWithOptions(info, EMBER_COAP_CODE_205_CONTENT, options, optionsLength, payload, payloadLength))
-#define emZclRespond400BadRequest(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_400_BAD_REQUEST))
-#define emZclRespond400BadRequestWithStatus(info, status) \
-  (emberZclRespondWithStatus(info, EMBER_COAP_CODE_400_BAD_REQUEST, status))
-#define emZclRespond400BadRequestCborState(info, state) \
-  (emberZclRespondCborState(info, EMBER_COAP_CODE_400_BAD_REQUEST, NULL, state))
-#define emZclRespond401Unauthorized(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_401_UNAUTHORIZED))
-#define emZclRespond402BadOption(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_402_BAD_OPTION))
-#define emZclRespond404NotFound(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_404_NOT_FOUND))
-#define emZclRespond405MethodNotAllowed(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_405_METHOD_NOT_ALLOWED))
-#define emZclRespond406NotAcceptable(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_406_NOT_ACCEPTABLE))
-#define emZclRespond412PreconditionFailedCborState(info, state) \
-  (emberZclRespondCborState(info, EMBER_COAP_CODE_412_PRECONDITION_FAILED, NULL, state))
-#define emZclRespond413RequestEntityTooLarge(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_413_REQUEST_ENTITY_TOO_LARGE))
-#define emZclRespond415UnsupportedContentFormat(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT))
-#define emZclRespond500InternalServerError(info) \
-  (emberZclRespondWithCode(info, EMBER_COAP_CODE_500_INTERNAL_SERVER_ERROR))
+#define chZclRespond201Created(info, locationPath) \
+  (chipZclRespondWithPath(info, CHIP_COAP_CODE_201_CREATED, locationPath, NULL, 0, NULL, 0))
+#define chZclRespond201CreatedCborState(info, locationPath, state) \
+  (chipZclRespondCborState(info, CHIP_COAP_CODE_201_CREATED, locationPath, state))
+#define chZclRespond202Deleted(info) \
+  (chipZclRespondWithStatus(info, CHIP_COAP_CODE_202_DELETED, CHIP_SUCCESS))
+#define chZclRespond204Changed(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_204_CHANGED))
+#define chZclRespond204ChangedWithStatus(info, status) \
+  (chipZclRespondWithStatus(info, CHIP_COAP_CODE_204_CHANGED, status))
+#define chZclRespond204ChangedCborState(info, state) \
+  (chipZclRespondCborState(info, CHIP_COAP_CODE_204_CHANGED, NULL, state))
+#define chZclRespond204ChangedWithPath(info, locationPath) \
+  (chipZclRespondWithPath((info), CHIP_COAP_CODE_204_CHANGED, locationPath, NULL, 0, NULL, 0))
+#define chZclRespond205ContentCbor(info, payload, payloadLength) \
+  (chipZclRespondCborPayload(info, CHIP_COAP_CODE_205_CONTENT, NULL, payload, payloadLength))
+#define chZclRespond205ContentCborState(info, state) \
+  (chipZclRespondCborState(info, CHIP_COAP_CODE_205_CONTENT, NULL, state))
+#define chZclRespond205ContentLinkFormat(info, payload, payloadLength, contentFormat) \
+  (chipZclRespondLinkFormatPayload(info, CHIP_COAP_CODE_205_CONTENT, payload, payloadLength, contentFormat))
+#define chZclRespond205ContentCborWithOptions(info, options, optionsLength, payload, payloadLength) \
+  (chZclRespondCborPayloadWithOptions(info, CHIP_COAP_CODE_205_CONTENT, options, optionsLength, payload, payloadLength))
+#define chZclRespond400BadRequest(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_400_BAD_REQUEST))
+#define chZclRespond400BadRequestWithStatus(info, status) \
+  (chipZclRespondWithStatus(info, CHIP_COAP_CODE_400_BAD_REQUEST, status))
+#define chZclRespond400BadRequestCborState(info, state) \
+  (chipZclRespondCborState(info, CHIP_COAP_CODE_400_BAD_REQUEST, NULL, state))
+#define chZclRespond401Unauthorized(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_401_UNAUTHORIZED))
+#define chZclRespond402BadOption(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_402_BAD_OPTION))
+#define chZclRespond404NotFound(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_404_NOT_FOUND))
+#define chZclRespond405MethodNotAllowed(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_405_METHOD_NOT_ALLOWED))
+#define chZclRespond406NotAcceptable(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_406_NOT_ACCEPTABLE))
+#define chZclRespond412PreconditionFailedCborState(info, state) \
+  (chipZclRespondCborState(info, CHIP_COAP_CODE_412_PRECONDITION_FAILED, NULL, state))
+#define chZclRespond413RequestEntityTooLarge(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_413_REQUEST_ENTITY_TOO_LARGE))
+#define chZclRespond415UnsupportedContentFormat(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT))
+#define chZclRespond500InternalServerError(info) \
+  (chipZclRespondWithCode(info, CHIP_COAP_CODE_500_INTERNAL_SERVER_ERROR))
 
-uint8_t emZclIntToHexString(uint32_t value, size_t size, uint8_t *result);
+uint8_t chZclIntToHexString(uint32_t value, size_t size, uint8_t *result);
 bool emHexStringToInt(const uint8_t *chars, size_t length, uintmax_t *result);
-bool emZclHexStringToInt(const uint8_t *chars, size_t length, uintmax_t *result);
+bool chZclHexStringToInt(const uint8_t *chars, size_t length, uintmax_t *result);
 bool emHexStringToInt(const uint8_t *chars, size_t length, uintmax_t *result);
-size_t emZclClusterToString(const EmberZclClusterSpec_t *clusterSpec,
+size_t chZclClusterToString(const ChipZclClusterSpec_t *clusterSpec,
                             uint8_t *result);
-bool emZclStringToCluster(const uint8_t *chars,
+bool chZclStringToCluster(const uint8_t *chars,
                           size_t length,
-                          EmberZclClusterSpec_t *clusterSpec);
-bool emZclParseUri(const uint8_t *payload, uint16_t payloadLength, uint8_t **incoming, EmberCoapContentFormatType contentFormat, EmZclUriContext_t *context);
-size_t emZclThingToUriPath(const EmberZclApplicationDestination_t *destination,
-                           const EmberZclClusterSpec_t *clusterSpec,
+                          ChipZclClusterSpec_t *clusterSpec);
+bool chZclParseUri(const uint8_t *payload, uint16_t payloadLength, uint8_t **incoming, ChipCoapContentFormatType contentFormat, ChZclUriContext_t *context);
+size_t chZclThingToUriPath(const ChipZclApplicationDestination_t *destination,
+                           const ChipZclClusterSpec_t *clusterSpec,
                            char thing,
                            uint8_t *result);
 
-size_t emZclCoapEndpointToUri(const EmberZclCoapEndpoint_t *network, uint8_t *result);
-size_t emZclDestinationToUri(const EmberZclDestination_t *destination, uint8_t *result);
-size_t emZclUriToCoapEndpoint(const uint8_t *uri, EmberZclCoapEndpoint_t *network);
-bool emZclUriToBindingEntry(const uint8_t *uri,
-                            EmberZclBindingEntry_t *result,
+size_t chZclCoapEndpointToUri(const ChipZclCoapEndpoint_t *network, uint8_t *result);
+size_t chZclDestinationToUri(const ChipZclDestination_t *destination, uint8_t *result);
+size_t chZclUriToCoapEndpoint(const uint8_t *uri, ChipZclCoapEndpoint_t *network);
+bool chZclUriToBindingEntry(const uint8_t *uri,
+                            ChipZclBindingEntry_t *result,
                             bool includeCluster);
-size_t emZclUidToString(const EmberZclUid_t *uid, uint16_t uidBits, uint8_t *result);
-bool emZclStringToUid(const uint8_t *uid,
+size_t chZclUidToString(const ChipZclUid_t *uid, uint16_t uidBits, uint8_t *result);
+bool chZclStringToUid(const uint8_t *uid,
                       size_t length,
-                      EmberZclUid_t *result,
+                      ChipZclUid_t *result,
                       uint16_t *resultBits);
-bool emZclConvertBase64UrlToCode(const uint8_t *base64Url,
+bool chZclConvertBase64UrlToCode(const uint8_t *base64Url,
                                  uint16_t length,
                                  uint8_t *code);
-size_t emZclUidToBase64Url(const EmberZclUid_t *uid,
+size_t chZclUidToBase64Url(const ChipZclUid_t *uid,
                            uint16_t uidBits,
                            uint8_t *base64Url);
-bool emZclBase64UrlToUid(const uint8_t *base64Url,
+bool chZclBase64UrlToUid(const uint8_t *base64Url,
                          size_t length,
-                         EmberZclUid_t *result,
+                         ChipZclUid_t *result,
                          uint16_t *resultBits);
-bool emZclNiUriToUid(const uint8_t *uri, uint16_t uriLength, EmberZclUid_t *uid);
+bool chZclNiUriToUid(const uint8_t *uri, uint16_t uriLength, ChipZclUid_t *uid);
 int emDecodeBase64Url(const uint8_t *input,
                       size_t inputLength,
                       uint8_t *output,
                       size_t outputLength);
 
-EmberZclStatus_t emZclCborValueReadStatusToEmberStatus(EmZclCoreCborValueReadStatus_t cborValueReadStatus);
+ChipZclStatus_t chZclCborValueReadStatusToChipStatus(ChZclCoreCborValueReadStatus_t cborValueReadStatus);
 
-#define emZclClusterToUriPath(address, clusterSpec, result) \
-  emZclThingToUriPath(address, clusterSpec, ' ', result)
-#define emZclAttributeToUriPath(address, clusterSpec, result) \
-  emZclThingToUriPath(address, clusterSpec, 'a', result)
-#define emZclBindingToUriPath(address, clusterSpec, result) \
-  emZclThingToUriPath(address, clusterSpec, 'b', result)
-#define emZclCommandToUriPath(address, clusterSpec, result) \
-  emZclThingToUriPath(address, clusterSpec, 'c', result)
-#define emZclNotificationToUriPath(address, clusterSpec, result) \
-  emZclThingToUriPath(address, clusterSpec, 'n', result)
-#define emZclReportingConfigurationToUriPath(address, clusterSpec, result) \
-  emZclThingToUriPath(address, clusterSpec, 'r', result)
+#define chZclClusterToUriPath(address, clusterSpec, result) \
+  chZclThingToUriPath(address, clusterSpec, ' ', result)
+#define chZclAttributeToUriPath(address, clusterSpec, result) \
+  chZclThingToUriPath(address, clusterSpec, 'a', result)
+#define chZclBindingToUriPath(address, clusterSpec, result) \
+  chZclThingToUriPath(address, clusterSpec, 'b', result)
+#define chZclCommandToUriPath(address, clusterSpec, result) \
+  chZclThingToUriPath(address, clusterSpec, 'c', result)
+#define chZclNotificationToUriPath(address, clusterSpec, result) \
+  chZclThingToUriPath(address, clusterSpec, 'n', result)
+#define chZclReportingConfigurationToUriPath(address, clusterSpec, result) \
+  chZclThingToUriPath(address, clusterSpec, 'r', result)
 
-size_t emZclThingIdToUriPath(const EmberZclApplicationDestination_t *destination,
-                             const EmberZclClusterSpec_t *clusterSpec,
+size_t chZclThingIdToUriPath(const ChipZclApplicationDestination_t *destination,
+                             const ChipZclClusterSpec_t *clusterSpec,
                              char thing,
                              uintmax_t thingId,
                              size_t size,
                              uint8_t *result);
-#define emZclAttributeIdToUriPath(address, clusterSpec, attributeId, result) \
-  emZclThingIdToUriPath(address, clusterSpec, 'a', attributeId, sizeof(EmberZclAttributeId_t), result)
-#define emZclBindingIdToUriPath(address, clusterSpec, bindingId, result) \
-  emZclThingIdToUriPath(address, clusterSpec, 'b', bindingId, sizeof(EmberZclBindingId_t), result)
-#define emZclCommandIdToUriPath(address, clusterSpec, commandId, result) \
-  emZclThingIdToUriPath(address, clusterSpec, 'c', commandId, sizeof(EmberZclCommandId_t), result)
-#define emZclReportingConfigurationIdToUriPath(address, clusterSpec, reportingConfigurationId, result) \
-  emZclThingIdToUriPath(address, clusterSpec, 'r', reportingConfigurationId, sizeof(EmberZclReportingConfigurationId_t), result)
+#define chZclAttributeIdToUriPath(address, clusterSpec, attributeId, result) \
+  chZclThingIdToUriPath(address, clusterSpec, 'a', attributeId, sizeof(ChipZclAttributeId_t), result)
+#define chZclBindingIdToUriPath(address, clusterSpec, bindingId, result) \
+  chZclThingIdToUriPath(address, clusterSpec, 'b', bindingId, sizeof(ChipZclBindingId_t), result)
+#define chZclCommandIdToUriPath(address, clusterSpec, commandId, result) \
+  chZclThingIdToUriPath(address, clusterSpec, 'c', commandId, sizeof(ChipZclCommandId_t), result)
+#define chZclReportingConfigurationIdToUriPath(address, clusterSpec, reportingConfigurationId, result) \
+  chZclThingIdToUriPath(address, clusterSpec, 'r', reportingConfigurationId, sizeof(ChipZclReportingConfigurationId_t), result)
 
-bool emZclGetMulticastAddress(EmberIpv6Address * dst);
+bool chZclGetMulticastAddress(ChipIpv6Address * dst);
 #endif
 
 /** @} end addtogroup */
@@ -1142,12 +1130,12 @@ bool emZclGetMulticastAddress(EmberIpv6Address * dst);
 // CLI.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-bool emZclCliGetUidArgument(uint8_t index, EmberZclUid_t *uid);
-void emZclCliResetCliState(void);
-void emZclCliSetCurrentRequestCommand(const EmberZclClusterSpec_t *clusterSpec,
-                                      EmberZclCommandId_t commandId,
+bool chZclCliGetUidArgument(uint8_t index, ChipZclUid_t *uid);
+void chZclCliResetCliState(void);
+void chZclCliSetCurrentRequestCommand(const ChipZclClusterSpec_t *clusterSpec,
+                                      ChipZclCommandId_t commandId,
                                       const ZclipStructSpec *structSpec,
-                                      EmZclCliRequestCommandFunction function,
+                                      ChZclCliRequestCommandFunction function,
                                       const char *cliFormat);
 #endif
 
@@ -1164,23 +1152,23 @@ void emZclCliSetCurrentRequestCommand(const EmberZclClusterSpec_t *clusterSpec,
  */
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#define EM_ZCL_ACCESS_TOKEN_KEY 19
-#define EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN 500
-void emZclAccessTokenHandler(EmZclContext_t *context);
+#define CH_ZCL_ACCESS_TOKEN_KEY 19
+#define CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN 500
+void chZclAccessTokenHandler(ChZclContext_t *context);
 
-bool emZclAddIncomingToken(const EmberZclUid_t *remoteUid,
+bool chZclAddIncomingToken(const ChipZclUid_t *remoteUid,
                            const uint8_t *tokenBytes,
                            uint16_t tokenLength);
-EmberZclStatus_t emZclAllowRemoteAccess(const uint8_t sessionId,
-                                        const EmberZclClusterSpec_t *clusterSpec,
-                                        EmberZclDeviceId_t endpointDeviceId,
+ChipZclStatus_t chZclAllowRemoteAccess(const uint8_t sessionId,
+                                        const ChipZclClusterSpec_t *clusterSpec,
+                                        ChipZclDeviceId_t endpointDeviceId,
                                         uint8_t accessType);
-bool emZclIsProtectedResource(const EmberZclClusterSpec_t *clusterSpec,
+bool chZclIsProtectedResource(const ChipZclClusterSpec_t *clusterSpec,
                               uint8_t accessType);
-bool emZclExtractBinaryAccessToken(CborState *state,
+bool chZclExtractBinaryAccessToken(CborState *state,
                                    uint8_t *output,
                                    uint16_t *outputSize);
-void emZclPrintAccessTokens(void);
+void chZclPrintAccessTokens(void);
 
 #endif
 

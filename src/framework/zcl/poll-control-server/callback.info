@@ -1,28 +1,28 @@
 #include PLATFORM_HEADER
 
-/** @brief emberAfSetLongPollIntervalQsCallback
+/** @brief chipAfSetLongPollIntervalQsCallback
  *
  * This function is called when the Poll Control plugin
  * LongPollInterval attribute (QS) is modified.
  */
-void emberAfSetLongPollIntervalQsCallback(int32u longPollIntervalQs)
+void chipAfSetLongPollIntervalQsCallback(int32u longPollIntervalQs)
 {
 }
 
-/** @brief emberAfSetShortPollIntervalQsCallback
+/** @brief chipAfSetShortPollIntervalQsCallback
  *
  * This function is called when the Poll Control plugin
  * ShortPollInterval attribute (QS) is modified.
  */
-void emberAfSetShortPollIntervalQsCallback(int16u shortPollIntervalQs)
+void chipAfSetShortPollIntervalQsCallback(int16u shortPollIntervalQs)
 {
 }
 
-/** @brief emberAfSetFastPollTimeoutQsCallback
+/** @brief chipAfSetFastPollTimeoutQsCallback
  *
  * This function is called when the Poll Control plugin
  * FastPollTimeout attribute (QS) is modified.
  */
-void emberAfSetFastPollTimeoutQsCallback(int16u shortPollIntervalQs)
+void chipAfSetFastPollTimeoutQsCallback(int16u shortPollIntervalQs)
 {
 }

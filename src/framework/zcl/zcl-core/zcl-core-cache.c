@@ -1,27 +1,15 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_BUFFER_MANAGEMENT
-#include EMBER_AF_API_BUFFER_QUEUE
-#include EMBER_AF_API_HAL
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_BUFFER_MANAGEMENT
+#include CHIP_AF_API_BUFFER_QUEUE
+#include CHIP_AF_API_HAL
+#include CHIP_AF_API_ZCL_CORE
 
 // -----------------------------------------------------------------------------
 // Description.
@@ -63,13 +51,13 @@
 // -----------------------------------------------------------------------------
 // Structures.
 typedef struct {
-  EmZclCacheIndex_t index;
-  EmZclCacheIndex_t lower;
-  EmZclCacheIndex_t upper;
+  ChZclCacheIndex_t index;
+  ChZclCacheIndex_t lower;
+  ChZclCacheIndex_t upper;
 } CacheIndexGenerator;
 
 typedef struct {
-  const EmberIpv6Address *prefix;
+  const ChipIpv6Address *prefix;
   uint8_t prefixLengthInBits;
 } CacheIpv6Prefix;
 
@@ -99,18 +87,18 @@ static CacheIndexGenerator indexGenerator = {
 // -----------------------------------------------------------------------------
 // Plugin handlers.
 
-void emZclCacheNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
-                                    EmberNetworkStatus oldNetworkStatus,
-                                    EmberJoinFailureReason reason)
+void chZclCacheNetworkStatusHandler(ChipNetworkStatus newNetworkStatus,
+                                    ChipNetworkStatus oldNetworkStatus,
+                                    ChipJoinFailureReason reason)
 {
   // If the device is no longer associated with a network, its address
   // cache is cleared.
-  if (newNetworkStatus == EMBER_NO_NETWORK) {
-    emZclCacheRemoveAll();
+  if (newNetworkStatus == CHIP_NO_NETWORK) {
+    chZclCacheRemoveAll();
   }
 }
 
-void emZclCacheMarkApplicationBuffersHandler(void)
+void chZclCacheMarkApplicationBuffersHandler(void)
 {
   emMarkBuffer(&addressCache);
 }
@@ -125,8 +113,8 @@ static void initCacheIndexGenerator(void)
   indexGenerator.upper = 0xFFFF;
 }
 
-static bool resolveGeneratorIndexBounds(const void *criteria, const EmZclCacheEntry_t *entry);
-static EmZclCacheIndex_t generateIndex(void)
+static bool resolveGeneratorIndexBounds(const void *criteria, const ChZclCacheEntry_t *entry);
+static ChZclCacheIndex_t generateIndex(void)
 {
   // Choose a random trial value within the number space; then scan cache
   // entries and check their index values to determine the lower and
@@ -138,7 +126,7 @@ static EmZclCacheIndex_t generateIndex(void)
       indexGenerator.index = halCommonGetRandom();
       indexGenerator.lower = 0x0;
       indexGenerator.upper = 0xFFFF;
-      emZclCacheScan(&indexGenerator, resolveGeneratorIndexBounds);
+      chZclCacheScan(&indexGenerator, resolveGeneratorIndexBounds);
     } while (indexGenerator.index == 0xFFFF
              || (indexGenerator.upper - indexGenerator.lower) < 100);
     indexGenerator.index = indexGenerator.lower;
@@ -150,33 +138,33 @@ static bool canAddEntry(void)
 {
   // If default cache table size has been reached, can exceed it to
   // accommodate a greater number of active bindings.
-  if (entryCount < EMBER_ZCL_CACHE_TABLE_SIZE
-      || entryCount < emZclGetBindingCount()) {
+  if (entryCount < CHIP_ZCL_CACHE_TABLE_SIZE
+      || entryCount < chZclGetBindingCount()) {
     return true;
   }
   return false;
 }
 
-static void fillCacheEntry(EmZclCacheEntry_t *entry,
-                           const EmberZclUid_t *key,
-                           const EmberIpv6Address *value,
+static void fillCacheEntry(ChZclCacheEntry_t *entry,
+                           const ChipZclUid_t *key,
+                           const ChipIpv6Address *value,
                            bool assignIndex)
 {
-  MEMCOPY(&entry->key, key, sizeof(EmberZclUid_t));
-  MEMCOPY(&entry->value, value, sizeof(EmberIpv6Address));
+  MEMCOPY(&entry->key, key, sizeof(ChipZclUid_t));
+  MEMCOPY(&entry->value, value, sizeof(ChipIpv6Address));
   if (assignIndex) {
     entry->index = generateIndex();
   }
 }
 
 static Buffer findCacheEntryBuffer(const void *criteria,
-                                   EmZclCacheScanPredicate match)
+                                   ChZclCacheScanPredicate match)
 {
   for (Buffer buffer = emBufferQueueHead(&addressCache);
        buffer != NULL_BUFFER;
        buffer = emBufferQueueNext(&addressCache, buffer)) {
-    const EmZclCacheEntry_t *entry
-      = (const EmZclCacheEntry_t *)emGetBufferPointer(buffer);
+    const ChZclCacheEntry_t *entry
+      = (const ChZclCacheEntry_t *)emGetBufferPointer(buffer);
     if ((*match)(criteria, entry)) {
       return buffer;
     }
@@ -185,7 +173,7 @@ static Buffer findCacheEntryBuffer(const void *criteria,
 }
 
 static size_t removeAllForCriteria(const void *criteria,
-                                   EmZclCacheScanPredicate match)
+                                   ChZclCacheScanPredicate match)
 {
   // Retain only the entries that DON'T match the criteria.
   Buffer temp = addressCache;
@@ -194,8 +182,8 @@ static size_t removeAllForCriteria(const void *criteria,
   entryCount = 0;
   while (!emBufferQueueIsEmpty(&temp)) {
     Buffer next = emBufferQueueRemoveHead(&temp);
-    const EmZclCacheEntry_t *entry
-      = (const EmZclCacheEntry_t *)emGetBufferPointer(next);
+    const ChZclCacheEntry_t *entry
+      = (const ChZclCacheEntry_t *)emGetBufferPointer(next);
     if ((*match)(criteria, entry)) {
       removedCount++;
     } else {
@@ -215,43 +203,43 @@ static void makeMostRecentlyUsed(Buffer buffer)
 }
 
 // -----------------------------------------------------------------------------
-// EmZclCacheScanPredicates to search/match entry per criteria
+// ChZclCacheScanPredicates to search/match entry per criteria
 
-static bool matchCacheKey(const void *criteria, const EmZclCacheEntry_t *entry)
+static bool matchCacheKey(const void *criteria, const ChZclCacheEntry_t *entry)
 {
   return (MEMCOMPARE((uint8_t *) criteria,
                      &entry->key,
-                     sizeof(EmberZclUid_t))
+                     sizeof(ChipZclUid_t))
           == 0);
 }
 
-static bool matchCacheValue(const void *criteria, const EmZclCacheEntry_t *entry)
+static bool matchCacheValue(const void *criteria, const ChZclCacheEntry_t *entry)
 {
   return (MEMCOMPARE((uint8_t *) criteria,
                      &entry->value,
-                     sizeof(EmberIpv6Address))
+                     sizeof(ChipIpv6Address))
           == 0);
 }
 
-static bool matchCacheIndex(const void *criteria, const EmZclCacheEntry_t *entry)
+static bool matchCacheIndex(const void *criteria, const ChZclCacheEntry_t *entry)
 {
-  EmZclCacheIndex_t index = *((const EmZclCacheIndex_t *)criteria);
+  ChZclCacheIndex_t index = *((const ChZclCacheIndex_t *)criteria);
   return (index == entry->index);
 }
 
 static bool matchCacheValueIpv6Prefix(const void *criteria,
-                                      const EmZclCacheEntry_t *entry)
+                                      const ChZclCacheEntry_t *entry)
 {
   const CacheIpv6Prefix *cacheIpv6Prefix = (const CacheIpv6Prefix *)criteria;
   return (emMatchingPrefixBitLength(cacheIpv6Prefix->prefix->bytes,
                                     cacheIpv6Prefix->prefixLengthInBits,
                                     entry->value.bytes,
-                                    EMBER_IPV6_BITS)
+                                    CHIP_IPV6_BITS)
           == cacheIpv6Prefix->prefixLengthInBits);
 }
 
 static bool resolveGeneratorIndexBounds(const void *criteria,
-                                        const EmZclCacheEntry_t *entry)
+                                        const ChZclCacheEntry_t *entry)
 {
   CacheIndexGenerator *generator = (CacheIndexGenerator *)criteria;
   if (entry->index == generator->index) {
@@ -271,27 +259,27 @@ static bool resolveGeneratorIndexBounds(const void *criteria,
 // -----------------------------------------------------------------------------
 // Internal.
 
-size_t emZclCacheGetEntryCount(void)
+size_t chZclCacheGetEntryCount(void)
 {
   return entryCount;
 }
 
-void emZclCacheScan(const void *criteria, EmZclCacheScanPredicate match)
+void chZclCacheScan(const void *criteria, ChZclCacheScanPredicate match)
 {
   findCacheEntryBuffer(criteria, match);
 }
 
-bool emZclCacheAdd(const EmberZclUid_t *key,
-                   const EmberIpv6Address *value,
-                   EmZclCacheIndex_t *index)
+bool chZclCacheAdd(const ChipZclUid_t *key,
+                   const ChipIpv6Address *value,
+                   ChZclCacheIndex_t *index)
 {
   Buffer buffer = findCacheEntryBufferByKey(key);
   if (buffer == NULL_BUFFER) {
     if (canAddEntry()) {
       // Allocate new buffer.
-      EmZclCacheEntry_t entry;
+      ChZclCacheEntry_t entry;
       fillCacheEntry(&entry, key, value, true); // assign entry index
-      buffer = emFillBuffer((const uint8_t *)&entry, sizeof(EmZclCacheEntry_t));
+      buffer = emFillBuffer((const uint8_t *)&entry, sizeof(ChZclCacheEntry_t));
       if (buffer != NULL_BUFFER) {
         emBufferQueueAddToHead(&addressCache, buffer);
         entryCount++;
@@ -308,7 +296,7 @@ bool emZclCacheAdd(const EmberZclUid_t *key,
 
   if (buffer != NULL_BUFFER) {
     // Reuse an existing buffer, which was found by key or is LRU entry.
-    EmZclCacheEntry_t *entry = (EmZclCacheEntry_t *)emGetBufferPointer(buffer);
+    ChZclCacheEntry_t *entry = (ChZclCacheEntry_t *)emGetBufferPointer(buffer);
     fillCacheEntry(entry, key, value, false); // reuse existing entry index
     makeMostRecentlyUsed(buffer);
     if (index != NULL) {
@@ -320,15 +308,15 @@ bool emZclCacheAdd(const EmberZclUid_t *key,
   return false;
 }
 
-bool emZclCacheGet(const EmberZclUid_t *key,
-                   EmberIpv6Address *value)
+bool chZclCacheGet(const ChipZclUid_t *key,
+                   ChipIpv6Address *value)
 {
   Buffer buffer = findCacheEntryBufferByKey(key);
   if (buffer != NULL_BUFFER) {
     if (value != NULL) {
-      const EmZclCacheEntry_t *entry
-        = (const EmZclCacheEntry_t *)emGetBufferPointer(buffer);
-      MEMCOPY(value, &entry->value, sizeof(EmberIpv6Address));
+      const ChZclCacheEntry_t *entry
+        = (const ChZclCacheEntry_t *)emGetBufferPointer(buffer);
+      MEMCOPY(value, &entry->value, sizeof(ChipIpv6Address));
     }
     makeMostRecentlyUsed(buffer);
     return true;
@@ -336,48 +324,48 @@ bool emZclCacheGet(const EmberZclUid_t *key,
   return false;
 }
 
-bool emZclCacheGetByIndex(EmZclCacheIndex_t index,
-                          EmberZclUid_t *key,
-                          EmberIpv6Address *value)
+bool chZclCacheGetByIndex(ChZclCacheIndex_t index,
+                          ChipZclUid_t *key,
+                          ChipIpv6Address *value)
 {
   Buffer buffer = findCacheEntryBufferByIndex(index);
   if (buffer != NULL_BUFFER) {
-    const EmZclCacheEntry_t *entry
-      = (const EmZclCacheEntry_t *)emGetBufferPointer(buffer);
+    const ChZclCacheEntry_t *entry
+      = (const ChZclCacheEntry_t *)emGetBufferPointer(buffer);
     if (key != NULL) {
-      MEMCOPY(key, &entry->key, sizeof(EmberZclUid_t));
+      MEMCOPY(key, &entry->key, sizeof(ChipZclUid_t));
     }
     if (value != NULL) {
-      MEMCOPY(value, &entry->value, sizeof(EmberIpv6Address));
+      MEMCOPY(value, &entry->value, sizeof(ChipIpv6Address));
     }
     return true;
   }
   return false;
 }
 
-bool emZclCacheGetFirstKeyForValue(const EmberIpv6Address *value,
-                                   EmberZclUid_t *key)
+bool chZclCacheGetFirstKeyForValue(const ChipIpv6Address *value,
+                                   ChipZclUid_t *key)
 {
   Buffer buffer = findCacheEntryBufferByValue(value);
   if (buffer != NULL_BUFFER) {
     if (key != NULL) {
-      const EmZclCacheEntry_t *entry
-        = (const EmZclCacheEntry_t *)emGetBufferPointer(buffer);
-      MEMCOPY(key, &entry->key, sizeof(EmberZclUid_t));
+      const ChZclCacheEntry_t *entry
+        = (const ChZclCacheEntry_t *)emGetBufferPointer(buffer);
+      MEMCOPY(key, &entry->key, sizeof(ChipZclUid_t));
     }
     return true;
   }
   return false;
 }
 
-bool emZclCacheGetIndex(const EmberZclUid_t *key,
-                        EmZclCacheIndex_t *index)
+bool chZclCacheGetIndex(const ChipZclUid_t *key,
+                        ChZclCacheIndex_t *index)
 {
   Buffer buffer = findCacheEntryBufferByKey(key);
   if (buffer != NULL_BUFFER) {
     if (index != NULL) {
-      const EmZclCacheEntry_t *entry
-        = (const EmZclCacheEntry_t *)emGetBufferPointer(buffer);
+      const ChZclCacheEntry_t *entry
+        = (const ChZclCacheEntry_t *)emGetBufferPointer(buffer);
       *index = entry->index;
     }
     return true;
@@ -385,7 +373,7 @@ bool emZclCacheGetIndex(const EmberZclUid_t *key,
   return false;
 }
 
-bool emZclCacheRemove(const EmberZclUid_t *key)
+bool chZclCacheRemove(const ChipZclUid_t *key)
 {
   Buffer buffer = findCacheEntryBufferByKey(key);
   if (buffer != NULL_BUFFER) {
@@ -396,7 +384,7 @@ bool emZclCacheRemove(const EmberZclUid_t *key)
   return false;
 }
 
-bool emZclCacheRemoveByIndex(EmZclCacheIndex_t index)
+bool chZclCacheRemoveByIndex(ChZclCacheIndex_t index)
 {
   Buffer buffer = findCacheEntryBufferByIndex(index);
   if (buffer != NULL_BUFFER) {
@@ -407,22 +395,22 @@ bool emZclCacheRemoveByIndex(EmZclCacheIndex_t index)
   return false;
 }
 
-void emZclCacheRemoveAll(void)
+void chZclCacheRemoveAll(void)
 {
   addressCache = NULL_BUFFER;
   entryCount = 0;
   initCacheIndexGenerator();
 }
 
-size_t emZclCacheRemoveAllByValue(const EmberIpv6Address *value)
+size_t chZclCacheRemoveAllByValue(const ChipIpv6Address *value)
 {
   return removeAllForCriteria(value, matchCacheValue);
 }
 
-size_t emZclCacheRemoveAllByIpv6Prefix(const EmberIpv6Address *prefix,
+size_t chZclCacheRemoveAllByIpv6Prefix(const ChipIpv6Address *prefix,
                                        uint8_t prefixLengthInBits)
 {
-  if (prefixLengthInBits > EMBER_IPV6_BITS) {
+  if (prefixLengthInBits > CHIP_IPV6_BITS) {
     return false;
   }
   CacheIpv6Prefix cacheIpv6Prefix = {

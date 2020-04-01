@@ -1,34 +1,22 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
-  #include EMBER_AF_API_ZCL_SCENES_SERVER
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
+  #include CHIP_AF_API_ZCL_SCENES_SERVER
 #endif
 #include "thread-callbacks.h"
 #include "door-lock-server.h"
 
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
   #ifdef DEFINETOKENS
 // Token based storage.
     #define retrieveSceneSubTableEntry(entry, i) \
@@ -37,44 +25,44 @@
   halCommonSetIndexedToken(TOKEN_ZCL_CORE_DOOR_LOCK_SCENE_SUBTABLE, i, &entry)
   #else
 // RAM based storage.
-EmZclDoorLockSceneSubTableEntry_t emZclPluginDoorLockServerSceneSubTable[EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
+ChZclDoorLockSceneSubTableEntry_t chZclPluginDoorLockServerSceneSubTable[CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
     #define retrieveSceneSubTableEntry(entry, i) \
-  (entry = emZclPluginDoorLockServerSceneSubTable[i])
+  (entry = chZclPluginDoorLockServerSceneSubTable[i])
     #define saveSceneSubTableEntry(entry, i) \
-  (emZclPluginDoorLockServerSceneSubTable[i] = entry)
+  (chZclPluginDoorLockServerSceneSubTable[i] = entry)
   #endif
 #endif
 
 // TODO- ZCL server command handlers...
 
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
 // Scenes callback handlers...
 
-void emZclDoorLockServerEraseSceneHandler(uint8_t tableIdx)
+void chZclDoorLockServerEraseSceneHandler(uint8_t tableIdx)
 {
-  EmZclDoorLockSceneSubTableEntry_t entry;
+  ChZclDoorLockSceneSubTableEntry_t entry;
 
   entry.hasLockStateValue = false;
 
   saveSceneSubTableEntry(entry, tableIdx);
 }
 
-bool emZclDoorLockServerAddSceneHandler(EmberZclClusterId_t clusterId,
+bool chZclDoorLockServerAddSceneHandler(ChipZclClusterId_t clusterId,
                                         uint8_t tableIdx,
                                         const uint8_t *sceneData,
                                         uint8_t length)
 {
-  if (clusterId == EMBER_ZCL_CLUSTER_DOOR_LOCK) {
+  if (clusterId == CHIP_ZCL_CLUSTER_DOOR_LOCK) {
     if (length < 1) {
       return false; // ext field format error (lockStateValue byte must be present).
     }
 
     // Extract bytes from input data block and update scene subtable fields.
-    EmZclDoorLockSceneSubTableEntry_t entry = { 0 };
+    ChZclDoorLockSceneSubTableEntry_t entry = { 0 };
     uint8_t *pData = (uint8_t *)sceneData;
 
     entry.hasLockStateValue = true;
-    entry.lockStateValue = emberZclPluginScenesServerGetUint8FromBuffer(&pData);
+    entry.lockStateValue = chipZclPluginScenesServerGetUint8FromBuffer(&pData);
 
     saveSceneSubTableEntry(entry, tableIdx);
 
@@ -84,7 +72,7 @@ bool emZclDoorLockServerAddSceneHandler(EmberZclClusterId_t clusterId,
   return false;
 }
 
-void emZclDoorLockServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
+void chZclDoorLockServerRecallSceneHandler(ChipZclEndpointId_t endpointId,
                                            uint8_t tableIdx,
                                            uint32_t transitionTime100mS)
 {
@@ -94,65 +82,65 @@ void emZclDoorLockServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
   // to the relevant door lock command handler to actually change the
   // hw state.
 
-  EmZclDoorLockSceneSubTableEntry_t entry;
+  ChZclDoorLockSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
   if (entry.hasLockStateValue) {
-    emberZclWriteAttribute(endpointId,
-                           &emberZclClusterDoorLockServerSpec,
-                           EMBER_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
+    chipZclWriteAttribute(endpointId,
+                           &chipZclClusterDoorLockServerSpec,
+                           CHIP_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
                            (uint8_t *)&entry.lockStateValue,
                            sizeof(entry.lockStateValue));
   }
 }
 
-void emZclDoorLockServerStoreSceneHandler(EmberZclEndpointId_t endpointId,
+void chZclDoorLockServerStoreSceneHandler(ChipZclEndpointId_t endpointId,
                                           uint8_t tableIdx)
 {
-  EmZclDoorLockSceneSubTableEntry_t entry;
+  ChZclDoorLockSceneSubTableEntry_t entry;
 
   entry.hasLockStateValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterDoorLockServerSpec,
-                           EMBER_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterDoorLockServerSpec,
+                           CHIP_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
                            (uint8_t *)&entry.lockStateValue,
-                           sizeof(entry.lockStateValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.lockStateValue)) == CHIP_ZCL_STATUS_SUCCESS);
 
   saveSceneSubTableEntry(entry, tableIdx);
 }
 
-void emZclDoorLockServerCopySceneHandler(uint8_t srcTableIdx,
+void chZclDoorLockServerCopySceneHandler(uint8_t srcTableIdx,
                                          uint8_t dstTableIdx)
 {
-  EmZclDoorLockSceneSubTableEntry_t entry;
+  ChZclDoorLockSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, srcTableIdx);
 
   saveSceneSubTableEntry(entry, dstTableIdx);
 }
 
-void emZclDoorLockServerViewSceneHandler(uint8_t tableIdx, uint8_t **ppExtFldData)
+void chZclDoorLockServerViewSceneHandler(uint8_t tableIdx, uint8_t **ppExtFldData)
 {
-  EmZclDoorLockSceneSubTableEntry_t entry;
+  ChZclDoorLockSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
   if (entry.hasLockStateValue) {
-    emberZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
-                                                EMBER_ZCL_CLUSTER_DOOR_LOCK);
-    emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData, 1);  // length=1
-    emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
+    chipZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
+                                                CHIP_ZCL_CLUSTER_DOOR_LOCK);
+    chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData, 1);  // length=1
+    chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
                                                entry.lockStateValue);
   }
 }
 
-void emZclDoorLockServerPrintInfoSceneHandler(uint8_t tableIdx)
+void chZclDoorLockServerPrintInfoSceneHandler(uint8_t tableIdx)
 {
-  EmZclDoorLockSceneSubTableEntry_t entry;
+  ChZclDoorLockSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
-  emberAfCorePrint(" door lock:%x",
+  chipAfCorePrint(" door lock:%x",
                    entry.lockStateValue);
 
-  emberAfCoreFlush();
+  chipAfCoreFlush();
 }
 #endif
 
@@ -164,7 +152,7 @@ void emZclDoorLockServerPrintInfoSceneHandler(uint8_t tableIdx)
   halCommonSetIndexedToken(TOKEN_ZCL_CORE_DOOR_LOCK_USER_TABLE, i, &entry)
 #else
 // Defines for RAM based User table storage.
-static EmberAfDoorLockUser_t userTable[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOCK_USER_TABLE_SIZE] = {};
+static ChipAfDoorLockUser_t userTable[CHIP_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOCK_USER_TABLE_SIZE] = {};
 #define retrieveUserTableEntry(entry, i) \
   (entry = userTable[i])
 #define saveUserTableEntry(entry, i) \
@@ -172,51 +160,51 @@ static EmberAfDoorLockUser_t userTable[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOC
 #endif
 
 // Define some nice short macros.
-#define USER_TABLE_SIZE      EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOCK_USER_TABLE_SIZE
-#define SCHEDULE_TABLE_SIZE  EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOCK_SCHEDULE_TABLE_SIZE
-#define MAX_PIN_LENGTH       EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOCK_MAX_PIN_LENGTH
+#define USER_TABLE_SIZE      CHIP_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOCK_USER_TABLE_SIZE
+#define SCHEDULE_TABLE_SIZE  CHIP_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOCK_SCHEDULE_TABLE_SIZE
+#define MAX_PIN_LENGTH       CHIP_AF_PLUGIN_DOOR_LOCK_SERVER_DOOR_LOCK_MAX_PIN_LENGTH
 
 // Static variable storages.
-static EmberAfDoorLockScheduleEntry_t schedule[SCHEDULE_TABLE_SIZE]; //TODO- provide an NV table for schedules?
+static ChipAfDoorLockScheduleEntry_t schedule[SCHEDULE_TABLE_SIZE]; //TODO- provide an NV table for schedules?
 
 // Static functions declarations.
 static void printScheduleTable(void);
 static void printUserTable(void);
-static void printPin(const EmberAfDoorLockUser_t *entry);
+static void printPin(const ChipAfDoorLockUser_t *entry);
 static void printSuccessOrFailure(bool success);
-static bool verifyPin(const EmberZclCommandContext_t *context,
-                      const EmberZclStringType_t *pin,
+static bool verifyPin(const ChipZclCommandContext_t *context,
+                      const ChipZclStringType_t *pin,
                       uint8_t *userId);
-static void opEventResponseHandler(EmberZclMessageStatus_t status,
-                                   const EmberZclCommandContext_t *context,
-                                   const EmberZclClusterDoorLockClientCommandOperationEventNotificationResponse_t *response);
-static void prgEventResponseHandler(EmberZclMessageStatus_t status,
-                                    const EmberZclCommandContext_t *context,
-                                    const EmberZclClusterDoorLockClientCommandProgrammingEventNotificationResponse_t *response);
-static void sendOperationEventToBoundDevice(const EmberZclCommandContext_t *context,
+static void opEventResponseHandler(ChipZclMessageStatus_t status,
+                                   const ChipZclCommandContext_t *context,
+                                   const ChipZclClusterDoorLockClientCommandOperationEventNotificationResponse_t *response);
+static void prgEventResponseHandler(ChipZclMessageStatus_t status,
+                                    const ChipZclCommandContext_t *context,
+                                    const ChipZclClusterDoorLockClientCommandProgrammingEventNotificationResponse_t *response);
+static void sendOperationEventToBoundDevice(const ChipZclCommandContext_t *context,
                                             uint8_t userId,
-                                            const EmberZclStringType_t *pin,
-                                            EmberAfDoorLockOperationEventCode_t eventCode);
-static void sendProgrammingEventToBoundDevice(const EmberZclCommandContext_t *context,
+                                            const ChipZclStringType_t *pin,
+                                            ChipAfDoorLockOperationEventCode_t eventCode);
+static void sendProgrammingEventToBoundDevice(const ChipZclCommandContext_t *context,
                                               uint8_t userId,
                                               uint8_t userType,
                                               uint8_t userStatus,
-                                              const EmberZclStringType_t *pin,
-                                              EmberAfDoorLockProgrammingEventCode_t eventCode);
-static void lockHandler(const EmberZclCommandContext_t *context,
-                        const EmberZclStringType_t *pin);
-static void unlockHandler(const EmberZclCommandContext_t *context,
-                          const EmberZclStringType_t *pin);
+                                              const ChipZclStringType_t *pin,
+                                              ChipAfDoorLockProgrammingEventCode_t eventCode);
+static void lockHandler(const ChipZclCommandContext_t *context,
+                        const ChipZclStringType_t *pin);
+static void unlockHandler(const ChipZclCommandContext_t *context,
+                          const ChipZclStringType_t *pin);
 
 // Static functions
 static void printScheduleTable(void)
 {
-  emberAfPluginDoorLockServerPrintln("id uid dm strth strtm stph stpm");
+  chipAfPluginDoorLockServerPrintln("id uid dm strth strtm stph stpm");
 
   for (uint8_t i = 0; i < SCHEDULE_TABLE_SIZE; i++) {
-    EmberAfDoorLockScheduleEntry_t *entry;
+    ChipAfDoorLockScheduleEntry_t *entry;
     entry = &schedule[i];
-    emberAfPluginDoorLockServerPrintln("%x %x  %x %4x   %4x   %4x  %4x",
+    chipAfPluginDoorLockServerPrintln("%x %x  %x %4x   %4x   %4x  %4x",
                                        i,
                                        entry->userId,
                                        entry->daysMask,
@@ -228,22 +216,22 @@ static void printScheduleTable(void)
 
 static void printUserTable(void)
 {
-  emberAfPluginDoorLockServerPrintln("id st ty pl pin");
+  chipAfPluginDoorLockServerPrintln("id st ty pl pin");
   for (uint8_t i = 0; i < USER_TABLE_SIZE; i++) {
-    EmberAfDoorLockUser_t entry;
+    ChipAfDoorLockUser_t entry;
     retrieveUserTableEntry(entry, i);
-    emberAfPluginDoorLockServerPrint("%x %x %x ", i, entry.status, entry.type);
+    chipAfPluginDoorLockServerPrint("%x %x %x ", i, entry.status, entry.type);
     printPin(&entry);
-    emberAfPluginDoorLockServerPrintln("");
+    chipAfPluginDoorLockServerPrintln("");
   }
 }
 
-static void printPin(const EmberAfDoorLockUser_t *entry)
+static void printPin(const ChipAfDoorLockUser_t *entry)
 {
   if (entry->pinLength > 0) {
-    emberAfPluginDoorLockServerPrint("(%x)", entry->pinLength);
+    chipAfPluginDoorLockServerPrint("(%x)", entry->pinLength);
     for (uint8_t i = 0; i < entry->pinLength; i++) {
-      emberAfPluginDoorLockServerPrint(" %c", entry->pinData[i]);
+      chipAfPluginDoorLockServerPrint(" %c", entry->pinData[i]);
     }
   }
 }
@@ -251,30 +239,30 @@ static void printPin(const EmberAfDoorLockUser_t *entry)
 static void printSuccessOrFailure(bool success)
 {
   if (success) {
-    emberAfPluginDoorLockServerPrintln("SUCCESS!");
+    chipAfPluginDoorLockServerPrintln("SUCCESS!");
   } else {
-    emberAfPluginDoorLockServerPrintln("FAILURE!");
+    chipAfPluginDoorLockServerPrintln("FAILURE!");
   }
 }
 
-static bool verifyPin(const EmberZclCommandContext_t *context,
-                      const EmberZclStringType_t *pin,
+static bool verifyPin(const ChipZclCommandContext_t *context,
+                      const ChipZclStringType_t *pin,
                       uint8_t *userId)
 {
   // Checks to see if a pin is required and, if it is and a pin is provided,
   // it validates the pin against those known in the user table.
 
   bool pinRequired = false;
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
   status =
-    emberZclReadAttribute(context->endpointId,
-                          &emberZclClusterDoorLockServerSpec,
-                          EMBER_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_REQUIRE_PIN_FOR_RF_OPERATION,
+    chipZclReadAttribute(context->endpointId,
+                          &chipZclClusterDoorLockServerSpec,
+                          CHIP_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_REQUIRE_PIN_FOR_RF_OPERATION,
                           (uint8_t *)&pinRequired,
                           sizeof(pinRequired));
 
-  if ((status != EMBER_ZCL_STATUS_SUCCESS)
+  if ((status != CHIP_ZCL_STATUS_SUCCESS)
       || (!pinRequired)) {
     return true;
   } else if (pin == NULL) {
@@ -282,7 +270,7 @@ static bool verifyPin(const EmberZclCommandContext_t *context,
   }
 
   for (uint8_t i = 0; i < USER_TABLE_SIZE; i++) {
-    EmberAfDoorLockUser_t entry;
+    ChipAfDoorLockUser_t entry;
     retrieveUserTableEntry(entry, i);
     if ((entry.pinLength == pin->length)
         && (MEMCOMPARE(entry.pinData, pin->ptr, pin->length) == 0)) {
@@ -294,33 +282,33 @@ static bool verifyPin(const EmberZclCommandContext_t *context,
   return false;
 }
 
-static void opEventResponseHandler(EmberZclMessageStatus_t status,
-                                   const EmberZclCommandContext_t *context,
-                                   const EmberZclClusterDoorLockClientCommandOperationEventNotificationResponse_t *response)
+static void opEventResponseHandler(ChipZclMessageStatus_t status,
+                                   const ChipZclCommandContext_t *context,
+                                   const ChipZclClusterDoorLockClientCommandOperationEventNotificationResponse_t *response)
 {
-  emberAfPluginDoorLockServerPrintln("opEventResponseHandler Status = %d ",
+  chipAfPluginDoorLockServerPrintln("opEventResponseHandler Status = %d ",
                                      status);
 }
 
-static void prgEventResponseHandler(EmberZclMessageStatus_t status,
-                                    const EmberZclCommandContext_t *context,
-                                    const EmberZclClusterDoorLockClientCommandProgrammingEventNotificationResponse_t *response)
+static void prgEventResponseHandler(ChipZclMessageStatus_t status,
+                                    const ChipZclCommandContext_t *context,
+                                    const ChipZclClusterDoorLockClientCommandProgrammingEventNotificationResponse_t *response)
 {
-  emberAfPluginDoorLockServerPrintln("prgEventResponseHandler Status = %d",
+  chipAfPluginDoorLockServerPrintln("prgEventResponseHandler Status = %d",
                                      status);
 }
 
-static void sendOperationEventToBoundDevice(const EmberZclCommandContext_t *context,
+static void sendOperationEventToBoundDevice(const ChipZclCommandContext_t *context,
                                             uint8_t userId,
-                                            const EmberZclStringType_t *pin,
-                                            EmberAfDoorLockOperationEventCode_t eventCode)
+                                            const ChipZclStringType_t *pin,
+                                            ChipAfDoorLockOperationEventCode_t eventCode)
 {
   uint16_t rfOperationEventMask = 0xffff; //will send events by default
 
   // Check if we should send event notification.
-  emberZclReadAttribute(context->endpointId,
-                        &emberZclClusterDoorLockServerSpec,
-                        EMBER_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_RF_OPERATION_EVENT_MASK,
+  chipZclReadAttribute(context->endpointId,
+                        &chipZclClusterDoorLockServerSpec,
+                        CHIP_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_RF_OPERATION_EVENT_MASK,
                         (uint8_t *)&rfOperationEventMask,
                         sizeof(rfOperationEventMask));
 
@@ -328,13 +316,13 @@ static void sendOperationEventToBoundDevice(const EmberZclCommandContext_t *cont
   if (rfOperationEventMask & BIT(eventCode)
       && (pin != NULL)) {
     // Find out the entry from the binding table for the cluster spec.
-    for (EmberZclBindingId_t i = 0; i < EMBER_ZCL_BINDING_TABLE_SIZE; i++) {
-      EmberZclBindingEntry_t entry = { 0 };
-      if (emberZclGetBinding(i, &entry)
-          && emberZclCompareClusterSpec(&emberZclClusterDoorLockServerSpec,
+    for (ChipZclBindingId_t i = 0; i < CHIP_ZCL_BINDING_TABLE_SIZE; i++) {
+      ChipZclBindingEntry_t entry = { 0 };
+      if (chipZclGetBinding(i, &entry)
+          && chipZclCompareClusterSpec(&chipZclClusterDoorLockServerSpec,
                                         &entry.clusterSpec)) {
-        EmberZclClusterDoorLockClientCommandOperationEventNotificationRequest_t request = { 0 };
-        request.source = EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF;
+        ChipZclClusterDoorLockClientCommandOperationEventNotificationRequest_t request = { 0 };
+        request.source = CHIP_ZCL_DOOR_LOCK_EVENT_SOURCE_RF;
         request.eventCode = eventCode;
         request.userId = userId;
         request.pin = *pin;
@@ -343,12 +331,12 @@ static void sendOperationEventToBoundDevice(const EmberZclCommandContext_t *cont
         request.data.length = sizeof(data);
         request.data.ptr = data;
 
-        EmberStatus status =
-          emberZclSendClusterDoorLockClientCommandOperationEventNotificationRequest((const EmberZclDestination_t *)&entry.destination,
+        ChipStatus status =
+          chipZclSendClusterDoorLockClientCommandOperationEventNotificationRequest((const ChipZclDestination_t *)&entry.destination,
                                                                                     &request,
                                                                                     opEventResponseHandler);
 
-        emberAfPluginDoorLockServerPrintln("op eventCode=%d, ep=%d, callStatus=%d",
+        chipAfPluginDoorLockServerPrintln("op eventCode=%d, ep=%d, callStatus=%d",
                                            request.eventCode,
                                            entry.destination.application.data.endpointId,
                                            status);
@@ -359,19 +347,19 @@ static void sendOperationEventToBoundDevice(const EmberZclCommandContext_t *cont
   }
 }
 
-static void sendProgrammingEventToBoundDevice(const EmberZclCommandContext_t *context,
+static void sendProgrammingEventToBoundDevice(const ChipZclCommandContext_t *context,
                                               uint8_t userId,
                                               uint8_t userType,
                                               uint8_t userStatus,
-                                              const EmberZclStringType_t *pin,
-                                              EmberAfDoorLockProgrammingEventCode_t eventCode)
+                                              const ChipZclStringType_t *pin,
+                                              ChipAfDoorLockProgrammingEventCode_t eventCode)
 {
   uint16_t programmingEventMask = 0xffff; //will send events by default
 
   // Check if we should send event notification.
-  emberZclReadAttribute(context->endpointId,
-                        &emberZclClusterDoorLockServerSpec,
-                        EMBER_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_RF_PROGRAMMING_EVENT_MASK,
+  chipZclReadAttribute(context->endpointId,
+                        &chipZclClusterDoorLockServerSpec,
+                        CHIP_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_RF_PROGRAMMING_EVENT_MASK,
                         (uint8_t *)&programmingEventMask,
                         sizeof(programmingEventMask));
 
@@ -379,14 +367,14 @@ static void sendProgrammingEventToBoundDevice(const EmberZclCommandContext_t *co
   if (programmingEventMask & BIT(eventCode)
       && (pin != NULL)) {
     // find out the entry from the binding table for the cluster spec
-    for (EmberZclBindingId_t i = 0; i < EMBER_ZCL_BINDING_TABLE_SIZE; i++) {
-      EmberZclBindingEntry_t entry = { 0 };
-      if (emberZclGetBinding(i, &entry)
-          && emberZclCompareClusterSpec(&emberZclClusterDoorLockServerSpec,
+    for (ChipZclBindingId_t i = 0; i < CHIP_ZCL_BINDING_TABLE_SIZE; i++) {
+      ChipZclBindingEntry_t entry = { 0 };
+      if (chipZclGetBinding(i, &entry)
+          && chipZclCompareClusterSpec(&chipZclClusterDoorLockServerSpec,
                                         &entry.clusterSpec)) {
-        EmberZclClusterDoorLockClientCommandProgrammingEventNotificationRequest_t request = { 0 };
+        ChipZclClusterDoorLockClientCommandProgrammingEventNotificationRequest_t request = { 0 };
 
-        request.source = EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF;
+        request.source = CHIP_ZCL_DOOR_LOCK_EVENT_SOURCE_RF;
         request.eventCode = eventCode;
         request.userId = userId;
         request.pin = *pin;
@@ -397,12 +385,12 @@ static void sendProgrammingEventToBoundDevice(const EmberZclCommandContext_t *co
         request.data.length = sizeof(data);
         request.data.ptr = data;
 
-        EmberStatus status
-          = emberZclSendClusterDoorLockClientCommandProgrammingEventNotificationRequest((const EmberZclDestination_t *)&entry.destination,
+        ChipStatus status
+          = chipZclSendClusterDoorLockClientCommandProgrammingEventNotificationRequest((const ChipZclDestination_t *)&entry.destination,
                                                                                         &request,
                                                                                         prgEventResponseHandler);
 
-        emberAfPluginDoorLockServerPrintln("prg eventCode=%d, ep=%d, callStatus=%d",
+        chipAfPluginDoorLockServerPrintln("prg eventCode=%d, ep=%d, callStatus=%d",
                                            request.eventCode,
                                            entry.destination.application.data.endpointId,
                                            status);
@@ -413,8 +401,8 @@ static void sendProgrammingEventToBoundDevice(const EmberZclCommandContext_t *co
   }
 }
 
-static void lockHandler(const EmberZclCommandContext_t *context,
-                        const EmberZclStringType_t *pin)
+static void lockHandler(const ChipZclCommandContext_t *context,
+                        const ChipZclStringType_t *pin)
 {
   uint8_t userId = 0;
   bool doorLocked = false;
@@ -423,36 +411,36 @@ static void lockHandler(const EmberZclCommandContext_t *context,
   printSuccessOrFailure(pinVerified);
 
   if (pinVerified) {
-    doorLocked = emberAfPluginDoorLockServerActivateDoorLockCallback(true); // lock door
+    doorLocked = chipAfPluginDoorLockServerActivateDoorLockCallback(true); // lock door
   }
 
   // Send cmd response.
-  EmberZclClusterDoorLockServerCommandLockDoorResponse_t response;
+  ChipZclClusterDoorLockServerCommandLockDoorResponse_t response;
   response.status = (doorLocked
-                     ? EMBER_ZCL_STATUS_SUCCESS
-                     : EMBER_ZCL_STATUS_FAILURE);
-  emberZclSendClusterDoorLockServerCommandLockDoorResponse(context, &response);
+                     ? CHIP_ZCL_STATUS_SUCCESS
+                     : CHIP_ZCL_STATUS_FAILURE);
+  chipZclSendClusterDoorLockServerCommandLockDoorResponse(context, &response);
 
   // Update attribute if success.
   if (doorLocked) {
-    uint8_t lockState = EMBER_ZCL_DOOR_LOCK_STATE_LOCKED;
-    emberZclWriteAttribute(context->endpointId,
-                           &emberZclClusterDoorLockServerSpec,
-                           EMBER_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
+    uint8_t lockState = CHIP_ZCL_DOOR_LOCK_STATE_LOCKED;
+    chipZclWriteAttribute(context->endpointId,
+                           &chipZclClusterDoorLockServerSpec,
+                           CHIP_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
                            (uint8_t *)&lockState,
                            sizeof(lockState));
   }
 
   // Send event to bound devices if is enabled and supported.
-  EmberAfDoorLockOperationEventCode_t eventCode
+  ChipAfDoorLockOperationEventCode_t eventCode
     = (doorLocked
-       ? EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_LOCK
-       : EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_LOCK_INVALID_PIN_OR_ID);
+       ? CHIP_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_LOCK
+       : CHIP_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_LOCK_INVALID_PIN_OR_ID);
   sendOperationEventToBoundDevice(context, userId, pin, eventCode);
 }
 
-static void unlockHandler(const EmberZclCommandContext_t *context,
-                          const EmberZclStringType_t *pin)
+static void unlockHandler(const ChipZclCommandContext_t *context,
+                          const ChipZclStringType_t *pin)
 {
   uint8_t userId = 0;
   bool doorUnlocked = false;
@@ -461,68 +449,68 @@ static void unlockHandler(const EmberZclCommandContext_t *context,
   printSuccessOrFailure(pinVerified);
 
   if (pinVerified) {
-    doorUnlocked = emberAfPluginDoorLockServerActivateDoorLockCallback(false);
+    doorUnlocked = chipAfPluginDoorLockServerActivateDoorLockCallback(false);
   }
 
   // Send cmd response.
-  EmberZclClusterDoorLockServerCommandUnlockDoorResponse_t response;
+  ChipZclClusterDoorLockServerCommandUnlockDoorResponse_t response;
   response.status = (doorUnlocked
-                     ? EMBER_ZCL_STATUS_SUCCESS
-                     : EMBER_ZCL_STATUS_FAILURE);
-  emberZclSendClusterDoorLockServerCommandUnlockDoorResponse(context, &response);
+                     ? CHIP_ZCL_STATUS_SUCCESS
+                     : CHIP_ZCL_STATUS_FAILURE);
+  chipZclSendClusterDoorLockServerCommandUnlockDoorResponse(context, &response);
 
   // Update attribute if success.
   if (doorUnlocked) {
-    uint8_t lockState = EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED;
-    emberZclWriteAttribute(context->endpointId,
-                           &emberZclClusterDoorLockServerSpec,
-                           EMBER_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
+    uint8_t lockState = CHIP_ZCL_DOOR_LOCK_STATE_UNLOCKED;
+    chipZclWriteAttribute(context->endpointId,
+                           &chipZclClusterDoorLockServerSpec,
+                           CHIP_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
                            (uint8_t *)&lockState,
                            sizeof(lockState));
   }
 
   // Send event to bound devices if the it is enabled and supported.
-  EmberAfDoorLockOperationEventCode_t eventCode
+  ChipAfDoorLockOperationEventCode_t eventCode
     = (doorUnlocked
-       ? EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK
-       : EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK_INVALID_PIN_OR_ID);
+       ? CHIP_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK
+       : CHIP_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK_INVALID_PIN_OR_ID);
   sendOperationEventToBoundDevice(context, userId, pin, eventCode);
 }
 
-void emberZclClusterDoorLockServerCommandLockDoorRequestHandler(const EmberZclCommandContext_t *context,
-                                                                const EmberZclClusterDoorLockServerCommandLockDoorRequest_t *request)
+void chipZclClusterDoorLockServerCommandLockDoorRequestHandler(const ChipZclCommandContext_t *context,
+                                                                const ChipZclClusterDoorLockServerCommandLockDoorRequest_t *request)
 {
-  emberAfCorePrintln("RX: LockDoor ");
+  chipAfCorePrintln("RX: LockDoor ");
 
   lockHandler(context, &request->PIN);
 }
 
-void emberZclClusterDoorLockServerCommandUnlockDoorRequestHandler(const EmberZclCommandContext_t *context,
-                                                                  const EmberZclClusterDoorLockServerCommandUnlockDoorRequest_t *request)
+void chipZclClusterDoorLockServerCommandUnlockDoorRequestHandler(const ChipZclCommandContext_t *context,
+                                                                  const ChipZclClusterDoorLockServerCommandUnlockDoorRequest_t *request)
 {
-  emberAfCorePrintln("RX: UnlockDoor ");
+  chipAfCorePrintln("RX: UnlockDoor ");
 
   unlockHandler(context, &request->PIN);
 }
 
-void emberZclClusterDoorLockServerCommandToggleRequestHandler(const EmberZclCommandContext_t *context,
-                                                              const EmberZclClusterDoorLockServerCommandToggleRequest_t *request)
+void chipZclClusterDoorLockServerCommandToggleRequestHandler(const ChipZclCommandContext_t *context,
+                                                              const ChipZclClusterDoorLockServerCommandToggleRequest_t *request)
 {
-  emberAfCorePrintln("RX: ToggleLockState");
+  chipAfCorePrintln("RX: ToggleLockState");
 
   uint8_t lockState = 0;
 
-  emberZclReadAttribute(context->endpointId,
-                        &emberZclClusterDoorLockServerSpec,
-                        EMBER_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
+  chipZclReadAttribute(context->endpointId,
+                        &chipZclClusterDoorLockServerSpec,
+                        CHIP_ZCL_CLUSTER_DOOR_LOCK_SERVER_ATTRIBUTE_LOCK_STATE,
                         (uint8_t *)&lockState,
                         sizeof(lockState));
 
   switch (lockState) {
-    case EMBER_ZCL_DOOR_LOCK_STATE_LOCKED:
+    case CHIP_ZCL_DOOR_LOCK_STATE_LOCKED:
       unlockHandler(context, &request->pin); // Locked --> unlock it
       break;
-    case EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED:
+    case CHIP_ZCL_DOOR_LOCK_STATE_UNLOCKED:
       lockHandler(context, &request->pin); // Unlocked --> Lock it
       break;
     default:
@@ -530,33 +518,33 @@ void emberZclClusterDoorLockServerCommandToggleRequestHandler(const EmberZclComm
   }
 }
 
-void emberZclClusterDoorLockServerCommandClearAllPinsRequestHandler(const EmberZclCommandContext_t *context,
-                                                                    const EmberZclClusterDoorLockServerCommandClearAllPinsRequest_t *request)
+void chipZclClusterDoorLockServerCommandClearAllPinsRequestHandler(const ChipZclCommandContext_t *context,
+                                                                    const ChipZclClusterDoorLockServerCommandClearAllPinsRequest_t *request)
 {
-  emberAfCorePrintln("RX: ClearAllPins");
+  chipAfCorePrintln("RX: ClearAllPins");
 
   for (uint8_t i = 0; i < USER_TABLE_SIZE; i++) {
-    EmberAfDoorLockUser_t entry = { 0 };
+    ChipAfDoorLockUser_t entry = { 0 };
     saveUserTableEntry(entry, i);
   }
 
-  EmberZclClusterDoorLockServerCommandClearAllPinsResponse_t response = { 0 };
-  response.status = EMBER_ZCL_STATUS_SUCCESS;
+  ChipZclClusterDoorLockServerCommandClearAllPinsResponse_t response = { 0 };
+  response.status = CHIP_ZCL_STATUS_SUCCESS;
 
-  emberZclSendClusterDoorLockServerCommandClearAllPinsResponse(context,
+  chipZclSendClusterDoorLockServerCommandClearAllPinsResponse(context,
                                                                &response); // Send response.
 }
 
-void emberZclClusterDoorLockServerCommandSetPinRequestHandler(const EmberZclCommandContext_t *context,
-                                                              const EmberZclClusterDoorLockServerCommandSetPinRequest_t *request)
+void chipZclClusterDoorLockServerCommandSetPinRequestHandler(const ChipZclCommandContext_t *context,
+                                                              const ChipZclClusterDoorLockServerCommandSetPinRequest_t *request)
 {
-  emberAfCorePrintln("RX: SetPin");
+  chipAfCorePrintln("RX: SetPin");
 
-  EmberZclClusterDoorLockServerCommandSetPinResponse_t response = { 0 };
+  ChipZclClusterDoorLockServerCommandSetPinResponse_t response = { 0 };
 
   if ((request->userId < USER_TABLE_SIZE)
       && (request->pin.length < MAX_PIN_LENGTH)) {
-    EmberAfDoorLockUser_t entry;
+    ChipAfDoorLockUser_t entry;
     entry.status = request->userStatus;
     entry.type = request->userType;
     MEMCOPY(entry.pinData, request->pin.ptr, request->pin.length);
@@ -565,81 +553,81 @@ void emberZclClusterDoorLockServerCommandSetPinRequestHandler(const EmberZclComm
     saveUserTableEntry(entry, request->userId);
     printUserTable();
 
-    response.status = EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS;
+    response.status = CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS;
   } else {
-    response.status = EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL;
+    response.status = CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL;
   }
-  emberZclSendClusterDoorLockServerCommandSetPinResponse(context, &response); // Send response.
+  chipZclSendClusterDoorLockServerCommandSetPinResponse(context, &response); // Send response.
 
-  if (response.status == EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS) {
+  if (response.status == CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS) {
     // Send event notifications.
     sendProgrammingEventToBoundDevice(context,
                                       request->userId,
                                       request->userType,
                                       request->userStatus,
                                       &request->pin,
-                                      EMBER_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED);
+                                      CHIP_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED);
   }
 }
 
-void emberZclClusterDoorLockServerCommandGetPinRequestHandler(const EmberZclCommandContext_t *context,
-                                                              const EmberZclClusterDoorLockServerCommandGetPinRequest_t *request)
+void chipZclClusterDoorLockServerCommandGetPinRequestHandler(const ChipZclCommandContext_t *context,
+                                                              const ChipZclClusterDoorLockServerCommandGetPinRequest_t *request)
 {
-  emberAfCorePrintln("RX: GetPin");
+  chipAfCorePrintln("RX: GetPin");
 
   if (request->userId < USER_TABLE_SIZE) {
-    EmberAfDoorLockUser_t entry;
+    ChipAfDoorLockUser_t entry;
     retrieveUserTableEntry(entry, request->userId);
-    EmberZclClusterDoorLockServerCommandGetPinResponse_t response = { 0 };
+    ChipZclClusterDoorLockServerCommandGetPinResponse_t response = { 0 };
     response.userId = request->userId;
     response.userStatus = entry.status;
     response.userType = entry.type;
     response.pin.length = entry.pinLength;
     response.pin.ptr = entry.pinData;
-    emberZclSendClusterDoorLockServerCommandGetPinResponse(context, &response); // Send response.
+    chipZclSendClusterDoorLockServerCommandGetPinResponse(context, &response); // Send response.
   } else {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_INSUFFICIENT_SPACE);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_INSUFFICIENT_SPACE);
   }
 }
 
-void emberZclClusterDoorLockServerCommandClearPinRequestHandler(const EmberZclCommandContext_t *context,
-                                                                const EmberZclClusterDoorLockServerCommandClearPinRequest_t *request)
+void chipZclClusterDoorLockServerCommandClearPinRequestHandler(const ChipZclCommandContext_t *context,
+                                                                const ChipZclClusterDoorLockServerCommandClearPinRequest_t *request)
 {
-  emberAfCorePrintln("RX: ClearPin");
+  chipAfCorePrintln("RX: ClearPin");
 
-  EmberZclClusterDoorLockServerCommandClearPinResponse_t response = { 0 };
+  ChipZclClusterDoorLockServerCommandClearPinResponse_t response = { 0 };
 
   if (request->userId < USER_TABLE_SIZE) {
-    EmberAfDoorLockUser_t entry = { 0 };
+    ChipAfDoorLockUser_t entry = { 0 };
     saveUserTableEntry(entry, request->userId);
-    response.status = EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS;
+    response.status = CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS;
   } else {
-    response.status = EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL;
+    response.status = CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL;
   }
-  emberZclSendClusterDoorLockServerCommandClearPinResponse(context, &response); // Send response.
+  chipZclSendClusterDoorLockServerCommandClearPinResponse(context, &response); // Send response.
 
-  if (response.status == EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS) {
+  if (response.status == CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS) {
     // Send event notifications.
-    EmberZclStringType_t userPin = { 0 }; //zero length string
+    ChipZclStringType_t userPin = { 0 }; //zero length string
     sendProgrammingEventToBoundDevice(context,
                                       request->userId,
                                       0,
                                       0,
                                       &userPin,
-                                      EMBER_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_DELETED);
+                                      CHIP_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_DELETED);
   }
 }
 
-void emberZclClusterDoorLockServerCommandSetWeekdayScheduleRequestHandler(const EmberZclCommandContext_t *context,
-                                                                          const EmberZclClusterDoorLockServerCommandSetWeekdayScheduleRequest_t *request)
+void chipZclClusterDoorLockServerCommandSetWeekdayScheduleRequestHandler(const ChipZclCommandContext_t *context,
+                                                                          const ChipZclClusterDoorLockServerCommandSetWeekdayScheduleRequest_t *request)
 {
-  emberAfCorePrintln("RX: SetWeekdaySchedule");
+  chipAfCorePrintln("RX: SetWeekdaySchedule");
 
-  EmberZclClusterDoorLockServerCommandSetWeekdayScheduleResponse_t response = { 0 };
+  ChipZclClusterDoorLockServerCommandSetWeekdayScheduleResponse_t response = { 0 };
 
   if ((request->userId < USER_TABLE_SIZE)
       && (request->scheduleId < SCHEDULE_TABLE_SIZE)) {
-    EmberAfDoorLockScheduleEntry_t *entry = &schedule[request->scheduleId];
+    ChipAfDoorLockScheduleEntry_t *entry = &schedule[request->scheduleId];
     entry->userId = request->userId;
     entry->daysMask = request->daysMask;
     entry->startHour = request->startHour;
@@ -647,34 +635,34 @@ void emberZclClusterDoorLockServerCommandSetWeekdayScheduleRequestHandler(const 
     entry->stopHour = request->endHour;
     entry->stopMinute = request->endMinute;
     printScheduleTable();
-    response.status = EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS;
+    response.status = CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS;
   } else {
-    response.status = EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL;
+    response.status = CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL;
   }
-  emberZclSendClusterDoorLockServerCommandSetWeekdayScheduleResponse(context,
+  chipZclSendClusterDoorLockServerCommandSetWeekdayScheduleResponse(context,
                                                                      &response); // Send response.
 
-  if (response.status == EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS) {
-    EmberZclStringType_t userPin = { 0 }; //zero length string
+  if (response.status == CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS) {
+    ChipZclStringType_t userPin = { 0 }; //zero length string
     sendProgrammingEventToBoundDevice(context,
                                       request->userId,
                                       0,
                                       0,
                                       &userPin,
-                                      EMBER_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_UNKNOWN_OR_MFG_SPECIFIC);
+                                      CHIP_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_UNKNOWN_OR_MFG_SPECIFIC);
   }
 }
 
-void emberZclClusterDoorLockServerCommandGetWeekdayScheduleRequestHandler(const EmberZclCommandContext_t *context,
-                                                                          const EmberZclClusterDoorLockServerCommandGetWeekdayScheduleRequest_t *request)
+void chipZclClusterDoorLockServerCommandGetWeekdayScheduleRequestHandler(const ChipZclCommandContext_t *context,
+                                                                          const ChipZclClusterDoorLockServerCommandGetWeekdayScheduleRequest_t *request)
 {
-  emberAfCorePrintln("RX: GetWeekdaySchedule");
+  chipAfCorePrintln("RX: GetWeekdaySchedule");
 
-  EmberZclClusterDoorLockServerCommandGetWeekdayScheduleResponse_t response = { 0 };
+  ChipZclClusterDoorLockServerCommandGetWeekdayScheduleResponse_t response = { 0 };
 
   if ((request->userId < USER_TABLE_SIZE)
       && (request->scheduleId < SCHEDULE_TABLE_SIZE)) {
-    EmberAfDoorLockScheduleEntry_t *entry = &schedule[request->scheduleId];
+    ChipAfDoorLockScheduleEntry_t *entry = &schedule[request->scheduleId];
     response.scheduleId = request->scheduleId;
     response.userId = request->userId;
     response.daysMask = entry->daysMask;
@@ -682,10 +670,10 @@ void emberZclClusterDoorLockServerCommandGetWeekdayScheduleRequestHandler(const 
     response.startMinute = entry->startMinute;
     response.endHour = entry->stopHour;
     response.endMinute = entry->stopMinute;
-    response.status = EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS;
+    response.status = CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS;
   } else {
-    response.status = EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL;
+    response.status = CHIP_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL;
   }
-  emberZclSendClusterDoorLockServerCommandGetWeekdayScheduleResponse(context,
+  chipZclSendClusterDoorLockServerCommandGetWeekdayScheduleResponse(context,
                                                                      &response); // Send response.
 }

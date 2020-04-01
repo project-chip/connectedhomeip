@@ -17,18 +17,18 @@
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_COMMAND_INTERPRETER2
-  #include EMBER_AF_API_COMMAND_INTERPRETER2
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_COMMAND_INTERPRETER2
+  #include CHIP_AF_API_COMMAND_INTERPRETER2
 #endif
-#include EMBER_AF_API_HUMIDITY
+#include CHIP_AF_API_HUMIDITY
 
 #define MAX_HUMIDITY_MEASUREMENT_INTERVAL_MS                                        \
-  (EMBER_AF_PLUGIN_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S \
+  (CHIP_AF_PLUGIN_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S \
    * 1000)
 
 //------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ static void writeHumidityAttributes(uint16_t humidityPercentage);
 
 //------------------------------------------------------------------------------
 // Global variables
-EmberEventControl emZclRelativeHumidityMeasurementServerReadEventControl;
+ChipEventControl chZclRelativeHumidityMeasurementServerReadEventControl;
 
 static uint32_t humidityMeasurementIntervalMs =
   MAX_HUMIDITY_MEASUREMENT_INTERVAL_MS;
@@ -49,7 +49,7 @@ static uint32_t humidityMeasurementIntervalMs =
 //******************************************************************************
 // Plugin init function
 //******************************************************************************
-void emZclRelativeHumidityeMeasurementServerInitHandler(void)
+void chZclRelativeHumidityeMeasurementServerInitHandler(void)
 {
   uint16_t maxHumidityDeciPercent;
   uint16_t minHumidityDeciPercent;
@@ -57,32 +57,32 @@ void emZclRelativeHumidityeMeasurementServerInitHandler(void)
   maxHumidityDeciPercent = halHumidityGetMaxMeasureableHumidityDeciPercent();
   minHumidityDeciPercent = halHumidityGetMinMeasureableHumidityDeciPercent();
 
-  emberZclWriteAttribute(1,
-                         &emberZclClusterRelativeHumidityMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_ATTRIBUTE_RELATIVE_HUMIDITY_MAX_MEASURED_VALUE,
+  chipZclWriteAttribute(1,
+                         &chipZclClusterRelativeHumidityMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_ATTRIBUTE_RELATIVE_HUMIDITY_MAX_MEASURED_VALUE,
                          (uint8_t *) &maxHumidityDeciPercent,
                          sizeof(maxHumidityDeciPercent));
 
-  emberZclWriteAttribute(1,
-                         &emberZclClusterRelativeHumidityMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_ATTRIBUTE_RELATIVE_HUMIDITY_MIN_MEASURED_VALUE,
+  chipZclWriteAttribute(1,
+                         &chipZclClusterRelativeHumidityMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_ATTRIBUTE_RELATIVE_HUMIDITY_MIN_MEASURED_VALUE,
                          (uint8_t *) &minHumidityDeciPercent,
                          sizeof(minHumidityDeciPercent));
   // Start the ReadEvent, which will re-activate itself perpetually
-  emberEventControlSetActive(
-    emZclRelativeHumidityMeasurementServerReadEventControl);
+  chipEventControlSetActive(
+    chZclRelativeHumidityMeasurementServerReadEventControl);
 }
 
-void emZclRelativeHumidityMeasurementServerNetworkStatusHandler(
-  EmberStatus status)
+void chZclRelativeHumidityMeasurementServerNetworkStatusHandler(
+  ChipStatus status)
 {
   // On network connect, chances are very good that someone (coordinator,
   // gateway, etc) will poll the temperature for an initial status.  As such,
   // it is useful to have fresh data to be polled.
-  if (status == EMBER_NETWORK_UP) {
+  if (status == CHIP_NETWORK_UP) {
     //checkForReportingConfig();
-    emberEventControlSetActive(
-      emZclRelativeHumidityMeasurementServerReadEventControl);
+    chipEventControlSetActive(
+      chZclRelativeHumidityMeasurementServerReadEventControl);
   }
 }
 
@@ -92,11 +92,11 @@ void emZclRelativeHumidityMeasurementServerNetworkStatusHandler(
 //******************************************************************************
 // Event used to generate a read of a new temperature value
 //******************************************************************************
-void emZclRelativeHumidityMeasurementServerReadEventHandler(void)
+void chZclRelativeHumidityMeasurementServerReadEventHandler(void)
 {
   halHumidityStartRead();
-  emberEventControlSetInactive(
-    emZclRelativeHumidityMeasurementServerReadEventControl);
+  chipEventControlSetInactive(
+    chZclRelativeHumidityMeasurementServerReadEventControl);
 }
 
 void halHumidityReadingCompleteCallback(uint16_t humidityDeciPercent,
@@ -104,14 +104,14 @@ void halHumidityReadingCompleteCallback(uint16_t humidityDeciPercent,
 {
   // If the read was successful, post the results to the cluster
   if (readSuccess) {
-    emberAfAppPrintln("Humidity: %d deciPercent", humidityDeciPercent);
+    chipAfAppPrintln("Humidity: %d deciPercent", humidityDeciPercent);
     writeHumidityAttributes(humidityDeciPercent);
   } else {
-    emberAfAppPrintln("Error reading humidity from HW");
+    chipAfAppPrintln("Error reading humidity from HW");
   }
 
-  emberEventControlSetDelayMS(
-    emZclRelativeHumidityMeasurementServerReadEventControl,
+  chipEventControlSetDelayMS(
+    chZclRelativeHumidityMeasurementServerReadEventControl,
     humidityMeasurementIntervalMs);
 }
 
@@ -121,33 +121,33 @@ void humiditySetCommand(void)
 {
   uint16_t humidityDeciPercent;
 
-  if (emberCommandArgumentCount() != 1) {
-    emberAfAppPrintln("ERR: expected %s <humidity>",
-                      emberStringCommandArgument(-1, NULL));
+  if (chipCommandArgumentCount() != 1) {
+    chipAfAppPrintln("ERR: expected %s <humidity>",
+                      chipStringCommandArgument(-1, NULL));
     return;
   }
-  humidityDeciPercent = (uint16_t)emberUnsignedCommandArgument(0);
+  humidityDeciPercent = (uint16_t)chipUnsignedCommandArgument(0);
 
-  emberAfAppPrintln("setting humidity to: %d", humidityDeciPercent);
+  chipAfAppPrintln("setting humidity to: %d", humidityDeciPercent);
   halHumidityReadingCompleteCallback(humidityDeciPercent, true);
 }
 
 //------------------------------------------------------------------------------
 // Plugin public functions
 
-void emberAfPluginRelativeHumidityMeasurementServerSetMeasurementInterval(
+void chipAfPluginRelativeHumidityMeasurementServerSetMeasurementInterval(
   uint32_t measurementIntervalS)
 {
   if ((measurementIntervalS == 0)
       || (measurementIntervalS
-          > EMBER_AF_PLUGIN_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S)) {
+          > CHIP_AF_PLUGIN_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S)) {
     humidityMeasurementIntervalMs = MAX_HUMIDITY_MEASUREMENT_INTERVAL_MS;
   } else {
     humidityMeasurementIntervalMs
       = measurementIntervalS * 1000;
   }
-  emberEventControlSetDelayMS(
-    emZclRelativeHumidityMeasurementServerReadEventControl,
+  chipEventControlSetDelayMS(
+    chZclRelativeHumidityMeasurementServerReadEventControl,
     humidityMeasurementIntervalMs);
 }
 
@@ -162,16 +162,16 @@ void emberAfPluginRelativeHumidityMeasurementServerSetMeasurementInterval(
 //******************************************************************************
 static void writeHumidityAttributes(uint16_t humidityDeciPercent)
 {
-  //EmberZclEndpointId_t i;
-  EmberZclEndpointId_t endpoint = 1;
+  //ChipZclEndpointId_t i;
+  ChipZclEndpointId_t endpoint = 1;
 
   //TODO: add multi-endpoint support here, once multiple endpoint are support in
   // zoip
 
   // Write the current temperature attribute
-  emberZclWriteAttribute(endpoint,
-                         &emberZclClusterRelativeHumidityMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_ATTRIBUTE_RELATIVE_HUMIDITY_MEASURED_VALUE,
+  chipZclWriteAttribute(endpoint,
+                         &chipZclClusterRelativeHumidityMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_SERVER_ATTRIBUTE_RELATIVE_HUMIDITY_MEASURED_VALUE,
                          (uint8_t *) &humidityDeciPercent,
                          sizeof(humidityDeciPercent));
 }

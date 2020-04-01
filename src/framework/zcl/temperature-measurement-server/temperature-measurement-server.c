@@ -17,18 +17,18 @@
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_COMMAND_INTERPRETER2
-  #include EMBER_AF_API_COMMAND_INTERPRETER2
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_COMMAND_INTERPRETER2
+  #include CHIP_AF_API_COMMAND_INTERPRETER2
 #endif
-#include EMBER_AF_API_TEMPERATURE
+#include CHIP_AF_API_TEMPERATURE
 
 #define MAX_TEMPERATURE_MEASUREMENT_INTERVAL_MS                               \
-  (EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S \
+  (CHIP_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S \
    * 1000)
 
 //------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ static void writeTemperatureAttributes(int32_t temperatureMilliC);
 
 //------------------------------------------------------------------------------
 // Global variables
-EmberEventControl emZclTemperatureMeasurementServerReadEventControl;
+ChipEventControl chZclTemperatureMeasurementServerReadEventControl;
 
 static uint32_t temperatureMeasurementIntervalMs =
   MAX_TEMPERATURE_MEASUREMENT_INTERVAL_MS;
@@ -49,7 +49,7 @@ static uint32_t temperatureMeasurementIntervalMs =
 //******************************************************************************
 // Plugin init function
 //******************************************************************************
-void emZclTemperatureMeasurementServerInitHandler(void)
+void chZclTemperatureMeasurementServerInitHandler(void)
 {
   int16_t maxTempAttDeciC;
   int16_t minTempAttDeciC;
@@ -61,32 +61,32 @@ void emZclTemperatureMeasurementServerInitHandler(void)
   maxTempAttDeciC = maxTempMilliC / 10;
   minTempAttDeciC = minTempMilliC / 10;
 
-  emberZclWriteAttribute(1,
-                         &emberZclClusterTempMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_TEMP_MEASUREMENT_SERVER_ATTRIBUTE_TEMP_MAX_MEASURED_VALUE,
+  chipZclWriteAttribute(1,
+                         &chipZclClusterTempMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_TEMP_MEASUREMENT_SERVER_ATTRIBUTE_TEMP_MAX_MEASURED_VALUE,
                          (uint8_t *) &maxTempAttDeciC,
                          sizeof(maxTempAttDeciC));
 
-  emberZclWriteAttribute(1,
-                         &emberZclClusterTempMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_TEMP_MEASUREMENT_SERVER_ATTRIBUTE_TEMP_MIN_MEASURED_VALUE,
+  chipZclWriteAttribute(1,
+                         &chipZclClusterTempMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_TEMP_MEASUREMENT_SERVER_ATTRIBUTE_TEMP_MIN_MEASURED_VALUE,
                          (uint8_t *) &minTempAttDeciC,
                          sizeof(minTempAttDeciC));
   // Start the ReadEvent, which will re-activate itself perpetually
-  emberEventControlSetActive(
-    emZclTemperatureMeasurementServerReadEventControl);
+  chipEventControlSetActive(
+    chZclTemperatureMeasurementServerReadEventControl);
 }
 
-void emZclTemperatureMeasurementServerNetworkStatusHandler(
-  EmberStatus status)
+void chZclTemperatureMeasurementServerNetworkStatusHandler(
+  ChipStatus status)
 {
   // On network connect, chances are very good that someone (coordinator,
   // gateway, etc) will poll the temperature for an initial status.  As such,
   // it is useful to have fresh data to be polled.
-  if (status == EMBER_NETWORK_UP) {
+  if (status == CHIP_NETWORK_UP) {
     //checkForReportingConfig();
-    emberEventControlSetActive(
-      emZclTemperatureMeasurementServerReadEventControl);
+    chipEventControlSetActive(
+      chZclTemperatureMeasurementServerReadEventControl);
   }
 }
 
@@ -96,11 +96,11 @@ void emZclTemperatureMeasurementServerNetworkStatusHandler(
 //******************************************************************************
 // Event used to generate a read of a new temperature value
 //******************************************************************************
-void emZclTemperatureMeasurementServerReadEventHandler(void)
+void chZclTemperatureMeasurementServerReadEventHandler(void)
 {
   halTemperatureStartRead();
-  emberEventControlSetInactive(
-    emZclTemperatureMeasurementServerReadEventControl);
+  chipEventControlSetInactive(
+    chZclTemperatureMeasurementServerReadEventControl);
 }
 
 void halTemperatureReadingCompleteCallback(int32_t temperatureMilliC,
@@ -108,14 +108,14 @@ void halTemperatureReadingCompleteCallback(int32_t temperatureMilliC,
 {
   // If the read was successful, post the results to the cluster
   if (readSuccess) {
-    emberAfAppPrintln("Temperature: %d milliC", temperatureMilliC);
+    chipAfAppPrintln("Temperature: %d milliC", temperatureMilliC);
     writeTemperatureAttributes(temperatureMilliC);
   } else {
-    emberAfAppPrintln("Error reading temperature from HW");
+    chipAfAppPrintln("Error reading temperature from HW");
   }
 
-  emberEventControlSetDelayMS(
-    emZclTemperatureMeasurementServerReadEventControl,
+  chipEventControlSetDelayMS(
+    chZclTemperatureMeasurementServerReadEventControl,
     temperatureMeasurementIntervalMs);
 }
 
@@ -125,33 +125,33 @@ void temperatureSetCommand(void)
 {
   int32_t temperatureMilliC;
 
-  if (emberCommandArgumentCount() != 1) {
-    emberAfAppPrintln("ERR: expected %s <temperature>",
-                      emberStringCommandArgument(-1, NULL));
+  if (chipCommandArgumentCount() != 1) {
+    chipAfAppPrintln("ERR: expected %s <temperature>",
+                      chipStringCommandArgument(-1, NULL));
     return;
   }
-  temperatureMilliC = emberSignedCommandArgument(0);
+  temperatureMilliC = chipSignedCommandArgument(0);
 
-  emberAfAppPrintln("setting temperature to: %d", temperatureMilliC);
+  chipAfAppPrintln("setting temperature to: %d", temperatureMilliC);
   halTemperatureReadingCompleteCallback(temperatureMilliC, true);
 }
 
 //------------------------------------------------------------------------------
 // Plugin public functions
 
-void emberAfPluginTemperatureMeasurementServerSetMeasurementInterval(
+void chipAfPluginTemperatureMeasurementServerSetMeasurementInterval(
   uint32_t measurementIntervalS)
 {
   if ((measurementIntervalS == 0)
       || (measurementIntervalS
-          > EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S)) {
+          > CHIP_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S)) {
     temperatureMeasurementIntervalMs = MAX_TEMPERATURE_MEASUREMENT_INTERVAL_MS;
   } else {
     temperatureMeasurementIntervalMs
       = measurementIntervalS * 1000;
   }
-  emberEventControlSetDelayMS(
-    emZclTemperatureMeasurementServerReadEventControl,
+  chipEventControlSetDelayMS(
+    chZclTemperatureMeasurementServerReadEventControl,
     temperatureMeasurementIntervalMs);
 }
 
@@ -177,9 +177,9 @@ static void writeTemperatureAttributes(int32_t temperatureMilliC)
   // zoip
 
   // Write the current temperature attribute
-  emberZclWriteAttribute(endpoint,
-                         &emberZclClusterTempMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_TEMP_MEASUREMENT_SERVER_ATTRIBUTE_TEMP_MEASURED_VALUE,
+  chipZclWriteAttribute(endpoint,
+                         &chipZclClusterTempMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_TEMP_MEASUREMENT_SERVER_ATTRIBUTE_TEMP_MEASURED_VALUE,
                          (uint8_t *) &temperatureCentiC,
                          sizeof(temperatureCentiC));
 }

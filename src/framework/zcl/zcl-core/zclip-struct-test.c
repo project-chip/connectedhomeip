@@ -1,22 +1,10 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
-#include "core/ember-stack.h"
+#include "core/chip-stack.h"
 #include "zclip-struct.h"
 #include "cbor.h"
 #include "zcl-core-types.h"
@@ -31,44 +19,44 @@ typedef struct {
   int32_t  field6;
   uint8_t  field7[7];
   char     field8[7];
-  EmberZclStringType_t field9;
-  EmberZclStringType_t field10;
+  ChipZclStringType_t field9;
+  ChipZclStringType_t field10;
 } ZclipTestStruct;
 
-#define EMBER_ZCLIP_STRUCT ZclipTestStruct
+#define CHIP_ZCLIP_STRUCT ZclipTestStruct
 
 ZclipStructSpec zclipTestStructSpec[] = {
-  EMBER_ZCLIP_OBJECT(sizeof(EMBER_ZCLIP_STRUCT),
+  CHIP_ZCLIP_OBJECT(sizeof(CHIP_ZCLIP_STRUCT),
                      11,        // fieldCount
                      NULL),     // names
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_BOOLEAN, field0),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, field1),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, field2),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, field3),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_INTEGER, field4),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_INTEGER, field5),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_INTEGER, field6),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_FIXED_LENGTH_BINARY, field7),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING, field8),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_UINT8_LENGTH_STRING, field9),
-  EMBER_ZCLIP_FIELD(EMBER_ZCLIP_TYPE_BINARY, field10)
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_BOOLEAN, field0),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, field1),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, field2),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, field3),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_INTEGER, field4),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_INTEGER, field5),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_INTEGER, field6),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_FIXED_LENGTH_BINARY, field7),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING, field8),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_UINT8_LENGTH_STRING, field9),
+  CHIP_ZCLIP_FIELD(CHIP_ZCLIP_TYPE_BINARY, field10)
 };
 
-#undef EMBER_ZCLIP_STRUCT
+#undef CHIP_ZCLIP_STRUCT
 
 typedef struct {
   bool field0;
   bool field1;
 } MixedKeysTestStruct;
-#define EMBER_ZCLIP_STRUCT MixedKeysTestStruct
+#define CHIP_ZCLIP_STRUCT MixedKeysTestStruct
 ZclipStructSpec mixedKeysTestStructSpec[] = {
-  EMBER_ZCLIP_OBJECT(sizeof(EMBER_ZCLIP_STRUCT),
+  CHIP_ZCLIP_OBJECT(sizeof(CHIP_ZCLIP_STRUCT),
                      2,        // fieldCount
                      NULL),     // names
-  EMBER_ZCLIP_FIELD_INDEXED(EMBER_ZCLIP_TYPE_BOOLEAN, field0),
-  EMBER_ZCLIP_FIELD_NAMED(EMBER_ZCLIP_TYPE_BOOLEAN, field1, "e"),
+  CHIP_ZCLIP_FIELD_INDEXED(CHIP_ZCLIP_TYPE_BOOLEAN, field0),
+  CHIP_ZCLIP_FIELD_NAMED(CHIP_ZCLIP_TYPE_BOOLEAN, field1, "e"),
 };
-#undef EMBER_ZCLIP_STRUCT
+#undef CHIP_ZCLIP_STRUCT
 
 // Prints encoded CBOR to stderr
 boolean debug = false;
@@ -178,12 +166,12 @@ static void printBuffer(uint8_t * buffer, uint16_t length)
 }
 
 // Test values for variable length text and binary strings.
-static const EmberZclStringType_t field9Value = {
+static const ChipZclStringType_t field9Value = {
   .ptr = "zxcvb",
   .length = 5
 };
 static uint8_t field10Binary[] = { 0x0f, 0x0a, 0x0c, 0x0a, 0x0d, 0x0e };
-static const EmberZclStringType_t field10Value = {
+static const ChipZclStringType_t field10Value = {
   .ptr = field10Binary,
   .length = 5
 };
@@ -214,8 +202,8 @@ int main(int argc, char *argv[])
   testStruct.field6 = -1234567;
   MEMCOPY(&testStruct.field7, "qwertyu", 7);
   MEMCOPY(&testStruct.field8, "asdf", 5);       // 5 to include the null
-  MEMCOPY(&testStruct.field9, &field9Value, sizeof(EmberZclStringType_t));
-  MEMCOPY(&testStruct.field10, &field10Value, sizeof(EmberZclStringType_t));
+  MEMCOPY(&testStruct.field9, &field9Value, sizeof(ChipZclStringType_t));
+  MEMCOPY(&testStruct.field10, &field10Value, sizeof(ChipZclStringType_t));
 
   uint8_t buffer[3][1000];
 
@@ -342,7 +330,7 @@ int main(int argc, char *argv[])
       for (j = 0; j < 5 - i; j++) {
         uint16_t v = 100 + j;
         emCborEncodeValue(&state,
-                          EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                          CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                           sizeof(v),
                           (uint8_t *) &v);
       }
@@ -377,7 +365,7 @@ int main(int argc, char *argv[])
       for (j = 0; j < 5 - i; j++) {
         uint16_t v;
         assert(emCborDecodeValue(&state,
-                                 EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                                 CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                                  sizeof(v),
                                  (uint8_t *) &v));
         assert(v == 100 + j);
@@ -412,7 +400,7 @@ int main(int argc, char *argv[])
         uint16_t v = 100 + j;
         emCborEncodeKey(&state, k);
         emCborEncodeValue(&state,
-                          EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                          CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                           sizeof(v),
                           (uint8_t *) &v);
       }
@@ -453,7 +441,7 @@ int main(int argc, char *argv[])
         k = emCborDecodeKey(&state);
         assert(k == j);
         assert(emCborDecodeValue(&state,
-                                 EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                                 CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                                  sizeof(v),
                                  (uint8_t *) &v));
         assert(v == 100 + j);
@@ -485,7 +473,7 @@ int main(int argc, char *argv[])
       for (j = 0; j < (i == 12 ? 25 : 1); j++) {
         uint16_t v = 100 + j;
         emCborEncodeValue(&state,
-                          EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                          CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                           sizeof(v),
                           (uint8_t *) &v);
       }
@@ -520,7 +508,7 @@ int main(int argc, char *argv[])
       for (j = 0; j < (i == 12 ? 25 : 1); j++) {
         uint16_t v;
         assert(emCborDecodeValue(&state,
-                                 EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                                 CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                                  sizeof(v),
                                  (uint8_t *) &v));
         assert(v == 100 + j);
@@ -554,15 +542,15 @@ int main(int argc, char *argv[])
       bool    field0;
       uint8_t field1;
     } TlvKeysTestStruct;
-#define EMBER_ZCLIP_STRUCT TlvKeysTestStruct
+#define CHIP_ZCLIP_STRUCT TlvKeysTestStruct
     ZclipStructSpec tlvKeysTestStructSpec[] = {
-      EMBER_ZCLIP_OBJECT(sizeof(EMBER_ZCLIP_STRUCT),
+      CHIP_ZCLIP_OBJECT(sizeof(CHIP_ZCLIP_STRUCT),
                          2,            // fieldCount
                          NULL),         // names
-      EMBER_ZCLIP_FIELD_INDEXED(EMBER_ZCLIP_TYPE_BOOLEAN, field0),
-      EMBER_ZCLIP_FIELD_TLV(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, field1, 7),
+      CHIP_ZCLIP_FIELD_INDEXED(CHIP_ZCLIP_TYPE_BOOLEAN, field0),
+      CHIP_ZCLIP_FIELD_TLV(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, field1, 7),
     };
-#undef EMBER_ZCLIP_STRUCT
+#undef CHIP_ZCLIP_STRUCT
 
     // Test CBOR decoding
     // {0: true, -8: 42}  TLV 7 corresponds to key -8
@@ -634,17 +622,17 @@ int main(int argc, char *argv[])
   emCborEncodeIndefiniteMapStart(&state, buffer[0], sizeof(buffer[0]));
   emCborEncodeMapEntry(&state,
                        0, // key
-                       EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                       CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                        sizeof(arrayValue),
                        &arrayValue);
   emCborEncodeKey(&state, 2);
   emCborEncodeIndefiniteArray(&state);
   emCborEncodeValue(&state,
-                    EMBER_ZCLIP_TYPE_STRING,
+                    CHIP_ZCLIP_TYPE_STRING,
                     1,
                     (const uint8_t *)"a");
   emCborEncodeValue(&state,
-                    EMBER_ZCLIP_TYPE_STRING,
+                    CHIP_ZCLIP_TYPE_STRING,
                     1,
                     (const uint8_t *)"b");
   emCborEncodeBreak(&state);

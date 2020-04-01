@@ -1,28 +1,16 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_HAL
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_HAL
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 #include "thread-callbacks.h"
 #include "poll-control-server.h"
 
@@ -55,7 +43,7 @@ typedef struct {
   uint8_t bindingIndex;
   int16u fastPollTimeoutQs;
 } Client_t;
-static Client_t clients[EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS];
+static Client_t clients[CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS];
 
 enum {
   INITIAL = 0,
@@ -67,29 +55,29 @@ static int32u fastPollStartTimeMs;
 
 // Define a timeout for the client checkIn response.
 #define CLIENT_CHECK_IN_TIMEOUT_DURATION_MS                      \
-  (EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_CHECK_IN_RESPONSE_TIMEOUT \
+  (CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_CHECK_IN_RESPONSE_TIMEOUT \
    * MILLISECOND_TICKS_PER_QUARTERSECOND)
 
 #define CLIENT_INDEX_NULL 0xFF
 
-EmberEventControl emZclPollControlServerCheckInEventControl;
+ChipEventControl chZclPollControlServerCheckInEventControl;
 
 // The cluster 'tick' is driven from an event so we can control when the tick fires.
-EmberEventControl emZclPollControlServerTickEventControl;
-void emZclPollControlServerTickEventHandler(void);
+ChipEventControl chZclPollControlServerTickEventControl;
+void chZclPollControlServerTickEventHandler(void);
 
-static EmberZclEndpointId_t serverEndpointId = EMBER_ZCL_ENDPOINT_NULL;
+static ChipZclEndpointId_t serverEndpointId = CHIP_ZCL_ENDPOINT_NULL;
 
-static bool readServerAttribute(EmberZclAttributeId_t attributeId,
+static bool readServerAttribute(ChipZclAttributeId_t attributeId,
                                 void* buffer,
                                 size_t size);
-static EmberZclStatus_t writeServerAttribute(EmberZclAttributeId_t attributeId,
+static ChipZclStatus_t writeServerAttribute(ChipZclAttributeId_t attributeId,
                                              void* buffer,
                                              size_t size);
 static void scheduleServerTick(uint32_t delayMs);
 static void deactivateServerTick(void);
 static void scheduleServerCheckIn(void);
-static uint8_t findClientIndex(const EmberZclCommandContext_t* context);
+static uint8_t findClientIndex(const ChipZclCommandContext_t* context);
 static bool pendingCheckInResponses(void);
 static bool outstandingFastPollRequests(void);
 static bool validateServerCheckInInterval(uint32_t newCheckInIntervalQs);
@@ -103,26 +91,26 @@ static bool validateServerFastPollTimeoutMax(uint16_t newFastPollTimeoutMaxQs);
 //------------------------------------------------------------------------------
 // Private functions
 
-static bool readServerAttribute(EmberZclAttributeId_t attributeId,
+static bool readServerAttribute(ChipZclAttributeId_t attributeId,
                                 void* buffer,
                                 size_t size)
 {
-  EmberZclStatus_t status;
-  status = emberZclReadAttribute(serverEndpointId,
-                                 &emberZclClusterPollControlServerSpec,
+  ChipZclStatus_t status;
+  status = chipZclReadAttribute(serverEndpointId,
+                                 &chipZclClusterPollControlServerSpec,
                                  attributeId,
                                  buffer,
                                  size);
-  return (status == EMBER_ZCL_STATUS_SUCCESS);
+  return (status == CHIP_ZCL_STATUS_SUCCESS);
 }
 
-static EmberZclStatus_t writeServerAttribute(EmberZclAttributeId_t attributeId,
+static ChipZclStatus_t writeServerAttribute(ChipZclAttributeId_t attributeId,
                                              void* buffer,
                                              size_t size)
 {
-  EmberZclStatus_t status;
-  status = emberZclWriteAttribute(serverEndpointId,
-                                  &emberZclClusterPollControlServerSpec,
+  ChipZclStatus_t status;
+  status = chipZclWriteAttribute(serverEndpointId,
+                                  &chipZclClusterPollControlServerSpec,
                                   attributeId,
                                   buffer,
                                   size);
@@ -131,45 +119,45 @@ static EmberZclStatus_t writeServerAttribute(EmberZclAttributeId_t attributeId,
 
 static void scheduleServerTick(uint32_t delayMs)
 {
-  emberEventControlSetDelayMS(emZclPollControlServerTickEventControl,
+  chipEventControlSetDelayMS(chZclPollControlServerTickEventControl,
                               delayMs);
 }
 
 static void deactivateServerTick(void)
 {
-  emberEventControlSetInactive(emZclPollControlServerTickEventControl);
+  chipEventControlSetInactive(chZclPollControlServerTickEventControl);
 }
 
 static void scheduleServerCheckIn(void)
 {
   uint32_t checkInIntervalQs;
 
-  if (readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL,
+  if (readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL,
                           (void*)&checkInIntervalQs,
                           sizeof(checkInIntervalQs))
       && (checkInIntervalQs != 0)) {
-    emberEventControlSetDelayMS(emZclPollControlServerCheckInEventControl,
+    chipEventControlSetDelayMS(chZclPollControlServerCheckInEventControl,
                                 (checkInIntervalQs * MILLISECOND_TICKS_PER_QUARTERSECOND));
   } else {
-    emberEventControlSetInactive(emZclPollControlServerCheckInEventControl);
+    chipEventControlSetInactive(chZclPollControlServerCheckInEventControl);
   }
 }
 
-static uint8_t findClientIndex(const EmberZclCommandContext_t* context)
+static uint8_t findClientIndex(const ChipZclCommandContext_t* context)
 {
   uint8_t bindingIdx;
 
   if ((context->endpointId != serverEndpointId)
-      || (!emberZclAreClusterSpecsEqual(&emberZclClusterPollControlServerSpec, context->clusterSpec)
-          && !emberZclAreClusterSpecsEqual(&emberZclClusterPollControlClientSpec, context->clusterSpec))) {
+      || (!chipZclAreClusterSpecsEqual(&chipZclClusterPollControlServerSpec, context->clusterSpec)
+          && !chipZclAreClusterSpecsEqual(&chipZclClusterPollControlClientSpec, context->clusterSpec))) {
     return CLIENT_INDEX_NULL; // Return if context does not refer to a Poll Control cluster (C or S) or the endpointId is wrong.
   }
 
   // Check if we have a binding table entry which matches the context.
-  for (bindingIdx = 0; bindingIdx < EMBER_ZCL_BINDING_TABLE_SIZE; bindingIdx++) {
-    EmberZclBindingEntry_t binding = { 0 };
-    if (emberZclGetBinding(bindingIdx, &binding)) {
-      if (emberZclAreClusterSpecsEqual(&emberZclClusterPollControlServerSpec, &binding.clusterSpec)) {
+  for (bindingIdx = 0; bindingIdx < CHIP_ZCL_BINDING_TABLE_SIZE; bindingIdx++) {
+    ChipZclBindingEntry_t binding = { 0 };
+    if (chipZclGetBinding(bindingIdx, &binding)) {
+      if (chipZclAreClusterSpecsEqual(&chipZclClusterPollControlServerSpec, &binding.clusterSpec)) {
         // Check the context ep and remote address matches the binding.
         if ((binding.endpointId == serverEndpointId)
             && (MEMCOMPARE(&context->remoteAddress, &binding.destination.network.data.address, 16) == 0)) {
@@ -179,15 +167,15 @@ static uint8_t findClientIndex(const EmberZclCommandContext_t* context)
     }
   }
 
-  if (bindingIdx < EMBER_ZCL_BINDING_TABLE_SIZE) {
+  if (bindingIdx < CHIP_ZCL_BINDING_TABLE_SIZE) {
     // Matching binding found, now check for a matching reference in the clients array.
-    EmberZclBindingEntry_t binding = { 0 };
-    if (emberZclGetBinding(bindingIdx, &binding)) {
+    ChipZclBindingEntry_t binding = { 0 };
+    if (chipZclGetBinding(bindingIdx, &binding)) {
       uint8_t clientIdx;
-      for (clientIdx = 0; clientIdx < EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; clientIdx++) {
-        EmberZclBindingEntry_t clientBinding;
-        if (emberZclGetBinding(clients[clientIdx].bindingIndex, &clientBinding)) {
-          if (MEMCOMPARE(&binding, &clientBinding, sizeof(EmberZclBindingEntry_t)) == 0) {
+      for (clientIdx = 0; clientIdx < CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; clientIdx++) {
+        ChipZclBindingEntry_t clientBinding;
+        if (chipZclGetBinding(clients[clientIdx].bindingIndex, &clientBinding)) {
+          if (MEMCOMPARE(&binding, &clientBinding, sizeof(ChipZclBindingEntry_t)) == 0) {
             return clientIdx;
           }
         }
@@ -200,7 +188,7 @@ static uint8_t findClientIndex(const EmberZclCommandContext_t* context)
 
 static bool pendingCheckInResponses(void)
 {
-  for (uint8_t i = 0; i < EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; i++) {
+  for (uint8_t i = 0; i < CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; i++) {
     if (clients[i].bindingIndex != CLIENT_INDEX_NULL
         && clients[i].fastPollTimeoutQs == 0) {
       return TRUE;
@@ -215,7 +203,7 @@ static bool outstandingFastPollRequests(void)
   uint32_t elapsedFastPollTimeMs = elapsedTimeInt32u(fastPollStartTimeMs,
                                                      currentTimeMs);
   uint16_t fastPollTimeoutQs = 0;
-  for (uint8_t i = 0; i < EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; i++) {
+  for (uint8_t i = 0; i < CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; i++) {
     if (clients[i].bindingIndex != CLIENT_INDEX_NULL) {
       if (clients[i].fastPollTimeoutQs * MILLISECOND_TICKS_PER_QUARTERSECOND
           < elapsedFastPollTimeMs) {
@@ -246,7 +234,7 @@ static bool validateServerCheckInInterval(uint32_t newCheckInIntervalQs)
   }
 
   uint32_t longPollIntervalQs;
-  if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
+  if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
                            (void*)&longPollIntervalQs,
                            sizeof(longPollIntervalQs))
       || (newCheckInIntervalQs < longPollIntervalQs)) {
@@ -254,11 +242,11 @@ static bool validateServerCheckInInterval(uint32_t newCheckInIntervalQs)
   }
 
   // Validate against optional CheckIn_Interval_Min attribute.
-  if (emZclFindAttribute(&emberZclClusterPollControlServerSpec,
-                         EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL_MIN,
+  if (chZclFindAttribute(&chipZclClusterPollControlServerSpec,
+                         CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL_MIN,
                          false)) { // exclude remote
     uint32_t checkInIntervalMinQs;
-    if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL_MIN,
+    if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL_MIN,
                              (void*)&checkInIntervalMinQs,
                              sizeof(checkInIntervalMinQs))
         || (newCheckInIntervalQs < checkInIntervalMinQs)) {
@@ -272,7 +260,7 @@ static bool validateServerCheckInInterval(uint32_t newCheckInIntervalQs)
 static bool validateServerLongPollInterval(uint32_t newLongPollIntervalQs)
 {
   uint32_t checkInIntervalQs;
-  if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL,
+  if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL,
                            (void*)&checkInIntervalQs,
                            sizeof(checkInIntervalQs))
       || (newLongPollIntervalQs > checkInIntervalQs)) {
@@ -280,7 +268,7 @@ static bool validateServerLongPollInterval(uint32_t newLongPollIntervalQs)
   }
 
   uint16_t shortPollIntervalQs;
-  if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL,
+  if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL,
                            (void*)&shortPollIntervalQs,
                            sizeof(shortPollIntervalQs))
       || (newLongPollIntervalQs < shortPollIntervalQs)) {
@@ -288,11 +276,11 @@ static bool validateServerLongPollInterval(uint32_t newLongPollIntervalQs)
   }
 
   // Validate against optional LongPoll_Interval_Min attribute.
-  if (emZclFindAttribute(&emberZclClusterPollControlServerSpec,
-                         EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL_MIN,
+  if (chZclFindAttribute(&chipZclClusterPollControlServerSpec,
+                         CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL_MIN,
                          false)) { // exclude remote
     uint32_t longPollIntervalMinQs;
-    if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL_MIN,
+    if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL_MIN,
                              (void*)&longPollIntervalMinQs,
                              sizeof(longPollIntervalMinQs))
         || (newLongPollIntervalQs < longPollIntervalMinQs)) {
@@ -306,7 +294,7 @@ static bool validateServerLongPollInterval(uint32_t newLongPollIntervalQs)
 static bool validateServerShortPollInterval(uint16_t newShortPollIntervalQs)
 {
   uint32_t longPollIntervalQs;
-  if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
+  if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
                            (void*)&longPollIntervalQs,
                            sizeof(longPollIntervalQs))
       || (newShortPollIntervalQs > longPollIntervalQs)) {
@@ -319,11 +307,11 @@ static bool validateServerShortPollInterval(uint16_t newShortPollIntervalQs)
 static bool validateServerFastPollTimeout(uint16_t newFastPollTimeoutQs)
 {
   // Validate new timeout value against optional Fast Poll Timeout_Max attribute.
-  if (emZclFindAttribute(&emberZclClusterPollControlServerSpec,
-                         EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT_MAX,
+  if (chZclFindAttribute(&chipZclClusterPollControlServerSpec,
+                         CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT_MAX,
                          false)) { // exclude remote
     uint16_t fastPollTimeoutMaxQs;
-    if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT_MAX,
+    if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT_MAX,
                              (uint8_t*)&fastPollTimeoutMaxQs,
                              sizeof(fastPollTimeoutMaxQs))
         || (newFastPollTimeoutQs > fastPollTimeoutMaxQs)) {
@@ -337,7 +325,7 @@ static bool validateServerFastPollTimeout(uint16_t newFastPollTimeoutQs)
 static bool validateServerCheckInIntervalMin(uint32_t newCheckInIntervalMinQs)
 {
   uint32_t checkInIntervalQs;
-  if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL,
+  if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL,
                            (void*)&checkInIntervalQs,
                            sizeof(checkInIntervalQs))
       || (newCheckInIntervalMinQs > checkInIntervalQs)) {
@@ -350,7 +338,7 @@ static bool validateServerCheckInIntervalMin(uint32_t newCheckInIntervalMinQs)
 static bool validateServerLongPollIntervalMin(uint32_t newLongPollIntervalMinQs)
 {
   uint32_t longPollIntervalQs;
-  if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
+  if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
                            (void*)&longPollIntervalQs,
                            sizeof(longPollIntervalQs))
       || (newLongPollIntervalMinQs > longPollIntervalQs)) {
@@ -363,7 +351,7 @@ static bool validateServerLongPollIntervalMin(uint32_t newLongPollIntervalMinQs)
 static bool validateServerFastPollTimeoutMax(uint16_t newFastPollTimeoutMaxQs)
 {
   uint16_t fastPollTimeoutQs;
-  if (!readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT,
+  if (!readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT,
                            (void*)&fastPollTimeoutQs,
                            sizeof(fastPollTimeoutQs))
       || (newFastPollTimeoutMaxQs < fastPollTimeoutQs)) {
@@ -376,48 +364,48 @@ static bool validateServerFastPollTimeoutMax(uint16_t newFastPollTimeoutMaxQs)
 //------------------------------------------------------------------------------
 // Public functions
 
-void emberZclPollControlServerInitHandler(void)
+void chipZclPollControlServerInitHandler(void)
 {
   // Set server endpoint to the first ep with a Poll Control Server cluster.
-  for (EmberZclEndpointIndex_t i = 0; i < emZclEndpointCount; i++) {
+  for (ChipZclEndpointIndex_t i = 0; i < chZclEndpointCount; i++) {
     serverEndpointId
-      = emberZclEndpointIndexToId(i, &emberZclClusterPollControlServerSpec);
-    if (serverEndpointId != EMBER_ZCL_ENDPOINT_NULL) {
+      = chipZclEndpointIndexToId(i, &chipZclClusterPollControlServerSpec);
+    if (serverEndpointId != CHIP_ZCL_ENDPOINT_NULL) {
       break;
     }
   }
-  if (serverEndpointId == EMBER_ZCL_ENDPOINT_NULL) {
+  if (serverEndpointId == CHIP_ZCL_ENDPOINT_NULL) {
     assert(false); // Fatal error, Poll Control Server cluster not found.
   }
 
   uint32_t longPollIntervalQs;
-  if (readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
+  if (readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
                           (void*)&longPollIntervalQs,
                           sizeof(longPollIntervalQs))) {
-    emberAfSetLongPollIntervalQsCallback(longPollIntervalQs);
+    chipAfSetLongPollIntervalQsCallback(longPollIntervalQs);
   }
   uint16_t shortPollIntervalQs;
-  if (readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL,
+  if (readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL,
                           (void*)&shortPollIntervalQs,
                           sizeof(shortPollIntervalQs))) {
-    emberAfSetShortPollIntervalQsCallback(shortPollIntervalQs);
+    chipAfSetShortPollIntervalQsCallback(shortPollIntervalQs);
   }
   uint16_t fastPollTimeoutQs;
-  if (readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT,
+  if (readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT,
                           (void*)&fastPollTimeoutQs,
                           sizeof(fastPollTimeoutQs))) {
-    emberAfSetFastPollTimeoutQsCallback(fastPollTimeoutQs);
+    chipAfSetFastPollTimeoutQsCallback(fastPollTimeoutQs);
   }
 
   // TODO: Begin checking in after the network comes up instead of at startup.
   scheduleServerCheckIn();
 }
 
-void emZclPollControlServerTickEventHandler(void)
+void chZclPollControlServerTickEventHandler(void)
 {
   if (state == WAITING) {
     uint16_t fastPollTimeoutQs = 0;
-    for (uint8_t i = 0; i < EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; i++) {
+    for (uint8_t i = 0; i < CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; i++) {
       if ((clients[i].bindingIndex != CLIENT_INDEX_NULL)
           && (fastPollTimeoutQs < clients[i].fastPollTimeoutQs)) {
         fastPollTimeoutQs = clients[i].fastPollTimeoutQs;
@@ -432,45 +420,45 @@ void emZclPollControlServerTickEventHandler(void)
     }
   }
 
-  emberAfCorePrintln("End Polling");
+  chipAfCorePrintln("End Polling");
   state = INITIAL;
   deactivateServerTick();
 }
 
-void emZclPollControlServerCheckInEventHandler(void)
+void chZclPollControlServerCheckInEventHandler(void)
 {
   // Clear clients array.
-  for (uint8_t i = 0; i < EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; i++) {
+  for (uint8_t i = 0; i < CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_MAX_CLIENTS; i++) {
     clients[i].bindingIndex = CLIENT_INDEX_NULL;
   }
 
   // Send checkIn cmd to all matching Poll Control Client entries in binding table.
   uint8_t clientIdx = 0;
-  for (uint8_t bindingIdx = 0; bindingIdx < EMBER_ZCL_BINDING_TABLE_SIZE; bindingIdx++) {
-    EmberZclBindingEntry_t binding = { 0 };
-    if (emberZclGetBinding(bindingIdx, &binding)) {
-      if (emberZclAreClusterSpecsEqual(&emberZclClusterPollControlServerSpec,
+  for (uint8_t bindingIdx = 0; bindingIdx < CHIP_ZCL_BINDING_TABLE_SIZE; bindingIdx++) {
+    ChipZclBindingEntry_t binding = { 0 };
+    if (chipZclGetBinding(bindingIdx, &binding)) {
+      if (chipZclAreClusterSpecsEqual(&chipZclClusterPollControlServerSpec,
                                        &binding.clusterSpec)) {
-        EmberIpv6Address destClientIpv6;
+        ChipIpv6Address destClientIpv6;
         MEMCOPY(&destClientIpv6,
                 &binding.destination.network.data.address,
-                sizeof(EmberIpv6Address));
-        EmberZclDestination_t destClientZcl = {
+                sizeof(ChipIpv6Address));
+        ChipZclDestination_t destClientZcl = {
           .network = {
             .address = destClientIpv6,
-            .flags = EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG,
+            .flags = CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG,
           },
           .application = {
             .data.endpointId = binding.destination.application.data.endpointId,
-            .type = EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT,
+            .type = CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT,
           },
         };
 
-        if (emberZclSendClusterPollControlClientCommandCheckInRequest(
+        if (chipZclSendClusterPollControlClientCommandCheckInRequest(
               &destClientZcl,
               NULL,           // no request payload for checkIn cmd.
-              (EmberZclClusterPollControlClientCommandCheckInResponseHandler)emberZclClusterPollControlServerCommandCheckInResponseHandler)
-            == EMBER_SUCCESS) {
+              (ChipZclClusterPollControlClientCommandCheckInResponseHandler)chipZclClusterPollControlServerCommandCheckInResponseHandler)
+            == CHIP_SUCCESS) {
           clients[clientIdx].bindingIndex = bindingIdx;
           clients[clientIdx].fastPollTimeoutQs = 0;
           clientIdx++;
@@ -490,50 +478,50 @@ void emZclPollControlServerCheckInEventHandler(void)
   scheduleServerCheckIn();
 }
 
-bool emZclPollControlServerPreAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                                     const EmberZclClusterSpec_t* clusterSpec,
-                                                     EmberZclAttributeId_t attributeId,
+bool chZclPollControlServerPreAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                                     const ChipZclClusterSpec_t* clusterSpec,
+                                                     ChipZclAttributeId_t attributeId,
                                                      const void* buffer,
                                                      size_t bufferLength)
 {
-  if ((!emberZclAreClusterSpecsEqual(&emberZclClusterPollControlServerSpec, clusterSpec))
+  if ((!chipZclAreClusterSpecsEqual(&chipZclClusterPollControlServerSpec, clusterSpec))
       || (endpointId != serverEndpointId)
       || (const uint8_t *)buffer == 0) {
     return true;
   }
 
   switch (attributeId) {
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL: {
       uint32_t newCheckInIntervalQs;
       MEMCOPY(&newCheckInIntervalQs, buffer, bufferLength);
       return validateServerCheckInInterval(newCheckInIntervalQs);
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL: {
       uint32_t newLongPollIntervalQs;
       MEMCOPY(&newLongPollIntervalQs, buffer, bufferLength);
       return validateServerLongPollInterval(newLongPollIntervalQs);
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL: {
       uint16_t newShortPollIntervalQs;
       MEMCOPY(&newShortPollIntervalQs, buffer, bufferLength);
       return validateServerShortPollInterval(newShortPollIntervalQs);
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT: {
       uint16_t newFastPollTimeoutQs;
       MEMCOPY(&newFastPollTimeoutQs, buffer, bufferLength);
       return validateServerFastPollTimeout(newFastPollTimeoutQs);
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL_MIN: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL_MIN: {
       uint32_t newCheckInIntervalMinQs;
       MEMCOPY(&newCheckInIntervalMinQs, buffer, bufferLength);
       return validateServerCheckInIntervalMin(newCheckInIntervalMinQs);
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL_MIN: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL_MIN: {
       uint32_t newLongPollIntervalMinQs;
       MEMCOPY(&newLongPollIntervalMinQs, buffer, bufferLength);
       return validateServerLongPollIntervalMin(newLongPollIntervalMinQs);
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT_MAX: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT_MAX: {
       uint32_t newFastPollTimeoutMaxQs;
       MEMCOPY(&newFastPollTimeoutMaxQs, buffer, bufferLength);
       return validateServerFastPollTimeoutMax(newFastPollTimeoutMaxQs);
@@ -546,9 +534,9 @@ bool emZclPollControlServerPreAttributeChangeHandler(EmberZclEndpointId_t endpoi
   return true; // attribute not found.
 }
 
-void emZclPollControlServerPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                                      const EmberZclClusterSpec_t* clusterSpec,
-                                                      EmberZclAttributeId_t attributeId,
+void chZclPollControlServerPostAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                                      const ChipZclClusterSpec_t* clusterSpec,
+                                                      ChipZclAttributeId_t attributeId,
                                                       const void* buffer,
                                                       size_t bufferLength)
 {
@@ -557,34 +545,34 @@ void emZclPollControlServerPostAttributeChangeHandler(EmberZclEndpointId_t endpo
   }
 
   switch (attributeId) {
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_CHECK_IN_INTERVAL: {
       scheduleServerCheckIn();
       break;
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL: {
       uint32_t longPollIntervalQs;
-      if (readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
+      if (readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
                               (void*)&longPollIntervalQs,
                               sizeof(longPollIntervalQs))) {
-        emberAfSetLongPollIntervalQsCallback(longPollIntervalQs);
+        chipAfSetLongPollIntervalQsCallback(longPollIntervalQs);
       }
       break;
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL: {
       uint16_t shortPollIntervalQs;
-      if (readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL,
+      if (readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL,
                               (void*)&shortPollIntervalQs,
                               sizeof(shortPollIntervalQs))) {
-        emberAfSetShortPollIntervalQsCallback(shortPollIntervalQs);
+        chipAfSetShortPollIntervalQsCallback(shortPollIntervalQs);
       }
       break;
     }
-    case EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT: {
+    case CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT: {
       uint16_t fastPollTimeoutQs;
-      if (readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT,
+      if (readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT,
                               (void*)&fastPollTimeoutQs,
                               sizeof(fastPollTimeoutQs))) {
-        emberAfSetShortPollIntervalQsCallback(fastPollTimeoutQs);
+        chipAfSetShortPollIntervalQsCallback(fastPollTimeoutQs);
       }
       break;
     }
@@ -594,13 +582,13 @@ void emZclPollControlServerPostAttributeChangeHandler(EmberZclEndpointId_t endpo
   }
 }
 
-void emberZclClusterPollControlServerCommandCheckInResponseHandler(EmberZclMessageStatus_t status,
-                                                                   const EmberZclCommandContext_t* context,
-                                                                   const EmberZclClusterPollControlClientCommandCheckInResponse_t* response)
+void chipZclClusterPollControlServerCommandCheckInResponseHandler(ChipZclMessageStatus_t status,
+                                                                   const ChipZclCommandContext_t* context,
+                                                                   const ChipZclClusterPollControlClientCommandCheckInResponse_t* response)
 
 {
-  if (status == EMBER_ZCL_MESSAGE_STATUS_COAP_RESPONSE) {
-    emberAfCorePrintln("RX: CheckInResponse 0x%x, 0x%2x", response->startFastPolling, response->fastPollTimeout);
+  if (status == CHIP_ZCL_MESSAGE_STATUS_COAP_RESPONSE) {
+    chipAfCorePrintln("RX: CheckInResponse 0x%x, 0x%2x", response->startFastPolling, response->fastPollTimeout);
 
     uint8_t startFastPolling = response->startFastPolling;
     uint16_t fastPollTimeoutQs = response->fastPollTimeout;
@@ -610,17 +598,17 @@ void emberZclClusterPollControlServerCommandCheckInResponseHandler(EmberZclMessa
     if (clientIndex != CLIENT_INDEX_NULL) {
       if (state == WAITING) {
         if (startFastPolling) {
-          EmberZclStatus_t zclStatus = EMBER_ZCL_STATUS_FAILURE;
+          ChipZclStatus_t zclStatus = CHIP_ZCL_STATUS_FAILURE;
           if (fastPollTimeoutQs == 0) {
-            if (readServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT,
+            if (readServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_FAST_POLL_TIMEOUT,
                                     (void*)&fastPollTimeoutQs,
                                     sizeof(fastPollTimeoutQs))) {
-              zclStatus = EMBER_ZCL_STATUS_SUCCESS;
+              zclStatus = CHIP_ZCL_STATUS_SUCCESS;
             }
           } else if (validateServerFastPollTimeout(fastPollTimeoutQs)) {
-            zclStatus = EMBER_ZCL_STATUS_SUCCESS;
+            zclStatus = CHIP_ZCL_STATUS_SUCCESS;
           }
-          if (zclStatus == EMBER_ZCL_STATUS_SUCCESS) {
+          if (zclStatus == CHIP_ZCL_STATUS_SUCCESS) {
             clients[clientIndex].fastPollTimeoutQs = fastPollTimeoutQs;
           } else {
             clients[clientIndex].bindingIndex = CLIENT_INDEX_NULL;
@@ -633,83 +621,83 @@ void emberZclClusterPollControlServerCommandCheckInResponseHandler(EmberZclMessa
         // temporarily fast poll mode to stop and will begin the actual fast poll
         // mode if applicable.
         if (!pendingCheckInResponses()) {
-          emZclPollControlServerTickEventHandler();
+          chZclPollControlServerTickEventHandler();
         }
       }
     }
   }
 }
 
-void emberZclClusterPollControlServerCommandFastPollStopRequestHandler(const EmberZclCommandContext_t* context,
-                                                                       const EmberZclClusterPollControlServerCommandFastPollStopRequest_t* request)
+void chipZclClusterPollControlServerCommandFastPollStopRequestHandler(const ChipZclCommandContext_t* context,
+                                                                       const ChipZclClusterPollControlServerCommandFastPollStopRequest_t* request)
 {
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_ACTION_DENIED;
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_ACTION_DENIED;
 
-  emberAfCorePrintln("RX: FastPollStop");
+  chipAfCorePrintln("RX: FastPollStop");
 
   uint8_t clientIndex = findClientIndex(context);
   if (clientIndex != CLIENT_INDEX_NULL) {
     if (state == POLLING) {
-      status = EMBER_ZCL_STATUS_SUCCESS;
+      status = CHIP_ZCL_STATUS_SUCCESS;
       clients[clientIndex].bindingIndex = CLIENT_INDEX_NULL;
 
       // Calling the tick directly in the polling state will cause the fast
       // poll mode to stop.
       if (!outstandingFastPollRequests()) {
-        emZclPollControlServerTickEventHandler();
+        chZclPollControlServerTickEventHandler();
       }
     } else {
-      status = EMBER_ZCL_STATUS_TIMEOUT;
+      status = CHIP_ZCL_STATUS_TIMEOUT;
     }
   }
 
-  emberZclSendDefaultResponse(context, status);
+  chipZclSendDefaultResponse(context, status);
 }
 
-void emberZclClusterPollControlServerCommandSetLongPollIntervalRequestHandler(const EmberZclCommandContext_t* context,
-                                                                              const EmberZclClusterPollControlServerCommandSetLongPollIntervalRequest_t* request)
+void chipZclClusterPollControlServerCommandSetLongPollIntervalRequestHandler(const ChipZclCommandContext_t* context,
+                                                                              const ChipZclClusterPollControlServerCommandSetLongPollIntervalRequest_t* request)
 {
-#ifdef EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_ACCEPT_SET_LONG_POLL_INTERVAL_COMMAND
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+#ifdef CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_ACCEPT_SET_LONG_POLL_INTERVAL_COMMAND
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
 
   if (context->endpointId == serverEndpointId) {
     uint32_t newLongPollIntervalQs = request->newLongPollInterval;
 
-    emberAfCorePrintln("RX: SetLongPollInterval 0x%4x", newLongPollIntervalQs);
+    chipAfCorePrintln("RX: SetLongPollInterval 0x%4x", newLongPollIntervalQs);
 
     // Trying to write the attribute will trigger the PreAttributeChanged
     // callback, which will handle validation.  If the write is successful, the
     // PostAttributeChanged callback will fire, which will handle setting the new
     // long poll interval.
-    status = writeServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
+    status = writeServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_LONG_POLL_INTERVAL,
                                   (void*)&newLongPollIntervalQs,
                                   sizeof(newLongPollIntervalQs));
   }
 
-  emberZclSendDefaultResponse(context, status);
+  chipZclSendDefaultResponse(context, status);
 #endif
 }
 
-void emberZclClusterPollControlServerCommandSetShortPollIntervalRequestHandler(const EmberZclCommandContext_t* context,
-                                                                               const EmberZclClusterPollControlServerCommandSetShortPollIntervalRequest_t* request)
+void chipZclClusterPollControlServerCommandSetShortPollIntervalRequestHandler(const ChipZclCommandContext_t* context,
+                                                                               const ChipZclClusterPollControlServerCommandSetShortPollIntervalRequest_t* request)
 {
-#ifdef EMBER_AF_PLUGIN_POLL_CONTROL_SERVER_ACCEPT_SET_SHORT_POLL_INTERVAL_COMMAND
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+#ifdef CHIP_AF_PLUGIN_POLL_CONTROL_SERVER_ACCEPT_SET_SHORT_POLL_INTERVAL_COMMAND
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
 
   if (context->endpointId == serverEndpointId) {
     uint16_t newShortPollIntervalQs = request->newShortPollInterval;
 
-    emberAfCorePrintln("RX: SetShortPollInterval 0x%2x", newShortPollIntervalQs);
+    chipAfCorePrintln("RX: SetShortPollInterval 0x%2x", newShortPollIntervalQs);
 
     // Trying to write the attribute will trigger the PreAttributeChanged
     // callback, which will handle validation.  If the write is successful, the
     // AttributeChanged callback will fire, which will handle setting the new
     // short poll interval.
-    status = writeServerAttribute(EMBER_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL,
+    status = writeServerAttribute(CHIP_ZCL_CLUSTER_POLL_CONTROL_SERVER_ATTRIBUTE_SHORT_POLL_INTERVAL,
                                   (void*)&newShortPollIntervalQs,
                                   sizeof(newShortPollIntervalQs));
   }
 
-  emberZclSendDefaultResponse(context, status);
+  chipZclSendDefaultResponse(context, status);
 #endif
 }

@@ -9,7 +9,7 @@
  *
  * @return true if the callback was able to activate/deactivate the Lock.
  */
-bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
+bool chipAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
 {
   return true;
 }

@@ -1,43 +1,31 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_ZCL_LEVEL_CONTROL_SERVER
-  #include EMBER_AF_API_ZCL_LEVEL_CONTROL_SERVER
-  #define SET_ON_OFF(endpointId, onOff) emberZclLevelControlServerSetOnOff(endpointId, onOff)
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_ZCL_LEVEL_CONTROL_SERVER
+  #include CHIP_AF_API_ZCL_LEVEL_CONTROL_SERVER
+  #define SET_ON_OFF(endpointId, onOff) chipZclLevelControlServerSetOnOff(endpointId, onOff)
 #else
-static void setOnOff(EmberZclEndpointId_t endpointId, bool onOff);
+static void setOnOff(ChipZclEndpointId_t endpointId, bool onOff);
   #define SET_ON_OFF(endpointId, onOff) setOnOff(endpointId, onOff)
 #endif
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
-  #include EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
+  #include CHIP_AF_API_ZCL_SCENES_SERVER
 #endif
 
 #include "on-off-server.h"
 
 // Globals
 
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
   #ifdef DEFINETOKENS
 // Token based storage.
     #define retrieveSceneSubTableEntry(entry, i) \
@@ -46,101 +34,101 @@ static void setOnOff(EmberZclEndpointId_t endpointId, bool onOff);
   halCommonSetIndexedToken(TOKEN_ZCL_CORE_ON_OFF_SCENE_SUBTABLE, i, &entry)
   #else
 // RAM based storage.
-EmZclOnOffSceneSubTableEntry_t emZclPluginOnOffServerSceneSubTable[EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
+ChZclOnOffSceneSubTableEntry_t chZclPluginOnOffServerSceneSubTable[CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
     #define retrieveSceneSubTableEntry(entry, i) \
-  (entry = emZclPluginOnOffServerSceneSubTable[i])
+  (entry = chZclPluginOnOffServerSceneSubTable[i])
     #define saveSceneSubTableEntry(entry, i) \
-  (emZclPluginOnOffServerSceneSubTable[i] = entry)
+  (chZclPluginOnOffServerSceneSubTable[i] = entry)
   #endif
 #endif
 
-static void setOnOffHandler(const EmberZclCommandContext_t *context, bool onOff);
-static bool getOnOff(EmberZclEndpointId_t endpointId);
+static void setOnOffHandler(const ChipZclCommandContext_t *context, bool onOff);
+static bool getOnOff(ChipZclEndpointId_t endpointId);
 
-void emberZclClusterOnOffServerCommandOffRequestHandler(const EmberZclCommandContext_t *context,
-                                                        const EmberZclClusterOnOffServerCommandOffRequest_t *request)
+void chipZclClusterOnOffServerCommandOffRequestHandler(const ChipZclCommandContext_t *context,
+                                                        const ChipZclClusterOnOffServerCommandOffRequest_t *request)
 {
-  emberAfCorePrintln("RX: Off");
+  chipAfCorePrintln("RX: Off");
   setOnOffHandler(context, false); // off
 }
 
-void emberZclClusterOnOffServerCommandOnRequestHandler(const EmberZclCommandContext_t *context,
-                                                       const EmberZclClusterOnOffServerCommandOnRequest_t *request)
+void chipZclClusterOnOffServerCommandOnRequestHandler(const ChipZclCommandContext_t *context,
+                                                       const ChipZclClusterOnOffServerCommandOnRequest_t *request)
 {
-  emberAfCorePrintln("RX: On");
+  chipAfCorePrintln("RX: On");
   setOnOffHandler(context, true); // on
 }
 
-void emberZclClusterOnOffServerCommandToggleRequestHandler(const EmberZclCommandContext_t *context,
-                                                           const EmberZclClusterOnOffServerCommandToggleRequest_t *request)
+void chipZclClusterOnOffServerCommandToggleRequestHandler(const ChipZclCommandContext_t *context,
+                                                           const ChipZclClusterOnOffServerCommandToggleRequest_t *request)
 {
-  emberAfCorePrintln("RX: Toggle");
+  chipAfCorePrintln("RX: Toggle");
   setOnOffHandler(context, !getOnOff(context->endpointId));
 }
 
-static bool getOnOff(EmberZclEndpointId_t endpointId)
+static bool getOnOff(ChipZclEndpointId_t endpointId)
 {
   bool onOff;
-  if (emberZclReadAttribute(endpointId,
-                            &emberZclClusterOnOffServerSpec,
-                            EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  if (chipZclReadAttribute(endpointId,
+                            &chipZclClusterOnOffServerSpec,
+                            CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                             &onOff,
                             sizeof(onOff))
-      == EMBER_ZCL_STATUS_SUCCESS) {
+      == CHIP_ZCL_STATUS_SUCCESS) {
     return onOff;
   } else {
     return false;
   }
 }
 
-#ifndef EMBER_AF_API_ZCL_LEVEL_CONTROL_SERVER
-static void setOnOff(EmberZclEndpointId_t endpointId, bool onOff)
+#ifndef CHIP_AF_API_ZCL_LEVEL_CONTROL_SERVER
+static void setOnOff(ChipZclEndpointId_t endpointId, bool onOff)
 {
-  emberZclWriteAttribute(endpointId,
-                         &emberZclClusterOnOffServerSpec,
-                         EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  chipZclWriteAttribute(endpointId,
+                         &chipZclClusterOnOffServerSpec,
+                         CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                          &onOff,
                          sizeof(onOff));
 }
 #endif
 
-static void setOnOffHandler(const EmberZclCommandContext_t *context, bool onOff)
+static void setOnOffHandler(const ChipZclCommandContext_t *context, bool onOff)
 {
   SET_ON_OFF(context->endpointId, onOff);
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
 }
 
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
 // Scenes callback handlers...
 
-void emZclOnOffServerEraseSceneHandler(uint8_t tableIdx)
+void chZclOnOffServerEraseSceneHandler(uint8_t tableIdx)
 {
-  EmZclOnOffSceneSubTableEntry_t entry;
+  ChZclOnOffSceneSubTableEntry_t entry;
 
   entry.hasOnOffValue = false;
 
   saveSceneSubTableEntry(entry, tableIdx);
 }
 
-bool emZclOnOffServerAddSceneHandler(EmberZclClusterId_t clusterId,
+bool chZclOnOffServerAddSceneHandler(ChipZclClusterId_t clusterId,
                                      uint8_t tableIdx,
                                      const uint8_t *sceneData,
                                      uint8_t length)
 {
-  if (clusterId == EMBER_ZCL_CLUSTER_ON_OFF) {
+  if (clusterId == CHIP_ZCL_CLUSTER_ON_OFF) {
     if (length < 1) {
       return false; // ext field format error (OnOffValue byte must be present).
     }
 
     // Extract bytes from input data block and update scene subtable fields.
-    EmZclOnOffSceneSubTableEntry_t entry = { 0 };
+    ChZclOnOffSceneSubTableEntry_t entry = { 0 };
     uint8_t *pData = (uint8_t *)sceneData;
 
     // We only know of one extension for the On/Off cluster and it is just one byte,
     // which means we can skip some logic for this cluster.
     // If other extensions are added in this cluster, more logic will be needed here.
     entry.hasOnOffValue = true;
-    entry.onOffValue = emberZclPluginScenesServerGetUint8FromBuffer(&pData);
+    entry.onOffValue = chipZclPluginScenesServerGetUint8FromBuffer(&pData);
 
     saveSceneSubTableEntry(entry, tableIdx);
 
@@ -150,7 +138,7 @@ bool emZclOnOffServerAddSceneHandler(EmberZclClusterId_t clusterId,
   return false;
 }
 
-void emZclOnOffServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
+void chZclOnOffServerRecallSceneHandler(ChipZclEndpointId_t endpointId,
                                         uint8_t tableIdx,
                                         uint32_t transitionTime100mS)
 {
@@ -159,59 +147,59 @@ void emZclOnOffServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
   // attribute(s), in a production system this could be replaced by a call
   // to the relevant onOff command handler to actually change the hw state.
 
-  EmZclOnOffSceneSubTableEntry_t entry;
+  ChZclOnOffSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
   if (entry.hasOnOffValue) {
-    emberZclWriteAttribute(endpointId,
-                           &emberZclClusterOnOffServerSpec,
-                           EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+    chipZclWriteAttribute(endpointId,
+                           &chipZclClusterOnOffServerSpec,
+                           CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                            (uint8_t *)&entry.onOffValue,
                            sizeof(entry.onOffValue));
   }
 }
 
-void emZclOnOffServerStoreSceneHandler(EmberZclEndpointId_t endpointId,
+void chZclOnOffServerStoreSceneHandler(ChipZclEndpointId_t endpointId,
                                        uint8_t tableIdx)
 {
-  EmZclOnOffSceneSubTableEntry_t entry;
+  ChZclOnOffSceneSubTableEntry_t entry;
 
-  entry.hasOnOffValue = (emberZclReadAttribute(endpointId,
-                                               &emberZclClusterOnOffServerSpec,
-                                               EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  entry.hasOnOffValue = (chipZclReadAttribute(endpointId,
+                                               &chipZclClusterOnOffServerSpec,
+                                               CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                                                (uint8_t *)&entry.onOffValue,
                                                sizeof(entry.onOffValue))
-                         == EMBER_ZCL_STATUS_SUCCESS);
+                         == CHIP_ZCL_STATUS_SUCCESS);
 
   saveSceneSubTableEntry(entry, tableIdx);
 }
 
-void emZclOnOffServerCopySceneHandler(uint8_t srcTableIdx, uint8_t dstTableIdx)
+void chZclOnOffServerCopySceneHandler(uint8_t srcTableIdx, uint8_t dstTableIdx)
 {
-  EmZclOnOffSceneSubTableEntry_t entry;
+  ChZclOnOffSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, srcTableIdx);
 
   saveSceneSubTableEntry(entry, dstTableIdx);
 }
 
-void emZclOnOffServerViewSceneHandler(uint8_t tableIdx, uint8_t **ppExtFldData)
+void chZclOnOffServerViewSceneHandler(uint8_t tableIdx, uint8_t **ppExtFldData)
 {
-  EmZclOnOffSceneSubTableEntry_t entry;
+  ChZclOnOffSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
   if (entry.hasOnOffValue) {
-    emberZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
-                                                EMBER_ZCL_CLUSTER_ON_OFF);
-    emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData, 1);  // length=1
-    emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData, entry.onOffValue);
+    chipZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
+                                                CHIP_ZCL_CLUSTER_ON_OFF);
+    chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData, 1);  // length=1
+    chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData, entry.onOffValue);
   }
 }
 
-void emZclOnOffServerPrintInfoSceneHandler(uint8_t tableIdx)
+void chZclOnOffServerPrintInfoSceneHandler(uint8_t tableIdx)
 {
-  EmZclOnOffSceneSubTableEntry_t entry;
+  ChZclOnOffSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
-  emberAfCorePrint(" on/off:%x", entry.onOffValue);
+  chipAfCorePrint(" on/off:%x", entry.onOffValue);
 }
 #endif

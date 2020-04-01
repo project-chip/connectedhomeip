@@ -1,29 +1,17 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_BULB_PWM_DRIVER
-#include EMBER_AF_API_CONNECTION_MANAGER
-#include EMBER_AF_API_HAL
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_BULB_PWM_DRIVER
+#include CHIP_AF_API_CONNECTION_MANAGER
+#include CHIP_AF_API_HAL
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
 
 #define BULB_UI_SHORT_REBOOT_TIMEOUT_MS  (1 * MILLISECOND_TICKS_PER_SECOND)
@@ -57,29 +45,29 @@ static void joinNetwork(void);
 static void leaveNetwork(void);
 static size_t getNumberOfUsedBinds(void);
 
-EmberEventControl emBulbUiEzModeControl;
-EmberEventControl emBulbUiEzBlinkControl;
-EmberEventControl emBulbUiRebootControl;
+ChipEventControl emBulbUiEzModeControl;
+ChipEventControl emBulbUiEzBlinkControl;
+ChipEventControl emBulbUiRebootControl;
 
 static uint8_t rebootEventState;
 static bool initiateEzModeOnAttach;
 static size_t numBindingsStartEzMode = 0;
-static EmberZclEndpointId_t endpoint = EMBER_AF_PLUGIN_BULB_UI_LIGHT_ENDPOINT;
+static ChipZclEndpointId_t endpoint = CHIP_AF_PLUGIN_BULB_UI_LIGHT_ENDPOINT;
 
 void emBulbUiInitHandler(void)
 {
-  EmberZclEndpointIndex_t endpointIndex;
+  ChipZclEndpointIndex_t endpointIndex;
   rebootEventState = REBOOT_EVENT_STATE_INITIAL_CHECK;
   initiateEzModeOnAttach = false;
 
-  endpointIndex = emberZclEndpointIdToIndex(EMBER_AF_PLUGIN_BULB_UI_LIGHT_ENDPOINT,
-                                            &emberZclClusterOnOffServerSpec);
-  if (endpointIndex == EMBER_ZCL_ENDPOINT_INDEX_NULL) {
-    emberAfCorePrintln("####ERROR!! Invalid endpoint selected for bulb UI Light Endpoint option!  Bulb UI will not function properly!!\n");
-    endpoint = emZclEndpointTable[0].endpointId;
+  endpointIndex = chipZclEndpointIdToIndex(CHIP_AF_PLUGIN_BULB_UI_LIGHT_ENDPOINT,
+                                            &chipZclClusterOnOffServerSpec);
+  if (endpointIndex == CHIP_ZCL_ENDPOINT_INDEX_NULL) {
+    chipAfCorePrintln("####ERROR!! Invalid endpoint selected for bulb UI Light Endpoint option!  Bulb UI will not function properly!!\n");
+    endpoint = chZclEndpointTable[0].endpointId;
   }
 
-  emberEventControlSetActive(emBulbUiRebootControl);
+  chipEventControlSetActive(emBulbUiRebootControl);
 }
 
 // On boot, increment the counter token and perform any bulb initialization.
@@ -103,7 +91,7 @@ void emBulbUiRebootHandler(void)
 
   switch (rebootEventState) {
     case REBOOT_EVENT_STATE_INITIAL_CHECK:
-      emberAfDebugPrintln("Bulb UI event Reset Reason:  %x %2x %p %p",
+      chipAfDebugPrintln("Bulb UI event Reset Reason:  %x %2x %p %p",
                           halGetResetInfo(),
                           halGetExtendedResetInfo(),
                           halGetResetString(),
@@ -111,14 +99,14 @@ void emBulbUiRebootHandler(void)
 
       incrementShortRebootMonitor();
       rebootEventState = REBOOT_EVENT_STATE_SHORT_REBOOT_TIME;
-      emberEventControlSetDelayMS(emBulbUiRebootControl,
+      chipEventControlSetDelayMS(emBulbUiRebootControl,
                                   BULB_UI_SHORT_REBOOT_TIMEOUT_MS);
 
       break;
 
     case REBOOT_EVENT_STATE_SHORT_REBOOT_TIME:
-      emberEventControlSetInactive(emBulbUiRebootControl);
-      emberAfCorePrintln("Short reboot timer ended, %d reboots detected",
+      chipEventControlSetInactive(emBulbUiRebootControl);
+      chipAfCorePrintln("Short reboot timer ended, %d reboots detected",
                          shortRebootMonitor);
 
       if (shortRebootMonitor >= 10) {
@@ -134,16 +122,16 @@ void emBulbUiRebootHandler(void)
         // If the user wants to enter EZ Mode and the device is already attached
         // to the network, do so immediately.  Otherwise, set the initEzMode flag
         // so that the device will enter ez mode on the next attach.
-        if (emberNetworkStatus() == EMBER_JOINED_NETWORK_ATTACHED) {
+        if (chipNetworkStatus() == CHIP_JOINED_NETWORK_ATTACHED) {
           initiateEzModeOnAttach = false;
-          emberEventControlSetActive(emBulbUiEzModeControl);
+          chipEventControlSetActive(emBulbUiEzModeControl);
         } else {
           initiateEzModeOnAttach = true;
         }
       } else if (shortRebootMonitor == 1) {
         // If the status is no network, then also try to join one now since we
         // are just now booting up
-        if (emberNetworkStatus() == EMBER_NO_NETWORK) {
+        if (chipNetworkStatus() == CHIP_NO_NETWORK) {
           joinNetwork();
         }
       }
@@ -159,20 +147,20 @@ void emBulbUiRebootHandler(void)
   }
 }
 
-void emBulbUiNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
-                                  EmberNetworkStatus oldNetworkStatus,
-                                  EmberJoinFailureReason reason)
+void emBulbUiNetworkStatusHandler(ChipNetworkStatus newNetworkStatus,
+                                  ChipNetworkStatus oldNetworkStatus,
+                                  ChipJoinFailureReason reason)
 {
-  if ((newNetworkStatus == EMBER_JOINED_NETWORK_ATTACHED)
+  if ((newNetworkStatus == CHIP_JOINED_NETWORK_ATTACHED)
       && (initiateEzModeOnAttach)) {
     // Ez Mode should only start on the first attach, not every time the bulb
     // attaches / reattaches for the life of the bulb
     initiateEzModeOnAttach = false;
-    emberEventControlSetDelayMS(emBulbUiEzModeControl,
+    chipEventControlSetDelayMS(emBulbUiEzModeControl,
                                 EZ_MODE_BLINK_REPEAT_TIME_MS);
-  } else if ((newNetworkStatus == EMBER_NO_NETWORK)
-             && (oldNetworkStatus == EMBER_JOINED_NETWORK_ATTACHED)) {
-    emberAfCorePrintln("Lost network");
+  } else if ((newNetworkStatus == CHIP_NO_NETWORK)
+             && (oldNetworkStatus == CHIP_JOINED_NETWORK_ATTACHED)) {
+    chipAfCorePrintln("Lost network");
     halBulbPwmDriverLedBlink(STACK_LEFT_BLINK_NUMBER,
                              STACK_LEFT_BLINK_TIME_MS);
   }
@@ -180,27 +168,27 @@ void emBulbUiNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
 
 // Before starting EZ Mode, the system will determine how many binds are
 // present in the binding table (as there is no callback generated when a bind
-// is created).  A call to emberZclStartEzMode will then initiate EZ mode
+// is created).  A call to chipZclStartEzMode will then initiate EZ mode
 // operation, and the bulb will start to blink the EZ Mode search pattern.  The
 // ezModeBlink event will then be used to poll the number of binds created
 // every few seconds to see if any new entries have been generated.
 void emBulbUiEzModeHandler(void)
 {
-  EmberStatus status;
+  ChipStatus status;
 
-  emberEventControlSetInactive(emBulbUiEzModeControl);
+  chipEventControlSetInactive(emBulbUiEzModeControl);
 
-  status = emberZclStartEzMode();
+  status = chipZclStartEzMode();
 
-  if (status == EMBER_SUCCESS) {
-    emberAfCorePrintln("starting ez mode\n");
+  if (status == CHIP_SUCCESS) {
+    chipAfCorePrintln("starting ez mode\n");
     numBindingsStartEzMode = getNumberOfUsedBinds();
     halBulbPwmDriverLedBlink(EZ_MODE_BLINK_NUMBER,
                              EZ_MODE_BLINK_TIME_MS);
-    emberEventControlSetDelayMS(emBulbUiEzBlinkControl,
+    chipEventControlSetDelayMS(emBulbUiEzBlinkControl,
                                 EZ_MODE_BLINK_REPEAT_TIME_MS);
   } else {
-    emberAfCorePrintln("Unable to start EZ mode: %d", status);
+    chipAfCorePrintln("Unable to start EZ mode: %d", status);
   }
 }
 
@@ -212,16 +200,16 @@ void emBulbUiEzBlinkHandler(void)
   numBindings = getNumberOfUsedBinds();
 
   if (numBindings != numBindingsStartEzMode) {
-    emberAfCorePrintln("%d new bindings created",
+    chipAfCorePrintln("%d new bindings created",
                        numBindings - numBindingsStartEzMode);
     blinkForNewBind = true;
 
     numBindingsStartEzMode = numBindings;
-    emberEventControlSetDelayMS(emBulbUiEzBlinkControl,
+    chipEventControlSetDelayMS(emBulbUiEzBlinkControl,
                                 EZ_MODE_BLINK_REPEAT_TIME_MS);
   }
 
-  if (emberZclEzModeIsActive()) {
+  if (chipZclEzModeIsActive()) {
     if (blinkForNewBind) {
       halBulbPwmDriverLedBlink(NEW_BIND_BLINK_NUMBER,
                                NEW_BIND_BLINK_TIME_MS);
@@ -229,24 +217,24 @@ void emBulbUiEzBlinkHandler(void)
       halBulbPwmDriverLedBlink(EZ_MODE_BLINK_NUMBER,
                                EZ_MODE_BLINK_TIME_MS);
     }
-    emberEventControlSetDelayMS(emBulbUiEzBlinkControl,
+    chipEventControlSetDelayMS(emBulbUiEzBlinkControl,
                                 EZ_MODE_BLINK_REPEAT_TIME_MS);
   } else {
-    emberEventControlSetInactive(emBulbUiEzBlinkControl);
+    chipEventControlSetInactive(emBulbUiEzBlinkControl);
   }
 }
 
 static size_t getNumberOfUsedBinds(void)
 {
-  EmberZclBindingId_t numberOfBinds = 0;
-  EmberZclBindingId_t currentBindIndex;
-  EmberZclBindingEntry_t currentBind;
+  ChipZclBindingId_t numberOfBinds = 0;
+  ChipZclBindingId_t currentBindIndex;
+  ChipZclBindingEntry_t currentBind;
 
   for (currentBindIndex = 0;
-       currentBindIndex < EMBER_ZCL_BINDING_TABLE_SIZE;
+       currentBindIndex < CHIP_ZCL_BINDING_TABLE_SIZE;
        currentBindIndex++) {
     // Check to see if the binding table entry is active
-    if (emberZclGetBinding(currentBindIndex, &currentBind)) {
+    if (chipZclGetBinding(currentBindIndex, &currentBind)) {
       numberOfBinds++;
     }
   }
@@ -255,9 +243,9 @@ static size_t getNumberOfUsedBinds(void)
 
 static void resetBindingsAndAttributes(void)
 {
-  emberAfCorePrintln("Clearing binding table and resetting all attributes\n");
-  emberZclRemoveAllBindings();
-  emberZclResetAttributes(endpoint);
+  chipAfCorePrintln("Clearing binding table and resetting all attributes\n");
+  chipZclRemoveAllBindings();
+  chipZclResetAttributes(endpoint);
 }
 
 static void incrementShortRebootMonitor(void)
@@ -268,26 +256,26 @@ static void incrementShortRebootMonitor(void)
 static void enableIdentify(void)
 {
   uint16_t identifyTimeS = DEFAULT_IDENTIFY_TIME_S;
-  EmberZclStatus_t status;
-  EmberZclEndpointId_t endpoint;
-  EmberZclEndpointIndex_t i;
+  ChipZclStatus_t status;
+  ChipZclEndpointId_t endpoint;
+  ChipZclEndpointIndex_t i;
 
-  emberAfCorePrintln("bulb-ui: identify mode enabled for %d seconds", identifyTimeS);
+  chipAfCorePrintln("bulb-ui: identify mode enabled for %d seconds", identifyTimeS);
 
-  for (i = 0; i < emZclEndpointCount; i++) {
-    endpoint = emberZclEndpointIndexToId(i,
-                                         &emberZclClusterIdentifyServerSpec);
-    if (endpoint != EMBER_ZCL_ENDPOINT_NULL) {
-      status = emberZclWriteAttribute(endpoint,
-                                      &emberZclClusterIdentifyServerSpec,
-                                      EMBER_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
+  for (i = 0; i < chZclEndpointCount; i++) {
+    endpoint = chipZclEndpointIndexToId(i,
+                                         &chipZclClusterIdentifyServerSpec);
+    if (endpoint != CHIP_ZCL_ENDPOINT_NULL) {
+      status = chipZclWriteAttribute(endpoint,
+                                      &chipZclClusterIdentifyServerSpec,
+                                      CHIP_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
                                       &identifyTimeS,
                                       sizeof(identifyTimeS));
-      if (status != EMBER_ZCL_STATUS_SUCCESS) {
-        emberAfCorePrintln("End node UI unable to identify on endpoint %d!",
+      if (status != CHIP_ZCL_STATUS_SUCCESS) {
+        chipAfCorePrintln("End node UI unable to identify on endpoint %d!",
                            i);
       } else {
-        emberAfCorePrintln("Identifying for %d seconds on endpoint %d",
+        chipAfCorePrintln("Identifying for %d seconds on endpoint %d",
                            identifyTimeS,
                            i);
       }
@@ -299,31 +287,31 @@ static void enableIdentify(void)
 
 static void leaveNetwork(void)
 {
-  emberAfCorePrintln("Attempting to reset the network connection");
-  emberConnectionManagerLeaveNetwork();
+  chipAfCorePrintln("Attempting to reset the network connection");
+  chipConnectionManagerLeaveNetwork();
 }
 
 static void joinNetwork(void)
 {
-  emberAfCorePrintln("Attempting to join a network");
-  emberConnectionManagerStartConnect();
+  chipAfCorePrintln("Attempting to join a network");
+  chipConnectionManagerStartConnect();
 }
 
-void emberZclIdentifyServerStartIdentifyingCallback(uint16_t identifyTimeS)
+void chipZclIdentifyServerStartIdentifyingCallback(uint16_t identifyTimeS)
 {
   // This callback is called whenever the endpoint should identify itself.  The
   // identification procedure is application specific, and could be implemented
   // by blinking an LED, playing a sound, or displaying a message.
 
-  emberAfCorePrintln("Identifying...");
+  chipAfCorePrintln("Identifying...");
   halBulbPwmDriverLedBlink(HAL_BULB_PWM_DRIVER_BLINK_FOREVER, 1000);
 }
 
-void emberZclIdentifyServerStopIdentifyingCallback(void)
+void chipZclIdentifyServerStopIdentifyingCallback(void)
 {
   // This callback is called whenever the endpoint should stop identifying
   // itself.
 
-  emberAfCorePrintln("Identify complete");
+  chipAfCorePrintln("Identify complete");
   halBulbPwmDriverLedOn(0);
 }

@@ -1,37 +1,25 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_BUFFER_MANAGEMENT
-#include EMBER_AF_API_EVENT_QUEUE
-#include EMBER_AF_API_HAL
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_BUFFER_MANAGEMENT
+#include CHIP_AF_API_EVENT_QUEUE
+#include CHIP_AF_API_HAL
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
-  #include EMBER_AF_API_ZCL_SCENES_SERVER
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
+  #include CHIP_AF_API_ZCL_SCENES_SERVER
 #endif
 #include "level-control-server.h"
 
-#define MIN_LEVEL EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL
-#define MAX_LEVEL EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL
+#define MIN_LEVEL CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL
+#define MAX_LEVEL CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL
 
 #define BOUND_MIN(value)     ((value) < MIN_LEVEL ? MIN_LEVEL : (value))
 #define BOUND_MAX(value)     ((value) < MAX_LEVEL ? (value) : MAX_LEVEL)
@@ -40,7 +28,7 @@
 
 #define MIN_DELAY_MS 1
 
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
   #ifdef DEFINETOKENS
 // Token based storage.
     #define retrieveSceneSubTableEntry(entry, i) \
@@ -49,42 +37,42 @@
   halCommonSetIndexedToken(TOKEN_ZCL_CORE_LEVEL_CONTROL_SCENE_SUBTABLE, i, &entry)
   #else
 // RAM based storage.
-EmZclLevelControlSceneSubTableEntry_t emZclPluginLevelControlServerSceneSubTable[EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
+ChZclLevelControlSceneSubTableEntry_t chZclPluginLevelControlServerSceneSubTable[CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
     #define retrieveSceneSubTableEntry(entry, i) \
-  (entry = emZclPluginLevelControlServerSceneSubTable[i])
+  (entry = chZclPluginLevelControlServerSceneSubTable[i])
     #define saveSceneSubTableEntry(entry, i) \
-  (emZclPluginLevelControlServerSceneSubTable[i] = entry)
+  (chZclPluginLevelControlServerSceneSubTable[i] = entry)
   #endif
 #endif
 
 int abs(int I);
-static void moveToLevelHandler(const EmberZclCommandContext_t *context,
-                               const EmberZclClusterLevelControlServerCommandMoveToLevelRequest_t *request,
+static void moveToLevelHandler(const ChipZclCommandContext_t *context,
+                               const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t *request,
                                bool withOnOff);
-static void moveHandler(const EmberZclCommandContext_t *context,
-                        const EmberZclClusterLevelControlServerCommandMoveRequest_t *request,
+static void moveHandler(const ChipZclCommandContext_t *context,
+                        const ChipZclClusterLevelControlServerCommandMoveRequest_t *request,
                         bool withOnOff);
-static void stepHandler(const EmberZclCommandContext_t *context,
-                        const EmberZclClusterLevelControlServerCommandStepRequest_t *request,
+static void stepHandler(const ChipZclCommandContext_t *context,
+                        const ChipZclClusterLevelControlServerCommandStepRequest_t *request,
                         bool withOnOff);
-static void stopHandler(const EmberZclCommandContext_t *context,
-                        const EmberZclClusterLevelControlServerCommandStopRequest_t *request,
+static void stopHandler(const ChipZclCommandContext_t *context,
+                        const ChipZclClusterLevelControlServerCommandStopRequest_t *request,
                         bool withOnOff);
-static bool getOnOff(EmberZclEndpointId_t endpointId);
-static void setOnOff(EmberZclEndpointId_t endpointId, bool onOff);
-static uint8_t  getCurrentLevel(EmberZclEndpointId_t endpointId);
-static uint16_t getOnOffTransitionTime(EmberZclEndpointId_t endpointId);
-static uint8_t getDefaultMoveRate(EmberZclEndpointId_t endpointId);
+static bool getOnOff(ChipZclEndpointId_t endpointId);
+static void setOnOff(ChipZclEndpointId_t endpointId, bool onOff);
+static uint8_t  getCurrentLevel(ChipZclEndpointId_t endpointId);
+static uint16_t getOnOffTransitionTime(ChipZclEndpointId_t endpointId);
+static uint8_t getDefaultMoveRate(ChipZclEndpointId_t endpointId);
 static bool shouldExecuteIfOff(uint8_t endpoint,
                                uint8_t optionMask,
                                uint8_t optionOverride);
-static void setCurrentLevel(EmberZclEndpointId_t endpointId,
+static void setCurrentLevel(ChipZclEndpointId_t endpointId,
                             uint8_t currentLevel);
-static uint8_t getOnLevelOrCurrentLevel(EmberZclEndpointId_t endpointId);
+static uint8_t getOnLevelOrCurrentLevel(ChipZclEndpointId_t endpointId);
 
 typedef struct {
   uint32_t delayMs;
-  EmberZclEndpointId_t endpointId;
+  ChipZclEndpointId_t endpointId;
   uint8_t targetLevel;
   uint8_t postTransitionLevel;
   bool increasing;
@@ -108,9 +96,9 @@ static EventActions actions = {
 };
 
 static LevelControlEvent *cancel(State *state);
-static EmberZclStatus_t schedule(State *state);
+static ChipZclStatus_t schedule(State *state);
 
-void emberZclLevelControlServerSetOnOff(EmberZclEndpointId_t endpointId,
+void chipZclLevelControlServerSetOnOff(ChipZclEndpointId_t endpointId,
                                         bool value)
 {
   State state = {
@@ -146,71 +134,71 @@ void emberZclLevelControlServerSetOnOff(EmberZclEndpointId_t endpointId,
   }
 }
 
-void emberZclClusterLevelControlServerCommandMoveToLevelRequestHandler(const EmberZclCommandContext_t *context,
-                                                                       const EmberZclClusterLevelControlServerCommandMoveToLevelRequest_t *request)
+void chipZclClusterLevelControlServerCommandMoveToLevelRequestHandler(const ChipZclCommandContext_t *context,
+                                                                       const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t *request)
 {
   moveToLevelHandler(context, request, false); // without on/off
 }
 
-void emberZclClusterLevelControlServerCommandMoveRequestHandler(const EmberZclCommandContext_t *context,
-                                                                const EmberZclClusterLevelControlServerCommandMoveRequest_t *request)
+void chipZclClusterLevelControlServerCommandMoveRequestHandler(const ChipZclCommandContext_t *context,
+                                                                const ChipZclClusterLevelControlServerCommandMoveRequest_t *request)
 {
   moveHandler(context, request, false); // without on/off
 }
 
-void emberZclClusterLevelControlServerCommandStepRequestHandler(const EmberZclCommandContext_t *context,
-                                                                const EmberZclClusterLevelControlServerCommandStepRequest_t *request)
+void chipZclClusterLevelControlServerCommandStepRequestHandler(const ChipZclCommandContext_t *context,
+                                                                const ChipZclClusterLevelControlServerCommandStepRequest_t *request)
 {
   stepHandler(context, request, false); // without on/off
 }
 
-void emberZclClusterLevelControlServerCommandStopRequestHandler(const EmberZclCommandContext_t *context,
-                                                                const EmberZclClusterLevelControlServerCommandStopRequest_t *request)
+void chipZclClusterLevelControlServerCommandStopRequestHandler(const ChipZclCommandContext_t *context,
+                                                                const ChipZclClusterLevelControlServerCommandStopRequest_t *request)
 {
   stopHandler(context, request, false); // without on/off
 }
 
-void emberZclClusterLevelControlServerCommandMoveToLevelWithOnOffRequestHandler(const EmberZclCommandContext_t *context,
-                                                                                const EmberZclClusterLevelControlServerCommandMoveToLevelWithOnOffRequest_t *request)
+void chipZclClusterLevelControlServerCommandMoveToLevelWithOnOffRequestHandler(const ChipZclCommandContext_t *context,
+                                                                                const ChipZclClusterLevelControlServerCommandMoveToLevelWithOnOffRequest_t *request)
 {
   moveToLevelHandler(context,
-                     (const EmberZclClusterLevelControlServerCommandMoveToLevelRequest_t *)request,
+                     (const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t *)request,
                      true); // with on/off
 }
 
-void emberZclClusterLevelControlServerCommandMoveWithOnOffRequestHandler(const EmberZclCommandContext_t *context,
-                                                                         const EmberZclClusterLevelControlServerCommandMoveWithOnOffRequest_t *request)
+void chipZclClusterLevelControlServerCommandMoveWithOnOffRequestHandler(const ChipZclCommandContext_t *context,
+                                                                         const ChipZclClusterLevelControlServerCommandMoveWithOnOffRequest_t *request)
 {
   moveHandler(context,
-              (const EmberZclClusterLevelControlServerCommandMoveRequest_t *)request,
+              (const ChipZclClusterLevelControlServerCommandMoveRequest_t *)request,
               true); // with on/off
 }
 
-void emberZclClusterLevelControlServerCommandStepWithOnOffRequestHandler(const EmberZclCommandContext_t *context,
-                                                                         const EmberZclClusterLevelControlServerCommandStepWithOnOffRequest_t *request)
+void chipZclClusterLevelControlServerCommandStepWithOnOffRequestHandler(const ChipZclCommandContext_t *context,
+                                                                         const ChipZclClusterLevelControlServerCommandStepWithOnOffRequest_t *request)
 {
   stepHandler(context,
-              (const EmberZclClusterLevelControlServerCommandStepRequest_t *)request,
+              (const ChipZclClusterLevelControlServerCommandStepRequest_t *)request,
               true); // with on/off
 }
 
-void emberZclClusterLevelControlServerCommandStopWithOnOffRequestHandler(const EmberZclCommandContext_t *context,
-                                                                         const EmberZclClusterLevelControlServerCommandStopWithOnOffRequest_t *request)
+void chipZclClusterLevelControlServerCommandStopWithOnOffRequestHandler(const ChipZclCommandContext_t *context,
+                                                                         const ChipZclClusterLevelControlServerCommandStopWithOnOffRequest_t *request)
 {
   stopHandler(context,
-              (const EmberZclClusterLevelControlServerCommandStopRequest_t *)request,
+              (const ChipZclClusterLevelControlServerCommandStopRequest_t *)request,
               true); // with on/off
 }
 
-static void moveToLevelHandler(const EmberZclCommandContext_t *context,
-                               const EmberZclClusterLevelControlServerCommandMoveToLevelRequest_t *request,
+static void moveToLevelHandler(const ChipZclCommandContext_t *context,
+                               const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t *request,
                                bool withOnOff)
 {
-  emberAfCorePrintln("RX: MoveToLevel%s", (withOnOff ? "WithOnOff" : ""));
+  chipAfCorePrintln("RX: MoveToLevel%s", (withOnOff ? "WithOnOff" : ""));
 
   // Use OptionsMask and OptionsOverride when implemented
   if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE)) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -230,10 +218,10 @@ static void moveToLevelHandler(const EmberZclCommandContext_t *context,
     setOnOff(context->endpointId, (state.targetLevel != MIN_LEVEL));
   }
 
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
   if (currentLevel == state.targetLevel) {
     cancel(&state);
-    status = EMBER_ZCL_STATUS_SUCCESS;
+    status = CHIP_ZCL_STATUS_SUCCESS;
   } else {
     uint8_t stepSize = abs(currentLevel - request->level);
     uint16_t onOffTransitionTime = getOnOffTransitionTime(context->endpointId);
@@ -247,14 +235,14 @@ static void moveToLevelHandler(const EmberZclCommandContext_t *context,
     state.delayMs = MAX(delayMs, MIN_DELAY_MS); // Make sure we didn't round down to zero
     status = schedule(&state);
   }
-  emberZclSendDefaultResponse(context, status);
+  chipZclSendDefaultResponse(context, status);
 }
 
-static void moveHandler(const EmberZclCommandContext_t *context,
-                        const EmberZclClusterLevelControlServerCommandMoveRequest_t *request,
+static void moveHandler(const ChipZclCommandContext_t *context,
+                        const ChipZclClusterLevelControlServerCommandMoveRequest_t *request,
                         bool withOnOff)
 {
-  emberAfCorePrintln("RX: Move%s", (withOnOff ? "WithOnOff" : ""));
+  chipAfCorePrintln("RX: Move%s", (withOnOff ? "WithOnOff" : ""));
 
   uint8_t level;
   switch (request->moveMode) {
@@ -265,19 +253,19 @@ static void moveHandler(const EmberZclCommandContext_t *context,
       level = MIN_LEVEL;
       break;
     default:
-      emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_INVALID_FIELD);
+      chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_INVALID_FIELD);
       return;
   }
 
   // Use OptionsMask and OptionsOverride when implemented
   if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE)) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
   // Moving at zero rate means not moving at all
   if (request->rate == 0) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -295,10 +283,10 @@ static void moveHandler(const EmberZclCommandContext_t *context,
     setOnOff(context->endpointId, (state.targetLevel != MIN_LEVEL));
   }
 
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
   if (currentLevel == state.targetLevel) {
     cancel(&state);
-    status = EMBER_ZCL_STATUS_SUCCESS;
+    status = CHIP_ZCL_STATUS_SUCCESS;
   } else {
     uint8_t  defaultMoveRate = getDefaultMoveRate(context->endpointId);
     uint32_t delayMs = (request->rate == 0xFF
@@ -307,14 +295,14 @@ static void moveHandler(const EmberZclCommandContext_t *context,
     state.delayMs = MAX(delayMs, MIN_DELAY_MS);   // Make sure we didn't round down to zero
     status = schedule(&state);
   }
-  emberZclSendDefaultResponse(context, status);
+  chipZclSendDefaultResponse(context, status);
 }
 
-static void stepHandler(const EmberZclCommandContext_t *context,
-                        const EmberZclClusterLevelControlServerCommandStepRequest_t *request,
+static void stepHandler(const ChipZclCommandContext_t *context,
+                        const ChipZclClusterLevelControlServerCommandStepRequest_t *request,
                         bool withOnOff)
 {
-  emberAfCorePrintln("RX: Step%s", (withOnOff ? "WithOnOff" : ""));
+  chipAfCorePrintln("RX: Step%s", (withOnOff ? "WithOnOff" : ""));
 
   uint8_t currentLevel = getCurrentLevel(context->endpointId);
   uint8_t level;
@@ -326,13 +314,13 @@ static void stepHandler(const EmberZclCommandContext_t *context,
       level = BOUND_MIN(currentLevel - request->stepSize);
       break;
     default:
-      emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_INVALID_FIELD);
+      chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_INVALID_FIELD);
       return;
   }
 
   // Use OptionsMask and OptionsOverride when implemented
   if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE)) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -349,10 +337,10 @@ static void stepHandler(const EmberZclCommandContext_t *context,
     setOnOff(context->endpointId, (state.targetLevel != MIN_LEVEL));
   }
 
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
   if (currentLevel == state.targetLevel) {
     cancel(&state);
-    status = EMBER_ZCL_STATUS_SUCCESS;
+    status = CHIP_ZCL_STATUS_SUCCESS;
   } else {
     state.delayMs = (request->transitionTime == 0xFFFF
                      ? MIN_DELAY_MS
@@ -361,18 +349,18 @@ static void stepHandler(const EmberZclCommandContext_t *context,
                         / request->stepSize));
     status = schedule(&state);
   }
-  emberZclSendDefaultResponse(context, status);
+  chipZclSendDefaultResponse(context, status);
 }
 
-static void stopHandler(const EmberZclCommandContext_t *context,
-                        const EmberZclClusterLevelControlServerCommandStopRequest_t *request,
+static void stopHandler(const ChipZclCommandContext_t *context,
+                        const ChipZclClusterLevelControlServerCommandStopRequest_t *request,
                         bool withOnOff)
 {
-  emberAfCorePrintln("RX: Stop%s", (withOnOff ? "WithOnOff" : ""));
+  chipAfCorePrintln("RX: Stop%s", (withOnOff ? "WithOnOff" : ""));
 
   // Use OptionsMask and OptionsOverride when implemented
   if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE)) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -382,60 +370,60 @@ static void stopHandler(const EmberZclCommandContext_t *context,
   };
   cancel(&state);
   //}
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
 }
 
-static bool getOnOff(EmberZclEndpointId_t endpointId)
+static bool getOnOff(ChipZclEndpointId_t endpointId)
 {
   bool onOff;
-  if (emberZclReadAttribute(endpointId,
-                            &emberZclClusterOnOffServerSpec,
-                            EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  if (chipZclReadAttribute(endpointId,
+                            &chipZclClusterOnOffServerSpec,
+                            CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                             &onOff,
                             sizeof(onOff))
-      == EMBER_ZCL_STATUS_SUCCESS) {
+      == CHIP_ZCL_STATUS_SUCCESS) {
     // Returns true if the light is on, false if the light is off
     return onOff;
   } else {
-    // If emberZclReadAttribute fails to return a success status,
+    // If chipZclReadAttribute fails to return a success status,
     // false is returned as a default to represent the off state
     return false;
   }
 }
 
-static void setOnOff(EmberZclEndpointId_t endpointId, bool onOff)
+static void setOnOff(ChipZclEndpointId_t endpointId, bool onOff)
 {
-  emberZclWriteAttribute(endpointId,
-                         &emberZclClusterOnOffServerSpec,
-                         EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  chipZclWriteAttribute(endpointId,
+                         &chipZclClusterOnOffServerSpec,
+                         CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                          &onOff,
                          sizeof(onOff));
 }
 
-static uint8_t getCurrentLevel(EmberZclEndpointId_t endpointId)
+static uint8_t getCurrentLevel(ChipZclEndpointId_t endpointId)
 {
   uint8_t currentLevel;
-  if (emberZclReadAttribute(endpointId,
-                            &emberZclClusterLevelControlServerSpec,
-                            EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+  if (chipZclReadAttribute(endpointId,
+                            &chipZclClusterLevelControlServerSpec,
+                            CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                             &currentLevel,
                             sizeof(currentLevel))
-      == EMBER_ZCL_STATUS_SUCCESS) {
+      == CHIP_ZCL_STATUS_SUCCESS) {
     return currentLevel;
   } else {
     return 0;
   }
 }
 
-static uint16_t getOnOffTransitionTime(EmberZclEndpointId_t endpointId)
+static uint16_t getOnOffTransitionTime(ChipZclEndpointId_t endpointId)
 {
   uint16_t onOffTransitionTime;
-  if (emberZclReadAttribute(endpointId,
-                            &emberZclClusterLevelControlServerSpec,
-                            EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_ON_OFF_TRANSITION_TIME,
+  if (chipZclReadAttribute(endpointId,
+                            &chipZclClusterLevelControlServerSpec,
+                            CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_ON_OFF_TRANSITION_TIME,
                             &onOffTransitionTime,
                             sizeof(onOffTransitionTime))
-      == EMBER_ZCL_STATUS_SUCCESS) {
+      == CHIP_ZCL_STATUS_SUCCESS) {
     return onOffTransitionTime;
   } else {
     return 0;   // Also default value for this attr
@@ -443,15 +431,15 @@ static uint16_t getOnOffTransitionTime(EmberZclEndpointId_t endpointId)
 }
 
 // If attribute is not supported return 0
-static uint8_t getDefaultMoveRate(EmberZclEndpointId_t endpointId)
+static uint8_t getDefaultMoveRate(ChipZclEndpointId_t endpointId)
 {
   uint8_t defaultMoveRate = 0;
-  if (emberZclReadAttribute(endpointId,
-                            &emberZclClusterLevelControlServerSpec,
-                            EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_DEFAULT_MOVE_RATE,
+  if (chipZclReadAttribute(endpointId,
+                            &chipZclClusterLevelControlServerSpec,
+                            CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_DEFAULT_MOVE_RATE,
                             &defaultMoveRate,
                             sizeof(defaultMoveRate))
-      == EMBER_ZCL_STATUS_SUCCESS) {
+      == CHIP_ZCL_STATUS_SUCCESS) {
     return defaultMoveRate;
   } else {
     // There's no default for this attribute. Caller should treat 0 as "unsupported"
@@ -476,11 +464,11 @@ static bool shouldExecuteIfOff(uint8_t endpoint,
   //      - The value of the ExecuteIfOff bit is 0."
 
   uint8_t options;
-  if (emberZclReadAttribute(endpoint,
-                            &emberZclClusterLevelControlServerSpec,
-                            EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_OPTIONS,
+  if (chipZclReadAttribute(endpoint,
+                            &chipZclClusterLevelControlServerSpec,
+                            CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_OPTIONS,
                             &options,
-                            sizeof(options)) != EMBER_ZCL_STATUS_SUCCESS) {
+                            sizeof(options)) != CHIP_ZCL_STATUS_SUCCESS) {
     options = 0;     // Default
   }
 
@@ -509,38 +497,38 @@ static bool shouldExecuteIfOff(uint8_t endpoint,
     // 0xFF are the default values passed to the command handler when
     // the payload is not present - in that case there is use of option
     // attribute to decide execution of the command
-    return READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
+    return READBITS(options, CHIP_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
   }
   // ---------- The above is to distinguish if the payload is present or not
 
-  if (READBITS(optionMask, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF)) {
+  if (READBITS(optionMask, CHIP_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF)) {
     // Mask is present and set in the command payload, this indicates
     // use the over ride as temporary option
-    return READBITS(optionOverride, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
+    return READBITS(optionOverride, CHIP_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
   }
   // if we are here - use the option bits
-  return (READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF));
+  return (READBITS(options, CHIP_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF));
 }
 
-static void setCurrentLevel(EmberZclEndpointId_t endpointId,
+static void setCurrentLevel(ChipZclEndpointId_t endpointId,
                             uint8_t currentLevel)
 {
-  emberZclWriteAttribute(endpointId,
-                         &emberZclClusterLevelControlServerSpec,
-                         EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+  chipZclWriteAttribute(endpointId,
+                         &chipZclClusterLevelControlServerSpec,
+                         CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                          &currentLevel,
                          sizeof(currentLevel));
 }
 
-static uint8_t getOnLevelOrCurrentLevel(EmberZclEndpointId_t endpointId)
+static uint8_t getOnLevelOrCurrentLevel(ChipZclEndpointId_t endpointId)
 {
   uint8_t onLevel;
-  if ((emberZclReadAttribute(endpointId,
-                             &emberZclClusterLevelControlServerSpec,
-                             EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_ON_LEVEL,
+  if ((chipZclReadAttribute(endpointId,
+                             &chipZclClusterLevelControlServerSpec,
+                             CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_ON_LEVEL,
                              &onLevel,
                              sizeof(onLevel))
-       == EMBER_ZCL_STATUS_SUCCESS)
+       == CHIP_ZCL_STATUS_SUCCESS)
       && onLevel != 0xFF) {
     return onLevel;
   } else {
@@ -570,7 +558,7 @@ static void eventHandler(LevelControlEvent *event)
                       event->state.postTransitionLevel);
     }
   } else {
-    emberEventSetDelayMs((Event *)event, event->state.delayMs);
+    chipEventSetDelayMs((Event *)event, event->state.delayMs);
   }
 }
 
@@ -579,67 +567,67 @@ static void eventMarker(LevelControlEvent *event)
 }
 
 static bool predicate(LevelControlEvent *event,
-                      EmberZclEndpointId_t *endpointId)
+                      ChipZclEndpointId_t *endpointId)
 {
   return (*endpointId == event->state.endpointId);
 }
 
 static LevelControlEvent *cancel(State *state)
 {
-  return (LevelControlEvent *)emberFindEvent(actions.queue,
+  return (LevelControlEvent *)chipFindEvent(actions.queue,
                                              &actions,
                                              (EventPredicate)predicate,
                                              &state->endpointId);
 }
 
-static EmberZclStatus_t schedule(State *state)
+static ChipZclStatus_t schedule(State *state)
 {
   LevelControlEvent *event = cancel(state);
   if (event == NULL) {
     Buffer buffer = emAllocateBuffer(sizeof(LevelControlEvent));
     if (buffer == NULL_BUFFER) {
-      return EMBER_ZCL_STATUS_FAILURE;
+      return CHIP_ZCL_STATUS_FAILURE;
     }
     event = (LevelControlEvent *)emGetBufferPointer(buffer);
   }
   event->event.actions = &actions;
   event->event.next = NULL;
   event->state = *state;
-  emberEventSetDelayMs((Event *)event, event->state.delayMs);
-  return EMBER_ZCL_STATUS_SUCCESS;
+  chipEventSetDelayMs((Event *)event, event->state.delayMs);
+  return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
 // Scenes callback handlers...
 
-void emZclLevelControlServerEraseSceneHandler(uint8_t tableIdx)
+void chZclLevelControlServerEraseSceneHandler(uint8_t tableIdx)
 {
-  EmZclLevelControlSceneSubTableEntry_t entry;
+  ChZclLevelControlSceneSubTableEntry_t entry;
 
   entry.hasCurrentLevelValue = false;
 
   saveSceneSubTableEntry(entry, tableIdx);
 }
 
-bool emZclLevelControlServerAddSceneHandler(EmberZclClusterId_t clusterId,
+bool chZclLevelControlServerAddSceneHandler(ChipZclClusterId_t clusterId,
                                             uint8_t tableIdx,
                                             const uint8_t *sceneData,
                                             uint8_t length)
 {
-  if (clusterId == EMBER_ZCL_CLUSTER_LEVEL_CONTROL) {
+  if (clusterId == CHIP_ZCL_CLUSTER_LEVEL_CONTROL) {
     if (length < 1) {
       return false; // ext field format error (CurrentLevelValue byte must be present).
     }
 
     // Extract bytes from input data block and update scene subtable fields.
-    EmZclLevelControlSceneSubTableEntry_t entry = { 0 };
+    ChZclLevelControlSceneSubTableEntry_t entry = { 0 };
     uint8_t *pData = (uint8_t *)sceneData;
 
     // We only know of one extension for the Level Control cluster and it is just
     // one byte, which means we can skip some logic for this cluster.
     // If other extensions are added in this cluster, more logic will be needed here.
     entry.hasCurrentLevelValue = true;
-    entry.currentLevelValue = emberZclPluginScenesServerGetUint8FromBuffer(&pData);
+    entry.currentLevelValue = chipZclPluginScenesServerGetUint8FromBuffer(&pData);
 
     saveSceneSubTableEntry(entry, tableIdx);
 
@@ -649,7 +637,7 @@ bool emZclLevelControlServerAddSceneHandler(EmberZclClusterId_t clusterId,
   return false;
 }
 
-void emZclLevelControlServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
+void chZclLevelControlServerRecallSceneHandler(ChipZclEndpointId_t endpointId,
                                                uint8_t tableIdx,
                                                uint32_t transitionTime100mS)
 {
@@ -659,61 +647,61 @@ void emZclLevelControlServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
   // to the relevant level control command handler to actually change the
   // hw state at the rate specified by the transition time.
 
-  EmZclLevelControlSceneSubTableEntry_t entry;
+  ChZclLevelControlSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
   if (entry.hasCurrentLevelValue) {
-    emberZclWriteAttribute(endpointId,
-                           &emberZclClusterLevelControlServerSpec,
-                           EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+    chipZclWriteAttribute(endpointId,
+                           &chipZclClusterLevelControlServerSpec,
+                           CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                            (uint8_t *)&entry.currentLevelValue,
                            sizeof(entry.currentLevelValue));
   }
 }
 
-void emZclLevelControlServerStoreSceneHandler(EmberZclEndpointId_t endpointId,
+void chZclLevelControlServerStoreSceneHandler(ChipZclEndpointId_t endpointId,
                                               uint8_t tableIdx)
 {
-  EmZclLevelControlSceneSubTableEntry_t entry;
+  ChZclLevelControlSceneSubTableEntry_t entry;
 
   entry.hasCurrentLevelValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterLevelControlServerSpec,
-                           EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterLevelControlServerSpec,
+                           CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                            (uint8_t *)&entry.currentLevelValue,
-                           sizeof(entry.currentLevelValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.currentLevelValue)) == CHIP_ZCL_STATUS_SUCCESS);
 
   saveSceneSubTableEntry(entry, tableIdx);
 }
 
-void emZclLevelControlServerCopySceneHandler(uint8_t srcTableIdx, uint8_t dstTableIdx)
+void chZclLevelControlServerCopySceneHandler(uint8_t srcTableIdx, uint8_t dstTableIdx)
 {
-  EmZclLevelControlSceneSubTableEntry_t entry;
+  ChZclLevelControlSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, srcTableIdx);
 
   saveSceneSubTableEntry(entry, dstTableIdx);
 }
 
-void emZclLevelControlServerViewSceneHandler(uint8_t tableIdx,
+void chZclLevelControlServerViewSceneHandler(uint8_t tableIdx,
                                              uint8_t **ppExtFldData)
 {
-  EmZclLevelControlSceneSubTableEntry_t entry;
+  ChZclLevelControlSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
   if (entry.hasCurrentLevelValue) {
-    emberZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
-                                                EMBER_ZCL_CLUSTER_LEVEL_CONTROL);
-    emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData, 1);  // length=1
-    emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
+    chipZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
+                                                CHIP_ZCL_CLUSTER_LEVEL_CONTROL);
+    chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData, 1);  // length=1
+    chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
                                                entry.currentLevelValue);
   }
 }
 
-void emZclLevelControlServerPrintInfoSceneHandler(uint8_t tableIdx)
+void chZclLevelControlServerPrintInfoSceneHandler(uint8_t tableIdx)
 {
-  EmZclLevelControlSceneSubTableEntry_t entry;
+  ChZclLevelControlSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
-  emberAfCorePrint(" lvl:%x", entry.currentLevelValue);
+  chipAfCorePrint(" lvl:%x", entry.currentLevelValue);
 }
 #endif

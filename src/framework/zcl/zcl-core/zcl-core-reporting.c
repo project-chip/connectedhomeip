@@ -1,33 +1,21 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_BUFFER_MANAGEMENT
-#include EMBER_AF_API_BUFFER_QUEUE
-#include EMBER_AF_API_EVENT_QUEUE
-#include EMBER_AF_API_HAL
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_BUFFER_MANAGEMENT
+#include CHIP_AF_API_BUFFER_QUEUE
+#include CHIP_AF_API_EVENT_QUEUE
+#include CHIP_AF_API_HAL
 #include "thread-callbacks.h"
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 #include "zcl-core-reporting.h"
 
-#ifdef EM_ZCL_ENDPOINT_CLUSTERS_WITH_REPORTABLE_ATTRIBUTES
-  #if EM_ZCL_ENDPOINT_CLUSTERS_WITH_REPORTABLE_ATTRIBUTES > EMBER_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE
+#ifdef CH_ZCL_ENDPOINT_CLUSTERS_WITH_REPORTABLE_ATTRIBUTES
+  #if CH_ZCL_ENDPOINT_CLUSTERS_WITH_REPORTABLE_ATTRIBUTES > CHIP_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE
 // Catch reporting configuration table size errors at compile time- the table must be at least
 // big enough to hold a 'default report configuration' for every ep/cluster that has one or
 // more reportable attributes. If the table size is increased further, custom reporting
@@ -61,9 +49,9 @@
 
 // Define type for ram-based reporting configurations.
 typedef struct {
-  EmberZclEndpointId_t endpointId;
-  EmberZclClusterSpec_t clusterSpec;
-  EmberZclReportingConfigurationId_t reportingConfigurationId;
+  ChipZclEndpointId_t endpointId;
+  ChipZclClusterSpec_t clusterSpec;
+  ChipZclReportingConfigurationId_t reportingConfigurationId;
   size_t sizeAttrFlags;
   size_t sizeReportableChanges;
   size_t sizeLastValues;
@@ -89,35 +77,35 @@ typedef struct {
 #define LOW_THRESHOLD_PRESENT 0x02
 #define HIGH_THRESHOLD_PRESENT 0x04
 
-#define EMBER_ZCLIP_STRUCT Configuration_t
+#define CHIP_ZCLIP_STRUCT Configuration_t
 static const ZclipStructSpec configurationSpec[] = {
-  EMBER_ZCLIP_OBJECT(sizeof(EMBER_ZCLIP_STRUCT),
+  CHIP_ZCLIP_OBJECT(sizeof(CHIP_ZCLIP_STRUCT),
                      2,     // fieldCount
                      NULL), // names
-  EMBER_ZCLIP_FIELD_NAMED_MANDATORY(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, minimumIntervalS, "n"),
-  EMBER_ZCLIP_FIELD_NAMED_MANDATORY(EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER, maximumIntervalS, "x"),
+  CHIP_ZCLIP_FIELD_NAMED_MANDATORY(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, minimumIntervalS, "n"),
+  CHIP_ZCLIP_FIELD_NAMED_MANDATORY(CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER, maximumIntervalS, "x"),
 };
-#undef EMBER_ZCLIP_STRUCT
+#undef CHIP_ZCLIP_STRUCT
 
 typedef struct {
-  uint8_t uri[EMBER_ZCL_URI_MAX_LENGTH];
+  uint8_t uri[CHIP_ZCL_URI_MAX_LENGTH];
 } Binding_t;
-#define EMBER_ZCLIP_STRUCT Binding_t
+#define CHIP_ZCLIP_STRUCT Binding_t
 static const ZclipStructSpec bindingSpec[] = {
-  EMBER_ZCLIP_OBJECT(sizeof(EMBER_ZCLIP_STRUCT),
+  CHIP_ZCLIP_OBJECT(sizeof(CHIP_ZCLIP_STRUCT),
                      1,     // fieldCount
                      NULL), // names
-  EMBER_ZCLIP_FIELD_NAMED_MANDATORY(EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING, uri, "u"),
+  CHIP_ZCLIP_FIELD_NAMED_MANDATORY(CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING, uri, "u"),
 };
-#undef EMBER_ZCLIP_STRUCT
+#undef CHIP_ZCLIP_STRUCT
 
 #define ZCL_CORE_REPORTING_EVENT_NAME_STR  "zcl core reporting"
 
 typedef struct {
   Event event;
-  EmberZclEndpointId_t endpointId;
-  EmberZclClusterSpec_t clusterSpec;
-  EmberZclReportingConfigurationId_t reportingConfigurationId;
+  ChipZclEndpointId_t endpointId;
+  ChipZclClusterSpec_t clusterSpec;
+  ChipZclReportingConfigurationId_t reportingConfigurationId;
   // NULL_BUFFER when a notification should be made and something else when the
   // notification in the Buffer should be sent.
   Buffer notification;
@@ -149,22 +137,22 @@ static void scheduleSendNotification(const Configuration_t *configuration,
 static bool reportingEventsPredicate(NotificationEvent *event);
 static void cancelReportingEvents(void);
 static bool addReportingConfiguration(Buffer buffer, bool nvUpdate);
-static EmberZclStatus_t decodeReportingConfigurationOta(const EmZclContext_t *context,
+static ChipZclStatus_t decodeReportingConfigurationOta(const ChZclContext_t *context,
                                                         Buffer buffer);
-static bool decodeBindingUri(const EmZclContext_t *context,
-                             EmberZclBindingEntry_t *entry);
-static void setDefaultReportableValue(const EmZclAttributeEntry_t *attribute,
+static bool decodeBindingUri(const ChZclContext_t *context,
+                             ChipZclBindingEntry_t *entry);
+static void setDefaultReportableValue(const ChZclAttributeEntry_t *attribute,
                                       uint8_t *buffer);
-static Buffer makeReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                         const EmberZclClusterSpec_t *clusterSpec);
+static Buffer makeReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                         const ChipZclClusterSpec_t *clusterSpec);
 static void resetToDefaultReportingConfiguration(Configuration_t *configuration);
 static void deleteReportingConfiguration(const Configuration_t *configuration);
-static Configuration_t *findReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                                   const EmberZclClusterSpec_t *clusterSpec,
-                                                   EmberZclReportingConfigurationId_t reportingConfigurationId);
-static bool matchReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                        const EmberZclClusterSpec_t *clusterSpec,
-                                        EmberZclReportingConfigurationId_t reportingConfigurationId,
+static Configuration_t *findReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                                   const ChipZclClusterSpec_t *clusterSpec,
+                                                   ChipZclReportingConfigurationId_t reportingConfigurationId);
+static bool matchReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                        const ChipZclClusterSpec_t *clusterSpec,
+                                        ChipZclReportingConfigurationId_t reportingConfigurationId,
                                         const Configuration_t *configuration);
 
 static bool isValidReportingConfiguration(const Configuration_t *configuration);
@@ -173,11 +161,11 @@ static bool hasReportableChangesOrThresholdCrossings(const Configuration_t *conf
 static bool hasReportableChangeOrThresholdCrossing(const uint8_t *oldValue,
                                                    const uint8_t *reportableChange,
                                                    const uint8_t *newValue,
-                                                   const EmZclAttributeEntry_t *attribute,
+                                                   const ChZclAttributeEntry_t *attribute,
                                                    uint8_t checkType);
 static bool findReportableAttributeIdInOtaConfigMap(CborState *state,
-                                                    const EmZclAttributeEntry_t *searchAttr);
-// TODO- Uncomment this function when EMBER_ZCLIP_TYPE_FLOAT is defined.
+                                                    const ChZclAttributeEntry_t *searchAttr);
+// TODO- Uncomment this function when CHIP_ZCLIP_TYPE_FLOAT is defined.
 //static bool convertFloatToDblFloatFormat(const uint8_t *input,
 //                                         uint8_t size,
 //                                         double *output);
@@ -200,12 +188,12 @@ static EventActions actions = {
 // Private functions -----------------------------------------------------------
 
 // GET .../r
-static void getReportingConfigurationIdsHandler(const EmZclContext_t *context)
+static void getReportingConfigurationIdsHandler(const ChZclContext_t *context)
 {
   CborState state;
-  uint8_t buffer[EM_ZCL_MAX_PAYLOAD_SIZE];
+  uint8_t buffer[CH_ZCL_MAX_PAYLOAD_SIZE];
   if (!emCborEncodeIndefiniteArrayStart(&state, buffer, sizeof(buffer))) {
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
     return;
   }
 
@@ -214,48 +202,48 @@ static void getReportingConfigurationIdsHandler(const EmZclContext_t *context)
     const Configuration_t *configuration
       = (const Configuration_t *)emGetBufferPointer(finger);
     if (context->endpoint->endpointId == configuration->endpointId
-        && emberZclAreClusterSpecsEqual(&context->clusterSpec,
+        && chipZclAreClusterSpecsEqual(&context->clusterSpec,
                                         &configuration->clusterSpec)
         && !emCborEncodeValue(&state,
-                              EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                              CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                               sizeof(configuration->reportingConfigurationId),
                               (const uint8_t *)&configuration->reportingConfigurationId)) {
-      emZclRespond500InternalServerError(context->info);
+      chZclRespond500InternalServerError(context->info);
       return;
     }
     finger = emBufferQueueNext(&configurations, finger);
   }
 
   if (emCborEncodeBreak(&state)) {
-    emZclRespond205ContentCborState(context->info, &state);
+    chZclRespond205ContentCborState(context->info, &state);
   } else {
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
   }
 }
 
 // POST .../r
-static void addReportingConfigurationHandler(const EmZclContext_t *context)
+static void addReportingConfigurationHandler(const ChZclContext_t *context)
 {
   Buffer buffer = makeReportingConfiguration(context->endpoint->endpointId,
                                              &context->clusterSpec);
   if (buffer == NULL_BUFFER) {
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
     return;
   }
 
   const Configuration_t *configuration
     = (const Configuration_t *)emGetBufferPointer(buffer);
-  EmberZclStatus_t decodeStatus
+  ChipZclStatus_t decodeStatus
     = decodeReportingConfigurationOta(context, buffer);
-  if (decodeStatus != EMBER_ZCL_STATUS_SUCCESS) {
-    emZclRespond400BadRequest(context->info);   // 16-07008-069, section 3.11.4
+  if (decodeStatus != CHIP_ZCL_STATUS_SUCCESS) {
+    chZclRespond400BadRequest(context->info);   // 16-07008-069, section 3.11.4
     return;
   }
 
   if (!addReportingConfiguration(buffer, true)) {  //nvUpdate=true
-    emberZclRespondWithStatus(context->info,
-                              EMBER_COAP_CODE_500_INTERNAL_SERVER_ERROR,
-                              EMBER_ZCL_STATUS_INSUFFICIENT_SPACE);
+    chipZclRespondWithStatus(context->info,
+                              CHIP_COAP_CODE_500_INTERNAL_SERVER_ERROR,
+                              CHIP_ZCL_STATUS_INSUFFICIENT_SPACE);
     return;
   }
 
@@ -267,61 +255,61 @@ static void addReportingConfigurationHandler(const EmZclContext_t *context)
   // Otherwise, a binding entry was created, and the payload SHALL be set to
   // a CBOR-encoded text string representing the URI Path.
 
-  EmberZclApplicationDestination_t destination = {
+  ChipZclApplicationDestination_t destination = {
     .data.endpointId = context->endpoint->endpointId,
-    .type = EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT,
+    .type = CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT,
   };
 
-  uint8_t uriPathReporting[EMBER_ZCL_URI_PATH_MAX_LENGTH];
-  emZclReportingConfigurationIdToUriPath(&destination,
+  uint8_t uriPathReporting[CHIP_ZCL_URI_PATH_MAX_LENGTH];
+  chZclReportingConfigurationIdToUriPath(&destination,
                                          &context->clusterSpec,
                                          configuration->reportingConfigurationId,
                                          uriPathReporting);
 
-  EmberZclBindingEntry_t entry = { 0 };
+  ChipZclBindingEntry_t entry = { 0 };
   if (!decodeBindingUri(context, &entry)) {
     // binding entry not requested or we were not able to parse the URI
     // so do not send any payload
-    emZclRespond201Created(context->info, uriPathReporting);
+    chZclRespond201Created(context->info, uriPathReporting);
     return;
   }
 
   entry.reportingConfigurationId = configuration->reportingConfigurationId;
-  EmberZclBindingId_t bindingId = emberZclAddBinding(&entry);
-  if (bindingId == EMBER_ZCL_BINDING_NULL) {
+  ChipZclBindingId_t bindingId = chipZclAddBinding(&entry);
+  if (bindingId == CHIP_ZCL_BINDING_NULL) {
     // binding entry requested but we were unable to create it
     // so do not send any payload
-    emZclRespond201Created(context->info, uriPathReporting);
+    chZclRespond201Created(context->info, uriPathReporting);
     return;
   }
 
   CborState state;
-  uint8_t payloadBuffer[EM_ZCL_MAX_PAYLOAD_SIZE];
-  uint8_t uriPathBinding[EMBER_ZCL_URI_PATH_MAX_LENGTH];
-  emZclBindingIdToUriPath(&destination,
+  uint8_t payloadBuffer[CH_ZCL_MAX_PAYLOAD_SIZE];
+  uint8_t uriPathBinding[CHIP_ZCL_URI_PATH_MAX_LENGTH];
+  chZclBindingIdToUriPath(&destination,
                           &context->clusterSpec,
                           bindingId,
                           uriPathBinding);
 
   if (emCborEncodeIndefiniteMapStart(&state, payloadBuffer, sizeof(payloadBuffer))
       && emCborEncodeValue(&state,
-                           EMBER_ZCLIP_TYPE_STRING,
+                           CHIP_ZCLIP_TYPE_STRING,
                            0, // size - ignored
                            (const uint8_t *)"u")
       && emCborEncodeValue(&state,
-                           EMBER_ZCLIP_TYPE_STRING,
+                           CHIP_ZCLIP_TYPE_STRING,
                            0, // size - ignored
                            uriPathBinding)
       && emCborEncodeBreak(&state)) {
     // binding successfully created so send CBOR-encoded string in payload
-    emZclRespond201CreatedCborState(context->info, uriPathReporting, &state);
+    chZclRespond201CreatedCborState(context->info, uriPathReporting, &state);
   } else {
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
   }
 }
 
 // GET .../r/R
-static void getReportingConfigurationHandler(const EmZclContext_t *context)
+static void getReportingConfigurationHandler(const ChZclContext_t *context)
 {
   const Configuration_t *configuration
     = findReportingConfiguration(context->endpoint->endpointId,
@@ -329,7 +317,7 @@ static void getReportingConfigurationHandler(const EmZclContext_t *context)
                                  context->reportingConfigurationId);
   if (configuration == NULL) {
     assert(false);
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
     return;
   }
 
@@ -338,27 +326,27 @@ static void getReportingConfigurationHandler(const EmZclContext_t *context)
 
   if (!emCborEncodeIndefiniteMapStart(&state, buffer, sizeof(buffer))
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_STRING,
+                            CHIP_ZCLIP_TYPE_STRING,
                             0, // size - ignored
                             (const uint8_t *)"n")
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                            CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                             sizeof(configuration->minimumIntervalS),
                             (const uint8_t *)&configuration->minimumIntervalS)
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_STRING,
+                            CHIP_ZCLIP_TYPE_STRING,
                             0, // size - ignored
                             (const uint8_t *)"x")
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                            CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                             sizeof(configuration->maximumIntervalS),
                             (const uint8_t *)&configuration->maximumIntervalS)
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_STRING,
+                            CHIP_ZCLIP_TYPE_STRING,
                             0, // size - ignored
                             (const uint8_t *)"a")
       || !emCborEncodeIndefiniteMap(&state)) {
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
     return;
   }
 
@@ -370,78 +358,78 @@ static void getReportingConfigurationHandler(const EmZclContext_t *context)
   size_t   offsetAttrFlags = 0;
   size_t   offsetReportableChange = 0;
 
-  for (size_t i = 0; i < EM_ZCL_ATTRIBUTE_COUNT; i++) {
-    const EmZclAttributeEntry_t *attribute = &emZclAttributeTable[i];
+  for (size_t i = 0; i < CH_ZCL_ATTRIBUTE_COUNT; i++) {
+    const ChZclAttributeEntry_t *attribute = &chZclAttributeTable[i];
     int32_t compare
-      = emberZclCompareClusterSpec(attribute->clusterSpec,
+      = chipZclCompareClusterSpec(attribute->clusterSpec,
                                    &configuration->clusterSpec);
     if (compare > 0) {
       break;
     } else if ((compare == 0)
-               && emZclIsAttributeLocal(attribute)
-               && emZclIsAttributeReportable(attribute)) {
+               && chZclIsAttributeLocal(attribute)
+               && chZclIsAttributeReportable(attribute)) {
       if ((*(attrFlags + offsetAttrFlags)) & ATTR_PRESENT) {
         if (!emCborEncodeValue(&state,
-                               EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                               CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                                sizeof(attribute->attributeId),
                                (const uint8_t *)&attribute->attributeId)
             || !emCborEncodeIndefiniteMap(&state)) {
-          emZclRespond500InternalServerError(context->info);
+          chZclRespond500InternalServerError(context->info);
           return;
         }
 
-        if (emZclIsAttributeAnalog(attribute)) {
+        if (chZclIsAttributeAnalog(attribute)) {
           assert(offsetReportableChange + attribute->size
                  <= configuration->sizeReportableChanges);
 
           // For analog attribute we add "r":repValue to the attribute map.
           if (!emCborEncodeValue(&state,
-                                 EMBER_ZCLIP_TYPE_STRING,
+                                 CHIP_ZCLIP_TYPE_STRING,
                                  0,               // size - ignored
                                  (const uint8_t *)"r")
               || !emCborEncodeValue(&state,
                                     attribute->type,
                                     attribute->size,
                                     reportableChanges + offsetReportableChange)) {
-            emZclRespond500InternalServerError(context->info);
+            chZclRespond500InternalServerError(context->info);
             return;
           }
           // If Low Threshold is present add "l":lowThreshold to the attribute map.
           if (((*(attrFlags + offsetAttrFlags)) & LOW_THRESHOLD_PRESENT)) {
             if (!emCborEncodeValue(&state,
-                                   EMBER_ZCLIP_TYPE_STRING,
+                                   CHIP_ZCLIP_TYPE_STRING,
                                    0,                   // size - ignored
                                    (const uint8_t *)"l")
                 || !emCborEncodeValue(&state,
                                       attribute->type,
                                       attribute->size,
                                       lowThresholds + offsetReportableChange)) {
-              emZclRespond500InternalServerError(context->info);
+              chZclRespond500InternalServerError(context->info);
               return;
             }
           }
           // If High Threshold is present add "l":lowThreshold to the attribute map.
           if (((*(attrFlags + offsetAttrFlags)) & HIGH_THRESHOLD_PRESENT)) {
             if (!emCborEncodeValue(&state,
-                                   EMBER_ZCLIP_TYPE_STRING,
+                                   CHIP_ZCLIP_TYPE_STRING,
                                    0,                   // size - ignored
                                    (const uint8_t *)"h")
                 || !emCborEncodeValue(&state,
                                       attribute->type,
                                       attribute->size,
                                       highThresholds + offsetReportableChange)) {
-              emZclRespond500InternalServerError(context->info);
+              chZclRespond500InternalServerError(context->info);
               return;
             }
           }
         }           // if analog
         if (!emCborEncodeBreak(&state)) {
-          emZclRespond500InternalServerError(context->info);
+          chZclRespond500InternalServerError(context->info);
           return;
         }
       } // if ATTR_PRESENT
         // Advance offset regrdless of whether the attribute is present
-      if (emZclIsAttributeAnalog(attribute)) {
+      if (chZclIsAttributeAnalog(attribute)) {
         offsetReportableChange += attribute->size;              // also tracks low/high thresholds
       }
       offsetAttrFlags++;
@@ -452,14 +440,14 @@ static void getReportingConfigurationHandler(const EmZclContext_t *context)
   // the outer map.
   if (emCborEncodeBreak(&state)
       && emCborEncodeBreak(&state)) {
-    emZclRespond205ContentCborState(context->info, &state);
+    chZclRespond205ContentCborState(context->info, &state);
   } else {
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
   }
 }
 
 // PUT .../r/R
-static void updateReportingConfigurationHandler(const EmZclContext_t *context)
+static void updateReportingConfigurationHandler(const ChZclContext_t *context)
 {
   Configuration_t *configuration
     = findReportingConfiguration(context->endpoint->endpointId,
@@ -467,7 +455,7 @@ static void updateReportingConfigurationHandler(const EmZclContext_t *context)
                                  context->reportingConfigurationId);
   if (configuration == NULL) {
     assert(false);
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
     return;
   }
 
@@ -479,7 +467,7 @@ static void updateReportingConfigurationHandler(const EmZclContext_t *context)
                             context->payloadLength,
                             bindingSpec,
                             &binding)) {
-    emZclRespond400BadRequest(context->info);
+    chZclRespond400BadRequest(context->info);
     return;
   }
 
@@ -489,25 +477,25 @@ static void updateReportingConfigurationHandler(const EmZclContext_t *context)
                                 + 3 * configuration->sizeReportableChanges
                                 + configuration->sizeLastValues));
   if (buffer == NULL_BUFFER) {
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
     return;
   }
 
-  EmberZclStatus_t status = decodeReportingConfigurationOta(context, buffer);
-  if (status == EMBER_ZCL_STATUS_SUCCESS) {
+  ChipZclStatus_t status = decodeReportingConfigurationOta(context, buffer);
+  if (status == CHIP_ZCL_STATUS_SUCCESS) {
     MEMCOPY(configuration,
             emGetBufferPointer(buffer),
             emGetBufferLength(buffer));
     updateNvReportingConfiguration(configuration, false); // Config changed so update nv mirror (no add allowed).
     scheduleMakeNotification(configuration, 0);
-    emZclRespond204ChangedWithStatus(context->info, status);
+    chZclRespond204ChangedWithStatus(context->info, status);
   } else {
-    emZclRespond400BadRequest(context->info);
+    chZclRespond400BadRequest(context->info);
   }
 }
 
 // DELETE .../r/R
-static void removeReportingConfigurationHandler(const EmZclContext_t *context)
+static void removeReportingConfigurationHandler(const ChZclContext_t *context)
 {
   Configuration_t *configuration
     = findReportingConfiguration(context->endpoint->endpointId,
@@ -515,21 +503,21 @@ static void removeReportingConfigurationHandler(const EmZclContext_t *context)
                                  context->reportingConfigurationId);
   if (configuration == NULL) {
     assert(false);
-    emZclRespond500InternalServerError(context->info);
+    chZclRespond500InternalServerError(context->info);
     return;
   }
 
   // Deleting a default reporting configuration just means resetting it to its
   // original state.  Any other reporting configuration is permanently deleted.
   if (configuration->reportingConfigurationId
-      == EMBER_ZCL_REPORTING_CONFIGURATION_DEFAULT) {
+      == CHIP_ZCL_REPORTING_CONFIGURATION_DEFAULT) {
     resetToDefaultReportingConfiguration(configuration);
     updateNvReportingConfiguration(configuration, false); // Config changed so update nv mirror (no add allowed).
     scheduleMakeNotification(configuration, 0);
   } else {
     deleteReportingConfiguration(configuration);
   }
-  emZclRespond202Deleted(context->info);
+  chZclRespond202Deleted(context->info);
 }
 
 static bool addReportingConfiguration(Buffer buffer, bool nvUpdate)
@@ -537,8 +525,8 @@ static bool addReportingConfiguration(Buffer buffer, bool nvUpdate)
   Configuration_t *configuration
     = (Configuration_t *)emGetBufferPointer(buffer);
 
-  EmberZclReportingConfigurationId_t reportingConfigurationId
-    = EMBER_ZCL_REPORTING_CONFIGURATION_DEFAULT;
+  ChipZclReportingConfigurationId_t reportingConfigurationId
+    = CHIP_ZCL_REPORTING_CONFIGURATION_DEFAULT;
   bool added = false;
 
   Buffer tmp = configurations;
@@ -551,14 +539,14 @@ static bool addReportingConfiguration(Buffer buffer, bool nvUpdate)
 
     if (!added
         && configuration->endpointId == fingee->endpointId
-        && emberZclAreClusterSpecsEqual(&configuration->clusterSpec,
+        && chipZclAreClusterSpecsEqual(&configuration->clusterSpec,
                                         &fingee->clusterSpec)) {
       if (reportingConfigurationId < fingee->reportingConfigurationId) {
         configuration->reportingConfigurationId = reportingConfigurationId;
         emBufferQueueAdd(&configurations, buffer);
         added = true;
       } else if (reportingConfigurationId
-                 < EMBER_ZCL_REPORTING_CONFIGURATION_NULL) {
+                 < CHIP_ZCL_REPORTING_CONFIGURATION_NULL) {
         reportingConfigurationId++;
       }
     }
@@ -566,7 +554,7 @@ static bool addReportingConfiguration(Buffer buffer, bool nvUpdate)
   }
 
   if (!added) {
-    if (reportingConfigurationId == EMBER_ZCL_REPORTING_CONFIGURATION_NULL) {
+    if (reportingConfigurationId == CHIP_ZCL_REPORTING_CONFIGURATION_NULL) {
       return false;
     }
     configuration->reportingConfigurationId = reportingConfigurationId;
@@ -591,8 +579,8 @@ static bool addReportingConfiguration(Buffer buffer, bool nvUpdate)
   return true;
 }
 
-static bool decodeBindingUri(const EmZclContext_t *context,
-                             EmberZclBindingEntry_t *entry)
+static bool decodeBindingUri(const ChZclContext_t *context,
+                             ChipZclBindingEntry_t *entry)
 {
   Binding_t binding = {
     .uri = { 0 },
@@ -608,10 +596,10 @@ static bool decodeBindingUri(const EmZclContext_t *context,
   entry->clusterSpec = context->clusterSpec; // not in URI
   entry->endpointId = context->endpoint->endpointId;
 
-  return emZclUriToBindingEntry(binding.uri, entry, false);
+  return chZclUriToBindingEntry(binding.uri, entry, false);
 }
 
-static EmberZclStatus_t decodeReportingConfigurationOta(const EmZclContext_t *context,
+static ChipZclStatus_t decodeReportingConfigurationOta(const ChZclContext_t *context,
                                                         Buffer buffer)
 {
   Configuration_t *configuration
@@ -624,7 +612,7 @@ static EmberZclStatus_t decodeReportingConfigurationOta(const EmZclContext_t *co
       || !isValidReportingConfiguration(configuration)) {
     // Spec 16-07008-071: 3.11.4 - If any conditions imposed upon non attribute fields
     // are not met the device SHALL respond with a 4.00 Bad Request with No Content.
-    return EMBER_ZCL_STATUS_INVALID_FIELD;
+    return CHIP_ZCL_STATUS_INVALID_FIELD;
   }
 
   // Decode attribute specific reportable fields from the "a":{<attrId>{ }} map.
@@ -637,16 +625,16 @@ static EmberZclStatus_t decodeReportingConfigurationOta(const EmZclContext_t *co
   size_t offsetAttrFlags = 0;
 
   bool foundResult = false;
-  for (size_t i = 0; i < EM_ZCL_ATTRIBUTE_COUNT; i++) {
-    const EmZclAttributeEntry_t *attribute = &emZclAttributeTable[i];
+  for (size_t i = 0; i < CH_ZCL_ATTRIBUTE_COUNT; i++) {
+    const ChZclAttributeEntry_t *attribute = &chZclAttributeTable[i];
     int32_t compare
-      = emberZclCompareClusterSpec(attribute->clusterSpec,
+      = chipZclCompareClusterSpec(attribute->clusterSpec,
                                    &context->clusterSpec);
     if (compare > 0) {
       break;
     } else if ((compare == 0)
-               && (emZclIsAttributeLocal(attribute))
-               && (emZclIsAttributeReportable(attribute))) {
+               && (chZclIsAttributeLocal(attribute))
+               && (chZclIsAttributeReportable(attribute))) {
       // Decode from the start of the payload for each reportable attribute.
       CborState state;
       emCborDecodeStart(&state,
@@ -662,7 +650,7 @@ static EmberZclStatus_t decodeReportingConfigurationOta(const EmZclContext_t *co
         *(attrFlags + offsetAttrFlags) = 0x0;
       }
 
-      if (emZclIsAttributeAnalog(attribute)) {
+      if (chZclIsAttributeAnalog(attribute)) {
         assert(offsetReportableChange + attribute->size <= configuration->sizeReportableChanges);
         if (foundAttributeIdInMap) {
           bool reportableChangeFound = false;
@@ -673,42 +661,42 @@ static EmberZclStatus_t decodeReportingConfigurationOta(const EmZclContext_t *co
               if (type == CBOR_TEXT) {
                 uint8_t keyName[CBOR_TEXT_KEY_MAX_LENGTH];
                 if (!emCborDecodeValue(&state,
-                                       EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING,
+                                       CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING,
                                        sizeof(keyName),
                                        keyName)) {
-                  return EMBER_ZCL_STATUS_INVALID_FIELD;
+                  return CHIP_ZCL_STATUS_INVALID_FIELD;
                 }
                 if (strcmp((const char *)keyName, "r") == 0) {
-                  if (!emCborDecodeValue(&state, EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                  if (!emCborDecodeValue(&state, CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                                          attribute->size, reportableChanges + offsetReportableChange)) {
-                    return EMBER_ZCL_STATUS_INVALID_FIELD;
+                    return CHIP_ZCL_STATUS_INVALID_FIELD;
                   }
                   reportableChangeFound = true;
                 } else if (strcmp((const char *)keyName, "l") == 0) {
-                  if (!emCborDecodeValue(&state, EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                  if (!emCborDecodeValue(&state, CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                                          attribute->size, lowThresholds + offsetReportableChange)) {
-                    return EMBER_ZCL_STATUS_INVALID_FIELD;
+                    return CHIP_ZCL_STATUS_INVALID_FIELD;
                   }
                   *(attrFlags + offsetAttrFlags) |= LOW_THRESHOLD_PRESENT;
                 } else if (strcmp((const char *)keyName, "h") == 0) {
-                  if (!emCborDecodeValue(&state, EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                  if (!emCborDecodeValue(&state, CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                                          attribute->size, highThresholds + offsetReportableChange)) {
-                    return EMBER_ZCL_STATUS_INVALID_FIELD;
+                    return CHIP_ZCL_STATUS_INVALID_FIELD;
                   }
                   *(attrFlags + offsetAttrFlags) |= HIGH_THRESHOLD_PRESENT;
                 } else {
-                  return EMBER_ZCL_STATUS_INVALID_FIELD;
+                  return CHIP_ZCL_STATUS_INVALID_FIELD;
                 }
               } else {         // some unknown key
-                return EMBER_ZCL_STATUS_INVALID_FIELD;
+                return CHIP_ZCL_STATUS_INVALID_FIELD;
               }
             }       // while()
           } else {
-            return EMBER_ZCL_STATUS_INVALID_FIELD;
+            return CHIP_ZCL_STATUS_INVALID_FIELD;
           }
           if (!reportableChangeFound) {
             // Reportable Change SHALL be included
-            return EMBER_ZCL_STATUS_INVALID_FIELD;
+            return CHIP_ZCL_STATUS_INVALID_FIELD;
           }
         }
         // offsetReportableChange is also the offset into low/highThresholds
@@ -717,7 +705,7 @@ static EmberZclStatus_t decodeReportingConfigurationOta(const EmZclContext_t *co
         // For discreet attributes r,h and l fields SHALL be omitted
         // Send error if we get anything other than an empty map
         if (!(emCborDecodeMap(&state) && emCborPeekSequenceEnd(&state))) {
-          return EMBER_ZCL_STATUS_INVALID_FIELD;
+          return CHIP_ZCL_STATUS_INVALID_FIELD;
         }
       }
       offsetAttrFlags++; // attrFlags tracks all local reportable attributes
@@ -728,29 +716,29 @@ static EmberZclStatus_t decodeReportingConfigurationOta(const EmZclContext_t *co
     // Spec 16_07008-060: 3.11.4 - "If the attribute map does not contain at
     // least one reportable attribute ID the device SHALL respond with a 4.00
     // Bad Request." Note- this can be an empty map, e.g. "a":{<attrId>:{}}
-    return EMBER_ZCL_STATUS_NOT_FOUND;
+    return CHIP_ZCL_STATUS_NOT_FOUND;
   }
 
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-static Buffer makeReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                         const EmberZclClusterSpec_t *clusterSpec)
+static Buffer makeReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                         const ChipZclClusterSpec_t *clusterSpec)
 {
   size_t sizeAttrFlags = 0;
   size_t sizeReportableChanges = 0;
   size_t sizeLastValues = 0;
 
-  for (size_t i = 0; i < EM_ZCL_ATTRIBUTE_COUNT; i++) {
-    const EmZclAttributeEntry_t *attribute = &emZclAttributeTable[i];
+  for (size_t i = 0; i < CH_ZCL_ATTRIBUTE_COUNT; i++) {
+    const ChZclAttributeEntry_t *attribute = &chZclAttributeTable[i];
     int32_t compare
-      = emberZclCompareClusterSpec(attribute->clusterSpec, clusterSpec);
+      = chipZclCompareClusterSpec(attribute->clusterSpec, clusterSpec);
     if (compare > 0) {
       break;
     } else if (compare == 0
-               && emZclIsAttributeLocal(attribute)
-               && emZclIsAttributeReportable(attribute)) {
-      if (emZclIsAttributeAnalog(attribute)) {
+               && chZclIsAttributeLocal(attribute)
+               && chZclIsAttributeReportable(attribute)) {
+      if (chZclIsAttributeAnalog(attribute)) {
         sizeReportableChanges += attribute->size;
       }
       sizeAttrFlags++;
@@ -770,7 +758,7 @@ static Buffer makeReportingConfiguration(EmberZclEndpointId_t endpointId,
     configuration->endpointId = endpointId;
     configuration->clusterSpec = *clusterSpec;
     configuration->reportingConfigurationId
-      = EMBER_ZCL_REPORTING_CONFIGURATION_NULL;
+      = CHIP_ZCL_REPORTING_CONFIGURATION_NULL;
     configuration->sizeAttrFlags = sizeAttrFlags;
     configuration->sizeReportableChanges = sizeReportableChanges;
     configuration->sizeLastValues = sizeLastValues;
@@ -788,11 +776,11 @@ static void resetToDefaultReportingConfiguration(Configuration_t *configuration)
   // reporting interval either of 0x0000 or in the range 0x003d to 0xfffe)
   // SHALL exist for every implemented attribute that is specified as
   // reportable.
-  EmberZclReportingConfiguration_t defaultReportingConfiguration = {
+  ChipZclReportingConfiguration_t defaultReportingConfiguration = {
     .minimumIntervalS = 0x0000, // no minimum interval
     .maximumIntervalS = 0xFFFE, // maximum report every 65534 seconds
   };
-  emberZclGetDefaultReportingConfigurationCallback(configuration->endpointId,
+  chipZclGetDefaultReportingConfigurationCallback(configuration->endpointId,
                                                    &configuration->clusterSpec,
                                                    &defaultReportingConfiguration);
   configuration->minimumIntervalS
@@ -811,17 +799,17 @@ static void resetToDefaultReportingConfiguration(Configuration_t *configuration)
   size_t   offsetReportableChange = 0;
   size_t   offsetLastValue = 0;
 
-  for (size_t i = 0; i < EM_ZCL_ATTRIBUTE_COUNT; i++) {
-    const EmZclAttributeEntry_t *attribute = &emZclAttributeTable[i];
+  for (size_t i = 0; i < CH_ZCL_ATTRIBUTE_COUNT; i++) {
+    const ChZclAttributeEntry_t *attribute = &chZclAttributeTable[i];
     int32_t compare
-      = emberZclCompareClusterSpec(attribute->clusterSpec,
+      = chipZclCompareClusterSpec(attribute->clusterSpec,
                                    &configuration->clusterSpec);
     if (compare > 0) {
       break;
     } else if (compare == 0
-               && emZclIsAttributeLocal(attribute)
-               && emZclIsAttributeReportable(attribute)) {
-      if (emZclIsAttributeAnalog(attribute)) {
+               && chZclIsAttributeLocal(attribute)
+               && chZclIsAttributeReportable(attribute)) {
+      if (chZclIsAttributeAnalog(attribute)) {
         assert(offsetReportableChange + attribute->size
                <= configuration->sizeReportableChanges);
 
@@ -830,7 +818,7 @@ static void resetToDefaultReportingConfiguration(Configuration_t *configuration)
                                    + offsetReportableChange));
 
         // Callback may modify the default reportable value for the analog attribute.
-        emberZclGetDefaultReportableChangeCallback(configuration->endpointId,
+        chipZclGetDefaultReportableChangeCallback(configuration->endpointId,
                                                    &configuration->clusterSpec,
                                                    attribute->attributeId,
                                                    (reportableChanges
@@ -855,11 +843,11 @@ static void resetToDefaultReportingConfiguration(Configuration_t *configuration)
              <= configuration->sizeLastValues);
 
       // Initialise attribute lastValue with the present attribute value.
-      if (emZclReadAttributeEntry(configuration->endpointId,
+      if (chZclReadAttributeEntry(configuration->endpointId,
                                   attribute,
                                   (lastValues + offsetLastValue),
                                   attribute->size)
-          != EMBER_ZCL_STATUS_SUCCESS) {
+          != CHIP_ZCL_STATUS_SUCCESS) {
         MEMSET(lastValues + offsetLastValue, 0x00, attribute->size);
       }
       offsetLastValue += attribute->size;
@@ -867,19 +855,19 @@ static void resetToDefaultReportingConfiguration(Configuration_t *configuration)
   }
 }
 
-static void setDefaultReportableValue(const EmZclAttributeEntry_t *attribute,
+static void setDefaultReportableValue(const ChZclAttributeEntry_t *attribute,
                                       uint8_t *buffer)
 {
   // Sets the appropriate analog attribute default reportable value in the
   // input buffer.
 
-  if (!emZclIsAttributeAnalog(attribute)) {
+  if (!chZclIsAttributeAnalog(attribute)) {
     assert(false);
     return; // Invalid call.
   }
 
   switch (attribute->type) {
-    case EMBER_ZCLIP_TYPE_INTEGER:
+    case CHIP_ZCLIP_TYPE_INTEGER:
       // Set buffer MS byte sign bit for analog signed integer types.
       MEMSET(buffer, 0x00, attribute->size);
   #if BIGENDIAN_CPU
@@ -888,15 +876,15 @@ static void setDefaultReportableValue(const EmZclAttributeEntry_t *attribute,
       buffer[attribute->size - 1] = 0x80; // Set top bit of MS byte.
   #endif
       break;
-    case EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER:
-      //case EMBER_ZCLIP_TYPE_UTC: //TODO-
+    case CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER:
+      //case CHIP_ZCLIP_TYPE_UTC: //TODO-
       MEMSET(buffer, 0x00, attribute->size);
       break;
-    //case EMBER_ZCLIP_TYPE_FLOAT: //TODO-
+    //case CHIP_ZCLIP_TYPE_FLOAT: //TODO-
     //  MEMSET(buffer, 0xFF, attribute->size);
     //  break;
-    //case EMBER_ZCLIP_TYPE_TIME_OF_DAY: //TODO-
-    //case EMBER_ZCLIP_TYPE_DATE_DATA: //TODO-
+    //case CHIP_ZCLIP_TYPE_TIME_OF_DAY: //TODO-
+    //case CHIP_ZCLIP_TYPE_DATE_DATA: //TODO-
     //  MEMSET(buffer, 0xFF, attribute->size);
     //  break;
     default:
@@ -920,26 +908,26 @@ static void deleteReportingConfiguration(const Configuration_t *configuration)
   // report configuration entry. The device SHALL then iterate through each entry in the binding table
   // and update any entry that references deleted attribute report configuration to point to the null
   // report configuration
-  if (configuration->reportingConfigurationId != EMBER_ZCL_REPORTING_CONFIGURATION_DEFAULT) {
-    for (EmberZclBindingId_t i = 0; i < EMBER_ZCL_BINDING_TABLE_SIZE; i++) {
-      EmberZclBindingEntry_t entry;
-      if (emberZclGetBinding(i, &entry)) {
+  if (configuration->reportingConfigurationId != CHIP_ZCL_REPORTING_CONFIGURATION_DEFAULT) {
+    for (ChipZclBindingId_t i = 0; i < CHIP_ZCL_BINDING_TABLE_SIZE; i++) {
+      ChipZclBindingEntry_t entry;
+      if (chipZclGetBinding(i, &entry)) {
         if ((configuration->endpointId == entry.endpointId)
-            && (emberZclAreClusterSpecsEqual(&configuration->clusterSpec,
+            && (chipZclAreClusterSpecsEqual(&configuration->clusterSpec,
                                              &entry.clusterSpec))
             && (configuration->reportingConfigurationId
                 == entry.reportingConfigurationId)) {
-          entry.reportingConfigurationId = EMBER_ZCL_REPORTING_CONFIGURATION_NULL;
-          emberZclSetBinding(i, &entry);
+          entry.reportingConfigurationId = CHIP_ZCL_REPORTING_CONFIGURATION_NULL;
+          chipZclSetBinding(i, &entry);
         }
       }
     }
   }
 }
 
-static Configuration_t *findReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                                   const EmberZclClusterSpec_t *clusterSpec,
-                                                   EmberZclReportingConfigurationId_t reportingConfigurationId)
+static Configuration_t *findReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                                   const ChipZclClusterSpec_t *clusterSpec,
+                                                   ChipZclReportingConfigurationId_t reportingConfigurationId)
 {
   // Finds the first reporting configuration in the ram-based configurations
   // buffer list which matches the specified search spec.
@@ -961,15 +949,15 @@ static Configuration_t *findReportingConfiguration(EmberZclEndpointId_t endpoint
   return NULL;
 }
 
-static bool matchReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                        const EmberZclClusterSpec_t *clusterSpec,
-                                        EmberZclReportingConfigurationId_t reportingConfigurationId,
+static bool matchReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                        const ChipZclClusterSpec_t *clusterSpec,
+                                        ChipZclReportingConfigurationId_t reportingConfigurationId,
                                         const Configuration_t *configuration)
 {
   // Checks if the reporting configuration matches the search spec.
 
   return (endpointId == configuration->endpointId
-          && emberZclAreClusterSpecsEqual(clusterSpec,
+          && chipZclAreClusterSpecsEqual(clusterSpec,
                                           &configuration->clusterSpec)
           && (reportingConfigurationId
               == configuration->reportingConfigurationId));
@@ -1004,58 +992,58 @@ static void makeNotification(const NotificationEvent *event)
                                * MILLISECOND_TICKS_PER_SECOND)
                             : UINT32_MAX)); // forever
 
-  // emZclDestinationToUri gives a URI ending with the endpoint id.
+  // chZclDestinationToUri gives a URI ending with the endpoint id.
   // We want to add just the the cluster id to that.
-  EmberZclDestination_t destination = {
+  ChipZclDestination_t destination = {
     .network = {
-      .uid = emZclUid,
-      .flags = EMBER_ZCL_HAVE_UID_FLAG,
-      .port = EMBER_COAP_PORT,
+      .uid = chZclUid,
+      .flags = CHIP_ZCL_HAVE_UID_FLAG,
+      .port = CHIP_COAP_PORT,
     },
     .application = {
       .data.endpointId = configuration->endpointId,
-      .type = EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT,
+      .type = CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT,
     },
   };
-  uint8_t uri[EMBER_ZCL_URI_MAX_LENGTH] = { 0 };
+  uint8_t uri[CHIP_ZCL_URI_MAX_LENGTH] = { 0 };
   uint8_t *finger = uri;
-  finger += emZclDestinationToUri(&destination, finger);
+  finger += chZclDestinationToUri(&destination, finger);
   *finger++ = '/';
-  emZclClusterToUriPath(NULL, &configuration->clusterSpec, finger);
+  chZclClusterToUriPath(NULL, &configuration->clusterSpec, finger);
 
   // TODO: 16-07008-026, section 3.14.1 says "t" is included in the map for
   // timestamp, and UID or URI.  The timestamp is problematic, because not all
   // devices track time.  Fortunately, it is optional, so it is simply omitted
   // here.
   CborState state;
-  uint8_t buffer[EM_ZCL_MAX_PAYLOAD_SIZE];
+  uint8_t buffer[CH_ZCL_MAX_PAYLOAD_SIZE];
   if (!emCborEncodeIndefiniteMapStart(&state, buffer, sizeof(buffer))
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_STRING,
+                            CHIP_ZCLIP_TYPE_STRING,
                             0, // size - ignored
                             (const uint8_t *)"r")
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                            CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                             sizeof(configuration->reportingConfigurationId),
                             (const uint8_t *)&configuration->reportingConfigurationId)
       //|| !emCborEncodeValue(&state,
-      //                      EMBER_ZCLIP_TYPE_STRING,
+      //                      CHIP_ZCLIP_TYPE_STRING,
       //                      0, // size - ignored
       //                      (const uint8_t *)"t")
       //|| !emCborEncodeValue(&state,
-      //                      EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+      //                      CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
       //                      sizeof(timestamp),
       //                      (const uint8_t *)&timestamp)
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_STRING,
+                            CHIP_ZCLIP_TYPE_STRING,
                             0, // size - ignored
                             (const uint8_t *)"u")
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_STRING,
+                            CHIP_ZCLIP_TYPE_STRING,
                             0, // size - ignored
                             uri)
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_STRING,
+                            CHIP_ZCLIP_TYPE_STRING,
                             0, // size - ignored
                             (const uint8_t *)"a")
       || !emCborEncodeIndefiniteMap(&state)) {
@@ -1067,19 +1055,19 @@ static void makeNotification(const NotificationEvent *event)
   uint8_t *lastValues = (attrFlags + configuration->sizeAttrFlags + 3 * (configuration->sizeReportableChanges));
   size_t offsetAttrFlags = 0;
   size_t offsetLastValue = 0;
-  for (size_t i = 0; i < EM_ZCL_ATTRIBUTE_COUNT; i++) {
-    const EmZclAttributeEntry_t *attribute = &emZclAttributeTable[i];
+  for (size_t i = 0; i < CH_ZCL_ATTRIBUTE_COUNT; i++) {
+    const ChZclAttributeEntry_t *attribute = &chZclAttributeTable[i];
     int32_t compare
-      = emberZclCompareClusterSpec(attribute->clusterSpec,
+      = chipZclCompareClusterSpec(attribute->clusterSpec,
                                    &configuration->clusterSpec);
     if (compare > 0) {
       break;
     } else if (compare == 0
-               && emZclIsAttributeLocal(attribute)
-               && emZclIsAttributeReportable(attribute)) {
+               && chZclIsAttributeLocal(attribute)
+               && chZclIsAttributeReportable(attribute)) {
       assert(offsetLastValue + attribute->size  <= configuration->sizeLastValues);
       if (((*(attrFlags + offsetAttrFlags)) & ATTR_PRESENT)
-          && !emZclReadEncodeAttributeKeyValue(&state,
+          && !chZclReadEncodeAttributeKeyValue(&state,
                                                configuration->endpointId,
                                                attribute,
                                                lastValues + offsetLastValue,
@@ -1099,11 +1087,11 @@ static void makeNotification(const NotificationEvent *event)
   // is always the last field in the notification map).
   uint8_t bindingId = 254;  // encoded as two bytes (0x18 0xFE) in cbor payload.
   if (!emCborEncodeValue(&state,
-                         EMBER_ZCLIP_TYPE_STRING,
+                         CHIP_ZCLIP_TYPE_STRING,
                          0, // size - ignored
                          (const uint8_t *)"b")
       || !emCborEncodeValue(&state,
-                            EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                            CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                             sizeof(bindingId),
                             (const uint8_t *)&bindingId)) {
     return;
@@ -1135,18 +1123,18 @@ static void sendNotification(const NotificationEvent *event)
     return;
   }
 
-  for (EmberZclBindingId_t bindingId = 0;
-       bindingId < EMBER_ZCL_BINDING_TABLE_SIZE;
+  for (ChipZclBindingId_t bindingId = 0;
+       bindingId < CHIP_ZCL_BINDING_TABLE_SIZE;
        bindingId++) {
-    EmberZclBindingEntry_t entry = { 0 };
-    if (emberZclGetBinding(bindingId, &entry)
+    ChipZclBindingEntry_t entry = { 0 };
+    if (chipZclGetBinding(bindingId, &entry)
         && event->endpointId == entry.endpointId
-        && emberZclAreClusterSpecsEqual(&event->clusterSpec, &entry.clusterSpec)
+        && chipZclAreClusterSpecsEqual(&event->clusterSpec, &entry.clusterSpec)
         && event->reportingConfigurationId == entry.reportingConfigurationId) {
-      EmberZclClusterSpec_t clusterSpec;
-      emberZclReverseClusterSpec(&event->clusterSpec, &clusterSpec);
-      uint8_t uriPath[EMBER_ZCL_URI_PATH_MAX_LENGTH];
-      emZclNotificationToUriPath(&entry.destination.application,
+      ChipZclClusterSpec_t clusterSpec;
+      chipZclReverseClusterSpec(&event->clusterSpec, &clusterSpec);
+      uint8_t uriPath[CHIP_ZCL_URI_PATH_MAX_LENGTH];
+      chZclNotificationToUriPath(&entry.destination.application,
                                  &clusterSpec,
                                  uriPath);
 
@@ -1163,16 +1151,16 @@ static void sendNotification(const NotificationEvent *event)
       state.finger = (uint8_t *)state.end - 2; // Set ptr to just before the 2 bindingId placeholder bytes.
       assert(*((uint8_t *)state.finger - 1) == 'b'); // Check payload is aligned as expected.
       if (!emCborEncodeValue(&state,
-                             EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                             CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                              sizeof(bindingId),
                              (const uint8_t *)&bindingId)) { // Encode the real bindingId value.
         return;
       }
 
-      EmberZclDestination_t destination;
-      emZclReadDestinationFromBinding(&entry, &destination);
-      emZclSend(&destination.network,
-                EMBER_COAP_CODE_POST,
+      ChipZclDestination_t destination;
+      chZclReadDestinationFromBinding(&entry, &destination);
+      chZclSend(&destination.network,
+                CHIP_COAP_CODE_POST,
                 uriPath,
                 state.start,
                 emCborEncodeSize(&state),
@@ -1193,7 +1181,7 @@ static bool makeNotificationPredicate(NotificationEvent *event,
                                       const Configuration_t *configuration)
 {
   return (configuration->endpointId == event->endpointId
-          && emberZclAreClusterSpecsEqual(&configuration->clusterSpec,
+          && chipZclAreClusterSpecsEqual(&configuration->clusterSpec,
                                           &event->clusterSpec)
           && (configuration->reportingConfigurationId
               == event->reportingConfigurationId)
@@ -1202,7 +1190,7 @@ static bool makeNotificationPredicate(NotificationEvent *event,
 
 static NotificationEvent *cancelMakeNotification(const Configuration_t *configuration)
 {
-  return (NotificationEvent *)emberFindEvent(actions.queue,
+  return (NotificationEvent *)chipFindEvent(actions.queue,
                                              &actions,
                                              (EventPredicate)makeNotificationPredicate,
                                              (void *)configuration);
@@ -1226,7 +1214,7 @@ static void scheduleMakeNotification(const Configuration_t *configuration,
       event->clusterSpec = configuration->clusterSpec;
       event->reportingConfigurationId = configuration->reportingConfigurationId;
       event->notification = NULL_BUFFER;
-      emberEventSetDelayMs((Event *)event, delayMs);
+      chipEventSetDelayMs((Event *)event, delayMs);
     }
   }
 }
@@ -1235,7 +1223,7 @@ static bool sendNotificationPredicate(NotificationEvent *event,
                                       const Configuration_t *configuration)
 {
   return (configuration->endpointId == event->endpointId
-          && emberZclAreClusterSpecsEqual(&configuration->clusterSpec,
+          && chipZclAreClusterSpecsEqual(&configuration->clusterSpec,
                                           &event->clusterSpec)
           && (configuration->reportingConfigurationId
               == event->reportingConfigurationId)
@@ -1244,7 +1232,7 @@ static bool sendNotificationPredicate(NotificationEvent *event,
 
 static NotificationEvent *cancelSendNotification(const Configuration_t *configuration)
 {
-  return (NotificationEvent *)emberFindEvent(actions.queue,
+  return (NotificationEvent *)chipFindEvent(actions.queue,
                                              &actions,
                                              (EventPredicate)sendNotificationPredicate,
                                              (void *)configuration);
@@ -1287,7 +1275,7 @@ static void scheduleSendNotification(const Configuration_t *configuration,
     delayMs = (timeNowMs < S_TO_MS(notifyStartupDelaySecs)
                ? S_TO_MS(notifyStartupDelaySecs) - timeNowMs
                : 0);   // Send immediately.
-    emberEventSetDelayMs((Event *)event, delayMs);
+    chipEventSetDelayMs((Event *)event, delayMs);
   }
 }
 
@@ -1302,7 +1290,7 @@ static bool reportingEventsPredicate(NotificationEvent *event)
 static void cancelReportingEvents(void)
 {
   // Cancel all reporting events.
-  emberFindAllEvents(actions.queue,
+  chipFindAllEvents(actions.queue,
                      &actions,
                      (EventPredicate)reportingEventsPredicate,
                      (void *)NULL);
@@ -1355,24 +1343,24 @@ static bool hasReportableChangesOrThresholdCrossings(const Configuration_t *conf
   size_t offsetReportableChange = 0;
   size_t offsetLastValue = 0;
 
-  for (size_t i = 0; i < EM_ZCL_ATTRIBUTE_COUNT; i++) {
-    const EmZclAttributeEntry_t *attribute = &emZclAttributeTable[i];
-    int32_t compare = emberZclCompareClusterSpec(attribute->clusterSpec,
+  for (size_t i = 0; i < CH_ZCL_ATTRIBUTE_COUNT; i++) {
+    const ChZclAttributeEntry_t *attribute = &chZclAttributeTable[i];
+    int32_t compare = chipZclCompareClusterSpec(attribute->clusterSpec,
                                                  &configuration->clusterSpec);
     if (compare > 0) {
       break;
     } else if (compare == 0
-               && emZclIsAttributeLocal(attribute)
-               && emZclIsAttributeReportable(attribute)) {
-      if (emZclIsAttributeAnalog(attribute)) {
+               && chZclIsAttributeLocal(attribute)
+               && chZclIsAttributeReportable(attribute)) {
+      if (chZclIsAttributeAnalog(attribute)) {
         assert(offsetReportableChange + attribute->size   <= configuration->sizeReportableChanges);
       }
       assert(offsetLastValue + attribute->size <= configuration->sizeLastValues);
 
-      uint8_t newValue[EMBER_ZCL_ATTRIBUTE_MAX_SIZE];
+      uint8_t newValue[CHIP_ZCL_ATTRIBUTE_MAX_SIZE];
       // Examine attribute value only if the attribute is present in the report config
       if (((*(attrFlags + offsetAttrFlags)) & ATTR_PRESENT)
-          && (emZclReadAttributeEntry(configuration->endpointId, attribute, newValue, sizeof(newValue)) == EMBER_ZCL_STATUS_SUCCESS)) {
+          && (chZclReadAttributeEntry(configuration->endpointId, attribute, newValue, sizeof(newValue)) == CHIP_ZCL_STATUS_SUCCESS)) {
         // offsetReportableChange tracks offset into all these: reportableChanges, lowThresholds, lowThresholds
 
         if (hasReportableChangeOrThresholdCrossing(lastValues + offsetLastValue, reportableChanges + offsetReportableChange,
@@ -1390,7 +1378,7 @@ static bool hasReportableChangesOrThresholdCrossings(const Configuration_t *conf
           return true;
         }
       }
-      if (emZclIsAttributeAnalog(attribute)) {
+      if (chZclIsAttributeAnalog(attribute)) {
         offsetReportableChange += attribute->size;
       }
       offsetLastValue += attribute->size;
@@ -1404,7 +1392,7 @@ static bool hasReportableChangesOrThresholdCrossings(const Configuration_t *conf
 static bool hasReportableChangeOrThresholdCrossing(const uint8_t * oldValue,
                                                    const uint8_t * compareValue,
                                                    const uint8_t * newValue,
-                                                   const EmZclAttributeEntry_t * attribute,
+                                                   const ChZclAttributeEntry_t * attribute,
                                                    uint8_t checkType)
 {
   // Depending on the checkType parameter value this function tests whether the change
@@ -1431,39 +1419,39 @@ static bool hasReportableChangeOrThresholdCrossing(const uint8_t * oldValue,
   // result in a notification being issued. Section 3.11.3.3.3: A transition of the
   // attribute from a value at or below the high threshold to a value above the high
   // threshold SHALL result in a notification being issued.
-  if (emZclIsAttributeAnalog(attribute)) {
+  if (chZclIsAttributeAnalog(attribute)) {
     switch (attribute->type) {
-      case EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER:
-      case EMBER_ZCLIP_TYPE_INTEGER: {
-        //case EMBER_ZCLIP_TYPE_UTC: { //TODO-
+      case CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER:
+      case CHIP_ZCLIP_TYPE_INTEGER: {
+        //case CHIP_ZCLIP_TYPE_UTC: { //TODO-
         // Allocate local storage for processing numeric integer attribute types-
         // (Buffer SIZE+1 allows us to add a sign-extension byte which is necessary
         // for absolute difference caculation to return the correct result).
-        uint8_t oldBuffer[EMBER_ZCL_ATTRIBUTE_MAX_SIZE + 1];
-        uint8_t newBuffer[EMBER_ZCL_ATTRIBUTE_MAX_SIZE + 1];
-        uint8_t compareBuffer[EMBER_ZCL_ATTRIBUTE_MAX_SIZE + 1];
-        uint8_t diffBuffer[EMBER_ZCL_ATTRIBUTE_MAX_SIZE + 1];
+        uint8_t oldBuffer[CHIP_ZCL_ATTRIBUTE_MAX_SIZE + 1];
+        uint8_t newBuffer[CHIP_ZCL_ATTRIBUTE_MAX_SIZE + 1];
+        uint8_t compareBuffer[CHIP_ZCL_ATTRIBUTE_MAX_SIZE + 1];
+        uint8_t diffBuffer[CHIP_ZCL_ATTRIBUTE_MAX_SIZE + 1];
 
         size_t size = attribute->size + 1;         // incr size to include one sign-extension byte.
 
-        emZclSignExtendAttributeBuffer(oldBuffer,
+        chZclSignExtendAttributeBuffer(oldBuffer,
                                        size,
                                        oldValue,
                                        attribute->size,
                                        attribute->type);
-        emZclSignExtendAttributeBuffer(newBuffer,
+        chZclSignExtendAttributeBuffer(newBuffer,
                                        size,
                                        newValue,
                                        attribute->size,
                                        attribute->type);
-        emZclSignExtendAttributeBuffer(compareBuffer,
+        chZclSignExtendAttributeBuffer(compareBuffer,
                                        size,
                                        compareValue,
                                        attribute->size,
                                        attribute->type);
 
         if (checkType == REPORTABLE_CHANGE) {
-          emZclGetAbsDifference(oldBuffer, newBuffer, diffBuffer, size);
+          chZclGetAbsDifference(oldBuffer, newBuffer, diffBuffer, size);
 
           // Check if value in diff buffer > reportable buffer (both hold absolute
           // +ve values at this stage so check can be bytewise starting at MS byte).
@@ -1481,10 +1469,10 @@ static bool hasReportableChangeOrThresholdCrossing(const uint8_t * oldValue,
 
         if (checkType == LOW_THRESHOLD) {
           // Return FALSE if (old < low_threshold) or (new >= low_threshold)
-          // emZclGetAbsDifference(A, B, diff, size) returns TRUE if A < B.
+          // chZclGetAbsDifference(A, B, diff, size) returns TRUE if A < B.
           // diff will be all zeros if A == B
-          if (emZclGetAbsDifference(oldBuffer, compareBuffer, diffBuffer, size)
-              || emZclGetAbsDifference(compareBuffer, newBuffer, diffBuffer, size)) {
+          if (chZclGetAbsDifference(oldBuffer, compareBuffer, diffBuffer, size)
+              || chZclGetAbsDifference(compareBuffer, newBuffer, diffBuffer, size)) {
             return false;
           }
           for (int i = size - 1; i >= 0; i--) {
@@ -1497,10 +1485,10 @@ static bool hasReportableChangeOrThresholdCrossing(const uint8_t * oldValue,
 
         if (checkType == HIGH_THRESHOLD) {
           // Return FALSE if (old > high_threshold) or (new <= high_threshold)
-          // emZclGetAbsDifference(A, B, diff, size) returns TRUE if A < B,
+          // chZclGetAbsDifference(A, B, diff, size) returns TRUE if A < B,
           // diff will be all zeros if A == B
-          if (emZclGetAbsDifference(compareBuffer, oldBuffer, diffBuffer, size)
-              || emZclGetAbsDifference(newBuffer, compareBuffer, diffBuffer, size)) {
+          if (chZclGetAbsDifference(compareBuffer, oldBuffer, diffBuffer, size)
+              || chZclGetAbsDifference(newBuffer, compareBuffer, diffBuffer, size)) {
             return false;
           }
           for (int i = size - 1; i >= 0; i--) {
@@ -1514,8 +1502,8 @@ static bool hasReportableChangeOrThresholdCrossing(const uint8_t * oldValue,
         break;
       }
 
-      // TODO- Uncomment this block when EMBER_ZCLIP_TYPE_FLOAT is defined.
-      //case EMBER_ZCLIP_TYPE_FLOAT: {
+      // TODO- Uncomment this block when CHIP_ZCLIP_TYPE_FLOAT is defined.
+      //case CHIP_ZCLIP_TYPE_FLOAT: {
       //  // Convert input old,new,reportable fp values (2,4 or 8 byte) to double
       //  // float format. Simple fp arithmetic can then be used to check for
       //  // reportable change.
@@ -1532,10 +1520,10 @@ static bool hasReportableChangeOrThresholdCrossing(const uint8_t * oldValue,
       //          || ((floatOld - floatNew) > floatReportable));
       //}
 
-      // TODO- Uncomment this block when EMBER_ZCLIP_TYPE_TIME_OF_DAY and
-      // EMBER_ZCLIP_TYPE_DATE_DATA are defined.
-      //case EMBER_ZCLIP_TYPE_TIME_OF_DAY:
-      //case EMBER_ZCLIP_TYPE_DATE_DATA: {
+      // TODO- Uncomment this block when CHIP_ZCLIP_TYPE_TIME_OF_DAY and
+      // CHIP_ZCLIP_TYPE_DATE_DATA are defined.
+      //case CHIP_ZCLIP_TYPE_TIME_OF_DAY:
+      //case CHIP_ZCLIP_TYPE_DATE_DATA: {
       //  // These attribute types have individual byte sub-fields arranged with the
       //  // most significant field in the MS byte. To check for reportable change
       //  // we check the difference against the reportable change value on a
@@ -1576,18 +1564,18 @@ static bool hasReportableChangeOrThresholdCrossing(const uint8_t * oldValue,
 }
 
 static bool findReportableAttributeIdInOtaConfigMap(CborState * state,
-                                                    const EmZclAttributeEntry_t * searchAttr)
+                                                    const ChZclAttributeEntry_t * searchAttr)
 {
   // Returns true if the specified reportable attributeId is found in the
   // ota reporting configuration map, e.g. { "a":{<attrId>:{}} }
 
-  if (!emZclIsAttributeReportable(searchAttr)) {
+  if (!chZclIsAttributeReportable(searchAttr)) {
     assert(false);
     return false;
   }
 
   if (emCborDecodeMap(state)) {
-    EmberZclAttributeId_t configAttrId;
+    ChipZclAttributeId_t configAttrId;
     bool foundAttributeMap = false;
     while (true) {
       uint8_t type = emCborDecodePeek(state, NULL);
@@ -1595,8 +1583,8 @@ static bool findReportableAttributeIdInOtaConfigMap(CborState * state,
         if (type == CBOR_UNSIGNED) {
           // Decode the attributeId key value.
           if (!emCborDecodeValue(state,
-                                 EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
-                                 sizeof(EmberZclAttributeId_t),
+                                 CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                                 sizeof(ChipZclAttributeId_t),
                                  (uint8_t *)&configAttrId)) {
             break;
           }
@@ -1608,7 +1596,7 @@ static bool findReportableAttributeIdInOtaConfigMap(CborState * state,
         if (type == CBOR_TEXT) {
           uint8_t keyName[CBOR_TEXT_KEY_MAX_LENGTH];
           if (!emCborDecodeValue(state,
-                                 EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING,
+                                 CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING,
                                  sizeof(keyName),
                                  keyName)) {
             break;
@@ -1632,7 +1620,7 @@ static bool findReportableAttributeIdInOtaConfigMap(CborState * state,
   return false;
 }
 
-// TODO- Uncomment this function when EMBER_ZCLIP_TYPE_FLOAT is defined.
+// TODO- Uncomment this function when CHIP_ZCLIP_TYPE_FLOAT is defined.
 //static bool convertFloatToDblFloatFormat(const uint8_t *input,
 //                                         uint8_t size,
 //                                         double *output) {
@@ -1695,10 +1683,10 @@ static void restoreReportingConfigurationsFromNv(void)
   // corresponding entry in the ram-based configuration buffer list (Ram-based
   // configuration entries are created if they do not already exist).
 
-  for (uint8_t i = 0; i < EMBER_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE; i++) {
-    EmZclNvReportingConfiguration_t nvConfiguration;
+  for (uint8_t i = 0; i < CHIP_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE; i++) {
+    ChZclNvReportingConfiguration_t nvConfiguration;
     retrieveNvConfigurationEntry(nvConfiguration, i);
-    if (nvConfiguration.endpointId == EMBER_ZCL_ENDPOINT_NULL) {
+    if (nvConfiguration.endpointId == CHIP_ZCL_ENDPOINT_NULL) {
       continue;
     }
 
@@ -1772,10 +1760,10 @@ static bool updateNvReportingConfiguration(const Configuration_t * configuration
   // in the nv reporting configuration mirror table.
 
   uint8_t index = NV_CONFIG_TABLE_NULL_INDEX;
-  EmZclNvReportingConfiguration_t nvConfiguration;
+  ChZclNvReportingConfiguration_t nvConfiguration;
 
   // Search for the specified nv reporting configuration.
-  for (uint8_t i = 0; i < EMBER_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE; i++) {
+  for (uint8_t i = 0; i < CHIP_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE; i++) {
     retrieveNvConfigurationEntry(nvConfiguration, i);
     if (matchReportingConfiguration(nvConfiguration.endpointId,
                                     &nvConfiguration.clusterSpec,
@@ -1784,7 +1772,7 @@ static bool updateNvReportingConfiguration(const Configuration_t * configuration
       index = i;
       break;
     } else if ((index == NV_CONFIG_TABLE_NULL_INDEX)
-               && (nvConfiguration.endpointId == EMBER_ZCL_ENDPOINT_NULL)
+               && (nvConfiguration.endpointId == CHIP_ZCL_ENDPOINT_NULL)
                && (allowAdd)) {
       index = i;         // records the first unused nv config entry in the table.
     }
@@ -1803,11 +1791,11 @@ static bool updateNvReportingConfiguration(const Configuration_t * configuration
   nvConfiguration.reportingConfigurationId = configuration->reportingConfigurationId;
   nvConfiguration.minimumIntervalS = configuration->minimumIntervalS;
   nvConfiguration.maximumIntervalS = configuration->maximumIntervalS;
-  if (configuration->sizeAttrFlags > EM_ZCL_MAX_SIZE_NV_REPORTABLE_ATTRIBUTES) {
+  if (configuration->sizeAttrFlags > CH_ZCL_MAX_SIZE_NV_REPORTABLE_ATTRIBUTES) {
     assert(false);         // attrFlags buffer in ram-based configuration is too big to store in nv structure!
     return false;
   }
-  if (configuration->sizeReportableChanges > EM_ZCL_MAX_SIZE_NV_REPORTABLE_CHANGES) {
+  if (configuration->sizeReportableChanges > CH_ZCL_MAX_SIZE_NV_REPORTABLE_CHANGES) {
     assert(false);         // reportableChanges buffer in ram-based configuration is too big to store in nv structure!
     return false;
   }
@@ -1843,11 +1831,11 @@ static void deleteAllNvReportingConfigurations(void)
 {
   // Deletes all non-volatile reporting configurations.
 
-  EmZclNvReportingConfiguration_t nvConfiguration;
-  for (uint8_t i = 0; i < EMBER_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE; i++) {
+  ChZclNvReportingConfiguration_t nvConfiguration;
+  for (uint8_t i = 0; i < CHIP_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE; i++) {
     retrieveNvConfigurationEntry(nvConfiguration, i);
     // Mark the nv reporting configuration entry as unused and save it.
-    nvConfiguration.endpointId = EMBER_ZCL_ENDPOINT_NULL;
+    nvConfiguration.endpointId = CHIP_ZCL_ENDPOINT_NULL;
     saveNvConfigurationEntry(nvConfiguration, i);
   }
 }
@@ -1861,14 +1849,14 @@ static void initialiseReportingConfigurations(void)
 
   // A default report configuration must exist for each ep/cluster combo so
   // we create new ram-based default configurations as necessary and save to nv.
-  for (size_t i = 0; i < emZclEndpointCount; i++) {
-    const EmZclEndpointEntry_t *endpoint = &emZclEndpointTable[i];
+  for (size_t i = 0; i < chZclEndpointCount; i++) {
+    const ChZclEndpointEntry_t *endpoint = &chZclEndpointTable[i];
     for (size_t j = 0; endpoint->clusterSpecs[j] != NULL; j++) {
-      const EmberZclClusterSpec_t *clusterSpec = endpoint->clusterSpecs[j];
+      const ChipZclClusterSpec_t *clusterSpec = endpoint->clusterSpecs[j];
       // Search for an existing matching ram-based default configuration.
       if (!findReportingConfiguration(endpoint->endpointId,
                                       clusterSpec,
-                                      EMBER_ZCL_REPORTING_CONFIGURATION_DEFAULT)) {
+                                      CHIP_ZCL_REPORTING_CONFIGURATION_DEFAULT)) {
         // Not found- make and add a ram-based default reporting configuration.
         Buffer buffer = makeReportingConfiguration(endpoint->endpointId,
                                                    clusterSpec);
@@ -1902,9 +1890,9 @@ static void deleteConfigurationEntry(const Configuration_t * configuration,
 
   if (nvUpdate) {
     // Delete the corresponding nv reporting configuration entry.
-    EmZclNvReportingConfiguration_t nvConfiguration;
+    ChZclNvReportingConfiguration_t nvConfiguration;
     uint8_t i;
-    for (i = 0; i < EMBER_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE; i++) {
+    for (i = 0; i < CHIP_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE; i++) {
       retrieveNvConfigurationEntry(nvConfiguration, i);
       if (matchReportingConfiguration(nvConfiguration.endpointId,
                                       &nvConfiguration.clusterSpec,
@@ -1913,9 +1901,9 @@ static void deleteConfigurationEntry(const Configuration_t * configuration,
         break;
       }
     }
-    if (i < EMBER_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE) {
+    if (i < CHIP_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE) {
       // Mark the nv reporting configuration entry as unused and save it.
-      nvConfiguration.endpointId = EMBER_ZCL_ENDPOINT_NULL;
+      nvConfiguration.endpointId = CHIP_ZCL_ENDPOINT_NULL;
       saveNvConfigurationEntry(nvConfiguration, i);
     }
   }
@@ -1923,14 +1911,14 @@ static void deleteConfigurationEntry(const Configuration_t * configuration,
 
 // Public functions ------------------------------------------------------------
 
-void emZclReportingMarkApplicationBuffersHandler(void)
+void chZclReportingMarkApplicationBuffersHandler(void)
 {
   emMarkBuffer(&configurations);
 }
 
-void emZclReportingNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
-                                        EmberNetworkStatus oldNetworkStatus,
-                                        EmberJoinFailureReason reason)
+void chZclReportingNetworkStatusHandler(ChipNetworkStatus newNetworkStatus,
+                                        ChipNetworkStatus oldNetworkStatus,
+                                        ChipJoinFailureReason reason)
 {
   // If the device is no longer associated with a network, its reporting
   // configurations are removed.  If we end up joined and attached and we have
@@ -1939,7 +1927,7 @@ void emZclReportingNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
   // a bit of time trying to make the default reportable connection whenever
   // the node reattaches after losing its connection temporarily.
   switch (newNetworkStatus) {
-    case EMBER_NO_NETWORK:
+    case CHIP_NO_NETWORK:
       // The buffer mgmt system resets buffers on a network down transition so
       // the following configuration clean-up must not use any ram-based
       // configuration pointers otherwise a buffer assert may result.
@@ -1947,7 +1935,7 @@ void emZclReportingNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
       deleteAllNvReportingConfigurations();
       cancelReportingEvents();         // Cancel any pending reporting events.
       break;
-    case EMBER_JOINED_NETWORK_ATTACHED:
+    case CHIP_JOINED_NETWORK_ATTACHED:
       if (configurations == NULL_BUFFER) {
         initialiseReportingConfigurations();
       }
@@ -1957,9 +1945,9 @@ void emZclReportingNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
   }
 }
 
-void emZclReportingPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                              const EmberZclClusterSpec_t * clusterSpec,
-                                              EmberZclAttributeId_t attributeId,
+void chZclReportingPostAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                              const ChipZclClusterSpec_t * clusterSpec,
+                                              ChipZclAttributeId_t attributeId,
                                               const void *buffer,
                                               size_t bufferLength)
 {
@@ -1969,7 +1957,7 @@ void emZclReportingPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
     const Configuration_t *configuration
       = (const Configuration_t *)emGetBufferPointer(finger);
     if (endpointId == configuration->endpointId
-        && emberZclAreClusterSpecsEqual(clusterSpec,
+        && chipZclAreClusterSpecsEqual(clusterSpec,
                                         &configuration->clusterSpec)) {
       uint32_t nowMs = halCommonGetInt32uMillisecondTick();
       uint32_t delayMs = UINT32_MAX;         // forever
@@ -1989,9 +1977,9 @@ void emZclReportingPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
   }
 }
 
-bool emZclHasReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                    const EmberZclClusterSpec_t * clusterSpec,
-                                    EmberZclReportingConfigurationId_t reportingConfigurationId)
+bool chZclHasReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                    const ChipZclClusterSpec_t * clusterSpec,
+                                    ChipZclReportingConfigurationId_t reportingConfigurationId)
 {
   return (findReportingConfiguration(endpointId,
                                      clusterSpec,
@@ -2003,17 +1991,17 @@ bool emZclHasReportingConfiguration(EmberZclEndpointId_t endpointId,
 //   GET: return list of reporting configuration ids.
 //   POST: add reporting configuration.
 //   OTHER: not allowed.
-void emZclUriClusterReportingConfigurationHandler(EmZclContext_t * context)
+void chZclUriClusterReportingConfigurationHandler(ChZclContext_t * context)
 {
-  if (context->groupId != EMBER_ZCL_GROUP_NULL) {
-    emZclRespond404NotFound(context->info);
+  if (context->groupId != CHIP_ZCL_GROUP_NULL) {
+    chZclRespond404NotFound(context->info);
     return;
   }
   switch (context->code) {
-    case EMBER_COAP_CODE_GET:
+    case CHIP_COAP_CODE_GET:
       getReportingConfigurationIdsHandler(context);
       break;
-    case EMBER_COAP_CODE_POST:
+    case CHIP_COAP_CODE_POST:
       addReportingConfigurationHandler(context);
       break;
     default:
@@ -2027,20 +2015,20 @@ void emZclUriClusterReportingConfigurationHandler(EmZclContext_t * context)
 //   PUT: replace reporting configuration.
 //   DELETE: remove reporting configuration.
 //   OTHER: not allowed.
-void emZclUriClusterReportingConfigurationIdHandler(EmZclContext_t * context)
+void chZclUriClusterReportingConfigurationIdHandler(ChZclContext_t * context)
 {
-  if (context->groupId != EMBER_ZCL_GROUP_NULL) {
-    emZclRespond404NotFound(context->info);
+  if (context->groupId != CHIP_ZCL_GROUP_NULL) {
+    chZclRespond404NotFound(context->info);
     return;
   }
   switch (context->code) {
-    case EMBER_COAP_CODE_GET:
+    case CHIP_COAP_CODE_GET:
       getReportingConfigurationHandler(context);
       break;
-    case EMBER_COAP_CODE_PUT:
+    case CHIP_COAP_CODE_PUT:
       updateReportingConfigurationHandler(context);
       break;
-    case EMBER_COAP_CODE_DELETE:
+    case CHIP_COAP_CODE_DELETE:
       removeReportingConfigurationHandler(context);
       break;
     default:
@@ -2049,7 +2037,7 @@ void emZclUriClusterReportingConfigurationIdHandler(EmZclContext_t * context)
   }
 }
 
-void emberZclReportingConfigurationsFactoryReset(EmberZclEndpointId_t endpointId)
+void chipZclReportingConfigurationsFactoryReset(ChipZclEndpointId_t endpointId)
 {
   // Loops thru all ram-based configurations and deletes any configurations
   // (including default reporting configurations) with the specified endpointId.

@@ -1,42 +1,30 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_BUFFER_MANAGEMENT
-#include EMBER_AF_API_BUFFER_QUEUE
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_ZCL_CORE_DTLS_MANAGER
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_BUFFER_MANAGEMENT
+#include CHIP_AF_API_BUFFER_QUEUE
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE_DTLS_MANAGER
 #include "stack/ip/tls/tls.h"
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #else
-  #define emberAfPluginZclCorePrint(...)
-  #define emberAfPluginZclCorePrintln(...)
-  #define emberAfPluginZclCoreFlush()
-  #define emberAfPluginZclCoreDebugExec(x)
-  #define emberAfPluginZclCorePrintBuffer(buffer, len, withSpace)
-  #define emberAfPluginZclCorePrintString(buffer)
+  #define chipAfPluginZclCorePrint(...)
+  #define chipAfPluginZclCorePrintln(...)
+  #define chipAfPluginZclCoreFlush()
+  #define chipAfPluginZclCoreDebugExec(x)
+  #define chipAfPluginZclCorePrintBuffer(buffer, len, withSpace)
+  #define chipAfPluginZclCorePrintString(buffer)
 #endif
 
 extern void emSha256Hash(const uint8_t *input, int count, uint8_t *output);
 
-extern bool emberVerifyEcdsaSignature(const uint8_t *hash, EccPublicKey *key,
+extern bool chipVerifyEcdsaSignature(const uint8_t *hash, EccPublicKey *key,
                                       const uint8_t *r, uint16_t rLength, const uint8_t *s,
                                       uint16_t sLength);
 
@@ -45,7 +33,7 @@ extern bool emberVerifyEcdsaSignature(const uint8_t *hash, EccPublicKey *key,
 // ZCL_ACCESS_CONTROL_ON_TEST enables access control and access token
 // signature verification with hardcoded public key
 // TODO: Implement an API for setting Commissioning Tool public key
-emZclAccessControlMode_t emZclUseAccessControl = ZCL_ACCESS_CONTROL_OFF;
+chZclAccessControlMode_t chZclUseAccessControl = ZCL_ACCESS_CONTROL_OFF;
 
 // This file has several related chunks of functionality:
 // - Maintaining information about the current set of DTLS sessions.
@@ -58,17 +46,17 @@ emZclAccessControlMode_t emZclUseAccessControl = ZCL_ACCESS_CONTROL_OFF;
 // Two needed functions that don't currently exist.  The local UID
 // value will be obtained from the node's operational certificate,
 // once we have such.
-extern EmberZclUid_t emZclUid;
-bool emIsOurUid(const EmberZclUid_t *uid)
+extern ChipZclUid_t chZclUid;
+bool emIsOurUid(const ChipZclUid_t *uid)
 {
-  return (memcmp(uid, &emZclUid, sizeof(EmberZclUid_t)) == 0);
+  return (memcmp(uid, &chZclUid, sizeof(ChipZclUid_t)) == 0);
 }
 
 // We save the UIDs of the incoming tokens and set the payload link
 // to be the audience string received in the token
 // No payload link implies that all clusters are allowed
 typedef struct {
-  EmberZclUid_t remoteUid; // the uid of the client that own the token.
+  ChipZclUid_t remoteUid; // the uid of the client that own the token.
 } RemoteTokenData_t;
 
 Buffer remoteTokens = NULL_BUFFER;
@@ -87,7 +75,7 @@ typedef struct {
   uint16_t length;           // length of the token
   uint16_t audienceOffset;   // offset of the 'aud' string
   uint16_t audienceLength;   // length of the 'aud' string
-  EmberZclUid_t confUid;     // the uid of the client that own the token.
+  ChipZclUid_t confUid;     // the uid of the client that own the token.
 } TokenData_t;
 
 // This contains a set of TokenData_t records for tokens that have our
@@ -98,27 +86,27 @@ static Buffer localTokens = NULL_BUFFER;
 // Mask of the token indexes that are currently in use.
 static uint16_t localTokenIndexes;
 
-static int8_t checkLocalAccess(EmberZclUid_t *targetUid,
+static int8_t checkLocalAccess(ChipZclUid_t *targetUid,
                                const RemoteTokenData_t *tokenData,
-                               const EmberZclClusterSpec_t *clusterSpec,
+                               const ChipZclClusterSpec_t *clusterSpec,
                                uint8_t accessType,
                                uint16_t mask);
-static int8_t checkRemoteAccess(EmberZclUid_t *targetUid,
+static int8_t checkRemoteAccess(ChipZclUid_t *targetUid,
                                 const RemoteTokenData_t *tokenData,
-                                const EmberZclClusterSpec_t *clusterSpec,
+                                const ChipZclClusterSpec_t *clusterSpec,
                                 uint8_t accessType,
                                 uint16_t mask);
 bool checkClusterAccess(const uint8_t *accessString,
                         uint16_t accessStringLength,
-                        const EmberZclClusterSpec_t *clusterSpec,
-                        EmberZclDeviceId_t deviceId,
+                        const ChipZclClusterSpec_t *clusterSpec,
+                        ChipZclDeviceId_t deviceId,
                         uint8_t accessType);
 
 //----------------------------------------------------------------
 // Private functions
 
-#ifndef EM_ZCL_MAX_REMOTE_ACCESS_TOKENS
-  #define EM_ZCL_MAX_REMOTE_ACCESS_TOKENS 3 // TODO: pluginize this?
+#ifndef CH_ZCL_MAX_REMOTE_ACCESS_TOKENS
+  #define CH_ZCL_MAX_REMOTE_ACCESS_TOKENS 3 // TODO: pluginize this?
 #endif
 
 static void printString(const uint8_t *buffer,
@@ -126,16 +114,16 @@ static void printString(const uint8_t *buffer,
                         bool newline)
 {
   for (uint8_t i = 0; i < length; i++) {
-    emberAfPluginZclCorePrint("%c", buffer[i]);
+    chipAfPluginZclCorePrint("%c", buffer[i]);
   }
   if (newline) {
-    emberAfPluginZclCorePrintln("");
+    chipAfPluginZclCorePrintln("");
   }
 }
 
-void emZclPrintAccessTokens(void)
+void chZclPrintAccessTokens(void)
 {
-  emberAfPluginZclCorePrintln("Access Control: Remote Tokens");
+  chipAfPluginZclCorePrintln("Access Control: Remote Tokens");
   uint8_t index = 0;
   for (Buffer buffer = emBufferQueueHead(&remoteTokens);
        buffer != NULL_BUFFER;
@@ -143,27 +131,27 @@ void emZclPrintAccessTokens(void)
     const RemoteTokenData_t *entry
       = (const RemoteTokenData_t *)emGetBufferPointer(buffer);
 
-    uint8_t result[EMBER_ZCL_UID_STRING_SIZE];
-    emZclUidToBase64Url(&entry->remoteUid, EMBER_ZCL_UID_BITS, result);
-    emberAfPluginZclCorePrint("index: %d | uid: %s | ", index, result);
+    uint8_t result[CHIP_ZCL_UID_STRING_SIZE];
+    chZclUidToBase64Url(&entry->remoteUid, CHIP_ZCL_UID_BITS, result);
+    chipAfPluginZclCorePrint("index: %d | uid: %s | ", index, result);
     index++;
 
     Buffer accessBuffer = emGetPayloadLink(buffer);
     uint16_t accessBufferLength = emGetBufferLength(accessBuffer);
     if (accessBufferLength == 0) {
-      emberAfPluginZclCorePrint("access: all");
+      chipAfPluginZclCorePrint("access: all");
     } else {
       uint8_t* accessBufferPtr = emGetBufferPointer(accessBuffer);
-      emberAfPluginZclCorePrint("access: ");
+      chipAfPluginZclCorePrint("access: ");
       printString(accessBufferPtr, accessBufferLength, false);
     }
-    emberAfPluginZclCorePrintln("");
+    chipAfPluginZclCorePrintln("");
   }
-  emberAfPluginZclCorePrintln("");
+  chipAfPluginZclCorePrintln("");
 }
 
 // true if token removed, false otherwise
-static bool removeRemoteToken(const EmberZclUid_t *targetUid,
+static bool removeRemoteToken(const ChipZclUid_t *targetUid,
                               uint8_t* targetContents,
                               uint16_t targetLength)
 {
@@ -175,7 +163,7 @@ static bool removeRemoteToken(const EmberZclUid_t *targetUid,
 
     if (MEMCOMPARE(&entry->remoteUid,
                    targetUid,
-                   sizeof(EmberZclUid_t)) == 0) {
+                   sizeof(ChipZclUid_t)) == 0) {
       Buffer accessBuffer = emGetPayloadLink(buffer);
       uint16_t accessBufferLength = emGetBufferLength(accessBuffer);
       uint8_t* accessBufferContents = emGetBufferPointer(accessBuffer);
@@ -183,7 +171,7 @@ static bool removeRemoteToken(const EmberZclUid_t *targetUid,
           && MEMCOMPARE(accessBufferContents,
                         targetContents,
                         targetLength) == 0) {
-        emberAfPluginZclCorePrintln("Access Control: Removed duplicate token");
+        chipAfPluginZclCorePrintln("Access Control: Removed duplicate token");
         emBufferQueueRemove(&remoteTokens, buffer);
         return true; // should only have one duplicate
       }
@@ -210,33 +198,33 @@ static void addRemoteTokenBuffer(Buffer tokenBuffer)
   emBufferQueueAddToHead(&remoteTokens, tokenBuffer);
 
   // remove oldest item, if queue too big
-  if (emBufferQueueLength(&remoteTokens) > EM_ZCL_MAX_REMOTE_ACCESS_TOKENS) {
+  if (emBufferQueueLength(&remoteTokens) > CH_ZCL_MAX_REMOTE_ACCESS_TOKENS) {
     emBufferQueueRemove(&remoteTokens, remoteTokens);
   }
 
-  emZclPrintAccessTokens();
+  chZclPrintAccessTokens();
 }
 
 // returns true if protected clusterSpec with given accessType, false otherwise
-bool emZclIsProtectedResource(const EmberZclClusterSpec_t *clusterSpec,
+bool chZclIsProtectedResource(const ChipZclClusterSpec_t *clusterSpec,
                               uint8_t accessType)
 {
-  if (emZclUseAccessControl == ZCL_ACCESS_CONTROL_OFF) {
+  if (chZclUseAccessControl == ZCL_ACCESS_CONTROL_OFF) {
     return false;
   }
 
-  emberAfPluginZclCorePrintln("Access Control: test access type: %c (r: %d, m: %d, c: %d)", accessType, clusterSpec->role, clusterSpec->manufacturerCode, clusterSpec->id);
+  chipAfPluginZclCorePrintln("Access Control: test access type: %c (r: %d, m: %d, c: %d)", accessType, clusterSpec->role, clusterSpec->manufacturerCode, clusterSpec->id);
   // Check if this is an unprotected zcl access (direction is not checked).
   // (Spec v047: 6.5 - Cluster Security Requirements)
   switch (accessType) {
-    //TODO- should be able to access the EMBER_ZCL_CLUSTER_IDs enums from here!
+    //TODO- should be able to access the CHIP_ZCL_CLUSTER_IDs enums from here!
     case 'a': // attribute
-      if ((clusterSpec->id == 0x0000)         // EMBER_ZCL_CLUSTER_BASIC
-          || (clusterSpec->id == 0x0101)      // EMBER_ZCL_CLUSTER_DOOR_LOCK
-          || (clusterSpec->id == 0x0500)      // EMBER_ZCL_CLUSTER_IAS_ZONE
-          || (clusterSpec->id == 0x0501)      // EMBER_ZCL_CLUSTER_IAS_ACE
-          || (clusterSpec->id == 0x0502)      // EMBER_ZCL_CLUSTER_IAS_WD
-          || (clusterSpec->id == 0x2000)      // EMBER_ZCL_CLUSTER_OTA_BOOTLOAD
+      if ((clusterSpec->id == 0x0000)         // CHIP_ZCL_CLUSTER_BASIC
+          || (clusterSpec->id == 0x0101)      // CHIP_ZCL_CLUSTER_DOOR_LOCK
+          || (clusterSpec->id == 0x0500)      // CHIP_ZCL_CLUSTER_IAS_ZONE
+          || (clusterSpec->id == 0x0501)      // CHIP_ZCL_CLUSTER_IAS_ACE
+          || (clusterSpec->id == 0x0502)      // CHIP_ZCL_CLUSTER_IAS_WD
+          || (clusterSpec->id == 0x2000)      // CHIP_ZCL_CLUSTER_OTA_BOOTLOAD
           ) {
         return true;
       }
@@ -244,28 +232,28 @@ bool emZclIsProtectedResource(const EmberZclClusterSpec_t *clusterSpec,
     case 'c': // command
     case 'r': // report
     case 'b': // binding
-      if ((clusterSpec->id == 0x0000)         // EMBER_ZCL_CLUSTER_BASIC
-          || (clusterSpec->id == 0x0004)      // EMBER_ZCL_CLUSTER_GROUPS
-          || (clusterSpec->id == 0x0005)      // EMBER_ZCL_CLUSTER_SCENES
-          || (clusterSpec->id == 0x0006)      // EMBER_ZCL_CLUSTER_ON_OFF
-          || (clusterSpec->id == 0x0008)      // EMBER_ZCL_CLUSTER_LEVEL_CONTROL
-          || (clusterSpec->id == 0x0009)      // EMBER_ZCL_CLUSTER_ALARM
-          || (clusterSpec->id == 0x0101)      // EMBER_ZCL_CLUSTER_DOOR_LOCK
-          || (clusterSpec->id == 0x0102)      // EMBER_ZCL_CLUSTER_WINDOW_COVERING
-          || (clusterSpec->id == 0x0300)      // EMBER_ZCL_CLUSTER_COLOR_CONTROL
-          || (clusterSpec->id == 0x0500)      // EMBER_ZCL_CLUSTER_IAS_ZONE
-          || (clusterSpec->id == 0x0501)      // EMBER_ZCL_CLUSTER_IAS_ACE
-          || (clusterSpec->id == 0x0502)      // EMBER_ZCL_CLUSTER_IAS_WD
-          || (clusterSpec->id == 0x2000)      // EMBER_ZCL_CLUSTER_OTA_BOOTLOAD
+      if ((clusterSpec->id == 0x0000)         // CHIP_ZCL_CLUSTER_BASIC
+          || (clusterSpec->id == 0x0004)      // CHIP_ZCL_CLUSTER_GROUPS
+          || (clusterSpec->id == 0x0005)      // CHIP_ZCL_CLUSTER_SCENES
+          || (clusterSpec->id == 0x0006)      // CHIP_ZCL_CLUSTER_ON_OFF
+          || (clusterSpec->id == 0x0008)      // CHIP_ZCL_CLUSTER_LEVEL_CONTROL
+          || (clusterSpec->id == 0x0009)      // CHIP_ZCL_CLUSTER_ALARM
+          || (clusterSpec->id == 0x0101)      // CHIP_ZCL_CLUSTER_DOOR_LOCK
+          || (clusterSpec->id == 0x0102)      // CHIP_ZCL_CLUSTER_WINDOW_COVERING
+          || (clusterSpec->id == 0x0300)      // CHIP_ZCL_CLUSTER_COLOR_CONTROL
+          || (clusterSpec->id == 0x0500)      // CHIP_ZCL_CLUSTER_IAS_ZONE
+          || (clusterSpec->id == 0x0501)      // CHIP_ZCL_CLUSTER_IAS_ACE
+          || (clusterSpec->id == 0x0502)      // CHIP_ZCL_CLUSTER_IAS_WD
+          || (clusterSpec->id == 0x2000)      // CHIP_ZCL_CLUSTER_OTA_BOOTLOAD
           ) {
         return true;
       }
       break;
     default:
-      emberAfPluginZclCorePrintln("Access Control: Unknown access type: %c", accessType);
+      chipAfPluginZclCorePrintln("Access Control: Unknown access type: %c", accessType);
       break;
   }
-  emberAfPluginZclCorePrintln("Access Control: Unrestricted");
+  chipAfPluginZclCorePrintln("Access Control: Unrestricted");
   return false;
 }
 
@@ -300,24 +288,24 @@ bool emZclIsProtectedResource(const EmberZclClusterSpec_t *clusterSpec,
 //       outputSize should initially be the size of the output
 //       array. If successful, it will signify number of bytes
 //       used.
-bool emZclExtractBinaryAccessToken(CborState *state,
+bool chZclExtractBinaryAccessToken(CborState *state,
                                    uint8_t *output,
                                    uint16_t *outputSize)
 {
   uint16_t key = 0;
-  uint8_t value[EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN];
+  uint8_t value[CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN];
 
   if (!emCborDecodeMap(state)
-      || (key = emCborDecodeKey(state) != EM_ZCL_ACCESS_TOKEN_KEY)
+      || (key = emCborDecodeKey(state) != CH_ZCL_ACCESS_TOKEN_KEY)
       || !emCborDecodeValue(state,
-                            EMBER_ZCLIP_TYPE_MAX_LENGTH_STRING,
+                            CHIP_ZCLIP_TYPE_MAX_LENGTH_STRING,
                             sizeof(value),
                             value)) {
-    emberAfPluginZclCorePrintln("Access Control: failed token key:%d", key);
+    chipAfPluginZclCorePrintln("Access Control: failed token key:%d", key);
     return false;
   }
 
-  // emberAfPluginZclCorePrintln("Access Control: token value:%s", value);
+  // chipAfPluginZclCorePrintln("Access Control: token value:%s", value);
   int decodeResult = emDecodeBase64Url(value,
                                        strlen((const char *)value),
                                        output,
@@ -327,12 +315,12 @@ bool emZclExtractBinaryAccessToken(CborState *state,
       || (*outputSize < decodeResult)) {
     return false;
   } else {
-    // emberAfPluginZclCoreDebugExec(
-    //   emberAfPluginZclCorePrintln("Access Control: binary token { ");
+    // chipAfPluginZclCoreDebugExec(
+    //   chipAfPluginZclCorePrintln("Access Control: binary token { ");
     //   for (uint16_t i = 0; i < decodeResult; i++) {
-    //   emberAfPluginZclCorePrint("%x ", output[i]);
+    //   chipAfPluginZclCorePrint("%x ", output[i]);
     // }
-    //   emberAfPluginZclCorePrintln("}");
+    //   chipAfPluginZclCorePrintln("}");
     //   );
     *outputSize = decodeResult;
     return true;
@@ -342,14 +330,14 @@ bool emZclExtractBinaryAccessToken(CborState *state,
 //----------------------------------------------------------------
 // Internal functions
 
-void emZclAccessMarkApplicationBuffersHandler(void)
+void chZclAccessMarkApplicationBuffersHandler(void)
 {
   emMarkBuffer(&localTokens);
   emMarkBuffer(&remoteTokens);
 }
 
 // Token resource: /zcl/t
-void emZclAccessTokenHandler(EmZclContext_t *context)
+void chZclAccessTokenHandler(ChZclContext_t *context)
 {
   if (emIsMulticastAddress(context->info->localAddress.bytes)) {
     // do not respond if request over multicast
@@ -357,54 +345,54 @@ void emZclAccessTokenHandler(EmZclContext_t *context)
   }
 
   // access token should only be set over a DTLS session
-  if (context->info->transmitHandler != &emberDtlsTransmitHandler) {
-    emZclRespond400BadRequest(context->info);
+  if (context->info->transmitHandler != &chipDtlsTransmitHandler) {
+    chZclRespond400BadRequest(context->info);
     return;
   }
 
-  EmberZclUid_t uid;
-  if (emberZclDtlsManagerGetUidBySessionId((uint8_t)(unsigned long) context->info->transmitHandlerData,
-                                           &uid) != EMBER_SUCCESS) {
-    emZclRespond401Unauthorized(context->info);
+  ChipZclUid_t uid;
+  if (chipZclDtlsManagerGetUidBySessionId((uint8_t)(unsigned long) context->info->transmitHandlerData,
+                                           &uid) != CHIP_SUCCESS) {
+    chZclRespond401Unauthorized(context->info);
     return;
   }
 
-  uint16_t binaryTokenSize = EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN;
-  uint8_t binaryToken[EM_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN];
+  uint16_t binaryTokenSize = CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN;
+  uint8_t binaryToken[CH_ZCL_ACCESS_TOKEN_VALUE_MAX_LEN];
   CborState state;
   emCborDecodeStart(&state, context->payload, context->payloadLength);
-  if (!emZclExtractBinaryAccessToken(&state,
+  if (!chZclExtractBinaryAccessToken(&state,
                                      binaryToken,
                                      &binaryTokenSize)) {
-    emZclRespond400BadRequest(context->info);
+    chZclRespond400BadRequest(context->info);
     return;
   }
 
-  if (emZclAddIncomingToken(NULL,
+  if (chZclAddIncomingToken(NULL,
                             binaryToken,
                             binaryTokenSize)) {
-    emZclRespond201Created(context->info, NULL);
+    chZclRespond201Created(context->info, NULL);
   } else {
-    emZclRespond401Unauthorized(context->info);
+    chZclRespond401Unauthorized(context->info);
   }
 }
 
 // check to see if the remote device with given UID has access to the requested
 // resource with given clusterSpec and accessType
-EmberZclStatus_t emZclAllowRemoteAccess(const uint8_t sessionId,
-                                        const EmberZclClusterSpec_t *clusterSpec,
-                                        EmberZclDeviceId_t endpointDeviceId,
+ChipZclStatus_t chZclAllowRemoteAccess(const uint8_t sessionId,
+                                        const ChipZclClusterSpec_t *clusterSpec,
+                                        ChipZclDeviceId_t endpointDeviceId,
                                         uint8_t accessType)
 {
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_NOT_AUTHORIZED;  // Returned if UID/kid not found
-  if (!emZclIsProtectedResource(clusterSpec, accessType)) {
-    return EMBER_ZCL_STATUS_SUCCESS;
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_NOT_AUTHORIZED;  // Returned if UID/kid not found
+  if (!chZclIsProtectedResource(clusterSpec, accessType)) {
+    return CHIP_ZCL_STATUS_SUCCESS;
   }
 
-  EmberZclUid_t targetUid = { { 0 } };
-  if (emberZclDtlsManagerGetUidBySessionId(sessionId, &targetUid)
-      != EMBER_SUCCESS) { // PSK/RPK mode?
-    return EMBER_ZCL_STATUS_FAILURE;
+  ChipZclUid_t targetUid = { { 0 } };
+  if (chipZclDtlsManagerGetUidBySessionId(sessionId, &targetUid)
+      != CHIP_SUCCESS) { // PSK/RPK mode?
+    return CHIP_ZCL_STATUS_FAILURE;
   }
 
   // iterate through remoteTokens
@@ -417,28 +405,28 @@ EmberZclStatus_t emZclAllowRemoteAccess(const uint8_t sessionId,
       = (const RemoteTokenData_t *)emGetBufferPointer(buffer);
     if (MEMCOMPARE(&entry->remoteUid,
                    &targetUid,
-                   sizeof(EmberZclUid_t)) == 0) {
+                   sizeof(ChipZclUid_t)) == 0) {
       Buffer accessBuffer = emGetPayloadLink(buffer);
       uint16_t accessBufferLength = emGetBufferLength(accessBuffer);
       if (accessBufferLength == 0) {
-        return EMBER_ZCL_STATUS_SUCCESS; // allow all
+        return CHIP_ZCL_STATUS_SUCCESS; // allow all
       } else if (checkClusterAccess(emGetBufferPointer(accessBuffer),
                                     accessBufferLength,
                                     clusterSpec,
                                     endpointDeviceId,
                                     accessType)) {
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return CHIP_ZCL_STATUS_SUCCESS;
       } else {
-        status = EMBER_ZCL_STATUS_FORBIDDEN;
+        status = CHIP_ZCL_STATUS_FORBIDDEN;
         continue; // could have another token which provides access
       }
     }
   }
 
-  emberAfPluginZclCoreDebugExec(                                                                      \
-    uint8_t uidString[EMBER_ZCL_UID_STRING_SIZE];                                                     \
-    emZclUidToBase64Url(&targetUid, EMBER_ZCL_UID_BITS, uidString);                                   \
-    emberAfPluginZclCorePrintln("Access Control: Access denied for cluster:0x%2x access:%c | uid:%s", \
+  chipAfPluginZclCoreDebugExec(                                                                      \
+    uint8_t uidString[CHIP_ZCL_UID_STRING_SIZE];                                                     \
+    chZclUidToBase64Url(&targetUid, CHIP_ZCL_UID_BITS, uidString);                                   \
+    chipAfPluginZclCorePrintln("Access Control: Access denied for cluster:0x%2x access:%c | uid:%s", \
                                 clusterSpec->id,                                                      \
                                 accessType,                                                           \
                                 uidString);                                                           \
@@ -458,14 +446,14 @@ EmberZclStatus_t emZclAllowRemoteAccess(const uint8_t sessionId,
 
 int16_t checkUidAccess(const uint8_t *accessString,
                        uint16_t accessStringLength,
-                       EmberZclUid_t *targetUid,
+                       ChipZclUid_t *targetUid,
                        uint8_t *accessBuf,
                        uint16_t accessBufLength)
 {
   // Checks that 'targetUid' is allowed access
   //
   // For outgoing tokens we don't know the type of remote devices so the
-  // caller can pass in EMBER_ZCL_DEVICE_ID_NULL and we just have to
+  // caller can pass in CHIP_ZCL_DEVICE_ID_NULL and we just have to
   // assume that the remote node is the right type for whatever token we
   // have.
   //
@@ -504,9 +492,9 @@ int16_t checkUidAccess(const uint8_t *accessString,
         case 'n': {
           uidSeen = true;
           if (targetUid) {
-            EmberZclUid_t uid;
-            if (emZclNiUriToUid(start, length, &uid)
-                && memcmp(&uid, targetUid, sizeof(EmberZclUid_t)) == 0) {
+            ChipZclUid_t uid;
+            if (chZclNiUriToUid(start, length, &uid)
+                && memcmp(&uid, targetUid, sizeof(ChipZclUid_t)) == 0) {
               uidMatch = true;
             }
           } else {
@@ -549,8 +537,8 @@ int16_t checkUidAccess(const uint8_t *accessString,
 
 bool checkClusterAccess(const uint8_t *accessString,
                         uint16_t accessStringLength,
-                        const EmberZclClusterSpec_t *clusterSpec,
-                        EmberZclDeviceId_t endpointDeviceId,
+                        const ChipZclClusterSpec_t *clusterSpec,
+                        ChipZclDeviceId_t endpointDeviceId,
                         uint8_t accessType)
 {
   // Returns true if the accessString allows 'clusterSpec' with 'accessType'.
@@ -560,7 +548,7 @@ bool checkClusterAccess(const uint8_t *accessString,
   //  'r' reports
   //  'b' bindings
   // If accessString contains d.<id>, then one of them needs to be
-  // equal to endpointDeviceId, unless it is EMBER_ZCL_DEVICE_ID_NULL
+  // equal to endpointDeviceId, unless it is CHIP_ZCL_DEVICE_ID_NULL
 
   bool deviceIdSeen = false;
   bool deviceIdMatch = false;
@@ -568,7 +556,7 @@ bool checkClusterAccess(const uint8_t *accessString,
   bool clusterIdMatch = false;
 
   uint8_t cluster[MAX_CLUSTER_STRING_LENGTH];
-  size_t clusterLen = emZclClusterToString(clusterSpec, cluster);
+  size_t clusterLen = chZclClusterToString(clusterSpec, cluster);
   cluster[clusterLen++] = '.';
   cluster[clusterLen++] = accessType;
 
@@ -589,12 +577,12 @@ bool checkClusterAccess(const uint8_t *accessString,
           deviceIdSeen = true;
           uintmax_t deviceId;
           if (!deviceIdMatch // already found a match
-              && ((endpointDeviceId == EMBER_ZCL_DEVICE_ID_NULL) // match on any deviceId.
+              && ((endpointDeviceId == CHIP_ZCL_DEVICE_ID_NULL) // match on any deviceId.
                   || ((length >= 3)
                       && (start[1] == '.')
                       && emHexStringToInt(start + 2, length - 2, &deviceId)
                       && (deviceId == endpointDeviceId)))) {
-            emberAfPluginZclCorePrintln("Access Control: checkClusterAccess() deviceId found: 0x%2x",
+            chipAfPluginZclCorePrintln("Access Control: checkClusterAccess() deviceId found: 0x%2x",
                                         endpointDeviceId);
             deviceIdMatch = true;
           }
@@ -606,7 +594,7 @@ bool checkClusterAccess(const uint8_t *accessString,
           if (!clusterIdMatch // already found a match
               && (length == clusterLen
                   && memcmp(cluster, start, clusterLen) == 0)) {
-            emberAfPluginZclCorePrintln("Access Control: checkClusterAccess() clusterId found");
+            chipAfPluginZclCorePrintln("Access Control: checkClusterAccess() clusterId found");
             clusterIdMatch = true;
           }
           break;
@@ -631,10 +619,10 @@ bool checkClusterAccess(const uint8_t *accessString,
   }
 }
 
-// TODO: do we need this now that we have emZclAllowRemoteAccess?
-int8_t checkResourceAccess(EmberZclUid_t *targetUid,
+// TODO: do we need this now that we have chZclAllowRemoteAccess?
+int8_t checkResourceAccess(ChipZclUid_t *targetUid,
                            const RemoteTokenData_t *tokenData,
-                           const EmberZclClusterSpec_t *clusterSpec,
+                           const ChipZclClusterSpec_t *clusterSpec,
                            uint8_t accessType,
                            uint16_t mask)
 {
@@ -647,7 +635,7 @@ int8_t checkResourceAccess(EmberZclUid_t *targetUid,
 
   // Check if this is an unprotected zcl access (direction is not checked).
   // (Spec v040: 6.5 - Cluster Security Requirements)
-  if (!emZclIsProtectedResource(clusterSpec, accessType)) {
+  if (!chZclIsProtectedResource(clusterSpec, accessType)) {
     return -2;
   }
 
@@ -657,7 +645,7 @@ int8_t checkResourceAccess(EmberZclUid_t *targetUid,
     return -1;
   }
 
-  if (!memcmp(targetUid, &emZclUid, sizeof(EmberZclUid_t))) {
+  if (!memcmp(targetUid, &chZclUid, sizeof(ChipZclUid_t))) {
     // Incoming resource request (we are RS).
     return checkLocalAccess(targetUid,
                             tokenData,
@@ -674,9 +662,9 @@ int8_t checkResourceAccess(EmberZclUid_t *targetUid,
   }
 }
 
-static int8_t checkLocalAccess(EmberZclUid_t *targetUid,
+static int8_t checkLocalAccess(ChipZclUid_t *targetUid,
                                const RemoteTokenData_t *tokenData,
-                               const EmberZclClusterSpec_t *clusterSpec,
+                               const ChipZclClusterSpec_t *clusterSpec,
                                uint8_t accessType,
                                uint16_t mask)
 {
@@ -697,12 +685,12 @@ static int8_t checkLocalAccess(EmberZclUid_t *targetUid,
 
   for (index = 0; token < end; token++, index++) {
     if ((mask & BIT(index))
-        && (!memcmp(&token->confUid, &tokenData->remoteUid, sizeof(EmberZclUid_t))) // Check token is owned by remote device.
+        && (!memcmp(&token->confUid, &tokenData->remoteUid, sizeof(ChipZclUid_t))) // Check token is owned by remote device.
         // no need to check deviceAccess here (device access is checked before token is saved).
         && checkClusterAccess(token->bytes + token->audienceOffset,
                               token->audienceLength,
                               clusterSpec,
-                              EMBER_ZCL_DEVICE_ID_NULL,
+                              CHIP_ZCL_DEVICE_ID_NULL,
                               accessType)) {
       return index;
     }
@@ -711,9 +699,9 @@ static int8_t checkLocalAccess(EmberZclUid_t *targetUid,
   return -1;
 }
 
-static int8_t checkRemoteAccess(EmberZclUid_t *targetUid,
+static int8_t checkRemoteAccess(ChipZclUid_t *targetUid,
                                 const RemoteTokenData_t *tokenData,
-                                const EmberZclClusterSpec_t *clusterSpec,
+                                const ChipZclClusterSpec_t *clusterSpec,
                                 uint8_t accessType,
                                 uint16_t mask)
 {
@@ -746,12 +734,12 @@ static int8_t checkRemoteAccess(EmberZclUid_t *targetUid,
 
   for (index = 0; token < end; token++, index++) {
     if ((mask & BIT(index))
-        && (!memcmp(&token->confUid, &emZclUid, sizeof(EmberZclUid_t))) // Check we own the token.
+        && (!memcmp(&token->confUid, &chZclUid, sizeof(ChipZclUid_t))) // Check we own the token.
         // no need to check deviceAccess here (device access is checked before token is saved).
         && checkClusterAccess(token->bytes + token->audienceOffset,
                               token->audienceLength,
                               clusterSpec,
-                              EMBER_ZCL_DEVICE_ID_NULL,
+                              CHIP_ZCL_DEVICE_ID_NULL,
                               accessType)) {
       return index;
     }
@@ -769,7 +757,7 @@ bool verifyAccessTokenSignature(const uint8_t *signature, const uint8_t *token, 
   uint8_t buffer[1024];
 
   // For now only verify signature if we are explicitly configured to be in a test mode
-  if (emZclUseAccessControl != ZCL_ACCESS_CONTROL_ON_TEST) {
+  if (chZclUseAccessControl != ZCL_ACCESS_CONTROL_ON_TEST) {
     return true;
   }
 
@@ -786,16 +774,16 @@ bool verifyAccessTokenSignature(const uint8_t *signature, const uint8_t *token, 
   //  Calculate its hash using SHA-256
   //  Sign the hash using the private key
   emCborEncodeArrayStart(&state, buffer, sizeof(buffer), 5);
-  emCborEncodeValue(&state, EMBER_ZCLIP_TYPE_STRING, sizeof("Signature"), (const uint8_t *)"Signature");
-  emCborEncodeValue(&state, EMBER_ZCLIP_TYPE_FIXED_LENGTH_BINARY, 0, NULL);
-  emCborEncodeValue(&state, EMBER_ZCLIP_TYPE_FIXED_LENGTH_BINARY, 0, NULL);
-  emCborEncodeValue(&state, EMBER_ZCLIP_TYPE_FIXED_LENGTH_BINARY, 0, NULL);
-  emCborEncodeValue(&state, EMBER_ZCLIP_TYPE_FIXED_LENGTH_BINARY, tokenLength, token);
+  emCborEncodeValue(&state, CHIP_ZCLIP_TYPE_STRING, sizeof("Signature"), (const uint8_t *)"Signature");
+  emCborEncodeValue(&state, CHIP_ZCLIP_TYPE_FIXED_LENGTH_BINARY, 0, NULL);
+  emCborEncodeValue(&state, CHIP_ZCLIP_TYPE_FIXED_LENGTH_BINARY, 0, NULL);
+  emCborEncodeValue(&state, CHIP_ZCLIP_TYPE_FIXED_LENGTH_BINARY, 0, NULL);
+  emCborEncodeValue(&state, CHIP_ZCLIP_TYPE_FIXED_LENGTH_BINARY, tokenLength, token);
 
   emSha256Hash(buffer, emCborEncodeSize(&state), hash);
 
   // Verify the signature using the public key
-  return emberVerifyEcdsaSignature(hash, &eccPublicKey, signature, 32, signature + 32, 32);
+  return chipVerifyEcdsaSignature(hash, &eccPublicKey, signature, 32, signature + 32, 32);
 }
 
 bool emDecodeAccessToken(TokenData_t *token)
@@ -873,10 +861,10 @@ bool emDecodeAccessToken(TokenData_t *token)
   // For safety, check signature here, the earliest possible point.
   // Shouldn't even decode the payload until after checking the signature.
   if (verifyAccessTokenSignature(signature, payload, payloadLength) != true) {
-    emberAfPluginZclCorePrintln("Access token signature not valid");
+    chipAfPluginZclCorePrintln("Access token signature not valid");
     return false;
   } else {
-    emberAfPluginZclCorePrintln("Access token signature is valid");
+    chipAfPluginZclCorePrintln("Access token signature is valid");
   }
 
   // For testing we may want to check that there is nothing else.
@@ -895,7 +883,7 @@ bool emDecodeAccessToken(TokenData_t *token)
   while (!emCborPeekSequenceEnd(&state)) {
     uint32_t key;
     if (!emCborDecodeValue(&state,
-                           EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                           CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
                            sizeof(key),
                            (uint8_t *) &key)) {
       return false;
@@ -930,7 +918,7 @@ bool emDecodeAccessToken(TokenData_t *token)
         if ((keyStringLength == 3)
             && strncmp("kid", (const char *) keyString, 3) == 0) {
           if (!(emCborDecodeItem(&state, CBOR_TEXT, &uidUri, &uidUriLength)
-                && emZclNiUriToUid(uidUri, uidUriLength, &token->confUid))) {
+                && chZclNiUriToUid(uidUri, uidUriLength, &token->confUid))) {
             return false;
           }
           haveUid = true;
@@ -999,7 +987,7 @@ bool emCacheConfiguredToken(const uint8_t *tokenBytes, uint16_t tokenLength)
 
 // UID is the identifier of the device that added this token; could be
 // NULL in which case don't compare it to the UID from the token
-bool emZclAddIncomingToken(const EmberZclUid_t *remoteUid,
+bool chZclAddIncomingToken(const ChipZclUid_t *remoteUid,
                            const uint8_t *tokenBytes,
                            uint16_t tokenLength)
 
@@ -1015,15 +1003,15 @@ bool emZclAddIncomingToken(const EmberZclUid_t *remoteUid,
   }
   // Verify that the remote node is the owner of the token -- do so only if remoteUid is provided
   if (remoteUid != NULL) {
-    if (memcmp(&token.confUid, remoteUid, sizeof(EmberZclUid_t)) != 0) {
-      emberAfPluginZclCorePrintln("Access token UID mismatch");
+    if (memcmp(&token.confUid, remoteUid, sizeof(ChipZclUid_t)) != 0) {
+      chipAfPluginZclCorePrintln("Access token UID mismatch");
       return false;
     }
   }
 
   RemoteTokenData_t incomingToken;
   memset(&incomingToken, 0, sizeof(incomingToken));
-  memcpy(&incomingToken.remoteUid, &token.confUid, sizeof(EmberZclUid_t));
+  memcpy(&incomingToken.remoteUid, &token.confUid, sizeof(ChipZclUid_t));
   Buffer incomingTokenBuffer = emFillBuffer((uint8_t *)&incomingToken, sizeof(incomingToken));
   if (incomingTokenBuffer == NULL_BUFFER) {
     return false;
@@ -1037,7 +1025,7 @@ bool emZclAddIncomingToken(const EmberZclUid_t *remoteUid,
   int16_t accessLength =
     checkUidAccess(token.bytes + token.audienceOffset,
                    token.audienceLength,
-                   &emZclUid,
+                   &chZclUid,
                    NULL,     // no access buffer on this check.
                    0);
 
@@ -1061,7 +1049,7 @@ bool emZclAddIncomingToken(const EmberZclUid_t *remoteUid,
   // Save token access spec entries to buffer.
   checkUidAccess(token.bytes + token.audienceOffset,
                  token.audienceLength,
-                 &emZclUid,
+                 &chZclUid,
                  contents,
                  accessLength);
 

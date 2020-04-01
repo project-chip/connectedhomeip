@@ -1,33 +1,21 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_CONNECTION_MANAGER
-#include EMBER_AF_API_HAL
-#include EMBER_AF_API_LED_BLINK
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_CONNECTION_MANAGER
+#include CHIP_AF_API_HAL
+#include CHIP_AF_API_LED_BLINK
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
 
 #define DEBOUNCE_TIME_MS \
-  EMBER_AF_PLUGIN_END_NODE_UI_BUTTON_DEBOUNCE_TIME_MS
+  CHIP_AF_PLUGIN_END_NODE_UI_BUTTON_DEBOUNCE_TIME_MS
 #define BUTTON_NETWORK_LEAVE_TIME_MS  (1 * MILLISECOND_TICKS_PER_SECOND)
 
 #define DEFAULT_IDENTIFY_TIME_S      180
@@ -53,10 +41,10 @@
 #define LED_SEARCH_BLINK_OFF_TIME_MS 1800
 
 // Each join attempt is about 14500ms long, blink pattern is 3000ms long.
-#if defined EMBER_AF_PLUGIN_CONNECTION_MANAGER_JIB_NUM_REJOIN_ATTEMPTS
-  #define DEFAULT_NUM_SEARCH_BLINKS  EMBER_AF_PLUGIN_CONNECTION_MANAGER_JIB_NUM_REJOIN_ATTEMPTS * 5
-#elif defined EMBER_AF_PLUGIN_CONNECTION_MANAGER_JOOB_NUM_REJOIN_ATTEMPTS
-  #define DEFAULT_NUM_SEARCH_BLINKS  EMBER_AF_PLUGIN_CONNECTION_MANAGER_JOOB_NUM_REJOIN_ATTEMPTS * 5
+#if defined CHIP_AF_PLUGIN_CONNECTION_MANAGER_JIB_NUM_REJOIN_ATTEMPTS
+  #define DEFAULT_NUM_SEARCH_BLINKS  CHIP_AF_PLUGIN_CONNECTION_MANAGER_JIB_NUM_REJOIN_ATTEMPTS * 5
+#elif defined CHIP_AF_PLUGIN_CONNECTION_MANAGER_JOOB_NUM_REJOIN_ATTEMPTS
+  #define DEFAULT_NUM_SEARCH_BLINKS  CHIP_AF_PLUGIN_CONNECTION_MANAGER_JOOB_NUM_REJOIN_ATTEMPTS * 5
 #else
   #define DEFAULT_NUM_SEARCH_BLINKS  100
 #endif
@@ -72,9 +60,9 @@ static void enableIdentify(void);
 static void leaveNetwork(void);
 static size_t getNumberOfUsedBinds(void);
 
-EmberEventControl emEndNodeUiEzModeControl;
-EmberEventControl emEndNodeUiEzBlinkControl;
-EmberEventControl emEndNodeUiButtonPressCountEventControl;
+ChipEventControl emEndNodeUiEzModeControl;
+ChipEventControl emEndNodeUiEzBlinkControl;
+ChipEventControl emEndNodeUiButtonPressCountEventControl;
 
 // State variables for controlling LED blink behavior on network join/leave
 static uint16_t networkLostBlinkPattern[] =
@@ -93,9 +81,9 @@ static uint16_t networkIdentifyBlinkPattern[] =
 
 static uint8_t consecutiveButtonPressCount = 0;
 static size_t numBindingsStartEzMode = 0;
-static uint8_t networkLed = EMBER_AF_PLUGIN_END_NODE_UI_NETWORK_ACTIVITY_LED;
+static uint8_t networkLed = CHIP_AF_PLUGIN_END_NODE_UI_NETWORK_ACTIVITY_LED;
 
-void emberAfPluginButtonInterfaceButton0PressedShortCallback(uint16_t timePressedMs)
+void chipAfPluginButtonInterfaceButton0PressedShortCallback(uint16_t timePressedMs)
 {
   // If the button was not held for longer than the debounce time, ignore the
   // press.
@@ -107,21 +95,21 @@ void emberAfPluginButtonInterfaceButton0PressedShortCallback(uint16_t timePresse
     leaveNetwork();
   } else {
     consecutiveButtonPressCount++;
-    emberEventControlSetDelayMS(emEndNodeUiButtonPressCountEventControl,
-                                EMBER_AF_PLUGIN_END_NODE_UI_CONSECUTIVE_PRESS_TIMEOUT_MS);
+    chipEventControlSetDelayMS(emEndNodeUiButtonPressCountEventControl,
+                                CHIP_AF_PLUGIN_END_NODE_UI_CONSECUTIVE_PRESS_TIMEOUT_MS);
   }
 }
 
-void emberEndNodeUiSetUiLed(uint8_t led)
+void chipEndNodeUiSetUiLed(uint8_t led)
 {
   networkLed = led;
 }
 
 void emEndNodeUiButtonPressCountEventHandler(void)
 {
-  emberEventControlSetInactive(emEndNodeUiButtonPressCountEventControl);
+  chipEventControlSetInactive(emEndNodeUiButtonPressCountEventControl);
 
-  if (emberNetworkStatus() == EMBER_JOINED_NETWORK_ATTACHED) {
+  if (chipNetworkStatus() == CHIP_JOINED_NETWORK_ATTACHED) {
     // If on a network:
     // 1 press   starts EZ Mode commissioning
     // 2 presses activates identify
@@ -131,7 +119,7 @@ void emEndNodeUiButtonPressCountEventHandler(void)
     //   supported)
     switch (consecutiveButtonPressCount) {
       case 1:
-        emberEventControlSetActive(emEndNodeUiEzModeControl);
+        chipEventControlSetActive(emEndNodeUiEzModeControl);
         break;
       case 2:
         enableIdentify();
@@ -149,8 +137,8 @@ void emEndNodeUiButtonPressCountEventHandler(void)
         break;
     }
   } else {
-    emberAfCorePrintln("attempting to connect");
-    emberConnectionManagerStartConnect();
+    chipAfCorePrintln("attempting to connect");
+    chipConnectionManagerStartConnect();
     halMultiLedBlinkPattern(DEFAULT_NUM_SEARCH_BLINKS,
                             COUNTOF(networkSearchBlinkPattern),
                             networkSearchBlinkPattern,
@@ -160,11 +148,11 @@ void emEndNodeUiButtonPressCountEventHandler(void)
   consecutiveButtonPressCount = 0;
 }
 
-void emberConnectionManagerConnectCompleteCallback(EmberConnectionManagerConnectionStatus status)
+void chipConnectionManagerConnectCompleteCallback(ChipConnectionManagerConnectionStatus status)
 {
-  if (status == EMBER_CONNECTION_MANAGER_STATUS_TIMED_OUT) {
+  if (status == CHIP_CONNECTION_MANAGER_STATUS_TIMED_OUT) {
     halMultiLedBlinkLedOff(0, networkLed);
-  } else if (status == EMBER_CONNECTION_MANAGER_STATUS_CONNECTED) {
+  } else if (status == CHIP_CONNECTION_MANAGER_STATUS_CONNECTED) {
     halMultiLedBlinkPattern(DEFAULT_NUM_FOUND_BLINKS,
                             COUNTOF(networkFoundBlinkPattern),
                             networkFoundBlinkPattern,
@@ -172,24 +160,24 @@ void emberConnectionManagerConnectCompleteCallback(EmberConnectionManagerConnect
   }
 }
 
-void emEndNodeUiNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
-                                     EmberNetworkStatus oldNetworkStatus,
-                                     EmberJoinFailureReason reason)
+void emEndNodeUiNetworkStatusHandler(ChipNetworkStatus newNetworkStatus,
+                                     ChipNetworkStatus oldNetworkStatus,
+                                     ChipJoinFailureReason reason)
 {
   static bool blinkingSearchPattern = false;
   static bool blinkingOrphanPattern = false;
 
   switch (newNetworkStatus) {
-    case EMBER_NO_NETWORK:
-    case EMBER_JOINED_NETWORK_ATTACHING:
-    case EMBER_JOINING_NETWORK:
-    case EMBER_JOINED_NETWORK_NO_PARENT:
+    case CHIP_NO_NETWORK:
+    case CHIP_JOINED_NETWORK_ATTACHING:
+    case CHIP_JOINING_NETWORK:
+    case CHIP_JOINED_NETWORK_NO_PARENT:
       // If the device has not yet started blinking its state appropriate
       // notification, start blinking it.  Note that when the device starts up,
       // it will enter a NO_PARENT state before the connection manager is able to
       // detect the orphan state, so the orphan blink pattern should be able to
       // supersede the network serarch blink pattern
-      if (emberConnectionmanagerIsOrphaned()) {
+      if (chipConnectionmanagerIsOrphaned()) {
         if (!blinkingOrphanPattern) {
           halMultiLedBlinkPattern(DEFAULT_NUM_LEAVE_BLINKS,
                                   COUNTOF(networkLostBlinkPattern),
@@ -205,7 +193,7 @@ void emEndNodeUiNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
         blinkingSearchPattern = true;
       }
       break;
-    case EMBER_JOINED_NETWORK_ATTACHED:
+    case CHIP_JOINED_NETWORK_ATTACHED:
       blinkingSearchPattern = false;
       blinkingOrphanPattern = false;
       break;
@@ -216,20 +204,20 @@ void emEndNodeUiNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
 
 // Before starting EZ Mode, the system will determine how many binds are
 // present in the binding table (as there is no callback generated when a bind
-// is created).  A call to emberZclStartEzMode will then initiate EZ mode
+// is created).  A call to chipZclStartEzMode will then initiate EZ mode
 // operation, and the device will start to blink the EZ Mode search pattern. The
 // ezModeBlink event will then be used to poll the number of binds created
 // every few seconds to see if any new entries have been generated.
 void emEndNodeUiEzModeHandler(void)
 {
-  EmberStatus status;
+  ChipStatus status;
 
-  emberEventControlSetInactive(emEndNodeUiEzModeControl);
+  chipEventControlSetInactive(emEndNodeUiEzModeControl);
 
-  status = emberZclStartEzMode();
+  status = chipZclStartEzMode();
 
-  if (status == EMBER_SUCCESS) {
-    emberAfCorePrintln("starting ez mode");
+  if (status == CHIP_SUCCESS) {
+    chipAfCorePrintln("starting ez mode");
     numBindingsStartEzMode = getNumberOfUsedBinds();
 
     halMultiLedBlinkPattern(DEFAULT_EZ_MODE_BLINKS,
@@ -237,10 +225,10 @@ void emEndNodeUiEzModeHandler(void)
                             ezModeSearchingBlinkPattern,
                             networkLed);
 
-    emberEventControlSetDelayMS(emEndNodeUiEzBlinkControl,
+    chipEventControlSetDelayMS(emEndNodeUiEzBlinkControl,
                                 EZ_MODE_BLINK_REPEAT_TIME_MS);
   } else {
-    emberAfCorePrintln("Unable to start EZ mode: %d", status);
+    chipAfCorePrintln("Unable to start EZ mode: %d", status);
   }
 }
 
@@ -252,20 +240,20 @@ void emEndNodeUiEzBlinkHandler(void)
   numBindings = getNumberOfUsedBinds();
 
   if (numBindings != numBindingsStartEzMode) {
-    emberAfCorePrintln("%d new bindings created",
+    chipAfCorePrintln("%d new bindings created",
                        numBindings - numBindingsStartEzMode);
     blinkForNewBind = true;
 
     numBindingsStartEzMode = numBindings;
-    emberEventControlSetDelayMS(emEndNodeUiEzBlinkControl,
+    chipEventControlSetDelayMS(emEndNodeUiEzBlinkControl,
                                 EZ_MODE_BLINK_REPEAT_TIME_MS);
   }
 
   // If the network went down mid ez-mode, the LED will be blinking some type of
   // search pattern, so stop blinking the EZ pattern
-  if (emberNetworkStatus() != EMBER_JOINED_NETWORK_ATTACHED) {
-    emberEventControlSetInactive(emEndNodeUiEzBlinkControl);
-  } else if (emberZclEzModeIsActive()) {
+  if (chipNetworkStatus() != CHIP_JOINED_NETWORK_ATTACHED) {
+    chipEventControlSetInactive(emEndNodeUiEzBlinkControl);
+  } else if (chipZclEzModeIsActive()) {
     if (blinkForNewBind) {
       halMultiLedBlinkPattern(NUM_BINDS_CHANGED_NUM_BLINKS,
                               COUNTOF(numberOfBindsChangedBlinkPattern),
@@ -277,25 +265,25 @@ void emEndNodeUiEzBlinkHandler(void)
                               ezModeSearchingBlinkPattern,
                               networkLed);
     }
-    emberEventControlSetDelayMS(emEndNodeUiEzBlinkControl,
+    chipEventControlSetDelayMS(emEndNodeUiEzBlinkControl,
                                 EZ_MODE_BLINK_REPEAT_TIME_MS);
   } else {
     halLedBlinkLedOff(0);
-    emberEventControlSetInactive(emEndNodeUiEzBlinkControl);
+    chipEventControlSetInactive(emEndNodeUiEzBlinkControl);
   }
 }
 
 static size_t getNumberOfUsedBinds(void)
 {
-  EmberZclBindingId_t numberOfBinds = 0;
-  EmberZclBindingId_t currentBindIndex;
-  EmberZclBindingEntry_t currentBind;
+  ChipZclBindingId_t numberOfBinds = 0;
+  ChipZclBindingId_t currentBindIndex;
+  ChipZclBindingEntry_t currentBind;
 
   for (currentBindIndex = 0;
-       currentBindIndex < EMBER_ZCL_BINDING_TABLE_SIZE;
+       currentBindIndex < CHIP_ZCL_BINDING_TABLE_SIZE;
        currentBindIndex++) {
     // Check to see if the binding table entry is active
-    if (emberZclGetBinding(currentBindIndex, &currentBind)) {
+    if (chipZclGetBinding(currentBindIndex, &currentBind)) {
       numberOfBinds++;
     }
   }
@@ -305,14 +293,14 @@ static size_t getNumberOfUsedBinds(void)
 static void resetBindingsAndAttributes(void)
 {
   size_t i;
-  EmberZclEndpointId_t currentEndpoint;
+  ChipZclEndpointId_t currentEndpoint;
 
-  emberAfCorePrintln("Clearing binding table and resetting all attributes\n");
-  emberZclRemoveAllBindings();
+  chipAfCorePrintln("Clearing binding table and resetting all attributes\n");
+  chipZclRemoveAllBindings();
 
-  for (i = 0; i < emZclEndpointCount; i++) {
-    currentEndpoint = emberZclEndpointIndexToId(i, NULL);
-    emberZclResetAttributes(currentEndpoint);
+  for (i = 0; i < chZclEndpointCount; i++) {
+    currentEndpoint = chipZclEndpointIndexToId(i, NULL);
+    chipZclResetAttributes(currentEndpoint);
   }
 
   halMultiLedBlinkPattern(NUM_BINDS_CHANGED_NUM_BLINKS,
@@ -324,24 +312,24 @@ static void resetBindingsAndAttributes(void)
 static void enableIdentify(void)
 {
   uint16_t identifyTimeS = DEFAULT_IDENTIFY_TIME_S;
-  EmberZclStatus_t status;
-  EmberZclEndpointId_t endpoint;
-  EmberZclEndpointIndex_t i;
+  ChipZclStatus_t status;
+  ChipZclEndpointId_t endpoint;
+  ChipZclEndpointIndex_t i;
 
-  for (i = 0; i < emZclEndpointCount; i++) {
-    endpoint = emberZclEndpointIndexToId(i,
-                                         &emberZclClusterIdentifyServerSpec);
-    if (endpoint != EMBER_ZCL_ENDPOINT_NULL) {
-      status = emberZclWriteAttribute(endpoint,
-                                      &emberZclClusterIdentifyServerSpec,
-                                      EMBER_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
+  for (i = 0; i < chZclEndpointCount; i++) {
+    endpoint = chipZclEndpointIndexToId(i,
+                                         &chipZclClusterIdentifyServerSpec);
+    if (endpoint != CHIP_ZCL_ENDPOINT_NULL) {
+      status = chipZclWriteAttribute(endpoint,
+                                      &chipZclClusterIdentifyServerSpec,
+                                      CHIP_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
                                       &identifyTimeS,
                                       sizeof(identifyTimeS));
-      if (status != EMBER_ZCL_STATUS_SUCCESS) {
-        emberAfCorePrintln("End node UI unable to identify on endpoint %d!",
+      if (status != CHIP_ZCL_STATUS_SUCCESS) {
+        chipAfCorePrintln("End node UI unable to identify on endpoint %d!",
                            i);
       } else {
-        emberAfCorePrintln("Identifying for %d seconds on endpoint %d",
+        chipAfCorePrintln("Identifying for %d seconds on endpoint %d",
                            identifyTimeS,
                            i);
       }
@@ -355,25 +343,25 @@ static void leaveNetwork(void)
 {
   // No need to blink here, as the blink will be performed in the network
   // status handler
-  emberAfCorePrintln("Resetting the network connection");
+  chipAfCorePrintln("Resetting the network connection");
   halMultiLedBlinkPattern(DEFAULT_NUM_LEAVE_BLINKS,
                           COUNTOF(networkLostBlinkPattern),
                           networkLostBlinkPattern,
                           networkLed);
-  emberConnectionManagerLeaveNetwork();
+  chipConnectionManagerLeaveNetwork();
 }
 
-void emberZclIdentifyServerStartIdentifyingCallback(uint16_t identifyTimeS)
+void chipZclIdentifyServerStartIdentifyingCallback(uint16_t identifyTimeS)
 {
-  emberAfCorePrintln("Identifying...");
+  chipAfCorePrintln("Identifying...");
   halMultiLedBlinkPattern(DEFAULT_NUM_IDENTIFY_BLINKS,
                           COUNTOF(networkIdentifyBlinkPattern),
                           networkIdentifyBlinkPattern,
                           networkLed);
 }
 
-void emberZclIdentifyServerStopIdentifyingCallback(void)
+void chipZclIdentifyServerStopIdentifyingCallback(void)
 {
-  emberAfCorePrintln("Identify complete");
+  chipAfCorePrintln("Identify complete");
   halLedBlinkLedOff(0);
 }

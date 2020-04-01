@@ -1,26 +1,14 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_HAL
-#include EMBER_AF_API_EEPROM
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CORE
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_STORAGE_CORE
+#include CHIP_AF_API_HAL
+#include CHIP_AF_API_EEPROM
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_CORE
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_STORAGE_CORE
 
 // The design of this plugin follows the same design as the znet implementation
 // the OTA Simple Storage EEPROM Driver (ota-storage-simple-eeprom) plugin. Here
@@ -91,12 +79,12 @@
 // Constants
 
 #define MAX_FILE_SIZE                                            \
-  ((EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_END_ADDRESS      \
-    - EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS) \
+  ((CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_END_ADDRESS      \
+    - CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS) \
    + 1)
 
 #if MAX_FILE_SIZE <= 0
-  #error "EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_END_ADDRESS must be greater than EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS."
+  #error "CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_END_ADDRESS must be greater than CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS."
 #endif
 
 #define OTA_HEADER_LENGTH_INDEX 6 /* 4-byte magic number, 2-byte version */
@@ -140,9 +128,9 @@
 // word size of 2, so let's go with that. We make a runtime assertion of this
 // below in the InitCallback().
 #define METADATA_START_ADDRESS                               \
-  (((EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_END_ADDRESS \
+  (((CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_END_ADDRESS \
      - TAG_OVERHEAD_SIZE                                     \
-     - EMBER_ZCL_OTA_BOOTLOAD_HEADER_MAX_SIZE                \
+     - CHIP_ZCL_OTA_BOOTLOAD_HEADER_MAX_SIZE                \
      - OTA_FILE_START_OFFSET)                                \
     + 1)                                                     \
    & ~1)
@@ -159,11 +147,11 @@ typedef struct {
 // -----------------------------------------------------------------------------
 // Globals
 
-EmberEventControl emZclOtaBootloadStorageEepromEraseEventControl;
+ChipEventControl chZclOtaBootloadStorageEepromEraseEventControl;
 
 static uint32_t nextEraseAddress;
 
-static EmberZclOtaBootloadStorageDeleteCallback currentDeleteCallback = NULL;
+static ChipZclOtaBootloadStorageDeleteCallback currentDeleteCallback = NULL;
 
 static uint32_t currentFileSize = UINT32_MAX;
 #define HAVE_CURRENT_FILE_SIZE() (currentFileSize != UINT32_MAX)
@@ -173,11 +161,11 @@ static uint32_t totalFileSize = UINT32_MAX;
 #define HAVE_TOTAL_FILE_SIZE() (totalFileSize != UINT32_MAX)
 #define ERASE_TOTAL_FILE_SIZE() (totalFileSize = UINT32_MAX)
 
-static EmberZclOtaBootloadFileSpec_t currentFileSpec = {
-  .version = EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL,
+static ChipZclOtaBootloadFileSpec_t currentFileSpec = {
+  .version = CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL,
 };
-#define HAVE_CURRENT_FILE_SPEC() (currentFileSpec.version != EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL)
-#define ERASE_CURRENT_FILE_SPEC() (currentFileSpec.version = EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL)
+#define HAVE_CURRENT_FILE_SPEC() (currentFileSpec.version != CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL)
+#define ERASE_CURRENT_FILE_SPEC() (currentFileSpec.version = CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL)
 
 static uint16_t currentFirstTagDataOffset = UINT16_MAX;
 #define HAVE_CURRENT_FIRST_TAG_DATA_OFFSET() (currentFirstTagDataOffset != UINT16_MAX)
@@ -190,16 +178,16 @@ static uint16_t currentFirstTagDataOffset = UINT16_MAX;
 // Logging
 
 #if 0
-  #ifdef EMBER_SCRIPTED_TEST
+  #ifdef CHIP_SCRIPTED_TEST
     #define debugPrint(...) fprintf(stderr, __VA_ARGS__)
   #else
-    #include EMBER_AF_API_DEBUG_PRINT
-    #define debugPrint(...) emberAfCorePrintln(__VA_ARGS__)
+    #include CHIP_AF_API_DEBUG_PRINT
+    #define debugPrint(...) chipAfCorePrintln(__VA_ARGS__)
   #endif
 
   #define log(read, offset, address, reallyDataLength, eepromStatus) \
   debugPrint("%s: %s(%lu/0x%08X, ..., %d) -> 0x%02X\n",              \
-             emberAfPluginEepromInfo()->partDescription,             \
+             chipAfPluginEepromInfo()->partDescription,             \
              ((read) ? "Read" : "Write"),                            \
              (offset),                                               \
              (address),                                              \
@@ -212,18 +200,18 @@ static uint16_t currentFirstTagDataOffset = UINT16_MAX;
 // -------------------------------------
 // Utility operations
 
-static EmberZclOtaBootloadStorageStatus_t readOrWrite(size_t offset,
+static ChipZclOtaBootloadStorageStatus_t readOrWrite(size_t offset,
                                                       uint8_t *data,
                                                       size_t dataLength,
                                                       bool read);
 
-static bool fileMatchesFileSpec(const EmberZclOtaBootloadFileSpec_t *fileSpec)
+static bool fileMatchesFileSpec(const ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   // Cache this file spec value so that we don't have to keep wasting time going
   // back to EEPROM!
   if (HAVE_CURRENT_FILE_SPEC()) {
     return (fileSpec == NULL
-            || emberZclOtaBootloadFileSpecsAreEqual(fileSpec,
+            || chipZclOtaBootloadFileSpecsAreEqual(fileSpec,
                                                     &currentFileSpec));
   }
 
@@ -231,13 +219,13 @@ static bool fileMatchesFileSpec(const EmberZclOtaBootloadFileSpec_t *fileSpec)
   const uint8_t fileVersion[] = FILE_VERSION_BYTES;
   uint8_t data[MAGIC_NUMBER_SIZE + FILE_VERSION_SIZE + FILE_SPEC_SIZE];
   uint8_t *finger = data;
-  EmberZclOtaBootloadStorageStatus_t storageStatus
+  ChipZclOtaBootloadStorageStatus_t storageStatus
     = readOrWrite(MAGIC_NUMBER_OFFSET,
                   data,
                   MAGIC_NUMBER_SIZE + FILE_VERSION_SIZE + FILE_SPEC_SIZE,
                   true); // read?
   // TODO: handle me more gracefully.
-  assert(storageStatus == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+  assert(storageStatus == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
   if (MEMCOMPARE(finger, magicNumber, MAGIC_NUMBER_SIZE) != 0) {
     return false;
   }
@@ -248,9 +236,9 @@ static bool fileMatchesFileSpec(const EmberZclOtaBootloadFileSpec_t *fileSpec)
   }
 
   finger += FILE_VERSION_SIZE;
-  emberZclOtaBootloadFetchFileSpec(finger, &currentFileSpec);
+  chipZclOtaBootloadFetchFileSpec(finger, &currentFileSpec);
   if (fileSpec != NULL
-      && !emberZclOtaBootloadFileSpecsAreEqual(fileSpec, &currentFileSpec)) {
+      && !chipZclOtaBootloadFileSpecsAreEqual(fileSpec, &currentFileSpec)) {
     ERASE_CURRENT_FILE_SPEC();
     return false;
   } else {
@@ -263,7 +251,7 @@ static bool fileExists(void)
   return fileMatchesFileSpec(NULL);
 }
 
-static void getFileSpec(EmberZclOtaBootloadFileSpec_t *fileSpec)
+static void getFileSpec(ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   // A call to fileExists will either 1) pass and cache the file spec in
   // currentFileSpec, or 2) fail, which will cause us to crash and burn.
@@ -276,10 +264,10 @@ static uint32_t getCurrentFileSize(void)
   assert(fileExists());
   if (!HAVE_CURRENT_FILE_SIZE()) {
     uint8_t bytemask[BYTEMASK_SIZE];
-    EmberZclOtaBootloadStorageStatus_t storageStatus
+    ChipZclOtaBootloadStorageStatus_t storageStatus
       = readOrWrite(BYTEMASK_OFFSET, bytemask, BYTEMASK_SIZE, true); // read?
     // TODO: handle me more gracefully.
-    assert(storageStatus == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+    assert(storageStatus == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
 
     // Find the first byte in the bytemask that is not 0xFF. The index of this
     // first byte indicates the first unwritten page of EEPROM.
@@ -289,7 +277,7 @@ static uint32_t getCurrentFileSize(void)
         break;
       }
     }
-    currentFileSize = (i * emberAfPluginEepromInfo()->pageSize);
+    currentFileSize = (i * chipAfPluginEepromInfo()->pageSize);
   }
   return currentFileSize;
 }
@@ -309,8 +297,8 @@ static uint32_t getTotalFileSize(void)
                        fileSizeData,
                        OTA_HEADER_FILE_SIZE_SIZE,
                        true) // read?
-           == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
-    totalFileSize = emberFetchLowHighInt32u(fileSizeData);
+           == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+    totalFileSize = chipFetchLowHighInt32u(fileSizeData);
   }
   return totalFileSize;
 }
@@ -319,14 +307,14 @@ static uint16_t getFirstTagDataOffset(void)
 {
   if (!HAVE_CURRENT_FIRST_TAG_DATA_OFFSET()) {
     uint8_t firstTagDataOffset[FIRST_TAG_DATA_OFFSET_SIZE];
-    EmberZclOtaBootloadStorageStatus_t storageStatus
+    ChipZclOtaBootloadStorageStatus_t storageStatus
       = readOrWrite(FIRST_TAG_DATA_OFFSET_OFFSET,
                     firstTagDataOffset,
                     FIRST_TAG_DATA_OFFSET_SIZE,
                     true); // read?
     // TODO: handle me more gracefully.
-    assert(storageStatus == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
-    currentFirstTagDataOffset = emberFetchHighLowInt16u(firstTagDataOffset);
+    assert(storageStatus == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+    currentFirstTagDataOffset = chipFetchHighLowInt16u(firstTagDataOffset);
   }
   return currentFirstTagDataOffset;
 }
@@ -338,18 +326,18 @@ static bool setFirstTagDataOffset(uint8_t *headerData, uint16_t headerDataLength
   // an OTA header.
   assert(headerDataLength >= OTA_HEADER_LENGTH_INDEX);
   uint16_t headerLength
-    = emberFetchLowHighInt16u(headerData + OTA_HEADER_LENGTH_INDEX);
+    = chipFetchLowHighInt16u(headerData + OTA_HEADER_LENGTH_INDEX);
 
   uint8_t firstTagDataOffset[FIRST_TAG_DATA_OFFSET_SIZE];
   currentFirstTagDataOffset = (OTA_FILE_START_OFFSET
                                + headerLength
                                + TAG_OVERHEAD_SIZE);
-  emberStoreHighLowInt16u(firstTagDataOffset, currentFirstTagDataOffset);
+  chipStoreHighLowInt16u(firstTagDataOffset, currentFirstTagDataOffset);
   return (readOrWrite(FIRST_TAG_DATA_OFFSET_OFFSET,
                       firstTagDataOffset,
                       FIRST_TAG_DATA_OFFSET_SIZE,
                       false) // read?
-          == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+          == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
 }
 
 static size_t makeReadOrWriteData(size_t offset,
@@ -379,7 +367,7 @@ static size_t makeReadOrWriteData(size_t offset,
       returnedReadOrWriteData[0].data = data;
       returnedReadOrWriteData[0].length = firstTagDataOffset - offset;
       returnedReadOrWriteData[1].address
-        = EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS;
+        = CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS;
       returnedReadOrWriteData[1].data
         = data + returnedReadOrWriteData[0].length;
       returnedReadOrWriteData[1].length
@@ -395,14 +383,14 @@ static size_t makeReadOrWriteData(size_t offset,
     returnedReadOrWriteData[0].address
       = (offset
          - firstTagDataOffset
-         + EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS);
+         + CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS);
     returnedReadOrWriteData[0].data = data;
     returnedReadOrWriteData[0].length = dataLength;
     return 1;
   }
 }
 
-static EmberZclOtaBootloadStorageStatus_t readOrWrite(size_t offset,
+static ChipZclOtaBootloadStorageStatus_t readOrWrite(size_t offset,
                                                       uint8_t *data,
                                                       size_t dataLength,
                                                       bool read)
@@ -414,7 +402,7 @@ static EmberZclOtaBootloadStorageStatus_t readOrWrite(size_t offset,
   if (!read
       && offset == OTA_FILE_START_OFFSET
       && !setFirstTagDataOffset(data, reallyDataLength)) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED;
   }
 
   ReadOrWriteData_t readOrWriteData[2];
@@ -425,10 +413,10 @@ static EmberZclOtaBootloadStorageStatus_t readOrWrite(size_t offset,
   for (size_t i = 0; i < readOrWriteDataCount; i++) {
     uint8_t eepromStatus
       = (read
-         ? emberAfPluginEepromRead(readOrWriteData[i].address,
+         ? chipAfPluginEepromRead(readOrWriteData[i].address,
                                    readOrWriteData[i].data,
                                    readOrWriteData[i].length)
-         : emberAfPluginEepromWrite(readOrWriteData[i].address,
+         : chipAfPluginEepromWrite(readOrWriteData[i].address,
                                     readOrWriteData[i].data,
                                     readOrWriteData[i].length));
     log(read,
@@ -438,7 +426,7 @@ static EmberZclOtaBootloadStorageStatus_t readOrWrite(size_t offset,
         eepromStatus);
 
     if (eepromStatus != EEPROM_SUCCESS) {
-      return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED;
+      return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED;
     }
   }
 
@@ -449,39 +437,39 @@ static EmberZclOtaBootloadStorageStatus_t readOrWrite(size_t offset,
       && offset >= OTA_FILE_START_OFFSET
       && (((offset - OTA_FILE_START_OFFSET) + reallyDataLength)
           == getTotalFileSize())
-      && emberAfPluginEepromFlushSavedPartialWrites() != EEPROM_SUCCESS) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED;
+      && chipAfPluginEepromFlushSavedPartialWrites() != EEPROM_SUCCESS) {
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED;
   }
 
-  return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
+  return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
 }
 
 // -------------------------------------
 // Erase event
 
-void emZclOtaBootloadStorageEepromEraseEventHandler(void)
+void chZclOtaBootloadStorageEepromEraseEventHandler(void)
 {
   assert(currentDeleteCallback != NULL);
 
-  uint32_t pageSize = emberAfPluginEepromInfo()->pageSize;
-  uint32_t pageEraseMs = emberAfPluginEepromInfo()->pageEraseMs;
-  if (emberAfPluginEepromBusy()) {
-    emberEventControlSetDelayMS(emZclOtaBootloadStorageEepromEraseEventControl,
+  uint32_t pageSize = chipAfPluginEepromInfo()->pageSize;
+  uint32_t pageEraseMs = chipAfPluginEepromInfo()->pageEraseMs;
+  if (chipAfPluginEepromBusy()) {
+    chipEventControlSetDelayMS(chZclOtaBootloadStorageEepromEraseEventControl,
                                 pageEraseMs);
   } else if (nextEraseAddress
-             >= EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_END_ADDRESS) {
+             >= CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_END_ADDRESS) {
     // Done!
-    (*currentDeleteCallback)(EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+    (*currentDeleteCallback)(CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
     currentDeleteCallback = NULL;
-    emberEventControlSetInactive(emZclOtaBootloadStorageEepromEraseEventControl);
+    chipEventControlSetInactive(chZclOtaBootloadStorageEepromEraseEventControl);
   } else {
-    uint8_t eepromStatus = emberAfPluginEepromErase(nextEraseAddress, pageSize);
+    uint8_t eepromStatus = chipAfPluginEepromErase(nextEraseAddress, pageSize);
     if (eepromStatus != EEPROM_SUCCESS) {
-      (*currentDeleteCallback)(EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED);
+      (*currentDeleteCallback)(CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED);
       currentDeleteCallback = NULL;
     } else {
       nextEraseAddress += pageSize;
-      emberEventControlSetDelayMS(emZclOtaBootloadStorageEepromEraseEventControl,
+      chipEventControlSetDelayMS(chZclOtaBootloadStorageEepromEraseEventControl,
                                   pageEraseMs);
     }
   }
@@ -490,7 +478,7 @@ void emZclOtaBootloadStorageEepromEraseEventHandler(void)
 // -----------------------------------------------------------------------------
 // Public API
 
-void emZclOtaBootloadStorageEepromInitCallback(void)
+void chZclOtaBootloadStorageEepromInitCallback(void)
 {
   // Here is some basic validation of the external EPROM. This is difficult to
   // do at generation-time (AppBuilder) or compile-time, so we do it at runtime.
@@ -500,7 +488,7 @@ void emZclOtaBootloadStorageEepromInitCallback(void)
   // those two options, then we need to update the metadata fields to start on
   // word boundaries and update this assumption here. For older EEPROM parts, we
   // may not have this EEPROM info, so we can't do any validation.
-  const HalEepromInformationType *eepromInfo = emberAfPluginEepromInfo();
+  const HalEepromInformationType *eepromInfo = chipAfPluginEepromInfo();
   if (eepromInfo != NULL) {
     assert(READBITS(eepromInfo->capabilitiesMask,
                     EEPROM_CAPABILITIES_ERASE_SUPPORTED));
@@ -510,8 +498,8 @@ void emZclOtaBootloadStorageEepromInitCallback(void)
   }
 }
 
-void emberZclOtaBootloadStorageGetInfo(EmberZclOtaBootloadStorageInfo_t *info,
-                                       EmberZclOtaBootloadFileSpec_t *returnedFiles,
+void chipZclOtaBootloadStorageGetInfo(ChipZclOtaBootloadStorageInfo_t *info,
+                                       ChipZclOtaBootloadFileSpec_t *returnedFiles,
                                        size_t returnedFilesMaxCount)
 {
   // Make sure to leave enough room for our file metadata in the maximum file
@@ -525,26 +513,26 @@ void emberZclOtaBootloadStorageGetInfo(EmberZclOtaBootloadStorageInfo_t *info,
   }
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageFind(const EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                                  EmberZclOtaBootloadStorageFileInfo_t *fileInfo)
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageFind(const ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                                  ChipZclOtaBootloadStorageFileInfo_t *fileInfo)
 {
   if (!fileMatchesFileSpec(fileSpec)) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
   }
 
   fileInfo->size = getCurrentFileSize();
 
-  return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
+  return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageCreate(const EmberZclOtaBootloadFileSpec_t *fileSpec)
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageCreate(const ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   if (fileMatchesFileSpec(fileSpec)) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
   }
 
   if (fileExists()) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_SPACE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_SPACE;
   }
 
   const uint8_t magicNumber[] = MAGIC_NUMBER_BYTES;
@@ -555,7 +543,7 @@ EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageCreate(const EmberZ
   finger += MAGIC_NUMBER_SIZE;
   MEMMOVE(finger, fileVersion, FILE_VERSION_SIZE);
   finger += FILE_VERSION_SIZE;
-  emberZclOtaBootloadStoreFileSpec(fileSpec, finger);
+  chipZclOtaBootloadStoreFileSpec(fileSpec, finger);
 
   return readOrWrite(MAGIC_NUMBER_OFFSET,
                      data,
@@ -563,17 +551,17 @@ EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageCreate(const EmberZ
                      false); // read?
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageRead(const EmberZclOtaBootloadFileSpec_t *fileSpec,
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageRead(const ChipZclOtaBootloadFileSpec_t *fileSpec,
                                                                   size_t offset,
                                                                   void *data,
                                                                   size_t dataLength)
 {
   if (!fileMatchesFileSpec(fileSpec)) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
   }
 
   if ((offset + dataLength) > getCurrentFileSize()) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
   }
 
   return readOrWrite(offset + OTA_FILE_START_OFFSET,
@@ -582,56 +570,56 @@ EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageRead(const EmberZcl
                      true); // read?
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageWrite(const EmberZclOtaBootloadFileSpec_t *fileSpec,
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageWrite(const ChipZclOtaBootloadFileSpec_t *fileSpec,
                                                                    size_t offset,
                                                                    const void *data,
                                                                    size_t dataLength)
 {
   if (!fileMatchesFileSpec(fileSpec)) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
   }
 
   if (offset != getCurrentFileSize()
       || (offset + dataLength) > MAX_OTA_FILE_SIZE) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
   }
 
-  EmberZclOtaBootloadStorageStatus_t storageStatus
+  ChipZclOtaBootloadStorageStatus_t storageStatus
     = readOrWrite(offset + OTA_FILE_START_OFFSET,
                   (uint8_t *)data,
                   dataLength,
                   false); // read?
-  if (storageStatus == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
+  if (storageStatus == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
     setCurrentFileSize(getCurrentFileSize() + dataLength);
   }
 
   return storageStatus;
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageDelete(const EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                                    EmberZclOtaBootloadStorageDeleteCallback callback)
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageDelete(const ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                                    ChipZclOtaBootloadStorageDeleteCallback callback)
 {
-  if (emberZclOtaBootloadFileSpecsAreEqual(fileSpec,
-                                           &emberZclOtaBootloadFileSpecNull)) {
+  if (chipZclOtaBootloadFileSpecsAreEqual(fileSpec,
+                                           &chipZclOtaBootloadFileSpecNull)) {
     // If we were told to delete all of our files, and no files exist, then we
     // are done here. If not, we go on and erase the one and only image.
     if (!fileExists()) {
-      (*callback)(EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
-      return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
+      (*callback)(CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+      return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
     }
   } else {
     if (!fileMatchesFileSpec(fileSpec)) {
-      return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+      return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
     }
   }
 
   currentDeleteCallback = callback;
-  nextEraseAddress = EMBER_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS;
+  nextEraseAddress = CHIP_AF_PLUGIN_OTA_BOOTLOAD_STORAGE_EEPROM_START_ADDRESS;
   ERASE_CURRENT_FILE_SIZE();
   ERASE_TOTAL_FILE_SIZE();
   ERASE_CURRENT_FILE_SPEC();
   ERASE_CURRENT_FIRST_TAG_DATA_OFFSET();
-  emberEventControlSetActive(emZclOtaBootloadStorageEepromEraseEventControl);
+  chipEventControlSetActive(chZclOtaBootloadStorageEepromEraseEventControl);
 
-  return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
+  return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
 }

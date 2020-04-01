@@ -1,29 +1,17 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CORE
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_STORAGE_CORE
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_CORE
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_STORAGE_CORE
 #include "../ota-bootload-storage-core/ota-static-file-data.h"
 #include "ota-bootload-server-test.h"
 
-#include "stack/core/ember-stack.h"
+#include "stack/core/chip-stack.h"
 #include "stack/core/scripted-stub.h"
 #include "stack/core/parcel.h"
 
@@ -32,7 +20,7 @@
 
 // Conversion the same as in ota-bootload-client.c.
 #define IMAGE_NOTIFY_PERIOD_MS \
-  (EMBER_AF_PLUGIN_OTA_BOOTLOAD_SERVER_IMAGE_NOTIFY_PERIOD_MINUTES << 16)
+  (CHIP_AF_PLUGIN_OTA_BOOTLOAD_SERVER_IMAGE_NOTIFY_PERIOD_MINUTES << 16)
 
 #define IMAGE_DATA_SIZE 1024
 static const uint8_t image[IMAGE_DATA_SIZE] = {
@@ -107,40 +95,40 @@ static const uint8_t image[IMAGE_DATA_SIZE] = {
 // -----------------------------------------------------------------------------
 // Globals
 
-const EmberEventData emAppEvents[] = {
-  { &emZclOtaBootloadServerImageNotifyEventControl, emZclOtaBootloadServerImageNotifyEventHandler, },
+const ChipEventData emAppEvents[] = {
+  { &chZclOtaBootloadServerImageNotifyEventControl, chZclOtaBootloadServerImageNotifyEventHandler, },
   { NULL, NULL, },
 };
 
-static const EmberZclOtaBootloadFileSpec_t theCurrentFileSpec = {
+static const ChipZclOtaBootloadFileSpec_t theCurrentFileSpec = {
   .manufacturerCode = 0x1234,
   .type = 0xACAC,
   .version = 0xD00DF00D,
 };
 
-static const EmberZclOtaBootloadFileSpec_t theNextFileSpec = {
+static const ChipZclOtaBootloadFileSpec_t theNextFileSpec = {
   .manufacturerCode = 0x1234,
   .type = 0xACAC,
   .version = 0xD00DF00E,
 };
 
-static const EmberZclOtaBootloadFileSpec_t emptyFileSpec = {
+static const ChipZclOtaBootloadFileSpec_t emptyFileSpec = {
   .manufacturerCode = 0x0000,
   .type = 0x0000,
   .version = 0x00000000,
 };
 
-static const EmberIpv6Address multicastAddress = {
+static const ChipIpv6Address multicastAddress = {
   { 0xFF, 0x33, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, }
 };
 
-static const EmberIpv6Address theRemoteAddress = {
+static const ChipIpv6Address theRemoteAddress = {
   { 0xFD, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, }
 };
 
-const EmberIpv6Address allCoapNodesSiteScope = {
+const ChipIpv6Address allCoapNodesSiteScope = {
   { 0xFF, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd, }
 };
@@ -149,15 +137,15 @@ const EmberIpv6Address allCoapNodesSiteScope = {
 // Scripted stubs
 
 // From zcl-core.c
-EmberStatus emberZclRespondWithPath(const EmberCoapRequestInfo *requestInfo,
-                                    EmberCoapCode code,
+ChipStatus chipZclRespondWithPath(const ChipCoapRequestInfo *requestInfo,
+                                    ChipCoapCode code,
                                     const uint8_t *path,
-                                    const EmberCoapOption *options,
+                                    const ChipCoapOption *options,
                                     uint8_t numberOfOptions,
                                     const uint8_t *payload,
                                     uint16_t payloadLength)
 {
-  return emberCoapRespondWithPath(requestInfo,
+  return chipCoapRespondWithPath(requestInfo,
                                   code,
                                   path,
                                   options,
@@ -167,43 +155,43 @@ EmberStatus emberZclRespondWithPath(const EmberCoapRequestInfo *requestInfo,
 }
 
 // From ota-bootload-server.c.
-static EmberNetworkStatus currentNetworkStatus = EMBER_NO_NETWORK;
+static ChipNetworkStatus currentNetworkStatus = CHIP_NO_NETWORK;
 #define addNetworkStatusCallbackAction(newStatus)                 \
   do {                                                            \
     addSimpleAction("NetworkStatusCallback %x %x",                \
-                    emZclOtaBootloadServerNetworkStatusCallback,  \
+                    chZclOtaBootloadServerNetworkStatusCallback,  \
                     3,                                            \
                     (newStatus),                                  \
                     (currentNetworkStatus),                       \
-                    (0)); /* EmberJoinFailureReason - whatever */ \
+                    (0)); /* ChipJoinFailureReason - whatever */ \
     currentNetworkStatus = newStatus;                             \
   } while (0);
 
-bool emberZclOtaBootloadServerGetImageNotifyInfoCallback(EmberIpv6Address *address,
-                                                         EmberZclOtaBootloadFileSpec_t *fileSpec)
+bool chipZclOtaBootloadServerGetImageNotifyInfoCallback(ChipIpv6Address *address,
+                                                         ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   *address = multicastAddress;
   *fileSpec = theCurrentFileSpec;
   return true;
 }
 
-static EmberZclClusterOtaBootloadClientCommandImageNotifyResponseHandler imageNotifyResponseHandler = NULL;
-EmberStatus emberZclSendClusterOtaBootloadClientCommandImageNotifyRequest(
-  const EmberZclDestination_t *destination,
-  const EmberZclClusterOtaBootloadClientCommandImageNotifyRequest_t *request,
-  const EmberZclClusterOtaBootloadClientCommandImageNotifyResponseHandler handler)
+static ChipZclClusterOtaBootloadClientCommandImageNotifyResponseHandler imageNotifyResponseHandler = NULL;
+ChipStatus chipZclSendClusterOtaBootloadClientCommandImageNotifyRequest(
+  const ChipZclDestination_t *destination,
+  const ChipZclClusterOtaBootloadClientCommandImageNotifyRequest_t *request,
+  const ChipZclClusterOtaBootloadClientCommandImageNotifyResponseHandler handler)
 {
   functionCallCheck("ImageNotifyRequest", "");
 
-  assert(!(destination->network.flags & EMBER_ZCL_USE_COAPS_FLAG));
+  assert(!(destination->network.flags & CHIP_ZCL_USE_COAPS_FLAG));
   assert(MEMCOMPARE(destination->network.address.bytes,
                     multicastAddress.bytes,
                     sizeof(multicastAddress.bytes))
          == 0);
-  assert(destination->network.flags & EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG);
-  assert(destination->network.port == EMBER_COAP_PORT);
+  assert(destination->network.flags & CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG);
+  assert(destination->network.port == CHIP_COAP_PORT);
   assert(destination->application.data.endpointId == 1);
-  assert(destination->application.type == EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT);
+  assert(destination->application.type == CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT);
 
   assert(request->payloadType == 0x03);
   assert(request->manufacturerId == theCurrentFileSpec.manufacturerCode);
@@ -212,13 +200,13 @@ EmberStatus emberZclSendClusterOtaBootloadClientCommandImageNotifyRequest(
 
   imageNotifyResponseHandler = handler;
 
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 #define addImageNotifyRequestCheck() addSimpleCheck("ImageNotifyRequest", "")
 
-EmberZclStatus_t emberZclOtaBootloadServerGetNextImageCallback(const EmberIpv6Address *source,
-                                                               const EmberZclOtaBootloadFileSpec_t *deviceFileSpec,
-                                                               EmberZclOtaBootloadFileSpec_t *nextFileSpec)
+ChipZclStatus_t chipZclOtaBootloadServerGetNextImageCallback(const ChipIpv6Address *source,
+                                                               const ChipZclOtaBootloadFileSpec_t *deviceFileSpec,
+                                                               ChipZclOtaBootloadFileSpec_t *nextFileSpec)
 {
   long *contents
     = functionCallCheck("GetNextImageCallback",
@@ -231,11 +219,11 @@ EmberZclStatus_t emberZclOtaBootloadServerGetNextImageCallback(const EmberIpv6Ad
                 sizeof(theRemoteAddress.bytes))
          == 0);
 
-  EmberZclStatus_t status = (EmberZclStatus_t)contents[3];
-  if (status == EMBER_ZCL_STATUS_SUCCESS) {
+  ChipZclStatus_t status = (ChipZclStatus_t)contents[3];
+  if (status == CHIP_ZCL_STATUS_SUCCESS) {
     *nextFileSpec = theNextFileSpec;
   } else {
-    *nextFileSpec = emberZclOtaBootloadFileSpecNull;
+    *nextFileSpec = chipZclOtaBootloadFileSpecNull;
   }
   return status;
 }
@@ -248,17 +236,17 @@ EmberZclStatus_t emberZclOtaBootloadServerGetNextImageCallback(const EmberIpv6Ad
                  (version),                                                   \
                  (status))
 
-static void callQueryNextRequest(EmberZclManufacturerCode_t manufacturerCode,
-                                 EmberZclOtaBootloadFileType_t type,
-                                 EmberZclOtaBootloadFileVersion_t version,
-                                 EmberZclOtaBootloadHardwareVersion_t hardwareVersion)
+static void callQueryNextRequest(ChipZclManufacturerCode_t manufacturerCode,
+                                 ChipZclOtaBootloadFileType_t type,
+                                 ChipZclOtaBootloadFileVersion_t version,
+                                 ChipZclOtaBootloadHardwareVersion_t hardwareVersion)
 {
-  EmberZclCommandContext_t context = {
+  ChipZclCommandContext_t context = {
     .remoteAddress = theRemoteAddress,
   };
-  EmberZclClusterOtaBootloadServerCommandQueryNextImageRequest_t request = {
+  ChipZclClusterOtaBootloadServerCommandQueryNextImageRequest_t request = {
     .fieldControl = ((hardwareVersion
-                      == EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL)
+                      == CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL)
                      ? 0
                      : BIT(0)),
     .manufacturerId = manufacturerCode,
@@ -266,7 +254,7 @@ static void callQueryNextRequest(EmberZclManufacturerCode_t manufacturerCode,
     .currentFileVersion = version,
     .hardwareVersion = hardwareVersion,
   };
-  emberZclClusterOtaBootloadServerCommandQueryNextImageRequestHandler(&context,
+  chipZclClusterOtaBootloadServerCommandQueryNextImageRequestHandler(&context,
                                                                       &request);
 }
 
@@ -282,9 +270,9 @@ static void callQueryNextRequest(EmberZclManufacturerCode_t manufacturerCode,
                   (version),                        \
                   (hardwareVersion))
 
-EmberStatus emberZclSendClusterOtaBootloadServerCommandQueryNextImageResponse(
-  const EmberZclCommandContext_t *context,
-  const EmberZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response)
+ChipStatus chipZclSendClusterOtaBootloadServerCommandQueryNextImageResponse(
+  const ChipZclCommandContext_t *context,
+  const ChipZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response)
 {
   functionCallCheck("QueryNextImageResponse",
                     "i",
@@ -293,37 +281,37 @@ EmberStatus emberZclSendClusterOtaBootloadServerCommandQueryNextImageResponse(
                 theRemoteAddress.bytes,
                 sizeof(theRemoteAddress.bytes))
          == 0);
-  if (response->status == EMBER_ZCL_STATUS_SUCCESS) {
+  if (response->status == CHIP_ZCL_STATUS_SUCCESS) {
     assert(response->fileVersion == theNextFileSpec.version);
     assert(response->imageSize == IMAGE_DATA_SIZE);
   }
 
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
 #define addQueryNextImageResponseCheck(status) \
   addSimpleCheck("QueryNextImageResponse", "i", (status))
 
-static void callUpgradeEndRequest(EmberZclStatus_t status)
+static void callUpgradeEndRequest(ChipZclStatus_t status)
 {
-  EmberZclCommandContext_t context = {
+  ChipZclCommandContext_t context = {
     .remoteAddress = theRemoteAddress,
   };
-  EmberZclClusterOtaBootloadServerCommandUpgradeEndRequest_t request = {
+  ChipZclClusterOtaBootloadServerCommandUpgradeEndRequest_t request = {
     .status = status,
     .manufacturerId = theNextFileSpec.manufacturerCode,
     .imageType = theNextFileSpec.type,
     .fileVersion = theNextFileSpec.version,
   };
-  emberZclClusterOtaBootloadServerCommandUpgradeEndRequestHandler(&context,
+  chipZclClusterOtaBootloadServerCommandUpgradeEndRequestHandler(&context,
                                                                   &request);
 }
 
-EmberStatus emberZclSendClusterOtaBootloadServerCommandQuerySpecificFileResponse(
-  const EmberZclCommandContext_t *context,
-  const EmberZclClusterOtaBootloadServerCommandQuerySpecificFileResponse_t *response)
+ChipStatus chipZclSendClusterOtaBootloadServerCommandQuerySpecificFileResponse(
+  const ChipZclCommandContext_t *context,
+  const ChipZclClusterOtaBootloadServerCommandQuerySpecificFileResponse_t *response)
 {
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
 #define addUpgradeEndRequestAction(status) \
@@ -332,9 +320,9 @@ EmberStatus emberZclSendClusterOtaBootloadServerCommandQuerySpecificFileResponse
                   1,                       \
                   (status))
 
-uint32_t emberZclOtaBootloadServerUpgradeEndRequestCallback(const EmberIpv6Address *source,
-                                                            const EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                            EmberZclStatus_t status)
+uint32_t chipZclOtaBootloadServerUpgradeEndRequestCallback(const ChipIpv6Address *source,
+                                                            const ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                            ChipZclStatus_t status)
 {
   long *contents = functionCallCheck("UpgradeEndRequestCallback",
                                      "i!",
@@ -355,8 +343,8 @@ uint32_t emberZclOtaBootloadServerUpgradeEndRequestCallback(const EmberIpv6Addre
 #define addUpgradeEndRequestCallbackCheck(status, upgradeTime) \
   addSimpleCheck("UpgradeEndRequestCallback", "i!", (status), (upgradeTime))
 
-EmberStatus emberZclSendDefaultResponse(const EmberZclCommandContext_t *context,
-                                        EmberZclStatus_t status)
+ChipStatus chipZclSendDefaultResponse(const ChipZclCommandContext_t *context,
+                                        ChipZclStatus_t status)
 {
   functionCallCheck("DefaultResponse", "");
   assert(memcmp(context->remoteAddress.bytes,
@@ -364,14 +352,14 @@ EmberStatus emberZclSendDefaultResponse(const EmberZclCommandContext_t *context,
                 sizeof(theRemoteAddress.bytes))
          == 0);
 
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
 #define addDefaultResponseCheck() addSimpleCheck("DefaultResponse", "")
 
-EmberStatus emberZclSendClusterOtaBootloadServerCommandUpgradeEndResponse(
-  const EmberZclCommandContext_t *context,
-  const EmberZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response)
+ChipStatus chipZclSendClusterOtaBootloadServerCommandUpgradeEndResponse(
+  const ChipZclCommandContext_t *context,
+  const ChipZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response)
 {
   functionCallCheck("UpgradeEndResponse",
                     "i",
@@ -386,7 +374,7 @@ EmberStatus emberZclSendClusterOtaBootloadServerCommandUpgradeEndResponse(
   assert(response->fileVersion == theNextFileSpec.version);
   assert(response->currentTime == 0); // use offset time
 
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
 #define addUpgradeEndResponseCheck(upgradeTime) \
@@ -398,13 +386,13 @@ static void callServerDownloadHandler(uint16_t manufacturerCode,
                                       uint8_t logSize,
                                       uint8_t number)
 {
-  // See emberReadBlockOption stub above.
+  // See chipReadBlockOption stub above.
   uint8_t cheatToWin[] = { 0x00, logSize, number };
-  EmberCoapReadOptions options;
+  ChipCoapReadOptions options;
   MEMMOVE(&options, cheatToWin, sizeof(cheatToWin));
-  uint8_t uriPath[EM_ZCL_OTA_BOOTLOAD_UPGRADE_FULL_URI_LENGTH + 1];
-  sprintf(uriPath, EM_ZCL_OTA_BOOTLOAD_UPGRADE_FULL_URI_FORMAT, EM_ZCL_OTA_BOOTLOAD_UPGRADE_BASE_URI, manufacturerCode, type, version);
-  emZclOtaBootloadServerDownloadHandler(EMBER_COAP_CODE_GET,
+  uint8_t uriPath[CH_ZCL_OTA_BOOTLOAD_UPGRADE_FULL_URI_LENGTH + 1];
+  sprintf(uriPath, CH_ZCL_OTA_BOOTLOAD_UPGRADE_FULL_URI_FORMAT, CH_ZCL_OTA_BOOTLOAD_UPGRADE_BASE_URI, manufacturerCode, type, version);
+  chZclOtaBootloadServerDownloadHandler(CHIP_COAP_CODE_GET,
                                         uriPath,
                                         &options,
                                         NULL,  // payload
@@ -422,10 +410,10 @@ static void callServerDownloadHandler(uint16_t manufacturerCode,
                   (logSize),                                \
                   (number))
 
-EmberStatus emberCoapRespondWithPath(const EmberCoapRequestInfo *requestInfo,
-                                     EmberCoapCode code,
+ChipStatus chipCoapRespondWithPath(const ChipCoapRequestInfo *requestInfo,
+                                     ChipCoapCode code,
                                      const uint8_t *path,
-                                     const EmberCoapOption *options,
+                                     const ChipCoapOption *options,
                                      uint8_t numberOfOptions,
                                      const uint8_t *payload,
                                      uint16_t payloadLength)
@@ -433,17 +421,17 @@ EmberStatus emberCoapRespondWithPath(const EmberCoapRequestInfo *requestInfo,
   long *contents = functionCallCheck("CoapRespond", "i!!", code);
 
   assert(path == NULL);
-  if (code == EMBER_COAP_CODE_205_CONTENT) {
+  if (code == CHIP_COAP_CODE_205_CONTENT) {
     assert(numberOfOptions == 2);
 
-    assert(options[0].type == EMBER_COAP_OPTION_CONTENT_FORMAT);
-    assert(options[0].intValue == EMBER_COAP_CONTENT_FORMAT_OCTET_STREAM);
+    assert(options[0].type == CHIP_COAP_OPTION_CONTENT_FORMAT);
+    assert(options[0].intValue == CHIP_COAP_CONTENT_FORMAT_OCTET_STREAM);
 
-    EmberCoapBlockOption blockOption;
-    emberParseBlockOptionValue(options[1].intValue, &blockOption);
+    ChipCoapBlockOption blockOption;
+    chipParseBlockOptionValue(options[1].intValue, &blockOption);
     assert(blockOption.logSize == (uint8_t)contents[1]);
     assert(blockOption.number == (uint32_t)contents[2]);
-    assert(emberVerifyBlockOption(&blockOption,
+    assert(chipVerifyBlockOption(&blockOption,
                                   payloadLength,
                                   (uint8_t)contents[1]));
 
@@ -455,14 +443,14 @@ EmberStatus emberCoapRespondWithPath(const EmberCoapRequestInfo *requestInfo,
     assert(numberOfOptions == 0);
   }
 
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
 #define addCoapRespondCheck(code, logSize, number) \
   addSimpleCheck("CoapRespond", "i!!", (code), (logSize), (number))
 
 #define addCoapRespondSuccessCheck(logSize, number) \
-  addCoapRespondCheck(EMBER_COAP_CODE_205_CONTENT, (logSize), (number))
+  addCoapRespondCheck(CHIP_COAP_CODE_205_CONTENT, (logSize), (number))
 
 #define addCoapRespondFailureCheck(code) \
   addCoapRespondCheck((code), 0, 0)
@@ -473,12 +461,12 @@ EmberStatus emberCoapRespondWithPath(const EmberCoapRequestInfo *requestInfo,
 static void imageNotifyTest(void)
 {
   // When the network goes down, we don't send ImageNotify.
-  addNetworkStatusCallbackAction(EMBER_NO_NETWORK);
+  addNetworkStatusCallbackAction(CHIP_NO_NETWORK);
   addRunAction(IMAGE_NOTIFY_PERIOD_MS);
   addRunAction(IMAGE_NOTIFY_PERIOD_MS);
 
   // When the network comes up, we start sending ImageNotify.
-  addNetworkStatusCallbackAction(EMBER_JOINED_NETWORK_ATTACHED);
+  addNetworkStatusCallbackAction(CHIP_JOINED_NETWORK_ATTACHED);
   addImageNotifyRequestCheck();
   addRunAction(10);
 
@@ -496,36 +484,36 @@ static void queryNextImageTest(void)
   addQueryNextRequestAction(0xFFFF,
                             0xFFFF,
                             0xFFFFFFFF,
-                            EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
+                            CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
   addGetNextImageCallbackCheck(0xFFFF,
                                0xFFFF,
                                0xFFFFFFFF,
-                               EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE);
-  addQueryNextImageResponseCheck(EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE);
+                               CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE);
+  addQueryNextImageResponseCheck(CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE);
 
   // We get a QueryNextImage from a weird node that isn't authorized, so we tell
   // them no as well.
   addQueryNextRequestAction(theCurrentFileSpec.manufacturerCode,
                             theCurrentFileSpec.type,
                             theCurrentFileSpec.version,
-                            EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
+                            CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
   addGetNextImageCallbackCheck(theCurrentFileSpec.manufacturerCode,
                                theCurrentFileSpec.type,
                                theCurrentFileSpec.version,
-                               EMBER_ZCL_STATUS_NOT_AUTHORIZED);
-  addQueryNextImageResponseCheck(EMBER_ZCL_STATUS_NOT_AUTHORIZED);
+                               CHIP_ZCL_STATUS_NOT_AUTHORIZED);
+  addQueryNextImageResponseCheck(CHIP_ZCL_STATUS_NOT_AUTHORIZED);
 
   // Finally, we get a QueryNextImage from a friendly node that has all the
   // right file specifications. We give them an updated file spec.
   addQueryNextRequestAction(theCurrentFileSpec.manufacturerCode,
                             theCurrentFileSpec.type,
                             theCurrentFileSpec.version,
-                            EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
+                            CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
   addGetNextImageCallbackCheck(theCurrentFileSpec.manufacturerCode,
                                theCurrentFileSpec.type,
                                theCurrentFileSpec.version,
-                               EMBER_ZCL_STATUS_SUCCESS);
-  addQueryNextImageResponseCheck(EMBER_ZCL_STATUS_SUCCESS);
+                               CHIP_ZCL_STATUS_SUCCESS);
+  addQueryNextImageResponseCheck(CHIP_ZCL_STATUS_SUCCESS);
 
   // What if we get a node that wants an image that works with their hardware
   // version? We should still process the command normally if the application
@@ -537,8 +525,8 @@ static void queryNextImageTest(void)
   addGetNextImageCallbackCheck(theCurrentFileSpec.manufacturerCode,
                                theCurrentFileSpec.type,
                                theCurrentFileSpec.version,
-                               EMBER_ZCL_STATUS_SUCCESS);
-  addQueryNextImageResponseCheck(EMBER_ZCL_STATUS_SUCCESS);
+                               CHIP_ZCL_STATUS_SUCCESS);
+  addQueryNextImageResponseCheck(CHIP_ZCL_STATUS_SUCCESS);
 
   // If we get a hardware version that the application doesn't like, they should
   // be able to say no.
@@ -549,8 +537,8 @@ static void queryNextImageTest(void)
   addGetNextImageCallbackCheck(theCurrentFileSpec.manufacturerCode,
                                theCurrentFileSpec.type,
                                theCurrentFileSpec.version,
-                               EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE);
-  addQueryNextImageResponseCheck(EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE);
+                               CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE);
+  addQueryNextImageResponseCheck(CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE);
 
   runScript();
 }
@@ -559,7 +547,7 @@ static void downloadTest(void)
 {
   // Try to download a random non-existent image
   addDownloadHandlerAction(emptyFileSpec, BLOCK_SIZE_LOG, 0);
-  addCoapRespondFailureCheck(EMBER_COAP_CODE_404_NOT_FOUND);
+  addCoapRespondFailureCheck(CHIP_COAP_CODE_404_NOT_FOUND);
 
   // If a client sends a QueryNextImage, but the application says that it
   // doesn't want the client to download anything, then we once again throw up
@@ -567,27 +555,27 @@ static void downloadTest(void)
   addQueryNextRequestAction(emptyFileSpec.manufacturerCode,
                             emptyFileSpec.type,
                             emptyFileSpec.version,
-                            EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
+                            CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
   addGetNextImageCallbackCheck(emptyFileSpec.manufacturerCode,
                                emptyFileSpec.type,
                                emptyFileSpec.version,
-                               EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE);
-  addQueryNextImageResponseCheck(EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE);
+                               CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE);
+  addQueryNextImageResponseCheck(CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE);
 
   addDownloadHandlerAction(emptyFileSpec, BLOCK_SIZE_LOG, 0);
-  addCoapRespondFailureCheck(EMBER_COAP_CODE_404_NOT_FOUND);
+  addCoapRespondFailureCheck(CHIP_COAP_CODE_404_NOT_FOUND);
 
   // After a client sends a query next image, it should be able to request
   // whatever block it wants.
   addQueryNextRequestAction(theCurrentFileSpec.manufacturerCode,
                             theCurrentFileSpec.type,
                             theCurrentFileSpec.version,
-                            EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
+                            CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL);
   addGetNextImageCallbackCheck(theCurrentFileSpec.manufacturerCode,
                                theCurrentFileSpec.type,
                                theCurrentFileSpec.version,
-                               EMBER_ZCL_STATUS_SUCCESS);
-  addQueryNextImageResponseCheck(EMBER_ZCL_STATUS_SUCCESS);
+                               CHIP_ZCL_STATUS_SUCCESS);
+  addQueryNextImageResponseCheck(CHIP_ZCL_STATUS_SUCCESS);
 
   addDownloadHandlerAction(theNextFileSpec, BLOCK_SIZE_LOG, 2);
   addCoapRespondSuccessCheck(BLOCK_SIZE_LOG, 2);
@@ -609,12 +597,12 @@ static void downloadTest(void)
   // If we receive a request for a block that starts off the end of the file, we
   // blame it on the client.
   addDownloadHandlerAction(theNextFileSpec, BLOCK_SIZE_LOG, lastBlockNumber + 1);
-  addCoapRespondFailureCheck(EMBER_COAP_CODE_402_BAD_OPTION);
+  addCoapRespondFailureCheck(CHIP_COAP_CODE_402_BAD_OPTION);
 
   // If we receive a request for a block that doesn't fit in our
   // MAX_RESPONSE_BLOCK_SIZE constant, we return 5.00.
   addDownloadHandlerAction(theNextFileSpec, 10 /* 1024 */, 0);
-  addCoapRespondFailureCheck(EMBER_COAP_CODE_500_INTERNAL_SERVER_ERROR);
+  addCoapRespondFailureCheck(CHIP_COAP_CODE_500_INTERNAL_SERVER_ERROR);
 
   // Other block sizes should work just as well.
   addDownloadHandlerAction(theNextFileSpec, BLOCK_SIZE_LOG - 1, 2);
@@ -639,30 +627,30 @@ static void upgradeEndTest(void)
   // We should report whatever status we get to the application.
   // If it is a failure status, then we should be sending back a default
   // response...which seems weird, but that is what 11.13.6.4 says.
-  addUpgradeEndRequestAction(EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE);
-  addUpgradeEndRequestCallbackCheck(EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE,
+  addUpgradeEndRequestAction(CHIP_ZCL_STATUS_REQUIRE_MORE_IMAGE);
+  addUpgradeEndRequestCallbackCheck(CHIP_ZCL_STATUS_REQUIRE_MORE_IMAGE,
                                     0); // upgradeTime
   addDefaultResponseCheck();
 
-  addUpgradeEndRequestAction(EMBER_ZCL_STATUS_INVALID_IMAGE);
-  addUpgradeEndRequestCallbackCheck(EMBER_ZCL_STATUS_INVALID_IMAGE,
+  addUpgradeEndRequestAction(CHIP_ZCL_STATUS_INVALID_IMAGE);
+  addUpgradeEndRequestCallbackCheck(CHIP_ZCL_STATUS_INVALID_IMAGE,
                                     0); // upgradeTime
   addDefaultResponseCheck();
 
-  addUpgradeEndRequestAction(EMBER_ZCL_STATUS_ABORT);
-  addUpgradeEndRequestCallbackCheck(EMBER_ZCL_STATUS_ABORT,
+  addUpgradeEndRequestAction(CHIP_ZCL_STATUS_ABORT);
+  addUpgradeEndRequestCallbackCheck(CHIP_ZCL_STATUS_ABORT,
                                     0); // upgradeTime
   addDefaultResponseCheck();
 
   // When we get a success status, the application tells us when the client
   // should perform the upgrade.
-  addUpgradeEndRequestAction(EMBER_ZCL_STATUS_SUCCESS);
-  addUpgradeEndRequestCallbackCheck(EMBER_ZCL_STATUS_SUCCESS,
+  addUpgradeEndRequestAction(CHIP_ZCL_STATUS_SUCCESS);
+  addUpgradeEndRequestCallbackCheck(CHIP_ZCL_STATUS_SUCCESS,
                                     0); // upgradeTime
   addUpgradeEndResponseCheck(0); // upgradeTime
 
-  addUpgradeEndRequestAction(EMBER_ZCL_STATUS_SUCCESS);
-  addUpgradeEndRequestCallbackCheck(EMBER_ZCL_STATUS_SUCCESS,
+  addUpgradeEndRequestAction(CHIP_ZCL_STATUS_SUCCESS);
+  addUpgradeEndRequestCallbackCheck(CHIP_ZCL_STATUS_SUCCESS,
                                     0xABCD); // upgradeTime
   addUpgradeEndResponseCheck(0xABCD); // upgradeTime
 
@@ -676,17 +664,17 @@ int main(int argc, char *argv[])
 {
   emInitializeBuffers();
   // From ota-bootload-storage-ram.c.
-  extern void emZclOtaBootloadStorageInitCallback(void);
-  emZclOtaBootloadStorageInitCallback();
+  extern void chZclOtaBootloadStorageInitCallback(void);
+  chZclOtaBootloadStorageInitCallback();
 
   // Populate the OTA storage with a fake image for testing.
-  assert(emberZclOtaBootloadStorageCreate(&theNextFileSpec)
-         == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
-  assert(emberZclOtaBootloadStorageWrite(&theNextFileSpec,
+  assert(chipZclOtaBootloadStorageCreate(&theNextFileSpec)
+         == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+  assert(chipZclOtaBootloadStorageWrite(&theNextFileSpec,
                                          0,
                                          image,
                                          IMAGE_DATA_SIZE)
-         == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+         == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
 
   Test tests[] = {
     { "image-notify", imageNotifyTest, },

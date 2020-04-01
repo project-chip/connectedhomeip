@@ -1,93 +1,81 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_HAL
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_HAL
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #else
-  #define emberAfPluginZclCorePrint(...)
-  #define emberAfPluginZclCorePrintln(...)
-  #define emberAfPluginZclCoreFlush()
-  #define emberAfPluginZclCoreDebugExec(x)
-  #define emberAfPluginZclCorePrintBuffer(buffer, len, withSpace)
-  #define emberAfPluginZclCorePrintString(buffer)
+  #define chipAfPluginZclCorePrint(...)
+  #define chipAfPluginZclCorePrintln(...)
+  #define chipAfPluginZclCoreFlush()
+  #define chipAfPluginZclCoreDebugExec(x)
+  #define chipAfPluginZclCorePrintBuffer(buffer, len, withSpace)
+  #define chipAfPluginZclCorePrintString(buffer)
 #endif
 
 // Group name "broadcast", this is a ZCL string, not NULL-terminated
 const uint8_t bcastGroupName[] = { 0x62, 0x72, 0x6f, 0x61, 0x64, 0x63, 0x61, 0x73, 0x74 };
 const uint8_t bcastGroupNameLength = 0x09;
-const EmberIpv6Address broadcastGroupAddress  = { { 0xff, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xc1, 0xff, 0xff } };
-const EmberIpv6Address allCoapNodesLinkScope  = { { 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd } };
-const EmberIpv6Address allCoapNodesRealmScope = { { 0xff, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd } };
-const EmberIpv6Address allCoapNodesAdminScope = { { 0xff, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd } };
-const EmberIpv6Address allCoapNodesSiteScope  = { { 0xff, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd } };
-const EmberIpv6Address allNodes               = { { 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 } };
+const ChipIpv6Address broadcastGroupAddress  = { { 0xff, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xc1, 0xff, 0xff } };
+const ChipIpv6Address allCoapNodesLinkScope  = { { 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd } };
+const ChipIpv6Address allCoapNodesRealmScope = { { 0xff, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd } };
+const ChipIpv6Address allCoapNodesAdminScope = { { 0xff, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd } };
+const ChipIpv6Address allCoapNodesSiteScope  = { { 0xff, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd } };
+const ChipIpv6Address allNodes               = { { 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 } };
 
-void emZclGroupNetworkStatusHandler(EmberNetworkStatus newNetworkStatus,
-                                    EmberNetworkStatus oldNetworkStatus,
-                                    EmberJoinFailureReason reason)
+void chZclGroupNetworkStatusHandler(ChipNetworkStatus newNetworkStatus,
+                                    ChipNetworkStatus oldNetworkStatus,
+                                    ChipJoinFailureReason reason)
 {
   // If the device is no longer associated with a network, its groups are
   // removed, because groups are specific to a network.
-  if (newNetworkStatus == EMBER_NO_NETWORK) {
-    emberZclRemoveAllGroups();
+  if (newNetworkStatus == CHIP_NO_NETWORK) {
+    chipZclRemoveAllGroups();
   }
 }
 
-bool emZclHasGroup(EmberZclGroupId_t groupId)
+bool chZclHasGroup(ChipZclGroupId_t groupId)
 {
-  for (size_t i = 0; i < emZclEndpointCount; i++) {
-    if (emberZclIsEndpointInGroup(emZclEndpointTable[i].endpointId, groupId)) {
+  for (size_t i = 0; i < chZclEndpointCount; i++) {
+    if (chipZclIsEndpointInGroup(chZclEndpointTable[i].endpointId, groupId)) {
       return true;
     }
   }
   return false;
 }
 
-size_t emZclGetGroupsCapacity(void)
+size_t chZclGetGroupsCapacity(void)
 {
   // Returns the remaining (unused) capacity in the Groups table.
 
-  size_t capacity = EMBER_ZCL_GROUP_TABLE_SIZE;
+  size_t capacity = CHIP_ZCL_GROUP_TABLE_SIZE;
 
-  for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-    EmberZclGroupEntry_t entry;
+  for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+    ChipZclGroupEntry_t entry;
     halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
-    if (entry.groupId != EMBER_ZCL_GROUP_NULL) {
+    if (entry.groupId != CHIP_ZCL_GROUP_NULL) {
       --capacity;
     }
   }
   return capacity;
 }
 
-bool emberZclIsEndpointInGroup(EmberZclEndpointId_t endpointId,
-                               EmberZclGroupId_t groupId)
+bool chipZclIsEndpointInGroup(ChipZclEndpointId_t endpointId,
+                               ChipZclGroupId_t groupId)
 {
-  if (groupId == EMBER_ZCL_GROUP_ALL_ENDPOINTS) {
+  if (groupId == CHIP_ZCL_GROUP_ALL_ENDPOINTS) {
     return true;
   }
-  if ((EMBER_ZCL_GROUP_MIN <= groupId)
-      && (groupId <= EMBER_ZCL_GROUP_MAX)) {
-    for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-      EmberZclGroupEntry_t entry;
+  if ((CHIP_ZCL_GROUP_MIN <= groupId)
+      && (groupId <= CHIP_ZCL_GROUP_MAX)) {
+    for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+      ChipZclGroupEntry_t entry;
       halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
       if (groupId == entry.groupId
           && endpointId == entry.endpointId) {
@@ -99,9 +87,9 @@ bool emberZclIsEndpointInGroup(EmberZclEndpointId_t endpointId,
   return false;
 }
 
-bool emberZclIsEndpointAndAddrInGroup(EmberZclEndpointId_t endpointId,
-                                      const EmberIpv6Address *dstAddr,
-                                      EmberZclGroupId_t groupId)
+bool chipZclIsEndpointAndAddrInGroup(ChipZclEndpointId_t endpointId,
+                                      const ChipIpv6Address *dstAddr,
+                                      ChipZclGroupId_t groupId)
 {
   // Always allow unicast and well-known addresses
   if (dstAddr == NULL
@@ -111,20 +99,20 @@ bool emberZclIsEndpointAndAddrInGroup(EmberZclEndpointId_t endpointId,
       || memcmp(allCoapNodesAdminScope.bytes, dstAddr->bytes, sizeof(dstAddr->bytes)) == 0
       || memcmp(allCoapNodesSiteScope.bytes, dstAddr->bytes, sizeof(dstAddr->bytes))  == 0
       || memcmp(allNodes.bytes, dstAddr->bytes, sizeof(dstAddr->bytes)) == 0) {
-    return emberZclIsEndpointInGroup(endpointId, groupId);
+    return chipZclIsEndpointInGroup(endpointId, groupId);
   }
 
-  if (groupId == EMBER_ZCL_GROUP_ALL_ENDPOINTS && memcmp(broadcastGroupAddress.bytes, dstAddr->bytes, sizeof(dstAddr->bytes)) == 0) {
+  if (groupId == CHIP_ZCL_GROUP_ALL_ENDPOINTS && memcmp(broadcastGroupAddress.bytes, dstAddr->bytes, sizeof(dstAddr->bytes)) == 0) {
     return true;
   }
 
-  if ((EMBER_ZCL_GROUP_MIN <= groupId) && (groupId <= EMBER_ZCL_GROUP_MAX)) {
-    for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-      EmberZclGroupEntry_t entry;
+  if ((CHIP_ZCL_GROUP_MIN <= groupId) && (groupId <= CHIP_ZCL_GROUP_MAX)) {
+    for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+      ChipZclGroupEntry_t entry;
       halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
       if (groupId == entry.groupId && endpointId == entry.endpointId) {
-        EmberIpv6Address address = { { 0 } };
-        emZclBuildGroupMcastAddress(&entry, address.bytes);
+        ChipIpv6Address address = { { 0 } };
+        chZclBuildGroupMcastAddress(&entry, address.bytes);
         if (memcmp(address.bytes, dstAddr->bytes, sizeof(dstAddr->bytes)) == 0) {
           return true;
         }
@@ -134,7 +122,7 @@ bool emberZclIsEndpointAndAddrInGroup(EmberZclEndpointId_t endpointId,
   return false;
 }
 
-bool emberZclIsAddressGroupMulticast(const EmberIpv6Address *dstAddr)
+bool chipZclIsAddressGroupMulticast(const ChipIpv6Address *dstAddr)
 {
   // First check against well-known addresses as it's cheaper than accessing NVRAM
   if (dstAddr == NULL
@@ -150,12 +138,12 @@ bool emberZclIsAddressGroupMulticast(const EmberIpv6Address *dstAddr)
     return true;
   }
 
-  for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-    EmberZclGroupEntry_t entry;
+  for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+    ChipZclGroupEntry_t entry;
     halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
 
-    EmberIpv6Address address = { { 0 } };
-    emZclBuildGroupMcastAddress(&entry, address.bytes);
+    ChipIpv6Address address = { { 0 } };
+    chZclBuildGroupMcastAddress(&entry, address.bytes);
     if (memcmp(address.bytes, dstAddr->bytes, sizeof(dstAddr->bytes)) == 0) {
       return true;
     }
@@ -164,23 +152,23 @@ bool emberZclIsAddressGroupMulticast(const EmberIpv6Address *dstAddr)
   return false;
 }
 
-bool emberZclGetGroupName(EmberZclEndpointId_t endpointId,
-                          EmberZclGroupId_t groupId,
+bool chipZclGetGroupName(ChipZclEndpointId_t endpointId,
+                          ChipZclGroupId_t groupId,
                           uint8_t *groupName,
                           uint8_t *groupNameLength)
 {
-  if (EMBER_ZCL_MAX_GROUP_NAME_LENGTH == 0) {
+  if (CHIP_ZCL_MAX_GROUP_NAME_LENGTH == 0) {
     return false;
-  } else if (groupId == EMBER_ZCL_GROUP_ALL_ENDPOINTS) {
+  } else if (groupId == CHIP_ZCL_GROUP_ALL_ENDPOINTS) {
     MEMCOPY(groupName, bcastGroupName, bcastGroupNameLength);
     *groupNameLength = bcastGroupNameLength;
     return true;
-  } else if (EMBER_ZCL_GROUP_MIN <= groupId && groupId <= EMBER_ZCL_GROUP_MAX) {
-    for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-      EmberZclGroupEntry_t entry;
+  } else if (CHIP_ZCL_GROUP_MIN <= groupId && groupId <= CHIP_ZCL_GROUP_MAX) {
+    for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+      ChipZclGroupEntry_t entry;
       halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
       if (groupId == entry.groupId && endpointId == entry.endpointId) {
-#if EMBER_ZCL_MAX_GROUP_NAME_LENGTH == 0
+#if CHIP_ZCL_MAX_GROUP_NAME_LENGTH == 0
 #else
         MEMCOPY(groupName, entry.groupName, entry.groupNameLength);
         *groupNameLength = entry.groupNameLength;
@@ -192,31 +180,31 @@ bool emberZclGetGroupName(EmberZclEndpointId_t endpointId,
   return false;
 }
 
-EmberZclStatus_t emberZclAddEndpointToGroup(EmberZclEndpointId_t endpointId,
-                                            EmberZclGroupId_t groupId,
+ChipZclStatus_t chipZclAddEndpointToGroup(ChipZclEndpointId_t endpointId,
+                                            ChipZclGroupId_t groupId,
                                             const uint8_t *groupName,
                                             uint8_t groupNameLength,
                                             uint8_t assignmentMode,
                                             const uint8_t *groupAddress,
                                             uint16_t groupUdpPort)
 {
-  if (groupId == EMBER_ZCL_GROUP_ALL_ENDPOINTS
-      || groupId < EMBER_ZCL_GROUP_MIN
-      || groupId > EMBER_ZCL_GROUP_MAX
-      || groupNameLength > EMBER_ZCL_MAX_GROUP_NAME_LENGTH
+  if (groupId == CHIP_ZCL_GROUP_ALL_ENDPOINTS
+      || groupId < CHIP_ZCL_GROUP_MIN
+      || groupId > CHIP_ZCL_GROUP_MAX
+      || groupNameLength > CHIP_ZCL_MAX_GROUP_NAME_LENGTH
       || (groupNameLength && groupName == NULL)
-      || (assignmentMode != EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL && groupAddress == NULL)) {
-    return EMBER_ZCL_STATUS_FAILURE;
-  } else if (emberZclIsEndpointInGroup(endpointId, groupId)) {
-    return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
+      || (assignmentMode != CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL && groupAddress == NULL)) {
+    return CHIP_ZCL_STATUS_FAILURE;
+  } else if (chipZclIsEndpointInGroup(endpointId, groupId)) {
+    return CHIP_ZCL_STATUS_DUPLICATE_EXISTS;
   } else {
-    for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-      EmberZclGroupEntry_t entry;
+    for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+      ChipZclGroupEntry_t entry;
       halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
-      if (entry.groupId == EMBER_ZCL_GROUP_NULL) {
+      if (entry.groupId == CHIP_ZCL_GROUP_NULL) {
         entry.groupId = groupId;
         entry.endpointId = endpointId;
-#if EMBER_ZCL_MAX_GROUP_NAME_LENGTH == 0
+#if CHIP_ZCL_MAX_GROUP_NAME_LENGTH == 0
 #else
         if (groupNameLength && groupName != NULL) {
           entry.groupNameLength = groupNameLength;
@@ -224,27 +212,27 @@ EmberZclStatus_t emberZclAddEndpointToGroup(EmberZclEndpointId_t endpointId,
         }
 #endif
         entry.addrAssignmentMode = assignmentMode;
-        if ( assignmentMode != EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
+        if ( assignmentMode != CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
           // If mode is 0xfe the whole IPv6 address is passed, otherwise -- 8 bits of flags
-          MEMCOPY(entry.groupMcastAddress.bytes, groupAddress, assignmentMode == EMBER_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL ? 16 : 1);
+          MEMCOPY(entry.groupMcastAddress.bytes, groupAddress, assignmentMode == CHIP_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL ? 16 : 1);
         }
 
         entry.groupUdpPort = groupUdpPort;
         // Now listen on the IPv6 address. Treat port 0 (invalid for UDP) as "no value", use default COAP port.
-        EmberIpv6Address address = { { 0 } };
-        emZclBuildGroupMcastAddress(&entry, address.bytes);
-        emberUdpListen(entry.groupUdpPort ? entry.groupUdpPort : EMBER_COAP_PORT, address.bytes);
+        ChipIpv6Address address = { { 0 } };
+        chZclBuildGroupMcastAddress(&entry, address.bytes);
+        chipUdpListen(entry.groupUdpPort ? entry.groupUdpPort : CHIP_COAP_PORT, address.bytes);
 
-        uint8_t dst[EMBER_IPV6_ADDRESS_STRING_SIZE];
-        if (emberIpv6AddressToString(&address, dst, sizeof(dst))) {
-          emberAfPluginZclCorePrintln("Added endpoint %d to group %d with address %s ", endpointId, groupId, dst);
+        uint8_t dst[CHIP_IPV6_ADDRESS_STRING_SIZE];
+        if (chipIpv6AddressToString(&address, dst, sizeof(dst))) {
+          chipAfPluginZclCorePrintln("Added endpoint %d to group %d with address %s ", endpointId, groupId, dst);
         }
 
         halCommonSetIndexedToken(TOKEN_ZCL_CORE_GROUP_TABLE, i, &entry);
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return CHIP_ZCL_STATUS_SUCCESS;
       }
     }
-    return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+    return CHIP_ZCL_STATUS_INSUFFICIENT_SPACE;
   }
 }
 
@@ -254,18 +242,18 @@ enum {
   ENDPOINT_FLAG   = 0x04,
 };
 
-static EmberZclStatus_t removeEndpoints(uint8_t mask,
-                                        EmberZclEndpointId_t endpointId,
-                                        EmberZclGroupId_t groupId)
+static ChipZclStatus_t removeEndpoints(uint8_t mask,
+                                        ChipZclEndpointId_t endpointId,
+                                        ChipZclGroupId_t groupId)
 {
   if ((mask & GROUP_FLAG)
-      && (groupId < EMBER_ZCL_GROUP_MIN || EMBER_ZCL_GROUP_MAX < groupId)) {
-    return EMBER_ZCL_STATUS_INVALID_FIELD;
+      && (groupId < CHIP_ZCL_GROUP_MIN || CHIP_ZCL_GROUP_MAX < groupId)) {
+    return CHIP_ZCL_STATUS_INVALID_FIELD;
   }
 
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_NOT_FOUND;
-  for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-    EmberZclGroupEntry_t entry;
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_NOT_FOUND;
+  for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+    ChipZclGroupEntry_t entry;
     halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
     uint8_t flags = 0;
     if (groupId == entry.groupId) {
@@ -275,60 +263,60 @@ static EmberZclStatus_t removeEndpoints(uint8_t mask,
       flags |= ENDPOINT_FLAG;
     }
     if (mask == NULL_GROUP_FLAG || (flags & mask) == mask) {
-      if ( entry.addrAssignmentMode != EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
-        EmberIpv6Address address = { { 0 } };
-        emZclBuildGroupMcastAddress(&entry, address.bytes);
-        emberRemoveUdpListeners(address.bytes);
+      if ( entry.addrAssignmentMode != CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
+        ChipIpv6Address address = { { 0 } };
+        chZclBuildGroupMcastAddress(&entry, address.bytes);
+        chipRemoveUdpListeners(address.bytes);
       }
-      entry.addrAssignmentMode = EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
-      entry.groupId = EMBER_ZCL_GROUP_NULL;
-      entry.endpointId = EMBER_ZCL_ENDPOINT_NULL;
+      entry.addrAssignmentMode = CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
+      entry.groupId = CHIP_ZCL_GROUP_NULL;
+      entry.endpointId = CHIP_ZCL_ENDPOINT_NULL;
       halCommonSetIndexedToken(TOKEN_ZCL_CORE_GROUP_TABLE, i, &entry);
       if ((mask & (GROUP_FLAG | ENDPOINT_FLAG))
           == (GROUP_FLAG | ENDPOINT_FLAG)) {
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return CHIP_ZCL_STATUS_SUCCESS;
       } else {
-        status = EMBER_ZCL_STATUS_SUCCESS;
+        status = CHIP_ZCL_STATUS_SUCCESS;
       }
     }
   }
   return status;
 }
 
-EmberZclStatus_t emberZclRemoveEndpointFromGroup(EmberZclEndpointId_t endpointId,
-                                                 EmberZclGroupId_t groupId)
+ChipZclStatus_t chipZclRemoveEndpointFromGroup(ChipZclEndpointId_t endpointId,
+                                                 ChipZclGroupId_t groupId)
 {
   return removeEndpoints(GROUP_FLAG | ENDPOINT_FLAG, endpointId, groupId);
 }
 
-EmberZclStatus_t emberZclRemoveEndpointFromAllGroups(EmberZclEndpointId_t endpointId)
+ChipZclStatus_t chipZclRemoveEndpointFromAllGroups(ChipZclEndpointId_t endpointId)
 {
-  return removeEndpoints(ENDPOINT_FLAG, endpointId, EMBER_ZCL_GROUP_NULL);
+  return removeEndpoints(ENDPOINT_FLAG, endpointId, CHIP_ZCL_GROUP_NULL);
 }
 
-EmberZclStatus_t emberZclRemoveGroup(EmberZclGroupId_t groupId)
+ChipZclStatus_t chipZclRemoveGroup(ChipZclGroupId_t groupId)
 {
-  return removeEndpoints(GROUP_FLAG, EMBER_ZCL_ENDPOINT_NULL, groupId);
+  return removeEndpoints(GROUP_FLAG, CHIP_ZCL_ENDPOINT_NULL, groupId);
 }
 
-EmberZclStatus_t emberZclRemoveAllGroups(void)
+ChipZclStatus_t chipZclRemoveAllGroups(void)
 {
   return removeEndpoints(NULL_GROUP_FLAG,
-                         EMBER_ZCL_ENDPOINT_NULL,
-                         EMBER_ZCL_GROUP_NULL);
+                         CHIP_ZCL_ENDPOINT_NULL,
+                         CHIP_ZCL_GROUP_NULL);
 }
 
 // Re-register to listen to all group multicast addresses, called upon init
-void emZclReregisterAllMcastAddresses(void)
+void chZclReregisterAllMcastAddresses(void)
 {
-  for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-    EmberZclGroupEntry_t entry;
+  for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+    ChipZclGroupEntry_t entry;
     halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
-    EmberIpv6Address address = { { 0 } };
-    if (entry.groupId != EMBER_ZCL_GROUP_NULL && entry.addrAssignmentMode != EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
-      emZclBuildGroupMcastAddress(&entry, address.bytes);
+    ChipIpv6Address address = { { 0 } };
+    if (entry.groupId != CHIP_ZCL_GROUP_NULL && entry.addrAssignmentMode != CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
+      chZclBuildGroupMcastAddress(&entry, address.bytes);
       // Treat port 0 (invalid for UDP) as "no value", use default COAP port.
-      emberUdpListen(entry.groupUdpPort ? entry.groupUdpPort : EMBER_COAP_PORT, address.bytes);
+      chipUdpListen(entry.groupUdpPort ? entry.groupUdpPort : CHIP_COAP_PORT, address.bytes);
     }
   }
 }
@@ -336,58 +324,58 @@ void emZclReregisterAllMcastAddresses(void)
 // zcl/g:
 //   GET: list groups.
 //   OTHER: not allowed.
-void emZclUriGroupHandler(EmZclContext_t *context)
+void chZclUriGroupHandler(ChZclContext_t *context)
 {
-  EmberZclGroupId_t groups[EMBER_ZCL_GROUP_TABLE_SIZE + 1];
+  ChipZclGroupId_t groups[CHIP_ZCL_GROUP_TABLE_SIZE + 1];
   uint16_t count = 0;
-  for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-    EmberZclGroupEntry_t entry;
+  for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+    ChipZclGroupEntry_t entry;
     halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
-    if (entry.groupId != EMBER_ZCL_GROUP_NULL) {
-      emZclInsertGroupIdIntoSortedList(entry.groupId,
+    if (entry.groupId != CHIP_ZCL_GROUP_NULL) {
+      chZclInsertGroupIdIntoSortedList(entry.groupId,
                                        groups,
                                        &count,
                                        COUNTOF(groups));
     }
   }
   // We know Broadcast Group's value is 0xffff and it will be last in the array.
-  groups[count] = EMBER_ZCL_GROUP_ALL_ENDPOINTS;
+  groups[count] = CHIP_ZCL_GROUP_ALL_ENDPOINTS;
   count++;
 
   CborState state;
-  uint8_t buffer[EM_ZCL_MAX_PAYLOAD_SIZE];
+  uint8_t buffer[CH_ZCL_MAX_PAYLOAD_SIZE];
   emCborEncodeIndefiniteArrayStart(&state, buffer, sizeof(buffer));
   for (size_t i = 0; i < count; i++) {
     if (!emCborEncodeValue(&state,
-                           EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
-                           sizeof(EmberZclGroupId_t),
+                           CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                           sizeof(ChipZclGroupId_t),
                            (const uint8_t *)&groups[i])) {
-      emZclRespond500InternalServerError(context->info);
+      chZclRespond500InternalServerError(context->info);
       return;
     }
   }
   emCborEncodeBreak(&state);
-  emZclRespond205ContentCborState(context->info, &state);
+  chZclRespond205ContentCborState(context->info, &state);
 }
 
 // GET zcl/g/XXXX:
 //   GET: list endpoints in group.
 //   OTHER: not allowed.
-void emZclUriGroupIdHandler(EmZclContext_t *context)
+void chZclUriGroupIdHandler(ChZclContext_t *context)
 {
   CborState state;
-  uint8_t buffer[EM_ZCL_MAX_PAYLOAD_SIZE];
+  uint8_t buffer[CH_ZCL_MAX_PAYLOAD_SIZE];
   bool endpointFound = false;
   emCborEncodeIndefiniteArrayStart(&state, buffer, sizeof(buffer));
-  for (size_t i = 0; i < emZclEndpointCount; i++) {
-    if (emberZclIsEndpointInGroup(emZclEndpointTable[i].endpointId,
+  for (size_t i = 0; i < chZclEndpointCount; i++) {
+    if (chipZclIsEndpointInGroup(chZclEndpointTable[i].endpointId,
                                   context->groupId)) {
       endpointFound = true;
       if (!emCborEncodeValue(&state,
-                             EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER,
-                             sizeof(EmberZclEndpointId_t),
-                             &emZclEndpointTable[i].endpointId)) {
-        emZclRespond500InternalServerError(context->info);
+                             CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER,
+                             sizeof(ChipZclEndpointId_t),
+                             &chZclEndpointTable[i].endpointId)) {
+        chZclRespond500InternalServerError(context->info);
         return;
       }
     }
@@ -395,15 +383,15 @@ void emZclUriGroupIdHandler(EmZclContext_t *context)
 
   if (endpointFound) {
     emCborEncodeBreak(&state);
-    emZclRespond205ContentCborState(context->info, &state);
+    chZclRespond205ContentCborState(context->info, &state);
   } else {
-    emZclRespond404NotFound(context->info);
+    chZclRespond404NotFound(context->info);
   }
 }
 
 // Insert a group ID into a list of group IDs, maintaining ascending order.
-void emZclInsertGroupIdIntoSortedList(const EmberZclGroupId_t groupId,
-                                      EmberZclGroupId_t * const pgroups,
+void chZclInsertGroupIdIntoSortedList(const ChipZclGroupId_t groupId,
+                                      ChipZclGroupId_t * const pgroups,
                                       uint16_t * const pcount,
                                       const uint16_t maxEntries)
 {
@@ -422,7 +410,7 @@ void emZclInsertGroupIdIntoSortedList(const EmberZclGroupId_t groupId,
         // Shift ordered successors forward to create gap.
         MEMMOVE(pgroups + i + 1,
                 pgroups + i,
-                (*pcount - i) * sizeof(EmberZclGroupId_t));
+                (*pcount - i) * sizeof(ChipZclGroupId_t));
         break;
       }
     }
@@ -436,9 +424,9 @@ void emZclInsertGroupIdIntoSortedList(const EmberZclGroupId_t groupId,
 
 // Given group IPv6 address parameters as passed in "add group" construct the actual address
 // If this entry has no address assignment return without doing anything
-void emZclBuildGroupMcastAddress(const EmberZclGroupEntry_t *entry, uint8_t *addressBytes)
+void chZclBuildGroupMcastAddress(const ChipZclGroupEntry_t *entry, uint8_t *addressBytes)
 {
-  if (entry->addrAssignmentMode == EMBER_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL) {
+  if (entry->addrAssignmentMode == CHIP_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL) {
     MEMCOPY(addressBytes, entry->groupMcastAddress.bytes, 16);
   } else {
     // Auto-create an IPv6 address for group.
@@ -448,7 +436,7 @@ void emZclBuildGroupMcastAddress(const EmberZclGroupEntry_t *entry, uint8_t *add
 
     uint8_t flags;
     uint8_t base;
-    if (entry->addrAssignmentMode == EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
+    if (entry->addrAssignmentMode == CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
       // ZLCIP BDB Section 2.5.6: Default flags: R=0, P=0, T=1. 2.5.5: Default scope = 5. Section E.1.7.1: Default base = 0x0A
       flags = 0x15;
       base = 0x0A;

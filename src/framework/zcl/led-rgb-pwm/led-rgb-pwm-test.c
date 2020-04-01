@@ -1,24 +1,12 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_BULB_PWM_DRIVER
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_BULB_PWM_DRIVER
 
 // Macros for zcl color modes
 #define COLOR_MODE_HSV  0//COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION
@@ -37,28 +25,28 @@ static uint16_t minColor, maxColor, colorTemp;
 static uint8_t  hue, saturation, colorMode;
 static uint16_t currentX, currentY;
 
-const EmberZclClusterSpec_t emberZclClusterLevelControlServerSpec = {
-  EMBER_ZCL_ROLE_CLIENT,
-  EMBER_ZCL_MANUFACTURER_CODE_NULL,
-  EMBER_ZCL_CLUSTER_LEVEL_CONTROL,
+const ChipZclClusterSpec_t chipZclClusterLevelControlServerSpec = {
+  CHIP_ZCL_ROLE_CLIENT,
+  CHIP_ZCL_MANUFACTURER_CODE_NULL,
+  CHIP_ZCL_CLUSTER_LEVEL_CONTROL,
 };
 
-const EmberZclClusterSpec_t emberZclClusterOnOffServerSpec = {
-  EMBER_ZCL_ROLE_CLIENT,
-  EMBER_ZCL_MANUFACTURER_CODE_NULL,
-  EMBER_ZCL_CLUSTER_ON_OFF,
+const ChipZclClusterSpec_t chipZclClusterOnOffServerSpec = {
+  CHIP_ZCL_ROLE_CLIENT,
+  CHIP_ZCL_MANUFACTURER_CODE_NULL,
+  CHIP_ZCL_CLUSTER_ON_OFF,
 };
 
-const EmberZclClusterSpec_t emberZclClusterColorControlServerSpec = {
-  EMBER_ZCL_ROLE_CLIENT,
-  EMBER_ZCL_MANUFACTURER_CODE_NULL,
-  EMBER_ZCL_CLUSTER_COLOR_CONTROL,
+const ChipZclClusterSpec_t chipZclClusterColorControlServerSpec = {
+  CHIP_ZCL_ROLE_CLIENT,
+  CHIP_ZCL_MANUFACTURER_CODE_NULL,
+  CHIP_ZCL_CLUSTER_COLOR_CONTROL,
 };
 
 void emLedRgbPwmInitHandler(void);
-void emLedRgbPwmPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                           const EmberZclClusterSpec_t *clusterSpec,
-                                           EmberZclAttributeId_t attributeId,
+void emLedRgbPwmPostAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                           const ChipZclClusterSpec_t *clusterSpec,
+                                           ChipZclAttributeId_t attributeId,
                                            const void *buffer,
                                            size_t bufferLength);
 
@@ -158,14 +146,14 @@ RgbOutputs rgbOutputs[] = {
   { 0, 6000, 3458, 988 }
 };
 
-EmberZclEndpointId_t emberZclEndpointIndexToId(EmberZclEndpointIndex_t index,
-                                               const EmberZclClusterSpec_t *clusterSpec)
+ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index,
+                                               const ChipZclClusterSpec_t *clusterSpec)
 {
   return 1;
 }
 
-bool emberZclAreClusterSpecsEqual(const EmberZclClusterSpec_t *s1,
-                                  const EmberZclClusterSpec_t *s2)
+bool chipZclAreClusterSpecsEqual(const ChipZclClusterSpec_t *s1,
+                                  const ChipZclClusterSpec_t *s2)
 {
   return (s1->role == s2->role
           && s1->manufacturerCode == s2->manufacturerCode
@@ -222,7 +210,7 @@ static void driveTest(void)
   setExpectedRgbInputs(rgbInputs[2]);
   setExpectedRgbOut(rgbOutputs[2]);
   emLedRgbPwmPostAttributeChangeHandler(1,
-                                        &emberZclClusterLevelControlServerSpec,
+                                        &chipZclClusterLevelControlServerSpec,
                                         0x0000,
                                         dummy,
                                         dummyLength);
@@ -230,7 +218,7 @@ static void driveTest(void)
   setExpectedRgbInputs(rgbInputs[3]);
   setExpectedRgbOut(rgbOutputs[3]);
   emLedRgbPwmPostAttributeChangeHandler(1,
-                                        &emberZclClusterOnOffServerSpec,
+                                        &chipZclClusterOnOffServerSpec,
                                         0x0000,
                                         dummy,
                                         dummyLength);
@@ -238,7 +226,7 @@ static void driveTest(void)
   setExpectedRgbInputs(rgbInputs[4]);
   setExpectedRgbOut(rgbOutputs[4]);
   emLedRgbPwmPostAttributeChangeHandler(1,
-                                        &emberZclClusterColorControlServerSpec,
+                                        &chipZclClusterColorControlServerSpec,
                                         0x0000,
                                         dummy,
                                         dummyLength);
@@ -293,7 +281,7 @@ uint16_t halBulbPwmDriverTicksPerPeriod(void)
   return 6000;
 }
 
-void emberAfPluginBulbPwmDriverDriveWrgb(uint16_t white, uint16_t red, uint16_t green, uint16_t blue)
+void chipAfPluginBulbPwmDriverDriveWrgb(uint16_t white, uint16_t red, uint16_t green, uint16_t blue)
 {
   //  printf("%d %d %d %d\r\n", white, red, green, blue);
   assert(white == expectedWhite);
@@ -302,57 +290,57 @@ void emberAfPluginBulbPwmDriverDriveWrgb(uint16_t white, uint16_t red, uint16_t 
   assert(blue == expectedBlue);
 }
 
-uint16_t emberAfPluginBulbPwmDriverMinDriveValue(void)
+uint16_t chipAfPluginBulbPwmDriverMinDriveValue(void)
 {
   return 0;
 }
 
-uint16_t emberAfPluginBulbPwmDriverMaxDriveValue(void)
+uint16_t chipAfPluginBulbPwmDriverMaxDriveValue(void)
 {
   return 6000;
 }
 
-EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
-                                       const EmberZclClusterSpec_t *clusterSpec,
-                                       EmberZclAttributeId_t attributeId,
+ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId,
+                                       const ChipZclClusterSpec_t *clusterSpec,
+                                       ChipZclAttributeId_t attributeId,
                                        void *buffer,
                                        size_t bufferLength)
 {
-  if (emberZclAreClusterSpecsEqual(&emberZclClusterColorControlServerSpec,
+  if (chipZclAreClusterSpecsEqual(&chipZclClusterColorControlServerSpec,
                                    clusterSpec)) {
     switch (attributeId) {
-      case EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_HUE:
+      case CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_HUE:
         *(uint8_t *)buffer = hue;
         break;
-      case EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION:
+      case CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION:
         *(uint8_t *)buffer = saturation;
         break;
-      case EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X:
+      case CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X:
         *(uint16_t *)buffer = currentX;
         break;
-      case EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y:
+      case CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y:
         *(uint16_t *)buffer = currentY;
         break;
-      case EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_MODE:
+      case CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_MODE:
         *(uint8_t *)buffer = colorMode;
         break;
-      case EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN:
+      case CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN:
         *(uint16_t *)buffer = minColor;
         break;
-      case EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX:
+      case CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX:
         *(uint16_t *)buffer = maxColor;
         break;
-      case EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE:
+      case CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE:
         *(uint16_t *)buffer = colorTemp;
         break;
       default:
         printf("Color Control attribute 0x%0x read unexpected\n", attributeId);
         assert(false);
     }
-  } else if (emberZclAreClusterSpecsEqual(&emberZclClusterOnOffServerSpec,
+  } else if (chipZclAreClusterSpecsEqual(&chipZclClusterOnOffServerSpec,
                                           clusterSpec)) {
     switch (attributeId) {
-      case EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF:
+      case CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF:
         *(bool *)buffer = onOff;
         break;
       default:
@@ -360,10 +348,10 @@ EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
         assert(false);
         break;
     }
-  } else if (emberZclAreClusterSpecsEqual(&emberZclClusterLevelControlServerSpec,
+  } else if (chipZclAreClusterSpecsEqual(&chipZclClusterLevelControlServerSpec,
                                           clusterSpec)) {
     switch (attributeId) {
-      case EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL:
+      case CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL:
         *(uint8_t *)buffer = expectedLevel;
         break;
       default:
@@ -376,5 +364,5 @@ EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
     assert(false);
   }
 
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }

@@ -1,8 +1,8 @@
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CORE
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CLIENT
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_CORE
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_CLIENT
 
 
 /**************************************************************************//**
@@ -13,7 +13,7 @@
  * @return `true` if there was an error setting one of the attributes
  *
  *****************************************************************************/
-bool emberZclOtaBootloadClientSetVersionInfoCallback()
+bool chipZclOtaBootloadClientSetVersionInfoCallback()
 {
   return false;
 }
@@ -29,7 +29,7 @@ bool emberZclOtaBootloadClientSetVersionInfoCallback()
  *       file to download. If `false` is returned, the OTA Client will continue
  *       to try to discover an OTA Server.
  *****************************************************************************/
-bool emberZclOtaBootloadClientServerHasStaticAddressCallback(EmberZclOtaBootloadClientServerInfo_t *serverInfo)
+bool chipZclOtaBootloadClientServerHasStaticAddressCallback(ChipZclOtaBootloadClientServerInfo_t *serverInfo)
 {
 	return false;
 }
@@ -43,7 +43,7 @@ bool emberZclOtaBootloadClientServerHasStaticAddressCallback(EmberZclOtaBootload
  * @note If `true` is returned, the OTA Client state machine will wait for the
  *       DNS hostname to be resolved.
  *****************************************************************************/
-bool emberZclOtaBootloadClientServerHasDnsNameCallback(EmberZclOtaBootloadClientServerInfo_t *serverInfo)
+bool chipZclOtaBootloadClientServerHasDnsNameCallback(ChipZclOtaBootloadClientServerInfo_t *serverInfo)
 {
 	return false;
 }
@@ -57,9 +57,9 @@ bool emberZclOtaBootloadClientServerHasDnsNameCallback(EmberZclOtaBootloadClient
  *
  * @note If `true` is returned, the OTA Client state machine will wait until the responseHandler is called
  *****************************************************************************/
-bool emberZclOtaBootloadClientServerHasDiscByClusterId(const EmberZclClusterSpec_t *clusterSpec, EmberCoapResponseHandler responseHandler)
+bool chipZclOtaBootloadClientServerHasDiscByClusterId(const ChipZclClusterSpec_t *clusterSpec, ChipCoapResponseHandler responseHandler)
 {
-	return emberZclDiscByClusterId(clusterSpec, responseHandler);
+	return chipZclDiscByClusterId(clusterSpec, responseHandler);
 }
 
 /**************************************************************************//**
@@ -67,7 +67,7 @@ bool emberZclOtaBootloadClientServerHasDiscByClusterId(const EmberZclClusterSpec
  *
  * @return `true` if the specification requires a DTLS connection to the server
  *****************************************************************************/
-bool emberZclOtaBootloadClientExpectSecureOta() {
+bool chipZclOtaBootloadClientExpectSecureOta() {
   return false;
 }
 
@@ -83,7 +83,7 @@ bool emberZclOtaBootloadClientExpectSecureOta() {
  *       file to download. If `false` is returned, the OTA Client will continue
  *       to try to discover an OTA Server.
  *****************************************************************************/
-bool emberZclOtaBootloadClientServerDiscoveredCallback(const EmberZclOtaBootloadClientServerInfo_t *serverInfo)
+bool chipZclOtaBootloadClientServerDiscoveredCallback(const ChipZclOtaBootloadClientServerInfo_t *serverInfo)
 {
   return true;
 }
@@ -93,14 +93,14 @@ bool emberZclOtaBootloadClientServerDiscoveredCallback(const EmberZclOtaBootload
  *
  * @param fileSpec The OTA file specification to include in the query.
  * @param hardwareVersion The current hardware version of the device, or
- *                        ::EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL if this
+ *                        ::CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL if this
  *                        information is to be ignored.
  * @return `true` if the device should continue to send a QueryNextImage
  *         command, or `false` if it should reschedule the command for a later
  *         time.
  *****************************************************************************/
-bool emberZclOtaBootloadClientGetQueryNextImageParametersCallback(EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                                  EmberZclOtaBootloadHardwareVersion_t *hardwareVersion)
+bool chipZclOtaBootloadClientGetQueryNextImageParametersCallback(ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                                  ChipZclOtaBootloadHardwareVersion_t *hardwareVersion)
 {
   return true;
 }
@@ -115,9 +115,9 @@ bool emberZclOtaBootloadClientGetQueryNextImageParametersCallback(EmberZclOtaBoo
  * @return `true` if the device should kick off the download process for this
  *         file, or `false` if it should continue to query for new images.
  *
- * @sa emberZclOtaBootloadStorageFind
+ * @sa chipZclOtaBootloadStorageFind
  *****************************************************************************/
-bool emberZclOtaBootloadClientStartDownloadCallback(const EmberZclOtaBootloadFileSpec_t *fileSpec,
+bool chipZclOtaBootloadClientStartDownloadCallback(const ChipZclOtaBootloadFileSpec_t *fileSpec,
                                                     bool existingFile)
 {
   return true;
@@ -132,10 +132,10 @@ bool emberZclOtaBootloadClientStartDownloadCallback(const EmberZclOtaBootloadFil
  *         This is an opportunity for the application to verify the downloaded
  *         image and return a related status.
  *
- * @sa emberZclOtaBootloadStorageFind
+ * @sa chipZclOtaBootloadStorageFind
  *****************************************************************************/
-EmberZclStatus_t emberZclOtaBootloadClientDownloadCompleteCallback(const EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                                   EmberZclStatus_t status)
+ChipZclStatus_t chipZclOtaBootloadClientDownloadCompleteCallback(const ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                                   ChipZclStatus_t status)
 {
   return status;
 }
@@ -145,8 +145,8 @@ EmberZclStatus_t emberZclOtaBootloadClientDownloadCompleteCallback(const EmberZc
  *
  * @param fileSpec The specification for the OTA file that will be installed.
  *
- * @sa emberZclOtaBootloadStorageFind
+ * @sa chipZclOtaBootloadStorageFind
  *****************************************************************************/
-void emberZclOtaBootloadClientPreBootloadCallback(const EmberZclOtaBootloadFileSpec_t *fileSpec)
+void chipZclOtaBootloadClientPreBootloadCallback(const ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
 }

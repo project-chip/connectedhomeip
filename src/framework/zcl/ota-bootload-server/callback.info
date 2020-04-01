@@ -1,7 +1,7 @@
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CORE
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_CORE
 
 /**************************************************************************//**
  * Get the information needed to send an ImageNotify command.
@@ -14,8 +14,8 @@
  * @note If `false` is returned, then the ImageNotify command will be
  *       rescheduled to be sent at a later time.
  *****************************************************************************/
-bool emberZclOtaBootloadServerGetImageNotifyInfoCallback(EmberIpv6Address *address,
-                                                         EmberZclOtaBootloadFileSpec_t *fileSpec)
+bool chipZclOtaBootloadServerGetImageNotifyInfoCallback(ChipIpv6Address *address,
+                                                         ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   return false;
 }
@@ -25,19 +25,19 @@ bool emberZclOtaBootloadServerGetImageNotifyInfoCallback(EmberIpv6Address *addre
  *
  * @param currentFileSpec The current file spec from the QueryNextImage command
  * @param nextFileSpec The next file spec to be downloaded by the client
- * @return One of the following ::EmberZclStatus_t values.
- * - @ref EMBER_ZCL_STATUS_SUCCESS if the server should tell the client to start
+ * @return One of the following ::ChipZclStatus_t values.
+ * - @ref CHIP_ZCL_STATUS_SUCCESS if the server should tell the client to start
  *        downloading the OTA file described by the nextFileSpec data
- * - @ref EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE if there is no image available for
+ * - @ref CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE if there is no image available for
  *        the client to download
- * - @ref EMBER_ZCL_STATUS_NOT_AUTHORIZED if the client is not authorized to
+ * - @ref CHIP_ZCL_STATUS_NOT_AUTHORIZED if the client is not authorized to
  *        download the next image
  *****************************************************************************/
-EmberZclStatus_t emberZclOtaBootloadServerGetNextImageCallback(const EmberIpv6Address *source,
-                                                               const EmberZclOtaBootloadFileSpec_t *currentFileSpec,
-                                                               EmberZclOtaBootloadFileSpec_t *nextFileSpec)
+ChipZclStatus_t chipZclOtaBootloadServerGetNextImageCallback(const ChipIpv6Address *source,
+                                                               const ChipZclOtaBootloadFileSpec_t *currentFileSpec,
+                                                               ChipZclOtaBootloadFileSpec_t *nextFileSpec)
 {
-  return EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE;
+  return CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE;
 }
 
 /**************************************************************************//**
@@ -53,12 +53,12 @@ EmberZclStatus_t emberZclOtaBootloadServerGetNextImageCallback(const EmberIpv6Ad
  *
  * @note This callback is called regardless of whether or not the client
  *       completed the download successfully. If the status parameter is not
- *       equal to ::EMBER_ZCL_STATUS_SUCCESS, then the server will not tell
+ *       equal to ::CHIP_ZCL_STATUS_SUCCESS, then the server will not tell
  *       the client to proceed with the upgrade.
  *****************************************************************************/
-uint32_t emberZclOtaBootloadServerUpgradeEndRequestCallback(const EmberIpv6Address *source,
-                                                            const EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                            EmberZclStatus_t status)
+uint32_t chipZclOtaBootloadServerUpgradeEndRequestCallback(const ChipIpv6Address *source,
+                                                            const ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                            ChipZclStatus_t status)
 {
   return 0;
 }

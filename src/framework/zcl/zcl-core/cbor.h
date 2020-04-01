@@ -1,18 +1,6 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #ifndef CBOR_H
@@ -64,14 +52,14 @@
 // Error status for CBOR parsing error and etc.
 
 typedef enum {
-  EM_ZCL_CORE_CBOR_VALUE_READ_SUCCESS               = 0x00,
-  EM_ZCL_CORE_CBOR_VALUE_READ_ERROR                 = 0x01,
-  EM_ZCL_CORE_CBOR_VALUE_READ_NOT_SUPPORTED         = 0x02,
-  EM_ZCL_CORE_CBOR_VALUE_READ_INVALID_BOOLEAN_VALUE = 0x03,
-  EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE       = 0x04,
-  EM_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_SMALL       = 0x05,
-  EM_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE            = 0x06,
-} EmZclCoreCborValueReadStatus_t;
+  CH_ZCL_CORE_CBOR_VALUE_READ_SUCCESS               = 0x00,
+  CH_ZCL_CORE_CBOR_VALUE_READ_ERROR                 = 0x01,
+  CH_ZCL_CORE_CBOR_VALUE_READ_NOT_SUPPORTED         = 0x02,
+  CH_ZCL_CORE_CBOR_VALUE_READ_INVALID_BOOLEAN_VALUE = 0x03,
+  CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_LARGE       = 0x04,
+  CH_ZCL_CORE_CBOR_VALUE_READ_VALUE_TOO_SMALL       = 0x05,
+  CH_ZCL_CORE_CBOR_VALUE_READ_WRONG_TYPE            = 0x06,
+} ChZclCoreCborValueReadStatus_t;
 
 //----------------------------------------------------------------
 // Struct that is used when writing or parsing CBOR data.
@@ -84,7 +72,7 @@ typedef struct {
   uint8_t *finger;      // pointer to next byte to be read or written
   const uint8_t *end;   // the end of the input or output buffer
 
-  EmZclCoreCborValueReadStatus_t readStatus;   // status of last decode read operation
+  ChZclCoreCborValueReadStatus_t readStatus;   // status of last decode read operation
 
   // Not yet used - will be needed if we have nested structs
   // uint8_t *heapFinger;  // ditto, but for allocation

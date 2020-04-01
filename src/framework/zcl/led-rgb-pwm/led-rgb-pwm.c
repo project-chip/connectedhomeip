@@ -1,28 +1,16 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include CONFIGURATION_HEADER
 #include PLATFORM_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_BULB_PWM_DRIVER
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_BULB_PWM_DRIVER
 
 #include "temp-to-rgb.h"
 
@@ -41,9 +29,9 @@
 
 #define PWM_TICKS_WHEN_OFF    0
 
-#define EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION 0x00
-#define EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y            0x01
-#define EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE                  0x02
+#define CHIP_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION 0x00
+#define CHIP_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y            0x01
+#define CHIP_ZCL_COLOR_MODE_COLOR_TEMPERATURE                  0x02
 
 static uint16_t maxPwmDrive;
 
@@ -58,10 +46,10 @@ uint8_t tempBlueValue[]  = { BLUE_VALUES };
 static void updateDriveLevel(void);
 static uint16_t maxDriveValue(void);
 
-static EmberZclEndpointId_t currentEndpoint(void)
+static ChipZclEndpointId_t currentEndpoint(void)
 {
   // Note:  LED bulbs only support one endpoint
-  return emberZclEndpointIndexToId(0, &emberZclClusterOnOffServerSpec);
+  return chipZclEndpointIndexToId(0, &chipZclClusterOnOffServerSpec);
 }
 
 void emLedRgbPwmInitHandler(void)
@@ -86,7 +74,7 @@ static void driveWrgb(uint16_t white, uint16_t red, uint16_t green, uint16_t blu
 // from the CIE xyY color model.  Here, currentX and currentY are the ZCL
 // attributes where x = currentX / 65536 and y = currentY / 65536.
 // http://en.wikipedia.org/wiki/CIE_1931_color_space for more details
-void emberAfPluginColorControlServerComputePwmFromXyCallback(EmberZclEndpointId_t endpointId)
+void chipAfPluginColorControlServerComputePwmFromXyCallback(ChipZclEndpointId_t endpointId)
 {
   uint16_t currentX, currentY;
   bool onOff;
@@ -97,53 +85,53 @@ void emberAfPluginColorControlServerComputePwmFromXyCallback(EmberZclEndpointId_
   int32_t r32, g32, b32;
   uint16_t rDrive, gDrive, bDrive;
 
-  EmberZclStatus_t status;
-  EmberZclEndpointId_t expectedEndpoint = currentEndpoint();
+  ChipZclStatus_t status;
+  ChipZclEndpointId_t expectedEndpoint = currentEndpoint();
 
   if (expectedEndpoint != endpointId) {
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
                                  &currentX,
                                  sizeof(currentX));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading current x attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading current x attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
                                  &currentY,
                                  sizeof(currentY));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading current y attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading current y attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterLevelControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterLevelControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                                  &currentLevel,
                                  sizeof(currentLevel));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading current level attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading current level attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterOnOffServerSpec,
-                                 EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterOnOffServerSpec,
+                                 CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                                  &onOff,
                                  sizeof(onOff));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading onOff attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading onOff attribute from ep %d\n",
                        endpointId);
     return;
   }
@@ -160,7 +148,7 @@ void emberAfPluginColorControlServerComputePwmFromXyCallback(EmberZclEndpointId_
   scratch = x32 + y32;
 
   if (scratch > CIE1931_SCALE_FACTOR) {
-    emberAfCorePrintln("X and Y are too big");
+    chipAfCorePrintln("X and Y are too big");
     return;
   }
 
@@ -225,7 +213,7 @@ void emberAfPluginColorControlServerComputePwmFromXyCallback(EmberZclEndpointId_
   driveWrgb(0, rDrive, gDrive, bDrive);
 }
 
-void emberAfPluginColorControlServerComputePwmFromTempCallback(EmberZclEndpointId_t endpointId)
+void chipAfPluginColorControlServerComputePwmFromTempCallback(ChipZclEndpointId_t endpointId)
 {
   uint16_t currentTemp;
   bool onOff;
@@ -234,42 +222,42 @@ void emberAfPluginColorControlServerComputePwmFromTempCallback(EmberZclEndpointI
   uint32_t r32, g32, b32, W32;
   uint16_t rDrive, gDrive, bDrive, wDrive;
 
-  EmberZclStatus_t status;
-  EmberZclEndpointId_t expectedEndpoint = currentEndpoint();
+  ChipZclStatus_t status;
+  ChipZclEndpointId_t expectedEndpoint = currentEndpoint();
 
   if (expectedEndpoint != endpointId) {
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE,
                                  &currentTemp,
                                  sizeof(currentTemp));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading color temperature attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading color temperature attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterLevelControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterLevelControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                                  &currentLevel,
                                  sizeof(currentLevel));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading current level attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading current level attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterOnOffServerSpec,
-                                 EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterOnOffServerSpec,
+                                 CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                                  &onOff,
                                  sizeof(onOff));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading onOff attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading onOff attribute from ep %d\n",
                        endpointId);
     return;
   }
@@ -321,7 +309,7 @@ void emberAfPluginColorControlServerComputePwmFromTempCallback(EmberZclEndpointI
   driveWrgb(wDrive, rDrive, gDrive, bDrive);
 }
 
-void emberAfPluginColorControlServerComputePwmFromHsvCallback(EmberZclEndpointId_t endpointId)
+void chipAfPluginColorControlServerComputePwmFromHsvCallback(ChipZclEndpointId_t endpointId)
 {
   uint8_t hue, saturation;
   bool onOff;
@@ -332,53 +320,53 @@ void emberAfPluginColorControlServerComputePwmFromHsvCallback(EmberZclEndpointId
   uint32_t r32, g32, b32;
   uint16_t rDrive, gDrive, bDrive;
 
-  EmberZclStatus_t status;
-  EmberZclEndpointId_t expectedEndpoint = currentEndpoint();
+  ChipZclStatus_t status;
+  ChipZclEndpointId_t expectedEndpoint = currentEndpoint();
 
   if (expectedEndpoint != endpointId) {
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_HUE,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_HUE,
                                  &hue,
                                  sizeof(hue));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading current hue attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading current hue attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
                                  &saturation,
                                  sizeof(saturation));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading current color attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading current color attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterLevelControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterLevelControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                                  &currentLevel,
                                  sizeof(currentLevel));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading level attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading level attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterOnOffServerSpec,
-                                 EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterOnOffServerSpec,
+                                 CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                                  &onOff,
                                  sizeof(onOff));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading onOff attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading onOff attribute from ep %d\n",
                        endpointId);
     return;
   }
@@ -472,55 +460,55 @@ void emberAfPluginColorControlServerComputePwmFromHsvCallback(EmberZclEndpointId
   driveWrgb(0, rDrive, gDrive, bDrive);
 }
 
-void emLedRgbPwmPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                           const EmberZclClusterSpec_t *clusterSpec,
-                                           EmberZclAttributeId_t attributeId,
+void emLedRgbPwmPostAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                           const ChipZclClusterSpec_t *clusterSpec,
+                                           ChipZclAttributeId_t attributeId,
                                            const void *buffer,
                                            size_t bufferLength)
 {
-  if (emberZclAreClusterSpecsEqual(&emberZclClusterOnOffServerSpec, clusterSpec)
-      || emberZclAreClusterSpecsEqual(&emberZclClusterLevelControlServerSpec, clusterSpec)
-      || emberZclAreClusterSpecsEqual(&emberZclClusterColorControlServerSpec, clusterSpec)) {
+  if (chipZclAreClusterSpecsEqual(&chipZclClusterOnOffServerSpec, clusterSpec)
+      || chipZclAreClusterSpecsEqual(&chipZclClusterLevelControlServerSpec, clusterSpec)
+      || chipZclAreClusterSpecsEqual(&chipZclClusterColorControlServerSpec, clusterSpec)) {
     updateDriveLevel();
   }
 }
 
 static void updateDriveLevel(void)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
   uint8_t colorMode;
-  EmberZclEndpointId_t endpointId = currentEndpoint();
+  ChipZclEndpointId_t endpointId = currentEndpoint();
 
   if (blinking) {
     // we are in a mode where we are blinking an output pattern.  Don't blink
     // anything
-    emberAfCorePrintln("blinking");
+    chipAfCorePrintln("blinking");
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_MODE,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_MODE,
                                  &colorMode,
                                  sizeof(colorMode));
 
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("ERROR! Application must support color mode attribute for led-rgb-pwm plugin to function!\n");
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("ERROR! Application must support color mode attribute for led-rgb-pwm plugin to function!\n");
     return;
   }
 
   switch (colorMode) {
-    case EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION:
-      emberAfPluginColorControlServerComputePwmFromHsvCallback(endpointId);
+    case CHIP_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION:
+      chipAfPluginColorControlServerComputePwmFromHsvCallback(endpointId);
       break;
-    case EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y:
-      emberAfPluginColorControlServerComputePwmFromXyCallback(endpointId);
+    case CHIP_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y:
+      chipAfPluginColorControlServerComputePwmFromXyCallback(endpointId);
       break;
-    case EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE:
-      emberAfPluginColorControlServerComputePwmFromTempCallback(endpointId);
+    case CHIP_ZCL_COLOR_MODE_COLOR_TEMPERATURE:
+      chipAfPluginColorControlServerComputePwmFromTempCallback(endpointId);
       break;
     default:
-      emberAfCorePrintln("read unexpected color mode: 0x%x\n", colorMode);
+      chipAfCorePrintln("read unexpected color mode: 0x%x\n", colorMode);
       break;
   }
 }

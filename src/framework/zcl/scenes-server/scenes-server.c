@@ -1,101 +1,89 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_HAL
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_HAL
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 #include "scenes-server.h"
 #include "thread-bookkeeping.h"
 
-#define EMBER_ZCL_SCENE_TABLE_NULL_INDEX          0xFF
-#define EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID  EMBER_ZCL_ENDPOINT_NULL
+#define CHIP_ZCL_SCENE_TABLE_NULL_INDEX          0xFF
+#define CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID  CHIP_ZCL_ENDPOINT_NULL
 
 // Globals
-uint8_t emberZclPluginScenesServerEntriesInUse = 0;
+uint8_t chipZclPluginScenesServerEntriesInUse = 0;
 
 #ifdef DEFINETOKENS
 // Token based storage.
-  #define emberZclPluginScenesServerRetrieveSceneEntry(entry, i) \
+  #define chipZclPluginScenesServerRetrieveSceneEntry(entry, i) \
   halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_SCENE_TABLE, i)
-  #define emberZclPluginScenesServerSaveSceneEntry(entry, i) \
+  #define chipZclPluginScenesServerSaveSceneEntry(entry, i) \
   halCommonSetIndexedToken(TOKEN_ZCL_CORE_SCENE_TABLE, i, &entry)
-  #define emberZclPluginScenesServerGetNumSceneEntriesInUse()                                      \
-  (halCommonGetToken(&emberZclClusterScenesServerEntriesInUse, TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES), \
-   emberZclClusterScenesServerEntriesInUse)
-  #define emberZclPluginScenesServerSetNumSceneEntriesInUse(x) \
-  (emberZclClusterScenesServerEntriesInUse = x,                \
-   halCommonSetToken(TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES, &emberZclClusterScenesServerEntriesInUse))
-  #define emberZclPluginScenesServerIncNumSceneEntriesInUse()                                       \
-  ((halCommonGetToken(&emberZclClusterScenesServerEntriesInUse, TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES), \
-    ++emberZclPluginScenesServerEntriesInUse),                                                      \
-   halCommonSetToken(TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES, &emberZclClusterScenesServerEntriesInUse))
-  #define emberZclPluginScenesServerDecNumSceneEntriesInUse()                                       \
-  ((halCommonGetToken(&emberZclClusterScenesServerEntriesInUse, TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES), \
-    --emberZclClusterScenesServerEntriesInUse),                                                     \
-   halCommonSetToken(TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES, &emberZclClusterScenesServerEntriesInUse))
+  #define chipZclPluginScenesServerGetNumSceneEntriesInUse()                                      \
+  (halCommonGetToken(&chipZclClusterScenesServerEntriesInUse, TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES), \
+   chipZclClusterScenesServerEntriesInUse)
+  #define chipZclPluginScenesServerSetNumSceneEntriesInUse(x) \
+  (chipZclClusterScenesServerEntriesInUse = x,                \
+   halCommonSetToken(TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES, &chipZclClusterScenesServerEntriesInUse))
+  #define chipZclPluginScenesServerIncNumSceneEntriesInUse()                                       \
+  ((halCommonGetToken(&chipZclClusterScenesServerEntriesInUse, TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES), \
+    ++chipZclPluginScenesServerEntriesInUse),                                                      \
+   halCommonSetToken(TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES, &chipZclClusterScenesServerEntriesInUse))
+  #define chipZclPluginScenesServerDecNumSceneEntriesInUse()                                       \
+  ((halCommonGetToken(&chipZclClusterScenesServerEntriesInUse, TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES), \
+    --chipZclClusterScenesServerEntriesInUse),                                                     \
+   halCommonSetToken(TOKEN_ZCL_CORE_SCENES_NUM_ENTRIES, &chipZclClusterScenesServerEntriesInUse))
 #else
 // RAM based storage.
-EmberZclSceneEntry_t emberZclPluginScenesServerSceneTable[EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };   // Ram-based Scenes table.
-  #define emberZclPluginScenesServerRetrieveSceneEntry(entry, i) \
-  (entry = emberZclPluginScenesServerSceneTable[i])
-  #define emberZclPluginScenesServerSaveSceneEntry(entry, i) \
-  (emberZclPluginScenesServerSceneTable[i] = entry)
-  #define emberZclPluginScenesServerGetNumSceneEntriesInUse() \
-  (emberZclPluginScenesServerEntriesInUse)
-  #define emberZclPluginScenesServerSetNumSceneEntriesInUse(x) \
-  (emberZclPluginScenesServerEntriesInUse = x)
-  #define emberZclPluginScenesServerIncNumSceneEntriesInUse() \
-  (++emberZclPluginScenesServerEntriesInUse)
-  #define emberZclPluginScenesServerDecNumSceneEntriesInUse() \
-  (--emberZclPluginScenesServerEntriesInUse)
+ChipZclSceneEntry_t chipZclPluginScenesServerSceneTable[CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };   // Ram-based Scenes table.
+  #define chipZclPluginScenesServerRetrieveSceneEntry(entry, i) \
+  (entry = chipZclPluginScenesServerSceneTable[i])
+  #define chipZclPluginScenesServerSaveSceneEntry(entry, i) \
+  (chipZclPluginScenesServerSceneTable[i] = entry)
+  #define chipZclPluginScenesServerGetNumSceneEntriesInUse() \
+  (chipZclPluginScenesServerEntriesInUse)
+  #define chipZclPluginScenesServerSetNumSceneEntriesInUse(x) \
+  (chipZclPluginScenesServerEntriesInUse = x)
+  #define chipZclPluginScenesServerIncNumSceneEntriesInUse() \
+  (++chipZclPluginScenesServerEntriesInUse)
+  #define chipZclPluginScenesServerDecNumSceneEntriesInUse() \
+  (--chipZclPluginScenesServerEntriesInUse)
 #endif
 
-static EmberZclEndpointId_t serverEndpointId = 0xFF;
+static ChipZclEndpointId_t serverEndpointId = 0xFF;
 
-static EmberZclStatus_t addSceneHelper(const EmberZclCommandContext_t *context,
-                                       const EmberZclClusterScenesServerCommandAddSceneRequest_t *request);
-static void viewSceneHelper(const EmberZclCommandContext_t *context,
-                            const EmberZclClusterScenesServerCommandViewSceneRequest_t *request,
-                            EmberZclClusterScenesServerCommandViewSceneResponse_t* response);
-static EmberZclStatus_t removeSceneHelper(const EmberZclCommandContext_t *context,
-                                          const EmberZclClusterScenesServerCommandRemoveSceneRequest_t *request);
-static EmberZclStatus_t removeAllScenesHelper(const EmberZclCommandContext_t *context,
-                                              const EmberZclClusterScenesServerCommandRemoveAllScenesRequest_t *request);
-static EmberZclStatus_t storeCurrentSceneHelper(const EmberZclCommandContext_t *context,
-                                                const EmberZclClusterScenesServerCommandStoreSceneRequest_t *request);
-static EmberZclStatus_t recallSavedSceneHelper(const EmberZclCommandContext_t *context,
-                                               const EmberZclClusterScenesServerCommandRecallSceneRequest_t *request);
-static void getSceneMembershipHelper(const EmberZclCommandContext_t *context,
-                                     const EmberZclClusterScenesServerCommandGetSceneMembershipRequest_t *request,
-                                     EmberZclClusterScenesServerCommandGetSceneMembershipResponse_t* response);
-static EmberZclStatus_t copySceneHelper(const EmberZclCommandContext_t *context,
-                                        const EmberZclClusterScenesServerCommandCopySceneRequest_t *request);
+static ChipZclStatus_t addSceneHelper(const ChipZclCommandContext_t *context,
+                                       const ChipZclClusterScenesServerCommandAddSceneRequest_t *request);
+static void viewSceneHelper(const ChipZclCommandContext_t *context,
+                            const ChipZclClusterScenesServerCommandViewSceneRequest_t *request,
+                            ChipZclClusterScenesServerCommandViewSceneResponse_t* response);
+static ChipZclStatus_t removeSceneHelper(const ChipZclCommandContext_t *context,
+                                          const ChipZclClusterScenesServerCommandRemoveSceneRequest_t *request);
+static ChipZclStatus_t removeAllScenesHelper(const ChipZclCommandContext_t *context,
+                                              const ChipZclClusterScenesServerCommandRemoveAllScenesRequest_t *request);
+static ChipZclStatus_t storeCurrentSceneHelper(const ChipZclCommandContext_t *context,
+                                                const ChipZclClusterScenesServerCommandStoreSceneRequest_t *request);
+static ChipZclStatus_t recallSavedSceneHelper(const ChipZclCommandContext_t *context,
+                                               const ChipZclClusterScenesServerCommandRecallSceneRequest_t *request);
+static void getSceneMchipshipHelper(const ChipZclCommandContext_t *context,
+                                     const ChipZclClusterScenesServerCommandGetSceneMchipshipRequest_t *request,
+                                     ChipZclClusterScenesServerCommandGetSceneMchipshipResponse_t* response);
+static ChipZclStatus_t copySceneHelper(const ChipZclCommandContext_t *context,
+                                        const ChipZclClusterScenesServerCommandCopySceneRequest_t *request);
 
 // Private functions -----------------------------------------------------------
 
-static EmberZclStatus_t addSceneHelper(const EmberZclCommandContext_t *context,
-                                       const EmberZclClusterScenesServerCommandAddSceneRequest_t *request)
+static ChipZclStatus_t addSceneHelper(const ChipZclCommandContext_t *context,
+                                       const ChipZclClusterScenesServerCommandAddSceneRequest_t *request)
 {
-  EmberZclSceneEntry_t entry;
-  bool enhanced = (context->commandId == EMBER_ZCL_CLUSTER_SCENES_SERVER_COMMAND_ENHANCED_ADD_SCENE);
+  ChipZclSceneEntry_t entry;
+  bool enhanced = (context->commandId == CHIP_ZCL_CLUSTER_SCENES_SERVER_COMMAND_ENHANCED_ADD_SCENE);
 
   uint16_t groupId = request->groupId;
   uint8_t sceneId = request->sceneId;
@@ -106,44 +94,44 @@ static EmberZclStatus_t addSceneHelper(const EmberZclCommandContext_t *context,
 
   uint8_t extFieldSetsLen = request->extensionFieldSets.length;
   uint8_t *pExtFieldSetsData = request->extensionFieldSets.ptr;
-  EmberZclEndpointId_t endpointId = context->endpointId;
+  ChipZclEndpointId_t endpointId = context->endpointId;
   uint8_t i;
-  uint8_t index = EMBER_ZCL_SCENE_TABLE_NULL_INDEX;
+  uint8_t index = CHIP_ZCL_SCENE_TABLE_NULL_INDEX;
 
-  emberAfCorePrint("%sAddScene 0x%2x, 0x%x, tr=0x%2x",
+  chipAfCorePrint("%sAddScene 0x%2x, 0x%x, tr=0x%2x",
                    (enhanced ? "Enhanced" : ""),
                    groupId,
                    sceneId,
                    transitionTime);
-  emberAfCorePrint(", %s, ", nameStr);
-  emberAfCorePrintBuffer(pExtFieldSetsData, extFieldSetsLen, FALSE);
-  emberAfCorePrintln("");
+  chipAfCorePrint(", %s, ", nameStr);
+  chipAfCorePrintBuffer(pExtFieldSetsData, extFieldSetsLen, FALSE);
+  chipAfCorePrintln("");
 
   // Add Scene commands can only reference groups to which we belong.
   if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID
-      && !emberZclIsEndpointInGroup(endpointId, groupId)) {
-    return EMBER_ZCL_STATUS_INVALID_FIELD;
+      && !chipZclIsEndpointInGroup(endpointId, groupId)) {
+    return CHIP_ZCL_STATUS_INVALID_FIELD;
   }
 
-  for (i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-    emberZclPluginScenesServerRetrieveSceneEntry(entry, i);
+  for (i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+    chipZclPluginScenesServerRetrieveSceneEntry(entry, i);
     if (entry.endpointId == endpointId
         && entry.groupId == groupId
         && entry.sceneId == sceneId) {
       index = i;
       break;
-    } else if (index == EMBER_ZCL_SCENE_TABLE_NULL_INDEX
-               && entry.endpointId == EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID) {
+    } else if (index == CHIP_ZCL_SCENE_TABLE_NULL_INDEX
+               && entry.endpointId == CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID) {
       index = i;
     }
   }
 
   // If the index is still null, the Scene table is full.
-  if (index == EMBER_ZCL_SCENE_TABLE_NULL_INDEX) {
-    return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+  if (index == CHIP_ZCL_SCENE_TABLE_NULL_INDEX) {
+    return CHIP_ZCL_STATUS_INSUFFICIENT_SPACE;
   }
 
-  emberZclPluginScenesServerRetrieveSceneEntry(entry, index);
+  chipZclPluginScenesServerRetrieveSceneEntry(entry, index);
 
   // The transition time is specified in seconds in the regular version of the
   // command and tenths of a second in the enhanced version.
@@ -155,7 +143,7 @@ static EmberZclStatus_t addSceneHelper(const EmberZclCommandContext_t *context,
     entry.transitionTime100ms = 0;
   }
 
-#ifdef EMBER_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
+#ifdef CHIP_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
   strcpy((char*)entry.name, nameStr);
 #endif
 
@@ -163,7 +151,7 @@ static EmberZclStatus_t addSceneHelper(const EmberZclCommandContext_t *context,
   if (newScene) {
     // Cluster specific erase scene functionality is handled here by registered
     // cluster plugin callbacks.
-    emZclEraseScene(index);
+    chZclEraseScene(index);
   }
 
   // Loop thru extension field data bytes adding cluster data to scene.
@@ -174,20 +162,20 @@ static EmberZclStatus_t addSceneHelper(const EmberZclCommandContext_t *context,
     // one-byte length followed by the attribute data bytes, otherwise, the data
     // format is malformed.
     if (pData + 3 > pExtFieldSetsData + extFieldSetsLen) {
-      return EMBER_ZCL_STATUS_MALFORMED_COMMAND; // data format error.
+      return CHIP_ZCL_STATUS_MALFORMED_COMMAND; // data format error.
     }
 
-    EmberZclClusterId_t clusterId = emberZclPluginScenesServerGetUint16FromBuffer(&pData);
-    uint8_t length = emberZclPluginScenesServerGetUint8FromBuffer(&pData);
+    ChipZclClusterId_t clusterId = chipZclPluginScenesServerGetUint16FromBuffer(&pData);
+    uint8_t length = chipZclPluginScenesServerGetUint8FromBuffer(&pData);
     if (length > 0) {
       if (pData + length > pExtFieldSetsData + extFieldSetsLen) {
-        return EMBER_ZCL_STATUS_MALFORMED_COMMAND; // ext field data format error.
+        return CHIP_ZCL_STATUS_MALFORMED_COMMAND; // ext field data format error.
       }
 
       // Cluster specific AddScene extension field functionality is handled
       // here by registered cluster plugin callbacks.
       const uint8_t *sceneData = (const uint8_t *)pData;
-      emZclAddScene(clusterId, index, sceneData, length);
+      chZclAddScene(clusterId, index, sceneData, length);
 
       pData += length; // Set pointer to start of data for next cluster.
     }
@@ -201,31 +189,31 @@ static EmberZclStatus_t addSceneHelper(const EmberZclCommandContext_t *context,
     entry.groupId = groupId;
     entry.sceneId = sceneId;
 
-    emberZclPluginScenesServerIncNumSceneEntriesInUse();
+    chipZclPluginScenesServerIncNumSceneEntriesInUse();
 
-    emberZclClusterScenesServerSetSceneCountAttribute(endpointId,
-                                                      emberZclPluginScenesServerGetNumSceneEntriesInUse());
+    chipZclClusterScenesServerSetSceneCountAttribute(endpointId,
+                                                      chipZclPluginScenesServerGetNumSceneEntriesInUse());
   }
-  emberZclPluginScenesServerSaveSceneEntry(entry, index);
+  chipZclPluginScenesServerSaveSceneEntry(entry, index);
 
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-static void viewSceneHelper(const EmberZclCommandContext_t *context,
-                            const EmberZclClusterScenesServerCommandViewSceneRequest_t *request,
-                            EmberZclClusterScenesServerCommandViewSceneResponse_t* response)
+static void viewSceneHelper(const ChipZclCommandContext_t *context,
+                            const ChipZclClusterScenesServerCommandViewSceneRequest_t *request,
+                            ChipZclClusterScenesServerCommandViewSceneResponse_t* response)
 {
   // Builds and sends the View Scene response.
 
-  EmberZclSceneEntry_t entry;
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_NOT_FOUND;
-  bool enhanced = (context->commandId == EMBER_ZCL_CLUSTER_SCENES_SERVER_COMMAND_ENHANCED_VIEW_SCENE);
-  EmberZclEndpointId_t endpointId = context->endpointId;
+  ChipZclSceneEntry_t entry;
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_NOT_FOUND;
+  bool enhanced = (context->commandId == CHIP_ZCL_CLUSTER_SCENES_SERVER_COMMAND_ENHANCED_VIEW_SCENE);
+  ChipZclEndpointId_t endpointId = context->endpointId;
   uint16_t groupId = request->groupId;
   uint8_t sceneId = request->sceneId;
   uint8_t index;
 
-  emberAfCorePrintln("%sViewScene 0x%2x, 0x%x",
+  chipAfCorePrintln("%sViewScene 0x%2x, 0x%x",
                      (enhanced ? "Enhanced" : ""),
                      groupId,
                      sceneId);
@@ -233,15 +221,15 @@ static void viewSceneHelper(const EmberZclCommandContext_t *context,
   // View Scene commands can only be addressed to a single device and only
   // referencing groups to which we belong.
   if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID
-      && !emberZclIsEndpointInGroup(endpointId, groupId)) {
-    status = EMBER_ZCL_STATUS_INVALID_FIELD;
+      && !chipZclIsEndpointInGroup(endpointId, groupId)) {
+    status = CHIP_ZCL_STATUS_INVALID_FIELD;
   } else {
-    for (index = 0; index < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; index++) {
-      emberZclPluginScenesServerRetrieveSceneEntry(entry, index);
+    for (index = 0; index < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; index++) {
+      chipZclPluginScenesServerRetrieveSceneEntry(entry, index);
       if (entry.endpointId == endpointId
           && entry.groupId == groupId
           && entry.sceneId == sceneId) {
-        status = EMBER_ZCL_STATUS_SUCCESS;
+        status = CHIP_ZCL_STATUS_SUCCESS;
         break;
       }
     }
@@ -254,7 +242,7 @@ static void viewSceneHelper(const EmberZclCommandContext_t *context,
   response->groupId = groupId;
   response->sceneId = sceneId;
 
-  if (status == EMBER_ZCL_STATUS_SUCCESS) {
+  if (status == CHIP_ZCL_STATUS_SUCCESS) {
     // The transition time is returned in seconds in the regular version of the
     // command and tenths of a second in the enhanced version.
     response->transitionTime = (enhanced)
@@ -262,7 +250,7 @@ static void viewSceneHelper(const EmberZclCommandContext_t *context,
                                : entry.transitionTime;
 
     char nameStr[ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 }; // temp storage for name string.
-    #ifdef EMBER_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
+    #ifdef CHIP_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
     MEMCOPY(nameStr, entry.name, ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH);
     #endif
     response->sceneName.ptr = (uint8_t *)nameStr;
@@ -273,43 +261,43 @@ static void viewSceneHelper(const EmberZclCommandContext_t *context,
     response->extensionFieldSets.ptr = pData;
 
     // Cluster specific View scene functionality is handled here by registered plugin callbacks.
-    emZclViewScene(index, &pData);
+    chZclViewScene(index, &pData);
 
     response->extensionFieldSets.length = pData - response->extensionFieldSets.ptr; // Data has been added to buffer so update response length.
   }
 
-  emberZclSendClusterScenesServerCommandViewSceneResponse(context, response); // Send the response.
+  chipZclSendClusterScenesServerCommandViewSceneResponse(context, response); // Send the response.
 }
 
-static EmberZclStatus_t removeSceneHelper(const EmberZclCommandContext_t *context,
-                                          const EmberZclClusterScenesServerCommandRemoveSceneRequest_t *request)
+static ChipZclStatus_t removeSceneHelper(const ChipZclCommandContext_t *context,
+                                          const ChipZclClusterScenesServerCommandRemoveSceneRequest_t *request)
 {
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_NOT_FOUND;
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_NOT_FOUND;
 
   uint16_t groupId = request->groupId;
   uint8_t sceneId = request->sceneId;
-  EmberZclEndpointId_t endpointId = context->endpointId;
+  ChipZclEndpointId_t endpointId = context->endpointId;
 
-  emberAfCorePrintln("RemoveScene 0x%2x, 0x%x", groupId, sceneId);
+  chipAfCorePrintln("RemoveScene 0x%2x, 0x%x", groupId, sceneId);
 
   // If a group id is specified but this endpointId isn't in it, take no action.
   if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID
-      && !emberZclIsEndpointInGroup(endpointId, groupId)) {
-    status = EMBER_ZCL_STATUS_INVALID_FIELD;
+      && !chipZclIsEndpointInGroup(endpointId, groupId)) {
+    status = CHIP_ZCL_STATUS_INVALID_FIELD;
   } else {
     uint8_t i;
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-      EmberZclSceneEntry_t entry;
-      emberZclPluginScenesServerRetrieveSceneEntry(entry, i);
+    for (i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+      ChipZclSceneEntry_t entry;
+      chipZclPluginScenesServerRetrieveSceneEntry(entry, i);
       if (entry.endpointId == endpointId
           && entry.groupId == groupId
           && entry.sceneId == sceneId) {
-        entry.endpointId = EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID;
-        emberZclPluginScenesServerSaveSceneEntry(entry, i);
-        emberZclPluginScenesServerDecNumSceneEntriesInUse();
-        emberZclClusterScenesServerSetSceneCountAttribute(serverEndpointId,
-                                                          emberZclPluginScenesServerGetNumSceneEntriesInUse());
-        status = EMBER_ZCL_STATUS_SUCCESS;
+        entry.endpointId = CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID;
+        chipZclPluginScenesServerSaveSceneEntry(entry, i);
+        chipZclPluginScenesServerDecNumSceneEntriesInUse();
+        chipZclClusterScenesServerSetSceneCountAttribute(serverEndpointId,
+                                                          chipZclPluginScenesServerGetNumSceneEntriesInUse());
+        status = CHIP_ZCL_STATUS_SUCCESS;
         break;
       }
     }
@@ -318,76 +306,76 @@ static EmberZclStatus_t removeSceneHelper(const EmberZclCommandContext_t *contex
   return status;
 }
 
-static EmberZclStatus_t removeAllScenesHelper(const EmberZclCommandContext_t *context,
-                                              const EmberZclClusterScenesServerCommandRemoveAllScenesRequest_t *request)
+static ChipZclStatus_t removeAllScenesHelper(const ChipZclCommandContext_t *context,
+                                              const ChipZclClusterScenesServerCommandRemoveAllScenesRequest_t *request)
 {
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_INVALID_FIELD;
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_INVALID_FIELD;
 
-  EmberZclEndpointId_t endpointId = context->endpointId;
+  ChipZclEndpointId_t endpointId = context->endpointId;
   uint16_t groupId = request->groupId;
 
-  emberAfCorePrintln("RemoveAllScenes 0x%2x", groupId);
+  chipAfCorePrintln("RemoveAllScenes 0x%2x", groupId);
 
   if (groupId == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID
-      || emberZclIsEndpointInGroup(endpointId, groupId)) {
+      || chipZclIsEndpointInGroup(endpointId, groupId)) {
     uint8_t i;
-    status = EMBER_ZCL_STATUS_SUCCESS;
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-      EmberZclSceneEntry_t entry;
-      emberZclPluginScenesServerRetrieveSceneEntry(entry, i);
+    status = CHIP_ZCL_STATUS_SUCCESS;
+    for (i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+      ChipZclSceneEntry_t entry;
+      chipZclPluginScenesServerRetrieveSceneEntry(entry, i);
       if (entry.endpointId == endpointId
           && entry.groupId == groupId) {
-        entry.endpointId = EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID;
-        emberZclPluginScenesServerSaveSceneEntry(entry, i);
-        emberZclPluginScenesServerDecNumSceneEntriesInUse();
+        entry.endpointId = CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID;
+        chipZclPluginScenesServerSaveSceneEntry(entry, i);
+        chipZclPluginScenesServerDecNumSceneEntriesInUse();
       }
     }
-    emberZclClusterScenesServerSetSceneCountAttribute(endpointId,
-                                                      emberZclPluginScenesServerGetNumSceneEntriesInUse());
+    chipZclClusterScenesServerSetSceneCountAttribute(endpointId,
+                                                      chipZclPluginScenesServerGetNumSceneEntriesInUse());
   }
 
   return status;
 }
 
-static EmberZclStatus_t storeCurrentSceneHelper(const EmberZclCommandContext_t *context,
-                                                const EmberZclClusterScenesServerCommandStoreSceneRequest_t *request)
+static ChipZclStatus_t storeCurrentSceneHelper(const ChipZclCommandContext_t *context,
+                                                const ChipZclClusterScenesServerCommandStoreSceneRequest_t *request)
 {
-  EmberZclSceneEntry_t entry;
+  ChipZclSceneEntry_t entry;
   uint8_t i;
-  uint8_t index = EMBER_ZCL_SCENE_TABLE_NULL_INDEX;
+  uint8_t index = CHIP_ZCL_SCENE_TABLE_NULL_INDEX;
 
-  EmberZclEndpointId_t endpointId = context->endpointId;
+  ChipZclEndpointId_t endpointId = context->endpointId;
   uint16_t groupId = request->groupId;
   uint8_t sceneId = request->sceneId;
 
   // If a group id is specified but this endpointId isn't in it, take no action.
   if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID
-      && !emberZclIsEndpointInGroup(endpointId, groupId)) {
-    return EMBER_ZCL_STATUS_INVALID_FIELD;
+      && !chipZclIsEndpointInGroup(endpointId, groupId)) {
+    return CHIP_ZCL_STATUS_INVALID_FIELD;
   }
 
-  for (i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-    emberZclPluginScenesServerRetrieveSceneEntry(entry, i);
+  for (i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+    chipZclPluginScenesServerRetrieveSceneEntry(entry, i);
     if (entry.endpointId == endpointId
         && entry.groupId == groupId
         && entry.sceneId == sceneId) {
       index = i;
       break;
-    } else if (index == EMBER_ZCL_SCENE_TABLE_NULL_INDEX
-               && entry.endpointId == EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID) {
+    } else if (index == CHIP_ZCL_SCENE_TABLE_NULL_INDEX
+               && entry.endpointId == CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID) {
       index = i;
     }
   }
 
   // If the target index is still zero, the table is full.
-  if (index == EMBER_ZCL_SCENE_TABLE_NULL_INDEX) {
-    return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+  if (index == CHIP_ZCL_SCENE_TABLE_NULL_INDEX) {
+    return CHIP_ZCL_STATUS_INSUFFICIENT_SPACE;
   }
 
-  emberZclPluginScenesServerRetrieveSceneEntry(entry, index);
+  chipZclPluginScenesServerRetrieveSceneEntry(entry, index);
 
   // Cluster specific Store scene functionality is handled here by registered plugin callbacks.
-  emZclStoreScene(endpointId, index);
+  chZclStoreScene(endpointId, index);
 
   // When creating a new entry, the name is set to the null string (i.e., the
   // length is set to zero) and the transition time is set to zero.  The scene
@@ -397,39 +385,39 @@ static EmberZclStatus_t storeCurrentSceneHelper(const EmberZclCommandContext_t *
     entry.endpointId = endpointId;
     entry.groupId = groupId;
     entry.sceneId = sceneId;
-#ifdef EMBER_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
+#ifdef CHIP_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
     entry.name[0] = 0;
 #endif
     entry.transitionTime = 0;
     entry.transitionTime100ms = 0;
 
-    emberZclPluginScenesServerIncNumSceneEntriesInUse();
-    emberZclClusterScenesServerSetSceneCountAttribute(endpointId,
-                                                      emberZclPluginScenesServerGetNumSceneEntriesInUse());
+    chipZclPluginScenesServerIncNumSceneEntriesInUse();
+    chipZclClusterScenesServerSetSceneCountAttribute(endpointId,
+                                                      chipZclPluginScenesServerGetNumSceneEntriesInUse());
   }
 
   // Save the scene entry and mark is as valid by storing its scene and group
   // ids in the attribute table and setting valid to true.
-  emberZclPluginScenesServerSaveSceneEntry(entry, index);
-  emberZclClusterScenesServerMakeValid(endpointId, sceneId, groupId);
+  chipZclPluginScenesServerSaveSceneEntry(entry, index);
+  chipZclClusterScenesServerMakeValid(endpointId, sceneId, groupId);
 
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-static EmberZclStatus_t recallSavedSceneHelper(const EmberZclCommandContext_t *context,
-                                               const EmberZclClusterScenesServerCommandRecallSceneRequest_t *request)
+static ChipZclStatus_t recallSavedSceneHelper(const ChipZclCommandContext_t *context,
+                                               const ChipZclClusterScenesServerCommandRecallSceneRequest_t *request)
 {
   uint16_t groupId = request->groupId;
   uint8_t sceneId = request->sceneId;
-  EmberZclEndpointId_t endpointId = context->endpointId;
+  ChipZclEndpointId_t endpointId = context->endpointId;
 
   if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID
-      && !emberZclIsEndpointInGroup(endpointId, groupId)) {
-    return EMBER_ZCL_STATUS_INVALID_FIELD;
+      && !chipZclIsEndpointInGroup(endpointId, groupId)) {
+    return CHIP_ZCL_STATUS_INVALID_FIELD;
   } else {
-    for (uint8_t tblIdx = 0; tblIdx < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; tblIdx++) {
-      EmberZclSceneEntry_t entry;
-      emberZclPluginScenesServerRetrieveSceneEntry(entry, tblIdx);
+    for (uint8_t tblIdx = 0; tblIdx < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; tblIdx++) {
+      ChipZclSceneEntry_t entry;
+      chipZclPluginScenesServerRetrieveSceneEntry(entry, tblIdx);
       if (entry.endpointId == endpointId
           && entry.groupId == groupId
           && entry.sceneId == sceneId) {
@@ -437,47 +425,47 @@ static EmberZclStatus_t recallSavedSceneHelper(const EmberZclCommandContext_t *c
         uint32_t transitionTime100mS = entry.transitionTime * 10 + entry.transitionTime100ms;
 
         // Cluster specific Recall scene functionality is handled here by registered plugin callbacks.
-        emZclRecallScene(endpointId, tblIdx, transitionTime100mS);
+        chZclRecallScene(endpointId, tblIdx, transitionTime100mS);
 
-        emberZclClusterScenesServerMakeValid(endpointId, sceneId, groupId);
+        chipZclClusterScenesServerMakeValid(endpointId, sceneId, groupId);
 
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return CHIP_ZCL_STATUS_SUCCESS;
       }
     }
   }
 
-  return EMBER_ZCL_STATUS_NOT_FOUND;
+  return CHIP_ZCL_STATUS_NOT_FOUND;
 }
 
-static void getSceneMembershipHelper(const EmberZclCommandContext_t *context,
-                                     const EmberZclClusterScenesServerCommandGetSceneMembershipRequest_t *request,
-                                     EmberZclClusterScenesServerCommandGetSceneMembershipResponse_t* response)
+static void getSceneMchipshipHelper(const ChipZclCommandContext_t *context,
+                                     const ChipZclClusterScenesServerCommandGetSceneMchipshipRequest_t *request,
+                                     ChipZclClusterScenesServerCommandGetSceneMchipshipResponse_t* response)
 {
-  // Builds the Scene Membership response.
+  // Builds the Scene Mchipship response.
 
-  EmberZclStatus_t status = EMBER_ZCL_STATUS_SUCCESS;
-  EmberZclEndpointId_t endpointId = context->endpointId;
+  ChipZclStatus_t status = CHIP_ZCL_STATUS_SUCCESS;
+  ChipZclEndpointId_t endpointId = context->endpointId;
   uint16_t groupId = request->groupId;
 
   if ((groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID)
-      && !emberZclIsEndpointInGroup(endpointId, groupId)) {
-    status = EMBER_ZCL_STATUS_INVALID_FIELD;
+      && !chipZclIsEndpointInGroup(endpointId, groupId)) {
+    status = CHIP_ZCL_STATUS_INVALID_FIELD;
   }
 
   // The status, capacity, and group id are always included in the response, but
   // the scene count and scene list are only included if the group id matched.
   response->status = status;
-  response->capacity = EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE
-                       - emberZclPluginScenesServerGetNumSceneEntriesInUse();
+  response->capacity = CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE
+                       - chipZclPluginScenesServerGetNumSceneEntriesInUse();
   response->groupId = groupId;
 
-  if (status == EMBER_ZCL_STATUS_SUCCESS) {
+  if (status == CHIP_ZCL_STATUS_SUCCESS) {
     uint8_t sceneCount = 0;
-    uint8_t sceneListBuffer[EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { 0 }; // local storage
+    uint8_t sceneListBuffer[CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { 0 }; // local storage
 
-    for (uint8_t i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-      EmberZclSceneEntry_t entry;
-      emberZclPluginScenesServerRetrieveSceneEntry(entry, i);
+    for (uint8_t i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+      ChipZclSceneEntry_t entry;
+      chipZclPluginScenesServerRetrieveSceneEntry(entry, i);
       if (entry.endpointId == endpointId
           && entry.groupId == groupId) {
         sceneListBuffer[sceneCount] = entry.sceneId;
@@ -488,22 +476,22 @@ static void getSceneMembershipHelper(const EmberZclCommandContext_t *context,
     // Set the response.
     response->sceneList.ptr = (uint8_t *)sceneListBuffer;
     response->sceneList.numElementsToEncode = sceneCount;
-    response->sceneList.fieldData.valueType = EMBER_ZCLIP_TYPE_UNSIGNED_INTEGER;
+    response->sceneList.fieldData.valueType = CHIP_ZCLIP_TYPE_UNSIGNED_INTEGER;
     response->sceneList.fieldData.valueSize = sizeof(sceneListBuffer[0]);
   }
 
-  emberZclSendClusterScenesServerCommandGetSceneMembershipResponse(context,
+  chipZclSendClusterScenesServerCommandGetSceneMchipshipResponse(context,
                                                                    response); // Send the response.
 }
 
-static EmberZclStatus_t copySceneHelper(const EmberZclCommandContext_t *context,
-                                        const EmberZclClusterScenesServerCommandCopySceneRequest_t *request)
+static ChipZclStatus_t copySceneHelper(const ChipZclCommandContext_t *context,
+                                        const ChipZclClusterScenesServerCommandCopySceneRequest_t *request)
 {
-  EmberZclSceneEntry_t fromEntry;
-  EmberZclSceneEntry_t toEntry;
+  ChipZclSceneEntry_t fromEntry;
+  ChipZclSceneEntry_t toEntry;
   uint8_t i;
 
-  EmberZclEndpointId_t endpointId = context->endpointId;
+  ChipZclEndpointId_t endpointId = context->endpointId;
 
   uint8_t mode = request->mode;
   bool copyAllScenes = mode & 0x01;  // If bit 0 is set all scenes in a GroupA will be copied to GroupB.
@@ -516,16 +504,16 @@ static EmberZclStatus_t copySceneHelper(const EmberZclCommandContext_t *context,
 
   // Validate from/to group id endpoints.
   if ((groupIdFrom == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID)
-      || (!emberZclIsEndpointInGroup(endpointId, groupIdFrom))
+      || (!chipZclIsEndpointInGroup(endpointId, groupIdFrom))
       || (groupIdTo == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID)
-      || (!emberZclIsEndpointInGroup(endpointId, groupIdTo))) {
-    return EMBER_ZCL_STATUS_INVALID_FIELD;
+      || (!chipZclIsEndpointInGroup(endpointId, groupIdTo))) {
+    return CHIP_ZCL_STATUS_INVALID_FIELD;
   }
 
   // Find the 'from' scene.
-  uint8_t fromIdx = EMBER_ZCL_SCENE_TABLE_NULL_INDEX;
-  for (i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-    emberZclPluginScenesServerRetrieveSceneEntry(fromEntry, i);
+  uint8_t fromIdx = CHIP_ZCL_SCENE_TABLE_NULL_INDEX;
+  for (i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+    chipZclPluginScenesServerRetrieveSceneEntry(fromEntry, i);
     if ((fromEntry.endpointId == endpointId)
         && (fromEntry.groupId == groupIdFrom)
         && ((fromEntry.sceneId == sceneIdFrom) || copyAllScenes)) {
@@ -533,14 +521,14 @@ static EmberZclStatus_t copySceneHelper(const EmberZclCommandContext_t *context,
       break;
     }
   }
-  if (fromIdx == EMBER_ZCL_SCENE_TABLE_NULL_INDEX) {
-    return EMBER_ZCL_STATUS_NOT_FOUND;  // 'from' scene not found
+  if (fromIdx == CHIP_ZCL_SCENE_TABLE_NULL_INDEX) {
+    return CHIP_ZCL_STATUS_NOT_FOUND;  // 'from' scene not found
   }
 
   // Find the 'to' scene.
-  uint8_t toIdx = EMBER_ZCL_SCENE_TABLE_NULL_INDEX;
-  for (i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-    emberZclPluginScenesServerRetrieveSceneEntry(toEntry, i);
+  uint8_t toIdx = CHIP_ZCL_SCENE_TABLE_NULL_INDEX;
+  for (i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+    chipZclPluginScenesServerRetrieveSceneEntry(toEntry, i);
     if ((toEntry.endpointId == endpointId)
         && (toEntry.groupId == groupIdTo)
         && ((toEntry.sceneId == sceneIdTo) || copyAllScenes)) {
@@ -548,346 +536,346 @@ static EmberZclStatus_t copySceneHelper(const EmberZclCommandContext_t *context,
       break;
     }
   }
-  if (toIdx == EMBER_ZCL_SCENE_TABLE_NULL_INDEX) {
+  if (toIdx == CHIP_ZCL_SCENE_TABLE_NULL_INDEX) {
     // Couldn't find exact match for destination scene, loop again
     // and allocate to first unused slot in scenes table.
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-      emberZclPluginScenesServerRetrieveSceneEntry(toEntry, i);
-      if (toEntry.endpointId == EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID) {
+    for (i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+      chipZclPluginScenesServerRetrieveSceneEntry(toEntry, i);
+      if (toEntry.endpointId == CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID) {
         toIdx = i;
         break;
       }
     }
   }
-  if (toIdx == EMBER_ZCL_SCENE_TABLE_NULL_INDEX) {
-    return EMBER_ZCL_STATUS_NOT_FOUND;  // 'to' scene not found or table full.
+  if (toIdx == CHIP_ZCL_SCENE_TABLE_NULL_INDEX) {
+    return CHIP_ZCL_STATUS_NOT_FOUND;  // 'to' scene not found or table full.
   }
 
-  //emberAfCorePrintln("RX: CopyScene 0x%x 0x%2x 0x%2x 0x%2x 0x%2x", mode, groupIdFrom, sceneIdFrom, groupIdTo, sceneIdTo);
+  //chipAfCorePrintln("RX: CopyScene 0x%x 0x%2x 0x%2x 0x%2x 0x%2x", mode, groupIdFrom, sceneIdFrom, groupIdTo, sceneIdTo);
 
   // Copy the scene table entry.
   fromEntry.groupId = groupIdTo;
   fromEntry.sceneId = sceneIdTo;
-  emberZclPluginScenesServerSaveSceneEntry(fromEntry, toIdx);
+  chipZclPluginScenesServerSaveSceneEntry(fromEntry, toIdx);
 
   // Cluster specific copy scene functionality is handled here by registered plugin callbacks.
-  emZclCopyScene(fromIdx, toIdx);
+  chZclCopyScene(fromIdx, toIdx);
 
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }
 
 // Public functions ------------------------------------------------------------
 
-void emZclScenesServerInitHandler(void)
+void chZclScenesServerInitHandler(void)
 {
   serverEndpointId = 0x01; //TODO, get this from app Metadata.
 
   #ifndef DEFINETOKENS
-  for (uint8_t i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; ++i) {
-    emberZclPluginScenesServerSceneTable[i].endpointId
-      = EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID; // If using ram-based Scenes table, init scene table entry eps = unused.
+  for (uint8_t i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; ++i) {
+    chipZclPluginScenesServerSceneTable[i].endpointId
+      = CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID; // If using ram-based Scenes table, init scene table entry eps = unused.
   }
   #endif
 
-  #ifdef EMBER_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
+  #ifdef CHIP_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
   {
     // The high bit of Name Support indicates whether scene names are supported.
     uint8_t nameSupport = BIT(7); // Set bit.
-    emberZclWriteAttribute(serverEndpointId,
-                           &emberZclClusterScenesServerSpec,
-                           EMBER_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_SCENE_NAME_SUPPORT,
+    chipZclWriteAttribute(serverEndpointId,
+                           &chipZclClusterScenesServerSpec,
+                           CHIP_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_SCENE_NAME_SUPPORT,
                            (uint8_t *)&nameSupport,
                            sizeof(nameSupport));
   }
   #endif
 
-  emberZclClusterScenesServerSetSceneCountAttribute(serverEndpointId,
-                                                    emberZclPluginScenesServerGetNumSceneEntriesInUse());
+  chipZclClusterScenesServerSetSceneCountAttribute(serverEndpointId,
+                                                    chipZclPluginScenesServerGetNumSceneEntriesInUse());
 }
 
-EmberZclStatus_t emberZclClusterScenesServerSetSceneCountAttribute(EmberZclEndpointId_t endpointId,
+ChipZclStatus_t chipZclClusterScenesServerSetSceneCountAttribute(ChipZclEndpointId_t endpointId,
                                                                    uint8_t newCount)
 {
-  return emberZclWriteAttribute(endpointId,
-                                &emberZclClusterScenesServerSpec,
-                                EMBER_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_SCENE_COUNT,
+  return chipZclWriteAttribute(endpointId,
+                                &chipZclClusterScenesServerSpec,
+                                CHIP_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_SCENE_COUNT,
                                 (uint8_t *)&newCount,
                                 sizeof(newCount));
 }
 
-EmberZclStatus_t emberZclClusterScenesServerMakeValid(EmberZclEndpointId_t endpointId,
+ChipZclStatus_t chipZclClusterScenesServerMakeValid(ChipZclEndpointId_t endpointId,
                                                       uint8_t sceneId,
                                                       uint16_t groupId)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
   // scene ID
-  status = emberZclWriteAttribute(endpointId,
-                                  &emberZclClusterScenesServerSpec,
-                                  EMBER_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_CURRENT_SCENE,
+  status = chipZclWriteAttribute(endpointId,
+                                  &chipZclClusterScenesServerSpec,
+                                  CHIP_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_CURRENT_SCENE,
                                   (uint8_t *)&sceneId,
                                   sizeof(sceneId));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
     return status;
   }
 
   // group ID
-  status = emberZclWriteAttribute(endpointId,
-                                  &emberZclClusterScenesServerSpec,
-                                  EMBER_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_CURRENT_GROUP,
+  status = chipZclWriteAttribute(endpointId,
+                                  &chipZclClusterScenesServerSpec,
+                                  CHIP_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_CURRENT_GROUP,
                                   (uint8_t *)&groupId,
                                   sizeof(groupId));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
     return status;
   }
 
   bool valid = true;
-  status = emberZclWriteAttribute(endpointId,
-                                  &emberZclClusterScenesServerSpec,
-                                  EMBER_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_SCENE_VALID,
+  status = chipZclWriteAttribute(endpointId,
+                                  &chipZclClusterScenesServerSpec,
+                                  CHIP_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_SCENE_VALID,
                                   (uint8_t *)&valid,
                                   sizeof(valid));
 
   return status;
 }
 
-EmberZclStatus_t emberZclClusterScenesServerMakeInvalidCallback(EmberZclEndpointId_t endpointId)
+ChipZclStatus_t chipZclClusterScenesServerMakeInvalidCallback(ChipZclEndpointId_t endpointId)
 {
   bool valid = FALSE;
-  return emberZclWriteAttribute(endpointId,
-                                &emberZclClusterScenesServerSpec,
-                                EMBER_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_SCENE_VALID,
+  return chipZclWriteAttribute(endpointId,
+                                &chipZclClusterScenesServerSpec,
+                                CHIP_ZCL_CLUSTER_SCENES_SERVER_ATTRIBUTE_SCENE_VALID,
                                 (uint8_t *)&valid,
                                 sizeof(valid));
 }
 
-void emberZclClusterScenesServerPrintInfo(void)
+void chipZclClusterScenesServerPrintInfo(void)
 {
   uint8_t i;
-  EmberZclSceneEntry_t entry;
-  emberAfCorePrintln("using 0x%x out of 0x%x table slots",
-                     emberZclPluginScenesServerGetNumSceneEntriesInUse(),
-                     EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE);
-  for (i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-    emberZclPluginScenesServerRetrieveSceneEntry(entry, i);
+  ChipZclSceneEntry_t entry;
+  chipAfCorePrintln("using 0x%x out of 0x%x table slots",
+                     chipZclPluginScenesServerGetNumSceneEntriesInUse(),
+                     CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE);
+  for (i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+    chipZclPluginScenesServerRetrieveSceneEntry(entry, i);
 
-    emberAfCorePrint("%x: ", i);
+    chipAfCorePrint("%x: ", i);
 
-    if (entry.endpointId != EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID) {
-      emberAfCorePrint("ep:%x grp:%2x scene:%x tt:%d",
+    if (entry.endpointId != CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID) {
+      chipAfCorePrint("ep:%x grp:%2x scene:%x tt:%d",
                        entry.endpointId,
                        entry.groupId,
                        entry.sceneId,
                        entry.transitionTime);
 
-      emberAfCorePrint(".%d", entry.transitionTime100ms);
+      chipAfCorePrint(".%d", entry.transitionTime100ms);
 
-      #ifdef EMBER_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
-      emberAfCorePrint(" name(%x)\"", strlen(entry.name));
-      emberAfCorePrint("%s", entry.name);
-      emberAfCorePrint("\"");
+      #ifdef CHIP_AF_PLUGIN_SCENES_SERVER_NAME_SUPPORT
+      chipAfCorePrint(" name(%x)\"", strlen(entry.name));
+      chipAfCorePrint("%s", entry.name);
+      chipAfCorePrint("\"");
       #endif
 
       // Cluster specific scene print info functionality is handled here by registered plugin callbacks.
-      emZclPrintInfoScene(i);
+      chZclPrintInfoScene(i);
 
-      emberAfCorePrintln("");
+      chipAfCorePrintln("");
     }
   }
 }
 
-void emberZclClusterScenesServerClearSceneTable(EmberZclEndpointId_t endpointId)
+void chipZclClusterScenesServerClearSceneTable(ChipZclEndpointId_t endpointId)
 {
-  for (uint8_t i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-    EmberZclSceneEntry_t entry;
-    emberZclPluginScenesServerRetrieveSceneEntry(entry, i);
+  for (uint8_t i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+    ChipZclSceneEntry_t entry;
+    chipZclPluginScenesServerRetrieveSceneEntry(entry, i);
     if ((endpointId == entry.endpointId)
-        || (endpointId == EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID)) {
-      entry.endpointId = EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID;
-      emberZclPluginScenesServerSaveSceneEntry(entry, i);
+        || (endpointId == CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID)) {
+      entry.endpointId = CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID;
+      chipZclPluginScenesServerSaveSceneEntry(entry, i);
     }
   }
-  emberZclPluginScenesServerSetNumSceneEntriesInUse(0);
-  emberZclClusterScenesServerSetSceneCountAttribute(endpointId, 0);
+  chipZclPluginScenesServerSetNumSceneEntriesInUse(0);
+  chipZclClusterScenesServerSetSceneCountAttribute(endpointId, 0);
 }
 
-void emberZclClusterScenesServerRemoveScenesInGroupCallback(EmberZclEndpointId_t endpointId,
+void chipZclClusterScenesServerRemoveScenesInGroupCallback(ChipZclEndpointId_t endpointId,
                                                             uint16_t groupId)
 {
-  for (uint8_t i = 0; i < EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
-    EmberZclSceneEntry_t entry;
-    emberZclPluginScenesServerRetrieveSceneEntry(entry, i);
+  for (uint8_t i = 0; i < CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE; i++) {
+    ChipZclSceneEntry_t entry;
+    chipZclPluginScenesServerRetrieveSceneEntry(entry, i);
     if (entry.endpointId == endpointId
         && entry.groupId == groupId) {
       entry.groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
-      entry.endpointId = EMBER_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID;
-      emberZclPluginScenesServerSaveSceneEntry(entry, i);
-      emberZclPluginScenesServerDecNumSceneEntriesInUse();
-      emberZclClusterScenesServerSetSceneCountAttribute(serverEndpointId,
-                                                        emberZclPluginScenesServerGetNumSceneEntriesInUse());
+      entry.endpointId = CHIP_ZCL_SCENE_TABLE_UNUSED_ENDPOINT_ID;
+      chipZclPluginScenesServerSaveSceneEntry(entry, i);
+      chipZclPluginScenesServerDecNumSceneEntriesInUse();
+      chipZclClusterScenesServerSetSceneCountAttribute(serverEndpointId,
+                                                        chipZclPluginScenesServerGetNumSceneEntriesInUse());
     }
   }
 }
 
 // Zcl command handlers...
 
-void emberZclClusterScenesServerCommandAddSceneRequestHandler(const EmberZclCommandContext_t *context,
-                                                              const EmberZclClusterScenesServerCommandAddSceneRequest_t *request)
+void chipZclClusterScenesServerCommandAddSceneRequestHandler(const ChipZclCommandContext_t *context,
+                                                              const ChipZclClusterScenesServerCommandAddSceneRequest_t *request)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
-  emberAfCorePrintln("RX: AddScene");
+  chipAfCorePrintln("RX: AddScene");
 
   // Add the scene.
   status = addSceneHelper(context, request);
 
   // Send the response msg.
-  EmberZclClusterScenesServerCommandAddSceneResponse_t response = { 0 };
+  ChipZclClusterScenesServerCommandAddSceneResponse_t response = { 0 };
   response.status = status;
   response.groupId = request->groupId;
   response.sceneId = request->sceneId;
-  emberZclSendClusterScenesServerCommandAddSceneResponse(context, &response);
+  chipZclSendClusterScenesServerCommandAddSceneResponse(context, &response);
 }
 
-void emberZclClusterScenesServerCommandViewSceneRequestHandler(const EmberZclCommandContext_t *context,
-                                                               const EmberZclClusterScenesServerCommandViewSceneRequest_t *request)
+void chipZclClusterScenesServerCommandViewSceneRequestHandler(const ChipZclCommandContext_t *context,
+                                                               const ChipZclClusterScenesServerCommandViewSceneRequest_t *request)
 {
-  emberAfCorePrintln("RX: ViewScene");
+  chipAfCorePrintln("RX: ViewScene");
 
   // Build and send the response message.
-  EmberZclClusterScenesServerCommandViewSceneResponse_t response = { 0 };
+  ChipZclClusterScenesServerCommandViewSceneResponse_t response = { 0 };
   viewSceneHelper(context, request, &response);
 }
 
-void emberZclClusterScenesServerCommandRemoveSceneRequestHandler(const EmberZclCommandContext_t *context,
-                                                                 const EmberZclClusterScenesServerCommandRemoveSceneRequest_t *request)
+void chipZclClusterScenesServerCommandRemoveSceneRequestHandler(const ChipZclCommandContext_t *context,
+                                                                 const ChipZclClusterScenesServerCommandRemoveSceneRequest_t *request)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
-  emberAfCorePrintln("RX: RemoveScene");
+  chipAfCorePrintln("RX: RemoveScene");
 
   // Remove the scene.
   status = removeSceneHelper(context, request);
 
   // Send the response msg.
-  EmberZclClusterScenesServerCommandRemoveSceneResponse_t response = { 0 };
+  ChipZclClusterScenesServerCommandRemoveSceneResponse_t response = { 0 };
   response.status = status;
   response.groupId = request->groupId;
   response.sceneId = request->sceneId;
-  emberZclSendClusterScenesServerCommandRemoveSceneResponse(context, &response);
+  chipZclSendClusterScenesServerCommandRemoveSceneResponse(context, &response);
 }
 
-void emberZclClusterScenesServerCommandRemoveAllScenesRequestHandler(const EmberZclCommandContext_t *context,
-                                                                     const EmberZclClusterScenesServerCommandRemoveAllScenesRequest_t *request)
+void chipZclClusterScenesServerCommandRemoveAllScenesRequestHandler(const ChipZclCommandContext_t *context,
+                                                                     const ChipZclClusterScenesServerCommandRemoveAllScenesRequest_t *request)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
-  emberAfCorePrintln("RX: RemoveAllScenes");
+  chipAfCorePrintln("RX: RemoveAllScenes");
 
   // Remove all scenes in the specified group.
   status = removeAllScenesHelper(context, request);
 
   // Send the response msg.
-  EmberZclClusterScenesServerCommandRemoveAllScenesResponse_t response = { 0 };
+  ChipZclClusterScenesServerCommandRemoveAllScenesResponse_t response = { 0 };
   response.status = status;
   response.groupId = request->groupId;
-  emberZclSendClusterScenesServerCommandRemoveAllScenesResponse(context, &response);
+  chipZclSendClusterScenesServerCommandRemoveAllScenesResponse(context, &response);
 }
 
-void emberZclClusterScenesServerCommandStoreSceneRequestHandler(const EmberZclCommandContext_t *context,
-                                                                const EmberZclClusterScenesServerCommandStoreSceneRequest_t *request)
+void chipZclClusterScenesServerCommandStoreSceneRequestHandler(const ChipZclCommandContext_t *context,
+                                                                const ChipZclClusterScenesServerCommandStoreSceneRequest_t *request)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
-  emberAfCorePrintln("RX: StoreScene");
+  chipAfCorePrintln("RX: StoreScene");
 
   // Store current scene.
   status = storeCurrentSceneHelper(context, request);
 
   // Send the response msg.
-  EmberZclClusterScenesServerCommandStoreSceneResponse_t response = { 0 };
+  ChipZclClusterScenesServerCommandStoreSceneResponse_t response = { 0 };
   response.status = status;
   response.groupId = request->groupId;
   response.sceneId = request->sceneId;
-  emberZclSendClusterScenesServerCommandStoreSceneResponse(context, &response);
+  chipZclSendClusterScenesServerCommandStoreSceneResponse(context, &response);
 }
 
-void emberZclClusterScenesServerCommandRecallSceneRequestHandler(const EmberZclCommandContext_t *context,
-                                                                 const EmberZclClusterScenesServerCommandRecallSceneRequest_t *request)
+void chipZclClusterScenesServerCommandRecallSceneRequestHandler(const ChipZclCommandContext_t *context,
+                                                                 const ChipZclClusterScenesServerCommandRecallSceneRequest_t *request)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
-  emberAfCorePrintln("RX: RecallScene");
+  chipAfCorePrintln("RX: RecallScene");
 
   // Recall specified saved scene.
   status = recallSavedSceneHelper(context, request);
 
   // Send default response msg.
-  emberZclSendDefaultResponse(context, status);
+  chipZclSendDefaultResponse(context, status);
 }
 
-void emberZclClusterScenesServerCommandGetSceneMembershipRequestHandler(const EmberZclCommandContext_t *context,
-                                                                        const EmberZclClusterScenesServerCommandGetSceneMembershipRequest_t *request)
+void chipZclClusterScenesServerCommandGetSceneMchipshipRequestHandler(const ChipZclCommandContext_t *context,
+                                                                        const ChipZclClusterScenesServerCommandGetSceneMchipshipRequest_t *request)
 {
-  emberAfCorePrintln("RX: GetSceneMembership");
+  chipAfCorePrintln("RX: GetSceneMchipship");
 
   // Build and send the response message.
-  EmberZclClusterScenesServerCommandGetSceneMembershipResponse_t response = { 0 };
-  getSceneMembershipHelper(context, request, &response);
+  ChipZclClusterScenesServerCommandGetSceneMchipshipResponse_t response = { 0 };
+  getSceneMchipshipHelper(context, request, &response);
 }
 
-void emberZclClusterScenesServerCommandEnhancedAddSceneRequestHandler(const EmberZclCommandContext_t *context,
-                                                                      const EmberZclClusterScenesServerCommandEnhancedAddSceneRequest_t *request)
+void chipZclClusterScenesServerCommandEnhancedAddSceneRequestHandler(const ChipZclCommandContext_t *context,
+                                                                      const ChipZclClusterScenesServerCommandEnhancedAddSceneRequest_t *request)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
-  emberAfCorePrintln("RX: EnAddScene");
+  chipAfCorePrintln("RX: EnAddScene");
 
   // Add the scene.
   status = addSceneHelper(context,
-                          (EmberZclClusterScenesServerCommandAddSceneRequest_t *)request);
+                          (ChipZclClusterScenesServerCommandAddSceneRequest_t *)request);
 
   // Send the response msg.
-  EmberZclClusterScenesServerCommandEnhancedAddSceneResponse_t response = { 0 };
+  ChipZclClusterScenesServerCommandEnhancedAddSceneResponse_t response = { 0 };
   response.status = status;
   response.groupId = request->groupId;
   response.sceneId = request->sceneId;
-  emberZclSendClusterScenesServerCommandEnhancedAddSceneResponse(context, &response);
+  chipZclSendClusterScenesServerCommandEnhancedAddSceneResponse(context, &response);
 }
 
-void emberZclClusterScenesServerCommandEnhancedViewSceneRequestHandler(const EmberZclCommandContext_t *context,
-                                                                       const EmberZclClusterScenesServerCommandEnhancedViewSceneRequest_t *request)
+void chipZclClusterScenesServerCommandEnhancedViewSceneRequestHandler(const ChipZclCommandContext_t *context,
+                                                                       const ChipZclClusterScenesServerCommandEnhancedViewSceneRequest_t *request)
 {
-  emberAfCorePrintln("RX: EnViewScene");
+  chipAfCorePrintln("RX: EnViewScene");
 
   // Build and send the response message.
-  EmberZclClusterScenesServerCommandEnhancedViewSceneResponse_t response = { 0 };
+  ChipZclClusterScenesServerCommandEnhancedViewSceneResponse_t response = { 0 };
   viewSceneHelper(context,
-                  (EmberZclClusterScenesServerCommandViewSceneRequest_t *)request,
-                  (EmberZclClusterScenesServerCommandViewSceneResponse_t *)&response);
+                  (ChipZclClusterScenesServerCommandViewSceneRequest_t *)request,
+                  (ChipZclClusterScenesServerCommandViewSceneResponse_t *)&response);
 }
 
-void emberZclClusterScenesServerCommandCopySceneRequestHandler(const EmberZclCommandContext_t *context,
-                                                               const EmberZclClusterScenesServerCommandCopySceneRequest_t *request)
+void chipZclClusterScenesServerCommandCopySceneRequestHandler(const ChipZclCommandContext_t *context,
+                                                               const ChipZclClusterScenesServerCommandCopySceneRequest_t *request)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
-  emberAfCorePrintln("RX: CopyScene");
+  chipAfCorePrintln("RX: CopyScene");
 
   // Copy the scene(s).
   status = copySceneHelper(context, request);
 
   // Send the response msg.
-  EmberZclClusterScenesServerCommandCopySceneResponse_t response = { 0 };
+  ChipZclClusterScenesServerCommandCopySceneResponse_t response = { 0 };
   response.status = status;
   response.groupIdFrom = request->groupIdFrom;
   response.sceneIdFrom = request->sceneIdFrom;
-  emberZclSendClusterScenesServerCommandCopySceneResponse(context, &response);
+  chipZclSendClusterScenesServerCommandCopySceneResponse(context, &response);
 }
 
 // Scenes utilities
 
-uint8_t emberZclPluginScenesServerGetUint8FromBuffer(uint8_t **ptr)
+uint8_t chipZclPluginScenesServerGetUint8FromBuffer(uint8_t **ptr)
 {
   // This fn modifies source ptr on exit.
   uint8_t value = **ptr;
@@ -895,39 +883,39 @@ uint8_t emberZclPluginScenesServerGetUint8FromBuffer(uint8_t **ptr)
   return value;
 }
 
-void emberZclPluginScenesServerPutUint8InBuffer(uint8_t **ptr, uint8_t value)
+void chipZclPluginScenesServerPutUint8InBuffer(uint8_t **ptr, uint8_t value)
 {
   // This fn modifies source ptr on exit.
   **ptr = value;
   *ptr += 1;
 }
 
-uint16_t emberZclPluginScenesServerGetUint16FromBuffer(uint8_t **ptr)
+uint16_t chipZclPluginScenesServerGetUint16FromBuffer(uint8_t **ptr)
 {
   // (where Buffer == Big-endian)
   // This fn modifies source ptr on exit.
-  uint16_t value = emberFetchHighLowInt16u(*ptr);
+  uint16_t value = chipFetchHighLowInt16u(*ptr);
   *ptr += 2;
   return value;
 }
 
-void emberZclPluginScenesServerPutUint16InBuffer(uint8_t **ptr, uint16_t value)
+void chipZclPluginScenesServerPutUint16InBuffer(uint8_t **ptr, uint16_t value)
 {
   // (where Buffer == Big-endian)
   // This fn modifies source ptr on exit.
-  emberStoreHighLowInt16u(*ptr, value);
+  chipStoreHighLowInt16u(*ptr, value);
   *ptr += 2;
 }
 
 // Scenes callback placeholders...
 
-void emberZclEraseSceneCallback(uint8_t tableIdx)
+void chipZclEraseSceneCallback(uint8_t tableIdx)
 {
   // Cluster specific callbacks for Delete scene function will be called in turn following
   // execution of this fn.
 }
 
-bool emberZclAddSceneCallback(EmberZclClusterId_t clusterId,
+bool chipZclAddSceneCallback(ChipZclClusterId_t clusterId,
                               uint8_t tableIdx,
                               const uint8_t *sceneData,
                               uint8_t length)
@@ -937,7 +925,7 @@ bool emberZclAddSceneCallback(EmberZclClusterId_t clusterId,
   return false;
 }
 
-void emberZclRecallSceneCallback(EmberZclEndpointId_t endpointId,
+void chipZclRecallSceneCallback(ChipZclEndpointId_t endpointId,
                                  uint8_t tableIdx,
                                  uint32_t transitionTime100mS)
 {
@@ -946,25 +934,25 @@ void emberZclRecallSceneCallback(EmberZclEndpointId_t endpointId,
   // to apply a recall transtion time (in 1/10S units) if desired.
 }
 
-void emberZclStoreSceneCallback(EmberZclEndpointId_t endpointId, uint8_t tableIdx)
+void chipZclStoreSceneCallback(ChipZclEndpointId_t endpointId, uint8_t tableIdx)
 {
   // Cluster specific callbacks for Store scene function will be called in turn following
   // execution of this fn.
 }
 
-void emberZclCopySceneCallback(uint8_t srcTableIdx, uint8_t dstTableIdx)
+void chipZclCopySceneCallback(uint8_t srcTableIdx, uint8_t dstTableIdx)
 {
   // Cluster specific callbacks for Copy scene function will be called in turn following
   // execution of this fn.
 }
 
-void emberZclViewSceneCallback(uint8_t tableIdx, uint8_t **pExtFieldData)
+void chipZclViewSceneCallback(uint8_t tableIdx, uint8_t **pExtFieldData)
 {
   // Cluster specific callbacks for View scene function will be called in turn following
   // execution of this fn. (Note: pData references the Scene extension field byte array).
 }
 
-void emberZclPrintInfoSceneCallback(uint8_t tableIdx)
+void chipZclPrintInfoSceneCallback(uint8_t tableIdx)
 {
   // Cluster specific callbacks for PrintInfo scene function will be called in turn following
   // execution of this fn.

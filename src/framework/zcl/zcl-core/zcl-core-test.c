@@ -1,107 +1,95 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 
 #include "stack/ip/tls/tls.h"
 #include "stack/ip/tls/tls-sha256.h"
 #include "app/coap/coap.h"
 
 #define USE_STUB_emIsDefaultDomainPrefix
-#define USE_STUB_emberCoapSend
-#define USE_STUB_emberGetNetworkParameters
-#define USE_STUB_emberGetNodeId
-#define USE_STUB_emberNetworkStatus
-#define USE_STUB_emberReadIntegerOption
+#define USE_STUB_chipCoapSend
+#define USE_STUB_chipGetNetworkParameters
+#define USE_STUB_chipGetNodeId
+#define USE_STUB_chipNetworkStatus
+#define USE_STUB_chipReadIntegerOption
 #define USE_STUB_emEventControlSetDelayMS
 #define USE_STUB_emIsDefaultGlobalPrefix
 #define USE_STUB_emIsLocalIpAddress
 #define USE_STUB_emMacExtendedId
 #define USE_STUB_emStoreDefaultGlobalPrefix
-#define USE_STUB_emberUdpListen
-#define USE_STUB_emberRemoveUdpListeners
-#define USE_STUB_emberGetSecureDtlsSessionId
-#define USE_STUB_emberGetDtlsConnectionPeerAddressBySessionId
-#define USE_STUB_emberGetDtlsConnectionPeerPortBySessionId
-#define USE_STUB_emberGetDtlsConnectionPeerPublicKeyBySessionId
-#define USE_STUB_emberGetDtlsConnectionNextSessionId
-#define USE_STUB_emberOpenDtlsConnection
-#define USE_STUB_emberCloseDtlsConnection
-#define USE_STUB_emberCoapRequestHandler
+#define USE_STUB_chipUdpListen
+#define USE_STUB_chipRemoveUdpListeners
+#define USE_STUB_chipGetSecureDtlsSessionId
+#define USE_STUB_chipGetDtlsConnectionPeerAddressBySessionId
+#define USE_STUB_chipGetDtlsConnectionPeerPortBySessionId
+#define USE_STUB_chipGetDtlsConnectionPeerPublicKeyBySessionId
+#define USE_STUB_chipGetDtlsConnectionNextSessionId
+#define USE_STUB_chipOpenDtlsConnection
+#define USE_STUB_chipCloseDtlsConnection
+#define USE_STUB_chipCoapRequestHandler
 #define USE_STUB_emProcessCoapMessage
-#define USE_STUB_emberReadLocationPath
+#define USE_STUB_chipReadLocationPath
 
 #include "stack/ip/stubs.c"
 
-void emZclHandler(EmberCoapCode code,
+void chZclHandler(ChipCoapCode code,
                   uint8_t *uri,
-                  EmberCoapReadOptions *options,
+                  ChipCoapReadOptions *options,
                   const uint8_t *payload,
                   uint16_t payloadLength,
-                  const EmberCoapRequestInfo *info);
+                  const ChipCoapRequestInfo *info);
 void resetSystemTokens(void);
 
 static const char *testUri;
 
-const EmberZclClusterSpec_t emberZclCluster3456ClientSpec = {
-  EMBER_ZCL_ROLE_CLIENT,
-  EMBER_ZCL_MANUFACTURER_CODE_NULL,
+const ChipZclClusterSpec_t chipZclCluster3456ClientSpec = {
+  CHIP_ZCL_ROLE_CLIENT,
+  CHIP_ZCL_MANUFACTURER_CODE_NULL,
   0x3456,
 };
-const EmberZclClusterSpec_t emberZclCluster3456ServerSpec = {
-  EMBER_ZCL_ROLE_SERVER,
-  EMBER_ZCL_MANUFACTURER_CODE_NULL,
+const ChipZclClusterSpec_t chipZclCluster3456ServerSpec = {
+  CHIP_ZCL_ROLE_SERVER,
+  CHIP_ZCL_MANUFACTURER_CODE_NULL,
   0x3456,
 };
-const EmberZclClusterSpec_t emberZclCluster34569abcClientSpec = {
-  EMBER_ZCL_ROLE_CLIENT,
+const ChipZclClusterSpec_t chipZclCluster34569abcClientSpec = {
+  CHIP_ZCL_ROLE_CLIENT,
   0x3456,
   0x9abc,
 };
-const EmberZclClusterSpec_t emberZclCluster34569abcServerSpec = {
-  EMBER_ZCL_ROLE_SERVER,
+const ChipZclClusterSpec_t chipZclCluster34569abcServerSpec = {
+  CHIP_ZCL_ROLE_SERVER,
   0x3456,
   0x9abc,
 };
 
 // These are generated in sorted order by AppBuilder.
-const EmberZclClusterSpec_t *emZclEndpoint1bSpec[] = {
-  &emberZclCluster3456ClientSpec,
-  &emberZclCluster34569abcClientSpec,
-  &emberZclCluster3456ServerSpec,
-  &emberZclCluster34569abcServerSpec,
+const ChipZclClusterSpec_t *chZclEndpoint1bSpec[] = {
+  &chipZclCluster3456ClientSpec,
+  &chipZclCluster34569abcClientSpec,
+  &chipZclCluster3456ServerSpec,
+  &chipZclCluster34569abcServerSpec,
   NULL,
 };
 
-const EmZclEndpointEntry_t emZclEndpointTable[] = {
-  { 0x1b, 0xDEAD, emZclEndpoint1bSpec }
+const ChZclEndpointEntry_t chZclEndpointTable[] = {
+  { 0x1b, 0xDEAD, chZclEndpoint1bSpec }
 };
-const size_t emZclEndpointCount = COUNTOF(emZclEndpointTable);
+const size_t chZclEndpointCount = COUNTOF(chZclEndpointTable);
 
 // These are generated in sorted order by AppBuilder.
-const EmZclCommandEntry_t emZclCommandTable[] = {
-  { &emberZclCluster3456ClientSpec, 0xf4, NULL, NULL },
-  { &emberZclCluster34569abcClientSpec, 0xf4, NULL, NULL },
-  { &emberZclCluster3456ServerSpec, 0xf4, NULL, NULL },
-  { &emberZclCluster34569abcServerSpec, 0xf4, NULL, NULL },
+const ChZclCommandEntry_t chZclCommandTable[] = {
+  { &chipZclCluster3456ClientSpec, 0xf4, NULL, NULL },
+  { &chipZclCluster34569abcClientSpec, 0xf4, NULL, NULL },
+  { &chipZclCluster3456ServerSpec, 0xf4, NULL, NULL },
+  { &chipZclCluster34569abcServerSpec, 0xf4, NULL, NULL },
 };
-const size_t emZclCommandCount = COUNTOF(emZclCommandTable);
+const size_t chZclCommandCount = COUNTOF(chZclCommandTable);
 
 // enum {
 //   clustersOnEndpointHandler,
@@ -110,55 +98,55 @@ const size_t emZclCommandCount = COUNTOF(emZclCommandTable);
 //   endpointsOnDeviceHandler
 // };
 
-void emZclAccessTokenHandler(EmZclContext_t *context)
+void chZclAccessTokenHandler(ChZclContext_t *context)
 {
 }
 
-bool emZclAddIncomingToken(const EmberZclUid_t *remoteUid,
+bool chZclAddIncomingToken(const ChipZclUid_t *remoteUid,
                            const uint8_t *tokenBytes,
                            uint16_t tokenLength)
 {
   return false;
 }
 
-EmberZclStatus_t emZclAllowRemoteAccess(const uint8_t sessionId,
-                                        const EmberZclClusterSpec_t *clusterSpec,
-                                        EmberZclDeviceId_t endpointDeviceId,
+ChipZclStatus_t chZclAllowRemoteAccess(const uint8_t sessionId,
+                                        const ChipZclClusterSpec_t *clusterSpec,
+                                        ChipZclDeviceId_t endpointDeviceId,
                                         uint8_t accessType)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-bool emZclIsProtectedResource(const EmberZclClusterSpec_t *clusterSpec,
+bool chZclIsProtectedResource(const ChipZclClusterSpec_t *clusterSpec,
                               uint8_t accessType)
 {
   return false;
 }
 
-bool emZclExtractBinaryAccessToken(CborState *state,
+bool chZclExtractBinaryAccessToken(CborState *state,
                                    uint8_t *output,
                                    uint16_t *outputSize)
 {
   return false;
 }
 
-bool emberDtlsTransmitHandler(const uint8_t *payload,
+bool chipDtlsTransmitHandler(const uint8_t *payload,
                               uint16_t payloadLength,
-                              const EmberIpv6Address *localAddress,
+                              const ChipIpv6Address *localAddress,
                               uint16_t localPort,
-                              const EmberIpv6Address *remoteAddress,
+                              const ChipIpv6Address *remoteAddress,
                               uint16_t remotePort,
                               void *transmitHandlerData)
 {
   return 0;
 }
 
-void emberZclGetPublicKeyCallback(const uint8_t **publicKey,
+void chipZclGetPublicKeyCallback(const uint8_t **publicKey,
                                   uint16_t *publicKeySize)
 {
 }
 
-bool emZclAttributeUriMetadataQueryParse(EmZclContext_t *context,
+bool chZclAttributeUriMetadataQueryParse(ChZclContext_t *context,
                                          void *data,
                                          uint8_t depth)
 {
@@ -166,7 +154,7 @@ bool emZclAttributeUriMetadataQueryParse(EmZclContext_t *context,
   return false;
 }
 
-bool emZclAttributeUriQueryFilterParse(EmZclContext_t *context,
+bool chZclAttributeUriQueryFilterParse(ChZclContext_t *context,
                                        void *data,
                                        uint8_t depth)
 {
@@ -174,7 +162,7 @@ bool emZclAttributeUriQueryFilterParse(EmZclContext_t *context,
   return false;
 }
 
-bool emZclAttributeUriQueryUndividedParse(EmZclContext_t *context,
+bool chZclAttributeUriQueryUndividedParse(ChZclContext_t *context,
                                           void *data,
                                           uint8_t depth)
 {
@@ -182,101 +170,101 @@ bool emZclAttributeUriQueryUndividedParse(EmZclContext_t *context,
   return false;
 }
 
-void emZclClusterCommandHandler(EmZclContext_t *context)
+void chZclClusterCommandHandler(ChZclContext_t *context)
 {
-  emZclRespond205ContentCbor(context->info, NULL, 0);
+  chZclRespond205ContentCbor(context->info, NULL, 0);
 }
-void emZclUriClusterAttributeHandler(EmZclContext_t *context)
+void chZclUriClusterAttributeHandler(ChZclContext_t *context)
 {
-  emZclRespond205ContentCbor(context->info, NULL, 0);
+  chZclRespond205ContentCbor(context->info, NULL, 0);
 }
-void emZclUriClusterAttributeIdHandler(EmZclContext_t *context)
+void chZclUriClusterAttributeIdHandler(ChZclContext_t *context)
 {
-  emZclRespond205ContentCbor(context->info, NULL, 0);
+  chZclRespond205ContentCbor(context->info, NULL, 0);
 }
 
-bool emZclHasReportingConfiguration(EmberZclEndpointId_t endpointId,
-                                    const EmberZclClusterSpec_t *clusterSpec,
-                                    EmberZclReportingConfigurationId_t reportingConfigurationId)
+bool chZclHasReportingConfiguration(ChipZclEndpointId_t endpointId,
+                                    const ChipZclClusterSpec_t *clusterSpec,
+                                    ChipZclReportingConfigurationId_t reportingConfigurationId)
 {
   return true;
 }
-void emZclUriClusterNotificationHandler(EmZclContext_t *context)
+void chZclUriClusterNotificationHandler(ChZclContext_t *context)
 {
 }
-void emZclUriClusterReportingConfigurationHandler(EmZclContext_t *context)
+void chZclUriClusterReportingConfigurationHandler(ChZclContext_t *context)
 {
 }
-void emZclUriClusterReportingConfigurationIdHandler(EmZclContext_t *context)
+void chZclUriClusterReportingConfigurationIdHandler(ChZclContext_t *context)
 {
 }
 
-EmberZclStatus_t emberZclReadAttribute(EmberZclEndpointId_t endpointId,
-                                       const EmberZclClusterSpec_t *clusterSpec,
-                                       EmberZclAttributeId_t attributeId,
+ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId,
+                                       const ChipZclClusterSpec_t *clusterSpec,
+                                       ChipZclAttributeId_t attributeId,
                                        void *buffer,
                                        size_t bufferLength)
 {
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-const EmZclAttributeEntry_t *emZclFindAttribute(const EmberZclClusterSpec_t *clusterSpec,
-                                                EmberZclAttributeId_t attributeId,
+const ChZclAttributeEntry_t *chZclFindAttribute(const ChipZclClusterSpec_t *clusterSpec,
+                                                ChipZclAttributeId_t attributeId,
                                                 bool includeRemote)
 {
-  return (EmZclAttributeEntry_t *) 1;  // any non-NULL value works
+  return (ChZclAttributeEntry_t *) 1;  // any non-NULL value works
 }
 
-EmberStatus emZclSend(const EmberZclCoapEndpoint_t *destination,
-                      EmberCoapCode code,
+ChipStatus chZclSend(const ChipZclCoapEndpoint_t *destination,
+                      ChipCoapCode code,
                       const uint8_t *uri,
                       const uint8_t *payload,
                       uint16_t payloadLength,
-                      EmberCoapResponseHandler handler,
+                      ChipCoapResponseHandler handler,
                       void *applicationData,
                       uint16_t applicationDataLength,
                       bool skipRetryEvent)
 {
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
-EmberStatus emZclSendWithOptions(const EmberZclCoapEndpoint_t *destination,
-                                 EmberCoapCode code,
+ChipStatus chZclSendWithOptions(const ChipZclCoapEndpoint_t *destination,
+                                 ChipCoapCode code,
                                  const uint8_t *uriPath,
-                                 const EmberCoapOption options[],
+                                 const ChipCoapOption options[],
                                  uint16_t optionsLength,
                                  const uint8_t *payload,
                                  uint16_t payloadLength,
-                                 EmberCoapResponseHandler handler,
+                                 ChipCoapResponseHandler handler,
                                  void *applicationData,
                                  uint16_t applicationDataLength,
                                  bool skipRetryEvent)
 {
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
-void emberParseBlockOptionValue(uint32_t value,
-                                EmberCoapBlockOption *option)
+void chipParseBlockOptionValue(uint32_t value,
+                                ChipCoapBlockOption *option)
 {
   option->more = (value & 0x08) != 0;
   option->logSize = (value & 0x07) + BLOCK_OPTION_VALUE_LOG_SIZE_MIN;
   option->number = value >> 4;
 }
 
-bool emberReadBlockOption(EmberCoapReadOptions *options,
-                          EmberCoapOptionType type,
-                          EmberCoapBlockOption *option)
+bool chipReadBlockOption(ChipCoapReadOptions *options,
+                          ChipCoapOptionType type,
+                          ChipCoapBlockOption *option)
 {
   uint32_t value;
-  if (emberReadIntegerOption(options, type, &value)) {
-    emberParseBlockOptionValue(value, option);
+  if (chipReadIntegerOption(options, type, &value)) {
+    chipParseBlockOptionValue(value, option);
     return true;
   } else {
     return false;
   }
 }
 
-uint32_t emberBlockOptionValue(bool more,
+uint32_t chipBlockOptionValue(bool more,
                                uint8_t logSize,
                                uint32_t number)
 {
@@ -286,8 +274,8 @@ uint32_t emberBlockOptionValue(bool more,
           | (number << 4));
 }
 
-void emberInitCoapOption(EmberCoapOption *option,
-                         EmberCoapOptionType type,
+void chipInitCoapOption(ChipCoapOption *option,
+                         ChipCoapOptionType type,
                          uint32_t value)
 {
   option->type = type;
@@ -296,16 +284,16 @@ void emberInitCoapOption(EmberCoapOption *option,
   option->intValue = value;
 }
 
-void emZclCoapStatusHandler(EmberCoapStatus status, EmberCoapResponseInfo *info)
+void chZclCoapStatusHandler(ChipCoapStatus status, ChipCoapResponseInfo *info)
 {
 }
 
-static EmberCoapCode expectedResponseCode;
+static ChipCoapCode expectedResponseCode;
 
-EmberStatus emberCoapRespondWithPath(const EmberCoapRequestInfo *requestInfo,
-                                     EmberCoapCode code,
+ChipStatus chipCoapRespondWithPath(const ChipCoapRequestInfo *requestInfo,
+                                     ChipCoapCode code,
                                      const uint8_t *path,
-                                     const EmberCoapOption *options,
+                                     const ChipCoapOption *options,
                                      uint8_t numberOfOptions,
                                      const uint8_t *payload,
                                      uint16_t payloadLength)
@@ -326,22 +314,22 @@ EmberStatus emberCoapRespondWithPath(const EmberCoapRequestInfo *requestInfo,
   //   fprintf(stderr, " %02X", payload[i]);
   // }
   // fprintf(stderr, "]\n");
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
-// emberResetReadOptionPointer and emberReadNextOption only work for URI paths,
+// chipResetReadOptionPointer and chipReadNextOption only work for URI paths,
 // which must be stored as a NUL-terminated string in testUri.
 const char *testUriFinger = NULL;
-void emberResetReadOptionPointer(EmberCoapReadOptions *options)
+void chipResetReadOptionPointer(ChipCoapReadOptions *options)
 {
   testUriFinger = testUri;
 }
-EmberCoapOptionType emberReadNextOption(EmberCoapReadOptions *options,
+ChipCoapOptionType chipReadNextOption(ChipCoapReadOptions *options,
                                         const uint8_t **valuePointerLoc,
                                         uint16_t *valueLengthLoc)
 {
   if (testUriFinger == NULL) {
-    return EMBER_COAP_NO_OPTION;
+    return CHIP_COAP_NO_OPTION;
   }
 
   *valuePointerLoc = (const uint8_t *)testUriFinger;
@@ -356,7 +344,7 @@ EmberCoapOptionType emberReadNextOption(EmberCoapReadOptions *options,
       testUriFinger = NULL;
     }
   }
-  return EMBER_COAP_OPTION_URI_PATH;
+  return CHIP_COAP_OPTION_URI_PATH;
 }
 
 static const char *notFound[] = {
@@ -390,33 +378,33 @@ static const char *clusterSuffixes[] = {
 };
 
 static void requestTest(const char *uri,
-                        EmberCoapCode requestCode,
+                        ChipCoapCode requestCode,
                         const uint8_t *payload,
                         uint16_t payloadLength,
-                        EmberCoapCode responseCode)
+                        ChipCoapCode responseCode)
 {
   // TODO: Set up info.
-  EmberCoapRequestInfo info;
+  ChipCoapRequestInfo info;
   memset(&info, 0, sizeof(info));
   testUri = uri;
   expectedResponseCode = responseCode;
-  emZclHandler(requestCode,
+  chZclHandler(requestCode,
                (uint8_t *)uri,
                NULL, // TODO: options
                payload,
                payloadLength,
                &info);
-  if (expectedResponseCode != (EmberCoapCode) - 1) {
+  if (expectedResponseCode != (ChipCoapCode) - 1) {
     fprintf(stderr, " URI %s got no reponse, want %d.%d\n",
             testUri,
             GET_COAP_CLASS(expectedResponseCode),
             GET_COAP_DETAIL(expectedResponseCode));
   }
-  assert(expectedResponseCode == (EmberCoapCode) - 1);
+  assert(expectedResponseCode == (ChipCoapCode) - 1);
 }
 
 #define uriTest(u, req, res) (requestTest((u), (req), NULL, 0, (res)))
-#define uriGetTest(u, rc) (uriTest((u), EMBER_COAP_CODE_GET, (rc)))
+#define uriGetTest(u, rc) (uriTest((u), CHIP_COAP_CODE_GET, (rc)))
 
 static void hexToIntTest(void)
 {
@@ -430,15 +418,15 @@ static void hexToIntTest(void)
 
     // We should accept it iff sscanf() does and get the same answer.
     if (sscanf((const char *)buffer, "%1x", &r0) == 1) {
-      assert(emZclHexStringToInt(buffer, 1, &r1));
+      assert(chZclHexStringToInt(buffer, 1, &r1));
       assert(r0 == r1);
     } else {
-      assert(!emZclHexStringToInt(buffer, 1, &r1));
+      assert(!chZclHexStringToInt(buffer, 1, &r1));
     }
 
     // Read back what snprintf() writes.
     snprintf((char *)buffer, sizeof(buffer), "%x", i);
-    assert(emZclHexStringToInt(buffer, strlen((char *)buffer), &r1));
+    assert(chZclHexStringToInt(buffer, strlen((char *)buffer), &r1));
     assert(r1 == i);
   }
 }
@@ -450,16 +438,16 @@ static void intToHexTest(void)
   for (i = 0; i < 65536; i++) {
     if (i < 256) {
       sprintf((char *)buffer1, "%x", i);
-      emZclIntToHexString(i, 1, buffer2);
+      chZclIntToHexString(i, 1, buffer2);
       assert(strcmp((const char *)buffer1, (const char *)buffer2) == 0);
     }
     sprintf((char *)buffer1, "%x", i);
-    emZclIntToHexString(i, 2, buffer2);
+    chZclIntToHexString(i, 2, buffer2);
     assert(strcmp((const char *)buffer1, (const char *)buffer2) == 0);
   }
   uint32_t x = -1;
   uint8_t buffer3[2 * sizeof(x) + 1];
-  emZclIntToHexString(x, sizeof(x), buffer3);
+  chZclIntToHexString(x, sizeof(x), buffer3);
 }
 
 // CBOR-encoded binding for POSTing.
@@ -471,14 +459,14 @@ static const int8u aBinding[] = {
   0x6c, 0x2f, 0x65, 0x2f, 0x32, 0x61, 0x72, 0x00
 };
 
-static bool cacheAddEntry(const EmberZclUid_t *uid, const EmberIpv6Address *address)
+static bool cacheAddEntry(const ChipZclUid_t *uid, const ChipIpv6Address *address)
 {
-  return emZclCacheAdd(uid, address, NULL);
+  return chZclCacheAdd(uid, address, NULL);
 }
 
-static EmberZclUid_t cacheExpectedUidInstance;
+static ChipZclUid_t cacheExpectedUidInstance;
 
-static EmberZclUid_t *cacheExpectedUid(uint8_t uidNumber)
+static ChipZclUid_t *cacheExpectedUid(uint8_t uidNumber)
 {
   MEMSET(&cacheExpectedUidInstance.bytes,
          uidNumber,
@@ -486,7 +474,7 @@ static EmberZclUid_t *cacheExpectedUid(uint8_t uidNumber)
   return &cacheExpectedUidInstance;
 }
 
-const EmberIpv6Address ipv6Prefix[] = {
+const ChipIpv6Address ipv6Prefix[] = {
   // Last byte of first row of each distinguishes 62-bit prefixes.
   { {
       0x20, 0x01, 0x0d, 0xb8, 0x85, 0x69, 0xb2, 0xb1, // 0xb1
@@ -498,52 +486,52 @@ const EmberIpv6Address ipv6Prefix[] = {
     } },
 };
 
-static EmberIpv6Address cacheExpectedAddrInstance;
+static ChipIpv6Address cacheExpectedAddrInstance;
 
-static EmberIpv6Address *cacheExpectedAddrPrefix(uint8_t addrNumber, uint8_t prefixIndex)
+static ChipIpv6Address *cacheExpectedAddrPrefix(uint8_t addrNumber, uint8_t prefixIndex)
 {
   assert(prefixIndex <= sizeof(ipv6Prefix) / sizeof(ipv6Prefix[0]));
   MEMCOPY(&cacheExpectedAddrInstance,
           &ipv6Prefix[prefixIndex],
-          sizeof(EmberIpv6Address));
+          sizeof(ChipIpv6Address));
   MEMSET(&cacheExpectedAddrInstance.bytes[12], addrNumber, 4);
   return &cacheExpectedAddrInstance;
 }
 
-static EmberIpv6Address *cacheExpectedAddr(uint8_t addrNumber)
+static ChipIpv6Address *cacheExpectedAddr(uint8_t addrNumber)
 {
   return cacheExpectedAddrPrefix(addrNumber, 0);
 }
 
 static void cachePopulate(uint8_t count)
 {
-  EmberZclUid_t returnedUid;
-  EmberIpv6Address returnedAddress;
+  ChipZclUid_t returnedUid;
+  ChipIpv6Address returnedAddress;
   uint8_t i;
   for (i = 1; i <= count; i++) {
     assert(cacheAddEntry(cacheExpectedUid(i), cacheExpectedAddr(i)));
-    assert(emZclCacheGet(cacheExpectedUid(i), &returnedAddress));
-    assert(MEMCOMPARE(cacheExpectedAddr(i), &returnedAddress, sizeof(EmberIpv6Address)) == 0);
-    assert(emZclCacheGetFirstKeyForValue(cacheExpectedAddr(i), &returnedUid));
-    assert(MEMCOMPARE(cacheExpectedUid(i), &returnedUid, sizeof(EmberZclUid_t)) == 0);
+    assert(chZclCacheGet(cacheExpectedUid(i), &returnedAddress));
+    assert(MEMCOMPARE(cacheExpectedAddr(i), &returnedAddress, sizeof(ChipIpv6Address)) == 0);
+    assert(chZclCacheGetFirstKeyForValue(cacheExpectedAddr(i), &returnedUid));
+    assert(MEMCOMPARE(cacheExpectedUid(i), &returnedUid, sizeof(ChipZclUid_t)) == 0);
   }
 }
 
-//static void printIUA(const EmZclCacheIndex_t *index,
-//                     const EmberZclUid_t *uid,
-//                     const EmberIpv6Address *addr) {
+//static void printIUA(const ChZclCacheIndex_t *index,
+//                     const ChipZclUid_t *uid,
+//                     const ChipIpv6Address *addr) {
 //  if (index != NULL) {
 //    fprintf(stderr, "\nIndx: %04x", *index);
 //  }
 //  if (uid != NULL) {
 //    fprintf(stderr, "\nUID:  ");
-//    for (int i = 0; i < sizeof(EmberZclUid_t); ++i) {
+//    for (int i = 0; i < sizeof(ChipZclUid_t); ++i) {
 //      fprintf(stderr, "%02x ", uid->bytes[i]);
 //    }
 //  }
 //  if (addr != NULL) {
 //    fprintf(stderr, "\nIPv6: ");
-//    for (int i = 0; i < sizeof(EmberIpv6Address); ++i) {
+//    for (int i = 0; i < sizeof(ChipIpv6Address); ++i) {
 //      fprintf(stderr, "%02x ", addr->bytes[i]);
 //    }
 //  }
@@ -551,7 +539,7 @@ static void cachePopulate(uint8_t count)
 //}
 
 // ScanPredicate
-//static bool cachePrintEntry(const void *criteria, const EmZclCacheEntry_t *entry)
+//static bool cachePrintEntry(const void *criteria, const ChZclCacheEntry_t *entry)
 //{
 //  printIUA(&entry->index, &entry->key.uid, &entry->value.address);
 //  return false; // continue through all entries
@@ -560,7 +548,7 @@ static void cachePopulate(uint8_t count)
 // Print cache entries in queue order
 //static void cachePrint(void)
 //{
-//  emZclCacheScan(NULL, cachePrintEntry);
+//  chZclCacheScan(NULL, cachePrintEntry);
 //}
 
 int main(int argc, char *argv[])
@@ -571,11 +559,11 @@ int main(int argc, char *argv[])
 
   fputc('.', stderr);
 
-  EmberZclBindingEntry_t entry;
+  ChipZclBindingEntry_t entry;
   entry.destination.network.port = 0x1234;
   MEMCOPY(&entry.destination.network.data.address, "abcdefghijlmnopq", 16);
   entry.endpointId = 2;
-  emberZclSetBinding(1, &entry);
+  chipZclSetBinding(1, &entry);
 
   hexToIntTest();
 
@@ -588,21 +576,21 @@ int main(int argc, char *argv[])
   const char **uris;
 
   for (uris = notFound; *uris != NULL; uris++) {
-    uriGetTest(*uris, EMBER_COAP_CODE_404_NOT_FOUND);
+    uriGetTest(*uris, CHIP_COAP_CODE_404_NOT_FOUND);
   }
 
   fputc('.', stderr);
 
-  uriTest("zcl/", EMBER_COAP_CODE_POST, EMBER_COAP_CODE_405_METHOD_NOT_ALLOWED);
+  uriTest("zcl/", CHIP_COAP_CODE_POST, CHIP_COAP_CODE_405_METHOD_NOT_ALLOWED);
 
   fputc('.', stderr);
 
-  assert(emberZclAddEndpointToGroup(0x1b, 0x1b2c, NULL, 0, 0xFF, NULL, 0) == EMBER_ZCL_STATUS_SUCCESS);
+  assert(chipZclAddEndpointToGroup(0x1b, 0x1b2c, NULL, 0, 0xFF, NULL, 0) == CHIP_ZCL_STATUS_SUCCESS);
 
   fputc('.', stderr);
 
   for (uris = found; *uris != NULL; uris++) {
-    uriGetTest(*uris, EMBER_COAP_CODE_205_CONTENT);
+    uriGetTest(*uris, CHIP_COAP_CODE_205_CONTENT);
   }
 
   fputc('.', stderr);
@@ -617,33 +605,33 @@ int main(int argc, char *argv[])
                         "c s"[i & 0x02],
                         (i & 0x04) ? "" : "_9abc");
     uriGetTest(uri, ((i & 0x01)
-                     ? EMBER_COAP_CODE_404_NOT_FOUND  // "g"
-                     : EMBER_COAP_CODE_205_CONTENT)); // "e"
+                     ? CHIP_COAP_CODE_404_NOT_FOUND  // "g"
+                     : CHIP_COAP_CODE_205_CONTENT)); // "e"
     const char **suffixes;
     for (suffixes = clusterSuffixes; *suffixes != 0; suffixes++) {
       sprintf(uri + count, "%s/", *suffixes);
       uriGetTest(uri,
                  (((*suffixes)[0] == 'c'
                    && 1 < strlen(*suffixes))
-                  ? EMBER_COAP_CODE_405_METHOD_NOT_ALLOWED
-                  : EMBER_COAP_CODE_205_CONTENT));
+                  ? CHIP_COAP_CODE_405_METHOD_NOT_ALLOWED
+                  : CHIP_COAP_CODE_205_CONTENT));
     }
   }
 
   fputc('.', stderr);
 
-  uriGetTest("zcl/e/1b/c3456_9abc/b/0/", EMBER_COAP_CODE_404_NOT_FOUND);
+  uriGetTest("zcl/e/1b/c3456_9abc/b/0/", CHIP_COAP_CODE_404_NOT_FOUND);
   requestTest("zcl/e/1b/c3456_9abc/b/",
-              EMBER_COAP_CODE_POST,
+              CHIP_COAP_CODE_POST,
               aBinding,
               sizeof(aBinding),
-              EMBER_COAP_CODE_201_CREATED);
-  uriGetTest("zcl/e/1b/c3456_9abc/b/0/", EMBER_COAP_CODE_205_CONTENT);
+              CHIP_COAP_CODE_201_CREATED);
+  uriGetTest("zcl/e/1b/c3456_9abc/b/0/", CHIP_COAP_CODE_205_CONTENT);
 
   fputc('.', stderr);
 
   // From "16-07043-003-UIDTextForZCLIPSpecExplanation minor update 2016-11-09"
-  // sent by Sander Raaijmakers to mesh_ip_tsc@mail.zigbee.org on November 9,
+  // sent by Sander Raaijmakers to mesh_ip_tsc@mail.zigbee.org on Novchip 9,
   // 2016.
   //
   // Updated by "16-07008-030-zcl-over-ip-base-device-specification",
@@ -659,7 +647,7 @@ int main(int argc, char *argv[])
     0x47, 0xba, 0xf0, 0x5b, 0x82, 0xc9, 0x1e, 0x75,
     0x5c, 0xf4, 0x55, 0x84, 0xa4, 0x66, 0xeb, 0x95,
   };
-  const EmberZclUid_t expectedUid = {
+  const ChipZclUid_t expectedUid = {
     .bytes = {
       0x36, 0xf6, 0xe4, 0x52, 0xb1, 0xca, 0xc0, 0x2a,
       0x4f, 0x6a, 0x6b, 0x4e, 0xf3, 0x41, 0xaf, 0x8e,
@@ -669,181 +657,181 @@ int main(int argc, char *argv[])
   };
   const uint8_t expectedBase64Url[] = "NvbkUrHKwCpPamtO80GvjpIoHyUBWwgfhoOlEpS1bUY";
 
-  EmberZclUid_t actualUid;
+  ChipZclUid_t actualUid;
   emSha256Hash(input, sizeof(input), actualUid.bytes);
-  assert(MEMCOMPARE(&expectedUid, &actualUid, sizeof(EmberZclUid_t)) == 0);
+  assert(MEMCOMPARE(&expectedUid, &actualUid, sizeof(ChipZclUid_t)) == 0);
 
-  uint8_t actualBase64Url[EMBER_ZCL_UID_BASE64URL_SIZE];
-  MEMSET(actualBase64Url, 0, EMBER_ZCL_UID_BASE64URL_SIZE);
-  assert(emZclUidToBase64Url(&expectedUid, EMBER_ZCL_UID_BITS, actualBase64Url) == EMBER_ZCL_UID_BASE64URL_LENGTH);
-  assert(MEMCOMPARE(expectedBase64Url, actualBase64Url, EMBER_ZCL_UID_BASE64URL_LENGTH) == 0);
-  MEMSET(&actualUid, 0, sizeof(EmberZclUid_t));
+  uint8_t actualBase64Url[CHIP_ZCL_UID_BASE64URL_SIZE];
+  MEMSET(actualBase64Url, 0, CHIP_ZCL_UID_BASE64URL_SIZE);
+  assert(chZclUidToBase64Url(&expectedUid, CHIP_ZCL_UID_BITS, actualBase64Url) == CHIP_ZCL_UID_BASE64URL_LENGTH);
+  assert(MEMCOMPARE(expectedBase64Url, actualBase64Url, CHIP_ZCL_UID_BASE64URL_LENGTH) == 0);
+  MEMSET(&actualUid, 0, sizeof(ChipZclUid_t));
   uint16_t resultBits = 0;
-  assert(emZclBase64UrlToUid(actualBase64Url, EMBER_ZCL_UID_BASE64URL_LENGTH, &actualUid, &resultBits));
-  assert(MEMCOMPARE(&expectedUid, &actualUid, sizeof(EmberZclUid_t)) == 0);
-  assert(resultBits == EMBER_ZCL_UID_BITS);
+  assert(chZclBase64UrlToUid(actualBase64Url, CHIP_ZCL_UID_BASE64URL_LENGTH, &actualUid, &resultBits));
+  assert(MEMCOMPARE(&expectedUid, &actualUid, sizeof(ChipZclUid_t)) == 0);
+  assert(resultBits == CHIP_ZCL_UID_BITS);
 
   fputc('.', stderr);
 
 // ----------------------------------------------------------------------------
 // UID cache tests
-  EmberIpv6Address actualAddress;
+  ChipIpv6Address actualAddress;
 
   // Clear cache.
-  emZclCacheRemoveAll();
-  assert(emZclCacheGetEntryCount() == 0);
-  assert(!emZclCacheGet(cacheExpectedUid(1), NULL));
-  assert(!emZclCacheGetFirstKeyForValue(cacheExpectedAddr(1), NULL));
-  assert(!emZclCacheGetFirstKeyForValue(cacheExpectedAddrPrefix(1, 1), NULL));
-  assert(!emZclCacheRemove(&expectedUid));
+  chZclCacheRemoveAll();
+  assert(chZclCacheGetEntryCount() == 0);
+  assert(!chZclCacheGet(cacheExpectedUid(1), NULL));
+  assert(!chZclCacheGetFirstKeyForValue(cacheExpectedAddr(1), NULL));
+  assert(!chZclCacheGetFirstKeyForValue(cacheExpectedAddrPrefix(1, 1), NULL));
+  assert(!chZclCacheRemove(&expectedUid));
 
   fputc('.', stderr);
 
   // Add an entry.
   assert(cacheAddEntry(cacheExpectedUid(1), cacheExpectedAddr(1)));
-  assert(emZclCacheGetEntryCount() == 1);
-  assert(emZclCacheGet(cacheExpectedUid(1), &actualAddress));
-  assert(MEMCOMPARE(cacheExpectedAddr(1), &actualAddress, sizeof(EmberIpv6Address)) == 0);
-  assert(emZclCacheGetFirstKeyForValue(cacheExpectedAddr(1), &actualUid));
-  assert(MEMCOMPARE(cacheExpectedUid(1), &actualUid, sizeof(EmberZclUid_t)) == 0);
+  assert(chZclCacheGetEntryCount() == 1);
+  assert(chZclCacheGet(cacheExpectedUid(1), &actualAddress));
+  assert(MEMCOMPARE(cacheExpectedAddr(1), &actualAddress, sizeof(ChipIpv6Address)) == 0);
+  assert(chZclCacheGetFirstKeyForValue(cacheExpectedAddr(1), &actualUid));
+  assert(MEMCOMPARE(cacheExpectedUid(1), &actualUid, sizeof(ChipZclUid_t)) == 0);
 
   fputc('.', stderr);
 
   // Remove that entry.
-  assert(emZclCacheRemove(cacheExpectedUid(1)));
-  assert(emZclCacheGetEntryCount() == 0);
-  assert(!emZclCacheGet(cacheExpectedUid(1), NULL));
-  assert(!emZclCacheGetFirstKeyForValue(cacheExpectedAddr(1), NULL));
+  assert(chZclCacheRemove(cacheExpectedUid(1)));
+  assert(chZclCacheGetEntryCount() == 0);
+  assert(!chZclCacheGet(cacheExpectedUid(1), NULL));
+  assert(!chZclCacheGetFirstKeyForValue(cacheExpectedAddr(1), NULL));
 
   fputc('.', stderr);
 
   // Test remove head (which is last one in: 3).
-  emZclCacheRemoveAll();
+  chZclCacheRemoveAll();
   cachePopulate(3);
-  assert(emZclCacheGetEntryCount() == 3);
-  assert(emZclCacheRemove(cacheExpectedUid(3)));
-  assert(emZclCacheGetEntryCount() == 2);
-  assert(!emZclCacheGet(cacheExpectedUid(3), NULL));
-  assert(!emZclCacheGetFirstKeyForValue(cacheExpectedAddr(3), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(1), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(2), NULL));
+  assert(chZclCacheGetEntryCount() == 3);
+  assert(chZclCacheRemove(cacheExpectedUid(3)));
+  assert(chZclCacheGetEntryCount() == 2);
+  assert(!chZclCacheGet(cacheExpectedUid(3), NULL));
+  assert(!chZclCacheGetFirstKeyForValue(cacheExpectedAddr(3), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(1), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(2), NULL));
 
   fputc('.', stderr);
 
   // Test remove tail (which is first one in: 1).
-  emZclCacheRemoveAll();
+  chZclCacheRemoveAll();
   cachePopulate(3);
-  assert(emZclCacheGetEntryCount() == 3);
-  assert(emZclCacheRemove(cacheExpectedUid(1)));
-  assert(emZclCacheGetEntryCount() == 2);
-  assert(!emZclCacheGet(cacheExpectedUid(1), NULL));
-  assert(!emZclCacheGetFirstKeyForValue(cacheExpectedAddr(1), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(2), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(3), NULL));
+  assert(chZclCacheGetEntryCount() == 3);
+  assert(chZclCacheRemove(cacheExpectedUid(1)));
+  assert(chZclCacheGetEntryCount() == 2);
+  assert(!chZclCacheGet(cacheExpectedUid(1), NULL));
+  assert(!chZclCacheGetFirstKeyForValue(cacheExpectedAddr(1), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(2), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(3), NULL));
 
   fputc('.', stderr);
 
   // Test remove interior entry (2).
-  emZclCacheRemoveAll();
+  chZclCacheRemoveAll();
   cachePopulate(3);
-  assert(emZclCacheGetEntryCount() == 3);
-  assert(emZclCacheRemove(cacheExpectedUid(2)));
-  assert(emZclCacheGetEntryCount() == 2);
-  assert(!emZclCacheGet(cacheExpectedUid(2), NULL));
-  assert(!emZclCacheGetFirstKeyForValue(cacheExpectedAddr(2), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(1), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(3), NULL));
+  assert(chZclCacheGetEntryCount() == 3);
+  assert(chZclCacheRemove(cacheExpectedUid(2)));
+  assert(chZclCacheGetEntryCount() == 2);
+  assert(!chZclCacheGet(cacheExpectedUid(2), NULL));
+  assert(!chZclCacheGetFirstKeyForValue(cacheExpectedAddr(2), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(1), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(3), NULL));
 
   // Test remove all by address (entries positioned at head, tail, interior).
-  emZclCacheRemoveAll();
+  chZclCacheRemoveAll();
   assert(cacheAddEntry(cacheExpectedUid(7), cacheExpectedAddr(7))); // tail
   cachePopulate(3); // 1-3
   assert(cacheAddEntry(cacheExpectedUid(4), cacheExpectedAddr(7)));
   assert(cacheAddEntry(cacheExpectedUid(5), cacheExpectedAddr(5)));
   assert(cacheAddEntry(cacheExpectedUid(6), cacheExpectedAddr(7))); // head
-  assert(emZclCacheGetEntryCount() == 7);
-  assert(emZclCacheRemoveAllByValue(cacheExpectedAddr(7)));
-  assert(emZclCacheGetEntryCount() == 4);
-  assert(emZclCacheGet(cacheExpectedUid(1), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(2), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(3), NULL));
-  assert(!emZclCacheGet(cacheExpectedUid(4), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(5), NULL));
-  assert(!emZclCacheGet(cacheExpectedUid(6), NULL));
-  assert(!emZclCacheGet(cacheExpectedUid(7), NULL));
-  assert(!emZclCacheGetFirstKeyForValue(cacheExpectedAddr(7), NULL));
+  assert(chZclCacheGetEntryCount() == 7);
+  assert(chZclCacheRemoveAllByValue(cacheExpectedAddr(7)));
+  assert(chZclCacheGetEntryCount() == 4);
+  assert(chZclCacheGet(cacheExpectedUid(1), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(2), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(3), NULL));
+  assert(!chZclCacheGet(cacheExpectedUid(4), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(5), NULL));
+  assert(!chZclCacheGet(cacheExpectedUid(6), NULL));
+  assert(!chZclCacheGet(cacheExpectedUid(7), NULL));
+  assert(!chZclCacheGetFirstKeyForValue(cacheExpectedAddr(7), NULL));
 
   fputc('.', stderr);
 
   // Test add entry for same UID updates existing entry with new address.
-  emZclCacheRemoveAll();
+  chZclCacheRemoveAll();
   cachePopulate(3);
-  assert(emZclCacheGetEntryCount() == 3);
-  assert(emZclCacheGet(cacheExpectedUid(2), &actualAddress));
-  assert(MEMCOMPARE(cacheExpectedAddr(2), &actualAddress, sizeof(EmberIpv6Address)) == 0);
-  assert(emZclCacheGetFirstKeyForValue(cacheExpectedAddr(2), &actualUid));
-  assert(MEMCOMPARE(cacheExpectedUid(2), &actualUid, sizeof(EmberZclUid_t)) == 0);
+  assert(chZclCacheGetEntryCount() == 3);
+  assert(chZclCacheGet(cacheExpectedUid(2), &actualAddress));
+  assert(MEMCOMPARE(cacheExpectedAddr(2), &actualAddress, sizeof(ChipIpv6Address)) == 0);
+  assert(chZclCacheGetFirstKeyForValue(cacheExpectedAddr(2), &actualUid));
+  assert(MEMCOMPARE(cacheExpectedUid(2), &actualUid, sizeof(ChipZclUid_t)) == 0);
   assert(cacheAddEntry(cacheExpectedUid(2), cacheExpectedAddr(7)));
-  assert(emZclCacheGetEntryCount() == 3);
-  assert(emZclCacheGet(cacheExpectedUid(2), &actualAddress));
-  assert(MEMCOMPARE(cacheExpectedAddr(2), &actualAddress, sizeof(EmberIpv6Address)) != 0);
-  assert(MEMCOMPARE(cacheExpectedAddr(7), &actualAddress, sizeof(EmberIpv6Address)) == 0);
-  assert(!emZclCacheGetFirstKeyForValue(cacheExpectedAddr(2), &actualUid));
+  assert(chZclCacheGetEntryCount() == 3);
+  assert(chZclCacheGet(cacheExpectedUid(2), &actualAddress));
+  assert(MEMCOMPARE(cacheExpectedAddr(2), &actualAddress, sizeof(ChipIpv6Address)) != 0);
+  assert(MEMCOMPARE(cacheExpectedAddr(7), &actualAddress, sizeof(ChipIpv6Address)) == 0);
+  assert(!chZclCacheGetFirstKeyForValue(cacheExpectedAddr(2), &actualUid));
 
   fputc('.', stderr);
 
   // Add max entries and test that next add reuses LRU entry (1).
-  emZclCacheRemoveAll();
-  cachePopulate(EMBER_ZCL_CACHE_TABLE_SIZE);
-  uint8_t plusOne = EMBER_ZCL_CACHE_TABLE_SIZE + 1;
+  chZclCacheRemoveAll();
+  cachePopulate(CHIP_ZCL_CACHE_TABLE_SIZE);
+  uint8_t plusOne = CHIP_ZCL_CACHE_TABLE_SIZE + 1;
   assert(cacheAddEntry(cacheExpectedUid(plusOne), cacheExpectedAddr(plusOne)));
-  assert(emZclCacheGetEntryCount() == EMBER_ZCL_CACHE_TABLE_SIZE);
-  assert(!emZclCacheGet(cacheExpectedUid(1), &actualAddress));
-  assert(emZclCacheGet(cacheExpectedUid(plusOne), &actualAddress));
+  assert(chZclCacheGetEntryCount() == CHIP_ZCL_CACHE_TABLE_SIZE);
+  assert(!chZclCacheGet(cacheExpectedUid(1), &actualAddress));
+  assert(chZclCacheGet(cacheExpectedUid(plusOne), &actualAddress));
 
   fputc('.', stderr);
 
   // Test remove all for Ipv6 prefix.
-  const EmberIpv6Address prefix = { {
+  const ChipIpv6Address prefix = { {
                                       0x20, 0x01, 0x0d, 0xb8, 0x85, 0x69, 0xb2, 0xb4,
                                     } };
   const uint8_t prefixLengthInBits = (7 * 8) + 6; // through upper 6 bits of 8th byte
-  emZclCacheRemoveAll();
+  chZclCacheRemoveAll();
   // Populate with 1,4 and 2,3 with different prefixes.
   assert(cacheAddEntry(cacheExpectedUid(1), cacheExpectedAddrPrefix(1, 0)));
-  assert(emZclCacheGetEntryCount() == 1);
+  assert(chZclCacheGetEntryCount() == 1);
   assert(cacheAddEntry(cacheExpectedUid(2), cacheExpectedAddrPrefix(2, 1)));
-  assert(emZclCacheGetEntryCount() == 2);
+  assert(chZclCacheGetEntryCount() == 2);
   assert(cacheAddEntry(cacheExpectedUid(3), cacheExpectedAddrPrefix(3, 1)));
-  assert(emZclCacheGetEntryCount() == 3);
+  assert(chZclCacheGetEntryCount() == 3);
   assert(cacheAddEntry(cacheExpectedUid(4), cacheExpectedAddrPrefix(4, 0)));
-  assert(emZclCacheGetEntryCount() == 4);
+  assert(chZclCacheGetEntryCount() == 4);
   // Remove all with specified prefix, verify resulting absence/presence.
-  assert(emZclCacheRemoveAllByIpv6Prefix(&prefix, prefixLengthInBits) == 2);
-  assert(emZclCacheGetEntryCount() == 2);
-  assert(emZclCacheGet(cacheExpectedUid(1), NULL));
-  assert(!emZclCacheGet(cacheExpectedUid(2), NULL));
-  assert(!emZclCacheGet(cacheExpectedUid(3), NULL));
-  assert(emZclCacheGet(cacheExpectedUid(4), NULL));
+  assert(chZclCacheRemoveAllByIpv6Prefix(&prefix, prefixLengthInBits) == 2);
+  assert(chZclCacheGetEntryCount() == 2);
+  assert(chZclCacheGet(cacheExpectedUid(1), NULL));
+  assert(!chZclCacheGet(cacheExpectedUid(2), NULL));
+  assert(!chZclCacheGet(cacheExpectedUid(3), NULL));
+  assert(chZclCacheGet(cacheExpectedUid(4), NULL));
 
   fputc('.', stderr);
 
   // Test cache operations with cache index.
-  emZclCacheRemoveAll();
-  const int ccount = EMBER_ZCL_CACHE_TABLE_SIZE;
+  chZclCacheRemoveAll();
+  const int ccount = CHIP_ZCL_CACHE_TABLE_SIZE;
   cachePopulate(ccount); // note, index i will have uid/addr i+1
   // cachePrint();
   for (int i = 0; i < ccount; ++i) {
-    EmZclCacheIndex_t index, otherIndex;
+    ChZclCacheIndex_t index, otherIndex;
     index = i;
-    MEMSET(actualUid.bytes, 0xAA, sizeof(EmberZclUid_t));
-    MEMSET(actualAddress.bytes, 0xBB, sizeof(EmberIpv6Address));
+    MEMSET(actualUid.bytes, 0xAA, sizeof(ChipZclUid_t));
+    MEMSET(actualAddress.bytes, 0xBB, sizeof(ChipIpv6Address));
     // printIUA(&index, &actualUid, &actualAddress);
-    assert(emZclCacheGetByIndex(index, &actualUid, &actualAddress));
+    assert(chZclCacheGetByIndex(index, &actualUid, &actualAddress));
     // printIUA(&index, &actualUid, &actualAddress);
-    assert(MEMCOMPARE(cacheExpectedUid(i + 1), &actualUid, sizeof(EmberZclUid_t)) == 0);
-    assert(MEMCOMPARE(cacheExpectedAddr(i + 1), &actualAddress, sizeof(EmberIpv6Address)) == 0);
-    assert(emZclCacheGetIndex(cacheExpectedUid(i + 1), &otherIndex));
+    assert(MEMCOMPARE(cacheExpectedUid(i + 1), &actualUid, sizeof(ChipZclUid_t)) == 0);
+    assert(MEMCOMPARE(cacheExpectedAddr(i + 1), &actualAddress, sizeof(ChipIpv6Address)) == 0);
+    assert(chZclCacheGetIndex(cacheExpectedUid(i + 1), &otherIndex));
     assert(index == otherIndex);
     //printIUA(NULL, &actualUid, NULL);
   }

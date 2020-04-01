@@ -1,34 +1,22 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
-  #include EMBER_AF_API_ZCL_SCENES_SERVER
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
+  #include CHIP_AF_API_ZCL_SCENES_SERVER
 #endif
 #include "thread-callbacks.h"
 #include "color-control-server.h"
 
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
   #ifdef DEFINETOKENS
 // Token based storage.
     #define retrieveSceneSubTableEntry(entry, i) \
@@ -37,17 +25,17 @@
   halCommonSetIndexedToken(TOKEN_ZCL_CORE_COLOR_CONTROL_SCENE_SUBTABLE, i, &entry)
   #else
 // RAM based storage.
-EmZclColorControlSceneSubTableEntry_t emZclPluginColorControlServerSceneSubTable[EMBER_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
+ChZclColorControlSceneSubTableEntry_t chZclPluginColorControlServerSceneSubTable[CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
     #define retrieveSceneSubTableEntry(entry, i) \
-  (entry = emZclPluginColorControlServerSceneSubTable[i])
+  (entry = chZclPluginColorControlServerSceneSubTable[i])
     #define saveSceneSubTableEntry(entry, i) \
-  (emZclPluginColorControlServerSceneSubTable[i] = entry)
+  (chZclPluginColorControlServerSceneSubTable[i] = entry)
   #endif
 #endif
 
-#define COLOR_TEMP_CONTROL emZclColorControlServerTempTransitionEventControl
-#define COLOR_XY_CONTROL   emZclColorControlServerXyTransitionEventControl
-#define COLOR_HSV_CONTROL  emZclColorControlServerHueSatTransitionEventControl
+#define COLOR_TEMP_CONTROL chZclColorControlServerTempTransitionEventControl
+#define COLOR_XY_CONTROL   chZclColorControlServerXyTransitionEventControl
+#define COLOR_HSV_CONTROL  chZclColorControlServerHueSatTransitionEventControl
 
 // direction
 enum {
@@ -82,9 +70,9 @@ enum {
   TEMPERATURE_TO_TEMPERATURE = 0x22
 };
 
-EmberEventControl emZclColorControlServerTempTransitionEventControl;
-EmberEventControl emZclColorControlServerXyTransitionEventControl;
-EmberEventControl emZclColorControlServerHueSatTransitionEventControl;
+ChipEventControl chZclColorControlServerTempTransitionEventControl;
+ChipEventControl chZclColorControlServerXyTransitionEventControl;
+ChipEventControl chZclColorControlServerHueSatTransitionEventControl;
 
 #define UPDATE_TIME_MS 100
 #define TRANSITION_TIME_1S 10
@@ -142,188 +130,188 @@ static uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState *p
                                                       uint16_t rate);
 
 // convenient token handling functions
-static uint8_t readColorMode(EmberZclEndpointId_t endpoint)
+static uint8_t readColorMode(ChipZclEndpointId_t endpoint)
 {
   uint8_t colorMode;
 
-  emberZclReadAttribute(endpoint,
-                        &emberZclClusterColorControlServerSpec,
-                        EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_MODE,
+  chipZclReadAttribute(endpoint,
+                        &chipZclClusterColorControlServerSpec,
+                        CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_MODE,
                         &colorMode,
                         sizeof(colorMode));
 
   return colorMode;
 }
 
-static uint8_t readHue(EmberZclEndpointId_t endpoint)
+static uint8_t readHue(ChipZclEndpointId_t endpoint)
 {
   uint8_t hue;
 
-  emberZclReadAttribute(endpoint,
-                        &emberZclClusterColorControlServerSpec,
-                        EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_HUE,
+  chipZclReadAttribute(endpoint,
+                        &chipZclClusterColorControlServerSpec,
+                        CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_HUE,
                         &hue,
                         sizeof(hue));
 
   return hue;
 }
 
-static uint8_t readSaturation(EmberZclEndpointId_t endpoint)
+static uint8_t readSaturation(ChipZclEndpointId_t endpoint)
 {
   uint8_t saturation;
 
-  emberZclReadAttribute(endpoint,
-                        &emberZclClusterColorControlServerSpec,
-                        EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
+  chipZclReadAttribute(endpoint,
+                        &chipZclClusterColorControlServerSpec,
+                        CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
                         &saturation,
                         sizeof(saturation));
 
   return saturation;
 }
 
-static uint16_t readColorX(EmberZclEndpointId_t endpoint)
+static uint16_t readColorX(ChipZclEndpointId_t endpoint)
 {
   uint16_t colorX;
 
-  emberZclReadAttribute(endpoint,
-                        &emberZclClusterColorControlServerSpec,
-                        EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
+  chipZclReadAttribute(endpoint,
+                        &chipZclClusterColorControlServerSpec,
+                        CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
                         &colorX,
                         sizeof(colorX));
 
   return colorX;
 }
 
-static uint16_t readColorY(EmberZclEndpointId_t endpoint)
+static uint16_t readColorY(ChipZclEndpointId_t endpoint)
 {
   uint16_t colorY;
 
-  emberZclReadAttribute(endpoint,
-                        &emberZclClusterColorControlServerSpec,
-                        EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
+  chipZclReadAttribute(endpoint,
+                        &chipZclClusterColorControlServerSpec,
+                        CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
                         &colorY,
                         sizeof(colorY));
 
   return colorY;
 }
 
-static uint16_t readColorTemperature(EmberZclEndpointId_t endpoint)
+static uint16_t readColorTemperature(ChipZclEndpointId_t endpoint)
 {
   uint16_t colorTemperature;
 
-  emberZclReadAttribute(endpoint,
-                        &emberZclClusterColorControlServerSpec,
-                        EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE,
+  chipZclReadAttribute(endpoint,
+                        &chipZclClusterColorControlServerSpec,
+                        CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE,
                         (uint8_t *)&colorTemperature,
                         sizeof(colorTemperature));
 
   return colorTemperature;
 }
 
-static uint16_t readColorTemperatureMin(EmberZclEndpointId_t endpoint)
+static uint16_t readColorTemperatureMin(ChipZclEndpointId_t endpoint)
 {
   uint16_t colorTemperatureMin;
-  EmberStatus status;
+  ChipStatus status;
 
   status =
-    emberZclReadAttribute(endpoint,
-                          &emberZclClusterColorControlServerSpec,
-                          EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN,
+    chipZclReadAttribute(endpoint,
+                          &chipZclClusterColorControlServerSpec,
+                          CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN,
                           (uint8_t *)&colorTemperatureMin,
                           sizeof(colorTemperatureMin));
 
-  if (status != EMBER_SUCCESS) {
+  if (status != CHIP_SUCCESS) {
     colorTemperatureMin = MIN_TEMPERATURE_VALUE;
   }
 
   return colorTemperatureMin;
 }
 
-static uint16_t readColorTemperatureMax(EmberZclEndpointId_t endpoint)
+static uint16_t readColorTemperatureMax(ChipZclEndpointId_t endpoint)
 {
   uint16_t colorTemperatureMax;
-  EmberStatus status;
+  ChipStatus status;
 
   status =
-    emberZclReadAttribute(endpoint,
-                          &emberZclClusterColorControlServerSpec,
-                          EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX,
+    chipZclReadAttribute(endpoint,
+                          &chipZclClusterColorControlServerSpec,
+                          CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX,
                           (uint8_t *)&colorTemperatureMax,
                           sizeof(colorTemperatureMax));
 
-  if (status != EMBER_SUCCESS) {
+  if (status != CHIP_SUCCESS) {
     colorTemperatureMax = MAX_TEMPERATURE_VALUE;
   }
 
   return colorTemperatureMax;
 }
 
-static EmberStatus writeRemainingTime(EmberZclEndpointId_t endpoint,
+static ChipStatus writeRemainingTime(ChipZclEndpointId_t endpoint,
                                       uint16_t remainingTime)
 {
-  return emberZclWriteAttribute(endpoint,
-                                &emberZclClusterColorControlServerSpec,
-                                EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_REMAINING_TIME,
+  return chipZclWriteAttribute(endpoint,
+                                &chipZclClusterColorControlServerSpec,
+                                CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_REMAINING_TIME,
                                 (uint8_t *)&remainingTime,
                                 sizeof(remainingTime));
 }
 
-static EmberStatus writeColorMode(EmberZclEndpointId_t endpoint,
+static ChipStatus writeColorMode(ChipZclEndpointId_t endpoint,
                                   uint8_t colorMode)
 {
-  return emberZclWriteAttribute(endpoint,
-                                &emberZclClusterColorControlServerSpec,
-                                EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_MODE,
+  return chipZclWriteAttribute(endpoint,
+                                &chipZclClusterColorControlServerSpec,
+                                CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_MODE,
                                 (uint8_t *)&colorMode,
                                 sizeof(colorMode));
 }
 
-static EmberStatus writeHue(EmberZclEndpointId_t endpoint,
+static ChipStatus writeHue(ChipZclEndpointId_t endpoint,
                             uint8_t hue)
 {
-  return emberZclWriteAttribute(endpoint,
-                                &emberZclClusterColorControlServerSpec,
-                                EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_HUE,
+  return chipZclWriteAttribute(endpoint,
+                                &chipZclClusterColorControlServerSpec,
+                                CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_HUE,
                                 (uint8_t *)&hue,
                                 sizeof(hue));
 }
 
-static EmberStatus writeSaturation(EmberZclEndpointId_t endpoint,
+static ChipStatus writeSaturation(ChipZclEndpointId_t endpoint,
                                    uint8_t saturation)
 {
-  return emberZclWriteAttribute(endpoint,
-                                &emberZclClusterColorControlServerSpec,
-                                EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
+  return chipZclWriteAttribute(endpoint,
+                                &chipZclClusterColorControlServerSpec,
+                                CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
                                 (uint8_t *)&saturation,
                                 sizeof(saturation));
 }
 
-static EmberStatus writeColorX(EmberZclEndpointId_t endpoint,
+static ChipStatus writeColorX(ChipZclEndpointId_t endpoint,
                                uint16_t colorX)
 {
-  return emberZclWriteAttribute(endpoint,
-                                &emberZclClusterColorControlServerSpec,
-                                EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
+  return chipZclWriteAttribute(endpoint,
+                                &chipZclClusterColorControlServerSpec,
+                                CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
                                 (uint8_t *)&colorX,
                                 sizeof(colorX));
 }
 
-static EmberStatus writeColorY(EmberZclEndpointId_t endpoint,
+static ChipStatus writeColorY(ChipZclEndpointId_t endpoint,
                                uint16_t colorY)
 {
-  return emberZclWriteAttribute(endpoint,
-                                &emberZclClusterColorControlServerSpec,
-                                EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
+  return chipZclWriteAttribute(endpoint,
+                                &chipZclClusterColorControlServerSpec,
+                                CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
                                 (uint8_t *)&colorY,
                                 sizeof(colorY));
 }
 
-static EmberStatus writeColorTemperature(EmberZclEndpointId_t endpoint,
+static ChipStatus writeColorTemperature(ChipZclEndpointId_t endpoint,
                                          uint16_t colorTemperature)
 {
-  return emberZclWriteAttribute(endpoint,
-                                &emberZclClusterColorControlServerSpec,
-                                EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE,
+  return chipZclWriteAttribute(endpoint,
+                                &chipZclClusterColorControlServerSpec,
+                                CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE,
                                 (uint8_t *)&colorTemperature,
                                 sizeof(colorTemperature));
 }
@@ -331,7 +319,7 @@ static EmberStatus writeColorTemperature(EmberZclEndpointId_t endpoint,
 // any time we call a hue or saturaiton transition, we need to assume certain
 // things about the hue and saturation data structures.  This function will
 // properly initialize them.
-static void initHueSat(EmberZclEndpointId_t endpoint)
+static void initHueSat(ChipZclEndpointId_t endpoint)
 {
   colorHueTransitionState.stepsRemaining = 0;
   colorHueTransitionState.currentHue = readHue(endpoint);
@@ -344,7 +332,7 @@ static void initHueSat(EmberZclEndpointId_t endpoint)
 // -------------------------------------------------------------------------
 // ****** callback section *******
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef CHIP_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 /** @brief Move To Hue And Saturation
  *
  *
@@ -353,15 +341,15 @@ static void initHueSat(EmberZclEndpointId_t endpoint)
  * @param saturation   Ver.: always
  * @param transitionTime   Ver.: always
  */
-void emberZclClusterColorControlServerCommandMoveToHueAndSaturationRequestHandler(const EmberZclCommandContext_t *context,
-                                                                                  const EmberZclClusterColorControlServerCommandMoveToHueAndSaturationRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveToHueAndSaturationRequestHandler(const ChipZclCommandContext_t *context,
+                                                                                  const ChipZclClusterColorControlServerCommandMoveToHueAndSaturationRequest_t *request)
 {
   uint8_t hue;
   uint8_t saturation;
   uint16_t transitionTime;
 
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
 
   hue = request->hue;
   saturation = request->saturation;
@@ -374,7 +362,7 @@ void emberZclClusterColorControlServerCommandMoveToHueAndSaturationRequestHandle
   // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
   // this and report a malformed packet.
   if (hue > MAX_HUE_VALUE || saturation > MAX_SATURATION_VALUE) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_MALFORMED_COMMAND);
     return;
   }
 
@@ -408,19 +396,19 @@ void emberZclClusterColorControlServerCommandMoveToHueAndSaturationRequestHandle
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandMoveHueRequestHandler(const EmberZclCommandContext_t *context,
-                                                                   const EmberZclClusterColorControlServerCommandMoveHueRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveHueRequestHandler(const ChipZclCommandContext_t *context,
+                                                                   const ChipZclClusterColorControlServerCommandMoveHueRequest_t *request)
 {
   uint8_t moveMode;
   uint8_t rate;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
 
   moveMode = request->moveMode;
   rate = request->rate;
@@ -429,7 +417,7 @@ void emberZclClusterColorControlServerCommandMoveHueRequestHandler(const EmberZc
   stopAllColorTransitions();
 
   if (moveMode == MOVE_MODE_STOP) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -459,20 +447,20 @@ void emberZclClusterColorControlServerCommandMoveHueRequestHandler(const EmberZc
   colorSaturationTransitionState.stepsRemaining = 0;
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandMoveSaturationRequestHandler(const EmberZclCommandContext_t *context,
-                                                                          const EmberZclClusterColorControlServerCommandMoveSaturationRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveSaturationRequestHandler(const ChipZclCommandContext_t *context,
+                                                                          const ChipZclClusterColorControlServerCommandMoveSaturationRequest_t *request)
 {
   uint8_t moveMode;
   uint8_t rate;
 
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
   uint16_t transitionTime;
 
   moveMode = request->moveMode;
@@ -482,7 +470,7 @@ void emberZclClusterColorControlServerCommandMoveSaturationRequestHandler(const 
   stopAllColorTransitions();
 
   if (moveMode == MOVE_MODE_STOP) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -515,14 +503,14 @@ void emberZclClusterColorControlServerCommandMoveSaturationRequestHandler(const 
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandMoveToHueRequestHandler(const EmberZclCommandContext_t *context,
-                                                                     const EmberZclClusterColorControlServerCommandMoveToHueRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveToHueRequestHandler(const ChipZclCommandContext_t *context,
+                                                                     const ChipZclClusterColorControlServerCommandMoveToHueRequest_t *request)
 {
   uint8_t hue;
   uint8_t direction;
@@ -535,7 +523,7 @@ void emberZclClusterColorControlServerCommandMoveToHueRequestHandler(const Ember
   transitionTime = request->transitionTime;
 
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
 
   if (transitionTime == 0) {
     transitionTime++;
@@ -544,7 +532,7 @@ void emberZclClusterColorControlServerCommandMoveToHueRequestHandler(const Ember
   // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
   // this and report a malformed packet.
   if (hue > MAX_HUE_VALUE) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_MALFORMED_COMMAND);
     return;
   }
 
@@ -585,7 +573,7 @@ void emberZclClusterColorControlServerCommandMoveToHueRequestHandler(const Ember
       up = false;
       break;
     default:
-      emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+      chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_MALFORMED_COMMAND);
       return;
   }
 
@@ -603,14 +591,14 @@ void emberZclClusterColorControlServerCommandMoveToHueRequestHandler(const Ember
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandMoveToSaturationRequestHandler(const EmberZclCommandContext_t *context,
-                                                                            const EmberZclClusterColorControlServerCommandMoveToSaturationRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveToSaturationRequestHandler(const ChipZclCommandContext_t *context,
+                                                                            const ChipZclClusterColorControlServerCommandMoveToSaturationRequest_t *request)
 {
   uint8_t saturation;
   uint16_t transitionTime;
@@ -619,7 +607,7 @@ void emberZclClusterColorControlServerCommandMoveToSaturationRequestHandler(cons
   transitionTime = request->transitionTime;
 
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
 
   if (transitionTime == 0) {
     transitionTime++;
@@ -628,7 +616,7 @@ void emberZclClusterColorControlServerCommandMoveToSaturationRequestHandler(cons
   // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
   // this and report a malformed packet.
   if (saturation > MAX_SATURATION_VALUE) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_MALFORMED_COMMAND);
     return;
   }
 
@@ -655,20 +643,20 @@ void emberZclClusterColorControlServerCommandMoveToSaturationRequestHandler(cons
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandStepHueRequestHandler(const EmberZclCommandContext_t *context,
-                                                                   const EmberZclClusterColorControlServerCommandStepHueRequest_t *request)
+void chipZclClusterColorControlServerCommandStepHueRequestHandler(const ChipZclCommandContext_t *context,
+                                                                   const ChipZclClusterColorControlServerCommandStepHueRequest_t *request)
 {
   uint8_t stepMode;
   uint8_t stepSize;
   uint8_t transitionTime;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
   uint8_t currentHue = readHue(endpoint);
 
   stepMode = request->stepMode;
@@ -683,7 +671,7 @@ void emberZclClusterColorControlServerCommandStepHueRequestHandler(const EmberZc
   stopAllColorTransitions();
 
   if (stepMode == MOVE_MODE_STOP) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -713,20 +701,20 @@ void emberZclClusterColorControlServerCommandStepHueRequestHandler(const EmberZc
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandStepSaturationRequestHandler(const EmberZclCommandContext_t *context,
-                                                                          const EmberZclClusterColorControlServerCommandStepSaturationRequest_t *request)
+void chipZclClusterColorControlServerCommandStepSaturationRequestHandler(const ChipZclCommandContext_t *context,
+                                                                          const ChipZclClusterColorControlServerCommandStepSaturationRequest_t *request)
 {
   uint8_t stepMode;
   uint8_t stepSize;
   uint8_t transitionTime;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
   uint8_t currentSaturation = readSaturation(endpoint);
 
   stepMode = request->stepMode;
@@ -741,7 +729,7 @@ void emberZclClusterColorControlServerCommandStepSaturationRequestHandler(const 
   stopAllColorTransitions();
 
   if (stepMode == MOVE_MODE_STOP) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -773,24 +761,24 @@ void emberZclClusterColorControlServerCommandStepSaturationRequestHandler(const 
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
 #endif
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef CHIP_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-void emberZclClusterColorControlServerCommandMoveToColorRequestHandler(const EmberZclCommandContext_t *context,
-                                                                       const EmberZclClusterColorControlServerCommandMoveToColorRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveToColorRequestHandler(const ChipZclCommandContext_t *context,
+                                                                       const ChipZclClusterColorControlServerCommandMoveToColorRequest_t *request)
 {
   uint16_t colorX;
   uint16_t colorY;
   uint16_t transitionTime;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
 
   colorX = request->colorX;
   colorY = request->colorY;
@@ -828,19 +816,19 @@ void emberZclClusterColorControlServerCommandMoveToColorRequestHandler(const Emb
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandMoveColorRequestHandler(const EmberZclCommandContext_t *context,
-                                                                     const EmberZclClusterColorControlServerCommandMoveColorRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveColorRequestHandler(const ChipZclCommandContext_t *context,
+                                                                     const ChipZclClusterColorControlServerCommandMoveColorRequest_t *request)
 {
   int16_t rateX;
   int16_t rateY;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
   uint16_t transitionTimeX, transitionTimeY;
   uint16_t unsignedRate;
 
@@ -897,20 +885,20 @@ void emberZclClusterColorControlServerCommandMoveColorRequestHandler(const Ember
   }
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandStepColorRequestHandler(const EmberZclCommandContext_t *context,
-                                                                     const EmberZclClusterColorControlServerCommandStepColorRequest_t *request)
+void chipZclClusterColorControlServerCommandStepColorRequestHandler(const ChipZclCommandContext_t *context,
+                                                                     const ChipZclClusterColorControlServerCommandStepColorRequest_t *request)
 {
   int16_t stepX;
   int16_t stepY;
   uint16_t transitionTime;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
   uint16_t colorX;
   uint16_t colorY;
 
@@ -953,23 +941,23 @@ void emberZclClusterColorControlServerCommandStepColorRequestHandler(const Ember
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
 #endif
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef CHIP_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-void emberZclClusterColorControlServerCommandMoveToColorTemperatureRequestHandler(const EmberZclCommandContext_t *context,
-                                                                                  const EmberZclClusterColorControlServerCommandMoveToColorTemperatureRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveToColorTemperatureRequestHandler(const ChipZclCommandContext_t *context,
+                                                                                  const ChipZclClusterColorControlServerCommandMoveToColorTemperatureRequest_t *request)
 {
   uint16_t colorTemperature;
   uint16_t transitionTime;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
   uint16_t temperatureMin = readColorTemperatureMin(endpoint);
   uint16_t temperatureMax = readColorTemperatureMax(endpoint);
 
@@ -1005,21 +993,21 @@ void emberZclClusterColorControlServerCommandMoveToColorTemperatureRequestHandle
   colorTempTransitionState.highLimit = temperatureMax;
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandMoveColorTemperatureRequestHandler(const EmberZclCommandContext_t *context,
-                                                                                const EmberZclClusterColorControlServerCommandMoveColorTemperatureRequest_t *request)
+void chipZclClusterColorControlServerCommandMoveColorTemperatureRequestHandler(const ChipZclCommandContext_t *context,
+                                                                                const ChipZclClusterColorControlServerCommandMoveColorTemperatureRequest_t *request)
 {
   uint8_t moveMode;
   uint16_t rate;
   uint16_t colorTemperatureMinimum;
   uint16_t colorTemperatureMaximum;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
   uint16_t tempPhysicalMin = readColorTemperatureMin(endpoint);
   uint16_t tempPhysicalMax = readColorTemperatureMax(endpoint);
   uint16_t transitionTime;
@@ -1033,7 +1021,7 @@ void emberZclClusterColorControlServerCommandMoveColorTemperatureRequestHandler(
   stopAllColorTransitions();
 
   if (moveMode == MOVE_MODE_STOP) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -1075,14 +1063,14 @@ void emberZclClusterColorControlServerCommandMoveColorTemperatureRequestHandler(
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
-void emberZclClusterColorControlServerCommandStepColorTemperatureRequestHandler(const EmberZclCommandContext_t *context,
-                                                                                const EmberZclClusterColorControlServerCommandStepColorTemperatureRequest_t *request)
+void chipZclClusterColorControlServerCommandStepColorTemperatureRequestHandler(const ChipZclCommandContext_t *context,
+                                                                                const ChipZclClusterColorControlServerCommandStepColorTemperatureRequest_t *request)
 {
   uint8_t stepMode;
   uint16_t stepSize;
@@ -1090,7 +1078,7 @@ void emberZclClusterColorControlServerCommandStepColorTemperatureRequestHandler(
   uint16_t colorTemperatureMinimum;
   uint16_t colorTemperatureMaximum;
   //TODO: Add multi endpoint support once it is available from the stack
-  EmberZclEndpointId_t endpoint = 1;//context->endpointId;
+  ChipZclEndpointId_t endpoint = 1;//context->endpointId;
   uint16_t tempPhysicalMin = readColorTemperatureMin(endpoint);
   uint16_t tempPhysicalMax = readColorTemperatureMax(endpoint);
 
@@ -1108,7 +1096,7 @@ void emberZclClusterColorControlServerCommandStepColorTemperatureRequestHandler(
   stopAllColorTransitions();
 
   if (stepMode == MOVE_MODE_STOP) {
-    emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
     return;
   }
 
@@ -1141,21 +1129,21 @@ void emberZclClusterColorControlServerCommandStepColorTemperatureRequestHandler(
   writeRemainingTime(endpoint, transitionTime);
 
   // kick off the state machine:
-  emberEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+  chipEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
 #endif
 
-void emberZclClusterColorControlServerCommandStopMoveStepRequestHandler(const EmberZclCommandContext_t *context,
-                                                                        const EmberZclClusterColorControlServerCommandStopMoveStepRequest_t *request)
+void chipZclClusterColorControlServerCommandStopMoveStepRequestHandler(const ChipZclCommandContext_t *context,
+                                                                        const ChipZclClusterColorControlServerCommandStopMoveStepRequest_t *request)
 {
   // Received a stop command.  This is all we need to do.
   stopAllColorTransitions();
 
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
   return;
 }
 
@@ -1163,12 +1151,12 @@ void emberZclClusterColorControlServerCommandStopMoveStepRequestHandler(const Em
 
 static void stopAllColorTransitions(void)
 {
-  emberEventControlSetInactive(COLOR_TEMP_CONTROL);
-  emberEventControlSetInactive(COLOR_XY_CONTROL);
-  emberEventControlSetInactive(COLOR_HSV_CONTROL);
+  chipEventControlSetInactive(COLOR_TEMP_CONTROL);
+  chipEventControlSetInactive(COLOR_XY_CONTROL);
+  chipEventControlSetInactive(COLOR_HSV_CONTROL);
 }
 
-void emberAfPluginColorControlServerStopTransition(void)
+void chipAfPluginColorControlServerStopTransition(void)
 {
   stopAllColorTransitions();
 }
@@ -1195,22 +1183,22 @@ static void handleModeSwitch(uint8_t endpoint, uint8_t newColorMode)
   // Note:  It may be OK to not do anything here.
   switch (colorModeTransition) {
     case HSV_TO_CIE_XY:
-      emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
+      chipAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
       break;
     case TEMPERATURE_TO_CIE_XY:
-      emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
+      chipAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
       break;
     case CIE_XY_TO_HSV:
-      emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint);
+      chipAfPluginColorControlServerComputePwmFromHsvCallback(endpoint);
       break;
     case TEMPERATURE_TO_HSV:
-      emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint);
+      chipAfPluginColorControlServerComputePwmFromHsvCallback(endpoint);
       break;
     case HSV_TO_TEMPERATURE:
-      emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint);
+      chipAfPluginColorControlServerComputePwmFromTempCallback(endpoint);
       break;
     case CIE_XY_TO_TEMPERATURE:
-      emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint);
+      chipAfPluginColorControlServerComputePwmFromTempCallback(endpoint);
       break;
 
     // for the following cases, there is no transition.
@@ -1354,7 +1342,7 @@ static bool computeNewHueValue(ColorHueTransitionState *p)
   return false;
 }
 
-void emZclColorControlServerHueSatTransitionEventHandler(void)
+void chZclColorControlServerHueSatTransitionEventHandler(void)
 {
   uint8_t endpoint = colorHueTransitionState.endpoint;
   boolean limitReached1, limitReached2;
@@ -1365,7 +1353,7 @@ void emZclColorControlServerHueSatTransitionEventHandler(void)
   if (limitReached1 || limitReached2) {
     stopAllColorTransitions();
   } else {
-    emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    chipEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
   }
 
   writeHue(colorHueTransitionState.endpoint,
@@ -1373,12 +1361,12 @@ void emZclColorControlServerHueSatTransitionEventHandler(void)
   writeSaturation(colorSaturationTransitionState.endpoint,
                   (uint8_t) colorSaturationTransitionState.currentValue);
 
-  emberAfCorePrintln("Hue %d Saturation %d endpoint %d",
+  chipAfCorePrintln("Hue %d Saturation %d endpoint %d",
                      colorHueTransitionState.currentHue,
                      colorSaturationTransitionState.currentValue,
                      endpoint);
 
-  emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint);
+  chipAfPluginColorControlServerComputePwmFromHsvCallback(endpoint);
 }
 
 // Return value of true means we need to stop.
@@ -1442,7 +1430,7 @@ static uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState *p
   return (uint16_t) transitionTime;
 }
 
-void emZclColorControlServerXyTransitionEventHandler(void)
+void chZclColorControlServerXyTransitionEventHandler(void)
 {
   uint8_t endpoint = colorXTransitionState.endpoint;
   boolean limitReachedX, limitReachedY;
@@ -1455,7 +1443,7 @@ void emZclColorControlServerXyTransitionEventHandler(void)
   if (limitReachedX || limitReachedY) {
     stopAllColorTransitions();
   } else {
-    emberEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
+    chipEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
   }
 
   // update the attributes
@@ -1464,14 +1452,14 @@ void emZclColorControlServerXyTransitionEventHandler(void)
   writeColorY(colorXTransitionState.endpoint,
               colorYTransitionState.currentValue);
 
-  emberAfCorePrintln("Color X %d Color Y %d",
+  chipAfCorePrintln("Color X %d Color Y %d",
                      colorXTransitionState.currentValue,
                      colorYTransitionState.currentValue);
 
-  emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
+  chipAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
 }
 
-void emZclColorControlServerTempTransitionEventHandler(void)
+void chZclColorControlServerTempTransitionEventHandler(void)
 {
   uint8_t endpoint = colorTempTransitionState.endpoint;
   boolean limitReached;
@@ -1481,24 +1469,24 @@ void emZclColorControlServerTempTransitionEventHandler(void)
   if (limitReached) {
     stopAllColorTransitions();
   } else {
-    emberEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+    chipEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
   }
 
   writeColorTemperature(colorTempTransitionState.endpoint,
                         colorTempTransitionState.currentValue);
 
-  emberAfCorePrintln("Color Temperature %d",
+  chipAfCorePrintln("Color Temperature %d",
                      colorTempTransitionState.currentValue);
 
-  emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint);
+  chipAfPluginColorControlServerComputePwmFromTempCallback(endpoint);
 }
 
-#ifdef EMBER_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
 // Scenes callback handlers...
 
-void emZclColorControlServerEraseSceneHandler(uint8_t tableIdx)
+void chZclColorControlServerEraseSceneHandler(uint8_t tableIdx)
 {
-  EmZclColorControlSceneSubTableEntry_t entry;
+  ChZclColorControlSceneSubTableEntry_t entry;
 
   entry.hasCurrentXValue = false;
   entry.hasCurrentYValue = false;
@@ -1511,46 +1499,46 @@ void emZclColorControlServerEraseSceneHandler(uint8_t tableIdx)
   saveSceneSubTableEntry(entry, tableIdx);
 }
 
-bool emZclColorControlServerAddSceneHandler(EmberZclClusterId_t clusterId,
+bool chZclColorControlServerAddSceneHandler(ChipZclClusterId_t clusterId,
                                             uint8_t tableIdx,
                                             const uint8_t *sceneData,
                                             uint8_t length)
 {
-  if (clusterId == EMBER_ZCL_CLUSTER_COLOR_CONTROL) {
+  if (clusterId == CHIP_ZCL_CLUSTER_COLOR_CONTROL) {
     if (length < 2) {
       return false; // ext field format error (currentXValue bytes must be present, other bytes optional).
     }
 
     // Extract bytes from input data block and update scene subtable fields.
-    EmZclColorControlSceneSubTableEntry_t entry = { 0 };
+    ChZclColorControlSceneSubTableEntry_t entry = { 0 };
     uint8_t *pData = (uint8_t *)sceneData;
 
     entry.hasCurrentXValue = true;
-    entry.currentXValue = emberZclPluginScenesServerGetUint16FromBuffer(&pData);
+    entry.currentXValue = chipZclPluginScenesServerGetUint16FromBuffer(&pData);
     length -= 2;
     if (length >= 2) {
       entry.hasCurrentYValue = true;
-      entry.currentYValue = emberZclPluginScenesServerGetUint16FromBuffer(&pData);
+      entry.currentYValue = chipZclPluginScenesServerGetUint16FromBuffer(&pData);
       length -= 2;
       if (length >= 2) {
         entry.hasEnhancedCurrentHueValue = true;
-        entry.enhancedCurrentHueValue = emberZclPluginScenesServerGetUint16FromBuffer(&pData);
+        entry.enhancedCurrentHueValue = chipZclPluginScenesServerGetUint16FromBuffer(&pData);
         length -= 2;
         if (length >= 1) {
           entry.hasCurrentSaturationValue = true;
-          entry.currentSaturationValue = emberZclPluginScenesServerGetUint8FromBuffer(&pData);
+          entry.currentSaturationValue = chipZclPluginScenesServerGetUint8FromBuffer(&pData);
           length--;
           if (length >= 1) {
             entry.hasColorLoopActiveValue = true;
-            entry.colorLoopActiveValue = emberZclPluginScenesServerGetUint8FromBuffer(&pData);
+            entry.colorLoopActiveValue = chipZclPluginScenesServerGetUint8FromBuffer(&pData);
             length--;
             if (length >= 1) {
               entry.hasColorLoopDirectionValue = true;
-              entry.colorLoopDirectionValue = emberZclPluginScenesServerGetUint8FromBuffer(&pData);
+              entry.colorLoopDirectionValue = chipZclPluginScenesServerGetUint8FromBuffer(&pData);
               length--;
               if (length >= 2) {
                 entry.hasColorLoopTimeValue = true;
-                entry.colorLoopTimeValue = emberZclPluginScenesServerGetUint16FromBuffer(&pData);
+                entry.colorLoopTimeValue = chipZclPluginScenesServerGetUint16FromBuffer(&pData);
               }
             }
           }
@@ -1566,7 +1554,7 @@ bool emZclColorControlServerAddSceneHandler(EmberZclClusterId_t clusterId,
   return false;
 }
 
-void emZclColorControlServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
+void chZclColorControlServerRecallSceneHandler(ChipZclEndpointId_t endpointId,
                                                uint8_t tableIdx,
                                                uint32_t transitionTime100mS)
 {
@@ -1576,20 +1564,20 @@ void emZclColorControlServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
   // to the relevant color control command handler to actually change the
   // hw state at the rate specified by the transition time.
 
-  EmZclColorControlSceneSubTableEntry_t entry;
+  ChZclColorControlSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
   if (entry.hasCurrentXValue) {
-    emberZclWriteAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
+    chipZclWriteAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
                            (uint8_t *)&entry.currentXValue,
                            sizeof(entry.currentXValue));
   }
   if (entry.hasCurrentYValue) {
-    emberZclWriteAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
+    chipZclWriteAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
                            (uint8_t *)&entry.currentYValue,
                            sizeof(entry.currentYValue));
   }
@@ -1600,107 +1588,107 @@ void emZclColorControlServerRecallSceneHandler(EmberZclEndpointId_t endpointId,
       && (entry.currentXValue == 0)
       && (entry.currentYValue == 0)) {
     if (entry.hasEnhancedCurrentHueValue) {
-      emberZclWriteAttribute(endpointId,
-                             &emberZclClusterColorControlServerSpec,
-                             EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_ENHANCED_CURRENT_HUE,
+      chipZclWriteAttribute(endpointId,
+                             &chipZclClusterColorControlServerSpec,
+                             CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_ENHANCED_CURRENT_HUE,
                              (uint8_t *)&entry.enhancedCurrentHueValue,
                              sizeof(entry.enhancedCurrentHueValue));
     }
     if (entry.hasCurrentSaturationValue) {
-      emberZclWriteAttribute(endpointId,
-                             &emberZclClusterColorControlServerSpec,
-                             EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
+      chipZclWriteAttribute(endpointId,
+                             &chipZclClusterColorControlServerSpec,
+                             CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
                              (uint8_t *)&entry.currentSaturationValue,
                              sizeof(entry.currentSaturationValue));
     }
     if (entry.hasColorLoopActiveValue) {
-      emberZclWriteAttribute(endpointId,
-                             &emberZclClusterColorControlServerSpec,
-                             EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_ACTIVE,
+      chipZclWriteAttribute(endpointId,
+                             &chipZclClusterColorControlServerSpec,
+                             CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_ACTIVE,
                              (uint8_t *)&entry.colorLoopActiveValue,
                              sizeof(entry.colorLoopActiveValue));
     }
     if (entry.hasColorLoopDirectionValue) {
-      emberZclWriteAttribute(endpointId,
-                             &emberZclClusterColorControlServerSpec,
-                             EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_DIRECTION,
+      chipZclWriteAttribute(endpointId,
+                             &chipZclClusterColorControlServerSpec,
+                             CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_DIRECTION,
                              (uint8_t *)&entry.colorLoopDirectionValue,
                              sizeof(entry.colorLoopDirectionValue));
     }
     if (entry.hasColorLoopTimeValue) {
-      emberZclWriteAttribute(endpointId,
-                             &emberZclClusterColorControlServerSpec,
-                             EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_TIME,
+      chipZclWriteAttribute(endpointId,
+                             &chipZclClusterColorControlServerSpec,
+                             CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_TIME,
                              (uint8_t *)&entry.colorLoopTimeValue,
                              sizeof(entry.colorLoopTimeValue));
     }
   }
 }
 
-void emZclColorControlServerStoreSceneHandler(EmberZclEndpointId_t endpointId,
+void chZclColorControlServerStoreSceneHandler(ChipZclEndpointId_t endpointId,
                                               uint8_t tableIdx)
 {
-  EmZclColorControlSceneSubTableEntry_t entry;
+  ChZclColorControlSceneSubTableEntry_t entry;
 
   entry.hasCurrentXValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_X,
                            (uint8_t *)&entry.currentXValue,
-                           sizeof(entry.currentXValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.currentXValue)) == CHIP_ZCL_STATUS_SUCCESS);
   entry.hasCurrentYValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_Y,
                            (uint8_t *)&entry.currentYValue,
-                           sizeof(entry.currentYValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.currentYValue)) == CHIP_ZCL_STATUS_SUCCESS);
   entry.hasEnhancedCurrentHueValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_ENHANCED_CURRENT_HUE,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_ENHANCED_CURRENT_HUE,
                            (uint8_t *)&entry.enhancedCurrentHueValue,
-                           sizeof(entry.enhancedCurrentHueValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.enhancedCurrentHueValue)) == CHIP_ZCL_STATUS_SUCCESS);
   entry.hasCurrentSaturationValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_CURRENT_SATURATION,
                            (uint8_t *)&entry.currentSaturationValue,
-                           sizeof(entry.currentSaturationValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.currentSaturationValue)) == CHIP_ZCL_STATUS_SUCCESS);
   entry.hasColorLoopActiveValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_ACTIVE,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_ACTIVE,
                            (uint8_t *)&entry.colorLoopActiveValue,
-                           sizeof(entry.colorLoopActiveValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.colorLoopActiveValue)) == CHIP_ZCL_STATUS_SUCCESS);
   entry.hasColorLoopDirectionValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_DIRECTION,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_DIRECTION,
                            (uint8_t *)&entry.colorLoopDirectionValue,
-                           sizeof(entry.colorLoopDirectionValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.colorLoopDirectionValue)) == CHIP_ZCL_STATUS_SUCCESS);
   entry.hasColorLoopTimeValue =
-    (emberZclReadAttribute(endpointId,
-                           &emberZclClusterColorControlServerSpec,
-                           EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_TIME,
+    (chipZclReadAttribute(endpointId,
+                           &chipZclClusterColorControlServerSpec,
+                           CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_LOOP_TIME,
                            (uint8_t *)&entry.colorLoopTimeValue,
-                           sizeof(entry.colorLoopTimeValue)) == EMBER_ZCL_STATUS_SUCCESS);
+                           sizeof(entry.colorLoopTimeValue)) == CHIP_ZCL_STATUS_SUCCESS);
 
   saveSceneSubTableEntry(entry, tableIdx);
 }
 
-void emZclColorControlServerCopySceneHandler(uint8_t srcTableIdx,
+void chZclColorControlServerCopySceneHandler(uint8_t srcTableIdx,
                                              uint8_t dstTableIdx)
 {
-  EmZclColorControlSceneSubTableEntry_t entry;
+  ChZclColorControlSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, srcTableIdx);
 
   saveSceneSubTableEntry(entry, dstTableIdx);
 }
 
-void emZclColorControlServerViewSceneHandler(uint8_t tableIdx,
+void chZclColorControlServerViewSceneHandler(uint8_t tableIdx,
                                              uint8_t **ppExtFldData)
 {
-  EmZclColorControlSceneSubTableEntry_t entry;
+  ChZclColorControlSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
   if ((entry.hasCurrentXValue)
@@ -1710,39 +1698,39 @@ void emZclColorControlServerViewSceneHandler(uint8_t tableIdx,
       || (entry.hasColorLoopActiveValue)
       || (entry.hasColorLoopDirectionValue)
       || (entry.hasColorLoopTimeValue)) {
-    emberZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
-                                                EMBER_ZCL_CLUSTER_COLOR_CONTROL);
+    chipZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
+                                                CHIP_ZCL_CLUSTER_COLOR_CONTROL);
 
     uint8_t *pLength = *ppExtFldData;  // Save pointer to length byte.
     *pLength = 0;
-    emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData, *pLength); // Insert temporary length value.
+    chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData, *pLength); // Insert temporary length value.
 
     if (entry.hasCurrentXValue) {
-      emberZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
+      chipZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
                                                   entry.currentXValue);
     }
     if (entry.hasCurrentYValue) {
-      emberZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
+      chipZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
                                                   entry.currentYValue);
     }
     if (entry.hasEnhancedCurrentHueValue) {
-      emberZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
+      chipZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
                                                   entry.enhancedCurrentHueValue);
     }
     if (entry.hasCurrentSaturationValue) {
-      emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
+      chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
                                                  entry.currentSaturationValue);
     }
     if (entry.hasColorLoopActiveValue) {
-      emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
+      chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
                                                  entry.colorLoopActiveValue);
     }
     if (entry.hasColorLoopDirectionValue) {
-      emberZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
+      chipZclPluginScenesServerPutUint8InBuffer(ppExtFldData,
                                                  entry.colorLoopDirectionValue);
     }
     if (entry.hasColorLoopTimeValue) {
-      emberZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
+      chipZclPluginScenesServerPutUint16InBuffer(ppExtFldData,
                                                   entry.colorLoopTimeValue);
     }
 
@@ -1751,21 +1739,21 @@ void emZclColorControlServerViewSceneHandler(uint8_t tableIdx,
   }
 }
 
-void emZclColorControlServerPrintInfoSceneHandler(uint8_t tableIdx)
+void chZclColorControlServerPrintInfoSceneHandler(uint8_t tableIdx)
 {
-  EmZclColorControlSceneSubTableEntry_t entry;
+  ChZclColorControlSceneSubTableEntry_t entry;
   retrieveSceneSubTableEntry(entry, tableIdx);
 
-  emberAfCorePrint(" color:%2x %2x",
+  chipAfCorePrint(" color:%2x %2x",
                    entry.currentXValue,
                    entry.currentYValue);
 
-  emberAfCorePrint(" %2x %x %x %x %2x",
+  chipAfCorePrint(" %2x %x %x %x %2x",
                    entry.enhancedCurrentHueValue,
                    entry.currentSaturationValue,
                    entry.colorLoopActiveValue,
                    entry.colorLoopDirectionValue,
                    entry.colorLoopTimeValue);
-  emberAfCoreFlush();
+  chipAfCoreFlush();
 }
 #endif

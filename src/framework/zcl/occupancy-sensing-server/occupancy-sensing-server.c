@@ -17,15 +17,15 @@
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_COMMAND_INTERPRETER2
-  #include EMBER_AF_API_COMMAND_INTERPRETER2
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_COMMAND_INTERPRETER2
+  #include CHIP_AF_API_COMMAND_INTERPRETER2
 #endif
-#include EMBER_AF_API_OCCUPANCY
+#include CHIP_AF_API_OCCUPANCY
 
 #include "thread-callbacks.h"
 
@@ -34,27 +34,27 @@ static void writeOccupancyState(HalOccupancyState occupancyState);
 // On initialization, set the device type attribute to the type reported by the
 // hardware plugin, in case the user forgot to set a default type for their
 // project
-void emZclOccupancySensingServerInitHandler(void)
+void chZclOccupancySensingServerInitHandler(void)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
   HalOccupancySensorType deviceType;
-  EmberZclEndpointId_t endpoint;
-  EmberZclEndpointIndex_t i;
+  ChipZclEndpointId_t endpoint;
+  ChipZclEndpointIndex_t i;
 
   deviceType = halOccupancyGetSensorType();
 
-  for (i = 0; i < emZclEndpointCount; i++) {
-    endpoint = emberZclEndpointIndexToId(i,
-                                         &emberZclClusterOccupancySensingServerSpec);
-    if (endpoint != EMBER_ZCL_ENDPOINT_NULL) {
+  for (i = 0; i < chZclEndpointCount; i++) {
+    endpoint = chipZclEndpointIndexToId(i,
+                                         &chipZclClusterOccupancySensingServerSpec);
+    if (endpoint != CHIP_ZCL_ENDPOINT_NULL) {
       status
-        = emberZclWriteAttribute(endpoint,
-                                 &emberZclClusterOccupancySensingServerSpec,
-                                 EMBER_ZCL_CLUSTER_OCCUPANCY_SENSING_SERVER_ATTRIBUTE_OCCUPANCY_SENSOR_TYPE,
+        = chipZclWriteAttribute(endpoint,
+                                 &chipZclClusterOccupancySensingServerSpec,
+                                 CHIP_ZCL_CLUSTER_OCCUPANCY_SENSING_SERVER_ATTRIBUTE_OCCUPANCY_SENSOR_TYPE,
                                  (uint8_t *) &deviceType,
                                  sizeof(uint8_t));
-      if (status != EMBER_ZCL_STATUS_SUCCESS) {
-        emberAfCorePrintln("Occupancy Sensing Server: failed to write value "
+      if (status != CHIP_ZCL_STATUS_SUCCESS) {
+        chipAfCorePrintln("Occupancy Sensing Server: failed to write value "
                            "0x%x to sensor type attribute of endpoint %d",
                            deviceType,
                            endpoint);
@@ -66,9 +66,9 @@ void emZclOccupancySensingServerInitHandler(void)
 void halOccupancyStateChangedCallback(HalOccupancyState occupancyState)
 {
   if (occupancyState == HAL_OCCUPANCY_STATE_OCCUPIED) {
-    emberAfCorePrintln("Occupancy detected");
+    chipAfCorePrintln("Occupancy detected");
   } else {
-    emberAfCorePrintln("Occupancy no longer detected");
+    chipAfCorePrintln("Occupancy no longer detected");
   }
 
   writeOccupancyState(occupancyState);
@@ -78,7 +78,7 @@ void halOccupancyStateChangedCallback(HalOccupancyState occupancyState)
   // in the case that occupancy is detected while the occupancy attribute is
   // already set to occupied, which can be helpful when doing things like
   // implementing a calibration mode
-  emberZclOccupancySensingServerOccupancyStateChangedCallback(occupancyState);
+  chipZclOccupancySensingServerOccupancyStateChangedCallback(occupancyState);
 }
 
 // Plugin CLI functions
@@ -86,9 +86,9 @@ void occupancySetCommand(void)
 {
   uint8_t occupancyState;
 
-  occupancyState = emberUnsignedCommandArgument(0);
+  occupancyState = chipUnsignedCommandArgument(0);
 
-  emberAfAppPrintln("setting occupied state to: %d", occupancyState);
+  chipAfAppPrintln("setting occupied state to: %d", occupancyState);
   halOccupancyStateChangedCallback((HalOccupancyState)occupancyState);
 }
 
@@ -96,22 +96,22 @@ void occupancySetCommand(void)
 
 static void writeOccupancyState(HalOccupancyState occupancyState)
 {
-  EmberZclStatus_t status;
-  EmberZclEndpointId_t endpoint;
-  EmberZclEndpointIndex_t i;
+  ChipZclStatus_t status;
+  ChipZclEndpointId_t endpoint;
+  ChipZclEndpointIndex_t i;
 
-  for (i = 0; i < emZclEndpointCount; i++) {
-    endpoint = emberZclEndpointIndexToId(i,
-                                         &emberZclClusterOccupancySensingServerSpec);
-    if (endpoint != EMBER_ZCL_ENDPOINT_NULL) {
+  for (i = 0; i < chZclEndpointCount; i++) {
+    endpoint = chipZclEndpointIndexToId(i,
+                                         &chipZclClusterOccupancySensingServerSpec);
+    if (endpoint != CHIP_ZCL_ENDPOINT_NULL) {
       status
-        = emberZclWriteAttribute(endpoint,
-                                 &emberZclClusterOccupancySensingServerSpec,
-                                 EMBER_ZCL_CLUSTER_OCCUPANCY_SENSING_SERVER_ATTRIBUTE_OCCUPANCY,
+        = chipZclWriteAttribute(endpoint,
+                                 &chipZclClusterOccupancySensingServerSpec,
+                                 CHIP_ZCL_CLUSTER_OCCUPANCY_SENSING_SERVER_ATTRIBUTE_OCCUPANCY,
                                  (uint8_t *) &occupancyState,
                                  sizeof(uint8_t));
-      if (status != EMBER_ZCL_STATUS_SUCCESS) {
-        emberAfCorePrintln("Occupancy Sensing Server: failed to write value "
+      if (status != CHIP_ZCL_STATUS_SUCCESS) {
+        chipAfCorePrintln("Occupancy Sensing Server: failed to write value "
                            "0x%x to occupancy state attribute of endpoint %d",
                            occupancyState,
                            endpoint);

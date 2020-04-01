@@ -1,39 +1,27 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_BUFFER_MANAGEMENT
-#include EMBER_AF_API_EVENT_QUEUE
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CORE
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_STORAGE_CORE
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_BUFFER_MANAGEMENT
+#include CHIP_AF_API_EVENT_QUEUE
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_CORE
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_STORAGE_CORE
 #include "ota-bootload-storage-unix.h"
 
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #else
-  #define emberAfPluginOtaBootloadStorageUnixPrint(...)
-  #define emberAfPluginOtaBootloadStorageUnixPrintln(...)
-  #define emberAfPluginOtaBootloadStorageUnixFlush()
-  #define emberAfPluginOtaBootloadStorageUnixDebugExec(x)
-  #define emberAfPluginOtaBootloadStorageUnixPrintBuffer(buffer, len, withSpace)
-  #define emberAfPluginOtaBootloadStorageUnixPrintString(buffer)
+  #define chipAfPluginOtaBootloadStorageUnixPrint(...)
+  #define chipAfPluginOtaBootloadStorageUnixPrintln(...)
+  #define chipAfPluginOtaBootloadStorageUnixFlush()
+  #define chipAfPluginOtaBootloadStorageUnixDebugExec(x)
+  #define chipAfPluginOtaBootloadStorageUnixPrintBuffer(buffer, len, withSpace)
+  #define chipAfPluginOtaBootloadStorageUnixPrintString(buffer)
 #endif
 
 #include <unistd.h>
@@ -64,7 +52,7 @@
 // Types
 
 typedef struct File_tag {
-  EmberZclOtaBootloadFileHeaderInfo_t headerInfo;
+  ChipZclOtaBootloadFileHeaderInfo_t headerInfo;
   char name[MAX_FILENAME_SIZE + 1]; // add a byte for the NUL-terminator
   FILE *file;
   uint16_t totalHeaderSize;
@@ -74,7 +62,7 @@ typedef struct File_tag {
 // -----------------------------------------------------------------------------
 // Globals
 
-static EmberZclOtaBootloadStorageInfo_t storageInfo = {
+static ChipZclOtaBootloadStorageInfo_t storageInfo = {
   .maximumFileSize = MAX_FILE_SIZE,
   .fileCount = 0,
 };
@@ -85,12 +73,12 @@ static File_t *files = NULL;
 
 #if 0
 static void logPrint(const char *api,
-                     const EmberZclOtaBootloadFileSpec_t *fileSpec,
+                     const ChipZclOtaBootloadFileSpec_t *fileSpec,
                      size_t offset,
                      const uint8_t *data,
                      size_t dataLength)
 {
-  emberAfPluginOtaBootloadStorageUnixPrint("%s(m=%04X t=%04X v=%08X, o=%zu, l=%zu, [ ",
+  chipAfPluginOtaBootloadStorageUnixPrint("%s(m=%04X t=%04X v=%08X, o=%zu, l=%zu, [ ",
                                            api,
                                            fileSpec->manufacturerCode,
                                            fileSpec->type,
@@ -98,13 +86,13 @@ static void logPrint(const char *api,
                                            offset,
                                            dataLength);
   if (dataLength > MAX_FILE_SIZE) {
-    emberAfPluginOtaBootloadStorageUnixPrintln("hugeSize! ])");
+    chipAfPluginOtaBootloadStorageUnixPrintln("hugeSize! ])");
     return;
   }
   for (size_t i = 0; i < dataLength; i++) {
-    emberAfPluginOtaBootloadStorageUnixPrint("%02x ", data[i]);
+    chipAfPluginOtaBootloadStorageUnixPrint("%02x ", data[i]);
   }
-  emberAfPluginOtaBootloadStorageUnixPrintln("])");
+  chipAfPluginOtaBootloadStorageUnixPrintln("])");
 }
 #else
   #define logPrint(...)
@@ -112,82 +100,82 @@ static void logPrint(const char *api,
 
 // -------------------------------------
 // Storage management
-bool emberZclOtaBootloadStorageUnixWriteFileHeader(FILE *file,
-                                                   EmberZclOtaBootloadFileHeaderInfo_t *fileHeaderInfo,
+bool chipZclOtaBootloadStorageUnixWriteFileHeader(FILE *file,
+                                                   ChipZclOtaBootloadFileHeaderInfo_t *fileHeaderInfo,
                                                    size_t imageDataSize)
 {
   // The OTA file is little-endian.
-  uint8_t headerData[EMBER_ZCL_OTA_BOOTLOAD_HEADER_MAX_SIZE];
-  EmberZclOtaBootloadFileStatus_t status;
-  if ((status = emberZclOtaBootloadStoreFileHeaderInfo(headerData, fileHeaderInfo, imageDataSize))
-      != EMBER_ZCL_OTA_BOOTLOAD_FILE_STATUS_VALID) {
-    emberAfPluginOtaBootloadStorageUnixPrintln("StoreFileHeaderInfo status: %d", status);
+  uint8_t headerData[CHIP_ZCL_OTA_BOOTLOAD_HEADER_MAX_SIZE];
+  ChipZclOtaBootloadFileStatus_t status;
+  if ((status = chipZclOtaBootloadStoreFileHeaderInfo(headerData, fileHeaderInfo, imageDataSize))
+      != CHIP_ZCL_OTA_BOOTLOAD_FILE_STATUS_VALID) {
+    chipAfPluginOtaBootloadStorageUnixPrintln("StoreFileHeaderInfo status: %d", status);
     return true;
   }
 
   assert(fseek(file, 0, SEEK_SET) != -1); // TODO: what if this fails?
 
-  emberAfPluginOtaBootloadStorageUnixPrintln("HeaderSize: %d", fileHeaderInfo->headerSize);
+  chipAfPluginOtaBootloadStorageUnixPrintln("HeaderSize: %d", fileHeaderInfo->headerSize);
   return (fwrite(headerData, 1, fileHeaderInfo->headerSize, file) != fileHeaderInfo->headerSize);
 }
 
-bool emberZclOtaBootloadStorageUnixReadFileHeader(FILE *file,
-                                                  EmberZclOtaBootloadFileHeaderInfo_t *fileHeaderInfo)
+bool chipZclOtaBootloadStorageUnixReadFileHeader(FILE *file,
+                                                  ChipZclOtaBootloadFileHeaderInfo_t *fileHeaderInfo)
 {
   // The OTA file is little-endian.
-  uint8_t headerData[EMBER_ZCL_OTA_BOOTLOAD_HEADER_MAX_SIZE];
+  uint8_t headerData[CHIP_ZCL_OTA_BOOTLOAD_HEADER_MAX_SIZE];
   uint8_t *finger = headerData;
 
   assert(fseek(file, 0, SEEK_SET) != -1);
 
   #define PREHEADER_SIZE 8
   if (fread(headerData, 1, PREHEADER_SIZE, file) != PREHEADER_SIZE) {
-    emberAfPluginOtaBootloadStorageUnixPrint("Bad preheader read ");
+    chipAfPluginOtaBootloadStorageUnixPrint("Bad preheader read ");
     return true;
   }
 
   // Magic number.
-  if (EMBER_ZCL_OTA_BOOTLOAD_FILE_MAGIC_NUMBER != emberFetchLowHighInt32u(finger)) {
-    emberAfPluginOtaBootloadStorageUnixPrint("Bad magic (%d != %d) ", EMBER_ZCL_OTA_BOOTLOAD_FILE_MAGIC_NUMBER, emberFetchLowHighInt32u(finger));
+  if (CHIP_ZCL_OTA_BOOTLOAD_FILE_MAGIC_NUMBER != chipFetchLowHighInt32u(finger)) {
+    chipAfPluginOtaBootloadStorageUnixPrint("Bad magic (%d != %d) ", CHIP_ZCL_OTA_BOOTLOAD_FILE_MAGIC_NUMBER, chipFetchLowHighInt32u(finger));
     return true;
   }
   finger += sizeof(uint32_t);
 
   // Header version.
-  if (EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION != emberFetchLowHighInt16u(finger)) {
-    emberAfPluginOtaBootloadStorageUnixPrint("Bad version (%d != %d)", EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION, emberFetchLowHighInt16u(finger));
+  if (CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION != chipFetchLowHighInt16u(finger)) {
+    chipAfPluginOtaBootloadStorageUnixPrint("Bad version (%d != %d)", CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION, chipFetchLowHighInt16u(finger));
     return true;
   }
   finger += sizeof(uint16_t);
 
   // Total Header length
-  uint16_t totalHeaderSize = emberFetchLowHighInt16u(finger);
+  uint16_t totalHeaderSize = chipFetchLowHighInt16u(finger);
   finger += sizeof(uint16_t);
 
   uint16_t readCount = 0;
   if ((readCount = fread(finger, 1, totalHeaderSize - PREHEADER_SIZE, file)) != (totalHeaderSize - PREHEADER_SIZE)) {
-    emberAfPluginOtaBootloadStorageUnixPrint("Bad total header read (%d != %d) ", readCount, (totalHeaderSize - PREHEADER_SIZE));
+    chipAfPluginOtaBootloadStorageUnixPrint("Bad total header read (%d != %d) ", readCount, (totalHeaderSize - PREHEADER_SIZE));
     return true;
   }
 
-  if (emberZclOtaBootloadFetchFileHeaderInfo(headerData, fileHeaderInfo)
-      != EMBER_ZCL_OTA_BOOTLOAD_FILE_STATUS_VALID) {
-    emberAfPluginOtaBootloadStorageUnixPrint("Bad file status info");
+  if (chipZclOtaBootloadFetchFileHeaderInfo(headerData, fileHeaderInfo)
+      != CHIP_ZCL_OTA_BOOTLOAD_FILE_STATUS_VALID) {
+    chipAfPluginOtaBootloadStorageUnixPrint("Bad file status info");
     return true;
   }
   assert(fseek(file, 0, SEEK_END) != -1);
   if (ftell(file) != fileHeaderInfo->fileSize) {
-    emberAfPluginOtaBootloadStorageUnixPrint("Header reported size (%ld) and actual file size (%d) mismatch",
+    chipAfPluginOtaBootloadStorageUnixPrint("Header reported size (%ld) and actual file size (%d) mismatch",
                                              ftell(file),
                                              fileHeaderInfo->fileSize);
     return true;
   }
 
-  emberAfPluginOtaBootloadStorageUnixPrint("m=0x%04X t=0x%04X v=0x%08X", fileHeaderInfo->spec.manufacturerCode, fileHeaderInfo->spec.type, fileHeaderInfo->spec.version);
+  chipAfPluginOtaBootloadStorageUnixPrint("m=0x%04X t=0x%04X v=0x%08X", fileHeaderInfo->spec.manufacturerCode, fileHeaderInfo->spec.type, fileHeaderInfo->spec.version);
   return false;
 }
 
-static File_t *createFile(const char *fileName, const EmberZclOtaBootloadFileSpec_t *fileSpec)
+static File_t *createFile(const char *fileName, const ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   if (strncmp(fileName + strlen(fileName) - 4, ".ota", 4) != 0) {
     return NULL;
@@ -203,16 +191,16 @@ static File_t *createFile(const char *fileName, const EmberZclOtaBootloadFileSpe
     return NULL;
   }
 
-  if (emberZclOtaBootloadFileSpecsAreEqual(fileSpec, &emberZclOtaBootloadFileSpecNull)) {
-    newFile->headerInfo.spec = emberZclOtaBootloadFileSpecNull;
-    if (emberZclOtaBootloadStorageUnixReadFileHeader(newFile->file, &(newFile->headerInfo))) {
+  if (chipZclOtaBootloadFileSpecsAreEqual(fileSpec, &chipZclOtaBootloadFileSpecNull)) {
+    newFile->headerInfo.spec = chipZclOtaBootloadFileSpecNull;
+    if (chipZclOtaBootloadStorageUnixReadFileHeader(newFile->file, &(newFile->headerInfo))) {
       uint32_t manufCode, type, version;
       if (sscanf(newFile->name, FILENAME_FORMAT, &(manufCode), &(type), &(version)) != 3) {
         fclose(newFile->file);
         free(newFile);
         return NULL;
       } else {
-        emberAfPluginOtaBootloadStorageUnixPrint("Keeping anyway ");
+        chipAfPluginOtaBootloadStorageUnixPrint("Keeping anyway ");
         newFile->headerInfo.spec.manufacturerCode = manufCode;
         newFile->headerInfo.spec.type = type;
         newFile->headerInfo.spec.version = version;
@@ -305,26 +293,26 @@ static void loadFiles(void)
 
   struct dirent *ent;
   while ((ent = readdir(dir)) != NULL) {
-    emberAfPluginOtaBootloadStorageUnixPrint("%s: ", ent->d_name);
-    createFile(ent->d_name, &emberZclOtaBootloadFileSpecNull);
-    emberAfPluginOtaBootloadStorageUnixPrintln("");
+    chipAfPluginOtaBootloadStorageUnixPrint("%s: ", ent->d_name);
+    createFile(ent->d_name, &chipZclOtaBootloadFileSpecNull);
+    chipAfPluginOtaBootloadStorageUnixPrintln("");
   }
-  emberAfPluginOtaBootloadStorageUnixPrintln("Load files found %d files", storageInfo.fileCount);
+  chipAfPluginOtaBootloadStorageUnixPrintln("Load files found %d files", storageInfo.fileCount);
 
   assert(closedir(dir) == 0); // TODO: what if this fails?
 }
 
-static File_t *findFileHelper(const EmberZclOtaBootloadFileSpec_t *fileSpec)
+static File_t *findFileHelper(const ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   for (File_t *file = files; file != NULL; file = file->next) {
-    if (emberZclOtaBootloadFileSpecsAreEqual(&file->headerInfo.spec, fileSpec)) {
+    if (chipZclOtaBootloadFileSpecsAreEqual(&file->headerInfo.spec, fileSpec)) {
       return file;
     }
   }
   return NULL;
 }
 
-static File_t *findFile(const EmberZclOtaBootloadFileSpec_t *fileSpec)
+static File_t *findFile(const ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   File_t *ret = findFileHelper(fileSpec);
   if ((ret == NULL) || (access(ret->name, F_OK) != 0)) {
@@ -337,13 +325,13 @@ static File_t *findFile(const EmberZclOtaBootloadFileSpec_t *fileSpec)
 // -----------------------------------------------------------------------------
 // API
 
-void emZclOtaBootloadStorageUnixInitCallback(void)
+void chZclOtaBootloadStorageUnixInitCallback(void)
 {
   loadFiles();
 }
 
-void emberZclOtaBootloadStorageGetInfo(EmberZclOtaBootloadStorageInfo_t *info,
-                                       EmberZclOtaBootloadFileSpec_t *returnedFiles,
+void chipZclOtaBootloadStorageGetInfo(ChipZclOtaBootloadStorageInfo_t *info,
+                                       ChipZclOtaBootloadFileSpec_t *returnedFiles,
                                        size_t returnedFilesMaxCount)
 {
   loadFiles(); // force a rescan of the folder
@@ -355,27 +343,27 @@ void emberZclOtaBootloadStorageGetInfo(EmberZclOtaBootloadStorageInfo_t *info,
   }
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageFind(const EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                                  EmberZclOtaBootloadStorageFileInfo_t *fileInfo)
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageFind(const ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                                  ChipZclOtaBootloadStorageFileInfo_t *fileInfo)
 {
   File_t *file = findFile(fileSpec);
   if (file == NULL) {
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
   }
 
   fileInfo->size = file->headerInfo.fileSize;
 
-  return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
+  return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageCreate(const EmberZclOtaBootloadFileSpec_t *fileSpec)
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageCreate(const ChipZclOtaBootloadFileSpec_t *fileSpec)
 {
   File_t *file = findFile(fileSpec);
   if (file != NULL) {
     // We already are storing a file with this file spec! We can't store two
     // different files with the same file spec, because this would violate the
     // bijection from fileSpec's to actual files in storage.
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
   }
 
   char fileName[MAX_FILENAME_SIZE + 1];
@@ -383,13 +371,13 @@ EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageCreate(const EmberZ
   file = createFile(fileName, fileSpec);
   if (file == NULL) {
     // If we can't create the file, then a system error happened, most likely.
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_SPACE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_SPACE;
   }
 
-  return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
+  return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS;
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageRead(const EmberZclOtaBootloadFileSpec_t *fileSpec,
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageRead(const ChipZclOtaBootloadFileSpec_t *fileSpec,
                                                                   size_t offset,
                                                                   void *data,
                                                                   size_t dataLength)
@@ -398,13 +386,13 @@ EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageRead(const EmberZcl
 
   File_t *file = findFile(fileSpec);
   if (file == NULL) {
-    emberAfPluginOtaBootloadStorageUnixPrintln("Read: Invalid file");
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+    chipAfPluginOtaBootloadStorageUnixPrintln("Read: Invalid file");
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
   }
 
   if (offset + dataLength > file->headerInfo.fileSize) {
-    emberAfPluginOtaBootloadStorageUnixPrintln("Read: Out of range");
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
+    chipAfPluginOtaBootloadStorageUnixPrintln("Read: Out of range");
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
   }
 
   return (readOrWrite(file,
@@ -412,11 +400,11 @@ EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageRead(const EmberZcl
                       data,
                       dataLength,
                       true) // read?
-          ? EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS
-          : EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED);
+          ? CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS
+          : CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED);
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageWrite(const EmberZclOtaBootloadFileSpec_t *fileSpec,
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageWrite(const ChipZclOtaBootloadFileSpec_t *fileSpec,
                                                                    size_t offset,
                                                                    const void *data,
                                                                    size_t dataLength)
@@ -425,21 +413,21 @@ EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageWrite(const EmberZc
 
   File_t *file = findFile(fileSpec);
   if (file == NULL) {
-    emberAfPluginOtaBootloadStorageUnixPrintln("Write: Invalid file");
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+    chipAfPluginOtaBootloadStorageUnixPrintln("Write: Invalid file");
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
   }
 
   // Only allow sequential writes (see OTA Bootload Storage Core API).
   if (offset != file->headerInfo.fileSize) {
-    emberAfPluginOtaBootloadStorageUnixPrintln("Write: offset out of range (got: %d, expected: %d)",
+    chipAfPluginOtaBootloadStorageUnixPrintln("Write: offset out of range (got: %d, expected: %d)",
                                                offset,
                                                file->headerInfo.fileSize);
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
   }
 
   if (offset + dataLength > storageInfo.maximumFileSize) {
-    emberAfPluginOtaBootloadStorageUnixPrintln("Write: length out of range");
-    return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
+    chipAfPluginOtaBootloadStorageUnixPrintln("Write: length out of range");
+    return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_OUT_OF_RANGE;
   }
 
   bool success = readOrWrite(file,
@@ -450,31 +438,31 @@ EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageWrite(const EmberZc
   if (success) {
     file->headerInfo.fileSize += dataLength;
   }
-  emberAfPluginOtaBootloadStorageUnixPrintln("Write: success = %d", success);
+  chipAfPluginOtaBootloadStorageUnixPrintln("Write: success = %d", success);
   return (success
-          ? EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS
-          : EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED);
+          ? CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS
+          : CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED);
 }
 
-EmberZclOtaBootloadStorageStatus_t emberZclOtaBootloadStorageDelete(const EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                                    EmberZclOtaBootloadStorageDeleteCallback callback)
+ChipZclOtaBootloadStorageStatus_t chipZclOtaBootloadStorageDelete(const ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                                    ChipZclOtaBootloadStorageDeleteCallback callback)
 {
   logPrint("Delete", fileSpec, 0, NULL, 0);
 
   // If the NULL file spec is passed, we delete all files.
   File_t *file = NULL;
-  if (!emberZclOtaBootloadFileSpecsAreEqual(fileSpec,
-                                            &emberZclOtaBootloadFileSpecNull)) {
+  if (!chipZclOtaBootloadFileSpecsAreEqual(fileSpec,
+                                            &chipZclOtaBootloadFileSpecNull)) {
     file = findFile(fileSpec);
     if (file == NULL) {
-      return EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
+      return CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE;
     }
   }
 
-  EmberZclOtaBootloadStorageStatus_t storageStatus
+  ChipZclOtaBootloadStorageStatus_t storageStatus
     = ((file != NULL ? closeFile(file, true) : closeAllFiles(true))
-       ? EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS
-       : EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED);
+       ? CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS
+       : CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_FAILED);
 
   (*callback)(storageStatus);
 

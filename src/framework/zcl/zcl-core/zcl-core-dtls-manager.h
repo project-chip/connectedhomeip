@@ -1,18 +1,6 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #ifndef ZCL_CORE_DTLS_SESSION_MANAGER_H
@@ -36,13 +24,13 @@
  *
  * @param remoteAddress address of the session to find
  * @param remotePort port of the session to find
- * @return session identifier or @ref EMBER_NULL_SESSION_ID if none found
+ * @return session identifier or @ref CHIP_NULL_SESSION_ID if none found
  *
- * Sessions are created using emberZclDtlsManagerGetConnection() function.
+ * Sessions are created using chipZclDtlsManagerGetConnection() function.
  *
- * @sa emberZclDtlsManagerGetConnection()
+ * @sa chipZclDtlsManagerGetConnection()
  *****************************************************************************/
-uint8_t emberZclDtlsManagerGetSessionIdByAddress(const EmberIpv6Address *remoteAddress,
+uint8_t chipZclDtlsManagerGetSessionIdByAddress(const ChipIpv6Address *remoteAddress,
                                                  uint16_t remotePort);
 
 /**************************************************************************//**
@@ -50,13 +38,13 @@ uint8_t emberZclDtlsManagerGetSessionIdByAddress(const EmberIpv6Address *remoteA
  *
  * @param remoteUid UID of the session to find
  * @param remotePort Port of the session to find (passing '0' will match any port)
- * @return session identifier or @ref EMBER_NULL_SESSION_ID if none found
+ * @return session identifier or @ref CHIP_NULL_SESSION_ID if none found
  *
- * Sessions are created using emberZclDtlsManagerGetConnection() function.
+ * Sessions are created using chipZclDtlsManagerGetConnection() function.
  *
- * @sa emberZclDtlsManagerGetConnection()
+ * @sa chipZclDtlsManagerGetConnection()
  *****************************************************************************/
-uint8_t emberZclDtlsManagerGetSessionIdByUid(const EmberZclUid_t *remoteUid, uint16_t remotePort);
+uint8_t chipZclDtlsManagerGetSessionIdByUid(const ChipZclUid_t *remoteUid, uint16_t remotePort);
 
 /**************************************************************************//**
  * Gets peer UID of the given session identifier.
@@ -64,15 +52,15 @@ uint8_t emberZclDtlsManagerGetSessionIdByUid(const EmberZclUid_t *remoteUid, uin
  * @param sessionId session identifier
  * @param remoteUid pointer to UID buffer to fill on success
  * @return
- * - @ref EMBER_SUCCESS if function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_SUCCESS if function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * Sessions are created using emberZclDtlsManagerGetConnection() function.
+ * Sessions are created using chipZclDtlsManagerGetConnection() function.
  *
- * @sa emberZclDtlsManagerGetConnection()
+ * @sa chipZclDtlsManagerGetConnection()
  *****************************************************************************/
-EmberStatus emberZclDtlsManagerGetUidBySessionId(const uint8_t sessionId,
-                                                 EmberZclUid_t *remoteUid);
+ChipStatus chipZclDtlsManagerGetUidBySessionId(const uint8_t sessionId,
+                                                 ChipZclUid_t *remoteUid);
 
 /**************************************************************************//**
  * Gets peer Address of the given session identifier.
@@ -80,15 +68,15 @@ EmberStatus emberZclDtlsManagerGetUidBySessionId(const uint8_t sessionId,
  * @param sessionId session identifier
  * @param remoteAddress pointer to Address buffer to fill on success
  * @return
- * - @ref EMBER_SUCCESS if function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_SUCCESS if function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * Sessions are created using emberZclDtlsManagerGetConnection() function.
+ * Sessions are created using chipZclDtlsManagerGetConnection() function.
  *
- * @sa emberZclDtlsManagerGetConnection()
+ * @sa chipZclDtlsManagerGetConnection()
  *****************************************************************************/
-EmberStatus emberZclDtlsManagerGetAddressBySessionId(const uint8_t sessionId,
-                                                     EmberIpv6Address *remoteAddress);
+ChipStatus chipZclDtlsManagerGetAddressBySessionId(const uint8_t sessionId,
+                                                     ChipIpv6Address *remoteAddress);
 
 /**************************************************************************//**
  * Gets peer Port of the given session identifier.
@@ -96,14 +84,14 @@ EmberStatus emberZclDtlsManagerGetAddressBySessionId(const uint8_t sessionId,
  * @param sessionId session identifier
  * @param remotePort pointer to Port buffer to fill on success
  * @return
- * - @ref EMBER_SUCCESS if function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_SUCCESS if function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * Sessions are created using emberZclDtlsManagerGetConnection() function.
+ * Sessions are created using chipZclDtlsManagerGetConnection() function.
  *
- * @sa emberZclDtlsManagerGetConnection()
+ * @sa chipZclDtlsManagerGetConnection()
  *****************************************************************************/
-EmberStatus emberZclDtlsManagerGetPortBySessionId(const uint8_t sessionId,
+ChipStatus chipZclDtlsManagerGetPortBySessionId(const uint8_t sessionId,
                                                   uint16_t *remotePort);
 
 /**************************************************************************//**
@@ -116,26 +104,26 @@ EmberStatus emberZclDtlsManagerGetPortBySessionId(const uint8_t sessionId,
  * @param mode DTLS session mode
  * @param returnHandle function pointer to be called with session identifier
  * @return
- * - @ref EMBER_SUCCESS if function call was successful
- * - @ref ::EmberStatus with failure reason otherwise
+ * - @ref CHIP_SUCCESS if function call was successful
+ * - @ref ::ChipStatus with failure reason otherwise
  *
- * All sessions can be closed using emberZclDtlsManagerCloseAllConnections().
+ * All sessions can be closed using chipZclDtlsManagerCloseAllConnections().
  *
- * @sa emberZclDtlsManagerCloseAllConnections()
+ * @sa chipZclDtlsManagerCloseAllConnections()
  *****************************************************************************/
-EmberStatus emberZclDtlsManagerGetConnection(const EmberIpv6Address *remoteAddress,
+ChipStatus chipZclDtlsManagerGetConnection(const ChipIpv6Address *remoteAddress,
                                              uint16_t remotePort,
-                                             EmberDtlsMode mode,
+                                             ChipDtlsMode mode,
                                              void (*returnHandle)(uint8_t));
 
 /**************************************************************************//**
  * Closes all open DTLS sessions.
  *
- * Sessions are created using emberZclDtlsManagerGetConnection() function.
+ * Sessions are created using chipZclDtlsManagerGetConnection() function.
  *
- * @sa emberZclDtlsManagerGetConnection()
+ * @sa chipZclDtlsManagerGetConnection()
  *****************************************************************************/
-void emberZclDtlsManagerCloseAllConnections(void);
+void chipZclDtlsManagerCloseAllConnections(void);
 
 /** @} end addtogroup ZCLIP_dtls_session_manager */
 /** @} end addtogroup ZCLIP */

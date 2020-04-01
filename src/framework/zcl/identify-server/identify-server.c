@@ -1,73 +1,61 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_HAL
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_HAL
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 #include "thread-callbacks.h"
 
-static uint16_t getIdentifyTimeS(EmberZclEndpointId_t endpointId);
-static void setIdentifyTimeS(EmberZclEndpointId_t endpointId,
+static uint16_t getIdentifyTimeS(ChipZclEndpointId_t endpointId);
+static void setIdentifyTimeS(ChipZclEndpointId_t endpointId,
                              uint16_t identifyTimeS,
                              bool external);
 static bool allIdentifyTimesAre0(void);
 
-EmberEventControl emZclIdentifyServerEventControl;
+ChipEventControl chZclIdentifyServerEventControl;
 static bool notify = true;
 
-void emZclIdentifyServerPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                                   const EmberZclClusterSpec_t *clusterSpec,
-                                                   EmberZclAttributeId_t attributeId,
+void chZclIdentifyServerPostAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                                   const ChipZclClusterSpec_t *clusterSpec,
+                                                   ChipZclAttributeId_t attributeId,
                                                    const void *buffer,
                                                    size_t bufferLength)
 {
-  if (emberZclAreClusterSpecsEqual(&emberZclClusterIdentifyServerSpec,
+  if (chipZclAreClusterSpecsEqual(&chipZclClusterIdentifyServerSpec,
                                    clusterSpec)
-      && attributeId == EMBER_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME) {
+      && attributeId == CHIP_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME) {
     uint16_t identifyTimeS = getIdentifyTimeS(endpointId);
     if (identifyTimeS == 0) {
-      if (emberEventControlGetActive(emZclIdentifyServerEventControl)) {
+      if (chipEventControlGetActive(chZclIdentifyServerEventControl)) {
         if (allIdentifyTimesAre0()) {
-          emberEventControlSetInactive(emZclIdentifyServerEventControl);
+          chipEventControlSetInactive(chZclIdentifyServerEventControl);
         }
-        emberZclIdentifyServerStopIdentifyingCallback(endpointId);
+        chipZclIdentifyServerStopIdentifyingCallback(endpointId);
       }
     } else {
       if (notify) {
-        emberZclIdentifyServerStartIdentifyingCallback(endpointId, identifyTimeS);
+        chipZclIdentifyServerStartIdentifyingCallback(endpointId, identifyTimeS);
       }
-      emberEventControlSetDelayMS(emZclIdentifyServerEventControl,
+      chipEventControlSetDelayMS(chZclIdentifyServerEventControl,
                                   MILLISECOND_TICKS_PER_SECOND);
     }
   }
 }
 
-void emZclIdentifyServerEventHandler(void)
+void chZclIdentifyServerEventHandler(void)
 {
-  for (EmberZclEndpointIndex_t index = 0;
-       index < EMBER_ZCL_CLUSTER_IDENTIFY_SERVER_COUNT;
+  for (ChipZclEndpointIndex_t index = 0;
+       index < CHIP_ZCL_CLUSTER_IDENTIFY_SERVER_COUNT;
        index++) {
-    EmberZclEndpointId_t endpointId
-      = emberZclEndpointIndexToId(index, &emberZclClusterIdentifyServerSpec);
+    ChipZclEndpointId_t endpointId
+      = chipZclEndpointIndexToId(index, &chipZclClusterIdentifyServerSpec);
     uint16_t identifyTimeS = getIdentifyTimeS(endpointId);
     if (identifyTimeS > 0) {
       setIdentifyTimeS(endpointId,
@@ -77,49 +65,49 @@ void emZclIdentifyServerEventHandler(void)
   }
 }
 
-void emberZclClusterIdentifyServerCommandIdentifyRequestHandler(const EmberZclCommandContext_t *context,
-                                                                const EmberZclClusterIdentifyServerCommandIdentifyRequest_t *request)
+void chipZclClusterIdentifyServerCommandIdentifyRequestHandler(const ChipZclCommandContext_t *context,
+                                                                const ChipZclClusterIdentifyServerCommandIdentifyRequest_t *request)
 {
-  emberAfCorePrintln("RX: Identify");
+  chipAfCorePrintln("RX: Identify");
   setIdentifyTimeS(context->endpointId,
                    request->identifyTime,
                    true); // external change
-  emberZclSendDefaultResponse(context, EMBER_ZCL_STATUS_SUCCESS);
+  chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
 }
 
-void emberZclClusterIdentifyServerCommandIdentifyQueryRequestHandler(const EmberZclCommandContext_t *context,
-                                                                     const EmberZclClusterIdentifyServerCommandIdentifyQueryRequest_t *request)
+void chipZclClusterIdentifyServerCommandIdentifyQueryRequestHandler(const ChipZclCommandContext_t *context,
+                                                                     const ChipZclClusterIdentifyServerCommandIdentifyQueryRequest_t *request)
 {
-  EmberZclClusterIdentifyServerCommandIdentifyQueryResponse_t response;
-  emberAfCorePrintln("RX: IdentifyQuery");
+  ChipZclClusterIdentifyServerCommandIdentifyQueryResponse_t response;
+  chipAfCorePrintln("RX: IdentifyQuery");
   response.timeout = getIdentifyTimeS(context->endpointId);
-  emberZclSendClusterIdentifyServerCommandIdentifyQueryResponse(context,
+  chipZclSendClusterIdentifyServerCommandIdentifyQueryResponse(context,
                                                                 &response);
 }
 
-static uint16_t getIdentifyTimeS(EmberZclEndpointId_t endpointId)
+static uint16_t getIdentifyTimeS(ChipZclEndpointId_t endpointId)
 {
   uint16_t identifyTimeS;
-  if (emberZclReadAttribute(endpointId,
-                            &emberZclClusterIdentifyServerSpec,
-                            EMBER_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
+  if (chipZclReadAttribute(endpointId,
+                            &chipZclClusterIdentifyServerSpec,
+                            CHIP_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
                             &identifyTimeS,
                             sizeof(identifyTimeS))
-      == EMBER_ZCL_STATUS_SUCCESS) {
+      == CHIP_ZCL_STATUS_SUCCESS) {
     return identifyTimeS;
   } else {
     return 0;
   }
 }
 
-static void setIdentifyTimeS(EmberZclEndpointId_t endpointId,
+static void setIdentifyTimeS(ChipZclEndpointId_t endpointId,
                              uint16_t identifyTimeS,
                              bool external)
 {
   notify = external;
-  emberZclWriteAttribute(endpointId,
-                         &emberZclClusterIdentifyServerSpec,
-                         EMBER_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
+  chipZclWriteAttribute(endpointId,
+                         &chipZclClusterIdentifyServerSpec,
+                         CHIP_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
                          &identifyTimeS,
                          sizeof(identifyTimeS));
   notify = true;
@@ -127,11 +115,11 @@ static void setIdentifyTimeS(EmberZclEndpointId_t endpointId,
 
 static bool allIdentifyTimesAre0(void)
 {
-  for (EmberZclEndpointIndex_t index = 0;
-       index < EMBER_ZCL_CLUSTER_IDENTIFY_SERVER_COUNT;
+  for (ChipZclEndpointIndex_t index = 0;
+       index < CHIP_ZCL_CLUSTER_IDENTIFY_SERVER_COUNT;
        index++) {
-    EmberZclEndpointId_t endpointId
-      = emberZclEndpointIndexToId(index, &emberZclClusterIdentifyServerSpec);
+    ChipZclEndpointId_t endpointId
+      = chipZclEndpointIndexToId(index, &chipZclClusterIdentifyServerSpec);
     if (getIdentifyTimeS(endpointId) > 0) {
       return false;
     }

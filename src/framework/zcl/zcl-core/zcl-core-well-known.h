@@ -1,18 +1,6 @@
 /***************************************************************************//**
  * @file
  * @brief ZCL Core Well Known API
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #ifndef ZCL_CORE_WELL_KNOWN_H
@@ -20,7 +8,7 @@
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 
 /**
  * @addtogroup ZCLIP
@@ -38,33 +26,33 @@
 /** Defines possible request modes. */
 typedef enum {
   /** Discovery request is allowed a single query. */
-  EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY = 0,
+  CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY = 0,
   /** Discovery request is allowed multiple queries. */
-  EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY = 1,
+  CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY = 1,
   /** Maximum discovery request mode. */
-  EMBER_ZCL_DISCOVERY_REQUEST_MODE_MAX = 2
-} EmberZclDiscoveryRequestMode;
+  CHIP_ZCL_DISCOVERY_REQUEST_MODE_MAX = 2
+} ChipZclDiscoveryRequestMode;
 
 /**************************************************************************//**
  * Initialization for sending Discovery command.
  *****************************************************************************/
-void emberZclDiscInit(void);
+void chipZclDiscInit(void);
 
 /**************************************************************************//**
  * This function sets mode to create a query.
  *
- * @param      mode  EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY - single query
- *                   EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY - multiple queries
+ * @param      mode  CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY - single query
+ *                   CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY - multiple queries
  *
  * @return     True if mode was set or false otherwise.
  *
- * Under EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode, appending one query string
+ * Under CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode, appending one query string
  * automatically triggers the Discovery command to be broadcast.
- * Under EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode, appended query strings
+ * Under CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode, appended query strings
  * is accumulated. The accumulated query string will not be broadcast until
- * emberZclDiscSend() is called.
+ * chipZclDiscSend() is called.
  *****************************************************************************/
-bool emberZclDiscSetMode(EmberZclDiscoveryRequestMode mode);
+bool chipZclDiscSetMode(ChipZclDiscoveryRequestMode mode);
 
 /**************************************************************************//**
  * This function broadcasts a GET using the Discovery request string.
@@ -74,19 +62,19 @@ bool emberZclDiscSetMode(EmberZclDiscoveryRequestMode mode);
  * @return     True if the message was sent or false otherwise.
  *
  *****************************************************************************/
-bool emberZclDiscSend(EmberCoapResponseHandler responseHandler);
+bool chipZclDiscSend(ChipCoapResponseHandler responseHandler);
 
 /**************************************************************************//**
  * This function appends a core.rd query to the discovery request string.
  *
  * @param      responseHandler  The response handler
  *
- * @return     in EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
+ * @return     in CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
  *               True if the command was sent or false otherwise.
- *             in EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
+ *             in CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
  *               True if the command was appended or false otherwise.
  *****************************************************************************/
-bool emberZclDiscCoreRd(EmberCoapResponseHandler responseHandler);
+bool chipZclDiscCoreRd(ChipCoapResponseHandler responseHandler);
 
 /**************************************************************************//**
  * This function appends a cluster ID query to the discovery request string.
@@ -94,13 +82,13 @@ bool emberZclDiscCoreRd(EmberCoapResponseHandler responseHandler);
  * @param      clusterSpec      A structure for cluster ID / role / manufacture code
  * @param      responseHandler  The response handler
  *
- * @return     in EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
+ * @return     in CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
  *               True if the command was sent or false otherwise.
- *             in EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
+ *             in CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
  *               True if the command was appended or false otherwise.
  *****************************************************************************/
-bool emberZclDiscByClusterId(const EmberZclClusterSpec_t *clusterSpec,
-                             EmberCoapResponseHandler responseHandler);
+bool chipZclDiscByClusterId(const ChipZclClusterSpec_t *clusterSpec,
+                             ChipCoapResponseHandler responseHandler);
 
 /**************************************************************************//**
  * This function appends an endpoint query to the Discovery request string.
@@ -109,14 +97,14 @@ bool emberZclDiscByClusterId(const EmberZclClusterSpec_t *clusterSpec,
  * @param      deviceId         The device identifier
  * @param      responseHandler  The response handler
  *
- * @return     in EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
+ * @return     in CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
  *               True if the command was sent or false otherwise.
- *             in EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
+ *             in CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
  *               True if the command was appended or false otherwise.
  *****************************************************************************/
-bool emberZclDiscByEndpoint(EmberZclEndpointId_t endpointId,
-                            EmberZclDeviceId_t deviceId,
-                            EmberCoapResponseHandler responseHandler);
+bool chipZclDiscByEndpoint(ChipZclEndpointId_t endpointId,
+                            ChipZclDeviceId_t deviceId,
+                            ChipCoapResponseHandler responseHandler);
 
 /**************************************************************************//**
  * This function appends a UID query to the discovery request string.
@@ -125,14 +113,14 @@ bool emberZclDiscByEndpoint(EmberZclEndpointId_t endpointId,
  * @param      uidBits          The uid bits
  * @param      responseHandler  The response handler
  *
- * @return     in EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
+ * @return     in CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
  *               True if the command was sent or false otherwise.
- *             in EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
+ *             in CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
  *               True if the command was appended or false otherwise.
  *****************************************************************************/
-bool emberZclDiscByUid(const EmberZclUid_t *uid,
+bool chipZclDiscByUid(const ChipZclUid_t *uid,
                        uint16_t uidBits,
-                       EmberCoapResponseHandler responseHandler);
+                       ChipCoapResponseHandler responseHandler);
 
 /**************************************************************************//**
  * This function appends a cluster revision query to the discovery request string.
@@ -140,13 +128,13 @@ bool emberZclDiscByUid(const EmberZclUid_t *uid,
  * @param      version          The version
  * @param      responseHandler  The response handler
  *
- * @return     in EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
+ * @return     in CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
  *               True if the command was sent or false otherwise.
- *             in EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
+ *             in CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
  *               True if the command was appended or false otherwise.
  *****************************************************************************/
-bool emberZclDiscByClusterRev(EmberZclClusterRevision_t version,
-                              EmberCoapResponseHandler responseHandler);
+bool chipZclDiscByClusterRev(ChipZclClusterRevision_t version,
+                              ChipCoapResponseHandler responseHandler);
 
 /**************************************************************************//**
  * This function appends a device ID query to the discovery request string.
@@ -154,13 +142,13 @@ bool emberZclDiscByClusterRev(EmberZclClusterRevision_t version,
  * @param      deviceId         The device identifier
  * @param      responseHandler  The response handler
  *
- * @return     in EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
+ * @return     in CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
  *               True if the command was sent or false otherwise.
- *             in EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
+ *             in CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
  *               True if the command was appended or false otherwise.
  *****************************************************************************/
-bool emberZclDiscByDeviceId(EmberZclDeviceId_t deviceId,
-                            EmberCoapResponseHandler responseHandler);
+bool chipZclDiscByDeviceId(ChipZclDeviceId_t deviceId,
+                            ChipCoapResponseHandler responseHandler);
 
 /**************************************************************************//**
  * This function appends a resource version query to the discovery request string.
@@ -168,44 +156,44 @@ bool emberZclDiscByDeviceId(EmberZclDeviceId_t deviceId,
  * @param      version          The version
  * @param      responseHandler  The response handler
  *
- * @return     in EMBER_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
+ * @return     in CHIP_ZCL_DISCOVERY_REQUEST_SINGLE_QUERY mode:
  *               True if the command was sent or false otherwise.
- *             in EMBER_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
+ *             in CHIP_ZCL_DISCOVERY_REQUEST_MULTIPLE_QUERY mode:
  *               True if the command was appended or false otherwise.
  *****************************************************************************/
-bool emberZclDiscByResourceVersion(EmberZclClusterRevision_t version,
-                                   EmberCoapResponseHandler responseHandler);
+bool chipZclDiscByResourceVersion(ChipZclClusterRevision_t version,
+                                   ChipCoapResponseHandler responseHandler);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-extern EmZclUriPath emZclWellKnownUriPaths[];
+extern ChZclUriPath chZclWellKnownUriPaths[];
 
-#define EM_ZCL_URI_QUERY_UID                                "ep="
-#define EM_ZCL_URI_QUERY_UID_SHA_256                        "ni:///sha-256;"
-#define EM_ZCL_URI_QUERY_UID_SHA_256_PREFIX                 EM_ZCL_URI_QUERY_UID EM_ZCL_URI_QUERY_UID_SHA_256
-#define EM_ZCL_URI_QUERY_PREFIX_RESOURCE_TYPE_CORE_RD       "rt=core.rd"
-#define EM_ZCL_URI_QUERY_PREFIX_RESOURCE_TYPE_CLUSTER_ID    "rt=urn:zcl"
-#define EM_ZCL_URI_QUERY_PREFIX_VERSION                     "if=urn:zcl:"
-#define EM_ZCL_URI_QUERY_PROTOCOL_REVISION_FORMAT           "if=urn:zcl:v%x"
-#define EM_ZCL_URI_QUERY_CLUSTER_REVISION_FORMAT            "if=urn:zcl:c.v%x"
-#define EM_ZCL_URI_QUERY_PREFIX_DEVICE_TYPE_AND_ENDPOINT    "ze=urn:zcl:"
-#define EM_ZCL_URI_QUERY_POSTFIX_DEVICE_ID                  "d."
-#define EM_ZCL_URI_QUERY_DOT                                '.'
-#define EM_ZCL_URI_QUERY_WILDCARD                           '*'
-#define EM_ZCL_URI_QUERY_VERSION_KEY                        "c.v"
-#define EM_ZCL_URI_WELL_KNOWN                               ".well-known"
-#define EM_ZCL_URI_CORE                                     "core"
-#define EM_ZCL_URI_WELL_KNOWN_CORE                          ".well-known/core"
-#define EM_ZCL_URI_RESPONSE_DELIMITER                       ";"
-#define EM_ZCL_URI_WELL_KNOWN_CORE_PAYLOAD                  "if=urn:zcl:v0;rt=urn:zcl"
-#define EM_ZCL_URI_DEVICE_UID_APPEND_MAX_LEN                (104) // Includes prefix, uid and postfix chars.
+#define CH_ZCL_URI_QUERY_UID                                "ep="
+#define CH_ZCL_URI_QUERY_UID_SHA_256                        "ni:///sha-256;"
+#define CH_ZCL_URI_QUERY_UID_SHA_256_PREFIX                 CH_ZCL_URI_QUERY_UID CH_ZCL_URI_QUERY_UID_SHA_256
+#define CH_ZCL_URI_QUERY_PREFIX_RESOURCE_TYPE_CORE_RD       "rt=core.rd"
+#define CH_ZCL_URI_QUERY_PREFIX_RESOURCE_TYPE_CLUSTER_ID    "rt=urn:zcl"
+#define CH_ZCL_URI_QUERY_PREFIX_VERSION                     "if=urn:zcl:"
+#define CH_ZCL_URI_QUERY_PROTOCOL_REVISION_FORMAT           "if=urn:zcl:v%x"
+#define CH_ZCL_URI_QUERY_CLUSTER_REVISION_FORMAT            "if=urn:zcl:c.v%x"
+#define CH_ZCL_URI_QUERY_PREFIX_DEVICE_TYPE_AND_ENDPOINT    "ze=urn:zcl:"
+#define CH_ZCL_URI_QUERY_POSTFIX_DEVICE_ID                  "d."
+#define CH_ZCL_URI_QUERY_DOT                                '.'
+#define CH_ZCL_URI_QUERY_WILDCARD                           '*'
+#define CH_ZCL_URI_QUERY_VERSION_KEY                        "c.v"
+#define CH_ZCL_URI_WELL_KNOWN                               ".well-known"
+#define CH_ZCL_URI_CORE                                     "core"
+#define CH_ZCL_URI_WELL_KNOWN_CORE                          ".well-known/core"
+#define CH_ZCL_URI_RESPONSE_DELIMITER                       ";"
+#define CH_ZCL_URI_WELL_KNOWN_CORE_PAYLOAD                  "if=urn:zcl:v0;rt=urn:zcl"
+#define CH_ZCL_URI_DEVICE_UID_APPEND_MAX_LEN                (104) // Includes prefix, uid and postfix chars.
 
-#define EM_ZCL_URI_METADATA_QUERY                           "meta="
-#define EM_ZCL_URI_METADATA_BASE                            "$base"
-#define EM_ZCL_URI_METADATA_ACCESS                          "$acc"
-#define EM_ZCL_URI_METADATA_WILDCARD                        "*"
+#define CH_ZCL_URI_METADATA_QUERY                           "meta="
+#define CH_ZCL_URI_METADATA_BASE                            "$base"
+#define CH_ZCL_URI_METADATA_ACCESS                          "$acc"
+#define CH_ZCL_URI_METADATA_WILDCARD                        "*"
 
-#define EM_ZCL_MAX_WELL_KNOWN_REPLY_PAYLOAD (800)
+#define CH_ZCL_MAX_WELL_KNOWN_REPLY_PAYLOAD (800)
 //TODO- Buffer size increased (was 700) to pass zcl-test-group-2.bsh script- at
 // the moment discovery responses (link-format+cbor) return an empty payload
 // with an error status if the payload exceeds the buffer length- it would be
@@ -215,19 +203,19 @@ extern EmZclUriPath emZclWellKnownUriPaths[];
 
 #define isMulticastAddress(ipAddress) ((ipAddress)[0] == 0xFF)
 
-uint16_t emZclUriAppendUriPath(char *finger,
+uint16_t chZclUriAppendUriPath(char *finger,
                                char *endOfBuffer,
-                               EmberZclEndpointId_t endpointId,
-                               const EmberZclClusterSpec_t *clusterSpec);
-bool emZclUriBreak(char *finger);
-bool emZclDiscByUidString(const uint8_t *uidString, EmberCoapResponseHandler responseHandler);
-bool emZclDiscSetAccept(EmberCoapContentFormatType accept);
+                               ChipZclEndpointId_t endpointId,
+                               const ChipZclClusterSpec_t *clusterSpec);
+bool chZclUriBreak(char *finger);
+bool chZclDiscByUidString(const uint8_t *uidString, ChipCoapResponseHandler responseHandler);
+bool chZclDiscSetAccept(ChipCoapContentFormatType accept);
 
 //----------------------------------------------------------------
 // Discovery Payload Context
 //
 // Supports generic generation CoRE link payloads with selectable
-// Content-Format (link-format or link-format+cbor). Member function
+// Content-Format (link-format or link-format+cbor). Mchip function
 // pointers are initialized with implementations for the selected
 // format.
 
@@ -235,41 +223,41 @@ typedef enum {
   DISCOVERY_PAYLOAD_CONTEXT_STATUS_SUCCESS,
   DISCOVERY_PAYLOAD_CONTEXT_STATUS_FAIL,
   DISCOVERY_PAYLOAD_CONTEXT_STATUS_BUFFER_OVERFLOW
-} EmZclDiscPayloadContextStatus;
+} ChZclDiscPayloadContextStatus;
 
-typedef struct EmZclDiscPayloadContext_s EmZclDiscPayloadContext_t;
-struct EmZclDiscPayloadContext_s {
-  EmberCoapContentFormatType contentFormat;
-  EmZclDiscPayloadContextStatus status;
+typedef struct ChZclDiscPayloadContext_s ChZclDiscPayloadContext_t;
+struct ChZclDiscPayloadContext_s {
+  ChipCoapContentFormatType contentFormat;
+  ChZclDiscPayloadContextStatus status;
   CborState cborState; // reuse start/finger/end pointers for non-CBOR buffer implementation
   uint8_t linkCount;
   uint8_t attrCount;
 
-  bool (*payloadIsEmpty)(EmZclDiscPayloadContext_t *dpc);
-  const uint8_t *(*payloadPointer)(EmZclDiscPayloadContext_t *dpc);
-  uint16_t (*payloadLength)(EmZclDiscPayloadContext_t *dpc);
-  void (*startPayload)(EmZclDiscPayloadContext_t *dpc);
-  void (*startLink)(EmZclDiscPayloadContext_t *dpc);
-  void (*addResourceUri)(EmZclDiscPayloadContext_t *dpc,
-                         EmberZclEndpointId_t endpointId,
-                         const EmberZclClusterSpec_t *clusterSpec);
-  void (*addRt)(EmZclDiscPayloadContext_t *dpc,
-                const EmberZclClusterSpec_t *spec,
+  bool (*payloadIsEmpty)(ChZclDiscPayloadContext_t *dpc);
+  const uint8_t *(*payloadPointer)(ChZclDiscPayloadContext_t *dpc);
+  uint16_t (*payloadLength)(ChZclDiscPayloadContext_t *dpc);
+  void (*startPayload)(ChZclDiscPayloadContext_t *dpc);
+  void (*startLink)(ChZclDiscPayloadContext_t *dpc);
+  void (*addResourceUri)(ChZclDiscPayloadContext_t *dpc,
+                         ChipZclEndpointId_t endpointId,
+                         const ChipZclClusterSpec_t *clusterSpec);
+  void (*addRt)(ChZclDiscPayloadContext_t *dpc,
+                const ChipZclClusterSpec_t *spec,
                 bool includeTrailingClusterTag);
-  void (*addIf)(EmZclDiscPayloadContext_t *dpc,
-                EmberZclEndpointId_t endpointId,
-                const EmberZclClusterSpec_t *clusterSpec);
-  void (*addEp)(EmZclDiscPayloadContext_t *dpc);
-  void (*addZe)(EmZclDiscPayloadContext_t *dpc,
-                EmberZclEndpointId_t endpointId,
-                EmberZclDeviceId_t deviceId);
-  void (*endLink)(EmZclDiscPayloadContext_t *dpc);
-  void (*endPayload)(EmZclDiscPayloadContext_t *dpc);
-  void (*appendUid)(EmZclDiscPayloadContext_t *dpc);
+  void (*addIf)(ChZclDiscPayloadContext_t *dpc,
+                ChipZclEndpointId_t endpointId,
+                const ChipZclClusterSpec_t *clusterSpec);
+  void (*addEp)(ChZclDiscPayloadContext_t *dpc);
+  void (*addZe)(ChZclDiscPayloadContext_t *dpc,
+                ChipZclEndpointId_t endpointId,
+                ChipZclDeviceId_t deviceId);
+  void (*endLink)(ChZclDiscPayloadContext_t *dpc);
+  void (*endPayload)(ChZclDiscPayloadContext_t *dpc);
+  void (*appendUid)(ChZclDiscPayloadContext_t *dpc);
 };
 
-bool emZclInitDiscPayloadContext(EmZclDiscPayloadContext_t *dpc,
-                                 EmberCoapContentFormatType contentFormat,
+bool chZclInitDiscPayloadContext(ChZclDiscPayloadContext_t *dpc,
+                                 ChipCoapContentFormatType contentFormat,
                                  uint8_t *buffer,
                                  uint16_t bufferLength);
 

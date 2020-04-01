@@ -1,6 +1,6 @@
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_OCCUPANCY
+#include CHIP_AF_API_OCCUPANCY
 
 /** @brief Occupancy state changed
  *
@@ -11,6 +11,6 @@
  * present, only bit 0 is used, and will be set to either
  * HAL_OCCUPANCY_STATE_OCCUPIED or HAL_OCCUPANCY_STATE_UNOCCUPIED.  Ver.: always
  */
-void emberZclOccupancySensingServerOccupancyStateChangedCallback(HalOccupancyState occupancyState)
+void chipZclOccupancySensingServerOccupancyStateChangedCallback(HalOccupancyState occupancyState)
 {
 }

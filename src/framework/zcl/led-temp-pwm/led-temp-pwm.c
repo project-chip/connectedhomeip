@@ -1,28 +1,16 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include CONFIGURATION_HEADER
 #include PLATFORM_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_BULB_PWM_DRIVER
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_BULB_PWM_DRIVER
+#include CHIP_AF_API_ZCL_CORE
 
 #define MIN_ON_TIME_MICROSECONDS 0
 
@@ -51,10 +39,10 @@ static uint16_t minDriveValue(void);
 static uint16_t maxDriveValue(void);
 static void computeRgbFromColorTemp(void);
 
-static EmberZclEndpointId_t currentEndpoint(void)
+static ChipZclEndpointId_t currentEndpoint(void)
 {
   // Note:  LED bulbs only support one endpoint
-  return emberZclEndpointIndexToId(0, &emberZclClusterOnOffServerSpec);
+  return chipZclEndpointIndexToId(0, &chipZclClusterOnOffServerSpec);
 }
 
 static void driveTempHiLo(uint16_t white, uint16_t lowtemp)
@@ -65,33 +53,33 @@ static void driveTempHiLo(uint16_t white, uint16_t lowtemp)
 
 void emLedTempPwmInitHandler(void)
 {
-  EmberZclEndpointId_t endpointId = currentEndpoint();
-  EmberZclStatus_t status;
+  ChipZclEndpointId_t endpointId = currentEndpoint();
+  ChipZclStatus_t status;
 
   blinking = false;
 
   minPwmDrive = minDriveValue();
   maxPwmDrive = maxDriveValue();
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN,
                                  &minColor,
                                  sizeof(minColor));
 
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Color Temp:  no color temp physical min attribute.");
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Color Temp:  no color temp physical min attribute.");
     minColor = MIN_COLOR_DEFAULT;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX,
                                  &maxColor,
                                  sizeof(maxColor));
 
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Color Temp:  no color temp physical max attribute.");
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Color Temp:  no color temp physical max attribute.");
     maxColor = MAX_COLOR_DEFAULT;
   }
 
@@ -103,8 +91,8 @@ static void computeRgbFromColorTemp(void)
   uint16_t currentTemp;
   bool onOff;
   uint8_t currentLevel;
-  EmberZclEndpointId_t endpointId = currentEndpoint();
-  EmberZclStatus_t status;
+  ChipZclEndpointId_t endpointId = currentEndpoint();
+  ChipZclStatus_t status;
 
   uint32_t high32, low32;
   uint16_t highDrive, lowDrive;
@@ -121,35 +109,35 @@ static void computeRgbFromColorTemp(void)
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterColorControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterColorControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_COLOR_CONTROL_SERVER_ATTRIBUTE_COLOR_CONTROL_COLOR_TEMPERATURE,
                                  &currentTemp,
                                  sizeof(currentTemp));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("error reading color temperature attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("error reading color temperature attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterLevelControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterLevelControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                                  &currentLevel,
                                  sizeof(currentLevel));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("error reading current level attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("error reading current level attribute from ep %d\n",
                        endpointId);
     return;
   }
 
-  status = emberZclReadAttribute(endpointId,
-                                 &emberZclClusterOnOffServerSpec,
-                                 EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  status = chipZclReadAttribute(endpointId,
+                                 &chipZclClusterOnOffServerSpec,
+                                 CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                                  &onOff,
                                  sizeof(onOff));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("error reading onOff attribute from ep %d\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("error reading onOff attribute from ep %d\n",
                        endpointId);
     return;
   }
@@ -206,15 +194,15 @@ static void computeRgbFromColorTemp(void)
   driveTempHiLo(highDrive, lowDrive);
 }
 
-void emLedTempPwmPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                            const EmberZclClusterSpec_t *clusterSpec,
-                                            EmberZclAttributeId_t attributeId,
+void emLedTempPwmPostAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                            const ChipZclClusterSpec_t *clusterSpec,
+                                            ChipZclAttributeId_t attributeId,
                                             const void *buffer,
                                             size_t bufferLength)
 {
-  if (emberZclAreClusterSpecsEqual(&emberZclClusterOnOffServerSpec, clusterSpec)
-      || emberZclAreClusterSpecsEqual(&emberZclClusterLevelControlServerSpec, clusterSpec)
-      || emberZclAreClusterSpecsEqual(&emberZclClusterColorControlServerSpec, clusterSpec)) {
+  if (chipZclAreClusterSpecsEqual(&chipZclClusterOnOffServerSpec, clusterSpec)
+      || chipZclAreClusterSpecsEqual(&chipZclClusterLevelControlServerSpec, clusterSpec)
+      || chipZclAreClusterSpecsEqual(&chipZclClusterColorControlServerSpec, clusterSpec)) {
     computeRgbFromColorTemp();
   }
 }
@@ -271,7 +259,7 @@ void halBulbPwmDriverBlinkStopCallback(void)
   computeRgbFromColorTemp();
 }
 
-void emberAfPluginColorControlServerComputePwmFromTempCallback(EmberZclEndpointId_t endpointId)
+void chipAfPluginColorControlServerComputePwmFromTempCallback(ChipZclEndpointId_t endpointId)
 {
   computeRgbFromColorTemp();
 }

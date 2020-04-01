@@ -1,18 +1,6 @@
 /***************************************************************************//**
  * @file
  * @brief ZCL Core Types
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #ifndef ZCL_CORE_TYPES_H
@@ -41,7 +29,7 @@
  * hexadecimal, CCCC is the 16-bit cluster ID in hexadecimal, and AAAA is the
  * 16-bit attribute ID in hexadecimal.  An extra byte is reserved for a null
  * terminator. */
-#define EMBER_ZCL_URI_MAX_LENGTH 120
+#define CHIP_ZCL_URI_MAX_LENGTH 120
 
 /**
  * The longest ZCL/IP URI path is a manufacturer-specific attribute request
@@ -50,7 +38,7 @@
  * where GGGG is the 16-bit group ID, R is c or s for client or server, MMMM is
  * the 16-bit manufacturer code, CCCC is the 16-bit cluster ID, and AAAA is the
  * 16-bit attribute ID.  An extra byte is reserved for a null terminator. */
-#define EMBER_ZCL_URI_PATH_MAX_LENGTH 29
+#define CHIP_ZCL_URI_PATH_MAX_LENGTH 29
 
 /**
  * The longest cluster ID in a ZCL/IP URI path is manufacturer-specific:
@@ -58,25 +46,25 @@
  * where R is c or s for client or server, MMMM is the 16-bit manufacturer
  * code, and CCCC is the 16-bit cluster ID.  An extra byte is reserved for a
  * null terminator. */
-#define EMBER_ZCL_URI_PATH_CLUSTER_ID_MAX_LENGTH 11
+#define CHIP_ZCL_URI_PATH_CLUSTER_ID_MAX_LENGTH 11
 
 /**
  * Manufacturer codes, if present, are separated from the cluster ID by an
  * underscore. */
-#define EMBER_ZCL_URI_PATH_MANUFACTURER_CODE_CLUSTER_ID_SEPARATOR '_'
+#define CHIP_ZCL_URI_PATH_MANUFACTURER_CODE_CLUSTER_ID_SEPARATOR '_'
 
 /** String overhead. */
-#define EMBER_ZCL_STRING_OVERHEAD            1
+#define CHIP_ZCL_STRING_OVERHEAD            1
 /** Maximum string length. */
-#define EMBER_ZCL_STRING_LENGTH_MAX          0xFE
+#define CHIP_ZCL_STRING_LENGTH_MAX          0xFE
 /** Invalid string length. */
-#define EMBER_ZCL_STRING_LENGTH_INVALID      0xFF
+#define CHIP_ZCL_STRING_LENGTH_INVALID      0xFF
 /** Long string overhead. */
-#define EMBER_ZCL_LONG_STRING_OVERHEAD       2
+#define CHIP_ZCL_LONG_STRING_OVERHEAD       2
 /** Maximum long string length. */
-#define EMBER_ZCL_LONG_STRING_LENGTH_MAX     0xFFFE
+#define CHIP_ZCL_LONG_STRING_LENGTH_MAX     0xFFFE
 /** Invalid long string length. */
-#define EMBER_ZCL_LONG_STRING_LENGTH_INVALID 0xFFFF
+#define CHIP_ZCL_LONG_STRING_LENGTH_INVALID 0xFFFF
 
 /** @} end addtogroup */
 
@@ -93,121 +81,121 @@
 // From 07-5123-05, section 2.5.3, table 2-10.
 /** A success or failure status, used as a system-wide return type for functions. */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberZclStatus_t
+enum ChipZclStatus_t
 #else
-typedef uint8_t EmberZclStatus_t;
+typedef uint8_t ChipZclStatus_t;
 enum
 #endif
 {
   /** The operation was successful. */
-  EMBER_ZCL_STATUS_SUCCESS                     = 0x00,
+  CHIP_ZCL_STATUS_SUCCESS                     = 0x00,
   /** The operation was not successful. */
-  EMBER_ZCL_STATUS_FAILURE                     = 0x01,
+  CHIP_ZCL_STATUS_FAILURE                     = 0x01,
   /**
    * The sender is recognized but forbidden from carrying out this
    * command. */
-  EMBER_ZCL_STATUS_FORBIDDEN                  = 0x7D,
+  CHIP_ZCL_STATUS_FORBIDDEN                  = 0x7D,
   /**
    * The sender of the command does not have authorization to carry out this
    * command. */
-  EMBER_ZCL_STATUS_NOT_AUTHORIZED              = 0x7E,
+  CHIP_ZCL_STATUS_NOT_AUTHORIZED              = 0x7E,
   /** A reserved field/subfield/bit contains a non-zero value. */
-  EMBER_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO     = 0x7F,
+  CHIP_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO     = 0x7F,
   /**
    * The command appears to contain the wrong fields, as detected either by the
    * presence of one or more invalid field entries or by missing
    * fields. Command not carried out. */
-  EMBER_ZCL_STATUS_MALFORMED_COMMAND           = 0x80,
+  CHIP_ZCL_STATUS_MALFORMED_COMMAND           = 0x80,
   /**
    * The specified cluster command is not supported on the device. The command is not
    * carried out. */
-  EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND       = 0x81,
+  CHIP_ZCL_STATUS_UNSUP_CLUSTER_COMMAND       = 0x81,
   /** The specified general ZCL command is not supported on the device. */
-  EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND       = 0x82,
+  CHIP_ZCL_STATUS_UNSUP_GENERAL_COMMAND       = 0x82,
   /**
    * A manufacturer-specific unicast, cluster specific command was received with
    * an unknown manufacturer code, or the manufacturer code was recognized but
    * the command is not supported. */
-  EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND = 0x83,
+  CHIP_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND = 0x83,
   /**
    * A manufacturer-specific unicast, ZCL specific command was received with an
    * unknown manufacturer code, or the manufacturer code was recognized but the
    * command is not supported. */
-  EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND = 0x84,
+  CHIP_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND = 0x84,
   /**
    * At least one field of the command contains an incorrect value, according to
    * the specification the device is implemented to. */
-  EMBER_ZCL_STATUS_INVALID_FIELD               = 0x85,
+  CHIP_ZCL_STATUS_INVALID_FIELD               = 0x85,
   /** The specified attribute does not exist on the device. */
-  EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE       = 0x86,
+  CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE       = 0x86,
   /**
    * An out of range error, or set to a reserved value. An attribute keeps its old
    * value. Note that an attribute value may be out of range if the attribute is
    * related to another, e.g., with minimum and maximum attributes. See the
    * individual attribute descriptions in ZCL specification for specific details. */
-  EMBER_ZCL_STATUS_INVALID_VALUE               = 0x87,
+  CHIP_ZCL_STATUS_INVALID_VALUE               = 0x87,
   /** Attempt to write a read only attribute. */
-  EMBER_ZCL_STATUS_READ_ONLY                   = 0x88,
+  CHIP_ZCL_STATUS_READ_ONLY                   = 0x88,
   /**
    * An operation (e.g., an attempt to create an entry in a table) failed due to
    * an insufficient amount of free space available. */
-  EMBER_ZCL_STATUS_INSUFFICIENT_SPACE          = 0x89,
+  CHIP_ZCL_STATUS_INSUFFICIENT_SPACE          = 0x89,
   /**
    * An attempt to create an entry in a table failed due to a duplicate entry
    * already present in the table. */
-  EMBER_ZCL_STATUS_DUPLICATE_EXISTS            = 0x8A,
+  CHIP_ZCL_STATUS_DUPLICATE_EXISTS            = 0x8A,
   /** The requested information (e.g., table entry) could not be found. */
-  EMBER_ZCL_STATUS_NOT_FOUND                   = 0x8B,
+  CHIP_ZCL_STATUS_NOT_FOUND                   = 0x8B,
   /** Periodic reports cannot be issued for this attribute. */
-  EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE      = 0x8C,
+  CHIP_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE      = 0x8C,
   /** The data type given for an attribute is incorrect. The command is not carried out. */
-  EMBER_ZCL_STATUS_INVALID_DATA_TYPE           = 0x8D,
+  CHIP_ZCL_STATUS_INVALID_DATA_TYPE           = 0x8D,
   /** The selector for an attribute is incorrect. */
-  EMBER_ZCL_STATUS_INVALID_SELECTOR            = 0x8E,
+  CHIP_ZCL_STATUS_INVALID_SELECTOR            = 0x8E,
   /**
    * A request has been made to read an attribute that the requestor is not
    * authorized to read. No action taken. */
-  EMBER_ZCL_STATUS_WRITE_ONLY                  = 0x8F,
+  CHIP_ZCL_STATUS_WRITE_ONLY                  = 0x8F,
   /**
    * Setting the requested values puts the device in an inconsistent state
    * on startup. No action taken.*/
-  EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE  = 0x90,
+  CHIP_ZCL_STATUS_INCONSISTENT_STARTUP_STATE  = 0x90,
   /**
    * An attempt has been made to write an attribute that is present but is
    * defined using an out-of-band method and not over the air. */
-  EMBER_ZCL_STATUS_DEFINED_OUT_OF_BAND         = 0x91,
+  CHIP_ZCL_STATUS_DEFINED_OUT_OF_BAND         = 0x91,
   /** The supplied values (e.g., contents of table cells) are inconsistent. */
-  EMBER_ZCL_STATUS_INCONSISTENT                = 0x92,
+  CHIP_ZCL_STATUS_INCONSISTENT                = 0x92,
   /**
    * The credentials presented by the device sending the command are not
    * sufficient to perform this action. */
-  EMBER_ZCL_STATUS_ACTION_DENIED               = 0x93,
+  CHIP_ZCL_STATUS_ACTION_DENIED               = 0x93,
   /** The exchange was aborted due to excessive response time. */
-  EMBER_ZCL_STATUS_TIMEOUT                     = 0x94,
+  CHIP_ZCL_STATUS_TIMEOUT                     = 0x94,
   /** Failed case when a client or a server decides to abort the upgrade process. */
-  EMBER_ZCL_STATUS_ABORT                       = 0x95,
+  CHIP_ZCL_STATUS_ABORT                       = 0x95,
   /**
    * Invalid OTA upgrade image (ex. failed signature validation or signer
    * information check or CRC check). */
-  EMBER_ZCL_STATUS_INVALID_IMAGE               = 0x96,
+  CHIP_ZCL_STATUS_INVALID_IMAGE               = 0x96,
   /** Server does not have the data block available yet. */
-  EMBER_ZCL_STATUS_WAIT_FOR_DATA               = 0x97,
+  CHIP_ZCL_STATUS_WAIT_FOR_DATA               = 0x97,
   /** No OTA upgrade image available for a particular client. */
-  EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE          = 0x98,
+  CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE          = 0x98,
   /**
    * The client still requires more OTA upgrade image files to
    * successfully upgrade. */
-  EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE          = 0x99,
+  CHIP_ZCL_STATUS_REQUIRE_MORE_IMAGE          = 0x99,
   /** The command has been received and is being processed. */
-  EMBER_ZCL_STATUS_NOTIFICATION_PENDING        = 0x9A,
+  CHIP_ZCL_STATUS_NOTIFICATION_PENDING        = 0x9A,
   /** An operation was unsuccessful due to a hardware failure. */
-  EMBER_ZCL_STATUS_HARDWARE_FAILURE            = 0xC0,
+  CHIP_ZCL_STATUS_HARDWARE_FAILURE            = 0xC0,
   /** An operation was unsuccessful due to a software failure. */
-  EMBER_ZCL_STATUS_SOFTWARE_FAILURE            = 0xC1,
+  CHIP_ZCL_STATUS_SOFTWARE_FAILURE            = 0xC1,
   /** An error occurred during calibration. */
-  EMBER_ZCL_STATUS_CALIBRATION_ERROR           = 0xC2,
+  CHIP_ZCL_STATUS_CALIBRATION_ERROR           = 0xC2,
   /** Distinguished value that represents a null (invalid) status. */
-  EMBER_ZCL_STATUS_NULL                        = 0xFF,
+  CHIP_ZCL_STATUS_NULL                        = 0xFF,
 };
 
 /** Representation (length and pointer) of a text or binary string value. */
@@ -216,7 +204,7 @@ typedef struct {
   uint32_t length;
   /** Pointer to the string. */
   uint8_t *ptr;
-} EmberZclStringType_t;
+} ChipZclStringType_t;
 
 // From 07-5123-05, section 2.5.2, table 2-9.
 typedef uint8_t  data8_t;
@@ -252,40 +240,40 @@ typedef uint32_t utc_time_t;
  */
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef uint32_t EmZclDiscoveryContextMask_t;
+typedef uint32_t ChZclDiscoveryContextMask_t;
 enum {
   /** No filter */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_NONE                                 = 0x00000001,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_NONE                                 = 0x00000001,
   /** Filter by Cluster (wildcard) e.g. zcl:c.<cluster_id_start>* */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUS_ID_WILDCARD                     = 0x00000002,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUS_ID_WILDCARD                     = 0x00000002,
   /** Filter by Cluster (wildcard) to return all e.g. zcl:c.* */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUS_ID_WILDCARD_ALL                 = 0x00000004,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUS_ID_WILDCARD_ALL                 = 0x00000004,
   /** Filter by Cluster identifier e.g. zcl:c.<cluster_id>.<role> or zcl:c.<cluster_id>.* */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUS_ID_WITH_ID                      = 0x00000008,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUS_ID_WITH_ID                      = 0x00000008,
   /** Filter by Cluster role e.g. zcl:c.<cluster_id>.<role> */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUS_ID_WITH_ROLE                    = 0x00000010,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUS_ID_WITH_ROLE                    = 0x00000010,
   /** Filter by Device (wildcard) e.g. zcl:d.<device_id_start>* */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_DEVICE_ID_WILDCARD                   = 0x00000020,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_DEVICE_ID_WILDCARD                   = 0x00000020,
   /** Filter by Device identifier e.g. zcl:d.<device_id>.<endpoint_id> or zcl:d.<device_id>.* */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_DEVICE_ID_WITH_ID                    = 0x00000040,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_DEVICE_ID_WITH_ID                    = 0x00000040,
   /** Filter by Endpoint e.g. zcl:d.<device_id>.<endpoint_id> */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_DEVICE_ID_WITH_ENDPOINT              = 0x00000080,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_DEVICE_ID_WITH_ENDPOINT              = 0x00000080,
   /** Filter by Cluster revision. */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUSTER_REVISION                     = 0x00000100,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_BY_CLUSTER_REVISION                     = 0x00000100,
   /** Query to check if ZCLIP is supported by Cluster. */
-  EM_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_ZCLIP_SUPPORT_BY_CLUS                = 0x00000200,
+  CH_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_ZCLIP_SUPPORT_BY_CLUS                = 0x00000200,
   /** Query to check if ZCLIP is supported by Resource version. */
-  EM_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_ZCLIP_SUPPORT_BY_RESOURCE_VERSION    = 0x00000400,
+  CH_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_ZCLIP_SUPPORT_BY_RESOURCE_VERSION    = 0x00000400,
   /** Query to check if ZCLIP is supported by Cluster/Role. */
-  EM_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_ZCLIP_SUPPORT_BY_CLUSTER_AND_ROLE    = 0x00000800,
+  CH_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_ZCLIP_SUPPORT_BY_CLUSTER_AND_ROLE    = 0x00000800,
   /** Query to check if ZCLIP is supported by Device/Endpoint. */
-  EM_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_ZCLIP_SUPPORT_BY_DEVICE_AND_ENDPOINT = 0x00001000,
+  CH_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_ZCLIP_SUPPORT_BY_DEVICE_AND_ENDPOINT = 0x00001000,
   /** Query for Unique identifier. */
-  EM_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_UID                                  = 0x00002000,
+  CH_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_UID                                  = 0x00002000,
   /** Query for Unique identifier prefix. */
-  EM_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_UID_PREFIX                           = 0x00004000,
+  CH_ZCL_DISCOVERY_CONTEXT_QUERY_FOR_UID_PREFIX                           = 0x00004000,
   /** Filter by resource wildcard i.e. if=urn:zcl* */
-  EM_ZCL_DISCOVERY_CONTEXT_FILTER_RESOURCE_WILDCARD                       = 0x00008000,
+  CH_ZCL_DISCOVERY_CONTEXT_FILTER_RESOURCE_WILDCARD                       = 0x00008000,
 };
 #endif
 
@@ -303,35 +291,35 @@ enum {
 
 /** Defines possible message statuses. */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberZclMessageStatus_t
+enum ChipZclMessageStatus_t
 #else
-typedef uint8_t EmberZclMessageStatus_t;
+typedef uint8_t ChipZclMessageStatus_t;
 enum
 #endif
 {
-  /** CoAP ::EMBER_COAP_MESSAGE_TIMED_OUT status recevied. */
-  EMBER_ZCL_MESSAGE_STATUS_COAP_TIMEOUT      = EMBER_COAP_MESSAGE_TIMED_OUT,
-  /** CoAP ::EMBER_COAP_MESSAGE_ACKED status received. */
-  EMBER_ZCL_MESSAGE_STATUS_COAP_ACK          = EMBER_COAP_MESSAGE_ACKED,
-  /** CoAP ::EMBER_COAP_MESSAGE_RESET status received. */
-  EMBER_ZCL_MESSAGE_STATUS_COAP_RESET        = EMBER_COAP_MESSAGE_RESET,
-  /** CoAP ::EMBER_COAP_MESSAGE_RESPONSE status received. */
-  // This must be the last of the EMBER_COAP_MESSAGE_... values so that
+  /** CoAP ::CHIP_COAP_MESSAGE_TIMED_OUT status recevied. */
+  CHIP_ZCL_MESSAGE_STATUS_COAP_TIMEOUT      = CHIP_COAP_MESSAGE_TIMED_OUT,
+  /** CoAP ::CHIP_COAP_MESSAGE_ACKED status received. */
+  CHIP_ZCL_MESSAGE_STATUS_COAP_ACK          = CHIP_COAP_MESSAGE_ACKED,
+  /** CoAP ::CHIP_COAP_MESSAGE_RESET status received. */
+  CHIP_ZCL_MESSAGE_STATUS_COAP_RESET        = CHIP_COAP_MESSAGE_RESET,
+  /** CoAP ::CHIP_COAP_MESSAGE_RESPONSE status received. */
+  // This must be the last of the CHIP_COAP_MESSAGE_... values so that
   // our addition does not collide with an existing value.
-  EMBER_ZCL_MESSAGE_STATUS_COAP_RESPONSE     = EMBER_COAP_MESSAGE_RESPONSE,
+  CHIP_ZCL_MESSAGE_STATUS_COAP_RESPONSE     = CHIP_COAP_MESSAGE_RESPONSE,
   /** Discovery timed out. */
-  EMBER_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT,
+  CHIP_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT,
   /** CoAP unknown status recevied. */
-  EMBER_ZCL_MESSAGE_STATUS_NULL              = 0xFF,
+  CHIP_ZCL_MESSAGE_STATUS_NULL              = 0xFF,
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef void (*EmZclMessageResponseHandler)(EmberZclMessageStatus_t status,
-                                            EmberCoapCode code,
-                                            EmberCoapReadOptions *options,
+typedef void (*ChZclMessageResponseHandler)(ChipZclMessageStatus_t status,
+                                            ChipCoapCode code,
+                                            ChipCoapReadOptions *options,
                                             uint8_t *payload,
                                             uint16_t payloadLength,
-                                            EmberCoapResponseInfo *info);
+                                            ChipCoapResponseInfo *info);
 #endif
 
 /** @} end addtogroup */
@@ -347,22 +335,22 @@ typedef void (*EmZclMessageResponseHandler)(EmberZclMessageStatus_t status,
  */
 
 /** UID size in bits. */
-#define EMBER_ZCL_UID_BITS          256
+#define CHIP_ZCL_UID_BITS          256
 /** UID size in bytes. */
-#define EMBER_ZCL_UID_SIZE          EMBER_BITS_TO_BYTES(EMBER_ZCL_UID_BITS)
+#define CHIP_ZCL_UID_SIZE          CHIP_BITS_TO_BYTES(CHIP_ZCL_UID_BITS)
 /** Text string length to represent a UID (hexadecimal characters). */
-#define EMBER_ZCL_UID_STRING_LENGTH (EMBER_ZCL_UID_BITS / 4) // bits to nibbles
+#define CHIP_ZCL_UID_STRING_LENGTH (CHIP_ZCL_UID_BITS / 4) // bits to nibbles
 /** Text string length to represent a UID (hexadecimal characters), plus trailing NUL. */
-#define EMBER_ZCL_UID_STRING_SIZE   (EMBER_ZCL_UID_STRING_LENGTH + 1) // NUL
+#define CHIP_ZCL_UID_STRING_SIZE   (CHIP_ZCL_UID_STRING_LENGTH + 1) // NUL
 /** Text string length to represent UID length (base64url characters). */
-#define EMBER_ZCL_UID_BASE64URL_LENGTH (((EMBER_ZCL_UID_SIZE * 8) + 5) / 6)
+#define CHIP_ZCL_UID_BASE64URL_LENGTH (((CHIP_ZCL_UID_SIZE * 8) + 5) / 6)
 /** Text string length to represent UID length (base64url characters), plus trailing NUL. */
-#define EMBER_ZCL_UID_BASE64URL_SIZE (EMBER_ZCL_UID_BASE64URL_LENGTH + 1) // NUL
+#define CHIP_ZCL_UID_BASE64URL_SIZE (CHIP_ZCL_UID_BASE64URL_LENGTH + 1) // NUL
 
 /** UID (Unique Identifier). */
 typedef struct {
-  uint8_t bytes[EMBER_ZCL_UID_SIZE];
-} EmberZclUid_t;
+  uint8_t bytes[CHIP_ZCL_UID_SIZE];
+} ChipZclUid_t;
 
 /** @} end addtogroup */
 
@@ -377,23 +365,23 @@ typedef struct {
  */
 
 /** An endpoint identifier. */
-typedef uint8_t EmberZclEndpointId_t;
+typedef uint8_t ChipZclEndpointId_t;
 /** A minimum endpoint identifer value. */
-#define EMBER_ZCL_ENDPOINT_MIN  0x01
+#define CHIP_ZCL_ENDPOINT_MIN  0x01
 /** A maximum endpoint identifer value. */
-#define EMBER_ZCL_ENDPOINT_MAX  0xF0
+#define CHIP_ZCL_ENDPOINT_MAX  0xF0
 /** A distinguished value that represents a null (invalid) endpoint identifer. */
-#define EMBER_ZCL_ENDPOINT_NULL ((EmberZclEndpointId_t)-1)
+#define CHIP_ZCL_ENDPOINT_NULL ((ChipZclEndpointId_t)-1)
 
 /** An endpoint index. */
-typedef uint8_t EmberZclEndpointIndex_t;
+typedef uint8_t ChipZclEndpointIndex_t;
 /** A distinguished value that represents a null (invalid) endpoint index. */
-#define EMBER_ZCL_ENDPOINT_INDEX_NULL ((EmberZclEndpointIndex_t)-1)
+#define CHIP_ZCL_ENDPOINT_INDEX_NULL ((ChipZclEndpointIndex_t)-1)
 
 /** A device identifier. */
-typedef uint16_t EmberZclDeviceId_t;
+typedef uint16_t ChipZclDeviceId_t;
 /** A distinguished value that represents a null (invalid) device identifer. */
-#define EMBER_ZCL_DEVICE_ID_NULL ((EmberZclDeviceId_t)-1)
+#define CHIP_ZCL_DEVICE_ID_NULL ((ChipZclDeviceId_t)-1)
 
 /** @} end addtogroup */
 
@@ -408,37 +396,37 @@ typedef uint16_t EmberZclDeviceId_t;
  */
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef uint8_t EmZclGroupNameSupportMask_t;
+typedef uint8_t ChZclGroupNameSupportMask_t;
 enum {
   /** Group names are supported. */
-  EM_ZCL_GROUP_NAME_SUPPORT_ENABLED  = 0x01,
+  CH_ZCL_GROUP_NAME_SUPPORT_ENABLED  = 0x01,
 };
 #endif
 
 /** A group identifier. */
-typedef uint16_t EmberZclGroupId_t;
+typedef uint16_t ChipZclGroupId_t;
 /**
  * A group identifier for the all-endpoints (endpoint broadcast) group.
  *
- * All endpoints are always members of this group. This group cannot be
+ * All endpoints are always mchips of this group. This group cannot be
  * removed and no endpoint can be removed from it.
  */
-#define EMBER_ZCL_GROUP_ALL_ENDPOINTS 0xFFFF
+#define CHIP_ZCL_GROUP_ALL_ENDPOINTS 0xFFFF
 /** A minimum group identifier value. */
-#define EMBER_ZCL_GROUP_MIN           0x0001
+#define CHIP_ZCL_GROUP_MIN           0x0001
 /** A maximum group identifier value. */
-#define EMBER_ZCL_GROUP_MAX           0xFFF7
+#define CHIP_ZCL_GROUP_MAX           0xFFF7
 /** A distinguished value that represents a null (invalid) group identifier. */
-#define EMBER_ZCL_GROUP_NULL          0x0000
+#define CHIP_ZCL_GROUP_NULL          0x0000
 
 /** Lower range for the automatic address assignment mode  */
-#define EMBER_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MIN     0x00
+#define CHIP_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MIN     0x00
 /** Upper range for the automatic address assignment mode  */
-#define EMBER_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MAX    0x10
+#define CHIP_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MAX    0x10
 /** Manual address assignment mode */
-#define EMBER_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL       0xFE
+#define CHIP_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL       0xFE
 /** Value representing empty address parameters passed, using defaults */
-#define EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL         0xFF
+#define CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL         0xFF
 
 /** @} end addtogroup */
 
@@ -454,16 +442,16 @@ typedef uint16_t EmberZclGroupId_t;
 
 /** Defines possible roles of a cluster. */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberZclRole_t
+enum ChipZclRole_t
 #else
-typedef uint8_t EmberZclRole_t;
+typedef uint8_t ChipZclRole_t;
 enum
 #endif
 {
   /** Cluster is a client. */
-  EMBER_ZCL_ROLE_CLIENT = 0,
+  CHIP_ZCL_ROLE_CLIENT = 0,
   /** Cluster is a server. */
-  EMBER_ZCL_ROLE_SERVER = 1,
+  CHIP_ZCL_ROLE_SERVER = 1,
 };
 
 /** @} end addtogroup */
@@ -479,9 +467,9 @@ enum
  */
 
 /** A manufacturer code. */
-typedef uint16_t EmberZclManufacturerCode_t;
+typedef uint16_t ChipZclManufacturerCode_t;
 /** A distinguished value that represents a null (invalid) manufacturer code. */
-#define EMBER_ZCL_MANUFACTURER_CODE_NULL 0x0000
+#define CHIP_ZCL_MANUFACTURER_CODE_NULL 0x0000
 
 /** @} end addtogroup */
 
@@ -496,19 +484,19 @@ typedef uint16_t EmberZclManufacturerCode_t;
  */
 
 /** A cluster identifier. */
-typedef uint16_t EmberZclClusterId_t;
+typedef uint16_t ChipZclClusterId_t;
 /** A distinguished value that represents a null (invalid) cluster identifier. */
-#define EMBER_ZCL_CLUSTER_NULL ((EmberZclClusterId_t)-1)
+#define CHIP_ZCL_CLUSTER_NULL ((ChipZclClusterId_t)-1)
 
 /** This structure holds a cluster specification. */
 typedef struct {
   /** Role of a cluster. */
-  EmberZclRole_t role;
+  ChipZclRole_t role;
   /** Manufacturer code of a cluster. */
-  EmberZclManufacturerCode_t manufacturerCode;
+  ChipZclManufacturerCode_t manufacturerCode;
   /** Identifier of a cluster. */
-  EmberZclClusterId_t id;
-} EmberZclClusterSpec_t;
+  ChipZclClusterId_t id;
+} ChipZclClusterSpec_t;
 
 /** @} end addtogroup */
 
@@ -523,42 +511,42 @@ typedef struct {
  */
 
 /** An attribute identifier. */
-typedef uint16_t EmberZclAttributeId_t;
+typedef uint16_t ChipZclAttributeId_t;
 /** An attribute identifier for the Cluster revision. */
-#define EMBER_ZCL_ATTRIBUTE_CLUSTER_REVISION 0xFFFD
+#define CHIP_ZCL_ATTRIBUTE_CLUSTER_REVISION 0xFFFD
 /** An attribute identifier for a Reporting status. */
-#define EMBER_ZCL_ATTRIBUTE_REPORTING_STATUS 0xFFFE
+#define CHIP_ZCL_ATTRIBUTE_REPORTING_STATUS 0xFFFE
 /** A distinguished value that represents a null (invalid) attribute identifier. */
-#define EMBER_ZCL_ATTRIBUTE_NULL             ((EmberZclAttributeId_t)-1)
+#define CHIP_ZCL_ATTRIBUTE_NULL             ((ChipZclAttributeId_t)-1)
 
 /** A cluster revision. */
-typedef uint16_t EmberZclClusterRevision_t;
+typedef uint16_t ChipZclClusterRevision_t;
 /** A cluster revision for Pre-ZCL 6 specification. */
-#define EMBER_ZCL_CLUSTER_REVISION_PRE_ZCL6 0
+#define CHIP_ZCL_CLUSTER_REVISION_PRE_ZCL6 0
 /** A cluster revision for ZCL 6 specification. */
-#define EMBER_ZCL_CLUSTER_REVISION_ZCL6     1
+#define CHIP_ZCL_CLUSTER_REVISION_ZCL6     1
 /** A distinguished value that represents a null (invalid) cluster revision. */
-#define EMBER_ZCL_CLUSTER_REVISION_NULL     ((EmberZclClusterRevision_t)-1)
+#define CHIP_ZCL_CLUSTER_REVISION_NULL     ((ChipZclClusterRevision_t)-1)
 
 /** This structure holds an attribute specification. */
 typedef struct {
   /** CoAP code of an attribute. */
-  EmberCoapCode code;
+  ChipCoapCode code;
   /** A group identifier of an attribute. */
-  EmberZclGroupId_t groupId;
+  ChipZclGroupId_t groupId;
   /** An endpoint identifier of an attribute. */
-  EmberZclEndpointId_t endpointId;
+  ChipZclEndpointId_t endpointId;
   /** A cluster specification of an attribute. */
-  const EmberZclClusterSpec_t *clusterSpec;
+  const ChipZclClusterSpec_t *clusterSpec;
   /** An attribute identifier. */
-  EmberZclAttributeId_t attributeId;
+  ChipZclAttributeId_t attributeId;
   /** A status of an attribute used when reading and writing. */
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   CborState *state;
 #endif
-} EmberZclAttributeContext_t;
+} ChipZclAttributeContext_t;
 
 /** @} end addtogroup */
 
@@ -573,23 +561,23 @@ typedef struct {
  */
 
 /** A binding identifier. */
-typedef uint8_t EmberZclBindingId_t;
+typedef uint8_t ChipZclBindingId_t;
 /** A distinguished value that represents a null (invalid) binding identifier. */
-#define EMBER_ZCL_BINDING_NULL ((EmberZclBindingId_t)-1)
+#define CHIP_ZCL_BINDING_NULL ((ChipZclBindingId_t)-1)
 
 /** This structure holds a binding context. */
 typedef struct {
   /** CoAP code of binding. */
-  EmberCoapCode code;
+  ChipCoapCode code;
   /** A group identifier of binding. */
-  EmberZclGroupId_t groupId;
+  ChipZclGroupId_t groupId;
   /** An endpoint identifier of binding. */
-  EmberZclEndpointId_t endpointId;
+  ChipZclEndpointId_t endpointId;
   /** A cluster specification of binding. */
-  const EmberZclClusterSpec_t *clusterSpec;
+  const ChipZclClusterSpec_t *clusterSpec;
   /** A binding identifier. */
-  EmberZclBindingId_t bindingId;
-} EmberZclBindingContext_t;
+  ChipZclBindingId_t bindingId;
+} ChipZclBindingContext_t;
 
 /** @} end addtogroup */
 
@@ -604,37 +592,37 @@ typedef struct {
  */
 
 /** A command identifier. */
-typedef uint8_t EmberZclCommandId_t;
+typedef uint8_t ChipZclCommandId_t;
 /** A distinguished value that represents a null (invalid) command identifier. */
-#define EMBER_ZCL_COMMAND_NULL ((EmberZclCommandId_t)-1)
+#define CHIP_ZCL_COMMAND_NULL ((ChipZclCommandId_t)-1)
 
 /** This structure holds a command context. */
 typedef struct {
   /** A remote address of a command. */
-  EmberIpv6Address remoteAddress;
+  ChipIpv6Address remoteAddress;
   /** CoAP code of a command. */
-  EmberCoapCode code;
+  ChipCoapCode code;
   /** EZ-Mode needs access to the request info structure */
-  const EmberCoapRequestInfo *info;
+  const ChipCoapRequestInfo *info;
   /** Payload of a command. */
   const uint8_t *payload;
   /** Payload length of a command. */
   uint16_t payloadLength;
   /** A group identifier of a command. */
-  EmberZclGroupId_t groupId;
+  ChipZclGroupId_t groupId;
   /** An endpoint identifier of a command. */
-  EmberZclEndpointId_t endpointId;
+  ChipZclEndpointId_t endpointId;
   /** A cluster specification of a command. */
-  const EmberZclClusterSpec_t *clusterSpec;
+  const ChipZclClusterSpec_t *clusterSpec;
   /** A command identifier. */
-  EmberZclCommandId_t commandId;
+  ChipZclCommandId_t commandId;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   CborState *state;
   uint8_t *buffer;
-  EmberStatus result;
+  ChipStatus result;
 #endif
-} EmberZclCommandContext_t;
+} ChipZclCommandContext_t;
 
 /** @} end addtogroup */
 
@@ -649,38 +637,38 @@ typedef struct {
  */
 
 /** A reporting configuration identifier. */
-typedef uint8_t EmberZclReportingConfigurationId_t;
+typedef uint8_t ChipZclReportingConfigurationId_t;
 /**
  * A distinguished value that represents a default reporting configuration
  * identifier. */
-#define EMBER_ZCL_REPORTING_CONFIGURATION_DEFAULT 0
+#define CHIP_ZCL_REPORTING_CONFIGURATION_DEFAULT 0
 /**
  * A distinguished value that represents a null (invalid) reporting configuration
  * identifier. */
-#define EMBER_ZCL_REPORTING_CONFIGURATION_NULL    ((EmberZclReportingConfigurationId_t)-1)
+#define CHIP_ZCL_REPORTING_CONFIGURATION_NULL    ((ChipZclReportingConfigurationId_t)-1)
 
 /** This structure holds a notification context. */
 typedef struct {
   /** A remote address of a notification. */
-  EmberIpv6Address remoteAddress;
+  ChipIpv6Address remoteAddress;
   /** A source endpoint identifier of a notification. */
-  EmberZclEndpointId_t sourceEndpointId;
+  ChipZclEndpointId_t sourceEndpointId;
   /** A source reporting configuration identifier of a notification. */
-  EmberZclReportingConfigurationId_t sourceReportingConfigurationId;
+  ChipZclReportingConfigurationId_t sourceReportingConfigurationId;
   /** A source timestamp of a notification. */
   uint32_t sourceTimestamp;
   /** A group identifier of a notification. */
-  EmberZclGroupId_t groupId;
+  ChipZclGroupId_t groupId;
   /** An endpoint identifier of a notification. */
-  EmberZclEndpointId_t endpointId;
+  ChipZclEndpointId_t endpointId;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  const EmberZclClusterSpec_t *clusterSpec;
-  EmberZclAttributeId_t attributeId;
+  const ChipZclClusterSpec_t *clusterSpec;
+  ChipZclAttributeId_t attributeId;
   uint8_t *buffer;
   size_t bufferLength;
 #endif
-} EmberZclNotificationContext_t;
+} ChipZclNotificationContext_t;
 
 /** @} end addtogroup */
 
@@ -695,32 +683,32 @@ typedef struct {
  */
 
 enum {
-  EMBER_ZCL_NO_FLAGS               = 0x00,
-  EMBER_ZCL_USE_COAPS_FLAG         = 0x01,
-  EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG = 0x02,
-  EMBER_ZCL_HAVE_UID_FLAG          = 0x04,
-  EMBER_ZCL_AVOID_NEW_DTLS_SESSION = 0x08, // Directive to emZclSend()
+  CHIP_ZCL_NO_FLAGS               = 0x00,
+  CHIP_ZCL_USE_COAPS_FLAG         = 0x01,
+  CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG = 0x02,
+  CHIP_ZCL_HAVE_UID_FLAG          = 0x04,
+  CHIP_ZCL_AVOID_NEW_DTLS_SESSION = 0x08, // Directive to chZclSend()
 };
 
 typedef struct {
   uint16_t flags;
-  EmberIpv6Address address;
-  EmberZclUid_t uid;
+  ChipIpv6Address address;
+  ChipZclUid_t uid;
   uint16_t port;
-} EmberZclCoapEndpoint_t;
+} ChipZclCoapEndpoint_t;
 
 /** Defines possible types for an application destination. */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberZclApplicationDestinationType_t
+enum ChipZclApplicationDestinationType_t
 #else
-typedef uint8_t EmberZclApplicationDestinationType_t;
+typedef uint8_t ChipZclApplicationDestinationType_t;
 enum
 #endif
 {
   /** An application destination uses an endpoint type. */
-  EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT = 0x00,
+  CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT = 0x00,
   /** An application destination uses a group type. */
-  EMBER_ZCL_APPLICATION_DESTINATION_TYPE_GROUP    = 0x01,
+  CHIP_ZCL_APPLICATION_DESTINATION_TYPE_GROUP    = 0x01,
 };
 
 /** This structure holds an application destination. */
@@ -730,32 +718,32 @@ typedef struct {
    * destination. */
   union {
     /** An endpoint identifier of an application destination. */
-    EmberZclEndpointId_t endpointId;
+    ChipZclEndpointId_t endpointId;
     /** A group identifier of an application destination. */
-    EmberZclGroupId_t groupId;
+    ChipZclGroupId_t groupId;
   } data;
   /** Type of an application destination. */
-  EmberZclApplicationDestinationType_t type;
-} EmberZclApplicationDestination_t;
+  ChipZclApplicationDestinationType_t type;
+} ChipZclApplicationDestination_t;
 
 /** This structure holds a destination. */
 typedef struct {
   /** A destination of a network. */
-  EmberZclCoapEndpoint_t network;
+  ChipZclCoapEndpoint_t network;
   /** A destination of an application. */
-  EmberZclApplicationDestination_t application;
-} EmberZclDestination_t;
+  ChipZclApplicationDestination_t application;
+} ChipZclDestination_t;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef uint16_t EmZclCacheIndex_t;
+typedef uint16_t ChZclCacheIndex_t;
 typedef struct {
-  EmberZclUid_t key;
-  EmberIpv6Address value;
-  EmZclCacheIndex_t index;      // for commands only
-} EmZclCacheEntry_t;
+  ChipZclUid_t key;
+  ChipIpv6Address value;
+  ChZclCacheIndex_t index;      // for commands only
+} ChZclCacheEntry_t;
 
-typedef bool (*EmZclCacheScanPredicate)(const void *criteria,
-                                        const EmZclCacheEntry_t *entry);
+typedef bool (*ChZclCacheScanPredicate)(const void *criteria,
+                                        const ChZclCacheEntry_t *entry);
 #endif
 
 /** @} end addtogroup */
@@ -765,10 +753,10 @@ typedef bool (*EmZclCacheScanPredicate)(const void *criteria,
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct {
-  EmberZclEndpointId_t endpointId;
-  EmberZclDeviceId_t deviceId;
-  const EmberZclClusterSpec_t **clusterSpecs;
-} EmZclEndpointEntry_t;
+  ChipZclEndpointId_t endpointId;
+  ChipZclDeviceId_t deviceId;
+  const ChipZclClusterSpec_t **clusterSpecs;
+} ChZclEndpointEntry_t;
 #endif
 
 // -----------------------------------------------------------------------------
@@ -793,10 +781,10 @@ typedef struct {
  *       if an error occured. If successful, a buffer contains an attribute value.
  *       If unsuccessful, the buffer is irrelevant.
  *
- * @sa emberZclSendAttributeRead()
+ * @sa chipZclSendAttributeRead()
  *****************************************************************************/
-typedef void (*EmberZclReadAttributeResponseHandler)(EmberZclMessageStatus_t status,
-                                                     const EmberZclAttributeContext_t *context,
+typedef void (*ChipZclReadAttributeResponseHandler)(ChipZclMessageStatus_t status,
+                                                     const ChipZclAttributeContext_t *context,
                                                      const void *buffer,
                                                      size_t bufferLength);
 
@@ -809,116 +797,116 @@ typedef void (*EmberZclReadAttributeResponseHandler)(EmberZclMessageStatus_t sta
  * @note `context->status` shows whether attribute was written successfully
  *       or if an error occured.
  *
- * @sa emberZclSendAttributeWrite()
+ * @sa chipZclSendAttributeWrite()
  *****************************************************************************/
-typedef void (*EmberZclWriteAttributeResponseHandler)(EmberZclMessageStatus_t status,
-                                                      const EmberZclAttributeContext_t *context);
+typedef void (*ChipZclWriteAttributeResponseHandler)(ChipZclMessageStatus_t status,
+                                                      const ChipZclAttributeContext_t *context);
 /** This structure holds write data for an attribute. */
 typedef struct {
   /** An attribute identifier to write to. */
-  EmberZclAttributeId_t attributeId;
+  ChipZclAttributeId_t attributeId;
   /** A buffer containing data to be written. */
   const void *buffer;
   /** Length of data to be written. */
   size_t bufferLength;
-} EmberZclAttributeWriteData_t;
+} ChipZclAttributeWriteData_t;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef uint16_t EmZclAttributeMask_t;
+typedef uint16_t ChZclAttributeMask_t;
 enum {
-  EM_ZCL_ATTRIBUTE_STORAGE_NONE           = 0x0000, // b0000_0000 b0000_0000
-  EM_ZCL_ATTRIBUTE_STORAGE_TYPE_EXTERNAL  = 0x0001, // b0000_0000 b0000_0001
-  EM_ZCL_ATTRIBUTE_STORAGE_TYPE_RAM       = 0x0003, // b0000_0000 b0000_0011
-  EM_ZCL_ATTRIBUTE_STORAGE_TYPE_MASK      = 0x0003, // b0000_0000 b0000_0011
-  EM_ZCL_ATTRIBUTE_STORAGE_SINGLETON_MASK = 0x0004, // b0000_0000 b0000_0100
-  EM_ZCL_ATTRIBUTE_STORAGE_MASK           = 0x0007, // b0000_0000 b0000_0111
+  CH_ZCL_ATTRIBUTE_STORAGE_NONE           = 0x0000, // b0000_0000 b0000_0000
+  CH_ZCL_ATTRIBUTE_STORAGE_TYPE_EXTERNAL  = 0x0001, // b0000_0000 b0000_0001
+  CH_ZCL_ATTRIBUTE_STORAGE_TYPE_RAM       = 0x0003, // b0000_0000 b0000_0011
+  CH_ZCL_ATTRIBUTE_STORAGE_TYPE_MASK      = 0x0003, // b0000_0000 b0000_0011
+  CH_ZCL_ATTRIBUTE_STORAGE_SINGLETON_MASK = 0x0004, // b0000_0000 b0000_0100
+  CH_ZCL_ATTRIBUTE_STORAGE_MASK           = 0x0007, // b0000_0000 b0000_0111
 
-  EM_ZCL_ATTRIBUTE_ACCESS_READABLE        = 0x0010, // b0000_0000 b0001_0000
-  EM_ZCL_ATTRIBUTE_ACCESS_WRITABLE        = 0x0020, // b0000_0000 b0010_0000
-  EM_ZCL_ATTRIBUTE_ACCESS_REPORTABLE      = 0x0040, // b0000_0000 b0100_0000
-  EM_ZCL_ATTRIBUTE_ACCESS_MASK            = 0x0070, // b0000_0000 b0111_0000
+  CH_ZCL_ATTRIBUTE_ACCESS_READABLE        = 0x0010, // b0000_0000 b0001_0000
+  CH_ZCL_ATTRIBUTE_ACCESS_WRITABLE        = 0x0020, // b0000_0000 b0010_0000
+  CH_ZCL_ATTRIBUTE_ACCESS_REPORTABLE      = 0x0040, // b0000_0000 b0100_0000
+  CH_ZCL_ATTRIBUTE_ACCESS_MASK            = 0x0070, // b0000_0000 b0111_0000
 
-  EM_ZCL_ATTRIBUTE_DATA_DEFAULT           = 0x0100, // b0000_0001 b0000_0000
-  EM_ZCL_ATTRIBUTE_DATA_MINIMUM           = 0x0200, // b0000_0010 b0000_0000
-  EM_ZCL_ATTRIBUTE_DATA_MAXIMUM           = 0x0400, // b0000_0100 b0000_0000
-  EM_ZCL_ATTRIBUTE_DATA_MASK              = 0x0700, // b0000_0111 b0000_0000
-  EM_ZCL_ATTRIBUTE_DATA_BOUNDED           = 0x0800, // b0000_1000 b0000_0000
-  EM_ZCL_ATTRIBUTE_DATA_ANALOG            = 0x1000, // b0001_0000 b0000_0000
+  CH_ZCL_ATTRIBUTE_DATA_DEFAULT           = 0x0100, // b0000_0001 b0000_0000
+  CH_ZCL_ATTRIBUTE_DATA_MINIMUM           = 0x0200, // b0000_0010 b0000_0000
+  CH_ZCL_ATTRIBUTE_DATA_MAXIMUM           = 0x0400, // b0000_0100 b0000_0000
+  CH_ZCL_ATTRIBUTE_DATA_MASK              = 0x0700, // b0000_0111 b0000_0000
+  CH_ZCL_ATTRIBUTE_DATA_BOUNDED           = 0x0800, // b0000_1000 b0000_0000
+  CH_ZCL_ATTRIBUTE_DATA_ANALOG            = 0x1000, // b0001_0000 b0000_0000
 };
 
 typedef struct {
-  const EmberZclClusterSpec_t *clusterSpec;
-  EmberZclAttributeId_t attributeId;
-  EmZclAttributeMask_t mask;
+  const ChipZclClusterSpec_t *clusterSpec;
+  ChipZclAttributeId_t attributeId;
+  ChZclAttributeMask_t mask;
   size_t dataOffset;
   size_t defaultMinMaxLookupOffset;
   size_t size;
   uint8_t type;
-} EmZclAttributeEntry_t;
+} ChZclAttributeEntry_t;
 
-typedef uint8_t EmZclAttributeQueryFilterType_t;
+typedef uint8_t ChZclAttributeQueryFilterType_t;
 enum {
-  EM_ZCL_ATTRIBUTE_QUERY_FILTER_TYPE_ID,
-  EM_ZCL_ATTRIBUTE_QUERY_FILTER_TYPE_COUNT,
-  EM_ZCL_ATTRIBUTE_QUERY_FILTER_TYPE_RANGE,
-  EM_ZCL_ATTRIBUTE_QUERY_FILTER_TYPE_WILDCARD,
+  CH_ZCL_ATTRIBUTE_QUERY_FILTER_TYPE_ID,
+  CH_ZCL_ATTRIBUTE_QUERY_FILTER_TYPE_COUNT,
+  CH_ZCL_ATTRIBUTE_QUERY_FILTER_TYPE_RANGE,
+  CH_ZCL_ATTRIBUTE_QUERY_FILTER_TYPE_WILDCARD,
 };
 
 typedef struct {
-  EmberZclAttributeId_t start;
+  ChipZclAttributeId_t start;
   uint16_t count;
-} EmZclAttributeQueryFilterCountData_t;
+} ChZclAttributeQueryFilterCountData_t;
 
 typedef struct {
-  EmberZclAttributeId_t start;
-  EmberZclAttributeId_t end;
-} EmZclAttributeQueryFilterRangeData_t;
+  ChipZclAttributeId_t start;
+  ChipZclAttributeId_t end;
+} ChZclAttributeQueryFilterRangeData_t;
 
 typedef struct {
-  EmZclAttributeQueryFilterType_t type;
+  ChZclAttributeQueryFilterType_t type;
   union {
-    EmberZclAttributeId_t attributeId;
-    EmZclAttributeQueryFilterCountData_t countData;
-    EmZclAttributeQueryFilterRangeData_t rangeData;
+    ChipZclAttributeId_t attributeId;
+    ChZclAttributeQueryFilterCountData_t countData;
+    ChZclAttributeQueryFilterRangeData_t rangeData;
   } data;
-} EmZclAttributeQueryFilter_t;
+} ChZclAttributeQueryFilter_t;
 
-#define EM_ZCL_ATTRIBUTE_QUERY_FILTER_COUNT_MAX 10
+#define CH_ZCL_ATTRIBUTE_QUERY_FILTER_COUNT_MAX 10
 
-typedef uint16_t EmZclMetadata_t;
+typedef uint16_t ChZclMetadata_t;
 enum {
-  EM_ZCL_METADATA_NONE,
-  EM_ZCL_METADATA_ID,
-  EM_ZCL_METADATA_TYPE,
-  EM_ZCL_METADATA_BASE,
-  EM_ZCL_METADATA_DISPLAY_NAME,
-  EM_ZCL_METADATA_DESCRIPTION,
-  EM_ZCL_METADATA_UNIT,
-  EM_ZCL_METADATA_MIN_VALUE,
-  EM_ZCL_METADATA_MAX_VALUE,
-  EM_ZCL_METADATA_ACCESS,
-  EM_ZCL_METADATA_VARIABILITY,
-  EM_ZCL_METADATA_VOLATILITY,
-  EM_ZCL_METADATA_LIMITED_WRITES,
-  EM_ZCL_METADATA_LINKS,
-  EM_ZCL_METADATA_TAGS,
-  EM_ZCL_METADATA_VALUE_TAGS,
-  EM_ZCL_METADATA_HYPERTEXT_REF,
-  EM_ZCL_METADATA_WILDCARD,
-  EM_ZCL_METADATA_NOT_SUPPORTED,
+  CH_ZCL_METADATA_NONE,
+  CH_ZCL_METADATA_ID,
+  CH_ZCL_METADATA_TYPE,
+  CH_ZCL_METADATA_BASE,
+  CH_ZCL_METADATA_DISPLAY_NAME,
+  CH_ZCL_METADATA_DESCRIPTION,
+  CH_ZCL_METADATA_UNIT,
+  CH_ZCL_METADATA_MIN_VALUE,
+  CH_ZCL_METADATA_MAX_VALUE,
+  CH_ZCL_METADATA_ACCESS,
+  CH_ZCL_METADATA_VARIABILITY,
+  CH_ZCL_METADATA_VOLATILITY,
+  CH_ZCL_METADATA_LIMITED_WRITES,
+  CH_ZCL_METADATA_LINKS,
+  CH_ZCL_METADATA_TAGS,
+  CH_ZCL_METADATA_VALUE_TAGS,
+  CH_ZCL_METADATA_HYPERTEXT_REF,
+  CH_ZCL_METADATA_WILDCARD,
+  CH_ZCL_METADATA_NOT_SUPPORTED,
 };
 
 typedef struct {
   // f=
-  EmZclAttributeQueryFilter_t filters[EM_ZCL_ATTRIBUTE_QUERY_FILTER_COUNT_MAX];
+  ChZclAttributeQueryFilter_t filters[CH_ZCL_ATTRIBUTE_QUERY_FILTER_COUNT_MAX];
   uint8_t filterCount;
 
   // u
   bool undivided;
 
   // meta=
-  EmZclMetadata_t metadata;
-} EmZclAttributeQuery_t;
+  ChZclMetadata_t metadata;
+} ChZclAttributeQuery_t;
 #endif
 
 /** @} end addtogroup */
@@ -939,31 +927,31 @@ typedef struct {
 
 /** Defines possible schemes for a network destination. */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberZclScheme_t
+enum ChipZclScheme_t
 #else
-typedef uint8_t EmberZclScheme_t;
+typedef uint8_t ChipZclScheme_t;
 enum
 #endif
 {
   /** Network destination uses standard CoAP scheme. */
-  EMBER_ZCL_SCHEME_COAP  = 0x00,
+  CHIP_ZCL_SCHEME_COAP  = 0x00,
   /** Network destination uses secure CoAP scheme. */
-  EMBER_ZCL_SCHEME_COAPS = 0x01,
+  CHIP_ZCL_SCHEME_COAPS = 0x01,
 };
 
 /** Defines possible types for a network destination. */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberZclNetworkDestinationType_t
+enum ChipZclNetworkDestinationType_t
 #else
-typedef uint8_t EmberZclNetworkDestinationType_t;
+typedef uint8_t ChipZclNetworkDestinationType_t;
 enum
 #endif
 {
   /** A network destination uses an address type. */
-  EMBER_ZCL_NETWORK_DESTINATION_TYPE_ADDRESS  = 0x00,
+  CHIP_ZCL_NETWORK_DESTINATION_TYPE_ADDRESS  = 0x00,
   /** A network destination uses a unique identifier type. */
-  EMBER_ZCL_NETWORK_DESTINATION_TYPE_UID      = 0x01,
-  //EMBER_ZCL_NETWORK_DESTINATION_TYPE_HOSTNAME = 0x02,
+  CHIP_ZCL_NETWORK_DESTINATION_TYPE_UID      = 0x01,
+  //CHIP_ZCL_NETWORK_DESTINATION_TYPE_HOSTNAME = 0x02,
 };
 
 /** This structure holds a binding entry. */
@@ -972,26 +960,26 @@ enum
 typedef struct {
   // From URI.
   /** An endpoint identifier of binding. */
-  EmberZclEndpointId_t endpointId;
+  ChipZclEndpointId_t endpointId;
   /** A cluster specification of binding. */
-  EmberZclClusterSpec_t clusterSpec;
+  ChipZclClusterSpec_t clusterSpec;
 
   struct {
     struct {
-      EmberZclScheme_t scheme;
+      ChipZclScheme_t scheme;
       union {
-        EmberIpv6Address address;
-        EmberZclUid_t uid;
+        ChipIpv6Address address;
+        ChipZclUid_t uid;
       } data;
-      EmberZclNetworkDestinationType_t type;
+      ChipZclNetworkDestinationType_t type;
       uint16_t port;
     } network;
-    EmberZclApplicationDestination_t application;
+    ChipZclApplicationDestination_t application;
   } destination;
 
   /** A reporting configuration of binding. */
-  EmberZclReportingConfigurationId_t reportingConfigurationId;
-} EmberZclBindingEntry_t;
+  ChipZclReportingConfigurationId_t reportingConfigurationId;
+} ChipZclBindingEntry_t;
 
 /**************************************************************************//**
  * A handler fired when adding, updating, or removing a binding.
@@ -1000,13 +988,13 @@ typedef struct {
  * @param context A context of binding to add, update, or remove
  * @param entry An entry of binding to add, update, or remove
  *
- * @sa emberZclSendAddBinding()
- * @sa emberZclSendUpdateBinding()
- * @sa emberZclSendRemoveBinding()
+ * @sa chipZclSendAddBinding()
+ * @sa chipZclSendUpdateBinding()
+ * @sa chipZclSendRemoveBinding()
  *****************************************************************************/
-typedef void (*EmberZclBindingResponseHandler)(EmberZclMessageStatus_t status,
-                                               const EmberZclBindingContext_t *context,
-                                               const EmberZclBindingEntry_t *entry);
+typedef void (*ChipZclBindingResponseHandler)(ChipZclMessageStatus_t status,
+                                               const ChipZclBindingContext_t *context,
+                                               const ChipZclBindingEntry_t *entry);
 
 /** @} end addtogroup */
 
@@ -1014,17 +1002,17 @@ typedef void (*EmberZclBindingResponseHandler)(EmberZclMessageStatus_t status,
 // Commands.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef void (*EmZclRequestHandler)(const EmberZclCommandContext_t *context,
+typedef void (*ChZclRequestHandler)(const ChipZclCommandContext_t *context,
                                     const void *request);
-typedef void (*EmZclResponseHandler)(EmberZclMessageStatus_t status,
-                                     const EmberZclCommandContext_t *context,
+typedef void (*ChZclResponseHandler)(ChipZclMessageStatus_t status,
+                                     const ChipZclCommandContext_t *context,
                                      const void *response);
 typedef struct {
-  const EmberZclClusterSpec_t *clusterSpec;
-  EmberZclCommandId_t commandId;
+  const ChipZclClusterSpec_t *clusterSpec;
+  ChipZclCommandId_t commandId;
   const ZclipStructSpec *spec;
-  EmZclRequestHandler handler;
-} EmZclCommandEntry_t;
+  ChZclRequestHandler handler;
+} ChZclCommandEntry_t;
 #endif
 
 // -----------------------------------------------------------------------------
@@ -1037,35 +1025,35 @@ typedef struct {
  * @{
  */
 
-#ifndef EMBER_ZCL_MAX_GROUP_NAME_LENGTH
-  #define EMBER_ZCL_MAX_GROUP_NAME_LENGTH 0
+#ifndef CHIP_ZCL_MAX_GROUP_NAME_LENGTH
+  #define CHIP_ZCL_MAX_GROUP_NAME_LENGTH 0
 #endif
 
 /**
- * This structure holds a group entry that represents membership of an endpoint
+ * This structure holds a group entry that represents mchipship of an endpoint
  * in a group. */
 // NOTE: When modifying this structure take into account NVM token space and
 // backward compatibility considerations
 typedef struct {
   /** A group identifier of a group entry. */
-  EmberZclGroupId_t groupId;
+  ChipZclGroupId_t groupId;
   /** An endpoint identifier of a group entry. */
-  EmberZclEndpointId_t endpointId;
+  ChipZclEndpointId_t endpointId;
   /** Length of group name. */
   uint8_t groupNameLength;
   /** An array containing group name. */
-#if EMBER_ZCL_MAX_GROUP_NAME_LENGTH == 0
+#if CHIP_ZCL_MAX_GROUP_NAME_LENGTH == 0
   /** Save space **/
 #else
-  uint8_t groupName[EMBER_ZCL_MAX_GROUP_NAME_LENGTH];
+  uint8_t groupName[CHIP_ZCL_MAX_GROUP_NAME_LENGTH];
 #endif
   /** Address assignment mode as passed in "add group" command or 0xFF if address is not assigned **/
   uint8_t addrAssignmentMode;
   /** Group IPv6 address or flag/scope bits from "add group" command **/
-  EmberIpv6Address  groupMcastAddress;
-  /** UDP port the group is listening on: EMBER_COAP_PORT or whatever was passed in "add group" **/
+  ChipIpv6Address  groupMcastAddress;
+  /** UDP port the group is listening on: CHIP_COAP_PORT or whatever was passed in "add group" **/
   uint16_t groupUdpPort;
-} EmberZclGroupEntry_t;
+} ChipZclGroupEntry_t;
 
 /** @} end addtogroup */
 
@@ -1085,7 +1073,7 @@ typedef struct {
   uint16_t minimumIntervalS;
   /** A maximum interval in seconds. */
   uint16_t maximumIntervalS;
-} EmberZclReportingConfiguration_t;
+} ChipZclReportingConfiguration_t;
 
 /** @} end addtogroup */
 
@@ -1096,20 +1084,20 @@ typedef struct {
 // This value is used when declaring buffers to hold ZCLIP payload data (with
 // the exception of responses to /.well-known/core requests). This size has
 // proven to be sufficient for the majority of ZCLIP messages, but can be
-// updated to fit an application's needs. It is important to remember that
+// updated to fit an application's needs. It is important to remchip that
 // fragmentation may not be supported on every transport layer sitting below
 // a ZCLIP implementation.
-#define EM_ZCL_MAX_PAYLOAD_SIZE 128
+#define CH_ZCL_MAX_PAYLOAD_SIZE 128
 
 #define MAX_URI_PATH_SEGMENTS 6 // zcl/[eg]/XX/<cluster>/Y/ZZ
 #define MAX_URI_QUERY_SEGMENTS 10 // actual value TBD
 
 typedef struct {
-  EmberCoapCode code;
-  EmberCoapReadOptions *options;
+  ChipCoapCode code;
+  ChipCoapReadOptions *options;
   const uint8_t *payload;
   uint16_t payloadLength;
-  const EmberCoapRequestInfo *info;
+  const ChipCoapRequestInfo *info;
   const uint8_t *uriPath[MAX_URI_PATH_SEGMENTS];
   uint16_t uriPathLength[MAX_URI_PATH_SEGMENTS];
   uint8_t uriPathSegments;
@@ -1120,19 +1108,19 @@ typedef struct {
   union {
     struct { // zcl values
       // Values parsed out of the URI Path
-      const EmZclEndpointEntry_t *endpoint;
-      EmberZclGroupId_t groupId;
-      const EmZclAttributeEntry_t *attribute;
-      EmberZclBindingId_t bindingId;
-      const EmZclCommandEntry_t *command;
-      EmberZclReportingConfigurationId_t reportingConfigurationId;
+      const ChZclEndpointEntry_t *endpoint;
+      ChipZclGroupId_t groupId;
+      const ChZclAttributeEntry_t *attribute;
+      ChipZclBindingId_t bindingId;
+      const ChZclCommandEntry_t *command;
+      ChipZclReportingConfigurationId_t reportingConfigurationId;
 
       // Values parsed out of the URI Queries
-      EmberZclClusterSpec_t clusterSpec;
-      EmberZclDeviceId_t deviceId;
-      EmberZclClusterRevision_t clusterRevision;
-      EmZclDiscoveryContextMask_t mask;
-      EmZclAttributeQuery_t attributeQuery;
+      ChipZclClusterSpec_t clusterSpec;
+      ChipZclDeviceId_t deviceId;
+      ChipZclClusterRevision_t clusterRevision;
+      ChZclDiscoveryContextMask_t mask;
+      ChZclAttributeQuery_t attributeQuery;
     };
     struct { // rd values
       uint8_t rdConfId;
@@ -1142,66 +1130,66 @@ typedef struct {
   const uint8_t *uidFilterString;
   uint16_t uidFilterLength;
 
-  EmberZclUid_t uid;
+  ChipZclUid_t uid;
   uint16_t uidBits;
-} EmZclContext_t;
+} ChZclContext_t;
 
-typedef EmberStatus (*EmZclMultiEndpointHandler)(
-  const EmZclContext_t *context,
+typedef ChipStatus (*ChZclMultiEndpointHandler)(
+  const ChZclContext_t *context,
   CborState *state,
   void *data);
 
-typedef EmberStatus (*EmZclCliRequestCommandFunction)(
-  const EmberZclDestination_t *destination,
+typedef ChipStatus (*ChZclCliRequestCommandFunction)(
+  const ChipZclDestination_t *destination,
   const void *payloadStruct,
-  const EmZclResponseHandler responseHandler);
+  const ChZclResponseHandler responseHandler);
 
-typedef uint8_t EmZclUriFlag;
+typedef uint8_t ChZclUriFlag;
 enum {
-  EM_ZCL_URI_FLAG_METHOD_MASK    = 0x0F,
-  EM_ZCL_URI_FLAG_METHOD_GET     = 0x01,
-  EM_ZCL_URI_FLAG_METHOD_POST    = 0x02,
-  EM_ZCL_URI_FLAG_METHOD_PUT     = 0x04,
-  EM_ZCL_URI_FLAG_METHOD_DELETE  = 0x08,
-  EM_ZCL_URI_FLAG_FORMAT_MASK    = 0x30,
-  EM_ZCL_URI_FLAG_FORMAT_CBOR    = 0x10,
-  EM_ZCL_URI_FLAG_FORMAT_LINK    = 0x20,
+  CH_ZCL_URI_FLAG_METHOD_MASK    = 0x0F,
+  CH_ZCL_URI_FLAG_METHOD_GET     = 0x01,
+  CH_ZCL_URI_FLAG_METHOD_POST    = 0x02,
+  CH_ZCL_URI_FLAG_METHOD_PUT     = 0x04,
+  CH_ZCL_URI_FLAG_METHOD_DELETE  = 0x08,
+  CH_ZCL_URI_FLAG_FORMAT_MASK    = 0x30,
+  CH_ZCL_URI_FLAG_FORMAT_CBOR    = 0x10,
+  CH_ZCL_URI_FLAG_FORMAT_LINK    = 0x20,
 };
 
-typedef bool (EmZclSegmentMatch)(EmZclContext_t *context, void *data, uint8_t depth);
-typedef void (EmZclUriAction)(EmZclContext_t *context);
+typedef bool (ChZclSegmentMatch)(ChZclContext_t *context, void *data, uint8_t depth);
+typedef void (ChZclUriAction)(ChZclContext_t *context);
 
 typedef const struct {
-  EmZclSegmentMatch *match;
+  ChZclSegmentMatch *match;
   void *data;
-  EmZclSegmentMatch *parse;
-} EmZclUriQuery;
+  ChZclSegmentMatch *parse;
+} ChZclUriQuery;
 
 typedef const struct {
   uint8_t matchSkip;    // how many entries to skip if the match succeeds
   uint8_t failSkip;     // how many entries to skip if the match fails
-  EmZclUriFlag flags;
-  EmZclSegmentMatch *match;
+  ChZclUriFlag flags;
+  ChZclSegmentMatch *match;
   void *data;
-  EmZclUriQuery *queries;
-  EmZclUriAction *action;
-} EmZclUriPath;
+  ChZclUriQuery *queries;
+  ChZclUriAction *action;
+} ChZclUriPath;
 
 // data representation of a URI-reference / context of URI.
 // e.g., </zc/e/EE/[sc]CCCC>
 typedef struct {
-  EmberZclEndpointId_t endpointId;
-  EmberZclClusterSpec_t *clusterSpec;
-} EmZclUriContext_t;
+  ChipZclEndpointId_t endpointId;
+  ChipZclClusterSpec_t *clusterSpec;
+} ChZclUriContext_t;
 #endif
 
 /** @} end addtogroup */
 
-// Used by emZclUseAccessControl to enable/disable access control
+// Used by chZclUseAccessControl to enable/disable access control
 typedef enum  {
   ZCL_ACCESS_CONTROL_OFF = 0,
   ZCL_ACCESS_CONTROL_ON = 1,
   ZCL_ACCESS_CONTROL_ON_TEST = 2
-} emZclAccessControlMode_t;
+} chZclAccessControlMode_t;
 
 #endif // ZCL_CORE_TYPES_H

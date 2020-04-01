@@ -1,79 +1,67 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_HAL
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_HAL
 
 #define isMulticastAddress(ipAddress) ((ipAddress)[0] == 0xFF)
 
-bool emZclGroupsServerPreAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                                const EmberZclClusterSpec_t *clusterSpec,
-                                                EmberZclAttributeId_t attributeId,
+bool chZclGroupsServerPreAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                                const ChipZclClusterSpec_t *clusterSpec,
+                                                ChipZclAttributeId_t attributeId,
                                                 const void *buffer,
                                                 size_t bufferLength)
 {
-  return (!emberZclAreClusterSpecsEqual(&emberZclClusterGroupsServerSpec,
+  return (!chipZclAreClusterSpecsEqual(&chipZclClusterGroupsServerSpec,
                                         clusterSpec)
           || *(const uint8_t *)buffer == 0);
 }
 
-static EmberZclStatus_t sanityCheckAddressParameters(int8u addrAssignmentMode, uint8_t *addrPtr, uint32_t addrLength)
+static ChipZclStatus_t sanityCheckAddressParameters(int8u addrAssignmentMode, uint8_t *addrPtr, uint32_t addrLength)
 {
   // For manual assignment mode the address parameter must be present and must carry a full IPv6 address
-  if (addrAssignmentMode == EMBER_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL  && addrLength != 16) {
-    return EMBER_ZCL_STATUS_FAILURE;
+  if (addrAssignmentMode == CHIP_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL  && addrLength != 16) {
+    return CHIP_ZCL_STATUS_FAILURE;
   }
 
   // For auto assignment mode the address parameter must be either absent or be a single byte
-  if ((EMBER_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MIN <= addrAssignmentMode)
-      && (addrAssignmentMode <= EMBER_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MAX)
+  if ((CHIP_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MIN <= addrAssignmentMode)
+      && (addrAssignmentMode <= CHIP_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MAX)
       && (addrLength != 1)
       && (addrLength != 0)) {
-    return EMBER_ZCL_STATUS_FAILURE;
+    return CHIP_ZCL_STATUS_FAILURE;
   }
 
   // Check against manually-assigned address not being multicast, check against invalid mode.
-  if ((addrAssignmentMode == EMBER_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL  && addrLength != 0 && addrPtr != NULL && !emIsMulticastAddress(addrPtr))
-      || (addrAssignmentMode > EMBER_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MAX && addrAssignmentMode != EMBER_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL)) {
-    return EMBER_ZCL_STATUS_FAILURE;
+  if ((addrAssignmentMode == CHIP_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL  && addrLength != 0 && addrPtr != NULL && !emIsMulticastAddress(addrPtr))
+      || (addrAssignmentMode > CHIP_ZCL_GROUP_ASSIGNMENT_MODE_AUTO_MAX && addrAssignmentMode != CHIP_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL)) {
+    return CHIP_ZCL_STATUS_FAILURE;
   }
 
-  return EMBER_ZCL_STATUS_SUCCESS;
+  return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-void emberZclClusterGroupsServerCommandAddGroupRequestHandler(const EmberZclCommandContext_t *context,
-                                                              const EmberZclClusterGroupsServerCommandAddGroupRequest_t *request)
+void chipZclClusterGroupsServerCommandAddGroupRequestHandler(const ChipZclCommandContext_t *context,
+                                                              const ChipZclClusterGroupsServerCommandAddGroupRequest_t *request)
 {
-  emberAfCorePrintln("RX: AddGroup");
-  uint8_t assignmentMode = EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
-  EmberZclClusterGroupsServerCommandAddGroupResponse_t response = { 0 };
-  EmZclGroupNameSupportMask_t nameSupport;
+  chipAfCorePrintln("RX: AddGroup");
+  uint8_t assignmentMode = CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
+  ChipZclClusterGroupsServerCommandAddGroupResponse_t response = { 0 };
+  ChZclGroupNameSupportMask_t nameSupport;
 
   // Check that address parameters are valid
   if (sanityCheckAddressParameters(request->addrAssignmentMode,
                                    request->groupMcastAddress.ptr,
-                                   request->groupMcastAddress.length) != EMBER_ZCL_STATUS_SUCCESS) {
-    response.status  = EMBER_ZCL_STATUS_FAILURE;
+                                   request->groupMcastAddress.length) != CHIP_ZCL_STATUS_SUCCESS) {
+    response.status  = CHIP_ZCL_STATUS_FAILURE;
     goto send_response;
   }
 
@@ -81,19 +69,19 @@ void emberZclClusterGroupsServerCommandAddGroupRequestHandler(const EmberZclComm
   // that both parameters are missing and use default values, we'll track this by setting mode to 0xff.
   // Revisit this logic when proper handling of optional parameters is implemented.
   if (request->groupMcastAddress.length == 0 || request->groupMcastAddress.ptr == NULL) {
-    assignmentMode = EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
+    assignmentMode = CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
   } else {
     assignmentMode = request->addrAssignmentMode;
   }
 
-  if ((emberZclReadAttribute(context->endpointId,
-                             &emberZclClusterGroupsServerSpec,
-                             EMBER_ZCL_CLUSTER_GROUPS_SERVER_ATTRIBUTE_GROUP_NAME_SUPPORT,
+  if ((chipZclReadAttribute(context->endpointId,
+                             &chipZclClusterGroupsServerSpec,
+                             CHIP_ZCL_CLUSTER_GROUPS_SERVER_ATTRIBUTE_GROUP_NAME_SUPPORT,
                              &nameSupport,
                              sizeof(nameSupport))
-       == EMBER_ZCL_STATUS_SUCCESS)
-      && nameSupport & EM_ZCL_GROUP_NAME_SUPPORT_ENABLED) {
-    response.status = emberZclAddEndpointToGroup(context->endpointId,
+       == CHIP_ZCL_STATUS_SUCCESS)
+      && nameSupport & CH_ZCL_GROUP_NAME_SUPPORT_ENABLED) {
+    response.status = chipZclAddEndpointToGroup(context->endpointId,
                                                  request->groupId,
                                                  request->groupName.ptr,
                                                  request->groupName.length,
@@ -102,7 +90,7 @@ void emberZclClusterGroupsServerCommandAddGroupRequestHandler(const EmberZclComm
                                                  request->groupUdpPort);
   } else {
     // ignore the groupName if support is not enabled
-    response.status = emberZclAddEndpointToGroup(context->endpointId,
+    response.status = chipZclAddEndpointToGroup(context->endpointId,
                                                  request->groupId,
                                                  NULL,
                                                  0,
@@ -114,25 +102,25 @@ void emberZclClusterGroupsServerCommandAddGroupRequestHandler(const EmberZclComm
   send_response:
 
   if (isMulticastAddress(context->info->localAddress.bytes)) {
-    ((EmberZclCommandContext_t *)context)->result = EMBER_NO_BUFFERS; // command response will be suppressed
+    ((ChipZclCommandContext_t *)context)->result = CHIP_NO_BUFFERS; // command response will be suppressed
   } else {
     response.groupId = request->groupId;
-    emberZclSendClusterGroupsServerCommandAddGroupResponse(context, &response);
+    chipZclSendClusterGroupsServerCommandAddGroupResponse(context, &response);
   }
 }
 
-void emberZclClusterGroupsServerCommandViewGroupRequestHandler(const EmberZclCommandContext_t *context,
-                                                               const EmberZclClusterGroupsServerCommandViewGroupRequest_t *request)
+void chipZclClusterGroupsServerCommandViewGroupRequestHandler(const ChipZclCommandContext_t *context,
+                                                               const ChipZclClusterGroupsServerCommandViewGroupRequest_t *request)
 {
-  emberAfCorePrintln("RX: ViewGroup");
+  chipAfCorePrintln("RX: ViewGroup");
 
-  EmberZclClusterGroupsServerCommandViewGroupResponse_t response = { 0 };
+  ChipZclClusterGroupsServerCommandViewGroupResponse_t response = { 0 };
   uint8_t emptyString[] = { 0 };
   // Group name "broadcast", this is a ZCL string, not NULL-terminated
   uint8_t broadcastGroupName[] = { 0x62, 0x72, 0x6f, 0x61, 0x64, 0x63, 0x61, 0x73, 0x74 };
-  EmZclGroupNameSupportMask_t nameSupport = 0;
+  ChZclGroupNameSupportMask_t nameSupport = 0;
   size_t                      i = 0;
-  EmberZclGroupEntry_t        entry;
+  ChipZclGroupEntry_t        entry;
 
   response.groupId = request->groupId;
 
@@ -144,35 +132,35 @@ void emberZclClusterGroupsServerCommandViewGroupRequestHandler(const EmberZclCom
   response.groupMcastAddress.length = 0;
   response.groupUdpPort = 0xffff;
 
-  if ((request->groupId < EMBER_ZCL_GROUP_MIN)
+  if ((request->groupId < CHIP_ZCL_GROUP_MIN)
       || isMulticastAddress(context->info->localAddress.bytes)) {
-    response.status = EMBER_ZCL_STATUS_NOT_FOUND;
+    response.status = CHIP_ZCL_STATUS_NOT_FOUND;
     goto send_response;
   }
 
-  emberZclReadAttribute(context->endpointId,
-                        &emberZclClusterGroupsServerSpec,
-                        EMBER_ZCL_CLUSTER_GROUPS_SERVER_ATTRIBUTE_GROUP_NAME_SUPPORT,
+  chipZclReadAttribute(context->endpointId,
+                        &chipZclClusterGroupsServerSpec,
+                        CHIP_ZCL_CLUSTER_GROUPS_SERVER_ATTRIBUTE_GROUP_NAME_SUPPORT,
                         &nameSupport,
                         sizeof(nameSupport));
 
-  for (i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
+  for (i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
     halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
-    if ((request->groupId == EMBER_ZCL_GROUP_ALL_ENDPOINTS)
+    if ((request->groupId == CHIP_ZCL_GROUP_ALL_ENDPOINTS)
         || (request->groupId == entry.groupId && context->endpointId == entry.endpointId)) {
       break;
     }
   }
 
   // Group not found
-  if (i == EMBER_ZCL_GROUP_TABLE_SIZE) {
-    response.status = EMBER_ZCL_STATUS_NOT_FOUND;
+  if (i == CHIP_ZCL_GROUP_TABLE_SIZE) {
+    response.status = CHIP_ZCL_STATUS_NOT_FOUND;
     goto send_response;
   }
 
   // Broadcast group uses hardcoded values
-  if (request->groupId == EMBER_ZCL_GROUP_ALL_ENDPOINTS) {
-    if (nameSupport & EM_ZCL_GROUP_NAME_SUPPORT_ENABLED) {
+  if (request->groupId == CHIP_ZCL_GROUP_ALL_ENDPOINTS) {
+    if (nameSupport & CH_ZCL_GROUP_NAME_SUPPORT_ENABLED) {
       response.groupName.ptr    = broadcastGroupName;
       response.groupName.length = sizeof(broadcastGroupName);
     }
@@ -183,21 +171,21 @@ void emberZclClusterGroupsServerCommandViewGroupRequestHandler(const EmberZclCom
     // omit these entries from the payload map.
     // Revisit when proper handling of optional parameters is implemented.
 
-    response.status = EMBER_ZCL_STATUS_SUCCESS;
+    response.status = CHIP_ZCL_STATUS_SUCCESS;
   } else {
-    if (nameSupport & EM_ZCL_GROUP_NAME_SUPPORT_ENABLED) {
-#if EMBER_ZCL_MAX_GROUP_NAME_LENGTH == 0
+    if (nameSupport & CH_ZCL_GROUP_NAME_SUPPORT_ENABLED) {
+#if CHIP_ZCL_MAX_GROUP_NAME_LENGTH == 0
 #else
       response.groupName.ptr = entry.groupName;
       response.groupName.length = entry.groupNameLength;
 #endif
     }
 
-    if (entry.addrAssignmentMode != EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
+    if (entry.addrAssignmentMode != CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL) {
       response.addrAssignmentMode = entry.addrAssignmentMode;
       response.groupMcastAddress.ptr = entry.groupMcastAddress.bytes;
-      response.groupMcastAddress.length = (entry.addrAssignmentMode == EMBER_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL ? 16 : 1);
-      response.groupUdpPort = entry.groupUdpPort ? entry.groupUdpPort : EMBER_COAP_PORT; // Return what we actually use
+      response.groupMcastAddress.length = (entry.addrAssignmentMode == CHIP_ZCL_GROUP_ASSIGNMENT_MODE_MANUAL ? 16 : 1);
+      response.groupUdpPort = entry.groupUdpPort ? entry.groupUdpPort : CHIP_COAP_PORT; // Return what we actually use
     } else {
       // No address was assigned to this group. Return values for addrAssignmentMode, groupMcastAddress and
       // groupUdpPort that are out of range for these ZCLIP types, this will cause CBOR encoder to omit these
@@ -205,21 +193,21 @@ void emberZclClusterGroupsServerCommandViewGroupRequestHandler(const EmberZclCom
       // Revisit when proper handling of optional parameters is implemented.
     }
 
-    response.status = EMBER_ZCL_STATUS_SUCCESS;
+    response.status = CHIP_ZCL_STATUS_SUCCESS;
   }
 
   send_response:
   if (isMulticastAddress(context->info->localAddress.bytes)) {
-    ((EmberZclCommandContext_t *)context)->result = EMBER_NO_BUFFERS;     // command response will be suppressed
+    ((ChipZclCommandContext_t *)context)->result = CHIP_NO_BUFFERS;     // command response will be suppressed
   } else {
-    emberZclSendClusterGroupsServerCommandViewGroupResponse(context, &response);
+    chipZclSendClusterGroupsServerCommandViewGroupResponse(context, &response);
   }
 }
 
-void emberZclClusterGroupsServerCommandGetGroupMembershipRequestHandler(const EmberZclCommandContext_t *context,
-                                                                        const EmberZclClusterGroupsServerCommandGetGroupMembershipRequest_t *request)
+void chipZclClusterGroupsServerCommandGetGroupMchipshipRequestHandler(const ChipZclCommandContext_t *context,
+                                                                        const ChipZclClusterGroupsServerCommandGetGroupMchipshipRequest_t *request)
 {
-  emberAfCorePrintln("RX: GetGroupMembership");
+  chipAfCorePrintln("RX: GetGroupMchipship");
 
   // Set buffer size for groupList buffers (request & response).
   #define GROUP_LIST_BUFFER_SIZE 40
@@ -233,20 +221,20 @@ void emberZclClusterGroupsServerCommandGetGroupMembershipRequestHandler(const Em
                                      sizeof(requestGroupListBuffer),
                                      sizeof(requestGroupListBuffer[0]));
 
-  EmberZclClusterGroupsServerCommandGetGroupMembershipResponse_t response = { 0 };
+  ChipZclClusterGroupsServerCommandGetGroupMchipshipResponse_t response = { 0 };
 
-  response.capacity = emZclGetGroupsCapacity();
+  response.capacity = chZclGetGroupsCapacity();
 
   // Construct response groupList in a buffer. Sized +1 for broadcast group.
-  EmberZclGroupId_t responseGroupListBuffer[EMBER_ZCL_GROUP_TABLE_SIZE + 1];
+  ChipZclGroupId_t responseGroupListBuffer[CHIP_ZCL_GROUP_TABLE_SIZE + 1];
   uint16_t responseGroupListCount = 0;
 
   if (requestGroupListCount != 0) {
     // Match on the supplied GroupList.
     for (size_t i = 0; i < requestGroupListCount; i++) {
-      EmberZclGroupId_t groupId = requestGroupListBuffer[i];
-      if (emberZclIsEndpointInGroup(context->endpointId, groupId)) {
-        emZclInsertGroupIdIntoSortedList(groupId,
+      ChipZclGroupId_t groupId = requestGroupListBuffer[i];
+      if (chipZclIsEndpointInGroup(context->endpointId, groupId)) {
+        chZclInsertGroupIdIntoSortedList(groupId,
                                          responseGroupListBuffer,
                                          &responseGroupListCount,
                                          COUNTOF(responseGroupListBuffer));
@@ -254,21 +242,21 @@ void emberZclClusterGroupsServerCommandGetGroupMembershipRequestHandler(const Em
     }
   } else {
     // Supplied GroupList is empty. Match on any group of which the
-    // endpoint is a member, including Broadcast Group.
-    for (size_t i = 0; i < EMBER_ZCL_GROUP_TABLE_SIZE; i++) {
-      EmberZclGroupEntry_t entry;
+    // endpoint is a mchip, including Broadcast Group.
+    for (size_t i = 0; i < CHIP_ZCL_GROUP_TABLE_SIZE; i++) {
+      ChipZclGroupEntry_t entry;
       halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_GROUP_TABLE, i);
-      EmberZclGroupId_t groupId = entry.groupId;
-      if (groupId != EMBER_ZCL_GROUP_NULL
+      ChipZclGroupId_t groupId = entry.groupId;
+      if (groupId != CHIP_ZCL_GROUP_NULL
           && context->endpointId == entry.endpointId) {
-        emZclInsertGroupIdIntoSortedList(groupId,
+        chZclInsertGroupIdIntoSortedList(groupId,
                                          responseGroupListBuffer,
                                          &responseGroupListCount,
                                          COUNTOF(responseGroupListBuffer));
       }
     }
     // Broadcast Group is 0xffff, last in the array.
-    responseGroupListBuffer[responseGroupListCount] = EMBER_ZCL_GROUP_ALL_ENDPOINTS;
+    responseGroupListBuffer[responseGroupListCount] = CHIP_ZCL_GROUP_ALL_ENDPOINTS;
     responseGroupListCount++;
   }
 
@@ -279,58 +267,58 @@ void emberZclClusterGroupsServerCommandGetGroupMembershipRequestHandler(const Em
 
   if ((responseGroupListCount == 0)
       && (isMulticastAddress(context->info->localAddress.bytes))) {
-    ((EmberZclCommandContext_t *)context)->result = EMBER_NO_BUFFERS; // command response will be suppressed
+    ((ChipZclCommandContext_t *)context)->result = CHIP_NO_BUFFERS; // command response will be suppressed
   } else {
-    emberZclSendClusterGroupsServerCommandGetGroupMembershipResponse(context,
+    chipZclSendClusterGroupsServerCommandGetGroupMchipshipResponse(context,
                                                                      &response);
   }
 }
 
-void emberZclClusterGroupsServerCommandRemoveGroupRequestHandler(const EmberZclCommandContext_t *context,
-                                                                 const EmberZclClusterGroupsServerCommandRemoveGroupRequest_t *request)
+void chipZclClusterGroupsServerCommandRemoveGroupRequestHandler(const ChipZclCommandContext_t *context,
+                                                                 const ChipZclClusterGroupsServerCommandRemoveGroupRequest_t *request)
 {
-  emberAfCorePrintln("RX: RemoveGroup");
+  chipAfCorePrintln("RX: RemoveGroup");
 
-  EmberZclClusterGroupsServerCommandRemoveGroupResponse_t response = { 0 };
-  response.status = emberZclRemoveEndpointFromGroup(context->endpointId,
+  ChipZclClusterGroupsServerCommandRemoveGroupResponse_t response = { 0 };
+  response.status = chipZclRemoveEndpointFromGroup(context->endpointId,
                                                     request->groupId);
   response.groupId = request->groupId;
 
   if (isMulticastAddress(context->info->localAddress.bytes)) {
-    ((EmberZclCommandContext_t *)context)->result = EMBER_NO_BUFFERS; // command response will be suppressed
+    ((ChipZclCommandContext_t *)context)->result = CHIP_NO_BUFFERS; // command response will be suppressed
   } else {
-    emberZclSendClusterGroupsServerCommandRemoveGroupResponse(context, &response);
+    chipZclSendClusterGroupsServerCommandRemoveGroupResponse(context, &response);
   }
 }
 
-void emberZclClusterGroupsServerCommandRemoveAllGroupsRequestHandler(const EmberZclCommandContext_t *context,
-                                                                     const EmberZclClusterGroupsServerCommandRemoveAllGroupsRequest_t *request)
+void chipZclClusterGroupsServerCommandRemoveAllGroupsRequestHandler(const ChipZclCommandContext_t *context,
+                                                                     const ChipZclClusterGroupsServerCommandRemoveAllGroupsRequest_t *request)
 {
-  emberAfCorePrintln("RX: RemoveAllGroups");
+  chipAfCorePrintln("RX: RemoveAllGroups");
 
-  emberZclRemoveEndpointFromAllGroups(context->endpointId);
+  chipZclRemoveEndpointFromAllGroups(context->endpointId);
 
   if (isMulticastAddress(context->info->localAddress.bytes)) {
-    ((EmberZclCommandContext_t *)context)->result = EMBER_NO_BUFFERS; // command response will be suppressed
+    ((ChipZclCommandContext_t *)context)->result = CHIP_NO_BUFFERS; // command response will be suppressed
   } else {
-    emZclRespond204Changed(context->info);   // Only 2.04 or 5.00 is allowed, 5.00 is not suitable here.
+    chZclRespond204Changed(context->info);   // Only 2.04 or 5.00 is allowed, 5.00 is not suitable here.
   }
 }
 
-void emberZclClusterGroupsServerCommandAddGroupIfIdentifyingRequestHandler(const EmberZclCommandContext_t *context,
-                                                                           const EmberZclClusterGroupsServerCommandAddGroupIfIdentifyingRequest_t *request)
+void chipZclClusterGroupsServerCommandAddGroupIfIdentifyingRequestHandler(const ChipZclCommandContext_t *context,
+                                                                           const ChipZclClusterGroupsServerCommandAddGroupIfIdentifyingRequest_t *request)
 {
-  emberAfCorePrintln("RX: AddGroupIfIdentifying");
-  uint8_t assignmentMode = EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
-  EmberZclClusterGroupsServerCommandAddGroupResponse_t response = { 0 };
+  chipAfCorePrintln("RX: AddGroupIfIdentifying");
+  uint8_t assignmentMode = CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
+  ChipZclClusterGroupsServerCommandAddGroupResponse_t response = { 0 };
   uint16_t identifyTimeS;
-  EmZclGroupNameSupportMask_t nameSupport;
+  ChZclGroupNameSupportMask_t nameSupport;
 
   // Check that address parameters are valid
   if (sanityCheckAddressParameters(request->addrAssignmentMode,
                                    request->groupMcastAddress.ptr,
-                                   request->groupMcastAddress.length) != EMBER_ZCL_STATUS_SUCCESS) {
-    response.status  = EMBER_ZCL_STATUS_FAILURE;
+                                   request->groupMcastAddress.length) != CHIP_ZCL_STATUS_SUCCESS) {
+    response.status  = CHIP_ZCL_STATUS_FAILURE;
     goto send_response;
   }
 
@@ -339,28 +327,28 @@ void emberZclClusterGroupsServerCommandAddGroupIfIdentifyingRequestHandler(const
   // parameters are missing.
   // Revisit this logic when proper handling of optional parameters is implemented.
   if (request->groupMcastAddress.length == 0 || request->groupMcastAddress.ptr == NULL) {
-    assignmentMode = EMBER_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
+    assignmentMode = CHIP_ZCL_GROUP_ASSIGNMENT_MODE_NULL;
   } else {
     assignmentMode = request->addrAssignmentMode;
   }
 
-  EmberZclStatus_t status
-    = emberZclReadAttribute(context->endpointId,
-                            &emberZclClusterIdentifyServerSpec,
-                            EMBER_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
+  ChipZclStatus_t status
+    = chipZclReadAttribute(context->endpointId,
+                            &chipZclClusterIdentifyServerSpec,
+                            CHIP_ZCL_CLUSTER_IDENTIFY_SERVER_ATTRIBUTE_IDENTIFY_TIME,
                             &identifyTimeS,
                             sizeof(identifyTimeS));
 
-  if ((status == EMBER_ZCL_STATUS_SUCCESS)
+  if ((status == CHIP_ZCL_STATUS_SUCCESS)
       && (identifyTimeS != 0)) {
-    if ((emberZclReadAttribute(context->endpointId,
-                               &emberZclClusterGroupsServerSpec,
-                               EMBER_ZCL_CLUSTER_GROUPS_SERVER_ATTRIBUTE_GROUP_NAME_SUPPORT,
+    if ((chipZclReadAttribute(context->endpointId,
+                               &chipZclClusterGroupsServerSpec,
+                               CHIP_ZCL_CLUSTER_GROUPS_SERVER_ATTRIBUTE_GROUP_NAME_SUPPORT,
                                &nameSupport,
                                sizeof(nameSupport))
-         == EMBER_ZCL_STATUS_SUCCESS)
-        && nameSupport & EM_ZCL_GROUP_NAME_SUPPORT_ENABLED) {
-      response.status = emberZclAddEndpointToGroup(context->endpointId,
+         == CHIP_ZCL_STATUS_SUCCESS)
+        && nameSupport & CH_ZCL_GROUP_NAME_SUPPORT_ENABLED) {
+      response.status = chipZclAddEndpointToGroup(context->endpointId,
                                                    request->groupId,
                                                    request->groupName.ptr,
                                                    request->groupName.length,
@@ -369,7 +357,7 @@ void emberZclClusterGroupsServerCommandAddGroupIfIdentifyingRequestHandler(const
                                                    request->groupUdpPort);
     } else {
       // ignore the groupName if support is not enabled
-      response.status = emberZclAddEndpointToGroup(context->endpointId,
+      response.status = chipZclAddEndpointToGroup(context->endpointId,
                                                    request->groupId,
                                                    NULL,
                                                    0,
@@ -380,15 +368,15 @@ void emberZclClusterGroupsServerCommandAddGroupIfIdentifyingRequestHandler(const
   } else {
     // Device is not identifying so send back failure without attempting to add
     // endpoint to group.
-    response.status = EMBER_ZCL_STATUS_FAILURE;
+    response.status = CHIP_ZCL_STATUS_FAILURE;
   }
 
   send_response:
 
   if (isMulticastAddress(context->info->localAddress.bytes)) {
-    ((EmberZclCommandContext_t *)context)->result = EMBER_NO_BUFFERS; // command response will be suppressed
+    ((ChipZclCommandContext_t *)context)->result = CHIP_NO_BUFFERS; // command response will be suppressed
   } else {
     response.groupId = request->groupId;
-    emberZclSendClusterGroupsServerCommandAddGroupResponse(context, &response);
+    chipZclSendClusterGroupsServerCommandAddGroupResponse(context, &response);
   }
 }

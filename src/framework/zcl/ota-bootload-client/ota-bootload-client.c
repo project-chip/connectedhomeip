@@ -1,43 +1,31 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_HAL
-#include EMBER_AF_API_STACK
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_ZCL_CORE_WELL_KNOWN
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CORE
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_CLIENT
-#include EMBER_AF_API_ZCL_OTA_BOOTLOAD_STORAGE_CORE
-#include EMBER_AF_API_ZCL_CORE_DTLS_MANAGER
+#include CHIP_AF_API_HAL
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE_WELL_KNOWN
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_CORE
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_CLIENT
+#include CHIP_AF_API_ZCL_OTA_BOOTLOAD_STORAGE_CORE
+#include CHIP_AF_API_ZCL_CORE_DTLS_MANAGER
 
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #else
-  #define emberAfPluginOtaBootloadClientPrint(...)
-  #define emberAfPluginOtaBootloadClientPrintln(...)
-  #define emberAfPluginOtaBootloadClientFlush()
-  #define emberAfPluginOtaBootloadClientDebugExec(x)
-  #define emberAfPluginOtaBootloadClientPrintBuffer(buffer, len, withSpace)
-  #define emberAfPluginOtaBootloadClientPrintString(buffer)
+  #define chipAfPluginOtaBootloadClientPrint(...)
+  #define chipAfPluginOtaBootloadClientPrintln(...)
+  #define chipAfPluginOtaBootloadClientFlush()
+  #define chipAfPluginOtaBootloadClientDebugExec(x)
+  #define chipAfPluginOtaBootloadClientPrintBuffer(buffer, len, withSpace)
+  #define chipAfPluginOtaBootloadClientPrintString(buffer)
 #endif
 
-#ifdef EMBER_SCRIPTED_TEST
+#ifdef CHIP_SCRIPTED_TEST
   #include "ota-bootload-client-test.h"
 #else
   #include "thread-callbacks.h"
@@ -87,19 +75,19 @@ static State_t state;
 // -----------------------------------------------------------------------------
 // Globals
 
-EmberEventControl emZclOtaBootloadClientEventControl;
+ChipEventControl chZclOtaBootloadClientEventControl;
 
-static EmberZclOtaBootloadClientServerInfo_t serverInfo;
-#define HAVE_SERVER_INFO()  (serverInfo.endpointId != EMBER_ZCL_ENDPOINT_NULL)
-#define ERASE_SERVER_INFO() do { serverInfo.endpointId = EMBER_ZCL_ENDPOINT_NULL; curBlockSizeLog = DEFAULT_BLOCK_SIZE_LOG; } while (0)
+static ChipZclOtaBootloadClientServerInfo_t serverInfo;
+#define HAVE_SERVER_INFO()  (serverInfo.endpointId != CHIP_ZCL_ENDPOINT_NULL)
+#define ERASE_SERVER_INFO() do { serverInfo.endpointId = CHIP_ZCL_ENDPOINT_NULL; curBlockSizeLog = DEFAULT_BLOCK_SIZE_LOG; } while (0)
 
-static EmberZclOtaBootloadFileSpec_t fileSpecToDownload;
-#define HAVE_FILE_SPEC_TO_DOWNLOAD()  (fileSpecToDownload.version != EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL)
-#define ERASE_FILE_SPEC_TO_DOWNLOAD() do { fileSpecToDownload.version = EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL; } while (0)
+static ChipZclOtaBootloadFileSpec_t fileSpecToDownload;
+#define HAVE_FILE_SPEC_TO_DOWNLOAD()  (fileSpecToDownload.version != CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL)
+#define ERASE_FILE_SPEC_TO_DOWNLOAD() do { fileSpecToDownload.version = CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION_NULL; } while (0)
 
-static EmberZclStatus_t downloadStatus;
-#define HAVE_DOWNLOAD_STATUS() (downloadStatus != EMBER_ZCL_STATUS_NULL)
-#define ERASE_DOWNLOAD_STATUS() do { downloadStatus = EMBER_ZCL_STATUS_NULL; } while (0)
+static ChipZclStatus_t downloadStatus;
+#define HAVE_DOWNLOAD_STATUS() (downloadStatus != CHIP_ZCL_STATUS_NULL)
+#define ERASE_DOWNLOAD_STATUS() do { downloadStatus = CHIP_ZCL_STATUS_NULL; } while (0)
 
 static bool ipAddressResolved;
 
@@ -109,7 +97,7 @@ static bool immediateUpgrade = false;
 // vendor, thus it could be any length. For now we just base the length off of
 // what our OTA server sends back.
 #define FILE_URI_LENGTH 32
-#if FILE_URI_LENGTH < (EM_ZCL_OTA_BOOTLOAD_UPGRADE_FULL_URI_LENGTH + 1)
+#if FILE_URI_LENGTH < (CH_ZCL_OTA_BOOTLOAD_UPGRADE_FULL_URI_LENGTH + 1)
   #error Length of the URI buffer is not large enough
 #endif
 static uint8_t fileUri[FILE_URI_LENGTH];
@@ -120,23 +108,23 @@ static uint8_t curBlockSizeLog = DEFAULT_BLOCK_SIZE_LOG;
 // Private API
 
 static void scheduleCreateDtlsSession(bool addJitter);
-static EmberStatus schedulePostDiscoverServerState();
+static ChipStatus schedulePostDiscoverServerState();
 static void scheduleQueryNextImage(bool addJitter);
-static void queryNextImageResponseHandler(EmberZclMessageStatus_t status,
-                                          const EmberZclCommandContext_t *context,
-                                          const EmberZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response);
-static void processQueryNextImageResponse(const EmberCoapCode code, const EmberZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response);
-static void blockResponseHandler(EmberCoapStatus status,
-                                 EmberCoapCode code,
-                                 EmberCoapReadOptions *options,
+static void queryNextImageResponseHandler(ChipZclMessageStatus_t status,
+                                          const ChipZclCommandContext_t *context,
+                                          const ChipZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response);
+static void processQueryNextImageResponse(const ChipCoapCode code, const ChipZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response);
+static void blockResponseHandler(ChipCoapStatus status,
+                                 ChipCoapCode code,
+                                 ChipCoapReadOptions *options,
                                  uint8_t *payload,
                                  uint16_t payloadLength,
-                                 EmberCoapResponseInfo *info);
+                                 ChipCoapResponseInfo *info);
 static void scheduleUpgradeEnd(void);
-static void upgradeEndResponseHandler(EmberZclMessageStatus_t status,
-                                      const EmberZclCommandContext_t *context,
-                                      const EmberZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response);
-static void processUpgradeEndResponse(const EmberZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response);
+static void upgradeEndResponseHandler(ChipZclMessageStatus_t status,
+                                      const ChipZclCommandContext_t *context,
+                                      const ChipZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response);
+static void processUpgradeEndResponse(const ChipZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response);
 
 static uint32_t convertToMs(uint32_t delay,
                             DelayType delayType,
@@ -160,34 +148,34 @@ static uint32_t convertToMs(uint32_t delay,
 static void setState(State_t newState, uint32_t delayMs)
 {
   state = newState;
-  emberEventControlSetDelayMS(emZclOtaBootloadClientEventControl, delayMs);
+  chipEventControlSetDelayMS(chZclOtaBootloadClientEventControl, delayMs);
 }
 
-static void serverInfoToZclDestination(EmberZclDestination_t *destination)
+static void serverInfoToZclDestination(ChipZclDestination_t *destination)
 {
   // TODO: send this command to an IPV6 address until UID discovery works.
   assert(HAVE_SERVER_INFO());
   destination->network.address = serverInfo.address;
   destination->network.flags =
-    (serverInfo.scheme == EMBER_ZCL_SCHEME_COAPS
-     ? (EMBER_ZCL_USE_COAPS_FLAG | EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG | EMBER_ZCL_HAVE_UID_FLAG)
-     : EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG);
+    (serverInfo.scheme == CHIP_ZCL_SCHEME_COAPS
+     ? (CHIP_ZCL_USE_COAPS_FLAG | CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG | CHIP_ZCL_HAVE_UID_FLAG)
+     : CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG);
   destination->network.uid = serverInfo.uid;
   destination->network.port = serverInfo.port;
   destination->application.data.endpointId = serverInfo.endpointId;
-  destination->application.type = EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT;
+  destination->application.type = CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT;
 }
 
-void emberZclClusterOtaBootloadClientCommandImageNotifyRequestHandler(
-  const EmberZclCommandContext_t *context,
-  const EmberZclClusterOtaBootloadClientCommandImageNotifyRequest_t *request)
+void chipZclClusterOtaBootloadClientCommandImageNotifyRequestHandler(
+  const ChipZclCommandContext_t *context,
+  const ChipZclClusterOtaBootloadClientCommandImageNotifyRequest_t *request)
 {
-  emberAfPluginOtaBootloadClientPrintln("ImageNotifyRequest received");
-  EmberZclOtaBootloadFileSpec_t fileSpec;
-  EmberZclOtaBootloadHardwareVersion_t hardwareVersion
-    = EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL;
+  chipAfPluginOtaBootloadClientPrintln("ImageNotifyRequest received");
+  ChipZclOtaBootloadFileSpec_t fileSpec;
+  ChipZclOtaBootloadHardwareVersion_t hardwareVersion
+    = CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL;
   if ((request->payloadType != 0x00)
-      && !emberZclOtaBootloadClientGetQueryNextImageParametersCallback(&fileSpec,
+      && !chipZclOtaBootloadClientGetQueryNextImageParametersCallback(&fileSpec,
                                                                        &hardwareVersion)) {
     return;
   }
@@ -212,7 +200,7 @@ void emberZclClusterOtaBootloadClientCommandImageNotifyRequestHandler(
       break;
   }
   uint8_t requestJitter = (halCommonGetRandom() % 100) + 1;
-  emberAfPluginOtaBootloadClientPrintln("ImageNotifyRequest match. Jitter: %u <= %u", requestJitter, request->queryJitter);
+  chipAfPluginOtaBootloadClientPrintln("ImageNotifyRequest match. Jitter: %u <= %u", requestJitter, request->queryJitter);
   if (requestJitter <= request->queryJitter) {
     ERASE_SERVER_INFO();
     setState(STATE_DISCOVER_SERVER, requestJitter);
@@ -233,47 +221,47 @@ static void scheduleDiscoverServer(bool eraseServerInfo, bool addJitter)
     ERASE_SERVER_INFO();
   }
   setState(STATE_DISCOVER_SERVER,
-           convertToMs(EMBER_AF_PLUGIN_OTA_BOOTLOAD_CLIENT_DISCOVER_SERVER_PERIOD_MINUTES,
+           convertToMs(CHIP_AF_PLUGIN_OTA_BOOTLOAD_CLIENT_DISCOVER_SERVER_PERIOD_MINUTES,
                        DELAY_TYPE_MINUTES,
                        addJitter));
   immediateUpgrade = false;
 }
 
-static void dnsLookupResponseHandler(EmberDnsLookupStatus status,
+static void dnsLookupResponseHandler(ChipDnsLookupStatus status,
                                      const uint8_t *domainName,
                                      uint8_t domainNameLength,
-                                     const EmberDnsResponse *response,
+                                     const ChipDnsResponse *response,
                                      void *applicationData,
                                      uint16_t applicationDataLength)
 {
-  emberAfPluginOtaBootloadClientPrintln("dnsLookupResponseHandler: %u", status);
+  chipAfPluginOtaBootloadClientPrintln("dnsLookupResponseHandler: %u", status);
   switch (status) {
-    case EMBER_DNS_LOOKUP_SUCCESS:
+    case CHIP_DNS_LOOKUP_SUCCESS:
       serverInfo.address = response->ipAddress;
-      emberAfPluginOtaBootloadClientPrint("Found via DNS: ");
-      emberAfPluginOtaBootloadClientDebugExec(emberAfPrintIpv6Address(&serverInfo.address));
-      emberAfPluginOtaBootloadClientPrintln("->%u", serverInfo.port);
-      if (schedulePostDiscoverServerState() == EMBER_SUCCESS) {
+      chipAfPluginOtaBootloadClientPrint("Found via DNS: ");
+      chipAfPluginOtaBootloadClientDebugExec(chipAfPrintIpv6Address(&serverInfo.address));
+      chipAfPluginOtaBootloadClientPrintln("->%u", serverInfo.port);
+      if (schedulePostDiscoverServerState() == CHIP_SUCCESS) {
         return;
       }
-      emberAfPluginOtaBootloadClientPrintln("No suitable OTA server at address");
+      chipAfPluginOtaBootloadClientPrintln("No suitable OTA server at address");
       scheduleDiscoverServer(true, false); // Let's try again
       break;
-    case EMBER_DNS_LOOKUP_NO_BORDER_ROUTER:
-    case EMBER_DNS_LOOKUP_NO_BORDER_ROUTER_RESPONSE:
-    case EMBER_DNS_LOOKUP_NO_DNS_RESPONSE:
-      emberAfPluginOtaBootloadClientPrintln("No DNS response: %u", status);
+    case CHIP_DNS_LOOKUP_NO_BORDER_ROUTER:
+    case CHIP_DNS_LOOKUP_NO_BORDER_ROUTER_RESPONSE:
+    case CHIP_DNS_LOOKUP_NO_DNS_RESPONSE:
+      chipAfPluginOtaBootloadClientPrintln("No DNS response: %u", status);
       scheduleDiscoverServer(true, false); // Let's try again
       break;
-    case EMBER_DNS_LOOKUP_BORDER_ROUTER_RESPONSE_ERROR:
-    case EMBER_DNS_LOOKUP_NO_DNS_RESPONSE_ERROR:
-      emberAfPluginOtaBootloadClientPrintln("DNS Error: %u", status);
+    case CHIP_DNS_LOOKUP_BORDER_ROUTER_RESPONSE_ERROR:
+    case CHIP_DNS_LOOKUP_NO_DNS_RESPONSE_ERROR:
+      chipAfPluginOtaBootloadClientPrintln("DNS Error: %u", status);
       scheduleDiscoverServer(true, false); // Let's try again
       break;
-    case EMBER_DNS_LOOKUP_NO_DNS_SERVER:
-    case EMBER_DNS_LOOKUP_NO_ENTRY_FOR_NAME:
-    case EMBER_DNS_LOOKUP_NO_BUFFERS:
-      emberAfPluginOtaBootloadClientPrintln("Can't lookup host: %u", status);
+    case CHIP_DNS_LOOKUP_NO_DNS_SERVER:
+    case CHIP_DNS_LOOKUP_NO_ENTRY_FOR_NAME:
+    case CHIP_DNS_LOOKUP_NO_BUFFERS:
+      chipAfPluginOtaBootloadClientPrintln("Can't lookup host: %u", status);
       scheduleDiscoverServer(true, false); // Let's try again
       break;
     default:
@@ -281,28 +269,28 @@ static void dnsLookupResponseHandler(EmberDnsLookupStatus status,
   }
 }
 
-static void discoverServerResponseHandler(EmberCoapStatus status,
-                                          EmberCoapCode code,
-                                          EmberCoapReadOptions *options,
+static void discoverServerResponseHandler(ChipCoapStatus status,
+                                          ChipCoapCode code,
+                                          ChipCoapReadOptions *options,
                                           uint8_t *payload,
                                           uint16_t payloadLength,
-                                          EmberCoapResponseInfo *info)
+                                          ChipCoapResponseInfo *info)
 {
   if (HAVE_SERVER_INFO()) { // We have already found a server to download from
     return;
   }
   switch (status) {
-    case EMBER_COAP_MESSAGE_TIMED_OUT:
-    case EMBER_COAP_MESSAGE_RESET:
+    case CHIP_COAP_MESSAGE_TIMED_OUT:
+    case CHIP_COAP_MESSAGE_RESET:
       // Since our discovery is multicast, we get the TIMED_OUT status when we
       // are done receiving responses (note that we could have received no
       // responses). If we found a server, we should have already moved on to the
       // next state. Otherwise, then we keep trying to discover a server.
       break;
-    case EMBER_COAP_MESSAGE_ACKED:
+    case CHIP_COAP_MESSAGE_ACKED:
       // This means that our request was ACK'd, but the actual response is coming.
       return;
-    case EMBER_COAP_MESSAGE_RESPONSE:
+    case CHIP_COAP_MESSAGE_RESPONSE:
     {
       if (payloadLength == 0) {
         break;
@@ -310,18 +298,18 @@ static void discoverServerResponseHandler(EmberCoapStatus status,
 
       // TODO: shouldn't the UID be contained somewhere in this response?
       // TODO: how do we get the endpoint from the response?
-      serverInfo.scheme = EMBER_ZCL_SCHEME_COAP;
+      serverInfo.scheme = CHIP_ZCL_SCHEME_COAP;
       serverInfo.address = info->remoteAddress;
       serverInfo.port = info->remotePort;
-      MEMSET(serverInfo.uid.bytes, 0x00, EMBER_ZCL_UID_SIZE);
+      MEMSET(serverInfo.uid.bytes, 0x00, CHIP_ZCL_UID_SIZE);
       serverInfo.endpointId = 1;
-      emberAfPluginOtaBootloadClientPrint("Discovered server: ");
-      emberAfPluginOtaBootloadClientDebugExec(emberAfPrintIpv6Address(&serverInfo.address));
-      emberAfPluginOtaBootloadClientPrintln("->%u", serverInfo.port);
-      if (schedulePostDiscoverServerState() == EMBER_SUCCESS) {
+      chipAfPluginOtaBootloadClientPrint("Discovered server: ");
+      chipAfPluginOtaBootloadClientDebugExec(chipAfPrintIpv6Address(&serverInfo.address));
+      chipAfPluginOtaBootloadClientPrintln("->%u", serverInfo.port);
+      if (schedulePostDiscoverServerState() == CHIP_SUCCESS) {
         return;
       }
-      emberAfPluginOtaBootloadClientPrintln("Discovered server was filtered out.");
+      chipAfPluginOtaBootloadClientPrintln("Discovered server was filtered out.");
       ERASE_SERVER_INFO();
       break;
     }
@@ -333,25 +321,25 @@ static void discoverServerResponseHandler(EmberCoapStatus status,
   return;
 }
 
-EmberStatus schedulePostDiscoverServerState()
+ChipStatus schedulePostDiscoverServerState()
 {
-  emberAfPluginOtaBootloadClientPrintln("Scheduling post discoverServerState");
-  if (emberZclOtaBootloadClientExpectSecureOta()) {
+  chipAfPluginOtaBootloadClientPrintln("Scheduling post discoverServerState");
+  if (chipZclOtaBootloadClientExpectSecureOta()) {
     scheduleCreateDtlsSession(false); // addJitter?
-    return EMBER_SUCCESS;
+    return CHIP_SUCCESS;
   } else {
-    emberAfPluginOtaBootloadClientPrintln("Don't need secure OTA");
+    chipAfPluginOtaBootloadClientPrintln("Don't need secure OTA");
   }
-  if (emberZclOtaBootloadClientServerDiscoveredCallback(&serverInfo)) {
+  if (chipZclOtaBootloadClientServerDiscoveredCallback(&serverInfo)) {
     scheduleQueryNextImage(false);
-    return EMBER_SUCCESS;
+    return CHIP_SUCCESS;
   } else {
-    emberAfPluginOtaBootloadClientPrintln("ServerInfo rejected by policy");
+    chipAfPluginOtaBootloadClientPrintln("ServerInfo rejected by policy");
   }
-  return EMBER_ERR_FATAL;
+  return CHIP_ERR_FATAL;
 }
 
-void emberGetGlobalAddressReturn(const EmberIpv6Address *address,
+void chipGetGlobalAddressReturn(const ChipIpv6Address *address,
                                  uint32_t preferredLifetime,
                                  uint32_t validLifetime,
                                  uint8_t addressFlags)
@@ -359,18 +347,18 @@ void emberGetGlobalAddressReturn(const EmberIpv6Address *address,
   if (ipAddressResolved) {
     return;
   }
-  if (emberIsIpv6UnspecifiedAddress(address)) {
-    emberAfPluginOtaBootloadClientPrintln("DNS Lookup: Failed to get Global Address");
+  if (chipIsIpv6UnspecifiedAddress(address)) {
+    chipAfPluginOtaBootloadClientPrintln("DNS Lookup: Failed to get Global Address");
     scheduleDiscoverServer(true, false); // addJitter?
     return;
   }
-  if (emberDnsLookup(serverInfo.name,
+  if (chipDnsLookup(serverInfo.name,
                      serverInfo.nameLength,
                      address->bytes,
                      dnsLookupResponseHandler,
                      NULL,
-                     0) != EMBER_SUCCESS) {
-    emberAfPluginOtaBootloadClientPrintln("DNS Lookup: Failed to lookup hostname");
+                     0) != CHIP_SUCCESS) {
+    chipAfPluginOtaBootloadClientPrintln("DNS Lookup: Failed to lookup hostname");
     scheduleDiscoverServer(true, false); // addJitter?
   } else {
     ipAddressResolved = true;
@@ -381,21 +369,21 @@ static void discoverServerStateHandler(void)
 {
   if (HAVE_SERVER_INFO()) { // we have the server, go to next state.
     scheduleQueryNextImage(false); // addJitter?
-  } else if ( emberZclOtaBootloadClientServerHasStaticAddressCallback(&serverInfo)) {
-    emberAfPluginOtaBootloadClientPrint("Using static OTA server IP: ");
-    emberAfPluginOtaBootloadClientDebugExec(emberAfPrintIpv6Address(&serverInfo.address));
-    emberAfPluginOtaBootloadClientPrintln("->%u", serverInfo.port);
-    if (schedulePostDiscoverServerState() == EMBER_SUCCESS) {
+  } else if ( chipZclOtaBootloadClientServerHasStaticAddressCallback(&serverInfo)) {
+    chipAfPluginOtaBootloadClientPrint("Using static OTA server IP: ");
+    chipAfPluginOtaBootloadClientDebugExec(chipAfPrintIpv6Address(&serverInfo.address));
+    chipAfPluginOtaBootloadClientPrintln("->%u", serverInfo.port);
+    if (schedulePostDiscoverServerState() == CHIP_SUCCESS) {
       return;
     }
-  } else if ( emberZclOtaBootloadClientServerHasDnsNameCallback(&serverInfo) ) {
-    emberAfPluginOtaBootloadClientPrintln("Using DNS lookup");
+  } else if ( chipZclOtaBootloadClientServerHasDnsNameCallback(&serverInfo) ) {
+    chipAfPluginOtaBootloadClientPrintln("Using DNS lookup");
     ipAddressResolved = false;
-    emberGetGlobalAddresses(NULL, 0); // force an update of the global address
-  } else if (emberZclOtaBootloadClientServerHasDiscByClusterId(&emberZclClusterOtaBootloadServerSpec, discoverServerResponseHandler)) {
-    emberAfPluginOtaBootloadClientPrintln("Using upgrade server discovery");
+    chipGetGlobalAddresses(NULL, 0); // force an update of the global address
+  } else if (chipZclOtaBootloadClientServerHasDiscByClusterId(&chipZclClusterOtaBootloadServerSpec, discoverServerResponseHandler)) {
+    chipAfPluginOtaBootloadClientPrintln("Using upgrade server discovery");
   } else {
-    emberAfPluginOtaBootloadClientPrintln("Failed to discoverServer");
+    chipAfPluginOtaBootloadClientPrintln("Failed to discoverServer");
     scheduleDiscoverServer(true, false); // addJitter?
   }
 }
@@ -417,14 +405,14 @@ static void scheduleCreateDtlsSession(bool addJitter)
 
 void dtlsSessionIdReturn(uint8_t sessionId)
 {
-  emberAfPluginOtaBootloadClientPrintln("DTLS Session ID was returned: %u", sessionId);
-  if (sessionId != EMBER_NULL_SESSION_ID) {
-    serverInfo.scheme = EMBER_ZCL_SCHEME_COAPS;
-    emberAfPluginOtaBootloadClientPrintln("DTLS session has been established: %u", sessionId);
+  chipAfPluginOtaBootloadClientPrintln("DTLS Session ID was returned: %u", sessionId);
+  if (sessionId != CHIP_NULL_SESSION_ID) {
+    serverInfo.scheme = CHIP_ZCL_SCHEME_COAPS;
+    chipAfPluginOtaBootloadClientPrintln("DTLS session has been established: %u", sessionId);
   }
-  if ((emberZclDtlsManagerGetUidBySessionId(sessionId, &serverInfo.uid) != EMBER_SUCCESS)
-      || (!emberZclOtaBootloadClientServerDiscoveredCallback(&serverInfo))) {
-    emberAfPluginOtaBootloadClientPrintln("UID or ServerInfo mismatch");
+  if ((chipZclDtlsManagerGetUidBySessionId(sessionId, &serverInfo.uid) != CHIP_SUCCESS)
+      || (!chipZclOtaBootloadClientServerDiscoveredCallback(&serverInfo))) {
+    chipAfPluginOtaBootloadClientPrintln("UID or ServerInfo mismatch");
     ERASE_SERVER_INFO();
     scheduleDiscoverServer(true, false); // addJitter?
     return;
@@ -434,20 +422,20 @@ void dtlsSessionIdReturn(uint8_t sessionId)
 
 static void createDtlsSessionStateHandler(void)
 {
-  if (!emberZclOtaBootloadIsWildcard(serverInfo.uid.bytes, sizeof(serverInfo.uid.bytes))) {
-    emberAfPluginOtaBootloadClientPrint("Looking up DTLS session by UID...");
-    uint8_t sessionId = emberZclDtlsManagerGetSessionIdByUid(&serverInfo.uid, serverInfo.port);
-    if (sessionId != EMBER_NULL_SESSION_ID) {
-      emberAfPluginOtaBootloadClientPrintln("success");
+  if (!chipZclOtaBootloadIsWildcard(serverInfo.uid.bytes, sizeof(serverInfo.uid.bytes))) {
+    chipAfPluginOtaBootloadClientPrint("Looking up DTLS session by UID...");
+    uint8_t sessionId = chipZclDtlsManagerGetSessionIdByUid(&serverInfo.uid, serverInfo.port);
+    if (sessionId != CHIP_NULL_SESSION_ID) {
+      chipAfPluginOtaBootloadClientPrintln("success");
       dtlsSessionIdReturn(sessionId);
       return;
     } else {
-      emberAfPluginOtaBootloadClientPrintln("fail");
+      chipAfPluginOtaBootloadClientPrintln("fail");
     }
   }
 
-  emberAfPluginOtaBootloadClientPrintln("Creating DTLS session to server");
-  emberZclDtlsManagerGetConnection(&(serverInfo.address), serverInfo.port, EMBER_DTLS_MODE_CERT, dtlsSessionIdReturn);
+  chipAfPluginOtaBootloadClientPrintln("Creating DTLS session to server");
+  chipZclDtlsManagerGetConnection(&(serverInfo.address), serverInfo.port, CHIP_DTLS_MODE_CERT, dtlsSessionIdReturn);
 }
 
 // -------------------------------------
@@ -456,17 +444,17 @@ static void createDtlsSessionStateHandler(void)
 static void scheduleQueryNextImage(bool addJitter)
 {
   setState(STATE_QUERY_NEXT_IMAGE,
-           convertToMs(immediateUpgrade ? 0 : EMBER_AF_PLUGIN_OTA_BOOTLOAD_CLIENT_QUERY_NEXT_IMAGE_PERIOD_MINUTES,
+           convertToMs(immediateUpgrade ? 0 : CHIP_AF_PLUGIN_OTA_BOOTLOAD_CLIENT_QUERY_NEXT_IMAGE_PERIOD_MINUTES,
                        DELAY_TYPE_MINUTES,
                        addJitter));
 }
 
 static void queryNextImageStateHandler(void)
 {
-  EmberZclOtaBootloadFileSpec_t fileSpec;
-  EmberZclOtaBootloadHardwareVersion_t hardwareVersion
-    = EMBER_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL;
-  if (!emberZclOtaBootloadClientGetQueryNextImageParametersCallback(&fileSpec,
+  ChipZclOtaBootloadFileSpec_t fileSpec;
+  ChipZclOtaBootloadHardwareVersion_t hardwareVersion
+    = CHIP_ZCL_OTA_BOOTLOAD_HARDWARE_VERSION_NULL;
+  if (!chipZclOtaBootloadClientGetQueryNextImageParametersCallback(&fileSpec,
                                                                     &hardwareVersion)) {
     scheduleQueryNextImage(false); // addJitter?
     return;
@@ -475,83 +463,83 @@ static void queryNextImageStateHandler(void)
   fileSpecToDownload.type = fileSpec.type;
 
   // TODO: should we create our own constants for this fieldControl value?
-  EmberZclDestination_t destination;
+  ChipZclDestination_t destination;
   serverInfoToZclDestination(&destination);
-  EmberZclClusterOtaBootloadServerCommandQueryNextImageRequest_t request = {
+  ChipZclClusterOtaBootloadServerCommandQueryNextImageRequest_t request = {
     .fieldControl = 0,
     .manufacturerId = fileSpec.manufacturerCode,
     .imageType = fileSpec.type,
     .currentFileVersion = fileSpec.version,
     .hardwareVersion = hardwareVersion,
   };
-  EmberStatus status
-    = emberZclSendClusterOtaBootloadServerCommandQueryNextImageRequest(&destination,
+  ChipStatus status
+    = chipZclSendClusterOtaBootloadServerCommandQueryNextImageRequest(&destination,
                                                                        &request,
                                                                        queryNextImageResponseHandler);
-  if (status != EMBER_SUCCESS) {
+  if (status != CHIP_SUCCESS) {
     // If we failed to submit the message for transmission, it could be
     // something on our side, so let's just try again later.
     scheduleQueryNextImage(true); // addJitter?
   }
 }
 
-static void queryNextImageResponseHandler(EmberZclMessageStatus_t status,
-                                          const EmberZclCommandContext_t *context,
-                                          const EmberZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response)
+static void queryNextImageResponseHandler(ChipZclMessageStatus_t status,
+                                          const ChipZclCommandContext_t *context,
+                                          const ChipZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response)
 {
   switch (status) {
-    case EMBER_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT:
-    case EMBER_ZCL_MESSAGE_STATUS_COAP_TIMEOUT:
-    case EMBER_ZCL_MESSAGE_STATUS_COAP_RESET:
+    case CHIP_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT:
+    case CHIP_ZCL_MESSAGE_STATUS_COAP_TIMEOUT:
+    case CHIP_ZCL_MESSAGE_STATUS_COAP_RESET:
       // If we couldn't reach the server for some reason, we need to go back and
       // try to find it again. Maybe it dropped off the network?
-      emberAfPluginOtaBootloadClientPrintln("Query: Got COAP Timeout/Reset");
+      chipAfPluginOtaBootloadClientPrintln("Query: Got COAP Timeout/Reset");
       scheduleDiscoverServer(true, false); // eraseServerInfo? addJitter?
       break;
-    case EMBER_ZCL_MESSAGE_STATUS_COAP_ACK:
+    case CHIP_ZCL_MESSAGE_STATUS_COAP_ACK:
       // This means that our request was ACK'd, but the actual response is coming.
-      emberAfPluginOtaBootloadClientPrintln("Query: Got COAP ACK");
+      chipAfPluginOtaBootloadClientPrintln("Query: Got COAP ACK");
       break;
-    case EMBER_ZCL_MESSAGE_STATUS_COAP_RESPONSE:
+    case CHIP_ZCL_MESSAGE_STATUS_COAP_RESPONSE:
       if (context->payloadLength < 6) { // if there is an error status code or no payload
-        emberAfPluginOtaBootloadClientPrintln("Query: Bad payloadLength");
+        chipAfPluginOtaBootloadClientPrintln("Query: Bad payloadLength");
         scheduleDiscoverServer(true, false); // eraseServerInfo? addJitter?
         break;
       }
-      emberAfPluginOtaBootloadClientPrintln("Query: Got COAP Response");
+      chipAfPluginOtaBootloadClientPrintln("Query: Got COAP Response");
       assert(context != NULL);
       processQueryNextImageResponse(context->code, response);
       break;
     default:
-      emberAfPluginOtaBootloadClientPrintln("Query: Bad query: %u", status);
+      chipAfPluginOtaBootloadClientPrintln("Query: Bad query: %u", status);
       scheduleDiscoverServer(true, false); // eraseServerInfo? addJitter?
   }
 }
 
-static void processQueryNextImageResponse(const EmberCoapCode code, const EmberZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response)
+static void processQueryNextImageResponse(const ChipCoapCode code, const ChipZclClusterOtaBootloadServerCommandQueryNextImageResponse_t *response)
 {
-  if (code != EMBER_COAP_CODE_204_CHANGED) {
-    emberAfPluginOtaBootloadClientPrintln("Query: CoAP response (%d) from server not understood", code);
-    downloadStatus = EMBER_ZCL_STATUS_FAILURE;
+  if (code != CHIP_COAP_CODE_204_CHANGED) {
+    chipAfPluginOtaBootloadClientPrintln("Query: CoAP response (%d) from server not understood", code);
+    downloadStatus = CHIP_ZCL_STATUS_FAILURE;
     scheduleUpgradeEnd();
     return;
   }
 
-  EmberZclOtaBootloadStorageInfo_t storageInfo;
-  emberZclOtaBootloadStorageGetInfo(&storageInfo, NULL, 0);
+  ChipZclOtaBootloadStorageInfo_t storageInfo;
+  chipZclOtaBootloadStorageGetInfo(&storageInfo, NULL, 0);
   if (response->imageSize > storageInfo.maximumFileSize) {
-    emberAfPluginOtaBootloadClientPrintln("Query: Not enough space (need %u, have %u)",
+    chipAfPluginOtaBootloadClientPrintln("Query: Not enough space (need %u, have %u)",
                                           response->imageSize,
                                           storageInfo.maximumFileSize);
-    downloadStatus = EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+    downloadStatus = CHIP_ZCL_STATUS_INSUFFICIENT_SPACE;
     scheduleUpgradeEnd();
     return;
   }
 
   fileSpecToDownload.version = response->fileVersion;
   if (response->fileUri.length > FILE_URI_LENGTH - 1) {
-    downloadStatus = EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
-    emberAfPluginOtaBootloadClientPrintln("Query: URI too long");
+    downloadStatus = CHIP_ZCL_STATUS_INSUFFICIENT_SPACE;
+    chipAfPluginOtaBootloadClientPrintln("Query: URI too long");
     scheduleUpgradeEnd();
     return;
   }
@@ -559,31 +547,31 @@ static void processQueryNextImageResponse(const EmberCoapCode code, const EmberZ
   fileUri[response->fileUri.length] = 0; // null terminator
 
   switch (response->status) {
-    case EMBER_ZCL_STATUS_SUCCESS:
+    case CHIP_ZCL_STATUS_SUCCESS:
       ERASE_DOWNLOAD_STATUS();
       setState(STATE_WAIT_FOR_DELETE, 0); // run now
       break;
-    case EMBER_ZCL_STATUS_NOT_AUTHORIZED:
-      emberAfPluginOtaBootloadClientPrintln("Query: Not authorized");
+    case CHIP_ZCL_STATUS_NOT_AUTHORIZED:
+      chipAfPluginOtaBootloadClientPrintln("Query: Not authorized");
       scheduleDiscoverServer(true, false); // eraseServerInfo? addJitter?
       break;
-    case EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE:
-      emberAfPluginOtaBootloadClientPrintln("Query: No Image Available");
+    case CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE:
+      chipAfPluginOtaBootloadClientPrintln("Query: No Image Available");
       scheduleQueryNextImage(false); // addJitter?
       break;
     default:
-      emberAfPluginOtaBootloadClientPrintln("Bad query: %u", response->status);
+      chipAfPluginOtaBootloadClientPrintln("Bad query: %u", response->status);
       scheduleDiscoverServer(true, false); // eraseServerInfo? addJitter?
   }
 }
 
 static void waitForDeleteStateHandler(void)
 {
-  EmberZclOtaBootloadStorageFileInfo_t storageFileInfo;
+  ChipZclOtaBootloadStorageFileInfo_t storageFileInfo;
   bool fileExists
-    = (emberZclOtaBootloadStorageFind(&fileSpecToDownload, &storageFileInfo)
-       == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
-  if (emberZclOtaBootloadClientStartDownloadCallback(&fileSpecToDownload,
+    = (chipZclOtaBootloadStorageFind(&fileSpecToDownload, &storageFileInfo)
+       == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS);
+  if (chipZclOtaBootloadClientStartDownloadCallback(&fileSpecToDownload,
                                                      fileExists)) {
     ERASE_DOWNLOAD_STATUS();
     setState(STATE_DOWNLOAD, 0); // run now
@@ -595,40 +583,40 @@ static void waitForDeleteStateHandler(void)
 // -------------------------------------
 // Download
 
-static EmberStatus getCurrentDownloadFileOffset(size_t *offset)
+static ChipStatus getCurrentDownloadFileOffset(size_t *offset)
 {
   assert(HAVE_FILE_SPEC_TO_DOWNLOAD());
-  EmberZclOtaBootloadStorageFileInfo_t storageFileInfo;
-  EmberZclOtaBootloadStorageStatus_t storageStatus
-    = emberZclOtaBootloadStorageFind(&fileSpecToDownload, &storageFileInfo);
+  ChipZclOtaBootloadStorageFileInfo_t storageFileInfo;
+  ChipZclOtaBootloadStorageStatus_t storageStatus
+    = chipZclOtaBootloadStorageFind(&fileSpecToDownload, &storageFileInfo);
 
-  if (storageStatus == EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE) {
+  if (storageStatus == CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_INVALID_FILE) {
     // need to create the OTA file storage
-    storageStatus = emberZclOtaBootloadStorageCreate(&fileSpecToDownload);
-    if (storageStatus != EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
-      emberAfPluginOtaBootloadClientPrintln("Could not create OTA Storage: %u", storageStatus);
-      return EMBER_ERR_FATAL;
+    storageStatus = chipZclOtaBootloadStorageCreate(&fileSpecToDownload);
+    if (storageStatus != CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
+      chipAfPluginOtaBootloadClientPrintln("Could not create OTA Storage: %u", storageStatus);
+      return CHIP_ERR_FATAL;
     }
 
-    storageStatus = emberZclOtaBootloadStorageFind(&fileSpecToDownload, &storageFileInfo);
+    storageStatus = chipZclOtaBootloadStorageFind(&fileSpecToDownload, &storageFileInfo);
   }
 
-  if (storageStatus != EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
-    emberAfPluginOtaBootloadClientPrintln("Could not find OTA Storage: %u", storageStatus);
-    return EMBER_ERR_FATAL;
+  if (storageStatus != CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
+    chipAfPluginOtaBootloadClientPrintln("Could not find OTA Storage: %u", storageStatus);
+    return CHIP_ERR_FATAL;
   }
 
   *offset = storageFileInfo.size;
-  return EMBER_SUCCESS;
+  return CHIP_SUCCESS;
 }
 
 static void handleBlockError(uint8_t *errors)
 {
   (*errors)++;
-  if (*errors >= EMBER_AF_PLUGIN_OTA_BOOTLOAD_CLIENT_BLOCK_ERROR_THRESHOLD) {
+  if (*errors >= CHIP_AF_PLUGIN_OTA_BOOTLOAD_CLIENT_BLOCK_ERROR_THRESHOLD) {
     *errors = 0;
-    downloadStatus = EMBER_ZCL_STATUS_ABORT;
-    emberAfPluginOtaBootloadClientPrintln("Exceeded block error count maximum");
+    downloadStatus = CHIP_ZCL_STATUS_ABORT;
+    chipAfPluginOtaBootloadClientPrintln("Exceeded block error count maximum");
     setState(STATE_UPGRADE_END, 0); // Fail right away
   } else {
     setState(STATE_DOWNLOAD,
@@ -641,74 +629,74 @@ static void handleBlockError(uint8_t *errors)
 static void downloadStateHandler(void)
 {
   size_t offset = 0;
-  if (getCurrentDownloadFileOffset(&offset) != EMBER_SUCCESS) {
-    emberAfPluginOtaBootloadClientPrintln("Error resolving storage offset");
+  if (getCurrentDownloadFileOffset(&offset) != CHIP_SUCCESS) {
+    chipAfPluginOtaBootloadClientPrintln("Error resolving storage offset");
     scheduleQueryNextImage(true); // addJitter?
     return;
   }
 
   // TODO: what if the offset of the file is not at a multiple of block size?
   assert(offset % (1 << curBlockSizeLog) == 0);
-  EmberCoapBlockOption block2Option = {
+  ChipCoapBlockOption block2Option = {
     .more = false,
     .logSize = curBlockSizeLog,
     .number = offset >> curBlockSizeLog
   };
 
   if (!HAVE_SERVER_INFO()) {
-    emberAfPluginOtaBootloadClientPrintln("Lost server info while downloading");
+    chipAfPluginOtaBootloadClientPrintln("Lost server info while downloading");
     scheduleDiscoverServer(true, true); // eraseServerInfo? addJitter?
     return;
   }
 
-  EmberZclCoapEndpoint_t destination = {
-    .flags = EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG
-             | (emberZclOtaBootloadClientExpectSecureOta() ? EMBER_ZCL_USE_COAPS_FLAG : 0x00)
-             | (emberZclOtaBootloadIsWildcard(serverInfo.uid.bytes, sizeof(serverInfo.uid.bytes)) ? 0x00 : EMBER_ZCL_HAVE_UID_FLAG),
+  ChipZclCoapEndpoint_t destination = {
+    .flags = CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG
+             | (chipZclOtaBootloadClientExpectSecureOta() ? CHIP_ZCL_USE_COAPS_FLAG : 0x00)
+             | (chipZclOtaBootloadIsWildcard(serverInfo.uid.bytes, sizeof(serverInfo.uid.bytes)) ? 0x00 : CHIP_ZCL_HAVE_UID_FLAG),
     .uid = serverInfo.uid,
     .address = serverInfo.address,
     .port = serverInfo.port
   };
 
-  emberAfPluginOtaBootloadClientPrintln("requesting block: %d*2^%d", block2Option.number, block2Option.logSize);
-  EmberStatus status = emberZclRequestBlock(&destination,
+  chipAfPluginOtaBootloadClientPrintln("requesting block: %d*2^%d", block2Option.number, block2Option.logSize);
+  ChipStatus status = chipZclRequestBlock(&destination,
                                             fileUri,
                                             &block2Option,
                                             blockResponseHandler);
 
-  if (status != EMBER_SUCCESS) {
-    emberAfPluginOtaBootloadClientPrintln("zcl send error: %u", status);
+  if (status != CHIP_SUCCESS) {
+    chipAfPluginOtaBootloadClientPrintln("zcl send error: %u", status);
     // If we fail to submit the message to the stack, just try again. Maybe
     // second time is the charm?
     setState(STATE_DOWNLOAD, 0); // run now
   }
 }
 
-static void blockResponseHandler(EmberCoapStatus status,
-                                 EmberCoapCode code,
-                                 EmberCoapReadOptions *options,
+static void blockResponseHandler(ChipCoapStatus status,
+                                 ChipCoapCode code,
+                                 ChipCoapReadOptions *options,
                                  uint8_t *payload,
                                  uint16_t payloadLength,
-                                 EmberCoapResponseInfo *info)
+                                 ChipCoapResponseInfo *info)
 {
   static uint8_t errors = 0;
-  emberAfPluginOtaBootloadClientPrintln("block responded: %d", status);
-  EmberCoapBlockOption block2Option;
-  if (status == EMBER_COAP_MESSAGE_ACKED) {
+  chipAfPluginOtaBootloadClientPrintln("block responded: %d", status);
+  ChipCoapBlockOption block2Option;
+  if (status == CHIP_COAP_MESSAGE_ACKED) {
     // If we got an ACK, that means the response is coming later, so just wait
     // for the next response.
     return;
-  } else if (status != EMBER_COAP_MESSAGE_RESPONSE
-             || code != EMBER_COAP_CODE_205_CONTENT
-             || !emberReadBlockOption(options,
-                                      EMBER_COAP_OPTION_BLOCK2,
+  } else if (status != CHIP_COAP_MESSAGE_RESPONSE
+             || code != CHIP_COAP_CODE_205_CONTENT
+             || !chipReadBlockOption(options,
+                                      CHIP_COAP_OPTION_BLOCK2,
                                       &block2Option)) {
-    emberAfPluginOtaBootloadClientPrintln("block error #%u: (%u != %u) || (%u != %u)",
+    chipAfPluginOtaBootloadClientPrintln("block error #%u: (%u != %u) || (%u != %u)",
                                           errors,
                                           status,
-                                          EMBER_COAP_MESSAGE_RESPONSE,
+                                          CHIP_COAP_MESSAGE_RESPONSE,
                                           code,
-                                          EMBER_COAP_CODE_205_CONTENT);
+                                          CHIP_COAP_CODE_205_CONTENT);
     handleBlockError(&errors);
     return;
   }
@@ -717,8 +705,8 @@ static void blockResponseHandler(EmberCoapStatus status,
     // so we must send subsequent requests with that size.
     curBlockSizeLog = block2Option.logSize;
   }
-  if (!emberVerifyBlockOption(&block2Option, payloadLength, curBlockSizeLog)) {
-    emberAfPluginOtaBootloadClientPrintln("block error #%u: invalidBlockOption(more: %u, number: 0x%x, log: %u != %u, payloadLength: %u)",
+  if (!chipVerifyBlockOption(&block2Option, payloadLength, curBlockSizeLog)) {
+    chipAfPluginOtaBootloadClientPrintln("block error #%u: invalidBlockOption(more: %u, number: 0x%x, log: %u != %u, payloadLength: %u)",
                                           errors,
                                           block2Option.more,
                                           block2Option.number,
@@ -731,16 +719,16 @@ static void blockResponseHandler(EmberCoapStatus status,
 
   assert(HAVE_FILE_SPEC_TO_DOWNLOAD());
   size_t offset = block2Option.number << block2Option.logSize;
-  EmberZclOtaBootloadStorageStatus_t storageStatus
-    = emberZclOtaBootloadStorageWrite(&fileSpecToDownload,
+  ChipZclOtaBootloadStorageStatus_t storageStatus
+    = chipZclOtaBootloadStorageWrite(&fileSpecToDownload,
                                       offset,
                                       payload,
                                       payloadLength);
-  if (storageStatus != EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
+  if (storageStatus != CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
     // If the storage is in a weird state, then we might keep hitting this
     // error. If that is the case, we can just let our errors go over the
     // threshold so we will give up on the download.
-    emberAfPluginOtaBootloadClientPrintln("block error #%u (blockNo: 0x%x): Storage status fail at offset=%u, length=%u",
+    chipAfPluginOtaBootloadClientPrintln("block error #%u (blockNo: 0x%x): Storage status fail at offset=%u, length=%u",
                                           errors,
                                           block2Option.number,
                                           offset,
@@ -748,10 +736,10 @@ static void blockResponseHandler(EmberCoapStatus status,
     handleBlockError(&errors);
     return;
   } else if (!block2Option.more) {
-    emberAfPluginOtaBootloadClientPrintln("download complete");
+    chipAfPluginOtaBootloadClientPrintln("download complete");
     setState(STATE_VERIFY_DOWNLOAD, 0); // run now
   } else {
-    emberAfPluginOtaBootloadClientPrintln("got blockNo: 0x%x", block2Option.number);
+    chipAfPluginOtaBootloadClientPrintln("got blockNo: 0x%x", block2Option.number);
     setState(STATE_DOWNLOAD, 0); // continue download
   }
 }
@@ -762,76 +750,76 @@ static void blockResponseHandler(EmberCoapStatus status,
 static void verifyDownloadStateHandler(void)
 {
   assert(HAVE_FILE_SPEC_TO_DOWNLOAD());
-  if (downloadStatus != EMBER_ZCL_STATUS_NULL) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: Invalid download status (%u != %u)", downloadStatus, EMBER_ZCL_STATUS_NULL);
+  if (downloadStatus != CHIP_ZCL_STATUS_NULL) {
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: Invalid download status (%u != %u)", downloadStatus, CHIP_ZCL_STATUS_NULL);
     scheduleUpgradeEnd();
     return;
   }
-  EmberZclOtaBootloadStorageStatus_t storageStatus;
-  EmberZclOtaBootloadStorageFileInfo_t storageFileInfo;
-  storageStatus = emberZclOtaBootloadStorageFind(&fileSpecToDownload, &storageFileInfo);
-  if (storageStatus != EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: file does not exist");
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
+  ChipZclOtaBootloadStorageStatus_t storageStatus;
+  ChipZclOtaBootloadStorageFileInfo_t storageFileInfo;
+  storageStatus = chipZclOtaBootloadStorageFind(&fileSpecToDownload, &storageFileInfo);
+  if (storageStatus != CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: file does not exist");
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
     scheduleUpgradeEnd();
     return;
   }
 
-  uint8_t bytes[sizeof(EmberZclOtaBootloadFileHeaderInfo_t)];
-  storageStatus = emberZclOtaBootloadStorageRead(&fileSpecToDownload,
+  uint8_t bytes[sizeof(ChipZclOtaBootloadFileHeaderInfo_t)];
+  storageStatus = chipZclOtaBootloadStorageRead(&fileSpecToDownload,
                                                  0,
                                                  &bytes,
                                                  sizeof(bytes));
-  if (storageStatus != EMBER_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: Error reading header (%u)", storageStatus);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
+  if (storageStatus != CHIP_ZCL_OTA_BOOTLOAD_STORAGE_STATUS_SUCCESS) {
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: Error reading header (%u)", storageStatus);
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
     scheduleUpgradeEnd();
     return;
   }
 
-  EmberZclOtaBootloadFileHeaderInfo_t fileHeaderInfo;
-  storageStatus = emberZclOtaBootloadFetchFileHeaderInfo(bytes, &fileHeaderInfo);
-  if (storageStatus != EMBER_ZCL_OTA_BOOTLOAD_FILE_STATUS_VALID) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: Error fetching header (%u)", storageStatus);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
-  } else if (fileHeaderInfo.version != EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: version mismatch (%u != %u)",
+  ChipZclOtaBootloadFileHeaderInfo_t fileHeaderInfo;
+  storageStatus = chipZclOtaBootloadFetchFileHeaderInfo(bytes, &fileHeaderInfo);
+  if (storageStatus != CHIP_ZCL_OTA_BOOTLOAD_FILE_STATUS_VALID) {
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: Error fetching header (%u)", storageStatus);
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
+  } else if (fileHeaderInfo.version != CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION) {
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: version mismatch (%u != %u)",
                                           fileHeaderInfo.version,
-                                          EMBER_ZCL_OTA_BOOTLOAD_FILE_VERSION);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
+                                          CHIP_ZCL_OTA_BOOTLOAD_FILE_VERSION);
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
   } else if (fileHeaderInfo.spec.manufacturerCode != fileSpecToDownload.manufacturerCode) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: manufacturerCode mismatch (%u != %u)",
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: manufacturerCode mismatch (%u != %u)",
                                           fileHeaderInfo.spec.manufacturerCode,
                                           fileSpecToDownload.manufacturerCode);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
   } else if (fileHeaderInfo.spec.type != fileSpecToDownload.type) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: imageType mismatch (%u != %u)",
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: imageType mismatch (%u != %u)",
                                           fileHeaderInfo.spec.type,
                                           fileSpecToDownload.type);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
   } else if (fileHeaderInfo.spec.version != fileSpecToDownload.version) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: imageVersion mismatch (%u != %u)",
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: imageVersion mismatch (%u != %u)",
                                           fileHeaderInfo.spec.version,
                                           fileSpecToDownload.version);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
-  } else if (fileHeaderInfo.stackVersion != EMBER_ZCL_OTA_BOOTLOAD_STACK_VERSION_IP) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: stackVersion mismatch (%u != %u)",
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
+  } else if (fileHeaderInfo.stackVersion != CHIP_ZCL_OTA_BOOTLOAD_STACK_VERSION_IP) {
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: stackVersion mismatch (%u != %u)",
                                           fileHeaderInfo.stackVersion,
-                                          EMBER_ZCL_OTA_BOOTLOAD_STACK_VERSION_IP);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
+                                          CHIP_ZCL_OTA_BOOTLOAD_STACK_VERSION_IP);
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
   } else if (fileHeaderInfo.fileSize != storageFileInfo.size) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: fileSize mismatch (%u != %u)",
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: fileSize mismatch (%u != %u)",
                                           fileHeaderInfo.fileSize,
                                           storageFileInfo.size);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
-  } else if (fileHeaderInfo.securityCredentialVersion != EMBER_ZCL_OTA_BOOTLOAD_SECURITY_CREDENTIAL_VERSION_IP) {
-    emberAfPluginOtaBootloadClientPrintln("Verify failed: securityCredentialVersion mismatch (%u != %u)",
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
+  } else if (fileHeaderInfo.securityCredentialVersion != CHIP_ZCL_OTA_BOOTLOAD_SECURITY_CREDENTIAL_VERSION_IP) {
+    chipAfPluginOtaBootloadClientPrintln("Verify failed: securityCredentialVersion mismatch (%u != %u)",
                                           fileHeaderInfo.securityCredentialVersion,
-                                          EMBER_ZCL_OTA_BOOTLOAD_SECURITY_CREDENTIAL_VERSION_IP);
-    downloadStatus = EMBER_ZCL_STATUS_INVALID_IMAGE;
+                                          CHIP_ZCL_OTA_BOOTLOAD_SECURITY_CREDENTIAL_VERSION_IP);
+    downloadStatus = CHIP_ZCL_STATUS_INVALID_IMAGE;
   } else {
-    emberAfPluginOtaBootloadClientPrintln("download verified");
-    downloadStatus = EMBER_ZCL_STATUS_SUCCESS;
+    chipAfPluginOtaBootloadClientPrintln("download verified");
+    downloadStatus = CHIP_ZCL_STATUS_SUCCESS;
   }
 
   scheduleUpgradeEnd();
@@ -852,68 +840,68 @@ static void scheduleUpgradeEnd(void)
 
 static void upgradeEndStateHandler(void)
 {
-  emberAfPluginOtaBootloadClientPrintln("Download Complete: %u", downloadStatus);
-  EmberStatus status
-    = emberZclOtaBootloadClientDownloadCompleteCallback(&fileSpecToDownload,
+  chipAfPluginOtaBootloadClientPrintln("Download Complete: %u", downloadStatus);
+  ChipStatus status
+    = chipZclOtaBootloadClientDownloadCompleteCallback(&fileSpecToDownload,
                                                         downloadStatus);
   // Only accept the application layer's status if we have not already encountered
   // some error
-  if (downloadStatus == EMBER_ZCL_STATUS_SUCCESS) {
+  if (downloadStatus == CHIP_ZCL_STATUS_SUCCESS) {
     downloadStatus = status;
   }
-  EmberZclDestination_t destination;
+  ChipZclDestination_t destination;
   serverInfoToZclDestination(&destination);
-  EmberZclClusterOtaBootloadServerCommandUpgradeEndRequest_t request = {
+  ChipZclClusterOtaBootloadServerCommandUpgradeEndRequest_t request = {
     .status = downloadStatus,
     .manufacturerId = fileSpecToDownload.manufacturerCode,
     .imageType = fileSpecToDownload.type,
     .fileVersion = fileSpecToDownload.version,
   };
   status
-    = emberZclSendClusterOtaBootloadServerCommandUpgradeEndRequest(&destination,
+    = chipZclSendClusterOtaBootloadServerCommandUpgradeEndRequest(&destination,
                                                                    &request,
                                                                    upgradeEndResponseHandler);
-  if (status != EMBER_SUCCESS) {
+  if (status != CHIP_SUCCESS) {
     // If we failed to submit the message for transmission, it could be
     // something on our side, so let's just try again later. We jitter the
     // response since giving the stack some time to breathe could solve our
     // problem.
-    emberAfPluginOtaBootloadClientPrintln("Download command fail: %u", status);
+    chipAfPluginOtaBootloadClientPrintln("Download command fail: %u", status);
     scheduleUpgradeEnd();
-  } else if (downloadStatus != EMBER_ZCL_STATUS_SUCCESS) {
+  } else if (downloadStatus != CHIP_ZCL_STATUS_SUCCESS) {
     // If our downloadStatus is not successful, then we are going to get a
     // default response from the server, so we should kick off the next image
     // query here.
-    emberAfPluginOtaBootloadClientPrintln("Download fail: %u", downloadStatus);
+    chipAfPluginOtaBootloadClientPrintln("Download fail: %u", downloadStatus);
     scheduleQueryNextImage(false); // addJitter?
   }
 }
 
-static void upgradeEndResponseHandler(EmberZclMessageStatus_t status,
-                                      const EmberZclCommandContext_t *context,
-                                      const EmberZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response)
+static void upgradeEndResponseHandler(ChipZclMessageStatus_t status,
+                                      const ChipZclCommandContext_t *context,
+                                      const ChipZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response)
 {
   switch (status) {
-    case EMBER_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT:
-    case EMBER_ZCL_MESSAGE_STATUS_COAP_TIMEOUT:
-    case EMBER_ZCL_MESSAGE_STATUS_COAP_RESET:
+    case CHIP_ZCL_MESSAGE_STATUS_DISCOVERY_TIMEOUT:
+    case CHIP_ZCL_MESSAGE_STATUS_COAP_TIMEOUT:
+    case CHIP_ZCL_MESSAGE_STATUS_COAP_RESET:
       // If we couldn't reach the server for some reason, then try again to send
       // the command.
       // TODO: we should probably add this to our error threshold!
-      emberAfPluginOtaBootloadClientPrintln("Timeout/reset");
+      chipAfPluginOtaBootloadClientPrintln("Timeout/reset");
       scheduleUpgradeEnd();
       break;
-    case EMBER_ZCL_MESSAGE_STATUS_COAP_ACK:
-      emberAfPluginOtaBootloadClientPrintln("COAP ack");
+    case CHIP_ZCL_MESSAGE_STATUS_COAP_ACK:
+      chipAfPluginOtaBootloadClientPrintln("COAP ack");
       // This means that our request was ACK'd, but the actual response is coming.
       break;
-    case EMBER_ZCL_MESSAGE_STATUS_COAP_RESPONSE:
-      if ((context != NULL) && (context->code != EMBER_COAP_CODE_204_CHANGED)) {
-        emberAfPluginOtaBootloadClientPrintln("COAP response: OTA server did not respond with 2.04 to upgradeEndRequest");
+    case CHIP_ZCL_MESSAGE_STATUS_COAP_RESPONSE:
+      if ((context != NULL) && (context->code != CHIP_COAP_CODE_204_CHANGED)) {
+        chipAfPluginOtaBootloadClientPrintln("COAP response: OTA server did not respond with 2.04 to upgradeEndRequest");
         scheduleDiscoverServer(true, true); // eraseServerInfo? addJitter?
         break;
       }
-      emberAfPluginOtaBootloadClientPrintln("COAP response");
+      chipAfPluginOtaBootloadClientPrintln("COAP response");
       processUpgradeEndResponse(response);
       break;
     default:
@@ -921,10 +909,10 @@ static void upgradeEndResponseHandler(EmberZclMessageStatus_t status,
   }
 }
 
-static void processUpgradeEndResponse(const EmberZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response)
+static void processUpgradeEndResponse(const ChipZclClusterOtaBootloadServerCommandUpgradeEndResponse_t *response)
 {
   if (!HAVE_FILE_SPEC_TO_DOWNLOAD() || (response == NULL)) {
-    emberAfPluginOtaBootloadClientPrintln("UpgradeEnd with no file spec to download");
+    chipAfPluginOtaBootloadClientPrintln("UpgradeEnd with no file spec to download");
     scheduleDiscoverServer(true, true); // eraseServerInfo? addJitter?
     return;
   }
@@ -935,7 +923,7 @@ static void processUpgradeEndResponse(const EmberZclClusterOtaBootloadServerComm
   // treat the two values like UTC times. Else if the upgrade time is 0xFFFFFFFF,
   // then that means to check back in later to see if we can upgrade.
   if (response->upgradeTime == 0xFFFFFFFF) {
-    emberAfPluginOtaBootloadClientPrintln("Will retry upgradeEnd");
+    chipAfPluginOtaBootloadClientPrintln("Will retry upgradeEnd");
     scheduleUpgradeEnd();
     return;
   }
@@ -945,13 +933,13 @@ static void processUpgradeEndResponse(const EmberZclClusterOtaBootloadServerComm
       || fileSpecToDownload.version != response->fileVersion) {
     // TODO: handle default response that may be sent back (see 11.13.6.4).
     // As a workaround for this issue, let's just reschedule the download.
-    emberAfPluginOtaBootloadClientPrintln("Mismatched firmware image properties %u:%u, %u:%u, %u:%u", fileSpecToDownload.manufacturerCode,
+    chipAfPluginOtaBootloadClientPrintln("Mismatched firmware image properties %u:%u, %u:%u, %u:%u", fileSpecToDownload.manufacturerCode,
                                           response->manufacturerId, fileSpecToDownload.type, response->imageType, fileSpecToDownload.version, response->fileVersion);
     scheduleQueryNextImage(false);
     return;
   }
 
-  emberAfPluginOtaBootloadClientPrintln("Will bootload in %d seconds", response->upgradeTime - response->currentTime);
+  chipAfPluginOtaBootloadClientPrintln("Will bootload in %d seconds", response->upgradeTime - response->currentTime);
   setState(STATE_BOOTLOAD,
            convertToMs(response->upgradeTime - response->currentTime,
                        DELAY_TYPE_SECONDS,
@@ -964,10 +952,10 @@ static void processUpgradeEndResponse(const EmberZclClusterOtaBootloadServerComm
 static void bootloadStateHandler(void)
 {
   assert(HAVE_FILE_SPEC_TO_DOWNLOAD());
-  emberZclOtaBootloadClientPreBootloadCallback(&fileSpecToDownload);
+  chipZclOtaBootloadClientPreBootloadCallback(&fileSpecToDownload);
 
-  emberAfPluginOtaBootloadClientPrintln("Loading new image");
-  EmberStatus status = halAppBootloaderInstallNewImage();
+  chipAfPluginOtaBootloadClientPrintln("Loading new image");
+  ChipStatus status = halAppBootloaderInstallNewImage();
   // This call should not return!
   (void)status;
 }
@@ -975,38 +963,38 @@ static void bootloadStateHandler(void)
 // -----------------------------------------------------------------------------
 // Public API downward
 
-void emZclOtaBootloadClientInitCallback(void)
+void chZclOtaBootloadClientInitCallback(void)
 {
   ERASE_SERVER_INFO();
   ERASE_FILE_SPEC_TO_DOWNLOAD();
   ERASE_DOWNLOAD_STATUS();
-  if (emberZclOtaBootloadClientSetVersionInfoCallback()) {
-    emberAfPluginOtaBootloadClientPrintln("Failure initializing OTA attributes");
+  if (chipZclOtaBootloadClientSetVersionInfoCallback()) {
+    chipAfPluginOtaBootloadClientPrintln("Failure initializing OTA attributes");
   }
   setState(STATE_NONE, 0); // run now
 }
 
-void emZclOtaBootloadClientNetworkStatusCallback(EmberNetworkStatus newNetworkStatus,
-                                                 EmberNetworkStatus oldNetworkStatus,
-                                                 EmberJoinFailureReason reason)
+void chZclOtaBootloadClientNetworkStatusCallback(ChipNetworkStatus newNetworkStatus,
+                                                 ChipNetworkStatus oldNetworkStatus,
+                                                 ChipJoinFailureReason reason)
 {
-#ifdef EMBER_AF_PLUGIN_OTA_BOOTLOAD_CLIENT_AUTO_START
-  if (newNetworkStatus == EMBER_JOINED_NETWORK_ATTACHED) {
+#ifdef CHIP_AF_PLUGIN_OTA_BOOTLOAD_CLIENT_AUTO_START
+  if (newNetworkStatus == CHIP_JOINED_NETWORK_ATTACHED) {
     scheduleDiscoverServer(false, true); // eraseServerInfo? addJitter?
   }
 #endif
 }
 
-#ifdef EMBER_AF_PLUGIN_POLLING
-bool emZclOtaBootloadClientOkToLongPoll(uint32_t durationMs)
+#ifdef CHIP_AF_PLUGIN_POLLING
+bool chZclOtaBootloadClientOkToLongPoll(uint32_t durationMs)
 {
   return state != STATE_DOWNLOAD;
 }
 #endif
 
-void emZclOtaBootloadClientEventHandler(void)
+void chZclOtaBootloadClientEventHandler(void)
 {
-  emberEventControlSetInactive(emZclOtaBootloadClientEventControl);
+  chipEventControlSetInactive(chZclOtaBootloadClientEventControl);
 
   typedef void (*StateHandler)(void);
   const StateHandler stateHandlers[] = {

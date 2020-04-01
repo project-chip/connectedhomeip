@@ -17,18 +17,18 @@
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#ifdef EMBER_AF_API_COMMAND_INTERPRETER2
-  #include EMBER_AF_API_COMMAND_INTERPRETER2
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_COMMAND_INTERPRETER2
+  #include CHIP_AF_API_COMMAND_INTERPRETER2
 #endif
-#include EMBER_AF_API_ILLUMINANCE
+#include CHIP_AF_API_ILLUMINANCE
 
 #define MAX_ILLUMINANCE_MEASUREMENT_INTERVAL_MS                               \
-  (EMBER_AF_PLUGIN_ILLUMINANCE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S \
+  (CHIP_AF_PLUGIN_ILLUMINANCE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S \
    * 1000)
 
 #define ILLUMINANCE_MEASUREMENT_SERVER_MULTIPLIER_MAX   200
@@ -41,7 +41,7 @@ static void writeIlluminanceAttributes(uint16_t illuminanceLogLx);
 
 //------------------------------------------------------------------------------
 // Global variables
-EmberEventControl emZclIlluminanceMeasurementServerReadEventControl;
+ChipEventControl chZclIlluminanceMeasurementServerReadEventControl;
 
 static uint32_t illuminanceMeasurementIntervalMs =
   MAX_ILLUMINANCE_MEASUREMENT_INTERVAL_MS;
@@ -52,7 +52,7 @@ static uint32_t illuminanceMeasurementIntervalMs =
 //******************************************************************************
 // Plugin init function
 //******************************************************************************
-void emZclIlluminanceMeasurementServerInitHandler(void)
+void chZclIlluminanceMeasurementServerInitHandler(void)
 {
   uint16_t maxIlluminanceLogLux;
   uint16_t minIlluminanceLogLux;
@@ -60,32 +60,32 @@ void emZclIlluminanceMeasurementServerInitHandler(void)
   maxIlluminanceLogLux = halIlluminanceGetMaxMeasureableIlluminanceLogLux();
   minIlluminanceLogLux = halIlluminanceGetMinMeasureableIlluminanceLogLux();
 
-  emberZclWriteAttribute(1,
-                         &emberZclClusterIllumMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_ILLUM_MEASUREMENT_SERVER_ATTRIBUTE_ILLUM_MAX_MEASURED_VALUE,
+  chipZclWriteAttribute(1,
+                         &chipZclClusterIllumMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_ILLUM_MEASUREMENT_SERVER_ATTRIBUTE_ILLUM_MAX_MEASURED_VALUE,
                          (uint8_t *) &maxIlluminanceLogLux,
                          sizeof(maxIlluminanceLogLux));
 
-  emberZclWriteAttribute(1,
-                         &emberZclClusterIllumMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_ILLUM_MEASUREMENT_SERVER_ATTRIBUTE_ILLUM_MIN_MEASURED_VALUE,
+  chipZclWriteAttribute(1,
+                         &chipZclClusterIllumMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_ILLUM_MEASUREMENT_SERVER_ATTRIBUTE_ILLUM_MIN_MEASURED_VALUE,
                          (uint8_t *) &minIlluminanceLogLux,
                          sizeof(minIlluminanceLogLux));
   // Start the ReadEvent, which will re-activate itself perpetually
-  emberEventControlSetActive(
-    emZclIlluminanceMeasurementServerReadEventControl);
+  chipEventControlSetActive(
+    chZclIlluminanceMeasurementServerReadEventControl);
 }
 
-void emZclIlluminanceMeasurementServerNetworkStatusHandler(
-  EmberStatus status)
+void chZclIlluminanceMeasurementServerNetworkStatusHandler(
+  ChipStatus status)
 {
   // On network connect, chances are very good that someone (coordinator,
   // gateway, etc) will poll the illuminance for an initial status.  As such,
   // it is useful to have fresh data to be polled.
-  if (status == EMBER_NETWORK_UP) {
+  if (status == CHIP_NETWORK_UP) {
     //checkForReportingConfig();
-    emberEventControlSetActive(
-      emZclIlluminanceMeasurementServerReadEventControl);
+    chipEventControlSetActive(
+      chZclIlluminanceMeasurementServerReadEventControl);
   }
 }
 
@@ -95,7 +95,7 @@ void emZclIlluminanceMeasurementServerNetworkStatusHandler(
 //******************************************************************************
 // Event used to generate a read of a new illuminance value
 //******************************************************************************
-void emZclIlluminanceMeasurementServerReadEventHandler(void)
+void chZclIlluminanceMeasurementServerReadEventHandler(void)
 {
   uint8_t multiplier;
 
@@ -109,19 +109,19 @@ void emZclIlluminanceMeasurementServerReadEventHandler(void)
     multiplier = 0; // use default value instead
   }
 
-  emberAfAppPrintln("I can read!! (eventhandler)");
+  chipAfAppPrintln("I can read!! (eventhandler)");
   halIlluminanceStartRead(multiplier);
-  emberEventControlSetInactive(
-    emZclIlluminanceMeasurementServerReadEventControl);
+  chipEventControlSetInactive(
+    chZclIlluminanceMeasurementServerReadEventControl);
 }
 
 void halIlluminanceReadingCompleteCallback(uint16_t illuminanceLogLx)
 {
-  emberAfAppPrintln("Illuminance: %d log lux", illuminanceLogLx);
+  chipAfAppPrintln("Illuminance: %d log lux", illuminanceLogLx);
   writeIlluminanceAttributes(illuminanceLogLx);
 
-  emberEventControlSetDelayMS(
-    emZclIlluminanceMeasurementServerReadEventControl,
+  chipEventControlSetDelayMS(
+    chZclIlluminanceMeasurementServerReadEventControl,
     illuminanceMeasurementIntervalMs);
 }
 
@@ -131,33 +131,33 @@ void illuminanceSetCommand(void)
 {
   int16_t illuminanceLogLx;
 
-  if (emberCommandArgumentCount() != 1) {
-    emberAfAppPrintln("ERR: expected %s <illuminance>",
-                      emberStringCommandArgument(-1, NULL));
+  if (chipCommandArgumentCount() != 1) {
+    chipAfAppPrintln("ERR: expected %s <illuminance>",
+                      chipStringCommandArgument(-1, NULL));
     return;
   }
-  illuminanceLogLx = (uint16_t)emberUnsignedCommandArgument(0);
+  illuminanceLogLx = (uint16_t)chipUnsignedCommandArgument(0);
 
-  emberAfAppPrintln("setting illuminance to: %d", illuminanceLogLx);
+  chipAfAppPrintln("setting illuminance to: %d", illuminanceLogLx);
   halIlluminanceReadingCompleteCallback(illuminanceLogLx);
 }
 
 //------------------------------------------------------------------------------
 // Plugin public functions
 
-void emberAfPluginIlluminanceMeasurementServerSetMeasurementInterval(
+void chipAfPluginIlluminanceMeasurementServerSetMeasurementInterval(
   uint32_t measurementIntervalS)
 {
   if ((measurementIntervalS == 0)
       || (measurementIntervalS
-          > EMBER_AF_PLUGIN_ILLUMINANCE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S)) {
+          > CHIP_AF_PLUGIN_ILLUMINANCE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S)) {
     illuminanceMeasurementIntervalMs = MAX_ILLUMINANCE_MEASUREMENT_INTERVAL_MS;
   } else {
     illuminanceMeasurementIntervalMs
       = measurementIntervalS * 1000;
   }
-  emberEventControlSetDelayMS(
-    emZclIlluminanceMeasurementServerReadEventControl,
+  chipEventControlSetDelayMS(
+    chZclIlluminanceMeasurementServerReadEventControl,
     illuminanceMeasurementIntervalMs);
 }
 
@@ -179,9 +179,9 @@ static void writeIlluminanceAttributes(uint16_t illuminanceLogLx)
   // zoip
 
   // Write the current illuminance attribute
-  emberZclWriteAttribute(endpoint,
-                         &emberZclClusterIllumMeasurementServerSpec,
-                         EMBER_ZCL_CLUSTER_ILLUM_MEASUREMENT_SERVER_ATTRIBUTE_ILLUM_MEASURED_VALUE,
+  chipZclWriteAttribute(endpoint,
+                         &chipZclClusterIllumMeasurementServerSpec,
+                         CHIP_ZCL_CLUSTER_ILLUM_MEASUREMENT_SERVER_ATTRIBUTE_ILLUM_MEASURED_VALUE,
                          (uint8_t *) &illuminanceLogLx,
                          sizeof(illuminanceLogLx));
 }

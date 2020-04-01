@@ -1,18 +1,6 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 // TODO: Pick creator codes.
@@ -28,23 +16,23 @@
 #define NVM3KEY_ZCL_CORE_REPORTING_CONFIGURATIONS_TABLE (NVM3KEY_DOMAIN_USER | 0x8100)
 
 #ifdef DEFINETYPES
-  #include EMBER_AF_API_ZCL_CORE
+  #include CHIP_AF_API_ZCL_CORE
   #include "zcl-core-reporting.h"
 #endif
 
 #ifdef DEFINETOKENS
 DEFINE_INDEXED_TOKEN(ZCL_CORE_BINDING_TABLE,
-                     EmberZclBindingEntry_t,
-                     EMBER_ZCL_BINDING_TABLE_SIZE,
-                     { EMBER_ZCL_ENDPOINT_NULL, })
+                     ChipZclBindingEntry_t,
+                     CHIP_ZCL_BINDING_TABLE_SIZE,
+                     { CHIP_ZCL_ENDPOINT_NULL, })
 
 DEFINE_INDEXED_TOKEN(ZCL_CORE_GROUP_TABLE,
-                     EmberZclGroupEntry_t,
-                     EMBER_ZCL_GROUP_TABLE_SIZE,
-                     { EMBER_ZCL_GROUP_NULL, })
+                     ChipZclGroupEntry_t,
+                     CHIP_ZCL_GROUP_TABLE_SIZE,
+                     { CHIP_ZCL_GROUP_NULL, })
 
 DEFINE_INDEXED_TOKEN(ZCL_CORE_REPORTING_CONFIGURATIONS_TABLE,
-                     EmZclNvReportingConfiguration_t,
-                     EMBER_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE,
-                     { EMBER_ZCL_ENDPOINT_NULL, })
+                     ChZclNvReportingConfiguration_t,
+                     CHIP_ZCL_REPORTING_CONFIGURATIONS_TABLE_SIZE,
+                     { CHIP_ZCL_ENDPOINT_NULL, })
 #endif

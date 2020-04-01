@@ -1,24 +1,12 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
 #include <stdio.h>
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 
 // Copies "src," including the NUL terminator, to "dst."  The number of
 // characters written, not including the NUL, is returned.
@@ -52,7 +40,7 @@ static uint8_t hexCharToNibble(char c)
 //   0x0000: returns 1 and sets "result" to "0"
 //   0x0001: returns 1 and sets "result" to "1"
 //   0xDEAD: returns 4 and sets "result" to "dead"
-uint8_t emZclIntToHexString(uint32_t value, size_t size, uint8_t *result)
+uint8_t chZclIntToHexString(uint32_t value, size_t size, uint8_t *result)
 {
   assert(size <= sizeof(value));
   // Make sure value is not larger than what fits in 'size'.  If
@@ -93,7 +81,7 @@ bool emHexStringToInt(const uint8_t *chars, size_t length, uintmax_t *result)
   return true;
 }
 
-bool emZclHexStringToInt(const uint8_t *chars, size_t length, uintmax_t *result)
+bool chZclHexStringToInt(const uint8_t *chars, size_t length, uintmax_t *result)
 {
   // Used in parsing URIs-
   // If a leading zero character is found we return true but with an invalid
@@ -123,30 +111,30 @@ bool emZclHexStringToInt(const uint8_t *chars, size_t length, uintmax_t *result)
   return emHexStringToInt(chars, actualLength, result);
 }
 
-size_t emZclClusterToString(const EmberZclClusterSpec_t *clusterSpec,
+size_t chZclClusterToString(const ChipZclClusterSpec_t *clusterSpec,
                             uint8_t *result)
 {
   uint8_t *finger = result;
-  *finger++ = (clusterSpec->role == EMBER_ZCL_ROLE_CLIENT ? 'c' : 's');
-  if (clusterSpec->manufacturerCode != EMBER_ZCL_MANUFACTURER_CODE_NULL) {
-    finger += emZclIntToHexString(clusterSpec->manufacturerCode,
+  *finger++ = (clusterSpec->role == CHIP_ZCL_ROLE_CLIENT ? 'c' : 's');
+  if (clusterSpec->manufacturerCode != CHIP_ZCL_MANUFACTURER_CODE_NULL) {
+    finger += chZclIntToHexString(clusterSpec->manufacturerCode,
                                   sizeof(clusterSpec->manufacturerCode),
                                   finger);
-    *finger++ = EMBER_ZCL_URI_PATH_MANUFACTURER_CODE_CLUSTER_ID_SEPARATOR;
+    *finger++ = CHIP_ZCL_URI_PATH_MANUFACTURER_CODE_CLUSTER_ID_SEPARATOR;
   }
-  finger += emZclIntToHexString(clusterSpec->id,
+  finger += chZclIntToHexString(clusterSpec->id,
                                 sizeof(clusterSpec->id),
                                 finger);
-  // emZclIntToHexString adds a null terminator, so we don't need to add one
+  // chZclIntToHexString adds a null terminator, so we don't need to add one
   // here.
   return finger - result;
 }
 
-bool emZclStringToCluster(const uint8_t *chars,
+bool chZclStringToCluster(const uint8_t *chars,
                           size_t length,
-                          EmberZclClusterSpec_t *clusterSpec)
+                          ChipZclClusterSpec_t *clusterSpec)
 {
-  EmberZclRole_t role;
+  ChipZclRole_t role;
   uintmax_t manufacturerCode;
   uintmax_t clusterId;
 
@@ -155,9 +143,9 @@ bool emZclStringToCluster(const uint8_t *chars,
   // Cluster ids start with c for client or s for server.  No other values are
   // valid.
   if (*finger == 'c') {
-    role = EMBER_ZCL_ROLE_CLIENT;
+    role = CHIP_ZCL_ROLE_CLIENT;
   } else if (*finger == 's') {
-    role = EMBER_ZCL_ROLE_SERVER;
+    role = CHIP_ZCL_ROLE_SERVER;
   } else {
     return false;
   }
@@ -168,22 +156,22 @@ bool emZclStringToCluster(const uint8_t *chars,
   // just the cluster id by itself.  Both are two-byte values.
   const uint8_t *separator
     = memchr(finger,
-             EMBER_ZCL_URI_PATH_MANUFACTURER_CODE_CLUSTER_ID_SEPARATOR,
+             CHIP_ZCL_URI_PATH_MANUFACTURER_CODE_CLUSTER_ID_SEPARATOR,
              length);
   if (separator == NULL) {
-    manufacturerCode = EMBER_ZCL_MANUFACTURER_CODE_NULL;
+    manufacturerCode = CHIP_ZCL_MANUFACTURER_CODE_NULL;
   } else {
     uint16_t sublength = separator - finger;
     if (!(sublength <= sizeof(clusterSpec->manufacturerCode) * 2  // bytes to nibbles
-          && emZclHexStringToInt(finger, sublength, &manufacturerCode)
-          && manufacturerCode != EMBER_ZCL_MANUFACTURER_CODE_NULL)) {
+          && chZclHexStringToInt(finger, sublength, &manufacturerCode)
+          && manufacturerCode != CHIP_ZCL_MANUFACTURER_CODE_NULL)) {
       return false;
     }
     finger = separator + 1;
     length = length - sublength - 1;
   }
   if (!(length <= sizeof(clusterSpec->id) * 2  // bytes to nibbles
-        && emZclHexStringToInt(finger, length, &clusterId))) {
+        && chZclHexStringToInt(finger, length, &clusterId))) {
     return false;
   }
 
@@ -196,29 +184,29 @@ bool emZclStringToCluster(const uint8_t *chars,
 // destination  : input that has the endpoint or group value and type
 // result       : output collecter - caller ensures the memeory is allocated
 // returns      : size of the output
-static size_t applicationDestinationToUriPath(const EmberZclApplicationDestination_t *destination,
+static size_t applicationDestinationToUriPath(const ChipZclApplicationDestination_t *destination,
                                               uint8_t *result)
 {
   uint8_t *finger = result;
-  if (destination->type == EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT) {
+  if (destination->type == CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT) {
     finger += writeString(finger, "zcl/e/");
-    finger += emZclIntToHexString(destination->data.endpointId,
+    finger += chZclIntToHexString(destination->data.endpointId,
                                   sizeof(destination->data.endpointId),
                                   finger);
   } else {
     finger += writeString(finger, "zcl/g/");
-    finger += emZclIntToHexString(destination->data.groupId,
+    finger += chZclIntToHexString(destination->data.groupId,
                                   sizeof(destination->data.groupId),
                                   finger);
   }
 
-  // emZclIntToHexString adds a null terminator, so we don't need to add one
+  // chZclIntToHexString adds a null terminator, so we don't need to add one
   // here.
   return finger - result;
 }
 
-static size_t clusterToUriPath(const EmberZclApplicationDestination_t *destination,
-                               const EmberZclClusterSpec_t *clusterSpec,
+static size_t clusterToUriPath(const ChipZclApplicationDestination_t *destination,
+                               const ChipZclClusterSpec_t *clusterSpec,
                                uint8_t *result)
 {
   uint8_t *finger = result;
@@ -226,14 +214,14 @@ static size_t clusterToUriPath(const EmberZclApplicationDestination_t *destinati
     finger += applicationDestinationToUriPath(destination, finger);
     *finger++ = '/';
   }
-  finger += emZclClusterToString(clusterSpec, finger);
-  // emZclClusterToString adds a null terminator, so we don't need to add one
+  finger += chZclClusterToString(clusterSpec, finger);
+  // chZclClusterToString adds a null terminator, so we don't need to add one
   // here.
   return finger - result;
 }
 
-size_t emZclThingToUriPath(const EmberZclApplicationDestination_t *destination,
-                           const EmberZclClusterSpec_t *clusterSpec,
+size_t chZclThingToUriPath(const ChipZclApplicationDestination_t *destination,
+                           const ChipZclClusterSpec_t *clusterSpec,
                            char thing,
                            uint8_t *result)
 {
@@ -248,46 +236,46 @@ size_t emZclThingToUriPath(const EmberZclApplicationDestination_t *destination,
   return finger - result;
 }
 
-size_t emZclThingIdToUriPath(const EmberZclApplicationDestination_t *destination,
-                             const EmberZclClusterSpec_t *clusterSpec,
+size_t chZclThingIdToUriPath(const ChipZclApplicationDestination_t *destination,
+                             const ChipZclClusterSpec_t *clusterSpec,
                              char thing,
                              uintmax_t thingId,
                              size_t size,
                              uint8_t *result)
 {
   uint8_t *finger = result;
-  finger += emZclThingToUriPath(destination, clusterSpec, thing, finger);
+  finger += chZclThingToUriPath(destination, clusterSpec, thing, finger);
   *finger++ = '/';
-  finger += emZclIntToHexString(thingId, size, finger);
-  // emZclIntToHexString adds a null terminator, so we don't need to add one
+  finger += chZclIntToHexString(thingId, size, finger);
+  // chZclIntToHexString adds a null terminator, so we don't need to add one
   // here.
   return finger - result;
 }
 
-size_t emZclDestinationToUri(const EmberZclDestination_t *destination,
+size_t chZclDestinationToUri(const ChipZclDestination_t *destination,
                              uint8_t *result)
 {
   uint8_t *finger = result;
 
-  if (destination->network.flags & EMBER_ZCL_USE_COAPS_FLAG) {
+  if (destination->network.flags & CHIP_ZCL_USE_COAPS_FLAG) {
     finger += writeString(finger, "coaps://");
   } else {
     finger += writeString(finger, "coap://");
   }
 
-  if (destination->network.flags & EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
+  if (destination->network.flags & CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
     *finger++ = '[';
-    if (!emberIpv6AddressToString(&destination->network.address,
+    if (!chipIpv6AddressToString(&destination->network.address,
                                   finger,
-                                  EMBER_IPV6_ADDRESS_STRING_SIZE)) {
+                                  CHIP_IPV6_ADDRESS_STRING_SIZE)) {
       return 0;
     }
     finger += strlen((const char *)finger);
     *finger++ = ']';
-  } else if (destination->network.flags & EMBER_ZCL_HAVE_UID_FLAG) {
+  } else if (destination->network.flags & CHIP_ZCL_HAVE_UID_FLAG) {
     finger += writeString(finger, "sha-256;");
-    finger += emZclUidToBase64Url(&destination->network.uid,
-                                  EMBER_ZCL_UID_BITS,
+    finger += chZclUidToBase64Url(&destination->network.uid,
+                                  CHIP_ZCL_UID_BITS,
                                   finger);
   } else {
     assert(false);
@@ -295,9 +283,9 @@ size_t emZclDestinationToUri(const EmberZclDestination_t *destination,
   }
 
   if (destination->network.port
-      != ((destination->network.flags & EMBER_ZCL_USE_COAPS_FLAG)
-          ? EMBER_COAP_SECURE_PORT
-          : EMBER_COAP_PORT)) {
+      != ((destination->network.flags & CHIP_ZCL_USE_COAPS_FLAG)
+          ? CHIP_COAP_SECURE_PORT
+          : CHIP_COAP_PORT)) {
     finger += sprintf((char *)finger, ":%u", destination->network.port);
   }
 
@@ -308,19 +296,19 @@ size_t emZclDestinationToUri(const EmberZclDestination_t *destination,
   return finger - result;
 }
 
-bool emZclUriToBindingEntry(const uint8_t *uri,
-                            EmberZclBindingEntry_t *result,
+bool chZclUriToBindingEntry(const uint8_t *uri,
+                            ChipZclBindingEntry_t *result,
                             bool includeCluster)
 {
   const uint8_t *finger = uri;
   if (strncmp((const char *)finger, "coap://", 7) == 0) {
     finger += 7;
-    result->destination.network.scheme = EMBER_ZCL_SCHEME_COAP;
-    result->destination.network.port = EMBER_COAP_PORT;
+    result->destination.network.scheme = CHIP_ZCL_SCHEME_COAP;
+    result->destination.network.port = CHIP_COAP_PORT;
   } else if (strncmp((const char *)finger, "coaps://", 8) == 0) {
     finger += 8;
-    result->destination.network.scheme = EMBER_ZCL_SCHEME_COAPS;
-    result->destination.network.port = EMBER_COAP_SECURE_PORT;
+    result->destination.network.scheme = CHIP_ZCL_SCHEME_COAPS;
+    result->destination.network.port = CHIP_COAP_SECURE_PORT;
   } else {
     return false;
   }
@@ -328,31 +316,31 @@ bool emZclUriToBindingEntry(const uint8_t *uri,
   if (*finger == '[') {
     finger++;
     const uint8_t *end = (const uint8_t *)strchr((const char *)finger, ']');
-    if (end == NULL || EMBER_IPV6_ADDRESS_STRING_SIZE <= end - finger) {
+    if (end == NULL || CHIP_IPV6_ADDRESS_STRING_SIZE <= end - finger) {
       return false;
     }
-    uint8_t address[EMBER_IPV6_ADDRESS_STRING_SIZE] = { 0 };
+    uint8_t address[CHIP_IPV6_ADDRESS_STRING_SIZE] = { 0 };
     MEMCOPY(address, finger, end - finger);
-    if (!emberIpv6StringToAddress(address,
+    if (!chipIpv6StringToAddress(address,
                                   &result->destination.network.data.address)) {
       return false;
     }
     finger = end + 1;
-    result->destination.network.type = EMBER_ZCL_NETWORK_DESTINATION_TYPE_ADDRESS;
+    result->destination.network.type = CHIP_ZCL_NETWORK_DESTINATION_TYPE_ADDRESS;
   } else if (strncmp((const char *)finger, "sha-256;", 8) == 0) {
     finger += 8;
     uint16_t uidBits;
-    if (!emZclBase64UrlToUid(finger,
-                             EMBER_ZCL_UID_BASE64URL_LENGTH,
+    if (!chZclBase64UrlToUid(finger,
+                             CHIP_ZCL_UID_BASE64URL_LENGTH,
                              &result->destination.network.data.uid,
                              &uidBits)) {
       return false;
     }
-    if (uidBits != EMBER_ZCL_UID_BITS) {
+    if (uidBits != CHIP_ZCL_UID_BITS) {
       return false;
     }
-    finger += EMBER_ZCL_UID_BASE64URL_LENGTH;
-    result->destination.network.type = EMBER_ZCL_NETWORK_DESTINATION_TYPE_UID;
+    finger += CHIP_ZCL_UID_BASE64URL_LENGTH;
+    result->destination.network.type = CHIP_ZCL_NETWORK_DESTINATION_TYPE_UID;
   } else {
     return false;
   }
@@ -361,7 +349,7 @@ bool emZclUriToBindingEntry(const uint8_t *uri,
     finger++;
     result->destination.network.port = 0;
     do {
-      uint8_t value = emberHexToInt(*finger);
+      uint8_t value = chipHexToInt(*finger);
       if (9 < value) {
         return false;
       }
@@ -388,15 +376,15 @@ bool emZclUriToBindingEntry(const uint8_t *uri,
     }
     size_t length = end - finger;
     uintmax_t id;
-    if (!emZclHexStringToInt(finger, length, &id)) {
+    if (!chZclHexStringToInt(finger, length, &id)) {
       return false;
     }
     if (finger[-2] == 'e') {
-      result->destination.application.data.endpointId = (EmberZclEndpointId_t)id;
-      result->destination.application.type = EMBER_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT;
+      result->destination.application.data.endpointId = (ChipZclEndpointId_t)id;
+      result->destination.application.type = CHIP_ZCL_APPLICATION_DESTINATION_TYPE_ENDPOINT;
     } else {
-      result->destination.application.data.groupId = (EmberZclGroupId_t)id;
-      result->destination.application.type = EMBER_ZCL_APPLICATION_DESTINATION_TYPE_GROUP;
+      result->destination.application.data.groupId = (ChipZclGroupId_t)id;
+      result->destination.application.type = CHIP_ZCL_APPLICATION_DESTINATION_TYPE_GROUP;
     }
     finger = end;
   } else {
@@ -418,34 +406,34 @@ bool emZclUriToBindingEntry(const uint8_t *uri,
   }
   size_t length = end - finger;
 
-  return emZclStringToCluster(finger, length, &result->clusterSpec);
+  return chZclStringToCluster(finger, length, &result->clusterSpec);
   return true;
 }
 
-size_t emZclCoapEndpointToUri(const EmberZclCoapEndpoint_t *network,
+size_t chZclCoapEndpointToUri(const ChipZclCoapEndpoint_t *network,
                               uint8_t *result)
 {
   uint8_t *finger = result;
 
-  if (network->flags & EMBER_ZCL_USE_COAPS_FLAG) {
+  if (network->flags & CHIP_ZCL_USE_COAPS_FLAG) {
     finger += writeString(finger, "coaps://");
   } else {
     finger += writeString(finger, "coap://");
   }
 
-  if (network->flags & EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
+  if (network->flags & CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG) {
     *finger++ = '[';
-    if (!emberIpv6AddressToString(&network->address,
+    if (!chipIpv6AddressToString(&network->address,
                                   finger,
-                                  EMBER_IPV6_ADDRESS_STRING_SIZE)) {
+                                  CHIP_IPV6_ADDRESS_STRING_SIZE)) {
       return 0;
     }
     finger += strlen((const char *)finger);
     *finger++ = ']';
-  } else if (network->flags & EMBER_ZCL_HAVE_UID_FLAG) {
+  } else if (network->flags & CHIP_ZCL_HAVE_UID_FLAG) {
     finger += writeString(finger, "sha-256;");
-    finger += emZclUidToBase64Url(&network->uid,
-                                  EMBER_ZCL_UID_BITS,
+    finger += chZclUidToBase64Url(&network->uid,
+                                  CHIP_ZCL_UID_BITS,
                                   finger);
   } else {
     assert(false);
@@ -453,25 +441,25 @@ size_t emZclCoapEndpointToUri(const EmberZclCoapEndpoint_t *network,
   }
 
   if (network->port
-      != ((network->flags & EMBER_ZCL_USE_COAPS_FLAG)
-          ? EMBER_COAP_SECURE_PORT
-          : EMBER_COAP_PORT)) {
+      != ((network->flags & CHIP_ZCL_USE_COAPS_FLAG)
+          ? CHIP_COAP_SECURE_PORT
+          : CHIP_COAP_PORT)) {
     finger += sprintf((char *)finger, ":%u", network->port);
   }
   return finger - result;
 }
 
-size_t emZclUriToCoapEndpoint(const uint8_t *uri, EmberZclCoapEndpoint_t *network)
+size_t chZclUriToCoapEndpoint(const uint8_t *uri, ChipZclCoapEndpoint_t *network)
 {
   const uint8_t *finger = uri;
   if (strncmp((const char *)finger, "coap://", 7) == 0) {
     finger += 7;
-    network->flags = EMBER_ZCL_NO_FLAGS;
-    network->port = EMBER_COAP_PORT;
+    network->flags = CHIP_ZCL_NO_FLAGS;
+    network->port = CHIP_COAP_PORT;
   } else if (strncmp((const char *)finger, "coaps://", 8) == 0) {
     finger += 8;
-    network->flags = EMBER_ZCL_USE_COAPS_FLAG;
-    network->port = EMBER_COAP_SECURE_PORT;
+    network->flags = CHIP_ZCL_USE_COAPS_FLAG;
+    network->port = CHIP_COAP_SECURE_PORT;
   } else {
     return 0;
   }
@@ -479,31 +467,31 @@ size_t emZclUriToCoapEndpoint(const uint8_t *uri, EmberZclCoapEndpoint_t *networ
   if (*finger == '[') {
     finger++;
     const uint8_t *end = (const uint8_t *)strchr((const char *)finger, ']');
-    if (end == NULL || EMBER_IPV6_ADDRESS_STRING_SIZE <= end - finger) {
+    if (end == NULL || CHIP_IPV6_ADDRESS_STRING_SIZE <= end - finger) {
       return 0;
     }
-    uint8_t address[EMBER_IPV6_ADDRESS_STRING_SIZE] = { 0 };
+    uint8_t address[CHIP_IPV6_ADDRESS_STRING_SIZE] = { 0 };
     MEMCOPY(address, finger, end - finger);
-    if (!emberIpv6StringToAddress(address,
+    if (!chipIpv6StringToAddress(address,
                                   &network->address)) {
       return 0;
     }
     finger = end + 1;
-    network->flags |= EMBER_ZCL_HAVE_IPV6_ADDRESS_FLAG;
+    network->flags |= CHIP_ZCL_HAVE_IPV6_ADDRESS_FLAG;
   } else if (strncmp((const char *)finger, "sha-256;", 8) == 0) {
     finger += 8;
     uint16_t uidBits;
-    if (!emZclBase64UrlToUid(finger,
-                             EMBER_ZCL_UID_BASE64URL_LENGTH,
+    if (!chZclBase64UrlToUid(finger,
+                             CHIP_ZCL_UID_BASE64URL_LENGTH,
                              &network->uid,
                              &uidBits)) {
       return 0;
     }
-    if (uidBits != EMBER_ZCL_UID_BITS) {
+    if (uidBits != CHIP_ZCL_UID_BITS) {
       return 0;
     }
-    finger += EMBER_ZCL_UID_BASE64URL_LENGTH;
-    network->flags |= EMBER_ZCL_HAVE_UID_FLAG;
+    finger += CHIP_ZCL_UID_BASE64URL_LENGTH;
+    network->flags |= CHIP_ZCL_HAVE_UID_FLAG;
   } else {
     return 0;
   }
@@ -512,7 +500,7 @@ size_t emZclUriToCoapEndpoint(const uint8_t *uri, EmberZclCoapEndpoint_t *networ
     finger++;
     network->port = 0;
     do {
-      uint8_t value = emberHexToInt(*finger);
+      uint8_t value = chipHexToInt(*finger);
       if (9 < value) {
         return 0;
       }
@@ -531,11 +519,11 @@ size_t emZclUriToCoapEndpoint(const uint8_t *uri, EmberZclCoapEndpoint_t *networ
 // These two functions are used for debugging only.  ZCLIP does not
 // use hexidecimal for sending UIDs over the air.
 
-size_t emZclUidToString(const EmberZclUid_t *uid,
+size_t chZclUidToString(const ChipZclUid_t *uid,
                         uint16_t uidBits,
                         uint8_t *result)
 {
-  assert(uidBits <= EMBER_ZCL_UID_BITS);
+  assert(uidBits <= CHIP_ZCL_UID_BITS);
 
   // We can only send whole nibbles over the air, so the number of bits
   // requested by the user has to be massaged into a multiple of four.
@@ -545,7 +533,7 @@ size_t emZclUidToString(const EmberZclUid_t *uid,
   uint8_t index = 0;
   for (size_t i = 0; i < uidBits; i += 4) { // bytes to bits
     index = i / 8;
-    if ( index < EMBER_ZCL_UID_SIZE) {
+    if ( index < CHIP_ZCL_UID_SIZE) {
       uint8_t byte = uid->bytes[index];
       uint8_t nibble = (byte >> (4 - (i % 8))) & 0x0F;
       // TODO: Should we print uppercase hexits in the UID?
@@ -556,16 +544,16 @@ size_t emZclUidToString(const EmberZclUid_t *uid,
   return finger - result;
 }
 
-bool emZclStringToUid(const uint8_t *uid,
+bool chZclStringToUid(const uint8_t *uid,
                       size_t length,
-                      EmberZclUid_t *result,
+                      ChipZclUid_t *result,
                       uint16_t *resultBits)
 {
-  if (EMBER_ZCL_UID_STRING_LENGTH < length) {
+  if (CHIP_ZCL_UID_STRING_LENGTH < length) {
     return false;
   }
 
-  MEMSET(result, 0, sizeof(EmberZclUid_t));
+  MEMSET(result, 0, sizeof(ChipZclUid_t));
   *resultBits = 0;
 
   const uint8_t *finger = uid;
@@ -611,7 +599,7 @@ static uint8_t decodeBase64UrlChar(uint8_t c)
 
 // If code is NULL, just validates that input string contains only
 // base64url characters.
-bool emZclConvertBase64UrlToCode(const uint8_t *base64Url,
+bool chZclConvertBase64UrlToCode(const uint8_t *base64Url,
                                  uint16_t length,
                                  uint8_t *code)
 {
@@ -634,13 +622,13 @@ static const uint8_t base64UrlChars[64] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                           "abcdefghijklmnopqrstuvwxyz"
                                           "0123456789-_";
 
-size_t emZclUidToBase64Url(const EmberZclUid_t *uid,
+size_t chZclUidToBase64Url(const ChipZclUid_t *uid,
                            uint16_t uidBits,
                            uint8_t *base64Url)
 {
   if (uid == NULL
       || base64Url == NULL
-      || uidBits > EMBER_ZCL_UID_BITS
+      || uidBits > CHIP_ZCL_UID_BITS
       || uidBits % 8 != 0) {
     return 0; // TODO: Is this the right return value for error?
   }
@@ -711,9 +699,9 @@ int emDecodeBase64Url(const uint8_t *input,
   return finger - output;
 }
 
-bool emZclBase64UrlToUid(const uint8_t *base64Url,
+bool chZclBase64UrlToUid(const uint8_t *base64Url,
                          size_t length,
-                         EmberZclUid_t *result,
+                         ChipZclUid_t *result,
                          uint16_t *resultBits)
 {
   if (base64Url == NULL
@@ -739,9 +727,9 @@ bool emZclBase64UrlToUid(const uint8_t *base64Url,
 #define niPrefix "ni:///sha-256;"
 #define niPrefixLength (sizeof(niPrefix) - 1)   // don't count the nul
 
-bool emZclNiUriToUid(const uint8_t *uri, uint16_t uriLength, EmberZclUid_t *uid)
+bool chZclNiUriToUid(const uint8_t *uri, uint16_t uriLength, ChipZclUid_t *uid)
 {
-  return (niPrefixLength + EMBER_ZCL_UID_BASE64URL_LENGTH <= uriLength
+  return (niPrefixLength + CHIP_ZCL_UID_BASE64URL_LENGTH <= uriLength
           && strncmp((const char *)uri, niPrefix, niPrefixLength) == 0
           && 0 < emDecodeBase64Url(uri + niPrefixLength,
                                    uriLength - niPrefixLength,

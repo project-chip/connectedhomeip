@@ -1,78 +1,66 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_HAL
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_HAL
 
 #include "thread-callbacks.h"
 #include "time-server.h"
 
 // Events used in the time server.
-EmberEventControl emZclTimeServerTickEventControl;
+ChipEventControl chZclTimeServerTickEventControl;
 
 // Static variables.
-static EmberZclEndpointId_t singletonEpId = EMBER_ZCL_ENDPOINT_NULL;
+static ChipZclEndpointId_t singletonEpId = CHIP_ZCL_ENDPOINT_NULL;
 
 // Static function definitions.
-static void timeServerInitEndpoint(EmberZclEndpointId_t endpointId);
-static EmberZclStatus_t readTime(EmberZclEndpointId_t endpointId, uint32_t *time);
-static EmberZclStatus_t writeTime(EmberZclEndpointId_t endpointId, uint32_t time);
+static void timeServerInitEndpoint(ChipZclEndpointId_t endpointId);
+static ChipZclStatus_t readTime(ChipZclEndpointId_t endpointId, uint32_t *time);
+static ChipZclStatus_t writeTime(ChipZclEndpointId_t endpointId, uint32_t time);
 
 // Static functions.
-static void timeServerInitEndpoint(EmberZclEndpointId_t endpointId)
+static void timeServerInitEndpoint(ChipZclEndpointId_t endpointId)
 {
-  EmberZclStatus_t status;
+  ChipZclStatus_t status;
   uint32_t currentTime;
   uint8_t timeStatus = 0;
 
-  if (emZclEndpointHasCluster(endpointId,
-                              &emberZclClusterTimeServerSpec)) {
-    const EmZclAttributeEntry_t *attribute
-      = emZclFindAttribute(&emberZclClusterTimeServerSpec,
-                           EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME,
+  if (chZclEndpointHasCluster(endpointId,
+                              &chipZclClusterTimeServerSpec)) {
+    const ChZclAttributeEntry_t *attribute
+      = chZclFindAttribute(&chipZclClusterTimeServerSpec,
+                           CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME,
                            false); // exclude remote
     if (!attribute) {
       return;
     }
-    if (emZclIsAttributeSingleton(attribute)) {
-      if (singletonEpId != EMBER_ZCL_ENDPOINT_NULL) {
+    if (chZclIsAttributeSingleton(attribute)) {
+      if (singletonEpId != CHIP_ZCL_ENDPOINT_NULL) {
         return;
       }
       singletonEpId = endpointId;
     }
 
     // Initialize the attribute with the real time, if it's available.
-    currentTime = emberZclClusterTimeServerGetCurrentTimeCallback();
+    currentTime = chipZclClusterTimeServerGetCurrentTimeCallback();
     if (currentTime != 0) {
       writeTime(endpointId, currentTime);
     }
 
-#ifdef EMBER_AF_PLUGIN_TIME_SERVER_MASTER
+#ifdef CHIP_AF_PLUGIN_TIME_SERVER_MASTER
     // The first bit of TimeStatus indicates whether the real time clock
     // corresponding to the Time attribute is internally set to the time
     // standard.
     timeStatus |= BIT(0);
-#elif defined(EMBER_AF_PLUGIN_TIME_SERVER_SYNCHRONIZED)
+#elif defined(CHIP_AF_PLUGIN_TIME_SERVER_SYNCHRONIZED)
     // The Synchronized bit specifies whether Time has been set over the ZigBee
     // network to synchronize it (as close as may be practical) to the time standard
     // bit must be explicitly written to indicate this - i.e. it is not set
@@ -81,71 +69,71 @@ static void timeServerInitEndpoint(EmberZclEndpointId_t endpointId)
     timeStatus |= BIT(1);
 #endif
 
-#ifdef EMBER_AF_PLUGIN_TIME_SERVER_MASTER_ZONE_DST
+#ifdef CHIP_AF_PLUGIN_TIME_SERVER_MASTER_ZONE_DST
     // The third bit of TimeStatus indicates whether the TimeZone, DstStart,
     // DstEnd, and DstShift attributes are set internally to correct values for
     // the location of the clock.
     if (emAfContainsTimeServerAttribute(endpointId,
-                                        EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME_ZONE)
+                                        CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME_ZONE)
         && emAfContainsTimeServerAttribute(endpointId,
-                                           EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_DST_START)
+                                           CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_DST_START)
         && emAfContainsTimeServerAttribute(endpointId,
-                                           EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_DST_END)
+                                           CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_DST_END)
         && emAfContainsTimeServerAttribute(endpointId,
-                                           EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_DST_SHIFT)) {
+                                           CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_DST_SHIFT)) {
       timeStatus |= BIT(2);
     }
-#endif //EMBER_AF_PLUGIN_TIME_SERVER_MASTER_ZONE_DST
+#endif //CHIP_AF_PLUGIN_TIME_SERVER_MASTER_ZONE_DST
 
-#ifdef EMBER_AF_PLUGIN_TIME_SERVER_SUPERSEDING
+#ifdef CHIP_AF_PLUGIN_TIME_SERVER_SUPERSEDING
     // Indicates that the time server should be considered as a more authoritative
     // time server.
     timeStatus |= BIT(3);
-#endif //EMBER_AF_PLUGIN_TIME_SERVER_SUPERSEDING
+#endif //CHIP_AF_PLUGIN_TIME_SERVER_SUPERSEDING
 
-    status = emberZclWriteAttribute(endpointId,
-                                    &emberZclClusterTimeServerSpec,
-                                    EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME_STATUS,
+    status = chipZclWriteAttribute(endpointId,
+                                    &chipZclClusterTimeServerSpec,
+                                    CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME_STATUS,
                                     (uint8_t *)&timeStatus,
                                     sizeof(timeStatus));
-    if (status != EMBER_ZCL_STATUS_SUCCESS) {
-      emberAfPluginTimeServerPrintln("ERR: writing time status %x", status);
+    if (status != CHIP_ZCL_STATUS_SUCCESS) {
+      chipAfPluginTimeServerPrintln("ERR: writing time status %x", status);
     }
 
     // Start the time update scheduler.
-    emberEventControlSetDelayMS(emZclTimeServerTickEventControl,
+    chipEventControlSetDelayMS(chZclTimeServerTickEventControl,
                                 MILLISECOND_TICKS_PER_SECOND);
   }
 }
 
-static EmberZclStatus_t readTime(EmberZclEndpointId_t endpointId, uint32_t *time)
+static ChipZclStatus_t readTime(ChipZclEndpointId_t endpointId, uint32_t *time)
 {
-  emberAfPluginTimeServerPrintln("Server Time Read ep=%d", endpointId);
+  chipAfPluginTimeServerPrintln("Server Time Read ep=%d", endpointId);
 
-  EmberZclStatus_t status =
-    emberZclReadAttribute(endpointId,
-                          &emberZclClusterTimeServerSpec,
-                          EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME,
+  ChipZclStatus_t status =
+    chipZclReadAttribute(endpointId,
+                          &chipZclClusterTimeServerSpec,
+                          CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME,
                           (uint8_t *)time,
                           sizeof(*time));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfPluginTimeServerPrintln("ERR: reading time %x", status);
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfPluginTimeServerPrintln("ERR: reading time %x", status);
   }
   return status;
 }
 
-static EmberZclStatus_t writeTime(EmberZclEndpointId_t endpointId, uint32_t time)
+static ChipZclStatus_t writeTime(ChipZclEndpointId_t endpointId, uint32_t time)
 {
-  emberAfPluginTimeServerPrintln("Server Time Write ep=%d time=%d", endpoint, time);
+  chipAfPluginTimeServerPrintln("Server Time Write ep=%d time=%d", endpoint, time);
 
-  EmberZclStatus_t status =
-    emberZclWriteAttribute(endpointId,
-                           &emberZclClusterTimeServerSpec,
-                           EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME,
+  ChipZclStatus_t status =
+    chipZclWriteAttribute(endpointId,
+                           &chipZclClusterTimeServerSpec,
+                           CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME,
                            (uint8_t *)&time,
                            sizeof(time));
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfPluginTimeServerPrintln("ERR: writing time %x", status);
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfPluginTimeServerPrintln("ERR: writing time %x", status);
   }
 
   //TODO- Refresh and calculate all the other optional attributes here...
@@ -153,16 +141,16 @@ static EmberZclStatus_t writeTime(EmberZclEndpointId_t endpointId, uint32_t time
   return status;
 }
 
-void emZclTimeServerInit(void)
+void chZclTimeServerInit(void)
 {
-  for (uint8_t i = 0; i < emZclEndpointCount; i++) {
-    const EmZclEndpointEntry_t *epEntry = &emZclEndpointTable[i];
+  for (uint8_t i = 0; i < chZclEndpointCount; i++) {
+    const ChZclEndpointEntry_t *epEntry = &chZclEndpointTable[i];
     if (epEntry) {
-      EmberZclEndpointId_t endpointId = epEntry->endpointId;
-      if (emZclEndpointHasCluster(endpointId,
-                                  &emberZclClusterTimeServerSpec)) {
-        emberAfPluginTimeServerPrintln("Server Init.. ZCL Has Time Cluster on ep=%d", endpointId);
-        if (!emberZclClusterTimeServerInitCallback(endpointId)) {
+      ChipZclEndpointId_t endpointId = epEntry->endpointId;
+      if (chZclEndpointHasCluster(endpointId,
+                                  &chipZclClusterTimeServerSpec)) {
+        chipAfPluginTimeServerPrintln("Server Init.. ZCL Has Time Cluster on ep=%d", endpointId);
+        if (!chipZclClusterTimeServerInitCallback(endpointId)) {
           // User did not handle the server init, so we do it.
           timeServerInitEndpoint(endpointId);
         }
@@ -171,23 +159,23 @@ void emZclTimeServerInit(void)
   }
 }
 
-void emZclTimeServerTickEventHandler(void)
+void chZclTimeServerTickEventHandler(void)
 {
   // The time server event handler ticks every second once intialised.
-  emberEventControlSetInactive(emZclTimeServerTickEventControl);
+  chipEventControlSetInactive(chZclTimeServerTickEventControl);
 
   // Update TimeServer time on all endpoints.
-  for (uint8_t i = 0; i < emZclEndpointCount; i++) {
-    const EmZclEndpointEntry_t *epEntry = &emZclEndpointTable[i];
+  for (uint8_t i = 0; i < chZclEndpointCount; i++) {
+    const ChZclEndpointEntry_t *epEntry = &chZclEndpointTable[i];
     if (epEntry) {
-      EmberZclEndpointId_t endpointId = epEntry->endpointId;
-      if (emZclEndpointHasCluster(endpointId,
-                                  &emberZclClusterTimeServerSpec)) {
-        if (!emberZclClusterTimeServerTickCallback(endpointId)) {
+      ChipZclEndpointId_t endpointId = epEntry->endpointId;
+      if (chZclEndpointHasCluster(endpointId,
+                                  &chipZclClusterTimeServerSpec)) {
+        if (!chipZclClusterTimeServerTickCallback(endpointId)) {
           // User did not handle the time server tick, so we do it-
           // Update the currentTime attribute with the real time if we have it.
           // Otherwise, just increment the currentTime attribute value.
-          uint32_t currentTime = emberZclClusterTimeServerGetCurrentTimeCallback();
+          uint32_t currentTime = chipZclClusterTimeServerGetCurrentTimeCallback();
           if (currentTime == 0) {
             readTime(endpointId, &currentTime);
             currentTime++;
@@ -198,7 +186,7 @@ void emZclTimeServerTickEventHandler(void)
     }
   }
   // Reschedule the next second.
-  emberEventControlSetDelayMS(emZclTimeServerTickEventControl,
+  chipEventControlSetDelayMS(chZclTimeServerTickEventControl,
                               MILLISECOND_TICKS_PER_SECOND);
 }
 
@@ -206,18 +194,18 @@ void emAfTimeClusterServerSetCurrentTime(uint32_t utcTime)
 {
   // Set the time on all endpoints that do not have a singleton time attribute
   // as well as on one of the endpoints with a singleton attribute.
-  for (uint8_t i = 0; i < emZclEndpointCount; i++) {
-    const EmZclEndpointEntry_t *epEntry = &emZclEndpointTable[i];
+  for (uint8_t i = 0; i < chZclEndpointCount; i++) {
+    const ChZclEndpointEntry_t *epEntry = &chZclEndpointTable[i];
     if (epEntry) {
-      EmberZclEndpointId_t endpointId = epEntry->endpointId;
-      if (emZclEndpointHasCluster(endpointId,
-                                  &emberZclClusterTimeServerSpec)) {
-        const EmZclAttributeEntry_t *attribute
-          = emZclFindAttribute(&emberZclClusterTimeServerSpec,
-                               EMBER_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME,
+      ChipZclEndpointId_t endpointId = epEntry->endpointId;
+      if (chZclEndpointHasCluster(endpointId,
+                                  &chipZclClusterTimeServerSpec)) {
+        const ChZclAttributeEntry_t *attribute
+          = chZclFindAttribute(&chipZclClusterTimeServerSpec,
+                               CHIP_ZCL_CLUSTER_TIME_SERVER_ATTRIBUTE_TIME,
                                false); // exclude remote
         if (attribute) {
-          if (!emZclIsAttributeSingleton(attribute)
+          if (!chZclIsAttributeSingleton(attribute)
               || (endpointId == singletonEpId)) {
             writeTime(endpointId, utcTime);
           }
@@ -229,18 +217,18 @@ void emAfTimeClusterServerSetCurrentTime(uint32_t utcTime)
 
 uint32_t emAfTimeClusterServerGetCurrentTime(void)
 {
-  uint32_t currentTime = emberZclClusterTimeServerGetCurrentTimeCallback();
+  uint32_t currentTime = chipZclClusterTimeServerGetCurrentTimeCallback();
 
   // If we don't have the current time, we have to try to get it from an
   // endpoint by rolling through all of them until one returns a time.
   if (currentTime == 0) {
-    for (uint8_t i = 0; i < emZclEndpointCount; i++) {
-      const EmZclEndpointEntry_t *epEntry = &emZclEndpointTable[i];
+    for (uint8_t i = 0; i < chZclEndpointCount; i++) {
+      const ChZclEndpointEntry_t *epEntry = &chZclEndpointTable[i];
       if (epEntry) {
-        EmberZclEndpointId_t endpointId = epEntry->endpointId;
-        if (emZclEndpointHasCluster(endpointId,
-                                    &emberZclClusterTimeServerSpec)) {
-          if (readTime(endpointId, &currentTime) == EMBER_ZCL_STATUS_SUCCESS) {
+        ChipZclEndpointId_t endpointId = epEntry->endpointId;
+        if (chZclEndpointHasCluster(endpointId,
+                                    &chipZclClusterTimeServerSpec)) {
+          if (readTime(endpointId, &currentTime) == CHIP_ZCL_STATUS_SUCCESS) {
             break;
           }
         }

@@ -17,20 +17,20 @@
 
 #include CONFIGURATION_HEADER
 #include PLATFORM_HEADER
-#include EMBER_AF_API_STACK
-#ifdef EMBER_AF_API_DEBUG_PRINT
-  #include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+  #include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_BULB_PWM_DRIVER
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_BULB_PWM_DRIVER
 
 #include "led-dim-pwm-transform.h"
 
-#ifndef EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL
-  #define EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL 0
+#ifndef CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL
+  #define CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL 0
 #endif
-#ifndef EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL
-  #define EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL 255
+#ifndef CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL
+  #define CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL 255
 #endif
 
 #define MIN_ON_TIME_MICROSECONDS 15
@@ -55,10 +55,10 @@ static uint16_t updateDriveLevelLumens(void);
 static uint16_t minDriveValue(void);
 static uint16_t maxDriveValue(void);
 
-static EmberZclEndpointId_t currentEndpoint(void)
+static ChipZclEndpointId_t currentEndpoint(void)
 {
   // Note:  LED bulbs only support one endpoint
-  return emberZclEndpointIndexToId(0, &emberZclClusterOnOffServerSpec);
+  return chipZclEndpointIndexToId(0, &chipZclClusterOnOffServerSpec);
 }
 
 void emLedDimPwmInitHandler(void)
@@ -73,7 +73,7 @@ void emLedDimPwmInitHandler(void)
 
 static void pwmSetValue(uint16_t value)
 {
-  emberAfCorePrintln("setting a new PWM value: %d", value);
+  chipAfCorePrintln("setting a new PWM value: %d", value);
   halBulbPwmDriverSetPwmLevel(value, BULB_PWM_WHITE);
 }
 
@@ -83,17 +83,17 @@ static uint16_t updateDriveLevelLumens(void)
   uint32_t driveScratchpad;
   uint8_t currentLevel, mappedLevel;
   uint16_t newDrive;
-  EmberZclStatus_t status;
-  EmberZclEndpointId_t endpoint = currentEndpoint();
+  ChipZclStatus_t status;
+  ChipZclEndpointId_t endpoint = currentEndpoint();
 
-  status = emberZclReadAttribute(endpoint,
-                                 &emberZclClusterLevelControlServerSpec,
-                                 EMBER_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
+  status = chipZclReadAttribute(endpoint,
+                                 &chipZclClusterLevelControlServerSpec,
+                                 CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
                                  &currentLevel,
                                  sizeof(currentLevel));
 
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
-    emberAfCorePrintln("Error reading level wehen updating driver lumens: 0x%x\n",
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
+    chipAfCorePrintln("Error reading level wehen updating driver lumens: 0x%x\n",
                        status);
     return 0;
   }
@@ -106,9 +106,9 @@ static uint16_t updateDriveLevelLumens(void)
   // Next, map the drive level into the size of the table
   // We have a 255 entry table that goes from 0 to 6000.
   // use 32 bit math to avoid losing information.
-  driveScratchpad = currentLevel - EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL;
+  driveScratchpad = currentLevel - CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL;
   driveScratchpad *= (PWM_VALUES_LENGTH - 1);
-  driveScratchpad /= (EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL - EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL);
+  driveScratchpad /= (CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL - CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL);
   mappedLevel = (uint8_t) driveScratchpad;
 
   driveScratchpad = (uint32_t) pwmValues[mappedLevel];
@@ -127,8 +127,8 @@ static uint16_t updateDriveLevelLumens(void)
 static void updateDriveLevel(void)
 {
   bool isOn;
-  EmberZclStatus_t status;
-  EmberZclEndpointId_t endpoint = currentEndpoint();
+  ChipZclStatus_t status;
+  ChipZclEndpointId_t endpoint = currentEndpoint();
 
   if (blinking) {
     // we are in a mode where we are blinking an output pattern.  Don't blink
@@ -136,15 +136,15 @@ static void updateDriveLevel(void)
     return;
   }
 
-  status = emberZclReadAttribute(endpoint,
-                                 &emberZclClusterOnOffServerSpec,
-                                 EMBER_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+  status = chipZclReadAttribute(endpoint,
+                                 &chipZclClusterOnOffServerSpec,
+                                 CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
                                  &isOn,
                                  sizeof(isOn));
 
-  if (status != EMBER_ZCL_STATUS_SUCCESS) {
+  if (status != CHIP_ZCL_STATUS_SUCCESS) {
     pwmSetValue(0);
-    emberAfCorePrintln("Error reading onOff when updating driver level: 0x%x\n",
+    chipAfCorePrintln("Error reading onOff when updating driver level: 0x%x\n",
                        status);
     return;
   }
@@ -156,15 +156,15 @@ static void updateDriveLevel(void)
   }
 }
 
-void emLedDimPwmPostAttributeChangeHandler(EmberZclEndpointId_t endpointId,
-                                           const EmberZclClusterSpec_t *clusterSpec,
-                                           EmberZclAttributeId_t attributeId,
+void emLedDimPwmPostAttributeChangeHandler(ChipZclEndpointId_t endpointId,
+                                           const ChipZclClusterSpec_t *clusterSpec,
+                                           ChipZclAttributeId_t attributeId,
                                            const void *buffer,
                                            size_t bufferLength)
 {
-  if (emberZclAreClusterSpecsEqual(&emberZclClusterOnOffServerSpec, clusterSpec)
-      || emberZclAreClusterSpecsEqual(&emberZclClusterLevelControlServerSpec, clusterSpec)) {
-    emberAfCorePrintln("updatingDriveLevel");
+  if (chipZclAreClusterSpecsEqual(&chipZclClusterOnOffServerSpec, clusterSpec)
+      || chipZclAreClusterSpecsEqual(&chipZclClusterLevelControlServerSpec, clusterSpec)) {
+    chipAfCorePrintln("updatingDriveLevel");
     updateDriveLevel();
   }
 }

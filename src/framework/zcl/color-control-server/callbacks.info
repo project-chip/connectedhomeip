@@ -5,7 +5,7 @@
  *
  * @param endpoint The identifying endpoint Ver.: always
  */
-void emberAfPluginColorControlServerComputePwmFromHsvCallback(uint8_t endpoint)
+void chipAfPluginColorControlServerComputePwmFromHsvCallback(uint8_t endpoint)
 {
 }
 
@@ -16,7 +16,7 @@ void emberAfPluginColorControlServerComputePwmFromHsvCallback(uint8_t endpoint)
  *
  * @param endpoint The identifying endpoint Ver.: always
  */
-void emberAfPluginColorControlServerComputePwmFromXyCallback(uint8_t endpoint)
+void chipAfPluginColorControlServerComputePwmFromXyCallback(uint8_t endpoint)
 {
 }
 
@@ -27,6 +27,6 @@ void emberAfPluginColorControlServerComputePwmFromXyCallback(uint8_t endpoint)
  *
  * @param endpoint The identifying endpoint Ver.: always
  */
-void emberAfPluginColorControlServerComputePwmFromTempCallback(uint8_t endpoint)
+void chipAfPluginColorControlServerComputePwmFromTempCallback(uint8_t endpoint)
 {
 }

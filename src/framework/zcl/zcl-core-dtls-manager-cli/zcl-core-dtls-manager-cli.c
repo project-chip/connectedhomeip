@@ -1,46 +1,34 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_ZCL_CORE
-#include EMBER_AF_API_COMMAND_INTERPRETER2
-#include EMBER_AF_API_ZCL_CORE_DTLS_MANAGER
-#include EMBER_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_ZCL_CORE
+#include CHIP_AF_API_COMMAND_INTERPRETER2
+#include CHIP_AF_API_ZCL_CORE_DTLS_MANAGER
+#include CHIP_AF_API_DEBUG_PRINT
 
 // ----------------------------------------------------------------------------
 // ZCL DTLS Session Manager CLI
 
 // zcl dtls-manager certs [no arguments]
-void emZclCliDtlsManagerCertsCommand(void)
+void chZclCliDtlsManagerCertsCommand(void)
 {
-  emberSetDtlsDeviceCertificate(NULL, NULL); // Use compiled certificates
+  chipSetDtlsDeviceCertificate(NULL, NULL); // Use compiled certificates
 }
 
 // zcl dtls-manager psk <ip> <psk> <identity>
-void emZclCliDtlsSetPskCommand(void)
+void chZclCliDtlsSetPskCommand(void)
 {
-  EmberIpv6Address address;
-  if (emberGetIpArgument(0, (uint8_t *) &address.bytes)) {
+  ChipIpv6Address address;
+  if (chipGetIpArgument(0, (uint8_t *) &address.bytes)) {
     uint8_t keyLength;
-    uint8_t *key = emberStringCommandArgument(1, &keyLength);
+    uint8_t *key = chipStringCommandArgument(1, &keyLength);
     uint8_t identityLength;
-    uint8_t *identity = emberStringCommandArgument(2, &identityLength);
-    emberSetDtlsPresharedKey((const uint8_t *) key,
+    uint8_t *identity = chipStringCommandArgument(2, &identityLength);
+    chipSetDtlsPresharedKey((const uint8_t *) key,
                              keyLength,
                              (const uint8_t *) identity,
                              identityLength,
@@ -50,61 +38,61 @@ void emZclCliDtlsSetPskCommand(void)
 
 static void dtlsSessionOpen(uint8_t sessionId)
 {
-  emberAfAppPrintln("DTLS session opened, session id:0x%x", sessionId);
+  chipAfAppPrintln("DTLS session opened, session id:0x%x", sessionId);
 }
 
 // zcl dtls-manager open <mode> <ip> <port>
-void emZclCliDtlsManagerOpenCommand(void)
+void chZclCliDtlsManagerOpenCommand(void)
 {
-  uint8_t mode = emberUnsignedCommandArgument(0);
-  EmberIpv6Address address;
-  if (emberGetIpArgument(1, (uint8_t *) &address.bytes)) {
-    uint16_t port = emberUnsignedCommandArgument(2);
-    EmberStatus status =
-      emberZclDtlsManagerGetConnection(&address, port, mode, &dtlsSessionOpen);
-    if (status == EMBER_SUCCESS) {
-      emberAfAppPrintln("DTLS session opening.");
+  uint8_t mode = chipUnsignedCommandArgument(0);
+  ChipIpv6Address address;
+  if (chipGetIpArgument(1, (uint8_t *) &address.bytes)) {
+    uint16_t port = chipUnsignedCommandArgument(2);
+    ChipStatus status =
+      chipZclDtlsManagerGetConnection(&address, port, mode, &dtlsSessionOpen);
+    if (status == CHIP_SUCCESS) {
+      chipAfAppPrintln("DTLS session opening.");
     } else {
-      emberAfAppPrintln("DTLS session open failed, status:0x%x", status);
+      chipAfAppPrintln("DTLS session open failed, status:0x%x", status);
     }
   }
 }
 
 // zcl dtls-manager close-all
-void emZclCliDtlsManagerCloseAllCommand(void)
+void chZclCliDtlsManagerCloseAllCommand(void)
 {
-  emberAfAppPrintln("Close all DTLS sessions.");
-  emberZclDtlsManagerCloseAllConnections();
+  chipAfAppPrintln("Close all DTLS sessions.");
+  chipZclDtlsManagerCloseAllConnections();
 }
 
 // zcl dtls-manager list
-void emZclCliDtlsManagerListCommand(void)
+void chZclCliDtlsManagerListCommand(void)
 {
-  emberAfAppPrintln("DTLS Sessions:");
-  uint8_t firstSessionId = emberGetDtlsConnectionNextSessionId(EMBER_NULL_SESSION_ID);
-  if (firstSessionId == EMBER_NULL_SESSION_ID) {
+  chipAfAppPrintln("DTLS Sessions:");
+  uint8_t firstSessionId = chipGetDtlsConnectionNextSessionId(CHIP_NULL_SESSION_ID);
+  if (firstSessionId == CHIP_NULL_SESSION_ID) {
     return;
   }
 
   uint8_t curSessionId = firstSessionId;
   do {
-    emberAfAppPrint("%d:", curSessionId);
-    EmberIpv6Address address;
-    if (emberZclDtlsManagerGetAddressBySessionId(curSessionId, &address) == EMBER_SUCCESS) {
-      emberAfAppPrint(" a=[");
-      emberAfAppDebugExec(emberAfPrintIpv6Address(&address));
-      emberAfAppPrint("]");
+    chipAfAppPrint("%d:", curSessionId);
+    ChipIpv6Address address;
+    if (chipZclDtlsManagerGetAddressBySessionId(curSessionId, &address) == CHIP_SUCCESS) {
+      chipAfAppPrint(" a=[");
+      chipAfAppDebugExec(chipAfPrintIpv6Address(&address));
+      chipAfAppPrint("]");
       uint16_t port;
-      if (emberZclDtlsManagerGetPortBySessionId(curSessionId, &port) == EMBER_SUCCESS) {
-        emberAfAppPrint(":%u", port);
+      if (chipZclDtlsManagerGetPortBySessionId(curSessionId, &port) == CHIP_SUCCESS) {
+        chipAfAppPrint(":%u", port);
       }
     }
-    EmberZclUid_t uid;
-    if (emberZclDtlsManagerGetUidBySessionId(curSessionId, &uid) == EMBER_SUCCESS) {
-      emberAfAppPrint(" uid=");
-      emberAfAppPrintBuffer(uid.bytes, sizeof(uid), false);
+    ChipZclUid_t uid;
+    if (chipZclDtlsManagerGetUidBySessionId(curSessionId, &uid) == CHIP_SUCCESS) {
+      chipAfAppPrint(" uid=");
+      chipAfAppPrintBuffer(uid.bytes, sizeof(uid), false);
     }
-    emberAfAppPrintln("");
-  } while (((curSessionId = emberGetDtlsConnectionNextSessionId(curSessionId))
-            != EMBER_NULL_SESSION_ID) && (curSessionId != firstSessionId));
+    chipAfAppPrintln("");
+  } while (((curSessionId = chipGetDtlsConnectionNextSessionId(curSessionId))
+            != CHIP_NULL_SESSION_ID) && (curSessionId != firstSessionId));
 }

@@ -1,6 +1,6 @@
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include EMBER_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 
 /**************************************************************************//**
  * Get the public key used in the application.
@@ -15,7 +15,7 @@
  *       the public key is a global value, so that the pointer provided by the
  *       implementation of this callback will point to constant public key data.
  *****************************************************************************/
-void emberZclGetPublicKeyCallback(const uint8_t **publicKey,
+void chipZclGetPublicKeyCallback(const uint8_t **publicKey,
                                   uint16_t *publicKeySize)
 {
 }
@@ -34,11 +34,11 @@ void emberZclGetPublicKeyCallback(const uint8_t **publicKey,
  * This callback gives the application an opportunity to prevent an attribute
  * from changing value by returning `false`.
  *
- * @sa emberZclPostAttributeChangeCallback
+ * @sa chipZclPostAttributeChangeCallback
  *****************************************************************************/
-bool emberZclPreAttributeChangeCallback(EmberZclEndpointId_t endpointId,
-                                        const EmberZclClusterSpec_t *clusterSpec,
-                                        EmberZclAttributeId_t attributeId,
+bool chipZclPreAttributeChangeCallback(ChipZclEndpointId_t endpointId,
+                                        const ChipZclClusterSpec_t *clusterSpec,
+                                        ChipZclAttributeId_t attributeId,
                                         const void *buffer,
                                         size_t bufferLength)
 {
@@ -57,11 +57,11 @@ bool emberZclPreAttributeChangeCallback(EmberZclEndpointId_t endpointId,
  * This callback gives the application an opportunity to react to an attribute
  * changing value.
  *
- * @sa emberZclPreAttributeChangeCallback
+ * @sa chipZclPreAttributeChangeCallback
  *****************************************************************************/
-void emberZclPostAttributeChangeCallback(EmberZclEndpointId_t endpointId,
-                                         const EmberZclClusterSpec_t *clusterSpec,
-                                         EmberZclAttributeId_t attributeId,
+void chipZclPostAttributeChangeCallback(ChipZclEndpointId_t endpointId,
+                                         const ChipZclClusterSpec_t *clusterSpec,
+                                         ChipZclAttributeId_t attributeId,
                                          const void *buffer,
                                          size_t bufferLength)
 {
@@ -75,24 +75,24 @@ void emberZclPostAttributeChangeCallback(EmberZclEndpointId_t endpointId,
  * @param attributeId The attribute ID
  * @param buffer The data buffer into which the attribute value will be read
  * @param bufferLength The length of the data buffer
- * @return An ::EmberZclStatus_t value representing the success or failure of
+ * @return An ::ChipZclStatus_t value representing the success or failure of
  *         the read operation.
  *
  * This callback alerts the application that an externally stored attribute
  * needs to be read. The application is expected to read the attribute value
  * from its external storage, populate the buffer parameter with the attribute
- * value, and return an ::EmberZclStatus_t value representing the success or
+ * value, and return an ::ChipZclStatus_t value representing the success or
  * failure of the read operation.
  *
- * @sa emberZclWriteExternalAttributeCallback
+ * @sa chipZclWriteExternalAttributeCallback
  *****************************************************************************/
-EmberZclStatus_t emberZclReadExternalAttributeCallback(EmberZclEndpointId_t endpointId,
-                                                       const EmberZclClusterSpec_t *clusterSpec,
-                                                       EmberZclAttributeId_t attributeId,
+ChipZclStatus_t chipZclReadExternalAttributeCallback(ChipZclEndpointId_t endpointId,
+                                                       const ChipZclClusterSpec_t *clusterSpec,
+                                                       ChipZclAttributeId_t attributeId,
                                                        void *buffer,
                                                        size_t bufferLength)
 {
-  return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+  return CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
 }
 
 /**************************************************************************//**
@@ -103,23 +103,23 @@ EmberZclStatus_t emberZclReadExternalAttributeCallback(EmberZclEndpointId_t endp
  * @param attributeId The attribute ID
  * @param buffer The data buffer holding the attribute value to be written
  * @param bufferLength The length of the data buffer
- * @return An ::EmberZclStatus_t value representing the success or failure of
+ * @return An ::ChipZclStatus_t value representing the success or failure of
  *         the write operation.
  *
  * This callback alerts the application that an externally stored attribute
  * needs to be written. The application is expected to write the attribute value
- * to its external storage and return an ::EmberZclStatus_t value representing
+ * to its external storage and return an ::ChipZclStatus_t value representing
  * the success or failure of the write operation.
  *
- * @sa emberZclReadExternalAttributeCallback
+ * @sa chipZclReadExternalAttributeCallback
  *****************************************************************************/
-EmberZclStatus_t emberZclWriteExternalAttributeCallback(EmberZclEndpointId_t endpointId,
-                                                        const EmberZclClusterSpec_t *clusterSpec,
-                                                        EmberZclAttributeId_t attributeId,
+ChipZclStatus_t chipZclWriteExternalAttributeCallback(ChipZclEndpointId_t endpointId,
+                                                        const ChipZclClusterSpec_t *clusterSpec,
+                                                        ChipZclAttributeId_t attributeId,
                                                         const void *buffer,
                                                         size_t bufferLength)
 {
-  return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+  return CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
 }
 
 /**************************************************************************//**
@@ -136,11 +136,11 @@ EmberZclStatus_t emberZclWriteExternalAttributeCallback(EmberZclEndpointId_t end
  * to update this parameter with its desired reporting configuration. This
  * callback is called when a reporting configuration is reset to its defaults.
  *
- * @sa emberZclGetDefaultReportableChangeCallback
+ * @sa chipZclGetDefaultReportableChangeCallback
  *****************************************************************************/
-void emberZclGetDefaultReportingConfigurationCallback(EmberZclEndpointId_t endpointId,
-                                                      const EmberZclClusterSpec_t *clusterSpec,
-                                                      EmberZclReportingConfiguration_t *configuration)
+void chipZclGetDefaultReportingConfigurationCallback(ChipZclEndpointId_t endpointId,
+                                                      const ChipZclClusterSpec_t *clusterSpec,
+                                                      ChipZclReportingConfiguration_t *configuration)
 {
 }
 
@@ -157,11 +157,11 @@ void emberZclGetDefaultReportingConfigurationCallback(EmberZclEndpointId_t endpo
  * change value for each attribute that is being reported. This callback is
  * called when a reporting configuration is reset to its defaults.
  *
- * @sa emberZclGetDefaultReportingConfigurationCallback
+ * @sa chipZclGetDefaultReportingConfigurationCallback
  *****************************************************************************/
-void emberZclGetDefaultReportableChangeCallback(EmberZclEndpointId_t endpointId,
-                                                const EmberZclClusterSpec_t *clusterSpec,
-                                                EmberZclAttributeId_t attributeId,
+void chipZclGetDefaultReportableChangeCallback(ChipZclEndpointId_t endpointId,
+                                                const ChipZclClusterSpec_t *clusterSpec,
+                                                ChipZclAttributeId_t attributeId,
                                                 void *buffer,
                                                 size_t bufferLength)
 {
@@ -176,9 +176,9 @@ void emberZclGetDefaultReportableChangeCallback(EmberZclEndpointId_t endpointId,
  * @param buffer The data buffer containing the reported attribute value
  * @param bufferLength The length of the data buffer
  *****************************************************************************/
-void emberZclNotificationCallback(const EmberZclNotificationContext_t *context,
-                                  const EmberZclClusterSpec_t *clusterSpec,
-                                  EmberZclAttributeId_t attributeId,
+void chipZclNotificationCallback(const ChipZclNotificationContext_t *context,
+                                  const ChipZclClusterSpec_t *clusterSpec,
+                                  ChipZclAttributeId_t attributeId,
                                   const void *buffer,
                                   size_t bufferLength)
 {

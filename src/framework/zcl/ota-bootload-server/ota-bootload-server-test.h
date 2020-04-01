@@ -1,18 +1,6 @@
 /***************************************************************************//**
  * @file
  * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
  ******************************************************************************/
 
 #ifndef OTA_BOOTLOAD_SERVER_TEST_H
@@ -20,27 +8,27 @@
 
 #include "../ota-bootload-core/ota-bootload-core-test.h"
 
-extern EmberEventControl emZclOtaBootloadServerImageNotifyEventControl;
-void emZclOtaBootloadServerImageNotifyEventHandler(void);
+extern ChipEventControl chZclOtaBootloadServerImageNotifyEventControl;
+void chZclOtaBootloadServerImageNotifyEventHandler(void);
 
-void emZclOtaBootloadServerNetworkStatusCallback(EmberNetworkStatus newNetworkStatus,
-                                                 EmberNetworkStatus oldNetworkStatus,
-                                                 EmberJoinFailureReason reason);
+void chZclOtaBootloadServerNetworkStatusCallback(ChipNetworkStatus newNetworkStatus,
+                                                 ChipNetworkStatus oldNetworkStatus,
+                                                 ChipJoinFailureReason reason);
 
-bool emberZclOtaBootloadServerGetImageNotifyInfoCallback(EmberIpv6Address *address,
-                                                         EmberZclOtaBootloadFileSpec_t *fileSpec);
-EmberZclStatus_t emberZclOtaBootloadServerGetNextImageCallback(const EmberIpv6Address *source,
-                                                               const EmberZclOtaBootloadFileSpec_t *currentFileSpec,
-                                                               EmberZclOtaBootloadFileSpec_t *nextFileSpec);
-uint32_t emberZclOtaBootloadServerUpgradeEndRequestCallback(const EmberIpv6Address *source,
-                                                            const EmberZclOtaBootloadFileSpec_t *fileSpec,
-                                                            EmberZclStatus_t status);
+bool chipZclOtaBootloadServerGetImageNotifyInfoCallback(ChipIpv6Address *address,
+                                                         ChipZclOtaBootloadFileSpec_t *fileSpec);
+ChipZclStatus_t chipZclOtaBootloadServerGetNextImageCallback(const ChipIpv6Address *source,
+                                                               const ChipZclOtaBootloadFileSpec_t *currentFileSpec,
+                                                               ChipZclOtaBootloadFileSpec_t *nextFileSpec);
+uint32_t chipZclOtaBootloadServerUpgradeEndRequestCallback(const ChipIpv6Address *source,
+                                                            const ChipZclOtaBootloadFileSpec_t *fileSpec,
+                                                            ChipZclStatus_t status);
 
-void emZclOtaBootloadServerDownloadHandler(EmberCoapCode code,
+void chZclOtaBootloadServerDownloadHandler(ChipCoapCode code,
                                            uint8_t *uri,
-                                           EmberCoapReadOptions *options,
+                                           ChipCoapReadOptions *options,
                                            const uint8_t *payload,
                                            uint16_t payloadLength,
-                                           const EmberCoapRequestInfo *info);
+                                           const ChipCoapRequestInfo *info);
 
 #endif // OTA_BOOTLOAD_SERVER_TEST_H
