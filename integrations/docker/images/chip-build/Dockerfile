@@ -18,3 +18,5 @@ RUN set -x \
       clang-tidy-9 \
       lcov \
       shellcheck \
+      gcc-multilib \
+      libfftw3-dev \
