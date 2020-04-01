@@ -5,7 +5,8 @@
  */
 
 /*
- * <COPYRIGHT>
+ * Copyright (c) 2020 Project CHIP Authors
+ * Copyright (c) 2015 Nest Labs, Inc.
  */
 
 #ifndef __LWIP_IP6_ROUTE_TABLE_H__
