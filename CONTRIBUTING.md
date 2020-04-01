@@ -171,7 +171,6 @@ CHIP considers there to be a few different types of pull requests:
 ### Prior to review, all changes require:
 - [GitHub Workflows](../.github/workflows) pass 
 - [Certification Tests](tests/certification/README.md) pass 
-- [Unit Tests](tests/unit/README.md) pass
 - [Fuzz Tests](tests/fuzz/README.md) pass
 - [Integration Tests](tests/integration/README.md) pass
 - Linting passes
@@ -204,7 +203,6 @@ your development branch and update.
 * Passes [Review Requirements](#review-requirements)
 * [GitHub Workflows](../.github/workflows) pass 
 * [Certification Tests](tests/certification/README.md) pass 
-* [Unit Tests](tests/unit/README.md) pass
 * [Fuzz Tests](tests/fuzz/README.md) pass
 * [Integration Tests](tests/integration/README.md) pass
 * Linting passes
