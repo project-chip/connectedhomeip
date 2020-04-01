@@ -61,9 +61,10 @@ using namespace chip::System;
 namespace chip {
 namespace System {
 
-extern nlTestSuite kTheSuite;
-
 using chip::ErrorStr;
+
+static int Initialize(void * aContext);
+static int Finalize(void * aContext);
 
 class TestObject : public Object
 {
@@ -462,7 +463,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
  *   Test Suite. It lists all the test functions.
  */
 // clang-format off
-const nlTest sTests[] =
+static const nlTest sTests[] =
 {
     NL_TEST_DEF("Retention",                TestObject::CheckRetention),
     NL_TEST_DEF("Concurrency",              TestObject::CheckConcurrency),
@@ -470,12 +471,20 @@ const nlTest sTests[] =
     NL_TEST_DEF("HighWatermarkConcurrency", TestObject::CheckHighWatermarkConcurrency),
 	NL_TEST_SENTINEL()
 };
+
+static nlTestSuite sTestSuite =
+{
+    "chip-system-object",
+    &sTests[0],
+    Initialize,
+    Finalize
+};
 // clang-format on
 
 /**
  *  Initialize the test suite.
  */
-int Initialize(void * aContext)
+static int Initialize(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
     void * lLayerContext   = NULL;
@@ -491,7 +500,7 @@ int Initialize(void * aContext)
     lLayerContext = &sLwIPEventQueue;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    lContext.mTestSuite    = &kTheSuite;
+    lContext.mTestSuite    = &sTestSuite;
     lContext.mLayerContext = lLayerContext;
     lContext.mAccumulator  = 0;
 
@@ -501,7 +510,7 @@ int Initialize(void * aContext)
 /**
  *  Finalize the test suite.
  */
-int Finalize(void * aContext)
+static int Finalize(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
 
@@ -509,16 +518,6 @@ int Finalize(void * aContext)
 
     return SUCCESS;
 }
-
-// clang-format off
-static nlTestSuite kTheSuite =
-{
-    "chip-system-object",
-    &sTests[0],
-    Initialize,
-    Finalize
-};
-// clang-format on
 
 } // namespace System
 } // namespace chip
@@ -532,7 +531,7 @@ int main(int argc, char * argv[])
     nl_test_set_output_style(OUTPUT_CSV);
 
     // Run test suit againt one lContext.
-    nlTestRunner(&kTheSuite, &chip::System::sContext);
+    nlTestRunner(&sTestSuite, &chip::System::sContext);
 
-    return nlTestRunnerStats(&kTheSuite);
+    return nlTestRunnerStats(&sTestSuite);
 }
