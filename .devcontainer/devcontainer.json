@@ -20,8 +20,7 @@
     "settings": {
         "terminal.integrated.shell.linux": "/bin/bash"
     },
-    "postCreateCommand": "source /usr/share/bash-completion/bash_completion",
-    "postCreateCommand": "source /etc/bash_completion.d/git-prompt ",
+    "postCreateCommand": "source /usr/share/bash-completion/bash_completion && source /etc/bash_completion.d/git-prompt",
     "remoteEnv": {
         "GIT_PS1_SHOWDIRTYSTATE": "1",
         "GIT_PS1_SHOWSTASHSTATE": "1",
