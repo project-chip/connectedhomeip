@@ -2,7 +2,7 @@
 
 CHIP documentation lives here:
 
-*   **GitHub** — All guides and tutorials across the complete [Project-CHIP organization](https://github/project-chip).
+*   **GitHub** — All guides and tutorials across the complete [Project-CHIP organization](https://github.com/project-chip).
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for general information on contributing to this project.
 
@@ -42,7 +42,7 @@ The text of a link should be descriptive, so it's clear what the link is for:
 
 ## Markdown guidelines
 
-Use standard Markdown when authoring CHIP documentation. While HTML may be used for more complex content such as tables, use Markdown as much as possible. 
+Use standard Markdown when authoring CHIP documentation. While HTML may be used for more complex content such as tables, use Markdown as much as possible.
 
 > Note: Edit this file to see the Markdown behind the examples.
 
