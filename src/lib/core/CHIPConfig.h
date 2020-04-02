@@ -20,7 +20,7 @@
 /**
  *    @file
  *      This file defines default compile-time configuration constants
- *      for chip.
+ *      for CHIP.
  *
  *      Package integrators that wish to override these values should
  *      either use preprocessor definitions or create a project-
