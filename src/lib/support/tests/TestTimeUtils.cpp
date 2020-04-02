@@ -39,7 +39,7 @@ void Abort()
     abort();
 }
 
-void TestAssert(bool assert, const char *msg)
+void TestAssert(bool assert, const char * msg)
 {
     if (!assert)
     {
@@ -55,6 +55,7 @@ struct OrdinalDateTestValue
     uint8_t DayOfMonth;
 };
 
+// clang-format off
 OrdinalDateTestValue StandardYearOrdinalDates[] =
 {
     { 1, 1, 1 },
@@ -795,12 +796,13 @@ OrdinalDateTestValue LeapYearOrdinalDates[] =
     { 366, 12, 31 },
     { 0, 0, 0 }
 };
+// clang-format on
 
 void TestOrdinalDateConversion(void)
 {
     for (uint16_t year = 0; year <= 10000; year++)
     {
-        OrdinalDateTestValue *testValue = (IsLeapYear(year)) ? LeapYearOrdinalDates : StandardYearOrdinalDates;
+        OrdinalDateTestValue * testValue = (IsLeapYear(year)) ? LeapYearOrdinalDates : StandardYearOrdinalDates;
 
         for (; testValue->DayOfYear != 0; testValue++)
         {
@@ -838,7 +840,8 @@ void TestDaysSinceEpochConversion(void)
                     if (calculatedDaysSinceEpoch != daysSinceEpoch)
                         printf("%04u/%02u/%02u %u %u\n", year, month, dayOfMonth, daysSinceEpoch, calculatedDaysSinceEpoch);
 
-                    TestAssert(calculatedDaysSinceEpoch == daysSinceEpoch, "CalendarDateToDaysSinceEpoch() returned unexpected value");
+                    TestAssert(calculatedDaysSinceEpoch == daysSinceEpoch,
+                               "CalendarDateToDaysSinceEpoch() returned unexpected value");
                 }
 
                 // Test DaysSinceEpochToCalendarDate()
@@ -849,11 +852,13 @@ void TestDaysSinceEpochConversion(void)
                     DaysSinceEpochToCalendarDate(daysSinceEpoch, calculatedYear, calculatedMonth, calculatedDayOfMonth);
 
                     if (calculatedYear != year || calculatedMonth != month || calculatedDayOfMonth != dayOfMonth)
-                        printf("%04u/%02u/%02u %04u/%02u/%02u\n", year, month, dayOfMonth, calculatedYear, calculatedMonth, calculatedDayOfMonth);
+                        printf("%04u/%02u/%02u %04u/%02u/%02u\n", year, month, dayOfMonth, calculatedYear, calculatedMonth,
+                               calculatedDayOfMonth);
 
                     TestAssert(calculatedYear == year, "DaysSinceEpochToCalendarDate() returned unexpected year value");
                     TestAssert(calculatedMonth == month, "DaysSinceEpochToCalendarDate() returned unexpected month value");
-                    TestAssert(calculatedDayOfMonth == dayOfMonth, "DaysSinceEpochToCalendarDate() returned unexpected dayOfMonth value");
+                    TestAssert(calculatedDayOfMonth == dayOfMonth,
+                               "DaysSinceEpochToCalendarDate() returned unexpected dayOfMonth value");
                 }
 
                 daysSinceEpoch++;
@@ -865,7 +870,7 @@ void TestDaysSinceEpochConversion(void)
 void TestSecondsSinceEpochConversion(void)
 {
     uint32_t daysSinceEpoch = 0;
-    uint32_t timeOfDay = 0;
+    uint32_t timeOfDay      = 0;
 
     for (uint16_t year = kEpochYear; year <= kMaxYearInSecondsSinceEpoch32; year++)
     {
@@ -878,16 +883,16 @@ void TestSecondsSinceEpochConversion(void)
                 {
                     uint32_t secondsSinceEpoch = daysSinceEpoch * kSecondsPerDay + timeOfDay;
 
-                    uint8_t hour = timeOfDay / kSecondsPerHour;
+                    uint8_t hour   = timeOfDay / kSecondsPerHour;
                     uint8_t minute = (timeOfDay - (hour * kSecondsPerHour)) / kSecondsPerMinute;
                     uint8_t second = timeOfDay - (hour * kSecondsPerHour + minute * kSecondsPerMinute);
 
 #define VERIFY_TEST_AGAINST_GMTTIME 0
 #if VERIFY_TEST_AGAINST_GMTTIME
                     {
-                        time_t epochTimeT = (time_t)secondsSinceEpoch;
+                        time_t epochTimeT = (time_t) secondsSinceEpoch;
 
-                        struct tm *gmt = gmtime(&epochTimeT);
+                        struct tm * gmt = gmtime(&epochTimeT);
 
                         TestAssert(year == gmt->tm_year + 1900, "gmtime() mismatch: year");
                         TestAssert(month == gmt->tm_mon + 1, "gmtime() mismatch: month");
@@ -903,14 +908,18 @@ void TestSecondsSinceEpochConversion(void)
                         uint16_t calculatedYear;
                         uint8_t calculatedMonth, calculatedDayOfMonth, calculatedHour, calculatedMinute, calculatedSecond;
 
-                        SecondsSinceEpochToCalendarTime(secondsSinceEpoch, calculatedYear, calculatedMonth, calculatedDayOfMonth, calculatedHour, calculatedMinute, calculatedSecond);
+                        SecondsSinceEpochToCalendarTime(secondsSinceEpoch, calculatedYear, calculatedMonth, calculatedDayOfMonth,
+                                                        calculatedHour, calculatedMinute, calculatedSecond);
 
                         TestAssert(calculatedYear == year, "SecondsSinceEpochToCalendarTime() returned unexpected year value");
                         TestAssert(calculatedMonth == month, "SecondsSinceEpochToCalendarTime() returned unexpected month value");
-                        TestAssert(calculatedDayOfMonth == dayOfMonth, "SecondsSinceEpochToCalendarTime() returned unexpected dayOfMonth value");
+                        TestAssert(calculatedDayOfMonth == dayOfMonth,
+                                   "SecondsSinceEpochToCalendarTime() returned unexpected dayOfMonth value");
                         TestAssert(calculatedHour == hour, "SecondsSinceEpochToCalendarTime() returned unexpected hour value");
-                        TestAssert(calculatedMinute == minute, "SecondsSinceEpochToCalendarTime() returned unexpected minute value");
-                        TestAssert(calculatedSecond == second, "SecondsSinceEpochToCalendarTime() returned unexpected second value");
+                        TestAssert(calculatedMinute == minute,
+                                   "SecondsSinceEpochToCalendarTime() returned unexpected minute value");
+                        TestAssert(calculatedSecond == second,
+                                   "SecondsSinceEpochToCalendarTime() returned unexpected second value");
                     }
 
                     // Test CalendarTimeToSecondsSinceEpoch()
@@ -920,7 +929,8 @@ void TestSecondsSinceEpochConversion(void)
 
                         CalendarTimeToSecondsSinceEpoch(year, month, dayOfMonth, hour, minute, second, calculatedSecondsSinceEpoch);
 
-                        TestAssert(calculatedSecondsSinceEpoch == secondsSinceEpoch, "CalendarTimeToSecondsSinceEpoch() returned unexpected value");
+                        TestAssert(calculatedSecondsSinceEpoch == secondsSinceEpoch,
+                                   "CalendarTimeToSecondsSinceEpoch() returned unexpected value");
                     }
 
                     // Iterate through times of day by skipping a large prime number of seconds.
@@ -931,9 +941,7 @@ void TestSecondsSinceEpochConversion(void)
             }
         }
     }
-
 }
-
 
 int main(void)
 {
