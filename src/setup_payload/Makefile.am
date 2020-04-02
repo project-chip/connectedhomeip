@@ -32,20 +32,21 @@ libQrCode_adir             = $(includedir)/setup_payload
 libQrCode_a_CPPFLAGS                                      = \
     -I$(top_srcdir)/src/lib                                 \
     -I$(top_srcdir)/src/system                              \
+    -I$(top_srcdir)/src/include/                            \
     $(NULL)
 
 libQrCode_a_SOURCES                                       = \
     QRCodeSetupPayloadGenerator.cpp                         \
     SetupPayload.cpp                                        \
     Base45.cpp                                              \
-    QRCodeSetupPayloadParser.cpp                            \       
+    QRCodeSetupPayloadParser.cpp                            \
    $(NULL)
 
 dist_libQrCode_a_HEADERS                                 = \
     QRCodeSetupPayloadGenerator.h                          \
     SetupPayload.h                                         \
     Base45.h                                               \
-    QRCodeSetupPayloadParser.h                             \        
+    QRCodeSetupPayloadParser.h                             \
     $(NULL)
 
 $(RECURSIVE_TARGETS): $(lib_LIBRARIES)

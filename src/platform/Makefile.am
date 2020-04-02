@@ -97,6 +97,7 @@ libDeviceLayer_a_SOURCES               +=       \
     nRF5/nRF5Config.cpp                         \
     nRF5/nRF5Utils.cpp                          \
     nRF5/Logging.cpp                            \
+    FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_NRF5
@@ -111,6 +112,7 @@ libDeviceLayer_a_SOURCES               +=       \
     EFR32/ConnectivityManagerImpl.cpp           \
     EFR32/EFR32Config.cpp                       \
     EFR32/Logging.cpp                           \
+    FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_EFR32
