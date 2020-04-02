@@ -1813,6 +1813,7 @@ src/inet/Makefile
 src/inet/tests/Makefile
 src/lib/Makefile
 src/lib/support/Makefile
+src/lib/support/tests/Makefile
 src/platform/Makefile
 tests/Makefile
 ])
