@@ -24,7 +24,7 @@
  */
 
 // Include module header
-#include <SystemTimer.h>
+#include <system/SystemTimer.h>
 
 // Include common private header
 #include "SystemLayerPrivate.h"
@@ -32,9 +32,9 @@
 // Include local headers
 #include <string.h>
 
-#include <SystemError.h>
-#include <SystemLayer.h>
-#include <SystemFaultInjection.h>
+#include <system/SystemError.h>
+#include <system/SystemLayer.h>
+#include <system/SystemFaultInjection.h>
 
 #include <support/CodeUtils.h>
 

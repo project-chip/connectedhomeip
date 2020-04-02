@@ -24,15 +24,15 @@
 #ifndef SYSTEMLAYERPRIVATE_H
 #define SYSTEMLAYERPRIVATE_H
 
-#include <SystemConfig.h>
+#include <system/SystemConfig.h>
 
 //
 // Common definitions for the LwIP configuration
 //
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#include "lwip/init.h"
-#include "lwip/stats.h"
+#include <lwip/init.h>
+#include <lwip/stats.h>
 
 // To use LwIP 1.x, some additional definitions are required here.
 #if LWIP_VERSION_MAJOR < 2

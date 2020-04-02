@@ -30,7 +30,7 @@
 #define SYSTEMOBJECT_H
 
 // Include configuration headers
-#include <SystemConfig.h>
+#include <system/SystemConfig.h>
 
 // Include dependent headers
 #include <stddef.h>
@@ -39,8 +39,8 @@
 
 #include <support/DLLUtil.h>
 
-#include <SystemError.h>
-#include <SystemStats.h>
+#include <system/SystemError.h>
+#include <system/SystemStats.h>
 
 #ifndef SYSTEM_OBJECT_HWM_TEST_HOOK
 #define SYSTEM_OBJECT_HWM_TEST_HOOK()

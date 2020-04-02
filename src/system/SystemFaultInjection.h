@@ -24,7 +24,7 @@
 #ifndef SYSTEMFAULTINJECTION_H
 #define SYSTEMFAULTINJECTION_H
 
-#include <SystemConfig.h>
+#include <system/SystemConfig.h>
 
 #if CHIP_SYSTEM_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
 

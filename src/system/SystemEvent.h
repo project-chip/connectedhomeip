@@ -26,7 +26,7 @@
 #define SYSTEMEVENT_H
 
 // Include headers
-#include <SystemConfig.h>
+#include <system/SystemConfig.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 

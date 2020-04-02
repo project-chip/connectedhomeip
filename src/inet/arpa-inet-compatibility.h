@@ -19,7 +19,7 @@
 #ifndef ARPA_INET_COMPATIBILITY_H
 #define ARPA_INET_COMPATIBILITY_H
 
-#include <SystemConfig.h>
+#include <system/SystemConfig.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <arpa/inet.h>

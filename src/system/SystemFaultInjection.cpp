@@ -23,7 +23,7 @@
 
 #include <string.h>
 #include <nlassert.h>
-#include <SystemFaultInjection.h>
+#include <system/SystemFaultInjection.h>
 
 #if CHIP_SYSTEM_CONFIG_TEST
 
