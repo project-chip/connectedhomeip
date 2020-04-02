@@ -60,3 +60,8 @@ Developers are encouraged to add tasks to the [launch json](../.vscode/launch.js
 ### Before submitting a PR, make sure these commands run and succeed
 * Run task: "Verify coding style conformance"
 * Run task: "Run Distribution Generation"
+
+## Common Issues
+* [Missing Git credential](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
+* [Missing Git SSH keys](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
+* [Using GPG signing keys](https://github.com/microsoft/vscode-remote-release/issues/72)
