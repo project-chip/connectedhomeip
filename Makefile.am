@@ -41,7 +41,7 @@ PRETTY_SUBDIRS                           = \
     $(NULL)
 
 EXTRA_DIST                               = \
-    BUILDING.md                            \
+    CODE_OF_CONDUCT.md                            \
     CONTRIBUTING.md                        \
     Makefile-Android                       \
     Makefile-bootstrap                     \
