@@ -16,5 +16,15 @@
 	// You can edit these settings after create using File > Preferences > Settings > Remote.
 	"settings": { 
 		"terminal.integrated.shell.linux": "/bin/bash"
+	},
+
+	"postCreateCommand": "source /usr/share/bash-completion/bash_completion",
+	"postCreateCommand": "source /etc/bash_completion.d/git-prompt ",
+
+	"remoteEnv": {
+		"GIT_PS1_SHOWDIRTYSTATE": "1",
+		"GIT_PS1_SHOWSTASHSTATE": "1",
+		"GIT_PS1_SHOWCOLORHINTS": "true",
+		"PROMPT_COMMAND": "${localEnv:PROMPT_COMMAND}"
 	}
 }

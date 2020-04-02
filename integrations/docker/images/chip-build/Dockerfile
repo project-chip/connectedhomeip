@@ -19,7 +19,9 @@ RUN set -x \
     lcov \
     shellcheck \
     gcc-multilib \
-    libfftw3-dev
+    libfftw3-dev \
+    git-core \
+    bash-completion
 
 RUN mkdir -p /var/bsim
 WORKDIR /var/bsim
