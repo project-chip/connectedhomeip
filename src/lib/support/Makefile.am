@@ -1,6 +1,5 @@
 #
 #    Copyright (c) 2020 Project CHIP Authors
-#    Copyright (c) 2016-2017 Nest Labs, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,41 +16,29 @@
 
 #
 #    Description:
-#      This file is the GNU automake template for the CHIP system layer
+#      This file is the GNU automake template for the CHIP support
 #      library.
 #
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-include SystemLayer.am
-
 SUBDIRS                             = \
-    tests                             \
     $(NULL)
 
+include SupportLayer.am
 
-EXTRA_DIST                          = \
-    SystemLayerPrivate.h              \
-    $(NULL)
 
-lib_LIBRARIES                       = libSystemLayer.a
+lib_LIBRARIES                       = libSupportLayer.a
 
-libSystemLayer_a_CPPFLAGS           = \
+libSupportLayer_a_CPPFLAGS          = \
     -I$(top_srcdir)/src               \
-    -I$(top_srcdir)/src/include       \
-    -I$(top_srcdir)/src/system        \
     -I$(top_srcdir)/src/lib           \
-    -I$(top_srcdir)/src/lib/core      \
-    $(LWIP_CPPFLAGS)                  \
-    $(SOCKETS_CPPFLAGS)               \
     $(NULL)
 
-libSystemLayer_a_SOURCES          = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
+libSupportLayer_a_SOURCES           = $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
 
-libSystemLayer_adir               = $(includedir)/system
+libSupportLayer_adir                = $(includedir)/support
 
-dist_libSystemLayer_a_HEADERS     = $(CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES)
-
-$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
+dist_libSupportLayer_a_HEADERS      = $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

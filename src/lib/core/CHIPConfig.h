@@ -36,7 +36,7 @@
 #ifndef CHIP_CONFIG_H_
 #define CHIP_CONFIG_H_
 
-#include <SystemConfig.h>
+#include <system/SystemConfig.h>
 
 /* COMING SOON: making the INET Layer optional entails making this inclusion optional. */
 //#include "InetConfig.h"
