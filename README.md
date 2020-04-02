@@ -7,7 +7,7 @@
 
 All documentation is inside of the [docs section](./docs/README.md)
 
-Additional build information can also be found in [BUILDING.md](./BUILDING.md).
+Instructions about how to build and develop CHIP can be found [here](./docs/README.md#BuildingandDeveloping).
 
 # Need help?
 
@@ -44,12 +44,6 @@ The CHIP repository is structured as follows:
 | `tests/` | Tests for CHIP |
 | `third_party/` | Third-party code used by CHIP.|
 | `tools/` | Tools needed to work with the CHIP repo, as well as develop in the repository |
-
-# Third Party Tools
-
-Some tools and utilities are dependent on third party tools, such as Docker.
-
-[Docker](https://www.docker.com) is an excellent way to have stable build environments that don't pollute the host OS. It is also much easier to maintain stability across multiple host environments. Install stable version of [Docker Desktop](https://www.docker.com/products/docker-desktop) relevant to your native OS (MacOS or Windows). Once installed, you can run docker commands from the shell/terminal.
 
 # Contributing
 
