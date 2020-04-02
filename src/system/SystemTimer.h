@@ -27,15 +27,15 @@
 #define SYSTEMTIMER_H
 
 // Include configuration headers
-#include <SystemConfig.h>
+#include <system/SystemConfig.h>
 
 // Include dependent headers
 #include <support/DLLUtil.h>
 
-#include <SystemClock.h>
-#include <SystemError.h>
-#include <SystemObject.h>
-#include <SystemStats.h>
+#include <system/SystemClock.h>
+#include <system/SystemError.h>
+#include <system/SystemObject.h>
+#include <system/SystemStats.h>
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 

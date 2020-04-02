@@ -23,7 +23,7 @@
  */
 
 // Include module header
-#include <SystemMutex.h>
+#include <system/SystemMutex.h>
 
 // Include common private header
 #include "SystemLayerPrivate.h"
