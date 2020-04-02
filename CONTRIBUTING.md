@@ -5,15 +5,14 @@ Want to contribute? Great! First, read this page (including the small
 print at the end).
 By submitting a pull request, you represent that you have the right to license your contribution to Zigbee and the
 community, and agree by submitting the patch that your contributions are licensed under the
-[Apache 2.0 license](./LICENSE.md).
+[Apache 2.0 license](./LICENSE).
 
 Before submitting the pull request, please make sure you have tested your changes and that they follow the project
-[guidelines for contributing code](./docs/CONTRIBUTION_GUIDELINES.md).
-
+[guidelines for contributing code](#pull-request-requirements).
 
 ## Becoming a Member
 
-Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip/connectedhomeip.git)
+Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip)
 * Must be a member of the Zigbee Alliance CHIP TSG Working Group
 * Have signed the Zigbee CHIP WG CLA
 * Have signed up as a Tiger team member in one of the follow roles: Lead, Spec Writer, Developer (or exception granted), Code Approvers, or Support Staff
@@ -21,7 +20,7 @@ Currently these are the requirements to becoming a member of the [Project-CHIP R
 
 ## Becoming a Contributor
 
-Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip/connectedhomeip.git)
+Currently these are the requirements to becoming a member of the [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip)
 * Must be a member of the Zigbee Alliance CHIP TSG Working Group
 * Have signed the Zigbee CHIP WG CLA
 * Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
@@ -144,7 +143,7 @@ git push origin <branch-name>
 
 This will trigger the continuous-integration checks.  You
 can view the results in the respective services.  Note that the integration
-checks will report failures on occasion. 
+checks will report failures on occasion.
 
 #### Pull Request Requirements
 
@@ -169,8 +168,8 @@ CHIP considers there to be a few different types of pull requests:
 - - Decription 2
 
 ### Prior to review, all changes require:
-- [GitHub Workflows](../.github/workflows) pass 
-- [Certification Tests](tests/certification/README.md) pass 
+- [GitHub Workflows](.github/workflows) pass
+- [Certification Tests](tests/certification/README.md) pass
 - [Fuzz Tests](tests/fuzz/README.md) pass
 - [Integration Tests](tests/integration/README.md) pass
 - Linting passes
@@ -201,8 +200,8 @@ your development branch and update.
 #### Merge Requirements
 
 * Passes [Review Requirements](#review-requirements)
-* [GitHub Workflows](../.github/workflows) pass 
-* [Certification Tests](tests/certification/README.md) pass 
+* [GitHub Workflows](.github/workflows) pass
+* [Certification Tests](tests/certification/README.md) pass
 * [Fuzz Tests](tests/fuzz/README.md) pass
 * [Integration Tests](tests/integration/README.md) pass
 * Linting passes
@@ -214,6 +213,6 @@ your development branch and update.
 
 Documentation undergoes the same review process as code
 
-See the [Documentation Style Guide][doc-style] for more information on
+See the [Documentation Style Guide](docs/STYLE_GUIDE.md) for more information on
 how to author and format documentation for contribution.
 

@@ -7,7 +7,7 @@
 
 All documentation is inside of the [docs section](./docs/README.md)
 
-Instructions about how to build and develop CHIP can be found [here](./docs/README.md#BuildingandDeveloping).
+Instructions about how to build and develop CHIP can be found [here](./docs/README.md#building-and-developing).
 
 # Need help?
 
