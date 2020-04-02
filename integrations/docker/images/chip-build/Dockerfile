@@ -17,4 +17,17 @@ RUN set -x \
     clang-format-9 \
     clang-tidy-9 \
     lcov \
-    shellcheck
+    shellcheck \
+    gcc-multilib \
+    libfftw3-dev \
+    git-core \
+    bash-completion
+
+RUN mkdir -p /var/bsim
+WORKDIR /var/bsim
+
+RUN cd /var/bsim
+RUN curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo  && chmod a+x ./repo
+RUN ./repo init -u https://github.com/BabbleSim/manifest.git -m everything.xml -b master
+RUN ./repo sync
+RUN make everything -j 8

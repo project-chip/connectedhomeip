@@ -47,8 +47,7 @@
  *
  */
 #if !defined(CHIP_ASSERT_ABORT)
-#define CHIP_ASSERT_ABORT()                                              \
-    chipDie()
+#define CHIP_ASSERT_ABORT() chipDie()
 #endif
 
 /**
@@ -91,6 +90,7 @@
  *                          further describing the assertion failure.
  *
  */
+// clang-format off
 #if !defined(CHIP_ASSERT_LOG)
 #define CHIP_ASSERT_LOG(aPrefix, aName, aCondition, aLabel, aFile, aLine, aMessage)         \
     do                                                                                    \
@@ -107,6 +107,7 @@
                       aLine);                                                             \
     } while (0)
 #endif
+// clang-format on
 
 /**
  *  @} chip-specific nlassert.h Overrides
@@ -120,8 +121,7 @@ namespace chip {
 // Generic min() and max() functions
 //
 template <typename _T>
-inline const _T &
-min(const _T &a, const _T &b)
+inline const _T & min(const _T & a, const _T & b)
 {
     if (b < a)
         return b;
@@ -130,8 +130,7 @@ min(const _T &a, const _T &b)
 }
 
 template <typename _T>
-inline const _T &
-max(const _T &a, const _T &b)
+inline const _T & max(const _T & a, const _T & b)
 {
     if (a < b)
         return b;
@@ -156,8 +155,7 @@ max(const _T &a, const _T &b)
  *  @endcode
  *
  */
-#define IgnoreUnusedVariable(aVariable)                                \
-    ((void)(aVariable))
+#define IgnoreUnusedVariable(aVariable) ((void) (aVariable))
 
 /**
  *  @def SuccessOrExit(aStatus)
@@ -188,8 +186,7 @@ max(const _T &a, const _T &b)
  *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
  *
  */
-#define SuccessOrExit(aStatus)                                         \
-    nlEXPECT((aStatus) == CHIP_NO_ERROR, exit)
+#define SuccessOrExit(aStatus) nlEXPECT((aStatus) == CHIP_NO_ERROR, exit)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)
@@ -221,8 +218,7 @@ max(const _T &a, const _T &b)
  *                          assertion fails.
  *
  */
-#define VerifyOrExit(aCondition, anAction)                             \
-    nlEXPECT_ACTION(aCondition, exit, anAction)
+#define VerifyOrExit(aCondition, anAction) nlEXPECT_ACTION(aCondition, exit, anAction)
 
 /**
  *  @def ExitNow(...)
@@ -260,11 +256,13 @@ max(const _T &a, const _T &b)
  *                          when the assertion fails.
  *
  */
+// clang-format off
 #define ExitNow(...)                                                   \
     do {                                                               \
         __VA_ARGS__;                                                   \
         goto exit;                                                     \
     } while (0)
+// clang-format on
 
 /**
  *  @brief
@@ -320,8 +318,7 @@ inline void chipDie(void)
  *  @sa #chipDie
  *
  */
-#define VerifyOrDie(aCondition)                                        \
-    nlABORT(aCondition)
+#define VerifyOrDie(aCondition) nlABORT(aCondition)
 
 /**
  *  @def VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)
@@ -357,8 +354,8 @@ inline void chipDie(void)
  *  @sa #chipDie
  *
  */
-#define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)         \
-    nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ## __VA_ARGS__))
+#define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
+    nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ##__VA_ARGS__))
 
 /**
  * @def ArraySize(aArray)
@@ -375,7 +372,7 @@ inline void chipDie(void)
  *
  * @return      The size of an array in number of elements.
  */
-#define ArraySize(a) (sizeof(a)/sizeof((a)[0]))
+#define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
 
 #if defined(__cplusplus) && (__cplusplus >= 201103L)
 

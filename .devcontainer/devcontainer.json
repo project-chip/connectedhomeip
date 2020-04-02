@@ -1,20 +1,31 @@
 {
-	"name": "CHIP Ubuntu Development Environment",
-	"dockerFile": "Dockerfile",
-	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
-
-	"remoteUser": "vscode",
-
-	// Add the IDs of extensions you want installed when the container is created in the array below.
-	"extensions": [
-		"ms-vscode.cpptools",
-		"ms-azuretools.vscode-docker",
-		"xaver.clang-format",
-		"github.vscode-pull-request-github"
-	],
-	// Use 'settings' to set *default* container specific settings.json values on container create. 
-	// You can edit these settings after create using File > Preferences > Settings > Remote.
-	"settings": { 
-		"terminal.integrated.shell.linux": "/bin/bash"
-	}
+    "name": "CHIP Ubuntu Development Environment",
+    "dockerFile": "Dockerfile",
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined"
+    ],
+    "remoteUser": "vscode",
+    // Add the IDs of extensions you want installed when the container is created in the array below.
+    "extensions": [
+        "ms-vscode.cpptools",
+        "ms-azuretools.vscode-docker",
+        "xaver.clang-format",
+        "github.vscode-pull-request-github",
+        "maelvalais.autoconf"
+    ],
+    // Use 'settings' to set *default* container specific settings.json values on container create. 
+    // You can edit these settings after create using File > Preferences > Settings > Remote.
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "postCreateCommand": "source /usr/share/bash-completion/bash_completion",
+    "postCreateCommand": "source /etc/bash_completion.d/git-prompt ",
+    "remoteEnv": {
+        "GIT_PS1_SHOWDIRTYSTATE": "1",
+        "GIT_PS1_SHOWSTASHSTATE": "1",
+        "GIT_PS1_SHOWCOLORHINTS": "true",
+        "PROMPT_COMMAND": "${localEnv:PROMPT_COMMAND}"
+    }
 }

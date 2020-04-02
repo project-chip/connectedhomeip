@@ -1,7 +1,7 @@
 #
 #    Copyright (c) 2020 Project CHIP Authors
-#    Copyright (c) 2014-2018 Nest Labs, Inc.
 #    Copyright (c) 2018 Google LLC
+#    Copyright (c) 2014-2018 Nest Labs, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -28,62 +28,85 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # Local headers to build against and distribute but not to install
 # since they are not part of the package.
 #
-noinst_HEADERS                                 = \
+noinst_HEADERS                                         = \
     $(NULL)
 
 #
 # Other files we do want to distribute with the package.
 #
-EXTRA_DIST                                     = \
+EXTRA_DIST                                             = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
 # C/C++ preprocessor option flags that will apply to all compiled
 # objects in this makefile.
 
-AM_CPPFLAGS                                    = \
-    -I$(top_srcdir)/src/lib                      \
-    -I$(top_srcdir)/src/lib/core                 \
-    -I$(top_srcdir)/src/system                   \
+AM_CPPFLAGS                                           = \
+    -I$(top_srcdir)/src                                 \
+    -I$(top_srcdir)/src/lib                             \
+    -I$(top_srcdir)/src/lib/core                        \
+    -I$(top_srcdir)/src/system                          \
     $(NULL)
 
-COMMON_LDADD                                   = \
+CHIP_LDADD                                            = \
+    $(top_builddir)/src/system/libSystemLayer.a         \
+    $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(NULL)
+
+COMMON_LDADD                                          = \
+    $(COMMON_LDFLAGS)                                   \
+    $(CHIP_LDADD)                                       \
+    $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
+    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
+    $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.
 
-check_PROGRAMS                                 = \
-    TestSystemLayer                              \
+check_PROGRAMS                                       = \
+    TestSystemLayer                                    \
+    TestSystemObject                                   \
+    TestSystemPacketBuffer                             \
+    TestSystemTimer                                    \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
-TESTS                                          = \
-    $(check_PROGRAMS)                            \
+TESTS                                                = \
+    $(check_PROGRAMS)                                  \
     $(NULL)
 
 # The additional environment variables and their values that will be
 # made available to all programs and scripts in TESTS.
 
-TESTS_ENVIRONMENT                              = \
+TESTS_ENVIRONMENT                                    = \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
 
-TestSystemLayer_LDADD                          = $(COMMON_LDADD)
-TestSystemLayer_SOURCES                        = tests.cpp
+TestSystemLayer_SOURCES                              = tests.cpp
+TestSystemLayer_LDADD                                = $(COMMON_LDADD)
+
+TestSystemObject_SOURCES                             = TestSystemObject.cpp
+TestSystemObject_LDADD                               = $(COMMON_LDADD)
+
+TestSystemPacketBuffer_SOURCES                       = TestSystemPacketBuffer.cpp
+TestSystemPacketBuffer_LDADD                         = $(COMMON_LDADD)
+
+TestSystemTimer_SOURCES                              = TestSystemTimer.cpp
+TestSystemTimer_LDADD                                = $(COMMON_LDADD)
 
 if CHIP_BUILD_COVERAGE
-CLEANFILES                                     = $(wildcard *.gcda *.gcno)
+CLEANFILES                                           = $(wildcard *.gcda *.gcno)
 
 if CHIP_BUILD_COVERAGE_REPORTS
 # The bundle should positively be qualified with the absolute build
 # path. Otherwise, VPATH will get auto-prefixed to it if there is
 # already such a directory in the non-colocated source tree.
 
-CHIP_COVERAGE_BUNDLE                           = ${abs_builddir}/${PACKAGE}${NL_COVERAGE_BUNDLE_SUFFIX}
-CHIP_COVERAGE_INFO                             = ${CHIP_COVERAGE_BUNDLE}/${PACKAGE}${NL_COVERAGE_INFO_SUFFIX}
+CHIP_COVERAGE_BUNDLE                                 = ${abs_builddir}/${PACKAGE}${NL_COVERAGE_BUNDLE_SUFFIX}
+CHIP_COVERAGE_INFO                                   = ${CHIP_COVERAGE_BUNDLE}/${PACKAGE}${NL_COVERAGE_INFO_SUFFIX}
 
 $(CHIP_COVERAGE_BUNDLE):
 	$(call create-directory)
@@ -103,5 +126,3 @@ endif # CHIP_BUILD_COVERAGE
 endif # CHIP_BUILD_TESTS
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
-
-

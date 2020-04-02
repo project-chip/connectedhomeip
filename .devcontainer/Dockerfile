@@ -20,7 +20,11 @@ RUN apt-get -fy install git vim emacs sudo \
     clang-format-9 \
     clang-tidy-9 \
     lcov \
-    shellcheck
+    shellcheck \
+    gcc-multilib \
+    libfftw3-dev \
+    git-core \
+    bash-completion
 
 RUN groupadd --gid $USER_GID $USERNAME
 RUN useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME
@@ -28,3 +32,13 @@ RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
 RUN chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN ln -s /usr/bin/clang-format-9 /usr/local/bin/clang-format
+
+
+RUN mkdir -p /var/bsim
+WORKDIR /var/bsim
+
+RUN cd /var/bsim
+RUN curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo  && chmod a+x ./repo
+RUN ./repo init -u https://github.com/BabbleSim/manifest.git -m everything.xml -b master
+RUN ./repo sync
+RUN make everything -j 8
