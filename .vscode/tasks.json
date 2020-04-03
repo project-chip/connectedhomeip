@@ -89,7 +89,7 @@
         {
             "label": "Clean tree",
             "type": "shell",
-            "command": "rm -rf third_party/nl[afui]* && git clean -xdf",
+            "command": "make -f Makefile-bootstrap clean-repos && git clean -xdf",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
