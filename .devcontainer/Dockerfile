@@ -22,7 +22,8 @@ RUN apt-get -fy install git vim emacs sudo \
     lcov \
     shellcheck \
     gcc-multilib \
-    libfftw3-dev
+    libfftw3-dev \
+	libssl-dev
 
 RUN groupadd --gid $USER_GID $USERNAME
 RUN useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME
