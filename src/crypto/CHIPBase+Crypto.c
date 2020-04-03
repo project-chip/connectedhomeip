@@ -20,7 +20,6 @@
 
 #include <string.h>
 
-
 void CHIP_store_bigendian(uint8_t x[4], uint32_t u)
 {
     x[0] = (uint8_t)(u >> 24);
