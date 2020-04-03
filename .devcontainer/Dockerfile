@@ -47,7 +47,6 @@ RUN apt-get install -y locales && localedef -i en_US -c -f UTF-8 -A /usr/share/l
 RUN apt-get -fy install git vim emacs sudo \
     apt-utils dialog \
     iproute2 procps lsb-release \
-    git-core \
     bash-completion \
     build-essential cmake cppcheck valgrind \
     wget
