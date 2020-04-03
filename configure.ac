@@ -1325,6 +1325,35 @@ AC_MSG_NOTICE([checking package dependencies])
 AC_PATH_PROG([PKG_CONFIG],[pkg-config])
 
 #
+#
+# OpenSSL
+#
+
+NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([OpenSSL],
+    [OPENSSL],
+    [openssl],
+    [-lcrypto],
+    [
+        # Check for required OpenSSL headers.
+
+        AC_CHECK_HEADERS([openssl/aes.h] [openssl/bn.h] [openssl/crypto.h] [openssl/ec.h] [openssl/err.h] [openssl/evp.h] [openssl/sha.h],
+            [],
+            [
+                AC_MSG_ERROR(The OpenSSL header "$ac_header" is required but cannot be found.)
+            ]
+        )
+    ]
+)
+
+AM_CONDITIONAL([CHIP_WITH_OPENSSL], [test "${nl_with_openssl}" != "no"])
+
+if test "${nl_with_openssl}" = "no"; then
+    AC_DEFINE([CHIP_WITH_OPENSSL], [0], [Define to 1 to build CHIP with OpenSSL features])
+else
+    AC_DEFINE([CHIP_WITH_OPENSSL], [1], [Define to 1 to build CHIP with OpenSSL features])
+fi
+
+#
 # LwIP
 #
 
@@ -1922,6 +1951,10 @@ AC_MSG_NOTICE([
   LwIP compile flags                               : ${LWIP_CPPFLAGS:--}
   LwIP link flags                                  : ${LWIP_LDFLAGS:--}
   LwIP link libraries                              : ${LWIP_LIBS:--}
+  OpenSSL source                                   : ${nl_with_openssl}
+  OpenSSL compile flags                            : ${OPENSSL_CPPFLAGS:--}
+  OpenSSL link flags                               : ${OPENSSL_LDFLAGS:--}
+  OpenSSL link libraries                           : ${OPENSSL_LIBS:--}
   Nlunit-test source                               : ${nl_with_nlunit_test:--}
   Nlunit-test compile flags                        : ${NLUNIT_TEST_CPPFLAGS:--}
   Nlunit-test link flags                           : ${NLUNIT_TEST_LDFLAGS:--}
