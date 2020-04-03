@@ -27,26 +27,26 @@
 #define CHIPCORE_H_
 
 #include <core/CHIPConfig.h>
-/*
-#include <SystemLayer.h>
+
+#include <system/SystemLayer.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #include <inet/InetLayer.h>
-*/
+
 #define CHIP_CORE_IDENTITY           "chip-core"
 #define CHIP_CORE_PREFIX             CHIP_CORE_IDENTITY ": "
 
 namespace chip {
-/*
+
 #if CONFIG_NETWORK_LAYER_BLE
-using namespace ::Ble;
+using namespace ::chip::Ble;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-using namespace ::Inet;
-*/
+using namespace ::chip::Inet;
+
 }
 
 #include <core/CHIPError.h>
