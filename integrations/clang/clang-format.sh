@@ -7,8 +7,8 @@ die() {
     exit 1
 }
 
-if command -v clang-format-6.0 > /dev/null; then
-    alias clang-format=clang-format-9.0
+if command -v clang-format-9 > /dev/null; then
+    alias clang-format=clang-format-9
 elif command -v clang-format > /dev/null; then
     case "$(clang-format --version)" in
         "$CLANG_FORMAT_VERSION"*)
