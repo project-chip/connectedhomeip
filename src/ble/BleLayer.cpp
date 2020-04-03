@@ -302,7 +302,7 @@ BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationD
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
-    RegisterBleLayerErrorFormatter();
+    Ble::RegisterLayerErrorFormatter();
 
     VerifyOrExit(platformDelegate != NULL, err = BLE_ERROR_BAD_ARGS);
     VerifyOrExit(appDelegate != NULL, err = BLE_ERROR_BAD_ARGS);

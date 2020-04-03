@@ -24,6 +24,10 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+SUBDIRS                             = \
+    tests                             \
+    $(NULL)
+
 include BleLayer.am
 
 lib_LIBRARIES                       = libBleLayer.a
@@ -42,5 +46,7 @@ libBleLayer_a_SOURCES               = $(CHIP_BUILD_BLE_LAYER_SOURCE_FILES)
 libBleLayer_adir                    = $(includedir)/ble
 
 dist_libBleLayer_a_HEADERS          = $(CHIP_BUILD_BLE_LAYER_HEADER_FILES)
+
+$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

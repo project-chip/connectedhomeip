@@ -185,7 +185,7 @@ BLE_ERROR BLEEndPoint::HandleConnectComplete()
     else
     {
         // If no connect complete callback has been set up, close the end point.
-        err = BLE_ERRROR_NO_CONNECT_COMPLETE_CALLBACK;
+        err = BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK;
     }
 
     return err;

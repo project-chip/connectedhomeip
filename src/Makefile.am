@@ -66,6 +66,7 @@ DIST_SUBDIRS                      = \
 # Always build (e.g. for 'make all') these subdirectories.
 
 SUBDIRS                           = \
+    lib/support                     \
     $(MAYBE_BLE_SUBDIRS)            \
     inet                            \
     lib                             \

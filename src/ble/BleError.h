@@ -340,14 +340,14 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
 #define BLE_ERROR_KEEP_ALIVE_TIMED_OUT                     _BLE_ERROR(25)
 
 /**
- *  @def BLE_ERRROR_NO_CONNECT_COMPLETE_CALLBACK
+ *  @def BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK
  *
  *  @brief
  *    No callback was registered to handle Bluetooth Transport Protocol (BTP)
  *    connect completion.
  *
  */
-#define BLE_ERRROR_NO_CONNECT_COMPLETE_CALLBACK            _BLE_ERROR(26)
+#define BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK            _BLE_ERROR(26)
 
 /**
  *  @def BLE_ERROR_INVALID_ACK
@@ -420,8 +420,8 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
 namespace chip {
 namespace Ble {
 
-extern void RegisterBleLayerErrorFormatter(void);
-extern bool FormatBleLayerError(char * buf, uint16_t bufSize, int32_t err);
+extern void RegisterLayerErrorFormatter(void);
+extern bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err);
 
 } /* namespace Ble */
 } /* namespace chip */
