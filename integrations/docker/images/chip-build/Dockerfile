@@ -20,6 +20,7 @@ RUN set -x \
     shellcheck \
     gcc-multilib \
     libfftw3-dev \
+    libssl-dev \
     git-core \
     bash-completion
 

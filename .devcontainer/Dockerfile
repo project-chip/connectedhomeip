@@ -23,6 +23,7 @@ RUN apt-get -fy install git vim emacs sudo \
     shellcheck \
     gcc-multilib \
     libfftw3-dev \
+    libssl-dev \ 
     git-core \
     bash-completion
 
