@@ -52,6 +52,10 @@ EXTRA_DIST                               = \
     bootstrap                              \
     bootstrap-configure                    \
     repos.conf                             \
+    $(srcdir)/build/autoconf               \
+    $(srcdir)/build/config                 \
+    $(srcdir)/build/efr32                  \
+    $(srcdir)/build/nrf5                   \
     $(NULL)
 
 BUILT_SOURCES                            = \
