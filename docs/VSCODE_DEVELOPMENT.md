@@ -65,3 +65,14 @@ Developers are encouraged to add tasks to the [launch json](../.vscode/launch.js
 * [Missing Git credential](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
 * [Missing Git SSH keys](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
 * [Using GPG signing keys](https://github.com/microsoft/vscode-remote-release/issues/72)
+
+## Visual Studio Code FAQ
+
+* *Highly* recommend you read through [this page](https://code.visualstudio.com/docs/getstarted/settings) to learn how to configure Visual Studio Code to suit your style: <https://code.visualstudio.com/docs/getstarted/settings>
+* Great primer set of videos [here](https://code.visualstudio.com/docs/getstarted/introvideos) <https://code.visualstudio.com/docs/getstarted/introvideos>
+
+## Visual Studio Code Recommended Settings
+
+* Configure the editor to format on save, in your Visual Studio Code Settings: `"editor.formatOnSave": true`
+* Configure the clang-format extension `@ext:xaver.clang-format`, it is installed in the docker container. Make sure all languages are enabled
+
