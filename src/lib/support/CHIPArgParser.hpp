@@ -41,23 +41,21 @@ struct OptionSet;
 /**
  * A function that can be called to handle a set of command line options.
  */
-typedef bool (*OptionHandlerFunct)(const char *progName, OptionSet *optSet, int id, const char *name, const char *arg);
-
+typedef bool (*OptionHandlerFunct)(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
 
 /**
  * A function that can be called to handle any remaining, non-option command line arguments.
  */
-typedef bool (*NonOptionArgHandlerFunct)(const char *progName, int argc, char *argv[]);
-
+typedef bool (*NonOptionArgHandlerFunct)(const char * progName, int argc, char * argv[]);
 
 /**
  * Defines the argument requirements for a command line option.
  */
 enum OptionArgumentType
 {
-    kNoArgument         = 0,
-    kArgumentRequired   = 1,
-    kArgumentOptional   = 2,
+    kNoArgument       = 0,
+    kArgumentRequired = 1,
+    kArgumentOptional = 2,
 };
 
 /**
@@ -65,11 +63,11 @@ enum OptionArgumentType
  */
 struct OptionDef
 {
-    const char *Name;                   /**< Long name for the option */
-    OptionArgumentType ArgType;         /**< An enumerated value specifying whether the option takes an argument */
-    uint16_t Id;                        /**< An integer id for the option.  If the value falls in the range of
-                                             graphical ASCII characters the value is also used as the short name
-                                             for the option. */
+    const char * Name;          /**< Long name for the option */
+    OptionArgumentType ArgType; /**< An enumerated value specifying whether the option takes an argument */
+    uint16_t Id;                /**< An integer id for the option.  If the value falls in the range of
+                                     graphical ASCII characters the value is also used as the short name
+                                     for the option. */
 };
 
 /**
@@ -77,10 +75,10 @@ struct OptionDef
  */
 struct OptionSet
 {
-    OptionHandlerFunct OptionHandler;   /**< Pointer to function for processing individual options */
-    OptionDef *OptionDefs;              /**< NULL terminated list of option definitions structures. */
-    const char *HelpGroupName;          /**< Group name under which options appear in help output */
-    const char *OptionHelp;             /**< Help text describing options */
+    OptionHandlerFunct OptionHandler; /**< Pointer to function for processing individual options */
+    OptionDef * OptionDefs;           /**< NULL terminated list of option definitions structures. */
+    const char * HelpGroupName;       /**< Group name under which options appear in help output */
+    const char * OptionHelp;          /**< Help text describing options */
 };
 
 /**
@@ -90,47 +88,52 @@ class OptionSetBase : public OptionSet
 {
 public:
     OptionSetBase();
-    virtual bool HandleOption(const char *progName, OptionSet *optSet, int id, const char *name, const char *arg) = 0;
+    virtual bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg) = 0;
 
 private:
-    static bool CallHandleFunct(const char *progName, OptionSet *optSet, int id, const char *name, const char *arg);
+    static bool CallHandleFunct(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
 };
 
-extern bool ParseArgs(const char *progName, int argc, char *argv[], OptionSet *optSets[]);
-extern bool ParseArgs(const char *progName, int argc, char *argv[], OptionSet *optSets[], NonOptionArgHandlerFunct nonOptArgHandler);
-extern bool ParseArgs(const char *progName, int argc, char *argv[], OptionSet *optSets[], NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
+extern bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[]);
+extern bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[],
+                      NonOptionArgHandlerFunct nonOptArgHandler);
+extern bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[],
+                      NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
 
-extern bool ParseArgsFromString(const char *progName, const char *argStr, OptionSet *optSets[]);
-extern bool ParseArgsFromString(const char *progName, const char *argStr, OptionSet *optSets[], NonOptionArgHandlerFunct nonOptArgHandler);
-extern bool ParseArgsFromString(const char *progName, const char *argStr, OptionSet *optSets[], NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
+extern bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[]);
+extern bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],
+                                NonOptionArgHandlerFunct nonOptArgHandler);
+extern bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],
+                                NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
 
-extern bool ParseArgsFromEnvVar(const char *progName, const char *varName, OptionSet *optSets[]);
-extern bool ParseArgsFromEnvVar(const char *progName, const char *varName, OptionSet *optSets[], NonOptionArgHandlerFunct nonOptArgHandler);
-extern bool ParseArgsFromEnvVar(const char *progName, const char *varName, OptionSet *optSets[], NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
+extern bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[]);
+extern bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[],
+                                NonOptionArgHandlerFunct nonOptArgHandler);
+extern bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[],
+                                NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
 
-extern void PrintOptionHelp(OptionSet *optionSets[], FILE *s);
+extern void PrintOptionHelp(OptionSet * optionSets[], FILE * s);
 
-extern void (*PrintArgError)(const char *msg, ...);
-extern void DefaultPrintArgError(const char *msg, ...);
+extern void (*PrintArgError)(const char * msg, ...);
+extern void DefaultPrintArgError(const char * msg, ...);
 
 // Utility functions for parsing common argument value types.
-extern bool ParseBoolean(const char *str, bool& output);
-extern bool ParseInt(const char *str, uint8_t& output);
-extern bool ParseInt(const char *str, uint16_t& output);
-extern bool ParseInt(const char *str, int32_t& output);
-extern bool ParseInt(const char *str, uint32_t& output);
-extern bool ParseInt(const char *str, uint64_t& output);
-extern bool ParseInt(const char *str, int32_t& output, int base);
-extern bool ParseInt(const char *str, uint32_t& output, int base);
-extern bool ParseInt(const char *str, uint64_t& output, int base);
-extern bool ParseIPAddress(const char *str, chip::Inet::IPAddress& output);
-extern bool ParseNodeId(const char *str, uint64_t& nodeId);
-extern bool ParseFabricId(const char *str, uint64_t& fabricId, bool allowReserved = false);
-extern bool ParseSubnetId(const char *str, uint16_t& subnetId);
-extern bool ParseHexString(const char *hexStr, uint32_t strLen, uint8_t *outBuf, uint32_t outBufSize, uint32_t& outDataLen);
+extern bool ParseBoolean(const char * str, bool & output);
+extern bool ParseInt(const char * str, uint8_t & output);
+extern bool ParseInt(const char * str, uint16_t & output);
+extern bool ParseInt(const char * str, int32_t & output);
+extern bool ParseInt(const char * str, uint32_t & output);
+extern bool ParseInt(const char * str, uint64_t & output);
+extern bool ParseInt(const char * str, int32_t & output, int base);
+extern bool ParseInt(const char * str, uint32_t & output, int base);
+extern bool ParseInt(const char * str, uint64_t & output, int base);
+extern bool ParseIPAddress(const char * str, chip::Inet::IPAddress & output);
+extern bool ParseNodeId(const char * str, uint64_t & nodeId);
+extern bool ParseFabricId(const char * str, uint64_t & fabricId, bool allowReserved = false);
+extern bool ParseSubnetId(const char * str, uint16_t & subnetId);
+extern bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);
 
-extern OptionSet **gActiveOptionSets;
-
+extern OptionSet ** gActiveOptionSets;
 
 /**
  * Common OptionSet for handling informational options (--help, --version).
@@ -139,20 +142,20 @@ extern OptionSet **gActiveOptionSets;
 class HelpOptions : public OptionSetBase
 {
 public:
-    const char *AppName;            /**< The name of the command-line application. */
-    const char *AppUsage;           /**< A short string depicting the application's command-line syntax. */
-    const char *AppVersion;             const char *AppDesc;            /**< A description of the application's purpose/behavior. */
+    const char * AppName;  /**< The name of the command-line application. */
+    const char * AppUsage; /**< A short string depicting the application's command-line syntax. */
+    const char * AppVersion;
+    const char * AppDesc; /**< A description of the application's purpose/behavior. */
 
-    HelpOptions(const char *appName, const char *appUsage, const char *appVersion);
-    HelpOptions(const char *appName, const char *appUsage, const char *appVersion, const char *appDesc);
+    HelpOptions(const char * appName, const char * appUsage, const char * appVersion);
+    HelpOptions(const char * appName, const char * appUsage, const char * appVersion, const char * appDesc);
 
-    void PrintBriefUsage(FILE *s);
-    void PrintLongUsage(OptionSet *optSets[], FILE *s);
-    void PrintVersion(FILE *s);
+    void PrintBriefUsage(FILE * s);
+    void PrintLongUsage(OptionSet * optSets[], FILE * s);
+    void PrintVersion(FILE * s);
 
-    virtual bool HandleOption(const char *progName, OptionSet *optSet, int id, const char *name, const char *arg);
+    virtual bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
 };
-
 
 } // namespace ArgParser
 } // namespace chip

@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -15,80 +16,89 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include <Weave/Core/WeaveCore.h>
+#include <core/CHIPCore.h>
 
-#include "../lib/support/nlargparser.hpp"
+#include <support/CHIPArgParser.hpp>
 
-using namespace nl::ArgParser;
+using namespace chip::ArgParser;
 
-static bool HandleOption(const char *progName, OptionSet *optSet, int id, const char *name, const char *arg);
-static bool HandleNonOptionArgs(const char *progName, int argc, char *argv[]);
-static void HandleArgError(const char *msg, ...);
+static bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
+static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[]);
+static void HandleArgError(const char * msg, ...);
 static void ClearCallbackRecords();
 
 #define DEBUG_TESTS 0
 
-#define QuitWithError(MSG) \
-do { \
-    fprintf(stderr, "%s FAILED (line %d): ", __FUNCTION__, __LINE__); \
-    fputs(MSG, stderr); \
-    fputs("\n", stderr); \
-    exit(EXIT_FAILURE); \
-} while (0)
+#define QuitWithError(MSG)                                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        fprintf(stderr, "%s FAILED (line %d): ", __FUNCTION__, __LINE__);                                                          \
+        fputs(MSG, stderr);                                                                                                        \
+        fputs("\n", stderr);                                                                                                       \
+        exit(EXIT_FAILURE);                                                                                                        \
+    } while (0)
 
-#define VerifyOrQuit(TST, MSG) \
-do { \
-    if (!(TST)) \
-    { \
-        QuitWithError(MSG); \
-    } \
-} while (0)
+#define VerifyOrQuit(TST, MSG)                                                                                                     \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(TST))                                                                                                                \
+        {                                                                                                                          \
+            QuitWithError(MSG);                                                                                                    \
+        }                                                                                                                          \
+    } while (0)
 
-#define VerifyHandleOptionCallback(INDEX, EXPECT_PROG_NAME, EXPECT_OPTSET, EXPECT_ID, EXPECT_NAME, EXPECT_ARG)              \
-do {                                                                                                                        \
-    CallbackRecord& rec = sCallbackRecords[INDEX];                                                                          \
-    const char *arg = EXPECT_ARG;                                                                                           \
-    VerifyOrQuit(rec.Type == CallbackRecord::kHandleOption, "Invalid callback type (expected HandleOption)");               \
-    VerifyOrQuit(strcmp(rec.ProgName, EXPECT_PROG_NAME) == 0, "Invalid value for HandleOption argument: progName");         \
-    VerifyOrQuit(rec.OptSet == EXPECT_OPTSET, "Invalid value for HandleOption argument: optSet");                           \
-    VerifyOrQuit(rec.Id == EXPECT_ID, "Invalid value for HandleOption argument: id");                                       \
-    VerifyOrQuit(strcmp(rec.Name, EXPECT_NAME) == 0, "Invalid value for HandleOption argument: name");                      \
-    if (arg != NULL)                                                                                                        \
-        VerifyOrQuit(strcmp(rec.Arg, arg) == 0, "Invalid value for HandleOption argument: arg");                            \
-    else                                                                                                                    \
-        VerifyOrQuit(rec.Arg == NULL, "Invalid value for HandleOption argument: arg");                                      \
-} while (0)
+#define VerifyHandleOptionCallback(INDEX, EXPECT_PROG_NAME, EXPECT_OPTSET, EXPECT_ID, EXPECT_NAME, EXPECT_ARG)                     \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
+        const char * arg     = EXPECT_ARG;                                                                                         \
+        VerifyOrQuit(rec.Type == CallbackRecord::kHandleOption, "Invalid callback type (expected HandleOption)");                  \
+        VerifyOrQuit(strcmp(rec.ProgName, EXPECT_PROG_NAME) == 0, "Invalid value for HandleOption argument: progName");            \
+        VerifyOrQuit(rec.OptSet == EXPECT_OPTSET, "Invalid value for HandleOption argument: optSet");                              \
+        VerifyOrQuit(rec.Id == EXPECT_ID, "Invalid value for HandleOption argument: id");                                          \
+        VerifyOrQuit(strcmp(rec.Name, EXPECT_NAME) == 0, "Invalid value for HandleOption argument: name");                         \
+        if (arg != NULL)                                                                                                           \
+            VerifyOrQuit(strcmp(rec.Arg, arg) == 0, "Invalid value for HandleOption argument: arg");                               \
+        else                                                                                                                       \
+            VerifyOrQuit(rec.Arg == NULL, "Invalid value for HandleOption argument: arg");                                         \
+    } while (0)
 
-#define VerifyHandleNonOptionArgsCallback(INDEX, EXPECT_PROG_NAME, EXPECT_ARGC)                                             \
-do {                                                                                                                        \
-    CallbackRecord& rec = sCallbackRecords[INDEX];                                                                          \
-    VerifyOrQuit(rec.Type == CallbackRecord::kHandleNonOptionArgs, "Invalid callback type (expected HandleNonOptionArgs)"); \
-    VerifyOrQuit(strcmp(rec.ProgName, EXPECT_PROG_NAME) == 0, "Invalid value for HandleNonOptionArgs argument: progName");  \
-    VerifyOrQuit(rec.Argc == EXPECT_ARGC, "Invalid value for HandleNonOptionArgs argument: argc");                          \
-} while (0)
+#define VerifyHandleNonOptionArgsCallback(INDEX, EXPECT_PROG_NAME, EXPECT_ARGC)                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
+        VerifyOrQuit(rec.Type == CallbackRecord::kHandleNonOptionArgs, "Invalid callback type (expected HandleNonOptionArgs)");    \
+        VerifyOrQuit(strcmp(rec.ProgName, EXPECT_PROG_NAME) == 0, "Invalid value for HandleNonOptionArgs argument: progName");     \
+        VerifyOrQuit(rec.Argc == EXPECT_ARGC, "Invalid value for HandleNonOptionArgs argument: argc");                             \
+    } while (0)
 
-#define VerifyNonOptionArg(INDEX, EXPECT_ARG)                                                                               \
-do {                                                                                                                        \
-    CallbackRecord& rec = sCallbackRecords[INDEX];                                                                          \
-    VerifyOrQuit(rec.Type == CallbackRecord::kNonOptionArg, "Invalid callback type (expected NonOptionArg)");               \
-    VerifyOrQuit(strcmp(rec.Arg, EXPECT_ARG) == 0, "Invalid value for NonOptionArg");                                       \
-} while (0)
+#define VerifyNonOptionArg(INDEX, EXPECT_ARG)                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
+        VerifyOrQuit(rec.Type == CallbackRecord::kNonOptionArg, "Invalid callback type (expected NonOptionArg)");                  \
+        VerifyOrQuit(strcmp(rec.Arg, EXPECT_ARG) == 0, "Invalid value for NonOptionArg");                                          \
+    } while (0)
 
-#define VerifyPrintArgErrorCallback(INDEX)                                                                                  \
-do {                                                                                                                        \
-    CallbackRecord& rec = sCallbackRecords[INDEX];                                                                          \
-    VerifyOrQuit(rec.Type == CallbackRecord::kArgError, "Invalid callback type (expected ArgError)");                       \
-} while (0)
+#define VerifyPrintArgErrorCallback(INDEX)                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
+        VerifyOrQuit(rec.Type == CallbackRecord::kArgError, "Invalid callback type (expected ArgError)");                          \
+    } while (0)
 
-#define VerifyArgErrorContains(INDEX, EXPECT_TEXT)                                                                          \
-do {                                                                                                                        \
-    CallbackRecord& rec = sCallbackRecords[INDEX];                                                                          \
-    VerifyOrQuit(strstr(rec.Error, EXPECT_TEXT) != NULL, "Expected text not found in error output");                        \
-} while (0)
+#define VerifyArgErrorContains(INDEX, EXPECT_TEXT)                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CallbackRecord & rec = sCallbackRecords[INDEX];                                                                            \
+        VerifyOrQuit(strstr(rec.Error, EXPECT_TEXT) != NULL, "Expected text not found in error output");                           \
+    } while (0)
 
 struct CallbackRecord
 {
@@ -99,13 +109,13 @@ struct CallbackRecord
         kNonOptionArg,
         kArgError
     } Type;
-    char *ProgName;
-    OptionSet *OptSet;
+    char * ProgName;
+    OptionSet * OptSet;
     int Id;
-    char *Name;
-    char *Arg;
+    char * Name;
+    char * Arg;
     int Argc;
-    char *Error;
+    char * Error;
 };
 
 enum
@@ -116,6 +126,7 @@ enum
 static CallbackRecord sCallbackRecords[kMaxCallbackRecords];
 static size_t sCallbackRecordCount = 0;
 
+// clang-format off
 static OptionDef sOptionSetA_Defs[] =
 {
     { "foo",  kNoArgument, '1'  },
@@ -153,32 +164,30 @@ static OptionSet sOptionSetB =
     "--run\n"
     "--walk\n"
 };
+// clang-format on
 
 static void SimpleParseTest_SingleLongOption()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
         "--foo",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
-    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1',  "--foo", NULL);
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", NULL);
     VerifyHandleNonOptionArgsCallback(1, __FUNCTION__, 0);
 }
 
@@ -186,27 +195,24 @@ static void SimpleParseTest_SingleShortOption()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
         "-s",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
-    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 's',  "-s",    NULL);
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 's', "-s", NULL);
     VerifyHandleNonOptionArgsCallback(1, __FUNCTION__, 0);
 }
 
@@ -214,24 +220,21 @@ static void SimpleParseTest_SingleLongOptionWithValue()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
         "--run", "run-value",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
@@ -242,24 +245,21 @@ static void SimpleParseTest_SingleShortOptionWithValue()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
         "-Z", "baz-value",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 2, "Invalid value returned for sCallbackRecordCount");
     VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
@@ -270,12 +270,8 @@ static void SimpleParseTest_VariousShortAndLongWithArgs()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
@@ -291,24 +287,25 @@ static void SimpleParseTest_VariousShortAndLongWithArgs()
         "non-opt-arg-4",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
     VerifyOrQuit(sCallbackRecordCount == 12, "Invalid value returned for sCallbackRecordCount");
-    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1',  "--foo", NULL);
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", NULL);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
-    VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetB, 's',  "-s",    NULL);
+    VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetB, 's', "-s", NULL);
     VerifyHandleOptionCallback(3, __FUNCTION__, &sOptionSetA, 1001, "--bar", NULL);
-    VerifyHandleOptionCallback(4, __FUNCTION__, &sOptionSetA, '1',  "-1",    NULL);
-    VerifyHandleOptionCallback(5, __FUNCTION__, &sOptionSetA, 'Z',  "-Z",    "baz-value");
+    VerifyHandleOptionCallback(4, __FUNCTION__, &sOptionSetA, '1', "-1", NULL);
+    VerifyHandleOptionCallback(5, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
     VerifyHandleOptionCallback(6, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value-2");
     VerifyHandleNonOptionArgsCallback(7, __FUNCTION__, 4);
-    VerifyNonOptionArg(8,  "non-opt-arg-1");
-    VerifyNonOptionArg(9,  "non-opt-arg-2");
+    VerifyNonOptionArg(8, "non-opt-arg-1");
+    VerifyNonOptionArg(9, "non-opt-arg-2");
     VerifyNonOptionArg(10, "non-opt-arg-3");
     VerifyNonOptionArg(11, "non-opt-arg-4");
 }
@@ -317,12 +314,8 @@ static void UnknownOptionTest_UnknownShortOption()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetB,
-        &sOptionSetA,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetB, &sOptionSetA, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
@@ -333,15 +326,16 @@ static void UnknownOptionTest_UnknownShortOption()
         "non-opt-arg-1",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 3, "Invalid value returned for sCallbackRecordCount");
-    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1',  "--foo", NULL);
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", NULL);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
     VerifyPrintArgErrorCallback(2);
     VerifyArgErrorContains(2, "Unknown");
@@ -352,12 +346,8 @@ static void UnknownOptionTest_UnknownLongOption()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetB,
-        &sOptionSetA,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetB, &sOptionSetA, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
@@ -368,15 +358,16 @@ static void UnknownOptionTest_UnknownLongOption()
         "non-opt-arg-1",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 3, "Invalid value returned for sCallbackRecordCount");
-    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1',  "--foo", NULL);
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", NULL);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
     VerifyPrintArgErrorCallback(2);
     VerifyArgErrorContains(2, "Unknown option");
@@ -387,12 +378,8 @@ static void UnknownOptionTest_UnknownShortOptionAfterKnown()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetB,
-        &sOptionSetA,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetB, &sOptionSetA, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
@@ -403,17 +390,18 @@ static void UnknownOptionTest_UnknownShortOptionAfterKnown()
         "non-opt-arg-1",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 4, "Invalid value returned for sCallbackRecordCount");
-    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1',  "--foo", NULL);
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", NULL);
     VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
-    VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetA, '1',  "-1",    NULL);
+    VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetA, '1', "-1", NULL);
     VerifyPrintArgErrorCallback(3);
     VerifyArgErrorContains(3, "Unknown");
     VerifyArgErrorContains(3, "-Q");
@@ -423,24 +411,21 @@ static void UnknownOptionTest_UnknownShortOptionBeforeKnown()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
         "-Q1", // <-- unknown option -Q
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -452,26 +437,23 @@ static void UnknownOptionTest_UnknownShortOptionAfterArgs()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
         "non-opt-arg-1",
         "non-opt-arg-2",
         "-Q", // <-- unknown option -Q
-		NULL
+        NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -483,12 +465,8 @@ static void UnknownOptionTest_UnknownLongOptionAfterArgs()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
@@ -497,12 +475,13 @@ static void UnknownOptionTest_UnknownLongOptionAfterArgs()
         "--barf", // <-- unknown option --barf
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -514,12 +493,8 @@ static void UnknownOptionTest_IgnoreUnknownLongOption()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
@@ -529,17 +504,18 @@ static void UnknownOptionTest_IgnoreUnknownLongOption()
         "-Zbaz-value",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs, true);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
 
     VerifyOrQuit(sCallbackRecordCount == 4, "Invalid value returned for sCallbackRecordCount");
 
-    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, 'Z',  "-Z", "baz-value");
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
     VerifyHandleNonOptionArgsCallback(1, __FUNCTION__, 2);
     VerifyNonOptionArg(2, "non-opt-arg-1");
     VerifyNonOptionArg(3, "non-opt-arg-2");
@@ -549,12 +525,8 @@ static void UnknownOptionTest_IgnoreUnknownShortOption()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
@@ -564,18 +536,19 @@ static void UnknownOptionTest_IgnoreUnknownShortOption()
         "-Zbaz-value",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs, true);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == true, "ParseArgs() returned false");
 
     VerifyOrQuit(sCallbackRecordCount == 5, "Invalid value returned for sCallbackRecordCount");
 
-    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1',  "-1", NULL);
-    VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetA, 'Z',  "-Z", "baz-value");
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "-1", NULL);
+    VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetA, 'Z', "-Z", "baz-value");
     VerifyHandleNonOptionArgsCallback(2, __FUNCTION__, 2);
     VerifyNonOptionArg(3, "non-opt-arg-1");
     VerifyNonOptionArg(4, "non-opt-arg-2");
@@ -585,24 +558,21 @@ static void MissingValueTest_MissingShortOptionValue()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
         "-Z",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs, true);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -614,24 +584,21 @@ static void MissingValueTest_MissingLongOptionValue()
 {
     bool res;
 
-    static OptionSet *optionSets[] =
-    {
-        &sOptionSetA,
-        &sOptionSetB,
-        NULL
-    };
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, NULL };
+    // clang-format off
     static const char *argv[] =
     {
         "",
         "--run",
 		NULL
     };
+    // clang-format on
     static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     ClearCallbackRecords();
     PrintArgError = HandleArgError;
 
-    res = ParseArgs(__FUNCTION__, argc, (char **)argv, optionSets, HandleNonOptionArgs, true);
+    res = ParseArgs(__FUNCTION__, argc, (char **) argv, optionSets, HandleNonOptionArgs, true);
     VerifyOrQuit(res == false, "ParseArgs() returned true");
     VerifyOrQuit(sCallbackRecordCount == 1, "Invalid value returned for sCallbackRecordCount");
     VerifyPrintArgErrorCallback(0);
@@ -656,26 +623,27 @@ static void ClearCallbackRecords()
     sCallbackRecordCount = 0;
 }
 
-static bool HandleOption(const char *progName, OptionSet *optSet, int id, const char *name, const char *arg)
+static bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
 #if DEBUG_TESTS
-    printf("HandleOption called: progName:%s optSet:%08lX id:%d name:%s arg:%s\n", progName, (intptr_t)optSet, id, name, arg);
+    printf("HandleOption called: progName:%s optSet:%08lX id:%d name:%s arg:%s\n", progName, (intptr_t) optSet, id, name, arg);
 #endif
 
     VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
-    sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kHandleOption;
+    sCallbackRecords[sCallbackRecordCount].Type     = CallbackRecord::kHandleOption;
     sCallbackRecords[sCallbackRecordCount].ProgName = strdup(progName);
-    sCallbackRecords[sCallbackRecordCount].OptSet = optSet;
-    sCallbackRecords[sCallbackRecordCount].Id = id;
-    sCallbackRecords[sCallbackRecordCount].Name = strdup(name);
-    sCallbackRecords[sCallbackRecordCount].Arg = (arg != NULL) ? strdup(arg) : NULL;
+    sCallbackRecords[sCallbackRecordCount].OptSet   = optSet;
+    sCallbackRecords[sCallbackRecordCount].Id       = id;
+    sCallbackRecords[sCallbackRecordCount].Name     = strdup(name);
+    sCallbackRecords[sCallbackRecordCount].Arg      = (arg != NULL) ? strdup(arg) : NULL;
     sCallbackRecordCount++;
     return true;
 }
 
-static bool HandleNonOptionArgs(const char *progName, int argc, char *argv[])
+static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
 {
 #if DEBUG_TESTS
+    // clang-format off
     printf("HandleNonOptionArgs called: progName:%s argc:%d argv[0]:%s argv[1]:%s argv[2]:%s argv[3]:%s \n",
             progName, argc,
             (argc > 0) ? argv[0] : "(n/a)",
@@ -683,28 +651,29 @@ static bool HandleNonOptionArgs(const char *progName, int argc, char *argv[])
             (argc > 2) ? argv[2] : "(n/a)",
             (argc > 3) ? argv[3] : "(n/a)"
     );
+    // clang-format on
 #endif
 
     VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
-    sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kHandleNonOptionArgs;
+    sCallbackRecords[sCallbackRecordCount].Type     = CallbackRecord::kHandleNonOptionArgs;
     sCallbackRecords[sCallbackRecordCount].ProgName = strdup(progName);
-    sCallbackRecords[sCallbackRecordCount].Argc = argc;
+    sCallbackRecords[sCallbackRecordCount].Argc     = argc;
     sCallbackRecordCount++;
 
     for (int i = 0; i < argc; i++)
     {
         VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
         sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kNonOptionArg;
-        sCallbackRecords[sCallbackRecordCount].Arg = strdup(argv[i]);
+        sCallbackRecords[sCallbackRecordCount].Arg  = strdup(argv[i]);
         sCallbackRecordCount++;
     }
 
     return true;
 }
 
-static void HandleArgError(const char *msg, ...)
+static void HandleArgError(const char * msg, ...)
 {
-    int     status;
+    int status;
     va_list ap;
 
     VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
@@ -713,7 +682,7 @@ static void HandleArgError(const char *msg, ...)
 
     va_start(ap, msg);
     status = vasprintf(&sCallbackRecords[sCallbackRecordCount].Error, msg, ap);
-    (void)status;
+    (void) status;
     va_end(ap);
 
 #if DEBUG_TESTS
@@ -723,7 +692,27 @@ static void HandleArgError(const char *msg, ...)
     sCallbackRecordCount++;
 }
 
-int main(int argc, char *argv[])
+/*
+ * Mock interface to avoid an unnecessary circular dependency on the
+ * Inet layer library imposed by the argument parsing facility.
+ *
+ */
+namespace chip {
+
+namespace Inet {
+
+class IPAddress;
+
+bool IPAddress::FromString(char const * aString, IPAddress & aAddress)
+{
+    return (false);
+}
+
+}; // namespace Inet
+
+}; // namespace chip
+
+int main(int argc, char * argv[])
 {
     SimpleParseTest_SingleLongOption();
     SimpleParseTest_SingleShortOption();
