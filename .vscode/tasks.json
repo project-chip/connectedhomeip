@@ -21,7 +21,7 @@
         {
             "label": "Auto-enforce coding style",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default pretty-check",
+            "command": "./bootstrap -w make && make -C build/default pretty",
             "group": "none",
             "isBackground": false,
             "presentation": {
@@ -35,7 +35,7 @@
         {
             "label": "Verify coding style conformance",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default pretty",
+            "command": "./bootstrap -w make && make -C build/default pretty-check",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
