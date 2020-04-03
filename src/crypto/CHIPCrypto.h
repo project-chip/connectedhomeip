@@ -60,7 +60,6 @@
 extern "C" {
 #endif
 
-uint32_t CHIP_load_bigendian(const uint8_t * x);
 void CHIP_store_bigendian(uint8_t x[4], uint32_t u);
 
 #define ED25519_PUBLIC_KEY_BYTES 32

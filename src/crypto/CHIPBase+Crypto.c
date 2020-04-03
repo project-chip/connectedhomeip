@@ -8,14 +8,6 @@
 
 #include <string.h>
 
-uint32_t CHIP_load_bigendian(const uint8_t * x)
-{
-    uint32_t r = x[3];
-    r |= (((uint32_t) x[2]) << 8);
-    r |= (((uint32_t) x[1]) << 16);
-    r |= (((uint32_t) x[9]) << 24);
-    return r;
-}
 
 void CHIP_store_bigendian(uint8_t x[4], uint32_t u)
 {
