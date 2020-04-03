@@ -30,28 +30,29 @@
 
 namespace chip {
 
-enum {
-    kYearsPerCentury = 100,
+enum
+{
+    kYearsPerCentury  = 100,
     kLeapYearInterval = 4,
 
     kMonthsPerYear = 12,
 
     kMaxDaysPerMonth = 31,
 
-    kDaysPerWeek = 7,
+    kDaysPerWeek         = 7,
     kDaysPerStandardYear = 365,
-    kDaysPerLeapYear = kDaysPerStandardYear + 1,
+    kDaysPerLeapYear     = kDaysPerStandardYear + 1,
 
-    kHoursPerDay = 24,
+    kHoursPerDay  = 24,
     kHoursPerWeek = kDaysPerWeek * kHoursPerDay,
 
     kMinutesPerHour = 60,
-    kMinutesPerDay = kHoursPerDay * kMinutesPerHour,
+    kMinutesPerDay  = kHoursPerDay * kMinutesPerHour,
 
-    kSecondsPerMinute = 60,
-    kSecondsPerHour = kSecondsPerMinute * kMinutesPerHour,
-    kSecondsPerDay = kSecondsPerHour * kHoursPerDay,
-    kSecondsPerWeek = kSecondsPerDay * kDaysPerWeek,
+    kSecondsPerMinute       = 60,
+    kSecondsPerHour         = kSecondsPerMinute * kMinutesPerHour,
+    kSecondsPerDay          = kSecondsPerHour * kHoursPerDay,
+    kSecondsPerWeek         = kSecondsPerDay * kDaysPerWeek,
     kSecondsPerStandardYear = kSecondsPerDay * kDaysPerStandardYear,
 
     kMillisecondPerSecond = 1000,
@@ -59,22 +60,24 @@ enum {
     kMicrosecondsPerSecond = 1000000
 };
 
-enum {
-    kJanuary = 1,
-    kFebruary = 2,
-    kMarch = 3,
-    kApril = 4,
-    kMay = 5,
-    kJune = 6,
-    kJuly = 7,
-    kAugust = 8,
+enum
+{
+    kJanuary   = 1,
+    kFebruary  = 2,
+    kMarch     = 3,
+    kApril     = 4,
+    kMay       = 5,
+    kJune      = 6,
+    kJuly      = 7,
+    kAugust    = 8,
     kSeptember = 9,
-    kOctober = 10,
-    kNovember = 11,
-    kDecember = 12
+    kOctober   = 10,
+    kNovember  = 11,
+    kDecember  = 12
 };
 
-enum {
+enum
+{
     // First year of the standard unix epoch.
     kEpochYear = 1970,
 
@@ -88,17 +91,15 @@ enum {
 extern bool IsLeapYear(uint16_t year);
 extern uint8_t DaysInMonth(uint16_t year, uint8_t month);
 extern uint8_t FirstWeekdayOfYear(uint16_t year);
-extern void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t& month, uint8_t& dayOfMonth);
-extern void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint16_t& dayOfYear);
-extern bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint32_t& daysSinceEpoch);
-extern void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t& year, uint8_t& month, uint8_t& dayOfMonth);
-extern void AdjustCalendarDate(uint16_t& year, uint8_t& month, uint8_t& dayOfMonth, int32_t relativeDays);
-extern bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth,
-                                            uint8_t hour, uint8_t minute, uint8_t second,
-                                            uint32_t& secondsSinceEpoch);
-extern void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch,
-                                            uint16_t& year, uint8_t& month, uint8_t& dayOfMonth,
-                                            uint8_t& hour, uint8_t& minute, uint8_t& second);
+extern void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t & month, uint8_t & dayOfMonth);
+extern void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint16_t & dayOfYear);
+extern bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint32_t & daysSinceEpoch);
+extern void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
+extern void AdjustCalendarDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, int32_t relativeDays);
+extern bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute,
+                                            uint8_t second, uint32_t & secondsSinceEpoch);
+extern void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
+                                            uint8_t & hour, uint8_t & minute, uint8_t & second);
 
 /**
  *  @def secondsToMilliseconds

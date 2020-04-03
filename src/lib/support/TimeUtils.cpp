@@ -34,7 +34,8 @@
 
 namespace chip {
 
-enum {
+enum
+{
     // Number of days during the invariant part of the year (after the leap day).
     kDaysFromMarch1ToDecember31 = 306,
 
@@ -132,7 +133,8 @@ uint8_t DaysInMonth(uint16_t year, uint8_t month)
 uint8_t FirstWeekdayOfYear(uint16_t year)
 {
     // Compute the day of the week for the first day of the given year using Gauss' algorithm.
-    return (1 + 5 * ((year - 1) % kLeapYearInterval) + 4 * ((year - 1) % kYearsPerCentury) + 6 * ((year - 1) % kYearsPerCycle)) % kDaysPerWeek;
+    return (1 + 5 * ((year - 1) % kLeapYearInterval) + 4 * ((year - 1) % kYearsPerCentury) + 6 * ((year - 1) % kYearsPerCycle)) %
+        kDaysPerWeek;
 }
 
 /**
@@ -154,7 +156,7 @@ uint8_t FirstWeekdayOfYear(uint16_t year)
  *    [OUTPUT] Corresponding day-of-month in standard form (1=1st, 2=2nd, etc.).
  *
  */
-void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t& month, uint8_t& dayOfMonth)
+void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t & month, uint8_t & dayOfMonth)
 {
     uint8_t daysToMarch1 = DaysToMarch1(year);
 
@@ -202,7 +204,7 @@ void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t& month
  *    [OUTPUT] Ordinal day of year, base 1 (1=January 1st, 2=January 2nd, etc.).
  *
  */
-void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint16_t& dayOfYear)
+void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint16_t & dayOfYear)
 {
     // Convert month to a March-based month number (i.e. 0=March, 1=April, ...11=February).
     month = month + (month > kFebruary ? -3 : 9);
@@ -246,7 +248,7 @@ void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth,
  *    This function makes no attempt to verify the correct range of any arguments other than year.
  *    Therefore callers must make sure the supplied values are valid prior to calling the function.
  */
-bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint32_t& daysSinceEpoch)
+bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint32_t & daysSinceEpoch)
 {
     // NOTE: This algorithm is based on the logic described in http://howardhinnant.github.io/date_algorithms.html.
 
@@ -276,7 +278,8 @@ bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMon
     uint32_t yearOfCycle = year - (cycle * kYearsPerCycle);
 
     // Compute the relative day within the cycle, accounting for leap-years.
-    uint32_t dayOfCycle = (yearOfCycle * kDaysPerStandardYear) + dayOfYear - (yearOfCycle / kYearsPerCentury) + (yearOfCycle / kLeapYearInterval);
+    uint32_t dayOfCycle =
+        (yearOfCycle * kDaysPerStandardYear) + dayOfYear - (yearOfCycle / kYearsPerCentury) + (yearOfCycle / kLeapYearInterval);
 
     // Compute the total number of days since the start of the logical calendar (0000-03-01).
     uint32_t daysSinceCalendarStart = (cycle * kDaysPerCycle) + dayOfCycle;
@@ -306,7 +309,7 @@ bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMon
  *    [OUTPUT] Day-of-month in standard form (1=1st, 2=2nd, etc.).
  *
  */
-void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t& year, uint8_t& month, uint8_t& dayOfMonth)
+void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
 {
     // NOTE: This algorithm is based on the logic described in http://howardhinnant.github.io/date_algorithms.html.
 
@@ -320,10 +323,11 @@ void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t& year, uint8
     uint32_t dayOfCycle = daysSinceEpoch - (cycle * kDaysPerCycle);
 
     // Compute the relative year within the cycle, adjusting for leap-years.
-    uint16_t yearOfCycle = (dayOfCycle - dayOfCycle/1460 + dayOfCycle/36524 - dayOfCycle/146096) / kDaysPerStandardYear;
+    uint16_t yearOfCycle = (dayOfCycle - dayOfCycle / 1460 + dayOfCycle / 36524 - dayOfCycle / 146096) / kDaysPerStandardYear;
 
     // Compute the relative day with the year.
-    uint16_t dayOfYear = dayOfCycle - (yearOfCycle * kDaysPerStandardYear + yearOfCycle/kLeapYearInterval - yearOfCycle/kYearsPerCentury);
+    uint16_t dayOfYear =
+        dayOfCycle - (yearOfCycle * kDaysPerStandardYear + yearOfCycle / kLeapYearInterval - yearOfCycle / kYearsPerCentury);
 
     // Compute a March-based month number (i.e. 0=March...11=February) from the day of year.
     month = MarchBasedDayOfYearToMonth(dayOfYear);
@@ -364,7 +368,7 @@ void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t& year, uint8
  *  @note
  *    Given date must be equal to or greater than 1970-01-01.
  */
-void AdjustCalendarDate(uint16_t& year, uint8_t& month, uint8_t& dayOfMonth, int32_t relativeDays)
+void AdjustCalendarDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, int32_t relativeDays)
 {
     uint32_t daysSinceEpoch;
 
@@ -414,9 +418,8 @@ void AdjustCalendarDate(uint16_t& year, uint8_t& month, uint8_t& dayOfMonth, int
  *    True if the date/time was converted successfully.  False if the given year falls outside the
  *    representable range.
  */
-bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth,
-                                     uint8_t hour, uint8_t minute, uint8_t second,
-                                     uint32_t& secondsSinceEpoch)
+bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute, uint8_t second,
+                                     uint32_t & secondsSinceEpoch)
 {
     uint32_t daysSinceEpoch;
 
@@ -472,12 +475,11 @@ bool CalendarTimeToSecondsSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOf
  *  @param second
  *    [OUTPUT] Second (0-59).
  */
-void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch,
-                                     uint16_t& year, uint8_t& month, uint8_t& dayOfMonth,
-                                     uint8_t& hour, uint8_t& minute, uint8_t& second)
+void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
+                                     uint8_t & hour, uint8_t & minute, uint8_t & second)
 {
     uint32_t daysSinceEpoch = secondsSinceEpoch / kSecondsPerDay;
-    uint32_t timeOfDay = secondsSinceEpoch - (daysSinceEpoch * kSecondsPerDay);
+    uint32_t timeOfDay      = secondsSinceEpoch - (daysSinceEpoch * kSecondsPerDay);
 
     DaysSinceEpochToCalendarDate(daysSinceEpoch, year, month, dayOfMonth);
 
@@ -485,7 +487,7 @@ void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch,
     timeOfDay -= (hour * kSecondsPerHour);
     minute = (uint8_t)(timeOfDay / kSecondsPerMinute);
     timeOfDay -= (minute * kSecondsPerMinute);
-    second = (uint8_t)timeOfDay;
+    second = (uint8_t) timeOfDay;
 }
 
 } // namespace chip

@@ -23,6 +23,7 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 SUBDIRS                             = \
+    tests                             \
     $(NULL)
 
 include SupportLayer.am
@@ -41,5 +42,7 @@ libSupportLayer_a_SOURCES           = $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
 libSupportLayer_adir                = $(includedir)/support
 
 dist_libSupportLayer_a_HEADERS      = $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)
+
+$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

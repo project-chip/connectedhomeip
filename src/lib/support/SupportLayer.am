@@ -29,6 +29,7 @@ CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                     = \
     @top_builddir@/src/lib/support/FibonacciUtils.cpp       \
     @top_builddir@/src/lib/support/logging/CHIPLogging.cpp  \
     @top_builddir@/src/lib/support/RandUtils.cpp            \
+    @top_builddir@/src/lib/support/TimeUtils.cpp            \
     $(NULL)
 
 CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
@@ -41,6 +42,7 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
     @top_builddir@/src/lib/support/logging/CHIPLogging.h    \
     @top_builddir@/src/lib/support/Base64.h                 \
     @top_builddir@/src/lib/support/RandUtils.h              \
+    @top_builddir@/src/lib/support/TimeUtils.h              \
     $(NULL)
 
 if CHIP_WITH_NLFAULTINJECTION
