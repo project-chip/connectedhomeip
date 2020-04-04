@@ -60,10 +60,10 @@ COMMON_LDADD                                          = \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.
-
 check_PROGRAMS                                        = \
     TestCHIPArgParser                                   \
     TestTimeUtils                                       \
+    TestErrorStr                                        \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -86,6 +86,9 @@ TestCHIPArgParser_LDADD                               = $(COMMON_LDADD)
 
 TestTimeUtils_SOURCES                                 = TestTimeUtils.cpp
 TestTimeUtils_LDADD                                   = $(COMMON_LDADD)
+
+TestErrorStr_SOURCES                                  = TestErrorStr.cpp
+TestErrorStr_LDADD                                    = $(COMMON_LDADD)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)
