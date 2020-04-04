@@ -62,8 +62,8 @@ COMMON_LDADD                                          = \
 # Test applications that should be run when the 'check' target is run.
 check_PROGRAMS                                        = \
     TestCHIPArgParser                                   \
-    TestTimeUtils                                       \
     TestErrorStr                                        \
+    TestTimeUtils                                       \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
