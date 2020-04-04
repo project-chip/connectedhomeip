@@ -28,8 +28,16 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # Build Configuration
 #
 
-include_HEADERS                    = \
-    BuildConfig.h                    \
+include_HEADERS                            = \
+    BuildConfig.h                            \
+    $(NULL)
+
+#
+# This project neither owns nor controls BuildConfig.h, so do not
+# attempt to enforce coding style on it.
+#
+PRETTY_FILES                               = \
+    $(filter-out BuildConfig.h,$(HEADERS))   \
     $(NULL)
 
 # Auto-generation targets to force the creation and subsequent check
