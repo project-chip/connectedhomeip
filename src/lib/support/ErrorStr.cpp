@@ -43,7 +43,7 @@ static char sErrorStr[CHIP_CONFIG_ERROR_STR_SIZE];
 /**
  * Linked-list of error formatter functions.
  */
-static const ErrorFormatter * sErrorFormatterList = NULL;
+static ErrorFormatter * sErrorFormatterList = NULL;
 
 /**
  * This routine returns a human-readable NULL-terminated C string
@@ -89,8 +89,8 @@ DLL_EXPORT const char * ErrorStr(int32_t err)
 DLL_EXPORT void RegisterErrorFormatter(ErrorFormatter * errFormatter)
 {
     // Do nothing if a formatter with the same format function is already in the list.
-    for (const ErrorFormatter * existingFormatter = sErrorFormatterList; existingFormatter != NULL;
-         existingFormatter                        = existingFormatter->Next)
+    for (ErrorFormatter * existingFormatter = sErrorFormatterList; existingFormatter != NULL;
+         existingFormatter                  = existingFormatter->Next)
     {
         if (existingFormatter->FormatError == errFormatter->FormatError)
         {
@@ -101,6 +101,25 @@ DLL_EXPORT void RegisterErrorFormatter(ErrorFormatter * errFormatter)
     // Add the formatter to the global list.
     errFormatter->Next  = sErrorFormatterList;
     sErrorFormatterList = errFormatter;
+}
+
+/**
+ * Remove an error formatter function from the global list of error formatters.
+ *
+ * @param[in] errFormatter             An ErrorFormatter structure containing a
+ *                                     pointer to the new error function.
+ */
+DLL_EXPORT void DeregisterErrorFormatter(ErrorFormatter * errFormatter)
+{
+    // Remove the formatter if present
+    for (ErrorFormatter ** lfp = &sErrorFormatterList; *lfp != NULL; lfp = &(*lfp)->Next)
+    {
+        // Remove the formatter from the global list, if found.
+        if (*lfp == errFormatter)
+        {
+            *lfp = errFormatter->Next;
+        }
+    }
 }
 
 #if !CHIP_CONFIG_CUSTOM_ERROR_FORMATTER
