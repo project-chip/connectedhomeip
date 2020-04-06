@@ -103,6 +103,18 @@
             "problemMatcher": [
                 "$gcc"
             ]
+        },
+
+        {
+            "label": "CHIP crypto Tests",
+            "type": "shell",
+            "command": "make -C build/x86_64-unknown-linux-gnu/src/setup_payload/ check",
+            "group": "none",
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
+
+        
     ]
 }
