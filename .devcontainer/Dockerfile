@@ -12,6 +12,7 @@ RUN set -x \
     autoconf \
     automake \
     libtool \
+    pkg-config \
     g++ \
     clang-9 \
     clang-format-9 \
