@@ -13,17 +13,23 @@ aclocal.m4
 autom4te.cache
 output/
 build/*
+!build/README.md
+!build/autoconf/m4/chip_check_project_config_includes.m4
 !build/autoconf/m4/nl_with_lwip.m4
 !build/config/standalone/CHIPProjectConfig.h
 !build/config/standalone/SystemProjectConfig.h
 !build/config/standalone/darwin/CHIPProjectConfig.h
 !build/config/standalone/no-openssl/CHIPProjectConfig.h
+!build/efr32/efr32-app.mk
+!build/efr32/efr32-chip.mk
+!build/nrf5/nrf5-app.mk
+!build/nrf5/nrf5-chip.mk
+!build/scripts/gen-chip-version
 config.log
 config.status
 configure
 src/include/BuildConfig.h
 src/include/BuildConfig.h.in
-
 
 # Repos stuff
 .repos-warning-stamp

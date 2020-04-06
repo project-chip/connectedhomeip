@@ -9,12 +9,13 @@
     "remoteUser": "vscode",
     // Add the IDs of extensions you want installed when the container is created in the array below.
     "extensions": [
-        "ms-vscode.cpptools",
-        "ms-azuretools.vscode-docker",
-        "xaver.clang-format",
-        "github.vscode-pull-request-github",
-        "maelvalais.autoconf"
-    ],
+		"ms-vscode.cpptools",
+		"ms-azuretools.vscode-docker",
+		"xaver.clang-format",
+		"github.vscode-pull-request-github",
+		"maelvalais.autoconf",
+		"yzhang.markdown-all-in-one"
+	],
     // Use 'settings' to set *default* container specific settings.json values on container create. 
     // You can edit these settings after create using File > Preferences > Settings > Remote.
     "settings": {
