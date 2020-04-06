@@ -4,7 +4,7 @@
         {
             "label": "Main Build",
             "type": "shell",
-            "command": "make -f Makefile-Standalone",
+            "command": "./bootstrap -w make && make -C build/default",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -21,7 +21,7 @@
         {
             "label": "Auto-enforce coding style",
             "type": "shell",
-            "command": "make -f Makefile-Standalone pretty-check",
+            "command": "./bootstrap -w make && make -C build/default pretty",
             "group": "none",
             "isBackground": false,
             "presentation": {
@@ -35,7 +35,7 @@
         {
             "label": "Verify coding style conformance",
             "type": "shell",
-            "command": "make -f Makefile-Standalone pretty",
+            "command": "./bootstrap -w make && make -C build/default pretty-check",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
@@ -44,7 +44,7 @@
         {
             "label": "Run Unit and Functional Tests",
             "type": "shell",
-            "command": "make -f Makefile-Standalone check",
+            "command": "./bootstrap -w make && make -C build/default check",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
@@ -53,7 +53,7 @@
         {
             "label": "Run Distribution Generation",
             "type": "shell",
-            "command": "make -f Makefile-Standalone distcheck",
+            "command": "./bootstrap -w make && make -C build/default distcheck",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
@@ -62,7 +62,7 @@
         {
             "label": "Run Code Coverage",
             "type": "shell",
-            "command": "make -f Makefile-Standalone coverage",
+            "command": "./bootstrap -w make && make -C build/default coverage",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
@@ -71,7 +71,7 @@
         {
             "label": "Clean build",
             "type": "shell",
-            "command": "make -f Makefile-Standalone clean",
+            "command": "./bootstrap -w make && make -C build/default distclean",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
@@ -80,16 +80,16 @@
         {
             "label": "Bootstrap the source tree",
             "type": "shell",
-            "command": "./bootstrap",
+            "command": "./bootstrap && mkdir -p build/default && (cd build/default && ../../configure --enable-coverage --enable-coverage-info)",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "Clean Tree",
+            "label": "Clean tree",
             "type": "shell",
-            "command": "git clean -xdf",
+            "command": "make -f Makefile-bootstrap clean-repos && git clean -xdf",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
@@ -98,7 +98,7 @@
         {
             "label": "QRCode Tests",
             "type": "shell",
-            "command": "make -C build/x86_64-unknown-linux-gnu/src/setup_payload/ check",
+            "command": "./bootstrap -w make && make -C build/default/src/setup_payload/ check",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
