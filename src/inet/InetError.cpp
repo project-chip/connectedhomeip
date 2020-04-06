@@ -36,9 +36,9 @@ namespace Inet {
 /**
  * Register a text error formatter for Inet Layer errors.
  */
-void RegisterInetLayerErrorFormatter(void)
+void RegisterLayerErrorFormatter(void)
 {
-    static chip::ErrorFormatter sInetLayerErrorFormatter = { FormatInetLayerError, NULL };
+    static chip::ErrorFormatter sInetLayerErrorFormatter = { FormatLayerError, NULL };
 
     RegisterErrorFormatter(&sInetLayerErrorFormatter);
 }
@@ -55,7 +55,7 @@ void RegisterInetLayerErrorFormatter(void)
  * @return false                    If the supplied error was not an Inet Layer error.
  *
  */
-bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
 {
     const char * desc = NULL;
 

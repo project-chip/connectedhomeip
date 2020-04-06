@@ -354,6 +354,15 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_WRONG_CERT_SUBJECT:
         desc = "Wrong certificate subject";
         break;
+    case CHIP_ERROR_INVALID_PROVISIONING_BUNDLE:
+        desc = "Invalid provisioning bundle";
+        break;
+    case CHIP_ERROR_PROVISIONING_BUNDLE_DECRYPTION_ERROR:
+        desc = "Provisioning bundle decryption error";
+        break;
+    case CHIP_ERROR_PASE_RECONFIGURE_REQUIRED:
+        desc = "PASE reconfiguration required";
+        break;
     case CHIP_ERROR_WRONG_NODE_ID:
         desc = "Wrong node ID";
         break;
@@ -492,8 +501,14 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_INVALID_INTEGER_VALUE:
         desc = "Invalid integer value.";
         break;
+    case CHIP_ERROR_CASE_RECONFIG_REQUIRED:
+        desc = "CASE reconfiguration required";
+        break;
     case CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS:
         desc = "Too many CASE reconfigurations were received.";
+        break;
+    case CHIP_ERROR_BAD_REQUEST:
+        desc = "Request cannot be processed or fulfilled.";
         break;
     case CHIP_ERROR_INVALID_MESSAGE_FLAG:
         desc = "Invalid message flag.";
@@ -587,6 +602,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         break;
     case CHIP_ERROR_WDM_PATH_STORE_FULL:
         desc = "A WDM TraitPath store is full";
+        break;
+    case CHIP_EVENT_ID_FOUND:
+        desc = "Event ID matching criteria was found";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

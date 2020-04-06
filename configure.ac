@@ -1867,6 +1867,7 @@ third_party/lwip/Makefile
 src/Makefile
 src/include/Makefile
 src/ble/Makefile
+src/ble/tests/Makefile
 src/crypto/Makefile
 src/crypto/tests/Makefile
 src/lwip/Makefile
@@ -1878,6 +1879,7 @@ src/setup_payload/tests/Makefile
 src/inet/Makefile
 src/inet/tests/Makefile
 src/lib/Makefile
+src/lib/core/tests/Makefile
 src/lib/support/Makefile
 src/lib/support/tests/Makefile
 src/platform/Makefile

@@ -178,8 +178,8 @@ namespace System {
  */
 typedef CHIP_SYSTEM_CONFIG_ERROR_TYPE Error;
 
-extern void RegisterSystemLayerErrorFormatter(void);
-extern bool FormatSystemLayerError(char * buf, uint16_t bufSize, int32_t err);
+extern void RegisterLayerErrorFormatter(void);
+extern bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err);
 
 extern Error MapErrorPOSIX(int code);
 extern const char * DescribeErrorPOSIX(Error code);

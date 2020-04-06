@@ -372,8 +372,8 @@ typedef INET_CONFIG_ERROR_TYPE          INET_ERROR;
 namespace chip {
 namespace Inet {
 
-extern void RegisterInetLayerErrorFormatter(void);
-extern bool FormatInetLayerError(char * buf, uint16_t bufSize, int32_t err);
+extern void RegisterLayerErrorFormatter(void);
+extern bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err);
 
 } // namespace Inet
 } // namespace chip

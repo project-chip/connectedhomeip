@@ -16,8 +16,8 @@
 
 #
 #    Description:
-#      This file is the GNU automake template for the Project CHIP Inet
-#      layer library unit tests.
+#      This file is the GNU automake template for the Project CHIP
+#      Core layer library unit tests.
 #
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
@@ -36,8 +36,8 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C preprocessor option flags that will apply to all compiled objects in this
-# makefile.
+# C/C++ preprocessor option flags that will apply to all compiled objects in
+# this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -48,7 +48,7 @@ AM_CPPFLAGS                                           = \
     $(NULL)
 
 CHIP_LDADD                                            = \
-    $(top_builddir)/src/inet/libInetLayer.a             \
+    $(top_builddir)/src/lib/libCHIP.a                   \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
@@ -63,8 +63,7 @@ COMMON_LDADD                                          = \
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                        = \
-    TestInetAddress                                     \
-    TestInetErrorStr                                    \
+    TestCHIPErrorStr                                    \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -82,11 +81,8 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
-TestInetAddress_SOURCES                               = TestInetAddress.cpp
-TestInetAddress_LDADD                                 = $(COMMON_LDADD)
-
-TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp
-TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
+TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStr.cpp
+TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)

@@ -69,6 +69,7 @@ DIST_SUBDIRS                      = \
 
 SUBDIRS                           = \
     include                         \
+    lib/support                     \
     $(MAYBE_BLE_SUBDIRS)            \
     inet                            \
     lib                             \
