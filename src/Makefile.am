@@ -54,6 +54,7 @@ endif # CONFIG_DEVICE_LAYER
 # Always package (e.g. for 'make dist') these subdirectories.
 
 DIST_SUBDIRS                      = \
+    include                         \
     $(BLE_SUBDIRS)                  \
     inet                            \
     lib                             \
@@ -66,6 +67,7 @@ DIST_SUBDIRS                      = \
 # Always build (e.g. for 'make all') these subdirectories.
 
 SUBDIRS                           = \
+    include                         \
     lib/support                     \
     $(MAYBE_BLE_SUBDIRS)            \
     inet                            \

@@ -16,7 +16,7 @@ Build system features:
 * Code style enforcement: 'make pretty' and 'make pretty-check' integration with clang-format
 
 Assuming you have all the required tools installed, the system will build the code,
-build a distribution, tidy, format, run tests, and run code coverage on the entire tree.  
+build a distribution, tidy, format, run tests, and run code coverage on the entire tree.
 Tests are built into the make system.
 
 
@@ -79,6 +79,9 @@ The helper Makefile-<platform> will automatically run configure the using a defa
 ```
 TESTS=1 DEBUG=1 COVERAGE=1 make -f Makefile-Standalone
 ```
+
+At any time after this if a Makefile.am is updated, `./bootstrap -w make` must be run again for the changes to be picked up.
+
 
 ### Build Custom configuration
 
