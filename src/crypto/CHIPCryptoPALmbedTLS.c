@@ -22,9 +22,9 @@
 
 #include "CHIPCryptoPAL.h"
 
-CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_len, const unsigned char * aad,
-                                    size_t aad_len, const unsigned char * key, const unsigned char * iv, size_t iv_length,
-                                    unsigned char * ciphertext, unsigned char * tag)
+CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                                    size_t aad_length, const unsigned char * key, const unsigned char * iv, size_t iv_length,
+                                    unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
     // TODO: Need mbedTLS based implementation for AES-CCM #264
     return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
