@@ -235,7 +235,6 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToDeviceLayer(const Chi
     ThreadStackMgr().OnPlatformEvent(event);
 #endif
     ConnectivityMgr().OnPlatformEvent(event);
-    // TimeSyncMgr().OnPlatformEvent(event);
 }
 
 template<class ImplClass>
