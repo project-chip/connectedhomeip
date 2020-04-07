@@ -27,6 +27,8 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                        = \
+    TestInetCommon.h                                    \
+    TestInetCommonOptions.h                             \
     $(NULL)
 
 #
@@ -36,6 +38,7 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 noinst_LIBRARIES                                      = \
+    libTestInetCommon.a                                 \
     $(NULL)
 
 if CHIP_BUILD_TESTS
@@ -49,6 +52,11 @@ AM_CPPFLAGS                                           = \
     $(LWIP_CPPFLAGS)                                    \
     $(SOCKETS_CPPFLAGS)                                 \
     $(PTHREAD_CFLAGS)                                   \
+    $(NULL)
+
+libTestInetCommon_a_SOURCES                           = \
+    TestInetCommon.cpp                                  \
+    TestInetCommonOptions.cpp                           \
     $(NULL)
 
 CHIP_LDADD                                            = \
@@ -70,6 +78,7 @@ COMMON_LDADD                                          = \
 check_PROGRAMS                                        = \
     TestInetAddress                                     \
     TestInetBuffer                                      \
+    TestInetEndPoint                                    \
     TestInetErrorStr                                    \
     TestInetTimer                                       \
     $(NULL)
@@ -95,6 +104,10 @@ TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 TestInetBuffer_SOURCES                                = TestInetBuffer.cpp      \
                                                         $(NULL)
 TestInetBuffer_LDADD                                  = $(COMMON_LDADD)
+
+TestInetEndPoint_SOURCES                              = TestInetEndPoint.cpp    \
+                                                        $(NULL)
+TestInetEndPoint_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
 
 TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
                                                         $(NULL)
