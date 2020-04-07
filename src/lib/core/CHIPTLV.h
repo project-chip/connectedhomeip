@@ -25,16 +25,16 @@
  *      more compact over the wire.
  */
 
-#ifndef CHIPTLV_H_
-#define CHIPTLV_H_
+#ifndef CHIP_TLV_H_
+#define CHIP_TLV_H_
 
 #include <stdlib.h>
 #include <stdarg.h>
 
 #include <support/DLLUtil.h>
 #include <core/CHIPError.h>
-#include "core/CHIPTLVTags.h"
-#include "core/CHIPTLVTypes.h"
+#include <core/CHIPTLVTags.h>
+#include <core/CHIPTLVTypes.h>
 
 // forward declaration of the PacketBuffer class used within the header.
 namespace chip {
@@ -463,4 +463,4 @@ private:
 } // namespace TLV
 } // namespace chip
 
-#endif /* CHIPTLV_H_ */
+#endif /* CHIP_TLV_H_ */
