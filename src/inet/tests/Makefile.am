@@ -95,6 +95,7 @@ noinst_PROGRAMS                                       = \
 check_PROGRAMS                                        = \
     TestInetAddress                                     \
     TestInetBuffer                                      \
+    TestInetEndPoint                                    \
     TestInetErrorStr                                    \
     TestInetTimer                                       \
     $(NULL)
