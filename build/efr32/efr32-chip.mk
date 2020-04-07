@@ -101,7 +101,6 @@ CHIP_CONFIGURE_OPTIONS = \
     --with-lwip=internal \
     --with-lwip-target=efr32 \
     --with-inet-endpoint="tcp udp" \
-    --with-openssl=no \
     --with-logging-style=external \
     --with-chip-project-includes=$(CHIP_PROJECT_CONFIG) \
     --with-chip-system-project-includes=$(CHIP_PROJECT_CONFIG) \
