@@ -86,6 +86,10 @@ libDeviceLayer_a_CPPFLAGS               = \
 
 libDeviceLayer_a_SOURCES                = \
     PersistedStorage.cpp                  \
+    SystemEventSupport.cpp                \
+    SystemTimerSupport.cpp                \
+    GeneralUtils.cpp                      \
+    Globals.cpp                           \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_NRF5

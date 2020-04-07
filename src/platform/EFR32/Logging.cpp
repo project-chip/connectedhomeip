@@ -48,6 +48,10 @@
 #define LOG_RTT_BUFFER_SIZE 256
 #endif
 
+// FreeRTOS includes
+#include "SEGGER_RTT.h"
+#include "SEGGER_RTT_Conf.h"
+
 #define LOG_ERROR "<error > "
 #define LOG_WARN "<warn  > "
 #define LOG_INFO "<info  > "
@@ -171,7 +175,7 @@ void Log(uint8_t module, uint8_t category, const char *aFormat, ...)
         char   formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t formattedMsgLen;
 
-        constexpr size_t maxPrefixLen = nlChipLoggingModuleNameLen + 3;
+        constexpr size_t maxPrefixLen = ChipLoggingModuleNameLen + 3;
         static_assert(sizeof(formattedMsg) > maxPrefixLen);
 
         switch (category)
