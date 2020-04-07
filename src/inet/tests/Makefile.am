@@ -35,12 +35,16 @@ noinst_HEADERS                                        = \
 EXTRA_DIST                                            = \
     $(NULL)
 
+noinst_LIBRARIES                                      = \
+    $(NULL)
+
 if CHIP_BUILD_TESTS
 # C preprocessor option flags that will apply to all compiled objects in this
 # makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
+    -I$(top_srcdir)/src/include                         \
     -I$(top_srcdir)/src/lib                             \
     $(LWIP_CPPFLAGS)                                    \
     $(SOCKETS_CPPFLAGS)                                 \
@@ -49,6 +53,7 @@ AM_CPPFLAGS                                           = \
 
 CHIP_LDADD                                            = \
     $(top_builddir)/src/inet/libInetLayer.a             \
+    $(top_builddir)/src/system/libSystemLayer.a         \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
@@ -64,6 +69,7 @@ COMMON_LDADD                                          = \
 
 check_PROGRAMS                                        = \
     TestInetAddress                                     \
+    TestInetBuffer                                      \
     TestInetErrorStr                                    \
     $(NULL)
 
@@ -85,7 +91,12 @@ TESTS_ENVIRONMENT                                     = \
 TestInetAddress_SOURCES                               = TestInetAddress.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 
-TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp
+TestInetBuffer_SOURCES                                = TestInetBuffer.cpp      \
+                                                        $(NULL)
+TestInetBuffer_LDADD                                  = $(COMMON_LDADD)
+
+TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
+                                                        $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
 
 if CHIP_BUILD_COVERAGE
