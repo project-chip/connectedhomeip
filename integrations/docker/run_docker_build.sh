@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Note: this needs to be run from the root directory presently. 
+# https://github.com/project-chip/connectedhomeip/issues/273
+
 set -e
 
 VERSION=$(cat integrations/docker/images/chip-build/version)
