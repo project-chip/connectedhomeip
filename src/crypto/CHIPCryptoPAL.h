@@ -36,13 +36,14 @@
  * @param iv Initial vector
  * @param iv_length Length of initial vector
  * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
+ * @param ciphertext_length Length of generated ciphertext
  * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
  * @param tag_length Expected length of tag
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                     size_t aad_length, const unsigned char * key, const unsigned char * iv, size_t iv_length,
-                                    unsigned char * ciphertext, unsigned char * tag, size_t tag_length);
+                                    unsigned char * ciphertext, size_t &ciphertext_length, unsigned char * tag, size_t tag_length);
 
 /**
  * @brief A function that implements 256-bit AES-CCM decryption
