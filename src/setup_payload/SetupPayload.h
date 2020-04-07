@@ -30,7 +30,7 @@
 using namespace std;
 
 namespace chip {
-// TODO this shuould point to the spec
+// TODO this should point to the spec
 const int kVersionFieldLengthInBits              = 3;
 const int kVendorIDFieldLengthInBits             = 16;
 const int kProductIDFieldLengthInBits            = 16;
