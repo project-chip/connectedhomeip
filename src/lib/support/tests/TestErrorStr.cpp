@@ -25,12 +25,12 @@
 
 using namespace chip;
 
-#define CHECK(v) (v) ? true : fprintf(stderr, "%s:%d: error: CHECK(%s) failed\n", __FUNCTION__, __LINE__, #v), false
+#define CHECK(v) (v) ? true : (fprintf(stderr, "%s:%d: error: CHECK(%s) failed\n", __FUNCTION__, __LINE__, #v), false)
 
 #define CHECK_EQ_STR(a, b)                                                                                                         \
-    !strcmp((a), (b)) ? true                                                                                                       \
-                      : fprintf(stderr, "%s:%d: error: CHECK_EQ_STR(\"%s\", \"%s\") failed\n", __FUNCTION__, __LINE__, (a), (b)),  \
-        false
+    !strcmp((a), (b))                                                                                                              \
+        ? true                                                                                                                     \
+        : (fprintf(stderr, "%s:%d: error: CHECK_EQ_STR(\"%s\", \"%s\") failed\n", __FUNCTION__, __LINE__, (a), (b)), false)
 
 static int falseFormatCalled = 0;
 static bool falseFormat(char * buf, uint16_t bufSize, int32_t err)
