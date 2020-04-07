@@ -37,6 +37,7 @@
  * @param iv_length Length of initial vector
  * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
  * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                     size_t aad_length, const unsigned char * key, const unsigned char * iv, size_t iv_length,
@@ -54,6 +55,7 @@ CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plai
  * @param iv Initial vector
  * @param iv_length Length of initial vector
  * @param plaintext Buffer to write plaintext into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
 CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
