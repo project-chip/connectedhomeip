@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 # FIX ME, should be "projectchip" or "zigbee" or something,
 #   (docker.io doesn't allow hyphens)
-ORG=${DOCKER_BUILD_ORG:-rwalkerapple}
+ORG=${DOCKER_BUILD_ORG:-connectedhomeip}
 
 # directory name is
 IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
