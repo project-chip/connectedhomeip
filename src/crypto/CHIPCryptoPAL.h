@@ -59,7 +59,6 @@ CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plai
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-
 CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
                                     size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
                                     const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
