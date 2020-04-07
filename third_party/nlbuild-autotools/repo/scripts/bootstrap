@@ -146,6 +146,58 @@ removetmp() {
     rm -r -f "${BOOTSTRAP_TMPDIR}"
 }
 
+#
+#  try_tool_action <tool executable>
+#
+#  This attempts to run the specified build bootstrap tool, displaying
+#  the tool action to standard output if the verbose flag has been
+#  asserted.
+#
+#  If the tool has failure status or if the verbose flag has been
+#  asserted, any error output from the tool is displayed to standard
+#  error. Likewise, if the tool has failure status, temporary files are
+#  removed and the script exits with that failed status.
+#
+try_tool_action()
+{
+    local action
+    local errors
+    local status
+
+    action="${1}"
+
+    # If the verbose flag is asserted, display to standard output the
+    # tool action that will be run.
+
+    if [[ -n "${verbose}" ]]; then
+        echo "${action}"
+    fi
+
+    # Run the tool, capturing any errors and exit status.
+
+    errors="$(${action} 2>&1)"
+    status="${?}"
+
+    # If there was failed exit status or if the verbose flag is
+    # asserted and if there were errors captured, display them to
+    # standard error.
+
+    if [[ ${status} -ne 0 ]] || [[ -n "${verbose}" ]]; then
+        if [[ -n "${errors}" ]]; then
+            echo "${errors}" >&2
+        fi
+    fi
+
+    # If there was failed exit status, clean up any temporary files
+    # and exit with the failed status.
+
+    if [[ ${status} -ne 0 ]]; then
+        removetmp
+
+        exit ${status}
+    fi
+}
+
 what="all"
 verbose=
 nlbuild_autotools_dir=
@@ -206,10 +258,6 @@ fi
 
 # Establish some key directories
 
-srcdir="$(dirname "${0}")"
-abs_srcdir="$(cd "${srcdir}" && pwd)"
-abs_top_srcdir="${abs_srcdir}"
-
 abs_top_hostdir="${nlbuild_autotools_dir}/tools/host"
 
 # Figure out what sort of build host we are running on, stripping off
@@ -236,6 +284,7 @@ AUTOM4TE="$(command -v autom4te)"
 AUTOMAKE="$(command -v automake)"
 LIBTOOLIZE="$(command -v libtoolize || command -v glibtoolize)"
 M4="$(command -v m4)"
+TRUE="$(command -v true)"
 
 export ACLOCAL
 export AUTOCONF
@@ -318,6 +367,7 @@ if [ -n "${verbose}" ]; then
     echo AUTOMAKE="${AUTOMAKE}"
     echo LIBTOOLIZE="${LIBTOOLIZE}"
     echo M4="${M4}"
+    echo TRUE="${TRUE}"
 
     echo AC_MACRODIR="${AC_MACRODIR}"
     echo AUTOM4TE_CFG="${AUTOM4TE_CFG}"
@@ -345,35 +395,35 @@ case "${what}" in
         ;;
 
     conf*)
-        local_action=true
-        header_action=true
-        tool_action=true
-        make_action=true
+        local_action="${TRUE}"
+        header_action="${TRUE}"
+        tool_action="${TRUE}"
+        make_action="${TRUE}"
         ;;
 
     make*)
-        local_action=true
-        header_action=true
-        config_action=true
+        local_action="${TRUE}"
+        header_action="${TRUE}"
+        config_action="${TRUE}"
         ;;
 
     none)
-        local_action=true
-        header_action=true
-        tool_action=true
-        make_action=true
-        config_action=true
+        local_action="${TRUE}"
+        header_action="${TRUE}"
+        tool_action="${TRUE}"
+        make_action="${TRUE}"
+        config_action="${TRUE}"
         ;;
 
 esac
 
 # Bootstrap the package.
 
-if [ -n "${verbose}" ]; then
-    echo "${local_action} && ${tool_action} && ${header_action} && ${make_action} && ${config_action}"
-fi
-
-${local_action} && ${tool_action} && ${header_action} && ${make_action} && ${config_action}
+try_tool_action "${local_action}"
+try_tool_action "${tool_action}"
+try_tool_action "${header_action}"
+try_tool_action "${make_action}"
+try_tool_action "${config_action}"
 
 # Clean up any temporary files created.
 
