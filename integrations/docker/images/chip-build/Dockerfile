@@ -1,6 +1,8 @@
 # start with Ubuntu 18.04LTS
 FROM ubuntu:bionic
 
+VOLUME "/var/source"
+
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
