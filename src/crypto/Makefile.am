@@ -44,4 +44,6 @@ dist_libChipCrypto_a_HEADERS                                 = \
     CHIPBase+CompilerAbstraction.h                             \
     $(NULL)
 
+$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
+
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
