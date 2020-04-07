@@ -1,3 +1,8 @@
+1.6.23 (2020-04-07)
+
+        * Collapse generate-coverage-report and
+          generate-coverage-report-with-filter into a single function.
+
 1.6.22 (2020-04-07)
 
         * Suppress non-failure diagnostic output from bootstrap tool actions
