@@ -41,22 +41,24 @@ using namespace chip::TLV;
 
 enum
 {
-    TestProfile_1				= 0xAABBCCDD,
-    TestProfile_2				= 0x11223344
+    TestProfile_1 = 0xAABBCCDD,
+    TestProfile_2 = 0x11223344
 };
 
+// clang-format off
 static const char sLargeString [] =
     "START..."
     "!123456789ABCDEF@123456789ABCDEF#123456789ABCDEF$123456789ABCDEF%123456789ABCDEF^123456789ABCDEF&123456789ABCDEF*123456789ABCDEF"
     "01234567(9ABCDEF01234567)9ABCDEF01234567-9ABCDEF01234567=9ABCDEF01234567[9ABCDEF01234567]9ABCDEF01234567;9ABCDEF01234567'9ABCDEF"
     "...END";
+// clang-format on
 
 void Abort()
 {
     abort();
 }
 
-void TestAndOpenContainer(nlTestSuite *inSuite, TLVReader& reader, TLVType type, uint64_t tag, TLVReader& containerReader)
+void TestAndOpenContainer(nlTestSuite * inSuite, TLVReader & reader, TLVType type, uint64_t tag, TLVReader & containerReader)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == type);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
@@ -68,8 +70,8 @@ void TestAndOpenContainer(nlTestSuite *inSuite, TLVReader& reader, TLVType type,
     NL_TEST_ASSERT(inSuite, containerReader.GetContainerType() == type);
 }
 
-template<class T>
-void TestAndEnterContainer(nlTestSuite *inSuite, T& t, TLVType type, uint64_t tag, TLVType& outerContainerType)
+template <class T>
+void TestAndEnterContainer(nlTestSuite * inSuite, T & t, TLVType type, uint64_t tag, TLVType & outerContainerType)
 {
     NL_TEST_ASSERT(inSuite, t.GetType() == type);
     NL_TEST_ASSERT(inSuite, t.GetTag() == tag);
@@ -84,27 +86,27 @@ void TestAndEnterContainer(nlTestSuite *inSuite, T& t, TLVType type, uint64_t ta
     NL_TEST_ASSERT(inSuite, t.GetContainerType() == type);
 }
 
-template<class T>
-void TestNext(nlTestSuite *inSuite, T& t)
+template <class T>
+void TestNext(nlTestSuite * inSuite, T & t)
 {
     CHIP_ERROR err = t.Next();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void TestSkip(nlTestSuite *inSuite, TLVReader& reader)
+void TestSkip(nlTestSuite * inSuite, TLVReader & reader)
 {
     CHIP_ERROR err = reader.Skip();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void TestMove(nlTestSuite *inSuite, TLVUpdater& updater)
+void TestMove(nlTestSuite * inSuite, TLVUpdater & updater)
 {
     CHIP_ERROR err = updater.Move();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-template<class T>
-void TestEnd(nlTestSuite *inSuite, T& t)
+template <class T>
+void TestEnd(nlTestSuite * inSuite, T & t)
 {
     CHIP_ERROR err;
 
@@ -112,7 +114,7 @@ void TestEnd(nlTestSuite *inSuite, T& t)
     NL_TEST_ASSERT(inSuite, err == CHIP_END_OF_TLV);
 }
 
-void TestEndAndCloseContainer(nlTestSuite *inSuite, TLVReader& reader, TLVReader& containerReader)
+void TestEndAndCloseContainer(nlTestSuite * inSuite, TLVReader & reader, TLVReader & containerReader)
 {
     CHIP_ERROR err;
 
@@ -122,8 +124,8 @@ void TestEndAndCloseContainer(nlTestSuite *inSuite, TLVReader& reader, TLVReader
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-template<class T>
-void TestEndAndExitContainer(nlTestSuite *inSuite, T& t, TLVType outerContainerType)
+template <class T>
+void TestEndAndExitContainer(nlTestSuite * inSuite, T & t, TLVType outerContainerType)
 {
     CHIP_ERROR err;
 
@@ -135,8 +137,8 @@ void TestEndAndExitContainer(nlTestSuite *inSuite, T& t, TLVType outerContainerT
     NL_TEST_ASSERT(inSuite, t.GetContainerType() == outerContainerType);
 }
 
-template<class S, class T>
-void TestGet(nlTestSuite *inSuite, S& s, TLVType type, uint64_t tag, T expectedVal)
+template <class S, class T>
+void TestGet(nlTestSuite * inSuite, S & s, TLVType type, uint64_t tag, T expectedVal)
 {
     NL_TEST_ASSERT(inSuite, s.GetType() == type);
     NL_TEST_ASSERT(inSuite, s.GetTag() == tag);
@@ -149,7 +151,8 @@ void TestGet(nlTestSuite *inSuite, S& s, TLVType type, uint64_t tag, T expectedV
     NL_TEST_ASSERT(inSuite, val == expectedVal);
 }
 
-void ForEachElement(nlTestSuite *inSuite, TLVReader& reader, void *context, void (*cb)(nlTestSuite *inSuite, TLVReader& reader, void *context))
+void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
+                    void (*cb)(nlTestSuite * inSuite, TLVReader & reader, void * context))
 {
     CHIP_ERROR err;
 
@@ -188,20 +191,19 @@ void ForEachElement(nlTestSuite *inSuite, TLVReader& reader, void *context, void
 
 struct TestTLVContext
 {
-    nlTestSuite *mSuite;
+    nlTestSuite * mSuite;
     int mEvictionCount;
     int mEvictedBytes;
 };
 
-
-void TestNull(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag)
+void TestNull(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_Null);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == 0);
 }
 
-void TestString(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag, const char *expectedVal)
+void TestString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const char * expectedVal)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_UTF8String);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
@@ -209,7 +211,7 @@ void TestString(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag, const cha
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char *val = (char *)malloc(expectedLen + 1);
+    char * val = (char *) malloc(expectedLen + 1);
 
     CHIP_ERROR err = reader.GetString(val, expectedLen + 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -219,7 +221,7 @@ void TestString(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag, const cha
     free(val);
 }
 
-void TestDupString(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag, const char *expectedVal)
+void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const char * expectedVal)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_UTF8String);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
@@ -227,7 +229,7 @@ void TestDupString(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag, const 
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char *val = (char *)malloc(expectedLen + 1);
+    char * val = (char *) malloc(expectedLen + 1);
 
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -237,14 +239,14 @@ void TestDupString(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag, const 
     free(val);
 }
 
-void TestDupBytes(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag, const uint8_t *expectedVal, uint32_t expectedLen)
+void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const uint8_t * expectedVal, uint32_t expectedLen)
 {
     NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_UTF8String);
     NL_TEST_ASSERT(inSuite, reader.GetTag() == tag);
 
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    uint8_t *val = (uint8_t *)malloc(expectedLen);
+    uint8_t * val  = (uint8_t *) malloc(expectedLen);
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -253,7 +255,7 @@ void TestDupBytes(nlTestSuite *inSuite, TLVReader& reader, uint64_t tag, const u
     free(val);
 }
 
-void TestBufferContents(nlTestSuite *inSuite, PacketBuffer *buf, const uint8_t *expectedVal, uint32_t expectedLen)
+void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t * expectedVal, uint32_t expectedLen)
 {
     while (buf != NULL)
     {
@@ -271,6 +273,7 @@ void TestBufferContents(nlTestSuite *inSuite, PacketBuffer *buf, const uint8_t *
     NL_TEST_ASSERT(inSuite, expectedLen == 0);
 }
 
+// clang-format off
 static const uint8_t Encoding1[] =
 {
     0xD5, 0xBB, 0xAA, 0xDD, 0xCC, 0x01, 0x00, 0xC9, 0xBB, 0xAA, 0xDD, 0xCC, 0x02, 0x00, 0x88, 0x02,
@@ -299,7 +302,9 @@ static const uint8_t Encoding1[] =
     0x8A, 0xFF, 0xFF, 0x33, 0x33, 0x8f, 0x41,
     0xAB, 0x00, 0x00, 0x01, 0x00, 0x66, 0x66, 0x66, 0x66, 0x66, 0xE6, 0x31, 0x40, 0x18
 };
+// clang-format on
 
+// clang-format off
 static const uint8_t Encoding1_DataMacro [] =
 {
     CHIP_TLV_STRUCTURE(CHIP_TLV_TAG_FULLY_QUALIFIED_6Bytes(TestProfile_1, 1)),
@@ -346,8 +351,9 @@ static const uint8_t Encoding1_DataMacro [] =
             0x66, 0x66, 0x66, 0x66, 0x66, 0xE6, 0x31, 0x40), // (double)17.9
     CHIP_TLV_END_OF_CONTAINER
 };
+// clang-format on
 
-void WriteEncoding1(nlTestSuite *inSuite, TLVWriter& writer)
+void WriteEncoding1(nlTestSuite * inSuite, TLVWriter & writer)
 {
     CHIP_ERROR err;
     TLVWriter writer2;
@@ -425,10 +431,10 @@ void WriteEncoding1(nlTestSuite *inSuite, TLVWriter& writer)
     err = writer2.PutString(ProfileTag(TestProfile_1, 5), "This is a test");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer2.Put(ProfileTag(TestProfile_2, 65535), (float)17.9);
+    err = writer2.Put(ProfileTag(TestProfile_2, 65535), (float) 17.9);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer2.Put(ProfileTag(TestProfile_2, 65536), (double)17.9);
+    err = writer2.Put(ProfileTag(TestProfile_2, 65536), (double) 17.9);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.CloseContainer(writer2);
@@ -438,7 +444,7 @@ void WriteEncoding1(nlTestSuite *inSuite, TLVWriter& writer)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void WriteEmptyEncoding(nlTestSuite *inSuite, TLVWriter& writer)
+void WriteEmptyEncoding(nlTestSuite * inSuite, TLVWriter & writer)
 {
     CHIP_ERROR err;
     TLVWriter writer2;
@@ -463,7 +469,7 @@ void WriteEmptyEncoding(nlTestSuite *inSuite, TLVWriter& writer)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void ReadEncoding1(nlTestSuite *inSuite, TLVReader& reader)
+void ReadEncoding1(nlTestSuite * inSuite, TLVReader & reader)
 {
     TestNext<TLVReader>(inSuite, reader);
 
@@ -545,7 +551,8 @@ void ReadEncoding1(nlTestSuite *inSuite, TLVReader& reader)
                 {
                     TLVType outerContainerType;
 
-                    TestAndEnterContainer<TLVReader>(inSuite, reader5, kTLVType_Structure, ProfileTag(TestProfile_2, 4000000000ULL), outerContainerType);
+                    TestAndEnterContainer<TLVReader>(inSuite, reader5, kTLVType_Structure, ProfileTag(TestProfile_2, 4000000000ULL),
+                                                     outerContainerType);
 
                     TestNext<TLVReader>(inSuite, reader5);
 
@@ -566,11 +573,11 @@ void ReadEncoding1(nlTestSuite *inSuite, TLVReader& reader)
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), (float)17.9);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), (float) 17.9);
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536), (double)17.9);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536), (double) 17.9);
 
         TestEndAndCloseContainer(inSuite, reader, reader2);
     }
@@ -578,7 +585,7 @@ void ReadEncoding1(nlTestSuite *inSuite, TLVReader& reader)
     TestEnd<TLVReader>(inSuite, reader);
 }
 
-void WriteEncoding2(nlTestSuite *inSuite, TLVWriter& writer)
+void WriteEncoding2(nlTestSuite * inSuite, TLVWriter & writer)
 {
     CHIP_ERROR err;
 
@@ -618,7 +625,7 @@ void WriteEncoding2(nlTestSuite *inSuite, TLVWriter& writer)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void WriteEncoding3(nlTestSuite *inSuite, TLVWriter& writer)
+void WriteEncoding3(nlTestSuite * inSuite, TLVWriter & writer)
 {
     CHIP_ERROR err;
 
@@ -639,7 +646,7 @@ void WriteEncoding3(nlTestSuite *inSuite, TLVWriter& writer)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void ReadEncoding3(nlTestSuite *inSuite, TLVReader& reader)
+void ReadEncoding3(nlTestSuite * inSuite, TLVReader & reader)
 {
     TLVReader reader2;
 
@@ -651,7 +658,7 @@ void ReadEncoding3(nlTestSuite *inSuite, TLVReader& reader)
 
     TestEndAndCloseContainer(inSuite, reader, reader2);
 }
-
+// clang-format off
 static const uint8_t Encoding5_DataMacro [] =
 {
     CHIP_TLV_STRUCTURE(CHIP_TLV_TAG_FULLY_QUALIFIED_6Bytes(TestProfile_1, 1)),
@@ -676,8 +683,9 @@ static const uint8_t Encoding5_DataMacro [] =
         CHIP_TLV_BOOL(CHIP_TLV_TAG_FULLY_QUALIFIED_6Bytes(TestProfile_1, 2), true),
     CHIP_TLV_END_OF_CONTAINER,
 };
+// clang-format on
 
-void WriteEncoding5(nlTestSuite *inSuite, TLVWriter& writer)
+void WriteEncoding5(nlTestSuite * inSuite, TLVWriter & writer)
 {
     CHIP_ERROR err;
 
@@ -769,7 +777,7 @@ void WriteEncoding5(nlTestSuite *inSuite, TLVWriter& writer)
  * <TestProfile_1, 1, kTLVType_Structure, <TestProfile_1, 2, true> <TestProfile_2, 2, false> >,
  * <TestProfile_2, 1, kTLVType_Structure, <TestProfile_2, 2, false> <TestProfile_1, 2, true> >
  */
-void AppendEncoding2(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint32_t maxLen, uint32_t& updatedLen)
+void AppendEncoding2(nlTestSuite * inSuite, uint8_t * buf, uint32_t dataLen, uint32_t maxLen, uint32_t & updatedLen)
 {
     CHIP_ERROR err;
 
@@ -883,7 +891,8 @@ void AppendEncoding2(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint3
  * <TestProfile_1, 1, kTLVType_Structure, <TestProfile_1, 2, true> <TestProfile_2, 2, false> >,
  * <TestProfile_2, 1, kTLVType_Structure, <TestProfile_2, 2, false> <TestProfile_1, 2, true> >
  */
-void FindAppendEncoding2(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint32_t maxLen, uint32_t& updatedLen, bool findContainer)
+void FindAppendEncoding2(nlTestSuite * inSuite, uint8_t * buf, uint32_t dataLen, uint32_t maxLen, uint32_t & updatedLen,
+                         bool findContainer)
 {
     CHIP_ERROR err;
 
@@ -905,7 +914,8 @@ void FindAppendEncoding2(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, u
         err = tagReader.EnterContainer(outerContainerType);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        do {
+        do
+        {
             err = tagReader.Next();
         } while (err != CHIP_END_OF_TLV);
 
@@ -1002,7 +1012,7 @@ void FindAppendEncoding2(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, u
     updatedLen = updater.GetLengthWritten();
 }
 
-void AppendEncoding3(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint32_t maxLen, uint32_t& updatedLen)
+void AppendEncoding3(nlTestSuite * inSuite, uint8_t * buf, uint32_t dataLen, uint32_t maxLen, uint32_t & updatedLen)
 {
     CHIP_ERROR err;
 
@@ -1041,7 +1051,7 @@ void AppendEncoding3(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint3
     updatedLen = updater.GetLengthWritten();
 }
 
-void AppendEncoding4(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint32_t maxLen, uint32_t& updatedLen)
+void AppendEncoding4(nlTestSuite * inSuite, uint8_t * buf, uint32_t dataLen, uint32_t maxLen, uint32_t & updatedLen)
 {
     CHIP_ERROR err;
 
@@ -1074,7 +1084,7 @@ void AppendEncoding4(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint3
     updatedLen = updater.GetLengthWritten();
 }
 
-void DeleteEncoding5(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint32_t maxLen, uint32_t& updatedLen)
+void DeleteEncoding5(nlTestSuite * inSuite, uint8_t * buf, uint32_t dataLen, uint32_t maxLen, uint32_t & updatedLen)
 {
     CHIP_ERROR err;
 
@@ -1147,7 +1157,7 @@ void DeleteEncoding5(nlTestSuite *inSuite, uint8_t *buf, uint32_t dataLen, uint3
     updatedLen = updater.GetLengthWritten();
 }
 
-void ReadAppendedEncoding2(nlTestSuite *inSuite, TLVReader& reader)
+void ReadAppendedEncoding2(nlTestSuite * inSuite, TLVReader & reader)
 {
     TestNext<TLVReader>(inSuite, reader);
 
@@ -1232,7 +1242,7 @@ void ReadAppendedEncoding2(nlTestSuite *inSuite, TLVReader& reader)
     TestEnd<TLVReader>(inSuite, reader);
 }
 
-void ReadAppendedEncoding3(nlTestSuite *inSuite, TLVReader& reader)
+void ReadAppendedEncoding3(nlTestSuite * inSuite, TLVReader & reader)
 {
     TestNext<TLVReader>(inSuite, reader);
 
@@ -1255,7 +1265,7 @@ void ReadAppendedEncoding3(nlTestSuite *inSuite, TLVReader& reader)
     TestEnd<TLVReader>(inSuite, reader);
 }
 
-void ReadAppendedEncoding4(nlTestSuite *inSuite, TLVReader& reader)
+void ReadAppendedEncoding4(nlTestSuite * inSuite, TLVReader & reader)
 {
     TestNext<TLVReader>(inSuite, reader);
 
@@ -1274,7 +1284,7 @@ void ReadAppendedEncoding4(nlTestSuite *inSuite, TLVReader& reader)
     TestEnd<TLVReader>(inSuite, reader);
 }
 
-void ReadDeletedEncoding5(nlTestSuite *inSuite, TLVReader& reader)
+void ReadDeletedEncoding5(nlTestSuite * inSuite, TLVReader & reader)
 {
     TestNext<TLVReader>(inSuite, reader);
 
@@ -1318,7 +1328,7 @@ void ReadDeletedEncoding5(nlTestSuite *inSuite, TLVReader& reader)
 /**
  *  Test Simple Write and Reader
  */
-void CheckSimpleWriteRead(nlTestSuite *inSuite, void *inContext)
+void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -1350,7 +1360,6 @@ void CheckSimpleWriteRead(nlTestSuite *inSuite, void *inContext)
     ReadEncoding1(inSuite, reader);
 }
 
-
 /**
  *  Log the specified message in the form of @a aFormat.
  *
@@ -1362,7 +1371,7 @@ void CheckSimpleWriteRead(nlTestSuite *inSuite, void *inContext)
  *                           to the format specifiers in @a aFormat.
  *
  */
-void SimpleDumpWriter(const char *aFormat, ...)
+void SimpleDumpWriter(const char * aFormat, ...)
 {
     va_list args;
 
@@ -1376,7 +1385,7 @@ void SimpleDumpWriter(const char *aFormat, ...)
 /**
  *  Test Pretty Printer
  */
-void CheckPrettyPrinter(nlTestSuite *inSuite, void *inContext)
+void CheckPrettyPrinter(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -1400,7 +1409,7 @@ void CheckPrettyPrinter(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test Data Macros
  */
-void CheckDataMacro(nlTestSuite *inSuite, void *inContext)
+void CheckDataMacro(nlTestSuite * inSuite, void * inContext)
 {
     NL_TEST_ASSERT(inSuite, sizeof(Encoding1_DataMacro) == sizeof(Encoding1));
     NL_TEST_ASSERT(inSuite, memcmp(Encoding1, Encoding1_DataMacro, sizeof(Encoding1)) == 0);
@@ -1416,16 +1425,16 @@ void CheckDataMacro(nlTestSuite *inSuite, void *inContext)
     NL_TEST_ASSERT(inSuite, memcmp(buf, Encoding5_DataMacro, encodedLen) == 0);
 }
 
-static CHIP_ERROR NullIterateHandler(const TLVReader &aReader, size_t aDepth, void *aContext)
+static CHIP_ERROR NullIterateHandler(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
-    (void)aReader;
-    (void)aDepth;
-    (void)aContext;
+    (void) aReader;
+    (void) aDepth;
+    (void) aContext;
 
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR FindContainerWithElement(const TLVReader &aReader, size_t aDepth, void *aContext)
+static CHIP_ERROR FindContainerWithElement(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
     TLVReader reader;
     TLVReader result;
@@ -1460,7 +1469,7 @@ exit:
 /**
  *  Test CHIP TLV Utilities
  */
-void CheckCHIPTLVUtilities(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVUtilities(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -1513,19 +1522,19 @@ void CheckCHIPTLVUtilities(nlTestSuite *inSuite, void *inContext)
         // position the reader on the first element
         reader1.Next();
         uint64_t tag = ProfileTag(TestProfile_1, 1);
-        err = chip::TLV::Utilities::Find(reader1, FindContainerWithElement, &tag, tagReader, false);
+        err          = chip::TLV::Utilities::Find(reader1, FindContainerWithElement, &tag, tagReader, false);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_TLV_TAG_NOT_FOUND);
 
         tag = ProfileTag(TestProfile_2, 2);
         err = chip::TLV::Utilities::Find(reader1, FindContainerWithElement, &tag, tagReader, false);
-        NL_TEST_ASSERT(inSuite, err ==  CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, tagReader.GetType() == kTLVType_Structure);
         NL_TEST_ASSERT(inSuite, tagReader.GetTag() == ProfileTag(TestProfile_1, 1));
 
         // Position the reader on the second element
         reader1.Next();
         err = chip::TLV::Utilities::Find(reader1, FindContainerWithElement, &tag, tagReader, false);
-        NL_TEST_ASSERT(inSuite, err ==  CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, tagReader.GetType() == kTLVType_Structure);
         NL_TEST_ASSERT(inSuite, tagReader.GetTag() == ProfileTag(TestProfile_2, 1));
     }
@@ -1553,7 +1562,7 @@ void CheckCHIPTLVUtilities(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test CHIP TLV Empty Find
  */
-void CheckCHIPTLVEmptyFind(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVEmptyFind(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t buf[30];
     TLVWriter writer;
@@ -1576,6 +1585,7 @@ void CheckCHIPTLVEmptyFind(nlTestSuite *inSuite, void *inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+// clang-format off
 uint8_t Encoding2[] =
 {
     // Container 1
@@ -1613,8 +1623,9 @@ uint8_t AppendedEncoding2[] =
         0xC9, 0xBB, 0xAA, 0xDD, 0xCC, 0x02, 0x00,
     0x18
 };
+// clang-format on
 
-void WriteAppendReadTest0(nlTestSuite *inSuite)
+void WriteAppendReadTest0(nlTestSuite * inSuite)
 {
     uint8_t buf[74];
     uint32_t updatedLen;
@@ -1666,7 +1677,7 @@ void WriteAppendReadTest0(nlTestSuite *inSuite)
     ReadAppendedEncoding2(inSuite, reader);
 }
 
-void WriteFindAppendReadTest(nlTestSuite *inSuite, bool findContainer)
+void WriteFindAppendReadTest(nlTestSuite * inSuite, bool findContainer)
 {
     uint8_t buf[74];
     uint32_t updatedLen;
@@ -1718,6 +1729,7 @@ void WriteFindAppendReadTest(nlTestSuite *inSuite, bool findContainer)
     ReadAppendedEncoding2(inSuite, reader);
 }
 
+// clang-format off
 uint8_t Encoding3[] =
 {
     // Container 1
@@ -1734,8 +1746,9 @@ uint8_t AppendedEncoding3[] =
         0x89, 0x02, 0x00,
     0x18
 };
+// clang-format on
 
-void WriteAppendReadTest1(nlTestSuite *inSuite)
+void WriteAppendReadTest1(nlTestSuite * inSuite)
 {
     uint8_t buf[14];
     uint32_t updatedLen;
@@ -1787,6 +1800,7 @@ void WriteAppendReadTest1(nlTestSuite *inSuite)
     ReadAppendedEncoding3(inSuite, reader);
 }
 
+// clang-format off
 uint8_t AppendedEncoding4[] =
 {
     // Container 1
@@ -1794,8 +1808,9 @@ uint8_t AppendedEncoding4[] =
         0x88, 0x02, 0x00,
     0x18,
 };
+// clang-format on
 
-void AppendReadTest(nlTestSuite *inSuite)
+void AppendReadTest(nlTestSuite * inSuite)
 {
     uint8_t buf[11];
     uint32_t updatedLen;
@@ -1837,6 +1852,7 @@ void AppendReadTest(nlTestSuite *inSuite)
     ReadAppendedEncoding4(inSuite, reader);
 }
 
+// clang-format off
 uint8_t Encoding5[] =
 {
     // Container 1
@@ -1874,8 +1890,9 @@ uint8_t DeletedEncoding5[] =
         0xC9, 0xBB, 0xAA, 0xDD, 0xCC, 0x02, 0x00,
     0x18
 };
+// clang-format on
 
-void WriteDeleteReadTest(nlTestSuite *inSuite)
+void WriteDeleteReadTest(nlTestSuite * inSuite)
 {
     uint8_t buf[74];
     uint32_t updatedLen;
@@ -1918,9 +1935,9 @@ void WriteDeleteReadTest(nlTestSuite *inSuite)
 /**
  *  Test Packet Buffer
  */
-void CheckPacketBuffer(nlTestSuite *inSuite, void *inContext)
+void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 {
-    PacketBuffer *buf = PacketBuffer::New(0);
+    PacketBuffer * buf = PacketBuffer::New(0);
     TLVWriter writer;
     TLVReader reader;
 
@@ -1944,9 +1961,9 @@ void CheckPacketBuffer(nlTestSuite *inSuite, void *inContext)
     PacketBuffer::Free(buf);
 }
 
-CHIP_ERROR CountEvictedMembers(CHIPCircularTLVBuffer &inBuffer, void * inAppData, TLVReader &inReader)
+CHIP_ERROR CountEvictedMembers(CHIPCircularTLVBuffer & inBuffer, void * inAppData, TLVReader & inReader)
 {
-    TestTLVContext *context = static_cast<TestTLVContext *>(inAppData);
+    TestTLVContext * context = static_cast<TestTLVContext *>(inAppData);
     CHIP_ERROR err;
 
     // "Process" the first element in the reader
@@ -1962,7 +1979,7 @@ CHIP_ERROR CountEvictedMembers(CHIPCircularTLVBuffer &inBuffer, void * inAppData
     return CHIP_NO_ERROR;
 }
 
-void CheckCircularTLVBufferSimple(nlTestSuite *inSuite, void *inContext)
+void CheckCircularTLVBufferSimple(nlTestSuite * inSuite, void * inContext)
 {
     // Write 40 bytes as 4 separate events into a 30 byte buffer.  On
     // completion of the test, the buffer should contain 2 elements
@@ -1972,16 +1989,16 @@ void CheckCircularTLVBufferSimple(nlTestSuite *inSuite, void *inContext)
     uint8_t backingStore[30];
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    TestTLVContext *context = static_cast<TestTLVContext *>(inContext);
+    TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
     CHIPCircularTLVBuffer buffer(backingStore, 30);
     writer.Init(&buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
-    context->mEvictedBytes = 0;
+    context->mEvictedBytes  = 0;
 
     buffer.mProcessEvictedElement = CountEvictedMembers;
-    buffer.mAppData = inContext;
+    buffer.mAppData               = inContext;
 
     writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
 
@@ -1994,7 +2011,7 @@ void CheckCircularTLVBufferSimple(nlTestSuite *inSuite, void *inContext)
     NL_TEST_ASSERT(inSuite, context->mEvictionCount == 2);
     NL_TEST_ASSERT(inSuite, context->mEvictedBytes == 18);
     NL_TEST_ASSERT(inSuite, buffer.DataLength() == 22);
-    NL_TEST_ASSERT(inSuite, (buffer.DataLength() + context->mEvictedBytes) ==  writer.GetLengthWritten());
+    NL_TEST_ASSERT(inSuite, (buffer.DataLength() + context->mEvictedBytes) == writer.GetLengthWritten());
 
     // At this point the buffer should contain 2 instances of Encoding3.
     reader.Init(&buffer);
@@ -2012,7 +2029,7 @@ void CheckCircularTLVBufferSimple(nlTestSuite *inSuite, void *inContext)
     TestEnd<TLVReader>(inSuite, reader);
 }
 
-void CheckCircularTLVBufferStartMidway(nlTestSuite *inSuite, void *inContext)
+void CheckCircularTLVBufferStartMidway(nlTestSuite * inSuite, void * inContext)
 {
     // Write 40 bytes as 4 separate events into a 30 byte buffer.  On
     // completion of the test, the buffer should contain 2 elements
@@ -2022,16 +2039,16 @@ void CheckCircularTLVBufferStartMidway(nlTestSuite *inSuite, void *inContext)
     uint8_t backingStore[30];
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    TestTLVContext *context = static_cast<TestTLVContext *>(inContext);
+    TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
     CHIPCircularTLVBuffer buffer(backingStore, 30, &(backingStore[15]));
     writer.Init(&buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
-    context->mEvictedBytes = 0;
+    context->mEvictedBytes  = 0;
 
     buffer.mProcessEvictedElement = CountEvictedMembers;
-    buffer.mAppData = inContext;
+    buffer.mAppData               = inContext;
 
     writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
 
@@ -2044,7 +2061,7 @@ void CheckCircularTLVBufferStartMidway(nlTestSuite *inSuite, void *inContext)
     NL_TEST_ASSERT(inSuite, context->mEvictionCount == 2);
     NL_TEST_ASSERT(inSuite, context->mEvictedBytes == 18);
     NL_TEST_ASSERT(inSuite, buffer.DataLength() == 22);
-    NL_TEST_ASSERT(inSuite, (buffer.DataLength() + context->mEvictedBytes) ==  writer.GetLengthWritten());
+    NL_TEST_ASSERT(inSuite, (buffer.DataLength() + context->mEvictedBytes) == writer.GetLengthWritten());
 
     // At this point the buffer should contain 2 instances of Encoding3.
     reader.Init(&buffer);
@@ -2062,7 +2079,7 @@ void CheckCircularTLVBufferStartMidway(nlTestSuite *inSuite, void *inContext)
     TestEnd<TLVReader>(inSuite, reader);
 }
 
-void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite *inSuite, void *inContext)
+void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite * inSuite, void * inContext)
 {
     // Write 95 bytes to the buffer as 9 different TLV elements: 1
     // 7-byte element and 8 11-byte elements.
@@ -2070,7 +2087,7 @@ void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite *inSuite, void *inCo
     // and 7 elements should have been evicted in the last call to
     // WriteEncoding.
 
-    TestTLVContext *context = static_cast<TestTLVContext *>(inContext);
+    TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
     uint8_t backingStore[30];
     CircularTLVWriter writer;
     CircularTLVReader reader;
@@ -2079,10 +2096,10 @@ void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite *inSuite, void *inCo
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
-    context->mEvictedBytes = 0;
+    context->mEvictedBytes  = 0;
 
     buffer.mProcessEvictedElement = CountEvictedMembers;
-    buffer.mAppData = inContext;
+    buffer.mAppData               = inContext;
 
     writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
 
@@ -2103,9 +2120,11 @@ void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite *inSuite, void *inCo
 
     WriteEncoding3(inSuite, writer);
 
-    NL_TEST_ASSERT(inSuite, writer.GetLengthWritten() == (8 * 11 + 7)); // 8 writes of Encoding3 (11 bytes each) and 7 bytes for the initial boolean.
+    NL_TEST_ASSERT(inSuite,
+                   writer.GetLengthWritten() ==
+                       (8 * 11 + 7)); // 8 writes of Encoding3 (11 bytes each) and 7 bytes for the initial boolean.
     NL_TEST_ASSERT(inSuite, buffer.DataLength() == 22);
-    NL_TEST_ASSERT(inSuite, (buffer.DataLength() + context->mEvictedBytes) ==  writer.GetLengthWritten());
+    NL_TEST_ASSERT(inSuite, (buffer.DataLength() + context->mEvictedBytes) == writer.GetLengthWritten());
     NL_TEST_ASSERT(inSuite, context->mEvictionCount == 7);
 
     // At this point the buffer should contain 2 instances of Encoding3.
@@ -2124,9 +2143,9 @@ void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite *inSuite, void *inCo
     TestEnd<TLVReader>(inSuite, reader);
 }
 
-void CheckCircularTLVBufferEdge(nlTestSuite *inSuite, void *inContext)
+void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
 {
-    TestTLVContext *context = static_cast<TestTLVContext *>(inContext);
+    TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
     CHIP_ERROR err;
     uint8_t backingStore[7];
     uint8_t backingStore1[14];
@@ -2140,10 +2159,10 @@ void CheckCircularTLVBufferEdge(nlTestSuite *inSuite, void *inContext)
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
-    context->mEvictedBytes = 0;
+    context->mEvictedBytes  = 0;
 
     buffer.mProcessEvictedElement = CountEvictedMembers;
-    buffer.mAppData = inContext;
+    buffer.mAppData               = inContext;
 
     // Test eviction for an element that fits in the underlying buffer exactly
     err = writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
@@ -2202,15 +2221,14 @@ void CheckCircularTLVBufferEdge(nlTestSuite *inSuite, void *inContext)
         TestEnd<TLVReader>(inSuite, reader);
     }
 
-
     writer.Init(&buffer1);
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
-    context->mEvictedBytes = 0;
+    context->mEvictedBytes  = 0;
 
     buffer1.mProcessEvictedElement = CountEvictedMembers;
-    buffer1.mAppData = inContext;
+    buffer1.mAppData               = inContext;
 
     // Two elements fit in the buffer exactly
     err = writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
@@ -2280,9 +2298,8 @@ void CheckCircularTLVBufferEdge(nlTestSuite *inSuite, void *inContext)
     reader.ImplicitProfileId = TestProfile_2;
 
     TestEnd<TLVReader>(inSuite, reader);
-
 }
-void CheckCHIPTLVPutStringF(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 24;
     char strBuffer[bufsize];
@@ -2290,7 +2307,7 @@ void CheckCHIPTLVPutStringF(nlTestSuite *inSuite, void *inContext)
     uint8_t backingStore[bufsize];
     TLVWriter writer;
     TLVReader reader;
-    size_t num = 1;
+    size_t num     = 1;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     writer.Init(backingStore, bufsize);
@@ -2312,7 +2329,7 @@ void CheckCHIPTLVPutStringF(nlTestSuite *inSuite, void *inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
 }
 
-void CheckCHIPTLVPutStringFCircular(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40;
     char strBuffer[bufsize];
@@ -2321,7 +2338,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite *inSuite, void *inContext)
     CircularTLVWriter writer;
     CircularTLVReader reader;
     CHIPCircularTLVBuffer buffer(backingStore, bufsize);
-    size_t num = 1;
+    size_t num     = 1;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Initial test: Verify that a straight printf works as expected into continuous buffer.
@@ -2343,7 +2360,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite *inSuite, void *inContext)
 
     reader.Init(&buffer);
 
-    //Skip over the initial element
+    // Skip over the initial element
     err = reader.Next();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -2377,7 +2394,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite *inSuite, void *inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
 }
 
-void CheckCHIPTLVSkipCircular(nlTestSuite *inSuite, void * inContext)
+void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40; // large enough s.t. 2 elements fit, 3rd causes eviction
     uint8_t backingStore[bufsize];
@@ -2412,30 +2429,29 @@ void CheckCHIPTLVSkipCircular(nlTestSuite *inSuite, void * inContext)
 
     err = reader.Skip(); // // Test that the buf ptr is handled correctly within the ReadData() function.
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
 }
 
 /**
  *  Test Buffer Overflow
  */
-void CheckBufferOverflow(nlTestSuite *inSuite, void *inContext)
+void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
 {
     TLVWriter writer;
     TLVReader reader;
 
-    PacketBuffer *buf = PacketBuffer::New(0);
+    PacketBuffer * buf  = PacketBuffer::New(0);
     uint16_t maxDataLen = buf->MaxDataLength();
-    uint16_t reserve = (sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0;
+    uint16_t reserve    = (sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0;
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
     // and larger amounts of space in the first buffer to force the encoding/decoding to overlap the
     // end of the buffer and the beginning of the next.
-    for ( ; reserve < maxDataLen; reserve++)
+    for (; reserve < maxDataLen; reserve++)
     {
         buf->SetStart(buf->Start() + reserve);
 
         writer.Init(buf);
-        writer.GetNewBuffer = TLVWriter::GetNewPacketBuffer;
+        writer.GetNewBuffer      = TLVWriter::GetNewPacketBuffer;
         writer.ImplicitProfileId = TestProfile_2;
 
         WriteEncoding1(inSuite, writer);
@@ -2463,6 +2479,7 @@ void CheckBufferOverflow(nlTestSuite *inSuite, void *inContext)
  * The issue has been spotted on debug builds.
  *
  */
+// clang-format off
 static const uint8_t sIdentifyResponseBuf[] =
 {
     0xD5, 0x00, 0x00, 0x0E, 0x00, 0x01, 0x00, 0x25,
@@ -2473,13 +2490,14 @@ static const uint8_t sIdentifyResponseBuf[] =
     0x2C, 0x09, 0x06, 0x31, 0x2E, 0x34, 0x72, 0x63,
     0x35, 0x24, 0x0C, 0x01, 0x18,
 };
+// clang-format on
 
 static const uint32_t kIdentifyResponseLen = 53;
 
-void CheckStrictAliasing(nlTestSuite *inSuite, void *inContext)
+void CheckStrictAliasing(nlTestSuite * inSuite, void * inContext)
 {
     const uint32_t kProfile_Id = 0x0000000e;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err             = CHIP_NO_ERROR;
     TLVReader reader;
 
     reader.Init(sIdentifyResponseBuf, kIdentifyResponseLen);
@@ -2494,7 +2512,7 @@ void CheckStrictAliasing(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test CHIP TLV Writer Copy Container
  */
-void TestCHIPTLVWriterCopyContainer(nlTestSuite *inSuite)
+void TestCHIPTLVWriterCopyContainer(nlTestSuite * inSuite)
 {
     uint8_t buf[2048];
 
@@ -2534,21 +2552,23 @@ void TestCHIPTLVWriterCopyContainer(nlTestSuite *inSuite)
 
         int memcmpRes = memcmp(buf, Encoding1, encodedLen);
         NL_TEST_ASSERT(inSuite, memcmpRes == 0);
-
     }
 }
 
 /**
  *  Test CHIP TLV Writer Copy Element
  */
-void TestCHIPTLVWriterCopyElement(nlTestSuite *inSuite)
+void TestCHIPTLVWriterCopyElement(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
     uint8_t expectedBuf[2048], testBuf[2048];
     uint32_t expectedLen, testLen;
     TLVWriter writer;
     TLVType outerContainerType;
-    enum { kRepeatCount = 3 };
+    enum
+    {
+        kRepeatCount = 3
+    };
 
     writer.Init(expectedBuf, sizeof(expectedBuf));
     writer.ImplicitProfileId = TestProfile_2;
@@ -2567,7 +2587,7 @@ void TestCHIPTLVWriterCopyElement(nlTestSuite *inSuite)
     err = writer.Finalize();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    expectedLen= writer.GetLengthWritten();
+    expectedLen = writer.GetLengthWritten();
 
     writer.Init(testBuf, sizeof(testBuf));
     writer.ImplicitProfileId = TestProfile_2;
@@ -2602,7 +2622,7 @@ void TestCHIPTLVWriterCopyElement(nlTestSuite *inSuite)
     NL_TEST_ASSERT(inSuite, memcmpRes == 0);
 }
 
-void PreserveSizeWrite(nlTestSuite *inSuite, TLVWriter& writer, bool preserveSize)
+void PreserveSizeWrite(nlTestSuite * inSuite, TLVWriter & writer, bool preserveSize)
 {
     CHIP_ERROR err;
     TLVWriter writer2;
@@ -2674,7 +2694,7 @@ void PreserveSizeWrite(nlTestSuite *inSuite, TLVWriter& writer, bool preserveSiz
 /**
  *  Test CHIP TLV Writer with Preserve Size
  */
-void TestCHIPTLVWriterPreserveSize(nlTestSuite *inSuite)
+void TestCHIPTLVWriterPreserveSize(nlTestSuite * inSuite)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -2691,7 +2711,7 @@ void TestCHIPTLVWriterPreserveSize(nlTestSuite *inSuite)
 /**
  *  Test error handling of CHIP TLV Writer
  */
-void TestCHIPTLVWriterErrorHandling(nlTestSuite *inSuite)
+void TestCHIPTLVWriterErrorHandling(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
     uint8_t buf[2048];
@@ -2726,20 +2746,21 @@ void TestCHIPTLVWriterErrorHandling(nlTestSuite *inSuite)
 
     // EndContainer()
     outerContainerType = kTLVType_Boolean;
-    err = writer.EndContainer(outerContainerType);
+    err                = writer.EndContainer(outerContainerType);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // PutPreEncodedContainer()
     TLVReader reader;
     reader.Init(buf, 2048);
-    err = writer.PutPreEncodedContainer(ProfileTag(TestProfile_2, 4000000000ULL), kTLVType_Boolean, reader.GetReadPoint(), reader.GetRemainingLength());
+    err = writer.PutPreEncodedContainer(ProfileTag(TestProfile_2, 4000000000ULL), kTLVType_Boolean, reader.GetReadPoint(),
+                                        reader.GetRemainingLength());
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 /**
  *  Test CHIP TLV Writer
  */
-void CheckCHIPTLVWriter(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVWriter(nlTestSuite * inSuite, void * inContext)
 {
     TestCHIPTLVWriterCopyContainer(inSuite);
 
@@ -2750,11 +2771,11 @@ void CheckCHIPTLVWriter(nlTestSuite *inSuite, void *inContext)
     TestCHIPTLVWriterErrorHandling(inSuite);
 }
 
-void SkipNonContainer(nlTestSuite *inSuite)
+void SkipNonContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
-    const uint8_t *readpoint1 = NULL;
-    const uint8_t *readpoint2 = NULL;
+    const uint8_t * readpoint1 = NULL;
+    const uint8_t * readpoint2 = NULL;
 
     reader.Init(Encoding1, sizeof(Encoding1));
     reader.ImplicitProfileId = TestProfile_2;
@@ -2771,11 +2792,11 @@ void SkipNonContainer(nlTestSuite *inSuite)
     NL_TEST_ASSERT(inSuite, readpoint1 == readpoint2);
 }
 
-void SkipContainer(nlTestSuite *inSuite)
+void SkipContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
-    const uint8_t *readpoint1 = NULL;
-    const uint8_t *readpoint2 = NULL;
+    const uint8_t * readpoint1 = NULL;
+    const uint8_t * readpoint2 = NULL;
 
     reader.Init(Encoding1, sizeof(Encoding1));
     reader.ImplicitProfileId = TestProfile_2;
@@ -2794,7 +2815,7 @@ void SkipContainer(nlTestSuite *inSuite)
     NL_TEST_ASSERT(inSuite, readpoint1 == readpoint2);
 }
 
-void NextContainer(nlTestSuite *inSuite)
+void NextContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
@@ -2810,7 +2831,7 @@ void NextContainer(nlTestSuite *inSuite)
 /**
  *  Test CHIP TLV Reader Skip functions
  */
-void TestCHIPTLVReaderSkip(nlTestSuite *inSuite)
+void TestCHIPTLVReaderSkip(nlTestSuite * inSuite)
 {
     SkipNonContainer(inSuite);
 
@@ -2822,7 +2843,7 @@ void TestCHIPTLVReaderSkip(nlTestSuite *inSuite)
 /**
  *  Test CHIP TLV Reader Dup functions
  */
-void TestCHIPTLVReaderDup(nlTestSuite *inSuite)
+void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
@@ -2907,7 +2928,8 @@ void TestCHIPTLVReaderDup(nlTestSuite *inSuite)
                 {
                     TLVType outerContainerType;
 
-                    TestAndEnterContainer<TLVReader>(inSuite, reader5, kTLVType_Structure, ProfileTag(TestProfile_2, 4000000000ULL), outerContainerType);
+                    TestAndEnterContainer<TLVReader>(inSuite, reader5, kTLVType_Structure, ProfileTag(TestProfile_2, 4000000000ULL),
+                                                     outerContainerType);
 
                     TestNext<TLVReader>(inSuite, reader5);
 
@@ -2924,15 +2946,15 @@ void TestCHIPTLVReaderDup(nlTestSuite *inSuite)
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestDupBytes(inSuite, reader2, ProfileTag(TestProfile_1, 5), (uint8_t *)("This is a test"), 14);
+        TestDupBytes(inSuite, reader2, ProfileTag(TestProfile_1, 5), (uint8_t *) ("This is a test"), 14);
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), (float)17.9);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), (float) 17.9);
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536), (double)17.9);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536), (double) 17.9);
 
         TestEndAndCloseContainer(inSuite, reader, reader2);
     }
@@ -2942,7 +2964,7 @@ void TestCHIPTLVReaderDup(nlTestSuite *inSuite)
 /**
  *  Test error handling of CHIP TLV Reader
  */
-void TestCHIPTLVReaderErrorHandling(nlTestSuite *inSuite)
+void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
     uint8_t buf[2048];
@@ -2987,25 +3009,25 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite *inSuite)
 
     // EnterContainer()
     TLVType outerContainerType = kTLVType_Boolean;
-    err = reader.EnterContainer(outerContainerType);
+    err                        = reader.EnterContainer(outerContainerType);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // DupString()
-    char *str = (char *)malloc(16);
-    err = reader.DupString(str);
+    char * str = (char *) malloc(16);
+    err        = reader.DupString(str);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
     free(str);
 
     // GetDataPtr()
-    const uint8_t *data = (uint8_t *)malloc(16);
-    err = reader.GetDataPtr(data);
+    const uint8_t * data = (uint8_t *) malloc(16);
+    err                  = reader.GetDataPtr(data);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
-    free((void *)data);
+    free((void *) data);
 }
 /**
  *  Test CHIP TLV Reader in a use case
  */
-void TestCHIPTLVReaderInPractice(nlTestSuite *inSuite)
+void TestCHIPTLVReaderInPractice(nlTestSuite * inSuite)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -3020,7 +3042,8 @@ void TestCHIPTLVReaderInPractice(nlTestSuite *inSuite)
 
     TestNext<TLVReader>(inSuite, reader);
 
-    TestGet<TLVReader, int64_t>(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL), (int64_t) 40000000000ULL);
+    TestGet<TLVReader, int64_t>(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL),
+                                (int64_t) 40000000000ULL);
 
     TestNext<TLVReader>(inSuite, reader);
 
@@ -3028,10 +3051,11 @@ void TestCHIPTLVReaderInPractice(nlTestSuite *inSuite)
 
     TestNext<TLVReader>(inSuite, reader);
 
-    TestGet<TLVReader, double>(inSuite, reader, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_1, 4000000000ULL), (float) 1.0);
+    TestGet<TLVReader, double>(inSuite, reader, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_1, 4000000000ULL),
+                               (float) 1.0);
 }
 
-void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite *inSuite, TLVReader& reader, void *context)
+void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
 {
     CHIP_ERROR err, nextRes1, nextRes2;
     TLVType outerContainerType;
@@ -3066,7 +3090,7 @@ void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite *inSuite, TL
 /**
  * Test using CHIP TLV Reader Next() method to skip over containers.
  */
-void TestCHIPTLVReader_NextOverContainer(nlTestSuite *inSuite)
+void TestCHIPTLVReader_NextOverContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
@@ -3076,7 +3100,7 @@ void TestCHIPTLVReader_NextOverContainer(nlTestSuite *inSuite)
     ForEachElement(inSuite, reader, NULL, TestCHIPTLVReader_NextOverContainer_ProcessElement);
 }
 
-void TestCHIPTLVReader_SkipOverContainer_ProcessElement(nlTestSuite *inSuite, TLVReader& reader, void *context)
+void TestCHIPTLVReader_SkipOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
 {
     CHIP_ERROR err;
     TLVType outerContainerType;
@@ -3108,7 +3132,7 @@ void TestCHIPTLVReader_SkipOverContainer_ProcessElement(nlTestSuite *inSuite, TL
 /**
  * Test using CHIP TLV Reader Skip() method to skip over containers.
  */
-void TestCHIPTLVReader_SkipOverContainer(nlTestSuite *inSuite)
+void TestCHIPTLVReader_SkipOverContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
@@ -3121,7 +3145,7 @@ void TestCHIPTLVReader_SkipOverContainer(nlTestSuite *inSuite)
 /**
  *  Test CHIP TLV Reader
  */
-void CheckCHIPTLVReader(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVReader(nlTestSuite * inSuite, void * inContext)
 {
     TestCHIPTLVReaderSkip(inSuite);
 
@@ -3139,7 +3163,7 @@ void CheckCHIPTLVReader(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test CHIP TLV Items
  */
-static void TestItems(nlTestSuite *inSuite, void *inContext)
+static void TestItems(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -3226,7 +3250,7 @@ static void TestItems(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test CHIP TLV Containers
  */
-static void TestContainers(nlTestSuite *inSuite, void *inContext)
+static void TestContainers(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVWriter writer;
@@ -3260,7 +3284,7 @@ static void TestContainers(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test CHIP TLV Basics
  */
-static void CheckCHIPTLVBasics(nlTestSuite *inSuite, void *inContext)
+static void CheckCHIPTLVBasics(nlTestSuite * inSuite, void * inContext)
 {
     TestItems(inSuite, inContext);
     TestContainers(inSuite, inContext);
@@ -3269,7 +3293,7 @@ static void CheckCHIPTLVBasics(nlTestSuite *inSuite, void *inContext)
 /**
  *  Test CHIP TLV Updater
  */
-static void CheckCHIPUpdater(nlTestSuite *inSuite, void *inContext)
+static void CheckCHIPUpdater(nlTestSuite * inSuite, void * inContext)
 {
     WriteAppendReadTest0(inSuite);
 
@@ -3277,7 +3301,7 @@ static void CheckCHIPUpdater(nlTestSuite *inSuite, void *inContext)
 
     WriteFindAppendReadTest(inSuite, false); // Find an element
 
-    WriteFindAppendReadTest(inSuite, true);  // Find a container
+    WriteFindAppendReadTest(inSuite, true); // Find a container
 
     AppendReadTest(inSuite);
 
@@ -3291,16 +3315,16 @@ static void CheckCHIPUpdater(nlTestSuite *inSuite, void *inContext)
 class OptimisticTLVWriter : public TLVWriter
 {
 public:
-    void Init(uint8_t *buf, uint32_t maxLen);
+    void Init(uint8_t * buf, uint32_t maxLen);
 };
 
-void OptimisticTLVWriter::Init(uint8_t *buf, uint32_t maxLen)
+void OptimisticTLVWriter::Init(uint8_t * buf, uint32_t maxLen)
 {
     TLVWriter::Init(buf, maxLen);
     SetCloseContainerReserved(false);
 }
 
-static void CheckCloseContainerReserve(nlTestSuite *inSuite, void *inContext)
+static void CheckCloseContainerReserve(nlTestSuite * inSuite, void * inContext)
 {
     // We are writing the structure looking like:
     //
@@ -3485,25 +3509,27 @@ static void CheckCloseContainerReserve(nlTestSuite *inSuite, void *inContext)
     }
 }
 
-static CHIP_ERROR ReadFuzzedEncoding1(nlTestSuite *inSuite, TLVReader& reader)
+static CHIP_ERROR ReadFuzzedEncoding1(nlTestSuite * inSuite, TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#define FUZZ_CHECK_VAL(TYPE, VAL)                                       \
-    do {                                                                \
-        TYPE val;                                                       \
-        err = reader.Get(val);                                          \
-        SuccessOrExit(err);                                             \
-        VerifyOrExit(val == (VAL), err = CHIP_ERROR_INVALID_ARGUMENT); \
+#define FUZZ_CHECK_VAL(TYPE, VAL)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        TYPE val;                                                                                                                  \
+        err = reader.Get(val);                                                                                                     \
+        SuccessOrExit(err);                                                                                                        \
+        VerifyOrExit(val == (VAL), err = CHIP_ERROR_INVALID_ARGUMENT);                                                             \
     } while (0)
 
-#define FUZZ_CHECK_STRING(VAL)                                                              \
-    do {                                                                                    \
-        char buf[sizeof(VAL)];                                                              \
-        VerifyOrExit(reader.GetLength() == strlen(VAL), err = CHIP_ERROR_INVALID_ADDRESS); \
-        err = reader.GetString(buf, sizeof(buf));                                           \
-        SuccessOrExit(err);                                                                 \
-        VerifyOrExit(strcmp(buf, (VAL)) == 0, err = CHIP_ERROR_INVALID_ADDRESS);           \
+#define FUZZ_CHECK_STRING(VAL)                                                                                                     \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        char buf[sizeof(VAL)];                                                                                                     \
+        VerifyOrExit(reader.GetLength() == strlen(VAL), err = CHIP_ERROR_INVALID_ADDRESS);                                         \
+        err = reader.GetString(buf, sizeof(buf));                                                                                  \
+        SuccessOrExit(err);                                                                                                        \
+        VerifyOrExit(strcmp(buf, (VAL)) == 0, err = CHIP_ERROR_INVALID_ADDRESS);                                                   \
     } while (0)
 
     err = reader.Next(kTLVType_Structure, ProfileTag(TestProfile_1, 1));
@@ -3628,12 +3654,12 @@ static CHIP_ERROR ReadFuzzedEncoding1(nlTestSuite *inSuite, TLVReader& reader)
         err = reader.Next(kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535));
         SuccessOrExit(err);
 
-        FUZZ_CHECK_VAL(double, (float)17.9);
+        FUZZ_CHECK_VAL(double, (float) 17.9);
 
         err = reader.Next(kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536));
         SuccessOrExit(err);
 
-        FUZZ_CHECK_VAL(double, (double)17.9);
+        FUZZ_CHECK_VAL(double, (double) 17.9);
 
         err = reader.ExitContainer(outerContainer1Type);
         SuccessOrExit(err);
@@ -3648,9 +3674,9 @@ exit:
 }
 
 static uint32_t sFuzzTestDurationSecs = 5;
-static uint8_t  sFixedFuzzMask = 0;
+static uint8_t sFixedFuzzMask         = 0;
 
-static void TLVReaderFuzzTest(nlTestSuite *inSuite, void *inContext)
+static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
 {
     time_t now, endTime;
     uint8_t fuzzedData[sizeof(Encoding1)];
@@ -3719,8 +3745,8 @@ static void TLVReaderFuzzTest(nlTestSuite *inSuite, void *inContext)
 
             if (readRes == CHIP_NO_ERROR)
             {
-                printf("Unexpected success of fuzz test: offset %u, original value 0x%02X, mutated value 0x%02X\n",
-                       (unsigned)i, (unsigned)origVal, (unsigned)fuzzedData[i]);
+                printf("Unexpected success of fuzz test: offset %u, original value 0x%02X, mutated value 0x%02X\n", (unsigned) i,
+                       (unsigned) origVal, (unsigned) fuzzedData[i]);
                 ExitNow();
             }
 
@@ -3731,7 +3757,7 @@ static void TLVReaderFuzzTest(nlTestSuite *inSuite, void *inContext)
             fuzzedData[i] = origVal;
         }
 
-       if (m < sizeof(sFixedFuzzVals))
+        if (m < sizeof(sFixedFuzzVals))
             m++;
     }
 
@@ -3776,7 +3802,7 @@ static const nlTest sTests[] =
 /**
  *  Main
  */
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
     // clang-format off
     nlTestSuite theSuite =

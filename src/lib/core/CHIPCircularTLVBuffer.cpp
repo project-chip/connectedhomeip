@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -51,17 +52,18 @@ using namespace chip::Encoding;
  *
  * @param[in] inBufferLength Length, in bytes, of the backing store
  *
- * @param[in] inHead         Initial point for the head.  The @a inHead pointer is must fall within the backing store for the circular buffer, i.e. within @a inBuffer and &(@a inBuffer[@a inBufferLength])
+ * @param[in] inHead         Initial point for the head.  The @a inHead pointer is must fall within the backing store for the
+ * circular buffer, i.e. within @a inBuffer and &(@a inBuffer[@a inBufferLength])
  */
-CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t *inBuffer, size_t inBufferLength, uint8_t *inHead)
+CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBufferLength, uint8_t * inHead)
 {
-    mQueue = inBuffer;
-    mQueueSize = inBufferLength;
+    mQueue       = inBuffer;
+    mQueueSize   = inBufferLength;
     mQueueLength = 0;
-    mQueueHead = inHead;
+    mQueueHead   = inHead;
 
     mProcessEvictedElement = NULL;
-    mAppData = NULL;
+    mAppData               = NULL;
 
     // use common as opposed to unspecified, s.t. the reader that
     // skips over the elements does not complain about implicit
@@ -77,22 +79,21 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t *inBuffer, size_t inBufferL
  *
  * @param[in] inBufferLength Length, in bytes, of the backing store
  */
-CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t *inBuffer, size_t inBufferLength)
+CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBufferLength)
 {
-    mQueue = inBuffer;
-    mQueueSize = inBufferLength;
+    mQueue       = inBuffer;
+    mQueueSize   = inBufferLength;
     mQueueLength = 0;
-    mQueueHead = mQueue;
+    mQueueHead   = mQueue;
 
     mProcessEvictedElement = NULL;
-    mAppData = NULL;
+    mAppData               = NULL;
 
     // use common as opposed to unspecified, s.t. the reader that
     // skips over the elements does not complain about implicit
     // profile tags.
     mImplicitProfileId = kCommonProfileId;
 }
-
 
 /**
  * @brief
@@ -115,7 +116,7 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t *inBuffer, size_t inBufferL
 CHIP_ERROR CHIPCircularTLVBuffer::EvictHead(void)
 {
     CircularTLVReader reader;
-    uint8_t *newHead;
+    uint8_t * newHead;
     size_t newLen;
     CHIP_ERROR err;
 
@@ -149,7 +150,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::EvictHead(void)
 
     // update queue state
     mQueueLength = newLen;
-    mQueueHead = newHead;
+    mQueueHead   = newHead;
 
 exit:
     return err;
@@ -173,12 +174,13 @@ exit:
  *                         top-level TLV element.
  */
 
-CHIP_ERROR CHIPCircularTLVBuffer::GetNewBuffer(TLVWriter& ioWriter, uint8_t *& outBufStart, uint32_t& outBufLen)
+CHIP_ERROR CHIPCircularTLVBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& outBufStart, uint32_t & outBufLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t * tail = QueueTail();
 
-    if (mQueueLength >= mQueueSize) {
+    if (mQueueLength >= mQueueSize)
+    {
         // Queue is out of space, need to evict an element
         err = EvictHead();
         SuccessOrExit(err);
@@ -200,7 +202,6 @@ exit:
     return err;
 }
 
-
 /**
  * @brief
  *   FinalizeBuffer adjust the `CHIPCircularTLVBuffer` state on
@@ -218,7 +219,7 @@ exit:
  * @retval #CHIP_NO_ERROR Unconditionally.
  */
 
-CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBuffer(TLVWriter& ioWriter, uint8_t *inBufStart, uint32_t inBufLen)
+CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBuffer(TLVWriter & ioWriter, uint8_t * inBufStart, uint32_t inBufLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t * tail = inBufStart + inBufLen;
@@ -235,7 +236,6 @@ CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBuffer(TLVWriter& ioWriter, uint8_t *i
     }
     return err;
 }
-
 
 /**
  * @brief
@@ -258,11 +258,11 @@ CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBuffer(TLVWriter& ioWriter, uint8_t *i
  *
  * @retval #CHIP_NO_ERROR    Succeeds unconditionally.
  */
-CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader& ioReader, const uint8_t *& outBufStart, uint32_t & outBufLen)
+CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader & ioReader, const uint8_t *& outBufStart, uint32_t & outBufLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t * tail = QueueTail();
-    const uint8_t *readerStart = outBufStart;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    uint8_t * tail              = QueueTail();
+    const uint8_t * readerStart = outBufStart;
 
     if (readerStart == NULL)
     {
@@ -282,7 +282,6 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader& ioReader, const uint8
         outBufLen = 0;
         return err;
     }
-
 
     if ((mQueueLength != 0) && (tail <= outBufStart))
     {
@@ -304,7 +303,6 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader& ioReader, const uint8
     return err;
 }
 
-
 /**
  * @brief
  *   A trampoline to fetch more space for the TLVWriter.
@@ -322,10 +320,11 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader& ioReader, const uint8
  * @retval other           If the function was unable to elide a complete
  *                         top-level TLV element.
  */
-CHIP_ERROR CHIPCircularTLVBuffer::GetNewBufferFunct(TLVWriter& ioWriter, uintptr_t& inBufHandle, uint8_t *&outBufStart, uint32_t& outBufLen)
+CHIP_ERROR CHIPCircularTLVBuffer::GetNewBufferFunct(TLVWriter & ioWriter, uintptr_t & inBufHandle, uint8_t *& outBufStart,
+                                                    uint32_t & outBufLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CHIPCircularTLVBuffer *buf;
+    CHIPCircularTLVBuffer * buf;
 
     VerifyOrExit(inBufHandle != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -336,7 +335,6 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNewBufferFunct(TLVWriter& ioWriter, uintptr
 exit:
     return err;
 }
-
 
 /**
  * @brief
@@ -354,10 +352,11 @@ exit:
  *
  * @retval #CHIP_NO_ERROR Unconditionally.
  */
-CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBufferFunct(TLVWriter& ioWriter, uintptr_t inBufHandle, uint8_t *inBufStart, uint32_t inBufLen)
+CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBufferFunct(TLVWriter & ioWriter, uintptr_t inBufHandle, uint8_t * inBufStart,
+                                                      uint32_t inBufLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CHIPCircularTLVBuffer *buf;
+    CHIPCircularTLVBuffer * buf;
 
     VerifyOrExit(inBufHandle != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -368,7 +367,6 @@ CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBufferFunct(TLVWriter& ioWriter, uintp
 exit:
     return err;
 }
-
 
 /**
  * @brief
@@ -387,10 +385,11 @@ exit:
  *
  * @retval #CHIP_NO_ERROR    Succeeds unconditionally.
  */
-CHIP_ERROR CHIPCircularTLVBuffer::GetNextBufferFunct(TLVReader& ioReader, uintptr_t &inBufHandle, const uint8_t *&outBufStart, uint32_t &outBufLen)
+CHIP_ERROR CHIPCircularTLVBuffer::GetNextBufferFunct(TLVReader & ioReader, uintptr_t & inBufHandle, const uint8_t *& outBufStart,
+                                                     uint32_t & outBufLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CHIPCircularTLVBuffer *buf;
+    CHIPCircularTLVBuffer * buf;
 
     VerifyOrExit(inBufHandle != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -417,18 +416,18 @@ exit:
  * @param[in]    buf   A pointer to a fully initialized CHIPCircularTLVBuffer
  *
  */
-void CircularTLVWriter::Init(CHIPCircularTLVBuffer *buf)
+void CircularTLVWriter::Init(CHIPCircularTLVBuffer * buf)
 {
-    mBufHandle = (uintptr_t) buf;
-    mLenWritten = 0;
-    mMaxLen = UINT32_MAX;
+    mBufHandle     = (uintptr_t) buf;
+    mLenWritten    = 0;
+    mMaxLen        = UINT32_MAX;
     mContainerType = kTLVType_NotSpecified;
     SetContainerOpen(false);
     SetCloseContainerReserved(false);
 
     ImplicitProfileId = kProfileIdNotSpecified;
-    GetNewBuffer = CHIPCircularTLVBuffer::GetNewBufferFunct;
-    FinalizeBuffer = CHIPCircularTLVBuffer::FinalizeBufferFunct;
+    GetNewBuffer      = CHIPCircularTLVBuffer::GetNewBufferFunct;
+    FinalizeBuffer    = CHIPCircularTLVBuffer::FinalizeBufferFunct;
 
     GetNewBuffer(*this, mBufHandle, mBufStart, mRemainingLen);
     mWritePoint = mBufStart;
@@ -446,24 +445,24 @@ void CircularTLVWriter::Init(CHIPCircularTLVBuffer *buf)
  * @param[in]    buf   A pointer to a fully initialized CHIPCircularTLVBuffer
  *
  */
-void CircularTLVReader::Init(CHIPCircularTLVBuffer *buf)
+void CircularTLVReader::Init(CHIPCircularTLVBuffer * buf)
 {
     uint32_t bufLen = 0;
 
-    mBufHandle = (uintptr_t) buf;
+    mBufHandle    = (uintptr_t) buf;
     GetNextBuffer = CHIPCircularTLVBuffer::GetNextBufferFunct;
-    mLenRead = 0;
-    mReadPoint = NULL;
+    mLenRead      = 0;
+    mReadPoint    = NULL;
     GetNextBuffer(*this, mBufHandle, mReadPoint, bufLen);
-    mBufEnd = mReadPoint + bufLen;
-    mMaxLen = buf->DataLength();
-    mControlByte = kTLVControlByte_NotSpecified;
-    mElemTag = AnonymousTag;
-    mElemLenOrVal = 0;
+    mBufEnd        = mReadPoint + bufLen;
+    mMaxLen        = buf->DataLength();
+    mControlByte   = kTLVControlByte_NotSpecified;
+    mElemTag       = AnonymousTag;
+    mElemLenOrVal  = 0;
     mContainerType = kTLVType_NotSpecified;
     SetContainerOpen(false);
     ImplicitProfileId = kProfileIdNotSpecified;
-    AppData = NULL;
+    AppData           = NULL;
 }
 
 } // namespace TLV
