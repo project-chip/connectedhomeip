@@ -488,7 +488,7 @@ static void TestInetEndPoint(nlTestSuite * inSuite, void * inContext)
 
 #if INET_CONFIG_ENABLE_TUN_ENDPOINT
     // TunEndPoint special cases to cover the error branch
-    testTunEP->Init(&Inet);
+    testTunEP->Init(&gInet);
     InterfaceId tunId = testTunEP->GetTunnelInterfaceId();
     NL_TEST_ASSERT(inSuite, tunId == INET_NULL_INTERFACEID);
     NL_TEST_ASSERT(inSuite, !testTunEP->IsInterfaceUp());

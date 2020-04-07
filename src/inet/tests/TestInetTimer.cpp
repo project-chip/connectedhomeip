@@ -149,7 +149,7 @@ int main(int argc, char * argv[])
 
     InitSystemLayer();
     InitNetwork();
-    sContext.mInet      = &Inet;
+    sContext.mInet      = &gInet;
     sContext.mTestSuite = &theSuite;
     // Run test suit againt one context.
     nlTestRunner(&theSuite, &sContext);
