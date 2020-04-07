@@ -124,9 +124,7 @@ bool Timer::IsEarlierEpoch(const Timer::Epoch & inFirst, const Timer::Epoch & in
  */
 Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState)
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
     Layer & lLayer = this->SystemLayer();
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, aDelayMilliseconds = 0);
 
@@ -171,6 +169,9 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
         lTimer->mNextTimer = this;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    lLayer.WakeSelect();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return CHIP_SYSTEM_NO_ERROR;
 }
