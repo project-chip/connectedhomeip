@@ -50,7 +50,7 @@ class ManualSetupPayloadGenerator
     public:
         ManualSetupPayloadGenerator(SetupPayload payload) : mSetupPayload(payload){};
 
-        // Returns a string representation of the payload in decimal format. 
+        // Populates decimal string representation of the payload into outDecimalString 
         CHIP_ERROR payloadDecimalStringRepresentation(string & outDecimalString);
 };
 

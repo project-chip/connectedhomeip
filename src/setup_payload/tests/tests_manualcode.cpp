@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 
+#include <assert.h>
+#include <stdio.h>
+#include <unistd.h>
+
 #include "ManualSetupPayloadGenerator.cpp"
 #include "ManualSetupPayloadParser.cpp"
 #include "SetupPayload.cpp"
@@ -53,7 +57,16 @@ void testDecimalRepresentation_PartialPayload_RequiresCustomFlow()
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
-    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
+    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    string expectedResult = "34896656190000000000";
+
+    bool succeeded = result.compare(expectedResult) == 0;
+    if (!succeeded)
+    {
+        printf("Expected result: %s\n", expectedResult.c_str());
+        printf("Actual result:   %s\n", result.c_str());
+    }
+    assert(succeeded);
 }
 
 void testDecimalRepresentation_FullPayloadWithoutZeros()
@@ -196,6 +209,17 @@ void testPayloadParser_PartialPayload()
     assertPayloadValues(ManualSetupPayloadParser("3669676692").populatePayload(payload), CHIP_NO_ERROR, payload, 90007882, 13, 0,
                         0);
     assertPayloadValues(ManualSetupPayloadParser("0268435458").populatePayload(payload), CHIP_NO_ERROR, payload, 1, 1, 0, 0);
+    assertPayloadValues(ManualSetupPayloadParser("00000000030000000000").populatePayload(payload), CHIP_NO_ERROR, payload, 1, 0, 0,
+                        0);
+
+    // no discriminator (= 0)
+    assert(ManualSetupPayloadParser("0000070548").populatePayload(payload) == CHIP_NO_ERROR);
+
+    // no vid (= 0)
+    assert(ManualSetupPayloadParser("40321242450000014536").populatePayload(payload) == CHIP_NO_ERROR);
+
+    // no pid (= 0)
+    assert(ManualSetupPayloadParser("40321242452645300000").populatePayload(payload) == CHIP_NO_ERROR);
 }
 
 void testExtractBits()
@@ -243,22 +267,9 @@ void testPayloadParser_InvalidEntry()
     // bit to indicate short code but long code length
     assertEmptyPayloadWithError(ManualSetupPayloadParser("23456789123456785610").populatePayload(payload),
                                 CHIP_ERROR_INVALID_STRING_LENGTH, payload);
-
-    // no discriminator (= 0)
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("0000070548").populatePayload(payload), CHIP_ERROR_INVALID_ARGUMENT,
-                                payload);
-
     // no pin code (= 0)
     assertEmptyPayloadWithError(ManualSetupPayloadParser("3221225472").populatePayload(payload), CHIP_ERROR_INVALID_ARGUMENT,
                                 payload);
-
-    // no vid (= 0)
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("40321242450000014536").populatePayload(payload),
-                                CHIP_ERROR_INVALID_ARGUMENT, payload);
-
-    // no pid (= 0)
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("40321242452645300000").populatePayload(payload),
-                                CHIP_ERROR_INVALID_ARGUMENT, payload);
 }
 
 void testCheckDecimalStringValidity()

@@ -68,12 +68,7 @@ bool SetupPayload::isValidManualCode()
         return false;
     }
 
-    if (discriminator == 0 && setUpPINCode == 0)
-    {
-        return false;
-    }
-
-    if (requiresCustomFlow && vendorID == 0 && productID == 0)
+    if (setUpPINCode == 0)
     {
         return false;
     }

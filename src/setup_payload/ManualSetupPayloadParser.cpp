@@ -147,9 +147,6 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     if (result != CHIP_NO_ERROR)
     {
         return result;
-    } else if (discriminator == 0) {
-        fprintf(stderr, "\nFailed decoding base10. Discriminator was 0.\n");
-        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     
     if (isLongCode) {
@@ -158,9 +155,6 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         if (result != CHIP_NO_ERROR)
         {
             return result;
-        } else if (vendorID == 0) {
-            fprintf(stderr, "\nFailed decoding base10. VendorID was 0.\n");
-            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         uint64_t productID;
@@ -168,9 +162,6 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         if (result != CHIP_NO_ERROR)
         {
             return result;
-        } else if (productID == 0) {
-            fprintf(stderr, "\nFailed decoding base10. ProductID was 0.\n");
-            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         outPayload.vendorID = vendorID;
         outPayload.productID = productID;
