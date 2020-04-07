@@ -1307,12 +1307,12 @@ AC_LANG_POP([C++])
 #
 #   * nlassert
 #   * nlio
+#   * openssl
 #
 # The following are optional, depending on configuration:
 #
 #   * lwip
 #   * nlunit-test
-#   * openssl
 #   * nlfaultinjection
 #
 # Most of these are supplied "in package"; however, they may be also
@@ -1329,14 +1329,15 @@ AC_PATH_PROG([PKG_CONFIG],[pkg-config])
 # OpenSSL
 #
 
-NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([OpenSSL],
+NL_WITH_REQUIRED_EXTERNAL_PACKAGE([OpenSSL],
     [OPENSSL],
     [openssl],
     [-lcrypto],
     [
         # Check for required OpenSSL headers.
 
-        AC_CHECK_HEADERS([openssl/aes.h] [openssl/bn.h] [openssl/crypto.h] [openssl/ec.h] [openssl/err.h] [openssl/evp.h] [openssl/sha.h],
+        AC_CHECK_HEADERS([openssl/aes.h] [openssl/bn.h] [openssl/crypto.h] [openssl/ec.h] [openssl/err.h] [openssl/evp.h] [openssl/hmac.h] [openssl/kdf.h] [openssl/rand.h] [openssl/sha.h] [openssl/srp.h],
+
             [],
             [
                 AC_MSG_ERROR(The OpenSSL header "$ac_header" is required but cannot be found.)
