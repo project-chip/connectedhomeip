@@ -80,4 +80,32 @@ SUBDIRS                           = \
     $(MAYBE_PLATFORM_SUBDIRS)       \
     $(NULL)
 
+if CHIP_BUILD_TESTS
+if CHIP_BUILD_COVERAGE
+if CHIP_BUILD_COVERAGE_REPORTS
+# The bundle should positively be qualified with the absolute build
+# path. Otherwise, VPATH will get auto-prefixed to it if there is
+# already such a directory in the non-colocated source tree.
+
+CHIP_COVERAGE_BUNDLE              = ${abs_builddir}/${PACKAGE}${NL_COVERAGE_BUNDLE_SUFFIX}
+CHIP_COVERAGE_INFO                = ${CHIP_COVERAGE_BUNDLE}/${PACKAGE}${NL_COVERAGE_INFO_SUFFIX}
+
+$(CHIP_COVERAGE_BUNDLE):
+	$(call create-directory)
+
+$(CHIP_COVERAGE_INFO): check | $(CHIP_COVERAGE_BUNDLE)
+	$(call generate-coverage-report,${top_builddir},*/usr/include/* */third_party/*)
+
+coverage-local: $(CHIP_COVERAGE_INFO)
+
+clean-local: clean-local-coverage
+
+.PHONY: clean-local-coverage
+clean-local-coverage:
+	-$(AM_V_at)rm -rf $(CHIP_COVERAGE_BUNDLE)
+
+endif # CHIP_BUILD_COVERAGE_REPORTS
+endif # CHIP_BUILD_COVERAGE
+endif # CHIP_BUILD_TESTS
+
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
