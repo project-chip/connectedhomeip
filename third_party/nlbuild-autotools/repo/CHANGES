@@ -1,3 +1,12 @@
+1.6.22 (2020-04-07)
+
+        * Suppress non-failure diagnostic output from bootstrap tool actions
+          unless there is failure status from those actions or the
+          verbose flag has been asserted.
+
+        * Ensure failure status from bootstrap tool actions is
+          captured and passed to invoking processes.
+
 1.6.21 (2020-03-30)
 
         * Allow examples/bootstrap may be run from anywhere.
