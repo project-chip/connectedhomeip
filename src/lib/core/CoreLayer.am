@@ -24,6 +24,7 @@
 #
 
 CHIP_BUILD_CORE_LAYER_SOURCE_FILES                        = \
+    core/CHIPCircularTLVBuffer.cpp                          \
     core/CHIPError.cpp                                      \
     core/CHIPTLVDebug.cpp                                   \
     core/CHIPTLVReader.cpp                                  \
@@ -34,6 +35,7 @@ CHIP_BUILD_CORE_LAYER_SOURCE_FILES                        = \
     $(NULL)
 
 CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
+    core/CHIPCircularTLVBuffer.h                            \
     core/CHIPConfig.h                                       \
     core/CHIPCore.h                                         \
     core/CHIPEncoding.h                                     \
