@@ -1,6 +1,6 @@
 /**
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <string> 
 
 using namespace chip;
 using namespace std;
@@ -35,13 +36,6 @@ static CHIP_ERROR checkDecimalStringValidity(string decimalString)
     if (decimalString.length() == 0) {
         fprintf(stderr, "\nFailed decoding base10. Input was empty. %lu\n", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
-    for (int i=0; i<decimalString.length(); ++i)
-    {
-        if (!isdigit(decimalString[i])) {
-            fprintf(stderr, "\nFailed decoding base10. Character was invalid %c\n", decimalString[i]);
-            return CHIP_ERROR_INVALID_INTEGER_VALUE;
-        }
     }
     return CHIP_NO_ERROR;
 }
@@ -57,26 +51,28 @@ static CHIP_ERROR checkCodeLengthValidity(string decimalString, bool isLongCode)
 }
 
 // Extract n bits starting at index i and store it in dest
-static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, int i, int n, int maxBits) 
+static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, int index, int numberBits, int maxBits) 
 { 
-    if ((i + n) > maxBits) {
-        printf("\nNumber %u maxBits %d index %d n %d\n", number, maxBits, i, n);
+    if ((index + numberBits) > maxBits) {
+        fprintf(stderr, "\nNumber %u maxBits %d index %d n %d\n", number, maxBits, index, numberBits);
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
-    dest = (((1 << n) - 1) & (number >> i)); 
+    dest = (((1 << numberBits) - 1) & (number >> index)); 
     return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR toNumber(string decimalString, uint64_t & dest)
 {
-    char shortCodeCharArr[decimalString.length()+1];
-    strcpy(shortCodeCharArr, decimalString.c_str());
-    long decimal = strtoul(shortCodeCharArr, 0L, 10);
-    if (decimal == 0) {
-        fprintf(stderr, "\nFailed decoding base10. Decimal string conversion failed. %s\n", decimalString.c_str());
-        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    uint64_t number = 0;
+    for (int i = 0; i < decimalString.length(); i++) {
+        if (!isdigit(decimalString[i])) {
+            fprintf(stderr, "\nFailed decoding base10. Character was invalid %c\n", decimalString[i]);
+            return CHIP_ERROR_INVALID_INTEGER_VALUE;
+        }
+        number *= 10;
+        number += decimalString[i] - '0';
     }
-    dest = decimal;
+    dest = number;
     return CHIP_NO_ERROR;
 }
 
@@ -84,8 +80,11 @@ static CHIP_ERROR toNumber(string decimalString, uint64_t & dest)
 static CHIP_ERROR readDigitsFromDecimalString(string decimalString, int & index, uint64_t & dest, size_t numberOfCharsToRead)
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length())) {
-         fprintf(stderr, "\nFailed decoding base10. Input was too short. %lu\n", decimalString.length());
-         return CHIP_ERROR_INVALID_STRING_LENGTH;
+        fprintf(stderr, "\nFailed decoding base10. Input was too short. %lu\n", decimalString.length());
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    } else if (index < 0) {
+        fprintf(stderr, "\nFailed decoding base10. Index was negative. %d\n", index);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
    
 
@@ -102,10 +101,7 @@ static CHIP_ERROR readBitsFromNumber(int32_t number, int & index, uint64_t & des
     if (result != CHIP_NO_ERROR) {
         return result;
     }
-    if (bits == 0) {
-        fprintf(stderr, "\nFailed decoding base10. Missing argument.\n");
-        return CHIP_ERROR_INVALID_INTEGER_VALUE;
-    }
+
     index += numberOfBitsToRead;
     dest = bits;
     return CHIP_NO_ERROR;
@@ -141,6 +137,9 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     if (result != CHIP_NO_ERROR)
     {
         return result;
+    } else if (setUpPINCode == 0) {
+        fprintf(stderr, "\nFailed decoding base10. SetUpPINCode was 0.\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     uint64_t discriminator;
@@ -148,6 +147,9 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     if (result != CHIP_NO_ERROR)
     {
         return result;
+    } else if (discriminator == 0) {
+        fprintf(stderr, "\nFailed decoding base10. Discriminator was 0.\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     
     if (isLongCode) {
@@ -156,6 +158,9 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         if (result != CHIP_NO_ERROR)
         {
             return result;
+        } else if (vendorID == 0) {
+            fprintf(stderr, "\nFailed decoding base10. VendorID was 0.\n");
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         uint64_t productID;
@@ -163,6 +168,9 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         if (result != CHIP_NO_ERROR)
         {
             return result;
+        } else if (productID == 0) {
+            fprintf(stderr, "\nFailed decoding base10. ProductID was 0.\n");
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         outPayload.vendorID = vendorID;
         outPayload.productID = productID;

@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ using namespace chip;
 static uint32_t shortPayloadRepresentation(SetupPayload payload)
 {
     int offset = 1;
-    uint32_t result = payload.vendorID ? 1 : 0;
+    uint32_t result = payload.requiresCustomFlow ? 1 : 0;
     result |= payload.setUpPINCode << offset;
     offset += kSetupPINCodeFieldLengthInBits;
 
@@ -43,21 +43,21 @@ static string decimalStringWithPadding(uint32_t number, int minLength)
     return string(buf);
 }
 
-string ManualSetupPayloadGenerator::payloadDecimalStringRepresentation() 
+CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(string & outDecimalString)
 {
-    mSetupPayload.isManualPayloadSetup = true;
-    if (!mSetupPayload.isValid())
+    if (!mSetupPayload.isValidManualCode())
     {
         fprintf(stderr, "\nFailed encoding invalid payload\n");
-        return string();
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     
     uint32_t shortDecimal = shortPayloadRepresentation(mSetupPayload);
     string decimalString = decimalStringWithPadding(shortDecimal, SetupPayload::manualSetupShortCodeCharLength());
 
-    if (mSetupPayload.vendorID) {
+    if (mSetupPayload.requiresCustomFlow) {
         decimalString += decimalStringWithPadding(mSetupPayload.vendorID, SetupPayload::manualSetupVendorIdCharLength());
         decimalString += decimalStringWithPadding(mSetupPayload.productID, SetupPayload::manualSetupProductIdCharLength());
     }
-    return decimalString;
+    outDecimalString = decimalString;
+    return CHIP_NO_ERROR;
 }

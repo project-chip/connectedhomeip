@@ -22,44 +22,81 @@
 
 using namespace chip;
 
-void testDecimalRepresentation_ValidPayload()
+void testDecimalRepresentation_PartialPayload()
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
     payload.setUpPINCode  = 2345;
     payload.discriminator = 13;
-    payload.isManualPayloadSetup = true;
-    assert(payload.isValid());
 
     ManualSetupPayloadGenerator generator(payload);
-    string result = generator.payloadDecimalStringRepresentation();
-    string expectedResult = "3489665618"; 
+    string result;
+    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    string expectedResult = "3489665618";
 
     bool succeeded = result.compare(expectedResult) == 0;
-    if (!succeeded) {
+    if (!succeeded)
+    {
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
     assert(succeeded);
 }
 
+void testDecimalRepresentation_PartialPayload_RequiresCustomFlow()
+{
+    printf("\n---Running Test--- %s\n", __FUNCTION__);
+    SetupPayload payload;
+    payload.setUpPINCode       = 2345;
+    payload.discriminator      = 13;
+    payload.requiresCustomFlow = true;
+
+    ManualSetupPayloadGenerator generator(payload);
+    string result;
+    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 void testDecimalRepresentation_FullPayloadWithoutZeros()
+{
+    printf("\n---Running Test--- %s\n", __FUNCTION__);
+    SetupPayload payload;
+    payload.setUpPINCode       = 2345;
+    payload.discriminator      = 13;
+    payload.vendorID           = 45367;
+    payload.productID          = 14526;
+    payload.requiresCustomFlow = true;
+
+    ManualSetupPayloadGenerator generator(payload);
+    string result;
+    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    string expectedResult = "34896656194536714526";
+
+    bool succeeded = result.compare(expectedResult) == 0;
+    if (!succeeded)
+    {
+        printf("Expected result: %s\n", expectedResult.c_str());
+        printf("Actual result: %s\n", result.c_str());
+    }
+    assert(succeeded);
+}
+
+void testDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow()
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
     payload.setUpPINCode  = 2345;
     payload.discriminator = 13;
-    payload.vendorID = 45367;
-    payload.productID = 14526;
-    payload.isManualPayloadSetup = true;
-    assert(payload.isValid());
+    payload.vendorID      = 45367;
+    payload.productID     = 14526;
 
     ManualSetupPayloadGenerator generator(payload);
-    string result = generator.payloadDecimalStringRepresentation();
-    string expectedResult = "34896656194536714526";
+    string result;
+    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    string expectedResult = "3489665618";
 
     bool succeeded = result.compare(expectedResult) == 0;
-    if (!succeeded) {
+    if (!succeeded)
+    {
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
@@ -70,19 +107,20 @@ void testDecimalRepresentation_FullPayloadWithZeros()
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
-    payload.setUpPINCode  = 2345;
-    payload.discriminator = 13;
-    payload.vendorID = 1;
-    payload.productID = 1;
-    payload.isManualPayloadSetup = true;
-    assert(payload.isValid());
+    payload.setUpPINCode       = 2345;
+    payload.discriminator      = 13;
+    payload.vendorID           = 1;
+    payload.productID          = 1;
+    payload.requiresCustomFlow = true;
 
     ManualSetupPayloadGenerator generator(payload);
-    string result = generator.payloadDecimalStringRepresentation();
+    string result;
+    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
     string expectedResult = "34896656190000100001";
-    
+
     bool succeeded = result.compare(expectedResult) == 0;
-    if (!succeeded) {
+    if (!succeeded)
+    {
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
@@ -95,14 +133,15 @@ void testDecimalRepresentation_AllZeros()
     SetupPayload payload;
     payload.setUpPINCode  = 0;
     payload.discriminator = 0;
-    payload.isManualPayloadSetup = true;
 
     ManualSetupPayloadGenerator generator(payload);
-    string result = generator.payloadDecimalStringRepresentation();
+    string result;
+    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
     string expectedResult = "";
-    
+
     bool succeeded = result.compare(expectedResult) == 0;
-    if (!succeeded) {
+    if (!succeeded)
+    {
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
@@ -115,13 +154,14 @@ void testDecimalRepresentation_InvalidPayload()
     SetupPayload payload;
     payload.setUpPINCode  = 2345;
     payload.discriminator = 18;
-    payload.isManualPayloadSetup = true;
-    assert(!payload.isValid());
+
+    ManualSetupPayloadGenerator generator(payload);
+    string result;
+    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-void assertPayloadValues(CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload,
-                         uint32_t pinCode, uint8_t discriminator, 
-                         uint16_t vendorID, uint16_t productID)
+void assertPayloadValues(CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload, uint32_t pinCode,
+                         uint8_t discriminator, uint16_t vendorID, uint16_t productID)
 {
     assert(actualError == expectedError);
     assert(payload.setUpPINCode == pinCode);
@@ -133,19 +173,19 @@ void assertPayloadValues(CHIP_ERROR actualError, CHIP_ERROR expectedError, Setup
 void assertEmptyPayloadWithError(CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload)
 {
     assert(actualError == expectedError);
-    assert(payload.setUpPINCode == 0 && 
-           payload.discriminator == 0 &&
-           payload.productID == 0 &&
-           payload.vendorID == 0);
+    assert(payload.setUpPINCode == 0 && payload.discriminator == 0 && payload.productID == 0 && payload.vendorID == 0);
 }
 
 void testPayloadParser_FullPayload()
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
-    assertPayloadValues(ManualSetupPayloadParser("34896656194536714526").populatePayload(payload), CHIP_NO_ERROR, payload, 2345, 13, 45367, 14526);
-    assertPayloadValues(ManualSetupPayloadParser("41039884090456200032").populatePayload(payload), CHIP_NO_ERROR, payload, 38728284, 15, 4562, 32);
-    assertPayloadValues(ManualSetupPayloadParser("02684354590000100001").populatePayload(payload), CHIP_NO_ERROR, payload, 1, 1, 1, 1);
+    assertPayloadValues(ManualSetupPayloadParser("34896656194536714526").populatePayload(payload), CHIP_NO_ERROR, payload, 2345, 13,
+                        45367, 14526);
+    assertPayloadValues(ManualSetupPayloadParser("41039884090456200032").populatePayload(payload), CHIP_NO_ERROR, payload, 38728284,
+                        15, 4562, 32);
+    assertPayloadValues(ManualSetupPayloadParser("02684354590000100001").populatePayload(payload), CHIP_NO_ERROR, payload, 1, 1, 1,
+                        1);
 }
 
 void testPayloadParser_PartialPayload()
@@ -153,7 +193,8 @@ void testPayloadParser_PartialPayload()
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
     assertPayloadValues(ManualSetupPayloadParser("2418402196").populatePayload(payload), CHIP_NO_ERROR, payload, 1241546, 9, 0, 0);
-    assertPayloadValues(ManualSetupPayloadParser("3669676692").populatePayload(payload), CHIP_NO_ERROR, payload, 90007882, 13, 0, 0);
+    assertPayloadValues(ManualSetupPayloadParser("3669676692").populatePayload(payload), CHIP_NO_ERROR, payload, 90007882, 13, 0,
+                        0);
     assertPayloadValues(ManualSetupPayloadParser("0268435458").populatePayload(payload), CHIP_NO_ERROR, payload, 1, 1, 0, 0);
 }
 
@@ -184,44 +225,47 @@ void testPayloadParser_InvalidEntry()
     assertEmptyPayloadWithError(ManualSetupPayloadParser("").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH, payload);
 
     // Invalid character
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("24184.2196").populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("24184.2196").populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE,
+                                payload);
 
     // too short
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("2456").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("2456").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
+                                payload);
 
     // too long for long code
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("123456789123456785671").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("123456789123456785671").populatePayload(payload),
+                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
 
     // too long for short code
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("12749875380").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("12749875380").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
+                                payload);
 
     // bit to indicate short code but long code length
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("23456789123456785610").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("23456789123456785610").populatePayload(payload),
+                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
 
     // no discriminator (= 0)
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("0000070548").populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("0000070548").populatePayload(payload), CHIP_ERROR_INVALID_ARGUMENT,
+                                payload);
 
     // no pin code (= 0)
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("3221225472").populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("3221225472").populatePayload(payload), CHIP_ERROR_INVALID_ARGUMENT,
+                                payload);
 
     // no vid (= 0)
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("40321242450000014536").populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("40321242450000014536").populatePayload(payload),
+                                CHIP_ERROR_INVALID_ARGUMENT, payload);
 
     // no pid (= 0)
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("40321242452645300000").populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser("40321242452645300000").populatePayload(payload),
+                                CHIP_ERROR_INVALID_ARGUMENT, payload);
 }
 
-void testCheckDecimalStringValidity() 
+void testCheckDecimalStringValidity()
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     assert(checkDecimalStringValidity("") == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(checkDecimalStringValidity("1010.9") == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    assert(checkDecimalStringValidity("1010/9") == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    assert(checkDecimalStringValidity("10?109") == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    assert(checkDecimalStringValidity(" ") == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    assert(checkDecimalStringValidity(";") == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    
-    assert(checkDecimalStringValidity("10109") == CHIP_NO_ERROR);
+    assert(checkDecimalStringValidity("1010.9") == CHIP_NO_ERROR);
     assert(checkDecimalStringValidity("0000") == CHIP_NO_ERROR);
 }
 
@@ -250,7 +294,10 @@ void testDecimalStringToNumber()
     assert(toNumber("00000001", number) == CHIP_NO_ERROR);
     assert(number == 1);
 
-    assert(toNumber("0", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    assert(toNumber("0", number) == CHIP_NO_ERROR);
+    assert(number == 0);
+
+    assert(toNumber("012345.123456789", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
     assert(toNumber("/", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
 }
 
@@ -279,11 +326,14 @@ void testReadCharsFromDecimalString()
     assert(number == 1);
 
     index = 2;
-    assert(readDigitsFromDecimalString("100001", index, number, 3) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    assert(readDigitsFromDecimalString("100001", index, number, 3) == CHIP_NO_ERROR);
 
     index = 1;
     assert(readDigitsFromDecimalString("12345", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
     assert(readDigitsFromDecimalString("12", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    index = -2;
+    assert(readDigitsFromDecimalString("6256276377282", index, number, 7) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 void testReadBitsFromNumber()
@@ -307,7 +357,8 @@ void testReadBitsFromNumber()
     assert(number == 12345);
 
     index = 1;
-    assert(readBitsFromNumber(1, index, number, 1, 14) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    assert(readBitsFromNumber(1, index, number, 1, 14) == CHIP_NO_ERROR);
+    assert(number == 0);
 
     index = 0;
     assert(readBitsFromNumber(12345, index, number, 15, 14) == CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -319,8 +370,10 @@ void testReadBitsFromNumber()
 int main()
 {
     printf("---Running Test--- tests from %s\n", __FILE__);
-    testDecimalRepresentation_ValidPayload();
+    testDecimalRepresentation_PartialPayload();
+    testDecimalRepresentation_PartialPayload_RequiresCustomFlow();
     testDecimalRepresentation_FullPayloadWithZeros();
+    testDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow();
     testDecimalRepresentation_FullPayloadWithoutZeros();
 
     testDecimalRepresentation_InvalidPayload();

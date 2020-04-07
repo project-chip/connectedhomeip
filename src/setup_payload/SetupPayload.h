@@ -30,16 +30,17 @@
 using namespace std;
 
 namespace chip {
-// TODO this should point to the spec
-const int kVersionFieldLengthInBits              = 3;
-const int kVendorIDFieldLengthInBits             = 16;
-const int kProductIDFieldLengthInBits            = 16;
-const int kCustomFlowRequiredFieldLengthInBits   = 1;
-const int kRendezvousInfoFieldLengthInBits       = 8;
-const int kPayloadDiscriminatorFieldLengthInBits = 8;
-const int kManualSetupDiscriminatorFieldLengthInBits    = 4;
-const int kSetupPINCodeFieldLengthInBits         = 27;
-const int kReservedFieldLengthInBits             = 1;
+
+// TODO this shuould point to the spec
+const int kVersionFieldLengthInBits                  = 3;
+const int kVendorIDFieldLengthInBits                 = 16;
+const int kProductIDFieldLengthInBits                = 16;
+const int kCustomFlowRequiredFieldLengthInBits       = 1;
+const int kRendezvousInfoFieldLengthInBits           = 8;
+const int kPayloadDiscriminatorFieldLengthInBits     = 8;
+const int kManualSetupDiscriminatorFieldLengthInBits = 4;
+const int kSetupPINCodeFieldLengthInBits             = 27;
+const int kReservedFieldLengthInBits                 = 1;
 
 const int kTotalPayloadDataSizeInBits =
     (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits + kCustomFlowRequiredFieldLengthInBits +
@@ -57,13 +58,13 @@ public:
     uint16_t rendezvousInformation;
     uint16_t discriminator;
     uint32_t setUpPINCode;
-    bool isManualPayloadSetup = false;
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :
         version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(0), discriminator(0), setUpPINCode(0){};
 
-    bool isValid();
+    bool isValidQRCodePayload();
+    bool isValidManualCode();
     bool operator==(const SetupPayload & input);
 
     static size_t manualSetupShortCodeCharLength();

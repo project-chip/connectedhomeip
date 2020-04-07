@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@
 
 #include <string>
 
+#include <core/CHIPError.h>
 #include "SetupPayload.h"
 
 using namespace std;
@@ -50,7 +51,7 @@ class ManualSetupPayloadGenerator
         ManualSetupPayloadGenerator(SetupPayload payload) : mSetupPayload(payload){};
 
         // Returns a string representation of the payload in decimal format. 
-        string payloadDecimalStringRepresentation();
+        CHIP_ERROR payloadDecimalStringRepresentation(string & outDecimalString);
 };
 
 }; // namespace chip

@@ -30,20 +30,17 @@ namespace chip {
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
 // `requiresCustomFlow` is not checked since it is a bool
-bool SetupPayload::isValid()
+bool SetupPayload::isValidQRCodePayload()
 {
-    if (!isManualPayloadSetup && version >= 1 << kVersionFieldLengthInBits)
+    if (version >= 1 << kVersionFieldLengthInBits)
     {
         return false;
     }
-    if (!isManualPayloadSetup && rendezvousInformation >= 1 << kRendezvousInfoFieldLengthInBits)
+    if (rendezvousInformation >= 1 << kRendezvousInfoFieldLengthInBits)
     {
         return false;
     }
-    if (isManualPayloadSetup && discriminator >= 1 << kManualSetupDiscriminatorFieldLengthInBits)
-    {
-        return false;
-    } else if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
+    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
     {
         return false;
     }
@@ -60,13 +57,36 @@ bool SetupPayload::isValid()
     return true;
 }
 
+bool SetupPayload::isValidManualCode()
+{
+    if (discriminator >= 1 << kManualSetupDiscriminatorFieldLengthInBits)
+    {
+        return false;
+    }
+    if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
+    {
+        return false;
+    }
+
+    if (discriminator == 0 && setUpPINCode == 0)
+    {
+        return false;
+    }
+
+    if (requiresCustomFlow && vendorID == 0 && productID == 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool SetupPayload::operator==(const SetupPayload & input)
 {
     return this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
         this->requiresCustomFlow == input.requiresCustomFlow && this->rendezvousInformation == input.rendezvousInformation &&
         this->discriminator == input.discriminator && this->setUpPINCode == input.setUpPINCode;
 }
-
 
 size_t SetupPayload::manualSetupShortCodeCharLength()
 {
