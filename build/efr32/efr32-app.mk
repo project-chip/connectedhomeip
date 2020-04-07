@@ -119,7 +119,7 @@ EXTRA_SRCS += \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/src/nvm3_default.c                                \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/src/nvm3_hal_flash.c                              \
     $(EFR32_SDK_ROOT)/platform/emdrv/sleep/src/sleep.c                                      \
-    $(EFR32_SDK_ROOT)/platform/base/hal/plugin/debug/rtt/SEGGER_RTT.c
+    $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c
 
 STD_INC_DIRS += \
     $(CHIP_ROOT)/src/include/platform/EFR32                                                 \
@@ -154,7 +154,8 @@ STD_INC_DIRS += \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/hal                                           \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/hal/efr32                                     \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/plugin/pa-conversions                         \
-    $(EFR32_SDK_ROOT)/platform/base/hal/plugin/debug/rtt/   \
+    $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/SEGGER                             \
+    $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/Config/                            \
     $(EFR32_SDK_ROOT)/util/plugin/plugin-common/fem-control                                 \
     $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/include
 
