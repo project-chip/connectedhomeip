@@ -234,7 +234,7 @@ static int32_t sContext[] =
 
 static const size_t kTestElements = sizeof(sContext) / sizeof(sContext[0]);
 
-static void CheckCHIPErrorStr(nlTestSuite * inSuite, void * inContext)
+static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
 {
     // Register the layer error formatter
 
