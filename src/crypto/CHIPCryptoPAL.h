@@ -24,11 +24,40 @@
 #define _CHIP_CRYPTO_PAL_H_
 
 #include <core/CHIPError.h>
+#include <stddef.h>
 
-CHIP_ERROR CHIP_aes_ccm_encrypt(unsigned char * plaintext, int plaintext_len, unsigned char * aad, int aad_len, unsigned char * key,
-                                unsigned char * iv, unsigned char * ciphertext, unsigned char * tag);
+/**
+ * @brief A function that implements 256-bit AES-CCM encryption
+ * @param plaintext Plaintext to encrypt
+ * @param plaintext_length Length of plain_text
+ * @param aad Additional authentication data
+ * @param aad_length Length of additional authentication data
+ * @param key Encryption key
+ * @param iv Initial vector
+ * @param iv_length Length of initial vector
+ * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
+ * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
+ * */
+CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                                    size_t aad_length, const unsigned char * key, const unsigned char * iv, size_t iv_length,
+                                    unsigned char * ciphertext, unsigned char * tag);
 
-CHIP_ERROR CHIP_aes_ccm_decrypt(unsigned char * ciphertext, int ciphertext_len, unsigned char * aad, int aad_len,
-                                unsigned char * tag, unsigned char * key, unsigned char * iv, unsigned char * plaintext);
+/**
+ * @brief A function that implements 256-bit AES-CCM decryption
+ * @param ciphertext Ciphertext to decrypt
+ * @param ciphertext_length Length of ciphertext
+ * @param aad Additional authentical data.
+ * @param aad_length Length of additional authentication data
+ * @param tag Tag to use to decrypt
+ * @param tag_length Length of tag
+ * @param key Decryption key
+ * @param iv Initial vector
+ * @param iv_length Length of initial vector
+ * @param plaintext Buffer to write plaintext into
+ **/
+
+CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
+                                    size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
+                                    const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
 
 #endif

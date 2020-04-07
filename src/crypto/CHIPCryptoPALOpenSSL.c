@@ -22,15 +22,17 @@
 
 #include "CHIPCryptoPAL.h"
 
-int CHIP_aes_ccm_encrypt(unsigned char * plaintext, int plaintext_len, unsigned char * aad, int aad_len, unsigned char * key,
-                         unsigned char * iv, unsigned char * ciphertext, unsigned char * tag)
+CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_len, const unsigned char * aad,
+                                    size_t aad_len, const unsigned char * key, const unsigned char * iv, size_t iv_length,
+                                    unsigned char * ciphertext, unsigned char * tag)
 {
     // TODO: Need to implement openSSL based AES-CCM #256
     return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
 }
 
-int CHIP_aes_ccm_decrypt(unsigned char * ciphertext, int ciphertext_len, unsigned char * aad, int aad_len, unsigned char * tag,
-                         unsigned char * key, unsigned char * iv, unsigned char * plaintext);
+CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad,
+                                    size_t aad_len, const unsigned char * tag, size_t tag_length, const unsigned char * key,
+                                    const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
 {
     // TODO: Need to implement openSSL based AES-CCM #256
     return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
