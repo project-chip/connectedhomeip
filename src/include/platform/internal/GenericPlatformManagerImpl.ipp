@@ -55,17 +55,17 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     // Arrange for Device Layer errors to be translated to text.
     RegisterDeviceLayerErrorFormatter();
 
-    // Initialize the source used by CHIP to get secure random data.
-    err = InitEntropy();
-    SuccessOrExit(err);
+    // TODO Initialize the source used by CHIP to get secure random data.
+    // err = InitEntropy();
+    // SuccessOrExit(err);
 
-    // Initialize the Configuration Manager object.
-    err = ConfigurationMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
+    // TODO Initialize the Configuration Manager object.
+    // err = ConfigurationMgr().Init();
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
+    // }
+    // SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
     new (&SystemLayer) System::Layer();
@@ -85,27 +85,27 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     }
     SuccessOrExit(err);
 
-    // Perform dynamic configuration of the core CHIP objects based on stored settings.
+    // TODO Perform dynamic configuration of the core CHIP objects based on stored settings.
     //
     // NB: In general, initialization of Device Layer objects should happen *after* this call
     // as their initialization methods may rely on the proper initialization of the core
     // objects.
     //
-    err = ConfigurationMgr().ConfigureChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "ConfigureChipStack failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
+    // err = ConfigurationMgr().ConfigureChipStack();
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(DeviceLayer, "ConfigureChipStack failed: %s", ErrorStr(err));
+    // }
+    // SuccessOrExit(err);
 
-    // Initialize the BLE manager.
+    //TODO Initialize the BLE manager.
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    err = BLEMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "BLEManager initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
+    // err = BLEMgr().Init();
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(DeviceLayer, "BLEManager initialization failed: %s", ErrorStr(err));
+    // }
+    // SuccessOrExit(err);
 #endif
 
     // Initialize the Connectivity Manager object.
@@ -116,30 +116,30 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
     }
     SuccessOrExit(err);
 
-    // Initialize CHIP Event Logging.
-    err = InitChipEventLogging();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Event Logging initialization failed: %s", ErrorStr(err));
-    }
+    // TODO Initialize CHIP Event Logging.
+    // err = InitChipEventLogging();
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(DeviceLayer, "Event Logging initialization failed: %s", ErrorStr(err));
+    // }
+    // SuccessOrExit(err);
+
+    // TODO Initialize the Time Sync Manager object.
+    // err = TimeSyncMgr().Init();
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(DeviceLayer, "Time Sync Manager initialization failed: %s", ErrorStr(err));
+    // }
     SuccessOrExit(err);
 
-    // Initialize the Time Sync Manager object.
-    err = TimeSyncMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Time Sync Manager initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
-
-    // Initialize the Software Update Manager object.
+    // TODO Initialize the Software Update Manager object.
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-    err = SoftwareUpdateMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Software Update Manager initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
+    // err = SoftwareUpdateMgr().Init();
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(DeviceLayer, "Software Update Manager initialization failed: %s", ErrorStr(err));
+    // }
+    // SuccessOrExit(err);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
 exit:
@@ -280,7 +280,7 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToDeviceLayer(const Chi
     ThreadStackMgr().OnPlatformEvent(event);
 #endif
     ConnectivityMgr().OnPlatformEvent(event);
-    TimeSyncMgr().OnPlatformEvent(event);
+    // TimeSyncMgr().OnPlatformEvent(event);
 }
 
 template<class ImplClass>
