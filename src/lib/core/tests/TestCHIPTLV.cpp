@@ -19,7 +19,7 @@
 
 /**
  *    @file
- *      This file implements unit tests for the Weave TLV implementation.
+ *      This file implements unit tests for the CHIP TLV implementation.
  *
  */
 
@@ -1458,9 +1458,9 @@ exit:
 }
 
 /**
- *  Test Weave TLV Utilities
+ *  Test CHIP TLV Utilities
  */
-void CheckWeaveTLVUtilities(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVUtilities(nlTestSuite *inSuite, void *inContext)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -1551,9 +1551,9 @@ void CheckWeaveTLVUtilities(nlTestSuite *inSuite, void *inContext)
 }
 
 /**
- *  Test Weave TLV Empty Find
+ *  Test CHIP TLV Empty Find
  */
-void CheckWeaveTLVEmptyFind(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVEmptyFind(nlTestSuite *inSuite, void *inContext)
 {
     uint8_t buf[30];
     TLVWriter writer;
@@ -2282,7 +2282,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite *inSuite, void *inContext)
     TestEnd<TLVReader>(inSuite, reader);
 
 }
-void CheckWeaveTLVPutStringF(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVPutStringF(nlTestSuite *inSuite, void *inContext)
 {
     const size_t bufsize = 24;
     char strBuffer[bufsize];
@@ -2312,7 +2312,7 @@ void CheckWeaveTLVPutStringF(nlTestSuite *inSuite, void *inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
 }
 
-void CheckWeaveTLVPutStringFCircular(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVPutStringFCircular(nlTestSuite *inSuite, void *inContext)
 {
     const size_t bufsize = 40;
     char strBuffer[bufsize];
@@ -2377,7 +2377,7 @@ void CheckWeaveTLVPutStringFCircular(nlTestSuite *inSuite, void *inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
 }
 
-void CheckWeaveTLVSkipCircular(nlTestSuite *inSuite, void * inContext)
+void CheckCHIPTLVSkipCircular(nlTestSuite *inSuite, void * inContext)
 {
     const size_t bufsize = 40; // large enough s.t. 2 elements fit, 3rd causes eviction
     uint8_t backingStore[bufsize];
@@ -2492,9 +2492,9 @@ void CheckStrictAliasing(nlTestSuite *inSuite, void *inContext)
 }
 
 /**
- *  Test Weave TLV Writer Copy Container
+ *  Test CHIP TLV Writer Copy Container
  */
-void TestWeaveTLVWriterCopyContainer(nlTestSuite *inSuite)
+void TestCHIPTLVWriterCopyContainer(nlTestSuite *inSuite)
 {
     uint8_t buf[2048];
 
@@ -2539,9 +2539,9 @@ void TestWeaveTLVWriterCopyContainer(nlTestSuite *inSuite)
 }
 
 /**
- *  Test Weave TLV Writer Copy Element
+ *  Test CHIP TLV Writer Copy Element
  */
-void TestWeaveTLVWriterCopyElement(nlTestSuite *inSuite)
+void TestCHIPTLVWriterCopyElement(nlTestSuite *inSuite)
 {
     CHIP_ERROR err;
     uint8_t expectedBuf[2048], testBuf[2048];
@@ -2672,9 +2672,9 @@ void PreserveSizeWrite(nlTestSuite *inSuite, TLVWriter& writer, bool preserveSiz
 }
 
 /**
- *  Test Weave TLV Writer with Preserve Size
+ *  Test CHIP TLV Writer with Preserve Size
  */
-void TestWeaveTLVWriterPreserveSize(nlTestSuite *inSuite)
+void TestCHIPTLVWriterPreserveSize(nlTestSuite *inSuite)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -2689,9 +2689,9 @@ void TestWeaveTLVWriterPreserveSize(nlTestSuite *inSuite)
 }
 
 /**
- *  Test error handling of Weave TLV Writer
+ *  Test error handling of CHIP TLV Writer
  */
-void TestWeaveTLVWriterErrorHandling(nlTestSuite *inSuite)
+void TestCHIPTLVWriterErrorHandling(nlTestSuite *inSuite)
 {
     CHIP_ERROR err;
     uint8_t buf[2048];
@@ -2737,17 +2737,17 @@ void TestWeaveTLVWriterErrorHandling(nlTestSuite *inSuite)
 }
 
 /**
- *  Test Weave TLV Writer
+ *  Test CHIP TLV Writer
  */
-void CheckWeaveTLVWriter(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVWriter(nlTestSuite *inSuite, void *inContext)
 {
-    TestWeaveTLVWriterCopyContainer(inSuite);
+    TestCHIPTLVWriterCopyContainer(inSuite);
 
-    TestWeaveTLVWriterCopyElement(inSuite);
+    TestCHIPTLVWriterCopyElement(inSuite);
 
-    TestWeaveTLVWriterPreserveSize(inSuite);
+    TestCHIPTLVWriterPreserveSize(inSuite);
 
-    TestWeaveTLVWriterErrorHandling(inSuite);
+    TestCHIPTLVWriterErrorHandling(inSuite);
 }
 
 void SkipNonContainer(nlTestSuite *inSuite)
@@ -2808,9 +2808,9 @@ void NextContainer(nlTestSuite *inSuite)
 }
 
 /**
- *  Test Weave TLV Reader Skip functions
+ *  Test CHIP TLV Reader Skip functions
  */
-void TestWeaveTLVReaderSkip(nlTestSuite *inSuite)
+void TestCHIPTLVReaderSkip(nlTestSuite *inSuite)
 {
     SkipNonContainer(inSuite);
 
@@ -2820,9 +2820,9 @@ void TestWeaveTLVReaderSkip(nlTestSuite *inSuite)
 }
 
 /**
- *  Test Weave TLV Reader Dup functions
+ *  Test CHIP TLV Reader Dup functions
  */
-void TestWeaveTLVReaderDup(nlTestSuite *inSuite)
+void TestCHIPTLVReaderDup(nlTestSuite *inSuite)
 {
     TLVReader reader;
 
@@ -2940,9 +2940,9 @@ void TestWeaveTLVReaderDup(nlTestSuite *inSuite)
     TestEnd<TLVReader>(inSuite, reader);
 }
 /**
- *  Test error handling of Weave TLV Reader
+ *  Test error handling of CHIP TLV Reader
  */
-void TestWeaveTLVReaderErrorHandling(nlTestSuite *inSuite)
+void TestCHIPTLVReaderErrorHandling(nlTestSuite *inSuite)
 {
     CHIP_ERROR err;
     uint8_t buf[2048];
@@ -3003,9 +3003,9 @@ void TestWeaveTLVReaderErrorHandling(nlTestSuite *inSuite)
     free((void *)data);
 }
 /**
- *  Test Weave TLV Reader in a use case
+ *  Test CHIP TLV Reader in a use case
  */
-void TestWeaveTLVReaderInPractice(nlTestSuite *inSuite)
+void TestCHIPTLVReaderInPractice(nlTestSuite *inSuite)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -3031,7 +3031,7 @@ void TestWeaveTLVReaderInPractice(nlTestSuite *inSuite)
     TestGet<TLVReader, double>(inSuite, reader, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_1, 4000000000ULL), (float) 1.0);
 }
 
-void TestWeaveTLVReader_NextOverContainer_ProcessElement(nlTestSuite *inSuite, TLVReader& reader, void *context)
+void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite *inSuite, TLVReader& reader, void *context)
 {
     CHIP_ERROR err, nextRes1, nextRes2;
     TLVType outerContainerType;
@@ -3064,19 +3064,19 @@ void TestWeaveTLVReader_NextOverContainer_ProcessElement(nlTestSuite *inSuite, T
 }
 
 /**
- * Test using Weave TLV Reader Next() method to skip over containers.
+ * Test using CHIP TLV Reader Next() method to skip over containers.
  */
-void TestWeaveTLVReader_NextOverContainer(nlTestSuite *inSuite)
+void TestCHIPTLVReader_NextOverContainer(nlTestSuite *inSuite)
 {
     TLVReader reader;
 
     reader.Init(Encoding1, sizeof(Encoding1));
     reader.ImplicitProfileId = TestProfile_2;
 
-    ForEachElement(inSuite, reader, NULL, TestWeaveTLVReader_NextOverContainer_ProcessElement);
+    ForEachElement(inSuite, reader, NULL, TestCHIPTLVReader_NextOverContainer_ProcessElement);
 }
 
-void TestWeaveTLVReader_SkipOverContainer_ProcessElement(nlTestSuite *inSuite, TLVReader& reader, void *context)
+void TestCHIPTLVReader_SkipOverContainer_ProcessElement(nlTestSuite *inSuite, TLVReader& reader, void *context)
 {
     CHIP_ERROR err;
     TLVType outerContainerType;
@@ -3106,38 +3106,38 @@ void TestWeaveTLVReader_SkipOverContainer_ProcessElement(nlTestSuite *inSuite, T
 }
 
 /**
- * Test using Weave TLV Reader Skip() method to skip over containers.
+ * Test using CHIP TLV Reader Skip() method to skip over containers.
  */
-void TestWeaveTLVReader_SkipOverContainer(nlTestSuite *inSuite)
+void TestCHIPTLVReader_SkipOverContainer(nlTestSuite *inSuite)
 {
     TLVReader reader;
 
     reader.Init(Encoding1, sizeof(Encoding1));
     reader.ImplicitProfileId = TestProfile_2;
 
-    ForEachElement(inSuite, reader, NULL, TestWeaveTLVReader_SkipOverContainer_ProcessElement);
+    ForEachElement(inSuite, reader, NULL, TestCHIPTLVReader_SkipOverContainer_ProcessElement);
 }
 
 /**
- *  Test Weave TLV Reader
+ *  Test CHIP TLV Reader
  */
-void CheckWeaveTLVReader(nlTestSuite *inSuite, void *inContext)
+void CheckCHIPTLVReader(nlTestSuite *inSuite, void *inContext)
 {
-    TestWeaveTLVReaderSkip(inSuite);
+    TestCHIPTLVReaderSkip(inSuite);
 
-    TestWeaveTLVReaderDup(inSuite);
+    TestCHIPTLVReaderDup(inSuite);
 
-    TestWeaveTLVReaderErrorHandling(inSuite);
+    TestCHIPTLVReaderErrorHandling(inSuite);
 
-    TestWeaveTLVReaderInPractice(inSuite);
+    TestCHIPTLVReaderInPractice(inSuite);
 
-    TestWeaveTLVReader_NextOverContainer(inSuite);
+    TestCHIPTLVReader_NextOverContainer(inSuite);
 
-    TestWeaveTLVReader_SkipOverContainer(inSuite);
+    TestCHIPTLVReader_SkipOverContainer(inSuite);
 }
 
 /**
- *  Test Weave TLV Items
+ *  Test CHIP TLV Items
  */
 static void TestItems(nlTestSuite *inSuite, void *inContext)
 {
@@ -3224,7 +3224,7 @@ static void TestItems(nlTestSuite *inSuite, void *inContext)
 }
 
 /**
- *  Test Weave TLV Containers
+ *  Test CHIP TLV Containers
  */
 static void TestContainers(nlTestSuite *inSuite, void *inContext)
 {
@@ -3258,18 +3258,18 @@ static void TestContainers(nlTestSuite *inSuite, void *inContext)
 }
 
 /**
- *  Test Weave TLV Basics
+ *  Test CHIP TLV Basics
  */
-static void CheckWeaveTLVBasics(nlTestSuite *inSuite, void *inContext)
+static void CheckCHIPTLVBasics(nlTestSuite *inSuite, void *inContext)
 {
     TestItems(inSuite, inContext);
     TestContainers(inSuite, inContext);
 }
 
 /**
- *  Test Weave TLV Updater
+ *  Test CHIP TLV Updater
  */
-static void CheckWeaveUpdater(nlTestSuite *inSuite, void *inContext)
+static void CheckCHIPUpdater(nlTestSuite *inSuite, void *inContext)
 {
     WriteAppendReadTest0(inSuite);
 
@@ -3485,6 +3485,260 @@ static void CheckCloseContainerReserve(nlTestSuite *inSuite, void *inContext)
     }
 }
 
+static CHIP_ERROR ReadFuzzedEncoding1(nlTestSuite *inSuite, TLVReader& reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#define FUZZ_CHECK_VAL(TYPE, VAL)                                       \
+    do {                                                                \
+        TYPE val;                                                       \
+        err = reader.Get(val);                                          \
+        SuccessOrExit(err);                                             \
+        VerifyOrExit(val == (VAL), err = CHIP_ERROR_INVALID_ARGUMENT); \
+    } while (0)
+
+#define FUZZ_CHECK_STRING(VAL)                                                              \
+    do {                                                                                    \
+        char buf[sizeof(VAL)];                                                              \
+        VerifyOrExit(reader.GetLength() == strlen(VAL), err = CHIP_ERROR_INVALID_ADDRESS); \
+        err = reader.GetString(buf, sizeof(buf));                                           \
+        SuccessOrExit(err);                                                                 \
+        VerifyOrExit(strcmp(buf, (VAL)) == 0, err = CHIP_ERROR_INVALID_ADDRESS);           \
+    } while (0)
+
+    err = reader.Next(kTLVType_Structure, ProfileTag(TestProfile_1, 1));
+    SuccessOrExit(err);
+
+    {
+        TLVType outerContainer1Type;
+
+        err = reader.EnterContainer(outerContainer1Type);
+        SuccessOrExit(err);
+
+        err = reader.Next(kTLVType_Boolean, ProfileTag(TestProfile_1, 2));
+        SuccessOrExit(err);
+
+        FUZZ_CHECK_VAL(bool, true);
+
+        err = reader.Next(kTLVType_Boolean, ProfileTag(TestProfile_2, 2));
+        SuccessOrExit(err);
+
+        FUZZ_CHECK_VAL(bool, false);
+
+        err = reader.Next(kTLVType_Array, ContextTag(0));
+        SuccessOrExit(err);
+
+        {
+            TLVType outerContainer2Type;
+
+            err = reader.EnterContainer(outerContainer2Type);
+            SuccessOrExit(err);
+
+            err = reader.Next(kTLVType_SignedInteger, AnonymousTag);
+            SuccessOrExit(err);
+
+            FUZZ_CHECK_VAL(int8_t, 42);
+            FUZZ_CHECK_VAL(int16_t, 42);
+            FUZZ_CHECK_VAL(int32_t, 42);
+            FUZZ_CHECK_VAL(int64_t, 42);
+            FUZZ_CHECK_VAL(uint8_t, 42);
+            FUZZ_CHECK_VAL(uint16_t, 42);
+            FUZZ_CHECK_VAL(uint32_t, 42);
+            FUZZ_CHECK_VAL(uint64_t, 42);
+
+            err = reader.Next(kTLVType_SignedInteger, AnonymousTag);
+            SuccessOrExit(err);
+
+            FUZZ_CHECK_VAL(int8_t, -17);
+            FUZZ_CHECK_VAL(int16_t, -17);
+            FUZZ_CHECK_VAL(int32_t, -17);
+            FUZZ_CHECK_VAL(int64_t, -17);
+
+            err = reader.Next(kTLVType_SignedInteger, AnonymousTag);
+            SuccessOrExit(err);
+
+            FUZZ_CHECK_VAL(int32_t, -170000);
+            FUZZ_CHECK_VAL(int64_t, -170000);
+
+            err = reader.Next(kTLVType_UnsignedInteger, AnonymousTag);
+            SuccessOrExit(err);
+
+            FUZZ_CHECK_VAL(int64_t, 40000000000ULL);
+            FUZZ_CHECK_VAL(uint64_t, 40000000000ULL);
+
+            err = reader.Next(kTLVType_Structure, AnonymousTag);
+            SuccessOrExit(err);
+
+            {
+                TLVType outerContainer3Type;
+
+                err = reader.EnterContainer(outerContainer3Type);
+                SuccessOrExit(err);
+
+                err = reader.ExitContainer(outerContainer3Type);
+                SuccessOrExit(err);
+            }
+
+            err = reader.Next(kTLVType_Path, AnonymousTag);
+            SuccessOrExit(err);
+
+            {
+                TLVType outerContainer3Type;
+
+                err = reader.EnterContainer(outerContainer3Type);
+                SuccessOrExit(err);
+
+                err = reader.Next(kTLVType_Null, ProfileTag(TestProfile_1, 17));
+                SuccessOrExit(err);
+
+                err = reader.Next(kTLVType_Null, ProfileTag(TestProfile_2, 900000));
+                SuccessOrExit(err);
+
+                err = reader.Next(kTLVType_Structure, ProfileTag(TestProfile_2, 4000000000ULL));
+                SuccessOrExit(err);
+
+                {
+                    TLVType outerContainer4Type;
+
+                    err = reader.EnterContainer(outerContainer4Type);
+                    SuccessOrExit(err);
+
+                    err = reader.Next(kTLVType_UTF8String, CommonTag(70000));
+                    SuccessOrExit(err);
+
+                    FUZZ_CHECK_STRING(sLargeString);
+
+                    err = reader.ExitContainer(outerContainer4Type);
+                    SuccessOrExit(err);
+                }
+
+                err = reader.ExitContainer(outerContainer3Type);
+                SuccessOrExit(err);
+            }
+
+            err = reader.ExitContainer(outerContainer2Type);
+            SuccessOrExit(err);
+        }
+
+        err = reader.Next(kTLVType_UTF8String, ProfileTag(TestProfile_1, 5));
+        SuccessOrExit(err);
+
+        FUZZ_CHECK_STRING("This is a test");
+
+        err = reader.Next(kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535));
+        SuccessOrExit(err);
+
+        FUZZ_CHECK_VAL(double, (float)17.9);
+
+        err = reader.Next(kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536));
+        SuccessOrExit(err);
+
+        FUZZ_CHECK_VAL(double, (double)17.9);
+
+        err = reader.ExitContainer(outerContainer1Type);
+        SuccessOrExit(err);
+    }
+
+    err = reader.Next();
+    if (err == CHIP_END_OF_TLV)
+        err = CHIP_NO_ERROR;
+
+exit:
+    return err;
+}
+
+static uint32_t sFuzzTestDurationSecs = 5;
+static uint8_t  sFixedFuzzMask = 0;
+
+static void TLVReaderFuzzTest(nlTestSuite *inSuite, void *inContext)
+{
+    time_t now, endTime;
+    uint8_t fuzzedData[sizeof(Encoding1)];
+
+    // clang-format off
+    static uint8_t sFixedFuzzVals[] =
+    {
+        0x00,
+        0x01,
+        0xFF,
+        0x20, // 1-byte signed integer with context tag
+        0x21, // 2-byte signed integer with context tag
+        0x22, // 4-byte signed integer with context tag
+        0x23, // 8-byte signed integer with context tag
+        0x24, // 1-byte unsigned integer with context tag
+        0x25, // 1-byte unsigned integer with context tag
+        0x26, // 1-byte unsigned integer with context tag
+        0x27, // 1-byte unsigned integer with context tag
+        0x28, // Boolean false with context tag
+        0x29, // Boolean true with context tag
+        0x27, // UTF-8 string with 1-byte length and context tag
+        0x30, // Byte string with 1-byte length and context tag
+        0x35, // Structure with context tag
+        0x36, // Array with context tag
+        0x18, // End of container
+    };
+    // clang-format on
+
+    memcpy(fuzzedData, Encoding1, sizeof(fuzzedData));
+
+    time(&now);
+    endTime = now + sFuzzTestDurationSecs + 1;
+
+    srand(now);
+
+    size_t m = 0;
+    while (true)
+    {
+        for (size_t i = 0; i < sizeof(fuzzedData); i++)
+        {
+            uint8_t origVal = fuzzedData[i];
+
+            if (m < sizeof(sFixedFuzzVals))
+            {
+                if (origVal == sFixedFuzzVals[m])
+                    continue;
+
+                fuzzedData[i] = sFixedFuzzVals[m];
+            }
+
+            else
+            {
+                uint8_t fuzzMask = sFixedFuzzMask;
+                while (fuzzMask == 0)
+                    fuzzMask = GetRandU8();
+
+                fuzzedData[i] ^= fuzzMask;
+            }
+
+            TLVReader reader;
+            reader.Init(fuzzedData, sizeof(fuzzedData));
+            reader.ImplicitProfileId = TestProfile_2;
+
+            CHIP_ERROR readRes = ReadFuzzedEncoding1(inSuite, reader);
+            NL_TEST_ASSERT(inSuite, readRes != CHIP_NO_ERROR);
+
+            if (readRes == CHIP_NO_ERROR)
+            {
+                printf("Unexpected success of fuzz test: offset %u, original value 0x%02X, mutated value 0x%02X\n",
+                       (unsigned)i, (unsigned)origVal, (unsigned)fuzzedData[i]);
+                ExitNow();
+            }
+
+            time(&now);
+            if (now >= endTime)
+                ExitNow();
+
+            fuzzedData[i] = origVal;
+        }
+
+       if (m < sizeof(sFixedFuzzVals))
+            m++;
+    }
+
+exit:
+    return;
+}
+
 // Test Suite
 
 /**
@@ -3499,20 +3753,21 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Pretty Print Test",                   CheckPrettyPrinter),
     NL_TEST_DEF("Data Macro Test",                     CheckDataMacro),
     NL_TEST_DEF("Strict Aliasing Test",                CheckStrictAliasing),
-    NL_TEST_DEF("Weave TLV Basics",                    CheckWeaveTLVBasics),
-    NL_TEST_DEF("Weave TLV Writer",                    CheckWeaveTLVWriter),
-    NL_TEST_DEF("Weave TLV Reader",                    CheckWeaveTLVReader),
-    NL_TEST_DEF("Weave TLV Utilities",                 CheckWeaveTLVUtilities),
-    NL_TEST_DEF("Weave TLV Updater",                   CheckWeaveUpdater),
-    NL_TEST_DEF("Weave TLV Empty Find",                CheckWeaveTLVEmptyFind),
-    NL_TEST_DEF("Weave Circular TLV buffer, simple",   CheckCircularTLVBufferSimple),
-    NL_TEST_DEF("Weave Circular TLV buffer, mid-buffer start", CheckCircularTLVBufferStartMidway),
-    NL_TEST_DEF("Weave Circular TLV buffer, straddle", CheckCircularTLVBufferEvictStraddlingEvent),
-    NL_TEST_DEF("Weave Circular TLV buffer, edge",     CheckCircularTLVBufferEdge),
-    NL_TEST_DEF("Weave TLV Printf",                    CheckWeaveTLVPutStringF),
-    NL_TEST_DEF("Weave TLV Printf, Circular TLV buf",  CheckWeaveTLVPutStringFCircular),
-    NL_TEST_DEF("Weave TLV Skip non-contiguous",       CheckWeaveTLVSkipCircular),
-    NL_TEST_DEF("Weave TLV Check reserve",             CheckCloseContainerReserve),
+    NL_TEST_DEF("CHIP TLV Basics",                     CheckCHIPTLVBasics),
+    NL_TEST_DEF("CHIP TLV Writer",                     CheckCHIPTLVWriter),
+    NL_TEST_DEF("CHIP TLV Reader",                     CheckCHIPTLVReader),
+    NL_TEST_DEF("CHIP TLV Utilities",                  CheckCHIPTLVUtilities),
+    NL_TEST_DEF("CHIP TLV Updater",                    CheckCHIPUpdater),
+    NL_TEST_DEF("CHIP TLV Empty Find",                 CheckCHIPTLVEmptyFind),
+    NL_TEST_DEF("CHIP Circular TLV buffer, simple",    CheckCircularTLVBufferSimple),
+    NL_TEST_DEF("CHIP Circular TLV buffer, mid-buffer start", CheckCircularTLVBufferStartMidway),
+    NL_TEST_DEF("CHIP Circular TLV buffer, straddle",  CheckCircularTLVBufferEvictStraddlingEvent),
+    NL_TEST_DEF("CHIP Circular TLV buffer, edge",      CheckCircularTLVBufferEdge),
+    NL_TEST_DEF("CHIP TLV Printf",                     CheckCHIPTLVPutStringF),
+    NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckCHIPTLVPutStringFCircular),
+    NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckCHIPTLVSkipCircular),
+    NL_TEST_DEF("CHIP TLV Check reserve",              CheckCloseContainerReserve),
+    NL_TEST_DEF("CHIP TLV Reader Fuzz Test",           TLVReaderFuzzTest),
 
     NL_TEST_SENTINEL()
 };
