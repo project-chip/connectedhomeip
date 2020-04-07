@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,9 @@
 
 /**
  *    @file
- *      This file implements constants, globals and interfaces common
- *      to and used by all Inet layer library test applications and tools.
+ *      This file implements constants, globals and interfaces common to
+ *      and used by all CHP Inet layer library test applications and
+ *      tools.
  *
  *      NOTE: These do not comprise a public part of the CHIP API and
  *            are subject to change without notice.
@@ -399,7 +400,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         if (NetworkIsReady())
 #endif
         {
-            printf("Weave Node ready to service events; PID: %d; PPID: %d\n", getpid(), getppid());
+            printf("CHIP node ready to service events; PID: %d; PPID: %d\n", getpid(), getppid());
             fflush(stdout);
             printed = true;
         }

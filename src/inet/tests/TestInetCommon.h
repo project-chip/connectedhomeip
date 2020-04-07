@@ -20,9 +20,10 @@
 /**
  *    @file
  *      This file defines constants, globals and interfaces common to
- *      and used by all Weave test applications and tools.
+ *      and used by all CHP Inet layer library test applications and
+ *      tools.
  *
- *      NOTE: These do not comprise a public part of the Weave API and
+ *      NOTE: These do not comprise a public part of the CHIP API and
  *            are subject to change without notice.
  *
  */
@@ -73,7 +74,7 @@ extern void InitNetwork(void);
 extern void ServiceEvents(struct ::timeval & aSleepTime);
 extern void ShutdownNetwork(void);
 
-inline static void ServiceNetwork(struct ::timeval &aSleepTime)
+inline static void ServiceNetwork(struct ::timeval & aSleepTime)
 {
     ServiceEvents(aSleepTime);
 }

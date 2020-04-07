@@ -72,7 +72,7 @@ NetworkOptions::NetworkOptions()
                  "\n"
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
                  "  --tap-device <tap-dev-name>\n"
-                 "       TAP device name for LwIP hosted OS usage. Defaults to weave-dev-<node-id>.\n"
+                 "       TAP device name for LwIP hosted OS usage. Defaults to chip-dev-<node-id>.\n"
                  "\n"
                  "  --ipv4-gateway <ip-addr>\n"
                  "       Address of default IPv4 gateway.\n"
