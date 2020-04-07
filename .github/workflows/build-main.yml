@@ -17,4 +17,4 @@ jobs:
           make -f Makefile-Standalone pretty-check
 
       - name: Run Build
-        run: ./bootstrap && make -f Makefile-Standalone distcheck
+        run: ./integrations/docker/run_docker_build.sh
