@@ -71,6 +71,7 @@ check_PROGRAMS                                        = \
     TestInetAddress                                     \
     TestInetBuffer                                      \
     TestInetErrorStr                                    \
+    TestInetTimer                                       \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -98,6 +99,10 @@ TestInetBuffer_LDADD                                  = $(COMMON_LDADD)
 TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
                                                         $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
+
+TestInetTimer_SOURCES                                 = TestInetTimer.cpp       \
+                                                        $(NULL)
+TestInetTimer_LDADD                                   = $(COMMON_LDADD)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)
