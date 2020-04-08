@@ -1,4 +1,6 @@
 #
+#    Copyright (c) 2020 Project nlbuild-autotools Authors
+#    Copyright (c) 2020 Google LLC
 #    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,6 +57,11 @@ NL_V_GENHTML_FLAGS    = $(nl__v_GENHTML_FLAGS_$(V))
 nl__v_GENHTML_FLAGS_  = $(nl__v_GENHTML_FLAGS_$(AM_DEFAULT_VERBOSITY))
 nl__v_GENHTML_FLAGS_0 = --quiet 
 nl__v_GENHTML_FLAGS_1 =
+
+# Ensure that coverage-recursive is included among the list of
+# recursive targets known by autotools.
+
+RECURSIVE_TARGETS    += coverage-recursive
 
 #
 # generate-coverage-report <directory> [remove_filters]

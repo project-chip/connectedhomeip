@@ -1,3 +1,10 @@
+1.6.24 (2020-04-08)
+
+        * Ensure that 'coverage-recursive' is included in the
+          canonical set of known recursive targets such that
+          dependency rules like "$(RECURSIVE_TARGETS):
+          $(lib_LIBRARIES)" work correctly.
+
 1.6.23 (2020-04-07)
 
         * Collapse generate-coverage-report and
