@@ -44,7 +44,7 @@
 #include <ble/BLEEndPoint.h>
 #include <ble/BleLayer.h>
 #include <ble/BtpEngine.h>
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
 #include "BtpEngineTest.h"
 #endif
 
@@ -223,7 +223,7 @@ void BLEEndPoint::HandleSubscribeReceived()
     VerifyOrExit(mSendQueue != NULL, err = BLE_ERROR_INCORRECT_STATE);
 
     // Send BTP capabilities response to peripheral via GATT indication.
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     VerifyOrExit(mBtpEngine.PopPacketTag(mSendQueue) == kType_Data, err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 #endif
     if (!SendIndication(mSendQueue))
@@ -308,7 +308,7 @@ void BLEEndPoint::Abort()
     OnConnectComplete  = NULL;
     OnConnectionClosed = NULL;
     OnMessageReceived  = NULL;
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     OnCommandReceived = NULL;
 #endif
 
@@ -321,7 +321,7 @@ void BLEEndPoint::Close()
     OnConnectComplete  = NULL;
     OnConnectionClosed = NULL;
     OnMessageReceived  = NULL;
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     OnCommandReceived = NULL;
 #endif
 
@@ -383,7 +383,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
     mSendQueue = NULL;
     QueueTxUnlock();
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     PacketBuffer::Free(mBtpEngineTest.mCommandReceiveQueue);
     mBtpEngineTest.mCommandReceiveQueue = NULL;
 #endif
@@ -501,7 +501,7 @@ void BLEEndPoint::Free()
     StopAckReceivedTimer();
     StopSendAckTimer();
     StopUnsubscribeTimer();
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     mBtpEngineTest.StopTestTimer();
     // Clear callback
     OnCommandReceived = NULL;
@@ -564,7 +564,7 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
         ExitNow();
     }
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     err = (BLE_ERROR) mTxQueueMutex.Init(mTxQueueMutex);
     if (err != BLE_NO_ERROR)
     {
@@ -574,7 +574,7 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     err = mBtpEngineTest.Init(this);
     if (err != BLE_NO_ERROR)
     {
-        ChipLogError(Ble, "CHIPoBleTest init failed");
+        ChipLogError(Ble, "BTP test init failed");
         ExitNow();
     }
 #endif
@@ -645,7 +645,7 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBuffer * buf)
  */
 void BLEEndPoint::QueueTx(PacketBuffer * data, PacketType_t type)
 {
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     ChipLogDebugBleEndPoint(Ble, "%s: data->%p, type %d, len %d", __FUNCTION__, data, type, data->DataLength());
     mBtpEngine.PushPacketTag(data, type);
 #endif
@@ -740,7 +740,7 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
 
     // Get the first queued packet to send
     QueueTxLock();
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     // Return if tx queue is empty
     // Note: DetachTail() does not check an empty queue
     if (mSendQueue == NULL)
@@ -754,11 +754,11 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
     mSendQueue          = mSendQueue->DetachTail();
     QueueTxUnlock();
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     // Get and consume the packet tag in message buffer
     PacketType_t type = mBtpEngine.PopPacketTag(data);
     mBtpEngine.SetTxPacketType(type);
-    mBtpEngineTest.DoTxTiming(data, CHIPOBLE_TX_START);
+    mBtpEngineTest.DoTxTiming(data, BTP_TX_START);
 #endif
 
     // Hand whole message payload to the fragmenter.
@@ -1081,9 +1081,9 @@ BLE_ERROR BLEEndPoint::DriveSending()
     {
         // Clear fragmenter's pointer to sent message buffer and reset its Tx state.
         PacketBuffer * sentBuf = mBtpEngine.TxPacket();
-#if CHIP_ENABLE_BTP_TEST
-        mBtpEngineTest.DoTxTiming(sentBuf, CHIPOBLE_TX_DONE);
-#endif // CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
+        mBtpEngineTest.DoTxTiming(sentBuf, BTP_TX_DONE);
+#endif // CHIP_ENABLE_CHIPOBLE_TEST
         mBtpEngine.ClearTxPacket();
 
         // Free sent buffer.
@@ -1234,7 +1234,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBuffer * data)
         ExitNow();
     }
 
-    // Set fragment size as minimum of (reported ATT MTU, CHIPoBLE characteristic size)
+    // Set fragment size as minimum of (reported ATT MTU, BTP characteristic size)
     resp.mFragmentSize = chip::min(resp.mFragmentSize, BtpEngine::sMaxFragmentSize);
 
     if ((resp.mSelectedProtocolVersion == kBleTransportProtocolVersion_V1) ||
@@ -1315,7 +1315,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
     uint8_t closeFlags           = kBleCloseFlag_AbortTransmission;
     bool didReceiveAck           = false;
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     if (mBtpEngine.IsCommandPacket(data))
     {
         ChipLogDebugBleEndPoint(Ble, "%s: Received Control frame: Flags %x", __FUNCTION__, *(data->Start()));
@@ -1379,14 +1379,14 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
         ExitNow();
     }
 
-    ChipLogDebugBleEndPoint(Ble, "CHIPoBLE about to rx characteristic, state before:");
+    ChipLogDebugBleEndPoint(Ble, "BTP about to rx characteristic, state before:");
     mBtpEngine.LogStateDebug();
 
     // Pass received packet into BTP protocol engine.
     err  = mBtpEngine.HandleCharacteristicReceived(data, receivedAck, didReceiveAck);
     data = NULL; // Buffer consumed by protocol engine; either freed or added to message reassembly area.
 
-    ChipLogDebugBleEndPoint(Ble, "CHIPoBLE rx'd characteristic, state after:");
+    ChipLogDebugBleEndPoint(Ble, "BTP rx'd characteristic, state after:");
     mBtpEngine.LogStateDebug();
 
     SuccessOrExit(err);
@@ -1477,7 +1477,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBuffer * data)
 
         ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
         // If we have a control message received callback, and end point is not closing...
         if (mBtpEngine.RxPacketType() == kType_Control && OnCommandReceived && mState != kState_Closing)
         {

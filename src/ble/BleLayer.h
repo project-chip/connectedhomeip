@@ -99,9 +99,9 @@ typedef enum
 typedef enum
 {
     kBleTransportProtocolVersion_None = 0,
-    kBleTransportProtocolVersion_V1   = 1, // Prototype BtpEngine version without ACKs or flow-control.
-    kBleTransportProtocolVersion_V2   = 2, // First CHIPoBLE version with ACKs and flow-control.
-    kBleTransportProtocolVersion_V3   = 3  // First CHIPoBLE version with asymetric fragement sizes.
+    kBleTransportProtocolVersion_V1   = 1, // Prototype BTP version without ACKs or flow-control.
+    kBleTransportProtocolVersion_V2   = 2, // First BTP version with ACKs and flow-control.
+    kBleTransportProtocolVersion_V3   = 3  // First BTP version with asymetric fragement sizes.
 } BleTransportProtocolVersion;
 
 class BleLayerObject
@@ -230,7 +230,7 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     friend class BtpEngineTest;
 #endif
 
@@ -330,7 +330,7 @@ public:
      *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this chipConnection and its end point object. */
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, BLE_ERROR err);
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     BLEEndPoint * mTestBleEndPoint;
 #endif
 

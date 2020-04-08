@@ -321,7 +321,7 @@ BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationD
 
     mState = kState_Initialized;
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = NULL;
 #endif
 
@@ -383,7 +383,7 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
 
     (*retEndPoint)->Init(this, connObj, role, autoClose);
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = *retEndPoint;
 #endif
 

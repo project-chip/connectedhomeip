@@ -30,7 +30,7 @@
 #if CONFIG_NETWORK_LAYER_BLE
 
 #include <ble/BtpEngine.h>
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
 #include <ble/BtpEngineTest.h>
 #endif
 
@@ -109,7 +109,7 @@ BLE_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
     mTxPacketCount         = 0;
     mTxNewestUnackedSeqNum = 0;
     mTxOldestUnackedSeqNum = 0;
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     mTxPacketType = kType_Data; // Default BtpEngine Data packet
     mRxPacketType = kType_Data; // Default BtpEngine Data packet
 #endif
@@ -273,7 +273,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
 
     // Get header flags, always in first byte.
     rx_flags = characteristic[cursor++];
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     if (GetFlag(rx_flags, kHeaderFlag_CommandMessage))
         SetRxPacketType(kType_Control);
     else
@@ -484,7 +484,7 @@ bool BtpEngine::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
         characteristic[0] = kHeaderFlag_StartMessage;
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
         if (TxPacketType() == kType_Control)
             SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
 #endif
@@ -537,7 +537,7 @@ bool BtpEngine::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
 
         characteristic[0] = kHeaderFlag_ContinueMessage;
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
         if (TxPacketType() == kType_Control)
             SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
 #endif

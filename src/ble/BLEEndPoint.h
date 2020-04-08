@@ -32,7 +32,7 @@
 
 #include <ble/BleLayer.h>
 #include <ble/BtpEngine.h>
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
 #include <ble/BtpEngineTest.h>
 #endif
 
@@ -50,7 +50,7 @@ enum
 // Forward declarations
 class BleLayer;
 class BleEndPointPool;
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
 class BtpEngineTest;
 #endif
 
@@ -58,7 +58,7 @@ class DLL_EXPORT BLEEndPoint : public BleLayerObject
 {
     friend class BleLayer;
     friend class BleEndPointPool;
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     friend class BtpEngineTest;
 #endif
 
@@ -87,7 +87,7 @@ public:
     typedef void (*OnConnectionClosedFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
     OnConnectionClosedFunct OnConnectionClosed;
 
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBuffer * msg);
     OnCommandReceivedFunct OnCommandReceived;
     inline void SetOnCommandReceivedCB(OnCommandReceivedFunct cb) { OnCommandReceived = cb; };
@@ -126,7 +126,7 @@ private:
         kTimerState_AckReceivedTimerRunning       = 0x04, // Ack received timer running due to unacked sent fragment.
         kTimerState_SendAckTimerRunning           = 0x08, // Send ack timer running; indicates pending ack to send.
         kTimerState_UnsubscribeTimerRunning       = 0x10, // Unsubscribe completion timer running.
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
         kTimerState_UnderTestTimerRunnung = 0x80 // running throughput Tx test
 #endif
     };
@@ -153,7 +153,7 @@ private:
     SequenceNumber_t mLocalReceiveWindowSize;
     SequenceNumber_t mRemoteReceiveWindowSize;
     SequenceNumber_t mReceiveWindowMaxSize;
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     chip::System::Mutex mTxQueueMutex; // For MT-safe Tx queuing
 #endif
 
@@ -219,7 +219,7 @@ private:
     void FreeBtpEngine(void);
 
     // Mutex lock on Tx queue. Used only in BtpEngine test build for now.
-#if CHIP_ENABLE_BTP_TEST
+#if CHIP_ENABLE_CHIPOBLE_TEST
     inline void QueueTxLock() { mTxQueueMutex.Lock(); };
     inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); };
 #else
