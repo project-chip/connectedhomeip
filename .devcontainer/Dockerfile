@@ -16,7 +16,7 @@ RUN apt-get -fy install git vim emacs sudo \
     iproute2 procps lsb-release \
     bash-completion \
     build-essential cmake cppcheck valgrind \
-    wget curl
+    wget curl telnet
 
 RUN groupadd --gid $USER_GID $USERNAME
 RUN useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME
