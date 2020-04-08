@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -21,8 +22,6 @@
 #include "app_config.h"
 #include "app_timer.h"
 #include "nrf_log.h"
-
-#include <schema/include/BoltLockTrait.h>
 
 #include "AppTask.h"
 #include "FreeRTOS.h"
@@ -167,7 +166,7 @@ void BoltLockManager::TimerEventHandler(void * p_context)
 void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 {
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-    int32_t actor = Schema::Weave::Trait::Security::BoltLockTrait::BOLT_LOCK_ACTOR_METHOD_LOCAL_IMPLICIT;
+    int32_t actor = 0; //Schema::Weave::Trait::Security::BoltLockTrait::BOLT_LOCK_ACTOR_METHOD_LOCAL_IMPLICIT;
 
     // Make sure auto lock timer is still armed.
     if (!lock->mAutoLockTimerArmed)

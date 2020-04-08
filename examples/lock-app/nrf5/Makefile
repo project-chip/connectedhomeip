@@ -1,5 +1,6 @@
 #
 #
+#   Copyright (c) 2020 Project CHIP Authors
 #   Copyright (c) 2019 Google LLC.
 #   All rights reserved.
 #
@@ -23,13 +24,11 @@
 
 PROJECT_ROOT := $(realpath .)
 
-OPENWEAVE_ROOT ?= $(PROJECT_ROOT)/third_party/openweave-core
-
-BUILD_SUPPORT_DIR = $(OPENWEAVE_ROOT)/build/nrf5
+CHIP_ROOT := $(PROJECT_ROOT)/../../../
+BUILD_SUPPORT_DIR = $(CHIP_ROOT)/build/nrf5
 
 include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
-include $(BUILD_SUPPORT_DIR)/nrf5-openweave.mk
-include $(BUILD_SUPPORT_DIR)/nrf5-openthread.mk
+include $(BUILD_SUPPORT_DIR)/nrf5-chip.mk
 
 APP = openweave-nrf52840-lock-example
 
@@ -38,18 +37,9 @@ SRCS = \
     $(PROJECT_ROOT)/main/AppTask.cpp \
     $(PROJECT_ROOT)/main/LEDWidget.cpp \
     $(PROJECT_ROOT)/main/BoltLockManager.cpp \
-    $(PROJECT_ROOT)/main/WDMFeature.cpp \
-    $(PROJECT_ROOT)/main/traits/BoltLockTraitDataSource.cpp \
-    $(PROJECT_ROOT)/main/traits/BoltLockSettingsTraitDataSink.cpp \
-    $(PROJECT_ROOT)/main/traits/DeviceIdentityTraitDataSource.cpp \
-    $(PROJECT_ROOT)/main/schema/BoltLockTrait.cpp \
-    $(PROJECT_ROOT)/main/schema/BoltLockSettingsTrait.cpp \
-    $(PROJECT_ROOT)/main/schema/DeviceIdentityTrait.cpp \
     $(PROJECT_ROOT)/main/support/CXXExceptionStubs.cpp \
     $(PROJECT_ROOT)/main/support/nRF5Sbrk.c \
     $(PROJECT_ROOT)/main/support/FreeRTOSNewlibLockSupport.c \
-    $(PROJECT_ROOT)/main/support/AltPrintf.c \
-    $(PROJECT_ROOT)/third_party/printf/printf.c \
     $(NRF5_SDK_ROOT)/components/ble/common/ble_advdata.c \
     $(NRF5_SDK_ROOT)/components/ble/common/ble_srv_common.c \
     $(NRF5_SDK_ROOT)/components/ble/nrf_ble_gatt/nrf_ble_gatt.c \
@@ -83,7 +73,6 @@ SRCS = \
     $(NRF5_SDK_ROOT)/components/softdevice/common/nrf_sdh.c \
     $(NRF5_SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
     $(NRF5_SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
-    $(NRF5_SDK_ROOT)/components/thread/freertos_mbedtls_mutex/freertos_mbedtls_mutex.c \
     $(NRF5_SDK_ROOT)/external/fprintf/nrf_fprintf.c \
     $(NRF5_SDK_ROOT)/external/fprintf/nrf_fprintf_format.c \
     $(NRF5_SDK_ROOT)/external/freertos/portable/CMSIS/nrf52/port_cmsis.c \
@@ -117,6 +106,10 @@ INC_DIRS = \
     $(PROJECT_ROOT)/main/traits/include \
     $(PROJECT_ROOT)/main/schema/include \
     $(PROJECT_ROOT)/third_party/printf \
+    $(CHIP_ROOT)/src/include/      \
+    $(CHIP_ROOT)/src/lib           \
+    $(CHIP_ROOT)/src/              \
+    $(CHIP_ROOT)/src/system        \
     $(NRF5_SDK_ROOT)/components \
     $(NRF5_SDK_ROOT)/components/boards \
     $(NRF5_SDK_ROOT)/components/ble/ble_advertising \
@@ -145,6 +138,7 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/components/libraries/util \
     $(NRF5_SDK_ROOT)/components/softdevice/common \
     $(NRF5_SDK_ROOT)/components/softdevice/s140/headers \
+    $(NRF5_SDK_ROOT)/components/softdevice/s140/headers/nrf52 \
     $(NRF5_SDK_ROOT)/components/softdevice/mbr/nrf52840/headers \
     $(NRF5_SDK_ROOT)/components/thread/freertos_mbedtls_mutex \
     $(NRF5_SDK_ROOT)/components/toolchain/cmsis/include \
@@ -154,6 +148,7 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/external/freertos/portable/CMSIS/nrf52 \
     $(NRF5_SDK_ROOT)/external/freertos/portable/GCC/nrf52 \
     $(NRF5_SDK_ROOT)/external/freertos/source/include \
+    $(NRF5_SDK_ROOT)/external/mbedtls/include \
     $(NRF5_SDK_ROOT)/external/segger_rtt \
     $(NRF5_SDK_ROOT)/integration/nrfx \
     $(NRF5_SDK_ROOT)/integration/nrfx/legacy \
@@ -172,7 +167,8 @@ DEFINES = \
     __HEAP_SIZE=40960 \
     __STACK_SIZE=8192 \
     SOFTDEVICE_PRESENT \
-    PRINTF_DISABLE_SUPPORT_EXPONENTIAL
+    PRINTF_DISABLE_SUPPORT_EXPONENTIAL \
+    S140
 
 CFLAGS = \
     --specs=nano.specs
@@ -182,7 +178,7 @@ LDFLAGS = \
 
 ifdef DEVICE_FIRMWARE_REVISION
 DEFINES += \
-    WEAVE_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION=\"$(DEVICE_FIRMWARE_REVISION)\"
+    CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION=\"$(DEVICE_FIRMWARE_REVISION)\"
 endif
 
 # A product's firmware usually comes with two build "flavors":
@@ -208,21 +204,15 @@ endif
 ifdef BUILD_RELEASE
     DEFINES += BUILD_RELEASE=1
     # Disable Thread logging.
-    OPENTHREAD_DEFINES += OPENTHREAD_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_NONE
+    CHIP_DEFINES += CHIP_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_NONE
 else
     DEFINES += BUILD_RELEASE=0
     # Increase Tread logging level to INFO.
-    OPENTHREAD_DEFINES += OPENTHREAD_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_INFO
+    CHIP_DEFINES += CHIP_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_INFO
 endif
 
-OPENWEAVE_PROJECT_CONFIG = $(PROJECT_ROOT)/main/include/WeaveProjectConfig.h
+CHIP_PROJECT_CONFIG = $(PROJECT_ROOT)/main/include/CHIPProjectConfig.h
 
-OPENTHREAD_PROJECT_CONFIG = $(PROJECT_ROOT)/main/include/OpenThreadConfig.h
-
-OPENTHREAD_CONFIGURE_OPTIONS += \
-    --enable-child-supervision \
-    --enable-jam-detection
-
-LINKER_SCRIPT = $(PROJECT_ROOT)/main/ldscripts/openweave-nrf52840-lock-example.ld
+LINKER_SCRIPT = $(PROJECT_ROOT)/main/ldscripts/chip-nrf52840-lock-example.ld
 
 $(call GenerateBuildRules)

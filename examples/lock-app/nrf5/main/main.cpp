@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -42,33 +43,12 @@ extern "C" {
 #include "nrf_log_backend_uart.h"
 #endif // NRF_LOG_ENABLED
 
-#include <mbedtls/platform.h>
-
-#include <openthread/instance.h>
-#include <openthread/thread.h>
-#include <openthread/tasklet.h>
-#include <openthread/link.h>
-#include <openthread/dataset.h>
-#include <openthread/error.h>
-#include <openthread/icmp6.h>
-#include <openthread/platform/openthread-system.h>
-extern "C" {
-#include <openthread/platform/platform-softdevice.h>
-}
-
-#include <Weave/DeviceLayer/WeaveDeviceLayer.h>
-#include <Weave/DeviceLayer/ThreadStackManager.h>
-#include <Weave/DeviceLayer/nRF5/GroupKeyStoreImpl.h>
-#include <Weave/DeviceLayer/internal/testing/ConfigUnitTest.h>
-#include <Weave/DeviceLayer/internal/testing/GroupKeyStoreUnitTest.h>
-#include <Weave/DeviceLayer/internal/testing/SystemClockUnitTest.h>
-
+#include <platform/CHIPDeviceLayer.h>
 #include <AppTask.h>
 
-using namespace ::nl;
-using namespace ::nl::Inet;
-using namespace ::nl::Weave;
-using namespace ::nl::Weave::DeviceLayer;
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::DeviceLayer;
 
 extern "C" size_t GetHeapTotalSize(void);
 
@@ -82,7 +62,7 @@ extern "C" size_t GetHeapTotalSize(void);
 
 uint32_t LogTimestamp(void)
 {
-    return static_cast<uint32_t>(nl::Weave::System::Platform::Layer::GetClock_MonotonicMS());
+    return 0;
 }
 
 #define LOG_TIMESTAMP_FUNC LogTimestamp
@@ -106,8 +86,6 @@ uint32_t LogTimestamp(void)
 static void OnSoCEvent(uint32_t sys_evt, void * p_context)
 {
     UNUSED_PARAMETER(p_context);
-
-    otSysSoftdeviceSocEvtHandler(sys_evt);
 }
 
 #endif // defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
@@ -168,13 +146,14 @@ int main(void)
 #endif
 
     NRF_LOG_INFO("==================================================");
-    NRF_LOG_INFO("openweave-nrf52840-lock-example starting");
+    NRF_LOG_INFO("chip-nrf52840-lock-example starting");
 #if BUILD_RELEASE
     NRF_LOG_INFO("*** PSEUDO-RELEASE BUILD ***");
 #else
     NRF_LOG_INFO("*** DEVELOPMENT BUILD ***");
 #endif
     NRF_LOG_INFO("==================================================");
+    NRF_LOG_FLUSH();
 
 #if defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
 
@@ -204,6 +183,7 @@ int main(void)
         NRF_LOG_INFO("nrf_mem_init() failed");
         APP_ERROR_HANDLER(ret);
     }
+    NRF_LOG_INFO("Mem init complete");
 
 #if NRF_CRYPTO_ENABLED
     ret = nrf_crypto_init();
@@ -212,6 +192,7 @@ int main(void)
         NRF_LOG_INFO("nrf_crypto_init() failed");
         APP_ERROR_HANDLER(ret);
     }
+    NRF_LOG_INFO("Crypto init complete");
 #endif
 
 #if defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
@@ -221,94 +202,33 @@ int main(void)
 
         // Configure the BLE stack using the default settings.
         // Fetch the start address of the application RAM.
-        ret = nrf_sdh_ble_default_cfg_set(WEAVE_DEVICE_LAYER_BLE_CONN_CFG_TAG, &appRAMStart);
+        ret = nrf_sdh_ble_default_cfg_set(CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG, &appRAMStart);
         APP_ERROR_CHECK(ret);
 
         // Enable BLE stack.
         ret = nrf_sdh_ble_enable(&appRAMStart);
         APP_ERROR_CHECK(ret);
+        NRF_LOG_INFO("SoftDevice BLE enabled");
     }
 
 #endif // defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
 
-    // Configure mbedTLS to use FreeRTOS-based mutexes.  This ensures that mbedTLS can be used
-    // simultaneously from multiple FreeRTOS tasks (e.g. OpenThread, OpenWeave and the application).
-    freertos_mbedtls_mutex_init();
-
-    NRF_LOG_INFO("Initializing Weave stack");
-
-    ret = PlatformMgr().InitWeaveStack();
-    if (ret != WEAVE_NO_ERROR)
+    NRF_LOG_INFO("Init CHIP stack");
+    ret = PlatformMgr().InitChipStack();
+    if (ret != CHIP_NO_ERROR)
     {
-        NRF_LOG_INFO("PlatformMgr().InitWeaveStack() failed");
+        NRF_LOG_INFO("PlatformMgr().InitChipStack() failed");
         APP_ERROR_HANDLER(ret);
     }
 
-    NRF_LOG_INFO("Initializing OpenThread stack");
-
-    otSysInit(0, NULL);
-
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != WEAVE_NO_ERROR)
-    {
-        NRF_LOG_INFO("ThreadStackMgr().InitThreadStack() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
-    // Reconfigure mbedTLS to use regular calloc and free.
-    //
-    // By default, OpenThread configures mbedTLS to use its private heap at initialization time.  However,
-    // the OpenThread heap is not thread-safe, effectively preventing other threads from using mbedTLS
-    // functions.
-    //
-    // Note that this presumes that the system heap is itself thread-safe.  On newlib-based systems
-    // this requires a proper implementation of __malloc_lock()/__malloc_unlock() for the applicable
-    // RTOS.  It also requires the heap to be provisioned with enough storage to accommodate OpenThread's
-    // needs.
-    //
-    mbedtls_platform_set_calloc_free(calloc, free);
-
-    // Configure device to operate as a Thread sleepy end-device.
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-    if (ret != WEAVE_NO_ERROR)
-    {
-        NRF_LOG_INFO("ConnectivityMgr().SetThreadDeviceType() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
-    // Configure the Thread polling behavior for the device.
-    {
-        ConnectivityManager::ThreadPollingConfig pollingConfig;
-        pollingConfig.Clear();
-        pollingConfig.ActivePollingIntervalMS = THREAD_ACTIVE_POLLING_INTERVAL_MS;
-        pollingConfig.InactivePollingIntervalMS = THREAD_INACTIVE_POLLING_INTERVAL_MS;
-        ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-        if (ret != WEAVE_NO_ERROR)
-        {
-            NRF_LOG_INFO("ConnectivityMgr().SetThreadPollingConfig() failed");
-            APP_ERROR_HANDLER(ret);
-        }
-    }
-
-    NRF_LOG_INFO("Starting Weave task");
-
+    NRF_LOG_INFO("Starting CHIP task");
     ret = PlatformMgr().StartEventLoopTask();
-    if (ret != WEAVE_NO_ERROR)
+    if (ret != CHIP_NO_ERROR)
     {
         NRF_LOG_INFO("PlatformMgr().StartEventLoopTask() failed");
         APP_ERROR_HANDLER(ret);
     }
-
-    NRF_LOG_INFO("Starting OpenThread task");
-
-    // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != WEAVE_NO_ERROR)
-    {
-        NRF_LOG_INFO("ThreadStackMgr().StartThreadTask() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-
+    
     ret = GetAppTask().StartAppTask();
     if (ret != NRF_SUCCESS)
     {
@@ -318,13 +238,13 @@ int main(void)
 
     // Activate deep sleep mode
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-
+/*
     {
         struct mallinfo minfo = mallinfo();
         NRF_LOG_INFO("System Heap Utilization: heap size %" PRId32 ", arena size %" PRId32 ", in use %" PRId32 ", free %" PRId32,
                 GetHeapTotalSize(), minfo.arena, minfo.uordblks, minfo.fordblks);
     }
-
+*/
     NRF_LOG_INFO("Starting FreeRTOS scheduler");
 
     /* Start FreeRTOS scheduler. */

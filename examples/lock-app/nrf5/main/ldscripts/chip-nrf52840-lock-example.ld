@@ -20,8 +20,8 @@ OT_DATA_FLASH_PAGES = 4;
 MEMORY
 {
     /* FLASH region occupied by the Nordic SoftDevice */
-    SD_FLASH (rx) : ORIGIN = 0, LENGTH = 0x26000
-    
+    SD_FLASH (rx) : ORIGIN = 0, LENGTH = 0x27000
+
     /* RAM region used by the Nordic SoftDevice */
     SD_RAM (rw) : ORIGIN = 0x20000000, LENGTH = 0x5800
 
