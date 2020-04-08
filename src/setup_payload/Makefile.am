@@ -25,25 +25,29 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 SUBDIRS                    = tests
 
-lib_LIBRARIES              = libQrCode.a
+lib_LIBRARIES              = libSetupPayload.a
 
-libQrCode_adir             = $(includedir)/setup_payload
+libSetupPayload_adir             = $(includedir)/setup_payload
 
-libQrCode_a_CPPFLAGS                                      = \
+libSetupPayload_a_CPPFLAGS                                      = \
     -I$(top_srcdir)/src                                     \
     -I$(top_srcdir)/src/lib                                 \
     -I$(top_srcdir)/src/system                              \
     -I$(top_srcdir)/src/include/                            \
     $(NULL)
 
-libQrCode_a_SOURCES                                       = \
+libSetupPayload_a_SOURCES                                       = \
+    ManualSetupPayloadGenerator.cpp                         \
+    ManualSetupPayloadParser.cpp                            \
     QRCodeSetupPayloadGenerator.cpp                         \
     SetupPayload.cpp                                        \
     Base45.cpp                                              \
     QRCodeSetupPayloadParser.cpp                            \
    $(NULL)
 
-dist_libQrCode_a_HEADERS                                  = \
+dist_libSetupPayload_a_HEADERS                                  = \
+    ManualSetupPayloadGenerator.h                           \
+    ManualSetupPayloadParser.h                              \
     QRCodeSetupPayloadGenerator.h                           \
     SetupPayload.h                                          \
     Base45.h                                                \
