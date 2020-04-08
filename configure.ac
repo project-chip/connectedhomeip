@@ -1869,8 +1869,6 @@ src/Makefile
 src/include/Makefile
 src/ble/Makefile
 src/ble/tests/Makefile
-src/crypto/Makefile
-src/crypto/tests/Makefile
 src/lwip/Makefile
 src/lwip/tests/Makefile
 src/system/Makefile
@@ -1884,6 +1882,8 @@ src/lib/core/tests/Makefile
 src/lib/support/Makefile
 src/lib/support/tests/Makefile
 src/platform/Makefile
+src/crypto/Makefile
+src/crypto/tests/Makefile
 tests/Makefile
 ])
 

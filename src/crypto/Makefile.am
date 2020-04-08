@@ -25,7 +25,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 SUBDIRS                    = tests
 
-lib_LIBRARIES              = libChipCrypto.a
+lib_LIBRARIES              = libChipCrypto.a libChipCryptoOpenSSL.a
 
 libChipCrypto_adir             = $(includedir)/crypto
 
@@ -42,6 +42,24 @@ libChipCrypto_a_SOURCES                                       = \
 dist_libChipCrypto_a_HEADERS                                 = \
     CHIPCrypto.h                                               \
     CHIPBase+CompilerAbstraction.h                             \
+    CHIPCryptoPAL.h                                            \
+    $(NULL)
+
+# Build openSSL based crypto as a separate library
+libChipCryptoOpenSSL_adir             = $(includedir)/crypto
+
+libChipCryptoOpenSSL_a_CPPFLAGS                              = \
+    -I$(top_srcdir)/src                                     \
+    -I$(top_srcdir)/src/lib                                 \
+    -I$(top_srcdir)/src/system                              \
+    -I$(top_srcdir)/src/include/                            \
+    $(NULL)
+
+libChipCryptoOpenSSL_a_SOURCES                               = \
+    CHIPCryptoPALOpenSSL.cpp                                   \
+   $(NULL)
+
+dist_libChipCrypto_a_HEADERS                                 = \
     CHIPCryptoPAL.h                                            \
     $(NULL)
 

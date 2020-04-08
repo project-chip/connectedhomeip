@@ -40,13 +40,14 @@ if CHIP_BUILD_TESTS
 # objects in this makefile.
 
 AM_CPPFLAGS                                    = \
+    -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
     -I$(top_srcdir)/src/system                   \
+    -I$(top_srcdir)/src/include/                 \    
     -I$(top_srcdir)/src/crypto                   \
     $(NULL)
 
 CHIP_LDADD                                      = \
-    $(top_builddir)/src/crypto/libChipCrypto.a    \
     $(NULL)
 
 COMMON_LDADD                                   = \
@@ -57,6 +58,7 @@ COMMON_LDADD                                   = \
 
 check_PROGRAMS                                 = \
     TestCrypto                                   \
+    TestOpenSSLCrypto                            \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -74,8 +76,23 @@ TESTS_ENVIRONMENT                              = \
 
 # Source, compiler, and linker options for test programs.
 
-TestCrypto_LDADD                               = $(COMMON_LDADD)
+TestCrypto_LDADD                               = \
+    $(COMMON_LDADD)                              \
+    $(top_builddir)/src/crypto/libChipCrypto.a   \
+    $(NULL)
+
+
 TestCrypto_SOURCES                             = CHIPCryptoTest.c
+
+#OpenSSL based tests
+TestOpenSSLCrypto_LDADD                        =        \
+    $(COMMON_LDADD)                                     \
+    $(top_builddir)/src/crypto/libChipCryptoOpenSSL.a   \
+    $(NULL)
+
+
+TestOpenSSLCrypto_SOURCES                       = CHIPCryptoPALOpenSSLTest.cpp
+
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)
@@ -92,7 +109,7 @@ $(CHIP_COVERAGE_BUNDLE):
 	$(call create-directory)
 
 $(CHIP_COVERAGE_INFO): check-local | $(CHIP_COVERAGE_BUNDLE)
-	$(call generate-coverage-report,${top_builddir})
+	$(call generate-coverage-report,${top_builddir},*/usr/include/* */third_party/*)
 
 coverage-local: $(CHIP_COVERAGE_INFO)
 

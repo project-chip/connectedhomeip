@@ -64,6 +64,7 @@ COMMON_LDADD                                          = \
 
 check_PROGRAMS                                        = \
     TestCHIPErrorStr                                    \
+    TestCHIPTLV                                         \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -84,6 +85,9 @@ TESTS_ENVIRONMENT                                     = \
 TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStr.cpp
 TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
 
+TestCHIPTLV_SOURCES                                   = TestCHIPTLV.cpp
+TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
+
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)
 
@@ -99,7 +103,7 @@ $(CHIP_COVERAGE_BUNDLE):
 	$(call create-directory)
 
 $(CHIP_COVERAGE_INFO): check-local | $(CHIP_COVERAGE_BUNDLE)
-	$(call generate-coverage-report,${top_builddir})
+	$(call generate-coverage-report,${top_builddir},*/usr/include/* */third_party/*)
 
 coverage-local: $(CHIP_COVERAGE_INFO)
 

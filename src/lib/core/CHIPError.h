@@ -1730,12 +1730,12 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_EVENT_ID_FOUND                                     _CHIP_ERROR(182)
 
 /**
- * @def CHIP_ERROR_UNKNOWN
+ * @def CHIP_ERROR_INTERNAL
  * 
  * @brief 
- *   Error unknown
+ *   Internal error
  */ 
-#define CHIP_ERROR_UNKNOWN                                      _CHIP_ERROR(183)
+#define CHIP_ERROR_INTERNAL                                      _CHIP_ERROR(183)
 
 /**
  *  @}

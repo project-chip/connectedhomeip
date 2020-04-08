@@ -43,7 +43,7 @@
  * */
 CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                     size_t aad_length, const unsigned char * key, const unsigned char * iv, size_t iv_length,
-                                    unsigned char * ciphertext, size_t &ciphertext_length, unsigned char * tag, size_t tag_length);
+                                    unsigned char * ciphertext, unsigned char * tag, size_t tag_length);
 
 /**
  * @brief A function that implements 256-bit AES-CCM decryption

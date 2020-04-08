@@ -29,8 +29,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <CHIPError.h>
-#include <CHIPTLV.h>
+#include <core/CHIPError.h>
+#include <core/CHIPTLV.h>
 
 namespace chip {
 
