@@ -51,7 +51,7 @@ static bool trueFormat(char * buf, uint16_t bufSize, int32_t err)
     return true; // means I handled it
 }
 
-bool testRegisterDeregisterErrorFormatter(void)
+static bool testRegisterDeregisterErrorFormatter(void)
 {
     static ErrorFormatter falseFormatter  = { falseFormat, NULL };
     static ErrorFormatter falseFormatter2 = { falseFormat2, NULL };
@@ -105,7 +105,12 @@ bool testRegisterDeregisterErrorFormatter(void)
     return ret;
 }
 
-bool testFormatErr()
+static bool testNoError()
+{
+    return CHECK_EQ_STR(ErrorStr(CHIP_NO_ERROR), "No Error");
+}
+
+static bool testFormatErr()
 {
     // assume success
     bool ret = true;
@@ -157,12 +162,7 @@ bool testFormatErr()
 
 int main(int argc, char * argv[])
 {
-    if (!testRegisterDeregisterErrorFormatter())
-    {
-        return EXIT_FAILURE;
-    }
-
-    if (!testFormatErr())
+    if (!testNoError() || !testRegisterDeregisterErrorFormatter() || !testFormatErr())
     {
         return EXIT_FAILURE;
     }
