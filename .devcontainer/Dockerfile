@@ -33,7 +33,7 @@ RUN set -x \
     && ./repo sync \
     && make everything -j 8)
 
-# above is same as "FROM rwalkerapple/chip-build"
+# above is same as "FROM connectedhomeip/chip-build"
 
 # development environment stuff, command line helpers, etc.
 ARG USERNAME=vscode
