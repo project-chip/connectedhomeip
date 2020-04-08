@@ -42,6 +42,7 @@ libChipCrypto_a_SOURCES                                       = \
 dist_libChipCrypto_a_HEADERS                                 = \
     CHIPCrypto.h                                               \
     CHIPBase+CompilerAbstraction.h                             \
+    CHIPCryptoPAL.h                                            \
     $(NULL)
 
 $(RECURSIVE_TARGETS): $(lib_LIBRARIES)
