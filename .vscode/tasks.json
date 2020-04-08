@@ -89,7 +89,7 @@
         {
             "label": "Clean tree",
             "type": "shell",
-            "command": "make -f Makefile-bootstrap clean-repos && git clean -xdf",
+            "command": "make -f Makefile-bootstrap clean-repos && git clean -Xdf",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
