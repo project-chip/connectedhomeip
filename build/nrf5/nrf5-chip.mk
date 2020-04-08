@@ -100,7 +100,6 @@ CHIP_CONFIGURE_OPTIONS = \
     --with-lwip=internal \
     --with-lwip-target=nrf5 \
     --with-inet-endpoint="tcp udp" \
-    --with-openssl=no \
     --with-logging-style=external \
     --with-chip-project-includes=$(CHIP_PROJECT_CONFIG) \
     --with-chip-system-project-includes=$(CHIP_PROJECT_CONFIG) \
@@ -144,6 +143,7 @@ STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib
 # Add CHIP libraries to standard libraries list.
 STD_LIBS += \
     -lDeviceLayer \
+    -lCHIP \
 	-lInetLayer \
 	-lnlfaultinjection \
 	-lSystemLayer \
@@ -157,6 +157,7 @@ STD_COMPILE_PREREQUISITES += install-chip
 # Add the CHIP libraries as prerequisites for linking the application.
 STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libDeviceLayer.a \
+    $(CHIP_OUTPUT_DIR)/lib/libCHIP.a \
 	$(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
 	$(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
 	$(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
