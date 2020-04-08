@@ -22,6 +22,8 @@ RUN set -x \
          lcov \
          shellcheck \
          libssl-dev \
+         unzip \
+         wget \
     && : # last line
 
 # BabbleSim layer
@@ -35,4 +37,11 @@ RUN set -x \
     && ./repo init -u https://github.com/BabbleSim/manifest.git -m everything.xml -b v1.0.3 --depth=1 \
     && ./repo sync \
     && make everything -j 8) \
+    && : # last line
+
+# Install specific release of openssl
+RUN set -x \
+    && cd /tmp && wget https://github.com/openssl/openssl/archive/OpenSSL_1_1_1f.zip \
+    && mkdir -p /tmp/openssl && cd /tmp/openssl && unzip ../OpenSSL_1_1_1f.zip \
+    && cd /tmp/openssl/openssl-OpenSSL_1_1_1f && ./config && make && make install \
     && : # last line
