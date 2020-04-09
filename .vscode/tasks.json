@@ -9,7 +9,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "isBackground": false,
             "presentation": {
                 "reveal": "always",
@@ -24,7 +24,7 @@
             "type": "shell",
             "command": "make -C build/default pretty",
             "group": "none",
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "isBackground": false,
             "presentation": {
                 "reveal": "always",
@@ -39,7 +39,7 @@
             "type": "shell",
             "command": "make -C build/default pretty-check",
             "group": "none",
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -49,7 +49,7 @@
             "type": "shell",
             "command": "make -C build/default check",
             "group": "none",
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -59,7 +59,7 @@
             "type": "shell",
             "command": "make -C build/default distcheck",
             "group": "none",
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -69,7 +69,7 @@
             "type": "shell",
             "command": "make -C build/default coverage; code -r build/default/src/chip.info/index.html",
             "group": "none",
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -79,7 +79,7 @@
             "type": "shell",
             "command": "make -C build/default distclean",
             "group": "none",
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -87,7 +87,7 @@
         {
             "label": "Configure",
             "type": "shell",
-            "command": "./bootstrap && mkdir -p build/default && (cd build/default && ../../configure --enable-debug --enable-coverage)"
+            "command": "./bootstrap && mkdir -p build/default && (cd build/default && ../../configure --enable-debug --enable-coverage)",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
@@ -96,7 +96,7 @@
         {
             "label": "Bootstrap",
             "type": "shell",
-            "command": "if [[ ! -f build/default/config.status ]]; then ./bootstrap && mkdir -p build/default; (cd build/default && ../../configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi"
+            "command": "if [[ ! -f build/default/config.status ]]; then ./bootstrap && mkdir -p build/default; (cd build/default && ../../configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
@@ -116,7 +116,7 @@
             "type": "shell",
             "command": "make -C build/default/src/setup_payload check",
             "group": "none",
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -126,11 +126,10 @@
             "type": "shell",
             "command": "make -C build/default/src/crypto check",
             "group": "none",
-            "dependsOn" : "Bootstrap",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
         },
     ],
-
 }
