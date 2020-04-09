@@ -1,0 +1,106 @@
+{
+    "C_Cpp.intelliSenseEngineFallback": "Enabled",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/build/default/src/",
+        "${workspaceFolder}/build/default/src/**",
+        "${workspaceFolder}/build/default/src/include/**",
+        "${workspaceFolder}/build/default/src/lib/**",
+        "${workspaceFolder}/build/config/standalone/",
+        "${workspaceFolder}/build/config/standalone/**",
+        "${workspaceFolder}/src/**",
+        "${workspaceFolder}/src/include/",
+        "${workspaceFolder}/src/include/**",
+        "${workspaceFolder}/src/lib/**",
+        "${workspaceFolder}/src/system/**",
+        "${workspaceFolder}/third_party/nlassert/repo/include/**",
+        "${workspaceFolder}/third_party/nlio/repo/include/**"
+    ],
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "files.associations": {
+        "iostream": "cpp",
+        "array": "cpp",
+        "atomic": "cpp",
+        "*.tcc": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "exception": "cpp",
+        "algorithm": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp",
+        "memory_resource": "cpp",
+        "optional": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "fstream": "cpp",
+        "initializer_list": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "cinttypes": "cpp",
+        "typeinfo": "cpp"
+    },
+    "files.eol": "\n",
+    "editor.formatOnSave": true,
+    "better-comments.tags": [
+        {
+            "tag": "!",
+            "color": "#FF2D00",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "?",
+            "color": "#3498DB",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "//",
+            "color": "#474747",
+            "strikethrough": true,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "todo",
+            "color": "#FF8C00",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "fixme",
+            "color": "#FF8C00",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "*",
+            "color": "#98C379",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        }
+    ],
+    "clang-format.fallbackStyle": "WebKit"
+}
