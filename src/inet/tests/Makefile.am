@@ -73,12 +73,28 @@ COMMON_LDADD                                          = \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
 
+# Test executables that should be built but not installed and should
+# always be built to ensure overall "build sanity".
+#
+# These will NOT be part of the externally-consumable binary SDK.
+#
+# XXX - At this point TestInetEndPoint is stranded here until a
+#       solution for enabling IPv6 on Linux containers for Docker on macOS
+#       can be resolved as that test involves executing APIs that
+#       exercise bind, listen, connect, accept, etc. on IPv4 and IPv6 IP end
+#       points. When that issue has been resolved, move that test to
+#       check_PROGRAMS.
+
+noinst_PROGRAMS                                       = \
+    TestInetEndPoint                                    \
+    $(NULL)
+
+
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                        = \
     TestInetAddress                                     \
     TestInetBuffer                                      \
-    TestInetEndPoint                                    \
     TestInetErrorStr                                    \
     TestInetTimer                                       \
     $(NULL)
