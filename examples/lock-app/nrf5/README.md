@@ -4,15 +4,13 @@ An example application showing the use [CHIP](https://github.com/project-chip/co
 
 <hr>
 
-* [Introduction](#intro)
-* [Software Architecture](#software-architecture)
-* [Example Application Design](#example-app-design)
-* [Device UI](#device-ui)
-* [Building](#building)
-* [Initializing the nRF52840 DK](#initializing)
-* [Flashing the Application](#flashing)
-* [Viewing Logging Output](#view-logging)
-* [Debugging with GDB](#debugging)
+- [CHIP nRF52840 Lock Example Application](#chip-nrf52840-lock-example-application)
+  - [Introduction](#introduction)
+  - [Device UI](#device-ui)
+  - [Building](#building)
+  - [Initializing the nRF52840 DK](#initializing-the-nrf52840-dk)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
 
 <hr>
 
@@ -68,20 +66,19 @@ The remaining two LEDs and buttons (#3 and #4) are unused.
 
 ## Building
 
-* Download and install the [Nordic nRF5 SDK for Thread and Zigbee version 3.1.0](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK-for-Thread-and-Zigbee)
-([Direct download link](https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5-SDK-for-Thread/nRF5-SDK-for-Thread-and-Zigbee/nRF5SDKforThreadandZigbeev310c7c4730.zip)) 
+* Download and install the [Nordic nRF5 SDK for Thread and Zigbee](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK-for-Thread-and-Zigbee)
+([Direct download link](https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5-SDK-for-Thread/nRF5-SDK-for-Thread-and-Zigbee/nRF5SDKforThreadandZigbeev400dc7186b.zip))
 
 
 * Download and install the [Nordic nRF5x Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools/Download)
 (Direct download link: 
-[Linux](https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/nRFCommandLineTools1030Linuxamd64tar.gz) 
-[Mac OS X](https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/nRF-Command-Line-Tools_10_3_0_OSX.tar))
-
+[Linux](https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRFCommandLineTools1070Linuxamd64tar.gz)
+[Mac OS X](https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRF-Command-Line-Tools_10_7_0_OSX.tar))
 
 * Download and install a suitable ARM gcc tool chain: [GNU Arm Embedded Toolchain 7-2018-q2-update](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 (Direct download link: 
-[Linux](https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2) 
-[Mac OS X](https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-mac.tar.bz2)) 
+[Linux](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2)
+[Mac OS X](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2))
 
 
 * Install some additional tools:
