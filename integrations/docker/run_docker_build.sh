@@ -5,7 +5,7 @@
 set -e
 
 VERSION=$(cat integrations/docker/images/chip-build/version)
-ORGANIZATION="rwalkerapple"
+ORGANIZATION="connectedhomeip"
 IMAGE="chip-build"
 TARGET_SOURCE_PATH="/var/source"
 
