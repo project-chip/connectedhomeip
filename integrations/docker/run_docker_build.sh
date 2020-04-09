@@ -9,4 +9,4 @@ ORGANIZATION="connectedhomeip"
 IMAGE="chip-build"
 TARGET_SOURCE_PATH="/var/source"
 
-docker run --rm -w $TARGET_SOURCE_PATH -v ${PWD}:$TARGET_SOURCE_PATH "$ORGANIZATION/$IMAGE:$VERSION" ./integrations/docker/run_build.sh
+docker run --rm -w "$TARGET_SOURCE_PATH" -v "${PWD}:$TARGET_SOURCE_PATH" "$ORGANIZATION/$IMAGE:$VERSION" ./integrations/docker/run_build.sh
