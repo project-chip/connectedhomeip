@@ -49,9 +49,6 @@ LEDs and buttons built in to the nRF52840 DK dev board.
 
 **Button #1** can be used to initiate a OTA software update as well as to reset the device to a default state. 
 
-A brief press of Button #1 instructs the device to perform a software update query to the Nest service.  Should the service indicate a software update is  available, the device
-will download the corresponding software image file.  This feature is only available once the device completed the pairing process. While software update is running, another brief press on Button #1 will abort it.
-
 Pressing and holding Button #1 for 6 seconds initiates a factory reset.  After an initial period of 3 seconds, all four LED will flash in unison to signal the pending reset.  Holding the button past 6 seconds
 will cause the device to reset its persistent configuration and initiate a reboot.  The reset action can be cancelled by releasing the button at any point before the 6 second limit.
 

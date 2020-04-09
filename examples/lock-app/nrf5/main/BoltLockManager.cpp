@@ -166,7 +166,7 @@ void BoltLockManager::TimerEventHandler(void * p_context)
 void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 {
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-    int32_t actor = 0; //Schema::Weave::Trait::Security::BoltLockTrait::BOLT_LOCK_ACTOR_METHOD_LOCAL_IMPLICIT;
+    int32_t actor = 0;
 
     // Make sure auto lock timer is still armed.
     if (!lock->mAutoLockTimerArmed)

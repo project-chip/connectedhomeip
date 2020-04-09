@@ -55,7 +55,7 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
 
 // Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "NESTUS"
+#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
 
 /**
  * CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
@@ -95,7 +95,7 @@
  * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
  *
  * A string identifying the firmware revision running on the device.
- * Nest service currently expects the firmware version to be in the format
+ * CHIP currently expects the firmware version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION

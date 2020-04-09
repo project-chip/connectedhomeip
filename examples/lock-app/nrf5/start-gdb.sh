@@ -3,7 +3,7 @@
 SCRIPT_ROOT=`dirname "$0"`
 GNU_INSTALL_ROOT=${GNU_INSTALL_ROOT:-${HOME}/tools/arm/gcc-arm-none-eabi-7-2018-q2-update/bin}
 GDB=${GNU_INSTALL_ROOT}/arm-none-eabi-gdb
-DEFAULT_APP=./build/openweave-nrf52840-lock-example.out
+DEFAULT_APP=./build/chip-nrf52840-lock-example.out
 STARTUP_CMDS=${SCRIPT_ROOT}/gdb-startup-cmds.txt
 
 if [ $# -eq 0 ]; then

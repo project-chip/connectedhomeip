@@ -38,7 +38,7 @@
 
 APP_TIMER_DEF(sFunctionTimer);
 
-static SemaphoreHandle_t sWeaveEventLock;
+static SemaphoreHandle_t sCHIPEventLock;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
@@ -137,8 +137,8 @@ int AppTask::Init()
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    sWeaveEventLock = xSemaphoreCreateMutex();
-    if (sWeaveEventLock == NULL)
+    sCHIPEventLock = xSemaphoreCreateMutex();
+    if (sCHIPEventLock == NULL)
     {
         NRF_LOG_INFO("xSemaphoreCreateMutex() failed");
         APP_ERROR_HANDLER(NRF_ERROR_NULL);
@@ -312,7 +312,6 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
         // Actually trigger Factory Reset
-        //nl::Weave::DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
     }
 }
 

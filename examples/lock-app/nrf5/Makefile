@@ -19,7 +19,7 @@
 
 # 
 #   @file
-#         Makefile for building the OpenWeave nRF52840 Lock Example Application.
+#         Makefile for building the CHIP nRF52840 Lock Example Application.
 #
 
 PROJECT_ROOT := $(realpath .)
@@ -30,7 +30,7 @@ BUILD_SUPPORT_DIR = $(CHIP_ROOT)/build/nrf5
 include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
 include $(BUILD_SUPPORT_DIR)/nrf5-chip.mk
 
-APP = openweave-nrf52840-lock-example
+APP = chip-nrf52840-lock-example
 
 SRCS = \
     $(PROJECT_ROOT)/main/main.cpp \
