@@ -53,6 +53,7 @@ COMMON_LDADD                                   = \
 
 check_PROGRAMS                                 = \
     TestQrCode                                   \
+    TestManualCode                               \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -72,6 +73,9 @@ TESTS_ENVIRONMENT                              = \
 
 TestQrCode_LDADD                               = $(COMMON_LDADD)
 TestQrCode_SOURCES                             = tests_qrcode.cpp
+
+TestManualCode_LDADD                           = $(COMMON_LDADD)
+TestManualCode_SOURCES                         = tests_manualcode.cpp
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)
