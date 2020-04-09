@@ -380,7 +380,7 @@ void testReadBitsFromNumber()
 
 void testShortCodeCharLengths()
 {
-    size_t numBits = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
+    size_t numBits                        = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
     size_t manualSetupShortCodeCharLength = ceil(log10(pow(2, numBits)));
     assert(manualSetupShortCodeCharLength == kManualSetupShortCodeCharLength);
 
@@ -390,9 +390,9 @@ void testShortCodeCharLengths()
     size_t manualSetupProductIdCharLength = ceil(log10(pow(2, kProductIDFieldLengthInBits)));
     assert(manualSetupProductIdCharLength == kManualSetupProductIdCharLength);
 
-    size_t manualSetupLongCodeCharLength = kManualSetupShortCodeCharLength + kManualSetupVendorIdCharLength + kManualSetupProductIdCharLength;
+    size_t manualSetupLongCodeCharLength =
+        kManualSetupShortCodeCharLength + kManualSetupVendorIdCharLength + kManualSetupProductIdCharLength;
     assert(manualSetupLongCodeCharLength == kManualSetupLongCodeCharLength);
-
 }
 
 int main()

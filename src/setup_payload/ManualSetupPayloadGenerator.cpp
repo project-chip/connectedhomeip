@@ -27,7 +27,7 @@ using namespace chip;
 
 static uint32_t shortPayloadRepresentation(SetupPayload payload)
 {
-    int offset = 1;
+    int offset      = 1;
     uint32_t result = payload.requiresCustomFlow ? 1 : 0;
     result |= payload.setUpPINCode << offset;
     offset += kSetupPINCodeFieldLengthInBits;
@@ -50,11 +50,12 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(strin
         fprintf(stderr, "\nFailed encoding invalid payload\n");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    
-    uint32_t shortDecimal = shortPayloadRepresentation(mSetupPayload);
-    string decimalString = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
 
-    if (mSetupPayload.requiresCustomFlow) {
+    uint32_t shortDecimal = shortPayloadRepresentation(mSetupPayload);
+    string decimalString  = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
+
+    if (mSetupPayload.requiresCustomFlow)
+    {
         decimalString += decimalStringWithPadding(mSetupPayload.vendorID, kManualSetupVendorIdCharLength);
         decimalString += decimalStringWithPadding(mSetupPayload.productID, kManualSetupProductIdCharLength);
     }

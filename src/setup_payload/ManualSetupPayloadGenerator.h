@@ -17,18 +17,18 @@
 
 /**
  *    @file
- *      This file describes a Manual Entry Code Generator based on the 
+ *      This file describes a Manual Entry Code Generator based on the
  *      CHIP specification.
- *  
- *      The encoding of the binary data to a decimal string is split 
+ *
+ *      The encoding of the binary data to a decimal string is split
  *      into 3 chunks <32 bit><16 bit><16 bit>:
  *      - <32 bit> Represents:
  *          - <1 bit> 1 if vid+pid present, 0 otherwise
  *          - <27 bit> setup pin code
  *          - <4 bit> discriminator
- *      - <16 bit> Vendor ID 
+ *      - <16 bit> Vendor ID
  *      - <16 bit> Product ID
- *      
+ *
  */
 
 #ifndef _MANUAL_SETUP_PAYLOAD_GENERATOR_H_
@@ -42,16 +42,16 @@
 using namespace std;
 namespace chip {
 
-class ManualSetupPayloadGenerator 
+class ManualSetupPayloadGenerator
 {
-    private:
-        SetupPayload mSetupPayload;
+private:
+    SetupPayload mSetupPayload;
 
-    public:
-        ManualSetupPayloadGenerator(SetupPayload payload) : mSetupPayload(payload){};
+public:
+    ManualSetupPayloadGenerator(SetupPayload payload) : mSetupPayload(payload){};
 
-        // Populates decimal string representation of the payload into outDecimalString 
-        CHIP_ERROR payloadDecimalStringRepresentation(string & outDecimalString);
+    // Populates decimal string representation of the payload into outDecimalString
+    CHIP_ERROR payloadDecimalStringRepresentation(string & outDecimalString);
 };
 
 }; // namespace chip

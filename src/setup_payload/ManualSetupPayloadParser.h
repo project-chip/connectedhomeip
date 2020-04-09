@@ -27,21 +27,20 @@
 #include <string>
 using namespace std;
 
-namespace chip
-{
+namespace chip {
 
 /**
  * @class ManualSetupPayloadParser
  * A class that can be used to convert a decimal encoded payload to a SetupPayload object
  * */
-class ManualSetupPayloadParser 
+class ManualSetupPayloadParser
 {
-    private:
-        string mDecimalStringRepresentation;
+private:
+    string mDecimalStringRepresentation;
 
-    public:
-        ManualSetupPayloadParser(string decimalRepresentation) : mDecimalStringRepresentation(decimalRepresentation){};
-        CHIP_ERROR populatePayload(SetupPayload & outPayload);
+public:
+    ManualSetupPayloadParser(string decimalRepresentation) : mDecimalStringRepresentation(decimalRepresentation){};
+    CHIP_ERROR populatePayload(SetupPayload & outPayload);
 };
 
 }; // namespace chip

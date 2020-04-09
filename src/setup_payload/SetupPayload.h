@@ -42,11 +42,10 @@ const int kManualSetupDiscriminatorFieldLengthInBits = 4;
 const int kSetupPINCodeFieldLengthInBits             = 27;
 const int kReservedFieldLengthInBits                 = 1;
 
-const int kManualSetupShortCodeCharLength            = 10;
-const int kManualSetupLongCodeCharLength             = 20;
-const int kManualSetupVendorIdCharLength             = 5;
-const int kManualSetupProductIdCharLength            = 5;
-
+const int kManualSetupShortCodeCharLength = 10;
+const int kManualSetupLongCodeCharLength  = 20;
+const int kManualSetupVendorIdCharLength  = 5;
+const int kManualSetupProductIdCharLength = 5;
 
 const int kTotalPayloadDataSizeInBits =
     (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits + kCustomFlowRequiredFieldLengthInBits +
