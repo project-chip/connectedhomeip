@@ -42,7 +42,7 @@ static CHIP_ERROR checkDecimalStringValidity(string decimalString)
 
 static CHIP_ERROR checkCodeLengthValidity(string decimalString, bool isLongCode)
 {
-    size_t expectedCharLength = isLongCode ? SetupPayload::manualSetupLongCodeCharLength() : SetupPayload::manualSetupShortCodeCharLength();
+    size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength) {
         fprintf(stderr, "\nFailed decoding base10. Input length %lu was not expected length %lu\n", decimalString.length(), expectedCharLength);
         return CHIP_ERROR_INVALID_STRING_LENGTH;
@@ -117,7 +117,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     int stringOffset = 0;
     uint64_t shortCode;
-    result = readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, shortCode, SetupPayload::manualSetupShortCodeCharLength());
+    result = readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, shortCode, kManualSetupShortCodeCharLength);
     if (result != CHIP_NO_ERROR)
     {
         return result;
@@ -151,14 +151,14 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     
     if (isLongCode) {
         uint64_t vendorID;
-        result = readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, vendorID, SetupPayload::manualSetupVendorIdCharLength());
+        result = readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, vendorID, kManualSetupVendorIdCharLength);
         if (result != CHIP_NO_ERROR)
         {
             return result;
         }
 
         uint64_t productID;
-        result = readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, productID, SetupPayload::manualSetupProductIdCharLength());
+        result = readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, productID, kManualSetupProductIdCharLength);
         if (result != CHIP_NO_ERROR)
         {
             return result;

@@ -52,11 +52,11 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(strin
     }
     
     uint32_t shortDecimal = shortPayloadRepresentation(mSetupPayload);
-    string decimalString = decimalStringWithPadding(shortDecimal, SetupPayload::manualSetupShortCodeCharLength());
+    string decimalString = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
 
     if (mSetupPayload.requiresCustomFlow) {
-        decimalString += decimalStringWithPadding(mSetupPayload.vendorID, SetupPayload::manualSetupVendorIdCharLength());
-        decimalString += decimalStringWithPadding(mSetupPayload.productID, SetupPayload::manualSetupProductIdCharLength());
+        decimalString += decimalStringWithPadding(mSetupPayload.vendorID, kManualSetupVendorIdCharLength);
+        decimalString += decimalStringWithPadding(mSetupPayload.productID, kManualSetupProductIdCharLength);
     }
     outDecimalString = decimalString;
     return CHIP_NO_ERROR;

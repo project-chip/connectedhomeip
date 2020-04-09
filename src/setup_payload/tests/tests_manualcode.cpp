@@ -378,6 +378,23 @@ void testReadBitsFromNumber()
     assert(readBitsFromNumber(12345, index, number, 1, 14) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
+void testShortCodeCharLengths()
+{
+    size_t numBits = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
+    size_t manualSetupShortCodeCharLength = ceil(log10(pow(2, numBits)));
+    assert(manualSetupShortCodeCharLength == kManualSetupShortCodeCharLength);
+
+    size_t manualSetupVendorIdCharLength = ceil(log10(pow(2, kVendorIDFieldLengthInBits)));
+    assert(manualSetupVendorIdCharLength == kManualSetupVendorIdCharLength);
+
+    size_t manualSetupProductIdCharLength = ceil(log10(pow(2, kProductIDFieldLengthInBits)));
+    assert(manualSetupProductIdCharLength == kManualSetupProductIdCharLength);
+
+    size_t manualSetupLongCodeCharLength = kManualSetupShortCodeCharLength + kManualSetupVendorIdCharLength + kManualSetupProductIdCharLength;
+    assert(manualSetupLongCodeCharLength == kManualSetupLongCodeCharLength);
+
+}
+
 int main()
 {
     printf("---Running Test--- tests from %s\n", __FILE__);
@@ -400,4 +417,6 @@ int main()
     testDecimalStringToNumber();
     testReadCharsFromDecimalString();
     testReadBitsFromNumber();
+
+    testShortCodeCharLengths();
 }
