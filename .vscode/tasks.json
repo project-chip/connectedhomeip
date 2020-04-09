@@ -4,11 +4,12 @@
         {
             "label": "Main Build",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default",
+            "command": "make -C build/default",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
+            "dependsOn": "Bootstrap",
             "isBackground": false,
             "presentation": {
                 "reveal": "always",
@@ -21,8 +22,9 @@
         {
             "label": "Auto-enforce coding style",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default pretty",
+            "command": "make -C build/default pretty",
             "group": "none",
+            "dependsOn": "Bootstrap",
             "isBackground": false,
             "presentation": {
                 "reveal": "always",
@@ -35,8 +37,9 @@
         {
             "label": "Verify coding style conformance",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default pretty-check",
+            "command": "make -C build/default pretty-check",
             "group": "none",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -44,8 +47,9 @@
         {
             "label": "Run Unit and Functional Tests",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default check",
+            "command": "make -C build/default check",
             "group": "none",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -53,8 +57,9 @@
         {
             "label": "Run Distribution Generation",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default distcheck",
+            "command": "make -C build/default distcheck",
             "group": "none",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -62,58 +67,78 @@
         {
             "label": "Run Code Coverage",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default coverage",
+            "command": "make -C build/default coverage; code -r build/default/src/chip.info/index.html",
+            "group": "none",
+            "dependsOn": "Bootstrap",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make -C build/default distclean",
+            "group": "none",
+            "dependsOn": "Bootstrap",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Configure",
+            "type": "shell",
+            "command": "./bootstrap && mkdir -p build/default && (cd build/default && ../../configure --enable-debug --enable-coverage)",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "Clean build",
+            "label": "Bootstrap",
             "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default distclean",
+            "command": "if [[ ! -f build/default/config.status ]]; then ./bootstrap && mkdir -p build/default; (cd build/default && ../../configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi",
+            "group": "none",
+            "problemMatcher": [
+                "$gcc"
+            ],
+        },
+        {
+            "label": "Clean Tree",
+            "type": "shell",
+            "command": "make -f Makefile-bootstrap clean-repos && git clean -Xdf",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "Bootstrap the source tree",
+            "label": "Build & Run Setup Payload Tests",
             "type": "shell",
-            "command": "./bootstrap && mkdir -p build/default && (cd build/default && ../../configure --enable-coverage --enable-coverage-info)",
+            "command": "make -C build/default/src/setup_payload check",
+            "group": "none",
+            "dependsOn": "Bootstrap",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Run Setup Payload Tests",
+            "type": "shell",
+            "command": "make -C build/default/src/setup_payload check",
             "group": "none",
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "Clean tree",
+            "label": "Run Crypto Tests",
             "type": "shell",
-            "command": "make -f Makefile-bootstrap clean-repos && git clean -xdf",
+            "command": "make -C build/default/src/crypto check",
             "group": "none",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
         },
-        {
-            "label": "QRCode Tests",
-            "type": "shell",
-            "command": "./bootstrap -w make && make -C build/default/src/setup_payload/ check",
-            "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
-        },
-
-        {
-            "label": "CHIP crypto Tests",
-            "type": "shell",
-            "command": "make -C build/x86_64-unknown-linux-gnu/src/crypto/ check",
-            "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
-        }
-        
-    ]
+    ],
 }

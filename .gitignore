@@ -7,7 +7,9 @@
 # Build System
 .deps
 .dirstamp
+.DS_Store
 .local-version
+.DS_Store
 Makefile.in
 aclocal.m4
 autom4te.cache
@@ -20,10 +22,8 @@ build/*
 !build/config/standalone/SystemProjectConfig.h
 !build/config/standalone/darwin/CHIPProjectConfig.h
 !build/config/standalone/no-openssl/CHIPProjectConfig.h
-!build/efr32/efr32-app.mk
-!build/efr32/efr32-chip.mk
-!build/nrf5/nrf5-app.mk
-!build/nrf5/nrf5-chip.mk
+!build/efr32/
+!build/nrf5/
 !build/scripts/gen-chip-version
 config.log
 config.status

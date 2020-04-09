@@ -76,7 +76,7 @@ ifndef FREERTOS_ROOT
 $(error ENVIRONMENT ERROR: FREERTOS_ROOT not set)
 endif
 
-
+uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 
 # Differentiate between boards
 # - BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
@@ -119,15 +119,10 @@ EXTRA_SRCS += \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/src/nvm3_default.c                                \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/src/nvm3_hal_flash.c                              \
     $(EFR32_SDK_ROOT)/platform/emdrv/sleep/src/sleep.c                                      \
+    $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c
 
 STD_INC_DIRS += \
     $(CHIP_ROOT)/src/include/platform/EFR32                                                 \
-    $(OPENTHREAD_ROOT)/output/include                                                       \
-    $(OPENTHREAD_ROOT)/src/core/                                                            \
-    $(OPENTHREAD_ROOT)/third_party/jlink/SEGGER_RTT_V640/RTT                                \
-    $(OPENTHREAD_ROOT)/third_party/mbedtls                                                  \
-    $(OPENTHREAD_ROOT)/third_party/mbedtls/repo/include                                     \
-    $(OPENTHREAD_ROOT)/third_party/mbedtls/repo/include/mbedtls                             \
     $(FREERTOS_ROOT)/Source/include                                                         \
     $(FREERTOS_ROOT)/Source/portable/GCC/ARM_CM3                                            \
     $(EFR32_SDK_ROOT)                                                                       \
@@ -159,11 +154,10 @@ STD_INC_DIRS += \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/hal                                           \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/hal/efr32                                     \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/plugin/pa-conversions                         \
+    $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/SEGGER                             \
+    $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/Config/                            \
     $(EFR32_SDK_ROOT)/util/plugin/plugin-common/fem-control                                 \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/include                            \
-    $(OPENTHREAD_ROOT)/examples/platforms/$(EFR32FAMILY)/                                   \
-    $(OPENTHREAD_ROOT)/examples/platforms/$(EFR32FAMILY)/$(BOARD_LC)                        \
-    $(OPENTHREAD_ROOT)/examples/platforms/$(EFR32FAMILY)/crypto
+    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/include
 
 ifeq ($(EFR32FAMILY), efr32mg12)
 STD_INC_DIRS += \
@@ -244,6 +238,8 @@ STD_LDFLAGS = \
     -ffunction-sections \
     -Wl,--gc-sections \
     -specs=nosys.specs \
+    $(foreach dir,$(LINKER_SCRIPT_INC_DIRS),-L$(dir)) \
+    -T$(LINKER_SCRIPT)
 
 ifeq ($(EFR32FAMILY), efr32mg21)
 STD_LDFLAGS += \
@@ -253,12 +249,14 @@ endif
 STD_LIBS = \
     -lc \
     -lstdc++ \
+    -lfreertos \
     -lnosys \
     -lm
 
 ifeq ($(EFR32FAMILY), efr32mg12)
 STD_LIBS += \
     $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a \
+    $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a
 else
@@ -277,11 +275,27 @@ STD_DEFINES = \
 
 STD_COMPILE_PREREQUISITES =
 
+STD_LINK_PREREQUISITES += $(OUTPUT_DIR)/freertos/libfreertos.a
+
 DEFINE_FLAGS = $(foreach def,$(STD_DEFINES) $(DEFINES),-D$(def))
 
 INC_FLAGS = $(foreach dir,$(INC_DIRS) $(STD_INC_DIRS),-I$(dir))
 
 LINKER_SCRIPT_INC_DIRS = $(PROJECT_ROOT) $(OUTPUT_DIR)/freertos
+
+# Default EFR32 linker script defines a section at top of Flash for NVM3 support.
+ifeq ($(EFR32FAMILY), efr32mg12)
+ifndef LINKER_SCRIPT
+LINKER_SCRIPT = $(APP)-MG12P.ld
+endif
+else
+ifeq ($(EFR32FAMILY), efr32mg21)
+ifndef LINKER_SCRIPT
+LINKER_SCRIPT = $(APP)-MG21.ld
+endif
+endif
+endif
+
 
 # ==================================================
 # Toolchain and external utilities / files
@@ -308,8 +322,11 @@ ifneq (, $(shell which ccache))
 CCACHE = ccache
 endif
 
+ifeq ($(uname_S),Darwin)
+COMMANDER = $(EFR32_TOOLS_ROOT)/developer/adapter_packs/commander/Commander.app/Contents/MacOS/commander
+else
 COMMANDER = $(EFR32_TOOLS_ROOT)/developer/adapter_packs/commander/commander
-
+endif
 
 # ==================================================
 # Build options

@@ -12,11 +12,11 @@ ENV LANG en_US.utf8
 RUN apt-get update
 RUN apt-get install -y locales && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 RUN apt-get -fy install git vim emacs sudo \
-    apt-utils dialog \
+    apt-utils dialog zsh \
     iproute2 procps lsb-release \
     bash-completion \
     build-essential cmake cppcheck valgrind \
-    wget
+    wget curl telnet
 
 RUN groupadd --gid $USER_GID $USERNAME
 RUN useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME

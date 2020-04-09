@@ -29,7 +29,7 @@ namespace chip {
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
 // `requiresCustomFlow` is not checked since it is a bool
-bool SetupPayload::isValid()
+bool SetupPayload::isValidQRCodePayload()
 {
     if (version >= 1 << kVersionFieldLengthInBits)
     {
@@ -49,6 +49,25 @@ bool SetupPayload::isValid()
     }
 
     if (version == 0 && rendezvousInformation == 0 && discriminator == 0 && setUpPINCode == 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool SetupPayload::isValidManualCode()
+{
+    if (discriminator >= 1 << kManualSetupDiscriminatorFieldLengthInBits)
+    {
+        return false;
+    }
+    if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
+    {
+        return false;
+    }
+
+    if (setUpPINCode == 0)
     {
         return false;
     }
