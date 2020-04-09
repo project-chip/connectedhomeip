@@ -27,6 +27,8 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                        = \
+    TestInetCommon.h                                    \
+    TestInetCommonOptions.h                             \
     $(NULL)
 
 #
@@ -35,20 +37,31 @@ noinst_HEADERS                                        = \
 EXTRA_DIST                                            = \
     $(NULL)
 
+noinst_LIBRARIES                                      = \
+    libTestInetCommon.a                                 \
+    $(NULL)
+
 if CHIP_BUILD_TESTS
 # C preprocessor option flags that will apply to all compiled objects in this
 # makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
+    -I$(top_srcdir)/src/include                         \
     -I$(top_srcdir)/src/lib                             \
     $(LWIP_CPPFLAGS)                                    \
     $(SOCKETS_CPPFLAGS)                                 \
     $(PTHREAD_CFLAGS)                                   \
     $(NULL)
 
+libTestInetCommon_a_SOURCES                           = \
+    TestInetCommon.cpp                                  \
+    TestInetCommonOptions.cpp                           \
+    $(NULL)
+
 CHIP_LDADD                                            = \
     $(top_builddir)/src/inet/libInetLayer.a             \
+    $(top_builddir)/src/system/libSystemLayer.a         \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
@@ -60,11 +73,30 @@ COMMON_LDADD                                          = \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
 
+# Test executables that should be built but not installed and should
+# always be built to ensure overall "build sanity".
+#
+# These will NOT be part of the externally-consumable binary SDK.
+#
+# XXX - At this point TestInetEndPoint is stranded here until a
+#       solution for enabling IPv6 on Linux containers for Docker on macOS
+#       can be resolved as that test involves executing APIs that
+#       exercise bind, listen, connect, accept, etc. on IPv4 and IPv6 IP end
+#       points. When that issue has been resolved, move that test to
+#       check_PROGRAMS.
+
+noinst_PROGRAMS                                       = \
+    TestInetEndPoint                                    \
+    $(NULL)
+
+
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                        = \
     TestInetAddress                                     \
+    TestInetBuffer                                      \
     TestInetErrorStr                                    \
+    TestInetTimer                                       \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -85,8 +117,21 @@ TESTS_ENVIRONMENT                                     = \
 TestInetAddress_SOURCES                               = TestInetAddress.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 
-TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp
+TestInetBuffer_SOURCES                                = TestInetBuffer.cpp      \
+                                                        $(NULL)
+TestInetBuffer_LDADD                                  = $(COMMON_LDADD)
+
+TestInetEndPoint_SOURCES                              = TestInetEndPoint.cpp    \
+                                                        $(NULL)
+TestInetEndPoint_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
+
+TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
+                                                        $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
+
+TestInetTimer_SOURCES                                 = TestInetTimer.cpp       \
+                                                        $(NULL)
+TestInetTimer_LDADD                                   = $(COMMON_LDADD)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)
