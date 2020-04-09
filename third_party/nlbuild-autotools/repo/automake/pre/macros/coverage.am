@@ -1,4 +1,6 @@
 #
+#    Copyright (c) 2020 Project nlbuild-autotools Authors
+#    Copyright (c) 2020 Google LLC
 #    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,36 +58,20 @@ nl__v_GENHTML_FLAGS_  = $(nl__v_GENHTML_FLAGS_$(AM_DEFAULT_VERBOSITY))
 nl__v_GENHTML_FLAGS_0 = --quiet 
 nl__v_GENHTML_FLAGS_1 =
 
-#
-# generate-coverage-report <directory>
-#
-# Capture, using lcov, a coverage report from the specified directory 'directory'
-# with an final output "info" file as specified by the target variable.
-#
-#   <directory> - The directory from which lcov should search for coverage data (*.gcno & *.gcda)
-#
-#   - create baseline coverage data file (base.info) with '-i|--initial' option
-#   - create test coverage data file (test.info)
-#   - combine baseline and test coverage data to create the final "info" file
-#
-# Then, on success, generate an HTML-based coverage report using genhtml.
-#
-define generate-coverage-report
-$(NL_V_LCOV)$(LCOV) $(NL_V_LCOV_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" --initial --capture --directory "$(1)" --output-file "base.info"
-$(NL_V_LCOV)$(LCOV) $(NL_V_LCOV_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" --capture --directory "$(1)" --output-file "test.info"
-$(NL_V_LCOV)$(LCOV) $(NL_V_LCOV_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" --add-tracefile "base.info" --add-tracefile "test.info" --output-file "$(@)"
-$(NL_V_GENHTML)$(GENHTML) $(NL_V_GENHTML_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" "$(@)" --output-directory "$(@D)"
-endef # generate-coverage-report
+# Ensure that coverage-recursive is included among the list of
+# recursive targets known by autotools.
+
+RECURSIVE_TARGETS    += coverage-recursive
 
 #
-# generate-coverage-report-with-filter <directory> <remove_filter>
+# generate-coverage-report <directory> [remove_filters]
 #
 # Capture, using lcov, a coverage report from the specified directory 'directory' and a filter 'remove_filter'
 # with an final output "info" file as specified by the target variable.
 #
 #   <directory>      - The directory from which lcov should search for coverage data (*.gcno & *.gcda)
 #
-#   <remove_filter>  - The filter is a whitespace-separated list of shell wildcard patterns. (note that they may need to be escaped accordingly to prevent
+#   [remove_filters] - Optional whitespace-separated list of shell wildcard patterns. (note that they may need to be escaped accordingly to prevent
 #                      the shell from expanding them first). Every file entry in tracefile which matches at least one of those patterns will be removed.
 #
 #   - create baseline coverage data file (base.info) with '-i|--initial' option
@@ -95,12 +81,12 @@ endef # generate-coverage-report
 #
 # Then, on success, generate an HTML-based coverage report using genhtml.
 #
-define generate-coverage-report-with-filter
+define generate-coverage-report
 $(NL_V_LCOV)$(LCOV) $(NL_V_LCOV_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" --initial --capture --directory "$(1)" --output-file "base.info"
 $(NL_V_LCOV)$(LCOV) $(NL_V_LCOV_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" --capture --directory "$(1)" --output-file "test.info"
 $(NL_V_LCOV)$(LCOV) $(NL_V_LCOV_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" --add-tracefile "base.info" --add-tracefile "test.info" --output-file "$(@)"
 $(NL_V_LCOV)$(LCOV) $(NL_V_LCOV_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" --remove "$(@)" $(foreach pattern,$(2),"$(pattern)") --output-file "$(@)"
 $(NL_V_GENHTML)$(GENHTML) $(NL_V_GENHTML_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" "$(@)" --output-directory "$(@D)"
-endef # generate-coverage-report-with-filter
+endef # generate-coverage-report
 
 
