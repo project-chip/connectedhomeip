@@ -22,7 +22,6 @@
  */
 
 #include "SetupPayload.h"
-#include <math.h>
 
 namespace chip {
 
