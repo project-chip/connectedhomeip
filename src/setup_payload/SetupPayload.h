@@ -30,15 +30,22 @@
 using namespace std;
 
 namespace chip {
-// TODO this should point to the spec
-const int kVersionFieldLengthInBits              = 3;
-const int kVendorIDFieldLengthInBits             = 16;
-const int kProductIDFieldLengthInBits            = 16;
-const int kCustomFlowRequiredFieldLengthInBits   = 1;
-const int kRendezvousInfoFieldLengthInBits       = 8;
-const int kPayloadDiscriminatorFieldLengthInBits = 8;
-const int kSetupPINCodeFieldLengthInBits         = 27;
-const int kReservedFieldLengthInBits             = 1;
+
+// TODO this shuould point to the spec
+const int kVersionFieldLengthInBits                  = 3;
+const int kVendorIDFieldLengthInBits                 = 16;
+const int kProductIDFieldLengthInBits                = 16;
+const int kCustomFlowRequiredFieldLengthInBits       = 1;
+const int kRendezvousInfoFieldLengthInBits           = 8;
+const int kPayloadDiscriminatorFieldLengthInBits     = 8;
+const int kManualSetupDiscriminatorFieldLengthInBits = 4;
+const int kSetupPINCodeFieldLengthInBits             = 27;
+const int kReservedFieldLengthInBits                 = 1;
+
+const int kManualSetupShortCodeCharLength = 10;
+const int kManualSetupLongCodeCharLength  = 20;
+const int kManualSetupVendorIdCharLength  = 5;
+const int kManualSetupProductIdCharLength = 5;
 
 const int kTotalPayloadDataSizeInBits =
     (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits + kCustomFlowRequiredFieldLengthInBits +
@@ -61,7 +68,8 @@ public:
     SetupPayload() :
         version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(0), discriminator(0), setUpPINCode(0){};
 
-    bool isValid();
+    bool isValidQRCodePayload();
+    bool isValidManualCode();
     bool operator==(const SetupPayload & input);
 };
 

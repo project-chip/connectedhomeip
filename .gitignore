@@ -9,6 +9,7 @@
 .dirstamp
 .DS_Store
 .local-version
+.DS_Store
 Makefile.in
 aclocal.m4
 autom4te.cache

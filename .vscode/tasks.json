@@ -112,7 +112,7 @@
             ]
         },
         {
-            "label": "QRCode Tests",
+            "label": "Build & Run Setup Payload Tests",
             "type": "shell",
             "command": "make -C build/default/src/setup_payload check",
             "group": "none",
@@ -122,7 +122,16 @@
             ]
         },
         {
-            "label": "Crypto Tests",
+            "label": "Run Setup Payload Tests",
+            "type": "shell",
+            "command": "make -C build/default/src/setup_payload check",
+            "group": "none",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Run Crypto Tests",
             "type": "shell",
             "command": "make -C build/default/src/crypto check",
             "group": "none",

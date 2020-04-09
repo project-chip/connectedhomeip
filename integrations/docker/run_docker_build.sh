@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Note: this needs to be run from the root directory presently. 
-# https://github.com/project-chip/connectedhomeip/issues/273
 
 set -e
+here=$(cd "$(dirname "$0")" && pwd)
+# update me if I move out of integrations/docker
+#         |
+#         +---------------+
+#                         V
+SOURCE_PATH=$(cd "${here}/../.." && pwd)
 
-VERSION=$(cat integrations/docker/images/chip-build/version)
 ORGANIZATION="connectedhomeip"
 IMAGE="chip-build"
-TARGET_SOURCE_PATH="/var/source"
+VERSION=$(cat "${here}/images/${IMAGE}/version")
 
-docker run --rm -w $TARGET_SOURCE_PATH -v ${PWD}:$TARGET_SOURCE_PATH "$ORGANIZATION/$IMAGE:$VERSION" ./integrations/docker/run_build.sh
+docker run --rm -w "${SOURCE_PATH}" -v "${SOURCE_PATH}:${SOURCE_PATH}" "${ORGANIZATION}/${IMAGE}:${VERSION}" integrations/docker/run_build.sh "${@:-distcheck}"

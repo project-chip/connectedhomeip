@@ -147,27 +147,27 @@ int testSetupPayloadVerify()
     payload.rendezvousInformation = 1;
     payload.discriminator         = 128;
     payload.setUpPINCode          = 2048;
-    surprises += EXPECT_EQ(payload.isValid(), true);
+    surprises += EXPECT_EQ(payload.isValidQRCodePayload(), true);
 
     // test invalid version
     SetupPayload test_payload = payload;
     test_payload.version      = 2 << kVersionFieldLengthInBits;
-    surprises += EXPECT_EQ(test_payload.isValid(), false);
+    surprises += EXPECT_EQ(test_payload.isValidQRCodePayload(), false);
 
     // test invalid rendezvousInformation
     test_payload                       = payload;
     test_payload.rendezvousInformation = 512;
-    surprises += EXPECT_EQ(test_payload.isValid(), false);
+    surprises += EXPECT_EQ(test_payload.isValidQRCodePayload(), false);
 
     // test invalid discriminator
     test_payload               = payload;
     test_payload.discriminator = 2 << kPayloadDiscriminatorFieldLengthInBits;
-    surprises += EXPECT_EQ(test_payload.isValid(), false);
+    surprises += EXPECT_EQ(test_payload.isValidQRCodePayload(), false);
 
     // test invalid stetup PIN
     test_payload              = payload;
     test_payload.setUpPINCode = 2 << kSetupPINCodeFieldLengthInBits;
-    surprises += EXPECT_EQ(test_payload.isValid(), false);
+    surprises += EXPECT_EQ(test_payload.isValidQRCodePayload(), false);
 
     return surprises;
 }
@@ -182,7 +182,7 @@ int testInvalidQRCodePayload_WrongCharacterSet()
     CHIP_ERROR err = parser.populatePayload(payload);
     bool didFail   = err != CHIP_NO_ERROR;
     surprises      = EXPECT_EQ(didFail, true);
-    surprises      = EXPECT_EQ(payload.isValid(), false);
+    surprises      = EXPECT_EQ(payload.isValidQRCodePayload(), false);
     return surprises;
 }
 
@@ -195,7 +195,7 @@ int testInvalidQRCodePayload_WrongLength()
     CHIP_ERROR err = parser.populatePayload(payload);
     bool didFail   = err != CHIP_NO_ERROR;
     surprises      = EXPECT_EQ(didFail, true);
-    surprises      = EXPECT_EQ(payload.isValid(), false);
+    surprises      = EXPECT_EQ(payload.isValidQRCodePayload(), false);
     return surprises;
 }
 
@@ -270,7 +270,7 @@ int testQRCodeToPayloadGeneration()
     CHIP_ERROR err  = parser.populatePayload(resultingPayload);
     bool didSucceed = err == CHIP_NO_ERROR;
     surprises       = EXPECT_EQ(didSucceed, true);
-    surprises       = EXPECT_EQ(resultingPayload.isValid(), true);
+    surprises       = EXPECT_EQ(resultingPayload.isValidQRCodePayload(), true);
 
     bool result = payload == resultingPayload;
     surprises += EXPECT_EQ(result, true);
