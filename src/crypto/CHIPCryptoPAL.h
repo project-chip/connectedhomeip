@@ -36,7 +36,6 @@
  * @param iv Initial vector
  * @param iv_length Length of initial vector
  * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
- * @param ciphertext_length Length of generated ciphertext
  * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
  * @param tag_length Expected length of tag
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
