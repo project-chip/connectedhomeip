@@ -42,31 +42,35 @@ using namespace ::chip;
 
 // Preprocessor Macros
 
-#define SetStatusFailed(aTestStatus)    do { (aTestStatus).mFailed = true; fprintf(stderr, "Test failed at %s:%u!\n", __func__, __LINE__); } while (0)
+#define SetStatusFailed(aTestStatus)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (aTestStatus).mFailed = true;                                                                                              \
+        fprintf(stderr, "Test failed at %s:%u!\n", __func__, __LINE__);                                                            \
+    } while (0)
 
-#define kToolOptBase                    1000
+#define kToolOptBase 1000
 
-#define kToolOptInterface               'I'
-#define kToolOptIPv4Only                '4'
-#define kToolOptIPv6Only                '6'
-#define kToolOptInterval                'i'
-#define kToolOptListen                  'l'
-#define kToolOptRawIP                   'r'
-#define kToolOptSendSize                's'
-#define kToolOptUDPIP                   'u'
-
+#define kToolOptInterface 'I'
+#define kToolOptIPv4Only '4'
+#define kToolOptIPv6Only '6'
+#define kToolOptInterval 'i'
+#define kToolOptListen 'l'
+#define kToolOptRawIP 'r'
+#define kToolOptSendSize 's'
+#define kToolOptUDPIP 'u'
 
 // Type Definitions
 
 enum OptFlagsCommon
 {
-    kOptFlagUseIPv4    = 0x00000001,
-    kOptFlagUseIPv6    = 0x00000002,
+    kOptFlagUseIPv4 = 0x00000001,
+    kOptFlagUseIPv6 = 0x00000002,
 
-    kOptFlagUseRawIP   = 0x00000004,
-    kOptFlagUseUDPIP   = 0x00000008,
+    kOptFlagUseRawIP = 0x00000004,
+    kOptFlagUseUDPIP = 0x00000008,
 
-    kOptFlagListen     = 0x00000010,
+    kOptFlagListen = 0x00000010,
 };
 
 enum kICMPTypeIndex
@@ -77,14 +81,14 @@ enum kICMPTypeIndex
 
 struct Stats
 {
-    uint32_t      mExpected;
-    uint32_t      mActual;
+    uint32_t mExpected;
+    uint32_t mActual;
 };
 
 struct TransferStats
 {
-    struct Stats  mReceive;
-    struct Stats  mTransmit;
+    struct Stats mReceive;
+    struct Stats mTransmit;
 };
 
 struct TestStatus
@@ -95,64 +99,69 @@ struct TestStatus
 
 // Global Variables
 
-static const uint16_t     kUDPPort              = 4242;
+static const uint16_t kUDPPort = 4242;
 
-static const size_t       kICMPv4_FilterTypes   = 2;
+static const size_t kICMPv4_FilterTypes = 2;
 
-static const size_t       kICMPv6_FilterTypes   = 2;
+static const size_t kICMPv6_FilterTypes = 2;
 
-extern const uint8_t      gICMPv4Types[kICMPv4_FilterTypes];
+extern const uint8_t gICMPv4Types[kICMPv4_FilterTypes];
 
-extern const uint8_t      gICMPv6Types[kICMPv6_FilterTypes];
+extern const uint8_t gICMPv6Types[kICMPv6_FilterTypes];
 
-extern bool               gSendIntervalExpired;
+extern bool gSendIntervalExpired;
 
-extern uint32_t           gSendIntervalMs;
+extern uint32_t gSendIntervalMs;
 
-extern const char *       gInterfaceName;
+extern const char * gInterfaceName;
 
-extern Inet::InterfaceId  gInterfaceId;
+extern Inet::InterfaceId gInterfaceId;
 
-extern uint16_t           gSendSize;
+extern uint16_t gSendSize;
 
-extern uint32_t           gOptFlags;
-
+extern uint32_t gOptFlags;
 
 // Function Prototypes
 
-namespace Common
-{
+namespace Common {
 
 extern bool IsReceiver(void);
 extern bool IsSender(void);
 
-extern bool IsTesting(const TestStatus &aTestStatus);
-extern bool WasSuccessful(const TestStatus &aTestStatus);
+extern bool IsTesting(const TestStatus & aTestStatus);
+extern bool WasSuccessful(const TestStatus & aTestStatus);
 
-extern System::PacketBuffer *MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue);
-extern System::PacketBuffer *MakeDataBuffer(uint16_t aDesiredLength);
-extern System::PacketBuffer *MakeICMPv4DataBuffer(uint16_t aDesiredUserLength);
-extern System::PacketBuffer *MakeICMPv6DataBuffer(uint16_t aDesiredUserLength);
+extern System::PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue);
+extern System::PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength);
+extern System::PacketBuffer * MakeICMPv4DataBuffer(uint16_t aDesiredUserLength);
+extern System::PacketBuffer * MakeICMPv6DataBuffer(uint16_t aDesiredUserLength);
 
-extern bool HandleDataReceived(const System::PacketBuffer *aBuffer, TransferStats &aStats, bool aStatsByPacket, bool aCheckBuffer, uint8_t aFirstValue);
-extern bool HandleDataReceived(const System::PacketBuffer *aBuffer, TransferStats &aStats, bool aStatsByPacket, bool aCheckBuffer);
-extern bool HandleICMPv4DataReceived(System::PacketBuffer *aBuffer, TransferStats &aStats, bool aStatsByPacket, bool aCheckBuffer);
-extern bool HandleICMPv6DataReceived(System::PacketBuffer *aBuffer, TransferStats &aStats, bool aStatsByPacket, bool aCheckBuffer);
-
+extern bool HandleDataReceived(const System::PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer,
+                               uint8_t aFirstValue);
+extern bool HandleDataReceived(const System::PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket,
+                               bool aCheckBuffer);
+extern bool HandleICMPv4DataReceived(System::PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket,
+                                     bool aCheckBuffer);
+extern bool HandleICMPv6DataReceived(System::PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket,
+                                     bool aCheckBuffer);
 
 // Timer Callback Handler
 
-extern void HandleSendTimerComplete(System::Layer *aSystemLayer, void *aAppState, System::Error aError);
+extern void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
 // Raw Endpoint Callback Handlers
 
-extern void HandleRawMessageReceived(const Inet::IPEndPointBasis *aEndPoint, const System::PacketBuffer *aBuffer, const Inet::IPPacketInfo *aPacketInfo);
-extern void HandleRawReceiveError(const Inet::IPEndPointBasis *aEndPoint, const INET_ERROR &aError, const Inet::IPPacketInfo *aPacketInfo);
+extern void HandleRawMessageReceived(const Inet::IPEndPointBasis * aEndPoint, const System::PacketBuffer * aBuffer,
+                                     const Inet::IPPacketInfo * aPacketInfo);
+extern void HandleRawReceiveError(const Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
+                                  const Inet::IPPacketInfo * aPacketInfo);
 
 // UDP Endpoint Callback Handlers
 
-extern void HandleUDPMessageReceived(const Inet::IPEndPointBasis *aEndPoint, const System::PacketBuffer *aBuffer, const Inet::IPPacketInfo *aPacketInfo);
-extern void HandleUDPReceiveError(const Inet::IPEndPointBasis *aEndPoint, const INET_ERROR &aError, const Inet::IPPacketInfo *aPacketInfo);
+extern void HandleUDPMessageReceived(const Inet::IPEndPointBasis * aEndPoint, const System::PacketBuffer * aBuffer,
+                                     const Inet::IPPacketInfo * aPacketInfo);
+extern void HandleUDPReceiveError(const Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
+                                  const Inet::IPPacketInfo * aPacketInfo);
 
 }; // namespace Common
 
@@ -160,6 +169,5 @@ extern void HandleUDPReceiveError(const Inet::IPEndPointBasis *aEndPoint, const 
 // referenced by common code.
 
 extern void DriveSend(void);
-
 
 #endif // CHIP_TEST_INETLAYER_COMMON_HPP

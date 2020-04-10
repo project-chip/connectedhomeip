@@ -49,13 +49,12 @@ using namespace chip::ArgParser;
 
 /* Preprocessor Macros */
 
-#define kToolName                       "TestInetLayer"
+#define kToolName "TestInetLayer"
 
-#define kToolOptTCPIP                   't'
+#define kToolOptTCPIP 't'
 
-#define kToolOptExpectedRxSize          (kToolOptBase + 0)
-#define kToolOptExpectedTxSize          (kToolOptBase + 1)
-
+#define kToolOptExpectedRxSize (kToolOptBase + 0)
+#define kToolOptExpectedTxSize (kToolOptBase + 1)
 
 /* Type Definitions */
 
@@ -64,49 +63,49 @@ enum OptFlags
     kOptFlagExpectedRxSize = 0x00010000,
     kOptFlagExpectedTxSize = 0x00020000,
 
-    kOptFlagUseTCPIP       = 0x00040000
+    kOptFlagUseTCPIP = 0x00040000
 };
 
 struct TestState
 {
-    TransferStats                mStats;
-    TestStatus                   mStatus;
+    TransferStats mStats;
+    TestStatus mStatus;
 };
-
 
 /* Function Declarations */
 
 static void HandleSignal(int aSignal);
-static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentifier, const char *aName, const char *aValue);
-static bool HandleNonOptionArgs(const char *aProgram, int argc, char *argv[]);
+static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
+static bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
 
 static void StartTest(void);
 static void CleanupTest(void);
 
-
 /* Global Variables */
 
-static const uint32_t    kExpectedRxSizeDefault = 1523;
-static const uint32_t    kExpectedTxSizeDefault = kExpectedRxSizeDefault;
+static const uint32_t kExpectedRxSizeDefault = 1523;
+static const uint32_t kExpectedTxSizeDefault = kExpectedRxSizeDefault;
 
-static const uint32_t    kOptFlagsDefault       = (kOptFlagUseIPv6 | kOptFlagUseUDPIP);
+static const uint32_t kOptFlagsDefault = (kOptFlagUseIPv6 | kOptFlagUseUDPIP);
 
-static RawEndPoint *     sRawIPEndPoint         = NULL;
-static TCPEndPoint *     sTCPIPEndPoint         = NULL;  // Used for connect/send/receive
-static TCPEndPoint *     sTCPIPListenEndPoint   = NULL;  // Used for accept/listen
-static UDPEndPoint *     sUDPIPEndPoint         = NULL;
+static RawEndPoint * sRawIPEndPoint       = NULL;
+static TCPEndPoint * sTCPIPEndPoint       = NULL; // Used for connect/send/receive
+static TCPEndPoint * sTCPIPListenEndPoint = NULL; // Used for accept/listen
+static UDPEndPoint * sUDPIPEndPoint       = NULL;
 
-static const uint16_t    kTCPPort               = kUDPPort;
-
+static const uint16_t kTCPPort = kUDPPort;
+// clang-format off
 static TestState         sTestState             =
 {
     { { 0, 0 }, { 0, 0 } },
     { false, false }
 };
+// clang-format on
 
-static IPAddress         sDestinationAddress   = IPAddress::Any;
-static const char *      sDestinationString    = NULL;
+static IPAddress sDestinationAddress   = IPAddress::Any;
+static const char * sDestinationString = NULL;
 
+// clang-format off
 static OptionDef         sToolOptionDefs[] =
 {
     { "interface",                 kArgumentRequired,  kToolOptInterface              },
@@ -185,15 +184,15 @@ static OptionSet *       sToolOptionSets[] =
     &sHelpOptions,
     NULL
 };
+// clang-format on
 
-static void CheckSucceededOrFailed(TestState &aTestState, bool &aOutSucceeded, bool &aOutFailed)
+static void CheckSucceededOrFailed(TestState & aTestState, bool & aOutSucceeded, bool & aOutFailed)
 {
-    const TransferStats &lStats = aTestState.mStats;
+    const TransferStats & lStats = aTestState.mStats;
 
 #if DEBUG
-    printf("%u/%u sent, %u/%u received\n",
-           lStats.mTransmit.mActual, lStats.mTransmit.mExpected,
-           lStats.mReceive.mActual, lStats.mReceive.mExpected);
+    printf("%u/%u sent, %u/%u received\n", lStats.mTransmit.mActual, lStats.mTransmit.mExpected, lStats.mReceive.mActual,
+           lStats.mReceive.mExpected);
 #endif
 
     if (((lStats.mTransmit.mExpected > 0) && (lStats.mTransmit.mActual > lStats.mTransmit.mExpected)) ||
@@ -225,14 +224,13 @@ static void HandleSignal(int aSignal)
     case SIGUSR1:
         SetStatusFailed(sTestState.mStatus);
         break;
-
     }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
-    bool          lSuccessful = true;
-    INET_ERROR    lStatus;
+    bool lSuccessful = true;
+    INET_ERROR lStatus;
 
     InitTestInetCommon();
 
@@ -279,9 +277,9 @@ int main(int argc, char *argv[])
     {
         struct timeval sleepTime;
         bool lSucceeded = true;
-        bool lFailed = false;
+        bool lFailed    = false;
 
-        sleepTime.tv_sec = 0;
+        sleepTime.tv_sec  = 0;
         sleepTime.tv_usec = 10000;
 
         ServiceNetwork(sleepTime);
@@ -289,6 +287,7 @@ int main(int argc, char *argv[])
         CheckSucceededOrFailed(sTestState, lSucceeded, lFailed);
 
 #if DEBUG
+        // clang-format off
         printf("%s %s number of expected bytes\n",
                ((lSucceeded) ? "successfully" :
                 ((lFailed) ? "failed to" :
@@ -297,6 +296,7 @@ int main(int argc, char *argv[])
                 ((lFailed) ? (Common::IsReceiver() ? "receive" : "send") :
                  Common::IsReceiver() ? "received" : "sent"))
                );
+        // clang-format on
 #endif
     }
 
@@ -312,9 +312,9 @@ exit:
     return (lSuccessful ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
-static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentifier, const char *aName, const char *aValue)
+static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
-    bool       retval = true;
+    bool retval = true;
 
     switch (aIdentifier)
     {
@@ -386,11 +386,11 @@ static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentif
             PrintArgError("%s: the use of --raw is exclusive with --udp. Please select only one of the two options.\n", aProgram);
             retval = false;
         }
-		else if (gOptFlags & kOptFlagUseTCPIP)
-		{
+        else if (gOptFlags & kOptFlagUseTCPIP)
+        {
             PrintArgError("%s: the use of --raw is exclusive with --tcp. Please select only one of the two options.\n", aProgram);
             retval = false;
-		}
+        }
         gOptFlags |= kOptFlagUseRawIP;
         break;
 
@@ -400,8 +400,8 @@ static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentif
             PrintArgError("%s: the use of --tcp is exclusive with --raw. Please select only one of the two options.\n", aProgram);
             retval = false;
         }
-		else if (gOptFlags & kOptFlagUseUDPIP)
-		{
+        else if (gOptFlags & kOptFlagUseUDPIP)
+        {
             PrintArgError("%s: the use of --tcp is exclusive with --udp. Please select only one of the two options.\n", aProgram);
             retval = false;
         }
@@ -422,8 +422,8 @@ static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentif
             PrintArgError("%s: the use of --udp is exclusive with --raw. Please select only one of the two options.\n", aProgram);
             retval = false;
         }
-		else if (gOptFlags & kOptFlagUseTCPIP)
-		{
+        else if (gOptFlags & kOptFlagUseTCPIP)
+        {
             PrintArgError("%s: the use of --udp is exclusive with --tcp. Please select only one of the two options.\n", aProgram);
             retval = false;
         }
@@ -434,13 +434,12 @@ static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentif
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
         break;
-
     }
 
     return (retval);
 }
 
-bool HandleNonOptionArgs(const char *aProgram, int argc, char *argv[])
+bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
 {
     bool retval = true;
 
@@ -454,12 +453,12 @@ bool HandleNonOptionArgs(const char *aProgram, int argc, char *argv[])
         }
 
         retval = IPAddress::FromString(argv[0], sDestinationAddress);
-        VerifyOrExit(retval == true,
-                     PrintArgError("%s: Please specify a valid destination address: %s\n", aProgram, argv[0]));
+        VerifyOrExit(retval == true, PrintArgError("%s: Please specify a valid destination address: %s\n", aProgram, argv[0]));
 
         sDestinationString = argv[0];
 
-        argc--; argv++;
+        argc--;
+        argv++;
     }
 
     if (argc > 0)
@@ -492,23 +491,17 @@ exit:
     return (retval);
 }
 
-static void PrintReceivedStats(const TransferStats &aStats)
+static void PrintReceivedStats(const TransferStats & aStats)
 {
-    printf("%u/%u received\n",
-           aStats.mReceive.mActual,
-           aStats.mReceive.mExpected);
+    printf("%u/%u received\n", aStats.mReceive.mActual, aStats.mReceive.mExpected);
 }
 
-static bool HandleDataReceived(const PacketBuffer *aBuffer, bool aCheckBuffer, uint8_t aFirstValue)
+static bool HandleDataReceived(const PacketBuffer * aBuffer, bool aCheckBuffer, uint8_t aFirstValue)
 {
-    const bool  lStatsByPacket = true;
-    bool        lStatus = true;
+    const bool lStatsByPacket = true;
+    bool lStatus              = true;
 
-    lStatus = Common::HandleDataReceived(aBuffer,
-                                         sTestState.mStats,
-                                         !lStatsByPacket,
-                                         aCheckBuffer,
-                                         aFirstValue);
+    lStatus = Common::HandleDataReceived(aBuffer, sTestState.mStats, !lStatsByPacket, aCheckBuffer, aFirstValue);
     VerifyOrExit(lStatus == true, );
 
     PrintReceivedStats(sTestState.mStats);
@@ -517,10 +510,10 @@ exit:
     return (lStatus);
 }
 
-static bool HandleDataReceived(const PacketBuffer *aBuffer, bool aCheckBuffer)
+static bool HandleDataReceived(const PacketBuffer * aBuffer, bool aCheckBuffer)
 {
-    const uint8_t  lFirstValue = 0;
-    bool           lStatus = true;
+    const uint8_t lFirstValue = 0;
+    bool lStatus              = true;
 
     lStatus = HandleDataReceived(aBuffer, aCheckBuffer, lFirstValue);
     VerifyOrExit(lStatus == true, );
@@ -531,20 +524,20 @@ exit:
 
 // TCP Endpoint Callbacks
 
-void HandleTCPConnectionComplete(TCPEndPoint *aEndPoint, INET_ERROR aError)
+void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, INET_ERROR aError)
 {
     INET_ERROR lStatus;
 
     if (aError == INET_NO_ERROR)
     {
-        IPAddress  lPeerAddress;
-        uint16_t   lPeerPort;
-        char       lPeerAddressBuffer[INET6_ADDRSTRLEN];
+        IPAddress lPeerAddress;
+        uint16_t lPeerPort;
+        char lPeerAddressBuffer[INET6_ADDRSTRLEN];
 
         lStatus = aEndPoint->GetPeerInfo(&lPeerAddress, &lPeerPort);
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::GetPeerInfo failed");
 
-        lPeerAddress.ToString(lPeerAddressBuffer, sizeof (lPeerAddressBuffer));
+        lPeerAddress.ToString(lPeerAddressBuffer, sizeof(lPeerAddressBuffer));
 
         printf("TCP connection established to %s:%u\n", lPeerAddressBuffer, lPeerPort);
 
@@ -573,7 +566,7 @@ void HandleTCPConnectionComplete(TCPEndPoint *aEndPoint, INET_ERROR aError)
     }
 }
 
-static void HandleTCPConnectionClosed(TCPEndPoint *aEndPoint, INET_ERROR aError)
+static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError)
 {
     if (aError == INET_NO_ERROR)
     {
@@ -594,23 +587,23 @@ static void HandleTCPConnectionClosed(TCPEndPoint *aEndPoint, INET_ERROR aError)
     }
 }
 
-static void HandleTCPDataSent(TCPEndPoint *aEndPoint, uint16_t len)
+static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len)
 {
     return;
 }
 
-static void HandleTCPDataReceived(TCPEndPoint *aEndPoint, PacketBuffer *aBuffer)
+static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBuffer * aBuffer)
 {
-    const uint8_t  lFirstValue = sTestState.mStats.mReceive.mActual;
-    const bool     lCheckBuffer = true;
-    IPAddress      lPeerAddress;
-    uint16_t       lPeerPort;
-    char           lPeerAddressBuffer[INET6_ADDRSTRLEN];
-    bool           lCheckPassed;
-    INET_ERROR     lStatus = INET_NO_ERROR;
+    const uint8_t lFirstValue = sTestState.mStats.mReceive.mActual;
+    const bool lCheckBuffer   = true;
+    IPAddress lPeerAddress;
+    uint16_t lPeerPort;
+    char lPeerAddressBuffer[INET6_ADDRSTRLEN];
+    bool lCheckPassed;
+    INET_ERROR lStatus = INET_NO_ERROR;
 
-    VerifyOrExit(aEndPoint != NULL,   lStatus = INET_ERROR_BAD_ARGS);
-    VerifyOrExit(aBuffer != NULL,     lStatus = INET_ERROR_BAD_ARGS);
+    VerifyOrExit(aEndPoint != NULL, lStatus = INET_ERROR_BAD_ARGS);
+    VerifyOrExit(aBuffer != NULL, lStatus = INET_ERROR_BAD_ARGS);
 
     if (aEndPoint->State != TCPEndPoint::kState_Connected)
     {
@@ -623,11 +616,9 @@ static void HandleTCPDataReceived(TCPEndPoint *aEndPoint, PacketBuffer *aBuffer)
     lStatus = aEndPoint->GetPeerInfo(&lPeerAddress, &lPeerPort);
     INET_FAIL_ERROR(lStatus, "TCPEndPoint::GetPeerInfo failed");
 
-    lPeerAddress.ToString(lPeerAddressBuffer, sizeof (lPeerAddressBuffer));
+    lPeerAddress.ToString(lPeerAddressBuffer, sizeof(lPeerAddressBuffer));
 
-    printf("TCP message received from %s:%u (%zu bytes)\n",
-           lPeerAddressBuffer,
-           lPeerPort,
+    printf("TCP message received from %s:%u (%zu bytes)\n", lPeerAddressBuffer, lPeerPort,
            static_cast<size_t>(aBuffer->DataLength()));
 
     lCheckPassed = HandleDataReceived(aBuffer, lCheckBuffer, lFirstValue);
@@ -648,18 +639,19 @@ exit:
     }
 }
 
-static void HandleTCPAcceptError(TCPEndPoint *aEndPoint, INET_ERROR aError)
+static void HandleTCPAcceptError(TCPEndPoint * aEndPoint, INET_ERROR aError)
 {
     printf("TCP accept error: %s\n", ErrorStr(aError));
 
     SetStatusFailed(sTestState.mStatus);
 }
 
-static void HandleTCPConnectionReceived(TCPEndPoint *aListenEndPoint, TCPEndPoint *aConnectEndPoint, const IPAddress &aPeerAddress, uint16_t aPeerPort)
+static void HandleTCPConnectionReceived(TCPEndPoint * aListenEndPoint, TCPEndPoint * aConnectEndPoint,
+                                        const IPAddress & aPeerAddress, uint16_t aPeerPort)
 {
     char lPeerAddressBuffer[INET6_ADDRSTRLEN];
 
-    aPeerAddress.ToString(lPeerAddressBuffer, sizeof (lPeerAddressBuffer));
+    aPeerAddress.ToString(lPeerAddressBuffer, sizeof(lPeerAddressBuffer));
 
     printf("TCP connection accepted from %s:%u\n", lPeerAddressBuffer, aPeerPort);
 
@@ -673,15 +665,15 @@ static void HandleTCPConnectionReceived(TCPEndPoint *aListenEndPoint, TCPEndPoin
 
 // Raw Endpoint Callbacks
 
-static void HandleRawMessageReceived(IPEndPointBasis *aEndPoint, PacketBuffer *aBuffer, const IPPacketInfo *aPacketInfo)
+static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
 {
-    const bool     lCheckBuffer = true;
-    const bool     lStatsByPacket = true;
-    IPAddressType  lAddressType;
-    bool           lStatus;
+    const bool lCheckBuffer   = true;
+    const bool lStatsByPacket = true;
+    IPAddressType lAddressType;
+    bool lStatus;
 
-    VerifyOrExit(aEndPoint != NULL,   lStatus = false);
-    VerifyOrExit(aBuffer != NULL,     lStatus = false);
+    VerifyOrExit(aEndPoint != NULL, lStatus = false);
+    VerifyOrExit(aBuffer != NULL, lStatus = false);
     VerifyOrExit(aPacketInfo != NULL, lStatus = false);
 
     Common::HandleRawMessageReceived(aEndPoint, aBuffer, aPacketInfo);
@@ -722,7 +714,7 @@ exit:
     }
 }
 
-static void HandleRawReceiveError(IPEndPointBasis *aEndPoint, INET_ERROR aError, const IPPacketInfo *aPacketInfo)
+static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleRawReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -731,13 +723,13 @@ static void HandleRawReceiveError(IPEndPointBasis *aEndPoint, INET_ERROR aError,
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis *aEndPoint, PacketBuffer *aBuffer, const IPPacketInfo *aPacketInfo)
+static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
 {
-    const bool  lCheckBuffer = true;
-    bool        lStatus;
+    const bool lCheckBuffer = true;
+    bool lStatus;
 
-    VerifyOrExit(aEndPoint != NULL,   lStatus = false);
-    VerifyOrExit(aBuffer != NULL,     lStatus = false);
+    VerifyOrExit(aEndPoint != NULL, lStatus = false);
+    VerifyOrExit(aBuffer != NULL, lStatus = false);
     VerifyOrExit(aPacketInfo != NULL, lStatus = false);
 
     Common::HandleUDPMessageReceived(aEndPoint, aBuffer, aPacketInfo);
@@ -756,7 +748,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis *aEndPoint, INET_ERROR aError, const IPPacketInfo *aPacketInfo)
+static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -822,10 +814,10 @@ static INET_ERROR PrepareTransportForSend(void)
     return (lStatus);
 }
 
-static INET_ERROR DriveSendForDestination(const IPAddress &aAddress, uint16_t aSize)
+static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
-    PacketBuffer *lBuffer = NULL;
-    INET_ERROR    lStatus = INET_NO_ERROR;
+    PacketBuffer * lBuffer = NULL;
+    INET_ERROR lStatus     = INET_NO_ERROR;
 
     if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
     {
@@ -908,19 +900,15 @@ void DriveSend(void)
 
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {
-            const uint32_t lRemaining = (sTestState.mStats.mTransmit.mExpected -
-                                         sTestState.mStats.mTransmit.mActual);
-            const uint32_t lSendSize  = chip::min(lRemaining,
-                                                  static_cast<uint32_t>(gSendSize));
+            const uint32_t lRemaining = (sTestState.mStats.mTransmit.mExpected - sTestState.mStats.mTransmit.mActual);
+            const uint32_t lSendSize  = chip::min(lRemaining, static_cast<uint32_t>(gSendSize));
 
             lStatus = DriveSendForDestination(sDestinationAddress, lSendSize);
             SuccessOrExit(lStatus);
 
             sTestState.mStats.mTransmit.mActual += lSendSize;
 
-            printf("%u/%u transmitted to %s\n",
-                   sTestState.mStats.mTransmit.mActual,
-                   sTestState.mStats.mTransmit.mExpected,
+            printf("%u/%u transmitted to %s\n", sTestState.mStats.mTransmit.mActual, sTestState.mStats.mTransmit.mExpected,
                    sDestinationString);
         }
     }
@@ -936,11 +924,11 @@ exit:
 
 static void StartTest(void)
 {
-    IPAddressType      lIPAddressType = kIPAddressType_IPv6;
-    IPProtocol         lIPProtocol    = kIPProtocol_ICMPv6;
-    IPVersion          lIPVersion     = kIPVersion_6;
-    IPAddress          lAddress       = chip::Inet::IPAddress::Any;
-    INET_ERROR         lStatus;
+    IPAddressType lIPAddressType = kIPAddressType_IPv6;
+    IPProtocol lIPProtocol       = kIPProtocol_ICMPv6;
+    IPVersion lIPVersion         = kIPVersion_6;
+    IPAddress lAddress           = chip::Inet::IPAddress::Any;
+    INET_ERROR lStatus;
 
     if (!gNetworkOptions.LocalIPv6Addr.empty())
         lAddress = gNetworkOptions.LocalIPv6Addr[0];
@@ -958,11 +946,13 @@ static void StartTest(void)
     }
 #endif // INET_CONFIG_ENABLE_IPV4
 
+    // clang-format off
     printf("Using %sIP%s, device interface: %s (w/%c LwIP)\n",
            ((gOptFlags & kOptFlagUseRawIP) ? "" : ((gOptFlags & kOptFlagUseTCPIP) ? "TCP/" : "UDP/")),
            ((gOptFlags & kOptFlagUseIPv4) ? "v4" : "v6"),
            ((gInterfaceName) ? gInterfaceName : "<none>"),
            (CHIP_SYSTEM_CONFIG_USE_LWIP ? '\0' : 'o'));
+    // clang-format on
 
     // Allocate the endpoints for sending or receiving.
 
@@ -1021,8 +1011,8 @@ static void StartTest(void)
         }
         else if (gOptFlags & kOptFlagUseTCPIP)
         {
-            const uint16_t  lConnectionBacklogMax = 1;
-            const bool      lReuseAddress = true;
+            const uint16_t lConnectionBacklogMax = 1;
+            const bool lReuseAddress             = true;
 
             lStatus = gInet.NewTCPEndPoint(&sTCPIPListenEndPoint);
             INET_FAIL_ERROR(lStatus, "InetLayer::NewTCPEndPoint failed");
@@ -1046,7 +1036,7 @@ static void StartTest(void)
 
 static void CleanupTest(void)
 {
-    INET_ERROR         lStatus;
+    INET_ERROR lStatus;
 
     gSendIntervalExpired = false;
     gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, NULL);
@@ -1069,7 +1059,7 @@ static void CleanupTest(void)
     if (sTCPIPListenEndPoint != NULL)
     {
         sTCPIPListenEndPoint->Shutdown();
-		sTCPIPListenEndPoint->Free();
+        sTCPIPListenEndPoint->Free();
     }
 
     if (sUDPIPEndPoint != NULL)

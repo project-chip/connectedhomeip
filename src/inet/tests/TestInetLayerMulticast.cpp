@@ -49,17 +49,15 @@ using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Inet;
 
-
 /* Preprocessor Macros */
 
-#define kToolName                       "TestInetLayerMulticast"
+#define kToolName "TestInetLayerMulticast"
 
-#define kToolOptNoLoopback              'L'
-#define kToolOptGroup                   'g'
+#define kToolOptNoLoopback 'L'
+#define kToolOptGroup 'g'
 
-#define kToolOptExpectedGroupRxPackets  (kToolOptBase + 0)
-#define kToolOptExpectedGroupTxPackets  (kToolOptBase + 1)
-
+#define kToolOptExpectedGroupRxPackets (kToolOptBase + 0)
+#define kToolOptExpectedGroupTxPackets (kToolOptBase + 1)
 
 /* Type Definitions */
 
@@ -70,38 +68,37 @@ enum OptFlags
 
 struct GroupAddress
 {
-    uint32_t       mGroup;
-    TransferStats  mStats;
-    IPAddress      mMulticastAddress;
+    uint32_t mGroup;
+    TransferStats mStats;
+    IPAddress mMulticastAddress;
 };
 
 template <size_t tCapacity>
 struct GroupAddresses
 {
-    size_t         mSize;
-    const size_t   mCapacity = tCapacity;
-    GroupAddress   mAddresses[tCapacity];
+    size_t mSize;
+    const size_t mCapacity = tCapacity;
+    GroupAddress mAddresses[tCapacity];
 };
 
 template <size_t tCapacity>
 struct TestState
 {
-    GroupAddresses<tCapacity> &  mGroupAddresses;
-    TestStatus                   mStatus;
+    GroupAddresses<tCapacity> & mGroupAddresses;
+    TestStatus mStatus;
 };
-
 
 /* Function Declarations */
 
 static void HandleSignal(int aSignal);
-static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentifier, const char *aName, const char *aValue);
-static bool HandleNonOptionArgs(const char *aProgram, int argc, char *argv[]);
-static bool ParseGroupOpt(const char *aProgram, const char *aValue, bool aIPv6, uint32_t &aOutLastGroupIndex);
-static bool ParseAndUpdateExpectedGroupPackets(const char *aProgram, const char *aValue, uint32_t aGroup, const char *aDescription, uint32_t &aOutExpected);
+static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
+static bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
+static bool ParseGroupOpt(const char * aProgram, const char * aValue, bool aIPv6, uint32_t & aOutLastGroupIndex);
+static bool ParseAndUpdateExpectedGroupPackets(const char * aProgram, const char * aValue, uint32_t aGroup,
+                                               const char * aDescription, uint32_t & aOutExpected);
 
 static void StartTest(void);
 static void CleanupTest(void);
-
 
 /* Global Variables */
 
@@ -204,14 +201,12 @@ static OptionSet *       sToolOptionSets[] =
 };
 // clang-format on
 
-static void CheckSucceededOrFailed(const GroupAddress &aAddress, bool &aOutSucceeded, bool &aOutFailed)
+static void CheckSucceededOrFailed(const GroupAddress & aAddress, bool & aOutSucceeded, bool & aOutFailed)
 {
-    const TransferStats &lStats = aAddress.mStats;
+    const TransferStats & lStats = aAddress.mStats;
 
 #if DEBUG
-    printf("Group %u: %u/%u sent, %u/%u received\n",
-           aAddress.mGroup,
-           lStats.mTransmit.mActual, lStats.mTransmit.mExpected,
+    printf("Group %u: %u/%u sent, %u/%u received\n", aAddress.mGroup, lStats.mTransmit.mActual, lStats.mTransmit.mExpected,
            lStats.mReceive.mActual, lStats.mReceive.mExpected);
 #endif
 
@@ -228,11 +223,11 @@ static void CheckSucceededOrFailed(const GroupAddress &aAddress, bool &aOutSucce
 }
 
 template <size_t tCapacity>
-static void CheckSucceededOrFailed(TestState<tCapacity> &aTestState, bool &aOutSucceeded, bool &aOutFailed)
+static void CheckSucceededOrFailed(TestState<tCapacity> & aTestState, bool & aOutSucceeded, bool & aOutFailed)
 {
     for (size_t i = 0; i < aTestState.mGroupAddresses.mSize; i++)
     {
-        const GroupAddress &lGroup = aTestState.mGroupAddresses.mAddresses[i];
+        const GroupAddress & lGroup = aTestState.mGroupAddresses.mAddresses[i];
 
         CheckSucceededOrFailed(lGroup, aOutSucceeded, aOutFailed);
     }
@@ -255,14 +250,13 @@ static void HandleSignal(int aSignal)
     case SIGUSR1:
         SetStatusFailed(sTestState.mStatus);
         break;
-
     }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
-    bool          lSuccessful = true;
-    INET_ERROR    lStatus;
+    bool lSuccessful = true;
+    INET_ERROR lStatus;
 
     InitTestInetCommon();
 
@@ -319,9 +313,9 @@ int main(int argc, char *argv[])
     {
         struct timeval sleepTime;
         bool lSucceeded = true;
-        bool lFailed = false;
+        bool lFailed    = false;
 
-        sleepTime.tv_sec = 0;
+        sleepTime.tv_sec  = 0;
         sleepTime.tv_usec = 10000;
 
         ServiceNetwork(sleepTime);
@@ -329,14 +323,10 @@ int main(int argc, char *argv[])
         CheckSucceededOrFailed(sTestState, lSucceeded, lFailed);
 
 #if DEBUG
-        printf("%s %s number of expected packets\n",
-               ((lSucceeded) ? "successfully" :
-                ((lFailed) ? "failed to" :
-                 "has not yet")),
-               ((lSucceeded) ? (Common::IsReceiver() ? "received" : "sent") :
-                ((lFailed) ? (Common::IsReceiver() ? "receive" : "send") :
-                 Common::IsReceiver() ? "received" : "sent"))
-               );
+        printf("%s %s number of expected packets\n", ((lSucceeded) ? "successfully" : ((lFailed) ? "failed to" : "has not yet")),
+               ((lSucceeded)
+                    ? (Common::IsReceiver() ? "received" : "sent")
+                    : ((lFailed) ? (Common::IsReceiver() ? "receive" : "send") : Common::IsReceiver() ? "received" : "sent")));
 #endif
     }
 
@@ -352,9 +342,9 @@ exit:
     return (lSuccessful ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
-static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentifier, const char *aName, const char *aValue)
+static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
-    bool       retval = true;
+    bool retval = true;
 
     switch (aIdentifier)
     {
@@ -382,27 +372,27 @@ static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentif
         }
         break;
 
-    case kToolOptExpectedGroupRxPackets:
+    case kToolOptExpectedGroupRxPackets: {
+        GroupAddress & lGroupAddress = sGroupAddresses.mAddresses[sLastGroupIndex];
+
+        if (!ParseAndUpdateExpectedGroupPackets(aProgram, aValue, lGroupAddress.mGroup, "received",
+                                                lGroupAddress.mStats.mReceive.mExpected))
         {
-            GroupAddress &lGroupAddress = sGroupAddresses.mAddresses[sLastGroupIndex];
-
-            if (!ParseAndUpdateExpectedGroupPackets(aProgram, aValue, lGroupAddress.mGroup, "received", lGroupAddress.mStats.mReceive.mExpected))
-            {
-                retval = false;
-            }
+            retval = false;
         }
-        break;
+    }
+    break;
 
-    case kToolOptExpectedGroupTxPackets:
+    case kToolOptExpectedGroupTxPackets: {
+        GroupAddress & lGroupAddress = sGroupAddresses.mAddresses[sLastGroupIndex];
+
+        if (!ParseAndUpdateExpectedGroupPackets(aProgram, aValue, lGroupAddress.mGroup, "sent",
+                                                lGroupAddress.mStats.mTransmit.mExpected))
         {
-            GroupAddress &lGroupAddress = sGroupAddresses.mAddresses[sLastGroupIndex];
-
-            if (!ParseAndUpdateExpectedGroupPackets(aProgram, aValue, lGroupAddress.mGroup, "sent", lGroupAddress.mStats.mTransmit.mExpected))
-            {
-                retval = false;
-            }
+            retval = false;
         }
-        break;
+    }
+    break;
 
 #if INET_CONFIG_ENABLE_IPV4
     case kToolOptIPv4Only:
@@ -465,19 +455,19 @@ static bool HandleOption(const char *aProgram, OptionSet *aOptions, int aIdentif
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
         break;
-
     }
 
     return (retval);
 }
 
-bool HandleNonOptionArgs(const char *aProgram, int argc, char *argv[])
+bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
 {
     bool retval = true;
 
     if ((gOptFlags & (kOptFlagListen | kOptFlagNoLoopback)) == (kOptFlagListen | kOptFlagNoLoopback))
     {
-        PrintArgError("%s: the listen option is exclusive with the loopback suppression option. Please select one or the other.\n", aProgram);
+        PrintArgError("%s: the listen option is exclusive with the loopback suppression option. Please select one or the other.\n",
+                      aProgram);
         retval = false;
         goto exit;
     }
@@ -525,7 +515,7 @@ static IPAddress MakeIPv6Multicast(uint32_t aGroupIdentifier)
     return (IPAddress::MakeIPv6Multicast(lFlags, kIPv6MulticastScope_Site, aGroupIdentifier));
 }
 
-static void SetGroup(GroupAddress &aGroupAddress, uint32_t aGroupIdentifier, uint32_t aExpectedRx, uint32_t aExpectedTx)
+static void SetGroup(GroupAddress & aGroupAddress, uint32_t aGroupIdentifier, uint32_t aExpectedRx, uint32_t aExpectedTx)
 {
     aGroupAddress.mGroup                     = aGroupIdentifier;
     aGroupAddress.mStats.mReceive.mExpected  = aExpectedRx;
@@ -534,10 +524,10 @@ static void SetGroup(GroupAddress &aGroupAddress, uint32_t aGroupIdentifier, uin
     aGroupAddress.mStats.mTransmit.mActual   = 0;
 }
 
-static bool ParseGroupOpt(const char *aProgram, const char *aValue, bool aIPv6, uint32_t &aOutLastGroupIndex)
+static bool ParseGroupOpt(const char * aProgram, const char * aValue, bool aIPv6, uint32_t & aOutLastGroupIndex)
 {
     uint32_t lGroupIdentifier;
-    bool     lRetval = true;
+    bool lRetval = true;
 
     if (sGroupAddresses.mSize == sGroupAddresses.mCapacity)
     {
@@ -555,19 +545,17 @@ static bool ParseGroupOpt(const char *aProgram, const char *aValue, bool aIPv6, 
 
     aOutLastGroupIndex = sGroupAddresses.mSize++;
 
-    SetGroup(sGroupAddresses.mAddresses[aOutLastGroupIndex],
-             lGroupIdentifier,
-             lGroupIdentifier,
-             lGroupIdentifier);
+    SetGroup(sGroupAddresses.mAddresses[aOutLastGroupIndex], lGroupIdentifier, lGroupIdentifier, lGroupIdentifier);
 
 exit:
     return (lRetval);
 }
 
-static bool ParseAndUpdateExpectedGroupPackets(const char *aProgram, const char *aValue, uint32_t aGroup, const char *aDescription, uint32_t &aOutExpected)
+static bool ParseAndUpdateExpectedGroupPackets(const char * aProgram, const char * aValue, uint32_t aGroup,
+                                               const char * aDescription, uint32_t & aOutExpected)
 {
-    uint32_t  lExpectedGroupPackets;
-    bool      lRetval = true;
+    uint32_t lExpectedGroupPackets;
+    bool lRetval = true;
 
     if (!ParseInt(aValue, lExpectedGroupPackets))
     {
@@ -582,13 +570,13 @@ exit:
     return (lRetval);
 }
 
-static GroupAddress *FindGroupAddress(const IPAddress &aSourceAddress)
+static GroupAddress * FindGroupAddress(const IPAddress & aSourceAddress)
 {
-    GroupAddress *lResult = NULL;
+    GroupAddress * lResult = NULL;
 
     for (size_t i = 0; i < sGroupAddresses.mSize; i++)
     {
-        GroupAddress &lGroupAddress = sGroupAddresses.mAddresses[i];
+        GroupAddress & lGroupAddress = sGroupAddresses.mAddresses[i];
 
         if (lGroupAddress.mMulticastAddress == aSourceAddress)
         {
@@ -600,23 +588,18 @@ static GroupAddress *FindGroupAddress(const IPAddress &aSourceAddress)
     return (lResult);
 }
 
-static void PrintReceivedStats(const GroupAddress &aGroupAddress)
+static void PrintReceivedStats(const GroupAddress & aGroupAddress)
 {
-    printf("%u/%u received for multicast group %u\n",
-           aGroupAddress.mStats.mReceive.mActual,
-           aGroupAddress.mStats.mReceive.mExpected,
-           aGroupAddress.mGroup);
+    printf("%u/%u received for multicast group %u\n", aGroupAddress.mStats.mReceive.mActual,
+           aGroupAddress.mStats.mReceive.mExpected, aGroupAddress.mGroup);
 }
 
-static bool HandleDataReceived(const PacketBuffer *aBuffer, GroupAddress &aGroupAddress, bool aCheckBuffer)
+static bool HandleDataReceived(const PacketBuffer * aBuffer, GroupAddress & aGroupAddress, bool aCheckBuffer)
 {
-    const bool  lStatsByPacket = true;
-    bool        lStatus = true;
+    const bool lStatsByPacket = true;
+    bool lStatus              = true;
 
-    lStatus = Common::HandleDataReceived(aBuffer,
-                                         aGroupAddress.mStats,
-                                         lStatsByPacket,
-                                         aCheckBuffer);
+    lStatus = Common::HandleDataReceived(aBuffer, aGroupAddress.mStats, lStatsByPacket, aCheckBuffer);
     VerifyOrExit(lStatus == true, );
 
     PrintReceivedStats(aGroupAddress);
@@ -625,10 +608,10 @@ exit:
     return (lStatus);
 }
 
-static bool HandleDataReceived(const PacketBuffer *aBuffer, const IPPacketInfo &aPacketInfo, bool aCheckBuffer)
+static bool HandleDataReceived(const PacketBuffer * aBuffer, const IPPacketInfo & aPacketInfo, bool aCheckBuffer)
 {
-    bool            lStatus = true;
-    GroupAddress *  lGroupAddress;
+    bool lStatus = true;
+    GroupAddress * lGroupAddress;
 
     lGroupAddress = FindGroupAddress(aPacketInfo.DestAddress);
 
@@ -644,16 +627,16 @@ exit:
 
 // Raw Endpoint Callbacks
 
-static void HandleRawMessageReceived(IPEndPointBasis *aEndPoint, PacketBuffer *aBuffer, const IPPacketInfo *aPacketInfo)
+static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
 {
-    const bool      lCheckBuffer = true;
-    const bool      lStatsByPacket = true;
-    IPAddressType   lAddressType;
-    bool            lStatus = true;
-    GroupAddress *  lGroupAddress;
+    const bool lCheckBuffer   = true;
+    const bool lStatsByPacket = true;
+    IPAddressType lAddressType;
+    bool lStatus = true;
+    GroupAddress * lGroupAddress;
 
-    VerifyOrExit(aEndPoint != NULL,   lStatus = false);
-    VerifyOrExit(aBuffer != NULL,     lStatus = false);
+    VerifyOrExit(aEndPoint != NULL, lStatus = false);
+    VerifyOrExit(aBuffer != NULL, lStatus = false);
     VerifyOrExit(aPacketInfo != NULL, lStatus = false);
 
     Common::HandleRawMessageReceived(aEndPoint, aBuffer, aPacketInfo);
@@ -699,7 +682,7 @@ exit:
     }
 }
 
-static void HandleRawReceiveError(IPEndPointBasis *aEndPoint, INET_ERROR aError, const IPPacketInfo *aPacketInfo)
+static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleRawReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -708,13 +691,13 @@ static void HandleRawReceiveError(IPEndPointBasis *aEndPoint, INET_ERROR aError,
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis *aEndPoint, PacketBuffer *aBuffer, const IPPacketInfo *aPacketInfo)
+static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
 {
-    const bool  lCheckBuffer = true;
-    bool        lStatus;
+    const bool lCheckBuffer = true;
+    bool lStatus;
 
-    VerifyOrExit(aEndPoint != NULL,   lStatus = false);
-    VerifyOrExit(aBuffer != NULL,     lStatus = false);
+    VerifyOrExit(aEndPoint != NULL, lStatus = false);
+    VerifyOrExit(aBuffer != NULL, lStatus = false);
     VerifyOrExit(aPacketInfo != NULL, lStatus = false);
 
     Common::HandleUDPMessageReceived(aEndPoint, aBuffer, aPacketInfo);
@@ -733,7 +716,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis *aEndPoint, INET_ERROR aError, const IPPacketInfo *aPacketInfo)
+static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -763,10 +746,10 @@ static INET_ERROR PrepareTransportForSend(void)
     return (lStatus);
 }
 
-static INET_ERROR DriveSendForDestination(const IPAddress &aAddress, uint16_t aSize)
+static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
-    PacketBuffer *lBuffer = NULL;
-    INET_ERROR    lStatus = INET_NO_ERROR;
+    PacketBuffer * lBuffer = NULL;
+    INET_ERROR lStatus     = INET_NO_ERROR;
 
     if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
     {
@@ -812,7 +795,7 @@ exit:
     return (lStatus);
 }
 
-static INET_ERROR DriveSendForGroup(GroupAddress &aGroupAddress)
+static INET_ERROR DriveSendForGroup(GroupAddress & aGroupAddress)
 {
     INET_ERROR lStatus = INET_NO_ERROR;
 
@@ -823,10 +806,8 @@ static INET_ERROR DriveSendForGroup(GroupAddress &aGroupAddress)
 
         aGroupAddress.mStats.mTransmit.mActual++;
 
-        printf("%u/%u transmitted for multicast group %u\n",
-               aGroupAddress.mStats.mTransmit.mActual,
-               aGroupAddress.mStats.mTransmit.mExpected,
-               aGroupAddress.mGroup);
+        printf("%u/%u transmitted for multicast group %u\n", aGroupAddress.mStats.mTransmit.mActual,
+               aGroupAddress.mStats.mTransmit.mExpected, aGroupAddress.mGroup);
     }
 
 exit:
@@ -834,7 +815,7 @@ exit:
 }
 
 template <size_t tCapacity>
-static INET_ERROR DriveSendForGroups(GroupAddresses<tCapacity> &aGroupAddresses)
+static INET_ERROR DriveSendForGroups(GroupAddresses<tCapacity> & aGroupAddresses)
 {
     INET_ERROR lStatus = INET_NO_ERROR;
 
@@ -843,7 +824,7 @@ static INET_ERROR DriveSendForGroups(GroupAddresses<tCapacity> &aGroupAddresses)
 
     for (size_t i = 0; i < aGroupAddresses.mSize; i++)
     {
-        GroupAddress &lGroupAddress = aGroupAddresses.mAddresses[i];
+        GroupAddress & lGroupAddress = aGroupAddresses.mAddresses[i];
 
         lStatus = DriveSendForGroup(lGroupAddress);
         SuccessOrExit(lStatus);
@@ -888,13 +869,13 @@ exit:
 
 static void StartTest(void)
 {
-    IPAddressType      lIPAddressType = kIPAddressType_IPv6;
-    IPProtocol         lIPProtocol    = kIPProtocol_ICMPv6;
-    IPVersion          lIPVersion     = kIPVersion_6;
-    IPAddress          lAddress       = IPAddress::Any;
-    IPEndPointBasis *  lEndPoint      = NULL;
-    const bool         lUseLoopback   = ((gOptFlags & kOptFlagNoLoopback) == 0);
-    INET_ERROR         lStatus;
+    IPAddressType lIPAddressType = kIPAddressType_IPv6;
+    IPProtocol lIPProtocol       = kIPProtocol_ICMPv6;
+    IPVersion lIPVersion         = kIPVersion_6;
+    IPAddress lAddress           = IPAddress::Any;
+    IPEndPointBasis * lEndPoint  = NULL;
+    const bool lUseLoopback      = ((gOptFlags & kOptFlagNoLoopback) == 0);
+    INET_ERROR lStatus;
 
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
@@ -905,11 +886,13 @@ static void StartTest(void)
     }
 #endif // INET_CONFIG_ENABLE_IPV4
 
+    // clang-format off
     printf("Using %sIP%s, device interface: %s (w/%c LwIP)\n",
            ((gOptFlags & kOptFlagUseRawIP) ? "" : "UDP/"),
            ((gOptFlags & kOptFlagUseIPv4) ? "v4" : "v6"),
            ((gInterfaceName) ? gInterfaceName : "<none>"),
            (CHIP_SYSTEM_CONFIG_USE_LWIP ? '\0' : 'o'));
+	// clang-format ob
 
     // Allocate the endpoints for sending or receiving.
 
@@ -974,9 +957,9 @@ static void StartTest(void)
 
     for (size_t i = 0; i < sGroupAddresses.mSize; i++)
     {
-        char            lAddressBuffer[INET6_ADDRSTRLEN];
-        GroupAddress &  lGroupAddress     = sGroupAddresses.mAddresses[i];
-        IPAddress &     lMulticastAddress = lGroupAddress.mMulticastAddress;
+        char lAddressBuffer[INET6_ADDRSTRLEN];
+        GroupAddress & lGroupAddress  = sGroupAddresses.mAddresses[i];
+        IPAddress & lMulticastAddress = lGroupAddress.mMulticastAddress;
 
         if ((lEndPoint != NULL) && IsInterfaceIdPresent(gInterfaceId))
         {
@@ -989,7 +972,7 @@ static void StartTest(void)
                 lMulticastAddress = MakeIPv6Multicast(lGroupAddress.mGroup);
             }
 
-            lMulticastAddress.ToString(lAddressBuffer, sizeof (lAddressBuffer));
+            lMulticastAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
 
             printf("Will join multicast group %s\n", lAddressBuffer);
 
@@ -1006,13 +989,13 @@ static void StartTest(void)
 
 static void CleanupTest(void)
 {
-    IPEndPointBasis *  lEndPoint      = NULL;
-    INET_ERROR         lStatus;
+    IPEndPointBasis * lEndPoint = NULL;
+    INET_ERROR lStatus;
 
     gSendIntervalExpired = false;
     gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, NULL);
 
-     //  Leave the multicast groups
+    //  Leave the multicast groups
 
     if (gOptFlags & kOptFlagUseRawIP)
     {
@@ -1025,13 +1008,13 @@ static void CleanupTest(void)
 
     for (size_t i = 0; i < sGroupAddresses.mSize; i++)
     {
-        char            lAddressBuffer[INET6_ADDRSTRLEN];
-        GroupAddress &  lGroupAddress     = sGroupAddresses.mAddresses[i];
-        IPAddress &     lMulticastAddress = lGroupAddress.mMulticastAddress;
+        char lAddressBuffer[INET6_ADDRSTRLEN];
+        GroupAddress & lGroupAddress  = sGroupAddresses.mAddresses[i];
+        IPAddress & lMulticastAddress = lGroupAddress.mMulticastAddress;
 
         if ((lEndPoint != NULL) && IsInterfaceIdPresent(gInterfaceId))
         {
-            lMulticastAddress.ToString(lAddressBuffer, sizeof (lAddressBuffer));
+            lMulticastAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
 
             printf("Will leave multicast group %s\n", lAddressBuffer);
 
