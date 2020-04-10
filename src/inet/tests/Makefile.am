@@ -80,16 +80,18 @@ COMMON_LDADD                                          = \
 #
 # These will NOT be part of the externally-consumable binary SDK.
 #
-# XXX - At this point TestInetEndPoint is stranded here until a
-#       solution for enabling IPv6 on Linux containers for Docker on macOS
-#       can be resolved as that test involves executing APIs that
-#       exercise bind, listen, connect, accept, etc. on IPv4 and IPv6 IP end
-#       points. When that issue has been resolved, move that test to
-#       check_PROGRAMS.
+# XXX - At this point TestInetEndPoint and TestInetLayerDNS are stranded
+#       here until a solution for enabling IPv6 on Linux containers for
+#       Docker on macOS can be resolved as that test involves
+#       executing APIs that exercise bind, listen, connect, accept,
+#       etc. on IPv4 and IPv6 IP end points. When that issue has been
+#       resolved, move these tests to check_PROGRAMS.
 
 noinst_PROGRAMS                                       = \
+    TestLwIPDNS                                         \
     TestInetEndPoint                                    \
     TestInetLayer                                       \
+    TestInetLayerDNS                                    \
     TestInetLayerMulticast                              \
     $(NULL)
 
@@ -117,6 +119,9 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
+TestLwIPDNS_SOURCES                                   = TestLwIPDNS.cpp
+TestLwIPDNS_LDADD                                     = libTestInetCommon.a $(COMMON_LDADD)
+
 TestInetAddress_SOURCES                               = TestInetAddress.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 
@@ -131,6 +136,9 @@ TestInetEndPoint_LDADD                                = libTestInetCommon.a $(CO
 TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
                                                         $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
+
+TestInetLayerDNS_SOURCES                              = TestInetLayerDNS.cpp
+TestInetLayerDNS_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
 
 TestInetLayer_SOURCES                                 = TestInetLayer.cpp    \
                                                         $(NULL)
