@@ -132,11 +132,10 @@
             ]
         },
         {
-            "label": "Run Crypto Tests",
+            "label": "Build & Run Crypto Tests",
             "type": "shell",
             "command": "make -C build/default/src/crypto check",
             "group": "none",
-            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]

@@ -16,7 +16,7 @@
 
 #
 #    Description:
-#      This is the GNU automake file for the CHIP QR code unit
+#      This is the GNU automake file for the CHIP crypto unit
 #      and functional tests.
 #
 
@@ -27,6 +27,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                 = \
+    AES_CCM_256_test_vectors.h                   \
     $(NULL)
 
 #
@@ -40,13 +41,14 @@ if CHIP_BUILD_TESTS
 # objects in this makefile.
 
 AM_CPPFLAGS                                    = \
+    -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
     -I$(top_srcdir)/src/system                   \
+    -I$(top_srcdir)/src/include/                 \    
     -I$(top_srcdir)/src/crypto                   \
     $(NULL)
 
 CHIP_LDADD                                      = \
-    $(top_builddir)/src/crypto/libChipCrypto.a    \
     $(NULL)
 
 COMMON_LDADD                                   = \
@@ -57,6 +59,7 @@ COMMON_LDADD                                   = \
 
 check_PROGRAMS                                 = \
     TestCrypto                                   \
+    TestOpenSSLCrypto                            \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -74,8 +77,23 @@ TESTS_ENVIRONMENT                              = \
 
 # Source, compiler, and linker options for test programs.
 
-TestCrypto_LDADD                               = $(COMMON_LDADD)
+TestCrypto_LDADD                               = \
+    $(COMMON_LDADD)                              \
+    $(top_builddir)/src/crypto/libChipCrypto.a   \
+    $(NULL)
+
+
 TestCrypto_SOURCES                             = CHIPCryptoTest.c
+
+#OpenSSL based tests
+TestOpenSSLCrypto_LDADD                        =        \
+    $(COMMON_LDADD)                                     \
+    $(top_builddir)/src/crypto/libChipCrypto.a          \
+    $(NULL)
+
+
+TestOpenSSLCrypto_SOURCES                       = CHIPCryptoPALOpenSSLTest.cpp
+
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)

@@ -17,7 +17,7 @@
 
 #
 #    Description:
-#      This file is the GNU automake template for the CHIP QR code
+#      This file is the GNU automake template for the CHIP crypto
 #      library.
 #
 
@@ -29,14 +29,17 @@ lib_LIBRARIES              = libChipCrypto.a
 
 libChipCrypto_adir             = $(includedir)/crypto
 
-libChipCrypto_a_CPPFLAGS                                      = \
-    -I$(top_srcdir)/src/lib                                     \
-    -I$(top_srcdir)/src/system                                  \
+libChipCrypto_a_CPPFLAGS            = \
+    -I$(top_srcdir)/src               \
+    -I$(top_srcdir)/src/lib           \
+    -I$(top_srcdir)/src/system        \
+    -I$(top_srcdir)/src/include/      \
     $(NULL)
 
 libChipCrypto_a_SOURCES                                       = \
     CHIPOpenSSL.c                                               \
     CHIPBase+Crypto.c                                           \
+    CHIPCryptoPALOpenSSL.cpp                                    \
    $(NULL)
 
 dist_libChipCrypto_a_HEADERS                                 = \
