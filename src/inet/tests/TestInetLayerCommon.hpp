@@ -1,0 +1,165 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      This file defines common preprocessor defintions, constants,
+ *      functions, and globals for unit and functional tests for the
+ *      Inet layer.
+ *
+ */
+
+#ifndef CHIP_TEST_INETLAYER_COMMON_HPP
+#define CHIP_TEST_INETLAYER_COMMON_HPP
+
+#include <stddef.h>
+#include <stdint.h>
+
+#include <inet/InetError.h>
+#include <inet/InetInterface.h>
+#include <inet/RawEndPoint.h>
+#include <inet/UDPEndPoint.h>
+
+#include <system/SystemPacketBuffer.h>
+
+using namespace ::chip;
+
+// Preprocessor Macros
+
+#define SetStatusFailed(aTestStatus)    do { (aTestStatus).mFailed = true; fprintf(stderr, "Test failed at %s:%u!\n", __func__, __LINE__); } while (0)
+
+#define kToolOptBase                    1000
+
+#define kToolOptInterface               'I'
+#define kToolOptIPv4Only                '4'
+#define kToolOptIPv6Only                '6'
+#define kToolOptInterval                'i'
+#define kToolOptListen                  'l'
+#define kToolOptRawIP                   'r'
+#define kToolOptSendSize                's'
+#define kToolOptUDPIP                   'u'
+
+
+// Type Definitions
+
+enum OptFlagsCommon
+{
+    kOptFlagUseIPv4    = 0x00000001,
+    kOptFlagUseIPv6    = 0x00000002,
+
+    kOptFlagUseRawIP   = 0x00000004,
+    kOptFlagUseUDPIP   = 0x00000008,
+
+    kOptFlagListen     = 0x00000010,
+};
+
+enum kICMPTypeIndex
+{
+    kICMP_EchoRequestIndex = 0,
+    kICMP_EchoReplyIndex   = 1
+};
+
+struct Stats
+{
+    uint32_t      mExpected;
+    uint32_t      mActual;
+};
+
+struct TransferStats
+{
+    struct Stats  mReceive;
+    struct Stats  mTransmit;
+};
+
+struct TestStatus
+{
+    bool mFailed;
+    bool mSucceeded;
+};
+
+// Global Variables
+
+static const uint16_t     kUDPPort              = 4242;
+
+static const size_t       kICMPv4_FilterTypes   = 2;
+
+static const size_t       kICMPv6_FilterTypes   = 2;
+
+extern const uint8_t      gICMPv4Types[kICMPv4_FilterTypes];
+
+extern const uint8_t      gICMPv6Types[kICMPv6_FilterTypes];
+
+extern bool               gSendIntervalExpired;
+
+extern uint32_t           gSendIntervalMs;
+
+extern const char *       gInterfaceName;
+
+extern Inet::InterfaceId  gInterfaceId;
+
+extern uint16_t           gSendSize;
+
+extern uint32_t           gOptFlags;
+
+
+// Function Prototypes
+
+namespace Common
+{
+
+extern bool IsReceiver(void);
+extern bool IsSender(void);
+
+extern bool IsTesting(const TestStatus &aTestStatus);
+extern bool WasSuccessful(const TestStatus &aTestStatus);
+
+extern System::PacketBuffer *MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue);
+extern System::PacketBuffer *MakeDataBuffer(uint16_t aDesiredLength);
+extern System::PacketBuffer *MakeICMPv4DataBuffer(uint16_t aDesiredUserLength);
+extern System::PacketBuffer *MakeICMPv6DataBuffer(uint16_t aDesiredUserLength);
+
+extern bool HandleDataReceived(const System::PacketBuffer *aBuffer, TransferStats &aStats, bool aStatsByPacket, bool aCheckBuffer, uint8_t aFirstValue);
+extern bool HandleDataReceived(const System::PacketBuffer *aBuffer, TransferStats &aStats, bool aStatsByPacket, bool aCheckBuffer);
+extern bool HandleICMPv4DataReceived(System::PacketBuffer *aBuffer, TransferStats &aStats, bool aStatsByPacket, bool aCheckBuffer);
+extern bool HandleICMPv6DataReceived(System::PacketBuffer *aBuffer, TransferStats &aStats, bool aStatsByPacket, bool aCheckBuffer);
+
+
+// Timer Callback Handler
+
+extern void HandleSendTimerComplete(System::Layer *aSystemLayer, void *aAppState, System::Error aError);
+
+// Raw Endpoint Callback Handlers
+
+extern void HandleRawMessageReceived(const Inet::IPEndPointBasis *aEndPoint, const System::PacketBuffer *aBuffer, const Inet::IPPacketInfo *aPacketInfo);
+extern void HandleRawReceiveError(const Inet::IPEndPointBasis *aEndPoint, const INET_ERROR &aError, const Inet::IPPacketInfo *aPacketInfo);
+
+// UDP Endpoint Callback Handlers
+
+extern void HandleUDPMessageReceived(const Inet::IPEndPointBasis *aEndPoint, const System::PacketBuffer *aBuffer, const Inet::IPPacketInfo *aPacketInfo);
+extern void HandleUDPReceiveError(const Inet::IPEndPointBasis *aEndPoint, const INET_ERROR &aError, const Inet::IPPacketInfo *aPacketInfo);
+
+}; // namespace Common
+
+// Period send function to be implemented by individual tests but
+// referenced by common code.
+
+extern void DriveSend(void);
+
+
+#endif // CHIP_TEST_INETLAYER_COMMON_HPP
