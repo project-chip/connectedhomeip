@@ -22,18 +22,19 @@
 #ifndef _AES_CCM_256_TEST_VECTORS_H_
 #define _AES_CCM_256_TEST_VECTORS_H_
 
-typedef struct ccm_test_vector {
-    const uint8_t *key;
+typedef struct ccm_test_vector
+{
+    const uint8_t * key;
     size_t key_len;
-    const uint8_t *pt;
+    const uint8_t * pt;
     size_t pt_len;
-    const uint8_t *ct;
+    const uint8_t * ct;
     size_t ct_len;
-    const uint8_t *iv;
+    const uint8_t * iv;
     size_t iv_len;
-    const uint8_t *aad;
+    const uint8_t * aad;
     size_t aad_len;
-    const uint8_t *tag;
+    const uint8_t * tag;
     size_t tag_len;
     unsigned tcId;
     uint64_t result;
