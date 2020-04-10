@@ -1461,4 +1461,66 @@ static const struct ccm_test_vector * ccm_test_vectors[]                  = {
     &chiptest_12cb0ed34854_test_vector_364, &chiptest_12cb0ed34854_test_vector_371, &chiptest_12cb0ed34854_test_vector_378
 };
 
+// These are some invalid vectors where the ct bits have been flipped.
+static const unsigned char chiptest_12cb0ed34854_key_3721[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
+                                                                0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
+                                                                0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
+static const unsigned char chiptest_12cb0ed34854_pt_3731[]  = { 0xee, 0xc3, 0xe6, 0xc0, 0xe5, 0x62, 0xa7, 0xea, 0xe0, 0x5c, 0x3d,
+                                                               0xc4, 0xd8, 0x8f, 0x58, 0x98, 0x58, 0x17, 0xcb, 0x02, 0xa5, 0xae,
+                                                               0x72, 0x03, 0xce, 0x79, 0x9f, 0x73, 0x4d, 0xfd, 0x25, 0xfa, 0x9a };
+static const unsigned char chiptest_12cb0ed34854_ct_3741[]  = { 0x22, 0x0b, 0x7a, 0x3c, 0xde, 0x64, 0x41, 0x34, 0x18, 0xc4, 0xa4,
+                                                               0x10, 0x23, 0x3b, 0x5c, 0x71, 0x85, 0x0e, 0x74, 0x40, 0xb9, 0x4b,
+                                                               0x03, 0xad, 0xaa, 0xd7, 0x76, 0x6c, 0xe7, 0x13, 0xc5, 0x6d, 0xff };
+static const unsigned char chiptest_12cb0ed34854_iv_3751[]  = { 0x95, 0xf9, 0x61, 0x8a, 0x2c, 0x8f, 0x0d,
+                                                               0x28, 0xb5, 0xbb, 0xe5, 0x8c, 0xe9 };
+static const unsigned char chiptest_12cb0ed34854_aad_3761[] = { 0x98, 0x5b, 0xf0, 0x38, 0x16, 0xe9, 0x29, 0xce, 0x66, 0x81, 0x0d,
+                                                                0x7e, 0x1a, 0x78, 0x46, 0xc9, 0x1e, 0x05, 0x68, 0x6d, 0x0e, 0xcf,
+                                                                0x8f, 0x94, 0x31, 0x0a, 0x37, 0xa1, 0xc0, 0x76, 0x1b, 0x04 };
+static const unsigned char chiptest_12cb0ed34854_tag_3771[] = { 0x07, 0x57, 0x3b, 0xc7, 0x7f, 0xa9, 0x58, 0x63,
+                                                                0xde, 0xc4, 0x16, 0xd6, 0xbe, 0x3b, 0x1e, 0xb3 };
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_3781 = { .key     = chiptest_12cb0ed34854_key_3721,
+                                                                               .key_len = 32,
+                                                                               .pt      = chiptest_12cb0ed34854_pt_3731,
+                                                                               .pt_len  = 33,
+                                                                               .ct      = chiptest_12cb0ed34854_ct_3741,
+                                                                               .ct_len  = 33,
+                                                                               .iv      = chiptest_12cb0ed34854_iv_3751,
+                                                                               .iv_len  = 13,
+                                                                               .aad     = chiptest_12cb0ed34854_aad_3761,
+                                                                               .aad_len = 32,
+                                                                               .tag     = chiptest_12cb0ed34854_tag_3771,
+                                                                               .tag_len = 16,
+                                                                               .tcId    = 54,
+                                                                               .result  = 1 };
+
+static const unsigned char chiptest_12cb0ed34854_key_1411[] = { 0x4a, 0x45, 0x65, 0x85, 0xb8, 0xd3, 0xd2, 0xf2, 0x39, 0x51, 0xf2,
+                                                                0x74, 0xbd, 0x98, 0xe6, 0x65, 0x5e, 0xd5, 0x3f, 0x3c, 0xec, 0x05,
+                                                                0xa4, 0x65, 0xd0, 0x20, 0xb0, 0xdf, 0x6a, 0x33, 0x45, 0xd5 };
+static const unsigned char chiptest_12cb0ed34854_pt_1421[]  = { 0xcd, 0x59, 0xde, 0x72, 0x61, 0x2d, 0x17, 0x54, 0xf8, 0x26, 0xe1,
+                                                               0x99, 0x65, 0x6b, 0x47, 0x21, 0x50, 0xd8, 0xf5, 0x9a, 0xf1, 0x5f,
+                                                               0xba, 0x7d, 0x49, 0xd7, 0xa3, 0x2b, 0x7f, 0xb4, 0x11, 0x30, 0x03 };
+static const unsigned char chiptest_12cb0ed34854_ct_1431[]  = { 0x9a, 0x48, 0xb4, 0x6d, 0x76, 0x24, 0xf5, 0xc1, 0x5f, 0x65, 0x45,
+                                                               0x91, 0x11, 0x39, 0x53, 0x1f, 0x2b, 0x25, 0xed, 0xcf, 0x6a, 0x9c,
+                                                               0xfd, 0x27, 0x9b, 0x16, 0x28, 0xcd, 0xa4, 0x5f, 0x58, 0xd0, 0x3e };
+static const unsigned char chiptest_12cb0ed34854_iv_1441[]  = { 0xaf, 0x38, 0xfc, 0xd0, 0x6b, 0x87, 0x80 };
+static const unsigned char chiptest_12cb0ed34854_aad_1451[] = {};
+static const unsigned char chiptest_12cb0ed34854_tag_1461[] = { 0xab, 0x73, 0x1f, 0xc8, 0x0a, 0xde, 0x38, 0xf1,
+                                                                0xa9, 0x84, 0x60, 0x6e, 0xae, 0x05, 0xa0, 0x2b };
+static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_1471 = { .key     = chiptest_12cb0ed34854_key_1411,
+                                                                               .key_len = 32,
+                                                                               .pt      = chiptest_12cb0ed34854_pt_1421,
+                                                                               .pt_len  = 33,
+                                                                               .ct      = chiptest_12cb0ed34854_ct_1431,
+                                                                               .ct_len  = 33,
+                                                                               .iv      = chiptest_12cb0ed34854_iv_1441,
+                                                                               .iv_len  = 7,
+                                                                               .aad     = chiptest_12cb0ed34854_aad_1451,
+                                                                               .aad_len = 0,
+                                                                               .tag     = chiptest_12cb0ed34854_tag_1461,
+                                                                               .tag_len = 16,
+                                                                               .tcId    = 21,
+                                                                               .result  = 1 };
+
+static const struct ccm_test_vector * ccm_invalid_test_vectors[] = { &chiptest_12cb0ed34854_test_vector_3781,
+                                                                     &chiptest_12cb0ed34854_test_vector_1471 };
 #endif

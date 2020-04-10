@@ -230,6 +230,29 @@ static void TestAES_CCM_256DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
     }
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
+
+static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_invalid_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_test_vector * vector = ccm_invalid_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_pt[vector->pt_len];
+            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
+                                                      vector->tag_len, vector->key, vector->iv, vector->iv_len, out_pt);
+
+            bool arePTsEqual = memcmp(vector->pt, out_pt, vector->pt_len) == 0;
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INTERNAL);
+            NL_TEST_ASSERT(inSuite, arePTsEqual == false);
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -245,7 +268,8 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test encrypting using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
     NL_TEST_DEF("Test decrypting invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
     NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey), 
-    NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen   ), 
+    NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
+    NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors), 
     NL_TEST_SENTINEL()
 };
 

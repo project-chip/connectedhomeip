@@ -49,10 +49,11 @@ CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plai
     CHIP_ERROR error         = CHIP_NO_ERROR;
     int result               = 1;
 
-    VerifyOrExit((plaintext != NULL && plaintext_length > 0), error = CHIP_ERROR_INVALID_ARGUMENT);
-
+    VerifyOrExit(plaintext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plaintext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(iv != NULL && iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     context = EVP_CIPHER_CTX_new();
@@ -63,7 +64,7 @@ CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plai
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in IV length
-    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_AEAD_SET_IVLEN, iv_length, NULL);
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_IVLEN, iv_length, NULL);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in tag length
@@ -133,11 +134,11 @@ CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t cip
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in IV length
-    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_AEAD_SET_IVLEN, iv_length, NULL);
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_IVLEN, iv_length, NULL);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in expected tag
-    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_AEAD_SET_TAG, tag_length, (void *) tag);
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_TAG, tag_length, (void *) tag);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in key + iv
@@ -155,7 +156,7 @@ CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t cip
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     }
 
-    // Pass in ciphertext
+    // Pass in ciphertext. We wont get anything if validation fails.
     result = EVP_DecryptUpdate(context, plaintext, &bytesOutput, ciphertext, ciphertext_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
