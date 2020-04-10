@@ -485,7 +485,7 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
             }
         }
     };
-	// clang-format on
+    // clang-format on
 
     // Start multiple DNS resolutions simultaneously.
     for (DNSResolutionTestContext & testContext : tests)
