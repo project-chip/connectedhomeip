@@ -28,6 +28,8 @@
 #include <support/CodeUtils.h>
 #include <string.h>
 
+using namespace chip::crypto;
+
 #define kKeyLengthInBits 256
 
 static bool _isValidTagLength(size_t tag_length)
@@ -39,9 +41,9 @@ static bool _isValidTagLength(size_t tag_length)
     return false;
 }
 
-CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                    size_t aad_length, const unsigned char * key, const unsigned char * iv, size_t iv_length,
-                                    unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
+CHIP_ERROR chip::crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                                             size_t aad_length, const unsigned char * key, const unsigned char * iv,
+                                             size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
     EVP_CIPHER_CTX * context = NULL;
     int bytesWritten         = 0;
@@ -110,9 +112,10 @@ exit:
     return error;
 }
 
-CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
-                                    size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
-                                    const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
+CHIP_ERROR chip::crypto::AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
+                                             size_t aad_length, const unsigned char * tag, size_t tag_length,
+                                             const unsigned char * key, const unsigned char * iv, size_t iv_length,
+                                             unsigned char * plaintext)
 {
     EVP_CIPHER_CTX * context = NULL;
     CHIP_ERROR error         = CHIP_NO_ERROR;
