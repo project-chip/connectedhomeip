@@ -88,6 +88,7 @@ COMMON_LDADD                                          = \
 #       check_PROGRAMS.
 
 noinst_PROGRAMS                                       = \
+    TestLwIPDNS                                         \
     TestInetEndPoint                                    \
     TestInetLayer                                       \
     TestInetLayerMulticast                              \
@@ -99,6 +100,7 @@ check_PROGRAMS                                        = \
     TestInetAddress                                     \
     TestInetBuffer                                      \
     TestInetErrorStr                                    \
+    TestInetLayerDNS                                    \
     TestInetTimer                                       \
     $(NULL)
 
@@ -117,6 +119,9 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
+TestLwIPDNS_SOURCES                                   = TestLwIPDNS.cpp
+TestLwIPDNS_LDADD                                     = libTestInetCommon.a $(COMMON_LDADD)
+
 TestInetAddress_SOURCES                               = TestInetAddress.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 
@@ -131,6 +136,9 @@ TestInetEndPoint_LDADD                                = libTestInetCommon.a $(CO
 TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
                                                         $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
+
+TestInetLayerDNS_SOURCES                              = TestInetLayerDNS.cpp
+TestInetLayerDNS_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
 
 TestInetLayer_SOURCES                                 = TestInetLayer.cpp    \
                                                         $(NULL)
