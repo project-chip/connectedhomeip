@@ -27,6 +27,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                 = \
+    AES_CCM_256_test_vectors.h                   \
     $(NULL)
 
 #
@@ -87,7 +88,7 @@ TestCrypto_SOURCES                             = CHIPCryptoTest.c
 #OpenSSL based tests
 TestOpenSSLCrypto_LDADD                        =        \
     $(COMMON_LDADD)                                     \
-    $(top_builddir)/src/crypto/libChipCryptoOpenSSL.a   \
+    $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(NULL)
 
 
