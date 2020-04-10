@@ -30,7 +30,7 @@
 
 #define kKeyLengthInBits 256
 
-bool _isValidTagLength(size_t tag_length)
+static bool _isValidTagLength(size_t tag_length)
 {
     if (tag_length == 8 || tag_length == 12 || tag_length == 16)
     {

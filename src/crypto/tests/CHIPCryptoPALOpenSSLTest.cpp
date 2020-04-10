@@ -21,10 +21,11 @@
 #include <nlunit-test.h>
 #include <stdio.h>
 #include <string.h>
+#include <support/CodeUtils.h>
 
 static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
@@ -58,7 +59,7 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
 
 static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
@@ -84,7 +85,7 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
 
 static void TestAES_CCM_256EncryptInvalidPlainText(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
@@ -106,7 +107,7 @@ static void TestAES_CCM_256EncryptInvalidPlainText(nlTestSuite * inSuite, void *
 
 static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
@@ -128,7 +129,7 @@ static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext
 
 static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
@@ -150,7 +151,7 @@ static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
 
 static void TestAES_CCM_256EncryptInvalidTagLen(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
@@ -172,7 +173,7 @@ static void TestAES_CCM_256EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
 
 static void TestAES_CCM_256DecryptInvalidCipherText(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
@@ -192,7 +193,7 @@ static void TestAES_CCM_256DecryptInvalidCipherText(nlTestSuite * inSuite, void 
 
 static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
@@ -212,7 +213,7 @@ static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
 
 static void TestAES_CCM_256DecryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
 {
-    int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
+    int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
