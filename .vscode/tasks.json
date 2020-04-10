@@ -126,6 +126,7 @@
             "type": "shell",
             "command": "make -C build/default/src/setup_payload check",
             "group": "none",
+            "dependsOn": "Bootstrap",
             "problemMatcher": [
                 "$gcc"
             ]
