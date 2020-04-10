@@ -89,6 +89,29 @@ static void ReleaseLwIP(void)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+struct RestartCallbackContext
+{
+    int mArgc;
+    char ** mArgv;
+};
+
+static void RebootCallbackFn(void);
+static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,
+                                    nl::FaultInjection::Record * aFaultRecord);
+
+static struct RestartCallbackContext sRestartCallbackCtx;
+static nl::FaultInjection::Callback sFuzzECHeaderCb;
+static nl::FaultInjection::Callback sAsyncEventCb;
+
+// clang-format off
+static nl::FaultInjection::GlobalContext sFaultInjectionGlobalContext = {
+    {
+        RebootCallbackFn,
+        PostInjectionCallbackFn
+    }
+};
+// clang-format on
+
 System::Layer gSystemLayer;
 
 Inet::InetLayer gInet;
@@ -105,6 +128,20 @@ static void OnLwIPInitComplete(void * arg);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 char gDefaultTapDeviceName[32];
+bool gDone            = false;
+bool gSigusr1Received = false;
+
+static void UseStdoutLineBuffering()
+{
+    // Set stdout to be line buffered with a buffer of 512 (will flush on new line
+    // or when the buffer of 512 is exceeded).
+    setvbuf(stdout, NULL, _IOLBF, 512);
+}
+
+void InitTestInetCommon()
+{
+    UseStdoutLineBuffering();
+}
 
 static void ExitOnSIGUSR1Handler(int signum)
 {
@@ -530,4 +567,169 @@ void ShutdownNetwork()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     ReleaseLwIP();
 #endif
+}
+
+void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t rowWidth)
+{
+    int indexWidth = snprintf(NULL, 0, "%X", len);
+
+    if (indexWidth < 4)
+        indexWidth = 4;
+
+    for (uint32_t i = 0; i < len; i += rowWidth)
+    {
+        printf("%s%0*X: ", prefix, indexWidth, i);
+
+        uint32_t rowEnd = i + rowWidth;
+
+        uint32_t j = i;
+        for (; j < rowEnd && j < len; j++)
+            printf("%02X ", mem[j]);
+
+        for (; j < rowEnd; j++)
+            printf("   ");
+
+        for (j = i; j < rowEnd && j < len; j++)
+            if (isprint((char) mem[j]))
+                printf("%c", mem[j]);
+            else
+                printf(".");
+
+        printf("\n");
+    }
+}
+
+void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix)
+{
+    const uint32_t kRowWidth = 16;
+
+    DumpMemory(mem, len, prefix, kRowWidth);
+}
+static void RebootCallbackFn(void)
+{
+    char * lArgv[sRestartCallbackCtx.mArgc + 2];
+    int i;
+    int j = 0;
+
+    if (gSigusr1Received)
+    {
+        printf("** skipping restart case after SIGUSR1 **\n");
+        ExitNow();
+    }
+
+    for (i = 0; sRestartCallbackCtx.mArgv[i] != NULL; i++)
+    {
+        if (strcmp(sRestartCallbackCtx.mArgv[i], "--faults") == 0)
+        {
+            // Skip the --faults argument for now
+            i++;
+            continue;
+        }
+        lArgv[j++] = sRestartCallbackCtx.mArgv[i];
+    }
+
+    lArgv[j] = NULL;
+
+    for (i = 0; lArgv[i] != NULL; i++)
+    {
+        printf("argv[%d]: %s\n", i, lArgv[i]);
+    }
+
+    // Need to close any open file descriptor above stdin/out/err.
+    // There is no portable way to get the max fd number.
+    // Given that Weave's test apps don't open a large number of files,
+    // FD_SETSIZE should be a reasonable upper bound (see the documentation
+    // of select).
+    for (i = 3; i < FD_SETSIZE; i++)
+    {
+        close(i);
+    }
+
+    printf("********** Restarting *********\n");
+    fflush(stdout);
+    execvp(lArgv[0], lArgv);
+
+exit:
+    return;
+}
+
+static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,
+                                    nl::FaultInjection::Record * aFaultRecord)
+{
+    uint16_t numargs = aFaultRecord->mNumArguments;
+    uint16_t i;
+
+    printf("***** Injecting fault %s_%s, instance number: %u; reboot: %s", aManager->GetName(), aManager->GetFaultNames()[aId],
+           aFaultRecord->mNumTimesChecked, aFaultRecord->mReboot ? "yes" : "no");
+    if (numargs)
+    {
+        printf(" with %u args:", numargs);
+
+        for (i = 0; i < numargs; i++)
+        {
+            printf(" %d", aFaultRecord->mArguments[i]);
+        }
+    }
+
+    printf("\n");
+}
+
+static bool PrintFaultInjectionMaxArgCbFn(nl::FaultInjection::Manager & mgr, nl::FaultInjection::Identifier aId,
+                                          nl::FaultInjection::Record * aFaultRecord, void * aContext)
+{
+    const char * faultName = mgr.GetFaultNames()[aId];
+
+    if (gFaultInjectionOptions.PrintFaultCounters && aFaultRecord->mNumArguments)
+    {
+        printf("FI_instance_params: %s_%s_s%u maxArg: %u;\n", mgr.GetName(), faultName, aFaultRecord->mNumTimesChecked,
+               aFaultRecord->mArguments[0]);
+    }
+
+    return false;
+}
+
+static bool PrintCHIPFaultInjectionMaxArgCbFn(nl::FaultInjection::Identifier aId, nl::FaultInjection::Record * aFaultRecord,
+                                              void * aContext)
+{
+    nl::FaultInjection::Manager & mgr = chip::FaultInjection::GetManager();
+
+    return PrintFaultInjectionMaxArgCbFn(mgr, aId, aFaultRecord, aContext);
+}
+
+static bool PrintSystemFaultInjectionMaxArgCbFn(nl::FaultInjection::Identifier aId, nl::FaultInjection::Record * aFaultRecord,
+                                                void * aContext)
+{
+    nl::FaultInjection::Manager & mgr = chip::System::FaultInjection::GetManager();
+
+    return PrintFaultInjectionMaxArgCbFn(mgr, aId, aFaultRecord, aContext);
+}
+
+void SetupFaultInjectionContext(int argc, char * argv[])
+{
+    SetupFaultInjectionContext(argc, argv, NULL, NULL);
+}
+
+void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(void),
+                                void (*aInjectAsyncEvents)(int32_t index))
+{
+    nl::FaultInjection::Manager & weavemgr  = chip::FaultInjection::GetManager();
+    nl::FaultInjection::Manager & systemmgr = chip::System::FaultInjection::GetManager();
+
+    sRestartCallbackCtx.mArgc = argc;
+    sRestartCallbackCtx.mArgv = argv;
+
+    nl::FaultInjection::SetGlobalContext(&sFaultInjectionGlobalContext);
+
+    memset(&sFuzzECHeaderCb, 0, sizeof(sFuzzECHeaderCb));
+    sFuzzECHeaderCb.mCallBackFn = PrintCHIPFaultInjectionMaxArgCbFn;
+    weavemgr.InsertCallbackAtFault(chip::FaultInjection::kFault_FuzzExchangeHeaderTx, &sFuzzECHeaderCb);
+
+    if (aNumEventsAvailable && aInjectAsyncEvents)
+    {
+        memset(&sAsyncEventCb, 0, sizeof(sAsyncEventCb));
+        sAsyncEventCb.mCallBackFn = PrintSystemFaultInjectionMaxArgCbFn;
+        systemmgr.InsertCallbackAtFault(chip::System::FaultInjection::kFault_AsyncEvent, &sAsyncEventCb);
+
+        chip::System::FaultInjection::SetAsyncEventCallbacks(aNumEventsAvailable, aInjectAsyncEvents);
+    }
 }

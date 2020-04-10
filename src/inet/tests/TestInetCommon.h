@@ -58,10 +58,24 @@
 
 #define CHIP_TOOL_COPYRIGHT "Copyright (c) 2020 Project CHIP Authors\nAll rights reserved.\n"
 
+#define INET_FAIL_ERROR(ERR, MSG)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if ((ERR) != INET_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            fprintf(stderr, "%s: %s\n", (MSG), ErrorStr(ERR));                                                                     \
+            exit(-1);                                                                                                              \
+        }                                                                                                                          \
+    } while (0)
+
 extern chip::System::Layer gSystemLayer;
 
 extern chip::Inet::InetLayer gInet;
 
+extern bool gDone;
+extern bool gSigusr1Received;
+
+extern void InitTestInetCommon(void);
 extern void SetSIGUSR1Handler(void);
 extern void InitSystemLayer(void);
 extern void ShutdownSystemLayer(void);
@@ -73,10 +87,15 @@ extern void SetSignalHandler(SignalHandler handler);
 extern void InitNetwork(void);
 extern void ServiceEvents(struct ::timeval & aSleepTime);
 extern void ShutdownNetwork(void);
+extern void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t rowWidth);
+extern void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix);
 
 inline static void ServiceNetwork(struct ::timeval & aSleepTime)
 {
     ServiceEvents(aSleepTime);
 }
 
+extern void SetupFaultInjectionContext(int argc, char * argv[]);
+extern void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(void),
+                                       void (*aInjectAsyncEvents)(int32_t index));
 #endif /* CHIP_TEST_INET_COMMON_H_ */
