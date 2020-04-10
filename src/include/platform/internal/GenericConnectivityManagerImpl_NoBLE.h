@@ -60,6 +60,7 @@ public:
     CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
     bool _IsBLEFastAdvertisingEnabled(void);
     CHIP_ERROR _SetBLEFastAdvertisingEnabled(bool val);
+    bool _IsBLEAdvertising(void);
     CHIP_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetBLEDeviceName(const char * deviceName);
     uint16_t _NumBLEConnections(void);
@@ -104,6 +105,12 @@ template<class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template<class ImplClass>
+inline bool GenericConnectivityManagerImpl_NoBLE<ImplClass>::_IsBLEAdvertising(void)
+{
+    return false;
 }
 
 template<class ImplClass>
