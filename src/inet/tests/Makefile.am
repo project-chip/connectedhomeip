@@ -29,6 +29,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 noinst_HEADERS                                        = \
     TestInetCommon.h                                    \
     TestInetCommonOptions.h                             \
+    TestInetLayerCommon.hpp                             \
     $(NULL)
 
 #
@@ -57,6 +58,7 @@ AM_CPPFLAGS                                           = \
 libTestInetCommon_a_SOURCES                           = \
     TestInetCommon.cpp                                  \
     TestInetCommonOptions.cpp                           \
+    TestInetLayerCommon.cpp                             \
     $(NULL)
 
 CHIP_LDADD                                            = \
@@ -87,8 +89,9 @@ COMMON_LDADD                                          = \
 
 noinst_PROGRAMS                                       = \
     TestInetEndPoint                                    \
+    TestInetLayer                                       \
+    TestInetLayerMulticast                              \
     $(NULL)
-
 
 # Test applications that should be run when the 'check' target is run.
 
@@ -129,6 +132,14 @@ TestInetEndPoint_LDADD                                = libTestInetCommon.a $(CO
 TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
                                                         $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
+
+TestInetLayer_SOURCES                                 = TestInetLayer.cpp    \
+                                                        $(NULL)
+TestInetLayer_LDADD                                   = libTestInetCommon.a $(COMMON_LDADD)
+
+TestInetLayerMulticast_SOURCES                        = TestInetLayerMulticast.cpp    \
+                                                        $(NULL)
+TestInetLayerMulticast_LDADD                          = libTestInetCommon.a $(COMMON_LDADD)
 
 TestInetTimer_SOURCES                                 = TestInetTimer.cpp       \
                                                         $(NULL)
