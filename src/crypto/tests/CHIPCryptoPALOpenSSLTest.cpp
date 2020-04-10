@@ -23,7 +23,7 @@
 #include <string.h>
 #include <support/CodeUtils.h>
 
-using namespace chip::crypto;
+using namespace chip::Crypto;
 
 static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {

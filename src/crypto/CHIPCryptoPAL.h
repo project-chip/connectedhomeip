@@ -27,7 +27,7 @@
 #include <stddef.h>
 
 namespace chip {
-namespace crypto {
+namespace Crypto {
 
 /**
  * @brief A function that implements 256-bit AES-CCM encryption

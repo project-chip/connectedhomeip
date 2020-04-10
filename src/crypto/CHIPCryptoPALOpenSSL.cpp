@@ -28,8 +28,6 @@
 #include <support/CodeUtils.h>
 #include <string.h>
 
-using namespace chip::crypto;
-
 #define kKeyLengthInBits 256
 
 static bool _isValidTagLength(size_t tag_length)
@@ -41,7 +39,7 @@ static bool _isValidTagLength(size_t tag_length)
     return false;
 }
 
-CHIP_ERROR chip::crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                              size_t aad_length, const unsigned char * key, const unsigned char * iv,
                                              size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
@@ -112,7 +110,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::crypto::AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
+CHIP_ERROR chip::Crypto::AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
                                              size_t aad_length, const unsigned char * tag, size_t tag_length,
                                              const unsigned char * key, const unsigned char * iv, size_t iv_length,
                                              unsigned char * plaintext)
