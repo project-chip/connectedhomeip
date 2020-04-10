@@ -72,16 +72,17 @@ BUILD_SUPPORT_DIR := $(CHIP_ROOT)/build/efr32
 include $(BUILD_SUPPORT_DIR)/efr32-app.mk
 include $(BUILD_SUPPORT_DIR)/efr32-chip.mk
 include $(BUILD_SUPPORT_DIR)/efr32-freertos.mk
+include $(PROJECT_ROOT)/src/display/efr32-lcd.mk
 
 APP = efr32-lock-example
 
 SRCS = \
-    $(PROJECT_ROOT)/src/main.cpp \
-    $(PROJECT_ROOT)/src/LEDWidget.cpp \
-    $(PROJECT_ROOT)/src/AppTask.cpp \
-    $(PROJECT_ROOT)/src/ButtonHandler.cpp \
-    $(PROJECT_ROOT)/src/init_mcu.c  \
-    $(PROJECT_ROOT)/src/init_board.c \
+    $(PROJECT_ROOT)/src/main.cpp                                                             \
+    $(PROJECT_ROOT)/src/LEDWidget.cpp                                                        \
+    $(PROJECT_ROOT)/src/AppTask.cpp                                                          \
+    $(PROJECT_ROOT)/src/ButtonHandler.cpp                                                    \
+    $(PROJECT_ROOT)/src/init_mcu.c                                                           \
+    $(PROJECT_ROOT)/src/init_board.c                                                         \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_bcc.c                                      \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_init.c                                     \
     $(EFR32_SDK_ROOT)/hardware/kit/common/bsp/bsp_stk.c                                      \
@@ -114,6 +115,7 @@ SRCS = \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/mx25flash_spi.c                            \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/retargetio.c                               \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/retargetserial.c                           \
+    $(LCD_SRCS)                                                                              \
 
 
 
@@ -155,7 +157,7 @@ INC_DIRS = \
     $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG12_BRD4161A                                     \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/                                        \
     $(EFR32_SDK_ROOT)/hardware/kit/common/halconfig/                                      \
-
+    $(LCD_INCLUDES)                                                                       \
 
 ifeq ($(EFR32FAMILY), efr32mg12)
 LINKER_SCRIPT=./ldscripts/$(APP)-MG12P.ld

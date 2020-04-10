@@ -32,6 +32,9 @@
 // $[BULBPWM_COLOR]
 // [BULBPWM_COLOR]$
 
+// $[DISPLAY]
+#define HAL_SPIDISPLAY_FREQUENCY                      (1000000)
+
 // $[BUTTON]
 #define BSP_BUTTON_PRESENT                            (1)
 
