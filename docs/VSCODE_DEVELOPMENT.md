@@ -21,7 +21,7 @@ Tested on:
 1. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension for Visual Studio Code, this extension allows you to use docker containers as a development backend.
 1. Once this is installed, you'll be prompted to reload Visual Studio Code, do so
 1. At the bottom right of your Visual Studio Code window you should have a new box prompting you to re-open the window as a container. Hit yes.
-1.  *Windows Only* Update your Visual Studio Code settings as documented here: https://code.visualstudio.com/docs/editor/integrated-terminal#_configuration to use Bash on Ubuntu (on Windows) eg:
+1. *Windows Only* Update your Visual Studio Code settings as documented here: https://code.visualstudio.com/docs/editor/integrated-terminal#_configuration to use Bash on Ubuntu (on Windows) eg:
 `"terminal.integrated.shell.windows": "C:\\Windows\\System32\\bash.exe"`
 1. Now your local machine is building a docker image that has all the tools necessary to build and test CHIP. This can take some time, but will eventually complete and open up the source tree
 
