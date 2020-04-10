@@ -25,8 +25,8 @@
 static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
-    int numOfTestsRan         = 0;
-    for (numOfTestsRan = 0;  numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[numOfTestsRan];
         if (vector->key_len == 32 && vector->pt_len > 0)
@@ -60,7 +60,7 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
 {
     int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
     int numOfTestsRan    = 0;
-    for (numOfTestsRan = 0;  numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[numOfTestsRan];
         if (vector->key_len == 32 && vector->pt_len > 0)
@@ -86,7 +86,7 @@ static void TestAES_CCM_256EncryptInvalidPlainText(nlTestSuite * inSuite, void *
 {
     int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
     int numOfTestsRan    = 0;
-    for (numOfTestsRan = 0;  numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[numOfTestsRan];
         if (vector->key_len == 32 && vector->pt_len > 0)
@@ -95,8 +95,8 @@ static void TestAES_CCM_256EncryptInvalidPlainText(nlTestSuite * inSuite, void *
             unsigned char out_ct[vector->ct_len];
             unsigned char out_tag[vector->tag_len];
 
-            CHIP_ERROR err    = CHIP_aes_ccm_256_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key,
-                                                      vector->iv, vector->iv_len, out_ct, out_tag, vector->tag_len);
+            CHIP_ERROR err = CHIP_aes_ccm_256_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key, vector->iv,
+                                                      vector->iv_len, out_ct, out_tag, vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -108,7 +108,7 @@ static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext
 {
     int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
     int numOfTestsRan    = 0;
-    for (numOfTestsRan = 0;  numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[numOfTestsRan];
         if (vector->key_len == 32 && vector->pt_len > 0)
@@ -130,7 +130,7 @@ static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
 {
     int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
     int numOfTestsRan    = 0;
-    for (numOfTestsRan = 0;  numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[numOfTestsRan];
         if (vector->key_len == 32 && vector->pt_len > 0)
@@ -152,7 +152,7 @@ static void TestAES_CCM_256EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
 {
     int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
     int numOfTestsRan    = 0;
-    for (numOfTestsRan = 0;  numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[numOfTestsRan];
         if (vector->key_len == 32 && vector->pt_len > 0)
@@ -174,15 +174,15 @@ static void TestAES_CCM_256DecryptInvalidCipherText(nlTestSuite * inSuite, void 
 {
     int numOfTestVectors = sizeof(ccm_test_vectors) / sizeof(ccm_test_vectors[0]);
     int numOfTestsRan    = 0;
-    for (numOfTestsRan = 0;  numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[numOfTestsRan];
         if (vector->key_len == 32 && vector->pt_len > 0)
         {
 
             unsigned char out_pt[vector->pt_len];
-            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag,
-                                                      vector->tag_len, vector->key, vector->iv, vector->iv_len, out_pt);
+            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
+                                                      vector->key, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -201,8 +201,8 @@ static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
         {
 
             unsigned char out_pt[vector->pt_len];
-            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                                      NULL, vector->iv, vector->iv_len, out_pt);
+            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
+                                                      vector->tag_len, NULL, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
