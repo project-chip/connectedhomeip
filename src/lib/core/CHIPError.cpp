@@ -606,6 +606,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_EVENT_ID_FOUND:
         desc = "Event ID matching criteria was found";
         break;
+    case CHIP_ERROR_INTERNAL:
+        desc = "Internal error";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
