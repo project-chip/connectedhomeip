@@ -66,6 +66,6 @@ CHIP_ERROR AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t cipherte
                                size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
                                const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
 
-} // namespace crypto
+} // namespace Crypto
 } // namespace chip
 #endif
