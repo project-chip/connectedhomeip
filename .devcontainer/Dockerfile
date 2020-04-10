@@ -16,11 +16,17 @@ RUN apt-get -fy install git vim emacs sudo \
     iproute2 procps lsb-release \
     bash-completion \
     build-essential cmake cppcheck valgrind \
-    wget curl telnet
-
+    wget curl telnet bsdtar
 RUN groupadd --gid $USER_GID $USERNAME
 RUN useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
 RUN chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN ln -s /usr/bin/clang-format-9 /usr/local/bin/clang-format
+
+RUN mkdir -p /var/downloads
+RUN cd /var/downloads
+RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix | bsdtar -xvf - extension
+RUN mkdir -p /home/vscode/.vscode-server/extensions
+RUN mv extension /home/vscode/.vscode-server/extensions/ms-vscode.cpptools-0.27.0
+RUN chown -R vscode:vscode /home/vscode
