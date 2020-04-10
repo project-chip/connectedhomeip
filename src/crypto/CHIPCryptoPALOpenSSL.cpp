@@ -80,7 +80,7 @@ CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plai
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in AAD
-    if (aad_length > 0)
+    if (aad_length > 0 && aad != NULL)
     {
         result = EVP_EncryptUpdate(context, NULL, &bytesWritten, aad, aad_length);
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
@@ -97,7 +97,8 @@ CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plai
     ciphertext_length += bytesWritten;
 
     // Get tag
-    EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_GET_TAG, tag_length, tag);
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_GET_TAG, tag_length, tag);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
     if (context != NULL)
@@ -150,7 +151,7 @@ CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t cip
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in aad
-    if (aad_length > 0)
+    if (aad_length > 0 && aad != NULL)
     {
         result = EVP_DecryptUpdate(context, NULL, &bytesOutput, aad, aad_length);
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
