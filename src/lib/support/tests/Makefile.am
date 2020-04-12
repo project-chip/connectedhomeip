@@ -51,6 +51,8 @@ CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
+MAKEDIR_TARGETS=$(CHIP_LDADD)
+
 COMMON_LDADD                                          = \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \

@@ -50,6 +50,8 @@ define check-file-CHIPVersion.h
 $(top_srcdir)/build/scripts/gen-chip-version "`cat $(1)`" -o "$(2)"
 endef # check-file-CHIPVersion.h
 
+MAKEDIR_TARGETS=$(top_builddir)/.local-version
+
 CHIPVersion.h: $(top_builddir)/.local-version
 	$(call check-file,CHIPVersion.h)
 
