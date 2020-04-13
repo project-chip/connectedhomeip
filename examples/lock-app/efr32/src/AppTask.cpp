@@ -303,7 +303,6 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
 
-            // sAppTask.mFunction = kFunction_SoftwareUpdate;
             sAppTask.mFunction = kFunction_NoneSelected;
         }
     }
@@ -365,12 +364,10 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     // and start flashing the LEDs rapidly to indicate action initiation.
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
-        // WdmFeature().GetBoltLockTraitDataSource().InitiateLock(aActor);
         EFR32_LOG("Lock Action has been initiated")
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
-        // WdmFeature().GetBoltLockTraitDataSource().InitiateUnlock(aActor);
         EFR32_LOG("Unlock Action has been initiated")
     }
 
@@ -386,7 +383,6 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         EFR32_LOG("Lock Action has been completed")
 
-        // WdmFeature().GetBoltLockTraitDataSource().LockingSuccessful();
         sLEDState = true;
         sLockLED.Set(sLEDState);
     }
@@ -394,7 +390,6 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         EFR32_LOG("Unlock Action has been completed")
 
-        // WdmFeature().GetBoltLockTraitDataSource().UnlockingSuccessful();
         sLEDState = false;
         sLockLED.Set(sLEDState);
     }
