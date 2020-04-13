@@ -41,9 +41,9 @@ ifndef EFR32_SDK_ROOT
 $(error ENVIRONMENT ERROR: EFR32_SDK_ROOT not set)
 endif
 
-CHIP_ROOT := $(realpath ../../../)
-EFR32_TOOLS_ROOT := $(realpath $(EFR32_SDK_ROOT)/../../../..)
-FREERTOS_ROOT := $(realpath $(EFR32_SDK_ROOT)/util/third_party/freertos)
+CHIP_ROOT ?= $(realpath $(PROJECT_ROOT)/third_party/connectedhomeip)
+EFR32_TOOLS_ROOT ?= $(realpath $(EFR32_SDK_ROOT)/../../../..)
+FREERTOS_ROOT ?= $(realpath $(EFR32_SDK_ROOT)/util/third_party/freertos)
 
 # Do not enable -Wconversion for Silicon Labs SDK sources
 override CFLAGS                              := $(filter-out -Wconversion,$(CFLAGS))
