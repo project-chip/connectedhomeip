@@ -312,6 +312,9 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
         {
             sAppTask.CancelTimer();
+
+            sAppTask.mFunction = kFunction_NoneSelected;
+
             EFR32_LOG("Software Update is not supported at this time");
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
