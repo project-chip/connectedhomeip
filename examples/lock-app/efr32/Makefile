@@ -61,13 +61,6 @@ override CXXFLAGS                            := $(filter-out -Wshadow,$(CXXFLAGS
 override CFLAGS                              := $(filter-out -Wundef,$(CFLAGS))
 override CXXFLAGS                            := $(filter-out -Wundef,$(CXXFLAGS))
 
-
-#
-# Default locations of dependent projects
-#
-CHIP_ROOT ?= $(PROJECT_ROOT)/third_party/connetedhomeip
-FREERTOS_ROOT ?= $(PROJECT_ROOT)/third_party/FreeRTOS/FreeRTOS
-
 FREERTOSCONFIG_DIR := $(PROJECT_ROOT)/include
 
 GECKO_SDK_SUITE_DIR    := $(EFR32_SDK_ROOT)/..
