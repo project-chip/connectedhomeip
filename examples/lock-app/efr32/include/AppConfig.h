@@ -55,8 +55,8 @@
 #define THREAD_INACTIVE_POLLING_INTERVAL_MS 1000
 
 // EFR Logging
-extern "C" int  efr32LogInit(void);
-extern "C" void efr32Log(const char *aFormat, ...);
+extern "C" int efr32LogInit(void);
+extern "C" void efr32Log(const char * aFormat, ...);
 #define EFR32_LOG(...) efr32Log(__VA_ARGS__);
 
 extern "C" void appError(int err);

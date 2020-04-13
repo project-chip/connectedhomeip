@@ -35,16 +35,16 @@ class AppTask
 {
 
 public:
-    int         StartAppTask();
-    static void AppTaskMain(void *pvParameter);
+    int StartAppTask();
+    static void AppTaskMain(void * pvParameter);
 
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
-    void PostEvent(const AppEvent *event);
+    void PostEvent(const AppEvent * event);
 
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
 
 private:
-    friend AppTask &GetAppTask(void);
+    friend AppTask & GetAppTask(void);
 
     int Init();
 
@@ -53,12 +53,12 @@ private:
 
     void CancelTimer(void);
 
-    void DispatchEvent(AppEvent *event);
+    void DispatchEvent(AppEvent * event);
 
-    static void FunctionTimerEventHandler(AppEvent *aEvent);
-    static void FunctionHandler(AppEvent *aEvent);
-    static void LockActionEventHandler(AppEvent *aEvent);
-    static void InstallEventHandler(AppEvent *aEvent);
+    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionHandler(AppEvent * aEvent);
+    static void LockActionEventHandler(AppEvent * aEvent);
+    static void InstallEventHandler(AppEvent * aEvent);
 
     static void TimerEventHandler(TimerHandle_t xTimer);
 
@@ -74,12 +74,12 @@ private:
     } Function;
 
     Function_t mFunction;
-    bool       mFunctionTimerActive;
+    bool mFunctionTimerActive;
 
     static AppTask sAppTask;
 };
 
-inline AppTask &GetAppTask(void)
+inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
 }

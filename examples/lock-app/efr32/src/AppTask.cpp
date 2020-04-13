@@ -37,7 +37,7 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 static SemaphoreHandle_t sChipEventLock;
 
-static TaskHandle_t  sAppTaskHandle;
+static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
 
 static LEDWidget sStatusLED;
@@ -94,7 +94,7 @@ int AppTask::Init()
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
                                   false,            // no timer reload (==one-shot)
-                                  (void *)this,     // init timer id = app task obj context
+                                  (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
     if (sFunctionTimer == NULL)
@@ -108,9 +108,9 @@ int AppTask::Init()
     return err;
 }
 
-void AppTask::AppTaskMain(void *pvParameter)
+void AppTask::AppTaskMain(void * pvParameter)
 {
-    int      err;
+    int err;
     AppEvent event;
 
     err = sAppTask.Init();
@@ -138,12 +138,12 @@ void AppTask::AppTaskMain(void *pvParameter)
         // task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned              = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled                  = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached                 = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections               = (ConnectivityMgr().NumBLEConnections() != 0);
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             // sIsPairedToAccount                = ConfigurationMgr().IsPairedToAccount();
-            sHaveServiceConnectivity          = ConnectivityMgr().HaveServiceConnectivity();
+            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             // sIsServiceSubscriptionEstablished = WdmFeature().AreServiceSubscriptionsEstablished();
             PlatformMgr().UnlockChipStack();
         }
@@ -170,8 +170,7 @@ void AppTask::AppTaskMain(void *pvParameter)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount &&
-                     (!sIsThreadAttached || !isFullyConnected))
+            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount && (!sIsThreadAttached || !isFullyConnected))
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -190,12 +189,12 @@ void AppTask::AppTaskMain(void *pvParameter)
     }
 }
 
-void AppTask::LockActionEventHandler(AppEvent *aEvent)
+void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
-    bool                      initiated = false;
+    bool initiated = false;
     BoltLockManager::Action_t action;
-    int32_t                   actor;
-    int                       err = CHIP_NO_ERROR;
+    int32_t actor;
+    int err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
@@ -212,7 +211,6 @@ void AppTask::LockActionEventHandler(AppEvent *aEvent)
         {
             action = BoltLockManager::UNLOCK_ACTION;
         }
-
     }
     else
     {
@@ -221,8 +219,8 @@ void AppTask::LockActionEventHandler(AppEvent *aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-            EFR32_LOG("Begin Lock Request.");
-            ActionCompleted(action);
+        EFR32_LOG("Begin Lock Request");
+        ActionCompleted(action);
     }
 }
 
@@ -254,12 +252,12 @@ void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = (void *)xTimer;
+    event.TimerEvent.Context = (void *) xTimer;
     event.Handler            = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::FunctionTimerEventHandler(AppEvent *aEvent)
+void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type != AppEvent::kEventType_Timer)
     {
@@ -289,7 +287,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent *aEvent)
     }
 }
 
-void AppTask::FunctionHandler(AppEvent *aEvent)
+void AppTask::FunctionHandler(AppEvent * aEvent)
 {
     if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON)
     {
@@ -414,7 +412,7 @@ void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aA
     PostEvent(&event);
 }
 
-void AppTask::PostEvent(const AppEvent *aEvent)
+void AppTask::PostEvent(const AppEvent * aEvent)
 {
     if (sAppEventQueue != NULL)
     {
@@ -425,7 +423,7 @@ void AppTask::PostEvent(const AppEvent *aEvent)
     }
 }
 
-void AppTask::DispatchEvent(AppEvent *aEvent)
+void AppTask::DispatchEvent(AppEvent * aEvent)
 {
     if (aEvent->Handler)
     {
