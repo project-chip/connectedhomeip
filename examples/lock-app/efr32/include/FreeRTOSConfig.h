@@ -1,20 +1,15 @@
-/***************************************************************************/ /**
-                                                                               * # License
-                                                                               *
-                                                                               * The licensor of this software is
-                                                                               *Silicon Laboratories Inc. Your use of
-                                                                               *this software is governed by the terms
-                                                                               *of Silicon Labs Master Software License
-                                                                               * Agreement (MSLA) available at
-                                                                               * www.silabs.com/about-us/legal/master-software-license-agreement.
-                                                                               *This software is Third Party Software
-                                                                               *licensed by Silicon Labs from a third
-                                                                               *party and is governed by the sections of
-                                                                               *the MSLA applicable to Third Party
-                                                                               * Software and the additional terms set
-                                                                               *forth below.
-                                                                               *
-                                                                               ******************************************************************************/
+/***************************************************************************
+ * # License
+ *
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is Third Party Software licensed by Silicon Labs from a third party
+ * and is governed by the sections of the MSLA applicable to Third Party
+ * Software and the additional terms set forth below.
+ *
+ ******************************************************************************/
 /*
     FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
@@ -241,20 +236,20 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define INCLUDE_xTimerPendFunctionCall (1)
 
 /* Stop if an assertion fails. */
-#define configASSERT(x)                           \
-    if ((x) == 0)                                 \
-    {                                             \
-        taskDISABLE_INTERRUPTS();                 \
-        printf("\nFREERTOS ASSERT ( %s )\n", #x); \
-        for (;;)                                  \
-            ;                                     \
+#define configASSERT(x)                                                                                                            \
+    if ((x) == 0)                                                                                                                  \
+    {                                                                                                                              \
+        taskDISABLE_INTERRUPTS();                                                                                                  \
+        printf("\nFREERTOS ASSERT ( %s )\n", #x);                                                                                  \
+        for (;;)                                                                                                                   \
+            ;                                                                                                                      \
     }
-#define configASSERTNULL(x)       \
-    if ((x) == NULL)              \
-    {                             \
-        taskDISABLE_INTERRUPTS(); \
-        for (;;)                  \
-            ;                     \
+#define configASSERTNULL(x)                                                                                                        \
+    if ((x) == NULL)                                                                                                               \
+    {                                                                                                                              \
+        taskDISABLE_INTERRUPTS();                                                                                                  \
+        for (;;)                                                                                                                   \
+            ;                                                                                                                      \
     }
 
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
