@@ -30,7 +30,7 @@ FreeRTOS, and select files from the Silicon Labs SDK.  The resultant image file 
 
 ## Building
 
-* Download and install the [Silicon Labs Simplicity Studio and SDK for Thread and Zigbee version v2.7] (https://www.silabs.com/products/development-tools/software/simplicity-studio)
+* Download and install the [Silicon Labs Simplicity Studio and SDK for Thread and Zigbee version v2.7](https://www.silabs.com/products/development-tools/software/simplicity-studio)
 
 Install SimplicityStudio or extract the SimplicityStudio archive to where you want to install Simplicity Studio and follow the instructions in README.txt found within the extracted archive to complete installation.
 
