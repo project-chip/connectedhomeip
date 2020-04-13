@@ -30,6 +30,8 @@
 
 #include "FreeRTOS.h"
 
+#include <platform/CHIPDeviceLayer.h>
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT       3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE                 (4096)
@@ -52,9 +54,10 @@ static bool sIsThreadProvisioned              = false;
 static bool sIsThreadEnabled                  = false;
 static bool sIsThreadAttached                 = false;
 static bool sIsPairedToAccount                = false;
-static bool sIsServiceSubscriptionEstablished = false;
 static bool sHaveBLEConnections               = false;
 static bool sHaveServiceConnectivity          = false;
+
+using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
@@ -167,9 +170,25 @@ void AppTask::AppTaskMain(void * pvParameter)
             sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
+
+        // Collect connectivity and configuration state from the CHIP stack.  Because the
+        // CHIP event loop is being run in a separate task, the stack must be locked
+        // while these values are queried.  However we use a non-blocking lock request
+        // (TryLockChipStack()) to avoid blocking other UI activities when the CHIP
+        // task is busy (e.g. with a long crypto operation).
+        if (PlatformMgr().TryLockChipStack())
+        {
+            sIsThreadProvisioned              = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled                  = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached                 = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections               = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveServiceConnectivity          = ConnectivityMgr().HaveServiceConnectivity();
+            PlatformMgr().UnlockChipStack();
+        }
+
         // Consider the system to be "fully connected" if it has service
         // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = (sHaveServiceConnectivity && sIsServiceSubscriptionEstablished);
+        bool isFullyConnected = sHaveServiceConnectivity;
 
         // Update the status LED if factory reset has not been initiated.
         //
@@ -214,7 +233,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
     bool initiated = false;
     BoltLockManager::Action_t action;
-    int32_t actor;
+    int32_t actor = 0;
     ret_code_t ret = NRF_SUCCESS;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
