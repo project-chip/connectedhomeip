@@ -66,6 +66,22 @@ CHIP_ERROR AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t cipherte
                                size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
                                const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
 
+/**
+ * @brief A function that implements SHA-256 based HKDF
+ * @param secret The secret to use as the key to the HKDF
+ * @param secret_length Length of the secret
+ * @param salt Optional salt to use as input to the HKDF
+ * @param salt_length Length of the salt
+ * @param info Optional info to use as input to the HKDF
+ * @param info_length Length of the info
+ * @param out_buffer Pointer to buffer to write output into.
+ * @param out_length Resulting length of out_buffer
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+
+CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
+                       const size_t salt_length, const unsigned char * info, const size_t info_length, unsigned char * out_buffer,
+                       size_t out_length);
 } // namespace Crypto
 } // namespace chip
 #endif

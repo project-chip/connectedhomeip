@@ -25,6 +25,7 @@
 #include <openssl/conf.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
+#include <openssl/kdf.h>
 #include <support/CodeUtils.h>
 #include <string.h>
 
@@ -169,5 +170,66 @@ exit:
         context = NULL;
     }
 
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
+                                     const size_t salt_length, const unsigned char * info, const size_t info_length,
+                                     unsigned char * out_buffer, size_t out_length)
+{
+    EVP_PKEY_CTX * context;
+    context          = EVP_PKEY_CTX_new_id(EVP_PKEY_HKDF, NULL);
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+
+    VerifyOrExit(secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Salt is optional
+    if (salt_length > 0)
+    {
+        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Info is optional
+    if (info_length > 0)
+    {
+        VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = EVP_PKEY_derive_init(context);
+    VerifyOrExit(result >= 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_CTX_set_hkdf_md(context, EVP_sha256());
+    VerifyOrExit(result >= 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_CTX_set1_hkdf_key(context, secret, secret_length);
+    VerifyOrExit(result >= 1, error = CHIP_ERROR_INTERNAL);
+
+    if (salt_length > 0 && salt != NULL)
+    {
+        result = EVP_PKEY_CTX_set1_hkdf_salt(context, salt, salt_length);
+        VerifyOrExit(result >= 1, error = CHIP_ERROR_INTERNAL);
+    }
+
+    if (info_length > 0 && info != NULL)
+    {
+        result = EVP_PKEY_CTX_add1_hkdf_info(context, info, info_length);
+        VerifyOrExit(result >= 1, error = CHIP_ERROR_INTERNAL);
+    }
+
+    result = EVP_PKEY_CTX_hkdf_mode(context, EVP_PKEY_HKDEF_MODE_EXTRACT_AND_EXPAND);
+    VerifyOrExit(result >= 1, error = CHIP_ERROR_INTERNAL);
+
+    // Get the OKM (Output Key Material)
+    result = EVP_PKEY_derive(context, out_buffer, &out_length);
+    VerifyOrExit(result >= 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    if (context != NULL)
+    {
+        EVP_PKEY_CTX_free(context);
+    }
     return error;
 }
