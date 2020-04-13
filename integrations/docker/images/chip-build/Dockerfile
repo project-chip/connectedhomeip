@@ -26,19 +26,6 @@ RUN set -x \
          wget \
     && : # last line
 
-# BabbleSim layer
-RUN set -x \
-    && apt-get install -fy \
-         gcc-multilib \
-         libfftw3-dev \
-    && (mkdir -p /var/bsim \
-    && cd /var/bsim \
-    && curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo  && chmod a+x ./repo \
-    && ./repo init -u https://github.com/BabbleSim/manifest.git -m everything.xml -b v1.0.3 --depth=1 \
-    && ./repo sync \
-    && make everything -j 8) \
-    && : # last line
-
 # Install specific release of openssl
 RUN set -x \
     && cd /tmp && wget https://github.com/openssl/openssl/archive/OpenSSL_1_1_1f.zip \
