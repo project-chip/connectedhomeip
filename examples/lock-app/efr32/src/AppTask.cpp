@@ -42,9 +42,6 @@ static QueueHandle_t sAppEventQueue;
 
 static LEDWidget sStatusLED;
 static LEDWidget sLockLED;
-// These LEDs are only used during a factory reset
-static LEDWidget sResetLED0;
-static LEDWidget sResetLED1;
 
 static bool sLEDState                         = true;
 static bool sIsThreadProvisioned              = false;
@@ -92,9 +89,6 @@ int AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(sLEDState);
-
-    sResetLED0.Init(BSP_LED_2);
-    sResetLED1.Init(BSP_LED_3);
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -190,8 +184,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         sStatusLED.Animate();
         sLockLED.Animate();
-        sResetLED0.Animate();
-        sResetLED1.Animate();
     }
 }
 
@@ -283,13 +275,9 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
         sStatusLED.Set(false);
         sLockLED.Set(false);
-        sResetLED0.Set(false);
-        sResetLED1.Set(false);
 
         sStatusLED.Blink(500);
         sLockLED.Blink(500);
-        sResetLED0.Blink(500);
-        sResetLED1.Blink(500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -328,8 +316,6 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
-            sResetLED0.Set(false);
-            sResetLED1.Set(false);
 
             // Set lock status LED back to show state of lock.
             sLockLED.Set(sLEDState);

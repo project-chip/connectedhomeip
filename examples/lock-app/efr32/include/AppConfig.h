@@ -29,8 +29,6 @@
 // EFR32 WSTK LEDs
 #define BSP_LED_0 0
 #define BSP_LED_1 1
-#define BSP_LED_2 2
-#define BSP_LED_3 3
 
 #define APP_FUNCTION_BUTTON PB0
 #define APP_LOCK_BUTTON PB1
