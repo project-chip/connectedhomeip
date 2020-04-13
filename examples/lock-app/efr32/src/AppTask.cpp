@@ -138,13 +138,11 @@ void AppTask::AppTaskMain(void * pvParameter)
         // task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
-            // sIsPairedToAccount                = ConfigurationMgr().IsPairedToAccount();
+            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
-            // sIsServiceSubscriptionEstablished = WdmFeature().AreServiceSubscriptionsEstablished();
             PlatformMgr().UnlockChipStack();
         }
 
