@@ -303,7 +303,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
 
-            sAppTask.mFunction = kFunction_NoneSelected;
+            sAppTask.mFunction = kFunction_SoftwareUpdate;
         }
     }
     else
