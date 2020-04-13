@@ -77,7 +77,6 @@ Copy the following lines to the top of the core_cm33.h file.
 * Build the example application:
 
          $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
-         $ source env.sh
          $ make BOARD=BRD4161A
 
 
