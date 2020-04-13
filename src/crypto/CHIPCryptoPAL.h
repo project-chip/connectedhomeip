@@ -26,6 +26,9 @@
 #include <core/CHIPError.h>
 #include <stddef.h>
 
+namespace chip {
+namespace Crypto {
+
 /**
  * @brief A function that implements 256-bit AES-CCM encryption
  * @param plaintext Plaintext to encrypt
@@ -40,9 +43,9 @@
  * @param tag_length Expected length of tag
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
-CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                    size_t aad_length, const unsigned char * key, const unsigned char * iv, size_t iv_length,
-                                    unsigned char * ciphertext, unsigned char * tag, size_t tag_length);
+CHIP_ERROR AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                               size_t aad_length, const unsigned char * key, const unsigned char * iv, size_t iv_length,
+                               unsigned char * ciphertext, unsigned char * tag, size_t tag_length);
 
 /**
  * @brief A function that implements 256-bit AES-CCM decryption
@@ -59,8 +62,10 @@ CHIP_ERROR CHIP_aes_ccm_256_encrypt(const unsigned char * plaintext, size_t plai
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
-CHIP_ERROR CHIP_aes_ccm_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
-                                    size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
-                                    const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
+CHIP_ERROR AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
+                               size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
+                               const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
 
+} // namespace Crypto
+} // namespace chip
 #endif

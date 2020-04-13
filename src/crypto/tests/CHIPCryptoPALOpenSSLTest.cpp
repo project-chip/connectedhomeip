@@ -23,6 +23,8 @@
 #include <string.h>
 #include <support/CodeUtils.h>
 
+using namespace chip::Crypto;
+
 static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestVectors = ArraySize(ccm_test_vectors);
@@ -36,8 +38,8 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
             unsigned char out_ct[vector->ct_len];
             unsigned char out_tag[vector->tag_len];
 
-            CHIP_ERROR err    = CHIP_aes_ccm_256_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key,
-                                                      vector->iv, vector->iv_len, out_ct, out_tag, vector->tag_len);
+            CHIP_ERROR err = AES_CCM_256_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->iv,
+                                                 vector->iv_len, out_ct, out_tag, vector->tag_len);
             bool areCTsEqual  = memcmp(out_ct, vector->ct, vector->ct_len) == 0;
             bool areTagsEqual = memcmp(out_tag, vector->tag, vector->tag_len) == 0;
             NL_TEST_ASSERT(inSuite, areCTsEqual);
@@ -68,8 +70,8 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
         {
             numOfTestsRan++;
             unsigned char out_pt[vector->pt_len];
-            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
-                                                      vector->tag_len, vector->key, vector->iv, vector->iv_len, out_pt);
+            CHIP_ERROR err = AES_CCM_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
+                                                 vector->tag_len, vector->key, vector->iv, vector->iv_len, out_pt);
 
             bool arePTsEqual = memcmp(vector->pt, out_pt, vector->pt_len) == 0;
             NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -96,8 +98,8 @@ static void TestAES_CCM_256EncryptInvalidPlainText(nlTestSuite * inSuite, void *
             unsigned char out_ct[vector->ct_len];
             unsigned char out_tag[vector->tag_len];
 
-            CHIP_ERROR err = CHIP_aes_ccm_256_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key, vector->iv,
-                                                      vector->iv_len, out_ct, out_tag, vector->tag_len);
+            CHIP_ERROR err = AES_CCM_256_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key, vector->iv,
+                                                 vector->iv_len, out_ct, out_tag, vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -118,8 +120,8 @@ static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext
             unsigned char out_ct[vector->ct_len];
             unsigned char out_tag[vector->tag_len];
 
-            CHIP_ERROR err = CHIP_aes_ccm_256_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, NULL, vector->iv,
-                                                      vector->iv_len, out_ct, out_tag, vector->tag_len);
+            CHIP_ERROR err = AES_CCM_256_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, NULL, vector->iv,
+                                                 vector->iv_len, out_ct, out_tag, vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -140,8 +142,8 @@ static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
             unsigned char out_ct[vector->ct_len];
             unsigned char out_tag[vector->tag_len];
 
-            CHIP_ERROR err = CHIP_aes_ccm_256_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key,
-                                                      vector->iv, 0, out_ct, out_tag, vector->tag_len);
+            CHIP_ERROR err = AES_CCM_256_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->iv,
+                                                 0, out_ct, out_tag, vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -162,8 +164,8 @@ static void TestAES_CCM_256EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
             unsigned char out_ct[vector->ct_len];
             unsigned char out_tag[vector->tag_len];
 
-            CHIP_ERROR err = CHIP_aes_ccm_256_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key,
-                                                      vector->iv, vector->iv_len, out_ct, out_tag, 13);
+            CHIP_ERROR err = AES_CCM_256_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->iv,
+                                                 vector->iv_len, out_ct, out_tag, 13);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -182,8 +184,8 @@ static void TestAES_CCM_256DecryptInvalidCipherText(nlTestSuite * inSuite, void 
         {
 
             unsigned char out_pt[vector->pt_len];
-            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                                      vector->key, vector->iv, vector->iv_len, out_pt);
+            CHIP_ERROR err = AES_CCM_256_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
+                                                 vector->key, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -202,8 +204,8 @@ static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
         {
 
             unsigned char out_pt[vector->pt_len];
-            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
-                                                      vector->tag_len, NULL, vector->iv, vector->iv_len, out_pt);
+            CHIP_ERROR err = AES_CCM_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
+                                                 vector->tag_len, NULL, vector->iv, vector->iv_len, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -222,8 +224,8 @@ static void TestAES_CCM_256DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
         {
 
             unsigned char out_pt[vector->pt_len];
-            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
-                                                      vector->tag_len, vector->key, vector->iv, 0, out_pt);
+            CHIP_ERROR err = AES_CCM_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
+                                                 vector->tag_len, vector->key, vector->iv, 0, out_pt);
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -242,8 +244,8 @@ static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void
         {
             numOfTestsRan++;
             unsigned char out_pt[vector->pt_len];
-            CHIP_ERROR err = CHIP_aes_ccm_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
-                                                      vector->tag_len, vector->key, vector->iv, vector->iv_len, out_pt);
+            CHIP_ERROR err = AES_CCM_256_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
+                                                 vector->tag_len, vector->key, vector->iv, vector->iv_len, out_pt);
 
             bool arePTsEqual = memcmp(vector->pt, out_pt, vector->pt_len) == 0;
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INTERNAL);
