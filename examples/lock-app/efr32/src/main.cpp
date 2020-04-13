@@ -74,10 +74,6 @@ int main(void)
     initMcu();
     initBoard();
 
-    BSP_LedsInit();
-    BSP_LedSet(0);
-    BSP_LedSet(1);
-
 #if EFR32_LOG_ENABLED
     if (efr32LogInit() != 0)
     {
