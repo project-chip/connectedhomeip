@@ -106,10 +106,10 @@ INC_DIRS = \
     $(PROJECT_ROOT)/main/traits/include \
     $(PROJECT_ROOT)/main/schema/include \
     $(PROJECT_ROOT)/third_party/printf \
-    $(CHIP_ROOT)/src/include/      \
-    $(CHIP_ROOT)/src/lib           \
-    $(CHIP_ROOT)/src/              \
-    $(CHIP_ROOT)/src/system        \
+    $(CHIP_ROOT)/src/include/ \
+    $(CHIP_ROOT)/src/lib \
+    $(CHIP_ROOT)/src/ \
+    $(CHIP_ROOT)/src/system \
     $(NRF5_SDK_ROOT)/components \
     $(NRF5_SDK_ROOT)/components/boards \
     $(NRF5_SDK_ROOT)/components/ble/ble_advertising \
