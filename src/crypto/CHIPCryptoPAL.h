@@ -84,7 +84,7 @@ CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length,
                        size_t out_length);
 
 /**
- * @brief A cryptogaphically secure random number generator based on NIST SP800-90A
+ * @brief A cryptographically secure random number generator based on NIST SP800-90A
  * @param out_buffer Buffer to write random bytes into
  * @param out_length Number of random bytes to generate
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
