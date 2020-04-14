@@ -22,8 +22,8 @@
  *          for platforms based on the Silicon Labs SDK.
  */
 
-#include <platform/internal/ChipDeviceLayerInternal.h>
-#include <Core/ChipKeyIds.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <Core/CHIPKeyIds.h>
 #include <platform/Profiles/security/ChipApplicationKeys.h>
 #include <platform/EFR32/EFR32Config.h>
 
