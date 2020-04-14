@@ -58,3 +58,7 @@ RUN set -x \
     && curl https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 \
     | tar jxvf -) \
     && : # last line
+
+ENV NRF5_SDK_ROOT=/var/nRF5_SDK_for_Thread_and_Zigbee
+ENV NRF5_TOOLS_ROOT=/var/nRF5_tools
+ENV ARM_GCC_INSTALL_ROOT=/var/gcc-arm-none-eabi-9-2019-q4-major/bin/
