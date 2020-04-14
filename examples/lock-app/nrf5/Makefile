@@ -24,7 +24,7 @@
 
 PROJECT_ROOT := $(realpath .)
 
-CHIP_ROOT := $(PROJECT_ROOT)/../../../
+CHIP_ROOT ?= $(realpath $(PROJECT_ROOT)/third_party/connectedhomeip)
 BUILD_SUPPORT_DIR = $(CHIP_ROOT)/build/nrf5
 
 include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
