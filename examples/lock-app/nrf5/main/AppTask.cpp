@@ -331,6 +331,8 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
         // Actually trigger Factory Reset
+        sAppTask.mFunction = kFunction_NoneSelected;
+        NRF_LOG_INFO("Factory reset is not implemented");
     }
 }
 
@@ -474,8 +476,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     {
         NRF_LOG_INFO("Event received with no handler. Dropping event.");
     }
-}
-
-void AppTask::InstallEventHandler(AppEvent * aEvent)
-{
 }

@@ -131,8 +131,8 @@
 #define ACTUATOR_MOVEMENT_PERIOS_MS             2000
 
 // ---- Lock Example SWU Config ----
-#define SWU_INTERVAl_WINDOW_MIN_MS				(23*60*60*1000) // 23 hours
-#define SWU_INTERVAl_WINDOW_MAX_MS				(24*60*60*1000) // 24 hours
+#define SWU_INTERVAl_WINDOW_MIN_MS              (23*60*60*1000) // 23 hours
+#define SWU_INTERVAl_WINDOW_MAX_MS              (24*60*60*1000) // 24 hours
 
 // ---- Thread Polling Config ----
 #define THREAD_ACTIVE_POLLING_INTERVAL_MS       100
