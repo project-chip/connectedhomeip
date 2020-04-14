@@ -28,9 +28,6 @@
         "GIT_PS1_SHOWDIRTYSTATE": "1",
         "GIT_PS1_SHOWSTASHSTATE": "1",
         "GIT_PS1_SHOWCOLORHINTS": "true",
-        "PROMPT_COMMAND": "${localEnv:PROMPT_COMMAND}",
-        "NRF5_SDK_ROOT": "/var/nRF5_SDK_for_Thread_and_Zigbee",
-        "NRF5_TOOLS_ROOT": "/var/nRF5_tools",
-        "ARM_GCC_INSTALL_ROOT": "/var/gcc-arm-none-eabi-9-2019-q4-major/bin/"
+        "PROMPT_COMMAND": "${localEnv:PROMPT_COMMAND}"
     }
 }

@@ -140,5 +140,14 @@
                 "$gcc"
             ]
         },
+        {
+            "label": "Build nRF5 Lock App",
+            "type": "shell",
+            "command": "cd examples/lock-app/nrf5 && make",
+            "group": "none",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
     ],
 }
