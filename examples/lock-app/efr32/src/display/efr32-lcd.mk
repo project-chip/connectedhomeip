@@ -16,8 +16,8 @@
 
 #
 #   @file
-#         Common makefile definitions for building lcd display
-#		  specific code
+#   Common makefile definitions for building lcd display
+#   specific code
 #
 
 #
@@ -34,28 +34,28 @@ $(error ENVIRONMENT ERROR: EFR32_SDK_ROOT not set)
 endif
 
 GLIB_SRCS = \
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/bmp.c 						\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib.c 						\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_bitmap.c 				\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_circle.c 				\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_font_narrow_6x8.c 		\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_font_normal_8x8.c 		\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_font_number_16x20.c 	\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_line.c 				\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_polygon.c 				\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_rectangle.c 			\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_string.c 				\
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/bmp.c                       \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib.c                      \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_bitmap.c               \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_circle.c               \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_font_narrow_6x8.c      \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_font_normal_8x8.c      \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_font_number_16x20.c    \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_line.c                 \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_polygon.c              \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_rectangle.c            \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/glib/glib_string.c               \
 
 LCD_SRCS = \
-$(PROJECT_ROOT)/src/display/init_lcd.c										\
-$(PROJECT_ROOT)/src/display/sample_qr_code.c								\
-$(EFR32_SDK_ROOT)/hardware/kit/common/drivers/display.c 					\
-$(EFR32_SDK_ROOT)/hardware/kit/common/drivers/displayls013b7dh03.c 			\
-$(EFR32_SDK_ROOT)/hardware/kit/common/drivers/displaypalemlib.c 			\
-$(EFR32_SDK_ROOT)/platform/middleware/glib/dmd/display/dmd_display.c 		\
-$(EFR32_SDK_ROOT)/util/silicon_labs/silabs_core/graphics/graphics.c 		\
-$(EFR32_SDK_ROOT)/hardware/kit/common/drivers/udelay.c 						\
-$(GLIB_SRCS)																\
+$(PROJECT_ROOT)/src/display/init_lcd.c                                      \
+$(PROJECT_ROOT)/src/display/sample_qr_code.c                                \
+$(EFR32_SDK_ROOT)/hardware/kit/common/drivers/display.c                     \
+$(EFR32_SDK_ROOT)/hardware/kit/common/drivers/displayls013b7dh03.c          \
+$(EFR32_SDK_ROOT)/hardware/kit/common/drivers/displaypalemlib.c             \
+$(EFR32_SDK_ROOT)/platform/middleware/glib/dmd/display/dmd_display.c        \
+$(EFR32_SDK_ROOT)/util/silicon_labs/silabs_core/graphics/graphics.c         \
+$(EFR32_SDK_ROOT)/hardware/kit/common/drivers/udelay.c                      \
+$(GLIB_SRCS)                                                                \
 
 LCD_INCLUDES = \
 $(EFR32_SDK_ROOT)/platform/middleware/glib                                  \
