@@ -414,12 +414,10 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     // and start flashing the LEDs rapidly to indicate action initiation.
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
-        //WdmFeature().GetBoltLockTraitDataSource().InitiateLock(aActor);
         NRF_LOG_INFO("Lock Action has been initiated")
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
-        //WdmFeature().GetBoltLockTraitDataSource().InitiateUnlock(aActor);
         NRF_LOG_INFO("Unlock Action has been initiated")
     }
 
