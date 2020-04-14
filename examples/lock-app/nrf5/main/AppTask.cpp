@@ -359,6 +359,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
         {
             sAppTask.CancelTimer();
+            sAppTask.mFunction = kFunction_NoneSelected;
+            NRF_LOG_INFO("Software update is not implemented");
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
