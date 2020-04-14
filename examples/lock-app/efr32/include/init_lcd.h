@@ -25,7 +25,7 @@ extern "C" {
 
 #include "board_features.h"
 #include "AppConfig.h"
-#define MAX_STR_LEN               48
+#define MAX_STR_LEN 48
 
 void initLCD(void);
 

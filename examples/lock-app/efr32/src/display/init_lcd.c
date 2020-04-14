@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include <stdio.h>
 #include <string.h>
 
@@ -28,32 +27,37 @@
 
 static GLIB_Context_t glibContext;
 
-void initLCD(void) {
+void initLCD(void)
+{
 
     EMSTATUS status;
 
     /* Initialize the display module. */
     status = DISPLAY_Init();
-    if (DISPLAY_EMSTATUS_OK != status) {
+    if (DISPLAY_EMSTATUS_OK != status)
+    {
         EFR32_LOG("Display init failed %d", status);
     }
 
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
-    if (DMD_OK != status) {
+    if (DMD_OK != status)
+    {
         EFR32_LOG("DMD init failed %d", status);
     }
 
     /* Initialize the glib context */
     status = GLIB_contextInit(&glibContext);
-    if (GLIB_OK != status) {
+    if (GLIB_OK != status)
+    {
         EFR32_LOG("Glib context init failed %d", status);
     }
 
     glibContext.backgroundColor = White;
     glibContext.foregroundColor = Black;
-    status = GLIB_clear(&glibContext);
-    if (GLIB_OK != status) {
+    status                      = GLIB_clear(&glibContext);
+    if (GLIB_OK != status)
+    {
         EFR32_LOG("Glib clear failed %d", status);
     }
     // Draw the QR Code
