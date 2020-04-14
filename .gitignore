@@ -15,7 +15,7 @@ Makefile.in
 aclocal.m4
 autom4te.cache
 output/
-build/*
+build/
 !build/README.md
 !build/autoconf/m4/chip_check_project_config_includes.m4
 !build/autoconf/m4/nl_with_lwip.m4
