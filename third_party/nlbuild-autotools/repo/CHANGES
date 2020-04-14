@@ -1,3 +1,13 @@
+1.7.0 (2020-04-14)
+
+        * Added support for project-global targets and target
+          subdirectories that can be used to allow for "build from
+          anywhere plus dependencies" functionality that does not
+          first require a top-level build.
+
+        * Added jobs support for tools/packages/build to take
+          advantage of multi-CPUs/-cores when available.
+
 1.6.24 (2020-04-08)
 
         * Ensure that 'coverage-recursive' is included in the

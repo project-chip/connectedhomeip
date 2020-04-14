@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 #
-#    Copyright 2014-2018 Nest Labs Inc. All Rights Reserved.
-#    Copyright 2018 Google LLC. All Rights Reserved.
+#    Copyright (c) 2020 Project nlbuild-autotools Authors. All Rights Reserved.
+#    Copyright (c) 2018 Google LLC. All Rights Reserved.
+#    Copyright (c) 2014-2018 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -337,6 +338,31 @@ patch_directory() {
 }
 
 #
+# Determine the number of CPU threads available to this process
+#
+nthreads() {
+    local nthreads
+
+    case `uname -s` in
+
+    Darwin)
+        nthreads=$(sysctl -n hw.ncpu)
+        ;;
+
+    Linux)
+        nthreads=$(nproc)
+        ;;
+
+    *)
+        nthreads=1
+        ;;
+
+    esac
+
+    echo "${nthreads}"
+}
+
+#
 # build_package <package> <version> <host> <patchdir> <archivedir> <builddir> <destdir>
 #
 # Build the specified package version for <host> in <builddir> from
@@ -355,6 +381,7 @@ build_package() {
     local fqpackage="${package}-${version}"
     local curdir=`pwd`
     local archive
+    local jobs
 
     verbose "  CHECK    ${package}"
 
@@ -453,15 +480,19 @@ build_package() {
 
     # Build the package
 
+    jobs=$(nthreads)
+
+    verbose "  JOBS     ${jobs}"
+
     verbose "  MAKE     ${package}"
 
-    make V=${VERBOSE} -C "${builddir}" all || exit ${?}
+    make -j ${jobs} V=${VERBOSE} -C "${builddir}" all || exit ${?}
 
     # Install / stage the package
 
     verbose "  INSTALL  ${package}"
 
-    make V=${VERBOSE} -C "${builddir}" DESTDIR="${destdir}" install || exit ${?}
+    make -j ${jobs} V=${VERBOSE} -C "${builddir}" DESTDIR="${destdir}" install || exit ${?}
 
     # Remove any temporary files created.
 

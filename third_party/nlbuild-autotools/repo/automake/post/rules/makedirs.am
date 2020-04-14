@@ -1,0 +1,65 @@
+#
+#    Copyright 2020 nlbuild-autotools Authors. All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+#
+#   Description:
+#     This file is the automake footer for building
+#     MAKEDIRS and MAKEDIR_TARGETS.
+#
+#     MAKEDIRS is a list of directories that produce implicit dependencies,
+#       where running '$(MAKE) -C <DIR>' will produce the desired implicit
+#       dependencies in a way that the current build expects.
+#
+#     MAKEDIR_TARGETS are *explicit* dependencies that follow the form
+#        '<DIR>/<TARGET>' where '$(MAKE) -C <DIR> <TARGET>' will produce
+#         the desired depency
+#
+#     Note: the effect of any MAKEDIR is to make all compilation targets
+#        (all _OBJECTS) defined by a Makefile.am to depend upon an invocation
+#        of `$(MAKE) -C <DIR>` in that directory.
+#
+.PHONY: makedirs force
+
+force: # no rules, please always build ;)
+
+# The way we make a MAKEDIR
+define makedirs-make
+	$(MAKE) -C $1
+
+endef # makedirs-make
+
+# simple dependency make snippet, scoped to makedirs
+define makedirs-depends
+$1: makedirs
+
+endef # makedirs-depends
+
+# Use brute force: before any compilation, all _OBJECTS depend on makedirs
+$(foreach objects,$(filter %_OBJECTS,$(.VARIABLES)),\
+   $(foreach object,$($(objects)),\
+   $(eval $(call makedirs-depends,$(object)))))
+
+makedirs: force
+	$(foreach dir,$(MAKEDIRS),$(call makedirs-make,$(dir)))
+
+# The way me make a MAKEDIR_TARGET
+define makedirs-makedir-target-rule
+$1: force
+	$(MAKE) -C $$(dir $$(@)) $$(notdir $$(@))
+endef # makedirs-makedir-target-rule
+
+$(foreach makedir_target,$(MAKEDIR_TARGETS),\
+   $(eval $(call makedirs-makedir-target-rule,$(makedir_target))))
