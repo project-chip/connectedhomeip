@@ -338,6 +338,7 @@ void AppTask::CancelTimer()
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
     {
         EFR32_LOG("app timer stop() failed");
+        appError(CHIP_ERROR_MAX);
     }
 
     mFunctionTimerActive = false;
@@ -357,6 +358,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
     {
         EFR32_LOG("app timer start() failed");
+        appError(CHIP_ERROR_MAX);
     }
 
     mFunctionTimerActive = true;
