@@ -19,8 +19,11 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
 The EFR32 lock example provides a baseline demonstration of a door lock device, built using CHIP and the Silicon Labs gecko SDK. The example is currently very basic and only supports responding
 to button presses to indicate the state of the lock and view logging from the device.
+It doesn't currently support any over the air connectivity via, BLE or OT.
 
-The lock example is intended to serve both as a means to explore the workings of CHIP as well as a template for creating real products based on the Silicon Labs platform.
+Eventually, the lock example is intended to serve both as a means to explore the workings
+of CHIP as well as a template for creating real products based on the Silicon Labs
+platform.
 
 A top-level Makefile orchestrates the entire build process, including building CHIP,
 FreeRTOS, and select files from the Silicon Labs SDK.  The resultant image file can be flashed directly onto the Silicon Labs WSTK kit hardware.
