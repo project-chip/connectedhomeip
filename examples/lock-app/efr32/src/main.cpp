@@ -32,7 +32,10 @@
 #include "AppConfig.h"
 #include "init_mcu.h"
 #include "init_board.h"
+
+#if DISPLAY_ENABLED
 #include "init_lcd.h"
+#endif
 
 #include <FreeRTOS.h>
 
@@ -74,7 +77,10 @@ int main(void)
 
     initMcu();
     initBoard();
+
+#if DISPLAY_ENABLED
     initLCD();
+#endif
 
 #if EFR32_LOG_ENABLED
     if (efr32LogInit() != 0)
