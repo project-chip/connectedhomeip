@@ -43,7 +43,7 @@ then
     do
       [[ $file =~ $exclude ]] && continue 2
     done
-    shellcheck -x -f gcc "$file"
+    shellcheck -f gcc "$file"
   done
 else
   #
@@ -61,5 +61,5 @@ else
     pattern_args+=( -o -name "$pattern" )
   done
 
-  find . "${exclude_args[@]}" '(' "${pattern_args[@]:1}" ')' -exec shellcheck -x -f gcc {} +
+  find . "${exclude_args[@]}" '(' "${pattern_args[@]:1}" ')' -exec shellcheck -f gcc {} +
 fi
