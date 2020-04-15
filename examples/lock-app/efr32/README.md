@@ -21,8 +21,7 @@ The EFR32 lock example provides a baseline demonstration of a door lock device, 
 to button presses to indicate the state of the lock and view logging from the device.
 It doesn't currently support any over the air connectivity via, BLE or OT.
 
-Eventually, the lock example is intended to serve both as a means to explore the workings
-of CHIP as well as a template for creating real products based on the Silicon Labs
+Eventually, the lock example is intended to serve both as a means to explore the workings of CHIP as well as a template for creating real products based on the Silicon Labs
 platform.
 
 A top-level Makefile orchestrates the entire build process, including building CHIP,
