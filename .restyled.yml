@@ -6,7 +6,7 @@ command:
 arguments: []
 exclude:
     - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
-  include:
+include:
   - "**/*.c"
   - "**/*.cc"
   - "**/*.cpp"
