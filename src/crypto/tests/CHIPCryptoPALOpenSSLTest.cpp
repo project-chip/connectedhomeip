@@ -17,6 +17,7 @@
 
 #include "CHIPCryptoPAL.h"
 #include "AES_CCM_256_test_vectors.h"
+#include "HKDF_SHA256_test_vectors.h"
 
 #include <nlunit-test.h>
 #include <stdio.h>
@@ -255,35 +256,45 @@ static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
+    int numOfTestsExecuted = 0;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hkdf_sha256_vector v = hkdf_sha256_test_vectors[numOfTestsExecuted];
+        size_t out_length    = v.output_key_material_length;
+        unsigned char out_buffer[out_length];
+        HKDF_SHA256(v.initial_key_material, v.initial_key_material_length, v.salt, v.salt_length, v.info, v.info_length, out_buffer,
+                    v.output_key_material_length);
+        bool success = memcmp(v.output_key_material, out_buffer, out_length) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == 3);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("Test encrypting test vectors", TestAES_CCM_256EncryptTestVectors),
-    NL_TEST_DEF("Test decrypting test vectors", TestAES_CCM_256DecryptTestVectors),
-    NL_TEST_DEF("Test encrypting invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
-    NL_TEST_DEF("Test encrypting using nil key", TestAES_CCM_256EncryptNilKey),
-    NL_TEST_DEF("Test encrypting using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
-    NL_TEST_DEF("Test encrypting using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
-    NL_TEST_DEF("Test decrypting invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
-    NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey), 
-    NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
-    NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors), 
-    NL_TEST_SENTINEL()
-};
+static const nlTest sTests[] = { NL_TEST_DEF("Test encrypting test vectors", TestAES_CCM_256EncryptTestVectors),
+                                 NL_TEST_DEF("Test decrypting test vectors", TestAES_CCM_256DecryptTestVectors),
+                                 NL_TEST_DEF("Test encrypting invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
+                                 NL_TEST_DEF("Test encrypting using nil key", TestAES_CCM_256EncryptNilKey),
+                                 NL_TEST_DEF("Test encrypting using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
+                                 NL_TEST_DEF("Test encrypting using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
+                                 NL_TEST_DEF("Test decrypting invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
+                                 NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey),
+                                 NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
+                                 NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
+                                 NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
+
+                                 NL_TEST_SENTINEL() };
 
 int main(void)
 {
-    nlTestSuite theSuite =
-	{
-        "CHIP Crypto PAL tests",
-        &sTests[0],
-        NULL,
-        NULL
-    };
+    nlTestSuite theSuite = { "CHIP Crypto PAL tests", &sTests[0], NULL, NULL };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
