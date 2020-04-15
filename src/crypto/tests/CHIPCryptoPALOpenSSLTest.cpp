@@ -301,23 +301,20 @@ static void TestDRBG_Output(nlTestSuite * inSuite, void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("Test encrypting test vectors", TestAES_CCM_256EncryptTestVectors),
-    NL_TEST_DEF("Test decrypting test vectors", TestAES_CCM_256DecryptTestVectors),
-    NL_TEST_DEF("Test encrypting invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
-    NL_TEST_DEF("Test encrypting using nil key", TestAES_CCM_256EncryptNilKey),
-    NL_TEST_DEF("Test encrypting using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
-    NL_TEST_DEF("Test encrypting using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
-    NL_TEST_DEF("Test decrypting invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
-    NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey), 
-    NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
-    NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
-    NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
-    NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
-    NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
-    NL_TEST_SENTINEL()
-};
+static const nlTest sTests[] = { NL_TEST_DEF("Test encrypting test vectors", TestAES_CCM_256EncryptTestVectors),
+                                 NL_TEST_DEF("Test decrypting test vectors", TestAES_CCM_256DecryptTestVectors),
+                                 NL_TEST_DEF("Test encrypting invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
+                                 NL_TEST_DEF("Test encrypting using nil key", TestAES_CCM_256EncryptNilKey),
+                                 NL_TEST_DEF("Test encrypting using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
+                                 NL_TEST_DEF("Test encrypting using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
+                                 NL_TEST_DEF("Test decrypting invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
+                                 NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey),
+                                 NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
+                                 NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
+                                 NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
+                                 NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
+                                 NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
+                                 NL_TEST_SENTINEL() };
 
 int main(void)
 {
