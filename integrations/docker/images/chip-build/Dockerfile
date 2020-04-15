@@ -24,6 +24,7 @@ RUN set -x \
          libssl-dev \
          unzip \
          wget \
+         libmbedtls-dev \
     && : # last line
 
 # Install specific release of openssl

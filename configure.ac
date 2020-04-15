@@ -1294,7 +1294,7 @@ CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-project-includes, CHIP_PROJECT_CONFIG_IN
 
 # Device Layer
 
-if test "${CONFIG_DEVICE_LAYER}" = 1; then 
+if test "${CONFIG_DEVICE_LAYER}" = 1; then
     CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-device-project-includes, CHIP_DEVICE_PROJECT_CONFIG_INCLUDE, CHIPDeviceProjectConfig.h, CHIP Device Layer,)
 fi
 
@@ -1484,6 +1484,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
         NLFAULTINJECTION_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlfaultinjection/repo/include"
         NLFAULTINJECTION_LDFLAGS="-L${ac_pwd}/third_party/nlfaultinjection/repo/src"
         NLFAULTINJECTION_LIBS="-lnlfaultinjection"
+        NLFAULTINJECTION_MAKEDIR=${ac_pwd}/third_party/nlfaultinjection/repo
     ],
     [
         # Check for required nlfaultinjection headers.
@@ -1554,6 +1555,7 @@ if test "${nl_cv_build_tests}" = "yes"; then
             NLUNIT_TEST_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlunit-test/repo/src"
             NLUNIT_TEST_LDFLAGS="-L${ac_pwd}/third_party/nlunit-test/repo/src"
             NLUNIT_TEST_LIBS="-lnlunit-test"
+            NLUNIT_TEST_MAKEDIR=${ac_pwd}/third_party/nlunit-test/repo
         ],
         [
             # Check for required nlunit-test headers.
@@ -1772,6 +1774,10 @@ AC_CHECK_HEADERS([new])
 
 AC_LANG_POP([C++])
 
+#
+# Make CHIPVersion.h
+#
+MAKEDIRS="${MAKEDIRS} ${ac_pwd}/src/include"
 
 # Add test enabled macro
 if test "${nl_cv_build_tests}" = "yes"; then
@@ -1784,6 +1790,7 @@ if test "${nl_cv_build_tests}" = "yes"; then
     fi
 fi
 
+
 # Add any OpenSSL CPPFLAGS, LDFLAGS, and LIBS
 
 CPPFLAGS="${CPPFLAGS} ${OPENSSL_CPPFLAGS}"
@@ -1795,6 +1802,7 @@ LIBS="${LIBS} ${OPENSSL_LIBS}"
 CPPFLAGS="${CPPFLAGS} ${NLUNIT_TEST_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${NLUNIT_TEST_LDFLAGS}"
 LIBS="${LIBS} ${NLUNIT_TEST_LIBS}"
+MAKEDIRS="${MAKEDIRS} ${NLUNIT_TEST_MAKEDIR}"
 
 # Add any nlio CPPFLAGS, LDFLAGS, and LIBS
 
@@ -1813,6 +1821,7 @@ LIBS="${LIBS} ${NLASSERT_LIBS}"
 CPPFLAGS="${CPPFLAGS} ${NLFAULTINJECTION_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${NLFAULTINJECTION_LDFLAGS}"
 LIBS="${LIBS} ${NLFAULTINJECTION_LIBS}"
+MAKEDIRS="${MAKEDIRS} ${NLFAULTINJECTION_MAKEDIR}"
 
 # Add any code coverage CPPFLAGS, LDFLAGS, and LIBS
 
@@ -1825,6 +1834,10 @@ LIBS="${LIBS} ${NL_COVERAGE_LIBS}"
 if test "${nl_had_CPPFLAGS_werror}" = "no"; then
     CPPFLAGS="${CPPFLAGS} ${NL_WERROR_CPPFLAGS}"
 fi
+
+# Export MAKEDIRS
+
+AC_SUBST(MAKEDIRS, [${MAKEDIRS}])
 
 # At this point, we can restore the compiler flags to whatever the
 # user passed in, now that we're clear of an -Werror issues by
@@ -2004,4 +2017,5 @@ AC_MSG_NOTICE([
   Link flags                                       : ${LDFLAGS:--}
   Link libraries                                   : ${LIBS}
   Fuzzing Enabled                                  : ${enable_fuzzing}
+  Make Dirs                                        : ${MAKEDIRS:--}
 ])

@@ -52,6 +52,8 @@ AM_CPPFLAGS                                    = \
 CHIP_LDADD                                      = \
     $(NULL)
 
+MAKEDIR_TARGETS=$(CHIP_LDADD)
+
 COMMON_LDADD                                   = \
     $(CHIP_LDADD)                                \
     $(NULL)

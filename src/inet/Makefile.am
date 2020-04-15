@@ -53,6 +53,4 @@ libInetLayer_adir                   = $(includedir)/inet
 
 dist_libInetLayer_a_HEADERS         = $(CHIP_BUILD_INET_LAYER_HEADER_FILES)
 
-$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
-
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

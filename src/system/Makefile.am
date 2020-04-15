@@ -52,6 +52,4 @@ libSystemLayer_adir               = $(includedir)/system
 
 dist_libSystemLayer_a_HEADERS     = $(CHIP_BUILD_SYSTEM_LAYER_HEADER_FILES)
 
-$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
-
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

@@ -43,6 +43,4 @@ libSupportLayer_adir                = $(includedir)/support
 
 dist_libSupportLayer_a_HEADERS      = $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)
 
-$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
-
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
