@@ -16,7 +16,7 @@ write_bash_command() {
 }
 
 write_bash_bootstrap() {
-    write_bash_command 'if [[ ! -f build/default/config.status ]]; then ./bootstrap && mkdir -p build/default; (cd build/default && ../../configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi'
+  write_bash_command 'if [[ ! -f build/default/config.status ]]; then ./bootstrap && mkdir -p build/default; (cd build/default && ../../configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi'
 }
 
 docker_run_bash_command() {
