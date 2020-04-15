@@ -12,7 +12,7 @@ write_bash_template() {
 }
 
 write_bash_command() {
-  echo $1 >>./build/scripts/build_command.sh
+  echo "$1" >>./build/scripts/build_command.sh
 }
 
 docker_run_bash_command() {
