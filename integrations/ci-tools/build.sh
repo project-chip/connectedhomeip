@@ -21,6 +21,7 @@ docker_run_bash_command() {
 
 case "$TASK" in
 
+  # You can add more tasks here, the top one shows an example of running a build inside our build container
   build-linux)
     write_bash_template
     write_bash_command './bootstrap && mkdir -p build/default && (cd build/default && ../../configure --enable-coverage) && make -C build/default "${@:-distcheck}" && git clean -Xdf && (cd examples/lock-app/nrf5 && make)'

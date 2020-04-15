@@ -9,6 +9,8 @@ before_install:
 script:
 - ./integrations/ci-tools/build.sh
 
+# Note: To add new job types, add it to the matrix below, with a unique TASK varable, then update the build.sh to do what you want during that task
+
 matrix:
   include:
     - name: "Main Build"
