@@ -1,0 +1,16 @@
+language: generic
+
+services:
+  - docker
+
+script:
+- ./integration/travis/build.sh
+
+matrix:
+  include:
+    - name: "Main Build"
+      env: TASK="build-linux"
+      
+    - name: "Shell Check"
+      env: TASK="preflight-shell-check"
+    
