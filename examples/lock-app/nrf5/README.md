@@ -66,7 +66,7 @@ The remaining two LEDs and buttons (#3 and #4) are unused.
 ## Building
 
 ### Using CHIP's VSCode `devcontainer`
-Tools and SDK are preinstalled in [CHIP's VSCode devcontainer](https://github.com/project-chip/connectedhomeip/blob/master/docs/VSCODE_DEVELOPMENT.md). You can build this example on a clean tree by running `make`. Run the following commands in a devconainer shell.
+Tools and SDK are preinstalled in [CHIP's VSCode devcontainer](https://github.com/project-chip/connectedhomeip/blob/master/docs/VSCODE_DEVELOPMENT.md). You can build this example on a clean tree by running `make`. Run the following commands in a devcontainer shell.
 
         $ cd /workspaces/connectedhomeip
 
