@@ -301,7 +301,6 @@ static void TestDRBG_Output(nlTestSuite * inSuite, void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 
-// clang-format off
 static const nlTest sTests[] =
 {
     NL_TEST_DEF("Test encrypting test vectors", TestAES_CCM_256EncryptTestVectors),
