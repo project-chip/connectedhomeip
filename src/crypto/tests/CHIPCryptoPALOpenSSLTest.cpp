@@ -274,6 +274,29 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted == 3);
 }
 
+static void TestDRBG_InvalidInputs(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    error            = DRBG_get_bytes(NULL, 10);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+    error = CHIP_NO_ERROR;
+    unsigned char buffer[5];
+    error = DRBG_get_bytes(buffer, 0);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+static void TestDRBG_Output(nlTestSuite * inSuite, void * inContext)
+{
+    // No good way to unit test a DRBG. Just validate that we get out something
+    CHIP_ERROR error           = CHIP_ERROR_INVALID_ARGUMENT;
+    unsigned char out_buf[10]  = { 0 };
+    unsigned char orig_buf[10] = { 0 };
+
+    error = DRBG_get_bytes(out_buf, sizeof(out_buf));
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, memcmp(out_buf, orig_buf, sizeof(out_buf)) != 0);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -289,7 +312,8 @@ static const nlTest sTests[] = { NL_TEST_DEF("Test encrypting test vectors", Tes
                                  NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
                                  NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
                                  NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
-
+                                 NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
+                                 NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
                                  NL_TEST_SENTINEL() };
 
 int main(void)

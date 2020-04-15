@@ -23,6 +23,7 @@
 #include "CHIPCryptoPAL.h"
 
 #include <openssl/conf.h>
+#include <openssl/rand.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #include <openssl/kdf.h>
@@ -178,11 +179,12 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
                                      unsigned char * out_buffer, size_t out_length)
 {
     EVP_PKEY_CTX * context;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+
     context = EVP_PKEY_CTX_new_id(EVP_PKEY_HKDF, NULL);
     VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
 
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 1;
     VerifyOrExit(secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -232,5 +234,20 @@ exit:
     {
         EVP_PKEY_CTX_free(context);
     }
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = RAND_priv_bytes(out_buffer, out_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
     return error;
 }

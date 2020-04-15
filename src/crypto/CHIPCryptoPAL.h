@@ -82,6 +82,15 @@ CHIP_ERROR AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t cipherte
 CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
                        const size_t salt_length, const unsigned char * info, const size_t info_length, unsigned char * out_buffer,
                        size_t out_length);
+
+/**
+ * @brief A cryptographically secure random number generator based on NIST SP800-90A
+ * @param out_buffer Buffer to write random bytes into
+ * @param out_length Number of random bytes to generate
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length);
+
 } // namespace Crypto
 } // namespace chip
 #endif
