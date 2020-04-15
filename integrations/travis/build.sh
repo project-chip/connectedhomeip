@@ -6,7 +6,7 @@ die()
     exit 1
 }
 
-case "${TASK}" in
+case "$TASK" in
 
     build-linux)
         ./integrations/docker/run_docker_build.sh
@@ -17,7 +17,7 @@ case "${TASK}" in
         ;;
 
     *)
-        die "Unknown task: ${TASK}."
+        die "Unknown task: $TASK."
         ;;
         
 esac
