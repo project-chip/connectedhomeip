@@ -6,4 +6,5 @@
  (shell-script-mode . ((sh-basic-offset . 4)))
  (c-mode . ((c-basic-offset . 4)))
  (c++-mode . ((c-basic-offset . 4)))
+ (makefile-mode . ((indent-tabs-mode t)))
  )
