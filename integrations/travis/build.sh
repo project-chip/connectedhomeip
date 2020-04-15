@@ -6,17 +6,17 @@ die() {
 }
 
 write_bash_template() {
-    echo '#!/bin/bash
-    ' > ./build/scripts/build_command.sh
-    chmod +x ./build/scripts/build_command.sh
+  echo '#!/bin/bash
+    ' >./build/scripts/build_command.sh
+  chmod +x ./build/scripts/build_command.sh
 }
 
 write_bash_command() {
-    echo '$1' >> ./build/scripts/build_command.sh
+  echo '$1' >>./build/scripts/build_command.sh
 }
 
 docker_run_bash_command() {
-    ./integrations/docker/images/chip-build/run.sh "build/scripts/build_command.sh"
+  ./integrations/docker/images/chip-build/run.sh "build/scripts/build_command.sh"
 }
 
 case "$TASK" in
