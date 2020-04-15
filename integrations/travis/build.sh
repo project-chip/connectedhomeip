@@ -11,12 +11,21 @@ write_bash_template() {
     chmod +x ./build/scripts/build_command.sh
 }
 
+write_bash_command() {
+    echo '#!/bin/bash
+    ' >> ./build/scripts/build_command.sh
+}
+
+docker_run_bash_command() {
+    ./integrations/docker/images/chip-build/run.sh "build/scripts/build_command.sh"
+}
+
 case "$TASK" in
 
   build-linux)
     write_bash_template
-    echo './bootstrap && mkdir -p build/default && (cd build/default && ../../configure --enable-coverage) && make -C build/default "${@:-distcheck}" && git clean -Xdf && (cd examples/lock-app/nrf5 && make)' >> ./build/scripts/build_command.sh 
-    ./integrations/docker/images/chip-build/run.sh "build/scripts/build_command.sh"
+    write_bash_command './bootstrap && mkdir -p build/default && (cd build/default && ../../configure --enable-coverage) && make -C build/default "${@:-distcheck}" && git clean -Xdf && (cd examples/lock-app/nrf5 && make)'
+    docker_run_bash_command
     ;;
 
   preflight-shell-check)
