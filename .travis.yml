@@ -13,7 +13,3 @@ matrix:
   include:
     - name: "Main Build"
       env: TASK="build-linux"
-      
-    - name: "Shell Check"
-      env: TASK="preflight-shell-check"
-    

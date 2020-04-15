@@ -27,10 +27,6 @@ case "$TASK" in
     docker_run_bash_command
     ;;
 
-  preflight-shell-check)
-    ./integrations/docker/images/chip-build/run.sh "integrations/shellcheck_tree.sh"
-    ;;
-
   *)
     die "Unknown task: $TASK."
     ;;
