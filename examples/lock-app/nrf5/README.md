@@ -8,6 +8,8 @@ An example application showing the use [CHIP](https://github.com/project-chip/co
   - [Introduction](#introduction)
   - [Device UI](#device-ui)
   - [Building](#building)
+    - [Using CHIP's VSCode `devcontainer`](#using-chips-vscode-devcontainer)
+    - [Using Native Shell](#using-native-shell)
   - [Initializing the nRF52840 DK](#initializing-the-nrf52840-dk)
   - [Flashing the Application](#flashing-the-application)
   - [Viewing Logging Output](#viewing-logging-output)
@@ -63,6 +65,21 @@ The remaining two LEDs and buttons (#3 and #4) are unused.
 
 ## Building
 
+### Using CHIP's VSCode `devcontainer`
+Tools and SDK are preinstalled in [CHIP's VSCode devcontainer](https://github.com/project-chip/connectedhomeip/blob/master/docs/VSCODE_DEVELOPMENT.md). You can build this example on a clean tree by running `make`. Run the following commands in a devconainer shell.
+
+        $ cd /workspaces/connectedhomeip
+
+        # CAUTION: the following step will delete any unstaged files
+        $ git clean -Xdf
+
+        $ cd examples/lock-app/nrf5
+        $ make clean
+        $ make
+
+Alternatively, you can run `Build nRF5 Lock App` VSCode task.
+
+### Using Native Shell
 * Download and install the [Nordic nRF5 SDK for Thread and Zigbee](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK-for-Thread-and-Zigbee)
 ([Direct download link](https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5-SDK-for-Thread/nRF5-SDK-for-Thread-and-Zigbee/nRF5SDKforThreadandZigbeev400dc7186b.zip))
 
@@ -137,7 +154,7 @@ To flash the example app, run the following commands:
         $ cd ~/connectedhomeip/examples/lock-app/nrf5
         $ make flash-app
 
-
+> The [VSCode devcontainer](#using-chips-vscode-devcontainer) cannot communicate with the nRF device. So, the above command must be run from a native shell. This also means that the `nRF command line tools` must be installed on your development machine.
 <a name="view-logging"></a>
 
 ## Viewing Logging Output
