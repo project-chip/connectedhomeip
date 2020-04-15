@@ -23,7 +23,7 @@
 #include "CHIPCryptoPAL.h"
 
 #include <openssl/conf.h>
-#include <openssl/rand_drbg.h>
+#include <openssl/rand.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #include <openssl/kdf.h>
@@ -245,7 +245,7 @@ CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = RAND_DRBG_bytes(RAND_DRBG_get0_private(), out_buffer, out_length);
+    result = RAND_priv_bytes(out_buffer, out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
