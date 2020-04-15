@@ -2,7 +2,7 @@
 
 die()
 {
-    echo " *** ERROR: " ${*}
+    echo " *** ERROR: " "${*}"
     exit 1
 }
 
@@ -13,11 +13,11 @@ case "${TASK}" in
         ;;
 
     preflight-shell-check)
-        ./integrations/docker/images/chip-build/run.sh integrations/shellcheck_tree.sh
+        ./integrations/docker/images/chip-build/run.sh "integrations/shellcheck_tree.sh"
         ;;
 
     *)
-        die "Unknown task: \"${TASK}\"."
+        die "Unknown task: ${TASK}."
         ;;
         
 esac
