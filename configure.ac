@@ -1294,7 +1294,7 @@ CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-project-includes, CHIP_PROJECT_CONFIG_IN
 
 # Device Layer
 
-if test "${CONFIG_DEVICE_LAYER}" = 1; then 
+if test "${CONFIG_DEVICE_LAYER}" = 1; then
     CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-device-project-includes, CHIP_DEVICE_PROJECT_CONFIG_INCLUDE, CHIPDeviceProjectConfig.h, CHIP Device Layer,)
 fi
 
