@@ -8,8 +8,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: shellcheck
-        id: shellcheck
-        uses: project-chip/action-shellcheck@master
-        env:
-          EXCLUDE_DIRS: third_party
+        run: integrations/docker/images/chip-build/run.sh integrations/shellcheck_tree.sh
