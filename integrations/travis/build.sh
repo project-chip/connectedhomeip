@@ -1,5 +1,11 @@
 #!/bin/sh
 
+die()
+{
+    echo " *** ERROR: " ${*}
+    exit 1
+}
+
 case "${TASK}" in
 
     build-linux)
