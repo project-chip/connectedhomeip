@@ -13,22 +13,22 @@ script:
 
 jobs:
   include:
-    - stage: build
-      name: "Main Build"
-      env: TASK="build-linux"
-    - stage: build
-      name: "Main Build"
-      env: TASK="build-main"
-    - stage: test
+    - stage: Build
+      name: "Build Ubuntu Linux"
+      env: TASK="build-ubuntu-linux"
+    - stage: Build
+      name: "Build NRF Example Lock App"
+      env: TASK="build-nrf-example-lock-app"
+    - stage: Tests
       name: "Unit & Functional Tests"
       env: TASK="run-unit-and-functional-tests"
-    - stage: test
+    - stage: Tests
       name: "Crypto Tests"
       env: TASK="run-crypto-tests"
-    - stage: test
+    - stage: Tests
       name: "Setup Payload Tests"
       env: TASK="run-setup-payload-tests"
-    - stage: deploy
+    - stage: Deploy
       name: "Distribution Check"
       env: TASK="build-distribution-check"
       
