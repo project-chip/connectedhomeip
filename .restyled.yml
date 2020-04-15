@@ -5,7 +5,7 @@ command:
   - "-i"
 arguments: []
 exclude:
-    - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
+  - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
 include:
   - "**/*.c"
   - "**/*.cc"
