@@ -4,7 +4,9 @@ command:
   - clang-format
   - "-i"
 arguments: []
-include:
+exclude:
+    - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
+  include:
   - "**/*.c"
   - "**/*.cc"
   - "**/*.cpp"
