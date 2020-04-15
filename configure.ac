@@ -1355,6 +1355,36 @@ else
 fi
 
 #
+#
+# mbedTLS
+#
+
+NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([mbedTLS],
+    [MBEDTLS],
+    [mbedtls],
+    [-lmbedtls],
+    [
+        # Check for required mbedTLS headers.
+
+        AC_CHECK_HEADERS([mbedtls/sha1.h] [mbedtls/sha256.h] [mbedtls/sha512.h] [mbedtls/md.h] [mbedtls/hkdf.h] [mbedtls/pkcs5.h] [mbedtls/chachapoly.h] [mbedtls/aes.h] [mbedtls/ecdh.h] [mbedtls/bignum.h],
+
+            [],
+            [
+                AC_MSG_ERROR(The mbedTLS header "$ac_header" is required but cannot be found.)
+            ]
+        )
+    ]
+)
+
+AM_CONDITIONAL([CHIP_WITH_MBEDTLS], [test "${nl_with_mbedtls}" != "no"])
+
+if test "${nl_with_mbedtls}" = "no"; then
+    AC_DEFINE([CHIP_WITH_MBEDTLS], [0], [Define to 1 to build CHIP with mbedTLS features])
+else
+    AC_DEFINE([CHIP_WITH_MBEDTLS], [1], [Define to 1 to build CHIP with mbedTLS features])
+fi
+
+#
 # LwIP
 #
 
@@ -1790,6 +1820,12 @@ CPPFLAGS="${CPPFLAGS} ${OPENSSL_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${OPENSSL_LDFLAGS}"
 LIBS="${LIBS} ${OPENSSL_LIBS}"
 
+# Add any mbedTLS CPPFLAGS, LDFLAGS, and LIBS
+
+CPPFLAGS="${CPPFLAGS} ${MBEDTLS_CPPFLAGS}"
+LDFLAGS="${LDFLAGS} ${MBEDTLS_LDFLAGS}"
+LIBS="${LIBS} ${MBEDTLS_LIBS}"
+
 # Add any nlunit-test CPPFLAGS, LDFLAGS, and LIBS
 
 CPPFLAGS="${CPPFLAGS} ${NLUNIT_TEST_CPPFLAGS}"
@@ -1961,6 +1997,10 @@ AC_MSG_NOTICE([
   OpenSSL compile flags                            : ${OPENSSL_CPPFLAGS:--}
   OpenSSL link flags                               : ${OPENSSL_LDFLAGS:--}
   OpenSSL link libraries                           : ${OPENSSL_LIBS:--}
+  mbedTLS source                                   : ${nl_with_mbedtls}
+  mbedTLS compile flags                            : ${MBEDTLS_CPPFLAGS:--}
+  mbedTLS link flags                               : ${MBEDTLS_LDFLAGS:--}
+  mbedTLS link libraries                           : ${MBEDTLS_LIBS:--}
   Nlunit-test source                               : ${nl_with_nlunit_test:--}
   Nlunit-test compile flags                        : ${NLUNIT_TEST_CPPFLAGS:--}
   Nlunit-test link flags                           : ${NLUNIT_TEST_LDFLAGS:--}
