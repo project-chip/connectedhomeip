@@ -16,3 +16,19 @@ jobs:
     - stage: build
       name: "Main Build"
       env: TASK="build-linux"
+    - stage: build
+      name: "Main Build"
+      env: TASK="build-main"
+    - stage: test
+      name: "Unit & Functional Tests"
+      env: TASK="run-unit-and-functional-tests"
+    - stage: test
+      name: "Crypto Tests"
+      env: TASK="run-crypto-tests"
+    - stage: test
+      name: "Setup Payload Tests"
+      env: TASK="run-setup-payload-tests"
+    - stage: deploy
+      name: "Distribution Check"
+      env: TASK="build-distribution-check"
+      
