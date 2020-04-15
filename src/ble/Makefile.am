@@ -47,6 +47,4 @@ libBleLayer_adir                    = $(includedir)/ble
 
 dist_libBleLayer_a_HEADERS          = $(CHIP_BUILD_BLE_LAYER_HEADER_FILES)
 
-$(RECURSIVE_TARGETS): $(lib_LIBRARIES)
-
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
