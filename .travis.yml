@@ -3,8 +3,11 @@ language: minimal
 services:
   - docker
 
+before_install:
+- ./integrations/ci-tools/pre_build.sh
+
 script:
-- ./integrations/travis/build.sh
+- ./integrations/ci-tools/build.sh
 
 matrix:
   include:
