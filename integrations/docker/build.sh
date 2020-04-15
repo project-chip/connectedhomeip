@@ -6,7 +6,6 @@
 # This script expects to find a Dockerfile next to $0, so symlink
 #  in an image name directory is the expected use case.
 
-
 me=$(basename "$0")
 cd "$(dirname "$0")"
 
@@ -34,8 +33,8 @@ VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
 }
 
 die() {
-    echo "$me: *** ERROR: $*"
-    exit 1
+  echo "$me: *** ERROR: $*"
+  exit 1
 }
 
 set -ex
