@@ -145,6 +145,7 @@
             "type": "shell",
             "command": "cd examples/lock-app/nrf5 && make",
             "group": "none",
+            "dependsOn": "Clean Tree",
             "problemMatcher": [
                 "$gcc"
             ]
