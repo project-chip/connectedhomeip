@@ -21,7 +21,7 @@
  *          General utility functions available on all platforms.
  */
 
-#include <inet/inet.h>
+#include <inet/Inet.h>
 
 namespace chip {
 namespace DeviceLayer {
