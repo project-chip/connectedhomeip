@@ -4,7 +4,7 @@ services:
   - docker
 
 script:
-- ./integration/travis/build.sh
+- ./integrations/travis/build.sh
 
 matrix:
   include:
