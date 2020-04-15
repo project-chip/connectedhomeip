@@ -1,0 +1,4241 @@
+[.text-center]
+= Project Connected Home over IP Software
+
+:plusplus: ++
+
+== Best Practices, Coding Conventions, and Style
+
+[.text-center]
+_Revision 1_ +
+_2020-04-14_
+
+[.text-center]
+*Status:* [red]*Draft* / [red]*Active*
+
+[[h.o38c57m7szye]]
+== Table of Contents
+
+link:#h.o38c57m7szye[Table of Contents]
+
+link:#h.5wmil4od4lhf[Typographic and Syntactic Conventions]
+
+link:#h.24y5n7x4898q[1.        Introduction]
+
+link:#h.x0vhexoqdhxm[1.1.        Summary]
+
+link:#h.jpdocvkdb8c1[2.        Standards]
+
+link:#h.9k10n9q3rxmw[2.1.        C]
+
+link:#h.psk6ibil0gsf[2.1.1.        Motivation and Rationale]
+
+link:#h.cdtfddg825xl[2.2.        C{plusplus}]
+
+link:#h.uzi88gnrfz2[2.2.1.        Motivation and Rationale]
+
+link:#h.2r2teebcrgzu[3.        Conventions and Best Practices]
+
+link:#h.8riuslehrhue[3.1.        Common]
+
+link:#h.gm5hkjt3wjj8[3.1.1.        When in Rome]
+
+link:#h.ho865sup9gc8[3.1.1.1.        Motivation and Rationale]
+
+link:#h.4u8s7lcwcspl[3.1.2.        Language-independent]
+
+link:#h.v5dq4emd6fju[3.1.2.1.        Avoid the Use of Inlines]
+
+link:#h.21fh5h3lyn7q[3.1.2.1.1.        Motivation and Rationale]
+
+link:#h.ydctsgfxvdwl[3.1.2.1.2.        Exceptions]
+
+link:#h.w81efp46u07r[3.1.2.2.        Use Inlines Judiciously]
+
+link:#h.s6j1guu4bjy7[3.1.2.2.1.        Motivation and Rationale]
+
+link:#h.lznwwfek3mml[3.1.2.3.        Return Statements]
+
+link:#h.rty7as6c0uuy[3.1.2.3.1.        Motivation and Rationale]
+
+link:#h.tjgjnfdzmvlt[3.1.2.4.        Non-local Goto]
+
+link:#h.8t6hzow490jy[3.1.2.4.1.        Motivation and Rationale]
+
+link:#h.umhin0x3q9of[3.1.2.4.2.        Exceptions]
+
+link:#h.96ozmz48upvf[3.1.2.5.        Local Goto]
+
+link:#h.qgrd04srrqqb[3.1.2.5.1.        Motivation and Rationale]
+
+link:#h.i7q73qr638dp[3.1.2.5.2.        Exceptions]
+
+link:#h.ti3ripa6ui4k[3.1.2.6.        C Preprocessor]
+
+link:#h.27x07deo3a0j[3.1.2.6.1.        Scope]
+
+link:#h.7lstppd2af2e[3.1.2.6.1.1.        Motivation and Rationale]
+
+link:#h.2ytza4t5ubwx[3.1.2.6.2.        define Directive Scope]
+
+link:#h.3livfcyimylu[3.1.2.6.2.1.        Motivation and Rationale]
+
+link:#h.vwywf2xaypvn[3.1.2.6.3.        endif Directive Scope]
+
+link:#h.g16081bc4uix[3.1.2.6.3.1.        Motivation and Rationale]
+
+link:#h.p09tg1y8sqca[3.1.2.6.4.        endif Directive Distance]
+
+link:#h.rbj54ztbzht[3.1.2.6.4.1.        Motivation and Rationale]
+
+link:#h.hhhv35d7i4a1[3.1.2.6.5.        include Directive]
+
+link:#h.xirzp5o2w8pr[3.1.2.6.5.1.        Placement in File]
+
+link:#h.dscgtbbup8mp[3.1.2.6.5.2.        Style]
+
+link:#h.3df2tlalosy2[3.1.2.6.5.3.        Ordering]
+
+link:#h.n3l3bylxq7tt[3.1.2.6.6.        Redefining Language Keywords]
+
+link:#h.ql0zczkhqre1[3.1.2.6.6.1.        Motivation and Rationale]
+
+link:#h.5snrngjwi14d[3.1.2.6.7.        Commenting Out or Disabling Code]
+
+link:#h.8l03g8lc5ede[3.1.2.6.7.1.        Motivation and Rationale]
+
+link:#h.p1wafsz4phs5[3.1.2.6.8.        Token Concatenation]
+
+link:#h.g7t3oqw943d[3.1.2.6.8.1.        Motivation and Rationale]
+
+link:#h.97pkzjvbwywl[3.1.2.6.9.        undef Directive]
+
+link:#h.6mk50n64wso5[3.1.2.6.9.1.        Motivation and Rationale]
+
+link:#h.cz1ekfdi0nou[3.1.2.6.9.2.        Exceptions]
+
+link:#h.q0uzbcc0d4je[3.1.2.7.        Object Scope]
+
+link:#h.bjdwc1tydc50[3.1.2.7.1.        Motivation and Rationale]
+
+link:#h.mg25aowb3crv[3.1.2.8.        Unbounded Recursion]
+
+link:#h.8ww2ntlg2lir[3.1.2.8.1.        Motivation and Rationale]
+
+link:#h.vdw23oco9358[3.1.2.9.        Error Handling]
+
+link:#h.fs01o63ie9ow[3.1.2.9.1.        Motivation and Rationale]
+
+link:#h.envas2gdcem[3.1.2.10.        Symmetric APIs]
+
+link:#h.oywtgd44z4wh[3.1.2.10.1.        Motivation and Rationale]
+
+link:#h.mgeqabhbxsbl[3.1.2.10.2.        Exceptions]
+
+link:#h.3rhka3x83t7f[3.1.2.11.        Use C stdint.h or C{plusplus} cstdint for
+Plain Old Data Types]
+
+link:#h.w69fpx14vx9b[3.1.2.11.1.        Motivation and Rationale]
+
+link:#h.imbb237rmsjp[3.1.2.12.        Constant Qualifiers]
+
+link:#h.23cim6tw3fos[3.1.2.12.1.        Motivation and Rationale]
+
+link:#h.3bq9ctkdcl91[3.1.2.13.        Header Include Guard]
+
+link:#h.kgh5bv11kkhb[3.1.2.13.1.        Motivation and Rationale]
+
+link:#h.wyqlzvouefvz[3.1.2.14.        Function and Method Prototypes]
+
+link:#h.4wx5jmahqtv6[3.1.2.14.1.        Forward Declarations]
+
+link:#h.svqou5p0wdw3[3.1.2.14.1.1.        Motivation and Rationale]
+
+link:#h.8mpgkl3hzy59[3.1.2.14.2.        Void Declarations]
+
+link:#h.rgzqdvy9x05d[3.1.2.14.2.1.        Motivation and Rationale]
+
+link:#h.yhrr5ii8cfbu[3.1.3.        Language-dependent]
+
+link:#h.mkronrmr00b1[3.1.3.1.        C]
+
+link:#h.kum6ou45sw6y[3.1.3.1.1.        C / C{plusplus} Linkage Wrappers]
+
+link:#h.qw4fhssvwwha[3.1.3.2.        C{plusplus}]
+
+link:#h.y9zkjq5g5hrs[3.1.3.2.1.        Prefer Passing Parameters by
+Reference to Pointer]
+
+link:#h.kepl5uvfblg7[3.1.3.2.1.1.        Motivations and Rationale]
+
+link:#h.f22itk3xdrc[3.1.3.2.2.        Passing Base Scalars]
+
+link:#h.gl0pdrnnqg6p[3.1.3.2.3.1.        Motivation and Rationale]
+
+link:#h.xlq577wwg3li[3.1.3.2.3.        Eliminate Unnecessary
+Destructors]
+
+link:#h.y3ur0vcvp0tl[3.1.3.2.3.1.        Motivation and Rationale]
+
+link:#h.8k07fbievmzx[3.1.3.2.4.        Default Parameters]
+
+link:#h.1tnvt8oseo1z[3.1.3.2.4.1.        Motivation and Rationale]
+
+link:#h.y6cfawslqmf7[3.1.3.2.4.2.        Exceptions]
+
+link:#h.nhdnx8t0pw6[3.1.3.2.5.        Default Parameters with Virtual
+Methods]
+
+link:#h.fer6xmqxejy5[3.1.3.2.5.1.        Motivation and Rationale]
+
+link:#h.fw4cnu1amog5[3.1.3.2.6.        Global and Scoped Static
+Construction]
+
+link:#h.ts13wx9s3cn8[3.1.3.2.6.1.        Motivation and Rationale]
+
+link:#h.hi6zs2jww7m[3.1.3.2.7.        C{plusplus}-style Casts]
+
+link:#h.ki779oh71f7u[3.1.3.2.7.1.        Motivation and Rationale]
+
+link:#h.ywd7qnlhd26t[3.1.3.2.8.        Avoid using namespace Statements
+in Headers]
+
+link:#h.a6ax5b5rpvcp[3.1.3.2.8.1.        Motivation and Rationale]
+
+link:#h.z146o5vxagmg[3.2.        Tightly-constrained Systems and Shared
+Infrastructure]
+
+link:#h.x7lqrzxfz422[3.2.1.        Avoid Heap-based Resource Allocation]
+
+link:#h.s1ou8umsa4tc[3.2.1.1.        Motivation and Rationale]
+
+link:#h.ot9bnxg09sh4[3.2.1.2.        Alternatives]
+
+link:#h.vjlnlsxz1fk1[3.2.1.2.1.        Use In Place Allocation and
+Initialization]
+
+link:#h.75lv77hnmovy[3.2.1.2.2.        Use Pool-based Allocators]
+
+link:#h.2l9r56wchq79[3.2.1.2.3.        Use Platform-defined and
+-assigned Allocators]
+
+link:#h.mn4lcnt0h77r[3.2.2.        Recursion]
+
+link:#h.w6o04dg7ppyg[3.2.2.1.        Motivation and Rationale]
+
+link:#h.kmp11gph6x86[3.2.3.        Avoid the Use of Virtual Functions]
+
+link:#h.5tazakvuilsx[3.2.3.1.        Motivation and Rationale]
+
+link:#h.ft3tkwpjkeex[3.2.4.        C{plusplus} Standard Library]
+
+link:#h.puxwibas4ffv[3.2.4.1.        Motivation and Rationale]
+
+link:#h.puxfseupcu6[3.2.5.        C{plusplus} Standard Template Library (STL)]
+
+link:#h.kn1dncdbm1qj[3.2.5.1.        Motivation and Rationale]
+
+link:#h.quu3bexseloj[3.2.6.        C{plusplus} Templates]
+
+link:#h.o6v3xzty75an[3.2.6.1.        Motivation and Rationale]
+
+link:#h.vuy3kslcw1c0[3.2.7.        Exceptions]
+
+link:#h.h46yos89hitf[3.2.7.1.        Motivation and Rationale]
+
+link:#h.s7u364eurjpt[3.2.7.2.        Exception Conversion]
+
+link:#h.fhtpetw2hmbz[3.2.8.        Runtime Type Information (RTTI)]
+
+link:#h.3d6buxo8847m[3.2.8.1.        Motivation and Rationale]
+
+link:#h.k2dwfzkooelt[3.3.        Loosely-constrained Systems]
+
+link:#h.fkxd2fqjejt1[4.        Format and Style]
+
+link:#h.cloehu8xtakl[4.1.        File Names]
+
+link:#h.9fouemxk8jl8[4.1.1.        Extensions]
+
+link:#h.dux1t2sfd7li[4.2.        Naming]
+
+link:#h.l007z8dc3ip8[4.2.1.        Motivation and Rationale]
+
+link:#h.grfkn5hjzchk[4.2.2.        Case]
+
+link:#h.crc9dmkm95gu[4.2.2.1.        C Preprocessor]
+
+link:#h.10vm0mwa1h80[4.2.2.1.1.        Motivation and Rationale]
+
+link:#h.p60oo0d2bddi[4.2.2.2.        C]
+
+link:#h.7g2jekkhysl3[4.2.2.2.1.        Motivation and Rationale]
+
+link:#h.miwjxvghuyuz[4.2.2.3.        C{plusplus}]
+
+link:#h.145w2jejpii6[4.2.2.3.1.        Motivation and Rationale]
+
+link:#h.qmpdysuy5ua3[4.2.2.3.2.        Exceptions]
+
+link:#h.t4nz5x74stu0[4.2.2.3.3.        C in C{plusplus}]
+
+link:#h.6lzjnxpm2beg[4.2.2.3.3.1.        Motivation and Rationale]
+
+link:#h.uo3g20huu09d[4.2.3.        Symbol Qualification]
+
+link:#h.n6ysvjmmnqel[4.2.3.1.        C]
+
+link:#h.axx89bk7v82m[4.2.3.1.1.        Motivation and Rationale]
+
+link:#h.nzy99j1n0ac[4.2.3.2.        C{plusplus}]
+
+link:#h.mug868ar44x2[4.2.3.2.1.        Motivation and Rationale]
+
+link:#h.yhdcr3jar7zr[4.2.3.2.2.        C in C{plusplus}]
+
+link:#h.6xl47949at8i[4.2.3.2.2.1.        Motivation and Rationale]
+
+link:#h.nsqhqioznzub[4.2.4.        Scope]
+
+link:#h.25a8q2ob61ck[4.2.4.1.        Global Data]
+
+link:#h.4uaw4cwzlxuk[4.2.4.2.        Static Data]
+
+link:#h.qab579rt9d6j[4.2.4.3.        Object Data]
+
+link:#h.1a2u9etcc6j9[4.2.4.4.        Function and Method Parameters]
+
+link:#h.6ty3geoum6tz[4.2.4.4.1.        Motivation and Rationale]
+
+link:#h.mt5fp1320019[4.2.4.5.        Other]
+
+link:#h.6x386e7a0wcc[4.2.5.        Data Types]
+
+link:#h.pdj6ponw9gcy[4.2.5.1.        Descriptiveness]
+
+link:#h.h936i2c3v6cj[4.2.5.1.1.        Motivation and Rationale]
+
+link:#h.gn491gg6oa07[4.2.5.2.        Snake Case Decoration]
+
+link:#h.315d63y336yn[4.2.5.2.1.        Motivation and Rationale]
+
+link:#h.7jck2gn34us8[4.2.6.        Functions and Methods]
+
+link:#h.r470rhvreuf[4.2.6.1.        Motivation and Rationale]
+
+link:#h.70bie2xuqpb7[4.2.6.2.        Resource-managing Function and
+Method Names]
+
+link:#h.wsz5aqr2v83e[4.2.6.2.1.        Motivation and Rationale]
+
+link:#h.o0zw9vl7b8qb[4.3.        Parenthesis and Compound Logical
+Expressions]
+
+link:#h.7v0kssfjw95f[4.3.1.        Motivation and Rationale]
+
+link:#h.yz7soha9efw8[4.4.        Compound Expressions and Statements]
+
+link:#h.t679fdi29uzi[4.4.1.        Motivation and Rationale]
+
+link:#h.limz4korot1y[4.4.2.        Exceptions]
+
+link:#h.i4hp2b46o7to[4.5.        White Space]
+
+link:#h.qunthdzgne23[4.5.1.        Motivation and Rationale]
+
+link:#h.h1hnyi16kha7[4.5.2.        Indentation]
+
+link:#h.s6uvtn55lvye[4.5.2.1.        Motivation and Rationale]
+
+link:#h.2cyrjq9n5v5p[4.5.3.        Conditionals]
+
+link:#h.1rdd1so1xobq[4.5.3.1.        Motivation and Rationale]
+
+link:#h.vzkc3ecm85lw[4.5.4.        Scoped Variable Declarations]
+
+link:#h.rpikhxxoketq[4.5.4.1.        Motivation and Rationale]
+
+link:#h.8tjkylu9hoq3[4.5.5.        Data Member Declarations]
+
+link:#h.gw77eoogszs3[4.5.6.        Braces]
+
+link:#h.efhwb8kzx30o[4.5.6.1.        Motivation and Rationale]
+
+link:#h.ph6w877xgegt[4.5.7.        Keywords]
+
+link:#h.ujn3swcsfhob[4.5.7.1.        Motivation and Rationale]
+
+link:#h.whogy4gar37m[4.6.        Comments]
+
+link:#h.mdgnqcgb7v4s[4.6.1.        File]
+
+link:#h.ss9q4xqcydgp[4.6.1.1.        Motivation and Rationale]
+
+link:#h.piy7um1wijnn[4.6.2.        Functions and Methods]
+
+link:#h.qkbvqttren3o[4.6.3.        Other]
+
+link:#h.ec2gbliviwcl[4.6.3.1.        Dos]
+
+link:#h.y4bouuh3jgyk[4.6.3.2.        Don'ts]
+
+link:#h.404ucmrrowjr[5.        Third-party Software]
+
+link:#h.iuro59gzpr5i[5.1.        Motivation and Rationale]
+
+link:#h.g80rf92mbhlo[6.        Testing]
+
+link:#h.v3hcxsk4f9us[6.1.        Motivation and Rationale]
+
+link:#h.q6j4dltimysu[7.        Documentation]
+
+link:#h.ez0vz15lmoef[7.1.        Requirements, Architecture, and Design]
+
+link:#h.wksw3epjdtqy[7.1.1.        Functional Requirements]
+
+link:#h.6y5rrhn94djb[7.1.2.        Architecture and Design]
+
+link:#h.uh9xvhljqsnc[7.1.3.        Protocol]
+
+link:#h.qknbiwdwffib[7.2.        Stack and API]
+
+link:#h.w7snhm7ke0xc[7.2.1.        Motivation and Rationale]
+
+link:#h.s32yg4caylj[8.        Building and Packaging]
+
+link:#h.20jp72cri73u[8.1.        Motivation and Rationale]
+
+link:#h.igvm4pqzrunk[9.        Recommended Reading]
+
+link:#h.x2rzoiv2hj24[Revision History]
+
+[[h.5wmil4od4lhf]]
+== Typographic and Syntactic Conventions
+
+The following syntactic conventions are used throughout this document:
+
+_shall_::
+
+is used to indicate a mandatory rule or guideline that must be adhered
+to without exception to claim compliance with this specification.
+
+_should_::
+
+is used to indicate a rule or guideline that serves as a strong
+preference to suggested practice and is to be followed in the absence of
+a compelling reason to do otherwise.
+
+_may_::
+
+is used to indicate a rule or guideline that serves as a reference to
+suggested practice.
+
+[[h.24y5n7x4898q]]
+== 1.        Introduction
+
+There are likely as many unique combinations of software engineering and
+development standards, conventions, and practices as there organizations
+that do such work. This document pulls together those that Project
+Connected Home over IP believes best for our organization, its efforts,
+and products that consume those efforts, with a particular emphasis on
+embedded systems with C or C{plusplus} language development and runtime
+environments.
+
+This document and requirements should be considered canonical for all
+Project Connected Home over IP shared infrastructure software, including
+both RTOS-based and non-RTOS-based projects on both tightly- and
+loosely-constrained system platforms.
+
+The document is broadly categorized at the highest level into:
+
+* Best Practices and Conventions
+* Format and Style
+
+And, within conventions, further sub-categorized into those that apply
+to:
+
+* Tightly-constrained
+* Loosely-constrained
+
+system platforms. Applicability to tightly-constrained systems also
+generally applies to shared infrastructure software that is used on both
+tightly- and loosely-constrained systems.
+
+link:#id.jzphr1iiku89[Figure 1 below] attempts to illustrate both
+qualitative and quantitative applicability of these guidelines to
+Project Connected Home over IP software.
+
+Generally, product-specific applications have the greatest flexibility
+and latitude in applying these guidelines to their software. Whereas,
+shared infrastructure bears the least flexibility and bears the greatest
+adherence to these guidelines.
+
+image:CODING_STYLE_GUIDE-figure1.png[Figure 1. Graphical summary of the
+qualitative and quantitative applicability to Project CHIP software.]
+
+[[id.jzphr1iiku89]]
+
+[.text-center]
+*Figure 1.* Graphical summary of the qualitative and quantitative
+applicability to Project CHIP software.
+
+[[h.x0vhexoqdhxm]]
+=== 1.1.        Summary
+
+[[t.ed5bc6cb15b6a40b0867d96e2e71111149df1bc7]][[t.1]]
+
+[cols="<~,<~",options="header"]
+|===
+|Requirement |Description
+
+<h|link:#h.jpdocvkdb8c1[2]
+<h|Standards
+
+|link:#h.9k10n9q3rxmw[2.1] a|
+Project CHIP embedded software development uses and enforces the
+ISO9899:1999 (aka ISO C99, C99) C language standard as the minimum.
+
+Wherever possible, particularly in non-product-specific,
+shared-infrastructure software, toolchain-specific (e.g GCC/GNU)
+extensions or the use of later standards shall be avoided or shall be
+leveraged through toolchain-compatibility preprocessor macros.
+
+|link:#h.cdtfddg825xl[2.2] a|
+Project CHIP embedded software development uses the ISO14882:2011 (aka
+ISO C{plusplus}11) language standard as a baseline for source code
+compatibility. Conformance with other standards, for example, ISO14882:1998
+(aka ISO C{plusplus}98), may be additionally required in cases where wider
+portability is necessary, but in all cases, ISO C{plusplus}11 is the baseline
+requirement.
+
+Wherever possible, particularly in non-product-specific,
+shared-infrastructure software, toolchain-specific (e.g GCC/GNU)
+extensions or the use of later standards shall be avoided or shall be
+leveraged through toolchain-compatibility preprocessor macros.
+
+<h|link:#h.2r2teebcrgzu[3]
+<h|Conventions and Best Practices
+
+<h|link:#h.8riuslehrhue[3.1]
+<h|Common
+
+|link:#h.gm5hkjt3wjj8[3.1.1] |When in Rome, do as the Romans do.
+
+<h|link:#h.4u8s7lcwcspl[3.1.2]
+<h|Language-independent
+
+|link:#h.v5dq4emd6fju[3.1.2.1] |The use of code in headers and, more
+specifically, the use of the non-local scope inline functions should be
+avoided.
+
+|link:#h.w81efp46u07r[3.1.2.2] |Inline functions should be used
+judiciously.
+
+|link:#h.lznwwfek3mml[3.1.2.3] |There should be one `return` statement per
+free function or method at the end of the free function or method.
+
+|link:#h.tjgjnfdzmvlt[3.1.2.4] |There should be no calls to the
+functions `setjmp` or `longjmp`.
+
+|link:#h.96ozmz48upvf[3.1.2.5] |There should be no calls to the C/C{plusplus}
+keyword `goto`.
+
+<h|link:#h.ti3ripa6ui4k[3.1.2.6]
+<h|C Preprocessor
+
+|link:#h.27x07deo3a0j[3.1.2.6.1] |Use of the C preprocessor should be
+limited to file inclusion and simple macros.
+
+|link:#h.2ytza4t5ubwx[3.1.2.6.2] |Macros shall not be defined within a
+function or a block and should be defined at the top of a file.
+
+|link:#h.vwywf2xaypvn[3.1.2.6.3] |All `#else`, `#elif`, and
+`#endif` preprocessor directives shall reside in the same file as the
+`#if` or `#ifdef` directive to which they are related.
+
+|link:#h.p09tg1y8sqca[3.1.2.6.4] |All `#endif` directives equal to or
+greater than 20 lines away from the `#if` or `#ifdef` directive to which
+they are related shall be decorated by language comment indicating the
+conditional they are associated with.
+
+<h|link:#h.hhhv35d7i4a1[3.1.2.6.5]
+<h|include Directive
+
+|link:#h.xirzp5o2w8pr[3.1.2.6.5.1] |Preprocessor `#include` directives in
+a file shall only be preceded by other preprocessor directives or
+comments.
+
+|link:#h.dscgtbbup8mp[3.1.2.6.5.2] a|
+Preprocessor `#include` directives shall use brace (“<”) and (“>”) style
+for all public headers, including C and C{plusplus} standard library, or other
+first- and third-party public library headers.
+
+Preprocessor `#include` directives should use double quote (‘“‘) and (‘“‘)
+style for all private or relative headers.
+
+|link:#h.3df2tlalosy2[3.1.2.6.5.3] a|
+Preprocessor `#include` directives should be grouped, ordered, or sorted
+as follows:
+
+* This compilation unit's corresponding header, if any.
+* C{plusplus} Standard Library headers
+* C Standard Library headers
+* Third-party library headers
+* First-party library headers
+* Private or local headers
+* Alphanumeric order within each subgroup
+
+|link:#h.n3l3bylxq7tt[3.1.2.6.6] |The preprocessor shall not be used to
+redefine reserved language keywords.
+
+|link:#h.5snrngjwi14d[3.1.2.6.7] |Unused code shall not be disabled by
+commenting it out with C- or C{plusplus}-style comments or with preprocessor `#if
+0 ... #endif` semantics.
+
+|link:#h.p1wafsz4phs5[3.1.2.6.8] |Use of the preprocessor token
+concatenation operator '`##`' should be avoided.
+
+|link:#h.97pkzjvbwywl[3.1.2.6.9] |The `undef` preprocessor directive
+should be avoided and shall never be used to undefine a symbol from a
+foreign module.
+
+|link:#h.q0uzbcc0d4je[3.1.2.7] a|
+Data objects shall be declared at the smallest possible level of scope.
+
+No declaration in an inner scope shall hide or shadow a declaration in
+an outer scope. Compiler flags shall be set to flag and enforce this.
+
+|link:#h.mg25aowb3crv[3.1.2.8] |There shall be no direct or indirect use
+of unbounded recursive function calls.
+
+|link:#h.vdw23oco9358[3.1.2.9] |The only functions that should not
+return some sort of error status are those that cannot possibly fail in
+either today's implementation or tomorrow's.
+
+|link:#h.envas2gdcem[3.1.2.10] a|
+Wherever possible and appropriate, particularly around the management of
+resources, APIs should be symmetric.
+
+For example, if there is a free function or object method that allocates
+a resource, then there should be one that deallocates it. If there is a
+free function or object method that opens a file or network stream, then
+there should be one that closes it.
+
+Further, the names of these free functions or objects methods should be
+consistently named such that the names are consistent with the operation
+being performed and are truly opposites:
+
+* [green]*Good:* open / close
+* [red]*Bad:* open / finish
+* [red]*Bad:* open
+
+In the first _bad_ example, it is likely unclear to the caller whether or
+not `finish` will do more or less than the opposite of `open`. Moreover, in
+the second bad example, things are even worse for the developer, for
+either error handling or successful operation closure, there is no API
+whatsoever to resolve the `open` call.
+
+|link:#h.3rhka3x83t7f[3.1.2.11] a|
+Standard, scalar data types defined in _stdint.h_ \(C) or _cstdint_ (C{plusplus})
+should be used for basic signed and unsigned integer types, especially
+when size and serialization to non-volatile storage or across a network
+is concerned.
+
+Examples of these are: `uint8_t`, `int8_t`, etc.
+
+|link:#h.imbb237rmsjp[3.1.2.12] a|
+Read-only methods, global variables, stack variables, or data members
+that are read-only should be qualified using the C or C{plusplus} `const`
+qualifier.
+
+Pointers or references to read-only objects or storage, including but
+not limited to function parameters, should be qualified using the C or
+C{plusplus} `const` qualifier.
+
+|link:#h.3bq9ctkdcl91[3.1.2.13] a|
+All C, C{plusplus}, Objective C, and Objective C{plusplus} headers shall use
+preprocessor header include guards.
+
+The terminating `endif` preprocessor directive shall have a comment, C or
+C{plusplus} depending on the header type, containing the preprocessor symbol
+introduced by the `ifndef` directive starting the guard.
+
+The symbol used for the guard should be the file name, converted to all
+uppercase, with any spaces (“ “) or dots (“.”) converted to underscores
+(“_”).
+
+<h|link:#h.wyqlzvouefvz[3.1.2.14]
+<h|Function and Method Prototypes
+
+|link:#h.4wx5jmahqtv6[3.1.2.14.1] |All external free functions shall
+have explicit forward declarations accessible via a public header file.
+
+|link:#h.8mpgkl3hzy59[3.1.2.14.2] |All void functions or methods shall
+explicitly declare and specify the void type keyword.
+
+<h|link:#h.yhrr5ii8cfbu[3.1.3]
+<h|Language-dependent
+
+<h|link:#h.mkronrmr00b1[3.1.3.1]
+<h|C
+
+|link:#h.kum6ou45sw6y[3.1.3.1.1] |All header files intended to have C
+symbol linkage shall use “extern C” linkage wrappers.
+
+<h|link:#h.qw4fhssvwwha[3.1.3.2]
+<h|C{plusplus}
+
+|link:#h.y9zkjq5g5hrs[3.1.3.2.1] a|
+Unlike C, C{plusplus} offers an alternate way to alias data over and above a
+pointer, the reference, indicated by the `&` symbol.
+
+Where appropriate, the reference should be preferred to the pointer.
+
+|link:#h.f22itk3xdrc[3.1.3.2.2] |Size- and call frequency-based
+considerations should be made when passing scalars as to whether they
+should be passed by value or by constant reference; however,
+pass-by-value should generally be preferred.
+
+|link:#h.xlq577wwg3li[3.1.3.2.3] a|
+The creation of empty or useless destructors should be avoided.
+
+Empty or useless destructors should be removed.
+
+|link:#h.8k07fbievmzx[3.1.3.2.4] |When you declare C{plusplus} free functions
+and object methods, you should avoid or minimize using default
+parameters.
+
+|link:#h.nhdnx8t0pw6[3.1.3.2.5] |When you declare C{plusplus} virtual object
+methods, you shall avoid using default parameters.
+
+|link:#h.fw4cnu1amog5[3.1.3.2.6] a|
+There shall be no use of global, static or otherwise, object
+construction.
+
+The use of scoped static object construction should be avoided.
+
+|link:#h.hi6zs2jww7m[3.1.3.2.7] |Wherever possible and practical, C{plusplus}
+style casts should be used and preferred to the C style cast equivalent.
+
+|link:#h.ywd7qnlhd26t[3.1.3.2.8] |The C{plusplus} `using namespace` statement
+should not be used outside of object scope inside header files.
+
+<h|link:#h.z146o5vxagmg[3.2]
+<h|Tightly-constrained Systems and Shared Infrastructure
+
+|link:#h.x7lqrzxfz422[3.2.1] |Heap-based resource allocation should be
+avoided.
+
+|link:#h.mn4lcnt0h77r[3.2.2] |There shall be no direct or indirect use
+of recursive function calls.
+
+|link:#h.kmp11gph6x86[3.2.3] |The use of virtual functions should be
+avoided.
+
+|link:#h.ft3tkwpjkeex[3.2.4] |The use of the C{plusplus} Standard Library shall
+be avoided.
+
+|link:#h.puxfseupcu6[3.2.5] |The use of the C{plusplus} Standard Template
+Library (STL) should be avoided or minimized.
+
+|link:#h.quu3bexseloj[3.2.6] |The use of the C{plusplus} templates should be
+avoided or minimized.
+
+|link:#h.vuy3kslcw1c0[3.2.7] |Code shall not use exceptions.
+
+|link:#h.s7u364eurjpt[3.2.7.2] |In the rare case that Project CHIP code
+does interact with external third-party or standard library code that
+does throw exceptions, exceptions shall be caught locally, translated
+into error status, and passed up the stack.
+
+|link:#h.fhtpetw2hmbz[3.2.8] |Code shall not use C{plusplus} runtime type
+information (RTTI), including facilities that rely upon it, such as
+`dynamic_cast` and `typeid`.
+
+<h|link:#h.k2dwfzkooelt[3.3]
+<h|Loosely-constrained Systems
+
+<h|link:#h.fkxd2fqjejt1[4]
+<h|Format and Style
+
+|link:#h.cloehu8xtakl[4.1] a|
+File names should match the names and types of what is described in the
+file.
+
+If a file contains many declarations and definitions, the author should
+choose the one that predominantly describes or that makes the most
+sense.
+
+File contents and names should be limited in the scope of what they
+contain. It may also be possible that there is too much stuff in one
+file and you need to break it up into multiple files.
+
+File names may be extended and the implementation split across multiple
+such files by using a dash (“-”) in the file name to indicate the
+subcomponent or subset of functionality.
+
+File names should be all lower case.
+
+File names should be prefixed with ‘chip’.
+
+File names should follow the pattern
+_chip<component>[-<subcomponent>].\{c,cpp,h,hpp,m,mm}_.
+
+|link:#h.9fouemxk8jl8[4.1.1] |File extensions shall be indicative and
+appropriate for the type and usage of the source or header file.
+
+|link:#h.dux1t2sfd7li[4.2] a|
+Names should be descriptive but not overly so and they should give some
+idea of scope  and should be selected such that wrong code looks wrong.
+
+Names shall not give any idea of type, such as is done with System
+Hungarian notation.
+
+<h|link:#h.grfkn5hjzchk[4.2.2]
+<h|Case
+
+|link:#h.crc9dmkm95gu[4.2.2.1] |C preprocessor symbols should be all
+uppercase.
+
+|link:#h.p60oo0d2bddi[4.2.2.2] |All Project CHIP names in the C language
+shall be in _snake case_.
+
+|link:#h.miwjxvghuyuz[4.2.2.3] a|
+All Project CHIP class, namespace, structure, method, function,
+enumeration, and type names in the C{plusplus} language shall be in _upper camel
+case_.
+
+All Project CHIP instantiated names of instances of classes, namespaces,
+structures, methods, functions, enumerations, and types as well as
+method and function parameters in the C{plusplus} language shall be in _lower
+camel case_.
+
+|link:#h.t4nz5x74stu0[4.2.2.3.3] |All Project CHIP names exported with C
+binding from the C{plusplus} language shall follow the conventions for names in
+the C{plusplus} language.
+
+<h|link:#h.uo3g20huu09d[4.2.3]
+<h|Symbol Qualification
+
+|link:#h.n6ysvjmmnqel[4.2.3.1] |All Project CHIP C public data types and
+free functions should have ‘chip’ prepended to their name.
+
+|link:#h.nzy99j1n0ac[4.2.3.2] |All Project CHIP C{plusplus} or Objective C{plusplus}
+code should be in the ‘chip’ top-level namespace.
+
+|link:#h.yhdcr3jar7zr[4.2.3.2.2] |All Project CHIP names exported with C
+binding or in the global namespace in the C{plusplus} language should have
+‘chip’ prepended to their name.
+
+<h|link:#h.nsqhqioznzub[4.2.4]
+<h|Scope
+
+|link:#h.25a8q2ob61ck[4.2.4.1] |All global data shall have a `g` prepended
+to the name to denote global scope.
+
+|link:#h.4uaw4cwzlxuk[4.2.4.2] |All static data shall have a `s` prepended
+to the name to denote static scope.
+
+|link:#h.qab579rt9d6j[4.2.4.3] |All class or structure data members
+shall have a `m` prepended to the name to denote member scope.
+
+|link:#h.1a2u9etcc6j9[4.2.4.4] a|
+All free function or method parameters should have an `a` prepended to the
+name to denote function parameter scope.
+
+All free function or method parameters may alternatively have:
+
+* `in` prepended to the name to denote input, read-only
+* `out` prepended to the name to denote output, write-only
+* `io` prepended to the name to denote input/output, read/write
+
+function parameters.
+
+|link:#h.mt5fp1320019[4.2.4.5] |All variables that do not have such
+prefixes shall be assumed to be function local scope.
+
+<h|link:#h.6x386e7a0wcc[4.2.5]
+<h|Data Types
+
+|link:#h.pdj6ponw9gcy[4.2.5.1] |Types should be descriptive but not
+overly so and they should give some idea of use.
+
+|link:#h.gn491gg6oa07[4.2.5.2] |Snake case type names should have ‘`_t`’
+appended to their names.
+
+|link:#h.7jck2gn34us8[4.2.6] |Function and method names should be
+descriptive but not overly so and they should give some idea of use.
+
+|link:#h.70bie2xuqpb7[4.2.6.2] |Functions or methods that return or
+allocate resources or objects should have method names indicative of
+their resource management contract.
+
+|link:#h.o0zw9vl7b8qb[4.3] |In compound expressions with multiple
+sub-expressions the intended order of evaluation shall be made explicit
+with parentheses.
+
+|link:#h.yz7soha9efw8[4.4] |There should be no more than one statement
+or variable declaration per line.
+
+|link:#h.i4hp2b46o7to[4.5] |Developers shall make use of white space in
+their code.
+
+|link:#h.h1hnyi16kha7[4.5.2] |Indentation shall be 4 space characters.
+
+|link:#h.2cyrjq9n5v5p[4.5.3] |Conditionals shall always appear on a
+separate line from the code to execute as a result of the condition.
+
+|link:#h.vzkc3ecm85lw[4.5.4] a|
+All scoped (that is, stack) variable declarations should be placed together
+at the top of the enclosing scope in which they are used.
+
+There shall be an empty line after all such variable declarations.
+
+The names of all variable declarations should be left aligned.
+
+|link:#h.8tjkylu9hoq3[4.5.5] a|
+All data member declarations should be placed together.
+
+The names of all data member declarations should be left aligned.
+
+The data member declarations for C{plusplus} classes should be placed at the end
+or tail of the class.
+
+|link:#h.gw77eoogszs3[4.5.6] a|
+Braces should go on their own lines.
+
+Statements should never be on the same line following a closing brace.
+
+|link:#h.ph6w877xgegt[4.5.7] |There should be a single space after
+language-reserved keywords (for, while, if, etc).
+
+<h|link:#h.whogy4gar37m[4.6]
+<h|Comments
+
+| a|
+All C, C{plusplus}, Objective C, Objective C{plusplus}, Perl, Python, and Java code
+should use Doxygen to:
+
+* Detail what the various source and header files are and how they fit
+into the broader context.
+* Detail what the various C{plusplus} / Objective C{plusplus} namespaces are.
+* Detail what the constants, C preprocessor definitions, and
+enumerations are.
+* Detail what the globals are and how they are to be used.
+* Detail what the free function and object / class methods are and how
+they are to be used, what their parameters are, and what their return
+values are.
+* Detail any other important technical information or theory of
+operation unique and relevant to the stack that is not otherwise
+captured in architecture, design, or protocol documentation.
+
+|link:#h.mdgnqcgb7v4s[4.6.1] |Every C, C{plusplus}, Objective C, Objective C{plusplus},
+Perl, Python, Shell, and Java source file should, at minimum, have a
+standard, boilerplate Project CHIP file header that also describes what
+the file is and how, if applicable, it fits into the broader
+implementation.
+
+|link:#h.piy7um1wijnn[4.6.2] a|
+Every public, and ideally private, free function and class method should
+likewise have a prologue comment that:
+
+* Briefly describes what it is and what it does.
+* Describes in detail, optionally, what it is and what it does.
+* Describes the purpose, function, and influence of each parameter as
+well as whether it is an input, an output, or both.
+* Describes the return value, if present, and the expected range or
+constraints of it.
+
+|link:#h.qkbvqttren3o[4.6.3] |Other
+
+|link:#h.ec2gbliviwcl[4.6.3.1] a|
+* *Do* use the '@' Doxygen markup style rather than the '\' markup style.
+* *Do* consider consulting the “Project CHIP Copy Style Guide” if you feel
+uncomfortable or unclear on your own writing style.
+* *Do* also consider consulting tips on
+http://centerforplainlanguage.org/5-steps-to-plain-language/[Plain
+Language] for additional style and tone input.
+* *Do* use consistent terminology and lingo.
+* *Do* properly paragraph justify and wrap your documentation.
+
+** See your editor's documentation on how to do this (for example, M-q in Emacs).
+
+|link:#h.y4bouuh3jgyk[4.6.3.2] a|
+* *Do not* forget to document your files, enumerations, constants,
+classes, objects, namespaces, functions, and methods.
+* *Do not* include the file name in any Doxygen file comments or
+directives.
+
+** Your editor knows the [.underline]#file name#, source code control knows the file
+name, and you know the file name.
+** When it changes on the file system, having to change it in the file
+comments is simply an added burden.
+
+* *Do not* include [.underline]#your name# in any Doxygen comments or directives.
+
+** Source code control knows who you are and what file revisions you own.
+** We do not want our project consumers knowing who you are and calling
+or e-mailing you directly for support.
+
+* *Do not* include the [.underline]#modification date# the file was last changed in
+Doxygen comments or directives, [.underline]#except for the copyright header#.
+
+** Source code control knows when the file was last changed and the date
+other revisions were made.
+
+* *Do not* include subjective or opinionated commentary or expose
+proprietary and confidential information not relevant to the code or
+APIs.
+
+** This content *will be* published to and for consumption by members, the
+CHIP community, and the general public.
+
+|link:#h.404ucmrrowjr[5] |No third-party software shall be used or
+included without prior legal, managerial, and technical authorization
+and approval.
+
+|link:#h.g80rf92mbhlo[6] |All code should be designed for test and co-developed
+with tests.
+
+All code unit tests should be implemented using https://github.com/nestlabs/nlunit-test[nlunit-test].
+
+All tested code should be coverable with code coverage.
+
+<h|link:#h.q6j4dltimysu[7]
+<h|Documentation
+
+<h|link:#h.s32yg4caylj[8]
+<h|Building and Packaging
+|===
+[.text-center]
+*Table 1.1.* Summary of best practices and coding conventions.
+
+[[h.jpdocvkdb8c1]]
+== 2.        Standards
+
+Project CHIP embedded software development adopts the minimum C and C{plusplus}
+standards listed in Table 2.1 below.
+
+[[t.4d8bfeef046f29261fc72f1a903d6d10a909957a]][[t.2]]
+
+[cols=3,options="header"]
+|===
+|Language |Minimum Standard |Aliases
+
+|C|ISO9899:1999|ISO C99, C99
+|C{plusplus}|ISO14882:2011|ISO C{plusplus}11, C{plusplus}11
+|===
+[.text-center]
+*Table 2.1.* C and C{plusplus} language minimum standards adopted by Project CHIP
+software.
+
+Product-specific software may elect to use later standards to the extent
+their software is not broadly shared inside or outside Project CHIP.
+
+[[h.9k10n9q3rxmw]]
+=== 2.1.        C
+
+Project CHIP embedded software development uses and enforces the
+ISO9899:1999 (aka ISO C99, C99) C language standard as the minimum.
+
+Wherever possible, particularly in non-product-specific,
+shared-infrastructure software, toolchain-specific (e.g GCC/GNU)
+extensions or the use of later standards shall be avoided or shall be
+leveraged through toolchain-compatibility preprocessor macros.
+
+[[h.psk6ibil0gsf]]
+==== 2.1.1.        Motivation and Rationale
+
+At the time of this writing, the C99 standard has been out for over 20
+years. Project CHIP and both the new and contributed source code that
+comprise it have only existed for the last seven to eight of those
+20-plus years.
+
+This is beyond more than adequate time for this standard to be pervasive
+throughout any toolchain vendor’s C compiler and saves team members from
+worrying about ISO9899:1990 (aka ISO C90, C90) portability issues that
+have long-since been solved by C99.
+
+[[h.cdtfddg825xl]]
+=== 2.2.        C{plusplus}
+
+Project CHIP embedded software development uses the ISO14882:2011 (aka
+ISO C{plusplus}11) language standard as a baseline for source code
+compatibility. Conformance with other standards, for example, ISO14882:1998
+(aka ISO C{plusplus}98), may be additionally required in cases where wider
+portability is necessary, but in all cases, ISO C{plusplus}11 is the baseline
+requirement.
+
+Wherever possible, particularly in non-product-specific,
+shared-infrastructure software, toolchain-specific (e.g GCC/GNU)
+extensions or the use of later standards shall be avoided or shall be
+leveraged through toolchain-compatibility preprocessor macros.
+
+[[h.uzi88gnrfz2]]
+==== 2.2.1.        Motivation and Rationale
+
+At the time of this writing, the C{plusplus}11 standard has been out for over
+seven years in one form or another and has been twice supplanted, once
+by C{plusplus}14 and again by C{plusplus}17. Project CHIP and the source code it has
+produced are nearly concurrent with C{plusplus}11.
+
+This is beyond more than adequate time for this standard to be pervasive
+throughout any toolchain vendor’s C{plusplus} compiler and saves team members
+from worrying about portability issues that have long-since been solved
+by C{plusplus}11.
+
+By contrast, ISO14882:2014 (aka ISO C{plusplus}14, C{plusplus}14) and ISO14882:2017 (aka
+ISO C{plusplus}17, C{plusplus}17), are still insufficiently broad and pervasive in their
+toolchain support to warrant the introduction of dependencies on these
+standards across all software.
+
+Note, that while C{plusplus}11 is the C{plusplus} language bar, per Figure 1, embrace of
+C{plusplus}11 language- and library-specific features should be approached
+thoughtfully and carefully, depending on the deployment context. A
+loosely-constrained embedded Linux or Darwin application may want a
+broad embrace of C{plusplus}11 language and library features whereas a
+tightly-constrained piece of shared infrastructure may want to eschew
+C{plusplus}11 entirely or conditionally depend on language-specific features,
+where appropriate.
+
+That said, suitable portability mnemonics, for example, via the C
+preprocessor should be used where possible and appropriate to maximize
+code portability, particularly for shared embedded product software. An
+example of such a portability mnemonic is shown in Listing 2.1 below.
+
+[[t.16a6acf58f58baf32a85024efb760804e50a55fe]][[t.3]]
+
+[source,C]
+----
+#ifdef __cplusplus
+# if __cplusplus >= 201103L
+# define __chipFINAL final
+# else
+# define __chipFINAL
+# endif
+#else
+#define __chipFINAL
+#endif
+----
+[.text-center]
+*Listing 2.1.* Using the C preprocessor to provide a portability mnemonic
+for the C{plusplus}11 and later final keyword.
+
+[[h.2r2teebcrgzu]]
+== 3.        Conventions and Best Practices
+
+[[h.8riuslehrhue]]
+=== 3.1.        Common
+
+The following sections summarize those best practices that are
+independent of particular nuances of either the C or C{plusplus} languages.
+
+[[h.gm5hkjt3wjj8]]
+==== 3.1.1.        When in Rome
+
+The most important convention and practice in the Project CHIP embedded
+software is "_When in Rome..._", per the quote below.
+
+[[t.22005318a2e46834df0fdf71b0e440501d9db14d]][[t.4]]
+
+[quote, St. Ambrose]
+____
+If you should be in Rome, live in the Roman manner; if you should be
+elsewhere, live as they do there.
+____
+
+[[h.ho865sup9gc8]]
+===== 3.1.1.1.        Motivation and Rationale
+
+At this stage in the work group’s and the team’s life cycle, it is rare
+the project or subsystem that is entirely new and built from scratch.
+More often than not, development will involve extending, enhancing, and
+fixing existing code in existing projects.
+
+When in this situation, it is mandatory you observe how things are done
+in this context and do the best that you can to follow the prevailing
+conventions present. Not doing so can lead to readability and
+maintenance problems down the line and will likely earn you the
+disapprobation of the code’s _owner_ or other team members.
+
+Your extensions or fixes to existing code should be *indistinguishable*,
+stylistically, from the original code such that the only way to
+ascertain ownership and responsibility is to use the source code control
+system’s change attribution (aka _blame_) feature.
+
+If you find the conventions so foreign or otherwise confusing, it may be
+best to let whoever owns the file make the necessary changes or seek the
+counsel of others in the group to find out what the right thing to do
+is. Never just start changing code wholesale for personal reasons
+without consulting others first.
+
+[[h.4u8s7lcwcspl]]
+==== 3.1.2.        Language-independent
+
+[[h.v5dq4emd6fju]]
+===== 3.1.2.1.        Avoid the Use of Inlines
+
+The use of code in headers and, more specifically, the use of the
+non-local scope inline functions should be avoided.
+
+[[h.21fh5h3lyn7q]]
+====== 3.1.2.1.1.        Motivation and Rationale
+
+Without proper care and oversight and a continuous attention to
+quantitative measurement, excessive inlining can lead to excessive code
+growth.
+
+Care must be taken and measurements must made to assess the impact of
+the:
+
+. number of times a function is called
+. size of the call site setup for each call
+
+From there, relative comparisons should be made between the size of the
+function instantiated and shared once through calls versus inlining that
+same function at each call site.
+
+[[h.ydctsgfxvdwl]]
+====== 3.1.2.1.2.        Exceptions
+
+Simple setters and getters such as those shown in Listing 3.1 are fine
+since the compiler can efficiently optimize these and make their
+overhead as low as a direct data member access.
+
+[[t.52132f1c902cb2d2cee7086b150a6f1665500157]][[t.5]]
+
+[source,C++]
+----
+inline int SetFoo(int aFoo)
+{
+    int status = SUCCESS;
+
+    if (mFoo == aFoo)
+        status = -EALREADY;
+    else
+        mFoo = aFoo;
+
+    return status;
+}
+----
+[.text-center]
+*Listing 3.1.* Using the inline keyword for a simple setter free function.
+
+As always, make quantitative size assessments using the `size` command
+line tool to assess trade-offs between using an inline or not.
+
+[[h.w81efp46u07r]]
+===== 3.1.2.2.        Use Inlines Judiciously
+
+Inline functions should be used judiciously.
+
+[[h.s6j1guu4bjy7]]
+====== 3.1.2.2.1.        Motivation and Rationale
+
+See “link:#h.v5dq4emd6fju[3.1.2.1. Avoid the Use of Inlines]” above.
+
+The judicious use of inlines can make an overall program smaller and
+more efficient. Make sure you can quantitatively measure and prove that
+is the case when you use inlines for small functions, such as simple
+data member setters or getters.
+
+[[h.lznwwfek3mml]]
+===== 3.1.2.3.        Return Statements
+
+There should be one `return` statement per free function or method at the
+end of the free function or method.
+
+[[h.rty7as6c0uuy]]
+====== 3.1.2.3.1.        Motivation and Rationale
+
+Use of `return` at places other than the end of functions can lead to all
+sorts of problems. A function has a single entry point. This makes sense
+and makes it easy to know where execution begins (what variable state
+looks like, what parameters are passed in and how they are validated,
+etc.).
+
+For the same reasons it also make sense to have a single return point.
+With each additional return point that is introduced into a function you
+increase the number of places that must be examined and, potentially,
+updated each time changes are made to that function. In code with
+multiple return points, failure to properly handle each and every return
+point when the function is changed is a common way that bugs are
+introduced. Of these bugs, resource leaks are one of the most common.
+System state may also become inconsistent (and this can lead to some
+very nasty problems to find).
+
+Very often a function starts out simple and having multiple returns
+seems harmless enough. That may indeed be true in some cases (for example, `if
+(...) return 0; else return 1;`). What later often happens, however, is
+that the function gets much more complicated and rather than eliminate
+the multiple return points because it's no longer such a simple piece of
+code, more return points get added because that seems easier to do than
+fix things the right way.
+
+If you go through a few iterations of this, you wind up with needless
+copy and pasting of code at each return point. Naturally, this does not
+always happen, but it does happen often enough to make use of multiple
+return points a very risky and unnecessary proposition.
+
+Additionally, with C{plusplus} in particular, the compiler must determine how to
+unwind the stack frame and destroy any scoped objects for each
+particular `return` site. While the compiler should, in theory, be
+intelligent about eliminating duplication among the unwind and
+destruction code it generates, in practice, many are not leading to
+nearly duplicate code generated at each `return` site. Consequently,
+coding for a single `return` site may also make your code smaller.
+
+[[h.tjgjnfdzmvlt]]
+===== 3.1.2.4.        Non-local Goto
+
+There should be no calls to the functions `setjmp` or `longjmp`.
+
+[[h.8t6hzow490jy]]
+====== 3.1.2.4.1.        Motivation and Rationale
+
+With very few exceptions, it is possible to write any piece of code
+without using non-local gotos. It will be both more readable and
+maintainable without them.
+
+[[h.umhin0x3q9of]]
+====== 3.1.2.4.2.        Exceptions
+
+Using these constructs to implement threading interfaces, such as _POSIX
+Threads_, is not uncommon. Generally-speaking, however, no one should be
+writing and implementing such interfaces.
+
+[[h.96ozmz48upvf]]
+===== 3.1.2.5.        Local Goto
+
+There should be no calls to the C/C{plusplus} keyword `goto`.
+
+[[h.qgrd04srrqqb]]
+====== 3.1.2.5.1.        Motivation and Rationale
+
+With very few exceptions, it is possible to write any piece of code
+without using non-local gotos. It will be both more readable and
+maintainable without them.
+
+Should you find that you're tempted to add a `goto` to solve some coding
+problem, first consider restructuring what is there, factoring some of
+the code into separate functions and/or using a different algorithm.
+Most of the time you'll find that the `goto` is no longer needed.
+
+[[h.i7q73qr638dp]]
+====== 3.1.2.5.2.        Exceptions
+
+The use of local gotos for the purposes of common error handling blocks
+and single points of function return (see link:#h.lznwwfek3mml[3.1.2.3.
+Return Statements]) at the bottom of a function is the first allowable
+exception to this.
+
+The implicit use of local gotos when used in the context of an approved
+declarative assertion macro library, such as
+https://github.com/nestlabs/nlassert[nlassert],
+is the second allowable exception to this.
+
+[[h.ti3ripa6ui4k]]
+===== 3.1.2.6.        C Preprocessor
+
+[[h.27x07deo3a0j]]
+====== 3.1.2.6.1.        Scope
+
+Use of the C preprocessor should be limited to file inclusion and simple
+macros.
+
+[[h.7lstppd2af2e]]
+3.1.2.6.1.1.        Motivation and Rationale
+
+Broad and extensive use of the C preprocessor, like C{plusplus} templates, can
+make code difficult to debug and to search through. From a debugging
+perspective, unlike C{plusplus} templates, all the more so because C
+preprocessor macros are not strongly typed in the way that inline or
+template functions are.
+
+[[h.2ytza4t5ubwx]]
+====== 3.1.2.6.2.        define Directive Scope
+
+Macros shall not be defined within a function or a block and should be
+defined at the top of a file.
+
+[[h.3livfcyimylu]]
+3.1.2.6.2.1.        Motivation and Rationale
+
+Including preprocessor macros within a function or block can lead the
+author or subsequent readers to believe the symbol defined is limited to
+that scope when, in fact, it is not.
+
+Further, such inclusion makes the code more difficult to read.
+
+[[h.vwywf2xaypvn]]
+====== 3.1.2.6.3.        endif Directive Scope
+
+All `#else`, `#elif`, and `#endif` preprocessor directives shall reside in the
+same file as the `#if` or `#ifdef` directive to which they are related.
+
+[[h.g16081bc4uix]]
+3.1.2.6.3.1.        Motivation and Rationale
+
+Debugging and trying to intuit the behavior of preprocessor macros
+across several different file scopes is incredibly difficult.
+
+[[h.p09tg1y8sqca]]
+====== 3.1.2.6.4.        endif Directive Distance
+
+All `#endif` directives equal to or greater than 20 lines away from the
+`#if` or `#ifdef` directive to which they are related shall be decorated by
+language comment indicating the conditional they are associated with.
+
+[[h.rbj54ztbzht]]
+3.1.2.6.4.1.        Motivation and Rationale
+
+While some code editors have built-in support for correlating blocks of
+preprocessor conditional directives, many do not. This means that it may
+be difficult for code readers and reviewers to visually and mentally
+correlate long conditional blocks. Providing such comments helps them
+perform that correlation.
+
+[[h.hhhv35d7i4a1]]
+====== 3.1.2.6.5.        include Directive
+
+[[h.xirzp5o2w8pr]]
+3.1.2.6.5.1.        Placement in File
+
+Preprocessor `#include` directives in a file shall only be preceded by
+other preprocessor directives or comments.
+
+3.1.2.6.5.1.1.        Motivation and Rationale
+
+The typical expectation is that such directives occur at the top of
+files. Enforcing that they be there reinforces that convention and
+follows the rule of least astonishment.
+
+When you are trying to debug or visually analyze code, it is typically a
+large and unpleasant surprise that there is an `#include` directive buried
+deep in the file.
+
+[[h.dscgtbbup8mp]]
+3.1.2.6.5.2.        Style
+
+Preprocessor `#include` directives shall use brace (“<”) and (“>”) style
+for all public headers, including C and C{plusplus} standard library, or other
+first- and third-party public library headers.
+
+Preprocessor `#include` directives should use double quote (‘“‘) and (‘“‘)
+style for all private or relative headers.
+
+3.1.2.6.5.2.1.        Motivation and Rationale
+
+First, using separate styles for public versus private headers makes it
+very easy for the code reader to quickly and easily identify which
+headers are public and which are private.
+
+Second, the brace style uses broader and different search rules relative
+to the narrower search rules used for double quote style.
+
+[[h.3df2tlalosy2]]
+3.1.2.6.5.3.        Ordering
+
+Preprocessor `#include` directives should be grouped, ordered, or sorted
+as follows:
+
+. This compilation unit's corresponding header, if any
+. C{plusplus} Standard Library headers
+. C Standard Library headers
+. Third-party library headers
+. First-party library headers
+. Private or local headers
+. Alphanumeric order within each subgroup
+
+Assuming a subsystem with the following files:
+
+* Private Header and Source Files
+
+** chipfoo/chipfoobar.h
+** chipfoo/chipfoobar.c
+** chipfoo/chipbaz.h
+** chipfoo/chipbaz.c
+** chipfoo/chipbar.h
+
+* Public Header Files
+
+** chipfoo/include/chipfoo/chipfoo.h
+
+An example for the _chipfoo/chipfoobar.c_ source compilation unit is shown
+in Listing 3.2.
+
+[[t.a697ea1e45e7311f9c3434c425e3c23c68e11850]][[t.6]]
+
+[source,C]
+----
+...
+
+#include “chipfoobar.h”
+
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <acme/tools.h>
+
+#include <chip/chiputilities.h>
+
+#include <foo/chipfoo.h>
+
+#include “chipbar.h”
+#include “chipbaz.h”
+
+...
+----
+[.text-center]
+*Listing 3.2.* Conformant example of include directive ordering.
+
+3.1.2.6.5.3.1.        Motivation and Rationale
+
+This convention, first and foremost, with the preferred ordering, if the
+compilation unit’s corresponding header omits any necessary includes,
+the build of the compilation unit will break. Thus, this rule ensures
+that build breakages due to headers that themselves insufficiently
+specify their own include directive dependencies show up first for the
+people working on these files, not for unrelated developers working on
+other packages and components.
+
+Second, this rule establishes a convention in the presence of otherwise
+random or arbitrary header organization.
+
+Beyond that, it ensures that include directives occur mostly in
+dependency order with standards and system libraries acting as the base
+of that dependency graph and taking primacy in symbol definition.
+
+Finally, the convention gives developers an easy, at-a-glance view of
+where to focus in when looking for a particular header.
+
+[[h.n3l3bylxq7tt]]
+====== 3.1.2.6.6.        Redefining Language Keywords
+
+The preprocessor shall not be used to redefine reserved language
+keywords.
+
+[[h.ql0zczkhqre1]]
+3.1.2.6.6.1.        Motivation and Rationale
+
+Redefining reserved language keywords leads to surprising and difficult
+to debug behavior for code reviewers and maintainers.
+
+[[h.5snrngjwi14d]]
+====== 3.1.2.6.7.        Commenting Out or Disabling Code
+
+Unused code shall not be disabled by commenting it out with C- or
+C{plusplus}-style comments or with preprocessor `#if 0 ... #endif` semantics.
+
+[[h.8l03g8lc5ede]]
+3.1.2.6.7.1.        Motivation and Rationale
+
+Code should either be actively maintained and “in” the source base for a
+purpose or removed entirely. Code that is disabled in this way is
+generally sloppy and does not convey a sense of certainty and direction
+in the code.
+
+Anyone who is interested in the history of a particular source code file
+should use the source code control system to browse it.
+
+Code that is debug- or test-only should be moved to a conditionally
+compiled test source file or conditionalized with an appropriate
+`WITH_DEBUG`, `WANT_DEBUG`, `WITH_TESTS`, `WANT_TESTS`, or some similar such
+preprocessor mnemonic that can be asserted from the build system.
+
+Please see “link:#h.piy7um1wijnn[7.3.2. Functions and Methods]” for more
+detail on commenting functions and methods.
+
+[[h.p1wafsz4phs5]]
+====== 3.1.2.6.8.        Token Concatenation
+
+Use of the preprocessor token concatenation operator '`##`' should be
+avoided.
+
+[[h.g7t3oqw943d]]
+3.1.2.6.8.1.        Motivation and Rationale
+
+While this is a very powerful tool of the C preprocessor and can
+eliminate a lot of otherwise duplicative typing, it makes code very
+difficult to debug as it makes symbols difficult, if not impossible, to
+search for in non-preprocessed code.
+
+[[h.97pkzjvbwywl]]
+====== 3.1.2.6.9.        undef Directive
+
+The `undef` preprocessor directive should be avoided and shall never be
+used to undefine a symbol from a foreign module.
+
+[[h.6mk50n64wso5]]
+3.1.2.6.9.1.        Motivation and Rationale
+
+Through the use of the `undef` directive, it becomes possible to have
+multiple definitions of macros with the same name in different file
+scopes with different behavior. Consequently, depending on the order of
+header inclusion, debugging and figuring out which symbol is in effect
+and what behavior will result can be both tedious and difficult.
+
+[[h.cz1ekfdi0nou]]
+3.1.2.6.9.2.        Exceptions
+
+Frequently `undef` is used to limit the scope of the definition of a local
+preprocessor symbol within a module, as shown in Listing 3.3, ensuring
+it does not propagate beyond that scope. This use of `undef` is acceptable
+and encouraged.
+
+[[t.063c45870a85b82e31fad321d77db1a3c248b592]][[t.7]]
+
+[source,C]
+----
+...
+
+#if SOMETHING
+#define __MY_INLINE inline
+#else
+#define __MY_INLINE __inline__
+#endif
+
+__MY_INLINE foo(int aBar);
+__MY_INLINE bar(int aFoo);
+
+#undef __MY_INLINE
+
+...
+----
+[.text-center]
+*Listing 3.3.* Using the undef preprocessor directive to control symbol
+scope.
+
+[[h.q0uzbcc0d4je]]
+===== 3.1.2.7.        Object Scope
+
+Data objects shall be declared at the smallest possible level of scope.
+
+No declaration in an inner scope shall hide or shadow a declaration in
+an outer scope. Compiler flags shall be set to flag and enforce this.
+
+[[h.bjdwc1tydc50]]
+====== 3.1.2.7.1.        Motivation and Rationale
+
+The larger the scope of a data object, the more exercise and thought
+that must be given to managing access to and the lifetime of the data
+object and the more difficult it will be for later evaluators and
+maintainers of the code to reason about the object.
+
+Likewise, while the C and C{plusplus} language specifications are very clear
+about scope precedence, having hidden or shadowed data declarations can
+make it very difficult for later evaluators and maintainers of the
+code—even the original author distanced by time—to reason about the
+correct behavior of the code.
+
+[[h.mg25aowb3crv]]
+===== 3.1.2.8.        Unbounded Recursion
+
+There shall be no direct or indirect use of unbounded recursive function
+calls.
+
+[[h.8ww2ntlg2lir]]
+====== 3.1.2.8.1.        Motivation and Rationale
+
+On our embedded systems there is no paging backing store and, for deeply
+embedded systems, memory resources are constrained and there is no
+dynamic memory allocation. Consequently, thread stacks are practically
+limited and fixed in size and, as a result, unbounded recursion can lead
+to rapid exhaustion in stack resources or the unnecessary expansion of
+those resources leading to non-real time system behavior.
+
+Either reconstruct a recursive algorithm to be non-recursive, thereby
+keeping stack usage constant for that algorithm relative to its
+recursive peer or place depth bounds on the recursion such that maximum
+resource usage can be predicted and accounted for in system resource
+budgeting and provisioning.
+
+[[h.vdw23oco9358]]
+===== 3.1.2.9.        Error Handling
+
+The only functions that should not return some sort of error status are
+those that cannot possibly fail in either today's implementation or
+tomorrow's.
+
+[[h.fs01o63ie9ow]]
+====== 3.1.2.9.1.        Motivation and Rationale
+
+_Murphy_, per the quote below, perhaps expresses the expectations about
+errors and faults best:
+
+[[t.19ab6be410ef0191c10da521211b05de7a0ae580]][[t.8]]
+
+[quote, Murphy]
+____
+Anything that can go wrong, will go wrong.
+____
+
+In light of this, plan for errors and faults.
+
+Once a function has been released to the world (that is, checked in), it
+will be used. If you first use a `void` return type for a free function or
+method and then later decide that it should return status of some type,
+all code that calls that function needs to be revisited. In addition,
+the people that write code that calls that function need to be informed
+and remember that all of a sudden they need to start checking a return
+status.
+
+Think carefully about error handling not only when generating new APIs
+but also when implementing code within the bodies of APIs and
+interfaces. Look at and understand the error schemes used by other parts
+of the code base before just rolling your own.
+
+Look at return status from functions you call and think about what to
+do. Real thought should go into error handling. A mental response along
+the lines of, “I don't know what to do when I get this error, so I'll
+throw it away." is generally *unacceptable*.
+
+If there is nothing reasonable that you can do with an error, then the
+most likely situation is that some other object has called your function
+and you should cleanup and communicate (that is, pass up or return) the
+error status to the caller. An example of bubbling up an error message
+is a failed resource request call, as shown in Listing 3.4 below.
+
+[[t.23bec4bbc0546d877c0adde24ff20b17610228bd]][[t.9]]
+
+[source,C]
+----
+int bar(foo **p)
+{
+    int status = 0;
+
+    ...
+
+    if (p == NULL)
+    {
+        status = -EINVAL;
+    }
+    else
+    {
+       ...
+
+        p = foo_malloc();
+
+        if (p == NULL)
+        {
+            status = -ENOMEM;
+        }
+        else
+        {
+            ...
+        }
+    }
+
+    return status;
+}
+----
+[.text-center]
+*Listing 3.4.* Correctly and successfully handling interface and
+allocation errors by passing return status up to the caller.
+
+Typically, an application will call some other module to allocate a
+resource, which may call through to something else to do something
+equivalent to `open` or `allocate`. At the lowest level, where the
+`open` actually fails, it probably is not appropriate to display an error
+dialog or print a message (other than an assert/debug type message). In
+fact it is probably not appropriate to do *anything* at any level below
+the caller that started the whole process except exit gracefully and
+pass the error to the caller.
+
+In general, modules used by an application should not take any action
+beyond defensive, preventing "bad things from happening" due to errors.
+It should be up to the application to take positive action to recover
+from an error.
+
+Do not use macros that can be compiled out as a method of handling
+errors. Since they can be compiled out they don't always do anything.
+Macros for error flagging can be useful to log unexpected error
+conditions at run time but should never take the place of explicit error
+handling.
+
+Project CHIP’s technologies sit at a unique confluence of consumer
+electronics and the mission- and application-criticality typically
+associated with medical devices or telecommunications and networking
+equipment. Consequently, it is important that the software running on
+them be resilient and robust in the face of errors and faults.
+
+[[h.envas2gdcem]]
+===== 3.1.2.10.        Symmetric APIs
+
+Wherever possible and appropriate, particularly around the management of
+resources, APIs should be symmetric.
+
+For example, if there is a free function or object method that allocates
+a resource, then there should be one that deallocates it. If there is a
+free function or object method that opens a file or network stream, then
+there should be one that closes it.
+
+Further, the names of these free functions or objects methods should be
+consistently named such that the names are consistent with the operation
+being performed and are truly opposites:
+
+* [green]*Good:* open / close
+* [red]*Bad:* open / finish
+* [red]*Bad:* open
+
+In the first _bad_ example, it is likely unclear to the caller whether or
+not `finish` will do more or less than the opposite of `open`. Moreover, in
+the second bad example, things are even worse for the developer, for
+either error handling or successful operation closure, there is no API
+whatsoever to resolve the `open` call.
+
+[[h.oywtgd44z4wh]]
+====== 3.1.2.10.1.        Motivation and Rationale
+
+Having symmetric APIs pays two dividends. The first is that it makes it
+visually and logically easier for humans reading and auditing the API
+and its callers to make sense of it and to identify places where leaks
+or other breakdowns in the API contract are occurring.
+
+The second is that it provides developers a means by which to perform
+both exceptional error handling clean up as well as successful operation
+closure, leaving system resources in a consistent and reusable state.
+
+[[h.mgeqabhbxsbl]]
+====== 3.1.2.10.2.        Exceptions
+
+There are isolated cases in which the system operation semantics are
+such that some resources are singletons and are initialized on system
+start-up and then are never disposed of and cannot be reinitialized
+until the system restarts.
+
+This may be particularly true for constrained systems in which the
+resources needed to implement symmetric APIs aren’t justified because
+they are unneeded. Ideally, the API designer includes a design in which
+the API is symmetric and can be fully tested as such but includes
+compile-time directives in which the deallocation or deinitialization
+half of the API may be optionally compiled out.
+
+[[h.3rhka3x83t7f]]
+===== 3.1.2.11.        Use C _stdint.h_ or C{plusplus} _cstdint_ for Plain Old Data Types
+
+Standard, scalar data types defined in _stdint.h_ \(C) or _cstdint_ (C{plusplus})
+should be used for basic signed and unsigned integer types, especially
+when size and serialization to non-volatile storage or across a network
+is concerned.
+
+Examples of these are: `uint8_t`, `int8_t`, etc.
+
+[[h.w69fpx14vx9b]]
+====== 3.1.2.11.1.        Motivation and Rationale
+
+These types have been effectively standardized since C99 and should be
+available on every platform and provide more neutral portability than
+OS-specific types such as `u8`, `UInt8`, etc. Moreover, because these are
+pervasive, you do not need to spend any time and energy as a developer
+and engineer creating more such types on your own—the compiler vendors
+have already done the hard work for you.
+
+Additionally, using traditional scalar types such as `int`, `short`, or
+`long` have portability issues where data width is concerned because these
+types are sized differently on different processor architectures and
+ABIs for those architectures. For example, a long is 32-bits on some
+architectures and 64-bits on others.
+
+[[h.imbb237rmsjp]]
+===== 3.1.2.12.        Constant Qualifiers
+
+Read-only methods, global variables, stack variables, or data members
+that are read-only should be qualified using the C or C{plusplus} `const`
+qualifier.
+
+Pointers or references to read-only objects or storage, including but
+not limited to function parameters, should be qualified using the C or
+C{plusplus} `const` qualifier.
+
+Examples are shown in Listing 3.5 through Listing 3.7 below.
+
+[[t.1c2ee279d54ba8378e8ace0a21bf28e38eca8382]][[t.10]]
+
+[source,C]
+----
+extern int Bar(const uint8_t *aFirst);
+extern int Foo(int aFirst, int aSecond, const int &aThird);
+----
+[.text-center]
+*Listing 3.5.* Use of the const qualifier with read-only pass-by-pointer
+and -reference parameters.
+
+[[t.8a317cb84b91c40eed70a04826337e0a6abaf672]][[t.11]]
+
+[source,C++]
+----
+class Foo
+{
+public:
+    Foo(void);
+    ~Foo(void);
+
+    int GetBar(void) const;
+
+private:
+    int mBar;
+};
+----
+[.text-center]
+*Listing 3.6.* Use of the const qualifier with read-only object methods.
+
+[[t.5549849ae803384b603e483e2924e5971423c853]][[t.12]]
+
+[source,C]
+----
+int Bar(const uint8_t *aFirst)
+{
+    const size_t length = sizeof (struct chipFoo);
+    ...
+
+    ...
+}
+----
+[.text-center]
+*Listing 3.7.* Use of the const qualifier with read-only variables.
+
+[[h.23cim6tw3fos]]
+====== 3.1.2.12.1.        Motivation and Rationale
+
+Use of the `const` keyword helps both the compiler and the reader of the
+code. It helps the compiler and reader alike by informing them of the
+contractual intent that no modifications to the variable, parameter, or
+object state will or should be made. The compiler, in particular, can
+leverage this intent insight by optimizing the code appropriately.
+
+[[h.3bq9ctkdcl91]]
+===== 3.1.2.13.        Header Include Guard
+
+All C, C{plusplus}, Objective C, and Objective C{plusplus} headers shall use
+preprocessor header include guards.
+
+The terminating `endif` preprocessor directive shall have a comment, C or
+C{plusplus} depending on the header type, containing the preprocessor symbol
+introduced by the `ifndef` directive starting the guard.
+
+The symbol used for the guard should be the file name, converted to all
+uppercase, with any spaces (“ “) or dots (“.”) converted to underscores
+(“_”).
+
+An example of this is shown in Listing 3.8 below.
+
+[[t.5296a7afbcd35894c7de2557adeccca99af1b028]][[t.13]]
+
+[source,C]
+----
+#ifndef CHIPEXAMPLE_HPP
+#define CHIPEXAMPLE_HPP
+...
+#endif // CHIPEXAMPLE_HPP
+----
+[.text-center]
+*Listing 3.8.* Example use of a header include guard for the file
+chipexample.hpp.
+
+[[h.kgh5bv11kkhb]]
+====== 3.1.2.13.1.        Motivation and Rationale
+
+This prevents redundant header inclusion on compilers that cannot detect
+this internally and stems hard-to-debug symbol redefinition errors.
+Also, see “link:#h.p09tg1y8sqca[3.1.2.6.4. endif Directive Distance]”.
+
+[[h.wyqlzvouefvz]]
+===== 3.1.2.14.        Function and Method Prototypes
+
+[[h.4wx5jmahqtv6]]
+====== 3.1.2.14.1.        Forward Declarations
+
+All external free functions shall have explicit forward declarations
+accessible via a public header file.
+
+[[h.svqou5p0wdw3]]
+3.1.2.14.1.1.        Motivation and Rationale
+
+This is a useful hint to the compiler to support ensuring that it can
+check and verify that the implementation of a function matches its
+public declaration. In addition, this a simple courtesy to other
+developers. A user of your public function should be able to include an
+appropriate header that contains your public, forward declaration and
+prototype rather than creating the prototype in their own source.
+
+[[h.8mpgkl3hzy59]]
+====== 3.1.2.14.2.        Void Declarations
+
+All void functions or methods shall explicitly declare and specify the
+`void` type keyword.
+
+[[h.rgzqdvy9x05d]]
+3.1.2.14.2.1.        Motivation and Rationale
+
+The `void` type is an intrinsic type just as is `char`, `short`, and `long`. If
+you declared a function with a single char parameter, you would declare
+it as:
+
+[[t.b397c6b35f96bdfa3c2e594faf3b342af0e39e7f]][[t.14]]
+
+[source,C]
+----
+int foo(char);
+----
+
+and invoke it as:
+
+[[t.afa5f391c7fef35c3f8c9d1989fc727976de72d0]][[t.15]]
+
+[source,C]
+----
+foo(‘c’);
+----
+
+similarly, when declaring a void parameter, the type should be declared
+explicitly:
+
+[[t.c64a5e091e7bbe9b70af32daf84972ab94c63bbc]][[t.16]]
+
+[source,C]
+----
+int bar(void);
+----
+
+where it would be invoked as:
+
+[[t.bde9f255673468301a79e03a399b76057adbfe6b]][[t.17]]
+
+[source,C]
+----
+bar();
+----
+
+This style makes it easy to visually identify and differentiate, at a
+glance, a declaration from an invocation.
+
+[[h.yhrr5ii8cfbu]]
+==== 3.1.3.        Language-dependent
+
+[[h.mkronrmr00b1]]
+===== 3.1.3.1.        C
+
+[[h.kum6ou45sw6y]]
+====== 3.1.3.1.1.        C / C{plusplus} Linkage Wrappers
+
+All header files intended to have C symbol linkage shall use “extern C”
+linkage wrappers as shown in Listing 3.9.
+
+[[t.e07c56ab7bef3c084cde6e1d4157f2b90b0dcb2b]][[t.18]]
+
+[source,C]
+----
+...
+
+#ifndef __cplusplus
+extern “C” {
+#endif
+
+/* C Symbol Definitions Are Placed Within This Brace Scope */
+
+#ifndef __cplusplus
+}
+#endif
+
+...
+----
+[.text-center]
+*Listing 3.9.* Example of using “extern C” linkage wrappers in C header
+files.
+
+[[h.qw4fhssvwwha]]
+===== 3.1.3.2.        C{plusplus}
+
+In Project CHIP, the main idea with C{plusplus} is to think of C{plusplus} as if it were
+C plus classes, C+ if you will.
+
+The C{plusplus} language provides us stricter static type checking and better
+access control. However, as you will read below, some of the other C{plusplus}
+features could be a double-edged sword, felling even the most seasoned
+and experienced of programmers.
+
+If you are working in the context of a tightly constrained system or on
+shared infrastructure code to be used across both tightly- and
+loosely-constrained system, the use of C{plusplus} should be limited to this
+range.
+
+[[h.y9zkjq5g5hrs]]
+====== 3.1.3.2.1.        Prefer Passing Parameters by Reference to Pointer
+
+Unlike C, C{plusplus} offers an alternate way to alias data over and above a
+pointer, the reference, indicated by the `&` symbol.
+
+Where appropriate, the reference should be preferred to the pointer.
+
+[[h.kepl5uvfblg7]]
+3.1.3.2.1.1.        Motivations and Rationale
+
+The semantics of references are stronger than their weaker pointer
+cousins, mandating a reference must always alias a real object whereas a
+pointer can alias just about anything, including NULL. Because of this,
+callees dealing with references need not be burdened with performing
+NULL pointer checks.
+
+While NULL pointers can be great for indicating optionality of a
+parameter, if there is no valid case in which anything other than a real
+object can be passed to your interface, stipulate a reference rather
+than a pointer.
+
+Consider Listing 3.10 below. The overhead imposed by the checking
+required of the pointer-based version of `Subtract` imposes 57% to 200%
+overhead relative to its reference-based version when compiled using G{plusplus}
+4.8.2 for _x86_64-unknown-linux-gnu_.
+
+[[t.2a7dc68f73b77e48ad3890c688cd3e24b928e471]][[t.19]]
+
+[source,C++]
+----
+#include <errno.h>
+
+struct Arguments
+{
+    int mMinuend;
+    int mSubtrahend;
+    int mDifference;
+};
+
+extern int Subtract(Arguments *aArguments);
+extern int Subtract(Arguments &aArguments);
+
+int Subtract(Arguments *aArguments)
+{
+    int status = 0;
+
+    if (aArguments == 0)
+    {
+        status = -EINVAL;
+    }
+    else
+    {
+        aArguments->mDifference =
+            aArguments->mMinuend - aArguments->mSubtrahend;
+    }
+
+    return status;
+}
+
+int Subtract(Arguments &aArguments)
+{
+    aArguments.mDifference =
+        aArguments.mMinuend - aArguments.mSubtrahend;
+
+    return 0;
+}
+----
+[.text-center]
+*Listing 3.10.* Comparison of pass-by-pointer vs. pass-by-reference
+semantics.
+
+[[h.f22itk3xdrc]]
+====== 3.1.3.2.2.        Passing Base Scalars
+
+Size- and call frequency-based considerations should be made when
+passing scalars as to whether they should be passed by value or by
+constant reference; however, pass-by-value should generally be
+preferred.
+
+[[h.gl0pdrnnqg6p]]
+3.1.3.2.3.1.        Motivation and Rationale
+
+Depending on the size of the scalar, compiler, optimization level,
+instruction set architecture (ISA), and application binary interface
+(ABI), both the callee and caller overhead for scalar (that is, non
+structure) types can vary depending on whether the values are passed by
+value or by constant reference. Data are shown below in Table 3.1 and
+Table 3.2 for armv7-none-eabi and x86_64-unknown-linux-gnu,
+respectively.
+
+[[t.19f237ffec37751d079d3b0c2f869bedb3a27ed1]][[t.20]]
+
+[cols="<,>,>,>,>,>,>",options="header"]
+|===
+|Architecture
+6+^|armv7-none-eabi
+h|Pass By
+3+^h|Value
+3+^h|Constant Reference
+h|Type
+^h|Caller
+^h|Callee
+^h|Total
+^h|Caller
+^h|Callee
+^h|Total
+|_bool_
+>|26|22|48|30|18|48
+|_uint8_t_
+>|26|22|48|30|18|48
+|_uint16_t_
+>|30|22|52|32|18|50
+|_uint32_t_
+>|28|16|44|28|18|46
+|_uint64_t_
+>|38|22|60|34|22|56
+|_float_
+>|28|16|44|32|18|50
+|_double_
+>|48|22|70|40|22|62
+|===
+[.text-center]
+*Table 3.1.* Comparison of caller and callee overhead of pass-by-value
+versus pass-by-constant reference for scalar types for the
+armv7-none-eabi binary interface.
+
+[[t.bd4dc60560954f86abc79dfbf28a3181591272e1]][[t.21]]
+
+[cols="<,>,>,>,>,>,>",options="header"]
+|===
+|Architecture
+6+^|x86_64-unknown-linux-gnu
+h|Pass By
+3+^h|Value
+3+^h|Constant Reference
+h|Type
+^h|Caller
+^h|Callee
+^h|Total
+^h|Caller
+^h|Callee
+^h|Total
+|_bool_
+>|10|4|14|21|6|27
+|_uint8_t_
+>|10|5|15|21|7|28
+|_uint16_t_
+>|10|5|15|26|8|34
+|_uint32_t_
+>|10|4|14|24|6|30
+|_uint64_t_
+>|12|5|17|25|8|33
+|_float
+>|13|6|19|24|10|34
+|_double
+>|13|6|19|30|10|40
+|===
+[.text-center]
+*Table 3.2.* Comparison of caller and callee overhead of pass-by-value
+versus pass-by-constant reference for scalar types for the
+x86_64-unknown-linux-gnu binary interface.
+
+Using the ARM ABI as a representative example, while the callee side may
+be smaller for pass-by-constant-reference, the caller side is larger.
+Consequently, for more than one invocation of a function or method, the
+economics of pass-by-value will often prevail.
+
+[[h.xlq577wwg3li]]
+====== 3.1.3.2.3.        Eliminate Unnecessary Destructors
+
+The creation of empty or useless destructors should be avoided.
+
+Empty or useless destructors should be removed.
+
+[[h.y3ur0vcvp0tl]]
+3.1.3.2.3.1.        Motivation and Rationale
+
+Destructors, whether virtual or not, have an impact on code space. For a
+project with a lot of classes, all the useless destructors add up.
+
+When the destructor is virtual, all the worse, because the linker cannot
+dead strip them. Only you, as the developer or engineer, have the
+insight and context to know when such destructors may be eliminated.
+
+[[h.8k07fbievmzx]]
+====== 3.1.3.2.4.        Default Parameters
+
+When you declare C{plusplus} free functions and object methods, you should avoid
+or minimize using default parameters.
+
+[[h.1tnvt8oseo1z]]
+3.1.3.2.4.1.        Motivation and Rationale
+
+The code in Listing 3.11 provides a good example of what is happening
+behind the scenes with the compiler.
+
+[[t.870428a36a483bcf7de366d8d9fa27b8e4a45d21]][[t.22]]
+
+[source,C++]
+----
+#include <stdio.h>
+
+extern void foo(int aParameter, int aOptionalParameter = 1234, void * anOptionalPointer = NULL);
+
+void foo(int aParameter, int anOptionalParameter, void * anOptionalPointer)
+{
+    printf("Received %d %d %p\n", aParameter, anOptionalParameter, anOptionalPointer);
+}
+
+int main(void)
+{
+    foo(42);
+}
+----
+[.text-center]
+*Listing 3.11.* The use of C{plusplus} default parameters in a free function.
+
+The program prints the expected result but there is subtle a piece of
+magic happening courtesy of the compiler that has a cost associated to
+it: it wastes valuable code space.
+
+As shown in Listing 3.12, the compiler has to pass the default values
+`1234` and `NULL` to the function `foo` even if the caller has not specified
+them, accepting the defaults. While at first glance, this does not seem
+like a big deal, if `foo` is called hundreds of times, the waste adds up
+to kilobytes.
+
+The cost of preparing these 2 extra parameters could be as low as 4
+bytes on architectures such as ARM; but, more frequently, it is 8 bytes
+or more.
+
+[[t.62e60c9b4e556a282d0fad214dfcd1ecbf87098a]][[t.23]]
+
+[source]
+----
+000000000040055c <main>:
+  40055c:   55                      push   %rbp
+  40055d:   48 89 e5                mov    %rsp,%rbp
+  400560:   ba 00 00 00 00          mov    $0x0,%edx         # Pass NULL
+  400565:   be d2 04 00 00          mov    $0x4d2,%esi       # Pass 1234
+  40056a:   bf 2a 00 00 00          mov    $0x2a,%edi        # Pass 42
+  40056f:   e8 b9 ff ff ff          callq  40052d <foo(int, int, void*)>
+  400574:   b8 00 00 00 00          mov    $0x0,%eax
+  400579:   5d                      pop    %rbp
+  40057a:   c3                      retq
+  40057b:   0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
+----
+[.text-center]
+*Listing 3.12.* The x86_64 assembly for the main routine from Listing
+3.11.
+
+The preferred way to address this, courtesy of C{plusplus} overloading, is shown
+in Listing 3.13.
+
+[[t.52786415faef32a62515addbb4a4babc7016c2c9]][[t.24]]
+
+[source,C++]
+----
+extern void foo(int aParameter);
+extern void foo(int aParameter, int aOptionalParameter);
+extern void foo(int aParameter,
+                int aOptionalParameter,
+                void * aOptionalPointer);
+
+void foo(int inParameter)
+{
+    foo(inParameter, 1234);
+
+    // Alternatively, if you are worried about performance and want to
+    // avoid the secondary, implicit call overhead.
+
+    foo(inParameter, 1234, NULL);
+}
+
+void foo(int aParameter, int anOptionalParameter)
+{
+    foo(aParameter, anOptionalParameter, NULL);
+}
+
+void foo(int aParameter, int anOptionalParameter, void * anOptionalPointer)
+{
+    printf("Received %d %d %p\n",
+           aParameter,
+           anOptionalParameter,
+           anOptionalPointer);
+}
+
+int main(void)
+{
+    foo(42);
+}
+----
+[.text-center]
+*Listing 3.13.* Minimizing the overhead of C{plusplus} default parameters by using
+function overloading.
+
+This time around, the result is identical, but the compiler calls the
+function `foo` without pushing three (one explicit and two implicit,
+default) parameters like it did in the example in Listing 3.12.
+
+[[h.y6cfawslqmf7]]
+3.1.3.2.4.2.        Exceptions
+
+If you have leaf inlines which do not call other non-inline functions,
+then the compiler can optimize the parameters without having to perform
+a formal call site with default argument passing, as shown in Listing
+3.14.
+
+[[t.773e27812c52d2c6d56ac8e3142ac70d5fdfcd72]][[t.25]]
+
+[source,C++]
+----
+#include <stdint.h>
+#include <stdio.h>
+
+static inline int foo(int aParameter, int aOptionalParameter = 1234, void * anOptionalPointer = NULL)
+{
+    const uint32_t magic = 0x34ac91f0;
+    int            iterator;
+    int            result = 0;
+
+    for (iterator = aParameter; iterator < anOptionalParameter; iterator++)
+    {
+        result = result + (iterator ^ magic);
+
+        if (anOptionalPointer != NULL)
+        {
+            result += *static_cast<int *>(anOptionalPointer);
+        }
+    }
+
+    return result;
+}
+
+int main(void)
+{
+    foo(42);
+
+    return 0;
+}
+----
+[.text-center]
+*Listing 3.14.* Exception to minimizing the overhead of C{plusplus} default
+parameters when leaf inline functions are involved.
+
+However, following the original guideline is still *strongly* recommended
+as subsequent authors of the code that may, absent a comment in the code
+about it, enhance or extend the API to call non-leaf or non-inline
+functions introducing the undesired overhead.
+
+[[h.nhdnx8t0pw6]]
+====== 3.1.3.2.5.        Default Parameters with Virtual Methods
+
+When you declare C{plusplus} virtual object methods, you shall avoid using
+default parameters.
+
+[[h.fer6xmqxejy5]]
+3.1.3.2.5.1.        Motivation and Rationale
+
+If different default parameters are used from superclass to subclass or
+if the superclass uses them but the subclass does not, this can be
+confusing to the reader and extremely difficult to debug.
+
+Inline forwarding functions or the use of the technique described in
+“link:#h.8k07fbievmzx[Avoid or Minimize Default Parameters]” should be
+used.
+
+[[h.fw4cnu1amog5]]
+====== 3.1.3.2.6.        Global and Scoped Static Construction
+
+There shall be no use of global, static or otherwise, object
+construction.
+
+The use of scoped static object construction should be avoided.
+
+Examples of this are shown in Listing 3.15 below.
+
+[[t.4eee2aa40b1b307497050b118b65a7b1bd00e69b]][[t.26]]
+
+[source,C++]
+----
+class Bar
+{
+public:
+    Bar(int aValue) { mValue = aValue; }
+    int GetValue(void) const { return mValue; }
+
+private:
+    int mValue;
+};
+
+// Global Construction
+const Bar gClass(15);
+
+Bar & GetSharedBarInstance(void)
+{
+    // Scoped Static Construction
+    static Bar sBar(42);
+
+    return sBar;
+}
+----
+[.text-center]
+*Listing 3.15.* Global and scoped static object construction.
+
+[[h.ts13wx9s3cn8]]
+3.1.3.2.6.1.        Motivation and Rationale
+
+Whether in embedded systems or not, there are a host of reasons for
+which this is problematic:
+
+* The C{plusplus} standard does not define a means by which the construction of
+global objects are ordered.
+
+** Consequently, it happens in a platform-specific and arbitrary order.
+* * There are no standard ways of indicating dependencies and forcing an
+order without linker script or C{plusplus} runtime start-up customization that
+make both very platform-, compiler-, and application-dependent.
+
+* Scope static objects must be constructed once and only once, when the
+scope is first executed.
+
+** This is guaranteed using some runtime semantics which not only have
+large overhead but is also difficult to orchestrate on deeply-embedded
+systems.
+
+*** This entails an extra piece of in-RAM state to effect a once variable
+for each object as well as code to set and check it.
+*** This variable setting and checking must also be thread safe, so the
+compiler also generates a lock and lock management code as well.
+
+* For both global and scoped static construction, the C{plusplus} runtime tries,
+per the standard to call the destructors when `main` entry point exits.
+
+** It does that by calling `atexit()` which, in turn, uses the heap to
+dynamically allocate the necessary closures for these destructors.
+** Unfortunately, many of Project CHIP’s deeply-embedded runtimes do not
+support heap-based allocation.
+** Whether or not `atexit` and `malloc` are called, there are nearly 100
+bytes (on ARM architectures) of unneeded stub function calls per
+construction, for the thread-safe once variable management.
+
+[[h.hi6zs2jww7m]]
+====== 3.1.3.2.7.        C{plusplus}-style Casts
+
+Wherever possible and practical, C{plusplus} style casts should be used and
+preferred to the C style cast equivalent.
+
+[[h.ki779oh71f7u]]
+3.1.3.2.7.1.        Motivation and Rationale
+
+One of the advantages of using C{plusplus} over C is its stronger type checking
+capabilities. This extends to the C{plusplus} style casts.
+
+The C style cast of:
+
+[source,C]
+----
+(type)(rvalue)
+----
+
+is a blunt instrument in that it tells the compiler, “Trust me. I know
+what I am doing; treat this rvalue as this type. It’ll be fine.
+Really.”, even if it is technically incorrect or illogical. By contrast,
+the C{plusplus} casts:
+
+* `const_cast`
+* `static_cast`
+* `reinterpret_cast`
+
+provide varying degrees of power and are strongly-typed, preventing
+you—or at least making it more difficult—from making casts that are
+technically incorrect or illogical.
+
+[[h.ywd7qnlhd26t]]
+====== 3.1.3.2.8.        Avoid using namespace Statements in Headers
+
+[[h.a6ax5b5rpvcp]]
+3.1.3.2.8.1.        Motivation and Rationale
+
+By doing this, you are effectively forcing every other module that
+includes the header to also be using the namespace. This causes
+namespace pollution and generally defeats the purposes of namespaces.
+Fully-qualified symbols should be used instead.
+
+[[h.z146o5vxagmg]]
+=== 3.2.        Tightly-constrained Systems and Shared Infrastructure
+
+Applicability to tightly-constrained systems also generally applies to
+shared infrastructure software that is used on both tightly- and
+loosely-constrained systems.
+
+[[h.x7lqrzxfz422]]
+==== 3.2.1.        Avoid Heap-based Resource Allocation
+
+Heap-based resource allocation should be avoided.
+
+[[h.s1ou8umsa4tc]]
+===== 3.2.1.1.        Motivation and Rationale
+
+As emphasized throughout this document, the software produced by Project
+CHIP is consumed both inside and outside Project CHIP, across a variety
+of platforms. The capabilities of these platforms are broad, spanning
+soft real-time, deeply-embedded systems based on FreeRTOS to richer,
+softly-embedded systems based on non-RTOS platforms such as Linux or
+Darwin. While the latter are apt to have fully-functional heaps, the
+former explicitly do not.
+
+Consequently, when planning new or extending existing projects, consider
+the platforms to which the project is targeted. If the platforms include
+those deeply-embedded platforms absent functioning heaps, then
+heap-based resource allocation is absolutely forbidden. If not,
+consideration should be made to the cost / benefit trade-offs of
+heap-based allocation and, if possible, it should be avoided.
+
+[[h.ot9bnxg09sh4]]
+===== 3.2.1.2.        Alternatives
+
+In either case, recommended resource allocation alternatives are:
+
+* In Place Allocation and Initialization
+* Pool-based Allocators
+* Platform-defined and -assigned Allocators
+
+[[h.vjlnlsxz1fk1]]
+====== 3.2.1.2.1.        Use In Place Allocation and Initialization
+
+Regardless of whether the source code and runtime are C or C{plusplus}, the
+first step is creating storage for the object being allocated and
+initialized. For simple
+https://en.wikipedia.org/wiki/Passive_data_structure[plain-old-data
+(POD)] data structures, this can be done by just allocating the
+structure at an appropriate scope. Alternatively, _raw_ storage can be
+allocated and then cast. However, great care must be taken with the
+latter approach to ensure that natural machine alignments and language
+strict-aliasing rules are observed. With the simple data structure
+declaration, the compiler does this on your behalf. With the raw
+approach, you must do this.
+
+Once the storage has been allocated, then use symmetric initializers and
+deinitializers such as those, for example, for `pthread_attr_t`. An
+example is shown below in Listing 3.16.
+
+[[t.f097f282632da31b71ffea4dd27459329969047f]][[t.27]]
+
+[source,C]
+----
+#include <pthread.h>
+#include <stdint.h>
+
+...
+
+#if USE_STRUCT_STORAGE
+// Allocate the structure directly.
+static pthread_attr_t sThreadAttributes;
+
+#elif USE_RAW_STORAGE
+// Allocate the structure using "raw" storage.
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof(align_type) - 1)) / sizeof(align_type))]
+
+static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (pthread_attr_t), uint64_t);
+
+#endif // USE_STRUCT_STORAGE
+
+int foobar(void)
+{
+    int              retval;
+    int              status;
+    pthread_t        thread;
+    pthread_attr_t * attrs = (pthread_attr_t *)&sThreadAttributes;
+
+    // Now "construct" or initialize the storage.
+    retval = pthread_attr_init(attrs);
+
+    if (retval == 0)
+    {
+        retval = pthread_create(&thread, attrs, NULL, NULL);
+
+        if (retval == 0)
+        {
+            status = pthread_join(thread, NULL);
+
+            if (status != 0)
+            {
+                retval = status;
+            }
+
+            status = pthread_attr_destroy(attrs);
+
+            if (status != 0)
+            {
+                retval = status;
+            }
+        }
+    }
+
+    return retval;
+}
+----
+[.text-center]
+*Listing 3.16.* Using in place allocation and initialization in C or C{plusplus}.
+
+For non-scalar types and objects such as C{plusplus} classes, this gets slightly
+trickier since C{plusplus} constructors and destructors must be accounted for
+and invoked. Fortunately, C{plusplus} has placement new which handles this.
+Listing 3.17 below modifies Listing 3.16 above using C{plusplus} placement new
+to ensure the class is properly constructed before initialization and
+destructed after deinitialization.
+
+[[t.c36e7704d587c703346c3f4e97ca3e315ec65bc7]][[t.28]]
+
+[source,C++]
+----
+#include <new>
+
+#include <pthread.h>
+#include <stdint.h>
+
+...
+
+class ThreadAttributes
+{
+public:
+    ThreadAttributes(void) {};
+    ~ThreadAttributes(void) {};
+
+    operator pthread_attr_t *(void) { return &mAttributes; }
+
+private:
+    pthread_attr_t mAttributes;
+};
+
+// Allocate the structure using "raw" storage.
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (ThreadAttributes), uint64_t);
+
+int foobar(void)
+{
+    int                retval = -1;
+    int                status;
+    pthread_t          thread;
+    ThreadAttributes * ta;
+    pthread_attr_t *   attrs;
+
+    ta = new (&sThreadAttributes) ThreadAttributes;
+
+    if (ta != NULL)
+    {
+        attrs = static_cast<pthread_attr_t *>(*ta);
+
+        // Now "construct" or initialize the storage.
+        retval = pthread_attr_init(attrs);
+
+        if (retval == 0)
+        {
+            retval = pthread_create(&thread, attrs, NULL, NULL);
+
+            if (retval == 0)
+            {
+                status = pthread_join(thread, NULL);
+
+                if (status != 0)
+                {
+                    retval = status;
+                }
+
+                status = pthread_attr_destroy(attrs);
+
+                if (status != 0)
+                {
+                    retval = status;
+                }
+            }
+        }
+
+        ta->~ThreadAttributes();
+    }
+
+    return retval;
+}
+----
+[.text-center]
+*Listing 3.17.* Using C{plusplus} placement new for in place allocation and
+initialization.
+
+[[h.75lv77hnmovy]]
+====== 3.2.1.2.2.        Use Pool-based Allocators
+
+In place allocation allows the successful allocation, initialization,
+deinitialization, and deallocation of a single object allocated from
+preallocated storage. However, if the desire exists for a fixed,
+configurable pool of objects where 0 to `n` of such objects can be
+allocated at any one time, a pool allocator for that specific object
+type must be created.
+
+As shown in Listing 3.18 below, a pool allocator for a `Foo` class of
+`CHIP_FOO_COUNT` objects is effected, assuming the existence of another
+helper class, StaticAllocatorBitmap, which uses a bitmap to track the
+storage of objects from a static array of storage.
+
+[[t.ec6ff8023cd9bbcf2515fce148c7dabc3c2a3ebd]][[t.29]]
+
+[source,C++]
+----
+
+#include <stdint.h>
+
+class Foo
+{
+public:
+    Foo(void);
+    Foo(const Foo &inFoo);
+    ~Foo(void);
+};
+
+static DEFINE_ALIGNED_VAR(sFooAllocatorBuffer, sizeof (StaticAllocatorBitmap), uint32_t);
+static StaticAllocatorBitmap *sFooAllocator;
+
+static void CreateFooAllocator(void *inStorage,
+                               const StaticAllocatorBitmap::size_type &inStorageSize,
+                               const StaticAllocatorBitmap::size_type &inElementCount,
+                               StaticAllocatorBitmap::InitializeFunction inInitialize,
+                               StaticAllocatorBitmap::DestroyFunction inDestroy)
+{
+    sFooAllocator = new (sFooAllocatorBuffer)
+        StaticAllocatorBitmap(inStorage,
+                              inStorageSize,
+                              inElementCount,
+                              inInitialize,
+                              inDestroy);
+}
+
+static StaticAllocatorBitmap &GetFooAllocator(void)
+{
+    return *sFooAllocator;
+}
+
+static void *FooInitialize(AllocatorBase &inAllocator, void *inObject)
+{
+    memset(inObject, 0, sizeof(Foo));
+
+    return inObject;
+}
+
+static void FooDestroy(AllocatorBase &inAllocator, void *inObject)
+{
+    return;
+}
+
+int Init(void)
+{
+    static const size_t sFooCount = CHIP_FOO_COUNT;
+    static chipAllocatorStaticBitmapStorageDefine(sFooStorage, Foo, sFooCount, uint32_t, sizeof (void *));
+    int retval = 0;
+
+    CreateFooAllocator(sFooStorage,
+                       sizeof (sFooStorage),
+                       sFooCount,
+                       FooInitialize,
+                       FooDestroy);
+
+    return retval;
+}
+
+Foo * FooAllocate(void)
+{
+    Foo *foo;
+
+    foo = static_cast<Foo *>(GetFooAllocator().allocate());
+
+    return foo;
+}
+
+void FooDeallocate(Foo *inFoo)
+{
+    GetFooAllocator().deallocate(inFoo);
+}
+----
+[.text-center]
+*Listing 3.18.* Using pool-based allocators.
+
+[[h.2l9r56wchq79]]
+====== 3.2.1.2.3.        Use Platform-defined and -assigned Allocators
+
+This is a variation on both in place allocation and pool-based
+allocation in that it completely delegates resource allocation to the
+system integrator and the platform on which the particular software
+subsystem is running.
+
+The advantage of this approach is that it allows the platform to decide
+how resource allocation will be handled and allows the package to scale
+independently of platform resource allocation.
+
+The package may define default implementations for a few types of
+platform allocation strategies, such as heap-based allocators and
+pool-based allocators.
+
+There are a range of granularities for achieving this type of
+delegation, depending on the desired size of the API surface, as shown
+in Listing 3.19 through Listing 3.22 below.
+
+[[t.62183ad11f6a43dac06b6ec0abc4b3e011daa7bd]][[t.30]]
+
+[source,C++]
+----
+
+chipPlatformInitFooAllocator();
+chipPlatformInitBarAllocator();
+…
+foo = chipPlatformGetFooAllocator().allocate();
+…
+chipPlatformGetFooAllocator().deallocate(foo);
+…
+bar = chipPlatformGetBarAllocator().allocate();
+…
+chipPlatformGetBarAllocator().deallocate(bar);
+----
+[.text-center]
+*Listing 3.19.* Using a common allocator method pattern with unique
+allocators per object, accessed from a unique singleton access per
+allocator.
+
+[[t.a7a8096f4f3e091008a3ae9e4f469eb0b9e13ff2]][[t.31]]
+
+[source,C++]
+----
+chipPlatformInitAllocator(CHIP_FOO_T);
+chipPlatformInitAllocator(CHIP_BAR_T);
+…
+foo = chipPlatformGetAllocator(CHIP_FOO_T).allocate();
+…
+chipPlatformGetAllocator(CHIP_FOO_T).deallocate(foo);
+…
+bar = chipPlatformGetAllocator(CHIP_BAR_T).allocate();
+…
+chipPlatformGetAllocator(CHIP_BAR_T).deallocate(bar);
+----
+[.text-center]
+*Listing 3.20.* Using a common allocator method pattern with unique
+allocators per object, accessed from a common singleton access with type
+per allocator.
+
+[[t.efdf1a2a6a3fd62ef9f7023999a53d7ec46ab19e]][[t.32]]
+
+[source,C]
+----
+chipPlatformInitFooAllocator();
+chipPlatformInitBarAllocator();
+…
+foo = chipPlatformFooAllocate();
+…
+chipPlatformFooDeallocate(foo);
+…
+bar = chipPlatformBarAllocate();
+…
+chipPlatformBarDeallocate(bar);
+----
+[.text-center]
+*Listing 3.21.* Using unique allocators per object.
+
+[[t.21842072f1b1e0b12fedb4f17fdaa0765e7dffeb]][[t.33]]
+
+[source,C]
+----
+
+chipPlatformInitAllocator(CHIP_FOO_T);
+chipPlatformInitAllocator(CHIP_BAR_T);
+…
+foo = chipPlatformAllocate(CHIP_FOO_T);
+…
+chipPlatformDeallocate(CHIP_FOO_T, foo);
+…
+bar = chipPlatformAllocate(CHIP_BAR_T);
+…
+chipPlatformBarDeallocate(CHIP_BAR_T, bar);
+----
+[.text-center]
+*Listing 3.22.* Using a common allocator pattern with unique allocators
+per object, accessed from a common interface with type per allocator.
+
+[[h.mn4lcnt0h77r]]
+==== 3.2.2.        Recursion
+
+There shall be no direct or indirect use of recursive function calls.
+
+[[h.w6o04dg7ppyg]]
+===== 3.2.2.1.        Motivation and Rationale
+
+On deeply embedded systems, particularly those with constrained
+resources and no dynamic memory allocation, thread stacks are both
+limited and fixed in size. Consequently, unbounded or even shallow
+recursion can lead to rapid exhaustion in stack resources and the
+unnecessary expansion of those resources.
+
+Typically, a recursive algorithm (while clever) can be restructured to
+be non-recursive, thereby keeping stack usage constant for that
+algorithm relative to its recursive peer.
+
+[[h.kmp11gph6x86]]
+==== 3.2.3.        Avoid the Use of Virtual Functions
+
+The use of virtual functions should be avoided.
+
+[[h.5tazakvuilsx]]
+===== 3.2.3.1.        Motivation and Rationale
+
+While virtual functions definitely solve a very real design problem and
+serve a very real purpose, their use is frequently misunderstood and,
+consequently, they are frequently overused when a more efficient
+solution could be employed. In addition, their use and inclusion exacts
+very real overhead in the system. That overhead comes in two forms:
+
+* The addition of the first virtual function to an object adds an
+implicit pointer to the object for a virtual function dispatch table, or
+_vtable_, growing the object by 4 or 8 bytes, depending on the processor
+architecture.
+* All virtual method calls are dereferenced or indirected through this
+_vtable_, implying that the overhead to call a virtual function is higher
+than for a non-virtual function.
+
+Virtual functions are most effective and applicable where there are
+multiple *runtime* instances of an object, each of which effects a common
+base interface but may have a very different underlying implementations,
+implementations which need to be differentiated at *runtime*.
+
+If there will only ever be one concrete implementation of an object in
+the system at runtime, then other techniques such as a static symbol
+dependency can be used.
+
+If at the beginning of the project you thought it was a good idea to
+keep the design as flexible as possible with virtual methods sprinkled
+around your objects, but the need for them did not materialize, revisit
+and eliminate the unnecessary virtual methods.
+
+[[h.ft3tkwpjkeex]]
+==== 3.2.4.        C{plusplus} Standard Library
+
+The use of the C{plusplus} Standard Library shall be avoided.
+
+[[h.puxwibas4ffv]]
+===== 3.2.4.1.        Motivation and Rationale
+
+The C{plusplus} Standard Library, including the string and stream libraries, are
+large and provide limited utility over their C Standard Library
+counterparts with all of the overhead of exceptions and runtime type
+information that we further want to avoid.
+
+Use the C Standard Library instead.
+
+[[h.puxfseupcu6]]
+==== 3.2.5.        C{plusplus} Standard Template Library (STL)
+
+The use of the C{plusplus} Standard Template Library (STL) should be avoided or
+minimized.
+
+[[h.kn1dncdbm1qj]]
+===== 3.2.5.1.        Motivation and Rationale
+
+Much of the C{plusplus} Standard Template Library relies on dynamic memory
+allocation and exceptions, the latter of which are forbidden by this
+document.
+
+In addition, while there are at this point in time few if any bugs in
+the STL itself, code that uses STL can be difficult to debug.
+
+Finally, in the hands of the non-expert, injudicious use of STL can
+quickly lead to unexpected code growth as instantiations of templates
+with different types can lead to many unique but otherwise identical
+template instantiations.
+
+[[h.quu3bexseloj]]
+==== 3.2.6.        C{plusplus} Templates
+
+The use of the C{plusplus} templates should be avoided or minimized.
+
+[[h.o6v3xzty75an]]
+===== 3.2.6.1.        Motivation and Rationale
+
+Code that uses C{plusplus} templates can be difficult to debug. However, they
+are far preferable to using the C preprocessor, when and where
+absolutely necessary.
+
+In addition, in the hands of the non-expert, injudicious use of STL can
+quickly lead to unexpected code growth as instantiations of templates
+with different types can lead to many unique but otherwise identical
+template instantiations.
+
+[[h.vuy3kslcw1c0]]
+==== 3.2.7.        Exceptions
+
+Code shall not use exceptions.
+
+[[h.h46yos89hitf]]
+===== 3.2.7.1.        Motivation and Rationale
+
+Exceptions add extra and substantial overhead to the code to ensure
+that, when an exception is thrown, all the appropriate error handling
+and object destruction occurs across whatever call frames the exception
+might possibly traverse before it is caught.
+
+Per this document, best practice and style is to use return error codes
+or status and to propagate them iteratively back up the call stack
+chain. Error handling and object destruction still needs to occur;
+however, it is explicitly generated by the developer rather than
+automatically and pessimistically by the compiler and is therefore
+smaller.
+
+[[h.s7u364eurjpt]]
+===== 3.2.7.2.        Exception Conversion
+
+In the rare case that Project CHIP code does interact with external
+third-party or standard library code that does throw exceptions,
+exceptions shall be caught locally, translated into error status, and
+passed up the stack, as prescribed in link:#h.vdw23oco9358[3.1.2.9.
+Error Handling].
+
+An example of this is shown below in Listing 3.23.
+
+[[t.dfbb1c00e42570a4f6c4073233d1751fe57d2444]][[t.34]]
+
+[source,C++]
+----
+
+int chipFooAllocate(chipFoo *& aFoo)
+{
+	int retval = 0;
+
+	try
+	{
+		aFoo = sFooInstace().allocate();
+	}
+
+	catch (std::bad_alloc &anException)
+	{
+		retval = -ENOMEM;
+	}
+
+	return retval;
+}
+----
+[.text-center]
+*Listing 3.23.* Local termination of exceptions and propagation as error
+status.
+
+[[h.fhtpetw2hmbz]]
+==== 3.2.8.        Runtime Type Information (RTTI)
+
+Code shall not use C{plusplus} runtime type information (RTTI), including
+facilities that rely upon it, such as `dynamic_cast` and `typeid`.
+
+[[h.3d6buxo8847m]]
+===== 3.2.8.1.        Motivation and Rationale
+
+Runtime type information adds extra and substantial overhead to the code
+to ensure that any generic base pointer can be generically introspected
+to find out what type it is.
+
+Rather than incurring this overhead for every object in the system,
+object-specific introspection should be used when and where necessary to
+provide comparable but application-specific functionality.
+
+[[h.k2dwfzkooelt]]
+=== 3.3.        Loosely-constrained Systems
+
+There are no conventions and best practices guidelines specific to
+loosely-constrained systems at this time.
+
+[[h.fkxd2fqjejt1]]
+== 4.        Format and Style
+
+[[h.cloehu8xtakl]]
+=== 4.1.        File Names
+
+File names should match the names and types of what is described in the
+file.
+
+If a file contains many declarations and definitions, the author should
+choose the one that predominantly describes or that makes the most
+sense.
+
+File contents and names should be limited in the scope of what they
+contain. It may also be possible that there is too much stuff in one
+file and you need to break it up into multiple files.
+
+File names may be extended and the implementation split across multiple
+such files by using a dash (“-”) in the file name to indicate the
+subcomponent or subset of functionality.
+
+File names should be all lower case.
+
+File names should be prefixed with ‘chip’.
+
+File names should follow the pattern
+_chip<component>[-<subcomponent>].\{c,cpp,h,hpp,m,mm}_.
+
+Examples are provided in Table 4.1 and in the list below.
+
+[[t.2d85502afccbdd6f629b035a9b883d8898fb7005]][[t.35]]
+
+[cols=3,options="header"]
+|===
+|Type |Language |File Name
+
+|chip_hash_table|C|chiphashtable.[ch]
+|chipHashTable|C or C{plusplus}|chiphashtable.{c,cpp,h,hpp}
+|chip::HashTable|C{plusplus}|chiphashtable.{cpp,hpp}
+|===
+[.text-center]
+*Table 4.1.* File names for specific data types and languages.
+
+* _chipfoo-types.h_
+
+** Basic public types for the foo subsystem.
+
+* _chipfoo-private.[ch]_
+
+** Private types and interfaces for the foo subsystem.
+
+* _chipfoo-test.[ch]_
+
+** Test types and interfaces for the foo subsystem.
+
+[[h.9fouemxk8jl8]]
+==== 4.1.1.        Extensions
+
+File extensions shall be indicative and appropriate for the type and
+usage of the source or header file, as directed by Table 4.2 below.
+
+[[t.13ec47090f88712d5728f3152e92730353657fb0]][[t.36]]
+
+[cols=3,options="header"]
+|===
+|Extension |Type |Usage
+
+|.h|Header|C-only or C and C{plusplus} with appropriate __cplusplus guards.
+|.hpp|Header|C{plusplus}-only.
+|.c|Source|C-only.
+|.cpp|Source|C{plusplus}-only.
+|.m|Source|Objective C-only.
+|.mm|Source|Objective C{plusplus}-only.
+|===
+[.text-center]
+*Table 4.2.* File extensions for specific file types and usages.
+
+[[h.dux1t2sfd7li]]
+=== 4.2.        Naming
+
+Names should be descriptive but not overly so and they should give some
+idea of scope  and should be selected such that wrong code looks wrong.
+
+Names shall not give any idea of type, such as is done with System
+Hungarian notation.
+
+[[h.l007z8dc3ip8]]
+==== 4.2.1.        Motivation and Rationale
+
+Short, vague variable names—outside of basic loop iterators, no matter
+how convenient they might be to type, are just a bad idea because their
+use and context is often ambiguous.
+
+The days of FORTRAN and BASIC's requirements for tiny variable names are
+long gone, so let us take advantage of that.
+
+[[h.grfkn5hjzchk]]
+==== 4.2.2.        Case
+
+[[h.crc9dmkm95gu]]
+===== 4.2.2.1.        C Preprocessor
+
+C preprocessor symbols should be all uppercase.
+
+[[h.10vm0mwa1h80]]
+====== 4.2.2.1.1.        Motivation and Rationale
+
+This convention makes it clear that such symbols are typically
+preprocessor macros.
+
+[[h.p60oo0d2bddi]]
+===== 4.2.2.2.        C
+
+All Project CHIP names in the C language shall be in _snake case_.
+
+[[h.7g2jekkhysl3]]
+====== 4.2.2.2.1.        Motivation and Rationale
+
+This is previously-agreed-upon long-standing convention.
+
+[[h.miwjxvghuyuz]]
+===== 4.2.2.3.        C{plusplus}
+
+All Project CHIP class, namespace, structure, method, function,
+enumeration, and type names in the C{plusplus} language shall be in _upper camel
+case_.
+
+All Project CHIP instantiated names of instances of classes, namespaces,
+structures, methods, functions, enumerations, and types as well as
+method and function parameters in the C{plusplus} language shall be in _lower
+camel case_.
+
+Examples are shown in Listing 4.1.
+
+[[t.886ca17159896112ac4493886b14c0055be19324]][[t.37]]
+
+[source,C++]
+----
+namespace chip
+{
+
+namespace ExampleNamespace
+{
+
+class ExampleClass
+{
+public:
+    enum ExampleEnumeration {
+        kFirstEnumeration,
+        kSecondEnumeration
+    };
+
+    typedef int Status;
+
+public:
+    ExampleClass(void);
+    ~ExampleClass(void);
+
+    Status ExampleMethod(int aParameter);
+    Status SetEnumeration(ExampleEnumeration aEnumeration)
+    {
+         Status retval = 0;
+
+         if (mEnumeration == aEnumeration)
+         {
+             retval = -EALREADY;
+         }
+         else
+         {
+             mEnumeration = aEnumeration;
+         }
+
+         return retval;
+     }
+
+     ExampleEnumeration GetEnumeration(void) const;
+
+private:
+    ExampleEnumeration mEnumeration;
+};
+
+ExampleClass::ExampleEnumeration GetEnumeration(ExampleClass &aClass);
+
+}; // namespace ExampleNamespace
+
+}; // namespace chip
+----
+[.text-center]
+*Listing 4.1.* Example usage of lower and upper camel case in the C{plusplus}
+language.
+
+[[h.145w2jejpii6]]
+====== 4.2.2.3.1.        Motivation and Rationale
+
+This is previously-agreed-upon long-standing convention.
+
+[[h.qmpdysuy5ua3]]
+====== 4.2.2.3.2.        Exceptions
+
+The top level Project CHIP namespace ‘chip’.
+
+[[h.t4nz5x74stu0]]
+====== 4.2.2.3.3.        C in C{plusplus}
+
+All Project CHIP names exported with C binding from the C{plusplus} language
+shall follow the conventions for names in the C{plusplus} language, per
+link:#h.miwjxvghuyuz[4.2.2.3].
+
+[[h.6lzjnxpm2beg]]
+4.2.2.3.3.1.        Motivation and Rationale
+
+This follows the module or subsystem convention (ostensibly C{plusplus} here) in
+preference to the language convention.
+
+[[h.uo3g20huu09d]]
+==== 4.2.3.        Symbol Qualification
+
+[[h.n6ysvjmmnqel]]
+===== 4.2.3.1.        C
+
+All Project CHIP C public data types and free functions should have
+‘chip’ prepended to their name.
+
+Examples are shown in Listing 4.2.
+
+[[t.9e4901a2b94bed282ed6ce90a013ca77e14c0a46]][[t.38]]
+
+[source,C]
+----
+enum chip_example_enumeration
+{
+    first_enumeration,
+    second_enumeration
+};
+
+typedef chip_example_enumeration chip_example_enumeration;
+
+struct chip_example_struct
+{
+    chip_example_enumeration   enumeration;
+    void *                     data;
+};
+
+extern int chip_function(chip_example_enumeration enumeration);
+
+extern chip_example_enumeration chip_global_example_enumeration;
+----
+[.text-center]
+*Listing 4.2.* Example usage of ‘chip’ symbol qualification in the C
+language.
+
+[[h.axx89bk7v82m]]
+====== 4.2.3.1.1.        Motivation and Rationale
+
+The ‘chip’ qualifier prevents symbol collisions with standard, system,
+platform, or vendor symbols and further makes it clear which code is
+owned and managed by Project CHIP and which is not.
+
+[[h.nzy99j1n0ac]]
+===== 4.2.3.2.        C{plusplus}
+
+All Project CHIP C{plusplus} or Objective C{plusplus} code should be in the ‘chip’
+top-level namespace.
+
+An example is shown in Listing 4.3 below.
+
+[[t.56bc6b62b3c5016a8b76744b5a3410252ab04411]][[t.39]]
+
+[source,C++]
+----
+namespace chip
+{
+
+...
+
+}; // namespace chip
+----
+[.text-center]
+*Listing 4.3.* Project CHIP ‘chip’ top-level C{plusplus} namespace.
+
+[[h.mug868ar44x2]]
+====== 4.2.3.2.1.        Motivation and Rationale
+
+This prevents symbol collisions with standard, system, platform, or
+vendor symbols and further makes it clear which code is owned and
+managed by Project CHIP and which is not.
+
+Code in the ‘chip’ namespace is, by extension, exempt from further
+qualifying its names and symbols with ‘chip’.
+
+[[h.yhdcr3jar7zr]]
+====== 4.2.3.2.2.        C in C{plusplus}
+
+All Project CHIP names exported with C binding or in the global
+namespace in the C{plusplus} language should have ‘chip’ prepended to their
+name.
+
+[[h.6xl47949at8i]]
+4.2.3.2.2.1.        Motivation and Rationale
+
+The ‘chip’ qualifier prevents symbol collisions with standard, system,
+platform, or vendor symbols and further makes it clear which code is
+owned and managed by Project CHIP and which is not.
+
+[[h.nsqhqioznzub]]
+==== 4.2.4.        Scope
+
+[[h.25a8q2ob61ck]]
+===== 4.2.4.1.        Global Data
+
+All global data shall have a `g` prepended to the name to denote global
+scope.
+
+[[h.4uaw4cwzlxuk]]
+===== 4.2.4.2.        Static Data
+
+All static data shall have a `s` prepended to the name to denote static
+scope.
+
+[[h.qab579rt9d6j]]
+===== 4.2.4.3.        Object Data
+
+All class or structure data members shall have a `m` prepended to the name
+to denote member scope.
+
+[[h.1a2u9etcc6j9]]
+===== 4.2.4.4.        Function and Method Parameters
+
+All free function or method parameters should have an `a` prepended to the
+name to denote function parameter scope.
+
+All free function or method parameters may alternatively have:
+
+* `in` prepended to the name to denote input, read-only
+* `out` prepended to the name to denote output, write-only
+* `io` prepended to the name to denote input/output, read/write
+
+function parameters.
+
+[[h.6ty3geoum6tz]]
+====== 4.2.4.4.1.        Motivation and Rationale
+
+At minimum, qualifying parameter names with `a` (for “argument”) helps to
+avoid shadow variable conflicts with local, stack variables and gives a
+clear indication to the reader, particularly for longer functions, which
+values being manipulated are local, stack variables and which are
+function or method arguments.
+
+In addition, the alternative `in`, `out`, and `io` provides further
+self-documentation to the code for the benefit of the reader and helps
+to align the code with the Doxygen `@param[in|out|io]` documentation
+directives.
+
+[[h.mt5fp1320019]]
+===== 4.2.4.5.        Other
+
+All variables that do not have such prefixes shall be assumed to be
+function local scope.
+
+[[h.6x386e7a0wcc]]
+==== 4.2.5.        Data Types
+
+[[h.pdj6ponw9gcy]]
+===== 4.2.5.1.        Descriptiveness
+
+Types should be descriptive but not overly so and they should give some
+idea of use.
+
+[[h.h936i2c3v6cj]]
+====== 4.2.5.1.1.        Motivation and Rationale
+
+Any developer working on a new and sufficiently complex technology has a
+large amount of concepts and nomenclature to keep straight in his or her
+head. While he or she can always consult the documentation for a
+newly-encountered data type, self-documenting data types alleviate the
+developer of some of that mental load.
+
+[[h.gn491gg6oa07]]
+===== 4.2.5.2.        Snake Case Decoration
+
+Snake case type names should have ‘`_t`’ appended to their names.
+
+[[h.315d63y336yn]]
+====== 4.2.5.2.1.        Motivation and Rationale
+
+The ‘`_t`’ qualifier makes it visually clear which symbols are types and
+which are instantiated type names.
+
+[[h.7jck2gn34us8]]
+==== 4.2.6.        Functions and Methods
+
+Function and method names should be descriptive but not overly so and
+they should give some idea of use.
+
+[[h.r470rhvreuf]]
+===== 4.2.6.1.        Motivation and Rationale
+
+Any developer working on a new and sufficiently complex technology has a
+large amount of concepts and nomenclature to keep straight in his or her
+head. While he or she can always consult the documentation for a
+newly-encountered function or method name, self-documenting function or
+method names alleviate the developer of some of that mental load.
+
+[[h.70bie2xuqpb7]]
+===== 4.2.6.2.        Resource-managing Function and Method Names
+
+Functions or methods that return or allocate resources or objects should
+have method names indicative of their resource management contract.
+
+Recommendations are shown in Table 4.3 and examples are shown in Listing
+4.4.
+
+[[t.612f51cfbd3375bd72436fd6340850dbd0ed21cc]][[t.40]]
+
+[cols=3,options="header"]
+|===
+|Name Should Contain |Return Semantics |Object Ownership Transferred
+
+|Get|Returns a weak reference to an object.|No
+|Copy|Returns a copy of an object. |Yes
+|Retain|Returns a strong reference to an object.|Yes
+|===
+
+[.text-center]
+*Table 4.3.* Recommended naming conventions for resource-managing
+functions or methods.
+
+[[t.8b492e74bcb96cbf9de6aa01b9e3350a28a4183d]][[t.41]]
+
+[source,C++]
+----
+class Foo;
+
+const Foo * GetFoo(void);     // Get an immutable weak reference to Foo.
+Foo *       GetFoo(void);     // Get a mutable weak reference to Foo.
+const Foo & GetFoo(void);     // Get an immutable weak reference to Foo.
+Foo &       GetFoo(void);     // Get a mutable weak reference to Foo.
+Foo         CopyFoo(void);    // Copy Foo by value.
+Foo *       CopyFoo(void);    // Copy Foo by pointer.
+Foo *       RetainFoo(Foo *); // Get a mutable strong reference to Foo.
+----
+[.text-center]
+*Listing 4.4.* Examples of naming conventions for resource-managing
+functions or methods.
+
+[[h.wsz5aqr2v83e]]
+====== 4.2.6.2.1.        Motivation and Rationale
+
+Resource management is an area of software development rife with the
+potential for bugs, resource leaks in particular. By choosing function
+and method names indicative of the resource management contract, this
+increases the likelihood that the developer will take the correct and
+appropriate actions to manage the lifetime of the object returned.
+
+[[h.o0zw9vl7b8qb]]
+=== 4.3.        Parenthesis and Compound Logical Expressions
+
+In compound expressions with multiple sub-expressions the intended order
+of evaluation shall be made explicit with parentheses.
+
+[[h.7v0kssfjw95f]]
+==== 4.3.1.        Motivation and Rationale
+
+Even though the C and C{plusplus} language specifications are very explicit
+about the order of evaluation, not every developer or engineer is
+equally clear and knowledgeable. Making the order explicit makes intent
+clear and prevents later code evaluators and maintainers from having to
+be C and C{plusplus} specification experts to intuit the correct intent and
+operation of the code.
+
+[[h.yz7soha9efw8]]
+=== 4.4.        Compound Expressions and Statements
+
+There should be no more than one statement or variable declaration per
+line.
+
+[[h.t679fdi29uzi]]
+==== 4.4.1.        Motivation and Rationale
+
+See “link:#h.i4hp2b46o7to[4.5. White Space]” below. Following a one
+expression or statement per line makes the code easier to read by making
+it clearer exactly what is happening on each line. When multiple
+expressions or statements are made per line, it can be visually
+difficult to see those expressions following the first.
+
+[[h.limz4korot1y]]
+==== 4.4.2.        Exceptions
+
+A single exception is the C / C{plusplus} `for` keyword loop control, where the
+three controlling statements (initialization, loop bound, and increment)
+may be placed on a single line.
+
+[[h.i4hp2b46o7to]]
+=== 4.5.        White Space
+
+Developers shall make use of white space in their code.
+
+[[h.qunthdzgne23]]
+==== 4.5.1.        Motivation and Rationale
+
+Proper use of white space can make it much easier to quickly scan
+through a piece of code to find something that you are looking for
+without the need to read each and every character.
+
+Further, adding white space makes code less dense which makes it harder
+for characters to get accidentally "lost" or missed when reading
+expressions.
+
+[[h.h1hnyi16kha7]]
+==== 4.5.2.        Indentation
+
+Indentation shall be 4 space characters.
+
+[[h.s6uvtn55lvye]]
+===== 4.5.2.1.        Motivation and Rationale
+
+The interpreted width of tabs is variable, depending on the editor in
+use. The use of spaces ensures consistent formatting of code, no matter
+what editor is used to view or edit the code.
+
+[[h.2cyrjq9n5v5p]]
+==== 4.5.3.        Conditionals
+
+Conditionals shall always appear on a separate line from the code to
+execute as a result of the condition.
+
+[[h.1rdd1so1xobq]]
+===== 4.5.3.1.        Motivation and Rationale
+
+As with all white space style issues, this improves readability by
+ensuring the code to execute is clearly distinguished and visible from
+the conditional. Consider the improved readability of
+`do_something` between the second of the two examples in Listing 4.5.
+
+[[t.763af7c5c4b359683daa8ed429c597c980874d75]][[t.42]]
+
+[source,C]
+----
+// Non-conformant example
+if (is_something()) { do_something(); }
+
+// Conformant example
+if (is_something())
+{
+    do_something();
+}
+----
+[.text-center]
+*Listing 4.5.* Non-conformant and conformant examples of improving
+conditional readability with white space.
+
+[[h.vzkc3ecm85lw]]
+==== 4.5.4.        Scoped Variable Declarations
+
+All scoped (that is, stack) variable declarations should be placed together
+at the top of the enclosing scope in which they are used.
+
+There shall be an empty line after all such variable declarations.
+
+The names of all variable declarations should be left aligned.
+
+An example of these three guidelines is shown in Listing 4.6.
+
+[[t.b13527dbc6624bc0be6a3200eb8415f19f15c3ef]][[t.43]]
+
+[source,C]
+----
+void foo(void)
+{
+    static const bar   = { 1, 2, 3, 4 };
+    const        magic = 0x9c3a5b1f;
+    int          iterator;
+    int          status
+
+    /* Actual Body of the Function Starts Here */
+
+      ...
+
+      iterator = 0;
+
+      while (/* some condition */)
+      {
+          const foobar_t *foobar = chipGetFoobarElement(i);
+
+          ...
+
+          iterator++;
+      }
+
+      ...
+}
+----
+[.text-center]
+*Listing 4.6.* Grouping of, use of a new line after, and left alignment of
+the names of scoped variable declarations.
+
+[[h.rpikhxxoketq]]
+===== 4.5.4.1.        Motivation and Rationale
+
+This improves readability by allowing the code auditor quickly  and
+easily see, at a single glance, all of the stack or automatic variables
+in play for the current scope in the following block and to further
+easily discern the types of those variables from their names.
+
+Finally, for C{plusplus} code, this follows Resource Acquisition Is
+Initialization (RAII) practices
+
+[[h.8tjkylu9hoq3]]
+==== 4.5.5.        Data Member Declarations
+
+All data member declarations should be placed together.
+
+The names of all data member declarations should be left aligned.
+
+The data member declarations for C{plusplus} classes should be placed at the end
+or tail of the class.
+
+An example of these guidelines are shown in Listing 4.6 and Listing 4.7.
+
+[[t.4be30735c50b4704e6f1bf22badc8e7e921089dc]][[t.44]]
+
+[source,C]
+----
+struct chipFoo
+{
+    uint8_t *    mData;
+    int          mBar;
+    const void * mPointer;
+    int          mParameter;
+    int          mResult;
+}
+----
+[.text-center]
+*Listing 4.6.* Grouping and left alignment of the names of data member
+declarations for structs.
+
+[[t.24620caafeb647593b1b2a0322bca547c473663f]][[t.45]]
+
+[source,C++]
+----
+class chipBar
+{
+public:
+    chipBar(void);
+
+    int GetBar(void) const;
+    const void *GetPointer(void) const;
+    int GetParameter(void) const;
+    int GetResult(void) const;
+
+private:
+    int          mBar;
+    const void * mPointer;
+    int          mParameter;
+    int          mResult;
+}
+----
+[.text-center]
+*Listing 4.7.* Grouping, placement, and left alignment of the names of
+data member declarations for classes.
+
+[[h.gw77eoogszs3]]
+==== 4.5.6.        Braces
+
+Braces should go on their own lines.
+
+Statements should never be on the same line following a closing brace.
+
+[[h.efhwb8kzx30o]]
+===== 4.5.6.1.        Motivation and Rationale
+
+Braces are like code white space (see “link:#h.i4hp2b46o7to[4.5. White
+Space]” above), not just a syntactical requirement of the compiler.
+
+[[h.ph6w877xgegt]]
+==== 4.5.7.        Keywords
+
+There should be a single space after language-reserved keywords (for,
+while, if, etc).
+
+[[h.ujn3swcsfhob]]
+===== 4.5.7.1.        Motivation and Rationale
+
+As with all white space style issues, this improves readability by
+ensuring the keyword is clearly distinguished and visible from its
+arguments. Consider the improved readability of `for` between the second
+of the two examples in Listing 4.8.
+
+[[t.06a90a382330273ce99f71068669be4bab256e6b]][[t.46]]
+
+[source,C]
+----
+// Non-conformant example
+for(frame = 0; frame < limit; frame++)
+
+// Conformant example
+for (frame = 0; frame < limit; frame++)
+----
+[.text-center]
+*Listing 4.8.* Non-conformant and conformant examples of improving keyword
+readability with white space.
+
+[[h.whogy4gar37m]]
+=== 4.6.        Comments
+
+Due to Project CHIP’s infrastructure nature, it will be consumed by
+other teams, both inside and outside Project CHIP. Therefore it is
+critical that how they work, how they behave, and how they are
+interfaced with are clearly documented.
+
+In support of this effort Project CHIP uses
+http://www.doxygen.org/[Doxygen] to
+markup (or markdown) all C, C{plusplus}, Objective C, Objective C{plusplus}, Perl,
+Python, and Java code to:
+
+* Detail what the various source and header files are and how they fit
+into the broader context.
+* Detail what the various C{plusplus} / Objective C{plusplus} namespaces are.
+* Detail what the constants, C preprocessor definitions, and
+enumerations are.
+* Detail what the globals are and how they are to be used.
+* Detail what the free function and object / class methods are and how
+they are to be used, what their parameters are, and what their return
+values are.
+* Detail any other important technical information or theory of
+operation unique and relevant to the stack that is not otherwise
+captured in architecture, design, or protocol documentation.
+
+[[h.mdgnqcgb7v4s]]
+==== 4.6.1.        File
+
+Every C, C{plusplus}, Objective C, Objective C{plusplus}, Perl, Python, Shell, and Java
+source file should, at minimum, have a standard, boilerplate Project
+CHIP file header that also describes what the file is and how, if
+applicable, it fits into the broader implementation.
+
+Canonical examples for C, C{plusplus}, Objective C, and Objective C{plusplus} and
+Python, Perl, and shell are shown in Listing 7.1 and Listing 7.2 below.
+
+[[t.559aa2df122ffa6243544340ecbb09727d473c4c]][[t.47]]
+
+[source,C]
+----
+/*
+ *    Copyright (c) <Create year>[-<Last modified year>] Project CHIP Authors.
+ */
+
+/**
+ *    @file
+ *        <Brief description>
+ *
+ *      [<Detailed description>]
+ */
+----
+[.text-center]
+*Listing 7.1.* Standard, boilerplate Project CHIP file header for C, C{plusplus},
+Objective C, and Objective C{plusplus}..
+
+[[t.a9d31cc21f2f86a32ac9e3c23dd410cce64ebf6b]][[t.48]]
+
+[source,perl]
+----
+#
+#    Copyright (c) <Create year>[-<Last modified year>] Project CHIP Authors.
+#
+
+##
+#    @file
+#        <Brief description>
+#
+#      [<Detailed description>]
+#
+----
+[.text-center]
+*Listing 7.2.* Standard, boilerplate Project CHIP file header for Perl,
+Python, shell, and make.
+
+where:
+
+* _<Create year>_ is the year the file was created.
+* _<Last modified year>_ is, optionally, the year the file was last
+modified if it is different from _<Create year>_.
+* _<Brief description>_ is a succinct description of what the file is.
+* _<Detailed description>_ is, optionally, a more in-depth description of
+what the file is and how it fits into the broader context.
+
+For header files, a good prologue for _<Brief description>_ is "This file
+defines...", describing what is being defined or declared. Likewise, for
+source files, a good prologue for _<Brief description>_ is "This file
+implements...", describing what is being implemented. Usually,
+copy-and-pasting the brief description from the header to the source and
+changing the prologue from "defines" to "implements" is sufficient.
+
+The _<Detailed description>_, if present, could be a link to one or more
+of the architecture, design, or protocol specifications or some more in
+depth but still succinct information about where the file and what it
+defines or implements fit into the broader design or implementation.
+
+[[h.ss9q4xqcydgp]]
+===== 4.6.1.1.        Motivation and Rationale
+
+The motivation and rationale for this is not from a legal perspective
+and as a consequence is not in opposition to guidance from legal.
+However, when Project CHIP provides a substantial amount of our code as
+reference code and as an SDK to third-parties, this makes it very
+clear—and consistently so—what code belongs to and is authored by
+Project CHIP and what is not.
+
+[[h.piy7um1wijnn]]
+==== 4.6.2.        Functions and Methods
+
+Every public, and ideally private, free function and class method should
+likewise have a prologue comment that:
+
+* Briefly describes what it is and what it does.
+* Describes in detail, optionally, what it is and what it does.
+* Describes the purpose, function, and influence of each parameter as
+well as whether it is an input, an output, or both.
+* Describes the return value, if present, and the expected range or
+constraints of it.
+
+An example is shown in Listing 27 below for C, C{plusplus}, Objective C, and
+Objective C{plusplus}. Adapt as appropriate for Perl, Python and Shell.
+
+[[t.5c2cc294dc82c3bb9f31493507a692333bb18555]][[t.49]]
+
+[source,C]
+----
+/**
+ * Parse and attempt to convert a string to a 64-bit unsigned integer,
+ * applying the appropriate interpretation based on the base parameter.
+ *
+ * @param[in]  str     A pointer to a NULL-terminated C string representing
+ *                     the integer to parse.
+ * @param[out] output  A reference to storage for a 64-bit unsigned integer
+ *                     to which the parsed value will be stored on success.
+ * @param[in]  base    The base according to which the string should be
+ *                     interpreted and parsed. If 0 or 16, the string may
+ *                     be hexadecimal and prefixed with "0x". Otherwise, a 0
+ *                     is implied as 10 unless a leading 0 is encountered in
+ *                     which 8 is implied.
+ *
+ * @return true on success; otherwise, false on failure.
+ */
+----
+[.text-center]
+*Listing 27.* Standard Doxygen-compatible free function or method comment
+for C, C{plusplus}, Objective C, and Objective C{plusplus}.
+
+In addition, developers should well document the bodies of their
+functions and methods, describing the overall flow, design intent, error
+handling nuances, historical bugs encountered and resolved, and so
+forth. While these types of comments do not typically become part of the
+external documentation, they are invaluable to future maintainers of the
+code.
+
+[[h.qkbvqttren3o]]
+==== 4.6.3.        Other
+
+[[h.ec2gbliviwcl]]
+===== 4.6.3.1.        Dos
+
+* *Do* use the '@' Doxygen markup style rather than the '\' markup style.
+* *Do* consider consulting the “Project CHIP Copy Style Guide” if you feel
+uncomfortable or unclear on your own writing style.
+* *Do* also consider consulting tips on
+http://centerforplainlanguage.org/5-steps-to-plain-language/[Plain
+Language] for additional style and tone input.
+* *Do* use consistent terminology and lingo.
+* *Do* properly paragraph justify and wrap your documentation.
+
+** See your editor's documentation on how to do this (for example, M-q in Emacs).
+
+[[h.y4bouuh3jgyk]]
+===== 4.6.3.2.        Don'ts
+
+* *Do not* forget to document your files, enumerations, constants,
+classes, objects, namespaces, functions, and methods.
+* *Do not* include the file name in any Doxygen file comments or
+directives.
+
+** Your editor knows the [.underline]#file name#, source code control knows the file
+name, and you know the file name.
+** When it changes on the file system, having to change it in the file
+comments is simply an added burden.
+
+* *Do not* include [.underline]#your name# in any Doxygen comments or directives.
+
+** Source code control knows who you are and what file revisions you own.
+** We do not want our project consumers knowing who you are and calling
+or e-mailing you directly for support.
+
+* *Do not* include the [.underline]#modification date# the file was last changed in
+Doxygen comments or directives, [.underline]#except for the copyright header#.
+
+** Source code control knows when the file was last changed and the date
+other revisions were made.
+
+* *Do not* include subjective or opinionated commentary or expose
+proprietary and confidential information not relevant to the code or
+APIs.
+
+** This content *will be* published to and for consumption by members, the
+CHIP community, and the general public.
+
+[[h.404ucmrrowjr]]
+== 5.        Third-party Software
+
+No third-party software shall be used or included without prior legal,
+managerial, and technical authorization and approval.
+
+[[h.iuro59gzpr5i]]
+=== 5.1.        Motivation and Rationale
+
+Third-party software, both commercial and open-source can, in many
+cases, provide a tremendous amount of benefit and leverage. In fact,
+nearly, all Project CHIP products to date have a substantial amount of
+third-party software in their core platform.
+
+However, third-party software comes with contractual, licensing, and
+technical liabilities that must be understood and vetted by appropriate
+legal, managerial, and technical leadership before being integrated with
+internal software.
+
+A failure to understand those liabilities can expose Project CHIP to
+substantial risk including, but not limited to, the loss of intellectual
+property.
+
+[[h.g80rf92mbhlo]]
+== 6.        Testing
+
+All code should be designed for test and co-developed with tests.
+
+All code unit tests should be implemented using
+https://github.com/nestlabs/nlunit-test[nlunit-test].
+
+All tested code should be coverable with code coverage.
+
+[[h.v3hcxsk4f9us]]
+=== 6.1.        Motivation and Rationale
+
+It is recognized and acknowledged that not every piece of code or
+subsystem, library, thread or process can be easily unit tested.
+
+However, unit tests—and tests in general—are a _Good Thing_™; and will
+give you the confidence to make changes and prove to both yourself and
+other colleagues that you have things _right_, in so far as your tests
+cover _right_.
+
+Unit tests will be combined with other methods of verification to fully
+cover the various test requirements in the system and for the module you
+are developing or supporting. The purpose of the unit test is to isolate
+your module's methods and ensure that they have the proper output,
+affect state properly, and handle errors appropriately. This ensures
+each of the building blocks of the system functions correctly. These
+tests can also be used for regression testing so that any code changes
+that affect a module's output will be automatically flagged.
+
+Code coverage is important because without it, it is impossible to know
+how effective your tests are at exercising your code, ensuring as much
+of it is as tested as desired. Further, without code coverage, it is
+possible without knowing it to add test upon test to your module that do
+not actually improve the amount of code exercised and tested but rather
+just further wear a well-worn path through your code.
+
+[[h.q6j4dltimysu]]
+== 7.        Documentation
+
+All new and revisionary work should attempt to create the following
+documents or specifications:
+
+* Functional Requirements
+* Architecture and Design
+* Protocol
+
+[[h.ez0vz15lmoef]]
+=== 7.1.        Requirements, Architecture, and Design
+
+[[h.wksw3epjdtqy]]
+==== 7.1.1.        Functional Requirements
+
+* Specifies what it is we are building, who the stakeholders are, how it
+fits into a larger system, what the broad functional behaviors are, what
+the functional requirements are, and what the priorities of those
+requirements are.
+
+[[h.6y5rrhn94djb]]
+==== 7.1.2.        Architecture and Design
+
+* Specifies an architecture and design that meets the functional
+requirements.
+* This covers enough detail to guide and influence an implementation but
+does not actually specify the implementation.
+
+[[h.uh9xvhljqsnc]]
+==== 7.1.3.        Protocol
+
+* If applicable, this may be a subset of the architecture and design
+specification.
+* This provides enough detail to completely specify packet formats,
+packet field definitions, protocol exchanges, schema definitions, data
+tags, status enumerations, and so forth.
+* Basically, this should be sufficient for anyone to write a protocol
+implementation against or to develop a network analysis or debugging
+tool against.
+
+In short, all of these documents—the architecture, design, and protocol
+in particular—should be sufficient to:
+
+* Inform partners, influencers, managers, and new employees about how
+the protocol, its implementation, and its various components work.
+* Enable support and tool vendors to develop and maintain network
+analysis and debugging tools.
+* Enable integration and quality assurance personnel to develop and
+execute test suites.
+* Enable technical writers to produce additional, externally-facing
+documentation in support of the above.
+
+[[h.qknbiwdwffib]]
+=== 7.2.        Stack and API
+
+Equally as important as the requirements, architecture and design
+documents and specifications that lead up an actual implementation, is
+the documentation for the API implementation itself.
+
+In support of this effort Project CHIP uses Doxygen to markup (or
+markdown) all C, C{plusplus}, Objective C, Objective C{plusplus}, Perl, Python, and Java
+code to:
+
+* Detail what the various source and header files are and how they fit
+into the broader architecture and design.
+* Detail what the various C{plusplus} / Objective C{plusplus} namespaces are.
+* Detail what the constants, C preprocessor definitions, and
+enumerations are.
+* Detail what the globals are and how they are to be used.
+* Detail what the free function and object / class methods are and how
+they are to be used, what their parameters are, and what their return
+values are.
+* Detail any other important technical information or theory of
+operation unique and relevant to the stack that is not otherwise
+captured in architecture, design, or protocol documentation.
+
+[[h.w7snhm7ke0xc]]
+==== 7.2.1.        Motivation and Rationale
+
+As mentioned previously, Project CHIP’s technology and infrastructure
+are business-critical infrastructure that undergirds all work group
+member products as well as those of their current and future product
+ecosystem partners. As a result, it is exceedingly important that it be
+documented as well as possible so that those inside and outside of
+Project CHIP can understand it, integrate it, support it, debug it, and
+develop against it.
+
+[[h.s32yg4caylj]]
+== 8.        Building and Packaging
+
+Projects should either use standalone makefiles if they are simple or
+https://github.com/nestlabs/nlbuild-autotools[nlbuild-autotools] if
+they are more complex, particularly when automatic support for unit
+testing and documentation is sought.
+
+[[h.20jp72cri73u]]
+=== 8.1.        Motivation and Rationale
+
+Having project- and technology-neutral build infrastructure is important
+because embedded communications software technologies are consumed by
+and used in a variety of internal projects as well as by external
+partners. In addition, they need to be used and testable in a standalone
+fashion.
+
+[[h.igvm4pqzrunk]]
+== 9.        Recommended Reading
+
+While the following references and reading are not part of the formal
+best practices, coding conventions, and style cannon, they are
+informative and useful guides for improving the style and quality of the
+code you write:
+
+. Jet Propulsion Laboratory.
+http://lars-lab.jpl.nasa.gov/JPL_Coding_Standard_C.pdf[JPL
+Institutional Coding Standard for the C Programming Language.] Version
+1.0. March 3, 2009.
+. Jet Propulsion Laboratory.
+http://pixelscommander.com/wp-content/uploads/2014/12/P10.pdf[The
+Power of Ten – Rules for Developing Safety Critical Code]. December
+2014.
+. Meyers, Scott. Effective C{plusplus}: 55 Specific Ways to Improve Your
+Programs and Designs. Third Edition. 2005.
+. Meyers, Scott. More Effective C{plusplus}: 35 New Ways to Improve Your
+Programs and Designs. 1996.
+. Motor Industry Software Reliability Association. Guidelines for the
+Use of the C Language in Critical Systems. March 2013.
+. Motor Industry Software Reliability Association. Guidelines for the
+Use of the C{plusplus} Language in Critical Systems. June 2008.
+
+[[h.x2rzoiv2hj24]]
+== Revision History
+
+[[t.6b0c55b7a932ee243e40f11558a481b0008c7f4b]] [[t.0]]
+
+[cols="^1,^1,<2,<3",options="header"]
+|===
+|Revision |Date |Modified By |Description
+|1 |2020-04-14 |Grant Erickson |Initial revision.
+|===
+
+[.text-center]
+_Project Connect Home over IP Public Information_
