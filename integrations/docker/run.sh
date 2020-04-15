@@ -32,4 +32,4 @@ RUN_DIR=${DOCKER_RUN_DIR:-$(pwd)}
   exit 0
 }
 
-docker run --rm -w "${RUN_DIR}" -v "${RUN_DIR}:${RUN_DIR}" "${ORG}/${IMAGE}:${VERSION}" "$@"
+docker run --rm -w "$RUN_DIR" -v "$RUN_DIR:$RUN_DIR" "$ORG/$IMAGE:$VERSION" "$@"
