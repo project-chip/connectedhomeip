@@ -19,7 +19,7 @@
 #      This file is the automake footer for all common
 #      (i.e. non-toolchain-specific) rules.
 #
-
+include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/makedirs.am
 include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/coverage.am
 include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/pretty.am
 include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/headers.am
