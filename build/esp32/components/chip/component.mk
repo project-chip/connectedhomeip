@@ -1,4 +1,5 @@
 #
+#    Copyright (c) 2020 Project CHIP Authors
 #    Copyright (c) 2018 Nest Labs, Inc.
 #    All rights reserved.
 #
@@ -15,44 +16,44 @@
 #    limitations under the License.
 #
 #    Description:
-#      Component makefile for building OpenWeave within the ESP32 ESP-IDF environment.
+#      Component makefile for building CHIP within the ESP32 ESP-IDF environment.
 #
 
 # ==================================================
 # General settings
 # ==================================================
 
-# OpenWeave source root directory
-OPENWEAVE_ROOT              ?= $(realpath $(COMPONENT_PATH)/../../../..)
+# CHIP source root directory
+CHIP_ROOT              ?= $(realpath $(COMPONENT_PATH)/../../../..)
 
-# Archtecture for which Weave will be built.
+# Archtecture for which CHIP will be built.
 HOST_ARCH                   := xtensa-unknown-linux-gnu
 
-# Directory into which the Weave build system will place its output. 
-OUTPUT_DIR					:= $(BUILD_DIR_BASE)/openweave
+# Directory into which the CHIP build system will place its output.
+OUTPUT_DIR					:= $(BUILD_DIR_BASE)/chip
 REL_OUTPUT_DIR              := $(shell perl -e 'use File::Spec; use Cwd; print File::Spec->abs2rel(Cwd::realpath($$ARGV[0]), Cwd::realpath($$ARGV[1])) . "\n"' $(OUTPUT_DIR) $(COMPONENT_PATH))
 
-# Directory containing esp32-specific Weave project configuration files.
-PROJECT_CONFIG_DIR          := $(OPENWEAVE_ROOT)/build/config/esp32
+# Directory containing esp32-specific CHIP project configuration files.
+PROJECT_CONFIG_DIR          := $(CHIP_ROOT)/build/config/esp32
 
-# Architcture on which Weave is being built.
-BUILD_ARCH                  := $(shell $(OPENWEAVE_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
+# Architcture on which CHIP is being built.
+BUILD_ARCH                  := $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
 
 # Directory containing the esp32-specific LwIP component sources.
 LWIP_COMPONENT_DIR      	?= $(PROJECT_PATH)/components/lwip
 
 
 # ==================================================
-# Compilation flags specific to building OpenWeave
+# Compilation flags specific to building CHIP
 # ==================================================
 
-# Include directories to be searched when building OpenWeave.
+# Include directories to be searched when building CHIP.
 INCLUDES                    := $(OUTPUT_DIR)/src/include \
-                               $(OUTPUT_DIR)/src/include/Weave/DeviceLayer/ESP32 \
-                               $(OPENWEAVE_ROOT)/src/adaptations/device-layer/trait-support \
+                               $(OUTPUT_DIR)/src/include/CHIP/DeviceLayer/ESP32 \
+                               $(CHIP_ROOT)/src/adaptations/device-layer/trait-support \
                                $(COMPONENT_INCLUDES)
 
-# Compiler flags for building OpenWeave
+# Compiler flags for building CHIP
 CFLAGS                      += $(addprefix -I,$(INCLUDES))
 CPPFLAGS                    += $(addprefix -I,$(INCLUDES))
 CXXFLAGS                    += $(addprefix -I,$(INCLUDES))
@@ -71,7 +72,7 @@ DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst \,\\,$(1
 
 
 # ==================================================
-# OpenWeave configuration options
+# CHIP configuration options
 # ==================================================
 
 # ESP-IDF's project.mk fails to define RANLIB appropriately, so we define it here.
@@ -93,11 +94,11 @@ CONFIGURE_OPTIONS       	:= AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJCOP
                                --with-inet-endpoint="tcp udp tun dns" \
                                --with-openssl=no \
                                --with-logging-style=external \
-                               --with-weave-project-includes= \
-                               --with-weave-system-project-includes= \
-                               --with-weave-inet-project-includes= \
-                               --with-weave-ble-project-includes= \
-                               --with-weave-warm-project-includes= \
+                               --with-chip-project-includes= \
+                               --with-chip-system-project-includes= \
+                               --with-chip-inet-project-includes= \
+                               --with-chip-ble-project-includes= \
+                               --with-chip-warm-project-includes= \
                                --disable-tests \
                                --disable-tools \
                                --disable-docs \
@@ -113,17 +114,17 @@ endif
 
 
 # ==================================================
-# Configuration for the OpenWeave ESF-IDF Component
+# Configuration for the CHIP ESF-IDF Component
 # ==================================================
 
-# Header directories to be included when building other components that use OpenWeave.
+# Header directories to be included when building other components that use CHIP.
 # Note that these must be relative to the component source directory.
 COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
                                $(REL_OUTPUT_DIR)/include
 
-# Linker flags to be included when building other components that use Weave. 
+# Linker flags to be included when building other components that use CHIP.
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib \
-					           -lWeave \
+					           -lCHIP \
 					           -lInetLayer \
 					           -lmincrypt \
 					           -lnlfaultinjection \
@@ -132,7 +133,7 @@ COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib \
 					           -lWarm \
 					           -lDeviceLayer
 
-# Tell the ESP-IDF build system that the OpenWeave component defines its own build
+# Tell the ESP-IDF build system that the CHIP component defines its own build
 # and clean targets.
 COMPONENT_OWNBUILDTARGET 	 = 1
 COMPONENT_OWNCLEANTARGET 	 = 1
@@ -144,7 +145,7 @@ COMPONENT_OWNCLEANTARGET 	 = 1
 
 .PHONY : check-config-args-updated
 check-config-args-updated : | $(OUTPUT_DIR)
-	echo $(OPENWEAVE_ROOT)/configure $(CONFIGURE_OPTIONS) > $(OUTPUT_DIR)/config.args.tmp; \
+	echo $(CHIP_ROOT)/configure $(CONFIGURE_OPTIONS) > $(OUTPUT_DIR)/config.args.tmp; \
 	(test -r $(OUTPUT_DIR)/config.args && cmp -s $(OUTPUT_DIR)/config.args.tmp $(OUTPUT_DIR)/config.args) || \
 	    mv $(OUTPUT_DIR)/config.args.tmp $(OUTPUT_DIR)/config.args; \
 	rm -f $(OUTPUT_DIR)/config.args.tmp;
@@ -152,29 +153,29 @@ check-config-args-updated : | $(OUTPUT_DIR)
 $(OUTPUT_DIR)/config.args : check-config-args-updated
 	@: # Null action required to work around make's crazy timestamp caching behavior.
 
-$(OPENWEAVE_ROOT)/configure : $(OPENWEAVE_ROOT)/configure.ac
-	echo "BOOTSTRAP OPENWEAVE..."
-	(cd $(OPENWEAVE_ROOT) && ./bootstrap)
+$(CHIP_ROOT)/configure : $(CHIP_ROOT)/configure.ac
+	echo "BOOTSTRAP CHIP..."
+	(cd $(CHIP_ROOT) && ./bootstrap)
 
-$(OUTPUT_DIR)/config.status : $(OPENWEAVE_ROOT)/configure $(OUTPUT_DIR)/config.args
-	echo "CONFIGURE OPENWEAVE..."
-	(cd $(OUTPUT_DIR) && $(OPENWEAVE_ROOT)/configure $(CONFIGURE_OPTIONS))
+$(OUTPUT_DIR)/config.status : $(CHIP_ROOT)/configure $(OUTPUT_DIR)/config.args
+	echo "CONFIGURE CHIP..."
+	(cd $(OUTPUT_DIR) && $(CHIP_ROOT)/configure $(CONFIGURE_OPTIONS))
 
-configure-weave : $(OUTPUT_DIR)/config.status
+configure-chip : $(OUTPUT_DIR)/config.status
 
 $(OUTPUT_DIR) :
 	echo "MKDIR $@"
 	@mkdir -p "$@"
 
-build-weave : configure-weave
-	echo "BUILD OPENWEAVE..."
+build-chip : configure-chip
+	echo "BUILD CHIP..."
 	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory all
 
-install-weave : | build-weave
-	echo "INSTALL OPENWEAVE..."
+install-chip : | build-chip
+	echo "INSTALL CHIP..."
 	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
 
-build : build-weave install-weave
+build : build-chip install-chip
 
 clean:
 	echo "RM $(OUTPUT_DIR)"
