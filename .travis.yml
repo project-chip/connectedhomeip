@@ -9,6 +9,9 @@ before_install:
 script:
 - ./integrations/ci-tools/build.sh
 
+after_success:
+- ./integrations/ci-tools/post_build_success.sh
+
 # Note: To add new job types, add it to the matrix below, with a unique TASK varable, then update the build.sh to do what you want during that task
 
 jobs:
