@@ -27,6 +27,7 @@ build/*
 !build/esp32/
 !build/nrf5/
 !build/scripts/gen-chip-version
+examples/**/build
 config.log
 config.status
 configure
