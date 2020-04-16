@@ -14,7 +14,7 @@ script:
 jobs:
   include:
     - stage: Build
-      name: "Build Ubuntu Linux"
+      name: "Build Ubuntu Linux Xenial LTS"
       env: TASK="build-ubuntu-linux"
     - stage: Build
       name: "Build NRF Example Lock App"
