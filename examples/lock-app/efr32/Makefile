@@ -110,14 +110,9 @@ SRCS = \
     $(EFR32_SDK_ROOT)/platform/service/mpu/src/sl_mpu.c                                      \
     $(EFR32_SDK_ROOT)/platform/service/sleeptimer/src/sl_sleeptimer.c                        \
     $(EFR32_SDK_ROOT)/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c               \
-    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c      \
-    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Source/GCC/startup_efr32mg12p.c \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/mx25flash_spi.c                            \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/retargetio.c                               \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/retargetserial.c                           \
-    $(LCD_SRCS)                                                                              \
-
-
 
 INC_DIRS = \
     $(PROJECT_ROOT)                                                                       \
@@ -152,31 +147,54 @@ INC_DIRS = \
     $(EFR32_SDK_ROOT)/platform/service/sleeptimer/inc                                     \
     $(EFR32_SDK_ROOT)/platform/service/sleeptimer/config                                  \
     $(EFR32_SDK_ROOT)/util/plugin/plugin-common/fem-control                               \
-    $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG12_$(BOARD)/config                              \
-    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Include                      \
-    $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG12_BRD4161A                                     \
     $(EFR32_SDK_ROOT)/hardware/kit/common/drivers/                                        \
     $(EFR32_SDK_ROOT)/hardware/kit/common/halconfig/                                      \
-    $(LCD_INCLUDES)                                                                       \
 
+# Board specfic SRCs and INCs
 ifeq ($(EFR32FAMILY), efr32mg12)
+SRCS += \
+    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c      \
+    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Source/GCC/startup_efr32mg12p.c
+INC_DIRS += \
+    $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG12_$(BOARD)/config                                 \
+    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG12P/Include
 LINKER_SCRIPT=./ldscripts/$(APP)-MG12P.ld
 else
 ifeq ($(EFR32FAMILY), efr32mg21)
+SRCS += \
+    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Source/system_efr32mg21.c      \
+    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Source/GCC/startup_efr32mg21.c
+INC_DIRS += \
+    $(EFR32_SDK_ROOT)/hardware/kit/EFR32MG21_$(BOARD)/config                               \
+    $(EFR32_SDK_ROOT)/platform/Device/SiliconLabs/EFR32MG21/Include
 LINKER_SCRIPT=./ldscripts/$(APP)-MG21.ld
 endif
 endif
 
-DEFINES = \
-  HARD_FAULT_LOG_ENABLE \
-  RETARGET_VCOM \
-  RETARGET_USART0 \
+# The mainboard for 4166A does not have a display
+ifeq ($(BOARD),BRD4166A)
+    SHOW_QR_CODE=0
+else
+    SHOW_QR_CODE=1
+endif
+
+# Add LCD sources if allowed
+ifeq ($(SHOW_QR_CODE), 1)
+    SRCS += $(LCD_SRCS)
+    INC_DIRS += $(LCD_INCLUDES)
+    DEFINES += DISPLAY_ENABLED
+endif
+
+DEFINES += \
+  HARD_FAULT_LOG_ENABLE                                 \
+  RETARGET_VCOM                                         \
+  RETARGET_USART0                                       \
   PLATFORM_HEADER='<hal/micro/cortexm3/compiler/gcc.h>' \
-  CORTEXM3_EFM32_MICRO \
-  CHIP_ERROR_LOGGING=1 \
-  CHIP_PROGRESS_LOGGING=1 \
-  CHIP_DETAIL_LOGGING=1  \
-  EFR32_LOG_ENABLED=1 \
+  CORTEXM3_EFM32_MICRO                                  \
+  CHIP_ERROR_LOGGING=1                                  \
+  CHIP_PROGRESS_LOGGING=1                               \
+  CHIP_DETAIL_LOGGING=1                                 \
+  EFR32_LOG_ENABLED=1                                   \
   NVM3_DEFAULT_NVM_SIZE=40960
 
 CFLAGS = \
