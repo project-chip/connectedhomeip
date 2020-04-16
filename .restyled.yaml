@@ -1,0 +1,81 @@
+# Do anything at all
+enabled: true
+
+# Push the style fixes directly to the original PR
+auto: false
+
+# Open Restyle PRs?
+pull_requests: true
+
+# Add labels to any created Restyle PRs
+labels:
+    - restyled
+
+# Labels to ignore
+ignore_labels:
+    - restyled-ignore
+
+# Leave comments on the original PR linking to the Restyle PR?
+comments: false
+
+# Request review on the Restyle PR
+request_review: none
+
+# Patterns to exclude from all Restylers
+exclude:
+    - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
+    - "third_party/**/*"
+    - "build/**/*"
+    - "autom4te.cache/**/*"
+
+# Restylers to run, and how
+restylers:
+    - name: clang-format
+      enabled: true
+      image: restyled/restyler-clang-format:v9.0.0
+      command:
+          - clang-format
+          - "-i"
+      arguments: []
+      include:
+          - "**/*.c"
+          - "**/*.cc"
+          - "**/*.cpp"
+          - "**/*.cxx"
+          - "**/*.c++"
+          - "**/*.C"
+          - "**/*.cs"
+          - "**/*.h"
+          - "**/*.hh"
+          - "**/*.hpp"
+          - "**/*.hxx"
+          - "**/*.h++"
+          - "**/*.H"
+          - "**/*.java"
+          - "**/*.js"
+          - "**/*.m"
+      interpreters: []
+    - name: prettier-json
+      enabled: true
+      include:
+          - "**/*.json"
+    - name: prettier-markdown
+      enabled: true
+      include:
+          - "**/*.md"
+          - "**/*.markdown"
+    - name: prettier-yaml
+      enabled: true
+      include:
+          - "**/*.yml"
+          - "**/*.yaml"
+    - name: shellharden
+      enabled: true
+      include:
+          - "**/*.sh"
+          - "**/*.bash"
+    - name: shfmt
+      enabled: true
+      include:
+          - "**/*.sh"
+          - "**/*.bash"
