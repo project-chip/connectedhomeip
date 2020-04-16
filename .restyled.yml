@@ -3,6 +3,7 @@ image: restyled/restyler-clang-format:v9.0.0
 command:
   - clang-format
   - "-i"
+auto: true
 arguments: []
 include:
   - "**/*.c"
