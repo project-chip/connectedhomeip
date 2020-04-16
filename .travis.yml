@@ -1,0 +1,35 @@
+language: minimal
+
+services:
+  - docker
+
+before_install:
+- ./integrations/ci-tools/pre_build.sh
+
+script:
+- ./integrations/ci-tools/build.sh
+
+# Note: To add new job types, add it to the matrix below, with a unique TASK varable, then update the build.sh to do what you want during that task
+
+jobs:
+  include:
+    - stage: Build
+      name: "Build Ubuntu Linux Xenial LTS"
+      env: TASK="build-ubuntu-linux"
+    - stage: Build
+      name: "Build NRF Example Lock App"
+      env: TASK="build-nrf-example-lock-app"
+    # Disabled given: https://github.com/project-chip/connectedhomeip/issues/385
+    # - stage: Tests
+    #   name: "Unit & Functional Tests"
+    #   env: TASK="run-unit-and-functional-tests"
+    # - stage: Tests
+    #   name: "Crypto Tests"
+    #   env: TASK="run-crypto-tests"
+    - stage: Tests
+      name: "Setup Payload Tests"
+      env: TASK="run-setup-payload-tests"
+    - stage: Deployment Checks
+      name: "Distribution Check"
+      env: TASK="build-distribution-check"
+      
