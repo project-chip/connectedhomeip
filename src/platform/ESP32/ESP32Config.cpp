@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -22,56 +23,53 @@
  *          Utilities for interacting with the the ESP32 "NVS" key-value store.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/DeviceLayer/ESP32/ESP32Config.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/ESP32/ESP32Config.h>
 
 #include "nvs_flash.h"
 #include "nvs.h"
 
 namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
 // NVS namespaces used to store device configuration information.
-const char ESP32Config::kConfigNamespace_WeaveFactory[]                    = "weave-factory";
-const char ESP32Config::kConfigNamespace_WeaveConfig[]                     = "weave-config";
-const char ESP32Config::kConfigNamespace_WeaveCounters[]                   = "weave-counters";
+const char ESP32Config::kConfigNamespace_ChipFactory[]  = "chip-factory";
+const char ESP32Config::kConfigNamespace_ChipConfig[]   = "chip-config";
+const char ESP32Config::kConfigNamespace_ChipCounters[] = "chip-counters";
 
-// Keys stored in the weave-factory namespace
-const ESP32Config::Key ESP32Config::kConfigKey_SerialNum                   = { kConfigNamespace_WeaveFactory, "serial-num"         };
-const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceId                 = { kConfigNamespace_WeaveFactory, "device-id"          };
-const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceCert               = { kConfigNamespace_WeaveFactory, "device-cert"        };
-const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceICACerts           = { kConfigNamespace_WeaveFactory, "device-ca-certs"    };
-const ESP32Config::Key ESP32Config::kConfigKey_MfrDevicePrivateKey         = { kConfigNamespace_WeaveFactory, "device-key"         };
-const ESP32Config::Key ESP32Config::kConfigKey_ProductRevision             = { kConfigNamespace_WeaveFactory, "product-rev"        };
-const ESP32Config::Key ESP32Config::kConfigKey_ManufacturingDate           = { kConfigNamespace_WeaveFactory, "mfg-date"           };
-const ESP32Config::Key ESP32Config::kConfigKey_PairingCode                 = { kConfigNamespace_WeaveFactory, "pairing-code"       };
+// Keys stored in the chip-factory namespace
+const ESP32Config::Key ESP32Config::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
+const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
+const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const ESP32Config::Key ESP32Config::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
+const ESP32Config::Key ESP32Config::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
+const ESP32Config::Key ESP32Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
+const ESP32Config::Key ESP32Config::kConfigKey_PairingCode         = { kConfigNamespace_ChipFactory, "pairing-code" };
 
-// Keys stored in the weave-config namespace
-const ESP32Config::Key ESP32Config::kConfigKey_FabricId                    = { kConfigNamespace_WeaveConfig,  "fabric-id"          };
-const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig               = { kConfigNamespace_WeaveConfig,  "service-config"     };
-const ESP32Config::Key ESP32Config::kConfigKey_PairedAccountId             = { kConfigNamespace_WeaveConfig,  "account-id"         };
-const ESP32Config::Key ESP32Config::kConfigKey_ServiceId                   = { kConfigNamespace_WeaveConfig,  "service-id"         };
-const ESP32Config::Key ESP32Config::kConfigKey_FabricSecret                = { kConfigNamespace_WeaveConfig,  "fabric-secret"      };
-const ESP32Config::Key ESP32Config::kConfigKey_GroupKeyIndex               = { kConfigNamespace_WeaveConfig,  "group-key-index"    };
-const ESP32Config::Key ESP32Config::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_WeaveConfig,  "last-ek-id"         };
-const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed               = { kConfigNamespace_WeaveConfig,  "fail-safe-armed"    };
-const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType          = { kConfigNamespace_WeaveConfig,  "sta-sec-type"       };
-const ESP32Config::Key ESP32Config::kConfigKey_OperationalDeviceId         = { kConfigNamespace_WeaveConfig,  "op-device-id"       };
-const ESP32Config::Key ESP32Config::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_WeaveConfig,  "op-device-cert"     };
-const ESP32Config::Key ESP32Config::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_WeaveConfig,  "op-device-ca-certs" };
-const ESP32Config::Key ESP32Config::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_WeaveConfig,  "op-device-key"      };
+// Keys stored in the chip-config namespace
+const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
+const ESP32Config::Key ESP32Config::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
+const ESP32Config::Key ESP32Config::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
+const ESP32Config::Key ESP32Config::kConfigKey_OperationalDeviceId         = { kConfigNamespace_ChipConfig, "op-device-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
+const ESP32Config::Key ESP32Config::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig, "op-device-ca-certs" };
+const ESP32Config::Key ESP32Config::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
 
-// Prefix used for NVS keys that contain Weave group encryption keys.
-const char ESP32Config::kGroupKeyNamePrefix[]                              = "gk-";
+// Prefix used for NVS keys that contain Chip group encryption keys.
+const char ESP32Config::kGroupKeyNamePrefix[] = "gk-";
 
-
-WEAVE_ERROR ESP32Config::ReadConfigValue(Key key, bool & val)
+CHIP_ERROR ESP32Config::ReadConfigValue(Key key, bool & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
     uint32_t intVal;
@@ -83,7 +81,7 @@ WEAVE_ERROR ESP32Config::ReadConfigValue(Key key, bool & val)
     err = nvs_get_u32(handle, key.Name, &intVal);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     SuccessOrExit(err);
 
@@ -97,9 +95,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::ReadConfigValue(Key key, uint32_t & val)
+CHIP_ERROR ESP32Config::ReadConfigValue(Key key, uint32_t & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -110,7 +108,7 @@ WEAVE_ERROR ESP32Config::ReadConfigValue(Key key, uint32_t & val)
     err = nvs_get_u32(handle, key.Name, &val);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     SuccessOrExit(err);
 
@@ -122,9 +120,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::ReadConfigValue(Key key, uint64_t & val)
+CHIP_ERROR ESP32Config::ReadConfigValue(Key key, uint64_t & val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -144,7 +142,7 @@ WEAVE_ERROR ESP32Config::ReadConfigValue(Key key, uint64_t & val)
     {
         uint8_t deviceIdBytes[sizeof(uint64_t)];
         size_t deviceIdLen = sizeof(deviceIdBytes);
-        err = nvs_get_blob(handle, key.Name, deviceIdBytes, &deviceIdLen);
+        err                = nvs_get_blob(handle, key.Name, deviceIdBytes, &deviceIdLen);
         if (err == ESP_OK)
         {
             VerifyOrExit(deviceIdLen == sizeof(deviceIdBytes), err = ESP_ERR_NVS_INVALID_LENGTH);
@@ -156,7 +154,7 @@ WEAVE_ERROR ESP32Config::ReadConfigValue(Key key, uint64_t & val)
     err = nvs_get_u64(handle, key.Name, &val);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     SuccessOrExit(err);
 
@@ -168,9 +166,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ESP32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -179,15 +177,15 @@ WEAVE_ERROR ESP32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize,
     needClose = true;
 
     outLen = bufSize;
-    err = nvs_get_str(handle, key.Name, buf, &outLen);
+    err    = nvs_get_str(handle, key.Name, buf, &outLen);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
         outLen = 0;
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err    = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     else if (err == ESP_ERR_NVS_INVALID_LENGTH)
     {
-        err = (buf == NULL) ? WEAVE_NO_ERROR : WEAVE_ERROR_BUFFER_TOO_SMALL;
+        err = (buf == NULL) ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     SuccessOrExit(err);
 
@@ -202,9 +200,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ESP32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -213,15 +211,15 @@ WEAVE_ERROR ESP32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSi
     needClose = true;
 
     outLen = bufSize;
-    err = nvs_get_blob(handle, key.Name, buf, &outLen);
+    err    = nvs_get_blob(handle, key.Name, buf, &outLen);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
         outLen = 0;
-        err = WEAVE_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        err    = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     else if (err == ESP_ERR_NVS_INVALID_LENGTH)
     {
-        err = (buf == NULL) ? WEAVE_NO_ERROR : WEAVE_ERROR_BUFFER_TOO_SMALL;
+        err = (buf == NULL) ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     SuccessOrExit(err);
 
@@ -234,9 +232,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::WriteConfigValue(Key key, bool val)
+CHIP_ERROR ESP32Config::WriteConfigValue(Key key, bool val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -251,7 +249,7 @@ WEAVE_ERROR ESP32Config::WriteConfigValue(Key key, bool val)
     err = nvs_commit(handle);
     SuccessOrExit(err);
 
-    WeaveLogProgress(DeviceLayer, "NVS set: %s/%s = %s", key.Namespace, key.Name, val ? "true" : "false");
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", key.Namespace, key.Name, val ? "true" : "false");
 
 exit:
     if (needClose)
@@ -262,9 +260,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::WriteConfigValue(Key key, uint32_t val)
+CHIP_ERROR ESP32Config::WriteConfigValue(Key key, uint32_t val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -279,7 +277,7 @@ WEAVE_ERROR ESP32Config::WriteConfigValue(Key key, uint32_t val)
     err = nvs_commit(handle);
     SuccessOrExit(err);
 
-    WeaveLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", key.Namespace, key.Name, val, val);
 
 exit:
     if (needClose)
@@ -290,9 +288,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::WriteConfigValue(Key key, uint64_t val)
+CHIP_ERROR ESP32Config::WriteConfigValue(Key key, uint64_t val)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -307,7 +305,7 @@ WEAVE_ERROR ESP32Config::WriteConfigValue(Key key, uint64_t val)
     err = nvs_commit(handle);
     SuccessOrExit(err);
 
-    WeaveLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", key.Namespace, key.Name, val, val);
 
 exit:
     if (needClose)
@@ -318,9 +316,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str)
+CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -337,7 +335,7 @@ WEAVE_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str)
         err = nvs_commit(handle);
         SuccessOrExit(err);
 
-        WeaveLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", key.Namespace, key.Name, str);
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", key.Namespace, key.Name, str);
     }
 
     else
@@ -355,15 +353,15 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
+CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     char * strCopy = NULL;
 
     if (str != NULL)
     {
         strCopy = strndup(str, strLen);
-        VerifyOrExit(strCopy != NULL, err = WEAVE_ERROR_NO_MEMORY);
+        VerifyOrExit(strCopy != NULL, err = CHIP_ERROR_NO_MEMORY);
     }
 
     err = ESP32Config::WriteConfigValueStr(key, strCopy);
@@ -376,9 +374,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR ESP32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -395,7 +393,7 @@ WEAVE_ERROR ESP32Config::WriteConfigValueBin(Key key, const uint8_t * data, size
         err = nvs_commit(handle);
         SuccessOrExit(err);
 
-        WeaveLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", key.Namespace, key.Name, dataLen);
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", key.Namespace, key.Name, dataLen);
     }
 
     else
@@ -413,9 +411,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::ClearConfigValue(Key key)
+CHIP_ERROR ESP32Config::ClearConfigValue(Key key)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -426,7 +424,7 @@ WEAVE_ERROR ESP32Config::ClearConfigValue(Key key)
     err = nvs_erase_key(handle, key.Name);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
-        ExitNow(err = WEAVE_NO_ERROR);
+        ExitNow(err = CHIP_NO_ERROR);
     }
     SuccessOrExit(err);
 
@@ -434,7 +432,7 @@ WEAVE_ERROR ESP32Config::ClearConfigValue(Key key)
     err = nvs_commit(handle);
     SuccessOrExit(err);
 
-    WeaveLogProgress(DeviceLayer, "NVS erase: %s/%s", key.Namespace, key.Name);
+    ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", key.Namespace, key.Name);
 
 exit:
     if (needClose)
@@ -447,7 +445,7 @@ exit:
 
 bool ESP32Config::ConfigValueExists(Key key)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -530,9 +528,9 @@ exit:
     return err == ESP_OK;
 }
 
-WEAVE_ERROR ESP32Config::EnsureNamespace(const char * ns)
+CHIP_ERROR ESP32Config::EnsureNamespace(const char * ns)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -557,9 +555,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Config::ClearNamespace(const char * ns)
+CHIP_ERROR ESP32Config::ClearNamespace(const char * ns)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     nvs_handle handle;
     bool needClose = false;
 
@@ -583,5 +581,5 @@ exit:
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
+} // namespace chip
 } // namespace nl

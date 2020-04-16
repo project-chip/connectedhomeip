@@ -121,6 +121,20 @@ libDeviceLayer_a_SOURCES               +=       \
 
 endif # CHIP_DEVICE_LAYER_TARGET_EFR32
 
+if CHIP_DEVICE_LAYER_TARGET_ESP32
+
+libDeviceLayer_a_SOURCES               +=       \
+    ESP32/BLEManagerImpl.cpp                    \
+    ESP32/PlatformManagerImpl.cpp               \
+    ESP32/ConnectivityManagerImpl.cpp           \
+    ESP32/ESP32Config.cpp                       \
+    ESP32/Logging.cpp                           \
+    FreeRTOS/SystemTimeSupport.cpp              \
+    ESP32/SystemTimerSupport.cpp                \
+    $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_ESP32
+
 endif # CONFIG_DEVICE_LAYER
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

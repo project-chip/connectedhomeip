@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -21,31 +22,30 @@
  *          General utility methods for the ESP32 platform.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <Weave/DeviceLayer/ESP32/ESP32Utils.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #include "esp_event.h"
 #include "esp_wifi.h"
 
-using namespace ::nl::Weave::DeviceLayer::Internal;
-using namespace ::nl::Weave::Profiles::NetworkProvisioning;
+using namespace ::chip::DeviceLayer::Internal;
 
-WEAVE_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
+CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     wifi_mode_t curWiFiMode;
 
     err = esp_wifi_get_mode(&curWiFiMode);
     if (err != ESP_OK)
     {
-        WeaveLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", nl::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
     apEnabled = (curWiFiMode == WIFI_MODE_AP || curWiFiMode == WIFI_MODE_APSTA);
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 bool ESP32Utils::IsStationProvisioned(void)
@@ -54,16 +54,16 @@ bool ESP32Utils::IsStationProvisioned(void)
     return (esp_wifi_get_config(ESP_IF_WIFI_STA, &stationConfig) == ERR_OK && stationConfig.sta.ssid[0] != 0);
 }
 
-WEAVE_ERROR ESP32Utils::IsStationConnected(bool & connected)
+CHIP_ERROR ESP32Utils::IsStationConnected(bool & connected)
 {
     wifi_ap_record_t apInfo;
     connected = (esp_wifi_sta_get_ap_info(&apInfo) == ESP_OK);
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-WEAVE_ERROR ESP32Utils::StartWiFiLayer(void)
+CHIP_ERROR ESP32Utils::StartWiFiLayer(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     int8_t ignored;
     bool wifiStarted;
 
@@ -78,7 +78,7 @@ WEAVE_ERROR ESP32Utils::StartWiFiLayer(void)
         break;
     case ESP_ERR_WIFI_NOT_STARTED:
         wifiStarted = false;
-        err = ESP_OK;
+        err         = ESP_OK;
         break;
     default:
         ExitNow();
@@ -86,12 +86,12 @@ WEAVE_ERROR ESP32Utils::StartWiFiLayer(void)
 
     if (!wifiStarted)
     {
-        WeaveLogProgress(DeviceLayer, "Starting ESP WiFi layer");
+        ChipLogProgress(DeviceLayer, "Starting ESP WiFi layer");
 
         err = esp_wifi_start();
         if (err != ESP_OK)
         {
-            WeaveLogError(DeviceLayer, "esp_wifi_start() failed: %s", nl::ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_wifi_start() failed: %s", chip::ErrorStr(err));
         }
     }
 
@@ -99,16 +99,16 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Utils::EnableStationMode(void)
+CHIP_ERROR ESP32Utils::EnableStationMode(void)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     wifi_mode_t curWiFiMode;
 
     // Get the current ESP WiFI mode.
     err = esp_wifi_get_mode(&curWiFiMode);
     if (err != ESP_OK)
     {
-        WeaveLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", nl::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", chip::ErrorStr(err));
     }
     SuccessOrExit(err);
 
@@ -116,12 +116,13 @@ WEAVE_ERROR ESP32Utils::EnableStationMode(void)
     // the mode to WIFI_MODE_APSTA.
     if (curWiFiMode == WIFI_MODE_AP)
     {
-        WeaveLogProgress(DeviceLayer, "Changing ESP WiFi mode: %s -> %s", WiFiModeToStr(WIFI_MODE_AP), WiFiModeToStr(WIFI_MODE_APSTA));
+        ChipLogProgress(DeviceLayer, "Changing ESP WiFi mode: %s -> %s", WiFiModeToStr(WIFI_MODE_AP),
+                        WiFiModeToStr(WIFI_MODE_APSTA));
 
         err = esp_wifi_set_mode(WIFI_MODE_APSTA);
         if (err != ESP_OK)
         {
-            WeaveLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", nl::ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", chip::ErrorStr(err));
         }
         SuccessOrExit(err);
     }
@@ -130,9 +131,9 @@ exit:
     return err;
 }
 
-WEAVE_ERROR ESP32Utils::SetAPMode(bool enabled)
+CHIP_ERROR ESP32Utils::SetAPMode(bool enabled)
 {
-    WEAVE_ERROR err;
+    CHIP_ERROR err;
     wifi_mode_t curWiFiMode, targetWiFiMode;
 
     targetWiFiMode = (enabled) ? WIFI_MODE_APSTA : WIFI_MODE_STA;
@@ -141,7 +142,7 @@ WEAVE_ERROR ESP32Utils::SetAPMode(bool enabled)
     err = esp_wifi_get_mode(&curWiFiMode);
     if (err != ESP_OK)
     {
-        WeaveLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", nl::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", chip::ErrorStr(err));
     }
     SuccessOrExit(err);
 
@@ -149,12 +150,12 @@ WEAVE_ERROR ESP32Utils::SetAPMode(bool enabled)
     // the mode to WIFI_MODE_APSTA.
     if (true /* curWiFiMode != targetWiFiMode */)
     {
-        WeaveLogProgress(DeviceLayer, "Changing ESP WiFi mode: %s -> %s", WiFiModeToStr(curWiFiMode), WiFiModeToStr(targetWiFiMode));
+        ChipLogProgress(DeviceLayer, "Changing ESP WiFi mode: %s -> %s", WiFiModeToStr(curWiFiMode), WiFiModeToStr(targetWiFiMode));
 
         err = esp_wifi_set_mode(targetWiFiMode);
         if (err != ESP_OK)
         {
-            WeaveLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", nl::ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", chip::ErrorStr(err));
         }
         SuccessOrExit(err);
     }
@@ -163,7 +164,7 @@ exit:
     return err;
 }
 
-WiFiSecurityType ESP32Utils::WiFiAuthModeToWeaveWiFiSecurityType(wifi_auth_mode_t authMode)
+WiFiSecurityType ESP32Utils::WiFiAuthModeToChipWiFiSecurityType(wifi_auth_mode_t authMode)
 {
     switch (authMode)
     {
@@ -225,7 +226,7 @@ struct netif * ESP32Utils::GetStationNetif(void)
 struct netif * ESP32Utils::GetNetif(tcpip_adapter_if_t intfId)
 {
     struct netif * netif;
-    return (tcpip_adapter_get_netif(intfId, (void **)&netif) == ESP_OK) ? netif : NULL;
+    return (tcpip_adapter_get_netif(intfId, (void **) &netif) == ESP_OK) ? netif : NULL;
 }
 
 bool ESP32Utils::IsInterfaceUp(tcpip_adapter_if_t intfId)

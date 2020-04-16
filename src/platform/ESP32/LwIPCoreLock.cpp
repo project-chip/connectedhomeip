@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -16,7 +17,7 @@
  *    limitations under the License.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace {
 
@@ -24,30 +25,28 @@ SemaphoreHandle_t LwIPCoreLock;
 
 }
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-WEAVE_ERROR InitLwIPCoreLock(void)
+CHIP_ERROR InitLwIPCoreLock(void)
 {
     if (LwIPCoreLock == NULL)
     {
         LwIPCoreLock = xSemaphoreCreateMutex();
         if (LwIPCoreLock == NULL)
         {
-            WeaveLogError(DeviceLayer, "Failed to create LwIP core lock");
-            return WEAVE_ERROR_NO_MEMORY;
+            ChipLogError(DeviceLayer, "Failed to create LwIP core lock");
+            return CHIP_ERROR_NO_MEMORY;
         }
     }
 
-    return WEAVE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 extern "C" void lock_lwip_core()
 {
