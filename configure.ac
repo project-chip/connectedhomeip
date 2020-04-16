@@ -1774,10 +1774,6 @@ AC_CHECK_HEADERS([new])
 
 AC_LANG_POP([C++])
 
-#
-# Make CHIPVersion.h
-#
-MAKEDIRS="${MAKEDIRS} ${ac_pwd}/src/include"
 
 # Add test enabled macro
 if test "${nl_cv_build_tests}" = "yes"; then
