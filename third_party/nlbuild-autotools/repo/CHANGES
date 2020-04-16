@@ -1,3 +1,8 @@
+1.7.1 (2020-04-15)
+
+        * Addressed an issue in which the use of MAKDIRS and
+          MAKEDIRS_TARGETS resulted in undesireable target rebuilds.
+
 1.7.0 (2020-04-14)
 
         * Added support for project-global targets and target
