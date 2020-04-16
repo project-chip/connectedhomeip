@@ -29,6 +29,12 @@
 namespace chip {
 namespace Crypto {
 
+enum DigestType
+{
+    SHA1 = 0,
+    SHA256
+};
+
 /**
  * @brief A function that implements 256-bit AES-CCM encryption
  * @param plaintext Plaintext to encrypt
@@ -91,6 +97,38 @@ CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length,
  **/
 CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length);
 
+/**
+ * @brief A function to sign a msg using EC DSA
+ * @param msg Message that needs to be signed
+ * @param msg_length Length of message
+ * @param curve_name Name of the curve to use
+ * @param private_key Key to use to sign the message
+ * @param private_key_length Length of private key
+ * @param out_buffer Buffer that will hold the output signature. If non-NULL caller needs to free this memory
+ * @param out_length Length of out signature
+ * @param digest The digest to use to sign the message
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const char * curve_name,
+                          const unsigned char * private_key, const size_t private_key_length, unsigned char ** out_buffer,
+                          size_t & out_length, DigestType digest);
+
+/**
+ * @brief A function to sign a msg using EC DSA
+ * @param msg Message that needs to be signed
+ * @param msg_length Length of message
+ * @param curve_name Name of the curve to use
+ * @param public_key Key to use to verify the message signature
+ * @param private_key_length Length of public key
+ * @param signature Signature to use for verification
+ * @param signature_length Length of signature
+ * * @param digest The digest used to sign the message
+ * @return Returns a CHIP_NO_ERROR on successful verification, a CHIP_ERROR otherwise
+ **/
+CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const char * curve_name,
+                                        const unsigned char * public_key, const size_t public_key_length,
+                                        const unsigned char * signature, const size_t signature_length, DigestType digest);
 } // namespace Crypto
 } // namespace chip
+
 #endif

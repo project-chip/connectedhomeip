@@ -122,7 +122,18 @@
             "command": "make -C examples/lock-app/nrf5",
             "group": "none",
             "dependsOn": "Clean Tree",
-            "problemMatcher": ["$gcc"]
-        }
-    ]
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Build openSSL crypto Tests",
+            "type": "shell",
+            "command": " make -C build/default/src/crypto/ && make -C build/default/src/crypto/tests/ TestOpenSSLCrypto",
+            "group": "none",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+    ],
 }

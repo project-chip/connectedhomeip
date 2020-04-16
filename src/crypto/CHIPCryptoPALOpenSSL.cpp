@@ -24,13 +24,17 @@
 
 #include <openssl/conf.h>
 #include <openssl/rand.h>
+#include <openssl/ecdsa.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #include <openssl/kdf.h>
+#include <openssl/ossl_typ.h>
 #include <support/CodeUtils.h>
 #include <string.h>
 
 #define kKeyLengthInBits 256
+
+using namespace chip::Crypto;
 
 static bool _isValidTagLength(size_t tag_length)
 {
@@ -39,6 +43,53 @@ static bool _isValidTagLength(size_t tag_length)
         return true;
     }
     return false;
+}
+
+static void _logSSLError()
+{
+    int ssl_err_code = ERR_get_error();
+    while (ssl_err_code != 0)
+    {
+        const char * err_str_lib     = ERR_lib_error_string(ssl_err_code);
+        const char * err_str_routine = ERR_func_error_string(ssl_err_code);
+        const char * err_str_reason  = ERR_reason_error_string(ssl_err_code);
+        if (err_str_lib)
+        {
+            printf("\nssl err  %s %s %s\n", err_str_lib, err_str_routine, err_str_reason);
+        }
+        ssl_err_code = ERR_get_error();
+    }
+}
+
+static const EVP_MD * _digestForType(chip::Crypto::DigestType digestType)
+{
+    switch (digestType)
+    {
+    case SHA1:
+        return EVP_sha1();
+        break;
+
+    case SHA256:
+        return EVP_sha256();
+
+    default:
+        return NULL;
+        break;
+    }
+}
+
+// Calller needs to free returned char *
+static char * _createHexString(const unsigned char * in, const size_t in_length)
+{
+    char * result        = (char *) calloc(in_length * 2, sizeof(char));
+    size_t current_index = 0;
+
+    for (size_t i = 0; i < in_length; i++)
+    {
+        snprintf(result + current_index, 3, "%02x", in[i]);
+        current_index += 2;
+    }
+    return result;
 }
 
 CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
@@ -249,5 +300,195 @@ CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const char * curve_name,
+                                        const unsigned char * private_key, const size_t private_key_length,
+                                        unsigned char ** out_buffer, size_t & out_length, DigestType digest)
+{
+    ERR_clear_error();
+    CHIP_ERROR error       = CHIP_NO_ERROR;
+    int result             = 0;
+    EVP_MD_CTX * context   = NULL;
+    int nid                = NID_undef;
+    EC_KEY * ec_key        = NULL;
+    EVP_PKEY * signing_key = NULL;
+    char * _hexString      = NULL;
+    BIGNUM * pvt_key_hex   = NULL;
+    const EVP_MD * md      = NULL;
+
+    VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(curve_name != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    nid = EC_curve_nist2nid(curve_name);
+    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(*out_buffer == NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
+
+    _hexString = _createHexString(private_key, private_key_length);
+    VerifyOrExit(_hexString != NULL, error = CHIP_ERROR_INTERNAL);
+
+    BN_hex2bn(&pvt_key_hex, _hexString);
+    VerifyOrExit(pvt_key_hex != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_private_key(ec_key, pvt_key_hex);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    signing_key = EVP_PKEY_new();
+    VerifyOrExit(signing_key != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_set1_EC_KEY(signing_key, ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    context = EVP_MD_CTX_create();
+    VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
+    md = _digestForType(digest);
+    VerifyOrExit(md != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = EVP_DigestSignInit(context, NULL, md, NULL, signing_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_DigestSignUpdate(context, msg, msg_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Call the EVP_DigestSignFinal with a NULL param to get length of the signature.
+    result = EVP_DigestSignFinal(context, NULL, &out_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    if (out_buffer)
+    {
+        *out_buffer = (unsigned char *) malloc(out_length);
+    }
+
+    result = EVP_DigestSignFinal(context, *out_buffer, &out_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    if (ec_key != NULL)
+    {
+        EC_KEY_free(ec_key);
+        ec_key = NULL;
+    }
+
+    if (context != NULL)
+    {
+        EVP_MD_CTX_destroy(context);
+        context = NULL;
+    }
+    if (signing_key != NULL)
+    {
+        EVP_PKEY_free(signing_key);
+        signing_key = NULL;
+    }
+
+    if (error != CHIP_NO_ERROR && out_buffer && *out_buffer != NULL)
+    {
+        free(*out_buffer);
+        *out_buffer = NULL;
+    }
+
+    if (error != CHIP_NO_ERROR)
+    {
+        _logSSLError();
+    }
+
+    if (_hexString)
+    {
+        free(_hexString);
+        _hexString = NULL;
+    }
+
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const char * curve_name,
+                                                      const unsigned char * public_key, const size_t public_key_length,
+                                                      const unsigned char * signature, const size_t signature_length,
+                                                      DigestType digest)
+{
+    ERR_clear_error();
+    CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
+    int nid                     = NID_undef;
+    const EVP_MD * md           = NULL;
+    EC_KEY * ec_key             = NULL;
+    EVP_PKEY * verification_key = NULL;
+    EC_POINT * key_point        = NULL;
+    EC_GROUP * ec_group         = NULL;
+    int result                  = 0;
+    EVP_MD_CTX * md_context     = NULL;
+
+    VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(curve_name != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    nid = EC_curve_nist2nid(curve_name);
+    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(signature_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    md = _digestForType(digest);
+    VerifyOrExit(md != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    ec_group = EC_GROUP_new_by_curve_name(nid);
+    VerifyOrExit(ec_group != NULL, error = CHIP_ERROR_INTERNAL);
+
+    key_point = EC_POINT_new(ec_group);
+    VerifyOrExit(key_point != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_POINT_oct2point(ec_group, key_point, public_key, public_key_length, NULL);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_public_key(ec_key, key_point);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_check_key(ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    verification_key = EVP_PKEY_new();
+    VerifyOrExit(verification_key != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_set1_EC_KEY(verification_key, ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    md_context = EVP_MD_CTX_create();
+    VerifyOrExit(md_context != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_DigestVerifyInit(md_context, NULL, md, NULL, verification_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_DigestVerifyUpdate(md_context, msg, msg_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_DigestVerifyFinal(md_context, signature, signature_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INVALID_SIGNATURE);
+    error = CHIP_NO_ERROR;
+
+exit:
+    _logSSLError();
+    if (ec_group != NULL)
+    {
+        EC_GROUP_free(ec_group);
+        ec_group = NULL;
+    }
+    if (key_point != NULL)
+    {
+        EC_POINT_clear_free(key_point);
+        key_point = NULL;
+    }
+    if (md_context)
+    {
+        EVP_MD_CTX_destroy(md_context);
+        md_context = NULL;
+    }
     return error;
 }
