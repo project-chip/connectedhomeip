@@ -128,5 +128,3 @@ endif # CHIP_BUILD_COVERAGE
 endif # CHIP_BUILD_TESTS
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
-
-
