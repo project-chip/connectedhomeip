@@ -25,6 +25,8 @@ request_review: none
 exclude:
     - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
     - "third_party/**/*"
+    - "third_party/**"
+    - "third_party/*"
     - "build/**/*"
     - "autom4te.cache/**/*"
 
