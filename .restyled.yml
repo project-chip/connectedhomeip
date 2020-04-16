@@ -5,6 +5,9 @@ command:
   - "-i"
 auto: true
 arguments: []
+exclude:
+  - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
+  - "third_party/**"
 include:
   - "**/*.c"
   - "**/*.cc"
