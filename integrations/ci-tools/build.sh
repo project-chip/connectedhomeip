@@ -55,20 +55,6 @@ case "$TASK" in
     docker_run_bash_command
     ;;
 
-  run-crypto-tests)
-    write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'make -C build/default/src/crypto check'
-    docker_run_bash_command
-    ;;
-
-  run-setup-payload-tests)
-    write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'make -C build/default/src/setup_payload check'
-    docker_run_bash_command
-    ;;
-
   *)
     die "Unknown task: $TASK."
     ;;
