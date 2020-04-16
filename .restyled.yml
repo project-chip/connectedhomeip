@@ -1,13 +1,14 @@
 ---
 image: restyled/restyler-clang-format:v9.0.0
+
 command:
   - clang-format
   - "-i"
+
 auto: true
+
 arguments: []
-exclude:
-  - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
-  - "**/third_party/**/*"
+
 include:
   - "**/*.c"
   - "**/*.cc"
@@ -25,4 +26,9 @@ include:
   - "**/*.java"
   - "**/*.js"
   - "**/*.m"
+
+exclude:
+  - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
+  - "**/third_party/**/*"
+
 interpreters: []
