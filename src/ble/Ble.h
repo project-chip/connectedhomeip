@@ -35,7 +35,7 @@
 #include <ble/BleLayer.h>
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
-#include <ble/CHIPoBle.h>
+#include <ble/BtpEngine.h>
 
 /**
  *   @namespace Ble

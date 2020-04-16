@@ -31,9 +31,9 @@
 #include <system/SystemMutex.h>
 
 #include <ble/BleLayer.h>
-#include <ble/CHIPoBle.h>
+#include <ble/BtpEngine.h>
 #if CHIP_ENABLE_CHIPOBLE_TEST
-#include <ble/CHIPoBleTest.h>
+#include <ble/BtpEngineTest.h>
 #endif
 
 namespace chip {
@@ -51,7 +51,7 @@ enum
 class BleLayer;
 class BleEndPointPool;
 #if CHIP_ENABLE_CHIPOBLE_TEST
-class CHIPoBleTest;
+class BtpEngineTest;
 #endif
 
 class DLL_EXPORT BLEEndPoint : public BleLayerObject
@@ -59,7 +59,7 @@ class DLL_EXPORT BLEEndPoint : public BleLayerObject
     friend class BleLayer;
     friend class BleEndPointPool;
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    friend class CHIPoBleTest;
+    friend class BtpEngineTest;
 #endif
 
 public:
@@ -91,7 +91,7 @@ public:
     typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBuffer * msg);
     OnCommandReceivedFunct OnCommandReceived;
     inline void SetOnCommandReceivedCB(OnCommandReceivedFunct cb) { OnCommandReceived = cb; };
-    CHIPoBleTest mCHIPoBleTest;
+    BtpEngineTest mBtpEngineTest;
     inline void SetTxWindowSize(uint8_t size) { mRemoteReceiveWindowSize = size; };
     inline void SetRxWindowSize(uint8_t size) { mReceiveWindowMaxSize = size; };
 #endif
@@ -136,7 +136,7 @@ private:
     // modify the state of the underlying BLE connection.
     BLE_CONNECTION_OBJECT mConnObj;
 
-    // Queue of outgoing messages to send when current CHIPoBle transmission completes.
+    // Queue of outgoing messages to send when current BtpEngine transmission completes.
     //
     // Re-used during connection setup to cache capabilities request and response payloads; payloads are freed when
     // connection is established.
@@ -146,7 +146,7 @@ private:
     // progress.
     PacketBuffer * mAckToSend;
 
-    CHIPoBle mCHIPoBle;
+    BtpEngine mBtpEngine;
     BleRole mRole;
     uint8_t mConnStateFlags;
     uint8_t mTimerStateFlags;
@@ -216,9 +216,9 @@ private:
     void FinalizeClose(uint8_t state, uint8_t flags, BLE_ERROR err);
     void ReleaseBleConnection(void);
     void Free(void);
-    void FreeCHIPoBle(void);
+    void FreeBtpEngine(void);
 
-    // Mutex lock on Tx queue. Used only in CHIPoBle test build for now.
+    // Mutex lock on Tx queue. Used only in BtpEngine test build for now.
 #if CHIP_ENABLE_CHIPOBLE_TEST
     inline void QueueTxLock() { mTxQueueMutex.Lock(); };
     inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); };

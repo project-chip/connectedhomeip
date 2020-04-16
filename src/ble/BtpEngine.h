@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef CHIPOBLE_H_
-#define CHIPOBLE_H_
+#ifndef BTP_ENGINE_H_
+#define BTP_ENGINE_H_
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -46,7 +46,7 @@ namespace Ble {
 
 using ::chip::System::PacketBuffer;
 
-typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in CHIPoBle::IsValidAck and
+typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in BtpEngine::IsValidAck and
                                   // BLEEndPoint::AdjustReceiveWindow.
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
@@ -58,9 +58,9 @@ typedef enum
 {
     kType_Data    = 0, // Default 0 for data
     kType_Control = 1,
-} PacketType_t; // CHIPoBle packet types
+} PacketType_t; // BTP packet types
 
-class CHIPoBle
+class BtpEngine
 {
 #if CHIP_ENABLE_CHIPOBLE_TEST
     friend class BLEEndPoint;
@@ -92,8 +92,8 @@ public:
 
 public:
     // Public functions:
-    CHIPoBle(void){};
-    ~CHIPoBle(void){};
+    BtpEngine(void){};
+    ~BtpEngine(void){};
 
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 
@@ -192,4 +192,4 @@ private:
 } /* namespace Ble */
 } /* namespace chip */
 
-#endif /* CHIPOBLE_H_ */
+#endif /* BTP_ENGINE_H_ */

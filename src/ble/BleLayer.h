@@ -99,9 +99,9 @@ typedef enum
 typedef enum
 {
     kBleTransportProtocolVersion_None = 0,
-    kBleTransportProtocolVersion_V1   = 1, // Prototype CHIPoBle version without ACKs or flow-control.
-    kBleTransportProtocolVersion_V2   = 2, // First CHIPoBLE version with ACKs and flow-control.
-    kBleTransportProtocolVersion_V3   = 3  // First CHIPoBLE version with asymetric fragement sizes.
+    kBleTransportProtocolVersion_V1   = 1, // Prototype BTP version without ACKs or flow-control.
+    kBleTransportProtocolVersion_V2   = 2, // First BTP version with ACKs and flow-control.
+    kBleTransportProtocolVersion_V3   = 3  // First BTP version with asymetric fragement sizes.
 } BleTransportProtocolVersion;
 
 class BleLayerObject
@@ -231,7 +231,7 @@ class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    friend class CHIPoBleTest;
+    friend class BtpEngineTest;
 #endif
 
 public:
