@@ -6,6 +6,9 @@ management in the code repository.
 
 ### Issues
 
+
+
+
 CHIP uses issues as simple problem descriptions or feature requests.  In
 general, all work contributed to the repository in the form of pull requests
 (PR) should be under the auspices of some open issue.  This may seem onerous and
