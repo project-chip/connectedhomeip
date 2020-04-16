@@ -15,7 +15,7 @@ Makefile.in
 aclocal.m4
 autom4te.cache
 output/
-build/
+build/*
 !build/README.md
 !build/autoconf/m4/chip_check_project_config_includes.m4
 !build/autoconf/m4/nl_with_lwip.m4
@@ -24,8 +24,10 @@ build/
 !build/config/standalone/darwin/CHIPProjectConfig.h
 !build/config/standalone/no-openssl/CHIPProjectConfig.h
 !build/efr32/
+!build/esp32/
 !build/nrf5/
 !build/scripts/gen-chip-version
+examples/**/build
 config.log
 config.status
 configure
