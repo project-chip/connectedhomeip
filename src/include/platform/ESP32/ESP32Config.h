@@ -25,10 +25,9 @@
 #ifndef ESP32_CONFIG_H
 #define ESP32_CONFIG_H
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -41,16 +40,15 @@ namespace Internal {
 class ESP32Config
 {
 public:
-
     struct Key;
 
     // Maximum length of an NVS key name, as specified in the ESP-IDF documentation.
     static constexpr size_t kMaxConfigKeyNameLength = 15;
 
     // NVS namespaces used to store device configuration information.
-    static const char kConfigNamespace_WeaveFactory[];
-    static const char kConfigNamespace_WeaveConfig[];
-    static const char kConfigNamespace_WeaveCounters[];
+    static const char kConfigNamespace_ChipFactory[];
+    static const char kConfigNamespace_ChipConfig[];
+    static const char kConfigNamespace_ChipCounters[];
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
@@ -78,23 +76,23 @@ public:
     static const char kGroupKeyNamePrefix[];
 
     // Config value accessors.
-    static WEAVE_ERROR ReadConfigValue(Key key, bool & val);
-    static WEAVE_ERROR ReadConfigValue(Key key, uint32_t & val);
-    static WEAVE_ERROR ReadConfigValue(Key key, uint64_t & val);
-    static WEAVE_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
-    static WEAVE_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
-    static WEAVE_ERROR WriteConfigValue(Key key, bool val);
-    static WEAVE_ERROR WriteConfigValue(Key key, uint32_t val);
-    static WEAVE_ERROR WriteConfigValue(Key key, uint64_t val);
-    static WEAVE_ERROR WriteConfigValueStr(Key key, const char * str);
-    static WEAVE_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
-    static WEAVE_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
-    static WEAVE_ERROR ClearConfigValue(Key key);
+    static CHIP_ERROR ReadConfigValue(Key key, bool & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
+    static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR WriteConfigValue(Key key, bool val);
+    static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
+    static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
+    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
+    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
+    static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
+    static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
 
     // NVS Namespace helper functions.
-    static WEAVE_ERROR EnsureNamespace(const char * ns);
-    static WEAVE_ERROR ClearNamespace(const char * ns);
+    static CHIP_ERROR EnsureNamespace(const char * ns);
+    static CHIP_ERROR ClearNamespace(const char * ns);
 };
 
 struct ESP32Config::Key
@@ -110,10 +108,8 @@ inline bool ESP32Config::Key::operator==(const Key & other) const
     return strcmp(Namespace, other.Namespace) == 0 && strcmp(Name, other.Name) == 0;
 }
 
-
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // ESP32_CONFIG_H
