@@ -140,5 +140,14 @@
                 "$gcc"
             ]
         },
+        {
+            "label": "Build openSSL crypto Tests",
+            "type": "shell",
+            "command": " make -C build/default/src/crypto/ && make -C build/default/src/crypto/tests/ TestOpenSSLCrypto",
+            "group": "none",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
     ],
 }

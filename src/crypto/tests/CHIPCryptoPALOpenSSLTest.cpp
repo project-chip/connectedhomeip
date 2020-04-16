@@ -23,7 +23,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <support/CodeUtils.h>
+#include <stdlib.h>
 
+using namespace chip;
 using namespace chip::Crypto;
 
 static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
@@ -297,24 +299,240 @@ static void TestDRBG_Output(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(out_buf, orig_buf, sizeof(out_buf)) != 0);
 }
 
+static void TestECDSA_Signing(nlTestSuite * inSuite, void * inContext)
+{
+    const char * msg                = "Hello World!";
+    size_t msg_length               = strlen((const char *) msg);
+    const char * curve_name         = "P-256";
+    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
+                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
+                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+
+    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+
+    unsigned char * signature = NULL;
+    size_t signature_length   = 0;
+    CHIP_ERROR signing_error  = ECDSA_sign_msg((const unsigned char *) msg, msg_length, curve_name, hex_private_key,
+                                              sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
+
+    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
+                                                               sizeof(hex_public_key), signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_NO_ERROR);
+}
+
+static void TestECDSA_ValidationFailsDifferentHashAlgorithm(nlTestSuite * inSuite, void * inContext)
+{
+    const char * msg                = "Hello World!";
+    size_t msg_length               = strlen((const char *) msg);
+    const char * curve_name         = "P-256";
+    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
+                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
+                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+
+    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+
+    unsigned char * signature = NULL;
+    size_t signature_length   = 0;
+    CHIP_ERROR signing_error  = ECDSA_sign_msg((const unsigned char *) msg, msg_length, curve_name, hex_private_key,
+                                              sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
+
+    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
+                                                               sizeof(hex_public_key), signature, signature_length, SHA256);
+    NL_TEST_ASSERT(inSuite, validation_error != CHIP_NO_ERROR);
+}
+
+static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, void * inContext)
+{
+    const char * msg                = "Hello World!";
+    size_t msg_length               = strlen((const char *) msg);
+    const char * curve_name         = "P-256";
+    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
+                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
+                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+
+    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+
+    unsigned char * signature = NULL;
+    size_t signature_length   = 0;
+    CHIP_ERROR signing_error  = ECDSA_sign_msg((const unsigned char *) msg, msg_length, curve_name, hex_private_key,
+                                              sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
+
+    const char * diff_msg  = "NOT Hello World!";
+    size_t diff_msg_length = strlen((const char *) msg);
+    CHIP_ERROR validation_error =
+        ECDSA_validate_msg_signature((const unsigned char *) diff_msg, diff_msg_length, curve_name, hex_public_key,
+                                     sizeof(hex_public_key), signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error != CHIP_NO_ERROR);
+}
+
+static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, void * inContext)
+{
+    const char * msg                = "Hello World!";
+    size_t msg_length               = strlen((const char *) msg);
+    const char * curve_name         = "P-256";
+    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
+                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
+                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+
+    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+
+    unsigned char * signature = NULL;
+    size_t signature_length   = 0;
+    CHIP_ERROR signing_error  = ECDSA_sign_msg((const unsigned char *) msg, msg_length, curve_name, hex_private_key,
+                                              sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
+    signature[0] = ~signature[0]; // Flipping bits should invalidate the signature.
+
+    CHIP_ERROR validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
+                                                               sizeof(hex_public_key), signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_SIGNATURE);
+}
+
+static void TestECDSA_SigningInvalidParams(nlTestSuite * inSuite, void * inContext)
+{
+    const unsigned char * msg       = (unsigned char *) "Hello World!";
+    size_t msg_length               = strlen((const char *) msg);
+    const char * curve_name         = "P-256";
+    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
+                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
+                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+
+    unsigned char * signature = NULL;
+    size_t signature_length   = 0;
+    CHIP_ERROR signing_error =
+        ECDSA_sign_msg(NULL, msg_length, curve_name, hex_private_key, sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
+    signing_error = CHIP_NO_ERROR;
+
+    signing_error =
+        ECDSA_sign_msg(msg, 0, curve_name, hex_private_key, sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
+    signing_error = CHIP_NO_ERROR;
+
+    signing_error =
+        ECDSA_sign_msg(msg, msg_length, "curve_name", hex_private_key, sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
+    signing_error = CHIP_NO_ERROR;
+
+    signing_error = ECDSA_sign_msg(msg, msg_length, curve_name, NULL, sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
+    signing_error = CHIP_NO_ERROR;
+
+    signing_error = ECDSA_sign_msg(msg, msg_length, "curve_name", hex_private_key, 0, &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
+    signing_error = CHIP_NO_ERROR;
+
+    signing_error =
+        ECDSA_sign_msg(msg, msg_length, curve_name, hex_private_key, sizeof(hex_private_key), NULL, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
+    signing_error = CHIP_NO_ERROR;
+
+}
+
+static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inContext)
+{
+    const char * msg                = "Hello World!";
+    size_t msg_length               = strlen((const char *) msg);
+    const char * curve_name         = "P-256";
+    unsigned char hex_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
+                                        0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
+                                        0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+
+    unsigned char hex_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                       0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                       0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                       0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                       0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+
+    unsigned char * signature = NULL;
+    size_t signature_length   = 0;
+    CHIP_ERROR signing_error =
+        ECDSA_sign_msg((const unsigned char *) msg, msg_length, curve_name, hex_private_key, sizeof(hex_private_key), &signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
+
+    CHIP_ERROR validation_error = ECDSA_validate_msg_signature(NULL, msg_length, curve_name, hex_public_key, sizeof(hex_public_key),
+                                                               signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
+    validation_error = CHIP_NO_ERROR;
+
+    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, 0, curve_name, hex_public_key,
+                                                               sizeof(hex_public_key), signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
+    validation_error = CHIP_NO_ERROR;
+
+    validation_error =
+        ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, "curve_name", hex_public_key, sizeof(hex_public_key),
+                                     signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
+    validation_error = CHIP_NO_ERROR;
+
+    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, NULL,
+                                                               sizeof(hex_public_key), signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
+    validation_error = CHIP_NO_ERROR;
+
+    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
+                                                               0, signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
+    validation_error = CHIP_NO_ERROR;
+
+    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
+                                                               sizeof(hex_public_key), NULL, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
+    validation_error = CHIP_NO_ERROR;
+
+    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
+                                                               sizeof(hex_public_key), signature, 0, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
+    validation_error = CHIP_NO_ERROR;
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 
-static const nlTest sTests[] = { NL_TEST_DEF("Test encrypting test vectors", TestAES_CCM_256EncryptTestVectors),
-                                 NL_TEST_DEF("Test decrypting test vectors", TestAES_CCM_256DecryptTestVectors),
-                                 NL_TEST_DEF("Test encrypting invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
-                                 NL_TEST_DEF("Test encrypting using nil key", TestAES_CCM_256EncryptNilKey),
-                                 NL_TEST_DEF("Test encrypting using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
-                                 NL_TEST_DEF("Test encrypting using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
-                                 NL_TEST_DEF("Test decrypting invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
-                                 NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey),
-                                 NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
-                                 NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
-                                 NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
-                                 NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
-                                 NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
-                                 NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    NL_TEST_DEF("Test encrypting test vectors", TestAES_CCM_256EncryptTestVectors),
+    NL_TEST_DEF("Test decrypting test vectors", TestAES_CCM_256DecryptTestVectors),
+    NL_TEST_DEF("Test encrypting invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
+    NL_TEST_DEF("Test encrypting using nil key", TestAES_CCM_256EncryptNilKey),
+    NL_TEST_DEF("Test encrypting using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
+    NL_TEST_DEF("Test encrypting using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
+    NL_TEST_DEF("Test decrypting invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
+    NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey),
+    NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
+    NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
+    NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
+    NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
+    NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
+    NL_TEST_DEF("Test ECDSA signing and validation", TestECDSA_Signing),
+    NL_TEST_DEF("Test ECDSA signature validation fail - Different hash algorithm", TestECDSA_ValidationFailsDifferentHashAlgorithm),
+    NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),
+    NL_TEST_DEF("Test ECDSA signature validation fail - Different signature", TestECDSA_ValidationFailIncorrectSignature),
+    NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningInvalidParams),
+    NL_TEST_DEF("Test ECDSA signature validation invalid parameters", TestECDSA_ValidationInvalidParam),
+
+    NL_TEST_SENTINEL()
+};
 
 int main(void)
 {
