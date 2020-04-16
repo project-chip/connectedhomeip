@@ -7,6 +7,7 @@
         "${workspaceFolder}/build/default/src/lib/**",
         "${workspaceFolder}/build/config/standalone/",
         "${workspaceFolder}/build/config/standalone/**",
+        "${workspaceFolder}/examples/**",
         "${workspaceFolder}/src/**",
         "${workspaceFolder}/src/include/",
         "${workspaceFolder}/src/include/**",
