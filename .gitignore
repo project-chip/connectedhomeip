@@ -40,3 +40,4 @@ third_party/nlassert/
 third_party/nlfaultinjection/
 third_party/nlio/
 third_party/nlunit-test/
+third_party/mbedtls/

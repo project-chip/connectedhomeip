@@ -1359,10 +1359,21 @@ fi
 # mbedTLS
 #
 
-NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([mbedTLS],
+NL_WITH_PACKAGE(
+    [mbedTLS],
     [MBEDTLS],
     [mbedtls],
     [-lmbedtls],
+    [
+        # At this point, the internal mbedTLS package will be neither
+        # configured nor built, so the normal checks we undertake for an
+        # external package cannot be run here. Simply set the appropriate
+        # variables and trust all will be well.
+
+        NLASSERT_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
+        NLASSERT_LDFLAGS=
+        NLASSERT_LIBS=
+    ],
     [
         # Check for required mbedTLS headers.
 
@@ -1376,13 +1387,28 @@ NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([mbedTLS],
     ]
 )
 
-AM_CONDITIONAL([CHIP_WITH_MBEDTLS], [test "${nl_with_mbedtls}" != "no"])
+# Depending on whether mbedTLS has been configured for an internal
+# location, its directory stem within this package needs to be set
+# accordingly. In addition, if the location is internal, then we need
+# to attempt to pull it down using the bootstrap makefile.
 
-if test "${nl_with_mbedtls}" = "no"; then
-    AC_DEFINE([CHIP_WITH_MBEDTLS], [0], [Define to 1 to build CHIP with mbedTLS features])
+if test "${nl_with_mbedtls}" = "internal"; then
+    maybe_mbedtls_dirstem="mbedtls/repo"
+    mbedtls_dirstem="third_party/${maybe_mbedtls_dirstem}"
+
+    AC_MSG_NOTICE([attempting to create internal ${mbedtls_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${mbedtls_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${mbedtls_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
 else
-    AC_DEFINE([CHIP_WITH_MBEDTLS], [1], [Define to 1 to build CHIP with mbedTLS features])
+    maybe_mbedtls_dirstem=""
 fi
+
+AC_SUBST(MBEDTLS_SUBDIRS, [${maybe_mbedtls_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_MBEDTLS_INTERNAL], [test "${nl_with_mbedtls}" = "internal"])
 
 #
 # LwIP
@@ -1897,6 +1923,10 @@ fi
 
 if test "${nl_with_nlassert}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlassert/repo])
+fi
+
+if test "${nl_with_mbedtls}" = "internal"; then
+AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
 fi
 
 if test "${nl_with_nlfaultinjection}" = "internal"; then
