@@ -55,8 +55,7 @@ restylers:
           - "**/*.js"
           - "**/*.m"
       interpreters: []
-    - name: prettier-json
-      image: restyled/restyler-prettier:v1.19.1-2
+    - name: jq
       enabled: true
       include:
           - "**/*.json"
