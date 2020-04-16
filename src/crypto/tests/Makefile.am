@@ -45,14 +45,17 @@ AM_CPPFLAGS                                    = \
     -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
     -I$(top_srcdir)/src/system                   \
-    -I$(top_srcdir)/src/include/                 \    
+    -I$(top_srcdir)/src/include/                 \
     -I$(top_srcdir)/src/crypto                   \
     $(NULL)
 
 CHIP_LDADD                                      = \
+    $(top_builddir)/src/crypto/libChipCrypto.a    \
     $(NULL)
 
-MAKEDIR_TARGETS=$(CHIP_LDADD)
+MAKEDIR_TARGETS                                 = \
+    $(CHIP_LDADD)                                 \
+    $(NULL)
 
 COMMON_LDADD                                   = \
     $(CHIP_LDADD)                                \
@@ -82,20 +85,18 @@ TESTS_ENVIRONMENT                              = \
 
 TestCrypto_LDADD                               = \
     $(COMMON_LDADD)                              \
-    $(top_builddir)/src/crypto/libChipCrypto.a   \
     $(NULL)
 
 
 TestCrypto_SOURCES                             = CHIPCryptoTest.c
 
-#OpenSSL based tests
+# OpenSSL based tests
 TestOpenSSLCrypto_LDADD                        =        \
     $(COMMON_LDADD)                                     \
-    $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(NULL)
 
 
-TestOpenSSLCrypto_SOURCES                       = CHIPCryptoPALOpenSSLTest.cpp
+TestOpenSSLCrypto_SOURCES                      = CHIPCryptoPALOpenSSLTest.cpp
 
 
 if CHIP_BUILD_COVERAGE
@@ -127,5 +128,3 @@ endif # CHIP_BUILD_COVERAGE
 endif # CHIP_BUILD_TESTS
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
-
-
