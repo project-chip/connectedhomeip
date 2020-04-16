@@ -10,11 +10,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run Pretty Check
-        run: |
-          sudo apt install clang-format-9
-          ./bootstrap
-          make -f Makefile-Standalone pretty-check
-
       - name: Run Build
         run: ./integrations/docker/run_docker_build.sh
