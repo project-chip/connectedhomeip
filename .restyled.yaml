@@ -2,10 +2,10 @@
 enabled: true
 
 # Push the style fixes directly to the original PR
-auto: false
+auto: true
 
 # Open Restyle PRs?
-pull_requests: true
+pull_requests: false
 
 # Add labels to any created Restyle PRs
 labels:
