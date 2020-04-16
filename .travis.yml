@@ -19,16 +19,17 @@ jobs:
     - stage: Build
       name: "Build NRF Example Lock App"
       env: TASK="build-nrf-example-lock-app"
-    - stage: Tests
-      name: "Unit & Functional Tests"
-      env: TASK="run-unit-and-functional-tests"
-    - stage: Tests
-      name: "Crypto Tests"
-      env: TASK="run-crypto-tests"
+    # Disabled given: https://github.com/project-chip/connectedhomeip/issues/385
+    # - stage: Tests
+    #   name: "Unit & Functional Tests"
+    #   env: TASK="run-unit-and-functional-tests"
+    # - stage: Tests
+    #   name: "Crypto Tests"
+    #   env: TASK="run-crypto-tests"
     - stage: Tests
       name: "Setup Payload Tests"
       env: TASK="run-setup-payload-tests"
-    - stage: Deploy
+    - stage: Deployment Checks
       name: "Distribution Check"
       env: TASK="build-distribution-check"
       
