@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -18,39 +19,39 @@
 
 /**
  *    @file
- *          Provides implementations for the OpenWeave logging functions
+ *          Provides implementations for the CHIP logging functions
  *          on the ESP32 platform.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Support/logging/WeaveLogging.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/logging/ChipLogging.h>
 
 #include "esp_log.h"
 
-using namespace ::nl::Weave;
-using namespace ::nl::Weave::DeviceLayer::Internal;
+using namespace ::chip;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
 
-void GetModuleName(char *buf, uint8_t module)
+void GetModuleName(char * buf, uint8_t module)
 {
-    if (module == ::nl::Weave::Logging::kLogModule_DeviceLayer)
+    if (module == ::chip::Logging::kLogModule_DeviceLayer)
     {
         memcpy(buf, "DL", 3);
     }
     else
     {
-        ::nl::Weave::Logging::GetModuleName(buf, module);
+        ::chip::Logging::GetModuleName(buf, module);
     }
 }
 
 } // unnamed namespace
 
 namespace nl {
-namespace Weave {
+namespace chip {
 namespace Logging {
 
-void Log(uint8_t module, uint8_t category, const char *msg, ...)
+void Log(uint8_t module, uint8_t category, const char * msg, ...)
 {
     va_list v;
 
@@ -58,23 +59,25 @@ void Log(uint8_t module, uint8_t category, const char *msg, ...)
 
     if (IsCategoryEnabled(category))
     {
-        enum {
-            kMaxTagLen = 7 + nlWeaveLoggingModuleNameLen
+        enum
+        {
+            kMaxTagLen = 7 + nlChipLoggingModuleNameLen
         };
         char tag[kMaxTagLen + 1];
         size_t tagLen;
-        char formattedMsg[WEAVE_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
-        strcpy(tag, "weave[");
+        strcpy(tag, "chip[");
         tagLen = strlen(tag);
         ::GetModuleName(tag + tagLen, module);
-        tagLen = strlen(tag);
+        tagLen        = strlen(tag);
         tag[tagLen++] = ']';
-        tag[tagLen] = 0;
+        tag[tagLen]   = 0;
 
         vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
 
-        switch (category) {
+        switch (category)
+        {
         case kLogCategory_Error:
             ESP_LOGE(tag, "%s", formattedMsg);
             break;
@@ -93,6 +96,5 @@ void Log(uint8_t module, uint8_t category, const char *msg, ...)
 }
 
 } // namespace Logging
-} // namespace Weave
+} // namespace chip
 } // namespace nl
-
