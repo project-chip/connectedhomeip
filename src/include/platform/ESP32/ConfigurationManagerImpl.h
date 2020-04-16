@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -25,11 +26,10 @@
 #ifndef CONFIGURATION_MANAGER_IMPL_H
 #define CONFIGURATION_MANAGER_IMPL_H
 
-#include <Weave/DeviceLayer/internal/GenericConfigurationManagerImpl.h>
-#include <Weave/DeviceLayer/ESP32/ESP32Config.h>
+#include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <platform/ESP32/ESP32Config.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 namespace Internal {
@@ -39,10 +39,9 @@ class NetworkProvisioningServerImpl;
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the ESP32 platform.
  */
-class ConfigurationManagerImpl final
-    : public ConfigurationManager,
-      public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-      private Internal::ESP32Config
+class ConfigurationManagerImpl final : public ConfigurationManager,
+                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                       private Internal::ESP32Config
 {
     // Allow the ConfigurationManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -53,17 +52,16 @@ class ConfigurationManagerImpl final
     friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 private:
-
     // ===== Members that implement the ConfigurationManager public interface.
 
-    WEAVE_ERROR _Init(void);
-    WEAVE_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
-    WEAVE_ERROR _GetDeviceDescriptor(::nl::Weave::Profiles::DeviceDescription::WeaveDeviceDescriptor & deviceDesc);
-    ::nl::Weave::Profiles::Security::AppKeys::GroupKeyStoreBase * _GetGroupKeyStore(void);
+    CHIP_ERROR _Init(void);
+    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
+    CHIP_ERROR _GetDeviceDescriptor(::chip::Profiles::DeviceDescription::ChipDeviceDescriptor & deviceDesc);
+    ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * _GetGroupKeyStore(void);
     bool _CanFactoryReset(void);
     void _InitiateFactoryReset(void);
-    WEAVE_ERROR _ReadPersistedStorageValue(::nl::Weave::Platform::PersistedStorage::Key key, uint32_t & value);
-    WEAVE_ERROR _WritePersistedStorageValue(::nl::Weave::Platform::PersistedStorage::Key key, uint32_t value);
+    CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
+    CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
@@ -75,8 +73,8 @@ private:
 
     static ConfigurationManagerImpl sInstance;
 
-    WEAVE_ERROR GetWiFiStationSecurityType(::nl::Weave::Profiles::NetworkProvisioning::WiFiSecurityType & secType);
-    WEAVE_ERROR UpdateWiFiStationSecurityType(::nl::Weave::Profiles::NetworkProvisioning::WiFiSecurityType secType);
+    CHIP_ERROR GetWiFiStationSecurityType(::chip::Profiles::NetworkProvisioning::WiFiSecurityType & secType);
+    CHIP_ERROR UpdateWiFiStationSecurityType(::chip::Profiles::NetworkProvisioning::WiFiSecurityType secType);
 
     // ===== Private members reserved for use by this class only.
 
@@ -86,7 +84,7 @@ private:
 /**
  * Returns the public interface of the ConfigurationManager singleton object.
  *
- * Weave applications should use this to access features of the ConfigurationManager object
+ * Chip applications should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
  */
 inline ConfigurationManager & ConfigurationMgr(void)
@@ -97,7 +95,7 @@ inline ConfigurationManager & ConfigurationMgr(void)
 /**
  * Returns the platform-specific implementation of the ConfigurationManager singleton object.
  *
- * Weave applications can use this to gain access to features of the ConfigurationManager
+ * Chip applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the ESP32 platform.
  */
 inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
@@ -106,7 +104,6 @@ inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // CONFIGURATION_MANAGER_IMPL_H

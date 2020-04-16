@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -15,67 +16,60 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 /**
  *    @file
- *          Provides an implementation of the Weave Group Key Store interface
+ *          Provides an implementation of the Chip Group Key Store interface
  *          for the ESP32 platform.
  */
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Core/WeaveKeyIds.h>
-#include <Weave/Profiles/security/WeaveApplicationKeys.h>
-#include <Weave/DeviceLayer/ESP32/ESP32Config.h>
+#include <platform/internal/ChipDeviceLayerInternal.h>
+#include <core/CHIPKeyIds.h>
+#include <platform/ESP32/ESP32Config.h>
 
 #include "nvs.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 /**
- * An implementation of the Weave GroupKeyStoreBase API for the ESP32.
+ * An implementation of the Chip GroupKeyStoreBase API for the ESP32.
  */
-class GroupKeyStoreImpl final
-        : public ::nl::Weave::Profiles::Security::AppKeys::GroupKeyStoreBase,
-          private ESP32Config
+class GroupKeyStoreImpl final : public ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase, private ESP32Config
 {
-    using WeaveGroupKey = ::nl::Weave::Profiles::Security::AppKeys::WeaveGroupKey;
+    using ChipGroupKey = ::chip::Profiles::Security::AppKeys::ChipGroupKey;
 
 public:
     enum
     {
-        kMaxGroupKeys = WEAVE_CONFIG_MAX_APPLICATION_EPOCH_KEYS +       // Maximum number of Epoch keys
-                        WEAVE_CONFIG_MAX_APPLICATION_GROUPS +           // Maximum number of Application Group Master keys
-                        1 +                                             // Maximum number of Root keys (1 for Service root key)
-                        1                                               // Fabric secret
+        kMaxGroupKeys = CHIP_CONFIG_MAX_APPLICATION_EPOCH_KEYS + // Maximum number of Epoch keys
+            CHIP_CONFIG_MAX_APPLICATION_GROUPS +                 // Maximum number of Application Group Master keys
+            1 +                                                  // Maximum number of Root keys (1 for Service root key)
+            1                                                    // Fabric secret
     };
 
-    WEAVE_ERROR Init();
+    CHIP_ERROR Init();
 
-    WEAVE_ERROR RetrieveGroupKey(uint32_t keyId, WeaveGroupKey & key) override;
-    WEAVE_ERROR StoreGroupKey(const WeaveGroupKey & key) override;
-    WEAVE_ERROR DeleteGroupKey(uint32_t keyId) override;
-    WEAVE_ERROR DeleteGroupKeysOfAType(uint32_t keyType) override;
-    WEAVE_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount) override;
-    WEAVE_ERROR Clear(void) override;
-    WEAVE_ERROR RetrieveLastUsedEpochKeyId(void) override;
-    WEAVE_ERROR StoreLastUsedEpochKeyId(void) override;
+    CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key) override;
+    CHIP_ERROR StoreGroupKey(const ChipGroupKey & key) override;
+    CHIP_ERROR DeleteGroupKey(uint32_t keyId) override;
+    CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType) override;
+    CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount) override;
+    CHIP_ERROR Clear(void) override;
+    CHIP_ERROR RetrieveLastUsedEpochKeyId(void) override;
+    CHIP_ERROR StoreLastUsedEpochKeyId(void) override;
 
 private:
-
     uint32_t mKeyIndex[kMaxGroupKeys];
     uint8_t mNumKeys;
 
-    WEAVE_ERROR AddKeyToIndex(uint32_t keyId, bool & indexUpdated);
-    WEAVE_ERROR WriteKeyIndex(nvs_handle handle);
-    WEAVE_ERROR DeleteKeyOrKeys(uint32_t targetKeyId, uint32_t targetKeyType);
+    CHIP_ERROR AddKeyToIndex(uint32_t keyId, bool & indexUpdated);
+    CHIP_ERROR WriteKeyIndex(nvs_handle handle);
+    CHIP_ERROR DeleteKeyOrKeys(uint32_t targetKeyId, uint32_t targetKeyType);
 
-    static WEAVE_ERROR FormKeyName(uint32_t keyId, char * buf, size_t bufSize);
+    static CHIP_ERROR FormKeyName(uint32_t keyId, char * buf, size_t bufSize);
 };
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip

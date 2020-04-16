@@ -19,7 +19,7 @@
 
 /**
  *    @file
- *          Provides implementations for the Chip entropy sourcing functions
+ *          Provides implementations for the CHIP entropy sourcing functions
  *          on the ESP32 platform.
  */
 
@@ -29,9 +29,7 @@
 #include "esp_log.h"
 
 using namespace ::chip;
-using namespace ::chip::Chip;
 
-namespace nl {
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -89,4 +87,3 @@ exit:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-} // namespace nl

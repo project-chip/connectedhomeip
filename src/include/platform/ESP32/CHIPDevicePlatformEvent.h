@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -19,17 +20,16 @@
 /**
  *    @file
  *          Defines platform-specific event types and data for the
- *          Weave Device Layer on the ESP32.
+ *          CHIP Device Layer on the ESP32.
  */
 
-#ifndef WEAVE_DEVICE_PLATFORM_EVENT_H
-#define WEAVE_DEVICE_PLATFORM_EVENT_H
+#ifndef CHIP_DEVICE_PLATFORM_EVENT_H
+#define CHIP_DEVICE_PLATFORM_EVENT_H
 
-#include <Weave/DeviceLayer/WeaveDeviceEvent.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <esp_event.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 namespace DeviceEventType {
@@ -39,7 +39,7 @@ namespace DeviceEventType {
  */
 enum
 {
-    kESPSystemEvent                     = kRange_PublicPlatformSpecific,
+    kESPSystemEvent = kRange_PublicPlatformSpecific,
 };
 
 } // namespace DeviceEventType
@@ -47,7 +47,7 @@ enum
 /**
  * Represents platform-specific event information for the ESP32 platform.
  */
-struct WeaveDevicePlatformEvent final
+struct ChipDevicePlatformEvent final
 {
     union
     {
@@ -56,8 +56,6 @@ struct WeaveDevicePlatformEvent final
 };
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
-
-#endif // WEAVE_DEVICE_PLATFORM_EVENT_H
+#endif // CHIP_DEVICE_PLATFORM_EVENT_H

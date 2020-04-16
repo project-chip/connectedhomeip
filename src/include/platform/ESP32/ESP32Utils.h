@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -19,24 +20,21 @@
 #ifndef ESP_UTILS_H
 #define ESP_UTILS_H
 
-#include <Weave/DeviceLayer/internal/WeaveDeviceLayerInternal.h>
-#include <Weave/Profiles/network-provisioning/NetworkProvisioning.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 class ESP32Utils
 {
 public:
-    static WEAVE_ERROR IsAPEnabled(bool & apEnabled);
+    static CHIP_ERROR IsAPEnabled(bool & apEnabled);
     static bool IsStationProvisioned(void);
-    static WEAVE_ERROR IsStationConnected(bool & connected);
-    static WEAVE_ERROR StartWiFiLayer(void);
-    static WEAVE_ERROR EnableStationMode(void);
-    static WEAVE_ERROR SetAPMode(bool enabled);
-    static ::nl::Weave::Profiles::NetworkProvisioning::WiFiSecurityType WiFiAuthModeToWeaveWiFiSecurityType(wifi_auth_mode_t authMode);
+    static CHIP_ERROR IsStationConnected(bool & connected);
+    static CHIP_ERROR StartWiFiLayer(void);
+    static CHIP_ERROR EnableStationMode(void);
+    static CHIP_ERROR SetAPMode(bool enabled);
     static int OrderScanResultsByRSSI(const void * _res1, const void * _res2);
     static const char * WiFiModeToStr(wifi_mode_t wifiMode);
     static struct netif * GetNetif(tcpip_adapter_if_t intfId);
@@ -48,7 +46,6 @@ public:
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // ESP_UTILS_H

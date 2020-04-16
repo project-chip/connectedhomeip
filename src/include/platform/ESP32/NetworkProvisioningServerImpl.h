@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -19,28 +20,24 @@
 #ifndef NETWORK_PROVISIONING_SERVER_IMPL_H
 #define NETWORK_PROVISIONING_SERVER_IMPL_H
 
-#include <Weave/DeviceLayer/internal/GenericNetworkProvisioningServerImpl.h>
+#include <platform/internal/GenericNetworkProvisioningServerImpl.h>
 
-
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 /**
  * Concrete implementation of the NetworkProvisioningServer singleton object for the ESP32 platform.
  */
-class NetworkProvisioningServerImpl final
-    : public NetworkProvisioningServer,
-      public GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>
+class NetworkProvisioningServerImpl final : public NetworkProvisioningServer,
+                                            public GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>
 {
 private:
-
     using GenericImplClass = GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>;
 
     // Allow the NetworkProvisioningServer interface class to delegate method calls to
     // the implementation methods provided by this class.
-    friend class ::nl::Weave::DeviceLayer::Internal::NetworkProvisioningServer;
+    friend class ::chip::DeviceLayer::Internal::NetworkProvisioningServer;
 
     // Allow the GenericNetworkProvisioningServerImpl base class to access helper methods
     // and types defined on this class.
@@ -48,26 +45,26 @@ private:
 
     // ===== Members that implement the NetworkProvisioningServer public interface.
 
-    WEAVE_ERROR _Init(void);
-    void _OnPlatformEvent(const WeaveDeviceEvent * event);
+    CHIP_ERROR _Init(void);
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
 
     // NOTE: Other public interface methods are implemented by GenericNetworkProvisioningServerImpl<>.
 
     // ===== Members used by GenericNetworkProvisioningServerImpl<> to invoke platform-specific
     //       operations.
 
-    WEAVE_ERROR GetWiFiStationProvision(NetworkInfo & netInfo, bool includeCredentials);
-    WEAVE_ERROR SetWiFiStationProvision(const NetworkInfo & netInfo);
-    WEAVE_ERROR ClearWiFiStationProvision(void);
-    WEAVE_ERROR InitiateWiFiScan(void);
+    CHIP_ERROR GetWiFiStationProvision(NetworkInfo & netInfo, bool includeCredentials);
+    CHIP_ERROR SetWiFiStationProvision(const NetworkInfo & netInfo);
+    CHIP_ERROR ClearWiFiStationProvision(void);
+    CHIP_ERROR InitiateWiFiScan(void);
     void HandleScanDone(void);
     static NetworkProvisioningServerImpl & Instance(void);
-    static void HandleScanTimeOut(::nl::Weave::System::Layer * aLayer, void * aAppState, ::nl::Weave::System::Error aError);
+    static void HandleScanTimeOut(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
     static bool IsSupportedWiFiSecurityType(WiFiSecurityType_t wifiSecType);
 
     // ===== Members for internal use by the following friends.
 
-    friend ::nl::Weave::DeviceLayer::Internal::NetworkProvisioningServer & NetworkProvisioningSvr(void);
+    friend ::chip::DeviceLayer::Internal::NetworkProvisioningServer & NetworkProvisioningSvr(void);
     friend NetworkProvisioningServerImpl & NetworkProvisioningSvrImpl(void);
 
     static NetworkProvisioningServerImpl sInstance;
@@ -97,7 +94,6 @@ inline NetworkProvisioningServerImpl & NetworkProvisioningSvrImpl(void)
 
 } // namespace Internal
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // NETWORK_PROVISIONING_SERVER_IMPL_H

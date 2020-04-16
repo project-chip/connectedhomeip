@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -18,7 +19,7 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the OpenWeave Inet
+ *          Platform-specific configuration overrides for the CHIP Inet
  *          Layer on the ESP32 platform.
  *
  */

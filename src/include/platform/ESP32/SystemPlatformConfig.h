@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -18,7 +19,7 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the OpenWeave System
+ *          Platform-specific configuration overrides for the CHIP System
  *          Layer on the ESP32 platform.
  *
  */
@@ -30,38 +31,36 @@
 
 #include "esp_err.h"
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
-struct WeaveDeviceEvent;
+struct ChipDeviceEvent;
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 // ==================== Platform Adaptations ====================
 
-#define WEAVE_SYSTEM_CONFIG_POSIX_LOCKING 0
-#define WEAVE_SYSTEM_CONFIG_FREERTOS_LOCKING 0
-#define WEAVE_SYSTEM_CONFIG_NO_LOCKING 1
-#define WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
-#define WEAVE_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
-#define WEAVE_SYSTEM_CONFIG_LWIP_EVENT_TYPE int
-#define WEAVE_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE const struct ::nl::Weave::DeviceLayer::WeaveDeviceEvent *
+#define CHIP_SYSTEM_CONFIG_POSIX_LOCKING 0
+#define CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING 0
+#define CHIP_SYSTEM_CONFIG_NO_LOCKING 1
+#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
+#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
+#define CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE int
+#define CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
 
-#define WEAVE_SYSTEM_CONFIG_ERROR_TYPE esp_err_t
-#define WEAVE_SYSTEM_CONFIG_NO_ERROR ESP_OK
-#define WEAVE_SYSTEM_CONFIG_ERROR_MIN 7000000
-#define WEAVE_SYSTEM_CONFIG_ERROR_MAX 7000999
-#define _WEAVE_SYSTEM_CONFIG_ERROR(e) (WEAVE_SYSTEM_CONFIG_ERROR_MIN + (e))
-#define WEAVE_SYSTEM_LWIP_ERROR_MIN 3000000
-#define WEAVE_SYSTEM_LWIP_ERROR_MAX 3000999
+#define CHIP_SYSTEM_CONFIG_ERROR_TYPE esp_err_t
+#define CHIP_SYSTEM_CONFIG_NO_ERROR ESP_OK
+#define CHIP_SYSTEM_CONFIG_ERROR_MIN 7000000
+#define CHIP_SYSTEM_CONFIG_ERROR_MAX 7000999
+#define _CHIP_SYSTEM_CONFIG_ERROR(e) (CHIP_SYSTEM_CONFIG_ERROR_MIN + (e))
+#define CHIP_SYSTEM_LWIP_ERROR_MIN 3000000
+#define CHIP_SYSTEM_LWIP_ERROR_MAX 3000999
 
 // ==================== General Configuration Overrides ====================
 
 // NOTE: Values that are mapped to CONFIG_ #defines are settable via the ESP-IDF Kconfig mechanism.
 
-#ifndef WEAVE_SYSTEM_CONFIG_NUM_TIMERS
-#define WEAVE_SYSTEM_CONFIG_NUM_TIMERS CONFIG_NUM_TIMERS
-#endif // WEAVE_SYSTEM_CONFIG_NUM_TIMERS
+#ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
+#define CHIP_SYSTEM_CONFIG_NUM_TIMERS CONFIG_NUM_TIMERS
+#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
 #endif // SYSTEM_PLATFORM_CONFIG_H

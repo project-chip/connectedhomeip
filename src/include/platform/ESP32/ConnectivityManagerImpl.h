@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -19,29 +20,23 @@
 #ifndef CONNECTIVITY_MANAGER_IMPL_H
 #define CONNECTIVITY_MANAGER_IMPL_H
 
-#include <Weave/DeviceLayer/ConnectivityManager.h>
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl.h>
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_BLE.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/GenericConnectivityManagerImpl.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_NoBLE.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
-#include <Weave/DeviceLayer/internal/GenericConnectivityManagerImpl_NoThread.h>
-#include <Weave/Profiles/network-provisioning/NetworkProvisioning.h>
-#include <Weave/Profiles/weave-tunneling/WeaveTunnelCommon.h>
-#include <Weave/Profiles/weave-tunneling/WeaveTunnelConnectionMgr.h>
-#include <Weave/Support/FlagUtils.hpp>
+#include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
+#include <support/FlagUtils.hpp>
 
 #include "esp_event.h"
 
-namespace nl {
 namespace Inet {
 class IPAddress;
 } // namespace Inet
-} // namespace nl
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -49,44 +44,43 @@ class PlatformManagerImpl;
 namespace Internal {
 
 class NetworkProvisioningServerImpl;
-template<class ImplClass> class GenericNetworkProvisioningServerImpl;
+template <class ImplClass>
+class GenericNetworkProvisioningServerImpl;
 
 } // namespace Internal
 
 /**
  * Concrete implementation of the ConnectivityManager singleton object for the ESP32 platform.
  */
-class ConnectivityManagerImpl final
-    : public ConnectivityManager,
-      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
-#if WEAVE_DEVICE_CONFIG_ENABLE_WOBLE
-      public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
+class ConnectivityManagerImpl final : public ConnectivityManager,
+                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+                                      public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
-      public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
 #endif
-      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
+                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
 {
-    using TunnelConnNotifyReasons = ::nl::Weave::Profiles::WeaveTunnel::WeaveTunnelConnectionMgr::TunnelConnNotifyReasons;
+    using TunnelConnNotifyReasons = ::chip::Profiles::ChipTunnel::ChipTunnelConnectionMgr::TunnelConnNotifyReasons;
 
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
 private:
-
     // ===== Members that implement the ConnectivityManager abstract interface.
 
     WiFiStationMode _GetWiFiStationMode(void);
-    WEAVE_ERROR _SetWiFiStationMode(WiFiStationMode val);
+    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
     bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationApplicationControlled(void);
     bool _IsWiFiStationConnected(void);
     uint32_t _GetWiFiStationReconnectIntervalMS(void);
-    WEAVE_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
     WiFiAPMode _GetWiFiAPMode(void);
-    WEAVE_ERROR _SetWiFiAPMode(WiFiAPMode val);
+    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
     bool _IsWiFiAPActive(void);
     bool _IsWiFiAPApplicationControlled(void);
     void _DemandStartWiFiAP(void);
@@ -94,17 +88,17 @@ private:
     void _MaintainOnDemandWiFiAP(void);
     uint32_t _GetWiFiAPIdleTimeoutMS(void);
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
-    WEAVE_ERROR _GetAndLogWifiStatsCounters(void);
+    CHIP_ERROR _GetAndLogWifiStatsCounters(void);
     bool _HaveIPv4InternetConnectivity(void);
     bool _HaveIPv6InternetConnectivity(void);
     ServiceTunnelMode _GetServiceTunnelMode(void);
-    WEAVE_ERROR _SetServiceTunnelMode(ServiceTunnelMode val);
+    CHIP_ERROR _SetServiceTunnelMode(ServiceTunnelMode val);
     bool _IsServiceTunnelConnected(void);
     bool _IsServiceTunnelRestricted(void);
     bool _HaveServiceConnectivityViaTunnel(void);
     bool _HaveServiceConnectivity(void);
-    WEAVE_ERROR _Init(void);
-    void _OnPlatformEvent(const WeaveDeviceEvent * event);
+    CHIP_ERROR _Init(void);
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
@@ -141,11 +135,11 @@ private:
 
     enum Flags
     {
-        kFlag_HaveIPv4InternetConnectivity      = 0x0001,
-        kFlag_HaveIPv6InternetConnectivity      = 0x0002,
-        kFlag_ServiceTunnelStarted              = 0x0004,
-        kFlag_ServiceTunnelUp                   = 0x0008,
-        kFlag_AwaitingConnectivity              = 0x0010,
+        kFlag_HaveIPv4InternetConnectivity = 0x0001,
+        kFlag_HaveIPv6InternetConnectivity = 0x0002,
+        kFlag_ServiceTunnelStarted         = 0x0004,
+        kFlag_ServiceTunnelUp              = 0x0008,
+        kFlag_AwaitingConnectivity         = 0x0010,
     };
 
     uint64_t mLastStationConnectFailTime;
@@ -163,12 +157,12 @@ private:
     void OnStationConnected(void);
     void OnStationDisconnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
-    static void DriveStationState(::nl::Weave::System::Layer * aLayer, void * aAppState, ::nl::Weave::System::Error aError);
+    static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
     void DriveAPState(void);
-    WEAVE_ERROR ConfigureWiFiAP(void);
+    CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
-    static void DriveAPState(::nl::Weave::System::Layer * aLayer, void * aAppState, ::nl::Weave::System::Error aError);
+    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
     void UpdateInternetConnectivityState(void);
     void OnStationIPv4AddressAvailable(const system_event_sta_got_ip_t & got_ip);
@@ -176,12 +170,12 @@ private:
     void OnIPv6AddressAvailable(const system_event_got_ip6_t & got_ip);
 
     void DriveServiceTunnelState(void);
-    static void DriveServiceTunnelState(::nl::Weave::System::Layer * aLayer, void * aAppState, ::nl::Weave::System::Error aError);
+    static void DriveServiceTunnelState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
     static const char * WiFiStationStateToStr(WiFiStationState state);
     static const char * WiFiAPStateToStr(WiFiAPState state);
     static void RefreshMessageLayer(void);
-    static void HandleServiceTunnelNotification(TunnelConnNotifyReasons reason, WEAVE_ERROR err, void *appCtxt);
+    static void HandleServiceTunnelNotification(TunnelConnNotifyReasons reason, CHIP_ERROR err, void * appCtxt);
 };
 
 inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
@@ -221,12 +215,12 @@ inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS(void)
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
 {
-    return ::nl::GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity);
+    return ::chip::GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity);
 }
 
 inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
 {
-    return ::nl::GetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity);
+    return ::chip::GetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity);
 }
 
 inline ConnectivityManager::ServiceTunnelMode ConnectivityManagerImpl::_GetServiceTunnelMode(void)
@@ -244,11 +238,10 @@ inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
     return HaveServiceConnectivityViaTunnel() || HaveServiceConnectivityViaThread();
 }
 
-
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
  *
- * Weave applications should use this to access features of the ConnectivityManager object
+ * Chip applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
 inline ConnectivityManager & ConnectivityMgr(void)
@@ -259,7 +252,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
 /**
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
- * Weave applications can use this to gain access to features of the ConnectivityManager
+ * Chip applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the ESP32 platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
@@ -268,7 +261,6 @@ inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // CONNECTIVITY_MANAGER_IMPL_H

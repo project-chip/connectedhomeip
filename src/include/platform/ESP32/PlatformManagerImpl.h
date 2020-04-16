@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -25,18 +26,15 @@
 #ifndef PLATFORM_MANAGER_IMPL_H
 #define PLATFORM_MANAGER_IMPL_H
 
-#include <Weave/DeviceLayer/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <platform/FreeRTOS/GenericPlatformManagerImpl_FreeRTOS.h>
 
-namespace nl {
-namespace Weave {
+namespace chip {
 namespace DeviceLayer {
 
 /**
  * Concrete implementation of the PlatformManager singleton object for the ESP32 platform.
  */
-class PlatformManagerImpl final
-    : public PlatformManager,
-      public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
+class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
 {
     // Allow the PlatformManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -47,17 +45,15 @@ class PlatformManagerImpl final
     friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 
 public:
-
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    WEAVE_ERROR InitLwIPCoreLock(void);
+    CHIP_ERROR InitLwIPCoreLock(void);
     static esp_err_t HandleESPSystemEvent(void * ctx, system_event_t * event);
 
 private:
-
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    WEAVE_ERROR _InitWeaveStack(void);
+    CHIP_ERROR _InitChipStack(void);
 
     // ===== Members for internal use by the following friends.
 
@@ -70,7 +66,7 @@ private:
 /**
  * Returns the public interface of the PlatformManager singleton object.
  *
- * Weave applications should use this to access features of the PlatformManager object
+ * Chip applications should use this to access features of the PlatformManager object
  * that are common to all platforms.
  */
 inline PlatformManager & PlatformMgr(void)
@@ -81,7 +77,7 @@ inline PlatformManager & PlatformMgr(void)
 /**
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
- * Weave applications can use this to gain access to features of the PlatformManager
+ * Chip applications can use this to gain access to features of the PlatformManager
  * that are specific to the ESP32 platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
@@ -90,7 +86,6 @@ inline PlatformManagerImpl & PlatformMgrImpl(void)
 }
 
 } // namespace DeviceLayer
-} // namespace Weave
-} // namespace nl
+} // namespace chip
 
 #endif // PLATFORM_MANAGER_IMPL_H
