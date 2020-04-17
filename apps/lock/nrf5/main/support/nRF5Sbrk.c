@@ -54,14 +54,12 @@ void * _sbrk(ptrdiff_t inc)
         __HeapBreak = &__HeapBase;
     }
 
-    if (inc < 0
-            ? (inc < (&__HeapBase  - __HeapBreak))
-            : (inc > (&__HeapLimit - __HeapBreak)))
+    if (inc < 0 ? (inc < (&__HeapBase - __HeapBreak)) : (inc > (&__HeapLimit - __HeapBreak)))
     {
         OnSBRKFail(&__HeapBase, &__HeapLimit, __HeapBreak, inc);
 
         errno = ENOMEM;
-        return (void *)-1;
+        return (void *) -1;
     }
 
     res = __HeapBreak;
@@ -81,6 +79,4 @@ size_t GetHeapFreeSize(void)
     return (size_t)(&__HeapLimit - __HeapBreak);
 }
 
-void __attribute__((weak)) OnSBRKFail(char * heapBase, char * heapLimit, char * heapBreak, ptrdiff_t inc)
-{
-}
+void __attribute__((weak)) OnSBRKFail(char * heapBase, char * heapLimit, char * heapBreak, ptrdiff_t inc) {}

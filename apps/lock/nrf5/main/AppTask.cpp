@@ -32,11 +32,11 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT       3000
+#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE                 (4096)
-#define APP_TASK_PRIORITY                   2
-#define APP_EVENT_QUEUE_SIZE                10
+#define APP_TASK_STACK_SIZE (4096)
+#define APP_TASK_PRIORITY 2
+#define APP_EVENT_QUEUE_SIZE 10
 
 APP_TIMER_DEF(sFunctionTimer);
 
@@ -50,12 +50,12 @@ static LEDWidget sLockLED;
 static LEDWidget sUnusedLED;
 static LEDWidget sUnusedLED_1;
 
-static bool sIsThreadProvisioned              = false;
-static bool sIsThreadEnabled                  = false;
-static bool sIsThreadAttached                 = false;
-static bool sIsPairedToAccount                = false;
-static bool sHaveBLEConnections               = false;
-static bool sHaveServiceConnectivity          = false;
+static bool sIsThreadProvisioned     = false;
+static bool sIsThreadEnabled         = false;
+static bool sIsThreadAttached        = false;
+static bool sIsPairedToAccount       = false;
+static bool sHaveBLEConnections      = false;
+static bool sHaveServiceConnectivity = false;
 
 using namespace ::chip::DeviceLayer;
 
@@ -75,7 +75,7 @@ int AppTask::StartAppTask()
 
     // Start App task.
     if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
-            pdPASS)
+        pdPASS)
     {
         ret = NRF_ERROR_NULL;
     }
@@ -178,11 +178,11 @@ void AppTask::AppTaskMain(void * pvParameter)
         // task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned              = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled                  = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached                 = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections               = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity          = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
@@ -233,7 +233,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
     bool initiated = false;
     BoltLockManager::Action_t action;
-    int32_t actor = 0;
+    int32_t actor  = 0;
     ret_code_t ret = NRF_SUCCESS;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
@@ -251,7 +251,6 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
         {
             action = BoltLockManager::UNLOCK_ACTION;
         }
-
     }
     else
     {

@@ -96,20 +96,11 @@ static void OnSoCEvent(uint32_t sys_evt, void * p_context)
 
 #if JLINK_MMD
 
-extern "C" void JLINK_MONITOR_OnExit(void)
-{
+extern "C" void JLINK_MONITOR_OnExit(void) {}
 
-}
+extern "C" void JLINK_MONITOR_OnEnter(void) {}
 
-extern "C" void JLINK_MONITOR_OnEnter(void)
-{
-
-}
-
-extern "C" void JLINK_MONITOR_OnPoll(void)
-{
-
-}
+extern "C" void JLINK_MONITOR_OnPoll(void) {}
 
 #endif // JLINK_MMD
 
@@ -132,7 +123,9 @@ int main(void)
     nrf_drv_clock_lfclk_request(NULL);
 
     // Wait for the clock to be ready.
-    while (!nrf_clock_lf_is_running()) { }
+    while (!nrf_clock_lf_is_running())
+    {
+    }
 
 #if NRF_LOG_ENABLED
 
@@ -168,7 +161,9 @@ int main(void)
 
     NRF_LOG_INFO("Waiting for SoftDevice to be enabled");
 
-    while (!nrf_sdh_is_enabled()) { }
+    while (!nrf_sdh_is_enabled())
+    {
+    }
 
     // Register a handler for SOC events.
     NRF_SDH_SOC_OBSERVER(m_soc_observer, NRF_SDH_SOC_STACK_OBSERVER_PRIO, OnSoCEvent, NULL);
@@ -241,8 +236,8 @@ int main(void)
     /*
         {
             struct mallinfo minfo = mallinfo();
-            NRF_LOG_INFO("System Heap Utilization: heap size %" PRId32 ", arena size %" PRId32 ", in use %" PRId32 ", free %" PRId32,
-                    GetHeapTotalSize(), minfo.arena, minfo.uordblks, minfo.fordblks);
+            NRF_LOG_INFO("System Heap Utilization: heap size %" PRId32 ", arena size %" PRId32 ", in use %" PRId32 ", free %"
+       PRId32, GetHeapTotalSize(), minfo.arena, minfo.uordblks, minfo.fordblks);
         }
     */
     NRF_LOG_INFO("Starting FreeRTOS scheduler");

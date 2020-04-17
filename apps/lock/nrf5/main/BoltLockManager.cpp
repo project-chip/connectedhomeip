@@ -41,16 +41,15 @@ int BoltLockManager::Init()
         APP_ERROR_HANDLER(ret);
     }
 
-    mState = kState_LockingCompleted;
+    mState              = kState_LockingCompleted;
     mAutoLockTimerArmed = false;
-    mAutoRelock = false;
-    mAutoLockDuration = 0;
+    mAutoRelock         = false;
+    mAutoLockDuration   = 0;
 
     return ret;
 }
 
-void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB,
-                                   Callback_fn_completed aActionCompleted_CB)
+void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
 {
     mActionInitiated_CB = aActionInitiated_CB;
     mActionCompleted_CB = aActionCompleted_CB;
@@ -166,7 +165,7 @@ void BoltLockManager::TimerEventHandler(void * p_context)
 void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 {
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-    int32_t actor = 0;
+    int32_t actor          = 0;
 
     // Make sure auto lock timer is still armed.
     if (!lock->mAutoLockTimerArmed)

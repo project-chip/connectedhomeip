@@ -1,19 +1,22 @@
-/***************************************************************************//**
- * @file
- * @brief init_mcu.h
- *******************************************************************************
- * # License
- * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
- *
- ******************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file
+                                                                               * @brief init_mcu.h
+                                                                               *******************************************************************************
+                                                                               * # License
+                                                                               * <b>Copyright 2018 Silicon Laboratories Inc.
+                                                                               *www.silabs.com</b>
+                                                                               *******************************************************************************
+                                                                               *
+                                                                               * The licensor of this software is Silicon
+                                                                               *Laboratories Inc. Your use of this software is
+                                                                               *governed by the terms of Silicon Labs Master
+                                                                               *Software License Agreement (MSLA) available at
+                                                                               * www.silabs.com/about-us/legal/master-software-license-agreement.
+                                                                               *This software is distributed to you in Source Code
+                                                                               *format and is governed by the sections of the MSLA
+                                                                               *applicable to Source Code.
+                                                                               *
+                                                                               ******************************************************************************/
 
 #ifndef INIT_MCU_H
 #define INIT_MCU_H
@@ -37,14 +40,13 @@ extern "C" {
  * for self use on custom boards.
  */
 
-//This is a Silicon Labs radio board, the CTUNE value can be read out from EEPROM
-#define MFG_CTUNE_EN   1
+// This is a Silicon Labs radio board, the CTUNE value can be read out from EEPROM
+#define MFG_CTUNE_EN 1
 
-
-//Address for CTUNE in User page
+// Address for CTUNE in User page
 #define MFG_CTUNE_ADDR 0x0FE00100UL
-//Value of the CTUNE in User page
-#define MFG_CTUNE_VAL  (*((uint16_t *) (MFG_CTUNE_ADDR)))
+// Value of the CTUNE in User page
+#define MFG_CTUNE_VAL (*((uint16_t *) (MFG_CTUNE_ADDR)))
 
 void initMcu(void);
 

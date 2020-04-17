@@ -22,8 +22,6 @@
  *          the Nordic nRF5 SDK.
  */
 
-
-
 // Include the version of nrf_log_ctrl_internal.h supplied by the nRF5 SDK.
 #include_next "nrf_log_ctrl_internal.h"
 
@@ -38,11 +36,13 @@
 // Override the NRF_LOG_INTERNAL_FLUSH define to wrap the process of flushing
 // pending log entries in a critical section.
 #undef NRF_LOG_INTERNAL_FLUSH
-#define NRF_LOG_INTERNAL_FLUSH()            \
-    do {                                    \
-        CRITICAL_REGION_ENTER();            \
-        while (NRF_LOG_INTERNAL_PROCESS()); \
-        CRITICAL_REGION_EXIT();             \
+#define NRF_LOG_INTERNAL_FLUSH()                                                                                                   \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CRITICAL_REGION_ENTER();                                                                                                   \
+        while (NRF_LOG_INTERNAL_PROCESS())                                                                                         \
+            ;                                                                                                                      \
+        CRITICAL_REGION_EXIT();                                                                                                    \
     } while (0)
 
 #endif // !NRF_LOG_NON_DEFFERED_CRITICAL_REGION_ENABLED

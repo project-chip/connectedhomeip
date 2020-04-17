@@ -28,7 +28,7 @@
 typedef struct ButtonArray
 {
     GPIO_Port_TypeDef port;
-    unsigned int      pin;
+    unsigned int pin;
 } ButtonArray_t;
 
 static const ButtonArray_t sButtonArray[BSP_BUTTON_COUNT] = BSP_BUTTON_INIT; // GPIO info for the 2 WDTK buttons.
@@ -42,13 +42,12 @@ void ButtonHandler::Init(void)
     // Create FreeRTOS sw timers for debouncing buttons.
     for (uint8_t i = 0; i < BSP_BUTTON_COUNT; i++)
     {
-        buttonTimers[i] =
-            xTimerCreate("BtnTmr",                      // Just a text name, not used by the RTOS kernel
-                         APP_BUTTON_DEBOUNCE_PERIOD_MS, // timer period
-                         false,                         // no timer reload (==one-shot)
-                         (void *)(int)i,                // init timer id = button index
-                         TimerCallback // timer callback handler (all buttons use the same timer cn function)
-                        );
+        buttonTimers[i] = xTimerCreate("BtnTmr",                      // Just a text name, not used by the RTOS kernel
+                                       APP_BUTTON_DEBOUNCE_PERIOD_MS, // timer period
+                                       false,                         // no timer reload (==one-shot)
+                                       (void *) (int) i,              // init timer id = button index
+                                       TimerCallback // timer callback handler (all buttons use the same timer cn function)
+        );
     }
 }
 
@@ -132,7 +131,7 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
 
     uint32_t timerId;
 
-    timerId = (uint32_t)pvTimerGetTimerID(xTimer);
+    timerId = (uint32_t) pvTimerGetTimerID(xTimer);
     if (timerId < BSP_BUTTON_COUNT)
     {
         uint8_t btnIdx = timerId;

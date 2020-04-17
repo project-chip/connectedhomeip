@@ -32,7 +32,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
 #define MBEDTLS_AES_C
@@ -71,8 +70,7 @@
 #define MBEDTLS_SSL_PROTO_DTLS
 #define MBEDTLS_SSL_TLS_C
 
-#if OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE || OPENTHREAD_CONFIG_COMMISSIONER_ENABLE || \
-    OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
+#if OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE || OPENTHREAD_CONFIG_COMMISSIONER_ENABLE || OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
 #define MBEDTLS_SSL_COOKIE_C
 #define MBEDTLS_SSL_SRV_C
 #endif
@@ -102,27 +100,27 @@
 #define MBEDTLS_PEM_PARSE_C
 #endif
 
-#define MBEDTLS_MPI_WINDOW_SIZE            1 /**< Maximum windows size used. */
-#define MBEDTLS_MPI_MAX_SIZE              32 /**< Maximum number of bytes for usable MPIs. */
-#define MBEDTLS_ECP_MAX_BITS             256 /**< Maximum bit size of groups */
-#define MBEDTLS_ECP_WINDOW_SIZE            2 /**< Maximum window size used */
-#define MBEDTLS_ECP_FIXED_POINT_OPTIM      0 /**< Enable fixed-point speed-up */
-#define MBEDTLS_ENTROPY_MAX_SOURCES        1 /**< Maximum number of sources supported */
+#define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
+#define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
+#define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
+#define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
+#define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
+#define MBEDTLS_ENTROPY_MAX_SOURCES 1   /**< Maximum number of sources supported */
 
 // #if OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE
-#define MBEDTLS_PLATFORM_STD_CALLOC      calloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE        free /**< Default free to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_CALLOC calloc /**< Default allocator to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_FREE free     /**< Default free to use, can be undefined */
 // #else
 // #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 // #endif
 
 #if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
-#define MBEDTLS_SSL_MAX_CONTENT_LEN      900 /**< Maxium fragment length in bytes */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
 #else
-#define MBEDTLS_SSL_MAX_CONTENT_LEN      768 /**< Maxium fragment length in bytes */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maxium fragment length in bytes */
 #endif
 
-#define MBEDTLS_SSL_CIPHERSUITES         MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
+#define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
 #if defined(MBEDTLS_USER_CONFIG_FILE)
 #include MBEDTLS_USER_CONFIG_FILE
