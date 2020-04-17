@@ -55,8 +55,8 @@ void * _sbrk(ptrdiff_t inc)
     }
 
     if (inc < 0
-        ? (inc < (&__HeapBase  - __HeapBreak))
-        : (inc > (&__HeapLimit - __HeapBreak)))
+            ? (inc < (&__HeapBase  - __HeapBreak))
+            : (inc > (&__HeapLimit - __HeapBreak)))
     {
         OnSBRKFail(&__HeapBase, &__HeapLimit, __HeapBreak, inc);
 

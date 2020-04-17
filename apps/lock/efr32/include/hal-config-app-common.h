@@ -36,7 +36,7 @@
 #undef BSP_CLK_LFXO_CTUNE
 #endif
 #define BSP_CLK_LFXO_CTUNE                            (32)
- 
+
 #define HAL_PA_RAMP                                   (10)
 #define HAL_PA_2P4_LOWPOWER                           (0)
 #define HAL_PA_POWER                                  (252)
@@ -110,5 +110,5 @@
 #define BSP_EXP_USART_TX_LOC    BSP_USART0_TX_LOC
 
 #endif // FEATURE_EXP_HEADER_USART3
-                          
+
 #endif /* HAL_CONFIG_APP_COMMON_H */

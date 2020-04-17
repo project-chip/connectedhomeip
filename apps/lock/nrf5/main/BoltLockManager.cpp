@@ -50,7 +50,7 @@ int BoltLockManager::Init()
 }
 
 void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB,
-                              Callback_fn_completed aActionCompleted_CB)
+                                   Callback_fn_completed aActionCompleted_CB)
 {
     mActionInitiated_CB = aActionInitiated_CB;
     mActionCompleted_CB = aActionCompleted_CB;

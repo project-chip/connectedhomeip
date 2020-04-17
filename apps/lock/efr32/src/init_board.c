@@ -36,21 +36,21 @@
 void initBoard(void)
 {
 
-  // Enable clock for CRYOTIMER
-  CMU_ClockEnable(cmuClock_CRYOTIMER, true);
+    // Enable clock for CRYOTIMER
+    CMU_ClockEnable(cmuClock_CRYOTIMER, true);
 #if ((HAL_VCOM_ENABLE == 1) \
     || (HAL_USART3_ENABLE == 1) \
     || (HAL_USART1_ENABLE == 1) \
     || (HAL_USART0_ENABLE == 1))
 #if defined(FEATURE_EXP_HEADER_USART3)
-  // Enable clock for USART3
-  CMU_ClockEnable(cmuClock_USART3, true);
+    // Enable clock for USART3
+    CMU_ClockEnable(cmuClock_USART3, true);
 #elif defined(FEATURE_EXP_HEADER_USART1)
-  // Enable clock for USART1
-  CMU_ClockEnable(cmuClock_USART1, true);
+    // Enable clock for USART1
+    CMU_ClockEnable(cmuClock_USART1, true);
 #else
-  // Enable clock for USART0
-  CMU_ClockEnable(cmuClock_USART0, true);
+    // Enable clock for USART0
+    CMU_ClockEnable(cmuClock_USART0, true);
 #endif
 #endif //(HAL_VCOM_ENABLE == 1)
 #if ((HAL_I2CSENSOR_ENABLE == 1) \
@@ -59,10 +59,10 @@ void initBoard(void)
     || (HAL_USART3_ENABLE == 1) \
     || (HAL_USART1_ENABLE == 1) \
     || (HAL_USART0_ENABLE == 1))
-  // Enable clock for PRS
-  CMU_ClockEnable(cmuClock_PRS, true);
-  // Enable GPIO clock source
-  CMU_ClockEnable(cmuClock_GPIO, true);
+    // Enable clock for PRS
+    CMU_ClockEnable(cmuClock_PRS, true);
+    // Enable GPIO clock source
+    CMU_ClockEnable(cmuClock_GPIO, true);
 #endif /* ((HAL_I2CSENSOR_ENABLE == 1) \
            || (HAL_VCOM_ENABLE == 1) \
            || (HAL_SPIDISPLAY_ENABLE == 1) \
@@ -70,18 +70,18 @@ void initBoard(void)
            || (HAL_USART1_ENABLE == 1) \
            || (HAL_USART0_ENABLE == 1)) */
 
-  // Put the SPI flash into Deep Power Down mode for those radio boards where it is available
-  MX25_init();
-  MX25_DP();
-  // We must disable SPI communication
-  MX25_deinit();
+    // Put the SPI flash into Deep Power Down mode for those radio boards where it is available
+    MX25_init();
+    MX25_DP();
+    // We must disable SPI communication
+    MX25_deinit();
 
 }
 
 void initVcomEnable(void)
 {
 #if defined(HAL_VCOM_ENABLE)
-  // Enable VCOM if requested
-  GPIO_PinModeSet(BSP_VCOM_ENABLE_PORT, BSP_VCOM_ENABLE_PIN, gpioModePushPull, HAL_VCOM_ENABLE);
+    // Enable VCOM if requested
+    GPIO_PinModeSet(BSP_VCOM_ENABLE_PORT, BSP_VCOM_ENABLE_PIN, gpioModePushPull, HAL_VCOM_ENABLE);
 #endif // HAL_VCOM_ENABLE
 }

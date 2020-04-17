@@ -151,35 +151,35 @@ standard names - or at least those used in the unmodified vector table. */
  * basing on the settings above
  */
 #if (configTICK_SOURCE == FREERTOS_USE_SYSTICK)
-    // do not define configSYSTICK_CLOCK_HZ for SysTick to be configured automatically
-    // to CPU clock source
-    #define xPortSysTickHandler     SysTick_Handler
+// do not define configSYSTICK_CLOCK_HZ for SysTick to be configured automatically
+// to CPU clock source
+#define xPortSysTickHandler     SysTick_Handler
 #elif (configTICK_SOURCE == FREERTOS_USE_RTC)
-    #define configSYSTICK_CLOCK_HZ  ( 32768UL )
-    #define xPortSysTickHandler     RTC1_IRQHandler
+#define configSYSTICK_CLOCK_HZ  ( 32768UL )
+#define xPortSysTickHandler     RTC1_IRQHandler
 #else
-    #error  Unsupported configTICK_SOURCE value
+#error  Unsupported configTICK_SOURCE value
 #endif
 
 /* Code below should be only used by the compiler, and not the assembler. */
 #if !(defined(__ASSEMBLY__) || defined(__ASSEMBLER__))
-    #include "nrf.h"
-    #include "nrf_assert.h"
+#include "nrf.h"
+#include "nrf_assert.h"
 
-    /* This part of definitions may be problematic in assembly - it uses definitions from files that are not assembly compatible. */
-    /* Cortex-M specific definitions. */
-    #ifdef __NVIC_PRIO_BITS
-        /* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
-        #define configPRIO_BITS             __NVIC_PRIO_BITS
-    #else
-        #error "This port requires __NVIC_PRIO_BITS to be defined"
-    #endif
+/* This part of definitions may be problematic in assembly - it uses definitions from files that are not assembly compatible. */
+/* Cortex-M specific definitions. */
+#ifdef __NVIC_PRIO_BITS
+/* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
+#define configPRIO_BITS             __NVIC_PRIO_BITS
+#else
+#error "This port requires __NVIC_PRIO_BITS to be defined"
+#endif
 
-    /* Access to current system core clock is required only if we are ticking the system by systimer */
-    #if (configTICK_SOURCE == FREERTOS_USE_SYSTICK)
-        #include <stdint.h>
-        extern uint32_t SystemCoreClock;
-    #endif
+/* Access to current system core clock is required only if we are ticking the system by systimer */
+#if (configTICK_SOURCE == FREERTOS_USE_SYSTICK)
+#include <stdint.h>
+extern uint32_t SystemCoreClock;
+#endif
 #endif /* !assembler */
 
 /** Implementation note:  Use this with caution and set this to 1 ONLY for debugging

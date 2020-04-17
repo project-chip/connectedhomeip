@@ -75,7 +75,7 @@ int AppTask::StartAppTask()
 
     // Start App task.
     if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
-        pdPASS)
+            pdPASS)
     {
         ret = NRF_ERROR_NULL;
     }

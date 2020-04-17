@@ -228,7 +228,7 @@ int main(void)
         NRF_LOG_INFO("PlatformMgr().StartEventLoopTask() failed");
         APP_ERROR_HANDLER(ret);
     }
-    
+
     ret = GetAppTask().StartAppTask();
     if (ret != NRF_SUCCESS)
     {
@@ -238,13 +238,13 @@ int main(void)
 
     // Activate deep sleep mode
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-/*
-    {
-        struct mallinfo minfo = mallinfo();
-        NRF_LOG_INFO("System Heap Utilization: heap size %" PRId32 ", arena size %" PRId32 ", in use %" PRId32 ", free %" PRId32,
-                GetHeapTotalSize(), minfo.arena, minfo.uordblks, minfo.fordblks);
-    }
-*/
+    /*
+        {
+            struct mallinfo minfo = mallinfo();
+            NRF_LOG_INFO("System Heap Utilization: heap size %" PRId32 ", arena size %" PRId32 ", in use %" PRId32 ", free %" PRId32,
+                    GetHeapTotalSize(), minfo.arena, minfo.uordblks, minfo.fordblks);
+        }
+    */
     NRF_LOG_INFO("Starting FreeRTOS scheduler");
 
     /* Start FreeRTOS scheduler. */

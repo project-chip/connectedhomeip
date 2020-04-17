@@ -96,7 +96,7 @@ int AppTask::Init()
                                   false,            // no timer reload (==one-shot)
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
-    );
+                                 );
     if (sFunctionTimer == NULL)
     {
         EFR32_LOG("funct timer create failed");
