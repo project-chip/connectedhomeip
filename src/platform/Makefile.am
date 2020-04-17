@@ -130,7 +130,7 @@ libDeviceLayer_a_SOURCES               +=       \
     ESP32/ESP32Config.cpp                       \
     ESP32/Logging.cpp                           \
     FreeRTOS/SystemTimeSupport.cpp              \
-    ESP32/SystemTimerSupport.cpp                \
+    ESP32/SystemTimeSupport.cpp                 \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_ESP32
