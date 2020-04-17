@@ -26,6 +26,7 @@ The CHIP repository is structured as follows:
 | File / Folder                 | Contents                                                                                                      |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `.default-version`            | Default CHIP version if none is available via source code control tags, `.dist-version`, or `.local-version`. |
+| `apps/`                       | Sample applications and examples                                                                              |
 | `bootstrap`                   | GNU autotools bootstrap script for the CHIP build system.                                                     |
 | `bootstrap-configure`         | Convenience script that will bootstrap the CHIP build system, via `bootstrap`, and invoke `configure`.        |
 | `build/`                      | Build system support content and build output directories                                                     |
