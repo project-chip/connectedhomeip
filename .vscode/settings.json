@@ -61,7 +61,8 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "*.ipp": "cpp"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,
