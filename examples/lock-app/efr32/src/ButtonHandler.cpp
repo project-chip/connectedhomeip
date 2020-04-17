@@ -33,7 +33,7 @@ typedef struct ButtonArray
 
 static const ButtonArray_t sButtonArray[BSP_BUTTON_COUNT] = BSP_BUTTON_INIT; // GPIO info for the 2 WDTK buttons.
 TimerHandle_t buttonTimers[BSP_BUTTON_COUNT]; // FreeRTOS timers used for debouncing buttons. Array to hold handles to
-                                              // the created timers.
+// the created timers.
 
 void ButtonHandler::Init(void)
 {
@@ -47,7 +47,7 @@ void ButtonHandler::Init(void)
                                        false,                         // no timer reload (==one-shot)
                                        (void *) (int) i,              // init timer id = button index
                                        TimerCallback // timer callback handler (all buttons use the same timer cn function)
-        );
+                                      );
     }
 }
 
