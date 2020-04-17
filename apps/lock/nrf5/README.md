@@ -150,7 +150,7 @@ Alternatively, you can run `Build nRF5 Lock App` VSCode task.
 
 * Run make to build the application
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrf5
+        $ cd ~/connectedhomeip/apps/lock/nrf5
         $ make clean
         $ make
 
@@ -169,7 +169,7 @@ should be erased and the Nordic SoftDevice image installed.
 
 * Use the Makefile to erase the flash and program the Nordic SoftDevice image.
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrf5
+        $ cd ~/connectedhomeip/apps/lock/nrf5
         $ make erase
         $ make flash-softdevice
 
@@ -184,7 +184,7 @@ and application again.
 
 To flash the example app, run the following commands:
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrf5
+        $ cd ~/connectedhomeip/apps/lock/nrf5
         $ make flash-app
 
 > The [VSCode devcontainer](#using-chips-vscode-devcontainer) cannot communicate
