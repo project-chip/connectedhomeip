@@ -47,7 +47,7 @@ void ButtonHandler::Init(void)
                                        false,                         // no timer reload (==one-shot)
                                        (void *) (int) i,              // init timer id = button index
                                        TimerCallback // timer callback handler (all buttons use the same timer cn function)
-                                      );
+        );
     }
 }
 

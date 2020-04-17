@@ -33,48 +33,48 @@
 
 extern "C" {
 
-    void * __cxa_allocate_exception(size_t)
-    {
-        abort();
-    }
+void * __cxa_allocate_exception(size_t)
+{
+    abort();
+}
 
-    void __cxa_free_exception(void *)
-    {
-        abort();
-    }
+void __cxa_free_exception(void *)
+{
+    abort();
+}
 
-    void * __cxa_allocate_dependent_exception()
-    {
-        abort();
-    }
+void * __cxa_allocate_dependent_exception()
+{
+    abort();
+}
 
-    void __cxa_free_dependent_exception(void *)
-    {
-        abort();
-    }
+void __cxa_free_dependent_exception(void *)
+{
+    abort();
+}
 
-    void __cxa_throw(void *, void *, void (*)(void *))
-    {
-        abort();
-    }
+void __cxa_throw(void *, void *, void (*)(void *))
+{
+    abort();
+}
 
-    void __cxa_rethrow()
-    {
-        abort();
-    }
+void __cxa_rethrow()
+{
+    abort();
+}
 
-    void * __cxa_begin_catch(void *)
-    {
-        abort();
-    }
+void * __cxa_begin_catch(void *)
+{
+    abort();
+}
 
-    void __cxa_end_catch()
-    {
-        abort();
-    }
+void __cxa_end_catch()
+{
+    abort();
+}
 
-    void * __cxa_get_exception_ptr(void *)
-    {
-        abort();
-    }
+void * __cxa_get_exception_ptr(void *)
+{
+    abort();
+}
 }
