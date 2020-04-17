@@ -53,13 +53,13 @@ class GenericNetworkProvisioningServerImpl;
  * Concrete implementation of the ConnectivityManager singleton object for the ESP32 platform.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
-                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+    public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-                                      public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
+    public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
-                                      public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
+    public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
 #endif
-                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
+    public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
 {
     using TunnelConnNotifyReasons = ::chip::Profiles::ChipTunnel::ChipTunnelConnectionMgr::TunnelConnNotifyReasons;
 

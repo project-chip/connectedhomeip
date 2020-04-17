@@ -40,8 +40,8 @@ class NetworkProvisioningServerImpl;
  * Concrete implementation of the ConfigurationManager singleton object for the ESP32 platform.
  */
 class ConfigurationManagerImpl final : public ConfigurationManager,
-                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-                                       private Internal::ESP32Config
+    public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+    private Internal::ESP32Config
 {
     // Allow the ConfigurationManager interface class to delegate method calls to
     // the implementation methods provided by this class.

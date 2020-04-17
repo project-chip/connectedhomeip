@@ -38,33 +38,33 @@ CHIP_ERROR GroupKeyStoreImpl::RetrieveGroupKey(uint32_t keyId, ChipGroupKey & ke
 
     // Iterate over all the GroupKey nvm3 records looking for a matching key...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [keyId, &key](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
-                            CHIP_ERROR err2;
-                            size_t keyLen;
-                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
-                            uint32_t curKeyId;
+    [keyId, &key](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
+        CHIP_ERROR err2;
+        size_t keyLen;
+        uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+        uint32_t curKeyId;
 
-                            // Read the nvm3 obj binary data data into the buffer.
-                            err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
+        // Read the nvm3 obj binary data data into the buffer.
+        err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
 
-                            // Decode the CHIP key id for the current key.
-                            err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
-                            SuccessOrExit(err2);
+        // Decode the CHIP key id for the current key.
+        err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
+        SuccessOrExit(err2);
 
-                            // If it matches the key we're looking for...
-                            if (curKeyId == keyId)
-                            {
-                                // Decode the associated key data.
-                                err2 = DecodeGroupKey(buf, keyLen, key);
-                                SuccessOrExit(err2);
+        // If it matches the key we're looking for...
+        if (curKeyId == keyId)
+        {
+            // Decode the associated key data.
+            err2 = DecodeGroupKey(buf, keyLen, key);
+            SuccessOrExit(err2);
 
-                                // End the iteration by returning a CHIP_END_OF_INPUT result.
-                                ExitNow(err2 = CHIP_END_OF_INPUT);
-                            }
+            // End the iteration by returning a CHIP_END_OF_INPUT result.
+            ExitNow(err2 = CHIP_END_OF_INPUT);
+        }
 
-                        exit:
-                            return err2;
-                        });
+exit:
+        return err2;
+    });
 
     // Modify error code for return.
     switch (err)
@@ -92,25 +92,25 @@ CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
     // Iterate over all the GroupKey nvm3 records looking for the first
     // empty nvm3 key where we can store the data. (Note- use arg addNewrecord=true)
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, true,
-                        [&key](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
-                            CHIP_ERROR err2;
-                            size_t keyLen;
-                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+    [&key](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
+        CHIP_ERROR err2;
+        size_t keyLen;
+        uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
 
-                            // Encode the key for storage in an nvm3 record.
-                            err2 = EncodeGroupKey(key, buf, sizeof(buf), keyLen);
-                            SuccessOrExit(err2);
+        // Encode the key for storage in an nvm3 record.
+        err2 = EncodeGroupKey(key, buf, sizeof(buf), keyLen);
+        SuccessOrExit(err2);
 
-                            // Write the encoded binary data into the nvm3 object.
-                            err2 = WriteConfigValueBin(nvm3Key, buf, keyLen);
-                            SuccessOrExit(err2);
+        // Write the encoded binary data into the nvm3 object.
+        err2 = WriteConfigValueBin(nvm3Key, buf, keyLen);
+        SuccessOrExit(err2);
 
-                            // End the iteration by returning a CHIP_END_OF_INPUT result.
-                            ExitNow(err2 = CHIP_END_OF_INPUT);
+        // End the iteration by returning a CHIP_END_OF_INPUT result.
+        ExitNow(err2 = CHIP_END_OF_INPUT);
 
-                        exit:
-                            return err2;
-                        });
+exit:
+        return err2;
+    });
 
     // Modify error code for return.
     switch (err)
@@ -165,33 +165,33 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKey(uint32_t keyId)
 
     // Iterate over all the GroupKey nvm3 records looking for a matching key...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [keyId](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
-                            CHIP_ERROR err2;
-                            size_t keyLen;
-                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
-                            uint32_t curKeyId;
+    [keyId](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
+        CHIP_ERROR err2;
+        size_t keyLen;
+        uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+        uint32_t curKeyId;
 
-                            // Read the nvm3 obj binary data data into the buffer.
-                            err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
-                            SuccessOrExit(err2);
+        // Read the nvm3 obj binary data data into the buffer.
+        err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
+        SuccessOrExit(err2);
 
-                            // Decode the CHIP key id for the current group key.
-                            err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
-                            SuccessOrExit(err2);
+        // Decode the CHIP key id for the current group key.
+        err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
+        SuccessOrExit(err2);
 
-                            // If it matches the key we are looking for, delete the nvm3 record.
-                            if (curKeyId == keyId)
-                            {
-                                err2 = ClearConfigValue(nvm3Key);
-                                ChipLogProgress(DeviceLayer, "GroupKeyStore: deleting key 0x%08" PRIX32, curKeyId);
+        // If it matches the key we are looking for, delete the nvm3 record.
+        if (curKeyId == keyId)
+        {
+            err2 = ClearConfigValue(nvm3Key);
+            ChipLogProgress(DeviceLayer, "GroupKeyStore: deleting key 0x%08" PRIX32, curKeyId);
 
-                                // End the iteration by returning a CHIP_END_OF_INPUT result.
-                                ExitNow(err2 = CHIP_END_OF_INPUT);
-                            }
+            // End the iteration by returning a CHIP_END_OF_INPUT result.
+            ExitNow(err2 = CHIP_END_OF_INPUT);
+        }
 
-                        exit:
-                            return err2;
-                        });
+exit:
+        return err2;
+    });
 
     // Modify error code for return.
     switch (err)
@@ -215,30 +215,30 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKeysOfAType(uint32_t keyType)
 
     // Iterate over all the GroupKey nvm3 records looking for a matching key...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [keyType](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
-                            CHIP_ERROR err2;
-                            size_t keyLen;
-                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
-                            uint32_t curKeyId;
+    [keyType](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
+        CHIP_ERROR err2;
+        size_t keyLen;
+        uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+        uint32_t curKeyId;
 
-                            // Read the nvm3 obj binary data data into the buffer.
-                            err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
-                            SuccessOrExit(err2);
+        // Read the nvm3 obj binary data data into the buffer.
+        err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
+        SuccessOrExit(err2);
 
-                            // Decode the CHIP key id for the current group key.
-                            err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
-                            SuccessOrExit(err2);
+        // Decode the CHIP key id for the current group key.
+        err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
+        SuccessOrExit(err2);
 
-                            // If the current key matches the type we are looking for, delete the nvm3 record.
-                            if (ChipKeyId::GetType(curKeyId) == keyType)
-                            {
-                                err2 = ClearConfigValue(nvm3Key);
-                                ChipLogProgress(DeviceLayer, "GroupKeyStore: deleting key 0x%08" PRIX32, curKeyId);
-                            }
+        // If the current key matches the type we are looking for, delete the nvm3 record.
+        if (ChipKeyId::GetType(curKeyId) == keyType)
+        {
+            err2 = ClearConfigValue(nvm3Key);
+            ChipLogProgress(DeviceLayer, "GroupKeyStore: deleting key 0x%08" PRIX32, curKeyId);
+        }
 
-                        exit:
-                            return err2;
-                        });
+exit:
+        return err2;
+    });
 
     return err;
 }
@@ -251,32 +251,32 @@ CHIP_ERROR GroupKeyStoreImpl::EnumerateGroupKeys(uint32_t keyType, uint32_t * ke
 
     // Iterate over all the GroupKey records looking for keys of the specified type...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [keyType, keyIds, keyIdsArraySize, &keyCount](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
-                            CHIP_ERROR err2;
-                            size_t keyLen;
-                            uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
-                            uint32_t curKeyId;
+    [keyType, keyIds, keyIdsArraySize, &keyCount](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
+        CHIP_ERROR err2;
+        size_t keyLen;
+        uint8_t buf[kMaxEncodedKeySize]; // (buf length == 45 bytes)
+        uint32_t curKeyId;
 
-                            // Read the nvm3 obj binary data data into the buffer.
-                            err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
-                            SuccessOrExit(err2);
+        // Read the nvm3 obj binary data data into the buffer.
+        err2 = ReadConfigValueBin(nvm3Key, buf, sizeof(buf), keyLen);
+        SuccessOrExit(err2);
 
-                            // Decode the CHIP key id for the current group key.
-                            err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
-                            SuccessOrExit(err2);
+        // Decode the CHIP key id for the current group key.
+        err2 = DecodeGroupKeyId(buf, keyLen, curKeyId);
+        SuccessOrExit(err2);
 
-                            // If the current key matches the type we're looking for, add it to the keyIds array.
-                            if ((keyType == ChipKeyId::kType_None) || (ChipKeyId::GetType(curKeyId) == keyType))
-                            {
-                                keyIds[keyCount++] = curKeyId;
+        // If the current key matches the type we're looking for, add it to the keyIds array.
+        if ((keyType == ChipKeyId::kType_None) || (ChipKeyId::GetType(curKeyId) == keyType))
+        {
+            keyIds[keyCount++] = curKeyId;
 
-                                // Stop iterating if there's no more room in the keyIds array.
-                                VerifyOrExit(keyCount < keyIdsArraySize, err2 = CHIP_ERROR_BUFFER_TOO_SMALL);
-                            }
+            // Stop iterating if there's no more room in the keyIds array.
+            VerifyOrExit(keyCount < keyIdsArraySize, err2 = CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
 
-                        exit:
-                            return err2;
-                        });
+exit:
+        return err2;
+    });
 
     // Simply return a truncated list if there are more matching keys than will fit in the array.
     if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -293,15 +293,15 @@ CHIP_ERROR GroupKeyStoreImpl::Clear(void)
 
     // Iterate over all the GroupKey nvm3 records deleting each one...
     err = ForEachRecord(kConfigKey_GroupKeyBase, kConfigKey_GroupKeyMax, false,
-                        [](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
-                            CHIP_ERROR err2;
+    [](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
+        CHIP_ERROR err2;
 
-                            err2 = ClearConfigValue(nvm3Key);
-                            SuccessOrExit(err2);
+        err2 = ClearConfigValue(nvm3Key);
+        SuccessOrExit(err2);
 
-                        exit:
-                            return err2;
-                        });
+exit:
+        return err2;
+    });
 
     return err;
 }
