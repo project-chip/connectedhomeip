@@ -39,20 +39,20 @@
 #undef vsnprintf
 #undef vprintf
 
-int printf(const char* format, ...)
+int printf(const char * format, ...)
 {
     /* Stdio not supported */
     return -1;
 }
 
-int sprintf(char* buffer, const char* format, ...)
+int sprintf(char * buffer, const char * format, ...)
 {
     /* Dangerous; should not be called */
     buffer[0] = 0;
     return -1;
 }
 
-int snprintf(char* buffer, size_t count, const char* format, ...)
+int snprintf(char * buffer, size_t count, const char * format, ...)
 {
     int res;
     va_list va;
@@ -62,31 +62,31 @@ int snprintf(char* buffer, size_t count, const char* format, ...)
     return res;
 }
 
-int vprintf(const char* format, va_list va)
+int vprintf(const char * format, va_list va)
 {
     /* Stdio not supported */
     return -1;
 }
 
-int vsprintf(char* buffer, const char* format, va_list va)
+int vsprintf(char * buffer, const char * format, va_list va)
 {
     /* Dangerous; should not be called */
     buffer[0] = 0;
     return -1;
 }
 
-int vsnprintf(char* buffer, size_t count, const char* format, va_list va)
+int vsnprintf(char * buffer, size_t count, const char * format, va_list va)
 {
     return vsnprintf_(buffer, count, format, va);
 }
 
-int fprintf(FILE *stream, const char *format, ...)
+int fprintf(FILE * stream, const char * format, ...)
 {
     /* Stdio not supported */
     return -1;
 }
 
-int vfprintf(FILE *stream, const char *format, va_list ap)
+int vfprintf(FILE * stream, const char * format, va_list ap)
 {
     /* Stdio not supported */
     return -1;
@@ -94,20 +94,20 @@ int vfprintf(FILE *stream, const char *format, va_list ap)
 
 /* iprintf variants */
 
-int iprintf(const char* format, ...)
+int iprintf(const char * format, ...)
 {
     /* Stdio not supported */
     return -1;
 }
 
-int siprintf(char* buffer, const char* format, ...)
+int siprintf(char * buffer, const char * format, ...)
 {
     /* Dangerous; should not be called */
     buffer[0] = 0;
     return -1;
 }
 
-int sniprintf(char* buffer, size_t count, const char* format, ...)
+int sniprintf(char * buffer, size_t count, const char * format, ...)
 {
     int res;
     va_list va;
@@ -117,31 +117,31 @@ int sniprintf(char* buffer, size_t count, const char* format, ...)
     return res;
 }
 
-int viprintf(const char* format, va_list va)
+int viprintf(const char * format, va_list va)
 {
     /* Stdio not supported */
     return -1;
 }
 
-int vsiprintf(char* buffer, const char* format, va_list va)
+int vsiprintf(char * buffer, const char * format, va_list va)
 {
     /* Dangerous; should not be called */
     buffer[0] = 0;
     return -1;
 }
 
-int vsniprintf(char* buffer, size_t count, const char* format, va_list va)
+int vsniprintf(char * buffer, size_t count, const char * format, va_list va)
 {
     return vsnprintf_(buffer, count, format, va);
 }
 
-int fiprintf(FILE *stream, const char *format, ...)
+int fiprintf(FILE * stream, const char * format, ...)
 {
     /* Stdio not supported */
     return -1;
 }
 
-int vfiprintf(FILE *stream, const char *format, va_list ap)
+int vfiprintf(FILE * stream, const char * format, va_list ap)
 {
     /* Stdio not supported */
     return -1;

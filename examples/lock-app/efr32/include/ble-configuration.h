@@ -21,21 +21,17 @@
 #ifndef __BLE_CONFIG__
 #define __BLE_CONFIG__
 
-
 // Top level macros
 #define SILABS_AF_DEVICE_NAME "lock-example"
 
-
 // Generated plugin macros
 
-
 // Custom macros
-#define BRD4161A  1
+#define BRD4161A 1
 
 #ifdef EMBER_AF_BOARD_TYPE
 #undef EMBER_AF_BOARD_TYPE
 #endif
 #define EMBER_AF_BOARD_TYPE BRD4161A
-
 
 #endif // __BLE_CONFIG__

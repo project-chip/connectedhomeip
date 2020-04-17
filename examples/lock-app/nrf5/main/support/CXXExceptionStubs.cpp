@@ -53,7 +53,7 @@ void __cxa_free_dependent_exception(void *)
     abort();
 }
 
-void __cxa_throw(void *, void *, void (*)(void*))
+void __cxa_throw(void *, void *, void (*)(void *))
 {
     abort();
 }
@@ -73,9 +73,8 @@ void __cxa_end_catch()
     abort();
 }
 
-void * __cxa_get_exception_ptr(void*)
+void * __cxa_get_exception_ptr(void *)
 {
     abort();
 }
-
 }

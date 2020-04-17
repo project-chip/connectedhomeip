@@ -46,7 +46,7 @@ public:
         kState_UnlockingCompleted,
     } State;
 
-    int  Init();
+    int Init();
     bool IsUnlocked();
     void EnableAutoRelock(bool aOn);
     void SetAutoLockDuration(uint32_t aDurationInSecs);
@@ -58,27 +58,27 @@ public:
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
 private:
-    friend BoltLockManager &BoltLockMgr(void);
-    State_t                 mState;
+    friend BoltLockManager & BoltLockMgr(void);
+    State_t mState;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-    bool     mAutoRelock;
+    bool mAutoRelock;
     uint32_t mAutoLockDuration;
-    bool     mAutoLockTimerArmed;
+    bool mAutoLockTimerArmed;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
     static void TimerEventHandler(TimerHandle_t xTimer);
-    static void AutoReLockTimerEventHandler(AppEvent *aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent *aEvent);
+    static void AutoReLockTimerEventHandler(AppEvent * aEvent);
+    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     static BoltLockManager sLock;
 };
 
-inline BoltLockManager &BoltLockMgr(void)
+inline BoltLockManager & BoltLockMgr(void)
 {
     return BoltLockManager::sLock;
 }
