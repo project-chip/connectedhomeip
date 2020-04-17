@@ -1394,7 +1394,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
 
 if test "${nl_with_mbedtls}" = "internal"; then
     maybe_mbedtls_dirstem="mbedtls"
-    mbedtls_dirstem="third_party/${maybe_mbedtls_dirstem}"
+    mbedtls_dirstem="third_party/${maybe_mbedtls_dirstem}/repo"
 
     AC_MSG_NOTICE([attempting to create internal ${mbedtls_dirstem}])
 
