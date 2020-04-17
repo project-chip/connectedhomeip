@@ -333,7 +333,7 @@ exit:
 #if CHIP_DEVICE_CONFIG_WIFI_SCAN_COMPLETION_TIMEOUT
 
 void NetworkProvisioningServerImpl::HandleScanTimeOut(::chip::System::Layer * aLayer, void * aAppState,
-        ::chip::System::Error aError)
+                                                      ::chip::System::Error aError)
 {
     ChipLogError(DeviceLayer, "WiFi scan timed out");
 

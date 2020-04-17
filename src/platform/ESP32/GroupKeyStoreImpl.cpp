@@ -245,7 +245,7 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteKeyOrKeys(uint32_t targetKeyId, uint32_t tar
         uint32_t curKeyId = mKeyIndex[i];
 
         if ((targetKeyId == ChipKeyId::kNone && targetKeyType == ChipKeyId::kType_None) || curKeyId == targetKeyId ||
-                ChipKeyId::GetType(curKeyId) == targetKeyType)
+            ChipKeyId::GetType(curKeyId) == targetKeyType)
         {
             if (!needClose)
             {
@@ -283,9 +283,9 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteKeyOrKeys(uint32_t targetKeyId, uint32_t tar
             else
 #endif // CHIP_PROGRESS_LOGGING
                 if (err == ESP_ERR_NVS_NOT_FOUND)
-                {
-                    err = CHIP_NO_ERROR;
-                }
+            {
+                err = CHIP_NO_ERROR;
+            }
             SuccessOrExit(err);
 
             mNumKeys--;

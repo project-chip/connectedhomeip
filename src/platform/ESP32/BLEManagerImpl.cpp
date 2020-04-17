@@ -54,29 +54,20 @@ struct ESP32ChipServiceData
 
 const uint16_t CHIPoBLEAppId = 0x235A;
 
-const uint8_t UUID_PrimaryService[]       = { 0x00, 0x28 };
-const uint8_t UUID_CharDecl[]             = { 0x03, 0x28 };
-const uint8_t UUID_ClientCharConfigDesc[] = { 0x02, 0x29 };
-const uint8_t UUID_CHIPoBLEService[]         = {
-    0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00
-};
-const uint8_t ShortUUID_CHIPoBLEService[] = { 0xAF, 0xFE };
-const uint8_t UUID_CHIPoBLEChar_RX[]      = {
-    0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
-};
-const uint8_t UUID_CHIPoBLEChar_TX[] = {
-    0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
-};
-const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { {
-        0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-        0x9D, 0x11
-    }
-};
-const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { {
-        0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-        0x9D, 0x12
-    }
-};
+const uint8_t UUID_PrimaryService[]        = { 0x00, 0x28 };
+const uint8_t UUID_CharDecl[]              = { 0x03, 0x28 };
+const uint8_t UUID_ClientCharConfigDesc[]  = { 0x02, 0x29 };
+const uint8_t UUID_CHIPoBLEService[]       = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
+                                         0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00 };
+const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xAF, 0xFE };
+const uint8_t UUID_CHIPoBLEChar_RX[]       = { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95,
+                                         0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 };
+const uint8_t UUID_CHIPoBLEChar_TX[]       = { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95,
+                                         0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 };
+const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
+                                                 0x9D, 0x11 } };
+const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
+                                                 0x9D, 0x12 } };
 
 const uint8_t CharProps_ReadNotify = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
 const uint8_t CharProps_Write      = ESP_GATT_CHAR_PROP_BIT_WRITE;
@@ -93,33 +84,28 @@ enum
 // Table of attribute definitions for Chip over BLE GATT service.
 const esp_gatts_attr_db_t CHIPoBLEGATTAttrs[] = {
     // Service Declaration for Chip over BLE Service
-    {   { ESP_GATT_AUTO_RSP },
-        {   ESP_UUID_LEN_16, (uint8_t *) UUID_PrimaryService, ESP_GATT_PERM_READ, ESP_UUID_LEN_128, ESP_UUID_LEN_128,
-            (uint8_t *) UUID_CHIPoBLEService
-        }
-    },
+    { { ESP_GATT_AUTO_RSP },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_PrimaryService, ESP_GATT_PERM_READ, ESP_UUID_LEN_128, ESP_UUID_LEN_128,
+        (uint8_t *) UUID_CHIPoBLEService } },
 
     // ----- Chip over BLE RX Characteristic -----
 
     // Characteristic declaration
-    {   { ESP_GATT_AUTO_RSP },
-        { ESP_UUID_LEN_16, (uint8_t *) UUID_CharDecl, ESP_GATT_PERM_READ, 1, 1, (uint8_t *) &CharProps_Write }
-    },
+    { { ESP_GATT_AUTO_RSP },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_CharDecl, ESP_GATT_PERM_READ, 1, 1, (uint8_t *) &CharProps_Write } },
     // Characteristic value
     { { ESP_GATT_RSP_BY_APP }, { ESP_UUID_LEN_128, (uint8_t *) UUID_CHIPoBLEChar_RX, ESP_GATT_PERM_WRITE, 512, 0, NULL } },
 
     // ----- Chip over BLE TX Characteristic -----
 
     // Characteristic declaration
-    {   { ESP_GATT_AUTO_RSP },
-        { ESP_UUID_LEN_16, (uint8_t *) UUID_CharDecl, ESP_GATT_PERM_READ, 1, 1, (uint8_t *) &CharProps_ReadNotify }
-    },
+    { { ESP_GATT_AUTO_RSP },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_CharDecl, ESP_GATT_PERM_READ, 1, 1, (uint8_t *) &CharProps_ReadNotify } },
     // Characteristic value
     { { ESP_GATT_RSP_BY_APP }, { ESP_UUID_LEN_128, (uint8_t *) UUID_CHIPoBLEChar_TX, ESP_GATT_PERM_READ, 512, 0, NULL } },
     // Client characteristic configuration description (CCCD) value
-    {   { ESP_GATT_RSP_BY_APP },
-        { ESP_UUID_LEN_16, (uint8_t *) UUID_ClientCharConfigDesc, ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, 2, 0, NULL }
-    },
+    { { ESP_GATT_RSP_BY_APP },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_ClientCharConfigDesc, ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, 2, 0, NULL } },
 };
 
 const uint16_t CHIPoBLEGATTAttrCount = sizeof(CHIPoBLEGATTAttrs) / sizeof(CHIPoBLEGATTAttrs[0]);
@@ -334,7 +320,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBuffer * data)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     CHIPoBLEConState * conState = GetConnectionState(conId);
 
     ESP_LOGD(TAG, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, data->DataLength());
@@ -465,12 +451,12 @@ void BLEManagerImpl::DriveBLEState(void)
 
     // If the application has enabled CHIPoBLE and BLE advertising...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled &&
-            GetFlag(mFlags, kFlag_AdvertisingEnabled)
+        GetFlag(mFlags, kFlag_AdvertisingEnabled)
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION
-            // and no connections are active...
-            && (_NumConnections() == 0)
+        // and no connections are active...
+        && (_NumConnections() == 0)
 #endif
-       )
+    )
     {
         // Start/re-start advertising if not already advertising, or if the advertising state of the
         // ESP BLE layer needs to be refreshed.
@@ -730,9 +716,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // Advertise in fast mode if not fully provisioned and there are no CHIPoBLE connections, or
     // if the application has expressly requested fast advertising.
     advertParams.adv_int_min = advertParams.adv_int_max =
-                                   ((numCons == 0 && !ConfigurationMgr().IsFullyProvisioned()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
-                                   ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
-                                   : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
+        ((numCons == 0 && !ConfigurationMgr().IsFullyProvisioned()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
+        ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
+        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
 
     ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable, device name %s)",
                     (((uint32_t) advertParams.adv_int_min) * 10) / 16, (connectable) ? "" : "non-", mDeviceName);
@@ -956,7 +942,7 @@ void BLEManagerImpl::HandleRXCharWrite(esp_ble_gatts_cb_param_t * param)
     // Post an event to the Chip queue to deliver the data into the Chip stack.
     {
         ChipDeviceEvent event;
-        event.Type                     = DeviceEventType::kCHIPoBLEWriteReceived;
+        event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->write.conn_id;
         event.CHIPoBLEWriteReceived.Data  = buf;
         PlatformMgr().PostEvent(&event);
@@ -1051,7 +1037,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(esp_ble_gatts_cb_param_t * param)
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type                 = (indicationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type = (indicationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = param->write.conn_id;
         PlatformMgr().PostEvent(&event);
     }
@@ -1084,7 +1070,7 @@ void BLEManagerImpl::HandleTXCharConfirm(CHIPoBLEConState * conState, esp_ble_ga
     {
         // Post an event to the Chip queue to process the indicate confirmation.
         ChipDeviceEvent event;
-        event.Type                       = DeviceEventType::kCHIPoBLEIndicateConfirm;
+        event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = param->conf.conn_id;
         PlatformMgr().PostEvent(&event);
     }
@@ -1092,7 +1078,7 @@ void BLEManagerImpl::HandleTXCharConfirm(CHIPoBLEConState * conState, esp_ble_ga
     else
     {
         ChipDeviceEvent event;
-        event.Type                        = DeviceEventType::kCHIPoBLEConnectionError;
+        event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
         event.CHIPoBLEConnectionError.ConId  = param->disconnect.conn_id;
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
         PlatformMgr().PostEvent(&event);
@@ -1109,7 +1095,7 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
     if (ReleaseConnectionState(param->disconnect.conn_id))
     {
         ChipDeviceEvent event;
-        event.Type                       = DeviceEventType::kCHIPoBLEConnectionError;
+        event.Type                          = DeviceEventType::kCHIPoBLEConnectionError;
         event.CHIPoBLEConnectionError.ConId = param->disconnect.conn_id;
         switch (param->disconnect.reason)
         {
@@ -1257,7 +1243,7 @@ void BLEManagerImpl::HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb
             // Post a CHIPoBLEAdvertisingChange(Started) event.
             {
                 ChipDeviceEvent advChange;
-                advChange.Type                          = DeviceEventType::kCHIPoBLEAdvertisingChange;
+                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                 advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
                 PlatformMgr().PostEvent(&advChange);
             }
@@ -1291,7 +1277,7 @@ void BLEManagerImpl::HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb
             // Post a CHIPoBLEAdvertisingChange(Stopped) event.
             {
                 ChipDeviceEvent advChange;
-                advChange.Type                          = DeviceEventType::kCHIPoBLEAdvertisingChange;
+                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                 advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
                 PlatformMgr().PostEvent(&advChange);
             }

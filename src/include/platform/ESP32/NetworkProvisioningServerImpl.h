@@ -30,7 +30,7 @@ namespace Internal {
  * Concrete implementation of the NetworkProvisioningServer singleton object for the ESP32 platform.
  */
 class NetworkProvisioningServerImpl final : public NetworkProvisioningServer,
-    public GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>
+                                            public GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>
 {
 private:
     using GenericImplClass = GenericNetworkProvisioningServerImpl<NetworkProvisioningServerImpl>;

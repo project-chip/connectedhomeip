@@ -408,21 +408,11 @@ struct ChipDeviceEvent final
         } CHIPoBLEAdvertisingChange;
     };
 
-    void Clear() {
-        memset(this, 0, sizeof(*this));
-    }
-    bool IsPublic() const {
-        return DeviceEventType::IsPublic(Type);
-    }
-    bool IsInternal() const {
-        return DeviceEventType::IsInternal(Type);
-    }
-    bool IsPlatformSpecific() const {
-        return DeviceEventType::IsPlatformSpecific(Type);
-    }
-    bool IsPlatformGeneric() const {
-        return DeviceEventType::IsPlatformGeneric(Type);
-    }
+    void Clear() { memset(this, 0, sizeof(*this)); }
+    bool IsPublic() const { return DeviceEventType::IsPublic(Type); }
+    bool IsInternal() const { return DeviceEventType::IsInternal(Type); }
+    bool IsPlatformSpecific() const { return DeviceEventType::IsPlatformSpecific(Type); }
+    bool IsPlatformGeneric() const { return DeviceEventType::IsPlatformGeneric(Type); }
 };
 
 } // namespace DeviceLayer

@@ -31,7 +31,7 @@ class DeviceNetworkInfo;
 
 template <class ImplClass>
 class GenericNetworkProvisioningServerImpl : public ::chip::Profiles::NetworkProvisioning::NetworkProvisioningServer,
-    public ::chip::Profiles::NetworkProvisioning::NetworkProvisioningDelegate
+                                             public ::chip::Profiles::NetworkProvisioning::NetworkProvisioningDelegate
 {
 protected:
     using ServerBaseClass    = ::chip::Profiles::NetworkProvisioning::NetworkProvisioningServer;
@@ -97,9 +97,7 @@ protected:
     static void HandleConnectivityTestTimeOut(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 
 private:
-    ImplClass * Impl() {
-        return static_cast<ImplClass *>(this);
-    }
+    ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
