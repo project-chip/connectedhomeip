@@ -31,6 +31,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 AM_MAKEFLAGS                             = --no-print-directory
 
 SUBDIRS                                  = \
+    examples                               \
     third_party                            \
     src                                    \
     tests                                  \
