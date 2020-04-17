@@ -1363,7 +1363,7 @@ NL_WITH_PACKAGE(
     [mbedTLS],
     [MBEDTLS],
     [mbedtls],
-    [-lmbedtls],
+    [],
     [
         # At this point, the internal mbedTLS package will be neither
         # configured nor built, so the normal checks we undertake for an
@@ -1371,8 +1371,8 @@ NL_WITH_PACKAGE(
         # variables and trust all will be well.
 
         MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
-        MBEDTLS_LDFLAGS=
-        MBEDTLS_LIBS=
+        MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls/repo/library"
+        MBEDTLS_LIBS="-lmbedtls"
     ],
     [
         # Check for required mbedTLS headers.
@@ -1393,7 +1393,7 @@ NL_WITH_PACKAGE(
 # to attempt to pull it down using the bootstrap makefile.
 
 if test "${nl_with_mbedtls}" = "internal"; then
-    maybe_mbedtls_dirstem="mbedtls/repo"
+    maybe_mbedtls_dirstem="mbedtls"
     mbedtls_dirstem="third_party/${maybe_mbedtls_dirstem}"
 
     AC_MSG_NOTICE([attempting to create internal ${mbedtls_dirstem}])
@@ -1940,6 +1940,7 @@ AC_CONFIG_FILES([
 Makefile
 third_party/Makefile
 third_party/lwip/Makefile
+third_party/mbedtls/Makefile
 src/Makefile
 src/include/Makefile
 src/ble/Makefile
