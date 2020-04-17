@@ -63,7 +63,7 @@ case "$TASK" in
     ;;
 
   build-nrf-example-lock-app)
-    docker_run_bash_command 'make VERBOSE=1 -C examples/lock-app/nrf5'
+    docker_run_bash_command 'make VERBOSE=1 -C apps/lock/nrf5'
     ;;
 
   build-distribution-check)

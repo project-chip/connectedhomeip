@@ -102,7 +102,7 @@ commands in a devcontainer shell.
         # CAUTION: the following step will delete any unstaged files
         $ git clean -Xdf
 
-        $ cd examples/lock-app/nrf5
+        $ cd apps/lock/nrf5
         $ make clean
         $ make
 

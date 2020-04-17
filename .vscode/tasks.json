@@ -119,7 +119,7 @@
         {
             "label": "Build nRF5 Lock App",
             "type": "shell",
-            "command": "make -C examples/lock-app/nrf5",
+            "command": "cd apps/lock/nrf5 && make",
             "group": "none",
             "dependsOn": "Clean Tree",
             "problemMatcher": ["$gcc"]
