@@ -62,7 +62,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
     {
         bool autoConnect;
         mWiFiStationMode = (esp_wifi_get_auto_connect(&autoConnect) == ESP_OK && autoConnect) ? kWiFiStationMode_Enabled
-                           : kWiFiStationMode_Disabled;
+                                                                                              : kWiFiStationMode_Disabled;
     }
     return mWiFiStationMode;
 }
@@ -598,7 +598,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         // then force the tunnel to close.  This will result in the tunnel being
         // re-established, which should lift the service-side restrictions.
         if (event->AccountPairingChange.IsPairedToAccount && GetFlag(mFlags, kFlag_ServiceTunnelStarted) &&
-                ServiceTunnelAgent.IsTunnelRoutingRestricted())
+            ServiceTunnelAgent.IsTunnelRoutingRestricted())
         {
             ChipLogProgress(DeviceLayer, "Restarting service tunnel to lift routing restrictions");
             ClearFlag(mFlags, kFlag_ServiceTunnelStarted);
@@ -668,7 +668,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // disconnect the station from the AP, unless the WiFi station mode is currently
         // under application control.
         if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled &&
-                (mWiFiStationMode != kWiFiStationMode_Enabled || !IsWiFiStationProvisioned()))
+            (mWiFiStationMode != kWiFiStationMode_Enabled || !IsWiFiStationProvisioned()))
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
             err = esp_wifi_disconnect();
@@ -690,7 +690,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // Advance the station state to NotConnected if it was previously Connected or Disconnecting,
         // or if a previous initiated connect attempt failed.
         if (mWiFiStationState == kWiFiStationState_Connected || mWiFiStationState == kWiFiStationState_Disconnecting ||
-                mWiFiStationState == kWiFiStationState_Connecting_Failed)
+            mWiFiStationState == kWiFiStationState_Connecting_Failed)
         {
             WiFiStationState prevState = mWiFiStationState;
             ChangeWiFiStationState(kWiFiStationState_NotConnected);
@@ -710,7 +710,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // not presently under application control), AND the system is not in the process of
         // scanning, then...
         if (mWiFiStationMode == kWiFiStationMode_Enabled && IsWiFiStationProvisioned() &&
-                !NetworkProvisioningSvr().ScanInProgress())
+            !NetworkProvisioningSvr().ScanInProgress())
         {
             // Initiate a connection to the AP if we haven't done so before, or if enough
             // time has passed since the last attempt.
@@ -920,7 +920,7 @@ void ConnectivityManagerImpl::DriveAPState()
     // If AP is active, but the interface doesn't have an IPv6 link-local
     // address, assign one now.
     if (mWiFiAPState == kWiFiAPState_Active && ESP32Utils::IsInterfaceUp(TCPIP_ADAPTER_IF_AP) &&
-            !ESP32Utils::HasIPv6LinkLocalAddress(TCPIP_ADAPTER_IF_AP))
+        !ESP32Utils::HasIPv6LinkLocalAddress(TCPIP_ADAPTER_IF_AP))
     {
         err = tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_AP);
         if (err != ESP_OK)
@@ -1106,7 +1106,7 @@ void ConnectivityManagerImpl::DriveServiceTunnelState(void)
 #if !CHIP_DEVICE_CONFIG_ENABLE_FIXED_TUNNEL_SERVER
                           && ConfigurationMgr().IsServiceProvisioned()
 #endif
-                         );
+    );
 
     // If the tunnel should be started but isn't, or vice versa, ...
     if (startServiceTunnel != GetFlag(mFlags, kFlag_ServiceTunnelStarted))
@@ -1241,7 +1241,7 @@ void ConnectivityManagerImpl::RefreshMessageLayer(void)
 }
 
 void ConnectivityManagerImpl::HandleServiceTunnelNotification(ChipTunnelConnectionMgr::TunnelConnNotifyReasons reason,
-        CHIP_ERROR err, void * appCtxt)
+                                                              CHIP_ERROR err, void * appCtxt)
 {
     bool newTunnelState  = false;
     bool prevTunnelState = GetFlag(sInstance.mFlags, kFlag_ServiceTunnelUp);
@@ -1290,8 +1290,8 @@ void ConnectivityManagerImpl::HandleServiceTunnelNotification(ChipTunnelConnecti
             event.ServiceConnectivityChange.ViaTunnel.Result = (newTunnelState) ? kConnectivity_Established : kConnectivity_Lost;
             event.ServiceConnectivityChange.ViaThread.Result = kConnectivity_NoChange;
             event.ServiceConnectivityChange.Overall.Result   = sInstance.HaveServiceConnectivityViaThread()
-                    ? kConnectivity_NoChange
-                    : event.ServiceConnectivityChange.ViaTunnel.Result;
+                ? kConnectivity_NoChange
+                : event.ServiceConnectivityChange.ViaTunnel.Result;
             PlatformMgr().PostEvent(&event);
         }
     }

@@ -43,9 +43,9 @@ public:
     enum
     {
         kMaxGroupKeys = CHIP_CONFIG_MAX_APPLICATION_EPOCH_KEYS + // Maximum number of Epoch keys
-                        CHIP_CONFIG_MAX_APPLICATION_GROUPS +                 // Maximum number of Application Group Master keys
-                        1 +                                                  // Maximum number of Root keys (1 for Service root key)
-                        1                                                    // Fabric secret
+            CHIP_CONFIG_MAX_APPLICATION_GROUPS +                 // Maximum number of Application Group Master keys
+            1 +                                                  // Maximum number of Root keys (1 for Service root key)
+            1                                                    // Fabric secret
     };
 
     CHIP_ERROR Init();
