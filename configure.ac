@@ -1370,9 +1370,9 @@ NL_WITH_PACKAGE(
         # external package cannot be run here. Simply set the appropriate
         # variables and trust all will be well.
 
-        NLASSERT_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
-        NLASSERT_LDFLAGS=
-        NLASSERT_LIBS=
+        MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
+        MBEDTLS_LDFLAGS=
+        MBEDTLS_LIBS=
     ],
     [
         # Check for required mbedTLS headers.
