@@ -34,5 +34,3 @@ else
 end
 set logging off
 set logging redirect off
-
-
