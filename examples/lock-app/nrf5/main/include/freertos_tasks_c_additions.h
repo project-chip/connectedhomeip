@@ -48,8 +48,7 @@
 /*
  * FreeRTOS debugging configuration information structure.
  */
-const uint8_t FreeRTOSDebugConfig[] __attribute__((section(".rodata"))) =
-{
+const uint8_t FreeRTOSDebugConfig[] __attribute__((section(".rodata"))) = {
     FREERTOS_DEBUG_CONFIG_MAJOR_VERSION,
     FREERTOS_DEBUG_CONFIG_MINOR_VERSION,
     tskKERNEL_VERSION_MAJOR,
@@ -71,6 +70,5 @@ const uint8_t FreeRTOSDebugConfig[] __attribute__((section(".rodata"))) =
     configMAX_PRIORITIES,
     0 /* padding */
 };
-
 
 #endif /* FREERTOS_TASKS_C_ADDITIONS_H */
