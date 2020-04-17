@@ -33,8 +33,8 @@ namespace DeviceLayer {
  * ESP32 platforms.
  */
 class SoftwareUpdateManagerImpl final : public SoftwareUpdateManager,
-                                        public Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>,
-                                        public Internal::GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManagerImpl>
+    public Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>,
+    public Internal::GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManagerImpl>
 {
     // Allow the SoftwareUpdateManager interface class to delegate method calls to
     // the implementation methods provided by this class.
