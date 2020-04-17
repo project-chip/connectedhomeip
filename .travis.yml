@@ -33,6 +33,9 @@ jobs:
       name: "Setup Payload Tests"
       env: TASK="run-setup-payload-tests"
     - stage: Deployment Checks
+      name: "Run Code Coverage"
+      env: TASK="run-code-coverage"
+    - stage: Deployment Checks
       name: "Distribution Check"
       env: TASK="build-distribution-check"
       

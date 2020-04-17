@@ -55,6 +55,13 @@ case "$TASK" in
     docker_run_bash_command
     ;;
 
+  run-code-coverage)
+    write_bash_template
+    write_bash_bootstrap
+    write_bash_command 'make -C build/default coverage; code -r build/default/src/chip.info/index.html'
+    docker_run_bash_command
+    ;;
+
   run-crypto-tests)
     write_bash_template
     write_bash_bootstrap
