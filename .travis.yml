@@ -22,6 +22,12 @@ jobs:
     - stage: Tests
       name: "Unit & Functional Tests"
       env: TASK="run-unit-and-functional-tests"
+    - stage: Tests
+      name: "Crypto Tests"
+      env: TASK="run-crypto-tests"
+    - stage: Tests
+      name: "Setup Payload Tests"
+      env: TASK="run-setup-payload-tests"
     - stage: Deployment Checks
       name: "Distribution Check"
       env: TASK="build-distribution-check"
