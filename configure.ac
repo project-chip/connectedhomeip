@@ -1359,7 +1359,7 @@ fi
 # mbedTLS
 #
 
-NL_WITH_PACKAGE(
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
     [mbedTLS],
     [MBEDTLS],
     [mbedtls],
