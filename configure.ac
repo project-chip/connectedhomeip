@@ -1358,11 +1358,25 @@ fi
 #
 # mbedTLS
 #
+if test "${with_mbedtls}" != "internal"; then
+    with_mbedtls="no"
+fi
 
-NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([mbedTLS],
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [mbedTLS],
     [MBEDTLS],
     [mbedtls],
-    [-lmbedtls],
+    [],
+    [
+        # At this point, the internal mbedTLS package will be neither
+        # configured nor built, so the normal checks we undertake for an
+        # external package cannot be run here. Simply set the appropriate
+        # variables and trust all will be well.
+
+        MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
+        MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls"
+        MBEDTLS_LIBS="-lmbedtls"
+    ],
     [
         # Check for required mbedTLS headers.
 
@@ -1376,13 +1390,28 @@ NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([mbedTLS],
     ]
 )
 
-AM_CONDITIONAL([CHIP_WITH_MBEDTLS], [test "${nl_with_mbedtls}" != "no"])
+# Depending on whether mbedTLS has been configured for an internal
+# location, its directory stem within this package needs to be set
+# accordingly. In addition, if the location is internal, then we need
+# to attempt to pull it down using the bootstrap makefile.
 
-if test "${nl_with_mbedtls}" = "no"; then
-    AC_DEFINE([CHIP_WITH_MBEDTLS], [0], [Define to 1 to build CHIP with mbedTLS features])
+if test "${nl_with_mbedtls}" = "internal"; then
+    maybe_mbedtls_dirstem="mbedtls"
+    mbedtls_dirstem="third_party/${maybe_mbedtls_dirstem}/repo"
+
+    AC_MSG_NOTICE([attempting to create internal ${mbedtls_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${mbedtls_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${mbedtls_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
 else
-    AC_DEFINE([CHIP_WITH_MBEDTLS], [1], [Define to 1 to build CHIP with mbedTLS features])
+    maybe_mbedtls_dirstem=""
 fi
+
+AC_SUBST(MBEDTLS_SUBDIRS, [${maybe_mbedtls_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_MBEDTLS_INTERNAL], [test "${nl_with_mbedtls}" = "internal"])
 
 #
 # LwIP
@@ -1899,6 +1928,10 @@ if test "${nl_with_nlassert}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlassert/repo])
 fi
 
+if test "${nl_with_mbedtls}" = "internal"; then
+AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
+fi
+
 if test "${nl_with_nlfaultinjection}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
 fi
@@ -1931,6 +1964,10 @@ src/lib/support/tests/Makefile
 src/platform/Makefile
 tests/Makefile
 ])
+
+if test "${nl_with_mbedtls}" = "internal"; then
+AC_CONFIG_FILES([third_party/mbedtls/Makefile])
+fi
 
 #
 # Generate the auto-generated files for the package
