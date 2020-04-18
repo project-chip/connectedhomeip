@@ -1358,6 +1358,9 @@ fi
 #
 # mbedTLS
 #
+if test "${with_mbedtls}" != "internal"; then
+    with_mbedtls="no"
+fi
 
 NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
     [mbedTLS],
