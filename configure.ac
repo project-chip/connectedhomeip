@@ -1943,7 +1943,6 @@ AC_CONFIG_FILES([
 Makefile
 third_party/Makefile
 third_party/lwip/Makefile
-third_party/mbedtls/Makefile
 src/Makefile
 src/include/Makefile
 src/ble/Makefile
@@ -1965,6 +1964,10 @@ src/lib/support/tests/Makefile
 src/platform/Makefile
 tests/Makefile
 ])
+
+if test "${nl_with_mbedtls}" = "internal"; then
+AC_CONFIG_FILES([third_party/mbedtls/Makefile])
+fi
 
 #
 # Generate the auto-generated files for the package
