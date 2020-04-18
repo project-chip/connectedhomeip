@@ -1371,7 +1371,7 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
         # variables and trust all will be well.
 
         MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
-        MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls/repo/library"
+        MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls"
         MBEDTLS_LIBS="-lmbedtls"
     ],
     [
