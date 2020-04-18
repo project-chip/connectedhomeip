@@ -103,7 +103,7 @@ libmbedtls_a_SOURCES                                                           =
     repo/library/md_wrap.c                  \
     $(NULL)
 
-liblwip_a_CPPFLAGS                                                             = \
+libmbedtls_a_CPPFLAGS                                                             = \
     -I$(top_srcdir)/third_party/mbedtls/repo/include                             \
     $(MBEDTLS_CPPFLAGS)                                                          \
     $(NULL)
