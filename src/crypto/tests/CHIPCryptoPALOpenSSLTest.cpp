@@ -445,7 +445,6 @@ static void TestECDSA_SigningInvalidParams(nlTestSuite * inSuite, void * inConte
         ECDSA_sign_msg(msg, msg_length, curve_name, hex_private_key, sizeof(hex_private_key), NULL, signature_length, SHA1);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_ERROR_INVALID_ARGUMENT);
     signing_error = CHIP_NO_ERROR;
-
 }
 
 static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inContext)
@@ -465,8 +464,8 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
 
     unsigned char * signature = NULL;
     size_t signature_length   = 0;
-    CHIP_ERROR signing_error =
-        ECDSA_sign_msg((const unsigned char *) msg, msg_length, curve_name, hex_private_key, sizeof(hex_private_key), &signature, signature_length, SHA1);
+    CHIP_ERROR signing_error  = ECDSA_sign_msg((const unsigned char *) msg, msg_length, curve_name, hex_private_key,
+                                              sizeof(hex_private_key), &signature, signature_length, SHA1);
     NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
     CHIP_ERROR validation_error = ECDSA_validate_msg_signature(NULL, msg_length, curve_name, hex_public_key, sizeof(hex_public_key),
@@ -475,33 +474,32 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     validation_error = CHIP_NO_ERROR;
 
     validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, 0, curve_name, hex_public_key,
-                                                               sizeof(hex_public_key), signature, signature_length, SHA1);
+                                                    sizeof(hex_public_key), signature, signature_length, SHA1);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
-    validation_error =
-        ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, "curve_name", hex_public_key, sizeof(hex_public_key),
-                                     signature, signature_length, SHA1);
+    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, "curve_name", hex_public_key,
+                                                    sizeof(hex_public_key), signature, signature_length, SHA1);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
     validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, NULL,
-                                                               sizeof(hex_public_key), signature, signature_length, SHA1);
+                                                    sizeof(hex_public_key), signature, signature_length, SHA1);
+    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
+    validation_error = CHIP_NO_ERROR;
+
+    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key, 0,
+                                                    signature, signature_length, SHA1);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
     validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
-                                                               0, signature, signature_length, SHA1);
+                                                    sizeof(hex_public_key), NULL, signature_length, SHA1);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
     validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
-                                                               sizeof(hex_public_key), NULL, signature_length, SHA1);
-    NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
-    validation_error = CHIP_NO_ERROR;
-
-    validation_error = ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, curve_name, hex_public_key,
-                                                               sizeof(hex_public_key), signature, 0, SHA1);
+                                                    sizeof(hex_public_key), signature, 0, SHA1);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 }
