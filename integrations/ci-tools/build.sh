@@ -16,7 +16,7 @@ write_bash_command() {
 }
 
 write_bash_bootstrap() {
-  write_bash_command 'if [[ ! -f build/default/config.status ]]; then ./bootstrap && mkdir -p build/default; (cd build/default && ../../configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi'
+  write_bash_command 'if [[ ! -f build/default/config.status ]]; then mkdir -p build/default; (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi'
 }
 
 docker_run_bash_command() {
@@ -36,8 +36,7 @@ case "$TASK" in
 
   build-nrf-example-lock-app)
     write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'cd examples/lock-app/nrf5 && make'
+    write_bash_command 'make -C examples/lock-app/nrf5'
     docker_run_bash_command
     ;;
 
