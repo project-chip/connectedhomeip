@@ -114,6 +114,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --disable-docs \
     --disable-java \
     --disable-device-manager \
+    --with-mbedtls=internal
 
 # Enable / disable optimization.
 ifeq ($(OPT),1)
@@ -156,7 +157,8 @@ STD_LIBS += \
     -lInetLayer \
     -lnlfaultinjection \
     -lSystemLayer \
-    -llwip
+    -llwip \
+    -lmbedtls
 
 # Add the appropriate CHIP target as a prerequisite to all application
 # compilation targets to ensure that CHIP gets built and its header
@@ -170,7 +172,8 @@ STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
     $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
-    $(CHIP_OUTPUT_DIR)/lib/liblwip.a
+    $(CHIP_OUTPUT_DIR)/lib/liblwip.a \
+    $(CHIP_OUTPUT_DIR)/lib/libmbedtls.a
 
 
 # ==================================================
