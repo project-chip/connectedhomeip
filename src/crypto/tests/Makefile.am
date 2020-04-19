@@ -93,7 +93,6 @@ TestCrypto_SOURCES                             = CHIPCryptoTest.c
 # OpenSSL based tests
 TestOpenSSLCrypto_LDADD                        =        \
     $(COMMON_LDADD)                                     \
-    $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
 
