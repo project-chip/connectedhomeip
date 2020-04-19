@@ -33,7 +33,8 @@ case "$TASK" in
     ;;
 
   build-ubuntu-linux)
-    docker_run_bash_command "$bootstrap"' && make V=1 -C build/default'
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default'
     ;;
 
   build-nrf-example-lock-app)
@@ -41,23 +42,28 @@ case "$TASK" in
     ;;
 
   build-distribution-check)
-    docker_run_bash_command "$bootstrap"'make V=1 -C build/default distcheck'
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default'
     ;;
 
   run-unit-and-functional-tests)
-    docker_run_bash_command "$bootstrap"'make V=1 -C build/default distcheck'
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default distcheck'
     ;;
 
   run-code-coverage)
-    docker_run_bash_command "$bootstrap"'make V=1 -C build/default coverage'
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default coverage'
     ;;
 
   run-crypto-tests)
-    docker_run_bash_command "$bootstrap"'make V=1 -C build/default/src/crypto check'
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default/src/crypto check'
     ;;
 
   run-setup-payload-tests)
-    docker_run_bash_command "$bootstrap"'make V=1 -C build/default/src/setup_payload check'
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default/src/setup_payload check'
     ;;
 
   *)
