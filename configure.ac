@@ -1514,7 +1514,6 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
         NLFAULTINJECTION_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlfaultinjection/repo/include"
         NLFAULTINJECTION_LDFLAGS="-L${ac_pwd}/third_party/nlfaultinjection/repo/src"
         NLFAULTINJECTION_LIBS="-lnlfaultinjection"
-        NLFAULTINJECTION_MAKEDIR="${ac_pwd}/third_party/nlfaultinjection/repo"
     ],
     [
         # Check for required nlfaultinjection headers.
