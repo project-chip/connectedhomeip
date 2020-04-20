@@ -67,7 +67,7 @@ GECKO_SDK_SUITE_DIR    := $(EFR32_SDK_ROOT)/..
 
 all : |
 
-BUILD_SUPPORT_DIR := $(CHIP_ROOT)/build/efr32
+BUILD_SUPPORT_DIR := $(CHIP_ROOT)/config/efr32
 
 include $(BUILD_SUPPORT_DIR)/efr32-app.mk
 include $(BUILD_SUPPORT_DIR)/efr32-chip.mk

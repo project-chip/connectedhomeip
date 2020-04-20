@@ -80,7 +80,7 @@ AC_CONFIG_AUX_DIR([build/autoconf])
 # Tell autoconf where to find auxilliary M4 macros
 # Note that nlbuild-autotools has macros in two subdirs, for local vs third-party scripts
 #
-AC_CONFIG_MACRO_DIRS([build/autoconf/m4 third_party/nlbuild-autotools/repo/third_party/autoconf/m4 third_party/nlbuild-autotools/repo/autoconf/m4])
+AC_CONFIG_MACRO_DIRS([build/autoconf/m4 autoconf/m4 third_party/nlbuild-autotools/repo/third_party/autoconf/m4 third_party/nlbuild-autotools/repo/autoconf/m4])
 
 #
 # Tell autoconf what file the package is using to aggregate C preprocessor
@@ -1274,23 +1274,23 @@ AC_LANG_PUSH([C++])
 
 # SystemLayer
 
-CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-system-project-includes, SYSTEM_PROJECT_CONFIG_INCLUDE, SystemProjectConfig.h, CHIP System Layer, ${ac_abs_confdir}/build/config/standalone)
+CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-system-project-includes, SYSTEM_PROJECT_CONFIG_INCLUDE, SystemProjectConfig.h, CHIP System Layer, ${ac_abs_confdir}/config/standalone)
 
 # BleLayer
 
 if test ${CONFIG_NETWORK_LAYER_BLE} = 1; then
-    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-ble-project-includes, BLE_PROJECT_CONFIG_INCLUDE, BleProjectConfig.h, CHIP BLE Layer, ${ac_abs_confdir}/build/config/standalone)
+    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-ble-project-includes, BLE_PROJECT_CONFIG_INCLUDE, BleProjectConfig.h, CHIP BLE Layer, ${ac_abs_confdir}/config/standalone)
 fi
 
 # InetLayer
 
 if test ${CONFIG_NETWORK_LAYER_INET} = 1; then
-    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-inet-project-includes, INET_PROJECT_CONFIG_INCLUDE, InetProjectConfig.h, CHIP Inet Layer, ${ac_abs_confdir}/build/config/standalone)
+    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-inet-project-includes, INET_PROJECT_CONFIG_INCLUDE, InetProjectConfig.h, CHIP Inet Layer, ${ac_abs_confdir}/config/standalone)
 fi
 
 # Core
 
-CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-project-includes, CHIP_PROJECT_CONFIG_INCLUDE, CHIPProjectConfig.h, CHIP Core, ${ac_abs_confdir}/build/config/standalone)
+CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-project-includes, CHIP_PROJECT_CONFIG_INCLUDE, CHIPProjectConfig.h, CHIP Core, ${ac_abs_confdir}/config/standalone)
 
 # Device Layer
 

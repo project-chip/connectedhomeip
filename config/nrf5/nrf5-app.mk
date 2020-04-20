@@ -34,7 +34,7 @@
 #   
 #       PROJECT_ROOT = $(realpath .)
 #
-#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/build/nrf5
+#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/config/nrf5
 #       
 #       include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
 #       
