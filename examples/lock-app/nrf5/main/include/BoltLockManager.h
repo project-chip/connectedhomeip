@@ -70,7 +70,7 @@ private:
 
     static void TimerEventHandler(void * p_context);
     static void AutoReLockTimerEventHandler(AppEvent * aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent *aEvent);
+    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     static BoltLockManager sLock;
 };

@@ -47,8 +47,7 @@ SemaphoreHandle_t __lock___arc4random_mutex;
  *
  * This is called automatically at system start by the C runtime.
  */
-__attribute__((constructor))
-static void InitNewlibMutexes(void)
+__attribute__((constructor)) static void InitNewlibMutexes(void)
 {
 #if USE_STATIC_NEWLIB_MUTEXES
 
@@ -90,54 +89,54 @@ static void InitNewlibMutexes(void)
 
 void __retarget_lock_init(_LOCK_T * lock)
 {
-    *lock = (_LOCK_T)xSemaphoreCreateMutex();
+    *lock = (_LOCK_T) xSemaphoreCreateMutex();
 }
 
 void __retarget_lock_init_recursive(_LOCK_T * lock)
 {
-    *lock = (_LOCK_T)xSemaphoreCreateRecursiveMutex();
+    *lock = (_LOCK_T) xSemaphoreCreateRecursiveMutex();
 }
 
 void __retarget_lock_close(_LOCK_T lock)
 {
-    vSemaphoreDelete((SemaphoreHandle_t)lock);
+    vSemaphoreDelete((SemaphoreHandle_t) lock);
 }
 
 void __retarget_lock_close_recursive(_LOCK_T lock)
 {
-    vSemaphoreDelete((SemaphoreHandle_t)lock);
+    vSemaphoreDelete((SemaphoreHandle_t) lock);
 }
 
 void __retarget_lock_acquire(_LOCK_T lock)
 {
     TickType_t waitTicks = (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) ? 0 : portMAX_DELAY;
-    xSemaphoreTake((SemaphoreHandle_t)lock, waitTicks);
+    xSemaphoreTake((SemaphoreHandle_t) lock, waitTicks);
 }
 
 void __retarget_lock_acquire_recursive(_LOCK_T lock)
 {
     TickType_t waitTicks = (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) ? 0 : portMAX_DELAY;
-    xSemaphoreTakeRecursive((SemaphoreHandle_t)lock, waitTicks);
+    xSemaphoreTakeRecursive((SemaphoreHandle_t) lock, waitTicks);
 }
 
 int __retarget_lock_try_acquire(_LOCK_T lock)
 {
-    return xSemaphoreTake((SemaphoreHandle_t)lock, 0) == pdTRUE ? 1 : 0;
+    return xSemaphoreTake((SemaphoreHandle_t) lock, 0) == pdTRUE ? 1 : 0;
 }
 
 int __retarget_lock_try_acquire_recursive(_LOCK_T lock)
 {
-    return xSemaphoreTakeRecursive((SemaphoreHandle_t)lock, 0) == pdTRUE ? 1 : 0;
+    return xSemaphoreTakeRecursive((SemaphoreHandle_t) lock, 0) == pdTRUE ? 1 : 0;
 }
 
 void __retarget_lock_release(_LOCK_T lock)
 {
-    xSemaphoreGive((SemaphoreHandle_t)lock);
+    xSemaphoreGive((SemaphoreHandle_t) lock);
 }
 
 void __retarget_lock_release_recursive(_LOCK_T lock)
 {
-    xSemaphoreGiveRecursive((SemaphoreHandle_t)lock);
+    xSemaphoreGiveRecursive((SemaphoreHandle_t) lock);
 }
 
 /*
@@ -156,4 +155,3 @@ void __malloc_unlock(struct _reent * r)
 {
     taskEXIT_CRITICAL();
 }
-

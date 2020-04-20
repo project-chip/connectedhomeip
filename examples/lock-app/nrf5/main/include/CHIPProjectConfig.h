@@ -28,13 +28,13 @@
 #ifndef CHIP_PROJECT_CONFIG_H
 #define CHIP_PROJECT_CONFIG_H
 
-#if BUILD_RELEASE  // release build
+#if BUILD_RELEASE // release build
 
 // Security and Authentication enabled for release build.
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 #define CHIP_CONFIG_REQUIRE_AUTH 1
 
-#else  // development build
+#else // development build
 
 // Security and Authentication disabled for development build.
 // For convenience, enable CHIP Security Test Mode and disable the requirement for
@@ -65,7 +65,7 @@
  */
 #define CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER "DUMMY_SN"
 
-# endif // BUILD_RELEASE
+#endif // BUILD_RELEASE
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
