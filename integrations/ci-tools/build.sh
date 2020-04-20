@@ -1,78 +1,69 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+#
+# In support of Travis CI which communicates via environment variables,
+#  this script supports the following:
+#
+#  TASK    a mnemonic for a supported build/test CI task to be mapped
+#            to a set of bash commands
+#  IMAGE   the location (under integrations/docker/image) of the desired
+#            run.sh
+#
+
+me=$(basename "$0")
 
 die() {
-  echo " *** ERROR: " "${*}"
+  echo "$me: *** ERROR: " "${*}"
   exit 1
 }
 
-write_bash_template() {
-  echo '#!/bin/bash
-    ' >./build/scripts/build_command.sh
-  chmod +x ./build/scripts/build_command.sh
-}
-
-write_bash_command() {
-  echo "$1" >>./build/scripts/build_command.sh
-}
-
-write_bash_bootstrap() {
-  write_bash_command 'if [[ ! -f build/default/config.status ]]; then mkdir -p build/default; (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi'
-}
+bootstrap='if [[ ! -f build/default/config.status ]]; then mkdir -p build/default; (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi'
 
 docker_run_bash_command() {
-  ./integrations/docker/images/chip-build/run.sh "build/scripts/build_command.sh"
+  integrations/docker/images/"${IMAGE:-chip-build}"/run.sh bash -c "$1"
 }
+
+set -x
 
 case "$TASK" in
 
   # You can add more tasks here, the top one shows an example of running a build inside our build container
+  self-test)
+    docker_run_bash_command 'echo looks ok to me && echo compound commands look good'
+    ;;
 
   build-ubuntu-linux)
-    write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'make -C build/default'
-    docker_run_bash_command
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default'
     ;;
 
   build-nrf-example-lock-app)
-    write_bash_template
-    write_bash_command 'make -C examples/lock-app/nrf5'
-    docker_run_bash_command
+    docker_run_bash_command 'make VERBOSE=1 -C examples/lock-app/nrf5'
     ;;
 
   build-distribution-check)
-    write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'make -C build/default distcheck'
-    docker_run_bash_command
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default'
     ;;
 
   run-unit-and-functional-tests)
-    write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'make -C build/default check'
-    docker_run_bash_command
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default distcheck'
     ;;
 
   run-code-coverage)
-    write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'make -C build/default coverage'
-    docker_run_bash_command
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default coverage'
     ;;
 
   run-crypto-tests)
-    write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'make -C build/default/src/crypto check'
-    docker_run_bash_command
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default/src/crypto check'
     ;;
 
   run-setup-payload-tests)
-    write_bash_template
-    write_bash_bootstrap
-    write_bash_command 'make -C build/default/src/setup_payload check'
-    docker_run_bash_command
+    docker_run_bash_command "$bootstrap"
+    docker_run_bash_command 'make V=1 -C build/default/src/setup_payload check'
     ;;
 
   *)
