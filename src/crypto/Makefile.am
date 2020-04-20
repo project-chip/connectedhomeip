@@ -40,10 +40,15 @@ libChipCrypto_a_CPPFLAGS            = \
     $(NULL)
 
 libChipCrypto_a_SOURCES                                       = \
-    CHIPOpenSSL.c                                               \
     CHIPBase+Crypto.c                                           \
+   $(NULL)
+
+if CHIP_WITH_OPENSSL
+libChipCrypto_a_SOURCES                                      += \
+    CHIPOpenSSL.c                                               \
     CHIPCryptoPALOpenSSL.cpp                                    \
    $(NULL)
+endif
 
 dist_libChipCrypto_a_HEADERS                                 = \
     CHIPCrypto.h                                               \

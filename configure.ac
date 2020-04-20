@@ -1426,6 +1426,9 @@ if test "${with_crypto}" = "mbedtls"; then
 fi
 fi
 
+AM_CONDITIONAL([CHIP_WITH_OPENSSL], [test "${nl_with_openssl}" != "no"])
+AM_CONDITIONAL([CHIP_WITH_MBEDTLS], [test "${nl_with_mbedtls}" != "no"])
+
 #
 # LwIP
 #
