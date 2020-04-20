@@ -65,10 +65,16 @@ restylers:
           - "**/*.js"
           - "**/*.m"
       interpreters: []
-    - name: jq
+    - name: prettier-json
+      image: restyled/restyler-prettier:v2.0.2-1
       enabled: true
+      command:
+        - prettier
+        - "--write"
+      arguments: []
       include:
           - "**/*.json"
+      interpreters: []
     - name: prettier-markdown
       enabled: true
       include:

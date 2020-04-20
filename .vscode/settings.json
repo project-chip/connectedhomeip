@@ -22,6 +22,15 @@
     "[dockerfile]": {
         "editor.defaultFormatter": "ms-azuretools.vscode-docker"
     },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[shellscript]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[properties]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
     "files.associations": {
         "iostream": "cpp",
         "array": "cpp",
@@ -108,5 +117,6 @@
             "backgroundColor": "transparent"
         }
     ],
-    "clang-format.fallbackStyle": "WebKit"
+    "clang-format.fallbackStyle": "WebKit",
+    "files.trimFinalNewlines": true
 }
