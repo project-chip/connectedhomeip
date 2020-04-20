@@ -5,12 +5,10 @@
 !.vscode/launch.json
 !.vscode/settings.json
 
+# Platforms
+.DS_Store
+
 # Build System
-.deps
-.dirstamp
-.DS_Store
-.local-version
-.DS_Store
 Makefile.in
 aclocal.m4
 autom4te.cache
@@ -20,7 +18,6 @@ examples/**/build
 config.log
 config.status
 configure
-src/include/BuildConfig.h
 src/include/BuildConfig.h.in
 
 # Repos stuff
