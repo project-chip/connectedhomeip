@@ -1324,94 +1324,107 @@ AC_MSG_NOTICE([checking package dependencies])
 
 AC_PATH_PROG([PKG_CONFIG],[pkg-config])
 
-#
-#
-# OpenSSL
-#
-
-NL_WITH_REQUIRED_EXTERNAL_PACKAGE([OpenSSL],
-    [OPENSSL],
-    [openssl],
-    [-lcrypto],
-    [
-        # Check for required OpenSSL headers.
-
-        AC_CHECK_HEADERS([openssl/aes.h] [openssl/bn.h] [openssl/crypto.h] [openssl/ec.h] [openssl/err.h] [openssl/evp.h] [openssl/hmac.h] [openssl/kdf.h] [openssl/rand.h] [openssl/sha.h] [openssl/srp.h],
-
-            [],
-            [
-                AC_MSG_ERROR(The OpenSSL header "$ac_header" is required but cannot be found.)
-            ]
-        )
-    ]
-)
-
-AM_CONDITIONAL([CHIP_WITH_OPENSSL], [test "${nl_with_openssl}" != "no"])
-
-if test "${nl_with_openssl}" = "no"; then
-    AC_DEFINE([CHIP_WITH_OPENSSL], [0], [Define to 1 to build CHIP with OpenSSL features])
-else
-    AC_DEFINE([CHIP_WITH_OPENSSL], [1], [Define to 1 to build CHIP with OpenSSL features])
-fi
-
-#
-#
-# mbedTLS
-#
-if test "${with_mbedtls}" != "internal"; then
-    with_mbedtls="no"
-fi
-
-NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
-    [mbedTLS],
-    [MBEDTLS],
-    [mbedtls],
+AC_ARG_WITH(crypto,
+    [AS_HELP_STRING([--with-crypto={openssl, mbedtls}],
+        [Specify which crypto library to use.])],
     [],
-    [
-        # At this point, the internal mbedTLS package will be neither
-        # configured nor built, so the normal checks we undertake for an
-        # external package cannot be run here. Simply set the appropriate
-        # variables and trust all will be well.
+    [with_crypto="openssl"])
 
-        MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
-        MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls"
-        MBEDTLS_LIBS="-lmbedtls"
-    ],
-    [
-        # Check for required mbedTLS headers.
+if test "${with_crypto}" = "openssl"; then
+    nl_with_mbedtls="no"
+    #
+    #
+    # OpenSSL
+    #
 
-        AC_CHECK_HEADERS([mbedtls/sha1.h] [mbedtls/sha256.h] [mbedtls/sha512.h] [mbedtls/md.h] [mbedtls/hkdf.h] [mbedtls/pkcs5.h] [mbedtls/chachapoly.h] [mbedtls/aes.h] [mbedtls/ecdh.h] [mbedtls/bignum.h],
+    NL_WITH_REQUIRED_EXTERNAL_PACKAGE([OpenSSL],
+        [OPENSSL],
+        [openssl],
+        [-lcrypto],
+        [
+            # Check for required OpenSSL headers.
 
-            [],
-            [
-                AC_MSG_ERROR(The mbedTLS header "$ac_header" is required but cannot be found.)
-            ]
-        )
-    ]
-)
+            AC_CHECK_HEADERS([openssl/aes.h] [openssl/bn.h] [openssl/crypto.h] [openssl/ec.h] [openssl/err.h] [openssl/evp.h] [openssl/hmac.h] [openssl/kdf.h] [openssl/rand.h] [openssl/sha.h] [openssl/srp.h],
 
-# Depending on whether mbedTLS has been configured for an internal
-# location, its directory stem within this package needs to be set
-# accordingly. In addition, if the location is internal, then we need
-# to attempt to pull it down using the bootstrap makefile.
+                [],
+                [
+                    AC_MSG_ERROR(The OpenSSL header "$ac_header" is required but cannot be found.)
+                ]
+            )
+        ]
+    )
 
-if test "${nl_with_mbedtls}" = "internal"; then
-    maybe_mbedtls_dirstem="mbedtls"
-    mbedtls_dirstem="third_party/${maybe_mbedtls_dirstem}/repo"
-
-    AC_MSG_NOTICE([attempting to create internal ${mbedtls_dirstem}])
-
-    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${mbedtls_dirstem}
-
-    if test $? -ne 0; then
-        AC_MSG_ERROR([failed to create ${mbedtls_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    if test "${nl_with_openssl}" = "no"; then
+        AC_DEFINE([CHIP_WITH_OPENSSL], [0], [Define to 1 to build CHIP with OpenSSL features])
+    else
+        AC_DEFINE([CHIP_WITH_OPENSSL], [1], [Define to 1 to build CHIP with OpenSSL features])
     fi
-else
-    maybe_mbedtls_dirstem=""
-fi
 
-AC_SUBST(MBEDTLS_SUBDIRS, [${maybe_mbedtls_dirstem}])
-AM_CONDITIONAL([CHIP_WITH_MBEDTLS_INTERNAL], [test "${nl_with_mbedtls}" = "internal"])
+    AC_SUBST([CRYPTO_CPPFLAGS], [${OPENSSL_CPPFLAGS}])
+    AC_SUBST([CRYPTO_LDFLAGS], [${OPENSSL_LDFLAGS}])
+    AC_SUBST([CRYPTO_LIBS], [${OPENSSL_LIBS}])
+else
+if test "${with_crypto}" = "mbedtls"; then
+    nl_with_openssl="no"
+    #
+    #
+    # mbedTLS
+    #
+    NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+        [mbedTLS],
+        [MBEDTLS],
+        [mbedtls],
+        [],
+        [
+            # At this point, the internal mbedTLS package will be neither
+            # configured nor built, so the normal checks we undertake for an
+            # external package cannot be run here. Simply set the appropriate
+            # variables and trust all will be well.
+
+            MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
+            MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls"
+            MBEDTLS_LIBS="-lmbedtls"
+        ],
+        [
+            # Check for required mbedTLS headers.
+
+            AC_CHECK_HEADERS([mbedtls/sha1.h] [mbedtls/sha256.h] [mbedtls/sha512.h] [mbedtls/md.h] [mbedtls/hkdf.h] [mbedtls/pkcs5.h] [mbedtls/chachapoly.h] [mbedtls/aes.h] [mbedtls/ecdh.h] [mbedtls/bignum.h],
+
+                [],
+                [
+                    AC_MSG_ERROR(The mbedTLS header "$ac_header" is required but cannot be found.)
+                ]
+            )
+        ]
+    )
+
+    # Depending on whether mbedTLS has been configured for an internal
+    # location, its directory stem within this package needs to be set
+    # accordingly. In addition, if the location is internal, then we need
+    # to attempt to pull it down using the bootstrap makefile.
+
+    if test "${nl_with_mbedtls}" = "internal"; then
+        maybe_mbedtls_dirstem="mbedtls"
+        mbedtls_dirstem="third_party/${maybe_mbedtls_dirstem}/repo"
+
+        AC_MSG_NOTICE([attempting to create internal ${mbedtls_dirstem}])
+
+        ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${mbedtls_dirstem}
+
+        if test $? -ne 0; then
+            AC_MSG_ERROR([failed to create ${mbedtls_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+        fi
+    else
+        maybe_mbedtls_dirstem=""
+    fi
+
+    AC_SUBST(MBEDTLS_SUBDIRS, [${maybe_mbedtls_dirstem}])
+
+    AC_SUBST(CRYPTO_CPPFLAGS, [${MBEDTLS_CPPFLAGS}])
+    AC_SUBST(CRYPTO_LDFLAGS, [${MBEDTLS_LDFLAGS}])
+    AC_SUBST(CRYPTO_LIBS, [${MBEDTLS_LIBS}])
+fi
+fi
 
 #
 # LwIP
@@ -1844,17 +1857,11 @@ if test "${nl_cv_build_tests}" = "yes"; then
 fi
 
 
-# Add any OpenSSL CPPFLAGS, LDFLAGS, and LIBS
+# Add any Crypto CPPFLAGS, LDFLAGS, and LIBS
 
-CPPFLAGS="${CPPFLAGS} ${OPENSSL_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${OPENSSL_LDFLAGS}"
-LIBS="${LIBS} ${OPENSSL_LIBS}"
-
-# Add any mbedTLS CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${MBEDTLS_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${MBEDTLS_LDFLAGS}"
-LIBS="${LIBS} ${MBEDTLS_LIBS}"
+CPPFLAGS="${CPPFLAGS} ${CRYPTO_CPPFLAGS}"
+LDFLAGS="${LDFLAGS} ${CRYPTO_LDFLAGS}"
+LIBS="${LIBS} ${CRYPTO_LIBS}"
 
 # Add any code coverage CPPFLAGS, LDFLAGS, and LIBS
 
@@ -2012,14 +2019,12 @@ AC_MSG_NOTICE([
   LwIP compile flags                               : ${LWIP_CPPFLAGS:--}
   LwIP link flags                                  : ${LWIP_LDFLAGS:--}
   LwIP link libraries                              : ${LWIP_LIBS:--}
+  Crypto Library                                   : ${with_crypto}
   OpenSSL source                                   : ${nl_with_openssl}
-  OpenSSL compile flags                            : ${OPENSSL_CPPFLAGS:--}
-  OpenSSL link flags                               : ${OPENSSL_LDFLAGS:--}
-  OpenSSL link libraries                           : ${OPENSSL_LIBS:--}
   mbedTLS source                                   : ${nl_with_mbedtls}
-  mbedTLS compile flags                            : ${MBEDTLS_CPPFLAGS:--}
-  mbedTLS link flags                               : ${MBEDTLS_LDFLAGS:--}
-  mbedTLS link libraries                           : ${MBEDTLS_LIBS:--}
+  Crypto compile flags                             : ${CRYPTO_CPPFLAGS:--}
+  Crypto link flags                                : ${CRYPTO_LDFLAGS:--}
+  Crypto link libraries                            : ${CRYPTO_LIBS:--}
   Nlunit-test source                               : ${nl_with_nlunit_test:--}
   Nlunit-test compile flags                        : ${NLUNIT_TEST_CPPFLAGS:--}
   Nlunit-test link flags                           : ${NLUNIT_TEST_LDFLAGS:--}
