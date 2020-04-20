@@ -29,9 +29,9 @@
 namespace chip {
 namespace Crypto {
 
-enum DigestType
+enum class DigestType
 {
-    SHA1 = 0,
+    SHA1,
     SHA256
 };
 
@@ -98,7 +98,7 @@ CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length,
 CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length);
 
 /**
- * @brief A function to sign a msg using EC DSA
+ * @brief A function to sign a msg using ECDSA
  * @param msg Message that needs to be signed
  * @param msg_length Length of message
  * @param curve_name Name of the curve to use
@@ -114,7 +114,7 @@ CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, co
                           size_t & out_length, DigestType digest);
 
 /**
- * @brief A function to sign a msg using EC DSA
+ * @brief A function to sign a msg using ECDSA
  * @param msg Message that needs to be signed
  * @param msg_length Length of message
  * @param curve_name Name of the curve to use

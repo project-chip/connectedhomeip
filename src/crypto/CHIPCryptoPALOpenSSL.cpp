@@ -65,12 +65,13 @@ static const EVP_MD * _digestForType(chip::Crypto::DigestType digestType)
 {
     switch (digestType)
     {
-    case SHA1:
+    case DigestType::SHA1:
         return EVP_sha1();
         break;
 
-    case SHA256:
+    case DigestType::SHA256:
         return EVP_sha256();
+        break;
 
     default:
         return NULL;
@@ -78,7 +79,7 @@ static const EVP_MD * _digestForType(chip::Crypto::DigestType digestType)
     }
 }
 
-// Calller needs to free returned char *
+// Caller needs to free returned char *
 static char * _createHexString(const unsigned char * in, const size_t in_length)
 {
     char * result        = (char *) calloc(in_length * 2, sizeof(char));
