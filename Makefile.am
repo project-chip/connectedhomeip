@@ -56,7 +56,7 @@ EXTRA_DIST                               = \
     $(srcdir)/config                 \
     $(srcdir)/config/efr32                  \
     $(srcdir)/config/nrf5                   \
-    $(srcdir)/build/scripts                \
+    $(srcdir)/scripts                       \
     $(NULL)
 
 BUILT_SOURCES                            = \

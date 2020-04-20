@@ -47,7 +47,7 @@ PRETTY_FILES                               = \
 CHIPVersion.h: force
 
 define check-file-CHIPVersion.h
-$(top_srcdir)/build/scripts/gen-chip-version "`cat $(1)`" -o "$(2)"
+$(top_srcdir)/scripts/gen-chip-version "`cat $(1)`" -o "$(2)"
 endef # check-file-CHIPVersion.h
 
 MAKEDIR_TARGETS=$(top_builddir)/.local-version

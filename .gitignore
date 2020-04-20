@@ -19,7 +19,6 @@ build/*
 !build/README.md
 !build/autoconf/m4/chip_check_project_config_includes.m4
 !build/autoconf/m4/nl_with_lwip.m4
-!build/scripts/gen-chip-version
 examples/**/build
 config.log
 config.status
