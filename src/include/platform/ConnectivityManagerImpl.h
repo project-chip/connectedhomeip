@@ -47,28 +47,26 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConnectivityManager singleton object for Nordic nRF52 platforms.
  */
-class ConnectivityManagerImpl final
-    : public ConnectivityManager,
-      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+class ConnectivityManagerImpl final : public ConnectivityManager,
+                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-      public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
-      public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-      public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
 #else
-      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
-      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>,
-      public Internal::GenericConnectivityManagerImpl_NoTunnel<ConnectivityManagerImpl>
+                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_NoTunnel<ConnectivityManagerImpl>
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
 private:
-
     // ===== Members that implement the ConnectivityManager abstract interface.
 
     bool _HaveIPv4InternetConnectivity(void);
@@ -99,7 +97,6 @@ inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
     return _HaveServiceConnectivityViaThread();
 }
-
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.

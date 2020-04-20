@@ -42,22 +42,19 @@ class GroupKeyStoreImpl final : public ::chip::Profiles::Security::AppKeys::Grou
 public:
     CHIP_ERROR Init();
 
-    CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey &key) override;
-    CHIP_ERROR StoreGroupKey(const ChipGroupKey &key) override;
+    CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key) override;
+    CHIP_ERROR StoreGroupKey(const ChipGroupKey & key) override;
     CHIP_ERROR DeleteGroupKey(uint32_t keyId) override;
     CHIP_ERROR DeleteGroupKeysOfAType(uint32_t keyType) override;
-    CHIP_ERROR EnumerateGroupKeys(uint32_t  keyType,
-                                   uint32_t *keyIds,
-                                   uint8_t   keyIdsArraySize,
-                                   uint8_t & keyCount) override;
+    CHIP_ERROR EnumerateGroupKeys(uint32_t keyType, uint32_t * keyIds, uint8_t keyIdsArraySize, uint8_t & keyCount) override;
     CHIP_ERROR Clear(void) override;
     CHIP_ERROR RetrieveLastUsedEpochKeyId(void) override;
     CHIP_ERROR StoreLastUsedEpochKeyId(void) override;
 
 private:
     static constexpr size_t kFixedEncodedKeySize = 4U + // key id
-                                                   4U + // start time / global id
-                                                   1U;  // key data length
+        4U +                                            // start time / global id
+        1U;                                             // key data length
 
     static constexpr size_t kMaxEncodedKeySize = kFixedEncodedKeySize + ChipGroupKey::MaxKeySize;
 
@@ -66,9 +63,9 @@ private:
     static constexpr uint16_t kGroupKeyRecordKey =  GetRecordKey(kConfigKey_GroupKey);
     */
 
-    static CHIP_ERROR EncodeGroupKey(const ChipGroupKey &key, uint8_t *buf, size_t bufSize, size_t &encodedKeyLen);
-    static CHIP_ERROR DecodeGroupKey(const uint8_t *encodedKey, size_t encodedKeyLen, ChipGroupKey &key);
-    static CHIP_ERROR DecodeGroupKeyId(const uint8_t *encodedKey, size_t encodedKeyLen, uint32_t &keyId);
+    static CHIP_ERROR EncodeGroupKey(const ChipGroupKey & key, uint8_t * buf, size_t bufSize, size_t & encodedKeyLen);
+    static CHIP_ERROR DecodeGroupKey(const uint8_t * encodedKey, size_t encodedKeyLen, ChipGroupKey & key);
+    static CHIP_ERROR DecodeGroupKeyId(const uint8_t * encodedKey, size_t encodedKeyLen, uint32_t & keyId);
 };
 
 } // namespace Internal

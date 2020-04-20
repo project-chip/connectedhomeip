@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include "AppTask.h"
 #include "ButtonHandler.h"
+#include "AppTask.h"
 
 #include "AppConfig.h"
 
@@ -32,8 +32,9 @@ typedef struct ButtonArray
 } ButtonArray_t;
 
 static const ButtonArray_t sButtonArray[BSP_BUTTON_COUNT] = BSP_BUTTON_INIT; // GPIO info for the 2 WDTK buttons.
-TimerHandle_t buttonTimers[BSP_BUTTON_COUNT]; // FreeRTOS timers used for debouncing buttons. Array to hold handles to
-                                              // the created timers.
+TimerHandle_t buttonTimers[BSP_BUTTON_COUNT];                                // FreeRTOS timers used for debouncing
+// buttons. Array to hold handles to
+// the created timers.
 
 void ButtonHandler::Init(void)
 {
@@ -46,7 +47,8 @@ void ButtonHandler::Init(void)
                                        APP_BUTTON_DEBOUNCE_PERIOD_MS, // timer period
                                        false,                         // no timer reload (==one-shot)
                                        (void *) (int) i,              // init timer id = button index
-                                       TimerCallback // timer callback handler (all buttons use the same timer cn function)
+                                       TimerCallback                  // timer callback handler (all buttons use
+                                                                      // the same timer cn function)
         );
     }
 }
@@ -105,7 +107,8 @@ void ButtonHandler::EventHelper(uint8_t btnIdx, bool isrContext)
         {
             portBASE_TYPE taskWoken = pdFALSE; // For FreeRTOS timer (below).
 
-            // Start/restart the button debounce timer (Note ISR version of FreeRTOS api call here).
+            // Start/restart the button debounce timer (Note ISR version of FreeRTOS
+            // api call here).
             xTimerStartFromISR(buttonTimers[btnIdx], &taskWoken);
 
             if (taskWoken != pdFALSE)

@@ -109,8 +109,7 @@ using namespace ::chip::DeviceLayer;
  * Glue function called directly by the OpenThread stack when tasklet processing work
  * is pending.
  */
-extern "C"
-void otTaskletsSignalPending(otInstance * p_instance)
+extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 {
     ThreadStackMgrImpl().SignalThreadActivityPending();
 }
@@ -119,10 +118,8 @@ void otTaskletsSignalPending(otInstance * p_instance)
  * Glue function called directly by the OpenThread stack when system event processing work
  * is pending.
  */
-extern "C"
-void otSysEventSignalPending(void)
+extern "C" void otSysEventSignalPending(void)
 {
     BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
     portYIELD_FROM_ISR(yieldRequired);
 }
-

@@ -37,11 +37,10 @@ namespace Internal {
  * or indirectly) by the PlatformManagerImpl class, which also appears as the template's ImplClass
  * parameter.
  */
-template<class ImplClass>
+template <class ImplClass>
 class GenericPlatformManagerImpl
 {
 protected:
-
     struct AppEventHandler
     {
         AppEventHandler * Next;
@@ -69,7 +68,7 @@ protected:
 private:
     bool mMsgLayerWasActive;
 
-    ImplClass * Impl() { return static_cast<ImplClass*>(this); }
+    ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.

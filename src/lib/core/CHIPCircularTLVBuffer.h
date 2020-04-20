@@ -58,25 +58,27 @@ namespace TLV {
 class DLL_EXPORT CHIPCircularTLVBuffer
 {
 public:
-    CHIPCircularTLVBuffer(uint8_t *inBuffer, size_t inBufferLength);
-    CHIPCircularTLVBuffer(uint8_t *inBuffer, size_t inBufferLength, uint8_t *inHead);
+    CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBufferLength);
+    CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBufferLength, uint8_t * inHead);
 
-    CHIP_ERROR GetNewBuffer(TLVWriter& ioWriter, uint8_t *& outBufStart, uint32_t& outBufLen);
-    CHIP_ERROR FinalizeBuffer(TLVWriter& ioWriter, uint8_t *inBufStart, uint32_t inBufLen);
-    CHIP_ERROR GetNextBuffer(TLVReader& ioReader, const uint8_t *& outBufStart, uint32_t& outBufLen);
+    CHIP_ERROR GetNewBuffer(TLVWriter & ioWriter, uint8_t *& outBufStart, uint32_t & outBufLen);
+    CHIP_ERROR FinalizeBuffer(TLVWriter & ioWriter, uint8_t * inBufStart, uint32_t inBufLen);
+    CHIP_ERROR GetNextBuffer(TLVReader & ioReader, const uint8_t *& outBufStart, uint32_t & outBufLen);
 
-    inline uint8_t *QueueHead(void) const { return mQueueHead; };
-    inline uint8_t *QueueTail(void) const { return mQueue + (((mQueueHead-mQueue) + mQueueLength) % mQueueSize); };
+    inline uint8_t * QueueHead(void) const { return mQueueHead; };
+    inline uint8_t * QueueTail(void) const { return mQueue + (((mQueueHead - mQueue) + mQueueLength) % mQueueSize); };
     inline size_t DataLength(void) const { return mQueueLength; };
     inline size_t AvailableDataLength(void) const { return mQueueSize - mQueueLength; };
     inline size_t GetQueueSize(void) const { return mQueueSize; };
-    inline uint8_t *GetQueue(void) const { return mQueue; };
+    inline uint8_t * GetQueue(void) const { return mQueue; };
 
     CHIP_ERROR EvictHead(void);
 
-    static CHIP_ERROR GetNewBufferFunct(TLVWriter& ioWriter, uintptr_t& inBufHandle, uint8_t *& outBufStart, uint32_t& outBufLen);
-    static CHIP_ERROR FinalizeBufferFunct(TLVWriter& ioWriter, uintptr_t inBufHandle, uint8_t *inBufStart, uint32_t inBufLen);
-    static CHIP_ERROR GetNextBufferFunct(TLVReader& ioReader, uintptr_t &inBufHandle, const uint8_t *& outBufStart, uint32_t& outBufLen);
+    static CHIP_ERROR GetNewBufferFunct(TLVWriter & ioWriter, uintptr_t & inBufHandle, uint8_t *& outBufStart,
+                                        uint32_t & outBufLen);
+    static CHIP_ERROR FinalizeBufferFunct(TLVWriter & ioWriter, uintptr_t inBufHandle, uint8_t * inBufStart, uint32_t inBufLen);
+    static CHIP_ERROR GetNextBufferFunct(TLVReader & ioReader, uintptr_t & inBufHandle, const uint8_t *& outBufStart,
+                                         uint32_t & outBufLen);
 
     /**
      *  @typedef CHIP_ERROR (*ProcessEvictedElementFunct)(CHIPCircularTLVBuffer &inBuffer, void * inAppData, TLVReader &inReader)
@@ -120,32 +122,35 @@ public:
      *                       triggered this element eviction will
      *                       fail.
      */
-    typedef CHIP_ERROR (*ProcessEvictedElementFunct)(CHIPCircularTLVBuffer &inBuffer, void * inAppData, TLVReader &inReader);
+    typedef CHIP_ERROR (*ProcessEvictedElementFunct)(CHIPCircularTLVBuffer & inBuffer, void * inAppData, TLVReader & inReader);
 
     uint32_t mImplicitProfileId;
     void * mAppData; /**< An optional, user supplied context to be used with the callback processing the evicted element. */
-    ProcessEvictedElementFunct mProcessEvictedElement; /**< An optional, user-supplied callback that processes the element prior to evicting it from the circular buffer.  See the ProcessEvictedElementFunct type definition on additional information on implementing the mProcessEvictedElement function. */
+    ProcessEvictedElementFunct
+        mProcessEvictedElement; /**< An optional, user-supplied callback that processes the element prior to evicting it from the
+                                   circular buffer.  See the ProcessEvictedElementFunct type definition on additional information on
+                                   implementing the mProcessEvictedElement function. */
 
 private:
-    uint8_t *mQueue;
+    uint8_t * mQueue;
     size_t mQueueSize;
-    uint8_t *mQueueHead;
+    uint8_t * mQueueHead;
     size_t mQueueLength;
 };
 
 class DLL_EXPORT CircularTLVReader : public TLVReader
 {
 public:
-    void Init(CHIPCircularTLVBuffer *buf);
+    void Init(CHIPCircularTLVBuffer * buf);
 };
 
 class DLL_EXPORT CircularTLVWriter : public TLVWriter
 {
 public:
-    void Init(CHIPCircularTLVBuffer *buf);
+    void Init(CHIPCircularTLVBuffer * buf);
 };
 
 } // namespace TLV
 } // namespace chip
 
-#endif //CHIP_CIRCULAR_TLV_BUFFER_H_
+#endif // CHIP_CIRCULAR_TLV_BUFFER_H_

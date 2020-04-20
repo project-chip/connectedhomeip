@@ -68,29 +68,28 @@ public:
     // NVM3 key base offsets used by the CHIP Device Layer.
     static constexpr uint8_t kChipFactory_KeyBase =
         0xA2; // Persistent config values set at manufacturing time. Retained during factory reset.
-    static constexpr uint8_t kChipConfig_KeyBase =
-        0xA3; // Persistent config values set at runtime. Cleared during factory reset.
+    static constexpr uint8_t kChipConfig_KeyBase = 0xA3; // Persistent config values set at runtime. Cleared during factory reset.
     static constexpr uint8_t kChipCounter_KeyBase =
         0xA4; // Persistent counter values set at runtime. Retained during factory reset.
 
     // Key definitions for well-known configuration values.
     // Factory config keys
-    static constexpr Key kConfigKey_SerialNum            = EFR32ConfigKey(kChipFactory_KeyBase, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId          = EFR32ConfigKey(kChipFactory_KeyBase, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert        = EFR32ConfigKey(kChipFactory_KeyBase, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey  = EFR32ConfigKey(kChipFactory_KeyBase, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate    = EFR32ConfigKey(kChipFactory_KeyBase, 0x04);
-    static constexpr Key kConfigKey_PairingCode          = EFR32ConfigKey(kChipFactory_KeyBase, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts    = EFR32ConfigKey(kChipFactory_KeyBase, 0x06);
+    static constexpr Key kConfigKey_SerialNum           = EFR32ConfigKey(kChipFactory_KeyBase, 0x00);
+    static constexpr Key kConfigKey_MfrDeviceId         = EFR32ConfigKey(kChipFactory_KeyBase, 0x01);
+    static constexpr Key kConfigKey_MfrDeviceCert       = EFR32ConfigKey(kChipFactory_KeyBase, 0x02);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey = EFR32ConfigKey(kChipFactory_KeyBase, 0x03);
+    static constexpr Key kConfigKey_ManufacturingDate   = EFR32ConfigKey(kChipFactory_KeyBase, 0x04);
+    static constexpr Key kConfigKey_PairingCode         = EFR32ConfigKey(kChipFactory_KeyBase, 0x05);
+    static constexpr Key kConfigKey_MfrDeviceICACerts   = EFR32ConfigKey(kChipFactory_KeyBase, 0x06);
     // CHIP Config Keys
-    static constexpr Key kConfigKey_FabricId             = EFR32ConfigKey(kChipConfig_KeyBase, 0x00);
-    static constexpr Key kConfigKey_ServiceConfig        = EFR32ConfigKey(kChipConfig_KeyBase, 0x01);
-    static constexpr Key kConfigKey_PairedAccountId      = EFR32ConfigKey(kChipConfig_KeyBase, 0x02);
-    static constexpr Key kConfigKey_ServiceId            = EFR32ConfigKey(kChipConfig_KeyBase, 0x03);
-    static constexpr Key kConfigKey_FabricSecret         = EFR32ConfigKey(kChipConfig_KeyBase, 0x04);
-    static constexpr Key kConfigKey_LastUsedEpochKeyId   = EFR32ConfigKey(kChipConfig_KeyBase, 0x05);
-    static constexpr Key kConfigKey_FailSafeArmed        = EFR32ConfigKey(kChipConfig_KeyBase, 0x06);
-    static constexpr Key kConfigKey_GroupKey             = EFR32ConfigKey(kChipConfig_KeyBase, 0x07);
+    static constexpr Key kConfigKey_FabricId                    = EFR32ConfigKey(kChipConfig_KeyBase, 0x00);
+    static constexpr Key kConfigKey_ServiceConfig               = EFR32ConfigKey(kChipConfig_KeyBase, 0x01);
+    static constexpr Key kConfigKey_PairedAccountId             = EFR32ConfigKey(kChipConfig_KeyBase, 0x02);
+    static constexpr Key kConfigKey_ServiceId                   = EFR32ConfigKey(kChipConfig_KeyBase, 0x03);
+    static constexpr Key kConfigKey_FabricSecret                = EFR32ConfigKey(kChipConfig_KeyBase, 0x04);
+    static constexpr Key kConfigKey_LastUsedEpochKeyId          = EFR32ConfigKey(kChipConfig_KeyBase, 0x05);
+    static constexpr Key kConfigKey_FailSafeArmed               = EFR32ConfigKey(kChipConfig_KeyBase, 0x06);
+    static constexpr Key kConfigKey_GroupKey                    = EFR32ConfigKey(kChipConfig_KeyBase, 0x07);
     static constexpr Key kConfigKey_ProductRevision             = EFR32ConfigKey(kChipConfig_KeyBase, 0x08);
     static constexpr Key kConfigKey_OperationalDeviceId         = EFR32ConfigKey(kChipConfig_KeyBase, 0x09);
     static constexpr Key kConfigKey_OperationalDeviceCert       = EFR32ConfigKey(kChipConfig_KeyBase, 0x0A);
@@ -98,8 +97,7 @@ public:
     static constexpr Key kConfigKey_OperationalDevicePrivateKey = EFR32ConfigKey(kChipConfig_KeyBase, 0x0C);
 
     static constexpr Key kConfigKey_GroupKeyBase = EFR32ConfigKey(kChipConfig_KeyBase, 0x0D);
-    static constexpr Key kConfigKey_GroupKeyMax =
-        EFR32ConfigKey(kChipConfig_KeyBase, 0x1C); // Allows 16 Group Keys to be created.
+    static constexpr Key kConfigKey_GroupKeyMax  = EFR32ConfigKey(kChipConfig_KeyBase, 0x1C); // Allows 16 Group Keys to be created.
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = EFR32ConfigKey(kChipFactory_KeyBase, 0x00);
@@ -113,29 +111,29 @@ public:
     static CHIP_ERROR Init(void);
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
-    static CHIP_ERROR ReadConfigValue(Key key, bool &val);
-    static CHIP_ERROR ReadConfigValue(Key key, uint32_t &val);
-    static CHIP_ERROR ReadConfigValue(Key key, uint64_t &val);
-    static CHIP_ERROR ReadConfigValueStr(Key key, char *buf, size_t bufSize, size_t &outLen);
-    static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t *buf, size_t bufSize, size_t &outLen);
-    static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t &val);
+    static CHIP_ERROR ReadConfigValue(Key key, bool & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
+    static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
-    static CHIP_ERROR WriteConfigValueStr(Key key, const char *str);
-    static CHIP_ERROR WriteConfigValueStr(Key key, const char *str, size_t strLen);
-    static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t *data, size_t dataLen);
+    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
+    static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
+    static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
     static CHIP_ERROR WriteConfigValueCounter(uint8_t counterIdx, uint32_t val);
     static CHIP_ERROR ClearConfigValue(Key key);
-    static bool        ConfigValueExists(Key key);
+    static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
-    static bool        ValidConfigKey(Key key);
+    static bool ValidConfigKey(Key key);
 
     static void RunConfigUnitTest(void);
     static void RepackNvm3Flash(void);
 
 protected:
-    using ForEachRecordFunct = std::function<CHIP_ERROR(const Key &nvm3Key, const size_t &length)>;
+    using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & nvm3Key, const size_t & length)>;
     static CHIP_ERROR ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct);
 
 private:

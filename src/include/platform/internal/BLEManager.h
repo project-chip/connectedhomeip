@@ -46,7 +46,6 @@ class BLEManager
     using ImplClass = BLEManagerImpl;
 
 public:
-
     // ===== Members that define the internal interface of the BLEManager
 
     using CHIPoBLEServiceMode = ConnectivityManager::CHIPoBLEServiceMode;
@@ -66,13 +65,12 @@ public:
     chip::Ble::BleLayer * GetBleLayer(void) const;
 
 protected:
-
     // Construction/destruction limited to subclasses.
-    BLEManager() = default;
+    BLEManager()  = default;
     ~BLEManager() = default;
 
     // No copy, move or assignment.
-    BLEManager(const BLEManager &) = delete;
+    BLEManager(const BLEManager &)  = delete;
     BLEManager(const BLEManager &&) = delete;
     BLEManager & operator=(const BLEManager &) = delete;
 };
@@ -113,66 +111,64 @@ namespace Internal {
 
 inline CHIP_ERROR BLEManager::Init(void)
 {
-    return static_cast<ImplClass*>(this)->_Init();
+    return static_cast<ImplClass *>(this)->_Init();
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManager::GetCHIPoBLEServiceMode(void)
 {
-    return static_cast<ImplClass*>(this)->_GetCHIPoBLEServiceMode();
+    return static_cast<ImplClass *>(this)->_GetCHIPoBLEServiceMode();
 }
 
 inline CHIP_ERROR BLEManager::SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
-    return static_cast<ImplClass*>(this)->_SetCHIPoBLEServiceMode(val);
+    return static_cast<ImplClass *>(this)->_SetCHIPoBLEServiceMode(val);
 }
 
 inline bool BLEManager::IsAdvertisingEnabled(void)
 {
-    return static_cast<ImplClass*>(this)->_IsAdvertisingEnabled();
+    return static_cast<ImplClass *>(this)->_IsAdvertisingEnabled();
 }
 
 inline CHIP_ERROR BLEManager::SetAdvertisingEnabled(bool val)
 {
-    return static_cast<ImplClass*>(this)->_SetAdvertisingEnabled(val);
+    return static_cast<ImplClass *>(this)->_SetAdvertisingEnabled(val);
 }
 
 inline bool BLEManager::IsFastAdvertisingEnabled(void)
 {
-    return static_cast<ImplClass*>(this)->_IsFastAdvertisingEnabled();
+    return static_cast<ImplClass *>(this)->_IsFastAdvertisingEnabled();
 }
 
 inline CHIP_ERROR BLEManager::SetFastAdvertisingEnabled(bool val)
 {
-    return static_cast<ImplClass*>(this)->_SetFastAdvertisingEnabled(val);
+    return static_cast<ImplClass *>(this)->_SetFastAdvertisingEnabled(val);
 }
 
 inline bool BLEManager::IsAdvertising(void)
 {
-    return static_cast<ImplClass*>(this)->_IsAdvertising();
+    return static_cast<ImplClass *>(this)->_IsAdvertising();
 }
 
 inline CHIP_ERROR BLEManager::GetDeviceName(char * buf, size_t bufSize)
 {
-    return static_cast<ImplClass*>(this)->_GetDeviceName(buf, bufSize);
+    return static_cast<ImplClass *>(this)->_GetDeviceName(buf, bufSize);
 }
 
 inline CHIP_ERROR BLEManager::SetDeviceName(const char * deviceName)
 {
-    return static_cast<ImplClass*>(this)->_SetDeviceName(deviceName);
+    return static_cast<ImplClass *>(this)->_SetDeviceName(deviceName);
 }
 
 inline uint16_t BLEManager::NumConnections(void)
 {
-    return static_cast<ImplClass*>(this)->_NumConnections();
+    return static_cast<ImplClass *>(this)->_NumConnections();
 }
 
-inline void BLEManager::OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+inline void BLEManager::OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 inline chip::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 {
-    return static_cast<const ImplClass*>(this)->_GetBleLayer();
+    return static_cast<const ImplClass *>(this)->_GetBleLayer();
 }
 
 } // namespace Internal
@@ -182,5 +178,3 @@ inline chip::Ble::BleLayer * BLEManager::GetBleLayer(void) const
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #endif // BLE_MANAGER_H
-
-

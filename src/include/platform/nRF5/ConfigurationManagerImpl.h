@@ -34,10 +34,9 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the nRF52 platform.
  */
-class ConfigurationManagerImpl final
-    : public ConfigurationManager,
-      public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-      private Internal::NRF5Config
+class ConfigurationManagerImpl final : public ConfigurationManager,
+                                       public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+                                       private Internal::NRF5Config
 {
     // Allow the ConfigurationManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -48,7 +47,6 @@ class ConfigurationManagerImpl final
     friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 private:
-
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR _Init(void);

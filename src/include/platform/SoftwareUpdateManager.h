@@ -40,22 +40,20 @@ class SoftwareUpdateManager
 {
     using ImplClass = SoftwareUpdateManagerImpl;
 
-
 public:
-
     // ===== Members that define the public interface of the SoftwareUpdateManager
 
     enum State
     {
-        kState_Idle                 = 1,
-        kState_ScheduledHoldoff     = 2,
-        kState_PrepareQuery         = 3,
-        kState_Query                = 4,
-        kState_PrepareImageStorage  = 5,
-        kState_Download             = 6,
-        kState_Install              = 7,
+        kState_Idle                = 1,
+        kState_ScheduledHoldoff    = 2,
+        kState_PrepareQuery        = 3,
+        kState_Query               = 4,
+        kState_PrepareImageStorage = 5,
+        kState_Download            = 6,
+        kState_Install             = 7,
 
-        kState_ApplicationManaged   = 8,
+        kState_ApplicationManaged = 8,
 
         kState_MaxState
     };
@@ -229,7 +227,7 @@ public:
          *
          *  Applications must NOT handle this event.
          */
-        kEvent_DefaultCheck                         = 100,
+        kEvent_DefaultCheck = 100,
 
     };
 
@@ -275,7 +273,7 @@ public:
      */
     union InEventParam;
 
-   /**
+    /**
      *  Outgoing parameters sent with events generated directly from this component
      *
      */
@@ -290,8 +288,8 @@ public:
         uint32_t NumRetries;
     };
 
-    typedef void (*EventCallback)(void *apAppState, EventType aEvent, const InEventParam& aInParam, OutEventParam& aOutParam);
-    typedef void (*RetryPolicyCallback)(void *aAppState, RetryParam& aRetryParam, uint32_t& aOutIntervalMsec);
+    typedef void (*EventCallback)(void * apAppState, EventType aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
+    typedef void (*RetryPolicyCallback)(void * aAppState, RetryParam & aRetryParam, uint32_t & aOutIntervalMsec);
 
     CHIP_ERROR Abort(void);
     CHIP_ERROR CheckNow(void);
@@ -306,26 +304,24 @@ public:
 
     State GetState(void);
 
-    static void DefaultEventHandler(void *apAppState, EventType aEvent,
-                                    const InEventParam& aInParam,
-                                    OutEventParam& aOutParam);
+    static void DefaultEventHandler(void * apAppState, EventType aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
 
 private:
     // ===== Members for internal use by the following friends.
 
     // friend class SoftwareUpdateManagerImpl;
-    template<class> friend class Internal::GenericPlatformManagerImpl;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl;
 
     CHIP_ERROR Init(void);
 
 protected:
-
     // Construction/destruction limited to subclasses.
-    SoftwareUpdateManager() = default;
+    SoftwareUpdateManager()  = default;
     ~SoftwareUpdateManager() = default;
 
     // No copy, move or assignment.
-    SoftwareUpdateManager(const SoftwareUpdateManager &) = delete;
+    SoftwareUpdateManager(const SoftwareUpdateManager &)  = delete;
     SoftwareUpdateManager(const SoftwareUpdateManager &&) = delete;
     SoftwareUpdateManager & operator=(const SoftwareUpdateManager &) = delete;
 };
@@ -382,32 +378,32 @@ union SoftwareUpdateManager::InEventParam
     struct
     {
         uint8_t IntegrityType;
-        const char *URI;
-        const char *Version;
+        const char * URI;
+        const char * Version;
     } SoftwareUpdateAvailable;
 
     struct
     {
-        const char *URI;
+        const char * URI;
     } FetchPartialImageInfo;
 
     struct
     {
-        const char *URI;
+        const char * URI;
         uint8_t IntegrityType;
     } PrepareImageStorage;
 
     struct
     {
-        uint8_t *DataBlock;
+        uint8_t * DataBlock;
         uint32_t DataBlockLen;
     } StoreImageBlock;
 
     struct
     {
         uint8_t IntegrityType;
-        uint8_t *IntegrityValueBuf;     // Pointer to the buffer for the app to copy Integrity Value into.
-        uint8_t IntegrityValueBufLen;   // Length of the provided buffer.
+        uint8_t * IntegrityValueBuf;  // Pointer to the buffer for the app to copy Integrity Value into.
+        uint8_t IntegrityValueBufLen; // Length of the provided buffer.
     } ComputeImageIntegrity;
 
     struct
@@ -423,8 +419,8 @@ union SoftwareUpdateManager::OutEventParam
     bool DefaultHandlerCalled;
     struct
     {
-        const char *PackageSpecification;
-        const char *DesiredLocale;
+        const char * PackageSpecification;
+        const char * DesiredLocale;
         CHIP_ERROR Error;
     } PrepareQuery;
 
@@ -456,57 +452,56 @@ union SoftwareUpdateManager::OutEventParam
 
 inline CHIP_ERROR SoftwareUpdateManager::Init(void)
 {
-    return static_cast<ImplClass*>(this)->_Init();
+    return static_cast<ImplClass *>(this)->_Init();
 }
 
 inline CHIP_ERROR SoftwareUpdateManager::CheckNow(void)
 {
-    return static_cast<ImplClass*>(this)->_CheckNow();
+    return static_cast<ImplClass *>(this)->_CheckNow();
 }
 
 inline CHIP_ERROR SoftwareUpdateManager::ImageInstallComplete(CHIP_ERROR aError)
 {
-    return static_cast<ImplClass*>(this)->_ImageInstallComplete(aError);
+    return static_cast<ImplClass *>(this)->_ImageInstallComplete(aError);
 }
 
 inline CHIP_ERROR SoftwareUpdateManager::PrepareImageStorageComplete(CHIP_ERROR aError)
 {
-    return static_cast<ImplClass*>(this)->_PrepareImageStorageComplete(aError);
+    return static_cast<ImplClass *>(this)->_PrepareImageStorageComplete(aError);
 }
 
 inline SoftwareUpdateManager::State SoftwareUpdateManager::GetState(void)
 {
-    return static_cast<ImplClass*>(this)->_GetState();
+    return static_cast<ImplClass *>(this)->_GetState();
 }
 
 inline CHIP_ERROR SoftwareUpdateManager::Abort(void)
 {
-    return static_cast<ImplClass*>(this)->_Abort();
+    return static_cast<ImplClass *>(this)->_Abort();
 }
 
 inline bool SoftwareUpdateManager::IsInProgress(void)
 {
-    return static_cast<ImplClass*>(this)->_IsInProgress();
+    return static_cast<ImplClass *>(this)->_IsInProgress();
 }
 
 inline CHIP_ERROR SoftwareUpdateManager::SetQueryIntervalWindow(uint32_t aMinRangeSecs, uint32_t aMaxRangeSecs)
 {
-    return static_cast<ImplClass*>(this)->_SetQueryIntervalWindow(aMinRangeSecs, aMaxRangeSecs);
+    return static_cast<ImplClass *>(this)->_SetQueryIntervalWindow(aMinRangeSecs, aMaxRangeSecs);
 }
 
 inline void SoftwareUpdateManager::SetRetryPolicyCallback(const RetryPolicyCallback aRetryPolicyCallback)
 {
-    static_cast<ImplClass*>(this)->_SetRetryPolicyCallback(aRetryPolicyCallback);
+    static_cast<ImplClass *>(this)->_SetRetryPolicyCallback(aRetryPolicyCallback);
 }
 
 inline CHIP_ERROR SoftwareUpdateManager::SetEventCallback(void * const aAppState, const EventCallback aEventCallback)
 {
-    return static_cast<ImplClass*>(this)->_SetEventCallback(aAppState, aEventCallback);
+    return static_cast<ImplClass *>(this)->_SetEventCallback(aAppState, aEventCallback);
 }
 
-inline void SoftwareUpdateManager::DefaultEventHandler(void *apAppState, EventType aEvent,
-                                                       const InEventParam& aInParam,
-                                                       OutEventParam& aOutParam)
+inline void SoftwareUpdateManager::DefaultEventHandler(void * apAppState, EventType aEvent, const InEventParam & aInParam,
+                                                       OutEventParam & aOutParam)
 {
     ImplClass::_DefaultEventHandler(apAppState, aEvent, aInParam, aOutParam);
 }

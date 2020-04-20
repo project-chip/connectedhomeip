@@ -41,7 +41,6 @@ constexpr inline uint32_t NRF5ConfigKey(uint16_t fileId, uint16_t recordId)
     return static_cast<uint32_t>(fileId) << 16 | recordId;
 }
 
-
 /**
  * Provides functions and definitions for accessing persisted device configuration
  * on platforms based on the Nordic nRF5 SDK.
@@ -57,22 +56,23 @@ constexpr inline uint32_t NRF5ConfigKey(uint16_t fileId, uint16_t recordId)
 class NRF5Config
 {
 public:
-
     // *** CAUTION ***: Changing the FDS file or record ids of these values will *break* existing devices.
 
     // Limits/definitions imposed by the Nordic SDK
-    static constexpr uint16_t kFDSFileIdMin                     = 0x0000; /**< Minimum value that can be used for a FDS file id (per Nordic SDK) */
-    static constexpr uint16_t kFDSFileIdMax                     = 0xBFFF; /**< Maximum value that can be used for a FDS file id (per Nordic SDK) */
-    static constexpr uint16_t kFDSRecordKeyMin                  = 0x0001; /**< Minimum value that can be used for a FDS record key (per Nordic SDK) */
-    static constexpr uint16_t kFDSRecordKeyMax                  = 0xBFFF; /**< Maximum value that can be used for a FDS record key (per Nordic SDK) */
+    static constexpr uint16_t kFDSFileIdMin = 0x0000; /**< Minimum value that can be used for a FDS file id (per Nordic SDK) */
+    static constexpr uint16_t kFDSFileIdMax = 0xBFFF; /**< Maximum value that can be used for a FDS file id (per Nordic SDK) */
+    static constexpr uint16_t kFDSRecordKeyMin =
+        0x0001; /**< Minimum value that can be used for a FDS record key (per Nordic SDK) */
+    static constexpr uint16_t kFDSRecordKeyMax =
+        0xBFFF; /**< Maximum value that can be used for a FDS record key (per Nordic SDK) */
 
     // FDS file ids used by the CHIP Device Layer
-    static constexpr uint16_t kFileId_ChipFactory              = 0x235A; /**< FDS file containing persistent config values set at manufacturing time.
-                                                                           *   Retained during factory reset. */
-    static constexpr uint16_t kFileId_ChipConfig               = 0x235B; /**< FDS file containing dynamic config values set at runtime.
-                                                                           *   Cleared during factory reset. */
-    static constexpr uint16_t kFileId_ChipCounter              = 0x235C; /**< FDS file containing dynamic counter values set at runtime.
-                                                                           *   Retained during factory reset. */
+    static constexpr uint16_t kFileId_ChipFactory = 0x235A; /**< FDS file containing persistent config values set at manufacturing
+                                                             * time. Retained during factory reset. */
+    static constexpr uint16_t kFileId_ChipConfig = 0x235B;  /**< FDS file containing dynamic config values set at runtime.
+                                                             *   Cleared during factory reset. */
+    static constexpr uint16_t kFileId_ChipCounter = 0x235C; /**< FDS file containing dynamic counter values set at runtime.
+                                                             *   Retained during factory reset. */
 
     // API data type used to represent the combination of a FDS file id and record key.
     using Key = uint32_t;
@@ -84,27 +84,27 @@ public:
     static constexpr Key kConfigKey_MfrDevicePrivateKey         = NRF5ConfigKey(kFileId_ChipFactory, 0x0004);
     static constexpr Key kConfigKey_ManufacturingDate           = NRF5ConfigKey(kFileId_ChipFactory, 0x0005);
     static constexpr Key kConfigKey_PairingCode                 = NRF5ConfigKey(kFileId_ChipFactory, 0x0006);
-    static constexpr Key kConfigKey_FabricId                    = NRF5ConfigKey(kFileId_ChipConfig,  0x0007);
-    static constexpr Key kConfigKey_ServiceConfig               = NRF5ConfigKey(kFileId_ChipConfig,  0x0008);
-    static constexpr Key kConfigKey_PairedAccountId             = NRF5ConfigKey(kFileId_ChipConfig,  0x0009);
-    static constexpr Key kConfigKey_ServiceId                   = NRF5ConfigKey(kFileId_ChipConfig,  0x000A);
-    static constexpr Key kConfigKey_FabricSecret                = NRF5ConfigKey(kFileId_ChipConfig,  0x000B);
-    static constexpr Key kConfigKey_LastUsedEpochKeyId          = NRF5ConfigKey(kFileId_ChipConfig,  0x000C);
-    static constexpr Key kConfigKey_FailSafeArmed               = NRF5ConfigKey(kFileId_ChipConfig,  0x000D);
-    static constexpr Key kConfigKey_GroupKey                    = NRF5ConfigKey(kFileId_ChipConfig,  0x000E);
+    static constexpr Key kConfigKey_FabricId                    = NRF5ConfigKey(kFileId_ChipConfig, 0x0007);
+    static constexpr Key kConfigKey_ServiceConfig               = NRF5ConfigKey(kFileId_ChipConfig, 0x0008);
+    static constexpr Key kConfigKey_PairedAccountId             = NRF5ConfigKey(kFileId_ChipConfig, 0x0009);
+    static constexpr Key kConfigKey_ServiceId                   = NRF5ConfigKey(kFileId_ChipConfig, 0x000A);
+    static constexpr Key kConfigKey_FabricSecret                = NRF5ConfigKey(kFileId_ChipConfig, 0x000B);
+    static constexpr Key kConfigKey_LastUsedEpochKeyId          = NRF5ConfigKey(kFileId_ChipConfig, 0x000C);
+    static constexpr Key kConfigKey_FailSafeArmed               = NRF5ConfigKey(kFileId_ChipConfig, 0x000D);
+    static constexpr Key kConfigKey_GroupKey                    = NRF5ConfigKey(kFileId_ChipConfig, 0x000E);
     static constexpr Key kConfigKey_ProductRevision             = NRF5ConfigKey(kFileId_ChipFactory, 0x000F);
     static constexpr Key kConfigKey_MfrDeviceICACerts           = NRF5ConfigKey(kFileId_ChipFactory, 0x0010);
-    static constexpr Key kConfigKey_OperationalDeviceId         = NRF5ConfigKey(kFileId_ChipConfig,  0x0011);
-    static constexpr Key kConfigKey_OperationalDeviceCert       = NRF5ConfigKey(kFileId_ChipConfig,  0x0012);
-    static constexpr Key kConfigKey_OperationalDeviceICACerts   = NRF5ConfigKey(kFileId_ChipConfig,  0x0013);
-    static constexpr Key kConfigKey_OperationalDevicePrivateKey = NRF5ConfigKey(kFileId_ChipConfig,  0x0014);
+    static constexpr Key kConfigKey_OperationalDeviceId         = NRF5ConfigKey(kFileId_ChipConfig, 0x0011);
+    static constexpr Key kConfigKey_OperationalDeviceCert       = NRF5ConfigKey(kFileId_ChipConfig, 0x0012);
+    static constexpr Key kConfigKey_OperationalDeviceICACerts   = NRF5ConfigKey(kFileId_ChipConfig, 0x0013);
+    static constexpr Key kConfigKey_OperationalDevicePrivateKey = NRF5ConfigKey(kFileId_ChipConfig, 0x0014);
 
     // Range of FDS record keys used to store CHIP persisted counter values.
-    static constexpr uint16_t kPersistedCounterRecordKeyBase    = kFDSRecordKeyMin;
-                                                                          /**< Base record key for records containing CHIP persisted counter values.
-                                                                           *   The CHIP counter id is added to this value to form the FDS record key.*/
-    static constexpr uint16_t kPersistedCounterRecordKeyMax     = kFDSRecordKeyMax;
-                                                                          /**< Max record key for records containing CHIP persisted counter values. */
+    static constexpr uint16_t kPersistedCounterRecordKeyBase = kFDSRecordKeyMin;
+    /**< Base record key for records containing CHIP persisted counter values.
+     *   The CHIP counter id is added to this value to form the FDS record key.*/
+    static constexpr uint16_t kPersistedCounterRecordKeyMax = kFDSRecordKeyMax;
+    /**< Max record key for records containing CHIP persisted counter values. */
 
     static CHIP_ERROR Init(void);
 
@@ -127,12 +127,11 @@ public:
     static void RunConfigUnitTest(void);
 
 protected:
-
     struct FDSAsyncOp
     {
         enum
         {
-            kAddRecord                      = 0,
+            kAddRecord = 0,
             kUpdateRecord,
             kAddOrUpdateRecord,
             kDeleteRecord,
@@ -151,7 +150,7 @@ protected:
         uint16_t RecordKey;
         uint8_t OpType;
 
-        inline FDSAsyncOp(uint8_t opType) : OpType(opType) { }
+        inline FDSAsyncOp(uint8_t opType) : OpType(opType) {}
     };
 
     using ForEachRecordFunct = std::function<CHIP_ERROR(const fds_flash_record_t & rec, bool & deleteRec)>;

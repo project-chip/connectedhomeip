@@ -17,8 +17,8 @@
  *    limitations under the License.
  */
 
-#include "AppTask.h"
 #include "LEDWidget.h"
+#include "AppTask.h"
 
 #include "bsp.h"
 

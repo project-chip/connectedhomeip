@@ -31,7 +31,7 @@
 // ==================== Platform Adaptations ====================
 
 #define BLE_CONNECTION_OBJECT uint16_t
-#define BLE_CONNECTION_UNINITIALIZED ((uint16_t)BLE_CONN_HANDLE_INVALID)
+#define BLE_CONNECTION_UNINITIALIZED ((uint16_t) BLE_CONN_HANDLE_INVALID)
 #define BLE_MAX_RECEIVE_WINDOW_SIZE 5
 
 #define BLE_CONFIG_ERROR_TYPE ret_code_t

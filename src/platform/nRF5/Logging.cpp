@@ -45,7 +45,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
 
-void GetModuleName(char *buf, uint8_t module)
+void GetModuleName(char * buf, uint8_t module)
 {
     if (module == ::chip::Logging::kLogModule_DeviceLayer)
     {
@@ -68,13 +68,10 @@ namespace DeviceLayer {
  * This function is intended be overridden by the application to, e.g.,
  * schedule output of queued log entries.
  */
-void __attribute__((weak)) OnLogOutput(void)
-{
-}
+void __attribute__((weak)) OnLogOutput(void) {}
 
 } // namespace DeviceLayer
 } // namespace chip
-
 
 NRF_LOG_MODULE_REGISTER();
 
@@ -84,12 +81,12 @@ namespace Logging {
 /**
  * Openchip log output function.
  */
-void Log(uint8_t module, uint8_t category, const char *msg, ...)
+void Log(uint8_t module, uint8_t category, const char * msg, ...)
 {
     va_list v;
 
-    (void)module;
-    (void)category;
+    (void) module;
+    (void) category;
 
     va_start(v, msg);
 
@@ -107,7 +104,7 @@ void Log(uint8_t module, uint8_t category, const char *msg, ...)
             // Form the log prefix, e.g. "[DL] "
             formattedMsg[0] = '[';
             ::GetModuleName(formattedMsg + 1, module);
-            prefixLen = strlen(formattedMsg);
+            prefixLen                 = strlen(formattedMsg);
             formattedMsg[prefixLen++] = ']';
             formattedMsg[prefixLen++] = ' ';
 
@@ -115,7 +112,8 @@ void Log(uint8_t module, uint8_t category, const char *msg, ...)
             vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
 
             // Invoke the NRF logging library to log the message.
-            switch (category) {
+            switch (category)
+            {
             case kLogCategory_Error:
                 NRF_LOG_ERROR("%s", NRF_LOG_PUSH(formattedMsg));
                 break;
@@ -142,7 +140,6 @@ void Log(uint8_t module, uint8_t category, const char *msg, ...)
 } // namespace Logging
 } // namespace chip
 
-
 #undef NRF_LOG_MODULE_NAME
 #define NRF_LOG_MODULE_NAME lwip
 NRF_LOG_MODULE_REGISTER();
@@ -150,8 +147,7 @@ NRF_LOG_MODULE_REGISTER();
 /**
  * LwIP log output function.
  */
-extern "C"
-void LwIPLog(const char *msg, ...)
+extern "C" void LwIPLog(const char * msg, ...)
 {
     va_list v;
 
@@ -164,7 +160,7 @@ void LwIPLog(const char *msg, ...)
         // Append the log message.
         size_t len = vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
 
-        while (len > 0 && isspace(formattedMsg[len-1]))
+        while (len > 0 && isspace(formattedMsg[len - 1]))
         {
             len--;
             formattedMsg[len] = 0;
@@ -188,13 +184,12 @@ void LwIPLog(const char *msg, ...)
 #define NRF_LOG_MODULE_NAME thread
 NRF_LOG_MODULE_REGISTER();
 
-extern "C"
-void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
+extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     va_list v;
 
-    (void)aLogLevel;
-    (void)aLogRegion;
+    (void) aLogLevel;
+    (void) aLogRegion;
 
     va_start(v, aFormat);
 
@@ -206,7 +201,8 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
         vsnprintf(formattedMsg, sizeof(formattedMsg), aFormat, v);
 
         // Invoke the NRF logging library to log the message.
-        switch (aLogLevel) {
+        switch (aLogLevel)
+        {
         case OT_LOG_LEVEL_CRIT:
             NRF_LOG_ERROR("%s", NRF_LOG_PUSH(formattedMsg));
             break;

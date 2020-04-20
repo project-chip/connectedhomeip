@@ -39,7 +39,7 @@
 
 // Compatibility adaptations for statistical data in LwIP 1.x
 #ifndef MEMP_STATS_GET
-#define MEMP_STATS_GET(FIELD, INDEX)    (lwip_stats.memp[INDEX].FIELD)
+#define MEMP_STATS_GET(FIELD, INDEX) (lwip_stats.memp[INDEX].FIELD)
 #endif // !defined(MEMP_STATS_GET)
 #endif // LWIP_VERSION_MAJOR
 

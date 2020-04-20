@@ -31,7 +31,7 @@ namespace chip {
 namespace Ble {
 struct ChipBLEDeviceIdentificationInfo;
 }
-}
+} // namespace chip
 
 namespace chip {
 namespace DeviceLayer {
@@ -39,7 +39,8 @@ namespace DeviceLayer {
 class PlatformManagerImpl;
 class ConfigurationManagerImpl;
 namespace Internal {
-template<class> class GenericPlatformManagerImpl;
+template <class>
+class GenericPlatformManagerImpl;
 }
 
 /**
@@ -48,13 +49,12 @@ template<class> class GenericPlatformManagerImpl;
 class ConfigurationManager
 {
 public:
-
     // ===== Members that define the public interface of the ConfigurationManager
 
     enum
     {
-        kMaxPairingCodeLength = 15,
-        kMaxSerialNumberLength = 32,
+        kMaxPairingCodeLength      = 15,
+        kMaxSerialNumberLength     = 32,
         kMaxFirmwareRevisionLength = 32,
     };
 
@@ -66,8 +66,8 @@ public:
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
     CHIP_ERROR GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen);
-    CHIP_ERROR GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
-            uint8_t & hour, uint8_t & minute, uint8_t & second);
+    CHIP_ERROR GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
+                                    uint8_t & second);
     CHIP_ERROR GetDeviceId(uint64_t & deviceId);
     CHIP_ERROR GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
     CHIP_ERROR GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
@@ -99,7 +99,8 @@ public:
     CHIP_ERROR StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen);
     CHIP_ERROR StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen);
     CHIP_ERROR StorePairingCode(const char * pairingCode, size_t pairingCodeLen);
-    CHIP_ERROR StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen, const char * accountId, size_t accountIdLen);
+    CHIP_ERROR StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
+                                            const char * accountId, size_t accountIdLen);
     CHIP_ERROR ClearServiceProvisioningData();
     CHIP_ERROR StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
     CHIP_ERROR StorePairedAccountId(const char * accountId, size_t accountIdLen);
@@ -123,11 +124,11 @@ public:
     CHIP_ERROR ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize);
 
 private:
-
     // ===== Members for internal use by the following friends.
 
     friend class ::chip::DeviceLayer::PlatformManagerImpl;
-    template<class> friend class ::chip::DeviceLayer::Internal::GenericPlatformManagerImpl;
+    template <class>
+    friend class ::chip::DeviceLayer::Internal::GenericPlatformManagerImpl;
     // Parentheses used to fix clang parsing issue with these declarations
     friend CHIP_ERROR ::chip::Platform::PersistedStorage::Read(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     friend CHIP_ERROR ::chip::Platform::PersistedStorage::Write(::chip::Platform::PersistedStorage::Key key, uint32_t value);
@@ -147,13 +148,12 @@ private:
 #endif
 
 protected:
-
     // Construction/destruction limited to subclasses.
-    ConfigurationManager() = default;
+    ConfigurationManager()  = default;
     ~ConfigurationManager() = default;
 
     // No copy, move or assignment.
-    ConfigurationManager(const ConfigurationManager &) = delete;
+    ConfigurationManager(const ConfigurationManager &)  = delete;
     ConfigurationManager(const ConfigurationManager &&) = delete;
     ConfigurationManager & operator=(const ConfigurationManager &) = delete;
 };
@@ -195,7 +195,7 @@ namespace DeviceLayer {
  */
 inline CHIP_ERROR ConfigurationManager::GetVendorId(uint16_t & vendorId)
 {
-    return static_cast<ImplClass*>(this)->_GetVendorId(vendorId);
+    return static_cast<ImplClass *>(this)->_GetVendorId(vendorId);
 }
 
 /**
@@ -203,7 +203,7 @@ inline CHIP_ERROR ConfigurationManager::GetVendorId(uint16_t & vendorId)
  */
 inline CHIP_ERROR ConfigurationManager::GetProductId(uint16_t & productId)
 {
-    return static_cast<ImplClass*>(this)->_GetProductId(productId);
+    return static_cast<ImplClass *>(this)->_GetProductId(productId);
 }
 
 /**
@@ -211,299 +211,302 @@ inline CHIP_ERROR ConfigurationManager::GetProductId(uint16_t & productId)
  */
 inline CHIP_ERROR ConfigurationManager::GetProductRevision(uint16_t & productRev)
 {
-    return static_cast<ImplClass*>(this)->_GetProductRevision(productRev);
+    return static_cast<ImplClass *>(this)->_GetProductRevision(productRev);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
 {
-    return static_cast<ImplClass*>(this)->_GetSerialNumber(buf, bufSize, serialNumLen);
+    return static_cast<ImplClass *>(this)->_GetSerialNumber(buf, bufSize, serialNumLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    return static_cast<ImplClass*>(this)->_GetPrimaryWiFiMACAddress(buf);
+    return static_cast<ImplClass *>(this)->_GetPrimaryWiFiMACAddress(buf);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
-    return static_cast<ImplClass*>(this)->_GetPrimary802154MACAddress(buf);
+    return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
 {
-    return static_cast<ImplClass*>(this)->_GetManufacturingDate(year, month, dayOfMonth);
+    return static_cast<ImplClass *>(this)->_GetManufacturingDate(year, month, dayOfMonth);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen)
 {
-    return static_cast<ImplClass*>(this)->_GetFirmwareRevision(buf, bufSize, outLen);
+    return static_cast<ImplClass *>(this)->_GetFirmwareRevision(buf, bufSize, outLen);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
-        uint8_t & hour, uint8_t & minute, uint8_t & second)
+inline CHIP_ERROR ConfigurationManager::GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,
+                                                             uint8_t & minute, uint8_t & second)
 {
-    return static_cast<ImplClass*>(this)->_GetFirmwareBuildTime(year, month, dayOfMonth, hour, minute, second);
+    return static_cast<ImplClass *>(this)->_GetFirmwareBuildTime(year, month, dayOfMonth, hour, minute, second);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetDeviceId(uint64_t & deviceId)
 {
-    return static_cast<ImplClass*>(this)->_GetDeviceId(deviceId);
+    return static_cast<ImplClass *>(this)->_GetDeviceId(deviceId);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
 {
-    return static_cast<ImplClass*>(this)->_GetDeviceCertificate(buf, bufSize, certLen);
+    return static_cast<ImplClass *>(this)->_GetDeviceCertificate(buf, bufSize, certLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
 {
-    return static_cast<ImplClass*>(this)->_GetDeviceIntermediateCACerts(buf, bufSize, certsLen);
+    return static_cast<ImplClass *>(this)->_GetDeviceIntermediateCACerts(buf, bufSize, certsLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
 {
-    return static_cast<ImplClass*>(this)->_GetDevicePrivateKey(buf, bufSize, keyLen);
+    return static_cast<ImplClass *>(this)->_GetDevicePrivateKey(buf, bufSize, keyLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetManufacturerDeviceId(uint64_t & deviceId)
 {
-    return static_cast<ImplClass*>(this)->_GetManufacturerDeviceId(deviceId);
+    return static_cast<ImplClass *>(this)->_GetManufacturerDeviceId(deviceId);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
 {
-    return static_cast<ImplClass*>(this)->_GetManufacturerDeviceCertificate(buf, bufSize, certLen);
+    return static_cast<ImplClass *>(this)->_GetManufacturerDeviceCertificate(buf, bufSize, certLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen)
 {
-    return static_cast<ImplClass*>(this)->_GetManufacturerDeviceIntermediateCACerts(buf, bufSize, certsLen);
+    return static_cast<ImplClass *>(this)->_GetManufacturerDeviceIntermediateCACerts(buf, bufSize, certsLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetManufacturerDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
 {
-    return static_cast<ImplClass*>(this)->_GetManufacturerDevicePrivateKey(buf, bufSize, keyLen);
+    return static_cast<ImplClass *>(this)->_GetManufacturerDevicePrivateKey(buf, bufSize, keyLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetPairingCode(char * buf, size_t bufSize, size_t & pairingCodeLen)
 {
-    return static_cast<ImplClass*>(this)->_GetPairingCode(buf, bufSize, pairingCodeLen);
+    return static_cast<ImplClass *>(this)->_GetPairingCode(buf, bufSize, pairingCodeLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetServiceId(uint64_t & serviceId)
 {
-    return static_cast<ImplClass*>(this)->_GetServiceId(serviceId);
+    return static_cast<ImplClass *>(this)->_GetServiceId(serviceId);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetFabricId(uint64_t & fabricId)
 {
-    return static_cast<ImplClass*>(this)->_GetFabricId(fabricId);
+    return static_cast<ImplClass *>(this)->_GetFabricId(fabricId);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen)
 {
-    return static_cast<ImplClass*>(this)->_GetServiceConfig(buf, bufSize, serviceConfigLen);
+    return static_cast<ImplClass *>(this)->_GetServiceConfig(buf, bufSize, serviceConfigLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen)
 {
-    return static_cast<ImplClass*>(this)->_GetPairedAccountId(buf, bufSize, accountIdLen);
+    return static_cast<ImplClass *>(this)->_GetPairedAccountId(buf, bufSize, accountIdLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreSerialNumber(serialNum, serialNumLen);
+    return static_cast<ImplClass *>(this)->_StoreSerialNumber(serialNum, serialNumLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StorePrimaryWiFiMACAddress(const uint8_t * buf)
 {
-    return static_cast<ImplClass*>(this)->_StorePrimaryWiFiMACAddress(buf);
+    return static_cast<ImplClass *>(this)->_StorePrimaryWiFiMACAddress(buf);
 }
 
 inline CHIP_ERROR ConfigurationManager::StorePrimary802154MACAddress(const uint8_t * buf)
 {
-    return static_cast<ImplClass*>(this)->_StorePrimary802154MACAddress(buf);
+    return static_cast<ImplClass *>(this)->_StorePrimary802154MACAddress(buf);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreManufacturingDate(mfgDate, mfgDateLen);
+    return static_cast<ImplClass *>(this)->_StoreManufacturingDate(mfgDate, mfgDateLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreProductRevision(uint16_t productRev)
 {
-    return static_cast<ImplClass*>(this)->_StoreProductRevision(productRev);
+    return static_cast<ImplClass *>(this)->_StoreProductRevision(productRev);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreFabricId(uint64_t fabricId)
 {
-    return static_cast<ImplClass*>(this)->_StoreFabricId(fabricId);
+    return static_cast<ImplClass *>(this)->_StoreFabricId(fabricId);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 inline CHIP_ERROR ConfigurationManager::StoreDeviceId(uint64_t deviceId)
 {
-    return static_cast<ImplClass*>(this)->_StoreDeviceId(deviceId);
+    return static_cast<ImplClass *>(this)->_StoreDeviceId(deviceId);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreDeviceCertificate(const uint8_t * cert, size_t certLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreDeviceCertificate(cert, certLen);
+    return static_cast<ImplClass *>(this)->_StoreDeviceCertificate(cert, certLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreDeviceIntermediateCACerts(certs, certsLen);
+    return static_cast<ImplClass *>(this)->_StoreDeviceIntermediateCACerts(certs, certsLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreDevicePrivateKey(const uint8_t * key, size_t keyLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreDevicePrivateKey(key, keyLen);
+    return static_cast<ImplClass *>(this)->_StoreDevicePrivateKey(key, keyLen);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceId(uint64_t deviceId)
 {
-    return static_cast<ImplClass*>(this)->_StoreManufacturerDeviceId(deviceId);
+    return static_cast<ImplClass *>(this)->_StoreManufacturerDeviceId(deviceId);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreManufacturerDeviceCertificate(cert, certLen);
+    return static_cast<ImplClass *>(this)->_StoreManufacturerDeviceCertificate(cert, certLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreManufacturerDeviceIntermediateCACerts(certs, certsLen);
+    return static_cast<ImplClass *>(this)->_StoreManufacturerDeviceIntermediateCACerts(certs, certsLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreManufacturerDevicePrivateKey(const uint8_t * key, size_t keyLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreManufacturerDevicePrivateKey(key, keyLen);
+    return static_cast<ImplClass *>(this)->_StoreManufacturerDevicePrivateKey(key, keyLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StorePairingCode(const char * pairingCode, size_t pairingCodeLen)
 {
-    return static_cast<ImplClass*>(this)->_StorePairingCode(pairingCode, pairingCodeLen);
+    return static_cast<ImplClass *>(this)->_StorePairingCode(pairingCode, pairingCodeLen);
 }
 
-inline CHIP_ERROR ConfigurationManager::StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen, const char * accountId, size_t accountIdLen)
+inline CHIP_ERROR ConfigurationManager::StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig,
+                                                                     size_t serviceConfigLen, const char * accountId,
+                                                                     size_t accountIdLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreServiceProvisioningData(serviceId, serviceConfig, serviceConfigLen, accountId, accountIdLen);
+    return static_cast<ImplClass *>(this)->_StoreServiceProvisioningData(serviceId, serviceConfig, serviceConfigLen, accountId,
+                                                                         accountIdLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::ClearServiceProvisioningData()
 {
-    return static_cast<ImplClass*>(this)->_ClearServiceProvisioningData();
+    return static_cast<ImplClass *>(this)->_ClearServiceProvisioningData();
 }
 
 inline CHIP_ERROR ConfigurationManager::StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen)
 {
-    return static_cast<ImplClass*>(this)->_StoreServiceConfig(serviceConfig, serviceConfigLen);
+    return static_cast<ImplClass *>(this)->_StoreServiceConfig(serviceConfig, serviceConfigLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::StorePairedAccountId(const char * accountId, size_t accountIdLen)
 {
-    return static_cast<ImplClass*>(this)->_StorePairedAccountId(accountId, accountIdLen);
+    return static_cast<ImplClass *>(this)->_StorePairedAccountId(accountId, accountIdLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    return static_cast<ImplClass*>(this)->_ReadPersistedStorageValue(key, value);
+    return static_cast<ImplClass *>(this)->_ReadPersistedStorageValue(key, value);
 }
 
 inline CHIP_ERROR ConfigurationManager::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    return static_cast<ImplClass*>(this)->_WritePersistedStorageValue(key, value);
+    return static_cast<ImplClass *>(this)->_WritePersistedStorageValue(key, value);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetQRCodeString(char * buf, size_t bufSize)
 {
-    return static_cast<ImplClass*>(this)->_GetQRCodeString(buf, bufSize);
+    return static_cast<ImplClass *>(this)->_GetQRCodeString(buf, bufSize);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetWiFiAPSSID(char * buf, size_t bufSize)
 {
-    return static_cast<ImplClass*>(this)->_GetWiFiAPSSID(buf, bufSize);
+    return static_cast<ImplClass *>(this)->_GetWiFiAPSSID(buf, bufSize);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
 {
-    return static_cast<ImplClass*>(this)->_GetBLEDeviceIdentificationInfo(deviceIdInfo);
+    return static_cast<ImplClass *>(this)->_GetBLEDeviceIdentificationInfo(deviceIdInfo);
 }
 
 inline bool ConfigurationManager::IsServiceProvisioned()
 {
-    return static_cast<ImplClass*>(this)->_IsServiceProvisioned();
+    return static_cast<ImplClass *>(this)->_IsServiceProvisioned();
 }
 
 inline bool ConfigurationManager::IsPairedToAccount()
 {
-    return static_cast<ImplClass*>(this)->_IsPairedToAccount();
+    return static_cast<ImplClass *>(this)->_IsPairedToAccount();
 }
 
 inline bool ConfigurationManager::IsMemberOfFabric()
 {
-    return static_cast<ImplClass*>(this)->_IsMemberOfFabric();
+    return static_cast<ImplClass *>(this)->_IsMemberOfFabric();
 }
 
 inline bool ConfigurationManager::IsFullyProvisioned()
 {
-    return static_cast<ImplClass*>(this)->_IsFullyProvisioned();
+    return static_cast<ImplClass *>(this)->_IsFullyProvisioned();
 }
 
 inline void ConfigurationManager::InitiateFactoryReset()
 {
-    static_cast<ImplClass*>(this)->_InitiateFactoryReset();
+    static_cast<ImplClass *>(this)->_InitiateFactoryReset();
 }
 
 inline CHIP_ERROR ConfigurationManager::ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
 {
-    return static_cast<ImplClass*>(this)->_ComputeProvisioningHash(hashBuf, hashBufSize);
+    return static_cast<ImplClass *>(this)->_ComputeProvisioningHash(hashBuf, hashBufSize);
 }
 
 inline CHIP_ERROR ConfigurationManager::Init()
 {
-    return static_cast<ImplClass*>(this)->_Init();
+    return static_cast<ImplClass *>(this)->_Init();
 }
 
 inline CHIP_ERROR ConfigurationManager::ConfigureChipStack()
 {
-    return static_cast<ImplClass*>(this)->_ConfigureChipStack();
+    return static_cast<ImplClass *>(this)->_ConfigureChipStack();
 }
 
 inline bool ConfigurationManager::CanFactoryReset()
 {
-    return static_cast<ImplClass*>(this)->_CanFactoryReset();
+    return static_cast<ImplClass *>(this)->_CanFactoryReset();
 }
 
 inline CHIP_ERROR ConfigurationManager::GetFailSafeArmed(bool & val)
 {
-    return static_cast<ImplClass*>(this)->_GetFailSafeArmed(val);
+    return static_cast<ImplClass *>(this)->_GetFailSafeArmed(val);
 }
 
 inline CHIP_ERROR ConfigurationManager::SetFailSafeArmed(bool val)
 {
-    return static_cast<ImplClass*>(this)->_SetFailSafeArmed(val);
+    return static_cast<ImplClass *>(this)->_SetFailSafeArmed(val);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 inline bool ConfigurationManager::OperationalDeviceCredentialsProvisioned()
 {
-    return static_cast<ImplClass*>(this)->_OperationalDeviceCredentialsProvisioned();
+    return static_cast<ImplClass *>(this)->_OperationalDeviceCredentialsProvisioned();
 }
 
 inline CHIP_ERROR ConfigurationManager::ClearOperationalDeviceCredentials(void)
 {
-    return static_cast<ImplClass*>(this)->_ClearOperationalDeviceCredentials();
+    return static_cast<ImplClass *>(this)->_ClearOperationalDeviceCredentials();
 }
 
 inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool val)
 {
-    static_cast<ImplClass*>(this)->_UseManufacturerCredentialsAsOperational(val);
+    static_cast<ImplClass *>(this)->_UseManufacturerCredentialsAsOperational(val);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING

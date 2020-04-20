@@ -44,11 +44,11 @@ extern "C" {
 #define PACK_STRUCT_STRUCT __attribute__((__packed__))
 #define PACK_STRUCT_FIELD(x) x
 
-extern void LwIPLog(const char *fmt, ...);
-#define LWIP_PLATFORM_DIAG(x) \
-    do                        \
-    {                         \
-        LwIPLog x;            \
+extern void LwIPLog(const char * fmt, ...);
+#define LWIP_PLATFORM_DIAG(x)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        LwIPLog x;                                                                                                                 \
     } while (0)
 
 // Place LwIP pools into their own subsections of .bss to make it easier to see

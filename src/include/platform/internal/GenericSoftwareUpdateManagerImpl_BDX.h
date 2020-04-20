@@ -44,18 +44,18 @@ namespace Internal {
  *
  */
 
-template<class ImplClass>
+template <class ImplClass>
 class GenericSoftwareUpdateManagerImpl_BDX
 {
-    using BDXTransfer = ::chip::Profiles::BulkDataTransfer::BDXTransfer;
-    using BDXNode = ::chip::Profiles::BulkDataTransfer::BdxNode;
+    using BDXTransfer   = ::chip::Profiles::BulkDataTransfer::BDXTransfer;
+    using BDXNode       = ::chip::Profiles::BulkDataTransfer::BdxNode;
     using ReceiveAccept = ::chip::Profiles::BulkDataTransfer::ReceiveAccept;
 
 protected:
     // ===== Members for use by the implementation subclass.
 
     CHIP_ERROR DoInit(void);
-    CHIP_ERROR StartImageDownload(char *aURI, uint64_t aStartOffset);
+    CHIP_ERROR StartImageDownload(char * aURI, uint64_t aStartOffset);
     CHIP_ERROR GetUpdateSchemeList(::chip::Profiles::SoftwareUpdate::UpdateSchemeList * aUpdateSchemeList);
     void AbortDownload(void);
 
@@ -66,8 +66,7 @@ private:
     CHIP_ERROR StartDownload(void);
     void ResetState(void);
 
-    static void BlockReceiveHandler(BDXTransfer * aXfer, uint64_t alength, uint8_t * aDataBlock,
-                                    bool aIsLastBlock);
+    static void BlockReceiveHandler(BDXTransfer * aXfer, uint64_t alength, uint8_t * aDataBlock, bool aIsLastBlock);
     static void ErrorHandler(BDXTransfer * aXfer, CHIP_ERROR anErrorCode);
     static CHIP_ERROR ReceiveAcceptHandler(BDXTransfer * aXfer, ReceiveAccept * aEeceiveAcceptMsg);
     static void ReceiveRejectHandler(BDXTransfer * aXfer, chip::StatusReport * aReport);
@@ -75,8 +74,7 @@ private:
     static void XferDoneHandler(BDXTransfer * aXfer);
 
     static void HandleBindingEvent(void * apAppState, ::chip::Binding::EventType aEvent,
-                                   const ::chip::Binding::InEventParam & aInParam,
-                                   ::chip::Binding::OutEventParam & aOutParam);
+                                   const ::chip::Binding::InEventParam & aInParam, ::chip::Binding::OutEventParam & aOutParam);
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 

@@ -50,7 +50,7 @@ typedef CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE Key;
  *          CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if aKey does not exist
  *          CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR Read(Key aKey, uint32_t &aValue);
+CHIP_ERROR Read(Key aKey, uint32_t & aValue);
 
 /**
  *  @brief
@@ -69,8 +69,8 @@ CHIP_ERROR Read(Key aKey, uint32_t &aValue);
  */
 CHIP_ERROR Write(Key aKey, uint32_t aValue);
 
-} // PersistedStorage
-} // Platform
-} // chip
+} // namespace PersistedStorage
+} // namespace Platform
+} // namespace chip
 
 #endif // PERSISTED_STORAGE_H

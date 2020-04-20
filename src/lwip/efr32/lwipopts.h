@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
- * 
+ *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -176,7 +176,7 @@
 #define TCP_RST_DEBUG (LWIP_DBG_OFF)
 #define PPP_DEBUG (LWIP_DBG_OFF)
 
-#define LWIP_DBG_TYPES_ON \
+#define LWIP_DBG_TYPES_ON                                                                                                          \
     (LWIP_DBG_ON | LWIP_DBG_TRACE) /* (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT) */
 
 #endif /* __LWIPOPTS_H__ */

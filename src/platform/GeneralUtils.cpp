@@ -33,7 +33,7 @@ CHIP_ERROR ParseCompilerDateStr(const char * dateStr, uint16_t & year, uint8_t &
     CHIP_ERROR err = CHIP_NO_ERROR;
     char monthStr[4];
     const char * p;
-    char* endptr;
+    char * endptr;
 
     static const char months[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
@@ -82,11 +82,7 @@ exit:
  */
 void RegisterDeviceLayerErrorFormatter(void)
 {
-    static ErrorFormatter sDeviceLayerErrorFormatter =
-    {
-        FormatDeviceLayerError,
-        NULL
-    };
+    static ErrorFormatter sDeviceLayerErrorFormatter = { FormatDeviceLayerError, NULL };
 
     RegisterErrorFormatter(&sDeviceLayerErrorFormatter);
 }
@@ -115,8 +111,12 @@ bool FormatDeviceLayerError(char * buf, uint16_t bufSize, int32_t err)
 #if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err)
     {
-    case CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND        : desc = "Config not found"; break;
-    case CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED : desc = "Not service provisioned"; break;
+    case CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND:
+        desc = "Config not found";
+        break;
+    case CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED:
+        desc = "Not service provisioned";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

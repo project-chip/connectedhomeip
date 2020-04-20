@@ -50,7 +50,7 @@ ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 CHIP_ERROR ConfigurationManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    bool        failSafeArmed;
+    bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
@@ -72,7 +72,7 @@ exit:
     return err;
 }
 
-::chip::Profiles::Security::AppKeys::GroupKeyStoreBase *ConfigurationManagerImpl::_GetGroupKeyStore()
+::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * ConfigurationManagerImpl::_GetGroupKeyStore()
 {
     return &gGroupKeyStore;
 }
@@ -88,9 +88,8 @@ void ConfigurationManagerImpl::_InitiateFactoryReset()
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(
-    ::chip::Platform::PersistedStorage::Key persistedStorageKey,
-    uint32_t &                                   value)
+CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
+                                                                uint32_t & value)
 {
     // This method reads CHIP Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
@@ -107,9 +106,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(
-    ::chip::Platform::PersistedStorage::Key persistedStorageKey,
-    uint32_t                                     value)
+CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
+                                                                 uint32_t value)
 {
     // This method reads CHIP Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).

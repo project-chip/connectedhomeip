@@ -43,20 +43,20 @@ namespace Internal {
 // by nvm3_open() on alignment or size violation.
 
 // Local version of SDK macro (avoids uninitialized var compile error).
-#define CHIP_NVM3_DEFINE_SECTION_STATIC_DATA(name, nvmSize, cacheSize) \
-    static nvm3_CacheEntry_t name##_cache[cacheSize];                   \
-    static uint8_t           name##_nvm[nvmSize] SL_ATTRIBUTE_SECTION(STRINGIZE(name##_section))
+#define CHIP_NVM3_DEFINE_SECTION_STATIC_DATA(name, nvmSize, cacheSize)                                                             \
+    static nvm3_CacheEntry_t name##_cache[cacheSize];                                                                              \
+    static uint8_t name##_nvm[nvmSize] SL_ATTRIBUTE_SECTION(STRINGIZE(name##_section))
 
 // Local version of SDK macro (allows CHIP to configure the maximum nvm3 object size and headroom).
-#define CHIP_NVM3_DEFINE_SECTION_INIT_DATA(name, maxObjectSize, repackHeadroom) \
-    static nvm3_Init_t name = {                                                  \
-        (nvm3_HalPtr_t)name##_nvm,                                               \
-        sizeof(name##_nvm),                                                      \
-        name##_cache,                                                            \
-        sizeof(name##_cache) / sizeof(nvm3_CacheEntry_t),                        \
-        maxObjectSize,                                                           \
-        repackHeadroom,                                                          \
-        &nvm3_halFlashHandle,                                                    \
+#define CHIP_NVM3_DEFINE_SECTION_INIT_DATA(name, maxObjectSize, repackHeadroom)                                                    \
+    static nvm3_Init_t name = {                                                                                                    \
+        (nvm3_HalPtr_t) name##_nvm,                                                                                                \
+        sizeof(name##_nvm),                                                                                                        \
+        name##_cache,                                                                                                              \
+        sizeof(name##_cache) / sizeof(nvm3_CacheEntry_t),                                                                          \
+        maxObjectSize,                                                                                                             \
+        repackHeadroom,                                                                                                            \
+        &nvm3_halFlashHandle,                                                                                                      \
     }
 
 #define CHIP_NVM3_REPACK_HEADROOM 64 // Threshold for User non-forced nvm3 flash repacking.
@@ -65,16 +65,15 @@ static nvm3_Handle_t handle;
 
 // Declare NVM3 data area and cache.
 
-CHIP_NVM3_DEFINE_SECTION_STATIC_DATA(chipNvm3,
-                                      CHIP_DEVICE_CONFIG_NVM3_NUM_FLASH_PAGES_FOR_STORAGE *FLASH_PAGE_SIZE,
-                                      CHIP_DEVICE_CONFIG_NVM3_MAX_NUM_OBJECTS);
+CHIP_NVM3_DEFINE_SECTION_STATIC_DATA(chipNvm3, CHIP_DEVICE_CONFIG_NVM3_NUM_FLASH_PAGES_FOR_STORAGE * FLASH_PAGE_SIZE,
+                                     CHIP_DEVICE_CONFIG_NVM3_MAX_NUM_OBJECTS);
 
 CHIP_NVM3_DEFINE_SECTION_INIT_DATA(chipNvm3, CHIP_DEVICE_CONFIG_NVM3_MAX_OBJECT_SIZE, CHIP_NVM3_REPACK_HEADROOM);
 
 CHIP_ERROR EFR32Config::Init()
 {
     CHIP_ERROR err;
-    bool        needClose = false;
+    bool needClose = false;
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
@@ -89,13 +88,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR EFR32Config::ReadConfigValue(Key key, bool &val)
+CHIP_ERROR EFR32Config::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
-    uint32_t    objectType;
-    size_t      dataLen;
-    bool        tmpVal;
+    bool needClose = false;
+    uint32_t objectType;
+    size_t dataLen;
+    bool tmpVal;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -120,13 +119,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint32_t &val)
+CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
-    uint32_t    objectType;
-    size_t      dataLen;
-    uint32_t    tmpVal;
+    bool needClose = false;
+    uint32_t objectType;
+    size_t dataLen;
+    uint32_t tmpVal;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -151,13 +150,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint64_t &val)
+CHIP_ERROR EFR32Config::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
-    uint32_t    objectType;
-    size_t      dataLen;
-    uint64_t    tmpVal;
+    bool needClose = false;
+    uint32_t objectType;
+    size_t dataLen;
+    uint64_t tmpVal;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -182,12 +181,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR EFR32Config::ReadConfigValueStr(Key key, char *buf, size_t bufSize, size_t &outLen)
+CHIP_ERROR EFR32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
-    uint32_t    objectType;
-    size_t      dataLen;
+    bool needClose = false;
+    uint32_t objectType;
+    size_t dataLen;
 
     outLen = 0;
 
@@ -240,12 +239,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR EFR32Config::ReadConfigValueBin(Key key, uint8_t *buf, size_t bufSize, size_t &outLen)
+CHIP_ERROR EFR32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
-    uint32_t    objectType;
-    size_t      dataLen;
+    bool needClose = false;
+    uint32_t objectType;
+    size_t dataLen;
 
     outLen = 0;
 
@@ -280,11 +279,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR EFR32Config::ReadConfigValueCounter(uint8_t counterIdx, uint32_t &val)
+CHIP_ERROR EFR32Config::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
-    uint32_t    tmpVal;
+    bool needClose = false;
+    uint32_t tmpVal;
 
     Key key = kMinConfigKey_ChipCounter + counterIdx;
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
@@ -309,7 +308,7 @@ exit:
 CHIP_ERROR EFR32Config::WriteConfigValue(Key key, bool val)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
+    bool needClose = false;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_ERROR_INVALID_ARGUMENT); // Verify key id.
 
@@ -331,7 +330,7 @@ exit:
 CHIP_ERROR EFR32Config::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
+    bool needClose = false;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -353,7 +352,7 @@ exit:
 CHIP_ERROR EFR32Config::WriteConfigValue(Key key, uint64_t val)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
+    bool needClose = false;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -372,15 +371,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR EFR32Config::WriteConfigValueStr(Key key, const char *str)
+CHIP_ERROR EFR32Config::WriteConfigValueStr(Key key, const char * str)
 {
     return WriteConfigValueStr(key, str, (str != NULL) ? strlen(str) : 0);
 }
 
-CHIP_ERROR EFR32Config::WriteConfigValueStr(Key key, const char *str, size_t strLen)
+CHIP_ERROR EFR32Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
+    bool needClose = false;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -409,10 +408,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR EFR32Config::WriteConfigValueBin(Key key, const uint8_t *data, size_t dataLen)
+CHIP_ERROR EFR32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
+    bool needClose = false;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
 
@@ -445,7 +444,7 @@ exit:
 CHIP_ERROR EFR32Config::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
+    bool needClose = false;
 
     Key key = kMinConfigKey_ChipCounter + counterIdx;
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
@@ -468,7 +467,7 @@ exit:
 CHIP_ERROR EFR32Config::ClearConfigValue(Key key)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
+    bool needClose = false;
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
@@ -489,9 +488,9 @@ exit:
 bool EFR32Config::ConfigValueExists(Key key)
 {
     CHIP_ERROR err;
-    bool        needClose = false;
-    uint32_t    objectType;
-    size_t      dataLen;
+    bool needClose = false;
+    uint32_t objectType;
+    size_t dataLen;
 
     err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));
     SuccessOrExit(err);
@@ -517,7 +516,7 @@ CHIP_ERROR EFR32Config::FactoryResetConfig(void)
 
     // Iterate over all the CHIP Config nvm3 records and delete each one...
     err = ForEachRecord(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig, false,
-                        [](const Key &nvm3Key, const size_t &length) -> CHIP_ERROR {
+                        [](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
 
                             err2 = ClearConfigValue(nvm3Key);
@@ -565,9 +564,9 @@ CHIP_ERROR EFR32Config::ForEachRecord(Key firstNvm3Key, Key lastNvm3Key, bool ad
 
     for (Key nvm3Key = firstNvm3Key; nvm3Key <= lastNvm3Key; ++nvm3Key)
     {
-        Ecode_t  nvm3Res;
+        Ecode_t nvm3Res;
         uint32_t objectType;
-        size_t   dataLen;
+        size_t dataLen;
 
         // Open nvm3 handle for reading on each iteration.
         err = MapNvm3Error(nvm3_open(&handle, &chipNvm3));

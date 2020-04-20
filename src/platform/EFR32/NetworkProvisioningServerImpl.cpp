@@ -25,7 +25,6 @@
 
 #include <platform/internal/GenericNetworkProvisioningServerImpl.ipp>
 
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

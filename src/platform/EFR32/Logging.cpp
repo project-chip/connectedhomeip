@@ -59,18 +59,17 @@
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
 
-
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
-static bool          sLogInitialized = false;
-static uint8_t       sLogBuffer[LOG_RTT_BUFFER_SIZE];
+static bool sLogInitialized = false;
+static uint8_t sLogBuffer[LOG_RTT_BUFFER_SIZE];
 
 /**
  * Print a log message to RTT
  */
-static void PrintLog(const char *msg)
+static void PrintLog(const char * msg)
 {
 #if EFR32_LOG_ENABLED
     if (sLogInitialized)
@@ -79,8 +78,8 @@ static void PrintLog(const char *msg)
         sz = strlen(msg);
         SEGGER_RTT_WriteNoLock(0, msg, sz);
 
-        const char *newline = "\r\n";
-        sz = strlen(newline);
+        const char * newline = "\r\n";
+        sz                   = strlen(newline);
         SEGGER_RTT_WriteNoLock(0, newline, sz);
     }
 #endif // EFR32_LOG_ENABLED
@@ -103,7 +102,7 @@ extern "C" int efr32LogInit(void)
 /**
  * General-purpose logging function
  */
-extern "C" void efr32Log(const char *aFormat, ...)
+extern "C" void efr32Log(const char * aFormat, ...)
 {
     va_list v;
 
@@ -128,7 +127,7 @@ extern "C" void efr32Log(const char *aFormat, ...)
 
 namespace {
 
-void GetModuleName(char *buf, uint8_t module)
+void GetModuleName(char * buf, uint8_t module)
 {
     if (module == ::chip::Logging::kLogModule_DeviceLayer)
     {
@@ -151,9 +150,7 @@ namespace DeviceLayer {
  * This function is intended be overridden by the application to, e.g.,
  * schedule output of queued log entries.
  */
-void __attribute__((weak)) OnLogOutput(void)
-{
-}
+void __attribute__((weak)) OnLogOutput(void) {}
 
 } // namespace DeviceLayer
 } // namespace chip
@@ -164,15 +161,15 @@ namespace Logging {
 /**
  * CHIP log output function.
  */
-void Log(uint8_t module, uint8_t category, const char *aFormat, ...)
+void Log(uint8_t module, uint8_t category, const char * aFormat, ...)
 {
-    va_list    v;
+    va_list v;
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
     if (IsCategoryEnabled(category))
     {
-        char   formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t formattedMsgLen;
 
         constexpr size_t maxPrefixLen = ChipLoggingModuleNameLen + 3;
@@ -221,11 +218,10 @@ void Log(uint8_t module, uint8_t category, const char *aFormat, ...)
 } // namespace Logging
 } // namespace chip
 
-
 /**
  * LwIP log output function.
  */
-extern "C" void LwIPLog(const char *aFormat, ...)
+extern "C" void LwIPLog(const char * aFormat, ...)
 {
     va_list v;
 
@@ -253,10 +249,10 @@ extern "C" void LwIPLog(const char *aFormat, ...)
  * Platform logging function for OpenThread
  */
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
+extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     IgnoreUnusedVariable(aLogRegion);
-    va_list    v;
+    va_list v;
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
@@ -309,21 +305,21 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 /**
  * Log register contents to UART when a hard fault occurs.
  */
-extern "C" void debugHardfault(uint32_t *sp)
+extern "C" void debugHardfault(uint32_t * sp)
 {
     uint32_t cfsr  = SCB->CFSR;
     uint32_t hfsr  = SCB->HFSR;
     uint32_t mmfar = SCB->MMFAR;
     uint32_t bfar  = SCB->BFAR;
-    uint32_t r0  = sp[0];
-    uint32_t r1  = sp[1];
-    uint32_t r2  = sp[2];
-    uint32_t r3  = sp[3];
-    uint32_t r12 = sp[4];
-    uint32_t lr  = sp[5];
-    uint32_t pc  = sp[6];
-    uint32_t psr = sp[7];
-    char     formattedMsg[32];
+    uint32_t r0    = sp[0];
+    uint32_t r1    = sp[1];
+    uint32_t r2    = sp[2];
+    uint32_t r3    = sp[3];
+    uint32_t r12   = sp[4];
+    uint32_t lr    = sp[5];
+    uint32_t pc    = sp[6];
+    uint32_t psr   = sp[7];
+    char formattedMsg[32];
 
     if (sLogInitialized == false)
     {
@@ -340,7 +336,7 @@ extern "C" void debugHardfault(uint32_t *sp)
     PrintLog(formattedMsg);
     snprintf(formattedMsg, sizeof formattedMsg, "SCB->BFAR   0x%08lx", bfar);
     PrintLog(formattedMsg);
-    snprintf(formattedMsg, sizeof formattedMsg, "SP          0x%08lx", (uint32_t)sp);
+    snprintf(formattedMsg, sizeof formattedMsg, "SP          0x%08lx", (uint32_t) sp);
     PrintLog(formattedMsg);
     snprintf(formattedMsg, sizeof formattedMsg, "R0          0x%08lx\n", r0);
     PrintLog(formattedMsg);

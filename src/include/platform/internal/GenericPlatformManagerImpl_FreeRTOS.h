@@ -22,7 +22,6 @@
  *          for use on FreeRTOS platforms.
  */
 
-
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_H
 #define GENERIC_PLATFORM_MANAGER_IMPL_FREERTOS_H
 
@@ -52,12 +51,10 @@ namespace Internal {
  * (directly or indirectly) by the PlatformManagerImpl class, which also appears as the template's
  * ImplClass parameter.
  */
-template<class ImplClass>
-class GenericPlatformManagerImpl_FreeRTOS
-    : public GenericPlatformManagerImpl<ImplClass>
+template <class ImplClass>
+class GenericPlatformManagerImpl_FreeRTOS : public GenericPlatformManagerImpl<ImplClass>
 {
 protected:
-
     TimeOut_t mNextTimerBaseTime;
     TickType_t mNextTimerDurationTicks;
     SemaphoreHandle_t mChipStackLock;
@@ -81,10 +78,9 @@ protected:
     void PostEventFromISR(const ChipDeviceEvent * event, BaseType_t & yieldRequired);
 
 private:
-
     // ===== Private members for use by this class only.
 
-    inline ImplClass * Impl() { return static_cast<ImplClass*>(this); }
+    inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
     static void EventLoopTaskMain(void * arg);
 };

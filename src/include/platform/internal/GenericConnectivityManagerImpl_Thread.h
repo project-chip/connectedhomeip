@@ -46,11 +46,10 @@ namespace Internal {
  * APIs.  This is achieved by delegating all stack-specific operations to the ThreadStackManager class.
  *
  */
-template<class ImplClass>
+template <class ImplClass>
 class GenericConnectivityManagerImpl_Thread
 {
 protected:
-
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     void _Init(void);
@@ -73,13 +72,12 @@ protected:
     void UpdateServiceConnectivity(void);
 
 private:
-
     // ===== Private members reserved for use by this class only.
 
     enum Flags
     {
-        kFlag_HaveServiceConnectivity      = 0x01,
-        kFlag_IsApplicationControlled      = 0x02
+        kFlag_HaveServiceConnectivity = 0x01,
+        kFlag_IsApplicationControlled = 0x02
     };
 
     uint8_t mFlags;
@@ -90,67 +88,70 @@ private:
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>;
 
-template<class ImplClass>
+template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_Init(void)
 {
     mFlags = 0;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_IsThreadEnabled(void)
 {
     return ThreadStackMgrImpl().IsThreadEnabled();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_IsThreadApplicationControlled(void)
 {
     return GetFlag(mFlags, kFlag_IsApplicationControlled);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_IsThreadAttached(void)
 {
     return ThreadStackMgrImpl().IsThreadAttached();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_IsThreadProvisioned(void)
 {
     return ThreadStackMgrImpl().IsThreadProvisioned();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ClearThreadProvision(void)
 {
     ThreadStackMgrImpl().ClearThreadProvision();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline ConnectivityManager::ThreadDeviceType GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadDeviceType(void)
 {
     return ThreadStackMgrImpl().GetThreadDeviceType();
 }
 
-template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
     return ThreadStackMgrImpl().SetThreadDeviceType(deviceType);
 }
 
-template<class ImplClass>
-inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig)
+template <class ImplClass>
+inline void
+GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     ThreadStackMgrImpl().GetThreadPollingConfig(pollingConfig);
 }
 
-template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig)
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPollingConfig(
+    const ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     return ThreadStackMgrImpl().SetThreadPollingConfig(pollingConfig);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnectivityViaThread(void)
 {
     return GetFlag(mFlags, kFlag_HaveServiceConnectivity);

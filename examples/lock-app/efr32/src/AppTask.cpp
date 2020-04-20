@@ -19,8 +19,8 @@
 
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
 #include "ButtonHandler.h"
+#include "LEDWidget.h"
 
 #include "AppConfig.h"
 
@@ -131,11 +131,11 @@ void AppTask::AppTaskMain(void * pvParameter)
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
 
-        // Collect connectivity and configuration state from the CHIP stack.  Because the
-        // CHIP event loop is being run in a separate task, the stack must be locked
-        // while these values are queried.  However we use a non-blocking lock request
-        // (TryLockCHIPStack()) to avoid blocking other UI activities when the CHIP
-        // task is busy (e.g. with a long crypto operation).
+        // Collect connectivity and configuration state from the CHIP stack. Because
+        // the CHIP event loop is being run in a separate task, the stack must be
+        // locked while these values are queried.  However we use a non-blocking
+        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
+        // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
@@ -147,19 +147,20 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
 
         // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular basis.
+        // connectivity and it is able to interact with the service on a regular
+        // basis.
         bool isFullyConnected = (sHaveServiceConnectivity && sIsServiceSubscriptionEstablished);
 
         // Update the status LED if factory reset has not been initiated.
         //
         // If system has "full connectivity", keep the LED On constantly.
         //
-        // If thread and service provisioned, but not attached to the thread network yet OR no
-        // connectivity to the service OR subscriptions are not fully established
-        // THEN blink the LED Off for a short period of time.
+        // If thread and service provisioned, but not attached to the thread network
+        // yet OR no connectivity to the service OR subscriptions are not fully
+        // established THEN blink the LED Off for a short period of time.
         //
-        // If the system has ble connection(s) uptill the stage above, THEN blink the LEDs at an even
-        // rate of 100ms.
+        // If the system has ble connection(s) uptill the stage above, THEN blink
+        // the LEDs at an even rate of 100ms.
         //
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
@@ -262,17 +263,20 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         return;
     }
 
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
+    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
+    // initiate factory reset
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
         EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_TRIGGER_TIMEOUT);
 
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to cancel, if required.
+        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
+        // cancel, if required.
         sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
         sAppTask.mFunction = kFunction_FactoryReset;
 
-        // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
+        // Turn off all LEDs before starting blink to make sure blink is
+        // co-ordinated.
         sStatusLED.Set(false);
         sLockLED.Set(false);
 
@@ -292,11 +296,13 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         return;
     }
 
-    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (< FACTORY_RESET_TRIGGER_TIMEOUT)
-    // To initiate factory reset: press the APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
-    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after FACTORY_RESET_TRIGGER_TIMEOUT to signal factory
-    // reset has been initiated. To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs start blinking
-    // within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
+    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
+    // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
+    // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
+    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
+    // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
+    // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
+    // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
     if (aEvent->ButtonEvent.Action == APP_BUTTON_PRESSED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
@@ -308,7 +314,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
     else
     {
-        // If the button was released before factory reset got initiated, trigger a software update.
+        // If the button was released before factory reset got initiated, trigger a
+        // software update.
         if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
         {
             sAppTask.CancelTimer();
@@ -325,7 +332,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
             sAppTask.CancelTimer();
 
-            // Change the function to none selected since factory reset has been canceled.
+            // Change the function to none selected since factory reset has been
+            // canceled.
             sAppTask.mFunction = kFunction_NoneSelected;
 
             EFR32_LOG("Factory Reset has been Canceled");
