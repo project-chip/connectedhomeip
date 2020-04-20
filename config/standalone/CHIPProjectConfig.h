@@ -24,7 +24,6 @@
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 
-
 #define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
 
 // Configure WDM for event offload
@@ -57,7 +56,7 @@
 #define WDM_ENFORCE_EXPIRY_TIME 1
 
 // Increase session idle timeout in stand-alone builds for the convenience of developers.
-#define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT           120000
+#define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000
 
 #define CHIP_CONFIG_ENABLE_WDM_UPDATE 1
 

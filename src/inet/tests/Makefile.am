@@ -50,6 +50,10 @@ AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
     -I$(top_srcdir)/src/include                         \
     -I$(top_srcdir)/src/lib                             \
+    $(NLASSERT_CPPFLAGS)                                \
+    $(NLFAULTINJECTION_CPPFLAGS)                        \
+    $(NLIO_CPPFLAGS)                                    \
+    $(NLUNIT_TEST_CPPFLAGS)                             \
     $(LWIP_CPPFLAGS)                                    \
     $(SOCKETS_CPPFLAGS)                                 \
     $(PTHREAD_CFLAGS)                                   \
@@ -72,9 +76,17 @@ MAKEDIR_TARGETS                                       = \
     $(top_builddir)/src/include/CHIPVersion.h           \
     $(NULL)
 
+MAKEDIRS                                              = \
+    $(top_builddir)/src/include                         \
+    $(NLFAULTINJECTION_MAKEDIR)                         \
+    $(NLUNIT_TEST_MAKEDIR)                              \
+    $(NULL)
+
 COMMON_LDADD                                          = \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
+    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
+    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \

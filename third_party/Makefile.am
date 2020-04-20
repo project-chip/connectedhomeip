@@ -41,7 +41,7 @@ DIST_SUBDIRS                                 = \
 # of the 'distclean' target. Consequently, we conditionally include
 # them in DIST_SUBDIRS on invocation of 'distclean-recursive'
 
-distclean-recursive: DIST_SUBDIRS += $(NLASSERT_SUBDIRS) $(NLFAULTINJECTION_SUBDIRS) $(NLIO_SUBDIRS) $(NLUNIT_TEST_SUBDIRS)
+distclean-recursive: DIST_SUBDIRS += $(NLASSERT_SUBDIRS) $(NLFAULTINJECTION_SUBDIRS) $(NLIO_SUBDIRS) $(NLUNIT_TEST_SUBDIRS) $(MBEDTLS_SUBDIRS)
 
 # Always build (e.g. for 'make all') these subdirectories.
 #
@@ -54,6 +54,7 @@ SUBDIRS                                      = \
     $(NLFAULTINJECTION_SUBDIRS)                \
     $(NLIO_SUBDIRS)                            \
     $(NLUNIT_TEST_SUBDIRS)                     \
+    $(MBEDTLS_SUBDIRS)                         \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

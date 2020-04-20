@@ -5,8 +5,8 @@
         "${workspaceFolder}/build/default/src/**",
         "${workspaceFolder}/build/default/src/include/**",
         "${workspaceFolder}/build/default/src/lib/**",
-        "${workspaceFolder}/build/config/standalone/",
-        "${workspaceFolder}/build/config/standalone/**",
+        "${workspaceFolder}/config/standalone/",
+        "${workspaceFolder}/config/standalone/**",
         "${workspaceFolder}/examples/**",
         "${workspaceFolder}/src/**",
         "${workspaceFolder}/src/include/",
@@ -18,6 +18,9 @@
     ],
     "[cpp]": {
         "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "[dockerfile]": {
+        "editor.defaultFormatter": "ms-azuretools.vscode-docker"
     },
     "files.associations": {
         "iostream": "cpp",
@@ -61,7 +64,9 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "*.ipp": "cpp",
+        "aes.h": "c"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,

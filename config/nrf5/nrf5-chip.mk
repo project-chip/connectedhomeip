@@ -16,33 +16,33 @@
 
 #
 #   @file
-#         Component makefile for incorporating CHIP into an EFR32
+#         Component makefile for incorporating CHIP into an nRF5
 #         application.
 #
 
 #
-#   This makefile is intended to work in conjunction with the efr32-app.mk
-#   makefile to build the CHIP example applications on Silicon Labs platforms.
-#   EFR32 applications should include this file in their top level Makefile
-#   along with the other makefiles in this directory.  E.g.:
+#   This makefile is intended to work in conjunction with the nrf5-app.mk
+#   makefile to build the CHIP example applications on Nordic platforms.
+#   nRF5 applications should include this file in their top level Makefile
+#   after including nrf5-app.mk.  E.g.:
 #
 #       PROJECT_ROOT = $(realpath .)
 #
-#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/build/efr32
-#
-#       include $(BUILD_SUPPORT_DIR)/efr32-app.mk
-#       include $(BUILD_SUPPORT_DIR)/efr32-chip.mk
+#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/config/nrf5
+#       
+#       include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
+#       include $(BUILD_SUPPORT_DIR)/nrf5-chip.mk
 #
 #       PROJECT_ROOT := $(realpath .)
-#
-#       APP := chip-efr32-bringup
-#
+#       
+#       APP := chip-nrf52840-bringup
+#       
 #       SRCS = \
 #           $(PROJECT_ROOT)/main.cpp \
 #           ...
 #
 #       $(call GenerateBuildRules)
-#
+#       
 
 # ==================================================
 # General settings
@@ -58,27 +58,27 @@ CHIP_HOST_ARCH := armv7-unknown-linux-gnu
 CHIP_OUTPUT_DIR = $(OUTPUT_DIR)/chip
 
 # An optional file containing application-specific configuration overrides.
-CHIP_PROJECT_CONFIG = $(wildcard $(PROJECT_ROOT)/include/CHIPProjectConfig.h)
+CHIP_PROJECT_CONFIG = $(wildcard $(PROJECT_ROOT)/CHIPProjectConfig.h)
 
 # Architcture on which CHIP is being built.
 CHIP_BUILD_ARCH = $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
+
 
 # ==================================================
 # Compilation flags specific to building CHIP
 # ==================================================
 
-CHIP_DEFINES += \
-    EFR32_OPENTHREAD_API
+CHIP_CPPFLAGS = $(STD_CFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $(OPT_FLAGS) $(DEFINE_FLAGS) $(INC_FLAGS) 
+CHIP_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS) 
 
-# Reduce number of buffers on efr32mg21 to fit within 96k RAM
-ifeq ($(EFR32FAMILY), efr32mg21)
-CHIP_DEFINES += \
-    CHIP_CONFIG_EFR32MG21_PBUF_POOLS
-endif
 
-CHIP_DEFINE_FLAGS = $(foreach def,$(CHIP_DEFINES),-D$(def))
-CHIP_CPPFLAGS = $(STD_CFLAGS) $(CFLAGS) $(DEBUG_FLAGS) $(OPT_FLAGS) $(DEFINE_FLAGS) $(CHIP_DEFINE_FLAGS) $(INC_FLAGS)
-CHIP_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS)
+# ==================================================
+# Utility Functions
+# ==================================================
+
+QuoteChar = "
+
+DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst \,\\,$(1)))$(QuoteChar)
 
 
 # ==================================================
@@ -88,18 +88,17 @@ CHIP_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS)
 CHIP_CONFIGURE_OPTIONS = \
     AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
     LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
-    CPPFLAGS="$(CHIP_CPPFLAGS)" \
-    CXXFLAGS="$(CHIP_CXXFLAGS)" \
+    CPPFLAGS=$(call DoubleQuoteStr, $(CHIP_CPPFLAGS)) \
+    CXXFLAGS=$(call DoubleQuoteStr, $(CHIP_CXXFLAGS)) \
     --prefix=$(CHIP_OUTPUT_DIR) \
     --exec-prefix=$(CHIP_OUTPUT_DIR) \
     --host=$(CHIP_HOST_ARCH) \
     --build=$(CHIP_BUILD_ARCH) \
-    --with-target-style=embedded \
-    --with-device-layer=efr32 \
+    --with-device-layer=nrf5 \
     --with-network-layer=all \
     --with-target-network=lwip \
     --with-lwip=internal \
-    --with-lwip-target=efr32 \
+    --with-lwip-target=nrf5 \
     --with-inet-endpoint="tcp udp" \
     --with-logging-style=external \
     --with-chip-project-includes=$(CHIP_PROJECT_CONFIG) \
@@ -114,6 +113,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --disable-docs \
     --disable-java \
     --disable-device-manager \
+    --with-mbedtls=internal
 
 # Enable / disable optimization.
 ifeq ($(OPT),1)
@@ -122,12 +122,9 @@ else
 CHIP_CONFIGURE_OPTIONS += --enable-optimization=no
 endif
 
-ifeq ($(DEBUG),1)
-CHIP_CONFIGURE_OPTIONS += --enable-debug
-endif
 
 # ==================================================
-# Adjustments to standard build settings to
+# Adjustments to standard build settings to 
 #   incorporate CHIP
 # ==================================================
 
@@ -135,16 +132,11 @@ endif
 STD_INC_DIRS += \
     $(CHIP_OUTPUT_DIR)/include \
     $(CHIP_OUTPUT_DIR)/src/include \
-    $(CHIP_ROOT)/src/adaptations/device-layer/trait-support \
+    $(CHIP_ROOT)/src/include \
     $(CHIP_ROOT)/third_party/lwip/repo/lwip/src/include \
     $(CHIP_ROOT)/src/lwip \
-    $(CHIP_ROOT)/src/lwip/efr32 \
-    $(CHIP_ROOT)/src/lwip/freertos \
-    $(EFR32_SDK_ROOT)/protocol/bluetooth/ble_stack/inc/soc \
-    $(EFR32_SDK_ROOT)/protocol/bluetooth/ble_stack/inc/common \
-    $(EFR32_SDK_ROOT)/app/bluetooth/common/util \
-    $(EFR32_SDK_ROOT)/platform/radio/rail_lib/protocol/ble \
-    $(EFR32_SDK_ROOT)/platform/radio/rail_lib/common
+    $(CHIP_ROOT)/src/lwip/nrf5 \
+    $(CHIP_ROOT)/src/lwip/freertos
 
 # Add the location of CHIP libraries to application link action.
 STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib
@@ -156,7 +148,8 @@ STD_LIBS += \
     -lInetLayer \
     -lnlfaultinjection \
     -lSystemLayer \
-    -llwip
+    -llwip \
+    -lmbedtls
 
 # Add the appropriate CHIP target as a prerequisite to all application
 # compilation targets to ensure that CHIP gets built and its header
@@ -170,19 +163,20 @@ STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
     $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
-    $(CHIP_OUTPUT_DIR)/lib/liblwip.a
+    $(CHIP_OUTPUT_DIR)/lib/liblwip.a \
+    $(CHIP_OUTPUT_DIR)/lib/libmbedtls.a
 
 
 # ==================================================
 # Late-bound build rules for CHIP
 # ==================================================
 
-# Add CHIPBuildRules to the list of late-bound build rules that
-# will be evaluated when GenerateBuildRules is called.
-LATE_BOUND_RULES += CHIPBuildRules
+# Add ChipBuildRules to the list of late-bound build rules that
+# will be evaluated when GenerateBuildRules is called. 
+LATE_BOUND_RULES += ChipBuildRules
 
 # Rules for configuring, building and installing CHIP.
-define CHIPBuildRules
+define ChipBuildRules
 
 .PHONY : config-chip .check-config-chip build-chip install-chip clean-chip
 
@@ -232,12 +226,12 @@ define TargetHelp +=
 
 
   config-chip          Run the CHIP configure script.
-
+  
   build-chip           Build the CHIP libraries.
-
+  
   install-chip         Install CHIP libraries and headers in
                         build output directory for use by application.
-
+  
   clean-chip           Clean all build outputs produced by the CHIP
                         build process.
 endef

@@ -25,7 +25,7 @@
 PROJECT_ROOT := $(realpath .)
 
 CHIP_ROOT ?= $(realpath $(PROJECT_ROOT)/third_party/connectedhomeip)
-BUILD_SUPPORT_DIR = $(CHIP_ROOT)/build/nrf5
+BUILD_SUPPORT_DIR = $(CHIP_ROOT)/config/nrf5
 
 include $(BUILD_SUPPORT_DIR)/nrf5-app.mk
 include $(BUILD_SUPPORT_DIR)/nrf5-chip.mk
@@ -148,7 +148,6 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/external/freertos/portable/CMSIS/nrf52 \
     $(NRF5_SDK_ROOT)/external/freertos/portable/GCC/nrf52 \
     $(NRF5_SDK_ROOT)/external/freertos/source/include \
-    $(NRF5_SDK_ROOT)/external/mbedtls/include \
     $(NRF5_SDK_ROOT)/external/segger_rtt \
     $(NRF5_SDK_ROOT)/integration/nrfx \
     $(NRF5_SDK_ROOT)/integration/nrfx/legacy \

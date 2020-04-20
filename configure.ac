@@ -80,7 +80,7 @@ AC_CONFIG_AUX_DIR([build/autoconf])
 # Tell autoconf where to find auxilliary M4 macros
 # Note that nlbuild-autotools has macros in two subdirs, for local vs third-party scripts
 #
-AC_CONFIG_MACRO_DIRS([build/autoconf/m4 third_party/nlbuild-autotools/repo/third_party/autoconf/m4 third_party/nlbuild-autotools/repo/autoconf/m4])
+AC_CONFIG_MACRO_DIRS([build/autoconf/m4 autoconf/m4 third_party/nlbuild-autotools/repo/third_party/autoconf/m4 third_party/nlbuild-autotools/repo/autoconf/m4])
 
 #
 # Tell autoconf what file the package is using to aggregate C preprocessor
@@ -1274,23 +1274,23 @@ AC_LANG_PUSH([C++])
 
 # SystemLayer
 
-CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-system-project-includes, SYSTEM_PROJECT_CONFIG_INCLUDE, SystemProjectConfig.h, CHIP System Layer, ${ac_abs_confdir}/build/config/standalone)
+CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-system-project-includes, SYSTEM_PROJECT_CONFIG_INCLUDE, SystemProjectConfig.h, CHIP System Layer, ${ac_abs_confdir}/config/standalone)
 
 # BleLayer
 
 if test ${CONFIG_NETWORK_LAYER_BLE} = 1; then
-    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-ble-project-includes, BLE_PROJECT_CONFIG_INCLUDE, BleProjectConfig.h, CHIP BLE Layer, ${ac_abs_confdir}/build/config/standalone)
+    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-ble-project-includes, BLE_PROJECT_CONFIG_INCLUDE, BleProjectConfig.h, CHIP BLE Layer, ${ac_abs_confdir}/config/standalone)
 fi
 
 # InetLayer
 
 if test ${CONFIG_NETWORK_LAYER_INET} = 1; then
-    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-inet-project-includes, INET_PROJECT_CONFIG_INCLUDE, InetProjectConfig.h, CHIP Inet Layer, ${ac_abs_confdir}/build/config/standalone)
+    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-inet-project-includes, INET_PROJECT_CONFIG_INCLUDE, InetProjectConfig.h, CHIP Inet Layer, ${ac_abs_confdir}/config/standalone)
 fi
 
 # Core
 
-CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-project-includes, CHIP_PROJECT_CONFIG_INCLUDE, CHIPProjectConfig.h, CHIP Core, ${ac_abs_confdir}/build/config/standalone)
+CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-project-includes, CHIP_PROJECT_CONFIG_INCLUDE, CHIPProjectConfig.h, CHIP Core, ${ac_abs_confdir}/config/standalone)
 
 # Device Layer
 
@@ -1358,11 +1358,25 @@ fi
 #
 # mbedTLS
 #
+if test "${with_mbedtls}" != "internal"; then
+    with_mbedtls="no"
+fi
 
-NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([mbedTLS],
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [mbedTLS],
     [MBEDTLS],
     [mbedtls],
-    [-lmbedtls],
+    [],
+    [
+        # At this point, the internal mbedTLS package will be neither
+        # configured nor built, so the normal checks we undertake for an
+        # external package cannot be run here. Simply set the appropriate
+        # variables and trust all will be well.
+
+        MBEDTLS_CPPFLAGS="-I\${abs_top_srcdir}/third_party/mbedtls/repo/include"
+        MBEDTLS_LDFLAGS="-L${ac_pwd}/third_party/mbedtls"
+        MBEDTLS_LIBS="-lmbedtls"
+    ],
     [
         # Check for required mbedTLS headers.
 
@@ -1376,13 +1390,28 @@ NL_WITH_OPTIONAL_EXTERNAL_PACKAGE([mbedTLS],
     ]
 )
 
-AM_CONDITIONAL([CHIP_WITH_MBEDTLS], [test "${nl_with_mbedtls}" != "no"])
+# Depending on whether mbedTLS has been configured for an internal
+# location, its directory stem within this package needs to be set
+# accordingly. In addition, if the location is internal, then we need
+# to attempt to pull it down using the bootstrap makefile.
 
-if test "${nl_with_mbedtls}" = "no"; then
-    AC_DEFINE([CHIP_WITH_MBEDTLS], [0], [Define to 1 to build CHIP with mbedTLS features])
+if test "${nl_with_mbedtls}" = "internal"; then
+    maybe_mbedtls_dirstem="mbedtls"
+    mbedtls_dirstem="third_party/${maybe_mbedtls_dirstem}/repo"
+
+    AC_MSG_NOTICE([attempting to create internal ${mbedtls_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${mbedtls_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${mbedtls_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
 else
-    AC_DEFINE([CHIP_WITH_MBEDTLS], [1], [Define to 1 to build CHIP with mbedTLS features])
+    maybe_mbedtls_dirstem=""
 fi
+
+AC_SUBST(MBEDTLS_SUBDIRS, [${maybe_mbedtls_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_MBEDTLS_INTERNAL], [test "${nl_with_mbedtls}" = "internal"])
 
 #
 # LwIP
@@ -1514,7 +1543,6 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
         NLFAULTINJECTION_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlfaultinjection/repo/include"
         NLFAULTINJECTION_LDFLAGS="-L${ac_pwd}/third_party/nlfaultinjection/repo/src"
         NLFAULTINJECTION_LIBS="-lnlfaultinjection"
-        NLFAULTINJECTION_MAKEDIR=${ac_pwd}/third_party/nlfaultinjection/repo
     ],
     [
         # Check for required nlfaultinjection headers.
@@ -1585,7 +1613,6 @@ if test "${nl_cv_build_tests}" = "yes"; then
             NLUNIT_TEST_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlunit-test/repo/src"
             NLUNIT_TEST_LDFLAGS="-L${ac_pwd}/third_party/nlunit-test/repo/src"
             NLUNIT_TEST_LIBS="-lnlunit-test"
-            NLUNIT_TEST_MAKEDIR=${ac_pwd}/third_party/nlunit-test/repo
         ],
         [
             # Check for required nlunit-test headers.
@@ -1829,32 +1856,6 @@ CPPFLAGS="${CPPFLAGS} ${MBEDTLS_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${MBEDTLS_LDFLAGS}"
 LIBS="${LIBS} ${MBEDTLS_LIBS}"
 
-# Add any nlunit-test CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${NLUNIT_TEST_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${NLUNIT_TEST_LDFLAGS}"
-LIBS="${LIBS} ${NLUNIT_TEST_LIBS}"
-MAKEDIRS="${MAKEDIRS} ${NLUNIT_TEST_MAKEDIR}"
-
-# Add any nlio CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${NLIO_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${NLIO_LDFLAGS}"
-LIBS="${LIBS} ${NLIO_LIBS}"
-
-# Add any nlassert CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${NLASSERT_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${NLASSERT_LDFLAGS}"
-LIBS="${LIBS} ${NLASSERT_LIBS}"
-
-# Add any nlfaultinjection CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${NLFAULTINJECTION_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${NLFAULTINJECTION_LDFLAGS}"
-LIBS="${LIBS} ${NLFAULTINJECTION_LIBS}"
-MAKEDIRS="${MAKEDIRS} ${NLFAULTINJECTION_MAKEDIR}"
-
 # Add any code coverage CPPFLAGS, LDFLAGS, and LIBS
 
 CPPFLAGS="${CPPFLAGS} ${NL_COVERAGE_CPPFLAGS}"
@@ -1867,9 +1868,6 @@ if test "${nl_had_CPPFLAGS_werror}" = "no"; then
     CPPFLAGS="${CPPFLAGS} ${NL_WERROR_CPPFLAGS}"
 fi
 
-# Export MAKEDIRS
-
-AC_SUBST(MAKEDIRS, [${MAKEDIRS}])
 
 # At this point, we can restore the compiler flags to whatever the
 # user passed in, now that we're clear of an -Werror issues by
@@ -1889,18 +1887,26 @@ AC_SUBST(PRETTY_CHECK_ARGS, [""])
 # Configure any autotools-based subdirectories
 if test "${nl_with_nlunit_test}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlunit-test/repo])
+AC_SUBST(NLUNIT_TEST_MAKEDIR,["${ac_pwd}/third_party/nlunit-test/repo"])
 fi
 
 if test "${nl_with_nlio}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlio/repo])
+AC_SUBST(NLIO_MAKEDIR,["${ac_pwd}/third_party/nlunio/repo"])
 fi
 
 if test "${nl_with_nlassert}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlassert/repo])
+AC_SUBST(NLASSERT_MAKEDIR,["${ac_pwd}/third_party/nlassert/repo"])
+fi
+
+if test "${nl_with_mbedtls}" = "internal"; then
+AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
 fi
 
 if test "${nl_with_nlfaultinjection}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
+AC_SUBST(NLFAULTINJECTION_MAKEDIR,["${ac_pwd}/third_party/nlfaultinjection/repo"])
 fi
 
 #
@@ -1931,6 +1937,10 @@ src/lib/support/tests/Makefile
 src/platform/Makefile
 tests/Makefile
 ])
+
+if test "${nl_with_mbedtls}" = "internal"; then
+AC_CONFIG_FILES([third_party/mbedtls/Makefile])
+fi
 
 #
 # Generate the auto-generated files for the package
@@ -2014,18 +2024,22 @@ AC_MSG_NOTICE([
   Nlunit-test compile flags                        : ${NLUNIT_TEST_CPPFLAGS:--}
   Nlunit-test link flags                           : ${NLUNIT_TEST_LDFLAGS:--}
   Nlunit-test link libraries                       : ${NLUNIT_TEST_LIBS:--}
+  Nlunit-test makedir                              : ${NLUNIT_TEST_MAKEDIR:--}
   Nlio source                                      : ${nl_with_nlio:--}
   Nlio compile flags                               : ${NLIO_CPPFLAGS:--}
   Nlio link flags                                  : ${NLIO_LDFLAGS:--}
   Nlio link libraries                              : ${NLIO_LIBS:--}
+  Nlio makedir                                     : ${NLIO_MAKDIR:--}
   Nlassert source                                  : ${nl_with_nlassert:--}
   Nlassert compile flags                           : ${NLASSERT_CPPFLAGS:--}
   Nlassert link flags                              : ${NLASSERT_LDFLAGS:--}
   Nlassert link libraries                          : ${NLASSERT_LIBS:--}
+  Nlassert makedir                                 : ${NLASSERT_MAKEDIR:--}
   Nlfaultinjection source                          : ${nl_with_nlfaultinjection:--}
   Nlfaultinjection compile flags                   : ${NLFAULTINJECTION_CPPFLAGS:--}
   Nlfaultinjection link flags                      : ${NLFAULTINJECTION_LDFLAGS:--}
   Nlfaultinjection link libraries                  : ${NLFAULTINJECTION_LIBS:--}
+  Nlfaultinjection makedir                         : ${NLFAULTINJECTION_MAKEDIR:--}
   Sockets compile flags                            : ${SOCKETS_CPPFLAGS:--}
   Sockets link flags                               : ${SOCKETS_LDFLAGS:--}
   Sockets link libraries                           : ${SOCKETS_LIBS:--}
@@ -2053,5 +2067,4 @@ AC_MSG_NOTICE([
   Link flags                                       : ${LDFLAGS:--}
   Link libraries                                   : ${LIBS}
   Fuzzing Enabled                                  : ${enable_fuzzing}
-  Make Dirs                                        : ${MAKEDIRS:--}
 ])

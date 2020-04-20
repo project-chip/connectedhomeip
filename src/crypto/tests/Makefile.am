@@ -47,6 +47,8 @@ AM_CPPFLAGS                                    = \
     -I$(top_srcdir)/src/system                   \
     -I$(top_srcdir)/src/include/                 \
     -I$(top_srcdir)/src/crypto                   \
+    $(NLASSERT_CPPFLAGS)                         \
+    $(NLUNIT_TEST_CPPFLAGS)                      \
     $(NULL)
 
 CHIP_LDADD                                      = \
@@ -57,7 +59,12 @@ MAKEDIR_TARGETS                                 = \
     $(CHIP_LDADD)                                 \
     $(NULL)
 
+MAKEDIRS                                       = \
+   $(NLUNIT_TEST_MAKEDIR)                        \
+   $(NULL)   
+
 COMMON_LDADD                                   = \
+    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)   \
     $(CHIP_LDADD)                                \
     $(NULL)
 

@@ -13,7 +13,7 @@ See "Getting Started" in repo/README.md.
 
 ### Subsequent Update
 
-Assuming the project copy of nlbuild-autotools was created with git
+Assuming the project copy of nlbuild-autotools was created with git  
 subtree, a subsequent update can be accomplished with the following,
 replacing HEAD with a named, tagged version if the HEAD commit is not
 what is desired.

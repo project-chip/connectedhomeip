@@ -16,7 +16,8 @@
 		"yzhang.markdown-all-in-one",
 		"eamodio.gitlens",
 		"yuichinukiyama.vscode-preview-server",
-		"aaron-bond.better-comments"
+		"aaron-bond.better-comments",
+		"foxundermoon.shell-format"
 	],
     // Use 'settings' to set *default* container specific settings.json values on container create. 
     // You can edit these settings after create using File > Preferences > Settings > Remote.

@@ -30,7 +30,7 @@
 #
 #       PROJECT_ROOT = $(realpath .)
 #
-#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/openweave-core/build/efr32
+#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/openweave-core/config/efr32
 #
 #       include $(BUILD_SUPPORT_DIR)/efr32-app.mk
 #       include $(BUILD_SUPPORT_DIR)/efr32-openweave.mk

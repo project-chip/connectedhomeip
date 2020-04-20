@@ -23,19 +23,19 @@ class LEDWidget
 {
 public:
     static void InitGpio(void);
-    void        Init(int ledNum);
-    void        Set(bool state);
-    void        Invert(void);
-    void        Blink(uint32_t changeRateMS);
-    void        Blink(uint32_t onTimeMS, uint32_t offTimeMS);
-    void        Animate();
+    void Init(int ledNum);
+    void Set(bool state);
+    void Invert(void);
+    void Blink(uint32_t changeRateMS);
+    void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
+    void Animate();
 
 private:
-    int64_t  mLastChangeTimeUS;
+    int64_t mLastChangeTimeUS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
-    int      mLedNum;
-    bool     mState;
+    int mLedNum;
+    bool mState;
 
     void DoSet(bool state);
 };

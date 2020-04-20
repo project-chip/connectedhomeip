@@ -66,7 +66,7 @@ ANDROID_STL_INCLUDES            = $(foreach dir,$(ANDROID_STL_INCLUDE_DIRS_$(AND
 # Tools and Executables
 #
 
-android-ndk-which               = $(shell $(AbsTopSourceDir)/build/scripts/android-ndk-which --ndk-home $(ANDROID_NDK_HOME) $(1) $(TARGET_ABI))
+android-ndk-which               = $(shell $(AbsTopSourceDir)/scripts/android-ndk-which --ndk-home $(ANDROID_NDK_HOME) $(1) $(TARGET_ABI))
 
 AR                              = $(call android-ndk-which,ar)
 AS                              = $(call android-ndk-which,as)
@@ -114,7 +114,7 @@ INCLUDES                       	+= -isystem $(ANDROID_NDK_HOME)/sysroot/usr/incl
 #
 # Compilation/Build Flags
 #
- 
+
 CPPFLAGS                        = --sysroot=$(ABI_SYSROOT) $(DEFINES) $(INCLUDES) $(ABI_CPPFLAGS)
 CFLAGS                          = $(CPPFLAGS) -ffunction-sections -funwind-tables $(ABI_CFLAGS)
 CXXFLAGS                        = $(CPPFLAGS) -fno-rtti $(ABI_CXXFLAGS)
@@ -142,7 +142,7 @@ CONFIGURE_OPTIONS               = --disable-cocoa \
 ifeq ($(DEBUG),1)
 CONFIGURE_OPTIONS              	+= --enable-debug --enable-optimization=no
 else
-CONFIGURE_OPTIONS              	+= 
+CONFIGURE_OPTIONS              	+=
 endif
 
 
@@ -162,7 +162,7 @@ TopResultDir                    = $(ResultPath)
 AbsTopResultDir                 = $(PWD)/$(TopResultDir)
 
 # NB: Regardless of where JAVA_HOME points, always use the JNI headers from the Android NDK,
-# and only include the top-most directory (include), not the system directory (include/linux). 
+# and only include the top-most directory (include), not the system directory (include/linux).
 # Because the NDK mixes the JNI headers in with the linux headers, listing the system
 # directory in the -I flags will result in strange compilation errors.  And unlike the standard
 # Java jni.h, the jni.h that comes with the Android NDK does not depend on any system-specific
@@ -257,7 +257,7 @@ JNI_INCLUDE_DIRS="$(JNI_INCLUDE_DIRS)" \
 --host=$(ABI_CONFIG_TUPLE_$(1)) \
 --with-sysroot=$(ABI_SYSROOT) \
 --with-libtool-sysroot=$(ABI_SYSROOT) \
---with-chip-project-includes=$(AbsTopSourceDir)/build/config/android \
+--with-chip-project-includes=$(AbsTopSourceDir)/config/android \
 --prefix=/ \
 --exec-prefix=/$(ABI_CONFIG_TUPLE_$(1)) \
 $(CONFIGURE_OPTIONS))
@@ -444,7 +444,7 @@ $(TopResultDir) $(BUILD_DIRS):
 
 help:
 	$(ECHO) ""
-	$(ECHO) "Type 'make -f $(firstword $(MAKEFILE_LIST))' to build CHIP for Android for the following" 
+	$(ECHO) "Type 'make -f $(firstword $(MAKEFILE_LIST))' to build CHIP for Android for the following"
 	$(ECHO) "API level and ABIs: "
 	$(ECHO) ""
 	$(ECHO) "    API Level $(ANDROID_API)"

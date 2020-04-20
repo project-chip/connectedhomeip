@@ -1,4 +1,4 @@
-/***************************************************************************//**
+/*******************************************************************************
  * @file
  * @brief init_mcu.h
  *******************************************************************************
@@ -37,14 +37,13 @@ extern "C" {
  * for self use on custom boards.
  */
 
-//This is a Silicon Labs radio board, the CTUNE value can be read out from EEPROM
-#define MFG_CTUNE_EN   1
+// This is a Silicon Labs radio board, the CTUNE value can be read out from EEPROM
+#define MFG_CTUNE_EN 1
 
-
-//Address for CTUNE in User page
+// Address for CTUNE in User page
 #define MFG_CTUNE_ADDR 0x0FE00100UL
-//Value of the CTUNE in User page
-#define MFG_CTUNE_VAL  (*((uint16_t *) (MFG_CTUNE_ADDR)))
+// Value of the CTUNE in User page
+#define MFG_CTUNE_VAL (*((uint16_t *) (MFG_CTUNE_ADDR)))
 
 void initMcu(void);
 
