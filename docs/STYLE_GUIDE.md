@@ -2,8 +2,8 @@
 
 CHIP documentation lives here:
 
-- **GitHub** — All guides and tutorials across the complete
-  [Project-CHIP organization](https://github.com/project-chip).
+-   **GitHub** — All guides and tutorials across the complete
+    [Project-CHIP organization](https://github.com/project-chip).
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for general information on
 contributing to this project.

@@ -5,17 +5,17 @@ Linux or MacOS.
 
 Tested on:
 
-- MacOS
-- Ubuntu 18.04
+-   MacOS
+-   Ubuntu 18.04
 
 Build system features:
 
-- Package management: 'make dist' and 'make distcheck'
-- Cross-platform handling: (Linux, Darwin, iOS, Android, embedded arm, etc.)
-- Multiple compiler support: clang, GCC
-- Integrates automated testing framework: 'make check'
-- Code style enforcement: 'make pretty' and 'make pretty-check' integration with
-  clang-format
+-   Package management: 'make dist' and 'make distcheck'
+-   Cross-platform handling: (Linux, Darwin, iOS, Android, embedded arm, etc.)
+-   Multiple compiler support: clang, GCC
+-   Integrates automated testing framework: 'make check'
+-   Code style enforcement: 'make pretty' and 'make pretty-check' integration
+    with clang-format
 
 Assuming you have all the required tools installed, the system will build the
 code, build a distribution, tidy, format, run tests, and run code coverage on
@@ -26,12 +26,12 @@ the entire tree. Tests are built into the make system.
 To take advantage of all the current capabilities of the make system, you'll
 want:
 
-- Bash 4.0 or greater
-- GNU make, automake, autoconf, libtool
-- C and C++ compilers
-- clang-tidy
-- clang-format-9
-- gcov
+-   Bash 4.0 or greater
+-   GNU make, automake, autoconf, libtool
+-   C and C++ compilers
+-   clang-tidy
+-   clang-format-9
+-   gcov
 
 #### How to install tool prerequisites on Linux
 
@@ -102,43 +102,43 @@ Where `<CONFIG>` is something that describes what configuration (as described by
 `<CONFIG ARGUMENTS>`) of the tree you're planning to build, or simply `out` if
 you're not feeling creative.
 
-- [x] **Build all source, libraries, and tests**
+-   [x] **Build all source, libraries, and tests**
 
 ```
 make
 ```
 
-- [x] **Build distribution**
+-   [x] **Build distribution**
 
 ```
 make dist
 ```
 
-- [x] **Build and check distribution, running all functional and unit tests**
+-   [x] **Build and check distribution, running all functional and unit tests**
 
 ```
 make distcheck
 ```
 
-- [x] **Run tests**
+-   [x] **Run tests**
 
 ```
 make check
 ```
 
-- [x] **Verify coding style conformance**
+-   [x] **Verify coding style conformance**
 
 ```
 make pretty-check
 ```
 
-- [x] **Auto-enforce coding style**
+-   [x] **Auto-enforce coding style**
 
 ```
 make pretty
 ```
 
-- [x] **Build just one module in a subdirectory**
+-   [x] **Build just one module in a subdirectory**
 
 Either enter the desired subdirectory directly and run `make` or pass the
 desired subdirectory to `make -C`.
@@ -165,13 +165,13 @@ ar: `u' modifier ignored since `D' is the default (see `U')
 make[1]: Leaving directory 'src/system'
 ```
 
-- [x] **Add new source folder** Add the folder to `src/` Update
-      `src/Makefile.am` to add the folder Update `AC_CONFIG_FILES` in
-      `configure.ac`
+-   [x] **Add new source folder** Add the folder to `src/` Update
+        `src/Makefile.am` to add the folder Update `AC_CONFIG_FILES` in
+        `configure.ac`
 
 And then build as needed.
 
-- [x] **Clean out entire source tree**
+-   [x] **Clean out entire source tree**
 
 This will clear out all build artifacts, including those created by
 `./bootstrap`.
@@ -226,9 +226,9 @@ Due to its leverage of GNU autotools, if you want to modify or otherwise
 maintain the CHIP build system, the following additional packages are required
 and are invoked by `bootstrap`:
 
-- autoconf
-- automake
-- libtool
+-   autoconf
+-   automake
+-   libtool
 
 Instructions for installing these tools is in the Tool Prerequisites section
 above.
