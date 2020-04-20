@@ -42,6 +42,9 @@ if CHIP_BUILD_TESTS
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
     -I$(top_srcdir)/src/lib                             \
+    $(NLASSERT_CPPFLAGS)                                \
+    $(NLIO_CPPFLAGS)                                    \
+    $(NLUNIT_TEST_CPPFLAGS)                             \
     $(LWIP_CPPFLAGS)                                    \
     $(SOCKETS_CPPFLAGS)                                 \
     $(PTHREAD_CFLAGS)                                   \
@@ -56,12 +59,19 @@ MAKEDIR_TARGETS                                       = \
     $(CHIP_LDADD)                                       \
     $(NULL)
 
-COMMON_LDADD                                          = \
-    $(COMMON_LDFLAGS)                                   \
-    $(CHIP_LDADD)                                       \
-    $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
-    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
-    $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
+MAKEDIRS                                              = \
+    $(NLFAULTINJECTION_MAKEDIR)                         \
+    $(NLUNIT_TEST_MAKEDIR)                              \
+    $(NULL)
+
+COMMON_LDADD                                          =  \
+    $(COMMON_LDFLAGS)                                    \
+    $(CHIP_LDADD)                                        \
+    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS) \
+    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)           \
+    $(LWIP_LDFLAGS) $(LWIP_LIBS)                         \
+    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                   \
+    $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                    \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.

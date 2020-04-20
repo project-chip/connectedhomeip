@@ -35,6 +35,8 @@ libSupportLayer_a_CPPFLAGS          = \
     -I$(top_srcdir)/src               \
     -I$(top_srcdir)/src/lib           \
     -I$(top_srcdir)/src/include       \
+    $(NLASSERT_CPPFLAGS)              \
+    $(NLFAULTINJECTION_CPPFLAGS)      \
     $(NULL)
 
 libSupportLayer_a_SOURCES           = $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)

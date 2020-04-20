@@ -31,11 +31,19 @@
 #        (all _OBJECTS) defined by a Makefile.am to depend upon an invocation
 #        of `$(MAKE) -C <DIR>` in that directory.
 #
+
+# same as ifdef MAKEDIRS || MAKEDIR_TARGETS
+ifneq ($(strip $(MAKEDIRS)$(MAKEDIR_TARGETS)),)
+
+.PHONY: makedirs-force
+makedirs-force: # no rules, please always build ;)
+
+endif # ifneq ($(strip $(MAKEDIRS)$(MAKEDIR_TARGETS)),)
+
 ifdef MAKEDIRS
 
-.PHONY: makedirs force
+.PHONY: makedirs
 
-force: # no rules, please always build ;)
 
 # The way we make a MAKEDIR
 define makedirs-make
@@ -54,7 +62,7 @@ $(foreach objects,$(filter %_OBJECTS,$(.VARIABLES)),\
    $(foreach object,$($(objects)),\
    $(eval $(call makedirs-depends,$(object)))))
 
-makedirs: force
+makedirs: makedirs-force
 	$(foreach dir,$(MAKEDIRS),$(call makedirs-make,$(dir)))
 
 endif # ifdef MAKEDIRS
@@ -62,7 +70,7 @@ endif # ifdef MAKEDIRS
 ifdef MAKEDIR_TARGETS
 # The way me make a MAKEDIR_TARGET
 define makedirs-makedir-target-rule
-$1: force
+$1: makedirs-force
 	$(MAKE) -C $$(dir $$(@)) $$(notdir $$(@))
 endef # makedirs-makedir-target-rule
 
