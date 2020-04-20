@@ -2003,6 +2003,7 @@ AC_MSG_NOTICE([
   Nlfaultinjection link flags                      : ${NLFAULTINJECTION_LDFLAGS:--}
   Nlfaultinjection link libraries                  : ${NLFAULTINJECTION_LIBS:--}
   Nlfaultinjection makedir                         : ${NLFAULTINJECTION_MAKEDIR:--}
+  Sockets compile flags                            : ${SOCKETS_CPPFLAGS:--}
   Sockets link flags                               : ${SOCKETS_LDFLAGS:--}
   Sockets link libraries                           : ${SOCKETS_LIBS:--}
   PThreads compile flags                           : ${PTHREAD_CFLAGS:--}
