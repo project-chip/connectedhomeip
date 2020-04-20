@@ -66,7 +66,7 @@ restylers:
           - "**/*.m"
       interpreters: []
     - name: prettier-json
-      image: restyled/restyler-prettier:v2.0.2-1
+      image: restyled/restyler-prettier:v1.19.1-2
       enabled: true
       command:
           - prettier
@@ -86,7 +86,7 @@ restylers:
           - "**/*.md"
           - "**/*.markdown"
     - name: prettier-yaml
-      image: restyled/restyler-prettier:v2.0.2-1
+      image: restyled/restyler-prettier:v1.19.1-2
       enabled: true
       include:
           - "**/*.yml"

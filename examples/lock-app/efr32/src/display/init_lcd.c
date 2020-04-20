@@ -19,10 +19,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "init_lcd.h"
+
 #include "display.h"
 #include "dmd.h"
 #include "glib.h"
-#include "init_lcd.h"
 #include "sample_qr_code.h"
 
 static GLIB_Context_t glibContext;
