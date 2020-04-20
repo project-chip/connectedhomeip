@@ -276,7 +276,7 @@ ac_cv_have_decl_clock_gettime=no \
 --target=$($(1)_arch_AUTOTOOLS)-$(TargetTupleStem) \
 --prefix=/ \
 --exec-prefix=/$(1)-$(TargetTuple) \
---with-chip-project-includes=$(AbsTopSourceDir)/build/config/ios \
+--with-chip-project-includes=$(AbsTopSourceDir)/config/ios \
 --with-logging-style=external \
 --enable-cocoa \
 --disable-docs \

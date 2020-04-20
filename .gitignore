@@ -19,13 +19,6 @@ build/*
 !build/README.md
 !build/autoconf/m4/chip_check_project_config_includes.m4
 !build/autoconf/m4/nl_with_lwip.m4
-!build/config/standalone/CHIPProjectConfig.h
-!build/config/standalone/SystemProjectConfig.h
-!build/config/standalone/darwin/CHIPProjectConfig.h
-!build/config/standalone/no-openssl/CHIPProjectConfig.h
-!build/efr32/
-!build/esp32/
-!build/nrf5/
 !build/scripts/gen-chip-version
 examples/**/build
 config.log

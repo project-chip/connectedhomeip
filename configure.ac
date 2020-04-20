@@ -1274,23 +1274,23 @@ AC_LANG_PUSH([C++])
 
 # SystemLayer
 
-CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-system-project-includes, SYSTEM_PROJECT_CONFIG_INCLUDE, SystemProjectConfig.h, CHIP System Layer, ${ac_abs_confdir}/build/config/standalone)
+CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-system-project-includes, SYSTEM_PROJECT_CONFIG_INCLUDE, SystemProjectConfig.h, CHIP System Layer, ${ac_abs_confdir}/config/standalone)
 
 # BleLayer
 
 if test ${CONFIG_NETWORK_LAYER_BLE} = 1; then
-    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-ble-project-includes, BLE_PROJECT_CONFIG_INCLUDE, BleProjectConfig.h, CHIP BLE Layer, ${ac_abs_confdir}/build/config/standalone)
+    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-ble-project-includes, BLE_PROJECT_CONFIG_INCLUDE, BleProjectConfig.h, CHIP BLE Layer, ${ac_abs_confdir}/config/standalone)
 fi
 
 # InetLayer
 
 if test ${CONFIG_NETWORK_LAYER_INET} = 1; then
-    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-inet-project-includes, INET_PROJECT_CONFIG_INCLUDE, InetProjectConfig.h, CHIP Inet Layer, ${ac_abs_confdir}/build/config/standalone)
+    CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-inet-project-includes, INET_PROJECT_CONFIG_INCLUDE, InetProjectConfig.h, CHIP Inet Layer, ${ac_abs_confdir}/config/standalone)
 fi
 
 # Core
 
-CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-project-includes, CHIP_PROJECT_CONFIG_INCLUDE, CHIPProjectConfig.h, CHIP Core, ${ac_abs_confdir}/build/config/standalone)
+CHIP_CHECK_PROJECT_CONFIG_INCLUDES(chip-project-includes, CHIP_PROJECT_CONFIG_INCLUDE, CHIPProjectConfig.h, CHIP Core, ${ac_abs_confdir}/config/standalone)
 
 # Device Layer
 

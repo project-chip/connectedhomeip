@@ -257,7 +257,7 @@ JNI_INCLUDE_DIRS="$(JNI_INCLUDE_DIRS)" \
 --host=$(ABI_CONFIG_TUPLE_$(1)) \
 --with-sysroot=$(ABI_SYSROOT) \
 --with-libtool-sysroot=$(ABI_SYSROOT) \
---with-chip-project-includes=$(AbsTopSourceDir)/build/config/android \
+--with-chip-project-includes=$(AbsTopSourceDir)/config/android \
 --prefix=/ \
 --exec-prefix=/$(ABI_CONFIG_TUPLE_$(1)) \
 $(CONFIGURE_OPTIONS))
