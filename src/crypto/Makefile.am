@@ -43,7 +43,7 @@ libChipCrypto_a_SOURCES                                       = \
     CHIPBase+Crypto.c                                           \
    $(NULL)
 
-if CHIP_WITH_OPENSSL
+if CHIP_CRYPTO_OPENSSL
 libChipCrypto_a_SOURCES                                      += \
     CHIPOpenSSL.c                                               \
     CHIPCryptoPALOpenSSL.cpp                                    \
