@@ -9,8 +9,8 @@ workflow [here](https://code.visualstudio.com/docs/remote/containers).
 
 Tested on:
 
-- MacOS 10.5
-- Windows 10 Pro + WSL + Ubuntu 18 LTS
+-   MacOS 10.5
+-   Windows 10 Pro + WSL + Ubuntu 18 LTS
 
 ## Setup Steps
 
@@ -67,17 +67,17 @@ same base configuration and build.
 
 ### Current base tasks are listed here
 
-- Main Build - Full build and test of the tree
-- Auto-enforce coding style
-- Verify coding style conformance
-- Run Unit and Functional Tests
-- Run Distribution Generation - Build and check distribution, running all
-  functional and unit tests
-- Run Code Coverage (via 'make coverage')
-- Clean build - Full clean build and test of the tree
-- Bootstrap the source tree - On a clean tree, pull in the third party
-  dependencies required
-- Clean Tree - Full (and destructive) git clean of the tree
+-   Main Build - Full build and test of the tree
+-   Auto-enforce coding style
+-   Verify coding style conformance
+-   Run Unit and Functional Tests
+-   Run Distribution Generation - Build and check distribution, running all
+    functional and unit tests
+-   Run Code Coverage (via 'make coverage')
+-   Clean build - Full clean build and test of the tree
+-   Bootstrap the source tree - On a clean tree, pull in the third party
+    dependencies required
+-   Clean Tree - Full (and destructive) git clean of the tree
 
 ## Launch Tasks
 
@@ -93,28 +93,28 @@ the same base debuging setup.
 
 ### Before submitting a PR, make sure these commands run and succeed
 
-- Run task: "Verify coding style conformance"
-- Run task: "Run Distribution Generation"
+-   Run task: "Verify coding style conformance"
+-   Run task: "Run Distribution Generation"
 
 ## Common Issues
 
-- [Missing Git credential](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
-- [Missing Git SSH keys](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
-- [Using GPG signing keys](https://github.com/microsoft/vscode-remote-release/issues/72)
+-   [Missing Git credential](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
+-   [Missing Git SSH keys](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container)
+-   [Using GPG signing keys](https://github.com/microsoft/vscode-remote-release/issues/72)
 
 ## Visual Studio Code FAQ
 
-- _Highly_ recommend you read through
-  [this page](https://code.visualstudio.com/docs/getstarted/settings) to learn
-  how to configure Visual Studio Code to suit your style:
-  <https://code.visualstudio.com/docs/getstarted/settings>
-- Great primer set of videos
-  [here](https://code.visualstudio.com/docs/getstarted/introvideos)
-  <https://code.visualstudio.com/docs/getstarted/introvideos>
+-   _Highly_ recommend you read through
+    [this page](https://code.visualstudio.com/docs/getstarted/settings) to learn
+    how to configure Visual Studio Code to suit your style:
+    <https://code.visualstudio.com/docs/getstarted/settings>
+-   Great primer set of videos
+    [here](https://code.visualstudio.com/docs/getstarted/introvideos)
+    <https://code.visualstudio.com/docs/getstarted/introvideos>
 
 ## Visual Studio Code Recommended Settings
 
-- Configure the editor to format on save, in your Visual Studio Code Settings:
-  `"editor.formatOnSave": true`
-- Configure the clang-format extension `@ext:xaver.clang-format`, it is
-  installed in the docker container. Make sure all languages are enabled
+-   Configure the editor to format on save, in your Visual Studio Code Settings:
+    `"editor.formatOnSave": true`
+-   Configure the clang-format extension `@ext:xaver.clang-format`, it is
+    installed in the docker container. Make sure all languages are enabled

@@ -31,6 +31,9 @@
     "[properties]": {
         "editor.defaultFormatter": "foxundermoon.shell-format"
     },
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
     "files.associations": {
         "iostream": "cpp",
         "array": "cpp",

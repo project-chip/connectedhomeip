@@ -15,24 +15,24 @@ changes and that they follow the project
 Currently these are the requirements to becoming a member of the
 [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip)
 
-- Must be a member of the Zigbee Alliance CHIP TSG Working Group
-- Have signed the Zigbee CHIP WG CLA
-- Have signed up as a Tiger team member in one of the follow roles: Lead, Spec
-  Writer, Developer (or exception granted), Code Approvers, or Support Staff
-- Have approval from your company's official approver
+-   Must be a member of the Zigbee Alliance CHIP TSG Working Group
+-   Have signed the Zigbee CHIP WG CLA
+-   Have signed up as a Tiger team member in one of the follow roles: Lead, Spec
+    Writer, Developer (or exception granted), Code Approvers, or Support Staff
+-   Have approval from your company's official approver
 
 ## Becoming a Contributor
 
 Currently these are the requirements to becoming a member of the
 [Project-CHIP Repository](https://github.com/project-chip/connectedhomeip)
 
-- Must be a member of the Zigbee Alliance CHIP TSG Working Group
-- Have signed the Zigbee CHIP WG CLA
-- Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
-- Agree to the [License](./LICENSE)
-- Have signed up as a Tiger team member in one of the follow roles: Lead, Spec
-  Writer, Developer (or exception granted), Code Approvers, or Support Staff
-- Have approval from your company's official approver
+-   Must be a member of the Zigbee Alliance CHIP TSG Working Group
+-   Have signed the Zigbee CHIP WG CLA
+-   Agree to the [Code of Conduct](./CODE_OF_CONDUCT.md)
+-   Agree to the [License](./LICENSE)
+-   Have signed up as a Tiger team member in one of the follow roles: Lead, Spec
+    Writer, Developer (or exception granted), Code Approvers, or Support Staff
+-   Have approval from your company's official approver
 
 ## Bugs
 
@@ -50,15 +50,15 @@ You can request a new feature by
 If you would like to implement a new feature, please consider the scope of the
 new feature:
 
-- _Large feature_: first
-  [submit a GitHub Issue](https://github.com/project-chip/connectedhomeip/issues/new)
-  and communicate your proposal so that the community can review and provide
-  feedback. Getting early feedback will help ensure your implementation work is
-  accepted by the community. This will also allow us to better coordinate our
-  efforts and minimize duplicated effort.
+-   _Large feature_: first
+    [submit a GitHub Issue](https://github.com/project-chip/connectedhomeip/issues/new)
+    and communicate your proposal so that the community can review and provide
+    feedback. Getting early feedback will help ensure your implementation work
+    is accepted by the community. This will also allow us to better coordinate
+    our efforts and minimize duplicated effort.
 
-- _Small feature_: can be implemented and directly
-  [submitted as a Pull Request](#submitting-a-pull-request).
+-   _Small feature_: can be implemented and directly
+    [submitted as a Pull Request](#submitting-a-pull-request).
 
 ## Contributing Code
 
@@ -159,33 +159,33 @@ on occasion.
 
 CHIP considers there to be a few different types of pull requests:
 
-- Trivial bug fix
-- - Decription 1
-- - Decription 2
-- Small Bug fix
-- - Decription 1
-- - Decription 2
-- Bug Fix
-- - Decription 1
-- - Decription 2
-- Significiant Change
-- - Decription 1
-- - Decription 2
-- Feature
-- - Decription 1
-- - Decription 2
-- Architecture Change
-- - Decription 1
-- - Decription 2
+-   Trivial bug fix
+-   -   Decription 1
+-   -   Decription 2
+-   Small Bug fix
+-   -   Decription 1
+-   -   Decription 2
+-   Bug Fix
+-   -   Decription 1
+-   -   Decription 2
+-   Significiant Change
+-   -   Decription 1
+-   -   Decription 2
+-   Feature
+-   -   Decription 1
+-   -   Decription 2
+-   Architecture Change
+-   -   Decription 1
+-   -   Decription 2
 
 ### Prior to review, all changes require:
 
-- [GitHub Workflows](.github/workflows) pass
-- [Certification Tests](tests/certification/README.md) pass
-- [Fuzz Tests](tests/fuzz/README.md) pass
-- [Integration Tests](tests/integration/README.md) pass
-- Linting passes
-- Code style passes
+-   [GitHub Workflows](.github/workflows) pass
+-   [Certification Tests](tests/certification/README.md) pass
+-   [Fuzz Tests](tests/fuzz/README.md) pass
+-   [Integration Tests](tests/integration/README.md) pass
+-   Linting passes
+-   Code style passes
 
 ### Review Requirements
 
@@ -213,13 +213,13 @@ branch and update.
 
 #### Merge Requirements
 
-- Passes [Review Requirements](#review-requirements)
-- [GitHub Workflows](.github/workflows) pass
-- [Certification Tests](tests/certification/README.md) pass
-- [Fuzz Tests](tests/fuzz/README.md) pass
-- [Integration Tests](tests/integration/README.md) pass
-- Linting passes
-- Code style passes
+-   Passes [Review Requirements](#review-requirements)
+-   [GitHub Workflows](.github/workflows) pass
+-   [Certification Tests](tests/certification/README.md) pass
+-   [Fuzz Tests](tests/fuzz/README.md) pass
+-   [Integration Tests](tests/integration/README.md) pass
+-   Linting passes
+-   Code style passes
 
 **When can I merge?** After these have been satisfied, any reviewer, or the
 originator can merge the PR into master.

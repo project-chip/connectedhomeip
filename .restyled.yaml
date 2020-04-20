@@ -69,28 +69,36 @@ restylers:
       image: restyled/restyler-prettier:v2.0.2-1
       enabled: true
       command:
-        - prettier
-        - "--write"
+          - prettier
+          - "--write"
       arguments: []
       include:
           - "**/*.json"
       interpreters: []
     - name: prettier-markdown
+      image: restyled/restyler-prettier:v1.19.1-2
+      command:
+          - prettier
+          - "--write"
+      arguments: []
       enabled: true
       include:
           - "**/*.md"
           - "**/*.markdown"
     - name: prettier-yaml
+      image: restyled/restyler-prettier:v2.0.2-1
       enabled: true
       include:
           - "**/*.yml"
           - "**/*.yaml"
     - name: shellharden
+      image: restyled/restyler-shellharden:v4.1.1-2
       enabled: true
       include:
           - "**/*.sh"
           - "**/*.bash"
     - name: shfmt
+      image: restyled/restyler-shfmt:v3.0.1
       enabled: true
       include:
           - "**/*.sh"
