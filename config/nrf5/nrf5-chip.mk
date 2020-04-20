@@ -113,7 +113,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --disable-docs \
     --disable-java \
     --disable-device-manager \
-    --with-mbedtls=internal
+    --with-crypto=mbedtls
 
 # Enable / disable optimization.
 ifeq ($(OPT),1)
