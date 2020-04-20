@@ -1543,7 +1543,6 @@ NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
         NLFAULTINJECTION_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlfaultinjection/repo/include"
         NLFAULTINJECTION_LDFLAGS="-L${ac_pwd}/third_party/nlfaultinjection/repo/src"
         NLFAULTINJECTION_LIBS="-lnlfaultinjection"
-        NLFAULTINJECTION_MAKEDIR=${ac_pwd}/third_party/nlfaultinjection/repo
     ],
     [
         # Check for required nlfaultinjection headers.
@@ -1614,7 +1613,6 @@ if test "${nl_cv_build_tests}" = "yes"; then
             NLUNIT_TEST_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlunit-test/repo/src"
             NLUNIT_TEST_LDFLAGS="-L${ac_pwd}/third_party/nlunit-test/repo/src"
             NLUNIT_TEST_LIBS="-lnlunit-test"
-            NLUNIT_TEST_MAKEDIR=${ac_pwd}/third_party/nlunit-test/repo
         ],
         [
             # Check for required nlunit-test headers.
@@ -1858,32 +1856,6 @@ CPPFLAGS="${CPPFLAGS} ${MBEDTLS_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${MBEDTLS_LDFLAGS}"
 LIBS="${LIBS} ${MBEDTLS_LIBS}"
 
-# Add any nlunit-test CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${NLUNIT_TEST_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${NLUNIT_TEST_LDFLAGS}"
-LIBS="${LIBS} ${NLUNIT_TEST_LIBS}"
-MAKEDIRS="${MAKEDIRS} ${NLUNIT_TEST_MAKEDIR}"
-
-# Add any nlio CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${NLIO_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${NLIO_LDFLAGS}"
-LIBS="${LIBS} ${NLIO_LIBS}"
-
-# Add any nlassert CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${NLASSERT_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${NLASSERT_LDFLAGS}"
-LIBS="${LIBS} ${NLASSERT_LIBS}"
-
-# Add any nlfaultinjection CPPFLAGS, LDFLAGS, and LIBS
-
-CPPFLAGS="${CPPFLAGS} ${NLFAULTINJECTION_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${NLFAULTINJECTION_LDFLAGS}"
-LIBS="${LIBS} ${NLFAULTINJECTION_LIBS}"
-MAKEDIRS="${MAKEDIRS} ${NLFAULTINJECTION_MAKEDIR}"
-
 # Add any code coverage CPPFLAGS, LDFLAGS, and LIBS
 
 CPPFLAGS="${CPPFLAGS} ${NL_COVERAGE_CPPFLAGS}"
@@ -1896,9 +1868,6 @@ if test "${nl_had_CPPFLAGS_werror}" = "no"; then
     CPPFLAGS="${CPPFLAGS} ${NL_WERROR_CPPFLAGS}"
 fi
 
-# Export MAKEDIRS
-
-AC_SUBST(MAKEDIRS, [${MAKEDIRS}])
 
 # At this point, we can restore the compiler flags to whatever the
 # user passed in, now that we're clear of an -Werror issues by
@@ -1918,14 +1887,17 @@ AC_SUBST(PRETTY_CHECK_ARGS, [""])
 # Configure any autotools-based subdirectories
 if test "${nl_with_nlunit_test}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlunit-test/repo])
+AC_SUBST(NLUNIT_TEST_MAKEDIR,["${ac_pwd}/third_party/nlunit-test/repo"])
 fi
 
 if test "${nl_with_nlio}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlio/repo])
+AC_SUBST(NLIO_MAKEDIR,["${ac_pwd}/third_party/nlunio/repo"])
 fi
 
 if test "${nl_with_nlassert}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlassert/repo])
+AC_SUBST(NLASSERT_MAKEDIR,["${ac_pwd}/third_party/nlassert/repo"])
 fi
 
 if test "${nl_with_mbedtls}" = "internal"; then
@@ -1934,6 +1906,7 @@ fi
 
 if test "${nl_with_nlfaultinjection}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
+AC_SUBST(NLFAULTINJECTION_MAKEDIR,["${ac_pwd}/third_party/nlfaultinjection/repo"])
 fi
 
 #
@@ -2051,18 +2024,22 @@ AC_MSG_NOTICE([
   Nlunit-test compile flags                        : ${NLUNIT_TEST_CPPFLAGS:--}
   Nlunit-test link flags                           : ${NLUNIT_TEST_LDFLAGS:--}
   Nlunit-test link libraries                       : ${NLUNIT_TEST_LIBS:--}
+  Nlunit-test makedir                              : ${NLUNIT_TEST_MAKEDIR:--}
   Nlio source                                      : ${nl_with_nlio:--}
   Nlio compile flags                               : ${NLIO_CPPFLAGS:--}
   Nlio link flags                                  : ${NLIO_LDFLAGS:--}
   Nlio link libraries                              : ${NLIO_LIBS:--}
+  Nlio makedir                                     : ${NLIO_MAKDIR:--}
   Nlassert source                                  : ${nl_with_nlassert:--}
   Nlassert compile flags                           : ${NLASSERT_CPPFLAGS:--}
   Nlassert link flags                              : ${NLASSERT_LDFLAGS:--}
   Nlassert link libraries                          : ${NLASSERT_LIBS:--}
+  Nlassert makedir                                 : ${NLASSERT_MAKEDIR:--}
   Nlfaultinjection source                          : ${nl_with_nlfaultinjection:--}
   Nlfaultinjection compile flags                   : ${NLFAULTINJECTION_CPPFLAGS:--}
   Nlfaultinjection link flags                      : ${NLFAULTINJECTION_LDFLAGS:--}
   Nlfaultinjection link libraries                  : ${NLFAULTINJECTION_LIBS:--}
+  Nlfaultinjection makedir                         : ${NLFAULTINJECTION_MAKEDIR:--}
   Sockets compile flags                            : ${SOCKETS_CPPFLAGS:--}
   Sockets link flags                               : ${SOCKETS_LDFLAGS:--}
   Sockets link libraries                           : ${SOCKETS_LIBS:--}
@@ -2090,5 +2067,4 @@ AC_MSG_NOTICE([
   Link flags                                       : ${LDFLAGS:--}
   Link libraries                                   : ${LIBS}
   Fuzzing Enabled                                  : ${enable_fuzzing}
-  Make Dirs                                        : ${MAKEDIRS:--}
 ])

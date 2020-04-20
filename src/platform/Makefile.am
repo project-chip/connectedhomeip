@@ -80,6 +80,8 @@ libDeviceLayer_a_CPPFLAGS               = \
     -I$(top_srcdir)/src/lib               \
     -I$(top_srcdir)/src/system            \
     -I$(top_srcdir)/src                   \
+    $(NLASSERT_CPPFLAGS)                  \
+    $(NLIO_CPPFLAGS)                      \
     $(LWIP_CPPFLAGS)                      \
     $(SOCKETS_CPPFLAGS)                   \
     $(NULL)
