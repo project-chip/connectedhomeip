@@ -156,8 +156,7 @@ STD_INC_DIRS += \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/plugin/pa-conversions                         \
     $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/SEGGER                             \
     $(EFR32_SDK_ROOT)/util/third_party/segger/systemview/Config/                            \
-    $(EFR32_SDK_ROOT)/util/plugin/plugin-common/fem-control                                 \
-    $(EFR32_SDK_ROOT)/util/third_party/mbedtls/sl_crypto/include
+    $(EFR32_SDK_ROOT)/util/plugin/plugin-common/fem-control
 
 ifeq ($(EFR32FAMILY), efr32mg12)
 STD_INC_DIRS += \
@@ -213,10 +212,6 @@ STD_CFLAGS = \
     -fshort-enums \
     --specs=nosys.specs
 
-MBEDTLS_FLAGS = \
-    -DMBEDTLS_CONFIG_FILE='"mbedtls-config.h"' \
-    -DMBEDTLS_USER_CONFIG_FILE='"efr32-chip-mbedtls-config.h"'
-
 STD_CXXFLAGS = \
     -fno-rtti \
     -fno-exceptions \
@@ -256,14 +251,12 @@ STD_LIBS = \
 ifeq ($(EFR32FAMILY), efr32mg12)
 STD_LIBS += \
     $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a \
-    $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG12P/GCC/libmbedtls.a \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a
 else
 ifeq ($(EFR32FAMILY), efr32mg21)
 STD_LIBS += \
     $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a \
-    $(EFR32_SDK_ROOT)/protocol/bluetooth/lib/EFR32MG21/GCC/libmbedtls.a \
     $(EFR32_SDK_ROOT)/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a \
     $(EFR32_SDK_ROOT)/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a
 endif
@@ -469,7 +462,7 @@ define CCRule
 $(call DepFileName,$1) : ;
 $(call ObjFileName,$1): $1 $(call DepFileName,$1) | $(OBJS_DIR) $(DEPS_DIR) $(STD_COMPILE_PREREQUISITES)
 	@echo "$$(HDR_PREFIX)CC $1"
-	$(NO_ECHO) $$(CCACHE) $$(CC) -c $$(STD_CFLAGS) $$(CFLAGS) $$(DEBUG_FLAGS) $$(OPT_FLAGS) $$(MBEDTLS_FLAGS) $$(DEFINE_FLAGS) $$(INC_FLAGS) -MT $$@ -MMD -MP -MF $(call DepFileName,$1).tmp -o $$@ $1
+	$(NO_ECHO) $$(CCACHE) $$(CC) -c $$(STD_CFLAGS) $$(CFLAGS) $$(DEBUG_FLAGS) $$(OPT_FLAGS) $$(DEFINE_FLAGS) $$(INC_FLAGS) -MT $$@ -MMD -MP -MF $(call DepFileName,$1).tmp -o $$@ $1
 	$(NO_ECHO)mv $(call DepFileName,$1).tmp $(call DepFileName,$1)
 $(NL)
 endef
@@ -479,7 +472,7 @@ define CXXRule
 $(call DepFileName,$1) : ;
 $(call ObjFileName,$1): $1 $(call DepFileName,$1) | $(OBJS_DIR) $(DEPS_DIR) $(STD_COMPILE_PREREQUISITES)
 	@echo "$$(HDR_PREFIX)CXX $1"
-	$(NO_ECHO) $$(CCACHE) $$(CXX) -c $$(AUTODEP_FLAGS) $$(STD_CFLAGS) $$(STD_CXXFLAGS) $$(CFLAGS) $$(CXXFLAGS) $$(DEBUG_FLAGS) $$(OPT_FLAGS) $$(MBEDTLS_FLAGS) $$(DEFINE_FLAGS) $$(INC_FLAGS) -MT $$@ -MMD -MP -MF $(call DepFileName,$1).tmp -o $$@ $1
+	$(NO_ECHO) $$(CCACHE) $$(CXX) -c $$(AUTODEP_FLAGS) $$(STD_CFLAGS) $$(STD_CXXFLAGS) $$(CFLAGS) $$(CXXFLAGS) $$(DEBUG_FLAGS) $$(OPT_FLAGS) $$(DEFINE_FLAGS) $$(INC_FLAGS) -MT $$@ -MMD -MP -MF $(call DepFileName,$1).tmp -o $$@ $1
 	$(NO_ECHO)mv $(call DepFileName,$1).tmp $(call DepFileName,$1)
 $(NL)
 endef
@@ -488,7 +481,7 @@ endef
 define ASRule
 $(call ObjFileName,$1): $1 | $(OBJS_DIR) $(STD_COMPILE_PREREQUISITES)
 	@echo "$$(HDR_PREFIX)AS $1"
-	$(NO_ECHO)$$(CC) -c -x assembler-with-cpp $$(STD_ASFLAGS) $$(ASFLAGS) $$(DEBUG_FLAGS) $$(OPT_FLAGS) $$(MBEDTLS_FLAGS) $$(DEFINE_FLAGS) $$(INC_FLAGS) -o $$@ $1
+	$(NO_ECHO)$$(CC) -c -x assembler-with-cpp $$(STD_ASFLAGS) $$(ASFLAGS) $$(DEBUG_FLAGS) $$(OPT_FLAGS) $$(DEFINE_FLAGS) $$(INC_FLAGS) -o $$@ $1
 $(NL)
 endef
 
