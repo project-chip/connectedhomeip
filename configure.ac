@@ -1358,9 +1358,11 @@ fi
 #
 # mbedTLS
 #
-if test "${with_mbedtls}" != "internal"; then
-    with_mbedtls="no"
-fi
+AC_ARG_WITH(mbedtls,
+    [AS_HELP_STRING([--with-mbedtls=<no/internal/external>],
+        [Specify if mbedTLS should be used, and how to link with it.])],
+    [],
+    [with_mbedtls="no"])
 
 NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
     [mbedTLS],
