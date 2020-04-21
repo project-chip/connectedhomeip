@@ -329,7 +329,7 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
                                         size_t & out_signature_length)
 {
     ERR_clear_error();
-    static_assert(kMinimum_ECDSA_Signature_Buffer_Length >= 4096, "kMinimum_ECDSA_Signature_Buffer_Length is too short");
+    static_assert(kMinimum_ECDSA_Signature_Buffer_Length >= 72, "kMinimum_ECDSA_Signature_Buffer_Length is too short");
 
     CHIP_ERROR error       = CHIP_NO_ERROR;
     int result             = 0;
@@ -357,8 +357,9 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
     ec_key = EC_KEY_new_by_curve_name(nid);
     VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
 
-    _hexKey = _createHexString(private_key, private_key_length);
-    BN_hex2bn(&pvt_key, _hexKey);
+    // _hexKey = _createHexString(private_key, private_key_length);
+    // BN_hex2bn(&pvt_key, _hexKey);
+    pvt_key = BN_bin2bn(private_key, private_key_length, pvt_key);
     VerifyOrExit(pvt_key != NULL, error = CHIP_ERROR_INTERNAL);
 
     result = EC_KEY_set_private_key(ec_key, pvt_key);
