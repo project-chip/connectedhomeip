@@ -34,7 +34,45 @@
 
 #define kKeyLengthInBits 256
 
+enum class DigestType
+{
+    SHA256
+};
+
+enum class ECName
+{
+    P256v1
+};
+
 using namespace chip::Crypto;
+
+static int _nidForCurve(ECName name)
+{
+    switch (name)
+    {
+    case ECName::P256v1:
+        return EC_curve_nist2nid("P-256");
+        break;
+
+    default:
+        return NID_undef;
+        break;
+    }
+}
+
+// Caller needs to free returned char *
+static char * _createHexString(const unsigned char * in, const size_t in_length)
+{
+    char * result        = (char *) calloc(in_length * 2, sizeof(char));
+    size_t current_index = 0;
+
+    for (size_t i = 0; i < in_length; i++)
+    {
+        snprintf(result + current_index, 3, "%02x", in[i]);
+        current_index += 2;
+    }
+    return result;
+}
 
 static bool _isValidTagLength(size_t tag_length)
 {
@@ -61,14 +99,10 @@ static void _logSSLError()
     }
 }
 
-static const EVP_MD * _digestForType(chip::Crypto::DigestType digestType)
+static const EVP_MD * _digestForType(DigestType digestType)
 {
     switch (digestType)
     {
-    case DigestType::SHA1:
-        return EVP_sha1();
-        break;
-
     case DigestType::SHA256:
         return EVP_sha256();
         break;
@@ -77,20 +111,6 @@ static const EVP_MD * _digestForType(chip::Crypto::DigestType digestType)
         return NULL;
         break;
     }
-}
-
-// Caller needs to free returned char *
-static char * _createHexString(const unsigned char * in, const size_t in_length)
-{
-    char * result        = (char *) calloc(in_length * 2, sizeof(char));
-    size_t current_index = 0;
-
-    for (size_t i = 0; i < in_length; i++)
-    {
-        snprintf(result + current_index, 3, "%02x", in[i]);
-        current_index += 2;
-    }
-    return result;
 }
 
 CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
@@ -304,41 +324,44 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const char * curve_name,
-                                        const unsigned char * private_key, const size_t private_key_length,
-                                        unsigned char ** out_buffer, size_t & out_length, DigestType digest)
+CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
+                                        const size_t private_key_length, unsigned char * out_signature,
+                                        size_t & out_signature_length)
 {
     ERR_clear_error();
+    static_assert(kMinimum_ECDSA_Signature_Buffer_Length >= 4096, "kMinimum_ECDSA_Signature_Buffer_Length is too short");
+
     CHIP_ERROR error       = CHIP_NO_ERROR;
     int result             = 0;
     EVP_MD_CTX * context   = NULL;
     int nid                = NID_undef;
     EC_KEY * ec_key        = NULL;
     EVP_PKEY * signing_key = NULL;
-    char * _hexString      = NULL;
-    BIGNUM * pvt_key_hex   = NULL;
+    char * _hexKey         = NULL;
+    BIGNUM * pvt_key       = NULL;
     const EVP_MD * md      = NULL;
+    ECName curve_name      = ECName::P256v1;
+    DigestType digest      = DigestType::SHA256;
+    size_t out_length      = 0;
 
     VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(curve_name != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    nid = EC_curve_nist2nid(curve_name);
+    nid = _nidForCurve(curve_name);
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(*out_buffer == NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    md = _digestForType(digest);
+    VerifyOrExit(md != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     ec_key = EC_KEY_new_by_curve_name(nid);
     VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
 
-    _hexString = _createHexString(private_key, private_key_length);
-    VerifyOrExit(_hexString != NULL, error = CHIP_ERROR_INTERNAL);
+    _hexKey = _createHexString(private_key, private_key_length);
+    BN_hex2bn(&pvt_key, _hexKey);
+    VerifyOrExit(pvt_key != NULL, error = CHIP_ERROR_INTERNAL);
 
-    BN_hex2bn(&pvt_key_hex, _hexString);
-    VerifyOrExit(pvt_key_hex != NULL, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_KEY_set_private_key(ec_key, pvt_key_hex);
+    result = EC_KEY_set_private_key(ec_key, pvt_key);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     signing_key = EVP_PKEY_new();
@@ -349,8 +372,6 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
 
     context = EVP_MD_CTX_create();
     VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
-    md = _digestForType(digest);
-    VerifyOrExit(md != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = EVP_DigestSignInit(context, NULL, md, NULL, signing_key);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
@@ -359,16 +380,16 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Call the EVP_DigestSignFinal with a NULL param to get length of the signature.
+
     result = EVP_DigestSignFinal(context, NULL, &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(out_signature_length >= out_length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (out_buffer)
-    {
-        *out_buffer = (unsigned char *) malloc(out_length);
-    }
-
-    result = EVP_DigestSignFinal(context, *out_buffer, &out_length);
+    result = EVP_DigestSignFinal(context, out_signature, &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    // This should not happen due to the check above. But check this nonetheless
+    VerifyOrExit(out_signature_length >= out_length, error = CHIP_ERROR_INTERNAL);
+    out_signature_length = out_length;
 
 exit:
     if (ec_key != NULL)
@@ -388,30 +409,22 @@ exit:
         signing_key = NULL;
     }
 
-    if (error != CHIP_NO_ERROR && out_buffer && *out_buffer != NULL)
-    {
-        free(*out_buffer);
-        *out_buffer = NULL;
-    }
-
     if (error != CHIP_NO_ERROR)
     {
         _logSSLError();
     }
 
-    if (_hexString)
+    if (_hexKey != NULL)
     {
-        free(_hexString);
-        _hexString = NULL;
+        free(_hexKey);
     }
 
     return error;
 }
 
-CHIP_ERROR chip::Crypto::ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const char * curve_name,
+CHIP_ERROR chip::Crypto::ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length,
                                                       const unsigned char * public_key, const size_t public_key_length,
-                                                      const unsigned char * signature, const size_t signature_length,
-                                                      DigestType digest)
+                                                      const unsigned char * signature, const size_t signature_length)
 {
     ERR_clear_error();
     CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
@@ -423,11 +436,12 @@ CHIP_ERROR chip::Crypto::ECDSA_validate_msg_signature(const unsigned char * msg,
     EC_GROUP * ec_group         = NULL;
     int result                  = 0;
     EVP_MD_CTX * md_context     = NULL;
+    ECName curve_name           = ECName::P256v1;
+    DigestType digest           = DigestType::SHA256;
 
     VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(curve_name != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    nid = EC_curve_nist2nid(curve_name);
+    nid = _nidForCurve(curve_name);
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -490,6 +504,16 @@ exit:
     {
         EVP_MD_CTX_destroy(md_context);
         md_context = NULL;
+    }
+    if (ec_key != NULL)
+    {
+        EC_KEY_free(ec_key);
+        ec_key = NULL;
+    }
+    if (verification_key != NULL)
+    {
+        EVP_PKEY_free(verification_key);
+        verification_key = NULL;
     }
     return error;
 }
