@@ -443,7 +443,6 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
 
-
     validation_error =
         ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, hex_public_key, 0, signature, signature_length);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
@@ -475,7 +474,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
     NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
-    NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256), NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
+    NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
+    NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
     NL_TEST_DEF("Test ECDSA signing and validation using SHA256", TestECDSA_Signing_SHA256),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),
