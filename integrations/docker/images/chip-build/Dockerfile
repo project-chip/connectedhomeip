@@ -7,24 +7,25 @@ VOLUME "/var/source"
 RUN set -x \
     && apt-get update \
     && apt-get install -fy \
-         git \
-         curl \
-         jq \
-         make \
-         autoconf \
-         automake \
-         libtool \
-         pkg-config \
-         g++ \
-         clang-9 \
-         clang-format-9 \
-         clang-tidy-9 \
-         lcov \
-         shellcheck \
-         libssl-dev \
-         unzip \
-         wget \
-         libmbedtls-dev \
+    git \
+    curl \
+    jq \
+    make \
+    autoconf \
+    automake \
+    libtool \
+    pkg-config \
+    g++ \
+    clang-9 \
+    clang-format-9 \
+    clang-tidy-9 \
+    lcov \
+    shellcheck \
+    libssl-dev \
+    unzip \
+    wget \
+    libmbedtls-dev \
+    && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 # Install specific release of openssl
@@ -32,6 +33,7 @@ RUN set -x \
     && cd /tmp && wget https://github.com/openssl/openssl/archive/OpenSSL_1_1_1f.zip \
     && mkdir -p /tmp/openssl && cd /tmp/openssl && unzip ../OpenSSL_1_1_1f.zip \
     && cd /tmp/openssl/openssl-OpenSSL_1_1_1f && ./config && make && make install \
+    && rm -rf /tmp/OpenSSL_1_1_1f.zip \
     && : # last line
 
 # nRF5 SDK, needed for building Nordic Platform code
@@ -41,6 +43,7 @@ RUN set -x \
     && (mkdir /var/nRF5_SDK_for_Thread_and_Zigbee \
     && cd /var/nRF5_SDK_for_Thread_and_Zigbee \
     && unzip /tmp/nRF5SDKforThreadandZigbee.zip) \
+    && rm -rf /tmp/nRF5SDKforThreadandZigbee.zip \
     && : # last line
 
 # Tools for flashing software on Nordic devices, and accessing device logs
@@ -51,6 +54,8 @@ RUN set -x \
     && dpkg -i JLink_Linux_*.deb \
     && dpkg -i nRF-Command-Line-Tools_*.deb \
     && tar zxvf nRF-Command-Line-Tools_*.tar.gz) \
+    && rm -rf /var/nRF5_tools/*.tar.gz \
+    && rm -rf /var/nRF5_tools/*.deb \
     && : # last line
 
 # GNU ARM Embedded toolchain, cross compiler for various platform builds

@@ -1,5 +1,7 @@
+ARG BUILD_VERSION
+
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
-FROM connectedhomeip/chip-build
+FROM connectedhomeip/chip-build:${BUILD_VERSION}
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
