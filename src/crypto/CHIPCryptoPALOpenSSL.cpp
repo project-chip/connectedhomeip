@@ -60,7 +60,6 @@ static int _nidForCurve(ECName name)
     }
 }
 
-
 static bool _isValidTagLength(size_t tag_length)
 {
     if (tag_length == 8 || tag_length == 12 || tag_length == 16)
