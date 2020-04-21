@@ -50,8 +50,7 @@ help() {
 runargs=()
 
 # extract run options
-for arg in "$@"
-do
+for arg in "$@"; do
   case "$arg" in
     --help)
       help
@@ -64,13 +63,13 @@ do
       ;;
 
     -*)
-      runargs+=( "$arg" )
+      runargs+=("$arg")
       shift
       ;;
 
     *)
       [[ -z $runargs ]] && break
-      runargs+=( "$arg" )
+      runargs+=("$arg")
       shift
       ;;
 
