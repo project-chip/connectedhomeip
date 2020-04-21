@@ -34,6 +34,7 @@ The CHIP repository is structured as follows:
 | `CONTRIBUTING.md`             | Guidelines for contributing to CHIP                                                                           |
 | `CONTRIBUTORS.md`             | Contributors to CHIP                                                                                          |
 | `docs/`                       | Documentation                                                                                                 |
+| `examples/`                   | Example firmware applications that demonstrate use of CHIP technology                                         |
 | `integrations/`               | Third party integrations related to this project                                                              |
 | `integrations/github/`        | GitHub integrations related to this project                                                                   |
 | `integrations/github/actions` | GitHub actions related to this project                                                                        |
