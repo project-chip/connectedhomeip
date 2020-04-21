@@ -49,7 +49,7 @@ help() {
     To just tell me about the image
       $ $me uname -a
 
-    Add /tmp as an additional volumeand run make
+    Add /tmp as an additional volume and run make
       $ $me --volume /tmp:/tmp -- make -C src
 
 "
