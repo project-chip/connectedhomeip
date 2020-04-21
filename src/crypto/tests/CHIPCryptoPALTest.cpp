@@ -314,7 +314,7 @@ static void TestECDSA_Signing_SHA256(nlTestSuite * inSuite, void * inContext)
                                        0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
                                        0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    unsigned char signature[4096];
+    unsigned char signature[kMax_ECDSA_Signature_Length];
     size_t signature_length  = sizeof(signature);
     CHIP_ERROR signing_error = ECDSA_sign_msg((const unsigned char *) msg, msg_length, hex_private_key, sizeof(hex_private_key),
                                               signature, signature_length);
@@ -340,7 +340,7 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
                                        0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
                                        0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    unsigned char signature[4096];
+    unsigned char signature[kMax_ECDSA_Signature_Length];
     size_t signature_length  = sizeof(signature);
     CHIP_ERROR signing_error = ECDSA_sign_msg((const unsigned char *) msg, msg_length, hex_private_key, sizeof(hex_private_key),
                                               signature, signature_length);
@@ -368,7 +368,7 @@ static void TestECDSA_ValidationFailIncorrectSignature(nlTestSuite * inSuite, vo
                                        0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
                                        0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    unsigned char signature[4096];
+    unsigned char signature[kMax_ECDSA_Signature_Length];
     size_t signature_length  = sizeof(signature);
     CHIP_ERROR signing_error = ECDSA_sign_msg((const unsigned char *) msg, msg_length, hex_private_key, sizeof(hex_private_key),
                                               signature, signature_length);
@@ -388,7 +388,7 @@ static void TestECDSA_SigningInvalidParams(nlTestSuite * inSuite, void * inConte
                                         0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
                                         0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
 
-    unsigned char signature[4096];
+    unsigned char signature[kMax_ECDSA_Signature_Length];
     size_t signature_length = sizeof(signature);
     CHIP_ERROR signing_error =
         ECDSA_sign_msg(NULL, msg_length, hex_private_key, sizeof(hex_private_key), signature, signature_length);
@@ -427,7 +427,7 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
                                        0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
                                        0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
 
-    unsigned char signature[4096];
+    unsigned char signature[kMax_ECDSA_Signature_Length];
     size_t signature_length  = sizeof(signature);
     CHIP_ERROR signing_error = ECDSA_sign_msg((const unsigned char *) msg, msg_length, hex_private_key, sizeof(hex_private_key),
                                               signature, signature_length);
