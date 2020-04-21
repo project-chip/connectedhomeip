@@ -97,10 +97,12 @@ CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length);
  * @brief A function to sign a msg using ECDSA
  * @param msg Message that needs to be signed
  * @param msg_length Length of message
- * @param private_key Key to use to sign the message
+ * @param private_key Key to use to sign the message. Private keys are encoded as padded big-endian field elements as described in
+ *SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
  * @param private_key_length Length of private key
- * @param out_buffer Buffer that will hold the output signature.
- * @param out_buffer_length Length of out buffer
+ * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s), represented
+ *as ASN.1 DER integers, plus the ASN.1 sequence Header
+ * @param out_signature_length Length of out buffer
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
@@ -110,9 +112,11 @@ CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, co
  * @brief A function to sign a msg using ECDSA
  * @param msg Message that needs to be signed
  * @param msg_length Length of message
- * @param public_key Key to use to verify the message signature
+ * @param public_key Key to use to verify the message signature. Public keys are encoded as uncompressed points as described in SEC
+ *1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
  * @param private_key_length Length of public key
- * @param signature Signature to use for verification
+ * @param signature Signature to use for verification. The signature consists of: 2 EC elements (r and s), represented as ASN.1 DER
+ *integers, plus the ASN.1 sequence Header
  * @param signature_length Length of signature
  * @return Returns a CHIP_NO_ERROR on successful verification, a CHIP_ERROR otherwise
  **/
