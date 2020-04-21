@@ -54,6 +54,7 @@ case "$TASK" in
   run-code-coverage)
     docker_run_bash_command "$bootstrap"
     docker_run_bash_command 'make V=1 -C build/default coverage'
+    docker_run_bash_command 'bash <(curl -s https://codecov.io/bash)'
     ;;
 
   run-crypto-tests)
