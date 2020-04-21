@@ -57,17 +57,17 @@ static mbedtls_ctr_drbg_context * get_mbedtls_drbg_context()
 {
     static mbedtls_ctr_drbg_context drbg_ctxt;
     static bool initialized = false;
-    static mbedtls_entropy_context entropy;
 
     if (initialized)
     {
         return &drbg_ctxt;
     }
 
+    static mbedtls_entropy_context entropy;
+    mbedtls_entropy_init(&entropy);
+
     mbedtls_ctr_drbg_context * ctxt = NULL;
     mbedtls_ctr_drbg_init(&drbg_ctxt);
-
-    mbedtls_entropy_init(&entropy);
 
     int status = mbedtls_ctr_drbg_seed(&drbg_ctxt, mbedtls_entropy_func, &entropy, NULL, 0);
     if (status == 0)
