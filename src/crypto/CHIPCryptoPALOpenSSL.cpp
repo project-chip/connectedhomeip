@@ -60,19 +60,6 @@ static int _nidForCurve(ECName name)
     }
 }
 
-// Caller needs to free returned char *
-static char * _createHexString(const unsigned char * in, const size_t in_length)
-{
-    char * result        = (char *) calloc(in_length * 2, sizeof(char));
-    size_t current_index = 0;
-
-    for (size_t i = 0; i < in_length; i++)
-    {
-        snprintf(result + current_index, 3, "%02x", in[i]);
-        current_index += 2;
-    }
-    return result;
-}
 
 static bool _isValidTagLength(size_t tag_length)
 {
@@ -357,8 +344,6 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
     ec_key = EC_KEY_new_by_curve_name(nid);
     VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
 
-    // _hexKey = _createHexString(private_key, private_key_length);
-    // BN_hex2bn(&pvt_key, _hexKey);
     pvt_key = BN_bin2bn(private_key, private_key_length, pvt_key);
     VerifyOrExit(pvt_key != NULL, error = CHIP_ERROR_INTERNAL);
 
