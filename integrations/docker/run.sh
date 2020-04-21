@@ -8,13 +8,22 @@
 here=$(cd "$(dirname "$0")" && pwd)
 me=$(basename "$0")
 
+die() {
+  echo "$me: *** ERROR: $*"
+  exit 1
+}
+
 ORG=${DOCKER_RUN_ORG:-connectedhomeip}
 
 # directory name is
 IMAGE=${DOCKER_RUN_IMAGE:-$(basename "$here")}
 
 # version
-VERSION=${DOCKER_RUN_VERSION:-$(cat "$here/version")}
+VERSION=${DOCKER_RUN_VERSION:-$(cat "$here/version")} ||
+  die "please run me from an image directory or set environment variables:
+          DOCKER_RUN_ORG
+          DOCKER_RUN_IMAGE
+          DOCKER_RUN_VERSION"
 
 # where
 RUN_DIR=${DOCKER_RUN_DIR:-$(pwd)}
@@ -68,7 +77,7 @@ for arg in "$@"; do
       ;;
 
     *)
-      [[ -z $runargs ]] && break
+      ((!${#runargs[*]})) && break
       runargs+=("$arg")
       shift
       ;;
@@ -76,4 +85,4 @@ for arg in "$@"; do
   esac
 done
 
-docker run "${runargs[@]}" --rm -w "$RUN_DIR" -v "$RUN_DIR:$RUN_DIR" "$ORG/$IMAGE:$VERSION" "$@"
+docker run "${runargs[@]}" --rm -w "$RUN_DIR" -v "$RUN_DIR:$RUN_DIR" "$ORG/$IMAGE${VERSION:+:${VERSION}}" "$@"
