@@ -35,7 +35,7 @@ static CHIP_ERROR checkDecimalStringValidity(string decimalString)
 {
     if (decimalString.length() == 0)
     {
-        fprintf(stderr, "\nFailed decoding base10. Input was empty. %lu\n", decimalString.length());
+        fprintf(stderr, "\nFailed decoding base10. Input was empty. %zu\n", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     return CHIP_NO_ERROR;
@@ -46,7 +46,7 @@ static CHIP_ERROR checkCodeLengthValidity(string decimalString, bool isLongCode)
     size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength)
     {
-        fprintf(stderr, "\nFailed decoding base10. Input length %lu was not expected length %lu\n", decimalString.length(),
+        fprintf(stderr, "\nFailed decoding base10. Input length %zu was not expected length %zu\n", decimalString.length(),
                 expectedCharLength);
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
@@ -87,7 +87,7 @@ static CHIP_ERROR readDigitsFromDecimalString(string decimalString, int & index,
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
     {
-        fprintf(stderr, "\nFailed decoding base10. Input was too short. %lu\n", decimalString.length());
+        fprintf(stderr, "\nFailed decoding base10. Input was too short. %zu\n", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     else if (index < 0)
