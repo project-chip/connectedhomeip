@@ -20,6 +20,12 @@ config.status
 configure
 src/include/BuildConfig.h.in
 
+# Build Artifacts
+.deps
+.dirstamp
+*.o
+*.a
+
 # Repos stuff
 .repos-warning-stamp
 third_party/nlassert/
