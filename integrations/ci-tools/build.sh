@@ -8,30 +8,55 @@
 #            to a set of bash commands
 #  IMAGE   the location (under integrations/docker/image) of the desired
 #            run.sh
+#  ENV     a comma-separated list of --env arguments to be passed to
+#            docker run, e.g. "GITHUB_TOKEN,FOO=BAR" will convey
+#            as "--env GITHUB_TOKEN --env FOO=BAR"
 #
 
 me=$(basename "$0")
+here=$(cd "$(dirname "$0")" && pwd)
 
 die() {
   echo "$me: *** ERROR: " "${*}"
   exit 1
 }
 
-bootstrap='if [[ ! -f build/default/config.status ]]; then mkdir -p build/default; (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi'
+# move to ToT, I don't work anywhere else
+cd "$here/../.." || die 'ack!, where am I?!?'
 
-docker_run_bash_command() {
-  integrations/docker/images/"${IMAGE:-chip-build}"/run.sh bash -c "$1"
+bootstrap='
+if [[ ! -f build/default/config.status ]]; then
+   mkdir -p build/default;
+   (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage);
+else
+   ./bootstrap -w make;
+fi'
+
+docker_run_command() {
+  integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
 }
 
-set -x
+docker_run_bash_command() {
+  docker_run_command bash -c "$1"
+}
+
+# convert ENV to an array of words: X,Y,Z => ( X Y Z )
+read -r -a ENV <<<"${ENV//,/ }"
+# convert ENV array to an array of args ( X Y ) => ( --env X --env Y )
+read -r -a ENV <<<"${ENV[@]/#/--env }"
 
 case "$TASK" in
 
-  # You can add more tasks here, the top one shows an example of running a build inside our build container
   self-test)
     docker_run_bash_command 'echo looks ok to me && echo compound commands look good'
     ;;
 
+  self-test-env)
+    docker_run_command bash -c "echo run me with ENV=HI=THERE,; env | echo HI=$'$'HI"
+    ;;
+
+  # You can add more tasks here, the top one shows an example of running
+  #  a build inside our build container
   build-ubuntu-linux)
     docker_run_bash_command "$bootstrap"
     docker_run_bash_command 'make V=1 -C build/default'
