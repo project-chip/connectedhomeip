@@ -36,7 +36,6 @@ extern "C" int mbedtls_hardware_poll(void * data, unsigned char * output, size_t
 #endif
 
 using namespace ::chip;
-using namespace ::chip::Chip;
 
 #if !CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
 #error "CHIP DRBG implementation must be enabled on EFR32 platforms"

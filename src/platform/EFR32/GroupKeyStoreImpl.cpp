@@ -26,7 +26,6 @@
 #include <platform/EFR32/GroupKeyStoreImpl.h>
 
 using namespace ::chip;
-using namespace ::chip::Chip;
 using namespace ::chip::Profiles::Security::AppKeys;
 
 namespace chip {

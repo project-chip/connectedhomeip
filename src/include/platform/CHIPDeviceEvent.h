@@ -27,7 +27,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-
 namespace DeviceEventType {
 
 enum
