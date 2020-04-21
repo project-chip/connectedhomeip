@@ -53,25 +53,27 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
     return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
 }
 
-static mbedtls_ctr_drbg_context* get_mbedtls_drbg_context() {
+static mbedtls_ctr_drbg_context * get_mbedtls_drbg_context()
+{
     static mbedtls_ctr_drbg_context drbg_ctxt;
     static bool initialized = false;
     static mbedtls_entropy_context entropy;
 
-    if (initialized) {
+    if (initialized)
+    {
         return &drbg_ctxt;
     }
 
-    mbedtls_ctr_drbg_context* ctxt = NULL;
+    mbedtls_ctr_drbg_context * ctxt = NULL;
     mbedtls_ctr_drbg_init(&drbg_ctxt);
 
     mbedtls_entropy_init(&entropy);
 
     int status = mbedtls_ctr_drbg_seed(&drbg_ctxt, mbedtls_entropy_func, &entropy, NULL, 0);
-    if(status == 0)
+    if (status == 0)
     {
         initialized = true;
-        ctxt = &drbg_ctxt;
+        ctxt        = &drbg_ctxt;
     }
 
     return ctxt;
@@ -79,9 +81,9 @@ static mbedtls_ctr_drbg_context* get_mbedtls_drbg_context() {
 
 CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result = 0;
-    mbedtls_ctr_drbg_context* drbg_ctxt = NULL;
+    CHIP_ERROR error                     = CHIP_NO_ERROR;
+    int result                           = 0;
+    mbedtls_ctr_drbg_context * drbg_ctxt = NULL;
 
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
