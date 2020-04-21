@@ -40,20 +40,29 @@ libChipCrypto_a_CPPFLAGS            = \
     $(NULL)
 
 libChipCrypto_a_SOURCES                                       = \
-    CHIPBase+Crypto.c                                           \
-   $(NULL)
+    $(NULL)
+
+dist_libChipCrypto_a_HEADERS                                 = \
+    CHIPCryptoPAL.h                                            \
+    $(NULL)
 
 if CHIP_CRYPTO_OPENSSL
 libChipCrypto_a_SOURCES                                      += \
+    CHIPBase+Crypto.c                                           \
     CHIPOpenSSL.c                                               \
     CHIPCryptoPALOpenSSL.cpp                                    \
-   $(NULL)
-endif
+    $(NULL)
 
-dist_libChipCrypto_a_HEADERS                                 = \
+dist_libChipCrypto_a_HEADERS                                += \
     CHIPCrypto.h                                               \
     CHIPBase+CompilerAbstraction.h                             \
-    CHIPCryptoPAL.h                                            \
     $(NULL)
+endif
+
+if CHIP_CRYPTO_MBEDTLS
+libChipCrypto_a_SOURCES                                      += \
+    CHIPCryptoPALmbedTLS.cpp                                    \
+    $(NULL)
+endif
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

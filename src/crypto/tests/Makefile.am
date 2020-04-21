@@ -71,9 +71,14 @@ COMMON_LDADD                                   = \
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \
-    TestCrypto                                   \
-    TestOpenSSLCrypto                            \
+    TestCryptoPAL                                \
     $(NULL)
+
+if CHIP_CRYPTO_OPENSSL
+check_PROGRAMS                                += \
+    TestCrypto                                   \
+    $(NULL)
+endif
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
@@ -98,12 +103,12 @@ TestCrypto_LDADD                               = \
 TestCrypto_SOURCES                             = CHIPCryptoTest.c
 
 # OpenSSL based tests
-TestOpenSSLCrypto_LDADD                        =        \
+TestCryptoPAL_LDADD                            =        \
     $(COMMON_LDADD)                                     \
     $(NULL)
 
 
-TestOpenSSLCrypto_SOURCES                      = CHIPCryptoPALOpenSSLTest.cpp
+TestCryptoPAL_SOURCES                          = CHIPCryptoPALTest.cpp
 
 
 if CHIP_BUILD_COVERAGE
