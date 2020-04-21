@@ -29,7 +29,7 @@
 namespace chip {
 namespace Crypto {
 
-const size_t kMinimum_ECDSA_Signature_Buffer_Length = 4096;
+const size_t kMinimum_ECDSA_Signature_Buffer_Length = 72;
 
 /**
  * @brief A function that implements 256-bit AES-CCM encryption
