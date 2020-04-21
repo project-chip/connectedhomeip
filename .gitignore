@@ -33,6 +33,7 @@ config.status
 configure
 src/include/BuildConfig.h
 src/include/BuildConfig.h.in
+src/include/BuildConfig.h.in~
 
 # Repos stuff
 .repos-warning-stamp
