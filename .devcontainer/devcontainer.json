@@ -1,6 +1,12 @@
 {
     "name": "CHIP Ubuntu Development Environment",
-    "dockerFile": "Dockerfile",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            //  "BUILD_VERSION": "$(cat integrations/docker/images/chip-build/version)" // trying to get this to work
+            "BUILD_VERSION": "0.2.7"
+        }
+    },
     "runArgs": [
         "--cap-add=SYS_PTRACE",
         "--security-opt",
@@ -9,16 +15,16 @@
     "remoteUser": "vscode",
     // Add the IDs of extensions you want installed when the container is created in the array below.
     "extensions": [
-		"ms-azuretools.vscode-docker",
-		"xaver.clang-format",
-		"github.vscode-pull-request-github",
-		"maelvalais.autoconf",
-		"yzhang.markdown-all-in-one",
-		"eamodio.gitlens",
-		"yuichinukiyama.vscode-preview-server",
-		"aaron-bond.better-comments",
-		"foxundermoon.shell-format"
-	],
+        "ms-azuretools.vscode-docker",
+        "xaver.clang-format",
+        "github.vscode-pull-request-github",
+        "maelvalais.autoconf",
+        "yzhang.markdown-all-in-one",
+        "eamodio.gitlens",
+        "yuichinukiyama.vscode-preview-server",
+        "aaron-bond.better-comments",
+        "foxundermoon.shell-format"
+    ],
     // Use 'settings' to set *default* container specific settings.json values on container create. 
     // You can edit these settings after create using File > Preferences > Settings > Remote.
     "settings": {
