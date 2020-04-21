@@ -38,17 +38,29 @@ PR Don'ts:
 
 ### Milestones
 
-In CHIP parlance, a milestone is simply a tag for an expected due date or release.  Milestones are intended to help contributors and their managers to prioritize work.  There are 2 types: Date-based and Release-based.
+In CHIP parlance, a milestone is simply a tag for an expected due date or
+release. Milestones are intended to help contributors and their managers to
+prioritize work. There are 2 types: Date-based and Release-based.
 
 #### Date-based
-Date-based milestones are named for their due date, typically a Friday of some week.  Date-based milestones are normally assigned based on a guess about when something's likely to bubble up and get done based on current work load and resourcing.  They are wishes, guesses.
+
+Date-based milestones are named for their due date, typically a Friday of some
+week. Date-based milestones are normally assigned based on a guess about when
+something's likely to bubble up and get done based on current work load and
+resourcing. They are wishes, guesses.
 
 #### Release-based
-Release-based milestones are named for the release version and may have flexible or subject-to-change due dates.  Release-based milestones are intended to track release blockers.
 
-A special "Not sure when" milestone is a marker for issues whose priority, scope, or blocking status have not been determined.  Monthly review of these is a project goal.
+Release-based milestones are named for the release version and may have flexible
+or subject-to-change due dates. Release-based milestones are intended to track
+release blockers.
 
-Issues without milestones are those that have yet to be considered for one of the above.  Weekly review of new issues is a project goal.
+A special "Not sure when" milestone is a marker for issues whose priority,
+scope, or blocking status have not been determined. Monthly review of these is a
+project goal.
+
+Issues without milestones are those that have yet to be considered for one of
+the above. Weekly review of new issues is a project goal.
 
 ### Projects
 
