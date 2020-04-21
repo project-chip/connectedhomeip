@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER

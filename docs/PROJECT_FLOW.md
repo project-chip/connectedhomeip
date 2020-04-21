@@ -12,14 +12,14 @@ be under the auspices of some open issue. This may seem onerous and in some
 cases duplicative, so consider these guidelines when deciding whether to you can
 get away with not creating an issue:
 
-- Trivial fixes: issues can function as TODO lists, simple reminders that
-  something should be addressed. Sometimes, though, the work required to fix is
-  smaller than the work required to write the issue.
-- Issues intended to be addressed by a PR may not actually be fixed or may
-  regress.
-- Issues can span PRs (as PRs should be as small as possible, but no smaller).
-- Issues help form an important basis for release notes. Any PR that addresses a
-  problem that should have release visibility, please do open an issue.
+-   Trivial fixes: issues can function as TODO lists, simple reminders that
+    something should be addressed. Sometimes, though, the work required to fix
+    is smaller than the work required to write the issue.
+-   Issues intended to be addressed by a PR may not actually be fixed or may
+    regress.
+-   Issues can span PRs (as PRs should be as small as possible, but no smaller).
+-   Issues help form an important basis for release notes. Any PR that addresses
+    a problem that should have release visibility, please do open an issue.
 
 ### Pull requests
 
@@ -30,11 +30,11 @@ your reviewers.
 
 PR Don'ts:
 
-- Don't combine unrelated changes. E.g. if the PR addresses a bug in some C
-  code, an update to the top-level .gitignore doesn't belong.
-- Don't make stacks. E.g. if a change in a component requires a new feature or
-  even a small tweak in one or more of its dependencies, each dependency change
-  belongs in its own separate PR.
+-   Don't combine unrelated changes. E.g. if the PR addresses a bug in some C
+    code, an update to the top-level .gitignore doesn't belong.
+-   Don't make stacks. E.g. if a change in a component requires a new feature or
+    even a small tweak in one or more of its dependencies, each dependency
+    change belongs in its own separate PR.
 
 ### Milestones
 

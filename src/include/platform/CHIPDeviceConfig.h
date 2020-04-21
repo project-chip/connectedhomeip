@@ -22,8 +22,6 @@
  *          Defines compile-time configuration values for the chip Device Layer.
  */
 
-
-
 #ifndef CHIP_DEVICE_CONFIG_H
 #define CHIP_DEVICE_CONFIG_H
 
@@ -632,7 +630,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_FIXED_TUNNEL_SERVER 0
 #endif
 
-
 /** CHIP_DEVICE_CONFIG_TUNNEL_SERVER_ADDRESS
  *
  * The address of the server to which the device should establish a service tunnel.
@@ -716,9 +713,9 @@
 #endif
 
 // Enable Network Telemetry feature if it is enabled for at lease one network.
-#define CHIP_DEVICE_CONFIG_ENABLE_NETWORK_TELEMETRY  (CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY || \
-                                                       CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY || \
-                                                       CHIP_DEVICE_CONFIG_ENABLE_TUNNEL_TELEMETRY)
+#define CHIP_DEVICE_CONFIG_ENABLE_NETWORK_TELEMETRY                                                                                \
+    (CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY || CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY ||                                     \
+     CHIP_DEVICE_CONFIG_ENABLE_TUNNEL_TELEMETRY)
 
 /**
  *  @def CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS
@@ -808,7 +805,7 @@
  *    The event id counter persisted storage epoch.
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH
-#define CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH   (0x10000)
+#define CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH (0x10000)
 #endif
 
 /**
@@ -818,7 +815,7 @@
  *    The critical event id counter (eidc) persisted storage key.
  */
 #ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY  "crit-eidc"
+#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY "crit-eidc"
 #endif
 
 /**
@@ -828,7 +825,7 @@
  *    The production event id counter (eidc) persisted storage key.
  */
 #ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY  "prod-eidc"
+#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY "prod-eidc"
 #endif
 
 /**
@@ -838,7 +835,7 @@
  *    The info event id counter (eidc) persisted storage key.
  */
 #ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY  "info-eidc"
+#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY "info-eidc"
 #endif
 
 /**
@@ -848,7 +845,7 @@
  *    The debug event id counter (eidc) persisted storage key.
  */
 #ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY  "debug-eidc"
+#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY "debug-eidc"
 #endif
 
 // -------------------- Software Update Manager Configuration --------------------
@@ -934,7 +931,7 @@
  * specify the max wait time interval to be used (in milliseconds)
  */
 #ifndef CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS
-#define CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS 1*60*60*1000 // 1 hour
+#define CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS 1 * 60 * 60 * 1000 // 1 hour
 #endif
 
 /**
@@ -961,7 +958,7 @@
  *
  */
 #ifndef CHIP_DEVICE_CONFIG_SWU_WAIT_TIME_MULTIPLIER_MS
-#define CHIP_DEVICE_CONFIG_SWU_WAIT_TIME_MULTIPLIER_MS 1*60*1000	// 1 minute
+#define CHIP_DEVICE_CONFIG_SWU_WAIT_TIME_MULTIPLIER_MS 1 * 60 * 1000 // 1 minute
 #endif
 
 /**
@@ -969,6 +966,6 @@
  *
  * Specifies the block size to be used during software download over BDX.
  */
-#define CHIP_DEVICE_CONFIG_SWU_BDX_BLOCK_SIZE		1024
+#define CHIP_DEVICE_CONFIG_SWU_BDX_BLOCK_SIZE 1024
 
 #endif // CHIP_DEVICE_CONFIG_H

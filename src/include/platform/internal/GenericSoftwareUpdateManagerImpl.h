@@ -43,7 +43,7 @@ using namespace chip::Inet;
  * or indirectly) by the SoftwareUpdateManagerImpl class, which also appears as the template's ImplClass
  * parameter.
  */
-template<class ImplClass>
+template <class ImplClass>
 class GenericSoftwareUpdateManagerImpl
 {
 
@@ -55,9 +55,9 @@ protected:
 
     void _SetRetryPolicyCallback(const SoftwareUpdateManager::RetryPolicyCallback aRetryPolicyCallback);
 
-    static void _DefaultEventHandler(void *apAppState, SoftwareUpdateManager::EventType aEvent,
-                             const SoftwareUpdateManager::InEventParam& aInParam,
-                             SoftwareUpdateManager::OutEventParam& aOutParam);
+    static void _DefaultEventHandler(void * apAppState, SoftwareUpdateManager::EventType aEvent,
+                                     const SoftwareUpdateManager::InEventParam & aInParam,
+                                     SoftwareUpdateManager::OutEventParam & aOutParam);
 
     CHIP_ERROR _Abort(void);
     CHIP_ERROR _CheckNow(void);
@@ -73,7 +73,8 @@ protected:
     void SoftwareUpdateFinished(CHIP_ERROR aError);
 
     CHIP_ERROR InstallImage(void);
-    CHIP_ERROR StoreImageBlock(uint32_t aLength, uint8_t *aData);
+    CHIP_ERROR StoreImageBlock(uint32_t aLength, uint8_t * aData);
+
 private:
     // ===== Private members reserved for use by this class only.
 
@@ -81,7 +82,7 @@ private:
     void CheckImageState(void);
     void CheckImageIntegrity(void);
     void DriveState(SoftwareUpdateManager::State aNextState);
-    void GetEventState(int32_t& aEventState);
+    void GetEventState(int32_t & aEventState);
     void HandleImageQueryResponse(PacketBuffer * aPayload);
     void SendQuery(void);
     void StartImageInstall(void);
@@ -94,15 +95,11 @@ private:
 
     static void PrepareBinding(intptr_t arg);
     static void StartDownload(intptr_t arg);
-    static void HandleHoldOffTimerExpired(::chip::System::Layer * aLayer,
-                                          void * aAppState,
-                                          ::chip::System::Error aError);
-    static void DefaultRetryPolicyCallback(void * const aAppState,
-                                           SoftwareUpdateManager::RetryParam & aRetryParam,
+    static void HandleHoldOffTimerExpired(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
+    static void DefaultRetryPolicyCallback(void * const aAppState, SoftwareUpdateManager::RetryParam & aRetryParam,
                                            uint32_t & aOutIntervalMsec);
 
 private:
-
     SoftwareUpdateManager::State mState;
 
     void * mAppState;

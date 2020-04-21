@@ -5,15 +5,15 @@ An example application showing the use
 
 <hr>
 
-- [CHIP nRF52840 Lock Example Application](#chip-nrf52840-lock-example-application)
-  - [Introduction](#introduction)
-  - [Device UI](#device-ui)
-  - [Building](#building)
-    - [Using CHIP's VSCode `devcontainer`](#using-chips-vscode-devcontainer)
-    - [Using Native Shell](#using-native-shell)
-  - [Initializing the nRF52840 DK](#initializing-the-nrf52840-dk)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
+-   [CHIP nRF52840 Lock Example Application](#chip-nrf52840-lock-example-application)
+    -   [Introduction](#introduction)
+    -   [Device UI](#device-ui)
+    -   [Building](#building)
+        -   [Using CHIP's VSCode `devcontainer`](#using-chips-vscode-devcontainer)
+        -   [Using Native Shell](#using-native-shell)
+    -   [Initializing the nRF52840 DK](#initializing-the-nrf52840-dk)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
 
 <hr>
 
@@ -52,17 +52,19 @@ general-purpose LEDs and buttons built in to the nRF52840 DK dev board.
 **LED #1** shows the overall state of the device and its connectivity. Four
 states are depicted:
 
-- _Short Flash On (50ms on/950ms off)_ &mdash; The device is in an unprovisioned
-  (unpaired) state and is waiting for a commissioning application to connect.
+-   _Short Flash On (50ms on/950ms off)_ &mdash; The device is in an
+    unprovisioned (unpaired) state and is waiting for a commissioning
+    application to connect.
 
-* _Rapid Even Flashing (100ms on/100ms off)_ &mdash; The device is in an
-  unprovisioned state and a commissioning application is connected via BLE.
+*   _Rapid Even Flashing (100ms on/100ms off)_ &mdash; The device is in an
+    unprovisioned state and a commissioning application is connected via BLE.
 
-- _Short Flash Off (950ms on/50ms off)_ &mdash; The device is full provisioned,
-  but does not yet have full network (Thread) or service connectivity.
+-   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is full
+    provisioned, but does not yet have full network (Thread) or service
+    connectivity.
 
-* _Solid On_ &mdash; The device is fully provisioned and has full network and
-  service connectivity.
+*   _Solid On_ &mdash; The device is fully provisioned and has full network and
+    service connectivity.
 
 **Button #1** can be used to initiate a OTA software update as well as to reset
 the device to a default state.
@@ -108,51 +110,51 @@ Alternatively, you can run `Build nRF5 Lock App` VSCode task.
 
 ### Using Native Shell
 
-- Download and install the
-  [Nordic nRF5 SDK for Thread and Zigbee](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK-for-Thread-and-Zigbee)
-  ([Direct download link](https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5-SDK-for-Thread/nRF5-SDK-for-Thread-and-Zigbee/nRF5SDKforThreadandZigbeev400dc7186b.zip))
+-   Download and install the
+    [Nordic nRF5 SDK for Thread and Zigbee](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK-for-Thread-and-Zigbee)
+    ([Direct download link](https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5-SDK-for-Thread/nRF5-SDK-for-Thread-and-Zigbee/nRF5SDKforThreadandZigbeev400dc7186b.zip))
 
-* Download and install the
-  [Nordic nRF5x Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools/Download)
-  (Direct download link:
-  [Linux](https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRFCommandLineTools1070Linuxamd64tar.gz)
-  [Mac OS X](https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRF-Command-Line-Tools_10_7_0_OSX.tar))
+*   Download and install the
+    [Nordic nRF5x Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools/Download)
+    (Direct download link:
+    [Linux](https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRFCommandLineTools1070Linuxamd64tar.gz)
+    [Mac OS X](https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-7-0/nRF-Command-Line-Tools_10_7_0_OSX.tar))
 
-* Download and install a suitable ARM gcc tool chain:
-  [GNU Arm Embedded Toolchain 7-2018-q2-update](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
-  (Direct download link:
-  [Linux](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2)
-  [Mac OS X](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2))
+*   Download and install a suitable ARM gcc tool chain:
+    [GNU Arm Embedded Toolchain 7-2018-q2-update](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+    (Direct download link:
+    [Linux](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2)
+    [Mac OS X](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2))
 
-- Install some additional tools:
+-   Install some additional tools:
 
-         # Linux
-         $ sudo apt-get install git make automake libtool ccache
+           # Linux
+           $ sudo apt-get install git make automake libtool ccache
 
-         # Mac OS X
-         $ brew install automake libtool ccache
+           # Mac OS X
+           $ brew install automake libtool ccache
 
-- Set the following environment variables based on the locations/versions of the
-  packages installed above:
+-   Set the following environment variables based on the locations/versions of
+    the packages installed above:
 
-        export NRF5_SDK_ROOT=${HOME}/tools/nRF5_SDK_for_Thread_and_Zigbee_v3.1.0
-        export NRF5_TOOLS_ROOT=${HOME}/tools/nRF-Command-Line-Tools
-        export GNU_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-7-2018-q2-update/bin/
-        export PATH=${PATH}:${NRF5_TOOLS_ROOT}/nrfjprog
+          export NRF5_SDK_ROOT=${HOME}/tools/nRF5_SDK_for_Thread_and_Zigbee_v3.1.0
+          export NRF5_TOOLS_ROOT=${HOME}/tools/nRF-Command-Line-Tools
+          export GNU_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-7-2018-q2-update/bin/
+          export PATH=${PATH}:${NRF5_TOOLS_ROOT}/nrfjprog
 
 <p style="margin-left: 40px">For convenience, place these settings in local script file (e.g. setup-env.sh) so that they can be loaded into the environment as needed (e.g. by running 'source ./setup-env.sh').</p>
 
-- Clone the [CHIP](https://github.com/project-chip/connectedhomeip) repo into a
-  local directory
+-   Clone the [CHIP](https://github.com/project-chip/connectedhomeip) repo into
+    a local directory
 
-        $ cd ~
-        $ git clone https://github.com/project-chip/connectedhomeip.git
+          $ cd ~
+          $ git clone https://github.com/project-chip/connectedhomeip.git
 
-* Run make to build the application
+*   Run make to build the application
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrf5
-        $ make clean
-        $ make
+          $ cd ~/connectedhomeip/examples/lock-app/nrf5
+          $ make clean
+          $ make
 
 <a name="initializing"></a>
 
@@ -163,15 +165,15 @@ The example application is designed to run on the
 development kit. Prior to installing the application, the device's flash memory
 should be erased and the Nordic SoftDevice image installed.
 
-- Connect the host machine to the J-Link Interface MCU USB connector on the
-  nRF52840 DK. The Interface MCU connector is the one on the _short_ side of the
-  board.
+-   Connect the host machine to the J-Link Interface MCU USB connector on the
+    nRF52840 DK. The Interface MCU connector is the one on the _short_ side of
+    the board.
 
-* Use the Makefile to erase the flash and program the Nordic SoftDevice image.
+*   Use the Makefile to erase the flash and program the Nordic SoftDevice image.
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrf5
-        $ make erase
-        $ make flash-softdevice
+          $ cd ~/connectedhomeip/examples/lock-app/nrf5
+          $ make erase
+          $ make flash-softdevice
 
 Once the above is complete, it shouldn't need be done again _unless_ the
 SoftDevice image or the Nordic configuration storage (fds) area becomes corrupt.
@@ -203,33 +205,34 @@ Using the RTT facility requires downloading and installing the _SEGGER J-Link
 Software and Documentation Pack_
 ([web site](https://www.segger.com/downloads/jlink#J-LinkSoftwareAndDocumentationPack)).
 
-- Download the J-Link installer by navigating to the appropriate URL and
-  agreeing to the license agreement.
+-   Download the J-Link installer by navigating to the appropriate URL and
+    agreeing to the license agreement.
 
 <p style="margin-left: 40px">Linux: <a href="https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb">JLink_Linux_x86_64.deb</a></p>
 <p style="margin-left: 40px">MacOS: <a href="https://www.segger.com/downloads/jlink/JLink\_MacOSX.pkg">JLink_MacOSX.pkg</a></p>
 
-- Install the J-Link software
+-   Install the J-Link software
 
-        $ cd ~/Downloads
-        $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+          $ cd ~/Downloads
+          $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
 
-* In Linux, grant the logged in user the ability to talk to the development
-  hardware via the linux tty device (/dev/ttyACMx) by adding them to the dialout
-  group.
+*   In Linux, grant the logged in user the ability to talk to the development
+    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
+    dialout group.
 
-        $ sudo usermod -a -G dialout ${USER}
+          $ sudo usermod -a -G dialout ${USER}
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
 
-- Run the JLinkExe tool with arguments to autoconnect to the nRF82480 DK board:
+-   Run the JLinkExe tool with arguments to autoconnect to the nRF82480 DK
+    board:
 
-        $ JLinkExe -device NRF52840_XXAA -if SWD -speed 4000 -autoconnect 1
+          $ JLinkExe -device NRF52840_XXAA -if SWD -speed 4000 -autoconnect 1
 
-- In a second terminal, run the JLinkRTTClient:
+-   In a second terminal, run the JLinkRTTClient:
 
-        $ JLinkRTTClient
+          $ JLinkRTTClient
 
 Logging output will appear in the second terminal.
 

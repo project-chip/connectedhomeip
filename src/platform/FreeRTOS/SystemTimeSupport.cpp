@@ -23,7 +23,6 @@
  *          time/clock functions based on the FreeRTOS tick counter.
  */
 
-
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/TimeUtils.h>
 
@@ -72,22 +71,21 @@ uint64_t FreeRTOSTicksSinceBoot(void)
         // Note that sNumOverflows may be quite stale, and under those
         // circumstances, the function may violate monotonicity guarantees
         timeOut.xTimeOnEntering = xTaskGetTickCountFromISR();
-        timeOut.xOverflowCount = sNumOfOverflows;
+        timeOut.xOverflowCount  = sNumOfOverflows;
     }
     else
     {
 #endif
 
-    vTaskSetTimeOutState(&timeOut);
+        vTaskSetTimeOutState(&timeOut);
 
 #ifdef __CORTEX_M
-    // BaseType_t is supposed to be atomic
-    sNumOfOverflows = timeOut.xOverflowCount;
+        // BaseType_t is supposed to be atomic
+        sNumOfOverflows = timeOut.xOverflowCount;
     }
 #endif
 
-    return static_cast<uint64_t>(timeOut.xTimeOnEntering) +
-          (static_cast<uint64_t>(timeOut.xOverflowCount) << kTicksOverflowShift);
+    return static_cast<uint64_t>(timeOut.xTimeOnEntering) + (static_cast<uint64_t>(timeOut.xOverflowCount) << kTicksOverflowShift);
 }
 
 uint64_t GetClock_Monotonic(void)

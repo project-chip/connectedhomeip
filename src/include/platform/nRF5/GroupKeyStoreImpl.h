@@ -35,14 +35,15 @@ class ChipGroupKey
 public:
     enum
     {
-        MaxKeySize                                      = 36
+        MaxKeySize = 36
     };
-    uint32_t KeyId;                                      /**< The key ID. */
-    uint8_t KeyLen;                                      /**< The key length. */
-    uint8_t Key[MaxKeySize];                             /**< The secret key material. */
-    union {
-        uint32_t StartTime;                              /**< The epoch key start time. */
-        uint32_t GlobalId;                               /**< The application group key global ID. */
+    uint32_t KeyId;          /**< The key ID. */
+    uint8_t KeyLen;          /**< The key length. */
+    uint8_t Key[MaxKeySize]; /**< The secret key material. */
+    union
+    {
+        uint32_t StartTime; /**< The epoch key start time. */
+        uint32_t GlobalId;  /**< The application group key global ID. */
     };
 };
 
@@ -50,14 +51,11 @@ public:
  * An implementation of the chip GroupKeyStoreBase API for platforms based
  * on the Nordic nRF5 SDK.
  */
-class GroupKeyStoreImpl final
-        : public ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase,
-          private NRF5Config
+class GroupKeyStoreImpl final : public ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase, private NRF5Config
 {
     using ChipGroupKey = ::chip::Profiles::Security::AppKeys::ChipGroupKey;
 
 public:
-
     CHIP_ERROR Init();
 
     CHIP_ERROR RetrieveGroupKey(uint32_t keyId, ChipGroupKey & key) override;
@@ -70,15 +68,14 @@ public:
     CHIP_ERROR StoreLastUsedEpochKeyId(void) override;
 
 private:
+    static constexpr size_t kFixedEncodedKeySize = 4U + // key id
+        4U +                                            // start time / global id
+        1U;                                             // key data length
 
-    static constexpr size_t kFixedEncodedKeySize =  4U +    // key id
-                                                    4U +    // start time / global id
-                                                    1U;     // key data length
+    static constexpr size_t kMaxEncodedKeySize = kFixedEncodedKeySize + ChipGroupKey::MaxKeySize;
 
-    static constexpr size_t kMaxEncodedKeySize =    kFixedEncodedKeySize + ChipGroupKey::MaxKeySize;
-
-    static constexpr uint16_t kGroupKeyFileId =     GetFileId(kConfigKey_GroupKey);
-    static constexpr uint16_t kGroupKeyRecordKey =  GetRecordKey(kConfigKey_GroupKey);
+    static constexpr uint16_t kGroupKeyFileId    = GetFileId(kConfigKey_GroupKey);
+    static constexpr uint16_t kGroupKeyRecordKey = GetRecordKey(kConfigKey_GroupKey);
 
     static CHIP_ERROR EncodeGroupKey(const ChipGroupKey & key, uint8_t * buf, size_t bufSize, size_t & encodedKeyLen);
     static CHIP_ERROR DecodeGroupKey(const uint8_t * encodedKey, size_t encodedKeyLen, ChipGroupKey & key);

@@ -41,7 +41,6 @@ CHIP_ERROR Write(Key key, uint32_t value)
     return ConfigurationMgr().WritePersistedStorageValue(key, value);
 }
 
-} // PersistedStorage
-} // Platform
-} // chip
-
+} // namespace PersistedStorage
+} // namespace Platform
+} // namespace chip

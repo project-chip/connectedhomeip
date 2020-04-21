@@ -37,11 +37,10 @@ namespace Internal {
  * class, which also appears as the template's ImplClass parameter.
  *
  */
-template<class ImplClass>
+template <class ImplClass>
 class GenericConnectivityManagerImpl_NoThread
 {
 protected:
-
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::ThreadMode _GetThreadMode(void);
@@ -60,72 +59,74 @@ protected:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
-template<class ImplClass>
+template <class ImplClass>
 inline ConnectivityManager::ThreadMode GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetThreadMode(void)
 {
     return ConnectivityManager::kThreadMode_NotSupported;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadMode(ConnectivityManager::ThreadMode val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_IsThreadEnabled(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_IsThreadApplicationControlled(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_IsThreadAttached(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_IsThreadProvisioned(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_ClearThreadProvision(void)
-{
-}
+{}
 
-template<class ImplClass>
+template <class ImplClass>
 inline ConnectivityManager::ThreadDeviceType GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetThreadDeviceType(void)
 {
     return ConnectivityManager::kThreadDeviceType_NotSupported;
 }
 
-template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
-inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig)
+template <class ImplClass>
+inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetThreadPollingConfig(
+    ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     pollingConfig.Clear();
 }
 
-template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig)
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadPollingConfig(
+    const ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_HaveServiceConnectivityViaThread(void)
 {
     return false;

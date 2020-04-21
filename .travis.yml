@@ -1,5 +1,9 @@
 language: minimal
 
+branches:
+    except:
+    - /^restyled.*$/
+  
 services:
   - docker
 

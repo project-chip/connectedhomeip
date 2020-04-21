@@ -7,14 +7,14 @@
 #
 
 die() {
-    echo " *** ERROR: $*"
-    exit 1
+  echo " *** ERROR: $*"
+  exit 1
 }
 
 # from `man diff`:
 # Exit status is 0 if inputs are the same, 1 if different, 2 if trouble.
 
-"$(dirname "$0")"/clang-format.sh -style=file "$@"  | diff -u "$@" - || die "diffs exist"
+"$(dirname "$0")"/clang-format.sh -style=file "$@" | diff -u "$@" - || die "diffs exist"
 
 for arg; do true; done
 file=$arg

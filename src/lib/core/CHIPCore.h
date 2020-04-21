@@ -36,8 +36,8 @@
 
 #include <inet/InetLayer.h>
 
-#define CHIP_CORE_IDENTITY           "chip-core"
-#define CHIP_CORE_PREFIX             CHIP_CORE_IDENTITY ": "
+#define CHIP_CORE_IDENTITY "chip-core"
+#define CHIP_CORE_PREFIX CHIP_CORE_IDENTITY ": "
 
 namespace chip {
 
@@ -47,7 +47,7 @@ using namespace ::chip::Ble;
 
 using namespace ::chip::Inet;
 
-}
+} // namespace chip
 
 #include <core/CHIPError.h>
 /*

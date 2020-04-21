@@ -118,8 +118,8 @@ int GetEntropy_nRF5(uint8_t * buf, size_t count)
 
     // In the absence of the SoftDevice, call the OpenThread platform API for
     // retrieving entropy.
-    otError otErr = otPlatRandomGetTrue(buf, (uint16_t)count);
-    res = (otErr == OT_ERROR_NONE);
+    otError otErr = otPlatRandomGetTrue(buf, (uint16_t) count);
+    res           = (otErr == OT_ERROR_NONE);
 
 #endif // SOFTDEVICE_PRESENT
 
@@ -144,7 +144,7 @@ CHIP_ERROR InitEntropy()
     // Seed the standard rand() pseudo-random generator with data from the secure random source.
     {
         unsigned int seed;
-        err = Platform::Security::GetSecureRandomData((uint8_t *)&seed, sizeof(seed));
+        err = Platform::Security::GetSecureRandomData((uint8_t *) &seed, sizeof(seed));
         SuccessOrExit(err);
         srand(seed);
     }

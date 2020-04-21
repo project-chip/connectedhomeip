@@ -59,7 +59,8 @@ namespace TLV {
 
 using chip::System::PacketBuffer;
 
-enum {
+enum
+{
     kTLVControlByte_NotSpecified = 0xFFFF
 };
 
@@ -91,16 +92,16 @@ enum {
  */
 class DLL_EXPORT TLVReader
 {
-friend class TLVWriter;
-friend class TLVUpdater;
+    friend class TLVWriter;
+    friend class TLVUpdater;
 
 public:
     // *** See CHIPTLVReader.cpp file for API documentation ***
 
-    void Init(const TLVReader &aReader);
-    void Init(const uint8_t *data, uint32_t dataLen);
-    void Init(PacketBuffer *buf, uint32_t maxLen = 0xFFFFFFFFUL);
-    void Init(PacketBuffer *buf, uint32_t maxLen, bool allowDiscontiguousBuffers);
+    void Init(const TLVReader & aReader);
+    void Init(const uint8_t * data, uint32_t dataLen);
+    void Init(PacketBuffer * buf, uint32_t maxLen = 0xFFFFFFFFUL);
+    void Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguousBuffers);
 
     CHIP_ERROR Next(void);
     CHIP_ERROR Next(TLVType expectedType, uint64_t expectedTag);
@@ -110,51 +111,51 @@ public:
     uint32_t GetLength(void) const;
     uint16_t GetControlByte(void) const;
 
-    CHIP_ERROR Get(bool& v);
-    CHIP_ERROR Get(int8_t& v);
-    CHIP_ERROR Get(int16_t& v);
-    CHIP_ERROR Get(int32_t& v);
-    CHIP_ERROR Get(int64_t& v);
-    CHIP_ERROR Get(uint8_t& v);
-    CHIP_ERROR Get(uint16_t& v);
-    CHIP_ERROR Get(uint32_t& v);
-    CHIP_ERROR Get(uint64_t& v);
-    CHIP_ERROR Get(float& v);
-    CHIP_ERROR Get(double& v);
-    CHIP_ERROR GetBytes(uint8_t *buf, uint32_t bufSize);
-    CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t& dataLen);
-    CHIP_ERROR GetString(char *buf, uint32_t bufSize);
+    CHIP_ERROR Get(bool & v);
+    CHIP_ERROR Get(int8_t & v);
+    CHIP_ERROR Get(int16_t & v);
+    CHIP_ERROR Get(int32_t & v);
+    CHIP_ERROR Get(int64_t & v);
+    CHIP_ERROR Get(uint8_t & v);
+    CHIP_ERROR Get(uint16_t & v);
+    CHIP_ERROR Get(uint32_t & v);
+    CHIP_ERROR Get(uint64_t & v);
+    CHIP_ERROR Get(float & v);
+    CHIP_ERROR Get(double & v);
+    CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize);
+    CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen);
+    CHIP_ERROR GetString(char * buf, uint32_t bufSize);
     CHIP_ERROR DupString(char *& buf);
     CHIP_ERROR GetDataPtr(const uint8_t *& data);
 
-    CHIP_ERROR EnterContainer(TLVType& outerContainerType);
+    CHIP_ERROR EnterContainer(TLVType & outerContainerType);
     CHIP_ERROR ExitContainer(TLVType outerContainerType);
-    CHIP_ERROR OpenContainer(TLVReader& containerReader);
-    CHIP_ERROR CloseContainer(TLVReader& containerReader);
+    CHIP_ERROR OpenContainer(TLVReader & containerReader);
+    CHIP_ERROR CloseContainer(TLVReader & containerReader);
     TLVType GetContainerType(void) const;
     CHIP_ERROR VerifyEndOfContainer(void);
 
     uint32_t GetLengthRead(void) const { return mLenRead; }
     uint32_t GetRemainingLength(void) const { return mMaxLen - mLenRead; }
 
-    const uint8_t *GetReadPoint(void) const { return mReadPoint; }
+    const uint8_t * GetReadPoint(void) const { return mReadPoint; }
     uintptr_t GetBufHandle(void) const { return mBufHandle; }
 
     CHIP_ERROR Skip(void);
 
     uint32_t ImplicitProfileId;
-    void *AppData;
+    void * AppData;
 
-    typedef CHIP_ERROR (*GetNextBufferFunct)(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart,
-            uint32_t& bufLen);
+    typedef CHIP_ERROR (*GetNextBufferFunct)(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart,
+                                             uint32_t & bufLen);
     GetNextBufferFunct GetNextBuffer;
 
 protected:
     uint64_t mElemTag;
     uint64_t mElemLenOrVal;
     uintptr_t mBufHandle;
-    const uint8_t *mReadPoint;
-    const uint8_t *mBufEnd;
+    const uint8_t * mReadPoint;
+    const uint8_t * mBufEnd;
     uint32_t mLenRead;
     uint32_t mMaxLen;
     TLVType mContainerType;
@@ -174,24 +175,21 @@ protected:
     CHIP_ERROR VerifyElement(void);
     uint64_t ReadTag(TLVTagControl tagControl, const uint8_t *& p);
     CHIP_ERROR EnsureData(CHIP_ERROR noDataErr);
-    CHIP_ERROR ReadData(uint8_t *buf, uint32_t len);
-    CHIP_ERROR GetElementHeadLength(uint8_t& elemHeadBytes) const;
+    CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
+    CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
     TLVElementType ElementType(void) const;
 
-    static CHIP_ERROR GetNextPacketBuffer(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart,
-            uint32_t& bufLen);
-    static CHIP_ERROR FailGetNextBuffer(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart,
-            uint32_t& bufLen);
+    static CHIP_ERROR GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen);
+    static CHIP_ERROR FailGetNextBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen);
 
 #if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    static CHIP_ERROR GetNextInetBuffer(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart,
-            uint32_t& bufLen);
+    static CHIP_ERROR GetNextInetBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen);
 #endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 };
 
 #if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-inline CHIP_ERROR TLVReader::GetNextInetBuffer(TLVReader& reader, uintptr_t& bufHandle, const uint8_t *& bufStart,
-    uint32_t& bufLen)
+inline CHIP_ERROR TLVReader::GetNextInetBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart,
+                                               uint32_t & bufLen)
 {
     return GetNextPacketBuffer(reader, bufHandle, bufStart, bufLen);
 }
@@ -214,13 +212,14 @@ inline CHIP_ERROR TLVReader::GetNextInetBuffer(TLVReader& reader, uintptr_t& buf
  */
 class DLL_EXPORT TLVWriter
 {
-friend class TLVUpdater;
+    friend class TLVUpdater;
+
 public:
     // *** See CHIPTLVWriter.cpp file for API documentation ***
 
-    void Init(uint8_t *buf, uint32_t maxLen);
-    void Init(PacketBuffer *buf, uint32_t maxLen = 0xFFFFFFFFUL);
-    void Init(PacketBuffer *buf, uint32_t maxLen, bool allowDiscontiguousBuffers);
+    void Init(uint8_t * buf, uint32_t maxLen);
+    void Init(PacketBuffer * buf, uint32_t maxLen = 0xFFFFFFFFUL);
+    void Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguousBuffers);
 
     CHIP_ERROR Finalize(void);
 
@@ -243,52 +242,50 @@ public:
     CHIP_ERROR Put(uint64_t tag, float v);
     CHIP_ERROR Put(uint64_t tag, double v);
     CHIP_ERROR PutBoolean(uint64_t tag, bool v);
-    CHIP_ERROR PutBytes(uint64_t tag, const uint8_t *buf, uint32_t len);
-    CHIP_ERROR PutString(uint64_t tag, const char *buf);
-    CHIP_ERROR PutString(uint64_t tag, const char *buf, uint32_t len);
-    CHIP_ERROR PutStringF(uint64_t tag, const char *fmt, ...);
-    CHIP_ERROR VPutStringF(uint64_t tag, const char *fmt, va_list ap);
+    CHIP_ERROR PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len);
+    CHIP_ERROR PutString(uint64_t tag, const char * buf);
+    CHIP_ERROR PutString(uint64_t tag, const char * buf, uint32_t len);
+    CHIP_ERROR PutStringF(uint64_t tag, const char * fmt, ...);
+    CHIP_ERROR VPutStringF(uint64_t tag, const char * fmt, va_list ap);
     CHIP_ERROR PutNull(uint64_t tag);
-    CHIP_ERROR CopyElement(TLVReader& reader);
-    CHIP_ERROR CopyElement(uint64_t tag, TLVReader& reader);
+    CHIP_ERROR CopyElement(TLVReader & reader);
+    CHIP_ERROR CopyElement(uint64_t tag, TLVReader & reader);
 
-    CHIP_ERROR StartContainer(uint64_t tag, TLVType containerType, TLVType& outerContainerType);
+    CHIP_ERROR StartContainer(uint64_t tag, TLVType containerType, TLVType & outerContainerType);
     CHIP_ERROR EndContainer(TLVType outerContainerType);
-    CHIP_ERROR OpenContainer(uint64_t tag, TLVType containerType, TLVWriter& containerWriter);
-    CHIP_ERROR CloseContainer(TLVWriter& containerWriter);
-    CHIP_ERROR PutPreEncodedContainer(uint64_t tag, TLVType containerType, const uint8_t *data, uint32_t dataLen);
-    CHIP_ERROR CopyContainer(TLVReader& container);
-    CHIP_ERROR CopyContainer(uint64_t tag, TLVReader& container);
+    CHIP_ERROR OpenContainer(uint64_t tag, TLVType containerType, TLVWriter & containerWriter);
+    CHIP_ERROR CloseContainer(TLVWriter & containerWriter);
+    CHIP_ERROR PutPreEncodedContainer(uint64_t tag, TLVType containerType, const uint8_t * data, uint32_t dataLen);
+    CHIP_ERROR CopyContainer(TLVReader & container);
+    CHIP_ERROR CopyContainer(uint64_t tag, TLVReader & container);
     CHIP_ERROR CopyContainer(uint64_t tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen);
     TLVType GetContainerType(void) const;
 
     uint32_t GetLengthWritten(void);
 
     uint32_t ImplicitProfileId;
-    void *AppData;
+    void * AppData;
 
-    typedef CHIP_ERROR (*GetNewBufferFunct)(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart,
-            uint32_t& bufLen);
+    typedef CHIP_ERROR (*GetNewBufferFunct)(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen);
     GetNewBufferFunct GetNewBuffer;
 
-    typedef CHIP_ERROR (*FinalizeBufferFunct)(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart,
-            uint32_t bufLen);
+    typedef CHIP_ERROR (*FinalizeBufferFunct)(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t bufLen);
     FinalizeBufferFunct FinalizeBuffer;
 
     // Implementations of GetNewBufferFunct/FinalizeBufferFunct that support writing into one or more
     // PacketBuffers.
-    static CHIP_ERROR GetNewPacketBuffer(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen);
-    static CHIP_ERROR FinalizePacketBuffer(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart, uint32_t dataLen);
+    static CHIP_ERROR GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen);
+    static CHIP_ERROR FinalizePacketBuffer(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t dataLen);
 
 #if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    static CHIP_ERROR GetNewInetBuffer(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen);
-    static CHIP_ERROR FinalizeInetBuffer(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart, uint32_t dataLen);
+    static CHIP_ERROR GetNewInetBuffer(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen);
+    static CHIP_ERROR FinalizeInetBuffer(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t dataLen);
 #endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 protected:
     uintptr_t mBufHandle;
-    uint8_t *mBufStart;
-    uint8_t *mWritePoint;
+    uint8_t * mBufStart;
+    uint8_t * mWritePoint;
     uint32_t mRemainingLen;
     uint32_t mLenWritten;
     uint32_t mMaxLen;
@@ -302,7 +299,8 @@ protected:
     bool IsContainerOpen(void) const { return mContainerOpen; }
     void SetContainerOpen(bool aContainerOpen) { mContainerOpen = aContainerOpen; }
 
-    enum {
+    enum
+    {
         kEndOfContainerMarkerSize = 1, /**< Size of the EndOfContainer marker, used in reserving space. */
     };
 
@@ -323,20 +321,20 @@ protected:
     void SetCloseContainerReserved(bool aCloseContainerReserved) { mCloseContainerReserved = aCloseContainerReserved; }
 
 #if CONFIG_HAVE_VCBPRINTF
-    static void CHIPTLVWriterPutcharCB(uint8_t c, void *appState);
+    static void CHIPTLVWriterPutcharCB(uint8_t c, void * appState);
 #endif
     CHIP_ERROR WriteElementHead(TLVElementType elemType, uint64_t tag, uint64_t lenOrVal);
-    CHIP_ERROR WriteElementWithData(TLVType type, uint64_t tag, const uint8_t *data, uint32_t dataLen);
-    CHIP_ERROR WriteData(const uint8_t *p, uint32_t len);
+    CHIP_ERROR WriteElementWithData(TLVType type, uint64_t tag, const uint8_t * data, uint32_t dataLen);
+    CHIP_ERROR WriteData(const uint8_t * p, uint32_t len);
 };
 
 #if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-inline CHIP_ERROR TLVWriter::GetNewInetBuffer(TLVWriter& writer, uintptr_t& bufHandle, uint8_t *& bufStart, uint32_t& bufLen)
+inline CHIP_ERROR TLVWriter::GetNewInetBuffer(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen)
 {
     return GetNewPacketBuffer(writer, bufHandle, bufStart, bufLen);
 }
 
-inline CHIP_ERROR TLVWriter::FinalizeInetBuffer(TLVWriter& writer, uintptr_t bufHandle, uint8_t *bufStart, uint32_t dataLen)
+inline CHIP_ERROR TLVWriter::FinalizeInetBuffer(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t dataLen)
 {
     return FinalizePacketBuffer(writer, bufHandle, bufStart, dataLen);
 }
@@ -379,8 +377,8 @@ inline CHIP_ERROR TLVWriter::FinalizeInetBuffer(TLVWriter& writer, uintptr_t buf
 class DLL_EXPORT TLVUpdater
 {
 public:
-    CHIP_ERROR Init(uint8_t *buf, uint32_t dataLen, uint32_t maxLen);
-    CHIP_ERROR Init(TLVReader& aReader, uint32_t freeLen);
+    CHIP_ERROR Init(uint8_t * buf, uint32_t dataLen, uint32_t maxLen);
+    CHIP_ERROR Init(TLVReader & aReader, uint32_t freeLen);
     CHIP_ERROR Finalize(void) { return mUpdaterWriter.Finalize(); }
 
     // Common methods
@@ -388,27 +386,27 @@ public:
     uint32_t GetImplicitProfileId(void) { return mUpdaterReader.ImplicitProfileId; }
     CHIP_ERROR Move(void);
     void MoveUntilEnd(void);
-    CHIP_ERROR EnterContainer(TLVType& outerContainerType);
+    CHIP_ERROR EnterContainer(TLVType & outerContainerType);
     CHIP_ERROR ExitContainer(TLVType outerContainerType);
-    void GetReader(TLVReader& containerReader) { containerReader = mUpdaterReader; }
+    void GetReader(TLVReader & containerReader) { containerReader = mUpdaterReader; }
 
     // Reader methods
     CHIP_ERROR Next(void);
 
-    CHIP_ERROR Get(bool& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(int8_t& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(int16_t& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(int32_t& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(int64_t& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(uint8_t& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(uint16_t& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(uint32_t& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(uint64_t& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(float& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR Get(double& v) { return mUpdaterReader.Get(v); }
-    CHIP_ERROR GetBytes(uint8_t *buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
-    CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t& dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }
-    CHIP_ERROR GetString(char *buf, uint32_t bufSize) { return mUpdaterReader.GetString(buf, bufSize); }
+    CHIP_ERROR Get(bool & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(int8_t & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(int16_t & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(int32_t & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(int64_t & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(uint8_t & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(uint16_t & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(uint32_t & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(uint64_t & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(float & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(double & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
+    CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }
+    CHIP_ERROR GetString(char * buf, uint32_t bufSize) { return mUpdaterReader.GetString(buf, bufSize); }
     CHIP_ERROR DupString(char *& buf) { return mUpdaterReader.DupString(buf); }
 
     TLVType GetType(void) const { return mUpdaterReader.GetType(); }
@@ -441,12 +439,15 @@ public:
     CHIP_ERROR Put(uint64_t tag, double v) { return mUpdaterWriter.Put(tag, v); }
     CHIP_ERROR PutBoolean(uint64_t tag, bool v) { return mUpdaterWriter.PutBoolean(tag, v); }
     CHIP_ERROR PutNull(uint64_t tag) { return mUpdaterWriter.PutNull(tag); }
-    CHIP_ERROR PutBytes(uint64_t tag, const uint8_t *buf, uint32_t len) { return mUpdaterWriter.PutBytes(tag, buf, len); }
-    CHIP_ERROR PutString(uint64_t tag, const char *buf) { return mUpdaterWriter.PutString(tag, buf); }
-    CHIP_ERROR PutString(uint64_t tag, const char *buf, uint32_t len) { return mUpdaterWriter.PutString(tag, buf, len); }
-    CHIP_ERROR CopyElement(TLVReader& reader) { return mUpdaterWriter.CopyElement(reader); }
-    CHIP_ERROR CopyElement(uint64_t tag, TLVReader& reader) { return mUpdaterWriter.CopyElement(tag, reader); }
-    CHIP_ERROR StartContainer(uint64_t tag, TLVType containerType, TLVType& outerContainerType) { return mUpdaterWriter.StartContainer(tag, containerType, outerContainerType); }
+    CHIP_ERROR PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len) { return mUpdaterWriter.PutBytes(tag, buf, len); }
+    CHIP_ERROR PutString(uint64_t tag, const char * buf) { return mUpdaterWriter.PutString(tag, buf); }
+    CHIP_ERROR PutString(uint64_t tag, const char * buf, uint32_t len) { return mUpdaterWriter.PutString(tag, buf, len); }
+    CHIP_ERROR CopyElement(TLVReader & reader) { return mUpdaterWriter.CopyElement(reader); }
+    CHIP_ERROR CopyElement(uint64_t tag, TLVReader & reader) { return mUpdaterWriter.CopyElement(tag, reader); }
+    CHIP_ERROR StartContainer(uint64_t tag, TLVType containerType, TLVType & outerContainerType)
+    {
+        return mUpdaterWriter.StartContainer(tag, containerType, outerContainerType);
+    }
     CHIP_ERROR EndContainer(TLVType outerContainerType) { return mUpdaterWriter.EndContainer(outerContainerType); }
     uint32_t GetLengthWritten(void) { return mUpdaterWriter.GetLengthWritten(); }
     uint32_t GetRemainingFreeLength(void) { return mUpdaterWriter.mRemainingLen; }
@@ -455,8 +456,8 @@ private:
     void AdjustInternalWriterFreeSpace(void);
 
 private:
-    TLVWriter       mUpdaterWriter;
-    TLVReader       mUpdaterReader;
+    TLVWriter mUpdaterWriter;
+    TLVReader mUpdaterReader;
     const uint8_t * mElementStartAddr;
 };
 

@@ -19,7 +19,6 @@
 #ifndef CHIP_DEVICE_ERROR_H
 #define CHIP_DEVICE_ERROR_H
 
-
 #define CHIP_DEVICE_ERROR_MIN 11000000
 #define CHIP_DEVICE_ERROR_MAX 11000999
 #define _CHIP_DEVICE_ERROR(e) (CHIP_DEVICE_ERROR_MIN + (e))
@@ -31,7 +30,7 @@
  *    The requested configuration value was not found.
  *
  */
-#define CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND                   _CHIP_DEVICE_ERROR(1)
+#define CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND _CHIP_DEVICE_ERROR(1)
 
 /**
  *  @def CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED
@@ -40,7 +39,7 @@
  *    The device has not been service provisioned.
  *
  */
-#define CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED            _CHIP_DEVICE_ERROR(2)
+#define CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED _CHIP_DEVICE_ERROR(2)
 
 /**
  *  @def CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED
@@ -49,7 +48,7 @@
  *    The software update was aborted by application
  *
  */
-#define CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED            _CHIP_DEVICE_ERROR(3)
+#define CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED _CHIP_DEVICE_ERROR(3)
 
 /**
  *  @def CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED
@@ -58,6 +57,6 @@
  *    The software update was ignored by application.
  *
  */
-#define CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED            _CHIP_DEVICE_ERROR(4)
+#define CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED _CHIP_DEVICE_ERROR(4)
 
 #endif // CHIP_DEVICE_ERROR_H

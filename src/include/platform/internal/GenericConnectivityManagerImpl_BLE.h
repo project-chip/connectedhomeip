@@ -34,7 +34,6 @@ class ConnectivityManagerImpl;
 
 namespace Internal {
 
-
 /**
  * Provides a generic implementation of BLE-specific ConnectivityManager features for
  * platforms where BLE functionality is implemented by the BLEManager class.
@@ -47,11 +46,10 @@ namespace Internal {
  * BLE support to the BLEManager class, is standard on platforms that support BLE, and helps to
  * limit the complexity of the ConnectivityManagerImpl class.
  */
-template<class ImplClass>
+template <class ImplClass>
 class GenericConnectivityManagerImpl_BLE
 {
 public:
-
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
@@ -67,68 +65,68 @@ public:
     static const char * _CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode);
 
 private:
-
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>;
 
-template<class ImplClass>
+template <class ImplClass>
 inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_BLE<ImplClass>::_GetCHIPoBLEServiceMode(void)
 {
     return BLEMgr().GetCHIPoBLEServiceMode();
 }
 
-template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_BLE<ImplClass>::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
 {
     return BLEMgr().SetCHIPoBLEServiceMode(val);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertisingEnabled(void)
 {
     return BLEMgr().IsAdvertisingEnabled();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEAdvertisingEnabled(bool val)
 {
     return BLEMgr().SetAdvertisingEnabled(val);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEFastAdvertisingEnabled(void)
 {
     return BLEMgr().IsFastAdvertisingEnabled();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
 {
     return BLEMgr().SetFastAdvertisingEnabled(val);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertising(void)
 {
     return BLEMgr().IsAdvertising();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_GetBLEDeviceName(char * buf, size_t bufSize)
 {
     return BLEMgr().GetDeviceName(buf, bufSize);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEDeviceName(const char * deviceName)
 {
     return BLEMgr().SetDeviceName(deviceName);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline uint16_t GenericConnectivityManagerImpl_BLE<ImplClass>::_NumBLEConnections(void)
 {
     return BLEMgr().NumConnections();

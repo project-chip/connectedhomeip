@@ -30,9 +30,8 @@ namespace DeviceLayer {
  * Concrete implementation of the SoftwareUpdateManager singleton object for the
  * nRF52 platforms.
  */
-class SoftwareUpdateManagerImpl final
-    : public SoftwareUpdateManager,
-      public Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>
+class SoftwareUpdateManagerImpl final : public SoftwareUpdateManager,
+                                        public Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>
 {
     // Allow the SoftwareUpdateManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -43,7 +42,6 @@ class SoftwareUpdateManagerImpl final
     friend class Internal::GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>;
 
 public:
-
     // ===== Members for internal use by the following friends.
 
     friend ::chip::DeviceLayer::SoftwareUpdateManager & SoftwareUpdateMgr(void);

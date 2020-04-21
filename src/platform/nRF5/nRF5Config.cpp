@@ -84,8 +84,8 @@ CHIP_ERROR NRF5Config::ReadConfigValue(Key key, bool & val)
 
     VerifyOrExit(rec.p_header->length_words == 1, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    wordVal = Encoding::LittleEndian::Get32((const uint8_t *)rec.p_data);
-    val = (wordVal != 0);
+    wordVal = Encoding::LittleEndian::Get32((const uint8_t *) rec.p_data);
+    val     = (wordVal != 0);
 
 exit:
     if (needClose)
@@ -108,7 +108,7 @@ CHIP_ERROR NRF5Config::ReadConfigValue(Key key, uint32_t & val)
 
     VerifyOrExit(rec.p_header->length_words == 1, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    val = Encoding::LittleEndian::Get32((const uint8_t *)rec.p_data);
+    val = Encoding::LittleEndian::Get32((const uint8_t *) rec.p_data);
 
 exit:
     if (needClose)
@@ -131,7 +131,7 @@ CHIP_ERROR NRF5Config::ReadConfigValue(Key key, uint64_t & val)
 
     VerifyOrExit(rec.p_header->length_words == 2, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    val = Encoding::LittleEndian::Get64((const uint8_t *)rec.p_data);
+    val = Encoding::LittleEndian::Get64((const uint8_t *) rec.p_data);
 
 exit:
     if (needClose)
@@ -153,10 +153,10 @@ CHIP_ERROR NRF5Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, s
     SuccessOrExit(err);
     needClose = true;
 
-    strEnd = (const uint8_t *)memchr(rec.p_data, 0, rec.p_header->length_words * kFDSWordSize);
+    strEnd = (const uint8_t *) memchr(rec.p_data, 0, rec.p_header->length_words * kFDSWordSize);
     VerifyOrExit(strEnd != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    outLen = strEnd - (const uint8_t *)rec.p_data;
+    outLen = strEnd - (const uint8_t *) rec.p_data;
 
     // NOTE: the caller is allowed to pass NULL for buf to query the length of the stored
     // value.
@@ -190,7 +190,7 @@ CHIP_ERROR NRF5Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize
     VerifyOrExit(rec.p_header->length_words >= 1, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // First two bytes are length.
-    outLen = Encoding::LittleEndian::Get16((const uint8_t *)rec.p_data);
+    outLen = Encoding::LittleEndian::Get16((const uint8_t *) rec.p_data);
 
     VerifyOrExit((rec.p_header->length_words * kFDSWordSize) >= (outLen + 2), err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -201,7 +201,7 @@ CHIP_ERROR NRF5Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize
     {
         VerifyOrExit(bufSize >= outLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        memcpy(buf, ((const uint8_t *)rec.p_data) + 2, outLen);
+        memcpy(buf, ((const uint8_t *) rec.p_data) + 2, outLen);
     }
 
 exit:
@@ -218,15 +218,16 @@ CHIP_ERROR NRF5Config::WriteConfigValue(Key key, bool val)
     uint32_t storedVal = (val) ? 1 : 0;
 
     FDSAsyncOp addOrUpdateOp(FDSAsyncOp::kAddOrUpdateRecord);
-    addOrUpdateOp.FileId = GetFileId(key);
-    addOrUpdateOp.RecordKey = GetRecordKey(key);
-    addOrUpdateOp.RecordData = (const uint8_t *)&storedVal;
+    addOrUpdateOp.FileId                = GetFileId(key);
+    addOrUpdateOp.RecordKey             = GetRecordKey(key);
+    addOrUpdateOp.RecordData            = (const uint8_t *) &storedVal;
     addOrUpdateOp.RecordDataLengthWords = 1;
 
     err = DoAsyncFDSOp(addOrUpdateOp);
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "FDS set: %04" PRIX16 "/%04" PRIX16 " = %s", GetFileId(key), GetRecordKey(key), val ? "true" : "false");
+    ChipLogProgress(DeviceLayer, "FDS set: %04" PRIX16 "/%04" PRIX16 " = %s", GetFileId(key), GetRecordKey(key),
+                    val ? "true" : "false");
 
 exit:
     return err;
@@ -237,15 +238,16 @@ CHIP_ERROR NRF5Config::WriteConfigValue(Key key, uint32_t val)
     CHIP_ERROR err;
 
     FDSAsyncOp addOrUpdateOp(FDSAsyncOp::kAddOrUpdateRecord);
-    addOrUpdateOp.FileId = GetFileId(key);
-    addOrUpdateOp.RecordKey = GetRecordKey(key);
-    addOrUpdateOp.RecordData = (const uint8_t *)&val;
+    addOrUpdateOp.FileId                = GetFileId(key);
+    addOrUpdateOp.RecordKey             = GetRecordKey(key);
+    addOrUpdateOp.RecordData            = (const uint8_t *) &val;
     addOrUpdateOp.RecordDataLengthWords = 1;
 
     err = DoAsyncFDSOp(addOrUpdateOp);
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = %" PRIu32 " (0x%" PRIX32 ")", GetFileId(key), GetRecordKey(key), val, val);
+    ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = %" PRIu32 " (0x%" PRIX32 ")", GetFileId(key),
+                    GetRecordKey(key), val, val);
 
 exit:
     return err;
@@ -256,15 +258,16 @@ CHIP_ERROR NRF5Config::WriteConfigValue(Key key, uint64_t val)
     CHIP_ERROR err;
 
     FDSAsyncOp addOrUpdateOp(FDSAsyncOp::kAddOrUpdateRecord);
-    addOrUpdateOp.FileId = GetFileId(key);
-    addOrUpdateOp.RecordKey = GetRecordKey(key);
-    addOrUpdateOp.RecordData = (const uint8_t *)&val;
+    addOrUpdateOp.FileId                = GetFileId(key);
+    addOrUpdateOp.RecordKey             = GetRecordKey(key);
+    addOrUpdateOp.RecordData            = (const uint8_t *) &val;
     addOrUpdateOp.RecordDataLengthWords = 2;
 
     err = DoAsyncFDSOp(addOrUpdateOp);
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = %" PRIu64 " (0x%" PRIX64 ")", GetFileId(key), GetRecordKey(key), val, val);
+    ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = %" PRIu64 " (0x%" PRIX64 ")", GetFileId(key),
+                    GetRecordKey(key), val, val);
 
 exit:
     return err;
@@ -284,22 +287,23 @@ CHIP_ERROR NRF5Config::WriteConfigValueStr(Key key, const char * str, size_t str
     {
         uint32_t storedValWords = FDSWords(strLen + 1);
 
-        storedVal = (uint8_t *)nrf_malloc(storedValWords * kFDSWordSize);
+        storedVal = (uint8_t *) nrf_malloc(storedValWords * kFDSWordSize);
         VerifyOrExit(storedVal != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         memcpy(storedVal, str, strLen);
         storedVal[strLen] = 0;
 
         FDSAsyncOp addOrUpdateOp(FDSAsyncOp::kAddOrUpdateRecord);
-        addOrUpdateOp.FileId = GetFileId(key);
-        addOrUpdateOp.RecordKey = GetRecordKey(key);
-        addOrUpdateOp.RecordData = storedVal;
+        addOrUpdateOp.FileId                = GetFileId(key);
+        addOrUpdateOp.RecordKey             = GetRecordKey(key);
+        addOrUpdateOp.RecordData            = storedVal;
         addOrUpdateOp.RecordDataLengthWords = storedValWords;
 
         err = DoAsyncFDSOp(addOrUpdateOp);
         SuccessOrExit(err);
 
-        ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = \"%s\"", GetFileId(key), GetRecordKey(key), (const char *)storedVal);
+        ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = \"%s\"", GetFileId(key), GetRecordKey(key),
+                        (const char *) storedVal);
     }
 
     else
@@ -325,24 +329,25 @@ CHIP_ERROR NRF5Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t
     {
         uint32_t storedValWords = FDSWords(dataLen + 2);
 
-        storedVal = (uint8_t *)nrf_malloc(storedValWords * kFDSWordSize);
+        storedVal = (uint8_t *) nrf_malloc(storedValWords * kFDSWordSize);
         VerifyOrExit(storedVal != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         // First two bytes encode the length.
-        Encoding::LittleEndian::Put16(storedVal, (uint16_t)dataLen);
+        Encoding::LittleEndian::Put16(storedVal, (uint16_t) dataLen);
 
         memcpy(storedVal + 2, data, dataLen);
 
         FDSAsyncOp addOrUpdateOp(FDSAsyncOp::kAddOrUpdateRecord);
-        addOrUpdateOp.FileId = GetFileId(key);
-        addOrUpdateOp.RecordKey = GetRecordKey(key);
-        addOrUpdateOp.RecordData = storedVal;
+        addOrUpdateOp.FileId                = GetFileId(key);
+        addOrUpdateOp.RecordKey             = GetRecordKey(key);
+        addOrUpdateOp.RecordData            = storedVal;
         addOrUpdateOp.RecordDataLengthWords = storedValWords;
 
         err = DoAsyncFDSOp(addOrUpdateOp);
         SuccessOrExit(err);
 
-        ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = (blob length %" PRId32 ")", GetFileId(key), GetRecordKey(key), dataLen);
+        ChipLogProgress(DeviceLayer, "FDS set: 0x%04" PRIX16 "/0x%04" PRIX16 " = (blob length %" PRId32 ")", GetFileId(key),
+                        GetRecordKey(key), dataLen);
     }
 
     else
@@ -364,7 +369,7 @@ CHIP_ERROR NRF5Config::ClearConfigValue(Key key)
     CHIP_ERROR err;
 
     FDSAsyncOp delOp(FDSAsyncOp::kDeleteRecordByKey);
-    delOp.FileId = GetFileId(key);
+    delOp.FileId    = GetFileId(key);
     delOp.RecordKey = GetRecordKey(key);
 
     err = DoAsyncFDSOp(delOp);
@@ -398,7 +403,7 @@ CHIP_ERROR NRF5Config::FactoryResetConfig(void)
     {
         FDSAsyncOp delOp(FDSAsyncOp::kDeleteFile);
         delOp.FileId = kFileId_ChipConfig;
-        err = DoAsyncFDSOp(delOp);
+        err          = DoAsyncFDSOp(delOp);
         SuccessOrExit(err);
         ChipLogProgress(DeviceLayer, "FDS delete file: 0x%04" PRIX16, kFileId_ChipConfig);
     }
@@ -429,12 +434,12 @@ CHIP_ERROR NRF5Config::OpenRecord(NRF5Config::Key key, fds_record_desc_t & recDe
     // Search for the requested record.  Return "CONFIG_NOT_FOUND" if it doesn't exist.
     memset(&findToken, 0, sizeof(findToken));
     fdsRes = fds_record_find(NRF5Config::GetFileId(key), NRF5Config::GetRecordKey(key), &recDesc, &findToken);
-    err = (fdsRes == FDS_ERR_NOT_FOUND) ? CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND : MapFDSError(fdsRes);
+    err    = (fdsRes == FDS_ERR_NOT_FOUND) ? CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND : MapFDSError(fdsRes);
     SuccessOrExit(err);
 
     // Open the record for reading.
     fdsRes = fds_record_open(&recDesc, &rec);
-    err = MapFDSError(fdsRes);
+    err    = MapFDSError(fdsRes);
     SuccessOrExit(err);
 
 exit:
@@ -443,7 +448,8 @@ exit:
 
 CHIP_ERROR NRF5Config::ForEachRecord(uint16_t fileId, uint16_t recordKey, ForEachRecordFunct funct)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ;
     ret_code_t fdsRes;
     fds_find_token_t findToken;
     fds_record_desc_t recDesc;
@@ -465,7 +471,7 @@ CHIP_ERROR NRF5Config::ForEachRecord(uint16_t fileId, uint16_t recordKey, ForEac
 
         // Open the record for reading.
         fdsRes = fds_record_open(&recDesc, &rec);
-        err = MapFDSError(fdsRes);
+        err    = MapFDSError(fdsRes);
         SuccessOrExit(err);
         needClose = true;
 
@@ -477,18 +483,18 @@ CHIP_ERROR NRF5Config::ForEachRecord(uint16_t fileId, uint16_t recordKey, ForEac
 
         // Close the record.
         needClose = false;
-        fdsRes = fds_record_close(&recDesc);
-        err = MapFDSError(fdsRes);
+        fdsRes    = fds_record_close(&recDesc);
+        err       = MapFDSError(fdsRes);
         SuccessOrExit(err);
 
         // Delete the record if requested.
         if (deleteRec)
         {
             FDSAsyncOp delOp(FDSAsyncOp::kDeleteRecord);
-            delOp.FileId = fileId;
-            delOp.RecordKey = recordKey;
+            delOp.FileId     = fileId;
+            delOp.RecordKey  = recordKey;
             delOp.RecordDesc = recDesc;
-            err = DoAsyncFDSOp(delOp);
+            err              = DoAsyncFDSOp(delOp);
             SuccessOrExit(err);
         }
     }
@@ -526,14 +532,13 @@ CHIP_ERROR NRF5Config::DoAsyncFDSOp(FDSAsyncOp & asyncOp)
         }
 
         // If adding or updating a record, prepare the FDS record structure with the record data.
-        if (asyncOp.OpType == FDSAsyncOp::kAddRecord ||
-            asyncOp.OpType == FDSAsyncOp::kUpdateRecord ||
+        if (asyncOp.OpType == FDSAsyncOp::kAddRecord || asyncOp.OpType == FDSAsyncOp::kUpdateRecord ||
             asyncOp.OpType == FDSAsyncOp::kAddOrUpdateRecord)
         {
             memset(&rec, 0, sizeof(rec));
-            rec.file_id = asyncOp.FileId;
-            rec.key = asyncOp.RecordKey;
-            rec.data.p_data = asyncOp.RecordData;
+            rec.file_id           = asyncOp.FileId;
+            rec.key               = asyncOp.RecordKey;
+            rec.data.p_data       = asyncOp.RecordData;
             rec.data.length_words = asyncOp.RecordDataLengthWords;
         }
 
@@ -550,13 +555,13 @@ CHIP_ERROR NRF5Config::DoAsyncFDSOp(FDSAsyncOp & asyncOp)
             // Depending on whether an existing record was found, call fds_record_write or fds_record_update.
             if (!existingRecFound)
             {
-        case FDSAsyncOp::kAddRecord:
+            case FDSAsyncOp::kAddRecord:
                 fdsRes = fds_record_write(NULL, &rec);
                 break;
             }
             else
             {
-        case FDSAsyncOp::kUpdateRecord:
+            case FDSAsyncOp::kUpdateRecord:
                 fdsRes = fds_record_update(&asyncOp.RecordDesc, &rec);
                 break;
             }
@@ -679,8 +684,7 @@ void NRF5Config::HandleFDSEvent(const fds_evt_t * fdsEvent)
     case FDSAsyncOp::kUpdateRecord:
         // Ignore the event if its not a WRITE or UPDATE, or if its for a different file/record.
         if ((fdsEvent->id != FDS_EVT_WRITE && fdsEvent->id != FDS_EVT_UPDATE) ||
-            fdsEvent->write.file_id != sActiveAsyncOp->FileId ||
-            fdsEvent->write.record_key != sActiveAsyncOp->RecordKey)
+            fdsEvent->write.file_id != sActiveAsyncOp->FileId || fdsEvent->write.record_key != sActiveAsyncOp->RecordKey)
         {
             return;
         }
@@ -688,8 +692,7 @@ void NRF5Config::HandleFDSEvent(const fds_evt_t * fdsEvent)
     case FDSAsyncOp::kDeleteRecord:
     case FDSAsyncOp::kDeleteRecordByKey:
         // Ignore the event if its not a DEL_RECORD, or if its for a different file/record.
-        if (fdsEvent->id != FDS_EVT_DEL_RECORD ||
-            fdsEvent->del.record_id != sActiveAsyncOp->RecordDesc.record_id)
+        if (fdsEvent->id != FDS_EVT_DEL_RECORD || fdsEvent->del.record_id != sActiveAsyncOp->RecordDesc.record_id)
         {
             return;
         }
@@ -749,24 +752,20 @@ void NRF5Config::RunConfigUnitTest()
 
     // NRF Config Test 1 -- Force GC
     {
-        const static uint8_t kTestData[] =
-        {
-            0xD5, 0x00, 0x00, 0x04, 0x00, 0x01, 0x00, 0x30, 0x01, 0x08, 0x79, 0x55, 0x9F, 0x15, 0x1F, 0x66,
-            0x3D, 0x8F, 0x24, 0x02, 0x05, 0x37, 0x03, 0x27, 0x13, 0x02, 0x00, 0x00, 0xEE, 0xEE, 0x30, 0xB4,
-            0x18, 0x18, 0x26, 0x04, 0x80, 0x41, 0x1B, 0x23, 0x26, 0x05, 0x7F, 0xFF, 0xFF, 0x52, 0x37, 0x06,
-            0x27, 0x11, 0x01, 0x00, 0x00, 0x00, 0x00, 0x30, 0xB4, 0x18, 0x18, 0x24, 0x07, 0x02, 0x26, 0x08,
-            0x25, 0x00, 0x5A, 0x23, 0x30, 0x0A, 0x39, 0x04, 0x9E, 0xC7, 0x77, 0xC5, 0xA4, 0x13, 0x31, 0xF7,
-            0x72, 0x2E, 0x27, 0xC2, 0x86, 0x3D, 0xC5, 0x2E, 0xD5, 0xD2, 0x3C, 0xCF, 0x7E, 0x06, 0xE3, 0x48,
-            0x53, 0x87, 0xE8, 0x4D, 0xB0, 0x27, 0x07, 0x58, 0x4A, 0x38, 0xB4, 0xF3, 0xB2, 0x47, 0x94, 0x45,
-            0x58, 0x65, 0x80, 0x08, 0x17, 0x6B, 0x8E, 0x4F, 0x07, 0x41, 0xA3, 0x3D, 0x5D, 0xCE, 0x76, 0x86,
-            0x35, 0x83, 0x29, 0x01, 0x18, 0x35, 0x82, 0x29, 0x01, 0x24, 0x02, 0x05, 0x18, 0x35, 0x84, 0x29,
-            0x01, 0x36, 0x02, 0x04, 0x02, 0x04, 0x01, 0x18, 0x18, 0x35, 0x81, 0x30, 0x02, 0x08, 0x42, 0xBD,
-            0x2C, 0x6B, 0x5B, 0x3A, 0x18, 0x16, 0x18, 0x35, 0x80, 0x30, 0x02, 0x08, 0x44, 0xE3, 0x40, 0x38,
-            0xA9, 0xD4, 0xB5, 0xA7, 0x18, 0x35, 0x0C, 0x30, 0x01, 0x19, 0x00, 0xA6, 0x5D, 0x54, 0xF5, 0xAE,
-            0x5D, 0x63, 0xEB, 0x69, 0xD8, 0xDB, 0xCB, 0xE2, 0x20, 0x0C, 0xD5, 0x6F, 0x43, 0x5E, 0x96, 0xA8,
-            0x54, 0xB2, 0x74, 0x30, 0x02, 0x19, 0x00, 0xE0, 0x37, 0x02, 0x8B, 0xB3, 0x04, 0x06, 0xDD, 0xBD,
-            0x28, 0xAA, 0xC4, 0xF1, 0xFF, 0xFB, 0xB1, 0xD4, 0x1C, 0x78, 0x40, 0xDA, 0x2C, 0xD8, 0x40, 0x18,
-            0x18,
+        const static uint8_t kTestData[] = {
+            0xD5, 0x00, 0x00, 0x04, 0x00, 0x01, 0x00, 0x30, 0x01, 0x08, 0x79, 0x55, 0x9F, 0x15, 0x1F, 0x66, 0x3D, 0x8F, 0x24,
+            0x02, 0x05, 0x37, 0x03, 0x27, 0x13, 0x02, 0x00, 0x00, 0xEE, 0xEE, 0x30, 0xB4, 0x18, 0x18, 0x26, 0x04, 0x80, 0x41,
+            0x1B, 0x23, 0x26, 0x05, 0x7F, 0xFF, 0xFF, 0x52, 0x37, 0x06, 0x27, 0x11, 0x01, 0x00, 0x00, 0x00, 0x00, 0x30, 0xB4,
+            0x18, 0x18, 0x24, 0x07, 0x02, 0x26, 0x08, 0x25, 0x00, 0x5A, 0x23, 0x30, 0x0A, 0x39, 0x04, 0x9E, 0xC7, 0x77, 0xC5,
+            0xA4, 0x13, 0x31, 0xF7, 0x72, 0x2E, 0x27, 0xC2, 0x86, 0x3D, 0xC5, 0x2E, 0xD5, 0xD2, 0x3C, 0xCF, 0x7E, 0x06, 0xE3,
+            0x48, 0x53, 0x87, 0xE8, 0x4D, 0xB0, 0x27, 0x07, 0x58, 0x4A, 0x38, 0xB4, 0xF3, 0xB2, 0x47, 0x94, 0x45, 0x58, 0x65,
+            0x80, 0x08, 0x17, 0x6B, 0x8E, 0x4F, 0x07, 0x41, 0xA3, 0x3D, 0x5D, 0xCE, 0x76, 0x86, 0x35, 0x83, 0x29, 0x01, 0x18,
+            0x35, 0x82, 0x29, 0x01, 0x24, 0x02, 0x05, 0x18, 0x35, 0x84, 0x29, 0x01, 0x36, 0x02, 0x04, 0x02, 0x04, 0x01, 0x18,
+            0x18, 0x35, 0x81, 0x30, 0x02, 0x08, 0x42, 0xBD, 0x2C, 0x6B, 0x5B, 0x3A, 0x18, 0x16, 0x18, 0x35, 0x80, 0x30, 0x02,
+            0x08, 0x44, 0xE3, 0x40, 0x38, 0xA9, 0xD4, 0xB5, 0xA7, 0x18, 0x35, 0x0C, 0x30, 0x01, 0x19, 0x00, 0xA6, 0x5D, 0x54,
+            0xF5, 0xAE, 0x5D, 0x63, 0xEB, 0x69, 0xD8, 0xDB, 0xCB, 0xE2, 0x20, 0x0C, 0xD5, 0x6F, 0x43, 0x5E, 0x96, 0xA8, 0x54,
+            0xB2, 0x74, 0x30, 0x02, 0x19, 0x00, 0xE0, 0x37, 0x02, 0x8B, 0xB3, 0x04, 0x06, 0xDD, 0xBD, 0x28, 0xAA, 0xC4, 0xF1,
+            0xFF, 0xFB, 0xB1, 0xD4, 0x1C, 0x78, 0x40, 0xDA, 0x2C, 0xD8, 0x40, 0x18, 0x18,
         };
         uint8_t buf[512];
         size_t dataLen;
@@ -786,8 +785,6 @@ void NRF5Config::RunConfigUnitTest()
         VerifyOrDie(memcmp(buf, kTestData, dataLen) == 0);
     }
 }
-
-
 
 } // namespace Internal
 } // namespace DeviceLayer

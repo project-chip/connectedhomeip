@@ -35,5 +35,4 @@ bool FormatNRFError(char * buf, uint16_t bufSize, int32_t err);
 } // namespace DeviceLayer
 } // namespace chip
 
-
 #endif // NRF5_UTILS_H

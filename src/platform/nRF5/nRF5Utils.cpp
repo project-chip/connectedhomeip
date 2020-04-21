@@ -38,11 +38,7 @@ namespace Internal {
  */
 void RegisterNRFErrorFormatter(void)
 {
-    static ErrorFormatter sNRFErrorFormatter =
-    {
-        FormatNRFError,
-        NULL
-    };
+    static ErrorFormatter sNRFErrorFormatter = { FormatNRFError, NULL };
 
     RegisterErrorFormatter(&sNRFErrorFormatter);
 }
@@ -83,8 +79,6 @@ bool FormatNRFError(char * buf, uint16_t bufSize, int32_t err)
     return true;
 }
 
-
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

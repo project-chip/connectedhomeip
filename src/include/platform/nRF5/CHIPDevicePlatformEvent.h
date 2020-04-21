@@ -34,7 +34,7 @@ namespace chip {
 namespace System {
 class PacketBuffer;
 }
-}
+} // namespace chip
 
 namespace chip {
 namespace DeviceLayer {
@@ -54,7 +54,7 @@ enum PublicPlatformSpecificEventTypes
  */
 enum InternalPlatformSpecificEventTypes
 {
-    kSoftDeviceBLEEvent                     = kRange_InternalPlatformSpecific,
+    kSoftDeviceBLEEvent = kRange_InternalPlatformSpecific,
     kCHIPoBLERXCharWriteEvent,
     kCHIPoBLEOutOfBuffersEvent,
 };
@@ -84,6 +84,5 @@ struct ChipDevicePlatformEvent final
 
 } // namespace DeviceLayer
 } // namespace chip
-
 
 #endif // CHIP_DEVICE_PLATFORM_EVENT_H

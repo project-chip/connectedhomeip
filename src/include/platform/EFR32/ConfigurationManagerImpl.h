@@ -54,10 +54,10 @@ private:
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t *buf);
+    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
     bool _CanFactoryReset(void);
     void _InitiateFactoryReset(void);
-    CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t &value);
+    CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
@@ -65,8 +65,8 @@ private:
     // ===== Members for internal use by the following friends.
 
     friend class Internal::NetworkProvisioningServerImpl;
-    friend ConfigurationManager &    ConfigurationMgr(void);
-    friend ConfigurationManagerImpl &ConfigurationMgrImpl(void);
+    friend ConfigurationManager & ConfigurationMgr(void);
+    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
 
     static ConfigurationManagerImpl sInstance;
 
@@ -81,7 +81,7 @@ private:
  * Chip applications should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
  */
-inline ConfigurationManager &ConfigurationMgr(void)
+inline ConfigurationManager & ConfigurationMgr(void)
 {
     return ConfigurationManagerImpl::sInstance;
 }
@@ -92,12 +92,12 @@ inline ConfigurationManager &ConfigurationMgr(void)
  * Chip applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the ESP32 platform.
  */
-inline ConfigurationManagerImpl &ConfigurationMgrImpl(void)
+inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
 {
     return ConfigurationManagerImpl::sInstance;
 }
 
-inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t *buf)
+inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

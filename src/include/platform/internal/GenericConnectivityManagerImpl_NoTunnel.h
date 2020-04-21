@@ -47,11 +47,10 @@ namespace Internal {
  * }
  * ```
  */
-template<class ImplClass>
+template <class ImplClass>
 class GenericConnectivityManagerImpl_NoTunnel
 {
 public:
-
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::ServiceTunnelMode _GetServiceTunnelMode(void);
@@ -62,46 +61,46 @@ public:
     static const char * _ServiceTunnelModeToStr(ConnectivityManager::ServiceTunnelMode mode);
 
 private:
-
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
-template<class ImplClass>
+template <class ImplClass>
 inline ConnectivityManager::ServiceTunnelMode GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_GetServiceTunnelMode(void)
 {
     return ConnectivityManager::kServiceTunnelMode_NotSupported;
 }
 
-template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_SetServiceTunnelMode(ConnectivityManager::ServiceTunnelMode val)
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_SetServiceTunnelMode(ConnectivityManager::ServiceTunnelMode val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_IsServiceTunnelConnected(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_IsServiceTunnelRestricted(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_HaveServiceConnectivityViaTunnel(void)
 {
     return false;
 }
 
-template<class ImplClass>
-inline const char * GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_ServiceTunnelModeToStr(ConnectivityManager::ServiceTunnelMode mode)
+template <class ImplClass>
+inline const char *
+GenericConnectivityManagerImpl_NoTunnel<ImplClass>::_ServiceTunnelModeToStr(ConnectivityManager::ServiceTunnelMode mode)
 {
     return NULL;
 }
-
 
 } // namespace Internal
 } // namespace DeviceLayer

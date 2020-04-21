@@ -1,4 +1,4 @@
- /*
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
@@ -47,11 +47,9 @@ GroupKeyStoreImpl gGroupKeyStore;
 
 } // unnamed namespace
 
-
 /** Singleton instance of the ConfigurationManager implementation object.
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
-
 
 CHIP_ERROR ConfigurationManagerImpl::_Init()
 {
@@ -70,8 +68,8 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
 
     {
         FactoryProvisioning factoryProv;
-        uint8_t * const kDeviceRAMStart = (uint8_t *)0x20000000;
-        uint8_t * const kDeviceRAMEnd = kDeviceRAMStart + (NRF_FICR->INFO.RAM * 1024) - 1;
+        uint8_t * const kDeviceRAMStart = (uint8_t *) 0x20000000;
+        uint8_t * const kDeviceRAMEnd   = kDeviceRAMStart + (NRF_FICR->INFO.RAM * 1024) - 1;
 
         // Scan device RAM for injected provisioning data and save to persistent storage if found.
         err = factoryProv.ProvisionDeviceFromRAM(kDeviceRAMStart, kDeviceRAMEnd);
@@ -103,7 +101,8 @@ void ConfigurationManagerImpl::_InitiateFactoryReset()
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
+                                                                uint32_t & value)
 {
     CHIP_ERROR err;
     uint16_t recordKey = persistedStorageKey + kPersistedCounterRecordKeyBase;
@@ -121,7 +120,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
+                                                                 uint32_t value)
 {
     CHIP_ERROR err;
     uint16_t recordKey = persistedStorageKey + kPersistedCounterRecordKeyBase;

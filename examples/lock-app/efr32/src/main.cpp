@@ -17,21 +17,21 @@
  *    limitations under the License.
  */
 
+#include <bsp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <bsp.h>
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdarg.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
 #include <AppTask.h>
 
 #include "AppConfig.h"
-#include "init_mcu.h"
 #include "init_board.h"
+#include "init_mcu.h"
 
 #if DISPLAY_ENABLED
 #include "init_lcd.h"

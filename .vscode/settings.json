@@ -22,6 +22,18 @@
     "[dockerfile]": {
         "editor.defaultFormatter": "ms-azuretools.vscode-docker"
     },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[shellscript]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[properties]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
     "files.associations": {
         "iostream": "cpp",
         "array": "cpp",
@@ -66,7 +78,8 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "*.ipp": "cpp",
-        "aes.h": "c"
+        "aes.h": "c",
+        "stdio.h": "c"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,
@@ -108,5 +121,6 @@
             "backgroundColor": "transparent"
         }
     ],
-    "clang-format.fallbackStyle": "WebKit"
+    "clang-format.fallbackStyle": "WebKit",
+    "files.trimFinalNewlines": true
 }

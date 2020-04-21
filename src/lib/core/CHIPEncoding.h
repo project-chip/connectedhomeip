@@ -67,7 +67,10 @@ namespace Encoding {
  *
  * @return The input value, byte order swapped.
  */
-inline uint16_t Swap16(uint16_t v)              { return nl::ByteOrder::Swap16(v); }
+inline uint16_t Swap16(uint16_t v)
+{
+    return nl::ByteOrder::Swap16(v);
+}
 
 /**
  * This unconditionally performs a byte order swap by value of the
@@ -77,7 +80,10 @@ inline uint16_t Swap16(uint16_t v)              { return nl::ByteOrder::Swap16(v
  *
  * @return The input value, byte order swapped.
  */
-inline uint32_t Swap32(uint32_t v)              { return nl::ByteOrder::Swap32(v); }
+inline uint32_t Swap32(uint32_t v)
+{
+    return nl::ByteOrder::Swap32(v);
+}
 
 /**
  * This unconditionally performs a byte order swap by value of the
@@ -87,7 +93,10 @@ inline uint32_t Swap32(uint32_t v)              { return nl::ByteOrder::Swap32(v
  *
  * @return The input value, byte order swapped.
  */
-inline uint64_t Swap64(uint64_t v)              { return nl::ByteOrder::Swap64(v); }
+inline uint64_t Swap64(uint64_t v)
+{
+    return nl::ByteOrder::Swap64(v);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the 8-bit value
@@ -98,7 +107,10 @@ inline uint64_t Swap64(uint64_t v)              { return nl::ByteOrder::Swap64(v
  *
  * @return The 8-bit value at the specified pointer address.
  */
-inline uint8_t  Get8(const uint8_t *p)          { return nl::IO::Get8(p); }
+inline uint8_t Get8(const uint8_t * p)
+{
+    return nl::IO::Get8(p);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -110,7 +122,10 @@ inline uint8_t  Get8(const uint8_t *p)          { return nl::IO::Get8(p); }
  * @param[in]  v      The 8-bit value to write.
  *
  */
-inline void     Put8(uint8_t *p, uint8_t v)     { nl::IO::Put8(p, v); }
+inline void Put8(uint8_t * p, uint8_t v)
+{
+    nl::IO::Put8(p, v);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the 16-bit value
@@ -123,7 +138,10 @@ inline void     Put8(uint8_t *p, uint8_t v)     { nl::IO::Put8(p, v); }
  *
  * @return The 8-bit value at the specified pointer address.
  */
-inline uint8_t  Read8(uint8_t *& p)             { return nl::IO::Read8((const void *&)p); }
+inline uint8_t Read8(uint8_t *& p)
+{
+    return nl::IO::Read8((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the 16-bit value
@@ -136,7 +154,10 @@ inline uint8_t  Read8(uint8_t *& p)             { return nl::IO::Read8((const vo
  *
  * @return The 8-bit value at the specified pointer address.
  */
-inline uint8_t  Read8(const uint8_t *& p)       { return nl::IO::Read8((const void *&)p); }
+inline uint8_t Read8(const uint8_t *& p)
+{
+    return nl::IO::Read8((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the 8-bit value
@@ -150,7 +171,10 @@ inline uint8_t  Read8(const uint8_t *& p)       { return nl::IO::Read8((const vo
  * @param[in]     v   The 8-bit value to write.
  *
  */
-inline void     Write8(uint8_t *& p, uint8_t v) { *p++ = v; }
+inline void Write8(uint8_t *& p, uint8_t v)
+{
+    *p++ = v;
+}
 
 /**
  *  @namespace chip::Encoding::LittleEndian
@@ -188,7 +212,10 @@ namespace LittleEndian {
  *
  * @return The input value, if necessary, byte order swapped.
  */
-inline uint16_t HostSwap16(uint16_t v)          { return nl::ByteOrder::Swap16LittleToHost(v); }
+inline uint16_t HostSwap16(uint16_t v)
+{
+    return nl::ByteOrder::Swap16LittleToHost(v);
+}
 
 /**
  * This conditionally performs, as necessary for the target system, a
@@ -203,7 +230,10 @@ inline uint16_t HostSwap16(uint16_t v)          { return nl::ByteOrder::Swap16Li
  *
  * @return The input value, if necessary, byte order swapped.
  */
-inline uint32_t HostSwap32(uint32_t v)          { return nl::ByteOrder::Swap32LittleToHost(v); }
+inline uint32_t HostSwap32(uint32_t v)
+{
+    return nl::ByteOrder::Swap32LittleToHost(v);
+}
 
 /**
  * This conditionally performs, as necessary for the target system, a
@@ -218,7 +248,10 @@ inline uint32_t HostSwap32(uint32_t v)          { return nl::ByteOrder::Swap32Li
  *
  * @return The input value, if necessary, byte order swapped.
  */
-inline uint64_t HostSwap64(uint64_t v)          { return nl::ByteOrder::Swap64LittleToHost(v); }
+inline uint64_t HostSwap64(uint64_t v)
+{
+    return nl::ByteOrder::Swap64LittleToHost(v);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -232,7 +265,10 @@ inline uint64_t HostSwap64(uint64_t v)          { return nl::ByteOrder::Swap64Li
  * @return The 16-bit value at the specified pointer address, if
  *         necessary, byte reordered.
  */
-inline uint16_t Get16(const uint8_t *p)         { return nl::IO::LittleEndian::GetUnaligned16(p); }
+inline uint16_t Get16(const uint8_t * p)
+{
+    return nl::IO::LittleEndian::GetUnaligned16(p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -246,7 +282,10 @@ inline uint16_t Get16(const uint8_t *p)         { return nl::IO::LittleEndian::G
  * @return The 32-bit value at the specified pointer address, if
  *         necessary, byte reordered.
  */
-inline uint32_t Get32(const uint8_t *p)         { return nl::IO::LittleEndian::GetUnaligned32(p); }
+inline uint32_t Get32(const uint8_t * p)
+{
+    return nl::IO::LittleEndian::GetUnaligned32(p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -260,7 +299,10 @@ inline uint32_t Get32(const uint8_t *p)         { return nl::IO::LittleEndian::G
  * @return The 64-bit value at the specified pointer address, if
  *         necessary, byte reordered.
  */
-inline uint64_t Get64(const uint8_t *p)         { return nl::IO::LittleEndian::GetUnaligned64(p); }
+inline uint64_t Get64(const uint8_t * p)
+{
+    return nl::IO::LittleEndian::GetUnaligned64(p);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -275,7 +317,10 @@ inline uint64_t Get64(const uint8_t *p)         { return nl::IO::LittleEndian::G
  * @param[in]  v      The 16-bit value to write, if necessary, byte reordered.
  *
  */
-inline void     Put16(uint8_t *p, uint16_t v)   { nl::IO::LittleEndian::PutUnaligned16(p, v); }
+inline void Put16(uint8_t * p, uint16_t v)
+{
+    nl::IO::LittleEndian::PutUnaligned16(p, v);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -290,7 +335,10 @@ inline void     Put16(uint8_t *p, uint16_t v)   { nl::IO::LittleEndian::PutUnali
  * @param[in]  v      The 32-bit value to write, if necessary, byte reordered.
  *
  */
-inline void     Put32(uint8_t *p, uint32_t v)   { nl::IO::LittleEndian::PutUnaligned32(p, v); }
+inline void Put32(uint8_t * p, uint32_t v)
+{
+    nl::IO::LittleEndian::PutUnaligned32(p, v);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -305,7 +353,10 @@ inline void     Put32(uint8_t *p, uint32_t v)   { nl::IO::LittleEndian::PutUnali
  * @param[in]  v      The 64-bit value to write, if necessary, byte reordered.
  *
  */
-inline void     Put64(uint8_t *p, uint64_t v)   { nl::IO::LittleEndian::PutUnaligned64(p, v); }
+inline void Put64(uint8_t * p, uint64_t v)
+{
+    nl::IO::LittleEndian::PutUnaligned64(p, v);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -322,7 +373,10 @@ inline void     Put64(uint8_t *p, uint64_t v)   { nl::IO::LittleEndian::PutUnali
  * @return The 16-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint16_t Read16(uint8_t *& p)            { return nl::IO::LittleEndian::ReadUnaligned16((const void *&)p); }
+inline uint16_t Read16(uint8_t *& p)
+{
+    return nl::IO::LittleEndian::ReadUnaligned16((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -339,7 +393,10 @@ inline uint16_t Read16(uint8_t *& p)            { return nl::IO::LittleEndian::R
  * @return The 32-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint32_t Read32(uint8_t *& p)            { return nl::IO::LittleEndian::ReadUnaligned32((const void *&)p); }
+inline uint32_t Read32(uint8_t *& p)
+{
+    return nl::IO::LittleEndian::ReadUnaligned32((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -356,7 +413,10 @@ inline uint32_t Read32(uint8_t *& p)            { return nl::IO::LittleEndian::R
  * @return The 64-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint64_t Read64(uint8_t *& p)            { return nl::IO::LittleEndian::ReadUnaligned64((const void *&)p); }
+inline uint64_t Read64(uint8_t *& p)
+{
+    return nl::IO::LittleEndian::ReadUnaligned64((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -373,7 +433,10 @@ inline uint64_t Read64(uint8_t *& p)            { return nl::IO::LittleEndian::R
  * @return The 16-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint16_t Read16(const uint8_t *& p)      { return nl::IO::LittleEndian::ReadUnaligned16((const void *&)p); }
+inline uint16_t Read16(const uint8_t *& p)
+{
+    return nl::IO::LittleEndian::ReadUnaligned16((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -390,7 +453,10 @@ inline uint16_t Read16(const uint8_t *& p)      { return nl::IO::LittleEndian::R
  * @return The 32-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint32_t Read32(const uint8_t *& p)      { return nl::IO::LittleEndian::ReadUnaligned32((const void *&)p); }
+inline uint32_t Read32(const uint8_t *& p)
+{
+    return nl::IO::LittleEndian::ReadUnaligned32((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the little endian
@@ -407,7 +473,10 @@ inline uint32_t Read32(const uint8_t *& p)      { return nl::IO::LittleEndian::R
  * @return The 64-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint64_t Read64(const uint8_t *& p)      { return nl::IO::LittleEndian::ReadUnaligned64((const void *&)p); }
+inline uint64_t Read64(const uint8_t *& p)
+{
+    return nl::IO::LittleEndian::ReadUnaligned64((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -425,7 +494,11 @@ inline uint64_t Read64(const uint8_t *& p)      { return nl::IO::LittleEndian::R
  *                    swapped.
  *
  */
-inline void Write16(uint8_t *& p, uint16_t v)   { Put16(p, v); p += sizeof(uint16_t); }
+inline void Write16(uint8_t *& p, uint16_t v)
+{
+    Put16(p, v);
+    p += sizeof(uint16_t);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -443,7 +516,11 @@ inline void Write16(uint8_t *& p, uint16_t v)   { Put16(p, v); p += sizeof(uint1
  *                    swapped.
  *
  */
-inline void Write32(uint8_t *& p, uint32_t v)   { Put32(p, v); p += sizeof(uint32_t); }
+inline void Write32(uint8_t *& p, uint32_t v)
+{
+    Put32(p, v);
+    p += sizeof(uint32_t);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -461,10 +538,13 @@ inline void Write32(uint8_t *& p, uint32_t v)   { Put32(p, v); p += sizeof(uint3
  *                    swapped.
  *
  */
-inline void Write64(uint8_t *& p, uint64_t v)   { Put64(p, v); p += sizeof(uint64_t); }
+inline void Write64(uint8_t *& p, uint64_t v)
+{
+    Put64(p, v);
+    p += sizeof(uint64_t);
+}
 
-} // LittleEndian
-
+} // namespace LittleEndian
 
 /**
  *  @namespace chip::Encoding::BigEndian
@@ -502,7 +582,10 @@ namespace BigEndian {
  *
  * @return The input value, if necessary, byte order swapped.
  */
-inline uint16_t HostSwap16(uint16_t v)          { return nl::ByteOrder::Swap16BigToHost(v); }
+inline uint16_t HostSwap16(uint16_t v)
+{
+    return nl::ByteOrder::Swap16BigToHost(v);
+}
 
 /**
  * This conditionally performs, as necessary for the target system, a
@@ -517,7 +600,10 @@ inline uint16_t HostSwap16(uint16_t v)          { return nl::ByteOrder::Swap16Bi
  *
  * @return The input value, if necessary, byte order swapped.
  */
-inline uint32_t HostSwap32(uint32_t v)          { return nl::ByteOrder::Swap32BigToHost(v); }
+inline uint32_t HostSwap32(uint32_t v)
+{
+    return nl::ByteOrder::Swap32BigToHost(v);
+}
 
 /**
  * This conditionally performs, as necessary for the target system, a
@@ -532,7 +618,10 @@ inline uint32_t HostSwap32(uint32_t v)          { return nl::ByteOrder::Swap32Bi
  *
  * @return The input value, if necessary, byte order swapped.
  */
-inline uint64_t HostSwap64(uint64_t v)          { return nl::ByteOrder::Swap64BigToHost(v); }
+inline uint64_t HostSwap64(uint64_t v)
+{
+    return nl::ByteOrder::Swap64BigToHost(v);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -546,7 +635,10 @@ inline uint64_t HostSwap64(uint64_t v)          { return nl::ByteOrder::Swap64Bi
  * @return The 16-bit value at the specified pointer address, if
  *         necessary, byte reordered.
  */
-inline uint16_t Get16(const uint8_t *p)         { return nl::IO::BigEndian::GetUnaligned16(p); }
+inline uint16_t Get16(const uint8_t * p)
+{
+    return nl::IO::BigEndian::GetUnaligned16(p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -560,7 +652,10 @@ inline uint16_t Get16(const uint8_t *p)         { return nl::IO::BigEndian::GetU
  * @return The 32-bit value at the specified pointer address, if
  *         necessary, byte reordered.
  */
-inline uint32_t Get32(const uint8_t *p)         { return nl::IO::BigEndian::GetUnaligned32(p); }
+inline uint32_t Get32(const uint8_t * p)
+{
+    return nl::IO::BigEndian::GetUnaligned32(p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -574,7 +669,10 @@ inline uint32_t Get32(const uint8_t *p)         { return nl::IO::BigEndian::GetU
  * @return The 64-bit value at the specified pointer address, if
  *         necessary, byte reordered.
  */
-inline uint64_t Get64(const uint8_t *p)         { return nl::IO::BigEndian::GetUnaligned64(p); }
+inline uint64_t Get64(const uint8_t * p)
+{
+    return nl::IO::BigEndian::GetUnaligned64(p);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -590,7 +688,10 @@ inline uint64_t Get64(const uint8_t *p)         { return nl::IO::BigEndian::GetU
  *                    swapped.
  *
  */
-inline void     Put16(uint8_t *p, uint16_t v)   { nl::IO::BigEndian::PutUnaligned16(p, v); }
+inline void Put16(uint8_t * p, uint16_t v)
+{
+    nl::IO::BigEndian::PutUnaligned16(p, v);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -606,7 +707,10 @@ inline void     Put16(uint8_t *p, uint16_t v)   { nl::IO::BigEndian::PutUnaligne
  *                    swapped.
  *
  */
-inline void     Put32(uint8_t *p, uint32_t v)   { nl::IO::BigEndian::PutUnaligned32(p, v); }
+inline void Put32(uint8_t * p, uint32_t v)
+{
+    nl::IO::BigEndian::PutUnaligned32(p, v);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -622,7 +726,10 @@ inline void     Put32(uint8_t *p, uint32_t v)   { nl::IO::BigEndian::PutUnaligne
  *                    swapped.
  *
  */
-inline void     Put64(uint8_t *p, uint64_t v)   { nl::IO::BigEndian::PutUnaligned64(p, v); }
+inline void Put64(uint8_t * p, uint64_t v)
+{
+    nl::IO::BigEndian::PutUnaligned64(p, v);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -639,7 +746,10 @@ inline void     Put64(uint8_t *p, uint64_t v)   { nl::IO::BigEndian::PutUnaligne
  * @return The 16-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint16_t Read16(uint8_t *& p)            { return nl::IO::BigEndian::ReadUnaligned16((const void *&)p); }
+inline uint16_t Read16(uint8_t *& p)
+{
+    return nl::IO::BigEndian::ReadUnaligned16((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -656,7 +766,10 @@ inline uint16_t Read16(uint8_t *& p)            { return nl::IO::BigEndian::Read
  * @return The 32-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint32_t Read32(uint8_t *& p)            { return nl::IO::BigEndian::ReadUnaligned32((const void *&)p); }
+inline uint32_t Read32(uint8_t *& p)
+{
+    return nl::IO::BigEndian::ReadUnaligned32((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -673,7 +786,10 @@ inline uint32_t Read32(uint8_t *& p)            { return nl::IO::BigEndian::Read
  * @return The 64-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint64_t Read64(uint8_t *& p)            { return nl::IO::BigEndian::ReadUnaligned64((const void *&)p); }
+inline uint64_t Read64(uint8_t *& p)
+{
+    return nl::IO::BigEndian::ReadUnaligned64((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -690,7 +806,10 @@ inline uint64_t Read64(uint8_t *& p)            { return nl::IO::BigEndian::Read
  * @return The 16-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint16_t Read16(const uint8_t *& p)      { return nl::IO::BigEndian::ReadUnaligned16((const void *&)p); }
+inline uint16_t Read16(const uint8_t *& p)
+{
+    return nl::IO::BigEndian::ReadUnaligned16((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -707,7 +826,10 @@ inline uint16_t Read16(const uint8_t *& p)      { return nl::IO::BigEndian::Read
  * @return The 32-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint32_t Read32(const uint8_t *& p)      { return nl::IO::BigEndian::ReadUnaligned32((const void *&)p); }
+inline uint32_t Read32(const uint8_t *& p)
+{
+    return nl::IO::BigEndian::ReadUnaligned32((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory read of the big endian
@@ -724,7 +846,10 @@ inline uint32_t Read32(const uint8_t *& p)      { return nl::IO::BigEndian::Read
  * @return The 64-bit value at the specified pointer address, if necessary,
  *         byte order swapped.
  */
-inline uint64_t Read64(const uint8_t *& p)      { return nl::IO::BigEndian::ReadUnaligned64((const void *&)p); }
+inline uint64_t Read64(const uint8_t *& p)
+{
+    return nl::IO::BigEndian::ReadUnaligned64((const void *&) p);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -742,7 +867,11 @@ inline uint64_t Read64(const uint8_t *& p)      { return nl::IO::BigEndian::Read
  *                    swapped.
  *
  */
-inline void Write16(uint8_t *& p, uint16_t v)   { Put16(p, v); p += sizeof(uint16_t); }
+inline void Write16(uint8_t *& p, uint16_t v)
+{
+    Put16(p, v);
+    p += sizeof(uint16_t);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -760,7 +889,11 @@ inline void Write16(uint8_t *& p, uint16_t v)   { Put16(p, v); p += sizeof(uint1
  *                    swapped.
  *
  */
-inline void Write32(uint8_t *& p, uint32_t v)   { Put32(p, v); p += sizeof(uint32_t); }
+inline void Write32(uint8_t *& p, uint32_t v)
+{
+    Put32(p, v);
+    p += sizeof(uint32_t);
+}
 
 /**
  * Perform a, potentially unaligned, memory write of the target system
@@ -778,12 +911,15 @@ inline void Write32(uint8_t *& p, uint32_t v)   { Put32(p, v); p += sizeof(uint3
  *                    swapped.
  *
  */
-inline void Write64(uint8_t *& p, uint64_t v)   { Put64(p, v); p += sizeof(uint64_t); }
+inline void Write64(uint8_t *& p, uint64_t v)
+{
+    Put64(p, v);
+    p += sizeof(uint64_t);
+}
 
-} // BigEndian
+} // namespace BigEndian
 
-
-} //Encoding
-} //chip
+} // namespace Encoding
+} // namespace chip
 
 #endif // _CHIPENCODING_H

@@ -30,8 +30,8 @@ namespace Profiles {
 namespace StatusReporting {
 class StatusReport;
 }
-}
-}
+} // namespace Profiles
+} // namespace chip
 
 namespace chip {
 namespace DeviceLayer {
@@ -39,9 +39,11 @@ namespace DeviceLayer {
 class PlatformManagerImpl;
 namespace Internal {
 extern CHIP_ERROR InitServiceDirectoryManager(void);
-template<class> class GenericPlatformManagerImpl;
-template<class> class GenericPlatformManagerImpl_FreeRTOS;
-}
+template <class>
+class GenericPlatformManagerImpl;
+template <class>
+class GenericPlatformManagerImpl_FreeRTOS;
+} // namespace Internal
 
 /**
  * Manages time synchronization for chip Devices.
@@ -49,14 +51,13 @@ template<class> class GenericPlatformManagerImpl_FreeRTOS;
 class TimeSyncManager final
 {
 public:
-
     // ===== Members that define the public interface of the TimeSyncManager
 
     enum TimeSyncMode
     {
-        kTimeSyncMode_NotSupported          = 0,
-        kTimeSyncMode_Disabled              = 1,
-        kTimeSyncMode_Service               = 2,
+        kTimeSyncMode_NotSupported = 0,
+        kTimeSyncMode_Disabled     = 1,
+        kTimeSyncMode_Service      = 2,
 
         kTimeSyncMode_Max,
     };
@@ -70,12 +71,13 @@ public:
     bool IsTimeSynchronized();
 
 private:
-
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
-    template<class> friend class Internal::GenericPlatformManagerImpl;
-    template<class> friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     friend CHIP_ERROR Internal::InitServiceDirectoryManager();
     friend TimeSyncManager & TimeSyncMgr(void);
 
@@ -107,20 +109,20 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
     static void TimeServiceSync_HandleBindingEvent(void * appState, ::chip::Binding::EventType event,
-            const ::chip::Binding::InEventParam & inParam, ::chip::Binding::OutEventParam & outParam);
+                                                   const ::chip::Binding::InEventParam & inParam,
+                                                   ::chip::Binding::OutEventParam & outParam);
     static void TimeServiceSync_HandleSyncComplete(void * context, CHIP_ERROR result, int64_t syncedRealTimeUS);
 #endif
 
     static void DriveTimeSync(::chip::System::Layer * layer, void * appState, ::chip::System::Error err);
 
 protected:
-
     // Construction/destruction limited to subclasses.
-    TimeSyncManager() = default;
+    TimeSyncManager()  = default;
     ~TimeSyncManager() = default;
 
     // No copy, move or assignment.
-    TimeSyncManager(const TimeSyncManager &) = delete;
+    TimeSyncManager(const TimeSyncManager &)  = delete;
     TimeSyncManager(const TimeSyncManager &&) = delete;
     TimeSyncManager & operator=(const TimeSyncManager &) = delete;
 };

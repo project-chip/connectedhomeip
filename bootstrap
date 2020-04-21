@@ -28,6 +28,6 @@
 
 nlbuild_autotools_stem="third_party/nlbuild-autotools/repo"
 
-abs_srcdir=$(cd $(dirname "${0}") && pwd)
+abs_srcdir=$(cd "$(dirname "${0}")" && pwd)
 
-(cd "${abs_srcdir}" && exec "${abs_srcdir}/${nlbuild_autotools_stem}/scripts/bootstrap" -I "${abs_srcdir}/${nlbuild_autotools_stem}" "${@}")
+(cd "$abs_srcdir" && exec "$abs_srcdir/$nlbuild_autotools_stem/scripts/bootstrap" -I "$abs_srcdir/$nlbuild_autotools_stem" "${@}")

@@ -41,11 +41,10 @@ namespace Internal {
  * or indirectly) by the ConfigurationManagerImpl class, which also appears as the template's ImplClass
  * parameter.
  */
-template<class ImplClass>
+template <class ImplClass>
 class GenericConfigurationManagerImpl
 {
 public:
-
     // ===== Methods that implement the ConfigurationManager abstract interface.
 
     CHIP_ERROR _Init();
@@ -55,8 +54,8 @@ public:
     CHIP_ERROR _GetProductRevision(uint16_t & productRev);
     CHIP_ERROR _StoreProductRevision(uint16_t productRev);
     CHIP_ERROR _GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen);
-    CHIP_ERROR _GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
-            uint8_t & hour, uint8_t & minute, uint8_t & second);
+    CHIP_ERROR _GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
+                                     uint8_t & second);
     CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
     CHIP_ERROR _StoreSerialNumber(const char * serialNum, size_t serialNumLen);
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
@@ -93,8 +92,8 @@ public:
     CHIP_ERROR _StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
     CHIP_ERROR _GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen);
     CHIP_ERROR _StorePairedAccountId(const char * accountId, size_t accountIdLen);
-    CHIP_ERROR _StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig,
-            size_t serviceConfigLen, const char * accountId, size_t accountIdLen);
+    CHIP_ERROR _StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
+                                             const char * accountId, size_t accountIdLen);
     CHIP_ERROR _ClearServiceProvisioningData();
     CHIP_ERROR _GetFailSafeArmed(bool & val);
     CHIP_ERROR _SetFailSafeArmed(bool val);
@@ -113,7 +112,6 @@ public:
 #endif
 
 protected:
-
     enum
     {
         kFlag_IsServiceProvisioned                    = 0x01,
@@ -129,7 +127,6 @@ protected:
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
 
 private:
-
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
@@ -140,22 +137,19 @@ private:
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetVendorId(uint16_t & vendorId)
 {
-    vendorId = (uint16_t)CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
+    vendorId = (uint16_t) CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
     return CHIP_NO_ERROR;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductId(uint16_t & productId)
 {
-    productId = (uint16_t)CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
+    productId = (uint16_t) CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
     return CHIP_NO_ERROR;
 }
-
-
-
 
 } // namespace Internal
 } // namespace DeviceLayer

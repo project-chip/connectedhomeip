@@ -22,7 +22,6 @@
  *          on nRF52 platforms using the Nordic nRF5 SDK.
  */
 
-
 #ifndef CHIP_DEVICE_PLATFORM_CONFIG_H
 #define CHIP_DEVICE_PLATFORM_CONFIG_H
 

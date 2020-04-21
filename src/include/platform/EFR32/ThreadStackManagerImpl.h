@@ -37,17 +37,16 @@ namespace DeviceLayer {
 class ThreadStackManager;
 class ThreadStackManagerImpl;
 namespace Internal {
-extern int GetEntropy_EFR32(uint8_t *buf, size_t bufSize);
+extern int GetEntropy_EFR32(uint8_t * buf, size_t bufSize);
 }
 
 /**
  * Concrete implementation of the ThreadStackManager singleton object for EFR32 platforms
  * using the Silicon Labs SDK and the OpenThread stack.
  */
-class ThreadStackManagerImpl final
-    : public ThreadStackManager,
-      public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>,
-      public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>
+class ThreadStackManagerImpl final : public ThreadStackManager,
+                                     public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>,
+                                     public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>
 {
     // Allow the ThreadStackManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -61,14 +60,14 @@ class ThreadStackManagerImpl final
 
     // Allow glue functions called by OpenThread to call helper methods on this
     // class.
-    friend void ::otTaskletsSignalPending(otInstance *otInst);
+    friend void ::otTaskletsSignalPending(otInstance * otInst);
     friend void ::otSysEventSignalPending(void);
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
     using ThreadStackManager::InitThreadStack;
-    CHIP_ERROR InitThreadStack(otInstance *otInst);
+    CHIP_ERROR InitThreadStack(otInstance * otInst);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -79,7 +78,7 @@ private:
 
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
-    friend int Internal::GetEntropy_EFR32(uint8_t *buf, size_t bufSize);
+    friend int Internal::GetEntropy_EFR32(uint8_t * buf, size_t bufSize);
 
     static ThreadStackManagerImpl sInstance;
 
@@ -96,7 +95,7 @@ private:
  * Chip applications should use this to access features of the ThreadStackManager object
  * that are common to all platforms.
  */
-inline ThreadStackManager &ThreadStackMgr(void)
+inline ThreadStackManager & ThreadStackMgr(void)
 {
     return ThreadStackManagerImpl::sInstance;
 }
@@ -107,7 +106,7 @@ inline ThreadStackManager &ThreadStackMgr(void)
  * Chip applications can use this to gain access to features of the ThreadStackManager
  * that are specific to EFR32 platforms.
  */
-inline ThreadStackManagerImpl &ThreadStackMgrImpl(void)
+inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 {
     return ThreadStackManagerImpl::sInstance;
 }

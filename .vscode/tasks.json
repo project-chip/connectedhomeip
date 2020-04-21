@@ -15,9 +15,7 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Auto-enforce coding style",
@@ -30,9 +28,7 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Verify coding style conformance",
@@ -40,9 +36,7 @@
             "command": "make -C build/default pretty-check",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Run Unit and Functional Tests",
@@ -50,9 +44,7 @@
             "command": "make -C build/default check",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Run Distribution Generation",
@@ -60,9 +52,7 @@
             "command": "make -C build/default distcheck",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Run Code Coverage",
@@ -70,9 +60,7 @@
             "command": "make -C build/default coverage; code -r build/default/src/chip.info/index.html",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Clean",
@@ -80,36 +68,28 @@
             "command": "make -C build/default distclean",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Configure",
             "type": "shell",
             "command": "mkdir -p build/default && (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage)",
             "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Bootstrap",
             "type": "shell",
             "command": "if [[ ! -f build/default/config.status ]]; then mkdir -p build/default; (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage); else ./bootstrap -w make; fi",
             "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ],
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Clean Tree",
             "type": "shell",
             "command": "make -f Makefile-bootstrap clean-repos && git clean -Xdf",
             "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Run Setup Payload Tests",
@@ -117,18 +97,14 @@
             "command": "make -C build/default/src/setup_payload check",
             "group": "none",
             "dependsOn": "Bootstrap",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Build & Run Crypto Tests",
             "type": "shell",
             "command": "make -C build/default/src/crypto check",
             "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Build nRF5 Lock App",
@@ -136,9 +112,7 @@
             "command": "make -C examples/lock-app/nrf5",
             "group": "none",
             "dependsOn": "Clean Tree",
-            "problemMatcher": [
-                "$gcc"
-            ]
-        },
-    ],
+            "problemMatcher": ["$gcc"]
+        }
+    ]
 }

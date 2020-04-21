@@ -61,7 +61,7 @@ exit:
     return err;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent *event)
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     // Forward the event to the generic base classes as needed.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

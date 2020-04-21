@@ -38,7 +38,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
-
 using namespace ::chip;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
@@ -47,7 +46,6 @@ namespace chip {
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
-
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {

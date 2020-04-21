@@ -47,11 +47,10 @@ namespace Internal {
  * }
  * ```
  */
-template<class ImplClass>
+template <class ImplClass>
 class GenericConnectivityManagerImpl_NoBLE
 {
 public:
-
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
@@ -67,72 +66,73 @@ public:
     static const char * _CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode);
 
 private:
-
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
-template<class ImplClass>
+template <class ImplClass>
 inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetCHIPoBLEServiceMode(void)
 {
     return ConnectivityManager::kCHIPoBLEServiceMode_NotSupported;
 }
 
-template<class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoBLE<ImplClass>::_IsBLEAdvertisingEnabled(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEAdvertisingEnabled(bool val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoBLE<ImplClass>::_IsBLEFastAdvertisingEnabled(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoBLE<ImplClass>::_IsBLEAdvertising(void)
 {
     return false;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetBLEDeviceName(char * buf, size_t bufSize)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetBLEDeviceName(const char * deviceName)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 inline uint16_t GenericConnectivityManagerImpl_NoBLE<ImplClass>::_NumBLEConnections(void)
 {
     return false;
 }
 
-template<class ImplClass>
-inline const char * GenericConnectivityManagerImpl_NoBLE<ImplClass>::_CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode)
+template <class ImplClass>
+inline const char *
+GenericConnectivityManagerImpl_NoBLE<ImplClass>::_CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode)
 {
     return NULL;
 }

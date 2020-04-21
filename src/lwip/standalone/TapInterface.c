@@ -155,8 +155,7 @@
 
 /* Global Variables */
 
-static const size_t kMacLength = sizeof (((TapInterface *)(0))->macAddr);
-
+static const size_t kMacLength = sizeof(((TapInterface *) (0))->macAddr);
 
 /**
  *  This is the LwIP TUN/TAP shim interface low level output method.
@@ -187,12 +186,11 @@ static const size_t kMacLength = sizeof (((TapInterface *)(0))->macAddr);
  *  @sa #TapInterface_SetupNetif
  *
  */
-static err_t
-TapInterface_low_level_output(struct netif *netif, struct pbuf *buf)
+static err_t TapInterface_low_level_output(struct netif * netif, struct pbuf * buf)
 {
-    const TapInterface *tapif = (const TapInterface *)(netif->state);
-    err_t retval = ERR_OK;
-    struct pbuf *outBuf;
+    const TapInterface * tapif = (const TapInterface *) (netif->state);
+    err_t retval               = ERR_OK;
+    struct pbuf * outBuf;
     int written;
 
     if (buf->tot_len > buf->len)
@@ -265,27 +263,28 @@ done:
  *  @sa #TapInterface_Select
  *
  */
-static struct pbuf *
-TapInterface_low_level_input(TapInterface *tapif, struct netif *netif)
+static struct pbuf * TapInterface_low_level_input(TapInterface * tapif, struct netif * netif)
 {
     struct pbuf *p, *q;
     u16_t len;
     char buf[2048];
-    char *bufptr;
+    char * bufptr;
 
     /* Obtain the size of the packet and put it into the "len"
      variable. */
-    len = read(tapif->fd, buf, sizeof (buf));
+    len = read(tapif->fd, buf, sizeof(buf));
     snmp_add_ifinoctets(netif, len);
 
     /* We allocate a pbuf chain of pbufs from the pool. */
     p = pbuf_alloc(PBUF_LINK, len, PBUF_POOL);
 
-    if (p != NULL) {
+    if (p != NULL)
+    {
         /* We iterate over the pbuf chain until we have read the entire
        packet into the pbuf. */
         bufptr = &buf[0];
-        for(q = p; q != NULL; q = q->next) {
+        for (q = p; q != NULL; q = q->next)
+        {
             /* Read enough bytes to fill this pbuf in the chain. The
          available data in the pbuf is given by the q->len
          variable. */
@@ -294,7 +293,9 @@ TapInterface_low_level_input(TapInterface *tapif, struct netif *netif)
             bufptr += q->len;
         }
         /* acknowledge that packet has been read(); */
-    } else {
+    }
+    else
+    {
         /* drop packet(); */
         snmp_inc_ifindiscards(netif);
         printf("Could not allocate pbufs\n");
@@ -325,31 +326,30 @@ TapInterface_low_level_input(TapInterface *tapif, struct netif *netif)
  *  @sa #TapInterface_Select
  *
  */
-err_t
-TapInterface_SetupNetif(struct netif *netif)
+err_t TapInterface_SetupNetif(struct netif * netif)
 {
-    const TapInterface *tapif = (const TapInterface *)(netif->state);
+    const TapInterface * tapif = (const TapInterface *) (netif->state);
 
     /* As far as LwIP is concerned, the network interface is an
      * Ethernet-like interface, so set it up accordingly, reusing
      * existing LwIP APIs for such interfaces where possible.
      */
 
-    netif->name[0]    = tapif->interfaceName[0];
-    netif->name[1]    = tapif->interfaceName[1];
-    netif->output     = etharp_output;
+    netif->name[0] = tapif->interfaceName[0];
+    netif->name[1] = tapif->interfaceName[1];
+    netif->output  = etharp_output;
 #if LWIP_IPV6
     netif->output_ip6 = ethip6_output;
 #endif /* LWIP_IPV6 */
     netif->linkoutput = TapInterface_low_level_output;
     netif->mtu        = 1500;
 
-    netif->flags      |= (NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP);
+    netif->flags |= (NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP);
 #if LWIP_IPV4
-    netif->flags      |= (NETIF_FLAG_IGMP);
+    netif->flags |= (NETIF_FLAG_IGMP);
 #endif
 #if LWIP_IPV6
-    netif->flags      |= (NETIF_FLAG_MLD6);
+    netif->flags |= (NETIF_FLAG_MLD6);
 #endif
 
     netif->hwaddr_len = kMacLength;
@@ -389,8 +389,7 @@ TapInterface_SetupNetif(struct netif *netif)
  *  @sa #TapInterface_Select
  *
  */
-err_t
-TapInterface_Init(TapInterface *tapif, const char *interfaceName, u8_t *macAddr)
+err_t TapInterface_Init(TapInterface * tapif, const char * interfaceName, u8_t * macAddr)
 {
 #if defined(linux)
     struct ifreq ifr;
@@ -406,7 +405,7 @@ TapInterface_Init(TapInterface *tapif, const char *interfaceName, u8_t *macAddr)
     /* Set the TUN/TAP interface storage to initial defaults.
      */
 
-    memset(tapif, 0, sizeof (*tapif));
+    memset(tapif, 0, sizeof(*tapif));
     tapif->fd = -1;
 
     /* Intialize the TUN/TAP interface name and MAC address. If the
@@ -422,9 +421,9 @@ TapInterface_Init(TapInterface *tapif, const char *interfaceName, u8_t *macAddr)
     }
     else
     {
-        const u32_t pid = htonl((u32_t)getpid());
+        const u32_t pid = htonl((u32_t) getpid());
         memset(tapif->macAddr, 0, kMacLength);
-        memcpy(tapif->macAddr + 2, &pid, sizeof (pid));
+        memcpy(tapif->macAddr + 2, &pid, sizeof(pid));
     }
 
     /* Attempt to open the OS-specific TUN/TAP driver control interface.
@@ -443,10 +442,10 @@ TapInterface_Init(TapInterface *tapif, const char *interfaceName, u8_t *macAddr)
      * no packet information (IFF_NO_PI).
      */
 
-    memset(&ifr, 0, sizeof (ifr));
+    memset(&ifr, 0, sizeof(ifr));
     ifr.ifr_flags = (IFF_TAP | IFF_NO_PI);
 
-    if (strlen(tapif->interfaceName) >= sizeof (ifr.ifr_name))
+    if (strlen(tapif->interfaceName) >= sizeof(ifr.ifr_name))
     {
         perror("TapInterface: invalid device name");
         return ERR_ARG;
@@ -454,7 +453,7 @@ TapInterface_Init(TapInterface *tapif, const char *interfaceName, u8_t *macAddr)
 
     strcpy(ifr.ifr_name, tapif->interfaceName);
 
-    if (ioctl(tapif->fd, TUNSETIFF, (void *)&ifr) < 0)
+    if (ioctl(tapif->fd, TUNSETIFF, (void *) &ifr) < 0)
     {
         perror("TapInterface: ioctl(TUNSETIFF) failed");
         return ERR_IF;
@@ -491,8 +490,7 @@ TapInterface_Init(TapInterface *tapif, const char *interfaceName, u8_t *macAddr)
  *  @sa #TapInterface_SetupNetif
  *
  */
-int
-TapInterface_Select(TapInterface *tapif, struct netif *netif, struct timeval sleepTime, size_t numIntfs)
+int TapInterface_Select(TapInterface * tapif, struct netif * netif, struct timeval sleepTime, size_t numIntfs)
 {
     fd_set readfds;
     int ret;
@@ -510,16 +508,17 @@ TapInterface_Select(TapInterface *tapif, struct netif *netif, struct timeval sle
         FD_SET(tapif[j].fd, &readfds);
     }
 
-    ret = select(tapif[numIntfs-1].fd + 1, &readfds, NULL, NULL, &sleepTime);
+    ret = select(tapif[numIntfs - 1].fd + 1, &readfds, NULL, NULL, &sleepTime);
     if (ret > 0)
     {
         for (j = 0; j < numIntfs; j++)
         {
-            if (! FD_ISSET(tapif[j].fd, &readfds))
+            if (!FD_ISSET(tapif[j].fd, &readfds))
                 continue;
 
-            struct pbuf *p = TapInterface_low_level_input(&(tapif[j]), &(netif[j]));
-            if (p != NULL) {
+            struct pbuf * p = TapInterface_low_level_input(&(tapif[j]), &(netif[j]));
+            if (p != NULL)
+            {
 #if LINK_STATS
                 lwip_stats.link.recv++;
 #endif /* LINK_STATS */
