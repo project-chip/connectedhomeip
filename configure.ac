@@ -1994,6 +1994,7 @@ fi
 #
 AC_CONFIG_FILES([
 Makefile
+examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
 src/Makefile
