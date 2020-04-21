@@ -1967,26 +1967,24 @@ AC_SUBST(PRETTY_CHECK_ARGS, [""])
 # Configure any autotools-based subdirectories
 if test "${nl_with_nlunit_test}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlunit-test/repo])
-AC_SUBST(NLUNIT_TEST_MAKEDIR,["${ac_pwd}/third_party/nlunit-test/repo"])
+AC_SUBST(NLUNIT_TEST_MAKEDIR,["${ac_pwd}/third_party/nlunit-test/repo/src"])
 fi
 
 if test "${nl_with_nlio}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlio/repo])
-AC_SUBST(NLIO_MAKEDIR,["${ac_pwd}/third_party/nlunio/repo"])
 fi
 
 if test "${nl_with_nlassert}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlassert/repo])
-AC_SUBST(NLASSERT_MAKEDIR,["${ac_pwd}/third_party/nlassert/repo"])
-fi
-
-if test "${nl_with_mbedtls}" = "internal"; then
-AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
 fi
 
 if test "${nl_with_nlfaultinjection}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
-AC_SUBST(NLFAULTINJECTION_MAKEDIR,["${ac_pwd}/third_party/nlfaultinjection/repo"])
+AC_SUBST(NLFAULTINJECTION_MAKEDIR,["${ac_pwd}/third_party/nlfaultinjection/repo"/src])
+fi
+
+if test "${nl_with_mbedtls}" = "internal"; then
+AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
 fi
 
 #
@@ -2114,12 +2112,10 @@ AC_MSG_NOTICE([
   Nlio compile flags                               : ${NLIO_CPPFLAGS:--}
   Nlio link flags                                  : ${NLIO_LDFLAGS:--}
   Nlio link libraries                              : ${NLIO_LIBS:--}
-  Nlio makedir                                     : ${NLIO_MAKDIR:--}
   Nlassert source                                  : ${nl_with_nlassert:--}
   Nlassert compile flags                           : ${NLASSERT_CPPFLAGS:--}
   Nlassert link flags                              : ${NLASSERT_LDFLAGS:--}
   Nlassert link libraries                          : ${NLASSERT_LIBS:--}
-  Nlassert makedir                                 : ${NLASSERT_MAKEDIR:--}
   Nlfaultinjection source                          : ${nl_with_nlfaultinjection:--}
   Nlfaultinjection compile flags                   : ${NLFAULTINJECTION_CPPFLAGS:--}
   Nlfaultinjection link flags                      : ${NLFAULTINJECTION_LDFLAGS:--}
