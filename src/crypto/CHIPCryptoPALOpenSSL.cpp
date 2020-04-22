@@ -334,7 +334,7 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
                                         size_t & out_signature_length)
 {
     ERR_clear_error();
-    static_assert(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
+    static_assert(kMax_ECDSA_Signature_Length >= 33, "ECDSA signature buffer length is too short");
 
     CHIP_ERROR error       = CHIP_NO_ERROR;
     int result             = 0;
@@ -421,6 +421,11 @@ exit:
     if (_hexKey != NULL)
     {
         free(_hexKey);
+    }
+
+    if (pvt_key != NULL)
+    {
+        BN_free(pvt_key);
     }
 
     return error;
@@ -519,5 +524,150 @@ exit:
         EVP_PKEY_free(verification_key);
         verification_key = NULL;
     }
+    return error;
+}
+
+// helper function to populate octet key into EVP_PKEY out_evp_pkey. Caller must free out_evp_pkey
+static CHIP_ERROR _create_evp_key_from_binary_key(const unsigned char * key, const size_t key_length, EVP_PKEY ** out_evp_pkey,
+                                                  EC_GROUP * group, bool isPrivateKey)
+{
+
+    CHIP_ERROR error     = CHIP_NO_ERROR;
+    BIGNUM * big_num_key = NULL;
+    EC_KEY * ec_key      = NULL;
+    int result           = -1;
+    EC_POINT * point     = NULL;
+
+    VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(*out_evp_pkey == NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    ec_key = EC_KEY_new_by_curve_name(_nidForCurve(ECName::P256v1));
+    VerifyOrExit(ec_key != NULL, error = CHIP_ERROR_INTERNAL);
+
+    big_num_key = BN_bin2bn(key, key_length, NULL);
+    VerifyOrExit(big_num_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (isPrivateKey)
+    {
+        result = EC_KEY_set_private_key(ec_key, big_num_key);
+    }
+    else
+    {
+        point = EC_POINT_bn2point(group, big_num_key, point, NULL);
+        VerifyOrExit(point != NULL, error = CHIP_ERROR_INTERNAL);
+        result = EC_KEY_set_public_key(ec_key, point);
+    }
+
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    *out_evp_pkey = EVP_PKEY_new();
+    VerifyOrExit(*out_evp_pkey != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_set1_EC_KEY(*out_evp_pkey, ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    if (big_num_key)
+    {
+        BN_free(big_num_key);
+        big_num_key = NULL;
+    }
+
+    if (ec_key != NULL)
+    {
+        EC_KEY_free(ec_key);
+        ec_key = NULL;
+    }
+
+    if (error != CHIP_NO_ERROR && *out_evp_pkey)
+    {
+        EVP_PKEY_free(*out_evp_pkey);
+        out_evp_pkey = NULL;
+    }
+
+    if (point != NULL)
+    {
+        EC_POINT_free(point);
+        point = NULL;
+    }
+
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
+                                            const unsigned char * local_private_key, const size_t local_private_key_length,
+                                            unsigned char * out_secret, size_t & out_secret_length)
+{
+    static_assert(kMax_ECDH_Secret_Length >= 64, "ECDH shared secret is too short");
+    ERR_clear_error();
+    CHIP_ERROR error      = CHIP_NO_ERROR;
+    int result            = -1;
+    EVP_PKEY * local_key  = NULL;
+    EVP_PKEY * remote_key = NULL;
+
+    EVP_PKEY_CTX * context = NULL;
+    EC_GROUP * group       = NULL;
+    size_t out_buf_length  = 0;
+
+    static_assert(kMax_ECDH_Secret_Length >= 32);
+    VerifyOrExit(remote_public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(remote_public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(local_private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(local_private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_secret_length >= kMax_ECDH_Secret_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    group = EC_GROUP_new_by_curve_name(_nidForCurve(ECName::P256v1));
+    VerifyOrExit(group != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = _create_evp_key_from_binary_key(local_private_key, local_private_key_length, &local_key, group, true);
+    VerifyOrExit(error == CHIP_NO_ERROR,
+                 error = error); // error = error because we just want to pass back the error from _create_evp_key_from_binary_key
+
+    error = _create_evp_key_from_binary_key(remote_public_key, remote_public_key_length, &remote_key, group, false);
+    VerifyOrExit(error == CHIP_NO_ERROR,
+                 error = error); // error = error because we just want to pass back the error from _create_evp_key_from_binary_key
+
+    context = EVP_PKEY_CTX_new(local_key, NULL);
+    VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_derive_init(context);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EVP_PKEY_derive_set_peer(context, remote_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    out_buf_length = out_secret_length;
+    result         = EVP_PKEY_derive(context, out_secret, &out_buf_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(out_secret_length >= out_buf_length, error = CHIP_ERROR_INTERNAL);
+    out_secret_length = out_buf_length;
+
+exit:
+    if (local_key != NULL)
+    {
+        EVP_PKEY_free(local_key);
+        local_key = NULL;
+    }
+
+    if (remote_key != NULL)
+    {
+        EVP_PKEY_free(remote_key);
+        remote_key = NULL;
+    }
+
+    if (context != NULL)
+    {
+        EVP_PKEY_CTX_free(context);
+        context = NULL;
+    }
+
+    if (group != NULL)
+    {
+        EC_GROUP_free(group);
+        group = NULL;
+    }
+    _logSSLError();
     return error;
 }
