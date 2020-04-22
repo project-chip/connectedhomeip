@@ -17,8 +17,4 @@
 #    limitations under the License.
 #
 
-git clean -fdx
-make -C third_party/nlassert/repo distclean
-make -C third_party/nlfaultinjection/repo distclean
-make -C third_party/nlio/repo distclean
-make -C third_party/nlunit-test/repo distclean
+make -f Makefile-bootstrap clean-repos && git clean -Xdf
