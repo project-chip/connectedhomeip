@@ -55,7 +55,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "Build & Run Crypto Tests",
+            "preLaunchTask": "Build openSSL crypto Tests",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

@@ -29,6 +29,8 @@
 namespace chip {
 namespace Crypto {
 
+const size_t kMax_ECDSA_Signature_Length = 72;
+
 /**
  * @brief A function that implements 256-bit AES-CCM encryption
  * @param plaintext Plaintext to encrypt
@@ -91,6 +93,37 @@ CHIP_ERROR HKDF_SHA256(const unsigned char * secret, const size_t secret_length,
  **/
 CHIP_ERROR DRBG_get_bytes(unsigned char * out_buffer, const size_t out_length);
 
+/**
+ * @brief A function to sign a msg using ECDSA
+ * @param msg Message that needs to be signed
+ * @param msg_length Length of message
+ * @param private_key Key to use to sign the message. Private keys are ASN.1 DER encoded as padded big-endian field elements as
+ *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
+ * @param private_key_length Length of private key
+ * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s), represented
+ *as ASN.1 DER integers, plus the ASN.1 sequence Header
+ * @param out_signature_length Length of out buffer
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
+                          const size_t private_key_length, unsigned char * out_signature, size_t & out_signature_length);
+
+/**
+ * @brief A function to sign a msg using ECDSA
+ * @param msg Message that needs to be signed
+ * @param msg_length Length of message
+ * @param public_key Key to use to verify the message signature. Public keys are ASN.1 DER encoded as uncompressed points as
+ *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
+ * @param private_key_length Length of public key
+ * @param signature Signature to use for verification. The signature consists of: 2 EC elements (r and s), represented as ASN.1 DER
+ *integers, plus the ASN.1 sequence Header
+ * @param signature_length Length of signature
+ * @return Returns a CHIP_NO_ERROR on successful verification, a CHIP_ERROR otherwise
+ **/
+CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const unsigned char * public_key,
+                                        const size_t public_key_length, const unsigned char * signature,
+                                        const size_t signature_length);
 } // namespace Crypto
 } // namespace chip
+
 #endif
