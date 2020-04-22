@@ -462,14 +462,15 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
 
 namespace chip {
 namespace Logging {
-    void Log(uint8_t module, uint8_t category, const char * format, ...) {
-        va_list argptr;
-        va_start(argptr, format);
-        vfprintf(stderr, format, argptr);
-        va_end(argptr);
-    }
+void Log(uint8_t module, uint8_t category, const char * format, ...)
+{
+    va_list argptr;
+    va_start(argptr, format);
+    vfprintf(stderr, format, argptr);
+    va_end(argptr);
 }
-}
+} // namespace Logging
+} // namespace chip
 
 /**
  *   Test Suite. It lists all the test functions.
