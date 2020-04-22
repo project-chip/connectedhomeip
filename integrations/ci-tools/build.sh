@@ -26,6 +26,12 @@ cd "$here/../.." || die 'ack!, where am I?!?'
 
 bootstrap='scripts/build/bootstrap.sh'
 
+bootstrap_mbedtls='
+   git clean -xdf
+   mkdir -p build/default;
+   (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage --with-crypto=mbedtls);
+'
+
 docker_run_command() {
     integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
 }
@@ -84,6 +90,13 @@ run-crypto-tests)
 run-setup-payload-tests)
     docker_run_bash_command "$bootstrap"
     docker_run_bash_command 'scripts/tests/setup_payload_tests.sh'
+    ;;
+
+run-mbedtls-crypto-tests)
+    docker_run_bash_command "$bootstrap_mbedtls"
+    docker_run_bash_command 'make V=1 -C build/default/third_party/mbedtls'
+    docker_run_bash_command 'make V=1 -C build/default/src/crypto check'
+    docker_run_bash_command 'git clean -xdf'
     ;;
 
 *)
