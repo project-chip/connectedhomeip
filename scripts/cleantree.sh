@@ -19,4 +19,4 @@
 
 abs_srcdir=$(cd "$(dirname "${0}")" && pwd)/..
 
-(cd $abs_srcdir && make -f Makefile-bootstrap clean-repos && git clean -Xdf)
+(cd "$abs_srcdir" && make -f Makefile-bootstrap clean-repos && git clean -Xdf)
