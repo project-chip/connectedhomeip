@@ -17,4 +17,6 @@
 #    limitations under the License.
 #
 
-make -f Makefile-bootstrap clean-repos && git clean -Xdf
+abs_srcdir=$(cd "$(dirname "${0}")" && pwd)/..
+
+(cd $abs_srcdir && make -f Makefile-bootstrap clean-repos && git clean -Xdf)
