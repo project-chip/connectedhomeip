@@ -460,6 +460,86 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     validation_error = CHIP_NO_ERROR;
 }
 
+static void TestECDH(nlTestSuite * inSuite, void * inContext)
+{
+    unsigned char private_key1[] = {
+        0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+        0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1
+    };
+
+    const unsigned char public_key1[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
+                                          0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
+                                          0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
+                                          0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
+                                          0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
+
+    const unsigned char private_key2[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
+                                           0x92, 0x5b, 0x0a, 0xa9, 0xa7, 0xc1, 0x1c, 0xe7, 0x06, 0x10, 0xe2,
+                                           0xdd, 0x16, 0x41, 0x52, 0x55, 0xb7, 0xb8, 0x80, 0x8d, 0x87, 0xa1 };
+
+    const unsigned char public_key2[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd, 0xfb, 0x1f,
+                                          0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3, 0xab, 0xe4, 0x33, 0xb6,
+                                          0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34, 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd,
+                                          0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
+                                          0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
+
+    unsigned char out_secret1[kMax_ECDH_Secret_Length] = { 0 };
+    size_t out_size1                                   = sizeof(out_secret1);
+
+    unsigned char out_secret2[kMax_ECDH_Secret_Length] = { 1 };
+    size_t out_size2                                   = sizeof(out_secret2);
+    CHIP_ERROR error                                   = CHIP_NO_ERROR;
+    NL_TEST_ASSERT(inSuite, memcmp(out_secret1, out_secret2, out_size1) != 0); // Validate that buffers are indeed different.
+
+    error = ECDH_derive_secret(public_key1, sizeof(public_key1), private_key2, sizeof(private_key2), out_secret1, out_size1);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+    error = ECDH_derive_secret(public_key2, sizeof(public_key2), private_key1, sizeof(private_key1), out_secret2, out_size2);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+    bool signature_lengths_match = out_size1 == out_size2;
+    NL_TEST_ASSERT(inSuite, signature_lengths_match);
+
+    bool signatures_match = (memcmp(out_secret1, out_secret2, out_size1) == 0);
+    NL_TEST_ASSERT(inSuite, signatures_match);
+}
+
+static void TestECDH_InvalidParams(nlTestSuite * inSuite, void * inContext)
+{
+    unsigned char private_key1[] = {
+        0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
+        0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65, 0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1
+    };
+
+    const unsigned char public_key2[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd, 0xfb, 0x1f,
+                                          0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3, 0xab, 0xe4, 0x33, 0xb6,
+                                          0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34, 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd,
+                                          0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
+                                          0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
+
+    unsigned char out_secret[kMax_ECDH_Secret_Length] = { 0 };
+    size_t out_size                                   = sizeof(out_secret);
+
+    CHIP_ERROR error = ECDH_derive_secret(NULL, sizeof(public_key2), private_key1, sizeof(private_key1), out_secret, out_size);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = ECDH_derive_secret(public_key2, 0, private_key1, sizeof(private_key1), out_secret, out_size);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = ECDH_derive_secret(public_key2, sizeof(public_key2), NULL, sizeof(private_key1), out_secret, out_size);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = ECDH_derive_secret(public_key2, sizeof(public_key2), private_key1, 0, out_secret, out_size);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = ECDH_derive_secret(public_key2, sizeof(public_key2), private_key1, sizeof(private_key1), NULL, out_size);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+
+    size_t bad_size = 0;
+    error = ECDH_derive_secret(public_key2, sizeof(public_key2), private_key1, sizeof(private_key1), out_secret, bad_size);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 namespace chip {
 namespace Logging {
 void Log(uint8_t module, uint8_t category, const char * format, ...)
@@ -488,12 +568,12 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
     NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
+    NL_TEST_DEF("Test ECDH derive shared secret", TestECDH),
+    NL_TEST_DEF("Test ECDH invalid params", TestECDH_InvalidParams),
 #endif
     NL_TEST_DEF("Test ECDSA signing and validation using SHA256", TestECDSA_Signing_SHA256),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different signature", TestECDSA_ValidationFailIncorrectSignature),
-    NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningInvalidParams),
-    NL_TEST_DEF("Test ECDSA signature validation invalid parameters", TestECDSA_ValidationInvalidParam),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),

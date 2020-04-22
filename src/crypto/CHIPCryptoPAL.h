@@ -30,6 +30,7 @@ namespace chip {
 namespace Crypto {
 
 const size_t kMax_ECDSA_Signature_Length = 72;
+const size_t kMax_ECDH_Secret_Length     = 64;
 
 /**
  * @brief A function that implements 256-bit AES-CCM encryption
@@ -162,6 +163,19 @@ CHIP_ERROR ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, co
 CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length, const unsigned char * public_key,
                                         const size_t public_key_length, const unsigned char * signature,
                                         const size_t signature_length);
+
+/** @brief A function to derive a shared secret using ECDH
+ * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel
+ * @param remote_public_key_length Length of remote_public_key
+ * @param local_private_key Local private key
+ * @param local_private_key_length Length of private_key_length
+ * @param out_secret Buffer to write out secret into
+ * @param out_secret_length Length of out_secret
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
+                              const unsigned char * local_private_key, const size_t local_private_key_length,
+                              unsigned char * out_secret, size_t & out_secret_length);
 } // namespace Crypto
 } // namespace chip
 
