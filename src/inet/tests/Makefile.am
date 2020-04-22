@@ -77,7 +77,6 @@ MAKEDIR_TARGETS                                       = \
     $(NULL)
 
 MAKEDIRS                                              = \
-    $(top_builddir)/src/include                         \
     $(NLFAULTINJECTION_MAKEDIR)                         \
     $(NLUNIT_TEST_MAKEDIR)                              \
     $(NULL)
