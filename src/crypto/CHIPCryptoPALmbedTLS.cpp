@@ -53,7 +53,7 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
-    const mbedtls_md_info_t* md;
+    const mbedtls_md_info_t * md;
 
     VerifyOrExit(secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
