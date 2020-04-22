@@ -27,7 +27,7 @@
 
 DEBUG                                                  ?= 0
 ENABLE_TARGETED_LISTEN                                 ?= 0
-OPENSSL_DIR                                            ?= internal
+OPENSSL_DIR                                            ?= $(shell if which brew > /dev/null && brew ls --versions openssl > /dev/null; then brew --prefix openssl; else echo "internal"; fi)
 
 xc-find-sdk                                             = $(shell xcrun --sdk $(1) --show-sdk-path)
 xc-find-tool                                            = $(shell xcrun -find $(1))
@@ -206,27 +206,22 @@ ModuleMap                                               = \
 ifndef BuildJobs
 BuildJobs := $(shell getconf _NPROCESSORS_ONLN)
 endif
-JOBSFLAG := -j$(BuildJobs)
+JOBSFLAG :=
 
 #
 # automake files
 #
-AMFILES =                                                \
-    src/system/SystemLayer.am                            \
-    src/system/Makefile.am                               \
-    src/lib/core/CoreLayer.am                            \
-    src/lib/support/SupportLayer.am                      \
-    src/lib/Makefile.am                                  \
-    src/inet/InetLayer.am                                \
-    src/inet/Makefile.am                                 \
-    src/ble/BleLayer.am                                  \
-    src/ble/Makefile.am                                  \
-    src/lwip/Makefile.am                                 \
-    src/Makefile.am                                      \
-    third_party/Makefile.am                              \
-    Makefile.am                                          \
-    configure.ac                                         \
-    $(NULL)
+AMFILES =                               \
+	src/system/Makefile.am              \
+	src/lib/Makefile.am                 \
+	src/inet/Makefile.am                \
+	src/ble/Makefile.am                 \
+	src/lwip/Makefile.am                \
+	src/Makefile.am                     \
+	third_party/Makefile.am             \
+	Makefile.am                         \
+	configure.ac                        \
+	$(NULL)
 
 #
 # configure-arch <arch>
@@ -501,7 +496,7 @@ $(FrameworkHeaderDir):
 	$(ECHO) "  Creating framework header dir: $(FrameworkHeaderDir)"
 	@$(MKDIR_P) $(FrameworkHeaderDir)
 	$(ECHO) "  Embedding headers in framework"
-	@cp $(addprefix $(ChipDeviceManagerIncludePath)/,*) $(FrameworkHeaderDir)
+	@cp -R $(addprefix $(ChipDeviceManagerIncludePath)/,*) $(FrameworkHeaderDir)
 
 $(FrameworkModulesDir):
 	$(ECHO) "  Creating framework modules dir: $(FrameworkModulesDir)"

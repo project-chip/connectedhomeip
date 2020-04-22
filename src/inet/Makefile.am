@@ -24,7 +24,6 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 SUBDIRS                             = \
-    tests                             \
     $(NULL)
 
 include InetLayer.am
