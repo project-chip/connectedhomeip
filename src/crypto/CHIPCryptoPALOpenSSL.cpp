@@ -101,16 +101,17 @@ static const EVP_MD * _digestForType(DigestType digestType)
 }
 
 CHIP_ERROR chip::Crypto::AES_CCM_128_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                             size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
-                                             size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
+                                             size_t aad_length, const unsigned char * key, size_t key_length,
+                                             const unsigned char * iv, size_t iv_length, unsigned char * ciphertext,
+                                             unsigned char * tag, size_t tag_length)
 {
     return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
 }
 
 CHIP_ERROR chip::Crypto::AES_CCM_128_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad,
                                              size_t aad_len, const unsigned char * tag, size_t tag_length,
-                                             const unsigned char * key, size_t key_length, const unsigned char * iv, size_t iv_length,
-                                             unsigned char * plaintext)
+                                             const unsigned char * key, size_t key_length, const unsigned char * iv,
+                                             size_t iv_length, unsigned char * plaintext)
 {
     return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
 }
