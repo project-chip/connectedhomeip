@@ -23,12 +23,23 @@
 #include "CHIPCryptoPAL.h"
 
 #include <mbedtls/ctr_drbg.h>
+#include <mbedtls/error.h>
 #include <mbedtls/entropy.h>
 #include <mbedtls/hkdf.h>
 #include <mbedtls/md.h>
 
 #include <support/CodeUtils.h>
 #include <string.h>
+
+static void _log_mbedTLS_error(int error_code)
+{
+    if (error_code != 0)
+    {
+        char error_str[32];
+        mbedtls_strerror(error_code, error_str, sizeof(error_str));
+        printf("\nmbedTLS error: %s\n", error_str);
+    }
+}
 
 CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                              size_t aad_length, const unsigned char * key, const unsigned char * iv,
@@ -69,12 +80,14 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
     {
         VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
+    VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     VerifyOrExit(md != NULL, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_hkdf(md, salt, salt_length, secret, secret_length, info, info_length, out_buffer, out_length);
+    _log_mbedTLS_error(result);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -103,6 +116,7 @@ static mbedtls_ctr_drbg_context * get_mbedtls_drbg_context()
         initialized = true;
         ctxt        = &drbg_ctxt;
     }
+    _log_mbedTLS_error(status);
 
     return ctxt;
 }

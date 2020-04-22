@@ -257,6 +257,7 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
     {
         VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
+    VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = EVP_PKEY_derive_init(context);
