@@ -32,6 +32,12 @@ else
    ./bootstrap -w make;
 fi'
 
+bootstrap_mbedtls='
+   git clean -xdf
+   mkdir -p build/default;
+   (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage --with-crypto=mbedtls);
+'
+
 docker_run_command() {
   integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
 }
@@ -90,6 +96,13 @@ case "$TASK" in
   run-setup-payload-tests)
     docker_run_bash_command "$bootstrap"
     docker_run_bash_command 'make V=1 -C build/default/src/setup_payload check'
+    ;;
+
+  run-mbedtls-crypto-tests)
+    docker_run_bash_command "$bootstrap_mbedtls"
+    docker_run_bash_command 'make V=1 -C build/default/third_party/mbedtls'
+    docker_run_bash_command 'make V=1 -C build/default/src/crypto check'
+    docker_run_bash_command 'git clean -xdf'
     ;;
 
   *)
