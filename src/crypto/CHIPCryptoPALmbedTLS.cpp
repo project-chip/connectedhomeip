@@ -23,10 +23,24 @@
 #include "CHIPCryptoPAL.h"
 
 #include <mbedtls/ctr_drbg.h>
+#include <mbedtls/error.h>
 #include <mbedtls/entropy.h>
+#include <mbedtls/hkdf.h>
+#include <mbedtls/md.h>
 
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 #include <string.h>
+
+static void _log_mbedTLS_error(int error_code)
+{
+    if (error_code != 0)
+    {
+        char error_str[32];
+        mbedtls_strerror(error_code, error_str, sizeof(error_str));
+        ChipLogError(Crypto, "mbedTLS error: %s\n", error_str);
+    }
+}
 
 CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                              size_t aad_length, const unsigned char * key, const unsigned char * iv,
@@ -49,8 +63,33 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
                                      const size_t salt_length, const unsigned char * info, const size_t info_length,
                                      unsigned char * out_buffer, size_t out_length)
 {
-    // TODO: Need mbedTLS based implementation for HKDF
-    return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+    const mbedtls_md_info_t * md;
+
+    VerifyOrExit(secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Salt is optional
+    if (salt_length > 0)
+    {
+        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    VerifyOrExit(md != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_hkdf(md, salt, salt_length, secret, secret_length, info, info_length, out_buffer, out_length);
+    _log_mbedTLS_error(result);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
 }
 
 static mbedtls_ctr_drbg_context * get_mbedtls_drbg_context()
@@ -75,6 +114,7 @@ static mbedtls_ctr_drbg_context * get_mbedtls_drbg_context()
         initialized = true;
         ctxt        = &drbg_ctxt;
     }
+    _log_mbedTLS_error(status);
 
     return ctxt;
 }

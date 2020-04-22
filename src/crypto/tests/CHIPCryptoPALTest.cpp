@@ -24,6 +24,7 @@
 #include <string.h>
 #include <support/CodeUtils.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -273,7 +274,7 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
         bool success = memcmp(v.output_key_material, out_buffer, out_length) == 0;
         NL_TEST_ASSERT(inSuite, success);
     }
-    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == 3);
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == 2);
 }
 
 static void TestDRBG_InvalidInputs(nlTestSuite * inSuite, void * inContext)
@@ -459,6 +460,18 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     validation_error = CHIP_NO_ERROR;
 }
 
+namespace chip {
+namespace Logging {
+void Log(uint8_t module, uint8_t category, const char * format, ...)
+{
+    va_list argptr;
+    va_start(argptr, format);
+    vfprintf(stderr, format, argptr);
+    va_end(argptr);
+}
+} // namespace Logging
+} // namespace chip
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -480,8 +493,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDSA signature validation fail - Different signature", TestECDSA_ValidationFailIncorrectSignature),
     NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningInvalidParams),
     NL_TEST_DEF("Test ECDSA signature validation invalid parameters", TestECDSA_ValidationInvalidParam),
-    NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
 #endif
+    NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
 

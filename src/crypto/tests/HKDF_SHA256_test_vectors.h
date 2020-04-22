@@ -91,6 +91,8 @@ hkdf_sha256_vector v2 = { .initial_key_material        = IKM2,
                           .output_key_material         = expected_OKM2,
                           .output_key_material_length  = sizeof(expected_OKM2) };
 
+// Since info is a mandatory field, the following vector is not being used for testing
+// Need a new test vector that has no salt, but has info
 // No salt and info
 const unsigned char IKM3[] = {
     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
@@ -114,5 +116,5 @@ hkdf_sha256_vector v3 = { .initial_key_material        = IKM3,
                           .output_key_material         = expected_OKM3,
                           .output_key_material_length  = sizeof(expected_OKM3) };
 
-hkdf_sha256_vector hkdf_sha256_test_vectors[] = { v1, v2, v3 };
+hkdf_sha256_vector hkdf_sha256_test_vectors[] = { v1, v2 };
 #endif
