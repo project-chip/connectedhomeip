@@ -29,6 +29,7 @@
 #include <mbedtls/md.h>
 
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 #include <string.h>
 
 static void _log_mbedTLS_error(int error_code)
@@ -37,7 +38,7 @@ static void _log_mbedTLS_error(int error_code)
     {
         char error_str[32];
         mbedtls_strerror(error_code, error_str, sizeof(error_str));
-        printf("\nmbedTLS error: %s\n", error_str);
+        ChipLogError(Crypto, "mbedTLS error: %s\n", error_str);
     }
 }
 
@@ -75,11 +76,8 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
         VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // Info is optional
-    if (info_length > 0)
-    {
-        VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -30,6 +30,7 @@
 #include <openssl/kdf.h>
 #include <openssl/ossl_typ.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 #include <string.h>
 
 #define kKeyLengthInBits 256
@@ -79,7 +80,7 @@ static void _logSSLError()
         const char * err_str_reason  = ERR_reason_error_string(ssl_err_code);
         if (err_str_lib)
         {
-            printf("\nssl err  %s %s %s\n", err_str_lib, err_str_routine, err_str_reason);
+            ChipLogError(Crypto, " ssl err  %s %s %s\n", err_str_lib, err_str_routine, err_str_reason);
         }
         ssl_err_code = ERR_get_error();
     }
@@ -252,11 +253,8 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
         VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // Info is optional
-    if (info_length > 0)
-    {
-        VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -24,6 +24,7 @@
 #include <string.h>
 #include <support/CodeUtils.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -273,7 +274,7 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
         bool success = memcmp(v.output_key_material, out_buffer, out_length) == 0;
         NL_TEST_ASSERT(inSuite, success);
     }
-    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == 3);
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == 2);
 }
 
 static void TestDRBG_InvalidInputs(nlTestSuite * inSuite, void * inContext)
@@ -457,6 +458,17 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
         ECDSA_validate_msg_signature((const unsigned char *) msg, msg_length, hex_public_key, sizeof(hex_public_key), signature, 0);
     NL_TEST_ASSERT(inSuite, validation_error == CHIP_ERROR_INVALID_ARGUMENT);
     validation_error = CHIP_NO_ERROR;
+}
+
+namespace chip {
+namespace Logging {
+    void Log(uint8_t module, uint8_t category, const char * format, ...) {
+        va_list argptr;
+        va_start(argptr, format);
+        vfprintf(stderr, format, argptr);
+        va_end(argptr);
+    }
+}
 }
 
 /**
