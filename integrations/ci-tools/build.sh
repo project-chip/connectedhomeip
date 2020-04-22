@@ -94,7 +94,7 @@ case "$TASK" in
 
   run-mbedtls-crypto-tests)
     docker_run_bash_command "$bootstrap_mbedtls"
-    # docker_run_bash_command 'scripts/tests/mbedtls_tests.sh'
+    docker_run_bash_command 'scripts/tests/mbedtls_tests.sh'
     docker_run_bash_command 'scripts/tests/crypto_tests.sh'
     ;;
 
