@@ -17,27 +17,21 @@ me=$(basename "$0")
 here=$(cd "$(dirname "$0")" && pwd)
 
 die() {
-  echo "$me: *** ERROR: " "${*}"
-  exit 1
+    echo "$me: *** ERROR: " "${*}"
+    exit 1
 }
 
 # move to ToT, I don't work anywhere else
 cd "$here/../.." || die 'ack!, where am I?!?'
 
-bootstrap='
-if [[ ! -f build/default/config.status ]]; then
-   mkdir -p build/default;
-   (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage);
-else
-   ./bootstrap -w make;
-fi'
+bootstrap='scripts/build/bootstrap.sh'
 
 docker_run_command() {
-  integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
+    integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
 }
 
 docker_run_bash_command() {
-  docker_run_command bash -c "$1"
+    docker_run_command bash -c "$1"
 }
 
 # convert ENV to an array of words: X,Y,Z => ( X Y Z )
@@ -47,52 +41,52 @@ read -r -a ENV <<<"${ENV[@]/#/--env }"
 
 case "$TASK" in
 
-  self-test)
+self-test)
     docker_run_bash_command 'echo looks ok to me && echo compound commands look good'
     ;;
 
-  self-test-env)
+self-test-env)
     docker_run_command bash -c "echo run me with ENV=HI=THERE,; env | echo HI=$'$'HI"
     ;;
 
-  # You can add more tasks here, the top one shows an example of running
-  #  a build inside our build container
-  build-ubuntu-linux)
+# You can add more tasks here, the top one shows an example of running
+#  a build inside our build container
+build-ubuntu-linux)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default'
+    docker_run_bash_command 'scripts/build/default.sh'
     ;;
 
-  build-nrf-example-lock-app)
-    docker_run_bash_command 'make VERBOSE=1 -C examples/lock-app/nrf5'
+build-nrf-example-lock-app)
+    docker_run_bash_command 'scripts/examples/nrf_lock_app.sh'
     ;;
 
-  build-distribution-check)
+build-distribution-check)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default'
+    docker_run_bash_command 'scripts/build/distribution_check.sh'
     ;;
 
-  run-unit-and-functional-tests)
+run-unit-and-functional-tests)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default distcheck'
+    docker_run_bash_command 'scripts/test/all_tests.sh'
     ;;
 
-  run-code-coverage)
+run-code-coverage)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default coverage'
+    docker_run_bash_command 'scripts/tools/codecoverage.sh'
     docker_run_bash_command 'bash <(curl -s https://codecov.io/bash)'
     ;;
 
-  run-crypto-tests)
+run-crypto-tests)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default/src/crypto check'
+    docker_run_bash_command 'scripts/tests/crypt_tests.sh'
     ;;
 
-  run-setup-payload-tests)
+run-setup-payload-tests)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default/src/setup_payload check'
+    docker_run_bash_command 'scripts/tests/setup_payload_tests.sh'
     ;;
 
-  *)
+*)
     die "Unknown task: $TASK."
     ;;
 
