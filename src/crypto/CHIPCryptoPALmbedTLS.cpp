@@ -24,6 +24,8 @@
 
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/entropy.h>
+#include <mbedtls/hkdf.h>
+#include <mbedtls/md.h>
 
 #include <support/CodeUtils.h>
 #include <string.h>
@@ -49,8 +51,34 @@ CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t 
                                      const size_t salt_length, const unsigned char * info, const size_t info_length,
                                      unsigned char * out_buffer, size_t out_length)
 {
-    // TODO: Need mbedTLS based implementation for HKDF
-    return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+    const mbedtls_md_info_t* md;
+
+    VerifyOrExit(secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Salt is optional
+    if (salt_length > 0)
+    {
+        VerifyOrExit(salt != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Info is optional
+    if (info_length > 0)
+    {
+        VerifyOrExit(info != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    VerifyOrExit(out_buffer != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    VerifyOrExit(md != NULL, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_hkdf(md, salt, salt_length, secret, secret_length, info, info_length, out_buffer, out_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
 }
 
 static mbedtls_ctr_drbg_context * get_mbedtls_drbg_context()
