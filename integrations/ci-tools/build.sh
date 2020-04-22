@@ -84,7 +84,7 @@ run-code-coverage)
 
 run-crypto-tests)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'scripts/tests/crypt_tests.sh'
+    docker_run_bash_command 'scripts/tests/crypto_tests.sh'
     ;;
 
 run-setup-payload-tests)
@@ -94,9 +94,8 @@ run-setup-payload-tests)
 
 run-mbedtls-crypto-tests)
     docker_run_bash_command "$bootstrap_mbedtls"
-    docker_run_bash_command 'make V=1 -C build/default/third_party/mbedtls'
-    docker_run_bash_command 'make V=1 -C build/default/src/crypto check'
-    docker_run_bash_command 'git clean -xdf'
+    docker_run_bash_command 'scripts/tests/mbedtls_tests.sh'
+    docker_run_bash_command 'scripts/tests/crypto_tests.sh'
     ;;
 
 *)
