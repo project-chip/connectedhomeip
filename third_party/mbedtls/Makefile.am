@@ -103,7 +103,14 @@ libmbedtls_a_SOURCES                                                           =
     repo/library/md_wrap.c                  \
     $(NULL)
 
-libmbedtls_a_CPPFLAGS                                                             = \
+if !CONFIG_DEVICE_LAYER
+libmbedtls_a_SOURCES                                                          += \
+    repo/library/entropy_poll.c             \
+    repo/library/timing.c                   \
+    $(NULL)
+endif
+
+libmbedtls_a_CPPFLAGS                                                          = \
     -I$(top_srcdir)/third_party/mbedtls/repo/include                             \
     $(MBEDTLS_CPPFLAGS)                                                          \
     $(NULL)
