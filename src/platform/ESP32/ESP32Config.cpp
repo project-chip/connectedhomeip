@@ -26,10 +26,14 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/ESP32/ESP32Config.h>
 
+#include <platform/ESP32/ESP32Utils.h>
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
+#include <core/CHIPEncoding.h>
+
 #include "nvs_flash.h"
 #include "nvs.h"
 
-namespace nl {
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -582,4 +586,3 @@ exit:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-} // namespace nl

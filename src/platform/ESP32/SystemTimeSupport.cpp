@@ -24,7 +24,9 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/logging/CHIPLogging.h>
 #include <support/TimeUtils.h>
+
 #include <esp_timer.h>
 
 namespace chip {

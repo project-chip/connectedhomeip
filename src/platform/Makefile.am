@@ -33,12 +33,12 @@ EXTRA_DIST                              = \
 noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/ConfigurationManager.h \
     @top_srcdir@/src/include/platform/ConnectivityManager.h \
-    @top_srcdir@/src/include/platform/ConnectivityManagerImpl.h \
-    @top_srcdir@/src/include/platform/PlatformManagerImpl.h \
     @top_srcdir@/src/include/platform/SoftwareUpdateManagerImpl.h \
+    @top_srcdir@/src/include/platform/nRF5/ConnectivityManagerImpl.h \
     @top_srcdir@/src/include/platform/nRF5/nRF5Config.h \
     @top_srcdir@/src/include/platform/nRF5/CHIPDevicePlatformConfig.h \
     @top_srcdir@/src/include/platform/nRF5/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/include/platform/nRF5/PlatformManagerImpl.h \
     @top_srcdir@/src/include/platform/EFR32/CHIPDevicePlatformConfig.h \
     @top_srcdir@/src/include/platform/EFR32/GroupKeyStoreImpl.h \
     @top_srcdir@/src/include/platform/EFR32/efr32-chip-mbedtls-config.h \
@@ -52,6 +52,14 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/EFR32/SoftwareUpdateManagerImpl.h \
     @top_srcdir@/src/include/platform/EFR32/CHIPDevicePlatformEvent.h \
     @top_srcdir@/src/include/platform/EFR32/NetworkProvisioningServerImpl.h \
+    @top_srcdir@/src/include/platform/ESP32/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/include/platform/ESP32/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/include/platform/ESP32/BLEManagerImpl.h \
+    @top_srcdir@/src/include/platform/ESP32/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/include/platform/ESP32/PlatformManagerImpl.h \
+    @top_srcdir@/src/include/platform/ESP32/SoftwareUpdateManagerImpl.h \
+    @top_srcdir@/src/include/platform/ESP32/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/include/platform/ESP32/NetworkProvisioningServerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp \
     @top_srcdir@/src/include/platform/GeneralUtils.h \
@@ -131,8 +139,8 @@ libDeviceLayer_a_SOURCES               +=       \
     ESP32/ConnectivityManagerImpl.cpp           \
     ESP32/ESP32Config.cpp                       \
     ESP32/Logging.cpp                           \
-    FreeRTOS/SystemTimeSupport.cpp              \
     ESP32/SystemTimeSupport.cpp                 \
+    FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_ESP32
