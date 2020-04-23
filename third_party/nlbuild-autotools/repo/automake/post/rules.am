@@ -1,5 +1,6 @@
 #
-#    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
+#    Copyright (c) 2020 Project nlbuild-autotools Authors. All Rights Reserved.
+#    Copyright (c) 2015-2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -19,7 +20,7 @@
 #      This file is the automake footer for all common
 #      (i.e. non-toolchain-specific) rules.
 #
-include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/makedirs.am
+include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/foreigndeps.am
 include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/coverage.am
 include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/pretty.am
 include $(abs_top_nlbuild_autotools_dir)/automake/post/rules/headers.am

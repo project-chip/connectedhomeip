@@ -1,6 +1,7 @@
 #
-#    Copyright 2019 Google LLC. All Rights Reserved.
-#    Copyright 2014-2016 Nest Labs Inc. All Rights Reserved.
+#    Copyright (c) 2020 Project nlbuild-autotools Authors. All Rights Reserved.
+#    Copyright (c) 2019 Google LLC. All Rights Reserved.
+#    Copyright (c) 2014-2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -27,6 +28,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/pretty.am
 include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/verbosity.am
 include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/coverage.am
 include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/subdirs.am
+include $(abs_top_nlbuild_autotools_dir)/automake/pre/macros/foreigndeps.am
 
 #
 # create-directory

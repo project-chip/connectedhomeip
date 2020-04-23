@@ -1,5 +1,6 @@
 #
-#    Copyright 2016 Nest Labs Inc. All Rights Reserved.
+#    Copyright (c) 2020 Project nlbuild-autotools Authors. All Rights Reserved.
+#    Copyright (c) 2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -93,6 +94,14 @@ $(@PACKAGE_SHORT_LOWER@_docdist_archive): $(@PACKAGE_SHORT_LOWER@_docdist_name)
 	$(AM_V_at)tardir="$(<)" && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c > "$(@)" && rm -rf $(<)
 
 docdist $(@PACKAGE_SHORT_LOWER@_docdist_alias): $(@PACKAGE_SHORT_LOWER@_docdist_archive)
+
+# Foreign make dependencies
+
+NLFOREIGN_FILE_DEPENDENCIES                           = \
+   $(top_builddir)/.local-version                       \
+   $(NULL)
+
+Doxyfile $(@PACKAGE_SHORT_LOWER@_docdist_name) $(@PACKAGE_SHORT_LOWER@_docdist_archive): $(NLFOREIGN_FILE_DEPENDENCIES)
 
 clean-local:
 	$(AM_V_at)rm -f -r html

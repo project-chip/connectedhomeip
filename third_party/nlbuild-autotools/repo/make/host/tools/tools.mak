@@ -102,16 +102,17 @@ endef # nl-remove-dir
 #                         make macro to invoke to actually check the file.
 #
 #
+nl-check-file-N:=$(shell echo N$$$$)
 define nl-check-file-with-subroutine
-$(NL_V_AT)set -e;                                   \
-$(_NL_PROGRESS) "CHECK" "$(@)";                     \
-$(MKDIR_P) $(dir $(@));                             \
-$(call $(1)-$(2),$(<),$(@).N);                      \
-if [ -r "$(@)" ] && $(CMP) -s "$(@)" "$(@).N"; then \
-    rm -f "$(@).N";                                 \
-else                                                \
-    $(_NL_PROGRESS) "GEN" "$(@)";                   \
-    mv -f "$(@).N" "$(@)";                          \
+$(NL_V_AT)$(_NL_PROGRESS) "CHECK" "$(@)";              \
+$(MKDIR_P) $(dir $(@));                                \
+$(call $(1)-$(2),$(<),$(@).$(nl-check-file-N));        \
+if [ -r "$(@)" ] &&                                    \
+    $(CMP) -s "$(@)" "$(@).$(nl-check-file-N)"; then   \
+    rm -f "$(@).$(nl-check-file-N)";                   \
+else                                                   \
+    $(_NL_PROGRESS) "GEN" "$(@)";                      \
+    mv -f "$(@).$(nl-check-file-N)" "$(@)";            \
 fi
 endef # nl-check-file
 
