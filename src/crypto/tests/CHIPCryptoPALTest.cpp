@@ -16,6 +16,7 @@
  */
 
 #include "CHIPCryptoPAL.h"
+#include "AES_CCM_128_test_vectors.h"
 #include "AES_CCM_256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
 
@@ -259,6 +260,214 @@ static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+static void TestAES_CCM_128EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_ct[vector->ct_len];
+            unsigned char out_tag[vector->tag_len];
+
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
+                                             vector->iv, vector->iv_len, out_ct, out_tag, vector->tag_len);
+            bool areCTsEqual  = memcmp(out_ct, vector->ct, vector->ct_len) == 0;
+            bool areTagsEqual = memcmp(out_tag, vector->tag, vector->tag_len) == 0;
+            NL_TEST_ASSERT(inSuite, areCTsEqual);
+            NL_TEST_ASSERT(inSuite, areTagsEqual);
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+            if (!areCTsEqual)
+            {
+                printf("\n Test %d failed due to mismatchinng ciphertext", vector->tcId);
+            }
+            if (!areTagsEqual)
+            {
+                printf("\n Test %d failed due to mismatchinng tags", vector->tcId);
+            }
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_128DecryptTestVectors(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_pt[vector->pt_len];
+            CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
+                                             vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt);
+
+            bool arePTsEqual = memcmp(vector->pt, out_pt, vector->pt_len) == 0;
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, arePTsEqual);
+            if (!arePTsEqual)
+            {
+                printf("\n Test %d failed due to mismatchinng plaintext", vector->tcId);
+            }
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_128EncryptInvalidPlainText(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_ct[vector->ct_len];
+            unsigned char out_tag[vector->tag_len];
+
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key, vector->key_len, vector->iv,
+                                             vector->iv_len, out_ct, out_tag, vector->tag_len);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 1);
+}
+
+static void TestAES_CCM_128EncryptNilKey(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+
+            unsigned char out_ct[vector->ct_len];
+            unsigned char out_tag[vector->tag_len];
+
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, NULL, 0, vector->iv,
+                                             vector->iv_len, out_ct, out_tag, vector->tag_len);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_128EncryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+
+            unsigned char out_ct[vector->ct_len];
+            unsigned char out_tag[vector->tag_len];
+
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
+                                             vector->iv, 0, out_ct, out_tag, vector->tag_len);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_128EncryptInvalidTagLen(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+
+            unsigned char out_ct[vector->ct_len];
+            unsigned char out_tag[vector->tag_len];
+
+            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
+                                             vector->iv, vector->iv_len, out_ct, out_tag, 13);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_128DecryptInvalidCipherText(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+
+            unsigned char out_pt[vector->pt_len];
+            CHIP_ERROR err = AES_CCM_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len, vector->key,
+                                             vector->key_len, vector->iv, vector->iv_len, out_pt);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_128DecryptInvalidKey(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+
+            unsigned char out_pt[vector->pt_len];
+            CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
+                                             NULL, 0, vector->iv, vector->iv_len, out_pt);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (numOfTestsRan = 0; numOfTestsRan < numOfTestVectors; numOfTestsRan++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[numOfTestsRan];
+        if (vector->key_len == 32 && vector->pt_len > 0)
+        {
+
+            unsigned char out_pt[vector->pt_len];
+            CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
+                                             vector->key, vector->key_len, vector->iv, 0, out_pt);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
 static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
@@ -477,17 +686,26 @@ void Log(uint8_t module, uint8_t category, const char * format, ...)
  */
 
 static const nlTest sTests[] = {
+    NL_TEST_DEF("Test encrypting AES-CCM-128 test vectors", TestAES_CCM_128EncryptTestVectors),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 test vectors", TestAES_CCM_128DecryptTestVectors),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 invalid plain text", TestAES_CCM_128EncryptInvalidPlainText),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 using nil key", TestAES_CCM_128EncryptNilKey),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid IV", TestAES_CCM_128EncryptInvalidIVLen),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid tag", TestAES_CCM_128EncryptInvalidTagLen),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid ct", TestAES_CCM_128DecryptInvalidCipherText),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid key", TestAES_CCM_128DecryptInvalidKey),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid IV", TestAES_CCM_128DecryptInvalidIVLen),
 #if CHIP_CRYPTO_OPENSSL // Following tests are currently supported only for OpenSSL
-    NL_TEST_DEF("Test encrypting test vectors", TestAES_CCM_256EncryptTestVectors),
-    NL_TEST_DEF("Test decrypting test vectors", TestAES_CCM_256DecryptTestVectors),
-    NL_TEST_DEF("Test encrypting invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
-    NL_TEST_DEF("Test encrypting using nil key", TestAES_CCM_256EncryptNilKey),
-    NL_TEST_DEF("Test encrypting using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
-    NL_TEST_DEF("Test encrypting using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
-    NL_TEST_DEF("Test decrypting invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
-    NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey),
-    NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
-    NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
+    NL_TEST_DEF("Test encrypting AES-CCM-256 test vectors", TestAES_CCM_256EncryptTestVectors),
+    NL_TEST_DEF("Test decrypting AES-CCM-256 test vectors", TestAES_CCM_256DecryptTestVectors),
+    NL_TEST_DEF("Test encrypting AES-CCM-256 invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
+    NL_TEST_DEF("Test encrypting AES-CCM-256 using nil key", TestAES_CCM_256EncryptNilKey),
+    NL_TEST_DEF("Test encrypting AES-CCM-256 using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
+    NL_TEST_DEF("Test encrypting AES-CCM-256 using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
+    NL_TEST_DEF("Test decrypting AES-CCM-256 invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
+    NL_TEST_DEF("Test decrypting AES-CCM-256 invalid key", TestAES_CCM_256DecryptInvalidKey),
+    NL_TEST_DEF("Test decrypting AES-CCM-256 invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
+    NL_TEST_DEF("Test decrypting AES-CCM-256 invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
 #endif
     NL_TEST_DEF("Test ECDSA signing and validation using SHA256", TestECDSA_Signing_SHA256),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),
