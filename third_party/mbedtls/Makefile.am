@@ -23,6 +23,8 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+if CHIP_WITH_MBEDTLS_INTERNAL
+
 lib_LIBRARIES                                                                  = libmbedtls.a
 
 libmbedtls_a_SOURCES                                                           = \
@@ -114,5 +116,7 @@ libmbedtls_a_CPPFLAGS                                                          =
     -I$(top_srcdir)/third_party/mbedtls/repo/include                             \
     $(MBEDTLS_CPPFLAGS)                                                          \
     $(NULL)
+
+endif # CHIP_WITH_MBEDTLS_INTERNAL
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
