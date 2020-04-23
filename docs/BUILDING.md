@@ -29,7 +29,6 @@ want:
 -   Bash 4.0 or greater
 -   GNU make, automake, autoconf, libtool
 -   C and C++ compilers
--   clang-tidy
 -   clang-format-9
 -   gcov
 
