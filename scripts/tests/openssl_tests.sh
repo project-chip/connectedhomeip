@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make -C build/default/src/crypto/ && make -C build/default/src/crypto/tests/ TestOpenSSLCrypto
+make -C build/default/src/crypto/ && make -C build/default/src/crypto/tests/ TestCryptoPal

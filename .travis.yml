@@ -29,9 +29,9 @@ jobs:
         - stage: Tests
           name: "Setup Payload Tests"
           env: TASK="run-setup-payload-tests"
-        # - stage: Tests
-        #   name: "mbedTLS Crypto Tests"
-        #   env: TASK="run-mbedtls-crypto-tests"
+        - stage: Tests
+          name: "mbedTLS Crypto Tests"
+          env: TASK="run-mbedtls-crypto-tests"
         - stage: Deployment Checks
           name: "Run Code Coverage"
           env: TASK="run-code-coverage"

@@ -26,11 +26,7 @@ cd "$here/../.." || die 'ack!, where am I?!?'
 
 bootstrap='scripts/build/bootstrap.sh'
 
-bootstrap_mbedtls='
-   git clean -xdf
-   mkdir -p build/default;
-   (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage --with-crypto=mbedtls);
-'
+bootstrap_mbedtls='scripts/build/bootstrap_mbedtls.sh'
 
 docker_run_command() {
   integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
