@@ -11,7 +11,8 @@
 #  ENV     a comma-separated list of --env arguments to be passed to
 #            docker run, e.g. "GITHUB_TOKEN,FOO=BAR" will convey
 #            as "--env GITHUB_TOKEN --env FOO=BAR"
-#  RUN     if task is "run", RUN is the command line, URL encoded
+#  RUN     if task is "run", RUN is the command line, base64-encoded
+#            with one command argument per line
 #
 
 me=$(basename "$0")
