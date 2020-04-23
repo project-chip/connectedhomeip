@@ -36,7 +36,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <string.h>
 
-#define MAX_ERROR_STR_LEN        128
+#define MAX_ERROR_STR_LEN 128
 #define NUM_BYTES_IN_SHA256_HASH 32
 static void _log_mbedTLS_error(int error_code)
 {
