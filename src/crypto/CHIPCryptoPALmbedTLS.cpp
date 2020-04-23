@@ -36,11 +36,13 @@
 #include <support/logging/CHIPLogging.h>
 #include <string.h>
 
+#define MAX_ERROR_STR_LEN        128
+#define NUM_BYTES_IN_SHA256_HASH 32
 static void _log_mbedTLS_error(int error_code)
 {
     if (error_code != 0)
     {
-        char error_str[128];
+        char error_str[MAX_ERROR_STR_LEN];
         mbedtls_strerror(error_code, error_str, sizeof(error_str));
         ChipLogError(Crypto, "mbedTLS error: %s\n", error_str);
     }
@@ -245,11 +247,9 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
                                         const size_t private_key_length, unsigned char * out_signature,
                                         size_t & out_signature_length)
 {
-    static_assert(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
-
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
-    unsigned char hash[32];
+    unsigned char hash[NUM_BYTES_IN_SHA256_HASH];
 
     mbedtls_ecp_keypair keypair;
     mbedtls_ecp_keypair_init(&keypair);
@@ -292,7 +292,7 @@ CHIP_ERROR chip::Crypto::ECDSA_validate_msg_signature(const unsigned char * msg,
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
-    unsigned char hash[32];
+    unsigned char hash[NUM_BYTES_IN_SHA256_HASH];
 
     mbedtls_ecp_keypair keypair;
     mbedtls_ecp_keypair_init(&keypair);
