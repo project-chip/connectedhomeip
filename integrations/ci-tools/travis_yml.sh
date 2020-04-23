@@ -23,9 +23,8 @@ read -r -a TESTDIRS <<<"${TESTDIRS[@]%/*}"
 
 # build the yml
 TESTS_YML=""
-for dir in "${TESTDIRS[@]}"
-do
-  RUN=$(base64<<<"make
+for dir in "${TESTDIRS[@]}"; do
+  RUN=$(base64 <<<"make
 -C
 build/default/$dir
 check-TESTS")
@@ -39,7 +38,7 @@ done
 #
 # .travis.yml template
 #
-cat<<EOF
+cat <<EOF
 ### THIS FILE IS GENERATED, PLEASE DO NOT EDIT DIRECTLY
 ###  The generator lives at integrations/ci-tools/travis_yml.sh
 language: minimal
