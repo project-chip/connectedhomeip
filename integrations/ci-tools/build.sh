@@ -62,7 +62,7 @@ case "$TASK" in
     ;;
 
   run)
-    (( ${#RUN[*]} )) || die "no RUN specified"
+    ((${#RUN[*]})) || die "no RUN specified"
     docker_run_command "${RUN[@]}"
     ;;
 
