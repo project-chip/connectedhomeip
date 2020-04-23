@@ -1960,9 +1960,9 @@ NL_RESTORE_WERROR
 # Code style
 #
 
-AC_SUBST(PRETTY, ["\${abs_top_srcdir}/integrations/clang/clang-format.sh"])
+AC_SUBST(PRETTY, ["\${abs_top_srcdir}/scripts/helpers/clang-format.sh"])
 AC_SUBST(PRETTY_ARGS, ["-style=file -i"])
-AC_SUBST(PRETTY_CHECK, ["\${abs_top_srcdir}/integrations/clang/clang-format-check.sh"])
+AC_SUBST(PRETTY_CHECK, ["\${abs_top_srcdir}/scripts/helpers/clang-format-check.sh"])
 AC_SUBST(PRETTY_CHECK_ARGS, [""])
 
 # Configure any autotools-based subdirectories
