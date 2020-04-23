@@ -54,7 +54,7 @@ static bool _isValidTagLength(size_t tag_length)
 
 static bool _isValidKeyLength(size_t length)
 {
-    if (length == 16 || length == 24 || length == 32)
+    if (length == 16)
     {
         return true;
     }
@@ -93,6 +93,7 @@ CHIP_ERROR chip::Crypto::AES_CCM_128_encrypt(const unsigned char * plaintext, si
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     if (aad_length > 0)
     {
@@ -128,7 +129,7 @@ CHIP_ERROR chip::Crypto::AES_CCM_128_decrypt(const unsigned char * ciphertext, s
     VerifyOrExit(ciphertext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(ciphertext_len > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(tag_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);

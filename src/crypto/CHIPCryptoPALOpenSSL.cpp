@@ -131,6 +131,7 @@ CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, si
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     context = EVP_CIPHER_CTX_new();
@@ -200,7 +201,7 @@ CHIP_ERROR chip::Crypto::AES_CCM_256_decrypt(const unsigned char * ciphertext, s
     VerifyOrExit(ciphertext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(ciphertext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(tag_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
