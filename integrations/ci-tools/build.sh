@@ -11,6 +11,7 @@
 #  ENV     a comma-separated list of --env arguments to be passed to
 #            docker run, e.g. "GITHUB_TOKEN,FOO=BAR" will convey
 #            as "--env GITHUB_TOKEN --env FOO=BAR"
+#  RUN     if task is "run", RUN is the command line, URL encoded
 #
 
 me=$(basename "$0")
@@ -45,6 +46,10 @@ read -r -a ENV <<<"${ENV//,/ }"
 # convert ENV array to an array of args ( X Y ) => ( --env X --env Y )
 read -r -a ENV <<<"${ENV[@]/#/--env }"
 
+# decode RUN, a base64-encoded array of newline-separated strings, each line
+#  is a command-line element
+readarray -t RUN < <(base64 -d <<<"$RUN")
+
 case "$TASK" in
 
   self-test)
@@ -53,6 +58,11 @@ case "$TASK" in
 
   self-test-env)
     docker_run_command bash -c "echo run me with ENV=HI=THERE,; env | echo HI=$'$'HI"
+    ;;
+
+  run)
+    (( ${#RUN[*]} )) || die "no RUN specified"
+    docker_run_command "${RUN[@]}"
     ;;
 
   # You can add more tasks here, the top one shows an example of running

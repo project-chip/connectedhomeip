@@ -1,3 +1,5 @@
+### THIS FILE IS GENERATED, PLEASE DO NOT EDIT DIRECTLY
+###  The generator lives at integrations/ci-tools/travis_yml.sh
 language: minimal
 
 branches:
@@ -10,7 +12,9 @@ services:
 script:
     - ./integrations/ci-tools/build.sh
 
-# Note: To add new job types, add it to the matrix below, with a unique TASK varable, then update the build.sh to do what you want during that task
+# Note: To add new non-test job types, add it to the matrix below,
+#  with a unique TASK varable, then update the accompanying build.sh
+#  to do what you want during that task
 
 jobs:
     include:
@@ -21,20 +25,33 @@ jobs:
           name: "Build NRF Example Lock App"
           env: TASK="build-nrf-example-lock-app"
         - stage: Tests
-          name: "Unit & Functional Tests"
-          env: TASK="run-unit-and-functional-tests"
+          name: "check-TESTS in src/ble/tests"
+          env: TASK=run RUN=bWFrZQotQwpidWlsZC9kZWZhdWx0L3NyYy9ibGUvdGVzdHMKY2hlY2stVEVTVFMK
         - stage: Tests
-          name: "Crypto Tests"
-          env: TASK="run-crypto-tests"
+          name: "check-TESTS in src/crypto/tests"
+          env: TASK=run RUN=bWFrZQotQwpidWlsZC9kZWZhdWx0L3NyYy9jcnlwdG8vdGVzdHMKY2hlY2stVEVTVFMK
         - stage: Tests
-          name: "Setup Payload Tests"
-          env: TASK="run-setup-payload-tests"
-        # - stage: Tests
-        #   name: "mbedTLS Crypto Tests"
-        #   env: TASK="run-mbedtls-crypto-tests"
+          name: "check-TESTS in src/inet/tests"
+          env: TASK=run RUN=bWFrZQotQwpidWlsZC9kZWZhdWx0L3NyYy9pbmV0L3Rlc3RzCmNoZWNrLVRFU1RTCg==
+        - stage: Tests
+          name: "check-TESTS in src/lib/core/tests"
+          env: TASK=run RUN=bWFrZQotQwpidWlsZC9kZWZhdWx0L3NyYy9saWIvY29yZS90ZXN0cwpjaGVjay1URVNUUwo=
+        - stage: Tests
+          name: "check-TESTS in src/lib/support/tests"
+          env: TASK=run RUN=bWFrZQotQwpidWlsZC9kZWZhdWx0L3NyYy9saWIvc3VwcG9ydC90ZXN0cwpjaGVjay1URVNUUwo=
+        - stage: Tests
+          name: "check-TESTS in src/lwip/tests"
+          env: TASK=run RUN=bWFrZQotQwpidWlsZC9kZWZhdWx0L3NyYy9sd2lwL3Rlc3RzCmNoZWNrLVRFU1RTCg==
+        - stage: Tests
+          name: "check-TESTS in src/setup_payload/tests"
+          env: TASK=run RUN=bWFrZQotQwpidWlsZC9kZWZhdWx0L3NyYy9zZXR1cF9wYXlsb2FkL3Rlc3RzCmNoZWNrLVRFU1RTCg==
+        - stage: Tests
+          name: "check-TESTS in src/system/tests"
+          env: TASK=run RUN=bWFrZQotQwpidWlsZC9kZWZhdWx0L3NyYy9zeXN0ZW0vdGVzdHMKY2hlY2stVEVTVFMK
         - stage: Deployment Checks
           name: "Run Code Coverage"
           env: TASK="run-code-coverage"
         - stage: Deployment Checks
           name: "Distribution Check"
           env: TASK="build-distribution-check"
+
