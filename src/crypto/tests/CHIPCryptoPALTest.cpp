@@ -488,12 +488,12 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting invalid key", TestAES_CCM_256DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
     NL_TEST_DEF("Test decrypting invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
+#endif
     NL_TEST_DEF("Test ECDSA signing and validation using SHA256", TestECDSA_Signing_SHA256),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different signature", TestECDSA_ValidationFailIncorrectSignature),
     NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningInvalidParams),
     NL_TEST_DEF("Test ECDSA signature validation invalid parameters", TestECDSA_ValidationInvalidParam),
-#endif
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
