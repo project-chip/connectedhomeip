@@ -628,7 +628,7 @@ menu "CHIP Device Layer"
 
         config ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
             bool "Enable Time Service Time Sync"
-            default y
+            default n
             help
                 Enables synchronizing the device's real time clock with a remote CHIP Time service
                 using the CHIP Time Sync protocol.
@@ -788,7 +788,7 @@ menu "CHIP Device Layer"
 
         config ENABLE_TUNNEL_TELEMETRY
             bool "Enable CHIP Tunnel Telemetry"
-            default y
+            default n
             help
                 Enable automatically uploading CHIP tunnel telemetry via trait on an interval.
 
