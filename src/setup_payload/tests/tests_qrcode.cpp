@@ -181,8 +181,8 @@ int testInvalidQRCodePayload_WrongCharacterSet()
     SetupPayload payload;
     CHIP_ERROR err = parser.populatePayload(payload);
     bool didFail   = err != CHIP_NO_ERROR;
-    surprises      = EXPECT_EQ(didFail, true);
-    surprises      = EXPECT_EQ(payload.isValidQRCodePayload(), false);
+    surprises += EXPECT_EQ(didFail, true);
+    surprises += EXPECT_EQ(payload.isValidQRCodePayload(), false);
     return surprises;
 }
 
@@ -194,8 +194,8 @@ int testInvalidQRCodePayload_WrongLength()
     SetupPayload payload;
     CHIP_ERROR err = parser.populatePayload(payload);
     bool didFail   = err != CHIP_NO_ERROR;
-    surprises      = EXPECT_EQ(didFail, true);
-    surprises      = EXPECT_EQ(payload.isValidQRCodePayload(), false);
+    surprises += EXPECT_EQ(didFail, true);
+    surprises += EXPECT_EQ(payload.isValidQRCodePayload(), false);
     return surprises;
 }
 
@@ -269,8 +269,8 @@ int testQRCodeToPayloadGeneration()
 
     CHIP_ERROR err  = parser.populatePayload(resultingPayload);
     bool didSucceed = err == CHIP_NO_ERROR;
-    surprises       = EXPECT_EQ(didSucceed, true);
-    surprises       = EXPECT_EQ(resultingPayload.isValidQRCodePayload(), true);
+    surprises += EXPECT_EQ(didSucceed, true);
+    surprises += EXPECT_EQ(resultingPayload.isValidQRCodePayload(), true);
 
     bool result = payload == resultingPayload;
     surprises += EXPECT_EQ(result, true);
