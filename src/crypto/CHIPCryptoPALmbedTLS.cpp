@@ -23,21 +23,26 @@
 #include "CHIPCryptoPAL.h"
 
 #include <mbedtls/ccm.h>
+#include <mbedtls/bignum.h>
 #include <mbedtls/ctr_drbg.h>
+#include <mbedtls/ecdsa.h>
 #include <mbedtls/error.h>
 #include <mbedtls/entropy.h>
 #include <mbedtls/hkdf.h>
 #include <mbedtls/md.h>
+#include <mbedtls/sha256.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <string.h>
 
+#define MAX_ERROR_STR_LEN 128
+#define NUM_BYTES_IN_SHA256_HASH 32
 static void _log_mbedTLS_error(int error_code)
 {
     if (error_code != 0)
     {
-        char error_str[32];
+        char error_str[MAX_ERROR_STR_LEN];
         mbedtls_strerror(error_code, error_str, sizeof(error_str));
         ChipLogError(Crypto, "mbedTLS error: %s\n", error_str);
     }
@@ -230,5 +235,97 @@ CHIP_ERROR chip::Crypto::DRBG_get_bytes(unsigned char * out_buffer, const size_t
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
+    return error;
+}
+
+static int ECDSA_sign_rng(void * ctxt, unsigned char * out_buffer, size_t out_length)
+{
+    return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
+}
+
+CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t msg_length, const unsigned char * private_key,
+                                        const size_t private_key_length, unsigned char * out_signature,
+                                        size_t & out_signature_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    unsigned char hash[NUM_BYTES_IN_SHA256_HASH];
+
+    mbedtls_ecp_keypair keypair;
+    mbedtls_ecp_keypair_init(&keypair);
+
+    mbedtls_ecdsa_context ecdsa_ctxt;
+    mbedtls_ecdsa_init(&ecdsa_ctxt);
+
+    VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_signature_length >= kMax_ECDSA_Signature_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_group_load(&keypair.grp, MBEDTLS_ECP_DP_SECP256R1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_mpi_read_binary(&keypair.d, private_key, private_key_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, &keypair);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_sha256_ret(msg, msg_length, hash, 0);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecdsa_write_signature(&ecdsa_ctxt, MBEDTLS_MD_SHA256, hash, sizeof(hash), out_signature, &out_signature_length,
+                                           ECDSA_sign_rng, NULL);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    mbedtls_ecp_keypair_free(&keypair);
+    mbedtls_ecdsa_free(&ecdsa_ctxt);
+    _log_mbedTLS_error(result);
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::ECDSA_validate_msg_signature(const unsigned char * msg, const size_t msg_length,
+                                                      const unsigned char * public_key, const size_t public_key_length,
+                                                      const unsigned char * signature, const size_t signature_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    unsigned char hash[NUM_BYTES_IN_SHA256_HASH];
+
+    mbedtls_ecp_keypair keypair;
+    mbedtls_ecp_keypair_init(&keypair);
+
+    mbedtls_ecdsa_context ecdsa_ctxt;
+    mbedtls_ecdsa_init(&ecdsa_ctxt);
+
+    VerifyOrExit(msg != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(signature_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_group_load(&keypair.grp, MBEDTLS_ECP_DP_SECP256R1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_point_read_binary(&keypair.grp, &keypair.Q, public_key, public_key_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, &keypair);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_sha256_ret(msg, msg_length, hash, 0);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecdsa_read_signature(&ecdsa_ctxt, hash, sizeof(hash), signature, signature_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_SIGNATURE);
+
+exit:
+    mbedtls_ecp_keypair_free(&keypair);
+    mbedtls_ecdsa_free(&ecdsa_ctxt);
+    _log_mbedTLS_error(result);
     return error;
 }
