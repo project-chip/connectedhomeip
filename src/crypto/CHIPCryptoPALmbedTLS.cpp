@@ -262,6 +262,7 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
     VerifyOrExit(private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_signature != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_signature_length >= kMax_ECDSA_Signature_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_ecp_group_load(&keypair.grp, MBEDTLS_ECP_DP_SECP256R1);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
