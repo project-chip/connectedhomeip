@@ -69,6 +69,45 @@ CHIP_ERROR AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t cipherte
                                const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
 
 /**
+ * @brief A function that implements 128-bit AES-CCM encryption
+ * @param plaintext Plaintext to encrypt
+ * @param plaintext_length Length of plain_text
+ * @param aad Additional authentication data
+ * @param aad_length Length of additional authentication data
+ * @param key Encryption key
+ * @param key_length Length of encryption key (in bytes)
+ * @param iv Initial vector
+ * @param iv_length Length of initial vector
+ * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
+ * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
+ * @param tag_length Expected length of tag
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ * */
+CHIP_ERROR AES_CCM_128_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                               size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
+                               size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length);
+
+/**
+ * @brief A function that implements 128-bit AES-CCM decryption
+ * @param ciphertext Ciphertext to decrypt
+ * @param ciphertext_length Length of ciphertext
+ * @param aad Additional authentical data.
+ * @param aad_length Length of additional authentication data
+ * @param tag Tag to use to decrypt
+ * @param tag_length Length of tag
+ * @param key Decryption key
+ * @param key_length Length of Decryption key (in bytes)
+ * @param iv Initial vector
+ * @param iv_length Length of initial vector
+ * @param plaintext Buffer to write plaintext into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+
+CHIP_ERROR AES_CCM_128_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
+                               size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
+                               size_t key_length, const unsigned char * iv, size_t iv_length, unsigned char * plaintext);
+
+/**
  * @brief A function that implements SHA-256 based HKDF
  * @param secret The secret to use as the key to the HKDF
  * @param secret_length Length of the secret

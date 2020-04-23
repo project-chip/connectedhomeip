@@ -22,6 +22,7 @@
 
 #include "CHIPCryptoPAL.h"
 
+#include <mbedtls/ccm.h>
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/error.h>
 #include <mbedtls/entropy.h>
@@ -42,11 +43,28 @@ static void _log_mbedTLS_error(int error_code)
     }
 }
 
+static bool _isValidTagLength(size_t tag_length)
+{
+    if (tag_length == 8 || tag_length == 12 || tag_length == 16)
+    {
+        return true;
+    }
+    return false;
+}
+
+static bool _isValidKeyLength(size_t length)
+{
+    if (length == 16)
+    {
+        return true;
+    }
+    return false;
+}
+
 CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                              size_t aad_length, const unsigned char * key, const unsigned char * iv,
                                              size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
-    // TODO: Need mbedTLS based implementation for AES-CCM #264
     return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
 }
 
@@ -55,8 +73,85 @@ CHIP_ERROR chip::Crypto::AES_CCM_256_decrypt(const unsigned char * ciphertext, s
                                              const unsigned char * key, const unsigned char * iv, size_t iv_length,
                                              unsigned char * plaintext)
 {
-    // TODO: Need mbedTLS based implementation for AES-CCM #264
     return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_128_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                                             size_t aad_length, const unsigned char * key, size_t key_length,
+                                             const unsigned char * iv, size_t iv_length, unsigned char * ciphertext,
+                                             unsigned char * tag, size_t tag_length)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+
+    mbedtls_ccm_context context;
+    mbedtls_ccm_init(&context);
+
+    VerifyOrExit(plaintext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plaintext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    if (aad_length > 0)
+    {
+        VerifyOrExit(aad != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Size of key = key_length * number of bits in a byte (8)
+    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key, key_length * 8);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    // Encrypt
+    result = mbedtls_ccm_encrypt_and_tag(&context, plaintext_length, iv, iv_length, aad, aad_length, plaintext, ciphertext, tag,
+                                         tag_length);
+    _log_mbedTLS_error(result);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    mbedtls_ccm_free(&context);
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_128_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad,
+                                             size_t aad_len, const unsigned char * tag, size_t tag_length,
+                                             const unsigned char * key, size_t key_length, const unsigned char * iv,
+                                             size_t iv_length, unsigned char * plaintext)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 1;
+
+    mbedtls_ccm_context context;
+    mbedtls_ccm_init(&context);
+
+    VerifyOrExit(ciphertext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext_len > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    if (aad_len > 0)
+    {
+        VerifyOrExit(aad != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Size of key = key_length * number of bits in a byte (8)
+    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key, key_length * 8);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    // Decrypt
+    result =
+        mbedtls_ccm_auth_decrypt(&context, ciphertext_len, iv, iv_length, aad, aad_len, ciphertext, plaintext, tag, tag_length);
+    _log_mbedTLS_error(result);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    mbedtls_ccm_free(&context);
+    return error;
 }
 
 CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
