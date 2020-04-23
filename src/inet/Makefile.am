@@ -27,10 +27,6 @@ SUBDIRS                             = \
     tests                             \
     $(NULL)
 
-MAKEDIR_TARGETS                             = \
-    $(top_builddir)/src/include/CHIPVersion.h \
-    $(NULL)
-
 include InetLayer.am
 
 EXTRA_DIST                          = \

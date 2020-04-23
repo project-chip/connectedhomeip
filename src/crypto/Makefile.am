@@ -25,8 +25,6 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 SUBDIRS                    = tests
 
-MAKEDIR_TARGETS            = $(top_builddir)/src/include/CHIPVersion.h
-
 lib_LIBRARIES              = libChipCrypto.a
 
 libChipCrypto_adir             = $(includedir)/crypto

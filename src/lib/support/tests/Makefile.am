@@ -51,10 +51,6 @@ CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
-MAKEDIR_TARGETS                                       = \
-    $(CHIP_LDADD)                                       \
-    $(NULL)
-
 COMMON_LDADD                                          = \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
@@ -93,6 +89,14 @@ TestTimeUtils_LDADD                                   = $(COMMON_LDADD)
 
 TestErrorStr_SOURCES                                  = TestErrorStr.cpp
 TestErrorStr_LDADD                                    = $(COMMON_LDADD)
+
+# Foreign make dependencies
+
+NLFOREIGN_FILE_DEPENDENCIES                           = \
+   $(CHIP_LDADD)                                        \
+   $(NULL)
+
+$(check_PROGRAMS): $(NLFOREIGN_FILE_DEPENDENCIES)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)

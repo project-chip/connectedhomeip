@@ -1968,7 +1968,7 @@ AC_SUBST(PRETTY_CHECK_ARGS, [""])
 # Configure any autotools-based subdirectories
 if test "${nl_with_nlunit_test}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlunit-test/repo])
-AC_SUBST(NLUNIT_TEST_MAKEDIR,["${ac_pwd}/third_party/nlunit-test/repo/src"])
+AC_SUBST(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlunit-test/repo/src"])
 fi
 
 if test "${nl_with_nlio}" = "internal"; then
@@ -1981,7 +1981,7 @@ fi
 
 if test "${nl_with_nlfaultinjection}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
-AC_SUBST(NLFAULTINJECTION_MAKEDIR,["${ac_pwd}/third_party/nlfaultinjection/repo"/src])
+AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo"/src])
 fi
 
 if test "${nl_with_mbedtls}" = "internal"; then
@@ -2105,7 +2105,7 @@ AC_MSG_NOTICE([
   Nlunit-test compile flags                        : ${NLUNIT_TEST_CPPFLAGS:--}
   Nlunit-test link flags                           : ${NLUNIT_TEST_LDFLAGS:--}
   Nlunit-test link libraries                       : ${NLUNIT_TEST_LIBS:--}
-  Nlunit-test makedir                              : ${NLUNIT_TEST_MAKEDIR:--}
+  Nlunit-test foreign subdirectory dependency      : ${NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY:--}
   Nlio source                                      : ${nl_with_nlio:--}
   Nlio compile flags                               : ${NLIO_CPPFLAGS:--}
   Nlio link flags                                  : ${NLIO_LDFLAGS:--}
@@ -2118,7 +2118,7 @@ AC_MSG_NOTICE([
   Nlfaultinjection compile flags                   : ${NLFAULTINJECTION_CPPFLAGS:--}
   Nlfaultinjection link flags                      : ${NLFAULTINJECTION_LDFLAGS:--}
   Nlfaultinjection link libraries                  : ${NLFAULTINJECTION_LIBS:--}
-  Nlfaultinjection makedir                         : ${NLFAULTINJECTION_MAKEDIR:--}
+  Nlfaultinjection foreign subdirectory dependency : ${NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY:--}
   Sockets compile flags                            : ${SOCKETS_CPPFLAGS:--}
   Sockets link flags                               : ${SOCKETS_LDFLAGS:--}
   Sockets link libraries                           : ${SOCKETS_LIBS:--}

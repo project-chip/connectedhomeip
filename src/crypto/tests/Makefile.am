@@ -56,14 +56,6 @@ CHIP_LDADD                                      = \
     $(top_builddir)/src/crypto/libChipCrypto.a    \
     $(NULL)
 
-MAKEDIR_TARGETS                                 = \
-    $(CHIP_LDADD)                                 \
-    $(NULL)
-
-MAKEDIRS                                       = \
-   $(NLUNIT_TEST_MAKEDIR)                        \
-   $(NULL)   
-
 COMMON_LDADD                                   = \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)   \
     $(CHIP_LDADD)                                \
@@ -111,6 +103,19 @@ TestCryptoPAL_LDADD                            =        \
 
 TestCryptoPAL_SOURCES                          = CHIPCryptoPALTest.cpp
 
+#
+# Foreign make dependencies
+#
+
+NLFOREIGN_FILE_DEPENDENCIES                           = \
+   $(CHIP_LDADD)                                        \
+   $(NULL)
+
+NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
+   $(NULL)
+
+$(check_PROGRAMS): $(NLFOREIGN_FILE_DEPENDENCIES)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)

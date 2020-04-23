@@ -50,8 +50,6 @@ define check-file-CHIPVersion.h
 $(top_srcdir)/scripts/gen-chip-version "`cat $(1)`" -o "$(2)"
 endef # check-file-CHIPVersion.h
 
-MAKEDIR_TARGETS=$(top_builddir)/.local-version
-
 CHIPVersion.h: $(top_builddir)/.local-version
 	$(call check-file,CHIPVersion.h)
 
@@ -62,6 +60,14 @@ BUILT_SOURCES                                               = \
 CLEANFILES                                                  = \
     CHIPVersion.h                                             \
     $(NULL)
+
+#
+# Foreign make dependencies
+#
+
+NLFOREIGN_FILE_DEPENDENCIES                                 = \
+   $(top_builddir)/.local-version                             \
+   $(NULL)
 
 # Ensure that auto-generated content such as BuildConfig.h and
 # CHIPVersion.h, while public API headers, are scrubbed out of
