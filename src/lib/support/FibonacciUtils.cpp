@@ -33,7 +33,7 @@ namespace chip {
 uint32_t GetFibonacciForIndex(uint32_t inIndex)
 {
     uint32_t retval = 0;
-    uint32_t tmp;
+    uint32_t tmp    = 0;
     uint32_t vals[2];
     uint32_t index = 0;
 
