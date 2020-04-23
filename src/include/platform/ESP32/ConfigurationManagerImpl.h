@@ -56,8 +56,6 @@ private:
 
     CHIP_ERROR _Init(void);
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
-    CHIP_ERROR _GetDeviceDescriptor(::chip::Profiles::DeviceDescription::ChipDeviceDescriptor & deviceDesc);
-    ::chip::Profiles::Security::AppKeys::GroupKeyStoreBase * _GetGroupKeyStore(void);
     bool _CanFactoryReset(void);
     void _InitiateFactoryReset(void);
     CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
@@ -72,9 +70,6 @@ private:
     friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
 
     static ConfigurationManagerImpl sInstance;
-
-    CHIP_ERROR GetWiFiStationSecurityType(::chip::Profiles::NetworkProvisioning::WiFiSecurityType & secType);
-    CHIP_ERROR UpdateWiFiStationSecurityType(::chip::Profiles::NetworkProvisioning::WiFiSecurityType secType);
 
     // ===== Private members reserved for use by this class only.
 

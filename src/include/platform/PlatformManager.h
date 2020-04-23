@@ -161,7 +161,7 @@ extern PlatformManagerImpl & PlatformMgrImpl(void);
 #ifdef EXTERNAL_PLATFORMMANAGERIMPL_HEADER
 #include EXTERNAL_PLATFORMMANAGERIMPL_HEADER
 #else
-#define PLATFORMMANAGERIMPL_HEADER <platform/PlatformManagerImpl.h>
+#define PLATFORMMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/PlatformManagerImpl.h>
 #include PLATFORMMANAGERIMPL_HEADER
 #endif
 
