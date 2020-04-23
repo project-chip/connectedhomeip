@@ -24,13 +24,7 @@ die() {
 # move to ToT, I don't work anywhere else
 cd "$here/../.." || die 'ack!, where am I?!?'
 
-bootstrap='
-if [[ ! -f build/default/config.status ]]; then
-   mkdir -p build/default;
-   (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage);
-else
-   ./bootstrap -w make;
-fi'
+bootstrap='scripts/build/bootstrap.sh'
 
 bootstrap_mbedtls='
    git clean -xdf
@@ -65,44 +59,43 @@ case "$TASK" in
   #  a build inside our build container
   build-ubuntu-linux)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default'
+    docker_run_bash_command 'scripts/build/default.sh'
     ;;
 
   build-nrf-example-lock-app)
-    docker_run_bash_command 'make VERBOSE=1 -C examples/lock-app/nrf5'
+    docker_run_bash_command 'scripts/examples/nrf_lock_app.sh'
     ;;
 
   build-distribution-check)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default'
+    docker_run_bash_command 'scripts/build/distribution_check.sh'
     ;;
 
   run-unit-and-functional-tests)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default distcheck'
+    docker_run_bash_command 'scripts/tests/all_tests.sh'
     ;;
 
   run-code-coverage)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default coverage'
+    docker_run_bash_command 'scripts/tools/codecoverage.sh'
     docker_run_bash_command 'bash <(curl -s https://codecov.io/bash)'
     ;;
 
   run-crypto-tests)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default/src/crypto check'
+    docker_run_bash_command 'scripts/tests/crypto_tests.sh'
     ;;
 
   run-setup-payload-tests)
     docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'make V=1 -C build/default/src/setup_payload check'
+    docker_run_bash_command 'scripts/tests/setup_payload_tests.sh'
     ;;
 
   run-mbedtls-crypto-tests)
     docker_run_bash_command "$bootstrap_mbedtls"
-    docker_run_bash_command 'make V=1 -C build/default/third_party/mbedtls'
-    docker_run_bash_command 'make V=1 -C build/default/src/crypto check'
-    docker_run_bash_command 'git clean -xdf'
+    docker_run_bash_command 'scripts/tests/mbedtls_tests.sh'
+    docker_run_bash_command 'scripts/tests/crypto_tests.sh'
     ;;
 
   *)

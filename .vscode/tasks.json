@@ -4,7 +4,7 @@
         {
             "label": "Main Build",
             "type": "shell",
-            "command": "make -C build/default",
+            "command": "scripts/build/default.sh",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -20,7 +20,7 @@
         {
             "label": "Auto-enforce coding style",
             "type": "shell",
-            "command": "make -C build/default pretty",
+            "command": "scripts/helpers/auto_enforce_code_style.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
             "isBackground": false,
@@ -33,7 +33,7 @@
         {
             "label": "Verify coding style conformance",
             "type": "shell",
-            "command": "make -C build/default pretty-check",
+            "command": "scripts/helpers/code_style_check.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
             "problemMatcher": ["$gcc"]
@@ -41,7 +41,7 @@
         {
             "label": "Run Unit and Functional Tests",
             "type": "shell",
-            "command": "make -C build/default check",
+            "command": "scripts/test/all_tests.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
             "problemMatcher": ["$gcc"]
@@ -49,7 +49,7 @@
         {
             "label": "Run Distribution Generation",
             "type": "shell",
-            "command": "make -C build/default distcheck",
+            "command": "scripts/build/distribution_check.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
             "problemMatcher": ["$gcc"]
@@ -57,7 +57,7 @@
         {
             "label": "Run Code Coverage",
             "type": "shell",
-            "command": "make -C build/default coverage; code -r build/default/src/chip.info/index.html",
+            "command": "scripts/tools/codecoverage.sh; code -r build/default/src/chip.info/index.html",
             "group": "none",
             "dependsOn": "Bootstrap",
             "problemMatcher": ["$gcc"]
@@ -65,46 +65,29 @@
         {
             "label": "Clean",
             "type": "shell",
-            "command": "make -C build/default distclean",
+            "command": "scripts/helpers/clean.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Configure",
-            "type": "shell",
-            "command": "mkdir -p build/default && (cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage)",
-            "group": "none",
-            "problemMatcher": ["$gcc"]
-        },
-        {
             "label": "Bootstrap",
             "type": "shell",
-            "command": [
-                "if [[ ! -f build/default/config.status ]]; then",
-                "  mkdir -p build/default;",
-                "  (cd build/default && ",
-                "  ../../bootstrap-configure --enable-debug --enable-coverage); ",
-                "elif [[ configure.ac -nt configure ]]; then",
-                "  ./bootstrap",
-                "else",
-                "  ./bootstrap -w make;",
-                "fi"
-            ],
+            "command": "scripts/build/bootstrap.sh",
             "group": "none",
             "problemMatcher": ["$gcc"]
         },
         {
             "label": "Clean Tree",
             "type": "shell",
-            "command": "make -f Makefile-bootstrap clean-repos && git clean -Xdf",
+            "command": "scripts/helpers/clean_tree.sh",
             "group": "none",
             "problemMatcher": ["$gcc"]
         },
         {
             "label": "Run Setup Payload Tests",
             "type": "shell",
-            "command": "make -C build/default/src/setup_payload check",
+            "command": "scripts/tests/setup_payload_tests.sh",
             "group": "none",
             "dependsOn": "Bootstrap",
             "problemMatcher": ["$gcc"]
@@ -112,28 +95,24 @@
         {
             "label": "Build & Run Crypto Tests",
             "type": "shell",
-            "command": "make -C build/default/src/crypto check",
+            "command": "scripts/tests/crypt_tests.sh",
             "group": "none",
             "problemMatcher": ["$gcc"]
         },
         {
             "label": "Build nRF5 Lock App",
             "type": "shell",
-            "command": "make -C examples/lock-app/nrf5",
+            "command": "scripts/examples/nrf_lock_app.sh",
             "group": "none",
             "dependsOn": "Clean Tree",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Build openSSL crypto Tests",
             "type": "shell",
-            "command": " make -C build/default/src/crypto/ && make -C build/default/src/crypto/tests/ TestOpenSSLCrypto",
+            "command": "scripts/tests/openssl_tests.sh",
             "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
-        },
-    ],
+            "problemMatcher": ["$gcc"]
+        }
+    ]
 }
