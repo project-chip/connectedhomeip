@@ -274,7 +274,7 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
         bool success = memcmp(v.output_key_material, out_buffer, out_length) == 0;
         NL_TEST_ASSERT(inSuite, success);
     }
-    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == 2);
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == 3);
 }
 
 static void TestDRBG_InvalidInputs(nlTestSuite * inSuite, void * inContext)
