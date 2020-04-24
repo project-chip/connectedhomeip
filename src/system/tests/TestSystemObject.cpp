@@ -308,7 +308,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
 void * TestObject::CheckHighWatermarkThread(void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
-    unsigned int i;
+    int i;
     chip::System::Stats::count_t lNumInUse;
     chip::System::Stats::count_t lHighWatermark;
 
@@ -371,11 +371,10 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 {
     memset(&sPool, 0, sizeof(sPool));
 
-    const unsigned int kNumObjects = kPoolSize;
-    TestObject * lObject           = NULL;
-    TestContext & lContext         = *static_cast<TestContext *>(aContext);
+    const int kNumObjects  = kPoolSize;
+    TestObject * lObject   = NULL;
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer lLayer;
-    unsigned int i;
     chip::System::Stats::count_t lNumInUse;
     chip::System::Stats::count_t lHighWatermark;
 
@@ -384,7 +383,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     // Take all objects one at a time and check the watermark
     // increases monotonically
 
-    for (i = 0; i < kNumObjects; ++i)
+    for (int i = 0; i < kNumObjects; ++i)
     {
         lObject = sPool.TryCreate(lLayer);
 
@@ -410,7 +409,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     // Free all objects one at a time and check that the watermark does not
     // change.
 
-    for (i = 0; i < kNumObjects; ++i)
+    for (int i = 0; i < (int) kNumObjects; ++i)
     {
         lObject = sPool.Get(lLayer, i);
 
@@ -427,7 +426,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     // Take all objects one at a time  again and check the watermark
     // does not move
 
-    for (i = 0; i < kNumObjects; ++i)
+    for (int i = 0; i < kNumObjects; ++i)
     {
         lObject = sPool.TryCreate(lLayer);
 
@@ -443,7 +442,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 
     // Cleanup
 
-    for (i = 0; i < kPoolSize; ++i)
+    for (int i = 0; i < kPoolSize; ++i)
     {
         lObject = sPool.Get(lLayer, i);
 
