@@ -24,10 +24,6 @@ die() {
 # move to ToT, I don't work anywhere else
 cd "$here/../.." || die 'ack!, where am I?!?'
 
-bootstrap='scripts/build/bootstrap.sh'
-
-bootstrap_mbedtls='scripts/build/bootstrap_mbedtls.sh'
-
 docker_run_command() {
   integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
 }
@@ -54,44 +50,44 @@ case "$TASK" in
   # You can add more tasks here, the top one shows an example of running
   #  a build inside our build container
   build-ubuntu-linux)
-    docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'scripts/build/default.sh'
+    docker_run_command 'scripts/build/bootstrap.sh'
+    docker_run_command 'scripts/build/default.sh'
     ;;
 
   build-nrf-example-lock-app)
-    docker_run_bash_command 'scripts/examples/nrf_lock_app.sh'
+    docker_run_command 'scripts/examples/nrf_lock_app.sh'
     ;;
 
   build-distribution-check)
-    docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'scripts/build/distribution_check.sh'
+    docker_run_command 'scripts/build/bootstrap.sh'
+    docker_run_command 'scripts/build/distribution_check.sh'
     ;;
 
   run-unit-and-functional-tests)
-    docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'scripts/tests/all_tests.sh'
+    docker_run_command 'scripts/build/bootstrap.sh'
+    docker_run_command 'scripts/tests/all_tests.sh'
     ;;
 
   run-code-coverage)
-    docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'scripts/tools/codecoverage.sh'
+    docker_run_command 'scripts/build/bootstrap.sh'
+    docker_run_command 'scripts/tools/codecoverage.sh'
     docker_run_bash_command 'bash <(curl -s https://codecov.io/bash)'
     ;;
 
   run-crypto-tests)
-    docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'scripts/tests/crypto_tests.sh'
+    docker_run_command 'scripts/build/bootstrap.sh'
+    docker_run_command 'scripts/tests/crypto_tests.sh'
     ;;
 
   run-setup-payload-tests)
-    docker_run_bash_command "$bootstrap"
-    docker_run_bash_command 'scripts/tests/setup_payload_tests.sh'
+    docker_run_command 'scripts/build/bootstrap.sh'
+    docker_run_command 'scripts/tests/setup_payload_tests.sh'
     ;;
 
   run-mbedtls-crypto-tests)
-    docker_run_bash_command "$bootstrap_mbedtls"
-    docker_run_bash_command 'scripts/tests/mbedtls_tests.sh'
-    docker_run_bash_command 'scripts/tests/crypto_tests.sh'
+    docker_run_command 'scripts/build/bootstrap_mbedtls.sh'
+    docker_run_command 'scripts/tests/mbedtls_tests.sh'
+    docker_run_command 'scripts/tests/crypto_tests.sh'
     ;;
 
   *)
