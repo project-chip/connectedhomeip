@@ -24,13 +24,13 @@
 
 die()
 {
-    echo " *** ERROR: " ${*}
+    echo " *** ERROR: " "${*}"
     exit 1
 }
 
 # Package build machine OS-specific configuration and setup
 
-case "${TRAVIS_OS_NAME}" in
+case "$TRAVIS_OS_NAME" in
 
     linux)
         # By default, Travis CI does not have IPv6 enabled on
