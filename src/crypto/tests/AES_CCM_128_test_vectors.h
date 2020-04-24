@@ -1019,8 +1019,7 @@ static const struct ccm_128_test_vector * ccm_128_test_vectors[]              = 
     &chiptest_dac9e1195a0d_test_vector_175, &chiptest_dac9e1195a0d_test_vector_182, &chiptest_dac9e1195a0d_test_vector_189,
     &chiptest_dac9e1195a0d_test_vector_196, &chiptest_dac9e1195a0d_test_vector_203, &chiptest_dac9e1195a0d_test_vector_210,
     &chiptest_dac9e1195a0d_test_vector_217, &chiptest_dac9e1195a0d_test_vector_224, &chiptest_dac9e1195a0d_test_vector_231,
-    &chiptest_dac9e1195a0d_test_vector_238, &chiptest_dac9e1195a0d_test_vector_245, &chiptest_dac9e1195a0d_test_vector_252,
-    &chiptest_dac9e1195a0d_test_vector_259, &chiptest_dac9e1195a0d_test_vector_266
+    &chiptest_dac9e1195a0d_test_vector_238, &chiptest_dac9e1195a0d_test_vector_245, &chiptest_dac9e1195a0d_test_vector_252
 };
 
 #endif // _AES_CCM_128_TEST_VECTORS_H_
