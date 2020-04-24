@@ -59,6 +59,7 @@ static bool _isValidTagLength(size_t tag_length)
 
 static bool _isValidKeyLength(size_t length)
 {
+    // 16 bytes key for AES-CCM-128
     if (length == 16)
     {
         return true;
@@ -66,25 +67,9 @@ static bool _isValidKeyLength(size_t length)
     return false;
 }
 
-CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                             size_t aad_length, const unsigned char * key, const unsigned char * iv,
-                                             size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
-{
-    return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
-}
-
-CHIP_ERROR chip::Crypto::AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad,
-                                             size_t aad_len, const unsigned char * tag, size_t tag_length,
-                                             const unsigned char * key, const unsigned char * iv, size_t iv_length,
-                                             unsigned char * plaintext)
-{
-    return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
-}
-
-CHIP_ERROR chip::Crypto::AES_CCM_128_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                             size_t aad_length, const unsigned char * key, size_t key_length,
-                                             const unsigned char * iv, size_t iv_length, unsigned char * ciphertext,
-                                             unsigned char * tag, size_t tag_length)
+CHIP_ERROR chip::Crypto::AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                                         size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
+                                         size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -95,7 +80,7 @@ CHIP_ERROR chip::Crypto::AES_CCM_128_encrypt(const unsigned char * plaintext, si
     VerifyOrExit(plaintext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plaintext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
     VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -120,10 +105,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR chip::Crypto::AES_CCM_128_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad,
-                                             size_t aad_len, const unsigned char * tag, size_t tag_length,
-                                             const unsigned char * key, size_t key_length, const unsigned char * iv,
-                                             size_t iv_length, unsigned char * plaintext)
+CHIP_ERROR chip::Crypto::AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_len, const unsigned char * aad,
+                                         size_t aad_len, const unsigned char * tag, size_t tag_length, const unsigned char * key,
+                                         size_t key_length, const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 1;
@@ -136,7 +120,7 @@ CHIP_ERROR chip::Crypto::AES_CCM_128_decrypt(const unsigned char * ciphertext, s
     VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
     VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     if (aad_len > 0)
