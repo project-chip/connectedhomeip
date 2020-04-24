@@ -537,7 +537,7 @@ static CHIP_ERROR _create_evp_key_from_binary_p256_key(const unsigned char * key
     int result           = -1;
     EC_POINT * point     = NULL;
     EC_GROUP * group     = NULL;
-    int nid = NID_undef;
+    int nid              = NID_undef;
 
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -560,13 +560,13 @@ static CHIP_ERROR _create_evp_key_from_binary_p256_key(const unsigned char * key
     {
         group = EC_GROUP_new_by_curve_name(nid);
         VerifyOrExit(group != NULL, error = CHIP_ERROR_INTERNAL);
-        
+
         point = EC_POINT_new(group);
         VerifyOrExit(point != NULL, error = CHIP_ERROR_INTERNAL);
-        
+
         result = EC_POINT_oct2point(group, point, key, key_length, NULL);
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-        
+
         result = EC_KEY_set_public_key(ec_key, point);
     }
 
