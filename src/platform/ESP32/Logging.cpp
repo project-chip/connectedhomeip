@@ -24,7 +24,7 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/logging/ChipLogging.h>
+#include <support/logging/CHIPLogging.h>
 
 #include "esp_log.h"
 
@@ -47,7 +47,6 @@ void GetModuleName(char * buf, uint8_t module)
 
 } // unnamed namespace
 
-namespace nl {
 namespace chip {
 namespace Logging {
 
@@ -61,7 +60,7 @@ void Log(uint8_t module, uint8_t category, const char * msg, ...)
     {
         enum
         {
-            kMaxTagLen = 7 + nlChipLoggingModuleNameLen
+            kMaxTagLen = 7 + ChipLoggingModuleNameLen
         };
         char tag[kMaxTagLen + 1];
         size_t tagLen;
@@ -97,4 +96,3 @@ void Log(uint8_t module, uint8_t category, const char * msg, ...)
 
 } // namespace Logging
 } // namespace chip
-} // namespace nl

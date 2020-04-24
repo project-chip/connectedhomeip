@@ -61,7 +61,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #endif
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
 {
-    using TunnelConnNotifyReasons = ::chip::Profiles::ChipTunnel::ChipTunnelConnectionMgr::TunnelConnNotifyReasons;
 
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -175,7 +174,6 @@ private:
     static const char * WiFiStationStateToStr(WiFiStationState state);
     static const char * WiFiAPStateToStr(WiFiAPState state);
     static void RefreshMessageLayer(void);
-    static void HandleServiceTunnelNotification(TunnelConnNotifyReasons reason, CHIP_ERROR err, void * appCtxt);
 };
 
 inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)

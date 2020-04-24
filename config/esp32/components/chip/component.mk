@@ -33,6 +33,8 @@ HOST_ARCH                   := xtensa-unknown-linux-gnu
 OUTPUT_DIR					:= $(BUILD_DIR_BASE)/chip
 REL_OUTPUT_DIR              := $(shell perl -e 'use File::Spec; use Cwd; print File::Spec->abs2rel(Cwd::realpath($$ARGV[0]), Cwd::realpath($$ARGV[1])) . "\n"' $(OUTPUT_DIR) $(COMPONENT_PATH))
 
+REL_CHIP_ROOT               := $(shell perl -e 'use File::Spec; use Cwd; print File::Spec->abs2rel(Cwd::realpath($$ARGV[0]), Cwd::realpath($$ARGV[1])) . "\n"' $(CHIP_ROOT) $(COMPONENT_PATH))
+
 # Directory containing esp32-specific CHIP project configuration files.
 PROJECT_CONFIG_DIR          := $(CHIP_ROOT)/build/config/esp32
 
@@ -40,7 +42,9 @@ PROJECT_CONFIG_DIR          := $(CHIP_ROOT)/build/config/esp32
 BUILD_ARCH                  := $(shell $(CHIP_ROOT)/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
 
 # Directory containing the esp32-specific LwIP component sources.
-LWIP_COMPONENT_DIR      	?= $(PROJECT_PATH)/components/lwip
+LWIP_COMPONENT_DIR      	?= $(IDF_PATH)/components/lwip
+
+COMPONENT_LIBRARIES         :=
 
 
 # ==================================================
@@ -49,8 +53,9 @@ LWIP_COMPONENT_DIR      	?= $(PROJECT_PATH)/components/lwip
 
 # Include directories to be searched when building CHIP.
 INCLUDES                    := $(OUTPUT_DIR)/src/include \
-                               $(OUTPUT_DIR)/src/include/CHIP/DeviceLayer/ESP32 \
-                               $(CHIP_ROOT)/src/adaptations/device-layer/trait-support \
+                               $(OUTPUT_DIR)/src/include/platform/ESP32 \
+                               $(IDF_PATH)/components/lwip/lwip/src/include \
+                               $(IDF_PATH)/components/freertos/include/freertos/ \
                                $(COMPONENT_INCLUDES)
 
 # Compiler flags for building CHIP
@@ -91,8 +96,7 @@ CONFIGURE_OPTIONS       	:= AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJCOP
                                --with-network-layer=all \
                                --with-target-network=lwip \
                                --with-lwip=$(LWIP_COMPONENT_DIR) \
-                               --with-inet-endpoint="tcp udp tun dns" \
-                               --with-openssl=no \
+                               --with-inet-endpoint="tcp udp" \
                                --with-logging-style=external \
                                --with-chip-project-includes= \
                                --with-chip-system-project-includes= \
@@ -119,18 +123,22 @@ endif
 
 # Header directories to be included when building other components that use CHIP.
 # Note that these must be relative to the component source directory.
+# TODO Boot the CHIP_ROOT includedirs
 COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
-                               $(REL_OUTPUT_DIR)/include
+                               $(REL_OUTPUT_DIR)/include \
+                               $(REL_CHIP_ROOT)/src/include/platform/ESP32 \
+                               $(REL_CHIP_ROOT)/src/include/ \
+                               $(REL_CHIP_ROOT)/src/lib \
+                               $(REL_CHIP_ROOT)/src/ \
+                               $(REL_CHIP_ROOT)/src/system
+
 
 # Linker flags to be included when building other components that use CHIP.
-COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib \
+COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
 					           -lCHIP \
 					           -lInetLayer \
-					           -lmincrypt \
 					           -lnlfaultinjection \
 					           -lSystemLayer \
-					           -luECC \
-					           -lWarm \
 					           -lDeviceLayer
 
 # Tell the ESP-IDF build system that the CHIP component defines its own build
@@ -176,6 +184,8 @@ install-chip : | build-chip
 	MAKEFLAGS= make -C $(OUTPUT_DIR) --no-print-directory install
 
 build : build-chip install-chip
+	echo "CHIP built and installed..."
+	cp ${OUTPUT_DIR}/lib/libCHIP.a ${OUTPUT_DIR}/libchip.a
 
 clean:
 	echo "RM $(OUTPUT_DIR)"
