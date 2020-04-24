@@ -27,6 +27,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                 = \
+    AES_CCM_128_test_vectors.h                   \
     AES_CCM_256_test_vectors.h                   \
     HKDF_SHA256_test_vectors.h                   \
     $(NULL)
