@@ -530,7 +530,7 @@ exit:
 }
 
 // helper function to populate octet key into EVP_PKEY out_evp_pkey. Caller must free out_evp_pkey
-static CHIP_ERROR _create_evp_key_from_binary_key(const unsigned char * key, const size_t key_length, EVP_PKEY ** out_evp_pkey,
+static CHIP_ERROR _create_evp_key_from_binary_p256_key(const unsigned char * key, const size_t key_length, EVP_PKEY ** out_evp_pkey,
                                                   EC_GROUP * group, bool isPrivateKey)
 {
 
@@ -621,11 +621,11 @@ CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_
     group = EC_GROUP_new_by_curve_name(_nidForCurve(ECName::P256v1));
     VerifyOrExit(group != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = _create_evp_key_from_binary_key(local_private_key, local_private_key_length, &local_key, group, true);
+    error = _create_evp_key_from_binary_p256_key(local_private_key, local_private_key_length, &local_key, group, true);
     VerifyOrExit(error == CHIP_NO_ERROR,
                  error = error); // error = error because we just want to pass back the error from _create_evp_key_from_binary_key
 
-    error = _create_evp_key_from_binary_key(remote_public_key, remote_public_key_length, &remote_key, group, false);
+    error = _create_evp_key_from_binary_p256_key(remote_public_key, remote_public_key_length, &remote_key, group, false);
     VerifyOrExit(error == CHIP_NO_ERROR,
                  error = error); // error = error because we just want to pass back the error from _create_evp_key_from_binary_key
 
