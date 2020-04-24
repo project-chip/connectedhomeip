@@ -35,6 +35,8 @@
 
 #define kKeyLengthInBits 256
 
+
+
 enum class DigestType
 {
     SHA256
@@ -46,6 +48,9 @@ enum class ECName
 };
 
 using namespace chip::Crypto;
+
+static_assert(kMax_ECDH_Secret_Length >= 64, "ECDH shared secret is too short");
+static_assert(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
 
 static int _nidForCurve(ECName name)
 {
@@ -331,7 +336,7 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
                                         size_t & out_signature_length)
 {
     ERR_clear_error();
-    static_assert(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
+    
 
     CHIP_ERROR error       = CHIP_NO_ERROR;
     int result             = 0;
@@ -596,7 +601,6 @@ CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_
                                             const unsigned char * local_private_key, const size_t local_private_key_length,
                                             unsigned char * out_secret, size_t & out_secret_length)
 {
-    static_assert(kMax_ECDH_Secret_Length >= 64, "ECDH shared secret is too short");
     ERR_clear_error();
     CHIP_ERROR error      = CHIP_NO_ERROR;
     int result            = -1;
@@ -607,7 +611,6 @@ CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_
     EC_GROUP * group       = NULL;
     size_t out_buf_length  = 0;
 
-    static_assert(kMax_ECDH_Secret_Length >= 32);
     VerifyOrExit(remote_public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(remote_public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(local_private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
