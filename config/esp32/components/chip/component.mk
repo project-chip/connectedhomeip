@@ -130,7 +130,7 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
                                $(REL_CHIP_ROOT)/src/include/ \
                                $(REL_CHIP_ROOT)/src/lib \
                                $(REL_CHIP_ROOT)/src/ \
-                               $(REL_CHIP_ROOT)/src/system \
+                               $(REL_CHIP_ROOT)/src/system
 
 
 # Linker flags to be included when building other components that use CHIP.
