@@ -10,5 +10,5 @@ PR
 | [jelderton](https://github.com/jelderton)             | Comcast, Inc.       |
 | [gerickson](https://github.com/gerickson)             | Google, Inc.        |
 | [robszewczyk](https://github.com/robszewczyk)         | Google, Inc.        |
-| [tpmanley](https://github.com/tpmanley)               | Samsung SmartThings |
+| [saurabhst](https://github.com/saurabhst)             | Samsung SmartThings |
 | [woody-apple](https://github.com/woody-apple)         | Apple, Inc.         |
