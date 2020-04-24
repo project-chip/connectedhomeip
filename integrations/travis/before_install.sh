@@ -45,7 +45,7 @@ case "$TRAVIS_OS_NAME" in
 
       touch /etc/docker/daemon.json
 
-      echo '{ "ipv6" : true }' > /etc/docker/daemon.json
+      echo '{ "ipv6" : true }' >/etc/docker/daemon.json
 
       service docker start
     fi
