@@ -41,13 +41,13 @@ case "$TRAVIS_OS_NAME" in
     # If Docker is present, then enable IPv6 configuration.
 
     if command -v docker; then
-      service docker stop
+      sudo service docker stop
 
-      touch /etc/docker/daemon.json
+      sudo touch /etc/docker/daemon.json
 
-      echo '{ "ipv6" : true }' >/etc/docker/daemon.json
+      sudo echo '{ "ipv6" : true }' >/etc/docker/daemon.json
 
-      service docker start
+      sudo service docker start
     fi
 
     ;;
