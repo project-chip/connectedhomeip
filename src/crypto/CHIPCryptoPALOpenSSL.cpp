@@ -70,6 +70,16 @@ static bool _isValidTagLength(size_t tag_length)
     return false;
 }
 
+static bool _isValidKeyLength(size_t length)
+{
+    // 16 bytes key for AES-CCM-128, 32 for AES-CCM-256
+    if (length == 16 || length == 32)
+    {
+        return true;
+    }
+    return false;
+}
+
 static void _logSSLError()
 {
     int ssl_err_code = ERR_get_error();
@@ -100,23 +110,28 @@ static const EVP_MD * _digestForType(DigestType digestType)
     }
 }
 
-static CHIP_ERROR AES_CCM_encrypt(const EVP_CIPHER * type, const unsigned char * plaintext, size_t plaintext_length,
-                                  const unsigned char * aad, size_t aad_length, const unsigned char * key, const unsigned char * iv,
-                                  size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
+CHIP_ERROR chip::Crypto::AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
+                                         size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
+                                         size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
 {
     EVP_CIPHER_CTX * context = NULL;
     int bytesWritten         = 0;
     size_t ciphertext_length = 0;
     CHIP_ERROR error         = CHIP_NO_ERROR;
     int result               = 1;
+    const EVP_CIPHER * type  = NULL;
 
     VerifyOrExit(plaintext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plaintext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // 16 bytes key for AES-CCM-128
+    type = (key_length == 16) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 
     context = EVP_CIPHER_CTX_new();
     VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
@@ -172,22 +187,27 @@ exit:
     return error;
 }
 
-static CHIP_ERROR AES_CCM_decrypt(const EVP_CIPHER * type, const unsigned char * ciphertext, size_t ciphertext_length,
-                                  const unsigned char * aad, size_t aad_length, const unsigned char * tag, size_t tag_length,
-                                  const unsigned char * key, const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
+CHIP_ERROR chip::Crypto::AES_CCM_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
+                                         size_t aad_length, const unsigned char * tag, size_t tag_length, const unsigned char * key,
+                                         size_t key_length, const unsigned char * iv, size_t iv_length, unsigned char * plaintext)
 {
     EVP_CIPHER_CTX * context = NULL;
     CHIP_ERROR error         = CHIP_NO_ERROR;
     int bytesOutput          = 0;
     int result               = 1;
+    const EVP_CIPHER * type  = NULL;
 
     VerifyOrExit(ciphertext != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(ciphertext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // 16 bytes key for AES-CCM-128
+    type = (key_length == 16) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 
     context = EVP_CIPHER_CTX_new();
     VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
@@ -231,41 +251,6 @@ exit:
     }
 
     return error;
-}
-
-CHIP_ERROR chip::Crypto::AES_CCM_128_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                             size_t aad_length, const unsigned char * key, size_t key_length,
-                                             const unsigned char * iv, size_t iv_length, unsigned char * ciphertext,
-                                             unsigned char * tag, size_t tag_length)
-{
-    return AES_CCM_encrypt(EVP_aes_128_ccm(), plaintext, plaintext_length, aad, aad_length, key, iv, iv_length, ciphertext, tag,
-                           tag_length);
-}
-
-CHIP_ERROR chip::Crypto::AES_CCM_128_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
-                                             size_t aad_length, const unsigned char * tag, size_t tag_length,
-                                             const unsigned char * key, size_t key_length, const unsigned char * iv,
-                                             size_t iv_length, unsigned char * plaintext)
-{
-    return AES_CCM_decrypt(EVP_aes_128_ccm(), ciphertext, ciphertext_length, aad, aad_length, tag, tag_length, key, iv, iv_length,
-                           plaintext);
-}
-
-CHIP_ERROR chip::Crypto::AES_CCM_256_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
-                                             size_t aad_length, const unsigned char * key, const unsigned char * iv,
-                                             size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
-{
-    return AES_CCM_encrypt(EVP_aes_256_ccm(), plaintext, plaintext_length, aad, aad_length, key, iv, iv_length, ciphertext, tag,
-                           tag_length);
-}
-
-CHIP_ERROR chip::Crypto::AES_CCM_256_decrypt(const unsigned char * ciphertext, size_t ciphertext_length, const unsigned char * aad,
-                                             size_t aad_length, const unsigned char * tag, size_t tag_length,
-                                             const unsigned char * key, const unsigned char * iv, size_t iv_length,
-                                             unsigned char * plaintext)
-{
-    return AES_CCM_decrypt(EVP_aes_256_ccm(), ciphertext, ciphertext_length, aad, aad_length, tag, tag_length, key, iv, iv_length,
-                           plaintext);
 }
 
 CHIP_ERROR chip::Crypto::HKDF_SHA256(const unsigned char * secret, const size_t secret_length, const unsigned char * salt,
