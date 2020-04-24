@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -18,6 +19,8 @@
 
 #ifndef LED_WIDGET_H
 #define LED_WIDGET_H
+
+#include <stdint.h>
 
 class LEDWidget
 {

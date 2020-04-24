@@ -19,6 +19,11 @@
 #ifndef BUTTON_HANDLER_H
 #define BUTTON_HANDLER_H
 
+#include <stdint.h>
+
+#include "FreeRTOS.h"
+#include "timers.h" // provides FreeRTOS timer support
+
 class ButtonHandler
 {
 public:
