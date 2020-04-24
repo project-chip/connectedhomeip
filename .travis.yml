@@ -34,7 +34,7 @@ jobs:
         #   env: TASK="run-mbedtls-crypto-tests"
         - stage: Deployment Checks
           name: "Run Code Coverage"
-          env: TASK="run-code-coverage"
+          env: ENV=CODECOV_TOKEN TASK="run-code-coverage"
         - stage: Deployment Checks
           name: "Distribution Check"
           env: TASK="build-distribution-check"
