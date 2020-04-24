@@ -18,28 +18,26 @@
 
 #
 #    Description:
-#      This file is the script for Travis CI hosted, distributed continuous 
+#      This file is the script for Travis CI hosted, distributed continuous
 #      integration 'before_install' trigger of the 'install' step.
 #
 
-die()
-{
-    echo " *** ERROR: " ${*}
-    exit 1
+die() {
+  echo " *** ERROR: " "${*}"
+  exit 1
 }
 
 # Package build machine OS-specific configuration and setup
 
-case "${TRAVIS_OS_NAME}" in
+case "$TRAVIS_OS_NAME" in
 
-    linux)
-        # By default, Travis CI does not have IPv6 enabled on
-        # Linux. Ensure that IPv6 is enabled since Weave, and its unit
-        # and functional tests, depend on working IPv6 support.
+  linux)
+    # By default, Travis CI does not have IPv6 enabled on
+    # Linux. Ensure that IPv6 is enabled since Weave, and its unit
+    # and functional tests, depend on working IPv6 support.
 
-        sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
+    sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
 
-        ;;
+    ;;
 
 esac
-
