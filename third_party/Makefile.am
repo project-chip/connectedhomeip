@@ -32,6 +32,7 @@ EXTRA_DIST                                   = \
 
 DIST_SUBDIRS                                 = \
     lwip                                       \
+    mbedtls                                    \
     $(NULL)
 
 # <any of the third-party packages listed in repos.conf>_SUBDIRS are

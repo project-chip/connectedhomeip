@@ -23,9 +23,14 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+if CHIP_WITH_MBEDTLS_INTERNAL
+
 lib_LIBRARIES                                                                  = libmbedtls.a
 
-libmbedtls_a_SOURCES                                                           = \
+# Never include the mbedTLS sources in a distribution; they always will get pulled from upstream
+# via git operations, hence the 'nodist_' qualifier.
+
+nodist_libmbedtls_a_SOURCES                                                    = \
     repo/library/aes.c                      \
     repo/library/pem.c                      \
     repo/library/aesni.c                    \
@@ -104,7 +109,7 @@ libmbedtls_a_SOURCES                                                           =
     $(NULL)
 
 if !CONFIG_DEVICE_LAYER
-libmbedtls_a_SOURCES                                                          += \
+nodist_libmbedtls_a_SOURCES                                                   += \
     repo/library/entropy_poll.c             \
     repo/library/timing.c                   \
     $(NULL)
@@ -114,5 +119,7 @@ libmbedtls_a_CPPFLAGS                                                          =
     -I$(top_srcdir)/third_party/mbedtls/repo/include                             \
     $(MBEDTLS_CPPFLAGS)                                                          \
     $(NULL)
+
+endif # CHIP_WITH_MBEDTLS_INTERNAL
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
