@@ -59,8 +59,8 @@ static bool _isValidTagLength(size_t tag_length)
 
 static bool _isValidKeyLength(size_t length)
 {
-    // 16 bytes key for AES-CCM-128
-    if (length == 16)
+    // 16 bytes key for AES-CCM-128, 32 for AES-CCM-256
+    if (length == 16 || length == 32)
     {
         return true;
     }
