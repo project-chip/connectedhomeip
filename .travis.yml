@@ -8,9 +8,10 @@ services:
     - docker
 
 script:
-    - ./integrations/ci-tools/build.sh
+    - ./integrations/ci-tools/travis.sh
 
-# Note: To add new job types, add it to the matrix below, with a unique TASK varable, then update the build.sh to do what you want during that task
+# Note: To add new job types, add it to the matrix below, with a unique
+#  TASK varable, then update travis.sh to do what you want during that task
 
 jobs:
     include:
