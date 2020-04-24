@@ -409,7 +409,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     // Free all objects one at a time and check that the watermark does not
     // change.
 
-    for (int i = 0; i < (int) kNumObjects; ++i)
+    for (int i = 0; i < kNumObjects; ++i)
     {
         lObject = sPool.Get(lLayer, i);
 
