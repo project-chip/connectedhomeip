@@ -53,11 +53,11 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
 
             if (!areCTsEqual)
             {
-                printf("\n Test %d failed due to mismatchinng ciphertext", vector->tcId);
+                printf("\n Test %d failed due to mismatching ciphertext", vector->tcId);
             }
             if (!areTagsEqual)
             {
-                printf("\n Test %d failed due to mismatchinng tags", vector->tcId);
+                printf("\n Test %d failed due to mismatching tags", vector->tcId);
             }
         }
     }
@@ -83,7 +83,7 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
             NL_TEST_ASSERT(inSuite, arePTsEqual);
             if (!arePTsEqual)
             {
-                printf("\n Test %d failed due to mismatchinng plaintext", vector->tcId);
+                printf("\n Test %d failed due to mismatching plaintext", vector->tcId);
             }
         }
     }
@@ -283,11 +283,11 @@ static void TestAES_CCM_128EncryptTestVectors(nlTestSuite * inSuite, void * inCo
 
             if (!areCTsEqual)
             {
-                printf("\n Test %d failed due to mismatchinng ciphertext", vector->tcId);
+                printf("\n Test %d failed due to mismatching ciphertext", vector->tcId);
             }
             if (!areTagsEqual)
             {
-                printf("\n Test %d failed due to mismatchinng tags", vector->tcId);
+                printf("\n Test %d failed due to mismatching tags", vector->tcId);
             }
         }
     }
@@ -313,7 +313,7 @@ static void TestAES_CCM_128DecryptTestVectors(nlTestSuite * inSuite, void * inCo
             NL_TEST_ASSERT(inSuite, arePTsEqual);
             if (!arePTsEqual)
             {
-                printf("\n Test %d failed due to mismatchinng plaintext", vector->tcId);
+                printf("\n Test %d failed due to mismatching plaintext", vector->tcId);
             }
         }
     }
