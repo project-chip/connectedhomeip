@@ -331,7 +331,7 @@ CHIP_ERROR chip::Crypto::ECDSA_sign_msg(const unsigned char * msg, const size_t 
                                         size_t & out_signature_length)
 {
     ERR_clear_error();
-    static_assert(kMax_ECDSA_Signature_Length >= 33, "ECDSA signature buffer length is too short");
+    static_assert(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
 
     CHIP_ERROR error       = CHIP_NO_ERROR;
     int result             = 0;
