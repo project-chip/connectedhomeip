@@ -104,7 +104,7 @@ static CHIP_ERROR readDigitsFromDecimalString(string decimalString, int & index,
 // Populate numberOfBits into dest from number starting at startIndex (LSB = right-most bit)
 static CHIP_ERROR readBitsFromNumber(int32_t number, int & index, uint64_t & dest, size_t numberOfBitsToRead, size_t maxBits)
 {
-    uint64_t bits;
+    uint64_t bits     = 0;
     CHIP_ERROR result = extractBits(number, bits, index, numberOfBitsToRead, maxBits);
     if (result != CHIP_NO_ERROR)
     {
