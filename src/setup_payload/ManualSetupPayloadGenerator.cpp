@@ -40,7 +40,6 @@ static string decimalStringWithPadding(uint32_t number, int minLength)
 {
     char buf[minLength + 1];
     snprintf(buf, sizeof(buf), "%0*u", minLength, number);
-    buf[minLength] = '\0';
     return string(buf);
 }
 
