@@ -543,19 +543,19 @@ static void TestECDH_InvalidParams(nlTestSuite * inSuite, void * inContext)
 
 static void TestECDH_SampleInputVectors(nlTestSuite * inSuite, void * inContext)
 {
-    
+
     size_t numOfTestsExecuted = 0;
     for (numOfTestsExecuted = 0; numOfTestsExecuted < ArraySize(ecdh_test_vectors); numOfTestsExecuted++)
     {
-        unsigned char out_secret[kMax_ECDH_Secret_Length] = {0};
-        size_t out_secret_length = sizeof(out_secret);
-        ECDH_P256_test_vector v = ecdh_test_vectors[numOfTestsExecuted];
-        CHIP_ERROR error = ECDH_derive_secret(v.remote_pub_key, v.remote_pub_key_length, 
-        v.local_pvt_key, v.local_pvt_key_length, out_secret, out_secret_length);
+        unsigned char out_secret[kMax_ECDH_Secret_Length] = { 0 };
+        size_t out_secret_length                          = sizeof(out_secret);
+        ECDH_P256_test_vector v                           = ecdh_test_vectors[numOfTestsExecuted];
+        CHIP_ERROR error = ECDH_derive_secret(v.remote_pub_key, v.remote_pub_key_length, v.local_pvt_key, v.local_pvt_key_length,
+                                              out_secret, out_secret_length);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         if (error == CHIP_NO_ERROR)
         {
-            int result  = memcmp(out_secret, v.shared_secret, out_secret_length) == 0;
+            int result = memcmp(out_secret, v.shared_secret, out_secret_length) == 0;
             NL_TEST_ASSERT(inSuite, result == true);
         }
     }
