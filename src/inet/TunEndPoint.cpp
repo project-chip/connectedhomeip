@@ -681,6 +681,7 @@ INET_ERROR TunEndPoint::TunDevOpen(const char * intfName)
     if (*intfName)
     {
         strncpy(ifr.ifr_name, intfName, sizeof(ifr.ifr_name) - 1);
+        ifr.ifr_name[sizeof(ifr.ifr_name) - 1] = '\0';
     }
 
 #if HAVE_LINUX_IF_TUN_H
@@ -701,6 +702,7 @@ INET_ERROR TunEndPoint::TunDevOpen(const char * intfName)
     {
         // Keep member copy of interface name and Id
         strncpy(tunIntfName, ifr.ifr_name, sizeof(tunIntfName) - 1);
+        tunIntfName[sizeof(tunIntfName) - 1] = '\0';
     }
     else
     {
