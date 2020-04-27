@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 
+#include "LEDWidget.h"
+
 #include "esp_system.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "esp_timer.h"
-
-#include "LEDWidget.h"
 
 extern const char * TAG;
 
