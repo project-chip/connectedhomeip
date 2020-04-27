@@ -47,7 +47,7 @@ enum class ECName
 
 using namespace chip::Crypto;
 
-static_assert(kMax_ECDH_Secret_Length >= 64, "ECDH shared secret is too short");
+static_assert(kMax_ECDH_Secret_Length >= 32, "ECDH shared secret is too short");
 static_assert(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
 
 static int _nidForCurve(ECName name)
@@ -626,7 +626,6 @@ CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_
     EVP_PKEY * remote_key = NULL;
 
     EVP_PKEY_CTX * context = NULL;
-    EC_GROUP * group       = NULL;
     size_t out_buf_length  = 0;
 
     VerifyOrExit(remote_public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -636,16 +635,11 @@ CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_
     VerifyOrExit(out_secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_secret_length >= kMax_ECDH_Secret_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    group = EC_GROUP_new_by_curve_name(_nidForCurve(ECName::P256v1));
-    VerifyOrExit(group != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
-
     error = _create_evp_key_from_binary_p256_key(local_private_key, local_private_key_length, &local_key, true);
-    VerifyOrExit(error == CHIP_NO_ERROR,
-                 error = error); // error = error because we just want to pass back the error from _create_evp_key_from_binary_key
+    SuccessOrExit(error);
 
     error = _create_evp_key_from_binary_p256_key(remote_public_key, remote_public_key_length, &remote_key, false);
-    VerifyOrExit(error == CHIP_NO_ERROR,
-                 error = error); // error = error because we just want to pass back the error from _create_evp_key_from_binary_key
+    SuccessOrExit(error);
 
     context = EVP_PKEY_CTX_new(local_key, NULL);
     VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
@@ -681,11 +675,6 @@ exit:
         context = NULL;
     }
 
-    if (group != NULL)
-    {
-        EC_GROUP_free(group);
-        group = NULL;
-    }
     _logSSLError();
     return error;
 }

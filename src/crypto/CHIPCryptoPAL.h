@@ -30,7 +30,7 @@ namespace chip {
 namespace Crypto {
 
 const size_t kMax_ECDSA_Signature_Length = 72;
-const size_t kMax_ECDH_Secret_Length     = 64;
+const size_t kMax_ECDH_Secret_Length     = 32;
 
 /**
  * @brief A function that implements AES-CCM encryption
@@ -135,7 +135,7 @@ CHIP_ERROR ECDSA_validate_msg_signature(const unsigned char * msg, const size_t 
  * @param local_private_key Local private key. local_private_key is ASN.1 DER encoded as padded big-endian field elements as
  *described in SEC 1: Elliptic Curve Cryptography [https://www.secg.org/sec1-v2.pdf]
  * @param local_private_key_length Length of private_key_length
- * @param out_secret Buffer to write out secret into
+ * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
  * @param out_secret_length Length of out_secret
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/

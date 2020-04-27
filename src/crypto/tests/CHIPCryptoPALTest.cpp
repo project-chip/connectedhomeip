@@ -18,6 +18,7 @@
 #include "CHIPCryptoPAL.h"
 #include "AES_CCM_128_test_vectors.h"
 #include "AES_CCM_256_test_vectors.h"
+#include "ECDH_P256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
 
 #include <nlunit-test.h>
@@ -675,7 +676,7 @@ static void TestECDSA_ValidationInvalidParam(nlTestSuite * inSuite, void * inCon
     validation_error = CHIP_NO_ERROR;
 }
 
-static void TestECDH(nlTestSuite * inSuite, void * inContext)
+static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
     unsigned char private_key1[] = {
         0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f, 0x11, 0x0e, 0x34, 0x15, 0x81,
@@ -755,6 +756,27 @@ static void TestECDH_InvalidParams(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+static void TestECDH_SampleInputVectors(nlTestSuite * inSuite, void * inContext)
+{
+
+    size_t numOfTestsExecuted = 0;
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < ArraySize(ecdh_test_vectors); numOfTestsExecuted++)
+    {
+        unsigned char out_secret[kMax_ECDH_Secret_Length] = { 0 };
+        size_t out_secret_length                          = sizeof(out_secret);
+        ECDH_P256_test_vector v                           = ecdh_test_vectors[numOfTestsExecuted];
+        CHIP_ERROR error = ECDH_derive_secret(v.remote_pub_key, v.remote_pub_key_length, v.local_pvt_key, v.local_pvt_key_length,
+                                              out_secret, out_secret_length);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+        if (error == CHIP_NO_ERROR)
+        {
+            int result = memcmp(out_secret, v.shared_secret, out_secret_length) == 0;
+            NL_TEST_ASSERT(inSuite, result == true);
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted > 0);
+}
+
 namespace chip {
 namespace Logging {
 void Log(uint8_t module, uint8_t category, const char * format, ...)
@@ -792,8 +814,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid key", TestAES_CCM_256DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
-
-
     NL_TEST_DEF("Test ECDSA signing and validation using SHA256", TestECDSA_Signing_SHA256),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different signature", TestECDSA_ValidationFailIncorrectSignature),
@@ -802,6 +822,11 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
+#if CHIP_CRYPTO_OPENSSL // Following tests are currently supported only for OpenSSL
+    NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),
+    NL_TEST_DEF("Test ECDH invalid params", TestECDH_InvalidParams),
+    NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
+#endif
 
     NL_TEST_SENTINEL()
 };
