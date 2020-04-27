@@ -28,10 +28,10 @@ extern const char * TAG;
 void LEDWidget::Init(gpio_num_t gpioNum)
 {
     mLastChangeTimeUS = 0;
-    mBlinkOnTimeMS = 0;
-    mBlinkOffTimeMS = 0;
-    mGPIONum = gpioNum;
-    mState = false;
+    mBlinkOnTimeMS    = 0;
+    mBlinkOffTimeMS   = 0;
+    mGPIONum          = gpioNum;
+    mState            = false;
 
     if (gpioNum < GPIO_NUM_MAX)
     {
@@ -52,7 +52,7 @@ void LEDWidget::Blink(uint32_t changeRateMS)
 
 void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
 {
-    mBlinkOnTimeMS = onTimeMS;
+    mBlinkOnTimeMS  = onTimeMS;
     mBlinkOffTimeMS = offTimeMS;
     Animate();
 }
@@ -61,8 +61,8 @@ void LEDWidget::Animate()
 {
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        int64_t nowUS = ::esp_timer_get_time();
-        int64_t stateDurUS = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
+        int64_t nowUS            = ::esp_timer_get_time();
+        int64_t stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
         int64_t nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
 
         if (nowUS > nextChangeTimeUS)
@@ -81,4 +81,3 @@ void LEDWidget::DoSet(bool state)
         gpio_set_level(mGPIONum, (state) ? 1 : 0);
     }
 }
-
