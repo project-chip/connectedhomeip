@@ -25,6 +25,13 @@ RUN set -x \
     unzip \
     wget \
     libmbedtls-dev \
+    python-pip \
+    libusb-1.0 \
+    libncurses5-dev \
+    libncursesw5-dev \
+    flex \
+    bison \
+    gperf \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
@@ -68,3 +75,15 @@ RUN set -x \
 ENV NRF5_SDK_ROOT=/var/nRF5_SDK_for_Thread_and_Zigbee
 ENV NRF5_TOOLS_ROOT=/var/nRF5_tools
 ENV ARM_GCC_INSTALL_ROOT=/var/gcc-arm-none-eabi-9-2019-q4-major/bin/
+
+# Setup the ESP-IDF
+RUN set -x \
+    && cd /var \
+    && git clone --progress -b release/v4.0 https://github.com/espressif/esp-idf.git \
+    && cd esp-idf \
+    && git submodule update --init --progress \
+    && IDF_TOOLS_PATH=/var/.espressif ./install.sh \
+    && : # last line
+
+ENV IDF_PATH=/var/esp-idf/
+ENV IDF_TOOLS_PATH=/var/.espressif
