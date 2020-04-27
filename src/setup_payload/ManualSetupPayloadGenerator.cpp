@@ -38,8 +38,9 @@ static uint32_t shortPayloadRepresentation(SetupPayload payload)
 
 static string decimalStringWithPadding(uint32_t number, int minLength)
 {
-    char buf[minLength];
-    sprintf(buf, "%0*u", minLength, number);
+    char buf[minLength + 1];
+    snprintf(buf, minLength, "%0*u", minLength, number);
+    buf[minLength] = '\0';
     return string(buf);
 }
 
