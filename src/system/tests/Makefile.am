@@ -58,15 +58,6 @@ CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
-MAKEDIR_TARGETS                                       = \
-    $(CHIP_LDADD)                                       \
-    $(NULL)
-
-MAKEDIRS                                              = \
-   $(NLUNIT_TEST_MAKEDIR)                               \
-   $(NLFAULTINJECTION_MAKEDIR)                          \
-   $(NULL)   
-
 COMMON_LDADD                                           = \
     $(COMMON_LDFLAGS)                                    \
     $(CHIP_LDADD)                                        \
@@ -116,6 +107,21 @@ TestSystemPacketBuffer_LDADD                          = $(COMMON_LDADD)
 
 TestSystemTimer_SOURCES                               = TestSystemTimer.cpp
 TestSystemTimer_LDADD                                 = $(COMMON_LDADD)
+
+#
+# Foreign make dependencies
+#
+
+NLFOREIGN_FILE_DEPENDENCIES                           = \
+   $(CHIP_LDADD)                                        \
+   $(NULL)
+
+NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
+   $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
+   $(NULL)
+
+$(check_PROGRAMS): $(NLFOREIGN_FILE_DEPENDENCIES)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)

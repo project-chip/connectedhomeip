@@ -28,28 +28,14 @@
 #      configuration script and testing those changes.
 #
 
-srcdir=`dirname ${0}`
-builddir=.
+srcdir=$(dirname "${0}")
 
-# Bring the package build back to a pristine state.
+# Try to bring the package build back to a pristine state.
 
-if [ -f config.status ]; then
-	make maintainer-clean
+if [[ -f config.status ]]; then
+  make maintainer-clean || exit ${?}
 fi
 
 # Change directories to the package source and rebootstrap the package.
 
-pushd ${srcdir}
-
-./bootstrap
-bootstrap_status=$?
-
-popd
-
-# If the package was successfully bootstrapped, configure it.
-
-if [ ${bootstrap_status} -eq 0 ]; then
-    ${srcdir}/configure $*
-else
-   exit ${bootstrap_status}
-fi
+(cd "$srcdir" && ./bootstrap) && "$srcdir"/configure "${@}"

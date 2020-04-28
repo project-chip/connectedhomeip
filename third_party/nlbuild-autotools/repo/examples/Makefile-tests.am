@@ -1,5 +1,6 @@
 #
-#    Copyright 2016 Nest Labs Inc. All Rights Reserved.
+#    Copyright (c) 2020 Project nlbuild-autotools Authors. All Rights Reserved.
+#    Copyright (c) 2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -74,7 +75,19 @@ TESTS_ENVIRONMENT                              = \
 @PACKAGE_SHORT_LOWER@_test_SOURCES             = @PACKAGE_SHORT_LOWER@-test.c                 
 
 @PACKAGE_SHORT_LOWER@_test_cxx_LDADD           = $(COMMON_LDADD)
-@PACKAGE_SHORT_LOWER@_test_cxx_SOURCES         = @PACKAGE_SHORT_LOWER@-test-cxx.cpp           
+@PACKAGE_SHORT_LOWER@_test_cxx_SOURCES         = @PACKAGE_SHORT_LOWER@-test-cxx.cpp
+
+# Foreign make dependencies
+
+NLFOREIGN_FILE_DEPENDENCIES                           = \
+   $(NULL)
+
+NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
+   ${top_builddir}/src                                  \
+   $(NULL)
+
+$(check_PROGRAMS): $(NLFOREIGN_FILE_DEPENDENCIES)
 
 if @PACKAGE_SHORT_UPPER@_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)
