@@ -822,11 +822,9 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
-#if CHIP_CRYPTO_OPENSSL // Following tests are currently supported only for OpenSSL
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),
     NL_TEST_DEF("Test ECDH invalid params", TestECDH_InvalidParams),
     NL_TEST_DEF("Test ECDH sample vectors", TestECDH_SampleInputVectors),
-#endif
 
     NL_TEST_SENTINEL()
 };
