@@ -21,6 +21,9 @@ jobs:
         - stage: Build
           name: "Build NRF Example Lock App"
           env: TASK="build-nrf-example-lock-app"
+        - stage: Build
+          name: "Build ESP32 Echo Example"
+          env: TASK="build-esp-example-echo-app"
         - stage: Tests
           name: "Unit & Functional Tests"
           env: TASK="run-unit-and-functional-tests"

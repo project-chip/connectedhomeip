@@ -40,14 +40,15 @@ step. To install these components manually, follow these steps:
           $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
 
-To build the application, follow these steps:
+### To build the application, follow these steps:
 
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
--   In the root of the example directory, use the `defconfig` make target to
-    configure the application with defaults.
+-   In the root of the example directory, source `idf.sh` and use the
+    `defconfig` make target to configure the application with defaults.
 
+          $ source idf.sh
           $ idf make defconfig
 
 -   Run make to build the demo application
