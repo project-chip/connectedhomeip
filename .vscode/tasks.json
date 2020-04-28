@@ -113,6 +113,14 @@
             "command": "scripts/tests/openssl_tests.sh",
             "group": "none",
             "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32 Echo Example",
+            "type": "shell",
+            "command": "scripts/examples/esp_echo_app.sh",
+            "group": "none",
+            "dependsOn": "Clean Tree",
+            "problemMatcher": ["$gcc"]
         }
     ]
 }
