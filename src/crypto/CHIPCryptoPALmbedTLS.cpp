@@ -313,3 +313,10 @@ exit:
     _log_mbedTLS_error(result);
     return error;
 }
+
+CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_key, const size_t remote_public_key_length,
+                                            const unsigned char * local_private_key, const size_t local_private_key_length,
+                                            unsigned char * out_secret, size_t & out_secret_length)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}

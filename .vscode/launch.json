@@ -48,7 +48,7 @@
             "name": "CHIP openSSL Tests",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/default/src/crypto/tests/TestOpenSSLCrypto",
+            "program": "${workspaceFolder}/build/default/src/crypto/tests/TestCryptoPAL",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

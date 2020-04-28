@@ -30,6 +30,7 @@ noinst_HEADERS                                 = \
     AES_CCM_128_test_vectors.h                   \
     AES_CCM_256_test_vectors.h                   \
     HKDF_SHA256_test_vectors.h                   \
+    ECDH_P256_test_vectors.h                     \
     $(NULL)
 
 #
