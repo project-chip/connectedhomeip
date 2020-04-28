@@ -25,6 +25,7 @@
 #include <mbedtls/ccm.h>
 #include <mbedtls/bignum.h>
 #include <mbedtls/ctr_drbg.h>
+#include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
 #include <mbedtls/error.h>
 #include <mbedtls/entropy.h>
@@ -318,5 +319,52 @@ CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_
                                             const unsigned char * local_private_key, const size_t local_private_key_length,
                                             unsigned char * out_secret, size_t & out_secret_length)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    mbedtls_ecp_group ecp_grp;
+    mbedtls_ecp_group_init(&ecp_grp);
+
+    mbedtls_mpi mpi_secret;
+    mbedtls_mpi_init(&mpi_secret);
+
+    mbedtls_ecp_point ecp_pubkey;
+    mbedtls_ecp_point_init(&ecp_pubkey);
+
+    mbedtls_mpi mpi_privkey;
+    mbedtls_mpi_init(&mpi_privkey);
+
+    mbedtls_ecdh_context ecdh_ctxt;
+    mbedtls_ecdh_init(&ecdh_ctxt);
+
+    VerifyOrExit(remote_public_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(remote_public_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(local_private_key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(local_private_key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_secret != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_secret_length >= kMax_ECDH_Secret_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_group_load(&ecp_grp, MBEDTLS_ECP_DP_SECP256R1);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_mpi_read_binary(&mpi_privkey, local_private_key, local_private_key_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, remote_public_key, remote_public_key_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &mpi_privkey, ECDSA_sign_rng, NULL);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_mpi_write_binary(&mpi_secret, out_secret, out_secret_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    mbedtls_ecdh_free(&ecdh_ctxt);
+    mbedtls_ecp_group_free(&ecp_grp);
+    mbedtls_mpi_free(&mpi_secret);
+    mbedtls_ecp_point_free(&ecp_pubkey);
+    mbedtls_mpi_free(&mpi_privkey);
+    _log_mbedTLS_error(result);
+    return error;
 }
