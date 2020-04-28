@@ -1,4 +1,4 @@
-# CHIP WiFI Echo Server Example
+# CHIP WiFi Echo Server Example
 
 A prototype appplication that uses CHIP to setup WiFi on the ESP32 and runs an
 Echo Server on a configured port. This example will evolve as more complex
