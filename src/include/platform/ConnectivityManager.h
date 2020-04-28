@@ -542,7 +542,10 @@ inline CHIP_ERROR ConnectivityManager::Init(void)
     return static_cast<ImplClass *>(this)->_Init();
 }
 
-inline void ConnectivityManager::OnPlatformEvent(const ChipDeviceEvent * event) {}
+inline void ConnectivityManager::OnPlatformEvent(const ChipDeviceEvent * event)
+{
+    static_cast<ImplClass *>(this)->_OnPlatformEvent(event);
+}
 
 inline bool ConnectivityManager::CanStartWiFiScan(void)
 {

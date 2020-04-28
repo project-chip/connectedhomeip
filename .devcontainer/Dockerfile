@@ -20,8 +20,8 @@ RUN apt-get -fy install git vim emacs sudo \
     build-essential cmake cppcheck valgrind \
     wget curl telnet bsdtar \
     docker.io
-RUN groupadd --gid $USER_GID $USERNAME
-RUN useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME
+RUN groupadd -g $USER_GID $USERNAME
+RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
 RUN chmod 0440 /etc/sudoers.d/$USERNAME
 
@@ -36,6 +36,7 @@ RUN mkdir -p /home/vscode/bin
 RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/restyle-path -o /home/vscode/bin/restyle-path
 RUN chmod +x /home/vscode/bin/restyle-path
 RUN chown -R vscode:vscode /home/vscode
+RUN echo "PATH=/home/vscode/bin:${PATH}" >> /home/vscode/.bashrc
 # vscode needs to own the esp-idf and tools for the examples to build
 RUN chown -R vscode:vscode /var/esp-idf
 RUN chown -R vscode:vscode /var/.espressif

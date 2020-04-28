@@ -60,7 +60,7 @@ else
 DEFINES                                                 = -DNDEBUG=1 -UDEBUG
 endif
 
-configure_OPTIONS                                       = --with-openssl=$(OPENSSL_DIR)
+configure_OPTIONS                                       = --with-crypto=openssl
 
 DEFINES                                                += \
     -DCHIP_CONFIG_ENABLE_TARGETED_LISTEN=$(ENABLE_TARGETED_LISTEN) \

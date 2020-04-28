@@ -18,6 +18,7 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace {
 

@@ -138,8 +138,10 @@ libDeviceLayer_a_SOURCES               +=       \
     ESP32/PlatformManagerImpl.cpp               \
     ESP32/ConnectivityManagerImpl.cpp           \
     ESP32/ESP32Config.cpp                       \
+    ESP32/ESP32Utils.cpp                        \
     ESP32/Logging.cpp                           \
     ESP32/SystemTimeSupport.cpp                 \
+    ESP32/LwIPCoreLock.cpp                      \
     FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
 

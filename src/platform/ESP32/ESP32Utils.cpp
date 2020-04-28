@@ -25,6 +25,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ESP32/ESP32Utils.h>
+#include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
+#include <support/ErrorStr.h>
 
 #include "esp_event.h"
 #include "esp_wifi.h"
@@ -162,27 +165,6 @@ CHIP_ERROR ESP32Utils::SetAPMode(bool enabled)
 
 exit:
     return err;
-}
-
-WiFiSecurityType ESP32Utils::WiFiAuthModeToChipWiFiSecurityType(wifi_auth_mode_t authMode)
-{
-    switch (authMode)
-    {
-    case WIFI_AUTH_OPEN:
-        return kWiFiSecurityType_None;
-    case WIFI_AUTH_WEP:
-        return kWiFiSecurityType_WEP;
-    case WIFI_AUTH_WPA_PSK:
-        return kWiFiSecurityType_WPAPersonal;
-    case WIFI_AUTH_WPA2_PSK:
-        return kWiFiSecurityType_WPA2Personal;
-    case WIFI_AUTH_WPA_WPA2_PSK:
-        return kWiFiSecurityType_WPA2MixedPersonal;
-    case WIFI_AUTH_WPA2_ENTERPRISE:
-        return kWiFiSecurityType_WPA2Enterprise;
-    default:
-        return kWiFiSecurityType_NotSpecified;
-    }
 }
 
 int ESP32Utils::OrderScanResultsByRSSI(const void * _res1, const void * _res2)
