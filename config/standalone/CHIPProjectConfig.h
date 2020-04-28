@@ -35,7 +35,6 @@
 
 #define CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT 1
 
-#define WDM_UPDATE_MAX_ITEMS_IN_TRAIT_DIRTY_PATH_STORE 300
 
 // Uncomment this for a large Tunnel MTU.
 //#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
@@ -53,7 +52,6 @@
 
 #define CHIP_CONFIG_SECURITY_TEST_MODE 1
 
-#define WDM_ENFORCE_EXPIRY_TIME 1
 
 // Increase session idle timeout in stand-alone builds for the convenience of developers.
 #define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000
