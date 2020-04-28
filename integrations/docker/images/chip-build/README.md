@@ -19,13 +19,17 @@ guidelines:
 -   Adding a tool? Increment minor version: e.g. 0.2.1 -> 0.3.0
 -   Removing a tool? Increment major version: e.g. 1.2 -> 2.0
 
+Note, you must have privileged access to the connectedhomeip:chip-build on
+Docker Hub
+
 Typical use:
 
 1.  new build tool dependency identified
 2.  add tool to Dockerfile
 3.  update version
 4.  `$ ./build.sh`, which installs the image locally as the new version
-5.  verify that the build works locally in the new image
-6.  `$ docker login`
-7.  `$ ./build.sh --push --latest`, _*Note:*_ omit `--latest` unless on the
+5.  update the image version in the devcontainer.json
+6.  verify that the build works locally in the new image
+7.  `$ docker login`
+8.  `$ ./build.sh --push --latest`, _*Note:*_ omit `--latest` unless on the
     master branch

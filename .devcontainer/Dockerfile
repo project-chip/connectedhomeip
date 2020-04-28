@@ -37,3 +37,6 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
 RUN chmod +x /home/vscode/bin/restyle-path
 RUN chown -R vscode:vscode /home/vscode
 RUN echo "PATH=/home/vscode/bin:${PATH}" >> /home/vscode/.bashrc
+# vscode needs to own the esp-idf and tools for the examples to build
+RUN chown -R vscode:vscode /var/esp-idf
+RUN chown -R vscode:vscode /var/.espressif
