@@ -347,6 +347,35 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
 
 CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
 {
+    CHIP_ERROR err;
+    wifi_config_t wifiConfig;
+    uint8_t primaryChannel;
+    wifi_second_chan_t secondChannel;
+    uint16_t freq;
+    uint16_t bssid;
+
+    err = esp_wifi_get_config(ESP_IF_WIFI_STA, &wifiConfig);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_get_config() failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    err = esp_wifi_get_channel(&primaryChannel, &secondChannel);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_get_channel() failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    freq  = MapFrequency(WIFI_BAND_2_4GHZ, primaryChannel);
+    bssid = (wifiConfig.sta.bssid[4] << 8) | wifiConfig.sta.bssid[5];
+    ChipLogProgress(DeviceLayer,
+                    "Wifi-Telemetry\n"
+                    "BSSID: %x\n"
+                    "freq: %d\n",
+                    bssid, freq);
+exit:
     return CHIP_NO_ERROR;
 }
 
@@ -879,8 +908,17 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     wifi_config_t wifiConfig;
 
     memset(&wifiConfig, 0, sizeof(wifiConfig));
-    err = ConfigurationMgr().GetWiFiAPSSID((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid));
+
+    // TODO Pull this from the configuration manager
+    uint8_t mac[6];
+    err = esp_wifi_get_mac(ESP_IF_WIFI_STA, mac);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_get_mac(ESP_IF_WIFI_STA) failed: %s", chip::ErrorStr(err));
+    }
     SuccessOrExit(err);
+
+    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
     wifiConfig.ap.authmode        = WIFI_AUTH_OPEN;
     wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
@@ -1014,7 +1052,7 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const system_event_got_ip6_
         IPAddress ipAddr = IPAddress::FromIPv6(got_ip.ip6_info.ip);
         char ipAddrStr[INET6_ADDRSTRLEN];
         ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
-        ChipLogProgress(DeviceLayer, "%s ready on %s interface: %s", CharacterizeIPv6Address(ipAddr),
+        ChipLogProgress(DeviceLayer, "IPv6 addr available. Ready on %s interface: %s",
                         Internal::ESP32Utils::InterfaceIdToName(got_ip.if_index), ipAddrStr);
     }
 #endif // CHIP_PROGRESS_LOGGING
@@ -1026,16 +1064,10 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const system_event_got_ip6_
 
 void ConnectivityManagerImpl::DriveServiceTunnelState(void)
 {
-    CHIP_ERROR err;
     bool startServiceTunnel;
 
     // Determine if the tunnel to the service should be started.
-    startServiceTunnel = (mServiceTunnelMode == kServiceTunnelMode_Enabled && GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity) &&
-                          ConfigurationMgr().IsMemberOfFabric()
-#if !CHIP_DEVICE_CONFIG_ENABLE_FIXED_TUNNEL_SERVER
-                          && ConfigurationMgr().IsServiceProvisioned()
-#endif
-    );
+    startServiceTunnel = (mServiceTunnelMode == kServiceTunnelMode_Enabled && GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity));
 
     // If the tunnel should be started but isn't, or vice versa, ...
     if (startServiceTunnel != GetFlag(mFlags, kFlag_ServiceTunnelStarted))
