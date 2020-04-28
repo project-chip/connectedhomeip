@@ -87,6 +87,9 @@ static void udp_server_task(void * pvParameters)
         if (err < 0)
         {
             ESP_LOGE(TAG, "Socket unable to bind: errno %d", errno);
+            // Avoid looping hard if binding fails continuously
+            vTaskDelay(50 / portTICK_PERIOD_MS);
+            continue;
         }
         ESP_LOGI(TAG, "Socket bound, port %d", PORT);
 
