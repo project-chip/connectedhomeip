@@ -37,13 +37,11 @@
 // Enable passcode encryption configuration 1
 #define CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY 1
 
-
 // Uncomment this for a large Tunnel MTU.
 //#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
 // Max number of Bindings per CHIPExchangeManager
 #define CHIP_CONFIG_MAX_BINDINGS 8
-
 
 #define CHIP_CONFIG_ENABLE_WDM_UPDATE 1
 
