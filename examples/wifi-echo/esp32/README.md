@@ -6,7 +6,7 @@ messaging is supported in CHIP.
 
 ---
 
--   [CHIP WiFI Echo Server Example](#chip-wifi-echo-server-example)
+-   [CHIP WiFi Echo Server Example](#chip-wifi-echo-server-example)
 -   [Supported Devices](#supported-devices)
 -   [Building the Example Application](#building-the-example-application)
 -   [Using the Echo Server](#using-the-echo-server)

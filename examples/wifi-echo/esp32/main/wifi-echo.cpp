@@ -65,7 +65,7 @@ static void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg);
 
 extern "C" void app_main()
 {
-    ESP_LOGI(TAG, "Wifi Echo Demo!");
+    ESP_LOGI(TAG, "WiFi Echo Demo!");
 
     /* Print chip information */
     esp_chip_info_t chip_info;
