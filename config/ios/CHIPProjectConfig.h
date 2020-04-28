@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    Copyright (c) 2019-2020 Google LLC.
  *    All rights reserved.
@@ -22,42 +23,42 @@
  *      Project-specific configuration file for iOS builds.
  *
  */
-#ifndef WEAVEPROJECTCONFIG_H
-#define WEAVEPROJECTCONFIG_H
+#ifndef CHIPPROJECTCONFIG_H
+#define CHIPPROJECTCONFIG_H
 
-// Enable use of an ephemeral UDP source port for locally initiated Weave exchanges.
-#define WEAVE_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
+// Enable use of an ephemeral UDP source port for locally initiated CHIP exchanges.
+#define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
 
-// Enable UDP listening on demand in the WeaveDeviceManager
-#define WEAVE_CONFIG_DEVICE_MGR_DEMAND_ENABLE_UDP 1
+// Enable UDP listening on demand in the CHIPDeviceManager
+#define CHIP_CONFIG_DEVICE_MGR_DEMAND_ENABLE_UDP 1
 
 #define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT 0
 
 // Enable passcode encryption configuration 1
-#define WEAVE_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY     1
+#define CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY 1
 
 #define WDM_UPDATE_MAX_ITEMS_IN_TRAIT_DIRTY_PATH_STORE 300
 
 // Uncomment this for a large Tunnel MTU.
-//#define WEAVE_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
+//#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
-// Max number of Bindings per WeaveExchangeManager
-#define WEAVE_CONFIG_MAX_BINDINGS 8
+// Max number of Bindings per CHIPExchangeManager
+#define CHIP_CONFIG_MAX_BINDINGS 8
 
 #define WDM_ENFORCE_EXPIRY_TIME 1
 
-#define WEAVE_CONFIG_ENABLE_WDM_UPDATE 1
+#define CHIP_CONFIG_ENABLE_WDM_UPDATE 1
 
-#define WEAVE_CONFIG_LEGACY_CASE_AUTH_DELEGATE 0
+#define CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE 0
 
-#define WEAVE_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0
+#define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0
 
-#define WEAVE_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC 300
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC 300
 
-#define WEAVE_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
+#define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
 
-#define WEAVE_CONFIG_DATA_MANAGEMENT_CLIENT_EXPERIMENTAL 1
+#define CHIP_CONFIG_DATA_MANAGEMENT_CLIENT_EXPERIMENTAL 1
 
-#define WEAVE_CONFIG_MAX_SOFTWARE_VERSION_LENGTH 128
+#define CHIP_CONFIG_MAX_SOFTWARE_VERSION_LENGTH 128
 
-#endif /* WEAVEPROJECTCONFIG_H */
+#endif /* CHIPPROJECTCONFIG_H */
