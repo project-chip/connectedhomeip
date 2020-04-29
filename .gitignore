@@ -30,3 +30,15 @@ third_party/mbedtls/
 
 # Example specific rules
 examples/**/sdkconfig
+
+# Xcode
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+*.xcodeproj/*
+*.xcworkspace/*
+*xcworkspace*
