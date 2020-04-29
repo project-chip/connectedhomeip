@@ -83,6 +83,12 @@ case "$TASK" in
         docker_run_command 'scripts/tests/crypto_tests.sh'
         ;;
 
+
+    run-osal-tests)
+      docker_run_command 'scripts/build/bootstrap_linux.sh'
+      docker_run_command 'scripts/tests/osal_tests.sh'
+      ;;
+
     run-setup-payload-tests)
         docker_run_command 'scripts/build/bootstrap.sh'
         docker_run_command 'scripts/tests/setup_payload_tests.sh'

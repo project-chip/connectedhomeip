@@ -62,6 +62,7 @@ DIST_SUBDIRS                      = \
     lib                             \
     setup_payload                   \
     crypto                          \
+    osal                            \
     $(PLATFORM_SUBDIRS)             \
     $(NULL)
 
@@ -77,6 +78,7 @@ SUBDIRS                           = \
     lib                             \
     setup_payload                   \
     crypto                          \
+    osal                            \
     $(MAYBE_PLATFORM_SUBDIRS)       \
     $(NULL)
 
