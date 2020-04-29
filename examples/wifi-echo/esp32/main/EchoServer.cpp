@@ -55,7 +55,7 @@ static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, cons
     {
         char src_addr[INET_ADDRSTRLEN];
         char dest_addr[INET_ADDRSTRLEN];
-        size_t data_len = buffer->DataLength();
+        const size_t data_len = buffer->DataLength();
 
         packet_info->SrcAddress.ToString(src_addr, sizeof(src_addr));
         packet_info->DestAddress.ToString(dest_addr, sizeof(dest_addr));
