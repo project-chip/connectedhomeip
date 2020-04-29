@@ -345,7 +345,7 @@ CHIP_ERROR chip::Crypto::ECDH_derive_secret(const unsigned char * remote_public_
     VerifyOrExit(out_secret_length >= kMax_ECDH_Secret_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_ecp_group_load(&ecp_grp, MBEDTLS_ECP_DP_SECP256R1);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_read_binary(&mpi_privkey, local_private_key, local_private_key_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
