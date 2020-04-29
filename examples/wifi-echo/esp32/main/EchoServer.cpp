@@ -31,125 +31,101 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
+#include <inet/UDPEndPoint.h>
+#include <inet/InetError.h>
+#include <inet/InetLayer.h>
+#include <inet/IPAddress.h>
+#include <system/SystemPacketBuffer.h>
+#include <support/ErrorStr.h>
+#include <platform/CHIPDeviceLayer.h>
+
 #define PORT CONFIG_ECHO_PORT
-#define RX_LEN 128
-#define ADDR_LEN 128
 
-static const char * TAG = "echo server";
+static const char * TAG = "echo_server";
 
-static void udp_server_task(void * pvParameters)
+using namespace ::chip;
+using namespace ::chip::Inet;
+
+// UDP Endpoint Callbacks
+static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, const IPPacketInfo * packet_info)
 {
-    char rx_buffer[RX_LEN];
-    char addr_str[ADDR_LEN];
-    int addr_family = (int) pvParameters;
-    int ip_protocol = 0;
-    struct sockaddr_in6 dest_addr;
+    bool status = endpoint != NULL && buffer != NULL && packet_info != NULL;
 
-    while (1)
+    if (status)
     {
+        char src_addr[INET_ADDRSTRLEN];
+        char dest_addr[INET_ADDRSTRLEN];
 
-        if (addr_family == AF_INET)
+        packet_info->SrcAddress.ToString(src_addr, sizeof(src_addr));
+        packet_info->DestAddress.ToString(dest_addr, sizeof(dest_addr));
+
+        ESP_LOGI(TAG, "UDP packet received from %s:%u to %s:%u (%zu bytes)", src_addr, packet_info->SrcPort, dest_addr,
+                 packet_info->DestPort, static_cast<size_t>(buffer->DataLength()));
+
+        // attempt to print the incoming message
+        char msg_buffer[buffer->DataLength() + 1];
+        msg_buffer[buffer->DataLength()] = 0; // Null-terminate whatever we received and treat like a string...
+        memcpy(msg_buffer, buffer->Start(), buffer->DataLength());
+        ESP_LOGI(TAG, "Client sent: \"%s\"", msg_buffer);
+
+        // Attempt to echo back
+        UDPEndPoint * udp_endpoint = static_cast<UDPEndPoint *>(endpoint);
+        INET_ERROR err             = udp_endpoint->SendTo(packet_info->SrcAddress, packet_info->SrcPort, buffer);
+        if (err != INET_NO_ERROR)
         {
-            struct sockaddr_in * dest_addr_ip4 = (struct sockaddr_in *) &dest_addr;
-            dest_addr_ip4->sin_addr.s_addr     = htonl(INADDR_ANY);
-            dest_addr_ip4->sin_family          = AF_INET;
-            dest_addr_ip4->sin_port            = htons(PORT);
-            ip_protocol                        = IPPROTO_IP;
+            ESP_LOGE(TAG, "Unable to echo back to client: %s", ErrorStr(err));
+            // Note the failure status
+            status = !status;
         }
-        else if (addr_family == AF_INET6)
+        else
         {
-            bzero(&dest_addr.sin6_addr.un, sizeof(dest_addr.sin6_addr.un));
-            dest_addr.sin6_family = AF_INET6;
-            dest_addr.sin6_port   = htons(PORT);
-            ip_protocol           = IPPROTO_IPV6;
-        }
-
-        int sock = socket(addr_family, SOCK_DGRAM, ip_protocol);
-        if (sock < 0)
-        {
-            ESP_LOGE(TAG, "Unable to create socket: errno %d", errno);
-            break;
-        }
-        ESP_LOGI(TAG, "Socket created");
-
-#if defined(CONFIG_ECHO_IPV4) && defined(CONFIG_ECHO_IPV6)
-        if (addr_family == AF_INET6)
-        {
-            // Note that by default IPV6 binds to both protocols, it is must be disabled
-            // if both protocols used at the same time (used in CI)
-            int opt = 1;
-            setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-            setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt));
-        }
-#endif
-
-        int err = bind(sock, (struct sockaddr *) &dest_addr, sizeof(dest_addr));
-        if (err < 0)
-        {
-            ESP_LOGE(TAG, "Socket unable to bind: errno %d", errno);
-            // Avoid looping hard if binding fails continuously
-            vTaskDelay(50 / portTICK_PERIOD_MS);
-            continue;
-        }
-        ESP_LOGI(TAG, "Socket bound, port %d", PORT);
-
-        while (1)
-        {
-
-            ESP_LOGI(TAG, "Waiting for data");
-            struct sockaddr_in6 source_addr; // Large enough for both IPv4 or IPv6
-            socklen_t socklen = sizeof(source_addr);
-            int len           = recvfrom(sock, rx_buffer, sizeof(rx_buffer) - 1, 0, (struct sockaddr *) &source_addr, &socklen);
-
-            // Error occurred during receiving
-            if (len < 0)
-            {
-                ESP_LOGE(TAG, "recvfrom failed: errno %d", errno);
-                break;
-            }
-            // Data received
-            else
-            {
-                // Get the sender's ip address as string
-                if (source_addr.sin6_family == PF_INET)
-                {
-                    inet_ntoa_r(((struct sockaddr_in *) &source_addr)->sin_addr.s_addr, addr_str, sizeof(addr_str) - 1);
-                }
-                else if (source_addr.sin6_family == PF_INET6)
-                {
-                    inet6_ntoa_r(source_addr.sin6_addr, addr_str, sizeof(addr_str) - 1);
-                }
-
-                rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string...
-                ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
-                ESP_LOGI(TAG, "%s", rx_buffer);
-
-                int err = sendto(sock, rx_buffer, len, 0, (struct sockaddr *) &source_addr, sizeof(source_addr));
-                if (err < 0)
-                {
-                    ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
-                    break;
-                }
-            }
-        }
-
-        if (sock != -1)
-        {
-            ESP_LOGE(TAG, "Shutting down socket and restarting...");
-            shutdown(sock, 0);
-            close(sock);
+            ESP_LOGI(TAG, "Echo sent");
         }
     }
-    vTaskDelete(NULL);
+
+    if (!status)
+    {
+        ESP_LOGE(TAG, "Received data but couldn't process it...");
+
+        // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
+        if (buffer != NULL)
+        {
+            System::PacketBuffer::Free(buffer);
+        }
+    }
+}
+
+static void error(IPEndPointBasis * ep, INET_ERROR error, const IPPacketInfo * pi)
+{
+    ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
 }
 
 // The echo server assumes the platform's networking has been setup already
-void startServer(void)
+void startServer(UDPEndPoint * endpoint)
 {
-#ifdef CONFIG_ECHO_IPV4
-    xTaskCreate(udp_server_task, "udp_server", 4096, (void *) AF_INET, 5, NULL);
-#endif
-#ifdef CONFIG_ECHO_IPV6
-    xTaskCreate(udp_server_task, "udp_server", 4096, (void *) AF_INET6, 5, NULL);
-#endif
+    ESP_LOGI(TAG, "Trying to get Inet");
+    INET_ERROR err = DeviceLayer::InetLayer.NewUDPEndPoint(&endpoint);
+    if (err != INET_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "ERROR: %s\n Couldn't create UDP Endpoint, server will not start.", ErrorStr(err));
+        return;
+    }
+
+    endpoint->OnMessageReceived = echo;
+    endpoint->OnReceiveError    = error;
+
+    err = endpoint->Bind(kIPAddressType_IPv4, IPAddress::Any, PORT);
+    if (err != INET_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Socket unable to bind: Error %s", ErrorStr(err));
+        return;
+    }
+
+    err = endpoint->Listen();
+    if (err != INET_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Socket unable to Listen: Error %s", ErrorStr(err));
+        return;
+    }
+    ESP_LOGI(TAG, "Echo Server Listening on PORT:%d...", PORT);
 }

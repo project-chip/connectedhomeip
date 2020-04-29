@@ -33,7 +33,8 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(void);
+extern void startServer(UDPEndPoint * endpoint);
+extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
@@ -150,7 +151,11 @@ extern "C" void app_main()
     statusLED.Init(STATUS_LED_GPIO_NUM);
 
     // Start the Echo Server
-    startServer();
+    UDPEndPoint * sEndpoint = NULL;
+    startServer(sEndpoint);
+#if CONFIG_USE_ECHO_CLIENT
+    startClient();
+#endif
 
     // Run the UI Loop
     while (true)
