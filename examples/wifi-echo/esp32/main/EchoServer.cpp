@@ -55,17 +55,18 @@ static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, cons
     {
         char src_addr[INET_ADDRSTRLEN];
         char dest_addr[INET_ADDRSTRLEN];
+        size_t data_len = buffer->DataLength();
 
         packet_info->SrcAddress.ToString(src_addr, sizeof(src_addr));
         packet_info->DestAddress.ToString(dest_addr, sizeof(dest_addr));
 
         ESP_LOGI(TAG, "UDP packet received from %s:%u to %s:%u (%zu bytes)", src_addr, packet_info->SrcPort, dest_addr,
-                 packet_info->DestPort, static_cast<size_t>(buffer->DataLength()));
+                 packet_info->DestPort, static_cast<size_t>(data_len));
 
         // attempt to print the incoming message
-        char msg_buffer[buffer->DataLength() + 1];
-        msg_buffer[buffer->DataLength()] = 0; // Null-terminate whatever we received and treat like a string...
-        memcpy(msg_buffer, buffer->Start(), buffer->DataLength());
+        char msg_buffer[data_len + 1];
+        msg_buffer[data_len] = 0; // Null-terminate whatever we received and treat like a string...
+        memcpy(msg_buffer, buffer->Start(), data_len);
         ESP_LOGI(TAG, "Client sent: \"%s\"", msg_buffer);
 
         // Attempt to echo back
