@@ -60,6 +60,7 @@ DIST_SUBDIRS                      = \
     inet                            \
     lib                             \
     lwip                            \
+    osal                            \
     setup_payload                   \
     crypto                          \
     $(PLATFORM_SUBDIRS)             \
@@ -75,6 +76,7 @@ SUBDIRS                           = \
     inet                            \
     lib                             \
     lwip                            \
+    osal                            \
     setup_payload                   \
     crypto                          \
     $(MAYBE_PLATFORM_SUBDIRS)       \

@@ -2015,6 +2015,8 @@ src/lib/Makefile
 src/lib/core/tests/Makefile
 src/lib/support/Makefile
 src/lib/support/tests/Makefile
+src/osal/Makefile
+src/osal/tests/Makefile
 src/platform/Makefile
 tests/Makefile
 ])
