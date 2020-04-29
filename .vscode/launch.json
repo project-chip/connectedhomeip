@@ -15,7 +15,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "Run Setup Payload Tests",
+            "preLaunchTask": "Build QRCode Payload Tests",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

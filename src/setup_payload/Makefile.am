@@ -41,7 +41,7 @@ libSetupPayload_a_SOURCES                                       = \
     ManualSetupPayloadParser.cpp                            \
     QRCodeSetupPayloadGenerator.cpp                         \
     SetupPayload.cpp                                        \
-    Base45.cpp                                              \
+    Base41.cpp                                              \
     QRCodeSetupPayloadParser.cpp                            \
    $(NULL)
 
@@ -50,7 +50,7 @@ dist_libSetupPayload_a_HEADERS                                  = \
     ManualSetupPayloadParser.h                              \
     QRCodeSetupPayloadGenerator.h                           \
     SetupPayload.h                                          \
-    Base45.h                                                \
+    Base41.h                                                \
     QRCodeSetupPayloadParser.h                              \
     $(NULL)
 

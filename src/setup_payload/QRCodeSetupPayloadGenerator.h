@@ -20,7 +20,7 @@
  *      This file describes a QRCode Setup Payload generator based on the
  *      CHIP specification.
  *
- *      The encoding of the binary data to a base45 string is as follows:
+ *      The encoding of the binary data to a base41 string is as follows:
  *      - Every 2 bytes (16 bits) of binary source data are encoded to 3
  *        characters of the Base-45 alphabet.
  *      - If an odd number of bytes are to be encoded, the remaining
@@ -44,7 +44,7 @@ private:
 
 public:
     string payloadBinaryRepresentation();
-    string payloadBase45Representation();
+    string payloadBase41Representation();
     QRCodeSetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload){};
 };
 
