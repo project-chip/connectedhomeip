@@ -35,14 +35,12 @@ menu "WiFi Echo Demo"
             bool "M5Stack"
     endchoice
 
-    config ECHO_IPV4
-        bool "IPV4"
-        default y
-
-    config ECHO_IPV6
-        bool "IPV6"
-        default n
-        select EXAMPLE_CONNECT_IPV6
+    config USE_ECHO_CLIENT
+        bool "Enable the built-in Echo Client"
+        default "y"
+        help
+            This enables a local FreeRTOS Echo Client so that the end-to-end echo server can be
+            tested easily
 
     config ECHO_PORT
         int "Port"
@@ -50,5 +48,11 @@ menu "WiFi Echo Demo"
         default 8000
         help
             Local port the example server will listen on.
+
+    config ECHO_HOST_IP
+    string "IPV4 address"
+    default "127.0.0.1"
+    help
+        The IPV4 Address of the ECHO Server.
 
 endmenu
