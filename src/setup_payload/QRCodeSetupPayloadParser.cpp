@@ -22,10 +22,11 @@
  */
 
 #include "QRCodeSetupPayloadParser.h"
-#include "Base45.h"
+#include "Base41.h"
 
 #include <core/CHIPError.h>
 #include <iostream>
+#include <string.h>
 #include <vector>
 
 using namespace chip;
@@ -55,11 +56,58 @@ static CHIP_ERROR readBits(vector<uint8_t> buf, int & index, uint64_t & dest, si
     return CHIP_NO_ERROR;
 }
 
+static string extractPayload(string inString)
+{
+    string chipSegment;
+    char delimiter = '%';
+    vector<int> delimiterIndices;
+    delimiterIndices.push_back(-1);
+
+    for (size_t i = 0; i < inString.length(); i++)
+    {
+        if (inString[i] == delimiter)
+        {
+            delimiterIndices.push_back(i);
+        }
+    }
+
+    // Find the first string between delimiters that starts with kQRCodePrefix
+    for (size_t i = 0; i < delimiterIndices.size(); i++)
+    {
+        size_t startIndex = delimiterIndices[i] + 1;
+        size_t endIndex   = (i == delimiterIndices.size() - 1 ? string::npos : delimiterIndices[i + 1]);
+        size_t length     = (endIndex != string::npos ? endIndex - startIndex : string::npos);
+        string segment    = inString.substr(startIndex, length);
+
+        // Find a segment that starts with kQRCodePrefix
+        if (segment.find(kQRCodePrefix, 0) == 0 && segment.length() > strlen(kQRCodePrefix))
+        {
+            chipSegment = segment;
+            break;
+        }
+    }
+
+    if (chipSegment.length() > 0)
+    {
+        return chipSegment.substr(strlen(kQRCodePrefix)); // strip out prefix before returning
+    }
+    else
+    {
+        return chipSegment;
+    }
+}
+
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
     vector<uint8_t> buf = vector<uint8_t>();
 
-    CHIP_ERROR result = base45Decode(mBase45Representation, buf);
+    string payload = extractPayload(mBase41Representation);
+    if (payload.length() == 0)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    CHIP_ERROR result = base41Decode(payload, buf);
 
     if (CHIP_NO_ERROR != result)
     {

@@ -23,7 +23,7 @@
  */
 
 #include "QRCodeSetupPayloadGenerator.h"
-#include "Base45.h"
+#include "Base41.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -94,7 +94,7 @@ string QRCodeSetupPayloadGenerator::payloadBinaryRepresentation()
     }
 }
 
-string QRCodeSetupPayloadGenerator::payloadBase45Representation()
+string QRCodeSetupPayloadGenerator::payloadBase41Representation()
 {
     if (mPayload.isValidQRCodePayload())
     {
@@ -102,7 +102,9 @@ string QRCodeSetupPayloadGenerator::payloadBase45Representation()
 
         generateBitSet(mPayload, bits);
 
-        return base45Encode(bits, sizeof(bits) / sizeof(bits[0]));
+        string encodedPayload = base41Encode(bits, sizeof(bits) / sizeof(bits[0]));
+        encodedPayload.insert(0, kQRCodePrefix);
+        return encodedPayload;
     }
     else
     {
