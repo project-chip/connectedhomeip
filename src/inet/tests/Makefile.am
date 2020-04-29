@@ -172,10 +172,6 @@ NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)
 
-$(check_PROGRAMS): $(NLFOREIGN_FILE_DEPENDENCIES)
-
-$(noinst_PROGRAMS): $(NLFOREIGN_FILE_DEPENDENCIES)
-
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)
 
