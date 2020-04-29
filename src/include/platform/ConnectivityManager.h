@@ -35,6 +35,8 @@ template <class>
 class GenericPlatformManagerImpl;
 template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
+template <class>
+class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
 
 class ConnectivityManagerImpl;
@@ -183,6 +185,8 @@ private:
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl_POSIX;
     friend class Internal::NetworkProvisioningServerImpl;
     template <class>
     friend class Internal::GenericNetworkProvisioningServerImpl;

@@ -929,7 +929,7 @@ AC_MSG_RESULT(${with_device_layer})
 
 case "${with_device_layer}" in
 linux)
-      CONFIG_DEVICE_LAYER=0
+      CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=Linux
       CHIP_DEVICE_LAYER_TARGET_LINUX=1
       CHIP_DEVICE_LAYER_TARGET_ESP32=0

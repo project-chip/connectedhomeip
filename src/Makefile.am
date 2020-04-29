@@ -39,6 +39,7 @@ MAYBE_BLE_SUBDIRS                += \
 endif # CONFIG_NETWORK_LAYER_BLE
 
 PLATFORM_SUBDIRS                  = \
+    osal                            \
     platform                        \
     $(NULL)
 

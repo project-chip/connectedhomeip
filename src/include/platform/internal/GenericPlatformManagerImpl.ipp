@@ -22,7 +22,6 @@
  *          GenericPlatformManagerImpl<> template.
  */
 
-
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_IPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_IPP
 
@@ -31,6 +30,7 @@
 #include <platform/internal/GenericPlatformManagerImpl.h>
 #include <platform/internal/EventLogging.h>
 #include <platform/internal/BLEManager.h>
+#include <inttypes.h>
 #include <new>
 
 #include <support/logging/CHIPLogging.h>
@@ -45,7 +45,7 @@ template class GenericPlatformManagerImpl<PlatformManagerImpl>;
 
 extern CHIP_ERROR InitEntropy();
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err;
@@ -101,7 +101,7 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -116,12 +116,12 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_AddEventHandler(PlatformManag
         }
     }
 
-    eventHandler = (AppEventHandler *)malloc(sizeof(AppEventHandler));
+    eventHandler = (AppEventHandler *) malloc(sizeof(AppEventHandler));
     VerifyOrExit(eventHandler != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    eventHandler->Next = mAppEventHandlerList;
+    eventHandler->Next    = mAppEventHandlerList;
     eventHandler->Handler = handler;
-    eventHandler->Arg = arg;
+    eventHandler->Arg     = arg;
 
     mAppEventHandlerList = eventHandler;
 
@@ -129,12 +129,12 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager::EventHandlerFunct handler, intptr_t arg)
 {
     AppEventHandler ** eventHandlerIndirectPtr;
 
-    for (eventHandlerIndirectPtr = &mAppEventHandlerList; *eventHandlerIndirectPtr != NULL; )
+    for (eventHandlerIndirectPtr = &mAppEventHandlerList; *eventHandlerIndirectPtr != NULL;)
     {
         AppEventHandler * eventHandler = (*eventHandlerIndirectPtr);
 
@@ -150,18 +150,18 @@ void GenericPlatformManagerImpl<ImplClass>::_RemoveEventHandler(PlatformManager:
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
     ChipDeviceEvent event;
-    event.Type = DeviceEventType::kCallWorkFunct;
+    event.Type                    = DeviceEventType::kCallWorkFunct;
     event.CallWorkFunct.WorkFunct = workFunct;
-    event.CallWorkFunct.Arg = arg;
+    event.CallWorkFunct.Arg       = arg;
 
     Impl()->PostEvent(&event);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
 #if CHIP_PROGRESS_LOGGING
@@ -208,23 +208,23 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 #endif // CHIP_PROGRESS_LOGGING
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Invoke the System Layer's event handler function.
-    err = SystemLayer.HandleEvent(*event->ChipSystemLayerEvent.Target,
-                                  event->ChipSystemLayerEvent.Type,
+    err = SystemLayer.HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
                                   event->ChipSystemLayerEvent.Argument);
     if (err != CHIP_SYSTEM_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s",
-                event->Type, ErrorStr(err));
+        ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));
     }
+#endif
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToDeviceLayer(const ChipDeviceEvent * event)
 {
     // Dispatch the event to all the components in the Device Layer.
@@ -237,19 +237,17 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToDeviceLayer(const Chi
     ConnectivityMgr().OnPlatformEvent(event);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToApplication(const ChipDeviceEvent * event)
 {
     // Dispatch the event to each of the registered application event handlers.
-    for (AppEventHandler * eventHandler = mAppEventHandlerList;
-         eventHandler != NULL;
-         eventHandler = eventHandler->Next)
+    for (AppEventHandler * eventHandler = mAppEventHandlerList; eventHandler != NULL; eventHandler = eventHandler->Next)
     {
         eventHandler->Handler(event, eventHandler->Arg);
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bool messageLayerIsActive)
 {
     GenericPlatformManagerImpl<ImplClass> & self = PlatformMgrImpl();
@@ -269,4 +267,3 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
 } // namespace chip
 
 #endif // GENERIC_PLATFORM_MANAGER_IMPL_IPP
-

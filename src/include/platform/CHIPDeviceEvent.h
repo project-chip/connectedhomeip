@@ -225,6 +225,7 @@ enum InternalEventTypes
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
+    kPlatformManagerTimer
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -406,6 +407,10 @@ struct ChipDeviceEvent final
         {
             ActivityChange Result;
         } CHIPoBLEAdvertisingChange;
+        struct
+        {
+            void * Context;
+        } PlatformManagerTimer;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

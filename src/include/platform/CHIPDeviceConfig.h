@@ -85,7 +85,7 @@
  * The maximum number of events that can be held in the chip Platform event queue.
  */
 #ifndef CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE
-#define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 100
+#define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 128
 #endif
 
 /**

@@ -28,10 +28,10 @@
 // Include headers
 #include <system/SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
 namespace chip {
 namespace System {
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  *  @typedef EventType
@@ -73,8 +73,37 @@ static inline bool IsEventOfType(EventType aType)
     return (aType >= kEvent_ReleaseObj && aType <= kEvent_ScheduleWork);
 }
 
+#else
+
+#ifndef CHIP_SYSTEM_CONFIG_EVENT_TYPE
+#define CHIP_SYSTEM_CONFIG_EVENT_TYPE int
+#endif
+
+#ifndef CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE
+#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
+#endif
+
+/**
+ *  @typedef EventType
+ *  The basic type for all InetLayer events.
+ *
+ *  This is defined to a platform- or system-specific type.
+ *
+ */
+typedef CHIP_SYSTEM_CONFIG_EVENT_TYPE EventType;
+
+/**
+ *  @typedef Event
+ *  The basic object for all InetLayer events.
+ *
+ *  This is defined to a platform- or system-specific type.
+ *
+ */
+typedef CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE Event;
+
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 } // namespace System
 } // namespace chip
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // defined(SYSTEMEVENT_H)

@@ -54,9 +54,13 @@ case "$TASK" in
     docker_run_command 'scripts/build/default.sh'
     ;;
 
-  build-nrf-example-lock-app)
-    docker_run_command 'scripts/examples/nrf_lock_app.sh'
-    ;;
+build-example-lock-app-nrf)
+  docker_run_bash_command 'scripts/examples/lock_app_nrf.sh'
+  ;;
+
+build-example-lock-app-linux)
+  docker_run_bash_command 'scripts/examples/lock_app_linux.sh'
+  ;;
 
   build-esp-example-echo-app)
     docker_run_command 'scripts/examples/esp_echo_app.sh'

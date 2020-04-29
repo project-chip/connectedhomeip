@@ -25,6 +25,7 @@ namespace Logging {
 
 enum
 {
+    kLogModule_Application = 254,
     kLogModule_DeviceLayer = 255,
 };
 
