@@ -116,6 +116,14 @@
             "problemMatcher": ["$gcc"]
         },
         {
+            "label": "Build Linux Lock App",
+            "type": "shell",
+            "command": "scripts/examples/lock_app_linux.sh",
+            "group": "none",
+            "dependsOn": "Clean Tree",
+            "problemMatcher": ["$gcc"]
+        },
+        {
             "label": "Build openSSL crypto Tests",
             "type": "shell",
             "command": "scripts/tests/openssl_tests.sh",
