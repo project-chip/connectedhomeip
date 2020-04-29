@@ -211,6 +211,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 template<class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Invoke the System Layer's event handler function.
@@ -222,6 +223,7 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const Chi
         ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s",
                 event->Type, ErrorStr(err));
     }
+#endif
 }
 
 template<class ImplClass>
