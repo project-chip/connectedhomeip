@@ -32,6 +32,9 @@ RUN set -x \
     flex \
     bison \
     gperf \
+    zlib1g-dev \
+    libglib2.0-dev \
+    libpixman-1-dev \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
@@ -87,3 +90,15 @@ RUN set -x \
 
 ENV IDF_PATH=/var/esp-idf/
 ENV IDF_TOOLS_PATH=/var/.espressif
+
+# Setup QEMU emulator for ESP32 platform
+RUN set -x \
+    && cd /var \
+    && git clone --progress https://github.com/Ebiroll/qemu-xtensa-esp32.git \
+    && (mkdir -p /var/qemu_esp32 && cd /var/qemu_esp32 \
+    && ../qemu-xtensa-esp32/configure --disable-werror --prefix=`pwd`/root --target-list=xtensa-softmmu,xtensaeb-softmmu \
+    && make ) \
+    && : # last line
+
+ENV QEMU_ESP32_DIR=/var/qemu_esp32
+ENV QEMU_ESP32=/var/qemu_esp32/xtensa-softmmu/qemu-system-xtensa
