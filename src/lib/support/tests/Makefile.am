@@ -96,8 +96,6 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
    $(CHIP_LDADD)                                        \
    $(NULL)
 
-$(check_PROGRAMS): $(NLFOREIGN_FILE_DEPENDENCIES)
-
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)
 
