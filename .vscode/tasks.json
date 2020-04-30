@@ -85,6 +85,14 @@
             "problemMatcher": ["$gcc"]
         },
         {
+            "label": "Run Setup Payload Tests",
+            "type": "shell",
+            "command": "scripts/tests/setup_payload_tests.sh",
+            "group": "none",
+            "dependsOn": "Bootstrap",
+            "problemMatcher": ["$gcc"]
+        },
+        {
             "label": "Build QRCode Payload Tests",
             "type": "shell",
             "command": "scripts/tests/qrcode_payload_tests.sh",
