@@ -94,7 +94,7 @@ be run again for the changes to be picked up.
 
 mkdir build/<CONFIG>
 cd build/<CONFIG>
-../../configure <CONFIG ARGUMENTS>
+../../configure -C <CONFIG ARGUMENTS>
 ```
 
 Where `<CONFIG>` is something that describes what configuration (as described by
