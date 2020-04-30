@@ -86,7 +86,7 @@ CHIP_CXXFLAGS = $(STD_CXXFLAGS) $(CXXFLAGS)
 # ==================================================
 
 CHIP_CONFIGURE_OPTIONS = \
-    AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
+    -C AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
     LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
     CPPFLAGS="$(CHIP_CPPFLAGS)" \
     CXXFLAGS="$(CHIP_CXXFLAGS)" \

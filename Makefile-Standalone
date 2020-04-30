@@ -245,7 +245,7 @@ AMFILES =                               \
 #
 define configure-target
 $(ECHO) "  CONFIG   $(1)..."
-(cd $(BuildPath)/$(1) && $(AbsTopSourceDir)/configure \
+(cd $(BuildPath)/$(1) && $(AbsTopSourceDir)/configure -C \
 INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
 --prefix=/ \
 --exec-prefix=/$(1) \

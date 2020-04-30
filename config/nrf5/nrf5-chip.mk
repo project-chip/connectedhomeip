@@ -86,6 +86,7 @@ DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst \,\\,$(1
 # ==================================================
 
 CHIP_CONFIGURE_OPTIONS = \
+    -C \
     AR="$(AR)" AS="$(AS)" CC="$(CCACHE) $(CC)" CXX="$(CCACHE) $(CXX)" \
     LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
     CPPFLAGS=$(call DoubleQuoteStr, $(CHIP_CPPFLAGS)) \

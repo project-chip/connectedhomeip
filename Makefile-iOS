@@ -257,7 +257,7 @@ AMFILES =                                                \
 #
 define configure-arch
 $(ECHO) "  CONFIG   $(1)-$(TargetTuple)..."
-(cd $(BuildPath)/$(1)-$(TargetTuple) && $(AbsTopSourceDir)/configure \
+(cd $(BuildPath)/$(1)-$(TargetTuple) && $(AbsTopSourceDir)/configure -C \
 CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)" OBJC="$(OBJC)" OBJCXX="$(OBJCXX)" AR="$(AR)" RANLIB="$(RANLIB)" NM="$(NM)" STRIP="$(STRIP)" \
 INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
 CPPFLAGS="$(CPPFLAGS)" \

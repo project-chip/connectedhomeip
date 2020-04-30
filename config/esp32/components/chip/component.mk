@@ -83,7 +83,7 @@ DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst \,\\,$(1
 # ESP-IDF's project.mk fails to define RANLIB appropriately, so we define it here.
 RANLIB                      := $(call dequote,$(CONFIG_TOOLPREFIX))ranlib
 
-CONFIGURE_OPTIONS       	:= AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" \
+CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJCOPY="$(OBJCOPY)" RANLIB="$(RANLIB)" \
                                INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
                                CFLAGS=$(call DoubleQuoteStr, $(CFLAGS)) \
                                CPPFLAGS=$(call DoubleQuoteStr, $(CPPFLAGS)) \

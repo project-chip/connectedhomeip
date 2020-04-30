@@ -242,7 +242,7 @@ AMFILES =                               \
 #
 define configure-action
 $(ECHO) "  CONFIG   $(ABI_CONFIG_TUPLE_$(1))..."
-(cd $(BuildPath)/$(ABI_CONFIG_TUPLE_$(1)) && $(AbsTopSourceDir)/configure \
+(cd $(BuildPath)/$(ABI_CONFIG_TUPLE_$(1)) && $(AbsTopSourceDir)/configure -C \
 CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)" OBJC="$(OBJC)" OBJCXX="$(OBJCXX)" AR="$(AR)" RANLIB="$(RANLIB)" NM="$(NM)" STRIP="$(STRIP)" \
 INSTALL="$(INSTALL) $(INSTALLFLAGS)" \
 CPPFLAGS="$(CPPFLAGS)" \
