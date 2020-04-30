@@ -1,5 +1,5 @@
 //
-//  CHPSetupPayload.m
+//  CHIPSetupPayload.m
 //  CHIPQRCodeReader
 /**
 *
@@ -18,9 +18,9 @@
 *    limitations under the License.
 */
 
-#import "CHPSetupPayload.h"
+#import "CHIPSetupPayload.h"
 
-@implementation CHPSetupPayload
+@implementation CHIPSetupPayload
 
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload
 {

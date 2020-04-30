@@ -1,5 +1,5 @@
 //
-//  CHPError.m
+//  CHIPError.m
 //  CHIPQRCodeReader
 //
 /**
@@ -19,39 +19,39 @@
 *    limitations under the License.
 */
 
-#import "CHPError.h"
+#import "CHIPError.h"
 
-NSString *const CHPErrorDomain = @"CHPErrorDomain";
+NSString *const CHIPErrorDomain = @"CHIPErrorDomain";
 
 
-@implementation CHPError
+@implementation CHIPError
 
 + (NSError *)errorForCHIPErrorCode:(int32_t)errorCode
 {
     switch (errorCode) {
         case 4030:
-            return [NSError errorWithDomain:CHPErrorDomain
-                                       code:CHPErrorCodeInvalidStringLength
+            return [NSError errorWithDomain:CHIPErrorDomain
+                                       code:CHIPErrorCodeInvalidStringLength
                                    userInfo:@{
                                    NSLocalizedDescriptionKey: NSLocalizedString(@"A list length is invalid.", nil)}];
         case 4145:
-            return [NSError errorWithDomain:CHPErrorDomain
-                                       code:CHPErrorCodeInvalidIntegerValue
+            return [NSError errorWithDomain:CHIPErrorDomain
+                                       code:CHIPErrorCodeInvalidIntegerValue
                                    userInfo:@{
                                        NSLocalizedDescriptionKey: NSLocalizedString(@"Unexpected integer value.", nil)}];
         case 4046:
-                   return [NSError errorWithDomain:CHPErrorDomain
-                                              code:CHPErrorCodeInvalidArgument
+                   return [NSError errorWithDomain:CHIPErrorDomain
+                                              code:CHIPErrorCodeInvalidArgument
                                           userInfo:@{
                                               NSLocalizedDescriptionKey: NSLocalizedString(@"An argument is invalid.", nil)}];
         case 4023:
-                   return [NSError errorWithDomain:CHPErrorDomain
-                                              code:CHPErrorCodeInvalidMessageLength
+                   return [NSError errorWithDomain:CHIPErrorDomain
+                                              code:CHIPErrorCodeInvalidMessageLength
                                           userInfo:@{
                                               NSLocalizedDescriptionKey: NSLocalizedString(@"A message length is invalid.", nil)}];
         default:
-            return [NSError errorWithDomain:CHPErrorDomain
-                                       code:CHPErrorCodeUndefinedError
+            return [NSError errorWithDomain:CHIPErrorDomain
+                                       code:CHIPErrorCodeUndefinedError
                                    userInfo:@{
                                        NSLocalizedDescriptionKey: NSLocalizedString(@"Undefined error.", nil)}];;
     }

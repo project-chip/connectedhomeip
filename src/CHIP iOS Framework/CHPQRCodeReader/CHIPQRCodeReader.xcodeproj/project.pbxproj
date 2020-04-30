@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B20252E12459ED6900F97062 /* CHP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B20252DF2459EC7600F97062 /* CHP.framework */; };
-		B20252E22459ED6900F97062 /* CHP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B20252DF2459EC7600F97062 /* CHP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
 		B204A627244E1D0600C7C0E1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A626244E1D0600C7C0E1 /* ViewController.m */; };
-		B204A62A244E1D0600C7C0E1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B204A628244E1D0600C7C0E1 /* Main.storyboard */; };
 		B204A62C244E1D0700C7C0E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B204A62B244E1D0700C7C0E1 /* Assets.xcassets */; };
-		B204A62F244E1D0700C7C0E1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B204A62D244E1D0700C7C0E1 /* LaunchScreen.storyboard */; };
 		B204A632244E1D0700C7C0E1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A631244E1D0700C7C0E1 /* main.m */; };
+		B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */; };
+		B2F53AEE245B0D1A0010745E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AEC245B0D190010745E /* Main.storyboard */; };
+		B2F53AEF245B0D910010745E /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; };
+		B2F53AF0245B0D910010745E /* CHIP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,7 +35,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B20252E22459ED6900F97062 /* CHP.framework in Embed Frameworks */,
+				B2F53AF0245B0D910010745E /* CHIP.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,21 +43,21 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B20252DF2459EC7600F97062 /* CHP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61C244E1D0600C7C0E1 /* CHIPQRCodeReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPQRCodeReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		B204A622244E1D0600C7C0E1 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
-		B204A623244E1D0600C7C0E1 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
-		B204A625244E1D0600C7C0E1 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		B204A626244E1D0600C7C0E1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		B204A629244E1D0600C7C0E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = UI/AppDelegate.h; sourceTree = "<group>"; };
+		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = UI/AppDelegate.m; sourceTree = "<group>"; };
+		B204A622244E1D0600C7C0E1 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SceneDelegate.h; path = UI/SceneDelegate.h; sourceTree = "<group>"; };
+		B204A623244E1D0600C7C0E1 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SceneDelegate.m; path = UI/SceneDelegate.m; sourceTree = "<group>"; };
+		B204A625244E1D0600C7C0E1 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = UI/ViewController.h; sourceTree = "<group>"; };
+		B204A626244E1D0600C7C0E1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = UI/ViewController.m; sourceTree = "<group>"; };
 		B204A62B244E1D0700C7C0E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B204A62E244E1D0700C7C0E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B204A630244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B204A631244E1D0700C7C0E1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B204A637244E1D0700C7C0E1 /* CHIPQRCodeReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPQRCodeReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A63D244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B2E0D7BE245B0C59003C5B48 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		B2F53AED245B0D190010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B20252E12459ED6900F97062 /* CHP.framework in Frameworks */,
+				B2F53AEF245B0D910010745E /* CHIP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,7 +82,7 @@
 		B20252DE2459EC7600F97062 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B20252DF2459EC7600F97062 /* CHP.framework */,
+				B2E0D7BE245B0C59003C5B48 /* CHIP.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -109,9 +109,17 @@
 		B204A61E244E1D0600C7C0E1 /* CHIPQRCodeReader */ = {
 			isa = PBXGroup;
 			children = (
+				B2F53AEC245B0D190010745E /* Main.storyboard */,
+				B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */,
 				B204A630244E1D0700C7C0E1 /* Info.plist */,
 				B204A631244E1D0700C7C0E1 /* main.m */,
-				B204A669244E1D9600C7C0E1 /* UI */,
+				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
+				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
+				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
+				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
+				B204A625244E1D0600C7C0E1 /* ViewController.h */,
+				B204A626244E1D0600C7C0E1 /* ViewController.m */,
+				B204A62B244E1D0700C7C0E1 /* Assets.xcassets */,
 			);
 			path = CHIPQRCodeReader;
 			sourceTree = "<group>";
@@ -122,22 +130,6 @@
 				B204A63D244E1D0700C7C0E1 /* Info.plist */,
 			);
 			path = CHIPQRCodeReaderTests;
-			sourceTree = "<group>";
-		};
-		B204A669244E1D9600C7C0E1 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
-				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
-				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
-				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
-				B204A625244E1D0600C7C0E1 /* ViewController.h */,
-				B204A626244E1D0600C7C0E1 /* ViewController.m */,
-				B204A628244E1D0600C7C0E1 /* Main.storyboard */,
-				B204A62B244E1D0700C7C0E1 /* Assets.xcassets */,
-				B204A62D244E1D0700C7C0E1 /* LaunchScreen.storyboard */,
-			);
-			path = UI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -221,9 +213,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B204A62F244E1D0700C7C0E1 /* LaunchScreen.storyboard in Resources */,
+				B2F53AEE245B0D1A0010745E /* Main.storyboard in Resources */,
 				B204A62C244E1D0700C7C0E1 /* Assets.xcassets in Resources */,
-				B204A62A244E1D0600C7C0E1 /* Main.storyboard in Resources */,
+				B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,20 +258,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		B204A628244E1D0600C7C0E1 /* Main.storyboard */ = {
+		B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				B204A629244E1D0600C7C0E1 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		B204A62D244E1D0700C7C0E1 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B204A62E244E1D0700C7C0E1 /* Base */,
+				B2F53AEA245B0D140010745E /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		B2F53AEC245B0D190010745E /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B2F53AED245B0D190010745E /* Base */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

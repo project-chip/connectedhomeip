@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:CHP/CHP.xcodeproj">
+      location = "group:CHIP/CHIP.xcodeproj">
    </FileRef>
    <FileRef
       location = "container:CHPQRCodeReader/CHIPQRCodeReader.xcodeproj">
