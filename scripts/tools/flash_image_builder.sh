@@ -29,7 +29,7 @@ usage() {
         echo "Error: $*"
     fi
     echo "Usage: $0 <image-size> <output-file> <offset1=input-file1> [<offset2=input-file2> ..]"
-    exit $exitcode
+    exit "$exitcode"
 }
 
 [[ $# -ge 3 ]] || usage "Incorrect number of arguments"
@@ -58,5 +58,5 @@ for item in "${@:3}"; do
     written=$((written + filesize))
     [[ $written -lt $image_size ]] || usage "Writing $file at $offset will overflow image"
 
-    dd if=$file of="$2" conv=notrunc bs=$offset seek=1
+    dd if="$file" of="$2" conv=notrunc bs="$offset" seek=1
 done
