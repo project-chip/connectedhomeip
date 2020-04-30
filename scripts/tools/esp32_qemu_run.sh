@@ -42,11 +42,11 @@ die() {
 
 [[ -n $QEMU_ESP32 ]] || die "Environment variable QEMU_ESP32 is undefined."
 
-firmare_path=$(realpath "$1")
+firmware_path=$(realpath "$1")
 flash_image=$(realpath "$2")
 
-[[ -r "${firmare_path}/rom.bin" ]] || usage "Could not read file ${firmare_path}/rom.bin"
-[[ -r "${firmare_path}/rom1.bin" ]] || usage "Could not read file ${firmare_path}/rom1.bin"
+[[ -r "${firmware_path}/rom.bin" ]] || usage "Could not read file ${firmware_path}/rom.bin"
+[[ -r "${firmware_path}/rom1.bin" ]] || usage "Could not read file ${firmware_path}/rom1.bin"
 [[ -r $flash_image ]] || usage "Could not read file $flash_image"
 
 tempdir=$(mktemp -d)
@@ -54,8 +54,8 @@ echo "Created $tempdir"
 
 trap "{ rm -rf $tempdir; }" EXIT
 
-ln -s "${firmare_path}/rom.bin" "${tempdir}/rom.bin"
-ln -s "${firmare_path}/rom1.bin" "${tempdir}/rom1.bin"
+ln -s "${firmware_path}/rom.bin" "${tempdir}/rom.bin"
+ln -s "${firmware_path}/rom1.bin" "${tempdir}/rom1.bin"
 ln -s "$flash_image" "${tempdir}/esp32flash.bin"
 
 cd "$tempdir" || die 'ack!, where am I?!?'
