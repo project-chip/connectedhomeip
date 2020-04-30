@@ -137,7 +137,6 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
 					           -lCHIP \
 					           -lInetLayer \
-					           -lnlfaultinjection \
 					           -lSystemLayer \
 					           -lDeviceLayer
 

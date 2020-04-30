@@ -155,7 +155,6 @@ STD_LIBS += \
     -lDeviceLayer \
     -lCHIP \
     -lInetLayer \
-    -lnlfaultinjection \
     -lSystemLayer \
     -llwip \
     -lmbedtls
@@ -170,7 +169,6 @@ STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libDeviceLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libCHIP.a \
     $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
-    $(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
     $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/liblwip.a \
     $(CHIP_OUTPUT_DIR)/lib/libmbedtls.a
