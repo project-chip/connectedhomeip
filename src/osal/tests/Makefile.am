@@ -64,8 +64,6 @@ check_PROGRAMS                                        = \
     TestOsQueue                                         \
     TestOsTask                                          \
     TestOsTimer                                         \
-    TestOsEventQ                                        \
-    TestOsCallout                                       \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -97,12 +95,6 @@ TestOsTask_SOURCES                                  = test_os_task.c
 
 TestOsTimer_LDADD                                   = $(COMMON_LDADD)
 TestOsTimer_SOURCES                                 = test_os_timer.c
-
-TestOsEventQ_LDADD                                  = $(COMMON_LDADD)
-TestOsEventQ_SOURCES                                = test_os_eventq.c
-
-TestOsCallout_LDADD                                 = $(COMMON_LDADD)
-TestOsCallout_SOURCES                               = test_os_callout.c
 
 # Build any and all libraries that the tests depend on.
 $(check_PROGRAMS): $(CHIP_LDADD)

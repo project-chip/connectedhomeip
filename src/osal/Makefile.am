@@ -48,8 +48,6 @@ libChipOsal_a_CPPFLAGS                             += \
     $(NULL)
 
 libChipOsal_a_SOURCES                              += \
-    posix/os_callout.c                                \
-    posix/os_eventq.cc                                \
     posix/os_queue.cc                                 \
     posix/os_mutex.c                                  \
     posix/os_sem.c                                    \

@@ -31,9 +31,7 @@
 extern "C" {
 #endif
 
-struct chip_os_event;
 struct chip_os_timer;
-typedef void chip_os_event_fn(struct chip_os_event * ev);
 typedef void chip_os_timer_fn(void * arg);
 typedef void chip_os_signal_fn(void * arg);
 
@@ -238,93 +236,6 @@ int chip_os_queue_inited(const struct chip_os_queue * msgq);
 bool chip_os_queue_is_empty(struct chip_os_queue * msgq);
 
 void chip_os_queue_set_signal_cb(struct chip_os_queue * msgq, chip_os_signal_fn signal_cb, void * data);
-
-/*
- * Event queue
- */
-
-/**
- * @brief Initialize an event queue.
- *
- * This routine initializes an event queue object, prior to its first use.
- *
- * Event queues deliver pointers to event objects allocated, managed, and owned by
- * a producer to a consumer in a thread-safe manner.
- *
- * @param evq Address of the event queue.
- * @param msg_size Message size (in bytes).
- * @param max_msgs Maximum number of messages that can be queued.
- *
- * @return N/A
- */
-void chip_os_eventq_init(struct chip_os_eventq * evq, size_t max_msgs);
-
-/**
- * @brief Receive a event from a event queue.
- *
- * This routine receives a event from event queue @a q in a "first in, first out" manner.
- *
- * @param evq Address of the event queue.
- * @param timeout Waiting period to receive the message (in milliseconds),
- *                or one of the special values CHIP_OS_TIME_NO_WAIT and CHIP_OS_TIME_FOREVER.
- *
- * @retval event Pointer to event, or NULL if none.
- */
-struct chip_os_event * chip_os_eventq_get(struct chip_os_eventq * evq, chip_os_time_t tmo);
-
-/**
- * @brief Send an event to an event queue.
- *
- * This routine sends a event to event queue @a eventq.
- *
- * @note Can be called by ISRs.
- *
- * @param evq Address of the event queue.
- * @param ev Pointer to the event.
- */
-void chip_os_eventq_put(struct chip_os_eventq * evq, struct chip_os_event * ev);
-
-bool chip_os_eventq_is_empty(struct chip_os_eventq * evq);
-
-/**
- * @brief Returns whether the given event queue is initialized and valid.
- *
- * @param eventq Address of the event queue.
- *
- * @retval CHIP_OS_OK Queue is valid.
- * @retval CHIP_OS_EINVAL Queue is not valid.
- */
-int chip_os_eventq_inited(const struct chip_os_eventq * evq);
-
-void chip_os_eventq_run(struct chip_os_eventq * evq);
-
-void chip_os_event_init(struct chip_os_event * ev, chip_os_event_fn * fn, void * arg);
-
-bool chip_os_event_is_queued(struct chip_os_event * ev);
-
-void * chip_os_event_get_arg(struct chip_os_event * ev);
-
-void chip_os_event_set_arg(struct chip_os_event * ev, void * arg);
-
-void chip_os_event_run(struct chip_os_event * ev);
-
-/*
- * Callouts
- */
-
-void chip_os_callout_init(struct chip_os_callout * co, struct chip_os_eventq * evq, chip_os_event_fn * ev_cb, void * ev_arg);
-
-chip_os_error_t chip_os_callout_reset(struct chip_os_callout * co, chip_os_time_t ticks);
-
-void chip_os_callout_stop(struct chip_os_callout * co);
-
-bool chip_os_callout_is_active(struct chip_os_callout * co);
-
-chip_os_time_t chip_os_callout_get_ticks(struct chip_os_callout * co);
-
-chip_os_time_t chip_os_callout_remaining_ticks(struct chip_os_callout * co, chip_os_time_t time);
-
-void chip_os_callout_set_arg(struct chip_os_callout * co, void * arg);
 
 /*
  * Timer

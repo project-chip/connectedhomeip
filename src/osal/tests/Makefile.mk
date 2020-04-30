@@ -77,8 +77,6 @@ TEST_OBJS += $(patsubst %.cpp,%.o,$(filter %.cpp, $(SRCS)))
 
 all: depend                  \
      test_os_task.exe        \
-     test_os_callout.exe     \
-     test_os_eventq.exe      \
      test_os_queue.exe       \
      test_os_sem.exe         \
      test_os_timer.exe       \
@@ -88,13 +86,7 @@ all: depend                  \
 test_os_task.exe: test_os_task.o $(OBJS)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 
-test_os_eventq.exe: test_os_eventq.o $(OBJS)
-	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
-
 test_os_queue.exe: test_os_queue.o $(OBJS)
-	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
-
-test_os_callout.exe: test_os_callout.o $(OBJS)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 test_os_sem.exe: test_os_sem.o $(OBJS)
@@ -108,8 +100,6 @@ test_ring.exe: test_ring.o $(OBJS)
 
 test: all
 	./test_os_task.exe
-	./test_os_callout.exe
-	./test_os_eventq.exe
 	./test_os_queue.exe
 	./test_os_sem.exe
 	./test_os_timer.exe

@@ -15,11 +15,9 @@ CHIP OSAL provides abstractions for:
 * tasks (aka threads)
 * mutex
 * semaphores
+* queues
 * timers
 * time
-* (message) queues
-* event queues
-* callouts
 
 CHIP OSAL currently supports the above abstractions for the following OS targets:
 
@@ -67,19 +65,6 @@ A timer triggers a callback function after a given amount of time has passed.
 
 A collection of utility functions for getting current system time and
 converting between milliseconds and CPU ticks is provided.
-
-## EventQ
-
-An event queue is an extension of a normal queue except rather than passing
-messages, it dispatches events which execute a callback function with a
-context pointer.  Event queues rely on the producer allocating and managing
-the event memory.
-
-## Callout
-
-A callout is a delayed event, which gets posted to a given event queue after
-a designated amount of time has passed. A callout common replacement for
-timers when an event queues are being used.
 
 # Porting guide
 

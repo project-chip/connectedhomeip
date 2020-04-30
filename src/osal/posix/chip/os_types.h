@@ -39,18 +39,6 @@ typedef int32_t chip_os_stime_t;
 typedef int chip_os_base_t;
 typedef int chip_os_stack_t;
 
-struct chip_os_event
-{
-    uint8_t ev_queued;
-    chip_os_event_fn * ev_cb;
-    void * ev_arg;
-};
-
-struct chip_os_eventq
-{
-    void * q;
-};
-
 struct chip_os_queue
 {
     void * q;
@@ -65,15 +53,6 @@ struct chip_os_timer
     timer_t tm_timer;
     bool tm_active;
     void * tm_arg;
-};
-
-struct chip_os_callout
-{
-    struct chip_os_event c_ev;
-    struct chip_os_eventq * c_evq;
-    uint32_t c_ticks;
-    timer_t c_timer;
-    bool c_active;
 };
 
 struct chip_os_mutex
