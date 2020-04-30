@@ -17,79 +17,72 @@
  *    limitations under the License.
  */
 
+#include <time.h>
 #include <errno.h>
 #include <semaphore.h>
 
 #include <chip/osal.h>
+#include "os_utils.h"
+
+#ifdef __APPLE__
 
 chip_os_error_t chip_os_sem_init(struct chip_os_sem * sem, uint16_t tokens)
 {
-    if (!sem)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
-
-    sem_init(&sem->lock, 0, tokens);
-
-    return CHIP_OS_OK;
+    sem->lock = dispatch_semaphore_create(tokens);
+    return (sem->lock == NULL) ? CHIP_OS_ENOMEM : CHIP_OS_OK;
 }
 
 chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem)
 {
-    int err;
-
-    if (!sem)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
-
-    err = sem_post(&sem->lock);
-
-    return (err) ? CHIP_OS_ERROR : CHIP_OS_OK;
+    int woke = dispatch_semaphore_signal(sem->lock);
+    (void) woke;
+    return CHIP_OS_OK;
 }
 
-chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, uint32_t timeout)
+chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, chip_os_time_t timeout)
 {
-    int err = 0;
-    struct timespec wait;
+    int expired = dispatch_semaphore_wait(sem->lock, timeout);
+    return (expired) ? CHIP_OS_TIMEOUT : CHIP_OS_OK;
+}
 
-    if (!sem)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
+#else
+
+chip_os_error_t chip_os_sem_init(struct chip_os_sem * sem, uint16_t tokens)
+{
+    int ret = sem_init(&sem->lock, 0, tokens);
+    return map_posix_to_osal_error(ret);
+}
+
+chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem)
+{
+    int ret = sem_post(&sem->lock);
+    return map_posix_to_osal_error(ret);
+}
+
+chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, chip_os_time_t timeout)
+{
+    int ret;
+    struct timespec wait;
 
     if (timeout == CHIP_OS_TIME_FOREVER)
     {
-        err = sem_wait(&sem->lock);
+        ret = sem_wait(&sem->lock);
+        SuccessOrExit(ret);
     }
     else
     {
-        err = clock_gettime(CLOCK_REALTIME, &wait);
-        if (err)
-        {
-            return CHIP_OS_ERROR;
-        }
+        ret = clock_gettime(CLOCK_REALTIME, &wait);
+        SuccessOrExit(ret);
 
         wait.tv_sec += timeout / 1000;
         wait.tv_nsec += (timeout % 1000) * 1000000;
-
-        err = sem_timedwait(&sem->lock, &wait);
-        if (err && errno == ETIMEDOUT)
-        {
-            return CHIP_OS_TIMEOUT;
-        }
+        ret = sem_timedwait(&sem->lock, &wait);
+        ret = (ret) ? errno : CHIP_OS_OK;
+        SuccessOrExit(ret);
     }
 
-    return (err) ? CHIP_OS_ERROR : CHIP_OS_OK;
+exit:
+    return map_posix_to_osal_error(ret);
 }
 
-uint16_t chip_os_sem_get_count(struct chip_os_sem * sem)
-{
-    int count;
-
-    assert(sem);
-    assert(&sem->lock);
-    sem_getvalue(&sem->lock, &count);
-
-    return count;
-}
+#endif // __APPLE__
