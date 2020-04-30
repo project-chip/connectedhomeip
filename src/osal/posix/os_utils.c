@@ -17,14 +17,45 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_OS_PORT_H
-#define CHIP_OS_PORT_H
+#include <errno.h>
+#include <pthread.h>
 
-#include <assert.h>
-#include <stdint.h>
-#include <string.h>
+#include <chip/osal.h>
 
-#include "os_time.h"
-#include "os_types.h"
+#include "os_utils.h"
 
-#endif /* CHIP_OS_PORT_H */
+chip_os_error_t map_posix_to_osal_error(int ret)
+{
+    chip_os_error_t err;
+
+    switch (ret)
+    {
+    case 0:
+        err = CHIP_OS_OK;
+        break;
+
+    case ENOMEM:
+        err = CHIP_OS_ENOMEM;
+        break;
+    case ETIMEDOUT:
+        err = CHIP_OS_TIMEOUT;
+        break;
+    case EBUSY:
+        err = CHIP_OS_EBUSY;
+        break;
+    case EINVAL:
+        err = CHIP_OS_EINVAL;
+        break;
+    case EDEADLK:
+        err = CHIP_OS_BAD_MUTEX;
+        break;
+    case EPERM:
+        err = CHIP_OS_ERR_PRIV;
+        break;
+    default:
+        err = CHIP_OS_ERROR;
+        break;
+    }
+
+    return err;
+}

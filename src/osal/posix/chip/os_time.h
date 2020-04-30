@@ -23,52 +23,46 @@
  *          to POSIX platforms.
  */
 
-#ifndef CHIP_OS_TYPES_H
-#define CHIP_OS_TYPES_H
+#ifndef CHIP_OS_TIME_H
+#define CHIP_OS_TIME_H
 
-#include <pthread.h>
-#include <semaphore.h>
+#include <time.h>
 
 #ifdef __APPLE__
+
 #include <dispatch/dispatch.h>
-#endif
 
-/* The highest and lowest task priorities */
-#define OS_TASK_PRI_HIGHEST (sched_get_priority_max(SCHED_RR))
-#define OS_TASK_PRI_LOWEST (sched_get_priority_min(SCHED_RR))
+// Apple MacOS
+#define CHIP_OS_TIME_FOREVER DISPATCH_TIME_FOREVER
+#define CHIP_OS_TIME_NO_WAIT 0
+#define CHIP_OS_TICKS_PER_SEC 1000000
 
-typedef int chip_os_base_t;
-typedef int chip_os_stack_t;
+typedef uint64_t chip_os_time_t;
+typedef int64_t chip_os_stime_t;
 
-struct chip_os_task
-{
-    pthread_t handle;
-    pthread_attr_t attr;
-    struct sched_param param;
-    const char * name;
-};
-
-struct chip_os_queue
-{
-    void * q;
-    chip_os_signal_fn * sig_cb;
-    void * sig_arg;
-};
-
-struct chip_os_mutex
-{
-    pthread_mutex_t lock;
-    pthread_mutexattr_t attr;
-    struct timespec wait;
-};
-
-struct chip_os_sem
-{
-#ifdef __APPLE__
-    dispatch_semaphore_t lock;
 #else
-    sem_t lock;
+
+// Linux and stock POSIX
+#define CHIP_OS_TIME_FOREVER INT32_MAX
+#define CHIP_OS_TIME_NO_WAIT 0
+#define CHIP_OS_TICKS_PER_SEC 1000
+
+typedef uint32_t chip_os_time_t;
+typedef int32_t chip_os_stime_t;
+
 #endif
+
+struct chip_os_timer
+{
+    chip_os_timer_fn * tm_cb;
+    chip_os_time_t tm_ticks;
+#ifdef __APPLE__
+    dispatch_source_t tm_timer;
+#else
+    timer_t tm_timer;
+#endif
+    bool tm_active;
+    void * tm_arg;
 };
 
-#endif // CHIP_OS_TYPES_H
+#endif // CHIP_OS_TIME_H

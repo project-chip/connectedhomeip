@@ -19,21 +19,37 @@
 
 PROJ_ROOT = ../../..
 
+### ===== Host System Variants =====
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+endif
+
 ### ===== Toolchain =====
 
 CROSS_COMPILE ?=
+
+ifeq ($(UNAME_S),Darwin)
+CC  = ccache $(CROSS_COMPILE)llvm-gcc
+CPP = ccache $(CROSS_COMPILE)llvm-g++
+LD  = $(CROSS_COMPILE)ld
+AR  = $(CROSS_COMPILE)ar
+else
 CC  = ccache $(CROSS_COMPILE)gcc
 CPP = ccache $(CROSS_COMPILE)g++
-LD  = $(CROSS_COMPILE)gcc
+LD  = $(CROSS_COMPILE)g++
 AR  = $(CROSS_COMPILE)ar
+endif
+
 
 ### ===== Compiler Flags =====
 
-INCLUDES =                                 \
-    -I.                                    \
-    -I$(PROJ_ROOT)/src/include             \
-    -I$(PROJ_ROOT)/src/osal/include        \
-    -I$(PROJ_ROOT)/src/osal/posix          \
+INCLUDES =                                            \
+    -I.                                               \
+    -I$(PROJ_ROOT)/src/include                        \
+    -I$(PROJ_ROOT)/src/osal/include                   \
+    -I$(PROJ_ROOT)/src/osal/posix                     \
+    -I$(PROJ_ROOT)/third_party/nlassert/repo/include  \
     $(NULL)
 
 DEBUG ?= 0
@@ -49,7 +65,10 @@ CFLAGS =                    \
     -O0                     \
     $(NULL)
 
-LIBS = -lrt -lpthread -lstdc++
+LIBS = -lpthread -lstdc++
+ifeq ($(UNAME_S),Linux)
+LIBS += -lrt
+endif
 
 LDFLAGS =
 
@@ -78,6 +97,7 @@ TEST_OBJS += $(patsubst %.cpp,%.o,$(filter %.cpp, $(SRCS)))
 all: depend                  \
      test_os_task.exe        \
      test_os_queue.exe       \
+     test_os_mutex.exe       \
      test_os_sem.exe         \
      test_os_timer.exe       \
      test_ring.exe           \
@@ -87,6 +107,9 @@ test_os_task.exe: test_os_task.o $(OBJS)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 test_os_queue.exe: test_os_queue.o $(OBJS)
+	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
+
+test_os_mutex.exe: test_os_mutex.o $(OBJS)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 test_os_sem.exe: test_os_sem.o $(OBJS)
@@ -101,6 +124,7 @@ test_ring.exe: test_ring.o $(OBJS)
 test: all
 	./test_os_task.exe
 	./test_os_queue.exe
+	./test_os_mutex.exe
 	./test_os_sem.exe
 	./test_os_timer.exe
 	./test_ring.exe

@@ -18,12 +18,16 @@
  */
 
 #include <limits.h>
+#include <errno.h>
 
 #include <chip/osal.h>
+#include "os_utils.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static int s_task_count = 0;
 
 /**
  * Initialize a task.
@@ -42,37 +46,40 @@ extern "C" {
  *
  * @return 0 on success, non-zero on failure.
  */
-int chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_func_t func, void * arg, uint8_t prio,
-                      uint16_t stack_size)
+chip_os_error_t chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_func_t func, void * arg, uint8_t prio,
+                                  uint16_t stack_size)
 {
-    int err;
+    int ret;
     if ((t == NULL) || (func == NULL))
     {
         return CHIP_OS_INVALID_PARAM;
     }
 
-    err = pthread_attr_init(&t->attr);
-    if (err)
-        return err;
-    err = pthread_attr_getschedparam(&t->attr, &t->param);
-    if (err)
-        return err;
-    err = pthread_attr_setschedpolicy(&t->attr, SCHED_RR);
-    if (err)
-        return err;
+    ret = pthread_attr_init(&t->attr);
+    SuccessOrExit(ret);
+
+    ret = pthread_attr_getschedparam(&t->attr, &t->param);
+    SuccessOrExit(ret);
+
+    ret = pthread_attr_setschedpolicy(&t->attr, SCHED_RR);
+    SuccessOrExit(ret);
+
     stack_size = (stack_size < PTHREAD_STACK_MIN) ? PTHREAD_STACK_MIN : stack_size;
-    err        = pthread_attr_setstacksize(&t->attr, stack_size);
-    if (err)
-        return err;
+    ret        = pthread_attr_setstacksize(&t->attr, stack_size);
+    SuccessOrExit(ret);
+
     t->param.sched_priority = prio;
-    err                     = pthread_attr_setschedparam(&t->attr, &t->param);
-    if (err)
-        return err;
+    ret                     = pthread_attr_setschedparam(&t->attr, &t->param);
+    SuccessOrExit(ret);
 
     t->name = name;
-    err     = pthread_create(&t->handle, &t->attr, func, arg);
+    ret     = pthread_create(&t->handle, &t->attr, func, arg);
+    SuccessOrExit(ret);
 
-    return err;
+    s_task_count += 1;
+
+exit:
+    return map_posix_to_osal_error(ret);
 }
 
 /*
@@ -80,9 +87,22 @@ int chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_f
  * XXX
  * NOTE: This interface is currently experimental and not ready for common use
  */
-int chip_os_task_remove(struct chip_os_task * t)
+chip_os_error_t chip_os_task_remove(struct chip_os_task * t)
 {
-    return pthread_cancel(t->handle);
+    int ret;
+    ret = (t == NULL) ? EINVAL : CHIP_OS_OK;
+    SuccessOrExit(ret);
+
+    ret = (t->handle) ? EINVAL : CHIP_OS_OK;
+    SuccessOrExit(ret);
+
+    ret = pthread_cancel(t->handle);
+    SuccessOrExit(ret);
+
+    s_task_count -= 1;
+
+exit:
+    return map_posix_to_osal_error(ret);
 }
 
 /**
@@ -92,7 +112,7 @@ int chip_os_task_remove(struct chip_os_task * t)
  */
 uint8_t chip_os_task_count(void)
 {
-    return 0;
+    return s_task_count;
 }
 
 void * chip_os_get_current_task_id(void)
@@ -102,7 +122,25 @@ void * chip_os_get_current_task_id(void)
 
 void chip_os_task_yield(void)
 {
-    pthread_yield();
+    sched_yield();
+}
+
+void chip_os_task_sleep_ms(chip_os_time_t ms)
+{
+    struct timespec sleep_time;
+    int s = ms / 1000;
+
+    ms -= s * 1000;
+    sleep_time.tv_sec  = s;
+    sleep_time.tv_nsec = ms * 1000000;
+
+    nanosleep(&sleep_time, NULL);
+}
+
+void chip_os_task_sleep(chip_os_time_t ticks)
+{
+    chip_os_time_t ms = chip_os_time_ticks_to_ms(ticks);
+    chip_os_task_sleep_ms(ms);
 }
 
 bool chip_os_sched_started(void)
@@ -112,10 +150,15 @@ bool chip_os_sched_started(void)
 
 void chip_os_sched_start(void)
 {
+#ifdef __APPLE__
+    /* Start the main queue */
+    dispatch_main();
+#else
     while (true)
     {
-        pthread_yield();
+        chip_os_task_yield();
     }
+#endif // __APPLE__
 
     assert(true);
 }

@@ -31,9 +31,9 @@
 extern "C" {
 #endif
 
-struct chip_os_timer;
 typedef void chip_os_timer_fn(void * arg);
 typedef void chip_os_signal_fn(void * arg);
+typedef void * (*chip_os_task_func_t)(void *);
 
 enum chip_os_error
 {
@@ -157,17 +157,6 @@ chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, chip_os_time_t timeou
  */
 chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem);
 
-/**
- * @brief Get a semaphore's count.
- *
- * This routine returns the current count of @a sem.
- *
- * @param sem Address of the semaphore.
- *
- * @return Current semaphore count.
- */
-uint16_t chip_os_sem_get_count(struct chip_os_sem * sem);
-
 /*
  * Message queue
  */
@@ -250,9 +239,10 @@ void chip_os_queue_set_signal_cb(struct chip_os_queue * msgq, chip_os_signal_fn 
  * @param cb        Callback function to invoke once timer expires.
  * @param arg       Argument to pass to timer callback function.
  *
- * @return N/A
+ * @retval CHIP_OS_OK Timer was created.
+ * @retval CHIP_OS_ERROR Timer creation failed.
  */
-void chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn cb, void * arg);
+chip_os_error_t chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn cb, void * arg);
 
 /**
  * @brief Start a timer.
@@ -265,11 +255,12 @@ void chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn cb, void 
  * using the new duration and period values.
  *
  * @param timer     Address of timer.
- * @param duration  Initial timer duration [milliseconds].
+ * @param duration  Initial timer duration [ticks].
  *
- * @return N/A
+ * @retval CHIP_OS_OK Message received.
+ * @retval CHIP_OS_EBUSY Returned without waiting.
  */
-void chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t duration);
+chip_os_error_t chip_os_timer_start_ms(struct chip_os_timer * timer, chip_os_time_t duration);
 
 /**
  * @brief Start a timer.
@@ -284,9 +275,10 @@ void chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t duration);
  * @param timer     Address of timer.
  * @param ticks     Initial timer duration [CPU ticks].
  *
- * @return N/A
+ * @retval CHIP_OS_OK Message received.
+ * @retval CHIP_OS_EBUSY Returned without waiting.
  */
-void chip_os_timer_start_ticks(struct chip_os_timer * timer, chip_os_time_t ticks);
+chip_os_error_t chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t ticks);
 
 /**
  * @brief Stop a timer.
@@ -304,7 +296,17 @@ void chip_os_timer_start_ticks(struct chip_os_timer * timer, chip_os_time_t tick
  *
  * @return N/A
  */
-void chip_os_timer_stop(struct chip_os_timer * timer);
+chip_os_error_t chip_os_timer_stop(struct chip_os_timer * timer);
+
+/**
+ * @brief Check whether the given timer has been initialized.
+ *
+ * @param timer     Address of timer.
+ *
+ * @retval CHIP_OS_OK Timer is initialized.
+ * @retval CHIP_OS_EINVAL Timer is invalid.
+ */
+chip_os_error_t chip_os_timer_inited(struct chip_os_timer * timer);
 
 bool chip_os_timer_is_active(struct chip_os_timer * timer);
 
@@ -330,25 +332,11 @@ void * chip_os_timer_arg_get(struct chip_os_timer * timer);
  */
 chip_os_time_t chip_os_time_get(void);
 
-chip_os_error_t chip_os_time_ms_to_ticks(uint32_t ms, chip_os_time_t * out_ticks);
+chip_os_time_t chip_os_time_get_ms(void);
 
-chip_os_error_t chip_os_time_ticks_to_ms(chip_os_time_t ticks, uint32_t * out_ms);
+chip_os_time_t chip_os_time_ms_to_ticks(chip_os_time_t ms);
 
-chip_os_time_t chip_os_time_ms_to_ticks32(uint32_t ms);
-
-uint32_t chip_os_time_ticks_to_ms32(chip_os_time_t ticks);
-
-/**
- * @brief Put the current thread to sleep.
- *
- * This routine puts the current thread to sleep for @a duration
- * [ticks].
- *
- * @param ticks Number of CPU ticks to sleep.
- *
- * @return N/A
- */
-void chip_os_time_delay(chip_os_time_t ticks);
+chip_os_time_t chip_os_time_ticks_to_ms(chip_os_time_t ticks);
 
 /*
  * Task functions
@@ -367,10 +355,11 @@ void chip_os_time_delay(chip_os_time_t ticks);
  * @param prio task priority.
  * @param stack_size Stack size in bytes.
  *
- * @return ID of new task.
+ * @retval CHIP_OS_OK Task is initialized.
+ * @retval CHIP_OS_ERROR Task is invalid.
  */
-int chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_func_t func, void * arg, uint8_t prio,
-                      uint16_t stack_size);
+chip_os_error_t chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_func_t func, void * arg, uint8_t prio,
+                                  uint16_t stack_size);
 
 /**
  * @brief Yield the current task.
@@ -382,6 +371,20 @@ int chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_f
  * @return N/A
  */
 void chip_os_task_yield(void);
+
+/**
+ * @brief Put the current thread to sleep.
+ *
+ * This routine puts the current thread to sleep for @a duration
+ * [ticks].
+ *
+ * @param ticks Number of CPU ticks to sleep.
+ *
+ * @return N/A
+ */
+void chip_os_task_sleep(chip_os_time_t ticks);
+
+void chip_os_task_sleep_ms(chip_os_time_t ms);
 
 /**
  * @brief Get task ID of the current task.
@@ -402,9 +405,10 @@ void * chip_os_get_current_task_id(void);
  *
  * @param task ID of task to abort.
  *
- * @return N/A
+ * @retval CHIP_OS_OK Task was removed.
+ * @retval CHIP_OS_ERROR Problem removing task.
  */
-int chip_os_task_remove(struct chip_os_task * t);
+chip_os_error_t chip_os_task_remove(struct chip_os_task * t);
 
 /*
  * Scheduler functions

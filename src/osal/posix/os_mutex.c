@@ -21,66 +21,60 @@
 #include <pthread.h>
 
 #include <chip/osal.h>
+#include "os_utils.h"
 
 chip_os_error_t chip_os_mutex_init(struct chip_os_mutex * mu)
 {
-    if (!mu)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
+    int ret = 0;
 
-    pthread_mutexattr_init(&mu->attr);
-    pthread_mutexattr_settype(&mu->attr, PTHREAD_MUTEX_RECURSIVE_NP);
-    pthread_mutex_init(&mu->lock, &mu->attr);
+    ret = pthread_mutexattr_init(&mu->attr);
+    SuccessOrExit(ret);
 
-    return CHIP_OS_OK;
+    ret = pthread_mutexattr_settype(&mu->attr, PTHREAD_MUTEX_RECURSIVE);
+    SuccessOrExit(ret);
+
+    ret = pthread_mutex_init(&mu->lock, &mu->attr);
+    SuccessOrExit(ret);
+
+exit:
+    return (ret) ? CHIP_OS_BAD_MUTEX : CHIP_OS_OK;
 }
 
 chip_os_error_t chip_os_mutex_give(struct chip_os_mutex * mu)
 {
-    if (!mu)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
+    int ret = (pthread_mutex_unlock(&mu->lock));
+    SuccessOrExit(ret);
 
-    if (pthread_mutex_unlock(&mu->lock))
-    {
-        return CHIP_OS_BAD_MUTEX;
-    }
-
-    return CHIP_OS_OK;
+exit:
+    return map_posix_to_osal_error(ret);
 }
 
-chip_os_error_t chip_os_mutex_take(struct chip_os_mutex * mu, uint32_t timeout)
+chip_os_error_t chip_os_mutex_take(struct chip_os_mutex * mu, chip_os_time_t timeout)
 {
-    int err;
+    int ret;
 
-    if (!mu)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
-
+#ifdef __APPLE__
+    ret = pthread_mutex_lock(&mu->lock);
+    SuccessOrExit(ret);
+#else
     if (timeout == CHIP_OS_TIME_FOREVER)
     {
-        err = pthread_mutex_lock(&mu->lock);
+        ret = pthread_mutex_lock(&mu->lock);
+        SuccessOrExit(ret);
     }
     else
     {
-        err = clock_gettime(CLOCK_REALTIME, &mu->wait);
-        if (err)
-        {
-            return CHIP_OS_ERROR;
-        }
+        ret = clock_gettime(CLOCK_REALTIME, &mu->wait);
+        SuccessOrExit(ret);
 
         mu->wait.tv_sec += timeout / 1000;
         mu->wait.tv_nsec += (timeout % 1000) * 1000000;
 
-        err = pthread_mutex_timedlock(&mu->lock, &mu->wait);
-        if (err == ETIMEDOUT)
-        {
-            return CHIP_OS_TIMEOUT;
-        }
+        ret = pthread_mutex_timedlock(&mu->lock, &mu->wait);
+        SuccessOrExit(ret);
     }
+#endif
 
-    return (err) ? CHIP_OS_ERROR : CHIP_OS_OK;
+exit:
+    return map_posix_to_osal_error(ret);
 }
