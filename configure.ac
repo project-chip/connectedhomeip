@@ -928,33 +928,21 @@ case "${with_device_layer}" in
 esp32)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=ESP32
-      CHIP_DEVICE_LAYER_TARGET_ESP32=1
-      CHIP_DEVICE_LAYER_TARGET_NRF5=0
-      CHIP_DEVICE_LAYER_TARGET_EFR32=0
       ;;
 
 nrf5)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=nRF5
-      CHIP_DEVICE_LAYER_TARGET_NRF5=1
-      CHIP_DEVICE_LAYER_TARGET_ESP32=0
-      CHIP_DEVICE_LAYER_TARGET_EFR32=0
       ;;
 
 efr32)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=EFR32
-      CHIP_DEVICE_LAYER_TARGET_EFR32=1
-      CHIP_DEVICE_LAYER_TARGET_NRF5=0
-      CHIP_DEVICE_LAYER_TARGET_ESP32=0
       ;;
 
 none)
       CONFIG_DEVICE_LAYER=0
       CHIP_DEVICE_LAYER_TARGET=NONE
-      CHIP_DEVICE_LAYER_TARGET_ESP32=0
-      CHIP_DEVICE_LAYER_TARGET_NRF5=0
-      CHIP_DEVICE_LAYER_TARGET_EFR32=0
       ;;
 
 esac
@@ -967,15 +955,15 @@ AC_SUBST(CHIP_DEVICE_LAYER_TARGET)
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET],[${CHIP_DEVICE_LAYER_TARGET}],[Target platform name for CHIP Device Layer.])
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_EFR32)
-AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_EFR32],    [test "${CHIP_DEVICE_LAYER_TARGET_EFR32}" = 1])
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_EFR32],    [test "${with_device_layer}" = "efr32"])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_EFR32],[${CHIP_DEVICE_LAYER_TARGET_EFR32}],[Define to 1 if you want to build the CHIP Device Layer for Silicon Labs EFR32 platforms.])
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_ESP32)
-AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_ESP32],    [test "${CHIP_DEVICE_LAYER_TARGET_ESP32}" = 1])
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_ESP32],    [test "${with_device_layer}" = "esp32"]])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_ESP32],[${CHIP_DEVICE_LAYER_TARGET_ESP32}],[Define to 1 if you want to build the CHIP Device Layer for the Espressif ESP32.])
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRF5)
-AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRF5],    [test "${CHIP_DEVICE_LAYER_TARGET_NRF5}" = 1])
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRF5],     [test "${with_device_layer}" = "nrf5"])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRF5],[${CHIP_DEVICE_LAYER_TARGET_NRF5}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF5* platforms.])
 
 if test "${CONFIG_DEVICE_LAYER}" = 1; then
@@ -2041,6 +2029,7 @@ AC_MSG_NOTICE([
   Target architecture                              : ${target_cpu}
   Target OS                                        : ${target_os}
   Target style                                     : ${CHIP_TARGET_STYLE}
+  Device layer                                     : ${CHIP_DEVICE_LAYER_TARGET}
   Cryptographic implementation                     : ${CHIP_CRYPTO}
   Target network layer                             : ${with_network_layer}
   Target network system(s)                         : ${CONFIG_TARGET_NETWORKS}
