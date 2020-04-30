@@ -32,9 +32,9 @@ AM_MAKEFLAGS                             = --no-print-directory
 
 SUBDIRS                                  = \
     examples                               \
-    third_party                            \
     src                                    \
     tests                                  \
+    third_party                            \
     $(NULL)
 
 PRETTY_SUBDIRS                           = \
@@ -42,7 +42,7 @@ PRETTY_SUBDIRS                           = \
     $(NULL)
 
 EXTRA_DIST                               = \
-    CODE_OF_CONDUCT.md                            \
+    CODE_OF_CONDUCT.md                     \
     CONTRIBUTING.md                        \
     Makefile-Android                       \
     Makefile-bootstrap                     \
