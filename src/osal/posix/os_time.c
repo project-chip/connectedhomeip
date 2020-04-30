@@ -21,6 +21,25 @@
 
 #include <chip/osal.h>
 
+#ifdef __APPLE__
+// OS X does not have clock_gettime, use clock_get_time
+
+#include <mach/clock.h>
+#include <mach/mach.h>
+
+chip_os_time_t chip_os_time_get(void)
+{
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    return mts.tv_sec * 1000.0 + mts.tv_nsec / 1000000.;
+}
+
+#else
+// True POSIX Implementation
+
 /**
  * Return ticks [ms] since system start as uint32_t.
  */
@@ -34,39 +53,14 @@ chip_os_time_t chip_os_time_get(void)
     return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
 }
 
-chip_os_error_t chip_os_time_ms_to_ticks(uint32_t ms, chip_os_time_t * out_ticks)
-{
-    *out_ticks = ms;
+#endif // __APPLE__
 
-    return CHIP_OS_OK;
+chip_os_time_t chip_os_time_ms_to_ticks(chip_os_time_t ms)
+{
+    return (ms * CHIP_OS_TICKS_PER_SEC) / 1000;
 }
 
-chip_os_error_t chip_os_time_ticks_to_ms(chip_os_time_t ticks, uint32_t * out_ms)
+chip_os_time_t chip_os_time_ticks_to_ms(chip_os_time_t ticks)
 {
-    *out_ms = ticks;
-
-    return CHIP_OS_OK;
-}
-
-chip_os_time_t chip_os_time_ms_to_ticks32(uint32_t ms)
-{
-    return ms;
-}
-
-uint32_t chip_os_time_ticks_to_ms32(chip_os_time_t ticks)
-{
-    return ticks;
-}
-
-void chip_os_time_delay(chip_os_time_t ticks)
-{
-    struct timespec sleep_time;
-    long ms    = chip_os_time_ticks_to_ms32(ticks);
-    uint32_t s = ms / 1000;
-
-    ms -= s * 1000;
-    sleep_time.tv_sec  = s;
-    sleep_time.tv_nsec = ms * 1000000;
-
-    nanosleep(&sleep_time, NULL);
+    return (ticks * 1000) / CHIP_OS_TICKS_PER_SEC;
 }

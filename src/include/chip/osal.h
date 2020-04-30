@@ -31,9 +31,9 @@
 extern "C" {
 #endif
 
-struct chip_os_timer;
 typedef void chip_os_timer_fn(void * arg);
 typedef void chip_os_signal_fn(void * arg);
+typedef void * (*chip_os_task_func_t)(void *);
 
 enum chip_os_error
 {
@@ -156,17 +156,6 @@ chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, chip_os_time_t timeou
  * @return N/A
  */
 chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem);
-
-/**
- * @brief Get a semaphore's count.
- *
- * This routine returns the current count of @a sem.
- *
- * @param sem Address of the semaphore.
- *
- * @return Current semaphore count.
- */
-uint16_t chip_os_sem_get_count(struct chip_os_sem * sem);
 
 /*
  * Message queue
@@ -306,6 +295,8 @@ void chip_os_timer_start_ticks(struct chip_os_timer * timer, chip_os_time_t tick
  */
 void chip_os_timer_stop(struct chip_os_timer * timer);
 
+int chip_os_timer_inited(struct chip_os_timer * timer);
+
 bool chip_os_timer_is_active(struct chip_os_timer * timer);
 
 chip_os_time_t chip_os_timer_get_ticks(struct chip_os_timer * timer);
@@ -330,25 +321,9 @@ void * chip_os_timer_arg_get(struct chip_os_timer * timer);
  */
 chip_os_time_t chip_os_time_get(void);
 
-chip_os_error_t chip_os_time_ms_to_ticks(uint32_t ms, chip_os_time_t * out_ticks);
+chip_os_time_t chip_os_time_ms_to_ticks(chip_os_time_t ms);
 
-chip_os_error_t chip_os_time_ticks_to_ms(chip_os_time_t ticks, uint32_t * out_ms);
-
-chip_os_time_t chip_os_time_ms_to_ticks32(uint32_t ms);
-
-uint32_t chip_os_time_ticks_to_ms32(chip_os_time_t ticks);
-
-/**
- * @brief Put the current thread to sleep.
- *
- * This routine puts the current thread to sleep for @a duration
- * [ticks].
- *
- * @param ticks Number of CPU ticks to sleep.
- *
- * @return N/A
- */
-void chip_os_time_delay(chip_os_time_t ticks);
+chip_os_time_t chip_os_time_ticks_to_ms(chip_os_time_t ticks);
 
 /*
  * Task functions
@@ -382,6 +357,18 @@ int chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_f
  * @return N/A
  */
 void chip_os_task_yield(void);
+
+/**
+ * @brief Put the current thread to sleep.
+ *
+ * This routine puts the current thread to sleep for @a duration
+ * [ticks].
+ *
+ * @param ticks Number of CPU ticks to sleep.
+ *
+ * @return N/A
+ */
+void chip_os_task_sleep(chip_os_time_t ticks);
 
 /**
  * @brief Get task ID of the current task.

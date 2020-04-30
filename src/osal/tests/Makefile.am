@@ -16,7 +16,7 @@
 
 #
 #    Description:
-#      This file is the GNU automake template for the Project CHIP Inet
+#      This file is the GNU automake template for the Project CHIP OSAL
 #      layer library unit tests.
 #
 
@@ -36,35 +36,46 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C preprocessor option flags that will apply to all compiled objects in this
-# makefile.
+# C/C++ preprocessor option flags that will apply to all compiled objects in
+# this makefile.
 
-AM_CPPFLAGS                                           = \
-    -I$(top_srcdir)/src/include                         \
-    -I$(top_srcdir)/src/osal/include                    \
-    -I$(top_srcdir)/src/osal/posix                      \
+AM_CPPFLAGS                                            = \
+    $(NLUNIT_TEST_CPPFLAGS)                              \
+    -I$(top_srcdir)/src/include                          \
+    -I$(top_srcdir)/src/osal/include                     \
+    -I$(top_srcdir)/src/osal/posix                       \
+    -I$(top_srcdir)/src/osal/test                        \
     $(NULL)
 
-CHIP_LDADD                                            = \
-    $(top_builddir)/src/osal/libChipOsal.a              \
+CHIP_LDADD                                             = \
+    $(top_builddir)/src/osal/libChipOsal.a               \
     $(NULL)
 
-COMMON_LDADD                                          = \
-    $(CHIP_LDADD)                                       \
-    -lrt                                                \
-    -lpthread                                           \
-    -lstdc++                                            \
+COMMON_LDADD                                           = \
+    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)           \
+    $(CHIP_LDADD)                                        \
+    -lrt                                                 \
+    -lpthread                                            \
+    -lstdc++                                             \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                        = \
+    $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+
+check_PROGRAMS                                       += \
     TestRing                                            \
-    TestOsSem                                           \
-    TestOsQueue                                         \
     TestOsTask                                          \
+    TestOsQueue                                         \
+    TestOsMutex                                         \
+    TestOsSem                                           \
     TestOsTimer                                         \
     $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
@@ -84,6 +95,9 @@ TESTS_ENVIRONMENT                                     = \
 TestRing_LDADD                                      = $(COMMON_LDADD)
 TestRing_SOURCES                                    = test_ring.cpp
 
+TestOsMutex_LDADD                                   = $(COMMON_LDADD)
+TestOsMutex_SOURCES                                 = test_os_mutex.c
+
 TestOsSem_LDADD                                     = $(COMMON_LDADD)
 TestOsSem_SOURCES                                   = test_os_sem.c
 
@@ -96,8 +110,19 @@ TestOsTask_SOURCES                                  = test_os_task.c
 TestOsTimer_LDADD                                   = $(COMMON_LDADD)
 TestOsTimer_SOURCES                                 = test_os_timer.c
 
-# Build any and all libraries that the tests depend on.
-$(check_PROGRAMS): $(CHIP_LDADD)
+#
+# Foreign make dependencies
+#
+
+NLFOREIGN_FILE_DEPENDENCIES                           = \
+   $(CHIP_LDADD)                                        \
+   $(NULL)
+   
+NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
+   $(NULL)
+
+$(check_PROGRAMS): $(NLFOREIGN_FILE_DEPENDENCIES)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                            = $(wildcard *.gcda *.gcno)

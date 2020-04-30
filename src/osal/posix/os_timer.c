@@ -21,6 +21,58 @@
 
 #include <chip/osal.h>
 
+#ifdef __APPLE__
+
+#define DEFAULT_TIMER_LEEWAY 100000 //< 100 [us]
+
+static void chip_os_timer_cb(void * arg)
+{
+    struct chip_os_timer * timer = (struct chip_os_timer *) arg;
+    assert(timer);
+
+    chip_os_timer_stop(timer);
+
+    timer->tm_cb(timer->tm_arg);
+}
+
+void chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn * tm_cb, void * tm_arg)
+{
+    dispatch_source_t dispatch = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
+    dispatch_source_set_event_handler_f(dispatch, chip_os_timer_cb);
+    dispatch_set_context(dispatch, timer);
+
+    /* Initialize the timer. */
+    memset(timer, 0, sizeof(*timer));
+    timer->tm_cb     = tm_cb;
+    timer->tm_arg    = tm_arg;
+    timer->tm_active = false;
+    timer->tm_timer  = dispatch;
+}
+
+void chip_os_timer_start_ticks(struct chip_os_timer * timer, chip_os_time_t ticks)
+{
+    dispatch_source_t dispatch = timer->tm_timer;
+
+    if (dispatch)
+    {
+        timer->tm_ticks = chip_os_time_get() + ticks;
+        dispatch_source_set_timer(dispatch, dispatch_time(DISPATCH_TIME_NOW, ticks), DISPATCH_TIME_FOREVER, DEFAULT_TIMER_LEEWAY);
+        dispatch_resume(dispatch);
+        timer->tm_active = true;
+    }
+}
+
+void chip_os_timer_stop(struct chip_os_timer * timer)
+{
+    if (chip_os_timer_inited(timer))
+    {
+        dispatch_source_cancel(timer->tm_timer);
+        timer->tm_active = false;
+    }
+}
+
+#else
+
 static void chip_os_timer_cb(union sigval sv)
 {
     struct chip_os_timer * timer = (struct chip_os_timer *) sv.sival_ptr;
@@ -34,7 +86,7 @@ void chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn * tm_cb, 
 {
     struct sigevent event;
 
-    /* Initialize the callout. */
+    /* Initialize the timer. */
     memset(timer, 0, sizeof(*timer));
     timer->tm_cb     = tm_cb;
     timer->tm_arg    = tm_arg;
@@ -46,18 +98,6 @@ void chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn * tm_cb, 
     event.sigev_notify_attributes = NULL;
 
     timer_create(CLOCK_REALTIME, &event, &timer->tm_timer);
-}
-
-bool chip_os_timer_is_active(struct chip_os_timer * timer)
-{
-    // TODO: seek native posix method to determine whether timer_t is active.
-    // TODO: fix bug where one-shot timer is still active after fired.
-    return timer->tm_active;
-}
-
-int chip_os_timer_inited(struct chip_os_timer * timer)
-{
-    return (timer->tm_timer != NULL);
 }
 
 void chip_os_timer_start_ticks(struct chip_os_timer * timer, chip_os_time_t ticks)
@@ -80,11 +120,6 @@ void chip_os_timer_start_ticks(struct chip_os_timer * timer, chip_os_time_t tick
     timer_settime(timer->tm_timer, 0, &its, NULL);
 }
 
-void chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t duration)
-{
-    chip_os_timer_start_ticks(timer, duration);
-}
-
 void chip_os_timer_stop(struct chip_os_timer * timer)
 {
     if (!chip_os_timer_inited(timer))
@@ -101,12 +136,24 @@ void chip_os_timer_stop(struct chip_os_timer * timer)
     timer->tm_active = false;
 }
 
-int chip_os_timer_queued(struct chip_os_timer * timer)
-{
-    struct itimerspec its;
-    timer_gettime(timer->tm_timer, &its);
+#endif // __APPLE__
 
-    return ((its.it_value.tv_sec > 0) || (its.it_value.tv_nsec > 0));
+void chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t duration)
+{
+    chip_os_time_t delta = chip_os_time_ms_to_ticks(duration);
+    chip_os_timer_start_ticks(timer, delta);
+}
+
+bool chip_os_timer_is_active(struct chip_os_timer * timer)
+{
+    // TODO: seek native posix method to determine whether timer_t is active.
+    // TODO: fix bug where one-shot timer is still active after fired.
+    return timer->tm_active;
+}
+
+int chip_os_timer_inited(struct chip_os_timer * timer)
+{
+    return (timer->tm_timer != NULL);
 }
 
 chip_os_time_t chip_os_timer_get_ticks(struct chip_os_timer * timer)
@@ -124,7 +171,29 @@ void chip_os_timer_arg_set(struct chip_os_timer * timer, void * arg)
     timer->tm_arg = arg;
 }
 
-uint32_t chip_os_timer_remaining_ticks(struct chip_os_timer * timer, chip_os_time_t now)
+#ifdef __APPLE__
+
+int chip_os_timer_queued(struct chip_os_timer * timer)
+{
+    return 0;
+}
+
+chip_os_time_t chip_os_timer_remaining_ticks(struct chip_os_timer * timer, chip_os_time_t now)
+{
+    return 0;
+}
+
+#else
+
+int chip_os_timer_queued(struct chip_os_timer * timer)
+{
+    struct itimerspec its;
+    timer_gettime(timer->tm_timer, &its);
+
+    return ((its.it_value.tv_sec > 0) || (its.it_value.tv_nsec > 0));
+}
+
+chip_os_time_t chip_os_timer_remaining_ticks(struct chip_os_timer * timer, chip_os_time_t now)
 {
     chip_os_time_t rt;
     uint32_t exp;
@@ -145,3 +214,4 @@ uint32_t chip_os_timer_remaining_ticks(struct chip_os_timer * timer, chip_os_tim
 
     return rt;
 }
+#endif // __APPLE__

@@ -21,7 +21,7 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-SUBDIRS                                             = $(NULL)
+SUBDIRS                                             = tests
 
 lib_LIBRARIES                                       = libChipOsal.a
 
@@ -42,8 +42,6 @@ libChipOsal_a_CPPFLAGS                              = \
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 
-SUBDIRS                                            += tests
-
 libChipOsal_a_CPPFLAGS                             += \
     -D_GNU_SOURCE                                     \
     -I$(top_srcdir)/src/osal/posix                    \
@@ -59,6 +57,7 @@ libChipOsal_a_SOURCES                              += \
     $(NULL)
 
 dist_libChipOsal_a_HEADERS                         += \
+    @top_builddir@/src/osal/posix/chip/os_time.h      \
     @top_builddir@/src/osal/posix/chip/os_types.h     \
     @top_builddir@/src/osal/posix/chip/os_port.h      \
     @top_builddir@/src/osal/posix/RingPthread.h       \

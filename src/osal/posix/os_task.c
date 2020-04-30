@@ -102,7 +102,20 @@ void * chip_os_get_current_task_id(void)
 
 void chip_os_task_yield(void)
 {
-    pthread_yield();
+    sched_yield();
+}
+
+void chip_os_task_sleep(chip_os_time_t ticks)
+{
+    struct timespec sleep_time;
+    long ms    = chip_os_time_ticks_to_ms(ticks);
+    uint32_t s = ms / 1000;
+
+    ms -= s * 1000;
+    sleep_time.tv_sec  = s;
+    sleep_time.tv_nsec = ms * 1000000;
+
+    nanosleep(&sleep_time, NULL);
 }
 
 bool chip_os_sched_started(void)
@@ -112,10 +125,15 @@ bool chip_os_sched_started(void)
 
 void chip_os_sched_start(void)
 {
+#ifdef __APPLE__
+    /* Start the main queue */
+    dispatch_main();
+#else
     while (true)
     {
-        pthread_yield();
+        chip_os_task_yield();
     }
+#endif // __APPLE__
 
     assert(true);
 }

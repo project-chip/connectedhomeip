@@ -24,42 +24,26 @@
 
 chip_os_error_t chip_os_mutex_init(struct chip_os_mutex * mu)
 {
-    if (!mu)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
-
+    chip_os_error_t err;
     pthread_mutexattr_init(&mu->attr);
-    pthread_mutexattr_settype(&mu->attr, PTHREAD_MUTEX_RECURSIVE_NP);
-    pthread_mutex_init(&mu->lock, &mu->attr);
-
-    return CHIP_OS_OK;
+    pthread_mutexattr_settype(&mu->attr, PTHREAD_MUTEX_RECURSIVE);
+    err = pthread_mutex_init(&mu->lock, &mu->attr);
+    return (err) ? CHIP_OS_BAD_MUTEX : CHIP_OS_OK;
 }
 
 chip_os_error_t chip_os_mutex_give(struct chip_os_mutex * mu)
 {
-    if (!mu)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
-
-    if (pthread_mutex_unlock(&mu->lock))
-    {
-        return CHIP_OS_BAD_MUTEX;
-    }
-
-    return CHIP_OS_OK;
+    chip_os_error_t err = (pthread_mutex_unlock(&mu->lock));
+    return (err) ? CHIP_OS_BAD_MUTEX : CHIP_OS_OK;
 }
 
-chip_os_error_t chip_os_mutex_take(struct chip_os_mutex * mu, uint32_t timeout)
+chip_os_error_t chip_os_mutex_take(struct chip_os_mutex * mu, chip_os_time_t timeout)
 {
     int err;
 
-    if (!mu)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
-
+#ifdef __APPLE__
+    err = pthread_mutex_lock(&mu->lock);
+#else
     if (timeout == CHIP_OS_TIME_FOREVER)
     {
         err = pthread_mutex_lock(&mu->lock);
@@ -81,6 +65,7 @@ chip_os_error_t chip_os_mutex_take(struct chip_os_mutex * mu, uint32_t timeout)
             return CHIP_OS_TIMEOUT;
         }
     }
+#endif
 
     return (err) ? CHIP_OS_ERROR : CHIP_OS_OK;
 }

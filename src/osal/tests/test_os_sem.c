@@ -23,7 +23,6 @@
   chip_os_error_t chip_os_sem_init(struct chip_os_sem *sem, uint16_t tokens);
   chip_os_error_t chip_os_sem_give(struct chip_os_sem *sem);
   chip_os_error_t chip_os_sem_take(struct chip_os_sem *sem, uint32_t timeout);
-  uint16_t chip_os_sem_get_count(struct chip_os_sem *sem);
 */
 
 #include <chip/osal.h>

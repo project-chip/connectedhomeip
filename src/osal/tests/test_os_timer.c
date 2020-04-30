@@ -41,7 +41,7 @@
 #define TEST_TASK_PRIO (1)
 #define TEST_STACK_SIZE (1024)
 
-#define TEST_TIMER_MARGIN (5)
+#define TEST_TIMER_MARGIN (10)
 #define TEST_TIMER1_DURATION (1000)
 
 static struct chip_os_task s_task1;
@@ -54,13 +54,15 @@ static void test_timer1_fired(void * arg)
 {
     struct chip_os_timer * t = (struct chip_os_timer *) arg;
     chip_os_time_t now       = chip_os_time_get();
-    chip_os_time_t delta     = now - s_timer1_start;
+    chip_os_stime_t delta    = now - s_timer1_start;
 
     TEST_LOG("test_timer fired delta=%d\n", delta);
     VerifyOrQuit((delta >= TEST_TIMER1_DURATION), "timer: duration too short");
     VerifyOrQuit((delta < (TEST_TIMER1_DURATION + TEST_TIMER_MARGIN)), "timer: duration too long");
     VerifyOrQuit(!chip_os_timer_is_active(t), "timer: fired, but still active");
     VerifyOrQuit(chip_os_timer_arg_get(t) == t, "timer: arg incorrect");
+
+    printf("All tests passed\n");
     exit(PASS);
 }
 
@@ -75,11 +77,11 @@ void test_timer1(struct chip_os_timer * t)
 void * task1_run(void * arg)
 {
     test_timer1(&s_timer1);
-    printf("All tests passed\n");
 
     /* Wait for timers to trigger exit. */
     while (1)
     {
+        chip_os_task_yield();
     }
 }
 

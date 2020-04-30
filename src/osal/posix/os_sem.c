@@ -17,46 +17,49 @@
  *    limitations under the License.
  */
 
+#include <time.h>
 #include <errno.h>
 #include <semaphore.h>
 
 #include <chip/osal.h>
 
+#ifdef __APPLE__
+
 chip_os_error_t chip_os_sem_init(struct chip_os_sem * sem, uint16_t tokens)
 {
-    if (!sem)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
-
-    sem_init(&sem->lock, 0, tokens);
-
+    sem->lock = dispatch_semaphore_create(tokens);
     return CHIP_OS_OK;
 }
 
 chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem)
 {
-    int err;
-
-    if (!sem)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
-
-    err = sem_post(&sem->lock);
-
-    return (err) ? CHIP_OS_ERROR : CHIP_OS_OK;
+    int woke = dispatch_semaphore_signal(sem->lock);
+    return CHIP_OS_OK;
 }
 
-chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, uint32_t timeout)
+chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, chip_os_time_t timeout)
 {
-    int err = 0;
-    struct timespec wait;
+    int expired = dispatch_semaphore_wait(sem->lock, timeout);
+    return (expired) ? CHIP_OS_TIMEOUT : CHIP_OS_OK;
+}
 
-    if (!sem)
-    {
-        return CHIP_OS_INVALID_PARAM;
-    }
+#else
+
+chip_os_error_t chip_os_sem_init(struct chip_os_sem * sem, uint16_t tokens)
+{
+    sem_init(&sem->lock, 0, tokens);
+    return CHIP_OS_OK;
+}
+
+chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem)
+{
+    return sem_post(&sem->lock) ? CHIP_OS_ERROR : CHIP_OS_OK;
+}
+
+chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, chip_os_time_t timeout)
+{
+    int err = CHIP_OS_OK;
+    struct timespec wait;
 
     if (timeout == CHIP_OS_TIME_FOREVER)
     {
@@ -72,7 +75,6 @@ chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, uint32_t timeout)
 
         wait.tv_sec += timeout / 1000;
         wait.tv_nsec += (timeout % 1000) * 1000000;
-
         err = sem_timedwait(&sem->lock, &wait);
         if (err && errno == ETIMEDOUT)
         {
@@ -83,13 +85,4 @@ chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, uint32_t timeout)
     return (err) ? CHIP_OS_ERROR : CHIP_OS_OK;
 }
 
-uint16_t chip_os_sem_get_count(struct chip_os_sem * sem)
-{
-    int count;
-
-    assert(sem);
-    assert(&sem->lock);
-    sem_getvalue(&sem->lock, &count);
-
-    return count;
-}
+#endif // __APPLE__

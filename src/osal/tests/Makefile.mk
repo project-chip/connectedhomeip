@@ -19,6 +19,14 @@
 
 PROJ_ROOT = ../../..
 
+### ===== Host System Variants =====
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+endif
+ifeq ($(UNAME_S),Darwin)
+endif
+
 ### ===== Toolchain =====
 
 CROSS_COMPILE ?=
@@ -49,7 +57,10 @@ CFLAGS =                    \
     -O0                     \
     $(NULL)
 
-LIBS = -lrt -lpthread -lstdc++
+LIBS = -lpthread -lstdc++
+ifeq ($(UNAME_S),Linux)
+LIBS += -lrt
+endif
 
 LDFLAGS =
 
@@ -78,6 +89,7 @@ TEST_OBJS += $(patsubst %.cpp,%.o,$(filter %.cpp, $(SRCS)))
 all: depend                  \
      test_os_task.exe        \
      test_os_queue.exe       \
+     test_os_mutex.exe       \
      test_os_sem.exe         \
      test_os_timer.exe       \
      test_ring.exe           \
@@ -87,6 +99,9 @@ test_os_task.exe: test_os_task.o $(OBJS)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 test_os_queue.exe: test_os_queue.o $(OBJS)
+	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
+
+test_os_mutex.exe: test_os_mutex.o $(OBJS)
 	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 test_os_sem.exe: test_os_sem.o $(OBJS)
@@ -101,6 +116,7 @@ test_ring.exe: test_ring.o $(OBJS)
 test: all
 	./test_os_task.exe
 	./test_os_queue.exe
+	./test_os_mutex.exe
 	./test_os_sem.exe
 	./test_os_timer.exe
 	./test_ring.exe

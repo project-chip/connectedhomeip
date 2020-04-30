@@ -24,30 +24,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "os_time.h"
 #include "os_types.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define CHIP_OS_OS_ALIGNMENT 4
-
-#define CHIP_OS_TIME_FOREVER INT32_MAX
-#define CHIP_OS_TIME_NO_WAIT 0
-
-#define SYSINIT_PANIC_MSG(msg) __assert_fail(msg, __FILE__, __LINE__, __func__)
-
-#define SYSINIT_PANIC_ASSERT_MSG(rc, msg)                                                                                          \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if (!(rc))                                                                                                                 \
-        {                                                                                                                          \
-            SYSINIT_PANIC_MSG(msg);                                                                                                \
-        }                                                                                                                          \
-    } while (0)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* CHIP_OS_PORT_H */
