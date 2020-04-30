@@ -1,5 +1,5 @@
 //
-//  CHPSetupPayloadParserTests.m
+//  CHIPSetupPayloadParserTests.m
 //  CHIPQRCodeReaderTests
 /**
 *
@@ -19,19 +19,19 @@
 */
 
 #import <XCTest/XCTest.h>
-#import "CHPManualSetupPayloadParser.h"
-#import "CHPQRCodeSetupPayloadParser.h"
+#import "CHIPManualSetupPayloadParser.h"
+#import "CHIPQRCodeSetupPayloadParser.h"
 
-@interface CHPSetupPayloadParserTests : XCTestCase
+@interface CHIPSetupPayloadParserTests : XCTestCase
 
 @end
 
-@implementation CHPSetupPayloadParserTests
+@implementation CHIPSetupPayloadParserTests
 
 - (void)testManualParser {
     NSError *error;
-    CHPManualSetupPayloadParser *parser = [[CHPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"34896656190000100001"];
-    CHPSetupPayload *payload = [parser populatePayload:&error];
+    CHIPManualSetupPayloadParser *parser = [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"34896656190000100001"];
+    CHIPSetupPayload *payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -47,26 +47,26 @@
 
 - (void)testManualParser_Error {
     NSError *error;
-    CHPManualSetupPayloadParser *parser = [[CHPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@""];
-    CHPSetupPayload *payload = [parser populatePayload:&error];
+    CHIPManualSetupPayloadParser *parser = [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@""];
+    CHIPSetupPayload *payload = [parser populatePayload:&error];
 
     XCTAssertNil(payload);
-    XCTAssertEqual(error.code, CHPErrorCodeInvalidStringLength);
+    XCTAssertEqual(error.code, CHIPErrorCodeInvalidStringLength);
 }
 
 - (void)testQRCodeParser_Error {
     NSError *error;
-    CHPManualSetupPayloadParser *parser = [[CHPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"B20800G.0G8G000"];
-    CHPSetupPayload *payload = [parser populatePayload:&error];
+    CHIPManualSetupPayloadParser *parser = [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"B20800G.0G8G000"];
+    CHIPSetupPayload *payload = [parser populatePayload:&error];
 
     XCTAssertNil(payload);
-    XCTAssertEqual(error.code, CHPErrorCodeInvalidIntegerValue);
+    XCTAssertEqual(error.code, CHIPErrorCodeInvalidIntegerValue);
 }
 
 - (void)testQRCodeParser {
     NSError *error;
-    CHPQRCodeSetupPayloadParser *parser = [[CHPQRCodeSetupPayloadParser alloc] initWithBase45Representation:@"B20800G00G8G000"];
-    CHPSetupPayload *payload = [parser populatePayload:&error];
+    CHIPQRCodeSetupPayloadParser *parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase45Representation:@"B20800G00G8G000"];
+    CHIPSetupPayload *payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);

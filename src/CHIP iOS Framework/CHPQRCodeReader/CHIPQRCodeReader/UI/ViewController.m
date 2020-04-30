@@ -19,8 +19,7 @@
 */
 
 #import "ViewController.h"
-#import <CHP/CHPQRCodeSetupPayloadParser.h>
-#import <CHP/CHPManualSetupPayloadParser.h>
+#import <CHIP/CHIP.h>
 #import <AVFoundation/AVFoundation.h>
 
 #define INDICATOR_DELAY 0.5 * NSEC_PER_SEC
@@ -127,7 +126,7 @@
     });
 }
 
-- (void)showPayload:(CHPSetupPayload *)payload
+- (void)showPayload:(CHIPSetupPayload *)payload
       decimalString:(nullable NSString *)decimalString
 {
     [self->_activityIndicator stopAnimating];
@@ -196,7 +195,7 @@
 }
 
 
-- (void)displayQRCodeInSetupPayloadView:(CHPSetupPayload *)payload withError:(NSError *)error
+- (void)displayQRCodeInSetupPayloadView:(CHIPSetupPayload *)payload withError:(NSError *)error
 {
     if (error) {
         [self showError:error];
@@ -210,9 +209,9 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_captureSession stopRunning];
     });
-    CHPQRCodeSetupPayloadParser *parser = [[CHPQRCodeSetupPayloadParser alloc] initWithBase45Representation:qrCode];
+    CHIPQRCodeSetupPayloadParser *parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase45Representation:qrCode];
     NSError *error;
-    CHPSetupPayload *payload = [parser populatePayload:&error];
+    CHIPSetupPayload *payload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self postScanningQRCodeState];
         
@@ -234,7 +233,7 @@
 }
 
 // MARK: Manual Code
-- (void)displayManualCodeInSetupPayloadView:(CHPSetupPayload *)payload
+- (void)displayManualCodeInSetupPayloadView:(CHIPSetupPayload *)payload
                               decimalString:(NSString *)decimalString
                                   withError:(NSError *)error
 {
@@ -265,9 +264,9 @@
     NSString *decimalString = _manualCodeTextField.text;
     [self manualCodeEnteredStartState];
 
-    CHPManualSetupPayloadParser *parser = [[CHPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
+    CHIPManualSetupPayloadParser *parser = [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError *error;
-    CHPSetupPayload *payload = [parser populatePayload:&error];
+    CHIPSetupPayload *payload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
         [self displayManualCodeInSetupPayloadView:payload decimalString:decimalString withError:error];
     });

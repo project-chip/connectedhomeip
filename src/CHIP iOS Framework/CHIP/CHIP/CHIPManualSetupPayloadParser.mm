@@ -1,5 +1,5 @@
 //
-//  CHPManualSetupPayloadParser.m
+//  CHIPManualSetupPayloadParser.m
 //  CHIPQRCodeReader
 /**
 *
@@ -18,12 +18,12 @@
 *    limitations under the License.
 */
 
-#import "CHPManualSetupPayloadParser.h"
+#import "CHIPManualSetupPayloadParser.h"
 
 #import <setup_payload/ManualSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
 
-@implementation CHPManualSetupPayloadParser {
+@implementation CHIPManualSetupPayloadParser {
     NSString *_decimalStringRepresentation;
     chip::ManualSetupPayloadParser *_chipManualSetupPayloadParser;
 }
@@ -37,16 +37,16 @@
     return self;
 }
 
-- (CHPSetupPayload *)populatePayload:(NSError *__autoreleasing *)error
+- (CHIPSetupPayload *)populatePayload:(NSError *__autoreleasing *)error
 {
     chip::SetupPayload cPlusPluspayload;
     CHIP_ERROR chipError = _chipManualSetupPayloadParser->populatePayload(cPlusPluspayload);
 
-    CHPSetupPayload *payload;
+    CHIPSetupPayload *payload;
     if (chipError == 0) {
-        payload = [[CHPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
+        payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
     } else if (error) {
-        *error = [CHPError errorForCHIPErrorCode:chipError];
+        *error = [CHIPError errorForCHIPErrorCode:chipError];
     }
     
     return payload;

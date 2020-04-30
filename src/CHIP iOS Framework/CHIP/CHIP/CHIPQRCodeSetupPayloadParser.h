@@ -1,5 +1,5 @@
 //
-//  CHPSetupPayload.h
+//  CHIPQRCodeSetupPayloadParser.h
 //  CHIPQRCodeReader
 /**
 *
@@ -17,29 +17,14 @@
 *    See the License for the specific language governing permissions and
 *    limitations under the License.
 */
-
 #import <Foundation/Foundation.h>
-
-#ifdef __cplusplus
-#import <setup_payload/SetupPayload.h>
-#endif
+#import "CHIPSetupPayload.h"
+#import "CHIPError.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHPSetupPayload : NSObject
-
-@property (nonatomic, strong) NSNumber          *version;
-@property (nonatomic, strong) NSNumber          *vendorID;
-@property (nonatomic, strong) NSNumber          *productID;
-@property (nonatomic, assign) BOOL              requiresCustomFlow;
-@property (nonatomic, strong) NSNumber          *rendezvousInformation;
-@property (nonatomic, strong) NSNumber          *discriminator;
-@property (nonatomic, strong) NSNumber          *setUpPINCode;
-
-#ifdef __cplusplus
-- (id)initWithSetupPayload:(chip::SetupPayload)setupPayload;
-#endif
-
+@interface CHIPQRCodeSetupPayloadParser : NSObject
+- (id)initWithBase45Representation:(NSString *)base45Representation;
+- (CHIPSetupPayload *)populatePayload:(NSError *__autoreleasing *)error;
 @end
-
-NS_ASSUME_NONNULL_END
+;NS_ASSUME_NONNULL_END

@@ -70,9 +70,8 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eNw-2a-OUY">
-                                <rect key="frame" x="339.66666666666669" y="66" width="53" height="23"/>
+                                <rect key="frame" x="338" y="66" width="56" height="23"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="53" id="lx7-oP-wIc"/>
                                     <constraint firstAttribute="height" constant="23" id="xVp-Aa-IeI"/>
                                 </constraints>
                                 <state key="normal" title="Cancel">

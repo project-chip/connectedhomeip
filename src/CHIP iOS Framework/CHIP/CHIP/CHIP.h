@@ -1,7 +1,6 @@
 //
-//  CHPError.h
-//  CHIPQRCodeReader
-//
+//  CHIP.h
+//  CHIP
 /**
 *
 *    Copyright (c) 2020 Project CHIP Authors
@@ -20,20 +19,16 @@
 */
 
 #import <Foundation/Foundation.h>
+#import "CHIPSetupPayload.h"
+#import "CHIPQRCodeSetupPayloadParser.h"
+#import "CHIPManualSetupPayloadParser.h"
+#import "CHIPError.h"
+//! Project version number for CHIP.
+FOUNDATION_EXPORT double CHIPVersionNumber;
 
-NS_ASSUME_NONNULL_BEGIN
-FOUNDATION_EXPORT NSErrorDomain const CHPErrorDomain;
+//! Project version string for CHIP.
+FOUNDATION_EXPORT const unsigned char CHIPVersionString[];
 
-typedef NS_ERROR_ENUM(CHPErrorDomain, CHPErrorCode) {
-    CHPErrorCodeUndefinedError = 0,
-    CHPErrorCodeInvalidStringLength = 1,
-    CHPErrorCodeInvalidIntegerValue = 2,
-    CHPErrorCodeInvalidArgument = 3,
-    CHPErrorCodeInvalidMessageLength = 4,
-};
+// In this header, you should import all the public headers of your framework using statements like #import <CHIP/PublicHeader.h>
 
-@interface CHPError : NSObject
-+ (nullable NSError *)errorForCHIPErrorCode:(int32_t)errorCode;
-@end
 
-NS_ASSUME_NONNULL_END

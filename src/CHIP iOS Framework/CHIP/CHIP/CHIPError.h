@@ -1,6 +1,7 @@
 //
-//  CHPQRCodeSetupPayloadParser.h
+//  CHIPError.h
 //  CHIPQRCodeReader
+//
 /**
 *
 *    Copyright (c) 2020 Project CHIP Authors
@@ -17,14 +18,22 @@
 *    See the License for the specific language governing permissions and
 *    limitations under the License.
 */
+
 #import <Foundation/Foundation.h>
-#import "CHPSetupPayload.h"
-#import "CHPError.h"
 
 NS_ASSUME_NONNULL_BEGIN
+FOUNDATION_EXPORT NSErrorDomain const CHIPErrorDomain;
 
-@interface CHPQRCodeSetupPayloadParser : NSObject
-- (id)initWithBase45Representation:(NSString *)base45Representation;
-- (CHPSetupPayload *)populatePayload:(NSError *__autoreleasing *)error;
+typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
+    CHIPErrorCodeUndefinedError = 0,
+    CHIPErrorCodeInvalidStringLength = 1,
+    CHIPErrorCodeInvalidIntegerValue = 2,
+    CHIPErrorCodeInvalidArgument = 3,
+    CHIPErrorCodeInvalidMessageLength = 4,
+};
+
+@interface CHIPError : NSObject
++ (nullable NSError *)errorForCHIPErrorCode:(int32_t)errorCode;
 @end
-;NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_END

@@ -1,5 +1,5 @@
 //
-//  CHPQRCodeSetupPayloadParser.m
+//  CHIPQRCodeSetupPayloadParser.m
 //  CHIPQRCodeReader
 /**
 *
@@ -18,13 +18,13 @@
 *    limitations under the License.
 */
 
-#import "CHPQRCodeSetupPayloadParser.h"
-#import "CHPError.h"
+#import "CHIPQRCodeSetupPayloadParser.h"
+#import "CHIPError.h"
 
 #import <setup_payload/QRCodeSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
 
-@implementation CHPQRCodeSetupPayloadParser {
+@implementation CHIPQRCodeSetupPayloadParser {
     NSString *_base45Representation;
     chip::QRCodeSetupPayloadParser *_chipQRCodeSetupPayloadParser;
 }
@@ -38,16 +38,16 @@
     return self;
 }
 
-- (CHPSetupPayload *)populatePayload:(NSError *__autoreleasing *)error
+- (CHIPSetupPayload *)populatePayload:(NSError *__autoreleasing *)error
 {
     chip::SetupPayload cPlusPluspayload;
     CHIP_ERROR chipError = _chipQRCodeSetupPayloadParser->populatePayload(cPlusPluspayload);
 
-    CHPSetupPayload *payload;
+    CHIPSetupPayload *payload;
     if (chipError == 0) {
-        payload = [[CHPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
+        payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
     } else if (error) {
-         *error = [CHPError errorForCHIPErrorCode:chipError];
+         *error = [CHIPError errorForCHIPErrorCode:chipError];
     }
     return payload;
 }
