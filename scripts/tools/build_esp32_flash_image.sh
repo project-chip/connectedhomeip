@@ -22,8 +22,8 @@
 #
 
 [[ $# -eq 2 ]] || {
-    echo "Usage: $0 <app-image.bin> <output-flash-image.bin>"
-    exit 1
+  echo "Usage: $0 <app-image.bin> <output-flash-image.bin>"
+  exit 1
 }
 
 here=$(cd "$(dirname "$0")" && pwd)
