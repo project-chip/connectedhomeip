@@ -280,18 +280,18 @@ int testQRCodeToPayloadGeneration()
 int testExtractPayload()
 {
     int surprises = 0;
-    surprises += EXPECT_EQ(extractPayload(string("CH:ABC")),string("ABC"));
-    surprises += EXPECT_EQ(extractPayload(string("CH:")),string(""));
-    surprises += EXPECT_EQ(extractPayload(string("H:")),string(""));
-    surprises += EXPECT_EQ(extractPayload(string("ASCH:")),string(""));
-    surprises += EXPECT_EQ(extractPayload(string("Z%CH:ABC%")),string("ABC"));
-    surprises += EXPECT_EQ(extractPayload(string("Z%CH:ABC")),string("ABC"));
-    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC")),string("ABC"));
-    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC%")),string("ABC"));
-    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC%DDD")),string("ABC"));
-    surprises += EXPECT_EQ(extractPayload(string("CH:ABC%DDD")),string("ABC"));
-    surprises += EXPECT_EQ(extractPayload(string("CH:ABC%")),string("ABC"));
-    
+    surprises += EXPECT_EQ(extractPayload(string("CH:ABC")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("CH:")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("H:")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("ASCH:")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("Z%CH:ABC%")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("Z%CH:ABC")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC%")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC%DDD")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("CH:ABC%DDD")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("CH:ABC%")), string("ABC"));
+
     return surprises;
 }
 

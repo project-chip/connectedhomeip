@@ -75,21 +75,24 @@ static string extractPayload(string inString)
     for (size_t i = 0; i < delimiterIndices.size(); i++)
     {
         size_t startIndex = delimiterIndices[i] + 1;
-        size_t endIndex = (i == delimiterIndices.size() - 1 ? string::npos : delimiterIndices[i + 1]);
-        size_t length = (endIndex != string::npos ? endIndex - startIndex : string::npos);
-        string segment = inString.substr(startIndex, length);
-        
+        size_t endIndex   = (i == delimiterIndices.size() - 1 ? string::npos : delimiterIndices[i + 1]);
+        size_t length     = (endIndex != string::npos ? endIndex - startIndex : string::npos);
+        string segment    = inString.substr(startIndex, length);
+
         // Find a segment that starts with kQRCodePrefix
-        if (segment.find(kQRCodePrefix, 0) == 0 && segment.length() > strlen(kQRCodePrefix)) {
+        if (segment.find(kQRCodePrefix, 0) == 0 && segment.length() > strlen(kQRCodePrefix))
+        {
             chipSegment = segment;
             break;
         }
     }
-    
-    if (chipSegment.length() > 0) {
+
+    if (chipSegment.length() > 0)
+    {
         return chipSegment.substr(strlen(kQRCodePrefix)); // strip out prefix before returning
     }
-    else {
+    else
+    {
         return chipSegment;
     }
 }
@@ -99,7 +102,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     vector<uint8_t> buf = vector<uint8_t>();
 
     string payload = extractPayload(mBase41Representation);
-    if (payload.length() == 0 )
+    if (payload.length() == 0)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
