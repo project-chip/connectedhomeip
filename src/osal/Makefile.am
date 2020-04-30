@@ -25,6 +25,8 @@ SUBDIRS                                             = $(NULL)
 
 lib_LIBRARIES                                       = libChipOsal.a
 
+libChipOsal_a_SOURCES                               = $(NULL)
+
 libChipOsal_adir                                    = $(includedir)/osal
 
 dist_libChipOsal_a_HEADERS                          = \
@@ -38,7 +40,7 @@ libChipOsal_a_CPPFLAGS                              = \
     -I$(top_srcdir)/src/osal/include                  \
     $(NULL)
 
-libChipOsal_a_SOURCES                              = $(NULL)
+if CHIP_DEVICE_LAYER_TARGET_LINUX
 
 SUBDIRS                                            += tests
 
@@ -61,5 +63,7 @@ dist_libChipOsal_a_HEADERS                         += \
     @top_builddir@/src/osal/posix/chip/os_port.h      \
     @top_builddir@/src/osal/posix/RingPthread.h       \
     $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

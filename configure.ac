@@ -902,9 +902,12 @@ AC_DEFINE_UNQUOTED([CONFIG_NETWORK_LAYER_INET],[${CONFIG_NETWORK_LAYER_INET}],[D
 AC_MSG_CHECKING([device layer])
 AC_ARG_WITH(device-layer,
     [AS_HELP_STRING([--with-device-layer=LAYER],
-        [Specify the target environment for the CHIP Device Layer.  Choose one of: efr32, esp32, nrf5, or none @<:@default=none@:>@.])],
+        [Specify the target environment for the CHIP Device Layer.  Choose one of: efr32, esp32, nrf5, linux, or none @<:@default=none@:>@.])],
     [
         case "${with_device_layer}" in
+
+        linux|none)
+            ;;
 
         esp32|none)
             ;;
@@ -925,12 +928,22 @@ AC_ARG_WITH(device-layer,
 AC_MSG_RESULT(${with_device_layer})
 
 case "${with_device_layer}" in
+linux)
+      CONFIG_DEVICE_LAYER=0
+      CHIP_DEVICE_LAYER_TARGET=Linux
+      CHIP_DEVICE_LAYER_TARGET_LINUX=1
+      CHIP_DEVICE_LAYER_TARGET_ESP32=0
+      CHIP_DEVICE_LAYER_TARGET_NRF5=0
+      CHIP_DEVICE_LAYER_TARGET_EFR32=0
+      ;;
+
 esp32)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=ESP32
       CHIP_DEVICE_LAYER_TARGET_ESP32=1
       CHIP_DEVICE_LAYER_TARGET_NRF5=0
       CHIP_DEVICE_LAYER_TARGET_EFR32=0
+      CHIP_DEVICE_LAYER_TARGET_LINUX=0
       ;;
 
 nrf5)
@@ -939,6 +952,7 @@ nrf5)
       CHIP_DEVICE_LAYER_TARGET_NRF5=1
       CHIP_DEVICE_LAYER_TARGET_ESP32=0
       CHIP_DEVICE_LAYER_TARGET_EFR32=0
+      CHIP_DEVICE_LAYER_TARGET_LINUX=0
       ;;
 
 efr32)
@@ -947,6 +961,7 @@ efr32)
       CHIP_DEVICE_LAYER_TARGET_EFR32=1
       CHIP_DEVICE_LAYER_TARGET_NRF5=0
       CHIP_DEVICE_LAYER_TARGET_ESP32=0
+      CHIP_DEVICE_LAYER_TARGET_LINUX=0
       ;;
 
 none)
@@ -955,6 +970,7 @@ none)
       CHIP_DEVICE_LAYER_TARGET_ESP32=0
       CHIP_DEVICE_LAYER_TARGET_NRF5=0
       CHIP_DEVICE_LAYER_TARGET_EFR32=0
+      CHIP_DEVICE_LAYER_TARGET_LINUX=0
       ;;
 
 esac
@@ -977,6 +993,10 @@ AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_ESP32],[${CHIP_DEVICE_LAYER_TARGET_
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRF5)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRF5],    [test "${CHIP_DEVICE_LAYER_TARGET_NRF5}" = 1])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRF5],[${CHIP_DEVICE_LAYER_TARGET_NRF5}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF5* platforms.])
+
+AC_SUBST(CHIP_DEVICE_LAYER_TARGET_LINUX)
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_LINUX],    [test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_LINUX],[${CHIP_DEVICE_LAYER_TARGET_LINUX}],[Define to 1 if you want to build the CHIP Device Layer for Linux platforms.])
 
 if test "${CONFIG_DEVICE_LAYER}" = 1; then
     AC_DEFINE_UNQUOTED([BLE_PLATFORM_CONFIG_INCLUDE],
@@ -2043,6 +2063,7 @@ AC_MSG_NOTICE([
   Target architecture                              : ${target_cpu}
   Target OS                                        : ${target_os}
   Target style                                     : ${CHIP_TARGET_STYLE}
+  Device layer                                     : ${CHIP_DEVICE_LAYER_TARGET}
   Cryptographic implementation                     : ${CHIP_CRYPTO}
   Target network layer                             : ${with_network_layer}
   Target network system(s)                         : ${CONFIG_TARGET_NETWORKS}
