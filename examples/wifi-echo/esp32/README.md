@@ -75,8 +75,8 @@ There are two ways to use the Echo Server running on the device.
 
 ### Connect the ESP32 to a 2.4GHz Network of your choice
 
-1.  To connect the device to your network all you need to do is give it the
-    credentials to your network via the `menuconfig` target.
+1.  To connect the device to your network, give it the network details via the
+    `menuconfig` target.
 
                 $ idf make menuconfig
 
