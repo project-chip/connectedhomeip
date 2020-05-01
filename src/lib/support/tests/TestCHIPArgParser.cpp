@@ -692,26 +692,6 @@ static void HandleArgError(const char * msg, ...)
     sCallbackRecordCount++;
 }
 
-/*
- * Mock interface to avoid an unnecessary circular dependency on the
- * Inet layer library imposed by the argument parsing facility.
- *
- */
-namespace chip {
-
-namespace Inet {
-
-class IPAddress;
-
-bool IPAddress::FromString(char const * aString, IPAddress & aAddress)
-{
-    return (false);
-}
-
-}; // namespace Inet
-
-}; // namespace chip
-
 int main(int argc, char * argv[])
 {
     SimpleParseTest_SingleLongOption();

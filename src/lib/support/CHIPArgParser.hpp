@@ -127,7 +127,6 @@ extern bool ParseInt(const char * str, uint64_t & output);
 extern bool ParseInt(const char * str, int32_t & output, int base);
 extern bool ParseInt(const char * str, uint32_t & output, int base);
 extern bool ParseInt(const char * str, uint64_t & output, int base);
-extern bool ParseIPAddress(const char * str, chip::Inet::IPAddress & output);
 extern bool ParseNodeId(const char * str, uint64_t & nodeId);
 extern bool ParseFabricId(const char * str, uint64_t & fabricId, bool allowReserved = false);
 extern bool ParseSubnetId(const char * str, uint16_t & subnetId);

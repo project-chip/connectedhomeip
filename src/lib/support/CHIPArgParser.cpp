@@ -59,7 +59,6 @@ namespace chip {
 namespace ArgParser {
 
 using namespace chip;
-using namespace chip::Inet;
 
 static char * MakeShortOptions(OptionSet ** optSets);
 static struct option * MakeLongOptions(OptionSet ** optSets);
@@ -882,24 +881,9 @@ bool ParseInt(const char * str, uint8_t & output)
     return false;
 }
 
-/**
- * Parse an IP address in text form.
- *
- * @param[in]  str    A pointer to a NULL-terminated C string containing
- *                    the address to parse.
- * @param[out] output A reference to an IPAddress object in which the parsed
- *                    value will be stored on success.
- *
- * @return true if the value was successfully parsed; false if not.
- */
-bool ParseIPAddress(const char * str, IPAddress & output)
-{
-    return IPAddress::FromString(str, output);
-}
-
 #if CHIP_ARG_PARSER_PARSE_NODE_ID
 /**
- * Parse a Weave node id in text form.
+ * Parse a CHIP node id in text form.
  *
  * @param[in]  str    A pointer to a NULL-terminated C string containing
  *                    the node id to parse.
@@ -931,7 +915,7 @@ bool ParseNodeId(const char * str, uint64_t & nodeId)
 
 #if CHIP_ARG_PARSER_PARSE_FABRIC_ID
 /**
- * Parse a Weave fabric id in text form.
+ * Parse a CHIP fabric id in text form.
  *
  * @param[in]  str              A pointer to a NULL-terminated C string containing
  *                              the fabric id to parse.
