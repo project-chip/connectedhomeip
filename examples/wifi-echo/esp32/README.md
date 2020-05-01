@@ -71,7 +71,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 ## Using the Echo Server
 
-There are two ways to use the Echo Server running on the deivce.
+There are two ways to use the Echo Server running on the device.
 
 ### Connect the ESP32 to a 2.4GHz Network of your choice
 
