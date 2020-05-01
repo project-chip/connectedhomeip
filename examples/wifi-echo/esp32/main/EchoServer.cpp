@@ -64,7 +64,7 @@ static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, cons
                  packet_info->DestPort, static_cast<size_t>(data_len));
 
         // attempt to print the incoming message
-        char msg_buffer[data_len];
+        char msg_buffer[data_len + 1];
         msg_buffer[data_len] = 0; // Null-terminate whatever we received and treat like a string...
         memcpy(msg_buffer, buffer->Start(), data_len);
         ESP_LOGI(TAG, "Client sent: \"%s\"", msg_buffer);
