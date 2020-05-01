@@ -101,7 +101,7 @@ There are two ways to use the Echo Server running on the device.
 
                 $ echo "Hello over IP" | nc -w1 -u 192.168.4.1 8000
 
-Note: The ESP32 does not support 5GHz networks. Also, the Device will presist
+Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
 
                 $ idf make erase_flash ESPPORT=/dev/tty.SLAB_USBtoUART
