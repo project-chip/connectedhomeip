@@ -35,13 +35,6 @@ menu "WiFi Echo Demo"
             bool "M5Stack"
     endchoice
 
-    config USE_ECHO_CLIENT
-        bool "Enable the built-in Echo Client"
-        default "y"
-        help
-            This enables a local FreeRTOS Echo Client so that the end-to-end echo server can be
-            tested easily
-
     config ECHO_PORT
         int "Port"
         range 0 65535
@@ -49,10 +42,17 @@ menu "WiFi Echo Demo"
         help
             Local port the example server will listen on.
 
+    config USE_ECHO_CLIENT
+        bool "Enable the built-in Echo Client"
+        default "y"
+        help
+            This enables a local FreeRTOS Echo Client so that the end-to-end echo server can be
+            tested easily
+
     config ECHO_HOST_IP
     string "IPV4 address"
     default "127.0.0.1"
+    depends on USE_ECHO_CLIENT
     help
         The IPV4 Address of the ECHO Server.
-
 endmenu
