@@ -90,7 +90,7 @@ There are two ways to use the Echo Server running on the deivce.
                 $ idf make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
 4.  The device should boot up and connect to your network. When that happens you
-    will see a long like this in the monitor.
+    will see a log like this in the monitor.
 
                 I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
                 I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
