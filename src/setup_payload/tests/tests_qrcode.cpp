@@ -291,6 +291,12 @@ int testExtractPayload()
     surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC%DDD")), string("ABC"));
     surprises += EXPECT_EQ(extractPayload(string("CH:ABC%DDD")), string("ABC"));
     surprises += EXPECT_EQ(extractPayload(string("CH:ABC%")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("%CH:")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("%CH:%")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("A%")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("CH:%")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("%CH:ABC")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("ABC")), string(""));
 
     return surprises;
 }
