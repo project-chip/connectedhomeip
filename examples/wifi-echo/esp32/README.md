@@ -63,7 +63,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     press and hold the `boot` button on the device while it's trying to connect
     before flashing.
 
-          $  make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
@@ -71,15 +71,54 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 ## Using the Echo Server
 
-After the application has been flashed, connect the ESP32's Soft-AP. It's
-usually something like `CHIP_DEMO-XXXX` where the last 4 digits are from the
-device's MAC address.
+There are two ways to use the Echo Server running on the deivce.
 
-Once you're connected, the server's IP can be found at the gateway address and
-at the listed port number(Default: `8000`).
+### Connect the ESP32 to a 2.4GHz Network of your choice
 
-Then running the following command will ping the ESP32 and cause it to echo. If
-necessary replace the `192.168.4.1` with the address printed by the device in
-the monitor.
+1.  To connect the device to your network all you need to do is give it the
+    credentials to your network via the `menuconfig` target.
 
-          $ echo "Hello over IP" | nc -w1 -u 192.168.4.1 8000
+                $ idf make menuconfig
+
+2.  While in the configurator, navigate to
+    `Component Config`->`CHIP Device Layer`->`WiFi Station Options` and fill out
+    the WiFi SSID and Password.
+
+3.  Now flash the device with the same command as before. (Use the right `/dev`
+    device)
+
+                $ idf make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
+
+4.  The device should boot up and connect to your network. When that happens you
+    will see a long like this in the monitor.
+
+                I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
+                I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
+
+5.  Then running the following command will ping the ESP32 and cause it to echo.
+    If necessary replace the `<IP_ADDRESS>` with the address printed by the
+    device in the monitor.
+
+                $ echo "Hello over IP" | nc -w1 -u 192.168.4.1 8000
+
+Note: The ESP32 does not support 5GHz networks. Also, the Device will presist
+your network configuration. To erase it, simply run.
+
+                $ idf make erase_flash ESPPORT=/dev/tty.SLAB_USBtoUART
+
+### Use the ESP32's Network
+
+Alternatively, you can connect to the ESP32's Soft-AP directly.
+
+1.  After the application has been flashed, connect the ESP32's Soft-AP. It's
+    usually something like `CHIP_DEMO-XXXX` where the last 4 digits are from the
+    device's MAC address.
+
+2.  Once you're connected, the server's IP can be found at the gateway address
+    and at the listed port number(Default: `8000`).
+
+3.  Then running the following command will ping the ESP32 and cause it to echo.
+    If necessary replace the `192.168.4.1` with the address printed by the
+    device in the monitor.
+
+              $ echo "Hello over IP" | nc -w1 -u 192.168.4.1 8000
