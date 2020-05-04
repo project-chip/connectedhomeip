@@ -27,7 +27,8 @@ To take advantage of all the current capabilities of the make system, you'll
 want:
 
 -   Bash 4.0 or greater
--   GNU make, automake, autoconf, libtool
+-   GNU make (versions prior to 4.1 may produce spurious warnings/errors)
+-   automake, autoconf, libtool
 -   C and C++ compilers
 -   clang-format-9
 -   gcov
