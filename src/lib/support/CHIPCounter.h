@@ -48,7 +48,7 @@ public:
      *  @brief
      *  Advance the value of the counter.
      *
-     *  @return A Chip error code if anything failed, CHIP_NO_ERROR otherwise.
+     *  @return A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
      */
     virtual CHIP_ERROR Advance(void) = 0;
 
