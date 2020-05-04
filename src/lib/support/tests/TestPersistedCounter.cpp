@@ -27,11 +27,6 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-#define CHIP_CONFIG_BDX_NAMESPACE kChipManagedNamespace_Development
-
 #include <new>
 #include <stdint.h>
 #include <string.h>

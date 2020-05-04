@@ -16,6 +16,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/PersistedCounter.h>
@@ -31,7 +32,10 @@ PersistedCounter::PersistedCounter(void) : MonotonicallyIncreasingCounter(), mSt
     memset(&mId, 0, sizeof(mId));
 }
 
-PersistedCounter::~PersistedCounter(void) {}
+PersistedCounter::~PersistedCounter(void)
+{
+    return;
+}
 
 CHIP_ERROR
 PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch)
