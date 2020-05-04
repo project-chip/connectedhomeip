@@ -132,9 +132,9 @@ extern "C" void app_main()
         return;
     }
 
-    // Configure the CHIP Connectivity Manager to automatically enable the WiFi AP interface
-    // whenever the WiFi station interface has not be configured.
-    ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_OnDemand_NoStationProvision);
+    // Configure the CHIP Connectivity Manager to always enable the AP. The Station interface
+    // will be enabled automatically if the required configuration is set.
+    ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.

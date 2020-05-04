@@ -60,6 +60,8 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/ESP32/SoftwareUpdateManagerImpl.h \
     @top_srcdir@/src/include/platform/ESP32/CHIPDevicePlatformEvent.h \
     @top_srcdir@/src/include/platform/ESP32/NetworkProvisioningServerImpl.h \
+    @top_srcdir@/src/include/platform/ESP32/ESP32Utils.h \
+    @top_srcdir@/src/include/platform/ESP32/ESP32Config.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp \
     @top_srcdir@/src/include/platform/GeneralUtils.h \
