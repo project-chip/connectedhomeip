@@ -27,6 +27,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                        = \
+    TestPersistedStorageImplementation.h                \
     $(NULL)
 
 #
