@@ -53,6 +53,8 @@ const int kTotalPayloadDataSizeInBits =
      kReservedFieldLengthInBits);
 const int kTotalPayloadDataSizeInBytes = (kTotalPayloadDataSizeInBits + 7) / 8;
 
+const char * kQRCodePrefix = "CH:";
+
 class SetupPayload
 {
 public:

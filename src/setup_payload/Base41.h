@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Utility header to encode an input into a Base45 String
+ *      Utility header to encode an input into a Base41 String
  */
 
 #ifndef _SETUP_CODE_UTILS_H_
@@ -33,8 +33,8 @@ using namespace std;
 
 namespace chip {
 // returns CHIP_NO_ERROR on successful decode
-CHIP_ERROR base45Decode(string base45, vector<uint8_t> & out);
-string base45Encode(const uint8_t * buf, size_t buf_len);
+CHIP_ERROR base41Decode(string base41, vector<uint8_t> & out);
+string base41Encode(const uint8_t * buf, size_t buf_len);
 
 } // namespace chip
 

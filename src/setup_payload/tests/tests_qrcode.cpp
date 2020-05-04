@@ -22,7 +22,7 @@
 #include <iostream>
 
 #include "SetupPayload.cpp"
-#include "Base45.cpp"
+#include "Base41.cpp"
 #include "QRCodeSetupPayloadGenerator.cpp"
 #include "QRCodeSetupPayloadParser.cpp"
 
@@ -51,7 +51,7 @@ int testPayloadByteArrayRep()
     return EXPECT_EQ(result, expected);
 }
 
-int testPayloadBase45Rep()
+int testPayloadBase41Rep()
 {
     SetupPayload payload;
 
@@ -64,30 +64,30 @@ int testPayloadBase45Rep()
     payload.setUpPINCode          = 2048;
 
     QRCodeSetupPayloadGenerator generator(payload);
-    string result   = generator.payloadBase45Representation();
-    string expected = "B20800G00G8G000";
+    string result   = generator.payloadBase41Representation();
+    string expected = "CH:J20800G00HKJ000";
 
     return EXPECT_EQ(result, expected);
 }
 
-int testBase45()
+int testBase41()
 {
     int surprises = 0;
 
     uint8_t input[] = { 10, 10, 10 };
 
-    surprises += EXPECT_EQ(base45Encode(input, 0), "");
+    surprises += EXPECT_EQ(base41Encode(input, 0), "");
 
-    surprises += EXPECT_EQ(base45Encode(input, 1), "A0");
+    surprises += EXPECT_EQ(base41Encode(input, 1), "A0");
 
-    surprises += EXPECT_EQ(base45Encode(input, 2), "5C1");
+    surprises += EXPECT_EQ(base41Encode(input, 2), "SL1");
 
-    surprises += EXPECT_EQ(base45Encode(input, 3), "5C1A0");
+    surprises += EXPECT_EQ(base41Encode(input, 3), "SL1A0");
 
-    surprises += EXPECT_EQ(base45Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1), "8 C VDN44I3E.VD/94");
+    surprises += EXPECT_EQ(base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1), "GHF.KGL+48-G5LGK35");
 
     vector<uint8_t> decoded = vector<uint8_t>();
-    surprises += EXPECT_EQ(base45Decode("8 C VDN44I3E.VD/94", decoded), CHIP_NO_ERROR);
+    surprises += EXPECT_EQ(base41Decode("GHF.KGL+48-G5LGK35", decoded), CHIP_NO_ERROR);
 
     string hello_world;
     for (size_t _ = 0; _ < decoded.size(); _++)
@@ -97,35 +97,35 @@ int testBase45()
     surprises += EXPECT_EQ(hello_world, "Hello World!");
 
     // short input
-    surprises += EXPECT_EQ(base45Decode("A0", decoded), CHIP_NO_ERROR);
+    surprises += EXPECT_EQ(base41Decode("A0", decoded), CHIP_NO_ERROR);
     surprises += EXPECT_EQ(decoded.size(), 2);
 
     // empty == empty
-    surprises += EXPECT_EQ(base45Decode("", decoded), CHIP_NO_ERROR);
+    surprises += EXPECT_EQ(base41Decode("", decoded), CHIP_NO_ERROR);
     surprises += EXPECT_EQ(decoded.size(), 0);
     // too short
-    surprises += EXPECT_EQ(base45Decode("A", decoded), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    surprises += EXPECT_EQ(base41Decode("A", decoded), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // outside valid chars
-    surprises += EXPECT_EQ(base45Decode("0\001", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("\0010", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("[0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("0[", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("0\001", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("\0010", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("[0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("0[", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     // BOGUS chars
-    surprises += EXPECT_EQ(base45Decode("!0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("\"0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("#0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("&0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("'0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("(0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode(")0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode(",0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode(";0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("<0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("=0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode(">0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
-    surprises += EXPECT_EQ(base45Decode("@0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("!0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("\"0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("#0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("&0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("'0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("(0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode(")0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode(",0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode(";0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("<0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("=0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode(">0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    surprises += EXPECT_EQ(base41Decode("@0", decoded), CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     return surprises;
 }
@@ -262,10 +262,10 @@ int testQRCodeToPayloadGeneration()
     payload.setUpPINCode          = 5221133;
 
     QRCodeSetupPayloadGenerator generator(payload);
-    string base45Rep = generator.payloadBase45Representation();
+    string base41Rep = generator.payloadBase41Representation();
 
     SetupPayload resultingPayload;
-    QRCodeSetupPayloadParser parser(base45Rep);
+    QRCodeSetupPayloadParser parser(base41Rep);
 
     CHIP_ERROR err  = parser.populatePayload(resultingPayload);
     bool didSucceed = err == CHIP_NO_ERROR;
@@ -277,11 +277,35 @@ int testQRCodeToPayloadGeneration()
     return surprises;
 }
 
+int testExtractPayload()
+{
+    int surprises = 0;
+    surprises += EXPECT_EQ(extractPayload(string("CH:ABC")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("CH:")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("H:")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("ASCH:")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("Z%CH:ABC%")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("Z%CH:ABC")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC%")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("%Z%CH:ABC%DDD")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("CH:ABC%DDD")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("CH:ABC%")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("%CH:")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("%CH:%")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("A%")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("CH:%")), string(""));
+    surprises += EXPECT_EQ(extractPayload(string("%CH:ABC")), string("ABC"));
+    surprises += EXPECT_EQ(extractPayload(string("ABC")), string(""));
+
+    return surprises;
+}
+
 int main(int argc, char ** argv)
 {
-    int result = testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase45Rep() + testBase45() + testSetupPayloadVerify() +
+    int result = testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase41Rep() + testBase41() + testSetupPayloadVerify() +
         testPayloadEquality() + testPayloadInEquality() + testQRCodeToPayloadGeneration() +
-        testInvalidQRCodePayload_WrongCharacterSet() + testInvalidQRCodePayload_WrongLength();
+        testInvalidQRCodePayload_WrongCharacterSet() + testInvalidQRCodePayload_WrongLength() + testExtractPayload();
     if (result == 0)
     {
         printf("\n** All QRCode tests pass **\n");
