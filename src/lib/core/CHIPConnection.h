@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -29,13 +30,72 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <ble/BleConfig.h>
+#include <ble/BLEEndPoint.h>
+#include <inet/InetInterface.h>
+#include <inet/IPAddress.h>
+#include <inet/TCPEndPoint.h>
+#include <inet/InetLayer.h>
 #include <support/DLLUtil.h>
-#include "HostPortList.h"
+#include <system/SystemPacketBuffer.h>
 #include <system/SystemStats.h>
+
+#include "HostPortList.h"
+#include "IdConstants.h"
 
 namespace chip {
 
-using System::PacketBuffer;
+/** Identifies how a peer node is authenticated.
+ *
+ * @note ChipAuthMode is an API data type only; it should never be sent over-the-wire.
+ */
+typedef uint16_t ChipAuthMode;
+enum
+{
+    kChipAuthMode_NotSpecified = 0x0000, /**< Authentication mode not specified. */
+
+    // ===== Major authentication categories =====
+    kChipAuthModeCategory_General        = 0x0000, /**< Peer authenticated using one of a set of general mechanisms */
+    kChipAuthModeCategory_AppDefinedBase = 0xC000, /**< Base value for application-defined authentication categories */
+
+    // ===== General authentication modes =====
+    kChipAuthMode_Unauthenticated = kChipAuthModeCategory_General | 0x001,
+    /**< Peer not authenticated. */
+
+    // ===== Subfield Masks =====
+    kChipAuthModeCategory_Mask = 0xF000,
+};
+
+class ChipConnection;
+
+/**
+ *  @struct ChipMessageInfo
+ *
+ *  @brief
+ *    Information about a CHIP message that is in the process of being sent or received.
+ *
+ */
+struct ChipMessageInfo
+{
+    uint64_t SourceNodeId;  /**< The source node identifier of the CHIP message. */
+    uint64_t DestNodeId;    /**< The destination node identifier of the CHIP message. */
+    uint32_t MessageId;     /**< The message identifier of the CHIP message. */
+    uint32_t Flags;         /**< Various flags associated with the CHIP message; see ChipMessageFlags. */
+    uint16_t KeyId;         /**< The encryption key identifier of the CHIP message. */
+    uint8_t MessageVersion; /**< The version of the CHIP message. */
+    uint8_t EncryptionType; /**< The encryption type used for the CHIP message. */
+
+    ChipAuthMode PeerAuthMode;
+    /**< The means by which the sender of the message was authenticated. Only meaningful for incoming messages. */
+
+    ChipConnection * InCon;
+    /**< The connection (if any) over which the message was received. Only meaningful for incoming messages.*/
+
+    const Inet::IPPacketInfo * InPacketInfo;
+    /**< The IP Addressing information of the received message. Only meaningful for incoming messages. */
+
+    void Clear() { memset(this, 0, sizeof(*this)); }
+};
 
 /**
  *  @class ChipConnection
@@ -83,7 +143,7 @@ public:
     };
 
     uint64_t PeerNodeId;             /**< [READ ONLY] The node identifier of the peer. */
-    IPAddress PeerAddr;              /**< [READ ONLY] The IP address of the peer node. */
+    Inet::IPAddress PeerAddr;        /**< [READ ONLY] The IP address of the peer node. */
     ChipMessageLayer * MessageLayer; /**< [READ ONLY] The associated ChipMessageLayer object. */
     void * AppState;                 /**< A pointer to the application-specific state object. */
     uint16_t PeerPort;               /**< [READ ONLY] The port number of the peer node. */
@@ -105,19 +165,20 @@ public:
 
     // Note: a downcall to Connect() may call OnConnectionComplete before it returns.
     CHIP_ERROR Connect(uint64_t peerNodeId);
-    CHIP_ERROR Connect(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort = 0);
-    CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, const IPAddress & peerAddr, uint16_t peerPort = 0,
-                       InterfaceId intf = INET_NULL_INTERFACEID);
+    CHIP_ERROR Connect(uint64_t peerNodeId, const Inet::IPAddress & peerAddr, uint16_t peerPort = 0);
+    CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, const Inet::IPAddress & peerAddr, uint16_t peerPort = 0,
+                       Inet::InterfaceId intf = INET_NULL_INTERFACEID);
     CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, const char * peerAddr, uint16_t defaultPort = 0);
     CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, const char * peerAddr, uint16_t peerAddrLen,
                        uint16_t defaultPort = 0);
     CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, const char * peerAddr, uint16_t peerAddrLen, uint8_t dnsOptions,
                        uint16_t defaultPort);
     CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList,
-                       InterfaceId intf = INET_NULL_INTERFACEID);
-    CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList, uint8_t dnsOptions, InterfaceId intf);
+                       Inet::InterfaceId intf = INET_NULL_INTERFACEID);
+    CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList, uint8_t dnsOptions,
+                       Inet::InterfaceId intf);
 
-    CHIP_ERROR GetPeerAddressInfo(IPPacketInfo & addrInfo);
+    CHIP_ERROR GetPeerAddressInfo(Inet::IPPacketInfo & addrInfo);
 
     enum
     {
@@ -128,12 +189,12 @@ public:
 
     void GetPeerDescription(char * buf, size_t bufSize) const;
 
-    CHIP_ERROR SendMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
 #if CHIP_CONFIG_ENABLE_TUNNELING
     /**
      * Function to send a Tunneled packet over a CHIP connection.
      */
-    CHIP_ERROR SendTunneledMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    CHIP_ERROR SendTunneledMessage(ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
 #endif
 
     // TODO COM-311: implement EnableReceived/DisableReceive for BLE ChipConnections.
@@ -158,7 +219,7 @@ public:
     CHIP_ERROR ResetUserTimeout(void);
     uint16_t LogId(void) const { return static_cast<uint16_t>(reinterpret_cast<intptr_t>(this)); }
 
-    TCPEndPoint * GetTCPEndPoint(void) const { return mTcpEndPoint; }
+    Inet::TCPEndPoint * GetTCPEndPoint(void) const { return mTcpEndPoint; }
 
     /**
      *  This function is the application callback that is invoked when a connection setup is complete.
@@ -190,10 +251,10 @@ public:
      *
      *  @param[in]    msgInfo       A pointer to a ChipMessageInfo structure containing information about the message.
      *
-     *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
+     *  @param[in]    msgBuf        A pointer to the System::PacketBuffer object holding the message.
      *
      */
-    typedef void (*MessageReceiveFunct)(ChipConnection * con, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    typedef void (*MessageReceiveFunct)(ChipConnection * con, ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
     MessageReceiveFunct OnMessageReceived;
 
 #if CHIP_CONFIG_ENABLE_TUNNELING
@@ -205,10 +266,10 @@ public:
      *
      *  @param[in]     msgInfo        A pointer to the ChipMessageInfo object.
      *
-     *  @param[in]     msgBuf         A pointer to the PacketBuffer object containing the tunneled packet received.
+     *  @param[in]     msgBuf         A pointer to the System::PacketBuffer object containing the tunneled packet received.
      *
      */
-    typedef void (*TunneledMsgReceiveFunct)(ChipConnection * con, const ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    typedef void (*TunneledMsgReceiveFunct)(ChipConnection * con, const ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
     TunneledMsgReceiveFunct OnTunneledMessageReceived;
 #endif
 
@@ -234,10 +295,10 @@ private:
         kDoCloseFlag_SuppressLogging  = 0x02
     } DoCloseFlags;
 
-    IPAddress mPeerAddrs[CHIP_CONFIG_CONNECT_IP_ADDRS];
-    TCPEndPoint * mTcpEndPoint;
+    Inet::IPAddress mPeerAddrs[CHIP_CONFIG_CONNECT_IP_ADDRS];
+    Inet::TCPEndPoint * mTcpEndPoint;
     HostPortList mPeerHostPortList;
-    InterfaceId mTargetInterface;
+    Inet::InterfaceId mTargetInterface;
     uint32_t mConnectTimeout;
     uint8_t mRefCount;
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
@@ -252,7 +313,7 @@ private:
     uint8_t mFlags; /**< Various flags associated with the connection. */
 
     void Init(ChipMessageLayer * msgLayer);
-    void MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & localAddr, const IPAddress & peerAddr);
+    void MakeConnectedTcp(Inet::TCPEndPoint * endPoint, const Inet::IPAddress & localAddr, const Inet::IPAddress & peerAddr);
     CHIP_ERROR StartConnect(void);
     void DoClose(CHIP_ERROR err, uint8_t flags);
     CHIP_ERROR TryNextPeerAddress(CHIP_ERROR lastErr);
@@ -265,14 +326,10 @@ private:
     void DisconnectOnError(CHIP_ERROR err);
     CHIP_ERROR StartConnectToAddressLiteral(const char * peerAddr, size_t peerAddrLen);
 
-    static void HandleResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
-    static void HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR conRes);
-    static void HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * data);
-    static void HandleTcpConnectionClosed(TCPEndPoint * endPoint, INET_ERROR err);
-    static void HandleSecureSessionEstablished(ChipSecurityManager * sm, ChipConnection * con, void * reqState,
-                                               uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType);
-    static void HandleSecureSessionError(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
-                                         uint64_t peerNodeId, Profiles::StatusReporting::StatusReport * statusReport);
+    static void HandleResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, Inet::IPAddress * addrArray);
+    static void HandleConnectComplete(Inet::TCPEndPoint * endPoint, INET_ERROR conRes);
+    static void HandleDataReceived(Inet::TCPEndPoint * endPoint, System::PacketBuffer * data);
+    static void HandleTcpConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err);
     static void DefaultConnectionClosedHandler(ChipConnection * con, CHIP_ERROR conErr);
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -280,13 +337,13 @@ public:
     CHIP_ERROR ConnectBle(BLE_CONNECTION_OBJECT connObj, ChipAuthMode authMode, bool autoClose = true);
 
 private:
-    BLEEndPoint * mBleEndPoint;
+    Ble::BLEEndPoint * mBleEndPoint;
 
-    void MakeConnectedBle(BLEEndPoint * endPoint);
+    void MakeConnectedBle(Ble::BLEEndPoint * endPoint);
 
-    static void HandleBleConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err);
-    static void HandleBleMessageReceived(BLEEndPoint * endPoint, System::PacketBuffer * data);
-    static void HandleBleConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err);
+    static void HandleBleConnectComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
+    static void HandleBleMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBuffer * data);
+    static void HandleBleConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
 #endif
 };
 

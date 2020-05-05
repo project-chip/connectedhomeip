@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -39,6 +40,11 @@
 #include <inet/InetLayer.h>
 
 namespace chip {
+
+using System::PacketBuffer;
+
+using namespace Ble;
+using namespace Inet;
 
 /**
  * Reserve a reference to the ChipConnection object.
@@ -156,8 +162,8 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, const IPAddress & peerAd
  *  @param[in]    peerNodeId    The node identifier of the peer, kNodeIdNotSpecified or 0 if
  *                              not known.
  *
- *  @param[in]    authMode      The desired authenticate mode for the peer. Only CASE, PASE and Unauthenticated
- *                              modes are supported.
+ *  @param[in]    authMode      The desired authenticate mode for the peer. Only Unauthenticated
+ *                              mode is supported.
  *
  *  @param[in]    peerAddr      The IP address of the peer, IPAddress::Any if not known.
  *
@@ -184,12 +190,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
 
     VerifyOrExit(State == kState_ReadyToConnect, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || IsCASEAuthMode(authMode) || IsPASEAuthMode(authMode),
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Can't request authentication if the security manager is not initialized.
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != NULL,
-                 err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
+    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated, err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
 
     // Application has made this an IP-based ChipConnection.
     NetworkType = kNetworkType_IP;
@@ -233,8 +234,8 @@ exit:
  *  @param[in]    peerNodeId    The node identifier of the peer, kNodeIdNotSpecified or 0 if
  *                              not known.
  *
- *  @param[in]    authMode      The desired authenticate mode for the peer. Only CASE, PASE and Unauthenticated
- *                              modes are supported.
+ *  @param[in]    authMode      The desired authenticate mode for the peer. Only Unauthenticated
+ *                              mode is supported.
  *
  *  @param[in]    peerAddr      The address or hostname of the peer as a NULL-terminated C string.
  *
@@ -276,8 +277,8 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
  *  @param[in]    peerNodeId    The node identifier of the peer, kNodeIdNotSpecified or 0 if
  *                              not known.
  *
- *  @param[in]    authMode      The desired authenticate mode for the peer. Only CASE, PASE and Unauthenticated
- *                              modes are supported.
+ *  @param[in]    authMode      The desired authenticate mode for the peer. Only Unauthenticated
+ *                              modes is supported.
  *
  *  @param[in]    peerAddr      The address or hostname of the peer as a non-NULL-terminated C string.
  *
@@ -300,7 +301,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
                                    uint16_t defaultPort)
 {
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    const uint8_t dnsOptions = ::nl::Inet::kDNSOption_Default;
+    const uint8_t dnsOptions = ::chip::Inet::kDNSOption_Default;
 #else
     const uint8_t dnsOptions = 0;
 #endif
@@ -327,8 +328,8 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
  *  @param[in]    peerNodeId    The node identifier of the peer, kNodeIdNotSpecified or 0 if
  *                              not known.
  *
- *  @param[in]    authMode      The desired authenticate mode for the peer. Only CASE, PASE and Unauthenticated
- *                              modes are supported.
+ *  @param[in]    authMode      The desired authenticate mode for the peer. Only Unauthenticated
+ *                              modes is supported.
  *
  *  @param[in]    peerAddr      The address or hostname of the peer as a non-NULL-terminated C string.
  *
@@ -336,7 +337,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
  *
  *  @param[in]    dnsOptions    An integer value controlling how host name resolution is performed.
  *                              Value should be the OR of one or more values from from the
- *                              #::nl::Inet::DNSOptions enumeration.
+ *                              #::chip::Inet::DNSOptions enumeration.
  *
  *  @param[in]    defaultPort   The optional default port to use for the connection if not supplied in the peerAddr
  *                              string.
@@ -362,12 +363,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
 
     VerifyOrExit(State == kState_ReadyToConnect, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || IsCASEAuthMode(authMode) || IsPASEAuthMode(authMode),
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Can't request authentication if the security manager is not initialized.
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != NULL,
-                 err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
+    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated, err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
 
     // If no peer address given, connect using the node id.
     if (peerAddr == NULL || peerAddrLen == 0)
@@ -443,7 +439,7 @@ exit:
 CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList, InterfaceId intf)
 {
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    const uint8_t dnsOptions = ::nl::Inet::kDNSOption_Default;
+    const uint8_t dnsOptions = ::chip::Inet::kDNSOption_Default;
 #else
     const uint8_t dnsOptions = 0;
 #endif
@@ -483,12 +479,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, H
 
     VerifyOrExit(State == kState_ReadyToConnect, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || IsCASEAuthMode(authMode) || IsPASEAuthMode(authMode),
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Can't request authentication if the security manager is not initialized.
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != NULL,
-                 err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
+    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated, err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
 
     // Application has made this an IP-based ChipConnection.
     NetworkType = kNetworkType_IP;
@@ -1209,26 +1200,10 @@ void ChipConnection::StartSession()
     if (AuthMode != kChipAuthMode_Unauthenticated)
     {
         // Enter the establishing session state.
-        State = kState_EstablishingSession;
-
-        CHIP_ERROR err;
-
-        // Call the security manager to initiate secure CASE session.
-        if (IsCASEAuthMode(AuthMode))
-            err = MessageLayer->SecurityMgr->StartCASESession(this, PeerNodeId, PeerAddr, PeerPort, AuthMode, NULL,
-                                                              HandleSecureSessionEstablished, HandleSecureSessionError);
-        // Call the security manager to initiate secure PASE session.
-        else if (IsPASEAuthMode(AuthMode))
-            err = MessageLayer->SecurityMgr->StartPASESession(this, AuthMode, NULL, HandleSecureSessionEstablished,
-                                                              HandleSecureSessionError);
-        else
-            err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE;
-
-        if (err != CHIP_NO_ERROR)
-            DoClose(err, 0);
+        State          = kState_EstablishingSession;
+        CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE;
+        DoClose(err, 0);
     }
-
-    // Otherwise...
     else
     {
         // Enter the connected state.
@@ -1471,18 +1446,11 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
         {
             ChipLogError(MessageLayer, "Con rcv data err %04X %ld", con->LogId(), err);
 
-            // Send key error response to the peer if required.
-            if (msgLayer->SecurityMgr->IsKeyError(err))
+            if (data != NULL)
             {
-                if (data != NULL)
-                {
-                    PacketBuffer::Free(data);
-                    data = NULL;
-                }
-
-                msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, NULL, con, err);
+                PacketBuffer::Free(data);
+                data = NULL;
             }
-
             con->DisconnectOnError(err);
             break;
         }
@@ -1568,31 +1536,6 @@ void ChipConnection::HandleTcpConnectionClosed(TCPEndPoint * endPoint, INET_ERRO
     if (err == INET_NO_ERROR && con->State == kState_EstablishingSession)
         err = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
     con->DoClose(err, 0);
-}
-
-void ChipConnection::HandleSecureSessionEstablished(ChipSecurityManager * sm, ChipConnection * con, void * reqState,
-                                                    uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType)
-{
-    // Establish the peer node identifier and the default key and encryption type to be used to send messages.
-    con->PeerNodeId            = peerNodeId;
-    con->DefaultKeyId          = sessionKeyId;
-    con->DefaultEncryptionType = encType;
-
-    // Enter the connected state.
-    con->State = kState_Connected;
-
-    ChipLogProgress(MessageLayer, "Con complete %04X", con->LogId());
-
-    // Invoke the app's completion function.
-    if (con->OnConnectionComplete != NULL)
-        con->OnConnectionComplete(con, CHIP_NO_ERROR);
-}
-
-void ChipConnection::HandleSecureSessionError(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
-                                              uint64_t peerNodeId, Profiles::StatusReporting::StatusReport * statusReport)
-{
-    // Couldn't get a secure session, so fail the connect attempt.
-    con->DoClose(localErr, 0);
 }
 
 void ChipConnection::Init(ChipMessageLayer * msgLayer)
@@ -1707,8 +1650,8 @@ void ChipConnection::MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & 
  *
  *  @param[in]    connObj    The BLE connection object.
  *
- *  @param[in]    authMode   The desired authenticate mode for the peer. Only CASE, PASE and Unauthenticated
- *                           modes are supported.
+ *  @param[in]    authMode   The desired authenticate mode for the peer. Only Unauthenticated
+ *                           modes is supported.
  *
  *  @param[in]    autoClose  true if automatic closing is enabled upon a long period of
  *                           inactivity, otherwise false.
@@ -1731,12 +1674,7 @@ CHIP_ERROR ChipConnection::ConnectBle(BLE_CONNECTION_OBJECT connObj, ChipAuthMod
 
     VerifyOrExit(State == kState_ReadyToConnect && MessageLayer->mBle != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || IsCASEAuthMode(authMode) || IsPASEAuthMode(authMode),
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Can't request authentication if the security manager is not initialized.
-    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated || MessageLayer->SecurityMgr != NULL,
-                 err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
+    VerifyOrExit(authMode == kChipAuthMode_Unauthenticated, err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
 
     // Application has made us a BLE-based ChipConnection.
     NetworkType = kNetworkType_BLE;
