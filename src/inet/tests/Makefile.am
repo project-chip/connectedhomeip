@@ -39,6 +39,7 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
+if !CONFIG_DEVICE_LAYER
 # C preprocessor option flags that will apply to all compiled objects in this
 # makefile.
 
@@ -198,6 +199,7 @@ clean-local-coverage:
 	-$(AM_V_at)rm -rf $(CHIP_COVERAGE_BUNDLE)
 endif # CHIP_BUILD_COVERAGE_REPORTS
 endif # CHIP_BUILD_COVERAGE
+endif # CONFIG_DEVICE_LAYER
 endif # CHIP_BUILD_TESTS
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

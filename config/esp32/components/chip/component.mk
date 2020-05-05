@@ -108,11 +108,16 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
                                --with-crypto=mbedtls \
                                --with-mbedtls-includes=$(IDF_PATH)/components/mbedtls/mbedtls/include \
                                --with-mbedtls-libs=$(BUILD_DIR_BASE)/mbedtls \
-                               --disable-tests \
                                --disable-tools \
                                --disable-docs \
                                --disable-java \
                                --disable-device-manager
+
+ifneq (,$(findstring ON_DEVICE_CHIP_TESTS,$(CXXFLAGS)))
+CONFIGURE_OPTIONS           += --enable-tests
+else
+CONFIGURE_OPTIONS           += --disable-tests
+endif
 
 # Enable debug and disable optimization if ESP-IDF Optimization Level is set to Debug.
 ifeq ($(CONFIG_OPTIMIZATION_LEVEL_DEBUG),y)
