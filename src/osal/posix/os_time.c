@@ -21,6 +21,12 @@
 
 #include <chip/osal.h>
 
+#define ONE_THOUSAND 1000.0
+#define ONE_BILLION 1000000000.0
+#define CHIP_OS_TICKS_PER_SEC_F ((double) CHIP_OS_TICKS_PER_SEC)
+#define CHIP_OS_TICKS_PER_MILLISEC_F (CHIP_OS_TICKS_PER_SEC_F * ONE_THOUSAND)
+#define CHIP_OS_TICKS_PER_NANOSEC_F (CHIP_OS_TICKS_PER_SEC_F * ONE_BILLION)
+
 #ifdef __APPLE__
 // OS X does not have clock_gettime, use clock_get_time
 
@@ -29,12 +35,14 @@
 
 chip_os_time_t chip_os_time_get(void)
 {
+    chip_os_time_t ticks;
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
     clock_get_time(cclock, &mts);
     mach_port_deallocate(mach_task_self(), cclock);
-    return mts.tv_sec * 1000.0 + mts.tv_nsec / 1000000.;
+    ticks = mts.tv_sec * CHIP_OS_TICKS_PER_SEC_F + mts.tv_nsec / CHIP_OS_TICKS_PER_NANOSEC_F;
+    return ticks;
 }
 
 #else
@@ -42,22 +50,29 @@ chip_os_time_t chip_os_time_get(void)
 
 chip_os_time_t chip_os_time_get(void)
 {
+    chip_os_time_t ticks;
     struct timespec now;
     if (clock_gettime(CLOCK_MONOTONIC, &now))
     {
         return 0;
     }
-    return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
+    ticks = now.tv_sec * CHIP_OS_TICKS_PER_SEC_F + now.tv_nsec / CHIP_OS_TICKS_PER_NANOSEC_F;
+    return ticks;
 }
 
 #endif // __APPLE__
 
 chip_os_time_t chip_os_time_ms_to_ticks(chip_os_time_t ms)
 {
-    return (ms * CHIP_OS_TICKS_PER_SEC) / 1000;
+    return (ms * CHIP_OS_TICKS_PER_SEC_F) / ONE_THOUSAND;
 }
 
 chip_os_time_t chip_os_time_ticks_to_ms(chip_os_time_t ticks)
 {
-    return (ticks * 1000) / CHIP_OS_TICKS_PER_SEC;
+    return (ticks * ONE_THOUSAND) / CHIP_OS_TICKS_PER_SEC_F;
+}
+
+chip_os_time_t chip_os_time_get_ms(void)
+{
+    return chip_os_time_ticks_to_ms(chip_os_time_get());
 }

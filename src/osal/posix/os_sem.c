@@ -35,6 +35,7 @@ chip_os_error_t chip_os_sem_init(struct chip_os_sem * sem, uint16_t tokens)
 chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem)
 {
     int woke = dispatch_semaphore_signal(sem->lock);
+    (void) woke;
     return CHIP_OS_OK;
 }
 
@@ -49,16 +50,12 @@ chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, chip_os_time_t timeou
 chip_os_error_t chip_os_sem_init(struct chip_os_sem * sem, uint16_t tokens)
 {
     int ret = sem_init(&sem->lock, 0, tokens);
-    SuccessOrExit(ret);
-exit:
     return map_posix_to_osal_error(ret);
 }
 
 chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem)
 {
     int ret = sem_post(&sem->lock);
-    SuccessOrExit(ret);
-exit:
     return map_posix_to_osal_error(ret);
 }
 

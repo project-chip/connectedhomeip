@@ -42,7 +42,7 @@ void * task0_run(void * args)
 void * task1_run(void * args)
 {
     int i = 10000;
-    VerifyOrQuit(args == &s_task_arg[1], "Wrong args passed to task0");
+    VerifyOrQuit(args == &s_task_arg[1], "Wrong args passed to task1");
 
     while (i--)
     {

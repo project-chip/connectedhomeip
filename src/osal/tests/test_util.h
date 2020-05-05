@@ -35,7 +35,7 @@ extern "C" {
     {                                                                                                                              \
         if ((ERR))                                                                                                                 \
         {                                                                                                                          \
-            fprintf(stderr, "\nFAILED %s:%d - %s\n", __FUNCTION__, __LINE__, MSG);                                                 \
+            fprintf(stderr, "\nFAILED %s:line #%d - %s\n", __FUNCTION__, __LINE__, MSG);                                           \
             exit(FAIL);                                                                                                            \
         }                                                                                                                          \
     } while (false)
@@ -45,7 +45,7 @@ extern "C" {
     {                                                                                                                              \
         if (!(TST))                                                                                                                \
         {                                                                                                                          \
-            fprintf(stderr, "\nFAILED %s:%d - %s\n", __FUNCTION__, __LINE__, MSG);                                                 \
+            fprintf(stderr, "\nFAILED %s:line #%d - %s\n", __FUNCTION__, __LINE__, MSG);                                           \
             exit(FAIL);                                                                                                            \
         }                                                                                                                          \
     } while (false)

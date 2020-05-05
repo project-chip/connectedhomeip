@@ -56,6 +56,7 @@ chip_os_error_t chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t
 {
     chip_os_error_t err;
     dispatch_source_t dispatch;
+    chip_os_time_t delay_ns;
 
     err = chip_os_timer_inited(timer);
     SuccessOrExit(err);
@@ -65,7 +66,8 @@ chip_os_error_t chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t
     SuccessOrExit(err);
 
     timer->tm_ticks = chip_os_time_get() + ticks;
-    dispatch_source_set_timer(dispatch, dispatch_time(DISPATCH_TIME_NOW, ticks), DISPATCH_TIME_FOREVER, DEFAULT_TIMER_LEEWAY);
+    delay_ns        = ticks * (1000000000.0 / CHIP_OS_TICKS_PER_SEC);
+    dispatch_source_set_timer(dispatch, dispatch_time(DISPATCH_TIME_NOW, delay_ns), DISPATCH_TIME_FOREVER, DEFAULT_TIMER_LEEWAY);
     dispatch_resume(dispatch);
     timer->tm_active = true;
 
@@ -88,6 +90,12 @@ chip_os_error_t chip_os_timer_stop(struct chip_os_timer * timer)
 
 exit:
     return err;
+}
+
+chip_os_time_t chip_os_timer_remaining_ticks(struct chip_os_timer * timer, chip_os_time_t now)
+{
+    // TODO: properly determine ticks remaining if possible or remove API if unused.
+    return 0;
 }
 
 #else
@@ -176,6 +184,28 @@ exit:
     return err;
 }
 
+chip_os_time_t chip_os_timer_remaining_ticks(struct chip_os_timer * timer, chip_os_time_t now)
+{
+    chip_os_time_t rt;
+    uint32_t exp;
+
+    struct itimerspec its;
+    timer_gettime(timer->tm_timer, &its);
+
+    exp = its.it_value.tv_sec * 1000;
+
+    if (exp > now)
+    {
+        rt = exp - now;
+    }
+    else
+    {
+        rt = 0;
+    }
+
+    return rt;
+}
+
 #endif // __APPLE__
 
 chip_os_error_t chip_os_timer_start_ms(struct chip_os_timer * timer, chip_os_time_t duration)
@@ -210,48 +240,3 @@ void chip_os_timer_arg_set(struct chip_os_timer * timer, void * arg)
 {
     timer->tm_arg = arg;
 }
-
-#ifdef __APPLE__
-
-int chip_os_timer_queued(struct chip_os_timer * timer)
-{
-    return 0;
-}
-
-chip_os_time_t chip_os_timer_remaining_ticks(struct chip_os_timer * timer, chip_os_time_t now)
-{
-    return 0;
-}
-
-#else
-
-int chip_os_timer_queued(struct chip_os_timer * timer)
-{
-    struct itimerspec its;
-    timer_gettime(timer->tm_timer, &its);
-
-    return ((its.it_value.tv_sec > 0) || (its.it_value.tv_nsec > 0));
-}
-
-chip_os_time_t chip_os_timer_remaining_ticks(struct chip_os_timer * timer, chip_os_time_t now)
-{
-    chip_os_time_t rt;
-    uint32_t exp;
-
-    struct itimerspec its;
-    timer_gettime(timer->tm_timer, &its);
-
-    exp = its.it_value.tv_sec * 1000;
-
-    if (exp > now)
-    {
-        rt = exp - now;
-    }
-    else
-    {
-        rt = 0;
-    }
-
-    return rt;
-}
-#endif // __APPLE__

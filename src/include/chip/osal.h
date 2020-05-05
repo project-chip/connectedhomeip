@@ -332,6 +332,8 @@ void * chip_os_timer_arg_get(struct chip_os_timer * timer);
  */
 chip_os_time_t chip_os_time_get(void);
 
+chip_os_time_t chip_os_time_get_ms(void);
+
 chip_os_time_t chip_os_time_ms_to_ticks(chip_os_time_t ms);
 
 chip_os_time_t chip_os_time_ticks_to_ms(chip_os_time_t ticks);
@@ -380,6 +382,8 @@ void chip_os_task_yield(void);
  * @return N/A
  */
 void chip_os_task_sleep(chip_os_time_t ticks);
+
+void chip_os_task_sleep_ms(chip_os_time_t ms);
 
 /**
  * @brief Get task ID of the current task.

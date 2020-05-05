@@ -35,7 +35,7 @@
 // Apple MacOS
 #define CHIP_OS_TIME_FOREVER DISPATCH_TIME_FOREVER
 #define CHIP_OS_TIME_NO_WAIT 0
-#define CHIP_OS_TICKS_PER_SEC 1000000000
+#define CHIP_OS_TICKS_PER_SEC 1000000
 
 typedef uint64_t chip_os_time_t;
 typedef int64_t chip_os_stime_t;
@@ -55,7 +55,7 @@ typedef int32_t chip_os_stime_t;
 struct chip_os_timer
 {
     chip_os_timer_fn * tm_cb;
-    uint32_t tm_ticks;
+    chip_os_time_t tm_ticks;
 #ifdef __APPLE__
     dispatch_source_t tm_timer;
 #else

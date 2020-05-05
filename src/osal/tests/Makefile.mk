@@ -24,16 +24,23 @@ PROJ_ROOT = ../../..
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 endif
-ifeq ($(UNAME_S),Darwin)
-endif
 
 ### ===== Toolchain =====
 
 CROSS_COMPILE ?=
+
+ifeq ($(UNAME_S),Darwin)
+CC  = ccache $(CROSS_COMPILE)llvm-gcc
+CPP = ccache $(CROSS_COMPILE)llvm-g++
+LD  = $(CROSS_COMPILE)ld
+AR  = $(CROSS_COMPILE)ar
+else
 CC  = ccache $(CROSS_COMPILE)gcc
 CPP = ccache $(CROSS_COMPILE)g++
-LD  = $(CROSS_COMPILE)gcc
+LD  = $(CROSS_COMPILE)g++
 AR  = $(CROSS_COMPILE)ar
+endif
+
 
 ### ===== Compiler Flags =====
 

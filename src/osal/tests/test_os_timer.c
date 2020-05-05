@@ -37,7 +37,6 @@
 
 #include "test_util.h"
 
-#define TEST_ITERATIONS (100)
 #define TEST_TASK_PRIO (1)
 #define TEST_STACK_SIZE (1024)
 
@@ -54,9 +53,13 @@ static void test_timer1_fired(void * arg)
 {
     struct chip_os_timer * t = (struct chip_os_timer *) arg;
     chip_os_time_t now       = chip_os_time_get();
-    chip_os_stime_t delta    = now - s_timer1_start;
+    chip_os_time_t delta     = now - s_timer1_start;
+    delta                    = chip_os_time_ticks_to_ms(delta);
 
-    TEST_LOG("test_timer fired delta=%d\n", delta);
+    TEST_LOG("test_timer fired now=%llu\n", now);
+    TEST_LOG("test_timer fired start=%llu\n", s_timer1_start);
+    TEST_LOG("test_timer fired delta=%llu\n", delta);
+
     VerifyOrQuit((delta >= TEST_TIMER1_DURATION), "timer: duration too short");
     VerifyOrQuit((delta < (TEST_TIMER1_DURATION + TEST_TIMER_MARGIN)), "timer: duration too long");
     VerifyOrQuit(!chip_os_timer_is_active(t), "timer: fired, but still active");
@@ -70,12 +73,32 @@ void test_timer1(struct chip_os_timer * t)
 {
     s_timer1_start = chip_os_time_get();
     chip_os_timer_init(t, test_timer1_fired, t);
-    chip_os_timer_start(t, TEST_TIMER1_DURATION);
+    chip_os_timer_start_ms(t, TEST_TIMER1_DURATION);
+}
+
+void test_sleep()
+{
+    chip_os_time_t start = chip_os_time_get_ms();
+    chip_os_time_t end, delta;
+
+    chip_os_task_sleep_ms(1000);
+
+    end   = chip_os_time_get_ms();
+    delta = end - start;
+
+    TEST_LOG("test_sleep now=%llu\n", end);
+    TEST_LOG("test_sleep start=%llu\n", start);
+    TEST_LOG("test_sleep delta=%llu\n", delta);
+
+    VerifyOrQuit((delta >= TEST_TIMER1_DURATION), "timer: duration too short");
+    VerifyOrQuit((delta < (TEST_TIMER1_DURATION + TEST_TIMER_MARGIN)), "timer: duration too long");
 }
 
 /* Task 1 handler function */
 void * task1_run(void * arg)
 {
+    test_sleep();
+
     test_timer1(&s_timer1);
 
     /* Wait for timers to trigger exit. */
@@ -83,6 +106,27 @@ void * task1_run(void * arg)
     {
         chip_os_task_yield();
     }
+}
+
+void test_time_convert(chip_os_time_t truth_ticks, chip_os_time_t truth_ms)
+{
+    chip_os_time_t ms;
+    chip_os_time_t ticks;
+
+    ms = chip_os_time_ticks_to_ms(truth_ticks);
+    TEST_LOG("Convert ticks=%llu to ms=%llu expect=%llu\n", truth_ticks, ms, truth_ms);
+    VerifyOrQuit(ms == truth_ms, "time: ticks to ms incorrect");
+    ticks = chip_os_time_ms_to_ticks(truth_ms);
+    TEST_LOG("Convert ms=%llu to ticks=%llu expect=%llu\n", truth_ms, ticks, truth_ticks);
+    VerifyOrQuit(ticks == truth_ticks, "time: ms to ticks incorrect");
+}
+
+void test_time_conversions()
+{
+    chip_os_time_t tps = CHIP_OS_TICKS_PER_SEC;
+    test_time_convert(tps, 1000);
+    test_time_convert(tps * 100, 100000);
+    test_time_convert(tps / 100, 10);
 }
 
 /**
@@ -94,6 +138,8 @@ void * task1_run(void * arg)
  */
 int main(void)
 {
+    test_time_conversions();
+
     /*
      * Initialize tasks 1 and 2 with the OS.
      */

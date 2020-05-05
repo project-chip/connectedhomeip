@@ -105,17 +105,22 @@ void chip_os_task_yield(void)
     sched_yield();
 }
 
-void chip_os_task_sleep(chip_os_time_t ticks)
+void chip_os_task_sleep_ms(chip_os_time_t ms)
 {
     struct timespec sleep_time;
-    long ms    = chip_os_time_ticks_to_ms(ticks);
-    uint32_t s = ms / 1000;
+    int s = ms / 1000;
 
     ms -= s * 1000;
     sleep_time.tv_sec  = s;
     sleep_time.tv_nsec = ms * 1000000;
 
     nanosleep(&sleep_time, NULL);
+}
+
+void chip_os_task_sleep(chip_os_time_t ticks)
+{
+    chip_os_time_t ms = chip_os_time_ticks_to_ms(ticks);
+    chip_os_task_sleep_ms(ms);
 }
 
 bool chip_os_sched_started(void)
