@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
@@ -842,9 +843,27 @@ int TestCHIPCryptoPAL(void)
         NULL
     };
     // clang-format on
+    // Run test suit againt one context.
+    nlTestRunner(&theSuite, NULL);
+
+    return (nlTestRunnerStats(&theSuite));
+}
+
+#ifdef ON_DEVICE_CHIP_TESTS
+void __attribute__ ((constructor)) my_init(void) {
+    printf("Deploying CHIP Crypto PAL tests\n");
+    nlTestSuite theSuite = { "CHIP Crypto PAL tests", &sTests[0], NULL, NULL };
+    if (CHIP_NO_ERROR != deploy_device_unit_tests(&theSuite)) {
+        printf("Failed in deploying CHIP Crypto PAL tests\n");
+    }
+}
+#else
+int main(void) {
+    nlTestSuite theSuite = { "CHIP Crypto PAL tests", &sTests[0], NULL, NULL };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
 
     return (nlTestRunnerStats(&theSuite));
 }
+#endif // ON_DEVICE_CHIP_TESTS
