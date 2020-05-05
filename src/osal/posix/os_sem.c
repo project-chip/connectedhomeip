@@ -61,31 +61,28 @@ chip_os_error_t chip_os_sem_give(struct chip_os_sem * sem)
 
 chip_os_error_t chip_os_sem_take(struct chip_os_sem * sem, chip_os_time_t timeout)
 {
-    int err = CHIP_OS_OK;
+    int ret;
     struct timespec wait;
 
     if (timeout == CHIP_OS_TIME_FOREVER)
     {
-        err = sem_wait(&sem->lock);
+        ret = sem_wait(&sem->lock);
+        SuccessOrExit(ret);
     }
     else
     {
-        err = clock_gettime(CLOCK_REALTIME, &wait);
-        if (err)
-        {
-            return CHIP_OS_ERROR;
-        }
+        ret = clock_gettime(CLOCK_REALTIME, &wait);
+        SuccessOrExit(ret);
 
         wait.tv_sec += timeout / 1000;
         wait.tv_nsec += (timeout % 1000) * 1000000;
-        err = sem_timedwait(&sem->lock, &wait);
-        if (err && errno == ETIMEDOUT)
-        {
-            return CHIP_OS_TIMEOUT;
-        }
+        ret = sem_timedwait(&sem->lock, &wait);
+        ret = (ret) ? errno : CHIP_OS_OK;
+        SuccessOrExit(ret);
     }
 
-    return (err) ? CHIP_OS_ERROR : CHIP_OS_OK;
+exit:
+    return map_posix_to_osal_error(ret);
 }
 
 #endif // __APPLE__

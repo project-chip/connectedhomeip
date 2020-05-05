@@ -355,10 +355,11 @@ chip_os_time_t chip_os_time_ticks_to_ms(chip_os_time_t ticks);
  * @param prio task priority.
  * @param stack_size Stack size in bytes.
  *
- * @return ID of new task.
+ * @retval CHIP_OS_OK Task is initialized.
+ * @retval CHIP_OS_ERROR Task is invalid.
  */
-int chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_func_t func, void * arg, uint8_t prio,
-                      uint16_t stack_size);
+chip_os_error_t chip_os_task_init(struct chip_os_task * t, const char * name, chip_os_task_func_t func, void * arg, uint8_t prio,
+                                  uint16_t stack_size);
 
 /**
  * @brief Yield the current task.
@@ -404,9 +405,10 @@ void * chip_os_get_current_task_id(void);
  *
  * @param task ID of task to abort.
  *
- * @return N/A
+ * @retval CHIP_OS_OK Task was removed.
+ * @retval CHIP_OS_ERROR Problem removing task.
  */
-int chip_os_task_remove(struct chip_os_task * t);
+chip_os_error_t chip_os_task_remove(struct chip_os_task * t);
 
 /*
  * Scheduler functions
