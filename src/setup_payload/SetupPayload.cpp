@@ -23,6 +23,16 @@
 
 #include "SetupPayload.h"
 
+#include <core/CHIPCore.h>
+#include <core/CHIPTLV.h>
+#include <core/CHIPTLVData.hpp>
+#include <core/CHIPTLVUtilities.hpp>
+#include <support/RandUtils.h>
+
+using namespace chip;
+using namespace std;
+using namespace chip::TLV;
+
 namespace chip {
 
 // Check the Setup Payload for validity
@@ -73,6 +83,42 @@ bool SetupPayload::isValidManualCode()
     }
 
     return true;
+}
+
+CHIP_ERROR SetupPayload::addOptionalData(OptionalQRCodeInfo info)
+{
+    optionalData[info.tag] = info;
+    return CHIP_NO_ERROR;
+}
+
+vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalData()
+{
+    vector<OptionalQRCodeInfo> returnedOptionalInfo;
+    for (map<uint64_t, OptionalQRCodeInfo>::iterator it = optionalData.begin(); it != optionalData.end(); ++it)
+    {
+        returnedOptionalInfo.push_back(it->second);
+    }
+    return returnedOptionalInfo;
+}
+
+CHIP_ERROR SetupPayload::removeOptionalData(uint64_t tag)
+{
+    if (optionalData.find(tag) == optionalData.end())
+    {
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+    optionalData.erase(tag);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag)
+{
+    if (tagNumber >= 1 << kRawVendorTagLengthInBits)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    outVendorTag = ContextTag(tagNumber);
+    return CHIP_NO_ERROR;
 }
 
 bool SetupPayload::operator==(const SetupPayload & input)
