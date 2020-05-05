@@ -37,11 +37,12 @@ AR  = $(CROSS_COMPILE)ar
 
 ### ===== Compiler Flags =====
 
-INCLUDES =                                 \
-    -I.                                    \
-    -I$(PROJ_ROOT)/src/include             \
-    -I$(PROJ_ROOT)/src/osal/include        \
-    -I$(PROJ_ROOT)/src/osal/posix          \
+INCLUDES =                                            \
+    -I.                                               \
+    -I$(PROJ_ROOT)/src/include                        \
+    -I$(PROJ_ROOT)/src/osal/include                   \
+    -I$(PROJ_ROOT)/src/osal/posix                     \
+    -I$(PROJ_ROOT)/third_party/nlassert/repo/include  \
     $(NULL)
 
 DEBUG ?= 0

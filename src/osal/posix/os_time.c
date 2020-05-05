@@ -40,9 +40,6 @@ chip_os_time_t chip_os_time_get(void)
 #else
 // True POSIX Implementation
 
-/**
- * Return ticks [ms] since system start as uint32_t.
- */
 chip_os_time_t chip_os_time_get(void)
 {
     struct timespec now;

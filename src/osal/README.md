@@ -94,6 +94,8 @@ contributors to CHIP OSAL, but each had gaps relative the requirements for Proje
     - Uses event queues with event pointer semantics whereas CHIP uses message queues with copy semantics.
     - Has an inconsistant API namespace.  All CHIP OSAL functions predictably begin with `chip_os`.
     - Was designed to enforce a particular embedded programming philosophy.  Semaphores are notably missing for example.
+    - Imposes its own centralized timer system rather than providing a thin pass-through to native OS timers.
+    - Centralized timer system relies on nler event queues, which are antithetical to the CHIP messsage queue paradigm.
 
 * [npl](https://github.com/apache/mynewt-nimble/tree/master/porting/npl) - MyNewt NimBLE Platform Layer
     - Uses event queues with event pointer semantics whereas CHIP uses message queues with copy semantics.
@@ -198,5 +200,7 @@ Apple uses POSIX pthreads but also Grand Central dispatch for the timer and sema
 │   ├── os_task.c          - Implementation of chip_os_task
 │   ├── os_time.c          - Implementation of chip_os_time
 │   ├── os_timer.c         - Implementation of chip_os_timer
+│   ├── os_utils.c         - Shared code for the posix port, most notably error mapping.
+│   ├── os_utils.h         - Shared header for the posix port, most notably nlassert code utility macros.
 │   └── RingPthread.h      - Thread-safe version of Ring using posix mutex and cond
 ```

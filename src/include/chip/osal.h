@@ -239,9 +239,10 @@ void chip_os_queue_set_signal_cb(struct chip_os_queue * msgq, chip_os_signal_fn 
  * @param cb        Callback function to invoke once timer expires.
  * @param arg       Argument to pass to timer callback function.
  *
- * @return N/A
+ * @retval CHIP_OS_OK Timer was created.
+ * @retval CHIP_OS_ERROR Timer creation failed.
  */
-void chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn cb, void * arg);
+chip_os_error_t chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn cb, void * arg);
 
 /**
  * @brief Start a timer.
@@ -254,11 +255,12 @@ void chip_os_timer_init(struct chip_os_timer * timer, chip_os_timer_fn cb, void 
  * using the new duration and period values.
  *
  * @param timer     Address of timer.
- * @param duration  Initial timer duration [milliseconds].
+ * @param duration  Initial timer duration [ticks].
  *
- * @return N/A
+ * @retval CHIP_OS_OK Message received.
+ * @retval CHIP_OS_EBUSY Returned without waiting.
  */
-void chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t duration);
+chip_os_error_t chip_os_timer_start_ms(struct chip_os_timer * timer, chip_os_time_t duration);
 
 /**
  * @brief Start a timer.
@@ -273,9 +275,10 @@ void chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t duration);
  * @param timer     Address of timer.
  * @param ticks     Initial timer duration [CPU ticks].
  *
- * @return N/A
+ * @retval CHIP_OS_OK Message received.
+ * @retval CHIP_OS_EBUSY Returned without waiting.
  */
-void chip_os_timer_start_ticks(struct chip_os_timer * timer, chip_os_time_t ticks);
+chip_os_error_t chip_os_timer_start(struct chip_os_timer * timer, chip_os_time_t ticks);
 
 /**
  * @brief Stop a timer.
@@ -293,9 +296,17 @@ void chip_os_timer_start_ticks(struct chip_os_timer * timer, chip_os_time_t tick
  *
  * @return N/A
  */
-void chip_os_timer_stop(struct chip_os_timer * timer);
+chip_os_error_t chip_os_timer_stop(struct chip_os_timer * timer);
 
-int chip_os_timer_inited(struct chip_os_timer * timer);
+/**
+ * @brief Check whether the given timer has been initialized.
+ *
+ * @param timer     Address of timer.
+ *
+ * @retval CHIP_OS_OK Timer is initialized.
+ * @retval CHIP_OS_EINVAL Timer is invalid.
+ */
+chip_os_error_t chip_os_timer_inited(struct chip_os_timer * timer);
 
 bool chip_os_timer_is_active(struct chip_os_timer * timer);
 

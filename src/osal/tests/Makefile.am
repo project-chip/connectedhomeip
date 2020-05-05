@@ -41,6 +41,7 @@ if CHIP_BUILD_TESTS
 
 AM_CPPFLAGS                                            = \
     $(NLUNIT_TEST_CPPFLAGS)                              \
+    $(NLASSERT_CPPFLAGS)                                 \
     -I$(top_srcdir)/src/include                          \
     -I$(top_srcdir)/src/osal/include                     \
     -I$(top_srcdir)/src/osal/posix                       \
