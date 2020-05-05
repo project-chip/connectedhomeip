@@ -26,6 +26,9 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
+
+#include <core/CHIPError.h>
 
 using namespace std;
 
@@ -42,6 +45,9 @@ const int kManualSetupDiscriminatorFieldLengthInBits = 4;
 const int kSetupPINCodeFieldLengthInBits             = 27;
 const int kReservedFieldLengthInBits                 = 1;
 
+const int kRawVendorTagLengthInBits = 7;
+const uint16_t kSerialNumberTag     = 128;
+
 const int kManualSetupShortCodeCharLength = 10;
 const int kManualSetupLongCodeCharLength  = 20;
 const int kManualSetupVendorIdCharLength  = 5;
@@ -55,8 +61,45 @@ const int kTotalPayloadDataSizeInBytes = (kTotalPayloadDataSizeInBits + 7) / 8;
 
 const char * const kQRCodePrefix = "CH:";
 
+enum optionalQRCodeInfoType
+{
+    optionalQRCodeInfoTypeString,
+    optionalQRCodeInfoTypeInt
+};
+
+/**
+ * @brief A struct to hold optional QR Code Info
+ * @param tag The tag number of the optional info
+ * @param type The type (String or Int) of the optional info
+ * @param data  If type is optionalQRCodeInfoTypeString,
+ *              the string value of the optional info,
+ *              otherwise should not be set.
+ * @param integer If type is optionalQRCodeInfoTypeInt,
+ *              the integer value of the optional info,
+ *              otherwise should not be set.
+ **/
+struct optionalQRCodeInfo
+{
+    uint64_t tag;
+    enum optionalQRCodeInfoType type;
+    int integer;
+    string data;
+};
+
+/**
+ * @brief A function to retrieve a vendor tag
+ * @param tagNumber Tag number is 7 bits long
+ * @param outVendorTag A 64-bit integer representing the tag
+ *                     to use in optionalQRCodeInfo
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag);
+
 class SetupPayload
 {
+private:
+    vector<optionalQRCodeInfo> optionalData;
+
 public:
     uint8_t version;
     uint16_t vendorID;
@@ -65,6 +108,26 @@ public:
     uint16_t rendezvousInformation;
     uint16_t discriminator;
     uint32_t setUpPINCode;
+    string serialNumber = "";
+
+    /**
+     * @brief A function to retrieve the vector of optionalQRCodeInfo infos
+     * @return Returns a vector of optionalQRCodeInfos
+     **/
+    vector<optionalQRCodeInfo> getAllOptionalData();
+
+    /** @brief A function to add an optional QR Code info object
+     * @param info Optional QR code info object to add
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR addOptionalData(optionalQRCodeInfo info);
+
+    /** @brief A function to remove an optional QR Code info object
+     * @param info Optional QR code info object to remove
+     * @return Returns CHIP_ERROR_KEY_NOT_FOUND if info could not be found in existing optional data structs,
+     *                 CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR removeOptionalData(optionalQRCodeInfo info);
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :

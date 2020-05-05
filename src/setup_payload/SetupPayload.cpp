@@ -23,8 +23,17 @@
 
 #include "SetupPayload.h"
 
-namespace chip {
+#include <core/CHIPCore.h>
+#include <core/CHIPTLV.h>
+#include <core/CHIPTLVUtilities.hpp>
+#include <core/CHIPTLVData.hpp>
+#include <support/RandUtils.h>
 
+using namespace chip;
+using namespace std;
+using namespace chip::TLV;
+
+namespace chip {
 // Check the Setup Payload for validity
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
@@ -73,6 +82,57 @@ bool SetupPayload::isValidManualCode()
     }
 
     return true;
+}
+
+CHIP_ERROR SetupPayload::addOptionalData(optionalQRCodeInfo info)
+{
+    optionalData.push_back(info);
+    return CHIP_NO_ERROR;
+}
+
+vector<optionalQRCodeInfo> SetupPayload::getAllOptionalData()
+{
+    vector<optionalQRCodeInfo> returnedOptionalInfo;
+    copy(optionalData.begin(), optionalData.end(), back_inserter(returnedOptionalInfo));
+    return returnedOptionalInfo;
+}
+
+CHIP_ERROR SetupPayload::removeOptionalData(optionalQRCodeInfo info)
+{
+    int i = -1;
+    for (optionalQRCodeInfo currentInfo : optionalData)
+    {
+        i++;
+        if (info.tag != currentInfo.tag)
+        {
+            continue;
+        }
+        if (info.type != currentInfo.type)
+        {
+            continue;
+        }
+        if (currentInfo.type == optionalQRCodeInfoTypeString && currentInfo.data.compare(info.data) == 0)
+        {
+            optionalData.erase(optionalData.begin() + i);
+            return CHIP_NO_ERROR;
+        }
+        if (currentInfo.type == optionalQRCodeInfoTypeInt && currentInfo.integer == info.integer)
+        {
+            optionalData.erase(optionalData.begin() + i);
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_KEY_NOT_FOUND;
+}
+
+CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag)
+{
+    if (tagNumber >= 1 << kRawVendorTagLengthInBits)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    outVendorTag = ContextTag(tagNumber);
+    return CHIP_NO_ERROR;
 }
 
 bool SetupPayload::operator==(const SetupPayload & input)

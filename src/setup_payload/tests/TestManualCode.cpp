@@ -24,6 +24,10 @@
 
 #include "TestManualCode.h"
 
+#include <iostream>
+#include <nlbyteorder.h>
+#include <nlunit-Test.h>
+
 #include "ManualSetupPayloadGenerator.cpp"
 #include "ManualSetupPayloadParser.cpp"
 #include "SetupPayload.cpp"
@@ -35,7 +39,7 @@
 
 using namespace chip;
 
-void testDecimalRepresentation_PartialPayload()
+void TestDecimalRepresentation_PartialPayload(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
@@ -44,7 +48,7 @@ void testDecimalRepresentation_PartialPayload()
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
-    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
     string expectedResult = "3489665618";
 
     bool succeeded = result.compare(expectedResult) == 0;
@@ -53,10 +57,10 @@ void testDecimalRepresentation_PartialPayload()
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
-    assert(succeeded);
+    NL_TEST_ASSERT(inSuite, succeeded);
 }
 
-void testDecimalRepresentation_PartialPayload_RequiresCustomFlow()
+void TestDecimalRepresentation_PartialPayload_RequiresCustomFlow(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
@@ -66,7 +70,7 @@ void testDecimalRepresentation_PartialPayload_RequiresCustomFlow()
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
-    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
     string expectedResult = "34896656190000000000";
 
     bool succeeded = result.compare(expectedResult) == 0;
@@ -75,10 +79,10 @@ void testDecimalRepresentation_PartialPayload_RequiresCustomFlow()
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result:   %s\n", result.c_str());
     }
-    assert(succeeded);
+    NL_TEST_ASSERT(inSuite, succeeded);
 }
 
-void testDecimalRepresentation_FullPayloadWithoutZeros()
+void TestDecimalRepresentation_FullPayloadWithoutZeros(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
@@ -90,7 +94,7 @@ void testDecimalRepresentation_FullPayloadWithoutZeros()
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
-    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
     string expectedResult = "34896656194536714526";
 
     bool succeeded = result.compare(expectedResult) == 0;
@@ -99,10 +103,10 @@ void testDecimalRepresentation_FullPayloadWithoutZeros()
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
-    assert(succeeded);
+    NL_TEST_ASSERT(inSuite, succeeded);
 }
 
-void testDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow()
+void TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
@@ -113,7 +117,7 @@ void testDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
-    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
     string expectedResult = "3489665618";
 
     bool succeeded = result.compare(expectedResult) == 0;
@@ -122,10 +126,10 @@ void testDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
-    assert(succeeded);
+    NL_TEST_ASSERT(inSuite, succeeded);
 }
 
-void testDecimalRepresentation_FullPayloadWithZeros()
+void TestDecimalRepresentation_FullPayloadWithZeros(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
@@ -137,7 +141,7 @@ void testDecimalRepresentation_FullPayloadWithZeros()
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
-    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
     string expectedResult = "34896656190000100001";
 
     bool succeeded = result.compare(expectedResult) == 0;
@@ -146,10 +150,10 @@ void testDecimalRepresentation_FullPayloadWithZeros()
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
-    assert(succeeded);
+    NL_TEST_ASSERT(inSuite, succeeded);
 }
 
-void testDecimalRepresentation_AllZeros()
+void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
@@ -158,7 +162,7 @@ void testDecimalRepresentation_AllZeros()
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
-    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
     string expectedResult = "";
 
     bool succeeded = result.compare(expectedResult) == 0;
@@ -167,10 +171,10 @@ void testDecimalRepresentation_AllZeros()
         printf("Expected result: %s\n", expectedResult.c_str());
         printf("Actual result: %s\n", result.c_str());
     }
-    assert(succeeded);
+    NL_TEST_ASSERT(inSuite, succeeded);
 }
 
-void testDecimalRepresentation_InvalidPayload()
+void TestDecimalRepresentation_InvalidPayload(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
@@ -179,255 +183,295 @@ void testDecimalRepresentation_InvalidPayload()
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
-    assert(generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-void assertPayloadValues(CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload, uint32_t pinCode,
-                         uint8_t discriminator, uint16_t vendorID, uint16_t productID)
+void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload,
+                         uint32_t pinCode, uint8_t discriminator, uint16_t vendorID, uint16_t productID)
 {
-    assert(actualError == expectedError);
-    assert(payload.setUpPINCode == pinCode);
-    assert(payload.discriminator == discriminator);
-    assert(payload.vendorID == vendorID);
-    assert(payload.productID == productID);
+    NL_TEST_ASSERT(inSuite, actualError == expectedError);
+    NL_TEST_ASSERT(inSuite, payload.setUpPINCode == pinCode);
+    NL_TEST_ASSERT(inSuite, payload.discriminator == discriminator);
+    NL_TEST_ASSERT(inSuite, payload.vendorID == vendorID);
+    NL_TEST_ASSERT(inSuite, payload.productID == productID);
 }
 
-void assertEmptyPayloadWithError(CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload)
+void assertEmptyPayloadWithError(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, SetupPayload payload)
 {
-    assert(actualError == expectedError);
-    assert(payload.setUpPINCode == 0 && payload.discriminator == 0 && payload.productID == 0 && payload.vendorID == 0);
+    NL_TEST_ASSERT(inSuite, actualError == expectedError);
+    NL_TEST_ASSERT(inSuite,
+                   payload.setUpPINCode == 0 && payload.discriminator == 0 && payload.productID == 0 && payload.vendorID == 0);
 }
 
-void testPayloadParser_FullPayload()
-{
-    printf("\n---Running Test--- %s\n", __FUNCTION__);
-    SetupPayload payload;
-    assertPayloadValues(ManualSetupPayloadParser("34896656194536714526").populatePayload(payload), CHIP_NO_ERROR, payload, 2345, 13,
-                        45367, 14526);
-    assertPayloadValues(ManualSetupPayloadParser("41039884090456200032").populatePayload(payload), CHIP_NO_ERROR, payload, 38728284,
-                        15, 4562, 32);
-    assertPayloadValues(ManualSetupPayloadParser("02684354590000100001").populatePayload(payload), CHIP_NO_ERROR, payload, 1, 1, 1,
-                        1);
-}
-
-void testPayloadParser_PartialPayload()
+void TestPayloadParser_FullPayload(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
-    assertPayloadValues(ManualSetupPayloadParser("2418402196").populatePayload(payload), CHIP_NO_ERROR, payload, 1241546, 9, 0, 0);
-    assertPayloadValues(ManualSetupPayloadParser("3669676692").populatePayload(payload), CHIP_NO_ERROR, payload, 90007882, 13, 0,
-                        0);
-    assertPayloadValues(ManualSetupPayloadParser("0268435458").populatePayload(payload), CHIP_NO_ERROR, payload, 1, 1, 0, 0);
-    assertPayloadValues(ManualSetupPayloadParser("00000000030000000000").populatePayload(payload), CHIP_NO_ERROR, payload, 1, 0, 0,
-                        0);
+    CHIP_ERROR err = ManualSetupPayloadParser("34896656194536714526").populatePayload(payload);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 2345, 13, 45367, 14526);
+    err = ManualSetupPayloadParser("41039884090456200032").populatePayload(payload);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 38728284, 15, 4562, 32);
+    err = ManualSetupPayloadParser("02684354590000100001").populatePayload(payload);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 1, 1, 1);
+}
+
+void TestPayloadParser_PartialPayload(nlTestSuite * inSuite, void * inContext)
+{
+    printf("\n---Running Test--- %s\n", __FUNCTION__);
+    SetupPayload payload;
+    CHIP_ERROR err = ManualSetupPayloadParser("2418402196").populatePayload(payload);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1241546, 9, 0, 0);
+
+    err = ManualSetupPayloadParser("3669676692").populatePayload(payload);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 90007882, 13, 0, 0);
+
+    err = ManualSetupPayloadParser("0268435458").populatePayload(payload);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 1, 0, 0);
+
+    err = ManualSetupPayloadParser("00000000030000000000").populatePayload(payload);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 1, 0, 0, 0);
 
     // no discriminator (= 0)
-    assert(ManualSetupPayloadParser("0000070548").populatePayload(payload) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser("0000070548").populatePayload(payload) == CHIP_NO_ERROR);
 
     // no vid (= 0)
-    assert(ManualSetupPayloadParser("40321242450000014536").populatePayload(payload) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser("40321242450000014536").populatePayload(payload) == CHIP_NO_ERROR);
 
     // no pid (= 0)
-    assert(ManualSetupPayloadParser("40321242452645300000").populatePayload(payload) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser("40321242452645300000").populatePayload(payload) == CHIP_NO_ERROR);
 }
 
-void testExtractBits()
+void TestExtractBits(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     uint64_t dest;
     CHIP_ERROR result = extractBits(5, dest, 2, 1, 3);
-    assert(result == CHIP_NO_ERROR);
-    assert(dest == 1);
+    NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, dest == 1);
 
     result = extractBits(4567, dest, 4, 8, 13);
-    assert(result == CHIP_NO_ERROR);
-    assert(dest == 29);
+    NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, dest == 29);
 
-    assert(extractBits(4567, dest, 4, 18, 13) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(extractBits(4567, dest, 14, 2, 13) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(extractBits(5, dest, 3, 1, 3) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(extractBits(5, dest, 2, 2, 3) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, extractBits(4567, dest, 4, 18, 13) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, extractBits(4567, dest, 14, 2, 13) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, extractBits(5, dest, 3, 1, 3) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, extractBits(5, dest, 2, 2, 3) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
-void testPayloadParser_InvalidEntry()
+void TestPayloadParser_InvalidEntry(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     SetupPayload payload;
 
     // Empty input
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser("").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
+                                payload);
 
     // Invalid character
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("24184.2196").populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE,
-                                payload);
+    assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser("24184.2196").populatePayload(payload),
+                                CHIP_ERROR_INVALID_INTEGER_VALUE, payload);
 
     // too short
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("2456").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
-                                payload);
+    assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser("2456").populatePayload(payload),
+                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
 
     // too long for long code
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("123456789123456785671").populatePayload(payload),
+    assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser("123456789123456785671").populatePayload(payload),
                                 CHIP_ERROR_INVALID_STRING_LENGTH, payload);
 
     // too long for short code
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("12749875380").populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
-                                payload);
+    assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser("12749875380").populatePayload(payload),
+                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
 
     // bit to indicate short code but long code length
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("23456789123456785610").populatePayload(payload),
+    assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser("23456789123456785610").populatePayload(payload),
                                 CHIP_ERROR_INVALID_STRING_LENGTH, payload);
     // no pin code (= 0)
-    assertEmptyPayloadWithError(ManualSetupPayloadParser("3221225472").populatePayload(payload), CHIP_ERROR_INVALID_ARGUMENT,
-                                payload);
+    assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser("3221225472").populatePayload(payload),
+                                CHIP_ERROR_INVALID_ARGUMENT, payload);
 }
 
-void testCheckDecimalStringValidity()
+void TestCheckDecimalStringValidity(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
-    assert(checkDecimalStringValidity("") == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(checkDecimalStringValidity("1010.9") == CHIP_NO_ERROR);
-    assert(checkDecimalStringValidity("0000") == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, checkDecimalStringValidity("") == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, checkDecimalStringValidity("1010.9") == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, checkDecimalStringValidity("0000") == CHIP_NO_ERROR);
 }
 
-void testCheckCodeLengthValidity()
+void TestCheckCodeLengthValidity(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
-    assert(checkCodeLengthValidity("01234567890123456789", true) == CHIP_NO_ERROR);
-    assert(checkCodeLengthValidity("0123456789", false) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, checkCodeLengthValidity("01234567890123456789", true) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, checkCodeLengthValidity("0123456789", false) == CHIP_NO_ERROR);
 
-    assert(checkCodeLengthValidity("01234567891", false) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(checkCodeLengthValidity("012345678", false) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(checkCodeLengthValidity("012345678901234567891", true) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(checkCodeLengthValidity("0123456789012345678", true) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, checkCodeLengthValidity("01234567891", false) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, checkCodeLengthValidity("012345678", false) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, checkCodeLengthValidity("012345678901234567891", true) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, checkCodeLengthValidity("0123456789012345678", true) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
-void testDecimalStringToNumber()
+void TestDecimalStringToNumber(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     uint64_t number;
-    assert(toNumber("12345", number) == CHIP_NO_ERROR);
-    assert(number == 12345);
+    NL_TEST_ASSERT(inSuite, toNumber("12345", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 12345);
 
-    assert(toNumber("01234567890123456789", number) == CHIP_NO_ERROR);
-    assert(number == 1234567890123456789);
+    NL_TEST_ASSERT(inSuite, toNumber("01234567890123456789", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 1234567890123456789);
 
-    assert(toNumber("00000001", number) == CHIP_NO_ERROR);
-    assert(number == 1);
+    NL_TEST_ASSERT(inSuite, toNumber("00000001", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 1);
 
-    assert(toNumber("0", number) == CHIP_NO_ERROR);
-    assert(number == 0);
+    NL_TEST_ASSERT(inSuite, toNumber("0", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 0);
 
-    assert(toNumber("012345.123456789", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    assert(toNumber("/", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, toNumber("012345.123456789", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, toNumber("/", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
 }
 
-void testReadCharsFromDecimalString()
+void TestReadCharsFromDecimalString(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     uint64_t number;
     int index = 3;
-    assert(readDigitsFromDecimalString("12345", index, number, 2) == CHIP_NO_ERROR);
-    assert(number == 45);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("12345", index, number, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 45);
 
     index = 2;
-    assert(readDigitsFromDecimalString("6256276377282", index, number, 7) == CHIP_NO_ERROR);
-    assert(number == 5627637);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("6256276377282", index, number, 7) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 5627637);
 
     index = 0;
-    assert(readDigitsFromDecimalString("10", index, number, 2) == CHIP_NO_ERROR);
-    assert(number == 10);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("10", index, number, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 10);
 
     index = 0;
-    assert(readDigitsFromDecimalString("01", index, number, 2) == CHIP_NO_ERROR);
-    assert(number == 1);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("01", index, number, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 1);
 
     index = 1;
-    assert(readDigitsFromDecimalString("11", index, number, 1) == CHIP_NO_ERROR);
-    assert(number == 1);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("11", index, number, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 1);
 
     index = 2;
-    assert(readDigitsFromDecimalString("100001", index, number, 3) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("100001", index, number, 3) == CHIP_NO_ERROR);
 
     index = 1;
-    assert(readDigitsFromDecimalString("12345", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    assert(readDigitsFromDecimalString("12", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("12345", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("12", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
 
     index = -2;
-    assert(readDigitsFromDecimalString("6256276377282", index, number, 7) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("6256276377282", index, number, 7) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-void testReadBitsFromNumber()
+void TestReadBitsFromNumber(nlTestSuite * inSuite, void * inContext)
 {
     printf("\n---Running Test--- %s\n", __FUNCTION__);
     uint64_t number;
     int index = 3;
-    assert(readBitsFromNumber(12345, index, number, 6, 14) == CHIP_NO_ERROR);
-    assert(number == 7);
+    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 6, 14) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 7);
 
     index = 0;
-    assert(readBitsFromNumber(12345, index, number, 14, 14) == CHIP_NO_ERROR);
-    assert(number == 12345);
+    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 14, 14) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 12345);
 
     index = 0;
-    assert(readBitsFromNumber(1, index, number, 1, 14) == CHIP_NO_ERROR);
-    assert(number == 1);
+    NL_TEST_ASSERT(inSuite, readBitsFromNumber(1, index, number, 1, 14) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 1);
 
     index = 0;
-    assert(readBitsFromNumber(12345, index, number, 20, 22) == CHIP_NO_ERROR);
-    assert(number == 12345);
+    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 20, 22) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 12345);
 
     index = 1;
-    assert(readBitsFromNumber(1, index, number, 1, 14) == CHIP_NO_ERROR);
-    assert(number == 0);
+    NL_TEST_ASSERT(inSuite, readBitsFromNumber(1, index, number, 1, 14) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, number == 0);
 
     index = 0;
-    assert(readBitsFromNumber(12345, index, number, 15, 14) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 15, 14) == CHIP_ERROR_INVALID_STRING_LENGTH);
 
     index = 14;
-    assert(readBitsFromNumber(12345, index, number, 1, 14) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 1, 14) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
-void testShortCodeCharLengths()
+void TestShortCodeCharLengths(nlTestSuite * inSuite, void * inContext)
 {
     size_t numBits                        = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
     size_t manualSetupShortCodeCharLength = ceil(log10(pow(2, numBits)));
-    assert(manualSetupShortCodeCharLength == kManualSetupShortCodeCharLength);
+    NL_TEST_ASSERT(inSuite, manualSetupShortCodeCharLength == kManualSetupShortCodeCharLength);
 
     size_t manualSetupVendorIdCharLength = ceil(log10(pow(2, kVendorIDFieldLengthInBits)));
-    assert(manualSetupVendorIdCharLength == kManualSetupVendorIdCharLength);
+    NL_TEST_ASSERT(inSuite, manualSetupVendorIdCharLength == kManualSetupVendorIdCharLength);
 
     size_t manualSetupProductIdCharLength = ceil(log10(pow(2, kProductIDFieldLengthInBits)));
-    assert(manualSetupProductIdCharLength == kManualSetupProductIdCharLength);
+    NL_TEST_ASSERT(inSuite, manualSetupProductIdCharLength == kManualSetupProductIdCharLength);
 
     size_t manualSetupLongCodeCharLength =
         kManualSetupShortCodeCharLength + kManualSetupVendorIdCharLength + kManualSetupProductIdCharLength;
-    assert(manualSetupLongCodeCharLength == kManualSetupLongCodeCharLength);
+    NL_TEST_ASSERT(inSuite, manualSetupLongCodeCharLength == kManualSetupLongCodeCharLength);
 }
 
-int TestManualSetupCode(void)
+/**
+ *  Test Suite that lists all the Test functions.
+ */
+// clang-format off
+static const nlTest sTests[] =
 {
-    printf("---Running Test--- tests from %s\n", __FILE__);
-    testDecimalRepresentation_PartialPayload();
-    testDecimalRepresentation_PartialPayload_RequiresCustomFlow();
-    testDecimalRepresentation_FullPayloadWithZeros();
-    testDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow();
-    testDecimalRepresentation_FullPayloadWithoutZeros();
+    NL_TEST_DEF("Generate Decimal Representation from Partial Payload",                 TestDecimalRepresentation_PartialPayload),
+    NL_TEST_DEF("Generate Decimal Representation from Partial Payload (Custom Flow)",   TestDecimalRepresentation_PartialPayload_RequiresCustomFlow),
+    NL_TEST_DEF("Generate Decimal Representation from Full Payload with Zeros",         TestDecimalRepresentation_FullPayloadWithZeros),
+    NL_TEST_DEF("Decimal Representation from Full Payload without Zeros",               TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow),
+    NL_TEST_DEF("Decimal Representation from Full Payload without Zeros (Custom Flow)", TestDecimalRepresentation_FullPayloadWithoutZeros),
+    NL_TEST_DEF("Test Decimal Representation - Invalid Payload",                        TestDecimalRepresentation_InvalidPayload),
+    NL_TEST_DEF("Test Decimal Representation - All Zeros",                              TestDecimalRepresentation_AllZeros),
+    NL_TEST_DEF("Parse from Partial Payload",                                           TestPayloadParser_PartialPayload),
+    NL_TEST_DEF("Parse from Full Payload",                                              TestPayloadParser_FullPayload),
+    NL_TEST_DEF("Test Invalid Entry To QR Code Parser",                                 TestPayloadParser_InvalidEntry),
+    NL_TEST_DEF("Test Extract Bits",                                                    TestExtractBits),
+    NL_TEST_DEF("Check Decimal String Validity",                                        TestCheckDecimalStringValidity),
+    NL_TEST_DEF("Check QR Code Length Validity",                                        TestCheckCodeLengthValidity),
+    NL_TEST_DEF("Test Decimal String to Number",                                        TestDecimalStringToNumber),
+    NL_TEST_DEF("Read Bits from Number",                                                TestReadBitsFromNumber),
+    NL_TEST_DEF("Test Short Code Character Lengths",                                    TestShortCodeCharLengths),
+    NL_TEST_DEF("Test Read Charatcers from Decimal String",                             TestReadCharsFromDecimalString),
 
-    testDecimalRepresentation_InvalidPayload();
-    testDecimalRepresentation_AllZeros();
 
-    testPayloadParser_PartialPayload();
-    testPayloadParser_FullPayload();
-    testPayloadParser_InvalidEntry();
+    NL_TEST_SENTINEL()
+};
+// clang-format on
 
-    testExtractBits();
-    testCheckDecimalStringValidity();
-    testCheckCodeLengthValidity();
-    testDecimalStringToNumber();
-    testReadCharsFromDecimalString();
-    testReadBitsFromNumber();
+struct TestContext
+{
+    nlTestSuite * mSuite;
+};
 
-    testShortCodeCharLengths();
+/**
+ *  Main
+ */
+int main(int argc, char * argv[])
+{
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "chip-manual-code-general-Tests",
+        &sTests[0],
+        NULL,
+        NULL
+    };
+    // clang-format on
+    TestContext context;
 
-    return (0);
+    context.mSuite = &theSuite;
+
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nl_test_set_output_style(OUTPUT_CSV);
+
+    // Run Test suit against one context
+    nlTestRunner(&theSuite, &context);
+
+    return nlTestRunnerStats(&theSuite);
 }
