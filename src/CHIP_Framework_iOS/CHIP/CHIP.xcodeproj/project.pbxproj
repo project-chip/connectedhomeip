@@ -12,7 +12,7 @@
 		B20252DD2459EA5F00F97062 /* libSetupPayload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B20252DB2459EA5F00F97062 /* libSetupPayload.a */; platformFilter = ios; };
 		B2E0D7B1245B0B5C003C5B48 /* CHIP.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A8245B0B5C003C5B48 /* CHIP.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B2245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B2E0D7B3245B0B5C003C5B48 /* CHIPError.m in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AA245B0B5C003C5B48 /* CHIPError.m */; };
+		B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */; };
 		B2E0D7B4245B0B5C003C5B48 /* CHIPError.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AB245B0B5C003C5B48 /* CHIPError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B5245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AC245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B6245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AD245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm */; };
@@ -41,7 +41,7 @@
 		B20252DB2459EA5F00F97062 /* libSetupPayload.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSetupPayload.a; path = "../../output/arm64-apple-darwin-ios/lib/libSetupPayload.a"; sourceTree = "<group>"; };
 		B2E0D7A8245B0B5C003C5B48 /* CHIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIP.h; sourceTree = "<group>"; };
 		B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPManualSetupPayloadParser.h; sourceTree = "<group>"; };
-		B2E0D7AA245B0B5C003C5B48 /* CHIPError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPError.m; sourceTree = "<group>"; };
+		B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPError.mm; sourceTree = "<group>"; };
 		B2E0D7AB245B0B5C003C5B48 /* CHIPError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPError.h; sourceTree = "<group>"; };
 		B2E0D7AC245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPQRCodeSetupPayloadParser.h; sourceTree = "<group>"; };
 		B2E0D7AD245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPManualSetupPayloadParser.mm; sourceTree = "<group>"; };
@@ -96,7 +96,7 @@
 			children = (
 				B2E0D7A8245B0B5C003C5B48 /* CHIP.h */,
 				B2E0D7AB245B0B5C003C5B48 /* CHIPError.h */,
-				B2E0D7AA245B0B5C003C5B48 /* CHIPError.m */,
+				B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */,
 				B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */,
 				B2E0D7AD245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm */,
 				B2E0D7AC245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h */,
@@ -239,7 +239,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
-				B2E0D7B3245B0B5C003C5B48 /* CHIPError.m in Sources */,
+				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* CHIPSetupPayload.mm in Sources */,
 				B2E0D7B6245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm in Sources */,
 			);
