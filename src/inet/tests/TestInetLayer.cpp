@@ -46,6 +46,7 @@
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::ArgParser;
+using namespace chip::System;
 
 /* Preprocessor Macros */
 

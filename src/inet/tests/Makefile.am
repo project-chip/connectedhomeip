@@ -38,13 +38,13 @@ noinst_HEADERS                                        = \
 EXTRA_DIST                                            = \
     $(NULL)
 
-noinst_LIBRARIES                                      = \
-    libTestInetCommon.a                                 \
-    $(NULL)
-
 if CHIP_BUILD_TESTS
 # C preprocessor option flags that will apply to all compiled objects in this
 # makefile.
+
+noinst_LIBRARIES                                      = \
+    libTestInetCommon.a                                 \
+    $(NULL)
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
