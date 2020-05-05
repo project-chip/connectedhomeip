@@ -84,7 +84,7 @@ case "$TASK" in
     ;;
 
   run-osal-tests)
-    docker_run_command 'scripts/build/bootstrap.sh --with-device-layer=linux'
+    docker_run_command 'scripts/build/bootstrap_linux.sh"'
     docker_run_command 'scripts/tests/osal_tests.sh'
     ;;
 

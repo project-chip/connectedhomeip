@@ -1,6 +1,6 @@
 #!/bin/bash
 
-"$config_options" = "$@"
+config_options="${@}"
 
 if [[ ! -f build/default/config.status ]]; then
   mkdir -p build/default

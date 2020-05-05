@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make -C build/src/osal check
+make -C build/default/src/osal check

@@ -31,6 +31,9 @@ jobs:
           name: "Crypto Tests"
           env: TASK="run-crypto-tests"
         - stage: Tests
+          name: "CHIP OSAL Tests"
+          env: TASK="run-osal-tests"
+        - stage: Tests
           name: "Setup Payload Tests"
           env: TASK="run-setup-payload-tests"
         - stage: Tests
