@@ -95,8 +95,8 @@
 /** Override calloc(), free() except for case where memory allocation scheme is not set to custom */
 #ifndef CONFIG_MBEDTLS_CUSTOM_MEM_ALLOC
 #include "esp_mem.h"
-#define MBEDTLS_PLATFORM_STD_CALLOC		esp_mbedtls_mem_calloc
-#define MBEDTLS_PLATFORM_STD_FREE		esp_mbedtls_mem_free
+#define MBEDTLS_PLATFORM_STD_CALLOC esp_mbedtls_mem_calloc
+#define MBEDTLS_PLATFORM_STD_FREE esp_mbedtls_mem_free
 #endif
 
 /* \} name SECTION: System support */
@@ -1158,7 +1158,6 @@
  * Comment this macro to disallow using RSASSA-PSS in certificates.
  */
 #define MBEDTLS_X509_RSASSA_PSS_SUPPORT
-
 
 /* \} name SECTION: mbed TLS feature support */
 
@@ -2261,7 +2260,9 @@
 /* SSL options */
 #ifndef CONFIG_MBEDTLS_ASYMMETRIC_CONTENT_LEN
 
-#define MBEDTLS_SSL_MAX_CONTENT_LEN             CONFIG_MBEDTLS_SSL_MAX_CONTENT_LEN /**< Maxium fragment length in bytes, determines the size of each of the two internal I/O buffers */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN                                                                                                \
+    CONFIG_MBEDTLS_SSL_MAX_CONTENT_LEN /**< Maxium fragment length in bytes, determines the size of each of the two internal I/O   \
+                                          buffers */
 
 #else
 
@@ -2272,7 +2273,7 @@
  * Uncomment to set the size of the inward TLS buffer independently of the
  * outward buffer.
  */
-#define MBEDTLS_SSL_IN_CONTENT_LEN              CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN
+#define MBEDTLS_SSL_IN_CONTENT_LEN CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN
 
 /** \def MBEDTLS_SSL_OUT_CONTENT_LEN
  *
@@ -2295,7 +2296,7 @@
  * guaranteed if the other end of the connection also supports the TLS
  * max_fragment_len extension. Otherwise the connection may fail.
  */
-#define MBEDTLS_SSL_OUT_CONTENT_LEN             CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN
+#define MBEDTLS_SSL_OUT_CONTENT_LEN CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN
 
 #endif /* !CONFIG_MBEDTLS_ASYMMETRIC_CONTENT_LEN */
 
