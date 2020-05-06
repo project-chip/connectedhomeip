@@ -1,6 +1,6 @@
-/***************************************************************************/ /**
+/**
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,13 +13,18 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- *
- ******************************************************************************/
+ */
 
+/**
+ *    @file
+ *      This file provides unit testing for the CHIP ZCL Application
+ *      layer's basic cluster server
+ *
+ */
 #include "utest.h"
 
-void zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(const ZapCommandContext_t *context,
-                                                                      const ZapClusterBasicServerCommandResetToFactoryDefaultsRequest_t *request);
+void zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(
+    const ZapCommandContext_t * context, const ZapClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request);
 
 int main()
 {
@@ -27,7 +32,7 @@ int main()
     ZapClusterBasicServerCommandResetToFactoryDefaultsRequest_t request;
 
     context.endpointId = 1;
-    request.dummy = true;
+    request.dummy      = true;
 
     zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(&context, &request);
 

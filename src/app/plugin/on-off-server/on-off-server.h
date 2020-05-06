@@ -1,6 +1,6 @@
-/***************************************************************************//**
+/**
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,8 +13,14 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      This file provides a header for the CHIP ZCL Application Layer's
+ *      On Off Cluster Server
  *
- ******************************************************************************/
+ */
 
 #ifndef ZCL_ON_OFF_SERVER_H
 #define ZCL_ON_OFF_SERVER_H
@@ -22,9 +28,10 @@
 // Define OnOff plugin Scenes sub-table structure.
 // NOTE: When modifying this structure take into account NVM token space and
 // backward compatibility considerations
-typedef struct {
-  bool hasOnOffValue;
-  bool onOffValue;
+typedef struct
+{
+    bool hasOnOffValue;
+    bool onOffValue;
 } ZapOnOffSceneSubTableEntry_t;
 
 #endif // ZCL_ON_OFF_SERVER_H

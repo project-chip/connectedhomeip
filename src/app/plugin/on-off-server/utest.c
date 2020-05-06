@@ -1,6 +1,6 @@
-/***************************************************************************/ /**
+/**
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,8 +13,14 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      This file provides unit test code for the CHIP ZCL Application Layer's
+ *      On Off Cluster Server
  *
- ******************************************************************************/
+ */
 
 #include "utest.h" /* TODO pass all that stuff in -D */
 
@@ -33,33 +39,33 @@ const ZapClusterSpec_t zapClusterOnOffServerSpec = {
     ZAP_CLUSTER_ON_OFF,
 };
 
-void zapClusterOnOffServerCommandOffRequestHandler(const ZapCommandContext_t *context,
-                                                   const ZapClusterOnOffServerCommandOffRequest_t *request);
-void zapClusterOnOffServerCommandOnRequestHandler(const ZapCommandContext_t *context,
-                                                  const ZapClusterOnOffServerCommandOnRequest_t *request);
-void zapClusterOnOffServerCommandToggleRequestHandler(const ZapCommandContext_t *context,
-                                                      const ZapClusterOnOffServerCommandToggleRequest_t *request);
+void zapClusterOnOffServerCommandOffRequestHandler(const ZapCommandContext_t * context,
+                                                   const ZapClusterOnOffServerCommandOffRequest_t * request);
+void zapClusterOnOffServerCommandOnRequestHandler(const ZapCommandContext_t * context,
+                                                  const ZapClusterOnOffServerCommandOnRequest_t * request);
+void zapClusterOnOffServerCommandToggleRequestHandler(const ZapCommandContext_t * context,
+                                                      const ZapClusterOnOffServerCommandToggleRequest_t * request);
 
 int main()
 {
-  ZapCommandContext_t context;
-  context.endpointId = 1;
+    ZapCommandContext_t context;
+    context.endpointId = 1;
 
-  ZapClusterOnOffServerCommandOffRequest_t request1;
-  request1.dummy = true;
+    ZapClusterOnOffServerCommandOffRequest_t request1;
+    request1.dummy = true;
 
-  zapClusterOnOffServerCommandOffRequestHandler(&context, &request1);
+    zapClusterOnOffServerCommandOffRequestHandler(&context, &request1);
 
-  ZapClusterOnOffServerCommandOnRequest_t request2;
-  request2.dummy = true;
+    ZapClusterOnOffServerCommandOnRequest_t request2;
+    request2.dummy = true;
 
-  zapClusterOnOffServerCommandOnRequestHandler(&context, &request2);
+    zapClusterOnOffServerCommandOnRequestHandler(&context, &request2);
 
-  ZapClusterOnOffServerCommandToggleRequest_t request3;
-  request3.dummy = true;
+    ZapClusterOnOffServerCommandToggleRequest_t request3;
+    request3.dummy = true;
 
-  zapClusterOnOffServerCommandToggleRequestHandler(&context, &request3);
+    zapClusterOnOffServerCommandToggleRequestHandler(&context, &request3);
 
-  printf("Success \n");
-  return 0;
+    printf("Success \n");
+    return 0;
 }
