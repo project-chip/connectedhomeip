@@ -56,6 +56,7 @@ INCLUDES                    := $(OUTPUT_DIR)/src/include \
                                $(OUTPUT_DIR)/src/include/platform/ESP32 \
                                $(IDF_PATH)/components/lwip/lwip/src/include \
                                $(IDF_PATH)/components/freertos/include/freertos/ \
+                               $(IDF_PATH)/components/mbedtls/mbedtls/include \
                                $(COMPONENT_INCLUDES)
 
 # Compiler flags for building CHIP
@@ -72,8 +73,9 @@ INSTALLFLAGS                := -C -v
 # ==================================================
 
 QuoteChar = "
+MBEDTLS_CONFIG_PATH = -DMBEDTLS_CONFIG_FILE='"mbedtls/esp_config.h"'
 
-DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst \,\\,$(1)))$(QuoteChar)
+DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst $(MBEDTLS_CONFIG_PATH),,$(subst \,\\,$(1))))$(QuoteChar)
 
 
 # ==================================================
@@ -103,6 +105,9 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
                                --with-chip-inet-project-includes= \
                                --with-chip-ble-project-includes= \
                                --with-chip-warm-project-includes= \
+                               --with-crypto=mbedtls \
+                               --with-mbedtls-includes=$(IDF_PATH)/components/mbedtls/mbedtls/include \
+                               --with-mbedtls-libs=$(BUILD_DIR_BASE)/mbedtls \
                                --disable-tests \
                                --disable-tools \
                                --disable-docs \
@@ -130,15 +135,17 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
                                $(REL_CHIP_ROOT)/src/include/ \
                                $(REL_CHIP_ROOT)/src/lib \
                                $(REL_CHIP_ROOT)/src/ \
-                               $(REL_CHIP_ROOT)/src/system
+                               $(REL_CHIP_ROOT)/src/system \
+                               $(IDF_PATH)/components/mbedtls/mbedtls/include
 
 
 # Linker flags to be included when building other components that use CHIP.
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
-					           -lCHIP \
-					           -lInetLayer \
-					           -lSystemLayer \
-					           -lDeviceLayer
+                               -lCHIP \
+                               -lInetLayer \
+                               -lSystemLayer \
+                               -lDeviceLayer \
+                               -lChipCrypto
 
 # Tell the ESP-IDF build system that the CHIP component defines its own build
 # and clean targets.

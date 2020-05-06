@@ -1438,7 +1438,7 @@ if test "${with_crypto}" = "mbedtls"; then
 	[mbedTLS],
 	[MBEDTLS],
 	[mbedtls],
-	[],
+	[-lmbedtls],
 	[
 	    # At this point, the internal mbedTLS package will be neither
 	    # configured nor built, so the normal checks we undertake for an
