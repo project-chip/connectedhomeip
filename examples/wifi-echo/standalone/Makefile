@@ -24,7 +24,7 @@
 
 PROJECT_ROOT := $(realpath .)
 
-CHIP_ROOT ?= $(realpath $(PROJECT_ROOT)/third_party/connectedhomeip)
+CHIP_ROOT = $(realpath $(PROJECT_ROOT)/third_party/connectedhomeip)
 BUILD_SUPPORT_DIR = $(CHIP_ROOT)/config/standalone
 
 include $(BUILD_SUPPORT_DIR)/standalone-app.mk
@@ -50,43 +50,10 @@ DEFINES = \
     USE_APP_CONFIG \
     $(NULL)
 
-CFLAGS =
-
-LDFLAGS =
-
-ifdef DEVICE_FIRMWARE_REVISION
-DEFINES += \
-    CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION=\"$(DEVICE_FIRMWARE_REnVISION)\"
-endif
-
-# A product's firmware usually comes with two build "flavors":
-# 1) a "development" build which typically enables debugging artifacts along with logging,
-# and disables security and optimizations and
-# 2) a "release" build which targets end-user devices
-# and disables debugging artifacts and logging, and enables security and optimizations.
-#
-# To facilitate supporting these two build flavors, the sample app source code supports
-# the build configuration option BUILD_RELEASE. By default, BUILD_RELEASE is not defined
-# and a development build is produced. If make is invoked with BUILD_RELEASE=1, then
-# a "pseudo-release" build is produced.
-#
-# We say "pseudo-release" build because the sample app is never to be used as-is
-# as the firmware for an end-user device. However, since real products may start off with
-# the sample app source code, we show how the BUILD_RELEASE build configuration option
-# can be used to produce two build flavors (development and release) of the firmware.
-#
-# IMPORTANT: By no means does the use of BUILD_RELEASE in the sample app cover all key aspects that
-# one should be concerned with (e.g. security, performance) when targeting real world end-user
-# devices. This is simply provided for guidance on how to support two build flavors.
-
 ifdef BUILD_RELEASE
     DEFINES += BUILD_RELEASE=1
-    # Disable Thread logging.
-    CHIP_DEFINES += CHIP_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_NONE
 else
     DEFINES += BUILD_RELEASE=0
-    # Increase Tread logging level to INFO.
-    CHIP_DEFINES += CHIP_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_INFO
 endif
 
 CHIP_PROJECT_CONFIG = $(PROJECT_ROOT)/include/CHIPProjectConfig.h
