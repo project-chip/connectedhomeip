@@ -128,10 +128,10 @@ void GetConnectionPeerDescription(char * buf, size_t bufSize, uint64_t nodeId, c
         const char * conType;
         switch (con->NetworkType)
         {
-        case CHIPConnection::kNetworkType_BLE:
+        case ChipConnection::kNetworkType_BLE:
             conType = "ble ";
             break;
-        case CHIPConnection::kNetworkType_IP:
+        case ChipConnection::kNetworkType_IP:
         default:
             conType = "";
             break;
@@ -483,7 +483,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
     NetworkType = kNetworkType_IP;
 
     // Parse the address into a host, port and interface name.
-    err = nl::Inet::ParseHostPortAndInterface(peerAddr, peerAddrLen, hostName, hostNameLen, PeerPort, intfName, intfNameLen);
+    err = Inet::ParseHostPortAndInterface(peerAddr, peerAddrLen, hostName, hostNameLen, PeerPort, intfName, intfNameLen);
     SuccessOrExit(err);
     if (PeerPort == 0)
         PeerPort = (defaultPort != 0) ? defaultPort : CHIP_PORT;
@@ -564,7 +564,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, H
  *
  *  @param[in]    dnsOptions    An integer value controlling how host name resolution is performed.
  *                              Value should be the OR of one or more values from from the
- *                              #::nl::Inet::DNSOptions enumeration.
+ *                              #chip::Inet::DNSOptions enumeration.
  *
  *  @param[in]    intf          The optional interface to use to connect to the peer node,
  *                              default to #INET_NULL_INTERFACEID.

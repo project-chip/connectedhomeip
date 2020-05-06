@@ -44,6 +44,55 @@
 #include "IdConstants.h"
 
 namespace chip {
+enum
+{
+    kChipPeerDescription_MaxLength =
+        100, /**< Maximum length of string (including NUL character) returned by ChipMessageLayer::GetPeerDescription(). */
+};
+
+/**
+ *  @brief
+ *    Definitions pertaining to the header of an encoded CHIP message.
+ *
+ */
+enum
+{
+    kMsgHeaderField_FlagsMask           = 0x0F0F,
+    kMsgHeaderField_FlagsShift          = 0,
+    kMsgHeaderField_EncryptionTypeMask  = 0x00F0,
+    kMsgHeaderField_EncryptionTypeShift = 4,
+    kMsgHeaderField_MessageVersionMask  = 0xF000,
+    kMsgHeaderField_MessageVersionShift = 12,
+
+    kChipHeaderFlag_DestNodeId   = 0x0100, /**< Indicates that the destination node ID is present in the CHIP message header. */
+    kChipHeaderFlag_SourceNodeId = 0x0200, /**< Indicates that the source node ID is present in the CHIP message header. */
+    kChipHeaderFlag_TunneledData = 0x0400, /**< Indicates that the CHIP message payload is a tunneled IP packet. */
+    kChipHeaderFlag_MsgCounterSyncReq = 0x0800, /**< Indicates that the sender requests message counter synchronization. */
+
+    kMsgHeaderField_ReservedFlagsMask = kMsgHeaderField_FlagsMask & ~kChipHeaderFlag_DestNodeId & ~kChipHeaderFlag_SourceNodeId &
+        ~kChipHeaderFlag_TunneledData & ~kChipHeaderFlag_MsgCounterSyncReq,
+
+    kMsgHeaderField_MessageHMACMask =
+        ~((kChipHeaderFlag_DestNodeId | kChipHeaderFlag_SourceNodeId | kChipHeaderFlag_MsgCounterSyncReq)
+          << kMsgHeaderField_FlagsShift)
+};
+
+/**
+ *  @brief
+ *    The version of the CHIP Message format.
+ *
+ *  @details
+ *    CHIP will choose the appropriate message version based on the frame format required for the CHIP
+ *    message. By default, the message version is kChipMessageVersion_V1. When using CHIP Reliable
+ *    Messaging, for example, the version is kChipMessageVersion_V2.
+ *
+ */
+typedef enum ChipMessageVersion
+{
+    kChipMessageVersion_Unspecified = 0, /**< Unspecified message version. */
+    kChipMessageVersion_V1          = 1, /**< Message header format version V1. */
+    kChipMessageVersion_V2          = 2  /**< Message header format version V2. */
+} ChipMessageVersion;
 
 /** Identifies how a peer node is authenticated.
  *
