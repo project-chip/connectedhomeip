@@ -46,8 +46,8 @@
 namespace chip {
 enum
 {
-    kChipPeerDescription_MaxLength =
-        100, /**< Maximum length of string (including NUL character) returned by ChipMessageLayer::GetPeerDescription(). */
+    kChipPeerDescription_MaxLength = 100,
+    /**< Maximum length of string (including NUL character) returned by GetPeerDescription(). */
 };
 
 /**
@@ -76,6 +76,16 @@ enum
         ~((kChipHeaderFlag_DestNodeId | kChipHeaderFlag_SourceNodeId | kChipHeaderFlag_MsgCounterSyncReq)
           << kMsgHeaderField_FlagsShift)
 };
+
+/**
+ *  @brief
+ *    The encryption types for the CHIP message.
+ *
+ */
+typedef enum ChipEncryptionType
+{
+    kChipEncryptionType_None = 0, /**< Message not encrypted. */
+} WeaveEncryptionType;
 
 /**
  *  @brief
@@ -190,6 +200,39 @@ struct ChipMessageInfo
 };
 
 /**
+ * @class ChipConnectionContext
+ *
+ * @brief
+ *   Provides the lower level interfaces for TCP and BLE for a CHIPConnection.
+ */
+class ChipConnectionContext
+{
+public:
+    virtual ~ChipConnectionContext();
+
+    virtual chip::Inet::InetLayer * InetLayer() = 0;
+    virtual chip::Ble::BleLayer * BleLayer()    = 0;
+
+    virtual uint64_t LocalNodeId() = 0;
+
+    virtual const Inet::IPAddress & ListenIPv4Addr() const = 0;
+    virtual const Inet::IPAddress & ListenIPv6Addr() const = 0;
+
+    virtual CHIP_ERROR DecodeMessageWithLength(System::PacketBuffer * msgBuf, uint64_t sourceNodeId, ChipConnection * con,
+                                               ChipMessageInfo * msgInfo, uint8_t ** rPayload, uint16_t * rPayloadLen,
+                                               uint32_t * rFrameLen) = 0;
+
+    virtual CHIP_ERROR EncodeMessageWithLength(ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf, ChipConnection * con,
+                                               uint16_t maxLen) = 0;
+
+    virtual CHIP_ERROR SelectDestNodeIdAndAddress(uint64_t & destNodeId, Inet::IPAddress & destAddr) = 0;
+
+    virtual void HandleConnectionClosed(ChipConnection * con) = 0;
+
+    virtual void OnReceiveError(ChipConnection * con, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo) = 0;
+};
+
+/**
  *  @class ChipConnection
  *
  *  @brief
@@ -236,10 +279,9 @@ public:
 
     uint64_t PeerNodeId;             /**< [READ ONLY] The node identifier of the peer. */
     Inet::IPAddress PeerAddr;        /**< [READ ONLY] The IP address of the peer node. */
-    ChipMessageLayer * MessageLayer; /**< [READ ONLY] The associated ChipMessageLayer object. */
+    ChipConnectionContext * Context; /**< [READ ONLY] The associated Context object. */
     void * AppState;                 /**< A pointer to the application-specific state object. */
     uint16_t PeerPort;               /**< [READ ONLY] The port number of the peer node. */
-    uint16_t DefaultKeyId;           /**< The default encryption key to use when sending messages. */
     ChipAuthMode AuthMode;           /**< [READ ONLY] The authentication mode used to establish the
                                            default encryption keys for the connection. */
     uint8_t DefaultEncryptionType;   /**< The default encryption type for messages. */
@@ -404,7 +446,7 @@ private:
 
     uint8_t mFlags; /**< Various flags associated with the connection. */
 
-    void Init(ChipMessageLayer * msgLayer);
+    void Init(ChipConnectionContext * context);
     void MakeConnectedTcp(Inet::TCPEndPoint * endPoint, const Inet::IPAddress & localAddr, const Inet::IPAddress & peerAddr);
     CHIP_ERROR StartConnect(void);
     void DoClose(CHIP_ERROR err, uint8_t flags);

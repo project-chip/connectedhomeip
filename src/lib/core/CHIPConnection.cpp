@@ -511,8 +511,8 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
 #if CHIP_CONFIG_ENABLE_DNS_RESOLVER
     // Initiate the host name resolution.
     State = kState_Resolving;
-    err   = MessageLayer->Inet->ResolveHostAddress(hostName, hostNameLen, dnsOptions, CHIP_CONFIG_CONNECT_IP_ADDRS, mPeerAddrs,
-                                                 HandleResolveComplete, this);
+    err   = Context->InetLayer()->ResolveHostAddress(hostName, hostNameLen, dnsOptions, CHIP_CONFIG_CONNECT_IP_ADDRS, mPeerAddrs,
+                                                   HandleResolveComplete, this);
 #else  // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
     err                      = StartConnectToAddressLiteral(hostName, hostNameLen);
 #endif // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
@@ -728,7 +728,7 @@ CHIP_ERROR ChipConnection::SendMessage(ChipMessageInfo * msgInfo, PacketBuffer *
     // TODO: implement back pressure
 
     // Set the source node identifier in the message header.
-    msgInfo->SourceNodeId = MessageLayer->FabricState->LocalNodeId;
+    msgInfo->SourceNodeId = Context->LocalNodeId();
 
     // If necessary, arrange for the source node identifier field to be encoded in the message.
     if (SendSourceNodeId)
@@ -757,7 +757,7 @@ CHIP_ERROR ChipConnection::SendMessage(ChipMessageInfo * msgInfo, PacketBuffer *
     }
     // Encode the CHIP message. NOTE that this results in the payload buffer containing the entire encoded message.
     // If the encoded message would have exceeded the sent limit, return CHIP_ERROR_SENDING_BLOCKED to the caller.
-    res = MessageLayer->EncodeMessageWithLength(msgInfo, msgBuf, this, UINT16_MAX);
+    res = Context->EncodeMessageWithLength(msgInfo, msgBuf, this, UINT16_MAX);
     if (res != CHIP_NO_ERROR)
     {
         ExitNow(res = (res == CHIP_ERROR_MESSAGE_TOO_LONG) ? CHIP_ERROR_SENDING_BLOCKED : res);
@@ -901,7 +901,7 @@ CHIP_ERROR ChipConnection::Close(bool suppressCloseLog)
     DoClose(CHIP_NO_ERROR, kDoCloseFlag_SuppressCallback | (suppressCloseLog ? kDoCloseFlag_SuppressLogging : 0));
 
     // Decrement the ref count that was added when the ChipConnection object
-    // was allocated (in ChipMessageLayer::NewConnection()).
+    // was allocated (in ChipConnectionContext::NewConnection()).
     VerifyOrDie(mRefCount != 0);
     mRefCount--;
 
@@ -933,7 +933,7 @@ void ChipConnection::Abort()
     DoClose(CHIP_ERROR_CONNECTION_ABORTED, kDoCloseFlag_SuppressCallback);
 
     // Decrement the ref count that was added when the ChipConnection object
-    // was allocated (in ChipMessageLayer::NewConnection()).
+    // was allocated (in ChipConnectionContext::NewConnection()).
     VerifyOrDie(mRefCount != 0);
     mRefCount--;
 }
@@ -1196,7 +1196,7 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
             // Cancel any outstanding DNS query that may still be active.  (This situation can
             // arise if the application initiates a connection to a peer using a DNS name and
             // then aborts/closes the connection before the DNS lookup completes).
-            MessageLayer->Inet->CancelResolveHostAddress(HandleResolveComplete, this);
+            Context->InetLayer()->CancelResolveHostAddress(HandleResolveComplete, this);
 #endif // CHIP_CONFIG_ENABLE_DNS_RESOLVER
         }
 
@@ -1206,12 +1206,7 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
         if ((flags & kDoCloseFlag_SuppressLogging) == 0)
             ChipLogProgress(MessageLayer, "Con closed %04X %ld", LogId(), (long) err);
 
-        // If the exchange manager has been initialized, call its callback.
-        if (MessageLayer->ExchangeMgr != NULL)
-            MessageLayer->ExchangeMgr->HandleConnectionClosed(this, err);
-
-        // Call the Fabric state object to alert it of the connection close.
-        MessageLayer->FabricState->HandleConnectionClosed(this);
+        Context->HandleConnectionClosed(this);
 
         // Call the appropriate app callback if allowed.
         if ((flags & kDoCloseFlag_SuppressCallback) == 0)
@@ -1286,8 +1281,8 @@ CHIP_ERROR ChipConnection::TryNextPeerAddress(CHIP_ERROR lastErr)
         //
         ChipLogProgress(MessageLayer, "Con DNS start %04" PRIX16 " %s %02" PRIX8, LogId(), hostName, mDNSOptions);
         State = kState_Resolving;
-        err   = MessageLayer->Inet->ResolveHostAddress(hostName, strlen(hostName), mDNSOptions, CHIP_CONFIG_CONNECT_IP_ADDRS,
-                                                     mPeerAddrs, HandleResolveComplete, this);
+        err   = Context->InetLayer()->ResolveHostAddress(hostName, strlen(hostName), mDNSOptions, CHIP_CONFIG_CONNECT_IP_ADDRS,
+                                                       mPeerAddrs, HandleResolveComplete, this);
 #else  // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
         err = StartConnectToAddressLiteral(hostName, strlen(hostName));
 #endif // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
@@ -1331,12 +1326,12 @@ CHIP_ERROR ChipConnection::StartConnect()
     // TODO: this is wrong. PeerNodeId should only be set once we have a successful connection (including security).
 
     // Determine the peer address/node identifier based on the information given by the caller.
-    err = MessageLayer->SelectDestNodeIdAndAddress(PeerNodeId, PeerAddr);
+    err = Context->SelectDestNodeIdAndAddress(PeerNodeId, PeerAddr);
     if (err != CHIP_NO_ERROR)
         return err;
 
     // Allocate a new TCP end point.
-    err = MessageLayer->Inet->NewTCPEndPoint(&mTcpEndPoint);
+    err = Context->InetLayer()->NewTCPEndPoint(&mTcpEndPoint);
     if (err != CHIP_NO_ERROR)
         return err;
 
@@ -1354,12 +1349,12 @@ CHIP_ERROR ChipConnection::StartConnect()
     // single interface (e.g. the loopback interface) and ensure that packets sent from a particular node have the
     // correct source address.
 #if INET_CONFIG_ENABLE_IPV4
-    if (!PeerAddr.IsIPv4() && MessageLayer->FabricState->ListenIPv6Addr != IPAddress::Any)
+    if (!PeerAddr.IsIPv4() && Context->ListenIPv6Addr() != IPAddress::Any)
 #else  // !INET_CONFIG_ENABLE_IPV4
-    if (MessageLayer->FabricState->ListenIPv6Addr != IPAddress::Any)
+    if (Context->ListenIPv6Addr() != IPAddress::Any)
 #endif // !INET_CONFIG_ENABLE_IPV4
     {
-        err = mTcpEndPoint->Bind(kIPAddressType_IPv6, MessageLayer->FabricState->ListenIPv6Addr, 0, true);
+        err = mTcpEndPoint->Bind(kIPAddressType_IPv6, Context->ListenIPv6Addr(), 0, true);
         if (err != CHIP_NO_ERROR)
             return err;
     }
@@ -1418,8 +1413,7 @@ void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR co
         // comissioner. The new device, having a ULA, would not encode its source node identifier in messages sent to the
         // commissioner, and the comissioner, on a different network than the new device, would be unable to see
         // the new device's ULA and use it to infer that device's node id.
-        if (!localAddr.IsIPv6ULA() ||
-            IPv6InterfaceIdToChipNodeId(localAddr.InterfaceId()) != con->MessageLayer->FabricState->LocalNodeId)
+        if (!localAddr.IsIPv6ULA() || IPv6InterfaceIdToChipNodeId(localAddr.InterfaceId()) != con->Context->LocalNodeId())
         {
             con->SendSourceNodeId = true;
         }
@@ -1457,8 +1451,8 @@ void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR co
 void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * data)
 {
     CHIP_ERROR err;
-    ChipConnection * con        = (ChipConnection *) endPoint->AppState;
-    ChipMessageLayer * msgLayer = con->MessageLayer;
+    ChipConnection * con            = (ChipConnection *) endPoint->AppState;
+    ChipConnectionContext * context = con->Context;
 
     // While in a state that allows receiving, process the received data...
     while (data != NULL && con->StateAllowsReceive() && con->ReceiveEnabled &&
@@ -1483,7 +1477,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
         msgInfo.InCon        = con;
 
         // Attempt to parse an message from the head of the received data.
-        err = msgLayer->DecodeMessageWithLength(data, con->PeerNodeId, con, &msgInfo, &payload, &payloadLen, &frameLen);
+        err = context->DecodeMessageWithLength(data, con->PeerNodeId, con, &msgInfo, &payload, &payloadLen, &frameLen);
 
         // If the data buffer contains only part of a message...
         if (err == CHIP_ERROR_MESSAGE_INCOMPLETE)
@@ -1514,7 +1508,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
         // Verify that destination node identifier refers to the local node.
         if (err == CHIP_NO_ERROR)
         {
-            if (msgInfo.DestNodeId != msgLayer->FabricState->LocalNodeId && msgInfo.DestNodeId != kAnyNodeId)
+            if (msgInfo.DestNodeId != context->LocalNodeId() && msgInfo.DestNodeId != kAnyNodeId)
                 err = CHIP_ERROR_INVALID_DESTINATION_NODE_ID;
         }
 
@@ -1645,15 +1639,14 @@ void ChipConnection::HandleTcpConnectionClosed(TCPEndPoint * endPoint, INET_ERRO
     con->DoClose(err, 0);
 }
 
-void ChipConnection::Init(ChipMessageLayer * msgLayer)
+void ChipConnection::Init(ChipConnectionContext * context)
 {
     // NOTE: Please keep these in declared order to make it easier keep in sync.
     PeerNodeId            = 0;
     PeerAddr              = IPAddress::Any;
-    MessageLayer          = msgLayer;
+    Context               = context;
     AppState              = NULL;
     PeerPort              = 0;
-    DefaultKeyId          = ChipKeyId::kNone;
     AuthMode              = kChipAuthMode_NotSpecified;
     DefaultEncryptionType = kChipEncryptionType_None;
     State                 = ChipConnection::kState_ReadyToConnect;
@@ -1714,7 +1707,7 @@ void ChipConnection::MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & 
 
     // If the local address is not a ULA, or if the interface identifier portion of the local address does not match
     // the local node id, then arrange to encode the source node identifier field in all messages sent to the peer.
-    if (!localAddr.IsIPv6ULA() || IPv6InterfaceIdToChipNodeId(localAddr.InterfaceId()) != MessageLayer->FabricState->LocalNodeId)
+    if (!localAddr.IsIPv6ULA() || IPv6InterfaceIdToChipNodeId(localAddr.InterfaceId()) != Context->LocalNodeId())
     {
         SendSourceNodeId = true;
     }
@@ -1779,7 +1772,7 @@ CHIP_ERROR ChipConnection::ConnectBle(BLE_CONNECTION_OBJECT connObj, ChipAuthMod
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(State == kState_ReadyToConnect && MessageLayer->mBle != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(State == kState_ReadyToConnect && Context->BleLayer() != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrExit(authMode == kChipAuthMode_Unauthenticated, err = CHIP_ERROR_UNSUPPORTED_AUTH_MODE);
 
@@ -1789,7 +1782,7 @@ CHIP_ERROR ChipConnection::ConnectBle(BLE_CONNECTION_OBJECT connObj, ChipAuthMod
     AuthMode = authMode;
 
     // Only BLE centrals can form new GATT connections, so specify this role in our creation of the BLEEndPoint.
-    err = MessageLayer->mBle->NewBleEndPoint(&mBleEndPoint, connObj, kBleRole_Central, autoClose);
+    err = Context->BleLayer()->NewBleEndPoint(&mBleEndPoint, connObj, kBleRole_Central, autoClose);
     SuccessOrExit(err);
 
     // Enter the connecting state.
@@ -1841,8 +1834,8 @@ exit:
 
 void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuffer * data)
 {
-    ChipConnection * con        = (ChipConnection *) endPoint->mAppState;
-    ChipMessageLayer * msgLayer = con->MessageLayer;
+    ChipConnection * con            = (ChipConnection *) endPoint->mAppState;
+    ChipConnectionContext * context = con->Context;
 
     // CHIP's BLE layer reassembles received messages in their entirety before it passes them up the stack,
     // so there's no need for received buffer compaction or reassembly at this layer.
@@ -1862,11 +1855,11 @@ void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuff
     VerifyOrExit(data->Next() == NULL, err = BLE_ERROR_BAD_ARGS);
 
     // Attempt to parse the message.
-    err = msgLayer->DecodeMessageWithLength(data, con->PeerNodeId, con, &msgInfo, &payload, &payloadLen, &frameLen);
+    err = context->DecodeMessageWithLength(data, con->PeerNodeId, con, &msgInfo, &payload, &payloadLen, &frameLen);
     SuccessOrExit(err);
 
     // Verify that destination node id refers to the local node.
-    VerifyOrExit(((msgInfo.DestNodeId == msgLayer->FabricState->LocalNodeId) || (msgInfo.DestNodeId == kAnyNodeId)),
+    VerifyOrExit(((msgInfo.DestNodeId == context->LocalNodeId()) || (msgInfo.DestNodeId == kAnyNodeId)),
                  err = CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
 
     // Verify that the received buffer contained exactly one CHIP message.
@@ -1891,10 +1884,6 @@ exit:
 
         if (data != NULL)
             PacketBuffer::Free(data);
-
-        // Send key error response to the peer if required.
-        if (msgLayer->SecurityMgr->IsKeyError(err))
-            msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, NULL, con, err);
     }
 }
 
@@ -1930,11 +1919,11 @@ void ChipConnection::DisconnectOnError(CHIP_ERROR err)
     {
         OnReceiveError(this, err);
     }
-    else if (MessageLayer->OnReceiveError != NULL)
+    else
     {
         IPPacketInfo addrInfo;
         GetPeerAddressInfo(addrInfo);
-        MessageLayer->OnReceiveError(MessageLayer, err, &addrInfo);
+        Context->OnReceiveError(this, err, &addrInfo);
     }
 
     DoClose(err, 0);
