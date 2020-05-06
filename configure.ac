@@ -1452,7 +1452,12 @@ if test "${with_crypto}" = "mbedtls"; then
 	],
 	[
 	    # Check for required mbedTLS headers.
-	    AC_CHECK_HEADERS([mbedtls/sha1.h] [mbedtls/sha256.h] [mbedtls/sha512.h] [mbedtls/md.h] [mbedtls/hkdf.h] [mbedtls/pkcs5.h] [mbedtls/chachapoly.h] [mbedtls/aes.h] [mbedtls/ecdh.h] [mbedtls/bignum.h])
+	    AC_CHECK_HEADERS([mbedtls/sha1.h] [mbedtls/sha256.h] [mbedtls/sha512.h] [mbedtls/md.h] [mbedtls/hkdf.h] [mbedtls/pkcs5.h] [mbedtls/chachapoly.h] [mbedtls/aes.h] [mbedtls/ecdh.h] [mbedtls/bignum.h],
+		[],
+		[
+		    AC_MSG_ERROR(The mbedTLS header "$ac_header" is required but cannot be found.)
+		]
+	    )
 	]
     )
 fi
