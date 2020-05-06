@@ -46,6 +46,113 @@ using System::PacketBuffer;
 using namespace Ble;
 using namespace Inet;
 
+namespace {
+
+/**
+ * Constructs a string describing a peer node and its associated address / connection information.
+ *
+ * The generated string has the following format:
+ *
+ *     <node-id> ([<ip-address>]:<port>%<interface>, con <con-id>)
+ *
+ * @param[in] buf                       A pointer to a buffer into which the string should be written. The supplied
+ *                                      buffer should be at least as big as kCHIPPeerDescription_MaxLength. If a
+ *                                      smaller buffer is given the string will be truncated to fit. The output
+ *                                      will include a NUL termination character in all cases.
+ * @param[in] bufSize                   The size of the buffer pointed at by buf.
+ * @param[in] nodeId                    The node id to be printed.
+ * @param[in] addr                      A pointer to an IP address to be printed; or NULL if no IP address should
+ *                                      be printed.
+ * @param[in] port                      An IP port number to be printed. No port number will be printed if addr
+ *                                      is NULL.
+ * @param[in] interfaceId               An InterfaceId identifying the interface to be printed. The output string
+ *                                      will contain the name of the interface as known to the underlying network
+ *                                      stack. No interface name will be printed if interfaceId is INET_NULL_INTERFACEID
+ *                                      or if addr is NULL.
+ * @param[in] con                       A pointer to a CHIPConnection object whose logging id should be printed;
+ *                                      or NULL if no connection id should be printed.
+ *
+ */
+void GetConnectionPeerDescription(char * buf, size_t bufSize, uint64_t nodeId, const IPAddress * addr, uint16_t port,
+                                  InterfaceId interfaceId, const ChipConnection * con)
+{
+    // Arbitrarily capped at 20 characters so long interface
+    // names do not blow out the available space.
+    constexpr size_t kMaxInterfaceNameLength = 20;
+
+    uint32_t len;
+    const char * sep = "";
+
+    if (nodeId != kNodeIdNotSpecified)
+    {
+        len = snprintf(buf, bufSize, "%" PRIX64 " (", nodeId);
+    }
+    else
+    {
+        len = snprintf(buf, bufSize, "unknown (");
+    }
+    VerifyOrExit(len < bufSize, /* no-op */);
+
+    if (addr != NULL)
+    {
+        buf[len++] = '[';
+        VerifyOrExit(len < bufSize, /* no-op */);
+
+        addr->ToString(buf + len, bufSize - len);
+        len = strlen(buf);
+
+        if (port > 0)
+        {
+            len += snprintf(buf + len, bufSize - len, "]:%" PRIu16, port);
+        }
+        else
+        {
+            len += snprintf(buf + len, bufSize - len, "]");
+        }
+        VerifyOrExit(len < bufSize, /* no-op */);
+
+        if (interfaceId != INET_NULL_INTERFACEID)
+        {
+            char interfaceName[kMaxInterfaceNameLength + 1];
+            Inet::GetInterfaceName(interfaceId, interfaceName, sizeof(interfaceName));
+            interfaceName[kMaxInterfaceNameLength] = 0;
+            len += snprintf(buf + len, bufSize - len, "%%%s", interfaceName);
+            VerifyOrExit(len < bufSize, /* no-op */);
+        }
+
+        sep = ", ";
+    }
+
+    if (con != NULL)
+    {
+        const char * conType;
+        switch (con->NetworkType)
+        {
+        case CHIPConnection::kNetworkType_BLE:
+            conType = "ble ";
+            break;
+        case CHIPConnection::kNetworkType_IP:
+        default:
+            conType = "";
+            break;
+        }
+
+        len += snprintf(buf + len, bufSize - len, "%s%scon %04" PRIX16, sep, conType, con->LogId());
+        VerifyOrExit(len < bufSize, /* no-op */);
+    }
+
+    snprintf(buf + len, bufSize - len, ")");
+
+exit:
+    if (bufSize > 0)
+    {
+        buf[bufSize - 1] = 0;
+    }
+    return;
+}
+
+} // namespace
+
 /**
  * Reserve a reference to the ChipConnection object.
  *
@@ -557,8 +664,8 @@ CHIP_ERROR ChipConnection::GetPeerAddressInfo(IPPacketInfo & addrInfo)
  */
 void ChipConnection::GetPeerDescription(char * buf, size_t bufSize) const
 {
-    ChipMessageLayer::GetPeerDescription(buf, bufSize, PeerNodeId, (NetworkType == kNetworkType_IP) ? &PeerAddr : NULL,
-                                         (NetworkType == kNetworkType_IP) ? PeerPort : 0, INET_NULL_INTERFACEID, this);
+    GetConnectionPeerDescription(buf, bufSize, PeerNodeId, (NetworkType == kNetworkType_IP) ? &PeerAddr : NULL,
+                                 (NetworkType == kNetworkType_IP) ? PeerPort : 0, INET_NULL_INTERFACEID, this);
 }
 
 #if CHIP_CONFIG_ENABLE_TUNNELING
