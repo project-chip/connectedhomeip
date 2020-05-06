@@ -21,6 +21,30 @@
 #
 #
 
+#
+#   This makefile is intended to work in conjunction with the standalone-app.mk
+#   makefile to build the CHIP example applications for Standalone/Host platforms.
+#   Applications should include this file in their top level Makefile
+#   along with the other makefiles in this directory.  E.g.:
+#
+#       PROJECT_ROOT = $(realpath .)
+#
+#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/config/standalone
+#
+#       include $(BUILD_SUPPORT_DIR)/standalone-app.mk
+#       include $(BUILD_SUPPORT_DIR)/standalone-chip.mk
+#
+#       PROJECT_ROOT := $(realpath .)
+#
+#       APP := chip-app-name
+#
+#       SRCS = \
+#           $(PROJECT_ROOT)/main.cpp \
+#           ...
+#
+#       $(call GenerateBuildRules)
+#
+
 # ==================================================
 # General settings
 # ==================================================

@@ -20,6 +20,40 @@
 #         Common makefile definitions for building standalone apps.
 #
 
+#
+#   This makefile is primarily intended to support building the
+#   CHIP example applications for Standalone/Host platforms.
+#   However it can be used for other applications if needed.
+#
+#   To build an application using this makefile, include the file
+#   in a project-specific Makefile, define make variables describing
+#   the application and how it should be built, and then call the
+#   GenerateBuildRules function.  E.g.:
+#
+#       PROJECT_ROOT = $(realpath .)
+#
+#       BUILD_SUPPORT_DIR = $(PROJECT_ROOT)/third_party/connectedhomeip/config/standalone
+#
+#       include $(BUILD_SUPPORT_DIR)/standalone-app.mk
+#
+#       APP := chip-app-name
+#
+#       SRCS = \
+#           $(PROJECT_ROOT)/main.cpp \
+#           ...
+#
+#       INC_DIRS = \
+#           $(PROJECT_ROOT) \
+#           ...
+#
+#       LIBS = \
+#           ...
+#
+#       DEFINES = \
+#           ...
+#
+#       $(call GenerateBuildRules)
+#
 
 # ==================================================
 # General definitions
