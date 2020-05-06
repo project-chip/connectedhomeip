@@ -73,8 +73,9 @@ INSTALLFLAGS                := -C -v
 # ==================================================
 
 QuoteChar = "
+MBEDTLS_CONFIG_PATH = -DMBEDTLS_CONFIG_FILE='"mbedtls/esp_config.h"'
 
-DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst \,\\,$(1)))$(QuoteChar)
+DoubleQuoteStr = $(QuoteChar)$(subst $(QuoteChar),\$(QuoteChar),$(subst $(MBEDTLS_CONFIG_PATH),,$(subst \,\\,$(1))))$(QuoteChar)
 
 
 # ==================================================
