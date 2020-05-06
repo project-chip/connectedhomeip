@@ -57,9 +57,9 @@ STD_LIBS = \
     -lm \
     -lpthread
 
-DEFINE_FLAGS = $(foreach def,$(STD_DEFINES) $(DEFINES),-D$(def))
+DEFINE_FLAGS = $(addprefix -D,$(STD_DEFINES) $(DEFINES))
 
-INC_FLAGS = $(foreach dir,$(INC_DIRS) $(STD_INC_DIRS),-I$(dir))
+INC_FLAGS = $(addprefix -I,$(INC_DIRS) $(STD_INC_DIRS))
 
 # ==================================================
 # Toolchain and external utilities / files
@@ -82,7 +82,7 @@ RANLIB  = $(TARGET_TUPLE)ranlib
 INSTALL = /usr/bin/install
 INSTALLFLAGS = -C -v
 
-ifneq (, $(shell which ccache))
+ifneq (, $(shell command -v ccache))
 CCACHE = ccache
 endif
 
