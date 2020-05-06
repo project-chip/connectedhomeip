@@ -79,6 +79,49 @@ enum
 
 /**
  *  @brief
+ *    Flags associated with a inbound or outbound CHIP message.
+ *
+ *    The values defined here are for use within the ChipMessageInfo.Flags field.
+ */
+typedef enum ChipMessageFlags
+{
+    kChipMessageFlag_ReuseMessageId = 0x00000010, /**< Indicates that the existing message identifier must be reused. */
+    kChipMessageFlag_ReuseSourceId  = 0x00000020, /**< Indicates that the existing source node identifier must be reused. */
+    kChipMessageFlag_DelaySend      = 0x00000040, /**< Indicates that the sending of the message needs to be delayed. */
+    kChipMessageFlag_RetainBuffer   = 0x00000080, /**< Indicates that the message buffer should not be freed after sending. */
+    kChipMessageFlag_MessageEncoded = 0x00001000, /**< Indicates that the CHIP message is already encoded. */
+    kChipMessageFlag_DefaultMulticastSourceAddress = 0x00002000, /**< Indicates that default IPv6 source address selection should
+                                                                     be used when sending IPv6 multicast messages. */
+    kChipMessageFlag_PeerRequestedAck = 0x00004000, /**< Indicates that the sender of the  message requested an acknowledgment. */
+    kChipMessageFlag_DuplicateMessage =
+        0x00008000, /**< Indicates that the message is a duplicate of a previously received message. */
+    kChipMessageFlag_PeerGroupMsgIdNotSynchronized =
+        0x00010000, /**< Indicates that the peer's group key message counter is not synchronized. */
+    kChipMessageFlag_FromInitiator =
+        0x00020000, /**< Indicates that the source of the message is the initiator of the
+                                                                                             CHIP exchange. */
+    kChipMessageFlag_ViaEphemeralUDPPort =
+        0x00040000, /**< Indicates that message is being sent/received via the local ephemeral UDP port. */
+
+    kChipMessageFlag_MulticastFromLinkLocal = kChipMessageFlag_DefaultMulticastSourceAddress,
+    /**< Deprecated alias for \c kChipMessageFlag_DefaultMulticastSourceAddress */
+
+    // NOTE: The bit positions of the following flags correspond to flag fields in an encoded
+    // CHIP message header.
+
+    kChipMessageFlag_DestNodeId = kChipHeaderFlag_DestNodeId,
+    /**< Indicates that the destination node ID is present in the CHIP message header. */
+    kChipMessageFlag_SourceNodeId = kChipHeaderFlag_SourceNodeId,
+    /**< Indicates that the source node ID is present in the CHIP message header. */
+    kChipMessageFlag_TunneledData = kChipHeaderFlag_TunneledData,
+    /**< Indicates that the CHIP message payload is a tunneled IP packet. */
+    kChipMessageFlag_MsgCounterSyncReq = kChipHeaderFlag_MsgCounterSyncReq,
+    /**< Indicates that the sender requests peer's message counter synchronization. */
+
+} ChipMessageFlags;
+
+/**
+ *  @brief
  *    The version of the CHIP Message format.
  *
  *  @details
