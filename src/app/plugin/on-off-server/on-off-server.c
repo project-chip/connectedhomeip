@@ -64,22 +64,22 @@ ChipZclOnOffSceneSubTableEntry_t zapPluginOnOffServerSceneSubTable[CHIP_AF_PLUGI
 static void setOnOffHandler(const ChipZclCommandContext_t * context, bool onOff);
 static bool getOnOff(ChipZclEndpointId_t endpointId);
 
-void zapClusterOnOffServerCommandOffRequestHandler(const ChipZclCommandContext_t * context,
-                                                   const ChipZclClusterOnOffServerCommandOffRequest_t * request)
+void chipZclClusterOnOffServerCommandOffRequestHandler(const ChipZclCommandContext_t * context,
+                                                       const ChipZclClusterOnOffServerCommandOffRequest_t * request)
 {
     chipZclCorePrintln("RX: Off");
     setOnOffHandler(context, false); // off
 }
 
-void zapClusterOnOffServerCommandOnRequestHandler(const ChipZclCommandContext_t * context,
-                                                  const ChipZclClusterOnOffServerCommandOnRequest_t * request)
+void chipZclClusterOnOffServerCommandOnRequestHandler(const ChipZclCommandContext_t * context,
+                                                      const ChipZclClusterOnOffServerCommandOnRequest_t * request)
 {
     chipZclCorePrintln("RX: On");
     setOnOffHandler(context, true); // on
 }
 
-void zapClusterOnOffServerCommandToggleRequestHandler(const ChipZclCommandContext_t * context,
-                                                      const ChipZclClusterOnOffServerCommandToggleRequest_t * request)
+void chipZclClusterOnOffServerCommandToggleRequestHandler(const ChipZclCommandContext_t * context,
+                                                          const ChipZclClusterOnOffServerCommandToggleRequest_t * request)
 {
     chipZclCorePrintln("RX: Toggle");
     setOnOffHandler(context, !getOnOff(context->endpointId));

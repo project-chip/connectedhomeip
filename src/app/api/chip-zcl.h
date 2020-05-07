@@ -250,8 +250,27 @@ enum
     CHIP_ZCL_STATUS_NULL = 0xFF,
 };
 
+// -----------------------------------------------------------------------------
+// Endpoints.
+
 /** An endpoint identifier. */
 typedef uint8_t ChipZclEndpointId_t;
+/** A minimum endpoint identifer value. */
+#define CHIP_ZCL_ENDPOINT_MIN 0x01
+/** A maximum endpoint identifer value. */
+#define CHIP_ZCL_ENDPOINT_MAX 0xF0
+/** A distinguished value that represents a null (invalid) endpoint identifer. */
+#define CHIP_ZCL_ENDPOINT_NULL ((ChipZclEndpointId_t) -1)
+
+/** An endpoint index. */
+typedef uint8_t ChipZclEndpointIndex_t;
+/** A distinguished value that represents a null (invalid) endpoint index. */
+#define CHIP_ZCL_ENDPOINT_INDEX_NULL ((ChipZclEndpointIndex_t) -1)
+
+/** A device identifier. */
+typedef uint16_t ChipZclDeviceId_t;
+/** A distinguished value that represents a null (invalid) device identifer. */
+#define CHIP_ZCL_DEVICE_ID_NULL ((ChipZclDeviceId_t) -1)
 
 typedef struct
 {
@@ -379,6 +398,29 @@ typedef struct
  */
 void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 
+void chEventControlSetDelayMS(ChipZclEventControl * event, uint32_t delay);
+/** @brief Sets this ::EmberEventControl to run "delay" milliseconds in the future.
+ *  NOTE: To avoid rollover errors in event calculation, the delay must be
+ *  less than ::EMBER_MAX_EVENT_CONTROL_DELAY_MS.
+ */
+#define chipZclEventControlSetDelayMS(control, delay)                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chEventControlSetDelayMS(&(control), (delay));                                                                             \
+    } while (0)
+
+/** @brief Sets this ::ChipEventControl as inactive (no pending event).
+ */
+#define chipZclEventControlSetInactive(control)                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        (control).status = CHIP_ZCL_EVENT_INACTIVE;                                                                                \
+    } while (0)
+
+/** @brief Returns true if the event is active, false otherwise.
+ */
+#define chipZclEventControlGetActive(control) ((control).status != CHIP_ZCL_EVENT_INACTIVE)
+
 /**
  * Returns the first scheduled event that has 'actions' and for which
  * 'predicate' returns true.  The returned event has been cancelled.
@@ -474,6 +516,10 @@ typedef struct
     ChipZclClusterId_t id;
 } ChipZclClusterSpec_t;
 
+int32_t chipZclCompareClusterSpec(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2);
+bool chipZclAreClusterSpecsEqual(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2);
+void chipZclReverseClusterSpec(const ChipZclClusterSpec_t * s1, ChipZclClusterSpec_t * s2);
+
 #define chipZclCorePrintln(...) // TODO make this return the string to be printed
 
 ChipZclStatus_t chipZclSendDefaultResponse(const ChipZclCommandContext_t * context, ChipZclStatus_t status);
@@ -495,3 +541,6 @@ void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 uint8_t * chipZclGetBufferPointer(Buffer buffer);
 
 Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused);
+
+// Endpoint Management
+ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);

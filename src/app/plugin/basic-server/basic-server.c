@@ -21,6 +21,7 @@
  *      used by the CHIP ZCL Application Layer
  *
  */
+
 #ifdef CHIP_TEST
 #include "utest.h"
 #endif

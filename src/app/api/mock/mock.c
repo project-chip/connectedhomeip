@@ -36,6 +36,12 @@ void chipZclReportingConfigurationsFactoryReset(ChipZclEndpointId_t endpointId)
     return;
 }
 
+// Endpoint Management Stubs
+ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec)
+{
+    return CHIP_ZCL_ENDPOINT_NULL;
+}
+
 // Attribute Management Stubs
 void chipZclResetAttributes(ChipZclEndpointId_t endpointId)
 {
@@ -62,6 +68,11 @@ Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredic
     return 0;
 }
 
+void chEventControlSetDelayMS(ChipZclEventControl * event, uint32_t delay)
+{
+    return;
+}
+
 void chipZclEventSetDelayMs(Event * event, uint32_t delay)
 {
     return;
@@ -76,4 +87,19 @@ uint8_t * chipZclGetBufferPointer(Buffer buffer)
 Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused)
 {
     return 0;
+}
+
+int32_t chipZclCompareClusterSpec(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2)
+{
+    return 0;
+}
+
+bool chipZclAreClusterSpecsEqual(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2)
+{
+    return 0;
+}
+
+void chipZclReverseClusterSpec(const ChipZclClusterSpec_t * s1, ChipZclClusterSpec_t * s2)
+{
+    return;
 }

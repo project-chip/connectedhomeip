@@ -39,12 +39,12 @@ const ChipZclClusterSpec_t chipZclClusterOnOffServerSpec = {
     CHIP_ZCL_CLUSTER_ON_OFF,
 };
 
-void zapClusterOnOffServerCommandOffRequestHandler(const ChipZclCommandContext_t * context,
-                                                   const ChipZclClusterOnOffServerCommandOffRequest_t * request);
-void zapClusterOnOffServerCommandOnRequestHandler(const ChipZclCommandContext_t * context,
-                                                  const ChipZclClusterOnOffServerCommandOnRequest_t * request);
-void zapClusterOnOffServerCommandToggleRequestHandler(const ChipZclCommandContext_t * context,
-                                                      const ChipZclClusterOnOffServerCommandToggleRequest_t * request);
+void chipZclClusterOnOffServerCommandOffRequestHandler(const ChipZclCommandContext_t * context,
+                                                       const ChipZclClusterOnOffServerCommandOffRequest_t * request);
+void chipZclClusterOnOffServerCommandOnRequestHandler(const ChipZclCommandContext_t * context,
+                                                      const ChipZclClusterOnOffServerCommandOnRequest_t * request);
+void chipZclClusterOnOffServerCommandToggleRequestHandler(const ChipZclCommandContext_t * context,
+                                                          const ChipZclClusterOnOffServerCommandToggleRequest_t * request);
 
 int main()
 {
@@ -54,17 +54,17 @@ int main()
     ChipZclClusterOnOffServerCommandOffRequest_t request1;
     request1.dummy = true;
 
-    zapClusterOnOffServerCommandOffRequestHandler(&context, &request1);
+    chipZclClusterOnOffServerCommandOffRequestHandler(&context, &request1);
 
     ChipZclClusterOnOffServerCommandOnRequest_t request2;
     request2.dummy = true;
 
-    zapClusterOnOffServerCommandOnRequestHandler(&context, &request2);
+    chipZclClusterOnOffServerCommandOnRequestHandler(&context, &request2);
 
     ChipZclClusterOnOffServerCommandToggleRequest_t request3;
     request3.dummy = true;
 
-    zapClusterOnOffServerCommandToggleRequestHandler(&context, &request3);
+    chipZclClusterOnOffServerCommandToggleRequestHandler(&context, &request3);
 
     printf("Success \n");
     return 0;
