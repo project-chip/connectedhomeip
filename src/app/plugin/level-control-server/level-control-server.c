@@ -22,27 +22,27 @@
  *
  */
 
-#ifdef ZAP_TEST
+#ifdef CHIP_TEST
 #include "utest.h"
 #endif
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include ZAP_AF_API_STACK
-#include ZAP_AF_API_BUFFER_MANAGEMENT
-#include ZAP_AF_API_EVENT_QUEUE
-#include ZAP_AF_API_HAL
-#ifdef ZAP_AF_API_DEBUG_PRINT
-#include ZAP_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#include CHIP_AF_API_BUFFER_MANAGEMENT
+#include CHIP_AF_API_EVENT_QUEUE
+#include CHIP_AF_API_HAL
+#ifdef CHIP_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include ZAP_AF_API_ZCL_CORE
-#ifdef ZAP_AF_API_ZCL_SCENES_SERVER
-#include ZAP_AF_API_ZCL_SCENES_SERVER
+#include CHIP_AF_API_ZCL_CORE
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
+#include CHIP_AF_API_ZCL_SCENES_SERVER
 #endif
 #include "level-control-server.h"
 
-#define MIN_LEVEL ZAP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL
-#define MAX_LEVEL ZAP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL
+#define MIN_LEVEL CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL
+#define MAX_LEVEL CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL
 
 #define BOUND_MIN(value) ((value) < MIN_LEVEL ? MIN_LEVEL : (value))
 #define BOUND_MAX(value) ((value) < MAX_LEVEL ? (value) : MAX_LEVEL)
@@ -51,41 +51,43 @@
 
 #define MIN_DELAY_MS 1
 
-#ifdef ZAP_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
 #ifdef DEFINETOKENS
 // Token based storage.
 #define retrieveSceneSubTableEntry(entry, i) halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_LEVEL_CONTROL_SCENE_SUBTABLE, i)
 #define saveSceneSubTableEntry(entry, i) halCommonSetIndexedToken(TOKEN_ZCL_CORE_LEVEL_CONTROL_SCENE_SUBTABLE, i, &entry)
 #else
 // RAM based storage.
-ZapLevelControlSceneSubTableEntry_t zapPluginLevelControlServerSceneSubTable[ZAP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
+ChipZclLevelControlSceneSubTableEntry_t zapPluginLevelControlServerSceneSubTable[CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = {
+    { 0 }
+};
 #define retrieveSceneSubTableEntry(entry, i) (entry = zapPluginLevelControlServerSceneSubTable[i])
 #define saveSceneSubTableEntry(entry, i) (zapPluginLevelControlServerSceneSubTable[i] = entry)
 #endif
 #endif
 
 int abs(int I);
-static void moveToLevelHandler(const ZapCommandContext_t * context,
-                               const ZapClusterLevelControlServerCommandMoveToLevelRequest_t * request, bool withOnOff);
-static void moveHandler(const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandMoveRequest_t * request,
-                        bool withOnOff);
-static void stepHandler(const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandStepRequest_t * request,
-                        bool withOnOff);
-static void stopHandler(const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandStopRequest_t * request,
-                        bool withOnOff);
-static bool getOnOff(ZapEndpointId_t endpointId);
-static void setOnOff(ZapEndpointId_t endpointId, bool onOff);
-static uint8_t getCurrentLevel(ZapEndpointId_t endpointId);
-static uint16_t getOnOffTransitionTime(ZapEndpointId_t endpointId);
-static uint8_t getDefaultMoveRate(ZapEndpointId_t endpointId);
+static void moveToLevelHandler(const ChipZclCommandContext_t * context,
+                               const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t * request, bool withOnOff);
+static void moveHandler(const ChipZclCommandContext_t * context,
+                        const ChipZclClusterLevelControlServerCommandMoveRequest_t * request, bool withOnOff);
+static void stepHandler(const ChipZclCommandContext_t * context,
+                        const ChipZclClusterLevelControlServerCommandStepRequest_t * request, bool withOnOff);
+static void stopHandler(const ChipZclCommandContext_t * context,
+                        const ChipZclClusterLevelControlServerCommandStopRequest_t * request, bool withOnOff);
+static bool getOnOff(ChipZclEndpointId_t endpointId);
+static void setOnOff(ChipZclEndpointId_t endpointId, bool onOff);
+static uint8_t getCurrentLevel(ChipZclEndpointId_t endpointId);
+static uint16_t getOnOffTransitionTime(ChipZclEndpointId_t endpointId);
+static uint8_t getDefaultMoveRate(ChipZclEndpointId_t endpointId);
 static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t optionMask, uint8_t optionOverride);
-static void setCurrentLevel(ZapEndpointId_t endpointId, uint8_t currentLevel);
-static uint8_t getOnLevelOrCurrentLevel(ZapEndpointId_t endpointId);
+static void setCurrentLevel(ChipZclEndpointId_t endpointId, uint8_t currentLevel);
+static uint8_t getOnLevelOrCurrentLevel(ChipZclEndpointId_t endpointId);
 
 typedef struct
 {
     uint32_t delayMs;
-    ZapEndpointId_t endpointId;
+    ChipZclEndpointId_t endpointId;
     uint8_t targetLevel;
     uint8_t postTransitionLevel;
     bool increasing;
@@ -106,9 +108,9 @@ static EventActions actions = { &emAppEventQueue, (void (*)(struct Event_s *)) e
                                 (void (*)(struct Event_s *)) eventMarker, "level control server" };
 
 static LevelControlEvent * cancel(State * state);
-static ZapStatus_t schedule(State * state);
+static ChipZclStatus_t schedule(State * state);
 
-void zapLevelControlServerSetOnOff(ZapEndpointId_t endpointId, bool value)
+void chipZclLevelControlServerSetOnOff(ChipZclEndpointId_t endpointId, bool value)
 {
     State state = {
         .endpointId = endpointId,
@@ -151,67 +153,67 @@ void zapLevelControlServerSetOnOff(ZapEndpointId_t endpointId, bool value)
     }
 }
 
-void zapClusterLevelControlServerCommandMoveToLevelRequestHandler(
-    const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandMoveToLevelRequest_t * request)
+void chipZclClusterLevelControlServerCommandMoveToLevelRequestHandler(
+    const ChipZclCommandContext_t * context, const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t * request)
 {
     moveToLevelHandler(context, request, false); // without on/off
 }
 
-void zapClusterLevelControlServerCommandMoveRequestHandler(const ZapCommandContext_t * context,
-                                                           const ZapClusterLevelControlServerCommandMoveRequest_t * request)
+void chipZclClusterLevelControlServerCommandMoveRequestHandler(const ChipZclCommandContext_t * context,
+                                                               const ChipZclClusterLevelControlServerCommandMoveRequest_t * request)
 {
     moveHandler(context, request, false); // without on/off
 }
 
-void zapClusterLevelControlServerCommandStepRequestHandler(const ZapCommandContext_t * context,
-                                                           const ZapClusterLevelControlServerCommandStepRequest_t * request)
+void chipZclClusterLevelControlServerCommandStepRequestHandler(const ChipZclCommandContext_t * context,
+                                                               const ChipZclClusterLevelControlServerCommandStepRequest_t * request)
 {
     stepHandler(context, request, false); // without on/off
 }
 
-void zapClusterLevelControlServerCommandStopRequestHandler(const ZapCommandContext_t * context,
-                                                           const ZapClusterLevelControlServerCommandStopRequest_t * request)
+void chipZclClusterLevelControlServerCommandStopRequestHandler(const ChipZclCommandContext_t * context,
+                                                               const ChipZclClusterLevelControlServerCommandStopRequest_t * request)
 {
     stopHandler(context, request, false); // without on/off
 }
 
-void zapClusterLevelControlServerCommandMoveToLevelWithOnOffRequestHandler(
-    const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandMoveToLevelWithOnOffRequest_t * request)
+void chipZclClusterLevelControlServerCommandMoveToLevelWithOnOffRequestHandler(
+    const ChipZclCommandContext_t * context, const ChipZclClusterLevelControlServerCommandMoveToLevelWithOnOffRequest_t * request)
 {
-    moveToLevelHandler(context, (const ZapClusterLevelControlServerCommandMoveToLevelRequest_t *) request,
+    moveToLevelHandler(context, (const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t *) request,
                        true); // with on/off
 }
 
-void zapClusterLevelControlServerCommandMoveWithOnOffRequestHandler(
-    const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandMoveWithOnOffRequest_t * request)
+void chipZclClusterLevelControlServerCommandMoveWithOnOffRequestHandler(
+    const ChipZclCommandContext_t * context, const ChipZclClusterLevelControlServerCommandMoveWithOnOffRequest_t * request)
 {
-    moveHandler(context, (const ZapClusterLevelControlServerCommandMoveRequest_t *) request,
+    moveHandler(context, (const ChipZclClusterLevelControlServerCommandMoveRequest_t *) request,
                 true); // with on/off
 }
 
-void zapClusterLevelControlServerCommandStepWithOnOffRequestHandler(
-    const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandStepWithOnOffRequest_t * request)
+void chipZclClusterLevelControlServerCommandStepWithOnOffRequestHandler(
+    const ChipZclCommandContext_t * context, const ChipZclClusterLevelControlServerCommandStepWithOnOffRequest_t * request)
 {
-    stepHandler(context, (const ZapClusterLevelControlServerCommandStepRequest_t *) request,
+    stepHandler(context, (const ChipZclClusterLevelControlServerCommandStepRequest_t *) request,
                 true); // with on/off
 }
 
-void zapClusterLevelControlServerCommandStopWithOnOffRequestHandler(
-    const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandStopWithOnOffRequest_t * request)
+void chipZclClusterLevelControlServerCommandStopWithOnOffRequestHandler(
+    const ChipZclCommandContext_t * context, const ChipZclClusterLevelControlServerCommandStopWithOnOffRequest_t * request)
 {
-    stopHandler(context, (const ZapClusterLevelControlServerCommandStopRequest_t *) request,
+    stopHandler(context, (const ChipZclClusterLevelControlServerCommandStopRequest_t *) request,
                 true); // with on/off
 }
 
-static void moveToLevelHandler(const ZapCommandContext_t * context,
-                               const ZapClusterLevelControlServerCommandMoveToLevelRequest_t * request, bool withOnOff)
+static void moveToLevelHandler(const ChipZclCommandContext_t * context,
+                               const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t * request, bool withOnOff)
 {
-    zapCorePrintln("RX: MoveToLevel%s", (withOnOff ? "WithOnOff" : ""));
+    chipZclCorePrintln("RX: MoveToLevel%s", (withOnOff ? "WithOnOff" : ""));
 
     // Use OptionsMask and OptionsOverride when implemented
     if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE))
     {
-        zapSendDefaultResponse(context, ZAP_STATUS_SUCCESS);
+        chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;
     }
 
@@ -232,11 +234,11 @@ static void moveToLevelHandler(const ZapCommandContext_t * context,
         setOnOff(context->endpointId, (state.targetLevel != MIN_LEVEL));
     }
 
-    ZapStatus_t status;
+    ChipZclStatus_t status;
     if (currentLevel == state.targetLevel)
     {
         cancel(&state);
-        status = ZAP_STATUS_SUCCESS;
+        status = CHIP_ZCL_STATUS_SUCCESS;
     }
     else
     {
@@ -254,13 +256,13 @@ static void moveToLevelHandler(const ZapCommandContext_t * context,
         state.delayMs = MAX(delayMs, MIN_DELAY_MS); // Make sure we didn't round down to zero
         status        = schedule(&state);
     }
-    zapSendDefaultResponse(context, status);
+    chipZclSendDefaultResponse(context, status);
 }
 
-static void moveHandler(const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandMoveRequest_t * request,
-                        bool withOnOff)
+static void moveHandler(const ChipZclCommandContext_t * context,
+                        const ChipZclClusterLevelControlServerCommandMoveRequest_t * request, bool withOnOff)
 {
-    zapCorePrintln("RX: Move%s", (withOnOff ? "WithOnOff" : ""));
+    chipZclCorePrintln("RX: Move%s", (withOnOff ? "WithOnOff" : ""));
 
     uint8_t level;
     switch (request->moveMode)
@@ -272,21 +274,21 @@ static void moveHandler(const ZapCommandContext_t * context, const ZapClusterLev
         level = MIN_LEVEL;
         break;
     default:
-        zapSendDefaultResponse(context, ZAP_STATUS_INVALID_FIELD);
+        chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_INVALID_FIELD);
         return;
     }
 
     // Use OptionsMask and OptionsOverride when implemented
     if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE))
     {
-        zapSendDefaultResponse(context, ZAP_STATUS_SUCCESS);
+        chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;
     }
 
     // Moving at zero rate means not moving at all
     if (request->rate == 0)
     {
-        zapSendDefaultResponse(context, ZAP_STATUS_SUCCESS);
+        chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;
     }
 
@@ -305,11 +307,11 @@ static void moveHandler(const ZapCommandContext_t * context, const ZapClusterLev
         setOnOff(context->endpointId, (state.targetLevel != MIN_LEVEL));
     }
 
-    ZapStatus_t status;
+    ChipZclStatus_t status;
     if (currentLevel == state.targetLevel)
     {
         cancel(&state);
-        status = ZAP_STATUS_SUCCESS;
+        status = CHIP_ZCL_STATUS_SUCCESS;
     }
     else
     {
@@ -320,13 +322,13 @@ static void moveHandler(const ZapCommandContext_t * context, const ZapClusterLev
         state.delayMs = MAX(delayMs, MIN_DELAY_MS); // Make sure we didn't round down to zero
         status        = schedule(&state);
     }
-    zapSendDefaultResponse(context, status);
+    chipZclSendDefaultResponse(context, status);
 }
 
-static void stepHandler(const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandStepRequest_t * request,
-                        bool withOnOff)
+static void stepHandler(const ChipZclCommandContext_t * context,
+                        const ChipZclClusterLevelControlServerCommandStepRequest_t * request, bool withOnOff)
 {
-    zapCorePrintln("RX: Step%s", (withOnOff ? "WithOnOff" : ""));
+    chipZclCorePrintln("RX: Step%s", (withOnOff ? "WithOnOff" : ""));
 
     uint8_t currentLevel = getCurrentLevel(context->endpointId);
     uint8_t level;
@@ -339,14 +341,14 @@ static void stepHandler(const ZapCommandContext_t * context, const ZapClusterLev
         level = BOUND_MIN(currentLevel - request->stepSize);
         break;
     default:
-        zapSendDefaultResponse(context, ZAP_STATUS_INVALID_FIELD);
+        chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_INVALID_FIELD);
         return;
     }
 
     // Use OptionsMask and OptionsOverride when implemented
     if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE))
     {
-        zapSendDefaultResponse(context, ZAP_STATUS_SUCCESS);
+        chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;
     }
 
@@ -364,11 +366,11 @@ static void stepHandler(const ZapCommandContext_t * context, const ZapClusterLev
         setOnOff(context->endpointId, (state.targetLevel != MIN_LEVEL));
     }
 
-    ZapStatus_t status;
+    ChipZclStatus_t status;
     if (currentLevel == state.targetLevel)
     {
         cancel(&state);
-        status = ZAP_STATUS_SUCCESS;
+        status = CHIP_ZCL_STATUS_SUCCESS;
     }
     else
     {
@@ -377,18 +379,18 @@ static void stepHandler(const ZapCommandContext_t * context, const ZapClusterLev
                                                : (request->transitionTime * MILLISECOND_TICKS_PER_DECISECOND / request->stepSize));
         status = schedule(&state);
     }
-    zapSendDefaultResponse(context, status);
+    chipZclSendDefaultResponse(context, status);
 }
 
-static void stopHandler(const ZapCommandContext_t * context, const ZapClusterLevelControlServerCommandStopRequest_t * request,
-                        bool withOnOff)
+static void stopHandler(const ChipZclCommandContext_t * context,
+                        const ChipZclClusterLevelControlServerCommandStopRequest_t * request, bool withOnOff)
 {
-    zapCorePrintln("RX: Stop%s", (withOnOff ? "WithOnOff" : ""));
+    chipZclCorePrintln("RX: Stop%s", (withOnOff ? "WithOnOff" : ""));
 
     // Use OptionsMask and OptionsOverride when implemented
     if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE))
     {
-        zapSendDefaultResponse(context, ZAP_STATUS_SUCCESS);
+        chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;
     }
 
@@ -398,36 +400,38 @@ static void stopHandler(const ZapCommandContext_t * context, const ZapClusterLev
     };
     cancel(&state);
     //}
-    zapSendDefaultResponse(context, ZAP_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
 }
 
-static bool getOnOff(ZapEndpointId_t endpointId)
+static bool getOnOff(ChipZclEndpointId_t endpointId)
 {
     bool onOff;
-    if (zapReadAttribute(endpointId, &zapClusterOnOffServerSpec, ZAP_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF, &onOff,
-                         sizeof(onOff)) == ZAP_STATUS_SUCCESS)
+    if (chipZclReadAttribute(endpointId, &chipZclClusterOnOffServerSpec, CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF, &onOff,
+                             sizeof(onOff)) == CHIP_ZCL_STATUS_SUCCESS)
     {
         // Returns true if the light is on, false if the light is off
         return onOff;
     }
     else
     {
-        // If zapReadAttribute fails to return a success status,
+        // If chipZclReadAttribute fails to return a success status,
         // false is returned as a default to represent the off state
         return false;
     }
 }
 
-static void setOnOff(ZapEndpointId_t endpointId, bool onOff)
+static void setOnOff(ChipZclEndpointId_t endpointId, bool onOff)
 {
-    zapWriteAttribute(endpointId, &zapClusterOnOffServerSpec, ZAP_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF, &onOff, sizeof(onOff));
+    chipZclWriteAttribute(endpointId, &chipZclClusterOnOffServerSpec, CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF, &onOff,
+                          sizeof(onOff));
 }
 
-static uint8_t getCurrentLevel(ZapEndpointId_t endpointId)
+static uint8_t getCurrentLevel(ChipZclEndpointId_t endpointId)
 {
     uint8_t currentLevel;
-    if (zapReadAttribute(endpointId, &zapClusterLevelControlServerSpec, ZAP_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
-                         &currentLevel, sizeof(currentLevel)) == ZAP_STATUS_SUCCESS)
+    if (chipZclReadAttribute(endpointId, &chipZclClusterLevelControlServerSpec,
+                             CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL, &currentLevel,
+                             sizeof(currentLevel)) == CHIP_ZCL_STATUS_SUCCESS)
     {
         return currentLevel;
     }
@@ -437,12 +441,12 @@ static uint8_t getCurrentLevel(ZapEndpointId_t endpointId)
     }
 }
 
-static uint16_t getOnOffTransitionTime(ZapEndpointId_t endpointId)
+static uint16_t getOnOffTransitionTime(ChipZclEndpointId_t endpointId)
 {
     uint16_t onOffTransitionTime;
-    if (zapReadAttribute(endpointId, &zapClusterLevelControlServerSpec,
-                         ZAP_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_ON_OFF_TRANSITION_TIME, &onOffTransitionTime,
-                         sizeof(onOffTransitionTime)) == ZAP_STATUS_SUCCESS)
+    if (chipZclReadAttribute(endpointId, &chipZclClusterLevelControlServerSpec,
+                             CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_ON_OFF_TRANSITION_TIME, &onOffTransitionTime,
+                             sizeof(onOffTransitionTime)) == CHIP_ZCL_STATUS_SUCCESS)
     {
         return onOffTransitionTime;
     }
@@ -453,12 +457,12 @@ static uint16_t getOnOffTransitionTime(ZapEndpointId_t endpointId)
 }
 
 // If attribute is not supported return 0
-static uint8_t getDefaultMoveRate(ZapEndpointId_t endpointId)
+static uint8_t getDefaultMoveRate(ChipZclEndpointId_t endpointId)
 {
     uint8_t defaultMoveRate = 0;
-    if (zapReadAttribute(endpointId, &zapClusterLevelControlServerSpec,
-                         ZAP_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_DEFAULT_MOVE_RATE, &defaultMoveRate,
-                         sizeof(defaultMoveRate)) == ZAP_STATUS_SUCCESS)
+    if (chipZclReadAttribute(endpointId, &chipZclClusterLevelControlServerSpec,
+                             CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_DEFAULT_MOVE_RATE, &defaultMoveRate,
+                             sizeof(defaultMoveRate)) == CHIP_ZCL_STATUS_SUCCESS)
     {
         return defaultMoveRate;
     }
@@ -484,8 +488,9 @@ static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t optionMask, uint8_t opt
     //      - The value of the ExecuteIfOff bit is 0."
 
     uint8_t options;
-    if (zapReadAttribute(endpoint, &zapClusterLevelControlServerSpec, ZAP_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_OPTIONS, &options,
-                         sizeof(options)) != ZAP_STATUS_SUCCESS)
+    if (chipZclReadAttribute(endpoint, &chipZclClusterLevelControlServerSpec,
+                             CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_OPTIONS, &options,
+                             sizeof(options)) != CHIP_ZCL_STATUS_SUCCESS)
     {
         options = 0; // Default
     }
@@ -517,31 +522,32 @@ static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t optionMask, uint8_t opt
         // 0xFF are the default values passed to the command handler when
         // the payload is not present - in that case there is use of option
         // attribute to decide execution of the command
-        return READBITS(options, ZAP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
+        return READBITS(options, CHIP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
     }
     // ---------- The above is to distinguish if the payload is present or not
 
-    if (READBITS(optionMask, ZAP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF))
+    if (READBITS(optionMask, CHIP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF))
     {
         // Mask is present and set in the command payload, this indicates
         // use the over ride as temporary option
-        return READBITS(optionOverride, ZAP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
+        return READBITS(optionOverride, CHIP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
     }
     // if we are here - use the option bits
-    return (READBITS(options, ZAP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF));
+    return (READBITS(options, CHIP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF));
 }
 
-static void setCurrentLevel(ZapEndpointId_t endpointId, uint8_t currentLevel)
+static void setCurrentLevel(ChipZclEndpointId_t endpointId, uint8_t currentLevel)
 {
-    zapWriteAttribute(endpointId, &zapClusterLevelControlServerSpec, ZAP_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
-                      &currentLevel, sizeof(currentLevel));
+    chipZclWriteAttribute(endpointId, &chipZclClusterLevelControlServerSpec,
+                          CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL, &currentLevel, sizeof(currentLevel));
 }
 
-static uint8_t getOnLevelOrCurrentLevel(ZapEndpointId_t endpointId)
+static uint8_t getOnLevelOrCurrentLevel(ChipZclEndpointId_t endpointId)
 {
     uint8_t onLevel;
-    if ((zapReadAttribute(endpointId, &zapClusterLevelControlServerSpec, ZAP_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_ON_LEVEL,
-                          &onLevel, sizeof(onLevel)) == ZAP_STATUS_SUCCESS) &&
+    if ((chipZclReadAttribute(endpointId, &chipZclClusterLevelControlServerSpec,
+                              CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_ON_LEVEL, &onLevel,
+                              sizeof(onLevel)) == CHIP_ZCL_STATUS_SUCCESS) &&
         onLevel != 0xFF)
     {
         return onLevel;
@@ -580,56 +586,57 @@ static void eventHandler(LevelControlEvent * event)
     }
     else
     {
-        zapEventSetDelayMs((Event *) event, event->state.delayMs);
+        chipZclEventSetDelayMs((Event *) event, event->state.delayMs);
     }
 }
 
 static void eventMarker(LevelControlEvent * event) {}
 
-static bool predicate(LevelControlEvent * event, ZapEndpointId_t * endpointId)
+static bool predicate(LevelControlEvent * event, ChipZclEndpointId_t * endpointId)
 {
     return (*endpointId == event->state.endpointId);
 }
 
 static LevelControlEvent * cancel(State * state)
 {
-    return (LevelControlEvent *) zapFindEvent(actions.queue, &actions, (EventPredicate) predicate, &state->endpointId);
+    return (LevelControlEvent *) chipZclFindEvent(actions.queue, &actions, (EventPredicate) predicate, &state->endpointId);
 }
 
-static ZapStatus_t schedule(State * state)
+static ChipZclStatus_t schedule(State * state)
 {
     LevelControlEvent * event = cancel(state);
     if (event == NULL)
     {
-        Buffer buffer = zapAllocateBuffer(sizeof(LevelControlEvent));
+        Buffer buffer = chipZclAllocateBuffer(sizeof(LevelControlEvent));
         if (buffer == NULL_BUFFER)
         {
-            return ZAP_STATUS_FAILURE;
+            return CHIP_ZCL_STATUS_FAILURE;
         }
-        event = (LevelControlEvent *) zapGetBufferPointer(buffer);
+        event = (LevelControlEvent *) chipZclGetBufferPointer(buffer);
     }
     event->event.actions = &actions;
     event->event.next    = NULL;
     event->state         = *state;
-    zapEventSetDelayMs((Event *) event, event->state.delayMs);
-    return ZAP_STATUS_SUCCESS;
+    chipZclEventSetDelayMs((Event *) event, event->state.delayMs);
+    return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-#ifdef ZAP_AF_API_ZCL_SCENES_SERVER
+#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
 // Scenes callback handlers...
 
-void zapLevelControlServerEraseSceneHandler(uint8_t tableIdx)
+void chipZclLevelControlServerEraseSceneHandler(uint8_t tableIdx)
 {
-    ZapLevelControlSceneSubTableEntry_t entry;
+    ChipZclLevelControlSceneSubTableEntry_t entry;
 
     entry.hasCurrentLevelValue = false;
 
     saveSceneSubTableEntry(entry, tableIdx);
 }
 
-bool zapLevelControlServerAddSceneHandler(ZapClusterId_t clusterId, uint8_t tableIdx, const uint8_t * sceneData, uint8_t length)
+bool chipZclLevelControlServerAddSceneHandler(ChipZclClusterId_t clusterId, uint8_t tableIdx, const uint8_t * sceneData,
+                                              uint8_t length)
 {
-    if (clusterId == ZAP_CLUSTER_LEVEL_CONTROL)
+    if (clusterId == CHIP_ZCL_CLUSTER_LEVEL_CONTROL)
     {
         if (length < 1)
         {
@@ -637,8 +644,8 @@ bool zapLevelControlServerAddSceneHandler(ZapClusterId_t clusterId, uint8_t tabl
         }
 
         // Extract bytes from input data block and update scene subtable fields.
-        ZapLevelControlSceneSubTableEntry_t entry = { 0 };
-        uint8_t * pData                           = (uint8_t *) sceneData;
+        ChipZclLevelControlSceneSubTableEntry_t entry = { 0 };
+        uint8_t * pData                               = (uint8_t *) sceneData;
 
         // We only know of one extension for the Level Control cluster and it is just
         // one byte, which means we can skip some logic for this cluster.
@@ -654,7 +661,7 @@ bool zapLevelControlServerAddSceneHandler(ZapClusterId_t clusterId, uint8_t tabl
     return false;
 }
 
-void zapLevelControlServerRecallSceneHandler(ZapEndpointId_t endpointId, uint8_t tableIdx, uint32_t transitionTime100mS)
+void chipZclLevelControlServerRecallSceneHandler(ChipZclEndpointId_t endpointId, uint8_t tableIdx, uint32_t transitionTime100mS)
 {
     // Handles the recallScene command for the level control cluster.
     // Note- this handler presently just updates (writes) the relevant cluster
@@ -662,51 +669,53 @@ void zapLevelControlServerRecallSceneHandler(ZapEndpointId_t endpointId, uint8_t
     // to the relevant level control command handler to actually change the
     // hw state at the rate specified by the transition time.
 
-    ZapLevelControlSceneSubTableEntry_t entry;
+    ChipZclLevelControlSceneSubTableEntry_t entry;
     retrieveSceneSubTableEntry(entry, tableIdx);
 
     if (entry.hasCurrentLevelValue)
     {
-        zapWriteAttribute(endpointId, &zapClusterLevelControlServerSpec, ZAP_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
-                          (uint8_t *) &entry.currentLevelValue, sizeof(entry.currentLevelValue));
+        chipZclWriteAttribute(endpointId, &chipZclClusterLevelControlServerSpec,
+                              CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL, (uint8_t *) &entry.currentLevelValue,
+                              sizeof(entry.currentLevelValue));
     }
 }
 
-void zapLevelControlServerStoreSceneHandler(ZapEndpointId_t endpointId, uint8_t tableIdx)
+void chipZclLevelControlServerStoreSceneHandler(ChipZclEndpointId_t endpointId, uint8_t tableIdx)
 {
-    ZapLevelControlSceneSubTableEntry_t entry;
+    ChipZclLevelControlSceneSubTableEntry_t entry;
 
     entry.hasCurrentLevelValue =
-        (zapReadAttribute(endpointId, &zapClusterLevelControlServerSpec, ZAP_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL,
-                          (uint8_t *) &entry.currentLevelValue, sizeof(entry.currentLevelValue)) == ZAP_STATUS_SUCCESS);
+        (chipZclReadAttribute(endpointId, &chipZclClusterLevelControlServerSpec,
+                              CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_ATTRIBUTE_CURRENT_LEVEL, (uint8_t *) &entry.currentLevelValue,
+                              sizeof(entry.currentLevelValue)) == CHIP_ZCL_STATUS_SUCCESS);
 
     saveSceneSubTableEntry(entry, tableIdx);
 }
 
-void zapLevelControlServerCopySceneHandler(uint8_t srcTableIdx, uint8_t dstTableIdx)
+void chipZclLevelControlServerCopySceneHandler(uint8_t srcTableIdx, uint8_t dstTableIdx)
 {
-    ZapLevelControlSceneSubTableEntry_t entry;
+    ChipZclLevelControlSceneSubTableEntry_t entry;
     retrieveSceneSubTableEntry(entry, srcTableIdx);
 
     saveSceneSubTableEntry(entry, dstTableIdx);
 }
 
-void zapLevelControlServerViewSceneHandler(uint8_t tableIdx, uint8_t ** ppExtFldData)
+void chipZclLevelControlServerViewSceneHandler(uint8_t tableIdx, uint8_t ** ppExtFldData)
 {
-    ZapLevelControlSceneSubTableEntry_t entry;
+    ChipZclLevelControlSceneSubTableEntry_t entry;
     retrieveSceneSubTableEntry(entry, tableIdx);
 
     if (entry.hasCurrentLevelValue)
     {
-        zapPluginScenesServerPutUint16InBuffer(ppExtFldData, ZAP_CLUSTER_LEVEL_CONTROL);
+        zapPluginScenesServerPutUint16InBuffer(ppExtFldData, CHIP_ZCL_CLUSTER_LEVEL_CONTROL);
         zapPluginScenesServerPutUint8InBuffer(ppExtFldData, 1); // length=1
         zapPluginScenesServerPutUint8InBuffer(ppExtFldData, entry.currentLevelValue);
     }
 }
 
-void zapLevelControlServerPrintInfoSceneHandler(uint8_t tableIdx)
+void chipZclLevelControlServerPrintInfoSceneHandler(uint8_t tableIdx)
 {
-    ZapLevelControlSceneSubTableEntry_t entry;
+    ChipZclLevelControlSceneSubTableEntry_t entry;
     retrieveSceneSubTableEntry(entry, tableIdx);
 
     zapCorePrint(" lvl:%x", entry.currentLevelValue);

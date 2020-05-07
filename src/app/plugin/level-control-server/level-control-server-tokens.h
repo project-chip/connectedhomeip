@@ -36,10 +36,10 @@
 #ifdef DEFINETOKENS
 #define CREATOR_ZCL_CORE_LEVEL_CONTROL_SCENE_SUBTABLE 0x534C // == Scene/Levelcontrol == "SL"
 
-DEFINE_INDEXED_TOKEN(ZCL_CORE_LEVEL_CONTROL_SCENE_SUBTABLE, ZapLevelControlSceneSubTableEntry_t,
-                     ZAP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE,
+DEFINE_INDEXED_TOKEN(ZCL_CORE_LEVEL_CONTROL_SCENE_SUBTABLE, ChipZclLevelControlSceneSubTableEntry_t,
+                     CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE,
                      {
-                         ZAP_SCENE_NULL,
+                         CHIP_SCENE_NULL,
                      })
 #endif // DEFINETOKENS
 

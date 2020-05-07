@@ -21,25 +21,25 @@
  *      used by the CHIP ZCL Application Layer
  *
  */
-#ifdef ZAP_TEST
+#ifdef CHIP_TEST
 #include "utest.h"
 #endif
 
 #include PLATFORM_HEADER
 #include CONFIGURATION_HEADER
-#include ZAP_AF_API_STACK
-#ifdef ZAP_AF_API_DEBUG_PRINT
-#include ZAP_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_STACK
+#ifdef CHIP_AF_API_DEBUG_PRINT
+#include CHIP_AF_API_DEBUG_PRINT
 #endif
-#include ZAP_AF_API_ZCL_CORE
+#include CHIP_AF_API_ZCL_CORE
 
 void zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(
-    const ZapCommandContext_t * context, const ZapClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request)
+    const ChipZclCommandContext_t * context, const ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request)
 {
-    zapCorePrintln("RX: ResetToFactoryDefaults");
+    chipZclCorePrintln("RX: ResetToFactoryDefaults");
 
-    zapSendDefaultResponse(context, ZAP_STATUS_SUCCESS);
+    chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
 
-    zapResetAttributes(context->endpointId);
-    zapReportingConfigurationsFactoryReset(context->endpointId);
+    chipZclResetAttributes(context->endpointId);
+    chipZclReportingConfigurationsFactoryReset(context->endpointId);
 }

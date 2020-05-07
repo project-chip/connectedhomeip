@@ -22,34 +22,34 @@
  *
  */
 
-#include "zap.h"
+#include "chip-zcl.h"
 
 // Default Response Stubs
-ZapStatus_t zapSendDefaultResponse(const ZapCommandContext_t * context, ZapStatus_t status)
+ChipZclStatus_t chipZclSendDefaultResponse(const ChipZclCommandContext_t * context, ChipZclStatus_t status)
 {
     return emberZclDefaultResponse(context, status);
 }
 
 // Reporting Configuration Stubs
-void zapReportingConfigurationsFactoryReset(ZapEndpointId_t endpointId)
+void chipZclReportingConfigurationsFactoryReset(ChipZclEndpointId_t endpointId)
 {
     emberZclReportingConfigurationsFactoryReset(endpointId);
 }
 
 // Attribute Management Stubs
-void zapResetAttributes(ZapEndpointId_t endpointId)
+void chipZclResetAttributes(ChipZclEndpointId_t endpointId)
 {
     emberZclResetAttributes(endpointId);
 }
 
-ZapStatus_t zapReadAttribute(ZapEndpointId_t endpointId, const ZapClusterSpec_t * clusterSpec, ZapAttributeId_t attributeId,
-                             void * buffer, size_t bufferLength)
+ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
+                                     ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
 {
     return emberZclReadAttribute(endpointId, clusterSpec, attributeId, buffer, bufferLength);
 }
 
-ZapStatus_t zapWriteAttribute(ZapEndpointId_t endpointId, const ZapClusterSpec_t * clusterSpec, ZapAttributeId_t attributeId,
-                              const void * buffer, size_t bufferLength)
+ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
+                                      ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
 {
     return emberZclWriteAttribute(endpointId, clusterSpec, attributeId, buffer, bufferLength);
 }
@@ -57,23 +57,23 @@ ZapStatus_t zapWriteAttribute(ZapEndpointId_t endpointId, const ZapClusterSpec_t
 // Event Management Stubs
 EventQueue emAppEventQueue;
 
-Event * zapEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all)
+Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all)
 {
     return emFindEvents(queue, actions, predicate, data, all);
 }
 
-void zapEventSetDelayMs(Event * event, uint32_t delay)
+void chipZclEventSetDelayMs(Event * event, uint32_t delay)
 {
     emberEventSetDelayMs(event, delay);
 }
 
 // Buffer Management Stubs
-uint8_t * zapGetBufferPointer(Buffer buffer)
+uint8_t * chipZclGetBufferPointer(Buffer buffer)
 {
     return emGetBufferPointer(buffer);
 }
 
-Buffer zapReallyAllocateBuffer(uint16_t length, bool unused)
+Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused)
 {
     return emReallyAllocateBuffer(length, unused);
 }

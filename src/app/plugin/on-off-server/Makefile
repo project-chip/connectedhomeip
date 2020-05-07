@@ -2,7 +2,7 @@ NAME=on-off-server
 
 # ---------- GENERIC -------------
 CC=gcc
-CFLAGS="-I../../api/" "-I../../utest-gen/" -DZAP_TEST
+CFLAGS="-I../../api/" "-I../../utest-gen/" -DCHIP_TEST
 
 $(NAME).out: $(NAME).o utest.o ../../api/mock/mock.o
 	$(CC) -o $(NAME).out $(NAME).o ../../api/mock/mock.o utest.o
@@ -13,4 +13,3 @@ test: $(NAME).out
 clean:
 	rm -f *.o $(objects) *.out
 	rm -f ../../api/mock/*.o
-	

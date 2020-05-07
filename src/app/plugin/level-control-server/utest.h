@@ -27,17 +27,17 @@
 
 #define PLATFORM_HEADER "utest.h"
 #define CONFIGURATION_HEADER "utest.h"
-#define ZAP_AF_API_STACK "utest.h"
-#define ZAP_AF_API_ZCL_CORE "utest.h"
-#define ZAP_AF_API_BUFFER_MANAGEMENT "utest.h"
-#define ZAP_AF_API_EVENT_QUEUE "utest.h"
-#define ZAP_AF_API_HAL "utest.h"
+#define CHIP_AF_API_STACK "utest.h"
+#define CHIP_AF_API_ZCL_CORE "utest.h"
+#define CHIP_AF_API_BUFFER_MANAGEMENT "utest.h"
+#define CHIP_AF_API_EVENT_QUEUE "utest.h"
+#define CHIP_AF_API_HAL "utest.h"
 
 // User options for plugin Level Control Server
-#define ZAP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL 255
-#define ZAP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL 0
+#define CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL 255
+#define CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL 0
 
-#include "zap.h"
+#include "chip-zcl.h"
 #include "gen-types.h"
 #include <stdio.h>
 #endif /*  UTEST_H */

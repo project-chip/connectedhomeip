@@ -38,7 +38,7 @@ typedef uint16_t enum16_t;
 typedef uint32_t utc_time_t;
 typedef unsigned long int size_t;
 
-typedef uint8_t ZapStatus_t;
+typedef uint8_t ChipZclStatus_t;
 
 #define TRUE true
 
@@ -133,157 +133,157 @@ typedef uint8_t ZapStatus_t;
 // From 07-5123-05, section 2.5.3, table 2-10.
 /** A success or failure status, used as a system-wide return type for functions. */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum ZapStatus_t
+enum ChipZclStatus_t
 #else
-typedef uint8_t ZapStatus_t;
+typedef uint8_t ChipZclStatus_t;
 enum
 #endif
 {
     /** The operation was successful. */
-    ZAP_STATUS_SUCCESS = 0x00,
+    CHIP_ZCL_STATUS_SUCCESS = 0x00,
     /** The operation was not successful. */
-    ZAP_STATUS_FAILURE = 0x01,
+    CHIP_ZCL_STATUS_FAILURE = 0x01,
     /**
      * The sender is recognized but forbidden from carrying out this
      * command. */
-    ZAP_STATUS_FORBIDDEN = 0x7D,
+    CHIP_ZCL_STATUS_FORBIDDEN = 0x7D,
     /**
      * The sender of the command does not have authorization to carry out this
      * command. */
-    ZAP_STATUS_NOT_AUTHORIZED = 0x7E,
+    CHIP_ZCL_STATUS_NOT_AUTHORIZED = 0x7E,
     /** A reserved field/subfield/bit contains a non-zero value. */
-    ZAP_STATUS_RESERVED_FIELD_NOT_ZERO = 0x7F,
+    CHIP_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO = 0x7F,
     /**
      * The command appears to contain the wrong fields, as detected either by the
      * presence of one or more invalid field entries or by missing
      * fields. Command not carried out. */
-    ZAP_STATUS_MALFORMED_COMMAND = 0x80,
+    CHIP_ZCL_STATUS_MALFORMED_COMMAND = 0x80,
     /**
      * The specified cluster command is not supported on the device. The command is not
      * carried out. */
-    ZAP_STATUS_UNSUP_CLUSTER_COMMAND = 0x81,
+    CHIP_ZCL_STATUS_UNSUP_CLUSTER_COMMAND = 0x81,
     /** The specified general ZCL command is not supported on the device. */
-    ZAP_STATUS_UNSUP_GENERAL_COMMAND = 0x82,
+    CHIP_ZCL_STATUS_UNSUP_GENERAL_COMMAND = 0x82,
     /**
      * A manufacturer-specific unicast, cluster specific command was received with
      * an unknown manufacturer code, or the manufacturer code was recognized but
      * the command is not supported. */
-    ZAP_STATUS_UNSUP_MANUF_CLUSTER_COMMAND = 0x83,
+    CHIP_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND = 0x83,
     /**
      * A manufacturer-specific unicast, ZCL specific command was received with an
      * unknown manufacturer code, or the manufacturer code was recognized but the
      * command is not supported. */
-    ZAP_STATUS_UNSUP_MANUF_GENERAL_COMMAND = 0x84,
+    CHIP_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND = 0x84,
     /**
      * At least one field of the command contains an incorrect value, according to
      * the specification the device is implemented to. */
-    ZAP_STATUS_INVALID_FIELD = 0x85,
+    CHIP_ZCL_STATUS_INVALID_FIELD = 0x85,
     /** The specified attribute does not exist on the device. */
-    ZAP_STATUS_UNSUPPORTED_ATTRIBUTE = 0x86,
+    CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE = 0x86,
     /**
      * An out of range error, or set to a reserved value. An attribute keeps its old
      * value. Note that an attribute value may be out of range if the attribute is
      * related to another, e.g., with minimum and maximum attributes. See the
      * individual attribute descriptions in ZCL specification for specific details. */
-    ZAP_STATUS_INVALID_VALUE = 0x87,
+    CHIP_ZCL_STATUS_INVALID_VALUE = 0x87,
     /** Attempt to write a read only attribute. */
-    ZAP_STATUS_READ_ONLY = 0x88,
+    CHIP_ZCL_STATUS_READ_ONLY = 0x88,
     /**
      * An operation (e.g., an attempt to create an entry in a table) failed due to
      * an insufficient amount of free space available. */
-    ZAP_STATUS_INSUFFICIENT_SPACE = 0x89,
+    CHIP_ZCL_STATUS_INSUFFICIENT_SPACE = 0x89,
     /**
      * An attempt to create an entry in a table failed due to a duplicate entry
      * already present in the table. */
-    ZAP_STATUS_DUPLICATE_EXISTS = 0x8A,
+    CHIP_ZCL_STATUS_DUPLICATE_EXISTS = 0x8A,
     /** The requested information (e.g., table entry) could not be found. */
-    ZAP_STATUS_NOT_FOUND = 0x8B,
+    CHIP_ZCL_STATUS_NOT_FOUND = 0x8B,
     /** Periodic reports cannot be issued for this attribute. */
-    ZAP_STATUS_UNREPORTABLE_ATTRIBUTE = 0x8C,
+    CHIP_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE = 0x8C,
     /** The data type given for an attribute is incorrect. The command is not carried out. */
-    ZAP_STATUS_INVALID_DATA_TYPE = 0x8D,
+    CHIP_ZCL_STATUS_INVALID_DATA_TYPE = 0x8D,
     /** The selector for an attribute is incorrect. */
-    ZAP_STATUS_INVALID_SELECTOR = 0x8E,
+    CHIP_ZCL_STATUS_INVALID_SELECTOR = 0x8E,
     /**
      * A request has been made to read an attribute that the requestor is not
      * authorized to read. No action taken. */
-    ZAP_STATUS_WRITE_ONLY = 0x8F,
+    CHIP_ZCL_STATUS_WRITE_ONLY = 0x8F,
     /**
      * Setting the requested values puts the device in an inconsistent state
      * on startup. No action taken.*/
-    ZAP_STATUS_INCONSISTENT_STARTUP_STATE = 0x90,
+    CHIP_ZCL_STATUS_INCONSISTENT_STARTUP_STATE = 0x90,
     /**
      * An attempt has been made to write an attribute that is present but is
      * defined using an out-of-band method and not over the air. */
-    ZAP_STATUS_DEFINED_OUT_OF_BAND = 0x91,
+    CHIP_ZCL_STATUS_DEFINED_OUT_OF_BAND = 0x91,
     /** The supplied values (e.g., contents of table cells) are inconsistent. */
-    ZAP_STATUS_INCONSISTENT = 0x92,
+    CHIP_ZCL_STATUS_INCONSISTENT = 0x92,
     /**
      * The credentials presented by the device sending the command are not
      * sufficient to perform this action. */
-    ZAP_STATUS_ACTION_DENIED = 0x93,
+    CHIP_ZCL_STATUS_ACTION_DENIED = 0x93,
     /** The exchange was aborted due to excessive response time. */
-    ZAP_STATUS_TIMEOUT = 0x94,
+    CHIP_ZCL_STATUS_TIMEOUT = 0x94,
     /** Failed case when a client or a server decides to abort the upgrade process. */
-    ZAP_STATUS_ABORT = 0x95,
+    CHIP_ZCL_STATUS_ABORT = 0x95,
     /**
      * Invalid OTA upgrade image (ex. failed signature validation or signer
      * information check or CRC check). */
-    ZAP_STATUS_INVALID_IMAGE = 0x96,
+    CHIP_ZCL_STATUS_INVALID_IMAGE = 0x96,
     /** Server does not have the data block available yet. */
-    ZAP_STATUS_WAIT_FOR_DATA = 0x97,
+    CHIP_ZCL_STATUS_WAIT_FOR_DATA = 0x97,
     /** No OTA upgrade image available for a particular client. */
-    ZAP_STATUS_NO_IMAGE_AVAILABLE = 0x98,
+    CHIP_ZCL_STATUS_NO_IMAGE_AVAILABLE = 0x98,
     /**
      * The client still requires more OTA upgrade image files to
      * successfully upgrade. */
-    ZAP_STATUS_REQUIRE_MORE_IMAGE = 0x99,
+    CHIP_ZCL_STATUS_REQUIRE_MORE_IMAGE = 0x99,
     /** The command has been received and is being processed. */
-    ZAP_STATUS_NOTIFICATION_PENDING = 0x9A,
+    CHIP_ZCL_STATUS_NOTIFICATION_PENDING = 0x9A,
     /** An operation was unsuccessful due to a hardware failure. */
-    ZAP_STATUS_HARDWARE_FAILURE = 0xC0,
+    CHIP_ZCL_STATUS_HARDWARE_FAILURE = 0xC0,
     /** An operation was unsuccessful due to a software failure. */
-    ZAP_STATUS_SOFTWARE_FAILURE = 0xC1,
+    CHIP_ZCL_STATUS_SOFTWARE_FAILURE = 0xC1,
     /** An error occurred during calibration. */
-    ZAP_STATUS_CALIBRATION_ERROR = 0xC2,
+    CHIP_ZCL_STATUS_CALIBRATION_ERROR = 0xC2,
     /** Distinguished value that represents a null (invalid) status. */
-    ZAP_STATUS_NULL = 0xFF,
+    CHIP_ZCL_STATUS_NULL = 0xFF,
 };
 
 /** An endpoint identifier. */
-typedef uint8_t ZapEndpointId_t;
+typedef uint8_t ChipZclEndpointId_t;
 
 typedef struct
 {
-    ZapEndpointId_t endpointId;
-} ZapCommandContext_t;
+    ChipZclEndpointId_t endpointId;
+} ChipZclCommandContext_t;
 
 /** brief An identifier for a task */
-typedef uint8_t ZapTaskId;
+typedef uint8_t ChipZclTaskId;
 
 /**
  * @brief Either marks an event as inactive or specifies the units for the
  * event execution time.
  */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum ZapEventUnits
+enum ChipZclEventUnits
 #else
-typedef uint8_t ZapEventUnits;
+typedef uint8_t ChipZclEventUnits;
 enum
 #endif
 {
     /** The event is not scheduled to run. */
-    ZAP_EVENT_INACTIVE = 0,
+    CHIP_ZCL_EVENT_INACTIVE = 0,
     /** The execution time is in approximate milliseconds.  */
-    ZAP_EVENT_MS_TIME,
+    CHIP_ZCL_EVENT_MS_TIME,
     /** The execution time is in 'binary' quarter seconds (256 approximate
         milliseconds each). */
-    ZAP_EVENT_QS_TIME,
+    CHIP_ZCL_EVENT_QS_TIME,
     /** The execution time is in 'binary' minutes (65536 approximate milliseconds
         each). */
-    ZAP_EVENT_MINUTE_TIME,
+    CHIP_ZCL_EVENT_MINUTE_TIME,
     /** The event is scheduled to run at the earliest opportunity. */
-    ZAP_EVENT_ZERO_DELAY
+    CHIP_ZCL_EVENT_ZERO_DELAY
 };
 
 //----------------------------------------------------------------
@@ -329,20 +329,20 @@ typedef struct EventQueue_s
 /** @brief Control structure for events.
  *
  * This structure should not be accessed directly.
- * It holds the event status (one of the @e ZAP_EVENT_ values)
+ * It holds the event status (one of the @e CHIP_ZCL_EVENT_ values)
  * and the time left before the event fires.
  */
 typedef struct
 {
     /** The event's status, either inactive or the units for timeToExecute. */
-    ZapEventUnits status;
+    ChipZclEventUnits status;
     /** The ID of the task this event belongs to. */
-    ZapTaskId taskid;
+    ChipZclTaskId taskid;
     /** How long before the event fires.
      *  Units are always in milliseconds.
      */
     uint32_t timeToExecute;
-} ZapEventControl;
+} ChipZclEventControl;
 
 /** @brief Complete events with a control and a handler procedure.
  *
@@ -354,10 +354,10 @@ typedef struct
 typedef struct
 {
     /** The control structure for the event. */
-    ZapEventControl * control;
+    ChipZclEventControl * control;
     /** The procedure to call when the event fires. */
     void (*handler)(void);
-} ZapEventData;
+} ChipZclEventData;
 
 /** @brief Control structure for tasks.
  *
@@ -368,22 +368,22 @@ typedef struct
     // The time when the next event associated with this task will fire
     uint32_t nextEventTime;
     // The list of events associated with this task
-    ZapEventData * events;
+    ChipZclEventData * events;
     // A flag that indicates the task has something to do other than events
     bool busy;
-} ZapTaskControl;
+} ChipZclTaskControl;
 
 /**
  * Schedule 'event' to run after 'delay' milliseconds.  Delays greater than
  * MAX_EVENT_DELAY_MS will be reduced to MAX_EVENT_DELAY_MS.
  */
-void zapEventSetDelayMs(Event * event, uint32_t delay);
+void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 
 /**
  * Returns the first scheduled event that has 'actions' and for which
  * 'predicate' returns true.  The returned event has been cancelled.
  */
-#define zapFindEvent(queue, actions, predicate, data) (zapEventFind((queue), (actions), (predicate), (data), false))
+#define chipZclFindEvent(queue, actions, predicate, data) (chipZclEventFind((queue), (actions), (predicate), (data), false))
 
 /**
  * Returns the scheduled events that have 'actions' and for which
@@ -395,11 +395,11 @@ void zapEventSetDelayMs(Event * event, uint32_t delay);
  * NULL before the event is passed to any event operation.
  */
 
-#define zapFindAllEvents(queue, actions, predicate, data) (zapEventFind((queue), (actions), (predicate), (data), true))
+#define chipZclFindAllEvents(queue, actions, predicate, data) (chipZclEventFind((queue), (actions), (predicate), (data), true))
 
 typedef bool (*EventPredicate)(Event *, void *);
 
-Event * zapEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all);
+Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all);
 
 // Buffers
 /**
@@ -411,15 +411,15 @@ typedef uint16_t Buffer;
  */
 #define NULL_BUFFER 0x0000
 
-Buffer zapReallyAllocateBuffer(uint16_t dataSizeInBytes, bool async);
+Buffer chipZclReallyAllocateBuffer(uint16_t dataSizeInBytes, bool async);
 
-#define zapAllocateBuffer(dataSizeInBytes) zapReallyAllocateBuffer(dataSizeInBytes, false)
+#define chipZclAllocateBuffer(dataSizeInBytes) chipZclReallyAllocateBuffer(dataSizeInBytes, false)
 
 // -----------------------------------------------------------------------------
 // Roles.
 
 /**
- * @addtogroup ZCLIP_clusters Clusters
+ * @addtogroup CHIP_clusters Clusters
  *
  * See zcl-core-types.h for source code.
  * @{
@@ -427,16 +427,16 @@ Buffer zapReallyAllocateBuffer(uint16_t dataSizeInBytes, bool async);
 
 /** Defines possible roles of a cluster. */
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum ZapRole_t
+enum ChipZclRole_t
 #else
-typedef uint8_t ZapRole_t;
+typedef uint8_t ChipZclRole_t;
 enum
 #endif
 {
     /** Cluster is a client. */
-    ZAP_ROLE_CLIENT = 0,
+    CHIP_ZCL_ROLE_CLIENT = 0,
     /** Cluster is a server. */
-    ZAP_ROLE_SERVER = 1,
+    CHIP_ZCL_ROLE_SERVER = 1,
 };
 
 /** @} end addtogroup */
@@ -452,46 +452,46 @@ enum
  */
 
 /** A manufacturer code. */
-typedef uint16_t ZapManufacturerCode_t;
+typedef uint16_t ChipZclManufacturerCode_t;
 /** A distinguished value that represents a null (invalid) manufacturer code. */
-#define ZAP_MANUFACTURER_CODE_NULL 0x0000
+#define CHIP_ZCL_MANUFACTURER_CODE_NULL 0x0000
 
 // -----------------------------------------------------------------------------
 // Clusters.
 /** A cluster identifier. */
-typedef uint16_t ZapClusterId_t;
-typedef uint8_t ZapRole_t;
-typedef uint16_t ZapManufacturerCode_t;
-typedef uint16_t ZapAttributeId_t;
+typedef uint16_t ChipZclClusterId_t;
+typedef uint8_t ChipZclRole_t;
+typedef uint16_t ChipZclManufacturerCode_t;
+typedef uint16_t ChipZclAttributeId_t;
 /** This structure holds a cluster specification. */
 typedef struct
 {
     /** Role of a cluster. */
-    ZapRole_t role;
+    ChipZclRole_t role;
     /** Manufacturer code of a cluster. */
-    ZapManufacturerCode_t manufacturerCode;
+    ChipZclManufacturerCode_t manufacturerCode;
     /** Identifier of a cluster. */
-    ZapClusterId_t id;
-} ZapClusterSpec_t;
+    ChipZclClusterId_t id;
+} ChipZclClusterSpec_t;
 
-#define zapCorePrintln(...) // TODO make this return the string to be printed
+#define chipZclCorePrintln(...) // TODO make this return the string to be printed
 
-ZapStatus_t zapSendDefaultResponse(const ZapCommandContext_t * context, ZapStatus_t status);
+ChipZclStatus_t chipZclSendDefaultResponse(const ChipZclCommandContext_t * context, ChipZclStatus_t status);
 
 // Attributes
-void zapResetAttributes(ZapEndpointId_t endpointId);
-void zapReportingConfigurationsFactoryReset(ZapEndpointId_t endpointId);
-ZapStatus_t zapReadAttribute(ZapEndpointId_t endpointId, const ZapClusterSpec_t * clusterSpec, ZapAttributeId_t attributeId,
-                             void * buffer, size_t bufferLength);
-ZapStatus_t zapWriteAttribute(ZapEndpointId_t endpointId, const ZapClusterSpec_t * clusterSpec, ZapAttributeId_t attributeId,
-                              const void * buffer, size_t bufferLength);
+void chipZclResetAttributes(ChipZclEndpointId_t endpointId);
+void chipZclReportingConfigurationsFactoryReset(ChipZclEndpointId_t endpointId);
+ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
+                                     ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength);
+ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
+                                      ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength);
 
 // Event Mechanism
-Event * zapEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all);
+Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all);
 
-void zapEventSetDelayMs(Event * event, uint32_t delay);
+void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 
 // Buffer Management Mechanism
-uint8_t * zapGetBufferPointer(Buffer buffer);
+uint8_t * chipZclGetBufferPointer(Buffer buffer);
 
-Buffer zapReallyAllocateBuffer(uint16_t length, bool unused);
+Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused);

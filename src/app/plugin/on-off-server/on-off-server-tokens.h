@@ -36,9 +36,9 @@
 #ifdef DEFINETOKENS
 #define CREATOR_ZCL_CORE_ON_OFF_SCENE_SUBTABLE 0x534F // == Scene/Onoff == "SO"
 
-DEFINE_INDEXED_TOKEN(ZCL_CORE_ON_OFF_SCENE_SUBTABLE, ZapOnOffSceneSubTableEntry_t, ZAP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE,
+DEFINE_INDEXED_TOKEN(ZCL_CORE_ON_OFF_SCENE_SUBTABLE, ChipZclOnOffSceneSubTableEntry_t, CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE,
                      {
-                         ZAP_SCENE_NULL,
+                         CHIP_SCENE_NULL,
                      })
 #endif // DEFINETOKENS
 

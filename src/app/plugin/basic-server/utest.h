@@ -27,10 +27,10 @@
 
 #define PLATFORM_HEADER "utest.h"
 #define CONFIGURATION_HEADER "utest.h"
-#define ZAP_AF_API_STACK "utest.h"
-#define ZAP_AF_API_ZCL_CORE "utest.h"
+#define CHIP_AF_API_STACK "utest.h"
+#define CHIP_AF_API_ZCL_CORE "utest.h"
 
-#include "zap.h"
+#include "chip-zcl.h"
 #include "gen-types.h"
 #include <stdio.h>
 #endif /*  UTEST_H */

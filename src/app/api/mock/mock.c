@@ -22,58 +22,58 @@
  *
  */
 
-#include "zap.h"
+#include "chip-zcl.h"
 
 // Default Response Stubs
-ZapStatus_t zapSendDefaultResponse(const ZapCommandContext_t * context, ZapStatus_t status)
+ChipZclStatus_t chipZclSendDefaultResponse(const ChipZclCommandContext_t * context, ChipZclStatus_t status)
 {
-    return ZAP_STATUS_SUCCESS;
+    return CHIP_ZCL_STATUS_SUCCESS;
 }
 
 // Reporting Configuration Stubs
-void zapReportingConfigurationsFactoryReset(ZapEndpointId_t endpointId)
+void chipZclReportingConfigurationsFactoryReset(ChipZclEndpointId_t endpointId)
 {
     return;
 }
 
 // Attribute Management Stubs
-void zapResetAttributes(ZapEndpointId_t endpointId)
+void chipZclResetAttributes(ChipZclEndpointId_t endpointId)
 {
     return;
 }
 
-ZapStatus_t zapReadAttribute(ZapEndpointId_t endpointId, const ZapClusterSpec_t * clusterSpec, ZapAttributeId_t attributeId,
-                             void * buffer, size_t bufferLength)
+ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
+                                     ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
 {
-    return ZAP_STATUS_SUCCESS;
+    return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-ZapStatus_t zapWriteAttribute(ZapEndpointId_t endpointId, const ZapClusterSpec_t * clusterSpec, ZapAttributeId_t attributeId,
-                              const void * buffer, size_t bufferLength)
+ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
+                                      ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
 {
-    return ZAP_STATUS_SUCCESS;
+    return CHIP_ZCL_STATUS_SUCCESS;
 }
 
 // Event Management Stubs
 EventQueue emAppEventQueue;
 
-Event * zapEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all)
+Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all)
 {
     return 0;
 }
 
-void zapEventSetDelayMs(Event * event, uint32_t delay)
+void chipZclEventSetDelayMs(Event * event, uint32_t delay)
 {
     return;
 }
 
 // Buffer Management Stubs
-uint8_t * zapGetBufferPointer(Buffer buffer)
+uint8_t * chipZclGetBufferPointer(Buffer buffer)
 {
     return 0;
 }
 
-Buffer zapReallyAllocateBuffer(uint16_t length, bool unused)
+Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused)
 {
     return 0;
 }

@@ -24,12 +24,12 @@
 #include "utest.h"
 
 void zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(
-    const ZapCommandContext_t * context, const ZapClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request);
+    const ChipZclCommandContext_t * context, const ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request);
 
 int main()
 {
-    ZapCommandContext_t context;
-    ZapClusterBasicServerCommandResetToFactoryDefaultsRequest_t request;
+    ChipZclCommandContext_t context;
+    ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t request;
 
     context.endpointId = 1;
     request.dummy      = true;

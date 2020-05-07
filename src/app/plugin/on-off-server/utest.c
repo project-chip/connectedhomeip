@@ -26,42 +26,42 @@
 
 // On/off cluster client (0x0006).
 // On/off cluster client (0x0006).
-const ZapClusterSpec_t zapClusterOnOffClientSpec = {
-    ZAP_ROLE_CLIENT,
-    ZAP_MANUFACTURER_CODE_NULL,
-    ZAP_CLUSTER_ON_OFF,
+const ChipZclClusterSpec_t chipZclClusterOnOffClientSpec = {
+    CHIP_ZCL_ROLE_CLIENT,
+    CHIP_ZCL_MANUFACTURER_CODE_NULL,
+    CHIP_ZCL_CLUSTER_ON_OFF,
 };
 
 // On/off cluster server (0x0006).
-const ZapClusterSpec_t zapClusterOnOffServerSpec = {
-    ZAP_ROLE_SERVER,
-    ZAP_MANUFACTURER_CODE_NULL,
-    ZAP_CLUSTER_ON_OFF,
+const ChipZclClusterSpec_t chipZclClusterOnOffServerSpec = {
+    CHIP_ZCL_ROLE_SERVER,
+    CHIP_ZCL_MANUFACTURER_CODE_NULL,
+    CHIP_ZCL_CLUSTER_ON_OFF,
 };
 
-void zapClusterOnOffServerCommandOffRequestHandler(const ZapCommandContext_t * context,
-                                                   const ZapClusterOnOffServerCommandOffRequest_t * request);
-void zapClusterOnOffServerCommandOnRequestHandler(const ZapCommandContext_t * context,
-                                                  const ZapClusterOnOffServerCommandOnRequest_t * request);
-void zapClusterOnOffServerCommandToggleRequestHandler(const ZapCommandContext_t * context,
-                                                      const ZapClusterOnOffServerCommandToggleRequest_t * request);
+void zapClusterOnOffServerCommandOffRequestHandler(const ChipZclCommandContext_t * context,
+                                                   const ChipZclClusterOnOffServerCommandOffRequest_t * request);
+void zapClusterOnOffServerCommandOnRequestHandler(const ChipZclCommandContext_t * context,
+                                                  const ChipZclClusterOnOffServerCommandOnRequest_t * request);
+void zapClusterOnOffServerCommandToggleRequestHandler(const ChipZclCommandContext_t * context,
+                                                      const ChipZclClusterOnOffServerCommandToggleRequest_t * request);
 
 int main()
 {
-    ZapCommandContext_t context;
+    ChipZclCommandContext_t context;
     context.endpointId = 1;
 
-    ZapClusterOnOffServerCommandOffRequest_t request1;
+    ChipZclClusterOnOffServerCommandOffRequest_t request1;
     request1.dummy = true;
 
     zapClusterOnOffServerCommandOffRequestHandler(&context, &request1);
 
-    ZapClusterOnOffServerCommandOnRequest_t request2;
+    ChipZclClusterOnOffServerCommandOnRequest_t request2;
     request2.dummy = true;
 
     zapClusterOnOffServerCommandOnRequestHandler(&context, &request2);
 
-    ZapClusterOnOffServerCommandToggleRequest_t request3;
+    ChipZclClusterOnOffServerCommandToggleRequest_t request3;
     request3.dummy = true;
 
     zapClusterOnOffServerCommandToggleRequestHandler(&context, &request3);

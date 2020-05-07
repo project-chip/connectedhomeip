@@ -32,6 +32,6 @@ typedef struct
 {
     bool hasOnOffValue;
     bool onOffValue;
-} ZapOnOffSceneSubTableEntry_t;
+} ChipZclOnOffSceneSubTableEntry_t;
 
 #endif // ZCL_ON_OFF_SERVER_H
