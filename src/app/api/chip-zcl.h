@@ -21,6 +21,9 @@
  *      layer.
  *
  */
+#ifndef CHIP_ZCL_MASTER_HEADER
+#define CHIP_ZCL_MASTER_HEADER
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -546,3 +549,5 @@ Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused);
 
 // Endpoint Management
 ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);
+
+#endif // CHIP_ZCL_MASTER_HEADER

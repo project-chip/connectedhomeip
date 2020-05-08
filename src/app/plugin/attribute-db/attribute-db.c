@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file provides the attribute database implementat
+ *      This file provides the attribute database implementation
  *      used by the CHIP ZCL Application Layer
  *
  */
@@ -34,6 +34,9 @@
 #include CHIP_AF_API_DEBUG_PRINT
 #endif
 #include CHIP_AF_API_ZCL_CORE
+
+#include "chip-zcl.h"
+#include "attribute-db.h"
 
 ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
                                      ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
