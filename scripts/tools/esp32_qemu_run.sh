@@ -28,7 +28,7 @@ usage() {
     exitcode=1
     echo "*** Error: $*"
   fi
-  echo "Usage: $0 <device firmware directory> <flash image file>"
+  echo "Usage: $0 <flash image file>"
   exit "$exitcode"
 }
 
@@ -38,26 +38,12 @@ die() {
   exit 1
 }
 
-[[ $# -eq 2 ]] || usage "Incorrect number of arguments"
+[[ $# -eq 1 ]] || usage "Incorrect number of arguments"
 
 [[ -n $QEMU_ESP32 ]] || die "Environment variable QEMU_ESP32 is undefined."
 
-firmware_path=$(realpath "$1")
-flash_image=$(realpath "$2")
+flash_image=$(realpath "$1")
 
-[[ -r "${firmware_path}/rom.bin" ]] || usage "Could not read file $firmware_path/rom.bin"
-[[ -r "${firmware_path}/rom1.bin" ]] || usage "Could not read file $firmware_path/rom1.bin"
 [[ -r $flash_image ]] || usage "Could not read file $flash_image"
 
-tempdir=$(mktemp -d)
-echo "Created $tempdir"
-
-trap "{ rm -rf $tempdir; }" EXIT
-
-ln -s "$firmware_path/rom.bin" "$tempdir/rom.bin"
-ln -s "$firmware_path/rom1.bin" "$tempdir/rom1.bin"
-ln -s "$flash_image" "$tempdir/esp32flash.bin"
-
-cd "$tempdir" || die 'ack!, where am I?!?'
-
-"$QEMU_ESP32" -d guest_errors,unimp -cpu esp32 -M esp32 -m 4M -s >io.txt
+"$QEMU_ESP32" -nographic -machine esp32 -drive file="$flash_image",if=mtd,format=raw -no-reboot
