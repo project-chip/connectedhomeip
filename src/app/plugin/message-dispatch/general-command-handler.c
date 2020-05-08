@@ -21,25 +21,37 @@
  *
  */
 
-#include "chip-zcl.h"
-#include "gen-command-id.h"
+#include "general-command-handler.h"
 
-static ChipZclStatus_t status(bool wasHandled)
-{
-    if (wasHandled)
-    {
-        return CHIP_ZCL_STATUS_SUCCESS;
-    }
-    else
-    {
-        return CHIP_ZCL_STATUS_UNSUP_GENERAL_COMMAND;
-    }
-}
+// Forward declarations
+static ChipZclStatus_t chipZclReadAttributesCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclReadAttributesResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclWriteAttributesCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclWriteAttributesUndividedCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclWriteAttributesResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclWriteAttributesNoResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclConfigureReportingCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclConfigureReportingResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclReadReportingConfigurationCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclReadReportingConfigurationResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclReportAttributesCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDefaultResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDiscoverAttributesCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDiscoverAttributesResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclReadAttributesStructuredCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclWriteAttributesStructuredCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclWriteAttributesStructuredResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDiscoverCommandsReceivedCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDiscoverCommandsReceivedResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDiscoverCommandsGeneratedCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDiscoverCommandsGeneratedResponseCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDiscoverAttributesExtendedCommandParse(ChipZclCommandContext_t * context);
+static ChipZclStatus_t chipZclDiscoverAttributesExtendedResponseCommandParse(ChipZclCommandContext_t * context);
 
-// Main cluster specific command parsing controller.
+// Main general command parsing controller.
 ChipZclStatus_t chipZclGeneralCommandParse(ChipZclCommandContext_t * context)
 {
-    ChipZclStatus_t result = status(false);
+    ChipZclStatus_t result = CHIP_ZCL_STATUS_UNSUP_GENERAL_COMMAND;
     switch (context->commandId)
     {
     case ZCL_READ_ATTRIBUTES_COMMAND_ID:
@@ -112,8 +124,122 @@ ChipZclStatus_t chipZclGeneralCommandParse(ChipZclCommandContext_t * context)
         result = chipZclDiscoverAttributesExtendedResponseCommandParse(context);
         break;
     default:
-        // Unrecognized cluster ID, error status will apply.
+        // Unrecognized general command ID, error status will apply.
         break;
     }
     return result;
+}
+
+static ChipZclStatus_t chipZclReadAttributesCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclReadAttributesResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclWriteAttributesCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclWriteAttributesUndividedCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclWriteAttributesResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclWriteAttributesNoResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclConfigureReportingCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+static ChipZclStatus_t chipZclConfigureReportingResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclReadReportingConfigurationCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclReadReportingConfigurationResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclReportAttributesCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDefaultResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDiscoverAttributesCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDiscoverAttributesResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclReadAttributesStructuredCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclWriteAttributesStructuredCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclWriteAttributesStructuredResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDiscoverCommandsReceivedCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDiscoverCommandsReceivedResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDiscoverCommandsGeneratedCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDiscoverCommandsGeneratedResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDiscoverAttributesExtendedCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
+}
+
+static ChipZclStatus_t chipZclDiscoverAttributesExtendedResponseCommandParse(ChipZclCommandContext_t * context)
+{
+    return CHIP_ZCL_STATUS_SUCCESS;
 }

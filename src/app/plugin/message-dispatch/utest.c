@@ -17,15 +17,18 @@
 
 /**
  *    @file
- *      This file provides initial message processing and dispatch
+ *      This provides unit testing for the CHIP ZCL Application
+ *      layer's level control cluster server
  *
  */
 
-#include "dispatch.h"
+#include "utest.h"
 
-// Main command parsing controller.
-ChipZclStatus_t chipZclCommandParse(ChipZclCommandContext_t * context)
+int main()
 {
-    ChipZclStatus_t result = context->clusterSpecific ? chipZclGeneralCommandParse(context) : chipZclClusterCommandParse(context);
-    return result;
+    ChipZclCommandContext_t context;
+    context.endpointId = 1;
+
+    printf("Success \n");
+    return 0;
 }

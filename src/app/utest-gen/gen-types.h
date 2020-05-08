@@ -24,6 +24,10 @@
  *
  */
 
+// Enclosing macro to prevent multiple inclusion
+#ifndef CHIP_ZCL_GEN_TYPES_HEADER
+#define CHIP_ZCL_GEN_TYPES_HEADER
+
 // Cluster ids.
 enum
 {
@@ -386,3 +390,5 @@ ChipZclStatus_t chipZclSendClusterIdentifyServerCommandTriggerEffectResponse(
 #define CHIP_ZCL_CLUSTER_ON_OFF_SERVER_COUNT 1
 #define CHIP_ZCL_CLUSTER_LEVEL_CONTROL_SERVER_COUNT 1
 #define CHIP_ZCL_CLUSTER_OTA_BOOTLOAD_CLIENT_COUNT 1
+
+#endif // CHIP_ZCL_GEN_TYPES_HEADER

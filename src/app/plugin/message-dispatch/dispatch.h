@@ -17,15 +17,19 @@
 
 /**
  *    @file
- *      This file provides initial message processing and dispatch
+ *      This file provides an API for ZCL Command message
+ *      processing dispatch.
  *
  */
 
-#include "dispatch.h"
+#ifndef ZCL_COMMAND_DISPATCH_H
+#define ZCL_COMMAND_DISPATCH_H
+
+#include "chip-zcl.h"
+#include "general-command-handler.h"
+#include "cluster-command-handler.h"
 
 // Main command parsing controller.
-ChipZclStatus_t chipZclCommandParse(ChipZclCommandContext_t * context)
-{
-    ChipZclStatus_t result = context->clusterSpecific ? chipZclGeneralCommandParse(context) : chipZclClusterCommandParse(context);
-    return result;
-}
+ChipZclStatus_t chipZclCommandParse(ChipZclCommandContext_t * context);
+
+#endif // ZCL_COMMAND_DISPATCH_H

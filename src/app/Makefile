@@ -1,4 +1,4 @@
-PLUGINS = basic-server on-off-server level-control-server identify-server attribute-db
+PLUGINS = basic-server on-off-server level-control-server identify-server attribute-db message-dispatch
 SAMPLES = utest
 
 subsystem:
