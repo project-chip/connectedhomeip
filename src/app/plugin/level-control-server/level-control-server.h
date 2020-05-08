@@ -45,4 +45,10 @@ typedef enum
     CHIP_LEVEL_CONTROL_OPTIONS_COUPLE_COLOR_TEMP_TO_LEVEL = 0x02,
 } ChipZclAfLevelControlOptions;
 
+typedef enum
+{
+    MOVE_MODE_UP   = 0x00,
+    MOVE_MODE_DOWN = 0x01,
+} ChipZclLevelControlMoveMode;
+
 #endif // ZCL_LEVEL_CONTROL_SERVER_H

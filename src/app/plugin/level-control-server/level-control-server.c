@@ -123,7 +123,7 @@ void chipZclLevelControlServerSetOnOff(ChipZclEndpointId_t endpointId, bool valu
         // Light is being turned on
         state.targetLevel         = getOnLevelOrCurrentLevel(endpointId);
         state.postTransitionLevel = state.targetLevel;
-        if (getOnOff(endpointId) == 0)
+        if (!getOnOff(endpointId))
         {
             // Only smoothly transition from off to on if the light is off
             setCurrentLevel(endpointId, MIN_LEVEL);
@@ -267,10 +267,10 @@ static void moveHandler(const ChipZclCommandContext_t * context,
     uint8_t level;
     switch (request->moveMode)
     {
-    case 0: // up
+    case MOVE_MODE_UP:
         level = MAX_LEVEL;
         break;
-    case 1: // down
+    case MOVE_MODE_DOWN:
         level = MIN_LEVEL;
         break;
     default:
@@ -334,10 +334,10 @@ static void stepHandler(const ChipZclCommandContext_t * context,
     uint8_t level;
     switch (request->stepMode)
     {
-    case 0: // up
+    case MOVE_MODE_UP:
         level = BOUND_MAX(currentLevel + request->stepSize);
         break;
-    case 1: // down
+    case MOVE_MODE_DOWN:
         level = BOUND_MIN(currentLevel - request->stepSize);
         break;
     default:
