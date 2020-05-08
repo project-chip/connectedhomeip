@@ -22,7 +22,6 @@
  *          on the Linux platforms.
  */
 
-
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/crypto/CHIPRNG.h>
 
@@ -42,7 +41,7 @@ CHIP_ERROR InitEntropy()
     SuccessOrExit(err);
 
     // Seed the standard rand() pseudo-random generator with data from the secure random source.
-    err = Platform::Security::GetSecureRandomData((uint8_t *)&seed, sizeof(seed));
+    err = Platform::Security::GetSecureRandomData((uint8_t *) &seed, sizeof(seed));
     SuccessOrExit(err);
     srand(seed);
 exit:
