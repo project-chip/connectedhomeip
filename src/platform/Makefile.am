@@ -23,6 +23,9 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+SUBDIRS                                 = \
+    $(NULL)
+
 EXTRA_DIST                              = \
     $(NULL)
 
@@ -110,6 +113,8 @@ libDeviceLayer_a_SOURCES                = \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
+
+SUBDIRS                                += tests
 
 libDeviceLayer_a_SOURCES               += \
     Linux/BLEManagerImpl.cpp              \
