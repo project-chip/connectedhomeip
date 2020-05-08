@@ -377,6 +377,9 @@ CHIP_ERROR ChipFabricState::GetFabricState(uint8_t * buf, uint32_t bufSize, uint
     err = writer.Put(ContextTag(kTag_FabricId), FabricId);
     SuccessOrExit(err);
 
+    err = writer.EndContainer(containerType);
+    SuccessOrExit(err);
+
     err = writer.Finalize();
     SuccessOrExit(err);
 
