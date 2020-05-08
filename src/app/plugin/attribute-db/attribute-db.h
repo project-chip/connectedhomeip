@@ -26,6 +26,8 @@
 #ifndef CHIP_ZCL_ATTRIBUTE_DB
 #define CHIP_ZCL_ATTRIBUTE_DB
 
+#include "gen-attribute-storage.h"
+
 /**
  * @brief Type for referring to zigbee application profile id
  */
@@ -472,5 +474,96 @@ typedef struct
 #define CHIP_ZCL_INVALID_ENDPOINT 0xFF
 
 #define CHIP_ZCL_INVALID_PAN_ID 0xFFFF
+
+/**
+ * @brief macro that returns true if the cluster is in the manufacturer specific range
+ *
+ * @param cluster EmberAfCluster* to consider
+ */
+#define chipZclClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
+
+/**
+ * @brief macro that returns true if attribute is read only.
+ *
+ * @param metadata EmberAfAttributeMetadata* to consider.
+ */
+#define chipZclAttributeIsReadOnly(metadata) (((metadata)->mask & ATTRIBUTE_MASK_WRITABLE) == 0)
+
+/**
+ * @brief macro that returns true if client attribute, and false if server.
+ *
+ * @param metadata EmberAfAttributeMetadata* to consider.
+ */
+#define chipZclAttributeIsClient(metadata) (((metadata)->mask & ATTRIBUTE_MASK_CLIENT) != 0)
+
+/**
+ * @brief macro that returns true if attribute is saved to token.
+ *
+ * @param metadata EmberAfAttributeMetadata* to consider.
+ */
+#define chipZclAttributeIsTokenized(metadata) (((metadata)->mask & ATTRIBUTE_MASK_TOKENIZE) != 0)
+
+/**
+ * @brief macro that returns true if attribute is saved in external storage.
+ *
+ * @param metadata EmberAfAttributeMetadata* to consider.
+ */
+#define chipZclAttributeIsExternal(metadata) (((metadata)->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE) != 0)
+
+/**
+ * @brief macro that returns true if attribute is a singleton
+ *
+ * @param metadata EmberAfAttributeMetadata* to consider.
+ */
+#define chipZclAttributeIsSingleton(metadata) (((metadata)->mask & ATTRIBUTE_MASK_SINGLETON) != 0)
+
+/**
+ * @brief macro that returns true if attribute is manufacturer specific
+ *
+ * @param metadata EmberAfAttributeMetadata* to consider.
+ */
+#define chipZclAttributeIsManufacturerSpecific(metadata) (((metadata)->mask & ATTRIBUTE_MASK_MANUFACTURER_SPECIFIC) != 0)
+
+/**
+ * @brief macro that returns size of attribute in bytes.
+ *
+ * @param metadata EmberAfAttributeMetadata* to consider.
+ */
+#define chipZclAttributeSize(metadata) ((metadata)->size)
+
+/**
+ *@brief Returns true if type is signed, false otherwise.
+ */
+bool chipZclIsTypeSigned(ChipZclAttributeType dataType);
+
+/**
+ * @brief Simple integer comparison function.
+ * Compares two values of a known length as integers.
+ * Signed integer comparison are supported for numbers with length of
+ * 4 (bytes) or less.
+ * The integers are in native endianness.
+ *
+ * @return -1, if val1 is smaller
+ *          0, if they are the same or if two negative numbers with length
+ *          greater than 4 is being compared
+ *          1, if val2 is smaller.
+ */
+int8_t chipZclCompareValues(uint8_t* val1, uint8_t* val2, uint8_t len, bool signedNumber);
+
+/**
+ * @brief Returns the total number of endpoints (dynamic and pre-compiled).
+ */
+uint8_t chipZclEndpointCount(void);
+
+/*
+ * @brief Function that determines the length of a zigbee Cluster Library string
+ *   (where the first byte is assumed to be the length).
+ */
+uint8_t chipZclStringLength(const uint8_t *buffer);
+/*
+ * @brief Function that determines the length of a zigbee Cluster Library long string.
+ *   (where the first two bytes are assumed to be the length).
+ */
+uint16_t chipZclLongStringLength(const uint8_t *buffer);
 
 #endif // SILABS_AF_API_TYPES
