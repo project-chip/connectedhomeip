@@ -24,21 +24,6 @@
 
 #include "utest.h" /* TODO pass all that stuff in -D */
 
-// On/off cluster client (0x0006).
-// On/off cluster client (0x0006).
-const ChipZclClusterSpec_t chipZclClusterOnOffClientSpec = {
-    CHIP_ZCL_ROLE_CLIENT,
-    CHIP_ZCL_MANUFACTURER_CODE_NULL,
-    CHIP_ZCL_CLUSTER_ON_OFF,
-};
-
-// On/off cluster server (0x0006).
-const ChipZclClusterSpec_t chipZclClusterOnOffServerSpec = {
-    CHIP_ZCL_ROLE_SERVER,
-    CHIP_ZCL_MANUFACTURER_CODE_NULL,
-    CHIP_ZCL_CLUSTER_ON_OFF,
-};
-
 void chipZclClusterOnOffServerCommandOffRequestHandler(const ChipZclCommandContext_t * context,
                                                        const ChipZclClusterOnOffServerCommandOffRequest_t * request);
 void chipZclClusterOnOffServerCommandOnRequestHandler(const ChipZclCommandContext_t * context,

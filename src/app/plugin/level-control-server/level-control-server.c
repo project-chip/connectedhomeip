@@ -211,7 +211,7 @@ static void moveToLevelHandler(const ChipZclCommandContext_t * context,
     chipZclCorePrintln("RX: MoveToLevel%s", (withOnOff ? "WithOnOff" : ""));
 
     // Use OptionsMask and OptionsOverride when implemented
-    if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE))
+    if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != true))
     {
         chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;
@@ -279,7 +279,7 @@ static void moveHandler(const ChipZclCommandContext_t * context,
     }
 
     // Use OptionsMask and OptionsOverride when implemented
-    if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE))
+    if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != true))
     {
         chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;
@@ -346,7 +346,7 @@ static void stepHandler(const ChipZclCommandContext_t * context,
     }
 
     // Use OptionsMask and OptionsOverride when implemented
-    if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE))
+    if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != true))
     {
         chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;
@@ -388,7 +388,7 @@ static void stopHandler(const ChipZclCommandContext_t * context,
     chipZclCorePrintln("RX: Stop%s", (withOnOff ? "WithOnOff" : ""));
 
     // Use OptionsMask and OptionsOverride when implemented
-    if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != TRUE))
+    if (!withOnOff && (shouldExecuteIfOff(context->endpointId, 0, 0) != true))
     {
         chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
         return;

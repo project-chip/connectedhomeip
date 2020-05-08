@@ -172,8 +172,8 @@ enum
 // Level Control cluster server (0x0008) - MoveToLevel (0x00) command.
 typedef struct
 {
-    int8u level;
-    int16u transitionTime;
+    uint8_t level;
+    uint16_t transitionTime;
 } ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t;
 typedef struct
 {
@@ -185,8 +185,8 @@ ChipZclStatus_t chipZclSendClusterLevelControlServerCommandMoveToLevelResponse(
 // Level Control cluster server (0x0008) - Move (0x01) command.
 typedef struct
 {
-    int8u moveMode;
-    int8u rate;
+    uint8_t moveMode;
+    uint8_t rate;
 } ChipZclClusterLevelControlServerCommandMoveRequest_t;
 typedef struct
 {
@@ -199,9 +199,9 @@ chipZclSendClusterLevelControlServerCommandMoveResponse(const ChipZclCommandCont
 // Level Control cluster server (0x0008) - Step (0x02) command.
 typedef struct
 {
-    int8u stepMode;
-    int8u stepSize;
-    int16u transitionTime;
+    uint8_t stepMode;
+    uint8_t stepSize;
+    uint16_t transitionTime;
 } ChipZclClusterLevelControlServerCommandStepRequest_t;
 typedef struct
 {
@@ -227,8 +227,8 @@ chipZclSendClusterLevelControlServerCommandStopResponse(const ChipZclCommandCont
 // Level Control cluster server (0x0008) - MoveToLevelWithOnOff (0x04) command.
 typedef struct
 {
-    int8u level;
-    int16u transitionTime;
+    uint8_t level;
+    uint16_t transitionTime;
 } ChipZclClusterLevelControlServerCommandMoveToLevelWithOnOffRequest_t;
 typedef struct
 {
@@ -241,8 +241,8 @@ ChipZclStatus_t chipZclSendClusterLevelControlServerCommandMoveToLevelWithOnOffR
 // Level Control cluster server (0x0008) - MoveWithOnOff (0x05) command.
 typedef struct
 {
-    int8u moveMode;
-    int8u rate;
+    uint8_t moveMode;
+    uint8_t rate;
 } ChipZclClusterLevelControlServerCommandMoveWithOnOffRequest_t;
 typedef struct
 {
@@ -254,9 +254,9 @@ ChipZclStatus_t chipZclSendClusterLevelControlServerCommandMoveWithOnOffResponse
 // Level Control cluster server (0x0008) - StepWithOnOff (0x06) command.
 typedef struct
 {
-    int8u stepMode;
-    int8u stepSize;
-    int16u transitionTime;
+    uint8_t stepMode;
+    uint8_t stepSize;
+    uint16_t transitionTime;
 } ChipZclClusterLevelControlServerCommandStepWithOnOffRequest_t;
 typedef struct
 {
@@ -315,7 +315,7 @@ enum
 // Identify cluster server (0x0003) - Identify (0x00) command.
 typedef struct
 {
-    int16u identifyTime;
+    uint16_t identifyTime;
 } ChipZclClusterIdentifyServerCommandIdentifyRequest_t;
 typedef struct
 {
@@ -332,7 +332,7 @@ typedef struct
 } ChipZclClusterIdentifyServerCommandIdentifyQueryRequest_t;
 typedef struct
 {
-    int16u timeout;
+    uint16_t timeout;
 } ChipZclClusterIdentifyServerCommandIdentifyQueryResponse_t;
 ChipZclStatus_t chipZclSendClusterIdentifyServerCommandIdentifyQueryResponse(
     const ChipZclCommandContext_t * context, const ChipZclClusterIdentifyServerCommandIdentifyQueryResponse_t * response);
@@ -340,7 +340,7 @@ ChipZclStatus_t chipZclSendClusterIdentifyServerCommandIdentifyQueryResponse(
 // Identify cluster server (0x0003) - EZModeInvoke (0x02) command.
 typedef struct
 {
-    int8u action;
+    uint8_t action;
 } ChipZclClusterIdentifyServerCommandEZModeInvokeRequest_t;
 typedef struct
 {
@@ -352,8 +352,8 @@ ChipZclStatus_t chipZclSendClusterIdentifyServerCommandEZModeInvokeResponse(
 // Identify cluster server (0x0003) - UpdateCommissionState (0x03) command.
 typedef struct
 {
-    int8u action;
-    int8u commissionStateMask;
+    uint8_t action;
+    uint8_t commissionStateMask;
 } ChipZclClusterIdentifyServerCommandUpdateCommissionStateRequest_t;
 typedef struct
 {
@@ -365,8 +365,8 @@ ChipZclStatus_t chipZclSendClusterIdentifyServerCommandUpdateCommissionStateResp
 // Identify cluster server (0x0003) - TriggerEffect (0x40) command.
 typedef struct
 {
-    int8u effectId;
-    int8u effectVariant;
+    uint8_t effectId;
+    uint8_t effectVariant;
 } ChipZclClusterIdentifyServerCommandTriggerEffectRequest_t;
 typedef struct
 {

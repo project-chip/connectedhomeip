@@ -22,7 +22,19 @@
  *
  */
 
+#include <stdarg.h>
+#include <stdio.h>
+
 #include "chip-zcl.h"
+
+void chipZclCorePrintln(const char * formatString, ...)
+{
+    va_list ap;
+    va_start(ap, formatString);
+    printf(formatString, ap);
+    printf("\n");
+    va_end(ap);
+}
 
 // Default Response Stubs
 ChipZclStatus_t chipZclSendDefaultResponse(const ChipZclCommandContext_t * context, ChipZclStatus_t status)

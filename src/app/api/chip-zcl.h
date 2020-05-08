@@ -24,14 +24,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef bool boolean; /*To ease adoption of bool instead of boolean.*/
-typedef unsigned char int8u;
-typedef signed char int8s;
-typedef unsigned short int int16u;
-typedef signed short int int16s;
-typedef unsigned long int int32u;
-typedef signed long int int32s;
-
 typedef uint64_t bitmap64_t;
 typedef uint8_t enum8_t;
 typedef uint16_t enum16_t;
@@ -39,8 +31,6 @@ typedef uint32_t utc_time_t;
 typedef unsigned long int size_t;
 
 typedef uint8_t ChipZclStatus_t;
-
-#define TRUE true
 
 // from platform/base/hal/host/micro-common.h
 // Since the STM32 host doesn't have a micro.h add these defines here.
@@ -143,6 +133,8 @@ enum
     CHIP_ZCL_STATUS_SUCCESS = 0x00,
     /** The operation was not successful. */
     CHIP_ZCL_STATUS_FAILURE = 0x01,
+    /** The cluster is not supported. */
+    CHIP_ZCL_STATUS_UNSUPPORTED_CLUSTER = 0xC3,
     /**
      * The sender is recognized but forbidden from carrying out this
      * command. */
@@ -275,6 +267,16 @@ typedef uint16_t ChipZclDeviceId_t;
 typedef struct
 {
     ChipZclEndpointId_t endpointId;
+    uint8_t * buffer;
+    uint16_t bufLen;
+    uint16_t clusterId;
+    bool clusterSpecific;
+    bool mfgSpecific;
+    uint16_t mfgCode;
+    uint8_t seqNum;
+    uint8_t commandId;
+    uint8_t payloadStartIndex;
+    uint8_t direction;
 } ChipZclCommandContext_t;
 
 /** brief An identifier for a task */
@@ -520,7 +522,7 @@ int32_t chipZclCompareClusterSpec(const ChipZclClusterSpec_t * s1, const ChipZcl
 bool chipZclAreClusterSpecsEqual(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2);
 void chipZclReverseClusterSpec(const ChipZclClusterSpec_t * s1, ChipZclClusterSpec_t * s2);
 
-#define chipZclCorePrintln(...) // TODO make this return the string to be printed
+void chipZclCorePrintln(const char * formatString, ...);
 
 ChipZclStatus_t chipZclSendDefaultResponse(const ChipZclCommandContext_t * context, ChipZclStatus_t status);
 
