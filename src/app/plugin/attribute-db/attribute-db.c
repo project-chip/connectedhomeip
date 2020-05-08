@@ -99,6 +99,23 @@ ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const Chip
     return CHIP_ZCL_STATUS_SUCCESS;
 }
 
+uint8_t chipZclEndpointCount(void)
+{
+  return emberEndpointCount;
+}
+
+
+uint8_t chipZclStringLength(const uint8_t *buffer)
+{
+  return (buffer[0] == 0xFF ? 0 : buffer[0]);
+}
+uint16_t chipZclLongStringLength(const uint8_t *buffer)
+{
+  uint16_t length = buffer[0] + (buffer[1] << 8);
+  return (length == 0xFFFF ? 0 : length);
+}
+
+
 void chipZclCopyString(uint8_t *dest, uint8_t *src, uint8_t size)
 {
   if ( src == NULL ) {
@@ -146,6 +163,82 @@ void chipZclCopyLongString(uint8_t *dest, uint8_t *src, uint16_t size)
     dest[0] = LOW_BYTE(length);
     dest[1] = HIGH_BYTE(length);
   }
+}
+// You can pass in val1 as NULL, which will assume that it is
+// pointing to an array of all zeroes. This is used so that
+// default value of NULL is treated as all zeroes.
+int8_t chipZclCompareValues(uint8_t* val1,
+                            uint8_t* val2,
+                            uint8_t len,
+                            bool signedNumber)
+{
+  uint8_t i, j, k;
+  if (signedNumber) { // signed number comparison
+    if (len <= 4) { // only number with 32-bits or less is supported
+      int32_t accum1 = 0x0;
+      int32_t accum2 = 0x0;
+      int32_t all1s = -1;
+
+      for (i = 0; i < len; i++) {
+        j = (val1 == NULL
+             ? 0
+             : (IS_BIG_ENDIAN() ? val1[i] : val1[(len - 1) - i])
+             );
+        accum1 |= j << (8 * (len - 1 - i));
+
+        k = (IS_BIG_ENDIAN()
+             ? val2[i]
+             : val2[(len - 1) - i]);
+        accum2 |= k << (8 * (len - 1 - i));
+      }
+
+      // sign extending, no need for 32-bits numbers
+      if (len < 4) {
+        if ((accum1 & (1 << (8 * len - 1))) != 0) { // check sign
+          accum1 |= all1s - ((1 << (len * 8)) - 1);
+        }
+        if ((accum2 & (1 << (8 * len - 1))) != 0) { // check sign
+          accum2 |= all1s - ((1 << (len * 8)) - 1);
+        }
+      }
+
+      if (accum1 > accum2) {
+        return 1;
+      } else if (accum1 < accum2) {
+        return -1;
+      } else {
+        return 0;
+      }
+    } else { // not supported
+      return 0;
+    }
+  } else { // regular unsigned number comparison
+    for (i = 0; i < len; i++) {
+      j = (val1 == NULL
+           ? 0
+           : (IS_BIG_ENDIAN() ? val1[i] : val1[(len - 1) - i])
+           );
+      k = (IS_BIG_ENDIAN()
+           ? val2[i]
+           : val2[(len - 1) - i]);
+
+      if (j > k) {
+        return 1;
+      } else if (k > j) {
+        return -1;
+      } else {
+        // MISRA requires ..else if.. to have terminating else.
+      }
+    }
+    return 0;
+  }
+}
+
+
+bool chipZclIsTypeSigned(ChipZclAttributeType dataType)
+{
+  return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE
+          && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 bool chipZclIsStringAttributeType(ChipZclAttributeType attributeType)
