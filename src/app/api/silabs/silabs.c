@@ -18,7 +18,8 @@
 /**
  *    @file
  *      This file provides the Silicon Labs implementation of functions
- *      required by the CHIP ZCL Application Layer
+ *      specifically only required by the Silicon Labs implementation
+ *      of these functions
  *
  */
 

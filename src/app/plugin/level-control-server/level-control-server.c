@@ -52,6 +52,9 @@
 
 #define MIN_DELAY_MS 1
 
+#define TRANSITION_TIME_USE_ATTRIBUTE 0xFFFF
+#define MOVE_RATE_USE_ATTRIBUTE 0xFF
+
 #ifdef CHIP_AF_API_ZCL_SCENES_SERVER
 #ifdef DEFINETOKENS
 // Token based storage.
@@ -246,7 +249,7 @@ static void moveToLevelHandler(const ChipZclCommandContext_t * context,
         uint8_t stepSize             = abs(currentLevel - request->level);
         uint16_t onOffTransitionTime = getOnOffTransitionTime(context->endpointId);
         uint32_t delayMs =
-            ((request->transitionTime == 0xFFFF)
+            ((request->transitionTime == TRANSITION_TIME_USE_ATTRIBUTE)
                  ? (onOffTransitionTime == 0x0 ? MIN_DELAY_MS : (onOffTransitionTime * MILLISECOND_TICKS_PER_DECISECOND / stepSize))
                  : (request->transitionTime * MILLISECOND_TICKS_PER_DECISECOND / stepSize));
         // If requested transition time is zero set level in next tick
@@ -317,11 +320,11 @@ static void moveHandler(const ChipZclCommandContext_t * context,
     else
     {
         uint8_t defaultMoveRate = getDefaultMoveRate(context->endpointId);
-        uint32_t delayMs =
-            (request->rate == 0xFF ? (defaultMoveRate == 0 ? MIN_DELAY_MS : MILLISECOND_TICKS_PER_SECOND / defaultMoveRate)
-                                   : MILLISECOND_TICKS_PER_SECOND / request->rate);
-        state.delayMs = MAX(delayMs, MIN_DELAY_MS); // Make sure we didn't round down to zero
-        status        = schedule(&state);
+        uint32_t delayMs        = (request->rate == MOVE_RATE_USE_ATTRIBUTE
+                                ? (defaultMoveRate == 0 ? MIN_DELAY_MS : MILLISECOND_TICKS_PER_SECOND / defaultMoveRate)
+                                : MILLISECOND_TICKS_PER_SECOND / request->rate);
+        state.delayMs           = MAX(delayMs, MIN_DELAY_MS); // Make sure we didn't round down to zero
+        status                  = schedule(&state);
     }
     chipZclSendDefaultResponse(context, status);
 }
