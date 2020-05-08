@@ -163,32 +163,6 @@ ChipZclStatus_t chipZclPreAttributeChangeCallback(uint8_t endpoint,
                                                 uint8_t size,
                                                 uint8_t* value);
 
-/** @brief Pre Attribute Change
- *
- * This function is called by the application framework before it changes an
- * attribute value.  The value passed into this callback is the value to which
- * the attribute is to be set by the framework.  The application should return
- * ::EMBER_ZCL_STATUS_SUCCESS to permit the change or any other ::EmberAfStatus
- * to reject it.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-ChipZclStatus_t chipZclPreAttributeChangeCallback(uint8_t endpoint,
-                                                ChipZclClusterId clusterId,
-                                                ChipZclAttributeId attributeId,
-                                                uint8_t mask,
-                                                uint16_t manufacturerCode,
-                                                uint8_t type,
-                                                uint8_t size,
-                                                uint8_t* value);
-
 /** @brief Post Attribute Change
  *
  * This function is called by the application framework after it changes an
