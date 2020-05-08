@@ -43,18 +43,6 @@ void chipZclResetAttributes(ChipZclEndpointId_t endpointId)
     emberZclResetAttributes(endpointId);
 }
 
-ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
-                                     ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
-{
-    return emberZclReadAttribute(endpointId, clusterSpec, attributeId, buffer, bufferLength);
-}
-
-ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
-                                      ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
-{
-    return emberZclWriteAttribute(endpointId, clusterSpec, attributeId, buffer, bufferLength);
-}
-
 // Event Management Stubs
 EventQueue emAppEventQueue;
 

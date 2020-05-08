@@ -60,18 +60,6 @@ void chipZclResetAttributes(ChipZclEndpointId_t endpointId)
     return;
 }
 
-ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
-                                     ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
-{
-    return CHIP_ZCL_STATUS_SUCCESS;
-}
-
-ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
-                                      ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
-{
-    return CHIP_ZCL_STATUS_SUCCESS;
-}
-
 // Event Management Stubs
 EventQueue emAppEventQueue;
 
