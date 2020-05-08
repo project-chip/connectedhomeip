@@ -1,3 +1,4 @@
+#include "../api/chip-zcl.h"
 #include "../plugin/attribute-db/attribute-db.h"
 
 // Callback implementations

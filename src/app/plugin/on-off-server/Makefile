@@ -1,5 +1,5 @@
 NAME=on-off-server
-REQUIRED_PLUGINS=../attribute-db/attribute-db.o
+REQUIRED_PLUGINS=../attribute-db/attribute-db.o ../../utest-gen/gen-callback-stubs.o
 
 # ---------- GENERIC -------------
 CC=gcc
