@@ -552,13 +552,13 @@ Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused);
 ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);
 
 // Some platform CHIP_ZCL_STATUS_INSUFFICIENT_SPACE
-#define MEMSET(d, v, l)          memset(d, v, l)
-#define MEMCOPY(d, s, l)         memcpy(d, s, l)
-#define MEMMOVE(d, s, l)         memmove(d, s, l)
-#define MEMCOMPARE(s0, s1, l)    memcmp(s0, s1, l)
+#define MEMSET(d, v, l) memset(d, v, l)
+#define MEMCOPY(d, s, l) memcpy(d, s, l)
+#define MEMMOVE(d, s, l) memmove(d, s, l)
+#define MEMCOMPARE(s0, s1, l) memcmp(s0, s1, l)
 #define MEMPGMCOMPARE(s0, s1, l) memcmp(s0, s1, l)
-#define LOW_BYTE(n)              ((uint8_t)((n) & 0xFF))
-#define HIGH_BYTE(n)             ((uint8_t)(LOW_BYTE((n) >> 8)))
-#define IS_BIG_ENDIAN()          false
+#define LOW_BYTE(n) ((uint8_t)((n) &0xFF))
+#define HIGH_BYTE(n) ((uint8_t)(LOW_BYTE((n) >> 8)))
+#define IS_BIG_ENDIAN() false
 
 #endif // CHIP_ZCL_MASTER_HEADER

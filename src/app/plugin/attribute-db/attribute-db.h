@@ -548,7 +548,7 @@ bool chipZclIsTypeSigned(ChipZclAttributeType dataType);
  *          greater than 4 is being compared
  *          1, if val2 is smaller.
  */
-int8_t chipZclCompareValues(uint8_t* val1, uint8_t* val2, uint8_t len, bool signedNumber);
+int8_t chipZclCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool signedNumber);
 
 /**
  * @brief Returns the total number of endpoints (dynamic and pre-compiled).
@@ -559,11 +559,11 @@ uint8_t chipZclEndpointCount(void);
  * @brief Function that determines the length of a zigbee Cluster Library string
  *   (where the first byte is assumed to be the length).
  */
-uint8_t chipZclStringLength(const uint8_t *buffer);
+uint8_t chipZclStringLength(const uint8_t * buffer);
 /*
  * @brief Function that determines the length of a zigbee Cluster Library long string.
  *   (where the first two bytes are assumed to be the length).
  */
-uint16_t chipZclLongStringLength(const uint8_t *buffer);
+uint16_t chipZclLongStringLength(const uint8_t * buffer);
 
 #endif // SILABS_AF_API_TYPES
