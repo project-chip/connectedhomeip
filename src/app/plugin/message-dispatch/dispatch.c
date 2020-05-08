@@ -17,24 +17,28 @@
 
 /**
  *    @file
- *      This file provides unit testing for the CHIP ZCL Command Handling
- *      related to the on-off-server functionality. It constructs an
- *      incoming message related to on-off and passes it into the CHIP
- *      ZCL message dispatch code
+ *      This file provides initial message processing and dispatch
  *
  */
 
-#include <stdio.h>
 #include "chip-zcl.h"
 #include "cluster-command-handler.h"
 
-int main()
+static ChipZclStatus_t status(bool wasHandled)
 {
-    ChipZclCommandContext_t context;
-    context.mfgSpecific    = false;
-    context.clusterId      = ZCL_ON_OFF_CLUSTER_ID;
-    context.commandId      = ZCL_ON_COMMAND_ID;
-    context.direction      = ZCL_DIRECTION_CLIENT_TO_SERVER;
-    ChipZclStatus_t status = chipZclClusterCommandParse(&context);
-    printf("Success: 0x%X \n", status);
+    if (wasHandled)
+    {
+        return CHIP_ZCL_STATUS_SUCCESS;
+    }
+    else
+    {
+        return CHIP_ZCL_STATUS_FAILURE;
+    }
+}
+
+// Main command parsing controller.
+ChipZclStatus_t chipZclCommandParse(ChipZclCommandContext_t * context)
+{
+    ChipZclStatus_t result = context->clusterSpecific ? chipZclGeneralCommandParse(context) : chipZclClusterCommandParse(context);
+    return result;
 }

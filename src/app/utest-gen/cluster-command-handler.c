@@ -24,8 +24,7 @@
  *
  */
 
-#include "chip-zcl.h"
-#include "call-command-handler.h"
+#include "cluster-command-handler.h"
 
 static ChipZclStatus_t status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
@@ -47,8 +46,8 @@ static ChipZclStatus_t status(bool wasHandled, bool clusterExists, bool mfgSpeci
     }
 }
 
-// Main command parsing controller.
-ChipZclStatus_t chipZclClusterSpecificCommandParse(ChipZclCommandContext_t * context)
+// Main cluster specific command parsing controller.
+ChipZclStatus_t chipZclClusterCommandParse(ChipZclCommandContext_t * context)
 {
     ChipZclStatus_t result = status(false, false, context->mfgSpecific);
     if (context->direction == (uint8_t) ZCL_DIRECTION_CLIENT_TO_SERVER)

@@ -28,28 +28,14 @@
 #ifndef CHIP_ZCL_COMMAND_PARSE_HEADER
 #define CHIP_ZCL_COMMAND_PARSE_HEADER
 
+#include "chip-zcl.h"
 #include "gen-types.h"
-
-#define ZCL_DIRECTION_CLIENT_TO_SERVER 0
-#define ZCL_DIRECTION_SERVER_TO_CLIENT 1
-
-// On-Off Cluster Id
-#define ZCL_ON_OFF_CLUSTER_ID 0x0006
-
-// Command types for cluster: On/off
-// Cluster specification level: zcl-7.0-07-5123-07
-
-// Client to server
-#define ZCL_OFF_COMMAND_ID 0x00                         // Ver.: always
-#define ZCL_ON_COMMAND_ID 0x01                          // Ver.: always
-#define ZCL_TOGGLE_COMMAND_ID 0x02                      // Ver.: always
-#define ZCL_OFF_WITH_EFFECT_COMMAND_ID 0x40             // Ver.: since zll-1.0-11-0037-10
-#define ZCL_ON_WITH_RECALL_GLOBAL_SCENE_COMMAND_ID 0x41 // Ver.: since zll-1.0-11-0037-10
-#define ZCL_ON_WITH_TIMED_OFF_COMMAND_ID 0x42           // Ver.: since zll-1.0-11-0037-10
+#include "gen-cluster-id.h"
+#include "gen-command-id.h"
 
 // This is a set of generated prototype for functions that parse the
 // the incomming message, and call appropriate command handler.
-ChipZclStatus_t chipZclClusterSpecificCommandParse(ChipZclCommandContext_t * context);
+ChipZclStatus_t chipZclClusterCommandParse(ChipZclCommandContext_t * context);
 
 // Cluster: On/off, server
 ChipZclStatus_t chipZclOnOffClusterServerCommandParse(ChipZclCommandContext_t * context);
