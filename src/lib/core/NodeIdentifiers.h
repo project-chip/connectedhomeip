@@ -84,6 +84,23 @@ enum
 };
 
 /**
+ *  CHIP has some reserved subnet numbers for distinguished network interfaces
+ *  on typical devices. These numbers are assigned here to symbolic constants.
+ *  These subnet numbers are used by CHIP to configure IPv6 ULA addresses on
+ *  appropriate interfaces.
+ */
+typedef enum ChipSubnetId
+{
+    kChipSubnetId_NotSpecified = 0, /**< Reserved as an unspecified or null value. */
+    kChipSubnetId_PrimaryWiFi  = 1, /**< The WiFi radio interface subnet number. */
+    kChipSubnetId_ThreadAlarm  = 2, /**< The Thread alarm radio interface subnet number. */
+    kChipSubnetId_WiFiAP       = 3, /**< The Local Wi-Fi AP interface subnet number. */
+    kChipSubnetId_MobileDevice = 4, /**< The subnet identifier for all Mobile devices. */
+    kChipSubnetId_Service      = 5, /**< The subnet identifier for the Nest Service endpoints. */
+    kChipSubnetId_ThreadMesh   = 6, /**< The Thread mesh radio interface subnet identifier. */
+} ChipSubnetId;
+
+/**
  *  Convert an IPv6 address interface identifier to a CHIP node identifier.
  *
  *  As a convenience to testing, node identifiers less or equal than #kMaxAlwaysLocalChipNodeId
@@ -134,6 +151,22 @@ inline uint64_t IPv6InterfaceIdToChipNodeId(uint64_t interfaceId)
 inline uint64_t ChipNodeIdToIPv6InterfaceId(uint64_t nodeId)
 {
     return (nodeId <= kMaxAlwaysLocalChipNodeId) ? nodeId : (nodeId ^ kEUI64_UL_Mask);
+}
+
+/**
+ *  Convert a CHIP fabric identifier to an IPv6 ULA global identifier.
+ *
+ *  The ULA global identifier for a fabric address is the lower 40 bits of the fabric's
+ *  64-bit fabric ID.
+ *
+ *  @param[in]    fabricId    The CHIP fabric identifier.
+ *
+ *  @return the mapped IPv6 global identifier.
+ *
+ */
+inline uint64_t ChipFabricIdToIPv6GlobalId(uint64_t fabricId)
+{
+    return (fabricId & 0xFFFFFFFFFFULL);
 }
 
 } // namespace chip
