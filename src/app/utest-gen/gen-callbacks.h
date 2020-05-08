@@ -78,12 +78,9 @@ void chipZclIdentifyServerStopIdentifyingCallback(ChipZclEndpointId_t endpointId
  * @param buffer   Ver.: always
  * @param maxReadLength   Ver.: always
  */
-ChipZclStatus_t chipZclExternalAttributeReadCallback(uint8_t endpoint,
-                                                    ChipZclClusterId clusterId,
-                                                    ChipZclAttributeMetadata *attributeMetadata,
-                                                    uint16_t manufacturerCode,
-                                                    uint8_t *buffer,
-                                                    uint16_t maxReadLength);
+ChipZclStatus_t chipZclExternalAttributeReadCallback(uint8_t endpoint, ChipZclClusterId clusterId,
+                                                     ChipZclAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
+                                                     uint8_t * buffer, uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -131,11 +128,9 @@ ChipZclStatus_t chipZclExternalAttributeReadCallback(uint8_t endpoint,
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  */
-ChipZclStatus_t chipZclExternalAttributeWriteCallback(uint8_t endpoint,
-                                                    ChipZclClusterId clusterId,
-                                                    ChipZclAttributeMetadata *attributeMetadata,
-                                                    uint16_t manufacturerCode,
-                                                    uint8_t *buffer);
+ChipZclStatus_t chipZclExternalAttributeWriteCallback(uint8_t endpoint, ChipZclClusterId clusterId,
+                                                      ChipZclAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
+                                                      uint8_t * buffer);
 
 /** @brief Pre Attribute Change
  *
@@ -154,14 +149,9 @@ ChipZclStatus_t chipZclExternalAttributeWriteCallback(uint8_t endpoint,
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-ChipZclStatus_t chipZclPreAttributeChangeCallback(uint8_t endpoint,
-                                                ChipZclClusterId clusterId,
-                                                ChipZclAttributeId attributeId,
-                                                uint8_t mask,
-                                                uint16_t manufacturerCode,
-                                                uint8_t type,
-                                                uint8_t size,
-                                                uint8_t* value);
+ChipZclStatus_t chipZclPreAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
+                                                  uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
+                                                  uint8_t * value);
 
 /** @brief Post Attribute Change
  *
@@ -178,14 +168,8 @@ ChipZclStatus_t chipZclPreAttributeChangeCallback(uint8_t endpoint,
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-void chipZclPostAttributeChangeCallback(uint8_t endpoint,
-                                        ChipZclClusterId clusterId,
-                                        ChipZclAttributeId attributeId,
-                                        uint8_t mask,
-                                        uint16_t manufacturerCode,
-                                        uint8_t type,
-                                        uint8_t size,
-                                        uint8_t* value);
+void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
 
 /** @brief Attribute Read Access
  *
@@ -197,9 +181,7 @@ void chipZclPostAttributeChangeCallback(uint8_t endpoint,
  * @param manufacturerCode   Ver.: always
  * @param attributeId   Ver.: always
  */
-bool chipZclAttributeReadAccessCallback(uint8_t endpoint,
-                                        ChipZclClusterId clusterId,
-                                        uint16_t manufacturerCode,
+bool chipZclAttributeReadAccessCallback(uint8_t endpoint, ChipZclClusterId clusterId, uint16_t manufacturerCode,
                                         uint16_t attributeId);
 
 /** @brief Attribute Write Access
@@ -212,9 +194,7 @@ bool chipZclAttributeReadAccessCallback(uint8_t endpoint,
  * @param manufacturerCode   Ver.: always
  * @param attributeId   Ver.: always
  */
-bool chipZclAttributeWriteAccessCallback(uint8_t endpoint,
-                                         ChipZclClusterId clusterId,
-                                         uint16_t manufacturerCode,
+bool chipZclAttributeWriteAccessCallback(uint8_t endpoint, ChipZclClusterId clusterId, uint16_t manufacturerCode,
                                          uint16_t attributeId);
 
 #endif // CHIP_ZCL_GEN_CALLBACKS_HEADER
