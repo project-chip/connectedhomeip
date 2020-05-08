@@ -23,6 +23,7 @@
  *      purposes of unit testing the CHIP ZCL Application Layer
  *
  */
+
 // Cluster ids.
 enum
 {
