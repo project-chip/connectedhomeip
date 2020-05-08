@@ -556,3 +556,8 @@ void CHIP_aes_ctr_done(CHIP_aes_ctr_ctx * ctx)
     EVP_CIPHER_CTX_free(handle->ctx);
     handle->ctx = NULL;
 }
+
+bool CHIP_RAND_bytes(void *buf, size_t len) {
+    return (RAND_bytes(buf, len) == 1);
+}
+
