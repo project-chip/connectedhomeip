@@ -27,6 +27,7 @@
 
 #include "chip-zcl.h"
 
+
 void chipZclCorePrintln(const char * formatString, ...)
 {
     va_list ap;
