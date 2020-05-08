@@ -27,6 +27,7 @@
 #include <support/TimeUtils.h>
 
 #include <sys/time.h>
+#include <inttypes.h>
 #include <chrono>
 
 namespace chip {
@@ -36,8 +37,8 @@ namespace Layer {
 
 uint64_t GetClock_Monotonic(void)
 {
-    std::chrono::seconds epoch =
-        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch());
+    std::chrono::microseconds epoch =
+        std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch());
     return epoch.count();
 }
 
