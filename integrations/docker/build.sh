@@ -18,8 +18,8 @@ IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
 
 [[ ${*/--help//} != "${*}" ]] && {
-    set +x
-    echo "Usage: $me <OPTIONS>
+  set +x
+  echo "Usage: $me <OPTIONS>
 
   Build and (optionally tag as latest, push) a docker image from Dockerfile in CWD
 
@@ -29,12 +29,12 @@ VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
    --help     get this message
 
 "
-    exit 0
+  exit 0
 }
 
 die() {
-    echo "$me: *** ERROR: $*"
-    exit 1
+  echo "$me: *** ERROR: $*"
+  exit 1
 }
 
 set -ex
@@ -43,37 +43,37 @@ set -ex
 
 BUILD_ARGS=""
 if [[ ${*/--no-cache//} != "${*}" ]]; then
-    BUILD_ARGS+=" --no-cache "
+  BUILD_ARGS+=" --no-cache "
 fi
 
 docker build "$BUILD_ARGS" -t "$ORG/$IMAGE:$VERSION" .
 
 [[ ${*/--latest//} != "${*}" ]] && {
-    docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
+  docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
 }
 
 [[ ${*/--push//} != "${*}" ]] && {
-    docker push "$ORG"/"$IMAGE":"$VERSION"
-    [[ ${*/--latest//} != "${*}" ]] && {
-        docker push "$ORG"/"$IMAGE":latest
-    }
+  docker push "$ORG"/"$IMAGE":"$VERSION"
+  [[ ${*/--latest//} != "${*}" ]] && {
+    docker push "$ORG"/"$IMAGE":latest
+  }
 }
 
 for filename in ./variants/*; do
-    echo "Variant Filename: $filename"
-    VARIANT=${filename##*.}
-    docker build "$BUILD_ARGS" -f "$filename" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE-$VARIANT:$VERSION" ./variants/
+  echo "Variant Filename: $filename"
+  VARIANT=${filename##*.}
+  docker build "$BUILD_ARGS" -f "$filename" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE-$VARIANT:$VERSION" ./variants/
 
+  [[ ${*/--latest//} != "${*}" ]] && {
+    docker tag "$ORG"/"$IMAGE-$VARIANT":"$VERSION" "$ORG"/"$IMAGE-$VARIANT":latest
+  }
+
+  [[ ${*/--push//} != "${*}" ]] && {
+    docker push "$ORG"/"$IMAGE-$VARIANT":"$VERSION"
     [[ ${*/--latest//} != "${*}" ]] && {
-        docker tag "$ORG"/"$IMAGE-$VARIANT":"$VERSION" "$ORG"/"$IMAGE-$VARIANT":latest
+      docker push "$ORG"/"$IMAGE-$VARIANT":latest
     }
-
-    [[ ${*/--push//} != "${*}" ]] && {
-        docker push "$ORG"/"$IMAGE-$VARIANT":"$VERSION"
-        [[ ${*/--latest//} != "${*}" ]] && {
-            docker push "$ORG"/"$IMAGE-$VARIANT":latest
-        }
-    }
+  }
 
 done
 
