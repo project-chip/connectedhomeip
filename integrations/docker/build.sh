@@ -46,7 +46,7 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=" --no-cache "
 fi
 
-docker build $BUILD_ARGS -t "$ORG/$IMAGE:$VERSION" .
+docker build "$BUILD_ARGS" -t "$ORG/$IMAGE:$VERSION" .
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
@@ -62,7 +62,7 @@ docker build $BUILD_ARGS -t "$ORG/$IMAGE:$VERSION" .
 for filename in ./variants/*; do
     echo "Variant Filename: $filename"
     VARIANT=${filename##*.}
-    docker build $BUILD_ARGS -f "$filename" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE-$VARIANT:$VERSION" ./variants/
+    docker build "$BUILD_ARGS" -f "$filename" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE-$VARIANT:$VERSION" ./variants/
 
     [[ ${*/--latest//} != "${*}" ]] && {
         docker tag "$ORG"/"$IMAGE-$VARIANT":"$VERSION" "$ORG"/"$IMAGE-$VARIANT":latest
