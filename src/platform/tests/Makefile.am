@@ -50,20 +50,26 @@ AM_CPPFLAGS                                    = \
     $(NULL)
 
 CHIP_LDADD                                      = \
+    $(top_builddir)/src/platform/libDeviceLayer.a \
+    $(top_builddir)/src/inet/libInetLayer.a       \
     $(top_builddir)/src/system/libSystemLayer.a   \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
-    $(top_builddir)/src/platform/libDeviceLayer.a \
     $(NULL)
 
 COMMON_LDADD                                   = \
-    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)   \
     $(CHIP_LDADD)                                \
+    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
+    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
+    $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
+    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
+    $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \
-    TestPlatformTime                         \
+    TestPlatformTime                             \
+    TestPlatformMgr                              \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -83,6 +89,9 @@ TESTS_ENVIRONMENT                              = \
 
 TestPlatformTime_LDADD                         = $(COMMON_LDADD)
 TestPlatformTime_SOURCES                       = TestPlatformTime.cpp
+
+TestPlatformMgr_LDADD                          = $(COMMON_LDADD)
+TestPlatformMgr_SOURCES                        = TestPlatformMgr.cpp
 
 #
 # Foreign make dependencies
