@@ -17,19 +17,19 @@ me=$(basename "$0")
 here=$(cd "$(dirname "$0")" && pwd)
 
 die() {
-  echo "$me: *** ERROR: " "${*}"
-  exit 1
+    echo "$me: *** ERROR: " "${*}"
+    exit 1
 }
 
 # move to ToT, I don't work anywhere else
 cd "$here/../.." || die 'ack!, where am I?!?'
 
 docker_run_command() {
-  integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
+    integrations/docker/images/"${IMAGE:-chip-build}"/run.sh "${ENV[@]}" -- "$@"
 }
 
 docker_run_bash_command() {
-  docker_run_command bash -c "$1"
+    docker_run_command bash -c "$1"
 }
 
 # convert ENV to an array of words: X,Y,Z => ( X Y Z )
@@ -39,11 +39,11 @@ read -r -a ENV <<<"${ENV[@]/#/--env }"
 
 case "$TASK" in
 
-  self-test)
+self-test)
     docker_run_bash_command 'echo looks ok to me && echo compound commands look good'
     ;;
 
-  self-test-env)
+self-test-env)
     docker_run_command bash -c "echo run me with ENV=HI=THERE,; env | echo HI=$'$'HI"
     ;;
 
@@ -94,7 +94,7 @@ case "$TASK" in
     docker_run_command 'scripts/tests/crypto_tests.sh'
     ;;
 
-  *)
+*)
     die "Unknown task: $TASK."
     ;;
 

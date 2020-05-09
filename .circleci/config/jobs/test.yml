@@ -1,0 +1,41 @@
+parameters:
+    builder:
+        type: string
+    run_setup_payload_tests:
+        type: boolean
+        default: true
+environment:
+    BUILD_TYPE: << parameters.builder >>
+executor: << parameters.builder >>
+steps:
+    - load-built-tree:
+          builder: << parameters.builder >>
+    - load-build-environment:
+          builder: << parameters.builder >>
+    - setup-environment:
+          builder: << parameters.builder >>
+    - run:
+          name: Run mbedTLS Tests
+          command:
+              scripts/tools/run_if.sh "mbedtls-build"
+              "$BUILD_TYPE"scripts/tests/mbedtls_tests.sh
+    - run:
+          name: Run Crypto Tests
+          command:
+              scripts/tools/run_if.sh "docker-build mbedtls-build" "$BUILD_TYPE"
+              scripts/tests/crypto_tests.sh
+    - run:
+          name: Run Setup Payload Tests
+          command:
+              scripts/tools/run_if.sh "docker-build ubuntu-16-lts" "$BUILD_TYPE"
+              scripts/tests/setup_payload_tests.sh
+    - run:
+          name: OpenSSL Tests
+          command:
+              scripts/tools/run_if.sh "docker-build" "$BUILD_TYPE"
+              scripts/tests/openssl_tests.sh
+    - run:
+          name: Run All Unit & Functional Tests
+          command:
+              scripts/tools/run_if.sh "docker-build" "$BUILD_TYPE"
+              scripts/tests/all_tests.sh

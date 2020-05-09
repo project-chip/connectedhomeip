@@ -1,0 +1,20 @@
+parameters:
+    builder:
+        type: string
+environment:
+    BUILD_TYPE: "<< parameters.builder >>"
+executor: << parameters.builder >>
+steps:
+    - checkout
+    - setup-environment:
+          builder: << parameters.builder >>
+    - bootstrap
+    - save-bootstrapped-tree:
+          builder: << parameters.builder >>
+    - run:
+          name: Build
+          command: scripts/build/default.sh
+    - save-built-tree:
+          builder: << parameters.builder >>
+    - save-build-environment:
+          builder: << parameters.builder >>

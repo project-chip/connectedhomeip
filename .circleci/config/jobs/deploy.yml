@@ -1,0 +1,16 @@
+parameters:
+    builder:
+        type: string
+environment:
+    BUILD_TYPE: << parameters.builder >>
+executor: << parameters.builder >>
+steps:
+    - load-built-tree:
+          builder: << parameters.builder >>
+    - load-build-environment:
+          builder: << parameters.builder >>
+    - setup-environment:
+          builder: << parameters.builder >>
+    - run:
+          name: Deployment Check
+          command: scripts/build/distribution_check.sh
