@@ -78,8 +78,8 @@ const ChipZclManufacturerCodeEntry attributeManufacturerCodes[] = GENERATED_ATTR
 const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT;
 
 // Forward declarations
-ChipZclStatus_t emAfReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRecord, ChipZclAttributeMetadata ** metadata,
-                                         uint8_t * buffer, uint16_t readLength, bool write);
+ChipZclStatus_t chipZclReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRecord, ChipZclAttributeMetadata ** metadata,
+                                            uint8_t * buffer, uint16_t readLength, bool write);
 
 ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
                                      ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
@@ -403,10 +403,10 @@ ChipZclStatus_t emAfWriteAttribute(uint8_t endpoint, ChipZclClusterId cluster, C
     record.clusterMask      = mask;
     record.attributeId      = attributeID;
     record.manufacturerCode = manufacturerCode;
-    emAfReadOrWriteAttribute(&record, &metadata,
-                             NULL,   // buffer
-                             0,      // buffer size
-                             false); // write?
+    chipZclReadOrWriteAttribute(&record, &metadata,
+                                NULL,   // buffer
+                                0,      // buffer size
+                                false); // write?
 
     // if we dont support that attribute
     if (metadata == NULL)
@@ -482,11 +482,11 @@ ChipZclStatus_t emAfWriteAttribute(uint8_t endpoint, ChipZclClusterId cluster, C
         }
 
         // write the attribute
-        status = emAfReadOrWriteAttribute(&record,
-                                          NULL, // metadata
-                                          data,
-                                          0,     // buffer size - unused
-                                          true); // write?
+        status = chipZclReadOrWriteAttribute(&record,
+                                             NULL, // metadata
+                                             data,
+                                             0,     // buffer size - unused
+                                             true); // write?
 
         if (status != CHIP_ZCL_STATUS_SUCCESS)
         {
@@ -550,8 +550,8 @@ ChipZclStatus_t emAfReadAttribute(uint8_t endpoint, ChipZclClusterId cluster, Ch
     record.clusterMask      = mask;
     record.attributeId      = attributeID;
     record.manufacturerCode = manufacturerCode;
-    status                  = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
-                                      false); // write?
+    status                  = chipZclReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
+                                         false); // write?
 
     if (status == CHIP_ZCL_STATUS_SUCCESS)
     {
@@ -585,8 +585,8 @@ ChipZclStatus_t emAfReadAttribute(uint8_t endpoint, ChipZclClusterId cluster, Ch
 // type.  For strings, the function will copy as many bytes as will fit in the
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
-ChipZclStatus_t emAfReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRecord, ChipZclAttributeMetadata ** metadata,
-                                         uint8_t * buffer, uint16_t readLength, bool write)
+ChipZclStatus_t chipZclReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRecord, ChipZclAttributeMetadata ** metadata,
+                                            uint8_t * buffer, uint16_t readLength, bool write)
 {
     uint8_t i;
     uint16_t attributeOffsetIndex = 0;
@@ -684,4 +684,22 @@ ChipZclStatus_t emAfReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRecor
         }
     }
     return CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
+}
+
+// Returns the pointer to metadata, or null if it is not found
+ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterId clusterId,
+                                                          ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode)
+{
+    ChipZclAttributeMetadata * metadata = NULL;
+    ChipZclAttributeSearchRecord record;
+    record.endpoint         = endpoint;
+    record.clusterId        = clusterId;
+    record.clusterMask      = mask;
+    record.attributeId      = attributeId;
+    record.manufacturerCode = manufacturerCode;
+    chipZclReadOrWriteAttribute(&record, &metadata,
+                                NULL,   // buffer
+                                0,      // buffer size
+                                false); // write?
+    return metadata;
 }
