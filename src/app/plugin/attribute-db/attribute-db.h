@@ -566,4 +566,20 @@ uint8_t chipZclStringLength(const uint8_t * buffer);
  */
 uint16_t chipZclLongStringLength(const uint8_t * buffer);
 
+/*
+ * @brief Function that returns a metadata structure for the given attribute.
+ * Returns null if none is found.
+ */
+ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterId clusterId,
+                                                          ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
+
+/*
+ * @brief Initialization of the endpoint structure. Before this call, endpoints are not enabled. After this call endpoints
+ * are enabled and linked together properly for use.
+ */
+void chipZclEndpointInit(void);
+
+// Endpoint Management
+ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);
+
 #endif // SILABS_AF_API_TYPES

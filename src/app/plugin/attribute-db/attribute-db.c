@@ -58,11 +58,11 @@ uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 #else
 #define ACTUAL_SINGLETONS_SIZE ATTRIBUTE_SINGLETONS_SIZE
 #endif
+
+uint8_t chipZclEndpointCounter = 0;
+ChipZclDefinedEndpoint chipZclEndpointArray[FIXED_ENDPOINT_COUNT];
+
 uint8_t singletonAttributeData[ACTUAL_SINGLETONS_SIZE];
-
-uint8_t emberEndpointCount = 0;
-
-ChipZclDefinedEndpoint emAfEndpoints[FIXED_ENDPOINT_COUNT];
 
 const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
 #ifdef GENERATED_MIN_MAX_DEFAULTS
@@ -95,7 +95,7 @@ ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const Chip
 
 uint8_t chipZclEndpointCount(void)
 {
-    return emberEndpointCount;
+    return chipZclEndpointCounter;
 }
 
 uint8_t chipZclStringLength(const uint8_t * buffer)
@@ -298,7 +298,7 @@ static ChipZclStatus_t typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, ChipZ
 
 bool chipZclEndpointIndexIsEnabled(uint8_t index)
 {
-    return (emAfEndpoints[index].bitmask & CHIP_ZCL_ENDPOINT_ENABLED);
+    return (chipZclEndpointArray[index].bitmask & CHIP_ZCL_ENDPOINT_ENABLED);
 }
 
 // Returns the manufacturer code or ::CHIP_ZCL_NULL_MANUFACTURER_CODE if none
@@ -593,9 +593,9 @@ ChipZclStatus_t chipZclReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRe
 
     for (i = 0; i < chipZclEndpointCount(); i++)
     {
-        if (emAfEndpoints[i].endpoint == attRecord->endpoint)
+        if (chipZclEndpointArray[i].endpoint == attRecord->endpoint)
         {
-            ChipZclEndpointType * endpointType = emAfEndpoints[i].endpointType;
+            ChipZclEndpointType * endpointType = chipZclEndpointArray[i].endpointType;
             uint8_t clusterIndex;
             if (!chipZclEndpointIndexIsEnabled(i))
             {
@@ -680,7 +680,7 @@ ChipZclStatus_t chipZclReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRe
         }
         else
         { // Not the endpoint we are looking for
-            attributeOffsetIndex += emAfEndpoints[i].endpointType->endpointSize;
+            attributeOffsetIndex += chipZclEndpointArray[i].endpointType->endpointSize;
         }
     }
     return CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
@@ -691,15 +691,44 @@ ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, Chip
                                                           ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode)
 {
     ChipZclAttributeMetadata * metadata = NULL;
+    ChipZclStatus_t status;
     ChipZclAttributeSearchRecord record;
     record.endpoint         = endpoint;
     record.clusterId        = clusterId;
     record.clusterMask      = mask;
     record.attributeId      = attributeId;
     record.manufacturerCode = manufacturerCode;
-    chipZclReadOrWriteAttribute(&record, &metadata,
-                                NULL,   // buffer
-                                0,      // buffer size
-                                false); // write?
+
+    status = chipZclReadOrWriteAttribute(&record,   // search record
+                                         &metadata, // where to write the result.
+                                         NULL,      // buffer
+                                         0,         // buffer size
+                                         false);    // write?
     return metadata;
+}
+
+// Initial configuration
+void chipZclEndpointInit(void)
+{
+    uint8_t ep;
+
+    uint8_t fixedEndpoints[]            = FIXED_ENDPOINT_ARRAY;
+    uint16_t fixedProfileIds[]          = FIXED_PROFILE_IDS;
+    uint16_t fixedDeviceIds[]           = FIXED_DEVICE_IDS;
+    uint8_t fixedDeviceVersions[]       = FIXED_DEVICE_VERSIONS;
+    uint8_t fixedEmberAfEndpointTypes[] = FIXED_ENDPOINT_TYPES;
+    uint8_t fixedNetworks[]             = FIXED_NETWORKS;
+
+    chipZclEndpointCounter = FIXED_ENDPOINT_COUNT;
+    for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
+    {
+        chipZclEndpointArray[ep].endpoint      = fixedEndpoints[ep];
+        chipZclEndpointArray[ep].profileId     = fixedProfileIds[ep];
+        chipZclEndpointArray[ep].deviceId      = fixedDeviceIds[ep];
+        chipZclEndpointArray[ep].deviceVersion = fixedDeviceVersions[ep];
+        chipZclEndpointArray[ep].endpointType =
+            (ChipZclEndpointType *) &(generatedChipZclEndpointTypes[fixedEmberAfEndpointTypes[ep]]);
+        chipZclEndpointArray[ep].networkIndex = fixedNetworks[ep];
+        chipZclEndpointArray[ep].bitmask      = CHIP_ZCL_ENDPOINT_ENABLED;
+    }
 }

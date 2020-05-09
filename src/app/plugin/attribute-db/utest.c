@@ -23,9 +23,46 @@
  */
 
 #include "utest.h" /* TODO pass all that stuff in -D */
+#include "attribute-db.h"
 
 int main()
 {
+    ChipZclAttributeMetadata * metadata;
+    int count;
+
+    chipZclEndpointInit();
+
+    count = chipZclEndpointCount();
+    if (count != 3)
+    {
+        printf("Error: expecting one endpoint, got %d\n", count);
+        return 1;
+    }
+
+    // This attribute doesn't exist
+    metadata = chipZclLocateAttributeMetadata(1, 2, 3, 4, 5);
+    if (metadata != NULL)
+    {
+        printf("Error: expecting NULL\n");
+        return 1;
+    }
+
+    // This one does, on endpoint 1
+    metadata = chipZclLocateAttributeMetadata(1, 0, 0, CLUSTER_MASK_SERVER, CHIP_ZCL_NULL_MANUFACTURER_CODE);
+    if (metadata == NULL)
+    {
+        printf("Error: expecting non-NULL\n");
+        return 1;
+    }
+
+    // Another existing attribute, on endpoint 242
+    metadata = chipZclLocateAttributeMetadata(242, 0x0021, 0x0011, CLUSTER_MASK_CLIENT, CHIP_ZCL_NULL_MANUFACTURER_CODE);
+    if (metadata == NULL)
+    {
+        printf("Error: expecting non-NULL\n");
+        return 1;
+    }
+
     printf("Success \n");
     return 0;
 }
