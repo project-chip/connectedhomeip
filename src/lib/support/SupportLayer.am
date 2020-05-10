@@ -36,7 +36,6 @@ CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                     = \
     @top_builddir@/src/lib/support/logging/CHIPLogging.cpp  \
     @top_builddir@/src/lib/support/PersistedCounter.cpp     \
     @top_builddir@/src/lib/support/RandUtils.cpp            \
-    @top_builddir@/src/lib/support/TestUtils.cpp            \
     @top_builddir@/src/lib/support/TimeUtils.cpp            \
     $(NULL)
 
@@ -53,9 +52,13 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
     @top_builddir@/src/lib/support/Base64.h                 \
     @top_builddir@/src/lib/support/PersistedCounter.h       \
     @top_builddir@/src/lib/support/RandUtils.h              \
-    @top_builddir@/src/lib/support/TestUtils.h              \
     @top_builddir@/src/lib/support/TimeUtils.h              \
     $(NULL)
+
+if CHIP_BUILD_TESTS
+CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES += @top_builddir@/src/lib/support/TestUtils.cpp
+CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES += @top_builddir@/src/lib/support/TestUtils.h
+endif
 
 if CHIP_WITH_NLFAULTINJECTION
 CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES += @top_builddir@/src/lib/support/CHIPFaultInjection.cpp
