@@ -77,22 +77,6 @@ const uint16_t clusterManufacturerCodeCount                     = GENERATED_CLUS
 const ChipZclManufacturerCodeEntry attributeManufacturerCodes[] = GENERATED_ATTRIBUTE_MANUFACTURER_CODES;
 const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT;
 
-// Forward declarations
-ChipZclStatus_t chipZclReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRecord, ChipZclAttributeMetadata ** metadata,
-                                            uint8_t * buffer, uint16_t readLength, bool write);
-
-ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
-                                     ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
-{
-    return CHIP_ZCL_STATUS_SUCCESS;
-}
-
-ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
-                                      ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
-{
-    return CHIP_ZCL_STATUS_SUCCESS;
-}
-
 uint8_t chipZclEndpointCount(void)
 {
     return chipZclEndpointCounter;
@@ -130,7 +114,7 @@ void chipZclCopyString(uint8_t * dest, uint8_t * src, uint8_t size)
     }
 }
 
-static uint8_t * singletonAttributeLocation(ChipZclAttributeMetadata * am)
+static uint8_t * chipZclSingletonAttributeLocation(ChipZclAttributeMetadata * am)
 {
     ChipZclAttributeMetadata * m = (ChipZclAttributeMetadata *) &(generatedAttributes[0]);
     uint16_t index               = 0;
@@ -264,8 +248,8 @@ bool chipZclIsLongStringAttributeType(ChipZclAttributeType attributeType)
 // This function does mem copy, but smartly, which means that if the type is a
 // string, it will copy as much as it can.
 // If src == NULL, then this method will set memory to zeroes
-static ChipZclStatus_t typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, ChipZclAttributeMetadata * am, bool write,
-                                            uint16_t readLength)
+static ChipZclStatus_t chipZclTypeSensitiveMemCopy(uint8_t * dest, uint8_t * src, ChipZclAttributeMetadata * am, bool write,
+                                                   uint16_t readLength)
 {
     ChipZclAttributeType attributeType = am->attributeType;
     uint16_t size                      = (readLength == 0) ? am->size : readLength;
@@ -303,7 +287,7 @@ bool chipZclEndpointIndexIsEnabled(uint8_t index)
 
 // Returns the manufacturer code or ::CHIP_ZCL_NULL_MANUFACTURER_CODE if none
 // could be found.
-static uint16_t getManufacturerCode(ChipZclManufacturerCodeEntry * codes, uint16_t codeTableSize, uint16_t tableIndex)
+static uint16_t chipZclGetManufacturerCode(ChipZclManufacturerCodeEntry * codes, uint16_t codeTableSize, uint16_t tableIndex)
 {
     uint16_t i;
     for (i = 0; i < codeTableSize; i++)
@@ -319,8 +303,8 @@ static uint16_t getManufacturerCode(ChipZclManufacturerCodeEntry * codes, uint16
 
 uint16_t chipZclGetManufacturerCodeForCluster(ChipZclCluster * cluster)
 {
-    return getManufacturerCode((ChipZclManufacturerCodeEntry *) clusterManufacturerCodes, clusterManufacturerCodeCount,
-                               (cluster - generatedClusters));
+    return chipZclGetManufacturerCode((ChipZclManufacturerCodeEntry *) clusterManufacturerCodes, clusterManufacturerCodeCount,
+                                      (cluster - generatedClusters));
 }
 
 /**
@@ -341,12 +325,12 @@ bool chipZclMatchCluster(ChipZclCluster * cluster, ChipZclAttributeSearchRecord 
              (chipZclGetManufacturerCodeForCluster(cluster) == attRecord->manufacturerCode)));
 }
 
-// This function basically wraps getManufacturerCode with the parameters
+// This function basically wraps chipZclGetManufacturerCode with the parameters
 // associating an attributes metadata with its code.
-uint16_t chipZclGetMfgCode(ChipZclAttributeMetadata * metadata)
+static uint16_t chipZclGetMfgCode(ChipZclAttributeMetadata * metadata)
 {
-    return getManufacturerCode((ChipZclManufacturerCodeEntry *) attributeManufacturerCodes, attributeManufacturerCodeCount,
-                               (metadata - generatedAttributes));
+    return chipZclGetManufacturerCode((ChipZclManufacturerCodeEntry *) attributeManufacturerCodes, attributeManufacturerCodeCount,
+                                      (metadata - generatedAttributes));
 }
 
 uint16_t chipZclGetManufacturerCodeForAttribute(ChipZclCluster * cluster, ChipZclAttributeMetadata * attMetaData)
@@ -371,6 +355,164 @@ void chipZclSaveAttributeToToken(uint8_t * data, uint8_t endpoint, ChipZclCluste
 #endif
 }
 
+/**
+ * @brief Matches an attribute based on attribute id and manufacturer code.
+ *   This function assumes that the passed cluster already matches the
+ *   clusterId, direction and mf specificity of the passed
+ *   ChipZclAttrib_tuteSearchRecord.
+ *
+ * Note: If both the attribute and cluster are manufacturer specific,
+ *   the cluster's mf code gets precedence.
+ *
+ * Attributes match if:
+ *   1. Att ids match AND
+ *      a. cluster IS mf specific OR
+ *      b. both stored and saught attributes are NOT mf specific OR
+ *      c. stored att IS mf specific AND mfg codes match.
+ */
+bool chipZclMatchAttribute(ChipZclCluster * cluster, ChipZclAttributeMetadata * am, ChipZclAttributeSearchRecord * attRecord)
+{
+    return (am->attributeId == attRecord->attributeId &&
+            (chipZclClusterIsManufacturerSpecific(cluster) ||
+             (chipZclGetManufacturerCodeForAttribute(cluster, am) == attRecord->manufacturerCode)));
+}
+
+// When reading non-string attributes, this function returns an error when destination
+// buffer isn't large enough to accommodate the attribute type.  For strings, the
+// function will copy at most readLength bytes.  This means the resulting string
+// may be truncated.  The length byte(s) in the resulting string will reflect
+// any truncation.  If readLength is zero, we are working with backwards-
+// compatibility wrapper functions and we just cross our fingers and hope for
+// the best.
+//
+// When writing attributes, readLength is ignored.  For non-string attributes,
+// this function assumes the source buffer is the same size as the attribute
+// type.  For strings, the function will copy as many bytes as will fit in the
+// attribute.  This means the resulting string may be truncated.  The length
+// byte(s) in the resulting string will reflect any truncated.
+static ChipZclStatus_t chipZclInternalReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRecord,
+                                                           ChipZclAttributeMetadata ** metadata, uint8_t * buffer,
+                                                           uint16_t readLength, bool write)
+{
+    uint8_t i;
+    uint16_t attributeOffsetIndex = 0;
+
+    for (i = 0; i < chipZclEndpointCount(); i++)
+    {
+        if (chipZclEndpointArray[i].endpoint == attRecord->endpoint)
+        {
+            ChipZclEndpointType * endpointType = chipZclEndpointArray[i].endpointType;
+            uint8_t clusterIndex;
+            if (!chipZclEndpointIndexIsEnabled(i))
+            {
+                continue;
+            }
+            for (clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++)
+            {
+                ChipZclCluster * cluster = &(endpointType->cluster[clusterIndex]);
+                if (chipZclMatchCluster(cluster, attRecord))
+                { // Got the cluster
+                    uint16_t attrIndex;
+                    for (attrIndex = 0; attrIndex < cluster->attributeCount; attrIndex++)
+                    {
+                        ChipZclAttributeMetadata * am = &(cluster->attributes[attrIndex]);
+                        if (chipZclMatchAttribute(cluster, am, attRecord))
+                        { // Got the attribute
+                            // If passed metadata location is not null, populate
+                            if (metadata != NULL)
+                            {
+                                *metadata = am;
+                            }
+
+                            {
+                                uint8_t * attributeLocation =
+                                    (am->mask & ATTRIBUTE_MASK_SINGLETON ? chipZclSingletonAttributeLocation(am)
+                                                                         : attributeData + attributeOffsetIndex);
+                                uint8_t *src, *dst;
+                                if (write)
+                                {
+                                    src = buffer;
+                                    dst = attributeLocation;
+                                    if (!chipZclAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                             chipZclGetManufacturerCodeForAttribute(cluster, am),
+                                                                             am->attributeId))
+                                    {
+                                        return CHIP_ZCL_STATUS_NOT_AUTHORIZED;
+                                    }
+                                }
+                                else
+                                {
+                                    if (buffer == NULL)
+                                    {
+                                        return CHIP_ZCL_STATUS_SUCCESS;
+                                    }
+
+                                    src = attributeLocation;
+                                    dst = buffer;
+                                    if (!chipZclAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                            chipZclGetManufacturerCodeForAttribute(cluster, am),
+                                                                            am->attributeId))
+                                    {
+                                        return CHIP_ZCL_STATUS_NOT_AUTHORIZED;
+                                    }
+                                }
+
+                                return (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE
+                                            ? (write) ? chipZclExternalAttributeWriteCallback(
+                                                            attRecord->endpoint, attRecord->clusterId, am,
+                                                            chipZclGetManufacturerCodeForAttribute(cluster, am), buffer)
+                                                      : chipZclExternalAttributeReadCallback(
+                                                            attRecord->endpoint, attRecord->clusterId, am,
+                                                            chipZclGetManufacturerCodeForAttribute(cluster, am), buffer,
+                                                            chipZclAttributeSize(am))
+                                            : chipZclTypeSensitiveMemCopy(dst, src, am, write, readLength));
+                            }
+                        }
+                        else
+                        { // Not the attribute we are looking for
+                            // Increase the index if attribute is not externally stored
+                            if (!(am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE) && !(am->mask & ATTRIBUTE_MASK_SINGLETON))
+                            {
+                                attributeOffsetIndex += chipZclAttributeSize(am);
+                            }
+                        }
+                    }
+                }
+                else
+                { // Not the cluster we are looking for
+                    attributeOffsetIndex += cluster->clusterSize;
+                }
+            }
+        }
+        else
+        { // Not the endpoint we are looking for
+            attributeOffsetIndex += chipZclEndpointArray[i].endpointType->endpointSize;
+        }
+    }
+    return CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
+}
+
+// Returns the pointer to metadata, or null if it is not found
+ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterId clusterId,
+                                                          ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode)
+{
+    ChipZclAttributeMetadata * metadata = NULL;
+    ChipZclStatus_t status;
+    ChipZclAttributeSearchRecord record;
+    record.endpoint         = endpoint;
+    record.clusterId        = clusterId;
+    record.clusterMask      = mask;
+    record.attributeId      = attributeId;
+    record.manufacturerCode = manufacturerCode;
+
+    status = chipZclInternalReadOrWriteAttribute(&record,   // search record
+                                                 &metadata, // where to write the result.
+                                                 NULL,      // buffer
+                                                 0,         // buffer size
+                                                 false);    // write?
+    return metadata;
+}
+
 // writes an attribute (identified by clusterID and attrID to the given value.
 // this returns:
 // - CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isnt supported by the device (the
@@ -392,9 +534,9 @@ void chipZclSaveAttributeToToken(uint8_t * data, uint8_t endpoint, ChipZclCluste
 // the table or the data is too large, returns true and writes to dataPtr
 // if the attribute is supported and the readLength specified is less than
 // the length of the data.
-ChipZclStatus_t chipZclInternalWriteAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID,
-                                              uint8_t mask, uint16_t manufacturerCode, uint8_t * data,
-                                              ChipZclAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
+static ChipZclStatus_t chipZclInternalWriteAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID,
+                                                     uint8_t mask, uint16_t manufacturerCode, uint8_t * data,
+                                                     ChipZclAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
 {
     ChipZclAttributeMetadata * metadata = NULL;
     ChipZclAttributeSearchRecord record;
@@ -403,10 +545,10 @@ ChipZclStatus_t chipZclInternalWriteAttribute(uint8_t endpoint, ChipZclClusterId
     record.clusterMask      = mask;
     record.attributeId      = attributeID;
     record.manufacturerCode = manufacturerCode;
-    chipZclReadOrWriteAttribute(&record, &metadata,
-                                NULL,   // buffer
-                                0,      // buffer size
-                                false); // write?
+    chipZclInternalReadOrWriteAttribute(&record, &metadata,
+                                        NULL,   // buffer
+                                        0,      // buffer size
+                                        false); // write?
 
     // if we dont support that attribute
     if (metadata == NULL)
@@ -482,11 +624,11 @@ ChipZclStatus_t chipZclInternalWriteAttribute(uint8_t endpoint, ChipZclClusterId
         }
 
         // write the attribute
-        status = chipZclReadOrWriteAttribute(&record,
-                                             NULL, // metadata
-                                             data,
-                                             0,     // buffer size - unused
-                                             true); // write?
+        status = chipZclInternalReadOrWriteAttribute(&record,
+                                                     NULL, // metadata
+                                                     data,
+                                                     0,     // buffer size - unused
+                                                     true); // write?
 
         if (status != CHIP_ZCL_STATUS_SUCCESS)
         {
@@ -513,36 +655,21 @@ ChipZclStatus_t chipZclInternalWriteAttribute(uint8_t endpoint, ChipZclClusterId
     return CHIP_ZCL_STATUS_SUCCESS;
 }
 
-/**
- * @brief Matches an attribute based on attribute id and manufacturer code.
- *   This function assumes that the passed cluster already matches the
- *   clusterId, direction and mf specificity of the passed
- *   ChipZclAttrib_tuteSearchRecord.
- *
- * Note: If both the attribute and cluster are manufacturer specific,
- *   the cluster's mf code gets precedence.
- *
- * Attributes match if:
- *   1. Att ids match AND
- *      a. cluster IS mf specific OR
- *      b. both stored and saught attributes are NOT mf specific OR
- *      c. stored att IS mf specific AND mfg codes match.
- */
-bool chipZclMatchAttribute(ChipZclCluster * cluster, ChipZclAttributeMetadata * am, ChipZclAttributeSearchRecord * attRecord)
+ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
+                                      ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
 {
-    return (am->attributeId == attRecord->attributeId &&
-            (chipZclClusterIsManufacturerSpecific(cluster) ||
-             (chipZclGetManufacturerCodeForAttribute(cluster, am) == attRecord->manufacturerCode)));
+    return CHIP_ZCL_STATUS_SUCCESS;
 }
 
 // If dataPtr is NULL, no data is copied to the caller.
 // readLength should be 0 in that case.
 
-ChipZclStatus_t chipZclInternalReadAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID,
-                                             uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength,
-                                             ChipZclAttributeType * dataType)
+static ChipZclStatus_t chipZclInternalReadAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID,
+                                                    uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength,
+                                                    ChipZclAttributeType * dataType)
 {
     ChipZclAttributeMetadata * metadata = NULL;
+
     ChipZclAttributeSearchRecord record;
     ChipZclStatus_t status;
     record.endpoint         = endpoint;
@@ -550,8 +677,8 @@ ChipZclStatus_t chipZclInternalReadAttribute(uint8_t endpoint, ChipZclClusterId 
     record.clusterMask      = mask;
     record.attributeId      = attributeID;
     record.manufacturerCode = manufacturerCode;
-    status                  = chipZclReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
-                                         false); // write?
+    status                  = chipZclInternalReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
+                                                 false); // write?
 
     if (status == CHIP_ZCL_STATUS_SUCCESS)
     {
@@ -572,139 +699,10 @@ ChipZclStatus_t chipZclInternalReadAttribute(uint8_t endpoint, ChipZclClusterId 
     return status;
 }
 
-// When reading non-string attributes, this function returns an error when destination
-// buffer isn't large enough to accommodate the attribute type.  For strings, the
-// function will copy at most readLength bytes.  This means the resulting string
-// may be truncated.  The length byte(s) in the resulting string will reflect
-// any truncation.  If readLength is zero, we are working with backwards-
-// compatibility wrapper functions and we just cross our fingers and hope for
-// the best.
-//
-// When writing attributes, readLength is ignored.  For non-string attributes,
-// this function assumes the source buffer is the same size as the attribute
-// type.  For strings, the function will copy as many bytes as will fit in the
-// attribute.  This means the resulting string may be truncated.  The length
-// byte(s) in the resulting string will reflect any truncated.
-ChipZclStatus_t chipZclReadOrWriteAttribute(ChipZclAttributeSearchRecord * attRecord, ChipZclAttributeMetadata ** metadata,
-                                            uint8_t * buffer, uint16_t readLength, bool write)
+ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
+                                     ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
 {
-    uint8_t i;
-    uint16_t attributeOffsetIndex = 0;
-
-    for (i = 0; i < chipZclEndpointCount(); i++)
-    {
-        if (chipZclEndpointArray[i].endpoint == attRecord->endpoint)
-        {
-            ChipZclEndpointType * endpointType = chipZclEndpointArray[i].endpointType;
-            uint8_t clusterIndex;
-            if (!chipZclEndpointIndexIsEnabled(i))
-            {
-                continue;
-            }
-            for (clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++)
-            {
-                ChipZclCluster * cluster = &(endpointType->cluster[clusterIndex]);
-                if (chipZclMatchCluster(cluster, attRecord))
-                { // Got the cluster
-                    uint16_t attrIndex;
-                    for (attrIndex = 0; attrIndex < cluster->attributeCount; attrIndex++)
-                    {
-                        ChipZclAttributeMetadata * am = &(cluster->attributes[attrIndex]);
-                        if (chipZclMatchAttribute(cluster, am, attRecord))
-                        { // Got the attribute
-                            // If passed metadata location is not null, populate
-                            if (metadata != NULL)
-                            {
-                                *metadata = am;
-                            }
-
-                            {
-                                uint8_t * attributeLocation =
-                                    (am->mask & ATTRIBUTE_MASK_SINGLETON ? singletonAttributeLocation(am)
-                                                                         : attributeData + attributeOffsetIndex);
-                                uint8_t *src, *dst;
-                                if (write)
-                                {
-                                    src = buffer;
-                                    dst = attributeLocation;
-                                    if (!chipZclAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                             chipZclGetManufacturerCodeForAttribute(cluster, am),
-                                                                             am->attributeId))
-                                    {
-                                        return CHIP_ZCL_STATUS_NOT_AUTHORIZED;
-                                    }
-                                }
-                                else
-                                {
-                                    if (buffer == NULL)
-                                    {
-                                        return CHIP_ZCL_STATUS_SUCCESS;
-                                    }
-
-                                    src = attributeLocation;
-                                    dst = buffer;
-                                    if (!chipZclAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                            chipZclGetManufacturerCodeForAttribute(cluster, am),
-                                                                            am->attributeId))
-                                    {
-                                        return CHIP_ZCL_STATUS_NOT_AUTHORIZED;
-                                    }
-                                }
-
-                                return (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE
-                                            ? (write) ? chipZclExternalAttributeWriteCallback(
-                                                            attRecord->endpoint, attRecord->clusterId, am,
-                                                            chipZclGetManufacturerCodeForAttribute(cluster, am), buffer)
-                                                      : chipZclExternalAttributeReadCallback(
-                                                            attRecord->endpoint, attRecord->clusterId, am,
-                                                            chipZclGetManufacturerCodeForAttribute(cluster, am), buffer,
-                                                            chipZclAttributeSize(am))
-                                            : typeSensitiveMemCopy(dst, src, am, write, readLength));
-                            }
-                        }
-                        else
-                        { // Not the attribute we are looking for
-                            // Increase the index if attribute is not externally stored
-                            if (!(am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE) && !(am->mask & ATTRIBUTE_MASK_SINGLETON))
-                            {
-                                attributeOffsetIndex += chipZclAttributeSize(am);
-                            }
-                        }
-                    }
-                }
-                else
-                { // Not the cluster we are looking for
-                    attributeOffsetIndex += cluster->clusterSize;
-                }
-            }
-        }
-        else
-        { // Not the endpoint we are looking for
-            attributeOffsetIndex += chipZclEndpointArray[i].endpointType->endpointSize;
-        }
-    }
-    return CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
-}
-
-// Returns the pointer to metadata, or null if it is not found
-ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterId clusterId,
-                                                          ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode)
-{
-    ChipZclAttributeMetadata * metadata = NULL;
-    ChipZclStatus_t status;
-    ChipZclAttributeSearchRecord record;
-    record.endpoint         = endpoint;
-    record.clusterId        = clusterId;
-    record.clusterMask      = mask;
-    record.attributeId      = attributeId;
-    record.manufacturerCode = manufacturerCode;
-
-    status = chipZclReadOrWriteAttribute(&record,   // search record
-                                         &metadata, // where to write the result.
-                                         NULL,      // buffer
-                                         0,         // buffer size
-                                         false);    // write?
-    return metadata;
+    return CHIP_ZCL_STATUS_SUCCESS;
 }
 
 // Initial configuration
