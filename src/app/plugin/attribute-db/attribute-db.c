@@ -392,9 +392,9 @@ void chipZclSaveAttributeToToken(uint8_t * data, uint8_t endpoint, ChipZclCluste
 // the table or the data is too large, returns true and writes to dataPtr
 // if the attribute is supported and the readLength specified is less than
 // the length of the data.
-ChipZclStatus_t emAfWriteAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID, uint8_t mask,
-                                   uint16_t manufacturerCode, uint8_t * data, ChipZclAttributeType dataType,
-                                   bool overrideReadOnlyAndDataType, bool justTest)
+ChipZclStatus_t chipZclInternalWriteAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID,
+                                              uint8_t mask, uint16_t manufacturerCode, uint8_t * data,
+                                              ChipZclAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
 {
     ChipZclAttributeMetadata * metadata = NULL;
     ChipZclAttributeSearchRecord record;
@@ -538,9 +538,9 @@ bool chipZclMatchAttribute(ChipZclCluster * cluster, ChipZclAttributeMetadata * 
 // If dataPtr is NULL, no data is copied to the caller.
 // readLength should be 0 in that case.
 
-ChipZclStatus_t emAfReadAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID, uint8_t mask,
-                                  uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength,
-                                  ChipZclAttributeType * dataType)
+ChipZclStatus_t chipZclInternalReadAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID,
+                                             uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength,
+                                             ChipZclAttributeType * dataType)
 {
     ChipZclAttributeMetadata * metadata = NULL;
     ChipZclAttributeSearchRecord record;
@@ -716,7 +716,7 @@ void chipZclEndpointInit(void)
     uint16_t fixedProfileIds[]          = FIXED_PROFILE_IDS;
     uint16_t fixedDeviceIds[]           = FIXED_DEVICE_IDS;
     uint8_t fixedDeviceVersions[]       = FIXED_DEVICE_VERSIONS;
-    uint8_t fixedEmberAfEndpointTypes[] = FIXED_ENDPOINT_TYPES;
+    uint8_t fixedChipZclEndpointTypes[] = FIXED_ENDPOINT_TYPES;
     uint8_t fixedNetworks[]             = FIXED_NETWORKS;
 
     chipZclEndpointCounter = FIXED_ENDPOINT_COUNT;
@@ -727,7 +727,7 @@ void chipZclEndpointInit(void)
         chipZclEndpointArray[ep].deviceId      = fixedDeviceIds[ep];
         chipZclEndpointArray[ep].deviceVersion = fixedDeviceVersions[ep];
         chipZclEndpointArray[ep].endpointType =
-            (ChipZclEndpointType *) &(generatedChipZclEndpointTypes[fixedEmberAfEndpointTypes[ep]]);
+            (ChipZclEndpointType *) &(generatedChipZclEndpointTypes[fixedChipZclEndpointTypes[ep]]);
         chipZclEndpointArray[ep].networkIndex = fixedNetworks[ep];
         chipZclEndpointArray[ep].bitmask      = CHIP_ZCL_ENDPOINT_ENABLED;
     }

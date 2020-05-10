@@ -579,7 +579,4 @@ ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, Chip
  */
 void chipZclEndpointInit(void);
 
-// Endpoint Management
-ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);
-
 #endif // SILABS_AF_API_TYPES
