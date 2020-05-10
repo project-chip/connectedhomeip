@@ -188,67 +188,40 @@
             0x0000, (ChipZclAttributeMetadata *) &(generatedAttributes[0]), 14, 0, (CLUSTER_MASK_SERVER), NULL,                    \
         },                                                                                                                         \
             {                                                                                                                      \
-                0x0003,                                                                                                            \
-                (ChipZclAttributeMetadata *) &(generatedAttributes[14]),                                                           \
-                2,                                                                                                                 \
-                4,                                                                                                                 \
-                (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION),                      \
-                NULL,                                                                                                              \
+                0x0003, (ChipZclAttributeMetadata *) &(generatedAttributes[14]), 2, 4, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0004, (ChipZclAttributeMetadata *) &(generatedAttributes[16]), 2,                                                \
-                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
+                0x0004, (ChipZclAttributeMetadata *) &(generatedAttributes[16]), 2, 3, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0005, (ChipZclAttributeMetadata *) &(generatedAttributes[18]), 6,                                                \
-                8,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
+                0x0005, (ChipZclAttributeMetadata *) &(generatedAttributes[18]), 6, 8, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0006,                                                                                                            \
-                (ChipZclAttributeMetadata *) &(generatedAttributes[24]),                                                           \
-                6,                                                                                                                 \
-                9,                                                                                                                 \
-                (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION),                      \
-                NULL,                                                                                                              \
+                0x0006, (ChipZclAttributeMetadata *) &(generatedAttributes[24]), 6, 9, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0008, (ChipZclAttributeMetadata *) &(generatedAttributes[30]), 5,                                                \
-                7,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
+                0x0008, (ChipZclAttributeMetadata *) &(generatedAttributes[30]), 5, 7, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0000, (ChipZclAttributeMetadata *) &(generatedAttributes[0]), 14, 0, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0003,                                                                                                            \
-                (ChipZclAttributeMetadata *) &(generatedAttributes[14]),                                                           \
-                2,                                                                                                                 \
-                4,                                                                                                                 \
-                (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION),                      \
-                NULL,                                                                                                              \
+                0x0003, (ChipZclAttributeMetadata *) &(generatedAttributes[14]), 2, 4, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0004, (ChipZclAttributeMetadata *) &(generatedAttributes[16]), 2,                                                \
-                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
+                0x0004, (ChipZclAttributeMetadata *) &(generatedAttributes[16]), 2, 3, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0005, (ChipZclAttributeMetadata *) &(generatedAttributes[18]), 6,                                                \
-                8,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
+                0x0005, (ChipZclAttributeMetadata *) &(generatedAttributes[18]), 6, 8, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0006,                                                                                                            \
-                (ChipZclAttributeMetadata *) &(generatedAttributes[24]),                                                           \
-                6,                                                                                                                 \
-                9,                                                                                                                 \
-                (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION),                      \
-                NULL,                                                                                                              \
+                0x0006, (ChipZclAttributeMetadata *) &(generatedAttributes[24]), 6, 9, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0008, (ChipZclAttributeMetadata *) &(generatedAttributes[30]), 5,                                                \
-                7,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
+                0x0008, (ChipZclAttributeMetadata *) &(generatedAttributes[30]), 5, 7, (CLUSTER_MASK_SERVER), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
-                0x0300, (ChipZclAttributeMetadata *) &(generatedAttributes[41]), 40,                                               \
-                66,     (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
+                0x0300, (ChipZclAttributeMetadata *) &(generatedAttributes[41]), 40, 66, (CLUSTER_MASK_SERVER), NULL,              \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x1000, (ChipZclAttributeMetadata *) &(generatedAttributes[81]), 1, 2, (CLUSTER_MASK_SERVER), NULL,                \

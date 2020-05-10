@@ -493,7 +493,7 @@ static ChipZclStatus_t chipZclInternalReadOrWriteAttribute(ChipZclAttributeSearc
 }
 
 // Returns the pointer to metadata, or null if it is not found
-ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterId clusterId,
+ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(ChipZclEndpointId_t endpoint, ChipZclClusterId clusterId,
                                                           ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode)
 {
     ChipZclAttributeMetadata * metadata = NULL;
@@ -534,9 +534,10 @@ ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, Chip
 // the table or the data is too large, returns true and writes to dataPtr
 // if the attribute is supported and the readLength specified is less than
 // the length of the data.
-static ChipZclStatus_t chipZclInternalWriteAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID,
-                                                     uint8_t mask, uint16_t manufacturerCode, uint8_t * data,
-                                                     ChipZclAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
+static ChipZclStatus_t chipZclInternalWriteAttribute(ChipZclEndpointId_t endpoint, ChipZclClusterId cluster,
+                                                     ChipZclAttributeId attributeID, uint8_t mask, uint16_t manufacturerCode,
+                                                     uint8_t * data, ChipZclAttributeType dataType,
+                                                     bool overrideReadOnlyAndDataType, bool justTest)
 {
     ChipZclAttributeMetadata * metadata = NULL;
     ChipZclAttributeSearchRecord record;
@@ -663,10 +664,11 @@ ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const Chip
 
 // If dataPtr is NULL, no data is copied to the caller.
 // readLength should be 0 in that case.
-
-static ChipZclStatus_t chipZclInternalReadAttribute(uint8_t endpoint, ChipZclClusterId cluster, ChipZclAttributeId attributeID,
-                                                    uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength,
-                                                    ChipZclAttributeType * dataType)
+//
+// This function populates the dataPtr with the data from the attribute, and dataType (if not-NULL) with the correct type.
+static ChipZclStatus_t chipZclInternalReadAttribute(ChipZclEndpointId_t endpoint, ChipZclClusterId cluster,
+                                                    ChipZclAttributeId attributeID, uint8_t mask, uint16_t manufacturerCode,
+                                                    uint8_t * dataPtr, uint16_t readLength, ChipZclAttributeType * dataType)
 {
     ChipZclAttributeMetadata * metadata = NULL;
 
