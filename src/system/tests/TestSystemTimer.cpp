@@ -254,13 +254,18 @@ static int TestTeardown(void * aContext)
     return (SUCCESS);
 }
 
-int main(int argc, char * argv[])
+int TestSystemTimer(void)
 {
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit againt one lContext.
     nlTestRunner(&kTheSuite, &sContext);
 
     return nlTestRunnerStats(&kTheSuite);
+}
+
+int main(int argc, char * argv[])
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestSystemTimer());
 }

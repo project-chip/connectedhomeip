@@ -1142,9 +1142,36 @@ static int TestTeardown(void * inContext)
     return (SUCCESS);
 }
 
+int TestInetBuffer(void)
+{
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "inet-buffer",
+        &sTests[0],
+        TestSetup,
+        TestTeardown
+    };
+    // clang-format on
+
+    // Run test suit againt one context.
+    nlTestRunner(&theSuite, &sContext);
+
+    return (nlTestRunnerStats(&theSuite));
+}
+
+#else // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+
+int TestInetBuffer(void)
+{
+    return (0);
+}
+
+#endif // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+
 int main(void)
 {
-    nlTestSuite theSuite = { "inet-buffer", &sTests[0], TestSetup, TestTeardown };
+#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
     // Init lwip
 #if INET_LWIP
@@ -1152,19 +1179,9 @@ int main(void)
 #endif
 
     // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
+    nlTestSetOutputStyle(OUTPUT_CSV);
+	
+#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-    // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
-
-    return nlTestRunnerStats(&theSuite);
+    return (TestInetBuffer());
 }
-
-#else // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-int main(void)
-{
-    return 0;
-}
-
-#endif // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES

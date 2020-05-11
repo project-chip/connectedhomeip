@@ -123,7 +123,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int main(void)
+int TestBleErrorStr(void)
 {
     // clang-format off
     nlTestSuite theSuite =
@@ -135,11 +135,16 @@ int main(void)
     };
     // clang-format on
 
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit againt one context.
     nlTestRunner(&theSuite, &sContext);
 
     return nlTestRunnerStats(&theSuite);
+}
+
+int main(void)
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestBleErrorStr());
 }

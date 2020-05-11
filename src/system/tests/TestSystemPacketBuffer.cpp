@@ -1178,7 +1178,7 @@ static int TestTeardown(void * inContext)
     return (SUCCESS);
 }
 
-int main(void)
+int TestSystemPacketBuffer(void)
 {
     // clang-format off
     nlTestSuite theSuite =
@@ -1194,11 +1194,13 @@ int main(void)
     tcpip_init(NULL, NULL);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+    return (nlTestRunnerStats(&theSuite));
+}
+
+int main(void)
+{
     // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
+    nlTestSetOutputStyle(OUTPUT_CSV);
 
-    // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
-
-    return nlTestRunnerStats(&theSuite);
+    return (TestSystemPacketBuffer());
 }

@@ -518,7 +518,16 @@ static int Finalize(void * aContext)
     return SUCCESS;
 }
 
+int TestSystemObject(void)
+{
+    // Run test suit againt one lContext.
+    nlTestRunner(&sTestSuite, &chip::System::sContext);
+
+    return nlTestRunnerStats(&sTestSuite);
+}
+
 } // namespace System
+
 } // namespace chip
 
 int main(int argc, char * argv[])
@@ -527,10 +536,7 @@ int main(int argc, char * argv[])
     srand(0);
 
     // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
+    nlTestSetOutputStyle(OUTPUT_CSV);
 
-    // Run test suit againt one lContext.
-    nlTestRunner(&sTestSuite, &chip::System::sContext);
-
-    return nlTestRunnerStats(&sTestSuite);
+    return (chip::System::TestSystemObject());
 }
