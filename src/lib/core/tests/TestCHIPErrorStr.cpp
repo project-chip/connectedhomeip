@@ -32,6 +32,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestCore.h"
+
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -288,12 +290,4 @@ int TestCHIPErrorStr(void)
     nlTestRunner(&theSuite, &sContext);
 
     return nlTestRunnerStats(&theSuite);
-}
-
-int main(void)
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestCHIPErrorStr());
 }

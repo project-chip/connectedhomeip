@@ -23,6 +23,8 @@
  *
  */
 
+#include "TestCore.h"
+
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
@@ -3818,15 +3820,4 @@ int TestCHIPTLV(void)
     nlTestRunner(&theSuite, &context);
 
     return (nlTestRunnerStats(&theSuite));
-}
-
-/**
- *  Main
- */
-int main(int argc, char * argv[])
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestCHIPTLV());
 }
