@@ -94,10 +94,10 @@ ENV IDF_TOOLS_PATH=/var/.espressif
 # Setup QEMU emulator for ESP32 platform
 RUN set -x \
     && cd /var \
-    && git clone --progress https://github.com/Ebiroll/qemu-xtensa-esp32.git \
-    && (mkdir -p /var/qemu_esp32 && cd /var/qemu_esp32 \
-    && ../qemu-xtensa-esp32/configure --disable-werror --prefix=`pwd`/root --target-list=xtensa-softmmu,xtensaeb-softmmu \
-    && make ) \
+    && git clone --progress https://github.com/espressif/qemu.git qemu_esp32 \
+    && (cd /var/qemu_esp32 \
+    && ./configure --target-list=xtensa-softmmu --enable-debug --enable-sanitizers --disable-strip --disable-user --disable-capstone --disable-vnc --disable-sdl --disable-gtk \
+    && make -j8) \
     && : # last line
 
 ENV QEMU_ESP32_DIR=/var/qemu_esp32
