@@ -263,4 +263,3 @@ int TestSystemTimer(void)
 
     return nlTestRunnerStats(&kTheSuite);
 }
-
