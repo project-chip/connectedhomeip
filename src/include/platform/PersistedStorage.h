@@ -36,6 +36,8 @@ namespace PersistedStorage {
 
 typedef CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE Key;
 
+constexpr Key kEmptyKey = nullptr;
+
 /**
  *  @brief
  *    Read integer value of a key from persistent storage.

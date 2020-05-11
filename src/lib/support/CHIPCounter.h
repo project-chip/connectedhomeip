@@ -42,7 +42,7 @@ class Counter
 {
 public:
     Counter(void){};
-    ~Counter(void){};
+    virtual ~Counter(void){};
 
     /**
      *  @brief
@@ -90,7 +90,7 @@ public:
      *
      *  @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
      */
-    virtual CHIP_ERROR Advance(void);
+    CHIP_ERROR Advance(void) override;
 
     /**
      *  @brief
@@ -98,7 +98,7 @@ public:
      *
      *  @return The current value of the counter.
      */
-    virtual uint32_t GetValue(void);
+    uint32_t GetValue(void) override;
 
 protected:
     uint32_t mCounterValue;

@@ -94,43 +94,42 @@ private:
     static bool CallHandleFunct(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
 };
 
-extern bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[]);
-extern bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[],
-                      NonOptionArgHandlerFunct nonOptArgHandler);
-extern bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[],
-                      NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
+bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[]);
+bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler);
+bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler,
+               bool ignoreUnknown);
 
-extern bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[]);
-extern bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],
-                                NonOptionArgHandlerFunct nonOptArgHandler);
-extern bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],
-                                NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
+bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[]);
+bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],
+                         NonOptionArgHandlerFunct nonOptArgHandler);
+bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],
+                         NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
 
-extern bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[]);
-extern bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[],
-                                NonOptionArgHandlerFunct nonOptArgHandler);
-extern bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[],
-                                NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
+bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[]);
+bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[],
+                         NonOptionArgHandlerFunct nonOptArgHandler);
+bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet * optSets[],
+                         NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
 
-extern void PrintOptionHelp(OptionSet * optionSets[], FILE * s);
+void PrintOptionHelp(OptionSet * optionSets[], FILE * s);
 
-extern void (*PrintArgError)(const char * msg, ...);
-extern void DefaultPrintArgError(const char * msg, ...);
+void (*PrintArgError)(const char * msg, ...);
+void DefaultPrintArgError(const char * msg, ...);
 
 // Utility functions for parsing common argument value types.
-extern bool ParseBoolean(const char * str, bool & output);
-extern bool ParseInt(const char * str, uint8_t & output);
-extern bool ParseInt(const char * str, uint16_t & output);
-extern bool ParseInt(const char * str, int32_t & output);
-extern bool ParseInt(const char * str, uint32_t & output);
-extern bool ParseInt(const char * str, uint64_t & output);
-extern bool ParseInt(const char * str, int32_t & output, int base);
-extern bool ParseInt(const char * str, uint32_t & output, int base);
-extern bool ParseInt(const char * str, uint64_t & output, int base);
-extern bool ParseNodeId(const char * str, uint64_t & nodeId);
-extern bool ParseFabricId(const char * str, uint64_t & fabricId, bool allowReserved = false);
-extern bool ParseSubnetId(const char * str, uint16_t & subnetId);
-extern bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);
+bool ParseBoolean(const char * str, bool & output);
+bool ParseInt(const char * str, uint8_t & output);
+bool ParseInt(const char * str, uint16_t & output);
+bool ParseInt(const char * str, int32_t & output);
+bool ParseInt(const char * str, uint32_t & output);
+bool ParseInt(const char * str, uint64_t & output);
+bool ParseInt(const char * str, int32_t & output, int base);
+bool ParseInt(const char * str, uint32_t & output, int base);
+bool ParseInt(const char * str, uint64_t & output, int base);
+bool ParseNodeId(const char * str, uint64_t & nodeId);
+bool ParseFabricId(const char * str, uint64_t & fabricId, bool allowReserved = false);
+bool ParseSubnetId(const char * str, uint16_t & subnetId);
+bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);
 
 extern OptionSet ** gActiveOptionSets;
 

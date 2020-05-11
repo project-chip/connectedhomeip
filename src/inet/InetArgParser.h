@@ -34,7 +34,7 @@
 namespace chip {
 namespace ArgParser {
 
-extern bool ParseIPAddress(const char * str, chip::Inet::IPAddress & output);
+bool ParseIPAddress(const char * str, chip::Inet::IPAddress & output);
 
 } // namespace ArgParser
 } // namespace chip

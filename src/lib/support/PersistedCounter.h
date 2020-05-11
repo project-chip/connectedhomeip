@@ -70,7 +70,7 @@ public:
      *
      *  @return Any error returned by a write to persisted storage.
      */
-    CHIP_ERROR Advance(void);
+    CHIP_ERROR Advance(void) override;
 
     /*
      *  @brief
