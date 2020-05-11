@@ -23,7 +23,7 @@
  *
  */
 
-#include "TestBle.h"
+#include "TestBleLayer.h"
 
 #include <nlunit-test.h>
 

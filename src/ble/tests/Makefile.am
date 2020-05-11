@@ -36,18 +36,18 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-lib_LIBRARIES                                        = \
-    libBleTests.a                                      \
+lib_LIBRARIES                                         = \
+    libBleLayerTests.a                                  \
     $(NULL)
 
-libBleTests_a_SOURCES                                = \
-    TestBleErrorStr.cpp                                \
+libBleLayerTests_a_SOURCES                            = \
+    TestBleErrorStr.cpp                                 \
     $(NULL)
 
-libBleTests_adir                                     = $(includedir)/ble
+libBleLayerTests_adir                                 = $(includedir)/ble
 
-dist_libBleTests_a_HEADERS                           = \
-    TestBle.h                                          \
+dist_libBleLayerTests_a_HEADERS                       = \
+    TestBleLayer.h                                      \
     $(NULL)
 
 # C/C++ preprocessor option flags that will apply to all compiled
@@ -69,7 +69,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          = \
-    libBleTests.a                                       \
+    libBleLayerTests.a                                  \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
