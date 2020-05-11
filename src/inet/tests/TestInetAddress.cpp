@@ -1765,7 +1765,7 @@ static int TestTeardown(void * inContext)
     return (SUCCESS);
 }
 
-int main(void)
+int TestInetAddress(void)
 {
     // clang-format off
     nlTestSuite theSuite = {
@@ -1776,11 +1776,16 @@ int main(void)
     };
     // clang-format on
 
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit againt one context.
     nlTestRunner(&theSuite, const_cast<TestContext *>(&sTestContext));
 
-    return nlTestRunnerStats(&theSuite);
+    return (nlTestRunnerStats(&theSuite));
+}
+
+int main(void)
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestInetAddress());
 }

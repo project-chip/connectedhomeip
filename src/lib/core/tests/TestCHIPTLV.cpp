@@ -3799,10 +3799,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-/**
- *  Main
- */
-int main(int argc, char * argv[])
+int TestCHIPTLV(void)
 {
     // clang-format off
     nlTestSuite theSuite =
@@ -3817,11 +3814,19 @@ int main(int argc, char * argv[])
 
     context.mSuite = &theSuite;
 
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit against one context
     nlTestRunner(&theSuite, &context);
 
-    return nlTestRunnerStats(&theSuite);
+    return (nlTestRunnerStats(&theSuite));
+}
+
+/**
+ *  Main
+ */
+int main(int argc, char * argv[])
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestCHIPTLV());
 }

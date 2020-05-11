@@ -135,36 +135,55 @@ static int TestTeardown(void * inContext)
     return (SUCCESS);
 }
 
-int main(int argc, char * argv[])
+int TestInetTimer(void)
 {
 #if INET_SOCKETS
-    nlTestSuite theSuite = { "inet-timer", &sTests[0], TestSetup, TestTeardown };
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
-    SetSIGUSR1Handler();
-
-    //    ParseArgs(argc, argv);
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "inet-timer",
+        &sTests[0],
+        TestSetup,
+        TestTeardown
+    };
+    // clang-format on
 
     InitSystemLayer();
     InitNetwork();
+
     sContext.mInet      = &gInet;
     sContext.mTestSuite = &theSuite;
+
     // Run test suit againt one context.
     nlTestRunner(&theSuite, &sContext);
 
-    return nlTestRunnerStats(&theSuite);
+    return (nlTestRunnerStats(&theSuite));
 #else  // !INET_SOCKETS
-    return 0;
+    return (0);
 #endif // !INET_SOCKETS
 }
 
 #else // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-int main(void)
+int TestInetTimer(void)
 {
-    return 0;
+    return (0);
 }
 
 #endif // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+
+int main(int argc, char * argv[])
+{
+#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+
+    SetSIGUSR1Handler();
+
+    //    ParseArgs(argc, argv);
+
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+	
+#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
+
+    return (TestInetTimer());
+}

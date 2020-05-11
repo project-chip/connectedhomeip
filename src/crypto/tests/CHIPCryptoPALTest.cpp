@@ -829,11 +829,28 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int main(void)
+int TestCHIPCryptoPAL(void)
 {
-    nlTestSuite theSuite = { "CHIP Crypto PAL tests", &sTests[0], NULL, NULL };
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "CHIP Crypto PAL tests",
+        &sTests[0],
+        NULL,
+        NULL
+    };
+    // clang-format on
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
-    return nlTestRunnerStats(&theSuite);
+
+    return (nlTestRunnerStats(&theSuite));
+}
+
+int main(void)
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestCHIPCryptoPAL());
 }

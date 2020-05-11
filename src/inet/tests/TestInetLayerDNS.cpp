@@ -676,7 +676,7 @@ static void HandleSIGUSR1(int sig)
     exit(0);
 }
 
-int main(int argc, char * argv[])
+int TestInetLayerDNS(void)
 {
     // clang-format off
     const nlTest DNSTests[] =
@@ -700,19 +700,7 @@ int main(int argc, char * argv[])
     };
     // clang-format on
 
-    nl_test_set_output_style(OUTPUT_CSV);
-
     InitTestInetCommon();
-
-    SetupFaultInjectionContext(argc, argv);
-
-    SetSignalHandler(HandleSIGUSR1);
-
-    if (!ParseArgsFromEnvVar(TOOL_NAME, TOOL_OPTIONS_ENV_VAR_NAME, gToolOptionSets, NULL, true) ||
-        !ParseArgs(TOOL_NAME, argc, argv, gToolOptionSets, NULL))
-    {
-        exit(EXIT_FAILURE);
-    }
 
     InitSystemLayer();
     InitNetwork();
@@ -729,7 +717,7 @@ int main(int argc, char * argv[])
 
 #else // !INET_CONFIG_ENABLE_DNS_RESOLVER
 
-int main(int argc, char * argv[])
+int TestInetLayerDNS(void)
 {
     fprintf(stderr, "Please assert INET_CONFIG_ENABLE_DNS_RESOLVER to use this test.\n");
 
@@ -737,3 +725,20 @@ int main(int argc, char * argv[])
 }
 
 #endif // !INET_CONFIG_ENABLE_DNS_RESOLVER
+
+int main(int argc, char * argv[])
+{
+    SetupFaultInjectionContext(argc, argv);
+
+    SetSignalHandler(HandleSIGUSR1);
+
+    if (!ParseArgsFromEnvVar(TOOL_NAME, TOOL_OPTIONS_ENV_VAR_NAME, gToolOptionSets, NULL, true) ||
+        !ParseArgs(TOOL_NAME, argc, argv, gToolOptionSets, NULL))
+    {
+        exit(EXIT_FAILURE);
+    }
+
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestInetLayerDNS());
+}

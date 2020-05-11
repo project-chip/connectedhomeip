@@ -1,6 +1,6 @@
 /*
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -395,7 +395,7 @@ void testShortCodeCharLengths()
     assert(manualSetupLongCodeCharLength == kManualSetupLongCodeCharLength);
 }
 
-int main()
+int TestManualSetupCode(void)
 {
     printf("---Running Test--- tests from %s\n", __FILE__);
     testDecimalRepresentation_PartialPayload();
@@ -419,4 +419,11 @@ int main()
     testReadBitsFromNumber();
 
     testShortCodeCharLengths();
+
+    return (0);
+}
+
+int main()
+{
+    return (TestManualSetupCode());
 }
