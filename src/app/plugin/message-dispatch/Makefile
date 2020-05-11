@@ -1,5 +1,5 @@
 NAME=dispatch
-REQUIRED_PLUGINS=../attribute-db/attribute-db.o ../on-off-server/on-off-server.o
+REQUIRED_PLUGINS=../zcl-data-model/zcl-data-model.o ../on-off-server/on-off-server.o
 REQUIRED_GEN=../../utest-gen/cluster-command-handler.o ../../utest-gen/gen-specs.o ../../utest-gen/gen-callback-stubs.o
 
 # ---------- GENERIC -------------

@@ -1,5 +1,5 @@
 #include "../api/chip-zcl.h"
-#include "../plugin/attribute-db/attribute-db.h"
+#include "../plugin/zcl-data-model/zcl-data-model.h"
 
 // Callback implementations
 

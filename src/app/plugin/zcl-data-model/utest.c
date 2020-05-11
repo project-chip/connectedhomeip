@@ -23,7 +23,7 @@
  */
 
 #include "utest.h" /* TODO pass all that stuff in -D */
-#include "attribute-db.h"
+#include "zcl-data-model.h"
 
 int main()
 {

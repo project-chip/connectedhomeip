@@ -36,7 +36,7 @@
 #include CHIP_AF_API_ZCL_CORE
 
 #include "chip-zcl.h"
-#include "attribute-db.h"
+#include "zcl-data-model.h"
 #include "gen-callbacks.h"
 #include "gen-attribute-type.h"
 #include "gen-endpoint-config.h"

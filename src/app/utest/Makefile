@@ -1,5 +1,5 @@
 NAME=utest-on-off
-REQUIRED_PLUGINS=../plugin/attribute-db/attribute-db.o ../utest-gen/gen-callback-stubs.o
+REQUIRED_PLUGINS=../plugin/zcl-data-model/zcl-data-model.o ../utest-gen/gen-callback-stubs.o
 
 # ---------- GENERIC -------------
 CC=gcc

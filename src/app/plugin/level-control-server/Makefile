@@ -1,5 +1,5 @@
 NAME=level-control-server
-REQUIRED_PLUGINS=../attribute-db/attribute-db.o ../../utest-gen/gen-callback-stubs.o
+REQUIRED_PLUGINS=../zcl-data-model/zcl-data-model.o ../../utest-gen/gen-callback-stubs.o
 
 # ---------- GENERIC -------------
 CC=gcc

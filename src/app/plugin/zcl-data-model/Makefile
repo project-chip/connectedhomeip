@@ -1,4 +1,4 @@
-NAME=attribute-db
+NAME=zcl-data-model
 
 # ---------- GENERIC -------------
 CC=gcc

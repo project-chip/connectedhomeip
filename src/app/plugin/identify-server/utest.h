@@ -33,7 +33,7 @@
 
 #include "chip-zcl.h"
 #include "gen-types.h"
-#include "../attribute-db/attribute-db.h"
+#include "../zcl-data-model/zcl-data-model.h"
 #include "gen-callbacks.h"
 #include <stdio.h>
 #endif /*  UTEST_H */
