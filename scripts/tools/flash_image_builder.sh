@@ -23,13 +23,13 @@
 #
 
 usage() {
-  exitcode=0
-  if [[ -n "$1" ]]; then
-    exitcode=1
-    echo "Error: $*"
-  fi
-  echo "Usage: $0 <image-size> <output-file> <offset1=input-file1> [<offset2=input-file2> ..]"
-  exit "$exitcode"
+    exitcode=0
+    if [[ -n "$1" ]]; then
+        exitcode=1
+        echo "Error: $*"
+    fi
+    echo "Usage: $0 <image-size> <output-file> <offset1=input-file1> [<offset2=input-file2> ..]"
+    exit "$exitcode"
 }
 
 [[ $# -ge 3 ]] || usage "Incorrect number of arguments"
@@ -46,17 +46,17 @@ written=0
 
 # Argument 3 onwards have input files and corresponding offsets
 for item in "${@:3}"; do
-  IFS='=' read -r start file <<<"$item"
+    IFS='=' read -r start file <<<"$item"
 
-  offset=$((start))
-  [[ $? -eq 0 ]] || usage "Offset ($start) must be a number"
+    offset=$((start))
+    [[ $? -eq 0 ]] || usage "Offset ($start) must be a number"
 
-  [[ -r $file ]] || usage "Cannot read file $file"
-  [[ $written -le $offset ]] || usage "Writing $file at $offset will overwrite previous segment"
+    [[ -r $file ]] || usage "Cannot read file $file"
+    [[ $written -le $offset ]] || usage "Writing $file at $offset will overwrite previous segment"
 
-  filesize=$(stat -c%s "$file")
-  written=$((written + filesize))
-  [[ $written -lt $image_size ]] || usage "Writing $file at $offset will overflow image"
+    filesize=$(stat -c%s "$file")
+    written=$((written + filesize))
+    [[ $written -lt $image_size ]] || usage "Writing $file at $offset will overflow image"
 
-  dd if="$file" of="$2" conv=notrunc bs="$offset" seek=1
+    dd if="$file" of="$2" conv=notrunc bs="$offset" seek=1
 done

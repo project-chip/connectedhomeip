@@ -23,19 +23,19 @@
 #
 
 usage() {
-  exitcode=0
-  if [[ -n "$1" ]]; then
-    exitcode=1
-    echo "*** Error: $*"
-  fi
-  echo "Usage: $0 <flash image file>"
-  exit "$exitcode"
+    exitcode=0
+    if [[ -n "$1" ]]; then
+        exitcode=1
+        echo "*** Error: $*"
+    fi
+    echo "Usage: $0 <flash image file>"
+    exit "$exitcode"
 }
 
 me=$(basename "$0")
 die() {
-  echo "$me: *** ERROR: " "${*}"
-  exit 1
+    echo "$me: *** ERROR: " "${*}"
+    exit 1
 }
 
 [[ $# -eq 1 ]] || usage "Incorrect number of arguments"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $1 == *"$2"* ]]; then
-  shift
-  shift
-  "$@"
+    shift
+    shift
+    "$@"
 fi
