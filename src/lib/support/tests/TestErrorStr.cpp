@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "TestSupport.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -160,8 +162,9 @@ static bool testFormatErr()
     return ret;
 }
 
-int main(int argc, char * argv[])
+int TestErrorStr(void)
 {
+
     if (!testNoError() || !testRegisterDeregisterErrorFormatter() || !testFormatErr())
     {
         return EXIT_FAILURE;

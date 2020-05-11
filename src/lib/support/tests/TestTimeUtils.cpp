@@ -24,6 +24,8 @@
  *
  */
 
+#include "TestSupport.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -943,11 +945,13 @@ void TestSecondsSinceEpochConversion(void)
     }
 }
 
-int main(void)
+int TestTimeUtils(void)
 {
     TestOrdinalDateConversion();
     TestDaysSinceEpochConversion();
     TestSecondsSinceEpochConversion();
+
     printf("All tests passed\n");
-    return 0;
+
+    return (0);
 }
