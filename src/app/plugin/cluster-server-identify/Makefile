@@ -1,5 +1,5 @@
 NAME=identify-server
-REQUIRED_PLUGINS=../zcl-data-model/zcl-data-model.o ../../utest-gen/gen-callback-stubs.o ../binding-mock/mock.o
+REQUIRED_PLUGINS=../core-data-model/zcl-data-model.o ../../utest-gen/gen-callback-stubs.o ../binding-mock/mock.o
 
 # ---------- GENERIC -------------
 CC=gcc
