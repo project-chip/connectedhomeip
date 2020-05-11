@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TESTBLE_H
-#define TESTBLE_H
+#ifndef TESTBLELAYER_H
+#define TESTBLELAYER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +35,4 @@ int TestBleErrorStr(void);
 }
 #endif
 
-#endif // TESTBLE_H
+#endif // TESTBLELAYER_H
