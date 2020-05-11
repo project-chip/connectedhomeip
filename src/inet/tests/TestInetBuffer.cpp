@@ -33,6 +33,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestInetLayer.h"
+
 #include <stdint.h>
 
 #include <inet/InetConfig.h>
@@ -1168,20 +1170,3 @@ int TestInetBuffer(void)
 }
 
 #endif // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-int main(void)
-{
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-    // Init lwip
-#if INET_LWIP
-    tcpip_init(NULL, NULL);
-#endif
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-    return (TestInetBuffer());
-}
