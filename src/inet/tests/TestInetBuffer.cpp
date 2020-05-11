@@ -1180,7 +1180,7 @@ int main(void)
 
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
-	
+
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
     return (TestInetBuffer());

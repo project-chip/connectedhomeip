@@ -182,7 +182,7 @@ int main(int argc, char * argv[])
 
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
-	
+
 #endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
     return (TestInetTimer());
