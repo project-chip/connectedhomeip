@@ -132,6 +132,33 @@ ChipZclStatus_t chipZclGeneralCommandParse(ChipZclCommandContext_t * context)
 
 static ChipZclStatus_t chipZclReadAttributesCommandParse(ChipZclCommandContext_t * context)
 {
+    // TODO: This is a total work in progress, it doesn't do anything like what needs to be done, we need to
+    // add in the retrieval of the Cluster Command Spec from the zcl-data-model, pass it to the codec
+    // to get the command parsed. Then it needs to use the parsed request to interact with the zcl-data-model
+    // again and create the response. Everything goes into the command context
+
+    chipZclCorePrintln("Rx: Read Attributes Command");
+
+    // TODO: Get Command Struct Spec from the attribute and command DB so that incoming request can be populated
+
+    // TODO: Pass context along with command struct spec into codec to get request populated
+
+    ChipZclGeneralCommandReadAttributesRequest_t * request = (ChipZclGeneralCommandReadAttributesRequest_t *) context->request;
+    chipZclCorePrintln("Attribute Count: %d", request->count);
+    for (uint16_t i = 0; i < request->count; i++)
+    {
+        ChipZclAttributeMetadata * metadata = chipZclLocateAttributeMetadata(
+            context->endpointId, context->clusterId, request->attributes[i], CLUSTER_MASK_SERVER, CHIP_ZCL_NULL_MANUFACTURER_CODE);
+        if (metadata != NULL)
+        {
+            chipZclCorePrintln("Metadata default value: %d", metadata->defaultValue);
+        }
+        else
+        {
+            chipZclCorePrintln("Metadata is null for %d, %d, %d, %d, %d", context->endpointId, context->clusterId,
+                               request->attributes[i], CLUSTER_MASK_SERVER, CHIP_ZCL_NULL_MANUFACTURER_CODE);
+        }
+    }
     return CHIP_ZCL_STATUS_SUCCESS;
 }
 

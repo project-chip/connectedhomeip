@@ -32,5 +32,6 @@
 
 #include "chip-zcl.h"
 #include "gen-types.h"
+#include "gen-cluster-id.h"
 #include <stdio.h>
 #endif /*  UTEST_H */

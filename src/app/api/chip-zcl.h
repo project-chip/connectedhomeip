@@ -281,6 +281,8 @@ typedef struct
     uint8_t commandId;
     uint8_t payloadStartIndex;
     uint8_t direction;
+    void * request;
+    void * response;
 } ChipZclCommandContext_t;
 
 /** brief An identifier for a task */

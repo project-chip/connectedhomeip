@@ -26,9 +26,29 @@
 
 int main()
 {
-    ChipZclCommandContext_t context;
-    context.endpointId = 1;
+    chipZclEndpointInit();
 
-    printf("Success \n");
-    return 0;
+    ChipZclStatus_t status = CHIP_ZCL_STATUS_FAILURE;
+
+    ChipZclAttributeId_t att[] = { 0x0000, 0x0001 };
+
+    ChipZclGeneralCommandReadAttributesRequest_t request = {
+        .count      = 2,
+        .attributes = att,
+    };
+
+    ChipZclCommandContext_t context = {
+        .endpointId      = 1,
+        .mfgSpecific     = false,
+        .clusterSpecific = false,
+        .clusterId       = CHIP_ZCL_CLUSTER_BASIC,
+        .commandId       = ZCL_READ_ATTRIBUTES_COMMAND_ID,
+        .direction       = ZCL_DIRECTION_CLIENT_TO_SERVER,
+        .request         = &request,
+    };
+
+    status = chipZclCommandParse(&context);
+
+    (status == CHIP_ZCL_STATUS_SUCCESS) ? printf("SUCCESS 0x%X\n", status) : printf("FAILURE 0x%X\n", status);
+    return status;
 }

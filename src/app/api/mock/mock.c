@@ -31,7 +31,7 @@ void chipZclCorePrintln(const char * formatString, ...)
 {
     va_list ap;
     va_start(ap, formatString);
-    printf(formatString, ap);
+    vprintf(formatString, ap);
     printf("\n");
     va_end(ap);
 }

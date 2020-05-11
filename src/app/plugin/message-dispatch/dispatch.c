@@ -26,6 +26,6 @@
 // Main command parsing controller.
 ChipZclStatus_t chipZclCommandParse(ChipZclCommandContext_t * context)
 {
-    ChipZclStatus_t result = context->clusterSpecific ? chipZclGeneralCommandParse(context) : chipZclClusterCommandParse(context);
+    ChipZclStatus_t result = context->clusterSpecific ? chipZclClusterCommandParse(context) : chipZclGeneralCommandParse(context);
     return result;
 }

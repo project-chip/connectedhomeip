@@ -54,7 +54,7 @@ ChipZclStatus_t chipZclClusterCommandParse(ChipZclCommandContext_t * context)
     {
         switch (context->clusterId)
         {
-        case ZCL_ON_OFF_CLUSTER_ID:
+        case CHIP_ZCL_CLUSTER_ON_OFF:
             result = chipZclOnOffClusterServerCommandParse(context);
             break;
         default:

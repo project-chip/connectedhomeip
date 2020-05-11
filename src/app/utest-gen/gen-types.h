@@ -28,17 +28,13 @@
 #ifndef CHIP_ZCL_GEN_TYPES_HEADER
 #define CHIP_ZCL_GEN_TYPES_HEADER
 
-// Cluster ids.
-enum
+// General Command structs
+#define CHIP_ZCL_ATTRIBUTE_REQUEST_MAX 0xff
+typedef struct
 {
-    CHIP_ZCL_CLUSTER_BASIC         = 0x0000,
-    CHIP_ZCL_CLUSTER_IDENTIFY      = 0x0003,
-    CHIP_ZCL_CLUSTER_GROUPS        = 0x0004,
-    CHIP_ZCL_CLUSTER_SCENES        = 0x0005,
-    CHIP_ZCL_CLUSTER_ON_OFF        = 0x0006,
-    CHIP_ZCL_CLUSTER_LEVEL_CONTROL = 0x0008,
-    CHIP_ZCL_CLUSTER_OTA_BOOTLOAD  = 0x2000,
-};
+    uint16_t count;
+    ChipZclAttributeId_t * attributes;
+} ChipZclGeneralCommandReadAttributesRequest_t;
 
 // Basic cluster server (0x0000) - ResetToFactoryDefaults (0x00) command.
 typedef struct
