@@ -87,7 +87,8 @@ COMMON_LDADD                                          =  \
 check_PROGRAMS                                        = \
     TestCHIPErrorStr                                    \
     TestCHIPTLV                                         \
-    TestCHIPUdpExchange                                  \
+    TestCHIPUdpExchange                                 \
+    TestCHIPFabricState                                 \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -111,8 +112,12 @@ TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
 TestCHIPTLV_SOURCES                                   = TestCHIPTLVDriver.cpp
 TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
 
-TestCHIPUdpExchange_SOURCES                            = TestCHIPUdpExchangeDriver.cpp
-TestCHIPUdpExchange_LDADD                              = $(COMMON_LDADD)
+TestCHIPUdpExchange_SOURCES                           = TestCHIPUdpExchangeDriver.cpp
+TestCHIPUdpExchange_LDADD                             = $(COMMON_LDADD)
+
+TestCHIPFabricState_SOURCES                           = TestCHIPTLV.cpp
+TestCHIPFabricState_LDADD                             = $(COMMON_LDADD)
+
 #
 # Foreign make dependencies
 #
