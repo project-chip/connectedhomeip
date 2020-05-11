@@ -17,8 +17,8 @@ steps:
     - run:
           name: Run mbedTLS Tests
           command:
-              scripts/tools/run_if.sh "mbedtls-build"
-              "$BUILD_TYPE"scripts/tests/mbedtls_tests.sh
+              scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE"
+              scripts/tests/mbedtls_tests.sh
     - run:
           name: Run Crypto Tests
           command:
