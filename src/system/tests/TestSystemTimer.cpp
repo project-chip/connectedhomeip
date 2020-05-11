@@ -27,6 +27,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestSystemLayer.h"
+
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
@@ -262,10 +264,3 @@ int TestSystemTimer(void)
     return nlTestRunnerStats(&kTheSuite);
 }
 
-int main(int argc, char * argv[])
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestSystemTimer());
-}

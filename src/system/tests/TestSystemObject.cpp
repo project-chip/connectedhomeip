@@ -28,6 +28,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestSystemLayer.h"
+
 // Install a sleep in the high water mark function, to force
 // collisions between the threads that call it.
 
@@ -518,25 +520,14 @@ static int Finalize(void * aContext)
     return SUCCESS;
 }
 
+} // namespace System
+
+} // namespace chip
+
 int TestSystemObject(void)
 {
     // Run test suit againt one lContext.
     nlTestRunner(&sTestSuite, &chip::System::sContext);
 
     return nlTestRunnerStats(&sTestSuite);
-}
-
-} // namespace System
-
-} // namespace chip
-
-int main(int argc, char * argv[])
-{
-    // Initialize standard pseudo-random number generator
-    srand(0);
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (chip::System::TestSystemObject());
 }

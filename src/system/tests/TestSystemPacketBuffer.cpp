@@ -26,6 +26,9 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+
+#include "TestSystemLayer.h"
+
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
@@ -1190,17 +1193,8 @@ int TestSystemPacketBuffer(void)
     };
     // clang-format on
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    // Run test suit againt one context.
+    nlTestRunner(&theSuite, &sContext);
 
     return (nlTestRunnerStats(&theSuite));
-}
-
-int main(void)
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestSystemPacketBuffer());
 }
