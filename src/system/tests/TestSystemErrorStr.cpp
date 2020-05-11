@@ -32,6 +32,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestSystemLayer.h"
+
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -115,12 +117,4 @@ int TestSystemErrorStr(void)
     nlTestRunner(&theSuite, &sContext);
 
     return (nlTestRunnerStats(&theSuite));
-}
-
-int main(void)
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestSystemErrorStr());
 }
