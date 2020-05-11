@@ -37,8 +37,24 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C preprocessor option flags that will apply to all compiled objects in this
-# makefile.
+lib_LIBRARIES                                         = \
+    libSupportTests.a                                   \
+    $(NULL)
+
+libSupportTests_a_SOURCES                             = \
+    TestCHIPArgParser.cpp                               \
+    TestErrorStr.cpp                                    \
+    TestTimeUtils.cpp                                   \
+    $(NULL)
+
+libSupportTests_adir                                  = $(includedir)/support
+
+dist_libSupportTests_a_HEADERS                        = \
+    TestSupport.h                                       \
+    $(NULL)
+
+# C/C++ preprocessor option flags that will apply to all compiled
+# objects in this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -56,6 +72,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          = \
+    libSupportTests.a                                   \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
@@ -88,13 +105,13 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
-TestCHIPArgParser_SOURCES                             = TestCHIPArgParser.cpp
+TestCHIPArgParser_SOURCES                             = TestCHIPArgParserDriver.cpp
 TestCHIPArgParser_LDADD                               = $(COMMON_LDADD)
 
-TestTimeUtils_SOURCES                                 = TestTimeUtils.cpp
+TestTimeUtils_SOURCES                                 = TestTimeUtilsDriver.cpp
 TestTimeUtils_LDADD                                   = $(COMMON_LDADD)
 
-TestErrorStr_SOURCES                                  = TestErrorStr.cpp
+TestErrorStr_SOURCES                                  = TestErrorStrDriver.cpp
 TestErrorStr_LDADD                                    = $(COMMON_LDADD)
 
 TestCHIPCounter_SOURCES                               = TestCHIPCounter.cpp
