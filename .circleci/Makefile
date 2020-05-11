@@ -69,7 +69,7 @@ endef
 export GENERATED_FILE_HEADER
 
 # GEN_CONFIG writes the config to a temporary file. If the whole process succeeds,
-# it them moves that file to $@. This makes is an atomic operation, so if it fails
+# it them moves that file to $@. This makes it an atomic operation, so if it fails
 # make doesn't consider a half-baked file up to date.
 define GEN_CONFIG
 	@$(CIRCLECI) config pack $(SOURCE_DIR) > $(CONFIG_PACKED)
