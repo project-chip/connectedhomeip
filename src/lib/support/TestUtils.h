@@ -25,9 +25,9 @@
 extern "C" {
 #endif
 
-CHIP_ERROR deploy_device_unit_tests(nlTestSuite * tests);
+CHIP_ERROR deploy_unit_tests(nlTestSuite * tests);
 
-int run_device_unit_tests();
+int run_deployed_unit_tests();
 
 #if __cplusplus
 }
