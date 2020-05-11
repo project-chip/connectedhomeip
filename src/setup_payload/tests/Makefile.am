@@ -43,7 +43,7 @@ lib_LIBRARIES                                  = \
 libSetupPayloadTests_a_SOURCES                 = \
     TestManualCode.cpp                           \
     TestQRCode.cpp                               \
-    $(NULL)x
+    $(NULL)
 
 libSetupPayloadTests_adir                      = $(includedir)/setup_payload
 
