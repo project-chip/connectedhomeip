@@ -24,6 +24,8 @@
  *
  */
 
+#include "TestInetLayer.h"
+
 #include <inet/IPAddress.h>
 
 #include <string.h>
@@ -1780,12 +1782,4 @@ int TestInetAddress(void)
     nlTestRunner(&theSuite, const_cast<TestContext *>(&sTestContext));
 
     return (nlTestRunnerStats(&theSuite));
-}
-
-int main(void)
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestInetAddress());
 }

@@ -25,6 +25,8 @@
  *
  */
 
+#include "TestInetLayer.h"
+
 #include <inet/InetConfig.h>
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
@@ -171,19 +173,3 @@ int TestInetTimer(void)
 }
 
 #endif // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-int main(int argc, char * argv[])
-{
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-    SetSIGUSR1Handler();
-
-    //    ParseArgs(argc, argv);
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-    return (TestInetTimer());
-}
