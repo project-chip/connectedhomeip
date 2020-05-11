@@ -36,8 +36,22 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C/C++ preprocessor option flags that will apply to all compiled objects in
-# this makefile.
+lib_LIBRARIES                                        = \
+    libBleTests.a                                      \
+    $(NULL)
+
+libBleTests_a_SOURCES                                = \
+    TestBleErrorStr.cpp                                \
+    $(NULL)
+
+libBleTests_adir                                     = $(includedir)/ble
+
+dist_libBleTests_a_HEADERS                           = \
+    TestBle.h                                          \
+    $(NULL)
+
+# C/C++ preprocessor option flags that will apply to all compiled
+# objects in this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -55,6 +69,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          = \
+    libBleTests.a                                       \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
@@ -84,7 +99,7 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
-TestBleErrorStr_SOURCES                               = TestBleErrorStr.cpp
+TestBleErrorStr_SOURCES                               = TestBleErrorStrDriver.cpp
 TestBleErrorStr_LDADD                                 = $(COMMON_LDADD)
 
 #

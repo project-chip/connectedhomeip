@@ -32,6 +32,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestBle.h"
+
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -139,12 +141,4 @@ int TestBleErrorStr(void)
     nlTestRunner(&theSuite, &sContext);
 
     return nlTestRunnerStats(&theSuite);
-}
-
-int main(void)
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestBleErrorStr());
 }
