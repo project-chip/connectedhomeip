@@ -113,7 +113,7 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
                                --disable-java \
                                --disable-device-manager
 
-ifneq (,$(findstring ON_DEVICE_CHIP_TESTS,$(CXXFLAGS)))
+ifneq (,$(findstring SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
 CONFIGURE_OPTIONS           += --enable-tests
 else
 CONFIGURE_OPTIONS           += --disable-tests

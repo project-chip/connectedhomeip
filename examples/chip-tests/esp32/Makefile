@@ -5,7 +5,7 @@
 
 PROJECT_NAME := chip-crypto-tests
 
-CXXFLAGS += -DON_DEVICE_CHIP_TESTS
+CXXFLAGS += -DSUPPORT_FOREIGN_TEST_DRIVERS
 
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/src/crypto
