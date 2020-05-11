@@ -31,7 +31,7 @@ using namespace std;
 
 namespace chip {
 
-// TODO this shuould point to the spec
+// TODO this should point to the spec
 const int kVersionFieldLengthInBits                  = 3;
 const int kVendorIDFieldLengthInBits                 = 16;
 const int kProductIDFieldLengthInBits                = 16;
@@ -53,7 +53,7 @@ const int kTotalPayloadDataSizeInBits =
      kReservedFieldLengthInBits);
 const int kTotalPayloadDataSizeInBytes = (kTotalPayloadDataSizeInBits + 7) / 8;
 
-const char * kQRCodePrefix = "CH:";
+const char * const kQRCodePrefix = "CH:";
 
 class SetupPayload
 {
