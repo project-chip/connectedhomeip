@@ -113,7 +113,7 @@ bool ParseArgsFromEnvVar(const char * progName, const char * varName, OptionSet 
 
 void PrintOptionHelp(OptionSet * optionSets[], FILE * s);
 
-void (*PrintArgError)(const char * msg, ...);
+extern void (*PrintArgError)(const char * msg, ...);
 void DefaultPrintArgError(const char * msg, ...);
 
 // Utility functions for parsing common argument value types.
@@ -160,4 +160,4 @@ public:
 
 #endif // CHIP_CONFIG_ENABLE_ARG_PARSER
 
-#endif // NLARGPARSER_H_
+#endif // CHIPARGPARSER_H_
