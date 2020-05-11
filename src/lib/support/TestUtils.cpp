@@ -30,7 +30,7 @@ typedef struct
 
 static test_suites_t gs_test_suites = { NULL, 0, 0 };
 
-CHIP_ERROR deploy_device_unit_tests(nlTestSuite * tests)
+CHIP_ERROR deploy_unit_tests(nlTestSuite * tests)
 {
     if (gs_test_suites.test_suites_size <= gs_test_suites.num_test_suites)
     {
@@ -48,7 +48,7 @@ CHIP_ERROR deploy_device_unit_tests(nlTestSuite * tests)
     return CHIP_NO_ERROR;
 }
 
-int run_device_unit_tests()
+int run_deployed_unit_tests()
 {
     int status = 0;
     for (uint32_t i = 0; i < gs_test_suites.num_test_suites; i++)
