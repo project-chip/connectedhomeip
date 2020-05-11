@@ -1,4 +1,4 @@
-PLUGINS = basic-server on-off-server level-control-server identify-server zcl-data-model message-dispatch
+PLUGINS = cluster-server-basic cluster-server-on-off cluster-server-level-control cluster-server-identify core-data-model core-message-dispatch
 SAMPLES = utest
 
 subsystem:

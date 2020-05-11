@@ -1,11 +1,12 @@
 NAME=zcl-data-model
+REQUIRED_PLUGINS=../../utest-gen/gen-callback-stubs.o ../binding-mock/mock.o
 
 # ---------- GENERIC -------------
 CC=gcc
 CFLAGS="-I../../api/" "-I../../utest-gen/" -DCHIP_TEST
 
-$(NAME).out: $(NAME).o utest.o ../../api/mock/mock.o ../../utest-gen/gen-callback-stubs.o 
-	$(CC) -o $(NAME).out $(NAME).o ../../api/mock/mock.o ../../utest-gen/gen-callback-stubs.o utest.o
+$(NAME).out: $(NAME).o utest.o $(REQUIRED_PLUGINS)
+	$(CC) -o $(NAME).out $(NAME).o utest.o $(REQUIRED_PLUGINS)
 
 test: $(NAME).out
 	./$(NAME).out
