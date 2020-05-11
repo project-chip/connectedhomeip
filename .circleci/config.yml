@@ -15,7 +15,7 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
@@ -43,7 +43,7 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
@@ -81,7 +81,7 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/build/distribution_check.sh
@@ -97,7 +97,7 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/tools/codecoverage.sh
@@ -113,7 +113,7 @@ jobs:
     steps:
     - checkout
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/build/bootstrap.sh
@@ -141,7 +141,7 @@ jobs:
     steps:
     - checkout
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/build/bootstrap.sh
@@ -182,7 +182,7 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/build/distribution_check.sh
@@ -198,7 +198,7 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-ubuntu-16-lts-built
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
@@ -223,7 +223,7 @@ jobs:
     steps:
     - checkout
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" "sudo scripts/setup/linux/install_packages.sh"
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/build/bootstrap.sh
@@ -344,7 +344,7 @@ workflows:
 #         type: string
 #     steps:
 #     - run:
-#         command: scripts/tools/run_if.sh \"ubuntu-16-lts\" \"$BUILD_TYPE\" \"sudo scripts/setup/linux/install_packages.sh\"
+#         command: scripts/tools/run_if.sh \"ubuntu-16-lts\" \"$BUILD_TYPE\" sudo scripts/setup/linux/install_packages.sh
 #         name: Setup Environment
 # executors:
 #   docker-build:
