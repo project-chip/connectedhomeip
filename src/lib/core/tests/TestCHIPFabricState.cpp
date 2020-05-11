@@ -26,11 +26,13 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <memory>
+
 #include <nlunit-test.h>
 
-#include <core/CHIPCore.h>
+#include <core/CHIPFabricState.h>
 
-#include "ToolCommon.h"
+using namespace chip;
 
 static const uint64_t kTestNodeId    = 0x18B43000002DCF71ULL;
 static const uint64_t kTestFabricId  = 0xFEEDBEEFULL;
@@ -89,6 +91,29 @@ static void CheckSelectNodeAddressWithSubnet(nlTestSuite * inSuite, void * inCon
     }
 }
 
+static void CheckGetAndJoinFabricState(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr size_t kMaxFabricStateBufferSize = 1024;
+    std::unique_ptr<uint8_t[]> buffer(new uint8_t[kMaxFabricStateBufferSize]);
+
+    // Startup assumption, based on TestSetup
+    NL_TEST_ASSERT(inSuite, sFabricState.FabricId == kTestFabricId);
+
+    uint32_t bufferSize = 0;
+    CHIP_ERROR err      = sFabricState.GetFabricState(buffer.get(), kMaxFabricStateBufferSize, bufferSize);
+
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, bufferSize > 0);
+    NL_TEST_ASSERT(inSuite, bufferSize <= kMaxFabricStateBufferSize);
+
+    sFabricState.ClearFabricState();
+    err = sFabricState.JoinExistingFabric(buffer.get(), bufferSize);
+
+    // Parsing should succeed.
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, sFabricState.FabricId == kTestFabricId);
+}
+
 /**
  *  Set up the test suite.
  */
@@ -117,7 +142,9 @@ static const nlTest sTests[] = {
     // TODO: ChipFabricState has much more functionality than tested here. A
     // more thorough collection of tests should be written.
     NL_TEST_DEF("ChipFabricState::SelectNodeAddress", CheckSelectNodeAddress),
-    NL_TEST_DEF("ChipFabricState::SelectNodeAddress", CheckSelectNodeAddressWithSubnet), NL_TEST_SENTINEL()
+    NL_TEST_DEF("ChipFabricState::SelectNodeAddress", CheckSelectNodeAddressWithSubnet),
+    NL_TEST_DEF("ChipFabricState::GetFabricState", CheckGetAndJoinFabricState),
+    NL_TEST_SENTINEL(),
 };
 
 int main(void)

@@ -57,6 +57,7 @@ dist_libCoreTests_a_HEADERS                           = \
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
+    -I$(top_srcdir)/src/include                         \
     -I$(top_srcdir)/src/lib                             \
     $(NLASSERT_CPPFLAGS)                                \
     $(NLIO_CPPFLAGS)                                    \
@@ -69,6 +70,7 @@ AM_CPPFLAGS                                           = \
 CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/libCHIP.a                   \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(NULL)
 
 COMMON_LDADD                                          =  \
@@ -112,10 +114,11 @@ TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
 TestCHIPTLV_SOURCES                                   = TestCHIPTLVDriver.cpp
 TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
 
+
 TestCHIPUdpExchange_SOURCES                           = TestCHIPUdpExchangeDriver.cpp
 TestCHIPUdpExchange_LDADD                             = $(COMMON_LDADD)
 
-TestCHIPFabricState_SOURCES                           = TestCHIPTLV.cpp
+TestCHIPFabricState_SOURCES                           = TestCHIPFabricState.cpp
 TestCHIPFabricState_LDADD                             = $(COMMON_LDADD)
 
 #

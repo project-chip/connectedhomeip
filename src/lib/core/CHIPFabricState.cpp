@@ -130,13 +130,6 @@ CHIP_ERROR ChipFabricState::Init()
     if (State != kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
 
-#ifdef CHIP_NON_PRODUCTION_MARKER
-    // This is a trick to force the linker to include the CHIP_NON_PRODUCTION_MARKER symbol
-    // in the linked output.  (Note that the test will never evaluate to true).
-    if (CHIP_NON_PRODUCTION_MARKER[0] == 0)
-        return CHIP_ERROR_INCORRECT_STATE;
-#endif
-
     FabricId      = kFabricIdNotSpecified;
     LocalNodeId   = 1;
     DefaultSubnet = kChipSubnetId_PrimaryWiFi;
