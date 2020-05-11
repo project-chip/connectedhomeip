@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "TestCryptoLayer.h"
+
 #include "CHIPCrypto.h"
 
 #include <nlassert.h>
@@ -484,7 +486,7 @@ static void test_bn_pad()
     CHIP_srp_verifier(v, salt, (const uint8_t *) "", 0, (const uint8_t *) "", 0);
 }
 
-int main()
+int TestCHIPCrypto(void)
 {
     test_ed25519(ed25519_sk, ed25519_pk, ed25519_m, ed25519_sig);
     test_X25519_1(rfc7748_alice_skey, rfc7748_alice_pkey);
@@ -507,5 +509,11 @@ int main()
 #endif
     test_store_big_endian(0x12345678);
     test_bn_pad();
+
     return 0;
+}
+
+int main()
+{
+    return (TestCHIPCrypto());
 }

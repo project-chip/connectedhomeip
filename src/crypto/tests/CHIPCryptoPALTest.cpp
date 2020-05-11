@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include "TestCryptoLayer.h"
+
 #include "CHIPCryptoPAL.h"
 #include "AES_CCM_128_test_vectors.h"
 #include "AES_CCM_256_test_vectors.h"
@@ -845,12 +847,4 @@ int TestCHIPCryptoPAL(void)
     nlTestRunner(&theSuite, NULL);
 
     return (nlTestRunnerStats(&theSuite));
-}
-
-int main(void)
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestCHIPCryptoPAL());
 }
