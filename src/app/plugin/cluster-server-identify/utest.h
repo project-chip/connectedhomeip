@@ -33,7 +33,7 @@
 
 #include "chip-zcl.h"
 #include "gen-types.h"
-#include "../zcl-data-model/zcl-data-model.h"
+#include "../core-data-model/zcl-data-model.h"
 #include "gen-callbacks.h"
 #include "gen-cluster-id.h"
 #include <stdio.h>
