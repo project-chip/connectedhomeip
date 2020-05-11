@@ -830,17 +830,16 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-#ifdef ON_DEVICE_CHIP_TESTS
 void __attribute__((constructor)) my_init(void)
 {
     printf("Deploying CHIP Crypto PAL tests\n");
     nlTestSuite theSuite = { "CHIP Crypto PAL tests", &sTests[0], NULL, NULL };
-    if (CHIP_NO_ERROR != deploy_device_unit_tests(&theSuite))
+    if (CHIP_NO_ERROR != deploy_unit_tests(&theSuite))
     {
         printf("Failed in deploying CHIP Crypto PAL tests\n");
     }
 }
-#else
+
 int main(void)
 {
     nlTestSuite theSuite = { "CHIP Crypto PAL tests", &sTests[0], NULL, NULL };
@@ -849,4 +848,3 @@ int main(void)
     nlTestRunner(&theSuite, NULL);
     return nlTestRunnerStats(&theSuite);
 }
-#endif // ON_DEVICE_CHIP_TESTS
