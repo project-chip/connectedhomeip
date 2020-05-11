@@ -107,6 +107,11 @@ static void CheckGetAndJoinFabricState(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, bufferSize <= kMaxFabricStateBufferSize);
 
     sFabricState.ClearFabricState();
+
+    // Clearing should lose whatever test defaults are. We are testing reload.
+    NL_TEST_ASSERT(inSuite, sFabricState.FabricId == kFabricIdNotSpecified);
+    NL_TEST_ASSERT(inSuite, sFabricState.FabricId != kTestFabricId);
+
     err = sFabricState.JoinExistingFabric(buffer.get(), bufferSize);
 
     // Parsing should succeed.
