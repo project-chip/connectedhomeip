@@ -1,5 +1,6 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -31,26 +32,19 @@
 
 #include "ToolCommon.h"
 
-static const uint64_t kTestNodeId = 0x18B43000002DCF71ULL;
-static const uint64_t kTestFabricId = 0xFEEDBEEFULL;
+static const uint64_t kTestNodeId    = 0x18B43000002DCF71ULL;
+static const uint64_t kTestFabricId  = 0xFEEDBEEFULL;
 static const uint16_t kDefaultSubnet = 0x01;
 static ChipFabricState sFabricState;
 
 /**
  * Test generating a ULA using the default subnet.
  */
-static void CheckSelectNodeAddress(nlTestSuite *inSuite, void *inContext)
+static void CheckSelectNodeAddress(nlTestSuite * inSuite, void * inContext)
 {
     // Bank of psuedorandom test node IDs
-    const uint64_t testIDs[] =
-    {
-        0x3e383920daadee75,
-        0xaf17346309a3dc4b,
-        0x000000000000ae14,
-        0x3085051285957d2e,
-        0xee8bffe99277378a,
-        kAnyNodeId
-    };
+    const uint64_t testIDs[] = { 0x3e383920daadee75, 0xaf17346309a3dc4b, 0x000000000000ae14,
+                                 0x3085051285957d2e, 0xee8bffe99277378a, kAnyNodeId };
 
     const size_t numTestIds = sizeof(testIDs) / sizeof(testIDs[0]);
 
@@ -74,19 +68,13 @@ static void CheckSelectNodeAddress(nlTestSuite *inSuite, void *inContext)
 /**
  * Test generating a ULA using arbitrary subnets.
  */
-static void CheckSelectNodeAddressWithSubnet(nlTestSuite *inSuite, void *inContext)
+static void CheckSelectNodeAddressWithSubnet(nlTestSuite * inSuite, void * inContext)
 {
     // Bank of psuedorandom test node IDs
-    const uint64_t testIDs[] =
-    {
-        0x3e383920daadee75,
-        0xaf17346309a3dc4b,
-        0x000000000000ae14,
-        0x3085051285957d2e,
-        0xee8bffe99277378a
-    };
+    const uint64_t testIDs[] = { 0x3e383920daadee75, 0xaf17346309a3dc4b, 0x000000000000ae14, 0x3085051285957d2e,
+                                 0xee8bffe99277378a };
 
-    const size_t numTestIds = sizeof(testIDs) / sizeof(testIDs[0]);
+    const size_t numTestIds        = sizeof(testIDs) / sizeof(testIDs[0]);
     const int subnetTestUpperLimit = 5;
 
     for (uint16_t j = 0; j < subnetTestUpperLimit; j++)
@@ -104,11 +92,11 @@ static void CheckSelectNodeAddressWithSubnet(nlTestSuite *inSuite, void *inConte
 /**
  *  Set up the test suite.
  */
-static int TestSetup(void *inContext)
+static int TestSetup(void * inContext)
 {
-    (void)sFabricState.Init();
-    sFabricState.LocalNodeId = kTestNodeId;
-    sFabricState.FabricId = kTestFabricId;
+    (void) sFabricState.Init();
+    sFabricState.LocalNodeId   = kTestNodeId;
+    sFabricState.FabricId      = kTestFabricId;
     sFabricState.DefaultSubnet = kDefaultSubnet;
 
     return (SUCCESS);
@@ -117,7 +105,7 @@ static int TestSetup(void *inContext)
 /**
  *  Tear down the test suite.
  */
-static int TestTeardown(void *inContext)
+static int TestTeardown(void * inContext)
 {
     return (SUCCESS);
 }
@@ -125,23 +113,16 @@ static int TestTeardown(void *inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] =
-{
+static const nlTest sTests[] = {
     // TODO: ChipFabricState has much more functionality than tested here. A
     // more thorough collection of tests should be written.
     NL_TEST_DEF("ChipFabricState::SelectNodeAddress", CheckSelectNodeAddress),
-    NL_TEST_DEF("ChipFabricState::SelectNodeAddress", CheckSelectNodeAddressWithSubnet),
-    NL_TEST_SENTINEL()
+    NL_TEST_DEF("ChipFabricState::SelectNodeAddress", CheckSelectNodeAddressWithSubnet), NL_TEST_SENTINEL()
 };
 
 int main(void)
 {
-    nlTestSuite theSuite =
-    {
-        "CHIP-fabric-state",
-        &sTests[0],
-        TestSetup,
-        TestTeardown
+    nlTestSuite theSuite = { "CHIP-fabric-state", &sTests[0], TestSetup, TestTeardown
 
     };
 
