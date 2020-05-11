@@ -185,7 +185,7 @@ int CHIP_constant_time_is_zero(const void * x, size_t length);
 void CHIP_constant_time_fill_zero(void * x, size_t length);
 void CHIP_constant_time_copy(void * x, const void * y, size_t length);
 
-bool CHIP_RAND_bytes(void *buf, size_t len);
+bool CHIP_RAND_bytes(void * buf, size_t len);
 
 #ifdef __cplusplus
 }
