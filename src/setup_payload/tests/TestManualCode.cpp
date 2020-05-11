@@ -15,6 +15,15 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file implements a unit test suite for the manual setup
+ *      code functionality.
+ *
+ */
+
+#include "TestSetupCode.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -421,9 +430,4 @@ int TestManualSetupCode(void)
     testShortCodeCharLengths();
 
     return (0);
-}
-
-int main()
-{
-    return (TestManualSetupCode());
 }
