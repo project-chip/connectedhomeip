@@ -15,6 +15,15 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file implements a unit test suite for the Quick Response
+ *      code functionality.
+ *
+ */
+
+#include "TestSetupCode.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -316,9 +325,4 @@ int TestQuickResponseCode(void)
     }
 
     return (result);
-}
-
-int main(int argc, char ** argv)
-{
-    return (TestQuickResponseCode());
 }

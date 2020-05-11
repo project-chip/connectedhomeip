@@ -36,6 +36,21 @@ EXTRA_DIST                                     = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
+lib_LIBRARIES                                  = \
+    libSetupPayloadTests.a                       \
+    $(NULL)
+
+libSetupPayloadTests_a_SOURCES                 = \
+    TestManualCode.cpp                           \
+    TestQRCode.cpp                               \
+    $(NULL)x
+
+libSetupPayloadTests_adir                      = $(includedir)/setup_payload
+
+dist_libSetupPayloadTests_a_HEADERS            = \
+    TestSetupCode.h                              \
+    $(NULL)
+
 # C/C++ preprocessor option flags that will apply to all compiled
 # objects in this makefile.
 
@@ -47,13 +62,14 @@ AM_CPPFLAGS                                    = \
     $(NULL)
 
 COMMON_LDADD                                   = \
+    libSetupPayloadTests.a                       \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \
-    TestQrCode                                   \
     TestManualCode                               \
+    TestQRCode                                   \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -71,11 +87,11 @@ TESTS_ENVIRONMENT                              = \
 
 # Source, compiler, and linker options for test programs.
 
-TestQrCode_LDADD                               = $(COMMON_LDADD)
-TestQrCode_SOURCES                             = tests_qrcode.cpp
+TestQRCode_LDADD                               = $(COMMON_LDADD)
+TestQRCode_SOURCES                             = TestQRCodeDriver.cpp
 
 TestManualCode_LDADD                           = $(COMMON_LDADD)
-TestManualCode_SOURCES                         = tests_manualcode.cpp
+TestManualCode_SOURCES                         = TestManualCodeDriver.cpp
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)
