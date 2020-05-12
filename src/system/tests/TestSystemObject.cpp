@@ -491,11 +491,11 @@ static int Initialize(void * aContext)
     void * lLayerContext   = NULL;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static sys_mbox * sLwIPEventQueue = NULL;
+    static sys_mbox_t * sLwIPEventQueue = NULL;
 
     if (sLwIPEventQueue == NULL)
     {
-        sys_mbox_new(&sLwIPEventQueue, 100);
+        sys_mbox_new(sLwIPEventQueue, 100);
     }
 
     lLayerContext = &sLwIPEventQueue;

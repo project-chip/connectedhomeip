@@ -21,35 +21,34 @@
 
 namespace chip {
 
-const size_t kTest_Suite_Count_Increments = 32;
+const size_t kTestSuitesMax = 32;
 
 typedef struct
 {
-    nlTestSuite test_suites[kTest_Suite_Count_Increments];
+    ChipUnitTestFunction test_suites[kTestSuitesMax];
     uint32_t num_test_suites;
 } test_suites_t;
 
 static test_suites_t gs_test_suites;
 
-CHIP_ERROR deploy_unit_tests(nlTestSuite * tests)
+CHIP_ERROR RegisterUnitTests(ChipUnitTestFunction tests)
 {
-    if (gs_test_suites.num_test_suites >= kTest_Suite_Count_Increments)
+    if (gs_test_suites.num_test_suites >= kTestSuitesMax)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    memcpy(&gs_test_suites.test_suites[gs_test_suites.num_test_suites], tests, sizeof(nlTestSuite));
+    gs_test_suites.test_suites[gs_test_suites.num_test_suites] = tests;
     gs_test_suites.num_test_suites++;
     return CHIP_NO_ERROR;
 }
 
-int run_deployed_unit_tests()
+int RunRegisteredUnitTests()
 {
     int status = 0;
     for (uint32_t i = 0; i < gs_test_suites.num_test_suites; i++)
     {
-        nlTestRunner(&gs_test_suites.test_suites[i], NULL);
-        status |= nlTestRunnerStats(&gs_test_suites.test_suites[i]);
+        status |= gs_test_suites.test_suites[i]();
     }
     return status;
 }

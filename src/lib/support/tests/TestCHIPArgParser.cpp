@@ -28,6 +28,8 @@
 
 #include <support/CHIPArgParser.hpp>
 
+#if CHIP_CONFIG_ENABLE_ARG_PARSER
+
 using namespace chip::ArgParser;
 
 static bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
@@ -720,3 +722,4 @@ int TestCHIPArgParser(void)
 
     return (EXIT_SUCCESS);
 }
+#endif
