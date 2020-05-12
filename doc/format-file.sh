@@ -33,4 +33,4 @@ FILENAME=${1}
 sed  -e 's:^[ 	]*namespace[ 	]\+WeaveMakeManagedNamespaceIdentifier(\([^ 	,()]\+\),[ 	]*kWeaveManagedNamespaceDesignation_\([^ 	,()]\+\))[ 	]*{[ 	]*$:namespace \1_\2 {:g' \
   -e 's/NS_ENUM(\([_a-zA-Z0-9][_a-zA-Z0-9]*\)[ 	]*,[ 	]*\([_a-zA-Z0-9][_a-zA-Z0-9]*\))/ enum \2 : \1 \2; enum \2 : \1/g' \
   -e 's/__attribute__(([^)]*))//g' \
-  -e 's/__attribute__([^)]*)//g' ${FILENAME}
+  -e 's/__attribute__([^)]*)//g' "$FILENAME"
