@@ -2080,6 +2080,7 @@ src/lib/support/Makefile
 src/lib/support/tests/Makefile
 src/platform/Makefile
 tests/Makefile
+doc/Makefile
 ])
 
 #

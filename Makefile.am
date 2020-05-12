@@ -34,6 +34,7 @@ SUBDIRS                                  = \
     examples                               \
     third_party                            \
     src                                    \
+    doc                                    \
     tests                                  \
     $(NULL)
 
@@ -42,7 +43,7 @@ PRETTY_SUBDIRS                           = \
     $(NULL)
 
 EXTRA_DIST                               = \
-    CODE_OF_CONDUCT.md                            \
+    CODE_OF_CONDUCT.md                     \
     CONTRIBUTING.md                        \
     Makefile-Android                       \
     Makefile-bootstrap                     \
