@@ -27,6 +27,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestSystemLayer.h"
+
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
@@ -254,11 +256,8 @@ static int TestTeardown(void * aContext)
     return (SUCCESS);
 }
 
-int main(int argc, char * argv[])
+int TestSystemTimer(void)
 {
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit againt one lContext.
     nlTestRunner(&kTheSuite, &sContext);
 

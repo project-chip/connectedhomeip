@@ -1,6 +1,6 @@
 /*
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,6 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+/**
+ *    @file
+ *      This file implements a unit test suite for the manual setup
+ *      code functionality.
+ *
+ */
+
+#include "TestSetupCode.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -395,7 +404,7 @@ void testShortCodeCharLengths()
     assert(manualSetupLongCodeCharLength == kManualSetupLongCodeCharLength);
 }
 
-int main()
+int TestManualSetupCode(void)
 {
     printf("---Running Test--- tests from %s\n", __FILE__);
     testDecimalRepresentation_PartialPayload();
@@ -419,4 +428,6 @@ int main()
     testReadBitsFromNumber();
 
     testShortCodeCharLengths();
+
+    return (0);
 }

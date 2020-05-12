@@ -39,12 +39,29 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C preprocessor option flags that will apply to all compiled objects in this
-# makefile.
+lib_LIBRARIES                                         = \
+    libInetLayerTests.a                                 \
+    $(NULL)
+
+libInetLayerTests_a_SOURCES                           = \
+    TestInetAddress.cpp                                 \
+    TestInetBuffer.cpp                                  \
+    TestInetErrorStr.cpp                                \
+    TestInetTimer.cpp                                   \
+    $(NULL)
+
+libInetLayerTests_adir                                = $(includedir)/inet
+
+dist_libInetLayerTests_a_HEADERS                      = \
+    TestInetLayer.h                                     \
+    $(NULL)
 
 noinst_LIBRARIES                                      = \
     libTestInetCommon.a                                 \
     $(NULL)
+
+# C/C++ preprocessor option flags that will apply to all compiled
+# objects in this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -72,6 +89,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          = \
+    libInetLayerTests.a                                  \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
@@ -128,10 +146,10 @@ TESTS_ENVIRONMENT                                     = \
 TestLwIPDNS_SOURCES                                   = TestLwIPDNS.cpp
 TestLwIPDNS_LDADD                                     = libTestInetCommon.a $(COMMON_LDADD)
 
-TestInetAddress_SOURCES                               = TestInetAddress.cpp
+TestInetAddress_SOURCES                               = TestInetAddressDriver.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 
-TestInetBuffer_SOURCES                                = TestInetBuffer.cpp      \
+TestInetBuffer_SOURCES                                = TestInetBufferDriver.cpp      \
                                                         $(NULL)
 TestInetBuffer_LDADD                                  = $(COMMON_LDADD)
 
@@ -139,7 +157,7 @@ TestInetEndPoint_SOURCES                              = TestInetEndPoint.cpp    
                                                         $(NULL)
 TestInetEndPoint_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
 
-TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
+TestInetErrorStr_SOURCES                              = TestInetErrorStrDriver.cpp    \
                                                         $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
 
@@ -154,7 +172,7 @@ TestInetLayerMulticast_SOURCES                        = TestInetLayerMulticast.c
                                                         $(NULL)
 TestInetLayerMulticast_LDADD                          = libTestInetCommon.a $(COMMON_LDADD)
 
-TestInetTimer_SOURCES                                 = TestInetTimer.cpp       \
+TestInetTimer_SOURCES                                 = TestInetTimerDriver.cpp       \
                                                         $(NULL)
 TestInetTimer_LDADD                                   = $(COMMON_LDADD)
 
