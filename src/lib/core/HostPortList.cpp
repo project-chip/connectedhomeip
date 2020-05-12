@@ -79,15 +79,15 @@ void HostPortList::Clear(void)
  *                                                       buffer.
  *  @retval  #CHIP_NO_ERROR                             On success.
  */
-CHIP_ERROR HostPortList::Get(uint8_t index, char *hostBuf, uint32_t hostBufSize, uint16_t& port) const
+CHIP_ERROR HostPortList::Get(uint8_t index, char * hostBuf, uint32_t hostBufSize, uint16_t & port) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    const uint8_t *elem;
+    const uint8_t * elem;
 
     VerifyOrExit(index < mCount, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     elem = mElements;
-    for ( ; index > 0; index--)
+    for (; index > 0; index--)
     {
         err = Skip(elem);
         SuccessOrExit(err);
@@ -122,7 +122,7 @@ exit:
  *                                                       buffer.
  *  @retval  #CHIP_NO_ERROR                             On success.
  */
-CHIP_ERROR HostPortList::Pop(char *hostBuf, uint32_t hostBufSize, uint16_t& port)
+CHIP_ERROR HostPortList::Pop(char * hostBuf, uint32_t hostBufSize, uint16_t & port)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -162,14 +162,15 @@ exit:
  *                                                       buffer.
  *  @retval  #CHIP_NO_ERROR                             On success.
  */
-CHIP_ERROR HostPortList::Get(const uint8_t *& elem, char *hostBuf, uint32_t hostBufSize, uint16_t& port) const
+CHIP_ERROR HostPortList::Get(const uint8_t *& elem, char * hostBuf, uint32_t hostBufSize, uint16_t & port) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t control, type, hostLen;
 
     control = *elem++;
-    type = control & kHostPortControl_TypeMask;
-    VerifyOrExit(type == kHostPortType_FullyQualified || type == kHostPortType_Indexed, err = CHIP_ERROR_UNSUPPORTED_HOST_PORT_ELEMENT);
+    type    = control & kHostPortControl_TypeMask;
+    VerifyOrExit(type == kHostPortType_FullyQualified || type == kHostPortType_Indexed,
+                 err = CHIP_ERROR_UNSUPPORTED_HOST_PORT_ELEMENT);
 
     hostLen = *elem++;
     VerifyOrExit(hostLen < hostBufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -220,8 +221,9 @@ CHIP_ERROR HostPortList::Skip(const uint8_t *& elem) const
     uint8_t control, type, hostLen;
 
     control = *elem++;
-    type = control & kHostPortControl_TypeMask;
-    VerifyOrExit(type == kHostPortType_FullyQualified || type == kHostPortType_Indexed, err = CHIP_ERROR_UNSUPPORTED_HOST_PORT_ELEMENT);
+    type    = control & kHostPortControl_TypeMask;
+    VerifyOrExit(type == kHostPortType_FullyQualified || type == kHostPortType_Indexed,
+                 err = CHIP_ERROR_UNSUPPORTED_HOST_PORT_ELEMENT);
 
     hostLen = *elem++;
     elem += hostLen;
@@ -261,15 +263,15 @@ exit:
  *  @retval  #CHIP_NO_ERROR                         On success.
  *
  */
-CHIP_ERROR HostPortList::GetSuffix(uint8_t index, char *buf, uint32_t bufSize, uint8_t& suffixLen) const
+CHIP_ERROR HostPortList::GetSuffix(uint8_t index, char * buf, uint32_t bufSize, uint8_t & suffixLen) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    const uint8_t *elem;
+    const uint8_t * elem;
 
     VerifyOrExit(index < mSuffixCount, err = CHIP_ERROR_INVALID_HOST_SUFFIX_INDEX);
 
     elem = mSuffixTable;
-    for ( ; index > 0; index--)
+    for (; index > 0; index--)
         elem += 1 + elem[0];
 
     suffixLen = *elem++;
@@ -281,6 +283,5 @@ CHIP_ERROR HostPortList::GetSuffix(uint8_t index, char *buf, uint32_t bufSize, u
 exit:
     return err;
 }
-
 
 } /* namespace chip */
