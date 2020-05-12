@@ -637,7 +637,7 @@ static void RebootCallbackFn(void)
 
     // Need to close any open file descriptor above stdin/out/err.
     // There is no portable way to get the max fd number.
-    // Given that Weave's test apps don't open a large number of files,
+    // Given that CHIP's test apps don't open a large number of files,
     // FD_SETSIZE should be a reasonable upper bound (see the documentation
     // of select).
     for (i = 3; i < FD_SETSIZE; i++)

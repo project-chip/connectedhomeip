@@ -30,6 +30,7 @@ CHIP_BUILD_INET_LAYER_SOURCE_FILES                         = \
     @top_builddir@/src/inet/IPAddress.cpp                    \
     @top_builddir@/src/inet/IPEndPointBasis.cpp              \
     @top_builddir@/src/inet/IPPrefix.cpp                     \
+    @top_builddir@/src/inet/InetArgParser.cpp                \
     @top_builddir@/src/inet/InetError.cpp                    \
     @top_builddir@/src/inet/InetInterface.cpp                \
     @top_builddir@/src/inet/InetLayer.cpp                    \
@@ -48,6 +49,7 @@ CHIP_BUILD_INET_LAYER_HEADER_FILES                         = \
     @top_builddir@/src/inet/IPEndPointBasis.h                \
     @top_builddir@/src/inet/IPPrefix.h                       \
     @top_builddir@/src/inet/Inet.h                           \
+    @top_builddir@/src/inet/InetArgParser.h                  \
     @top_builddir@/src/inet/InetBuffer.h                     \
     @top_builddir@/src/inet/InetConfig.h                     \
     @top_builddir@/src/inet/InetError.h                      \
@@ -92,4 +94,3 @@ endif # CHIP_SYSTEM_CONFIG_USE_SOCKETS
 if CHIP_WITH_NLFAULTINJECTION
 CHIP_BUILD_INET_LAYER_SOURCE_FILES += @top_builddir@/src/inet/InetFaultInjection.cpp
 endif # CHIP_WITH_NLFAULTINJECTION
-

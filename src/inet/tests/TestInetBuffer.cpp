@@ -33,6 +33,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestInetLayer.h"
+
 #include <stdint.h>
 
 #include <inet/InetConfig.h>
@@ -1142,29 +1144,29 @@ static int TestTeardown(void * inContext)
     return (SUCCESS);
 }
 
-int main(void)
+int TestInetBuffer(void)
 {
-    nlTestSuite theSuite = { "inet-buffer", &sTests[0], TestSetup, TestTeardown };
-
-    // Init lwip
-#if INET_LWIP
-    tcpip_init(NULL, NULL);
-#endif
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "inet-buffer",
+        &sTests[0],
+        TestSetup,
+        TestTeardown
+    };
+    // clang-format on
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, &sContext);
 
-    return nlTestRunnerStats(&theSuite);
+    return (nlTestRunnerStats(&theSuite));
 }
 
 #else // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
-int main(void)
+int TestInetBuffer(void)
 {
-    return 0;
+    return (0);
 }
 
 #endif // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES

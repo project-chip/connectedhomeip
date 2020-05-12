@@ -36,8 +36,23 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C/C++ preprocessor option flags that will apply to all compiled objects in
-# this makefile.
+lib_LIBRARIES                                         = \
+    libCoreTests.a                                      \
+    $(NULL)
+
+libCoreTests_a_SOURCES                                = \
+    TestCHIPErrorStr.cpp                                \
+    TestCHIPTLV.cpp                                     \
+    $(NULL)
+
+libCoreTests_adir                                     = $(includedir)
+
+dist_libCoreTests_a_HEADERS                           = \
+    TestCore.h                                          \
+    $(NULL)
+
+# C/C++ preprocessor option flags that will apply to all compiled
+# objects in this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -56,6 +71,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          =  \
+    libCoreTests.a                                       \
     $(COMMON_LDFLAGS)                                    \
     $(CHIP_LDADD)                                        \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS) \
@@ -87,10 +103,10 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
-TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStr.cpp
+TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStrDriver.cpp
 TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
 
-TestCHIPTLV_SOURCES                                   = TestCHIPTLV.cpp
+TestCHIPTLV_SOURCES                                   = TestCHIPTLVDriver.cpp
 TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
 
 #

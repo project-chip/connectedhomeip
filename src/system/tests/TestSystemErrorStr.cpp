@@ -32,6 +32,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestSystemLayer.h"
+
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -99,7 +101,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int main(void)
+int TestSystemErrorStr(void)
 {
     // clang-format off
     nlTestSuite theSuite =
@@ -111,11 +113,8 @@ int main(void)
     };
     // clang-format on
 
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit againt one context.
     nlTestRunner(&theSuite, &sContext);
 
-    return nlTestRunnerStats(&theSuite);
+    return (nlTestRunnerStats(&theSuite));
 }

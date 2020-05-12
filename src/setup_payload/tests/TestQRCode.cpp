@@ -15,6 +15,15 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file implements a unit test suite for the Quick Response
+ *      code functionality.
+ *
+ */
+
+#include "TestSetupCode.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -301,7 +310,7 @@ int testExtractPayload()
     return surprises;
 }
 
-int main(int argc, char ** argv)
+int TestQuickResponseCode(void)
 {
     int result = testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase41Rep() + testBase41() + testSetupPayloadVerify() +
         testPayloadEquality() + testPayloadInEquality() + testQRCodeToPayloadGeneration() +
@@ -314,5 +323,6 @@ int main(int argc, char ** argv)
     {
         printf("\n**== QRCode tests FAILED ==**\n");
     }
-    return result;
+
+    return (result);
 }

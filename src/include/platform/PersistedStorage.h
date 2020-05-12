@@ -34,7 +34,26 @@ namespace chip {
 namespace Platform {
 namespace PersistedStorage {
 
+// Persistent storage key type is const char * in core config, however
+// it is uint8_t/uint16_t on other platofmrs (EFR32 and nRF5 respectively)
 typedef CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE Key;
+
+namespace internal {
+template <typename T>
+struct EmptyKey
+{
+    static constexpr T value = 0; // handles numeric values
+};
+
+template <>
+struct EmptyKey<const char *>
+{
+    static constexpr const char * value = nullptr;
+};
+
+} // namespace internal
+
+constexpr Key kEmptyKey = internal::EmptyKey<Key>::value;
 
 /**
  *  @brief

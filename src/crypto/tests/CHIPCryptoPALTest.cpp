@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include "TestCryptoLayer.h"
+
 #include "CHIPCryptoPAL.h"
 #include "AES_CCM_128_test_vectors.h"
 #include "AES_CCM_256_test_vectors.h"
@@ -829,11 +831,20 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int main(void)
+int TestCHIPCryptoPAL(void)
 {
-    nlTestSuite theSuite = { "CHIP Crypto PAL tests", &sTests[0], NULL, NULL };
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "CHIP Crypto PAL tests",
+        &sTests[0],
+        NULL,
+        NULL
+    };
+    // clang-format on
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
-    return nlTestRunnerStats(&theSuite);
+
+    return (nlTestRunnerStats(&theSuite));
 }

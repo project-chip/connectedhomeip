@@ -17,6 +17,8 @@
  *    limitations under the License.
  */
 
+#include "TestSupport.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -692,27 +694,7 @@ static void HandleArgError(const char * msg, ...)
     sCallbackRecordCount++;
 }
 
-/*
- * Mock interface to avoid an unnecessary circular dependency on the
- * Inet layer library imposed by the argument parsing facility.
- *
- */
-namespace chip {
-
-namespace Inet {
-
-class IPAddress;
-
-bool IPAddress::FromString(char const * aString, IPAddress & aAddress)
-{
-    return (false);
-}
-
-}; // namespace Inet
-
-}; // namespace chip
-
-int main(int argc, char * argv[])
+int TestCHIPArgParser(void)
 {
     SimpleParseTest_SingleLongOption();
     SimpleParseTest_SingleShortOption();
@@ -736,5 +718,5 @@ int main(int argc, char * argv[])
 
     printf("All tests succeeded\n");
 
-    return EXIT_SUCCESS;
+    return (EXIT_SUCCESS);
 }

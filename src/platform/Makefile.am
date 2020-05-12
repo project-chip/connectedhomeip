@@ -79,6 +79,7 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericSoftwareUpdateManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericSoftwareUpdateManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/CHIPDeviceLayerInternal.h \
+    @top_srcdir@/src/include/platform/PersistedStorage.h \
     $(NULL)
 
 if CONFIG_DEVICE_LAYER
