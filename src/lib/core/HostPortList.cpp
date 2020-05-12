@@ -21,7 +21,7 @@
  *    @file
  *      This file implements a class for managing and manipulating a Host
  *      Port List, a compact, binary-encoded collection of host and port
- *      identifier tuples associated with the CHIP Service Directory.
+ *      identifier tuples.
  *
  */
 
