@@ -86,7 +86,7 @@ enum LogModule
     kLogModule_TLV,
     kLogModule_ASN1,
     kLogModule_Crypto,
-    kLogModule_DeviceManager,
+    kLogModule_Controller,
     kLogModule_Alarm,
     kLogModule_BDX,
     kLogModule_DataManagement,

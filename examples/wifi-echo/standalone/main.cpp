@@ -18,7 +18,7 @@
 #include <support/CodeUtils.h>
 #include <inet/UDPEndPoint.h>
 
-#include "CHIPManager.h"
+#include <controller/CHIPDeviceController.h>
 
 #define SEND_DELAY 5
 
@@ -27,10 +27,11 @@ using namespace ::chip::Inet;
 
 static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
 
-// UDP Endpoint Callbacks
-static void EchoResponse(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, const IPPacketInfo * packet_info)
+// Device Manager Callbacks
+static void EchoResponse(chip::DeviceController::ChipDeviceController * deviceMgr, void * appReqState,
+                         System::PacketBuffer * buffer, const IPPacketInfo * packet_info)
 {
-    bool status = endpoint != NULL && buffer != NULL && packet_info != NULL;
+    bool status = deviceMgr != NULL && buffer != NULL && packet_info != NULL;
 
     if (status)
     {
@@ -71,7 +72,8 @@ static void EchoResponse(IPEndPointBasis * endpoint, System::PacketBuffer * buff
     }
 }
 
-static void Error(IPEndPointBasis * ep, INET_ERROR error, const IPPacketInfo * pi)
+static void ReceiveError(chip::DeviceController::ChipDeviceController * deviceMgr, void * appReqState, CHIP_ERROR error,
+                         const IPPacketInfo * pi)
 {
     printf("ERROR: %s\n Got UDP error\n", ErrorStr(error));
 }
@@ -87,9 +89,6 @@ int main(void)
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
     snprintf((char *) buffer->Start(), payload_len + 1, "%s", PAYLOAD);
     buffer->SetDataLength(payload_len);
-
-    CHIP_ERROR err;
-    UDPEndPoint * endpoint;
 
     std::string host_ip;
     std::cout << "Please, enter the Echo Host's IP Address: ";
@@ -116,42 +115,20 @@ int main(void)
         return -1;
     }
 
-    ChipManager chipMgr = ChipManager();
-    chipMgr.InitLayers();
+    chip::DeviceController::ChipDeviceController * controller = new chip::DeviceController::ChipDeviceController();
+    controller->Init();
 
-    err = chipMgr.InetLayer()->NewUDPEndPoint(&endpoint);
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("ERROR: %s\n Couldn't create UDP Endpoint, server will not start\n", ErrorStr(err));
-        return -1;
-    }
-
-    err = endpoint->Bind(kIPAddressType_IPv4, IPAddress::Any, port);
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("ERROR: %s\n Bind failed\n", ErrorStr(err));
-        return -1;
-    }
-
-    err = endpoint->Listen();
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("ERROR: %s\n Listen failed\n", ErrorStr(err));
-        return -1;
-    }
-
-    endpoint->OnMessageReceived = EchoResponse;
-    endpoint->OnReceiveError    = Error;
+    controller->ConnectDevice(1, host_addr, NULL, EchoResponse, ReceiveError, port);
 
     // Run the client
     while (1)
     {
         // Send calls release on this buffer, so bump up the ref because we want to reuse it
         buffer->AddRef();
-        endpoint->SendTo(host_addr, port, buffer);
+        controller->SendMessage(NULL, buffer);
         printf("Msg sent to server at %s:%d\n", host_ip.c_str(), port);
 
-        chipMgr.ServiceEvents();
+        controller->ServiceEvents();
 
         sleep(SEND_DELAY);
     }

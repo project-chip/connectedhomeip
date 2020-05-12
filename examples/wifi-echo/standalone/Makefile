@@ -34,7 +34,6 @@ APP = chip-standalone-demo
 
 SRCS = \
     $(PROJECT_ROOT)/main.cpp \
-    $(PROJECT_ROOT)/CHIPManager.cpp \
     $(NULL)
 
 INC_DIRS = \
@@ -43,6 +42,7 @@ INC_DIRS = \
     $(CHIP_ROOT)/src/lib \
     $(CHIP_ROOT)/src/ \
     $(CHIP_ROOT)/src/system \
+    $(CHIP_ROOT)/src/controller \
     $(CHIP_ROOT)/config/standalone \
     $(NULL)
 
