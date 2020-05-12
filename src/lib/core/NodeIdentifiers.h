@@ -18,6 +18,12 @@
  *    limitations under the License.
  */
 
+/**
+ *  @file
+ *    Header that defines CHIP constants, bitmasks and handling functions for
+ *    node and fabric id values.
+ */
+
 #ifndef ID_CONSTANTS_H
 #define ID_CONSTANTS_H
 

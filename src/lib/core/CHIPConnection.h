@@ -32,6 +32,8 @@
 
 #include <ble/BleConfig.h>
 #include <ble/BLEEndPoint.h>
+#include <core/HostPortList.h>
+#include <core/NodeIdentifiers.h>
 #include <inet/InetInterface.h>
 #include <inet/IPAddress.h>
 #include <inet/TCPEndPoint.h>
@@ -39,9 +41,6 @@
 #include <support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/SystemStats.h>
-
-#include "HostPortList.h"
-#include "IdConstants.h"
 
 namespace chip {
 enum
@@ -85,7 +84,7 @@ enum
 typedef enum ChipEncryptionType
 {
     kChipEncryptionType_None = 0, /**< Message not encrypted. */
-} WeaveEncryptionType;
+} ChipEncryptionType;
 
 /**
  *  @brief
