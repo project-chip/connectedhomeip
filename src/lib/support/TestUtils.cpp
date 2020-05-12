@@ -21,30 +21,22 @@
 
 namespace chip {
 
-const size_t kTest_Suite_Count_Increments = 16;
+const size_t kTest_Suite_Count_Increments = 32;
 
 typedef struct
 {
-    nlTestSuite * test_suites;
-    uint32_t test_suites_size;
+    nlTestSuite test_suites[kTest_Suite_Count_Increments];
     uint32_t num_test_suites;
 } test_suites_t;
 
-static test_suites_t gs_test_suites = { NULL, 0, 0 };
+static test_suites_t gs_test_suites;
 
 CHIP_ERROR deploy_unit_tests(nlTestSuite * tests)
 {
-    if (gs_test_suites.test_suites_size <= gs_test_suites.num_test_suites)
-    {
-        uint32_t new_size        = gs_test_suites.test_suites_size + kTest_Suite_Count_Increments;
-        nlTestSuite * new_suites = (nlTestSuite *) realloc(gs_test_suites.test_suites, sizeof(nlTestSuite) * new_size);
-        if (new_suites == NULL)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        gs_test_suites.test_suites      = new_suites;
-        gs_test_suites.test_suites_size = new_size;
+    if (gs_test_suites.num_test_suites >= kTest_Suite_Count_Increments) {
+        return CHIP_ERROR_NO_MEMORY;
     }
+
     memcpy(&gs_test_suites.test_suites[gs_test_suites.num_test_suites], tests, sizeof(nlTestSuite));
     gs_test_suites.num_test_suites++;
     return CHIP_NO_ERROR;
