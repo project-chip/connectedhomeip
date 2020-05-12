@@ -25,9 +25,13 @@
 extern "C" {
 #endif
 
+namespace chip {
+
 CHIP_ERROR deploy_unit_tests(nlTestSuite * tests);
 
 int run_deployed_unit_tests();
+
+} // namespace chip
 
 #if __cplusplus
 }
