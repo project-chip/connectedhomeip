@@ -1728,6 +1728,9 @@ fi
 AC_SUBST(NLUNIT_TEST_SUBDIRS, [${maybe_nlunit_test_dirstem}])
 AM_CONDITIONAL([CHIP_WITH_NLUNIT_TEST_INTERNAL], [test "${nl_with_nlunit_test}" = "internal"])
 
+# Check if foreign test drivers are enabled
+AM_CONDITIONAL([CHIP_SUPPORT_FOREIGN_TEST_DRIVERS], [test "${with_foreign_test_drivers}" = "yes"])
+
 #
 # Sockets
 #
