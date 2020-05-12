@@ -19,6 +19,8 @@
 #include <string.h>
 #include <support/TestUtils.h>
 
+namespace chip {
+
 const size_t kTest_Suite_Count_Increments = 16;
 
 typedef struct
@@ -58,3 +60,5 @@ int run_deployed_unit_tests()
     }
     return status;
 }
+
+} // namespace chip

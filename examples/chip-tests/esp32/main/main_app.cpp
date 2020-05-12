@@ -20,6 +20,8 @@
 
 #include <support/TestUtils.h>
 
+using namespace ::chip;
+
 const char * TAG = "CHIP-tests";
 
 extern "C" void app_main()

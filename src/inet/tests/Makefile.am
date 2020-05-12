@@ -39,7 +39,7 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-if !CONFIG_DEVICE_LAYER
+if !CHIP_SUPPORT_FOREIGN_TEST_DRIVERS
 # C preprocessor option flags that will apply to all compiled objects in this
 # makefile.
 
