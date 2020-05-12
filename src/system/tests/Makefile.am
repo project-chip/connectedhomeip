@@ -45,6 +45,7 @@ lib_LIBRARIES                                         = \
 libSystemLayerTests_a_SOURCES                         = \
     TestSystemErrorStr.cpp                              \
     TestSystemObject.cpp                                \
+    TestSystemPacketBuffer.cpp                          \
     TestSystemTimer.cpp                                 \
     $(NULL)
 
@@ -90,18 +91,9 @@ COMMON_LDADD                                           = \
 check_PROGRAMS                                        = \
     TestSystemErrorStr                                  \
     TestSystemObject                                    \
+    TestSystemPacketBuffer                              \
     TestSystemTimer                                     \
     $(NULL)
-
-if !CHIP_SUPPORT_FOREIGN_TEST_DRIVERS
-libSystemLayerTests_a_SOURCES                        += \
-    TestSystemPacketBuffer.cpp                          \
-    $(NULL)
-
-check_PROGRAMS                                       += \
-    TestSystemPacketBuffer                              \
-    $(NULL)
-endif
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
