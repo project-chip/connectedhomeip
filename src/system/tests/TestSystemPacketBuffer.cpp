@@ -37,6 +37,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/init.h>
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -123,13 +124,21 @@ static void BufferAlloc(struct TestContext * theContext)
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if (LWIP_VERSION_MAJOR >=2 && LWIP_VERSION_MINOR >= 1)
+    lType  = theContext->buf->type_internal;
+#else
     lType  = theContext->buf->type;
+#endif
     lFlags = theContext->buf->flags;
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
     lPool = theContext->buf->pool;
 #endif // LWIP_PBUF_FROM_CUSTOM_POOLS
     memset(theContext->buf, 0, lAllocSize);
+#if (LWIP_VERSION_MAJOR >=2 && LWIP_VERSION_MINOR >= 1)
+    theContext->buf->type_internal = lType;
+#else
     theContext->buf->type  = lType;
+#endif
     theContext->buf->flags = lFlags;
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
     theContext->buf->pool = lPool;
