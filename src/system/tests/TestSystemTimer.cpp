@@ -36,6 +36,7 @@
 #include <system/SystemConfig.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/init.h>
 #include <lwip/tcpip.h>
 #include <lwip/sys.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -248,6 +249,12 @@ static int TestTeardown(void * aContext)
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
 
     lContext.mLayer->Shutdown();
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !(LWIP_VERSION_MAJOR >=2 && LWIP_VERSION_MINOR >= 1)
+    tcpip_finish(NULL, NULL);
+#endif
+#endif
 
     return (SUCCESS);
 }
