@@ -54,4 +54,5 @@ CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
     core/CHIPKeyIds.h                                       \
     core/CHIPConnection.h                                   \
     core/HostPortList.h                                     \
+    core/IdConstants.h                                      \
     $(NULL)
