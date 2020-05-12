@@ -25,13 +25,13 @@ const size_t kTestSuitesMax = 32;
 
 typedef struct
 {
-    ChipUnitTestFunction test_suites[kTestSuitesMax];
+    UnitTestTriggerFunction test_suites[kTestSuitesMax];
     uint32_t num_test_suites;
 } test_suites_t;
 
 static test_suites_t gs_test_suites;
 
-CHIP_ERROR RegisterUnitTests(ChipUnitTestFunction tests)
+CHIP_ERROR RegisterUnitTests(UnitTestTriggerFunction tests)
 {
     if (gs_test_suites.num_test_suites >= kTestSuitesMax)
     {

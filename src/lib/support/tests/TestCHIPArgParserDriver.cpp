@@ -25,9 +25,7 @@
 
 #include "TestSupport.h"
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER
 int main(void)
 {
     return (TestCHIPArgParser());
 }
-#endif
