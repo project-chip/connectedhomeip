@@ -1,4 +1,5 @@
 #
+#    Copyright 2020 Project nlbuild-autotools Authors. All Rights Reserved.
 #    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +51,7 @@ AC_DEFUN([NL_ENABLE_OPTIMIZATION],
         [m4_fatal([$0: invalid default value '$1'; must be 'yes' or 'no'])])
 
     AC_CACHE_CHECK([whether to build code-optimized instances of programs and libraries],
-        nl_cv_build_optimized,
+        [nl_cv_build_optimized],
         [
             AC_ARG_ENABLE(optimization,
                 [AS_HELP_STRING([--enable-optimization],[Enable the generation of code-optimized instances @<:@default=$1@:>@.])],
@@ -81,12 +82,13 @@ AC_DEFUN([NL_ENABLE_OPTIMIZATION],
             
                     fi
                 ])
-
-            if test "${nl_cv_build_optimized}" = "no"; then
-                CFLAGS="`echo ${CFLAGS} | sed -e 's,-O[[[:alnum:]]]*,-O0,g'`"
-                CXXFLAGS="`echo ${CXXFLAGS} | sed -e 's,-O[[[:alnum:]]]*,-O0,g'`"
-                OBJCFLAGS="`echo ${OBJCFLAGS} | sed -e 's,-O[[[:alnum:]]]*,-O0,g'`"
-                OBJCXXFLAGS="`echo ${OBJCXXFLAGS} | sed -e 's,-O[[[:alnum:]]]*,-O0,g'`"
-            fi
     ])
+
+    if test "${nl_cv_build_optimized}" = "no"; then
+	CFLAGS="`echo ${CFLAGS} | sed -e 's,-O[[[:alnum:]]]*,-O0,g'`"
+	CXXFLAGS="`echo ${CXXFLAGS} | sed -e 's,-O[[[:alnum:]]]*,-O0,g'`"
+	OBJCFLAGS="`echo ${OBJCFLAGS} | sed -e 's,-O[[[:alnum:]]]*,-O0,g'`"
+	OBJCXXFLAGS="`echo ${OBJCXXFLAGS} | sed -e 's,-O[[[:alnum:]]]*,-O0,g'`"
+    fi
+
 ])

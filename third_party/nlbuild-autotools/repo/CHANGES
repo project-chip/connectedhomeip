@@ -1,3 +1,10 @@
+1.7.3 (2020-05-11)
+
+        * Addressed an issue in which NL_ENABLE_COVERAGE,
+          NL_ENABLE_DEBUG, and NL_ENABLE_OPTIMIZATION failed to
+          correctly transform their respective flags when the values
+          they control are satisfied from the configuration cache.
+
 1.7.2 (2020-04-22)
 
         * Incorporated changes to refactor makedirs to use sentinel
