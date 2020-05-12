@@ -27,9 +27,11 @@ extern "C" {
 
 namespace chip {
 
-CHIP_ERROR deploy_unit_tests(nlTestSuite * tests);
+typedef int (*ChipUnitTestFunction)(void);
 
-int run_deployed_unit_tests();
+CHIP_ERROR RegisterUnitTests(ChipUnitTestFunction tests);
+
+int RunRegisteredUnitTests();
 
 } // namespace chip
 
