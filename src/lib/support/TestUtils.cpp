@@ -33,7 +33,8 @@ static test_suites_t gs_test_suites;
 
 CHIP_ERROR deploy_unit_tests(nlTestSuite * tests)
 {
-    if (gs_test_suites.num_test_suites >= kTest_Suite_Count_Increments) {
+    if (gs_test_suites.num_test_suites >= kTest_Suite_Count_Increments)
+    {
         return CHIP_ERROR_NO_MEMORY;
     }
 
