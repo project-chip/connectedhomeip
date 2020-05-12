@@ -1,4 +1,5 @@
 #
+#    Copyright 2020 Project nlbuild-autotools Authors. All Rights Reserved.
 #    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +49,7 @@ AC_DEFUN([NL_ENABLE_DEBUG],
         [m4_fatal([$0: invalid default value '$1'; must be 'yes' or 'no'])])
 
     AC_CACHE_CHECK([whether to build debug instances of programs and libraries],
-        nl_cv_build_debug,
+        [nl_cv_build_debug],
         [
             AC_ARG_ENABLE(debug,
                 [AS_HELP_STRING([--enable-debug],[Enable the generation of debug instances @<:@default=$1@:>@.])],
@@ -68,12 +69,13 @@ AC_DEFUN([NL_ENABLE_DEBUG],
                 [
                     nl_cv_build_debug=$1
                 ])
-
-            if test "${nl_cv_build_debug}" = "yes"; then
-                CFLAGS="${CFLAGS} -DDEBUG"
-                CXXFLAGS="${CXXFLAGS} -DDEBUG"
-                OBJCFLAGS="${OBJCFLAGS} -DDEBUG"
-                OBJCXXFLAGS="${OBJCXXFLAGS} -DDEBUG"
-            fi
     ])
+
+    if test "${nl_cv_build_debug}" = "yes"; then
+	CFLAGS="${CFLAGS} -DDEBUG"
+	CXXFLAGS="${CXXFLAGS} -DDEBUG"
+	OBJCFLAGS="${OBJCFLAGS} -DDEBUG"
+	OBJCXXFLAGS="${OBJCXXFLAGS} -DDEBUG"
+    fi
+
 ])
