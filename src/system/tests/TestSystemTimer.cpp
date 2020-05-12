@@ -251,7 +251,7 @@ static int TestTeardown(void * aContext)
     lContext.mLayer->Shutdown();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !(LWIP_VERSION_MAJOR >=2 && LWIP_VERSION_MINOR >= 1)
+#if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
     tcpip_finish(NULL, NULL);
 #endif
 #endif
