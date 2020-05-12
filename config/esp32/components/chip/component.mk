@@ -115,7 +115,7 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
 
 ifneq (,$(findstring CHIP_SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
 CONFIGURE_OPTIONS           += --enable-tests
-CONFIGURE_OPTIONS           += --with-foreign-test-drivers
+CONFIGURE_OPTIONS           += --enable-foreign-test-drivers
 else
 CONFIGURE_OPTIONS           += --disable-tests
 endif

@@ -40,6 +40,7 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
+if !CHIP_SUPPORT_FOREIGN_TEST_DRIVERS
 lib_LIBRARIES                                         = \
     libInetLayerTests.a                                 \
     $(NULL)
@@ -219,6 +220,7 @@ clean-local-coverage:
 	-$(AM_V_at)rm -rf $(CHIP_COVERAGE_BUNDLE)
 endif # CHIP_BUILD_COVERAGE_REPORTS
 endif # CHIP_BUILD_COVERAGE
+endif # CHIP_SUPPORT_FOREIGN_TEST_DRIVERS
 endif # CHIP_BUILD_TESTS
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

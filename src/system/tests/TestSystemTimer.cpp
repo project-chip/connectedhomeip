@@ -224,9 +224,9 @@ static int TestSetup(void * aContext)
     void * lLayerContext   = NULL;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static sys_mbox * sLwIPEventQueue = NULL;
+    static sys_mbox_t * sLwIPEventQueue = NULL;
 
-    sys_mbox_new(&sLwIPEventQueue, 100);
+    sys_mbox_new(sLwIPEventQueue, 100);
     tcpip_init(NULL, NULL);
     lLayerContext = &sLwIPEventQueue;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -248,10 +248,6 @@ static int TestTeardown(void * aContext)
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
 
     lContext.mLayer->Shutdown();
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    tcpip_finish(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     return (SUCCESS);
 }
