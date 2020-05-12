@@ -722,4 +722,10 @@ int TestCHIPArgParser(void)
 
     return (EXIT_SUCCESS);
 }
-#endif
+#else // CHIP_CONFIG_ENABLE_ARG_PARSER
+int TestCHIPArgParser(void)
+{
+    printf("No tests were run\n");
+    return (EXIT_SUCCESS);
+}
+#endif // CHIP_CONFIG_ENABLE_ARG_PARSER

@@ -27,9 +27,9 @@ extern "C" {
 
 namespace chip {
 
-typedef int (*ChipUnitTestFunction)(void);
+typedef int (*UnitTestTriggerFunction)(void);
 
-CHIP_ERROR RegisterUnitTests(ChipUnitTestFunction tests);
+CHIP_ERROR RegisterUnitTests(UnitTestTriggerFunction tests);
 
 int RunRegisteredUnitTests();
 
