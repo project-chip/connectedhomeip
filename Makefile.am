@@ -34,7 +34,7 @@ SUBDIRS                                  = \
     examples                               \
     third_party                            \
     src                                    \
-    doc                                    \
+    docs                                   \
     tests                                  \
     $(NULL)
 
@@ -212,7 +212,7 @@ distclean-local:
 
 .PHONY: docdist
 docdist: $(BUILT_SOURCES)
-	$(MAKE) -C doc docdistdir=$(abs_builddir) $(@)
+	$(MAKE) -C docs docdistdir=$(abs_builddir) $(@)
 
 #
 # Top-level convenience target for making a tools-only distribution

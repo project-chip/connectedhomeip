@@ -18,17 +18,17 @@
 
 #
 #    Description:
-#      This file is the GNU automake template for the Nest Weave
+#      This file is the GNU automake template for the CHIP
 #      API and stack documentation.
 #
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-EXTRA_DIST                                      = \
-    $(srcdir)/Doxyfile.in                         \
-    $(srcdir)/ChipDoxygenLayout.xml              \
-    $(srcdir)/format-file.sh                      \
-    $(srcdir)/namespaces.dox                      \
+EXTRA_DIST                                                = \
+    $(srcdir)/Doxyfile.in                                   \
+    $(srcdir)/ChipDoxygenLayout.xml                         \
+     $(top_srcdir)/scripts/helpers/doxygen-format-check.sh  \
+    $(srcdir)/namespaces.dox                                \
     $(NULL)
 
 #
@@ -88,7 +88,7 @@ html/index.html: Doxyfile
 
 #
 # Addition rules and commands to create a documentation-only
-# distribution of Weave
+# distribution of Chip
 #
 
 $(chip_docdist_name): $(EXTRA_DOCS) html/index.html

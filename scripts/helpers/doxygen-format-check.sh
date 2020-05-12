@@ -18,7 +18,7 @@
 #    limitations under the License.
 #
 
-# Managed namespace constructs within Weave ended up seriously
+# Managed namespace constructs within CHIP ended up seriously
 # confusing Doxygen, and I could not find a nicer way to evaluate
 # those macros via Doxygen's PREDEFINED directives.  Instead, we
 # process the incoming files via this script file.
@@ -26,11 +26,11 @@
 SED=/bin/sed
 FILENAME=${1}
 # clang format has difficulty recognizing the
-# WeaveMakeManagedNamespaceIdentifier() macro as a valid namespace;
+# ChipMakeManagedNamespaceIdentifier() macro as a valid namespace;
 # temporarily change the namespace name to something more palatable to
 # clang-format
 
-sed -e 's:^[ 	]*namespace[ 	]\+WeaveMakeManagedNamespaceIdentifier(\([^ 	,()]\+\),[ 	]*kWeaveManagedNamespaceDesignation_\([^ 	,()]\+\))[ 	]*{[ 	]*$:namespace \1_\2 {:g' \
+sed -e 's:^[ 	]*namespace[ 	]\+ChipMakeManagedNamespaceIdentifier(\([^ 	,()]\+\),[ 	]*kChipManagedNamespaceDesignation_\([^ 	,()]\+\))[ 	]*{[ 	]*$:namespace \1_\2 {:g' \
   -e 's/NS_ENUM(\([_a-zA-Z0-9][_a-zA-Z0-9]*\)[ 	]*,[ 	]*\([_a-zA-Z0-9][_a-zA-Z0-9]*\))/ enum \2 : \1 \2; enum \2 : \1/g' \
   -e 's/__attribute__(([^)]*))//g' \
   -e 's/__attribute__([^)]*)//g' "$FILENAME"

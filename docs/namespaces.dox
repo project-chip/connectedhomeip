@@ -19,28 +19,19 @@
 
 /*
  *    Description:
- *      This file documents all C++ namespaces used within the Weave
+ *      This file documents all C++ namespaces used within the CHIP
  *      Core SDK that are not otherwise documented in an umbrella
  *      header encompassing that namespace.
  *
  */
 
 /**
- *   @namespace nl
+ *   @namespace chip
  *
  *   @brief
- *     This namespace is the outermost namespace for all Weave interfaces.
+ *     This namespace is the outermost namespace for all CHIP interfaces.
  *
- *     @note All Nest Labs interfaces shall appear within this namespace.
- *
- *     @note No third-party interfaces shall appear within this namespace.
- */
-
-/**
- *   @namespace nl::Weave
- *
- *   @brief
- *     This namespace includes interfaces within the Weave Core SDK
- *     that cover the Core stack, the Common and Nest vendor-specific
+ *     This namespace includes interfaces within the CHIP Core SDK
+ *     that cover the Core stack, the Common and vendor-specific
  *     profiles, and the support interfaces.
  */

@@ -914,7 +914,7 @@ IMAGE_PATH             =
 # code is scanned, but not when the output code is generated. If lines are added
 # or removed, the anchors will not be placed correctly.
 
-INPUT_FILTER           = @abs_srcdir@/format-file.sh
+INPUT_FILTER           = @abs_top_srcdir@/scripts/helpers/doxygen-format-check.sh
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
 # basis. Doxygen will compare the file name with each pattern and apply the
