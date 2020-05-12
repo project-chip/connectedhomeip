@@ -27,7 +27,7 @@ const char * TAG = "CHIP-tests";
 extern "C" void app_main()
 {
     ESP_LOGI(TAG, "Starting CHIP tests!");
-    int status = run_deployed_unit_tests();
+    int status = RunRegisteredUnitTests();
     ESP_LOGI(TAG, "CHIP test status: %d", status);
     exit(status);
 }

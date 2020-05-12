@@ -1792,7 +1792,25 @@ AC_SUBST(NLUNIT_TEST_SUBDIRS, [${maybe_nlunit_test_dirstem}])
 AM_CONDITIONAL([CHIP_WITH_NLUNIT_TEST_INTERNAL], [test "${nl_with_nlunit_test}" = "internal"])
 
 # Check if foreign test drivers are enabled
-AM_CONDITIONAL([CHIP_SUPPORT_FOREIGN_TEST_DRIVERS], [test "${with_foreign_test_drivers}" = "yes"])
+AC_MSG_CHECKING([whether to enable foreign test driver])
+AC_ARG_ENABLE(foreign_test_drivers,
+    [AS_HELP_STRING([--enable-foreign-test-drivers],[Enable use of foreign test drivers @<:@default=no@:>@.])],
+    [
+        case "${enableval}" in
+
+        no|yes)
+            foreign_test_drivers=${enableval}
+            ;;
+
+        *)
+            AC_MSG_ERROR([Invalid value ${enableval} for --enable-foreign-test-drivers])
+            ;;
+
+        esac
+    ],
+    [foreign_test_drivers=no])
+AC_MSG_RESULT(${foreign_test_drivers})
+AM_CONDITIONAL([CHIP_SUPPORT_FOREIGN_TEST_DRIVERS], [test "${foreign_test_drivers}" = "yes"])
 
 #
 # Sockets

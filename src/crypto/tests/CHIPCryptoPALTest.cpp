@@ -851,16 +851,7 @@ int TestCHIPCryptoPAL(void)
 void __attribute__((constructor)) my_init(void)
 {
     printf("Deploying CHIP Crypto PAL tests\n");
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "CHIP Crypto PAL tests",
-        &sTests[0],
-        NULL,
-        NULL
-    };
-    // clang-format on
-    if (CHIP_NO_ERROR != deploy_unit_tests(&theSuite))
+    if (CHIP_NO_ERROR != RegisterUnitTests(&TestCHIPCryptoPAL))
     {
         printf("Failed in deploying CHIP Crypto PAL tests\n");
     }
