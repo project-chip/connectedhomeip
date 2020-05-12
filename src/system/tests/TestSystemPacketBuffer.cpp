@@ -132,14 +132,14 @@ static void BufferAlloc(struct TestContext * theContext)
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    lType = PBUF_TYPE(theContext->buf);
+    lType  = PBUF_TYPE(theContext->buf);
     lFlags = theContext->buf->flags;
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
     lPool = theContext->buf->pool;
 #endif // LWIP_PBUF_FROM_CUSTOM_POOLS
     memset(theContext->buf, 0, lAllocSize);
     PBUF_TYPE(theContext->buf) = lType;
-    theContext->buf->flags = lFlags;
+    theContext->buf->flags     = lFlags;
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
     theContext->buf->pool = lPool;
 #endif // LWIP_PBUF_FROM_CUSTOM_POOLS
