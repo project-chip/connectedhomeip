@@ -27,6 +27,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                        = \
+    TestPersistedStorageImplementation.h                \
     $(NULL)
 
 #
@@ -42,9 +43,12 @@ if CHIP_BUILD_TESTS
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
     -I$(top_srcdir)/src/lib                             \
+    -I$(top_srcdir)/src/include                         \
     $(LWIP_CPPFLAGS)                                    \
     $(SOCKETS_CPPFLAGS)                                 \
     $(PTHREAD_CFLAGS)                                   \
+    $(NLASSERT_CPPFLAGS)                                \
+    $(NLUNIT_TEST_CPPFLAGS)                             \
     $(NULL)
 
 CHIP_LDADD                                            = \
@@ -57,6 +61,7 @@ COMMON_LDADD                                          = \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
+    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.
@@ -64,6 +69,8 @@ check_PROGRAMS                                        = \
     TestCHIPArgParser                                   \
     TestErrorStr                                        \
     TestTimeUtils                                       \
+    TestCHIPCounter                                     \
+    TestPersistedCounter                                \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -90,10 +97,22 @@ TestTimeUtils_LDADD                                   = $(COMMON_LDADD)
 TestErrorStr_SOURCES                                  = TestErrorStr.cpp
 TestErrorStr_LDADD                                    = $(COMMON_LDADD)
 
+TestCHIPCounter_SOURCES                               = TestCHIPCounter.cpp
+TestCHIPCounter_LDADD                                 = $(COMMON_LDADD)
+
+TestPersistedCounter_SOURCES                          = \
+    TestPersistedCounter.cpp                            \
+    TestPersistedStorageImplementation.cpp
+TestPersistedCounter_LDADD                            = $(COMMON_LDADD)
+
 # Foreign make dependencies
 
 NLFOREIGN_FILE_DEPENDENCIES                           = \
    $(CHIP_LDADD)                                        \
+   $(NULL)
+
+NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)
 
 if CHIP_BUILD_COVERAGE
