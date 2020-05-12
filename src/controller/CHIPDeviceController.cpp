@@ -19,7 +19,7 @@
 
 /**
  *    @file
- *      Implementation of CHIP Device Manager, a common class
+ *      Implementation of CHIP Device Controller, a common class
  *      that implements discovery, pairing and provisioning of Weave
  *      devices.
  *

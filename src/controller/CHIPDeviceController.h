@@ -19,7 +19,7 @@
 
 /**
  *    @file
- *      Declaration of CHIP Device Manager, a common class
+ *      Declaration of CHIP Device Controller, a common class
  *      that implements connecting and messaging and will later
  *      be expanded to support discovery, pairing and
  *      provisioning of CHIP  devices.
