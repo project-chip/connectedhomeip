@@ -26,8 +26,8 @@
  *
  */
 
-#ifndef __CHIPDEVICEMANAGER_H
-#define __CHIPDEVICEMANAGER_H
+#ifndef __CHIPDEVICECONTROLLER_H
+#define __CHIPDEVICECONTROLLER_H
 
 #include <support/DLLUtil.h>
 #include <core/CHIPCore.h>
@@ -110,4 +110,4 @@ private:
 } // namespace DeviceController
 } // namespace chip
 
-#endif // __CHIPDEVICEMANAGER_H
+#endif // __CHIPDEVICECONTROLLER_H
