@@ -48,7 +48,7 @@ int RunRegisteredUnitTests()
     int status = 0;
     for (uint32_t i = 0; i < gs_test_suites.num_test_suites; i++)
     {
-        status |= gs_test_suites.test_suites[i]();
+        status += gs_test_suites.test_suites[i]();
     }
     return status;
 }
