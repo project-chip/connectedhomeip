@@ -77,7 +77,7 @@ CHIP_ERROR ChipConnection::DoConnect()
         return err;
     }
 
-    err = mUDPEndPoint->Bind(kIPAddressType_IPv4, IPAddress::Any, CHIP_PORT);
+    err = mUDPEndPoint->Bind(mPeerAddr.Type(), IPAddress::Any, CHIP_PORT);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Inet, "Error: %s\n Bind failed\n", ErrorStr(err));

@@ -74,8 +74,8 @@ public:
      *  @param[in]    pktInfo       A pointer to the IPPacketInfo object carrying sender details.
      *
      */
-    typedef void (*MessageReceiveFunct)(ChipConnection * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
-    MessageReceiveFunct OnMessageReceived;
+    typedef void (*MessageReceiveHandler)(ChipConnection * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
+    MessageReceiveHandler OnMessageReceived;
 
     /**
      *  This function is the application callback invoked upon encountering an error when receiving
@@ -88,8 +88,8 @@ public:
      *  @param[in]    pktInfo         A pointer to the IPPacketInfo object carrying sender details.
      *
      */
-    typedef void (*ReceiveErrorFunct)(ChipConnection * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
-    ReceiveErrorFunct OnReceiveError;
+    typedef void (*ReceiveErrorHandler)(ChipConnection * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    ReceiveErrorHandler OnReceiveError;
 
 private:
     Inet::InetLayer * mInetLayer;

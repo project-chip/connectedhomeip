@@ -103,12 +103,17 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     if (mDeviceCon != NULL)
     {
         mDeviceCon->Close();
+        delete mDeviceCon;
         mDeviceCon = NULL;
     }
-
+    mSystemLayer->Shutdown();
+    mInetLayer->Shutdown();
+    delete mSystemLayer;
+    delete mInetLayer;
     mSystemLayer = NULL;
     mInetLayer   = NULL;
-    mConState    = kConnectionState_NotConnected;
+
+    mConState = kConnectionState_NotConnected;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
     mOnError = NULL;
 
@@ -116,18 +121,18 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 }
 
 CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState,
-                                               MessageReceiveFunct OnMessageReceived, ErrorFunct onError, uint16_t peerPort)
+                                               MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mConState != kConnectionState_NotConnected)
+    if (mState != kState_Initialized || mDeviceCon != NULL || mConState != kConnectionState_NotConnected)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
     mDeviceId    = deviceId;
     mDeviceAddr  = deviceAddr;
-    mDevicePort  = peerPort;
+    mDevicePort  = devicePort;
     mAppReqState = appReqState;
     mDeviceCon   = new ChipConnection();
 
@@ -139,14 +144,36 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
     mDeviceCon->OnReceiveError    = OnReceiveError;
     mDeviceCon->AppState          = this;
 
-    mOnComplete.Response = OnMessageReceived;
+    mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
     mConState = kConnectionState_Connected;
 
 exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        mDeviceCon->Close();
+        delete mDeviceCon;
+        mDeviceCon = NULL;
+    }
     return err;
 }
+
+CHIP_ERROR ChipDeviceController::DisconnectDevice()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mState != kState_Initialized || mConState != kConnectionState_Connected)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    err = mDeviceCon->Close();
+    delete mDeviceCon;
+    mDeviceCon = NULL;
+    mConState  = kConnectionState_NotConnected;
+    return err;
+};
 
 CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * buffer)
 {
@@ -222,7 +249,7 @@ void ChipDeviceController::ClearRequestState()
 void ChipDeviceController::OnReceiveMessage(ChipConnection * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
 {
     ChipDeviceController * mgr = (ChipDeviceController *) con->AppState;
-    if (mgr->mConState && mgr->mOnComplete.Response != NULL && pktInfo != NULL)
+    if (mgr->mConState == kConnectionState_Connected && mgr->mOnComplete.Response != NULL && pktInfo != NULL)
     {
         mgr->mOnComplete.Response(mgr, mgr->mAppReqState, msgBuf, pktInfo);
     }
@@ -231,7 +258,7 @@ void ChipDeviceController::OnReceiveMessage(ChipConnection * con, PacketBuffer *
 void ChipDeviceController::OnReceiveError(ChipConnection * con, CHIP_ERROR err, const IPPacketInfo * pktInfo)
 {
     ChipDeviceController * mgr = (ChipDeviceController *) con->AppState;
-    if (mgr->mDeviceCon && mgr->mOnError != NULL && pktInfo != NULL)
+    if (mgr->mConState == kConnectionState_Connected && mgr->mOnError != NULL && pktInfo != NULL)
     {
         mgr->mOnError(mgr, mgr->mAppReqState, err, pktInfo);
     }

@@ -40,10 +40,10 @@ namespace DeviceController {
 class ChipDeviceController;
 
 extern "C" {
-typedef void (*CompleteFunct)(ChipDeviceController * deviceMgr, void * appReqState);
-typedef void (*ErrorFunct)(ChipDeviceController * deviceMgr, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pktInfo);
-typedef void (*MessageReceiveFunct)(ChipDeviceController * deviceMgr, void * appReqState, PacketBuffer * payload,
-                                    const IPPacketInfo * pktInfo);
+typedef void (*CompleteHandler)(ChipDeviceController * deviceMgr, void * appReqState);
+typedef void (*ErrorHandler)(ChipDeviceController * deviceMgr, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceMgr, void * appReqState, PacketBuffer * payload,
+                                      const IPPacketInfo * pktInfo);
 };
 
 class DLL_EXPORT ChipDeviceController
@@ -57,13 +57,47 @@ public:
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
-    CHIP_ERROR ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState, MessageReceiveFunct OnMessageReceived,
-                             ErrorFunct onError, uint16_t peerPort = CHIP_PORT);
+    /**
+     * @brief
+     *   Connect to a CHIP device at a given address and an optional port
+     *
+     * @param deviceId              A device identifier. Currently unused and can be set to any value
+     * @param deviceAddr            The IPAddress of the requested Device
+     * @param appReqState           Application specific context to be passed back when a message is received or on error
+     * @param onMessageReceived     Callback for when a message is received
+     * @param onError               Callback for when an error occurs
+     * @param devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
+     * @return CHIP_ERROR           The connection status
+     */
+    CHIP_ERROR ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState, MessageReceiveHandler onMessageReceived,
+                             ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
 
     // ----- Messaging -----
+    /**
+     * @brief
+     *   Send a message to a connected CHIP device
+     *
+     * @param appReqState   Application specific context to be passed back when a message is received or on error
+     * @param buffer        The Data Buffer to trasmit to the deviec
+     * @return CHIP_ERROR   The return status
+     */
     CHIP_ERROR SendMessage(void * appReqState, PacketBuffer * buffer);
 
+    /**
+     * @brief
+     *   Disconnect from a connected device
+     *
+     * @return CHIP_ERROR   If the device was disconnected successfully
+     */
+    CHIP_ERROR DisconnectDevice();
+
     // ----- IO -----
+    /**
+     * @brief
+     *   Allow the CHIP Stack to process any pending events
+     *   This can be called in an event handler loop to tigger callbacks within the CHIP stack
+     *   Note - Some platforms might need to implement their own event handler
+     */
     void ServiceEvents();
 
 private:
@@ -75,9 +109,8 @@ private:
 
     enum ConnectionState
     {
-        kConnectionState_NotConnected  = 0,
-        kConnectionState_ConnectDevice = 1,
-        kConnectionState_Connected     = 2,
+        kConnectionState_NotConnected = 0,
+        kConnectionState_Connected    = 1,
     };
 
     System::Layer * mSystemLayer;
@@ -89,11 +122,11 @@ private:
 
     union
     {
-        CompleteFunct General;
-        MessageReceiveFunct Response;
+        CompleteHandler General;
+        MessageReceiveHandler Response;
     } mOnComplete;
 
-    ErrorFunct mOnError;
+    ErrorHandler mOnError;
     PacketBuffer * mCurReqMsg;
 
     uint64_t mDeviceId;
