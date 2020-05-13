@@ -111,6 +111,7 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
    $(NULL)
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)
 

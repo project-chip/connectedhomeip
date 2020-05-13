@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,30 +18,12 @@
  */
 
 /**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP TLV unit tests.
- *
+ * @file
+ *   This file defines functions for taking configuration for the LwIP stack
+ *   from the corresponding configuration on the tap interface.
  */
 
-#include "TestCore.h"
+#include <new>
+#include <vector>
 
-#include <core/CHIPConfig.h>
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/tcpip.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#include <nlunit-test.h>
-
-int main(void)
-{
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestCHIPTLV());
-}
+int CollectTapAddresses(std::vector<char *> & addresses, const char * ifName);
