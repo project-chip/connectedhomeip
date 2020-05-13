@@ -24,10 +24,20 @@
 
 #include "TestCore.h"
 
+#include <core/CHIPConfig.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 #include <nlunit-test.h>
 
 int main(void)
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    tcpip_init(NULL, NULL);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
 
