@@ -40,7 +40,7 @@ include support/SupportLayer.am
 EXTRA_DIST                          =                         \
     $(CHIP_BUILD_CORE_LAYER_HEADER_FILES)                     \
     $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)                  \
-    $(CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES)
+    $(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
 
 lib_LIBRARIES                       = libCHIP.a
 

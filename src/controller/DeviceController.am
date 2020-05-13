@@ -31,10 +31,17 @@
 CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES                                       = \
     $(NULL)
 
+CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES                                       = \
+$(NULL)
+
 if CONFIG_HAVE_HEAP
 
 CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES                                      += \
     @top_builddir@/src/controller/CHIPDeviceController.cpp   \
+    $(NULL)
+
+CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES                                      += \
+    @top_builddir@/src/controller/CHIPDeviceController.h   \
     $(NULL)
 
 endif # CONFIG_HAVE_HEAP
