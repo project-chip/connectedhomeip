@@ -2060,6 +2060,7 @@ fi
 #
 AC_CONFIG_FILES([
 Makefile
+docs/Makefile
 examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
