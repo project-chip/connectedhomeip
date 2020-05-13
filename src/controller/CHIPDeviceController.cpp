@@ -50,14 +50,23 @@ using namespace chip::Encoding;
 
 ChipDeviceController::ChipDeviceController()
 {
-    mState = kState_NotInitialized;
+    mState      = kState_NotInitialized;
+    AppState    = NULL;
+    mConState   = kConnectionState_NotConnected;
+    mDeviceCon  = NULL;
+    mCurReqMsg  = NULL;
+    mOnError    = NULL;
+    mDeviceAddr = IPAddress::Any;
+    mDevicePort = CHIP_PORT;
+    mDeviceId   = 0;
+    memset(&mOnComplete, 0, sizeof(mOnComplete));
 }
 
 CHIP_ERROR ChipDeviceController::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AppState = NULL;
+    VerifyOrExit(mState == kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSystemLayer = new System::Layer();
     mInetLayer   = new Inet::InetLayer();
@@ -78,16 +87,6 @@ CHIP_ERROR ChipDeviceController::Init()
     }
     SuccessOrExit(err);
 
-    mConState  = kConnectionState_NotConnected;
-    mDeviceCon = NULL;
-    mCurReqMsg = NULL;
-    memset(&mOnComplete, 0, sizeof(mOnComplete));
-    mOnError = NULL;
-
-    mDeviceAddr = IPAddress::Any;
-    mDevicePort = CHIP_PORT;
-    mDeviceId   = 0;
-
     mState = kState_Initialized;
 
 exit:
@@ -96,9 +95,13 @@ exit:
 
 CHIP_ERROR ChipDeviceController::Shutdown()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mState != kState_Initialized)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
-    mState = kState_NotInitialized;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mState         = kState_NotInitialized;
 
     if (mDeviceCon != NULL)
     {
@@ -150,7 +153,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
     mConState = kConnectionState_Connected;
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR && mDeviceCon != NULL)
     {
         mDeviceCon->Close();
         delete mDeviceCon;
@@ -191,6 +194,11 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
 void ChipDeviceController::ServiceEvents()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+    if (mState != kState_Initialized)
+    {
+        return;
+    }
     // Set the select timeout to 100ms
     struct timeval aSleepTime;
     aSleepTime.tv_sec  = 0;
