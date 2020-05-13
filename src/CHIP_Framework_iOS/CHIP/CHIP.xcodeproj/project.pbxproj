@@ -148,6 +148,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B20252A12459E34F00F97062 /* Build configuration list for PBXNativeTarget "CHIP" */;
 			buildPhases = (
+				0C40A67D246C9AC700885C81 /* ShellScript */,
 				B20252882459E34F00F97062 /* Headers */,
 				B20252892459E34F00F97062 /* Sources */,
 				B202528A2459E34F00F97062 /* Frameworks */,
@@ -232,6 +233,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0C40A67D246C9AC700885C81 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nexport PKG_CONFIG_PATH=\"/usr/local/opt/openssl@1.1/lib/pkgconfig\" && $SRCROOT/../../../bootstrap && cd $SRCROOT/../../../ && make -f $SRCROOT/../../..//Makefile-iOS arm64\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B20252892459E34F00F97062 /* Sources */ = {
