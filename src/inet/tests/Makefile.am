@@ -27,6 +27,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                        = \
+    TapAddrAutoconf.h                                   \
     TestInetCommon.h                                    \
     TestInetCommonOptions.h                             \
     TestInetLayerCommon.hpp                             \
@@ -77,6 +78,7 @@ AM_CPPFLAGS                                           = \
     $(NULL)
 
 libTestInetCommon_a_SOURCES                           = \
+    TapAddrAutoconf.cpp                                 \
     TestInetCommon.cpp                                  \
     TestInetCommonOptions.cpp                           \
     TestInetLayerCommon.cpp                             \
@@ -89,7 +91,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          = \
-    libInetLayerTests.a                                  \
+    libInetLayerTests.a                                 \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
