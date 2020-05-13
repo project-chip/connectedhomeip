@@ -19,7 +19,6 @@
 #define TEST_UTILS_H_
 
 #include <core/CHIPError.h>
-#include <nlunit-test.h>
 
 #if __cplusplus
 extern "C" {
