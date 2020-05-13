@@ -18,8 +18,10 @@
 
 /**
  *    @file
- *      This file implements unit tests for the CHIP Connection implementation.
+ *      This file implements unit tests for the CHIPConnection implementation.
  */
+
+#include "TestCore.h"
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -251,14 +253,10 @@ static int Finalize(void * aContext)
 /**
  *  Main
  */
-int main(int argc, char * argv[])
+int TestCHIPConnection()
 {
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 
-    return nlTestRunnerStats(&sSuite);
+    return (nlTestRunnerStats(&sSuite));
 }

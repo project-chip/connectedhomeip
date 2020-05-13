@@ -43,6 +43,7 @@ lib_LIBRARIES                                         = \
 libCoreTests_a_SOURCES                                = \
     TestCHIPErrorStr.cpp                                \
     TestCHIPTLV.cpp                                     \
+    TestCHIPConnection.cpp                              \
     $(NULL)
 
 libCoreTests_adir                                     = $(includedir)
@@ -110,7 +111,7 @@ TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
 TestCHIPTLV_SOURCES                                   = TestCHIPTLVDriver.cpp
 TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
 
-TestCHIPConnection_SOURCES                            = TestCHIPConnection.cpp
+TestCHIPConnection_SOURCES                            = TestCHIPConnectionDriver.cpp
 TestCHIPConnection_LDADD                              = $(COMMON_LDADD)
 #
 # Foreign make dependencies
