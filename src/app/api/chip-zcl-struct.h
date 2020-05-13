@@ -75,7 +75,7 @@ enum
 // All zclip structs (i.e. Struct spec and Field specs) have a
 // header info block == 2 ZclipStructSpec fields, which are actually
 // one FieldSpec followed by a char pointer.
-#define CHIP_ZCL_STRUCT_STRUCT_HEADER_SIZE 2
+#define CHIP_ZCL_STRUCT_HEADER_SIZE 2
 
 // Defined as unsigned long to align with width of a pointer for both
 // 32-bit and 64-bit architectures (host apps). This allows the "name"
@@ -192,5 +192,59 @@ uint32_t chipZclFetchInt32uValue(const uint8_t * valueLoc, uint16_t valueSize);
 int32_t chipZclFetchInt32sValue(const uint8_t * valueLoc, uint16_t valueSize);
 void chipZclStoreInt32sValue(uint8_t * valueLoc, int32_t value, uint8_t valueSize);
 void chipZclStoreInt32uValue(uint8_t * valueLoc, uint32_t value, uint8_t valueSize);
+
+/**
+ * @addtogroup ZCLIP_utilities Utilities
+ *
+ * @{
+ */
+
+/**
+ * The longest ZCL/IP URI is:
+ *   coaps://nih:sha-256;<uid>:PPPPP/zcl/g/GGGG/RMMMM_CCCC/a/AAAA
+ * where <uid> is a 256-bit UID represented as 64 hexadecimal characters, PPPPP
+ * is a 16-bit UDP port in decimal, GGGG is the 16-bit group ID in hexadecimal,
+ * R is c or s for client or server, MMMM is the 16-bit manufacturer code in
+ * hexadecimal, CCCC is the 16-bit cluster ID in hexadecimal, and AAAA is the
+ * 16-bit attribute ID in hexadecimal.  An extra byte is reserved for a null
+ * terminator. */
+#define CHIP_ZCL_URI_MAX_LENGTH 120
+
+/**
+ * The longest ZCL/IP URI path is a manufacturer-specific attribute request
+ * sent to a group:
+ *   zcl/g/GGGG/RMMMM_CCCC/a/AAAA
+ * where GGGG is the 16-bit group ID, R is c or s for client or server, MMMM is
+ * the 16-bit manufacturer code, CCCC is the 16-bit cluster ID, and AAAA is the
+ * 16-bit attribute ID.  An extra byte is reserved for a null terminator. */
+#define CHIP_ZCL_URI_PATH_MAX_LENGTH 29
+
+/**
+ * The longest cluster ID in a ZCL/IP URI path is manufacturer-specific:
+ *   RMMMM_CCCC
+ * where R is c or s for client or server, MMMM is the 16-bit manufacturer
+ * code, and CCCC is the 16-bit cluster ID.  An extra byte is reserved for a
+ * null terminator. */
+#define CHIP_ZCL_URI_PATH_CLUSTER_ID_MAX_LENGTH 11
+
+/**
+ * Manufacturer codes, if present, are separated from the cluster ID by an
+ * underscore. */
+#define CHIP_ZCL_URI_PATH_MANUFACTURER_CODE_CLUSTER_ID_SEPARATOR '_'
+
+/** String overhead. */
+#define CHIP_ZCL_STRING_OVERHEAD 1
+/** Maximum string length. */
+#define CHIP_ZCL_STRING_LENGTH_MAX 0xFE
+/** Invalid string length. */
+#define CHIP_ZCL_STRING_LENGTH_INVALID 0xFF
+/** Long string overhead. */
+#define CHIP_ZCL_LONG_STRING_OVERHEAD 2
+/** Maximum long string length. */
+#define CHIP_ZCL_LONG_STRING_LENGTH_MAX 0xFFFE
+/** Invalid long string length. */
+#define CHIP_ZCL_LONG_STRING_LENGTH_INVALID 0xFFFF
+
+/** @} end addtogroup */
 
 #endif // CHIP_ZCL_STRUCT

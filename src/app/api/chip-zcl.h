@@ -562,5 +562,10 @@ ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const
 #define LOW_BYTE(n) ((uint8_t)((n) &0xFF))
 #define HIGH_BYTE(n) ((uint8_t)(LOW_BYTE((n) >> 8)))
 #define IS_BIG_ENDIAN() false
+/**
+ * @brief Returns the value built from the two \c uint8_t
+ * values \c high and \c low.
+ */
+#define HIGH_LOW_TO_INT(high, low) (((uint16_t)(((uint16_t)(high)) << 8)) + ((uint16_t)((low) &0xFF)))
 
 #endif // CHIP_ZCL_MASTER_HEADER

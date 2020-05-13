@@ -23,8 +23,3 @@
 #ifdef CHIP_TEST
 #include "utest.h"
 #endif
-
-/**
- * @brief Starts the encoding process.
- */
-void chipZclCodecStartEncoding(uint8_t * buffer, uint8_t index, uint8_t length);
