@@ -1,4 +1,4 @@
-PLUGINS = cluster-server-basic cluster-server-on-off cluster-server-level-control cluster-server-identify core-data-model core-message-dispatch test-on-off
+PLUGINS = cluster-server-basic cluster-server-on-off cluster-server-level-control cluster-server-identify core-data-model core-message-dispatch test-on-off codec-simple
 
 subsystem:
 	for p in $(PLUGINS); do cd plugin/$$p && $(MAKE); cd ../..; done
