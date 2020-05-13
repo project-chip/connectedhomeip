@@ -27,9 +27,10 @@
 #ifndef CHIP_BLE_H
 #define CHIP_BLE_H
 
+#include <ble/BleConfig.h>
+
 #include <ble/BLEEndPoint.h>
 #include <ble/BleApplicationDelegate.h>
-#include <ble/BleConfig.h>
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <ble/BlePlatformDelegate.h>
