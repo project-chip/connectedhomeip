@@ -108,6 +108,7 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
                                --with-crypto=mbedtls \
                                --with-mbedtls-includes=$(IDF_PATH)/components/mbedtls/mbedtls/include \
                                --with-mbedtls-libs=$(BUILD_DIR_BASE)/mbedtls \
+                               --with-target-style=embedded \
                                --disable-tools \
                                --disable-docs \
                                --disable-java \
@@ -115,7 +116,6 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
 
 ifneq (,$(findstring CHIP_SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
 CONFIGURE_OPTIONS           += --enable-tests
-CONFIGURE_OPTIONS           += --enable-foreign-test-drivers
 else
 CONFIGURE_OPTIONS           += --disable-tests
 endif
