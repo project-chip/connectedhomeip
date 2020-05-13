@@ -55,9 +55,44 @@ public:
 
     void * AppState; /**< A pointer to the application-specific state object. */
 
+    /**
+     * @brief
+     *   Initialize a CHIP Connection
+     *
+     * @param inetLayer     A pointer to the <tt>chip::Inet::InetLayer</tt>
+     */
     void Init(Inet::InetLayer * inetLayer);
+
+    /**
+     * @brief
+     *   Attempt to establish a connection to the given peer
+     *
+     * @param peerNodeId    Currently unused; a NodeId to identify this peer
+     * @param peerAddr      The <tt>chip::Inet::IPAddress</tt> of the requested peer
+     * @param peerPort      The port of the requested peer
+     * @return CHIP_ERROR   The connection result
+     */
     CHIP_ERROR Connect(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort = 0);
+
+    /**
+     * @brief
+     *   Send a message to the currently connected peer
+     *
+     * @param msgBuf        A PacketBuffer containing the message to be sent
+     * @return CHIP_ERROR   The send result
+     *
+     * @details
+     *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
+     *   behalf of the caller regardless of the return status.
+     */
     CHIP_ERROR SendMessage(PacketBuffer * msgBuf);
+
+    /**
+     * @brief
+     *   Close an existing connection. This allows reusing this Connection object.
+     *
+     * @return CHIP_ERROR   The close result
+     */
     CHIP_ERROR Close(void);
 
     void Retain(void);

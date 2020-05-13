@@ -46,15 +46,13 @@ struct TestContext
 
 struct TestContext sContext;
 
-static const char * PAYLOAD = "Hello!";
+static const char PAYLOAD[] = "Hello!";
 
 static void MessageReceiveHandler(ChipConnection * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
 {
     size_t data_len = msgBuf->DataLength();
-    char msg_buffer[data_len];
-    msg_buffer[data_len] = 0; // Null-terminate
-    memcpy(msg_buffer, msgBuf->Start(), data_len);
-    int compare = strncmp(msg_buffer, PAYLOAD, data_len);
+
+    int compare = memcmp(msgBuf->Start(), PAYLOAD, data_len);
     NL_TEST_ASSERT(reinterpret_cast<nlTestSuite *>(con->AppState), compare == 0);
 };
 
@@ -152,10 +150,10 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    size_t payload_len = strlen(PAYLOAD);
+    size_t payload_len = sizeof(PAYLOAD);
 
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
-    snprintf((char *) buffer->Start(), payload_len + 1, "%s", PAYLOAD);
+    memmove(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
 
     IPAddress addr;

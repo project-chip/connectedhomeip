@@ -116,15 +116,13 @@ CHIP_ERROR ChipConnection::SendMessage(PacketBuffer * msgBuf)
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
 
-    // UDP EndPoint's SendMsg decrements the ref count
-    msgBuf->AddRef();
-
     IPPacketInfo addrInfo;
     addrInfo.Clear();
     addrInfo.DestAddress = mPeerAddr;
     addrInfo.DestPort    = mPeerPort;
 
-    err = mUDPEndPoint->SendMsg(&addrInfo, msgBuf);
+    err    = mUDPEndPoint->SendMsg(&addrInfo, msgBuf);
+    msgBuf = NULL;
 
 exit:
     if (msgBuf != NULL)
