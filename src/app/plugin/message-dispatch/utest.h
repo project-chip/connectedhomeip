@@ -26,8 +26,10 @@
 #define UTEST_H
 
 #include "chip-zcl.h"
-#include "gen-types.h"
 #include "dispatch.h"
 #include "general-command-handler.h"
+
+#include "gen-types.h"
+
 #include <stdio.h>
 #endif /*  UTEST_H */

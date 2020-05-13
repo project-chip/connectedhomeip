@@ -38,7 +38,9 @@
 #define CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL 0
 
 #include "chip-zcl.h"
-#include "gen-types.h"
+
 #include "gen-cluster-id.h"
+#include "gen-types.h"
+
 #include <stdio.h>
 #endif /*  UTEST_H */

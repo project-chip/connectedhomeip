@@ -29,9 +29,10 @@
 #define CHIP_ZCL_COMMAND_PARSE_HEADER
 
 #include "chip-zcl.h"
-#include "gen-types.h"
+
 #include "gen-cluster-id.h"
 #include "gen-command-id.h"
+#include "gen-types.h"
 
 // This is a set of generated prototype for functions that parse the
 // the incomming message, and call appropriate command handler.

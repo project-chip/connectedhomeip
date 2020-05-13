@@ -3,7 +3,7 @@ REQUIRED_PLUGINS=../zcl-data-model/zcl-data-model.o ../../utest-gen/gen-callback
 
 # ---------- GENERIC -------------
 CC=gcc
-CFLAGS="-I../../api/" "-I../../utest-gen/" -DCHIP_TEST
+CFLAGS="-I../../api/" "-I../../utest-gen/" "-I../zcl-data-model" -DCHIP_TEST
 
 $(NAME).out: $(NAME).o utest.o ../../api/mock/mock.o $(REQUIRED_PLUGINS)
 	$(CC) -o $(NAME).out $(NAME).o ../../api/mock/mock.o utest.o  $(REQUIRED_PLUGINS)
