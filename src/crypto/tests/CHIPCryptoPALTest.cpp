@@ -17,18 +17,18 @@
 
 #include "TestCryptoLayer.h"
 
-#include "CHIPCryptoPAL.h"
 #include "AES_CCM_128_test_vectors.h"
 #include "AES_CCM_256_test_vectors.h"
 #include "ECDH_P256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
 
+#include <CHIPCryptoPAL.h>
 #include <nlunit-test.h>
-#include <stdio.h>
-#include <string.h>
 #include <support/CodeUtils.h>
-#include <stdlib.h>
+
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 
 using namespace chip;
 using namespace chip::Crypto;
