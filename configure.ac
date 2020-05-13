@@ -2044,11 +2044,15 @@ fi
 
 if test "${nl_with_nlfaultinjection}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
-AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo"/src])
+AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo/src"])
 fi
 
 if test "${nl_with_mbedtls}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
+fi
+
+if test "${nl_with_lwip}" = "internal"; then
+AC_SUBST(LWIP_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/src/lwip"])
 fi
 
 #
