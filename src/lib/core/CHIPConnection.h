@@ -319,12 +319,6 @@ public:
     void GetPeerDescription(char * buf, size_t bufSize) const;
 
     CHIP_ERROR SendMessage(ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
-#if CHIP_CONFIG_ENABLE_TUNNELING
-    /**
-     * Function to send a Tunneled packet over a CHIP connection.
-     */
-    CHIP_ERROR SendTunneledMessage(ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
-#endif
 
     // TODO COM-311: implement EnableReceived/DisableReceive for BLE ChipConnections.
     void EnableReceive(void);
@@ -385,22 +379,6 @@ public:
      */
     typedef void (*MessageReceiveFunct)(ChipConnection * con, ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
     MessageReceiveFunct OnMessageReceived;
-
-#if CHIP_CONFIG_ENABLE_TUNNELING
-    /**
-     *  This function is the application callback that is invoked upon receipt of a Tunneled data packet over the
-     *  CHIP connection.
-     *
-     *  @param[in]     con            A pointer to the ChipConnection object.
-     *
-     *  @param[in]     msgInfo        A pointer to the ChipMessageInfo object.
-     *
-     *  @param[in]     msgBuf         A pointer to the System::PacketBuffer object containing the tunneled packet received.
-     *
-     */
-    typedef void (*TunneledMsgReceiveFunct)(ChipConnection * con, const ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
-    TunneledMsgReceiveFunct OnTunneledMessageReceived;
-#endif
 
     /**
      *  This function is the application callback invoked upon encountering an error when receiving
