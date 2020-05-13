@@ -100,7 +100,7 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
                                --with-lwip=$(LWIP_COMPONENT_DIR) \
                                --with-inet-endpoint="tcp udp" \
                                --with-logging-style=external \
-                               --with-chip-project-includes= \
+                               --with-chip-project-includes=$(CONFIG_CHIP_PROJECT_CONFIG) \
                                --with-chip-system-project-includes= \
                                --with-chip-inet-project-includes= \
                                --with-chip-ble-project-includes= \

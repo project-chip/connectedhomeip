@@ -378,6 +378,11 @@ endmenu # "CHIP"
 menu "CHIP Device Layer"
 
     menu "General Options"
+        config CHIP_PROJECT_CONFIG
+            string "CHIP Project Configuration file"
+            default ""
+            help
+                CHIP's project configuration file location.
 
         config CHIP_TASK_STACK_SIZE
             int "CHIP Task Stack Size"
