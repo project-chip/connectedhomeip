@@ -61,7 +61,7 @@ static void ReceiveErrorHandler(ChipConnection * con, CHIP_ERROR err, const IPPa
     NL_TEST_ASSERT(reinterpret_cast<nlTestSuite *>(con->AppState), false);
 };
 
-void DriveIO(TestContext & ctx)
+static void DriveIO(TestContext & ctx)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Set the select timeout to 100ms
