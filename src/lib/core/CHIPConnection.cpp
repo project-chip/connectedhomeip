@@ -407,12 +407,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
 CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, const char * peerAddr, uint16_t peerAddrLen,
                                    uint16_t defaultPort)
 {
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    const uint8_t dnsOptions = ::chip::Inet::kDNSOption_Default;
-#else
-    const uint8_t dnsOptions = 0;
-#endif
-    return Connect(peerNodeId, authMode, peerAddr, peerAddrLen, dnsOptions, defaultPort);
+    return Connect(peerNodeId, authMode, peerAddr, peerAddrLen, 0 /* dnsOptions */, defaultPort);
 }
 
 /**
@@ -508,14 +503,7 @@ CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, ChipAuthMode authMode, c
 
     ChipLogProgress(MessageLayer, "Con start %04X %016llX %04X", LogId(), peerNodeId, authMode);
 
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    // Initiate the host name resolution.
-    State = kState_Resolving;
-    err   = Context->InetLayer()->ResolveHostAddress(hostName, hostNameLen, dnsOptions, CHIP_CONFIG_CONNECT_IP_ADDRS, mPeerAddrs,
-                                                   HandleResolveComplete, this);
-#else  // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    err                      = StartConnectToAddressLiteral(hostName, hostNameLen);
-#endif // !CHIP_CONFIG_ENABLE_DNS_RESOLVER
+    err = StartConnectToAddressLiteral(hostName, hostNameLen);
 
 exit:
     return err;
@@ -1066,13 +1054,6 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
                 mTcpEndPoint->Free();
                 mTcpEndPoint = NULL;
             }
-
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-            // Cancel any outstanding DNS query that may still be active.  (This situation can
-            // arise if the application initiates a connection to a peer using a DNS name and
-            // then aborts/closes the connection before the DNS lookup completes).
-            Context->InetLayer()->CancelResolveHostAddress(HandleResolveComplete, this);
-#endif // CHIP_CONFIG_ENABLE_DNS_RESOLVER
         }
 
         uint8_t oldState = State;
@@ -1488,10 +1469,7 @@ void ChipConnection::Init(ChipConnectionContext * context)
     SendSourceNodeId = false;
     SendDestNodeId   = false;
     mConnectTimeout  = 0;
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    mDNSOptions = 0;
-#endif
-    mFlags = 0;
+    mFlags           = 0;
 }
 
 // Default OnConnectionClosed handler.

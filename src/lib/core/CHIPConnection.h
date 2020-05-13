@@ -404,9 +404,6 @@ private:
     Inet::InterfaceId mTargetInterface;
     uint32_t mConnectTimeout;
     uint8_t mRefCount;
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    uint8_t mDNSOptions;
-#endif
 
     enum FlagsEnum
     {
