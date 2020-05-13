@@ -26,14 +26,14 @@
 # mobiles) or within resource rich devices (typically linux based).  As
 # such it depends on the presense of a generalized heap (malloc el al).
 # In contexts where this isn't available, simply skip building the Device
-# Manager code altogether.
+# Controller code altogether.
 
-CHIP_BUILD_DEVICE_MANAGER_SOURCE_FILES                                       = \
+CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES                                       = \
     $(NULL)
 
 if CONFIG_HAVE_HEAP
 
-CHIP_BUILD_DEVICE_MANAGER_SOURCE_FILES                                      += \
+CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES                                      += \
     @top_builddir@/src/controller/CHIPDeviceController.cpp   \
     $(NULL)
 
