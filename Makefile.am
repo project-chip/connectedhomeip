@@ -34,8 +34,8 @@ SUBDIRS                                  = \
     examples                               \
     third_party                            \
     src                                    \
-    docs                                   \
     tests                                  \
+    docs                                   \
     $(NULL)
 
 PRETTY_SUBDIRS                           = \

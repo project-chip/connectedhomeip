@@ -2056,6 +2056,7 @@ fi
 #
 AC_CONFIG_FILES([
 Makefile
+docs/Makefile
 examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
@@ -2080,7 +2081,6 @@ src/lib/support/Makefile
 src/lib/support/tests/Makefile
 src/platform/Makefile
 tests/Makefile
-docs/Makefile
 ])
 
 #

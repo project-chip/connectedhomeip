@@ -24,11 +24,11 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-EXTRA_DIST                                                = \
-    $(srcdir)/Doxyfile.in                                   \
-    $(srcdir)/ChipDoxygenLayout.xml                         \
-     $(top_srcdir)/scripts/helpers/doxygen-format-check.sh  \
-    $(srcdir)/namespaces.dox                                \
+EXTRA_DIST                                               = \
+    $(srcdir)/Doxyfile.in                                  \
+    $(srcdir)/ChipDoxygenLayout.xml                        \
+    $(top_srcdir)/scripts/helpers/doxygen-format-check.sh  \
+    $(srcdir)/namespaces.dox                               \
     $(NULL)
 
 #
