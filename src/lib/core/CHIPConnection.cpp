@@ -32,18 +32,30 @@
 
 namespace chip {
 
-void ChipConnection::Init(Inet::InetLayer * inetLayer)
+void ChipConnection::ChipConnection() : mState(kState_NotReady), mRefCount(1)
 {
-    mInetLayer        = inetLayer;
-    mPeerNodeId       = 0;
-    mPeerAddr         = IPAddress::Any;
-    mPeerPort         = 0;
-    mState            = ChipConnection::kState_ReadyToConnect;
+    mState            = kState_NotReady;
+    mRefCount         = 1;
     mUDPEndPoint      = NULL;
     mRefCount         = 1;
     OnMessageReceived = NULL;
     OnReceiveError    = NULL;
+    mPeerNodeId       = 0;
+    mPeerAddr         = IPAddress::Any;
+    mPeerPort         = 0;
 }
+
+void ChipConnection::Init(Inet::InetLayer * inetLayer)
+{
+    if (mState != kState_NotReady)
+    {
+        return;
+    }
+
+    mInetLayer = inetLayer;
+    mState     = kState_ReadyToConnect;
+
+} // namespace chip
 
 CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort)
 {
@@ -111,10 +123,7 @@ CHIP_ERROR ChipConnection::SendMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (!StateAllowsSend())
-    {
-        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
-    }
+    VerifyOrExit(StateAllowsSend, err = CHIP_ERROR_INCORRECT_STATE);
 
     IPPacketInfo addrInfo;
     addrInfo.Clear();

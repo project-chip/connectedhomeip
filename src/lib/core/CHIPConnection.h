@@ -48,9 +48,10 @@ public:
     enum State
     {
         // TODO need more modes when TCP support is added
-        kState_ReadyToConnect = 0, /**< State after initialization of the CHIP connection. */
-        kState_Connected      = 1, /**< State when the connection has been established. */
-        kState_Closed         = 2  /**< State when the connection is closed. */
+        kState_NotReady       = 0, /**< State before initialization. */
+        kState_ReadyToConnect = 1, /**< State after initialization of the CHIP connection. */
+        kState_Connected      = 2, /**< State when the connection has been established. */
+        kState_Closed         = 3  /**< State when the connection is closed. */
     };
 
     void * AppState; /**< A pointer to the application-specific state object. */
@@ -89,7 +90,7 @@ public:
 
     /**
      * @brief
-     *   Close an existing connection. This allows reusing this Connection object.
+     *   Close an existing connection. Once close is called, the ChipConnection object can no longer be used
      *
      * @return CHIP_ERROR   The close result
      */
@@ -126,13 +127,15 @@ public:
     typedef void (*ReceiveErrorHandler)(ChipConnection * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
     ReceiveErrorHandler OnReceiveError;
 
+    ChipConnection();
+
 private:
     Inet::InetLayer * mInetLayer;
     UDPEndPoint * mUDPEndPoint;
     uint64_t mPeerNodeId;
     IPAddress mPeerAddr;
     uint16_t mPeerPort;
-    uint8_t mState;
+    State mState;
     uint8_t mRefCount;
 
     CHIP_ERROR DoConnect();
