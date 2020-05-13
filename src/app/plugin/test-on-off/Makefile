@@ -1,6 +1,6 @@
 NAME=utest-on-off
 GEN=../../gen
-REQUIRED_PLUGINS=../core-data-model/zcl-data-model.o ../cluster-server-on-off/on-off-server.o ../../utest-gen/gen-callback-stubs.o ../binding-mock/mock.o
+REQUIRED_PLUGINS=../core-data-model/zcl-data-model.o ../cluster-server-on-off/on-off-server.o $(GEN)/gen-callback-stubs.o ../binding-mock/mock.o
 
 # ---------- GENERIC -------------
 CC=gcc
