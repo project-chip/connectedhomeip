@@ -28,10 +28,10 @@ using namespace ::chip::Inet;
 static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
 
 // Device Manager Callbacks
-static void EchoResponse(chip::DeviceController::ChipDeviceController * deviceMgr, void * appReqState,
+static void EchoResponse(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState,
                          System::PacketBuffer * buffer, const IPPacketInfo * packet_info)
 {
-    bool status = deviceMgr != NULL && buffer != NULL && packet_info != NULL;
+    bool status = deviceController != NULL && buffer != NULL && packet_info != NULL;
 
     if (status)
     {
@@ -72,7 +72,7 @@ static void EchoResponse(chip::DeviceController::ChipDeviceController * deviceMg
     }
 }
 
-static void ReceiveError(chip::DeviceController::ChipDeviceController * deviceMgr, void * appReqState, CHIP_ERROR error,
+static void ReceiveError(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
                          const IPPacketInfo * pi)
 {
     printf("ERROR: %s\n Got UDP error\n", ErrorStr(error));

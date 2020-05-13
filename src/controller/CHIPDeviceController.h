@@ -40,9 +40,10 @@ namespace DeviceController {
 class ChipDeviceController;
 
 extern "C" {
-typedef void (*CompleteHandler)(ChipDeviceController * deviceMgr, void * appReqState);
-typedef void (*ErrorHandler)(ChipDeviceController * deviceMgr, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pktInfo);
-typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceMgr, void * appReqState, PacketBuffer * payload,
+typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * appReqState);
+typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
+                             const IPPacketInfo * pktInfo);
+typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, PacketBuffer * payload,
                                       const IPPacketInfo * pktInfo);
 };
 
