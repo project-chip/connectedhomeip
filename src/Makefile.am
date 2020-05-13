@@ -55,11 +55,11 @@ endif # CONFIG_DEVICE_LAYER
 
 DIST_SUBDIRS                      = \
     include                         \
+    lwip                            \
     system                          \
     $(BLE_SUBDIRS)                  \
     inet                            \
     lib                             \
-    lwip                            \
     setup_payload                   \
     crypto                          \
     $(PLATFORM_SUBDIRS)             \
@@ -69,12 +69,12 @@ DIST_SUBDIRS                      = \
 
 SUBDIRS                           = \
     include                         \
+    lwip                            \
     lib/support                     \
     system                          \
     $(MAYBE_BLE_SUBDIRS)            \
     inet                            \
     lib                             \
-    lwip                            \
     setup_payload                   \
     crypto                          \
     $(MAYBE_PLATFORM_SUBDIRS)       \
