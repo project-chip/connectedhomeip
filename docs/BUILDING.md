@@ -146,7 +146,8 @@ To build the documentation bundle using doxygen, run the following:
 make docdist
 ```
 
-The top of the browsable web documentation can be found in `docs/html/index.html`.
+The top of the browsable web documentation can be found in
+`docs/html/index.html`.
 
 -   [x] **Build just one module in a subdirectory**
 
