@@ -65,11 +65,10 @@ enum
 
     kChipHeaderFlag_DestNodeId   = 0x0100, /**< Indicates that the destination node ID is present in the CHIP message header. */
     kChipHeaderFlag_SourceNodeId = 0x0200, /**< Indicates that the source node ID is present in the CHIP message header. */
-    kChipHeaderFlag_TunneledData = 0x0400, /**< Indicates that the CHIP message payload is a tunneled IP packet. */
     kChipHeaderFlag_MsgCounterSyncReq = 0x0800, /**< Indicates that the sender requests message counter synchronization. */
 
     kMsgHeaderField_ReservedFlagsMask = kMsgHeaderField_FlagsMask & ~kChipHeaderFlag_DestNodeId & ~kChipHeaderFlag_SourceNodeId &
-        ~kChipHeaderFlag_TunneledData & ~kChipHeaderFlag_MsgCounterSyncReq,
+        ~kChipHeaderFlag_MsgCounterSyncReq,
 
     kMsgHeaderField_MessageHMACMask =
         ~((kChipHeaderFlag_DestNodeId | kChipHeaderFlag_SourceNodeId | kChipHeaderFlag_MsgCounterSyncReq)
@@ -122,8 +121,6 @@ typedef enum ChipMessageFlags
     /**< Indicates that the destination node ID is present in the CHIP message header. */
     kChipMessageFlag_SourceNodeId = kChipHeaderFlag_SourceNodeId,
     /**< Indicates that the source node ID is present in the CHIP message header. */
-    kChipMessageFlag_TunneledData = kChipHeaderFlag_TunneledData,
-    /**< Indicates that the CHIP message payload is a tunneled IP packet. */
     kChipMessageFlag_MsgCounterSyncReq = kChipHeaderFlag_MsgCounterSyncReq,
     /**< Indicates that the sender requests peer's message counter synchronization. */
 
