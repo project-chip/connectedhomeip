@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013-2017 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,31 +17,21 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP TLV unit tests.
+/*
+ *    Description:
+ *      This file documents all C++ namespaces used within the CHIP
+ *      Core SDK that are not otherwise documented in an umbrella
+ *      header encompassing that namespace.
  *
  */
 
-#include "TestCore.h"
-
-#include <core/CHIPConfig.h>
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/tcpip.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#include <nlunit-test.h>
-
-int main(void)
-{
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestCHIPTLV());
-}
+/**
+ *   @namespace chip
+ *
+ *   @brief
+ *     This namespace is the outermost namespace for all CHIP interfaces.
+ *
+ *     This namespace includes interfaces within the CHIP Core SDK
+ *     that cover the Core stack, the Common and vendor-specific
+ *     profiles, and the support interfaces.
+ */

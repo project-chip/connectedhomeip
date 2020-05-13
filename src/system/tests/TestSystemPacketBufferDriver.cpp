@@ -25,6 +25,8 @@
 
 #include "TestSystemLayer.h"
 
+#include <system/SystemConfig.h>
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

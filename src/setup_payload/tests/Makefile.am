@@ -59,6 +59,7 @@ AM_CPPFLAGS                                    = \
     -I$(top_srcdir)/src/lib                      \
     -I$(top_srcdir)/src/system                   \
     -I$(top_srcdir)/src/setup_payload            \
+    $(LWIP_CPPFLAGS)                             \
     $(NULL)
 
 COMMON_LDADD                                   = \
