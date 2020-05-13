@@ -25,4 +25,48 @@
 #ifndef CHIP_ZCL_CODEC
 #define CHIP_ZCL_CODEC
 
+/**
+ * Base types for the codec. This is a smaller subset than the actual ZCL types, and the
+ * generated layer for a specific code is responsible for mapping ZCL types onto these
+ * base types.
+ */
+enum
+{
+    CHIP_ZCL_CODEC_TYPE_BOOLEAN,
+
+    CHIP_ZCL_CODEC_TYPE_INTEGER,
+    CHIP_ZCL_CODEC_TYPE_UNSIGNED_INTEGER,
+
+    CHIP_ZCL_CODEC_TYPE_BINARY,
+    CHIP_ZCL_CODEC_TYPE_FIXED_LENGTH_BINARY,
+
+    CHIP_ZCL_CODEC_TYPE_STRING,
+    CHIP_ZCL_CODEC_TYPE_MAX_LENGTH_STRING,
+
+    // These are used for struct-based encoding/decoding from/to an
+    // EmberZclStringType_t substructure.
+    CHIP_ZCL_CODEC_TYPE_UINT8_LENGTH_STRING,
+    CHIP_ZCL_CODEC_TYPE_UINT16_LENGTH_STRING,
+
+    // Additional types for non-struct internal use.
+    //
+    // These allow direct encoding/decoding from/to a buffer containing a
+    // length-prefixed binary or text string.
+    CHIP_ZCL_CODEC_TYPE_UINT8_LENGTH_PREFIXED_BINARY,
+    CHIP_ZCL_CODEC_TYPE_UINT16_LENGTH_PREFIXED_BINARY,
+    CHIP_ZCL_CODEC_TYPE_UINT8_LENGTH_PREFIXED_STRING,
+    CHIP_ZCL_CODEC_TYPE_UINT16_LENGTH_PREFIXED_STRING,
+
+    // Used for NULL and other weird cases.
+    CHIP_ZCL_CODEC_TYPE_MISC,
+
+    // Markers that are not really value types.
+    CHIP_ZCL_CODEC_START_MARKER,
+    CHIP_ZCL_CODEC_ARRAY_MARKER
+};
+
+/**
+ * @brief Start a decoding session.
+ */
+
 #endif // CHIP_ZCL_CODEC

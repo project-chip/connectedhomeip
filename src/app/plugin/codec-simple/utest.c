@@ -21,10 +21,22 @@
  *
  */
 
+#include <stdlib.h>
+#include <memory.h>
 #include "utest.h" /* TODO pass all that stuff in -D */
+#include "../../api/chip-zcl-codec.h"
 
 int main()
 {
+    // Let's assume we are encoding and decoding a 100 byte buffer that contains
+    // the following data:
+    //   unsigned int, 1 byte, value = 0x13
+    //   unsigned int, 2 bytes, value = 0x4231
+    //   unsigned int, 4 bytes, value = 0xABCD1234
+    //   unsigned length-prefixed string, 1 byte length, value of string "This is an example of the string."
+    //
+    int8_t * buffer = malloc(1000); // Make sure we have enough space
+
     printf("Success \n");
     return 0;
 }
