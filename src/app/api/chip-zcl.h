@@ -268,11 +268,19 @@ typedef uint16_t ChipZclDeviceId_t;
 /** A distinguished value that represents a null (invalid) device identifer. */
 #define CHIP_ZCL_DEVICE_ID_NULL ((ChipZclDeviceId_t) -1)
 
+/**
+ * Structure that describes the raw buffers passed between the CHIP layers and the Zap layer.
+ */
+typedef struct
+{
+    uint8_t * buffer;
+    uint16_t totalLength;
+    uint16_t index;
+} ChipZclRawBuffer_t;
+
 typedef struct
 {
     ChipZclEndpointId_t endpointId;
-    uint8_t * buffer;
-    uint16_t bufLen;
     uint16_t clusterId;
     bool clusterSpecific;
     bool mfgSpecific;
