@@ -34,6 +34,7 @@
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
+#include <climits>
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
