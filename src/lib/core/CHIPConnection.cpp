@@ -1164,12 +1164,7 @@ CHIP_ERROR ChipConnection::StartConnect()
     if (err != CHIP_NO_ERROR)
         return err;
 
-    // If the peer address is not a ULA, or if the interface identifier portion of the peer address does not match
-    // the peer node id, then force the destination node identifier field to be encoded in all sent messages.
-    if (!PeerAddr.IsIPv6ULA() || IPv6InterfaceIdToChipNodeId(PeerAddr.InterfaceId()) != PeerNodeId)
-    {
-        SendDestNodeId = true;
-    }
+    SendDestNodeId = true;
 
 #if CHIP_CONFIG_ENABLE_TARGETED_LISTEN
     // TEMPORARY TESTING CODE: If the destination address is IPv6, and an IPv6 listening address has been specified,
@@ -1219,10 +1214,6 @@ void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR co
         IPAddress localAddr;
         uint16_t localPort;
 
-        // If the peer node identifier is unknown, attempt to infer it from the address of the peer.
-        if (con->PeerNodeId == kNodeIdNotSpecified && con->PeerAddr.IsIPv6ULA())
-            con->PeerNodeId = IPv6InterfaceIdToChipNodeId(con->PeerAddr.InterfaceId());
-
         // Get the local address that was used for the connection.
         err = endPoint->GetLocalInfo(&localAddr, &localPort);
         if (err != INET_NO_ERROR)
@@ -1232,20 +1223,8 @@ void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR co
             return;
         }
 
-        // If the local address is not a ULA, or if the interface identifier portion of the local address does not match
-        // the local node id, then arrange to encode the source node identifier field in messages sent to the peer.
-        //
-        // We rely on this behavior in the case of Thread-assisted pairing. In this case, the (non-ULA) link-local
-        // address used by the new device while provisionally joined to the assisting device's PAN forces it to
-        // encode its source node identifier in all messages sent to the remote commissioning device. If the new device's
-        // local address were a ULA in this scenario, it would be unable to receive communications from the remote
-        // comissioner. The new device, having a ULA, would not encode its source node identifier in messages sent to the
-        // commissioner, and the comissioner, on a different network than the new device, would be unable to see
-        // the new device's ULA and use it to infer that device's node id.
-        if (!localAddr.IsIPv6ULA() || IPv6InterfaceIdToChipNodeId(localAddr.InterfaceId()) != con->Context->LocalNodeId())
-        {
-            con->SendSourceNodeId = true;
-        }
+        // Always sends the source node id since no ULA-based decision and decoding is made.
+        con->SendSourceNodeId = true;
 
         // Setup various callbacks on the end point.
         endPoint->OnDataReceived     = HandleDataReceived;
@@ -1498,22 +1477,11 @@ void ChipConnection::MakeConnectedTcp(TCPEndPoint * endPoint, const IPAddress & 
     endPoint->OnDataSent         = NULL; // TODO: should handle flow control
     endPoint->OnConnectionClosed = HandleTcpConnectionClosed;
 
-    PeerNodeId = (peerAddr.IsIPv6ULA()) ? IPv6InterfaceIdToChipNodeId(peerAddr.InterfaceId()) : kNodeIdNotSpecified;
+    PeerNodeId = kNodeIdNotSpecified;
     PeerAddr   = peerAddr;
 
-    // If the local address is not a ULA, or if the interface identifier portion of the local address does not match
-    // the local node id, then arrange to encode the source node identifier field in all messages sent to the peer.
-    if (!localAddr.IsIPv6ULA() || IPv6InterfaceIdToChipNodeId(localAddr.InterfaceId()) != Context->LocalNodeId())
-    {
-        SendSourceNodeId = true;
-    }
-
-    // Similarly, if we were unable do derive the node identifier of the peer from its address, then arrange for the
-    // destination node identifier field to be encoded in all sent messages.
-    if (PeerNodeId == kNodeIdNotSpecified)
-    {
-        SendDestNodeId = true;
-    }
+    SendSourceNodeId = true;
+    SendDestNodeId   = true;
 
     AppState = NULL;
     mRefCount++;
