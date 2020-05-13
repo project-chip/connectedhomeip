@@ -24,12 +24,12 @@
 extern "C" {
 #endif
 
-#include "rtos_gecko.h"
 #include "FreeRTOS.h"
+#include "event_groups.h"
+#include "rtos_gecko.h"
+#include "semphr.h"
 #include "task.h"
 #include "timers.h"
-#include "semphr.h"
-#include "event_groups.h"
 
 // Bluetooth event flag group
 extern EventGroupHandle_t bluetooth_event_flags;

@@ -26,6 +26,7 @@
 #define CONFIGURATION_MANAGER_IMPL_H
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+
 #include "EFR32Config.h"
 
 namespace chip {

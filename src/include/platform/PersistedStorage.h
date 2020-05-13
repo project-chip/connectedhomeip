@@ -27,8 +27,8 @@
 #ifndef PERSISTED_STORAGE_H
 #define PERSISTED_STORAGE_H
 
-#include <core/CHIPError.h>
 #include <core/CHIPConfig.h>
+#include <core/CHIPError.h>
 
 namespace chip {
 namespace Platform {

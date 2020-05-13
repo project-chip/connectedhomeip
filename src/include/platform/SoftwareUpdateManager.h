@@ -26,8 +26,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <core/CHIPTLV.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {

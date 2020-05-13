@@ -28,8 +28,8 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "bg_types.h"
-#include "rtos_gecko.h"
 #include "gatt_db.h"
+#include "rtos_gecko.h"
 
 namespace chip {
 namespace DeviceLayer {
