@@ -38,8 +38,8 @@
 #include <ble/BleConfig.h>
 
 #include <ble/BleError.h>
-#include <system/SystemPacketBuffer.h>
 #include <support/FlagUtils.hpp>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace Ble {

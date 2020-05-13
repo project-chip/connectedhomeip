@@ -56,15 +56,15 @@
 
 #include <string.h>
 
-#include <ble/BlePlatformDelegate.h>
+#include <ble/BLEEndPoint.h>
 #include <ble/BleApplicationDelegate.h>
 #include <ble/BleLayer.h>
+#include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
-#include <ble/BLEEndPoint.h>
 
 #include <core/CHIPEncoding.h>
-#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 // clang-format off
 
