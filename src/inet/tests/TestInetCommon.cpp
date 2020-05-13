@@ -134,7 +134,7 @@ Inet::InetLayer gInet;
 // CollectTapAddresses() is only available on such targets.
 
 static std::vector<TapInterface> sTapIFs;
-#endif // CHIP_TARGET_STYLE_UNIX
+#endif                                    // CHIP_TARGET_STYLE_UNIX
 static std::vector<struct netif> sNetIFs; // interface to filter
 #endif                                    // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -220,10 +220,10 @@ static void PrintNetworkState()
     {
         struct netif * netIF = &(sNetIFs[j]);
 #if CHIP_TARGET_STYLE_UNIX
-// TapAddrAutoconf and TapInterface are only needed for LwIP on
-// sockets simulation in which a host tap/tun interface is used to
-// proxy the LwIP stack onto a host native network interface.
-// CollectTapAddresses() is only available on such targets.
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
 
         TapInterface * tapIF = &(sTapIFs[j]);
 #endif // CHIP_TARGET_STYLE_UNIX
@@ -233,10 +233,10 @@ static void PrintNetworkState()
         printf("  Interface Name: %s\n", intfName);
         printf("  Tap Device: %s\n", gNetworkOptions.TapDeviceName[j]);
 #if CHIP_TARGET_STYLE_UNIX
-// TapAddrAutoconf and TapInterface are only needed for LwIP on
-// sockets simulation in which a host tap/tun interface is used to
-// proxy the LwIP stack onto a host native network interface.
-// CollectTapAddresses() is only available on such targets.
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
 
         printf("  MAC address: %02x:%02x:%02x:%02x:%02x:%02x\n", tapIF->macAddr[0], tapIF->macAddr[1], tapIF->macAddr[2],
                tapIF->macAddr[3], tapIF->macAddr[4], tapIF->macAddr[5]);
@@ -288,10 +288,10 @@ void InitNetwork()
     }
 
 #if CHIP_TARGET_STYLE_UNIX
-// TapAddrAutoconf and TapInterface are only needed for LwIP on
-// sockets simulation in which a host tap/tun interface is used to
-// proxy the LwIP stack onto a host native network interface.
-// CollectTapAddresses() is only available on such targets.
+    // TapAddrAutoconf and TapInterface are only needed for LwIP on
+    // sockets simulation in which a host tap/tun interface is used to
+    // proxy the LwIP stack onto a host native network interface.
+    // CollectTapAddresses() is only available on such targets.
 
     sTapIFs.clear();
 #endif // CHIP_TARGET_STYLE_UNIX
@@ -300,10 +300,10 @@ void InitNetwork()
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
 #if CHIP_TARGET_STYLE_UNIX
-// TapAddrAutoconf and TapInterface are only needed for LwIP on
-// sockets simulation in which a host tap/tun interface is used to
-// proxy the LwIP stack onto a host native network interface.
-// CollectTapAddresses() is only available on such targets.
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
 
         TapInterface tapIF;
         sTapIFs.push_back(tapIF);
@@ -314,10 +314,10 @@ void InitNetwork()
 
 #if CHIP_TARGET_STYLE_UNIX
 
-// TapAddrAutoconf and TapInterface are only needed for LwIP on
-// sockets simulation in which a host tap/tun interface is used to
-// proxy the LwIP stack onto a host native network interface.
-// CollectTapAddresses() is only available on such targets.
+    // TapAddrAutoconf and TapInterface are only needed for LwIP on
+    // sockets simulation in which a host tap/tun interface is used to
+    // proxy the LwIP stack onto a host native network interface.
+    // CollectTapAddresses() is only available on such targets.
 
     err_t lwipErr;
 
@@ -345,10 +345,10 @@ void InitNetwork()
 
 #if CHIP_TARGET_STYLE_UNIX
 
-// TapAddrAutoconf and TapInterface are only needed for LwIP on
-// sockets simulation in which a host tap/tun interface is used to
-// proxy the LwIP stack onto a host native network interface.
-// CollectTapAddresses() is only available on such targets.
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
         if (gNetworkOptions.TapUseSystemConfig)
         {
             CollectTapAddresses(addrsVec, gNetworkOptions.TapDeviceName[j]);
@@ -367,10 +367,10 @@ void InitNetwork()
         }
 
 #if CHIP_TARGET_STYLE_UNIX
-// TapAddrAutoconf and TapInterface are only needed for LwIP on
-// sockets simulation in which a host tap/tun interface is used to
-// proxy the LwIP stack onto a host native network interface.
-// CollectTapAddresses() is only available on such targets.
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
 
         IPAddress ip4Gateway = (j < gNetworkOptions.IPv4GatewayAddr.size()) ? gNetworkOptions.IPv4GatewayAddr[j] : IPAddress::Any;
 
@@ -568,10 +568,10 @@ void ServiceEvents(struct ::timeval & aSleepTime)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if CHIP_TARGET_STYLE_UNIX
-// TapAddrAutoconf and TapInterface are only needed for LwIP on
-// sockets simulation in which a host tap/tun interface is used to
-// proxy the LwIP stack onto a host native network interface.
-// CollectTapAddresses() is only available on such targets.
+    // TapAddrAutoconf and TapInterface are only needed for LwIP on
+    // sockets simulation in which a host tap/tun interface is used to
+    // proxy the LwIP stack onto a host native network interface.
+    // CollectTapAddresses() is only available on such targets.
 
     TapInterface_Select(&(sTapIFs[0]), &(sNetIFs[0]), aSleepTime, gNetworkOptions.TapDeviceName.size());
 #endif // CHIP_TARGET_STYLE_UNIX
