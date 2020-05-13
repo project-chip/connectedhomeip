@@ -32,7 +32,7 @@
 
 namespace chip {
 
-void ChipConnection::ChipConnection() : mState(kState_NotReady), mRefCount(1)
+ChipConnection::ChipConnection() : mState(kState_NotReady), mRefCount(1)
 {
     mState            = kState_NotReady;
     mRefCount         = 1;
@@ -123,7 +123,7 @@ CHIP_ERROR ChipConnection::SendMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(StateAllowsSend, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(StateAllowsSend(), err = CHIP_ERROR_INCORRECT_STATE);
 
     IPPacketInfo addrInfo;
     addrInfo.Clear();
