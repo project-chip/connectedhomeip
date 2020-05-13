@@ -32,7 +32,7 @@
 
 #include <ble/BleConfig.h>
 #include <ble/BLEEndPoint.h>
-#include <core/HostPortList.h>
+#include <core/CHIPError.h>
 #include <core/NodeIdentifiers.h>
 #include <inet/InetInterface.h>
 #include <inet/IPAddress.h>
@@ -306,10 +306,6 @@ public:
                        uint16_t defaultPort = 0);
     CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, const char * peerAddr, uint16_t peerAddrLen, uint8_t dnsOptions,
                        uint16_t defaultPort);
-    CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList,
-                       Inet::InterfaceId intf = INET_NULL_INTERFACEID);
-    CHIP_ERROR Connect(uint64_t peerNodeId, ChipAuthMode authMode, HostPortList hostPortList, uint8_t dnsOptions,
-                       Inet::InterfaceId intf);
 
     CHIP_ERROR GetPeerAddressInfo(Inet::IPPacketInfo & addrInfo);
 
@@ -430,7 +426,6 @@ private:
 
     Inet::IPAddress mPeerAddrs[CHIP_CONFIG_CONNECT_IP_ADDRS];
     Inet::TCPEndPoint * mTcpEndPoint;
-    HostPortList mPeerHostPortList;
     Inet::InterfaceId mTargetInterface;
     uint32_t mConnectTimeout;
     uint8_t mRefCount;
