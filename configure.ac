@@ -2158,6 +2158,7 @@ AC_MSG_NOTICE([
   LwIP compile flags                               : ${LWIP_CPPFLAGS:--}
   LwIP link flags                                  : ${LWIP_LDFLAGS:--}
   LwIP link libraries                              : ${LWIP_LIBS:--}
+  LwIP foreign subdirectory dependency             : ${LWIP_FOREIGN_SUBDIR_DEPENDENCY:--}
   mbedTLS source                                   : ${nl_with_mbedtls:--}
   mbedTLS compile flags                            : ${MBEDTLS_CPPFLAGS:--}
   mbedTLS link flags                               : ${MBEDTLS_LDFLAGS:--}
