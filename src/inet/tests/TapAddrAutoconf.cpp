@@ -33,7 +33,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-int CollectTapAddresses(std::vector<char *>  &addresses, const char * ifName)
+int CollectTapAddresses(std::vector<char *> & addresses, const char * ifName)
 {
     struct ifaddrs *addrsList, *curAddr;
     const int err = getifaddrs(&addrsList);
@@ -48,15 +48,15 @@ int CollectTapAddresses(std::vector<char *>  &addresses, const char * ifName)
             {
                 char buf[INET6_ADDRSTRLEN];
                 const char * rv;
-                char *tmp;
+                char * tmp;
                 rv = inet_ntop(curAddr->ifa_addr->sa_family,
-                               curAddr->ifa_addr->sa_family == AF_INET6 ?
-                               (const void *)&(((sockaddr_in6 *)curAddr->ifa_addr)->sin6_addr) :
-                               (const void *)&(((sockaddr_in *)curAddr->ifa_addr)->sin_addr),
+                               curAddr->ifa_addr->sa_family == AF_INET6
+                                   ? (const void *) &(((sockaddr_in6 *) curAddr->ifa_addr)->sin6_addr)
+                                   : (const void *) &(((sockaddr_in *) curAddr->ifa_addr)->sin_addr),
                                buf, sizeof(buf));
                 if (rv != NULL)
                 {
-                    tmp = (char *)malloc(strlen(buf));
+                    tmp = (char *) malloc(strlen(buf));
                     strcpy(tmp, buf);
                     addresses.push_back(tmp);
                 }
