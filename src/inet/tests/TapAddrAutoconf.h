@@ -26,4 +26,4 @@
 #include <new>
 #include <vector>
 
-int CollectTapAddresses(std::vector<char *>  &addresses, const char * ifName);
+int CollectTapAddresses(std::vector<char *> & addresses, const char * ifName);
