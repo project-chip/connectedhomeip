@@ -23,13 +23,13 @@
  *          stack.
  *
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/ThreadStackManager.h>
-#include <platform/OpenThread/OpenThreadUtils.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.ipp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.ipp>
+
+#include <platform/OpenThread/OpenThreadUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

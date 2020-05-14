@@ -21,10 +21,13 @@
  *          Provides implementations for the Chip entropy sourcing functions
  *          on the Silcon Labs EFR32 platforms.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <support/crypto/CHIPRNG.h>
+
 #include <mbedtls/entropy_poll.h>
+
 #include <em_device.h>
 
 #if defined(_SILICON_LABS_32B_SERIES_1)

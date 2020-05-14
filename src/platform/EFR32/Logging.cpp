@@ -27,13 +27,15 @@
  *          logs wait indefinitely until a slot is available whereas
  *          non-error logs are dropped to avoid delays.
  */
-
-#include <stdio.h>
-#include <retargetserial.h>
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <support/logging/CHIPLogging.h>
-#include <task.h>
+
 #include <queue.h>
+#include <retargetserial.h>
+#include <stdio.h>
+#include <task.h>
 
 // RTT Buffer size and name
 #ifndef LOG_RTT_BUFFER_INDEX
