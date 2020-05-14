@@ -4,6 +4,10 @@ jobs:
           matrix:
               parameters:
                   builder: ["docker-build", "mbedtls-build", "ubuntu-16-lts"]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
 
     - test:
           name: Run Tests [<< matrix.builder >>]
@@ -12,6 +16,10 @@ jobs:
                   builder: ["docker-build", "mbedtls-build", "ubuntu-16-lts"]
           requires:
               - Build CHIP [<< matrix.builder >>]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
 
     - code-coverage:
           name: Code Coverage [<< matrix.builder >>]
@@ -20,6 +28,10 @@ jobs:
                   builder: ["docker-build"]
           requires:
               - Build CHIP [<< matrix.builder >>]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
 
     - deploy:
           name: Deploy [<< matrix.builder >>]
@@ -28,8 +40,20 @@ jobs:
                   builder: ["docker-build"]
           requires:
               - Run Tests [<< matrix.builder >>]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
 
     - examples_nrf:
           name: Build Examples [nRF]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
     - examples_esp32:
           name: Build Examples [ESP32]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
