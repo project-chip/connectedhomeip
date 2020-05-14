@@ -67,7 +67,7 @@ follow these steps:
 
 -   Build the flash image for QEMU and run the application.
 
-          $ ../../../scripts/tools/build_esp32_flash_image.sh ./build/chip-crypto-tests.bin test.bin
+          $ ../../../scripts/tools/build_esp32_flash_image.sh ./build/chip-tests.bin test.bin
           $ ../../../scripts/tools/esp32_qemu_run.sh ./test.bin
 
 #### Using DevKitC or M5Stack

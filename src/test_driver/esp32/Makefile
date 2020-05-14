@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := chip-crypto-tests
+PROJECT_NAME := chip-tests
 
 CXXFLAGS += -DCHIP_SUPPORT_FOREIGN_TEST_DRIVERS
 
