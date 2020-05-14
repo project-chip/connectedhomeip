@@ -52,9 +52,9 @@
 #define __ARCH_CC_H__
 
 /* Include some files for defining library routines */
+#include <limits.h>
 #include <string.h>
 #include <sys/time.h>
-#include <limits.h>
 
 #define LWIP_TIMEVAL_PRIVATE 0
 
