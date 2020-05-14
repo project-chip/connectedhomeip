@@ -22,18 +22,17 @@
  *
  */
 
-#include "TestSetupCode.h"
+#include "TestQRCode.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <unistd.h>
-
-#include <iostream>
-
-#include "SetupPayload.cpp"
 #include "Base41.cpp"
 #include "QRCodeSetupPayloadGenerator.cpp"
 #include "QRCodeSetupPayloadParser.cpp"
+#include "SetupPayload.cpp"
+
+#include <assert.h>
+#include <iostream>
+#include <stdio.h>
+#include <unistd.h>
 
 using namespace chip;
 using namespace std;

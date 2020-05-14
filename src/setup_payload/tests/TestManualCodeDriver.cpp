@@ -22,7 +22,7 @@
  *
  */
 
-#include "TestSetupCode.h"
+#include "TestManualCode.h"
 
 int main(void)
 {
