@@ -29,6 +29,7 @@
 #include <stdint.h>
 
 #include "chip-zcl.h"
+
 #include "gen-attribute-storage.h"
 
 /**
