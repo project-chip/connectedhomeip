@@ -22,12 +22,13 @@
  *          Provides an implementation of the Chip GroupKeyStore interface
  *          for the ESP32 platform.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/ESP32/GroupKeyStoreImpl.h>
 
-#include "nvs_flash.h"
 #include "nvs.h"
+#include "nvs_flash.h"
 
 using namespace ::chip;
 using namespace ::nl::Weave::Profiles::Security::AppKeys;
