@@ -29,13 +29,13 @@
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <system/SystemLayer.h>
 #include <support/CodeUtils.h>
+#include <system/SystemLayer.h>
 
 // Include local headers
 #include <stddef.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 namespace chip {
 namespace System {

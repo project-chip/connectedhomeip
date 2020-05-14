@@ -24,13 +24,14 @@
  *      error strings.
  */
 
-#include <stddef.h>
-
 // Include module header
 #include <system/SystemError.h>
 
 // Include common private header
 #include "SystemLayerPrivate.h"
+
+#include <support/DLLUtil.h>
+#include <support/ErrorStr.h>
 
 // Include local headers
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -41,8 +42,7 @@
 #include <string.h>
 #endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
-#include <support/ErrorStr.h>
-#include <support/DLLUtil.h>
+#include <stddef.h>
 
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 

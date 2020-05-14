@@ -29,6 +29,11 @@
 // Include configuration headers
 #include <system/SystemConfig.h>
 
+#include <support/DLLUtil.h>
+#include <system/SystemError.h>
+#include <system/SystemEvent.h>
+#include <system/SystemObject.h>
+
 // Include dependent headers
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/select.h>
@@ -37,12 +42,6 @@
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-
-#include <support/DLLUtil.h>
-
-#include <system/SystemError.h>
-#include <system/SystemObject.h>
-#include <system/SystemEvent.h>
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
