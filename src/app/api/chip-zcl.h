@@ -28,6 +28,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "chip-zcl-buffer.h"
+
 typedef uint64_t bitmap64_t;
 typedef uint8_t enum8_t;
 typedef uint16_t enum16_t;
@@ -267,16 +269,6 @@ typedef uint8_t ChipZclEndpointIndex_t;
 typedef uint16_t ChipZclDeviceId_t;
 /** A distinguished value that represents a null (invalid) device identifer. */
 #define CHIP_ZCL_DEVICE_ID_NULL ((ChipZclDeviceId_t) -1)
-
-/**
- * Structure that describes the raw buffers passed between the CHIP layers and the Zap layer.
- */
-typedef struct
-{
-    uint8_t * buffer;
-    uint16_t totalLength;
-    uint16_t index;
-} ChipZclRawBuffer_t;
 
 typedef struct
 {
