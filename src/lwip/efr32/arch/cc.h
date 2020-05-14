@@ -8,13 +8,13 @@
 #ifndef CHIP_LWIP_FREERTOS_ARCH_CC_H
 #define CHIP_LWIP_FREERTOS_ARCH_CC_H
 
+#include <assert.h>
 #include <errno.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <sys/time.h>
 
 #if __cplusplus

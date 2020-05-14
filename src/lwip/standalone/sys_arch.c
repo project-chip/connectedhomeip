@@ -65,16 +65,16 @@
  */
 #include "lwip/debug.h"
 
+#include <pthread.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <pthread.h>
 
-#include "lwip/sys.h"
 #include "lwip/opt.h"
 #include "lwip/stats.h"
+#include "lwip/sys.h"
 
 #define UMAX(a, b) ((a) > (b) ? (a) : (b))
 
