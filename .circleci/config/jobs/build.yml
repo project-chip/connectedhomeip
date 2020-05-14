@@ -6,6 +6,16 @@ environment:
 executor: << parameters.builder >>
 steps:
     - checkout
+    - run:
+         name: Enable IPv6
+         command: |
+           cat \<<'EOF' | sudo tee /etc/docker/daemon.json
+           {
+             "ipv6": true,
+             "fixed-cidr-v6": "2001:db8:1::/64"
+           }
+           EOF
+           sudo service docker restart
     - setup-environment:
           builder: << parameters.builder >>
     - bootstrap

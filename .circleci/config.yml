@@ -113,6 +113,16 @@ jobs:
     steps:
     - checkout
     - run:
+        command: |
+          cat <<'EOF' | sudo tee /etc/docker/daemon.json
+          {
+            "ipv6": true,
+            "fixed-cidr-v6": "2001:db8:1::/64"
+          }
+          EOF
+          sudo service docker restart
+        name: Enable IPv6
+    - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
@@ -140,6 +150,16 @@ jobs:
     - BUILD_TYPE: ubuntu-16-lts
     steps:
     - checkout
+    - run:
+        command: |
+          cat <<'EOF' | sudo tee /etc/docker/daemon.json
+          {
+            "ipv6": true,
+            "fixed-cidr-v6": "2001:db8:1::/64"
+          }
+          EOF
+          sudo service docker restart
+        name: Enable IPv6
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
@@ -222,6 +242,16 @@ jobs:
     - BUILD_TYPE: docker-build
     steps:
     - checkout
+    - run:
+        command: |
+          cat <<'EOF' | sudo tee /etc/docker/daemon.json
+          {
+            "ipv6": true,
+            "fixed-cidr-v6": "2001:db8:1::/64"
+          }
+          EOF
+          sudo service docker restart
+        name: Enable IPv6
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
@@ -372,6 +402,16 @@ workflows:
 #         type: string
 #     steps:
 #     - checkout
+#     - run:
+#         command: |
+#           cat \\<<'EOF' | sudo tee /etc/docker/daemon.json
+#           {
+#             \"ipv6\": true,
+#             \"fixed-cidr-v6\": \"2001:db8:1::/64\"
+#           }
+#           EOF
+#           sudo service docker restart
+#         name: Enable IPv6
 #     - setup-environment:
 #         builder: << parameters.builder >>
 #     - bootstrap
