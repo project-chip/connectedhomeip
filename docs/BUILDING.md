@@ -176,11 +176,28 @@ ar: `u' modifier ignored since `D' is the default (see `U')
 make[1]: Leaving directory 'src/system'
 ```
 
--   [x] **Add new source folder** Add the folder to `src/` Update
-        `src/Makefile.am` to add the folder Update `AC_CONFIG_FILES` in
-        `configure.ac`
+-   [x] **Add new source folder**
 
-And then build as needed.
+To add a new source folder, say under `src/<new>`, follow these steps:
+
+1. Create the `src/<new>` directory and add a new `Makefile.am` within it.
+2. Update `src/Makefile.am` and add a reference to the `<new>` folder under
+   `SUBDIRS`.
+3. Update `AC_CONFIG_FILES` in `configure.ac` to reference the `<new>/Makefile`
+   (not the `Makefile.am`).
+4. Rerun bootstrap and configure.
+5. Now build as needed.
+
+-   [x] **Add new source files**
+
+To add new source files to the project, say under `src/<module>`, follow these
+steps:
+
+1. Add the new files to `src/<module>`
+2. Add references to the new files in `src/<module>/Makefile.am` under
+   target_SOURCES or target_HEADERS as appropriate.
+3. Run `./bootstrap -w make` at the top-level.
+4. Now build as needed.
 
 -   [x] **Clean out entire source tree**
 
