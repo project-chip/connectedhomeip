@@ -28,13 +28,14 @@
 #ifndef CHIP_TLV_H_
 #define CHIP_TLV_H_
 
-#include <stdlib.h>
-#include <stdarg.h>
-
-#include <support/DLLUtil.h>
 #include <core/CHIPError.h>
 #include <core/CHIPTLVTags.h>
 #include <core/CHIPTLVTypes.h>
+
+#include <support/DLLUtil.h>
+
+#include <stdarg.h>
+#include <stdlib.h>
 
 // forward declaration of the PacketBuffer class used within the header.
 namespace chip {

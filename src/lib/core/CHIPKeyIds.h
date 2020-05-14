@@ -26,6 +26,8 @@
 #ifndef CHIPKEYS_H_
 #define CHIPKEYS_H_
 
+#include <stdint.h>
+
 namespace chip {
 
 /**

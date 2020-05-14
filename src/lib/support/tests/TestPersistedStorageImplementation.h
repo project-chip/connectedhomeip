@@ -17,8 +17,8 @@
  *    limitations under the License.
  */
 
-#include <string>
 #include <map>
+#include <string>
 
 extern std::map<std::string, std::string> sPersistentStore;
 

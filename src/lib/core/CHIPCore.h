@@ -51,12 +51,12 @@ using namespace ::chip::Inet;
 
 #include <core/CHIPError.h>
 /*
-#include "core/CHIPKeyIds.h"
-#include "core/CHIPFabricState.h"
-#include "core/CHIPMessageLayer.h"
 #include "core/CHIPBinding.h"
 #include "core/CHIPExchangeMgr.h"
-#include "core/CHIPSecurityMgr.h"
+#include "core/CHIPFabricState.h"
 #include "core/CHIPGlobals.h"
+#include "core/CHIPKeyIds.h"
+#include "core/CHIPMessageLayer.h"
+#include "core/CHIPSecurityMgr.h"
 */
 #endif /* CHIPCORE_H_ */

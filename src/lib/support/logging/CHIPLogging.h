@@ -35,9 +35,9 @@
 #ifndef CHIPLOGGING_H_
 #define CHIPLOGGING_H_
 
-#include <stdint.h>
-
 #include <core/CHIPConfig.h>
+
+#include <stdint.h>
 
 /**
  *   @namespace chip::Logging
