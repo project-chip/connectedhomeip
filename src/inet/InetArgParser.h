@@ -29,6 +29,7 @@
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
 #include <support/CHIPArgParser.hpp>
+
 #include <inet/IPAddress.h>
 
 namespace chip {

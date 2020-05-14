@@ -34,9 +34,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <system/SystemFaultInjection.h>
-#include <support/CHIPFaultInjection.h>
 #include <inet/InetFaultInjection.h>
+#include <support/CHIPFaultInjection.h>
+#include <system/SystemFaultInjection.h>
 
 using namespace chip;
 using namespace chip::ArgParser;

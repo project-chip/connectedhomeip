@@ -39,8 +39,8 @@
 #endif
 
 #else
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 #endif
 
 #include <nlunit-test.h>

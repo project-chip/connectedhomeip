@@ -27,11 +27,11 @@
 
 #include <inet/InetConfig.h>
 
-#include <inet/InetError.h>
 #include "inet/IANAConstants.h"
 #include "inet/InetLayerBasis.h"
-#include <inet/InetLayerEvents.h>
+#include <inet/InetError.h>
 #include <inet/InetInterface.h>
+#include <inet/InetLayerEvents.h>
 
 #include <support/DLLUtil.h>
 

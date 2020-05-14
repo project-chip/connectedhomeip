@@ -47,8 +47,8 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #define NL_INET_IPV6_ADDR_LEN_IN_BYTES (16)

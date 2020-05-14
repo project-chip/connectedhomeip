@@ -22,12 +22,13 @@
  *      Asynchronous Domain Name System (DNS) resolution in InetLayer.
  *
  */
+#include <InetLayer.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
-#include <InetLayer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
