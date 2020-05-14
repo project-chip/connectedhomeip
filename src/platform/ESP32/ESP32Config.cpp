@@ -22,17 +22,18 @@
  *    @file
  *          Utilities for interacting with the the ESP32 "NVS" key-value store.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/ESP32/ESP32Config.h>
 
-#include <platform/ESP32/ESP32Utils.h>
-#include <support/logging/CHIPLogging.h>
-#include <support/CodeUtils.h>
 #include <core/CHIPEncoding.h>
+#include <platform/ESP32/ESP32Utils.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
-#include "nvs_flash.h"
 #include "nvs.h"
+#include "nvs_flash.h"
 
 namespace chip {
 namespace DeviceLayer {

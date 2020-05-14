@@ -22,10 +22,11 @@
  *          Provides implementations of the CHIP System Layer platform
  *          time/clock functions that are suitable for use on the ESP32 platform.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/logging/CHIPLogging.h>
+
 #include <support/TimeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 #include <esp_timer.h>
 

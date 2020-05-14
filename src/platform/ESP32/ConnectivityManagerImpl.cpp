@@ -16,28 +16,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
-
-#include <platform/ESP32/ESP32Utils.h>
-#include <support/logging/CHIPLogging.h>
-#include <support/CodeUtils.h>
-
-#include "esp_event.h"
-#include "esp_wifi.h"
-
-#include <lwip/ip_addr.h>
-#include <lwip/netif.h>
-#include <lwip/nd6.h>
-#include <lwip/dns.h>
-
-#include <new>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
+#include <platform/ConnectivityManager.h>
+
+#include <platform/ESP32/ESP32Utils.h>
+#include <platform/internal/BLEManager.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+
+#include "esp_event.h"
+#include "esp_wifi.h"
+
+#include <lwip/dns.h>
+#include <lwip/ip_addr.h>
+#include <lwip/nd6.h>
+#include <lwip/netif.h>
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #error "WiFi Station support must be enabled when building for ESP32"

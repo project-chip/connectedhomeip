@@ -22,8 +22,9 @@
  *          Provides an implementation of the PlatformManager object
  *          for the ESP32 platform.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 

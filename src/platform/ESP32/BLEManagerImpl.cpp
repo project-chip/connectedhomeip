@@ -22,20 +22,22 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for the ESP32 platform.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/BLEManager.h>
-#include <ble/CHIPBleServiceData.h>
-#include <new>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
+#include <ble/CHIPBleServiceData.h>
+#include <platform/internal/BLEManager.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
 #include "esp_gap_ble_api.h"
-#include "esp_gatts_api.h"
 #include "esp_gatt_common_api.h"
+#include "esp_gatts_api.h"
 #include "esp_log.h"
+
+#include <new>
 
 using namespace ::chip;
 using namespace ::chip::Ble;
