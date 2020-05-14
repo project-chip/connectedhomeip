@@ -29,8 +29,8 @@
 // Enable use of an ephemeral UDP source port for locally initiated CHIP exchanges.
 #define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
 
-// Enable UDP listening on demand in the CHIPDeviceManager
-#define CHIP_CONFIG_DEVICE_MGR_DEMAND_ENABLE_UDP 1
+// Enable UDP listening on demand in the CHIPDeviceController
+#define CHIP_CONFIG_DEVICE_CONTROLLER_DEMAND_ENABLE_UDP 1
 
 #define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT 0
 
