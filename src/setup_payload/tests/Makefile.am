@@ -48,7 +48,8 @@ libSetupPayloadTests_a_SOURCES                 = \
 libSetupPayloadTests_adir                      = $(includedir)/setup_payload
 
 dist_libSetupPayloadTests_a_HEADERS            = \
-    TestSetupCode.h                              \
+    TestQRCode.h                                 \
+    TestManualCode.h                             \
     $(NULL)
 
 # C/C++ preprocessor option flags that will apply to all compiled
