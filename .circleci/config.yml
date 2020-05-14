@@ -171,22 +171,6 @@ jobs:
     - run:
         command: scripts/examples/esp_echo_app.sh
         name: Build example Echo App
-  Deploy [mbedtls-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
-    environment:
-    - BUILD_TYPE: mbedtls-build
-    steps:
-    - restore_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-mbedtls-build-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - run:
-        command: scripts/build/distribution_check.sh
-        name: Deployment Check
   Run Tests [ubuntu-16-lts]:
     machine:
       image: ubuntu-1604:202004-01
@@ -264,9 +248,6 @@ workflows:
     - Deploy [docker-build]:
         requires:
         - Run Tests [docker-build]
-    - Deploy [mbedtls-build]:
-        requires:
-        - Run Tests [mbedtls-build]
     - Build Examples [nRF]
     - Build Examples [ESP32]
   version: 2
@@ -508,7 +489,6 @@ workflows:
 #           parameters:
 #             builder:
 #             - docker-build
-#             - mbedtls-build
 #         name: Deploy [<< matrix.builder >>]
 #         requires:
 #         - Run Tests [<< matrix.builder >>]

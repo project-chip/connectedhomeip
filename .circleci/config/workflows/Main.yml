@@ -22,7 +22,7 @@ jobs:
           name: Deploy [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["docker-build", "mbedtls-build"]
+                  builder: ["docker-build"]
           requires:
               - Run Tests [<< matrix.builder >>]
     - examples_nrf:
