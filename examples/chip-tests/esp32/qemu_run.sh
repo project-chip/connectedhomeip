@@ -26,8 +26,8 @@ chip_dir="$here/../../.."
 set -e
 
 die() {
-  echo "$me: *** ERROR: " "${*}"
-  exit 1
+    echo "$me: *** ERROR: " "${*}"
+    exit 1
 }
 
 # move to the example folder, I don't work anywhere else
@@ -45,12 +45,12 @@ trap "{ rm -f $flash_image_file; }" EXIT
 
 # If the logs contain failure message
 if grep -F "] : FAILED" results.log; then
-  die 'Some tests failed. Check results.log'
+    die 'Some tests failed. Check results.log'
 fi
 
 # If the logs do not contain final success status
 if grep -F "CHIP-tests: CHIP test status: 0" results.log; then
-  echo "$me: All tests passed"
+    echo "$me: All tests passed"
 else
-  die 'Tests did not run to completion. Check results.log'
+    die 'Tests did not run to completion. Check results.log'
 fi
