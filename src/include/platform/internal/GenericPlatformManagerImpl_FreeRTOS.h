@@ -29,14 +29,14 @@
 
 #if defined(ESP_PLATFORM)
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
 #include "freertos/queue.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
 #else
 #include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
 #include "queue.h"
+#include "semphr.h"
+#include "task.h"
 #endif
 
 namespace chip {

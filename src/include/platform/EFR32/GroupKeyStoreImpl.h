@@ -22,10 +22,10 @@
  *          for platforms based on the Silicon Labs SDK.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <Core/CHIPKeyIds.h>
-#include <platform/Profiles/security/ChipApplicationKeys.h>
 #include <platform/EFR32/EFR32Config.h>
+#include <platform/Profiles/security/ChipApplicationKeys.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
