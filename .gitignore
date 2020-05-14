@@ -31,6 +31,9 @@ third_party/mbedtls/
 # Example specific rules
 examples/**/sdkconfig
 
+# Temporary Directories
+.tmp/
+
 # Xcode
 *.pbxuser
 *.mode1v3

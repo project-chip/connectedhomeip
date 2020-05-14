@@ -1,0 +1,8 @@
+environment:
+    BUILD_TYPE: esp32-build
+executor: esp32-build
+steps:
+    - checkout
+    - run:
+          name: Build example Echo App
+          command: scripts/examples/esp_echo_app.sh

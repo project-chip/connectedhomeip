@@ -1,0 +1,8 @@
+environment:
+    BUILD_TYPE: nrf-build
+executor: nrf-build
+steps:
+    - checkout
+    - run:
+          name: Build example nRF5 Lock App
+          command: scripts/examples/nrf_lock_app.sh

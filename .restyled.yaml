@@ -100,6 +100,16 @@ restylers:
     - name: shfmt
       image: restyled/restyler-shfmt:v3.0.1
       enabled: true
+      command:
+          - shfmt
+          - "-w"
+      arguments:
+          - "-i"
+          - "4"
+          - "-ci"
+      interpreters:
+          - sh
+          - bash
       include:
           - "**/*.sh"
           - "**/*.bash"
