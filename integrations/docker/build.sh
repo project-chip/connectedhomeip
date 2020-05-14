@@ -42,9 +42,9 @@ set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
-BUILD_ARGS=( )
+BUILD_ARGS=()
 if [[ ${*/--no-cache//} != "${*}" ]]; then
-    BUILD_ARGS+=( --no-cache )
+    BUILD_ARGS+=(--no-cache)
 fi
 
 docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
