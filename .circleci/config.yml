@@ -191,6 +191,16 @@ jobs:
     - run:
         command: scripts/examples/esp_echo_app.sh
         name: Build example Echo App
+  Run Tests [QEMU-ESP32]:
+    docker:
+    - image: connectedhomeip/chip-build-esp32-qemu:0.2.11
+    environment:
+    - BUILD_TYPE: qemu-esp32-tests
+    steps:
+    - checkout
+    - run:
+        command: examples/chip-tests/esp32/qemu_run.sh
+        name: Run CHIP tests on ESP32 QEMU
   Run Tests [ubuntu-16-lts]:
     machine:
       image: ubuntu-1604:202004-01
@@ -262,6 +272,9 @@ workflows:
     - Build CHIP [mbedtls-build]
     - Build CHIP [ubuntu-16-lts]
     - Run Tests [docker-build]:
+        requires:
+        - Build CHIP [docker-build]
+    - Run Tests [QEMU-ESP32]:
         requires:
         - Build CHIP [docker-build]
     - Run Tests [mbedtls-build]:

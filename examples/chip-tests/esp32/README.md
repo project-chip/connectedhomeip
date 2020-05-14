@@ -55,20 +55,15 @@ follow these steps:
 
 #### Using QEMU
 
--   In the root of the example directory, source `idf.sh` and use the
-    `defconfig` make target to configure the application with defaults.
+-   Run `qemu_run.sh` located in the root of the example directory. The script
+    builds the application for QEMU target, executes it, and checks the test
+    results. The script exit status is `0` on success, and non zero on errors.
+    It also outputs the final test results on console.
 
-          $ source idf.sh
-          $ SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
+              $ qemu_run.sh
 
--   Run make to build the application
-
-          $ idf make
-
--   Build the flash image for QEMU and run the application.
-
-          $ ../../../scripts/tools/build_esp32_flash_image.sh ./build/chip-crypto-tests.bin test.bin
-          $ ../../../scripts/tools/esp32_qemu_run.sh ./test.bin
+    > If you previously built the example for DevKitC or M5Stack, you should
+    > delete the build folder and sdkconfig prior to running `qemu_run.sh`.
 
 #### Using DevKitC or M5Stack
 
