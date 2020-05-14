@@ -271,10 +271,8 @@ workflows:
     - Build CHIP [docker-build]
     - Build CHIP [mbedtls-build]
     - Build CHIP [ubuntu-16-lts]
+    - Run Tests [QEMU-ESP32]
     - Run Tests [docker-build]:
-        requires:
-        - Build CHIP [docker-build]
-    - Run Tests [QEMU-ESP32]:
         requires:
         - Build CHIP [docker-build]
     - Run Tests [mbedtls-build]:
