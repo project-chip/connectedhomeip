@@ -17,10 +17,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+// module header
+#import "CHIPSetupPayload.h"
 
 #import <Foundation/Foundation.h>
-#import "CHIPSetupPayload.h"
-#import "CHIPError.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
