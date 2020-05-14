@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make -C examples/lock-app/nrf5
+make VERBOSE=1 -C examples/lock-app/nrf5
