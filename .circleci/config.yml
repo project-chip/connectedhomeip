@@ -92,27 +92,6 @@ jobs:
     - run:
         command: scripts/build/distribution_check.sh
         name: Deployment Check
-  Code Coverage [docker-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
-    environment:
-    - BUILD_TYPE: docker-build
-    steps:
-    - restore_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-docker-build-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-docker-build-persistent-cache
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - run:
-        command: scripts/tools/codecoverage.sh
-        name: Run Code Coverage
-    - run:
-        command: bash <(curl -s https://codecov.io/bash)
-        name: Upload Code Coverage
   Build CHIP [mbedtls-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
@@ -294,13 +273,6 @@ workflows:
             - /restyled.*/
         requires:
         - Build CHIP [ubuntu-16-lts]
-    - Code Coverage [docker-build]:
-        filters:
-          branches:
-            ignore:
-            - /restyled.*/
-        requires:
-        - Build CHIP [docker-build]
     - Deploy [docker-build]:
         filters:
           branches:
@@ -578,18 +550,6 @@ workflows:
 #             - mbedtls-build
 #             - ubuntu-16-lts
 #         name: Run Tests [<< matrix.builder >>]
-#         requires:
-#         - Build CHIP [<< matrix.builder >>]
-#     - code-coverage:
-#         filters:
-#           branches:
-#             ignore:
-#             - /restyled.*/
-#         matrix:
-#           parameters:
-#             builder:
-#             - docker-build
-#         name: Code Coverage [<< matrix.builder >>]
 #         requires:
 #         - Build CHIP [<< matrix.builder >>]
 #     - deploy:
