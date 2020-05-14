@@ -41,8 +41,8 @@
 
 #if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 #include <FreeRTOS.h>
-#include <task.h>
 #include <semphr.h>
+#include <task.h>
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
 namespace chip {

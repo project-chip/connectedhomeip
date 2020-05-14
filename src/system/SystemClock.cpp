@@ -32,17 +32,18 @@
 #define __STDC_CONSTANT_MACROS
 #endif // __STDC_CONSTANT_MACROS
 
-#include <stdint.h>
-#include <stdlib.h>
-
+// config
 #include <system/SystemConfig.h>
 
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
+// module header
 #include <system/SystemClock.h>
+// common private
+#include "SystemLayerPrivate.h"
+
 #include <support/CodeUtils.h>
 #include <system/SystemError.h>
-#include "SystemLayerPrivate.h"
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 #include <time.h>
@@ -55,6 +56,9 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/sys.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#include <stdint.h>
+#include <stdlib.h>
 
 namespace chip {
 namespace System {

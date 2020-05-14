@@ -26,32 +26,31 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+// config
+#include <system/SystemConfig.h>
 
+// module header
 #include "TestSystemLayer.h"
 
-#include <stdint.h>
-#include <string.h>
-#include <errno.h>
-
-#include <system/SystemConfig.h>
+#include <nlunit-test.h>
+#include <support/ErrorStr.h>
+#include <system/SystemError.h>
+#include <system/SystemLayer.h>
+#include <system/SystemTimer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
-#include <lwip/tcpip.h>
 #include <lwip/sys.h>
+#include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/select.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#include <system/SystemError.h>
-#include <system/SystemLayer.h>
-#include <system/SystemTimer.h>
-
-#include <support/ErrorStr.h>
-
-#include <nlunit-test.h>
+#include <errno.h>
+#include <stdint.h>
+#include <string.h>
 
 using chip::ErrorStr;
 using namespace chip::System;
