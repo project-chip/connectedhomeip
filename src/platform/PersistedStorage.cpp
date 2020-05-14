@@ -21,8 +21,9 @@
  *          Provides implementations for the CHIP persistent storage
  *          APIs.  This implementation is common across all platforms.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/ConfigurationManager.h>
 
 namespace chip {

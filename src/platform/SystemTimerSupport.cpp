@@ -22,8 +22,9 @@
  *          Provides implementations of the CHIP System Layer platform
  *          timer functions that are suitable for use on all platforms.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/PlatformManager.h>
 
 namespace chip {
