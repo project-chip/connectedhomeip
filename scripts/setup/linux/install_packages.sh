@@ -22,9 +22,9 @@ apt-get install -fy \
     wget \
     libmbedtls-dev
 
-if [[ ! -f 'build/downloads/open_ssl_1.1.1f_installed' ]]; then
-    mkdir -p build/downloads
-    cd build/downloads
+if [[ ! -f 'ci-cache-persistent/openssl/open_ssl_1.1.1f_installed' ]]; then
+    mkdir -p ci-cache-persistent/openssl
+    cd ci-cache-persistent/openssl
     wget https://github.com/openssl/openssl/archive/OpenSSL_1_1_1f.zip
     mkdir openssl
     cd openssl
@@ -36,9 +36,9 @@ if [[ ! -f 'build/downloads/open_ssl_1.1.1f_installed' ]]; then
     rm -rf ../OpenSSL_1_1_1f.zip
 
     cd ~/project
-    touch build/downloads/open_ssl_1.1.1f_installed
+    touch ci-cache-persistent/openssl/open_ssl_1.1.1f_installed
     chown -R circleci:circleci build
 fi
 
-cd ~/project/build/downloads/openssl/openssl-OpenSSL_1_1_1f
+cd ~/project/ci-cache-persistent/openssl/openssl/openssl-OpenSSL_1_1_1f
 make install_sw install_ssldirs
