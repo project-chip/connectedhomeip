@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include "utest.h" /* TODO pass all that stuff in -D */
-#include "../../api/chip-zcl-codec.h"
+#include "../../api/chip-zcl.h"
 
 int main()
 {
@@ -35,8 +35,11 @@ int main()
     //   unsigned int, 4 bytes, value = 0xABCD1234
     //   unsigned length-prefixed string, 1 byte length, value of string "This is an example of the string."
     //
-    int8_t * buffer = malloc(1000); // Make sure we have enough space
+    ChipZclRawBuffer_t * buffer = chipZclBufferAlloc(1000);
 
     printf("Success \n");
+
+    chipZclBufferFree(buffer);
+
     return 0;
 }
