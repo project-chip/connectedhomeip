@@ -31,7 +31,7 @@ extern "C" {
 
 int TestCHIPErrorStr(void);
 int TestCHIPTLV(void);
-int TestCHIPConnection(void);
+int TestChipUdpExchange(void);
 
 #ifdef __cplusplus
 }

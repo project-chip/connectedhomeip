@@ -32,7 +32,7 @@
 #include <support/DLLUtil.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
-#include <core/CHIPConnection.h>
+#include <core/CHIPUdpExchange.h>
 
 namespace chip {
 namespace DeviceController {
@@ -116,7 +116,7 @@ private:
 
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
-    ChipConnection * mDeviceCon;
+    ChipUdpExchange * mUdpExchange;
 
     ConnectionState mConState;
     void * mAppReqState;
@@ -137,8 +137,8 @@ private:
     void ClearRequestState();
     void ClearOpState();
 
-    static void OnReceiveMessage(ChipConnection * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
-    static void OnReceiveError(ChipConnection * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    static void OnReceiveMessage(ChipUdpExchange * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
+    static void OnReceiveError(ChipUdpExchange * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 };
 
 } // namespace DeviceController
