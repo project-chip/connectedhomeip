@@ -24,16 +24,19 @@
 #define TASK0_ARG 55
 #define TASK1_ARG 66
 
+#define TEST_TASK_PRIORITY CHIP_OS_PRIORITY_APP
+#define TEST_TASK_STACK_SIZE 1028
+
 static struct chip_os_task s_task[2];
 static int s_task_arg[2] = { TASK0_ARG, TASK1_ARG };
 
 void * task0_run(void * args)
 {
-    int i = 10000;
     VerifyOrQuit(args == &s_task_arg[0], "Wrong args passed to task0");
 
-    while (i--)
+    while (1)
     {
+        chip_os_task_yield();
     }
 
     return NULL;
@@ -46,6 +49,7 @@ void * task1_run(void * args)
 
     while (i--)
     {
+        chip_os_task_yield();
     }
 
     printf("All tests passed\n");
@@ -65,23 +69,24 @@ void * task1_run(void * args)
 int test_init(void)
 {
     int err;
-    err = chip_os_task_init(NULL, "Null task", NULL, NULL, 1, 0);
+    err = chip_os_task_init(NULL, "Null task", NULL, NULL, TEST_TASK_PRIORITY, TEST_TASK_STACK_SIZE);
     VerifyOrQuit(err, "chip_os_task_init accepted NULL parameters.");
 
-    err = chip_os_task_init(&s_task[0], "s_task[0]", task0_run, &s_task_arg[0], 1, 0);
+    err = chip_os_task_init(&s_task[0], "s_task[0]", task0_run, &s_task_arg[0], TEST_TASK_PRIORITY, TEST_TASK_STACK_SIZE);
     SuccessOrQuit(err, "chip_os_task_init failed.");
 
-    err = chip_os_task_init(&s_task[1], "s_task[1]", task1_run, &s_task_arg[1], 1, 0);
+    err = chip_os_task_init(&s_task[1], "s_task[1]", task1_run, &s_task_arg[1], TEST_TASK_PRIORITY, TEST_TASK_STACK_SIZE);
 
     return err;
 }
 
 int main(void)
 {
-    int ret = PASS;
     SuccessOrQuit(test_init(), "Failed: chip_os_task_init");
 
-    pthread_exit(&ret);
+    chip_os_sched_start();
 
-    return ret;
+    /* main never returns */
+
+    exit(FAIL);
 }

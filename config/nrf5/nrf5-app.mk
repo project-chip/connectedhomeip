@@ -110,7 +110,7 @@ STD_CFLAGS = \
     -fno-strict-aliasing \
     -fshort-enums \
     --specs=nosys.specs
-
+o
 STD_CXXFLAGS = \
     -fno-rtti \
     -fno-exceptions \

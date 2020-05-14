@@ -34,8 +34,9 @@
 #endif
 
 /* The highest and lowest task priorities */
-#define OS_TASK_PRI_HIGHEST (sched_get_priority_max(SCHED_RR))
-#define OS_TASK_PRI_LOWEST (sched_get_priority_min(SCHED_RR))
+#define CHIP_OS_PRIORITY_MIN (sched_get_priority_min(SCHED_RR))
+#define CHIP_OS_PRIORITY_MAX (sched_get_priority_max(SCHED_RR))
+#define CHIP_OS_PRIORITY_APP (CHIP_OS_PRIORITY_MIN + 1)
 
 typedef int chip_os_base_t;
 typedef int chip_os_stack_t;

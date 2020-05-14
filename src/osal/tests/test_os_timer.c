@@ -40,6 +40,8 @@
 #define TEST_TASK_PRIO (1)
 #define TEST_STACK_SIZE (1024)
 
+#define TEST_TIME_CONVERSION_MARGIN (1)
+
 #define TEST_TIMER_MARGIN (10)
 #define TEST_TIMER1_DURATION (1000)
 
@@ -115,10 +117,13 @@ void test_time_convert(chip_os_time_t truth_ticks, chip_os_time_t truth_ms)
 
     ms = chip_os_time_ticks_to_ms(truth_ticks);
     TEST_LOG("Convert ticks=%d to ms=%d expect=%d\n", truth_ticks, ms, truth_ms);
-    VerifyOrQuit(ms == truth_ms, "time: ticks to ms incorrect");
+    VerifyOrQuit((ms >= truth_ms - TEST_TIME_CONVERSION_MARGIN), "time: ticks to ms conversion too short");
+    VerifyOrQuit((ms <= truth_ms + TEST_TIME_CONVERSION_MARGIN), "time: ticks to ms conversion too long");
+
     ticks = chip_os_time_ms_to_ticks(truth_ms);
     TEST_LOG("Convert ms=%d to ticks=%d expect=%d\n", truth_ms, ticks, truth_ticks);
-    VerifyOrQuit(ticks == truth_ticks, "time: ms to ticks incorrect");
+    VerifyOrQuit((ticks >= truth_ticks - TEST_TIME_CONVERSION_MARGIN), "time: ms to ticks conversion too short");
+    VerifyOrQuit((ticks <= truth_ticks + TEST_TIME_CONVERSION_MARGIN), "time: ms to ticks conversion too long");
 }
 
 void test_time_conversions()
