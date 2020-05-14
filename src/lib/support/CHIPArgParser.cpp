@@ -30,15 +30,11 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#define __STDC_VERSION__ 199901L
-
 #include "CHIPArgParser.hpp"
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
+#include <climits>
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
