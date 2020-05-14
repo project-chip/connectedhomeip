@@ -22,22 +22,20 @@
  *          Utilities for accessing persisted device configuration on
  *          platforms based on the Nordic nRF5 SDK.
  */
-
-#include <atomic>
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/nRF5/nRF5Config.h>
+
 #include <core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
-
-#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 #include "FreeRTOS.h"
-#include "semphr.h"
-
 #include "fds.h"
 #include "mem_manager.h"
+#include "semphr.h"
 
 namespace chip {
 namespace DeviceLayer {

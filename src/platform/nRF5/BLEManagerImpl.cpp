@@ -21,23 +21,24 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for the nRF5 platforms.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/BLEManager.h>
-#include <ble/CHIPBleServiceData.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
-#include <new>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "nrf_error.h"
+#include <ble/CHIPBleServiceData.h>
+#include <platform/internal/BLEManager.h>
+
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+
 #include "ble.h"
+#include "ble_advdata.h"
 #include "ble_gap.h"
 #include "ble_gattc.h"
-#include "ble_advdata.h"
 #include "ble_srv_common.h"
 #include "nrf_ble_gatt.h"
+#include "nrf_error.h"
 
 #define NRF_LOG_MODULE_NAME chip
 #include "nrf_log.h"
