@@ -22,14 +22,14 @@
 # This file can also be used as an executable
 me=${0##*/}
 die() {
-  echo "$me: *** ERROR: " "${*}"
-  exit 1
+    echo "$me: *** ERROR: " "${*}"
+    exit 1
 }
 idf() {
-  [[ -d $IDF_PATH && -r $IDF_PATH/export.sh ]] || die "can't find IDF's export.sh"
-  . "$IDF_PATH/export.sh"
-  "$@"
+    [[ -d $IDF_PATH && -r $IDF_PATH/export.sh ]] || die "can't find IDF's export.sh"
+    . "$IDF_PATH/export.sh"
+    "$@"
 }
 if [[ ${0} == ${BASH_SOURCE[0]} ]]; then
-  idf "${@}"
+    idf "${@}"
 fi
