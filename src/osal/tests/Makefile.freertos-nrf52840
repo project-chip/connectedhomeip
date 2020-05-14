@@ -1,0 +1,103 @@
+#
+#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2018 Google LLC
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+# Platform Makefile for Nordic nrf52840-freertos
+
+CROSS_COMPILE = arm-none-eabi-
+
+TARGET_OSAL = freertos
+
+# Default to NRF5 SDK version of FreeRTOS
+FREERTOS_DIR ?= $(NRF5_SDK_ROOT)/external/freertos
+
+# Use a config that enables timers: `#define configUSE_TIMERS 1`
+FREERTOS_CONFIG_DIR ?= $(NRF5_SDK_ROOT)/examples/peripheral/blinky_freertos/config
+
+TARGET_INCLUDES =                                         \
+    -I$(FREERTOS_CONFIG_DIR)                              \
+    -I$(FREERTOS_DIR)/portable/CMSIS/nrf52                \
+    -I$(FREERTOS_DIR)/portable/GCC/nrf52                  \
+    -I$(FREERTOS_DIR)/source/include                      \
+    -I$(NRF5_SDK_ROOT)/config/nrf52840/config             \
+    -I$(NRF5_SDK_ROOT)/components/toolchain/cmsis/include \
+    -I$(NRF5_SDK_ROOT)/components/softdevice/s140/headers \
+    -I$(NRF5_SDK_ROOT)/components/libraries/util          \
+    -I$(NRF5_SDK_ROOT)/components/libraries/log           \
+    -I$(NRF5_SDK_ROOT)/components/libraries/log/src       \
+    -I$(NRF5_SDK_ROOT)/components/libraries/experimental_section_vars \
+    -I$(NRF5_SDK_ROOT)/integration/nrfx                   \
+    -I$(NRF5_SDK_ROOT)/integration/nrfx/legacy            \
+    -I$(NRF5_SDK_ROOT)/modules/nrfx                       \
+    -I$(NRF5_SDK_ROOT)/modules/nrfx/mdk                   \
+    -I$(NRF5_SDK_ROOT)/modules/nrfx/hal                   \
+    -I$(NRF5_SDK_ROOT)/modules/nrfx/drivers/include       \
+    $(NULL)
+
+TARGET_SRCS =                                             \
+    $(FREERTOS_DIR)/source/list.c                         \
+    $(FREERTOS_DIR)/source/portable/MemMang/heap_3.c      \
+    $(FREERTOS_DIR)/source/queue.c                        \
+    $(FREERTOS_DIR)/source/tasks.c                        \
+    $(FREERTOS_DIR)/source/timers.c                       \
+    $(NULL)
+
+TARGET_SRCS +=                                                                   \
+    $(NRF5_SDK_ROOT)/external/freertos/portable/GCC/nrf52/port.c                 \
+    $(NRF5_SDK_ROOT)/external/freertos/portable/CMSIS/nrf52/port_cmsis.c         \
+    $(NRF5_SDK_ROOT)/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c \
+    $(NRF5_SDK_ROOT)/components/libraries/util/app_util_platform.c               \
+    $(NRF5_SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c                     \
+    $(NRF5_SDK_ROOT)/modules/nrfx/drivers/src/nrfx_clock.c                       \
+    $(NRF5_SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52840.S                     \
+    $(NRF5_SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c                          \
+    $(NULL)
+
+TARGET_CCFLAGS =                                          \
+    -DCHIP_DEVICE_LAYER_TARGET_NRF5=1                     \
+    -DNRF52840_XXAA                                       \
+    -DNRF_CLOCK_ENABLED=1                                 \
+    -mcpu=cortex-m4                                       \
+    -mthumb                                               \
+    -mabi=aapcs                                           \
+    -Wall                                                 \
+    -mfloat-abi=hard                                      \
+    -mfpu=fpv4-sp-d16                                     \
+    -ffunction-sections                                   \
+    -fdata-sections                                       \
+    -fno-strict-aliasing                                  \
+    -fshort-enums                                         \
+    --specs=nosys.specs                                   \
+    --specs=nano.specs                                    \
+    $(NULL)
+
+TARGET_LDFLAGS =                                          \
+    -mthumb                                               \
+    -mabi=aapcs                                           \
+    -mcpu=cortex-m4                                       \
+    -mfloat-abi=hard                                      \
+    -mfpu=fpv4-sp-d16                                     \
+    -Wl,--gc-sections                                     \
+    --specs=nosys.specs                                   \
+    --specs=nano.specs                                    \
+    -L$(NRF5_SDK_ROOT)/modules/nrfx/mdk                   \
+    -T$(NRF5_SDK_ROOT)/modules/nrfx/mdk/nrf52840_xxaa.ld  \
+    $(NULL)
+
+TARGET_EXT = hex
+
+%.hex: %.exe
+	arm-none-eabi-objcopy -O ihex $< $@

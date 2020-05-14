@@ -68,4 +68,41 @@ dist_libChipOsal_a_HEADERS                         += \
 
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
+if CHIP_DEVICE_LAYER_TARGET_NRF5
+
+FREERTOS_DIR ?= $(NRF5_SDK_ROOT)/external/freertos
+
+# nRF5 specific dependencies in FreeRTOSConfig.h
+libChipOsal_a_CPPFLAGS                             +=     \
+    -I$(NRF5_SDK_ROOT)/modules/nrfx/mdk                   \
+    -I$(NRF5_SDK_ROOT)/components/toolchain/cmsis/include \
+    -I$(NRF5_SDK_ROOT)/components/softdevice/s140/headers \
+    -I$(NRF5_SDK_ROOT)/components/libraries/util          \
+    $(NULL)
+
+libChipOsal_a_CPPFLAGS                             += \
+    -D_GNU_SOURCE                                     \
+    -I$(FREERTOS_DIR)/config                          \
+    -I$(FREERTOS_DIR)/portable/CMSIS/nrf52            \
+    -I$(FREERTOS_DIR)/portable/GCC/nrf52              \
+    -I$(FREERTOS_DIR)/source/include                  \
+    -I$(top_srcdir)/src/osal/freertos                 \
+    $(NULL)
+
+libChipOsal_a_SOURCES                              += \
+    freertos/os_mutex.c                               \
+    freertos/os_queue.c                               \
+    freertos/os_sem.c                                 \
+    freertos/os_task.c                                \
+    freertos/os_timer.c                               \
+    $(NULL)
+
+dist_libChipOsal_a_HEADERS                         += \
+    @top_builddir@/src/osal/freertos/chip/os_port.h   \
+    @top_builddir@/src/osal/freertos/os_hw.h          \
+    @top_builddir@/src/osal/freertos/os_utils.h       \
+    $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_NRF5
+
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

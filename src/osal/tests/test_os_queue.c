@@ -74,7 +74,7 @@ my_msg_t s_task2_msgs_src[] = {
 
 #define TEST_MSGS_COUNT (sizeof(s_task1_msgs_src) / sizeof(my_msg_t))
 
-void test_init(struct chip_os_queue * q)
+void test_queue_init(struct chip_os_queue * q)
 {
     VerifyOrQuit(!chip_os_queue_inited(q), "queue: q already initialized");
     chip_os_queue_init(q, sizeof(my_msg_t), TEST_QUEUE_SIZE);
@@ -101,7 +101,7 @@ void test_get(void)
 
 void test_queue_units()
 {
-    test_init(&s_queue);
+    test_queue_init(&s_queue);
     test_put();
     test_get();
     test_put();
@@ -159,20 +159,6 @@ void * task2_run(void * arg)
     /* Never returns -- task1 will exit the test. */
 }
 
-/* Initialize task 1 exposed data objects */
-void task1_init(void)
-{
-    /* Initialize task1 queue */
-    test_init(&s_task1_queue);
-}
-
-/* Initialize task 2 exposed data objects */
-void task2_init(void)
-{
-    /* Initialize task2 queue */
-    test_init(&s_task2_queue);
-}
-
 /**
  * init_app_tasks
  *
@@ -186,8 +172,9 @@ int main(void)
      * Call task specific initialization functions to initialize any shared objects
      * before initializing the tasks with the OS.
      */
-    task1_init();
-    task2_init();
+    test_queue_init(&s_task1_queue);
+
+    test_queue_init(&s_task2_queue);
 
     /*
      * Initialize tasks 1 and 2 with the OS.
