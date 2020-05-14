@@ -27,8 +27,8 @@ test_dir="$chip_dir"/examples/chip-tests/esp32
 set -e
 
 die() {
-  echo "$me: *** ERROR: " "${*}"
-  exit 1
+    echo "$me: *** ERROR: " "${*}"
+    exit 1
 }
 
 source "$test_dir"/idf.sh
@@ -44,12 +44,12 @@ trap "{ rm -f $flash_image_file $log_file; }" EXIT
 
 # If the logs contain failure message
 if grep -F "] : FAILED" "$log_file"; then
-  die 'Some tests failed.'
+    die 'Some tests failed.'
 fi
 
 # If the logs do not contain final success status
 if grep -F "CHIP-tests: CHIP test status: 0" "$log_file"; then
-  echo "$me: All tests passed"
+    echo "$me: All tests passed"
 else
-  die 'Tests did not run to completion.'
+    die 'Tests did not run to completion.'
 fi
