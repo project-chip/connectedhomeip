@@ -22,35 +22,34 @@
 
 here=$(cd "$(dirname "$0")" && pwd)
 chip_dir="$here/../../.."
+test_dir="$chip_dir"/examples/chip-tests/esp32
 
 set -e
 
 die() {
-    echo "$me: *** ERROR: " "${*}"
-    exit 1
+  echo "$me: *** ERROR: " "${*}"
+  exit 1
 }
 
-# move to the example folder, I don't work anywhere else
-cd "$here" || die 'ack!, where am I?!?'
-
-source idf.sh
-SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
-idf make
+source "$test_dir"/idf.sh
+SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make -C "$test_dir" defconfig
+idf make -C "$test_dir"
 
 flash_image_file=$(mktemp)
-trap "{ rm -f $flash_image_file; }" EXIT
+log_file=$(mktemp)
+trap "{ rm -f $flash_image_file $log_file; }" EXIT
 
-"$chip_dir"/scripts/tools/build_esp32_flash_image.sh ./build/chip-crypto-tests.bin "$flash_image_file"
-"$chip_dir"/scripts/tools/esp32_qemu_run.sh "$flash_image_file" | tee results.log
+"$chip_dir"/scripts/tools/build_esp32_flash_image.sh "$test_dir"/build/chip-crypto-tests.bin "$flash_image_file"
+"$chip_dir"/scripts/tools/esp32_qemu_run.sh "$flash_image_file" | tee "$log_file"
 
 # If the logs contain failure message
-if grep -F "] : FAILED" results.log; then
-    die 'Some tests failed. Check results.log'
+if grep -F "] : FAILED" "$log_file"; then
+  die 'Some tests failed.'
 fi
 
 # If the logs do not contain final success status
-if grep -F "CHIP-tests: CHIP test status: 0" results.log; then
-    echo "$me: All tests passed"
+if grep -F "CHIP-tests: CHIP test status: 0" "$log_file"; then
+  echo "$me: All tests passed"
 else
-    die 'Tests did not run to completion. Check results.log'
+  die 'Tests did not run to completion.'
 fi
