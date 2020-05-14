@@ -25,7 +25,7 @@
 #include <CHIPCryptoPAL.h>
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
-
+#include <support/TestUtils.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -842,9 +842,17 @@ int TestCHIPCryptoPAL(void)
         NULL
     };
     // clang-format on
-
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
 
     return (nlTestRunnerStats(&theSuite));
+}
+
+void __attribute__((constructor)) my_init(void)
+{
+    printf("Deploying CHIP Crypto PAL tests\n");
+    if (CHIP_NO_ERROR != RegisterUnitTests(&TestCHIPCryptoPAL))
+    {
+        printf("Failed in deploying CHIP Crypto PAL tests\n");
+    }
 }

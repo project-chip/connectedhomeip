@@ -37,10 +37,19 @@
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/init.h>
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <nlunit-test.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#define PBUF_TYPE(pbuf) (pbuf)->type_internal
+#else
+#define PBUF_TYPE(pbuf) (pbuf)->type
+#endif // (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using ::chip::System::PacketBuffer;
 
@@ -123,14 +132,14 @@ static void BufferAlloc(struct TestContext * theContext)
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    lType  = theContext->buf->type;
+    lType  = PBUF_TYPE(theContext->buf);
     lFlags = theContext->buf->flags;
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
     lPool = theContext->buf->pool;
 #endif // LWIP_PBUF_FROM_CUSTOM_POOLS
     memset(theContext->buf, 0, lAllocSize);
-    theContext->buf->type  = lType;
-    theContext->buf->flags = lFlags;
+    PBUF_TYPE(theContext->buf) = lType;
+    theContext->buf->flags     = lFlags;
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
     theContext->buf->pool = lPool;
 #endif // LWIP_PBUF_FROM_CUSTOM_POOLS

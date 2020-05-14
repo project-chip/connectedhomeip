@@ -78,11 +78,22 @@ AM_CPPFLAGS                                           = \
     $(NULL)
 
 libTestInetCommon_a_SOURCES                           = \
-    TapAddrAutoconf.cpp                                 \
     TestInetCommon.cpp                                  \
     TestInetCommonOptions.cpp                           \
     TestInetLayerCommon.cpp                             \
     $(NULL)
+
+if CHIP_LWIP_TARGET_STANDALONE
+
+# TapAddrAutoconf is only needed for LwIP on sockets simulation in
+# which a host tap/tun interface is used to proxy the LwIP stack onto
+# a host native network interface.
+
+libTestInetCommon_a_SOURCES                          += \
+    TapAddrAutoconf.cpp                                 \
+    $(NULL)
+
+endif # CHIP_LWIP_TARGET_STANDALONE
 
 CHIP_LDADD                                            = \
     $(top_builddir)/src/inet/libInetLayer.a             \
@@ -113,6 +124,8 @@ COMMON_LDADD                                          = \
 #       etc. on IPv4 and IPv6 IP end points. When that issue has been
 #       resolved, move these tests to check_PROGRAMS.
 
+if CHIP_LWIP_TARGET_STANDALONE
+# Build and run these test targets only on standalone device targets
 noinst_PROGRAMS                                       = \
     TestLwIPDNS                                         \
     TestInetEndPoint                                    \
@@ -136,6 +149,7 @@ check_PROGRAMS                                        = \
 TESTS                                                 = \
     $(check_PROGRAMS)                                   \
     $(NULL)
+endif # CHIP_LWIP_TARGET_STANDALONE
 
 # The additional environment variables and their values that will be
 # made available to all programs and scripts in TESTS.

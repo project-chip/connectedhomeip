@@ -68,8 +68,9 @@ AM_CPPFLAGS                                    = \
     $(NLUNIT_TEST_CPPFLAGS)                      \
     $(NULL)
 
-CHIP_LDADD                                      = \
-    $(top_builddir)/src/crypto/libChipCrypto.a    \
+CHIP_LDADD                                          = \
+    $(top_builddir)/src/crypto/libChipCrypto.a        \
+    $(top_builddir)/src/lib/support/libSupportLayer.a \
     $(NULL)
 
 COMMON_LDADD                                   = \

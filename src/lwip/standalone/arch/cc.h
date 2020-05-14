@@ -51,6 +51,10 @@
 #ifndef __ARCH_CC_H__
 #define __ARCH_CC_H__
 
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+
 /* Include some files for defining library routines */
 #include <limits.h>
 #include <string.h>
