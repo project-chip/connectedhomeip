@@ -22,7 +22,9 @@
  */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <memory.h>
+#include <string.h>
 #include "utest.h" /* TODO pass all that stuff in -D */
 #include "../../api/chip-zcl.h"
 
@@ -36,10 +38,51 @@ int main()
     //   unsigned length-prefixed string, 1 byte length, value of string "This is an example of the string."
     //
     ChipZclRawBuffer_t * buffer = chipZclBufferAlloc(1000);
+    uint8_t num1                = 0x13;
+    uint16_t num2               = 0x4231;
+    uint32_t num4               = 0xABCD1234;
+    char * sIn                  = "Test data is encoded and decoded back.";
+    char * sOut                 = malloc(100);
+    uint16_t ret;
 
-    printf("Success \n");
+    chipZclCodecEncodeStart(buffer);
+    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num1, 1);
+    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num2, 2);
+    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num4, 4);
+    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_STRING, sIn, strlen(sIn));
+    chipZclCodecEncodeEnd(buffer);
+
+    chipZclBufferFlip(buffer);
+
+    chipZclCodecDecodeStart(buffer);
+    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num1, 1, &ret);
+    if (num1 != 0x13)
+    {
+        printf("Failure: num1=%d\n", num1);
+        return 1;
+    }
+    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num2, 2, &ret);
+    if (num2 != 0x4231)
+    {
+        printf("Failure: num2=%d\n", num2);
+        return 1;
+    }
+    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num4, 4, &ret);
+    if (num4 != 0xABCD1234)
+    {
+        printf("Failure: num4=%d\n", num4);
+        return 1;
+    }
+    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_STRING, sOut, 100, &ret);
+    if (strcmp(sIn, sOut))
+    {
+        printf("Failure: sOut=%s\n", sOut);
+        return 1;
+    }
+    chipZclCodecDecodeEnd(buffer);
 
     chipZclBufferFree(buffer);
 
+    printf("Success: %s\n", sOut);
     return 0;
 }
