@@ -30,8 +30,8 @@
 
 #include <support/DLLUtil.h>
 #include <system/SystemObject.h>
-#include <stdint.h>
 
+#include <stdint.h>
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/select.h>
 #endif

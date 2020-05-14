@@ -29,20 +29,19 @@
 
 #define __APPLE_USE_RFC_3542
 
-#include <string.h>
-
 #include "RawEndPoint.h"
-#include <InetLayer.h>
+
 #include "InetFaultInjection.h"
-#include <system/SystemFaultInjection.h>
+#include <InetLayer.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemFaultInjection.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/ip.h>
 #include <lwip/raw.h>
 #include <lwip/tcpip.h>
-#include <lwip/ip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -51,9 +50,9 @@
 #include <sys/socket.h>
 #endif // HAVE_SYS_SOCKET_H
 #include <errno.h>
-#include <unistd.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 #if HAVE_NETINET_ICMP6_H
 #include <netinet/icmp6.h>
 #endif // HAVE_NETINET_ICMP6_H
@@ -65,6 +64,8 @@
 #else
 #define SOCK_FLAGS 0
 #endif
+
+#include <string.h>
 
 namespace chip {
 namespace Inet {

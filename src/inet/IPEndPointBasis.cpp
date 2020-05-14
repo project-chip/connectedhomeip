@@ -50,12 +50,12 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <sys/socket.h>
 #include <errno.h>
-#include <unistd.h>
-#include <netinet/in.h>
 #include <net/if.h>
+#include <netinet/in.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif // HAVE_SYS_SOCKET_H

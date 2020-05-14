@@ -22,8 +22,8 @@
  *      Support functions for parsing command-line arguments for Inet types
  *
  */
-
 #include <inet/InetArgParser.h>
+
 #include <inet/IPAddress.h>
 
 namespace chip {

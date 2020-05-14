@@ -35,8 +35,8 @@
 
 #include <CHIPVersion.h>
 
-#include <inet/InetLayer.h>
 #include <inet/InetError.h>
+#include <inet/InetLayer.h>
 
 #include <support/CHIPArgParser.hpp>
 
