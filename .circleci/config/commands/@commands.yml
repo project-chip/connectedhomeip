@@ -4,6 +4,28 @@ bootstrap:
         - run:
               command: scripts/build/bootstrap.sh
               name: Bootstrap
+save-persistent-ci-cache:
+    description: Save persistent CI Cache
+    parameters:
+        builder:
+            type: string
+    steps:
+        - save_cache:
+              key:
+                  build-environment-{{ arch
+                  }}-<<parameters.builder>>-persistent-cache
+              paths:
+                  - ./ci-cache-persistent
+load-persistent-ci-cache:
+    description: Load persistent CI Cache
+    parameters:
+        builder:
+            type: string
+    steps:
+        - restore_cache:
+              key:
+                  build-environment-{{ arch
+                  }}-<<parameters.builder>>-persistent-cache
 save-build-environment:
     description: Save the build environment
     parameters:

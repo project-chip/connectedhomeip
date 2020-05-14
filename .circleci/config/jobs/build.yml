@@ -6,7 +6,11 @@ environment:
 executor: << parameters.builder >>
 steps:
     - checkout
+    - load-persistent-ci-cache:
+          builder: << parameters.builder >>
     - setup-environment:
+          builder: << parameters.builder >>
+    - save-persistent-ci-cache:
           builder: << parameters.builder >>
     - bootstrap
     - save-bootstrapped-tree:
