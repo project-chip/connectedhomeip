@@ -22,8 +22,9 @@
  *          Provides implementations of the CHIP System Layer platform
  *          time/clock functions based on the FreeRTOS tick counter.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <support/TimeUtils.h>
 
 #include "FreeRTOS.h"
