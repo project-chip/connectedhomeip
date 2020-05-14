@@ -30,7 +30,7 @@
  * generated layer for a specific code is responsible for mapping ZCL types onto these
  * base types.
  */
-enum
+typedef enum
 {
     CHIP_ZCL_STRUCT_TYPE_BOOLEAN,
 
@@ -63,7 +63,7 @@ enum
     // Markers that are not really value types.
     CHIP_ZCL_STRUCT_START_MARKER,
     CHIP_ZCL_STRUCT_ARRAY_MARKER
-};
+} ChipZclType_t;
 
 // Override CHIP_ZCL_STRUCT_TYPE bit 7 - indicates mandatory field.
 #define CHIP_ZCL_STRUCT_TYPE_MODIFIER_MANDATORY 0x80

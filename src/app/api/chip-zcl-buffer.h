@@ -33,7 +33,8 @@ typedef struct
 {
     uint8_t * buffer;
     uint16_t totalLength;
-    uint16_t index;
+    uint16_t currentPosition;
+    uint16_t endPosition;
 } ChipZclRawBuffer_t;
 
 /**
@@ -45,5 +46,10 @@ ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
  * Function that frees a buffer.
  */
 void chipZclBufferFree(ChipZclRawBuffer_t * buffer);
+
+/**
+ * Flips the buffer between reading and writing.
+ */
+void chipZclBufferFlip(ChipZclRawBuffer_t * buffer);
 
 #endif // CHIP_ZCL_BUFFER

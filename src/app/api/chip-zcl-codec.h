@@ -27,4 +27,35 @@
 
 #include "chip-zcl-struct.h"
 
+/**
+ * @brief Starts the encoding process. if there is any kind of preamble of anything, this function is responsible for putting it
+ * there.
+ */
+ChipZclStatus_t chipZclCodecEncodeStart(ChipZclRawBuffer_t * buffer);
+
+/**
+ * @brief Encodes a single value of a given type.
+ */
+ChipZclStatus_t chipZclCodecEncode(ChipZclRawBuffer_t * buffer, ChipZclType_t type, void * ptr, uint16_t ptrLen);
+
+/**
+ * @brief Ends the encoding process. After this call the buffer is ready to go back to the lower layers.
+ */
+ChipZclStatus_t chipZclCodecEncodeEnd(ChipZclRawBuffer_t * buffer);
+
+/**
+ * @brief Starts the decoding process. if there is any kind of preamble of anything, this function is responsible for decoding it.
+ */
+ChipZclStatus_t chipZclCodecDecodeStart(ChipZclRawBuffer_t * buffer);
+
+/**
+ * @brief Decodes a single value and puts it into the pointer. If retLen is not NULL, the size of decoded value is put there.
+ */
+ChipZclStatus_t chipZclCodecDecode(ChipZclRawBuffer_t * buffer, ChipZclType_t type, void * ptr, uint16_t ptrLen, uint16_t * retLen);
+
+/**
+ * @brief Ends the decoding process. After this call, buffer should no longer be used for further decoding.
+ */
+ChipZclStatus_t chipZclCodecDecodeEnd(ChipZclRawBuffer_t * buffer);
+
 #endif // CHIP_ZCL_CODEC
