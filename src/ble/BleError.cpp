@@ -27,8 +27,8 @@
 
 #if CONFIG_NETWORK_LAYER_BLE
 
-#include <ble/BleLayer.h>
 #include <ble/BleError.h>
+#include <ble/BleLayer.h>
 
 #include <support/ErrorStr.h>
 

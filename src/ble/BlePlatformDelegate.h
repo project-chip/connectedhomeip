@@ -29,8 +29,8 @@
 
 #include <ble/BleUUID.h>
 
-#include <system/SystemPacketBuffer.h>
 #include <support/DLLUtil.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace Ble {

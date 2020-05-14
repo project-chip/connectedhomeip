@@ -25,9 +25,9 @@
 #ifndef BLEAPPLICATIONDELEGATE_H_
 #define BLEAPPLICATIONDELEGATE_H_
 
-#include <support/DLLUtil.h>
+#include <ble/BleConfig.h>
 
-#include "BleConfig.h"
+#include <support/DLLUtil.h>
 
 namespace chip {
 namespace Ble {
