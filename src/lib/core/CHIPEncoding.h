@@ -34,11 +34,11 @@
 #ifndef _CHIPENCODING_H
 #define _CHIPENCODING_H
 
-#include <stdint.h>
-
 #include <nlbyteorder.hpp>
-#include <nlio.hpp>
 #include <nlio-byteorder.hpp>
+#include <nlio.hpp>
+
+#include <stdint.h>
 
 namespace chip {
 

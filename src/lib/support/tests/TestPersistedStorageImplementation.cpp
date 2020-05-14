@@ -35,10 +35,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <platform/PersistedStorage.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CodeUtils.h>
-#include <platform/PersistedStorage.h>
 
 #include "TestPersistedStorageImplementation.h"
 

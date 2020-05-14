@@ -26,13 +26,13 @@
 
 #include "TestSupport.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <errno.h>
 
-#include <support/logging/CHIPLogging.h>
 #include <support/TimeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 using namespace chip;
 
