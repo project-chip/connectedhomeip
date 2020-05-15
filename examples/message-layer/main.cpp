@@ -36,6 +36,12 @@ constexpr const char * sToolOptionHelp = //
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
 
+struct
+{
+    bool Listen = false;
+    bool Udp    = false;
+} ProgramArguments;
+
 OptionSet sToolOptions = { //
     HandleOption,          //
     sToolOptionDefs,       //
@@ -54,6 +60,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 {
     switch (aIdentifier)
     {
+    case kToolOptListen:
+        ProgramArguments.Listen = true;
+        break;
+    case kToolOptUDPIP:
+        ProgramArguments.Udp = true;
+        break;
     default:
         return false;
     }
@@ -118,12 +130,23 @@ int main(int argc, char * argv[])
     initContext.systemLayer = &systemLayer;
     initContext.inet        = &inetLayer;
     initContext.fabricState = &fabricState;
+    initContext.listenTCP   = ProgramArguments.Listen;
+    initContext.listenUDP   = ProgramArguments.Listen;
 
     err = messageLayer.Init(&initContext);
     SuccessOrExit(err);
 
     err = exchangeMgr.Init(&messageLayer);
     SuccessOrExit(err);
+
+    if (ProgramArguments.Listen)
+    {
+        std::cout << "Acting as a SERVER ..." << std::endl;
+    }
+    else
+    {
+        std::cout << "Acting as a CLIENT ..." << std::endl;
+    }
 
     RegisterStopHandler();
     while (!programStopped)
