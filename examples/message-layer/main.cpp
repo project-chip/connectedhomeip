@@ -1,4 +1,8 @@
 #include <iostream>
+#include <thread>
+#include <chrono>
+
+#include <signal.h>
 
 #include <CHIPVersion.h>
 
@@ -67,6 +71,20 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
     return true;
 }
 
+volatile bool programStopped = false;
+void StopHandler(int s)
+{
+    programStopped = true;
+}
+
+void RegisterStopHandler()
+{
+    signal(SIGHUP, StopHandler);
+    signal(SIGQUIT, StopHandler);
+    signal(SIGSTOP, StopHandler);
+    signal(SIGINT, StopHandler);
+}
+
 } // namespace
 
 int main(int argc, char * argv[])
@@ -107,7 +125,11 @@ int main(int argc, char * argv[])
     err = exchangeMgr.Init(&messageLayer);
     SuccessOrExit(err);
 
-    // FIXME: how to loop and listen here?
+    RegisterStopHandler();
+    while (!programStopped)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
 
     // TODO(Andrei): RAII would be nice here
     exchangeMgr.Shutdown();
@@ -118,6 +140,10 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         std::cout << "FAILED: " << ErrorStr(err) << std::endl;
+    }
+    else
+    {
+        std::cout << "DONE!" << std::endl;
     }
 
     return 0;
