@@ -8,7 +8,6 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
-
     - test:
           name: Run Tests [<< matrix.builder >>]
           matrix:
@@ -20,7 +19,6 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
-
     - code-coverage:
           name: Code Coverage [<< matrix.builder >>]
           matrix:
@@ -32,7 +30,6 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
-
     - deploy:
           name: Deploy [<< matrix.builder >>]
           matrix:
@@ -44,7 +41,6 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
-
     - examples_nrf:
           name: Build Examples [nRF]
           filters:
