@@ -18,8 +18,8 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController <AVCaptureMetadataOutputObjectsDelegate>
 

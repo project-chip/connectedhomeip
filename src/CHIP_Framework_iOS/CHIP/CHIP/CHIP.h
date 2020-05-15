@@ -18,11 +18,13 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import "CHIPSetupPayload.h"
-#import "CHIPQRCodeSetupPayloadParser.h"
-#import "CHIPManualSetupPayloadParser.h"
+// pull together CHIP headers
 #import "CHIPError.h"
+#import "CHIPManualSetupPayloadParser.h"
+#import "CHIPQRCodeSetupPayloadParser.h"
+#import "CHIPSetupPayload.h"
+
+#import <Foundation/Foundation.h>
 //! Project version number for CHIP.
 FOUNDATION_EXPORT double CHIPVersionNumber;
 
