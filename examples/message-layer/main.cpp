@@ -107,7 +107,12 @@ int main(int argc, char * argv[])
     err = exchangeMgr.Init(&messageLayer);
     SuccessOrExit(err);
 
-    // FIXME: what now?
+    // FIXME: how to loop and listen here?
+
+    // TODO(Andrei): RAII would be nice here
+    exchangeMgr.Shutdown();
+    inetLayer.Shutdown();
+    systemLayer.Shutdown();
 
 exit:
     if (err != CHIP_NO_ERROR)
