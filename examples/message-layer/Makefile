@@ -32,7 +32,14 @@ include $(BUILD_SUPPORT_DIR)/standalone-chip.mk
 
 APP = chip-message-layer-demo
 
-STD_LIBS += -lChipCrypto -lssl -lcrypto
+STD_LIBS +=                           \
+   -lChipCrypto                       \
+   $(OPENSSL_LDFLAGS) $(OPENSSL_LIBS) \
+   $(CRYPTO_LDFLAGS) $(CRYPTO_LIBS)   \
+   $(MBEDTLS_LDFLAGS) $(MBEDTLS_LIBS)
+
+# TODO: find out why above is not sufficient
+STD_LIBS += -lcrypto
 
 SRCS = \
     $(PROJECT_ROOT)/main.cpp \

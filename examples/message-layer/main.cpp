@@ -1,10 +1,13 @@
 #include <iostream>
 
 #include <CHIPVersion.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CodeUtils.h>
+
 #include <core/CHIPExchangeMgr.h>
 #include <core/CHIPMessageLayer.h>
+#include <inet/InetLayer.h>
+#include <support/CHIPArgParser.hpp>
+#include <support/CodeUtils.h>
+#include <system/SystemLayer.h>
 
 namespace {
 
@@ -75,13 +78,36 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    chip::ChipExchangeManager exchangeMgr;
-    chip::ChipMessageLayer messageLayer;
-
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipExchangeManager exchangeMgr;
+    ChipMessageLayer messageLayer;
+    ChipFabricState fabricState;
+    System::Layer systemLayer;
+    Inet::InetLayer inetLayer;
+
+    ChipMessageLayer::InitContext initContext;
+
+    err = systemLayer.Init(NULL);
+    SuccessOrExit(err);
+
+    err = inetLayer.Init(systemLayer, NULL);
+    SuccessOrExit(err);
+
+    err = fabricState.Init();
+    SuccessOrExit(err);
+
+    initContext.systemLayer = &systemLayer;
+    initContext.inet        = &inetLayer;
+    initContext.fabricState = &fabricState;
+
+    err = messageLayer.Init(&initContext);
+    SuccessOrExit(err);
 
     err = exchangeMgr.Init(&messageLayer);
     SuccessOrExit(err);
+
+    // FIXME: what now?
 
 exit:
     if (err != CHIP_NO_ERROR)
