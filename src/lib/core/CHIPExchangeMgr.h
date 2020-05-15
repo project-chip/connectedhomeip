@@ -137,8 +137,6 @@ public:
     uint16_t ExchangeId;      /**< [READ ONLY] Assigned exchange ID. */
     void * AppState;          /**< Pointer to application-specific state object. */
     bool AllowDuplicateMsgs;  /**< Boolean indicator of whether duplicate messages are allowed for a given exchange. */
-    uint8_t EncryptionType;   /**< Encryption type to use when sending a message. */
-    uint16_t KeyId;           /**< Encryption key to use when sending a message. */
     uint32_t RetransInterval; /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
     Timeout ResponseTimeout;  /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -184,8 +182,6 @@ public:
     void SetResponseExpected(bool inResponseExpected);
     bool AutoRequestAck() const;
     void SetAutoRequestAck(bool autoReqAck);
-    bool GetAutoReleaseKey() const;
-    void SetAutoReleaseKey(bool autoReleaseKey);
     bool ShouldAutoReleaseConnection() const;
     void SetShouldAutoReleaseConnection(bool autoReleaseCon);
     bool UseEphemeralUDPPort(void) const;

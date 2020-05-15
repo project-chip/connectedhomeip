@@ -94,22 +94,6 @@ enum
     kTag_FabricId = 1, /**< [ uint ] Fabric ID. */
 };
 
-/**
- * Profile values and tags from Weave protocol, kept for CHIP porting
- * purposes. These are @deprecated and should be removed.
- */
-
-enum ChipVendorId
-{
-    kChipVendor_Common = 0
-};
-
-enum ChipProfileId
-{
-    kChipProfile_Common             = (kChipVendor_Common << 16) | 0x0000, // Common Profile
-    kChipProfile_FabricProvisioning = (kChipVendor_Common << 16) | 0x0005, // Fabric Provisioning Profile
-};
-
 } // namespace
 
 ChipFabricState::ChipFabricState()

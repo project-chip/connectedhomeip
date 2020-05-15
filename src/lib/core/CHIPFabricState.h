@@ -56,6 +56,32 @@ class DLL_EXPORT ChipExchangeManager;
 struct ChipMessageInfo;
 
 /**
+ * Profile values and tags from Weave protocol, kept for CHIP porting
+ * purposes. These are @deprecated and should be removed.
+ */
+
+enum ChipVendorId
+{
+    kChipVendor_Common = 0
+};
+
+enum ChipProfileId
+{
+    kChipProfile_Common             = (kChipVendor_Common << 16) | 0x0000, // Common Profile
+    kChipProfile_FabricProvisioning = (kChipVendor_Common << 16) | 0x0005, // Fabric Provisioning Profile
+};
+
+enum ChipCommonProfileMsssageTypes {
+    kCommonMsgType_StatusReport             = 1,
+    kCommonMsgType_Null                     = 2,
+
+    //Reliable Messaging Protocol Message Types
+    kCommonMsgType_WRMP_Delayed_Delivery    = 3,
+    kCommonMsgType_WRMP_Throttle_Flow       = 4
+};
+
+
+/**
  * @class ChipSessionState
  *
  * @brief

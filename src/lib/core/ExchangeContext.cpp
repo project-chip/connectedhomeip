@@ -32,18 +32,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <core/CHIPCore.h>
+#include <core/CHIPExchangeMgr.h>
 #include <core/CHIPEncoding.h>
-#include <Profiles/CHIPProfiles.h>
-#include <Profiles/common/CommonProfile.h>
+#include <core/CHIPMessageLayer.h>
 #include <support/CodeUtils.h>
 #include <support/FlagUtils.hpp>
 #include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <SystemLayer/SystemTimer.h>
+#include <system/SystemTimer.h>
 #include <support/CHIPFaultInjection.h>
-#include <SystemLayer/SystemStats.h>
-//#include <nestlabs/log/nllog.hpp>
+#include <system/SystemStats.h>
+
 #undef nlLogError
 #define nlLogError(MSG, ...)
 
@@ -232,9 +231,9 @@ bool ExchangeContext::ShouldDropAck(void) const
 
 static inline bool IsWRMPControlMessage(uint32_t profileId, uint8_t msgType)
 {
-    return (profileId == chip::Profiles::kChipProfile_Common &&
-            (msgType == chip::Profiles::Common::kMsgType_WRMP_Throttle_Flow ||
-             msgType == chip::Profiles::Common::kMsgType_WRMP_Delayed_Delivery));
+    return (profileId == kChipProfile_Common &&
+            (msgType == kCommonMsgType_WRMP_Throttle_Flow ||
+             msgType == kCommonMsgType_WRMP_Delayed_Delivery));
 }
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
@@ -269,27 +268,6 @@ bool ExchangeContext::AutoRequestAck() const
 void ExchangeContext::SetAutoRequestAck(bool autoReqAck)
 {
     SetFlag(mFlags, static_cast<uint16_t>(kFlagAutoRequestAck), autoReqAck);
-}
-
-/**
- * Return whether the encryption key associated with the exchange should be
- * released when the exchange is freed.
- */
-bool ExchangeContext::GetAutoReleaseKey() const
-{
-    return GetFlag(mFlags, static_cast<uint16_t>(kFlagAutoReleaseKey));
-}
-
-/**
- * Set whether the encryption key associated with the exchange should be
- * released when the exchange is freed.
- *
- * @param[in] autoReleaseKey        True if the message encryption key should be
- *                                  automatically released.
- */
-void ExchangeContext::SetAutoReleaseKey(bool autoReleaseKey)
-{
-    SetFlag(mFlags, static_cast<uint16_t>(kFlagAutoReleaseKey), autoReleaseKey);
 }
 
 /**
@@ -378,8 +356,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
     msgInfo.Clear();
     msgInfo.SourceNodeId = ExchangeMgr->FabricState->LocalNodeId;
     msgInfo.DestNodeId = PeerNodeId;
-    msgInfo.EncryptionType = EncryptionType;
-    msgInfo.KeyId = KeyId;
 
     return SendMessage(profileId, msgType, msgBuf, sendFlags, &msgInfo, msgCtxt);
 }
@@ -467,8 +443,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
     // Set the Message Protocol Version
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     if (sendFlags & kSendFlag_RequestAck || IsWRMPControlMessage(profileId, msgType) ||
-        (profileId == chip::Profiles::kChipProfile_Common &&
-         msgType == chip::Profiles::Common::kMsgType_Null))
+        (profileId == kChipProfile_Common && msgType == kCommonMsgType_Null))
     {
         if (kChipMessageVersion_Unspecified == mMsgProtocolVersion)
         {
@@ -678,8 +653,7 @@ CHIP_ERROR ExchangeContext::SendCommonNullMessage(void)
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err = SendMessage(chip::Profiles::kChipProfile_Common,
-                      chip::Profiles::Common::kMsgType_Null, msgBuf,
+    err = SendMessage(kChipProfile_Common, kCommonMsgType_Null, msgBuf,
                       kSendFlag_NoAutoRequestAck);
     msgBuf = NULL;
 
@@ -886,14 +860,6 @@ void ExchangeContext::Release(void)
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
         uint16_t tmpid = ExchangeId;
 #endif
-
-        // If so configured, automatically release any reservation held on
-        // the message encryption key.
-        if (GetAutoReleaseKey())
-        {
-            em->MessageLayer->SecurityMgr->ReleaseKey(PeerNodeId, KeyId);
-        }
-
         // If configured, automatically release a reference to the ChipConnection object.
         if (ShouldAutoReleaseConnection() && Con != NULL)
         {
@@ -935,8 +901,6 @@ CHIP_ERROR ExchangeContext::ResendMessage()
     msgInfo.Clear();
     msgInfo.MessageVersion = mMsgProtocolVersion;
     msgInfo.SourceNodeId = ExchangeMgr->FabricState->LocalNodeId;
-    msgInfo.EncryptionType = EncryptionType;
-    msgInfo.KeyId = KeyId;
     msgInfo.DestNodeId = PeerNodeId;
     res = ExchangeMgr->MessageLayer->DecodeHeader(msg, &msgInfo, &payload);
     if (res != CHIP_NO_ERROR)
@@ -1268,7 +1232,7 @@ CHIP_ERROR ExchangeContext::WRMPSendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_WRMP_Throttle_Flow,
+    err = SendMessage(kChipProfile_Common, kCommonMsgType_WRMP_Throttle_Flow,
                       msgBuf, kSendFlag_NoAutoRequestAck);
 
 exit:
@@ -1326,7 +1290,7 @@ CHIP_ERROR ExchangeContext::WRMPSendDelayedDelivery(uint32_t pauseTimeMillis, ui
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Profiles::kChipProfile_Common, Profiles::Common::kMsgType_WRMP_Delayed_Delivery,
+    err = SendMessage(kChipProfile_Common, kCommonMsgType_WRMP_Delayed_Delivery,
                       msgBuf, kSendFlag_NoAutoRequestAck);
 
 exit:
@@ -1578,8 +1542,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipEx
     }
 
     //Received Flow Throttle
-    if (exchHeader->ProfileId == chip::Profiles::kChipProfile_Common &&
-        exchHeader->MessageType == chip::Profiles::Common::kMsgType_WRMP_Throttle_Flow)
+    if (exchHeader->ProfileId == kChipProfile_Common &&
+        exchHeader->MessageType == kCommonMsgType_WRMP_Throttle_Flow)
     {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         //Extract PauseTimeMillis from msgBuf
@@ -1590,8 +1554,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipEx
 #endif
     }
     //Return and not pass this to Application if Common::Null Msg Type
-    else if ((exchHeader->ProfileId == chip::Profiles::kChipProfile_Common) &&
-        (exchHeader->MessageType == chip::Profiles::Common::kMsgType_Null))
+    else if ((exchHeader->ProfileId == kChipProfile_Common) &&
+        (exchHeader->MessageType == kCommonMsgType_Null))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
