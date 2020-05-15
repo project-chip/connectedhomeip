@@ -31,21 +31,19 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <core/CHIPCore.h>
-#include <Profiles/CHIPProfiles.h>
-#include <Profiles/common/CommonProfile.h>
-#include <Profiles/security/CHIPSecurity.h>
+#include <core/CHIPExchangeMgr.h>
+#include <core/CHIPFabricState.h>
+#include <core/CHIPMessageLayer.h>
 #include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/CHIPFaultInjection.h>
-#include <SystemLayer/SystemTimer.h>
-#include <SystemLayer/SystemStats.h>
+#include <system/SystemTimer.h>
+#include <system/SystemStats.h>
 
 namespace chip {
 
-using namespace chip::Profiles;
 using namespace chip::Encoding;
 
 /**
@@ -264,8 +262,6 @@ ExchangeContext *ChipExchangeManager::NewContext(ChipConnection *con, void *appS
     if (ec != NULL)
     {
         ec->Con = con;
-        ec->KeyId = con->DefaultKeyId;
-        ec->EncryptionType = con->DefaultEncryptionType;
     }
     return ec;
 }
@@ -638,10 +634,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
     bool msgNeedsAck;
     bool sendAckAndCloseExchange;
 #endif
-#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    bool isMsgCounterSyncResp;
-    bool peerGroupMsgIdNotSynchronized;
-#endif
     CHIP_ERROR  err                       = CHIP_NO_ERROR;
 
     // Decode the exchange header.
@@ -655,12 +647,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
         ExitNow(err = CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION);
     }
 
-    // Notify CHIP Security Manager that encrypted message has been received.
-    if (msgInfo->EncryptionType != kChipEncryptionType_None)
-    {
-        MessageLayer->SecurityMgr->OnEncryptedMsgRcvd(msgInfo->KeyId, msgInfo->SourceNodeId, msgInfo->EncryptionType);
-    }
-
     msgCon = msgInfo->InCon;
 
     ChipLogRetain(ExchangeManager, "Msg %s %08" PRIX32 ":%d %d %016" PRIX64 " %04" PRIX16 " %04" PRIX16 " %ld MsgId:%08" PRIX32,
@@ -668,45 +654,10 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
                    (int)msgBuf->DataLength(), msgInfo->SourceNodeId, msgCon->LogId(), exchangeHeader.ExchangeId,
                    (long)err, msgInfo->MessageId);
 
-#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    isMsgCounterSyncResp = exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Security &&
-                           exchangeHeader.MessageType == chip::Profiles::Security::kMsgType_MsgCounterSyncResp;
-    peerGroupMsgIdNotSynchronized = (msgInfo->Flags & kChipMessageFlag_PeerGroupMsgIdNotSynchronized) != 0;
-
-    // If received message is a MsgCounterSyncResp process it first.
-    if (isMsgCounterSyncResp)
-    {
-        MessageLayer->SecurityMgr->HandleMsgCounterSyncRespMsg(msgInfo, msgBuf);
-        msgBuf = NULL;
-    }
-
-    // If message counter synchronization was requested.
-    if ((msgInfo->Flags & kChipMessageFlag_MsgCounterSyncReq) != 0)
-    {
-        MessageLayer->SecurityMgr->SendMsgCounterSyncResp(msgInfo, msgInfo->InPacketInfo);
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        // Retransmit all pending messages that were encrypted with application group key.
-        RetransPendingAppGroupMsgs(msgInfo->SourceNodeId);
-#endif
-    }
-    // Otherwise, if received message is not MsgCounterSyncResp and peer's message counter synchronization is needed.
-    else if (!isMsgCounterSyncResp && peerGroupMsgIdNotSynchronized)
-    {
-        MessageLayer->SecurityMgr->SendSolitaryMsgCounterSyncReq(msgInfo, msgInfo->InPacketInfo);
-    }
-
-    // Exit now without error if received MsgCounterSyncResp message.
-    if (isMsgCounterSyncResp)
-    {
-        ExitNow();
-    }
-#endif // CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     //Received Delayed Delivery Message: Extend time for pending retrans objects
-    if (exchangeHeader.ProfileId == chip::Profiles::kChipProfile_Common &&
-        exchangeHeader.MessageType == chip::Profiles::Common::kMsgType_WRMP_Delayed_Delivery)
+    if (exchangeHeader.ProfileId == kChipProfile_Common &&
+        exchangeHeader.MessageType == kCommonMsgType_WRMP_Delayed_Delivery)
     {
         // Process Delayed Delivery message if it is not a duplicate.
         if ((msgInfo->Flags & kChipMessageFlag_DuplicateMessage) == 0)
@@ -805,11 +756,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
     // Create new exchange to send ack for a duplicate message and then close this exchange.
     sendAckAndCloseExchange = msgNeedsAck && (matchingUMH == NULL || (dupMsg && !matchingUMH->AllowDuplicateMsgs));
 
-#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    // Don't create new EC only to send an ack if Peer's message counter synchronization is required.
-    if (peerGroupMsgIdNotSynchronized)
-        sendAckAndCloseExchange = false;
-#endif
 #endif
 
     // If we found a handler or we need to open a new exchange to send ack for a duplicate message.
@@ -845,8 +791,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
                 ec->PeerIntf = msgInfo->InPacketInfo->Interface;
             }
         }
-        ec->EncryptionType = msgInfo->EncryptionType;
-        ec->KeyId = msgInfo->KeyId;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // No need to set WRMP timer, this will be done when we add to retrans table
         ec->mWRMPNextAckTime = 0;
@@ -890,12 +834,6 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
         ec->SetUseEphemeralUDPPort(GetFlag(msgInfo->Flags, kChipMessageFlag_ViaEphemeralUDPPort));
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
-
-        // Add a reservation for the message encryption key.  This will ensure the key is not removed until the exchange is freed.
-        MessageLayer->SecurityMgr->ReserveKey(ec->PeerNodeId, ec->KeyId);
-
-        // Arrange to automatically release the encryption key when the exchange is freed.
-        ec->SetAutoReleaseKey(true);
 
         ec->HandleMessage(msgInfo, &exchangeHeader, msgBuf, umhandler);
         msgBuf = NULL;
@@ -978,7 +916,7 @@ void ChipExchangeManager::HandleMessageReceived(ChipMessageLayer *msgLayer, Chip
 
 void ChipExchangeManager::HandleMessageReceived(ChipConnection *con, ChipMessageInfo *msgInfo, PacketBuffer *msgBuf)
 {
-    con->MessageLayer->ExchangeMgr->DispatchMessage(msgInfo, msgBuf);
+    con->GetMessageLayer()->ExchangeMgr->DispatchMessage(msgInfo, msgBuf);
 }
 
 CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader *exchangeHeader, PacketBuffer *buf)
@@ -1108,48 +1046,6 @@ void ChipExchangeManager::AllowUnsolicitedMessages(ChipConnection *con)
 }
 
 /**
- *  Invoked when a message encryption key has been rejected by a peer (via a KeyError), or a key has
- *  otherwise become invalid (e.g. by ending a session).
- *
- *  @param[in] peerNodeId  The ID of the peer node with which the key is associated.
- *  @param[in] keyId       The ID of the key that has failed.
- *  @param[in] keyErr      A CHIP_ERROR representing the reason the key is no longer valid.
- *
- */
-void ChipExchangeManager::NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr)
-{
-    ExchangeContext *ec = (ExchangeContext *) ContextPool;
-
-    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
-    {
-        if (ec->ExchangeMgr != NULL && ec->KeyId == keyId && ec->PeerNodeId == peerNodeId)
-        {
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-            // Ensure the exchange context stays around until we're done with it.
-            ec->AddRef();
-
-            // Fail entries matching ec.
-            FailRetransmitTableEntries(ec, keyErr);
-#endif
-
-            // Application callback function in key error case.
-            if (ec->OnKeyError)
-                ec->OnKeyError(ec, keyErr);
-
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-            // Release reference to the exchange context.
-            ec->Release();
-#endif
-        }
-    }
-
-    for (int i = 0; i < CHIP_CONFIG_MAX_BINDINGS; i++)
-    {
-        BindingPool[i].OnKeyFailed(peerNodeId, keyId, keyErr);
-    }
-}
-
-/**
  *  Invoked when the security manager becomes available for initiating new secure sessions.
  */
 void ChipExchangeManager::NotifySecurityManagerAvailable()
@@ -1165,54 +1061,6 @@ void ChipExchangeManager::NotifySecurityManagerAvailable()
 }
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-/**
- *  Clear MsgCounterSyncReq flag for all pending messages to that peer.
- *
- *  @param[in] peerNodeId    Node ID of the destination node.
- *
- */
-void ChipExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
-{
-    RetransTableEntry *re = (RetransTableEntry *) RetransTable;
-
-    // Find all retransmit entries (re) matching peerNodeId and using application group key.
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++, re++)
-    {
-        if (re->exchContext != NULL && re->exchContext->PeerNodeId == peerNodeId && ChipKeyId::IsAppGroupKey(re->exchContext->KeyId))
-        {
-            // Clear MsgCounterSyncReq flag.
-            uint16_t headerField = LittleEndian::Get16(re->msgBuf->Start());
-            headerField &= ~kChipMessageFlag_MsgCounterSyncReq;
-            LittleEndian::Put16(re->msgBuf->Start(), headerField);
-        }
-    }
-}
-
-/**
- *  Retransmit all pending messages that were encrypted with application
- *  group key and were addressed to the specified node.
- *
- *  @param[in] peerNodeId    Node ID of the destination node.
- *
- */
-void ChipExchangeManager::RetransPendingAppGroupMsgs(uint64_t peerNodeId)
-{
-    RetransTableEntry *re = (RetransTableEntry *) RetransTable;
-
-    // Find all retransmit entries (re) matching peerNodeId and using application group key.
-    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++, re++)
-    {
-        if (re->exchContext != NULL && re->exchContext->PeerNodeId == peerNodeId && ChipKeyId::IsAppGroupKey(re->exchContext->KeyId))
-        {
-            // Decrement counter to discount the first sent message, which
-            // was ignored by receiver due to un-synchronized message counter.
-            re->sendCount--;
-
-            // Retramsmit message.
-            SendFromRetransTable(re);
-        }
-    }
-}
 
 /**
 * Return a tick counter value given a time difference and a tick interval.

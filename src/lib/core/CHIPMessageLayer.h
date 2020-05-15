@@ -275,6 +275,7 @@ public:
     /************** ChipConnectionContext implementation ******************/
     Inet::InetLayer * InetLayer() override { return Inet; }
     Ble::BleLayer * BleLayer() override { return mBle; }
+    ChipMessageLayer * MessageLayer() override { return this; }
 
 
     CHIP_ERROR EncodeMessageWithLength(ChipMessageInfo *msgInfo, PacketBuffer *msgBuf, ChipConnection *con,

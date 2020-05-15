@@ -450,10 +450,6 @@ public:
 
     void AllowUnsolicitedMessages(ChipConnection * con);
 
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    void ClearMsgCounterSyncReq(uint64_t peerNodeId);
-#endif
-
 private:
     uint16_t NextExchangeId;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -495,7 +491,6 @@ private:
     void ClearRetransmitTable(ExchangeContext * ec);
     void ClearRetransmitTable(RetransTableEntry & rEntry);
     void FailRetransmitTableEntries(ExchangeContext * ec, CHIP_ERROR err);
-    void RetransPendingAppGroupMsgs(uint64_t peerNodeId);
 
     void TicklessDebugDumpRetransTable(const char * log);
 
@@ -544,7 +539,6 @@ private:
     uint16_t GetBindingLogId(const Binding * const binding) const;
 
     void NotifySecurityManagerAvailable();
-    void NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr);
 
     ChipExchangeManager(const ChipExchangeManager &); // not defined
 };

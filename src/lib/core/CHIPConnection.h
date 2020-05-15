@@ -43,6 +43,9 @@
 #include <system/SystemStats.h>
 
 namespace chip {
+
+class ChipMessageLayer;
+
 enum
 {
     kChipPeerDescription_MaxLength = 100,
@@ -203,6 +206,7 @@ public:
 
     virtual chip::Inet::InetLayer * InetLayer() = 0;
     virtual chip::Ble::BleLayer * BleLayer()    = 0;
+    virtual ChipMessageLayer * MessageLayer() = 0;
 
     virtual uint64_t LocalNodeId() = 0;
 
@@ -233,7 +237,6 @@ public:
 class ChipConnection
 {
     friend class ChipMessageLayer;
-
 public:
     /**
      *  @enum State
@@ -385,6 +388,9 @@ public:
 
     bool IsIncoming(void) const { return GetFlag(mFlags, kFlag_IsIncoming); }
     void SetIncoming(bool val) { SetFlag(mFlags, kFlag_IsIncoming, val); }
+
+
+    ChipMessageLayer* GetMessageLayer() { return Context->MessageLayer(); }
 
 private:
     enum

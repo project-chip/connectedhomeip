@@ -138,8 +138,8 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg);
 #define CHIP_FAULT_INJECT_MAX_ARG(aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements)                                 \
     do                                                                                                                             \
     {                                                                                                                              \
-        FaultInjection::Manager & mgr          = chip::FaultInjection::GetManager();                                               \
-        const FaultInjection::Record * records = mgr.GetFaultRecords();                                                            \
+        nl::FaultInjection::Manager & mgr          = chip::FaultInjection::GetManager();                                               \
+        const nl::FaultInjection::Record * records = mgr.GetFaultRecords();                                                            \
         if (records[aFaultID].mNumArguments == 0)                                                                                  \
         {                                                                                                                          \
             int32_t arg = aMaxArg;                                                                                                 \
