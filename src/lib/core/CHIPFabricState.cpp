@@ -550,18 +550,21 @@ void ChipFabricState::SetDelegate(FabricStateDelegate * aDelegate)
     Delegate = aDelegate;
 }
 
-CHIP_ERROR ChipFabricState::GetSessionState(uint64_t remoteNodeId, ChipConnection *con, ChipSessionState& outSessionState) {
-    if (con == NULL) {
+CHIP_ERROR ChipFabricState::GetSessionState(uint64_t remoteNodeId, ChipConnection * con, ChipSessionState & outSessionState)
+{
+    if (con == NULL)
+    {
         PeerIndexType peerIndex;
         FindOrAllocPeerEntry(remoteNodeId, true, peerIndex);
-        outSessionState = ChipSessionState(
-                &NextUnencUDPMsgId, &PeerStates.MaxUnencUDPMsgIdRcvd[peerIndex], &PeerStates.UnencRcvFlags[peerIndex]);
-    } else{
+        outSessionState =
+            ChipSessionState(&NextUnencUDPMsgId, &PeerStates.MaxUnencUDPMsgIdRcvd[peerIndex], &PeerStates.UnencRcvFlags[peerIndex]);
+    }
+    else
+    {
         outSessionState = ChipSessionState(&NextUnencTCPMsgId, NULL, NULL);
     }
 
-   return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
-
 
 } // namespace chip

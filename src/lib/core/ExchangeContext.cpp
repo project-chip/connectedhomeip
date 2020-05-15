@@ -50,20 +50,23 @@ namespace chip {
 
 using namespace chip::Encoding;
 
-enum {
-    kFlagInitiator              = 0x0001, /// This context is the initiator of the exchange.
-    kFlagConnectionClosed       = 0x0002, /// This context was associated with a ChipConnection.
-    kFlagAutoRequestAck         = 0x0004, /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
-    kFlagDropAck                = 0x0008, /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
-    kFlagResponseExpected       = 0x0010, /// If a response is expected for a message that is being sent.
-    kFlagAckPending             = 0x0020, /// When set, signifies that there is an acknowledgment pending to be sent back.
-    kFlagPeerRequestedAck       = 0x0040, /// When set, signifies that at least one message received on this exchange requested an acknowledgment.
-                                          /// This flag is read by the application to decide if it needs to request an acknowledgment for the
-                                          /// response message it is about to send. This flag can also indicate whether peer is using WRMP.
-    kFlagMsgRcvdFromPeer        = 0x0080, /// When set, signifies that at least one message has been received from peer on this exchange context.
-    kFlagAutoReleaseKey         = 0x0100, /// Automatically release the message encryption key when the exchange context is freed.
-    kFlagAutoReleaseConnection  = 0x0200, /// Automatically release the associated ChipConnection when the exchange context is freed.
-    kFlagUseEphemeralUDPPort    = 0x0400, /// When set, use the local ephemeral UDP port as the source port for outbound messages.
+enum
+{
+    kFlagInitiator        = 0x0001, /// This context is the initiator of the exchange.
+    kFlagConnectionClosed = 0x0002, /// This context was associated with a ChipConnection.
+    kFlagAutoRequestAck   = 0x0004, /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
+    kFlagDropAck          = 0x0008, /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
+    kFlagResponseExpected = 0x0010, /// If a response is expected for a message that is being sent.
+    kFlagAckPending       = 0x0020, /// When set, signifies that there is an acknowledgment pending to be sent back.
+    kFlagPeerRequestedAck =
+        0x0040, /// When set, signifies that at least one message received on this exchange requested an acknowledgment.
+                /// This flag is read by the application to decide if it needs to request an acknowledgment for the
+                /// response message it is about to send. This flag can also indicate whether peer is using WRMP.
+    kFlagMsgRcvdFromPeer =
+        0x0080, /// When set, signifies that at least one message has been received from peer on this exchange context.
+    kFlagAutoReleaseKey        = 0x0100, /// Automatically release the message encryption key when the exchange context is freed.
+    kFlagAutoReleaseConnection = 0x0200, /// Automatically release the associated ChipConnection when the exchange context is freed.
+    kFlagUseEphemeralUDPPort   = 0x0400, /// When set, use the local ephemeral UDP port as the source port for outbound messages.
 };
 
 /**
@@ -232,8 +235,7 @@ bool ExchangeContext::ShouldDropAck(void) const
 static inline bool IsWRMPControlMessage(uint32_t profileId, uint8_t msgType)
 {
     return (profileId == kChipProfile_Common &&
-            (msgType == kCommonMsgType_WRMP_Throttle_Flow ||
-             msgType == kCommonMsgType_WRMP_Delayed_Delivery));
+            (msgType == kCommonMsgType_WRMP_Throttle_Flow || msgType == kCommonMsgType_WRMP_Delayed_Delivery));
 }
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
@@ -348,14 +350,14 @@ void ExchangeContext::SetUseEphemeralUDPPort(bool val)
  *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
  *                                                       network layer.
  */
-CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer *msgBuf, uint16_t sendFlags,
-    void *msgCtxt)
+CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
+                                        void * msgCtxt)
 {
     // Setup the message info structure.
     ChipMessageInfo msgInfo;
     msgInfo.Clear();
     msgInfo.SourceNodeId = ExchangeMgr->FabricState->LocalNodeId;
-    msgInfo.DestNodeId = PeerNodeId;
+    msgInfo.DestNodeId   = PeerNodeId;
 
     return SendMessage(profileId, msgType, msgBuf, sendFlags, &msgInfo, msgCtxt);
 }
@@ -390,13 +392,13 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
  *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
  *                                                       network layer.
  */
-CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer *msgBuf, uint16_t sendFlags,
-    ChipMessageInfo * msgInfo, void *msgCtxt)
+CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
+                                        ChipMessageInfo * msgInfo, void * msgCtxt)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
     bool sendCalled = false;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    ChipExchangeManager::RetransTableEntry *entry = NULL;
+    ChipExchangeManager::RetransTableEntry * entry = NULL;
 #endif
 
 #if CHIP_RETAIN_LOGGING
@@ -472,7 +474,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
     // flag validation
     if (sendFlags & kSendFlag_RetransmissionTrickle)
     {
-        //We do not allow WRM to be used when Trickle retransmission is requested
+        // We do not allow WRM to be used when Trickle retransmission is requested
         if (sendFlags & kSendFlag_RequestAck)
         {
             ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -480,7 +482,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
 
         // We do not support trickle retrasnmissions over
         // connection-oriented exchanges
-        VerifyOrExit(Con == NULL, err=CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(Con == NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         if (0 == RetransInterval)
         { // we're not retransmitting, do not hold onto the buffer
@@ -516,10 +518,10 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
         }
     }
 
-    //Fill in appropriate message header flags
+    // Fill in appropriate message header flags
     if (sendFlags & kSendFlag_DelaySend)
         msgInfo->Flags |= kChipMessageFlag_DelaySend;
-    //FIXME: RS: possibly unnecessary, should addref instead
+    // FIXME: RS: possibly unnecessary, should addref instead
     if (sendFlags & kSendFlag_RetainBuffer)
         msgInfo->Flags |= kChipMessageFlag_RetainBuffer;
     if (sendFlags & kSendFlag_AlreadyEncoded)
@@ -544,8 +546,8 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
         // called when messages arrive.
         Con->OnMessageReceived = ChipExchangeManager::HandleMessageReceived;
 
-        err = Con->SendMessage(msgInfo, msgBuf);
-        msgBuf = NULL;
+        err        = Con->SendMessage(msgInfo, msgBuf);
+        msgBuf     = NULL;
         sendCalled = true;
     }
     else
@@ -556,34 +558,28 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
         {
             err = ExchangeMgr->MessageLayer->SelectDestNodeIdAndAddress(msgInfo->DestNodeId, PeerAddr);
             SuccessOrExit(err);
-            err = ExchangeMgr->MessageLayer->EncodeMessage(PeerAddr, PeerPort, PeerIntf,
-                                                           msgInfo, msgBuf);
+            err = ExchangeMgr->MessageLayer->EncodeMessage(PeerAddr, PeerPort, PeerIntf, msgInfo, msgBuf);
             SuccessOrExit(err);
 
             // Copy msg to a right-sized buffer if applicable
             msgBuf = PacketBuffer::RightSize(msgBuf);
 
-            //Add to Table for subsequent sending
+            // Add to Table for subsequent sending
             err = ExchangeMgr->AddToRetransTable(this, msgBuf, msgInfo->MessageId, msgCtxt, &entry);
             SuccessOrExit(err);
             msgBuf = NULL;
 
-            err = ExchangeMgr->SendFromRetransTable(entry);
+            err        = ExchangeMgr->SendFromRetransTable(entry);
             sendCalled = true;
             SuccessOrExit(err);
 
-            CHIP_FAULT_INJECT(FaultInjection::kFault_WRMDoubleTx,
-                               entry->nextRetransTime = 0;
-                               ExchangeMgr->WRMPStartTimer()
-                               );
-
+            CHIP_FAULT_INJECT(FaultInjection::kFault_WRMDoubleTx, entry->nextRetransTime = 0; ExchangeMgr->WRMPStartTimer());
         }
         else
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         {
-            err = ExchangeMgr->MessageLayer->SendMessage(PeerAddr, PeerPort, PeerIntf,
-                                                         msgInfo, msgBuf);
-            msgBuf = NULL;
+            err        = ExchangeMgr->MessageLayer->SendMessage(PeerAddr, PeerPort, PeerIntf, msgInfo, msgBuf);
+            msgBuf     = NULL;
             sendCalled = true;
             SuccessOrExit(err);
         }
@@ -601,13 +597,12 @@ CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, Pac
         }
     }
 
-
 exit:
     if (sendCalled)
     {
         ChipLogRetain(ExchangeManager, "Msg %s %08" PRIX32 ":%d %d %016" PRIX64 " %04" PRIX16 " %04" PRIX16 " %ld MsgId:%08" PRIX32,
-                       "sent", profileId, msgType, (int)payloadLen, msgInfo->DestNodeId,
-                       (Con ? Con->LogId() : 0), ExchangeId, (long)err, msgInfo->MessageId);
+                      "sent", profileId, msgType, (int) payloadLen, msgInfo->DestNodeId, (Con ? Con->LogId() : 0), ExchangeId,
+                      (long) err, msgInfo->MessageId);
     }
     if (err != CHIP_NO_ERROR && IsResponseExpected())
     {
@@ -621,11 +616,11 @@ exit:
             msg = NULL;
     }
 
-    //Release the reference to the exchange context acquired above. Under normal circumstances
-    //this will merely decrement the reference count, without actually freeing the exchange context.
-    //However if one of the function calls in this method resulted in a callback to the application,
-    //the application may have released its reference, resulting in the exchange context actually
-    //being freed here.
+    // Release the reference to the exchange context acquired above. Under normal circumstances
+    // this will merely decrement the reference count, without actually freeing the exchange context.
+    // However if one of the function calls in this method resulted in a callback to the application,
+    // the application may have released its reference, resulting in the exchange context actually
+    // being freed here.
     Release();
 
     return err;
@@ -645,29 +640,27 @@ exit:
  */
 CHIP_ERROR ExchangeContext::SendCommonNullMessage(void)
 {
-    CHIP_ERROR  err     = CHIP_NO_ERROR;
-    PacketBuffer *msgBuf = NULL;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    PacketBuffer * msgBuf = NULL;
 
     // Allocate a buffer for the null message
     msgBuf = PacketBuffer::NewWithAvailableSize(0);
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err = SendMessage(kChipProfile_Common, kCommonMsgType_Null, msgBuf,
-                      kSendFlag_NoAutoRequestAck);
+    err    = SendMessage(kChipProfile_Common, kCommonMsgType_Null, msgBuf, kSendFlag_NoAutoRequestAck);
     msgBuf = NULL;
 
 exit:
     if (ChipMessageLayer::IsSendErrorNonCritical(err))
     {
-        ChipLogError(ExchangeManager, "Non-crit err %ld sending solitary ack",
-                      long(err));
+        ChipLogError(ExchangeManager, "Non-crit err %ld sending solitary ack", long(err));
         err = CHIP_NO_ERROR;
     }
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ExchangeManager, "Failed to send Solitary ack for MsgId:%08" PRIX32 " to Peer %016" PRIX64 ":%ld",
-                      mPendingPeerAckId, PeerNodeId, (long)err);
+                     mPendingPeerAckId, PeerNodeId, (long) err);
     }
 
     return err;
@@ -691,15 +684,15 @@ exit:
  *                                          for encoding the exchange header.
  *  @retval  #CHIP_NO_ERROR                If encoding of the message was successful.
  */
-CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader *exchangeHeader, uint32_t profileId, uint8_t msgType,
-    PacketBuffer *msgBuf, uint16_t sendFlags)
+CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader, uint32_t profileId, uint8_t msgType,
+                                             PacketBuffer * msgBuf, uint16_t sendFlags)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Fill the exchange header to the message buffer.
-    exchangeHeader->Version = kChipExchangeVersion_V1;
-    exchangeHeader->ExchangeId = ExchangeId;
-    exchangeHeader->ProfileId = profileId;
+    exchangeHeader->Version     = kChipExchangeVersion_V1;
+    exchangeHeader->ExchangeId  = ExchangeId;
+    exchangeHeader->ProfileId   = profileId;
     exchangeHeader->MessageType = msgType;
     // sendFlags under special circumstances (such as a retransmission
     // of the remote alarm) can override the initiator flag in the
@@ -711,8 +704,8 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader *exchangeHeader,
     if (mMsgProtocolVersion == kChipMessageVersion_V2)
     {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        //If there is a pending acknowledgment piggyback it on this message.
-        //If there is no pending acknowledgment piggyback the last Ack that was sent.
+        // If there is a pending acknowledgment piggyback it on this message.
+        // If there is no pending acknowledgment piggyback the last Ack that was sent.
         //   - HasPeerRequestedAck() is used to verify that AckId field is valid
         //     to avoid piggybacking uninitialized AckId.
         if (HasPeerRequestedAck())
@@ -723,19 +716,18 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader *exchangeHeader,
             exchangeHeader->Flags |= kChipExchangeFlag_AckId;
             exchangeHeader->AckMsgId = mPendingPeerAckId;
 
-            //Set AckPending flag to false after setting the Ack flag;
+            // Set AckPending flag to false after setting the Ack flag;
             SetAckPending(false);
 
             // Schedule next physical wakeup
             ExchangeMgr->WRMPStartTimer();
 
 #if defined(DEBUG)
-            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
-                             mPendingPeerAckId);
+            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", mPendingPeerAckId);
 #endif
         }
 
-        //Assert the flag if message requires an Ack back;
+        // Assert the flag if message requires an Ack back;
         if ((sendFlags & kSendFlag_RequestAck) && !IsWRMPControlMessage(profileId, msgType))
         {
             exchangeHeader->Flags |= kChipExchangeFlag_NeedsAck;
@@ -766,27 +758,28 @@ void ExchangeContext::AddRef()
 {
     mRefCount++;
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], refCount++: %d", EXCHANGE_CONTEXT_ID(this - ExchangeMgr->ContextPool), ExchangeId, mRefCount);
+    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], refCount++: %d",
+                    EXCHANGE_CONTEXT_ID(this - ExchangeMgr->ContextPool), ExchangeId, mRefCount);
 #endif
 }
 
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
     // Clear app callbacks
-    OnMessageReceived = NULL;
-    OnResponseTimeout = NULL;
+    OnMessageReceived       = NULL;
+    OnResponseTimeout       = NULL;
     OnRetransmissionTimeout = NULL;
-    OnConnectionClosed = NULL;
-    OnKeyError = NULL;
+    OnConnectionClosed      = NULL;
+    OnKeyError              = NULL;
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
     ExchangeMgr->WRMPExpireTicks();
 
     OnThrottleRcvd = NULL;
-    OnDDRcvd = NULL;
-    OnSendError = NULL;
-    OnAckRcvd = NULL;
+    OnDDRcvd       = NULL;
+    OnSendError    = NULL;
+    OnAckRcvd      = NULL;
 
     // Flush any pending WRM acks
     WRMPFlushAcks();
@@ -818,7 +811,8 @@ void ExchangeContext::Close()
     VerifyOrDie(ExchangeMgr != NULL && mRefCount != 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", EXCHANGE_CONTEXT_ID(this - ExchangeMgr->ContextPool), ExchangeId, __func__);
+    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", EXCHANGE_CONTEXT_ID(this - ExchangeMgr->ContextPool),
+                    ExchangeId, __func__);
 #endif
 
     DoClose(false);
@@ -834,7 +828,8 @@ void ExchangeContext::Abort()
     VerifyOrDie(ExchangeMgr != NULL && mRefCount != 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", EXCHANGE_CONTEXT_ID(this - ExchangeMgr->ContextPool), ExchangeId, __func__);
+    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", EXCHANGE_CONTEXT_ID(this - ExchangeMgr->ContextPool),
+                    ExchangeId, __func__);
 #endif
 
     DoClose(true);
@@ -853,10 +848,10 @@ void ExchangeContext::Release(void)
 
     if (mRefCount == 1)
     {
-        //Ideally, in this scenario, the retransmit table should
-        //be clear of any outstanding messages for this context and
-        //the boolean parameter passed to DoClose() should not matter.
-        ChipExchangeManager *em = ExchangeMgr;
+        // Ideally, in this scenario, the retransmit table should
+        // be clear of any outstanding messages for this context and
+        // the boolean parameter passed to DoClose() should not matter.
+        ChipExchangeManager * em = ExchangeMgr;
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
         uint16_t tmpid = ExchangeId;
 #endif
@@ -868,13 +863,14 @@ void ExchangeContext::Release(void)
         }
 
         DoClose(false);
-        mRefCount = 0;
+        mRefCount   = 0;
         ExchangeMgr = NULL;
 
         em->mContextsInUse--;
         em->MessageLayer->SignalMessageLayerActivityChanged();
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-        ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", EXCHANGE_CONTEXT_ID(this - em->ContextPool), tmpid,  em->mContextsInUse, this);
+        ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x",
+                        EXCHANGE_CONTEXT_ID(this - em->ContextPool), tmpid, em->mContextsInUse, this);
 #endif
         SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
     }
@@ -882,7 +878,8 @@ void ExchangeContext::Release(void)
     {
         mRefCount--;
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-        ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], refCount--: %d", EXCHANGE_CONTEXT_ID(this - ExchangeMgr->ContextPool), ExchangeId, mRefCount);
+        ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], refCount--: %d",
+                        EXCHANGE_CONTEXT_ID(this - ExchangeMgr->ContextPool), ExchangeId, mRefCount);
 #endif
     }
 }
@@ -900,16 +897,13 @@ CHIP_ERROR ExchangeContext::ResendMessage()
 
     msgInfo.Clear();
     msgInfo.MessageVersion = mMsgProtocolVersion;
-    msgInfo.SourceNodeId = ExchangeMgr->FabricState->LocalNodeId;
-    msgInfo.DestNodeId = PeerNodeId;
-    res = ExchangeMgr->MessageLayer->DecodeHeader(msg, &msgInfo, &payload);
+    msgInfo.SourceNodeId   = ExchangeMgr->FabricState->LocalNodeId;
+    msgInfo.DestNodeId     = PeerNodeId;
+    res                    = ExchangeMgr->MessageLayer->DecodeHeader(msg, &msgInfo, &payload);
     if (res != CHIP_NO_ERROR)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    msgInfo.Flags |=
-        kChipMessageFlag_RetainBuffer |
-        kChipMessageFlag_MessageEncoded |
-        kChipMessageFlag_ReuseMessageId |
+    msgInfo.Flags |= kChipMessageFlag_RetainBuffer | kChipMessageFlag_MessageEncoded | kChipMessageFlag_ReuseMessageId |
         kChipMessageFlag_ReuseSourceId;
 
     return ExchangeMgr->MessageLayer->ResendMessage(PeerAddr, PeerPort, PeerIntf, &msgInfo, msg);
@@ -929,17 +923,17 @@ CHIP_ERROR ExchangeContext::StartTimerT()
     }
 
     // range from 1 to RetransInterval
-    backoff = 1 + (GetRandU32() % (RetransInterval-1));
+    backoff      = 1 + (GetRandU32() % (RetransInterval - 1));
     msgsReceived = 0;
     ChipLogDetail(ExchangeManager, "Trickle new interval");
     return ExchangeMgr->MessageLayer->SystemLayer->StartTimer(backoff, TimerTau, this);
 }
 
-void ExchangeContext::TimerT(System::Layer* aSystemLayer, void* aAppState, System::Error aError)
+void ExchangeContext::TimerT(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    ExchangeContext* client = reinterpret_cast<ExchangeContext*>(aAppState);
+    ExchangeContext * client = reinterpret_cast<ExchangeContext *>(aAppState);
 
-    if ( (aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
+    if ((aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
     {
         return;
     }
@@ -949,11 +943,11 @@ void ExchangeContext::TimerT(System::Layer* aSystemLayer, void* aAppState, Syste
     }
 }
 
-void ExchangeContext::TimerTau(System::Layer* aSystemLayer, void* aAppState, System::Error aError)
+void ExchangeContext::TimerTau(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    ExchangeContext* ec = reinterpret_cast<ExchangeContext*>(aAppState);
+    ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
 
-    if ( (aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
+    if ((aSystemLayer == NULL) || (aAppState == NULL) || (aError != CHIP_SYSTEM_NO_ERROR))
     {
         return;
     }
@@ -976,9 +970,8 @@ void ExchangeContext::TimerTau(System::Layer* aSystemLayer, void* aAppState, Sys
     }
 }
 
-
-bool ExchangeContext::MatchExchange(ChipConnection *msgCon, const ChipMessageInfo *msgInfo,
-        const ChipExchangeHeader *exchangeHeader)
+bool ExchangeContext::MatchExchange(ChipConnection * msgCon, const ChipMessageInfo * msgInfo,
+                                    const ChipExchangeHeader * exchangeHeader)
 {
     // A given message is part of a particular exchange if...
     return
@@ -992,12 +985,12 @@ bool ExchangeContext::MatchExchange(ChipConnection *msgCon, const ChipMessageInf
         && (Con == msgCon)
 
         // AND The message was received from the peer node associated with the exchange, or the peer node identifier is 'any'.
-            && (((PeerNodeId == kAnyNodeId) && (msgInfo->DestNodeId == ExchangeMgr->FabricState->LocalNodeId))
-                || (PeerNodeId == msgInfo->SourceNodeId))
-
+        && (((PeerNodeId == kAnyNodeId) && (msgInfo->DestNodeId == ExchangeMgr->FabricState->LocalNodeId)) ||
+            (PeerNodeId == msgInfo->SourceNodeId))
 
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
-        //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast case, the initiator is ill defined)
+        //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
+        //    case, the initiator is ill defined)
 
         && (((exchangeHeader->Flags & kChipExchangeFlag_Initiator) != 0) != IsInitiator());
 }
@@ -1010,23 +1003,21 @@ bool ExchangeContext::MatchExchange(ChipConnection *msgCon, const ChipMessageInf
  *  @param[in]    msgInfo    A pointer to the CHIP message info structure.
  *
  */
-void ExchangeContext::HandleTrickleMessage(const IPPacketInfo *pktInfo, const ChipMessageInfo *msgInfo)
+void ExchangeContext::HandleTrickleMessage(const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo)
 {
     // check if we're at all interested in this message
     const bool isMessageIdMatching = currentBcastMsgID == msgInfo->MessageId;
-    const bool isNodeIdMatching = (PeerNodeId == kAnyNodeId) || (PeerNodeId == msgInfo->SourceNodeId);
-    if (isMessageIdMatching &&
-        isNodeIdMatching)
+    const bool isNodeIdMatching    = (PeerNodeId == kAnyNodeId) || (PeerNodeId == msgInfo->SourceNodeId);
+    if (isMessageIdMatching && isNodeIdMatching)
     {
         msgsReceived++;
         ChipLogDetail(ExchangeManager, "Increasing trickle duplicate message counter: %u", msgsReceived);
     }
     else
     {
-        ChipLogDetail(ExchangeManager, "Not counted as duplicate message, for MsgId:%08" PRIX32 " NodeId:%d",
-            isMessageIdMatching, isNodeIdMatching);
+        ChipLogDetail(ExchangeManager, "Not counted as duplicate message, for MsgId:%08" PRIX32 " NodeId:%d", isMessageIdMatching,
+                      isNodeIdMatching);
     }
-
 }
 
 /**
@@ -1046,7 +1037,7 @@ CHIP_ERROR ExchangeContext::SetupTrickleRetransmit(uint32_t retransInterval, uin
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CancelRetrans();
-    RetransInterval = retransInterval;
+    RetransInterval      = retransInterval;
     rebroadcastThreshold = threshold;
     if (timeout != 0)
     {
@@ -1069,7 +1060,7 @@ CHIP_ERROR ExchangeContext::SetupTrickleRetransmit(uint32_t retransInterval, uin
  */
 void ExchangeContext::TeardownTrickleRetransmit()
 {
-    System::Layer* lSystemLayer = ExchangeMgr->MessageLayer->SystemLayer;
+    System::Layer * lSystemLayer = ExchangeMgr->MessageLayer->SystemLayer;
     if (lSystemLayer == NULL)
     {
         // this is an assertion error, which shall never happen
@@ -1083,14 +1074,14 @@ void ExchangeContext::TeardownTrickleRetransmit()
         PacketBuffer::Free(msg);
     }
 
-    msg = NULL;
-    backoff = 0;
+    msg             = NULL;
+    backoff         = 0;
     RetransInterval = 0;
 }
 
-void ExchangeContext::CancelRetransmissionTimer(System::Layer* aSystemLayer, void* aAppState, System::Error aError)
+void ExchangeContext::CancelRetransmissionTimer(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    ExchangeContext* ec = reinterpret_cast<ExchangeContext*>(aAppState);
+    ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
 
     if (ec == NULL)
         return;
@@ -1111,9 +1102,9 @@ void ExchangeContext::CancelResponseTimer()
     ExchangeMgr->MessageLayer->SystemLayer->CancelTimer(HandleResponseTimeout, this);
 }
 
-void ExchangeContext::HandleResponseTimeout(System::Layer* aSystemLayer, void* aAppState, System::Error aError)
+void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    ExchangeContext* ec = reinterpret_cast<ExchangeContext*>(aAppState);
+    ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
 
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
@@ -1124,24 +1115,22 @@ void ExchangeContext::HandleResponseTimeout(System::Layer* aSystemLayer, void* a
 }
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-bool ExchangeContext::WRMPCheckAndRemRetransTable(uint32_t ackMsgId, void **rCtxt)
+bool ExchangeContext::WRMPCheckAndRemRetransTable(uint32_t ackMsgId, void ** rCtxt)
 {
     bool res = false;
 
     for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
-        if ((ExchangeMgr->RetransTable[i].exchContext == this) &&
-            (ExchangeMgr->RetransTable[i].msgId == ackMsgId))
+        if ((ExchangeMgr->RetransTable[i].exchContext == this) && (ExchangeMgr->RetransTable[i].msgId == ackMsgId))
         {
-            //Return context value
+            // Return context value
             *rCtxt = ExchangeMgr->RetransTable[i].msgCtxt;
 
-            //Clear the entry from the retransmision table.
+            // Clear the entry from the retransmision table.
             ExchangeMgr->ClearRetransmitTable(ExchangeMgr->RetransTable[i]);
 
 #if defined(DEBUG)
-            ChipLogProgress(ExchangeManager, "Rxd Ack; Removing MsgId:%08" PRIX32 " from Retrans Table",
-                             ackMsgId);
+            ChipLogProgress(ExchangeManager, "Rxd Ack; Removing MsgId:%08" PRIX32 " from Retrans Table", ackMsgId);
 #endif
             res = true;
             break;
@@ -1155,21 +1144,21 @@ bool ExchangeContext::WRMPCheckAndRemRetransTable(uint32_t ackMsgId, void **rCtx
     return res;
 }
 
-//Flush the pending Ack
+// Flush the pending Ack
 CHIP_ERROR ExchangeContext::WRMPFlushAcks(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (IsAckPending())
     {
-        //Send the acknowledgment as a Common::Null message
+        // Send the acknowledgment as a Common::Null message
         err = SendCommonNullMessage();
 
         if (err == CHIP_NO_ERROR)
         {
 #if defined(DEBUG)
-            ChipLogProgress(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32 " to Peer %016" PRIX64,
-                             mPendingPeerAckId, PeerNodeId);
+            ChipLogProgress(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32 " to Peer %016" PRIX64, mPendingPeerAckId,
+                            PeerNodeId);
 #endif
         }
     }
@@ -1186,8 +1175,7 @@ CHIP_ERROR ExchangeContext::WRMPFlushAcks(void)
  */
 uint32_t ExchangeContext::GetCurrentRetransmitTimeout(void)
 {
-  return (HasRcvdMsgFromPeer() ? mWRMPConfig.mActiveRetransTimeout :
-                                 mWRMPConfig.mInitialRetransTimeout);
+    return (HasRcvdMsgFromPeer() ? mWRMPConfig.mActiveRetransTimeout : mWRMPConfig.mInitialRetransTimeout);
 }
 
 /**
@@ -1215,25 +1203,24 @@ uint32_t ExchangeContext::GetCurrentRetransmitTimeout(void)
  */
 CHIP_ERROR ExchangeContext::WRMPSendThrottleFlow(uint32_t pauseTimeMillis)
 {
-    CHIP_ERROR  err     = CHIP_NO_ERROR;
-    PacketBuffer *msgBuf = NULL;
-    uint8_t      *p      = NULL;
-    uint8_t      msgLen  = sizeof(pauseTimeMillis);
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    PacketBuffer * msgBuf = NULL;
+    uint8_t * p           = NULL;
+    uint8_t msgLen        = sizeof(pauseTimeMillis);
 
     msgBuf = PacketBuffer::NewWithAvailableSize(msgLen);
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     p = msgBuf->Start();
 
-    //Encode the fields in the buffer
+    // Encode the fields in the buffer
     LittleEndian::Write32(p, pauseTimeMillis);
     msgBuf->SetDataLength(msgLen);
 
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(kChipProfile_Common, kCommonMsgType_WRMP_Throttle_Flow,
-                      msgBuf, kSendFlag_NoAutoRequestAck);
+    err = SendMessage(kChipProfile_Common, kCommonMsgType_WRMP_Throttle_Flow, msgBuf, kSendFlag_NoAutoRequestAck);
 
 exit:
     msgBuf = NULL;
@@ -1271,18 +1258,18 @@ exit:
  */
 CHIP_ERROR ExchangeContext::WRMPSendDelayedDelivery(uint32_t pauseTimeMillis, uint64_t delayedNodeId)
 {
-    CHIP_ERROR  err     = CHIP_NO_ERROR;
-    PacketBuffer *msgBuf = NULL;
-    uint8_t      *p      = NULL;
-    uint8_t      msgLen  = sizeof(pauseTimeMillis) + sizeof(delayedNodeId);
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    PacketBuffer * msgBuf = NULL;
+    uint8_t * p           = NULL;
+    uint8_t msgLen        = sizeof(pauseTimeMillis) + sizeof(delayedNodeId);
 
     msgBuf = PacketBuffer::NewWithAvailableSize(msgLen);
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     p = msgBuf->Start();
-    //Set back the pointer by the length of the fields
+    // Set back the pointer by the length of the fields
 
-    //Encode the fields in the buffer
+    // Encode the fields in the buffer
     LittleEndian::Write32(p, pauseTimeMillis);
     LittleEndian::Write64(p, delayedNodeId);
     msgBuf->SetDataLength(msgLen);
@@ -1290,8 +1277,7 @@ CHIP_ERROR ExchangeContext::WRMPSendDelayedDelivery(uint32_t pauseTimeMillis, ui
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(kChipProfile_Common, kCommonMsgType_WRMP_Delayed_Delivery,
-                      msgBuf, kSendFlag_NoAutoRequestAck);
+    err = SendMessage(kChipProfile_Common, kCommonMsgType_WRMP_Delayed_Delivery, msgBuf, kSendFlag_NoAutoRequestAck);
 
 exit:
     msgBuf = NULL;
@@ -1314,45 +1300,42 @@ exit:
  *  @retval  #CHIP_NO_ERROR                             if the context was removed.
  *
  */
-CHIP_ERROR ExchangeContext::WRMPHandleRcvdAck(const ChipExchangeHeader *exchHeader, const ChipMessageInfo *msgInfo)
+CHIP_ERROR ExchangeContext::WRMPHandleRcvdAck(const ChipExchangeHeader * exchHeader, const ChipMessageInfo * msgInfo)
 {
-    void         *msgCtxt  = NULL;
-    CHIP_ERROR  err     = CHIP_NO_ERROR;
+    void * msgCtxt = NULL;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    //Msg is an Ack; Check Retrans Table and remove message context
+    // Msg is an Ack; Check Retrans Table and remove message context
     if (!WRMPCheckAndRemRetransTable(exchHeader->AckMsgId, &msgCtxt))
     {
 #if defined(DEBUG)
-        ChipLogError(ExchangeManager, "CHIP MsgId:%08" PRIX32" not in RetransTable",
-                      exchHeader->AckMsgId);
+        ChipLogError(ExchangeManager, "CHIP MsgId:%08" PRIX32 " not in RetransTable", exchHeader->AckMsgId);
 #endif
         err = CHIP_ERROR_INVALID_ACK_ID;
-        //Optionally call an application callback with this error.
+        // Optionally call an application callback with this error.
     }
     else
     {
-        //Call OnAckRcvd Here
+        // Call OnAckRcvd Here
         if (OnAckRcvd)
         {
             OnAckRcvd(this, msgCtxt);
         }
         else
         {
-            ChipLogDetail(ExchangeManager,
-                           "No App Handler for Ack");
+            ChipLogDetail(ExchangeManager, "No App Handler for Ack");
         }
 #if defined(DEBUG)
-        ChipLogProgress(ExchangeManager, "Removed CHIP MsgId:%08" PRIX32 " from RetransTable",
-                         exchHeader->AckMsgId);
+        ChipLogProgress(ExchangeManager, "Removed CHIP MsgId:%08" PRIX32 " from RetransTable", exchHeader->AckMsgId);
 #endif
     }
 
     return err;
 }
 
-CHIP_ERROR ExchangeContext::WRMPHandleNeedsAck(const ChipMessageInfo *msgInfo)
+CHIP_ERROR ExchangeContext::WRMPHandleNeedsAck(const ChipMessageInfo * msgInfo)
 {
-    CHIP_ERROR  err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
     ExchangeMgr->WRMPExpireTicks();
@@ -1361,8 +1344,7 @@ CHIP_ERROR ExchangeContext::WRMPHandleNeedsAck(const ChipMessageInfo *msgInfo)
     if (msgInfo->Flags & kChipMessageFlag_DuplicateMessage)
     {
 #if defined(DEBUG)
-            ChipLogProgress(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32,
-                             msgInfo->MessageId);
+        ChipLogProgress(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32, msgInfo->MessageId);
 #endif
         // Is there pending ack for a different message id.
         bool wasAckPending = IsAckPending() && mPendingPeerAckId != msgInfo->MessageId;
@@ -1393,7 +1375,7 @@ CHIP_ERROR ExchangeContext::WRMPHandleNeedsAck(const ChipMessageInfo *msgInfo)
         {
 #if defined(DEBUG)
             ChipLogProgress(ExchangeManager, "Pending ack queue full; forcing tx of solitary ack for MsgId:%08" PRIX32,
-                             mPendingPeerAckId);
+                            mPendingPeerAckId);
 #endif
             // Send the Ack for the currently pending Ack in a Common::Null message.
             err = SendCommonNullMessage();
@@ -1402,7 +1384,8 @@ CHIP_ERROR ExchangeContext::WRMPHandleNeedsAck(const ChipMessageInfo *msgInfo)
 
         // Replace the Pending ack id.
         mPendingPeerAckId = msgInfo->MessageId;
-        mWRMPNextAckTime = ExchangeMgr->GetTickCounterFromTimeDelta(mWRMPConfig.mAckPiggybackTimeout + System::Timer::GetCurrentEpoch(), ExchangeMgr->mWRMPTimeStampBase);
+        mWRMPNextAckTime  = ExchangeMgr->GetTickCounterFromTimeDelta(
+            mWRMPConfig.mAckPiggybackTimeout + System::Timer::GetCurrentEpoch(), ExchangeMgr->mWRMPTimeStampBase);
         SetAckPending(true);
     }
 
@@ -1459,8 +1442,7 @@ CHIP_ERROR ExchangeContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
     }
     else
     {
-        ChipLogDetail(ExchangeManager,
-                       "No App Handler for Throttle Message");
+        ChipLogDetail(ExchangeManager, "No App Handler for Throttle Message");
     }
 
     // Schedule next physical wakeup
@@ -1472,7 +1454,7 @@ CHIP_ERROR ExchangeContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
 /**
  * @overload
  */
-CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipExchangeHeader *exchHeader, PacketBuffer *msgBuf)
+CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf)
 {
     return HandleMessage(msgInfo, exchHeader, msgBuf, NULL);
 }
@@ -1497,13 +1479,13 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipEx
  *                          installed in the ExchangeContext.
  *
  */
-CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipExchangeHeader *exchHeader, PacketBuffer *msgBuf,
-                                           ExchangeContext::MessageReceiveFunct umhandler)
+CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf,
+                                          ExchangeContext::MessageReceiveFunct umhandler)
 {
-    CHIP_ERROR   err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    const uint8_t *p  = NULL;
-    uint32_t      PauseTimeMillis = 0;
+    const uint8_t * p        = NULL;
+    uint32_t PauseTimeMillis = 0;
 #endif
 
     // We hold a reference to the ExchangeContext here to
@@ -1521,10 +1503,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipEx
         }
         if (exchHeader->Flags & kChipExchangeFlag_NeedsAck)
         {
-            //Set the flag in message header indicating an ack requested by peer;
+            // Set the flag in message header indicating an ack requested by peer;
             msgInfo->Flags |= kChipMessageFlag_PeerRequestedAck;
 
-            //Set the flag in the exchange context indicating an ack requested;
+            // Set the flag in the exchange context indicating an ack requested;
             SetPeerRequestedAck(true);
 
             if (!ShouldDropAck())
@@ -1541,21 +1523,19 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipEx
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    //Received Flow Throttle
-    if (exchHeader->ProfileId == kChipProfile_Common &&
-        exchHeader->MessageType == kCommonMsgType_WRMP_Throttle_Flow)
+    // Received Flow Throttle
+    if (exchHeader->ProfileId == kChipProfile_Common && exchHeader->MessageType == kCommonMsgType_WRMP_Throttle_Flow)
     {
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-        //Extract PauseTimeMillis from msgBuf
-        p = msgBuf->Start();
+        // Extract PauseTimeMillis from msgBuf
+        p               = msgBuf->Start();
         PauseTimeMillis = LittleEndian::Read32(p);
         HandleThrottleFlow(PauseTimeMillis);
         ExitNow(err = CHIP_NO_ERROR);
 #endif
     }
-    //Return and not pass this to Application if Common::Null Msg Type
-    else if ((exchHeader->ProfileId == kChipProfile_Common) &&
-        (exchHeader->MessageType == kCommonMsgType_Null))
+    // Return and not pass this to Application if Common::Null Msg Type
+    else if ((exchHeader->ProfileId == kChipProfile_Common) && (exchHeader->MessageType == kCommonMsgType_Null))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
@@ -1572,7 +1552,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipEx
         if (umhandler)
         {
             umhandler(this, msgInfo->InPacketInfo, const_cast<ChipMessageInfo *>(msgInfo), exchHeader->ProfileId,
-                    exchHeader->MessageType, msgBuf);
+                      exchHeader->MessageType, msgBuf);
             msgBuf = NULL;
         }
         else if (OnMessageReceived != NULL)
@@ -1583,9 +1563,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo *msgInfo, const ChipEx
         }
         else
         {
-            ChipLogError(ExchangeManager,
-                          "No App Handler for Msg(MsgId:%08" PRIX32 ")",
-                          msgInfo->MessageId);
+            ChipLogError(ExchangeManager, "No App Handler for Msg(MsgId:%08" PRIX32 ")", msgInfo->MessageId);
         }
     }
 
@@ -1618,7 +1596,7 @@ void ExchangeContext::HandleConnectionClosed(CHIP_ERROR conErr)
 
     // Discard the EC's pointer to the connection, preventing further use.
     ChipConnection * con = Con;
-    Con = NULL;
+    Con                  = NULL;
 
     // Call the application's OnConnectionClosed handler, if set.
     if (OnConnectionClosed != NULL)
@@ -1636,8 +1614,8 @@ void ExchangeContext::HandleConnectionClosed(CHIP_ERROR conErr)
  */
 void ExchangeContext::GetPeerDescription(char * buf, uint32_t bufSize) const
 {
-    ChipMessageLayer::GetPeerDescription(buf, bufSize, PeerNodeId,
-        (PeerAddr != IPAddress::Any) ? &PeerAddr : NULL, PeerPort, PeerIntf, Con);
+    ChipMessageLayer::GetPeerDescription(buf, bufSize, PeerNodeId, (PeerAddr != IPAddress::Any) ? &PeerAddr : NULL, PeerPort,
+                                         PeerIntf, Con);
 }
 
 } // namespace chip

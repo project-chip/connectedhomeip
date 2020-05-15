@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef __STDC_FORMAT_MACROS
 #define __STDC_FORMAT_MACROS
 #endif
@@ -73,13 +72,13 @@ ChipExchangeManager::ChipExchangeManager()
  *  @retval #CHIP_NO_ERROR On success.
  *
  */
-CHIP_ERROR ChipExchangeManager::Init(ChipMessageLayer *msgLayer)
+CHIP_ERROR ChipExchangeManager::Init(ChipMessageLayer * msgLayer)
 {
     if (State != kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
 
     MessageLayer = msgLayer;
-    FabricState = msgLayer->FabricState;
+    FabricState  = msgLayer->FabricState;
 
     NextExchangeId = GetRandU16();
 
@@ -91,12 +90,12 @@ CHIP_ERROR ChipExchangeManager::Init(ChipMessageLayer *msgLayer)
     memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
     OnExchangeContextChanged = NULL;
 
-    msgLayer->ExchangeMgr = this;
+    msgLayer->ExchangeMgr       = this;
     msgLayer->OnMessageReceived = HandleMessageReceived;
-    msgLayer->OnAcceptError = HandleAcceptError;
+    msgLayer->OnAcceptError     = HandleAcceptError;
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    mWRMPTimerInterval  = CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD;       //WRMP Timer tick period
+    mWRMPTimerInterval = CHIP_CONFIG_WRMP_TIMER_DEFAULT_PERIOD; // WRMP Timer tick period
 
     memset(RetransTable, 0, sizeof(RetransTable));
 
@@ -129,14 +128,14 @@ CHIP_ERROR ChipExchangeManager::Shutdown()
     {
         if (MessageLayer->ExchangeMgr == this)
         {
-            MessageLayer->ExchangeMgr = NULL;
+            MessageLayer->ExchangeMgr       = NULL;
             MessageLayer->OnMessageReceived = NULL;
-            MessageLayer->OnAcceptError = NULL;
+            MessageLayer->OnAcceptError     = NULL;
         }
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         WRMPStopTimer();
 
-        //Clear the retransmit table
+        // Clear the retransmit table
         for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
         {
             ClearRetransmitTable(RetransTable[i]);
@@ -165,7 +164,7 @@ CHIP_ERROR ChipExchangeManager::Shutdown()
  *            can be allocated or is available.
  *
  */
-ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, void *appState)
+ExchangeContext * ChipExchangeManager::NewContext(const uint64_t & peerNodeId, void * appState)
 {
     return NewContext(peerNodeId, FabricState->SelectNodeAddress(peerNodeId), CHIP_PORT, INET_NULL_INTERFACEID, appState);
 }
@@ -184,7 +183,7 @@ ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, voi
  *            can be allocated or is available.
  *
  */
-ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, const IPAddress &peerAddr, void *appState)
+ExchangeContext * ChipExchangeManager::NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, void * appState)
 {
     return NewContext(peerNodeId, peerAddr, CHIP_PORT, INET_NULL_INTERFACEID, appState);
 }
@@ -207,34 +206,35 @@ ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, con
  *            can be allocated or is available.
  *
  */
-ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, const IPAddress &peerAddr, uint16_t peerPort, InterfaceId sendIntfId, void *appState)
+ExchangeContext * ChipExchangeManager::NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, uint16_t peerPort,
+                                                  InterfaceId sendIntfId, void * appState)
 {
-    ExchangeContext *ec = AllocContext();
+    ExchangeContext * ec = AllocContext();
     if (ec != NULL)
     {
         ec->ExchangeId = NextExchangeId++;
         ec->PeerNodeId = peerNodeId;
-        ec->PeerAddr = peerAddr;
-        ec->PeerPort = (peerPort != 0) ? peerPort : CHIP_PORT;
-        ec->PeerIntf = sendIntfId;
-        ec->AppState = appState;
+        ec->PeerAddr   = peerAddr;
+        ec->PeerPort   = (peerPort != 0) ? peerPort : CHIP_PORT;
+        ec->PeerIntf   = sendIntfId;
+        ec->AppState   = appState;
         ec->SetInitiator(true);
-        //Initialize WRMP variables
+        // Initialize WRMP variables
         ec->mMsgProtocolVersion = 0;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         // No need to set WRMP timer, this will be done when we add to retrans table
         ec->mWRMPNextAckTime = 0;
         ec->SetAckPending(false);
         ec->SetMsgRcvdFromPeer(false);
-        ec->mWRMPConfig = gDefaultWRMPConfig;
+        ec->mWRMPConfig          = gDefaultWRMPConfig;
         ec->mWRMPThrottleTimeout = 0;
-        //Internal and for Debug Only; When set, Exchange Layer does not send Ack.
+        // Internal and for Debug Only; When set, Exchange Layer does not send Ack.
         ec->SetDropAck(false);
-        //Initialize the App callbacks to NULL
+        // Initialize the App callbacks to NULL
         ec->OnThrottleRcvd = NULL;
-        ec->OnDDRcvd = NULL;
-        ec->OnAckRcvd = NULL;
-        ec->OnSendError = NULL;
+        ec->OnDDRcvd       = NULL;
+        ec->OnAckRcvd      = NULL;
+        ec->OnSendError    = NULL;
 #endif
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
         ec->SetUseEphemeralUDPPort(MessageLayer->EphemeralUDPPortEnabled());
@@ -256,9 +256,9 @@ ExchangeContext *ChipExchangeManager::NewContext(const uint64_t &peerNodeId, con
  *            can be allocated or is available.
  *
  */
-ExchangeContext *ChipExchangeManager::NewContext(ChipConnection *con, void *appState)
+ExchangeContext * ChipExchangeManager::NewContext(ChipConnection * con, void * appState)
 {
-    ExchangeContext *ec = NewContext(con->PeerNodeId, con->PeerAddr, con->PeerPort, INET_NULL_INTERFACEID, appState);
+    ExchangeContext * ec = NewContext(con->PeerNodeId, con->PeerAddr, con->PeerPort, INET_NULL_INTERFACEID, appState);
     if (ec != NULL)
     {
         ec->Con = con;
@@ -281,12 +281,11 @@ ExchangeContext *ChipExchangeManager::NewContext(ChipConnection *con, void *appS
  *  @return   A pointer to the ExchangeContext object matching the provided parameters On success, NULL on no match.
  *
  */
-ExchangeContext *ChipExchangeManager::FindContext(uint64_t peerNodeId, ChipConnection *con, void *appState, bool isInitiator)
+ExchangeContext * ChipExchangeManager::FindContext(uint64_t peerNodeId, ChipConnection * con, void * appState, bool isInitiator)
 {
-    ExchangeContext *ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = (ExchangeContext *) ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
-        if (ec->ExchangeMgr != NULL && ec->PeerNodeId == peerNodeId &&
-            ec->Con == con && ec->AppState == appState &&
+        if (ec->ExchangeMgr != NULL && ec->PeerNodeId == peerNodeId && ec->Con == con && ec->AppState == appState &&
             ec->IsInitiator() == isInitiator)
             return ec;
     return NULL;
@@ -306,14 +305,15 @@ ExchangeContext *ChipExchangeManager::FindContext(uint64_t peerNodeId, ChipConne
  *                                                             is full and a new one cannot be allocated.
  *  @retval #CHIP_NO_ERROR On success.
  */
-CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId,
-        ExchangeContext::MessageReceiveFunct handler, void *appState)
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler,
+                                                                  void * appState)
 {
     return RegisterUMH(profileId, (int16_t) -1, NULL, false, handler, appState);
 }
 
 /**
- *  Register an unsolicited message handler for a given profile identifier. This handler would be invoked for all messages of the given profile.
+ *  Register an unsolicited message handler for a given profile identifier. This handler would be invoked for all messages of the
+ * given profile.
  *
  *  @param[in]    profileId     The profile identifier of the received message.
  *
@@ -327,8 +327,8 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
  *                                                             is full and a new one cannot be allocated.
  *  @retval #CHIP_NO_ERROR On success.
  */
-CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId,
-        ExchangeContext::MessageReceiveFunct handler, bool allowDups, void *appState)
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler,
+                                                                  bool allowDups, void * appState)
 {
     return RegisterUMH(profileId, (int16_t) -1, NULL, allowDups, handler, appState);
 }
@@ -349,7 +349,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
  *  @retval #CHIP_NO_ERROR On success.
  */
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
-        ExchangeContext::MessageReceiveFunct handler, void *appState)
+                                                                  ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
     return RegisterUMH(profileId, (int16_t) msgType, NULL, false, handler, appState);
 }
@@ -373,7 +373,8 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
  *  @retval #CHIP_NO_ERROR On success.
  */
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
-        ExchangeContext::MessageReceiveFunct handler, bool allowDups, void *appState)
+                                                                  ExchangeContext::MessageReceiveFunct handler, bool allowDups,
+                                                                  void * appState)
 {
     return RegisterUMH(profileId, (int16_t) msgType, NULL, allowDups, handler, appState);
 }
@@ -397,8 +398,8 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
  *                                                             is full and a new one cannot be allocated.
  *  @retval #CHIP_NO_ERROR On success.
  */
-CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con,
-        ExchangeContext::MessageReceiveFunct handler, void *appState)
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con,
+                                                                  ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
     return RegisterUMH(profileId, (int16_t) msgType, con, false, handler, appState);
 }
@@ -425,8 +426,9 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
  *                                                             is full and a new one cannot be allocated.
  *  @retval #CHIP_NO_ERROR On success.
  */
-CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con,
-        ExchangeContext::MessageReceiveFunct handler, bool allowDups, void *appState)
+CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con,
+                                                                  ExchangeContext::MessageReceiveFunct handler, bool allowDups,
+                                                                  void * appState)
 {
     return RegisterUMH(profileId, (int16_t) msgType, con, allowDups, handler, appState);
 }
@@ -475,37 +477,37 @@ CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t pro
  *                                                       is not found.
  *  @retval #CHIP_NO_ERROR On success.
  */
-CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con)
+CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con)
 {
     return UnregisterUMH(profileId, (int16_t) msgType, con);
 }
 
-void ChipExchangeManager::HandleAcceptError(ChipMessageLayer *msgLayer, CHIP_ERROR err)
+void ChipExchangeManager::HandleAcceptError(ChipMessageLayer * msgLayer, CHIP_ERROR err)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(err));
 }
 
-void ChipExchangeManager::HandleConnectionReceived(ChipConnection *con)
+void ChipExchangeManager::HandleConnectionReceived(ChipConnection * con)
 {
     // Hook the OnMessageReceived callback for new inbound connections.
     con->OnMessageReceived = HandleMessageReceived;
 }
 
-void ChipExchangeManager::HandleConnectionClosed(ChipConnection *con, CHIP_ERROR conErr)
+void ChipExchangeManager::HandleConnectionClosed(ChipConnection * con, CHIP_ERROR conErr)
 {
     for (int i = 0; i < CHIP_CONFIG_MAX_BINDINGS; i++)
     {
         BindingPool[i].OnConnectionClosed(con, conErr);
     }
 
-    ExchangeContext *ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = (ExchangeContext *) ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr != NULL && ec->Con == con)
         {
             ec->HandleConnectionClosed(conErr);
         }
 
-    UnsolicitedMessageHandler *umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * umh = (UnsolicitedMessageHandler *) UMHandlerPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         if (umh->Handler != NULL && umh->Con == con)
         {
@@ -523,8 +525,8 @@ void ChipExchangeManager::HandleConnectionClosed(ChipConnection *con, CHIP_ERROR
 #if CHIP_CONFIG_TEST
 size_t ChipExchangeManager::ExpireExchangeTimers(void)
 {
-    size_t retval = 0;
-    ExchangeContext *ec = (ExchangeContext *) ContextPool;
+    size_t retval        = 0;
+    ExchangeContext * ec = (ExchangeContext *) ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != NULL)
@@ -542,23 +544,23 @@ size_t ChipExchangeManager::ExpireExchangeTimers(void)
 }
 #endif
 
-ExchangeContext *ChipExchangeManager::AllocContext()
+ExchangeContext * ChipExchangeManager::AllocContext()
 {
-    ExchangeContext *ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = (ExchangeContext *) ContextPool;
 
-    CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext,
-                       return NULL);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return NULL);
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr == NULL)
         {
-            *ec = ExchangeContext();
+            *ec             = ExchangeContext();
             ec->ExchangeMgr = this;
-            ec->mRefCount = 1;
+            ec->mRefCount   = 1;
             mContextsInUse++;
             MessageLayer->SignalMessageLayerActivityChanged();
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-            ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), mContextsInUse, ec);
+            ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool),
+                            mContextsInUse, ec);
 #endif
             SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 
@@ -574,75 +576,70 @@ void ChipExchangeManager::WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
     WRMPExpireTicks();
 
-    //Go through the retrans table entries for that node and adjust the timer.
+    // Go through the retrans table entries for that node and adjust the timer.
     for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
-        //Exchcontext is the sentinel object to ascertain validity of the element
+        // Exchcontext is the sentinel object to ascertain validity of the element
         if (RetransTable[i].exchContext)
         {
-            //Adjust the retrans timer value if Delayed Node identifier matches Peer in ExchangeContext
+            // Adjust the retrans timer value if Delayed Node identifier matches Peer in ExchangeContext
             if (DelayedNodeId == RetransTable[i].exchContext->PeerNodeId)
             {
 
-                //Paustime is specified in milliseconds; Update retrans values
+                // Paustime is specified in milliseconds; Update retrans values
                 RetransTable[i].nextRetransTime += (PauseTimeMillis / mWRMPTimerInterval);
 
-                //Call the application callback
+                // Call the application callback
                 if (RetransTable[i].exchContext->OnDDRcvd)
                 {
-                    RetransTable[i].exchContext->OnDDRcvd(RetransTable[i].exchContext,
-                                                          PauseTimeMillis);
+                    RetransTable[i].exchContext->OnDDRcvd(RetransTable[i].exchContext, PauseTimeMillis);
                 }
                 else
                 {
-                    ChipLogError(ExchangeManager,
-                                  "No App Handler for Delayed Delivery for ExchangeContext with Id %04" PRIX16,
-                                  RetransTable[i].exchContext->ExchangeId);
-
+                    ChipLogError(ExchangeManager, "No App Handler for Delayed Delivery for ExchangeContext with Id %04" PRIX16,
+                                 RetransTable[i].exchContext->ExchangeId);
                 }
-            }//DelayedNodeId == PeerNodeId
-        }//exchContext
-    }//for loop in table entry
+            } // DelayedNodeId == PeerNodeId
+        }     // exchContext
+    }         // for loop in table entry
 
     // Schedule next physical wakeup
     WRMPStartTimer();
 }
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
-static void DefaultOnMessageReceived(ExchangeContext *ec, const IPPacketInfo *pktInfo, const ChipMessageInfo *msgInfo, uint32_t profileId,
-            uint8_t msgType, PacketBuffer *payload)
+static void DefaultOnMessageReceived(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
+                                     uint32_t profileId, uint8_t msgType, PacketBuffer * payload)
 {
-    ChipLogError(ExchangeManager,
-            "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
-            profileId, msgType, ec->ExchangeId, msgInfo->MessageId);
+    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32, profileId, msgType,
+                 ec->ExchangeId, msgInfo->MessageId);
 
     PacketBuffer::Free(payload);
 }
 
-void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer *msgBuf)
+void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf)
 {
     ChipExchangeHeader exchangeHeader;
-    UnsolicitedMessageHandler *umh         = NULL;
-    UnsolicitedMessageHandler *matchingUMH = NULL;
-    ExchangeContext *ec                    = NULL;
-    ChipConnection *msgCon                = NULL;
+    UnsolicitedMessageHandler * umh         = NULL;
+    UnsolicitedMessageHandler * matchingUMH = NULL;
+    ExchangeContext * ec                    = NULL;
+    ChipConnection * msgCon                 = NULL;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    const uint8_t      *p                  = NULL;
-    uint32_t     PauseTimeMillis           = 0;
-    uint64_t     DelayedNodeId             = 0;
+    const uint8_t * p        = NULL;
+    uint32_t PauseTimeMillis = 0;
+    uint64_t DelayedNodeId   = 0;
     bool dupMsg;
     bool msgNeedsAck;
     bool sendAckAndCloseExchange;
 #endif
-    CHIP_ERROR  err                       = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Decode the exchange header.
     err = DecodeHeader(&exchangeHeader, msgInfo, msgBuf);
     SuccessOrExit(err);
 
-    //Check if the version is supported
-    if ((msgInfo->MessageVersion != kChipMessageVersion_V1) &&
-        (msgInfo->MessageVersion != kChipMessageVersion_V2))
+    // Check if the version is supported
+    if ((msgInfo->MessageVersion != kChipMessageVersion_V1) && (msgInfo->MessageVersion != kChipMessageVersion_V2))
     {
         ExitNow(err = CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION);
     }
@@ -650,14 +647,12 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
     msgCon = msgInfo->InCon;
 
     ChipLogRetain(ExchangeManager, "Msg %s %08" PRIX32 ":%d %d %016" PRIX64 " %04" PRIX16 " %04" PRIX16 " %ld MsgId:%08" PRIX32,
-                   "rcvd", exchangeHeader.ProfileId, exchangeHeader.MessageType,
-                   (int)msgBuf->DataLength(), msgInfo->SourceNodeId, msgCon->LogId(), exchangeHeader.ExchangeId,
-                   (long)err, msgInfo->MessageId);
+                  "rcvd", exchangeHeader.ProfileId, exchangeHeader.MessageType, (int) msgBuf->DataLength(), msgInfo->SourceNodeId,
+                  msgCon->LogId(), exchangeHeader.ExchangeId, (long) err, msgInfo->MessageId);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    //Received Delayed Delivery Message: Extend time for pending retrans objects
-    if (exchangeHeader.ProfileId == kChipProfile_Common &&
-        exchangeHeader.MessageType == kCommonMsgType_WRMP_Delayed_Delivery)
+    // Received Delayed Delivery Message: Extend time for pending retrans objects
+    if (exchangeHeader.ProfileId == kChipProfile_Common && exchangeHeader.MessageType == kCommonMsgType_WRMP_Delayed_Delivery)
     {
         // Process Delayed Delivery message if it is not a duplicate.
         if ((msgInfo->Flags & kChipMessageFlag_DuplicateMessage) == 0)
@@ -665,14 +660,14 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
             p = msgBuf->Start();
 
             PauseTimeMillis = LittleEndian::Read32(p);
-            DelayedNodeId = LittleEndian::Read64(p);
+            DelayedNodeId   = LittleEndian::Read64(p);
 
             WRMPProcessDDMessage(PauseTimeMillis, DelayedNodeId);
         }
 
-        //Return after processing Delayed Delivery message
+        // Return after processing Delayed Delivery message
         ExitNow(err = CHIP_NO_ERROR);
-    }//If delayed delivery Msg
+    } // If delayed delivery Msg
 #endif
 
     // Search for an existing exchange that the message applies to. If a match is found...
@@ -690,7 +685,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
             }
 #endif
 
-            //Matched ExchangeContext; send to message handler.
+            // Matched ExchangeContext; send to message handler.
             ec->HandleMessage(msgInfo, &exchangeHeader, msgBuf);
 
             msgBuf = NULL;
@@ -702,7 +697,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     // Is message a duplicate that needs ack.
     msgNeedsAck = exchangeHeader.Flags & kChipExchangeFlag_NeedsAck;
-    dupMsg = (msgInfo->Flags & kChipMessageFlag_DuplicateMessage);
+    dupMsg      = (msgInfo->Flags & kChipMessageFlag_DuplicateMessage);
 #endif
 
     // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
@@ -717,8 +712,8 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
         matchingUMH = NULL;
 
         for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
-            if (umh->Handler != NULL && umh->ProfileId == exchangeHeader.ProfileId && (umh->Con == NULL || umh->Con == msgCon)
-                && (!(msgInfo->Flags & kChipMessageFlag_DuplicateMessage) || umh->AllowDuplicateMsgs))
+            if (umh->Handler != NULL && umh->ProfileId == exchangeHeader.ProfileId && (umh->Con == NULL || umh->Con == msgCon) &&
+                (!(msgInfo->Flags & kChipMessageFlag_DuplicateMessage) || umh->AllowDuplicateMsgs))
             {
                 if (umh->MessageType == exchangeHeader.MessageType)
                 {
@@ -763,14 +758,14 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
         || sendAckAndCloseExchange
 #endif
-       )
+    )
     {
         ExchangeContext::MessageReceiveFunct umhandler = NULL;
 
         ec = AllocContext();
         VerifyOrExit(ec != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        ec->Con = msgCon;
+        ec->Con        = msgCon;
         ec->ExchangeId = exchangeHeader.ExchangeId;
         ec->PeerNodeId = msgInfo->SourceNodeId;
         if (msgInfo->InPacketInfo != NULL)
@@ -796,13 +791,13 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
         ec->mWRMPNextAckTime = 0;
         ec->SetAckPending(false);
         ec->SetMsgRcvdFromPeer(true);
-        ec->mWRMPConfig = gDefaultWRMPConfig;
+        ec->mWRMPConfig          = gDefaultWRMPConfig;
         ec->mWRMPThrottleTimeout = 0;
-        //Internal and for Debug Only; When set, Exchange Layer does not send Ack.
+        // Internal and for Debug Only; When set, Exchange Layer does not send Ack.
         ec->SetDropAck(false);
 #endif
 
-        //Set the ExchangeContext version from the Message header version
+        // Set the ExchangeContext version from the Message header version
         ec->mMsgProtocolVersion = msgInfo->MessageVersion;
 
         // If UMH was found and the exchange is created not just for sending ack.
@@ -813,8 +808,8 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer
             umhandler = matchingUMH->Handler;
 
             ec->SetInitiator(false);
-            ec->AppState = matchingUMH->AppState;
-            ec->OnMessageReceived = DefaultOnMessageReceived;
+            ec->AppState           = matchingUMH->AppState;
+            ec->OnMessageReceived  = DefaultOnMessageReceived;
             ec->AllowDuplicateMsgs = matchingUMH->AllowDuplicateMsgs;
 
             ChipLogProgress(ExchangeManager, "ec id: %d, AppState: 0x%x", EXCHANGE_CONTEXT_ID(ec - ContextPool), ec->AppState);
@@ -859,11 +854,11 @@ exit:
     return;
 }
 
-CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection *con, bool allowDups,
-        ExchangeContext::MessageReceiveFunct handler, void *appState)
+CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con, bool allowDups,
+                                            ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
-    UnsolicitedMessageHandler *umh = (UnsolicitedMessageHandler *) UMHandlerPool;
-    UnsolicitedMessageHandler *selected = NULL;
+    UnsolicitedMessageHandler * umh      = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * selected = NULL;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
         if (umh->Handler == NULL)
@@ -873,7 +868,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType,
         }
         else if (umh->ProfileId == profileId && umh->MessageType == msgType && umh->Con == con)
         {
-            umh->Handler = handler;
+            umh->Handler  = handler;
             umh->AppState = appState;
             return CHIP_NO_ERROR;
         }
@@ -882,11 +877,11 @@ CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType,
     if (selected == NULL)
         return CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
 
-    selected->Handler = handler;
-    selected->AppState = appState;
-    selected->ProfileId = profileId;
-    selected->Con = con;
-    selected->MessageType = msgType;
+    selected->Handler            = handler;
+    selected->AppState           = appState;
+    selected->ProfileId          = profileId;
+    selected->Con                = con;
+    selected->MessageType        = msgType;
     selected->AllowDuplicateMsgs = allowDups;
 
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
@@ -894,9 +889,9 @@ CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipExchangeManager::UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection *con)
+CHIP_ERROR ChipExchangeManager::UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con)
 {
-    UnsolicitedMessageHandler *umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * umh = (UnsolicitedMessageHandler *) UMHandlerPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
         if (umh->Handler != NULL && umh->ProfileId == profileId && umh->MessageType == msgType && umh->Con == con)
@@ -909,21 +904,21 @@ CHIP_ERROR ChipExchangeManager::UnregisterUMH(uint32_t profileId, int16_t msgTyp
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
 
-void ChipExchangeManager::HandleMessageReceived(ChipMessageLayer *msgLayer, ChipMessageInfo *msgInfo, PacketBuffer *msgBuf)
+void ChipExchangeManager::HandleMessageReceived(ChipMessageLayer * msgLayer, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf)
 {
     msgLayer->ExchangeMgr->DispatchMessage(msgInfo, msgBuf);
 }
 
-void ChipExchangeManager::HandleMessageReceived(ChipConnection *con, ChipMessageInfo *msgInfo, PacketBuffer *msgBuf)
+void ChipExchangeManager::HandleMessageReceived(ChipConnection * con, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf)
 {
     con->GetMessageLayer()->ExchangeMgr->DispatchMessage(msgInfo, msgBuf);
 }
 
-CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader *exchangeHeader, PacketBuffer *buf)
+CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader * exchangeHeader, PacketBuffer * buf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t headLen = 8; //Constant part: Version/Flags + Msg Type + Exch Id + Profile Id
-    uint8_t *p = NULL;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    uint16_t headLen = 8; // Constant part: Version/Flags + Msg Type + Exch Id + Profile Id
+    uint8_t * p      = NULL;
 
     // Make sure the buffer has a reserved size big enough to hold the full CHIP header.
     if (!buf->EnsureReservedSize(CHIP_HEADER_RESERVE_SIZE))
@@ -934,7 +929,7 @@ CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader *exchangeHeader
         ExitNow(err = CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    //Compute the Header Len
+    // Compute the Header Len
     if (exchangeHeader->Flags & kChipExchangeFlag_AckId)
     {
         headLen += 4;
@@ -943,7 +938,7 @@ CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader *exchangeHeader
 
     p = buf->Start();
 
-    //Move the buffer start pointer back by the size of the app header.
+    // Move the buffer start pointer back by the size of the app header.
     p -= headLen;
 
     // Adjust the buffer so that the start points to the start of the encoded message.
@@ -962,39 +957,36 @@ CHIP_ERROR ChipExchangeManager::PrependHeader(ChipExchangeHeader *exchangeHeader
     }
 #endif
 
-    CHIP_FAULT_INJECT_MAX_ARG(FaultInjection::kFault_FuzzExchangeHeaderTx,
-            // The FuzzExchangeHeader function takes as argument an index (0 to n-1) into a
-            // (logical) array of fuzzing cases, because every field of the header can be fuzzed in 3
-            // different ways. Therefore, the max index that can be used for the
-            // message being sent depends on the number of fields in the header.
-            // There are 4 fields, unless the AckMsgId field is present as
-            // well, for a total of 5.
-                ((exchangeHeader->Flags & kChipExchangeFlag_AckId ?
-                   CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS :
-                   CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP) * CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES) -1,
-                int32_t arg = 0;
-                if (numFaultArgs > 0)
-                {
-                    arg = faultArgs[0];
-                }
-            ,
-            // Code executed without the Manager's lock:
-                chip::FaultInjection::FuzzExchangeHeader(buf->Start(), arg);
-            );
+    CHIP_FAULT_INJECT_MAX_ARG(
+        FaultInjection::kFault_FuzzExchangeHeaderTx,
+        // The FuzzExchangeHeader function takes as argument an index (0 to n-1) into a
+        // (logical) array of fuzzing cases, because every field of the header can be fuzzed in 3
+        // different ways. Therefore, the max index that can be used for the
+        // message being sent depends on the number of fields in the header.
+        // There are 4 fields, unless the AckMsgId field is present as
+        // well, for a total of 5.
+        ((exchangeHeader->Flags & kChipExchangeFlag_AckId ? CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS
+                                                          : CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_WRMP) *
+         CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES) -
+            1,
+        int32_t arg = 0;
+        if (numFaultArgs > 0) { arg = faultArgs[0]; },
+        // Code executed without the Manager's lock:
+        chip::FaultInjection::FuzzExchangeHeader(buf->Start(), arg););
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipExchangeManager::DecodeHeader(ChipExchangeHeader *exchangeHeader, ChipMessageInfo *msgInfo, PacketBuffer *buf)
+CHIP_ERROR ChipExchangeManager::DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo, PacketBuffer * buf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint8_t *p = NULL;
+    uint8_t * p = NULL;
     uint8_t versionFlags;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    uint16_t msgLen = buf->DataLength();
-    uint8_t *msgEnd = buf->Start() + msgLen;
+    uint16_t msgLen  = buf->DataLength();
+    uint8_t * msgEnd = buf->Start() + msgLen;
 #endif
 
     if (buf->DataLength() < 8)
@@ -1002,9 +994,9 @@ CHIP_ERROR ChipExchangeManager::DecodeHeader(ChipExchangeHeader *exchangeHeader,
 
     p = buf->Start();
 
-    versionFlags = Read8(p);
+    versionFlags            = Read8(p);
     exchangeHeader->Version = versionFlags >> 4;
-    exchangeHeader->Flags = versionFlags & 0xF;
+    exchangeHeader->Flags   = versionFlags & 0xF;
 
     if (exchangeHeader->Version != kChipExchangeVersion_V1)
         ExitNow(err = CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION);
@@ -1039,7 +1031,7 @@ exit:
  *  @param[in]    con           A pointer to the CHIP connection object.
  *
  */
-void ChipExchangeManager::AllowUnsolicitedMessages(ChipConnection *con)
+void ChipExchangeManager::AllowUnsolicitedMessages(ChipConnection * con)
 {
     // Hook the OnMessageReceived callback.
     con->OnMessageReceived = HandleMessageReceived;
@@ -1063,20 +1055,19 @@ void ChipExchangeManager::NotifySecurityManagerAvailable()
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
 /**
-* Return a tick counter value given a time difference and a tick interval.
-* The difference in time is not expected to exceed (2^32 - 1) within the
-* scope of two timestamp comparisons in WRMP and, thus, it makes sense to cast
-* the time delta to uint32_t. This also avoids invocation of 64 bit divisions
-* in constrained platforms that do not support them.
-*
-* @param[in]  newTime        Timestamp value of in milliseconds.
-* @param[in]  oldTime        Timestamp value of in milliseconds.
-* @param[in]  tickInterval   Timer tick interval in milliseconds.
-*
-* @return Tick count for the time delta.
-*/
-uint32_t ChipExchangeManager::GetTickCounterFromTimeDelta (uint64_t newTime,
-                                                            uint64_t oldTime)
+ * Return a tick counter value given a time difference and a tick interval.
+ * The difference in time is not expected to exceed (2^32 - 1) within the
+ * scope of two timestamp comparisons in WRMP and, thus, it makes sense to cast
+ * the time delta to uint32_t. This also avoids invocation of 64 bit divisions
+ * in constrained platforms that do not support them.
+ *
+ * @param[in]  newTime        Timestamp value of in milliseconds.
+ * @param[in]  oldTime        Timestamp value of in milliseconds.
+ * @param[in]  tickInterval   Timer tick interval in milliseconds.
+ *
+ * @return Tick count for the time delta.
+ */
+uint32_t ChipExchangeManager::GetTickCounterFromTimeDelta(uint64_t newTime, uint64_t oldTime)
 {
     // Note on math: we have a utility function that will compute U64 var / U32
     // compile-time const => U32.  At the moment, we are leaving
@@ -1094,37 +1085,38 @@ uint32_t ChipExchangeManager::GetTickCounterFromTimeDelta (uint64_t newTime,
 }
 
 #if defined(WRMP_TICKLESS_DEBUG)
-void ChipExchangeManager::TicklessDebugDumpRetransTable(const char *log)
+void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log)
 {
-     ChipLogProgress(ExchangeManager, log);
+    ChipLogProgress(ExchangeManager, log);
 
-     for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
-     {
-         if (RetransTable[i].exchContext)
-         {
-             ChipLogProgress(ExchangeManager, "EC:%04" PRIX16 " MsgId:%08" PRIX32 " NextRetransTimeCtr:%04" PRIX16,
-                              RetransTable[i].exchContext,
-                              RetransTable[i].msgId,
-                              RetransTable[i].nextRetransTime);
-         }
-     }
+    for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
+    {
+        if (RetransTable[i].exchContext)
+        {
+            ChipLogProgress(ExchangeManager, "EC:%04" PRIX16 " MsgId:%08" PRIX32 " NextRetransTimeCtr:%04" PRIX16,
+                            RetransTable[i].exchContext, RetransTable[i].msgId, RetransTable[i].nextRetransTime);
+        }
+    }
 }
 #else
-void ChipExchangeManager::TicklessDebugDumpRetransTable(const char *log) { return; }
+void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log)
+{
+    return;
+}
 #endif // WRMP_TICKLESS_DEBUG
 
 /**
-* Iterate through active exchange contexts and retrans table entries.
-* If an action needs to be triggered by WRMP time facilities, execute
-* that action.
-*
-*/
+ * Iterate through active exchange contexts and retrans table entries.
+ * If an action needs to be triggered by WRMP time facilities, execute
+ * that action.
+ *
+ */
 void ChipExchangeManager::WRMPExecuteActions(void)
 {
-    ExchangeContext *ec               = NULL;
+    ExchangeContext * ec = NULL;
 
-    //Process Ack Tables for all ExchangeContexts
-    ec = (ExchangeContext *)ContextPool;
+    // Process Ack Tables for all ExchangeContexts
+    ec = (ExchangeContext *) ContextPool;
 
 #if defined(WRMP_TICKLESS_DEBUG)
     ChipLogProgress(ExchangeManager, "WRMPExecuteActions");
@@ -1139,7 +1131,7 @@ void ChipExchangeManager::WRMPExecuteActions(void)
 #if defined(WRMP_TICKLESS_DEBUG)
                 ChipLogProgress(ExchangeManager, "WRMPExecuteActions sending ACK");
 #endif
-                //Send the Ack in a Common::Null message
+                // Send the Ack in a Common::Null message
                 ec->SendCommonNullMessage();
                 ec->SetAckPending(false);
             }
@@ -1160,14 +1152,15 @@ void ChipExchangeManager::WRMPExecuteActions(void)
             if (0 == RetransTable[i].nextRetransTime)
             {
                 uint8_t sendCount = RetransTable[i].sendCount;
-                void * msgCtxt = RetransTable[i].msgCtxt;
+                void * msgCtxt    = RetransTable[i].msgCtxt;
 
                 if (sendCount > ec->mWRMPConfig.mMaxRetrans)
                 {
                     err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
-                    ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                                  RetransTable[i].msgId, sendCount, ec->mWRMPConfig.mMaxRetrans);
+                    ChipLogError(ExchangeManager,
+                                 "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
+                                 RetransTable[i].msgId, sendCount, ec->mWRMPConfig.mMaxRetrans);
 
                     // Remove from Table
                     ClearRetransmitTable(RetransTable[i]);
@@ -1184,8 +1177,8 @@ void ChipExchangeManager::WRMPExecuteActions(void)
                     // If the retransmission was successful, update the passive timer
                     RetransTable[i].nextRetransTime = ec->GetCurrentRetransmitTimeout() / mWRMPTimerInterval;
 #if defined(DEBUG)
-                    ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d",
-                            RetransTable[i].msgId, RetransTable[i].sendCount);
+                    ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", RetransTable[i].msgId,
+                                    RetransTable[i].sendCount);
 #endif
                 }
 
@@ -1196,7 +1189,7 @@ void ChipExchangeManager::WRMPExecuteActions(void)
                         ec->OnSendError(ec, err, msgCtxt);
                     }
                 }
-            } //nextRetransTime = 0
+            } // nextRetransTime = 0
         }
     }
 
@@ -1204,22 +1197,22 @@ void ChipExchangeManager::WRMPExecuteActions(void)
 }
 
 /**
-* Calculate number of virtual WRMP ticks that have expired since we last
-* called this function. Iterate through active exchange contexts and
-* retrans table entries, subtracting expired virtual ticks to synchronize
-* wakeup times with the current system time. Do not perform any actions
-* beyond updating tick counts, actions will be performed by the physical
-* WRMP timer tick expiry.
-*
-*/
+ * Calculate number of virtual WRMP ticks that have expired since we last
+ * called this function. Iterate through active exchange contexts and
+ * retrans table entries, subtracting expired virtual ticks to synchronize
+ * wakeup times with the current system time. Do not perform any actions
+ * beyond updating tick counts, actions will be performed by the physical
+ * WRMP timer tick expiry.
+ *
+ */
 void ChipExchangeManager::WRMPExpireTicks(void)
 {
-    uint64_t            now         = 0;
-    ExchangeContext*    ec          = NULL;
-    uint32_t            deltaTicks;
+    uint64_t now         = 0;
+    ExchangeContext * ec = NULL;
+    uint32_t deltaTicks;
 
-    //Process Ack Tables for all ExchangeContexts
-    ec = (ExchangeContext *)ContextPool;
+    // Process Ack Tables for all ExchangeContexts
+    ec = (ExchangeContext *) ContextPool;
 
     now = System::Timer::GetCurrentEpoch();
 
@@ -1243,7 +1236,7 @@ void ChipExchangeManager::WRMPExpireTicks(void)
     {
         if (ec->ExchangeMgr != NULL && ec->IsAckPending())
         {
-            //Decrement counter of Ack timestamp by the elapsed timer ticks
+            // Decrement counter of Ack timestamp by the elapsed timer ticks
             if (ec->mWRMPNextAckTime >= deltaTicks)
             {
                 ec->mWRMPNextAckTime -= deltaTicks;
@@ -1258,15 +1251,15 @@ void ChipExchangeManager::WRMPExpireTicks(void)
         }
     }
 
-    //Process Throttle Time
-    //Check Throttle timeout stored in EC to set/unset Throttle flag
+    // Process Throttle Time
+    // Check Throttle timeout stored in EC to set/unset Throttle flag
     for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         ec = RetransTable[i].exchContext;
         if (ec)
         {
-            //Process Retransmit Table
-            //Decrement Throttle timeout by elapsed timeticks
+            // Process Retransmit Table
+            // Decrement Throttle timeout by elapsed timeticks
             if (ec->mWRMPThrottleTimeout >= deltaTicks)
             {
                 ec->mWRMPThrottleTimeout -= deltaTicks;
@@ -1279,7 +1272,7 @@ void ChipExchangeManager::WRMPExpireTicks(void)
             ChipLogProgress(ExchangeManager, "WRMPExpireTicks set mWRMPThrottleTimeout to %u", RetransTable[i].nextRetransTime);
 #endif
 
-            //Decrement Retransmit timeout by elapsed timeticks
+            // Decrement Retransmit timeout by elapsed timeticks
             if (RetransTable[i].nextRetransTime >= deltaTicks)
             {
                 RetransTable[i].nextRetransTime -= deltaTicks;
@@ -1291,7 +1284,7 @@ void ChipExchangeManager::WRMPExpireTicks(void)
 #if defined(WRMP_TICKLESS_DEBUG)
             ChipLogProgress(ExchangeManager, "WRMPExpireTicks set nextRetransTime to %u", RetransTable[i].nextRetransTime);
 #endif
-        } //ec entry is allocated
+        } // ec entry is allocated
     }
 
     // Re-Adjust the base time stamp to the most recent tick boundary
@@ -1314,9 +1307,9 @@ void ChipExchangeManager::WRMPExpireTicks(void)
  * Handle physical wakeup of system due to WRMP wakeup.
  *
  */
-void ChipExchangeManager::WRMPTimeout(System::Layer* aSystemLayer, void* aAppState,  System::Error aError)
+void ChipExchangeManager::WRMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    ChipExchangeManager*   exchangeMgr             = reinterpret_cast<ChipExchangeManager*>(aAppState);
+    ChipExchangeManager * exchangeMgr = reinterpret_cast<ChipExchangeManager *>(aAppState);
 
     VerifyOrDie((aSystemLayer != NULL) && (exchangeMgr != NULL));
 
@@ -1352,32 +1345,34 @@ void ChipExchangeManager::WRMPTimeout(System::Layer* aSystemLayer, void* aAppSta
  *  @retval  #CHIP_NO_ERROR On success.
  *
  */
-CHIP_ERROR ChipExchangeManager::AddToRetransTable(ExchangeContext *ec, PacketBuffer *msgBuf, uint32_t messageId, void *msgCtxt, RetransTableEntry **rEntry)
+CHIP_ERROR ChipExchangeManager::AddToRetransTable(ExchangeContext * ec, PacketBuffer * msgBuf, uint32_t messageId, void * msgCtxt,
+                                                  RetransTableEntry ** rEntry)
 {
-    bool added      = false;
+    bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
-        //Check the exchContext pointer for finding an empty slot in Table
+        // Check the exchContext pointer for finding an empty slot in Table
         if (!RetransTable[i].exchContext)
         {
             // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
             WRMPExpireTicks();
 
-            RetransTable[i].exchContext = ec;
-            RetransTable[i].msgId = messageId;
-            RetransTable[i].msgBuf = msgBuf;
-            RetransTable[i].sendCount = 0;
-            RetransTable[i].nextRetransTime = GetTickCounterFromTimeDelta(ec->GetCurrentRetransmitTimeout() + System::Timer::GetCurrentEpoch(), mWRMPTimeStampBase);
+            RetransTable[i].exchContext     = ec;
+            RetransTable[i].msgId           = messageId;
+            RetransTable[i].msgBuf          = msgBuf;
+            RetransTable[i].sendCount       = 0;
+            RetransTable[i].nextRetransTime = GetTickCounterFromTimeDelta(
+                ec->GetCurrentRetransmitTimeout() + System::Timer::GetCurrentEpoch(), mWRMPTimeStampBase);
 
             RetransTable[i].msgCtxt = msgCtxt;
-            *rEntry = &RetransTable[i];
-            //Increment the reference count
+            *rEntry                 = &RetransTable[i];
+            // Increment the reference count
             ec->AddRef();
             added = true;
 
-            //Check if the timer needs to be started and start it.
+            // Check if the timer needs to be started and start it.
             WRMPStartTimer();
             break;
         }
@@ -1400,23 +1395,20 @@ CHIP_ERROR ChipExchangeManager::AddToRetransTable(ExchangeContext *ec, PacketBuf
  *  @return  #CHIP_NO_ERROR On success, else corresponding CHIP_ERROR returned from SendMessage.
  *
  */
-CHIP_ERROR ChipExchangeManager::SendFromRetransTable(RetransTableEntry *entry)
+CHIP_ERROR ChipExchangeManager::SendFromRetransTable(RetransTableEntry * entry)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     uint16_t msgSendFlags = 0;
-    uint8_t     *p = NULL;
-    uint32_t    len = 0;
-    ExchangeContext *ec = entry->exchContext;
+    uint8_t * p           = NULL;
+    uint32_t len          = 0;
+    ExchangeContext * ec  = entry->exchContext;
 
     // To trigger a call to OnSendError, set the number of transmissions so
     // that the next call to WRMPExecuteActions will abort this entry,
     // restart the timer immediately, and ExitNow.
 
-    CHIP_FAULT_INJECT(FaultInjection::kFault_WRMSendError,
-                       entry->sendCount = (ec->mWRMPConfig.mMaxRetrans + 1);
-                       entry->nextRetransTime = 0;
-                       WRMPStartTimer();
-                       ExitNow());
+    CHIP_FAULT_INJECT(FaultInjection::kFault_WRMSendError, entry->sendCount = (ec->mWRMPConfig.mMaxRetrans + 1);
+                      entry->nextRetransTime = 0; WRMPStartTimer(); ExitNow());
 
     if (ec)
     {
@@ -1426,19 +1418,17 @@ CHIP_ERROR ChipExchangeManager::SendFromRetransTable(RetransTableEntry *entry)
         SetFlag(msgSendFlags, kChipMessageFlag_ViaEphemeralUDPPort, ec->UseEphemeralUDPPort());
 #endif // CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
 
-        //Locally store the start and length;
-        p = entry->msgBuf->Start();
+        // Locally store the start and length;
+        p   = entry->msgBuf->Start();
         len = entry->msgBuf->DataLength();
 
-        //Send the message through
-        err = MessageLayer->SendMessage(ec->PeerAddr, ec->PeerPort, ec->PeerIntf,
-                                        entry->msgBuf,
-                                        msgSendFlags);
-        //Reset the msgBuf start pointer and data length after sending
+        // Send the message through
+        err = MessageLayer->SendMessage(ec->PeerAddr, ec->PeerPort, ec->PeerIntf, entry->msgBuf, msgSendFlags);
+        // Reset the msgBuf start pointer and data length after sending
         entry->msgBuf->SetStart(p);
         entry->msgBuf->SetDataLength(len);
 
-        //Update the counters
+        // Update the counters
         entry->sendCount++;
     }
     else
@@ -1448,20 +1438,20 @@ CHIP_ERROR ChipExchangeManager::SendFromRetransTable(RetransTableEntry *entry)
 
     VerifyOrExit(err != CHIP_NO_ERROR, err = CHIP_NO_ERROR);
 
-    //Any error generated during initial sending is evaluated for criticality which would
-    //qualify it to be reportable back to the caller. If it is non-critical then
-    //err is set to CHIP_NO_ERROR.
+    // Any error generated during initial sending is evaluated for criticality which would
+    // qualify it to be reportable back to the caller. If it is non-critical then
+    // err is set to CHIP_NO_ERROR.
     if (ChipMessageLayer::IsSendErrorNonCritical(err))
     {
-        ChipLogError(ExchangeManager, "Non-crit err %ld sending CHIP MsgId:%08" PRIX32 " from retrans table",
-                      long(err), entry->msgId);
+        ChipLogError(ExchangeManager, "Non-crit err %ld sending CHIP MsgId:%08" PRIX32 " from retrans table", long(err),
+                     entry->msgId);
         err = CHIP_NO_ERROR;
     }
     else
     {
-        //Remove from table
-        ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
-                long(err), entry->msgId, entry->sendCount);
+        // Remove from table
+        ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d", long(err), entry->msgId,
+                     entry->sendCount);
 
         ClearRetransmitTable(*entry);
     }
@@ -1476,13 +1466,13 @@ exit:
  *  @param[in]    ec    A pointer to the ExchangeContext object.
  *
  */
-void ChipExchangeManager::ClearRetransmitTable(ExchangeContext *ec)
+void ChipExchangeManager::ClearRetransmitTable(ExchangeContext * ec)
 {
     for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         if (RetransTable[i].exchContext == ec)
         {
-            //Clear the retransmit table entry.
+            // Clear the retransmit table entry.
             ClearRetransmitTable(RetransTable[i]);
         }
     }
@@ -1494,7 +1484,7 @@ void ChipExchangeManager::ClearRetransmitTable(ExchangeContext *ec)
  *  @param[in]    rEntry   A reference to the RetransTableEntry object.
  *
  */
-void ChipExchangeManager::ClearRetransmitTable(RetransTableEntry &rEntry)
+void ChipExchangeManager::ClearRetransmitTable(RetransTableEntry & rEntry)
 {
     if (rEntry.exchContext)
     {
@@ -1515,7 +1505,6 @@ void ChipExchangeManager::ClearRetransmitTable(RetransTableEntry &rEntry)
 
         // Schedule next physical wakeup
         WRMPStartTimer();
-
     }
 }
 
@@ -1527,13 +1516,13 @@ void ChipExchangeManager::ClearRetransmitTable(RetransTableEntry &rEntry)
  *  @param[in]    err   The error for failing table entries.
  *
  */
-void ChipExchangeManager::FailRetransmitTableEntries(ExchangeContext *ec, CHIP_ERROR err)
+void ChipExchangeManager::FailRetransmitTableEntries(ExchangeContext * ec, CHIP_ERROR err)
 {
     for (int i = 0; i < CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE; i++)
     {
         if (RetransTable[i].exchContext == ec)
         {
-            void *msgCtxt = RetransTable[i].msgCtxt;
+            void * msgCtxt = RetransTable[i].msgCtxt;
 
             // Remove the entry from the retransmission table.
             ClearRetransmitTable(RetransTable[i]);
@@ -1546,27 +1535,28 @@ void ChipExchangeManager::FailRetransmitTableEntries(ExchangeContext *ec, CHIP_E
 }
 
 /**
-* Iterate through active exchange contexts and retrans table entries.
-* Determine how many WRMP ticks we need to sleep before we need to physically
-* wake the CPU to perform an action.  Set a timer to go off when we
-* next need to wake the system.
-*
-*/
+ * Iterate through active exchange contexts and retrans table entries.
+ * Determine how many WRMP ticks we need to sleep before we need to physically
+ * wake the CPU to perform an action.  Set a timer to go off when we
+ * next need to wake the system.
+ *
+ */
 void ChipExchangeManager::WRMPStartTimer()
 {
-    CHIP_ERROR res                   = CHIP_NO_ERROR;
-    uint32_t nextWakeTime             = UINT32_MAX;
-    bool foundWake                    = false;
-    ExchangeContext *ec               = NULL;
+    CHIP_ERROR res        = CHIP_NO_ERROR;
+    uint32_t nextWakeTime = UINT32_MAX;
+    bool foundWake        = false;
+    ExchangeContext * ec  = NULL;
 
     // When do we need to next wake up to send an ACK?
-    ec = (ExchangeContext *)ContextPool;
+    ec = (ExchangeContext *) ContextPool;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
-        if (ec->ExchangeMgr != NULL && ec->IsAckPending() && ec->mWRMPNextAckTime < nextWakeTime) {
+        if (ec->ExchangeMgr != NULL && ec->IsAckPending() && ec->mWRMPNextAckTime < nextWakeTime)
+        {
             nextWakeTime = ec->mWRMPNextAckTime;
-            foundWake = true;
+            foundWake    = true;
 #if defined(WRMP_TICKLESS_DEBUG)
             ChipLogProgress(ExchangeManager, "WRMPStartTimer next ACK time %u", nextWakeTime);
 #endif
@@ -1579,18 +1569,20 @@ void ChipExchangeManager::WRMPStartTimer()
         if (ec)
         {
             // When do we need to next wake up for throttle retransmission?
-            if (ec->mWRMPThrottleTimeout != 0 && ec->mWRMPThrottleTimeout < nextWakeTime) {
+            if (ec->mWRMPThrottleTimeout != 0 && ec->mWRMPThrottleTimeout < nextWakeTime)
+            {
                 nextWakeTime = ec->mWRMPThrottleTimeout;
-                foundWake = true;
+                foundWake    = true;
 #if defined(WRMP_TICKLESS_DEBUG)
                 ChipLogProgress(ExchangeManager, "WRMPStartTimer throttle timeout %u", nextWakeTime);
 #endif
             }
 
             // When do we need to next wake up for WRMP retransmit?
-            if (RetransTable[i].nextRetransTime < nextWakeTime) {
+            if (RetransTable[i].nextRetransTime < nextWakeTime)
+            {
                 nextWakeTime = RetransTable[i].nextRetransTime;
-                foundWake = true;
+                foundWake    = true;
 #if defined(WRMP_TICKLESS_DEBUG)
                 ChipLogProgress(ExchangeManager, "WRMPStartTimer RetransTime %u", nextWakeTime);
 #endif
@@ -1598,22 +1590,23 @@ void ChipExchangeManager::WRMPStartTimer()
         }
     }
 
-    if (foundWake) {
+    if (foundWake)
+    {
         // Set timer for next tick boundary - subtract the elapsed time from the current tick
-        System::Timer::Epoch currentTime = System::Timer::GetCurrentEpoch();
-        int32_t timerArmValue = nextWakeTime * mWRMPTimerInterval - (currentTime - mWRMPTimeStampBase);
+        System::Timer::Epoch currentTime      = System::Timer::GetCurrentEpoch();
+        int32_t timerArmValue                 = nextWakeTime * mWRMPTimerInterval - (currentTime - mWRMPTimeStampBase);
         System::Timer::Epoch timerExpiryEpoch = currentTime + timerArmValue;
 
 #if defined(WRMP_TICKLESS_DEBUG)
-        ChipLogProgress(ExchangeManager, "WRMPStartTimer wake in %d ms (%" PRIu64" %u %" PRIu64 " %" PRIu64 ")",
-                timerArmValue,
-                timerExpiryEpoch, nextWakeTime, currentTime, mWRMPTimeStampBase);
+        ChipLogProgress(ExchangeManager, "WRMPStartTimer wake in %d ms (%" PRIu64 " %u %" PRIu64 " %" PRIu64 ")", timerArmValue,
+                        timerExpiryEpoch, nextWakeTime, currentTime, mWRMPTimeStampBase);
 #endif
         if (timerExpiryEpoch != mWRMPCurrentTimerExpiry)
         {
             // If the tick boundary has expired in the past (delayed processing of event due to other system activity),
             // expire the timer immediately
-            if (timerArmValue < 0) {
+            if (timerArmValue < 0)
+            {
                 timerArmValue = 0;
             }
 
@@ -1621,16 +1614,20 @@ void ChipExchangeManager::WRMPStartTimer()
             ChipLogProgress(ExchangeManager, "WRMPStartTimer set timer for %d %" PRIu64, timerArmValue, timerExpiryEpoch);
 #endif
             WRMPStopTimer();
-            res = MessageLayer->SystemLayer->StartTimer((uint32_t)timerArmValue, WRMPTimeout, this);
+            res = MessageLayer->SystemLayer->StartTimer((uint32_t) timerArmValue, WRMPTimeout, this);
 
             VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start WRMPTimeout\n");
             mWRMPCurrentTimerExpiry = timerExpiryEpoch;
 #if defined(WRMP_TICKLESS_DEBUG)
-        } else {
+        }
+        else
+        {
             ChipLogProgress(ExchangeManager, "WRMPStartTimer timer already set for %" PRIu64, timerExpiryEpoch);
 #endif
         }
-    } else {
+    }
+    else
+    {
 #if defined(WRMP_TICKLESS_DEBUG)
         ChipLogProgress(ExchangeManager, "Not setting WRMP timeout at %" PRIu64, System::Timer::GetCurrentEpoch());
 #endif
@@ -1655,7 +1652,7 @@ void ChipExchangeManager::InitBindingPool(void)
     memset(BindingPool, 0, sizeof(BindingPool));
     for (size_t i = 0; i < CHIP_CONFIG_MAX_BINDINGS; ++i)
     {
-        BindingPool[i].mState = Binding::kState_NotAllocated;
+        BindingPool[i].mState           = Binding::kState_NotAllocated;
         BindingPool[i].mExchangeManager = this;
     }
     mBindingsInUse = 0;
@@ -1671,8 +1668,7 @@ Binding * ChipExchangeManager::AllocBinding(void)
 {
     Binding * pResult = NULL;
 
-    CHIP_FAULT_INJECT(FaultInjection::kFault_AllocBinding,
-                           return NULL);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_AllocBinding, return NULL);
 
     for (size_t i = 0; i < CHIP_CONFIG_MAX_BINDINGS; ++i)
     {
@@ -1711,7 +1707,7 @@ void ChipExchangeManager::FreeBinding(Binding * binding)
  *  @return  A pointer to the newly allocated Binding, or NULL if the pool has been exhausted
  *
  */
-Binding * ChipExchangeManager::NewBinding(Binding::EventCallback eventCallback, void *appState)
+Binding * ChipExchangeManager::NewBinding(Binding::EventCallback eventCallback, void * appState)
 {
     Binding * pResult = AllocBinding();
     if (NULL != pResult)
