@@ -48,7 +48,7 @@
 #include <support/FlagUtils.hpp>
 #include <core/CHIPKeyIds.h>
 #include <core/CHIPConnection.h>
-#include <core/IdConstants.h>
+#include <core/NodeIdentifiers.h>
 
 namespace chip {
 

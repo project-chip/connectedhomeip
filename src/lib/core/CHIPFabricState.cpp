@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include <crypto/CHIPCrypto.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <core/CHIPFabricState.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
@@ -109,14 +109,6 @@ enum ChipProfileId
     kChipProfile_Common             = (kChipVendor_Common << 16) | 0x0000, // Common Profile
     kChipProfile_FabricProvisioning = (kChipVendor_Common << 16) | 0x0005, // Fabric Provisioning Profile
 };
-
-/**
- * Generate secure random data. To be moved towards teh crypto layer
- */
-CHIP_ERROR GetSecureRandomData(uint8_t * buf, uint16_t len)
-{
-    return CHIP_RAND_bytes(buf, len) ? CHIP_NO_ERROR : CHIP_ERROR_RANDOM_DATA_UNAVAILABLE;
-}
 
 } // namespace
 
@@ -319,7 +311,8 @@ CHIP_ERROR ChipFabricState::CreateFabric()
         // uniqueness.
         do
         {
-            err = GetSecureRandomData((unsigned char *) &FabricId, sizeof(FabricId));
+
+            err = chip::Crypto::DRBG_get_bytes((unsigned char *) &FabricId, sizeof(FabricId));
             SuccessOrExit(err);
         } while (FabricId == kFabricIdNotSpecified || FabricId >= kReservedFabricIdStart);
     }
