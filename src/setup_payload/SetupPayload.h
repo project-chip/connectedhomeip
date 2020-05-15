@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <map>
 #include <vector>
 
 #include <core/CHIPError.h>
@@ -98,7 +99,7 @@ CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag);
 class SetupPayload
 {
 private:
-    vector<optionalQRCodeInfo> optionalData;
+    map<uint64_t, optionalQRCodeInfo> optionalData;
 
 public:
     uint8_t version;
@@ -123,11 +124,11 @@ public:
     CHIP_ERROR addOptionalData(optionalQRCodeInfo info);
 
     /** @brief A function to remove an optional QR Code info object
-     * @param info Optional QR code info object to remove
+     * @param tag Optional QR code info tag number to remove
      * @return Returns CHIP_ERROR_KEY_NOT_FOUND if info could not be found in existing optional data structs,
      *                 CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR removeOptionalData(optionalQRCodeInfo info);
+    CHIP_ERROR removeOptionalData(uint64_t tag);
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :

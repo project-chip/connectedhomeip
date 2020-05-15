@@ -81,7 +81,7 @@ void TestOptionalDataPayload(nlTestSuite * inSuite, void * inContext)
         }
     }
 
-    payload.removeOptionalData(stringInfo);
+    payload.removeOptionalData(stringInfo.tag);
     optionalData = payload.getAllOptionalData();
     NL_TEST_ASSERT(inSuite, optionalData.size() == 1);
     optionalQRCodeInfo info = optionalData.front();
@@ -121,6 +121,7 @@ void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
     err = generator.payloadBase41Representation(result);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(result);
 

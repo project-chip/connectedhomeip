@@ -79,7 +79,8 @@
         "typeinfo": "cpp",
         "*.ipp": "cpp",
         "aes.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "map": "cpp"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,

@@ -65,30 +65,31 @@ static CHIP_ERROR readBits(vector<uint8_t> buf, int & index, uint64_t & dest, si
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR openTLVContainer(TLVReader & reader, TLVType type, uint64_t tag, TLVReader & containerReader)
+static CHIP_ERROR openTLVContainer(TLVReader & reader, TLVType type, uint64_t tag, TLVReader & containerReader)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (reader.GetType() != type || reader.GetTag() != tag || reader.GetLength() != 0)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    CHIP_ERROR err = reader.OpenContainer(containerReader);
+    err = reader.OpenContainer(containerReader);
     if (err != CHIP_NO_ERROR)
     {
         return err;
     }
     if (containerReader.GetContainerType() != type)
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-        ;
+        err = CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
-CHIP_ERROR retrieveStringOptionalInfo(TLVReader reader, optionalQRCodeInfo & info)
+static CHIP_ERROR retrieveStringOptionalInfo(TLVReader reader, optionalQRCodeInfo & info)
 {
+    CHIP_ERROR err     = CHIP_NO_ERROR;
     uint32_t valLength = reader.GetLength();
     char * val         = (char *) malloc(valLength + 1);
-    CHIP_ERROR err     = reader.GetString(val, valLength + 1);
+    err                = reader.GetString(val, valLength + 1);
     if (err != CHIP_NO_ERROR)
     {
         return err;
@@ -96,13 +97,15 @@ CHIP_ERROR retrieveStringOptionalInfo(TLVReader reader, optionalQRCodeInfo & inf
     info.type = optionalQRCodeInfoTypeString;
     info.tag  = reader.GetTag();
     info.data = string(val);
-    return CHIP_NO_ERROR;
+    free(val);
+    return err;
 }
 
-CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader reader, optionalQRCodeInfo & info)
+static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader reader, optionalQRCodeInfo & info)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int storedInteger;
-    CHIP_ERROR err = reader.Get(storedInteger);
+    err = reader.Get(storedInteger);
     if (err != CHIP_NO_ERROR)
     {
         return err;
@@ -110,10 +113,10 @@ CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader reader, optionalQRCodeInfo & in
     info.type    = optionalQRCodeInfoTypeInt;
     info.tag     = reader.GetTag();
     info.integer = storedInteger;
-    return CHIP_NO_ERROR;
+    return err;
 }
 
-void populatePayloadTLVField(SetupPayload & outPayload, optionalQRCodeInfo info)
+static void populatePayloadTLVField(SetupPayload & outPayload, optionalQRCodeInfo info)
 {
     if (info.tag == ContextTag(kSerialNumberTag))
     {
@@ -127,40 +130,46 @@ void populatePayloadTLVField(SetupPayload & outPayload, optionalQRCodeInfo info)
 
 static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t tlvDataLengthInBytes)
 {
-    TLVReader reader;
-    reader.Init(tlvDataStart, tlvDataLengthInBytes);
-    reader.ImplicitProfileId = outPayload.productID;
-    CHIP_ERROR err           = reader.Next();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLVReader rootReader;
+    rootReader.Init(tlvDataStart, tlvDataLengthInBytes);
+    rootReader.ImplicitProfileId = outPayload.productID;
+    err                          = rootReader.Next();
     if (err != CHIP_NO_ERROR)
     {
         return err;
     }
     {
-        TLVReader reader2;
-        err = openTLVContainer(reader, kTLVType_Structure, ProfileTag(2, 1), reader2);
+        TLVReader innerStructureReader;
+        err = openTLVContainer(rootReader, kTLVType_Structure, ProfileTag(2, 1), innerStructureReader);
         if (err != CHIP_NO_ERROR)
         {
             return err;
         }
-        err = reader2.Next();
+        err = innerStructureReader.Next();
         while (err == CHIP_NO_ERROR)
         {
-            TLVType type = reader2.GetType();
+            TLVType type = innerStructureReader.GetType();
             optionalQRCodeInfo info;
+            if (type != kTLVType_UTF8String && type != kTLVType_SignedInteger)
+            {
+                err = innerStructureReader.Next();
+                continue;
+            }
             if (type == kTLVType_UTF8String)
             {
-                err = retrieveStringOptionalInfo(reader2, info);
+                err = retrieveStringOptionalInfo(innerStructureReader, info);
             }
             else if (type == kTLVType_SignedInteger)
             {
-                err = retrieveIntegerOptionalInfo(reader2, info);
+                err = retrieveIntegerOptionalInfo(innerStructureReader, info);
             }
             if (err != CHIP_NO_ERROR)
             {
                 return err;
             }
             populatePayloadTLVField(outPayload, info);
-            err = reader2.Next();
+            err = innerStructureReader.Next();
         }
     }
     if (err == CHIP_END_OF_TLV)
@@ -168,7 +177,7 @@ static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataSta
         err = CHIP_NO_ERROR;
     }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 static CHIP_ERROR populateTLV(SetupPayload & outPayload, vector<uint8_t> buf, int & index)
@@ -234,6 +243,7 @@ static string extractPayload(string inString)
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
     vector<uint8_t> buf = vector<uint8_t>();
+    CHIP_ERROR result   = CHIP_NO_ERROR;
 
     string payload = extractPayload(mBase41Representation);
     if (payload.length() == 0)
@@ -241,7 +251,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR result = base41Decode(payload, buf);
+    result = base41Decode(payload, buf);
 
     if (CHIP_NO_ERROR != result)
     {
