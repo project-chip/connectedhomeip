@@ -388,7 +388,6 @@ void Binding::ResetConfig()
     mPeerAddress      = Inet::IPAddress::Any;
     mPeerPort         = CHIP_PORT;
     mInterfaceId      = INET_NULL_INTERFACEID;
-    mHostName         = NULL;
 
     mCon = NULL;
 
@@ -1105,56 +1104,6 @@ Binding::Configuration & Binding::Configuration::TargetAddress_IP(const Inet::IP
     mBinding.mPeerAddress      = aPeerAddress;
     mBinding.mPeerPort         = (aPeerPort != 0) ? aPeerPort : CHIP_PORT;
     mBinding.mInterfaceId      = aInterfaceId;
-    return *this;
-}
-
-/**
- * When communicating with the peer, use the specific host name, port and network interface.
- *
- * NOTE: The caller must ensure that the supplied host name string remains valid until the
- * binding preparation phase completes.
- *
- * @param[in] aHostName                 A NULL-terminated string containing the host name of the peer.
- * @param[in] aPeerPort                 Remote port to use when communicating with the peer.
- * @param[in] aInterfaceId              The ID of local network interface to use for communication.
- *
- * @return                              A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::TargetAddress_IP(const char * aHostName, uint16_t aPeerPort,
-                                                                  InterfaceId aInterfaceId)
-{
-    return TargetAddress_IP(aHostName, strlen(aHostName), aPeerPort, aInterfaceId);
-}
-
-/**
- * When communicating with the peer, use the specific host name, port and network interface.
- *
- * NOTE: The caller must ensure that the supplied host name string remains valid until the
- * binding preparation phase completes.
- *
- * @param[in] aHostName                 A string containing the host name of the peer.  This string
- *                                      does not need to be NULL terminated.
- * @param[in] aHostNameLen              The length of the string pointed at by aHostName.
- * @param[in] aPeerPort                 Remote port to use when communicating with the peer.
- * @param[in] aInterfaceId              The ID of local network interface to use for communication.
- *
- * @return                              A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::TargetAddress_IP(const char * aHostName, size_t aHostNameLen, uint16_t aPeerPort,
-                                                                  InterfaceId aInterfaceId)
-{
-    if (aHostNameLen <= UINT8_MAX)
-    {
-        mBinding.mAddressingOption = Binding::kAddressing_HostName;
-        mBinding.mHostName         = aHostName;
-        mBinding.mHostNameLen      = (uint8_t) aHostNameLen;
-        mBinding.mPeerPort         = (aPeerPort != 0) ? aPeerPort : CHIP_PORT;
-        mBinding.mInterfaceId      = aInterfaceId;
-    }
-    else
-    {
-        mError = CHIP_ERROR_INVALID_ARGUMENT;
-    }
     return *this;
 }
 

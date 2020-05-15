@@ -23,24 +23,28 @@ using namespace chip::ArgParser;
 
 constexpr uint16_t kToolOptListen = 'l';
 constexpr uint16_t kToolOptUDPIP  = 'u';
+constexpr uint16_t kToolOptNodeId = 'n';
 
 OptionDef sToolOptionDefs[] = { //
     { "listen", kNoArgument, kToolOptListen },
     { "udp", kNoArgument, kToolOptUDPIP },
+    { "node", kArgumentRequired, kToolOptNodeId },
     {}
 };
 
 constexpr const char * sToolOptionHelp = //
-    "  -l, --listen\n      Act as a server (i.e., listen) for packets rather than send them.\n\n"
-    "  -u, --udp\n         Use UDP over IP.\n\n";
+    "  -l, --listen\n         Act as a server (i.e., listen) for packets rather than send them.\n\n"
+    "  -u, --udp\n         Use UDP over IP.\n\n"
+    "  -n, --node <Id>\n           Use UDP over IP.\n\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
 
 struct
 {
-    bool Listen = false;
-    bool Udp    = false;
+    bool Listen    = false;
+    bool Udp       = false;
+    int64_t NodeId = 1;
 } ProgramArguments;
 
 OptionSet sToolOptions = { //
@@ -66,6 +70,9 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     case kToolOptUDPIP:
         ProgramArguments.Udp = true;
+        break;
+    case kToolOptNodeId:
+        ProgramArguments.NodeId = atoll(aValue);
         break;
     default:
         return false;
@@ -120,9 +127,12 @@ void SendClientRequest(ChipExchangeManager * exchangeMgr)
             configuration.Transport_TCP();
         }
 
-        err = configuration                                                  //
-                  .Target_NodeId(kAnyNodeId)                                 //
-                  .TargetAddress_IP("::1", static_cast<uint16_t>(CHIP_PORT)) //
+        Inet::IPAddress address;
+        VerifyOrExit(Inet::IPAddress::FromString("::1", address), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        err = configuration                               //
+                  .Target_NodeId(ProgramArguments.NodeId) //
+                  .TargetAddress_IP(address, CHIP_PORT)   //
                   .PrepareBinding();
         SuccessOrExit(err);
     }
@@ -181,6 +191,7 @@ int main(int argc, char * argv[])
     if (ProgramArguments.Listen)
     {
         std::cout << "Acting as a SERVER ..." << std::endl;
+        std::cout << "Node ID: " << fabricState.LocalNodeId << std::endl;
     }
     else
     {

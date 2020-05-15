@@ -277,14 +277,12 @@ private:
 
     // Transport-specific configuration
     Inet::IPAddress mPeerAddress;
-    const char * mHostName;
     ChipConnection * mCon;
     uint32_t mDefaultResponseTimeoutMsec;
     uint32_t mUDPPathMTU;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     WRMPConfig mDefaultWRMPConfig;
 #endif
-    uint8_t mHostNameLen;
 
     CHIP_ERROR Init(void * apAppState, EventCallback aEventCallback);
 
@@ -334,10 +332,6 @@ public:
     Configuration & TargetAddress_ChipService(void);
     Configuration & TargetAddress_ChipFabric(uint16_t aSubnetId);
     Configuration & TargetAddress_IP(Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
-                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
-    Configuration & TargetAddress_IP(const char * aHostName, uint16_t aPeerPort = CHIP_PORT,
-                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
-    Configuration & TargetAddress_IP(const char * aHostName, size_t aHostNameLen, uint16_t aPeerPort = CHIP_PORT,
                                      InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
 
     Configuration & Transport_TCP(void);
