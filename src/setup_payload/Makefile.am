@@ -43,6 +43,7 @@ libSetupPayload_a_SOURCES                                       = \
     SetupPayload.cpp                                        \
     Base41.cpp                                              \
     QRCodeSetupPayloadParser.cpp                            \
+    SetupPayloadHelper.cpp                                  \
    $(NULL)
 
 dist_libSetupPayload_a_HEADERS                                  = \
@@ -52,6 +53,7 @@ dist_libSetupPayload_a_HEADERS                                  = \
     SetupPayload.h                                          \
     Base41.h                                                \
     QRCodeSetupPayloadParser.h                              \
+    SetupPayloadHelper.http                                 \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
