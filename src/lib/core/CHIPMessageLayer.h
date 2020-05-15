@@ -274,7 +274,6 @@ public:
 
     /************** ChipConnectionContext implementation ******************/
     Inet::InetLayer * InetLayer() override { return Inet; }
-    Ble::BleLayer * BleLayer() override { return mBle; }
     ChipMessageLayer * MessageLayer() override { return this; }
 
 
@@ -295,6 +294,10 @@ public:
     void HandleOnReceiveError(ChipConnection * con, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo) override {
         OnReceiveError(this, err, pktInfo);
     }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * BleLayer() override { return mBle; }
+#endif
 
 private:
     enum

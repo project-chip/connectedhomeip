@@ -205,7 +205,6 @@ public:
     virtual ~ChipConnectionContext(){}
 
     virtual chip::Inet::InetLayer * InetLayer() = 0;
-    virtual chip::Ble::BleLayer * BleLayer()    = 0;
     virtual ChipMessageLayer * MessageLayer() = 0;
 
     virtual uint64_t LocalNodeId() = 0;
@@ -224,6 +223,10 @@ public:
     virtual void HandleConnectionClosed(ChipConnection * con, CHIP_ERROR err) = 0;
 
     virtual void HandleOnReceiveError(ChipConnection * con, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo) = 0;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    virtual chip::Ble::BleLayer * BleLayer()    = 0;
+#endif
 };
 
 /**

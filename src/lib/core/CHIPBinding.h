@@ -224,7 +224,7 @@ public:
 
     static void DefaultEventHandler(void *apAppState, EventType aEvent, const InEventParam& aInParam, OutEventParam& aOutParam);
 
-    CHIP_ERROR AllocateRightSizedBuffer(PacketBuffer *& buf,
+    CHIP_ERROR AllocateRightSizedBuffer(System::PacketBuffer *& buf,
                                          const uint32_t desiredSize,
                                          const uint32_t minSize,
                                          uint32_t & outMaxPayloadSize);
