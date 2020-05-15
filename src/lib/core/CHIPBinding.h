@@ -35,12 +35,13 @@
 #endif // __STDC_FORMAT_MACROS
 
 #include <core/CHIPWRMPConfig.h>
+#include <core/CHIPConnection.h>
+#include <InetLayer.h>
 
 namespace chip {
 
 class ChipExchangeManager;
 class ExchangeContext;
-class ChipSecurityManager;
 
 namespace Profiles {
 namespace StatusReporting {
@@ -185,9 +186,7 @@ public:
     uint16_t GetLogId(void) const;
 
     uint64_t GetPeerNodeId(void) const;
-    void GetPeerIPAddress(nl::Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const;
-    uint32_t GetKeyId(void) const;
-    uint8_t GetEncryptionType(void) const;
+    void GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const;
     uint32_t GetDefaultResponseTimeout() const;
     void SetDefaultResponseTimeout(uint32_t msec);
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -252,17 +251,6 @@ private:
         kTransport_ExistingConnection               = 4,
     };
 
-    enum SecurityOption
-    {
-        kSecurityOption_NotSpecified                = 0,
-        kSecurityOption_None                        = 1,
-        kSecurityOption_SpecificKey                 = 2,
-        kSecurityOption_CASESession                 = 3,
-        kSecurityOption_SharedCASESession           = 4,
-        kSecurityOption_PASESession                 = 5,
-        kSecurityOption_TAKESession                 = 6,
-    };
-
     enum Flags
     {
         kFlag_KeyReserved                           = 0x1,
@@ -273,13 +261,9 @@ private:
 
     uint8_t mRefCount;
     State mState : 4;
-    SecurityOption mSecurityOption : 3;
     AddressingOption mAddressingOption : 3;
     TransportOption mTransportOption : 3;
     unsigned mFlags : 3;
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    uint8_t mDNSOptions;
-#endif
 
     EventCallback mAppEventCallback;
     EventCallback mProtocolLayerCallback;
@@ -292,7 +276,7 @@ private:
     uint16_t mPeerPort;
 
     // Transport-specific configuration
-    nl::Inet::IPAddress mPeerAddress;
+    Inet::IPAddress mPeerAddress;
     const char *mHostName;
     ChipConnection *mCon;
     uint32_t mDefaultResponseTimeoutMsec;
@@ -301,11 +285,6 @@ private:
     WRMPConfig mDefaultWRMPConfig;
 #endif
     uint8_t mHostNameLen;
-
-    // Security-specific configuration
-    uint8_t mEncType;
-    ChipAuthMode mAuthMode;
-    uint32_t mKeyId;
 
     CHIP_ERROR Init(void * apAppState, EventCallback aEventCallback);
 
@@ -319,21 +298,14 @@ private:
     void ResetConfig(void);
     void PrepareAddress(void);
     void PrepareTransport(void);
-    void PrepareSecurity(void);
     void HandleBindingReady(void);
     void HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::StatusReport *statusReport, bool raiseEvent);
-    void OnKeyFailed(uint64_t peerNodeId, uint32_t keyId, CHIP_ERROR keyErr);
     void OnSecurityManagerAvailable(void);
     void OnConnectionClosed(ChipConnection *con, CHIP_ERROR conErr);
     uint32_t GetChipTrailerSize(void);
     uint32_t GetChipHeaderSize(void);
 
-    static void OnSecureSessionReady(ChipSecurityManager *sm, ChipConnection *con, void *reqState,
-            uint16_t keyId, uint64_t peerNodeId, uint8_t encType);
-    static void OnSecureSessionFailed(ChipSecurityManager *sm, ChipConnection *con, void *reqState,
-            CHIP_ERROR localErr, uint64_t peerNodeId, Profiles::StatusReporting::StatusReport *statusReport);
     void OnSecureSessionReady(uint64_t peerNodeId, uint8_t encType, ChipAuthMode authMode, uint16_t keyId);
-    void OnKeyError(const uint32_t aKeyId, const uint64_t aPeerNodeId, const CHIP_ERROR aKeyErr);
 
     static void OnResolveComplete(void *appState, INET_ERROR err, uint8_t addrCount, IPAddress *addrArray);
     static void OnConnectionComplete(ChipConnection *con, CHIP_ERROR conErr);
@@ -362,11 +334,9 @@ public:
 
     Configuration& TargetAddress_ChipService(void);
     Configuration& TargetAddress_ChipFabric(uint16_t aSubnetId);
-    Configuration& TargetAddress_IP(nl::Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+    Configuration& TargetAddress_IP(Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
     Configuration& TargetAddress_IP(const char *aHostName, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
     Configuration& TargetAddress_IP(const char *aHostName, size_t aHostNameLen, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
-
-    Configuration& DNS_Options(uint8_t dnsOptions);
 
     Configuration& Transport_TCP(void);
     Configuration& Transport_UDP(void);
@@ -376,17 +346,6 @@ public:
     Configuration& Transport_ExistingConnection(ChipConnection *apConnection);
 
     Configuration& Exchange_ResponseTimeoutMsec(uint32_t aResponseTimeoutMsec);
-
-    Configuration& Security_None(void);
-    Configuration& Security_CASESession(void);
-    Configuration& Security_SharedCASESession(void);
-    Configuration& Security_SharedCASESession(uint64_t aRouterNodeId);
-    Configuration& Security_PASESession(uint8_t aPasswordSource);
-    Configuration& Security_TAKESession();
-    Configuration& Security_Key(uint32_t aKeyId);
-    Configuration& Security_AppGroupKey(uint32_t aAppGroupGlobalId, uint32_t aRootKeyId, bool aUseRotatingKey);
-    Configuration& Security_EncryptionType(uint8_t aEncType);
-    Configuration& Security_AuthenticationMode(ChipAuthMode aAuthMode);
 
     Configuration& ConfigureFromMessage(const ChipMessageInfo *aMsgInfo, const Inet::IPPacketInfo *aPacketInfo);
 
@@ -421,11 +380,6 @@ struct Binding::InEventParam
         {
             CHIP_ERROR Reason;
         } BindingFailed;
-
-        struct
-        {
-            uint8_t PasswordSource;
-        } PASEParametersRequested;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }
@@ -443,21 +397,6 @@ struct Binding::OutEventParam
         {
             CHIP_ERROR PrepareError;
         } PrepareRequested;
-
-        struct
-        {
-            const uint8_t * Password;
-            uint16_t PasswordLength;
-        } PASEParametersRequested;
-
-        struct
-        {
-            bool EncryptAuthPhase;
-            bool EncryptCommPhase;
-            bool TimeLimitedIK;
-            bool SendChallengerId;
-            chip::Profiles::Security::TAKE::ChipTAKEChallengerAuthDelegate *AuthDelegate;
-        } TAKEParametersRequested;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }
@@ -495,21 +434,11 @@ inline uint64_t Binding::GetPeerNodeId() const
     return mPeerNodeId;
 }
 
-inline void Binding::GetPeerIPAddress(nl::Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
+inline void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
 {
     address = mPeerAddress;
     port = mPeerPort;
     interfaceId = mInterfaceId;
-}
-
-inline uint32_t Binding::GetKeyId(void) const
-{
-    return mKeyId;
-}
-
-inline uint8_t Binding::GetEncryptionType(void) const
-{
-    return mEncType;
 }
 
 inline uint32_t Binding::GetDefaultResponseTimeout() const
@@ -618,7 +547,6 @@ inline CHIP_ERROR Binding::Configuration::GetError(void) const
     return mError;
 }
 
-}; // CHIP
-}; // nl
+} // namespace chip
 
 #endif // CHIP_BINDING_H_

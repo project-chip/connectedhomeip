@@ -29,6 +29,7 @@
 #include <core/CHIPBinding.h>
 #include <support/CodeUtils.h>
 #include <support/CHIPFaultInjection.h>
+#include <support/ErrorStr.h>
 #include <system/SystemStats.h>
 
 namespace chip {
@@ -64,7 +65,7 @@ namespace chip {
  */
 
 /**
- * @fn void Binding::GetPeerIPAddress(nl::Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
+ * @fn void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
  *
  * Retrieve the IP address information for the peer, if available.
  *
@@ -84,17 +85,7 @@ namespace chip {
  *                                  via which the peer can be reached.  If the peer's IP address information is
  *                                  unavailable, this value is undefined.
  */
-/**
- * @fn uint32_t Binding::GetKeyId() const
- *
- * Retrieve the id of the message encryption key to be used when encrypting messages to/from to the peer.
- */
 
-/**
- * @fn uint8_t Binding::GetEncryptionType() const
- *
- * Retrieve the message encryption type to be used when encrypting messages to/from the peer.
- */
 
 /**
  * @fn uint32_t Binding::GetDefaultResponseTimeout() const
@@ -359,19 +350,8 @@ void Binding::DoReset(State newState)
     // being removed.
     if (GetFlag(kFlag_KeyReserved))
     {
-        sm->ReleaseKey(mPeerNodeId, mKeyId);
         ClearFlag(kFlag_KeyReserved);
     }
-
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-
-    // If host name resolution is in progress, cancel it.
-    if (origState == kState_PreparingAddress_ResolveHostName)
-    {
-        mExchangeManager->MessageLayer->Inet->CancelResolveHostAddress(OnResolveComplete, this);
-    }
-
-#endif
 
     // Release the reference to the connection object, if held.  Block any callback to our
     // connection complete handler that may result from releasing the connection.
@@ -432,7 +412,7 @@ void Binding::ResetConfig()
     mPeerNodeId = kNodeIdNotSpecified;
 
     mAddressingOption = kAddressing_NotSpecified;
-    mPeerAddress      = nl::Inet::IPAddress::Any;
+    mPeerAddress      = Inet::IPAddress::Any;
     mPeerPort         = CHIP_PORT;
     mInterfaceId      = INET_NULL_INTERFACEID;
     mHostName         = NULL;
@@ -446,16 +426,8 @@ void Binding::ResetConfig()
 #endif
     mUDPPathMTU = CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE;
 
-    mSecurityOption = kSecurityOption_NotSpecified;
-    mKeyId          = ChipKeyId::kNone;
-    mEncType        = kChipEncryptionType_None;
-    mAuthMode       = kChipAuthMode_Unauthenticated;
-
     mFlags = 0;
 
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    mDNSOptions = ::nl::Inet::kDNSOption_Default;
-#endif
 }
 
 /**
@@ -536,30 +508,6 @@ CHIP_ERROR Binding::DoPrepare(CHIP_ERROR configErr)
     // App must pick a transport option
     VerifyOrExit(kTransport_NotSpecified != mTransportOption, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // App must pick a security option
-    VerifyOrExit(kSecurityOption_NotSpecified != mSecurityOption, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR
-    // Shared CASE session not supported over connection-oriented transports.
-    VerifyOrExit(mSecurityOption != kSecurityOption_SharedCASESession || mTransportOption == kTransport_UDP ||
-                     mTransportOption == kTransport_UDP_WRM,
-                 err = CHIP_ERROR_NOT_IMPLEMENTED);
-#endif
-
-#if CHIP_CONFIG_ENABLE_PASE_INITIATOR
-    // PASE sessions not supported over UDP transports.
-    VerifyOrExit(mSecurityOption != kSecurityOption_PASESession ||
-                     (mTransportOption != kTransport_UDP && mTransportOption != kTransport_UDP_WRM),
-                 err = CHIP_ERROR_NOT_IMPLEMENTED);
-#endif
-
-#if CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-    // TAKE sessions not supported over UDP transports.
-    VerifyOrExit(mSecurityOption != kSecurityOption_TAKESession ||
-                     (mTransportOption != kTransport_UDP && mTransportOption != kTransport_UDP_WRM),
-                 err = CHIP_ERROR_NOT_IMPLEMENTED);
-#endif
-
     mState = kState_Preparing;
 
     ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): Preparing", GetLogId(), mRefCount);
@@ -581,8 +529,6 @@ exit:
  */
 void Binding::PrepareAddress()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     mState = kState_PreparingAddress;
 
     // If configured to use an existing connection, extract the peer IP addressing information from the
@@ -609,40 +555,7 @@ void Binding::PrepareAddress()
         mPeerAddress = mExchangeManager->FabricState->SelectNodeAddress(mPeerNodeId, mPeerAddress.Subnet());
     }
 
-    // If requested, resolve a supplied host name or string-form IP address...
-    else if (kAddressing_HostName == mAddressingOption)
-    {
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-
-        mState = kState_PreparingAddress_ResolveHostName;
-
-        // Initiate a DNS query for the specified host name.
-        err = mExchangeManager->MessageLayer->Inet->ResolveHostAddress(mHostName, mHostNameLen, mDNSOptions, 1, &mPeerAddress,
-                                                                       OnResolveComplete, this);
-
-        ExitNow();
-
-#elif CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
-
-        if (!IPAddress::FromString(mHostName, mHostNameLen, mPeerAddress))
-        {
-            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-        }
-
-#else // !CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
-
-        ExitNow(err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-#endif // !CHIP_CONFIG_RESOLVE_IPADDR_LITERAL
-    }
-
     PrepareTransport();
-
-exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        HandleBindingFailed(err, NULL, false);
-    }
 }
 
 /**
@@ -681,7 +594,7 @@ void Binding::PrepareTransport()
         mState = kState_PreparingTransport_TCPConnect;
 
         // Initiate a connection to the peer.
-        err = mCon->Connect(mPeerNodeId, kChipAuthMode_None, mPeerAddress, mPeerPort, mInterfaceId);
+        err = mCon->Connect(mPeerNodeId, kChipAuthMode_Unauthenticated, mPeerAddress, mPeerPort, mInterfaceId);
         SuccessOrExit(err);
     }
 
@@ -695,165 +608,10 @@ void Binding::PrepareTransport()
         }
 
         // No further work to do in preparing the transport, so proceed to preparing security.
-        PrepareSecurity();
+        HandleBindingReady();
     }
 
 exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        HandleBindingFailed(err, NULL, true);
-    }
-}
-
-/**
- * Do any work necessary to establish communication security with the peer.
- */
-void Binding::PrepareSecurity()
-{
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    ChipSecurityManager * sm = mExchangeManager->MessageLayer->SecurityMgr;
-
-    mState = kState_PreparingSecurity;
-
-    // Default encryption type, if not specified.
-    if (kSecurityOption_None != mSecurityOption && kChipEncryptionType_None == mEncType)
-    {
-        mEncType = kChipEncryptionType_AES128CTRSHA1;
-    }
-
-    switch (mSecurityOption)
-    {
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR
-    case kSecurityOption_CASESession:
-    case kSecurityOption_SharedCASESession: {
-        IPAddress peerAddress;
-        uint16_t peerPort;
-        uint64_t terminatingNodeId;
-        const bool isSharedSession = (mSecurityOption == kSecurityOption_SharedCASESession);
-
-        if (isSharedSession)
-        {
-            // This is also defined in CHIP/Profiles/ServiceDirectory.h, but this is in CHIP Core
-            // TODO: move this to a common location.
-            static const uint64_t kServiceEndpoint_CoreRouter = 0x18B4300200000012ull;
-
-            const uint64_t fabricGlobalId = ChipFabricIdToIPv6GlobalId(mExchangeManager->FabricState->FabricId);
-            peerAddress                   = IPAddress::MakeULA(fabricGlobalId, chip::kChipSubnetId_Service,
-                                             chip::ChipNodeIdToIPv6InterfaceId(kServiceEndpoint_CoreRouter));
-            peerPort                      = CHIP_PORT;
-            terminatingNodeId             = kServiceEndpoint_CoreRouter;
-        }
-        else
-        {
-            peerAddress       = mPeerAddress;
-            peerPort          = mPeerPort;
-            terminatingNodeId = kNodeIdNotSpecified;
-        }
-
-        ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): Initiating %sCASE session", GetLogId(), mRefCount,
-                      isSharedSession ? "shared " : "");
-
-        mState = kState_PreparingSecurity_EstablishSession;
-
-        // Call the security manager to initiate the CASE session.  Note that security manager will call the
-        // OnSecureSessionReady function during this call if a shared session is requested and the session is
-        // already available.
-        err = sm->StartCASESession(mCon, mPeerNodeId, peerAddress, peerPort, mAuthMode, this, OnSecureSessionReady,
-                                   OnSecureSessionFailed, NULL, terminatingNodeId);
-        SuccessOrExit(err);
-    }
-    break;
-#endif // CHIP_CONFIG_ENABLE_CASE_INITIATOR
-
-#if CHIP_CONFIG_ENABLE_PASE_INITIATOR
-    case kSecurityOption_PASESession: {
-        InEventParam inParam;
-        OutEventParam outParam;
-
-        ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): Initiating PASE session", GetLogId(), mRefCount);
-
-        mState = kState_PreparingSecurity_EstablishSession;
-
-        // Call up to the application to get PASE parameters--essentially, the password.  Note that
-        // the application is free to ignore this event, resulting in this code passing NULL to the
-        // security manager which will then automatically choose the pairing code from the fabric
-        // state object.
-        // The application may NOT alter the state of the Binding during this callback.
-        inParam.Clear();
-        inParam.Source                                 = this;
-        inParam.PASEParametersRequested.PasswordSource = PasswordSourceFromAuthMode(mAuthMode);
-        outParam.Clear();
-        mAppEventCallback(AppState, kEvent_PASEParametersRequested, inParam, outParam);
-
-        // Call the security manager to initiate the PASE session.
-        err = sm->StartPASESession(mCon, mAuthMode, this, OnSecureSessionReady, OnSecureSessionFailed,
-                                   outParam.PASEParametersRequested.Password, outParam.PASEParametersRequested.PasswordLength);
-        SuccessOrExit(err);
-    }
-    break;
-#endif // CHIP_CONFIG_ENABLE_PASE_INITIATOR
-
-#if CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-    case kSecurityOption_TAKESession: {
-        InEventParam inParam;
-        OutEventParam outParam;
-
-        ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): Initiating TAKE session", GetLogId(), mRefCount);
-
-        mState = kState_PreparingSecurity_EstablishSession;
-
-        // Call up to the application to get TAKE parameters.
-        // NOTE: The application may NOT alter the state of the Binding during this callback.
-        inParam.Clear();
-        inParam.Source = this;
-        outParam.Clear();
-        mAppEventCallback(AppState, kEvent_TAKEParametersRequested, inParam, outParam);
-
-        // Verify the application handled the event.
-        VerifyOrExit(!outParam.DefaultHandlerCalled, err = CHIP_ERROR_INVALID_TAKE_PARAMETER);
-
-        // Call the security manager to initiate the TAKE session.
-        err = sm->StartTAKESession(
-            mCon, mAuthMode, this, OnSecureSessionReady, OnSecureSessionFailed, outParam.TAKEParametersRequested.EncryptAuthPhase,
-            outParam.TAKEParametersRequested.EncryptCommPhase, outParam.TAKEParametersRequested.TimeLimitedIK,
-            outParam.TAKEParametersRequested.SendChallengerId, outParam.TAKEParametersRequested.AuthDelegate);
-        SuccessOrExit(err);
-    }
-    break;
-#endif // CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-
-    case kSecurityOption_SpecificKey:
-
-        // Add a reservation on the specified key.  This reservation will be owned by the binding
-        // until it closes.
-        sm->ReserveKey(mPeerNodeId, mKeyId);
-        SetFlag(kFlag_KeyReserved);
-
-        HandleBindingReady();
-        break;
-
-    case kSecurityOption_None:
-        // No further preparation needed.
-        HandleBindingReady();
-        break;
-
-    default:
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-exit:
-
-    // If the security manager is currently busy, wait for it to finish.  When this happens,
-    // Binding::OnSecurityManagerAvailable() will be called, which will give the binding an opportunity
-    // to try again.
-    if (err == CHIP_ERROR_SECURITY_MANAGER_BUSY)
-    {
-        ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): Security manager busy; waiting.", GetLogId(), mRefCount);
-
-        mState = kState_PreparingSecurity_WaitSecurityMgr;
-        err    = CHIP_NO_ERROR;
-    }
-
     if (CHIP_NO_ERROR != err)
     {
         HandleBindingFailed(err, NULL, true);
@@ -960,7 +718,7 @@ void Binding::HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::Sta
                   (eventType == kEvent_BindingFailed) ? "Binding" : "Prepare", mPeerNodeId,
                   (err == CHIP_ERROR_STATUS_REPORT_RECEIVED && statusReport != NULL) ? "Status Report received: " : "",
                   (err == CHIP_ERROR_STATUS_REPORT_RECEIVED && statusReport != NULL)
-                      ? nl::StatusReportStr(statusReport->mProfileId, statusReport->mStatusCode)
+                      ? StatusReportStr(statusReport->mProfileId, statusReport->mStatusCode)
                       : ErrorStr(err));
 
     // Reset the binding and enter the Failed state.
@@ -981,36 +739,6 @@ void Binding::HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::Sta
 
     Release();
 }
-
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-
-/**
- * Invoked when DNS host name resolution completes (successfully or otherwise).
- */
-void Binding::OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray)
-{
-    Binding * _this = (Binding *) appState;
-
-    // It is legal for a DNS entry to exist but contain no A/AAAA records. If this happens, return a reasonable error
-    // to the user.
-    if (err == INET_NO_ERROR && addrCount == 0)
-        err = INET_ERROR_HOST_NOT_FOUND;
-
-    ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): DNS resolution %s%s", _this->GetLogId(), _this->mRefCount,
-                  (err == INET_NO_ERROR) ? "succeeded" : "failed: ", (err == INET_NO_ERROR) ? "" : ErrorStr(err));
-
-    // If the resolution succeeded, proceed to preparing the transport, otherwise fail the binding.
-    if (err == INET_NO_ERROR)
-    {
-        _this->PrepareTransport();
-    }
-    else
-    {
-        _this->HandleBindingFailed(err, NULL, true);
-    }
-}
-
-#endif // CHIP_CONFIG_ENABLE_DNS_RESOLVER
 
 /**
  * Invoked when TCP connection establishment completes (successfully or otherwise).
@@ -1042,7 +770,7 @@ void Binding::OnConnectionComplete(ChipConnection * con, CHIP_ERROR conErr)
         // If the binding is still in the TCPConnect state, proceed to preparing security.
         if (_this->mState == kState_PreparingTransport_TCPConnect)
         {
-            _this->PrepareSecurity();
+            _this->HandleBindingReady();
         }
     }
 
@@ -1083,73 +811,6 @@ exit:
     return;
 }
 
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR || CHIP_CONFIG_ENABLE_PASE_INITIATOR || CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-
-/**
- * Invoked when a security session establishment has completed successfully.
- */
-void Binding::OnSecureSessionReady(ChipSecurityManager * sm, ChipConnection * con, void * reqState, uint16_t keyId,
-                                   uint64_t peerNodeId, uint8_t encType)
-{
-    Binding * _this = (Binding *) reqState;
-
-    // Verify the state of the binding.
-    VerifyOrDie(_this->mState == kState_PreparingSecurity_EstablishSession);
-
-    // Save the session key id and encryption type.
-    _this->mKeyId   = keyId;
-    _this->mEncType = encType;
-
-    // Remember that the key must be released when the binding closes.
-    _this->SetFlag(kFlag_KeyReserved);
-
-    // Tell the application that the binding is ready.
-    _this->HandleBindingReady();
-}
-
-/**
- * Invoked when security session establishment fails.
- */
-void Binding::OnSecureSessionFailed(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
-                                    uint64_t peerNodeId, Profiles::StatusReporting::StatusReport * statusReport)
-{
-    Binding * _this = (Binding *) reqState;
-
-    // Verify the state of the binding.
-    VerifyOrDie(_this->mState == kState_PreparingSecurity_EstablishSession);
-
-    // Tell the application that the binding has failed.
-    _this->HandleBindingFailed(localErr, statusReport, true);
-}
-
-#endif // CHIP_CONFIG_ENABLE_CASE_INITIATOR || CHIP_CONFIG_ENABLE_PASE_INITIATOR || CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-
-/**
- * Invoked when a message encryption key has been rejected by a peer (via a KeyError), or a key has
- * otherwise become invalid (e.g. by ending a session).
- */
-void Binding::OnKeyFailed(uint64_t peerNodeId, uint32_t keyId, CHIP_ERROR keyErr)
-{
-    // NOTE: This method is called for any and all key errors that occur system-wide.  Thus this code
-    // must filter for errors that apply to the current binding.
-
-    // Ignore the key error if the binding is not in the Ready state or one of the preparing states.
-    VerifyOrExit(IsPreparing() || mState == kState_Ready, /* no-op */);
-
-    // Ignore the key error if it is not in relation to the specified peer node.
-    VerifyOrExit(peerNodeId == mPeerNodeId, /* no-op */);
-
-    // Ignore the key error if the binding is in the Ready state and the failed key id does
-    // not match the key id associated with the binding.
-    VerifyOrExit(mState != kState_Ready || keyId == mKeyId, /* no-op */);
-
-    // Fail the binding.
-    HandleBindingFailed(keyErr, NULL, true);
-
-exit:
-    return;
-}
-
 /**
  *  Invoked when the security manager becomes available for initiating new sessions.
  */
@@ -1161,7 +822,7 @@ void Binding::OnSecurityManagerAvailable()
     // If the binding is waiting for the security manager, retry preparing security.
     if (mState == kState_PreparingSecurity_WaitSecurityMgr)
     {
-        PrepareSecurity();
+        HandleBindingReady();
     }
 }
 
@@ -1237,12 +898,6 @@ bool Binding::IsAuthenticMessageFromPeer(const chip::ChipMessageHeader * msgInfo
             return false;
     }
 
-    if (msgInfo->EncryptionType != mEncType)
-        return false;
-
-    if (mEncType != kChipEncryptionType_None && !ChipKeyId::IsSameKeyOrGroup(msgInfo->KeyId, mKeyId))
-        return false;
-
     return true;
 }
 
@@ -1281,7 +936,7 @@ uint32_t Binding::GetMaxChipPayloadSize(const System::PacketBuffer * msgBuf)
 void Binding::GetPeerDescription(char * buf, uint32_t bufSize) const
 {
     ChipMessageLayer::GetPeerDescription(buf, bufSize, mPeerNodeId,
-                                         (mPeerAddress != nl::Inet::IPAddress::Any) ? &mPeerAddress : NULL, mPeerPort, mInterfaceId,
+                                         (mPeerAddress != Inet::IPAddress::Any) ? &mPeerAddress : NULL, mPeerPort, mInterfaceId,
                                          mCon);
 }
 
@@ -1338,27 +993,6 @@ CHIP_ERROR Binding::NewExchangeContext(chip::ExchangeContext *& appExchangeConte
         // Configure the exchange context to use the connection and release it when it's done.
         appExchangeContext->Con = mCon;
         appExchangeContext->SetShouldAutoReleaseConnection(true);
-    }
-
-    // If message encryption is enabled...
-    if (mSecurityOption != kSecurityOption_None)
-    {
-        uint32_t keyId;
-
-        // If the key id specifies a logical group key (e.g. the "current" rotating group key), resolve it to
-        // the id for a specific key.
-        err = mExchangeManager->FabricState->GroupKeyStore->GetCurrentAppKeyId(mKeyId, keyId);
-        SuccessOrExit(err);
-
-        // Configure the exchange context with the selected key id and encryption type.
-        appExchangeContext->KeyId          = keyId;
-        appExchangeContext->EncryptionType = mEncType;
-
-        // Add a reservation for the key.
-        mExchangeManager->MessageLayer->SecurityMgr->ReserveKey(mPeerNodeId, keyId);
-
-        // Arrange for the exchange context to automatically release the key when it is freed.
-        appExchangeContext->SetAutoReleaseKey(true);
     }
 
     err = AdjustResponseTimeout(appExchangeContext);
@@ -1445,8 +1079,8 @@ Binding::Configuration::Configuration(Binding & aBinding) : mBinding(aBinding)
             mBinding.ResetConfig();
         }
 
-        mBinding.mState = kState_Configuring;
-        mError          = CHIP_NO_ERROR;
+        mBinding.mState          = kState_Configuring;
+        mError                   = CHIP_NO_ERROR;
 
         ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): Configuring", mBinding.GetLogId(), mBinding.mRefCount);
     }
@@ -1497,7 +1131,7 @@ Binding::Configuration & Binding::Configuration::Target_ServiceEndpoint(uint64_t
  *
  * @return                              A reference to the binding object.
  */
-Binding::Configuration & Binding::Configuration::TargetAddress_IP(const nl::Inet::IPAddress aPeerAddress, const uint16_t aPeerPort,
+Binding::Configuration & Binding::Configuration::TargetAddress_IP(const Inet::IPAddress aPeerAddress, const uint16_t aPeerPort,
                                                                   const InterfaceId aInterfaceId)
 {
     mBinding.mAddressingOption = Binding::kAddressing_UnicastIP;
@@ -1554,24 +1188,6 @@ Binding::Configuration & Binding::Configuration::TargetAddress_IP(const char * a
     {
         mError = CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return *this;
-}
-
-/**
- * When resolving the host name of the peer, use the specified DNS options.
- *
- * @param[in]  dnsOptions               An integer value controlling how host name resolution is performed.
- *                                      Value should be one of values from the #::nl::Inet::DNSOptions enumeration.
- *
- * @return                              A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::DNS_Options(uint8_t dnsOptions)
-{
-#if CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    mBinding.mDNSOptions = dnsOptions;
-#else  // CHIP_CONFIG_ENABLE_DNS_RESOLVER
-    mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_CONFIG_ENABLE_DNS_RESOLVER
     return *this;
 }
 
@@ -1700,224 +1316,6 @@ Binding::Configuration & Binding::Configuration::Exchange_ResponseTimeoutMsec(ui
 }
 
 /**
- * When communicating with the peer, send and receive unencrypted (i.e. unsecured) messages.
- *
- * @return                              A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_None()
-{
-    mBinding.mSecurityOption = kSecurityOption_None;
-    mBinding.mKeyId          = ChipKeyId::kNone;
-    mBinding.mAuthMode       = kChipAuthMode_Unauthenticated;
-    return *this;
-}
-
-/**
- * When communicating with the peer, send and receive messages encrypted using a CASE session key
- * established with the peer node.
- *
- * If the necessary session is not available, it will be established automatically as part of
- * preparing the binding.
- *
- * @return                              A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_CASESession(void)
-{
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR
-    mBinding.mSecurityOption = kSecurityOption_CASESession;
-    mBinding.mKeyId          = ChipKeyId::kNone;
-    mBinding.mAuthMode       = kChipAuthMode_CASE_AnyCert;
-#else
-    mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-    return *this;
-}
-
-/**
- * When communicating with the peer, send and receive messages encrypted using a shared CASE
- * session key established with the Nest core router.
- *
- * If the necessary session is not available, it will be established automatically as part of
- * preparing the binding.
- *
- * @return                              A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_SharedCASESession(void)
-{
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR
-    mBinding.mSecurityOption = kSecurityOption_SharedCASESession;
-    mBinding.mKeyId          = ChipKeyId::kNone;
-    mBinding.mAuthMode       = kChipAuthMode_CASE_ServiceEndPoint;
-#else
-    mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-    return *this;
-}
-
-/**
- * When communicating with the peer, send and receive messages encrypted using a shared CASE
- * session key established with a specified router node.
- *
- * If the necessary session is not available, it will be established automatically as part of
- * preparing the binding.
- *
- * @param[in] aRouterNodeId             The CHIP node ID of the router with which shared CASE
- *                                      session should be established.
- *
- * @return                              A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_SharedCASESession(uint64_t aRouterNodeId)
-{
-#if CHIP_CONFIG_ENABLE_CASE_INITIATOR
-    // This is also defined in CHIP/Profiles/ServiceDirectory.h, but this is in CHIP Core
-    // TODO: move this elsewhere.
-    static const uint64_t kServiceEndpoint_CoreRouter = 0x18B4300200000012ull;
-
-    // TODO: generalize this
-    // Only support the router to be Core Router in Nest service
-    VerifyOrExit(kServiceEndpoint_CoreRouter == aRouterNodeId, mError = CHIP_ERROR_NOT_IMPLEMENTED);
-
-    Security_SharedCASESession();
-
-exit:
-#else
-    IgnoreUnusedVariable(aRouterNodeId);
-    mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-    return *this;
-}
-
-/**
- * When communicating with the peer, send and receive messages encrypted using a PASE session key
- * established with the peer node.
- *
- * If the necessary session is not available, it will be established automatically as part of
- * preparing the binding.
- *
- * @param[in] aPasswordSource   The source for the password to be used during PASE session
- *                              establishment.
- *
- * @return                      A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_PASESession(uint8_t aPasswordSource)
-{
-#if CHIP_CONFIG_ENABLE_PASE_INITIATOR
-    mBinding.mSecurityOption = kSecurityOption_PASESession;
-    mBinding.mKeyId          = ChipKeyId::kNone;
-    mBinding.mAuthMode       = kChipAuthModeCategory_PASE | (kChipAuthMode_PASE_PasswordSourceMask & aPasswordSource);
-#else
-    IgnoreUnusedVariable(aPasswordSource);
-    mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-    return *this;
-}
-
-/**
- * When communicating with the peer, send and receive messages encrypted using a TAKE session key
- * established with the peer node.
- *
- * If the necessary session is not available, it will be established automatically as part of
- * preparing the binding.
- *
- * @return                      A reference to the binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_TAKESession()
-{
-#if CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-    mBinding.mSecurityOption = kSecurityOption_TAKESession;
-    mBinding.mKeyId          = ChipKeyId::kNone;
-    mBinding.mAuthMode       = kChipAuthMode_TAKE_IdentificationKey;
-#else
-    mError = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-    return *this;
-}
-
-/**
- * When communicating with the peer, send and receive messages encrypted using a specified key.
- *
- * @param[in] aKeyId            The id of the encryption key.  The specified key must be
- *                              suitable for CHIP message encryption.
- *
- * @return                      A reference to the Binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_Key(uint32_t aKeyId)
-{
-    if (ChipKeyId::IsMessageEncryptionKeyId(aKeyId))
-    {
-        mBinding.mSecurityOption = kSecurityOption_SpecificKey;
-        if (!ChipKeyId::IsAppRotatingKey(aKeyId))
-            mBinding.mKeyId = aKeyId;
-        else
-            mBinding.mKeyId = ChipKeyId::ConvertToCurrentAppKeyId(aKeyId);
-        mBinding.mAuthMode = kChipAuthMode_NotSpecified;
-    }
-    else
-    {
-        mError = CHIP_ERROR_INVALID_KEY_ID;
-    }
-    return *this;
-}
-
-/**
- * When communicating with the peer, send and receive messages encrypted for a specified
- * CHIP Application Group.
- *
- * @param[in] aAppGroupGlobalId The global id of the application group for which messages should
- *                              be encrypted.
- * @param[in] aRootKeyId        The root key used to derive encryption keys for the specified
- *                              CHIP Application Group.
- * @param[in] aUseRotatingKey   True if the CHIP Application Group uses rotating message keys.
- *
- * @return                      A reference to the Binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_AppGroupKey(uint32_t aAppGroupGlobalId, uint32_t aRootKeyId,
-                                                                      bool aUseRotatingKey)
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-        mError = mBinding.mExchangeManager->FabricState->GetMsgEncKeyIdForAppGroup(aAppGroupGlobalId, aRootKeyId, aUseRotatingKey,
-                                                                                   mBinding.mKeyId);
-        if (mError == CHIP_NO_ERROR)
-        {
-            mBinding.mSecurityOption = kSecurityOption_SpecificKey;
-            mBinding.mAuthMode       = GroupKeyAuthMode(mBinding.mKeyId);
-        }
-#else
-        mError = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
-    }
-    return *this;
-}
-
-/**
- * When communicating with the peer, send and receive messages encrypted using the specified message encryption type.
- *
- * @param[in] aEncType          The CHIP message encryption type.
- *
- * @return                      A reference to the Binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_EncryptionType(uint8_t aEncType)
-{
-    mBinding.mEncType = aEncType;
-    return *this;
-}
-
-/**
- *  Set the requested authentication mode to be used to authenticate the peer.
- *
- *  @param[in] aAuthMode        The requested authentication mode.
- *
- *  @return                     A reference to the Binding object.
- */
-Binding::Configuration & Binding::Configuration::Security_AuthenticationMode(ChipAuthMode aAuthMode)
-{
-    mBinding.mAuthMode = aAuthMode;
-    return *this;
-}
-
-/**
  *  Configure the binding to allow communication with the sender of a received message.
  *
  *  @param[in]  aMsgInfo        Message information structure associated with the received message.
@@ -1925,7 +1323,7 @@ Binding::Configuration & Binding::Configuration::Security_AuthenticationMode(Chi
  *
  */
 Binding::Configuration & Binding::Configuration::ConfigureFromMessage(const chip::ChipMessageInfo * aMsgInfo,
-                                                                      const nl::Inet::IPPacketInfo * aPacketInfo)
+                                                                      const Inet::IPPacketInfo * aPacketInfo)
 {
     mBinding.mPeerNodeId = aMsgInfo->SourceNodeId;
 
@@ -1956,19 +1354,8 @@ Binding::Configuration & Binding::Configuration::ConfigureFromMessage(const chip
                          aPacketInfo->SrcAddress.IsIPv6LinkLocal() ? aPacketInfo->Interface : INET_NULL_INTERFACEID);
     }
 
-    if (aMsgInfo->KeyId == ChipKeyId::kNone)
-    {
-        Security_None();
-    }
-    else
-    {
-        Security_Key(aMsgInfo->KeyId);
-        Security_EncryptionType(aMsgInfo->EncryptionType);
-    }
-
     return *this;
 }
 
-}; // namespace chip
-}
-; // nl
+} // namespace chip
+

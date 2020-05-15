@@ -131,7 +131,6 @@ const WRMPConfig gDefaultWRMPConfig = { CHIP_CONFIG_WRMP_DEFAULT_INITIAL_RETRANS
 
 // clang-format on
 
-}; // CHIP
-}; // nl
+} // chip
 
 #endif // CHIP_WRM_CONFIG_H_
