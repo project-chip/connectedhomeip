@@ -15,14 +15,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/internal/NetworkProvisioningServer.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+
 #include <core/CHIPTLV.h>
 #include <platform/Profiles/CHIPProfiles.h>
 #include <platform/Profiles/common/CommonProfile.h>
-
+#include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericNetworkProvisioningServerImpl.ipp>
 
 namespace chip {

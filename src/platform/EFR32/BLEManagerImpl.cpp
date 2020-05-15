@@ -22,16 +22,18 @@
  *          for the Silicon Labs EFR32 platforms.
  */
 
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/BLEManager.h>
-#include <ble/CHIPBleServiceData.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
-#include <new>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include <platform/internal/BLEManager.h>
+
+#include <ble/CHIPBleServiceData.h>
 #include <platform/EFR32/freertos_bluetooth.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+
 #include "rtos_gecko.h"
 
 using namespace ::chip;
@@ -724,7 +726,6 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile struct gecko_cmd_packet
 
 void BLEManagerImpl::HandleWriteEvent(volatile struct gecko_cmd_packet * evt)
 {
-    struct gecko_msg_gatt_server_read_attribute_type_rsp_t * rsp;
     uint16_t attribute = evt->data.evt_gatt_server_user_write_request.characteristic;
 
     ChipLogProgress(DeviceLayer, "Char Write Req, char : %d", attribute);
