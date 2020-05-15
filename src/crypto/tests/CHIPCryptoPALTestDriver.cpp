@@ -23,14 +23,15 @@
  *
  */
 
-#include "TestCryptoLayer.h"
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
+using namespace ::chip;
 int main(void)
 {
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestCHIPCryptoPAL());
+    return (RunRegisteredUnitTests());
 }
