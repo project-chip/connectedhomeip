@@ -6,6 +6,7 @@
 
 #include <CHIPVersion.h>
 
+#include <core/CHIPBinding.h>
 #include <core/CHIPExchangeMgr.h>
 #include <core/CHIPMessageLayer.h>
 #include <inet/InetLayer.h>
@@ -97,6 +98,44 @@ void RegisterStopHandler()
     signal(SIGINT, StopHandler);
 }
 
+void SendClientRequest(ChipExchangeManager * exchangeMgr)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Binding * binding = exchangeMgr->NewBinding();
+    VerifyOrExit(binding != NULL, err = CHIP_ERROR_NO_MEMORY);
+
+    std::cout << "Binding allocated" << std::endl;
+
+    {
+
+        Binding::Configuration configuration = binding->BeginConfiguration();
+
+        if (ProgramArguments.Udp)
+        {
+            configuration.Transport_UDP();
+        }
+        else
+        {
+            configuration.Transport_TCP();
+        }
+
+        err = configuration                                                  //
+                  .Target_NodeId(kAnyNodeId)                                 //
+                  .TargetAddress_IP("::1", static_cast<uint16_t>(CHIP_PORT)) //
+                  .PrepareBinding();
+        SuccessOrExit(err);
+    }
+
+    std::cout << "Binding configured" << std::endl;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        std::cout << "Sent message error: " << ErrorStr(err) << std::endl;
+    }
+}
+
 } // namespace
 
 int main(int argc, char * argv[])
@@ -146,6 +185,7 @@ int main(int argc, char * argv[])
     else
     {
         std::cout << "Acting as a CLIENT ..." << std::endl;
+        SendClientRequest(&exchangeMgr);
     }
 
     RegisterStopHandler();
