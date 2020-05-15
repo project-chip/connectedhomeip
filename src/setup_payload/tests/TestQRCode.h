@@ -17,14 +17,13 @@
 
 /**
  *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the Quick Response code unit tests.
+ *      This file declares test entry point for CHIP qr code unit tests.
  *
  */
 
-#include "TestQRCode.h"
+#ifndef TESTQRCODE_H
+#define TESTQRCODE_H
 
-int main(void)
-{
-    return (TestQuickResponseCode());
-}
+int TestQuickResponseCode(void);
+
+#endif // TESTQRCODE_H

@@ -9,6 +9,8 @@ steps:
           builder: << parameters.builder >>
     - load-build-environment:
           builder: << parameters.builder >>
+    - load-persistent-ci-cache:
+          builder: << parameters.builder >>
     - setup-environment:
           builder: << parameters.builder >>
     - run:

@@ -33,18 +33,17 @@
 #include <system/SystemTimer.h>
 
 // Include additional CHIP headers
-#include <support/logging/CHIPLogging.h>
-
-#include <support/DLLUtil.h>
 #include <support/CodeUtils.h>
+#include <support/DLLUtil.h>
+#include <support/logging/CHIPLogging.h>
 
 // Include system and language headers
 #include <stddef.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <unistd.h>
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

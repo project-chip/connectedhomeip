@@ -17,13 +17,14 @@
  *    limitations under the License.
  */
 
+#include <platform/EFR32/freertos_bluetooth.h>
+
+#include <em_device.h>
 #include <stdint.h>
 #include <string.h>
-#include <em_device.h>
 
-#include "rtos_gecko.h"
 #include "gecko_configuration.h"
-#include <platform/EFR32/freertos_bluetooth.h>
+#include "rtos_gecko.h"
 
 #ifdef CONFIGURATION_HEADER
 #include CONFIGURATION_HEADER

@@ -21,8 +21,9 @@
  *          Provides an implementation of the CHIP GroupKeyStore interface
  *          for platforms based on the Silicon Labs SDK.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/EFR32/GroupKeyStoreImpl.h>
 
 using namespace ::chip;

@@ -21,19 +21,21 @@
  *          Provides the implementation of the Device Layer ConfigurationManager object
  *          for nRF52 platforms using the Nordic nRF5 SDK.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/ConfigurationManager.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+
 #include <core/CHIPVendorIdentifiers.hpp>
 #include <platform/nRF5/nRF5Config.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 #include <platform/internal/FactoryProvisioning.ipp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
-#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

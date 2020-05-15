@@ -14,6 +14,8 @@ jobs:
         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-docker-build-built
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-docker-build-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
@@ -42,6 +44,8 @@ jobs:
         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-mbedtls-build-built
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
@@ -80,6 +84,8 @@ jobs:
         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-docker-build-built
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-docker-build-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
@@ -96,6 +102,8 @@ jobs:
         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-docker-build-built
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-docker-build-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
@@ -112,9 +120,15 @@ jobs:
     - BUILD_TYPE: mbedtls-build
     steps:
     - checkout
+    - restore_cache:
+        key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
+    - save_cache:
+        key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
+        paths:
+        - ./ci-cache-persistent
     - run:
         command: scripts/build/bootstrap.sh
         name: Bootstrap
@@ -140,9 +154,15 @@ jobs:
     - BUILD_TYPE: ubuntu-16-lts
     steps:
     - checkout
+    - restore_cache:
+        key: build-environment-{{ arch }}-ubuntu-16-lts-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
+    - save_cache:
+        key: build-environment-{{ arch }}-ubuntu-16-lts-persistent-cache
+        paths:
+        - ./ci-cache-persistent
     - run:
         command: scripts/build/bootstrap.sh
         name: Bootstrap
@@ -171,22 +191,6 @@ jobs:
     - run:
         command: scripts/examples/esp_echo_app.sh
         name: Build example Echo App
-  Deploy [mbedtls-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
-    environment:
-    - BUILD_TYPE: mbedtls-build
-    steps:
-    - restore_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-mbedtls-build-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - run:
-        command: scripts/build/distribution_check.sh
-        name: Deployment Check
   Run Tests [ubuntu-16-lts]:
     machine:
       image: ubuntu-1604:202004-01
@@ -197,6 +201,8 @@ jobs:
         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-ubuntu-16-lts-built
     - restore_cache:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-ubuntu-16-lts-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-ubuntu-16-lts-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
@@ -222,9 +228,15 @@ jobs:
     - BUILD_TYPE: docker-build
     steps:
     - checkout
+    - restore_cache:
+        key: build-environment-{{ arch }}-docker-build-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
+    - save_cache:
+        key: build-environment-{{ arch }}-docker-build-persistent-cache
+        paths:
+        - ./ci-cache-persistent
     - run:
         command: scripts/build/bootstrap.sh
         name: Bootstrap
@@ -264,9 +276,6 @@ workflows:
     - Deploy [docker-build]:
         requires:
         - Run Tests [docker-build]
-    - Deploy [mbedtls-build]:
-        requires:
-        - Run Tests [mbedtls-build]
     - Build Examples [nRF]
     - Build Examples [ESP32]
   version: 2
@@ -305,6 +314,14 @@ workflows:
 #     steps:
 #     - restore_cache:
 #         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-<< parameters.builder>>-built
+#   load-persistent-ci-cache:
+#     description: Load persistent CI Cache
+#     parameters:
+#       builder:
+#         type: string
+#     steps:
+#     - restore_cache:
+#         key: build-environment-{{ arch }}-<<parameters.builder>>-persistent-cache
 #   save-bootstrapped-tree:
 #     description: Save the bootstrapped tree
 #     parameters:
@@ -337,6 +354,16 @@ workflows:
 #         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-<< parameters.builder>>-built
 #         paths:
 #         - .
+#   save-persistent-ci-cache:
+#     description: Save persistent CI Cache
+#     parameters:
+#       builder:
+#         type: string
+#     steps:
+#     - save_cache:
+#         key: build-environment-{{ arch }}-<<parameters.builder>>-persistent-cache
+#         paths:
+#         - ./ci-cache-persistent
 #   setup-environment:
 #     description: Setup Environment
 #     parameters:
@@ -372,7 +399,11 @@ workflows:
 #         type: string
 #     steps:
 #     - checkout
+#     - load-persistent-ci-cache:
+#         builder: << parameters.builder >>
 #     - setup-environment:
+#         builder: << parameters.builder >>
+#     - save-persistent-ci-cache:
 #         builder: << parameters.builder >>
 #     - bootstrap
 #     - save-bootstrapped-tree:
@@ -396,6 +427,8 @@ workflows:
 #         builder: << parameters.builder >>
 #     - load-build-environment:
 #         builder: << parameters.builder >>
+#     - load-persistent-ci-cache:
+#         builder: << parameters.builder >>
 #     - setup-environment:
 #         builder: << parameters.builder >>
 #     - run:
@@ -415,6 +448,8 @@ workflows:
 #     - load-built-tree:
 #         builder: << parameters.builder >>
 #     - load-build-environment:
+#         builder: << parameters.builder >>
+#     - load-persistent-ci-cache:
 #         builder: << parameters.builder >>
 #     - setup-environment:
 #         builder: << parameters.builder >>
@@ -453,6 +488,8 @@ workflows:
 #     - load-built-tree:
 #         builder: << parameters.builder >>
 #     - load-build-environment:
+#         builder: << parameters.builder >>
+#     - load-persistent-ci-cache:
 #         builder: << parameters.builder >>
 #     - setup-environment:
 #         builder: << parameters.builder >>
@@ -508,7 +545,6 @@ workflows:
 #           parameters:
 #             builder:
 #             - docker-build
-#             - mbedtls-build
 #         name: Deploy [<< matrix.builder >>]
 #         requires:
 #         - Run Tests [<< matrix.builder >>]
