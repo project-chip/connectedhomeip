@@ -22,16 +22,16 @@
  *
  */
 
-#include "TestSetupCode.h"
-
-#include <assert.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "TestManualCode.h"
 
 #include "ManualSetupPayloadGenerator.cpp"
 #include "ManualSetupPayloadParser.cpp"
 #include "SetupPayload.cpp"
 #include "SetupPayload.h"
+
+#include <assert.h>
+#include <stdio.h>
+#include <unistd.h>
 
 using namespace chip;
 

@@ -17,22 +17,13 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP setup code unit tests.
+ *      This file declares test entry point for CHIP manual code unit tests.
  *
  */
 
-#ifndef TESTSETUPCODE_H
-#define TESTSETUPCODE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef TESTMANUALCODE_H
+#define TESTMANUALCODE_H
 
 int TestManualSetupCode(void);
-int TestQuickResponseCode(void);
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif // TESTSETUPCODE_H
+#endif // TESTMANUALCODE_H

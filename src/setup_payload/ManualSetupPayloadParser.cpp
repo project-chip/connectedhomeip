@@ -24,9 +24,9 @@
 #include "ManualSetupPayloadParser.h"
 
 #include <iostream>
-#include <vector>
 #include <math.h>
 #include <string>
+#include <vector>
 
 using namespace chip;
 using namespace std;
