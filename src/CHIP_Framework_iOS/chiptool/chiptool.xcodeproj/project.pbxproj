@@ -1,0 +1,416 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B2B845BF246DACCE00FB110E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B2B845BE246DACCE00FB110E /* main.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		B2B845D0246DB15000FB110E /* CHIPToolCommandManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B2B845CC246DB14F00FB110E /* CHIPToolCommandManager.m */; };
+		B2B8460B246EAC2F00FB110E /* setup_payload_operations.m in Sources */ = {isa = PBXBuildFile; fileRef = B2B8460A246EAC2F00FB110E /* setup_payload_operations.m */; };
+		B2B8461F246EBD4400FB110E /* ManualSetupPayloadGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2B8460F246EBD4400FB110E /* ManualSetupPayloadGenerator.cpp */; };
+		B2B84620246EBD4400FB110E /* QRCodeSetupPayloadGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2B84612246EBD4400FB110E /* QRCodeSetupPayloadGenerator.cpp */; };
+		B2B84621246EBD4400FB110E /* QRCodeSetupPayloadParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2B84614246EBD4400FB110E /* QRCodeSetupPayloadParser.cpp */; };
+		B2B84622246EBD4400FB110E /* Base41.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2B84615246EBD4400FB110E /* Base41.cpp */; };
+		B2B84623246EBD4400FB110E /* SetupPayload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2B84616246EBD4400FB110E /* SetupPayload.cpp */; };
+		B2B84624246EBD4400FB110E /* ManualSetupPayloadParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2B84618246EBD4400FB110E /* ManualSetupPayloadParser.cpp */; };
+		B2B8462B246ED32E00FB110E /* SetupPayloadHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2B84629246ED32E00FB110E /* SetupPayloadHelper.cpp */; };
+		B2B8462E246ED78500FB110E /* CHIPSetupPayloadHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2B8462D246ED78500FB110E /* CHIPSetupPayloadHelper.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B2B845B9246DACCE00FB110E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		B2B845BB246DACCE00FB110E /* chiptool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = chiptool; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2B845BE246DACCE00FB110E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		B2B845CC246DB14F00FB110E /* CHIPToolCommandManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPToolCommandManager.m; sourceTree = "<group>"; };
+		B2B845CE246DB15000FB110E /* CHIPToolCommandManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPToolCommandManager.h; sourceTree = "<group>"; };
+		B2B84607246EAB3700FB110E /* setup_payload_operations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = setup_payload_operations.h; sourceTree = "<group>"; };
+		B2B8460A246EAC2F00FB110E /* setup_payload_operations.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = setup_payload_operations.m; sourceTree = "<group>"; };
+		B2B8460D246EBD4400FB110E /* CHIPCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPCore.h; path = connectedhomeoverip/CHIPCore.h; sourceTree = SOURCE_ROOT; };
+		B2B8460F246EBD4400FB110E /* ManualSetupPayloadGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ManualSetupPayloadGenerator.cpp; sourceTree = "<group>"; };
+		B2B84610246EBD4400FB110E /* QRCodeSetupPayloadGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeSetupPayloadGenerator.h; sourceTree = "<group>"; };
+		B2B84611246EBD4400FB110E /* Base41.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base41.h; sourceTree = "<group>"; };
+		B2B84612246EBD4400FB110E /* QRCodeSetupPayloadGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QRCodeSetupPayloadGenerator.cpp; sourceTree = "<group>"; };
+		B2B84613246EBD4400FB110E /* SetupPayload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetupPayload.h; sourceTree = "<group>"; };
+		B2B84614246EBD4400FB110E /* QRCodeSetupPayloadParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QRCodeSetupPayloadParser.cpp; sourceTree = "<group>"; };
+		B2B84615246EBD4400FB110E /* Base41.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base41.cpp; sourceTree = "<group>"; };
+		B2B84616246EBD4400FB110E /* SetupPayload.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SetupPayload.cpp; sourceTree = "<group>"; };
+		B2B84617246EBD4400FB110E /* ManualSetupPayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManualSetupPayloadParser.h; sourceTree = "<group>"; };
+		B2B84618246EBD4400FB110E /* ManualSetupPayloadParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ManualSetupPayloadParser.cpp; sourceTree = "<group>"; };
+		B2B84619246EBD4400FB110E /* QRCodeSetupPayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeSetupPayloadParser.h; sourceTree = "<group>"; };
+		B2B8461A246EBD4400FB110E /* ManualSetupPayloadGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManualSetupPayloadGenerator.h; sourceTree = "<group>"; };
+		B2B8461B246EBD4400FB110E /* CHIPError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPError.h; path = connectedhomeoverip/CHIPError.h; sourceTree = SOURCE_ROOT; };
+		B2B8461C246EBD4400FB110E /* CHIPConfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CHIPConfig.hpp; path = connectedhomeoverip/CHIPConfig.hpp; sourceTree = SOURCE_ROOT; };
+		B2B8461D246EBD4400FB110E /* SystemConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SystemConfig.h; path = connectedhomeoverip/SystemConfig.h; sourceTree = SOURCE_ROOT; };
+		B2B8461E246EBD4400FB110E /* BuildConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BuildConfig.h; path = connectedhomeoverip/BuildConfig.h; sourceTree = SOURCE_ROOT; };
+		B2B84629246ED32E00FB110E /* SetupPayloadHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SetupPayloadHelper.cpp; sourceTree = "<group>"; };
+		B2B8462A246ED32E00FB110E /* SetupPayloadHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SetupPayloadHelper.hpp; sourceTree = "<group>"; };
+		B2B8462C246ED78500FB110E /* CHIPSetupPayloadHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPSetupPayloadHelper.h; sourceTree = "<group>"; };
+		B2B8462D246ED78500FB110E /* CHIPSetupPayloadHelper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPSetupPayloadHelper.mm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B2B845B8246DACCE00FB110E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B2B845B2246DACCE00FB110E = {
+			isa = PBXGroup;
+			children = (
+				B2B84625246EC55100FB110E /* Wrappers */,
+				B2B8460C246EBD2400FB110E /* chipcode */,
+				B2B845C9246DB0D500FB110E /* Source */,
+				B2B845BC246DACCE00FB110E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B2B845BC246DACCE00FB110E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B2B845BB246DACCE00FB110E /* chiptool */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B2B845C9246DB0D500FB110E /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				B2B845BE246DACCE00FB110E /* main.m */,
+				B2B845CA246DB0E700FB110E /* Controllers */,
+				B2B845CB246DB0F400FB110E /* Operations */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		B2B845CA246DB0E700FB110E /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				B2B845CE246DB15000FB110E /* CHIPToolCommandManager.h */,
+				B2B845CC246DB14F00FB110E /* CHIPToolCommandManager.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		B2B845CB246DB0F400FB110E /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				B2B84607246EAB3700FB110E /* setup_payload_operations.h */,
+				B2B8460A246EAC2F00FB110E /* setup_payload_operations.m */,
+			);
+			name = Operations;
+			sourceTree = "<group>";
+		};
+		B2B8460C246EBD2400FB110E /* chipcode */ = {
+			isa = PBXGroup;
+			children = (
+				B2B8461E246EBD4400FB110E /* BuildConfig.h */,
+				B2B8461C246EBD4400FB110E /* CHIPConfig.hpp */,
+				B2B8460D246EBD4400FB110E /* CHIPCore.h */,
+				B2B8461B246EBD4400FB110E /* CHIPError.h */,
+				B2B8460E246EBD4400FB110E /* setup_payload */,
+				B2B8461D246EBD4400FB110E /* SystemConfig.h */,
+			);
+			path = chipcode;
+			sourceTree = "<group>";
+		};
+		B2B8460E246EBD4400FB110E /* setup_payload */ = {
+			isa = PBXGroup;
+			children = (
+				B2B8460F246EBD4400FB110E /* ManualSetupPayloadGenerator.cpp */,
+				B2B84610246EBD4400FB110E /* QRCodeSetupPayloadGenerator.h */,
+				B2B84611246EBD4400FB110E /* Base41.h */,
+				B2B84612246EBD4400FB110E /* QRCodeSetupPayloadGenerator.cpp */,
+				B2B84613246EBD4400FB110E /* SetupPayload.h */,
+				B2B84614246EBD4400FB110E /* QRCodeSetupPayloadParser.cpp */,
+				B2B84615246EBD4400FB110E /* Base41.cpp */,
+				B2B84616246EBD4400FB110E /* SetupPayload.cpp */,
+				B2B84617246EBD4400FB110E /* ManualSetupPayloadParser.h */,
+				B2B84618246EBD4400FB110E /* ManualSetupPayloadParser.cpp */,
+				B2B84619246EBD4400FB110E /* QRCodeSetupPayloadParser.h */,
+				B2B8461A246EBD4400FB110E /* ManualSetupPayloadGenerator.h */,
+				B2B84629246ED32E00FB110E /* SetupPayloadHelper.cpp */,
+				B2B8462A246ED32E00FB110E /* SetupPayloadHelper.hpp */,
+			);
+			name = setup_payload;
+			path = connectedhomeoverip/setup_payload;
+			sourceTree = SOURCE_ROOT;
+		};
+		B2B84625246EC55100FB110E /* Wrappers */ = {
+			isa = PBXGroup;
+			children = (
+				B2B8462C246ED78500FB110E /* CHIPSetupPayloadHelper.h */,
+				B2B8462D246ED78500FB110E /* CHIPSetupPayloadHelper.mm */,
+			);
+			name = Wrappers;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B2B845BA246DACCE00FB110E /* chiptool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B2B845C2246DACCE00FB110E /* Build configuration list for PBXNativeTarget "chiptool" */;
+			buildPhases = (
+				B2B845B7246DACCE00FB110E /* Sources */,
+				B2B845B8246DACCE00FB110E /* Frameworks */,
+				B2B845B9246DACCE00FB110E /* CopyFiles */,
+				B2B845C5246DAE3700FB110E /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = chiptool;
+			productName = chiptool;
+			productReference = B2B845BB246DACCE00FB110E /* chiptool */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B2B845B3246DACCE00FB110E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1140;
+				ORGANIZATIONNAME = CHIP;
+				TargetAttributes = {
+					B2B845BA246DACCE00FB110E = {
+						CreatedOnToolsVersion = 11.4.1;
+					};
+				};
+			};
+			buildConfigurationList = B2B845B6246DACCE00FB110E /* Build configuration list for PBXProject "chiptool" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B2B845B2246DACCE00FB110E;
+			productRefGroup = B2B845BC246DACCE00FB110E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B2B845BA246DACCE00FB110E /* chiptool */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B2B845C5246DAE3700FB110E /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp ${BUILT_PRODUCTS_DIR}/chiptool ${PROJECT_DIR}/bin\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B2B845B7246DACCE00FB110E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B2B8462B246ED32E00FB110E /* SetupPayloadHelper.cpp in Sources */,
+				B2B84620246EBD4400FB110E /* QRCodeSetupPayloadGenerator.cpp in Sources */,
+				B2B8461F246EBD4400FB110E /* ManualSetupPayloadGenerator.cpp in Sources */,
+				B2B845BF246DACCE00FB110E /* main.m in Sources */,
+				B2B84621246EBD4400FB110E /* QRCodeSetupPayloadParser.cpp in Sources */,
+				B2B84624246EBD4400FB110E /* ManualSetupPayloadParser.cpp in Sources */,
+				B2B84623246EBD4400FB110E /* SetupPayload.cpp in Sources */,
+				B2B84622246EBD4400FB110E /* Base41.cpp in Sources */,
+				B2B845D0246DB15000FB110E /* CHIPToolCommandManager.m in Sources */,
+				B2B8460B246EAC2F00FB110E /* setup_payload_operations.m in Sources */,
+				B2B8462E246ED78500FB110E /* CHIPSetupPayloadHelper.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B2B845C0246DACCE00FB110E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B2B845C1246DACCE00FB110E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B2B845C3246DACCE00FB110E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = K3V3JM297H;
+				ENABLE_HARDENED_RUNTIME = YES;
+				OTHER_LDFLAGS = "-lreadline";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B2B845C4246DACCE00FB110E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = K3V3JM297H;
+				ENABLE_HARDENED_RUNTIME = YES;
+				OTHER_LDFLAGS = "-lreadline";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B2B845B6246DACCE00FB110E /* Build configuration list for PBXProject "chiptool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2B845C0246DACCE00FB110E /* Debug */,
+				B2B845C1246DACCE00FB110E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B2B845C2246DACCE00FB110E /* Build configuration list for PBXNativeTarget "chiptool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2B845C3246DACCE00FB110E /* Debug */,
+				B2B845C4246DACCE00FB110E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B2B845B3246DACCE00FB110E /* Project object */;
+}
