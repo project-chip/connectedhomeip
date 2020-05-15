@@ -125,7 +125,7 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
         break;
     case SetupPayloadKey_SetupPINCode:
         printf("Loaded setupPinCode: %llu\n", parameter.uintValue);
-        setupPayload.setUpPINCode = (uint32_t)parameter.uintValue;
+        setupPayload.setUpPINCode = (uint32_t) parameter.uintValue;
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -136,7 +136,8 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
 CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, string filePath)
 {
     ifstream fileStream(filePath);
-    if (fileStream.fail()) {
+    if (fileStream.fail())
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     while (fileStream)
@@ -144,27 +145,28 @@ CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, string filePath)
         string key;
         string value;
         SetupPayloadParameter parameter;
-        
+
         getline(fileStream, key, ' ');
         fileStream >> value;
         fileStream.ignore();
-        
-        if (key.length() == 0) {
+
+        if (key.length() == 0)
+        {
             continue;
         }
         CHIP_ERROR err = resolveSetupPayloadParameter(parameter, key, value);
-        if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
         err = addParameter(setupPayload, parameter);
-        if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR)
+        {
             return err;
         }
     }
     return CHIP_NO_ERROR;
 }
-
-
 
 CHIP_ERROR generateQRCodeFromFilePath(string filePath, string & outCode)
 {
@@ -176,7 +178,8 @@ CHIP_ERROR generateQRCodeFromFilePath(string filePath, string & outCode)
     }
     QRCodeSetupPayloadGenerator generator(setupPayload);
     outCode = generator.payloadBase41Representation();
-    if (outCode.length() == 0) {
+    if (outCode.length() == 0)
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     return CHIP_NO_ERROR;
@@ -194,5 +197,4 @@ CHIP_ERROR generateManualCodeFromFilePath(string filePath, string & outCode)
     err = generator.payloadDecimalStringRepresentation(outCode);
     return err;
 }
-}
-
+} // namespace chip

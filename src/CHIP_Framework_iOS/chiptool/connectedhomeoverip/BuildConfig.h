@@ -387,7 +387,7 @@
 #undef INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 /* Define to 1 for enabling TUN Endpoint (only for LWIP and Linux w/ support)
-   */
+ */
 #undef INET_CONFIG_ENABLE_TUN_ENDPOINT
 
 /* Define to 1 for enabling UDP Endpoint */
