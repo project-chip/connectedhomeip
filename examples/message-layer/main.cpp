@@ -2,8 +2,13 @@
 
 #include <CHIPVersion.h>
 #include <support/CHIPArgParser.hpp>
+#include <support/CodeUtils.h>
+#include <core/CHIPExchangeMgr.h>
+#include <core/CHIPMessageLayer.h>
 
 namespace {
+
+using namespace chip;
 using namespace chip::ArgParser;
 
 #define kToolName "message-layer-demo"
@@ -70,7 +75,19 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    std::cout << "HELLO WORLD" << std::endl;
+    chip::ChipExchangeManager exchangeMgr;
+    chip::ChipMessageLayer messageLayer;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = exchangeMgr.Init(&messageLayer);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        std::cout << "FAILED: " << ErrorStr(err) << std::endl;
+    }
 
     return 0;
 }

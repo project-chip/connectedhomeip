@@ -36,7 +36,7 @@
 
 #include <core/CHIPWRMPConfig.h>
 #include <core/CHIPConnection.h>
-#include <InetLayer.h>
+#include <inet/InetLayer.h>
 
 namespace chip {
 
@@ -51,9 +51,8 @@ namespace Security {
 namespace TAKE {
 class ChipTAKEChallengerAuthDelegate;
 }
-}
-}
-
+} // namespace Security
+} // namespace Profiles
 
 /**
  * @class Binding
@@ -126,48 +125,51 @@ class ChipTAKEChallengerAuthDelegate;
 class Binding
 {
 public:
-
     class Configuration;
     struct InEventParam;
     struct OutEventParam;
 
     enum State
     {
-        kState_NotAllocated                         = 0,
-        kState_NotConfigured                        = 1,
-        kState_Configuring                          = 2,
-        kState_Preparing                            = 3,
-        kState_PreparingAddress                     = 4,
-        kState_PreparingAddress_ResolveHostName     = 5,
-        kState_PreparingTransport                   = 6,
-        kState_PreparingTransport_TCPConnect        = 7,
-        kState_PreparingSecurity                    = 8,
-        kState_PreparingSecurity_EstablishSession   = 9,
-        kState_PreparingSecurity_WaitSecurityMgr    = 10,
-        kState_Ready                                = 11,
-        kState_Resetting                            = 12,
-        kState_Closed                               = 13,
-        kState_Failed                               = 14,
+        kState_NotAllocated                       = 0,
+        kState_NotConfigured                      = 1,
+        kState_Configuring                        = 2,
+        kState_Preparing                          = 3,
+        kState_PreparingAddress                   = 4,
+        kState_PreparingAddress_ResolveHostName   = 5,
+        kState_PreparingTransport                 = 6,
+        kState_PreparingTransport_TCPConnect      = 7,
+        kState_PreparingSecurity                  = 8,
+        kState_PreparingSecurity_EstablishSession = 9,
+        kState_PreparingSecurity_WaitSecurityMgr  = 10,
+        kState_Ready                              = 11,
+        kState_Resetting                          = 12,
+        kState_Closed                             = 13,
+        kState_Failed                             = 14,
 
-        kState_MaxState                             = 15, // limited to 4 bits
+        kState_MaxState = 15, // limited to 4 bits
     };
 
     enum EventType
     {
-        kEvent_ConnectionEstablished                = 1,    ///< The requested CHIP connection has been established.
-        kEvent_BindingReady                         = 2,    ///< The prepare action on the binding succeeded and the binding may now be used to communicate with the peer.
-        kEvent_PrepareFailed                        = 3,    ///< The prepare action on the binding failed.
-        kEvent_BindingFailed                        = 4,    ///< The binding failed and can no longer be used to communicate with the peer.
-        kEvent_PrepareRequested                     = 5,    ///< The application is requested to configure and prepare the binding for use by the network stack.
-        kEvent_PASEParametersRequested              = 6,    ///< The application is requested to supply parameters to be used during PASE session establishment.
-        kEvent_TAKEParametersRequested              = 7,    ///< The application is requested to supply parameters to be used during TAKE session establishment.
+        kEvent_ConnectionEstablished = 1, ///< The requested CHIP connection has been established.
+        kEvent_BindingReady =
+            2, ///< The prepare action on the binding succeeded and the binding may now be used to communicate with the peer.
+        kEvent_PrepareFailed = 3, ///< The prepare action on the binding failed.
+        kEvent_BindingFailed = 4, ///< The binding failed and can no longer be used to communicate with the peer.
+        kEvent_PrepareRequested =
+            5, ///< The application is requested to configure and prepare the binding for use by the network stack.
+        kEvent_PASEParametersRequested =
+            6, ///< The application is requested to supply parameters to be used during PASE session establishment.
+        kEvent_TAKEParametersRequested =
+            7, ///< The application is requested to supply parameters to be used during TAKE session establishment.
 
-        kEvent_DefaultCheck                         = 100,  ///< Used to verify correct default event handling in the application.
+        kEvent_DefaultCheck = 100, ///< Used to verify correct default event handling in the application.
     };
 
-    typedef void (*EventCallback)(void *apAppState, EventType aEvent, const InEventParam& aInParam, OutEventParam& aOutParam);
+    typedef void (*EventCallback)(void * apAppState, EventType aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
 
-    void *AppState;
+    void * AppState;
 
     void AddRef(void);
     void Release(void);
@@ -190,13 +192,13 @@ public:
     uint32_t GetDefaultResponseTimeout() const;
     void SetDefaultResponseTimeout(uint32_t msec);
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    const WRMPConfig& GetDefaultWRMPConfig(void) const;
-    void SetDefaultWRMPConfig(const WRMPConfig& wrmpConfig);
+    const WRMPConfig & GetDefaultWRMPConfig(void) const;
+    void SetDefaultWRMPConfig(const WRMPConfig & wrmpConfig);
 #endif // #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     EventCallback GetEventCallback() const;
     void SetEventCallback(EventCallback aEventCallback);
-    ChipConnection *GetConnection() const;
-    ChipExchangeManager *GetExchangeManager() const;
+    ChipConnection * GetConnection() const;
+    ChipExchangeManager * GetExchangeManager() const;
     bool IsConnectionTransport() const;
     bool IsUDPTransport() const;
     bool IsWRMTransport() const;
@@ -205,56 +207,54 @@ public:
     enum
     {
         kGetPeerDescription_MaxLength = chip::kChipPeerDescription_MaxLength,
-                                                             /**< Maximum length of string (including NUL character)
-                                                                  returned by GetPeerDescription(). */
+        /**< Maximum length of string (including NUL character)
+             returned by GetPeerDescription(). */
     };
 
     void GetPeerDescription(char * buf, uint32_t bufSize) const;
 
-    void GetProtocolLayerCallback(EventCallback& callback, void *& state) const;
-    void SetProtocolLayerCallback(EventCallback callback, void *state);
+    void GetProtocolLayerCallback(EventCallback & callback, void *& state) const;
+    void SetProtocolLayerCallback(EventCallback callback, void * state);
 
     CHIP_ERROR NewExchangeContext(ExchangeContext *& appExchangeContext);
 
     CHIP_ERROR AdjustResponseTimeout(ExchangeContext * apExchangeContext) const;
 
-    bool IsAuthenticMessageFromPeer(const ChipMessageInfo *msgInfo);
+    bool IsAuthenticMessageFromPeer(const ChipMessageInfo * msgInfo);
 
-    uint32_t GetMaxChipPayloadSize(const System::PacketBuffer *msgBuf);
+    uint32_t GetMaxChipPayloadSize(const System::PacketBuffer * msgBuf);
 
-    static void DefaultEventHandler(void *apAppState, EventType aEvent, const InEventParam& aInParam, OutEventParam& aOutParam);
+    static void DefaultEventHandler(void * apAppState, EventType aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
 
-    CHIP_ERROR AllocateRightSizedBuffer(System::PacketBuffer *& buf,
-                                         const uint32_t desiredSize,
-                                         const uint32_t minSize,
-                                         uint32_t & outMaxPayloadSize);
+    CHIP_ERROR AllocateRightSizedBuffer(System::PacketBuffer *& buf, const uint32_t desiredSize, const uint32_t minSize,
+                                        uint32_t & outMaxPayloadSize);
+
 private:
-
     friend class ChipExchangeManager;
 
     enum AddressingOption
     {
-        kAddressing_NotSpecified                    = 0,
-        kAddressing_UnicastIP                       = 1,
-        kAddressing_HostName                        = 2,
-        kAddressing_ChipFabric                     = 3,
-        kAddressing_ServiceDirectory                = 4,
-        kAddressing_MulticastIP                     = 5,
+        kAddressing_NotSpecified     = 0,
+        kAddressing_UnicastIP        = 1,
+        kAddressing_HostName         = 2,
+        kAddressing_ChipFabric       = 3,
+        kAddressing_ServiceDirectory = 4,
+        kAddressing_MulticastIP      = 5,
     };
 
     enum TransportOption
     {
-        kTransport_NotSpecified                     = 0,
-        kTransport_UDP                              = 1,
-        kTransport_UDP_WRM                          = 2,
-        kTransport_TCP                              = 3,
-        kTransport_ExistingConnection               = 4,
+        kTransport_NotSpecified       = 0,
+        kTransport_UDP                = 1,
+        kTransport_UDP_WRM            = 2,
+        kTransport_TCP                = 3,
+        kTransport_ExistingConnection = 4,
     };
 
     enum Flags
     {
-        kFlag_KeyReserved                           = 0x1,
-        kFlag_ConnectionReferenced                  = 0x2,
+        kFlag_KeyReserved          = 0x1,
+        kFlag_ConnectionReferenced = 0x2,
     };
 
     ChipExchangeManager * mExchangeManager;
@@ -267,7 +267,7 @@ private:
 
     EventCallback mAppEventCallback;
     EventCallback mProtocolLayerCallback;
-    void *mProtocolLayerState;
+    void * mProtocolLayerState;
 
     uint64_t mPeerNodeId;
 
@@ -277,8 +277,8 @@ private:
 
     // Transport-specific configuration
     Inet::IPAddress mPeerAddress;
-    const char *mHostName;
-    ChipConnection *mCon;
+    const char * mHostName;
+    ChipConnection * mCon;
     uint32_t mDefaultResponseTimeoutMsec;
     uint32_t mUDPPathMTU;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
@@ -299,16 +299,16 @@ private:
     void PrepareAddress(void);
     void PrepareTransport(void);
     void HandleBindingReady(void);
-    void HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::StatusReport *statusReport, bool raiseEvent);
+    void HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::StatusReport * statusReport, bool raiseEvent);
     void OnSecurityManagerAvailable(void);
-    void OnConnectionClosed(ChipConnection *con, CHIP_ERROR conErr);
+    void OnConnectionClosed(ChipConnection * con, CHIP_ERROR conErr);
     uint32_t GetChipTrailerSize(void);
     uint32_t GetChipHeaderSize(void);
 
     void OnSecureSessionReady(uint64_t peerNodeId, uint8_t encType, ChipAuthMode authMode, uint16_t keyId);
 
-    static void OnResolveComplete(void *appState, INET_ERROR err, uint8_t addrCount, IPAddress *addrArray);
-    static void OnConnectionComplete(ChipConnection *con, CHIP_ERROR conErr);
+    static void OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
+    static void OnConnectionComplete(ChipConnection * con, CHIP_ERROR conErr);
 };
 
 /**
@@ -324,30 +324,32 @@ private:
 class Binding::Configuration
 {
 public:
-
     // NOTE TO IMPLEMENTERS: Binding::Configuration uses a declarative-style interface.  This means
     // the application is free to call the object's configuration methods IN ANY ORDER.  Any new
     // methods added to the class must follow this pattern.
 
-    Configuration& Target_NodeId(uint64_t aPeerNodeId);
-    Configuration& Target_ServiceEndpoint(uint64_t aPeerNodeId);
+    Configuration & Target_NodeId(uint64_t aPeerNodeId);
+    Configuration & Target_ServiceEndpoint(uint64_t aPeerNodeId);
 
-    Configuration& TargetAddress_ChipService(void);
-    Configuration& TargetAddress_ChipFabric(uint16_t aSubnetId);
-    Configuration& TargetAddress_IP(Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
-    Configuration& TargetAddress_IP(const char *aHostName, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
-    Configuration& TargetAddress_IP(const char *aHostName, size_t aHostNameLen, uint16_t aPeerPort = CHIP_PORT, InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+    Configuration & TargetAddress_ChipService(void);
+    Configuration & TargetAddress_ChipFabric(uint16_t aSubnetId);
+    Configuration & TargetAddress_IP(Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
+                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+    Configuration & TargetAddress_IP(const char * aHostName, uint16_t aPeerPort = CHIP_PORT,
+                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+    Configuration & TargetAddress_IP(const char * aHostName, size_t aHostNameLen, uint16_t aPeerPort = CHIP_PORT,
+                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
 
-    Configuration& Transport_TCP(void);
-    Configuration& Transport_UDP(void);
-    Configuration& Transport_UDP_WRM(void);
-    Configuration& Transport_UDP_PathMTU(uint32_t aPathMTU);
-    Configuration& Transport_DefaultWRMPConfig(const WRMPConfig& aWRMPConfig);
-    Configuration& Transport_ExistingConnection(ChipConnection *apConnection);
+    Configuration & Transport_TCP(void);
+    Configuration & Transport_UDP(void);
+    Configuration & Transport_UDP_WRM(void);
+    Configuration & Transport_UDP_PathMTU(uint32_t aPathMTU);
+    Configuration & Transport_DefaultWRMPConfig(const WRMPConfig & aWRMPConfig);
+    Configuration & Transport_ExistingConnection(ChipConnection * apConnection);
 
-    Configuration& Exchange_ResponseTimeoutMsec(uint32_t aResponseTimeoutMsec);
+    Configuration & Exchange_ResponseTimeoutMsec(uint32_t aResponseTimeoutMsec);
 
-    Configuration& ConfigureFromMessage(const ChipMessageInfo *aMsgInfo, const Inet::IPPacketInfo *aPacketInfo);
+    Configuration & ConfigureFromMessage(const ChipMessageInfo * aMsgInfo, const Inet::IPPacketInfo * aPacketInfo);
 
     CHIP_ERROR PrepareBinding(void);
 
@@ -356,10 +358,10 @@ public:
 private:
     friend class Binding;
 
-    Binding& mBinding;
+    Binding & mBinding;
     CHIP_ERROR mError;
 
-    Configuration(Binding& aBinding);
+    Configuration(Binding & aBinding);
 };
 
 /**
@@ -367,13 +369,13 @@ private:
  */
 struct Binding::InEventParam
 {
-    Binding *Source;
+    Binding * Source;
     union
     {
         struct
         {
             CHIP_ERROR Reason;
-            Profiles::StatusReporting::StatusReport *StatusReport;
+            Profiles::StatusReporting::StatusReport * StatusReport;
         } PrepareFailed;
 
         struct
@@ -401,7 +403,6 @@ struct Binding::OutEventParam
 
     void Clear() { memset(this, 0, sizeof(*this)); }
 };
-
 
 /*
  * Inline Functions
@@ -436,8 +437,8 @@ inline uint64_t Binding::GetPeerNodeId() const
 
 inline void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
 {
-    address = mPeerAddress;
-    port = mPeerPort;
+    address     = mPeerAddress;
+    port        = mPeerPort;
     interfaceId = mInterfaceId;
 }
 
@@ -453,12 +454,12 @@ inline void Binding::SetDefaultResponseTimeout(uint32_t timeout)
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
-inline const WRMPConfig& Binding::GetDefaultWRMPConfig(void) const
+inline const WRMPConfig & Binding::GetDefaultWRMPConfig(void) const
 {
     return mDefaultWRMPConfig;
 }
 
-inline void Binding::SetDefaultWRMPConfig(const WRMPConfig& aWRMPConfig)
+inline void Binding::SetDefaultWRMPConfig(const WRMPConfig & aWRMPConfig)
 {
     mDefaultWRMPConfig = aWRMPConfig;
 }
@@ -475,19 +476,19 @@ inline void Binding::SetEventCallback(EventCallback aEventCallback)
     mAppEventCallback = aEventCallback;
 }
 
-inline void Binding::GetProtocolLayerCallback(EventCallback& callback, void *& state) const
+inline void Binding::GetProtocolLayerCallback(EventCallback & callback, void *& state) const
 {
     callback = mProtocolLayerCallback;
-    state = mProtocolLayerState;
+    state    = mProtocolLayerState;
 }
 
-inline void Binding::SetProtocolLayerCallback(EventCallback callback, void *state)
+inline void Binding::SetProtocolLayerCallback(EventCallback callback, void * state)
 {
     mProtocolLayerCallback = callback;
-    mProtocolLayerState = state;
+    mProtocolLayerState    = state;
 }
 
-inline ChipConnection *Binding::GetConnection() const
+inline ChipConnection * Binding::GetConnection() const
 {
     return mCon;
 }
@@ -507,7 +508,7 @@ inline void Binding::ClearFlag(uint8_t flag)
     mFlags &= ~flag;
 }
 
-inline ChipExchangeManager *Binding::GetExchangeManager() const
+inline ChipExchangeManager * Binding::GetExchangeManager() const
 {
     return mExchangeManager;
 }
