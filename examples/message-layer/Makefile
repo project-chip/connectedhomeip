@@ -32,6 +32,8 @@ include $(BUILD_SUPPORT_DIR)/standalone-chip.mk
 
 APP = chip-message-layer-demo
 
+STD_LIBS += -lChipCrypto -lssl -lcrypto
+
 SRCS = \
     $(PROJECT_ROOT)/main.cpp \
     $(NULL)
