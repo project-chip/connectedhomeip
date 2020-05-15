@@ -34,7 +34,11 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <ble/BleLayer.h>
 #include <core/NodeIdentifiers.h>
+#include <core/CHIPFabricState.h>
+#include <core/CHIPConnection.h>
+#include <inet/InetLayer.h>
 #include <support/DLLUtil.h>
 #include <system/SystemStats.h>
 
@@ -45,7 +49,6 @@ using System::PacketBuffer;
 class ChipMessageLayer;
 class ChipMessageLayerTestObject;
 class ChipExchangeManager;
-class ChipSecurityManager;
 class ChipConnection;
 
 namespace Profiles {
@@ -63,10 +66,9 @@ class StatusReport;
  *    to establish a communication channel with other CHIP nodes.
  *
  */
-class DLL_EXPORT ChipMessageLayer
+class DLL_EXPORT ChipMessageLayer: public ChipConnectionContext
 {
     friend class ChipMessageLayerTestObject;
-    friend class ChipConnection;
     friend class ChipExchangeManager;
     friend class ExchangeContext;
     friend class ChipFabricState;
@@ -98,12 +100,12 @@ public:
     {
     public:
         System::Layer*      systemLayer;    /**< A pointer to the SystemLayer object. */
-        ChipFabricState*   fabricState;    /**< A pointer to the ChipFabricState object. */
-        InetLayer*          inet;           /**< A pointer to the InetLayer object. */
+        ChipFabricState*    fabricState;    /**< A pointer to the ChipFabricState object. */
+        Inet::InetLayer*    inet;           /**< A pointer to the InetLayer object. */
         bool                listenTCP;      /**< Accept inbound CHIP TCP connections from remote peers on the CHIP port. */
         bool                listenUDP;      /**< Accept unsolicited inbound CHIP UDP messages from remote peers on the CHIP port. */
 #if CONFIG_NETWORK_LAYER_BLE
-        BleLayer*           ble;            /**< A pointer to the BleLayer object. */
+        Ble::BleLayer*      ble;            /**< A pointer to the BleLayer object. */
         bool                listenBLE;      /**< Accept inbound CHIP over BLE connections from remote peers. */
 #endif
 #if CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -135,11 +137,10 @@ public:
     ChipMessageLayer(void);
 
     System::Layer *SystemLayer;                         /*** [READ ONLY] The associated SystemLayer object. */
-    InetLayer *Inet;                                    /**< [READ ONLY] The associated InetLayer object. */
-    ChipFabricState *FabricState;                      /**< [READ ONLY] The associated ChipFabricState object. */
+    Inet::InetLayer *Inet;                              /**< [READ ONLY] The associated InetLayer object. */
+    ChipFabricState *FabricState;                       /**< [READ ONLY] The associated ChipFabricState object. */
     void *AppState;                                     /**< A pointer to an application-specific state object. */
-    ChipExchangeManager *ExchangeMgr;                  /**< [READ ONLY] The associated ChipExchangeManager object. */
-    ChipSecurityManager *SecurityMgr;                  /**< [READ ONLY] The associated ChipSecurityManager object. */
+    ChipExchangeManager *ExchangeMgr;                   /**< [READ ONLY] The associated ChipExchangeManager object. */
     uint32_t IncomingConIdleTimeout;                    /**< Default idle timeout (in milliseconds) for incoming connections. */
     uint8_t State;                                      /**< [READ ONLY] The state of the ChipMessageLayer object. */
     bool IsListening;                                   /**< [READ ONLY] True if listening for incoming connections/messages,
@@ -271,6 +272,29 @@ public:
     static void GetPeerDescription(char *buf, size_t bufSize, uint64_t nodeId, const IPAddress *addr, uint16_t port, InterfaceId interfaceId, const ChipConnection *con);
     static void GetPeerDescription(char *buf, size_t bufSize, const ChipMessageInfo *msgInfo);
 
+    /************** ChipConnectionContext implementation ******************/
+    Inet::InetLayer * InetLayer() override { return Inet; }
+    Ble::BleLayer * BleLayer() override { return mBle; }
+
+
+    CHIP_ERROR EncodeMessageWithLength(ChipMessageInfo *msgInfo, PacketBuffer *msgBuf, ChipConnection *con,
+            uint16_t maxLen) override;
+    CHIP_ERROR DecodeMessageWithLength(PacketBuffer *msgBuf, uint64_t sourceNodeId, ChipConnection *con,
+            ChipMessageInfo *msgInfo, uint8_t **rPayload, uint16_t *rPayloadLen, uint32_t *rFrameLen) override;
+
+    uint64_t LocalNodeId() override { return FabricState->LocalNodeId; }
+
+    const Inet::IPAddress & ListenIPv6Addr() const override {
+	    return FabricState->ListenIPv6Addr;
+    }
+
+    CHIP_ERROR SelectDestNodeIdAndAddress(uint64_t& destNodeId, IPAddress& destAddr) override;
+    void HandleConnectionClosed(ChipConnection * con, CHIP_ERROR err) override;
+
+    void HandleOnReceiveError(ChipConnection * con, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo) override {
+        OnReceiveError(this, err, pktInfo);
+    }
+
 private:
     enum
     {
@@ -327,13 +351,8 @@ private:
 
     CHIP_ERROR SendMessage(const IPAddress &destAddr, uint16_t destPort, InterfaceId sendIntfId, PacketBuffer *payload, uint32_t msgFlags);
     CHIP_ERROR SelectOutboundUDPEndPoint(const IPAddress & destAddr, uint32_t msgFlags, UDPEndPoint *& ep);
-    CHIP_ERROR SelectDestNodeIdAndAddress(uint64_t& destNodeId, IPAddress& destAddr);
     CHIP_ERROR DecodeMessage(PacketBuffer *msgBuf, uint64_t sourceNodeId, ChipConnection *con,
             ChipMessageInfo *msgInfo, uint8_t **rPayload, uint16_t *rPayloadLen);
-    CHIP_ERROR EncodeMessageWithLength(ChipMessageInfo *msgInfo, PacketBuffer *msgBuf, ChipConnection *con,
-            uint16_t maxLen);
-    CHIP_ERROR DecodeMessageWithLength(PacketBuffer *msgBuf, uint64_t sourceNodeId, ChipConnection *con,
-            ChipMessageInfo *msgInfo, uint8_t **rPayload, uint16_t *rPayloadLen, uint32_t *rFrameLen);
     void GetIncomingTCPConCount(const IPAddress &peerAddr, uint16_t &count, uint16_t &countFromIP);
     void CheckForceRefreshUDPEndPointsNeeded(CHIP_ERROR udpSendErr);
 
@@ -342,10 +361,6 @@ private:
     static void HandleIncomingTcpConnection(TCPEndPoint *listeningEndPoint, TCPEndPoint *conEndPoint, const IPAddress &peerAddr,
             uint16_t peerPort);
     static void HandleAcceptError(TCPEndPoint *endPoint, INET_ERROR err);
-    static void Encrypt_AES128CTRSHA1(const ChipMessageInfo *msgInfo, const uint8_t *key,
-                                      const uint8_t *inData, uint16_t inLen, uint8_t *outBuf);
-    static void ComputeIntegrityCheck_AES128CTRSHA1(const ChipMessageInfo *msgInfo, const uint8_t *key,
-                                                    const uint8_t *inData, uint16_t inLen, uint8_t *outBuf);
     static CHIP_ERROR FilterUDPSendError(CHIP_ERROR err, bool isMulticast);
     static bool IsIgnoredMulticastSendError(CHIP_ERROR err);
 
@@ -355,7 +370,7 @@ private:
 
 #if CONFIG_NETWORK_LAYER_BLE
 public:
-    BleLayer *mBle;                                      /**< [READ ONLY] Associated BleLayer object. */
+    Ble::BleLayer *mBle;                                      /**< [READ ONLY] Associated BleLayer object. */
 
 private:
     static void HandleIncomingBleConnection(BLEEndPoint *bleEndPoint);

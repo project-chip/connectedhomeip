@@ -31,6 +31,7 @@
 #define CHIP_EXCHANGE_MGR_H
 
 #include <support/DLLUtil.h>
+#include <core/CHIPBinding.h>
 #include <core/CHIPWRMPConfig.h>
 #include <core/CHIPFabricState.h>
 #include <system/SystemTimer.h>

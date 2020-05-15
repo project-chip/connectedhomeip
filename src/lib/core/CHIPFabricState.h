@@ -52,7 +52,6 @@
 
 namespace chip {
 
-class DLL_EXPORT ChipMessageLayer;
 class DLL_EXPORT ChipExchangeManager;
 struct ChipMessageInfo;
 
@@ -165,6 +164,7 @@ public:
     void ClearFabricState(void);
     CHIP_ERROR GetFabricState(uint8_t * buf, uint32_t bufSize, uint32_t & fabricStateLen);
     CHIP_ERROR JoinExistingFabric(const uint8_t * fabricState, uint32_t fabricStateLen);
+    CHIP_ERROR GetSessionState(uint64_t remoteNodeId, ChipConnection *con, ChipSessionState& outSessionState);
 
     /**
      * This method sets the delegate object.

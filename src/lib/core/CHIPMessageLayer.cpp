@@ -37,15 +37,11 @@
 #include <string.h>
 #include <errno.h>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPMessageLayer.h>
 #include <core/CHIPExchangeMgr.h>
 #include <core/CHIPEncoding.h>
-#include <support/crypto/CHIPCrypto.h>
-#include <support/crypto/HashAlgos.h>
-#include <support/crypto/HMAC.h>
-#include <support/crypto/AESBlockCipher.h>
-#include <support/crypto/CTRMode.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/ErrorStr.h>
 #include <support/CodeUtils.h>
@@ -54,7 +50,6 @@
 
 namespace chip {
 
-using namespace chip::Crypto;
 using namespace chip::Encoding;
 
 /**
@@ -137,7 +132,6 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext *context)
 #endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
     FabricState = context->fabricState;
-    FabricState->MessageLayer = this;
     OnMessageReceived = NULL;
     OnReceiveError = NULL;
     OnConnectionReceived = NULL;
@@ -148,7 +142,6 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext *context)
     memset(mConPool, 0, sizeof(mConPool));
     AppState = NULL;
     ExchangeMgr = NULL;
-    SecurityMgr = NULL;
     IsListening = context->listenTCP || context->listenUDP;
     IncomingConIdleTimeout = CHIP_CONFIG_DEFAULT_INCOMING_CONNECTION_IDLE_TIMEOUT;
 
@@ -837,6 +830,13 @@ void ChipMessageLayer::GetConnectionPoolStats(chip::System::Stats::count_t &aOut
     }
 }
 
+void ChipMessageLayer::HandleConnectionClosed(ChipConnection * con, CHIP_ERROR err) {
+    if (ExchangeMgr == NULL) {
+        return;
+    }
+    ExchangeMgr->HandleConnectionClosed(con, err);
+}
+
 /**
  *  Create a new ChipConnection object from a pool.
  *
@@ -979,7 +979,6 @@ CHIP_ERROR ChipMessageLayer::SelectDestNodeIdAndAddress(uint64_t& destNodeId, IP
 static uint16_t EncodeHeaderField(const ChipMessageInfo *msgInfo)
 {
     return ((((uint16_t)msgInfo->Flags) << kMsgHeaderField_FlagsShift) & kMsgHeaderField_FlagsMask) |
-           ((((uint16_t)msgInfo->EncryptionType) << kMsgHeaderField_EncryptionTypeShift) & kMsgHeaderField_EncryptionTypeMask) |
            ((((uint16_t)msgInfo->MessageVersion) << kMsgHeaderField_MessageVersionShift) & kMsgHeaderField_MessageVersionMask);
 }
 
@@ -987,7 +986,6 @@ static uint16_t EncodeHeaderField(const ChipMessageInfo *msgInfo)
 static void DecodeHeaderField(const uint16_t headerField, ChipMessageInfo *msgInfo)
 {
     msgInfo->Flags = (uint16_t)((headerField & kMsgHeaderField_FlagsMask) >> kMsgHeaderField_FlagsShift);
-    msgInfo->EncryptionType = (uint8_t)((headerField & kMsgHeaderField_EncryptionTypeMask) >> kMsgHeaderField_EncryptionTypeShift);
     msgInfo->MessageVersion = (uint8_t)((headerField & kMsgHeaderField_MessageVersionMask) >> kMsgHeaderField_MessageVersionShift);
 }
 
@@ -1059,7 +1057,7 @@ CHIP_ERROR ChipMessageLayer::DecodeHeader(PacketBuffer *msgBuf, ChipMessageInfo 
         }
         msgInfo->DestNodeId = LittleEndian::Read64(p);
     }
-    else
+    else {
         // TODO: This is wrong. If not specified in the message, the destination node identifier must be
         // derived from destination IPv6 address to which the message was sent.  This is relatively
         // easy to determine for messages received over TCP (specifically by the inspecting the local
@@ -1067,22 +1065,10 @@ CHIP_ERROR ChipMessageLayer::DecodeHeader(PacketBuffer *msgBuf, ChipMessageInfo 
         // use of IP_PKTINFO socket option in sockets). For now we just assume the intended destination
         // is the local node.
         msgInfo->DestNodeId = FabricState->LocalNodeId;
-    // Decode the encryption key identifier if present.
-    if (msgInfo->EncryptionType != kChipEncryptionType_None)
-    {
-        if ((p + kKeyIdLen) > msgEnd)
-        {
-            ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-        }
-        msgInfo->KeyId = LittleEndian::Read16(p);
     }
-    else
-    {
-        // Clear flag, which could have been accidentally set in the older version of code only for unencrypted messages.
-        msgInfo->Flags &= ~kChipMessageFlag_MsgCounterSyncReq;
 
-        msgInfo->KeyId = ChipKeyId::kNone;
-    }
+    // Clear flag, which could have been accidentally set in the older version of code only for unencrypted messages.
+    msgInfo->Flags &= ~kChipMessageFlag_MsgCounterSyncReq;
 
     if (payloadStart != NULL)
     {
@@ -1096,49 +1082,12 @@ exit:
 CHIP_ERROR ChipMessageLayer::ReEncodeMessage(PacketBuffer *msgBuf)
 {
     ChipMessageInfo msgInfo;
-    CHIP_ERROR err;
     uint8_t *p;
-    ChipSessionState sessionState;
-    uint16_t msgLen = msgBuf->DataLength();
-    uint8_t *msgStart = msgBuf->Start();
-    uint16_t encryptionLen;
 
     msgInfo.Clear();
     msgInfo.SourceNodeId = kNodeIdNotSpecified;
 
-    err = DecodeHeader(msgBuf, &msgInfo, &p);
-    if (err != CHIP_NO_ERROR)
-        return err;
-
-    encryptionLen = msgLen - (p - msgStart);
-
-    err = FabricState->GetSessionState(msgInfo.SourceNodeId, msgInfo.KeyId, msgInfo.EncryptionType, NULL, sessionState);
-    if (err != CHIP_NO_ERROR)
-        return err;
-
-    switch (msgInfo.EncryptionType)
-    {
-    case kChipEncryptionType_None:
-        break;
-
-    case kChipEncryptionType_AES128CTRSHA1:
-        {
-            // TODO: re-validate MIC to ensure that no part of the message has been altered since the time it was received.
-
-            // Re-encrypt the payload.
-            AES128CTRMode aes128CTR;
-            aes128CTR.SetKey(sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey);
-            aes128CTR.SetChipMessageCounter(msgInfo.SourceNodeId, msgInfo.MessageId);
-            aes128CTR.EncryptData(p, encryptionLen, p);
-        }
-        break;
-    default:
-        return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
-    }
-
-    // signature remains untouched -- we have not modified it.
-
-    return CHIP_NO_ERROR;
+    return DecodeHeader(msgBuf, &msgInfo, &p);
 }
 
 /**
@@ -1201,20 +1150,6 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffe
         headLen += 8;
     if (msgInfo->Flags & kChipMessageFlag_DestNodeId)
         headLen += 8;
-    switch (msgInfo->EncryptionType)
-    {
-    case kChipEncryptionType_None:
-        break;
-    case kChipEncryptionType_AES128CTRSHA1:
-        // Can only encrypt non-zero length payloads.
-        if (payloadLen == 0)
-            return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
-        headLen += 2;
-        tailLen += HMACSHA1::kDigestLength;
-        break;
-    default:
-        return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
-    }
 
     // Error if the encoded message would be longer than the requested maximum.
     if ((headLen + msgBuf->DataLength() + tailLen) > maxLen)
@@ -1234,35 +1169,12 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffe
     // Get the session state for the given destination node and encryption key.
     ChipSessionState sessionState;
 
-    if (msgInfo->DestNodeId == kAnyNodeId)
-    {
-        err = FabricState->GetSessionState(msgInfo->SourceNodeId, msgInfo->KeyId, msgInfo->EncryptionType, con, sessionState);
-    }
-    else
-    {
-        err = FabricState->GetSessionState(msgInfo->DestNodeId, msgInfo->KeyId, msgInfo->EncryptionType, con, sessionState);
-    }
-    if (err != CHIP_NO_ERROR)
-        return err;
-
     // Starting encoding at the appropriate point in the buffer before the payload data.
     uint8_t *p = payloadStart - headLen;
 
     // Allocate a new message identifier and write the message identifier field.
     if ((msgInfo->Flags & kChipMessageFlag_ReuseMessageId) == 0)
         msgInfo->MessageId = sessionState.NewMessageId();
-
-#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    // Request message counter synchronization if peer group key counter is not synchronized.
-    if (sessionState.MessageIdNotSynchronized() && ChipKeyId::IsAppGroupKey(msgInfo->KeyId))
-    {
-        // Set the flag.
-        msgInfo->Flags |= kChipMessageFlag_MsgCounterSyncReq;
-
-        // Update fabric state.
-        FabricState->OnMsgCounterSyncReqSent(msgInfo->MessageId);
-    }
-#endif
 
     // Adjust the buffer so that the start points to the start of the encoded message.
     msgBuf->SetStart(p);
@@ -1294,32 +1206,8 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo *msgInfo, PacketBuffe
         LittleEndian::Write64(p, msgInfo->DestNodeId);
     }
 
-    switch (msgInfo->EncryptionType)
-    {
-    case kChipEncryptionType_None:
-        // If no encryption requested, skip over the payload in the message buffer.
-        p += payloadLen;
-        break;
-
-    case kChipEncryptionType_AES128CTRSHA1:
-        // Encode the key id.
-        LittleEndian::Write16(p, msgInfo->KeyId);
-
-        // At this point we've completed encoding the head of the message (and therefore p == payloadStart),
-        // so skip over the payload data.
-        p += payloadLen;
-
-        // Compute the integrity check value and store it immediately after the payload data.
-        ComputeIntegrityCheck_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.IntegrityKey,
-                                            payloadStart, payloadLen, p);
-        p += HMACSHA1::kDigestLength;
-
-        // Encrypt the message payload and the integrity check value that follows it, in place, in the message buffer.
-        Encrypt_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey,
-                              payloadStart, payloadLen + HMACSHA1::kDigestLength, payloadStart);
-
-        break;
-    }
+    // No encryption is supported. Skip over the payload in the message buffer.
+    p += payloadLen;
 
     msgInfo->Flags |= kChipMessageFlag_MessageEncoded;
     // Update the buffer length to reflect the entire encoded message.
@@ -1339,7 +1227,6 @@ CHIP_ERROR ChipMessageLayer::DecodeMessage(PacketBuffer *msgBuf, uint64_t source
     CHIP_ERROR err;
     uint8_t *msgStart = msgBuf->Start();
     uint16_t msgLen = msgBuf->DataLength();
-    uint8_t *msgEnd = msgStart + msgLen;
     uint8_t *p = msgStart;
     msgInfo->SourceNodeId = sourceNodeId;
     err = DecodeHeader(msgBuf, msgInfo, &p);
@@ -1351,67 +1238,20 @@ CHIP_ERROR ChipMessageLayer::DecodeMessage(PacketBuffer *msgBuf, uint64_t source
     // Get the session state for the given source node and encryption key.
     ChipSessionState sessionState;
 
-    err = FabricState->GetSessionState(sourceNodeId, msgInfo->KeyId, msgInfo->EncryptionType, con, sessionState);
-    if (err != CHIP_NO_ERROR)
-        return err;
+    err = FabricState->GetSessionState(sourceNodeId, con, sessionState);
 
-    switch (msgInfo->EncryptionType)
-    {
-    case kChipEncryptionType_None:
-        // Return the position and length of the payload within the message.
-        *rPayloadLen = msgLen - (p - msgStart);
-        *rPayload = p;
+    // Return the position and length of the payload within the message.
+    *rPayloadLen = msgLen - (p - msgStart);
+    *rPayload = p;
 
-        // Skip over the payload.
-        p += *rPayloadLen;
-        break;
-
-    case kChipEncryptionType_AES128CTRSHA1:
-    {
-        // Error if the message is short given the expected fields.
-        if ((p + kMinPayloadLen + HMACSHA1::kDigestLength) > msgEnd)
-            return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
-
-        // Return the position and length of the payload within the message.
-        uint16_t payloadLen = msgLen - ((p - msgStart) + HMACSHA1::kDigestLength);
-        *rPayloadLen = payloadLen;
-        *rPayload = p;
-
-        // Decrypt the message payload and the integrity check value that follows it, in place, in the message buffer.
-        Encrypt_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.DataKey,
-                              p, payloadLen + HMACSHA1::kDigestLength, p);
-
-        // Compute the expected integrity check value from the decrypted payload.
-        uint8_t expectedIntegrityCheck[HMACSHA1::kDigestLength];
-        ComputeIntegrityCheck_AES128CTRSHA1(msgInfo, sessionState.MsgEncKey->EncKey.AES128CTRSHA1.IntegrityKey,
-                                            p, payloadLen, expectedIntegrityCheck);
-        // Error if the expected integrity check doesn't match the integrity check in the message.
-        if (!ConstantTimeCompare(p + payloadLen, expectedIntegrityCheck, HMACSHA1::kDigestLength))
-            return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-        // Skip past the payload and the integrity check value.
-        p += payloadLen + HMACSHA1::kDigestLength;
-
-        break;
-    }
-
-    default:
-        return CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE;
-    }
+    // Skip over the payload.
+    p += *rPayloadLen;
 
     // Set flag in the message header indicating that the message is a duplicate if:
     //  - A message with the same message identifier has already been received from that peer.
     //  - This is the first message from that peer encrypted with application keys.
     if (sessionState.IsDuplicateMessage(msgInfo->MessageId))
         msgInfo->Flags |= kChipMessageFlag_DuplicateMessage;
-
-#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-    // Set flag if peer group key message counter is not synchronized.
-    if (sessionState.MessageIdNotSynchronized() && ChipKeyId::IsAppGroupKey(msgInfo->KeyId))
-        msgInfo->Flags |= kChipMessageFlag_PeerGroupMsgIdNotSynchronized;
-#endif
-
-    // Pass the peer authentication mode back to the application via the CHIP message header structure.
-    msgInfo->PeerAuthMode = sessionState.AuthMode;
 
     return err;
 }
@@ -1556,21 +1396,14 @@ void ChipMessageLayer::HandleUDPMessage(UDPEndPoint *endPoint, PacketBuffer *msg
     //Check if message carries tunneled data and needs to be sent to Tunnel Agent
     if (msgInfo.MessageVersion == kChipMessageVersion_V2)
     {
-        if (msgInfo.Flags & kChipMessageFlag_TunneledData)
+        // Call the supplied OnMessageReceived callback.
+        if (msgLayer->OnMessageReceived != NULL)
         {
-	   // FIXME: no tunnel - what to do here?
+            msgLayer->OnMessageReceived(msgLayer, &msgInfo, msg);
         }
         else
         {
-            // Call the supplied OnMessageReceived callback.
-            if (msgLayer->OnMessageReceived != NULL)
-            {
-                msgLayer->OnMessageReceived(msgLayer, &msgInfo, msg);
-            }
-            else
-            {
-                ExitNow(err = CHIP_ERROR_NO_MESSAGE_HANDLER);
-            }
+            ExitNow(err = CHIP_ERROR_NO_MESSAGE_HANDLER);
         }
     }
     else if (msgInfo.MessageVersion == kChipMessageVersion_V1)
@@ -1587,14 +1420,9 @@ void ChipMessageLayer::HandleUDPMessage(UDPEndPoint *endPoint, PacketBuffer *msg
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(MessageLayer, "HandleUDPMessage Error %s", nl::ErrorStr(err));
+        ChipLogError(MessageLayer, "HandleUDPMessage Error %s", ErrorStr(err));
 
         PacketBuffer::Free(msg);
-
-        // Send key error response to the peer if required.
-        // Key error response is sent only if the received message is not a multicast.
-        if (!pktInfo->DestAddress.IsMulticast() && msgLayer->SecurityMgr->IsKeyError(err))
-            msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, pktInfo, NULL, err);
 
         if (msgLayer->OnReceiveError != NULL)
             msgLayer->OnReceiveError(msgLayer, err, pktInfo);
@@ -1605,7 +1433,7 @@ exit:
 
 void ChipMessageLayer::HandleUDPReceiveError(UDPEndPoint *endPoint, INET_ERROR err, const IPPacketInfo *pktInfo)
 {
-    ChipLogError(MessageLayer, "HandleUDPReceiveError Error %s", nl::ErrorStr(err));
+    ChipLogError(MessageLayer, "HandleUDPReceiveError Error %s", ErrorStr(err));
 
     ChipMessageLayer *msgLayer = (ChipMessageLayer *) endPoint->AppState;
     if (msgLayer->OnReceiveError != NULL)
@@ -2063,53 +1891,6 @@ exit:
     return err;
 }
 
-void ChipMessageLayer::Encrypt_AES128CTRSHA1(const ChipMessageInfo *msgInfo, const uint8_t *key,
-                                              const uint8_t *inData, uint16_t inLen, uint8_t *outBuf)
-{
-    AES128CTRMode aes128CTR;
-    aes128CTR.SetKey(key);
-    aes128CTR.SetChipMessageCounter(msgInfo->SourceNodeId, msgInfo->MessageId);
-    aes128CTR.EncryptData(inData, inLen, outBuf);
-}
-
-void ChipMessageLayer::ComputeIntegrityCheck_AES128CTRSHA1(const ChipMessageInfo *msgInfo, const uint8_t *key,
-                                                            const uint8_t *inData, uint16_t inLen, uint8_t *outBuf)
-{
-    HMACSHA1 hmacSHA1;
-    uint8_t encodedBuf[2 * sizeof(uint64_t) + sizeof(uint16_t) + sizeof(uint32_t)];
-    uint8_t *p = encodedBuf;
-
-    // Initialize HMAC Key.
-    hmacSHA1.Begin(key, ChipEncryptionKey_AES128CTRSHA1::IntegrityKeySize);
-
-    // Encode the source and destination node identifiers in a little-endian format.
-    Encoding::LittleEndian::Write64(p, msgInfo->SourceNodeId);
-    Encoding::LittleEndian::Write64(p, msgInfo->DestNodeId);
-
-    // Hash the message header field and the message Id for the message version V2.
-    if (msgInfo->MessageVersion == kChipMessageVersion_V2)
-    {
-        // Encode message header field value.
-        uint16_t headerField = EncodeHeaderField(msgInfo);
-
-        // Mask destination and source node Id flags.
-        headerField &= kMsgHeaderField_MessageHMACMask;
-
-        // Encode the message header field and the message Id in a little-endian format.
-        Encoding::LittleEndian::Write16(p, headerField);
-        Encoding::LittleEndian::Write32(p, msgInfo->MessageId);
-    }
-
-    // Hash encoded message header fields.
-    hmacSHA1.AddData(encodedBuf, p - encodedBuf);
-
-    // Handle payload data.
-    hmacSHA1.AddData(inData, inLen);
-
-    // Generate the MAC.
-    hmacSHA1.Finish(outBuf);
-}
-
 /**
  *  Close all open TCP and UDP endpoints. Then abort any
  *  open ChipConnections.
@@ -2257,11 +2038,7 @@ void ChipMessageLayer::SetSignalMessageLayerActivityChanged(MessageLayerActivity
 
 bool ChipMessageLayer::IsMessageLayerActive(void)
 {
-    return (ExchangeMgr->mContextsInUse != 0)
-#if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-           || FabricState->IsMsgCounterSyncReqInProgress()
-#endif
-           ;
+    return (ExchangeMgr->mContextsInUse != 0);
 }
 
 /**
@@ -2457,7 +2234,7 @@ DLL_EXPORT CHIP_ERROR GenerateChipNodeId(uint64_t & nodeId)
 
     while (id <= kMaxAlwaysLocalChipNodeId)
     {
-        err = chip::Platform::Security::GetSecureRandomData(reinterpret_cast<uint8_t*>(&id), sizeof(id));
+        err = chip::Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t*>(&id), sizeof(id));
         SuccessOrExit(err);
 
         id &= ~kEUI64_UL_Local;

@@ -36,6 +36,7 @@ CHIP_BUILD_CORE_LAYER_SOURCE_FILES                        = \
     core/CHIPConnection.cpp                                 \
     core/CHIPUdpExchange.cpp                                \
     core/CHIPBinding.cpp                                    \
+    core/CHIPMessageLayer.cpp                               \
     $(NULL)
 
 CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
@@ -60,4 +61,5 @@ CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
     core/CHIPUdpExchange.h                                  \
     core/CHIPBinding.h                                      \
     core/CHIPExchangeMgr.h                                  \
+    core/CHIPMessageLayer.h                                 \
     $(NULL)

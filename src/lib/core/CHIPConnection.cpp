@@ -1062,7 +1062,7 @@ void ChipConnection::DoClose(CHIP_ERROR err, uint8_t flags)
         if ((flags & kDoCloseFlag_SuppressLogging) == 0)
             ChipLogProgress(MessageLayer, "Con closed %04X %ld", LogId(), (long) err);
 
-        Context->HandleConnectionClosed(this);
+        Context->HandleConnectionClosed(this, err);
 
         // Call the appropriate app callback if allowed.
         if ((flags & kDoCloseFlag_SuppressCallback) == 0)
@@ -1687,7 +1687,7 @@ void ChipConnection::DisconnectOnError(CHIP_ERROR err)
     {
         IPPacketInfo addrInfo;
         GetPeerAddressInfo(addrInfo);
-        Context->OnReceiveError(this, err, &addrInfo);
+        Context->HandleOnReceiveError(this, err, &addrInfo);
     }
 
     DoClose(err, 0);

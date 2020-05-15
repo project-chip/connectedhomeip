@@ -179,12 +179,7 @@ struct ChipMessageInfo
     uint64_t DestNodeId;    /**< The destination node identifier of the CHIP message. */
     uint32_t MessageId;     /**< The message identifier of the CHIP message. */
     uint32_t Flags;         /**< Various flags associated with the CHIP message; see ChipMessageFlags. */
-    uint16_t KeyId;         /**< The encryption key identifier of the CHIP message. */
     uint8_t MessageVersion; /**< The version of the CHIP message. */
-    uint8_t EncryptionType; /**< The encryption type used for the CHIP message. */
-
-    ChipAuthMode PeerAuthMode;
-    /**< The means by which the sender of the message was authenticated. Only meaningful for incoming messages. */
 
     ChipConnection * InCon;
     /**< The connection (if any) over which the message was received. Only meaningful for incoming messages.*/
@@ -204,14 +199,13 @@ struct ChipMessageInfo
 class ChipConnectionContext
 {
 public:
-    virtual ~ChipConnectionContext();
+    virtual ~ChipConnectionContext(){}
 
     virtual chip::Inet::InetLayer * InetLayer() = 0;
     virtual chip::Ble::BleLayer * BleLayer()    = 0;
 
     virtual uint64_t LocalNodeId() = 0;
 
-    virtual const Inet::IPAddress & ListenIPv4Addr() const = 0;
     virtual const Inet::IPAddress & ListenIPv6Addr() const = 0;
 
     virtual CHIP_ERROR DecodeMessageWithLength(System::PacketBuffer * msgBuf, uint64_t sourceNodeId, ChipConnection * con,
@@ -223,9 +217,9 @@ public:
 
     virtual CHIP_ERROR SelectDestNodeIdAndAddress(uint64_t & destNodeId, Inet::IPAddress & destAddr) = 0;
 
-    virtual void HandleConnectionClosed(ChipConnection * con) = 0;
+    virtual void HandleConnectionClosed(ChipConnection * con, CHIP_ERROR err) = 0;
 
-    virtual void OnReceiveError(ChipConnection * con, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo) = 0;
+    virtual void HandleOnReceiveError(ChipConnection * con, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo) = 0;
 };
 
 /**
