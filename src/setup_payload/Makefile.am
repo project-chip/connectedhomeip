@@ -31,11 +31,16 @@ libSetupPayload_adir             = $(includedir)/setup_payload
 
 libSetupPayload_a_CPPFLAGS                                      = \
     -I$(top_srcdir)/src                                     \
-    -I$(top_srcdir)/src/lib                                 \
-    -I$(top_srcdir)/src/system                              \
     -I$(top_srcdir)/src/include                             \
+    -I$(top_srcdir)/src/lib                                 \
+    -I$(top_srcdir)/src/lib/core                            \
+    -I$(top_srcdir)/src/system                              \
+    $(NLASSERT_CPPFLAGS)                                    \
+    $(NLFAULTINJECTION_CPPFLAGS)                            \
+    $(NLIO_CPPFLAGS)                                        \
     $(LWIP_CPPFLAGS)                                        \
     $(NULL)
+
 
 libSetupPayload_a_SOURCES                                       = \
     ManualSetupPayloadGenerator.cpp                         \
@@ -44,6 +49,7 @@ libSetupPayload_a_SOURCES                                       = \
     SetupPayload.cpp                                        \
     Base41.cpp                                              \
     QRCodeSetupPayloadParser.cpp                            \
+    SetupPayloadHelper.cpp                                  \
    $(NULL)
 
 dist_libSetupPayload_a_HEADERS                                  = \
@@ -53,6 +59,7 @@ dist_libSetupPayload_a_HEADERS                                  = \
     SetupPayload.h                                          \
     Base41.h                                                \
     QRCodeSetupPayloadParser.h                              \
+    SetupPayloadHelper.h                                    \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

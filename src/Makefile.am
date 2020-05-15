@@ -63,6 +63,7 @@ DIST_SUBDIRS                      = \
     setup_payload                   \
     crypto                          \
     $(PLATFORM_SUBDIRS)             \
+    chipcli                         \
     $(NULL)
 
 # Always build (e.g. for 'make all') these subdirectories.
@@ -78,6 +79,7 @@ SUBDIRS                           = \
     setup_payload                   \
     crypto                          \
     $(MAYBE_PLATFORM_SUBDIRS)       \
+    chipcli                         \
     $(NULL)
 
 if CHIP_BUILD_TESTS
