@@ -59,4 +59,5 @@ CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
     core/NodeIdentifiers.h                                  \
     core/CHIPUdpExchange.h                                  \
     core/CHIPBinding.h                                      \
+    core/CHIPExchangeMgr.h                                  \
     $(NULL)

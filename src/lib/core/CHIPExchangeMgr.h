@@ -32,9 +32,9 @@
 
 #include <support/DLLUtil.h>
 #include <core/CHIPWRMPConfig.h>
-#include <SystemLayer/SystemTimer.h>
+#include <system/SystemTimer.h>
 
- #define EXCHANGE_CONTEXT_ID(x)     ((x)+1)
+#define EXCHANGE_CONTEXT_ID(x) ((x) + 1)
 
 namespace chip {
 
@@ -76,14 +76,14 @@ class Binding;
 class ChipExchangeHeader
 {
 public:
-    uint8_t  Version;        /**< The version of the CHIP Exchange Header format */
-    uint8_t  Flags;          /**< Bit flag indicators for the type of CHIP message */
-    uint16_t ExchangeId;     /**< The Exchange identifier for the ExchangeContext */
-    uint32_t ProfileId;      /**< The Profile identifier of the CHIP message */
-    uint8_t  MessageType;    /**< The Message type for the specified CHIP profile */
+    uint8_t Version;     /**< The version of the CHIP Exchange Header format */
+    uint8_t Flags;       /**< Bit flag indicators for the type of CHIP message */
+    uint16_t ExchangeId; /**< The Exchange identifier for the ExchangeContext */
+    uint32_t ProfileId;  /**< The Profile identifier of the CHIP message */
+    uint8_t MessageType; /**< The Message type for the specified CHIP profile */
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    uint32_t AckMsgId;       /**< Optional; Message identifier being acknowledged.
-                                  Specified when requiring acknowledgments. */
+    uint32_t AckMsgId; /**< Optional; Message identifier being acknowledged.
+                            Specified when requiring acknowledgments. */
 #endif
 };
 
@@ -102,9 +102,9 @@ typedef enum ChipExchangeVersion
  */
 typedef enum ChipExchangeFlags
 {
-    kChipExchangeFlag_Initiator     = 0x1,  /**< Set when current message is sent by the initiator of an exchange */
-    kChipExchangeFlag_AckId         = 0x2,  /**< Set when current message is an acknowledgment for a previously received message */
-    kChipExchangeFlag_NeedsAck      = 0x4   /**< Set when current message is requesting an acknowledgment from the recipient. */
+    kChipExchangeFlag_Initiator = 0x1, /**< Set when current message is sent by the initiator of an exchange */
+    kChipExchangeFlag_AckId     = 0x2, /**< Set when current message is an acknowledgment for a previously received message */
+    kChipExchangeFlag_NeedsAck  = 0x4  /**< Set when current message is requesting an acknowledgment from the recipient. */
 } ChipExchangeFlags;
 
 /**
@@ -122,44 +122,44 @@ class DLL_EXPORT ExchangeContext
     friend class ChipMessageLayer;
 
 public:
+    typedef uint32_t Timeout; /**< Type used to express the timeout in this ExchangeContext, in milliseconds */
 
-    typedef uint32_t Timeout;                   /**< Type used to express the timeout in this ExchangeContext, in milliseconds */
-
-    ChipExchangeManager *ExchangeMgr;          /**< [READ ONLY] Owning exchange manager. */
-    uint16_t mMsgProtocolVersion;               /**< Message Protocol version for the ExchangeContext. */
-    ChipConnection *Con;                       /**< [READ ONLY] Associated CHIP connection. */
-    uint64_t PeerNodeId;                        /**< [READ ONLY] Node ID of peer node. */
-    IPAddress PeerAddr;                         /**< [READ ONLY] IP address of peer node. */
-    InterfaceId PeerIntf;                       /**< [READ ONLY] Outbound interface to be used when sending messages to the peer. (Only meaningful for UDP.) */
-    uint16_t PeerPort;                          /**< [READ ONLY] Port of peer node. */
-    uint16_t ExchangeId;                        /**< [READ ONLY] Assigned exchange ID. */
-    void *AppState;                             /**< Pointer to application-specific state object. */
-    bool AllowDuplicateMsgs;                    /**< Boolean indicator of whether duplicate messages are allowed for a given exchange. */
-    uint8_t EncryptionType;                     /**< Encryption type to use when sending a message. */
-    uint16_t KeyId;                             /**< Encryption key to use when sending a message. */
-    uint32_t RetransInterval;                   /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
-    Timeout ResponseTimeout;                    /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
+    ChipExchangeManager * ExchangeMgr; /**< [READ ONLY] Owning exchange manager. */
+    uint16_t mMsgProtocolVersion;      /**< Message Protocol version for the ExchangeContext. */
+    ChipConnection * Con;              /**< [READ ONLY] Associated CHIP connection. */
+    uint64_t PeerNodeId;               /**< [READ ONLY] Node ID of peer node. */
+    IPAddress PeerAddr;                /**< [READ ONLY] IP address of peer node. */
+    InterfaceId
+        PeerIntf; /**< [READ ONLY] Outbound interface to be used when sending messages to the peer. (Only meaningful for UDP.) */
+    uint16_t PeerPort;        /**< [READ ONLY] Port of peer node. */
+    uint16_t ExchangeId;      /**< [READ ONLY] Assigned exchange ID. */
+    void * AppState;          /**< Pointer to application-specific state object. */
+    bool AllowDuplicateMsgs;  /**< Boolean indicator of whether duplicate messages are allowed for a given exchange. */
+    uint8_t EncryptionType;   /**< Encryption type to use when sending a message. */
+    uint16_t KeyId;           /**< Encryption key to use when sending a message. */
+    uint32_t RetransInterval; /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
+    Timeout ResponseTimeout;  /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    WRMPConfig mWRMPConfig;                     /**< WRMP configuration. */
+    WRMPConfig mWRMPConfig; /**< WRMP configuration. */
 #endif
     enum
     {
-        kSendFlag_AutoRetrans                   = 0x0001, /**< Used to indicate that automatic retransmission is enabled. */
-        kSendFlag_ExpectResponse                = 0x0002, /**< Used to indicate that a response is expected within a specified timeout. */
-        kSendFlag_RetransmissionTrickle         = 0x0004, /**< Used to indicate the requirement of retransmissions for Trickle. */
-        kSendFlag_DelaySend                     = 0x0008, /**< Used to indicate that the sending of the current message needs to be delayed. */
-        kSendFlag_ReuseMessageId                = 0x0010, /**< Used to indicate that the message ID in the message header can be reused. */
-        kSendFlag_ReuseSourceId                 = 0x0020, /**< Used to indicate that the source node ID in the message header can be reused. */
-        kSendFlag_RetainBuffer                  = 0x0040, /**< Used to indicate that the message buffer should not be freed after sending. */
-        kSendFlag_AlreadyEncoded                = 0x0080, /**< Used to indicate that the message is already encoded. */
-        kSendFlag_DefaultMulticastSourceAddress = 0x0100, /**< Used to indicate that default IPv6 source address selection should be used when
-                                                               sending IPv6 multicast messages. */
-        kSendFlag_FromInitiator                 = 0x0200, /**< Used to indicate that the current message is the initiator of the exchange. */
-        kSendFlag_RequestAck                    = 0x0400, /**< Used to send a WRM message requesting an acknowledgment. */
-        kSendFlag_NoAutoRequestAck              = 0x0800, /**< Suppress the auto-request acknowledgment feature when sending a message. */
+        kSendFlag_AutoRetrans           = 0x0001, /**< Used to indicate that automatic retransmission is enabled. */
+        kSendFlag_ExpectResponse        = 0x0002, /**< Used to indicate that a response is expected within a specified timeout. */
+        kSendFlag_RetransmissionTrickle = 0x0004, /**< Used to indicate the requirement of retransmissions for Trickle. */
+        kSendFlag_DelaySend      = 0x0008, /**< Used to indicate that the sending of the current message needs to be delayed. */
+        kSendFlag_ReuseMessageId = 0x0010, /**< Used to indicate that the message ID in the message header can be reused. */
+        kSendFlag_ReuseSourceId  = 0x0020, /**< Used to indicate that the source node ID in the message header can be reused. */
+        kSendFlag_RetainBuffer   = 0x0040, /**< Used to indicate that the message buffer should not be freed after sending. */
+        kSendFlag_AlreadyEncoded = 0x0080, /**< Used to indicate that the message is already encoded. */
+        kSendFlag_DefaultMulticastSourceAddress = 0x0100, /**< Used to indicate that default IPv6 source address selection should be
+                                                             used when sending IPv6 multicast messages. */
+        kSendFlag_FromInitiator    = 0x0200, /**< Used to indicate that the current message is the initiator of the exchange. */
+        kSendFlag_RequestAck       = 0x0400, /**< Used to send a WRM message requesting an acknowledgment. */
+        kSendFlag_NoAutoRequestAck = 0x0800, /**< Suppress the auto-request acknowledgment feature when sending a message. */
 
-        kSendFlag_MulticastFromLinkLocal        = kSendFlag_DefaultMulticastSourceAddress,
-                                                          /**< Deprecated alias for \c kSendFlag_DefaultMulticastSourceAddress */
+        kSendFlag_MulticastFromLinkLocal = kSendFlag_DefaultMulticastSourceAddress,
+        /**< Deprecated alias for \c kSendFlag_DefaultMulticastSourceAddress */
     };
 
     bool IsInitiator(void) const;
@@ -191,13 +191,16 @@ public:
     void SetUseEphemeralUDPPort(bool val);
 #endif
 
-    CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer *msgPayload, uint16_t sendFlags = 0, void *msgCtxt = 0);
-    CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer *msgBuf, uint16_t sendFlags, ChipMessageInfo * msgInfo, void *msgCtxt = 0);
+    CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgPayload, uint16_t sendFlags = 0,
+                           void * msgCtxt = 0);
+    CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
+                           ChipMessageInfo * msgInfo, void * msgCtxt = 0);
     CHIP_ERROR SendCommonNullMessage(void);
-    CHIP_ERROR EncodeExchHeader(ChipExchangeHeader *exchangeHeader, uint32_t profileId, uint8_t msgType, PacketBuffer *msgBuf, uint16_t sendFlags);
+    CHIP_ERROR EncodeExchHeader(ChipExchangeHeader * exchangeHeader, uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf,
+                                uint16_t sendFlags);
     void TeardownTrickleRetransmit(void);
-    CHIP_ERROR SetupTrickleRetransmit(uint32_t retransInterval=CHIP_TRICKLE_DEFAULT_PERIOD, uint8_t threshold=CHIP_TRICKLE_DEFAULT_THRESHOLD, uint32_t timeout=0);
-
+    CHIP_ERROR SetupTrickleRetransmit(uint32_t retransInterval = CHIP_TRICKLE_DEFAULT_PERIOD,
+                                      uint8_t threshold = CHIP_TRICKLE_DEFAULT_THRESHOLD, uint32_t timeout = 0);
 
     /**
      * This function is the application callback for handling a received CHIP message.
@@ -214,8 +217,8 @@ public:
      *
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
-    typedef void (*MessageReceiveFunct)(ExchangeContext *ec, const IPPacketInfo *pktInfo, const ChipMessageInfo *msgInfo, uint32_t profileId,
-            uint8_t msgType, PacketBuffer *payload);
+    typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
+                                        uint32_t profileId, uint8_t msgType, PacketBuffer * payload);
     MessageReceiveFunct OnMessageReceived;
 
     /**
@@ -225,7 +228,7 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      *
      */
-    typedef void (*ResponseTimeoutFunct)(ExchangeContext *ec);
+    typedef void (*ResponseTimeoutFunct)(ExchangeContext * ec);
     ResponseTimeoutFunct OnResponseTimeout;
 
     /**
@@ -235,7 +238,7 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      *
      */
-    typedef void (*RetransmissionTimeoutFunct)(ExchangeContext *ec);
+    typedef void (*RetransmissionTimeoutFunct)(ExchangeContext * ec);
     RetransmissionTimeoutFunct OnRetransmissionTimeout;
 
     /**
@@ -250,7 +253,7 @@ public:
      *                              was closed.
      *
      */
-    typedef void (*ConnectionClosedFunct)(ExchangeContext *ec, ChipConnection *con, CHIP_ERROR conErr);
+    typedef void (*ConnectionClosedFunct)(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr);
     ConnectionClosedFunct OnConnectionClosed;
 
     /**
@@ -261,7 +264,7 @@ public:
      *  @param[in]    keyErr        The CHIP_ERROR type that was reported in the key error message.
      *
      */
-    typedef void (*KeyErrorFunct)(ExchangeContext *ec, CHIP_ERROR keyErr);
+    typedef void (*KeyErrorFunct)(ExchangeContext * ec, CHIP_ERROR keyErr);
 
     /**
      * This function is the application callback to invoke when key error message has been received
@@ -270,7 +273,7 @@ public:
     KeyErrorFunct OnKeyError;
 
     void CancelRetrans(void);
-    void HandleTrickleMessage(const IPPacketInfo *pktInfo, const ChipMessageInfo *msgInfo);
+    void HandleTrickleMessage(const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     CHIP_ERROR WRMPSendThrottleFlow(uint32_t PauseTimeMillis);
@@ -286,7 +289,7 @@ public:
      *                              the original message being acknowledged.
      *
      */
-    typedef void (*WRMPAckRcvdFunct)(ExchangeContext *ec, void *msgCtxt);
+    typedef void (*WRMPAckRcvdFunct)(ExchangeContext * ec, void * msgCtxt);
 
     /**
      * This function is the application callback to invoke when a Throttle message or Delayed
@@ -299,7 +302,7 @@ public:
      *  @param[in]    pauseTime     Time to pause transmission (in milliseconds).
      *
      */
-    typedef void (*WRMPPauseRcvdFunct)(ExchangeContext *ec, uint32_t pauseTime);
+    typedef void (*WRMPPauseRcvdFunct)(ExchangeContext * ec, uint32_t pauseTime);
 
     /**
      * This function is the application callback to invoke when an error is encountered while
@@ -314,13 +317,13 @@ public:
      *                              the original message being reported on.
      *
      */
-    typedef void (*WRMPSendErrorFunct)(ExchangeContext *ec, CHIP_ERROR err, void *msgCtxt);
+    typedef void (*WRMPSendErrorFunct)(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt);
 
-    WRMPPauseRcvdFunct OnThrottleRcvd;            /**< Application callback for received Throttle message. */
-    WRMPPauseRcvdFunct OnDDRcvd;                  /**< Application callback for received Delayed Delivery message. */
-    WRMPSendErrorFunct OnSendError;               /**< Application callback for error while sending. */
-    WRMPAckRcvdFunct   OnAckRcvd;                 /**< Application callback for received acknowledgment. */
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
+    WRMPPauseRcvdFunct OnThrottleRcvd; /**< Application callback for received Throttle message. */
+    WRMPPauseRcvdFunct OnDDRcvd;       /**< Application callback for received Delayed Delivery message. */
+    WRMPSendErrorFunct OnSendError;    /**< Application callback for error while sending. */
+    WRMPAckRcvdFunct OnAckRcvd;        /**< Application callback for received acknowledgment. */
+#endif                                 // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
     /*
      * in order to use reference counting (see refCount below)
@@ -337,47 +340,47 @@ public:
     enum
     {
         kGetPeerDescription_MaxLength = chip::kChipPeerDescription_MaxLength,
-                                                             /**< Maximum length of string (including NUL character)
-                                                                  returned by GetPeerDescription(). */
+        /**< Maximum length of string (including NUL character)
+             returned by GetPeerDescription(). */
     };
 
     void GetPeerDescription(char * buf, uint32_t bufSize) const;
 
 private:
-    PacketBuffer *msg;                            // If we are re-transmitting, then this is the pointer to the message being retransmitted
+    PacketBuffer * msg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
     // Trickle-controlled retransmissions:
-    uint32_t backoff;                           // backoff for sampling the numner of messages
+    uint32_t backoff; // backoff for sampling the numner of messages
     uint32_t currentBcastMsgID;
-    uint8_t msgsReceived;                       // number of messages heard during the backoff period
-    uint8_t rebroadcastThreshold;               // re-broadcast threshold
+    uint8_t msgsReceived;         // number of messages heard during the backoff period
+    uint8_t rebroadcastThreshold; // re-broadcast threshold
 
-    uint16_t mFlags;                            // Internal state flags
+    uint16_t mFlags; // Internal state flags
 
     CHIP_ERROR ResendMessage(void);
-    bool MatchExchange(ChipConnection *msgCon, const ChipMessageInfo *msgInfo, const ChipExchangeHeader *exchangeHeader);
-    static void TimerTau(System::Layer* aSystemLayer, void* aAppState, System::Error aError);
-    static void CancelRetransmissionTimer(System::Layer* aSystemLayer, void* aAppState, System::Error aError);
-    static void TimerT(System::Layer* aSystemLayer, void* aAppState, System::Error aError);
+    bool MatchExchange(ChipConnection * msgCon, const ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchangeHeader);
+    static void TimerTau(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void CancelRetransmissionTimer(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void TimerT(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
     CHIP_ERROR StartResponseTimer(void);
     void CancelResponseTimer(void);
-    static void HandleResponseTimeout(System::Layer* aSystemLayer, void* aAppState, System::Error aError);
+    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
     uint32_t mPendingPeerAckId;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    uint16_t mWRMPNextAckTime;                  //Next time for triggering Solo Ack
-    uint16_t mWRMPThrottleTimeout;              //Timeout until when Throttle is On when WRMPThrottleEnabled is set
+    uint16_t mWRMPNextAckTime;     // Next time for triggering Solo Ack
+    uint16_t mWRMPThrottleTimeout; // Timeout until when Throttle is On when WRMPThrottleEnabled is set
 #endif
     void DoClose(bool clearRetransTable);
-    CHIP_ERROR HandleMessage(ChipMessageInfo *msgInfo, const ChipExchangeHeader *exchHeader, PacketBuffer *msgBuf);
-    CHIP_ERROR HandleMessage(ChipMessageInfo *msgInfo, const ChipExchangeHeader *exchHeader, PacketBuffer *msgBuf,
-                              ExchangeContext::MessageReceiveFunct umhandler);
+    CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf);
+    CHIP_ERROR HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf,
+                             ExchangeContext::MessageReceiveFunct umhandler);
     void HandleConnectionClosed(CHIP_ERROR conErr);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    bool WRMPCheckAndRemRetransTable(uint32_t msgId, void **rCtxt);
-    CHIP_ERROR WRMPHandleRcvdAck(const ChipExchangeHeader *exchHeader, const ChipMessageInfo *msgInfo);
-    CHIP_ERROR WRMPHandleNeedsAck(const ChipMessageInfo *msgInfo);
+    bool WRMPCheckAndRemRetransTable(uint32_t msgId, void ** rCtxt);
+    CHIP_ERROR WRMPHandleRcvdAck(const ChipExchangeHeader * exchHeader, const ChipMessageInfo * msgInfo);
+    CHIP_ERROR WRMPHandleNeedsAck(const ChipMessageInfo * msgInfo);
     CHIP_ERROR HandleThrottleFlow(uint32_t PauseTimeMillis);
 #endif
 
@@ -405,49 +408,49 @@ class DLL_EXPORT ChipExchangeManager
 public:
     enum State
     {
-        kState_NotInitialized = 0,              /**< Used to indicate that the ChipExchangeManager is not initialized */
-        kState_Initialized = 1                  /**< Used to indicate that the ChipExchangeManager is initialized */
+        kState_NotInitialized = 0, /**< Used to indicate that the ChipExchangeManager is not initialized */
+        kState_Initialized    = 1  /**< Used to indicate that the ChipExchangeManager is initialized */
     };
 
     ChipExchangeManager(void);
 
-    ChipMessageLayer *MessageLayer;            /**< [READ ONLY] The associated ChipMessageLayer object. */
-    ChipFabricState *FabricState;              /**< [READ ONLY] The associated FabricState object. */
-    uint8_t State;                              /**< [READ ONLY] The state of the ChipExchangeManager object. */
+    ChipMessageLayer * MessageLayer; /**< [READ ONLY] The associated ChipMessageLayer object. */
+    ChipFabricState * FabricState;   /**< [READ ONLY] The associated FabricState object. */
+    uint8_t State;                   /**< [READ ONLY] The state of the ChipExchangeManager object. */
 
-    CHIP_ERROR Init(ChipMessageLayer *msgLayer);
+    CHIP_ERROR Init(ChipMessageLayer * msgLayer);
     CHIP_ERROR Shutdown(void);
 
 #if CHIP_CONFIG_TEST
     size_t ExpireExchangeTimers(void);
 #endif
 
-    ExchangeContext *NewContext(const uint64_t &peerNodeId, void *appState = NULL);
-    ExchangeContext *NewContext(const uint64_t &peerNodeId, const IPAddress &peerAddr, void *appState = NULL);
-    ExchangeContext *NewContext(const uint64_t &peerNodeId, const IPAddress &peerAddr, uint16_t peerPort, InterfaceId sendIntfId, void *appState = NULL);
-    ExchangeContext *NewContext(ChipConnection *con, void *appState = NULL);
+    ExchangeContext * NewContext(const uint64_t & peerNodeId, void * appState = NULL);
+    ExchangeContext * NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, void * appState = NULL);
+    ExchangeContext * NewContext(const uint64_t & peerNodeId, const IPAddress & peerAddr, uint16_t peerPort, InterfaceId sendIntfId,
+                                 void * appState = NULL);
+    ExchangeContext * NewContext(ChipConnection * con, void * appState = NULL);
 
-    ExchangeContext *FindContext(uint64_t peerNodeId, ChipConnection *con, void *appState, bool isInitiator);
+    ExchangeContext * FindContext(uint64_t peerNodeId, ChipConnection * con, void * appState, bool isInitiator);
 
-    Binding * NewBinding(Binding::EventCallback eventCallback = Binding::DefaultEventHandler, void *appState = NULL);
+    Binding * NewBinding(Binding::EventCallback eventCallback = Binding::DefaultEventHandler, void * appState = NULL);
 
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler,
-            void *appState);
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler,
-            bool allowDups, void *appState);
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
-            ExchangeContext::MessageReceiveFunct handler, void *appState);
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
-            ExchangeContext::MessageReceiveFunct handler, bool allowDups, void *appState);
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con,
-            ExchangeContext::MessageReceiveFunct handler, void *appState);
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con,
-            ExchangeContext::MessageReceiveFunct handler, bool allowDups, void *appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler, void * appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler, bool allowDups,
+                                                 void * appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ExchangeContext::MessageReceiveFunct handler,
+                                                 void * appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ExchangeContext::MessageReceiveFunct handler,
+                                                 bool allowDups, void * appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con,
+                                                 ExchangeContext::MessageReceiveFunct handler, void * appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con,
+                                                 ExchangeContext::MessageReceiveFunct handler, bool allowDups, void * appState);
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t profileId);
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType);
-    CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection *con);
+    CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con);
 
-    void AllowUnsolicitedMessages(ChipConnection *con);
+    void AllowUnsolicitedMessages(ChipConnection * con);
 
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     void ClearMsgCounterSyncReq(uint64_t peerNodeId);
@@ -456,9 +459,9 @@ public:
 private:
     uint16_t NextExchangeId;
 #if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    uint64_t mWRMPTimeStampBase;    //WRMP timer base value to add offsets to evaluate timeouts
-    System::Timer::Epoch mWRMPCurrentTimerExpiry; //Tracks when the WRM timer will next expire
-    uint16_t mWRMPTimerInterval;    //WRMP Timer tick period
+    uint64_t mWRMPTimeStampBase;                  // WRMP timer base value to add offsets to evaluate timeouts
+    System::Timer::Epoch mWRMPCurrentTimerExpiry; // Tracks when the WRM timer will next expire
+    uint16_t mWRMPTimerInterval;                  // WRMP Timer tick period
     /**
      *  @class RetransTableEntry
      *
@@ -471,34 +474,34 @@ private:
      */
     class RetransTableEntry
     {
-      public:
-       uint32_t             msgId;              /**< The message identifier of the CHIP message awaiting acknowledgment. */
-       ExchangeContext      *exchContext;       /**< The ExchangeContext for the stored CHIP message. */
-       PacketBuffer         *msgBuf;            /**< A pointer to the PacketBuffer object holding the CHIP message. */
-       void                 *msgCtxt;           /**< A pointer to an application level context object associated with the message. */
-       uint16_t             nextRetransTime;    /**< A counter representing the next retransmission time for the message. */
-       uint8_t              sendCount;          /**< A counter representing the number of times the message has been sent. */
+    public:
+        uint32_t msgId;                /**< The message identifier of the CHIP message awaiting acknowledgment. */
+        ExchangeContext * exchContext; /**< The ExchangeContext for the stored CHIP message. */
+        PacketBuffer * msgBuf;         /**< A pointer to the PacketBuffer object holding the CHIP message. */
+        void * msgCtxt;                /**< A pointer to an application level context object associated with the message. */
+        uint16_t nextRetransTime;      /**< A counter representing the next retransmission time for the message. */
+        uint8_t sendCount;             /**< A counter representing the number of times the message has been sent. */
     };
-    void     WRMPExecuteActions(void);
-    void     WRMPExpireTicks(void);
-    void     WRMPStartTimer(void);
-    void     WRMPStopTimer(void);
-    void     WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
-    uint32_t GetTickCounterFromTimeDelta (uint64_t newTime,
-                                          uint64_t oldTime);
-    static void WRMPTimeout(System::Layer* aSystemLayer, void* aAppState, System::Error aError);
+    void WRMPExecuteActions(void);
+    void WRMPExpireTicks(void);
+    void WRMPStartTimer(void);
+    void WRMPStopTimer(void);
+    void WRMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
+    uint32_t GetTickCounterFromTimeDelta(uint64_t newTime, uint64_t oldTime);
+    static void WRMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
     static bool isLaterInWRMP(uint64_t t2, uint64_t t1);
     bool IsSendErrorCritical(CHIP_ERROR err) const;
-    CHIP_ERROR AddToRetransTable(ExchangeContext *ec, PacketBuffer *inetBuff, uint32_t msgId, void *msgCtxt, RetransTableEntry **rEntry);
-    CHIP_ERROR SendFromRetransTable(RetransTableEntry *entry);
-    void ClearRetransmitTable(ExchangeContext *ec);
-    void ClearRetransmitTable(RetransTableEntry &rEntry);
-    void FailRetransmitTableEntries(ExchangeContext *ec, CHIP_ERROR err);
+    CHIP_ERROR AddToRetransTable(ExchangeContext * ec, PacketBuffer * inetBuff, uint32_t msgId, void * msgCtxt,
+                                 RetransTableEntry ** rEntry);
+    CHIP_ERROR SendFromRetransTable(RetransTableEntry * entry);
+    void ClearRetransmitTable(ExchangeContext * ec);
+    void ClearRetransmitTable(RetransTableEntry & rEntry);
+    void FailRetransmitTableEntries(ExchangeContext * ec, CHIP_ERROR err);
     void RetransPendingAppGroupMsgs(uint64_t peerNodeId);
 
-    void TicklessDebugDumpRetransTable(const char *log);
+    void TicklessDebugDumpRetransTable(const char * log);
 
-    //WRMP Global tables for timer context
+    // WRMP Global tables for timer context
     RetransTableEntry RetransTable[CHIP_CONFIG_WRMP_RETRANS_TABLE_SIZE];
 #endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
 
@@ -506,13 +509,12 @@ private:
     {
     public:
         ExchangeContext::MessageReceiveFunct Handler;
-        void *AppState;
+        void * AppState;
         uint32_t ProfileId;
-        ChipConnection *Con; // NULL means any connection, or no connection (i.e. UDP)
-        int16_t MessageType; // -1 represents any message type
+        ChipConnection * Con; // NULL means any connection, or no connection (i.e. UDP)
+        int16_t MessageType;  // -1 represents any message type
         bool AllowDuplicateMsgs;
     };
-
 
     ExchangeContext ContextPool[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
     size_t mContextsInUse;
@@ -523,30 +525,30 @@ private:
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
-    ExchangeContext *AllocContext(void);
+    ExchangeContext * AllocContext(void);
 
-    void HandleConnectionReceived(ChipConnection *con);
-    void HandleConnectionClosed(ChipConnection *con, CHIP_ERROR conErr);
-    void DispatchMessage(ChipMessageInfo *msgInfo, PacketBuffer *msgBuf);
-    CHIP_ERROR RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection *con, bool allowDups,
-            ExchangeContext::MessageReceiveFunct handler, void *appState);
-    CHIP_ERROR UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection *con);
+    void HandleConnectionReceived(ChipConnection * con);
+    void HandleConnectionClosed(ChipConnection * con, CHIP_ERROR conErr);
+    void DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    CHIP_ERROR RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con, bool allowDups,
+                           ExchangeContext::MessageReceiveFunct handler, void * appState);
+    CHIP_ERROR UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con);
 
-    static void HandleAcceptError(ChipMessageLayer *msgLayer, CHIP_ERROR err);
-    static void HandleMessageReceived(ChipMessageLayer *msgLayer, ChipMessageInfo *msgInfo, PacketBuffer *msgBuf);
-    static void HandleMessageReceived(ChipConnection *con, ChipMessageInfo *msgInfo, PacketBuffer *msgBuf);
-    static CHIP_ERROR PrependHeader(ChipExchangeHeader *exchangeHeader, PacketBuffer *buf);
-    static CHIP_ERROR DecodeHeader(ChipExchangeHeader *exchangeHeader, ChipMessageInfo *msgInfo, PacketBuffer *buf);
+    static void HandleAcceptError(ChipMessageLayer * msgLayer, CHIP_ERROR err);
+    static void HandleMessageReceived(ChipMessageLayer * msgLayer, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    static void HandleMessageReceived(ChipConnection * con, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    static CHIP_ERROR PrependHeader(ChipExchangeHeader * exchangeHeader, PacketBuffer * buf);
+    static CHIP_ERROR DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo, PacketBuffer * buf);
 
     void InitBindingPool(void);
     Binding * AllocBinding(void);
-    void FreeBinding(Binding *binding);
+    void FreeBinding(Binding * binding);
     uint16_t GetBindingLogId(const Binding * const binding) const;
 
     void NotifySecurityManagerAvailable();
     void NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr);
 
-    ChipExchangeManager(const ChipExchangeManager&); // not defined
+    ChipExchangeManager(const ChipExchangeManager &); // not defined
 };
 
 #if !CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
@@ -557,7 +559,6 @@ inline bool ExchangeContext::UseEphemeralUDPPort(void) const
 }
 
 #endif // !CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT
-
 
 } // namespace chip
 

@@ -27,32 +27,13 @@
 #endif // __STDC_FORMAT_MACROS
 
 #include <core/CHIPBinding.h>
+#include <core/CHIPExchangeMgr.h>
 #include <support/CodeUtils.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/ErrorStr.h>
 #include <system/SystemStats.h>
 
 namespace chip {
-
-/**
- * @fn Binding::State Binding::GetState(void) const
- *
- * Retrieve the current state of the binding.
- *
- * @return                          The binding state.
- */
-
-/**
- * @fn bool Binding::IsPreparing() const
- *
- * @return                          True if the Binding is currently being prepared.
- */
-
-/**
- * @fn bool Binding::IsReady() const
- *
- * @return                          True if the Binding is in the Ready state.
- */
 
 /**
  * @fn uint64_t Binding::GetPeerNodeId() const
@@ -85,7 +66,6 @@ namespace chip {
  *                                  via which the peer can be reached.  If the peer's IP address information is
  *                                  unavailable, this value is undefined.
  */
-
 
 /**
  * @fn uint32_t Binding::GetDefaultResponseTimeout() const
@@ -427,7 +407,6 @@ void Binding::ResetConfig()
     mUDPPathMTU = CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE;
 
     mFlags = 0;
-
 }
 
 /**
@@ -935,9 +914,8 @@ uint32_t Binding::GetMaxChipPayloadSize(const System::PacketBuffer * msgBuf)
  */
 void Binding::GetPeerDescription(char * buf, uint32_t bufSize) const
 {
-    ChipMessageLayer::GetPeerDescription(buf, bufSize, mPeerNodeId,
-                                         (mPeerAddress != Inet::IPAddress::Any) ? &mPeerAddress : NULL, mPeerPort, mInterfaceId,
-                                         mCon);
+    ChipMessageLayer::GetPeerDescription(buf, bufSize, mPeerNodeId, (mPeerAddress != Inet::IPAddress::Any) ? &mPeerAddress : NULL,
+                                         mPeerPort, mInterfaceId, mCon);
 }
 
 /**
@@ -1079,8 +1057,8 @@ Binding::Configuration::Configuration(Binding & aBinding) : mBinding(aBinding)
             mBinding.ResetConfig();
         }
 
-        mBinding.mState          = kState_Configuring;
-        mError                   = CHIP_NO_ERROR;
+        mBinding.mState = kState_Configuring;
+        mError          = CHIP_NO_ERROR;
 
         ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): Configuring", mBinding.GetLogId(), mBinding.mRefCount);
     }
@@ -1358,4 +1336,3 @@ Binding::Configuration & Binding::Configuration::ConfigureFromMessage(const chip
 }
 
 } // namespace chip
-
