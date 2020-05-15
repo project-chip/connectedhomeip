@@ -14,8 +14,6 @@ constexpr uint16_t kToolOptUDPIP  = 'u';
 OptionDef sToolOptionDefs[] = { //
     { "listen", kNoArgument, kToolOptListen },
     { "udp", kNoArgument, kToolOptUDPIP },
-    { "help", kNoArgument, 'h' },
-    { "version", kNoArgument, 'v' },
     {}
 };
 
@@ -38,12 +36,15 @@ HelpOptions sHelpOptions(                                                       
     "Usage: " kToolName " [ <options> ] [ -g <group> [ ... ] -I <interface> ]\n", //
     CHIP_VERSION_STRING "\nCopyright (c) 2020 Project CHIP Authors\nAll rights reserved.\n");
 
-static OptionSet * sToolOptionSets[] = { &sToolOptions, NULL };
+static OptionSet * sToolOptionSets[] = { &sToolOptions, &sHelpOptions, NULL };
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
-    // FIXME: implement
-    std::cout << aProgram << std::endl;
+    switch (aIdentifier)
+    {
+    default:
+        return false;
+    }
     return true;
 }
 
