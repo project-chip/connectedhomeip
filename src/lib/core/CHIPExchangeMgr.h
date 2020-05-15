@@ -32,6 +32,7 @@
 
 #include <support/DLLUtil.h>
 #include <core/CHIPWRMPConfig.h>
+#include <core/CHIPFabricState.h>
 #include <system/SystemTimer.h>
 
 #define EXCHANGE_CONTEXT_ID(x) ((x) + 1)

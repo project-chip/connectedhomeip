@@ -27,7 +27,9 @@
 #endif // __STDC_FORMAT_MACROS
 
 #include <core/CHIPBinding.h>
+#include <core/CHIPConnection.h>
 #include <core/CHIPExchangeMgr.h>
+#include <core/CHIPMessageLayer.h>
 #include <support/CodeUtils.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/ErrorStr.h>
@@ -318,9 +320,6 @@ void Binding::DoReset(State newState)
 {
     VerifyOrDie(mState != kState_NotAllocated);
 
-    ChipSecurityManager * sm = mExchangeManager->MessageLayer->SecurityMgr;
-    State origState          = mState;
-
     // Temporarily enter the resetting state.  This has the effect of suppressing any callbacks
     // from lower layers that might result from the effort of resetting the binding.
     mState = kState_Resetting;
@@ -342,12 +341,6 @@ void Binding::DoReset(State newState)
         ClearFlag(kFlag_ConnectionReferenced);
     }
     mCon = NULL;
-
-    // If a session establishment was in progress, cancel it.
-    if (origState == kState_PreparingSecurity_EstablishSession)
-    {
-        sm->CancelSessionEstablishment(this);
-    }
 
     // Reset the configuration state of the binding, except when entering the Failed state.
     //
@@ -693,12 +686,8 @@ void Binding::HandleBindingFailed(CHIP_ERROR err, Profiles::StatusReporting::Sta
         eventType                    = kEvent_BindingFailed;
     }
 
-    ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): %s FAILED: peer %" PRIX64 ", %s%s", GetLogId(), mRefCount,
-                  (eventType == kEvent_BindingFailed) ? "Binding" : "Prepare", mPeerNodeId,
-                  (err == CHIP_ERROR_STATUS_REPORT_RECEIVED && statusReport != NULL) ? "Status Report received: " : "",
-                  (err == CHIP_ERROR_STATUS_REPORT_RECEIVED && statusReport != NULL)
-                      ? StatusReportStr(statusReport->mProfileId, statusReport->mStatusCode)
-                      : ErrorStr(err));
+    ChipLogDetail(ExchangeManager, "Binding[%" PRIu8 "] (%" PRIu16 "): %s FAILED: peer %" PRIX64 ", %s", GetLogId(), mRefCount,
+                  (eventType == kEvent_BindingFailed) ? "Binding" : "Prepare", mPeerNodeId, ErrorStr(err));
 
     // Reset the binding and enter the Failed state.
     DoReset(kState_Failed);
@@ -858,7 +847,7 @@ exit:
  *
  * @return                              True if the message is authentically from the peer.
  */
-bool Binding::IsAuthenticMessageFromPeer(const chip::ChipMessageHeader * msgInfo)
+bool Binding::IsAuthenticMessageFromPeer(const chip::ChipMessageInfo * msgInfo)
 {
     if (mState != kState_Ready)
         return false;
