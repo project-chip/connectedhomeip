@@ -28,20 +28,21 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <stdlib.h>
-#include <stdint.h>
-#include <errno.h>
-#include <time.h>
+// module header, comes first
+#include <controller/CHIPDeviceController.h>
 
 #include <core/CHIPCore.h>
+#include <core/CHIPEncoding.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
-#include <core/CHIPEncoding.h>
-
-#include <controller/CHIPDeviceController.h>
-#include <support/logging/CHIPLogging.h>
 #include <support/ErrorStr.h>
 #include <support/TimeUtils.h>
+#include <support/logging/CHIPLogging.h>
+
+#include <errno.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <time.h>
 
 namespace chip {
 namespace DeviceController {

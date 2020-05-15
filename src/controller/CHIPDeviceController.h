@@ -29,10 +29,10 @@
 #ifndef __CHIPDEVICECONTROLLER_H
 #define __CHIPDEVICECONTROLLER_H
 
-#include <support/DLLUtil.h>
+#include <core/CHIPConnection.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
-#include <core/CHIPConnection.h>
+#include <support/DLLUtil.h>
 
 namespace chip {
 namespace DeviceController {
