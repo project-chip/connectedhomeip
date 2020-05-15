@@ -27,19 +27,18 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+#include "TunEndPoint.h"
 
 #include <core/CHIPTunnelConfig.h>
 
-#include "TunEndPoint.h"
 #include <InetLayer.h>
-
-#include <string.h>
-#include <stdio.h>
 
 #include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>
 
 #include "arpa-inet-compatibility.h"
+#include <stdio.h>
+#include <string.h>
 
 namespace chip {
 namespace Inet {

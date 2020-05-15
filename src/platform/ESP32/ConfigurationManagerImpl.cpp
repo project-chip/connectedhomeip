@@ -22,23 +22,25 @@
  *          Provides the implementation of the Device Layer ConfigurationManager object
  *          for the ESP32.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/ConfigurationManager.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+
 #include <core/CHIPKeyIds.h>
 #include <core/CHIPVendorIdentifiers.hpp>
 // #include <Profiles/security/ChipApplicationKeys.h>
-#include <platform/ESP32/GroupKeyStoreImpl.h>
 #include <platform/ESP32/ESP32Config.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/ESP32/GroupKeyStoreImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 #include <platform/internal/FactoryProvisioning.ipp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
 #include "esp_wifi.h"
-#include "nvs_flash.h"
 #include "nvs.h"
+#include "nvs_flash.h"
 namespace chip {
 namespace DeviceLayer {
 

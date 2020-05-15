@@ -2,4 +2,4 @@
 
 git clean -xdf
 mkdir -p build/default
-(cd build/default && ../../bootstrap-configure --enable-debug --enable-coverage --with-crypto=mbedtls)
+(cd build/default && ../../bootstrap-configure -C --enable-debug --enable-coverage --with-crypto=mbedtls)

@@ -27,6 +27,7 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 # since they are not part of the package.
 #
 noinst_HEADERS                                        = \
+    TapAddrAutoconf.h                                   \
     TestInetCommon.h                                    \
     TestInetCommonOptions.h                             \
     TestInetLayerCommon.hpp                             \
@@ -39,12 +40,29 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C preprocessor option flags that will apply to all compiled objects in this
-# makefile.
+lib_LIBRARIES                                         = \
+    libInetLayerTests.a                                 \
+    $(NULL)
+
+libInetLayerTests_a_SOURCES                           = \
+    TestInetAddress.cpp                                 \
+    TestInetBuffer.cpp                                  \
+    TestInetErrorStr.cpp                                \
+    TestInetTimer.cpp                                   \
+    $(NULL)
+
+libInetLayerTests_adir                                = $(includedir)/inet
+
+dist_libInetLayerTests_a_HEADERS                      = \
+    TestInetLayer.h                                     \
+    $(NULL)
 
 noinst_LIBRARIES                                      = \
     libTestInetCommon.a                                 \
     $(NULL)
+
+# C/C++ preprocessor option flags that will apply to all compiled
+# objects in this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -65,6 +83,18 @@ libTestInetCommon_a_SOURCES                           = \
     TestInetLayerCommon.cpp                             \
     $(NULL)
 
+if CHIP_LWIP_TARGET_STANDALONE
+
+# TapAddrAutoconf is only needed for LwIP on sockets simulation in
+# which a host tap/tun interface is used to proxy the LwIP stack onto
+# a host native network interface.
+
+libTestInetCommon_a_SOURCES                          += \
+    TapAddrAutoconf.cpp                                 \
+    $(NULL)
+
+endif # CHIP_LWIP_TARGET_STANDALONE
+
 CHIP_LDADD                                            = \
     $(top_builddir)/src/inet/libInetLayer.a             \
     $(top_builddir)/src/system/libSystemLayer.a         \
@@ -72,6 +102,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          = \
+    libInetLayerTests.a                                 \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
@@ -93,6 +124,8 @@ COMMON_LDADD                                          = \
 #       etc. on IPv4 and IPv6 IP end points. When that issue has been
 #       resolved, move these tests to check_PROGRAMS.
 
+if CHIP_LWIP_TARGET_STANDALONE
+# Build and run these test targets only on standalone device targets
 noinst_PROGRAMS                                       = \
     TestLwIPDNS                                         \
     TestInetEndPoint                                    \
@@ -116,6 +149,7 @@ check_PROGRAMS                                        = \
 TESTS                                                 = \
     $(check_PROGRAMS)                                   \
     $(NULL)
+endif # CHIP_LWIP_TARGET_STANDALONE
 
 # The additional environment variables and their values that will be
 # made available to all programs and scripts in TESTS.
@@ -128,10 +162,10 @@ TESTS_ENVIRONMENT                                     = \
 TestLwIPDNS_SOURCES                                   = TestLwIPDNS.cpp
 TestLwIPDNS_LDADD                                     = libTestInetCommon.a $(COMMON_LDADD)
 
-TestInetAddress_SOURCES                               = TestInetAddress.cpp
+TestInetAddress_SOURCES                               = TestInetAddressDriver.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 
-TestInetBuffer_SOURCES                                = TestInetBuffer.cpp      \
+TestInetBuffer_SOURCES                                = TestInetBufferDriver.cpp      \
                                                         $(NULL)
 TestInetBuffer_LDADD                                  = $(COMMON_LDADD)
 
@@ -139,7 +173,7 @@ TestInetEndPoint_SOURCES                              = TestInetEndPoint.cpp    
                                                         $(NULL)
 TestInetEndPoint_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
 
-TestInetErrorStr_SOURCES                              = TestInetErrorStr.cpp    \
+TestInetErrorStr_SOURCES                              = TestInetErrorStrDriver.cpp    \
                                                         $(NULL)
 TestInetErrorStr_LDADD                                = $(COMMON_LDADD)
 
@@ -154,7 +188,7 @@ TestInetLayerMulticast_SOURCES                        = TestInetLayerMulticast.c
                                                         $(NULL)
 TestInetLayerMulticast_LDADD                          = libTestInetCommon.a $(COMMON_LDADD)
 
-TestInetTimer_SOURCES                                 = TestInetTimer.cpp       \
+TestInetTimer_SOURCES                                 = TestInetTimerDriver.cpp       \
                                                         $(NULL)
 TestInetTimer_LDADD                                   = $(COMMON_LDADD)
 
@@ -168,6 +202,7 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
    $(NULL)
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
    $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)

@@ -7,11 +7,13 @@
 #include "CHIPCrypto.h"
 
 #include <nlassert.h>
+
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/kdf.h>
-#include <openssl/srp.h>
 #include <openssl/rand.h>
+#include <openssl/srp.h>
+
 #include <stdbool.h>
 
 static void hash_init(EVP_MD_CTX ** ctx, const EVP_MD * type)

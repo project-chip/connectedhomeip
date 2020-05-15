@@ -28,28 +28,28 @@
 
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
-#include "inet/IPPrefix.h"
+#include <inet/IPPrefix.h>
 
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include "lwip/netif.h"
-#include <lwip/ip_addr.h>
 #include <lwip/ip.h>
-#include <lwip/tcpip.h>
 #include <lwip/ip6.h>
 #include <lwip/ip6_route_table.h>
+#include <lwip/ip_addr.h>
+#include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <net/if.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
 #include <errno.h>
-#include <unistd.h>
-#include <netinet/ip6.h>
-#include <netinet/in.h>
+#include <fcntl.h>
+#include <net/if.h>
 #include <net/route.h>
+#include <netinet/in.h>
+#include <netinet/ip6.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #if HAVE_LINUX_IF_TUN_H
 #include <linux/if_tun.h>

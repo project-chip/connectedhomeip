@@ -26,11 +26,13 @@
 #ifndef NRF5_CONFIG_H
 #define NRF5_CONFIG_H
 
-#include <functional>
-
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "FreeRTOS.h"
 #include "fds.h"
+#include "semphr.h"
+
+#include <functional>
 
 namespace chip {
 namespace DeviceLayer {

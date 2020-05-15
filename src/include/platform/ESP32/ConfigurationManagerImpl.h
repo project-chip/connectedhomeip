@@ -27,6 +27,7 @@
 #define CONFIGURATION_MANAGER_IMPL_H
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+
 #include <platform/ESP32/ESP32Config.h>
 
 namespace chip {

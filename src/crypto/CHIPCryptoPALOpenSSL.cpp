@@ -23,14 +23,16 @@
 #include "CHIPCryptoPAL.h"
 
 #include <openssl/conf.h>
-#include <openssl/rand.h>
 #include <openssl/ecdsa.h>
-#include <openssl/evp.h>
 #include <openssl/err.h>
+#include <openssl/evp.h>
 #include <openssl/kdf.h>
 #include <openssl/ossl_typ.h>
+#include <openssl/rand.h>
+
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+
 #include <string.h>
 
 #define kKeyLengthInBits 256

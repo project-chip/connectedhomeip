@@ -36,8 +36,22 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C/C++ preprocessor option flags that will apply to all compiled objects in
-# this makefile.
+lib_LIBRARIES                                         = \
+    libBleLayerTests.a                                  \
+    $(NULL)
+
+libBleLayerTests_a_SOURCES                            = \
+    TestBleErrorStr.cpp                                 \
+    $(NULL)
+
+libBleLayerTests_adir                                 = $(includedir)/ble
+
+dist_libBleLayerTests_a_HEADERS                       = \
+    TestBleLayer.h                                      \
+    $(NULL)
+
+# C/C++ preprocessor option flags that will apply to all compiled
+# objects in this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -55,6 +69,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          = \
+    libBleLayerTests.a                                  \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
@@ -84,7 +99,7 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
-TestBleErrorStr_SOURCES                               = TestBleErrorStr.cpp
+TestBleErrorStr_SOURCES                               = TestBleErrorStrDriver.cpp
 TestBleErrorStr_LDADD                                 = $(COMMON_LDADD)
 
 #
@@ -96,6 +111,7 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
    $(NULL)
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)
 

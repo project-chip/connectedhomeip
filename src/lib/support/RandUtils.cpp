@@ -26,11 +26,11 @@
  *
  */
 
+#include "RandUtils.h"
+
+#include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <limits.h>
-
-#include "RandUtils.h"
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS

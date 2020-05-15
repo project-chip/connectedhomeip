@@ -16,7 +16,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
@@ -24,8 +24,8 @@
 #include <Profiles/CHIPProfiles.h>
 #include <Profiles/common/CommonProfile.h>
 
-#include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.ipp>
 #include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl.ipp>
+#include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.ipp>
 
 namespace chip {
 namespace DeviceLayer {

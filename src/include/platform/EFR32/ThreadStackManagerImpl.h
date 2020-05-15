@@ -26,8 +26,8 @@
 #ifndef THREAD_STACK_MANAGER_IMPL_H
 #define THREAD_STACK_MANAGER_IMPL_H
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
 
 extern "C" void otSysEventSignalPending(void);
 

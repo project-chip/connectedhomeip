@@ -32,17 +32,14 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <string.h>
-#include <stdio.h>
-
-#include <system/SystemFaultInjection.h>
-
 #include "TCPEndPoint.h"
-#include <InetLayer.h>
+
 #include "InetFaultInjection.h"
+#include <InetLayer.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemFaultInjection.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcp.h>
@@ -50,17 +47,20 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <net/if.h>
 #include <netinet/tcp.h>
+#include <sys/ioctl.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #include "arpa-inet-compatibility.h"
+
+#include <stdio.h>
+#include <string.h>
 
 // SOCK_CLOEXEC not defined on all platforms, e.g. iOS/MacOS:
 #ifdef SOCK_CLOEXEC

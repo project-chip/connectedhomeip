@@ -30,17 +30,16 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <stddef.h>
-
-#include "support/DLLUtil.h"
-
+#include <support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
 #include <system/SystemError.h>
 
+#include <stddef.h>
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/pbuf.h>
 #include <lwip/mem.h>
 #include <lwip/memp.h>
+#include <lwip/pbuf.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {

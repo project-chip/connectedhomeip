@@ -2044,11 +2044,15 @@ fi
 
 if test "${nl_with_nlfaultinjection}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
-AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo"/src])
+AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo/src"])
 fi
 
 if test "${nl_with_mbedtls}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
+fi
+
+if test "${nl_with_lwip}" = "internal"; then
+AC_SUBST(LWIP_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/src/lwip"])
 fi
 
 #
@@ -2056,6 +2060,7 @@ fi
 #
 AC_CONFIG_FILES([
 Makefile
+docs/Makefile
 examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
@@ -2154,6 +2159,7 @@ AC_MSG_NOTICE([
   LwIP compile flags                               : ${LWIP_CPPFLAGS:--}
   LwIP link flags                                  : ${LWIP_LDFLAGS:--}
   LwIP link libraries                              : ${LWIP_LIBS:--}
+  LwIP foreign subdirectory dependency             : ${LWIP_FOREIGN_SUBDIR_DEPENDENCY:--}
   mbedTLS source                                   : ${nl_with_mbedtls:--}
   mbedTLS compile flags                            : ${MBEDTLS_CPPFLAGS:--}
   mbedTLS link flags                               : ${MBEDTLS_LDFLAGS:--}

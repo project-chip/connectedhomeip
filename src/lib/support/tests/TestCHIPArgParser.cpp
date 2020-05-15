@@ -17,14 +17,18 @@
  *    limitations under the License.
  */
 
+#include "TestSupport.h"
+
 #include <stdarg.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <core/CHIPCore.h>
 
 #include <support/CHIPArgParser.hpp>
+
+#if CHIP_CONFIG_ENABLE_ARG_PARSER
 
 using namespace chip::ArgParser;
 
@@ -692,7 +696,7 @@ static void HandleArgError(const char * msg, ...)
     sCallbackRecordCount++;
 }
 
-int main(int argc, char * argv[])
+int TestCHIPArgParser(void)
 {
     SimpleParseTest_SingleLongOption();
     SimpleParseTest_SingleShortOption();
@@ -716,5 +720,12 @@ int main(int argc, char * argv[])
 
     printf("All tests succeeded\n");
 
-    return EXIT_SUCCESS;
+    return (EXIT_SUCCESS);
 }
+#else  // CHIP_CONFIG_ENABLE_ARG_PARSER
+int TestCHIPArgParser(void)
+{
+    printf("No tests were run\n");
+    return (EXIT_SUCCESS);
+}
+#endif // CHIP_CONFIG_ENABLE_ARG_PARSER

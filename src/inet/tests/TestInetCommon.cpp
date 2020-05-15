@@ -40,52 +40,62 @@
 #include <vector>
 
 #include <inttypes.h>
-#include <stdint.h>
 #include <signal.h>
+#include <stdint.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <system/SystemTimer.h>
-#include <system/SystemFaultInjection.h>
-#include <support/CHIPFaultInjection.h>
 #include <inet/InetFaultInjection.h>
+#include <support/CHIPFaultInjection.h>
+#include <system/SystemFaultInjection.h>
+#include <system/SystemTimer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/dns.h>
+#include <lwip/init.h>
 #include <lwip/netif.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
 #include <netif/etharp.h>
 
+#if CHIP_TARGET_STYLE_UNIX
+
+// TapAddrAutoconf and TapInterface are only needed for LwIP on
+// sockets simulation in which a host tap/tun interface is used to
+// proxy the LwIP stack onto a host native network interface.
+
 #include "TapAddrAutoconf.h"
 #include "TapInterface.h"
+#endif // CHIP_TARGET_STYLE_UNIX
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <arpa/inet.h>
 #include <sys/select.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 using namespace chip;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-static sys_mbox * sLwIPEventQueue     = NULL;
+static sys_mbox_t * sLwIPEventQueue   = NULL;
 static unsigned int sLwIPAcquireCount = 0;
 
 static void AcquireLwIP(void)
 {
     if (sLwIPAcquireCount++ == 0)
     {
-        sys_mbox_new(&sLwIPEventQueue, 100);
+        sys_mbox_new(sLwIPEventQueue, 100);
     }
 }
 
 static void ReleaseLwIP(void)
 {
+#if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
     if (sLwIPAcquireCount > 0 && --sLwIPAcquireCount == 0)
     {
         tcpip_finish(NULL, NULL);
     }
+#endif
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -117,7 +127,14 @@ System::Layer gSystemLayer;
 Inet::InetLayer gInet;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_TARGET_STYLE_UNIX
+// TapAddrAutoconf and TapInterface are only needed for LwIP on
+// sockets simulation in which a host tap/tun interface is used to
+// proxy the LwIP stack onto a host native network interface.
+// CollectTapAddresses() is only available on such targets.
+
 static std::vector<TapInterface> sTapIFs;
+#endif                                    // CHIP_TARGET_STYLE_UNIX
 static std::vector<struct netif> sNetIFs; // interface to filter
 #endif                                    // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -202,15 +219,29 @@ static void PrintNetworkState()
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
         struct netif * netIF = &(sNetIFs[j]);
-        TapInterface * tapIF = &(sTapIFs[j]);
+#if CHIP_TARGET_STYLE_UNIX
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
 
+        TapInterface * tapIF = &(sTapIFs[j]);
+#endif // CHIP_TARGET_STYLE_UNIX
         GetInterfaceName(netIF, intfName, sizeof(intfName));
 
         printf("LwIP interface ready\n");
         printf("  Interface Name: %s\n", intfName);
         printf("  Tap Device: %s\n", gNetworkOptions.TapDeviceName[j]);
+#if CHIP_TARGET_STYLE_UNIX
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
+
         printf("  MAC address: %02x:%02x:%02x:%02x:%02x:%02x\n", tapIF->macAddr[0], tapIF->macAddr[1], tapIF->macAddr[2],
                tapIF->macAddr[3], tapIF->macAddr[4], tapIF->macAddr[5]);
+#endif // CHIP_TARGET_STYLE_UNIX
+
 #if INET_CONFIG_ENABLE_IPV4
         printf("  IPv4 Address: %s\n", ipaddr_ntoa(&(netIF->ip_addr)));
         printf("  IPv4 Mask: %s\n", ipaddr_ntoa(&(netIF->netmask)));
@@ -256,19 +287,39 @@ void InitNetwork()
         }
     }
 
-    err_t lwipErr;
+#if CHIP_TARGET_STYLE_UNIX
+    // TapAddrAutoconf and TapInterface are only needed for LwIP on
+    // sockets simulation in which a host tap/tun interface is used to
+    // proxy the LwIP stack onto a host native network interface.
+    // CollectTapAddresses() is only available on such targets.
 
     sTapIFs.clear();
+#endif // CHIP_TARGET_STYLE_UNIX
     sNetIFs.clear();
 
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
-        TapInterface tapIF;
-        struct netif netIF;
+#if CHIP_TARGET_STYLE_UNIX
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
 
+        TapInterface tapIF;
         sTapIFs.push_back(tapIF);
+#endif // CHIP_TARGET_STYLE_UNIX
+        struct netif netIF;
         sNetIFs.push_back(netIF);
     }
+
+#if CHIP_TARGET_STYLE_UNIX
+
+    // TapAddrAutoconf and TapInterface are only needed for LwIP on
+    // sockets simulation in which a host tap/tun interface is used to
+    // proxy the LwIP stack onto a host native network interface.
+    // CollectTapAddresses() is only available on such targets.
+
+    err_t lwipErr;
 
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
@@ -280,6 +331,7 @@ void InitNetwork()
             exit(EXIT_FAILURE);
         }
     }
+#endif // CHIP_TARGET_STYLE_UNIX
     tcpip_init(OnLwIPInitComplete, NULL);
 
     // Lock LwIP stack
@@ -291,11 +343,17 @@ void InitNetwork()
 
         addrsVec.clear();
 
+#if CHIP_TARGET_STYLE_UNIX
+
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
         if (gNetworkOptions.TapUseSystemConfig)
         {
             CollectTapAddresses(addrsVec, gNetworkOptions.TapDeviceName[j]);
         }
-
+#endif // CHIP_TARGET_STYLE_UNIX
 #if INET_CONFIG_ENABLE_IPV4
 
         IPAddress ip4Addr = (j < gNetworkOptions.LocalIPv4Addr.size()) ? gNetworkOptions.LocalIPv4Addr[j] : IPAddress::Any;
@@ -307,6 +365,12 @@ void InitNetwork()
                 ip4Addr = auto_addr;
             }
         }
+
+#if CHIP_TARGET_STYLE_UNIX
+        // TapAddrAutoconf and TapInterface are only needed for LwIP on
+        // sockets simulation in which a host tap/tun interface is used to
+        // proxy the LwIP stack onto a host native network interface.
+        // CollectTapAddresses() is only available on such targets.
 
         IPAddress ip4Gateway = (j < gNetworkOptions.IPv4GatewayAddr.size()) ? gNetworkOptions.IPv4GatewayAddr[j] : IPAddress::Any;
 
@@ -320,19 +384,21 @@ void InitNetwork()
             ip4AddrLwIP = ip4Addr.ToIPv4();
             IP4_ADDR(&ip4NetmaskLwIP, 255, 255, 255, 0);
             ip4GatewayLwIP = ip4Gateway.ToIPv4();
-            netif_add(&(netIFs[j]), &ip4AddrLwIP, &ip4NetmaskLwIP, &ip4GatewayLwIP, &(sTapIFs[j]), TapInterface_SetupNetif,
+            netif_add(&(sNetIFs[j]), &ip4AddrLwIP, &ip4NetmaskLwIP, &ip4GatewayLwIP, &(sTapIFs[j]), TapInterface_SetupNetif,
                       tcpip_input);
         }
+#endif // CHIP_TARGET_STYLE_UNIX
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        netif_create_ip6_linklocal_address(&(netIFs[j]), 1);
+        netif_create_ip6_linklocal_address(&(sNetIFs[j]), 1);
 
+#if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
         if (j < gNetworkOptions.LocalIPv6Addr.size())
         {
             ip6_addr_t ip6addr = gNetworkOptions.LocalIPv6Addr[j].ToIPv6();
             s8_t index;
-            netif_add_ip6_address_with_route(&(netIFs[j]), &ip6addr, 64, &index);
+            netif_add_ip6_address_with_route(&(sNetIFs[j]), &ip6addr, 64, &index);
             // add ipv6 route for ipv6 address
             if (j < gNetworkOptions.IPv6GatewayAddr.size())
             {
@@ -340,11 +406,11 @@ void InitNetwork()
                 struct ip6_prefix ip6_prefix;
                 ip6_prefix.addr       = Inet::IPAddress::Any.ToIPv6();
                 ip6_prefix.prefix_len = 0;
-                ip6_add_route_entry(&ip6_prefix, &netIFs[j], &br_ip6_addr, NULL);
+                ip6_add_route_entry(&ip6_prefix, &sNetIFs[j], &br_ip6_addr, NULL);
             }
             if (index >= 0)
             {
-                netif_ip6_addr_set_state(&(netIFs[j]), index, IP6_ADDR_PREFERRED);
+                netif_ip6_addr_set_state(&(sNetIFs[j]), index, IP6_ADDR_PREFERRED);
             }
         }
         for (size_t n = 0; n < addrsVec.size(); n++)
@@ -358,19 +424,20 @@ void InitNetwork()
                     continue; // skip over the LLA addresses, LwIP is aready adding those
                 if (auto_addr.IsIPv6Multicast())
                     continue; // skip over the multicast addresses from host for now.
-                netif_add_ip6_address_with_route(&(netIFs[j]), &ip6addr, 64, &index);
+                netif_add_ip6_address_with_route(&(sNetIFs[j]), &ip6addr, 64, &index);
                 if (index >= 0)
                 {
-                    netif_ip6_addr_set_state(&(netIFs[j]), index, IP6_ADDR_PREFERRED);
+                    netif_ip6_addr_set_state(&(sNetIFs[j]), index, IP6_ADDR_PREFERRED);
                 }
             }
         }
+#endif
 
-        netif_set_up(&(netIFs[j]));
-        netif_set_link_up(&(netIFs[j]));
+        netif_set_up(&(sNetIFs[j]));
+        netif_set_link_up(&(sNetIFs[j]));
     }
 
-    netif_set_default(&(netIFs[0]));
+    netif_set_default(&(sNetIFs[0]));
     // UnLock LwIP stack
 
     UNLOCK_TCPIP_CORE();
@@ -390,11 +457,11 @@ void InitNetwork()
     {
         if (j < gNetworkOptions.LocalIPv6Addr.size())
         {
-            netif_ip6_addr_set_state(&(netIFs[j]), 2, 0x30);
+            netif_ip6_addr_set_state(&(sNetIFs[j]), 2, 0x30);
         }
         else
         {
-            netif_ip6_addr_set_state(&(netIFs[j]), 1, 0x30);
+            netif_ip6_addr_set_state(&(sNetIFs[j]), 1, 0x30);
         }
     }
 
@@ -500,7 +567,14 @@ void ServiceEvents(struct ::timeval & aSleepTime)
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_TARGET_STYLE_UNIX
+    // TapAddrAutoconf and TapInterface are only needed for LwIP on
+    // sockets simulation in which a host tap/tun interface is used to
+    // proxy the LwIP stack onto a host native network interface.
+    // CollectTapAddresses() is only available on such targets.
+
     TapInterface_Select(&(sTapIFs[0]), &(sNetIFs[0]), aSleepTime, gNetworkOptions.TapDeviceName.size());
+#endif // CHIP_TARGET_STYLE_UNIX
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (gInet.State == InetLayer::kState_Initialized)
@@ -544,7 +618,7 @@ static bool NetworkIsReady()
     {
         for (int i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
         {
-            if (!ip6_addr_isany(netif_ip6_addr(&(netIFs[j]), i)) && ip6_addr_istentative(netif_ip6_addr_state(&(netIFs[j]), i)))
+            if (!ip6_addr_isany(netif_ip6_addr(&(sNetIFs[j]), i)) && ip6_addr_istentative(netif_ip6_addr_state(&(sNetIFs[j]), i)))
             {
                 ready = false;
                 break;

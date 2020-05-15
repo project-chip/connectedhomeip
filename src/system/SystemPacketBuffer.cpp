@@ -23,12 +23,10 @@
  *      mechanisms for manipulating packets of octet-serialized
  *      data.
  */
-
 // Include standard C library limit macros
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <stdint.h>
 
 // Include module header
 #include <system/SystemPacketBuffer.h>
@@ -37,22 +35,22 @@
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <system/SystemMutex.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
+#include <system/SystemMutex.h>
+#include <system/SystemStats.h>
 
-#include <string.h>
-#include <stdlib.h>
+#include <stdint.h>
+
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/pbuf.h>
 #include <lwip/mem.h>
+#include <lwip/pbuf.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#include <support/logging/CHIPLogging.h>
-#include <support/CodeUtils.h>
-
-#include <system/SystemStats.h>
 
 namespace chip {
 namespace System {

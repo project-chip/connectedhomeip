@@ -1,0 +1,35 @@
+jobs:
+    - build:
+          name: Build CHIP [<< matrix.builder >>]
+          matrix:
+              parameters:
+                  builder: ["docker-build", "mbedtls-build", "ubuntu-16-lts"]
+
+    - test:
+          name: Run Tests [<< matrix.builder >>]
+          matrix:
+              parameters:
+                  builder: ["docker-build", "mbedtls-build", "ubuntu-16-lts"]
+          requires:
+              - Build CHIP [<< matrix.builder >>]
+
+    - code-coverage:
+          name: Code Coverage [<< matrix.builder >>]
+          matrix:
+              parameters:
+                  builder: ["docker-build"]
+          requires:
+              - Build CHIP [<< matrix.builder >>]
+
+    - deploy:
+          name: Deploy [<< matrix.builder >>]
+          matrix:
+              parameters:
+                  builder: ["docker-build"]
+          requires:
+              - Run Tests [<< matrix.builder >>]
+
+    - examples_nrf:
+          name: Build Examples [nRF]
+    - examples_esp32:
+          name: Build Examples [ESP32]

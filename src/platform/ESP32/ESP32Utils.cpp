@@ -21,13 +21,13 @@
  *    @file
  *          General utility methods for the ESP32 platform.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ESP32/ESP32Utils.h>
-#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/logging/CHIPLogging.h>
 
 #include "esp_event.h"
 #include "esp_wifi.h"

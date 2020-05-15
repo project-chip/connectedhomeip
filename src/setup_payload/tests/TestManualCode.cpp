@@ -1,6 +1,6 @@
 /*
  *
- *    <COPYRIGHT>
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +15,23 @@
  *    limitations under the License.
  */
 
-#include <assert.h>
-#include <stdio.h>
-#include <unistd.h>
+/**
+ *    @file
+ *      This file implements a unit test suite for the manual setup
+ *      code functionality.
+ *
+ */
+
+#include "TestManualCode.h"
 
 #include "ManualSetupPayloadGenerator.cpp"
 #include "ManualSetupPayloadParser.cpp"
 #include "SetupPayload.cpp"
 #include "SetupPayload.h"
+
+#include <assert.h>
+#include <stdio.h>
+#include <unistd.h>
 
 using namespace chip;
 
@@ -395,7 +404,7 @@ void testShortCodeCharLengths()
     assert(manualSetupLongCodeCharLength == kManualSetupLongCodeCharLength);
 }
 
-int main()
+int TestManualSetupCode(void)
 {
     printf("---Running Test--- tests from %s\n", __FILE__);
     testDecimalRepresentation_PartialPayload();
@@ -419,4 +428,6 @@ int main()
     testReadBitsFromNumber();
 
     testShortCodeCharLengths();
+
+    return (0);
 }

@@ -29,7 +29,7 @@
 
 #include <core/CHIPError.h>
 #include <support/ErrorStr.h>
-#include "support/logging/CHIPLogging.h"
+#include <support/logging/CHIPLogging.h>
 
 /**
  *  @name chip-specific nlassert.h Overrides

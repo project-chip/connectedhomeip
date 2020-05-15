@@ -15,18 +15,20 @@
  *    limitations under the License.
  */
 
-#include "CHIPCryptoPAL.h"
+#include "TestCryptoLayer.h"
+
 #include "AES_CCM_128_test_vectors.h"
 #include "AES_CCM_256_test_vectors.h"
 #include "ECDH_P256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
 
+#include <CHIPCryptoPAL.h>
 #include <nlunit-test.h>
-#include <stdio.h>
-#include <string.h>
 #include <support/CodeUtils.h>
-#include <stdlib.h>
+#include <support/TestUtils.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -829,11 +831,28 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int main(void)
+int TestCHIPCryptoPAL(void)
 {
-    nlTestSuite theSuite = { "CHIP Crypto PAL tests", &sTests[0], NULL, NULL };
-
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "CHIP Crypto PAL tests",
+        &sTests[0],
+        NULL,
+        NULL
+    };
+    // clang-format on
     // Run test suit againt one context.
     nlTestRunner(&theSuite, NULL);
-    return nlTestRunnerStats(&theSuite);
+
+    return (nlTestRunnerStats(&theSuite));
+}
+
+void __attribute__((constructor)) my_init(void)
+{
+    printf("Deploying CHIP Crypto PAL tests\n");
+    if (CHIP_NO_ERROR != RegisterUnitTests(&TestCHIPCryptoPAL))
+    {
+        printf("Failed in deploying CHIP Crypto PAL tests\n");
+    }
 }

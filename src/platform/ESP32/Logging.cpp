@@ -22,8 +22,9 @@
  *          Provides implementations for the CHIP logging functions
  *          on the ESP32 platform.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <support/logging/CHIPLogging.h>
 
 #include "esp_log.h"

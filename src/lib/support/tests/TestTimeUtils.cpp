@@ -24,13 +24,15 @@
  *
  */
 
+#include "TestSupport.h"
+
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <errno.h>
 
-#include <support/logging/CHIPLogging.h>
 #include <support/TimeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 using namespace chip;
 
@@ -943,11 +945,13 @@ void TestSecondsSinceEpochConversion(void)
     }
 }
 
-int main(void)
+int TestTimeUtils(void)
 {
     TestOrdinalDateConversion();
     TestDaysSinceEpochConversion();
     TestSecondsSinceEpochConversion();
+
     printf("All tests passed\n");
-    return 0;
+
+    return (0);
 }

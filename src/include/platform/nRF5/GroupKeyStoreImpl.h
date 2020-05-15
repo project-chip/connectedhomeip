@@ -22,8 +22,8 @@
  *          for platforms based on the Nordic nRF5 SDK.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <core/CHIPKeyIds.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/nRF5/nRF5Config.h>
 
 namespace chip {

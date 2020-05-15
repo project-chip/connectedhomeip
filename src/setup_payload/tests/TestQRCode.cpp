@@ -15,16 +15,24 @@
  *    limitations under the License.
  */
 
-#include <assert.h>
-#include <stdio.h>
-#include <unistd.h>
+/**
+ *    @file
+ *      This file implements a unit test suite for the Quick Response
+ *      code functionality.
+ *
+ */
 
-#include <iostream>
+#include "TestQRCode.h"
 
-#include "SetupPayload.cpp"
 #include "Base41.cpp"
 #include "QRCodeSetupPayloadGenerator.cpp"
 #include "QRCodeSetupPayloadParser.cpp"
+#include "SetupPayload.cpp"
+
+#include <assert.h>
+#include <iostream>
+#include <stdio.h>
+#include <unistd.h>
 
 using namespace chip;
 using namespace std;
@@ -301,7 +309,7 @@ int testExtractPayload()
     return surprises;
 }
 
-int main(int argc, char ** argv)
+int TestQuickResponseCode(void)
 {
     int result = testBitsetLen() + testPayloadByteArrayRep() + testPayloadBase41Rep() + testBase41() + testSetupPayloadVerify() +
         testPayloadEquality() + testPayloadInEquality() + testQRCodeToPayloadGeneration() +
@@ -314,5 +322,6 @@ int main(int argc, char ** argv)
     {
         printf("\n**== QRCode tests FAILED ==**\n");
     }
-    return result;
+
+    return (result);
 }

@@ -17,9 +17,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+// module header
 #import "ViewController.h"
+
+// local imports
 #import <CHIP/CHIP.h>
+
+// system imports
 #import <AVFoundation/AVFoundation.h>
 
 #define INDICATOR_DELAY 0.5 * NSEC_PER_SEC

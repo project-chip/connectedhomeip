@@ -34,9 +34,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <system/SystemFaultInjection.h>
-#include <support/CHIPFaultInjection.h>
 #include <inet/InetFaultInjection.h>
+#include <support/CHIPFaultInjection.h>
+#include <system/SystemFaultInjection.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -171,7 +171,9 @@ bool NetworkOptions::HandleOption(const char * progName, OptionSet * optSet, int
 
     case kToolCommonOpt_DebugLwIP:
 #if defined(LWIP_DEBUG)
+#if CHIP_TARGET_STYLE_UNIX
         gLwIP_DebugFlags = (LWIP_DBG_ON | LWIP_DBG_TRACE | LWIP_DBG_STATE | LWIP_DBG_FRESH | LWIP_DBG_HALT);
+#endif
 #endif
         break;
     case kToolCommonOpt_EventDelay:

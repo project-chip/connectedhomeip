@@ -21,15 +21,17 @@
  *          Utilities for accessing persisted device configuration on
  *          platforms based on the Silicon Labs SDK.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/EFR32/EFR32Config.h>
+
 #include <core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
+#include "FreeRTOS.h"
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
-#include "FreeRTOS.h"
 
 namespace chip {
 namespace DeviceLayer {

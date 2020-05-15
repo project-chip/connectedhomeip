@@ -44,9 +44,10 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+#include "InetLayer.h"
 
-#include <InetLayer.h>
 #include "InetFaultInjection.h"
+
 #include <system/SystemTimer.h>
 
 #include <support/CodeUtils.h>
@@ -58,12 +59,12 @@
 #include <string.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/sys.h>
 #include <lwip/netif.h>
+#include <lwip/sys.h>
 #else // !CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <unistd.h>
 #include <fcntl.h>
 #include <net/if.h>
+#include <unistd.h>
 #ifdef __ANDROID__
 #include <ifaddrs-android.h>
 #else

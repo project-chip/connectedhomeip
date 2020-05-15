@@ -16,11 +16,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "PersistedCounter.h"
 
+#include <platform/PersistedStorage.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <support/PersistedCounter.h>
-#include <platform/PersistedStorage.h>
 
 #include <stdlib.h>
 #include <string.h>

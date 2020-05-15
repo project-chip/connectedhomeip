@@ -1,4 +1,5 @@
 #
+#    Copyright 2020 Project nlbuild-autotools Authors. All Rights Reserved.
 #    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,7 +54,7 @@ AC_DEFUN([NL_ENABLE_COVERAGE],
         [m4_fatal([$0: invalid default value '$1'; must be 'yes' or 'no'])])
 
     AC_CACHE_CHECK([whether to build code-coverage instances of programs and libraries],
-        nl_cv_build_coverage,
+        [nl_cv_build_coverage],
         [
             AC_ARG_ENABLE(coverage,
                 [AS_HELP_STRING([--enable-coverage],[Enable the generation of code-coverage instances @<:@default=$1@:>@.])],
@@ -84,20 +85,21 @@ AC_DEFUN([NL_ENABLE_COVERAGE],
 
                     fi
                 ])
-
-            if test "${nl_cv_build_coverage}" = "yes"; then
-                if test "${GCC}" != "yes"; then
-                    AC_MSG_ERROR([GCC or a GCC-compatible toolchain is required for --enable-coverage])
-                else
-                    NL_COVERAGE_CPPFLAGS="--coverage"
-                    if ${CC} --version | grep -q clang; then
-                        NL_COVERAGE_LDFLAGS="--coverage"
-                    else
-                        NL_COVERAGE_LIBS="-lgcov"
-                    fi
-                fi
-            fi
     ])
+
+    if test "${nl_cv_build_coverage}" = "yes"; then
+	if test "${GCC}" != "yes"; then
+	    AC_MSG_ERROR([GCC or a GCC-compatible toolchain is required for --enable-coverage])
+	else
+	    NL_COVERAGE_CPPFLAGS="--coverage"
+	    if ${CC} --version | grep -q clang; then
+		NL_COVERAGE_LDFLAGS="--coverage"
+	    else
+		NL_COVERAGE_LIBS="-lgcov"
+	    fi
+	fi
+    fi
+
 ])
 
 

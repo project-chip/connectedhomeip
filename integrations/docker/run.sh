@@ -9,8 +9,8 @@ here=$(cd "$(dirname "$0")" && pwd)
 me=$(basename "$0")
 
 die() {
-  echo "$me: *** ERROR: $*"
-  exit 1
+    echo "$me: *** ERROR: $*"
+    exit 1
 }
 
 ORG=${DOCKER_RUN_ORG:-connectedhomeip}
@@ -20,7 +20,7 @@ IMAGE=${DOCKER_RUN_IMAGE:-$(basename "$here")}
 
 # version
 VERSION=${DOCKER_RUN_VERSION:-$(cat "$here/version")} ||
-  die "please run me from an image directory or set environment variables:
+    die "please run me from an image directory or set environment variables:
           DOCKER_RUN_ORG
           DOCKER_RUN_IMAGE
           DOCKER_RUN_VERSION"
@@ -29,8 +29,8 @@ VERSION=${DOCKER_RUN_VERSION:-$(cat "$here/version")} ||
 RUN_DIR=${DOCKER_RUN_DIR:-$(pwd)}
 
 help() {
-  set +x
-  echo "Usage: $me [RUN_OPTIONS -- ] command
+    set +x
+    echo "Usage: $me [RUN_OPTIONS -- ] command
 
   Run a command in a docker image described by $here
 
@@ -60,29 +60,29 @@ runargs=()
 
 # extract run options
 for arg in "$@"; do
-  case "$arg" in
-    --help)
-      help
-      exit
-      ;;
+    case "$arg" in
+        --help)
+            help
+            exit
+            ;;
 
-    --)
-      shift
-      break
-      ;;
+        --)
+            shift
+            break
+            ;;
 
-    -*)
-      runargs+=("$arg")
-      shift
-      ;;
+        -*)
+            runargs+=("$arg")
+            shift
+            ;;
 
-    *)
-      ((!${#runargs[*]})) && break
-      runargs+=("$arg")
-      shift
-      ;;
+        *)
+            ((!${#runargs[*]})) && break
+            runargs+=("$arg")
+            shift
+            ;;
 
-  esac
+    esac
 done
 
 docker run "${runargs[@]}" --rm -w "$RUN_DIR" -v "$RUN_DIR:$RUN_DIR" "$ORG/$IMAGE${VERSION:+:${VERSION}}" "$@"

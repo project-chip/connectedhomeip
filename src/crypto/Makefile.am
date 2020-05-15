@@ -30,6 +30,7 @@ lib_LIBRARIES              = libChipCrypto.a
 libChipCrypto_adir             = $(includedir)/crypto
 
 libChipCrypto_a_CPPFLAGS            = \
+    $(LWIP_CPPFLAGS)                  \
     $(NLASSERT_CPPFLAGS)              \
     -I$(top_srcdir)/src               \
     -I$(top_srcdir)/src/lib           \

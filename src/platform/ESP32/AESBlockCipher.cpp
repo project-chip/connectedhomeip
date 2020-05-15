@@ -22,15 +22,15 @@
  *          Provides implementations for the CHIP AES BlockCipher classes
  *          on the ESP32 platform.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <string.h>
-
-#include <crypto/CHIPCrypto.h>
 #include <crypto/AESBlockCipher.h>
+#include <crypto/CHIPCrypto.h>
 
 #include <hwcrypto/aes.h>
+
+#include <string.h>
 
 namespace chip {
 namespace Platform {

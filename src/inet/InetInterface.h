@@ -27,12 +27,9 @@
 #ifndef INETINTERFACE_H
 #define INETINTERFACE_H
 
-#include <stddef.h>
-#include <stdint.h>
-
-#include <support/DLLUtil.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
+#include <support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/netif.h>
@@ -42,6 +39,9 @@
 struct if_nameindex;
 struct ifaddrs;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#include <stddef.h>
+#include <stdint.h>
 
 namespace chip {
 namespace Inet {

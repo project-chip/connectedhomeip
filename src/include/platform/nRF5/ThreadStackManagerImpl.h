@@ -26,10 +26,11 @@
 #ifndef THREAD_STACK_MANAGER_IMPL_H
 #define THREAD_STACK_MANAGER_IMPL_H
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
-#include <openthread/thread.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
+
 #include <openthread/tasklet.h>
+#include <openthread/thread.h>
 
 extern "C" void otSysEventSignalPending(void);
 

@@ -35,9 +35,9 @@
 #include <nlunit-test.h>
 
 #include <CHIPVersion.h>
+#include <platform/PersistedStorage.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/PersistedCounter.h>
-#include <platform/PersistedStorage.h>
 
 #include "TestPersistedStorageImplementation.h"
 
