@@ -26,7 +26,6 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/PlatformManager.h>
-#include <platform/Linux/PosixQueue.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
@@ -36,6 +35,7 @@
 #include <system/SystemLayer.h>
 
 #include <poll.h>
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sched.h>
@@ -69,7 +69,7 @@ exit:
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack(void)
 {
-    pthread_mutex_lock(&mChipStackLock);
+    assert(pthread_mutex_lock(&mChipStackLock) == 0);
 }
 
 template <class ImplClass>
@@ -81,7 +81,7 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack(void)
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack(void)
 {
-    pthread_mutex_unlock(&mChipStackLock);
+    assert(pthread_mutex_unlock(&mChipStackLock) == 0);
 }
 
 template <class ImplClass>

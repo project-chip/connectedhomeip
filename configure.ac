@@ -906,16 +906,7 @@ AC_ARG_WITH(device-layer,
     [
         case "${with_device_layer}" in
 
-        linux|none)
-            ;;
-
-        esp32|none)
-            ;;
-
-        nrf5|none)
-            ;;
-
-        efr32|none)
+        efr32|esp32|nrf5|linux|none)
             ;;
 
         *)
@@ -927,52 +918,41 @@ AC_ARG_WITH(device-layer,
     [with_device_layer=none])
 AC_MSG_RESULT(${with_device_layer})
 
+# Disable all device layer targets by default
+CHIP_DEVICE_LAYER_TARGET_LINUX=0
+CHIP_DEVICE_LAYER_TARGET_ESP32=0
+CHIP_DEVICE_LAYER_TARGET_NRF5=0
+CHIP_DEVICE_LAYER_TARGET_EFR32=0
+
 case "${with_device_layer}" in
 linux)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=Linux
       CHIP_DEVICE_LAYER_TARGET_LINUX=1
-      CHIP_DEVICE_LAYER_TARGET_ESP32=0
-      CHIP_DEVICE_LAYER_TARGET_NRF5=0
-      CHIP_DEVICE_LAYER_TARGET_EFR32=0
       ;;
 
 esp32)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=ESP32
       CHIP_DEVICE_LAYER_TARGET_ESP32=1
-      CHIP_DEVICE_LAYER_TARGET_NRF5=0
-      CHIP_DEVICE_LAYER_TARGET_EFR32=0
-      CHIP_DEVICE_LAYER_TARGET_LINUX=0
       ;;
 
 nrf5)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=nRF5
       CHIP_DEVICE_LAYER_TARGET_NRF5=1
-      CHIP_DEVICE_LAYER_TARGET_ESP32=0
-      CHIP_DEVICE_LAYER_TARGET_EFR32=0
-      CHIP_DEVICE_LAYER_TARGET_LINUX=0
       ;;
 
 efr32)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=EFR32
       CHIP_DEVICE_LAYER_TARGET_EFR32=1
-      CHIP_DEVICE_LAYER_TARGET_NRF5=0
-      CHIP_DEVICE_LAYER_TARGET_ESP32=0
-      CHIP_DEVICE_LAYER_TARGET_LINUX=0
       ;;
 
 none)
       CONFIG_DEVICE_LAYER=0
       CHIP_DEVICE_LAYER_TARGET=NONE
-      CHIP_DEVICE_LAYER_TARGET_ESP32=0
-      CHIP_DEVICE_LAYER_TARGET_NRF5=0
-      CHIP_DEVICE_LAYER_TARGET_EFR32=0
-      CHIP_DEVICE_LAYER_TARGET_LINUX=0
       ;;
-
 esac
 
 AC_SUBST(CONFIG_DEVICE_LAYER)
