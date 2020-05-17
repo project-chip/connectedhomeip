@@ -38,12 +38,12 @@ include core/CoreLayer.am
 include support/SupportLayer.am
 
 # install headers for core layer
-CoreLayer_adir=$(includedir)/core
-dist_CoreLayer_a_HEADERS=$(CHIP_BUILD_CORE_LAYER_HEADER_FILES)
+CoreLayer_dir=$(includedir)/core
+dist_CoreLayer__HEADERS=$(CHIP_BUILD_CORE_LAYER_HEADER_FILES)
 
 # install headers for DeviceController
-DeviceController_adir=$(includedir)/controller
-dist_DeviceController_a_HEADERS=$(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
+DeviceController_dir=$(includedir)/controller
+dist_DeviceController__HEADERS=$(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
 
 
 lib_LIBRARIES                       = libCHIP.a
