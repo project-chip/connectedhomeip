@@ -46,7 +46,7 @@ libCoreTests_a_SOURCES                                = \
     TestCHIPConnection.cpp                              \
     $(NULL)
 
-libCoreTests_adir                                     = $(includedir)
+libCoreTests_adir                                     = $(includedir)/core
 
 dist_libCoreTests_a_HEADERS                           = \
     TestCore.h                                          \

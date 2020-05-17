@@ -26,8 +26,6 @@
 
 # Set this to the relative location of nlbuild-autotools to this script
 
-echo "RUNNING BOOTSTRAP"
-
 nlbuild_autotools_stem="third_party/nlbuild-autotools/repo"
 
 abs_srcdir=$(cd "$(dirname "${0}")" && pwd)

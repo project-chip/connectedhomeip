@@ -70,7 +70,6 @@ DIST_SUBDIRS                      = \
 SUBDIRS                           = \
     include                         \
     lwip                            \
-    lib/support                     \
     system                          \
     $(MAYBE_BLE_SUBDIRS)            \
     inet                            \

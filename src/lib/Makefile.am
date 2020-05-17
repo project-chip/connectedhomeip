@@ -37,10 +37,14 @@ include ../system/SystemLayer.am
 include core/CoreLayer.am
 include support/SupportLayer.am
 
-EXTRA_DIST                          =                         \
-    $(CHIP_BUILD_CORE_LAYER_HEADER_FILES)                     \
-    $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)                  \
-    $(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
+# install headers for core layer
+CoreLayer_adir=$(includedir)/core
+dist_CoreLayer_a_HEADERS=$(CHIP_BUILD_CORE_LAYER_HEADER_FILES)
+
+# install headers for DeviceController
+DeviceController_adir=$(includedir)/controller
+dist_DeviceController_a_HEADERS=$(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
+
 
 lib_LIBRARIES                       = libCHIP.a
 

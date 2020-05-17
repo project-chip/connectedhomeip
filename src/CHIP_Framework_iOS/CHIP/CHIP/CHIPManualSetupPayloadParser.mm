@@ -17,7 +17,7 @@
 *    See the License for the specific language governing permissions and
 *    limitations under the License.
 */
-
+#import "CHIPError.h"
 #import "CHIPManualSetupPayloadParser.h"
 
 #import <setup_payload/ManualSetupPayloadParser.h>
