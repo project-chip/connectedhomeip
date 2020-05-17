@@ -17,8 +17,9 @@
 *    See the License for the specific language governing permissions and
 *    limitations under the License.
 */
-#import "CHIPError.h"
 #import "CHIPManualSetupPayloadParser.h"
+
+#import "CHIPError.h"
 
 #import <setup_payload/ManualSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
@@ -48,7 +49,7 @@
     } else if (error) {
         *error = [CHIPError errorForCHIPErrorCode:chipError];
     }
-    
+
     return payload;
 }
 
