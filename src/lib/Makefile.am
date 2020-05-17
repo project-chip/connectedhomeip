@@ -42,8 +42,8 @@ CoreLayer_dir=$(includedir)/core
 dist_CoreLayer__HEADERS=$(CHIP_BUILD_CORE_LAYER_HEADER_FILES)
 
 # install headers for DeviceController
-DeviceController_dir=$(includedir)/controller
-dist_DeviceController__HEADERS=$(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
+Controller_dir=$(includedir)/controller
+dist_Controller__HEADERS=$(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
 
 
 lib_LIBRARIES                       = libCHIP.a
