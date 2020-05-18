@@ -41,16 +41,16 @@ EXTRA_DIST                                     = \
 
 if CHIP_BUILD_TESTS
 lib_LIBRARIES                                  = \
-    libCryptoLayerTests.a                        \
+    libChipCryptoTests.a                         \
     $(NULL)
 
-libCryptoLayerTests_a_SOURCES                  = \
+libChipCryptoTests_a_SOURCES                   = \
     CHIPCryptoPALTest.cpp                        \
     $(NULL)
 
-libCryptoLayerTests_adir                       = $(includedir)/crypto
+libChipCryptoTests_adir                        = $(includedir)/crypto
 
-dist_libCryptoLayerTests_a_HEADERS             = \
+dist_libChipCryptoTests_a_HEADERS              = \
     TestCryptoLayer.h                            \
     $(NULL)
 
@@ -74,7 +74,7 @@ CHIP_LDADD                                          = \
     $(NULL)
 
 COMMON_LDADD                                   = \
-    libCryptoLayerTests.a                        \
+    libChipCryptoTests.a                         \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)   \
     $(CHIP_LDADD)                                \
     $(NULL)
