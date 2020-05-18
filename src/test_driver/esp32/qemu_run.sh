@@ -45,7 +45,7 @@ SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
 idf make
 idf make esp32_elf_builder
 
-bash build/chip/esp32_elf_builder.sh $1
+bash build/chip/esp32_elf_builder.sh "$1"
 
 flash_image_file=$(mktemp)
 log_file=$(mktemp)
