@@ -24,9 +24,9 @@
 #ifndef CHIP_ZCL_MASTER_HEADER
 #define CHIP_ZCL_MASTER_HEADER
 
+#include <memory.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <memory.h>
 
 typedef uint64_t bitmap64_t;
 typedef uint8_t enum8_t;

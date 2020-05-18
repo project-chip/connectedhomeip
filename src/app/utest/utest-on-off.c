@@ -24,10 +24,12 @@
  *
  */
 
-#include <stdio.h>
 #include "chip-zcl.h"
 #include "cluster-command-handler.h"
+
 #include "gen-cluster-id.h"
+
+#include <stdio.h>
 
 int main()
 {
