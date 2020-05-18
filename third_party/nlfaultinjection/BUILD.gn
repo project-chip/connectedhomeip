@@ -12,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("all") {
-  deps = [
-    "third_party/nlassert",
-    "third_party/nlfaultinjection",
-    "third_party/nlunit-test",
+config("nlfaultinjection_config") {
+  include_dirs = [ "repo/include" ]
+}
+
+static_library("nlfaultinjection") {
+  sources = [
+    "repo/include/nlfaultinjection.hpp",
+    "repo/src/nlfaultinjection.cpp",
   ]
+
+  deps = [ "//third_party/nlassert" ]
+
+  public_configs = [ ":nlfaultinjection_config" ]
 }
