@@ -258,26 +258,66 @@ jobs:
 workflows:
   Main:
     jobs:
-    - Build CHIP [docker-build]
-    - Build CHIP [mbedtls-build]
-    - Build CHIP [ubuntu-16-lts]
+    - Build CHIP [docker-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+    - Build CHIP [mbedtls-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+    - Build CHIP [ubuntu-16-lts]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
     - Run Tests [docker-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Build CHIP [docker-build]
     - Run Tests [mbedtls-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Build CHIP [mbedtls-build]
     - Run Tests [ubuntu-16-lts]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Build CHIP [ubuntu-16-lts]
     - Code Coverage [docker-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Build CHIP [docker-build]
     - Deploy [docker-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Run Tests [docker-build]
-    - Build Examples [nRF]
-    - Build Examples [ESP32]
+    - Build Examples [nRF]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+    - Build Examples [ESP32]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
   version: 2
 
 # Original config.yml file:
@@ -515,6 +555,10 @@ workflows:
 #   Main:
 #     jobs:
 #     - build:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         matrix:
 #           parameters:
 #             builder:
@@ -523,6 +567,10 @@ workflows:
 #             - ubuntu-16-lts
 #         name: Build CHIP [<< matrix.builder >>]
 #     - test:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         matrix:
 #           parameters:
 #             builder:
@@ -533,6 +581,10 @@ workflows:
 #         requires:
 #         - Build CHIP [<< matrix.builder >>]
 #     - code-coverage:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         matrix:
 #           parameters:
 #             builder:
@@ -541,6 +593,10 @@ workflows:
 #         requires:
 #         - Build CHIP [<< matrix.builder >>]
 #     - deploy:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         matrix:
 #           parameters:
 #             builder:
@@ -549,6 +605,14 @@ workflows:
 #         requires:
 #         - Run Tests [<< matrix.builder >>]
 #     - examples_nrf:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         name: Build Examples [nRF]
 #     - examples_esp32:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         name: Build Examples [ESP32]
