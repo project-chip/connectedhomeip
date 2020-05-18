@@ -69,6 +69,15 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
     before the device shows up on `/dev/tty`.
 
+-   Quit the monitor by hitting `Ctrl+]`.
+
+    Note: You can see a menu of various monitor commands by hitting
+    `Ctrl+t Ctrl+h` while the monitor is running.
+
+-   If desired, the monitor can be run again like so:
+
+          $ idf make monitor ESPPORT=/dev/tty.SLAB_USBtoUART
+
 ## Using the Echo Server
 
 There are two ways to use the Echo Server running on the device.
