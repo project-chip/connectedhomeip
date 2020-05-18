@@ -61,7 +61,8 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     `/dev/tty.SLAB_USBtoUART`(MacOS) with the correct USB device name for your
     system(like `/dev/ttyUSB0` on Linux). Note that sometimes you might have to
     press and hold the `boot` button on the device while it's trying to connect
-    before flashing.
+    before flashing.  For ESP32-DevKitC devices this is labeled in the
+    [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
           $ idf make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
