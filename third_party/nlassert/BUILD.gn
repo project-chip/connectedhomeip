@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("all") {
-  deps = [
-    "third_party/nlassert",
-    "third_party/nlunit-test",
-  ]
+config("nlassert_config") {
+  include_dirs = [ "repo/include" ]
+}
+
+source_set("nlassert") {
+  sources = [ "repo/include/nlassert.h" ]
+
+  public_configs = [ ":nlassert_config" ]
 }
