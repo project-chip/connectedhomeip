@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("all") {
-  deps = [ "third_party/nlunit-test" ]
+config("nlunit-test_config") {
+  include_dirs = [ "repo/src" ]
+}
+
+source_set("nlunit-test") {
+  sources = [
+    "repo/src/nlunit-test.c",
+    "repo/src/nlunit-test.h",
+  ]
+
+  public_configs = [ ":nlunit-test_config" ]
 }
