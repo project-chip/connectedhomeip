@@ -1,7 +1,7 @@
 # Overview of CHIP nRF52840 Adaption
 
-The following is an overview of the nRF5 adaptation of CHIP. Most of this
-code will have parallels in any new adaptation.
+The following is an overview of the nRF5 adaptation of CHIP. Most of this code
+will have parallels in any new adaptation.
 
 (All file names are relative to `connectedhomeip/src/platform/nRF5...`).
 
