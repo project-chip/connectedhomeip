@@ -34,38 +34,9 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/ConfigurationManager.h \
     @top_srcdir@/src/include/platform/ConnectivityManager.h \
     @top_srcdir@/src/include/platform/SoftwareUpdateManagerImpl.h \
-    @top_srcdir@/src/include/platform/nRF5/ConnectivityManagerImpl.h \
-    @top_srcdir@/src/include/platform/nRF5/nRF5Config.h \
-    @top_srcdir@/src/include/platform/nRF5/CHIPDevicePlatformConfig.h \
-    @top_srcdir@/src/include/platform/nRF5/CHIPDevicePlatformEvent.h \
-    @top_srcdir@/src/include/platform/nRF5/PlatformManagerImpl.h \
-    @top_srcdir@/src/include/platform/EFR32/CHIPDevicePlatformConfig.h \
-    @top_srcdir@/src/include/platform/EFR32/GroupKeyStoreImpl.h \
-    @top_srcdir@/src/include/platform/EFR32/efr32-chip-mbedtls-config.h \
-    @top_srcdir@/src/include/platform/EFR32/EFR32Config.h \
-    @top_srcdir@/src/include/platform/EFR32/gatt_db.h \
-    @top_srcdir@/src/include/platform/EFR32/freertos_bluetooth.h \
-    @top_srcdir@/src/include/platform/EFR32/ConnectivityManagerImpl.h \
-    @top_srcdir@/src/include/platform/EFR32/BLEManagerImpl.h \
-    @top_srcdir@/src/include/platform/EFR32/ConfigurationManagerImpl.h \
-    @top_srcdir@/src/include/platform/EFR32/PlatformManagerImpl.h \
-    @top_srcdir@/src/include/platform/EFR32/SoftwareUpdateManagerImpl.h \
-    @top_srcdir@/src/include/platform/EFR32/CHIPDevicePlatformEvent.h \
-    @top_srcdir@/src/include/platform/EFR32/NetworkProvisioningServerImpl.h \
-    @top_srcdir@/src/include/platform/ESP32/CHIPDevicePlatformConfig.h \
-    @top_srcdir@/src/include/platform/ESP32/ConnectivityManagerImpl.h \
-    @top_srcdir@/src/include/platform/ESP32/BLEManagerImpl.h \
-    @top_srcdir@/src/include/platform/ESP32/ConfigurationManagerImpl.h \
-    @top_srcdir@/src/include/platform/ESP32/PlatformManagerImpl.h \
-    @top_srcdir@/src/include/platform/ESP32/SoftwareUpdateManagerImpl.h \
-    @top_srcdir@/src/include/platform/ESP32/CHIPDevicePlatformEvent.h \
-    @top_srcdir@/src/include/platform/ESP32/NetworkProvisioningServerImpl.h \
-    @top_srcdir@/src/include/platform/ESP32/ESP32Utils.h \
-    @top_srcdir@/src/include/platform/ESP32/ESP32Config.h \
-    @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
-    @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp \
     @top_srcdir@/src/include/platform/GeneralUtils.h \
     @top_srcdir@/src/include/platform/PlatformManager.h \
+    @top_srcdir@/src/include/platform/PersistedStorage.h \
     @top_srcdir@/src/include/platform/SoftwareUpdateManager.h \
     @top_srcdir@/src/include/platform/TimeSyncManager.h \
     @top_srcdir@/src/include/platform/CHIPDeviceConfig.h \
@@ -78,8 +49,37 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericSoftwareUpdateManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericSoftwareUpdateManagerImpl.ipp \
+    @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
+    @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp \
     @top_srcdir@/src/include/platform/internal/CHIPDeviceLayerInternal.h \
-    @top_srcdir@/src/include/platform/PersistedStorage.h \
+    @top_srcdir@/src/platform/nRF5/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/platform/nRF5/nRF5Config.h \
+    @top_srcdir@/src/platform/nRF5/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/platform/nRF5/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/nRF5/PlatformManagerImpl.h \
+    @top_srcdir@/src/platform/EFR32/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/platform/EFR32/GroupKeyStoreImpl.h \
+    @top_srcdir@/src/platform/EFR32/efr32-chip-mbedtls-config.h \
+    @top_srcdir@/src/platform/EFR32/EFR32Config.h \
+    @top_srcdir@/src/platform/EFR32/gatt_db.h \
+    @top_srcdir@/src/platform/EFR32/freertos_bluetooth.h \
+    @top_srcdir@/src/platform/EFR32/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/platform/EFR32/BLEManagerImpl.h \
+    @top_srcdir@/src/platform/EFR32/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/platform/EFR32/PlatformManagerImpl.h \
+    @top_srcdir@/src/platform/EFR32/SoftwareUpdateManagerImpl.h \
+    @top_srcdir@/src/platform/EFR32/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/EFR32/NetworkProvisioningServerImpl.h \
+    @top_srcdir@/src/platform/ESP32/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/platform/ESP32/ConnectivityManagerImpl.h \
+    @top_srcdir@/src/platform/ESP32/BLEManagerImpl.h \
+    @top_srcdir@/src/platform/ESP32/ConfigurationManagerImpl.h \
+    @top_srcdir@/src/platform/ESP32/PlatformManagerImpl.h \
+    @top_srcdir@/src/platform/ESP32/SoftwareUpdateManagerImpl.h \
+    @top_srcdir@/src/platform/ESP32/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/ESP32/NetworkProvisioningServerImpl.h \
+    @top_srcdir@/src/platform/ESP32/ESP32Utils.h \
+    @top_srcdir@/src/platform/ESP32/ESP32Config.h \
     $(NULL)
 
 if CONFIG_DEVICE_LAYER
