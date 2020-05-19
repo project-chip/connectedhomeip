@@ -175,6 +175,8 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    string binary;
+
     if (!mPayload.isValidQRCodePayload())
     {
         fprintf(stderr, "\nFailed encoding invalid payload\n");
@@ -195,14 +197,11 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & bin
         return err;
     }
 
-    string binary;
     for (int i = ArraySize(bits) - 1; i >= 0; i--)
     {
-        string miniBinary;
         for (unsigned j = 1 << 7; j != 0;)
         {
             binary += bits[i] & j ? "1" : "0";
-            miniBinary += bits[i] & j ? "1" : "0";
             j >>= 1;
         }
     }

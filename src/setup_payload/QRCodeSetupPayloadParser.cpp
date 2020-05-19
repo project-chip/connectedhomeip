@@ -98,7 +98,7 @@ static CHIP_ERROR retrieveStringOptionalInfo(TLVReader & reader, OptionalQRCodeI
     return err;
 }
 
-static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader reader, OptionalQRCodeInfo & info)
+static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader & reader, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int storedInteger;
@@ -168,20 +168,20 @@ exit:
     return err;
 }
 
-static CHIP_ERROR populateTLV(SetupPayload & outPayload, vector<uint8_t> buf, int & index)
+static CHIP_ERROR populateTLV(SetupPayload & outPayload, const vector<uint8_t> & buf, int & index)
 {
     if (buf.size() * 8 == (uint) index)
     {
         return CHIP_NO_ERROR;
     }
     size_t bitsLeftToRead = (buf.size() * 8) - index;
-    size_t tlvBytesLength = ceil(bitsLeftToRead / 8);
+    size_t tlvBytesLength = ceil(double(bitsLeftToRead) / 8);
     uint8_t * tlvArray    = new uint8_t[tlvBytesLength];
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest;
         readBits(buf, index, dest, 8);
-        tlvArray[i] = (uint8_t) dest;
+        tlvArray[i] = static_cast<uint8_t>(dest);
     }
 
     return parseTLVFields(outPayload, tlvArray, tlvBytesLength);
