@@ -22,9 +22,9 @@
  *          for the ESP32 platform.
  */
 
-#include <platform/internal/ChipDeviceLayerInternal.h>
 #include <core/CHIPKeyIds.h>
 #include <platform/ESP32/ESP32Config.h>
+#include <platform/internal/ChipDeviceLayerInternal.h>
 
 #include "nvs.h"
 

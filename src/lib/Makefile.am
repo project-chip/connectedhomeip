@@ -30,15 +30,17 @@ SUBDIRS                             =                         \
 
 # Pull in the sources that comprise the CHIP library.
 
-include ../system/SystemLayer.am
-include ../inet/InetLayer.am
 include ../ble/BleLayer.am
+include ../controller/DeviceController.am
+include ../inet/InetLayer.am
+include ../system/SystemLayer.am
 include core/CoreLayer.am
 include support/SupportLayer.am
 
 EXTRA_DIST                          =                         \
     $(CHIP_BUILD_CORE_LAYER_HEADER_FILES)                     \
-    $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)
+    $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)                  \
+    $(CHIP_BUILD_DEVICE_CONTROLLER_HEADER_FILES)
 
 lib_LIBRARIES                       = libCHIP.a
 
@@ -61,6 +63,7 @@ libCHIP_a_SOURCES                   = $(CHIP_BUILD_SYSTEM_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_INET_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_CORE_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
+libCHIP_a_SOURCES                  += $(CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES)
 
 if CONFIG_NETWORK_LAYER_BLE
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_BLE_LAYER_SOURCE_FILES)

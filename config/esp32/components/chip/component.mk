@@ -100,7 +100,7 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
                                --with-lwip=$(LWIP_COMPONENT_DIR) \
                                --with-inet-endpoint="tcp udp" \
                                --with-logging-style=external \
-                               --with-chip-project-includes= \
+                               --with-chip-project-includes=$(CONFIG_CHIP_PROJECT_CONFIG) \
                                --with-chip-system-project-includes= \
                                --with-chip-inet-project-includes= \
                                --with-chip-ble-project-includes= \
@@ -108,11 +108,17 @@ CONFIGURE_OPTIONS       	:= -C AR="$(AR)" CC="$(CC)" CXX="$(CXX)" LD="$(LD)" OBJ
                                --with-crypto=mbedtls \
                                --with-mbedtls-includes=$(IDF_PATH)/components/mbedtls/mbedtls/include \
                                --with-mbedtls-libs=$(BUILD_DIR_BASE)/mbedtls \
-                               --disable-tests \
+                               --with-target-style=embedded \
                                --disable-tools \
                                --disable-docs \
                                --disable-java \
                                --disable-device-manager
+
+ifneq (,$(findstring CHIP_SUPPORT_FOREIGN_TEST_DRIVERS,$(CXXFLAGS)))
+CONFIGURE_OPTIONS           += --enable-tests
+else
+CONFIGURE_OPTIONS           += --disable-tests
+endif
 
 # Enable debug and disable optimization if ESP-IDF Optimization Level is set to Debug.
 ifeq ($(CONFIG_OPTIMIZATION_LEVEL_DEBUG),y)

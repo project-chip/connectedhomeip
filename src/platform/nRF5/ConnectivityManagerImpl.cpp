@@ -15,20 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
-
-#include <lwip/ip_addr.h>
-#include <lwip/netif.h>
-#include <lwip/nd6.h>
-#include <lwip/dns.h>
-
-#include <new>
-
-#include <support/logging/CHIPLogging.h>
-#include <support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
@@ -37,6 +25,16 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
+
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/BLEManager.h>
+#include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
+
+#include <lwip/dns.h>
+#include <lwip/ip_addr.h>
+#include <lwip/nd6.h>
+#include <lwip/netif.h>
 
 using namespace ::chip;
 using namespace ::chip::TLV;

@@ -26,6 +26,10 @@
 #ifndef CHIP_ZCL_ATTRIBUTE_DB
 #define CHIP_ZCL_ATTRIBUTE_DB
 
+#include <stdint.h>
+
+#include "chip-zcl.h"
+
 #include "gen-attribute-storage.h"
 
 /**

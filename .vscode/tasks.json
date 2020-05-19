@@ -129,6 +129,14 @@
             "group": "none",
             "dependsOn": "Clean Tree",
             "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build Standalone Echo Client",
+            "type": "shell",
+            "command": "scripts/examples/standalone_echo_client.sh",
+            "group": "none",
+            "dependsOn": "Clean Tree",
+            "problemMatcher": ["$gcc"]
         }
     ]
 }

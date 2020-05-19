@@ -28,6 +28,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include "TestSystemLayer.h"
+
 // Install a sleep in the high water mark function, to force
 // collisions between the threads that call it.
 
@@ -489,11 +491,11 @@ static int Initialize(void * aContext)
     void * lLayerContext   = NULL;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static sys_mbox * sLwIPEventQueue = NULL;
+    static sys_mbox_t * sLwIPEventQueue = NULL;
 
     if (sLwIPEventQueue == NULL)
     {
-        sys_mbox_new(&sLwIPEventQueue, 100);
+        sys_mbox_new(sLwIPEventQueue, 100);
     }
 
     lLayerContext = &sLwIPEventQueue;
@@ -519,16 +521,11 @@ static int Finalize(void * aContext)
 }
 
 } // namespace System
+
 } // namespace chip
 
-int main(int argc, char * argv[])
+int TestSystemObject(void)
 {
-    // Initialize standard pseudo-random number generator
-    srand(0);
-
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit againt one lContext.
     nlTestRunner(&sTestSuite, &chip::System::sContext);
 

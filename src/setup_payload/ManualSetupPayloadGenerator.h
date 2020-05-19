@@ -34,10 +34,11 @@
 #ifndef _MANUAL_SETUP_PAYLOAD_GENERATOR_H_
 #define _MANUAL_SETUP_PAYLOAD_GENERATOR_H_
 
-#include <string>
+#include "SetupPayload.h"
 
 #include <core/CHIPError.h>
-#include "SetupPayload.h"
+
+#include <string>
 
 using namespace std;
 namespace chip {

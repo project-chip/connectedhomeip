@@ -21,9 +21,9 @@
  *      This file implements CHIP key types helper functions.
  *
  */
+#include "CHIPKeyIds.h"
 
 #include <core/CHIPCore.h>
-#include "CHIPKeyIds.h"
 #include <support/CodeUtils.h>
 
 namespace chip {

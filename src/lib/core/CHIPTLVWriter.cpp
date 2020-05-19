@@ -25,14 +25,16 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <stdint.h>
-#include <stdarg.h>
+#include <CHIPTLV.h>
 
 #include <CHIPCore.h>
 #include <CHIPEncoding.h>
-#include <CHIPTLV.h>
+
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
+
+#include <stdarg.h>
+#include <stdint.h>
 
 namespace chip {
 namespace TLV {

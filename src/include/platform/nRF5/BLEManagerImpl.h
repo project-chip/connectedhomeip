@@ -27,8 +27,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "nrf_sdh_ble.h"
 #include "nrf_ble_gatt.h"
+#include "nrf_sdh_ble.h"
 
 namespace chip {
 namespace DeviceLayer {

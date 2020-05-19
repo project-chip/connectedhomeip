@@ -33,8 +33,8 @@
 #include <string.h>
 
 #include <system/SystemError.h>
-#include <system/SystemLayer.h>
 #include <system/SystemFaultInjection.h>
+#include <system/SystemLayer.h>
 
 #include <support/CodeUtils.h>
 

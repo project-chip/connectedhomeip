@@ -25,8 +25,10 @@
  */
 
 #include "chip-zcl.h"
-#include "gen-types.h"
+
 #include "gen-cluster-id.h"
+#include "gen-types.h"
+
 #include <stdio.h>
 
 // -----------------------------------------------------------------------------

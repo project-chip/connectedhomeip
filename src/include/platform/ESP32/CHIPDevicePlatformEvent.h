@@ -27,6 +27,7 @@
 #define CHIP_DEVICE_PLATFORM_EVENT_H
 
 #include <platform/CHIPDeviceEvent.h>
+
 #include <esp_event.h>
 
 namespace chip {

@@ -31,12 +31,12 @@
 #include "task.h"
 
 #include "arch/sys_arch.h"
-#include "lwip/opt.h"
 #include "lwip/debug.h"
 #include "lwip/def.h"
-#include "lwip/sys.h"
 #include "lwip/mem.h"
+#include "lwip/opt.h"
 #include "lwip/stats.h"
+#include "lwip/sys.h"
 
 #ifndef LWIP_FREERTOS_USE_STATIC_TCPIP_TASK
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK configSUPPORT_STATIC_ALLOCATION

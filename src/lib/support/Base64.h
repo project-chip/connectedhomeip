@@ -25,6 +25,8 @@
 #ifndef BASE64_H_
 #define BASE64_H_
 
+#include <stdint.h>
+
 namespace chip {
 
 typedef char (*Base64ValToCharFunct)(uint8_t val);

@@ -21,8 +21,9 @@
  *      Implementation of the fault-injection utilities for Inet.
  */
 
-#include <nlassert.h>
 #include "InetFaultInjection.h"
+
+#include <nlassert.h>
 
 #if INET_CONFIG_TEST
 

@@ -799,6 +799,69 @@ AC_ARG_ENABLE(tools,
 AC_MSG_RESULT(${build_tools})
 AM_CONDITIONAL([CHIP_BUILD_TOOLS], [test "${build_tools}" = "yes"])
 
+# Happy
+
+AC_MSG_CHECKING([checking whether to run functional tests with Happy])
+AC_ARG_WITH(happy,
+    [AS_HELP_STRING([--with-happy=HAPPY],
+        [Run CHIP functional tests using the Happy network functional test framework: yes, no, auto, or a path to the Happy network functional test framework [default=auto].])],
+    [
+        case "${with_happy}" in
+
+        no|yes)
+            ;;
+
+        *)
+            configure_happy_path=${with_happy}
+            happy_path="${with_happy}/lib/python${am_cv_python_version}/site-packages/"
+            with_happy=yes
+            ;;
+        esac
+    ],
+    [with_happy=auto])
+
+if test "${nl_cv_build_tests}" != "yes"; then
+    with_happy=no
+    happy_path="-"
+else
+    if test -n ${happy_path}; then
+        grep "Nest Labs" ${configure_happy_path}/setup.py &> /dev/null
+        if test $? = 0; then
+            AC_MSG_ERROR(["You have specified a valid path, ${configure_happy_path} to a Nest Labs network functional test framework (Happy) source directory; however, it does not appear to be built and installed. Please build and install Happy from the specified path, ${configure_happy_path}, and then try again."])
+        fi
+        if ! test -d ${happy_path}; then
+            AC_MSG_ERROR(["No Nest Labs network functional test framework (Happy) installation could be found at ${configure_happy_path}. Please provide a path to a valid Happy installation."])
+        fi
+    fi
+fi
+
+if test "${with_happy}" != "no"; then
+    PYTHONPATH=${happy_path}:${PYTHONPATH} python -c 'import happy' 2> /dev/null
+    if test $? != 0; then
+        if test "${with_happy}" = "yes"; then
+            if test -z ${happy_path}; then
+                AC_MSG_ERROR(["The Happy network functional test framework was configured with the defaults; however, Happy could not be found in the Python default package locations. Please either install Happy in a default location or invoke 'configure' with an explicit path using '--with-happy=<path to happy>'."])
+            else
+                AC_MSG_ERROR(["The Happy network functional test framework was configured with the path ${happy_path}; however, Happy could neither be found in the Python default package locations and nor at ${happy_path}."])
+            fi
+        else
+            with_happy=no
+            happy_path="-"
+        fi
+    else
+        with_happy=yes
+    fi
+fi
+
+if test "${with_happy}" = "yes"; then
+    HAPPY_MINIMUM_VERSION="1.1.36"
+    happy_version=`PYTHONPATH=${happy_path}:${PYTHONPATH} ${PYTHON} -c 'import happy; print happy.__version__ if "__version__" in dir(happy) else "0.0.0"'`
+    AX_COMPARE_VERSION([${HAPPY_MINIMUM_VERSION}],[gt],[${happy_version}],[AC_MSG_ERROR(["The Happy network functional test framework is installed with version ${happy_version}; however, Weave test apps require at least version ${HAPPY_MINIMUM_VERSION}."])],[])
+fi
+
+AC_MSG_RESULT(${with_happy})
+AM_CONDITIONAL([WEAVE_RUN_HAPPY], [test "${with_happy}" = "yes"])
+AC_SUBST(HAPPY_PATH,[${happy_path}])
 #
 # CHIPoBLE Control Path and Throughput Test  (CHIPoBLE Test)
 #
@@ -1981,11 +2044,15 @@ fi
 
 if test "${nl_with_nlfaultinjection}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/nlfaultinjection/repo])
-AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo"/src])
+AC_SUBST(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlfaultinjection/repo/src"])
 fi
 
 if test "${nl_with_mbedtls}" = "internal"; then
 AC_CONFIG_SUBDIRS([third_party/mbedtls/repo])
+fi
+
+if test "${nl_with_lwip}" = "internal"; then
+AC_SUBST(LWIP_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/src/lwip"])
 fi
 
 #
@@ -1993,6 +2060,7 @@ fi
 #
 AC_CONFIG_FILES([
 Makefile
+docs/Makefile
 examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
@@ -2059,7 +2127,8 @@ AC_MSG_NOTICE([
   Build coverage reports                           : ${nl_cv_build_coverage_reports}
   Lcov                                             : ${LCOV:--}
   Genhtml                                          : ${GENHTML:--}
-  Schema                                           : ${with_schema}
+  Happy                                            : ${with_happy}
+  Happy Path                                       : ${happy_path}
   Treat warnings as errors                         : ${nl_cv_warnings_as_errors}
   Build tests                                      : ${nl_cv_build_tests}
   Build long running tests                         : ${nl_cv_build_long_tests}
@@ -2090,6 +2159,7 @@ AC_MSG_NOTICE([
   LwIP compile flags                               : ${LWIP_CPPFLAGS:--}
   LwIP link flags                                  : ${LWIP_LDFLAGS:--}
   LwIP link libraries                              : ${LWIP_LIBS:--}
+  LwIP foreign subdirectory dependency             : ${LWIP_FOREIGN_SUBDIR_DEPENDENCY:--}
   mbedTLS source                                   : ${nl_with_mbedtls:--}
   mbedTLS compile flags                            : ${MBEDTLS_CPPFLAGS:--}
   mbedTLS link flags                               : ${MBEDTLS_LDFLAGS:--}

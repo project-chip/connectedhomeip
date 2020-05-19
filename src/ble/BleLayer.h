@@ -58,10 +58,10 @@
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include <ble/BlePlatformDelegate.h>
 #include <ble/BleApplicationDelegate.h>
-#include <ble/BleUUID.h>
 #include <ble/BleError.h>
+#include <ble/BlePlatformDelegate.h>
+#include <ble/BleUUID.h>
 
 #if BLE_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 #include <inet/InetLayer.h>

@@ -1,0 +1,111 @@
+bootstrap:
+    description: Bootstrap the source tree
+    steps:
+        - run:
+              command: scripts/build/bootstrap.sh
+              name: Bootstrap
+save-persistent-ci-cache:
+    description: Save persistent CI Cache
+    parameters:
+        builder:
+            type: string
+    steps:
+        - save_cache:
+              key:
+                  build-environment-{{ arch
+                  }}-<<parameters.builder>>-persistent-cache
+              paths:
+                  - ./ci-cache-persistent
+load-persistent-ci-cache:
+    description: Load persistent CI Cache
+    parameters:
+        builder:
+            type: string
+    steps:
+        - restore_cache:
+              key:
+                  build-environment-{{ arch
+                  }}-<<parameters.builder>>-persistent-cache
+save-build-environment:
+    description: Save the build environment
+    parameters:
+        builder:
+            type: string
+    steps:
+        - save_cache:
+              key:
+                  build-environment-{{ arch }}-{{
+                  .Branch}}-{{.Environment.CIRCLE_SHA1 }}-<<
+                  parameters.builder>>-built
+              paths:
+                  - build/downloads
+save-bootstrapped-tree:
+    description: Save the bootstrapped tree
+    parameters:
+        builder:
+            type: string
+    steps:
+        - save_cache:
+              key:
+                  bootstrapped-tree-{{ arch }}-{{
+                  .Branch}}-{{.Environment.CIRCLE_SHA1 }}-<<
+                  parameters.builder>>-built
+              paths:
+                  - .
+load-bootstrapped-tree:
+    description: Load the bootstrapped tree
+    parameters:
+        builder:
+            type: string
+    steps:
+        - restore_cache:
+              key:
+                  bootstrapped-tree-{{ arch }}-{{
+                  .Branch}}-{{.Environment.CIRCLE_SHA1 }}-<<
+                  parameters.builder>>-built
+save-built-tree:
+    description: Save the built tree
+    parameters:
+        builder:
+            type: string
+    steps:
+        - save_cache:
+              key:
+                  built-tree-{{ arch }}-{{
+                  .Branch}}-{{.Environment.CIRCLE_SHA1}}-<<
+                  parameters.builder>>-built
+              paths:
+                  - .
+load-build-environment:
+    description: Load the build environment
+    parameters:
+        builder:
+            type: string
+    steps:
+        - restore_cache:
+              key:
+                  build-environment-{{ arch }}-{{
+                  .Branch}}-{{.Environment.CIRCLE_SHA1 }}-<<
+                  parameters.builder>>-built
+load-built-tree:
+    description: Load the built tree
+    parameters:
+        builder:
+            type: string
+    steps:
+        - restore_cache:
+              key:
+                  built-tree-{{ arch }}-{{
+                  .Branch}}-{{.Environment.CIRCLE_SHA1}}-<<
+                  parameters.builder>>-built
+setup-environment:
+    description: Setup Environment
+    parameters:
+        builder:
+            type: string
+    steps:
+        - run:
+              name: Setup Environment
+              command:
+                  scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo
+                  scripts/setup/linux/install_packages.sh

@@ -26,29 +26,31 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-
-#include <stdint.h>
-#include <string.h>
-#include <errno.h>
-
+// config
 #include <system/SystemConfig.h>
 
+// module header
+#include "TestSystemLayer.h"
+
+#include <nlunit-test.h>
+#include <support/ErrorStr.h>
+#include <system/SystemError.h>
+#include <system/SystemLayer.h>
+#include <system/SystemTimer.h>
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/tcpip.h>
+#include <lwip/init.h>
 #include <lwip/sys.h>
+#include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/select.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#include <system/SystemError.h>
-#include <system/SystemLayer.h>
-#include <system/SystemTimer.h>
-
-#include <support/ErrorStr.h>
-
-#include <nlunit-test.h>
+#include <errno.h>
+#include <stdint.h>
+#include <string.h>
 
 using chip::ErrorStr;
 using namespace chip::System;
@@ -222,9 +224,9 @@ static int TestSetup(void * aContext)
     void * lLayerContext   = NULL;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static sys_mbox * sLwIPEventQueue = NULL;
+    static sys_mbox_t * sLwIPEventQueue = NULL;
 
-    sys_mbox_new(&sLwIPEventQueue, 100);
+    sys_mbox_new(sLwIPEventQueue, 100);
     tcpip_init(NULL, NULL);
     lLayerContext = &sLwIPEventQueue;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -248,17 +250,16 @@ static int TestTeardown(void * aContext)
     lContext.mLayer->Shutdown();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
     tcpip_finish(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif
+#endif
 
     return (SUCCESS);
 }
 
-int main(int argc, char * argv[])
+int TestSystemTimer(void)
 {
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
-
     // Run test suit againt one lContext.
     nlTestRunner(&kTheSuite, &sContext);
 

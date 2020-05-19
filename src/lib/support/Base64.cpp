@@ -25,10 +25,10 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+#include "Base64.h"
+
 #include <ctype.h>
 #include <stdint.h>
-
-#include "Base64.h"
 
 namespace chip {
 
@@ -295,8 +295,8 @@ uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out)
 
 #ifdef TEST
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 void TestBase64(const char * test, bool base64URL = false)
 {

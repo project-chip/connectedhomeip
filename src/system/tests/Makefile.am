@@ -38,8 +38,25 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C/C++ preprocessor option flags that will apply to all compiled objects in
-# this makefile.
+lib_LIBRARIES                                         = \
+    libSystemLayerTests.a                               \
+    $(NULL)
+
+libSystemLayerTests_a_SOURCES                         = \
+    TestSystemErrorStr.cpp                              \
+    TestSystemObject.cpp                                \
+    TestSystemPacketBuffer.cpp                          \
+    TestSystemTimer.cpp                                 \
+    $(NULL)
+
+libSystemLayerTests_adir                              = $(includedir)/system
+
+dist_libSystemLayerTests_a_HEADERS                    = \
+    TestSystemLayer.h                                   \
+    $(NULL)
+
+# C/C++ preprocessor option flags that will apply to all compiled
+# objects in this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -59,6 +76,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                           = \
+    libSystemLayerTests.a                                \
     $(COMMON_LDFLAGS)                                    \
     $(CHIP_LDADD)                                        \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)           \
@@ -72,7 +90,6 @@ COMMON_LDADD                                           = \
 
 check_PROGRAMS                                        = \
     TestSystemErrorStr                                  \
-    TestSystemLayer                                     \
     TestSystemObject                                    \
     TestSystemPacketBuffer                              \
     TestSystemTimer                                     \
@@ -93,19 +110,16 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
-TestSystemErrorStr_SOURCES                            = TestSystemErrorStr.cpp
+TestSystemErrorStr_SOURCES                            = TestSystemErrorStrDriver.cpp
 TestSystemErrorStr_LDADD                              = $(COMMON_LDADD)
 
-TestSystemLayer_SOURCES                               = tests.cpp
-TestSystemLayer_LDADD                                 = $(COMMON_LDADD)
-
-TestSystemObject_SOURCES                              = TestSystemObject.cpp
+TestSystemObject_SOURCES                              = TestSystemObjectDriver.cpp
 TestSystemObject_LDADD                                = $(COMMON_LDADD)
 
-TestSystemPacketBuffer_SOURCES                        = TestSystemPacketBuffer.cpp
+TestSystemPacketBuffer_SOURCES                        = TestSystemPacketBufferDriver.cpp
 TestSystemPacketBuffer_LDADD                          = $(COMMON_LDADD)
 
-TestSystemTimer_SOURCES                               = TestSystemTimer.cpp
+TestSystemTimer_SOURCES                               = TestSystemTimerDriver.cpp
 TestSystemTimer_LDADD                                 = $(COMMON_LDADD)
 
 #
@@ -117,6 +131,7 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
    $(NULL)
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
    $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)

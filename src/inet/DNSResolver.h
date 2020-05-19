@@ -28,7 +28,7 @@
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
-#include "inet/InetLayerBasis.h"
+#include <inet/InetLayerBasis.h>
 
 #define NL_DNS_HOSTNAME_MAX_LEN (253)
 

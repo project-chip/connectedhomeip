@@ -28,7 +28,6 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <stdint.h>
 
 // Include configuration headers
 #include <core/CHIPConfig.h>
@@ -37,10 +36,12 @@
 #include <support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/mem.h>
 #include <lwip/opt.h>
 #include <lwip/pbuf.h>
-#include <lwip/mem.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#include <stdint.h>
 
 namespace chip {
 namespace System {

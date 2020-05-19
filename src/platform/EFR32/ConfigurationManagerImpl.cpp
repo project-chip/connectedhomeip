@@ -21,13 +21,15 @@
  *          Provides the implementation of the Device Layer ConfigurationManager object
  *          for EFR32 platforms using the Silicon Labs SDK.
  */
-
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/ConfigurationManager.h>
-#include <platform/Profiles/security/CHIPApplicationKeys.h>
-#include <platform/EFR32/GroupKeyStoreImpl.h>
-#include <platform/EFR32/EFR32Config.h>
+
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+
+#include <platform/ConfigurationManager.h>
+#include <platform/EFR32/EFR32Config.h>
+#include <platform/EFR32/GroupKeyStoreImpl.h>
+#include <platform/Profiles/security/CHIPApplicationKeys.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -18,40 +18,46 @@ IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
 
 [[ ${*/--help//} != "${*}" ]] && {
-  set +x
-  echo "Usage: $me <OPTIONS>
+    set +x
+    echo "Usage: $me <OPTIONS>
 
   Build and (optionally tag as latest, push) a docker image from Dockerfile in CWD
 
   Options:
+   --no-cache passed as a docker build argument
    --latest   update latest to the current built version (\"$VERSION\")
    --push     push image(s) to docker.io (requires docker login for \"$ORG\")
    --help     get this message
 
 "
-  exit 0
+    exit 0
 }
 
 die() {
-  echo "$me: *** ERROR: $*"
-  exit 1
+    echo "$me: *** ERROR: $*"
+    exit 1
 }
 
 set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
-docker build -t "$ORG/$IMAGE:$VERSION" .
+BUILD_ARGS=()
+if [[ ${*/--no-cache//} != "${*}" ]]; then
+    BUILD_ARGS+=(--no-cache)
+fi
+
+docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
 
 [[ ${*/--latest//} != "${*}" ]] && {
-  docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
+    docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
 }
 
 [[ ${*/--push//} != "${*}" ]] && {
-  docker push "$ORG"/"$IMAGE":"$VERSION"
-  [[ ${*/--latest//} != "${*}" ]] && {
-    docker push "$ORG"/"$IMAGE":latest
-  }
+    docker push "$ORG"/"$IMAGE":"$VERSION"
+    [[ ${*/--latest//} != "${*}" ]] && {
+        docker push "$ORG"/"$IMAGE":latest
+    }
 }
 
 exit 0

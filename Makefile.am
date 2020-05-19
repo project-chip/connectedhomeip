@@ -35,6 +35,7 @@ SUBDIRS                                  = \
     third_party                            \
     src                                    \
     tests                                  \
+    docs                                   \
     $(NULL)
 
 PRETTY_SUBDIRS                           = \
@@ -42,7 +43,7 @@ PRETTY_SUBDIRS                           = \
     $(NULL)
 
 EXTRA_DIST                               = \
-    CODE_OF_CONDUCT.md                            \
+    CODE_OF_CONDUCT.md                     \
     CONTRIBUTING.md                        \
     Makefile-Android                       \
     Makefile-bootstrap                     \
@@ -211,7 +212,7 @@ distclean-local:
 
 .PHONY: docdist
 docdist: $(BUILT_SOURCES)
-	$(MAKE) -C doc docdistdir=$(abs_builddir) $(@)
+	$(MAKE) -C docs docdistdir=$(abs_builddir) $(@)
 
 #
 # Top-level convenience target for making a tools-only distribution

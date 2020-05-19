@@ -40,6 +40,20 @@ EXTRA_DIST                                     = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
+lib_LIBRARIES                                  = \
+    libCryptoLayerTests.a                        \
+    $(NULL)
+
+libCryptoLayerTests_a_SOURCES                  = \
+    CHIPCryptoPALTest.cpp                        \
+    $(NULL)
+
+libCryptoLayerTests_adir                       = $(includedir)/crypto
+
+dist_libCryptoLayerTests_a_HEADERS             = \
+    TestCryptoLayer.h                            \
+    $(NULL)
+
 # C/C++ preprocessor option flags that will apply to all compiled
 # objects in this makefile.
 
@@ -49,15 +63,18 @@ AM_CPPFLAGS                                    = \
     -I$(top_srcdir)/src/system                   \
     -I$(top_srcdir)/src/include/                 \
     -I$(top_srcdir)/src/crypto                   \
+    $(LWIP_CPPFLAGS)                             \
     $(NLASSERT_CPPFLAGS)                         \
     $(NLUNIT_TEST_CPPFLAGS)                      \
     $(NULL)
 
-CHIP_LDADD                                      = \
-    $(top_builddir)/src/crypto/libChipCrypto.a    \
+CHIP_LDADD                                          = \
+    $(top_builddir)/src/crypto/libChipCrypto.a        \
+    $(top_builddir)/src/lib/support/libSupportLayer.a \
     $(NULL)
 
 COMMON_LDADD                                   = \
+    libCryptoLayerTests.a                        \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)   \
     $(CHIP_LDADD)                                \
     $(NULL)
@@ -102,7 +119,7 @@ TestCryptoPAL_LDADD                            =        \
     $(NULL)
 
 
-TestCryptoPAL_SOURCES                          = CHIPCryptoPALTest.cpp
+TestCryptoPAL_SOURCES                          = CHIPCryptoPALTestDriver.cpp
 
 #
 # Foreign make dependencies

@@ -35,8 +35,8 @@
 
 #include <CHIPVersion.h>
 
-#include <inet/InetLayer.h>
 #include <inet/InetError.h>
+#include <inet/InetLayer.h>
 
 #include <support/CHIPArgParser.hpp>
 
@@ -586,6 +586,28 @@ static int TestTeardown(void * inContext)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+int TestInetEndPoint(void)
+{
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "inet-endpoint",
+        &sTests[0],
+        TestSetup,
+        TestTeardown
+    };
+    // clang-format on
+
+    // Run test suite against one context.
+    nlTestRunner(&theSuite, NULL);
+
+    return nlTestRunnerStats(&theSuite);
+#else  // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    return (0);
+#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+}
+
 int main(int argc, char * argv[])
 {
     SetSIGUSR1Handler();
@@ -595,17 +617,8 @@ int main(int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    nlTestSuite theSuite = { "inet-endpoint", &sTests[0], TestSetup, TestTeardown };
-
     // Generate machine-readable, comma-separated value (CSV) output.
-    nl_test_set_output_style(OUTPUT_CSV);
+    nlTestSetOutputStyle(OUTPUT_CSV);
 
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, NULL);
-
-    return nlTestRunnerStats(&theSuite);
-#else  // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    return 0;
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    return (TestInetEndPoint());
 }

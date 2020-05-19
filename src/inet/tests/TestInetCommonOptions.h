@@ -28,8 +28,9 @@
 
 #include <vector>
 
-#include <inet/InetLayer.h>
 #include <core/CHIPCore.h>
+#include <inet/InetArgParser.h>
+#include <inet/InetLayer.h>
 #include <support/CHIPArgParser.hpp>
 #include <system/SystemLayer.h>
 

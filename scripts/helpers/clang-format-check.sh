@@ -7,8 +7,8 @@
 #
 
 die() {
-  echo " *** ERROR: $*"
-  exit 1
+    echo " *** ERROR: $*"
+    exit 1
 }
 
 # from `man diff`:

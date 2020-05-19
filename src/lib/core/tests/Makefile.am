@@ -36,8 +36,24 @@ EXTRA_DIST                                            = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
-# C/C++ preprocessor option flags that will apply to all compiled objects in
-# this makefile.
+lib_LIBRARIES                                         = \
+    libCoreTests.a                                      \
+    $(NULL)
+
+libCoreTests_a_SOURCES                                = \
+    TestCHIPErrorStr.cpp                                \
+    TestCHIPTLV.cpp                                     \
+    TestCHIPConnection.cpp                              \
+    $(NULL)
+
+libCoreTests_adir                                     = $(includedir)
+
+dist_libCoreTests_a_HEADERS                           = \
+    TestCore.h                                          \
+    $(NULL)
+
+# C/C++ preprocessor option flags that will apply to all compiled
+# objects in this makefile.
 
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
@@ -56,6 +72,7 @@ CHIP_LDADD                                            = \
     $(NULL)
 
 COMMON_LDADD                                          =  \
+    libCoreTests.a                                       \
     $(COMMON_LDFLAGS)                                    \
     $(CHIP_LDADD)                                        \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS) \
@@ -70,6 +87,7 @@ COMMON_LDADD                                          =  \
 check_PROGRAMS                                        = \
     TestCHIPErrorStr                                    \
     TestCHIPTLV                                         \
+    TestCHIPConnection                                  \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -87,12 +105,14 @@ TESTS_ENVIRONMENT                                     = \
 
 # Source, compiler, and linker options for test programs.
 
-TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStr.cpp
+TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStrDriver.cpp
 TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
 
-TestCHIPTLV_SOURCES                                   = TestCHIPTLV.cpp
+TestCHIPTLV_SOURCES                                   = TestCHIPTLVDriver.cpp
 TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
 
+TestCHIPConnection_SOURCES                            = TestCHIPConnectionDriver.cpp
+TestCHIPConnection_LDADD                              = $(COMMON_LDADD)
 #
 # Foreign make dependencies
 #
@@ -102,6 +122,7 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
    $(NULL)
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
    $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)
