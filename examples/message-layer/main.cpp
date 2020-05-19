@@ -141,11 +141,14 @@ void HandleBindingEvent(void * appState, chip::Binding::EventType event, const c
         err = exchangeContext->SendMessage(kProfileId, kMessageType, packet);
     }
 
-    std::cout << "Message has been sent." << std::endl;
 exit:
     if (err != CHIP_NO_ERROR)
     {
         std::cout << "Sent message error: " << ErrorStr(err) << std::endl;
+    }
+    else
+    {
+        std::cout << "Message has been sent." << std::endl;
     }
 }
 
