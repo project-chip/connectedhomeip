@@ -81,7 +81,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR retrieveStringOptionalInfo(TLVReader reader, OptionalQRCodeInfo & info)
+static CHIP_ERROR retrieveStringOptionalInfo(TLVReader & reader, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint32_t valLength = reader.GetLength();
@@ -230,7 +230,7 @@ static string extractPayload(string inString)
 
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
-    vector<uint8_t> buf = vector<uint8_t>();
+    vector<uint8_t> buf;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     int indexToReadFrom = 0;
     uint64_t dest;

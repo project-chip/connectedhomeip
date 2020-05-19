@@ -234,7 +234,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(string & bas
         return err;
     }
 
-    string encodedPayload = base41Encode(bits, sizeof(bits) / sizeof(bits[0]));
+    string encodedPayload = base41Encode(bits, ArraySize(bits));
     encodedPayload.insert(0, kQRCodePrefix);
     base41Representation = encodedPayload;
 

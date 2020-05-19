@@ -98,9 +98,6 @@ CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag);
 
 class SetupPayload
 {
-private:
-    map<uint64_t, OptionalQRCodeInfo> optionalData;
-
 public:
     uint8_t version;
     uint16_t vendorID;
@@ -109,7 +106,7 @@ public:
     uint16_t rendezvousInformation;
     uint16_t discriminator;
     uint32_t setUpPINCode;
-    string serialNumber = "";
+    string serialNumber;
 
     /**
      * @brief A function to retrieve the vector of OptionalQRCodeInfo infos
@@ -137,6 +134,9 @@ public:
     bool isValidQRCodePayload();
     bool isValidManualCode();
     bool operator==(const SetupPayload & input);
+
+private:
+    map<uint64_t, OptionalQRCodeInfo> optionalData;
 };
 
 }; // namespace chip
