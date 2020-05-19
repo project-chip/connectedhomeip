@@ -1679,8 +1679,8 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
         }
         else
         {
-            if (elemType != kTLVElementType_EndOfContainer && mContainerType != kTLVType_NotSpecified &&
-                mContainerType != kTLVType_Array)
+            if (elemType != kTLVElementType_EndOfContainer && mContainerType != kTLVType_NotSpecified
+                    && mContainerType != kTLVType_Array && mContainerType != kTLVType_Path)
                 return CHIP_ERROR_INVALID_TLV_TAG;
 
             Write8(p, kTLVTagControl_Anonymous | elemType);
