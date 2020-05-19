@@ -7,11 +7,11 @@
 == TLV Format
 
 [.text-center]
-_Revision 5_ +
-_2020-04-23_
+_Revision 6_ +
+_2020-05-08_
 
 [.text-center]
-*Status:* [red]*Draft* / [red]*Active*
+*Status:* [red]*Final* / [red]*Active*
 
 toc::[]
 
@@ -30,7 +30,7 @@ types_ and _container types_. Primitive types convey fundamental data
 values such as integers and strings. Container types convey collections
 of elements that themselves are either primitives or containers. The
 CHIP TLV format supports three different container types: structures,
-arrays and paths.
+arrays and lists.
 
 All valid _TLV encodings_ consist of a single top-level element. This
 value can be either a primitive type or a container type.
@@ -73,6 +73,26 @@ immediately within a structure. This implies that an element with a
 context-specific tag cannot appear as the outermost element of a TLV
 encoding.
 
+=== Anonymous Tags
+
+A special anonymous tag is used to denote TLV elements that lack a tag
+value. Such a TLV element is referred to as an anonymous element.  
+
+=== Canonical Ordering of Tags
+
+Where a distinguished ordering of tags is required (e.g. for the purposes
+of generating a hash or cryptographic signature of elements within a
+structure), the following ordering rules shall be used:
+
+* Anonymous tags shall be ordered before all other tags.
+* Context specific tags shall be ordered before profile specific tags.
+* Context specific tags with numerically lesser tag values shall be ordered
+before those with higher tag values.
+* Profile specific tags with numerically lesser vendor ids shall be ordered
+before those with higher vendor ids.
+* Profile specific tags with the same vendor id, but numerically lesser
+profile numbers shall be ordered before those with higher numbers.
+
 == Lengths
 
 Depending on its type, a TLV element may contain a length field that
@@ -105,7 +125,7 @@ The CHIP TLV format supports the following container types:
 
 * Structures
 * Arrays
-* Paths
+* Lists
 
 Each of the container types is a form of element collection that can
 contain primitive types and/or other container types. The elements
@@ -129,21 +149,36 @@ receiver. For example, in some situations, senders and receivers may
 agree on a particular ordering of elements to make encoding and decoding
 easier.
 
+Where a distinguished ordering of members is required (for example, for
+the purposes of generating a hash or cryptographic signature of the
+structure), the members of the structure shall be encoded in order of
+their tag values, according to the rules for the canonical ordering of tags.
+
 === Arrays
 
 An array is an ordered collection of member elements that either do not
 have distinct meanings, or whose meanings are implied by their encoded
-positions in the array. All member elements of an array must be
-anonymous elements.
+positions in the array. An array can contain any type of element,
+including other arrays. All member elements of an array must be anonymous
+elements–that is, they must be encoded with an anonymous tag.
 
-=== Paths
+=== Lists
 
-A path is an ordered collection of member elements that describes how to
-traverse a tree of TLV elements to arrive at a particular element or set
-of elements. Thus a path forms a kind of name for a TLV element. A path
-can contain any type of element, including other paths. All member
-elements of a path must have a tag, however unlike structures these tags
-needn’t be unique with respect to the other members of the path.
+A list is an ordered collection of member elements, each of which may be
+encoded with a tag. The meanings of member elements in a list are denoted
+by their position within the list in conjunction with any associated tag
+value they may have.
+
+A list can contain any type of element, including other lists. The members
+of a list may be encoded with any form of tag, including an anonymous tag.
+The tags within a list needn’t be unique with respect to other members of
+the list.
+
+|===
+**Note:** In a previous version of this specification, the list type was
+referred to as a “path”. It was subsequently renamed to better reflect its
+use in practice.
+|===
 
 == Element Encoding
 
@@ -173,9 +208,10 @@ value itself.
 
 [cols="^1,^1,^1,^1,^1,^1,^1,^1,<8",options="header"]
 |===
-3+|
-5+|Element Type
-|
+8+h|Control Byte
+.3+h|Description
+3+h|Tag Control
+5+h|Element Type
 h|7
 h|6
 h|5
@@ -184,39 +220,38 @@ h|3
 h|2
 h|1
 h|0
-h|Description
-| | | |0|0|0|0|0|Signed Integer, 1-byte value
-| | | |0|0|0|0|1|Signed Integer, 2-byte value
-| | | |0|0|0|1|0|Signed Integer, 4-byte value
-| | | |0|0|0|1|1|Signed Integer, 8-byte value
-| | | |0|0|1|0|0|Unsigned Integer, 1-byte value
-| | | |0|0|1|0|1|Unsigned Integer, 2-byte value
-| | | |0|0|1|1|0|Unsigned Integer, 4-byte value
-| | | |0|0|1|1|1|Unsigned Integer, 8-byte value
-| | | |0|1|0|0|0|Boolean False
-| | | |0|1|0|0|1|Boolean True
-| | | |0|1|0|1|0|Floating Point Number, 4-byte value
-| | | |0|1|0|1|1|Floating Point Number, 8-byte value
-| | | |0|1|1|0|0|UTF-8 String, 1-byte length
-| | | |0|1|1|0|1|UTF-8 String, 2-byte length
-| | | |0|1|1|1|0|UTF-8 String, 4-byte length
-| | | |0|1|1|1|1|UTF-8 String, 8-byte length
-| | | |1|0|0|0|0|Byte String, 1-byte length
-| | | |1|0|0|0|1|Byte String, 2-byte length
-| | | |1|0|0|1|0|Byte String, 4-byte length
-| | | |1|0|0|1|1|Byte String, 8-byte length
-| | | |1|0|1|0|0|Null
-| | | |1|0|1|0|1|Structure
-| | | |1|0|1|1|0|Array
-| | | |1|0|1|1|1|Path
-| | | |1|1|0|0|0|End of Container
-| | | |1|1|0|0|1|Reserved
-| | | |1|1|0|1|0|Reserved
-| | | |1|1|0|1|1|Reserved
-| | | |1|1|1|0|0|Reserved
-| | | |1|1|1|0|1|Reserved
-| | | |1|1|1|1|0|Reserved
-| | | |1|1|1|1|1|Reserved
+|x|x|x|0|0|0|0|0|Signed Integer, 1-byte value
+|x|x|x|0|0|0|0|1|Signed Integer, 2-byte value
+|x|x|x|0|0|0|1|0|Signed Integer, 4-byte value
+|x|x|x|0|0|0|1|1|Signed Integer, 8-byte value
+|x|x|x|0|0|1|0|0|Unsigned Integer, 1-byte value
+|x|x|x|0|0|1|0|1|Unsigned Integer, 2-byte value
+|x|x|x|0|0|1|1|0|Unsigned Integer, 4-byte value
+|x|x|x|0|0|1|1|1|Unsigned Integer, 8-byte value
+|x|x|x|0|1|0|0|0|Boolean False
+|x|x|x|0|1|0|0|1|Boolean True
+|x|x|x|0|1|0|1|0|Floating Point Number, 4-byte value
+|x|x|x|0|1|0|1|1|Floating Point Number, 8-byte value
+|x|x|x|0|1|1|0|0|UTF-8 String, 1-byte length
+|x|x|x|0|1|1|0|1|UTF-8 String, 2-byte length
+|x|x|x|0|1|1|1|0|UTF-8 String, 4-byte length
+|x|x|x|0|1|1|1|1|UTF-8 String, 8-byte length
+|x|x|x|1|0|0|0|0|Byte String, 1-byte length
+|x|x|x|1|0|0|0|1|Byte String, 2-byte length
+|x|x|x|1|0|0|1|0|Byte String, 4-byte length
+|x|x|x|1|0|0|1|1|Byte String, 8-byte length
+|x|x|x|1|0|1|0|0|Null
+|x|x|x|1|0|1|0|1|Structure
+|x|x|x|1|0|1|1|0|Array
+|x|x|x|1|0|1|1|1|List
+|x|x|x|1|1|0|0|0|End of Container
+|x|x|x|1|1|0|0|1|Reserved
+|x|x|x|1|1|0|1|0|Reserved
+|x|x|x|1|1|0|1|1|Reserved
+|x|x|x|1|1|1|0|0|Reserved
+|x|x|x|1|1|1|0|1|Reserved
+|x|x|x|1|1|1|1|0|Reserved
+|x|x|x|1|1|1|1|1|Reserved
 |===
 
 For types that have varying length or value fields, the bottom two bits
@@ -235,9 +270,10 @@ The tag control field identifies the form of tag assigned to the element
 
 [cols="^1,^1,^1,^1,^1,^1,^1,^1,<8",options="header"]
 |===
-3+|Tag Control
-5+|
-|
+8+h|Control Byte
+.3+h|Description
+3+h|Tag Control
+5+h|Element Type
 h|7
 h|6
 h|5
@@ -246,15 +282,14 @@ h|3
 h|2
 h|1
 h|0
-h|Description
-|0|0|0| | | | | |Anonymous, 0 bytes
-|0|0|1| | | | | |Context-specific Tag, 1 byte
-|0|1|0| | | | | |Common Profile Tag, 2 bytes
-|0|1|1| | | | | |Common Profile Tag, 4 bytes
-|1|0|0| | | | | |Implicit Profile Tag, 2 bytes
-|1|0|1| | | | | |Implicit Profile Tag, 4 bytes
-|1|1|0| | | | | |Fully-qualified Tag, 6 bytes
-|1|1|1| | | | | |Fully-qualified Tag, 8 bytes
+|0|0|0|x|x|x|x|x|Anonymous, 0 bytes
+|0|0|1|x|x|x|x|x|Context-specific Tag, 1 byte
+|0|1|0|x|x|x|x|x|Common Profile Tag, 2 bytes
+|0|1|1|x|x|x|x|x|Common Profile Tag, 4 bytes
+|1|0|0|x|x|x|x|x|Implicit Profile Tag, 2 bytes
+|1|0|1|x|x|x|x|x|Implicit Profile Tag, 4 bytes
+|1|1|0|x|x|x|x|x|Fully-qualified Tag, 6 bytes
+|1|1|1|x|x|x|x|x|Fully-qualified Tag, 8 bytes
 |===
 
 == Tag Encoding
@@ -403,9 +438,9 @@ Boolean elements are encoded as follows:
 The value of a Boolean element (true or false) is implied by the type
 indicated in the element type field.
 
-=== Arrays, Structures and Paths
+=== Arrays, Structures and Lists
 
-Array, structure and path elements are encoded as follows:
+Array, structure and list elements are encoded as follows:
 
 [options="header"]
 |===
@@ -413,11 +448,11 @@ Array, structure and path elements are encoded as follows:
 |1 byte|0 to 8 bytes|_Variable_|1-byte
 |===
 
-The value field of an array/structure/path element is a sequence of
+The value field of an array/structure/list element is a sequence of
 encoded TLV elements that constitute the members of the element,
 followed by an end-of-container element. The end-of-container element
 must always be present, even in cases where the end of the
-array/structure/path element could be inferred by other means (e.g. the
+array/structure/list element could be inferred by other means (e.g. the
 length of the packet containing the TLV encoding).
 
 === Floating Point Numbers
@@ -432,9 +467,11 @@ A floating point number is encoded as follows:
 
 The value field of a floating point element contains an IEEE 754-1985
 single or double precision floating point number encoded in
-little-endian format. The choice of precision is implied by the type
-specified in the element type field (within the control byte). The
-sender is free to choose either precision at their discretion.
+little-endian format (specifically, the reverse of the order described
+in External Data Representation, RFC 4506). The choice of precision is
+implied by the type specified in the element type field (within the
+control byte). The sender is free to choose either precision at their
+discretion.
 
 === Nulls
 
@@ -452,6 +489,15 @@ A null value is encoded as follows:
 [cols="^1,^1,<1,<4",options="header"]
 |===
 |Revision |Date |Modified By |Description
+|6|2020-05-08|Jay Logue|Renamed path type to list and clarified text in corresponding section.
+
+Added section on canonical ordering of tags.
+
+Added section describing anonymous tags.
+
+Clarified descriptions of structure and array types.
+
+Clarified encoding of floating point values with reference to RFC-4506.
 |5|2020-04-23|Grant Erickson|Import into Project Connected Home over IP.
 |4|2013-05-20|Jay Logue|Fixed incorrect control byte value for end of container encoding.
 |3|2013-04-22|Jay Logue|Renamed dictionary to structure.
