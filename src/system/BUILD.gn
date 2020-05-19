@@ -1,0 +1,110 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/tests.gni")
+import("system.gni")
+
+declare_args() {
+  # Extra header to include in CHIPConfig.h for project.
+  # TODO - This should probably be in src/core but src/system also uses it.
+  chip_project_config_include = ""
+
+  # Extra header to include in CHIPConfig.h for platform.
+  # TODO - This should probably be in src/core but src/system also uses it.
+  chip_platform_config_include = ""
+
+  # Extra header to include in SystemConfig.h for project.
+  system_project_config_include = ""
+
+  # Extra header to include in SystemConfig.h for platform.
+  system_platform_config_include = ""
+}
+
+config("system_config") {
+  configs = [ "//src:includes" ]
+
+  defines = []
+  if (chip_project_config_include != "") {
+    defines += [ "CHIP_PROJECT_CONFIG_INCLUDE=${chip_project_config_include}" ]
+  }
+  if (chip_platform_config_include != "") {
+    defines +=
+        [ "CHIP_PLATFORM_CONFIG_INCLUDE=${chip_platform_config_include}" ]
+  }
+  if (system_project_config_include != "") {
+    defines +=
+        [ "SYSTEM_PROJECT_CONFIG_INCLUDE=${system_project_config_include}" ]
+  }
+  if (system_platform_config_include != "") {
+    defines +=
+        [ "SYSTEM_PLATFORM_CONFIG_INCLUDE=${system_platform_config_include}" ]
+  }
+  if (chip_build_tests) {
+    defines += [ "CHIP_SYSTEM_CONFIG_TEST=1" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_TEST=0" ]
+  }
+  if (chip_with_nlfaultinjection) {
+    defines += [ "CHIP_WITH_NLFAULTINJECTION=1" ]
+  } else {
+    defines += [ "CHIP_WITH_NLFAULTINJECTION=0" ]
+  }
+  if (chip_system_config_use_lwip) {
+    defines += [ "CHIP_SYSTEM_CONFIG_USE_LWIP=1" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_USE_LWIP=0" ]
+  }
+  if (chip_system_config_use_sockets) {
+    defines += [ "CHIP_SYSTEM_CONFIG_USE_SOCKETS=1" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_USE_SOCKETS=0" ]
+  }
+  if (chip_system_config_locking == "posix") {
+    defines += [ "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=1" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=0" ]
+  }
+  if (chip_system_config_locking == "freertos") {
+    defines += [ "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=1" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=0" ]
+  }
+  if (chip_system_config_locking == "none") {
+    defines += [ "CHIP_SYSTEM_CONFIG_NO_LOCKING=1" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_NO_LOCKING=0" ]
+  }
+  if (chip_system_config_provide_statistics) {
+    defines += [ "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=1" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=0" ]
+  }
+  if (chip_system_config_use_malloc) {
+    defines += [ "HAVE_MALLOC=1" ]
+    defines += [ "HAVE_FREE=1" ]
+  }
+  if (chip_system_config_clock == "clock_gettime") {
+    defines += [ "HAVE_CLOCK_GETTIME=1" ]
+    defines += [ "HAVE_CLOCK_SETTIME=1" ]
+  }
+  if (chip_system_config_clock == "gettimeofday") {
+    defines += [ "HAVE_GETTIMEOFDAY=1" ]
+  }
+}
+
+source_set("system_config_header") {
+  sources = [ "SystemConfig.h" ]
+
+  public_configs = [ ":system_config" ]
+}
