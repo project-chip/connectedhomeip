@@ -8,7 +8,7 @@ die() {
     exit 1
 }
 
-export > "$TEMP_DIR/env.sh"
+export >"$TEMP_DIR/env.sh"
 
 set -ex
 
@@ -48,7 +48,7 @@ configure_OPTIONS+=(
 )
 
 [[ ${PLATFORM_NAME} == iphoneos ]] && {
-  configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios --with-logging-style=external)
+    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios --with-logging-style=external)
 }
 
 [[ ${PLATFORM_NAME} == macosx ]] && configure_OPTIONS+=(--with-chip-project-includes=no)
