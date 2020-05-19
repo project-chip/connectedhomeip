@@ -2084,6 +2084,7 @@ src/lib/core/tests/Makefile
 src/lib/support/Makefile
 src/lib/support/tests/Makefile
 src/platform/Makefile
+src/platform/tests/Makefile
 tests/Makefile
 src/qrcodetool/Makefile
 ])
