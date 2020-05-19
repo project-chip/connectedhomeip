@@ -12,7 +12,7 @@ think would be useful to their fellow engineers.
 
 This document contains the following sections:
 
--   [Device Layer Adaptation Patterns](#Device Layer Adaptation Patterns)
+-   [Device Layer Adaptation Patterns](#Device-Layer-Adaptation-Patterns)
 
 ---
 
