@@ -8,7 +8,7 @@ die() {
     exit 1
 }
 
-export > "${TEMP_DIR}/env.sh"
+export > "$TEMP_DIR/env.sh"
 
 set -ex
 
