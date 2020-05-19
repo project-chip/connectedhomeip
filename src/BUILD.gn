@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Enable building tests.
-  chip_build_tests = true
-
-  # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = true
+config("includes") {
+  include_dirs = [ "." ]
 }
