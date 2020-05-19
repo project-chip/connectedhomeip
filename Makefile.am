@@ -47,7 +47,6 @@ EXTRA_DIST                               = \
     CONTRIBUTING.md                        \
     Makefile-Android                       \
     Makefile-bootstrap                     \
-    Makefile-iOS                           \
     Makefile-Standalone                    \
     README.md                              \
     .default-version                       \
