@@ -19,17 +19,17 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
-    - code-coverage:
-          name: Code Coverage [<< matrix.builder >>]
-          matrix:
-              parameters:
-                  builder: ["docker-build"]
-          requires:
-              - Build CHIP [<< matrix.builder >>]
-          filters:
-              branches:
-                  ignore:
-                      - /restyled.*/
+    # - code-coverage:
+    #       name: Code Coverage [<< matrix.builder >>]
+    #       matrix:
+    #           parameters:
+    #               builder: ["docker-build"]
+    #       requires:
+    #           - Build CHIP [<< matrix.builder >>]
+    #       filters:
+    #           branches:
+    #               ignore:
+    #                   - /restyled.*/
     - deploy:
           name: Deploy [<< matrix.builder >>]
           matrix:
