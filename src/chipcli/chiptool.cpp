@@ -37,7 +37,6 @@ static int help(int argc, char ** argv)
     }
 }
 
-
 static int usage(const char * prog_name)
 {
     ChipLogDetail(chipTool,
@@ -67,11 +66,11 @@ static int execute_command(int argc, char ** argv)
     }
 
     if (found)
-    {   
+    {
         ChipLogDetail(chipTool, "Executing cmd %s\n", command_to_execute->c_name);
         return command_to_execute->c_func(argc, argv);
     }
-    else 
+    else
     {
         help(0, NULL);
     }
@@ -87,8 +86,8 @@ int main(int argc, char ** argv)
     char * prog_name = strrchr(argv[0], '/');
     prog_name        = prog_name ? prog_name + 1 : argv[0];
     /* Do getopt stuff for global options. */
-    optind   = 1;
-    
+    optind = 1;
+
     while ((ch = getopt(argc, argv, "h")) != -1)
     {
         switch (ch)

@@ -55,7 +55,7 @@ static int execute_command(int argc, char ** argv)
         return -1;
     }
     const qrcodetool_command_t * command_to_execute = NULL;
-    bool found                                          = false;
+    bool found                                      = false;
 
     for (command_to_execute = commands; command_to_execute->c_name; command_to_execute++)
     {
@@ -87,8 +87,8 @@ int main(int argc, char ** argv)
     char * prog_name = strrchr(argv[0], '/');
     prog_name        = prog_name ? prog_name + 1 : argv[0];
     /* Do getopt stuff for global options. */
-    optind   = 1;
-    
+    optind = 1;
+
     while ((ch = getopt(argc, argv, "h")) != -1)
     {
         switch (ch)
