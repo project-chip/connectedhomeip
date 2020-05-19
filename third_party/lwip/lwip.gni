@@ -145,7 +145,7 @@ template("lwip_target") {
     ]
   }
 
-  static_library(lwip_target_name) {
+  source_set(lwip_target_name) {
     forward_variables_from(invoker,
                            [
                              "sources",
