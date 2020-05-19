@@ -9,161 +9,180 @@
 #import "CHIPToolCommandManager.h"
 
 @interface CHIPToolTask ()
-@property (readwrite, strong, nonatomic, nullable) NSDictionary *arguments;
-@property (readwrite, strong, nonatomic, nullable) NSArray<NSString*>* expectedParameters;
+@property (readwrite, strong, nonatomic, nullable) NSDictionary * arguments;
+@property (readwrite, strong, nonatomic, nullable) NSArray<NSString *> * expectedParameters;
 @property (readwrite, assign) BOOL waitingForEvent;
-- (void) willPerformTaskWithParameters:(int) argc argv:(char * const *) argv;
+- (void)willPerformTaskWithParameters:(int)argc argv:(char * const *)argv;
 
 @end
 
 @implementation CHIPToolTask
 
-- (id) init {
+- (id)init
+{
     return [self initWithExpectedParameters:nil];
 }
 
-- (id) initWithExpectedParameters:(NSArray<NSString*>* _Nullable) parameters {
+- (id)initWithExpectedParameters:(NSArray<NSString *> * _Nullable)parameters
+{
     self = [super init];
-    if(self) {
+    if (self) {
         _expectedParameters = parameters;
-        if(!_expectedParameters) {
+        if (!_expectedParameters) {
             _expectedParameters = [[self class] expectedParameters];
         }
     }
     return self;
 }
 
-- (void) performTask {
+- (void)performTask
+{
 }
 
-- (void) finishTask {
+- (void)finishTask
+{
     [self finishWaitingForEvent];
 }
 
-- (void) willPerformTaskWithParameters:(int) argc argv:(char * const *) argv {
-    
-//    for(int i = 0; i < argc; i++) {
-//        CHIPPrintf(@"arg[%d] == %s", i, argv[i]);
-//    }
+- (void)willPerformTaskWithParameters:(int)argc argv:(char * const *)argv
+{
 
-    NSMutableString *expectedParameters = [NSMutableString string];
-    for(NSString *expected in self.expectedParameters) {
+    //    for(int i = 0; i < argc; i++) {
+    //        CHIPPrintf(@"arg[%d] == %s", i, argv[i]);
+    //    }
+
+    NSMutableString * expectedParameters = [NSMutableString string];
+    for (NSString * expected in self.expectedParameters) {
         [expectedParameters appendFormat:@"%@:", expected];
     }
 
     self.arguments = [NSDictionary dictionaryWithArgc:argc argv:argv expected:[expectedParameters UTF8String]];
 }
 
-- (id) argumentForKey:(NSString*) key withDefault:(id) defaultValue{
+- (id)argumentForKey:(NSString *)key withDefault:(id)defaultValue
+{
     return [self.arguments objectForKey:key withDefault:defaultValue];
 }
 
-- (void) dealloc {
+- (void)dealloc
+{
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-+ (int) performTask:(int) argc argv:(char * const *) argv {
++ (int)performTask:(int)argc argv:(char * const *)argv
+{
     @try {
-        CHIPToolTask *task = [[[self class] alloc] init];
+        CHIPToolTask * task = [[[self class] alloc] init];
         [task willPerformTaskWithParameters:argc argv:argv];
         [task performTask];
-    }
-    @catch(NSException *ex) {
+    } @catch (NSException * ex) {
         CHIPPrintf(@"Call stack:\n%@", [ex callStackSymbols]);
         return 1;
     }
     return 0;
 }
 
-- (void) finishWaitingForEvent {
+- (void)finishWaitingForEvent
+{
     self.waitingForEvent = NO;
 }
 
-- (void) waitForDuration:(NSTimeInterval) duration {
+- (void)waitForDuration:(NSTimeInterval)duration
+{
     NSTimeInterval finishTime = [NSDate timeIntervalSinceReferenceDate] + duration;
-    while(finishTime > [NSDate timeIntervalSinceReferenceDate]) {
+    while (finishTime > [NSDate timeIntervalSinceReferenceDate]) {
         @autoreleasepool {
-            [[NSRunLoop currentRunLoop] runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
         }
     }
     CHIPPrintf(@"Done waiting for interval");
 }
 
-- (void) waitForEventsToCompleteWithCompletion:(dispatch_block_t) completion {
+- (void)waitForEventsToCompleteWithCompletion:(dispatch_block_t)completion
+{
     self.waitingForEvent = YES;
-    while(self.waitingForEvent) {
+    while (self.waitingForEvent) {
         @autoreleasepool {
-            [[NSRunLoop currentRunLoop] runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
         }
     }
-    
+
     CHIPPrintf(@"Done waiting for event");
-    if(completion) {
+    if (completion) {
         completion();
     }
 }
 
-- (void) waitForEventsToComplete {
+- (void)waitForEventsToComplete
+{
     [self waitForEventsToCompleteWithCompletion:nil];
 }
 
-+ (NSString *) commandName {
++ (NSString *)commandName
+{
     return NSStringFromClass([self class]);
 }
 
-+ (BOOL) commandShouldConnect {
++ (BOOL)commandShouldConnect
+{
     return YES;
 }
 
-+ (NSString *) usage {
++ (NSString *)usage
+{
     return @"";
 }
 
-+ (NSString *) help {
++ (NSString *)help
+{
     return @"";
 }
 
-+ (void) registerToolTask {
++ (void)registerToolTask
+{
     [[CHIPToolCommandManager sharedInstance] registerToolTaskClass:[self class]];
 }
 
-+ (void) load {
-//   CHIPSetAlwaysUseSingletonProxies(YES);
++ (void)load
+{
+    //   CHIPSetAlwaysUseSingletonProxies(YES);
 }
 
-+ (NSArray<NSString*>*) expectedParameters {
++ (NSArray<NSString *> *)expectedParameters
+{
     return nil;
 }
 
 @end
 
 @implementation NSDictionary (UserArguments)
-+ (instancetype) dictionaryWithArgc:(int) argc argv:(char * const *) argv expected:(const char*) expected {
-    NSMutableDictionary *args = [NSMutableDictionary new];
++ (instancetype)dictionaryWithArgc:(int)argc argv:(char * const *)argv expected:(const char *)expected
+{
+    NSMutableDictionary * args = [NSMutableDictionary new];
     int ch;
     while ((ch = getopt(argc, argv, expected)) != -1) {
         [args setObject:[NSString stringWithUTF8String:optarg] forKey:[NSString stringWithFormat:@"%c", ch]];
     }
     return args;
 }
-- (id) objectForKey:(id)aKey withDefault:(id) defaultValue {
+- (id)objectForKey:(id)aKey withDefault:(id)defaultValue
+{
     id value = [self objectForKey:aKey];
     return value ? value : defaultValue;
 }
 
-
-
 @end
 
-void CHIPPrintf(NSString *format, ...) {
+void CHIPPrintf(NSString * format, ...)
+{
     @autoreleasepool {
         va_list args;
         va_start(args, format);
-        NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
+        NSString * message = [[NSString alloc] initWithFormat:format arguments:args];
         printf("%s\n", [message UTF8String]);
-        
+
         fflush(stdout);
-        
+
         va_end(args);
     }
 }
