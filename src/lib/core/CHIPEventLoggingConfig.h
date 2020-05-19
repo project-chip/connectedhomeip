@@ -60,18 +60,6 @@
 #endif /* CHIP_CONFIG_EVENT_LOGGING_BDX_OFFLOAD */
 
 /**
- *  @def CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD
- *
- *  @brief
- *    Control whether the logs are offloaded using the WDM profile
- *
- *   Select the ability to offload logs to any interested subscribers using WDM.
- */
-#ifndef CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD
-#define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 0
-#endif /* CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD */
-
-/**
  * @def CHIP_CONFIG_EVENT_LOGGING_XFER_THRESHOLD
  *
  * @brief

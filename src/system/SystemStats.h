@@ -79,29 +79,6 @@ enum
 #if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     kServiceMgr_NumRequests,
 #endif
-#if WDM_ENABLE_SUBSCRIPTION_PUBLISHER
-    kWDM_NumTraits,
-#endif
-#if WDM_ENABLE_SUBSCRIPTION_CLIENT
-    kWDM_NumSubscriptionClients,
-#endif
-#if WDM_ENABLE_SUBSCRIPTION_PUBLISHER
-    kWDM_NumSubscriptionHandlers,
-#endif
-#if WDM_PUBLISHER_ENABLE_CUSTOM_COMMANDS
-    kWDM_NumCommands,
-#endif
-
-#if CHIP_CONFIG_LEGACY_WDM
-    kWDMLegacy_NumViews,
-#if CHIP_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
-    kWDMLegacy_NumSubscribes,
-    kWDMLegacy_NumCancels,
-#endif // CHIP_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
-    kWDMLegacy_NumUpdates,
-    kWDMLegacy_NumBindings,
-    kWDMLegacy_NumTransactions,
-#endif // CHIP_CONFIG_LEGACY_WDM
 
     kNumEntries
 };

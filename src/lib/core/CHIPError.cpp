@@ -495,8 +495,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM:
         desc = "CHIP signature not signed with required signature algorithm";
         break;
-    case CHIP_ERROR_WDM_SCHEMA_MISMATCH:
-        desc = "Schema mismatch in WDM.";
+    case CHIP_ERROR_SCHEMA_MISMATCH:
+        desc = "Schema mismatch.";
         break;
     case CHIP_ERROR_INVALID_INTEGER_VALUE:
         desc = "Invalid integer value.";
@@ -537,7 +537,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES:
         desc = "Too many shared session end nodes";
         break;
-    case CHIP_ERROR_WDM_MALFORMED_DATA_ELEMENT:
+    case CHIP_ERROR_MALFORMED_DATA_ELEMENT:
         desc = "Malformed WDM DataElement";
         break;
     case CHIP_ERROR_WRONG_CERT_TYPE:
@@ -570,11 +570,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION:
         desc = "Update Required Version mismatch";
         break;
-    case CHIP_ERROR_WDM_MALFORMED_STATUS_ELEMENT:
-        desc = "Status Element in WDM update is malformed";
-        break;
-    case CHIP_ERROR_WDM_SUBSCRIPTIONLESS_NOTIFY_PARTIAL:
-        desc = "The WDM Subscriptionless Notify is partial";
+    case CHIP_ERROR_MALFORMED_STATUS_ELEMENT:
+        desc = "Status Element is malformed";
         break;
     case CHIP_ERROR_ACCESS_DENIED:
         desc = "The CHIP message is not granted access";
@@ -582,25 +579,25 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_UNKNOWN_RESOURCE_ID:
         desc = "Unknown resource ID";
         break;
-    case CHIP_ERROR_WDM_MALFORMED_UPDATE_RESPONSE:
-        desc = "Malformed WDM Update response";
+    case CHIP_ERROR_MALFORMED_UPDATE_RESPONSE:
+        desc = "Malformed Update response";
         break;
-    case CHIP_ERROR_WDM_VERSION_MISMATCH:
+    case CHIP_ERROR_VERSION_MISMATCH:
         desc = "The conditional update of a WDM path failed for a version mismatch";
         break;
-    case CHIP_ERROR_WDM_POTENTIAL_DATA_LOSS:
+    case CHIP_ERROR_POTENTIAL_DATA_LOSS:
         desc = "A potential data loss was detected in a WDM Trait Instance";
         break;
     case CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE:
         desc = "Legacy device doesn't support standalone Thread network creation";
         break;
-    case CHIP_ERROR_WDM_INCONSISTENT_CONDITIONALITY:
+    case CHIP_ERROR_INCONSISTENT_CONDITIONALITY:
         desc = "The Trait Instance is already being updated with a different conditionality";
         break;
-    case CHIP_ERROR_WDM_LOCAL_DATA_INCONSISTENT:
+    case CHIP_ERROR_LOCAL_DATA_INCONSISTENT:
         desc = "The local data does not match any known version of the Trait Instance";
         break;
-    case CHIP_ERROR_WDM_PATH_STORE_FULL:
+    case CHIP_ERROR_PATH_STORE_FULL:
         desc = "A WDM TraitPath store is full";
         break;
     case CHIP_EVENT_ID_FOUND:

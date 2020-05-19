@@ -67,28 +67,28 @@ typedef enum
     kFault_ServiceManager_Lookup,            /**< Fail the lookup of an endpoint id */
     kFault_ServiceDirectoryReplaceError,     /**< Fail the replacement of a ServiceDirectory entry */
 #endif                                       // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-    kFault_WDM_TraitInstanceNew,             /**< Fail the allocation of a WDM TraitInstanceInfo object */
-    kFault_WDM_SubscriptionHandlerNew,       /**< Fail the allocation of a WDM SubscriptionHandler object */
-    kFault_WDM_SubscriptionClientNew,        /**< Fail the allocation of a WDM SubscriptionClient object */
-    kFault_WDM_BadSubscriptionId,            /**< Corrupt the SubscriptionId of an incoming notification */
-    kFault_WDM_SendUnsupportedReqMsgType, /**< Corrupt the message type of an outgoing SubscriptionRequest, so it is received as an
+    kFault_CHIP_TraitInstanceNew,            /**< Fail the allocation of a WDM TraitInstanceInfo object */
+    kFault_CHIP_SubscriptionHandlerNew,      /**< Fail the allocation of a WDM SubscriptionHandler object */
+    kFault_CHIP_SubscriptionClientNew,       /**< Fail the allocation of a WDM SubscriptionClient object */
+    kFault_CHIP_BadSubscriptionId,           /**< Corrupt the SubscriptionId of an incoming notification */
+    kFault_CHIP_SendUnsupportedReqMsgType, /**< Corrupt the message type of an outgoing SubscriptionRequest, so it is received as an
                                              unsupported message by the responder */
-    kFault_WDM_NotificationSize,      /**< Override the max payload size in a SubscriptionHandler; the size to be used can passed as
-                                           an argument to the fault */
-    kFault_WDM_SendCommandExpired,    /**< Force the ExpiryTime of a WDM command to be in the past */
-    kFault_WDM_SendCommandBadVersion, /**< Alter the version of a WDM command being transmitted */
-    kFault_WDM_SendUpdateBadVersion,  /**< Alter the version of a WDM update data element being transmitted */
-    kFault_WDM_DelayUpdateResponse,   /**< Drop the message received after sending an UpdateRequest, which usually is the
-                                         StatusReport;   this causes the NotificationRequest to be processed first */
-    kFault_WDM_UpdateRequestTimeout,  /**< Inject an exchange timeout for the UpdateRequest */
-    kFault_WDM_UpdateRequestSendErrorInline, /**< Inject an inline Inet Send error for the UpdateRequest */
-    kFault_WDM_UpdateRequestSendErrorAsync,  /**< Inject a WRM SendError for the UpdateRequest */
-    kFault_WDM_UpdateRequestBadProfile,      /**< Inject an invalid Profile ID in the UpdateRequest */
-    kFault_WDM_UpdateRequestDropMessage,     /**< Drop an outgoing WDM UpdateRequest message using the DropOutgoingUDPMsg fault */
-    kFault_WDM_UpdateResponseBusy,           /**< Inject a status code busy in the StatusList */
-    kFault_WDM_PathStoreFull,                /**< Inject a WDM_PATH_STORE_FULL error */
-    kFault_WDM_TreatNotifyAsCancel,          /**< Process a Notify request as a CancelSubscription request */
-    kFault_CASEKeyConfirm,                   /**< Trigger a CHIP_ERROR_KEY_CONFIRMATION_FAILED error in chipCASEEngine */
+    kFault_CHIP_NotificationSize,   /**< Override the max payload size in a SubscriptionHandler; the size to be used can passed as
+                                        an argument to the fault */
+    kFault_CHIP_SendCommandExpired, /**< Force the ExpiryTime of a WDM command to be in the past */
+    kFault_CHIP_SendCommandBadVersion,        /**< Alter the version of a WDM command being transmitted */
+    kFault_CHIP_SendUpdateBadVersion,         /**< Alter the version of a WDM update data element being transmitted */
+    kFault_CHIP_DelayUpdateResponse,          /**< Drop the message received after sending an UpdateRequest, which usually is the
+                                                StatusReport;   this causes the NotificationRequest to be processed first */
+    kFault_CHIP_UpdateRequestTimeout,         /**< Inject an exchange timeout for the UpdateRequest */
+    kFault_CHIP_UpdateRequestSendErrorInline, /**< Inject an inline Inet Send error for the UpdateRequest */
+    kFault_CHIP_UpdateRequestSendErrorAsync,  /**< Inject a WRM SendError for the UpdateRequest */
+    kFault_CHIP_UpdateRequestBadProfile,      /**< Inject an invalid Profile ID in the UpdateRequest */
+    kFault_CHIP_UpdateRequestDropMessage,     /**< Drop an outgoing WDM UpdateRequest message using the DropOutgoingUDPMsg fault */
+    kFault_CHIP_UpdateResponseBusy,           /**< Inject a status code busy in the StatusList */
+    kFault_CHIP_PathStoreFull,                /**< Inject a CHIP_PATH_STORE_FULL error */
+    kFault_CHIP_TreatNotifyAsCancel,          /**< Process a Notify request as a CancelSubscription request */
+    kFault_CASEKeyConfirm,                    /**< Trigger a CHIP_ERROR_KEY_CONFIRMATION_FAILED error in chipCASEEngine */
     kFault_SecMgrBusy, /**< Trigger a CHIP_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
 #if CHIP_CONFIG_ENABLE_TUNNELING
     kFault_TunnelQueueFull, /**< Trigger a CHIP_ERROR_TUNNEL_SERVICE_QUEUE_FULL when enqueueing a packet in the Tunnel queue */

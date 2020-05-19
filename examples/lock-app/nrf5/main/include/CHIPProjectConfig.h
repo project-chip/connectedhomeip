@@ -126,13 +126,6 @@
 #define CHIP_CONFIG_MAX_BINDINGS 8
 
 /**
- * CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD
- *
- * Select the ability to offload event logs to any interested subscribers using WDM.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
-
-/**
  * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
  *
  * Enable recording UTC timestamps.
