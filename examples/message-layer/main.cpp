@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <string>
 
 #include <signal.h>
 
@@ -21,30 +22,34 @@ using namespace chip::ArgParser;
 
 #define kToolName "message-layer-demo"
 
-constexpr uint16_t kToolOptListen = 'l';
-constexpr uint16_t kToolOptUDPIP  = 'u';
-constexpr uint16_t kToolOptNodeId = 'n';
+constexpr uint16_t kToolOptListen  = 'l';
+constexpr uint16_t kToolOptUDPIP   = 'u';
+constexpr uint16_t kToolOptNodeId  = 'n';
+constexpr uint16_t kToolOptMessage = 'm';
 
 OptionDef sToolOptionDefs[] = { //
     { "listen", kNoArgument, kToolOptListen },
     { "udp", kNoArgument, kToolOptUDPIP },
     { "node", kArgumentRequired, kToolOptNodeId },
+    { "message", kArgumentRequired, kToolOptMessage },
     {}
 };
 
 constexpr const char * sToolOptionHelp = //
     "  -l, --listen\n         Act as a server (i.e., listen) for packets rather than send them.\n\n"
     "  -u, --udp\n         Use UDP over IP.\n\n"
-    "  -n, --node <Id>\n           Use UDP over IP.\n\n";
+    "  -n, --node <Id>\n           Use UDP over IP.\n\n"
+    "  -m, --message <Id>\n           Message to send over the wire.\n\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
 
 struct
 {
-    bool Listen    = false;
-    bool Udp       = false;
-    int64_t NodeId = 1;
+    bool Listen         = false;
+    bool Udp            = false;
+    int64_t NodeId      = 1;
+    std::string Message = "This is a message";
 } ProgramArguments;
 
 OptionSet sToolOptions = { //
@@ -73,6 +78,9 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     case kToolOptNodeId:
         ProgramArguments.NodeId = atoll(aValue);
+        break;
+    case kToolOptMessage:
+        ProgramArguments.Message = aValue;
         break;
     default:
         return false;
@@ -105,14 +113,13 @@ void RegisterStopHandler()
     signal(SIGINT, StopHandler);
 }
 
-void SendClientRequest(ChipExchangeManager * exchangeMgr)
+void SendClientRequest(ChipExchangeManager * exchangeMgr, const std::string & data)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    chip::ExchangeContext * exchangeContext = NULL;
 
     Binding * binding = exchangeMgr->NewBinding();
     VerifyOrExit(binding != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-    std::cout << "Binding allocated" << std::endl;
 
     {
 
@@ -137,7 +144,18 @@ void SendClientRequest(ChipExchangeManager * exchangeMgr)
         SuccessOrExit(err);
     }
 
-    std::cout << "Binding configured" << std::endl;
+    err = binding->NewExchangeContext(exchangeContext);
+    SuccessOrExit(err);
+
+    {
+        PacketBuffer * packet = PacketBuffer::NewWithAvailableSize(data.size());
+        VerifyOrExit(packet != NULL, err = CHIP_ERROR_NO_MEMORY);
+
+        memcpy(packet->Start(), data.data(), data.size());
+        err = exchangeContext->SendMessage(100 /* profileId */, 200 /* msgType */, packet);
+    }
+
+    std::cout << "Message has been sent." << std::endl;
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -196,7 +214,7 @@ int main(int argc, char * argv[])
     else
     {
         std::cout << "Acting as a CLIENT ..." << std::endl;
-        SendClientRequest(&exchangeMgr);
+        SendClientRequest(&exchangeMgr, ProgramArguments.Message);
     }
 
     RegisterStopHandler();
