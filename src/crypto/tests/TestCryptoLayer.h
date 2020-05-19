@@ -29,7 +29,6 @@
 extern "C" {
 #endif
 
-int TestCHIPCrypto(void);
 int TestCHIPCryptoPAL(void);
 
 #ifdef __cplusplus
