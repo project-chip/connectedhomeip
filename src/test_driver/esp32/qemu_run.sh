@@ -22,7 +22,7 @@
 
 [[ $# -eq 1 ]] || {
     echo "Usage: $0 <UnitTestLibrary>"
-    echo "  e.g. $0 \"-lChipCryptoTests\""
+    echo "  e.g. $0 \"-lCryptoLayerTests\""
     exit 1
 }
 
