@@ -112,14 +112,44 @@ void RegisterStopHandler()
     signal(SIGSTOP, StopHandler);
     signal(SIGINT, StopHandler);
 }
-
-void SendClientRequest(ChipExchangeManager * exchangeMgr, const std::string & data)
+void HandleBindingEvent(void * appState, chip::Binding::EventType event, const chip::Binding::InEventParam & in,
+                        chip::Binding::OutEventParam & out)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
+
+    if (event != chip::Binding::EventType::kEvent_BindingReady)
+    {
+        return;
+    }
+    CHIP_ERROR err;
     chip::ExchangeContext * exchangeContext = NULL;
+
+    err = in.Source->NewExchangeContext(exchangeContext);
+    SuccessOrExit(err);
+
+    {
+        PacketBuffer * packet = PacketBuffer::NewWithAvailableSize(ProgramArguments.Message.size());
+        VerifyOrExit(packet != NULL, err = CHIP_ERROR_NO_MEMORY);
+
+        memcpy(packet->Start(), ProgramArguments.Message.data(), ProgramArguments.Message.size());
+        err = exchangeContext->SendMessage(100 /* profileId */, 200 /* msgType */, packet);
+    }
+
+    std::cout << "Message has been sent." << std::endl;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        std::cout << "Sent message error: " << ErrorStr(err) << std::endl;
+    }
+}
+
+void ConnectToServer(ChipExchangeManager * exchangeMgr)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     Binding * binding = exchangeMgr->NewBinding();
     VerifyOrExit(binding != NULL, err = CHIP_ERROR_NO_MEMORY);
+
+    binding->SetEventCallback(HandleBindingEvent);
 
     {
 
@@ -143,19 +173,6 @@ void SendClientRequest(ChipExchangeManager * exchangeMgr, const std::string & da
                   .PrepareBinding();
         SuccessOrExit(err);
     }
-
-    err = binding->NewExchangeContext(exchangeContext);
-    SuccessOrExit(err);
-
-    {
-        PacketBuffer * packet = PacketBuffer::NewWithAvailableSize(data.size());
-        VerifyOrExit(packet != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        memcpy(packet->Start(), data.data(), data.size());
-        err = exchangeContext->SendMessage(100 /* profileId */, 200 /* msgType */, packet);
-    }
-
-    std::cout << "Message has been sent." << std::endl;
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -214,7 +231,7 @@ int main(int argc, char * argv[])
     else
     {
         std::cout << "Acting as a CLIENT ..." << std::endl;
-        SendClientRequest(&exchangeMgr, ProgramArguments.Message);
+        ConnectToServer(&exchangeMgr);
     }
 
     RegisterStopHandler();

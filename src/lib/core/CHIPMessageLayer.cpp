@@ -1155,6 +1155,11 @@ CHIP_ERROR ChipMessageLayer::EncodeMessage(ChipMessageInfo * msgInfo, PacketBuff
 
     // Get the session state for the given destination node and encryption key.
     ChipSessionState sessionState;
+    err = FabricState->GetSessionState(msgInfo->SourceNodeId, con, sessionState);
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
 
     // Starting encoding at the appropriate point in the buffer before the payload data.
     uint8_t * p = payloadStart - headLen;
