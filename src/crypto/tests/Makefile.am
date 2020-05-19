@@ -85,12 +85,6 @@ check_PROGRAMS                                 = \
     TestCryptoPAL                                \
     $(NULL)
 
-if CHIP_CRYPTO_OPENSSL
-check_PROGRAMS                                += \
-    TestCrypto                                   \
-    $(NULL)
-endif
-
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
@@ -105,19 +99,9 @@ TESTS_ENVIRONMENT                              = \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
-
-TestCrypto_LDADD                               = \
-    $(COMMON_LDADD)                              \
-    $(NULL)
-
-
-TestCrypto_SOURCES                             = CHIPCryptoTest.c
-
-# OpenSSL based tests
 TestCryptoPAL_LDADD                            =        \
     $(COMMON_LDADD)                                     \
     $(NULL)
-
 
 TestCryptoPAL_SOURCES                          = CHIPCryptoPALTestDriver.cpp
 
