@@ -71,15 +71,15 @@ enum ChipProfileId
     kChipProfile_FabricProvisioning = (kChipVendor_Common << 16) | 0x0005, // Fabric Provisioning Profile
 };
 
-enum ChipCommonProfileMsssageTypes {
-    kCommonMsgType_StatusReport             = 1,
-    kCommonMsgType_Null                     = 2,
+enum ChipCommonProfileMsssageTypes
+{
+    kCommonMsgType_StatusReport = 1,
+    kCommonMsgType_Null         = 2,
 
-    //Reliable Messaging Protocol Message Types
-    kCommonMsgType_WRMP_Delayed_Delivery    = 3,
-    kCommonMsgType_WRMP_Throttle_Flow       = 4
+    // Reliable Messaging Protocol Message Types
+    kCommonMsgType_WRMP_Delayed_Delivery = 3,
+    kCommonMsgType_WRMP_Throttle_Flow    = 4
 };
-
 
 /**
  * @class ChipSessionState
@@ -190,7 +190,7 @@ public:
     void ClearFabricState(void);
     CHIP_ERROR GetFabricState(uint8_t * buf, uint32_t bufSize, uint32_t & fabricStateLen);
     CHIP_ERROR JoinExistingFabric(const uint8_t * fabricState, uint32_t fabricStateLen);
-    CHIP_ERROR GetSessionState(uint64_t remoteNodeId, ChipConnection *con, ChipSessionState& outSessionState);
+    CHIP_ERROR GetSessionState(uint64_t remoteNodeId, ChipConnection * con, ChipSessionState & outSessionState);
 
     /**
      * This method sets the delegate object.

@@ -202,10 +202,10 @@ struct ChipMessageInfo
 class ChipConnectionContext
 {
 public:
-    virtual ~ChipConnectionContext(){}
+    virtual ~ChipConnectionContext() {}
 
     virtual chip::Inet::InetLayer * InetLayer() = 0;
-    virtual ChipMessageLayer * MessageLayer() = 0;
+    virtual ChipMessageLayer * MessageLayer()   = 0;
 
     virtual uint64_t LocalNodeId() = 0;
 
@@ -225,7 +225,7 @@ public:
     virtual void HandleOnReceiveError(ChipConnection * con, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo) = 0;
 
 #if CONFIG_NETWORK_LAYER_BLE
-    virtual chip::Ble::BleLayer * BleLayer()    = 0;
+    virtual chip::Ble::BleLayer * BleLayer() = 0;
 #endif
 };
 
@@ -240,6 +240,7 @@ public:
 class ChipConnection
 {
     friend class ChipMessageLayer;
+
 public:
     /**
      *  @enum State
@@ -392,8 +393,7 @@ public:
     bool IsIncoming(void) const { return GetFlag(mFlags, kFlag_IsIncoming); }
     void SetIncoming(bool val) { SetFlag(mFlags, kFlag_IsIncoming, val); }
 
-
-    ChipMessageLayer* GetMessageLayer() { return Context->MessageLayer(); }
+    ChipMessageLayer * GetMessageLayer() { return Context->MessageLayer(); }
 
 private:
     enum
