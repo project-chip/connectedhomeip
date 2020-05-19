@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+here=$(cd "${0%/*}" && pwd)
 me=${0##*/}
 
 die() {
     echo "$me: *** ERROR: $*"
     exit 1
 }
+
+export > ${TEMP_DIR}/env.sh
 
 set -ex
 
@@ -15,8 +18,10 @@ else
     target=$ARCHS-apple-darwin
 fi
 
-# TODO: set in the xcode project?
-CHIP_ROOT=$(cd "$SRCROOT/../../.." && pwd)
+# these should be set by the Xcode project
+CHIP_ROOT=${CHIP_ROOT:-"$SRCROOT/../../.."}
+CHIP_ROOT=$(cd "$CHIP_ROOT" && pwd)
+CHIP_PREFIX=${CHIP_PREFIX:-"$BUILT_PRODUCTS_DIR"}
 
 [[ -d ${CHIP_ROOT} ]] || die Please set CHIP_ROOT to the location of the CHIP directory
 
@@ -42,18 +47,16 @@ configure_OPTIONS+=(
     LDFLAGS="$ARCH_FLAGS"
 )
 
-configure_OPTIONS+=(--prefix="$BUILT_PRODUCTS_DIR")
+[[ ${PLATFORM_NAME} == iphoneos ]] && {
+  configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios --with-logging-style=external)
+}
 
-[[ ${PLATFORM_NAME} == iphoneos ]] && configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios)
+[[ ${PLATFORM_NAME} == macosx ]] && configure_OPTIONS+=(--with-chip-project-includes=no)
 
 configure_OPTIONS+=(
+    --prefix="$CHIP_PREFIX"
     --target="$target"
     --host="$target"
-    lt_cv_ld_exported_symbols_list=yes
-    ac_cv_func_clock_gettime=no
-    ac_cv_have_decl_clock_gettime=no
-    --with-logging-style=external
-    --enable-cocoa
     --disable-docs
     --disable-java
     --disable-python
@@ -65,14 +68,12 @@ configure_OPTIONS+=(
     --with-chip-ble-project-includes=no
     --with-chip-warm-project-includes=no
     --with-chip-device-project-includes=no
-    CROSS_TOP="$PLATFORM_DIR"
-    CROSS_SDK="iPhoneOS$SDK_VERSION.sdk"
 )
 
 (
     cd "$TEMP_DIR"
 
-    if [[ ! -x config.status ]]; then
+    if [[ ! -x config.status || ${here}/${me} -nt config.status ]]; then
         "$CHIP_ROOT"/bootstrap-configure -C "${configure_OPTIONS[@]}"
     else
         for makefile_am in "$(find "$CHIP_ROOT" -name Makefile.am)"; do
@@ -83,5 +84,5 @@ configure_OPTIONS+=(
         done
     fi
 
-    make install
+    make V=1 install
 )

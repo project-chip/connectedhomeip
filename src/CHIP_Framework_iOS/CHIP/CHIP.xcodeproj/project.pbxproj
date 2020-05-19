@@ -3,13 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		B20252972459E34F00F97062 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B202528D2459E34F00F97062 /* CHIP.framework */; };
-		B20252DC2459EA5F00F97062 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B20252DA2459EA5F00F97062 /* libCHIP.a */; platformFilter = ios; };
-		B20252DD2459EA5F00F97062 /* libSetupPayload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B20252DB2459EA5F00F97062 /* libSetupPayload.a */; platformFilter = ios; };
 		B2E0D7B1245B0B5C003C5B48 /* CHIP.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A8245B0B5C003C5B48 /* CHIP.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B2245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */; };
@@ -20,6 +18,8 @@
 		B2E0D7B8245B0B5C003C5B48 /* CHIPSetupPayload.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AF245B0B5C003C5B48 /* CHIPSetupPayload.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B9245B0B5C003C5B48 /* CHIPSetupPayload.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7B0245B0B5C003C5B48 /* CHIPSetupPayload.mm */; };
 		B2F53AF2245B0DCF0010745E /* CHIPSetupPayloadParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */; };
+		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
+		BA09EB44247477BC00605257 /* libSetupPayload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB402474762900605257 /* libSetupPayload.a */; };
 		BA107AEF2470CFBB004287EB /* chip_xcode_build_connector.sh in Resources */ = {isa = PBXBuildFile; fileRef = BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */; };
 /* End PBXBuildFile section */
 
@@ -38,8 +38,6 @@
 		B20252912459E34F00F97062 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B20252962459E34F00F97062 /* CHIPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B202529D2459E34F00F97062 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B20252DA2459EA5F00F97062 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		B20252DB2459EA5F00F97062 /* libSetupPayload.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSetupPayload.a; path = lib/libSetupPayload.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2E0D7A8245B0B5C003C5B48 /* CHIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIP.h; sourceTree = "<group>"; };
 		B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPManualSetupPayloadParser.h; sourceTree = "<group>"; };
 		B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPError.mm; sourceTree = "<group>"; };
@@ -50,6 +48,8 @@
 		B2E0D7AF245B0B5C003C5B48 /* CHIPSetupPayload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPSetupPayload.h; sourceTree = "<group>"; };
 		B2E0D7B0245B0B5C003C5B48 /* CHIPSetupPayload.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPSetupPayload.mm; sourceTree = "<group>"; };
 		B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPSetupPayloadParserTests.m; sourceTree = "<group>"; };
+		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA09EB402474762900605257 /* libSetupPayload.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSetupPayload.a; path = lib/libSetupPayload.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -58,8 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B20252DC2459EA5F00F97062 /* libCHIP.a in Frameworks */,
-				B20252DD2459EA5F00F97062 /* libSetupPayload.a in Frameworks */,
+				BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */,
+				BA09EB44247477BC00605257 /* libSetupPayload.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,7 +81,7 @@
 				B202528F2459E34F00F97062 /* CHIP */,
 				B202529A2459E34F00F97062 /* CHIPTests */,
 				B202528E2459E34F00F97062 /* Products */,
-				B20252D92459EA5E00F97062 /* Frameworks */,
+				BA09EB3E2474762900605257 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -120,11 +120,11 @@
 			path = CHIPTests;
 			sourceTree = "<group>";
 		};
-		B20252D92459EA5E00F97062 /* Frameworks */ = {
+		BA09EB3E2474762900605257 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B20252DA2459EA5F00F97062 /* libCHIP.a */,
-				B20252DB2459EA5F00F97062 /* libSetupPayload.a */,
+				BA09EB3F2474762900605257 /* libCHIP.a */,
+				BA09EB402474762900605257 /* libSetupPayload.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -251,6 +251,8 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(CHIP_PREFIX)/lib/libCHIP.a",
+				"$(CHIP_PREFIX)/lib/libSetupPayload.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -398,6 +400,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -408,6 +411,8 @@
 		B20252A22459E34F00F97062 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CHIP_PREFIX = "$(BUILT_PRODUCTS_DIR)";
+				CHIP_ROOT = "$(SRCROOT)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -415,9 +420,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/include";
-				"HEADER_SEARCH_PATHS[sdk=iphoneos*]" = "$(SRCROOT)/../../../config/ios";
-				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(SRCROOT)/../../../config/ios";
+				HEADER_SEARCH_PATHS = "$(CHIP_PREFIX)/include";
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -425,7 +428,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/lib";
+				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -437,6 +440,8 @@
 		B20252A32459E34F00F97062 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CHIP_PREFIX = "$(BUILT_PRODUCTS_DIR)";
+				CHIP_ROOT = "$(SRCROOT)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -444,9 +449,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/include";
-				"HEADER_SEARCH_PATHS[sdk=iphoneos*]" = "$(SRCROOT)/../../../config/ios";
-				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(SRCROOT)/../../../config/ios";
+				HEADER_SEARCH_PATHS = "$(CHIP_PREFIX)/include";
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -454,7 +457,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/lib";
+				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
