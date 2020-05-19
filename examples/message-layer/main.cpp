@@ -215,7 +215,7 @@ int main(int argc, char * argv[])
     initContext.inet        = &inetLayer;
     initContext.fabricState = &fabricState;
     initContext.listenTCP   = ProgramArguments.Listen;
-    initContext.listenUDP   = ProgramArguments.Listen;
+    initContext.listenUDP   = ProgramArguments.Udp;
 
     err = messageLayer.Init(&initContext);
     SuccessOrExit(err);
@@ -233,6 +233,9 @@ int main(int argc, char * argv[])
         std::cout << "Acting as a CLIENT ..." << std::endl;
         ConnectToServer(&exchangeMgr);
     }
+
+    err = messageLayer.RefreshEndpoints();
+    SuccessOrExit(err);
 
     RegisterStopHandler();
     while (!programStopped)
