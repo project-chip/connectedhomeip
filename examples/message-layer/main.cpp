@@ -228,7 +228,7 @@ int main(int argc, char * argv[])
     initContext.inet        = controller.InetLayer();
     initContext.fabricState = &fabricState;
     initContext.listenTCP   = ProgramArguments.Listen;
-    initContext.listenUDP   = ProgramArguments.Udp;
+    initContext.listenUDP   = ProgramArguments.Listen || ProgramArguments.Udp;
 
     err = messageLayer.Init(&initContext);
     SuccessOrExit(err);
