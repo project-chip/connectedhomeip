@@ -20,6 +20,9 @@ configure
 src/include/BuildConfig.h.in
 src/include/BuildConfig.h.in~
 
+# GN build system
+out/
+
 # Repos stuff
 .repos-warning-stamp
 
