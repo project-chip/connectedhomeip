@@ -84,7 +84,7 @@ static CHIP_ERROR openTLVContainer(TLVReader & reader, TLVType type, uint64_t ta
     return err;
 }
 
-static CHIP_ERROR retrieveStringOptionalInfo(TLVReader reader, optionalQRCodeInfo & info)
+static CHIP_ERROR retrieveStringOptionalInfo(TLVReader reader, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint32_t valLength = reader.GetLength();
@@ -101,7 +101,7 @@ static CHIP_ERROR retrieveStringOptionalInfo(TLVReader reader, optionalQRCodeInf
     return err;
 }
 
-static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader reader, optionalQRCodeInfo & info)
+static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader reader, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int storedInteger;
@@ -116,7 +116,7 @@ static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader reader, optionalQRCodeIn
     return err;
 }
 
-static void populatePayloadTLVField(SetupPayload & outPayload, optionalQRCodeInfo info)
+static void populatePayloadTLVField(SetupPayload & outPayload, OptionalQRCodeInfo info)
 {
     if (info.tag == ContextTag(kSerialNumberTag))
     {
@@ -150,7 +150,7 @@ static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataSta
         while (err == CHIP_NO_ERROR)
         {
             TLVType type = innerStructureReader.GetType();
-            optionalQRCodeInfo info;
+            OptionalQRCodeInfo info;
             if (type != kTLVType_UTF8String && type != kTLVType_SignedInteger)
             {
                 err = innerStructureReader.Next();

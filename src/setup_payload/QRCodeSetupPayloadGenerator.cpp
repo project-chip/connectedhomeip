@@ -85,7 +85,7 @@ static void addCHIPInfoToOptionalData(SetupPayload & outPayload)
 {
     if (outPayload.serialNumber.length() > 0)
     {
-        optionalQRCodeInfo info;
+        OptionalQRCodeInfo info;
         info.type = optionalQRCodeInfoTypeString;
         info.tag  = ContextTag(kSerialNumberTag);
         info.data = outPayload.serialNumber;
@@ -93,10 +93,10 @@ static void addCHIPInfoToOptionalData(SetupPayload & outPayload)
     }
 }
 
-CHIP_ERROR writeOptionaData(TLVWriter & writer, vector<optionalQRCodeInfo> optionalData)
+CHIP_ERROR writeOptionaData(TLVWriter & writer, vector<OptionalQRCodeInfo> optionalData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    for (optionalQRCodeInfo info : optionalData)
+    for (OptionalQRCodeInfo info : optionalData)
     {
         if (info.type == optionalQRCodeInfoTypeString)
         {
@@ -115,7 +115,7 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     addCHIPInfoToOptionalData(outPayload);
-    vector<optionalQRCodeInfo> optionalData = outPayload.getAllOptionalData();
+    vector<OptionalQRCodeInfo> optionalData = outPayload.getAllOptionalData();
     if (optionalData.size() == 0)
     {
         return CHIP_NO_ERROR;

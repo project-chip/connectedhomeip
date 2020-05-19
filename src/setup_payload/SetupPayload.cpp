@@ -85,16 +85,16 @@ bool SetupPayload::isValidManualCode()
     return true;
 }
 
-CHIP_ERROR SetupPayload::addOptionalData(optionalQRCodeInfo info)
+CHIP_ERROR SetupPayload::addOptionalData(OptionalQRCodeInfo info)
 {
     optionalData[info.tag] = info;
     return CHIP_NO_ERROR;
 }
 
-vector<optionalQRCodeInfo> SetupPayload::getAllOptionalData()
+vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalData()
 {
-    vector<optionalQRCodeInfo> returnedOptionalInfo;
-    for (map<uint64_t, optionalQRCodeInfo>::iterator it = optionalData.begin(); it != optionalData.end(); ++it)
+    vector<OptionalQRCodeInfo> returnedOptionalInfo;
+    for (map<uint64_t, OptionalQRCodeInfo>::iterator it = optionalData.begin(); it != optionalData.end(); ++it)
     {
         returnedOptionalInfo.push_back(it->second);
     }

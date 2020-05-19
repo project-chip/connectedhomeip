@@ -79,7 +79,7 @@ enum optionalQRCodeInfoType
  *              the integer value of the optional info,
  *              otherwise should not be set.
  **/
-struct optionalQRCodeInfo
+struct OptionalQRCodeInfo
 {
     uint64_t tag;
     enum optionalQRCodeInfoType type;
@@ -91,7 +91,7 @@ struct optionalQRCodeInfo
  * @brief A function to retrieve a vendor tag
  * @param tagNumber Tag number is 7 bits long
  * @param outVendorTag A 64-bit integer representing the tag
- *                     to use in optionalQRCodeInfo
+ *                     to use in OptionalQRCodeInfo
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag);
@@ -99,7 +99,7 @@ CHIP_ERROR VendorTag(uint16_t tagNumber, uint64_t & outVendorTag);
 class SetupPayload
 {
 private:
-    map<uint64_t, optionalQRCodeInfo> optionalData;
+    map<uint64_t, OptionalQRCodeInfo> optionalData;
 
 public:
     uint8_t version;
@@ -112,16 +112,16 @@ public:
     string serialNumber = "";
 
     /**
-     * @brief A function to retrieve the vector of optionalQRCodeInfo infos
+     * @brief A function to retrieve the vector of OptionalQRCodeInfo infos
      * @return Returns a vector of optionalQRCodeInfos
      **/
-    vector<optionalQRCodeInfo> getAllOptionalData();
+    vector<OptionalQRCodeInfo> getAllOptionalData();
 
     /** @brief A function to add an optional QR Code info object
      * @param info Optional QR code info object to add
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addOptionalData(optionalQRCodeInfo info);
+    CHIP_ERROR addOptionalData(OptionalQRCodeInfo info);
 
     /** @brief A function to remove an optional QR Code info object
      * @param tag Optional QR code info tag number to remove

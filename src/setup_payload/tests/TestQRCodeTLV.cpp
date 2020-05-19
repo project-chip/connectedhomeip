@@ -44,10 +44,10 @@ void TestOptionalDataPayload(nlTestSuite * inSuite, void * inContext)
     payload.setUpPINCode          = 13;
     payload.serialNumber          = "123456789QWDHANTYUIOP";
 
-    vector<optionalQRCodeInfo> optionalData = payload.getAllOptionalData();
+    vector<OptionalQRCodeInfo> optionalData = payload.getAllOptionalData();
     NL_TEST_ASSERT(inSuite, optionalData.size() == 0);
 
-    optionalQRCodeInfo stringInfo;
+    OptionalQRCodeInfo stringInfo;
     uint64_t tag;
     CHIP_ERROR err = VendorTag(2, tag);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -56,7 +56,7 @@ void TestOptionalDataPayload(nlTestSuite * inSuite, void * inContext)
     stringInfo.data = "myData";
     payload.addOptionalData(stringInfo);
 
-    optionalQRCodeInfo intInfo;
+    OptionalQRCodeInfo intInfo;
     err = VendorTag(3, tag);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     intInfo.tag     = tag;
@@ -67,7 +67,7 @@ void TestOptionalDataPayload(nlTestSuite * inSuite, void * inContext)
     optionalData = payload.getAllOptionalData();
     NL_TEST_ASSERT(inSuite, optionalData.size() == 2);
 
-    for (optionalQRCodeInfo info : optionalData)
+    for (OptionalQRCodeInfo info : optionalData)
     {
         if (info.type == optionalQRCodeInfoTypeString)
         {
@@ -84,7 +84,7 @@ void TestOptionalDataPayload(nlTestSuite * inSuite, void * inContext)
     payload.removeOptionalData(stringInfo.tag);
     optionalData = payload.getAllOptionalData();
     NL_TEST_ASSERT(inSuite, optionalData.size() == 1);
-    optionalQRCodeInfo info = optionalData.front();
+    OptionalQRCodeInfo info = optionalData.front();
     NL_TEST_ASSERT(inSuite, intInfo.integer == info.integer);
     NL_TEST_ASSERT(inSuite, intInfo.tag == info.tag);
 }
@@ -101,7 +101,7 @@ void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
     payload.setUpPINCode          = 1;
     payload.serialNumber          = "123456789QWERTYUIOP";
 
-    optionalQRCodeInfo stringInfo;
+    OptionalQRCodeInfo stringInfo;
     stringInfo.type = optionalQRCodeInfoTypeString;
     stringInfo.data = "info1";
     uint64_t tag;
@@ -110,7 +110,7 @@ void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
     stringInfo.tag = tag;
     payload.addOptionalData(stringInfo);
 
-    optionalQRCodeInfo intInfo;
+    OptionalQRCodeInfo intInfo;
     intInfo.type    = optionalQRCodeInfoTypeInt;
     intInfo.integer = 9;
     err             = VendorTag(4, tag);
@@ -127,11 +127,11 @@ void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
 
     SetupPayload outPayload;
     err                                     = parser.populatePayload(outPayload);
-    vector<optionalQRCodeInfo> optionalData = outPayload.getAllOptionalData();
+    vector<OptionalQRCodeInfo> optionalData = outPayload.getAllOptionalData();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, optionalData.size() == 2);
     NL_TEST_ASSERT(inSuite, payload.serialNumber.compare(outPayload.serialNumber) == 0);
-    for (optionalQRCodeInfo info : optionalData)
+    for (OptionalQRCodeInfo info : optionalData)
     {
         if (info.type == optionalQRCodeInfoTypeString)
         {
