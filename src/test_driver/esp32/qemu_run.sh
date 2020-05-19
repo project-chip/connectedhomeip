@@ -27,8 +27,7 @@
 }
 
 here=$(cd "$(dirname "$0")" && pwd)
-chip_dir="$here/../../.."
-test_dir="$chip_dir"/src/test_driver/esp32
+chip_dir="$here/third_party/connectedhomeip"
 
 set -e
 
