@@ -25,19 +25,15 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 #
-# Build Configuration
+# Any build configuration *supplied by CHIP* is shipped
 #
+CHIP_CONFIG_INCLUDES=$(subst $(abspath $(abs_top_srcdir)),$(top_srcdir),$(filter $(abspath $(top_srcdir)/config/%),$(abspath $(CHIP_PROJECT_CONFIG_INCLUDES))))
 
+#
+# headers to install
 include_HEADERS                            = \
+    $(CHIP_CONFIG_INCLUDES)                  \
     BuildConfig.h                            \
-    $(NULL)
-
-#
-# This project neither owns nor controls BuildConfig.h, so do not
-# attempt to enforce coding style on it.
-#
-PRETTY_FILES                               = \
-    $(filter-out BuildConfig.h,$(HEADERS))   \
     $(NULL)
 
 # Auto-generation targets to force the creation and subsequent check
