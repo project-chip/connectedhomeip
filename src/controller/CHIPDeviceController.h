@@ -101,6 +101,9 @@ public:
      */
     void ServiceEvents();
 
+    System::Layer * SystemLayer() { return mSystemLayer; }
+    Inet::InetLayer * InetLayer() { return mInetLayer; }
+
 private:
     enum
     {

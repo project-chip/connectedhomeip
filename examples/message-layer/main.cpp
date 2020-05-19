@@ -14,11 +14,15 @@
 #include <support/CHIPArgParser.hpp>
 #include <support/CodeUtils.h>
 #include <system/SystemLayer.h>
+#include <controller/CHIPDeviceController.h>
 
 namespace {
 
 using namespace chip;
 using namespace chip::ArgParser;
+
+constexpr uint32_t kProfileId  = 100;
+constexpr uint8_t kMessageType = 123;
 
 #define kToolName "message-layer-demo"
 
@@ -120,6 +124,8 @@ void HandleBindingEvent(void * appState, chip::Binding::EventType event, const c
     {
         return;
     }
+    std::cout << "Binding ready. Can sent message." << std::endl;
+
     CHIP_ERROR err;
     chip::ExchangeContext * exchangeContext = NULL;
 
@@ -130,8 +136,9 @@ void HandleBindingEvent(void * appState, chip::Binding::EventType event, const c
         PacketBuffer * packet = PacketBuffer::NewWithAvailableSize(ProgramArguments.Message.size());
         VerifyOrExit(packet != NULL, err = CHIP_ERROR_NO_MEMORY);
 
+        packet->SetDataLength(ProgramArguments.Message.size());
         memcpy(packet->Start(), ProgramArguments.Message.data(), ProgramArguments.Message.size());
-        err = exchangeContext->SendMessage(100 /* profileId */, 200 /* msgType */, packet);
+        err = exchangeContext->SendMessage(kProfileId, kMessageType, packet);
     }
 
     std::cout << "Message has been sent." << std::endl;
@@ -181,6 +188,16 @@ exit:
     }
 }
 
+void ReceiveMessageHandler(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo, uint32_t profileId,
+                           uint8_t msgType, PacketBuffer * payload)
+{
+    std::cout << "Received a message type " << static_cast<int>(msgType) << std::endl;
+
+    std::string data(reinterpret_cast<const char *>(payload->Start()), payload->DataLength());
+
+    std::cout << "Payload of size " << payload->DataLength() << ": '" << data << "'" << std::endl;
+}
+
 } // namespace
 
 int main(int argc, char * argv[])
@@ -197,22 +214,18 @@ int main(int argc, char * argv[])
     ChipExchangeManager exchangeMgr;
     ChipMessageLayer messageLayer;
     ChipFabricState fabricState;
-    System::Layer systemLayer;
-    Inet::InetLayer inetLayer;
+    chip::DeviceController::ChipDeviceController controller;
 
     ChipMessageLayer::InitContext initContext;
-
-    err = systemLayer.Init(NULL);
-    SuccessOrExit(err);
-
-    err = inetLayer.Init(systemLayer, NULL);
-    SuccessOrExit(err);
 
     err = fabricState.Init();
     SuccessOrExit(err);
 
-    initContext.systemLayer = &systemLayer;
-    initContext.inet        = &inetLayer;
+    err = controller.Init();
+    SuccessOrExit(err);
+
+    initContext.systemLayer = controller.SystemLayer();
+    initContext.inet        = controller.InetLayer();
     initContext.fabricState = &fabricState;
     initContext.listenTCP   = ProgramArguments.Listen;
     initContext.listenUDP   = ProgramArguments.Udp;
@@ -221,6 +234,9 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     err = exchangeMgr.Init(&messageLayer);
+    SuccessOrExit(err);
+
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(kProfileId, ReceiveMessageHandler, nullptr);
     SuccessOrExit(err);
 
     if (ProgramArguments.Listen)
@@ -241,12 +257,12 @@ int main(int argc, char * argv[])
     while (!programStopped)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        controller.ServiceEvents();
     }
 
     // TODO(Andrei): RAII would be nice here
     exchangeMgr.Shutdown();
-    inetLayer.Shutdown();
-    systemLayer.Shutdown();
+    controller.Shutdown();
 
 exit:
     if (err != CHIP_NO_ERROR)
