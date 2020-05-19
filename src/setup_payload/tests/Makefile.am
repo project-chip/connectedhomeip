@@ -61,15 +61,19 @@ AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
     -I$(top_srcdir)/src/lib                             \
     -I$(top_srcdir)/src/lib/core                        \
+    -I$(top_srcdir)/src/system                          \
     -I$(top_srcdir)/src/setup_payload                   \
     $(LWIP_CPPFLAGS)                                    \
-    $(NULL)
-
-COMMON_LDADD                                          = \
-    libSetupPayloadTests.a                              \
     $(NLASSERT_CPPFLAGS)                                \
     $(NLIO_CPPFLAGS)                                    \
     $(NLUNIT_TEST_CPPFLAGS)                             \
+    $(SOCKETS_CPPFLAGS)                                 \
+    $(PTHREAD_CFLAGS)                                   \
+    $(NULL)
+    $(NULL)
+
+COMMON_LDADD                                           = \
+    libSetupPayloadTests.a                               \
     $(COMMON_LDFLAGS)                                    \
     $(CHIP_LDADD)                                        \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)           \

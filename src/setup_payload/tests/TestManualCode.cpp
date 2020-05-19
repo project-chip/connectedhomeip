@@ -452,7 +452,7 @@ struct TestContext
 /**
  *  Main
  */
-int main(int argc, char * argv[])
+int TestManualSetupCode(void)
 {
     // clang-format off
     nlTestSuite theSuite =
