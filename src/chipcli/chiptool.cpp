@@ -21,7 +21,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "chipqrcodetool_command_manager.h"
+#include "chiptool_command_manager.h"
 
 static int match_command(const char * command_name, const char * name)
 {
@@ -30,12 +30,13 @@ static int match_command(const char * command_name, const char * name)
 
 static int help(int argc, char ** argv)
 {
-    chipqrcodetool_command_t * cmd = NULL;
+    chiptool_command_t * cmd = NULL;
     for (cmd = commands; cmd->c_name != NULL; cmd++)
     {
         ChipLogDetail(chipTool, "%s\t%s\n", cmd->c_name, cmd->c_help);
     }
 }
+
 
 static int usage(const char * prog_name)
 {
@@ -53,8 +54,8 @@ static int execute_command(int argc, char ** argv)
     {
         return -1;
     }
-    const chipqrcodetool_command_t * command_to_execute = NULL;
-    bool found                                          = false;
+    const chiptool_command_t * command_to_execute = NULL;
+    bool found                                    = false;
 
     for (command_to_execute = commands; command_to_execute->c_name; command_to_execute++)
     {
@@ -66,11 +67,11 @@ static int execute_command(int argc, char ** argv)
     }
 
     if (found)
-    {
+    {   
         ChipLogDetail(chipTool, "Executing cmd %s\n", command_to_execute->c_name);
         return command_to_execute->c_func(argc, argv);
     }
-    else
+    else 
     {
         help(0, NULL);
     }
@@ -87,7 +88,7 @@ int main(int argc, char ** argv)
     prog_name        = prog_name ? prog_name + 1 : argv[0];
     /* Do getopt stuff for global options. */
     optind   = 1;
-    optreset = 1;
+    
     while ((ch = getopt(argc, argv, "h")) != -1)
     {
         switch (ch)

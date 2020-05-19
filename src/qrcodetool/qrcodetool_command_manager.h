@@ -15,22 +15,22 @@
  *    limitations under the License.
  */
 
-#ifndef CHIPTOOL_CMD_MANAGER_H
-#define CHIPTOOL_CMD_MANAGER_H
+#ifndef QRCODETOOL_CMD_MANAGER_H
+#define QRCODETOOL_CMD_MANAGER_H
 
 #include "setup_payload_commands.h"
 
 typedef int (*command_func)(int argc, char * const * argv);
 
-typedef struct chipqrcodetool_command_t
+typedef struct qrcodetool_command_t
 {
     const char * c_name;  /* name of the command. */
     command_func c_func;  /* function to execute the command. */
     const char * c_usage; /* usage string for command. */
     const char * c_help;  /* help string for (or description of) command. */
-} chipqrcodetool_command_t;
+} qrcodetool_command_t;
 
-chipqrcodetool_command_t commands[] = { { "generate-qr-code", setup_payload_operation_generate_qr_code,
+qrcodetool_command_t commands[] = { { "generate-qr-code", setup_payload_operation_generate_qr_code,
                                           "    -f File path of payload.\n", "Generate qr code from payload in text file." },
 
                                         { "generate-manual-code", setup_payload_operation_generate_manual_code,

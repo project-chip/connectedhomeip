@@ -23,7 +23,6 @@
 #ifndef SetupPayloadHelper_h
 #define SetupPayloadHelper_h
 
-#include <stdio.h>
 #include <string>
 #include <core/CHIPError.h>
 
