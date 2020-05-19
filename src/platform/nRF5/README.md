@@ -1,11 +1,11 @@
 # Overview of CHIP nRF52840 Adaption
 
-The following is a quick overview of the nRF5 adaptation of CHIP. Most of this
+The following is an overview of the nRF5 adaptation of CHIP. Most of this
 code will have parallels in any new adaptation.
 
-(All file names are relative to `connectedhomeip/src/...`).
+(All file names are relative to `connectedhomeip/src/platform/nRF5...`).
 
-`include/platform/nRF5/PlatformManagerImpl.h`<br>`nRF5/PlatformManagerImpl.cpp`
+`PlatformManagerImpl.h`<br>`PlatformManagerImpl.cpp`
 
 -   Concrete implementation of PlatformManager interface
 -   Provides initialization of the CHIP stack and core event loop for the chip
@@ -13,7 +13,7 @@ code will have parallels in any new adaptation.
 -   Relies on GenericPlatformManagerImpl_FreeRTOS<> class to provide most of the
     implementation
 
-`include/platform/nRF5/ConfigurationManagerImpl.h`<br>`nRF5/ConfigurationManagerImpl.cpp`
+`ConfigurationManagerImpl.h`<br>`ConfigurationManagerImpl.cpp`
 
 -   Concrete implementation of ConfigurationManager interface
 -   Manages storage and retrieval of persistent configuration data
@@ -22,38 +22,37 @@ code will have parallels in any new adaptation.
 -   Delegates low-level reading and writing of persistent values to NRF5Config
     class
 
-`include/platform/nRF5/ConnectivityManagerImpl.h`<br>`nRF5/ConnectivityManagerImpl.cpp`
+`ConnectivityManagerImpl.h`<br>`ConnectivityManagerImpl.cpp`
 
 -   Concrete implementation of ConnectivityManager interface
 -   Provides high-level APIs for managing device connectivity
--   Relies on various generic implementation classes to provide API
-    functionality
--   Very much a work-in-progress in the nrf52840 branch
+-   Relies on GenericConnectivityManagerImpl_Thread<> class to provide most of
+    the implementation
 
-`include/platform/nRF5/ThreadStackManagerImpl.h`<br>`nRF5/ThreadStackManagerImpl.cpp`
+`ThreadStackManagerImpl.h`<br>`ThreadStackManagerImpl.cpp`
 
 -   Concrete implementation of ThreadStackManager interface
 -   Supports Thread stack initialization and core event loop processing
 -   Relies on GenericThreadStackManagerImpl_OpenThread/FreeRTOS/LwIP<> classes
     to implement most API functionaltiy
--   Work-in-progress [2019/04/01]
 
-`include/platform/nRF5/BLEManagerImpl.h`<br>`nRF5/BLEManagerImpl.cpp`
+`BLEManagerImpl.h`<br>`BLEManagerImpl.cpp`
 
 -   Concrete implementation of the BLEManager interface
 -   Maps CHIP's BLE interface abstractions (BleLayer, BlePlatformDelegate,
     BleApplicationDelegate) onto the platform's native BLE services
--   Implements chip-compatible BLE advertising.
+-   Implements CHIP-compatible BLE advertising and GATT service using the
+    Softdevice BLE stack
 
-`platform/nRF5/Entropy.cpp`
+`Entropy.cpp`
 
 -   Implements interface to platform entropy source
 
-`platform/nRF5/Logging.cpp`
+`Logging.cpp`
 
--   Adaption of chip debug logging to platform logging facility.
+-   Adaption of chip debug logging to platform logging facility
 
-`platform/nRF5/NRF5Config.cpp`
+`NRF5Config.cpp`
 
 -   Implements low-level read/write of persistent configuration values
 -   Class API specifically designed to work in conjunction with the
