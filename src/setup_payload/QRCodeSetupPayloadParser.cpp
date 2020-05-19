@@ -35,6 +35,7 @@
 #include <core/CHIPTLVUtilities.hpp>
 #include <core/CHIPTLVData.hpp>
 #include <support/RandUtils.h>
+#include <support/CodeUtils.h>
 
 using namespace chip;
 using namespace std;
@@ -68,19 +69,15 @@ static CHIP_ERROR readBits(vector<uint8_t> buf, int & index, uint64_t & dest, si
 static CHIP_ERROR openTLVContainer(TLVReader & reader, TLVType type, uint64_t tag, TLVReader & containerReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (reader.GetType() != type || reader.GetTag() != tag || reader.GetLength() != 0)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    VerifyOrExit(reader.GetType() == type, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(reader.GetTag() == tag, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(reader.GetLength() == 0, err = CHIP_ERROR_INVALID_ARGUMENT);
+
     err = reader.OpenContainer(containerReader);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-    if (containerReader.GetContainerType() != type)
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    SuccessOrExit(err);
+
+    VerifyOrExit(containerReader.GetContainerType() == type, err = CHIP_ERROR_INVALID_ARGUMENT);
+exit:
     return err;
 }
 
@@ -135,17 +132,11 @@ static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataSta
     rootReader.Init(tlvDataStart, tlvDataLengthInBytes);
     rootReader.ImplicitProfileId = outPayload.productID;
     err                          = rootReader.Next();
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
+    SuccessOrExit(err);
     {
         TLVReader innerStructureReader;
         err = openTLVContainer(rootReader, kTLVType_Structure, ProfileTag(2, 1), innerStructureReader);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        SuccessOrExit(err);
         err = innerStructureReader.Next();
         while (err == CHIP_NO_ERROR)
         {
@@ -164,10 +155,7 @@ static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataSta
             {
                 err = retrieveIntegerOptionalInfo(innerStructureReader, info);
             }
-            if (err != CHIP_NO_ERROR)
-            {
-                return err;
-            }
+            SuccessOrExit(err);
             populatePayloadTLVField(outPayload, info);
             err = innerStructureReader.Next();
         }
@@ -176,7 +164,7 @@ static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataSta
     {
         err = CHIP_NO_ERROR;
     }
-
+exit:
     return err;
 }
 
@@ -243,84 +231,50 @@ static string extractPayload(string inString)
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
     vector<uint8_t> buf = vector<uint8_t>();
-    CHIP_ERROR result   = CHIP_NO_ERROR;
-
-    string payload = extractPayload(mBase41Representation);
-    if (payload.length() == 0)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    result = base41Decode(payload, buf);
-
-    if (CHIP_NO_ERROR != result)
-    {
-        return result;
-    }
-
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     int indexToReadFrom = 0;
     uint64_t dest;
 
-    result = readBits(buf, indexToReadFrom, dest, kVersionFieldLengthInBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    string payload = extractPayload(mBase41Representation);
+    VerifyOrExit(payload.length() != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err = base41Decode(payload, buf);
+    SuccessOrExit(err);
+
+    err = readBits(buf, indexToReadFrom, dest, kVersionFieldLengthInBits);
+    SuccessOrExit(err);
     outPayload.version = dest;
 
-    result = readBits(buf, indexToReadFrom, dest, kVendorIDFieldLengthInBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    err = readBits(buf, indexToReadFrom, dest, kVendorIDFieldLengthInBits);
+    SuccessOrExit(err);
     outPayload.vendorID = dest;
 
-    result = readBits(buf, indexToReadFrom, dest, kProductIDFieldLengthInBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    err = readBits(buf, indexToReadFrom, dest, kProductIDFieldLengthInBits);
+    SuccessOrExit(err);
     outPayload.productID = dest;
 
-    result = readBits(buf, indexToReadFrom, dest, kCustomFlowRequiredFieldLengthInBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    err = readBits(buf, indexToReadFrom, dest, kCustomFlowRequiredFieldLengthInBits);
+    SuccessOrExit(err);
     outPayload.requiresCustomFlow = dest;
 
-    result = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
+    SuccessOrExit(err);
     outPayload.rendezvousInformation = dest;
 
-    result = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    err = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
+    SuccessOrExit(err);
     outPayload.discriminator = dest;
 
-    result = readBits(buf, indexToReadFrom, dest, kSetupPINCodeFieldLengthInBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    err = readBits(buf, indexToReadFrom, dest, kSetupPINCodeFieldLengthInBits);
+    SuccessOrExit(err);
     outPayload.setUpPINCode = dest;
 
-    result = readBits(buf, indexToReadFrom, dest, kReservedFieldLengthInBits);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    err = readBits(buf, indexToReadFrom, dest, kReservedFieldLengthInBits);
+    SuccessOrExit(err);
 
-    result = populateTLV(outPayload, buf, indexToReadFrom);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
-    }
+    err = populateTLV(outPayload, buf, indexToReadFrom);
+    SuccessOrExit(err);
 
-    return result;
+exit:
+    return err;
 }
