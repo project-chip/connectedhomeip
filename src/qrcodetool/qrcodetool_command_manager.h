@@ -31,13 +31,13 @@ typedef struct qrcodetool_command_t
 } qrcodetool_command_t;
 
 qrcodetool_command_t commands[] = { { "generate-qr-code", setup_payload_operation_generate_qr_code,
-                                          "    -f File path of payload.\n", "Generate qr code from payload in text file." },
+                                      "    -f File path of payload.\n", "Generate qr code from payload in text file." },
 
-                                        { "generate-manual-code", setup_payload_operation_generate_manual_code,
-                                          "[-f file-path]\n"
-                                          "    -f File path of payload.\n",
-                                          "Generate manual code from payload in text file." },
-                                        // Last one
-                                        {} };
+                                    { "generate-manual-code", setup_payload_operation_generate_manual_code,
+                                      "[-f file-path]\n"
+                                      "    -f File path of payload.\n",
+                                      "Generate manual code from payload in text file." },
+                                    // Last one
+                                    {} };
 
 #endif
