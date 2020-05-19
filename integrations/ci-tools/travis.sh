@@ -62,6 +62,10 @@ case "$TASK" in
         docker_run_command 'scripts/examples/esp_echo_app.sh'
         ;;
 
+    build-standalone-example-echo-client)
+        docker_run_command 'scripts/examples/standalone_echo_example.sh'
+        ;;
+
     build-distribution-check)
         docker_run_command 'scripts/build/bootstrap.sh'
         docker_run_command 'scripts/build/distribution_check.sh'

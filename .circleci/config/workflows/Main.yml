@@ -53,3 +53,14 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
+    - examples_standalone:
+          name: Build Examples [<< matrix.builder >>]
+          matrix:
+              parameters:
+                  builder: ["docker-build"]
+          requires:
+              - Build CHIP [<< matrix.builder >>]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
