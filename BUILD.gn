@@ -17,6 +17,7 @@ import("build/tests.gni")
 group("all") {
   deps = [
     "src/lwip:all",
+    "third_party/mbedtls",
     "third_party/nlassert",
     "third_party/nlfaultinjection",
     "third_party/nlio",
