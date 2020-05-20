@@ -1403,7 +1403,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    A mismatch in schema was encountered.
  *
  */
-#define CHIP_ERROR_SCHEMA_MISMATCH                         _CHIP_ERROR(144)
+#define CHIP_ERROR_SCHEMA_MISMATCH                            _CHIP_ERROR(144)
 
 /**
  *  @def CHIP_ERROR_INVALID_INTEGER_VALUE
