@@ -111,7 +111,7 @@ public:
 
     /**
      * @brief
-     *   Get pointers to the Layers ownerd by the conttoller
+     *   Get pointers to the Layers ownerd by the controller
      *
      * @param systemLayer[out]   A pointer to the SystemLayer object
      * @param inetLayer[out]     A pointer to the InetLayer object
