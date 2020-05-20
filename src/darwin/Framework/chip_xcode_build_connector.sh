@@ -55,7 +55,7 @@ configure_OPTIONS+=(
 )
 
 [[ ${PLATFORM_FAMILY_NAME} == iOS ]] && {
-    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios --with-logging-style=external)
+    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios)
 }
 
 [[ ${PLATFORM_FAMILY_NAME} == macOS ]] && configure_OPTIONS+=(--with-chip-project-includes=no)
@@ -70,6 +70,7 @@ configure_OPTIONS+=(
     --disable-shared
     --disable-tests
     --disable-tools
+    --with-logging-style=external
     --with-chip-system-project-includes=no
     --with-chip-inet-project-includes=no
     --with-chip-ble-project-includes=no
