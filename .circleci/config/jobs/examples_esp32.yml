@@ -1,6 +1,6 @@
 environment:
-    BUILD_TYPE: esp32-build
-executor: esp32-build
+    BUILD_TYPE: esp32
+executor: esp32
 steps:
     - checkout
     - run:

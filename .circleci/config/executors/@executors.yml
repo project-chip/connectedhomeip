@@ -1,15 +1,17 @@
-docker-build:
+main:
     docker:
         - image: connectedhomeip/chip-build:0.2.11
-nrf-build:
+nrf:
     docker:
         - image: connectedhomeip/chip-build-nrf-platform:0.2.11
-esp32-build:
+esp32:
     docker:
         - image: connectedhomeip/chip-build-esp32:0.2.11
-mbedtls-build:
+mbedtls:
+    environment:
+        BOOTSTRAP_ARGUMENTS: " --with-crypto=mbedtls"
     docker:
         - image: connectedhomeip/chip-build:0.2.11
-ubuntu-16-lts:
-    machine:
-        image: ubuntu-1604:202004-01
+# ubuntu-16-lts:
+#     machine:
+#         image: ubuntu-1604:202004-01

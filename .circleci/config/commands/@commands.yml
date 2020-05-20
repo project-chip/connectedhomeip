@@ -1,9 +1,12 @@
 bootstrap:
     description: Bootstrap the source tree
+    parameters:
+        builder:
+            type: string
     steps:
         - run:
-              command: scripts/build/bootstrap.sh
               name: Bootstrap
+              command: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
 save-persistent-ci-cache:
     description: Save persistent CI Cache
     parameters:

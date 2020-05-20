@@ -12,7 +12,8 @@ steps:
           builder: << parameters.builder >>
     - save-persistent-ci-cache:
           builder: << parameters.builder >>
-    - bootstrap
+    - bootstrap:
+          builder: << parameters.builder >>
     - save-bootstrapped-tree:
           builder: << parameters.builder >>
     - run:

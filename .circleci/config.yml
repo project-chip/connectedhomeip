@@ -4,300 +4,226 @@
 ### ***
 version: 2
 jobs:
-  Run Tests [docker-build]:
+  Build CHIP [main]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
     environment:
-    - BUILD_TYPE: docker-build
-    steps:
-    - restore_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-docker-build-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-docker-build-persistent-cache
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - run:
-        command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
-        name: Run mbedTLS Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build mbedtls-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
-        name: Run Crypto Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build ubuntu-16-lts" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
-        name: Run Setup Payload Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
-        name: OpenSSL Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
-        name: Run All Unit & Functional Tests
-  Run Tests [mbedtls-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
-    environment:
-    - BUILD_TYPE: mbedtls-build
-    steps:
-    - restore_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-mbedtls-build-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - run:
-        command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
-        name: Run mbedTLS Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build mbedtls-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
-        name: Run Crypto Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build ubuntu-16-lts" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
-        name: Run Setup Payload Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
-        name: OpenSSL Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
-        name: Run All Unit & Functional Tests
-  Build Examples [nRF]:
-    docker:
-    - image: connectedhomeip/chip-build-nrf-platform:0.2.11
-    environment:
-    - BUILD_TYPE: nrf-build
+    - BUILD_TYPE: main
     steps:
     - checkout
+    - restore_cache:
+        key: build-environment-{{ arch }}-main-persistent-cache
     - run:
-        command: scripts/examples/nrf_lock_app.sh
-        name: Build example nRF5 Lock App
-  Deploy [docker-build]:
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment
+    - save_cache:
+        key: build-environment-{{ arch }}-main-persistent-cache
+        paths:
+        - ./ci-cache-persistent
+    - run:
+        command: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
+        name: Bootstrap
+    - save_cache:
+        key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-main-built
+        paths:
+        - .
+    - run:
+        command: scripts/build/default.sh
+        name: Build
+    - save_cache:
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-main-built
+        paths:
+        - .
+    - save_cache:
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-main-built
+        paths:
+        - build/downloads
+  Build CHIP [mbedtls]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
     environment:
-    - BUILD_TYPE: docker-build
+    - BOOTSTRAP_ARGUMENTS: ' --with-crypto=mbedtls'
+    - BUILD_TYPE: mbedtls
+    steps:
+    - checkout
+    - restore_cache:
+        key: build-environment-{{ arch }}-mbedtls-persistent-cache
+    - run:
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment
+    - save_cache:
+        key: build-environment-{{ arch }}-mbedtls-persistent-cache
+        paths:
+        - ./ci-cache-persistent
+    - run:
+        command: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
+        name: Bootstrap
+    - save_cache:
+        key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-built
+        paths:
+        - .
+    - run:
+        command: scripts/build/default.sh
+        name: Build
+    - save_cache:
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-mbedtls-built
+        paths:
+        - .
+    - save_cache:
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-built
+        paths:
+        - build/downloads
+  Run Tests [main]:
+    docker:
+    - image: connectedhomeip/chip-build:0.2.11
+    environment:
+    - BUILD_TYPE: main
     steps:
     - restore_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-docker-build-built
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-main-built
     - restore_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-main-built
     - restore_cache:
-        key: build-environment-{{ arch }}-docker-build-persistent-cache
+        key: build-environment-{{ arch }}-main-persistent-cache
+    - run:
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment
+    - run:
+        command: scripts/tools/run_if.sh "mbedtls" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
+        name: Run mbedTLS Tests
+    - run:
+        command: scripts/tools/run_if.sh "main mbedtls" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
+        name: Run Crypto Tests
+    - run:
+        command: scripts/tools/run_if.sh "main ubuntu-16-lts" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
+        name: Run Setup Payload Tests
+    - run:
+        command: scripts/tools/run_if.sh "main" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
+        name: OpenSSL Tests
+    - run:
+        command: scripts/tools/run_if.sh "main" "$BUILD_TYPE" scripts/tests/all_tests.sh
+        name: Run All Unit & Functional Tests
+  Run Tests [mbedtls]:
+    docker:
+    - image: connectedhomeip/chip-build:0.2.11
+    environment:
+    - BOOTSTRAP_ARGUMENTS: ' --with-crypto=mbedtls'
+    - BUILD_TYPE: mbedtls
+    steps:
+    - restore_cache:
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-mbedtls-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-mbedtls-persistent-cache
+    - run:
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment
+    - run:
+        command: scripts/tools/run_if.sh "mbedtls" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
+        name: Run mbedTLS Tests
+    - run:
+        command: scripts/tools/run_if.sh "main mbedtls" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
+        name: Run Crypto Tests
+    - run:
+        command: scripts/tools/run_if.sh "main ubuntu-16-lts" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
+        name: Run Setup Payload Tests
+    - run:
+        command: scripts/tools/run_if.sh "main" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
+        name: OpenSSL Tests
+    - run:
+        command: scripts/tools/run_if.sh "main" "$BUILD_TYPE" scripts/tests/all_tests.sh
+        name: Run All Unit & Functional Tests
+  Deploy [main]:
+    docker:
+    - image: connectedhomeip/chip-build:0.2.11
+    environment:
+    - BUILD_TYPE: main
+    steps:
+    - restore_cache:
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-main-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-main-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-main-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/build/distribution_check.sh
         name: Deployment Check
-  Build Examples [docker-build]:
+  Build Examples [nRF]:
+    docker:
+    - image: connectedhomeip/chip-build-nrf-platform:0.2.11
+    environment:
+    - BUILD_TYPE: nrf
+    steps:
+    - checkout
+    - run:
+        command: scripts/examples/nrf_lock_app.sh
+        name: Build example nRF5 Lock App
+  Build Examples [ESP32]:
+    docker:
+    - image: connectedhomeip/chip-build-esp32:0.2.11
+    environment:
+    - BUILD_TYPE: esp32
+    steps:
+    - checkout
+    - run:
+        command: scripts/examples/esp_echo_app.sh
+        name: Build example Echo App
+  Build Examples [main]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
     environment:
-    - BUILD_TYPE: docker-build
+    - BUILD_TYPE: main
     steps:
     - restore_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-docker-build-built
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-main-built
     - restore_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-main-built
     - restore_cache:
-        key: build-environment-{{ arch }}-docker-build-persistent-cache
+        key: build-environment-{{ arch }}-main-persistent-cache
     - run:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
         command: scripts/examples/standalone_echo_client.sh
         name: Build example Standalone Echo Client
-  Build CHIP [mbedtls-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
-    environment:
-    - BUILD_TYPE: mbedtls-build
-    steps:
-    - checkout
-    - restore_cache:
-        key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - save_cache:
-        key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
-        paths:
-        - ./ci-cache-persistent
-    - run:
-        command: scripts/build/bootstrap.sh
-        name: Bootstrap
-    - save_cache:
-        key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
-        paths:
-        - .
-    - run:
-        command: scripts/build/default.sh
-        name: Build
-    - save_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-mbedtls-build-built
-        paths:
-        - .
-    - save_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
-        paths:
-        - build/downloads
-  Build CHIP [ubuntu-16-lts]:
-    machine:
-      image: ubuntu-1604:202004-01
-    environment:
-    - BUILD_TYPE: ubuntu-16-lts
-    steps:
-    - checkout
-    - restore_cache:
-        key: build-environment-{{ arch }}-ubuntu-16-lts-persistent-cache
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - save_cache:
-        key: build-environment-{{ arch }}-ubuntu-16-lts-persistent-cache
-        paths:
-        - ./ci-cache-persistent
-    - run:
-        command: scripts/build/bootstrap.sh
-        name: Bootstrap
-    - save_cache:
-        key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-ubuntu-16-lts-built
-        paths:
-        - .
-    - run:
-        command: scripts/build/default.sh
-        name: Build
-    - save_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-ubuntu-16-lts-built
-        paths:
-        - .
-    - save_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-ubuntu-16-lts-built
-        paths:
-        - build/downloads
-  Build Examples [ESP32]:
-    docker:
-    - image: connectedhomeip/chip-build-esp32:0.2.11
-    environment:
-    - BUILD_TYPE: esp32-build
-    steps:
-    - checkout
-    - run:
-        command: scripts/examples/esp_echo_app.sh
-        name: Build example Echo App
-  Run Tests [ubuntu-16-lts]:
-    machine:
-      image: ubuntu-1604:202004-01
-    environment:
-    - BUILD_TYPE: ubuntu-16-lts
-    steps:
-    - restore_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-ubuntu-16-lts-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-ubuntu-16-lts-built
-    - restore_cache:
-        key: build-environment-{{ arch }}-ubuntu-16-lts-persistent-cache
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - run:
-        command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
-        name: Run mbedTLS Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build mbedtls-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
-        name: Run Crypto Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build ubuntu-16-lts" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
-        name: Run Setup Payload Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
-        name: OpenSSL Tests
-    - run:
-        command: scripts/tools/run_if.sh "docker-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
-        name: Run All Unit & Functional Tests
-  Build CHIP [docker-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
-    environment:
-    - BUILD_TYPE: docker-build
-    steps:
-    - checkout
-    - restore_cache:
-        key: build-environment-{{ arch }}-docker-build-persistent-cache
-    - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
-    - save_cache:
-        key: build-environment-{{ arch }}-docker-build-persistent-cache
-        paths:
-        - ./ci-cache-persistent
-    - run:
-        command: scripts/build/bootstrap.sh
-        name: Bootstrap
-    - save_cache:
-        key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
-        paths:
-        - .
-    - run:
-        command: scripts/build/default.sh
-        name: Build
-    - save_cache:
-        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-docker-build-built
-        paths:
-        - .
-    - save_cache:
-        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-docker-build-built
-        paths:
-        - build/downloads
 workflows:
   Main:
     jobs:
-    - Build CHIP [docker-build]:
+    - Build CHIP [main]:
         filters:
           branches:
             ignore:
             - /restyled.*/
-    - Build CHIP [mbedtls-build]:
+    - Build CHIP [mbedtls]:
         filters:
           branches:
             ignore:
             - /restyled.*/
-    - Build CHIP [ubuntu-16-lts]:
-        filters:
-          branches:
-            ignore:
-            - /restyled.*/
-    - Run Tests [docker-build]:
+    - Run Tests [main]:
         filters:
           branches:
             ignore:
             - /restyled.*/
         requires:
-        - Build CHIP [docker-build]
-    - Run Tests [mbedtls-build]:
+        - Build CHIP [main]
+    - Run Tests [mbedtls]:
         filters:
           branches:
             ignore:
             - /restyled.*/
         requires:
-        - Build CHIP [mbedtls-build]
-    - Run Tests [ubuntu-16-lts]:
+        - Build CHIP [mbedtls]
+    - Deploy [main]:
         filters:
           branches:
             ignore:
             - /restyled.*/
         requires:
-        - Build CHIP [ubuntu-16-lts]
-    - Deploy [docker-build]:
-        filters:
-          branches:
-            ignore:
-            - /restyled.*/
-        requires:
-        - Run Tests [docker-build]
+        - Run Tests [main]
     - Build Examples [nRF]:
         filters:
           branches:
@@ -308,22 +234,25 @@ workflows:
           branches:
             ignore:
             - /restyled.*/
-    - Build Examples [docker-build]:
+    - Build Examples [main]:
         filters:
           branches:
             ignore:
             - /restyled.*/
         requires:
-        - Build CHIP [docker-build]
+        - Build CHIP [main]
   version: 2
 
 # Original config.yml file:
 # commands:
 #   bootstrap:
 #     description: Bootstrap the source tree
+#     parameters:
+#       builder:
+#         type: string
 #     steps:
 #     - run:
-#         command: scripts/build/bootstrap.sh
+#         command: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
 #         name: Bootstrap
 #   load-bootstrapped-tree:
 #     description: Load the bootstrapped tree
@@ -411,21 +340,20 @@ workflows:
 #         command: scripts/tools/run_if.sh \"ubuntu-16-lts\" \"$BUILD_TYPE\" sudo scripts/setup/linux/install_packages.sh
 #         name: Setup Environment
 # executors:
-#   docker-build:
-#     docker:
-#     - image: connectedhomeip/chip-build:0.2.11
-#   esp32-build:
+#   esp32:
 #     docker:
 #     - image: connectedhomeip/chip-build-esp32:0.2.11
-#   mbedtls-build:
+#   main:
 #     docker:
 #     - image: connectedhomeip/chip-build:0.2.11
-#   nrf-build:
+#   mbedtls:
+#     docker:
+#     - image: connectedhomeip/chip-build:0.2.11
+#     environment:
+#       BOOTSTRAP_ARGUMENTS: ' --with-crypto=mbedtls'
+#   nrf:
 #     docker:
 #     - image: connectedhomeip/chip-build-nrf-platform:0.2.11
-#   ubuntu-16-lts:
-#     machine:
-#       image: ubuntu-1604:202004-01
 # jobs:
 #   build:
 #     environment:
@@ -442,7 +370,8 @@ workflows:
 #         builder: << parameters.builder >>
 #     - save-persistent-ci-cache:
 #         builder: << parameters.builder >>
-#     - bootstrap
+#     - bootstrap:
+#         builder: << parameters.builder >>
 #     - save-bootstrapped-tree:
 #         builder: << parameters.builder >>
 #     - run:
@@ -495,8 +424,8 @@ workflows:
 #         name: Deployment Check
 #   examples_esp32:
 #     environment:
-#       BUILD_TYPE: esp32-build
-#     executor: esp32-build
+#       BUILD_TYPE: esp32
+#     executor: esp32
 #     steps:
 #     - checkout
 #     - run:
@@ -504,8 +433,8 @@ workflows:
 #         name: Build example Echo App
 #   examples_nrf:
 #     environment:
-#       BUILD_TYPE: nrf-build
-#     executor: nrf-build
+#       BUILD_TYPE: nrf
+#     executor: nrf
 #     steps:
 #     - checkout
 #     - run:
@@ -550,21 +479,19 @@ workflows:
 #     - setup-environment:
 #         builder: << parameters.builder >>
 #     - run:
-#         command: scripts/tools/run_if.sh \"mbedtls-build\" \"$BUILD_TYPE\" scripts/tests/mbedtls_tests.sh
+#         command: scripts/tools/run_if.sh \"mbedtls\" \"$BUILD_TYPE\" scripts/tests/mbedtls_tests.sh
 #         name: Run mbedTLS Tests
 #     - run:
-#         command: scripts/tools/run_if.sh \"docker-build mbedtls-build\" \"$BUILD_TYPE\"
-#           scripts/tests/crypto_tests.sh
+#         command: scripts/tools/run_if.sh \"main mbedtls\" \"$BUILD_TYPE\" scripts/tests/crypto_tests.sh
 #         name: Run Crypto Tests
 #     - run:
-#         command: scripts/tools/run_if.sh \"docker-build ubuntu-16-lts\" \"$BUILD_TYPE\"
-#           scripts/tests/setup_payload_tests.sh
+#         command: scripts/tools/run_if.sh \"main ubuntu-16-lts\" \"$BUILD_TYPE\" scripts/tests/setup_payload_tests.sh
 #         name: Run Setup Payload Tests
 #     - run:
-#         command: scripts/tools/run_if.sh \"docker-build\" \"$BUILD_TYPE\" scripts/tests/openssl_tests.sh
+#         command: scripts/tools/run_if.sh \"main\" \"$BUILD_TYPE\" scripts/tests/openssl_tests.sh
 #         name: OpenSSL Tests
 #     - run:
-#         command: scripts/tools/run_if.sh \"docker-build\" \"$BUILD_TYPE\" scripts/tests/all_tests.sh
+#         command: scripts/tools/run_if.sh \"main\" \"$BUILD_TYPE\" scripts/tests/all_tests.sh
 #         name: Run All Unit & Functional Tests
 # version: 2.1
 # workflows:
@@ -578,9 +505,8 @@ workflows:
 #         matrix:
 #           parameters:
 #             builder:
-#             - docker-build
-#             - mbedtls-build
-#             - ubuntu-16-lts
+#             - main
+#             - mbedtls
 #         name: Build CHIP [<< matrix.builder >>]
 #     - test:
 #         filters:
@@ -590,9 +516,8 @@ workflows:
 #         matrix:
 #           parameters:
 #             builder:
-#             - docker-build
-#             - mbedtls-build
-#             - ubuntu-16-lts
+#             - main
+#             - mbedtls
 #         name: Run Tests [<< matrix.builder >>]
 #         requires:
 #         - Build CHIP [<< matrix.builder >>]
@@ -604,7 +529,7 @@ workflows:
 #         matrix:
 #           parameters:
 #             builder:
-#             - docker-build
+#             - main
 #         name: Deploy [<< matrix.builder >>]
 #         requires:
 #         - Run Tests [<< matrix.builder >>]
@@ -628,7 +553,7 @@ workflows:
 #         matrix:
 #           parameters:
 #             builder:
-#             - docker-build
+#             - main
 #         name: Build Examples [<< matrix.builder >>]
 #         requires:
 #         - Build CHIP [<< matrix.builder >>]

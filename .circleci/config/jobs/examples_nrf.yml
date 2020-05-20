@@ -1,6 +1,6 @@
 environment:
-    BUILD_TYPE: nrf-build
-executor: nrf-build
+    BUILD_TYPE: nrf
+executor: nrf
 steps:
     - checkout
     - run:
