@@ -8,15 +8,15 @@
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B202528C2459E34F00F97062"
-               BuildableName = "CHIP.framework"
-               BlueprintName = "CHIP"
+               BlueprintIdentifier = "B20252952459E34F00F97062"
+               BuildableName = "CHIPTests.xctest"
+               BlueprintName = "CHIPTests"
                ReferencedContainer = "container:CHIP.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,15 +47,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B202528C2459E34F00F97062"
-            BuildableName = "CHIP.framework"
-            BlueprintName = "CHIP"
-            ReferencedContainer = "container:CHIP.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug macOS">

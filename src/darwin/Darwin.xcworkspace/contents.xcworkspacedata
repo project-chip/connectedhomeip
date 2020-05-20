@@ -5,6 +5,6 @@
       location = "group:CHIPQRCodeReader/CHIPQRCodeReader.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:CHIP/CHIP.xcodeproj">
+      location = "group:Framework/CHIP Framework.xcodeproj">
    </FileRef>
 </Workspace>
