@@ -12,21 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("build/tests.gni")
-
-group("all") {
-  deps = [
-    "src/lib/core:chip_config_header",
-    "src/lwip:all",
-    "src/system:system_config_header",
-    "third_party/mbedtls",
-    "third_party/nlassert",
-    "third_party/nlfaultinjection",
-    "third_party/nlio",
-    "third_party/nlunit-test",
-  ]
-
-  if (chip_build_tests) {
-    deps += [ "src/lwip/tests" ]
-  }
+config("includes") {
+  include_dirs = [ "." ]
 }
