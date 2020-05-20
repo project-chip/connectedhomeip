@@ -1,5 +1,7 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+if CHIP_BUILD_TOOLS
+
 bin_PROGRAMS                       = qrcodetool
 qrcodetool_SOURCES                   = qrcodetool.cpp setup_payload_commands.cpp setup_payload_commands.h qrcodetool_command_manager.h
 
@@ -19,5 +21,7 @@ qrcodetool_LDADD = \
 NLFOREIGN_FILE_DEPENDENCIES = \
       $(qrcodetool_LDADD) \
       $(NULL)
+
+endif
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
