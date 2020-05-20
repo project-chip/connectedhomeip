@@ -16,6 +16,7 @@ import("build/tests.gni")
 
 group("all") {
   deps = [
+    "src",
     "src/ble",
     "src/controller",
     "src/crypto",
