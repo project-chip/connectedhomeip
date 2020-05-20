@@ -94,12 +94,8 @@ TESTS_ENVIRONMENT                              = \
 
 if CHIP_TARGET_STYLE_EMBEDDED
 
-# bin_SCRIPTS                                    = \
-#     $(top_srcdir)/scripts/tools/qemu_run_test.sh \
-#     $(NULL)
-
 check_SCRIPTS                                 += \
-    ../../../qemu_run_test.sh                    \
+    qemu_crypto_tests.sh                         \
     $(NULL)
 
 TESTS_ENVIRONMENT                             += \

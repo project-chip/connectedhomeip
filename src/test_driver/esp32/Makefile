@@ -21,4 +21,3 @@ esp32_elf_builder: all
 	mkdir -p build/chip/bootloader
 	ln -s $(PROJECT_PATH)/build/bootloader/bootloader.bin $(PROJECT_PATH)/build/chip/bootloader/bootloader.bin
 	ln -s $(PROJECT_PATH)/idf.sh $(PROJECT_PATH)/build/chip/env.sh
-	ln -s $(PROJECT_PATH)/third_party/connectedhomeip/scripts/tools/qemu_run_test.sh $(PROJECT_PATH)/build/chip/qemu_run_test.sh
