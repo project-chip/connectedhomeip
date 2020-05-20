@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #import <Foundation/Foundation.h>
+#import <os/log.h>
 
 #include <support/CHIPLogging.h>
 
@@ -81,9 +82,9 @@ namespace chip {
                     prefixLen = sizeof(formattedMsg) - 1;
 
                 vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aMsg, v);
-                
-                NSLog(@"%s", formattedMsg);
-                
+
+                os_log(OS_LOG_DEFAULT, "%s", formattedMsg);
+
             }
 
             va_end(v);
