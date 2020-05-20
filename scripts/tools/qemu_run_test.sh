@@ -27,14 +27,14 @@ die() {
     exit 1
 }
 
-source $abs_top_builddir/env.sh
-bash $abs_top_builddir/esp32_elf_builder.sh "$QEMU_TEST_TARGET"
+source "$abs_top_builddir"/env.sh
+bash "$abs_top_builddir"/esp32_elf_builder.sh "$QEMU_TEST_TARGET"
 
 flash_image_file=$(mktemp)
 log_file=$(mktemp)
 trap "{ rm -f $flash_image_file $log_file; }" EXIT
 
-"$abs_top_srcdir"/scripts/tools/build_esp32_flash_image.sh $abs_top_builddir/chip-tests.bin "$flash_image_file"
+"$abs_top_srcdir"/scripts/tools/build_esp32_flash_image.sh "$abs_top_builddir"/chip-tests.bin "$flash_image_file"
 "$abs_top_srcdir"/scripts/tools/esp32_qemu_run.sh "$flash_image_file" | tee "$log_file"
 
 # If the logs contain failure message
