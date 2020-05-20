@@ -12,27 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("build/tests.gni")
-
-group("all") {
-  deps = [
-    "src/ble",
-    "src/controller",
-    "src/crypto",
-    "src/inet",
-    "src/lib/core",
-    "src/lib/support",
-    "src/lwip:all",
-    "src/system",
-    "src/transport",
-    "third_party/mbedtls",
-    "third_party/nlassert",
-    "third_party/nlfaultinjection",
-    "third_party/nlio",
-    "third_party/nlunit-test",
+source_set("controller") {
+  sources = [
+    "CHIPDeviceController.cpp",
+    "CHIPDeviceController.h",
   ]
 
-  if (chip_build_tests) {
-    deps += [ "src/lwip/tests" ]
-  }
+  public_deps = [
+    "//src/lib/core",
+    "//src/lib/support",
+    "//src/transport",
+  ]
 }
