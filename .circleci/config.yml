@@ -97,6 +97,19 @@ jobs:
     - run:
         command: scripts/tests/esp32_qemu_tests.sh
         name: Build ESP32 QEMU and Run Tests
+  Build and Test [Linux Embedded]:
+    docker:
+    - image: connectedhomeip/chip-build:0.2.11
+    environment:
+    - BUILD_TYPE: linux-embedded-build
+    steps:
+    - checkout
+    - run:
+        command: |-
+          scripts/build/bootstrap.sh --with-device-layer=linux
+          scripts/build/default.sh
+          make -C build/default/src/platform check
+        name: Build and test Linux embedded
   Build CHIP [mbedtls-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
@@ -329,6 +342,11 @@ workflows:
             - /restyled.*/
         requires:
         - Run Tests [main-build]
+    - Build and Test [Linux Embedded]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
     - Build Examples [nRF]:
         filters:
           branches:

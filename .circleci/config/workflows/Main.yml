@@ -47,6 +47,12 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
+    - linux_embedded:
+          name: Build and Test [Linux Embedded]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
     - examples_nrf:
           name: Build Examples [nRF]
           filters:

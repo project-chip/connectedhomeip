@@ -1,0 +1,11 @@
+environment:
+    BUILD_TYPE: linux-embedded-build
+executor: linux-embedded-build
+steps:
+    - checkout
+    - run:
+          name: Build and test Linux embedded
+          command: |
+              scripts/build/bootstrap.sh --with-device-layer=linux
+              scripts/build/default.sh
+              make -C build/default/src/platform check
