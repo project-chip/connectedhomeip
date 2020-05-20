@@ -538,7 +538,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         desc = "Too many shared session end nodes";
         break;
     case CHIP_ERROR_MALFORMED_DATA_ELEMENT:
-        desc = "Malformed WDM DataElement";
+        desc = "Malformed DataElement";
         break;
     case CHIP_ERROR_WRONG_CERT_TYPE:
         desc = "Wrong certificate type";
@@ -583,10 +583,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         desc = "Malformed Update response";
         break;
     case CHIP_ERROR_VERSION_MISMATCH:
-        desc = "The conditional update of a WDM path failed for a version mismatch";
-        break;
-    case CHIP_ERROR_POTENTIAL_DATA_LOSS:
-        desc = "A potential data loss was detected in a WDM Trait Instance";
+        desc = "Version mismatch";
         break;
     case CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE:
         desc = "Legacy device doesn't support standalone Thread network creation";
@@ -596,9 +593,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         break;
     case CHIP_ERROR_LOCAL_DATA_INCONSISTENT:
         desc = "The local data does not match any known version of the Trait Instance";
-        break;
-    case CHIP_ERROR_PATH_STORE_FULL:
-        desc = "A WDM TraitPath store is full";
         break;
     case CHIP_EVENT_ID_FOUND:
         desc = "Event ID matching criteria was found";

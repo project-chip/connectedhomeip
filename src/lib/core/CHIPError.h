@@ -1666,14 +1666,6 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_VERSION_MISMATCH                         _CHIP_ERROR(176)
 
 /**
- * @def CHIP_ERROR_POTENTIAL_DATA_LOSS
- *
- * @brief
- *   A potential data loss was detected for a Trait Instance.
- */
-#define CHIP_ERROR_POTENTIAL_DATA_LOSS                      _CHIP_ERROR(177)
-
-/**
  *  @def CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE
  *
  *  @brief
@@ -1705,14 +1697,6 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  */
 #define CHIP_ERROR_LOCAL_DATA_INCONSISTENT                  _CHIP_ERROR(180)
 
-/**
- *  @def CHIP_ERROR_PATH_STORE_FULL
- *
- *  @brief
- *    WDM cannot store a TraitPath for lack of memory.
- *
- */
-#define CHIP_ERROR_PATH_STORE_FULL                          _CHIP_ERROR(181)
 /**
  * @def CHIP_EVENT_ID_FOUND
  *
