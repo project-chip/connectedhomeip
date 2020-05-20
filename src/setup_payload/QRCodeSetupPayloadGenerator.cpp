@@ -103,7 +103,7 @@ CHIP_ERROR writeOptionaData(TLVWriter & writer, vector<OptionalQRCodeInfo> optio
         }
         else if (info.type == optionalQRCodeInfoTypeInt)
         {
-            err = writer.Put(info.tag, info.integer);
+            err = writer.Put(info.tag, static_cast<int64_t>(info.integer));
         }
     }
     return err;
