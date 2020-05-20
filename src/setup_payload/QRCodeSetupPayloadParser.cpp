@@ -25,17 +25,17 @@
 #include "Base41.h"
 
 #include <iostream>
-#include <string.h>
 #include <math.h>
+#include <string.h>
 #include <vector>
 
-#include <core/CHIPError.h>
 #include <core/CHIPCore.h>
+#include <core/CHIPError.h>
 #include <core/CHIPTLV.h>
-#include <core/CHIPTLVUtilities.hpp>
 #include <core/CHIPTLVData.hpp>
-#include <support/RandUtils.h>
+#include <core/CHIPTLVUtilities.hpp>
 #include <support/CodeUtils.h>
+#include <support/RandUtils.h>
 
 using namespace chip;
 using namespace std;

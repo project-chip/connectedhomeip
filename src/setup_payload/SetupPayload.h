@@ -24,9 +24,9 @@
 #ifndef _SETUP_PAYLOAD_H_
 #define _SETUP_PAYLOAD_H_
 
+#include <map>
 #include <stdint.h>
 #include <string>
-#include <map>
 #include <vector>
 
 #include <core/CHIPError.h>

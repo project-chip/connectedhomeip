@@ -24,10 +24,10 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include "SetupPayload.cpp"
 #include "Base41.cpp"
 #include "QRCodeSetupPayloadGenerator.cpp"
 #include "QRCodeSetupPayloadParser.cpp"
+#include "SetupPayload.cpp"
 
 using namespace chip;
 using namespace std;

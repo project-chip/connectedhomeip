@@ -25,8 +25,8 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
-#include <core/CHIPTLVUtilities.hpp>
 #include <core/CHIPTLVData.hpp>
+#include <core/CHIPTLVUtilities.hpp>
 #include <support/RandUtils.h>
 
 using namespace chip;

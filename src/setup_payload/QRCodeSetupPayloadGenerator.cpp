@@ -30,11 +30,11 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
+#include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
-#include <core/CHIPTLVData.hpp>
-#include <support/RandUtils.h>
 #include <support/CodeUtils.h>
+#include <support/RandUtils.h>
 
 using namespace chip;
 using namespace std;
