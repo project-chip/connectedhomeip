@@ -28,7 +28,7 @@
 namespace chip {
 
 PersistedCounter::PersistedCounter(void) :
-    MonotonicallyIncreasingCounter(), mId(chip::Platform::PersistedStorage::kEmptyKey), mStartingCounterValue(0), mEpoch(0)
+    MonotonicallyIncreasingCounter(), mId(chip::Platform::PersistedStorage::kEmptyKey), mEpoch(0), mNextEpoch(0)
 {}
 
 PersistedCounter::~PersistedCounter(void)
@@ -40,29 +40,27 @@ CHIP_ERROR
 PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(aEpoch > 0, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     // Store the ID.
-    mId = aId;
-
-    // Check and store the epoch.
-    VerifyOrExit(aEpoch > 0, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
+    mId    = aId;
     mEpoch = aEpoch;
 
+    uint32_t startValue;
+
     // Read our previously-stored starting value.
-    err = ReadStartValue(mStartingCounterValue);
+    err = ReadStartValue(startValue);
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-    ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%x mStartingCounterValue 0x%x", aEpoch, mStartingCounterValue);
+    ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%x startValue 0x%x", aEpoch, startValue);
 #endif
 
-    // Write out the counter value with which we'll start next time we
-    // boot up.
-    err = WriteStartValue(mStartingCounterValue + mEpoch);
+    err = PersistNextEpochStart(startValue + aEpoch);
     SuccessOrExit(err);
 
     // This will set the starting value, after which we're ready.
-    err = MonotonicallyIncreasingCounter::Init(mStartingCounterValue);
+    err = MonotonicallyIncreasingCounter::Init(startValue);
     SuccessOrExit(err);
 
 exit:
@@ -72,64 +70,32 @@ exit:
 CHIP_ERROR
 PersistedCounter::Advance(void)
 {
-    return IncrementCount();
-}
-
-CHIP_ERROR
-PersistedCounter::AdvanceEpochRelative(uint32_t aValue)
-{
-    CHIP_ERROR ret;
-
-    mStartingCounterValue = (aValue / mEpoch) * mEpoch;         // Start of enclosing epoch
-    mCounterValue         = mStartingCounterValue + mEpoch - 1; // Move to end of enclosing epoch
-    ret                   = IncrementCount();                   // Force to next epoch
-#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-    ChipLogError(EventLogging, "Advanced counter to 0x%x (relative to 0x%x)", mCounterValue, aValue);
-#endif
-
-    return ret;
-}
-
-bool PersistedCounter::GetNextValue(uint32_t & aValue)
-{
-    bool startNewEpoch = false;
-
-    // Increment aValue.
-    aValue++;
-
-    // If we've exceeded the value with which we started by aEpoch or
-    // more, we need to start a new epoch.
-    if ((aValue - mStartingCounterValue) >= mEpoch)
-    {
-        aValue        = mStartingCounterValue + mEpoch;
-        startNewEpoch = true;
-    }
-
-    return startNewEpoch;
-}
-
-CHIP_ERROR
-PersistedCounter::IncrementCount(void)
-{
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Get the incremented value.
-    if (GetNextValue(mCounterValue))
+    VerifyOrExit(mId != chip::Platform::PersistedStorage::kEmptyKey, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = MonotonicallyIncreasingCounter::Advance();
+    SuccessOrExit(err);
+
+    if (GetValue() >= mNextEpoch)
     {
-        // Started a new epoch, so write out the next one.
-        err = WriteStartValue(mCounterValue + mEpoch);
+        // Value advanced past the previously persisted "start point".
+        // Ensure that a new starting point is persisted.
+        err = PersistNextEpochStart(mNextEpoch + mEpoch);
         SuccessOrExit(err);
 
-        mStartingCounterValue = mCounterValue;
+        // Advancing the epoch should have ensured that the current value
+        // is valid
+        VerifyOrExit(GetValue() < mNextEpoch, err = CHIP_ERROR_INTERNAL);
     }
-
 exit:
     return err;
 }
 
 CHIP_ERROR
-PersistedCounter::WriteStartValue(uint32_t aStartValue)
+PersistedCounter::PersistNextEpochStart(uint32_t aStartValue)
 {
+    mNextEpoch = aStartValue;
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
     ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%x", aStartValue);
 #endif

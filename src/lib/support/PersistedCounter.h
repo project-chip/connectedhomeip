@@ -39,8 +39,21 @@ namespace chip {
  * @brief
  *   A class for managing a counter as an integer value intended to persist
  *   across reboots.
+ *
+ * Counter values are always set to start at a multiple of a bootup value
+ * "epoch".
+ *
+ * Example:
+ *
+ * - Assuming epoch is 100 via PersistedCounter::Init(_, 100) and GetValue +
+ *   AdvanceValue is called, we get the following outputs:
+ *
+ *   - Output: 0, 1, 2, 3, 4  <reboot/reinit>
+ *   - Output: 100, 101, 102, 103, 104, 105 <reboot/reinit>
+ *   - Output: 200, 201, 202, ...., 299, 300, 301, 302 <reboot/reinit>
+ *   - Output: 400, 401 ...
+ *
  */
-
 class PersistedCounter : public MonotonicallyIncreasingCounter
 {
 public:
@@ -72,36 +85,7 @@ public:
      */
     CHIP_ERROR Advance(void) override;
 
-    /*
-     *  @brief
-     *    Advance the counter to start of the epoch following the provided
-     *    value.
-     *
-     *  @return Any error returned by a write to persistent storage.
-     */
-    CHIP_ERROR AdvanceEpochRelative(uint32_t aValue);
-
 private:
-    /**
-     *  @brief
-     *  Get the next value of the counter, based on aValue.
-     *
-     *  @param[inout] aValue.  The value to be incremented.
-     *
-     *  @return true if incrementing aValue started a new epoch, false otherwise.
-     */
-    bool GetNextValue(uint32_t & aValue);
-
-    /**
-     *  @brief
-     *    Increment the value of the counter by one.  May perform a write to
-     *    persistent storage.
-     *
-     *  @return Any error returned by a write to persistent storage,
-     *          CHIP_NO_ERROR otherwise
-     */
-    CHIP_ERROR IncrementCount(void);
-
     /**
      *  @brief
      *    Write out the counter value to persistent storage.
@@ -110,7 +94,7 @@ private:
      *
      *  @return Any error returned by a write to persistent storage.
      */
-    CHIP_ERROR WriteStartValue(uint32_t aStartValue);
+    CHIP_ERROR PersistNextEpochStart(uint32_t aStartValue);
 
     /**
      *  @brief
@@ -122,9 +106,9 @@ private:
      */
     CHIP_ERROR ReadStartValue(uint32_t & aStartValue);
 
-    chip::Platform::PersistedStorage::Key mId;
-    uint32_t mStartingCounterValue;
-    uint32_t mEpoch;
+    chip::Platform::PersistedStorage::Key mId; // start value is stored here
+    uint32_t mEpoch;                           // epoch modulus value
+    uint32_t mNextEpoch;                       // next epoch start
 };
 
 } // namespace chip
