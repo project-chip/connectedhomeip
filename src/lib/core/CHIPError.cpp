@@ -421,7 +421,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         desc = "Shortcut Tunnel peer entry not found";
         break;
     case CHIP_ERROR_TUNNEL_FORCE_ABORT:
-        desc = "Forced Tunnel Abort.";
+        desc = "Forced Tunnel Abort";
         break;
     case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED:
         desc = "DRBG entropy source failed to generate entropy data";
@@ -478,16 +478,16 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         desc = "Failure to lock/unlock OS-provided lock";
         break;
     case CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG:
-        desc = "Unsupported passcode encryption configuration.";
+        desc = "Unsupported passcode encryption configuration";
         break;
     case CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED:
-        desc = "Passcode authentication failed.";
+        desc = "Passcode authentication failed";
         break;
     case CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED:
-        desc = "Passcode fingerprint failed.";
+        desc = "Passcode fingerprint failed";
         break;
     case CHIP_ERROR_SERIALIZATION_ELEMENT_NULL:
-        desc = "Element requested is null.";
+        desc = "Element requested is null";
         break;
     case CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM:
         desc = "Certificate not signed with required signature algorithm";
@@ -496,25 +496,25 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         desc = "CHIP signature not signed with required signature algorithm";
         break;
     case CHIP_ERROR_SCHEMA_MISMATCH:
-        desc = "Schema mismatch.";
+        desc = "Schema mismatch";
         break;
     case CHIP_ERROR_INVALID_INTEGER_VALUE:
-        desc = "Invalid integer value.";
+        desc = "Invalid integer value";
         break;
     case CHIP_ERROR_CASE_RECONFIG_REQUIRED:
         desc = "CASE reconfiguration required";
         break;
     case CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS:
-        desc = "Too many CASE reconfigurations were received.";
+        desc = "Too many CASE reconfigurations were received";
         break;
     case CHIP_ERROR_BAD_REQUEST:
-        desc = "Request cannot be processed or fulfilled.";
+        desc = "Request cannot be processed or fulfilled";
         break;
     case CHIP_ERROR_INVALID_MESSAGE_FLAG:
-        desc = "Invalid message flag.";
+        desc = "Invalid message flag";
         break;
     case CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED:
-        desc = "Key export protocol required to reconfigure.";
+        desc = "Key export protocol required to reconfigure";
         break;
     case CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS:
         desc = "No supported key export protocol configurations in common";
