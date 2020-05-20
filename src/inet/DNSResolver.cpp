@@ -101,9 +101,11 @@ INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     uint8_t optionFlags      = (options & kDNSOption_Flags_Mask);
 
     // Check that the supplied options are valid.
-    if ((addrFamilyOption != kDNSOption_AddrFamily_Any && addrFamilyOption != kDNSOption_AddrFamily_IPv4Only &&
-         addrFamilyOption != kDNSOption_AddrFamily_IPv4Preferred && addrFamilyOption != kDNSOption_AddrFamily_IPv6Only &&
-         addrFamilyOption != kDNSOption_AddrFamily_IPv6Preferred) ||
+    if ((addrFamilyOption != kDNSOption_AddrFamily_Any &&
+#if INET_CONFIG_ENABLE_IPV4
+         addrFamilyOption != kDNSOption_AddrFamily_IPv4Only && addrFamilyOption != kDNSOption_AddrFamily_IPv4Preferred &&
+#endif
+         addrFamilyOption != kDNSOption_AddrFamily_IPv6Only && addrFamilyOption != kDNSOption_AddrFamily_IPv6Preferred) ||
         (optionFlags & ~kDNSOption_ValidFlags) != 0)
     {
         Release();
@@ -271,7 +273,7 @@ INET_ERROR DNSResolver::Cancel()
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     // NOTE: DNS lookups can be canceled only when using the asynchronous mode.
 
     InetLayer & inet = Layer();
