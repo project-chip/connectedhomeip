@@ -26,9 +26,6 @@
 
 #define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
 
-// Configure WDM for event offload
-#define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
-
 #define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
 
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
@@ -37,9 +34,6 @@
 
 // Uncomment this for a large Tunnel MTU.
 //#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
-
-// Max number of Bindings per CHIPExchangeManager
-#define CHIP_CONFIG_MAX_BINDINGS 8
 
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
@@ -54,7 +48,7 @@
 // Increase session idle timeout in stand-alone builds for the convenience of developers.
 #define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 120000
 
-#define CHIP_CONFIG_ENABLE_WDM_UPDATE 1
+#define CHIP_CONFIG_ENABLE_UPDATE 1
 
 #define CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE 0
 

@@ -32,7 +32,7 @@ namespace chip {
 namespace FaultInjection {
 
 static nl::FaultInjection::Record sFaultRecordArray[kFault_NumItems];
-static int32_t sFault_WDMNotificationSize_Arguments[1];
+static int32_t sFault_CHIPNotificationSize_Arguments[1];
 static int32_t sFault_FuzzExchangeHeader_Arguments[1];
 static class nl::FaultInjection::Manager sChipFaultInMgr;
 static const nl::FaultInjection::Name sManagerName  = "chip";
@@ -44,10 +44,6 @@ static const nl::FaultInjection::Name sFaultNames[] = {
     "SendAlarm",
     "HandleAlarm",
     "FuzzExchangeHeaderTx",
-#if CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
-    "WRMDoubleTx",
-    "WRMSendError",
-#endif // CHIP_CONFIG_ENABLE_RELIABLE_MESSAGING
     "BDXBadBlockCounter",
     "BDXAllocTransfer",
 #if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
@@ -55,24 +51,6 @@ static const nl::FaultInjection::Name sFaultNames[] = {
     "SMLookup",
     "SMCacheReplaceEntryError",
 #endif // CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
-    "WDMTraitInstanceNew",
-    "WDMSubscriptionHandlerNew",
-    "WDMSubscriptionClientNew",
-    "WDMBadSubscriptionId",
-    "WDMSendUnsupportedReqMsgType",
-    "WDMNotificationSize",
-    "WDMSendCommandExpired",
-    "WDMSendCommandBadVersion",
-    "WDMSendUpdateBadVersion",
-    "WDMDelayUpdateResponse",
-    "WDMUpdateRequestTimeout",
-    "WDMUpdateRequestSendErrorInline",
-    "WDMUpdateRequestSendErrorAsync",
-    "WDMUpdateRequestBadProfile",
-    "WDMUpdateRequestDropMessage",
-    "WDMUpdateResponseBusy",
-    "WDMPathStoreFull",
-    "WDMTreatNotifyAsCancel",
     "CASEKeyConfirm",
     "SecMgrBusy",
 #if CHIP_CONFIG_ENABLE_TUNNELING
@@ -92,11 +70,7 @@ nl::FaultInjection::Manager & GetManager(void)
     if (0 == sChipFaultInMgr.GetNumFaults())
     {
         sChipFaultInMgr.Init(kFault_NumItems, sFaultRecordArray, sManagerName, sFaultNames);
-        memset(&sFault_WDMNotificationSize_Arguments, 0, sizeof(sFault_WDMNotificationSize_Arguments));
-        sFaultRecordArray[kFault_WDM_NotificationSize].mArguments = sFault_WDMNotificationSize_Arguments;
-        sFaultRecordArray[kFault_WDM_NotificationSize].mLengthOfArguments =
-            static_cast<uint8_t>(sizeof(sFault_WDMNotificationSize_Arguments) / sizeof(sFault_WDMNotificationSize_Arguments[0]));
-
+        memset(&sFault_CHIPNotificationSize_Arguments, 0, sizeof(sFault_CHIPNotificationSize_Arguments));
         memset(&sFault_FuzzExchangeHeader_Arguments, 0, sizeof(sFault_FuzzExchangeHeader_Arguments));
         sFaultRecordArray[kFault_FuzzExchangeHeaderTx].mArguments = sFault_FuzzExchangeHeader_Arguments;
         sFaultRecordArray[kFault_FuzzExchangeHeaderTx].mLengthOfArguments =

@@ -61,37 +61,11 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
 #if INET_CONFIG_NUM_DNS_RESOLVERS
     "InetLayer_NumDNSResolversInUse",
 #endif
-    "ExchangeMgr_NumContextsInUse",
-    "ExchangeMgr_NumUMHandlersInUse",
-    "ExchangeMgr_NumBindings",
-    "MessageLayer_NumConnectionsInUse",
+    "ExchangeMgr_NumContextsInUse",   "ExchangeMgr_NumUMHandlersInUse",
+    "ExchangeMgr_NumBindings",        "MessageLayer_NumConnectionsInUse",
 #if CHIP_CONFIG_ENABLE_SERVICE_DIRECTORY
     "ServiceMgr_NumRequestsInUse",
 #endif
-
-#if WDM_ENABLE_SUBSCRIPTION_PUBLISHER
-    "WDM_NumTraits",
-#endif
-#if WDM_ENABLE_SUBSCRIPTION_CLIENT
-    "WDM_NumSubscriptionClients",
-#endif
-#if WDM_ENABLE_SUBSCRIPTION_PUBLISHER
-    "WDM_NumSubscriptionHandlers",
-#endif
-#if WDM_PUBLISHER_ENABLE_CUSTOM_COMMANDS
-    "WDM_NumCommands",
-#endif
-
-#if CHIP_CONFIG_LEGACY_WDM
-    "WDMLegacy_NumViewInUse",
-#if CHIP_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
-    "WDMLegacy_NumSubscribeInUse",
-    "WDMLegacy_NumCancelInUse",
-#endif // CHIP_CONFIG_WDM_ALLOW_CLIENT_SUBSCRIPTION
-    "WDMLegacy_NumUpdateInUse",
-    "WDMLegacy_NumBindingsInUse",
-    "WDMLegacy_NumTransactions",
-#endif // CHIP_CONFIG_LEGACY_WDM
 
 };
 

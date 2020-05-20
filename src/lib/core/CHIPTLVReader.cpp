@@ -1381,7 +1381,6 @@ CHIP_ERROR TLVReader::VerifyElement()
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_Structure:
-        case kTLVType_Path:
             if (mElemTag == AnonymousTag)
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
@@ -1390,6 +1389,7 @@ CHIP_ERROR TLVReader::VerifyElement()
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_UnknownContainer:
+        case kTLVType_Path:
             break;
         default:
             return CHIP_ERROR_INCORRECT_STATE;

@@ -92,7 +92,7 @@ jobs:
     - run:
         command: scripts/build/distribution_check.sh
         name: Deployment Check
-  Code Coverage [docker-build]:
+  Build Examples [docker-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
     environment:
@@ -108,11 +108,8 @@ jobs:
         command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
         name: Setup Environment
     - run:
-        command: scripts/tools/codecoverage.sh
-        name: Run Code Coverage
-    - run:
-        command: bash <(curl -s https://codecov.io/bash)
-        name: Upload Code Coverage
+        command: scripts/examples/standalone_echo_client.sh
+        name: Build example Standalone Echo Client
   Build CHIP [mbedtls-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
@@ -258,26 +255,66 @@ jobs:
 workflows:
   Main:
     jobs:
-    - Build CHIP [docker-build]
-    - Build CHIP [mbedtls-build]
-    - Build CHIP [ubuntu-16-lts]
+    - Build CHIP [docker-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+    - Build CHIP [mbedtls-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+    - Build CHIP [ubuntu-16-lts]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
     - Run Tests [docker-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Build CHIP [docker-build]
     - Run Tests [mbedtls-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Build CHIP [mbedtls-build]
     - Run Tests [ubuntu-16-lts]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Build CHIP [ubuntu-16-lts]
-    - Code Coverage [docker-build]:
-        requires:
-        - Build CHIP [docker-build]
     - Deploy [docker-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
         requires:
         - Run Tests [docker-build]
-    - Build Examples [nRF]
-    - Build Examples [ESP32]
+    - Build Examples [nRF]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+    - Build Examples [ESP32]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+    - Build Examples [docker-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+        requires:
+        - Build CHIP [docker-build]
   version: 2
 
 # Original config.yml file:
@@ -474,6 +511,25 @@ workflows:
 #     - run:
 #         command: scripts/examples/nrf_lock_app.sh
 #         name: Build example nRF5 Lock App
+#   examples_standalone:
+#     environment:
+#       BUILD_TYPE: << parameters.builder >>
+#     executor: << parameters.builder >>
+#     parameters:
+#       builder:
+#         type: string
+#     steps:
+#     - load-built-tree:
+#         builder: << parameters.builder >>
+#     - load-build-environment:
+#         builder: << parameters.builder >>
+#     - load-persistent-ci-cache:
+#         builder: << parameters.builder >>
+#     - setup-environment:
+#         builder: << parameters.builder >>
+#     - run:
+#         command: scripts/examples/standalone_echo_client.sh
+#         name: Build example Standalone Echo Client
 #   test:
 #     environment:
 #       BUILD_TYPE: << parameters.builder >>
@@ -515,6 +571,10 @@ workflows:
 #   Main:
 #     jobs:
 #     - build:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         matrix:
 #           parameters:
 #             builder:
@@ -523,6 +583,10 @@ workflows:
 #             - ubuntu-16-lts
 #         name: Build CHIP [<< matrix.builder >>]
 #     - test:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         matrix:
 #           parameters:
 #             builder:
@@ -532,15 +596,11 @@ workflows:
 #         name: Run Tests [<< matrix.builder >>]
 #         requires:
 #         - Build CHIP [<< matrix.builder >>]
-#     - code-coverage:
-#         matrix:
-#           parameters:
-#             builder:
-#             - docker-build
-#         name: Code Coverage [<< matrix.builder >>]
-#         requires:
-#         - Build CHIP [<< matrix.builder >>]
 #     - deploy:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         matrix:
 #           parameters:
 #             builder:
@@ -549,6 +609,26 @@ workflows:
 #         requires:
 #         - Run Tests [<< matrix.builder >>]
 #     - examples_nrf:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         name: Build Examples [nRF]
 #     - examples_esp32:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
 #         name: Build Examples [ESP32]
+#     - examples_standalone:
+#         filters:
+#           branches:
+#             ignore:
+#             - /restyled.*/
+#         matrix:
+#           parameters:
+#             builder:
+#             - docker-build
+#         name: Build Examples [<< matrix.builder >>]
+#         requires:
+#         - Build CHIP [<< matrix.builder >>]

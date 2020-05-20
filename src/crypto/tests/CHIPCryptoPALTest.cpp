@@ -848,11 +848,7 @@ int TestCHIPCryptoPAL(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-void __attribute__((constructor)) my_init(void)
+static void __attribute__((constructor)) TestCHIPCryptoCtor(void)
 {
-    printf("Deploying CHIP Crypto PAL tests\n");
-    if (CHIP_NO_ERROR != RegisterUnitTests(&TestCHIPCryptoPAL))
-    {
-        printf("Failed in deploying CHIP Crypto PAL tests\n");
-    }
+    VerifyOrDie(RegisterUnitTests(&TestCHIPCryptoPAL) == CHIP_NO_ERROR);
 }

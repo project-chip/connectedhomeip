@@ -47,14 +47,7 @@ dist_libChipCrypto_a_HEADERS                                 = \
 
 if CHIP_CRYPTO_OPENSSL
 libChipCrypto_a_SOURCES                                      += \
-    CHIPBase+Crypto.c                                           \
-    CHIPOpenSSL.c                                               \
     CHIPCryptoPALOpenSSL.cpp                                    \
-    $(NULL)
-
-dist_libChipCrypto_a_HEADERS                                += \
-    CHIPCrypto.h                                               \
-    CHIPBase+CompilerAbstraction.h                             \
     $(NULL)
 endif
 
