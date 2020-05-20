@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build/tests.gni")
+import("//src/inet/inet.gni")
 import("core.gni")
 
 config("chip_config") {
@@ -102,4 +103,40 @@ source_set("chip_config_header") {
   public_configs = [ ":chip_config" ]
 
   public_deps = [ "//src/system:system_config_header" ]
+}
+
+source_set("core") {
+  sources = [
+    "CHIPCircularTLVBuffer.cpp",
+    "CHIPCircularTLVBuffer.h",
+    "CHIPCore.h",
+    "CHIPEncoding.h",
+    "CHIPError.cpp",
+    "CHIPError.h",
+    "CHIPKeyIds.cpp",
+    "CHIPKeyIds.h",
+    "CHIPTLV.h",
+    "CHIPTLVDebug.cpp",
+    "CHIPTLVReader.cpp",
+    "CHIPTLVTags.h",
+    "CHIPTLVTypes.h",
+    "CHIPTLVUpdater.cpp",
+    "CHIPTLVUtilities.cpp",
+    "CHIPTLVWriter.cpp",
+  ]
+
+  public_deps = [
+    ":chip_config_header",
+    "//src/ble",
+    "//src/inet",
+    "//src/lib/support",
+    "//src/system",
+    "//third_party/nlio",
+  ]
+
+  allow_circular_includes_from = [
+    "//src/ble",
+    "//src/lib/support",
+    "//src/inet",
+  ]
 }
