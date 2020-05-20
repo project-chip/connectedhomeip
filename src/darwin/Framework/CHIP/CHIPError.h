@@ -1,7 +1,3 @@
-//
-//  CHIPError.h
-//  CHIPQRCodeReader
-//
 /**
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -24,16 +20,19 @@
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const CHIPErrorDomain;
 
+typedef int32_t CHIP_ERROR;
+
 typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
     CHIPErrorCodeUndefinedError = 0,
     CHIPErrorCodeInvalidStringLength = 1,
     CHIPErrorCodeInvalidIntegerValue = 2,
     CHIPErrorCodeInvalidArgument = 3,
     CHIPErrorCodeInvalidMessageLength = 4,
+    CHIPErrorCodeInvalidState = 5,
 };
 
 @interface CHIPError : NSObject
-+ (nullable NSError *)errorForCHIPErrorCode:(int32_t)errorCode;
++ (nullable NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
 @end
 
 NS_ASSUME_NONNULL_END

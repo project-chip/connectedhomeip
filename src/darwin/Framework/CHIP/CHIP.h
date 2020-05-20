@@ -1,6 +1,3 @@
-//
-//  CHIP.h
-//  CHIP
 /**
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -23,6 +20,8 @@
 #import "CHIPManualSetupPayloadParser.h"
 #import "CHIPQRCodeSetupPayloadParser.h"
 #import "CHIPSetupPayload.h"
+#import "CHIPDeviceController.h"
+#import "CHIPEchoClient.h"
 
 #import <Foundation/Foundation.h>
 //! Project version number for CHIP.

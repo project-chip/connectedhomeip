@@ -256,6 +256,11 @@ Error SetClock_RealTime(uint64_t newCurTime)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
+Error SetClock_RealTime(uint64_t newCurTime)
+{
+    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+}
+
 } // namespace Layer
 } // namespace Platform
 } // namespace System
