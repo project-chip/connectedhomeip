@@ -65,11 +65,7 @@ AbsTopResultDir                 = $(CURDIR)/$(TopResultDir)
 
 TargetTuple                     = $(shell ${AbsTopSourceDir}/third_party/nlbuild-autotools/repo/third_party/autoconf/config.guess | sed -e 's/[[:digit:].]*$$//g')
 
-ifeq ($(HOSTOS),darwin)
-ProjectConfigDir               ?= $(AbsTopSourceDir)/config/standalone/darwin
-else
 ProjectConfigDir               ?= $(AbsTopSourceDir)/config/standalone
-endif
 
 ifeq ($(ARCH),x86_64)
 configure_OPTIONS               = CPPFLAGS="-maes"
