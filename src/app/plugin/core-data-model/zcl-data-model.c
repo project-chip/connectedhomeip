@@ -23,8 +23,6 @@
  *
  */
 
-#include "zcl-data-model.h"
-
 #ifdef CHIP_TEST
 #include "utest.h"
 #endif

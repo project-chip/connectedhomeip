@@ -23,7 +23,7 @@
  */
 
 #include "utest.h" /* TODO pass all that stuff in -D */
-#include "zcl-data-model.h"
+#include "chip-zcl.h"
 
 int main()
 {

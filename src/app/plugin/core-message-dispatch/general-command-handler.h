@@ -27,7 +27,6 @@
 
 #include "chip-zcl.h"
 #include "gen.h"
-#include "zcl-data-model.h"
 
 ChipZclStatus_t chipZclGeneralCommandParse(ChipZclCommandContext_t * context);
 

@@ -1,6 +1,6 @@
 NAME=dispatch
 GEN=../../gen
-REQUIRED_PLUGINS=../core-data-model/zcl-data-model.o ../cluster-server-on-off/on-off-server.o ../binding-mock/mock.o $(GEN)/cluster-command-handler.o $(GEN)/gen-specs.o $(GEN)/gen-callback-stubs.o
+REQUIRED_PLUGINS=../core-data-model/zcl-data-model.o ../cluster-server-on-off/on-off-server.o ../binding-mock/mock.o $(GEN)/gen-command-handler.o $(GEN)/gen-specs.o $(GEN)/gen-callback-stubs.o
 
 # ---------- GENERIC -------------
 CC=gcc

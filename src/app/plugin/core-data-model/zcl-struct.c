@@ -39,7 +39,6 @@
 #include "chip-zcl-struct.h"
 #include "chip-zcl.h"
 #include "gen.h"
-#include "zcl-data-model.h"
 // Functions for extracting information about structs and fields.
 
 uint16_t chipZclLowHighInt16u(const uint8_t * contents)
