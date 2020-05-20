@@ -54,7 +54,7 @@ endif # CONFIG_DEVICE_LAYER
 MAYBE_QRCODE_TOOL                 = \
     $(NULL)
 
-if CHIP_TARGET_STYLE_UNIX
+if !CONFIG_DEVICE_LAYER
     MAYBE_QRCODE_TOOL +=  \ 
     qrcodetool \
     $(NULL)
