@@ -31,68 +31,65 @@
 
 #include <support/CHIPLogging.h>
 
-
 #if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
 
 namespace chip {
 
-    namespace Logging {
+namespace Logging {
 
-        /*
-         *  void Log()
-         *
-         *  Description:
-         *    This routine writes to the Foundation log stream, the
-         *    specified CHIP-related variable argument message for the
-         *    specified CHIP module and category.
-         *
-         *  Input(s):
-         *    aModule   - An enumeration indicating the CHIP module or
-         *                subsystem the message is associated with.
-         *    aCategory - An enumeration indicating the CHIP category
-         *                the message is associated with.
-         *    aMsg      - A NULL-terminated C string containing the message,
-         *                with C Standard I/O-style format specifiers, to log.
-         *    ...       - A variable argument list, corresponding to format
-         *                specifiers in the message.
-         *
-         *  Output(s):
-         *    N/A
-         *
-         *  Returns:
-         *    N/A
-         *
-         */
-        void Log(uint8_t aModule, uint8_t aCategory, const char * aMsg, ...)
-        {
-            va_list v;
+    /*
+     *  void Log()
+     *
+     *  Description:
+     *    This routine writes to the Foundation log stream, the
+     *    specified CHIP-related variable argument message for the
+     *    specified CHIP module and category.
+     *
+     *  Input(s):
+     *    aModule   - An enumeration indicating the CHIP module or
+     *                subsystem the message is associated with.
+     *    aCategory - An enumeration indicating the CHIP category
+     *                the message is associated with.
+     *    aMsg      - A NULL-terminated C string containing the message,
+     *                with C Standard I/O-style format specifiers, to log.
+     *    ...       - A variable argument list, corresponding to format
+     *                specifiers in the message.
+     *
+     *  Output(s):
+     *    N/A
+     *
+     *  Returns:
+     *    N/A
+     *
+     */
+    void Log(uint8_t aModule, uint8_t aCategory, const char * aMsg, ...)
+    {
+        va_list v;
 
-            va_start(v, aMsg);
+        va_start(v, aMsg);
 
-            if (IsCategoryEnabled(aCategory)) {
-                char formattedMsg[512];
-                size_t prefixLen;
+        if (IsCategoryEnabled(aCategory)) {
+            char formattedMsg[512];
+            size_t prefixLen;
 
-                char moduleName[ChipLoggingModuleNameLen + 1];
-                GetModuleName(moduleName, aModule);
+            char moduleName[ChipLoggingModuleNameLen + 1];
+            GetModuleName(moduleName, aModule);
 
-                prefixLen = snprintf(formattedMsg, sizeof(formattedMsg), "CHIP:%s: %s", moduleName,
-                    (aCategory == kLogCategory_Error) ? "ERROR: " : "");
-                if (prefixLen >= sizeof(formattedMsg))
-                    prefixLen = sizeof(formattedMsg) - 1;
+            prefixLen = snprintf(
+                formattedMsg, sizeof(formattedMsg), "CHIP:%s: %s", moduleName, (aCategory == kLogCategory_Error) ? "ERROR: " : "");
+            if (prefixLen >= sizeof(formattedMsg))
+                prefixLen = sizeof(formattedMsg) - 1;
 
-                vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aMsg, v);
+            vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aMsg, v);
 
-                os_log(OS_LOG_DEFAULT, "%s", formattedMsg);
-
-            }
-
-            va_end(v);
+            os_log(OS_LOG_DEFAULT, "%s", formattedMsg);
         }
 
-    } // namespace Logging
+        va_end(v);
+    }
+
+} // namespace Logging
 
 } // namespace chip
 
 #endif // CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
-
