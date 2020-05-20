@@ -15,17 +15,16 @@
  *    limitations under the License.
  */
 
-
 #ifndef CHIP_DEVICE_CONTROLLER_H
 #define CHIP_DEVICE_CONTROLLER_H
 
-#import <Foundation/Foundation.h>
 #import "CHIPError.h"
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^ControllerOnMessageBlock)(NSData* message, NSString* ipAddress, UInt16 port);
-typedef void (^ControllerOnErrorBlock)(NSError* error);
+typedef void (^ControllerOnMessageBlock)(NSData * message, NSString * ipAddress, UInt16 port);
+typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @interface CHIPDeviceController : NSObject
 
@@ -33,7 +32,11 @@ typedef void (^ControllerOnErrorBlock)(NSError* error);
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
 - (instancetype)init:(dispatch_queue_t)appCallbackQueue;
-- (BOOL)connect:(NSString *)ipAddress port:(UInt16)port error:(NSError * __autoreleasing *)error onMessage:(ControllerOnMessageBlock)onMessage onError:(ControllerOnErrorBlock)onError;
+- (BOOL)connect:(NSString *)ipAddress
+           port:(UInt16)port
+          error:(NSError * __autoreleasing *)error
+      onMessage:(ControllerOnMessageBlock)onMessage
+        onError:(ControllerOnErrorBlock)onError;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
 - (BOOL)isConnected;
