@@ -17,22 +17,16 @@
 
 /**
  *    @file
- *      This file provides the unit test header for the CHIP ZCL
- *      Application Layer basic cluster server plugin
+ *      This file provides single inclusion header for the entire generated layer.
  *
  */
 
-#ifndef UTEST_H
-#define UTEST_H
+// Enclosing macro to prevent multiple inclusion
+#ifndef CHIP_ZCL_GEN_HEADER
+#define CHIP_ZCL_GEN_HEADER
 
-#define PLATFORM_HEADER "utest.h"
-#define CONFIGURATION_HEADER "utest.h"
-#define CHIP_AF_API_STACK "utest.h"
-#define CHIP_AF_API_ZCL_CORE "utest.h"
+#include "gen-callbacks.h"
+#include "gen-cluster-id.h"
+#include "gen-types.h"
 
-#include "chip-zcl.h"
-
-#include "gen.h"
-
-#include <stdio.h>
-#endif /*  UTEST_H */
+#endif // CHIP_ZCL_GEN_HEADER

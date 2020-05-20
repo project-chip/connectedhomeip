@@ -28,6 +28,7 @@
 
 #include "../../api/chip-zcl-codec.h"
 #include <memory.h>
+#include <stdint.h>
 
 /**
  * @brief Starts the encoding process. if there is any kind of preamble of anything, this function is responsible for putting it

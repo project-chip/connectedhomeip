@@ -26,7 +26,7 @@
 #define ZCL_COMMAND_DISPATCH_H
 
 #include "chip-zcl.h"
-#include "cluster-command-handler.h"
+#include "gen-command-handler.h"
 #include "general-command-handler.h"
 
 // Main command parsing controller.
