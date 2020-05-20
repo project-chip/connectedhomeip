@@ -88,37 +88,6 @@ ifeq ($(HOSTOS),darwin)
 configure_OPTIONS              += ac_cv_func_clock_gettime=no  ac_cv_have_decl_clock_gettime=no
 endif
 
-# By default, attempt use the system's OpenSSL library, falling back to building the internal
-# copy of OpenSSL (in third_party/openssl) when necessary.
-#
-# On Linux, the logic uses pkg-config to determine if the OpenSSL development package (libssl-dev)
-# has been installed.  If not, the internal copy of OpenSSL is built.
-#
-# On OS X, the logic uses homebrew to determine if OpenSSL has been installed.  If not, the
-# internal copy of OpenSSL will be built.
-#
-# The variable OPENSSL can be used to override the above logic and specify a particular root
-# directory in which to find the OpenSSL headers and libraries.
-#
-# Setting OPENSSL=no or NO_OPENSSL=1 will cause CHIP to be built without OpenSSL.  Note that
-# building without OpenSSL automatically suppresses the building of various command line tools that
-# have a hard dependency on OpenSSL (e.g. the CHIP tool).
-
-ifeq ($(NO_OPENSSL),1)
-OPENSSL                         = no
-else
-ifeq ($(HOSTOS),darwin)
-OPENSSL                        ?= $(shell if which brew > /dev/null && brew ls --versions openssl > /dev/null; then brew --prefix openssl; else echo "internal"; fi)
-else
-OPENSSL                        ?= $(shell if which pkg-config > /dev/null && pkg-config --exists openssl; then echo ""; else echo "internal"; fi)
-endif
-endif
-configure_OPTIONS              += --with-openssl=$(OPENSSL)
-ifeq ($(OPENSSL),no)
-configure_OPTIONS              += --disable-tools
-ProjectConfigDir                = $(AbsTopSourceDir)/config/standalone/no-openssl
-endif
-
 # If the user has asserted USE_FUZZING enable fuzzing build
 ifeq ($(USE_FUZZING),1)
 configure_OPTIONS              += --enable-fuzzing
