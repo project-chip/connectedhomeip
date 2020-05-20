@@ -10,6 +10,8 @@ die() {
 
 export >"$TEMP_DIR/env.sh"
 
+export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
+
 set -ex
 
 if [[ ${ARCHS} = arm64 ]]; then
@@ -53,7 +55,7 @@ configure_OPTIONS+=(
 )
 
 [[ ${PLATFORM_FAMILY_NAME} == iOS ]] && {
-    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios --with-logging-style=external)
+    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios)
 }
 
 [[ ${PLATFORM_FAMILY_NAME} == macOS ]] && configure_OPTIONS+=(--with-chip-project-includes=no)
@@ -68,6 +70,7 @@ configure_OPTIONS+=(
     --disable-shared
     --disable-tests
     --disable-tools
+    --with-logging-style=external
     --with-chip-system-project-includes=no
     --with-chip-inet-project-includes=no
     --with-chip-ble-project-includes=no
@@ -89,5 +92,7 @@ configure_OPTIONS+=(
         done
     fi
 
-    make V=1 install
+    make V=1 install-data                 # all the headers
+    make V=1 -C src/lib install           # libCHIP.a
+    make V=1 -C src/setup_payload install # libSetupPayload.a
 )

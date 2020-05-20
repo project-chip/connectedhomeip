@@ -21,6 +21,7 @@
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
 		BA09EB44247477BC00605257 /* libSetupPayload.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB402474762900605257 /* libSetupPayload.a */; };
 		BA107AEF2470CFBB004287EB /* chip_xcode_build_connector.sh in Resources */ = {isa = PBXBuildFile; fileRef = BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */; };
+		C4C222C02475A38700984173 /* CHIPLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = C4C222BF2475A38700984173 /* CHIPLogging.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA09EB402474762900605257 /* libSetupPayload.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSetupPayload.a; path = lib/libSetupPayload.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
+		C4C222BF2475A38700984173 /* CHIPLogging.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPLogging.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 				B2E0D7A8245B0B5C003C5B48 /* CHIP.h */,
 				B2E0D7AB245B0B5C003C5B48 /* CHIPError.h */,
 				B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */,
+				C4C222BF2475A38700984173 /* CHIPLogging.mm */,
 				B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */,
 				B2E0D7AD245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm */,
 				B2E0D7AC245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h */,
@@ -267,6 +270,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
+				C4C222C02475A38700984173 /* CHIPLogging.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* CHIPSetupPayload.mm in Sources */,
 				B2E0D7B6245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm in Sources */,
@@ -554,6 +558,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -655,6 +660,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
