@@ -31,9 +31,9 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include <CHIPTLV.h>
-#include <CHIPTLVDebug.hpp>
-#include <CHIPTLVUtilities.hpp>
+#include <core/CHIPTLV.h>
+#include <core/CHIPTLVDebug.hpp>
+#include <core/CHIPTLVUtilities.hpp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
