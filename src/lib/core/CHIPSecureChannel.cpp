@@ -24,6 +24,7 @@
 
 #include <core/CHIPSecureChannel.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <string.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
