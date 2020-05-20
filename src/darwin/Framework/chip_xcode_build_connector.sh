@@ -91,5 +91,9 @@ configure_OPTIONS+=(
         done
     fi
 
-    make V=1 install
+    make V=1 install-headers                 # all the headers
+    make V=1 -C src/lib/support install-am   # other headers
+    make V=1 -C src/system      install-am   # other headers
+    make V=1 -C src/lib install-am           # libCHIP.a
+    make V=1 -C src/setup_payload install-am # libSetupPayload.a
 )
