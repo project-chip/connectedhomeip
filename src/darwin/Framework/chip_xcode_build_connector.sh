@@ -10,6 +10,8 @@ die() {
 
 export >"$TEMP_DIR/env.sh"
 
+export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
+
 set -ex
 
 if [[ ${ARCHS} = arm64 ]]; then
