@@ -34,7 +34,7 @@ static NSString * const kEchoString = @"Hello from darwin!";
 - (instancetype)initWithServerAddress:(NSString *)ipAddress port:(UInt16)port {
     if (self = [super init]) {
         NSError * error;
-        _echoCallbackQueue = dispatch_queue_create("com.za.chip.echoCallbackQueue", NULL);
+        _echoCallbackQueue = dispatch_queue_create("com.zigbee.chip.echo", NULL);
         _chipController = [[CHIPDeviceController alloc] init:_echoCallbackQueue];
 
         BOOL didInit = [_chipController connect:ipAddress port:port error:&error onMessage:^(NSData *  _Nonnull message, NSString * _Nonnull ipAddress, UInt16 port) {
