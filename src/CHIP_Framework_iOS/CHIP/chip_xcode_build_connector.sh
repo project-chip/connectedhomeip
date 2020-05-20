@@ -25,17 +25,22 @@ CHIP_PREFIX=${CHIP_PREFIX:-"$BUILT_PRODUCTS_DIR"}
 
 [[ -d ${CHIP_ROOT} ]] || die Please set CHIP_ROOT to the location of the CHIP directory
 
+DEFINES=()
 # lots of environment variables passed by xcode to this script
-if [[ ${CONFIGURATION} == Debug ]]; then
+if [[ ${CONFIGURATION} == Debug* ]]; then
     configure_OPTIONS+=(--enable-debug)
-    DEFINES+="-DDEBUG=1 -UNDEBUG"
+    DEFINES+=(-UNDEBUG)
 else
-    DEFINES+="-DNDEBUG=1 -UDEBUG"
+    DEFINES+=(-UDEBUG)
 fi
+
+read -r -a GCC_PREPROCESSOR_DEFINITIONS <<<$GCC_PREPROCESSOR_DEFINITIONS
+
+DEFINES+=("${GCC_PREPROCESSOR_DEFINITIONS[@]/#/-D}")
 
 ARCH_FLAGS="-arch $ARCHS"
 SYSROOT_FLAGS="-isysroot $SDK_DIR"
-COMPILER_FLAGS="$ARCH_FLAGS $SYSROOT_FLAGS $DEFINES"
+COMPILER_FLAGS="$ARCH_FLAGS $SYSROOT_FLAGS ${DEFINES[*]}"
 
 configure_OPTIONS+=(
     CPP="cc -E"
@@ -47,11 +52,11 @@ configure_OPTIONS+=(
     LDFLAGS="$ARCH_FLAGS"
 )
 
-[[ ${PLATFORM_NAME} == iphoneos ]] && {
+[[ ${PLATFORM_FAMILY_NAME} == iOS ]] && {
     configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios --with-logging-style=external)
 }
 
-[[ ${PLATFORM_NAME} == macosx ]] && configure_OPTIONS+=(--with-chip-project-includes=no)
+[[ ${PLATFORM_FAMILY_NAME} == macOS ]] && configure_OPTIONS+=(--with-chip-project-includes=no)
 
 configure_OPTIONS+=(
     --prefix="$CHIP_PREFIX"
