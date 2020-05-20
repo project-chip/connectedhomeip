@@ -18,7 +18,7 @@ group("all") {
   deps = [
     "src/ble",
     "src/inet",
-    "src/lib/core:chip_config_header",
+    "src/lib/core",
     "src/lib/support",
     "src/lwip:all",
     "src/system",
