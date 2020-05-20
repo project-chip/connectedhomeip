@@ -72,6 +72,11 @@ AM_CPPFLAGS                                           = \
     $(NULL)
     $(NULL)
 
+CHIP_LDADD                                            = \
+    $(top_builddir)/src/lib/libCHIP.a                   \
+    $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(NULL)
+
 COMMON_LDADD                                           = \
     libSetupPayloadTests.a                               \
     $(COMMON_LDFLAGS)                                    \
@@ -81,11 +86,6 @@ COMMON_LDADD                                           = \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                         \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                   \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                    \
-    $(NULL)
-
-CHIP_LDADD                                            = \
-    $(top_builddir)/src/lib/libCHIP.a                   \
-    $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
     
 # Test applications that should be run when the 'check' target is run.
