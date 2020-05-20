@@ -36,12 +36,12 @@
 
 #include <assert.h>
 
-#include "chip-zcl.h"
 #include "chip-zcl-struct.h"
-#include "zcl-data-model.h"
-#include "gen-callbacks.h"
+#include "chip-zcl.h"
 #include "gen-attribute-type.h"
+#include "gen-callbacks.h"
 #include "gen-endpoint-config.h"
+#include "zcl-data-model.h"
 // Functions for extracting information about structs and fields.
 
 uint16_t chipZclLowHighInt16u(const uint8_t * contents)
