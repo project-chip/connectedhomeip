@@ -105,6 +105,7 @@ enum LogModule
     kLogModule_chipSystemLayer,
     kLogModule_EventLogging,
     kLogModule_Support,
+    kLogModule_chipTool,
 
     kLogModule_Max
 };

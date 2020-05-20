@@ -51,6 +51,15 @@ MAYBE_PLATFORM_SUBDIRS           += \
     $(NULL)
 endif # CONFIG_DEVICE_LAYER
 
+MAYBE_QRCODE_TOOL                 = \
+    $(NULL)
+
+if !CONFIG_DEVICE_LAYER
+    MAYBE_QRCODE_TOOL +=  \ 
+    qrcodetool \
+    $(NULL)
+endif
+
 # Always package (e.g. for 'make dist') these subdirectories.
 
 DIST_SUBDIRS                      = \
@@ -63,6 +72,7 @@ DIST_SUBDIRS                      = \
     setup_payload                   \
     crypto                          \
     $(PLATFORM_SUBDIRS)             \
+    qrcodetool                      \
     $(NULL)
 
 # Always build (e.g. for 'make all') these subdirectories.
@@ -77,6 +87,7 @@ SUBDIRS                           = \
     setup_payload                   \
     crypto                          \
     $(MAYBE_PLATFORM_SUBDIRS)       \
+    $(MAYBE_QRCODE_TOOL)            \
     $(NULL)
 
 if CHIP_BUILD_TESTS
