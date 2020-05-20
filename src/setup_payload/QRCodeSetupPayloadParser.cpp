@@ -101,7 +101,7 @@ static CHIP_ERROR retrieveStringOptionalInfo(TLVReader & reader, OptionalQRCodeI
 static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader & reader, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    int storedInteger;
+    int64_t storedInteger;
     err = reader.Get(storedInteger);
     if (err != CHIP_NO_ERROR)
     {
