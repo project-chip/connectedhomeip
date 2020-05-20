@@ -103,3 +103,36 @@ void chipZclReverseClusterSpec(const ChipZclClusterSpec_t * s1, ChipZclClusterSp
 {
     return;
 }
+
+/**
+ * Function that allocates a buffer.
+ */
+ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
+{
+    ChipZclRawBuffer_t * buffer = malloc(sizeof(ChipZclRawBuffer_t));
+    buffer->buffer              = malloc(allocatedLength * sizeof(uint8_t));
+    buffer->endPosition         = 0;
+    buffer->currentPosition     = 0;
+    buffer->totalLength         = allocatedLength;
+}
+
+/**
+ * Function that frees a buffer.
+ */
+void chipZclBufferFree(ChipZclRawBuffer_t * buffer)
+{
+    free(buffer->buffer);
+    free(buffer);
+}
+
+void chipZclBufferFlip(ChipZclRawBuffer_t * buffer)
+{
+    buffer->endPosition     = buffer->currentPosition;
+    buffer->currentPosition = 0;
+}
+
+void chipZclBufferClear(ChipZclRawBuffer_t * buffer)
+{
+    buffer->currentPosition = 0;
+    buffer->endPosition     = buffer->totalLength;
+}
