@@ -22,7 +22,7 @@
  *      Asynchronous Domain Name System (DNS) resolution in InetLayer.
  *
  */
-#include <InetLayer.h>
+#include <inet/InetLayer.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 

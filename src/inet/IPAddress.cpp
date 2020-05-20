@@ -31,7 +31,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <IPAddress.h>
+#include <inet/IPAddress.h>
 
 #include <core/CHIPEncoding.h>
 

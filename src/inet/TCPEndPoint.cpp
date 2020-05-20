@@ -35,7 +35,7 @@
 #include "TCPEndPoint.h"
 
 #include "InetFaultInjection.h"
-#include <InetLayer.h>
+#include <inet/InetLayer.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>

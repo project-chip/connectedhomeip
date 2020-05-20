@@ -28,7 +28,7 @@
 
 #include <support/DLLUtil.h>
 
-#include <InetLayer.h>
+#include <inet/InetLayer.h>
 
 namespace chip {
 namespace Inet {
