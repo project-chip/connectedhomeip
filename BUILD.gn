@@ -17,6 +17,7 @@ import("build/tests.gni")
 group("all") {
   deps = [
     "src/lib/core:chip_config_header",
+    "src/lib/support",
     "src/lwip:all",
     "src/system:system_config_header",
     "third_party/mbedtls",
