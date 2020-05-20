@@ -2135,7 +2135,6 @@ AC_MSG_NOTICE([
   Build long running tests                         : ${nl_cv_build_long_tests}
   Build tools                                      : ${build_tools}
   Tunnel Failover support                          : ${build_tunnel_failover}
-  Build legacy WDM profile                         : ${build_legacy_wdm}
   Prefix                                           : ${prefix}
   Shadow directory program                         : ${LNDIR}
   Cocoa support                                    : ${enable_cocoa}

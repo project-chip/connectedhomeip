@@ -40,9 +40,6 @@
 // Uncomment this for a large Tunnel MTU.
 //#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
-// Max number of Bindings per CHIPExchangeManager
-#define CHIP_CONFIG_MAX_BINDINGS 8
-
 #define CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE 0
 
 #define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0

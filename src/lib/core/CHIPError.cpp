@@ -421,7 +421,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         desc = "Shortcut Tunnel peer entry not found";
         break;
     case CHIP_ERROR_TUNNEL_FORCE_ABORT:
-        desc = "Forced Tunnel Abort.";
+        desc = "Forced Tunnel Abort";
         break;
     case CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED:
         desc = "DRBG entropy source failed to generate entropy data";
@@ -478,16 +478,16 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         desc = "Failure to lock/unlock OS-provided lock";
         break;
     case CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG:
-        desc = "Unsupported passcode encryption configuration.";
+        desc = "Unsupported passcode encryption configuration";
         break;
     case CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED:
-        desc = "Passcode authentication failed.";
+        desc = "Passcode authentication failed";
         break;
     case CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED:
-        desc = "Passcode fingerprint failed.";
+        desc = "Passcode fingerprint failed";
         break;
     case CHIP_ERROR_SERIALIZATION_ELEMENT_NULL:
-        desc = "Element requested is null.";
+        desc = "Element requested is null";
         break;
     case CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM:
         desc = "Certificate not signed with required signature algorithm";
@@ -495,26 +495,26 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM:
         desc = "CHIP signature not signed with required signature algorithm";
         break;
-    case CHIP_ERROR_WDM_SCHEMA_MISMATCH:
-        desc = "Schema mismatch in WDM.";
+    case CHIP_ERROR_SCHEMA_MISMATCH:
+        desc = "Schema mismatch";
         break;
     case CHIP_ERROR_INVALID_INTEGER_VALUE:
-        desc = "Invalid integer value.";
+        desc = "Invalid integer value";
         break;
     case CHIP_ERROR_CASE_RECONFIG_REQUIRED:
         desc = "CASE reconfiguration required";
         break;
     case CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS:
-        desc = "Too many CASE reconfigurations were received.";
+        desc = "Too many CASE reconfigurations were received";
         break;
     case CHIP_ERROR_BAD_REQUEST:
-        desc = "Request cannot be processed or fulfilled.";
+        desc = "Request cannot be processed or fulfilled";
         break;
     case CHIP_ERROR_INVALID_MESSAGE_FLAG:
-        desc = "Invalid message flag.";
+        desc = "Invalid message flag";
         break;
     case CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED:
-        desc = "Key export protocol required to reconfigure.";
+        desc = "Key export protocol required to reconfigure";
         break;
     case CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS:
         desc = "No supported key export protocol configurations in common";
@@ -537,8 +537,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES:
         desc = "Too many shared session end nodes";
         break;
-    case CHIP_ERROR_WDM_MALFORMED_DATA_ELEMENT:
-        desc = "Malformed WDM DataElement";
+    case CHIP_ERROR_MALFORMED_DATA_ELEMENT:
+        desc = "Malformed DataElement";
         break;
     case CHIP_ERROR_WRONG_CERT_TYPE:
         desc = "Wrong certificate type";
@@ -570,38 +570,23 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION:
         desc = "Update Required Version mismatch";
         break;
-    case CHIP_ERROR_WDM_MALFORMED_STATUS_ELEMENT:
-        desc = "Status Element in WDM update is malformed";
-        break;
-    case CHIP_ERROR_WDM_SUBSCRIPTIONLESS_NOTIFY_PARTIAL:
-        desc = "The WDM Subscriptionless Notify is partial";
-        break;
     case CHIP_ERROR_ACCESS_DENIED:
         desc = "The CHIP message is not granted access";
         break;
     case CHIP_ERROR_UNKNOWN_RESOURCE_ID:
         desc = "Unknown resource ID";
         break;
-    case CHIP_ERROR_WDM_MALFORMED_UPDATE_RESPONSE:
-        desc = "Malformed WDM Update response";
-        break;
-    case CHIP_ERROR_WDM_VERSION_MISMATCH:
-        desc = "The conditional update of a WDM path failed for a version mismatch";
-        break;
-    case CHIP_ERROR_WDM_POTENTIAL_DATA_LOSS:
-        desc = "A potential data loss was detected in a WDM Trait Instance";
+    case CHIP_ERROR_VERSION_MISMATCH:
+        desc = "Version mismatch";
         break;
     case CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE:
         desc = "Legacy device doesn't support standalone Thread network creation";
         break;
-    case CHIP_ERROR_WDM_INCONSISTENT_CONDITIONALITY:
+    case CHIP_ERROR_INCONSISTENT_CONDITIONALITY:
         desc = "The Trait Instance is already being updated with a different conditionality";
         break;
-    case CHIP_ERROR_WDM_LOCAL_DATA_INCONSISTENT:
+    case CHIP_ERROR_LOCAL_DATA_INCONSISTENT:
         desc = "The local data does not match any known version of the Trait Instance";
-        break;
-    case CHIP_ERROR_WDM_PATH_STORE_FULL:
-        desc = "A WDM TraitPath store is full";
         break;
     case CHIP_EVENT_ID_FOUND:
         desc = "Event ID matching criteria was found";

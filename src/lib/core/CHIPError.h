@@ -1397,13 +1397,13 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM             _CHIP_ERROR(143)
 
 /**
- *  @def CHIP_ERROR_WDM_SCHEMA_MISMATCH
+ *  @def CHIP_ERROR_SCHEMA_MISMATCH
  *
  *  @brief
  *    A mismatch in schema was encountered.
  *
  */
-#define CHIP_ERROR_WDM_SCHEMA_MISMATCH                         _CHIP_ERROR(144)
+#define CHIP_ERROR_SCHEMA_MISMATCH                            _CHIP_ERROR(144)
 
 /**
  *  @def CHIP_ERROR_INVALID_INTEGER_VALUE
@@ -1524,14 +1524,14 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES           _CHIP_ERROR(157)
 
 /**
- * @def CHIP_ERROR_WDM_MALFORMED_DATA_ELEMENT
+ * @def CHIP_ERROR_MALFORMED_DATA_ELEMENT
  *
  * @brief
- *   The WDM DataElement is malformed: it either does not contain
+ *   The DataElement is malformed: it either does not contain
  *   the required elements, or it contais both the MergeData element
  *   and DeletedDictionaryKeyList.
  */
-#define CHIP_ERROR_WDM_MALFORMED_DATA_ELEMENT                  _CHIP_ERROR(158)
+#define CHIP_ERROR_MALFORMED_DATA_ELEMENT                  _CHIP_ERROR(158)
 
 /**
  * @def CHIP_ERROR_WRONG_CERT_TYPE
@@ -1616,26 +1616,10 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *  @def CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION
  *
  *  @brief
- *    Encountered a mismatch between wdm update required version and current version
+ *    Encountered a mismatch between update required version and current version
  */
 #define CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION            _CHIP_ERROR(170)
 
-/**
- * @def CHIP_ERROR_WDM_MALFORMED_STATUS_ELEMENT
- *
- * @brief
- *   The WDM StatusElement is malformed: it does not contain
- *   either the profile id or the status code.
- */
-#define CHIP_ERROR_WDM_MALFORMED_STATUS_ELEMENT                _CHIP_ERROR(171)
-
-/**
- * @def CHIP_ERROR_WDM_SUBSCRIPTIONLESS_NOTIFY_PARTIAL
- *
- * @brief
- *   The WDM Subscriptionless Notify is partial.
- */
-#define CHIP_ERROR_WDM_SUBSCRIPTIONLESS_NOTIFY_PARTIAL         _CHIP_ERROR(172)
 
 /**
  *  @def CHIP_ERROR_ACCESS_DENIED
@@ -1655,31 +1639,14 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_UNKNOWN_RESOURCE_ID                          _CHIP_ERROR(174)
 
 /**
- * @def CHIP_ERROR_WDM_MALFORMED_UPDATE_RESPONSE
- *
- * @brief
- *   The WDM UpdateResponse payload is malformed: it does not contain
- *   either the StatusList or the VersionList.
- */
-#define CHIP_ERROR_WDM_MALFORMED_UPDATE_RESPONSE                _CHIP_ERROR(175)
-
-/**
- * @def CHIP_ERROR_WDM_VERSION_MISMATCH
+ * @def CHIP_ERROR_VERSION_MISMATCH
  *
  * @brief
  *   The conditional update of a trait instance path has failed
  *   because the local changes are based on an obsolete version of the
  *   data.
  */
-#define CHIP_ERROR_WDM_VERSION_MISMATCH                         _CHIP_ERROR(176)
-
-/**
- * @def CHIP_ERROR_WDM_POTENTIAL_DATA_LOSS
- *
- * @brief
- *   A potential data loss was detected for a Trait Instance.
- */
-#define CHIP_ERROR_WDM_POTENTIAL_DATA_LOSS                      _CHIP_ERROR(177)
+#define CHIP_ERROR_VERSION_MISMATCH                         _CHIP_ERROR(176)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE
@@ -1693,7 +1660,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE            _CHIP_ERROR(178)
 
 /**
- *  @def CHIP_ERROR_WDM_INCONSISTENT_CONDITIONALITY
+ *  @def CHIP_ERROR_INCONSISTENT_CONDITIONALITY
  *
  *  @brief
  *    A TraitPath was declared updated with a conditionality that
@@ -1701,26 +1668,18 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *    same Trait Instance.
  *
  */
-#define CHIP_ERROR_WDM_INCONSISTENT_CONDITIONALITY              _CHIP_ERROR(179)
+#define CHIP_ERROR_INCONSISTENT_CONDITIONALITY              _CHIP_ERROR(179)
 
 /**
- *  @def CHIP_ERROR_WDM_LOCAL_DATA_INCONSISTENT
+ *  @def CHIP_ERROR_LOCAL_DATA_INCONSISTENT
  *
  *  @brief
  *    The local data does not match any known version of the
  *    Trait Instance and cannot support the operation requested.
  *
  */
-#define CHIP_ERROR_WDM_LOCAL_DATA_INCONSISTENT                  _CHIP_ERROR(180)
+#define CHIP_ERROR_LOCAL_DATA_INCONSISTENT                  _CHIP_ERROR(180)
 
-/**
- *  @def CHIP_ERROR_WDM_PATH_STORE_FULL
- *
- *  @brief
- *    WDM cannot store a TraitPath for lack of memory.
- *
- */
-#define CHIP_ERROR_WDM_PATH_STORE_FULL                          _CHIP_ERROR(181)
 /**
  * @def CHIP_EVENT_ID_FOUND
  *

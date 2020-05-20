@@ -138,13 +138,6 @@ enum PublicEventTypes
     kServiceConnectivityChange,
 
     /**
-     * Service Subscription State Change
-     *
-     * Signals a change in the device's WDM subscription state with a chip-enabled service.
-     */
-    kServiceSubscriptionStateChange,
-
-    /**
      * Fabric Membership Change
      *
      * Signals a change in the device's membership in a chip fabric.

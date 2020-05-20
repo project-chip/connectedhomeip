@@ -109,22 +109,6 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER "DUMMY_SN"
 
 /**
- * CHIP_CONFIG_MAX_BINDINGS
- *
- * Maximum number of simultaneously active bindings per ChipExchangeManager
- * 1 (Time Sync) + 2 (Two 1-way subscriptions) + 1 (Software Update) = 4
- * in the worst case. Keeping another 4 as buffer.
- */
-#define CHIP_CONFIG_MAX_BINDINGS 8
-
-/**
- * CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD
- *
- * Select the ability to offload event logs to any interested subscribers using WDM.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
-
-/**
  * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
  *
  * Enable recording UTC timestamps.
