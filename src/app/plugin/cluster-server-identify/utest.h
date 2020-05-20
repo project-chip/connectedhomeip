@@ -32,9 +32,7 @@
 #define CHIP_AF_API_HAL "utest.h"
 
 #include "chip-zcl.h"
-#include "gen-callbacks.h"
-#include "gen-cluster-id.h"
-#include "gen-types.h"
+#include "gen.h"
 
 #include <stdio.h>
 #endif /*  UTEST_H */

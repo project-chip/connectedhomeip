@@ -26,8 +26,7 @@
 #define ZCL_GENERAL_COMMAND_HANDLER_H
 
 #include "chip-zcl.h"
-#include "gen-command-id.h"
-#include "gen-types.h"
+#include "gen.h"
 #include "zcl-data-model.h"
 
 ChipZclStatus_t chipZclGeneralCommandParse(ChipZclCommandContext_t * context);

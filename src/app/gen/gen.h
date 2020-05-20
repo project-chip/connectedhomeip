@@ -25,8 +25,13 @@
 #ifndef CHIP_ZCL_GEN_HEADER
 #define CHIP_ZCL_GEN_HEADER
 
+#include "gen-attribute-storage.h"
+#include "gen-attribute-type.h"
 #include "gen-callbacks.h"
 #include "gen-cluster-id.h"
+#include "gen-command-handler.h"
+#include "gen-command-id.h"
+#include "gen-endpoint-config.h"
 #include "gen-types.h"
 
 #endif // CHIP_ZCL_GEN_HEADER

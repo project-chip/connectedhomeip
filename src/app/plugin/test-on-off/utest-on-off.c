@@ -25,9 +25,7 @@
  */
 
 #include "chip-zcl.h"
-#include "gen-command-handler.h"
-
-#include "gen-cluster-id.h"
+#include "gen.h"
 
 #include <stdio.h>
 

@@ -38,9 +38,7 @@
 
 #include "chip-zcl-struct.h"
 #include "chip-zcl.h"
-#include "gen-attribute-type.h"
-#include "gen-callbacks.h"
-#include "gen-endpoint-config.h"
+#include "gen.h"
 #include "zcl-data-model.h"
 // Functions for extracting information about structs and fields.
 

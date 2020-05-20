@@ -28,7 +28,7 @@
 
 #include "chip-zcl.h"
 
-#include "gen-attribute-storage.h"
+#include "gen.h"
 
 #define CHIP_ZCL_INVALID_CLUSTER_ID 0xFFFF
 

@@ -39,9 +39,7 @@
 
 #include "chip-zcl.h"
 
-#include "gen-attribute-type.h"
-#include "gen-callbacks.h"
-#include "gen-endpoint-config.h"
+#include "gen.h"
 
 //------------------------------------------------------------------------------
 // Globals
