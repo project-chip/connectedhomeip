@@ -16,12 +16,12 @@
  */
 
 // pull together CHIP headers
+#import "CHIPDeviceController.h"
+#import "CHIPEchoClient.h"
 #import "CHIPError.h"
 #import "CHIPManualSetupPayloadParser.h"
 #import "CHIPQRCodeSetupPayloadParser.h"
 #import "CHIPSetupPayload.h"
-#import "CHIPDeviceController.h"
-#import "CHIPEchoClient.h"
 
 #import <Foundation/Foundation.h>
 //! Project version number for CHIP.

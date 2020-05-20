@@ -43,7 +43,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPEchoClient : NSObject
 
-
 /// Initialize the CHIPEchoClient with a server address
 /// @param ipAddress    A string representation of the server's IPAddress
 /// @param port               The server's port
