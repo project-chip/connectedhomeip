@@ -22,10 +22,6 @@
  *      but will do ok in a typical unit test case.
  *
  */
-#ifdef CHIP_TEST
-#include "utest.h"
-#endif
-
 #include "../../api/chip-zcl-codec.h"
 #include <memory.h>
 #include <stdint.h>
