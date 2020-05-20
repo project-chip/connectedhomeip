@@ -570,9 +570,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION:
         desc = "Update Required Version mismatch";
         break;
-    case CHIP_ERROR_MALFORMED_STATUS_ELEMENT:
-        desc = "Status Element is malformed";
-        break;
     case CHIP_ERROR_ACCESS_DENIED:
         desc = "The CHIP message is not granted access";
         break;
