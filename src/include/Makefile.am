@@ -33,6 +33,7 @@ CHIP_CONFIG_INCLUDES=$(subst $(abspath $(abs_top_srcdir)),$(top_srcdir),$(filter
 # headers to install
 include_HEADERS                            = \
     $(CHIP_CONFIG_INCLUDES)                  \
+    CHIPVersion.h                            \
     BuildConfig.h                            \
     $(NULL)
 
