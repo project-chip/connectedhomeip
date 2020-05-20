@@ -1,7 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "test-unit.h"
 
-void main(int argc, char ** argv)
+int main(int argc, char ** argv)
 {
+    printf("%s: === start ===\n", argv[0]);
     testClusterServerBasic();
     testClusterServerIdentify();
     testClusterServerLevelControl();
@@ -9,4 +13,6 @@ void main(int argc, char ** argv)
     testCodecSimple();
     testCoreDataModel();
     testCoreMessageDispatch();
+    printf("%s: === end ===\n", argv[0]);
+    return 0;
 }

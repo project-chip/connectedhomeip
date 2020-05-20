@@ -29,13 +29,15 @@
 
 #include <stdio.h>
 
-int main()
+int main(int argc, char ** argv)
 {
+    printf("%s: === start ===\n", argv[0]);
     ChipZclCommandContext_t context;
     context.mfgSpecific    = false;
     context.clusterId      = CHIP_ZCL_CLUSTER_ON_OFF;
     context.commandId      = ZCL_ON_COMMAND_ID;
     context.direction      = ZCL_DIRECTION_CLIENT_TO_SERVER;
     ChipZclStatus_t status = chipZclClusterCommandParse(&context);
-    printf("Success: 0x%X \n", status);
+    printf("%s: success: 0x%X \n", argv[0], status);
+    printf("%s: === end ===\n", argv[0]);
 }
