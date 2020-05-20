@@ -19,7 +19,7 @@ group("all") {
     "src/lib/core:chip_config_header",
     "src/lib/support",
     "src/lwip:all",
-    "src/system:system_config_header",
+    "src/system",
     "third_party/mbedtls",
     "third_party/nlassert",
     "third_party/nlfaultinjection",
