@@ -35,9 +35,6 @@
 // Uncomment this for a large Tunnel MTU.
 //#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
-// Max number of Bindings per CHIPExchangeManager
-#define CHIP_CONFIG_MAX_BINDINGS 8
-
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 

@@ -1527,7 +1527,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  * @def CHIP_ERROR_MALFORMED_DATA_ELEMENT
  *
  * @brief
- *   The WDM DataElement is malformed: it either does not contain
+ *   The DataElement is malformed: it either does not contain
  *   the required elements, or it contais both the MergeData element
  *   and DeletedDictionaryKeyList.
  */
@@ -1616,18 +1616,10 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *  @def CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION
  *
  *  @brief
- *    Encountered a mismatch between wdm update required version and current version
+ *    Encountered a mismatch between update required version and current version
  */
 #define CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION            _CHIP_ERROR(170)
 
-/**
- * @def CHIP_ERROR_MALFORMED_STATUS_ELEMENT
- *
- * @brief
- *   The WDM StatusElement is malformed: it does not contain
- *   either the profile id or the status code.
- */
-#define CHIP_ERROR_MALFORMED_STATUS_ELEMENT                _CHIP_ERROR(171)
 
 /**
  *  @def CHIP_ERROR_ACCESS_DENIED
@@ -1645,15 +1637,6 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *
  */
 #define CHIP_ERROR_UNKNOWN_RESOURCE_ID                          _CHIP_ERROR(174)
-
-/**
- * @def CHIP_ERROR_MALFORMED_UPDATE_RESPONSE
- *
- * @brief
- *   The WDM UpdateResponse payload is malformed: it does not contain
- *   either the StatusList or the VersionList.
- */
-#define CHIP_ERROR_MALFORMED_UPDATE_RESPONSE                _CHIP_ERROR(175)
 
 /**
  * @def CHIP_ERROR_VERSION_MISMATCH

@@ -579,9 +579,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_UNKNOWN_RESOURCE_ID:
         desc = "Unknown resource ID";
         break;
-    case CHIP_ERROR_MALFORMED_UPDATE_RESPONSE:
-        desc = "Malformed Update response";
-        break;
     case CHIP_ERROR_VERSION_MISMATCH:
         desc = "Version mismatch";
         break;

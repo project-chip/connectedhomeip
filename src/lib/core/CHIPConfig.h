@@ -1267,20 +1267,6 @@
 #define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS                  16
 #endif // CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 
-/**
- *  @def CHIP_CONFIG_MAX_BINDINGS
- *
- *  @brief
- *    Maximum number of simultaneously active bindings per chipExchangeManager
- *    The new single source TimeSync client takes one binding.
- *    Every WDM one-way subscription takes one binding. Mutual subscription counts as two one-way subscriptions.
- *    A reserved slot is needed to take an incoming subscription request.
- *    For a device with 2 mutual subscriptions, and one single source time sync client, it needs 2 x 2 + 1 = 5 bindings at least.
- *    At least six is needed if it still wants to take new WDM subscriptions under this load.
- */
-#ifndef CHIP_CONFIG_MAX_BINDINGS
-#define CHIP_CONFIG_MAX_BINDINGS                           6
-#endif // CHIP_CONFIG_MAX_BINDINGS
 
 /**
  *  @def CHIP_CONFIG_CONNECT_IP_ADDRS
@@ -2135,19 +2121,6 @@
  */
 #ifndef CHIP_CONFIG_SERIALIZATION_DEBUG_LOGGING
 #define CHIP_CONFIG_SERIALIZATION_DEBUG_LOGGING 0
-#endif
-
-/**
- * @def CHIP_CONFIG_SERIALIZATION_ENABLE_DESERIALIZATION
- *
- * @brief Enable deserialization as well as serialization APIs.  We
- *   make deserialization configurable because it requires some extra
- *   memory that a highly resource-constrained platform could preserve
- *   if it doesn't consume WDM events or otherwise has no need to
- *   deserialize.
- */
-#ifndef CHIP_CONFIG_SERIALIZATION_ENABLE_DESERIALIZATION
-#define CHIP_CONFIG_SERIALIZATION_ENABLE_DESERIALIZATION 1
 #endif
 
 /**

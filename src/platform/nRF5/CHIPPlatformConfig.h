@@ -126,6 +126,4 @@
 #define CHIP_CONFIG_ENABLE_CASE_RESPONDER 1
 #endif // CHIP_CONFIG_ENABLE_CASE_RESPONDER
 
-// ==================== WDM Configuration Overrides ====================
-
 #endif /* CHIP_PLATFORM_CONFIG_H */
