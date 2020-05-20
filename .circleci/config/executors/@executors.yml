@@ -7,6 +7,9 @@ nrf-build:
 esp32-build:
     docker:
         - image: connectedhomeip/chip-build-esp32:0.2.11
+linux-embedded-build:
+    docker:
+        - image: connectedhomeip/chip-build:0.2.11
 mbedtls-build:
     environment:
         BOOTSTRAP_ARGUMENTS: " --with-crypto=mbedtls"
