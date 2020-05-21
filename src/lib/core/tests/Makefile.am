@@ -44,6 +44,7 @@ libCoreTests_a_SOURCES                                = \
     TestCHIPErrorStr.cpp                                \
     TestCHIPTLV.cpp                                     \
     TestCHIPConnection.cpp                              \
+    TestCHIPSecureChannel.cpp                           \
     $(NULL)
 
 libCoreTests_adir                                     = $(includedir)/core
@@ -69,6 +70,7 @@ AM_CPPFLAGS                                           = \
 CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/libCHIP.a                   \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(NULL)
 
 COMMON_LDADD                                          =  \
@@ -88,6 +90,7 @@ check_PROGRAMS                                        = \
     TestCHIPErrorStr                                    \
     TestCHIPTLV                                         \
     TestCHIPConnection                                  \
+    TestCHIPSecureChannel                               \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -113,6 +116,10 @@ TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
 
 TestCHIPConnection_SOURCES                            = TestCHIPConnectionDriver.cpp
 TestCHIPConnection_LDADD                              = $(COMMON_LDADD)
+
+TestCHIPSecureChannel_SOURCES                         = TestCHIPSecureChannelDriver.cpp
+TestCHIPSecureChannel_LDADD                           = $(COMMON_LDADD)
+
 #
 # Foreign make dependencies
 #

@@ -17,25 +17,19 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP core library
- *      unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP core library CHIP Secure Channel tests.
  *
  */
 
-#ifndef TESTCORE_H
-#define TESTCORE_H
+#include "TestCore.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <nlunit-test.h>
 
-int TestCHIPErrorStr(void);
-int TestCHIPTLV(void);
-int TestCHIPConnection(void);
-int TestCHIPSecureChannel(void);
+int main(void)
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
 
-#ifdef __cplusplus
+    return (TestCHIPSecureChannel());
 }
-#endif
-
-#endif // TESTCORE_H
