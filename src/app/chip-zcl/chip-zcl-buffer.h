@@ -83,4 +83,9 @@ uint16_t chipZclBufferUsedLength(ChipZclRawBuffer_t * buffer);
  */
 void chipZclBufferFlip(ChipZclRawBuffer_t * buffer);
 
+/**
+ * Creates a ZCL buffer out of raw chunk of memory.
+ */
+ChipZclRawBuffer_t * chipZclBufferCreate(uint8_t * rawBuffer, uint16_t rawLength);
+
 #endif // CHIP_ZCL_BUFFER

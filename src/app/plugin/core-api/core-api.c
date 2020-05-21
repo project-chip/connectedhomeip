@@ -33,6 +33,19 @@ ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
 }
 
 /**
+ * Creates a zcl buffer out of a raw chunk of memory.
+ */
+ChipZclRawBuffer_t * chipZclBufferCreate(uint8_t * rawBuffer, uint16_t rawLength)
+{
+    ChipZclRawBuffer_t * buffer = chipZclRawAlloc(sizeof(ChipZclRawBuffer_t));
+    buffer->buffer              = rawBuffer;
+    buffer->endPosition         = 0;
+    buffer->currentPosition     = 0;
+    buffer->totalLength         = rawLength;
+    return buffer;
+}
+
+/**
  * Function that returns a pointer to the raw buffer.
  */
 uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer)
@@ -72,4 +85,17 @@ void chipZclBufferClear(ChipZclRawBuffer_t * buffer)
 {
     buffer->currentPosition = 0;
     buffer->endPosition     = buffer->totalLength;
+}
+
+ChipZclStatus_t chipZclClusterCommandParse(ChipZclCommandContext_t * context);
+
+ChipZclStatus_t chipZclProcessIncoming(uint8_t * rawBuffer, uint16_t rawBufferLength)
+{
+    ChipZclRawBuffer_t * buffer       = chipZclBufferCreate(rawBuffer, rawBufferLength);
+    ChipZclCommandContext_t * context = chipZclRawAlloc(sizeof(ChipZclCommandContext_t));
+
+    chipZclDecodeZclHeader(buffer, context);
+    chipZclClusterCommandParse(context);
+
+    return CHIP_ZCL_STATUS_SUCCESS;
 }
