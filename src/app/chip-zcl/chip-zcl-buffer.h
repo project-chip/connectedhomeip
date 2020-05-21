@@ -38,6 +38,21 @@ typedef struct
 } ChipZclRawBuffer_t;
 
 /**
+ * Raw memory allocation. Can be mapped to an equivalent of malloc().
+ * Expected to return NULL if it failed.
+ */
+void * chipZclRawAlloc(uint16_t allocatedLength);
+
+/**
+ * Raw memory free. Can be mapped to an equivalent of free().
+ */
+void chipZclRawFree(void * allocatedMemory);
+
+/**
+ * Raw memory free. Can be mapped to an equivalent of free()
+ */
+
+/**
  * Function that allocates a buffer.
  */
 ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
