@@ -119,6 +119,7 @@ TestCHIPConnection_LDADD                              = $(COMMON_LDADD)
 
 TestCHIPSecureChannel_SOURCES                         = TestCHIPSecureChannelDriver.cpp
 TestCHIPSecureChannel_LDADD                           = $(COMMON_LDADD)
+
 #
 # Foreign make dependencies
 #

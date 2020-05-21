@@ -81,7 +81,7 @@ public:
      */
     size_t EncryptionOverhead(void);
 
-    ChipSecureChannel();
+    ChipSecureChannel(void);
 
 private:
     static const size_t kAES_CCM128_Key_Length = 16;
