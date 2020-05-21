@@ -644,7 +644,7 @@ typedef struct
      */
     uint8_t clusterCount;
     /**
-     * Size of all non-external, non-singlet attribute in this endpoint type.
+     * Size of all non-external, non-singleton attributes in this endpoint type.
      */
     uint16_t endpointSize;
 } ChipZclEndpointType;

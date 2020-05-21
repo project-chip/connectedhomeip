@@ -29,7 +29,7 @@ ChipZclCommandContext_t * testCreateCommandContext()
     ChipZclCommandContext_t * context;
 
     context                  = (ChipZclCommandContext_t *) chipZclRawAlloc(sizeof(ChipZclCommandContext_t));
-    context->endpointId      = 0;
+    context->endpointId      = 1;
     context->clusterId       = CHIP_ZCL_CLUSTER_ON_OFF;
     context->clusterSpecific = true;
     context->mfgSpecific     = false;
@@ -42,6 +42,8 @@ ChipZclCommandContext_t * testCreateCommandContext()
 // Function that tests that the command encoder/decoder works correctly.
 int testEncodingDecoding(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context)
 {
+    chipZclEndpointInit();
+
     // Create another context to test decoding of header
     ChipZclCommandContext_t context2;
     chipZclBufferFlip(buffer);
@@ -77,6 +79,15 @@ int testEncodingDecoding(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * 
     return 0;
 }
 
+bool globalAttributeChangedFlag = false;
+
+void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+{
+    printf("Attribute change callback: ep=%d clusterId=%d attributeId=%d\n", endpoint, clusterId, attributeId);
+    globalAttributeChangedFlag = true;
+}
+
 int testClusterCmdOnOff(void)
 {
     // First construct an incoming buffer for test, give it 1024 bytes for no good reason.
@@ -105,7 +116,15 @@ int testClusterCmdOnOff(void)
 
     if (status == CHIP_ZCL_STATUS_SUCCESS)
     {
-        return 0;
+        if (globalAttributeChangedFlag == false)
+        {
+            printf("ERROR: attribute change callback did not fire!\n");
+        }
+        else
+        {
+            printf("SUCCESS: attribute got changed and attrribute change callback did fire.\n");
+            return 0;
+        }
     }
     else
     {
