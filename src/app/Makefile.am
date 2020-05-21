@@ -26,8 +26,8 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 SUBDIRS                             = \
     chip-zcl                          \
     plugin/test-unit                  \
+    plugin/test-on-off                \
     $(NULL)
 
-#    plugin/test-on-off                
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
