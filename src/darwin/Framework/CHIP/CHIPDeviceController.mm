@@ -29,8 +29,7 @@
 static const char *const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
 static const char *const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
-
-@implementation CHIPDeviceController {
+@interface CHIPDeviceController () {
     chip::DeviceController::ChipDeviceController* _cppController;
     // queue used for all interactions with the cpp chip controller and for all chip internal events
     // try to run small jobs in this queue
@@ -45,10 +44,11 @@ static const char *const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
     ControllerOnErrorBlock _onErrorHandler;
 }
 
-@synthesize appCallbackQueue = _appCallbackQueue;
-@synthesize chipWorkQueue = _chipWorkQueue;
+@end
 
-- (instancetype)init:(dispatch_queue_t)appCallbackQueue {
+@implementation CHIPDeviceController
+
+- (instancetype)initWithCallbackQueue:(dispatch_queue_t)appCallbackQueue {
     if (self = [super init]) {
         _appCallbackQueue = appCallbackQueue;
         _chipWorkQueue = dispatch_queue_create(CHIP_WORK_QUEUE, DISPATCH_QUEUE_SERIAL);
@@ -97,7 +97,7 @@ static void onMessageReceived(chip::DeviceController::ChipDeviceController * dev
         buffer = buffer->Next();
     }
     
-    [controller dispatchAsyncMessageBlock:dataBuffer ipAddress:ipAddress port:packet_info->SrcPort];
+    [controller _dispatchAsyncMessageBlock:dataBuffer ipAddress:ipAddress port:packet_info->SrcPort];
     
     //ignore unused variable
     (void) deviceController;
@@ -108,10 +108,10 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
                             const chip::IPPacketInfo * pi)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
-    [controller dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:error]];
+    [controller _dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:error]];
 }
 
-- (void)dispatchAsyncErrorBlock:(NSError *)error
+- (void)_dispatchAsyncErrorBlock:(NSError *)error
 {
     //to avoid retaining "self"
     ControllerOnErrorBlock onErrorHandler = _onErrorHandler;
@@ -121,7 +121,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 }
 
-- (void)dispatchAsyncMessageBlock:(NSData *)data ipAddress:(NSString*)ipAddress port:(UInt16)port
+- (void)_dispatchAsyncMessageBlock:(NSData *)data ipAddress:(NSString*)ipAddress port:(UInt16)port
 {
     //to avoid retaining "self"
     ControllerOnMessageBlock onMessageHandler = _onMessageHandler;
@@ -147,7 +147,9 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
     
     if (err != CHIP_NO_ERROR) {
-        *error = [CHIPError errorForCHIPErrorCode:err];
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
         return NO;
     }
     
@@ -156,7 +158,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     _onErrorHandler = onError;
     
     // Start the IO pump
-    [self serviceEvents];
+    [self _serviceEvents];
 
     return YES;
 }
@@ -176,7 +178,9 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
     
     if (err != CHIP_NO_ERROR) {
-        *error = [CHIPError errorForCHIPErrorCode:err];
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
         return NO;
     }
     return YES;
@@ -190,7 +194,9 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
     
     if (err != CHIP_NO_ERROR) {
-        *error = [CHIPError errorForCHIPErrorCode:err];
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
         return NO;
     }
     return YES;
@@ -208,7 +214,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 }
 
 // TODO kill this with fire (NW might implicitly replace this?)
-- (void)serviceEvents
+- (void)_serviceEvents
 {
     dispatch_async(_chipWorkQueue, ^() {
         __block fd_set readFDs, writeFDs, exceptFDs;
@@ -253,7 +259,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
                     inetLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
                 }
 
-                [self serviceEvents];
+                [self _serviceEvents];
             });
         });
     });

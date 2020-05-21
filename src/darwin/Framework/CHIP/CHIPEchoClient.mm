@@ -35,7 +35,7 @@ static NSString * const kEchoString = @"Hello from darwin!";
     if (self = [super init]) {
         NSError * error;
         _echoCallbackQueue = dispatch_queue_create("com.zigbee.chip.echo", NULL);
-        _chipController = [[CHIPDeviceController alloc] init:_echoCallbackQueue];
+        _chipController = [[CHIPDeviceController alloc] initWithCallbackQueue:_echoCallbackQueue];
 
         BOOL didInit = [_chipController connect:ipAddress port:port error:&error onMessage:^(NSData *  _Nonnull message, NSString * _Nonnull ipAddress, UInt16 port) {
             NSData* sentMessage = [kEchoString dataUsingEncoding:NSUTF8StringEncoding];
@@ -63,7 +63,7 @@ static NSString * const kEchoString = @"Hello from darwin!";
     return self;
 }
 
-- (BOOL)start:(NSError * __autoreleasing *)error frequency:(UInt32)frequency {
+- (BOOL)startWithFrequency:(UInt32)frequency withError:(NSError * __autoreleasing *)error  {
     dispatch_source_set_timer(_send_timer, dispatch_walltime(NULL, 0), frequency * NSEC_PER_SEC, 1 * NSEC_PER_SEC);
     dispatch_source_set_event_handler(_send_timer, ^{
         os_log(OS_LOG_DEFAULT, "Sending echo...");
@@ -77,12 +77,12 @@ static NSString * const kEchoString = @"Hello from darwin!";
     return YES;
 }
 
-- (BOOL)start:(NSError * __autoreleasing *)error {
-    return [self start:error frequency:kDefaultFrequencySeconds];
+- (BOOL)startWithError:(NSError * __autoreleasing *)error {
+    return [self startWithFrequency:kDefaultFrequencySeconds withError:error];
 }
 
-- (BOOL)start:(NSError * __autoreleasing *)error frequency:(UInt32)frequency stopAfter:(UInt32)stopAfter {
-    BOOL result = [self start:error frequency:frequency];
+- (BOOL)startWithFrequency:(UInt32)frequency stopAfter:(UInt32)stopAfter withError:(NSError * __autoreleasing *)error {
+    BOOL result = [self startWithFrequency:frequency withError:error];
     dispatch_after(dispatch_walltime(nil, stopAfter * NSEC_PER_SEC), _echoCallbackQueue, ^{
         [self stop];
     });
@@ -93,6 +93,10 @@ static NSString * const kEchoString = @"Hello from darwin!";
     dispatch_suspend(self->_send_timer);
     [self->_chipController disconnect:nil];
     os_log(OS_LOG_DEFAULT, "Echo client stopped...");
+}
+
+- (void)dealloc {
+    [self stop];
 }
 
 @end

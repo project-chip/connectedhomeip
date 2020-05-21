@@ -28,10 +28,7 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @interface CHIPDeviceController : NSObject
 
-@property (readonly) dispatch_queue_t appCallbackQueue;
-@property (atomic, readonly) dispatch_queue_t chipWorkQueue;
-
-- (instancetype)init:(dispatch_queue_t)appCallbackQueue;
+- (nullable instancetype)initWithCallbackQueue:(dispatch_queue_t)appCallbackQueue;
 - (BOOL)connect:(NSString *)ipAddress
            port:(UInt16)port
           error:(NSError * __autoreleasing *)error
@@ -40,6 +37,9 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
 - (BOOL)isConnected;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

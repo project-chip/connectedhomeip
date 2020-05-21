@@ -26,7 +26,7 @@
  *        _echoClient = [[CHIPEchoClient alloc] initWithServerAddress:@"192.168.1.22" port:8000];
  *        if (_echoClient) {
  *            NSError * error;
- *            BOOL didStart = [_echoClient start:&error frequency:10 stopAfter:60];
+ *            BOOL didStart = [_echoClient startWithFrequency:10 stopAfter:60 withError:&error];
  *            if (!didStart) {
  *                os_log(OS_LOG_DEFAULT, @"Failed to start echo client %@", error);
  *            }
@@ -46,26 +46,29 @@ NS_ASSUME_NONNULL_BEGIN
 /// Initialize the CHIPEchoClient with a server address
 /// @param ipAddress    A string representation of the server's IPAddress
 /// @param port               The server's port
-- (instancetype)initWithServerAddress:(NSString *)ipAddress port:(UInt16)port;
+- (nullable instancetype)initWithServerAddress:(NSString *)ipAddress port:(UInt16)port;
 
 /// Start the Echo Client with the default configuration
 /// By default, the echo client will send an echo to the server every 10 seconds indefinitely
 /// @param error  Returns a CHIP Error Code if the client was unable to start
-- (BOOL)start:(NSError * __autoreleasing *)error;
+- (BOOL)startWithError:(NSError * __autoreleasing *)error;
 
 /// Start the Echo Client with a custom echo frequency
-/// @param error               Returns a CHIP Error Code if the client was unable to start
 /// @param frequency      The frequency, in seconds, of the client's echo messages
-- (BOOL)start:(NSError * __autoreleasing *)error frequency:(UInt32)frequency;
+/// @param error               Returns a CHIP Error Code if the client was unable to start
+- (BOOL)startWithFrequency:(UInt32)frequency withError:(NSError * __autoreleasing *)error;
 
 /// Start the echo client with a custom echo frequency and automatically stop it after the specified time
-/// @param error             Returns a CHIP Error Code if the client was unable to start
 /// @param frequency    The frequency, in seconds, of the client's echo messages
 /// @param stopAfter    The number of seconds after which the echo client will stop sending messages
-- (BOOL)start:(NSError * __autoreleasing *)error frequency:(UInt32)frequency stopAfter:(UInt32)stopAfter;
+/// @param error             Returns a CHIP Error Code if the client was unable to start
+- (BOOL)startWithFrequency:(UInt32)frequency stopAfter:(UInt32)stopAfter withError:(NSError * __autoreleasing *)error;
 
 /// Stop the echo client
 - (void)stop;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

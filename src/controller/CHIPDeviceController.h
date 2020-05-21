@@ -85,7 +85,7 @@ public:
      * @brief
      *   Check if there's an active connection
      *
-     * @return CHIP_ERROR   If there is an active connected
+     * @return bool   If there is an active connection
      */
     bool IsConnected();
 
