@@ -12,38 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-config("public_includes") {
-  include_dirs = [ "include" ]
-}
-
-config("includes") {
-  include_dirs = [ "." ]
-
-  configs = [ ":public_includes" ]
-}
-
-static_library("chip") {
-  public_deps = [
-    "app/plugin:chip",
-    "ble",
-    "controller",
-    "crypto",
-    "inet",
-    "lib/core",
-    "lib/support",
-    "system",
-    "transport",
-  ]
-
-  output_name = "libCHIP"
-
-  output_dir = "${root_out_dir}/lib"
-
-  complete_static_lib = true
-}
-
-group("src") {
-  deps = [ ":chip" ]
+group("app") {
+  public_deps = [ "plugin:chip" ]
 }
