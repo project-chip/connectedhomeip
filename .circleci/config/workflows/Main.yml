@@ -3,7 +3,7 @@ jobs:
           name: Build CHIP [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["main-build", "mbedtls-build", "clang-build"]
+                  builder: ["main-build", "mbedtls-build", "clang-build", "linux-embedded"]
           filters:
               branches:
                   ignore:
@@ -12,7 +12,7 @@ jobs:
           name: Run Tests [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["main-build", "mbedtls-build", "clang-build"]
+                  builder: ["main-build", "mbedtls-build", "clang-build", "linux-embedded"]
           requires:
               - Build CHIP [<< matrix.builder >>]
           filters:
@@ -43,12 +43,6 @@ jobs:
                   builder: ["main-build"]
           requires:
               - Run Tests [<< matrix.builder >>]
-          filters:
-              branches:
-                  ignore:
-                      - /restyled.*/
-    - linux_embedded:
-          name: Build and Test [Linux Embedded]
           filters:
               branches:
                   ignore:

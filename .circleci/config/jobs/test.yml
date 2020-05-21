@@ -37,6 +37,11 @@ steps:
               scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE"
               scripts/tests/openssl_tests.sh
     - run:
+          name: Run Platform Tests
+          command:
+              scripts/tools/run_if.sh "linux-embedded" "$BUILD_TYPE"
+              make -C build/default/src/platform check
+    - run:
           name: Run All Unit & Functional Tests
           command:
               scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE"
