@@ -32,6 +32,8 @@
 extern "C" {
 #endif /* #ifdef __cplusplus */
 
+#include "chip-zcl.h"
+
 /**
  * Base types for the codec. This is a smaller subset than the actual ZCL types, and the
  * generated layer for a specific code is responsible for mapping ZCL types onto these
