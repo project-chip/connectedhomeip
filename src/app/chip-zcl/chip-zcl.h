@@ -892,20 +892,6 @@ typedef bool (*EventPredicate)(Event *, void *);
 
 Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all);
 
-// Buffers
-/**
- * @brief For use when declaring a Buffer.
- */
-typedef uint16_t Buffer;
-/**
- * @brief Denotes a null buffer.
- */
-#define NULL_BUFFER 0x0000
-
-Buffer chipZclReallyAllocateBuffer(uint16_t dataSizeInBytes, bool async);
-
-#define chipZclAllocateBuffer(dataSizeInBytes) chipZclReallyAllocateBuffer(dataSizeInBytes, false)
-
 // -----------------------------------------------------------------------------
 // Roles.
 
@@ -986,13 +972,11 @@ Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredic
 
 void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 
-// Buffer Management Mechanism
-uint8_t * chipZclGetBufferPointer(Buffer buffer);
-
-Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused);
-
 // Endpoint Management
 ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);
+
+// Toplevel functions
+ChipZclStatus_t chipZclDecode(ChipZclRawBuffer_t * buffer);
 
 // Some platform CHIP_ZCL_STATUS_INSUFFICIENT_SPACE
 #define MEMSET(d, v, l) memset(d, v, l)

@@ -80,17 +80,6 @@ void chipZclEventSetDelayMs(Event * event, uint32_t delay)
     return;
 }
 
-// Buffer Management Stubs
-uint8_t * chipZclGetBufferPointer(Buffer buffer)
-{
-    return 0;
-}
-
-Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused)
-{
-    return 0;
-}
-
 int32_t chipZclCompareClusterSpec(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2)
 {
     return 0;
@@ -117,6 +106,14 @@ ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
     buffer->currentPosition     = 0;
     buffer->totalLength         = allocatedLength;
     return buffer;
+}
+
+/**
+ * Function that returns a pointer to the raw buffer.
+ */
+uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer)
+{
+    return buffer->buffer;
 }
 
 /**

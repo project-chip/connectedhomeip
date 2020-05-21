@@ -43,6 +43,11 @@ typedef struct
 ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
 
 /**
+ * Function that returns a raw pointer to the underlying buffer.
+ */
+uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer);
+
+/**
  * Function that frees a buffer.
  */
 void chipZclBufferFree(ChipZclRawBuffer_t * buffer);
