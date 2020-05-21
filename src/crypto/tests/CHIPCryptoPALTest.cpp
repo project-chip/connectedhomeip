@@ -24,7 +24,7 @@
 #include "Hash_SHA256_test_vectors.h"
 #include "PBKDF2_SHA256_test_vectors.h"
 
-#include <CHIPCryptoPAL.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
 #include <support/TestUtils.h>
