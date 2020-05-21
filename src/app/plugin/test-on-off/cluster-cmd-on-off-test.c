@@ -23,52 +23,83 @@
 
 #include <stdio.h>
 
-int testClusterCmdOnOff(void)
+// Test function that creates a command context and populates it with some data.
+ChipZclCommandContext_t * testCreateCommandContext()
 {
-    // First construct an incoming buffer for test, give it 1024 bytes for no good reason.
-    ChipZclRawBuffer_t * buffer = chipZclBufferAlloc(1024);
+    ChipZclCommandContext_t * context;
 
-    ChipZclCommandContext_t context;
-    context.endpointId      = 1;
-    context.clusterId       = CHIP_ZCL_CLUSTER_ON_OFF;
-    context.clusterSpecific = true;
-    context.mfgSpecific     = false;
-    context.commandId       = ZCL_ON_COMMAND_ID;
-    context.direction       = ZCL_DIRECTION_CLIENT_TO_SERVER;
+    context                  = (ChipZclCommandContext_t *) chipZclRawAlloc(sizeof(ChipZclCommandContext_t));
+    context->endpointId      = 1;
+    context->clusterId       = CHIP_ZCL_CLUSTER_ON_OFF;
+    context->clusterSpecific = true;
+    context->mfgSpecific     = false;
+    context->commandId       = ZCL_ON_COMMAND_ID;
+    context->direction       = ZCL_DIRECTION_CLIENT_TO_SERVER;
 
-    // Encode the header into the buffer
-    chipZclEncodeZclHeader(buffer, &context);
+    return context;
+}
 
+// Function that tests that the command encoder/decoder works correctly.
+int testEncodingDecoding(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context)
+{
     // Create another context to test decoding of header
     ChipZclCommandContext_t context2;
     chipZclBufferFlip(buffer);
     chipZclDecodeZclHeader(buffer, &context2);
 
-    if (context2.endpointId != context.endpointId)
+    if (context2.endpointId != context->endpointId)
     {
         printf("ERROR: Endpoint ID doesnt match.");
         return 1;
     }
-    if (context2.clusterId != context.clusterId)
+    if (context2.clusterId != context->clusterId)
     {
         printf("ERROR: Cluster ID doesnt match.");
         return 1;
     }
-    if (context2.commandId != context.commandId)
+    if (context2.commandId != context->commandId)
     {
         printf("ERROR: Command ID doesnt match.");
         return 1;
     }
-    if (context2.mfgSpecific != context.mfgSpecific)
+    if (context2.mfgSpecific != context->mfgSpecific)
     {
         printf("ERROR: MFG specific doesnt match.");
         return 1;
     }
-    if (context2.clusterSpecific != context.clusterSpecific)
+    if (context2.clusterSpecific != context->clusterSpecific)
     {
         printf("ERROR: Cluster specific doesnt match.");
         return 1;
     }
+    printf("SUCCESS: header encoder/decoder");
 
-    return chipZclClusterCommandParse(&context);
+    return 0;
+}
+
+int testClusterCmdOnOff(void)
+{
+    // First construct an incoming buffer for test, give it 1024 bytes for no good reason.
+    ChipZclRawBuffer_t * buffer = chipZclBufferAlloc(1024);
+
+    ChipZclCommandContext_t * context = testCreateCommandContext();
+
+    // Encode the header into the buffer
+    chipZclEncodeZclHeader(buffer, context);
+
+    if (testEncodingDecoding(buffer, context) != 0)
+    {
+        return 1;
+    }
+
+    chipZclBufferReset(buffer);
+
+    uint8_t * rawBuffer   = chipZclBufferPointer(buffer);
+    uint16_t bufferLength = chipZclBufferUsedLength(buffer);
+
+    printf("Buffer for processing is ready, length: %d\n", bufferLength);
+
+    //  At this point, we have a buffer encoded with the command context that contains the command.
+
+    return chipZclClusterCommandParse(context);
 }

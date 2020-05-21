@@ -68,6 +68,17 @@ uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer);
 void chipZclBufferFree(ChipZclRawBuffer_t * buffer);
 
 /**
+ * Function that resets a buffer.
+ * After this call, the buffer is reading for reading from beginning again.
+ */
+void chipZclBufferReset(ChipZclRawBuffer_t * buffer);
+
+/**
+ * Function that returns the size of the used portion of the buffer.
+ */
+uint16_t chipZclBufferUsedLength(ChipZclRawBuffer_t * buffer);
+
+/**
  * Flips the buffer between reading and writing.
  */
 void chipZclBufferFlip(ChipZclRawBuffer_t * buffer);
