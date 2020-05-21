@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the Openchip Inet
+ *          Platform-specific configuration overrides for the CHIP Inet
  *          Layer on Linux platforms.
  *
  */

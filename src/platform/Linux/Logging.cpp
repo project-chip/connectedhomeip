@@ -55,7 +55,7 @@ namespace chip {
 namespace Logging {
 
 /**
- * Openchip log output function.
+ * CHIP log output function.
  */
 void Log(uint8_t module, uint8_t category, const char * msg, ...)
 {

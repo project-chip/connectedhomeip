@@ -50,7 +50,7 @@
  * @def CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
  *
  * The priority of the SoftDevice observer event handler registered by the
- * Openchip BleLayer.
+ * CHIP BleLayer.
  */
 #ifndef CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
 #define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
@@ -59,7 +59,7 @@
 /**
  * @def CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
  *
- * The SoftDevice BLE connection configuration tag used by the Openchip
+ * The SoftDevice BLE connection configuration tag used by the CHIP
  * BleLayer.
  */
 #ifndef CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
