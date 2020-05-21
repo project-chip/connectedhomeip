@@ -25,11 +25,19 @@
 static UInt32 const kDefaultFrequencySeconds = 10;
 static NSString * const kEchoString = @"Hello from darwin!";
 
-@implementation CHIPEchoClient {
+@interface CHIPEchoClient()  {
     dispatch_queue_t _echoCallbackQueue;
-    dispatch_source_t _send_timer;
+    dispatch_source_t _sendTimer;
     CHIPDeviceController* _chipController;
 }
+
+@property (readonly) dispatch_queue_t echoCallbackQueue;
+@property (readonly) dispatch_source_t sendTimer;
+@property (readonly) CHIPDeviceController* chipController;
+
+@end
+
+@implementation CHIPEchoClient
 
 - (instancetype)initWithServerAddress:(NSString *)ipAddress port:(UInt16)port {
     if (self = [super init]) {
@@ -53,8 +61,8 @@ static NSString * const kEchoString = @"Hello from darwin!";
             os_log(OS_LOG_DEFAULT, "Failed to init with error %@", error);
             return nil;
         }
-        _send_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _echoCallbackQueue);
-        if (!_send_timer) {
+        _sendTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _echoCallbackQueue);
+        if (!_sendTimer) {
             os_log(OS_LOG_DEFAULT, "Could not create dispatch source");
             return nil;
         }
@@ -64,16 +72,16 @@ static NSString * const kEchoString = @"Hello from darwin!";
 }
 
 - (BOOL)startWithFrequency:(UInt32)frequency withError:(NSError * __autoreleasing *)error  {
-    dispatch_source_set_timer(_send_timer, dispatch_walltime(NULL, 0), frequency * NSEC_PER_SEC, 1 * NSEC_PER_SEC);
-    dispatch_source_set_event_handler(_send_timer, ^{
+    dispatch_source_set_timer(self.sendTimer, dispatch_walltime(NULL, 0), frequency * NSEC_PER_SEC, 1 * NSEC_PER_SEC);
+    dispatch_source_set_event_handler(self.sendTimer, ^{
         os_log(OS_LOG_DEFAULT, "Sending echo...");
         NSError * error;
-        if (![self->_chipController sendMessage:[kEchoString dataUsingEncoding:NSUTF8StringEncoding] error:&error]) {
+        if (![self.chipController sendMessage:[kEchoString dataUsingEncoding:NSUTF8StringEncoding] error:&error]) {
             os_log(OS_LOG_DEFAULT, "Failed to send with error %@", error);
         }
 
     });
-    dispatch_activate(_send_timer);
+    dispatch_activate(self.sendTimer);
     return YES;
 }
 
@@ -83,15 +91,15 @@ static NSString * const kEchoString = @"Hello from darwin!";
 
 - (BOOL)startWithFrequency:(UInt32)frequency stopAfter:(UInt32)stopAfter withError:(NSError * __autoreleasing *)error {
     BOOL result = [self startWithFrequency:frequency withError:error];
-    dispatch_after(dispatch_walltime(nil, stopAfter * NSEC_PER_SEC), _echoCallbackQueue, ^{
+    dispatch_after(dispatch_walltime(nil, stopAfter * NSEC_PER_SEC), self.echoCallbackQueue, ^{
         [self stop];
     });
     return result;
 }
 
 - (void)stop {
-    dispatch_suspend(self->_send_timer);
-    [self->_chipController disconnect:nil];
+    dispatch_suspend(self->_sendTimer);
+    [self.chipController disconnect:nil];
     os_log(OS_LOG_DEFAULT, "Echo client stopped...");
 }
 

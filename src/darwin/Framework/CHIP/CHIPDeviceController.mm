@@ -45,6 +45,13 @@ static const char *const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
     ControllerOnErrorBlock _onErrorHandler;
 }
 
+@property (atomic, readonly) dispatch_queue_t chipWorkQueue;
+@property (atomic, readonly) dispatch_queue_t chipSelectQueue;
+@property (readonly) dispatch_queue_t appCallbackQueue;
+@property (readonly) ControllerOnMessageBlock onMessageHandler;
+@property (readonly) ControllerOnErrorBlock onErrorHandler;
+@property (readonly) chip::DeviceController::ChipDeviceController* cppController;
+
 @end
 
 @implementation CHIPDeviceController
@@ -118,7 +125,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     CHIP_LOG_METHOD_ENTRY();
     //to avoid retaining "self"
-    ControllerOnErrorBlock onErrorHandler = _onErrorHandler;
+    ControllerOnErrorBlock onErrorHandler = self.onErrorHandler;
     
     dispatch_async(_appCallbackQueue, ^() {
         onErrorHandler(error);
@@ -129,7 +136,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     CHIP_LOG_METHOD_ENTRY();
     //to avoid retaining "self"
-    ControllerOnMessageBlock onMessageHandler = _onMessageHandler;
+    ControllerOnMessageBlock onMessageHandler = self.onMessageHandler;
     
     dispatch_async(_appCallbackQueue, ^() {
         onMessageHandler(data, ipAddress, port);
@@ -145,10 +152,10 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     // this could be done async but the error we care about is sync. However, I think this could be restructured such that
     // the request is fired async and that Block can then return an error to the caller. This function would then never error out.
     // the only drawback is that it complicates the api where the user must handle async errors on every function
-    dispatch_sync(_chipWorkQueue, ^() {
+    dispatch_sync(self.chipWorkQueue, ^() {
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
-        err = _cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError, port);
+        err = self.cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError, port);
     });
     
     if (err != CHIP_NO_ERROR) {
@@ -176,7 +183,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
     
-    dispatch_sync(_chipWorkQueue, ^() {
+    dispatch_sync(self.chipWorkQueue, ^() {
         size_t messageLen = [message length];
         const void * messageChars = [message bytes];
         
@@ -184,7 +191,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         buffer->SetDataLength(messageLen);
         
         memcpy(buffer->Start(), messageChars, messageLen);
-        err = _cppController->SendMessage((__bridge void *) self, buffer);
+        err = self.cppController->SendMessage((__bridge void *) self, buffer);
     });
     
     if (err != CHIP_NO_ERROR) {
@@ -200,8 +207,8 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 - (BOOL)disconnect:(NSError * __autoreleasing *)error {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
     
-    dispatch_sync(_chipWorkQueue, ^() {
-        err = _cppController->DisconnectDevice();
+    dispatch_sync(self.chipWorkQueue, ^() {
+        err = self.cppController->DisconnectDevice();
     });
     
     if (err != CHIP_NO_ERROR) {
@@ -218,8 +225,8 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     __block bool isConnected = false;
     
     //the work queue is being used for atomic access to chip's cpp controller
-    dispatch_sync(_chipWorkQueue, ^() {
-        isConnected = _cppController->IsConnected();
+    dispatch_sync(self.chipWorkQueue, ^() {
+        isConnected = self.cppController->IsConnected();
     });
     
     return isConnected ? YES : NO;
@@ -228,7 +235,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 // TODO kill this with fire (NW might implicitly replace this?)
 - (void)_serviceEvents
 {
-    dispatch_async(_chipWorkQueue, ^() {
+    dispatch_async(self.chipWorkQueue, ^() {
         __block fd_set readFDs, writeFDs, exceptFDs;
         struct timeval aSleepTime;
         int numFDs = 0;
@@ -241,7 +248,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         chip::System::Layer * systemLayer = NULL;
         chip::Inet::InetLayer * inetLayer = NULL;
         // ask for the system and inet layers
-        self->_cppController->GetLayers(&systemLayer, &inetLayer);
+        self.cppController->GetLayers(&systemLayer, &inetLayer);
 
         if (systemLayer != NULL && systemLayer->State() == chip::System::kLayerState_Initialized)
             systemLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
@@ -249,17 +256,17 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         if (inetLayer != NULL && inetLayer->State == chip::Inet::InetLayer::kState_Initialized)
             inetLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
         
-        dispatch_async(self->_chipSelectQueue, ^() {
+        dispatch_async(self.chipSelectQueue, ^() {
             int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, const_cast<struct timeval *>(&aSleepTime));
             
-            dispatch_async(self->_chipWorkQueue, ^() {
-                if (!self->_cppController->IsConnected()) {
+            dispatch_async(self.chipWorkQueue, ^() {
+                if (!self.cppController->IsConnected()) {
                     // cancel the loop, it'll restart the next time a connection is established
                     return;
                 }
                 chip::System::Layer * systemLayer = NULL;
                 chip::Inet::InetLayer * inetLayer = NULL;
-                self->_cppController->GetLayers(&systemLayer, &inetLayer);
+                self.cppController->GetLayers(&systemLayer, &inetLayer);
                 
                 if (systemLayer != NULL && systemLayer->State() == chip::System::kLayerState_Initialized)
                 {
