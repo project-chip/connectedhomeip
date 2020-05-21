@@ -9,7 +9,6 @@ An appplication that runs CHIP's unit tests on ESP32 device or QEMU.
     -   [Building the Application](#building-the-application)
         -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
             -   [Using QEMU](#using-qemu)
-            -   [Using DevKitC or M5Stack](#using-devkitc-or-m5stack)
 
 ---
 
@@ -55,46 +54,12 @@ follow these steps:
 
 #### Using QEMU
 
--   In the root of the example directory, source `idf.sh` and use the
-    `defconfig` make target to configure the application with defaults.
+-   Setup ESP32 QEMU. This will build QEMU and install necessary artifacts to
+    run unit tests.
 
           $ source idf.sh
-          $ SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
+          $ ./qemu_setup.sh
 
--   Run make to build the application
+-   Run specific unit tests
 
-          $ idf make
-
--   Build the flash image for QEMU and run the application.
-
-          $ ../../../scripts/tools/build_esp32_flash_image.sh ./build/chip-tests.bin test.bin
-          $ ../../../scripts/tools/esp32_qemu_run.sh ./test.bin
-
-#### Using DevKitC or M5Stack
-
-Currently building in VSCode _and_ deploying from native is not supported, so
-make sure the IDF_PATH has been exported(See the manual setup steps above).
-
--   In the root of the example directory, source `idf.sh` and use the
-    `defconfig` make target to configure the application with defaults.
-
-          $ source idf.sh
-          $ idf make defconfig
-
--   Run make to build the application
-
-          $ idf make
-
--   After building the application, to flash it outside of VSCode, connect your
-    device via USB. Then run the following command to flash the demo application
-    onto the device and then monitor its output. If necessary, replace
-    `/dev/tty.SLAB_USBtoUART`(MacOS) with the correct USB device name for your
-    system(like `/dev/ttyUSB0` on Linux). Note that sometimes you might have to
-    press and hold the `boot` button on the device while it's trying to connect
-    before flashing.
-
-          $  make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
-
-    Note: Some users might have to install the
-    [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
-    before the device shows up on `/dev/tty`.
+          $ idf make -C build/chip/src/crypto/tests check
