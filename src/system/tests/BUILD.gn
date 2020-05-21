@@ -12,32 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("build/tests.gni")
+import("//build/chip_test_suite.gni")
 
-group("all") {
-  deps = [
-    "src",
-    "src/ble",
-    "src/controller",
-    "src/crypto",
-    "src/inet",
-    "src/lib/core",
-    "src/lib/support",
-    "src/lwip:all",
-    "src/system",
-    "src/transport",
-    "third_party/mbedtls",
-    "third_party/nlassert",
-    "third_party/nlfaultinjection",
-    "third_party/nlio",
-    "third_party/nlunit-test",
+chip_test_suite("tests") {
+  common_sources = [
+    "TestSystemErrorStr.cpp",
+    "TestSystemLayer.h",
+    "TestSystemObject.cpp",
+    "TestSystemPacketBuffer.cpp",
+    "TestSystemTimer.cpp",
+    "TestTimeSource.cpp",
   ]
 
-  if (chip_build_tests) {
-    deps += [
-      "src/lib/support/tests",
-      "src/lwip/tests",
-      "src/system/tests",
-    ]
-  }
+  public_deps = [
+    "//src/inet",
+    "//src/system",
+    "//third_party/nlunit-test",
+  ]
+
+  tests = [
+    "TestSystemErrorStr",
+    "TestSystemObject",
+    "TestSystemPacketBuffer",
+    "TestSystemTimer",
+    "TestTimeSource",
+  ]
 }
