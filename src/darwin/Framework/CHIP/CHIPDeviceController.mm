@@ -160,8 +160,12 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     }
     
     // Set the callback handlers
+    if (onMessage) {
     _onMessageHandler = onMessage;
+    }
+    if (onError) {
     _onErrorHandler = onError;
+    }
     
     // Start the IO pump
     [self _serviceEvents];
