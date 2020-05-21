@@ -55,7 +55,7 @@ MAYBE_QRCODE_TOOL                 = \
     $(NULL)
 
 if !CONFIG_DEVICE_LAYER
-    MAYBE_QRCODETOOL_SUBDIR       = \
+MAYBE_QRCODETOOL_SUBDIR           = \
     qrcodetool                      \
     $(NULL)
 endif
