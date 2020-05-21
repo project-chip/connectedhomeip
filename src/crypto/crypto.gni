@@ -12,25 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("build/tests.gni")
+declare_args() {
+  # Crypto implementation: mbedtls, openssl.
+  chip_crypto = ""
+}
 
-group("all") {
-  deps = [
-    "src/ble",
-    "src/crypto",
-    "src/inet",
-    "src/lib/core",
-    "src/lib/support",
-    "src/lwip:all",
-    "src/system",
-    "third_party/mbedtls",
-    "third_party/nlassert",
-    "third_party/nlfaultinjection",
-    "third_party/nlio",
-    "third_party/nlunit-test",
-  ]
-
-  if (chip_build_tests) {
-    deps += [ "src/lwip/tests" ]
+if (chip_crypto == "") {
+  if (current_os == "freertos" || current_os == "mac") {
+    chip_crypto = "mbedtls"
+  } else {
+    chip_crypto = "openssl"
   }
 }
+
+assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
+       "Please select a valid crypto implementation: mbedtls, openssl")
