@@ -112,3 +112,59 @@ ChipZclStatus_t chipZclCodecDecodeEnd(ChipZclRawBuffer_t * buffer)
 {
     return CHIP_ZCL_STATUS_SUCCESS;
 }
+
+void chipZclEncodeZclHeader(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context)
+{
+    uint8_t mask = 0;
+    if (context->clusterSpecific)
+        mask |= 0x01;
+    if (context->mfgSpecific)
+        mask |= 0x02;
+
+    chipZclCodecEncodeStart(buffer);
+    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &mask, sizeof(mask));
+    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->endpointId), sizeof(context->endpointId));
+    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->commandId), sizeof(context->commandId));
+    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->direction), sizeof(context->direction));
+    if (mask & 0x01)
+    {
+        chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->clusterId), sizeof(context->clusterId));
+    }
+    if (mask & 0x02)
+    {
+        chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->mfgCode), sizeof(context->mfgCode));
+    }
+    chipZclCodecEncodeEnd(buffer);
+}
+
+/**
+ * This function takes the buffer and decodes it into ZCL header data in the context.
+ */
+void chipZclDecodeZclHeader(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context)
+{
+    uint8_t mask = 0;
+    chipZclCodecDecodeStart(buffer);
+    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &mask, sizeof(mask), NULL);
+    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->endpointId), sizeof(context->endpointId), NULL);
+    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->commandId), sizeof(context->commandId), NULL);
+    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->direction), sizeof(context->direction), NULL);
+    if (mask & 0x01)
+    {
+        context->clusterSpecific = true;
+        chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->clusterId), sizeof(context->clusterId), NULL);
+    }
+    else
+    {
+        context->clusterSpecific = false;
+    }
+    if (mask & 0x02)
+    {
+        context->mfgSpecific = true;
+        chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &(context->mfgCode), sizeof(context->mfgCode), NULL);
+    }
+    else
+    {
+        context->mfgSpecific = false;
+    }
+    chipZclCodecDecodeEnd(buffer);
+}

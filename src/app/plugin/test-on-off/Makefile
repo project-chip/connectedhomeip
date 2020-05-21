@@ -5,6 +5,7 @@ REQUIRED_PLUGINS=\
   ../core-api/core-api.o \
   ../cluster-server-on-off/on-off-server.o \
   ../binding-mock/mock.o \
+  ../codec-simple/codec-simple.o \
   cluster-cmd-on-off-test.o \
   $(GEN)/gen-callback-stubs.o \
   $(GEN)/gen-specs.o \
