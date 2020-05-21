@@ -5,8 +5,8 @@
 version: 2
 jobs:
   Build CHIP [main-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    machine:
+      image: ubuntu-1604:201903-01
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -14,8 +14,8 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-main-build-persistent-cache
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
+        command: scripts/tools/run_if.sh "ubuntu-16-lts main-build" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment for VM builds
     - save_cache:
         key: build-environment-{{ arch }}-main-build-persistent-cache
         paths:
@@ -49,8 +49,8 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
+        command: scripts/tools/run_if.sh "ubuntu-16-lts main-build" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment for VM builds
     - save_cache:
         key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
         paths:
@@ -74,8 +74,8 @@ jobs:
         paths:
         - build/downloads
   Run Tests [main-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    machine:
+      image: ubuntu-1604:201903-01
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -86,8 +86,8 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-main-build-persistent-cache
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
+        command: scripts/tools/run_if.sh "ubuntu-16-lts main-build" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment for VM builds
     - run:
         command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
         name: Run mbedTLS Tests
@@ -103,6 +103,12 @@ jobs:
     - run:
         command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
+    - run:
+        command: scripts/tests/save_logs.sh /tmp/test_logs
+        name: Save test log files
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/test_logs
   Run Tests [mbedtls-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
@@ -117,8 +123,8 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-mbedtls-build-persistent-cache
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
+        command: scripts/tools/run_if.sh "ubuntu-16-lts main-build" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment for VM builds
     - run:
         command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
         name: Run mbedTLS Tests
@@ -134,19 +140,15 @@ jobs:
     - run:
         command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
-  Run Tests [ESP32-QEMU]:
-    docker:
-    - image: connectedhomeip/chip-build-esp32-qemu:0.2.11
-    environment:
-    - BUILD_TYPE: esp32-qemu-build
-    steps:
-    - checkout
     - run:
-        command: scripts/tests/esp32_qemu_tests.sh
-        name: Build QEMU and run unit tests
+        command: scripts/tests/save_logs.sh /tmp/test_logs
+        name: Save test log files
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/test_logs
   Deploy [main-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    machine:
+      image: ubuntu-1604:201903-01
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -157,8 +159,8 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-main-build-persistent-cache
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
+        command: scripts/tools/run_if.sh "ubuntu-16-lts main-build" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment for VM builds
     - run:
         command: scripts/build/distribution_check.sh
         name: Deployment Check
@@ -183,8 +185,8 @@ jobs:
         command: scripts/examples/esp_echo_app.sh
         name: Build example Echo App
   Build Examples [main-build]:
-    docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    machine:
+      image: ubuntu-1604:201903-01
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -195,8 +197,8 @@ jobs:
     - restore_cache:
         key: build-environment-{{ arch }}-main-build-persistent-cache
     - run:
-        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
-        name: Setup Environment
+        command: scripts/tools/run_if.sh "ubuntu-16-lts main-build" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment for VM builds
     - run:
         command: scripts/examples/standalone_echo_client.sh
         name: Build example Standalone Echo Client
@@ -220,11 +222,6 @@ workflows:
             - /restyled.*/
         requires:
         - Build CHIP [main-build]
-    - Run Tests [ESP32-QEMU]:
-        filters:
-          branches:
-            ignore:
-            - /restyled.*/
     - Run Tests [mbedtls-build]:
         filters:
           branches:
@@ -352,15 +349,16 @@ workflows:
 #         type: string
 #     steps:
 #     - run:
-#         command: scripts/tools/run_if.sh \"ubuntu-16-lts\" \"$BUILD_TYPE\" sudo scripts/setup/linux/install_packages.sh
-#         name: Setup Environment
+#         command: scripts/tools/run_if.sh \"ubuntu-16-lts main-build\" \"$BUILD_TYPE\"
+#           sudo scripts/setup/linux/install_packages.sh
+#         name: Setup Environment for VM builds
 # executors:
 #   esp32-build:
 #     docker:
 #     - image: connectedhomeip/chip-build-esp32:0.2.11
 #   main-build:
-#     docker:
-#     - image: connectedhomeip/chip-build:0.2.11
+#     machine:
+#       image: ubuntu-1604:201903-01
 #   mbedtls-build:
 #     docker:
 #     - image: connectedhomeip/chip-build:0.2.11
@@ -510,6 +508,12 @@ workflows:
 #     - run:
 #         command: scripts/tools/run_if.sh \"main-build\" \"$BUILD_TYPE\" scripts/tests/all_tests.sh
 #         name: Run All Unit & Functional Tests
+#     - run:
+#         command: scripts/tests/save_logs.sh /tmp/test_logs
+#         name: Save test log files
+#         when: on_fail
+#     - store_artifacts:
+#         path: /tmp/test_logs
 # version: 2.1
 # workflows:
 #   Main:

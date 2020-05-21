@@ -41,3 +41,9 @@ steps:
           command:
               scripts/tools/run_if.sh "main-build" "$BUILD_TYPE"
               scripts/tests/all_tests.sh
+    - run:
+          name: Save test log files
+          command: scripts/tests/save_logs.sh /tmp/test_logs
+          when: on_fail
+    - store_artifacts:
+          path: /tmp/test_logs

@@ -117,18 +117,19 @@ COMMON_LDADD                                          = \
 #
 # These will NOT be part of the externally-consumable binary SDK.
 #
-# XXX - At this point TestInetEndPoint and TestInetLayerDNS are stranded
-#       here until a solution for enabling IPv6 on Linux containers for
-#       Docker on macOS can be resolved as that test involves
-#       executing APIs that exercise bind, listen, connect, accept,
-#       etc. on IPv4 and IPv6 IP end points. When that issue has been
-#       resolved, move these tests to check_PROGRAMS.
+# TODO: some tests are stranded as CI servers historically did not fully
+#       support IPv6. Supporting these is a WIP.
+#
+# CI documentation on IPv6:
+#    https://circleci.com/docs/2.0/faq/#can-i-use-ipv6-in-my-tests
+
+# When support is added, move these tests to check_PROGRAMS.
+#
 
 if CHIP_TARGET_STYLE_UNIX
 # Build and run these test targets only on standalone device targets
 noinst_PROGRAMS                                       = \
     TestLwIPDNS                                         \
-    TestInetEndPoint                                    \
     TestInetLayer                                       \
     TestInetLayerDNS                                    \
     TestInetLayerMulticast                              \
@@ -139,6 +140,7 @@ noinst_PROGRAMS                                       = \
 check_PROGRAMS                                        = \
     TestInetAddress                                     \
     TestInetBuffer                                      \
+    TestInetEndPoint                                    \
     TestInetErrorStr                                    \
     TestInetTimer                                       \
     $(NULL)

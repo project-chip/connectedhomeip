@@ -19,6 +19,7 @@ save-persistent-ci-cache:
                   }}-<<parameters.builder>>-persistent-cache
               paths:
                   - ./ci-cache-persistent
+
 load-persistent-ci-cache:
     description: Load persistent CI Cache
     parameters:
@@ -108,7 +109,7 @@ setup-environment:
             type: string
     steps:
         - run:
-              name: Setup Environment
+              name: Setup Environment for VM builds
               command:
-                  scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo
-                  scripts/setup/linux/install_packages.sh
+                  scripts/tools/run_if.sh "ubuntu-16-lts main-build"
+                  "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh

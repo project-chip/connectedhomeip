@@ -42,3 +42,6 @@ fi
 
 cd ~/project/ci-cache-persistent/openssl/openssl/openssl-OpenSSL_1_1_1f
 make install_sw install_ssldirs
+
+# new libraries may be installed in /usr/local/lib. Pick them up
+ldconfig
