@@ -134,6 +134,16 @@ jobs:
     - run:
         command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
+  Run Tests [ESP32-QEMU]:
+    docker:
+    - image: connectedhomeip/chip-build-esp32-qemu:0.2.11
+    environment:
+    - BUILD_TYPE: esp32-qemu-build
+    steps:
+    - checkout
+    - run:
+        command: scripts/tests/esp32_qemu_tests.sh
+        name: Build QEMU and run unit tests
   Deploy [main-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
@@ -210,6 +220,11 @@ workflows:
             - /restyled.*/
         requires:
         - Build CHIP [main-build]
+    - Run Tests [ESP32-QEMU]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
     - Run Tests [mbedtls-build]:
         filters:
           branches:
