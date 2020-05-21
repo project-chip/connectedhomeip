@@ -27,6 +27,7 @@
 #include <memory.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "chip-zcl-buffer.h"
 
@@ -34,7 +35,6 @@ typedef uint64_t bitmap64_t;
 typedef uint8_t enum8_t;
 typedef uint16_t enum16_t;
 typedef uint32_t utc_time_t;
-typedef unsigned long int size_t;
 
 typedef uint8_t ChipZclStatus_t;
 
@@ -1108,10 +1108,10 @@ uint16_t chipZclLongStringLength(const uint8_t * buffer);
 
 /*
  * @brief Function that returns a metadata structure for the given attribute.
- * Returns null if none is found.
+ * *metadata is set to null if none is found,
  */
-ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterId clusterId,
-                                                          ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
+ChipZclStatus_t chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId,
+                                               uint8_t mask, uint16_t manufacturerCode, ChipZclAttributeMetadata ** metadata);
 
 /*
  * @brief Initialization of the endpoint structure. Before this call, endpoints are not enabled. After this call endpoints

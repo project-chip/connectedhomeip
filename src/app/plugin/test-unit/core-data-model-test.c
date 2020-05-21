@@ -33,6 +33,7 @@
 int testCoreDataModel()
 {
     ChipZclAttributeMetadata * metadata;
+    ChipZclStatus_t status;
     int count;
 
     chipZclEndpointInit();
@@ -44,25 +45,26 @@ int testCoreDataModel()
         return 1;
     }
 
+    status = chipZclLocateAttributeMetadata(1, 2, 3, 4, 5, &metadata);
     // This attribute doesn't exist
-    metadata = chipZclLocateAttributeMetadata(1, 2, 3, 4, 5);
-    if (metadata != NULL)
+    if (CHIP_ZCL_STATUS_SUCCESS == status)
     {
-        printf("Error: expecting NULL\n");
+        printf("Error: expecting failure\n");
         return 1;
     }
 
     // This one does, on endpoint 1
-    metadata = chipZclLocateAttributeMetadata(1, 0, 0, CLUSTER_MASK_SERVER, CHIP_ZCL_NULL_MANUFACTURER_CODE);
-    if (metadata == NULL)
+    status = chipZclLocateAttributeMetadata(1, 0, 0, CLUSTER_MASK_SERVER, CHIP_ZCL_NULL_MANUFACTURER_CODE, &metadata);
+
+    if (CHIP_ZCL_STATUS_SUCCESS != status)
     {
-        printf("Error: expecting non-NULL\n");
+        printf("Error: expecting success, got %d\n", status);
         return 1;
     }
 
     // Another existing attribute, on endpoint 242
-    metadata = chipZclLocateAttributeMetadata(242, 0x0021, 0x0011, CLUSTER_MASK_CLIENT, CHIP_ZCL_NULL_MANUFACTURER_CODE);
-    if (metadata == NULL)
+    status = chipZclLocateAttributeMetadata(242, 0x0021, 0x0011, CLUSTER_MASK_CLIENT, CHIP_ZCL_NULL_MANUFACTURER_CODE, &metadata);
+    if (CHIP_ZCL_STATUS_SUCCESS != status)
     {
         printf("Error: expecting non-NULL\n");
         return 1;

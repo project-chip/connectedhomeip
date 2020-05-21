@@ -479,24 +479,22 @@ static ChipZclStatus_t chipZclInternalReadOrWriteAttribute(ChipZclAttributeSearc
 }
 
 // Returns the pointer to metadata, or null if it is not found
-ChipZclAttributeMetadata * chipZclLocateAttributeMetadata(ChipZclEndpointId_t endpoint, ChipZclClusterId clusterId,
-                                                          ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode)
+ChipZclStatus_t chipZclLocateAttributeMetadata(ChipZclEndpointId_t endpoint, ChipZclClusterId clusterId,
+                                               ChipZclAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode,
+                                               ChipZclAttributeMetadata ** metadata)
 {
-    ChipZclAttributeMetadata * metadata = NULL;
-    ChipZclStatus_t status;
     ChipZclAttributeSearchRecord record;
     record.endpoint         = endpoint;
     record.clusterId        = clusterId;
     record.clusterMask      = mask;
     record.attributeId      = attributeId;
     record.manufacturerCode = manufacturerCode;
-
-    status = chipZclInternalReadOrWriteAttribute(&record,   // search record
-                                                 &metadata, // where to write the result.
-                                                 NULL,      // buffer
-                                                 0,         // buffer size
-                                                 false);    // write?
-    return metadata;
+    *metadata               = NULL;
+    return chipZclInternalReadOrWriteAttribute(&record,  // search record
+                                               metadata, // where to write the result.
+                                               NULL,     // buffer
+                                               0,        // buffer size
+                                               false);   // write?
 }
 
 // writes an attribute (identified by clusterID and attrID to the given value.
