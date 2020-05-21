@@ -22,8 +22,13 @@
  *
  */
 
-#include "chip-zcl.h"
-#include "test-unit.h"
+#include "ChipZclUnitTests.h"
+
+#include <chip-zcl.h>
+
+#include <stdio.h>
+
+#include "gen.h"
 
 int testCoreDataModel()
 {

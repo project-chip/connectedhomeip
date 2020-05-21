@@ -14,21 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <stdio.h>
-#include <stdlib.h>
 
-#include "test-unit.h"
+#include "ChipZclOnOffTest.h"
 
-int main(int argc, char ** argv)
+int main(void)
 {
-    printf("%s: === start ===\n", argv[0]);
-    testClusterServerBasic();
-    testClusterServerIdentify();
-    testClusterServerLevelControl();
-    testClusterServerOnOff();
-    testCodecSimple();
-    testCoreDataModel();
-    testCoreMessageDispatch();
-    printf("%s: === end ===\n", argv[0]);
-    return 0;
-}
+    return testClusterCmdOnOff();
+};

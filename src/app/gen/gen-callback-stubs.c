@@ -1,4 +1,4 @@
-#include "../api/chip-zcl.h"
+#include "chip-zcl.h"
 
 // Callback implementations
 

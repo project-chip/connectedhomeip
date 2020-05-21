@@ -1,4 +1,4 @@
-NAME=test-unit
+NAME=ChipZclUnitTests
 GEN=../../gen
 REQUIRED_PLUGINS=\
   ../binding-mock/mock.o \
@@ -25,13 +25,13 @@ TEST_FILES=\
 
 # ---------- GENERIC -------------
 CC=gcc
-CFLAGS="-I../../api/" "-I$(GEN)/" -DCHIP_TEST -g
+CFLAGS="-I../../chip-zcl/" "-I$(GEN)/" -DCHIP_TEST -g
 
 $(NAME).out: $(NAME).o $(REQUIRED_PLUGINS) $(TEST_FILES)
 	$(CC) -o $(NAME).out $(NAME).o $(REQUIRED_PLUGINS) $(TEST_FILES)
 
 test: $(NAME).out
 	./$(NAME).out
-	
+
 clean:
 	rm -f *.o $(objects) *.out
