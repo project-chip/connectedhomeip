@@ -119,6 +119,7 @@ int testClusterCmdOnOff(void)
         if (globalAttributeChangedFlag == false)
         {
             printf("ERROR: attribute change callback did not fire!\n");
+            return 1;
         }
         else
         {
