@@ -12,34 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("build/tests.gni")
+import("//build/chip_test_suite.gni")
 
-group("all") {
-  deps = [
-    "src",
-    "src/ble",
-    "src/controller",
-    "src/crypto",
-    "src/inet",
-    "src/lib/core",
-    "src/lib/support",
-    "src/lwip:all",
-    "src/system",
-    "src/transport",
-    "third_party/mbedtls",
-    "third_party/nlassert",
-    "third_party/nlfaultinjection",
-    "third_party/nlio",
-    "third_party/nlunit-test",
+chip_test_suite("tests") {
+  common_sources = [
+    "TestBleErrorStr.cpp",
+    "TestBleLayer.h",
   ]
 
-  if (chip_build_tests) {
-    deps += [
-      "src/ble/tests",
-      "src/inet/tests",
-      "src/lib/support/tests",
-      "src/lwip/tests",
-      "src/system/tests",
-    ]
-  }
+  public_deps = [
+    "//src/ble",
+    "//third_party/nlunit-test",
+  ]
+
+  tests = [ "TestBleErrorStr" ]
 }
