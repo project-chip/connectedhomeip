@@ -37,6 +37,9 @@ lib_LIBRARIES                                  = \
     libChipZclUnitTests.a                        \
     $(NULL)
 
+# TODO: pick a place to "install": this
+EXTRA_DIST = ChipZclUnitTests.h
+
 # plugins we're unit testing
 libChipZclUnitTests_a_SOURCES                            = \
     ../../gen/gen-callback-stubs.c                         \

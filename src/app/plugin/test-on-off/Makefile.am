@@ -37,6 +37,9 @@ lib_LIBRARIES                                  = \
     libChipZclOnOffTest.a                        \
     $(NULL)
 
+# TODO: pick a place to "install": this
+EXTRA_DIST = ChipZclOnOffTest.h
+
 # plugins we need
 libChipZclOnOffTest_a_SOURCES                           = \
     ../../gen/gen-callback-stubs.c                        \

@@ -20,4 +20,4 @@
 int main(void)
 {
     return testClusterCmdOnOff();
-};
+}

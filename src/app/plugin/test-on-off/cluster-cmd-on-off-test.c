@@ -31,4 +31,4 @@ int testClusterCmdOnOff(void)
     context.commandId   = ZCL_ON_COMMAND_ID;
     context.direction   = ZCL_DIRECTION_CLIENT_TO_SERVER;
     return chipZclClusterCommandParse(&context);
-};
+}

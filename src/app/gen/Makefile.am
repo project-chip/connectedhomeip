@@ -16,17 +16,26 @@
 
 #
 #    Description:
-#      This file governs what comes out of the app directory, chiefly
-#        the data model and application layer for the CHIP interaction
-#        model.
+#      A placeholder for temporary distribution of generated source for
+#        unit testing.
 #
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-SUBDIRS                               = \
-    gen                                 \
-    chip-zcl                            \
-    plugin                              \
+EXTRA_DIST                    = \
+    gen-attribute-storage.h     \
+    gen-attribute-type.h        \
+    gen-callback-stubs.c        \
+    gen-callbacks.h             \
+    gen-cluster-id.h            \
+    gen-command-handler.c       \
+    gen-command-handler.h       \
+    gen-command-id.h            \
+    gen-endpoint-config.h       \
+    gen-specs.c                 \
+    gen-types.h                 \
+    gen.h                       \
+    README.md                   \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

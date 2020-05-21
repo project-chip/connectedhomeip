@@ -24,9 +24,18 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 SUBDIRS                               = \
-    gen                                 \
-    chip-zcl                            \
-    plugin                              \
+    test-on-off                         \
+    test-unit                           \
     $(NULL)
+
+# this tree isn't included in a library, files are pulled into applications
+# so: just distribute (maybe later install ;) )
+
+plugins_EXTRA_DIST_ams = $(wildcard @top_srcdir@/src/app/plugin/*/extra_dist.am)
+
+EXTRA_DIST=$(plugins_EXTRA_DIST_ams)
+
+-include $(plugins_EXTRA_DIST_ams)
+
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
