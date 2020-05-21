@@ -28,7 +28,7 @@
  *            NSError * error;
  *            BOOL didStart = [_echoClient startWithFrequency:10 stopAfter:60 withError:&error];
  *            if (!didStart) {
- *                os_log(OS_LOG_DEFAULT, @"Failed to start echo client %@", error);
+ *                os_log(OS_LOG_DEFAULT, "Failed to start echo client %@", error);
  *            }
  *         }
  *

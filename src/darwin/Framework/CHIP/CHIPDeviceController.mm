@@ -21,6 +21,7 @@
 
 #import "CHIPDeviceController.h"
 #import "CHIPError.h"
+#import "CHIPLogging.h"
 
 #include <controller/CHIPDeviceController.h>
 #include <inet/IPAddress.h>
@@ -63,10 +64,12 @@ static const char *const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
         
         _cppController = new chip::DeviceController::ChipDeviceController();
         if(!_cppController) {
+            CHIP_LOG_ERROR("Error: couldn't create c++ controller");
             return nil;
         }
         
         if (CHIP_NO_ERROR != _cppController->Init()){
+            CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
             delete _cppController;
             _cppController = NULL;
             return nil;
@@ -113,6 +116,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (void)_dispatchAsyncErrorBlock:(NSError *)error
 {
+    CHIP_LOG_METHOD_ENTRY();
     //to avoid retaining "self"
     ControllerOnErrorBlock onErrorHandler = _onErrorHandler;
     
@@ -123,6 +127,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (void)_dispatchAsyncMessageBlock:(NSData *)data ipAddress:(NSString*)ipAddress port:(UInt16)port
 {
+    CHIP_LOG_METHOD_ENTRY();
     //to avoid retaining "self"
     ControllerOnMessageBlock onMessageHandler = _onMessageHandler;
     
@@ -147,6 +152,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
     
     if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error: %@, connect failed", [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
@@ -178,6 +184,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
     
     if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error: %@, send failed", [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
@@ -194,6 +201,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
     
     if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error: %@, disconnect failed", [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
