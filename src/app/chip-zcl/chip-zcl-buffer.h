@@ -40,6 +40,7 @@ typedef struct
 /**
  * Raw memory allocation. Can be mapped to an equivalent of malloc().
  * Expected to return NULL if it failed.
+ * Expected to follow the same alignment requirements as malloc() does.
  */
 void * chipZclRawAlloc(uint16_t allocatedLength);
 
@@ -47,10 +48,6 @@ void * chipZclRawAlloc(uint16_t allocatedLength);
  * Raw memory free. Can be mapped to an equivalent of free().
  */
 void chipZclRawFree(void * allocatedMemory);
-
-/**
- * Raw memory free. Can be mapped to an equivalent of free()
- */
 
 /**
  * Function that allocates a buffer.
