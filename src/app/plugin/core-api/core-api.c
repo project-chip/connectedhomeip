@@ -18,6 +18,7 @@
 #include <memory.h>
 
 #include "chip-zcl.h"
+
 /**
  * Function that allocates a buffer.
  */

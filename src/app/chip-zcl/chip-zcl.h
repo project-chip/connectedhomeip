@@ -270,21 +270,6 @@ typedef uint16_t ChipZclDeviceId_t;
 /** A distinguished value that represents a null (invalid) device identifer. */
 #define CHIP_ZCL_DEVICE_ID_NULL ((ChipZclDeviceId_t) -1)
 
-typedef struct
-{
-    ChipZclEndpointId_t endpointId;
-    uint16_t clusterId;
-    bool clusterSpecific;
-    bool mfgSpecific;
-    uint16_t mfgCode;
-    uint8_t seqNum;
-    uint8_t commandId;
-    uint8_t payloadStartIndex;
-    uint8_t direction;
-    void * request;
-    void * response;
-} ChipZclCommandContext_t;
-
 /** brief An identifier for a task */
 typedef uint8_t ChipZclTaskId;
 
@@ -937,6 +922,7 @@ typedef uint16_t ChipZclManufacturerCode_t;
 // Clusters.
 /** A cluster identifier. */
 typedef uint16_t ChipZclClusterId_t;
+typedef uint16_t ChipZclCommandId_t;
 typedef uint8_t ChipZclRole_t;
 typedef uint16_t ChipZclManufacturerCode_t;
 typedef uint16_t ChipZclAttributeId_t;
@@ -950,6 +936,21 @@ typedef struct
     /** Identifier of a cluster. */
     ChipZclClusterId_t id;
 } ChipZclClusterSpec_t;
+
+typedef struct
+{
+    ChipZclEndpointId_t endpointId;
+    ChipZclClusterId_t clusterId;
+    bool clusterSpecific;
+    bool mfgSpecific;
+    uint16_t mfgCode;
+    ChipZclCommandId_t commandId;
+    uint8_t direction;
+
+    uint8_t payloadStartIndex;
+    void * request;
+    void * response;
+} ChipZclCommandContext_t;
 
 int32_t chipZclCompareClusterSpec(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2);
 bool chipZclAreClusterSpecsEqual(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2);
@@ -1102,5 +1103,19 @@ ChipZclStatus_t chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterI
  * are enabled and linked together properly for use.
  */
 void chipZclEndpointInit(void);
+
+// Toplevel API functions
+
+/**
+ * This function takes the ZCL header data in the context and encodes it into a buffer.
+ */
+void chipZclEncodeZclHeader(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context);
+
+/**
+ * This function takes the buffer and decodes it into ZCL header data in the context.
+ */
+void chipZclDecodeZclHeader(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context);
+
+ChipZclCommandContext_t * createCommandContext(ChipZclEndpointId_t endpointId, ChipZclClusterId_t clusterId);
 
 #endif // CHIP_ZCL_MASTER_HEADER
