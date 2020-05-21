@@ -17,6 +17,7 @@ import("build/tests.gni")
 group("all") {
   deps = [
     "src",
+    "src/app",
     "src/ble",
     "src/controller",
     "src/crypto",
@@ -35,6 +36,7 @@ group("all") {
 
   if (chip_build_tests) {
     deps += [
+      "src/app/plugin/tests",
       "src/ble/tests",
       "src/crypto/tests",
       "src/inet/tests",

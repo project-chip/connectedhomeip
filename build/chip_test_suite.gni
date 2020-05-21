@@ -31,14 +31,28 @@ template("chip_test_suite") {
   }
 
   tests = []
-  foreach(test, invoker.tests) {
-    executable(test) {
-      sources = [ "${test}Driver.cpp" ]
+  if (defined(invoker.tests)) {
+    foreach(test, invoker.tests) {
+      executable(test) {
+        sources = [ "${test}Driver.cpp" ]
 
-      public_deps = [ ":${suite_name}_common" ]
+        public_deps = [ ":${suite_name}_common" ]
+      }
+
+      tests += [ ":${test}" ]
     }
+  }
 
-    tests += [ ":${test}" ]
+  if (defined(invoker.c_tests)) {
+    foreach(test, invoker.c_tests) {
+      executable(test) {
+        sources = [ "${test}Driver.c" ]
+
+        public_deps = [ ":${suite_name}_common" ]
+      }
+
+      tests += [ ":${test}" ]
+    }
   }
 
   group(suite_name) {
