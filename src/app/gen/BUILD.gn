@@ -12,38 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-config("public_includes") {
-  include_dirs = [ "include" ]
-}
-
-config("includes") {
+config("gen_config") {
   include_dirs = [ "." ]
-
-  configs = [ ":public_includes" ]
 }
 
-static_library("chip") {
-  public_deps = [
-    "app/plugin:chip",
-    "ble",
-    "controller",
-    "crypto",
-    "inet",
-    "lib/core",
-    "lib/support",
-    "system",
-    "transport",
+static_library("gen") {
+  sources = [
+    "gen-attribute-storage.h",
+    "gen-attribute-type.h",
+    "gen-callback-stubs.c",
+    "gen-callbacks.h",
+    "gen-cluster-id.h",
+    "gen-command-handler.c",
+    "gen-command-handler.h",
+    "gen-command-id.h",
+    "gen-endpoint-config.h",
+    "gen-global-command-handler.c",
+    "gen-global-command-handler.h",
+    "gen-specs.c",
+    "gen-types.h",
+    "gen.h",
   ]
 
-  output_name = "libCHIP"
+  check_includes = false
 
-  output_dir = "${root_out_dir}/lib"
+  public_configs = [ ":gen_config" ]
 
-  complete_static_lib = true
-}
-
-group("src") {
-  deps = [ ":chip" ]
+  public_deps = [ "//src/app/chip-zcl" ]
 }

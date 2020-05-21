@@ -1,0 +1,50 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+source_set("common") {
+  sources = [
+    "cluster-server-basic/basic-server.c",
+    "cluster-server-identify/identify-server.c",
+    "cluster-server-level-control/level-control-server-tokens.h",
+    "cluster-server-level-control/level-control-server.c",
+    "cluster-server-level-control/level-control-server.h",
+    "cluster-server-on-off/on-off-server-tokens.h",
+    "cluster-server-on-off/on-off-server.c",
+    "cluster-server-on-off/on-off-server.h",
+    "codec-simple/codec-simple.c",
+    "core-api/core-api.c",
+    "core-data-model/zcl-data-model.c",
+    "core-message-dispatch/dispatch.c",
+    "core-message-dispatch/dispatch.h",
+  ]
+
+  public_deps = [
+    "//src/app/chip-zcl",
+    "//src/app/gen",
+    "//src/lib/support",
+    "//src/system",
+  ]
+}
+
+source_set("chip") {
+  sources = [ "binding-chip/chip.cpp" ]
+
+  public_deps = [ ":common" ]
+}
+
+source_set("mock") {
+  sources = [ "binding-mock/mock.c" ]
+
+  public_deps = [ ":common" ]
+}
