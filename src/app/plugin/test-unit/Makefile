@@ -1,4 +1,4 @@
-NAME=ChipZclUnitTests
+NAME=ChipZclUnitTestsDriver
 GEN=../../gen
 REQUIRED_PLUGINS=\
   ../binding-mock/mock.o \

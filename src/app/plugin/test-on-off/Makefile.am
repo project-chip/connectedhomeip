@@ -49,14 +49,13 @@ libChipZclOnOffTest_a_SOURCES                           = \
     ../cluster-server-on-off/on-off-server.c              \
     ../binding-mock/mock.c                                \
     cluster-cmd-on-off-test.c                             \
-    ChipZclOnOffTest.c                                    \
     $(NULL)
 
 check_PROGRAMS                                 = \
-    ChipZclOnOffTest                             \
+    ChipZclOnOffTestDriver                       \
     $(NULL)
 
-ChipZclOnOffTest_LDADD                         = libChipZclOnOffTest.a
+ChipZclOnOffTestDriver_LDADD                   = libChipZclOnOffTest.a
 
 TESTS = $(check_PROGRAMS)
 

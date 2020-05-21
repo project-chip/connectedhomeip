@@ -28,6 +28,8 @@
 
 #include "gen.h"
 
+#include <stdio.h>
+
 // Main command parsing controller.
 ChipZclStatus_t chipZclCommandParse(ChipZclCommandContext_t * context);
 

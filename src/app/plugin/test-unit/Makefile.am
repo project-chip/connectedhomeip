@@ -67,10 +67,10 @@ libChipZclUnitTests_a_SOURCES                           += \
     $(NULL)
 
 check_PROGRAMS                                 = \
-    ChipZclUnitTests                             \
+    ChipZclUnitTestsDriver                       \
     $(NULL)
 
-ChipZclUnitTests_LDADD                         = libChipZclUnitTests.a
+ChipZclUnitTestsDriver_LDADD                   = libChipZclUnitTests.a
 
 TESTS = $(check_PROGRAMS)
 

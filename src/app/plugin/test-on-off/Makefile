@@ -1,4 +1,4 @@
-NAME=ChipZclOnOffTest
+NAME=ChipZclOnOffTestDriver
 GEN=../../gen
 REQUIRED_PLUGINS=../core-data-model/zcl-data-model.o ../cluster-server-on-off/on-off-server.o $(GEN)/gen-callback-stubs.o $(GEN)/gen-specs.o $(GEN)/gen-command-handler.o ../binding-mock/mock.o cluster-cmd-on-off-test.o
 

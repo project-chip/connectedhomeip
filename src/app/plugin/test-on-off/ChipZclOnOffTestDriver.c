@@ -15,6 +15,15 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file provides unit testing for the CHIP ZCL Command Handling
+ *      related to the on-off-server functionality. It constructs an
+ *      incoming message related to on-off and passes it into the CHIP
+ *      ZCL message dispatch code
+ *
+ */
+
 #include "ChipZclOnOffTest.h"
 
 int main(void)
