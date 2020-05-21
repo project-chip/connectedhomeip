@@ -181,6 +181,13 @@ Error SetClock_RealTime(uint64_t newCurTime)
 #endif // HAVE_CLOCK_SETTIME
 }
 
+#else // !HAVE_CLOCK_SETTTIME
+
+Error SetClock_RealTime(uint64_t newCurTime)
+{
+    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+}
+
 #endif // HAVE_CLOCK_SETTIME || HAVE_SETTIMEOFDAY
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS

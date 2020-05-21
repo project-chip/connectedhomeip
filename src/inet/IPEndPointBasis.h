@@ -93,7 +93,7 @@ public:
      *
      * @param[in]   endPoint    The endpoint associated with the event.
      * @param[in]   msg         The message text received.
-     * @param[in]   senderAddr  The IP address of the sender.
+     * @param[in]   pktInfo     The packet's IP information.
      *
      * @details
      *  Provide a function of this type to the \c OnMessageReceived delegate

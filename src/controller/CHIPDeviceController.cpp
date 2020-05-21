@@ -163,6 +163,11 @@ exit:
     return err;
 }
 
+bool ChipDeviceController::IsConnected()
+{
+    return kState_Initialized && mConState == kConnectionState_Connected;
+}
+
 CHIP_ERROR ChipDeviceController::DisconnectDevice()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -190,6 +195,24 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     }
 
     return err;
+}
+
+CHIP_ERROR ChipDeviceController::GetLayers(Layer ** systemLayer, InetLayer ** inetLayer)
+{
+    if (mState != kState_Initialized)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    if (systemLayer != NULL)
+    {
+        *systemLayer = mSystemLayer;
+    }
+    if (inetLayer != NULL)
+    {
+        *inetLayer = mInetLayer;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void ChipDeviceController::ServiceEvents()

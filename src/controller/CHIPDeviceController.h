@@ -62,27 +62,16 @@ public:
      * @brief
      *   Connect to a CHIP device at a given address and an optional port
      *
-     * @param deviceId              A device identifier. Currently unused and can be set to any value
-     * @param deviceAddr            The IPAddress of the requested Device
-     * @param appReqState           Application specific context to be passed back when a message is received or on error
-     * @param onMessageReceived     Callback for when a message is received
-     * @param onError               Callback for when an error occurs
-     * @param devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
+     * @param[in] deviceId              A device identifier. Currently unused and can be set to any value
+     * @param[in] deviceAddr            The IPAddress of the requested Device
+     * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
+     * @param[in] onMessageReceived     Callback for when a message is received
+     * @param[in] onError               Callback for when an error occurs
+     * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
      * @return CHIP_ERROR           The connection status
      */
     CHIP_ERROR ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState, MessageReceiveHandler onMessageReceived,
                              ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
-
-    // ----- Messaging -----
-    /**
-     * @brief
-     *   Send a message to a connected CHIP device
-     *
-     * @param appReqState   Application specific context to be passed back when a message is received or on error
-     * @param buffer        The Data Buffer to trasmit to the deviec
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR SendMessage(void * appReqState, PacketBuffer * buffer);
 
     /**
      * @brief
@@ -92,6 +81,25 @@ public:
      */
     CHIP_ERROR DisconnectDevice();
 
+    /**
+     * @brief
+     *   Check if there's an active connection
+     *
+     * @return bool   If there is an active connection
+     */
+    bool IsConnected();
+
+    // ----- Messaging -----
+    /**
+     * @brief
+     *   Send a message to a connected CHIP device
+     *
+     * @param[in] appReqState   Application specific context to be passed back when a message is received or on error
+     * @param[in] buffer        The Data Buffer to trasmit to the deviec
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR SendMessage(void * appReqState, PacketBuffer * buffer);
+
     // ----- IO -----
     /**
      * @brief
@@ -100,6 +108,16 @@ public:
      *   Note - Some platforms might need to implement their own event handler
      */
     void ServiceEvents();
+
+    /**
+     * @brief
+     *   Get pointers to the Layers ownerd by the controller
+     *
+     * @param systemLayer[out]   A pointer to the SystemLayer object
+     * @param inetLayer[out]     A pointer to the InetLayer object
+     * @return CHIP_ERROR   Indicates whether the layers were populated correctly
+     */
+    CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
 
 private:
     enum

@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		991DC0852475F45400C13860 /* CHIPEchoClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0832475F45400C13860 /* CHIPEchoClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		991DC0882475F47D00C13860 /* CHIPEchoClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0862475F47D00C13860 /* CHIPEchoClient.mm */; };
+		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
+		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
 		B20252972459E34F00F97062 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B202528D2459E34F00F97062 /* CHIP.framework */; };
 		B2E0D7B1245B0B5C003C5B48 /* CHIP.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A8245B0B5C003C5B48 /* CHIP.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B2245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -35,6 +40,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		991DC0822475F45400C13860 /* CHIPDeviceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceController.h; sourceTree = "<group>"; };
+		991DC0832475F45400C13860 /* CHIPEchoClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPEchoClient.h; sourceTree = "<group>"; };
+		991DC0862475F47D00C13860 /* CHIPEchoClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPEchoClient.mm; sourceTree = "<group>"; };
+		991DC0872475F47D00C13860 /* CHIPDeviceController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceController.mm; sourceTree = "<group>"; };
+		991DC08A247704DC00C13860 /* CHIPLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPLogging.h; sourceTree = "<group>"; };
 		B202528D2459E34F00F97062 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20252912459E34F00F97062 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B20252962459E34F00F97062 /* CHIPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,12 +113,17 @@
 				B2E0D7AB245B0B5C003C5B48 /* CHIPError.h */,
 				B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */,
 				C4C222BF2475A38700984173 /* CHIPLogging.mm */,
+				991DC08A247704DC00C13860 /* CHIPLogging.h */,
 				B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */,
 				B2E0D7AD245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm */,
 				B2E0D7AC245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h */,
 				B2E0D7AE245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm */,
 				B2E0D7AF245B0B5C003C5B48 /* CHIPSetupPayload.h */,
 				B2E0D7B0245B0B5C003C5B48 /* CHIPSetupPayload.mm */,
+				991DC0832475F45400C13860 /* CHIPEchoClient.h */,
+				991DC0862475F47D00C13860 /* CHIPEchoClient.mm */,
+				991DC0822475F45400C13860 /* CHIPDeviceController.h */,
+				991DC0872475F47D00C13860 /* CHIPDeviceController.mm */,
 				B20252912459E34F00F97062 /* Info.plist */,
 			);
 			path = CHIP;
@@ -139,10 +154,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */,
+				991DC0852475F45400C13860 /* CHIPEchoClient.h in Headers */,
 				B2E0D7B2245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* CHIP.h in Headers */,
 				B2E0D7B8245B0B5C003C5B48 /* CHIPSetupPayload.h in Headers */,
 				B2E0D7B5245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h in Headers */,
+				991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* CHIPError.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -269,6 +287,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				991DC0882475F47D00C13860 /* CHIPEchoClient.mm in Sources */,
+				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
 				C4C222C02475A38700984173 /* CHIPLogging.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
