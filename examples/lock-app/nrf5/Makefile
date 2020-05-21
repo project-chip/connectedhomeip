@@ -73,6 +73,9 @@ SRCS = \
     $(NRF5_SDK_ROOT)/components/softdevice/common/nrf_sdh.c \
     $(NRF5_SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
     $(NRF5_SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
+    $(NRF5_SDK_ROOT)/examples/multiprotocol/app_utils/multiprotocol_802154_config.c \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/nrf_cc310_plat/src/nrf_cc310_platform_mutex_freertos.c \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/nrf_cc310_plat/src/nrf_cc310_platform_abort_freertos.c \
     $(NRF5_SDK_ROOT)/external/fprintf/nrf_fprintf.c \
     $(NRF5_SDK_ROOT)/external/fprintf/nrf_fprintf_format.c \
     $(NRF5_SDK_ROOT)/external/freertos/portable/CMSIS/nrf52/port_cmsis.c \
@@ -140,45 +143,68 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/components/softdevice/s140/headers \
     $(NRF5_SDK_ROOT)/components/softdevice/s140/headers/nrf52 \
     $(NRF5_SDK_ROOT)/components/softdevice/mbr/nrf52840/headers \
-    $(NRF5_SDK_ROOT)/components/thread/freertos_mbedtls_mutex \
     $(NRF5_SDK_ROOT)/components/toolchain/cmsis/include \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/config \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/mbedtls_plat_config \
-    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/nrf_cc310_plat/include \
-    $(NRF5_SDK_ROOT)/external/openthread/project/config \
-    $(NRF5_SDK_ROOT)/external/openthread/project/nrf52840 \
     $(NRF5_SDK_ROOT)/config/nrf52840/config \
+    $(NRF5_SDK_ROOT)/examples/multiprotocol/app_utils \
     $(NRF5_SDK_ROOT)/external/fprintf \
     $(NRF5_SDK_ROOT)/external/freertos/config \
     $(NRF5_SDK_ROOT)/external/freertos/portable/CMSIS/nrf52 \
     $(NRF5_SDK_ROOT)/external/freertos/portable/GCC/nrf52 \
     $(NRF5_SDK_ROOT)/external/freertos/source/include \
+    $(NRF5_SDK_ROOT)/external/nRF-IEEE-802.15.4-radio-driver/src \
+    $(NRF5_SDK_ROOT)/external/nRF-IEEE-802.15.4-radio-driver/src/fem \
+    $(NRF5_SDK_ROOT)/external/nRF-IEEE-802.15.4-radio-driver/src/fem/three_pin_gpio \
+    $(NRF5_SDK_ROOT)/external/nRF-IEEE-802.15.4-radio-driver/src/rsch/raal \
+    $(NRF5_SDK_ROOT)/external/nRF-IEEE-802.15.4-radio-driver/src/rsch/raal/softdevice \
     $(NRF5_SDK_ROOT)/external/openthread/include \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/config \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/config \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/include/ \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/include/mbedtls \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/mbedtls_plat_config \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/nrf_cc310_plat/include \
+    $(NRF5_SDK_ROOT)/external/openthread/project/config \
+    $(NRF5_SDK_ROOT)/external/openthread/project/nrf52840 \
     $(NRF5_SDK_ROOT)/external/segger_rtt \
     $(NRF5_SDK_ROOT)/integration/nrfx \
     $(NRF5_SDK_ROOT)/integration/nrfx/legacy \
     $(NRF5_SDK_ROOT)/modules/nrfx \
     $(NRF5_SDK_ROOT)/modules/nrfx/drivers/include \
     $(NRF5_SDK_ROOT)/modules/nrfx/hal \
-    $(NRF5_SDK_ROOT)/modules/nrfx/mdk
+    $(NRF5_SDK_ROOT)/modules/nrfx/mdk \
 
 DEFINES = \
-    NRF52840_XXAA \
     BOARD_PCA10056 \
     BSP_DEFINES_ONLY \
     CONFIG_GPIO_AS_PINRESET \
+    ENABLE_FEM \
     FLOAT_ABI_HARD \
+    FREERTOS \
     MBEDTLS_CONFIG_FILE=\"nrf-config.h\" \
     MBEDTLS_USER_CONFIG_FILE=\"nrf52840-mbedtls-config.h\" \
+    MULTIPROTOCOL_802154_CONFIG_PRESENT \
+    NRF52840_XXAA \
+    NRFX_PRS_ENABLED=0 \
+    NRF_SD_BLE_API_VERSION=7 \
+    OPENTHREAD_CONFIG_COAP_API_ENABLE \
+    OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS=0 \
     OPENTHREAD_CONFIG_FILE=\"openthread-config-wrap.h\" \
+    OPENTHREAD_FTD=1 \
+    PRINTF_DISABLE_SUPPORT_EXPONENTIAL \
+    S140 \
+    SOFTDEVICE_PRESENT \
+    THREAD_EXAMPLE_COAP_SERVER=1 \
+    THREAD_EXAMPLE_FREERTOS=1 \
+    UART0_ENABLED=0 \
+    UART1_ENABLED=1 \
     USE_APP_CONFIG \
     __HEAP_SIZE=40960 \
     __STACK_SIZE=8192 \
-    SOFTDEVICE_PRESENT \
-    PRINTF_DISABLE_SUPPORT_EXPONENTIAL \
-    S140
 
 LIBS = \
+    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-cli-ftd.a \
+    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-ftd.a \
+    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-platform-utils.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
@@ -188,6 +214,19 @@ LIBS = \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_tls_vanilla.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_x509_vanilla.a \
     $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libnrf_cc310_platform_0.9.1.a \
+    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-nrf52840-softdevice-sdk.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
+    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libnordicsemi-nrf52840-radio-driver-softdevice.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_cc310_backend.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
+    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-platform-utils.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_base_vanilla.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_tls_vanilla.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_x509_vanilla.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libnrf_cc310_platform_0.9.1.a \
+    $(NRF5_SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-ftd.a \
 
 CFLAGS = \
     --specs=nano.specs

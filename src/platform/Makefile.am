@@ -111,6 +111,7 @@ libDeviceLayer_a_SOURCES                = \
     SystemTimerSupport.cpp                \
     GeneralUtils.cpp                      \
     Globals.cpp                           \
+    OpenThread/OpenThreadUtils.cpp        \
     $(NULL)
 
 if CHIP_DEVICE_LAYER_TARGET_LINUX
@@ -137,6 +138,7 @@ libDeviceLayer_a_SOURCES               +=       \
     nRF5/nRF5Config.cpp                         \
     nRF5/nRF5Utils.cpp                          \
     nRF5/Logging.cpp                            \
+    nRF5/ThreadStackManagerImpl.cpp             \
     FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
 
