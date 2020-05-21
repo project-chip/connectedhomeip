@@ -21,14 +21,14 @@
  *
  */
 
-#include "utest.h" /* TODO pass all that stuff in -D */
-#include "../../api/chip-zcl.h"
+#include "chip-zcl.h"
+#include "test-unit.h"
 #include <memory.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-int main()
+int testCodecSimple()
 {
     // Let's assume we are encoding and decoding a 100 byte buffer that contains
     // the following data:

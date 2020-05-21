@@ -17,24 +17,25 @@
 
 /**
  *    @file
- *      This file provides a header for the unit tests around the
- *      CHIP ZCL Application Layer's Identify Cluster Server
+ *      This file provides unit testing for the CHIP ZCL Application
+ *      layer's basic cluster server
  *
  */
+#include "test-unit.h"
 
-#ifndef UTEST_H
-#define UTEST_H
+void zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(
+    const ChipZclCommandContext_t * context, const ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request);
 
-#define PLATFORM_HEADER "utest.h"
-#define CONFIGURATION_HEADER "utest.h"
-#define CHIP_AF_API_STACK "utest.h"
-#define CHIP_AF_API_ZCL_CORE "utest.h"
-#define CHIP_AF_API_HAL "utest.h"
+int testClusterServerBasic()
+{
+    ChipZclCommandContext_t context;
+    ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t request;
 
-#include "chip-zcl.h"
-#include "gen-callbacks.h"
-#include "gen-cluster-id.h"
-#include "gen-types.h"
+    context.endpointId = 1;
+    request.dummy      = true;
 
-#include <stdio.h>
-#endif /*  UTEST_H */
+    zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(&context, &request);
+
+    printf("Success \n");
+    return 0;
+}

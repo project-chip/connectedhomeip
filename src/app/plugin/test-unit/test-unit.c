@@ -14,28 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <stdio.h>
+#include <stdlib.h>
 
-/**
- *    @file
- *      This file provides unit testing for the CHIP ZCL Application
- *      layer's basic cluster server
- *
- */
-#include "utest.h"
+#include "test-unit.h"
 
-void zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(
-    const ChipZclCommandContext_t * context, const ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request);
-
-int main()
+int main(int argc, char ** argv)
 {
-    ChipZclCommandContext_t context;
-    ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t request;
-
-    context.endpointId = 1;
-    request.dummy      = true;
-
-    zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(&context, &request);
-
-    printf("Success \n");
+    printf("%s: === start ===\n", argv[0]);
+    testClusterServerBasic();
+    testClusterServerIdentify();
+    testClusterServerLevelControl();
+    testClusterServerOnOff();
+    testCodecSimple();
+    testCoreDataModel();
+    testCoreMessageDispatch();
+    printf("%s: === end ===\n", argv[0]);
     return 0;
 }

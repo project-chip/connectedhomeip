@@ -23,44 +23,11 @@
  *      Layer's On Off Cluster Server
  */
 
-#ifdef CHIP_TEST
-#include "utest.h"
-#endif
-
-#include PLATFORM_HEADER
-#include CONFIGURATION_HEADER
-#include CHIP_AF_API_STACK
-#ifdef CHIP_AF_API_DEBUG_PRINT
-#include CHIP_AF_API_DEBUG_PRINT
-#endif
-#include CHIP_AF_API_ZCL_CORE
-#ifdef CHIP_AF_API_ZCL_LEVEL_CONTROL_SERVER
-#include CHIP_AF_API_ZCL_LEVEL_CONTROL_SERVER
-#define SET_ON_OFF(endpointId, onOff) chipZclLevelControlServerSetOnOff(endpointId, onOff)
-#else
-static void setOnOff(ChipZclEndpointId_t endpointId, bool onOff);
-#define SET_ON_OFF(endpointId, onOff) setOnOff(endpointId, onOff)
-#endif
-#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
-#include CHIP_AF_API_ZCL_SCENES_SERVER
-#endif
-
 #include "on-off-server.h"
+#include "chip-zcl.h"
+#include "gen.h"
 
 // Globals
-
-#ifdef CHIP_AF_API_ZCL_SCENES_SERVER
-#ifdef DEFINETOKENS
-// Token based storage.
-#define retrieveSceneSubTableEntry(entry, i) halCommonGetIndexedToken(&entry, TOKEN_ZCL_CORE_ON_OFF_SCENE_SUBTABLE, i)
-#define saveSceneSubTableEntry(entry, i) halCommonSetIndexedToken(TOKEN_ZCL_CORE_ON_OFF_SCENE_SUBTABLE, i, &entry)
-#else
-// RAM based storage.
-ChipZclOnOffSceneSubTableEntry_t zapPluginOnOffServerSceneSubTable[CHIP_AF_PLUGIN_SCENES_SERVER_TABLE_SIZE] = { { 0 } };
-#define retrieveSceneSubTableEntry(entry, i) (entry = zapPluginOnOffServerSceneSubTable[i])
-#define saveSceneSubTableEntry(entry, i) (zapPluginOnOffServerSceneSubTable[i] = entry)
-#endif
-#endif
 
 static void setOnOffHandler(const ChipZclCommandContext_t * context, bool onOff);
 static bool getOnOff(ChipZclEndpointId_t endpointId);
@@ -100,17 +67,15 @@ static bool getOnOff(ChipZclEndpointId_t endpointId)
     }
 }
 
-#ifndef CHIP_AF_API_ZCL_LEVEL_CONTROL_SERVER
 static void setOnOff(ChipZclEndpointId_t endpointId, bool onOff)
 {
     chipZclWriteAttribute(endpointId, &chipZclClusterOnOffServerSpec, CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF, &onOff,
                           sizeof(onOff));
 }
-#endif
 
 static void setOnOffHandler(const ChipZclCommandContext_t * context, bool onOff)
 {
-    SET_ON_OFF(context->endpointId, onOff);
+    setOnOff(context->endpointId, onOff);
     chipZclSendDefaultResponse(context, CHIP_ZCL_STATUS_SUCCESS);
 }
 

@@ -17,21 +17,21 @@
 
 /**
  *    @file
- *      This file provides a header for the unit tests around the
- *      simple codec
+ *      This file provides single inclusion header for the entire generated layer.
  *
  */
 
-#ifndef UTEST_H
-#define UTEST_H
+// Enclosing macro to prevent multiple inclusion
+#ifndef CHIP_ZCL_GEN_HEADER
+#define CHIP_ZCL_GEN_HEADER
 
-#define PLATFORM_HEADER "utest.h"
-#define CONFIGURATION_HEADER "utest.h"
-#define CHIP_AF_API_STACK "utest.h"
-#define CHIP_AF_API_ZCL_CORE "utest.h"
-
-#include "chip-zcl-codec.h"
-#include "chip-zcl.h"
+#include "gen-attribute-storage.h"
+#include "gen-attribute-type.h"
+#include "gen-callbacks.h"
+#include "gen-cluster-id.h"
+#include "gen-command-handler.h"
+#include "gen-command-id.h"
+#include "gen-endpoint-config.h"
 #include "gen-types.h"
-#include <stdio.h>
-#endif /*  UTEST_H */
+
+#endif // CHIP_ZCL_GEN_HEADER

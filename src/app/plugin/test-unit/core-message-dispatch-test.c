@@ -22,9 +22,12 @@
  *
  */
 
-#include "utest.h"
+#include "test-unit.h"
 
-int main()
+// Main command parsing controller.
+ChipZclStatus_t chipZclCommandParse(ChipZclCommandContext_t * context);
+
+int testCoreMessageDispatch()
 {
     chipZclEndpointInit();
 

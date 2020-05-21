@@ -23,17 +23,8 @@
  *
  */
 
-#ifdef CHIP_TEST
-#include "utest.h"
-#endif
-
-#include PLATFORM_HEADER
-#include CONFIGURATION_HEADER
-#include CHIP_AF_API_STACK
-#ifdef CHIP_AF_API_DEBUG_PRINT
-#include CHIP_AF_API_DEBUG_PRINT
-#endif
-#include CHIP_AF_API_ZCL_CORE
+#include "chip-zcl.h"
+#include "gen.h"
 
 void zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(
     const ChipZclCommandContext_t * context, const ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request)

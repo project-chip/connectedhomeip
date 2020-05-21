@@ -25,6 +25,9 @@
 #ifndef CHIP_ZCL_STRUCT
 #define CHIP_ZCL_STRUCT
 
+#include <stdbool.h>
+#include <stdint.h>
+
 /**
  * Base types for the codec. This is a smaller subset than the actual ZCL types, and the
  * generated layer for a specific code is responsible for mapping ZCL types onto these

@@ -26,6 +26,9 @@
 #define CHIP_ZCL_CODEC
 
 #include "chip-zcl-struct.h"
+#include "chip-zcl.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 /**
  * @brief Starts the encoding process. if there is any kind of preamble of anything, this function is responsible for putting it

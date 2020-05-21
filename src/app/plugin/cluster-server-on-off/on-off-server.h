@@ -26,6 +26,8 @@
 #ifndef ZCL_ON_OFF_SERVER_H
 #define ZCL_ON_OFF_SERVER_H
 
+#include <stdbool.h>
+
 // Define OnOff plugin Scenes sub-table structure.
 // NOTE: When modifying this structure take into account NVM token space and
 // backward compatibility considerations

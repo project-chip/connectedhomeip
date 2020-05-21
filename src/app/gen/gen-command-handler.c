@@ -24,7 +24,7 @@
  *
  */
 
-#include "cluster-command-handler.h"
+#include "gen-command-handler.h"
 
 static ChipZclStatus_t status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
