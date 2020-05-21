@@ -1118,4 +1118,6 @@ void chipZclDecodeZclHeader(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t
 
 ChipZclCommandContext_t * createCommandContext(ChipZclEndpointId_t endpointId, ChipZclClusterId_t clusterId);
 
+ChipZclStatus_t chipZclProcessIncoming(uint8_t * buffer, uint16_t bufferLength);
+
 #endif // CHIP_ZCL_MASTER_HEADER

@@ -48,6 +48,7 @@ libChipZclOnOffTest_a_SOURCES                           = \
     ../core-data-model/zcl-data-model.c                   \
     ../cluster-server-on-off/on-off-server.c              \
     ../binding-mock/mock.c                                \
+    ../core-api/core-api.c                                \
     cluster-cmd-on-off-test.c                             \
     $(NULL)
 

@@ -99,7 +99,17 @@ int testClusterCmdOnOff(void)
 
     printf("Buffer for processing is ready, length: %d\n", bufferLength);
 
-    //  At this point, we have a buffer encoded with the command context that contains the command.
+    // At this point, we have a buffer encoded with the command context that contains the command.
+    // So we will be testing top-level entry API.
+    ChipZclStatus_t status = chipZclProcessIncoming(rawBuffer, bufferLength);
 
-    return chipZclClusterCommandParse(context);
+    if (status == CHIP_ZCL_STATUS_SUCCESS)
+    {
+        return 0;
+    }
+    else
+    {
+        printf("ERROR: Process incoming failed with: %d\n", status);
+        return 1;
+    }
 }
