@@ -3,7 +3,7 @@ jobs:
           name: Build CHIP [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["docker-build", "mbedtls-build", "ubuntu-16-lts"]
+                  builder: ["main-build", "mbedtls-build"]
           filters:
               branches:
                   ignore:
@@ -12,7 +12,7 @@ jobs:
           name: Run Tests [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["docker-build", "mbedtls-build", "ubuntu-16-lts"]
+                  builder: ["main-build", "mbedtls-build"]
           requires:
               - Build CHIP [<< matrix.builder >>]
           filters:
@@ -23,7 +23,7 @@ jobs:
     #       name: Code Coverage [<< matrix.builder >>]
     #       matrix:
     #           parameters:
-    #               builder: ["docker-build"]
+    #               builder: ["main-build"]
     #       requires:
     #           - Build CHIP [<< matrix.builder >>]
     #       filters:
@@ -34,7 +34,7 @@ jobs:
           name: Deploy [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["docker-build"]
+                  builder: ["main-build"]
           requires:
               - Run Tests [<< matrix.builder >>]
           filters:
@@ -57,7 +57,7 @@ jobs:
           name: Build Examples [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["docker-build"]
+                  builder: ["main-build"]
           requires:
               - Build CHIP [<< matrix.builder >>]
           filters:
