@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
 #include <inttypes.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>

@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <new>
 
-#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
