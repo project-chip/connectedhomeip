@@ -96,43 +96,18 @@ void chipZclReverseClusterSpec(const ChipZclClusterSpec_t * s1, ChipZclClusterSp
 }
 
 /**
- * Function that allocates a buffer.
+ * Raw memory allocation. Can be mapped to an equivalent of malloc().
+ * Expected to return NULL if it failed.
  */
-ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
+void * chipZclRawAlloc(uint16_t allocatedLength)
 {
-    ChipZclRawBuffer_t * buffer = malloc(sizeof(ChipZclRawBuffer_t));
-    buffer->buffer              = malloc(allocatedLength * sizeof(uint8_t));
-    buffer->endPosition         = 0;
-    buffer->currentPosition     = 0;
-    buffer->totalLength         = allocatedLength;
-    return buffer;
+    return malloc(allocatedLength);
 }
 
 /**
- * Function that returns a pointer to the raw buffer.
+ * Raw memory free. Can be mapped to an equivalent of free().
  */
-uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer)
+void chipZclRawFree(void * allocatedMemory)
 {
-    return buffer->buffer;
-}
-
-/**
- * Function that frees a buffer.
- */
-void chipZclBufferFree(ChipZclRawBuffer_t * buffer)
-{
-    free(buffer->buffer);
-    free(buffer);
-}
-
-void chipZclBufferFlip(ChipZclRawBuffer_t * buffer)
-{
-    buffer->endPosition     = buffer->currentPosition;
-    buffer->currentPosition = 0;
-}
-
-void chipZclBufferClear(ChipZclRawBuffer_t * buffer)
-{
-    buffer->currentPosition = 0;
-    buffer->endPosition     = buffer->totalLength;
+    free(allocatedMemory);
 }
