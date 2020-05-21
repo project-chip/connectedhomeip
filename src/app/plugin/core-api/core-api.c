@@ -41,12 +41,25 @@ uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer)
 }
 
 /**
+ * Function that returns the size of the used portion of the buffer.
+ */
+uint16_t chipZclBufferUsedLength(ChipZclRawBuffer_t * buffer)
+{
+    return buffer->endPosition;
+}
+
+/**
  * Function that frees a buffer.
  */
 void chipZclBufferFree(ChipZclRawBuffer_t * buffer)
 {
     chipZclRawFree(buffer->buffer);
     chipZclRawFree(buffer);
+}
+
+void chipZclBufferReset(ChipZclRawBuffer_t * buffer)
+{
+    buffer->currentPosition = 0;
 }
 
 void chipZclBufferFlip(ChipZclRawBuffer_t * buffer)
