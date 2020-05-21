@@ -23,14 +23,14 @@
  *          for Linux platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/ConfigurationManager.h>
 #include <core/CHIPVendorIdentifiers.hpp>
+#include <platform/ConfigurationManager.h>
 #include <platform/Linux/PosixConfig.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

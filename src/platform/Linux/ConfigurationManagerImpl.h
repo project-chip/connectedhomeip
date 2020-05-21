@@ -24,8 +24,8 @@
 #ifndef CONFIGURATION_MANAGER_IMPL_H
 #define CONFIGURATION_MANAGER_IMPL_H
 
-#include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/Linux/PosixConfig.h>
+#include <platform/internal/GenericConfigurationManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {

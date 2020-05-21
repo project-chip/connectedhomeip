@@ -23,12 +23,12 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/logging/CHIPLogging.h>
 #include <support/TimeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
-#include <sys/time.h>
-#include <inttypes.h>
 #include <chrono>
+#include <inttypes.h>
+#include <sys/time.h>
 
 namespace chip {
 namespace System {

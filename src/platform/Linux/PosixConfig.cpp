@@ -23,10 +23,10 @@
  *          Utilities for interacting with the the ESP32 "NVS" key-value store.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/Linux/PosixConfig.h>
-#include <support/CodeUtils.h>
 #include <core/CHIPEncoding.h>
+#include <platform/Linux/PosixConfig.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

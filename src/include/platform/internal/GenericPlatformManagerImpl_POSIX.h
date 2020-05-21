@@ -29,12 +29,12 @@
 
 #include <fcntl.h>
 #include <sched.h>
-#include <unistd.h>
-#include <sys/time.h>
 #include <sys/select.h>
+#include <sys/time.h>
+#include <unistd.h>
 
-#include <queue>
 #include <pthread.h>
+#include <queue>
 
 namespace chip {
 namespace DeviceLayer {

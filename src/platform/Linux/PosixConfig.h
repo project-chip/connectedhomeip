@@ -24,8 +24,8 @@
 #ifndef POSIX_CONFIG_H
 #define POSIX_CONFIG_H
 
-#include <inttypes.h>
 #include <functional>
+#include <inttypes.h>
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
