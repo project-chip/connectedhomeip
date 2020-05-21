@@ -34,7 +34,11 @@
 #endif
 #include "mem_manager.h"
 extern "C" {
-#include "freertos_mbedtls_mutex.h"
+#include "multiprotocol_802154_config.h"
+#include "nrf_802154.h"
+#include "nrf_cc310_platform_abort.h"
+#include "nrf_cc310_platform_mutex.h"
+#include <openthread/platform/platform-softdevice.h>
 }
 
 #if NRF_LOG_ENABLED
@@ -44,7 +48,19 @@ extern "C" {
 #endif // NRF_LOG_ENABLED
 
 #include <AppTask.h>
+#include <mbedtls/platform.h>
+#include <openthread/cli.h>
+#include <openthread/dataset.h>
+#include <openthread/error.h>
+#include <openthread/heap.h>
+#include <openthread/icmp6.h>
+#include <openthread/instance.h>
+#include <openthread/link.h>
+#include <openthread/platform/openthread-system.h>
+#include <openthread/tasklet.h>
+#include <openthread/thread.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -85,6 +101,7 @@ uint32_t LogTimestamp(void)
 
 static void OnSoCEvent(uint32_t sys_evt, void * p_context)
 {
+    otSysSoftdeviceSocEvtHandler(sys_evt);
     UNUSED_PARAMETER(p_context);
 }
 
@@ -172,24 +189,6 @@ int main(void)
 
 #endif // defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
 
-    ret = nrf_mem_init();
-    if (ret != NRF_SUCCESS)
-    {
-        NRF_LOG_INFO("nrf_mem_init() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-    NRF_LOG_INFO("Mem init complete");
-
-#if NRF_CRYPTO_ENABLED
-    ret = nrf_crypto_init();
-    if (ret != NRF_SUCCESS)
-    {
-        NRF_LOG_INFO("nrf_crypto_init() failed");
-        APP_ERROR_HANDLER(ret);
-    }
-    NRF_LOG_INFO("Crypto init complete");
-#endif
-
 #if defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
 
     {
@@ -216,11 +215,57 @@ int main(void)
         APP_ERROR_HANDLER(ret);
     }
 
+    NRF_LOG_INFO("Initializing OpenThread stack");
+
+    mbedtls_platform_set_calloc_free(calloc, free);
+    nrf_cc310_platform_abort_init();
+    nrf_cc310_platform_mutex_init();
+    mbedtls_platform_setup(NULL);
+    otHeapSetCAllocFree(calloc, free);
+
+    otSysInit(0, NULL);
+
+    // Configure multiprotocol to work with BLE.
+    {
+        uint32_t retval = multiprotocol_802154_mode_set(MULTIPROTOCOL_802154_MODE_FAST_SWITCHING_TIMES);
+
+        if (retval != NRF_SUCCESS)
+        {
+            NRF_LOG_INFO("multiprotocol 15.4 failed");
+            APP_ERROR_HANDLER(CHIP_ERROR_INTERNAL);
+        }
+    }
+
+    ret = ThreadStackMgr().InitThreadStack();
+    if (ret != CHIP_NO_ERROR)
+    {
+        NRF_LOG_INFO("ThreadStackMgr().InitThreadStack() failed");
+        APP_ERROR_HANDLER(ret);
+    }
+
+    // Configure device to operate as a Thread sleepy end-device.
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    if (ret != CHIP_NO_ERROR)
+    {
+        NRF_LOG_INFO("ConnectivityMgr().SetThreadDeviceType() failed");
+        APP_ERROR_HANDLER(ret);
+    }
+
     NRF_LOG_INFO("Starting CHIP task");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
         NRF_LOG_INFO("PlatformMgr().StartEventLoopTask() failed");
+        APP_ERROR_HANDLER(ret);
+    }
+
+    NRF_LOG_INFO("Starting OpenThread task");
+
+    // Start OpenThread task
+    ret = ThreadStackMgrImpl().StartThreadTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        NRF_LOG_INFO("ThreadStackMgr().StartThreadTask() failed");
         APP_ERROR_HANDLER(ret);
     }
 
@@ -233,13 +278,13 @@ int main(void)
 
     // Activate deep sleep mode
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-    /*
-        {
-            struct mallinfo minfo = mallinfo();
-            NRF_LOG_INFO("System Heap Utilization: heap size %" PRId32 ", arena size %" PRId32 ", in use %" PRId32 ", free %"
-       PRId32, GetHeapTotalSize(), minfo.arena, minfo.uordblks, minfo.fordblks);
-        }
-    */
+
+    {
+        struct mallinfo minfo = mallinfo();
+        NRF_LOG_INFO("System Heap Utilization: heap size %" PRId32 ", arena size %" PRId32 ", in use %" PRId32 ", free %" PRId32,
+                     GetHeapTotalSize(), minfo.arena, minfo.uordblks, minfo.fordblks);
+    }
+
     NRF_LOG_INFO("Starting FreeRTOS scheduler");
 
     /* Start FreeRTOS scheduler. */

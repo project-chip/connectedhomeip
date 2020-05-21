@@ -109,6 +109,7 @@ enum LogModule
     kLogModule_chipTool,
     kLogModule_Zcl,
     kLogModule_Shell,
+    kLogModule_DeviceLayer,
 
     kLogModule_Max
 };

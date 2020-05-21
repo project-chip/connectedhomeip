@@ -113,6 +113,12 @@ libDeviceLayer_a_SOURCES                = \
     Globals.cpp                           \
     $(NULL)
 
+if CHIP_ENABLE_OPENTHREAD
+libDeviceLayer_a_SOURCES               += \
+    OpenThread/OpenThreadUtils.cpp        \
+    $(NULL)
+endif
+
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 
 SUBDIRS                                += tests
@@ -137,6 +143,7 @@ libDeviceLayer_a_SOURCES               +=       \
     nRF5/nRF5Config.cpp                         \
     nRF5/nRF5Utils.cpp                          \
     nRF5/Logging.cpp                            \
+    nRF5/ThreadStackManagerImpl.cpp             \
     FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
 

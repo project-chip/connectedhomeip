@@ -904,6 +904,26 @@ NL_ENABLE_DOCS([auto],[NO])
 AM_CONDITIONAL(CHIP_BUILD_DOCS, [test "${nl_cv_build_docs}" = "yes"])
 
 #
+# OpenThread
+#
+AC_MSG_CHECKING([OpenThread])
+AC_ARG_ENABLE(openthread,
+    [AS_HELP_STRING([--enable-openthread],
+        [Enable OpenThread @<:@default=no@:>@.])],
+    [
+     enable_openthread=${enableval}
+    ],
+    [enable_openthread=no])
+AC_MSG_RESULT(${enable_openthread})
+AM_CONDITIONAL([CHIP_ENABLE_OPENTHREAD], [test "${enable_openthread}" = "yes"])
+if test "${enable_openthread}" = "yes"; then
+    CHIP_ENABLE_OPENTHREAD=1
+else
+    CHIP_ENABLE_OPENTHREAD=0
+fi
+AC_DEFINE_UNQUOTED([CHIP_ENABLE_OPENTHREAD],[${CHIP_ENABLE_OPENTHREAD}],[Define to 1 if you want to enable OpenThread.])
+
+#
 # Network Technology Layer
 #
 AC_MSG_CHECKING([network layer])
