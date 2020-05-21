@@ -35,6 +35,7 @@ group("all") {
 
   if (chip_build_tests) {
     deps += [
+      "src/inet/tests",
       "src/lib/support/tests",
       "src/lwip/tests",
       "src/system/tests",
