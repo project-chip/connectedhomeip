@@ -82,20 +82,42 @@ COMMON_LDADD                                   = \
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \
+    $(NULL)
+
+check_SCRIPTS                                  = \
+    $(NULL)
+
+# The additional environment variables and their values that will be
+# made available to all programs and scripts in TESTS.
+TESTS_ENVIRONMENT                              = \
+    $(NULL)
+
+if CHIP_TARGET_STYLE_EMBEDDED
+
+check_SCRIPTS                                 += \
+    qemu_crypto_tests.sh                         \
+    $(NULL)
+
+TESTS_ENVIRONMENT                             += \
+    abs_top_srcdir='$(abs_top_srcdir)'           \
+    abs_top_builddir='$(abs_top_builddir)'       \
+    QEMU_TEST_TARGET=libCryptoLayerTests.a       \
+    $(NULL)
+
+else # CHIP_TARGET_STYLE_EMBEDDED
+
+check_PROGRAMS                                += \
     TestCryptoPAL                                \
     $(NULL)
+
+endif # CHIP_TARGET_STYLE_EMBEDDED
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
 TESTS                                          = \
     $(check_PROGRAMS)                            \
-    $(NULL)
-
-# The additional environment variables and their values that will be
-# made available to all programs and scripts in TESTS.
-
-TESTS_ENVIRONMENT                              = \
+    $(check_SCRIPTS)                             \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
