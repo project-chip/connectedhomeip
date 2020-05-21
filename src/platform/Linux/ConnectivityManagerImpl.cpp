@@ -16,9 +16,10 @@
  *    limitations under the License.
  */
 
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <new>
 

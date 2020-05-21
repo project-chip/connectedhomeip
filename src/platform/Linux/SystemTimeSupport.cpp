@@ -23,6 +23,7 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
 

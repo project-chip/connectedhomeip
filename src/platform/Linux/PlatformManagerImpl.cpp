@@ -22,8 +22,9 @@
  *          for Linux platforms.
  */
 
-#include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 namespace chip {

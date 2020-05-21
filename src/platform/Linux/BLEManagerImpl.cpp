@@ -21,10 +21,11 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for Linux platforms.
  */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <ble/CHIPBleServiceData.h>
 #include <new>
 #include <platform/internal/BLEManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
