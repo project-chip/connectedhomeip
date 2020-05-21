@@ -86,6 +86,8 @@ config("chip_config") {
     defines += [ "CHIP_LOGGING_STYLE_STDIO_WEAK=0" ]
   }
 
+  include_dirs = [ target_gen_dir ]
+
   configs = [
     "//src:includes",
     "//src/lib:includes",
