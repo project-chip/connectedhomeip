@@ -539,7 +539,7 @@ static ChipZclStatus_t chipZclInternalWriteAttribute(ChipZclEndpointId_t endpoin
     // if we dont support that attribute
     if (metadata == NULL)
     {
-        chipZclCorePrintln("%pep %x clus %2x attr %2x not supported", "WRITE ERR: ", endpoint, cluster, attributeID);
+        chipZclCorePrintln("%sep %x clus %2x attr %2x not supported", "WRITE ERR: ", endpoint, cluster, attributeID);
         return CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
 
@@ -645,7 +645,8 @@ static ChipZclStatus_t chipZclInternalWriteAttribute(ChipZclEndpointId_t endpoin
 ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
                                       ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
 {
-    return CHIP_ZCL_STATUS_SUCCESS;
+    return chipZclInternalWriteAttribute(endpointId, clusterSpec->id, attributeId, 0, 0, buffer, ZCL_BOOLEAN_ATTRIBUTE_TYPE, true,
+                                         false);
 }
 
 #if 0  // this function needs more dispatch information to be consumed by the public Read/Write functions

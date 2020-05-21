@@ -29,7 +29,7 @@ ChipZclCommandContext_t * testCreateCommandContext()
     ChipZclCommandContext_t * context;
 
     context                  = (ChipZclCommandContext_t *) chipZclRawAlloc(sizeof(ChipZclCommandContext_t));
-    context->endpointId      = 1;
+    context->endpointId      = 0;
     context->clusterId       = CHIP_ZCL_CLUSTER_ON_OFF;
     context->clusterSpecific = true;
     context->mfgSpecific     = false;
