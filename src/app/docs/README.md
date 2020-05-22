@@ -13,7 +13,9 @@ Messages enter into and are handled by the CHIP ZCL Application Framework throug
 
 Messages arriving in the <code>core-message-dispatch</code> are assumed to have had their "APS" Header decoded completely such that they arrive in the form of a pointer to a <code>ChipZclCommandContext_t</code> which is defined in <code>src/app/api/chip-zcl.h</code>. Values that are normally part of the Zigbee APS header such as <code>endpointId</code>, <code>clusterId</code> and <code>commandId</code> are used by the <code>core-message-dispatch</code> to determine how to process the incoming message.
 
-For more information on the handling of plugins please see the diagram below:
+<code>core-message-dispatch</code> uses information parsed from the "APS" header to retrieve a "request spec" and command handler pointer from the <code>core-data-model</code>. The "request spec" contains all the information necessary to decode the incoming request. The "request spec" and a pointer to the appropriate "request struct" are passed by the <code>core-message-dispatch</code> to the appropriate codec. The codec decodes the incoming message payload and populates the associated "request struct" which can then be passed on throughout the system for actual command processing and device actuation etc...
+
+For more information and an example on the handling of incoming messaages by the <code>plugins please see the diagram below:
 
 
 ![CHIP ZCL Message Flow](chip-zcl-msg-flow.png)
