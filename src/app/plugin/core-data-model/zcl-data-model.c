@@ -498,7 +498,6 @@ ChipZclStatus_t chipZclLocateAttributeMetadata(ChipZclEndpointId_t endpoint, Chi
                                                false);   // write?
 }
 
-#if 0 // this function needs more dispatch information to be consumed by the public Read/Write functions
 // writes an attribute (identified by clusterID and attrID to the given value.
 // this returns:
 // - CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isnt supported by the device (the
@@ -641,7 +640,6 @@ static ChipZclStatus_t chipZclInternalWriteAttribute(ChipZclEndpointId_t endpoin
 
     return CHIP_ZCL_STATUS_SUCCESS;
 }
-#endif // if 0
 
 ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
                                       ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
