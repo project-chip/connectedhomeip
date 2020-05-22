@@ -2,7 +2,9 @@
 
 ## What is this?
 
-Documentation for the CHIP Zigbee Cluster Library (ZCL) implementation. This document provides information regarding how the different parts of the CHIP Application layer implementation of the Zigbee Cluster Library fit together.
+Documentation for the CHIP Zigbee Cluster Library (ZCL) implementation. This document provides information on how the different parts of the CHIP Application layer implementation of the Zigbee Cluster Library fit together.
+
+***THIS DOCUMENT IS A WORK IN PROGRESS AS THE DESIGN OF THE CHIP APPLICATION FRAMEWORK IS STILL IN FLUX***
 
 ## Design
 
@@ -15,7 +17,7 @@ Messages arriving in the <code>core-message-dispatch</code> are assumed to have 
 
 <code>core-message-dispatch</code> uses information parsed from the "APS" header to retrieve a "request spec" and command handler pointer from the <code>core-data-model</code>. The "request spec" contains all the information necessary to decode the incoming request. The "request spec" and a pointer to the appropriate "request struct" are passed by the <code>core-message-dispatch</code> to the appropriate codec. The codec decodes the incoming message payload and populates the associated "request struct" which can then be passed on throughout the system for actual command processing and device actuation etc...
 
-For more information and an example on the handling of incoming messaages by the <code>plugins please see the diagram below:
+For more information and an example on the handling of incoming On/Off Command messages by the <code>core-message-dispatch</code> and other plugins please see the diagram below:
 
 
 ![CHIP ZCL Message Flow](chip-zcl-msg-flow.png)
