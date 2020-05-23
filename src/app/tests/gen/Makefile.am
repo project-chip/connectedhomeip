@@ -16,20 +16,26 @@
 
 #
 #    Description:
-#      This file governs what comes out of the app directory, chiefly
-#        the data model and application layer for the CHIP interaction
-#        model.
+#      A placeholder for temporary distribution of generated source for
+#        unit testing.
 #
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-# this tree isn't included in a library, files are pulled into applications
-# so: just distribute (maybe later install ;) )
-
-plugins_EXTRA_DIST_ams = $(wildcard @top_srcdir@/src/app/plugin/*/extra_dist.am)
-
-EXTRA_DIST=$(plugins_EXTRA_DIST_ams)
-
--include $(plugins_EXTRA_DIST_ams)
+EXTRA_DIST                    = \
+    gen-attribute-storage.h     \
+    gen-attribute-type.h        \
+    gen-callback-stubs.c        \
+    gen-callbacks.h             \
+    gen-cluster-id.h            \
+    gen-command-handler.c       \
+    gen-command-handler.h       \
+    gen-command-id.h            \
+    gen-endpoint-config.h       \
+    gen-specs.c                 \
+    gen-types.h                 \
+    gen.h                       \
+    README.md                   \
+    $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
