@@ -40,13 +40,13 @@ lib_LIBRARIES                                  = \
 # TODO: pick a place to "install": this
 EXTRA_DIST = ChipZclUnitTests.h
 
-PLUGINS_DIR=..
-GEN_DIR=../..
+PLUGINS_DIR=$(top_srcdir)/src/app/plugin
+GEN_DIR=$(top_srcdir)/src/app/gen
 
 # plugins we're unit testing
 libChipZclUnitTests_a_SOURCES                                        = \
-    $(GEN_DIR)/gen/gen-callback-stubs.c                                \
-    $(GEN_DIR)/gen/gen-command-handler.c                               \
+    $(GEN_DIR)/gen-callback-stubs.c                                    \
+    $(GEN_DIR)/gen-command-handler.c                                   \
     $(PLUGINS_DIR)/binding-mock/mock.c                                 \
     $(PLUGINS_DIR)/core-api/core-api.c                                 \
     $(PLUGINS_DIR)/cluster-server-basic/basic-server.c                 \

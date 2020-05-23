@@ -40,14 +40,14 @@ lib_LIBRARIES                                  = \
 # TODO: pick a place to "install": this
 EXTRA_DIST = ChipZclOnOffTest.h
 
-PLUGINS_DIR=..
-GEN_DIR=$(GEN_DIR)
+PLUGINS_DIR=$(top_srcdir)/src/app/plugin
+GEN_DIR=$(top_srcdir)/src/app/gen
 
 # plugins we need
 libChipZclOnOffTest_a_SOURCES                            = \
-    $(GEN_DIR)/gen/gen-callback-stubs.c                    \
-    $(GEN_DIR)/gen/gen-specs.c                             \
-    $(GEN_DIR)/gen/gen-command-handler.c                   \
+    $(GEN_DIR)/gen-callback-stubs.c                        \
+    $(GEN_DIR)/gen-specs.c                                 \
+    $(GEN_DIR)/gen-command-handler.c                       \
     $(PLUGINS_DIR)/core-data-model/zcl-data-model.c        \
     $(PLUGINS_DIR)/cluster-server-on-off/on-off-server.c   \
     $(PLUGINS_DIR)/binding-mock/mock.c                     \
