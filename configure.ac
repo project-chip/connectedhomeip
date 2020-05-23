@@ -2070,8 +2070,6 @@ src/include/Makefile
 src/app/Makefile
 src/app/chip-zcl/Makefile
 src/app/plugin/Makefile
-src/app/plugin/test-unit/Makefile
-src/app/plugin/test-on-off/Makefile
 src/app/tests/Makefile
 src/app/tests/gen/Makefile
 src/ble/Makefile

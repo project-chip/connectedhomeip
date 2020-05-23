@@ -42,27 +42,24 @@ lib_LIBRARIES                                  = \
 # TODO: pick a place to "install": this
 EXTRA_DIST = ChipZclUnitTests.h
 
-PLUGINS_DIR=$(top_srcdir)/src/app/plugin
-GEN_DIR=$(top_srcdir)/src/app/gen
-
 # plugins we're unit testing
-libChipZclUnitTests_a_SOURCES                                        = \
-    $(GEN_DIR)/gen-callback-stubs.c                                    \
-    $(GEN_DIR)/gen-command-handler.c                                   \
-    $(PLUGINS_DIR)/binding-mock/mock.c                                 \
-    $(PLUGINS_DIR)/core-api/core-api.c                                 \
-    $(PLUGINS_DIR)/cluster-server-basic/basic-server.c                 \
-    $(PLUGINS_DIR)/cluster-server-level-control/level-control-server.c \
-    $(PLUGINS_DIR)/cluster-server-identify/identify-server.c           \
-    $(PLUGINS_DIR)/cluster-server-on-off/on-off-server.c               \
-    $(PLUGINS_DIR)/codec-simple/codec-simple.c                         \
-    $(PLUGINS_DIR)/core-message-dispatch/dispatch.c                    \
-    $(PLUGINS_DIR)/core-message-dispatch/general-command-handler.c     \
-    $(PLUGINS_DIR)/core-data-model/zcl-data-model.c                    \
+libChipZclUnitTests_a_SOURCES                            = \
+    ../plugin/binding-mock/mock.c                                 \
+    ../plugin/core-api/core-api.c                                 \
+    ../plugin/cluster-server-basic/basic-server.c                 \
+    ../plugin/cluster-server-level-control/level-control-server.c \
+    ../plugin/cluster-server-identify/identify-server.c           \
+    ../plugin/cluster-server-on-off/on-off-server.c               \
+    ../plugin/codec-simple/codec-simple.c                         \
+    ../plugin/core-message-dispatch/dispatch.c                    \
+    ../plugin/core-message-dispatch/general-command-handler.c     \
+    ../plugin/core-data-model/zcl-data-model.c                    \
     $(NULL)
 
 # individual tests
 libChipZclUnitTests_a_SOURCES                           += \
+    gen/gen-callback-stubs.c                               \
+    gen/gen-command-handler.c                              \
     cluster-server-basic-test.c                            \
     cluster-server-identify-test.c                         \
     cluster-server-level-control-test.c                    \
