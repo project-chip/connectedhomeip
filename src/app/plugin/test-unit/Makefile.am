@@ -40,23 +40,20 @@ lib_LIBRARIES                                  = \
 # TODO: pick a place to "install": this
 EXTRA_DIST = ChipZclUnitTests.h
 
-PLUGINS_DIR=..
-GEN_DIR=../..
-
 # plugins we're unit testing
-libChipZclUnitTests_a_SOURCES                                        = \
-    $(GEN_DIR)/gen/gen-callback-stubs.c                                \
-    $(GEN_DIR)/gen/gen-command-handler.c                               \
-    $(PLUGINS_DIR)/binding-mock/mock.c                                 \
-    $(PLUGINS_DIR)/core-api/core-api.c                                 \
-    $(PLUGINS_DIR)/cluster-server-basic/basic-server.c                 \
-    $(PLUGINS_DIR)/cluster-server-level-control/level-control-server.c \
-    $(PLUGINS_DIR)/cluster-server-identify/identify-server.c           \
-    $(PLUGINS_DIR)/cluster-server-on-off/on-off-server.c               \
-    $(PLUGINS_DIR)/codec-simple/codec-simple.c                         \
-    $(PLUGINS_DIR)/core-message-dispatch/dispatch.c                    \
-    $(PLUGINS_DIR)/core-message-dispatch/general-command-handler.c     \
-    $(PLUGINS_DIR)/core-data-model/zcl-data-model.c                    \
+libChipZclUnitTests_a_SOURCES                            = \
+    ../../gen/gen-callback-stubs.c                         \
+    ../../gen/gen-command-handler.c                        \
+    ../binding-mock/mock.c                                 \
+    ../core-api/core-api.c                                 \
+    ../cluster-server-basic/basic-server.c                 \
+    ../cluster-server-level-control/level-control-server.c \
+    ../cluster-server-identify/identify-server.c           \
+    ../cluster-server-on-off/on-off-server.c               \
+    ../codec-simple/codec-simple.c                         \
+    ../core-message-dispatch/dispatch.c                    \
+    ../core-message-dispatch/general-command-handler.c     \
+    ../core-data-model/zcl-data-model.c                    \
     $(NULL)
 
 # individual tests
