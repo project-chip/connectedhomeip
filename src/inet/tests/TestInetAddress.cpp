@@ -47,6 +47,9 @@
 
 #include <inet/IPPrefix.h>
 
+#include <support/CodeUtils.h>
+#include <support/TestUtils.h>
+
 using namespace chip;
 using namespace chip::Inet;
 
@@ -1782,4 +1785,9 @@ int TestInetAddress(void)
     nlTestRunner(&theSuite, const_cast<TestContext *>(&sTestContext));
 
     return (nlTestRunnerStats(&theSuite));
+}
+
+static void __attribute__((constructor)) TestCHIPInetAddressCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestInetAddress) == CHIP_NO_ERROR);
 }

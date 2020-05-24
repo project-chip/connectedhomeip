@@ -28,6 +28,8 @@
 #include "TestInetLayer.h"
 
 #include <inet/InetConfig.h>
+#include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
@@ -163,6 +165,11 @@ int TestInetTimer(void)
 #else  // !INET_SOCKETS
     return (0);
 #endif // !INET_SOCKETS
+}
+
+static void __attribute__((constructor)) TestCHIPInetTimerCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestInetTimer) == CHIP_NO_ERROR);
 }
 
 #else // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
