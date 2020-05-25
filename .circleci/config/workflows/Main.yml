@@ -19,6 +19,12 @@ jobs:
               branches:
                   ignore:
                       - /restyled.*/
+    - test_esp32_qemu:
+          name: Run Tests [ESP32-QEMU]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
     # - code-coverage:
     #       name: Code Coverage [<< matrix.builder >>]
     #       matrix:
