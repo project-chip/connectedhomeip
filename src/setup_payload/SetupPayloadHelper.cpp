@@ -16,8 +16,8 @@
  */
 
 #include "SetupPayloadHelper.h"
-#include "QRCodeSetupPayloadGenerator.h"
 #include "ManualSetupPayloadGenerator.h"
+#include "QRCodeSetupPayloadGenerator.h"
 #include "SetupPayload.h"
 #include <fstream>
 
@@ -106,15 +106,15 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
     {
     case SetupPayloadKey_Version:
         printf("Loaded version: %llu\n", parameter.uintValue);
-        setupPayload.version = parameter.uintValue;
+        setupPayload.version = (uint8_t) parameter.uintValue;
         break;
     case SetupPayloadKey_VendorID:
         printf("Loaded vendorID: %llu\n", parameter.uintValue);
-        setupPayload.vendorID = parameter.uintValue;
+        setupPayload.vendorID = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_ProductID:
         printf("Loaded productID: %llu\n", parameter.uintValue);
-        setupPayload.productID = parameter.uintValue;
+        setupPayload.productID = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_RequiresCustomFlowTrue:
         printf("Requires custom flow was set to true\n");
@@ -122,11 +122,11 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
         break;
     case SetupPayloadKey_RendezVousInformation:
         printf("Loaded rendezvousInfo: %llu\n", parameter.uintValue);
-        setupPayload.rendezvousInformation = parameter.uintValue;
+        setupPayload.rendezvousInformation = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_Discriminator:
         printf("Loaded discriminator: %llu\n", parameter.uintValue);
-        setupPayload.discriminator = parameter.uintValue;
+        setupPayload.discriminator = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_SetupPINCode:
         printf("Loaded setupPinCode: %llu\n", parameter.uintValue);
@@ -177,11 +177,7 @@ CHIP_ERROR generateQRCodeFromFilePath(string filePath, string & outCode)
         return err;
     }
     QRCodeSetupPayloadGenerator generator(setupPayload);
-    outCode = generator.payloadBase41Representation();
-    if (outCode.length() == 0)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    err = generator.payloadBase41Representation(outCode);
     return err;
 }
 

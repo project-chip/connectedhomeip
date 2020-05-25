@@ -70,7 +70,6 @@ AM_CPPFLAGS                                           = \
     $(SOCKETS_CPPFLAGS)                                 \
     $(PTHREAD_CFLAGS)                                   \
     $(NULL)
-    $(NULL)
 
 CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/libCHIP.a                   \

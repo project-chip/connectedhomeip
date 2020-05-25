@@ -11,6 +11,10 @@ qrcodetool_CPPFLAGS                   = \
     -I$(top_srcdir)/src/lib           \
     -I$(top_srcdir)/src/system        \
     -I$(top_srcdir)/src/include/      \
+    $(NLASSERT_CPPFLAGS)              \
+    $(NLFAULTINJECTION_CPPFLAGS)      \
+    $(NLIO_CPPFLAGS)                  \
+    $(LWIP_CPPFLAGS)                  \
     $(NULL)
 
 qrcodetool_LDADD = \
