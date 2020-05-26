@@ -22,7 +22,7 @@ menu "WiFi Echo Demo"
 
     choice
         prompt "Device Type"
-        default DEVICE_TYPE_ESP32_DEVKITC
+        default DEVICE_TYPE_M5STACK
         help
             Specifies the type of ESP32 device.
 
@@ -44,7 +44,7 @@ menu "WiFi Echo Demo"
 
     config USE_ECHO_CLIENT
         bool "Enable the built-in Echo Client"
-        default "y"
+        default "n"
         help
             This enables a local FreeRTOS Echo Client so that the end-to-end echo server can be
             tested easily
@@ -55,4 +55,15 @@ menu "WiFi Echo Demo"
     depends on USE_ECHO_CLIENT
     help
         The IPV4 Address of the ECHO Server.
+
+    # NOTE: This config is not displayed as a input in the Kconfig menu, as its value is
+    # entirely derived from the Device Type choice.  However the CONFIG_EXAMPLE_DISPLAY_TYPE
+    # define that is produced is needed to configure the TFT library correctly.
+    config TFT_PREDEFINED_DISPLAY_TYPE
+        int
+        range 0 5
+        default 3 if DEVICE_TYPE_M5STACK
+        default 0 if DEVICE_TYPE_ESP32_DEVKITC
+
+
 endmenu

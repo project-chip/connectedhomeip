@@ -142,7 +142,8 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
                                $(REL_CHIP_ROOT)/src/lib \
                                $(REL_CHIP_ROOT)/src/ \
                                $(REL_CHIP_ROOT)/src/system \
-                               $(IDF_PATH)/components/mbedtls/mbedtls/include
+                               $(IDF_PATH)/components/mbedtls/mbedtls/include \
+                               $(REL_CHIP_ROOT)/src/app \
 
 
 # Linker flags to be included when building other components that use CHIP.
