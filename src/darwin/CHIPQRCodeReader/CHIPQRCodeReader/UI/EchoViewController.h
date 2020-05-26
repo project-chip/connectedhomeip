@@ -20,11 +20,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface EchoViewController : UIViewController
-@property (weak, nonatomic) IBOutlet UITextField * serverIPTextField;
-@property (weak, nonatomic) IBOutlet UITextField * serverPortTextField;
-@property (weak, nonatomic) IBOutlet UITextField * messageTextField;
-@property (weak, nonatomic) IBOutlet UILabel * resultLabel;
-@property (weak, nonatomic) IBOutlet UIButton * sendButton;
 
 - (IBAction)sendAction:(id)sender;
 
