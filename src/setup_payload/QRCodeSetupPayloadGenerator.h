@@ -43,8 +43,8 @@ private:
     SetupPayload mPayload;
 
 public:
-    string payloadBinaryRepresentation();
-    string payloadBase41Representation();
+    CHIP_ERROR payloadBinaryRepresentation(string & binaryRepresentation);
+    CHIP_ERROR payloadBase41Representation(string & base41Representation);
     QRCodeSetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload){};
 };
 

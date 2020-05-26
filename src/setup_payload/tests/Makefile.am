@@ -43,6 +43,7 @@ lib_LIBRARIES                                  = \
 libSetupPayloadTests_a_SOURCES                 = \
     TestManualCode.cpp                           \
     TestQRCode.cpp                               \
+    TestQRCodeTLV.cpp                            \
     $(NULL)
 
 libSetupPayloadTests_adir                      = $(includedir)/setup_payload
@@ -50,28 +51,48 @@ libSetupPayloadTests_adir                      = $(includedir)/setup_payload
 dist_libSetupPayloadTests_a_HEADERS            = \
     TestQRCode.h                                 \
     TestManualCode.h                             \
+    TestQRCodeTLV.h                              \
     $(NULL)
 
 # C/C++ preprocessor option flags that will apply to all compiled
 # objects in this makefile.
 
-AM_CPPFLAGS                                    = \
-    -I$(top_srcdir)/src                          \
-    -I$(top_srcdir)/src/lib                      \
-    -I$(top_srcdir)/src/system                   \
-    -I$(top_srcdir)/src/setup_payload            \
-    $(LWIP_CPPFLAGS)                             \
+AM_CPPFLAGS                                           = \
+    -I$(top_srcdir)/src                                 \
+    -I$(top_srcdir)/src/lib                             \
+    -I$(top_srcdir)/src/lib/core                        \
+    -I$(top_srcdir)/src/system                          \
+    -I$(top_srcdir)/src/setup_payload                   \
+    $(LWIP_CPPFLAGS)                                    \
+    $(NLASSERT_CPPFLAGS)                                \
+    $(NLIO_CPPFLAGS)                                    \
+    $(NLUNIT_TEST_CPPFLAGS)                             \
+    $(SOCKETS_CPPFLAGS)                                 \
+    $(PTHREAD_CFLAGS)                                   \
     $(NULL)
 
-COMMON_LDADD                                   = \
-    libSetupPayloadTests.a                       \
+CHIP_LDADD                                            = \
+    $(top_builddir)/src/lib/libCHIP.a                   \
+    $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
+COMMON_LDADD                                           = \
+    libSetupPayloadTests.a                               \
+    $(COMMON_LDFLAGS)                                    \
+    $(CHIP_LDADD)                                        \
+    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)           \
+    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS) \
+    $(LWIP_LDFLAGS) $(LWIP_LIBS)                         \
+    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                   \
+    $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                    \
+    $(NULL)
+    
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \
     TestManualCode                               \
     TestQRCode                                   \
+    TestQRCodeTLV                                \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -94,6 +115,22 @@ TestQRCode_SOURCES                             = TestQRCodeDriver.cpp
 
 TestManualCode_LDADD                           = $(COMMON_LDADD)
 TestManualCode_SOURCES                         = TestManualCodeDriver.cpp
+
+TestQRCodeTLV_LDADD                            = $(COMMON_LDADD)
+TestQRCodeTLV_SOURCES                          = TestQRCodeTLVDriver.cpp
+
+#
+# Foreign make dependencies
+#
+
+NLFOREIGN_FILE_DEPENDENCIES                           = \
+   $(CHIP_LDADD)                                        \
+   $(NULL)
+
+NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
+   $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
+   $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
+   $(NULL)
 
 if CHIP_BUILD_COVERAGE
 CLEANFILES                                     = $(wildcard *.gcda *.gcno)
@@ -124,5 +161,3 @@ endif # CHIP_BUILD_COVERAGE
 endif # CHIP_BUILD_TESTS
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
-
-

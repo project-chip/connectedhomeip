@@ -17,21 +17,13 @@
 
 /**
  *    @file
- *      The implementation of the Setup Payload Helper. To be used by the chip command line tool.
+ *      This file declares test entry point for CHIP qr code tlv unit tests.
+ *
  */
 
-#ifndef SetupPayloadHelper_h
-#define SetupPayloadHelper_h
+#ifndef TESTQRCODETLV_H
+#define TESTQRCODETLV_H
 
-#include <core/CHIPError.h>
+int TestQRCodeTLV(void);
 
-#include <string>
-
-using namespace std;
-
-namespace chip {
-CHIP_ERROR generateQRCodeFromFilePath(string filePath, string & outCode);
-CHIP_ERROR generateManualCodeFromFilePath(string filePath, string & outCode);
-} // namespace chip
-
-#endif /* SetupPayloadHelper_h */
+#endif // TESTQRCODETLV_H
