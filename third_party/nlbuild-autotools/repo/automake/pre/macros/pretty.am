@@ -1,5 +1,6 @@
 #
-#    Copyright 2016 Nest Labs Inc. All Rights Reserved.
+#    Copyright (c) 2020 Project nlbuild-autotools Authors. All Rights Reserved.
+#    Copyright (c) 2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -50,3 +51,38 @@ PRETTY_FILES    ?= $(SOURCES) $(HEADERS)
 
 PRETTY_SUBDIRS  ?= $(SUBDIRS)
 
+ifneq ($(PRETTY_CHECK),)
+
+define MaybePrintPrettyCheckHelp
+$(NL_V_AT)echo "  pretty-check"
+$(NL_V_AT)echo "    Check but do not (re-)format a collection of project"
+$(NL_V_AT)echo "    source files."
+$(NL_V_AT)echo
+endef # MaybePrintPrettyCheckHelp
+
+else
+
+define MaybePrintPrettyCheckHelp
+endef # MaybePrintPrettyCheckHelp
+
+endif # PRETTY_CHECK
+
+ifneq ($(PRETTY),)
+
+define MaybePrintPrettyHelp
+$(NL_V_AT)echo "  pretty"
+$(NL_V_AT)echo "    (Re-)format a collection of project source files."
+$(NL_V_AT)echo
+endef # MaybePrintPrettyHelp
+
+else
+
+define MaybePrintPrettyHelp
+endef # MaybePrintPrettyHelp
+
+endif # PRETTY
+
+define PrintPrettyHelp
+$(call MaybePrintPrettyHelp)
+$(call MaybePrintPrettyCheckHelp)
+endef # PrintPrettyHelp

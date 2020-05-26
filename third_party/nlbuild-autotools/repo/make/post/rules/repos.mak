@@ -212,16 +212,3 @@ endif # REPOS
 define PrintReposHelp
 $(call MaybePrintReposHelp)
 endef # PrintReposHelp
-
-.PHONY: help-repos-local
-help-repos-local:
-	$(call PrintReposHelp)
-
-.PHONY: help-repos-hook
-help-repos-hook: help-repos-local
-
-.PHONY: help-repos
-help-repos: help-repos-local help-repos-hook
-
-.PHONY: help
-help: help-repos

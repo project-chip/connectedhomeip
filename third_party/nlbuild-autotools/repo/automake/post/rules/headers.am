@@ -1,5 +1,6 @@
 #
-#    Copyright 2015-2016 Nest Labs Inc. All Rights Reserved.
+#    Copyright (c) 2020 Project nlbuild-autotools Authors. All Rights Reserved.
+#    Copyright (c) 2015-2016 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -43,3 +44,15 @@ install-headers: $(BUILT_SOURCES) install-headers-recursive
 
 install-headers-recursive:
 	$(nl-make-subdirs)
+
+define MaybePrintInstallHeadersHelp
+$(NL_V_AT)echo "  install-headers"
+$(NL_V_AT)echo "    Generate all configured public header artifacts for this"
+$(NL_V_AT)echo "    project and install them in DESTDIR on the build host"
+$(NL_V_AT)echo "    system."
+$(NL_V_AT)echo
+endef # MaybePrintInstallHeadersHelp
+
+define PrintInstallHeadersHelp
+$(call MaybePrintInstallHeadersHelp)
+endef # PrintInstallHeadersHelp
