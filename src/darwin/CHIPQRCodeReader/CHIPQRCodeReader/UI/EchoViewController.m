@@ -24,9 +24,9 @@
 
 @interface EchoViewController ()
 
-@property CHIPDeviceController * chipController;
-@property dispatch_queue_t chipCallbackQueue;
-@property BOOL reconnectOnForeground;
+@property (readwrite) CHIPDeviceController * chipController;
+@property (readwrite) dispatch_queue_t chipCallbackQueue;
+@property (readwrite) BOOL reconnectOnForeground;
 
 @property (weak, nonatomic) IBOutlet UITextField * serverIPTextField;
 @property (weak, nonatomic) IBOutlet UITextField * serverPortTextField;
@@ -127,17 +127,18 @@
     // collect fields
     NSString * inputIPAddress = self.serverIPTextField.text;
     UInt16 inputPort = [self.serverPortTextField.text intValue];
-    __block BOOL needsReconnect;
+    BOOL needsReconnect = NO;
 
     if (self.messageTextField.text.length == 0) {
         [self _postResult:@"Error: Message cannot be empty"];
         return;
     }
 
-    // check the address of the connected device
-    BOOL gotAddrs = [self.chipController getDeviceAddress:^(NSString * ipAddress, UInt16 port) {
+    // check the addr of the connected device
+    AddressInfo * addrInfo = [self.chipController getAddressInfo];
+    if (addrInfo) {
         // check if the addr changed
-        if (![ipAddress isEqualToString:inputIPAddress] || port != inputPort) {
+        if (![addrInfo.ip isEqualToString:inputIPAddress] || addrInfo.port != inputPort) {
             NSError * error;
             // stop current connection
             if (![self.chipController disconnect:&error]) {
@@ -146,9 +147,9 @@
             }
             needsReconnect = YES;
         }
-    }];
+    }
 
-    if (!gotAddrs || needsReconnect) {
+    if (!addrInfo || needsReconnect) {
         [self _connect];
     }
 

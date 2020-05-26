@@ -30,6 +30,16 @@
 static const char *const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
 static const char *const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
+@implementation AddressInfo
+- (instancetype) initWithIP:()ip andPort:(UInt16)port {
+    if (self = [super init]) {
+        _ip = ip;
+        _port = port;
+    }
+    return self;
+}
+@end
+
 @interface CHIPDeviceController () {
     chip::DeviceController::ChipDeviceController* _cppController;
     // queue used for all interactions with the cpp chip controller and for all chip internal events
@@ -181,10 +191,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 }
 
 
-- (BOOL)getDeviceAddress:(void (^)(NSString *ipAddress, UInt16 port))completionBlock {
-    if (!completionBlock) {
-        return NO;
-    }
+- (AddressInfo * )getAddressInfo {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
     __block chip::IPAddress ipAddr;
     __block uint16_t port;
@@ -194,15 +201,13 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 
     if (err != CHIP_NO_ERROR) {
-        return NO;
+        return nil;
     }
     // A buffer big enough to hold ipv4 and ipv6 addresses
     char ipAddrStr[64];
     ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
     NSString* ipAddress = [NSString stringWithUTF8String:ipAddrStr];
-    completionBlock(ipAddress, port);
-
-    return YES;
+    return [[AddressInfo alloc] initWithIP:ipAddress andPort:port];
 }
 
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error {
