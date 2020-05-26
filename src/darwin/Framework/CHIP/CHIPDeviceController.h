@@ -28,9 +28,9 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @interface AddressInfo : NSObject
 
-@property (readonly, copy) NSString *ip;
+@property (readonly, copy) NSString * ip;
 @property (readonly) UInt16 port;
-- (instancetype) initWithIP:()ip andPort:(UInt16)port;
+- (instancetype)initWithIP:()ip andPort:(UInt16)port;
 
 @end
 
@@ -42,7 +42,7 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
           error:(NSError * __autoreleasing *)error
       onMessage:(ControllerOnMessageBlock)onMessage
         onError:(ControllerOnErrorBlock)onError;
-- (nullable AddressInfo * )getAddressInfo;
+- (nullable AddressInfo *)getAddressInfo;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
 - (BOOL)isConnected;
