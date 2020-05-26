@@ -1,5 +1,6 @@
 #
 #    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2018 Nest Labs, Inc.
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +16,12 @@
 #    limitations under the License.
 #
 #    Description:
-#      Component makefile for the ESP32 demo application.
+#      Component makefile for the QRCode component used by the CHIP
+#      ESP32 demo applications.
 #
-# (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
-COMPONENT_DEPENDS := chip QRCode tft spidriver
+CFLAGS += -Wno-unknown-pragmas
+
+COMPONENT_ADD_INCLUDEDIRS := repo/c
+COMPONENT_SRCDIRS := repo/c
+COMPONENT_OBJS := repo/c/qrcodegen.o

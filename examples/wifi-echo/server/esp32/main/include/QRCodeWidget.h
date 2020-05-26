@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,28 +16,23 @@
  *    limitations under the License.
  */
 
-#ifndef LED_WIDGET_H
-#define LED_WIDGET_H
+#ifndef QRCODE_WIDGET_H
+#define QRCODE_WIDGET_H
 
-#include "driver/gpio.h"
+#include "Display.h"
 
-class LEDWidget
+#if CONFIG_HAVE_DISPLAY
+
+class QRCodeWidget
 {
 public:
-    void Init(gpio_num_t gpioNum);
-    void Set(bool state);
-    void Blink(uint32_t changeRateMS);
-    void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
-    void Animate();
+    color_t QRCodeColor;
+    uint16_t VMargin;
 
-private:
-    int64_t mLastChangeTimeUS;
-    uint32_t mBlinkOnTimeMS;
-    uint32_t mBlinkOffTimeMS;
-    gpio_num_t mGPIONum;
-    bool mState;
-
-    void DoSet(bool state);
+    void Init();
+    void Display();
 };
 
-#endif // TITLE_WIDGET_H
+#endif // CONFIG_HAVE_DISPLAY
+
+#endif // QRCODE_WIDGET_H
