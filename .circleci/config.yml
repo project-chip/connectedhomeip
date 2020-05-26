@@ -33,6 +33,9 @@ jobs:
         command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
         name: OpenSSL Tests
     - run:
+        command: scripts/tools/run_if.sh "linux-embedded" "$BUILD_TYPE" make -C build/default/src/platform check
+        name: Run Platform Tests
+    - run:
         command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
     - run:
@@ -132,6 +135,81 @@ jobs:
         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-mbedtls-build-built
         paths:
         - build/downloads
+  Run Tests [linux-embedded]:
+    docker:
+    - image: connectedhomeip/chip-build:0.2.11
+    environment:
+    - BOOTSTRAP_ARGUMENTS: ' --with-device-layer=linux'
+    - BUILD_TYPE: linux-embedded
+    steps:
+    - restore_cache:
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-linux-embedded-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-linux-embedded-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-linux-embedded-persistent-cache
+    - run:
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment
+    - run:
+        command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
+        name: Run mbedTLS Tests
+    - run:
+        command: scripts/tools/run_if.sh "main-build mbedtls-build clang-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
+        name: Run Crypto Tests
+    - run:
+        command: scripts/tools/run_if.sh "main-build ubuntu-16-lts clang-build" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
+        name: Run Setup Payload Tests
+    - run:
+        command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
+        name: OpenSSL Tests
+    - run:
+        command: scripts/tools/run_if.sh "linux-embedded" "$BUILD_TYPE" make -C build/default/src/platform check
+        name: Run Platform Tests
+    - run:
+        command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
+        name: Run All Unit & Functional Tests
+    - run:
+        command: scripts/tests/save_logs.sh /tmp/test_logs
+        name: Save test log files
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/test_logs
+  Build CHIP [linux-embedded]:
+    docker:
+    - image: connectedhomeip/chip-build:0.2.11
+    environment:
+    - BOOTSTRAP_ARGUMENTS: ' --with-device-layer=linux'
+    - BUILD_TYPE: linux-embedded
+    steps:
+    - checkout
+    - restore_cache:
+        key: build-environment-{{ arch }}-linux-embedded-persistent-cache
+    - run:
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment
+    - save_cache:
+        key: build-environment-{{ arch }}-linux-embedded-persistent-cache
+        paths:
+        - ./ci-cache-persistent
+    - run:
+        command: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
+        name: Bootstrap
+    - save_cache:
+        key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-linux-embedded-built
+        paths:
+        - .
+    - run:
+        command: scripts/build/default.sh
+        name: Build
+    - save_cache:
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-linux-embedded-built
+        paths:
+        - .
+    - save_cache:
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-linux-embedded-built
+        paths:
+        - build/downloads
   Build CHIP [main-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
@@ -205,8 +283,17 @@ jobs:
         command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
         name: OpenSSL Tests
     - run:
+        command: scripts/tools/run_if.sh "linux-embedded" "$BUILD_TYPE" make -C build/default/src/platform check
+        name: Run Platform Tests
+    - run:
         command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
+    - run:
+        command: scripts/tests/save_logs.sh /tmp/test_logs
+        name: Save test log files
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/test_logs
   Build CHIP [clang-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
@@ -270,6 +357,9 @@ jobs:
         command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
         name: OpenSSL Tests
     - run:
+        command: scripts/tools/run_if.sh "linux-embedded" "$BUILD_TYPE" make -C build/default/src/platform check
+        name: Run Platform Tests
+    - run:
         command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
     - run:
@@ -296,6 +386,11 @@ workflows:
           branches:
             ignore:
             - /restyled.*/
+    - Build CHIP [linux-embedded]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
     - Run Tests [main-build]:
         filters:
           branches:
@@ -317,6 +412,13 @@ workflows:
             - /restyled.*/
         requires:
         - Build CHIP [clang-build]
+    - Run Tests [linux-embedded]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+        requires:
+        - Build CHIP [linux-embedded]
     - Run Tests [ESP32-QEMU]:
         filters:
           branches:
@@ -347,351 +449,3 @@ workflows:
         requires:
         - Build CHIP [main-build]
   version: 2
-
-# Original config.yml file:
-# commands:
-#   bootstrap:
-#     description: Bootstrap the source tree
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - run:
-#         command: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
-#         name: Bootstrap
-#   load-bootstrapped-tree:
-#     description: Load the bootstrapped tree
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - restore_cache:
-#         key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1
-#           }}-<< parameters.builder>>-built
-#   load-build-environment:
-#     description: Load the build environment
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - restore_cache:
-#         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1
-#           }}-<< parameters.builder>>-built
-#   load-built-tree:
-#     description: Load the built tree
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - restore_cache:
-#         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-<< parameters.builder>>-built
-#   load-persistent-ci-cache:
-#     description: Load persistent CI Cache
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - restore_cache:
-#         key: build-environment-{{ arch }}-<<parameters.builder>>-persistent-cache
-#   save-bootstrapped-tree:
-#     description: Save the bootstrapped tree
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - save_cache:
-#         key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1
-#           }}-<< parameters.builder>>-built
-#         paths:
-#         - .
-#   save-build-environment:
-#     description: Save the build environment
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - save_cache:
-#         key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1
-#           }}-<< parameters.builder>>-built
-#         paths:
-#         - build/downloads
-#   save-built-tree:
-#     description: Save the built tree
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - save_cache:
-#         key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-<< parameters.builder>>-built
-#         paths:
-#         - .
-#   save-persistent-ci-cache:
-#     description: Save persistent CI Cache
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - save_cache:
-#         key: build-environment-{{ arch }}-<<parameters.builder>>-persistent-cache
-#         paths:
-#         - ./ci-cache-persistent
-#   setup-environment:
-#     description: Setup Environment
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - run:
-#         command: scripts/tools/run_if.sh \"ubuntu-16-lts\" \"$BUILD_TYPE\" sudo scripts/setup/linux/install_packages.sh
-#         name: Setup Environment
-# executors:
-#   clang-build:
-#     docker:
-#     - image: connectedhomeip/chip-build:0.2.11
-#     environment:
-#       BOOTSTRAP_ARGUMENTS: ' CC=clang-9 CXX=clang++-9'
-#   esp32-build:
-#     docker:
-#     - image: connectedhomeip/chip-build-esp32:0.2.11
-#   esp32-qemu-build:
-#     docker:
-#     - image: connectedhomeip/chip-build-esp32-qemu:0.2.11
-#   main-build:
-#     docker:
-#     - image: connectedhomeip/chip-build:0.2.11
-#   mbedtls-build:
-#     docker:
-#     - image: connectedhomeip/chip-build:0.2.11
-#     environment:
-#       BOOTSTRAP_ARGUMENTS: ' --with-crypto=mbedtls'
-#   nrf-build:
-#     docker:
-#     - image: connectedhomeip/chip-build-nrf-platform:0.2.11
-# jobs:
-#   build:
-#     environment:
-#       BUILD_TYPE: << parameters.builder >>
-#     executor: << parameters.builder >>
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - checkout
-#     - load-persistent-ci-cache:
-#         builder: << parameters.builder >>
-#     - setup-environment:
-#         builder: << parameters.builder >>
-#     - save-persistent-ci-cache:
-#         builder: << parameters.builder >>
-#     - bootstrap:
-#         builder: << parameters.builder >>
-#     - save-bootstrapped-tree:
-#         builder: << parameters.builder >>
-#     - run:
-#         command: scripts/build/default.sh
-#         name: Build
-#     - save-built-tree:
-#         builder: << parameters.builder >>
-#     - save-build-environment:
-#         builder: << parameters.builder >>
-#   code-coverage:
-#     environment:
-#       BUILD_TYPE: << parameters.builder >>
-#     executor: << parameters.builder >>
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - load-built-tree:
-#         builder: << parameters.builder >>
-#     - load-build-environment:
-#         builder: << parameters.builder >>
-#     - load-persistent-ci-cache:
-#         builder: << parameters.builder >>
-#     - setup-environment:
-#         builder: << parameters.builder >>
-#     - run:
-#         command: scripts/tools/codecoverage.sh
-#         name: Run Code Coverage
-#     - run:
-#         command: bash <(curl -s https://codecov.io/bash)
-#         name: Upload Code Coverage
-#   deploy:
-#     environment:
-#       BUILD_TYPE: << parameters.builder >>
-#     executor: << parameters.builder >>
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - load-built-tree:
-#         builder: << parameters.builder >>
-#     - load-build-environment:
-#         builder: << parameters.builder >>
-#     - load-persistent-ci-cache:
-#         builder: << parameters.builder >>
-#     - setup-environment:
-#         builder: << parameters.builder >>
-#     - run:
-#         command: scripts/build/distribution_check.sh
-#         name: Deployment Check
-#   examples_esp32:
-#     environment:
-#       BUILD_TYPE: esp32-build
-#     executor: esp32-build
-#     steps:
-#     - checkout
-#     - run:
-#         command: scripts/examples/esp_echo_app.sh
-#         name: Build example Echo App
-#   examples_nrf:
-#     environment:
-#       BUILD_TYPE: nrf-build
-#     executor: nrf-build
-#     steps:
-#     - checkout
-#     - run:
-#         command: scripts/examples/nrf_lock_app.sh
-#         name: Build example nRF5 Lock App
-#   examples_standalone:
-#     environment:
-#       BUILD_TYPE: << parameters.builder >>
-#     executor: << parameters.builder >>
-#     parameters:
-#       builder:
-#         type: string
-#     steps:
-#     - load-built-tree:
-#         builder: << parameters.builder >>
-#     - load-build-environment:
-#         builder: << parameters.builder >>
-#     - load-persistent-ci-cache:
-#         builder: << parameters.builder >>
-#     - setup-environment:
-#         builder: << parameters.builder >>
-#     - run:
-#         command: scripts/examples/standalone_echo_client.sh
-#         name: Build example Standalone Echo Client
-#   test:
-#     environment:
-#       BUILD_TYPE: << parameters.builder >>
-#     executor: << parameters.builder >>
-#     parameters:
-#       builder:
-#         type: string
-#       run_setup_payload_tests:
-#         default: true
-#         type: boolean
-#     steps:
-#     - load-built-tree:
-#         builder: << parameters.builder >>
-#     - load-build-environment:
-#         builder: << parameters.builder >>
-#     - load-persistent-ci-cache:
-#         builder: << parameters.builder >>
-#     - setup-environment:
-#         builder: << parameters.builder >>
-#     - run:
-#         command: scripts/tools/run_if.sh \"mbedtls-build\" \"$BUILD_TYPE\" scripts/tests/mbedtls_tests.sh
-#         name: Run mbedTLS Tests
-#     - run:
-#         command: scripts/tools/run_if.sh \"main-build mbedtls-build clang-build\" \"$BUILD_TYPE\"
-#           scripts/tests/crypto_tests.sh
-#         name: Run Crypto Tests
-#     - run:
-#         command: scripts/tools/run_if.sh \"main-build ubuntu-16-lts clang-build\" \"$BUILD_TYPE\"
-#           scripts/tests/setup_payload_tests.sh
-#         name: Run Setup Payload Tests
-#     - run:
-#         command: scripts/tools/run_if.sh \"main-build clang-build\" \"$BUILD_TYPE\" scripts/tests/openssl_tests.sh
-#         name: OpenSSL Tests
-#     - run:
-#         command: scripts/tools/run_if.sh \"main-build clang-build\" \"$BUILD_TYPE\" scripts/tests/all_tests.sh
-#         name: Run All Unit & Functional Tests
-#     - run:
-#         command: scripts/tests/save_logs.sh /tmp/test_logs
-#         name: Save test log files
-#         when: on_fail
-#     - store_artifacts:
-#         path: /tmp/test_logs
-#   test_esp32_qemu:
-#     environment:
-#       BUILD_TYPE: esp32-qemu-build
-#     executor: esp32-qemu-build
-#     steps:
-#     - checkout
-#     - run:
-#         command: scripts/tests/esp32_qemu_tests.sh
-#         name: Build ESP32 QEMU and Run Tests
-# version: 2.1
-# workflows:
-#   Main:
-#     jobs:
-#     - build:
-#         filters:
-#           branches:
-#             ignore:
-#             - /restyled.*/
-#         matrix:
-#           parameters:
-#             builder:
-#             - main-build
-#             - mbedtls-build
-#             - clang-build
-#         name: Build CHIP [<< matrix.builder >>]
-#     - test:
-#         filters:
-#           branches:
-#             ignore:
-#             - /restyled.*/
-#         matrix:
-#           parameters:
-#             builder:
-#             - main-build
-#             - mbedtls-build
-#             - clang-build
-#         name: Run Tests [<< matrix.builder >>]
-#         requires:
-#         - Build CHIP [<< matrix.builder >>]
-#     - test_esp32_qemu:
-#         filters:
-#           branches:
-#             ignore:
-#             - /restyled.*/
-#         name: Run Tests [ESP32-QEMU]
-#     - deploy:
-#         filters:
-#           branches:
-#             ignore:
-#             - /restyled.*/
-#         matrix:
-#           parameters:
-#             builder:
-#             - main-build
-#         name: Deploy [<< matrix.builder >>]
-#         requires:
-#         - Run Tests [<< matrix.builder >>]
-#     - examples_nrf:
-#         filters:
-#           branches:
-#             ignore:
-#             - /restyled.*/
-#         name: Build Examples [nRF]
-#     - examples_esp32:
-#         filters:
-#           branches:
-#             ignore:
-#             - /restyled.*/
-#         name: Build Examples [ESP32]
-#     - examples_standalone:
-#         filters:
-#           branches:
-#             ignore:
-#             - /restyled.*/
-#         matrix:
-#           parameters:
-#             builder:
-#             - main-build
-#         name: Build Examples [<< matrix.builder >>]
-#         requires:
-#         - Build CHIP [<< matrix.builder >>]

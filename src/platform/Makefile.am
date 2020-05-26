@@ -23,6 +23,9 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+SUBDIRS                                 = \
+    $(NULL)
+
 EXTRA_DIST                              = \
     $(NULL)
 
@@ -47,6 +50,8 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/internal/EventLogging.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.ipp \
+    @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_POSIX.h \
+    @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_POSIX.ipp \
     @top_srcdir@/src/include/platform/internal/GenericSoftwareUpdateManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericSoftwareUpdateManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h \
@@ -80,6 +85,9 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/platform/ESP32/NetworkProvisioningServerImpl.h \
     @top_srcdir@/src/platform/ESP32/ESP32Utils.h \
     @top_srcdir@/src/platform/ESP32/ESP32Config.h \
+    @top_srcdir@/src/platform/Linux/CHIPDevicePlatformConfig.h \
+    @top_srcdir@/src/platform/Linux/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/Linux/PlatformManagerImpl.h \
     $(NULL)
 
 if CONFIG_DEVICE_LAYER
@@ -104,6 +112,21 @@ libDeviceLayer_a_SOURCES                = \
     GeneralUtils.cpp                      \
     Globals.cpp                           \
     $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+
+SUBDIRS                                += tests
+
+libDeviceLayer_a_SOURCES               += \
+    Linux/BLEManagerImpl.cpp              \
+    Linux/ConnectivityManagerImpl.cpp     \
+    Linux/Logging.cpp                     \
+    Linux/PosixConfig.cpp                 \
+    Linux/PlatformManagerImpl.cpp         \
+    Linux/SystemTimeSupport.cpp           \
+    $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_LINUX
 
 if CHIP_DEVICE_LAYER_TARGET_NRF5
 

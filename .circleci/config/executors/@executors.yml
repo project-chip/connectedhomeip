@@ -10,6 +10,11 @@ esp32-build:
 esp32-qemu-build:
     docker:
         - image: connectedhomeip/chip-build-esp32-qemu:0.2.11
+linux-embedded:
+    environment:
+        BOOTSTRAP_ARGUMENTS: " --with-device-layer=linux"
+    docker:
+        - image: connectedhomeip/chip-build:0.2.11
 mbedtls-build:
     environment:
         BOOTSTRAP_ARGUMENTS: " --with-crypto=mbedtls"
