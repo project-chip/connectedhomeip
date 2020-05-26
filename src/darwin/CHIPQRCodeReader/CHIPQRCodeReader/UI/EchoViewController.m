@@ -22,15 +22,17 @@
 
 #define RESULT_DISPLAY_DURATION 5.0 * NSEC_PER_SEC
 
-@interface EchoViewController () {
-    CHIPDeviceController * _chipController;
-    dispatch_queue_t _chipCallbackQueue;
-    BOOL _reconnectOnForeground;
-}
+@interface EchoViewController ()
 
 @property CHIPDeviceController * chipController;
 @property dispatch_queue_t chipCallbackQueue;
 @property BOOL reconnectOnForeground;
+
+@property (weak, nonatomic) IBOutlet UITextField * serverIPTextField;
+@property (weak, nonatomic) IBOutlet UITextField * serverPortTextField;
+@property (weak, nonatomic) IBOutlet UITextField * messageTextField;
+@property (weak, nonatomic) IBOutlet UILabel * resultLabel;
+@property (weak, nonatomic) IBOutlet UIButton * sendButton;
 
 @end
 
