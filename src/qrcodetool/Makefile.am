@@ -3,9 +3,9 @@ include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 if CHIP_BUILD_TOOLS
 
 bin_PROGRAMS                       = qrcodetool
-qrcodetool_SOURCES                   = qrcodetool.cpp setup_payload_commands.cpp setup_payload_commands.h qrcodetool_command_manager.h
+qrcodetool_SOURCES                 = qrcodetool.cpp setup_payload_commands.cpp setup_payload_commands.h qrcodetool_command_manager.h
 
-qrcodetool_CPPFLAGS                   = \
+qrcodetool_CPPFLAGS                                       = \
     -I$(top_srcdir)/src                                     \
     -I$(top_srcdir)/src/lib                                 \
     -I$(top_srcdir)/src/lib/core                            \
@@ -14,7 +14,6 @@ qrcodetool_CPPFLAGS                   = \
     $(NLASSERT_CPPFLAGS)                                    \
     $(NLFAULTINJECTION_CPPFLAGS)                            \
     $(NLIO_CPPFLAGS)                                        \
-    $(LWIP_CPPFLAGS)                                        \
     $(NULL)
 
 qrcodetool_LDADD = \
@@ -25,7 +24,12 @@ qrcodetool_LDADD = \
     $(NULL)
 
 NLFOREIGN_FILE_DEPENDENCIES = \
-      $(qrcodetool_LDADD) \
+      $(top_builddir)/src/setup_payload/libSetupPayload.a   \
+      $(top_builddir)/src/lib/libCHIP.a                     \
+      $(NULL)
+
+NLFOREIGN_SUBDIR_DEPENDENCIES = \
+      $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)         \
       $(NULL)
 
 endif

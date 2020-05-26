@@ -166,8 +166,9 @@ static CHIP_ERROR payloadBinaryRepresentationWithTLV(SetupPayload & setupPayload
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     string binary;
-    uint8_t bits[bitsetSize] = { 0 };
-    err                      = generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes);
+    uint8_t bits[bitsetSize];
+    memset(bits, 0, bitsetSize);
+    err = generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes);
     SuccessOrExit(err);
 
     for (int i = ArraySize(bits) - 1; i >= 0; i--)
@@ -204,7 +205,8 @@ exit:
 static CHIP_ERROR payloadBase41RepresentationWithTLV(SetupPayload & setupPayload, string & base41Representation, size_t bitsetSize,
                                                      uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
-    uint8_t bits[bitsetSize] = { 0 };
+    uint8_t bits[bitsetSize];
+    memset(bits, 0, bitsetSize);
     string encodedPayload;
     CHIP_ERROR err = generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes);
     SuccessOrExit(err);
