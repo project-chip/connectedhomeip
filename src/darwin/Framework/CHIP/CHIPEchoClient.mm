@@ -24,11 +24,7 @@
 static UInt32 const kDefaultFrequencySeconds = 10;
 static NSString * const kEchoString = @"Hello from darwin!";
 
-@interface CHIPEchoClient () {
-    dispatch_queue_t _echoCallbackQueue;
-    dispatch_source_t _sendTimer;
-    CHIPDeviceController * _chipController;
-}
+@interface CHIPEchoClient ()
 
 @property (readonly) dispatch_queue_t echoCallbackQueue;
 @property (readonly) dispatch_source_t sendTimer;

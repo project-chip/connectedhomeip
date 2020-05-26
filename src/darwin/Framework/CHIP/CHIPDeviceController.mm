@@ -39,23 +39,15 @@ static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 }
 @end
 
-@interface CHIPDeviceController () {
-    chip::DeviceController::ChipDeviceController * _cppController;
-    // queue used for all interactions with the cpp chip controller and for all chip internal events
-    // try to run small jobs in this queue
-    dispatch_queue_t _chipWorkQueue;
-    // queue used to call select on the system and inet layer fds., remove this with NW Framework.
-    // primarily used to not block the work queue
-    dispatch_queue_t _chipSelectQueue;
-    // queue used to signal callbacks to the application
-    dispatch_queue_t _appCallbackQueue;
+@interface CHIPDeviceController ()
 
-    ControllerOnMessageBlock _onMessageHandler;
-    ControllerOnErrorBlock _onErrorHandler;
-}
-
+// queue used for all interactions with the cpp chip controller and for all chip internal events
+// try to run small jobs in this queue
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
+// queue used to call select on the system and inet layer fds., remove this with NW Framework.
+// primarily used to not block the work queue
 @property (atomic, readonly) dispatch_queue_t chipSelectQueue;
+// queue used to signal callbacks to the application
 @property (readonly) dispatch_queue_t appCallbackQueue;
 @property (readonly) ControllerOnMessageBlock onMessageHandler;
 @property (readonly) ControllerOnErrorBlock onErrorHandler;
