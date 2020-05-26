@@ -103,8 +103,9 @@ Applicaton Framework.
 
 ## Plugins
 
-Not all plugins within in the CHIP ZCL Application Framework are documented here. This is merely documentation for the critical plugins associated
-with the framework such as <code>core-message-dispatch</code> and
+Not all plugins within in the CHIP ZCL Application Framework are documented
+here. This is merely documentation for the critical plugins associated with the
+framework such as <code>core-message-dispatch</code> and
 <code>core-data-model</code>.
 
 ### <code>core-message-dispatch</code>
