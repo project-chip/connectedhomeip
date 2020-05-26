@@ -1,5 +1,6 @@
 #
-#    Copyright 2018 Nest Labs Inc. All Rights Reserved.
+#    Copyright (c) 2020 Project nlbuild-autotools Authors. All Rights Reserved.
+#    Copyright (c) 2018 Nest Labs Inc. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -55,9 +56,6 @@ bootstrap-make:
 	$(BOOTSTRAP) -w make
 
 define PrintBootstrapHelp
-$(NL_V_AT)echo "  all"
-$(NL_V_AT)echo "    Generate all configured build artifacts for this project."
-$(NL_V_AT)echo
 $(NL_V_AT)echo "  bootstrap"
 $(NL_V_AT)echo "    (Re-)generate all build infrastructure for the project, "
 $(NL_V_AT)echo "    including both build configuration scripts and makefiles."
@@ -72,33 +70,10 @@ $(NL_V_AT)echo
 $(NL_V_AT)echo "  bootstrap-make"
 $(NL_V_AT)echo "    (Re-)generate build makefiles for the project."
 $(NL_V_AT)echo
-$(NL_V_AT)echo "  check"
-$(NL_V_AT)echo "    Generate all configured build artifacts and run all unit "
-$(NL_V_AT)echo "    and functional tests for this project."
-$(NL_V_AT)echo
 $(NL_V_AT)echo "  coverage"
 $(NL_V_AT)echo "    Generate all configured build artifacts, run all unit "
 $(NL_V_AT)echo "    and functional tests, and generate code coverage results "
 $(NL_V_AT)echo "    for this project."
-$(NL_V_AT)echo
-$(NL_V_AT)echo "  dist"
-$(NL_V_AT)echo "    Generate an archive distribution snapshot for this project."
-$(NL_V_AT)echo
-$(NL_V_AT)echo "  distcheck"
-$(NL_V_AT)echo "    Generate an archive distribution snapshot for this project "
-$(NL_V_AT)echo "    and sanity check the resulting distribution by running "
-$(NL_V_AT)echo "    'make check' on it for this project."
-$(NL_V_AT)echo
-$(NL_V_AT)echo "  doc"
-$(NL_V_AT)echo "    Generate documentation for the project."
-$(NL_V_AT)echo
-$(NL_V_AT)echo "  docdist"
-$(NL_V_AT)echo "    Generate an archive distribution of the documentation for "
-$(NL_V_AT)echo "    the project."
-$(NL_V_AT)echo
-$(NL_V_AT)echo "  install"
-$(NL_V_AT)echo "    Generate all configured build artifacts for this project "
-$(NL_V_AT)echo "    and install them in DESTDIR on the build host system."
 $(NL_V_AT)echo
 $(NL_V_AT)echo "  install-headers"
 $(NL_V_AT)echo "    Generate all configured public header artifacts for this "
