@@ -38,6 +38,8 @@
 #include <stdint.h>
 
 #include <inet/InetConfig.h>
+#include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
@@ -1160,6 +1162,11 @@ int TestInetBuffer(void)
     nlTestRunner(&theSuite, &sContext);
 
     return (nlTestRunnerStats(&theSuite));
+}
+
+static void __attribute__((constructor)) TestCHIPInetBufferCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestInetBuffer) == CHIP_NO_ERROR);
 }
 
 #else // !INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES

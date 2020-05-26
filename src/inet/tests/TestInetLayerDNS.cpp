@@ -37,6 +37,8 @@
 #include <CHIPVersion.h>
 
 #include <inet/InetLayer.h>
+#include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #include <system/SystemClock.h>
 #include <system/SystemTimer.h>
@@ -713,6 +715,11 @@ int TestInetLayerDNS(void)
     ShutdownSystemLayer();
 
     return nlTestRunnerStats(&DNSTestSuite);
+}
+
+static void __attribute__((constructor)) TestCHIPInetLayerDNSCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestInetLayerDNS) == CHIP_NO_ERROR);
 }
 
 #else // !INET_CONFIG_ENABLE_DNS_RESOLVER

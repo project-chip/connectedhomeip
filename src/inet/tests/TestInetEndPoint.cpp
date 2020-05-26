@@ -39,6 +39,8 @@
 #include <inet/InetLayer.h>
 
 #include <support/CHIPArgParser.hpp>
+#include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #include <system/SystemError.h>
 #include <system/SystemTimer.h>
@@ -606,6 +608,11 @@ int TestInetEndPoint(void)
 #else  // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return (0);
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+}
+
+static void __attribute__((constructor)) TestCHIPInetEndpointCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestInetEndPoint) == CHIP_NO_ERROR);
 }
 
 int main(int argc, char * argv[])
