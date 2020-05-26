@@ -18,7 +18,8 @@ Building the example application is quite straightforward.
 
           $ make
 
--   After the application is built, it can be found in the build directory as `chip-standalone-demo.out`
+-   After the application is built, it can be found in the build directory as
+    `chip-standalone-demo.out`
 
 ## Using the Echo Client
 
@@ -26,9 +27,11 @@ To start the Echo Client run the built executable.
 
           $ ./build/chip-standalone-demo.out
 
+The app will prompt the user for the server's IP address and Port. If valid
+values are supplied, it will begin to priodically sending messages to the server
+address provided.
 
-The app will prompt the user for the server's IP address and Port. If valid values are supplied, it will begin to priodically sending messages to the server address provided.
-
-It also verifies that the incoming echo from the server matches what was sent out.
+It also verifies that the incoming echo from the server matches what was sent
+out.
 
 Stop the Client at anytime with `Ctrl + C`.
