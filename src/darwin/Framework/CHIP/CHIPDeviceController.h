@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^ControllerOnMessageBlock)(NSData * message, NSString * ipAddress, UInt16 port);
 typedef void (^ControllerOnErrorBlock)(NSError * error);
 
-typedef void (^ControllerAddressAvailable)(NSString *ipAddress, UInt16 port, NSError * error);
+typedef void (^ControllerAddressAvailable)(NSString * ipAddress, UInt16 port, NSError * error);
 
 @interface CHIPDeviceController : NSObject
 
@@ -36,7 +36,7 @@ typedef void (^ControllerAddressAvailable)(NSString *ipAddress, UInt16 port, NSE
           error:(NSError * __autoreleasing *)error
       onMessage:(ControllerOnMessageBlock)onMessage
         onError:(ControllerOnErrorBlock)onError;
-- (BOOL)getDeviceAddress:(void (^)(NSString *ipAddress, UInt16 port))completionBlock;
+- (BOOL)getDeviceAddress:(void (^)(NSString * ipAddress, UInt16 port))completionBlock;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
 - (BOOL)isConnected;
