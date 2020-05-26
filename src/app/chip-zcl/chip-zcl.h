@@ -270,21 +270,6 @@ typedef uint16_t ChipZclDeviceId_t;
 /** A distinguished value that represents a null (invalid) device identifer. */
 #define CHIP_ZCL_DEVICE_ID_NULL ((ChipZclDeviceId_t) -1)
 
-typedef struct
-{
-    ChipZclEndpointId_t endpointId;
-    uint16_t clusterId;
-    bool clusterSpecific;
-    bool mfgSpecific;
-    uint16_t mfgCode;
-    uint8_t seqNum;
-    uint8_t commandId;
-    uint8_t payloadStartIndex;
-    uint8_t direction;
-    void * request;
-    void * response;
-} ChipZclCommandContext_t;
-
 /** brief An identifier for a task */
 typedef uint8_t ChipZclTaskId;
 
@@ -659,7 +644,7 @@ typedef struct
      */
     uint8_t clusterCount;
     /**
-     * Size of all non-external, non-singlet attribute in this endpoint type.
+     * Size of all non-external, non-singleton attributes in this endpoint type.
      */
     uint16_t endpointSize;
 } ChipZclEndpointType;
@@ -892,20 +877,6 @@ typedef bool (*EventPredicate)(Event *, void *);
 
 Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredicate predicate, void * data, bool all);
 
-// Buffers
-/**
- * @brief For use when declaring a Buffer.
- */
-typedef uint16_t Buffer;
-/**
- * @brief Denotes a null buffer.
- */
-#define NULL_BUFFER 0x0000
-
-Buffer chipZclReallyAllocateBuffer(uint16_t dataSizeInBytes, bool async);
-
-#define chipZclAllocateBuffer(dataSizeInBytes) chipZclReallyAllocateBuffer(dataSizeInBytes, false)
-
 // -----------------------------------------------------------------------------
 // Roles.
 
@@ -951,6 +922,7 @@ typedef uint16_t ChipZclManufacturerCode_t;
 // Clusters.
 /** A cluster identifier. */
 typedef uint16_t ChipZclClusterId_t;
+typedef uint16_t ChipZclCommandId_t;
 typedef uint8_t ChipZclRole_t;
 typedef uint16_t ChipZclManufacturerCode_t;
 typedef uint16_t ChipZclAttributeId_t;
@@ -964,6 +936,21 @@ typedef struct
     /** Identifier of a cluster. */
     ChipZclClusterId_t id;
 } ChipZclClusterSpec_t;
+
+typedef struct
+{
+    ChipZclEndpointId_t endpointId;
+    ChipZclClusterId_t clusterId;
+    bool clusterSpecific;
+    bool mfgSpecific;
+    uint16_t mfgCode;
+    ChipZclCommandId_t commandId;
+    uint8_t direction;
+
+    uint8_t payloadStartIndex;
+    void * request;
+    void * response;
+} ChipZclCommandContext_t;
 
 int32_t chipZclCompareClusterSpec(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2);
 bool chipZclAreClusterSpecsEqual(const ChipZclClusterSpec_t * s1, const ChipZclClusterSpec_t * s2);
@@ -986,13 +973,11 @@ Event * chipZclEventFind(EventQueue * queue, EventActions * actions, EventPredic
 
 void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 
-// Buffer Management Mechanism
-uint8_t * chipZclGetBufferPointer(Buffer buffer);
-
-Buffer chipZclReallyAllocateBuffer(uint16_t length, bool unused);
-
 // Endpoint Management
 ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);
+
+// Toplevel functions
+ChipZclStatus_t chipZclDecode(ChipZclRawBuffer_t * buffer);
 
 // Some platform CHIP_ZCL_STATUS_INSUFFICIENT_SPACE
 #define MEMSET(d, v, l) memset(d, v, l)
@@ -1118,5 +1103,21 @@ ChipZclStatus_t chipZclLocateAttributeMetadata(uint8_t endpoint, ChipZclClusterI
  * are enabled and linked together properly for use.
  */
 void chipZclEndpointInit(void);
+
+// Toplevel API functions
+
+/**
+ * This function takes the ZCL header data in the context and encodes it into a buffer.
+ */
+void chipZclEncodeZclHeader(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context);
+
+/**
+ * This function takes the buffer and decodes it into ZCL header data in the context.
+ */
+void chipZclDecodeZclHeader(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context);
+
+ChipZclCommandContext_t * createCommandContext(ChipZclEndpointId_t endpointId, ChipZclClusterId_t clusterId);
+
+ChipZclStatus_t chipZclProcessIncoming(uint8_t * buffer, uint16_t bufferLength);
 
 #endif // CHIP_ZCL_MASTER_HEADER

@@ -471,7 +471,8 @@ static ChipZclStatus_t chipZclInternalReadOrWriteAttribute(ChipZclAttributeSearc
             }
         }
         else
-        { // Not the endpoint we are looking for
+        {
+            // Not the endpoint we are looking for
             attributeOffsetIndex += chipZclEndpointArray[i].endpointType->endpointSize;
         }
     }
@@ -497,7 +498,6 @@ ChipZclStatus_t chipZclLocateAttributeMetadata(ChipZclEndpointId_t endpoint, Chi
                                                false);   // write?
 }
 
-#if 0 // this function needs more dispatch information to be consumed by the public Read/Write functions
 // writes an attribute (identified by clusterID and attrID to the given value.
 // this returns:
 // - CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isnt supported by the device (the
@@ -539,7 +539,7 @@ static ChipZclStatus_t chipZclInternalWriteAttribute(ChipZclEndpointId_t endpoin
     // if we dont support that attribute
     if (metadata == NULL)
     {
-        chipZclCorePrintln("%pep %x clus %2x attr %2x not supported", "WRITE ERR: ", endpoint, cluster, attributeID);
+        chipZclCorePrintln("%sep %x clus %2x attr %2x not supported", "WRITE ERR: ", endpoint, cluster, attributeID);
         return CHIP_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
 
@@ -548,13 +548,13 @@ static ChipZclStatus_t chipZclInternalWriteAttribute(ChipZclEndpointId_t endpoin
     {
         if (dataType != metadata->attributeType)
         {
-            chipZclCorePrintln("%pinvalid data type", "WRITE ERR: ");
+            chipZclCorePrintln("%sinvalid data type", "WRITE ERR: ");
             return CHIP_ZCL_STATUS_INVALID_DATA_TYPE;
         }
 
         if (chipZclAttributeIsReadOnly(metadata))
         {
-            chipZclCorePrintln("%pattr not writable", "WRITE ERR: ");
+            chipZclCorePrintln("%sattr not writable", "WRITE ERR: ");
             return CHIP_ZCL_STATUS_READ_ONLY;
         }
     }
@@ -640,12 +640,13 @@ static ChipZclStatus_t chipZclInternalWriteAttribute(ChipZclEndpointId_t endpoin
 
     return CHIP_ZCL_STATUS_SUCCESS;
 }
-#endif // if 0
 
 ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
                                       ChipZclAttributeId_t attributeId, const void * buffer, size_t bufferLength)
 {
-    return CHIP_ZCL_STATUS_SUCCESS;
+    uint8_t mask = (clusterSpec->role == CHIP_ZCL_ROLE_CLIENT ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER);
+    return chipZclInternalWriteAttribute(endpointId, clusterSpec->id, attributeId, mask, 0, (uint8_t *) buffer,
+                                         ZCL_BOOLEAN_ATTRIBUTE_TYPE, true, false);
 }
 
 #if 0  // this function needs more dispatch information to be consumed by the public Read/Write functions

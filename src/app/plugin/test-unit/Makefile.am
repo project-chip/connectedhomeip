@@ -45,6 +45,7 @@ libChipZclUnitTests_a_SOURCES                            = \
     ../../gen/gen-callback-stubs.c                         \
     ../../gen/gen-command-handler.c                        \
     ../binding-mock/mock.c                                 \
+    ../core-api/core-api.c                                 \
     ../cluster-server-basic/basic-server.c                 \
     ../cluster-server-level-control/level-control-server.c \
     ../cluster-server-identify/identify-server.c           \

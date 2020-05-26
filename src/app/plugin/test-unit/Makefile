@@ -2,6 +2,7 @@ NAME=ChipZclUnitTestsDriver
 GEN=../../gen
 REQUIRED_PLUGINS=\
   ../binding-mock/mock.o \
+  ../core-api/core-api.o \
   ../codec-simple/codec-simple.o \
   ../../gen/gen-callback-stubs.o \
   ../../gen/gen-command-handler.o \

@@ -14,10 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "ChipZclUnitTests.h"
+#include "chip-zcl.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ChipZclUnitTests.h"
+void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+{
+    printf("Attribute change callback: ep=%d clusterId=%d attributeId=%d\n", endpoint, clusterId, attributeId);
+}
 
 int main(int argc, char ** argv)
 {

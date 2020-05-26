@@ -41,14 +41,20 @@ lib_LIBRARIES                                  = \
 EXTRA_DIST = ChipZclOnOffTest.h
 
 # plugins we need
-libChipZclOnOffTest_a_SOURCES                           = \
-    ../../gen/gen-callback-stubs.c                        \
-    ../../gen/gen-specs.c                                 \
-    ../../gen/gen-command-handler.c                       \
-    ../core-data-model/zcl-data-model.c                   \
-    ../cluster-server-on-off/on-off-server.c              \
-    ../binding-mock/mock.c                                \
-    cluster-cmd-on-off-test.c                             \
+libChipZclOnOffTest_a_SOURCES                = \
+    ../../gen/gen-callback-stubs.c             \
+    ../../gen/gen-specs.c                      \
+    ../../gen/gen-command-handler.c            \
+    ../core-data-model/zcl-data-model.c        \
+    ../cluster-server-on-off/on-off-server.c   \
+    ../binding-mock/mock.c                     \
+    ../codec-simple/codec-simple.c             \
+    ../core-api/core-api.c                     \
+    $(NULL)
+
+# actual test files
+libChipZclOnOffTest_a_SOURCES               += \
+    cluster-cmd-on-off-test.c                  \
     $(NULL)
 
 check_PROGRAMS                                 = \
