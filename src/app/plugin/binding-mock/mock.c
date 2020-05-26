@@ -116,6 +116,7 @@ ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
     buffer->endPosition         = 0;
     buffer->currentPosition     = 0;
     buffer->totalLength         = allocatedLength;
+    return buffer;
 }
 
 /**

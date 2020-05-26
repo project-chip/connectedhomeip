@@ -14,21 +14,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <stdio.h>
-#include <stdlib.h>
 
-#include "test-unit.h"
+/**
+ *    @file
+ *      This file provides unit testing for the CHIP ZCL Command Handling
+ *      related to the on-off-server functionality. It constructs an
+ *      incoming message related to on-off and passes it into the CHIP
+ *      ZCL message dispatch code
+ *
+ */
 
-int main(int argc, char ** argv)
+#include "ChipZclOnOffTest.h"
+
+int main(void)
 {
-    printf("%s: === start ===\n", argv[0]);
-    testClusterServerBasic();
-    testClusterServerIdentify();
-    testClusterServerLevelControl();
-    testClusterServerOnOff();
-    testCodecSimple();
-    testCoreDataModel();
-    testCoreMessageDispatch();
-    printf("%s: === end ===\n", argv[0]);
-    return 0;
+    return testClusterServerOnOffCmd();
 }

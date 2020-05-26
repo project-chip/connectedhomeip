@@ -21,7 +21,13 @@
  *      layer's basic cluster server
  *
  */
-#include "test-unit.h"
+#include "ChipZclUnitTests.h"
+
+#include <chip-zcl.h>
+
+#include "gen.h"
+
+#include <stdio.h>
 
 void zapClusterBasicServerCommandResetToFactoryDefaultsRequestHandler(
     const ChipZclCommandContext_t * context, const ChipZclClusterBasicServerCommandResetToFactoryDefaultsRequest_t * request);

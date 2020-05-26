@@ -22,7 +22,8 @@
  *      but will do ok in a typical unit test case.
  *
  */
-#include "../../api/chip-zcl-codec.h"
+#include "chip-zcl-codec.h"
+
 #include <memory.h>
 #include <stdint.h>
 
@@ -94,9 +95,9 @@ ChipZclStatus_t chipZclCodecDecode(ChipZclRawBuffer_t * buffer, ChipZclType_t ty
     case CHIP_ZCL_STRUCT_TYPE_STRING:
         memcpy(&encodedLength, &(buffer->buffer[buffer->currentPosition]), 2);
         buffer->currentPosition += 2;
-        if (encodedLength + 1 > ptrLen)
+        if (encodedLength > ptrLen)
             return CHIP_ZCL_STATUS_FAILURE;
-        strncpy(ptr, &(buffer->buffer[buffer->currentPosition]), encodedLength);
+        memmove(ptr, &(buffer->buffer[buffer->currentPosition]), encodedLength);
         buffer->currentPosition += encodedLength;
         return CHIP_ZCL_STATUS_SUCCESS;
     default:

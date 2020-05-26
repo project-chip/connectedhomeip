@@ -21,10 +21,16 @@
  *
  */
 
-#include "chip-zcl.h"
-#include "test-unit.h"
+#include "ChipZclUnitTests.h"
+
+#include <chip-zcl-codec.h>
+#include <chip-zcl.h>
+
+#include "gen.h"
+
 #include <memory.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -74,7 +80,7 @@ int testCodecSimple()
         return 1;
     }
     chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_STRING, sOut, 100, &ret);
-    if (strcmp(sIn, sOut))
+    if (memcmp(sIn, sOut, ret))
     {
         printf("Failure: sOut=%s\n", sOut);
         return 1;

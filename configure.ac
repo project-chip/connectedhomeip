@@ -2067,6 +2067,12 @@ third_party/lwip/Makefile
 third_party/mbedtls/Makefile
 src/Makefile
 src/include/Makefile
+src/app/Makefile
+src/app/chip-zcl/Makefile
+src/app/gen/Makefile
+src/app/plugin/Makefile
+src/app/plugin/test-unit/Makefile
+src/app/plugin/test-on-off/Makefile
 src/ble/Makefile
 src/ble/tests/Makefile
 src/crypto/Makefile
@@ -2084,8 +2090,8 @@ src/lib/core/tests/Makefile
 src/lib/support/Makefile
 src/lib/support/tests/Makefile
 src/platform/Makefile
-tests/Makefile
 src/qrcodetool/Makefile
+tests/Makefile
 ])
 
 #

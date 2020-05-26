@@ -14,22 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef CHIP_ZCL_TEST_UNIT
-#define CHIP_ZCL_TEST_UNIT
 
-#include "chip-zcl-codec.h"
+#include "ChipZclOnOffTest.h"
+
 #include "chip-zcl.h"
+
 #include "gen.h"
-#include <stdint.h>
+
 #include <stdio.h>
-#include <stdlib.h>
 
-int testClusterServerBasic();
-int testClusterServerIdentify();
-int testClusterServerLevelControl();
-int testClusterServerOnOff();
-int testCodecSimple();
-int testCoreDataModel();
-int testCoreMessageDispatch();
-
-#endif // CHIP_ZCL_TEST_UNIT
+int testClusterCmdOnOff(void)
+{
+    ChipZclCommandContext_t context;
+    context.mfgSpecific = false;
+    context.clusterId   = CHIP_ZCL_CLUSTER_ON_OFF;
+    context.commandId   = ZCL_ON_COMMAND_ID;
+    context.direction   = ZCL_DIRECTION_CLIENT_TO_SERVER;
+    return chipZclClusterCommandParse(&context);
+}
