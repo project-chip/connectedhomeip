@@ -29,7 +29,8 @@ static const char * const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
 @implementation AddressInfo
-- (instancetype) initWithIP:(NSString *)ip andPort:(UInt16)port {
+- (instancetype)initWithIP:(NSString *)ip andPort:(UInt16)port
+{
     if (self = [super init]) {
         _ip = ip;
         _port = port;
@@ -209,7 +210,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     // A buffer big enough to hold ipv4 and ipv6 addresses
     char ipAddrStr[64];
     ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
-    NSString* ipAddress = [NSString stringWithUTF8String:ipAddrStr];
+    NSString * ipAddress = [NSString stringWithUTF8String:ipAddrStr];
     return [[AddressInfo alloc] initWithIP:ipAddress andPort:port];
 }
 
