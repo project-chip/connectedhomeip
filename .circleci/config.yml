@@ -24,16 +24,16 @@ jobs:
         command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
         name: Run mbedTLS Tests
     - run:
-        command: scripts/tools/run_if.sh "main-build mbedtls-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
+        command: scripts/tools/run_if.sh "main-build mbedtls-build clang-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
         name: Run Crypto Tests
     - run:
-        command: scripts/tools/run_if.sh "main-build ubuntu-16-lts" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
+        command: scripts/tools/run_if.sh "main-build ubuntu-16-lts clang-build" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
         name: Run Setup Payload Tests
     - run:
-        command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
+        command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
         name: OpenSSL Tests
     - run:
-        command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
+        command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
     - run:
         command: scripts/tests/save_logs.sh /tmp/test_logs
@@ -176,6 +176,72 @@ jobs:
     - run:
         command: scripts/examples/esp_echo_app.sh
         name: Build example Echo App
+  Run Tests [clang-build]:
+    docker:
+    - image: connectedhomeip/chip-build:0.2.11
+    environment:
+    - BOOTSTRAP_ARGUMENTS: ' CC=clang-9 CXX=clang++-9'
+    - BUILD_TYPE: clang-build
+    steps:
+    - restore_cache:
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-clang-build-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-clang-build-built
+    - restore_cache:
+        key: build-environment-{{ arch }}-clang-build-persistent-cache
+    - run:
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment
+    - run:
+        command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
+        name: Run mbedTLS Tests
+    - run:
+        command: scripts/tools/run_if.sh "main-build mbedtls-build clang-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
+        name: Run Crypto Tests
+    - run:
+        command: scripts/tools/run_if.sh "main-build ubuntu-16-lts clang-build" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
+        name: Run Setup Payload Tests
+    - run:
+        command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
+        name: OpenSSL Tests
+    - run:
+        command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
+        name: Run All Unit & Functional Tests
+  Build CHIP [clang-build]:
+    docker:
+    - image: connectedhomeip/chip-build:0.2.11
+    environment:
+    - BOOTSTRAP_ARGUMENTS: ' CC=clang-9 CXX=clang++-9'
+    - BUILD_TYPE: clang-build
+    steps:
+    - checkout
+    - restore_cache:
+        key: build-environment-{{ arch }}-clang-build-persistent-cache
+    - run:
+        command: scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo scripts/setup/linux/install_packages.sh
+        name: Setup Environment
+    - save_cache:
+        key: build-environment-{{ arch }}-clang-build-persistent-cache
+        paths:
+        - ./ci-cache-persistent
+    - run:
+        command: scripts/build/bootstrap.sh $BOOTSTRAP_ARGUMENTS
+        name: Bootstrap
+    - save_cache:
+        key: bootstrapped-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-clang-build-built
+        paths:
+        - .
+    - run:
+        command: scripts/build/default.sh
+        name: Build
+    - save_cache:
+        key: built-tree-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1}}-clang-build-built
+        paths:
+        - .
+    - save_cache:
+        key: build-environment-{{ arch }}-{{ .Branch}}-{{.Environment.CIRCLE_SHA1 }}-clang-build-built
+        paths:
+        - build/downloads
   Run Tests [main-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.11
@@ -195,16 +261,16 @@ jobs:
         command: scripts/tools/run_if.sh "mbedtls-build" "$BUILD_TYPE" scripts/tests/mbedtls_tests.sh
         name: Run mbedTLS Tests
     - run:
-        command: scripts/tools/run_if.sh "main-build mbedtls-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
+        command: scripts/tools/run_if.sh "main-build mbedtls-build clang-build" "$BUILD_TYPE" scripts/tests/crypto_tests.sh
         name: Run Crypto Tests
     - run:
-        command: scripts/tools/run_if.sh "main-build ubuntu-16-lts" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
+        command: scripts/tools/run_if.sh "main-build ubuntu-16-lts clang-build" "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
         name: Run Setup Payload Tests
     - run:
-        command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
+        command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/openssl_tests.sh
         name: OpenSSL Tests
     - run:
-        command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
+        command: scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
     - run:
         command: scripts/tests/save_logs.sh /tmp/test_logs
@@ -225,6 +291,11 @@ workflows:
           branches:
             ignore:
             - /restyled.*/
+    - Build CHIP [clang-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
     - Run Tests [main-build]:
         filters:
           branches:
@@ -239,6 +310,13 @@ workflows:
             - /restyled.*/
         requires:
         - Build CHIP [mbedtls-build]
+    - Run Tests [clang-build]:
+        filters:
+          branches:
+            ignore:
+            - /restyled.*/
+        requires:
+        - Build CHIP [clang-build]
     - Run Tests [ESP32-QEMU]:
         filters:
           branches:
@@ -367,6 +445,11 @@ workflows:
 #         command: scripts/tools/run_if.sh \"ubuntu-16-lts\" \"$BUILD_TYPE\" sudo scripts/setup/linux/install_packages.sh
 #         name: Setup Environment
 # executors:
+#   clang-build:
+#     docker:
+#     - image: connectedhomeip/chip-build:0.2.11
+#     environment:
+#       BOOTSTRAP_ARGUMENTS: ' CC=clang-9 CXX=clang++-9'
 #   esp32-build:
 #     docker:
 #     - image: connectedhomeip/chip-build-esp32:0.2.11
@@ -512,18 +595,18 @@ workflows:
 #         command: scripts/tools/run_if.sh \"mbedtls-build\" \"$BUILD_TYPE\" scripts/tests/mbedtls_tests.sh
 #         name: Run mbedTLS Tests
 #     - run:
-#         command: scripts/tools/run_if.sh \"main-build mbedtls-build\" \"$BUILD_TYPE\"
+#         command: scripts/tools/run_if.sh \"main-build mbedtls-build clang-build\" \"$BUILD_TYPE\"
 #           scripts/tests/crypto_tests.sh
 #         name: Run Crypto Tests
 #     - run:
-#         command: scripts/tools/run_if.sh \"main-build ubuntu-16-lts\" \"$BUILD_TYPE\"
+#         command: scripts/tools/run_if.sh \"main-build ubuntu-16-lts clang-build\" \"$BUILD_TYPE\"
 #           scripts/tests/setup_payload_tests.sh
 #         name: Run Setup Payload Tests
 #     - run:
-#         command: scripts/tools/run_if.sh \"main-build\" \"$BUILD_TYPE\" scripts/tests/openssl_tests.sh
+#         command: scripts/tools/run_if.sh \"main-build clang-build\" \"$BUILD_TYPE\" scripts/tests/openssl_tests.sh
 #         name: OpenSSL Tests
 #     - run:
-#         command: scripts/tools/run_if.sh \"main-build\" \"$BUILD_TYPE\" scripts/tests/all_tests.sh
+#         command: scripts/tools/run_if.sh \"main-build clang-build\" \"$BUILD_TYPE\" scripts/tests/all_tests.sh
 #         name: Run All Unit & Functional Tests
 #     - run:
 #         command: scripts/tests/save_logs.sh /tmp/test_logs
@@ -554,6 +637,7 @@ workflows:
 #             builder:
 #             - main-build
 #             - mbedtls-build
+#             - clang-build
 #         name: Build CHIP [<< matrix.builder >>]
 #     - test:
 #         filters:
@@ -565,6 +649,7 @@ workflows:
 #             builder:
 #             - main-build
 #             - mbedtls-build
+#             - clang-build
 #         name: Run Tests [<< matrix.builder >>]
 #         requires:
 #         - Build CHIP [<< matrix.builder >>]
