@@ -25,9 +25,6 @@
 #include "QRCodeSetupPayloadGenerator.h"
 #include "Base41.h"
 
-#include <iostream>
-#include <stdlib.h>
-
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <core/CHIPTLVData.hpp>
@@ -35,6 +32,10 @@
 #include <core/CHIPTLVUtilities.hpp>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
 
 using namespace chip;
 using namespace std;
