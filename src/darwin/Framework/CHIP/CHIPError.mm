@@ -18,6 +18,7 @@
 #import "CHIPError.h"
 
 #import <core/CHIPError.h>
+#import <inet/InetError.h>
 
 NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 
@@ -46,6 +47,10 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
             return [NSError errorWithDomain:CHIPErrorDomain
                                        code:CHIPErrorCodeInvalidState
                                    userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Invalid object state.", nil) }];
+        case INET_ERROR_WRONG_ADDRESS_TYPE:
+            return [NSError errorWithDomain:CHIPErrorDomain
+                                       code:CHIPERRORCodeWrongAddressType
+                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Wrong address type.", nil) }];
         default:
             return [NSError errorWithDomain:CHIPErrorDomain
                                        code:CHIPErrorCodeUndefinedError
