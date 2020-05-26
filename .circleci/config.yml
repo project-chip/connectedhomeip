@@ -35,6 +35,12 @@ jobs:
     - run:
         command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
+    - run:
+        command: scripts/tests/save_logs.sh /tmp/test_logs
+        name: Save test log files
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/test_logs
   Build Examples [nRF]:
     docker:
     - image: connectedhomeip/chip-build-nrf-platform:0.2.11
@@ -200,6 +206,12 @@ jobs:
     - run:
         command: scripts/tools/run_if.sh "main-build" "$BUILD_TYPE" scripts/tests/all_tests.sh
         name: Run All Unit & Functional Tests
+    - run:
+        command: scripts/tests/save_logs.sh /tmp/test_logs
+        name: Save test log files
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/test_logs
 workflows:
   Main:
     jobs:
@@ -513,6 +525,12 @@ workflows:
 #     - run:
 #         command: scripts/tools/run_if.sh \"main-build\" \"$BUILD_TYPE\" scripts/tests/all_tests.sh
 #         name: Run All Unit & Functional Tests
+#     - run:
+#         command: scripts/tests/save_logs.sh /tmp/test_logs
+#         name: Save test log files
+#         when: on_fail
+#     - store_artifacts:
+#         path: /tmp/test_logs
 #   test_esp32_qemu:
 #     environment:
 #       BUILD_TYPE: esp32-qemu-build
