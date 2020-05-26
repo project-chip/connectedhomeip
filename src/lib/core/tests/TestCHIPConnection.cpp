@@ -23,14 +23,14 @@
 
 #include "TestCore.h"
 
+#include <core/CHIPConnection.h>
+#include <core/CHIPCore.h>
+#include <support/CodeUtils.h>
+
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
+
 #include <errno.h>
-
-#include <core/CHIPCore.h>
-#include <core/CHIPConnection.h>
-
-#include <support/CodeUtils.h>
 
 using namespace chip;
 
