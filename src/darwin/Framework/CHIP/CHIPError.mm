@@ -18,6 +18,7 @@
 #import "CHIPError.h"
 
 #import <core/CHIPError.h>
+#import <inet/InetError.h>
 
 NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 

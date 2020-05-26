@@ -162,7 +162,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error: %@, connect failed", [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
@@ -183,6 +183,30 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return YES;
 }
 
+- (BOOL)getDeviceAddress:(void (^)(NSString *ipAddress, UInt16 port))completionBlock {
+    if (!completionBlock) {
+        return NO;
+    }
+    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    __block chip::IPAddress ipAddr;
+    __block uint16_t port;
+
+    dispatch_sync(self.chipWorkQueue, ^() {
+        err = self.cppController->GetDeviceAddress(&ipAddr, &port);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        return NO;
+    }
+    // A buffer big enough to hold ipv4 and ipv6 addresses
+    char ipAddrStr[64];
+    ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
+    NSString* ipAddress = [NSString stringWithUTF8String:ipAddrStr];
+    completionBlock(ipAddress, port);
+
+    return YES;
+}
+
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
@@ -199,7 +223,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error: %@, send failed", [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%d): %@, send failed", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
@@ -217,7 +241,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error: %@, disconnect failed", [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%d): %@, disconnect failed", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
