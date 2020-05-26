@@ -163,6 +163,27 @@ exit:
     return err;
 }
 
+CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16_t * devicePort)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mState != kState_Initialized || mConState != kConnectionState_Connected)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (deviceAddr)
+    {
+        *deviceAddr = mDeviceAddr;
+    }
+    if (devicePort)
+    {
+        *devicePort = mDevicePort;
+    }
+
+    return err;
+}
+
 bool ChipDeviceController::IsConnected()
 {
     return kState_Initialized && mConState == kConnectionState_Connected;

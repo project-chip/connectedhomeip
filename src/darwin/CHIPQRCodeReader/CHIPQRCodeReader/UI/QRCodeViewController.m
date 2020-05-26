@@ -1,6 +1,3 @@
-//
-//  ViewController.m
-//  CHIPQRCodeReader
 /**
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -18,7 +15,7 @@
  *    limitations under the License.
  */
 // module header
-#import "ViewController.h"
+#import "QRCodeViewController.h"
 
 // local imports
 #import <CHIP/CHIP.h>
@@ -32,13 +29,13 @@
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
-@interface ViewController ()
+@interface QRCodeViewController ()
 
 @property (nonatomic, strong) AVCaptureSession * captureSession;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer * videoPreviewLayer;
 @end
 
-@implementation ViewController {
+@implementation QRCodeViewController {
     dispatch_queue_t _captureSessionQueue;
 }
 
