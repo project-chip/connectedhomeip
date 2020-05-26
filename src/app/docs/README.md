@@ -43,7 +43,7 @@ see the design document below.
 
 ## Design
 
-The CHIP ZCL implementation is broken down into "plugins." Plugins are located
+The CHIP ZCL implementation is broken down into "plugins". Plugins are located
 in the plugin directory located at <code>src/app/plugin</code>. A plugin
 represents a discrete piece of functionality implemented within the CHIP ZCL.
 Everything in the CHIP ZCL Application Framework is encapsulated in a plugin.
@@ -103,9 +103,7 @@ Applicaton Framework.
 
 ## Plugins
 
-I do not attempt to document all of the plugins in the CHIP ZCL Application
-Framework here, this would be a never ending tasks since they are being added to
-all the time. This is merely documentation for the critical plugins associated
+Not all plugins within in the CHIP ZCL Application Framework are documented here. This is merely documentation for the critical plugins associated
 with the framework such as <code>core-message-dispatch</code> and
 <code>core-data-model</code>.
 
