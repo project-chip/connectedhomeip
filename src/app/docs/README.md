@@ -123,9 +123,11 @@ the incoming message is handled by the application framework and putting the
 response into the CHIP outgoing message queue.
 
 Messages arriving in the <code>core-message-dispatch</code> are assumed to have
-had their ZCL Header Data (APS Header in Zigbee Pro) decoded completely such that they arrive in the form of a
-pointer to a <code>ChipZclCommandContext_t</code> which is defined in
-<code>src/app/api/chip-zcl.h</code>. Values that are normally part of the ZCL Header Data such as <code>endpointId</code>, <code>clusterId</code> and
+had their ZCL Header Data (APS Header in Zigbee Pro) decoded completely such
+that they arrive in the form of a pointer to a
+<code>ChipZclCommandContext_t</code> which is defined in
+<code>src/app/api/chip-zcl.h</code>. Values that are normally part of the ZCL
+Header Data such as <code>endpointId</code>, <code>clusterId</code> and
 <code>commandId</code> are used by the <code>core-message-dispatch</code> to
 determine how to process the incoming message.
 
@@ -134,19 +136,22 @@ to retrieve a "request spec" and command handler pointer from the
 <code>core-data-model</code>. The "request spec" contains all the information
 necessary to decode the incoming request. The "request spec" and a pointer to
 the appropriate "request struct" are passed by the
-<code>core-message-dispatch</code> to the appropriate struct parser which is tied to the codec. The codec understands how data is encoded Over the Air (OTA) The struct parser and codec decode
-the incoming message payload and populate the associated "request struct" which
-can then be passed on throughout the system for actual command processing and
-device actuation etc...
+<code>core-message-dispatch</code> to the appropriate struct parser which is
+tied to the codec. The codec understands how data is encoded Over the Air (OTA)
+The struct parser and codec decode the incoming message payload and populate the
+associated "request struct" which can then be passed on throughout the system
+for actual command processing and device actuation etc...
 
-This design gives the CHIP Application Framework the flexibilty to swap out or call a different codec if the OTA format of the message changes. It also insulates the command processing "normative behavior" or "business logic" from other logic in the system such as the OTA encode/decode.
+This design gives the CHIP Application Framework the flexibilty to swap out or
+call a different codec if the OTA format of the message changes. It also
+insulates the command processing "normative behavior" or "business logic" from
+other logic in the system such as the OTA encode/decode.
 
 For more information and an example on the handling of incoming On/Off Command
 messages by the <code>core-message-dispatch</code> and other plugins please see
 the diagram below:
 
-![CHIP ZCL Message Flow for On Command](chip-zcl-msg-flow-on-command.svg
-)
+![CHIP ZCL Message Flow for On Command](chip-zcl-msg-flow-on-command.svg)
 
 ### <code>core-data-model</code>
 
@@ -154,11 +159,11 @@ The <code>core-data-model</code> plugin is responsible for the storage and
 interaction with the data model associated with a device. This includes all ZCL
 attributes and command handlers. For instance, when an attribute needs to be
 updated, the application interacts with the <code>core-data-model</code>. The
-data is a generated piece of code located in the <code>gen</code>
-directory associated with a given project. There is a <code>gen</code> directory
-located at <code>/src/app/gen</code>. This is not the gen directory for an
-application. It is merely an example of generated code used for unit testing the
-CHIP ZCL Application Framework.
+data is a generated piece of code located in the <code>gen</code> directory
+associated with a given project. There is a <code>gen</code> directory located
+at <code>/src/app/gen</code>. This is not the gen directory for an application.
+It is merely an example of generated code used for unit testing the CHIP ZCL
+Application Framework.
 
 When a ZCL attribute is updated in the data model, the
 <code>core-data-model</code> will call the
