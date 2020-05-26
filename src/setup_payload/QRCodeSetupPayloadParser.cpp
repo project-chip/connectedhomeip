@@ -85,16 +85,14 @@ static CHIP_ERROR retrieveStringOptionalInfo(TLVReader & reader, OptionalQRCodeI
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint32_t valLength = reader.GetLength();
-    char * val         = (char *) malloc(valLength + 1);
+    char * val         = new char[valLength + 1];
     err                = reader.GetString(val, valLength + 1);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
+    SuccessOrExit(err);
     info.type = optionalQRCodeInfoTypeString;
     info.tag  = reader.GetTag();
     info.data = string(val);
-    free(val);
+exit:
+    delete[] val;
     return err;
 }
 
@@ -176,7 +174,7 @@ static CHIP_ERROR populateTLV(SetupPayload & outPayload, const vector<uint8_t> &
     }
     size_t bitsLeftToRead = (buf.size() * 8) - index;
     size_t tlvBytesLength = ceil(double(bitsLeftToRead) / 8);
-    uint8_t * tlvArray    = new uint8_t[tlvBytesLength];
+    uint8_t * tlvArray    = new uint8_t[tlvBytesLength]; // TODO: Allow caller to allocate buffer #825
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest;

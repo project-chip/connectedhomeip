@@ -6,20 +6,22 @@ bin_PROGRAMS                       = qrcodetool
 qrcodetool_SOURCES                   = qrcodetool.cpp setup_payload_commands.cpp setup_payload_commands.h qrcodetool_command_manager.h
 
 qrcodetool_CPPFLAGS                   = \
-    $(NLASSERT_CPPFLAGS)              \
-    -I$(top_srcdir)/src               \
-    -I$(top_srcdir)/src/lib           \
-    -I$(top_srcdir)/src/system        \
-    -I$(top_srcdir)/src/include/      \
-    $(NLASSERT_CPPFLAGS)              \
-    $(NLFAULTINJECTION_CPPFLAGS)      \
-    $(NLIO_CPPFLAGS)                  \
-    $(LWIP_CPPFLAGS)                  \
+    -I$(top_srcdir)/src                                     \
+    -I$(top_srcdir)/src/lib                                 \
+    -I$(top_srcdir)/src/lib/core                            \
+    -I$(top_srcdir)/src/system                              \
+    -I$(top_srcdir)/src/include                             \
+    $(NLASSERT_CPPFLAGS)                                    \
+    $(NLFAULTINJECTION_CPPFLAGS)                            \
+    $(NLIO_CPPFLAGS)                                        \
+    $(LWIP_CPPFLAGS)                                        \
     $(NULL)
 
 qrcodetool_LDADD = \
-    $(top_builddir)/src/lib/libCHIP.a \
-    $(top_builddir)/src/setup_payload/libSetupPayload.a \
+    $(COMMON_LDFLAGS)                                       \
+    $(top_builddir)/src/setup_payload/libSetupPayload.a     \
+    $(top_builddir)/src/lib/libCHIP.a                       \
+    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)    \
     $(NULL)
 
 NLFOREIGN_FILE_DEPENDENCIES = \

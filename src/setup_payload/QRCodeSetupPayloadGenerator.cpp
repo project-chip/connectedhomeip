@@ -100,12 +100,15 @@ CHIP_ERROR writeOptionaData(TLVWriter & writer, vector<OptionalQRCodeInfo> optio
         if (info.type == optionalQRCodeInfoTypeString)
         {
             err = writer.PutString(info.tag, info.data.c_str());
+            SuccessOrExit(err);
         }
         else if (info.type == optionalQRCodeInfoTypeInt)
         {
             err = writer.Put(info.tag, static_cast<int64_t>(info.integer));
+            SuccessOrExit(err);
         }
     }
+exit:
     return err;
 }
 
@@ -216,11 +219,10 @@ exit:
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(string & base41Representation)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t tlvDataStart[2048];
+    uint8_t tlvDataStart[512]; // TODO: Allow caller to allocate buffer #825
     uint32_t tlvDataLengthInBytes = 0;
 
     VerifyOrExit(mPayload.isValidQRCodePayload(), err = CHIP_ERROR_INVALID_ARGUMENT);
-
     err = generateTLVFromOptionalData(mPayload, tlvDataStart, sizeof(tlvDataStart), tlvDataLengthInBytes);
     SuccessOrExit(err);
 

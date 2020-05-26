@@ -105,15 +105,15 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
     switch (parameter.key)
     {
     case SetupPayloadKey_Version:
-        printf("Loaded version: %llu\n", parameter.uintValue);
+        printf("Loaded version: %u\n", (uint8_t) parameter.uintValue);
         setupPayload.version = (uint8_t) parameter.uintValue;
         break;
     case SetupPayloadKey_VendorID:
-        printf("Loaded vendorID: %llu\n", parameter.uintValue);
+        printf("Loaded vendorID: %u\n", (uint16_t) parameter.uintValue);
         setupPayload.vendorID = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_ProductID:
-        printf("Loaded productID: %llu\n", parameter.uintValue);
+        printf("Loaded productID: %u\n", (uint16_t) parameter.uintValue);
         setupPayload.productID = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_RequiresCustomFlowTrue:
@@ -121,15 +121,15 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, SetupPayloadParamete
         setupPayload.requiresCustomFlow = true;
         break;
     case SetupPayloadKey_RendezVousInformation:
-        printf("Loaded rendezvousInfo: %llu\n", parameter.uintValue);
+        printf("Loaded rendezvousInfo: %u\n", (uint16_t) parameter.uintValue);
         setupPayload.rendezvousInformation = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_Discriminator:
-        printf("Loaded discriminator: %llu\n", parameter.uintValue);
+        printf("Loaded discriminator: %u\n", (uint16_t) parameter.uintValue);
         setupPayload.discriminator = (uint16_t) parameter.uintValue;
         break;
     case SetupPayloadKey_SetupPINCode:
-        printf("Loaded setupPinCode: %llu\n", parameter.uintValue);
+        printf("Loaded setupPinCode: %lu\n", (unsigned long) parameter.uintValue);
         setupPayload.setUpPINCode = (uint32_t) parameter.uintValue;
         break;
     default:
