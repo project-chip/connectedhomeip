@@ -15,3 +15,8 @@ mbedtls-build:
         BOOTSTRAP_ARGUMENTS: " --with-crypto=mbedtls"
     docker:
         - image: connectedhomeip/chip-build:0.2.11
+clang-build:
+    environment:
+        BOOTSTRAP_ARGUMENTS: " CC=clang-9 CXX=clang++-9"
+    docker:
+        - image: connectedhomeip/chip-build:0.2.11

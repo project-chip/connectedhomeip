@@ -24,20 +24,20 @@ steps:
     - run:
           name: Run Crypto Tests
           command:
-              scripts/tools/run_if.sh "main-build mbedtls-build" "$BUILD_TYPE"
-              scripts/tests/crypto_tests.sh
+              scripts/tools/run_if.sh "main-build mbedtls-build clang-build"
+              "$BUILD_TYPE" scripts/tests/crypto_tests.sh
     - run:
           name: Run Setup Payload Tests
           command:
-              scripts/tools/run_if.sh "main-build ubuntu-16-lts" "$BUILD_TYPE"
-              scripts/tests/setup_payload_tests.sh
+              scripts/tools/run_if.sh "main-build ubuntu-16-lts clang-build"
+              "$BUILD_TYPE" scripts/tests/setup_payload_tests.sh
     - run:
           name: OpenSSL Tests
           command:
-              scripts/tools/run_if.sh "main-build" "$BUILD_TYPE"
+              scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE"
               scripts/tests/openssl_tests.sh
     - run:
           name: Run All Unit & Functional Tests
           command:
-              scripts/tools/run_if.sh "main-build" "$BUILD_TYPE"
+              scripts/tools/run_if.sh "main-build clang-build" "$BUILD_TYPE"
               scripts/tests/all_tests.sh

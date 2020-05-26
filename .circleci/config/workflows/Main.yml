@@ -3,7 +3,7 @@ jobs:
           name: Build CHIP [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["main-build", "mbedtls-build"]
+                  builder: ["main-build", "mbedtls-build", "clang-build"]
           filters:
               branches:
                   ignore:
@@ -12,7 +12,7 @@ jobs:
           name: Run Tests [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["main-build", "mbedtls-build"]
+                  builder: ["main-build", "mbedtls-build", "clang-build"]
           requires:
               - Build CHIP [<< matrix.builder >>]
           filters:
