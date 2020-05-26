@@ -30,7 +30,7 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @property (readonly, copy) NSString * ip;
 @property (readonly) UInt16 port;
-- (instancetype)initWithIP:()ip andPort:(UInt16)port;
+- (instancetype)initWithIP:(NSString *)ip andPort:(UInt16)port;
 
 @end
 

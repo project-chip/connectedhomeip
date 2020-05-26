@@ -29,7 +29,7 @@ static const char * const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
 @implementation AddressInfo
-- (instancetype) initWithIP:()ip andPort:(UInt16)port {
+- (instancetype) initWithIP:(NSString *)ip andPort:(UInt16)port {
     if (self = [super init]) {
         _ip = ip;
         _port = port;
