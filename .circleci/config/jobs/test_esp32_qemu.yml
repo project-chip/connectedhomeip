@@ -1,0 +1,8 @@
+environment:
+    BUILD_TYPE: esp32-qemu-build
+executor: esp32-qemu-build
+steps:
+    - checkout
+    - run:
+          name: Build ESP32 QEMU and Run Tests
+          command: scripts/tests/esp32_qemu_tests.sh
