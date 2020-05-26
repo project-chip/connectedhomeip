@@ -23,6 +23,8 @@
 
 #include "ManualSetupPayloadParser.h"
 
+#include <support/verhoeff/Verhoeff.h>
+
 #include <iostream>
 #include <math.h>
 #include <string>
@@ -31,13 +33,21 @@
 using namespace chip;
 using namespace std;
 
-static CHIP_ERROR checkDecimalStringValidity(string decimalString)
+static CHIP_ERROR checkDecimalStringValidity(string decimalString, string & decimalStringWithoutCheckDigit)
 {
-    if (decimalString.length() == 0)
+    if (decimalString.length() < 2)
     {
         fprintf(stderr, "\nFailed decoding base10. Input was empty. %zu\n", decimalString.length());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
+    string repWithoutCheckChar = decimalString.substr(0, decimalString.length() - 1);
+    char checkChar             = decimalString.back();
+
+    if (!Verhoeff10::ValidateCheckChar(checkChar, repWithoutCheckChar.c_str()))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    decimalStringWithoutCheckDigit = repWithoutCheckChar;
     return CHIP_NO_ERROR;
 }
 
@@ -118,8 +128,11 @@ static CHIP_ERROR readBitsFromNumber(int32_t number, int & index, uint64_t & des
 
 CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
+    CHIP_ERROR result = CHIP_NO_ERROR;
     SetupPayload payload;
-    CHIP_ERROR result = checkDecimalStringValidity(mDecimalStringRepresentation);
+    string representationWithoutCheckDigit;
+
+    result = checkDecimalStringValidity(mDecimalStringRepresentation, representationWithoutCheckDigit);
     if (result != CHIP_NO_ERROR)
     {
         return result;
@@ -127,14 +140,14 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     int stringOffset = 0;
     uint64_t shortCode;
-    result = readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, shortCode, kManualSetupShortCodeCharLength);
+    result = readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, shortCode, kManualSetupShortCodeCharLength);
     if (result != CHIP_NO_ERROR)
     {
         return result;
     }
 
     bool isLongCode = (shortCode & 1) == 1;
-    result          = checkCodeLengthValidity(mDecimalStringRepresentation, isLongCode);
+    result          = checkCodeLengthValidity(representationWithoutCheckDigit, isLongCode);
     if (result != CHIP_NO_ERROR)
     {
         return result;
@@ -165,7 +178,8 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     if (isLongCode)
     {
         uint64_t vendorID;
-        result = readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, vendorID, kManualSetupVendorIdCharLength);
+        result =
+            readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, vendorID, kManualSetupVendorIdCharLength);
         if (result != CHIP_NO_ERROR)
         {
             return result;
@@ -173,7 +187,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
         uint64_t productID;
         result =
-            readDigitsFromDecimalString(mDecimalStringRepresentation, stringOffset, productID, kManualSetupProductIdCharLength);
+            readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, productID, kManualSetupProductIdCharLength);
         if (result != CHIP_NO_ERROR)
         {
             return result;
@@ -184,5 +198,5 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     outPayload.setUpPINCode  = setUpPINCode;
     outPayload.discriminator = discriminator;
 
-    return CHIP_NO_ERROR;
+    return result;
 }
