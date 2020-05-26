@@ -15,9 +15,7 @@
  *    limitations under the License.
  */
 
-
 #import <Foundation/Foundation.h>
-
 
 #import "CHIPDeviceController.h"
 #import "CHIPError.h"
@@ -27,11 +25,11 @@
 #include <inet/IPAddress.h>
 #include <system/SystemPacketBuffer.h>
 
-static const char *const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
-static const char *const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
+static const char * const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
+static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
 @interface CHIPDeviceController () {
-    chip::DeviceController::ChipDeviceController* _cppController;
+    chip::DeviceController::ChipDeviceController * _cppController;
     // queue used for all interactions with the cpp chip controller and for all chip internal events
     // try to run small jobs in this queue
     dispatch_queue_t _chipWorkQueue;
@@ -40,7 +38,7 @@ static const char *const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
     dispatch_queue_t _chipSelectQueue;
     // queue used to signal callbacks to the application
     dispatch_queue_t _appCallbackQueue;
-    
+
     ControllerOnMessageBlock _onMessageHandler;
     ControllerOnErrorBlock _onErrorHandler;
 }
@@ -50,55 +48,56 @@ static const char *const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 @property (readonly) dispatch_queue_t appCallbackQueue;
 @property (readonly) ControllerOnMessageBlock onMessageHandler;
 @property (readonly) ControllerOnErrorBlock onErrorHandler;
-@property (readonly) chip::DeviceController::ChipDeviceController* cppController;
+@property (readonly) chip::DeviceController::ChipDeviceController * cppController;
 
 @end
 
 @implementation CHIPDeviceController
 
-- (instancetype)initWithCallbackQueue:(dispatch_queue_t)appCallbackQueue {
+- (instancetype)initWithCallbackQueue:(dispatch_queue_t)appCallbackQueue
+{
     if (self = [super init]) {
         _appCallbackQueue = appCallbackQueue;
         _chipWorkQueue = dispatch_queue_create(CHIP_WORK_QUEUE, DISPATCH_QUEUE_SERIAL);
         if (!_chipWorkQueue) {
             return nil;
         }
-        
+
         _chipSelectQueue = dispatch_queue_create(CHIP_SELECT_QUEUE, DISPATCH_QUEUE_SERIAL);
         if (!_chipSelectQueue) {
             return nil;
         }
-        
+
         _cppController = new chip::DeviceController::ChipDeviceController();
-        if(!_cppController) {
+        if (!_cppController) {
             CHIP_LOG_ERROR("Error: couldn't create c++ controller");
             return nil;
         }
-        
-        if (CHIP_NO_ERROR != _cppController->Init()){
+
+        if (CHIP_NO_ERROR != _cppController->Init()) {
             CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
             delete _cppController;
             _cppController = NULL;
             return nil;
         }
     }
-    
+
     return self;
 }
 
 static void onMessageReceived(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState,
-                              chip::System::PacketBuffer * buffer, const chip::IPPacketInfo * packet_info)
+    chip::System::PacketBuffer * buffer, const chip::IPPacketInfo * packet_info)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
-    
+
     char src_addr[INET_ADDRSTRLEN];
     size_t data_len = buffer->DataLength();
-    
+
     packet_info->SrcAddress.ToString(src_addr, sizeof(src_addr));
-    NSString* ipAddress = [[NSString alloc] initWithUTF8String:src_addr];
-    
-    //convert to NSData and pass back to the application
-    NSMutableData* dataBuffer = [[NSMutableData alloc] initWithBytes:buffer->Start() length:data_len];
+    NSString * ipAddress = [[NSString alloc] initWithUTF8String:src_addr];
+
+    // convert to NSData and pass back to the application
+    NSMutableData * dataBuffer = [[NSMutableData alloc] initWithBytes:buffer->Start() length:data_len];
     buffer = buffer->Next();
 
     while (buffer != NULL) {
@@ -106,16 +105,16 @@ static void onMessageReceived(chip::DeviceController::ChipDeviceController * dev
         [dataBuffer appendBytes:buffer->Start() length:data_len];
         buffer = buffer->Next();
     }
-    
+
     [controller _dispatchAsyncMessageBlock:dataBuffer ipAddress:ipAddress port:packet_info->SrcPort];
-    
-    //ignore unused variable
+
+    // ignore unused variable
     (void) deviceController;
     chip::System::PacketBuffer::Free(buffer);
 }
 
 static void onInternalError(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
-                            const chip::IPPacketInfo * pi)
+    const chip::IPPacketInfo * pi)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
     [controller _dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:error]];
@@ -124,29 +123,33 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 - (void)_dispatchAsyncErrorBlock:(NSError *)error
 {
     CHIP_LOG_METHOD_ENTRY();
-    //to avoid retaining "self"
+    // to avoid retaining "self"
     ControllerOnErrorBlock onErrorHandler = self.onErrorHandler;
-    
+
     dispatch_async(_appCallbackQueue, ^() {
         onErrorHandler(error);
     });
 }
 
-- (void)_dispatchAsyncMessageBlock:(NSData *)data ipAddress:(NSString*)ipAddress port:(UInt16)port
+- (void)_dispatchAsyncMessageBlock:(NSData *)data ipAddress:(NSString *)ipAddress port:(UInt16)port
 {
     CHIP_LOG_METHOD_ENTRY();
-    //to avoid retaining "self"
+    // to avoid retaining "self"
     ControllerOnMessageBlock onMessageHandler = self.onMessageHandler;
-    
+
     dispatch_async(_appCallbackQueue, ^() {
         onMessageHandler(data, ipAddress, port);
     });
 }
 
-
-- (BOOL)connect:(NSString *)ipAddress port:(UInt16)port error:(NSError * __autoreleasing *)error onMessage:(ControllerOnMessageBlock)onMessage onError:(ControllerOnErrorBlock)onError {
+- (BOOL)connect:(NSString *)ipAddress
+           port:(UInt16)port
+          error:(NSError * __autoreleasing *)error
+      onMessage:(ControllerOnMessageBlock)onMessage
+        onError:(ControllerOnErrorBlock)onError
+{
     __block CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     // TODO maybe refactor
     // the work queue is being used for atomic access to chip's cpp controller
     // this could be done async but the error we care about is sync. However, I think this could be restructured such that
@@ -157,7 +160,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
         err = self.cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError, port);
     });
-    
+
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error: %@, connect failed", [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
@@ -165,35 +168,36 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         }
         return NO;
     }
-    
+
     // Set the callback handlers
     if (onMessage) {
-    _onMessageHandler = onMessage;
+        _onMessageHandler = onMessage;
     }
     if (onError) {
-    _onErrorHandler = onError;
+        _onErrorHandler = onError;
     }
-    
+
     // Start the IO pump
     [self _serviceEvents];
 
     return YES;
 }
 
-- (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error {
+- (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error
+{
     __block CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     dispatch_sync(self.chipWorkQueue, ^() {
         size_t messageLen = [message length];
         const void * messageChars = [message bytes];
-        
+
         chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(messageLen);
         buffer->SetDataLength(messageLen);
-        
+
         memcpy(buffer->Start(), messageChars, messageLen);
         err = self.cppController->SendMessage((__bridge void *) self, buffer);
     });
-    
+
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error: %@, send failed", [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
@@ -204,13 +208,14 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return YES;
 }
 
-- (BOOL)disconnect:(NSError * __autoreleasing *)error {
+- (BOOL)disconnect:(NSError * __autoreleasing *)error
+{
     __block CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     dispatch_sync(self.chipWorkQueue, ^() {
         err = self.cppController->DisconnectDevice();
     });
-    
+
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error: %@, disconnect failed", [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
@@ -221,14 +226,15 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return YES;
 }
 
-- (BOOL)isConnected {
+- (BOOL)isConnected
+{
     __block bool isConnected = false;
-    
-    //the work queue is being used for atomic access to chip's cpp controller
+
+    // the work queue is being used for atomic access to chip's cpp controller
     dispatch_sync(self.chipWorkQueue, ^() {
         isConnected = self.cppController->IsConnected();
     });
-    
+
     return isConnected ? YES : NO;
 }
 
@@ -239,12 +245,12 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         __block fd_set readFDs, writeFDs, exceptFDs;
         struct timeval aSleepTime;
         int numFDs = 0;
-        aSleepTime.tv_sec  = 5;
-        
+        aSleepTime.tv_sec = 5;
+
         FD_ZERO(&readFDs);
         FD_ZERO(&writeFDs);
         FD_ZERO(&exceptFDs);
-        
+
         chip::System::Layer * systemLayer = NULL;
         chip::Inet::InetLayer * inetLayer = NULL;
         // ask for the system and inet layers
@@ -252,13 +258,13 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
         if (systemLayer != NULL && systemLayer->State() == chip::System::kLayerState_Initialized)
             systemLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-        
+
         if (inetLayer != NULL && inetLayer->State == chip::Inet::InetLayer::kState_Initialized)
             inetLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-        
+
         dispatch_async(self.chipSelectQueue, ^() {
             int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, const_cast<struct timeval *>(&aSleepTime));
-            
+
             dispatch_async(self.chipWorkQueue, ^() {
                 if (!self.cppController->IsConnected()) {
                     // cancel the loop, it'll restart the next time a connection is established
@@ -267,14 +273,12 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
                 chip::System::Layer * systemLayer = NULL;
                 chip::Inet::InetLayer * inetLayer = NULL;
                 self.cppController->GetLayers(&systemLayer, &inetLayer);
-                
-                if (systemLayer != NULL && systemLayer->State() == chip::System::kLayerState_Initialized)
-                {
+
+                if (systemLayer != NULL && systemLayer->State() == chip::System::kLayerState_Initialized) {
                     systemLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
                 }
-                
-                if (inetLayer != NULL && inetLayer->State == chip::Inet::InetLayer::kState_Initialized)
-                {
+
+                if (inetLayer != NULL && inetLayer->State == chip::Inet::InetLayer::kState_Initialized) {
                     inetLayer->HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
                 }
 
