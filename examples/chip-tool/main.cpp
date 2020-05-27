@@ -65,42 +65,56 @@ static void ReceiveError(chip::DeviceController::ChipDeviceController * deviceCo
     printf("ERROR: %s\n Got UDP error\n", ErrorStr(error));
 }
 
+void ShowUsage(const char* executable)
+{
+    fprintf(stderr,
+            "Usage: \n"
+            "  %s device-ip-address device-port\n",
+            executable);
+}
+
+bool DetermineAddress(int argc, char* argv[], IPAddress* hostAddr, uint16_t* port)
+{
+    if (argc < 3) {
+        return false;
+    }
+
+    if (!IPAddress::FromString(argv[1], *hostAddr))
+    {
+        fputs("Error: Invalid device IP address", stderr);
+        return false;
+    }
+
+    std::string port_str(argv[2]);
+    std::stringstream ss(port_str);
+    ss >> *port;
+    if (ss.fail() || !ss.eof())
+    {
+        fputs("Error: Invalid device port", stderr);
+        return false;
+    }
+
+    return true;
+}
+
 // ================================================================================
 // Main Code
 // ================================================================================
 
-int main(void)
+int main(int argc, char* argv[])
 {
+    IPAddress host_addr;
+    uint16_t port;
+    if (!DetermineAddress(argc, argv, &host_addr, &port)) {
+        ShowUsage(argv[0]);
+        return -1;
+    }
+
     size_t payload_len = strlen(PAYLOAD);
 
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
     snprintf((char *) buffer->Start(), payload_len + 1, "%s", PAYLOAD);
     buffer->SetDataLength(payload_len);
-
-    std::string host_ip;
-    std::cout << "Please, enter the Echo Host's IP Address: ";
-    std::getline(std::cin, host_ip);
-
-    IPAddress host_addr;
-    if (!IPAddress::FromString(host_ip.c_str(), host_addr))
-    {
-        printf("Error: Invalid Host Address\n");
-        return -1;
-    }
-    IPAddress local_addr;
-    VerifyOrDie(IPAddress::FromString("127.0.0.1", local_addr));
-
-    uint16_t port;
-    std::string port_str;
-    std::cout << "Please, enter the Echo Host's Port: ";
-    getline(std::cin, port_str);
-    std::stringstream ss(port_str);
-    ss >> port;
-    if (ss.fail() || !ss.eof())
-    {
-        printf("Error: Invalid Host Port\n");
-        return -1;
-    }
 
     chip::DeviceController::ChipDeviceController * controller = new chip::DeviceController::ChipDeviceController();
     controller->Init();
@@ -108,12 +122,14 @@ int main(void)
     controller->ConnectDevice(1, host_addr, NULL, EchoResponse, ReceiveError, port);
 
     // Run the client
+    char host_ip_str[40];
+    host_addr.ToString(host_ip_str, sizeof(host_ip_str));
     while (1)
     {
         // Send calls release on this buffer, so bump up the ref because we want to reuse it
         buffer->AddRef();
         controller->SendMessage(NULL, buffer);
-        printf("Msg sent to server at %s:%d\n", host_ip.c_str(), port);
+        printf("Msg sent to server at %s:%d\n", host_ip_str, port);
 
         controller->ServiceEvents();
 
