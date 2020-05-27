@@ -86,8 +86,8 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
 #include "em_device.h"
+#include <stdio.h>
 
 /*-----------------------------------------------------------
  * Application specific definitions.

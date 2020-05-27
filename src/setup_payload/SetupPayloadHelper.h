@@ -23,8 +23,8 @@
 #ifndef SetupPayloadHelper_h
 #define SetupPayloadHelper_h
 
-#include <string>
 #include <core/CHIPError.h>
+#include <string>
 
 using namespace std;
 

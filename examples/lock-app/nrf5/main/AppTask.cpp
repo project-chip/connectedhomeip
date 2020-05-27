@@ -21,9 +21,9 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 
+#include "app_button.h"
 #include "app_config.h"
 #include "app_timer.h"
-#include "app_button.h"
 #include "boards.h"
 
 #include "nrf_log.h"

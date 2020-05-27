@@ -19,8 +19,8 @@
 #ifndef LOCK_MANAGER_H
 #define LOCK_MANAGER_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "AppEvent.h"
 

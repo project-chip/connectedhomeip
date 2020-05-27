@@ -27,8 +27,8 @@
 #ifndef ESP_CONFIG_H
 #define ESP_CONFIG_H
 
-#include "sdkconfig.h"
 #include "mbedtls/config.h"
+#include "sdkconfig.h"
 
 /**
  * \name SECTION: System support

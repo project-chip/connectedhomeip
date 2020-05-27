@@ -21,8 +21,8 @@
 #include <stdint.h>
 
 #include "boards.h"
-#include "nrf_log.h"
 #include "nrf_delay.h"
+#include "nrf_log.h"
 #ifdef SOFTDEVICE_PRESENT
 #include "nrf_sdh.h"
 #include "nrf_sdh_ble.h"
@@ -38,13 +38,13 @@ extern "C" {
 }
 
 #if NRF_LOG_ENABLED
+#include "nrf_log_backend_uart.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
-#include "nrf_log_backend_uart.h"
 #endif // NRF_LOG_ENABLED
 
-#include <platform/CHIPDeviceLayer.h>
 #include <AppTask.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;

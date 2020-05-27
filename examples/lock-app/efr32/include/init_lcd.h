@@ -23,8 +23,8 @@
 extern "C" {
 #endif
 
-#include "board_features.h"
 #include "AppConfig.h"
+#include "board_features.h"
 #define MAX_STR_LEN 48
 
 void initLCD(void);

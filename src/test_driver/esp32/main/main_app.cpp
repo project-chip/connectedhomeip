@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
 #include "esp_log.h"
+#include <stdio.h>
 
 #include <support/TestUtils.h>
 

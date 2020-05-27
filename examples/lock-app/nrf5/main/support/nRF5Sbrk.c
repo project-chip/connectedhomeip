@@ -22,8 +22,8 @@
  *
  */
 
-#include <stdlib.h>
 #include <errno.h>
+#include <stdlib.h>
 
 extern void OnSBRKFail(char * heapBase, char * heapLimit, char * heapBreak, ptrdiff_t inc);
 

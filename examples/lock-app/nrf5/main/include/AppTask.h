@@ -19,12 +19,12 @@
 #ifndef APP_TASK_H
 #define APP_TASK_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "FreeRTOS.h"
-#include "task.h"
 #include "semphr.h"
+#include "task.h"
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"

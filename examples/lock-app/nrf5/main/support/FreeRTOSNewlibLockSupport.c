@@ -23,10 +23,10 @@
  *
  */
 
-#include <sys/lock.h>
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
+#include <sys/lock.h>
 
 /*
  * Global mutex objects used by newlib.

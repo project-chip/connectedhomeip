@@ -16,8 +16,8 @@
  */
 
 #include "SetupPayloadHelper.h"
-#include "QRCodeSetupPayloadGenerator.h"
 #include "ManualSetupPayloadGenerator.h"
+#include "QRCodeSetupPayloadGenerator.h"
 #include "SetupPayload.h"
 #include <fstream>
 

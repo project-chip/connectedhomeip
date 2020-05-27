@@ -25,9 +25,9 @@
  *
  */
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 
 // Include header file from mpaland printf.
 #include "printf.h"

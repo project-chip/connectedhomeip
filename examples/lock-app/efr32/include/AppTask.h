@@ -20,8 +20,8 @@
 #ifndef APP_TASK_H
 #define APP_TASK_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
