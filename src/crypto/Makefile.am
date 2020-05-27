@@ -39,10 +39,12 @@ libChipCrypto_a_CPPFLAGS            = \
     $(NULL)
 
 libChipCrypto_a_SOURCES                                       = \
+    CHIPSecureChannel.cpp                                       \
     $(NULL)
 
 dist_libChipCrypto_a_HEADERS                                 = \
     CHIPCryptoPAL.h                                            \
+    CHIPSecureChannel.h                                        \
     $(NULL)
 
 if CHIP_CRYPTO_OPENSSL

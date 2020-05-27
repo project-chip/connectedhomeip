@@ -22,7 +22,7 @@
  *
  */
 
-#include "TestCore.h"
+#include "TestCryptoLayer.h"
 
 #include <nlunit-test.h>
 

@@ -46,6 +46,7 @@ lib_LIBRARIES                                  = \
 
 libCryptoLayerTests_a_SOURCES                  = \
     CHIPCryptoPALTest.cpp                        \
+    TestCHIPSecureChannel.cpp                    \
     $(NULL)
 
 libCryptoLayerTests_adir                       = $(includedir)/crypto
@@ -108,6 +109,7 @@ else # CHIP_TARGET_STYLE_EMBEDDED
 
 check_PROGRAMS                                += \
     TestCryptoPAL                                \
+    TestCHIPSecureChannel                        \
     $(NULL)
 
 endif # CHIP_TARGET_STYLE_EMBEDDED
@@ -121,11 +123,11 @@ TESTS                                          = \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
-TestCryptoPAL_LDADD                            =        \
-    $(COMMON_LDADD)                                     \
-    $(NULL)
-
+TestCryptoPAL_LDADD                            = $(COMMON_LDADD)
 TestCryptoPAL_SOURCES                          = CHIPCryptoPALTestDriver.cpp
+
+TestCHIPSecureChannel_LDADD                    = $(COMMON_LDADD)
+TestCHIPSecureChannel_SOURCES                  = TestCHIPSecureChannelDriver.cpp
 
 #
 # Foreign make dependencies

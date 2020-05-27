@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 int TestCHIPCryptoPAL(void);
+int TestCHIPSecureChannel(void);
 
 #ifdef __cplusplus
 }

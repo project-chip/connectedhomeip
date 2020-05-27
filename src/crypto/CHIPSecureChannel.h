@@ -26,7 +26,9 @@
 #ifndef __CHIPSECURECHANNEL_H__
 #define __CHIPSECURECHANNEL_H__
 
-#include <core/CHIPCore.h>
+#include <core/CHIPConfig.h>
+#include <core/CHIPError.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 
@@ -35,18 +37,45 @@ class DLL_EXPORT ChipSecureChannel
 public:
     /**
      * @brief
-     *   Derive a shared key. The derived key will be used for encryting/decrypting
-     *   data exchanged on the secure channel.
+     *   Initialization parameters of secure channel
      *
      * @param remote_public_key  A pointer to peer's public key
      * @param public_key_length  Length of remote_public_key
      * @param local_private_key  A pointer to local private key
      * @param private_key_length Length of local_private_key
+     * @param salt               Salt used for key derivation
+     * @param salt_length        Length of salt
+     * @param info               Info used for key derivation
+     * @param info_length        Length of info
+     */
+    typedef struct
+    {
+        const unsigned char * remote_public_key;
+        size_t public_key_length;
+        const unsigned char * local_private_key;
+        size_t private_key_length;
+        const unsigned char * salt;
+        size_t salt_length;
+        const unsigned char * info;
+        size_t info_length;
+    } secure_channel_params_t;
+
+    /**
+     * @brief
+     *   Derive a shared key. The derived key will be used for encryting/decrypting
+     *   data exchanged on the secure channel.
+     *
+     * @param parameters  A pointer to channel parameters
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR Init(const unsigned char * remote_public_key, const size_t public_key_length,
-                    const unsigned char * local_private_key, const size_t private_key_length, const unsigned char * salt,
-                    const size_t salt_length, const unsigned char * info, const size_t info_length);
+    CHIP_ERROR Init(const secure_channel_params_t * parameters);
+
+    /**
+     * @brief
+     *   Close the channel, and release its resources. The released channel can be
+     *   reused for a new security context by calling Init().
+     */
+    void Close(void);
 
     /**
      * @brief

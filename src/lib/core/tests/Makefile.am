@@ -44,7 +44,6 @@ libCoreTests_a_SOURCES                                = \
     TestCHIPErrorStr.cpp                                \
     TestCHIPTLV.cpp                                     \
     TestCHIPConnection.cpp                              \
-    TestCHIPSecureChannel.cpp                           \
     $(NULL)
 
 libCoreTests_adir                                     = $(includedir)/core
@@ -90,7 +89,6 @@ check_PROGRAMS                                        = \
     TestCHIPErrorStr                                    \
     TestCHIPTLV                                         \
     TestCHIPConnection                                  \
-    TestCHIPSecureChannel                               \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -116,9 +114,6 @@ TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
 
 TestCHIPConnection_SOURCES                            = TestCHIPConnectionDriver.cpp
 TestCHIPConnection_LDADD                              = $(COMMON_LDADD)
-
-TestCHIPSecureChannel_SOURCES                         = TestCHIPSecureChannelDriver.cpp
-TestCHIPSecureChannel_LDADD                           = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies
