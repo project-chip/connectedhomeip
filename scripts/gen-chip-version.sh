@@ -99,7 +99,7 @@ declare chip_version=$1
 # Establish the copyright year and script base name scalar variables
 # for substitution in the here document output.
 
-declare first_year=2018
+declare first_year=2020
 declare current_year=$(date "+%Y")
 
 declare copyright_year=$first_year
