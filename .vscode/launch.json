@@ -8,7 +8,7 @@
             "name": "QRCode Tests",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/default/src/setup_payload/tests/TestQrCode",
+            "program": "${workspaceFolder}/build/default/src/setup_payload/tests/TestQRCode",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
