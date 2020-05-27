@@ -94,15 +94,15 @@ done
 ((${#@} < 1)) && usage 2 please pass a version on the command line
 ((${#@} > 1)) && usage 2 too many arguments
 
-declare chip_version=$1
+declare chip_version="$1"
 
 # Establish the copyright year and script base name scalar variables
 # for substitution in the here document output.
 
 declare first_year=2020
-declare current_year=$(date "+%Y")
+declare current_year="$(date "+%Y")"
 
-declare copyright_year=$first_year
+declare copyright_year="$first_year"
 
 ((first_year < current_year)) && {
     copyright_year+="-$current_year"
@@ -121,7 +121,7 @@ read -r chip_major chip_minor chip_patch chip_extra <<<"${chip_version//./ }"
 
 # Major and minor should be numbers. If they're not use the full input version as
 #  the "extra" and set everything else back to 0
-[ ${chip_major} -eq ${chip_major} -a ${chip_minor} -eq ${chip_minor} ] 2>/dev/null || {
+[ "$chip_major" -eq "$chip_major" -a "$chip_minor" -eq "$chip_minor" ] 2>/dev/null || {
     chip_major=0
     chip_minor=0
     chip_patch=0
@@ -129,8 +129,8 @@ read -r chip_major chip_minor chip_patch chip_extra <<<"${chip_version//./ }"
 }
 
 # If chip_patch isn't a number, set chip_patch to zero and push the non-number back into chip_extra
-[ ${chip_patch} -eq ${chip_patch} ] || {
-    chip_extra=.${chip_patch}${chip_extra}
+[ "$chip_patch" -eq "$chip_patch" ] || {
+    chip_extra=.$chip_patch$chip_extra
     chip_patch=0
 }
 
