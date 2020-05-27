@@ -65,7 +65,7 @@ static void ReceiveError(chip::DeviceController::ChipDeviceController * deviceCo
     printf("ERROR: %s\n Got UDP error\n", ErrorStr(error));
 }
 
-void ShowUsage(const char* executable)
+void ShowUsage(const char * executable)
 {
     fprintf(stderr,
             "Usage: \n"
@@ -73,9 +73,10 @@ void ShowUsage(const char* executable)
             executable);
 }
 
-bool DetermineAddress(int argc, char* argv[], IPAddress* hostAddr, uint16_t* port)
+bool DetermineAddress(int argc, char * argv[], IPAddress * hostAddr, uint16_t * port)
 {
-    if (argc < 3) {
+    if (argc < 3)
+    {
         return false;
     }
 
@@ -101,11 +102,12 @@ bool DetermineAddress(int argc, char* argv[], IPAddress* hostAddr, uint16_t* por
 // Main Code
 // ================================================================================
 
-int main(int argc, char* argv[])
+int main(int argc, char * argv[])
 {
     IPAddress host_addr;
     uint16_t port;
-    if (!DetermineAddress(argc, argv, &host_addr, &port)) {
+    if (!DetermineAddress(argc, argv, &host_addr, &port))
+    {
         ShowUsage(argv[0]);
         return -1;
     }
