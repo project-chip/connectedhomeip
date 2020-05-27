@@ -23,12 +23,13 @@ Building the example application is quite straightforward.
 
 ## Using the Echo Client
 
-To start the Echo Client run the built executable and pass it the IP address and port of the server to talk to.
+To start the Echo Client run the built executable and pass it the IP address and
+port of the server to talk to.
 
           $ ./build/chip-standalone-demo.out 192.168.0.30 8000
 
-If valid values are supplied, it will begin to periodically send
-messages to the server address provided.
+If valid values are supplied, it will begin to periodically send messages to the
+server address provided.
 
 It also verifies that the incoming echo from the server matches what was sent
 out.
