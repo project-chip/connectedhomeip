@@ -43,12 +43,12 @@ int testCodecSimple()
     //   unsigned int, 4 bytes, value = 0xABCD1234
     //   unsigned length-prefixed string, 1 byte length, value of string "This is an example of the string."
     //
-    ChipZclRawBuffer_t * buffer = chipZclBufferAlloc(1000);
-    uint8_t num1                = 0x13;
-    uint16_t num2               = 0x4231;
-    uint32_t num4               = 0xABCD1234;
-    char * sIn                  = "Test data is encoded and decoded back.";
-    char * sOut                 = malloc(100);
+    ChipZclBuffer_t * buffer = chipZclBufferAlloc(1000);
+    uint8_t num1             = 0x13;
+    uint16_t num2            = 0x4231;
+    uint32_t num4            = 0xABCD1234;
+    char * sIn               = "Test data is encoded and decoded back.";
+    char * sOut              = malloc(100);
     uint16_t ret;
 
     chipZclCodecEncodeStart(buffer);
