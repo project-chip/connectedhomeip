@@ -43,9 +43,50 @@ private:
     SetupPayload mPayload;
 
 public:
-    CHIP_ERROR payloadBinaryRepresentation(string & binaryRepresentation);
-    CHIP_ERROR payloadBase41Representation(string & base41Representation);
     QRCodeSetupPayloadGenerator(SetupPayload setupPayload) : mPayload(setupPayload){};
+
+    /**
+     * This function is called to encode the binary data of a payload to a
+     * base41 string using CHIP TLV encoding scheme.
+     *
+     * @param[out] base41Representation
+     *                  The string to copy the base41 to.
+     *
+     * @retval #CHIP_NO_ERROR if the method succeeded.
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT if the payload is invalid.
+     * @retval other Other CHIP or platform-specific error codes indicating
+     *               that an error occurred preventing the function from
+     *               producing the requested string.
+     */
+    CHIP_ERROR payloadBase41Representation(string & base41Representation);
+
+    /**
+     * This function is called to encode the binary data of a payload to a
+     * base41 string. Callers must pass a buffer of at least
+     * chip::kTotalPayloadDataInBytes or more if there is any serialNumber or
+     * any other optional data. The buffer should be big enough to hold the
+     * TLV encoded value of the payload. If not an error will be throw.
+     *
+     * @param[out] base41Representation
+     *                  The string to copy the base41 to.
+     * @param[in]  tlvDataStart
+     *                  A pointer to an uint8_t buffer into which the TLV
+     *                  should be written.
+     * @param[in]  tlvDataStartSize
+     *                  The maximum number of bytes that should be written to
+     *                  the output buffer.
+     *
+     * @retval #CHIP_NO_ERROR if the method succeeded.
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT if the payload is invalid.
+     * @retval other Other CHIP or platform-specific error codes indicating
+     *               that an error occurred preventing the function from
+     *               producing the requested string.
+     */
+    CHIP_ERROR payloadBase41Representation(string & base41Representation, uint8_t * tlvDataStart, size_t tlvDataStartSize);
+
+    // These methods are only used for testing purposes.
+    CHIP_ERROR payloadBinaryRepresentation(string & binaryRepresentation);
+    CHIP_ERROR payloadBinaryRepresentation(string & binaryRepresentation, uint8_t * tlvDataStart, size_t tlvDataStartSize);
 };
 
 }; // namespace chip

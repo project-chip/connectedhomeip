@@ -187,13 +187,19 @@ exit:
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t tlvDataStart[2048];
+    uint8_t tlvDataStart[kTotalPayloadDataSizeInBytes];
+    return payloadBinaryRepresentation(binaryRepresentation, tlvDataStart, sizeof(tlvDataStart));
+}
+
+CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation, uint8_t * tlvDataStart,
+                                                                    size_t tlvDataStartSize)
+{
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     uint32_t tlvDataLengthInBytes = 0;
 
     VerifyOrExit(mPayload.isValidQRCodePayload(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = generateTLVFromOptionalData(mPayload, tlvDataStart, sizeof(tlvDataStart), tlvDataLengthInBytes);
+    err = generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes);
     SuccessOrExit(err);
 
     err = payloadBinaryRepresentationWithTLV(mPayload, binaryRepresentation, kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes,
@@ -221,12 +227,18 @@ exit:
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(string & base41Representation)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t tlvDataStart[512]; // TODO: Allow caller to allocate buffer #825
+    uint8_t tlvDataStart[kTotalPayloadDataSizeInBytes];
+    return payloadBase41Representation(base41Representation, tlvDataStart, sizeof(tlvDataStart));
+}
+
+CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(string & base41Representation, uint8_t * tlvDataStart,
+                                                                    size_t tlvDataStartSize)
+{
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     uint32_t tlvDataLengthInBytes = 0;
 
     VerifyOrExit(mPayload.isValidQRCodePayload(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    err = generateTLVFromOptionalData(mPayload, tlvDataStart, sizeof(tlvDataStart), tlvDataLengthInBytes);
+    err = generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes);
     SuccessOrExit(err);
 
     err = payloadBase41RepresentationWithTLV(mPayload, base41Representation, kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes,
