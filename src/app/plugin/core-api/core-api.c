@@ -20,32 +20,6 @@
 #include "chip-zcl.h"
 
 /**
- * Function that allocates a buffer.
- */
-ChipZclBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
-{
-    ChipZclBuffer_t * buffer = chipZclRawAlloc(sizeof(ChipZclBuffer_t));
-    buffer->buffer           = chipZclRawAlloc(allocatedLength * sizeof(uint8_t));
-    buffer->dataLength       = 0;
-    buffer->currentPosition  = 0;
-    buffer->totalLength      = allocatedLength;
-    return buffer;
-}
-
-/**
- * Creates a zcl buffer out of a raw chunk of memory.
- */
-ChipZclBuffer_t * chipZclBufferCreate(uint8_t * rawBuffer, uint16_t rawLength)
-{
-    ChipZclBuffer_t * buffer = chipZclRawAlloc(sizeof(ChipZclBuffer_t));
-    buffer->buffer           = rawBuffer;
-    buffer->dataLength       = 0;
-    buffer->currentPosition  = 0;
-    buffer->totalLength      = rawLength;
-    return buffer;
-}
-
-/**
  * Function that returns a pointer to the raw buffer.
  */
 uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer)
@@ -59,23 +33,6 @@ uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer)
 uint16_t chipZclBufferUsedLength(ChipZclBuffer_t * buffer)
 {
     return buffer->dataLength;
-}
-
-/**
- * Function that frees a buffer and its storage.
- */
-void chipZclBufferFree(ChipZclBuffer_t * buffer)
-{
-    chipZclRawFree(buffer->buffer);
-    chipZclBufferFreeOnlyBuffer(buffer);
-}
-
-/**
- * Function that frees a buffer but not its storage.
- */
-void chipZclBufferFreeOnlyBuffer(ChipZclBuffer_t * buffer)
-{
-    chipZclRawFree(buffer);
 }
 
 void chipZclBufferReset(ChipZclBuffer_t * buffer)
@@ -99,14 +56,12 @@ ChipZclStatus_t chipZclClusterCommandParse(ChipZclCommandContext_t * context);
 
 ChipZclStatus_t chipZclProcessIncoming(uint8_t * rawBuffer, uint16_t rawBufferLength)
 {
-    ChipZclBuffer_t * buffer          = chipZclBufferCreate(rawBuffer, rawBufferLength);
-    ChipZclCommandContext_t * context = chipZclRawAlloc(sizeof(ChipZclCommandContext_t));
+    ChipZclBuffer_t buffer = { rawBuffer, 0, 0, rawBufferLength };
 
-    chipZclDecodeZclHeader(buffer, context);
-    chipZclClusterCommandParse(context);
+    ChipZclCommandContext_t context = { 0 };
 
-    chipZclRawFree(context);
-    chipZclBufferFreeOnlyBuffer(buffer);
+    chipZclDecodeZclHeader(&buffer, &context);
+    chipZclClusterCommandParse(&context);
 
     return CHIP_ZCL_STATUS_SUCCESS;
 }

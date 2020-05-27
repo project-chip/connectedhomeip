@@ -24,19 +24,14 @@
 #include <stdio.h>
 
 // Test function that creates a command context and populates it with some data.
-ChipZclCommandContext_t * testCreateCommandContext()
+void testInitCommandContext(ChipZclCommandContext_t * context)
 {
-    ChipZclCommandContext_t * context;
-
-    context                  = (ChipZclCommandContext_t *) chipZclRawAlloc(sizeof(ChipZclCommandContext_t));
     context->endpointId      = 1;
     context->clusterId       = CHIP_ZCL_CLUSTER_ON_OFF;
     context->clusterSpecific = true;
     context->mfgSpecific     = false;
     context->commandId       = ZCL_ON_COMMAND_ID;
     context->direction       = ZCL_DIRECTION_CLIENT_TO_SERVER;
-
-    return context;
 }
 
 // Function that tests that the command encoder/decoder works correctly.
@@ -92,13 +87,14 @@ int testClusterCmdOnOff(void)
     // First construct an incoming buffer for test, give it 1024 bytes for no good reason.
     ChipZclBuffer_t * buffer = chipZclBufferAlloc(1024);
 
-    ChipZclCommandContext_t * context = testCreateCommandContext();
+    ChipZclCommandContext_t context;
+    testInitCommandContext(&context);
 
     // Encode the header into the buffer
-    chipZclEncodeZclHeader(buffer, context);
+    chipZclEncodeZclHeader(buffer, &context);
     chipZclBufferFinishWriting(buffer);
 
-    if (testEncodingDecoding(buffer, context) != 0)
+    if (testEncodingDecoding(buffer, &context) != 0)
     {
         return 1;
     }

@@ -96,18 +96,22 @@ void chipZclReverseClusterSpec(const ChipZclClusterSpec_t * s1, ChipZclClusterSp
 }
 
 /**
- * Raw memory allocation. Can be mapped to an equivalent of malloc().
- * Expected to return NULL if it failed.
+ * Function that allocates a buffer.
  */
-void * chipZclRawAlloc(uint16_t allocatedLength)
+ChipZclBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
 {
-    return malloc(allocatedLength);
+    ChipZclBuffer_t * buffer = (ChipZclBuffer_t *) malloc(sizeof(ChipZclBuffer_t) + allocatedLength);
+    buffer->buffer           = (uint8_t *) (buffer + 1);
+    buffer->dataLength       = 0;
+    buffer->currentPosition  = 0;
+    buffer->totalLength      = allocatedLength;
+    return buffer;
 }
 
 /**
- * Raw memory free. Can be mapped to an equivalent of free().
+ * Function that frees a buffer and its storage.
  */
-void chipZclRawFree(void * allocatedMemory)
+void chipZclBufferFree(ChipZclBuffer_t * buffer)
 {
-    free(allocatedMemory);
+    free(buffer);
 }
