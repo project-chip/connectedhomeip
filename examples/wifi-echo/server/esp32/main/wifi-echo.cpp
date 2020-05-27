@@ -15,17 +15,17 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
+#include "LEDWidget.h"
+#include "esp_event_loop.h"
+#include "esp_heap_caps_init.h"
+#include "esp_log.h"
+#include "esp_spi_flash.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_spi_flash.h"
-#include "esp_log.h"
-#include "esp_wifi.h"
-#include "esp_event_loop.h"
 #include "nvs_flash.h"
-#include "esp_heap_caps_init.h"
-#include "LEDWidget.h"
+#include <stdio.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>

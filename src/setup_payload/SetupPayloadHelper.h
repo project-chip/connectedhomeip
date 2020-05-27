@@ -24,6 +24,7 @@
 #define SetupPayloadHelper_h
 
 #include <core/CHIPError.h>
+#include <string>
 
 #include <string>
 

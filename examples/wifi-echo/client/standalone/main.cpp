@@ -11,12 +11,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <support/CHIPLogging.h>
-#include <inet/InetLayer.h>
 #include <core/CHIPError.h>
-#include <support/ErrorStr.h>
-#include <support/CodeUtils.h>
+#include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
+#include <support/CHIPLogging.h>
+#include <support/CodeUtils.h>
+#include <support/ErrorStr.h>
 
 #include <controller/CHIPDeviceController.h>
 

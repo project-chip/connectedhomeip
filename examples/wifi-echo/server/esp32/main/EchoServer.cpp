@@ -15,29 +15,29 @@
  *    limitations under the License.
  */
 
-#include <string.h>
-#include <sys/param.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_log.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "nvs_flash.h"
 #include "tcpip_adapter.h"
+#include <string.h>
+#include <sys/param.h>
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
-#include <inet/UDPEndPoint.h>
+#include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
-#include <inet/IPAddress.h>
-#include <system/SystemPacketBuffer.h>
-#include <support/ErrorStr.h>
+#include <inet/UDPEndPoint.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/ErrorStr.h>
+#include <system/SystemPacketBuffer.h>
 
 #define PORT CONFIG_ECHO_PORT
 
