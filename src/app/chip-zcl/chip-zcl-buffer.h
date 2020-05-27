@@ -27,7 +27,7 @@
 #include <stdint.h>
 
 /**
- * Structure that describes the raw buffers passed between the CHIP layers and
+ * Structure that describes the buffers passed between the CHIP layers and
  * the Zap layer.
  *
  * This structure can be in one of two modes: ready to be written to, or ready
