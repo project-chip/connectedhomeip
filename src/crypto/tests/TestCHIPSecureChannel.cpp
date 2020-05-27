@@ -27,8 +27,8 @@
 
 #include <crypto/CHIPSecureChannel.h>
 
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 #include <support/CodeUtils.h>
 #include <support/TestUtils.h>
 
