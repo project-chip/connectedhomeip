@@ -46,7 +46,6 @@ int testEncodingDecoding(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * 
 
     // Create another context to test decoding of header
     ChipZclCommandContext_t context2;
-    chipZclBufferFlip(buffer);
     chipZclDecodeZclHeader(buffer, &context2);
 
     if (context2.endpointId != context->endpointId)
@@ -97,6 +96,7 @@ int testClusterCmdOnOff(void)
 
     // Encode the header into the buffer
     chipZclEncodeZclHeader(buffer, context);
+    chipZclBufferFinishWriting(buffer);
 
     if (testEncodingDecoding(buffer, context) != 0)
     {
