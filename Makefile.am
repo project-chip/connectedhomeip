@@ -102,21 +102,18 @@ PRETTY_FILES                            := $(NULL)
 # during makefile execution.
 
 VERSION_FILE                      := $(if $(wildcard $(builddir)/.local-version),$(builddir)/.local-version,$(if $(wildcard $(srcdir)/.dist-version),$(srcdir)/.dist-version,$(srcdir)/.default-version))
-
 #
 # Override autotool's default notion of the package version variables.
 # This ensures that when we create a source distribution the
 # version is always the current version, not the package bootstrap
 # version.
 #
-# The two-level variables and the check against MAKELEVEL ensures that
-# not only can the package version be overridden from the command line
-# but also when the version is NOT overridden that we bind the version
-# once and only once across potential sub-makes to prevent the version
-# from flapping as VERSION_FILE changes.
+# The two-level variables ensures that not only can the package version
+# be overridden from the command line but also when the version is NOT
+# overridden that we bind the version once and only once across potential
+# sub-makes to prevent the version from flapping as VERSION_FILE changes.
 #
-
-export MAYBE_CHIP_VERSION        := $(if $(filter 0,$(MAKELEVEL)),$(shell cat $(VERSION_FILE) 2> /dev/null),$(MAYBE_CHIP_VERSION))
+export MAYBE_CHIP_VERSION        := $(shell cat $(VERSION_FILE) 2> /dev/null)
 
 CHIP_VERSION                     ?= $(MAYBE_CHIP_VERSION)
 
@@ -136,13 +133,11 @@ VERSION                            = $(PACKAGE_VERSION)
 # This is called from $(call check-file,.local-version).
 #
 define check-file-.local-version
-if [ "$(origin CHIP_VERSION)" != "file" ]; then       \
-    echo "$(CHIP_VERSION)" > "$(2)";                  \
-else                                                   \
+$(if $(filter-out file,$(origin CHIP_VERSION)),\
+    echo "$(CHIP_VERSION)" > "$(2)",\
     $(abs_top_nlbuild_autotools_dir)/scripts/mkversion \
         -b "$(CHIP_VERSION)" "$(top_srcdir)"          \
-        > "$(2)";                                      \
-fi
+        > "$(2)")
 endef
 
 #
