@@ -58,7 +58,7 @@ int testCodecSimple()
     chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_STRING, sIn, strlen(sIn));
     chipZclCodecEncodeEnd(buffer);
 
-    chipZclBufferFlip(buffer);
+    chipZclBufferFinishWriting(buffer);
 
     chipZclCodecDecodeStart(buffer);
     chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num1, 1, &ret);

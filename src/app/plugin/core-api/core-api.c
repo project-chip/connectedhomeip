@@ -26,7 +26,7 @@ ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
 {
     ChipZclRawBuffer_t * buffer = chipZclRawAlloc(sizeof(ChipZclRawBuffer_t));
     buffer->buffer              = chipZclRawAlloc(allocatedLength * sizeof(uint8_t));
-    buffer->endPosition         = 0;
+    buffer->dataLength          = 0;
     buffer->currentPosition     = 0;
     buffer->totalLength         = allocatedLength;
     return buffer;
@@ -39,7 +39,7 @@ ChipZclRawBuffer_t * chipZclBufferCreate(uint8_t * rawBuffer, uint16_t rawLength
 {
     ChipZclRawBuffer_t * buffer = chipZclRawAlloc(sizeof(ChipZclRawBuffer_t));
     buffer->buffer              = rawBuffer;
-    buffer->endPosition         = 0;
+    buffer->dataLength          = 0;
     buffer->currentPosition     = 0;
     buffer->totalLength         = rawLength;
     return buffer;
@@ -58,15 +58,23 @@ uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer)
  */
 uint16_t chipZclBufferUsedLength(ChipZclRawBuffer_t * buffer)
 {
-    return buffer->endPosition;
+    return buffer->dataLength;
 }
 
 /**
- * Function that frees a buffer.
+ * Function that frees a buffer and its storage.
  */
 void chipZclBufferFree(ChipZclRawBuffer_t * buffer)
 {
     chipZclRawFree(buffer->buffer);
+    chipZclBufferFreeOnlyBuffer(buffer);
+}
+
+/**
+ * Function that frees a buffer but not its storage.
+ */
+void chipZclBufferFreeOnlyBuffer(ChipZclRawBuffer_t * buffer)
+{
     chipZclRawFree(buffer);
 }
 
@@ -75,16 +83,16 @@ void chipZclBufferReset(ChipZclRawBuffer_t * buffer)
     buffer->currentPosition = 0;
 }
 
-void chipZclBufferFlip(ChipZclRawBuffer_t * buffer)
+void chipZclBufferFinishWriting(ChipZclRawBuffer_t * buffer)
 {
-    buffer->endPosition     = buffer->currentPosition;
+    buffer->dataLength      = buffer->currentPosition;
     buffer->currentPosition = 0;
 }
 
 void chipZclBufferClear(ChipZclRawBuffer_t * buffer)
 {
     buffer->currentPosition = 0;
-    buffer->endPosition     = buffer->totalLength;
+    buffer->dataLength      = 0;
 }
 
 ChipZclStatus_t chipZclClusterCommandParse(ChipZclCommandContext_t * context);
@@ -96,6 +104,9 @@ ChipZclStatus_t chipZclProcessIncoming(uint8_t * rawBuffer, uint16_t rawBufferLe
 
     chipZclDecodeZclHeader(buffer, context);
     chipZclClusterCommandParse(context);
+
+    chipZclRawFree(context);
+    chipZclBufferFreeOnlyBuffer(buffer);
 
     return CHIP_ZCL_STATUS_SUCCESS;
 }
