@@ -38,16 +38,12 @@ MAYBE_BLE_SUBDIRS                += \
     $(NULL)
 endif # CONFIG_NETWORK_LAYER_BLE
 
-PLATFORM_SUBDIRS                  = \
-    platform                        \
-    $(NULL)
-
 MAYBE_PLATFORM_SUBDIRS            = \
     $(NULL)
 
 if CONFIG_DEVICE_LAYER
 MAYBE_PLATFORM_SUBDIRS           += \
-    $(PLATFORM_SUBDIRS)             \
+    platform                        \
     $(NULL)
 endif # CONFIG_DEVICE_LAYER
 
@@ -72,8 +68,9 @@ DIST_SUBDIRS                      = \
     lib                             \
     setup_payload                   \
     crypto                          \
-    $(PLATFORM_SUBDIRS)             \
+    platform                        \
     qrcodetool                      \
+    transport                       \
     $(NULL)
 
 # Always build (e.g. for 'make all') these subdirectories.
@@ -83,11 +80,12 @@ SUBDIRS                           = \
     include                         \
     lwip                            \
     system                          \
-    $(MAYBE_BLE_SUBDIRS)            \
     inet                            \
     lib                             \
     setup_payload                   \
     crypto                          \
+    transport                       \
+    $(MAYBE_BLE_SUBDIRS)            \
     $(MAYBE_PLATFORM_SUBDIRS)       \
     $(MAYBE_QRCODETOOL_SUBDIR)      \
     $(NULL)
