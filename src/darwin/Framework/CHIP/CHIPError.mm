@@ -18,6 +18,7 @@
 #import "CHIPError.h"
 
 #import <core/CHIPError.h>
+#import <inet/InetError.h>
 
 NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 
@@ -26,31 +27,31 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
 {
     switch (errorCode) {
-        case CHIP_ERROR_INVALID_STRING_LENGTH:
-            return [NSError errorWithDomain:CHIPErrorDomain
-                                       code:CHIPErrorCodeInvalidStringLength
-                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A list length is invalid.", nil) }];
-        case CHIP_ERROR_INVALID_INTEGER_VALUE:
-            return [NSError errorWithDomain:CHIPErrorDomain
-                                       code:CHIPErrorCodeInvalidIntegerValue
-                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unexpected integer value.", nil) }];
-        case CHIP_ERROR_INVALID_ARGUMENT:
-            return [NSError errorWithDomain:CHIPErrorDomain
-                                       code:CHIPErrorCodeInvalidArgument
-                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"An argument is invalid.", nil) }];
-        case CHIP_ERROR_INVALID_MESSAGE_LENGTH:
-            return [NSError errorWithDomain:CHIPErrorDomain
-                                       code:CHIPErrorCodeInvalidMessageLength
-                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A message length is invalid.", nil) }];
-        case CHIP_ERROR_INCORRECT_STATE:
-            return [NSError errorWithDomain:CHIPErrorDomain
-                                       code:CHIPErrorCodeInvalidState
-                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Invalid object state.", nil) }];
-        default:
-            return [NSError errorWithDomain:CHIPErrorDomain
-                                       code:CHIPErrorCodeUndefinedError
-                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Undefined error.", nil) }];
-            ;
+    case CHIP_ERROR_INVALID_STRING_LENGTH:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeInvalidStringLength
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A list length is invalid.", nil) }];
+    case CHIP_ERROR_INVALID_INTEGER_VALUE:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeInvalidIntegerValue
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unexpected integer value.", nil) }];
+    case CHIP_ERROR_INVALID_ARGUMENT:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeInvalidArgument
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"An argument is invalid.", nil) }];
+    case CHIP_ERROR_INVALID_MESSAGE_LENGTH:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeInvalidMessageLength
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A message length is invalid.", nil) }];
+    case CHIP_ERROR_INCORRECT_STATE:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeInvalidState
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Invalid object state.", nil) }];
+    default:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeUndefinedError
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Undefined error.", nil) }];
+        ;
     }
 }
 @end

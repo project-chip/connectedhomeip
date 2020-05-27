@@ -112,6 +112,33 @@ COMMON_LDADD                                          = \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
 
+# Test applications that should be run when the 'check' target is run.
+
+check_PROGRAMS                                        = \
+    $(NULL)
+
+check_SCRIPTS                                         = \
+    $(NULL)
+
+# The additional environment variables and their values that will be
+# made available to all programs and scripts in TESTS.
+TESTS_ENVIRONMENT                                     = \
+    $(NULL)
+
+if CHIP_TARGET_STYLE_EMBEDDED
+
+check_SCRIPTS                                        += \
+    qemu_inet_tests.sh                                  \
+    $(NULL)
+
+TESTS_ENVIRONMENT                                    += \
+    abs_top_srcdir='$(abs_top_srcdir)'                  \
+    abs_top_builddir='$(abs_top_builddir)'              \
+    QEMU_TEST_TARGET=libInetLayerTests.a                \
+    $(NULL)
+
+else # CHIP_TARGET_STYLE_EMBEDDED
+
 # Test executables that should be built but not installed and should
 # always be built to ensure overall "build sanity".
 #
@@ -124,7 +151,6 @@ COMMON_LDADD                                          = \
 #       etc. on IPv4 and IPv6 IP end points. When that issue has been
 #       resolved, move these tests to check_PROGRAMS.
 
-if CHIP_TARGET_STYLE_UNIX
 # Build and run these test targets only on standalone device targets
 noinst_PROGRAMS                                       = \
     TestLwIPDNS                                         \
@@ -134,28 +160,21 @@ noinst_PROGRAMS                                       = \
     TestInetLayerMulticast                              \
     $(NULL)
 
-# Test applications that should be run when the 'check' target is run.
-
-check_PROGRAMS                                        = \
+check_PROGRAMS                                       += \
     TestInetAddress                                     \
     TestInetBuffer                                      \
     TestInetErrorStr                                    \
     TestInetTimer                                       \
     $(NULL)
 
+endif # CHIP_TARGET_STYLE_EMBEDDED
+
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
 TESTS                                                 = \
     $(check_PROGRAMS)                                   \
-    $(NULL)
-
-endif # CHIP_TARGET_STYLE_UNIX
-
-# The additional environment variables and their values that will be
-# made available to all programs and scripts in TESTS.
-
-TESTS_ENVIRONMENT                                     = \
+    $(check_SCRIPTS)                                    \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.

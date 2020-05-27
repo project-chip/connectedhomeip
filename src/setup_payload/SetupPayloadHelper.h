@@ -26,6 +26,8 @@
 #include <core/CHIPError.h>
 #include <string>
 
+#include <string>
+
 using namespace std;
 
 namespace chip {

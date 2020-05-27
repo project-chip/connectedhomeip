@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make -C build/default/src/crypto check
+make V=1 -C build/default/src/crypto check

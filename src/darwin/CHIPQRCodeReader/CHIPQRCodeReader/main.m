@@ -1,6 +1,3 @@
-//
-//  main.m
-//  CHIPQRCodeReader
 /**
  *
  *    Copyright (c) 2020 Project CHIP Authors

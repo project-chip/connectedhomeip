@@ -1,3 +1,10 @@
+1.7.4 (2020-05-18)
+
+        * Ensure that 'make help' displays help for generated make
+          files in addition to the bootstrap make file for the all,
+          check, coverage, dist, distcheck, doc, docdist, install,
+          install-headers, manifest, repos, and clean-repos targets.
+
 1.7.3 (2020-05-11)
 
         * Addressed an issue in which NL_ENABLE_COVERAGE,

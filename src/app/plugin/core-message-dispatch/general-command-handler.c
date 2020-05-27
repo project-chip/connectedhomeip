@@ -147,9 +147,10 @@ static ChipZclStatus_t chipZclReadAttributesCommandParse(ChipZclCommandContext_t
     chipZclCorePrintln("Attribute Count: %d", request->count);
     for (uint16_t i = 0; i < request->count; i++)
     {
-        ChipZclAttributeMetadata * metadata = chipZclLocateAttributeMetadata(
-            context->endpointId, context->clusterId, request->attributes[i], CLUSTER_MASK_SERVER, CHIP_ZCL_NULL_MANUFACTURER_CODE);
-        if (metadata != NULL)
+        ChipZclAttributeMetadata * metadata = NULL;
+        ChipZclStatus_t status = chipZclLocateAttributeMetadata(context->endpointId, context->clusterId, request->attributes[i],
+                                                                CLUSTER_MASK_SERVER, CHIP_ZCL_NULL_MANUFACTURER_CODE, &metadata);
+        if (CHIP_ZCL_STATUS_SUCCESS == status)
         {
             chipZclCorePrintln("Metadata default value: %d", metadata->defaultValue);
         }

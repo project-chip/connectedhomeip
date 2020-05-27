@@ -22,7 +22,13 @@
  *
  */
 
-#include "test-unit.h"
+#include "ChipZclUnitTests.h"
+
+#include <chip-zcl.h>
+
+#include "gen.h"
+
+#include <stdio.h>
 
 // -----------------------------------------------------------------------------
 // Identify cluster (0x0003).

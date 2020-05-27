@@ -3,7 +3,7 @@ jobs:
           name: Build CHIP [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["main-build", "mbedtls-build"]
+                  builder: ["main-build", "mbedtls-build", "clang-build", "linux-embedded"]
           filters:
               branches:
                   ignore:
@@ -12,9 +12,15 @@ jobs:
           name: Run Tests [<< matrix.builder >>]
           matrix:
               parameters:
-                  builder: ["main-build", "mbedtls-build"]
+                  builder: ["main-build", "mbedtls-build", "clang-build", "linux-embedded"]
           requires:
               - Build CHIP [<< matrix.builder >>]
+          filters:
+              branches:
+                  ignore:
+                      - /restyled.*/
+    - test_esp32_qemu:
+          name: Run Tests [ESP32-QEMU]
           filters:
               branches:
                   ignore:

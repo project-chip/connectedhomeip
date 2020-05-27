@@ -16,7 +16,10 @@
  */
 
 #include "setup_payload_commands.h"
+
 #include <setup_payload/SetupPayloadHelper.h>
+#include <support/logging/CHIPLogging.h>
+
 #include <stdio.h>
 #include <support/logging/CHIPLogging.h>
 #include <unistd.h>

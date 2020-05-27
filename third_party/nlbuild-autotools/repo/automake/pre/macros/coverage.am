@@ -89,4 +89,15 @@ $(NL_V_LCOV)$(LCOV) $(NL_V_LCOV_FLAGS) --config-file="$(abs_top_nlbuild_autotool
 $(NL_V_GENHTML)$(GENHTML) $(NL_V_GENHTML_FLAGS) --config-file="$(abs_top_nlbuild_autotools_dir)/etc/lcov.config" "$(@)" --output-directory "$(@D)"
 endef # generate-coverage-report
 
+define MaybePrintCoverageHelp
+$(NL_V_AT)echo "  coverage"
+$(NL_V_AT)echo "    Generate all configured build artifacts, run all unit"
+$(NL_V_AT)echo "    and functional tests, and generate code coverage results"
+$(NL_V_AT)echo "    for this project."
+$(NL_V_AT)echo
+endef # MaybePrintCoverageHelp
+
+define PrintCoverageHelp
+$(call MaybePrintCoverageHelp)
+endef # PrintCoverageHelp
 

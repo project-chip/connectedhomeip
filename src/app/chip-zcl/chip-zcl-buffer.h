@@ -38,9 +38,26 @@ typedef struct
 } ChipZclRawBuffer_t;
 
 /**
+ * Raw memory allocation. Can be mapped to an equivalent of malloc().
+ * Expected to return NULL if it failed.
+ * Expected to follow the same alignment requirements as malloc() does.
+ */
+void * chipZclRawAlloc(uint16_t allocatedLength);
+
+/**
+ * Raw memory free. Can be mapped to an equivalent of free().
+ */
+void chipZclRawFree(void * allocatedMemory);
+
+/**
  * Function that allocates a buffer.
  */
 ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
+
+/**
+ * Function that returns a raw pointer to the underlying buffer.
+ */
+uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer);
 
 /**
  * Function that frees a buffer.
@@ -48,8 +65,24 @@ ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
 void chipZclBufferFree(ChipZclRawBuffer_t * buffer);
 
 /**
+ * Function that resets a buffer.
+ * After this call, the buffer is reading for reading from beginning again.
+ */
+void chipZclBufferReset(ChipZclRawBuffer_t * buffer);
+
+/**
+ * Function that returns the size of the used portion of the buffer.
+ */
+uint16_t chipZclBufferUsedLength(ChipZclRawBuffer_t * buffer);
+
+/**
  * Flips the buffer between reading and writing.
  */
 void chipZclBufferFlip(ChipZclRawBuffer_t * buffer);
+
+/**
+ * Creates a ZCL buffer out of raw chunk of memory.
+ */
+ChipZclRawBuffer_t * chipZclBufferCreate(uint8_t * rawBuffer, uint16_t rawLength);
 
 #endif // CHIP_ZCL_BUFFER

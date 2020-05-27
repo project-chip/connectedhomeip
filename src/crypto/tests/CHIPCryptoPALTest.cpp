@@ -24,6 +24,9 @@
 
 #include <CHIPCryptoPAL.h>
 #include <nlunit-test.h>
+#include <support/CodeUtils.h>
+#include <support/TestUtils.h>
+
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>

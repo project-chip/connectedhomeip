@@ -14,22 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef CHIP_ZCL_TEST_UNIT
-#define CHIP_ZCL_TEST_UNIT
 
-#include "chip-zcl-codec.h"
-#include "chip-zcl.h"
-#include "gen.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#import <UIKit/UIKit.h>
 
-int testClusterServerBasic();
-int testClusterServerIdentify();
-int testClusterServerLevelControl();
-int testClusterServerOnOff();
-int testCodecSimple();
-int testCoreDataModel();
-int testCoreMessageDispatch();
+NS_ASSUME_NONNULL_BEGIN
 
-#endif // CHIP_ZCL_TEST_UNIT
+@interface EchoViewController : UIViewController
+
+- (IBAction)sendAction:(id)sender;
+
+@end
+
+NS_ASSUME_NONNULL_END

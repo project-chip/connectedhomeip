@@ -1,6 +1,3 @@
-//
-//  ViewController.h
-//  CHIPQRCodeReader
 /**
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -21,7 +18,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController <AVCaptureMetadataOutputObjectsDelegate>
+@interface QRCodeViewController : UIViewController <AVCaptureMetadataOutputObjectsDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView * qrCodeViewPreview;
 @property (weak, nonatomic) IBOutlet UITextField * manualCodeTextField;
