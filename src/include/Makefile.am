@@ -44,7 +44,7 @@ include_HEADERS                            = \
 CHIPVersion.h: force
 
 define check-file-CHIPVersion.h
-$(top_srcdir)/scripts/gen-chip-version "`cat $(1)`" -o "$(2)"
+$(top_srcdir)/scripts/gen-chip-version.sh -o "$(2)" "`cat $(1)`"
 endef # check-file-CHIPVersion.h
 
 CHIPVersion.h: $(top_builddir)/.local-version
