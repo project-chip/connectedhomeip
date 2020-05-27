@@ -108,7 +108,6 @@ declare copyright_year=$first_year
     copyright_year+="-$current_year"
 }
 
-
 declare chip_major
 declare chip_minor
 declare chip_patch
@@ -123,16 +122,16 @@ read -r chip_major chip_minor chip_patch chip_extra <<<"${chip_version//./ }"
 # Major and minor should be numbers. If they're not use the full input version as
 #  the "extra" and set everything else back to 0
 [ ${chip_major} -eq ${chip_major} -a ${chip_minor} -eq ${chip_minor} ] 2>/dev/null || {
-  chip_major=0
-  chip_minor=0
-  chip_patch=0
-  chip_extra=.$chip_version
+    chip_major=0
+    chip_minor=0
+    chip_patch=0
+    chip_extra=.$chip_version
 }
 
 # If chip_patch isn't a number, set chip_patch to zero and push the non-number back into chip_extra
 [ ${chip_patch} -eq ${chip_patch} ] || {
-  chip_extra=.${chip_patch}${chip_extra}
-  chip_patch=0
+    chip_extra=.${chip_patch}${chip_extra}
+    chip_patch=0
 }
 
 # Canonically recompose the version from its components.  zero-patchlevel is no patchlevel
