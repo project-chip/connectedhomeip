@@ -1,10 +1,10 @@
-# CHIP WiFi Echo Client Example
+# CHIP Echo Client Example
 
 An example application that uses CHIP to send messages to a CHIP echo server.
 
 ---
 
--   [CHIP WiFi Echo Client Example](#chip-wifi-echo-client-example)
+-   [CHIP Echo Client Example](#chip-wifi-echo-client-example)
 -   [Building the Example Application](#building-the-example-application)
 -   [Using the Echo Client](#using-the-echo-client)
 
@@ -23,13 +23,13 @@ Building the example application is quite straightforward.
 
 ## Using the Echo Client
 
-To start the Echo Client run the built executable.
+To start the Echo Client run the built executable and pass it the IP address and
+port of the server to talk to.
 
-          $ ./build/chip-standalone-demo.out
+          $ ./build/chip-standalone-demo.out 192.168.0.30 8000
 
-The app will prompt the user for the server's IP address and Port. If valid
-values are supplied, it will begin to priodically sending messages to the server
-address provided.
+If valid values are supplied, it will begin to periodically send messages to the
+server address provided.
 
 It also verifies that the incoming echo from the server matches what was sent
 out.
