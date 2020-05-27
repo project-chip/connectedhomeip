@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make -C examples/wifi-echo/client/standalone
+make -C examples/chip-tool
