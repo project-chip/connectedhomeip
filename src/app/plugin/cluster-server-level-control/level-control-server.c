@@ -598,7 +598,7 @@ static ChipZclStatus_t schedule(State * state)
     LevelControlEvent * event = cancel(state);
     if (event == NULL)
     {
-        ChipZclRawBuffer_t * buffer = chipZclBufferAlloc(sizeof(LevelControlEvent));
+        ChipZclBuffer_t * buffer = chipZclBufferAlloc(sizeof(LevelControlEvent));
         if (buffer == NULL)
         {
             return CHIP_ZCL_STATUS_FAILURE;

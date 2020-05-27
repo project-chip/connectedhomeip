@@ -27,7 +27,7 @@
 #include <stdint.h>
 
 /**
- * Structure that describes the raw buffers passed between the CHIP layers and
+ * Structure that describes the buffers passed between the CHIP layers and
  * the Zap layer.
  *
  * This structure can be in one of two modes: ready to be written to, or ready
@@ -56,7 +56,7 @@ typedef struct
      * when it's ready to be read from.
      */
     uint16_t dataLength;
-} ChipZclRawBuffer_t;
+} ChipZclBuffer_t;
 
 /**
  * Raw memory allocation. Can be mapped to an equivalent of malloc().
@@ -83,7 +83,7 @@ void chipZclRawFree(void * allocatedMemory);
  * @return A newly allocated buffer.  This should later be freed with
  *         chipZclBufferFree.
  */
-ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
+ChipZclBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
 
 /**
  * Function that returns a raw pointer to the underlying buffer.
@@ -91,7 +91,7 @@ ChipZclRawBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
  * @param buffer the buffer we are working with.
  * @return A pointer to its underlying memory.
  */
-uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer);
+uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer);
 
 /**
  * Function that frees a buffer and its storage.
@@ -99,7 +99,7 @@ uint8_t * chipZclBufferPointer(ChipZclRawBuffer_t * buffer);
  * @param buffer a buffer to free.  The buffer should have been allocated with
  *        chipZclBufferAlloc.
  */
-void chipZclBufferFree(ChipZclRawBuffer_t * buffer);
+void chipZclBufferFree(ChipZclBuffer_t * buffer);
 
 /**
  * Function that frees a buffer, but not its storage.  This can be used in
@@ -108,7 +108,7 @@ void chipZclBufferFree(ChipZclRawBuffer_t * buffer);
  * @param buffer the buffer to free.  The buffer should have been allocated with
  *        chipZclBufferCreate.
  */
-void chipZclBufferFreeOnlyBuffer(ChipZclRawBuffer_t * buffer);
+void chipZclBufferFreeOnlyBuffer(ChipZclBuffer_t * buffer);
 
 /**
  * Function that resets a buffer.
@@ -118,7 +118,7 @@ void chipZclBufferFreeOnlyBuffer(ChipZclRawBuffer_t * buffer);
  *
  * @param buffer the buffer to reset.
  */
-void chipZclBufferReset(ChipZclRawBuffer_t * buffer);
+void chipZclBufferReset(ChipZclBuffer_t * buffer);
 
 /**
  * Function that returns the size of the used portion of the buffer, in octets,
@@ -128,14 +128,14 @@ void chipZclBufferReset(ChipZclRawBuffer_t * buffer);
  * @param buffer the buffer whose used length we want.
  * @return The number of bytes the given buffer holds.
  */
-uint16_t chipZclBufferUsedLength(ChipZclRawBuffer_t * buffer);
+uint16_t chipZclBufferUsedLength(ChipZclBuffer_t * buffer);
 
 /**
  * Indicates that we are done writing to a buffer and prepares it for reading.
  *
  * @param buffer the buffer we are done writing to.
  */
-void chipZclBufferFinishWriting(ChipZclRawBuffer_t * buffer);
+void chipZclBufferFinishWriting(ChipZclBuffer_t * buffer);
 
 /**
  * Creates a ZCL buffer out of raw chunk of memory.
@@ -146,6 +146,6 @@ void chipZclBufferFinishWriting(ChipZclRawBuffer_t * buffer);
  *         freed using chipZclBufferFreeOnlyBuffer, since presumably someone
  *         else is responsible for freeing rawBuffer.
  */
-ChipZclRawBuffer_t * chipZclBufferCreate(uint8_t * rawBuffer, uint16_t rawLength);
+ChipZclBuffer_t * chipZclBufferCreate(uint8_t * rawBuffer, uint16_t rawLength);
 
 #endif // CHIP_ZCL_BUFFER

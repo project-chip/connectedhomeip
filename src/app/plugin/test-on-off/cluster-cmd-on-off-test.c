@@ -40,7 +40,7 @@ ChipZclCommandContext_t * testCreateCommandContext()
 }
 
 // Function that tests that the command encoder/decoder works correctly.
-int testEncodingDecoding(ChipZclRawBuffer_t * buffer, ChipZclCommandContext_t * context)
+int testEncodingDecoding(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * context)
 {
     chipZclEndpointInit();
 
@@ -90,7 +90,7 @@ void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clust
 int testClusterCmdOnOff(void)
 {
     // First construct an incoming buffer for test, give it 1024 bytes for no good reason.
-    ChipZclRawBuffer_t * buffer = chipZclBufferAlloc(1024);
+    ChipZclBuffer_t * buffer = chipZclBufferAlloc(1024);
 
     ChipZclCommandContext_t * context = testCreateCommandContext();
 
