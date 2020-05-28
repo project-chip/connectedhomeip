@@ -39,6 +39,8 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 
+#include "DataModelHandler.h"
+
 #define PORT CONFIG_ECHO_PORT
 
 static const char * TAG = "echo_server";
@@ -62,6 +64,13 @@ static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, cons
 
         ESP_LOGI(TAG, "UDP packet received from %s:%u to %s:%u (%zu bytes)", src_addr, packet_info->SrcPort, dest_addr,
                  packet_info->DestPort, static_cast<size_t>(data_len));
+
+        if (data_len > 0 && buffer->Start()[0] < 0x20)
+        {
+            // Non-ACII; assume it's a data model message.
+            HandleDataModelMessage(buffer);
+            return;
+        }
 
         // attempt to print the incoming message
         char msg_buffer[data_len + 1];

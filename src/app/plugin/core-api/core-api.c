@@ -61,7 +61,5 @@ ChipZclStatus_t chipZclProcessIncoming(uint8_t * rawBuffer, uint16_t rawBufferLe
     ChipZclCommandContext_t context = { 0 };
 
     chipZclDecodeZclHeader(&buffer, &context);
-    chipZclClusterCommandParse(&context);
-
-    return CHIP_ZCL_STATUS_SUCCESS;
+    return chipZclClusterCommandParse(&context);
 }
