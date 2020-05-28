@@ -20,8 +20,7 @@
  *      This file provides ZCL General message processing dispatch.
  *
  */
-
-#include "general-command-handler.h"
+#include "gen-global-command-handler.h"
 
 // Forward declarations
 static ChipZclStatus_t chipZclReadAttributesCommandParse(ChipZclCommandContext_t * context);

@@ -44,6 +44,7 @@ EXTRA_DIST = ChipZclUnitTests.h
 libChipZclUnitTests_a_SOURCES                            = \
     ../../gen/gen-callback-stubs.c                         \
     ../../gen/gen-command-handler.c                        \
+    ../../gen/gen-global-command-handler.c                 \
     ../binding-mock/mock.c                                 \
     ../core-api/core-api.c                                 \
     ../cluster-server-basic/basic-server.c                 \
@@ -52,7 +53,6 @@ libChipZclUnitTests_a_SOURCES                            = \
     ../cluster-server-on-off/on-off-server.c               \
     ../codec-simple/codec-simple.c                         \
     ../core-message-dispatch/dispatch.c                    \
-    ../core-message-dispatch/general-command-handler.c     \
     ../core-data-model/zcl-data-model.c                    \
     $(NULL)
 
