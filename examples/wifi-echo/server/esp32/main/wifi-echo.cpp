@@ -70,7 +70,7 @@ static QRCodeWidget sQRCodeWidget;
 
 #endif // CONFIG_HAVE_DISPLAY
 
-static LEDWidget statusLED;
+LEDWidget statusLED;
 static Button attentionButton;
 static volatile ConnectivityChange sConnectionState = kConnectivity_NoChange;
 

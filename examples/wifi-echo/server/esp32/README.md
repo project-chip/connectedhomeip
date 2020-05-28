@@ -18,8 +18,8 @@ messaging is supported in CHIP.
 The CHIP demo application is intended to work on two categories of ESP32
 devices: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
-and the [M5Stack](http://m5stack.com). Support for the
-[M5Stack](http://m5stack.com) is still a Work in Progress.
+and the [M5Stack](http://m5stack.com).
+On the [M5Stack](http://m5stack.com) this example displays a CHIP QRCode with the device's Soft-AP SSID encoded in the TLV section.
 
 ## Building the Example Application
 
@@ -45,13 +45,23 @@ step. To install these components manually, follow these steps:
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
--   In the root of the example directory, source `idf.sh` and use the
-    `defconfig` make target to configure the application with defaults.
+-   In the root of the example directory, sync the dependencies and source `idf.sh`.
+    Note: This does not have to be repeated for incremental builds.
 
+          $ make -C third_party/connectedhomeip -f Makefile-bootstrap repos
           $ source idf.sh
+
+-   Next, if you want to use the M5Stack with its display and show a QRCode run `menuconfig`.
+
+          $ idf make menuconfig
+
+    While in the configurator, navigate to `WiFi Echo Demo`->`Device Type` and select `M5Stack`.
+
+    Otherwise, run the default config.
+
           $ idf make defconfig
 
--   Run make to build the demo application
+-   Run make to build the demo application.
 
           $ idf make
 
@@ -104,6 +114,8 @@ There are two ways to use the Echo Server running on the device.
 
                 I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
                 I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
+
+    Note: If you are using the M5Stack, the screen will display the server's IP Address and Port if it successfully conencts to the configured 2.4GHz Network.
 
 5.  Then running the following command will ping the ESP32 and cause it to echo.
     If necessary replace the `<IP_ADDRESS>` with the address printed by the
