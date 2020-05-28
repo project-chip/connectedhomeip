@@ -34,10 +34,29 @@ namespace chip {
 class MessageHeader
 {
 public:
+    /**
+     * Gets the source node id in the current message.
+     *
+     * NOTE: the source node id is optional and may be missing.
+     */
     const Optional<uint64_t> & GetSourceNodeId() const { return mSourceNodeId; }
+
+    /**
+     * Gets the destination node id in the current message.
+     *
+     * NOTE: the destination node id is optional and may be missing.
+     */
     const Optional<uint64_t> & GetDestinationNodeId() const { return mDestinationNodeId; }
+
+    /**
+     * Gets the message id set in the header.
+     *
+     * Message IDs are expecte to monotonically increase by one for each mesage
+     * that has been sent.
+     */
     uint32_t GetMessageId() const { return mMessageId; }
 
+    /** Set the message id for this header. */
     MessageHeader & SetMessageId(uint32_t id)
     {
         mMessageId = id;
@@ -45,6 +64,7 @@ public:
         return *this;
     }
 
+    /** Set the source node id for this header. */
     MessageHeader & SetSourceNodeId(uint64_t id)
     {
         mSourceNodeId.SetValue(id);
@@ -52,6 +72,7 @@ public:
         return *this;
     }
 
+    /** Clear the source node id for this header. */
     MessageHeader & ClearSourceNodeId()
     {
         mSourceNodeId.ClearValue();
@@ -59,6 +80,7 @@ public:
         return *this;
     }
 
+    /** Set the destination node id for this header. */
     MessageHeader & SetDestinationNodeId(uint64_t id)
     {
         mDestinationNodeId.SetValue(id);
@@ -66,6 +88,7 @@ public:
         return *this;
     }
 
+    /** Clear the destination node id for this header. */
     MessageHeader & ClearDestinationNodeId()
     {
         mDestinationNodeId.ClearValue();
