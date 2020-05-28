@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "DataModelHandler.h"
 #include "LEDWidget.h"
 #include "esp_event_loop.h"
 #include "esp_heap_caps_init.h"
@@ -58,7 +59,7 @@ extern void startClient(void);
 
 #endif // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-static LEDWidget statusLED;
+LEDWidget statusLED;
 
 const char * TAG = "wifi-echo-demo";
 
@@ -151,6 +152,7 @@ extern "C" void app_main()
     statusLED.Init(STATUS_LED_GPIO_NUM);
 
     // Start the Echo Server
+    InitDataModelHandler();
     UDPEndPoint * sEndpoint = NULL;
     startServer(sEndpoint);
 #if CONFIG_USE_ECHO_CLIENT
@@ -160,9 +162,6 @@ extern "C" void app_main()
     // Run the UI Loop
     while (true)
     {
-        statusLED.Blink(500);
-        statusLED.Animate();
-
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }
 }

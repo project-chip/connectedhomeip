@@ -30,6 +30,7 @@ third_party/mbedtls/
 
 # Example specific rules
 examples/**/sdkconfig
+examples/**/sdkconfig.old
 
 # Temporary Directories
 .tmp/
