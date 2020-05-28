@@ -38,6 +38,11 @@ CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                     = \
     @top_builddir@/src/lib/support/RandUtils.cpp            \
     @top_builddir@/src/lib/support/TestUtils.cpp            \
     @top_builddir@/src/lib/support/TimeUtils.cpp            \
+    @top_builddir@/src/lib/support/verhoeff/Verhoeff.cpp    \
+    @top_builddir@/src/lib/support/verhoeff/Verhoeff10.cpp  \
+    @top_builddir@/src/lib/support/verhoeff/Verhoeff16.cpp  \
+    @top_builddir@/src/lib/support/verhoeff/Verhoeff32.cpp  \
+    @top_builddir@/src/lib/support/verhoeff/Verhoeff36.cpp  \
     $(NULL)
 
 CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
@@ -55,6 +60,10 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
     @top_builddir@/src/lib/support/RandUtils.h              \
     @top_builddir@/src/lib/support/TestUtils.h              \
     @top_builddir@/src/lib/support/TimeUtils.h              \
+    $(NULL)
+
+CHIP_BUILD_SUPPORT_LAYER_VERHOEFF_HEADER_FILES            = \
+    @top_builddir@/src/lib/support/verhoeff/Verhoeff.h      \
     $(NULL)
 
 if CHIP_WITH_NLFAULTINJECTION

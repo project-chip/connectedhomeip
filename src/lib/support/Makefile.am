@@ -31,13 +31,13 @@ include SupportLayer.am
 
 lib_LIBRARIES                       = libSupportLayer.a
 
-libSupportLayer_a_CPPFLAGS          = \
-    -I$(top_srcdir)/src               \
-    -I$(top_srcdir)/src/lib           \
-    -I$(top_srcdir)/src/include       \
-    $(LWIP_CPPFLAGS)                  \
-    $(NLASSERT_CPPFLAGS)              \
-    $(NLFAULTINJECTION_CPPFLAGS)      \
+libSupportLayer_a_CPPFLAGS                    = \
+    -I$(top_srcdir)/src                         \
+    -I$(top_srcdir)/src/lib                     \
+    -I$(top_srcdir)/src/include                 \
+    $(LWIP_CPPFLAGS)                            \
+    $(NLASSERT_CPPFLAGS)                        \
+    $(NLFAULTINJECTION_CPPFLAGS)                \
     $(NULL)
 
 libSupportLayer_a_SOURCES           = $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
@@ -45,5 +45,7 @@ libSupportLayer_a_SOURCES           = $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
 libSupportLayer_adir                = $(includedir)/support
 
 dist_libSupportLayer_a_HEADERS      = $(CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES)
+
+EXTRA_DIST                          = $(CHIP_BUILD_SUPPORT_LAYER_VERHOEFF_HEADER_FILES)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

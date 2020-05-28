@@ -23,6 +23,8 @@
 
 #include "ManualSetupPayloadGenerator.h"
 
+#include <support/verhoeff/Verhoeff.h>
+
 using namespace chip;
 
 static uint32_t shortPayloadRepresentation(SetupPayload payload)
@@ -59,6 +61,8 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(strin
         decimalString += decimalStringWithPadding(mSetupPayload.vendorID, kManualSetupVendorIdCharLength);
         decimalString += decimalStringWithPadding(mSetupPayload.productID, kManualSetupProductIdCharLength);
     }
+    decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
+
     outDecimalString = decimalString;
     return CHIP_NO_ERROR;
 }
