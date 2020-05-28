@@ -30,6 +30,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <ble/CHIPBleServiceData.h>
 #include <support/Base64.h>
+#include <support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -187,7 +188,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * b
         VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER));
         serialNumLen = sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) - 1;
-        ChipProgress(DeviceLayer, "Serial Number not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER);
+        ChipLogProgress(DeviceLayer, "Serial Number not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER);
         err = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
