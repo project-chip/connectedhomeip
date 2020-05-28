@@ -26,7 +26,6 @@
 
 CHIP_BUILD_DATA_MODEL_SOURCE_FILES                                                  = \
     @top_builddir@/src/app/gen/gen-callback-stubs.c                                   \
-    @top_builddir@/src/app/gen/gen-command-handler.c                                  \
     @top_builddir@/src/app/gen/gen-specs.c                                            \
     @top_builddir@/src/app/plugin/binding-mock/mock.c                                 \
     @top_builddir@/src/app/plugin/cluster-server-basic/basic-server.c                 \
@@ -37,7 +36,6 @@ CHIP_BUILD_DATA_MODEL_SOURCE_FILES                                              
     @top_builddir@/src/app/plugin/core-api/core-api.c                                 \
     @top_builddir@/src/app/plugin/core-data-model/zcl-data-model.c                    \
     @top_builddir@/src/app/plugin/core-message-dispatch/dispatch.c                    \
-    @top_builddir@/src/app/plugin/core-message-dispatch/general-command-handler.c     \
     $(NULL)
 
 # Excluding this one for now because it has #include syntax that does
