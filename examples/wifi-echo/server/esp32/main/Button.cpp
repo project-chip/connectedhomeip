@@ -21,7 +21,6 @@
 #include "esp_log.h"
 #include "esp_system.h"
 
-
 #include "Button.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
