@@ -1,0 +1,79 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//third_party/nrf5_sdk/nrf5_sdk.gni")
+
+assert(current_os == "freertos")
+
+nrf5_sdk("sdk") {
+  include_dirs = [
+    "main/include",
+    "main",
+    "//src/include",
+  ]
+
+  sources = [
+    "main/include/CHIPProjectConfig.h",
+    "main/include/FreeRTOSConfig.h",
+    "main/include/OpenThreadConfig.h",
+    "main/include/app_config.h",
+    "main/include/freertos_tasks_c_additions.h",
+    "main/include/nrf_log_ctrl_internal.h",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  defines += [ "USE_APP_CONFIG" ]
+}
+
+executable("lock_app") {
+  public_deps = [
+    ":sdk",
+    "//src:chip",
+    "//src/platform",
+  ]
+
+  sources = [
+    "main/AppTask.cpp",
+    "main/BoltLockManager.cpp",
+    "main/DataModelHandler.cpp",
+    "main/LEDWidget.cpp",
+    "main/Server.cpp",
+    "main/include/AppEvent.h",
+    "main/include/AppTask.h",
+    "main/include/BoltLockManager.h",
+    "main/include/DataModelHandler.h",
+    "main/include/LEDWidget.h",
+    "main/include/Server.h",
+    "main/main.cpp",
+    "main/support/CXXExceptionStubs.cpp",
+    "main/support/FreeRTOSNewlibLockSupport.c",
+    "main/support/nRF5Sbrk.c",
+  ]
+
+  output_dir = root_out_dir
+
+  ldscript = "main/ldscripts/chip-nrf52840-lock-example.ld"
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("nrf5") {
+  deps = [ ":lock_app" ]
+}

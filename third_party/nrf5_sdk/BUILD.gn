@@ -13,26 +13,17 @@
 # limitations under the License.
 
 import("//build/device.gni")
+import("//third_party/nrf5_sdk/nrf5_sdk.gni")
+
+assert(device_platform == "nrf5")
 
 declare_args() {
-  # Enable IPv4 support.
-  inet_config_enable_ipv4 = true
+  # Build target to use for nRF5 SDK. Use this to set global SDK defines.
+  nrf5_sdk_target = ""
+}
 
-  # Enable DNS resolver.
-  inet_config_enable_dns_resolver = true
+assert(nrf5_sdk_target != "", "nrf5_sdk_target must be specified")
 
-  # Enable async DNS.
-  inet_config_enable_async_dns_sockets = true
-
-  # Enable raw endpoint.
-  inet_config_enable_raw_endpoint = true
-
-  # Enable UDP endpoint.
-  inet_config_enable_udp_endpoint = true
-
-  # Enable TCP endpoint.
-  inet_config_enable_tcp_endpoint = true
-
-  # Enable TUN endpoint.
-  inet_config_enable_tun_endpoint = current_os == "linux"
+group("nrf5_sdk") {
+  public_deps = [ nrf5_sdk_target ]
 }
