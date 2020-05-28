@@ -27,6 +27,7 @@
 
 #include "chip-zcl-struct.h"
 #include "chip-zcl.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -56,7 +57,7 @@ typedef struct ChipZclCodec_t
  * @brief Starts the encoding process. if there is any kind of preamble of anything, this function is responsible for putting it
  * there.
  */
-ChipZclStatus_t chipZclCodecInit(ChipZclCodec_t * codec, ChipZclBuffer_t * buffer);
+ChipZclStatus_t chipZclCodecEncodeStart(ChipZclCodec_t * me, ChipZclBuffer_t * buffer);
 
 /**
  * @brief Encodes a single value of a given type.
