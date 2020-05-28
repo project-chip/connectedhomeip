@@ -405,7 +405,7 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     ChipStorage *storage = NULL;
 
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0) {
-        storage = PosixStorage::GetFacotryStorage();        
+        storage = PosixStorage::GetFacotryStorage();
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0) {
         storage = PosixStorage::GetConfigStorage();

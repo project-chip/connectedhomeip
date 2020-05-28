@@ -134,9 +134,9 @@ CHIP_ERROR GdbmStorage::Open()
     });
 
 exit:
-    if (err == CHIP_NO_ERROR) 
+    if (err == CHIP_NO_ERROR)
         state = DB_READY;
-    else 
+    else
         state = DB_ERROR;
 
     return err;
@@ -534,7 +534,7 @@ ChipMutableStorage *PosixStorage::GetCountersStorage()
     CHIP_ERROR err = instance.Open();
     if (err == CHIP_NO_ERROR)
         return &instance;
-    else 
+    else
         return NULL;
 }
 
