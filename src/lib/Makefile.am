@@ -55,6 +55,7 @@ libCHIP_a_CPPFLAGS                  =                         \
     -I$(top_srcdir)/src/lib                                   \
     -I$(top_srcdir)/src/lib/core                              \
     -I$(top_srcdir)/src/lib/support                           \
+    -I$(top_srcdir)/src/lib/support/verhoeff                  \
     -I$(top_srcdir)/src/system                                \
     $(NLASSERT_CPPFLAGS)                                      \
     $(NLFAULTINJECTION_CPPFLAGS)                              \

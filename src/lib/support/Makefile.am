@@ -31,13 +31,14 @@ include SupportLayer.am
 
 lib_LIBRARIES                       = libSupportLayer.a
 
-libSupportLayer_a_CPPFLAGS          = \
-    -I$(top_srcdir)/src               \
-    -I$(top_srcdir)/src/lib           \
-    -I$(top_srcdir)/src/include       \
-    $(LWIP_CPPFLAGS)                  \
-    $(NLASSERT_CPPFLAGS)              \
-    $(NLFAULTINJECTION_CPPFLAGS)      \
+libSupportLayer_a_CPPFLAGS                    = \
+    -I$(top_srcdir)/src                         \
+    -I$(top_srcdir)/src/lib                     \
+    -I$(top_srcdir)/src/include                 \
+    -I$(top_srcdir)/src/lib/support/verhoeff    \
+    $(LWIP_CPPFLAGS)                            \
+    $(NLASSERT_CPPFLAGS)                        \
+    $(NLFAULTINJECTION_CPPFLAGS)                \
     $(NULL)
 
 libSupportLayer_a_SOURCES           = $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
