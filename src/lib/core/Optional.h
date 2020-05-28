@@ -41,32 +41,41 @@ public:
     constexpr Optional(Optional && other)      = default;
     Optional & operator=(const Optional & other) = default;
 
+    /** Make the optional contain a specific value */
     void SetValue(const T & value)
     {
         mValue    = value;
         mHasValue = true;
     }
 
+    /** Invalidate the value inside the optional. Optional now has no value */
     void ClearValue(void) { mHasValue = false; }
 
+    /** Gets the current value of the optional. Valid IFF `HasValue`. */
     const T & Value(void) const
     {
         assert(HasValue());
         return mValue;
     }
+
+    /** Checks if the optional contains a value or not */
     bool HasValue() const { return mHasValue; }
 
+    /** Comparison operator, hadling missing values. */
     bool operator==(const Optional & other) const
     {
         return (mHasValue == other.mHasValue) && (!mHasValue || (mValue == other.mValue));
     }
 
+    /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing(void) { return Optional<T>(); }
+
+    /** Convenience method to create an optional containing the specified value. */
     static Optional<T> Value(const T & value) { return Optional(value); }
 
 private:
-    T mValue;
-    bool mHasValue;
+    T mValue;       ///< Value IFF optional contains a value
+    bool mHasValue; ///< True IFF optional contains a value
 };
 
 } // namespace chip
