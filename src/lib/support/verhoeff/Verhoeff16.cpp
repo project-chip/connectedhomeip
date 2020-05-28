@@ -22,11 +22,10 @@
  *      algorithm for base-16 strings.
  *
  */
+#include "Verhoeff.h"
 
 #include <stdint.h>
 #include <string.h>
-
-#include "Verhoeff.h"
 
 #ifndef VERHOEFF16_NO_MULTIPLY_TABLE
 

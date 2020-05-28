@@ -45,7 +45,7 @@ static CHIP_ERROR checkDecimalStringValidity(string decimalString, string & deci
 
     if (!Verhoeff10::ValidateCheckChar(checkChar, repWithoutCheckChar.c_str()))
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
     }
     decimalStringWithoutCheckDigit = repWithoutCheckChar;
     return CHIP_NO_ERROR;

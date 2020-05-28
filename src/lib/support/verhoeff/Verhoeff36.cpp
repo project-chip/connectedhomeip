@@ -22,13 +22,12 @@
  *      algorithm for base-36 strings.
  *
  */
+#include "Verhoeff.h"
 
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "Verhoeff.h"
 
 #ifndef VERHOEFF36_NO_MULTIPLY_TABLE
 

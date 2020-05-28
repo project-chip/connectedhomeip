@@ -23,12 +23,12 @@
  *
  */
 
+#include "Verhoeff.h"
+
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "Verhoeff.h"
 
 #ifndef VERHOEFF32_NO_MULTIPLY_TABLE
 

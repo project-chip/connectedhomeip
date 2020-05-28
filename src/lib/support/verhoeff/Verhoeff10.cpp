@@ -23,10 +23,10 @@
  *
  */
 
+#include "Verhoeff.h"
+
 #include <stdint.h>
 #include <string.h>
-
-#include "Verhoeff.h"
 
 #ifndef VERHOEFF10_NO_MULTIPLY_TABLE
 

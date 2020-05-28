@@ -60,9 +60,12 @@ CHIP_BUILD_SUPPORT_LAYER_HEADER_FILES                     = \
     @top_builddir@/src/lib/support/RandUtils.h              \
     @top_builddir@/src/lib/support/TestUtils.h              \
     @top_builddir@/src/lib/support/TimeUtils.h              \
+    $(NULL)
+
+CHIP_BUILD_SUPPORT_LAYER_VERHOEFF_HEADER_FILES            = \
     @top_builddir@/src/lib/support/verhoeff/Verhoeff.h      \
     $(NULL)
-    
+
 if CHIP_WITH_NLFAULTINJECTION
 CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES += @top_builddir@/src/lib/support/CHIPFaultInjection.cpp
 endif # CHIP_WITH_NLFAULTINJECTION

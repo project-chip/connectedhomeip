@@ -367,7 +367,7 @@ void TestPayloadParser_InvalidEntry(nlTestSuite * inSuite, void * inContext)
     // wrong check digit
     decimalString = "02684354589";
     assertEmptyPayloadWithError(inSuite, ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INVALID_ARGUMENT, payload);
+                                CHIP_ERROR_INTEGRITY_CHECK_FAILED, payload);
 }
 
 void TestCheckDecimalStringValidity(nlTestSuite * inSuite, void * inContext)
@@ -390,8 +390,6 @@ void TestCheckDecimalStringValidity(nlTestSuite * inSuite, void * inContext)
     decimalString                   = representationWithoutCheckDigit + checkDigit;
     NL_TEST_ASSERT(inSuite, checkDecimalStringValidity(decimalString, outReprensation) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, outReprensation.compare(representationWithoutCheckDigit) == 0);
-    printf("\nShanaLog before %s checkDigit %c after %s without %s\n", representationWithoutCheckDigit.c_str(), checkDigit,
-           decimalString.c_str(), outReprensation.c_str());
 
     representationWithoutCheckDigit = "0000";
     checkDigit                      = Verhoeff10::ComputeCheckChar(representationWithoutCheckDigit.c_str());
