@@ -88,6 +88,12 @@ public:
      * @param size - bytes available in the buffer
      * @param decode_size - number of bytes read from the buffer to decode the
      *                      object
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
      */
     CHIP_ERROR Decode(const uint8_t * data, size_t size, size_t * decode_size);
 
@@ -97,6 +103,11 @@ public:
      * @param data - the buffer to write to
      * @param size - space available in the buffer (in bytes)
      * @param decode_size - number of bytes written to the buffer.
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
     CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size);
 
