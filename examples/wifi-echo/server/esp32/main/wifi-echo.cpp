@@ -15,8 +15,11 @@
  *    limitations under the License.
  */
 
+#include "Button.h"
 #include "DataModelHandler.h"
+#include "Display.h"
 #include "LEDWidget.h"
+#include "QRCodeWidget.h"
 #include "esp_event_loop.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -26,6 +29,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+
+#include "tcpip_adapter.h"
 #include <stdio.h>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -59,7 +64,15 @@ extern void startClient(void);
 
 #endif // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
+#if CONFIG_HAVE_DISPLAY
+
+static QRCodeWidget sQRCodeWidget;
+
+#endif // CONFIG_HAVE_DISPLAY
+
 LEDWidget statusLED;
+static Button attentionButton;
+static volatile ConnectivityChange sConnectionState = kConnectivity_NoChange;
 
 const char * TAG = "wifi-echo-demo";
 
@@ -159,9 +172,78 @@ extern "C" void app_main()
     startClient();
 #endif
 
+#if CONFIG_HAVE_DISPLAY
+
+    // Only setup the button for the M5Stack since it's only being used to wake the display right now
+    err = attentionButton.Init(ATTENTION_BUTTON_GPIO_NUM, 50);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Button.Init() failed: %s", ErrorStr(err));
+        return;
+    }
+
+    // Initialize the display device.
+    err = InitDisplay();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "InitDisplay() failed: %s", ErrorStr(err));
+        return;
+    }
+
+    // Initialize the UI widgets.
+    sQRCodeWidget.Init();
+    ClearDisplay();
+    sQRCodeWidget.Display();
+
+#endif // CONFIG_HAVE_DISPLAY
+
     // Run the UI Loop
     while (true)
     {
+#if CONFIG_HAVE_DISPLAY
+
+        // TODO consider refactoring this example to use FreeRTOS tasks
+        // Poll the attention button.  Whenever we detect a *release* of the button
+        // reset the display timer
+        if (attentionButton.Poll() && !attentionButton.IsPressed())
+        {
+            WakeDisplay();
+        }
+
+        switch (sConnectionState)
+        {
+        case kConnectivity_Established:
+            // Show the currently connected state
+            tcpip_adapter_ip_info_t ipInfo;
+            if (tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo) == ESP_OK)
+            {
+                char ipAddrStr[INET_ADDRSTRLEN];
+                IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
+                wifi_ap_record_t apInfo;
+                if (esp_wifi_sta_get_ap_info(&apInfo) == ESP_OK)
+                {
+                    char message[256];
+                    snprintf(message, sizeof(message), "WiFi Connected: %s\nEcho Server at %s:%d", (char *) apInfo.ssid, ipAddrStr,
+                             CONFIG_ECHO_PORT);
+                    // place it close to the bottom of the screen
+                    DisplayStatusMessage(message, 85);
+                }
+            }
+            sConnectionState = kConnectivity_NoChange;
+            break;
+        case kConnectivity_Lost:
+            ESP_LOGE(TAG, "here4");
+            // Hide the currently connected state
+            sConnectionState = kConnectivity_NoChange;
+            ClearDisplay();
+            sQRCodeWidget.Display();
+            break;
+        case kConnectivity_NoChange:
+        default:
+            break;
+        }
+#endif // CONFIG_HAVE_DISPLAY
+
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }
 }
@@ -172,6 +254,25 @@ extern "C" void app_main()
  */
 void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
+    if (event->Type == DeviceEventType::kInternetConnectivityChange)
+    {
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
+        {
+            tcpip_adapter_ip_info_t ipInfo;
+            if (tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo) == ESP_OK)
+            {
+                char ipAddrStr[INET_ADDRSTRLEN];
+                IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
+                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CONFIG_ECHO_PORT);
+                sConnectionState = kConnectivity_Established;
+            }
+        }
+        else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
+        {
+            ESP_LOGE(TAG, "Lost IP...");
+            sConnectionState = kConnectivity_Lost;
+        }
+    }
     if (event->Type == DeviceEventType::kSessionEstablished && event->SessionEstablished.IsCommissioner)
     {
         ESP_LOGI(TAG, "Commissioner detected!");
