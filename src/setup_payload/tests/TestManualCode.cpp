@@ -534,7 +534,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test Read Characters from Decimal String",                             TestReadCharsFromDecimalString),
     NL_TEST_DEF("Generate Full Payload and Parse it",                                   TestGenerateAndParser_FullPayload),
     NL_TEST_DEF("Generate Partial Payload and Parse it",                                TestGenerateAndParser_PartialPayload),
-    
+
 
     NL_TEST_SENTINEL()
 };
