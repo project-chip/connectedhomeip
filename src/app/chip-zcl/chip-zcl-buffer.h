@@ -43,14 +43,12 @@ typedef struct
      * The data storage for our buffer.
      */
     uint8_t * buffer;
+
     /**
-     * The size of our data storage.
+     * The size of our buffer above.
      */
-    uint16_t totalLength;
-    /**
-     * The current read/write position.
-     */
-    uint16_t currentPosition;
+    uint16_t bufferLength;
+
     /**
      * The length of the data that can be read from this buffer; nonzero only
      * when it's ready to be read from.
@@ -85,10 +83,8 @@ uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer);
 void chipZclBufferFree(ChipZclBuffer_t * buffer);
 
 /**
- * Function that resets a buffer.
- *
- * After this call, the buffer is ready for reading or writing from the
- * beginning again, depending on whether it was in reading more or writing mode.
+ * Function that resets a buffer to have its entire allocated length
+ *  available for writing.
  *
  * @param[in] buffer the buffer to reset.
  */
@@ -100,15 +96,25 @@ void chipZclBufferReset(ChipZclBuffer_t * buffer);
  * being written to.
  *
  * @param[in] buffer the buffer whose used length we want.
- * @return The number of bytes the given buffer holds.
+ * @return The number of bytes of data the given buffer holds.
  */
-uint16_t chipZclBufferUsedLength(ChipZclBuffer_t * buffer);
+uint16_t chipZclBufferDataLength(ChipZclBuffer_t * buffer);
 
 /**
  * Indicates that we are done writing to a buffer and prepares it for reading.
  *
  * @param[in] buffer the buffer we are done writing to.
+ * @param[in] newLength the length of the written data
  */
-void chipZclBufferFinishWriting(ChipZclBuffer_t * buffer);
+void chipZclBufferSetDataLength(ChipZclBuffer_t * buffer, uint16_t newLength);
+
+/**
+ * Function that returns available space remaining in the buffer after any
+ * data in the buffer.
+ *
+ * @param[in] buffer the buffer we are interested in
+ * @return The number of bytes left available for writing after any data
+ */
+uint16_t chipZclBufferAvailableLength(ChipZclBuffer_t * buffer);
 
 #endif // CHIP_ZCL_BUFFER

@@ -31,34 +31,51 @@
 #include <stdint.h>
 
 /**
+ * Codec keeps track of an ongoing encode/decode session of a Buffer
+ */
+typedef struct ChipZclCodec_t
+{
+    /**
+     * Buffer into/out of which this codec is co-dec'ing
+     */
+    ChipZclBuffer_t * buffer;
+
+    /**
+     * The current read/write position.
+     */
+    uint16_t cursor;
+
+    /**
+     * space available in the buffer for writing
+     */
+    uint16_t available;
+
+} ChipZclCodec_t;
+
+/**
  * @brief Starts the encoding process. if there is any kind of preamble of anything, this function is responsible for putting it
  * there.
  */
-ChipZclStatus_t chipZclCodecEncodeStart(ChipZclBuffer_t * buffer);
+ChipZclStatus_t chipZclCodecInit(ChipZclCodec_t * codec, ChipZclBuffer_t * buffer);
 
 /**
  * @brief Encodes a single value of a given type.
  */
-ChipZclStatus_t chipZclCodecEncode(ChipZclBuffer_t * buffer, ChipZclType_t type, void * ptr, uint16_t ptrLen);
+ChipZclStatus_t chipZclCodecEncode(ChipZclCodec_t * codec, ChipZclType_t type, void * ptr, uint16_t ptrLen);
 
 /**
  * @brief Ends the encoding process. After this call the buffer is ready to go back to the lower layers.
  */
-ChipZclStatus_t chipZclCodecEncodeEnd(ChipZclBuffer_t * buffer);
+ChipZclStatus_t chipZclCodecEncodeEnd(ChipZclCodec_t * codec);
 
 /**
  * @brief Starts the decoding process. if there is any kind of preamble of anything, this function is responsible for decoding it.
  */
-ChipZclStatus_t chipZclCodecDecodeStart(ChipZclBuffer_t * buffer);
+ChipZclStatus_t chipZclCodecDecodeStart(ChipZclCodec_t * codec, ChipZclBuffer_t * buffer);
 
 /**
  * @brief Decodes a single value and puts it into the pointer. If retLen is not NULL, the size of decoded value is put there.
  */
-ChipZclStatus_t chipZclCodecDecode(ChipZclBuffer_t * buffer, ChipZclType_t type, void * ptr, uint16_t ptrLen, uint16_t * retLen);
-
-/**
- * @brief Ends the decoding process. After this call, buffer should no longer be used for further decoding.
- */
-ChipZclStatus_t chipZclCodecDecodeEnd(ChipZclBuffer_t * buffer);
+ChipZclStatus_t chipZclCodecDecode(ChipZclCodec_t * codec, ChipZclType_t type, void * ptr, uint16_t ptrLen, uint16_t * retLen);
 
 #endif // CHIP_ZCL_CODEC

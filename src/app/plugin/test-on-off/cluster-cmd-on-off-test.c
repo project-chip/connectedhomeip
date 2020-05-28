@@ -92,17 +92,14 @@ int testClusterCmdOnOff(void)
 
     // Encode the header into the buffer
     chipZclEncodeZclHeader(buffer, &context);
-    chipZclBufferFinishWriting(buffer);
 
     if (testEncodingDecoding(buffer, &context) != 0)
     {
         return 1;
     }
 
-    chipZclBufferReset(buffer);
-
     uint8_t * rawBuffer   = chipZclBufferPointer(buffer);
-    uint16_t bufferLength = chipZclBufferUsedLength(buffer);
+    uint16_t bufferLength = chipZclBufferDataLength(buffer);
 
     printf("Buffer for processing is ready, length: %d\n", bufferLength);
 
