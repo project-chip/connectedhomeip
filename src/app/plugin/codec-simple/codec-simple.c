@@ -157,12 +157,18 @@ ChipZclStatus_t chipZclCodecDecode(ChipZclCodec_t * me, ChipZclType_t type, void
 }
 
 /**
- * @brief Ends the decoding process. After this call, buffer should no longer be used for further decoding.
+ * @brief Call after decoding to verify that everything has been decoded
  */
 ChipZclStatus_t chipZclCodecDecodeEnd(ChipZclCodec_t * me)
 {
-    chipZclBufferSetDataLength(me->buffer, me->cursor);
-    return CHIP_ZCL_STATUS_SUCCESS;
+    if (chipZclBufferDataLength(me->buffer) == me->cursor)
+    {
+        return CHIP_ZCL_STATUS_SUCCESS;
+    }
+    else
+    {
+        return CHIP_ZCL_STATUS_FAILURE;
+    }
 }
 
 void chipZclEncodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * context)

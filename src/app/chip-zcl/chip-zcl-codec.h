@@ -79,4 +79,9 @@ ChipZclStatus_t chipZclCodecDecodeStart(ChipZclCodec_t * codec, ChipZclBuffer_t 
  */
 ChipZclStatus_t chipZclCodecDecode(ChipZclCodec_t * codec, ChipZclType_t type, void * ptr, uint16_t ptrLen, uint16_t * retLen);
 
+/**
+ * @brief Call after decoding to verify that everything has been decoded
+ */
+ChipZclStatus_t chipZclCodecDecodeEnd(ChipZclCodec_t * me);
+
 #endif // CHIP_ZCL_CODEC
