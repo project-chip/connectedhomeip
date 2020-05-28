@@ -35,7 +35,6 @@ libSetupPayload_a_CPPFLAGS                                      = \
     -I$(top_srcdir)/src/lib/core                            \
     -I$(top_srcdir)/src/system                              \
     -I$(top_srcdir)/src/include                             \
-    -I$(top_srcdir)/src/lib/support/verhoeff                \
     $(NLASSERT_CPPFLAGS)                                    \
     $(NLFAULTINJECTION_CPPFLAGS)                            \
     $(NLIO_CPPFLAGS)                                        \

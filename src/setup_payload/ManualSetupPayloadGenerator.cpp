@@ -22,7 +22,8 @@
  */
 
 #include "ManualSetupPayloadGenerator.h"
-#include "support/verhoeff/Verhoeff.h"
+
+#include <support/verhoeff/Verhoeff.h>
 
 using namespace chip;
 
