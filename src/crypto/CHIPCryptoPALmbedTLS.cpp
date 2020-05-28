@@ -69,6 +69,33 @@ static bool _isValidKeyLength(size_t length)
     return false;
 }
 
+CHIP_ERROR chip::Crypto::AES_CCM_encrypt_session_new(chip_ccm_encrypt_session_t * session)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_decrypt_session_new(chip_ccm_decrypt_session_t * session)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_session_free(chip_ccm_session_common_t * session)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_session_encrypt(chip_ccm_encrypt_session_t * session, const unsigned char * input, size_t length,
+                                                 unsigned char * output)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_session_decrypt(chip_ccm_decrypt_session_t * session, const unsigned char * input, size_t length,
+                                                 unsigned char * output)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR chip::Crypto::AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                          size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
                                          size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)

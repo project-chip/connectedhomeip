@@ -33,6 +33,101 @@ const size_t kMax_ECDSA_Signature_Length = 72;
 const size_t kMax_ECDH_Secret_Length     = 32;
 
 /**
+ * @brief A structure that defines CHIP's AES-CCM session parameters
+ * @param key Encryption key
+ * @param key_length Length of encryption key (in bytes)
+ * @param iv Initial vector
+ * @param iv_length Length of initial vector
+ * @param aad Additional authentication data
+ * @param aad_length Length of additional authentication data
+ * @param total_data_length Total length of input data
+ * @param cipher_context Internal cipher context used for crypto operations
+ * @param processed_data_length amount of data that's already been processed
+ * */
+typedef struct
+{
+    const unsigned char * key;
+    size_t key_length;
+    const unsigned char * iv;
+    size_t iv_length;
+    const unsigned char * aad;
+    size_t aad_length;
+    size_t total_data_length;
+    /* The items below are for internal use */
+    void * cipher_context;
+    size_t processed_data_length;
+} chip_ccm_session_common_t;
+
+/**
+ * @brief A structure that defines CHIP's AES-CCM encrypt session parameters
+ * @param common common fields in encrypt and decrypt sessions
+ * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
+ * @param tag_length Expected length of tag
+ * */
+typedef struct
+{
+    chip_ccm_session_common_t common;
+    unsigned char * tag;
+    size_t tag_length;
+} chip_ccm_encrypt_session_t;
+
+/**
+ * @brief A structure that defines CHIP's AES-CCM decrypt session parameters
+ * @param common common fields in encrypt and decrypt sessions
+ * @param tag Buffer that contains tag
+ * @param tag_length Length of tag
+ * */
+typedef struct
+{
+    chip_ccm_session_common_t common;
+    const unsigned char * tag;
+    size_t tag_length;
+} chip_ccm_decrypt_session_t;
+
+/**
+ * @brief A function that initializes a new session for AES-CCM encryption
+ * @param session Pointer to session parameters
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ * */
+CHIP_ERROR AES_CCM_encrypt_session_new(chip_ccm_encrypt_session_t * session);
+
+/**
+ * @brief A function that initializes a new session for AES-CCM decryption
+ * @param session Pointer to session parameters
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ * */
+CHIP_ERROR AES_CCM_decrypt_session_new(chip_ccm_decrypt_session_t * session);
+
+/**
+ * @brief A function that frees previously created session for AES-CCM operations
+ * @param session Session to be freed
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ * */
+CHIP_ERROR AES_CCM_session_free(chip_ccm_session_common_t * session);
+
+/**
+ * @brief A function that implements AES-CCM encryption using session (created via AES_CCM_session_new())
+ * @param session AES CCM Session
+ * @param input Plaintext to encrypt
+ * @param length Length of plain_text
+ * @param output Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ * */
+CHIP_ERROR AES_CCM_session_encrypt(chip_ccm_encrypt_session_t * session, const unsigned char * input, size_t length,
+                                   unsigned char * output);
+
+/**
+ * @brief A function that implements AES-CCM decryption using session (created via AES_CCM_session_new())
+ * @param session AES CCM Session
+ * @param input Ciphertext to decrypt
+ * @param length Length of cipher text
+ * @param output Buffer to write plain text into. Caller must ensure this is large enough to hold the plain text
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ * */
+CHIP_ERROR AES_CCM_session_decrypt(chip_ccm_decrypt_session_t * session, const unsigned char * input, size_t length,
+                                   unsigned char * output);
+
+/**
  * @brief A function that implements AES-CCM encryption
  * @param plaintext Plaintext to encrypt
  * @param plaintext_length Length of plain_text

@@ -480,6 +480,270 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+static void TestAES_CCM_Streaming_128EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_ct[vector->ct_len];
+            unsigned char out_tag[vector->tag_len];
+
+            chip_ccm_encrypt_session_t session = { { vector->key, vector->key_len, vector->iv, vector->iv_len, vector->aad,
+                                                     vector->aad_len, vector->pt_len, NULL, 0 },
+                                                   out_tag,
+                                                   vector->tag_len };
+
+            CHIP_ERROR err = AES_CCM_encrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            err = AES_CCM_session_encrypt(&session, vector->pt, vector->pt_len, out_ct);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            AES_CCM_session_free(&session.common);
+
+            if (vector->result == CHIP_NO_ERROR)
+            {
+                bool areCTsEqual  = memcmp(out_ct, vector->ct, vector->ct_len) == 0;
+                bool areTagsEqual = memcmp(out_tag, vector->tag, vector->tag_len) == 0;
+                NL_TEST_ASSERT(inSuite, areCTsEqual);
+                NL_TEST_ASSERT(inSuite, areTagsEqual);
+                if (!areCTsEqual)
+                {
+                    printf("\n Test %d failed due to mismatching ciphertext\n", vector->tcId);
+                }
+                if (!areTagsEqual)
+                {
+                    printf("\n Test %d failed due to mismatching tags\n", vector->tcId);
+                }
+            }
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_Streaming_128DecryptTestVectors(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_pt[vector->pt_len];
+            chip_ccm_decrypt_session_t session = { { vector->key, vector->key_len, vector->iv, vector->iv_len, vector->aad,
+                                                     vector->aad_len, vector->ct_len, NULL, 0 },
+                                                   vector->tag,
+                                                   vector->tag_len };
+
+            CHIP_ERROR err = AES_CCM_decrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            err = AES_CCM_session_decrypt(&session, vector->ct, vector->ct_len, out_pt);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            AES_CCM_session_free(&session.common);
+
+            if (vector->result == CHIP_NO_ERROR)
+            {
+                bool arePTsEqual = memcmp(vector->pt, out_pt, vector->pt_len) == 0;
+                NL_TEST_ASSERT(inSuite, arePTsEqual);
+                if (!arePTsEqual)
+                {
+                    printf("\n Test %d failed due to mismatching plaintext\n", vector->tcId);
+                }
+            }
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_Streaming_128EncryptInvalidPlainText(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_ct[vector->ct_len];
+            unsigned char out_tag[vector->tag_len];
+            chip_ccm_encrypt_session_t session = { { vector->key, vector->key_len, vector->iv, vector->iv_len, vector->aad,
+                                                     vector->aad_len, vector->pt_len, NULL, 0 },
+                                                   out_tag,
+                                                   vector->tag_len };
+
+            CHIP_ERROR err = AES_CCM_encrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            err = AES_CCM_session_encrypt(&session, vector->pt, vector->pt_len + 1, out_ct);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+
+            AES_CCM_session_free(&session.common);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_Streaming_128EncryptNilKey(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_tag[vector->tag_len];
+
+            chip_ccm_encrypt_session_t session = { { NULL, 0, vector->iv, vector->iv_len, vector->aad, vector->aad_len,
+                                                     vector->pt_len, NULL, 0 },
+                                                   out_tag,
+                                                   vector->tag_len };
+
+            CHIP_ERROR err = AES_CCM_encrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_Streaming_128EncryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_tag[vector->tag_len];
+
+            chip_ccm_encrypt_session_t session = { { vector->key, vector->key_len, vector->iv, 0, vector->aad, vector->aad_len,
+                                                     vector->pt_len, NULL, 0 },
+                                                   out_tag,
+                                                   vector->tag_len };
+
+            CHIP_ERROR err = AES_CCM_encrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_Streaming_128EncryptInvalidTagLen(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_tag[vector->tag_len];
+
+            chip_ccm_encrypt_session_t session = { { vector->key, vector->key_len, vector->iv, vector->iv_len, vector->aad,
+                                                     vector->aad_len, vector->pt_len, NULL, 0 },
+                                                   out_tag,
+                                                   13 };
+
+            CHIP_ERROR err = AES_CCM_encrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_Streaming_128DecryptInvalidCipherText(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            unsigned char out_pt[vector->pt_len];
+            chip_ccm_decrypt_session_t session = { { vector->key, vector->key_len, vector->iv, vector->iv_len, vector->aad,
+                                                     vector->aad_len, vector->ct_len, NULL, 0 },
+                                                   vector->tag,
+                                                   vector->tag_len };
+
+            CHIP_ERROR err = AES_CCM_decrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            err = AES_CCM_session_decrypt(&session, vector->ct, vector->ct_len + 1, out_pt);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+
+            AES_CCM_session_free(&session.common);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_Streaming_128DecryptInvalidKey(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            chip_ccm_decrypt_session_t session = { { NULL, 0, vector->iv, vector->iv_len, vector->aad, vector->aad_len,
+                                                     vector->ct_len, NULL, 0 },
+                                                   vector->tag,
+                                                   vector->tag_len };
+
+            CHIP_ERROR err = AES_CCM_decrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAES_CCM_Streaming_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        if (vector->pt_len > 0)
+        {
+            numOfTestsRan++;
+            chip_ccm_decrypt_session_t session = { { vector->key, vector->key_len, vector->iv, 0, vector->aad, vector->aad_len,
+                                                     vector->ct_len, NULL, 0 },
+                                                   vector->tag,
+                                                   vector->tag_len };
+
+            CHIP_ERROR err = AES_CCM_decrypt_session_new(&session);
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+            break;
+        }
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
 static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
@@ -809,6 +1073,18 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid ct", TestAES_CCM_128DecryptInvalidCipherText),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid key", TestAES_CCM_128DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid IV", TestAES_CCM_128DecryptInvalidIVLen),
+#if CHIP_CRYPTO_OPENSSL // Following tests are currently supported only for OpenSSL
+    NL_TEST_DEF("Test encrypting AES-CCM-128 test vectors using streaming API", TestAES_CCM_Streaming_128EncryptTestVectors),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 test vectors using streaming API", TestAES_CCM_Streaming_128DecryptTestVectors),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 invalid plain text using streaming API",
+                TestAES_CCM_Streaming_128EncryptInvalidPlainText),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 using nil key using streaming API", TestAES_CCM_Streaming_128EncryptNilKey),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid IV using streaming API", TestAES_CCM_Streaming_128EncryptInvalidIVLen),
+    NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid tag using streaming API", TestAES_CCM_Streaming_128EncryptInvalidTagLen),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid ct using streaming API", TestAES_CCM_Streaming_128DecryptInvalidCipherText),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid key using streaming API", TestAES_CCM_Streaming_128DecryptInvalidKey),
+    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid IV using streaming API", TestAES_CCM_Streaming_128DecryptInvalidIVLen),
+#endif
     NL_TEST_DEF("Test encrypting AES-CCM-256 test vectors", TestAES_CCM_256EncryptTestVectors),
     NL_TEST_DEF("Test decrypting AES-CCM-256 test vectors", TestAES_CCM_256DecryptTestVectors),
     NL_TEST_DEF("Test encrypting AES-CCM-256 invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),

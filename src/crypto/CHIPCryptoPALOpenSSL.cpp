@@ -115,6 +115,218 @@ static const EVP_MD * _digestForType(DigestType digestType)
     }
 }
 
+CHIP_ERROR AES_CCM_common_session_new(chip_ccm_session_common_t * session)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(session != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(session->key != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidKeyLength(session->key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(session->iv != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(session->iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    if (session->aad_length > 0)
+    {
+        VerifyOrExit(session->aad != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    VerifyOrExit(session->total_data_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    session->processed_data_length = 0;
+
+exit:
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_encrypt_session_new(chip_ccm_encrypt_session_t * session)
+{
+    EVP_CIPHER_CTX * context = NULL;
+    int bytesWritten         = 0;
+    CHIP_ERROR error         = CHIP_NO_ERROR;
+    int result               = 1;
+    const EVP_CIPHER * type  = NULL;
+
+    error = AES_CCM_common_session_new(&session->common);
+    SuccessOrExit(error);
+
+    VerifyOrExit(session->tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidTagLength(session->tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // 16 bytes key for AES-CCM-128
+    type = (session->common.key_length == 16) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
+
+    context = EVP_CIPHER_CTX_new();
+    VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in cipher
+    result = EVP_EncryptInit_ex(context, type, NULL, NULL, NULL);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in IV length
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_IVLEN, session->common.iv_length, NULL);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in tag length
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_TAG, session->tag_length, NULL);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in key + iv
+    result = EVP_EncryptInit_ex(context, NULL, NULL, session->common.key, session->common.iv);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in input length
+    result = EVP_EncryptUpdate(context, NULL, &bytesWritten, NULL, session->common.total_data_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in AAD
+    if (session->common.aad_length > 0)
+    {
+        result = EVP_EncryptUpdate(context, NULL, &bytesWritten, session->common.aad, session->common.aad_length);
+        VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    }
+
+    session->common.cipher_context = context;
+    return error;
+
+exit:
+    if (context != NULL)
+    {
+        EVP_CIPHER_CTX_free(context);
+        context = NULL;
+    }
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_decrypt_session_new(chip_ccm_decrypt_session_t * session)
+{
+    EVP_CIPHER_CTX * context = NULL;
+    int bytesWritten         = 0;
+    CHIP_ERROR error         = CHIP_NO_ERROR;
+    int result               = 1;
+    const EVP_CIPHER * type  = NULL;
+
+    error = AES_CCM_common_session_new(&session->common);
+    SuccessOrExit(error);
+
+    VerifyOrExit(session->tag != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(_isValidTagLength(session->tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // 16 bytes key for AES-CCM-128
+    type = (session->common.key_length == 16) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
+
+    context = EVP_CIPHER_CTX_new();
+    VerifyOrExit(context != NULL, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in cipher
+    result = EVP_DecryptInit_ex(context, type, NULL, NULL, NULL);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in IV length
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_IVLEN, session->common.iv_length, NULL);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in tag length
+    result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_TAG, session->tag_length, (void *) session->tag);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in key + iv
+    result = EVP_DecryptInit_ex(context, NULL, NULL, session->common.key, session->common.iv);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in cipher text length
+    result = EVP_DecryptUpdate(context, NULL, &bytesWritten, NULL, session->common.total_data_length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // Pass in aad
+    if (session->common.aad_length > 0)
+    {
+        result = EVP_DecryptUpdate(context, NULL, &bytesWritten, session->common.aad, session->common.aad_length);
+        VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    }
+
+    session->common.cipher_context = context;
+    return error;
+
+exit:
+    if (context != NULL)
+    {
+        EVP_CIPHER_CTX_free(context);
+        context = NULL;
+    }
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_session_free(chip_ccm_session_common_t * session)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(session != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (session->cipher_context != NULL)
+    {
+        EVP_CIPHER_CTX * context = (EVP_CIPHER_CTX *) session->cipher_context;
+        EVP_CIPHER_CTX_free(context);
+    }
+
+exit:
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_session_encrypt(chip_ccm_encrypt_session_t * session, const unsigned char * input, size_t length,
+                                                 unsigned char * output)
+{
+    CHIP_ERROR error         = CHIP_NO_ERROR;
+    int bytesWritten         = 0;
+    int result               = 1;
+    EVP_CIPHER_CTX * context = NULL;
+
+    VerifyOrExit(session != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(session->common.cipher_context != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(length <= (session->common.total_data_length - session->common.processed_data_length),
+                 error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    context = (EVP_CIPHER_CTX *) session->common.cipher_context;
+
+    // Encrypt
+    result = EVP_EncryptUpdate(context, output, &bytesWritten, input, length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    if (session->common.processed_data_length + length == session->common.total_data_length)
+    {
+        // Finalize encryption
+        result = EVP_EncryptFinal_ex(context, output + bytesWritten, &bytesWritten);
+        VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+        // Get tag
+        result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_GET_TAG, session->tag_length, session->tag);
+        VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    }
+
+exit:
+    return error;
+}
+
+CHIP_ERROR chip::Crypto::AES_CCM_session_decrypt(chip_ccm_decrypt_session_t * session, const unsigned char * input, size_t length,
+                                                 unsigned char * output)
+{
+    CHIP_ERROR error         = CHIP_NO_ERROR;
+    int bytesWritten         = 0;
+    int result               = 1;
+    EVP_CIPHER_CTX * context = NULL;
+
+    VerifyOrExit(session != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(session->common.cipher_context != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(length <= (session->common.total_data_length - session->common.processed_data_length),
+                 error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    context = (EVP_CIPHER_CTX *) session->common.cipher_context;
+
+    // Pass in ciphertext. We wont get anything if validation fails.
+    result = EVP_DecryptUpdate(context, output, &bytesWritten, input, length);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
 CHIP_ERROR chip::Crypto::AES_CCM_encrypt(const unsigned char * plaintext, size_t plaintext_length, const unsigned char * aad,
                                          size_t aad_length, const unsigned char * key, size_t key_length, const unsigned char * iv,
                                          size_t iv_length, unsigned char * ciphertext, unsigned char * tag, size_t tag_length)
