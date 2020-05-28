@@ -32,6 +32,7 @@
 #include "gen-command-handler.h"
 #include "gen-command-id.h"
 #include "gen-endpoint-config.h"
+#include "gen-global-command-handler.h"
 #include "gen-types.h"
 
 #endif // CHIP_ZCL_GEN_HEADER

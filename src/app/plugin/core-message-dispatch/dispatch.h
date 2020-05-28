@@ -27,7 +27,6 @@
 
 #include "chip-zcl.h"
 #include "gen.h"
-#include "general-command-handler.h"
 
 // Main command parsing controller.
 ChipZclStatus_t chipZclCommandParse(ChipZclCommandContext_t * context);

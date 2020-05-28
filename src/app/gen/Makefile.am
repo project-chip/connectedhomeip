@@ -22,20 +22,22 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-EXTRA_DIST                    = \
-    gen-attribute-storage.h     \
-    gen-attribute-type.h        \
-    gen-callback-stubs.c        \
-    gen-callbacks.h             \
-    gen-cluster-id.h            \
-    gen-command-handler.c       \
-    gen-command-handler.h       \
-    gen-command-id.h            \
-    gen-endpoint-config.h       \
-    gen-specs.c                 \
-    gen-types.h                 \
-    gen.h                       \
-    README.md                   \
+EXTRA_DIST                    =  \
+    gen-attribute-storage.h      \
+    gen-attribute-type.h         \
+    gen-callback-stubs.c         \
+    gen-callbacks.h              \
+    gen-cluster-id.h             \
+    gen-command-handler.c        \
+    gen-command-handler.h        \
+    gen-command-id.h             \
+    gen-endpoint-config.h        \
+    gen-global-command-handler.c \
+    gen-global-command-handler.h \
+    gen-specs.c                  \
+    gen-types.h                  \
+    gen.h                        \
+    README.md                    \
     $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
