@@ -178,7 +178,6 @@ code.
 ===== Dos
 
 * *Do* use the '@' Doxygen markup style rather than the '\' markup style.
-uncomfortable or unclear on your own writing style.
 * *Do* also consider consulting tips on
 http://centerforplainlanguage.org/5-steps-to-plain-language/[Plain
 Language] for additional style and tone input.
