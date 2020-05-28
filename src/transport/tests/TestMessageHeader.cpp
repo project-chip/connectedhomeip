@@ -47,6 +47,7 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     MessageHeader header;
     uint8_t buffer[64];
     size_t encodeLen;
+    size_t decodeLen;
 
     header.SetMessageId(123);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
@@ -54,7 +55,8 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     // change it to verify decoding
     header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
 
-    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen, &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 123);
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
     NL_TEST_ASSERT(inSuite, !header.GetSourceNodeId().HasValue());
@@ -65,7 +67,8 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     // change it to verify decoding
     header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
 
-    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen, &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 123);
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(55));
@@ -75,7 +78,8 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 
     // change it to verify decoding
     header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
-    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen, &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 123);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(11));
     NL_TEST_ASSERT(inSuite, !header.GetSourceNodeId().HasValue());
@@ -85,10 +89,24 @@ void TestHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 
     // change it to verify decoding
     header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
-    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encodeLen, &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77));
+}
+
+void TestHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
+{
+    MessageHeader header;
+    uint8_t buffer[64];
+    size_t unusedLen;
+
+    for (size_t shortLen = 0; shortLen < 6; shortLen++)
+    {
+        NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
+    }
 }
 
 } // namespace
@@ -98,6 +116,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("InitialState", TestHeaderInitialState),
     NL_TEST_DEF("EncodeDecode", TestHeaderEncodeDecode),
+    NL_TEST_DEF("EncodeDecodeBounds", TestHeaderEncodeDecodeBounds),
     NL_TEST_SENTINEL()
 };
 // clang-format on
