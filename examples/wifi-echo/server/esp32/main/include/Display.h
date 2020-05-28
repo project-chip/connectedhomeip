@@ -41,7 +41,7 @@ extern "C" {
 } // extern "C"
 
 // To reduce wear (and heat) on the screen, the display will always go off after a few seconds
-#define DISPLAY_TIMEOUT_MS 15000
+#define DISPLAY_TIMEOUT_MS 30000
 
 extern uint16_t DisplayHeight;
 extern uint16_t DisplayWidth;

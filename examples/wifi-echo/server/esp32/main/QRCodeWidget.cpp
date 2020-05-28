@@ -26,6 +26,7 @@
 #include "qrcodegen.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CodeUtils.h>
 
 #include "Display.h"
@@ -61,6 +62,32 @@ void GetAPName(char * ssid, size_t ssid_len)
     snprintf(ssid, ssid_len, "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
 }
 
+string createSetupPayload()
+{
+    char ap_ssid[MAX_SSID_LEN];
+    GetAPName(ap_ssid, sizeof(ap_ssid));
+    SetupPayload payload;
+    payload.version   = 1;
+    payload.vendorID  = 2;
+    payload.productID = 3;
+    uint64_t tag;
+    VendorTag(2, tag);
+    OptionalQRCodeInfo stringInfo;
+    stringInfo.tag  = tag;
+    stringInfo.type = optionalQRCodeInfoTypeString;
+    stringInfo.data = ap_ssid;
+    payload.addOptionalData(stringInfo);
+    QRCodeSetupPayloadGenerator generator(payload);
+    string result;
+    uint8_t tlvDataStart[sizeof(ap_ssid)];
+    CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, sizeof(tlvDataStart));
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Couldn't get payload string %d", generator.payloadBase41Representation(result));
+    }
+    return result;
+};
+
 void QRCodeWidget::Init()
 {
     QRCodeColor = TFT_DARKGREY;
@@ -79,11 +106,7 @@ void QRCodeWidget::Display()
     uint8_t * qrCode        = NULL;
     uint16_t qrCodeDisplaySize, qrCodeX, qrCodeY, qrCodeXOffset, qrCodeYOffset;
 
-    // get the ssid of the Soft-AP
-    char ap_ssid[MAX_SSID_LEN];
-    GetAPName(ap_ssid, sizeof(ap_ssid));
-    // TODO create a CHIP qrcode here with the soft-ap in the tlv secion
-    qrCodeStr = ap_ssid;
+    qrCodeStr = (char *) createSetupPayload().c_str();
 
     // Generate the QR code.
     uint16_t qrCodeSize = qrcodegen_BUFFER_LEN_FOR_VERSION(kQRCodeVersion);
