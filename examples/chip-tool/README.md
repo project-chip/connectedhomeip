@@ -1,12 +1,12 @@
-# CHIP Echo Client Example
+# CHIP Client Example
 
-An example application that uses CHIP to send messages to a CHIP echo server.
+An example application that uses CHIP to send messages to a CHIP server.
 
 ---
 
--   [CHIP Echo Client Example](#chip-wifi-echo-client-example)
+-   [CHIP Client Example](#chip-client-example)
 -   [Building the Example Application](#building-the-example-application)
--   [Using the Echo Client](#using-the-echo-client)
+-   [Using the Client to Request an Echo](#using-the-client-to-request-an-echo)
 
 ---
 
@@ -21,12 +21,12 @@ Building the example application is quite straightforward.
 -   After the application is built, it can be found in the build directory as
     `chip-standalone-demo.out`
 
-## Using the Echo Client
+## Using the Client to Request an Echo
 
-To start the Echo Client run the built executable and pass it the IP address and
-port of the server to talk to.
+To start the Client in echo mode, run the built executable and pass it the IP
+address and port of the server to talk to, as well as the command "echo".
 
-          $ ./build/chip-standalone-demo.out 192.168.0.30 8000
+          $ ./build/chip-standalone-demo.out 192.168.0.30 8000 echo
 
 If valid values are supplied, it will begin to periodically send messages to the
 server address provided.
@@ -34,4 +34,15 @@ server address provided.
 It also verifies that the incoming echo from the server matches what was sent
 out.
 
-Stop the Client at anytime with `Ctrl + C`.
+Stop the Client at any time with `Ctrl + C`.
+
+## Using the Client to Send CHIP Commands
+
+To use the Client to send a CHIP comands, run the built executable and pass it
+the IP address and port of the server to talk to, as well as the name of the
+command to send. Right now the "off", "on", and "toggle" commands are supported,
+from the On/Off cluster.
+
+          $ ./build/chip-standalone-demo.out 192.168.0.30 8000 on
+
+The client will send a single command packet and then exit.

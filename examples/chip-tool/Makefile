@@ -44,11 +44,14 @@ INC_DIRS = \
     $(CHIP_ROOT)/src/system \
     $(CHIP_ROOT)/src/controller \
     $(CHIP_ROOT)/config/standalone \
+    $(CHIP_ROOT)/src/app \
     $(NULL)
 
 DEFINES = \
     USE_APP_CONFIG \
     $(NULL)
+
+CXXFLAGS += -std=c++11
 
 ifdef BUILD_RELEASE
     DEFINES += BUILD_RELEASE=1
