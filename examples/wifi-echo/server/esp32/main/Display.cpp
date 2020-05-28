@@ -17,6 +17,13 @@
  *    limitations under the License.
  */
 
+/**
+ * @file Display.cpp
+ *
+ * This file implements helper APIs for the M5Stack's display
+ *
+ */
+
 #include <string.h>
 
 #include "driver/ledc.h"
@@ -30,7 +37,15 @@
 
 #if CONFIG_HAVE_DISPLAY
 
-#define DEF_BRIGHTNESS_PERCENT 80
+#define DEFFAULT_BRIGHTNESS_PERCENT 80
+
+// 8MHz is the recommended SPI speed to init the driver with
+// It later gets set to the preconfigured defaults within the driver
+#define TFT_SPI_CLOCK_HZ 8000000
+
+// The frequency used by the ledc timer
+// value chosen to eliminate flicker
+#define LEDC_PWM_HZ 1000
 
 // with a duty resolution of LEDC_TIMER_8_BIT
 // the highest possible brightness value is 255
@@ -55,25 +70,23 @@ esp_err_t InitDisplay()
     esp_err_t err;
     spi_lobo_device_handle_t spi;
 
+    // configured based on the display driver's examples
     spi_lobo_bus_config_t buscfg;
     memset((void *) &buscfg, 0, sizeof(buscfg));
-    buscfg.miso_io_num     = PIN_NUM_MISO; // set SPI MISO pin
-    buscfg.mosi_io_num     = PIN_NUM_MOSI; // set SPI MOSI pin
-    buscfg.sclk_io_num     = PIN_NUM_CLK;  // set SPI CLK pin
-    buscfg.quadwp_io_num   = -1;
-    buscfg.quadhd_io_num   = -1;
-    buscfg.max_transfer_sz = 6 * 1024;
+    buscfg.miso_io_num   = PIN_NUM_MISO; // set SPI MISO pin
+    buscfg.mosi_io_num   = PIN_NUM_MOSI; // set SPI MOSI pin
+    buscfg.sclk_io_num   = PIN_NUM_CLK;  // set SPI CLK pin
+    buscfg.quadwp_io_num = -1;
+    buscfg.quadhd_io_num = -1;
 
     spi_lobo_device_interface_config_t devcfg;
     memset((void *) &devcfg, 0, sizeof(devcfg));
-    devcfg.clock_speed_hz   = 8000000;                  // Initial clock out at 8 MHz
+    devcfg.clock_speed_hz   = TFT_SPI_CLOCK_HZ;
     devcfg.mode             = 0;                        // SPI mode 0
     devcfg.spics_io_num     = -1;                       // we will use external CS pin
     devcfg.spics_ext_io_num = PIN_NUM_CS;               // external CS pin
     devcfg.flags            = LB_SPI_DEVICE_HALFDUPLEX; // ALWAYS SET  to HALF DUPLEX MODE!! for display spi
-
-    tft_disp_type   = DISP_TYPE_ILI9341;
-    tft_max_rdclock = 8000000;
+    tft_max_rdclock         = TFT_SPI_CLOCK_HZ;
 
     // Initialize all pins used by display driver.
     TFT_PinsInit();
@@ -96,10 +109,10 @@ esp_err_t InitDisplay()
     // Initialize the display driver.
     TFT_display_init();
 
-    // ---- Detect maximum read speed ----
+    // Detect maximum read speed and set it.
     tft_max_rdclock = find_rd_speed();
 
-    // Set the SPI clock speed.
+    // Set the SPI clock speed overriding the initialized 8MHz speed
     spi_lobo_set_speed(spi, DEFAULT_SPI_CLOCK);
 
     TFT_setGammaCurve(0);
@@ -116,18 +129,18 @@ esp_err_t InitDisplay()
 
     // prepare the display for brightness control
     SetupBrightnessControl();
-    displayTimer = xTimerCreate("DisplayTimer", pdMS_TO_TICKS(DISPLAY_TIMEOUT_MS), false, NULL, TimerCallback);
 
+    displayTimer = xTimerCreate("DisplayTimer", pdMS_TO_TICKS(DISPLAY_TIMEOUT_MS), false, NULL, TimerCallback);
     // lower the brightness of the screen
     WakeDisplay();
 
     return err;
 }
 
-void SetBrightness(uint16_t brightness)
+void SetBrightness(uint16_t brightness_percent)
 {
-    uint16_t brightness_percent = (brightness * BRIGHTNESS_MAX) / 100;
-    if (ledc_set_duty(LEDC_HIGH_SPEED_MODE, BACKLIGHT_CHANNEL, brightness_percent) ||
+    uint16_t brightness = (brightness_percent * BRIGHTNESS_MAX) / 100;
+    if (ledc_set_duty(LEDC_HIGH_SPEED_MODE, BACKLIGHT_CHANNEL, brightness) ||
         ledc_update_duty(LEDC_HIGH_SPEED_MODE, BACKLIGHT_CHANNEL))
     {
         ESP_LOGE(TAG, "Failed to set display brightness...");
@@ -136,7 +149,7 @@ void SetBrightness(uint16_t brightness)
 
 void WakeDisplay()
 {
-    SetBrightness(DEF_BRIGHTNESS_PERCENT);
+    SetBrightness(DEFFAULT_BRIGHTNESS_PERCENT);
     xTimerStart(displayTimer, 0);
     ESP_LOGI(TAG, "Display awake but will switch off automatically in %d seconds", DISPLAY_TIMEOUT_MS / 1000);
 }
@@ -166,12 +179,12 @@ void SetupBrightnessControl()
     memset(&ledc_timer, 0, sizeof(ledc_timer));
 
     ledc_timer.duty_resolution = LEDC_TIMER_8_BIT;     // resolution of PWM duty
-    ledc_timer.freq_hz         = 1000;                 // frequency of PWM signal
+    ledc_timer.freq_hz         = LEDC_PWM_HZ;          // frequency of PWM signal
     ledc_timer.speed_mode      = LEDC_HIGH_SPEED_MODE; // timer mode
     ledc_timer.timer_num       = LEDC_TIMER_0;         // timer index
     ledc_timer_config(&ledc_timer);
 
-    ledc_timer_set(LEDC_HIGH_SPEED_MODE, LEDC_TIMER_0, 1000, LEDC_TIMER_8_BIT, LEDC_REF_TICK);
+    ledc_timer_set(LEDC_HIGH_SPEED_MODE, LEDC_TIMER_0, LEDC_PWM_HZ, LEDC_TIMER_8_BIT, LEDC_REF_TICK);
 
     ledc_channel_config_t ledc_channel;
     memset(&ledc_channel, 0, sizeof(ledc_channel));

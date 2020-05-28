@@ -17,6 +17,13 @@
  *    limitations under the License.
  */
 
+/**
+ * @file Display.h
+ *
+ * This describes helper APIs for the M5Stack's Display
+ *
+ */
+
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
@@ -46,9 +53,32 @@ extern "C" {
 extern uint16_t DisplayHeight;
 extern uint16_t DisplayWidth;
 
+/**
+ * @brief
+ *  Initialize the M5Stack's display driver and set the default bright control and timeout
+ *
+ * @return esp_err_t    0 if the display driver was initialized correctly
+ */
 extern esp_err_t InitDisplay();
+/**
+ * @brief
+ *  Clear the display by setting the whole screen to black
+ */
 extern void ClearDisplay();
+/**
+ * @brief
+ *  Display a status message at a given vertical position
+ *
+ *  The status message will be drawn from the left edge of the screen
+ *
+ * @param msg   The message to display
+ * @param vpos  The vertical position(0-100 percent) of the message. Where 0 is the top of the screen
+ */
 extern void DisplayStatusMessage(char * msg, uint16_t vpos);
+/**
+ * @brief
+ *  Reset the display timeout and set the brightness back up to default values
+ */
 extern void WakeDisplay();
 
 #endif // #if CONFIG_HAVE_DISPLAY
