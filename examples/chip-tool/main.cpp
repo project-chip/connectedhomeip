@@ -205,7 +205,7 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
     static const size_t bufferSize = 1024;
     auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
 
-    ChipZclBuffer_t zcl_buffer  = { buffer->Start(), 0, 0, bufferSize };
+    ChipZclBuffer_t zcl_buffer  = { buffer->Start(), bufferSize, 0 };
     ChipZclCommandContext_t ctx = {
         1,                              // endpointId
         CHIP_ZCL_CLUSTER_ON_OFF,        // clusterId
@@ -219,8 +219,8 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
         nullptr                         // response
     };
     chipZclEncodeZclHeader(&zcl_buffer, &ctx);
-    chipZclBufferFinishWriting(&zcl_buffer);
-    const size_t data_len = chipZclBufferUsedLength(&zcl_buffer);
+
+    const size_t data_len = chipZclBufferDataLength(&zcl_buffer);
 
 #ifdef DEBUG
     fprintf(stderr, "SENDING: %zu ", data_len);

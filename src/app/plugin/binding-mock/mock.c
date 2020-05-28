@@ -101,10 +101,12 @@ void chipZclReverseClusterSpec(const ChipZclClusterSpec_t * s1, ChipZclClusterSp
 ChipZclBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
 {
     ChipZclBuffer_t * buffer = (ChipZclBuffer_t *) malloc(sizeof(ChipZclBuffer_t) + allocatedLength);
-    buffer->buffer           = (uint8_t *) (buffer + 1);
-    buffer->dataLength       = 0;
-    buffer->currentPosition  = 0;
-    buffer->totalLength      = allocatedLength;
+    if (NULL != buffer)
+    {
+        buffer->buffer       = (uint8_t *) (buffer + 1);
+        buffer->dataLength   = 0;
+        buffer->bufferLength = allocatedLength;
+    }
     return buffer;
 }
 

@@ -50,42 +50,41 @@ int testCodecSimple()
     char * sIn               = "Test data is encoded and decoded back.";
     char * sOut              = malloc(100);
     uint16_t ret;
+    ChipZclCodec_t codec;
 
-    chipZclCodecEncodeStart(buffer);
-    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num1, 1);
-    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num2, 2);
-    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num4, 4);
-    chipZclCodecEncode(buffer, CHIP_ZCL_STRUCT_TYPE_STRING, sIn, strlen(sIn));
-    chipZclCodecEncodeEnd(buffer);
+    chipZclCodecEncodeStart(&codec, buffer);
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num1, 1);
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num2, 2);
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num4, 4);
+    chipZclCodecEncode(&codec, CHIP_ZCL_STRUCT_TYPE_STRING, sIn, strlen(sIn));
+    chipZclCodecEncodeEnd(&codec);
 
-    chipZclBufferFinishWriting(buffer);
-
-    chipZclCodecDecodeStart(buffer);
-    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num1, 1, &ret);
+    chipZclCodecDecodeStart(&codec, buffer);
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num1, 1, &ret);
     if (num1 != 0x13)
     {
         printf("Failure: num1=%d\n", num1);
         return 1;
     }
-    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num2, 2, &ret);
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num2, 2, &ret);
     if (num2 != 0x4231)
     {
         printf("Failure: num2=%d\n", num2);
         return 1;
     }
-    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num4, 4, &ret);
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_INTEGER, &num4, 4, &ret);
     if (num4 != 0xABCD1234)
     {
         printf("Failure: num4=%d\n", num4);
         return 1;
     }
-    chipZclCodecDecode(buffer, CHIP_ZCL_STRUCT_TYPE_STRING, sOut, 100, &ret);
+    chipZclCodecDecode(&codec, CHIP_ZCL_STRUCT_TYPE_STRING, sOut, 100, &ret);
     if (memcmp(sIn, sOut, ret))
     {
         printf("Failure: sOut=%s\n", sOut);
         return 1;
     }
-    chipZclCodecDecodeEnd(buffer);
+    chipZclCodecDecodeEnd(&codec);
 
     chipZclBufferFree(buffer);
 

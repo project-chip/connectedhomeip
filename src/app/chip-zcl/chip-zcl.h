@@ -976,9 +976,6 @@ void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 // Endpoint Management
 ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);
 
-// Toplevel functions
-ChipZclStatus_t chipZclDecode(ChipZclBuffer_t * buffer);
-
 // Some platform CHIP_ZCL_STATUS_INSUFFICIENT_SPACE
 #define MEMSET(d, v, l) memset(d, v, l)
 #define MEMCOPY(d, s, l) memcpy(d, s, l)
@@ -1115,8 +1112,6 @@ void chipZclEncodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * 
  * This function takes the buffer and decodes it into ZCL header data in the context.
  */
 void chipZclDecodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * context);
-
-ChipZclCommandContext_t * createCommandContext(ChipZclEndpointId_t endpointId, ChipZclClusterId_t clusterId);
 
 ChipZclStatus_t chipZclProcessIncoming(uint8_t * buffer, uint16_t bufferLength);
 
