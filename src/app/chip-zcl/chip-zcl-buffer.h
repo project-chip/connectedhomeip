@@ -61,8 +61,8 @@ typedef struct
 /**
  * Function that allocates a buffer.
  *
- * @param allocatedLength the number of octets the resulting buffer should be
- *                        able to store.
+ * @param[in] allocatedLength the number of octets the resulting buffer should
+ *                            be able to store.
  * @return A newly allocated buffer.  This should later be freed with
  *         chipZclBufferFree.
  */
@@ -71,7 +71,7 @@ ChipZclBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength);
 /**
  * Function that returns a raw pointer to the underlying buffer.
  *
- * @param buffer the buffer we are working with.
+ * @param[in] buffer the buffer we are working with.
  * @return A pointer to its underlying memory.
  */
 uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer);
@@ -79,8 +79,8 @@ uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer);
 /**
  * Function that frees a buffer and its storage.
  *
- * @param buffer a buffer to free.  The buffer should have been allocated with
- *        chipZclBufferAlloc.
+ * @param[in] buffer a buffer to free.  The buffer should have been allocated
+ *            with chipZclBufferAlloc.
  */
 void chipZclBufferFree(ChipZclBuffer_t * buffer);
 
@@ -90,7 +90,7 @@ void chipZclBufferFree(ChipZclBuffer_t * buffer);
  * After this call, the buffer is ready for reading or writing from the
  * beginning again, depending on whether it was in reading more or writing mode.
  *
- * @param buffer the buffer to reset.
+ * @param[in] buffer the buffer to reset.
  */
 void chipZclBufferReset(ChipZclBuffer_t * buffer);
 
@@ -99,7 +99,7 @@ void chipZclBufferReset(ChipZclBuffer_t * buffer);
  * when the buffer is ready for reading.  Always returns 0 for buffers that are
  * being written to.
  *
- * @param buffer the buffer whose used length we want.
+ * @param[in] buffer the buffer whose used length we want.
  * @return The number of bytes the given buffer holds.
  */
 uint16_t chipZclBufferUsedLength(ChipZclBuffer_t * buffer);
@@ -107,7 +107,7 @@ uint16_t chipZclBufferUsedLength(ChipZclBuffer_t * buffer);
 /**
  * Indicates that we are done writing to a buffer and prepares it for reading.
  *
- * @param buffer the buffer we are done writing to.
+ * @param[in] buffer the buffer we are done writing to.
  */
 void chipZclBufferFinishWriting(ChipZclBuffer_t * buffer);
 
