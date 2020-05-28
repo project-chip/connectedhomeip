@@ -42,16 +42,21 @@ namespace {
 
 using namespace chip::Encoding;
 
+/// size of the fixed portion of the header
 constexpr size_t kFixedHeaderSizeBytes = 6;
-constexpr size_t kNodeIdSizeBytes      = 8;
 
-// Available flags
+/// size of a serialized node id inside a header
+constexpr size_t kNodeIdSizeBytes = 8;
+
+/// Header flag specifying that a destination node id is included in the header.
 constexpr uint16_t kFlagDestinationNodeIdPresent = 0x0100;
-constexpr uint16_t kFlagSourceNodeIdPresent      = 0x0200;
+/// Header flag specifying that a source node id is included in the header.
+constexpr uint16_t kFlagSourceNodeIdPresent = 0x0200;
 
-// Version parsing and setting
+/// Mask to extract just the version part from a 16bit header prefix.
 constexpr uint16_t kVersionMask = 0xF000;
-constexpr int kVersionShift     = 12;
+/// Shift to convert to/from a masked version 16bit value to a 4bit version.
+constexpr int kVersionShift = 12;
 
 } // namespace
 

@@ -101,11 +101,16 @@ public:
     CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size);
 
 private:
+    /// Represents the current encode/decode header version
     static constexpr int kHeaderVersion = 2;
 
+    /// Value expected to be incremented for each message sent.
     uint32_t mMessageId = 0;
 
+    /// What node the message originated from
     Optional<uint64_t> mSourceNodeId;
+
+    /// Intended recipient of the message.
     Optional<uint64_t> mDestinationNodeId;
 };
 
