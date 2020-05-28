@@ -9,7 +9,7 @@
 
 Due to Project CHIP’s infrastructure nature, it will be consumed by
 other teams, both inside and outside Project CHIP. Therefore it is
-critical that how they work, how they behave, and how they are
+critical that how it works, how it behaves, and how it is
 interfaced with are clearly documented.
 
 In support of this effort Project CHIP uses
