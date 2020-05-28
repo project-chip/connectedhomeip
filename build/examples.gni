@@ -13,9 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  # Enable building tests.
-  chip_build_tests = current_os != "freertos"
-
-  # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = true
+  # Enable nRF5 lock app example.
+  build_nrf5_lock_app = false
 }

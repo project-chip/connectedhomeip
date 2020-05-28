@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Enable building tests.
-  chip_build_tests = current_os != "freertos"
+import("common_args.gni")
 
-  # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = true
-}
+# These values help set up the default toolchain in standalone sample app
+# builds. They must be in a separate file to avoid namespace conflicts in
+# multi target builds.
+custom_toolchain = "//examples/lock-app/nrf5/toolchain:nrf5_lock_app"
+target_cpu = "arm"
+target_os = "freertos"
+# Don't add more args here, add them to common_args.gni.

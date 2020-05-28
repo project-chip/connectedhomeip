@@ -133,6 +133,7 @@ source_set("core") {
     "//src/ble",
     "//src/inet",
     "//src/lib/support",
+    "//src/platform",
     "//src/system",
     "//third_party/nlio",
   ]
@@ -142,5 +143,6 @@ source_set("core") {
     "//src/lib/support",
     "//src/inet",
     "//src/system",
+    "//src/platform",
   ]
 }
