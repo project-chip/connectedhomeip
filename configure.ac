@@ -1799,6 +1799,24 @@ AC_SUBST(NLUNIT_TEST_SUBDIRS, [${maybe_nlunit_test_dirstem}])
 AM_CONDITIONAL([CHIP_WITH_NLUNIT_TEST_INTERNAL], [test "${nl_with_nlunit_test}" = "internal"])
 
 #
+# XML2
+#
+
+if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
+    PKG_CHECK_MODULES([XML2], [libxml-2.0])
+fi
+
+#
+# NSPR
+#
+
+if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
+    NL_WITH_REQUIRED_EXTERNAL_PACKAGE([libnspr4-dev],
+    [NSPR],
+    [nspr])
+fi
+
+#
 # Sockets
 #
 
@@ -2212,6 +2230,10 @@ AC_MSG_NOTICE([
   Sockets link libraries                           : ${SOCKETS_LIBS:--}
   PThreads compile flags                           : ${PTHREAD_CFLAGS:--}
   PThreads link libraries                          : ${PTHREAD_LIBS:--}
+  XML2 compile flags                               : ${XML2_CFLAGS:--}
+  XML2 link libraries                              : ${XML2_LIBS:--}
+  NSPR compile flags                               : ${NSPR_CFLAGS:--}
+  NSPR link libraries                              : ${NSPR_LIBS:--} 
   C Preprocessor                                   : ${CPP}
   C Compiler                                       : ${CC}
   C++ Preprocessor                                 : ${CXXCPP}

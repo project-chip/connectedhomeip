@@ -6,7 +6,7 @@ version: 2
 jobs:
   Run Tests [mbedtls-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.14
+    - image: connectedhomeip/chip-build:0.2.15
     environment:
     - BOOTSTRAP_ARGUMENTS: ' --with-crypto=mbedtls'
     - BUILD_TYPE: mbedtls-build
@@ -46,7 +46,7 @@ jobs:
         path: /tmp/test_logs
   Build Examples [nRF]:
     docker:
-    - image: connectedhomeip/chip-build-nrf-platform:0.2.14
+    - image: connectedhomeip/chip-build-nrf-platform:0.2.15
     environment:
     - BUILD_TYPE: nrf-build
     steps:
@@ -79,7 +79,7 @@ jobs:
         path: example_binaries/nrf-build
   Deploy [main-build]:
     docker:
-    - image: connectedhomeip/chip-build-openssl:0.2.14
+    - image: connectedhomeip/chip-build-openssl:0.2.15
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -97,7 +97,7 @@ jobs:
         name: Deployment Check
   Build Examples [main-build]:
     docker:
-    - image: connectedhomeip/chip-build-openssl:0.2.14
+    - image: connectedhomeip/chip-build-openssl:0.2.15
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -141,7 +141,7 @@ jobs:
         path: example_binaries/main-build
   Run Tests [ESP32-QEMU]:
     docker:
-    - image: connectedhomeip/chip-build-esp32-qemu:0.2.14
+    - image: connectedhomeip/chip-build-esp32-qemu:0.2.15
     environment:
     - BUILD_TYPE: esp32-qemu-build
     steps:
@@ -151,7 +151,7 @@ jobs:
         name: Build ESP32 QEMU and Run Tests
   Build CHIP [mbedtls-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.14
+    - image: connectedhomeip/chip-build:0.2.15
     environment:
     - BOOTSTRAP_ARGUMENTS: ' --with-crypto=mbedtls'
     - BUILD_TYPE: mbedtls-build
@@ -186,7 +186,7 @@ jobs:
         - build/downloads
   Run Tests [linux-embedded]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.14
+    - image: connectedhomeip/chip-build:0.2.15
     environment:
     - BOOTSTRAP_ARGUMENTS: ' --with-device-layer=linux'
     - BUILD_TYPE: linux-embedded
@@ -226,7 +226,7 @@ jobs:
         path: /tmp/test_logs
   Build CHIP [linux-embedded]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.14
+    - image: connectedhomeip/chip-build:0.2.15
     environment:
     - BOOTSTRAP_ARGUMENTS: ' --with-device-layer=linux'
     - BUILD_TYPE: linux-embedded
@@ -261,7 +261,7 @@ jobs:
         - build/downloads
   Build CHIP [main-build]:
     docker:
-    - image: connectedhomeip/chip-build-openssl:0.2.14
+    - image: connectedhomeip/chip-build-openssl:0.2.15
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -295,7 +295,7 @@ jobs:
         - build/downloads
   Build Examples [ESP32]:
     docker:
-    - image: connectedhomeip/chip-build-esp32:0.2.14
+    - image: connectedhomeip/chip-build-esp32:0.2.15
     environment:
     - BUILD_TYPE: esp32-build
     steps:
@@ -328,7 +328,7 @@ jobs:
         path: example_binaries/esp32-build
   Run Tests [clang-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.14
+    - image: connectedhomeip/chip-build:0.2.15
     environment:
     - BOOTSTRAP_ARGUMENTS: ' CC=clang-9 CXX=clang++-9'
     - BUILD_TYPE: clang-build
@@ -368,7 +368,7 @@ jobs:
         path: /tmp/test_logs
   Build CHIP [clang-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.14
+    - image: connectedhomeip/chip-build:0.2.15
     environment:
     - BOOTSTRAP_ARGUMENTS: ' CC=clang-9 CXX=clang++-9'
     - BUILD_TYPE: clang-build
@@ -403,7 +403,7 @@ jobs:
         - build/downloads
   Run Tests [main-build]:
     docker:
-    - image: connectedhomeip/chip-build-openssl:0.2.14
+    - image: connectedhomeip/chip-build-openssl:0.2.15
     environment:
     - BUILD_TYPE: main-build
     steps:
