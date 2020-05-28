@@ -62,9 +62,10 @@ extern "C" {
 #include <openthread/platform/openthread-system.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
-#endif // CHIP_ENABLE_OPENTHREAD
 
 using namespace ::chip;
 using namespace ::chip::Inet;

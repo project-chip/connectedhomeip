@@ -107,6 +107,12 @@ source_set("system_config_header") {
   sources = [ "SystemConfig.h" ]
 
   public_configs = [ ":system_config" ]
+
+  public_deps = []
+
+  if (chip_system_config_use_lwip) {
+    public_deps += [ "//src/lwip" ]
+  }
 }
 
 source_set("system") {

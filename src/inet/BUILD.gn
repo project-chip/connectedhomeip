@@ -118,8 +118,6 @@ source_set("inet") {
     "RawEndPoint.h",
     "TCPEndPoint.cpp",
     "TCPEndPoint.h",
-    "TunEndPoint.cpp",
-    "TunEndPoint.h",
     "UDPEndPoint.cpp",
     "UDPEndPoint.h",
     "arpa-inet-compatibility.h",
@@ -131,6 +129,13 @@ source_set("inet") {
     "//src/system",
     "//third_party/nlio",
   ]
+
+  if (current_os == "linux") {
+    sources += [
+      "TunEndPoint.cpp",
+      "TunEndPoint.h",
+    ]
+  }
 
   if (chip_with_nlfaultinjection) {
     sources += [ "InetFaultInjection.cpp" ]

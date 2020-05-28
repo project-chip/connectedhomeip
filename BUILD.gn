@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("build/examples.gni")
 import("build/tests.gni")
 import("build/tools.gni")
 
@@ -53,6 +54,12 @@ group("all") {
     deps += [
       "src/qrcodetool",
       "src/setup_payload",
+    ]
+  }
+
+  if (build_nrf5_lock_app) {
+    deps += [
+      "examples/lock-app/nrf5(examples/lock-app/nrf5/toolchain:nrf5_lock_app)",
     ]
   }
 }
