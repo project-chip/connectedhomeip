@@ -37,7 +37,6 @@
 #if CONFIG_HAVE_DISPLAY
 
 extern const char * TAG;
-const char * const QRCODE_DATA = "https://github.com/project-chip/connectedhomeip";
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;

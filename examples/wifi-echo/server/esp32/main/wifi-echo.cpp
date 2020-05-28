@@ -174,7 +174,7 @@ extern "C" void app_main()
 
 #if CONFIG_HAVE_DISPLAY
 
-    // Only setup the button for the M5Stack since it's only being used to wake the display right now
+    // Only set up the button for the M5Stack since it's only being used to wake the display right now
     err = attentionButton.Init(ATTENTION_BUTTON_GPIO_NUM, 50);
     if (err != CHIP_NO_ERROR)
     {
@@ -232,7 +232,6 @@ extern "C" void app_main()
             sConnectionState = kConnectivity_NoChange;
             break;
         case kConnectivity_Lost:
-            ESP_LOGE(TAG, "here4");
             // Hide the currently connected state
             sConnectionState = kConnectivity_NoChange;
             ClearDisplay();
@@ -269,7 +268,7 @@ void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
         {
-            ESP_LOGE(TAG, "Lost IP...");
+            ESP_LOGE(TAG, "Lost IPv4 address...");
             sConnectionState = kConnectivity_Lost;
         }
     }
