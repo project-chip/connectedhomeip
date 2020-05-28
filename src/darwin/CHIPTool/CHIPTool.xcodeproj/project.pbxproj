@@ -25,7 +25,7 @@
 			containerPortal = B204A614244E1D0600C7C0E1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = B204A61B244E1D0600C7C0E1;
-			remoteInfo = CHIPQRCodeReader;
+			remoteInfo = CHIPTool;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -46,7 +46,7 @@
 /* Begin PBXFileReference section */
 		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EchoViewController.h; path = UI/EchoViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = EchoViewController.m; path = UI/EchoViewController.m; sourceTree = "<group>"; };
-		B204A61C244E1D0600C7C0E1 /* CHIPQRCodeReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPQRCodeReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = UI/AppDelegate.h; sourceTree = "<group>"; };
 		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = UI/AppDelegate.m; sourceTree = "<group>"; };
 		B204A622244E1D0600C7C0E1 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SceneDelegate.h; path = UI/SceneDelegate.h; sourceTree = "<group>"; };
@@ -56,7 +56,7 @@
 		B204A62B244E1D0700C7C0E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B204A630244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B204A631244E1D0700C7C0E1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		B204A637244E1D0700C7C0E1 /* CHIPQRCodeReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPQRCodeReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B204A637244E1D0700C7C0E1 /* CHIPToolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPToolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A63D244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B2E0D7BE245B0C59003C5B48 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -93,8 +93,8 @@
 		B204A613244E1D0600C7C0E1 = {
 			isa = PBXGroup;
 			children = (
-				B204A61E244E1D0600C7C0E1 /* CHIPQRCodeReader */,
-				B204A63A244E1D0700C7C0E1 /* CHIPQRCodeReaderTests */,
+				B204A61E244E1D0600C7C0E1 /* CHIPTool */,
+				B204A63A244E1D0700C7C0E1 /* CHIPToolTests */,
 				B204A61D244E1D0600C7C0E1 /* Products */,
 				B20252DE2459EC7600F97062 /* Frameworks */,
 			);
@@ -103,13 +103,13 @@
 		B204A61D244E1D0600C7C0E1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B204A61C244E1D0600C7C0E1 /* CHIPQRCodeReader.app */,
-				B204A637244E1D0700C7C0E1 /* CHIPQRCodeReaderTests.xctest */,
+				B204A61C244E1D0600C7C0E1 /* CHIPTool.app */,
+				B204A637244E1D0700C7C0E1 /* CHIPToolTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B204A61E244E1D0600C7C0E1 /* CHIPQRCodeReader */ = {
+		B204A61E244E1D0600C7C0E1 /* CHIPTool */ = {
 			isa = PBXGroup;
 			children = (
 				B2F53AEC245B0D190010745E /* Main.storyboard */,
@@ -126,23 +126,23 @@
 				991DC08F247747F500C13860 /* EchoViewController.h */,
 				991DC090247747F500C13860 /* EchoViewController.m */,
 			);
-			path = CHIPQRCodeReader;
+			path = CHIPTool;
 			sourceTree = "<group>";
 		};
-		B204A63A244E1D0700C7C0E1 /* CHIPQRCodeReaderTests */ = {
+		B204A63A244E1D0700C7C0E1 /* CHIPToolTests */ = {
 			isa = PBXGroup;
 			children = (
 				B204A63D244E1D0700C7C0E1 /* Info.plist */,
 			);
-			path = CHIPQRCodeReaderTests;
+			path = CHIPToolTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B204A61B244E1D0600C7C0E1 /* CHIPQRCodeReader */ = {
+		B204A61B244E1D0600C7C0E1 /* CHIPTool */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B204A64B244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPQRCodeReader" */;
+			buildConfigurationList = B204A64B244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPTool" */;
 			buildPhases = (
 				B204A618244E1D0600C7C0E1 /* Sources */,
 				B204A619244E1D0600C7C0E1 /* Frameworks */,
@@ -153,14 +153,14 @@
 			);
 			dependencies = (
 			);
-			name = CHIPQRCodeReader;
-			productName = CHIPQRCodeReader;
-			productReference = B204A61C244E1D0600C7C0E1 /* CHIPQRCodeReader.app */;
+			name = CHIPTool;
+			productName = CHIPTool;
+			productReference = B204A61C244E1D0600C7C0E1 /* CHIPTool.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B204A636244E1D0700C7C0E1 /* CHIPQRCodeReaderTests */ = {
+		B204A636244E1D0700C7C0E1 /* CHIPToolTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B204A64E244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPQRCodeReaderTests" */;
+			buildConfigurationList = B204A64E244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPToolTests" */;
 			buildPhases = (
 				B204A633244E1D0700C7C0E1 /* Sources */,
 				B204A634244E1D0700C7C0E1 /* Frameworks */,
@@ -171,9 +171,9 @@
 			dependencies = (
 				B204A639244E1D0700C7C0E1 /* PBXTargetDependency */,
 			);
-			name = CHIPQRCodeReaderTests;
-			productName = CHIPQRCodeReaderTests;
-			productReference = B204A637244E1D0700C7C0E1 /* CHIPQRCodeReaderTests.xctest */;
+			name = CHIPToolTests;
+			productName = CHIPToolTests;
+			productReference = B204A637244E1D0700C7C0E1 /* CHIPToolTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -194,7 +194,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPQRCodeReader" */;
+			buildConfigurationList = B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPTool" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -207,8 +207,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B204A61B244E1D0600C7C0E1 /* CHIPQRCodeReader */,
-				B204A636244E1D0700C7C0E1 /* CHIPQRCodeReaderTests */,
+				B204A61B244E1D0600C7C0E1 /* CHIPTool */,
+				B204A636244E1D0700C7C0E1 /* CHIPToolTests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,7 +258,7 @@
 /* Begin PBXTargetDependency section */
 		B204A639244E1D0700C7C0E1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B204A61B244E1D0600C7C0E1 /* CHIPQRCodeReader */;
+			target = B204A61B244E1D0600C7C0E1 /* CHIPTool */;
 			targetProxy = B204A638244E1D0700C7C0E1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -401,12 +401,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = CHIPQRCodeReader/Info.plist;
+				INFOPLIST_FILE = CHIPTool/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPQRCodeReader;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -421,12 +421,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = CHIPQRCodeReader/Info.plist;
+				INFOPLIST_FILE = CHIPTool/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPQRCodeReader;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -438,17 +438,17 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = CHIPQRCodeReaderTests/Info.plist;
+				INFOPLIST_FILE = CHIPToolTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPQRCodeReaderTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPToolTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CHIPQRCodeReader.app/CHIPQRCodeReader";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CHIPTool.app/CHIPTool";
 			};
 			name = "Debug iOS";
 		};
@@ -457,24 +457,24 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = CHIPQRCodeReaderTests/Info.plist;
+				INFOPLIST_FILE = CHIPToolTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPQRCodeReaderTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPToolTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CHIPQRCodeReader.app/CHIPQRCodeReader";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CHIPTool.app/CHIPTool";
 			};
 			name = "Release iOS";
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPQRCodeReader" */ = {
+		B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPTool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B204A649244E1D0700C7C0E1 /* Debug iOS */,
@@ -483,7 +483,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Release iOS";
 		};
-		B204A64B244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPQRCodeReader" */ = {
+		B204A64B244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPTool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B204A64C244E1D0700C7C0E1 /* Debug iOS */,
@@ -492,7 +492,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Release iOS";
 		};
-		B204A64E244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPQRCodeReaderTests" */ = {
+		B204A64E244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPToolTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B204A64F244E1D0700C7C0E1 /* Debug iOS */,

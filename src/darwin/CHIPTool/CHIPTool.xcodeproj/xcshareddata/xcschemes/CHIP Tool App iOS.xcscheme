@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B204A61B244E1D0600C7C0E1"
-               BuildableName = "CHIPQRCodeReader.app"
-               BlueprintName = "CHIPQRCodeReader"
-               ReferencedContainer = "container:CHIPQRCodeReader.xcodeproj">
+               BuildableName = "CHIPTool.app"
+               BlueprintName = "CHIPTool"
+               ReferencedContainer = "container:CHIPTool.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B204A61B244E1D0600C7C0E1"
-            BuildableName = "CHIPQRCodeReader.app"
-            BlueprintName = "CHIPQRCodeReader"
-            ReferencedContainer = "container:CHIPQRCodeReader.xcodeproj">
+            BuildableName = "CHIPTool.app"
+            BlueprintName = "CHIPTool"
+            ReferencedContainer = "container:CHIPTool.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B204A61B244E1D0600C7C0E1"
-            BuildableName = "CHIPQRCodeReader.app"
-            BlueprintName = "CHIPQRCodeReader"
-            ReferencedContainer = "container:CHIPQRCodeReader.xcodeproj">
+            BuildableName = "CHIPTool.app"
+            BlueprintName = "CHIPTool"
+            ReferencedContainer = "container:CHIPTool.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
