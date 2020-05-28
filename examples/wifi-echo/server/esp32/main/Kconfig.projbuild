@@ -22,7 +22,7 @@ menu "WiFi Echo Demo"
 
     choice
         prompt "Device Type"
-        default DEVICE_TYPE_M5STACK
+        default DEVICE_TYPE_ESP32_DEVKITC
         help
             Specifies the type of ESP32 device.
 
