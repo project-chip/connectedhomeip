@@ -36,6 +36,20 @@ EXTRA_DIST                                     = \
     $(NULL)
 
 if CHIP_BUILD_TESTS
+lib_LIBRARIES                                  = \
+    libPlatformTests.a                           \
+    $(NULL)
+
+libPlatformTests_a_SOURCES                     = \
+    TestConfigurationMgr.cpp                     \
+    $(NULL)
+
+libPlatformTests_adir                          = $(includedir)/platform
+
+dist_libPlatformTests_a_HEADERS                = \
+    TestConfigurationMgr.h                       \
+    $(NULL)
+
 # C/C++ preprocessor option flags that will apply to all compiled
 # objects in this makefile.
 
@@ -57,13 +71,16 @@ CHIP_LDADD                                      = \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
 
-COMMON_LDADD                                   = \
-    $(CHIP_LDADD)                                \
+COMMON_LDADD                                          = \
+    libPlatformTests.a                                  \
+    $(CHIP_LDADD)                                       \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
+    $(XML2_CFLAGS) $(XML2_LIBS)                         \
+    $(NSPR_CFLAGS) $(NSPR_LIBS)                         \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.
@@ -72,6 +89,8 @@ check_PROGRAMS                                 = \
     TestPlatformTime                             \
     TestPlatformMgr                              \
     $(NULL)
+
+# TODO Add TestConfigurationMgr to check_PROGRAMS when dependent core profile are merged 
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
@@ -93,6 +112,9 @@ TestPlatformTime_SOURCES                       = TestPlatformTime.cpp
 
 TestPlatformMgr_LDADD                          = $(COMMON_LDADD)
 TestPlatformMgr_SOURCES                        = TestPlatformMgr.cpp
+
+TestConfigurationMgr_LDADD                     = $(COMMON_LDADD)
+TestConfigurationMgr_SOURCES                   = TestConfigurationMgrDriver.cpp
 
 #
 # Foreign make dependencies

@@ -29,6 +29,8 @@ RUN set -x \
     libusb-1.0 \
     libncurses5-dev \
     libncursesw5-dev \
+    libnspr4-dev \
+    libxml2-dev \
     flex \
     bison \
     gperf \
