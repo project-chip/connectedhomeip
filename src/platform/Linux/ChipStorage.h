@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef CHIP_STORAGE_H
 #define CHIP_STORAGE_H
 
@@ -36,41 +35,43 @@ using namespace ::chip::Platform::PersistedStorage;
 /*
  * Read-only storage interface
  */
-class ChipStorage {
+class ChipStorage
+{
 public:
-    virtual const char *GetName() = 0;
-    virtual bool IsExists(Key key) = 0;
-    virtual CHIP_ERROR ReadValue(Key key, bool & val) = 0;
-    virtual CHIP_ERROR ReadValue(Key key, uint32_t & val) = 0;
-    virtual CHIP_ERROR ReadValue(Key key, uint64_t & val) = 0;
-    virtual CHIP_ERROR ReadValueStr(Key key, char * buf, size_t bufSize, size_t & outLen) = 0;
+    virtual const char * GetName()                                                           = 0;
+    virtual bool IsExists(Key key)                                                           = 0;
+    virtual CHIP_ERROR ReadValue(Key key, bool & val)                                        = 0;
+    virtual CHIP_ERROR ReadValue(Key key, uint32_t & val)                                    = 0;
+    virtual CHIP_ERROR ReadValue(Key key, uint64_t & val)                                    = 0;
+    virtual CHIP_ERROR ReadValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)    = 0;
     virtual CHIP_ERROR ReadValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen) = 0;
 
 protected:
     virtual ~ChipStorage() = 0;
 };
 
-inline ChipStorage::~ChipStorage() { }
+inline ChipStorage::~ChipStorage() {}
 
 /*
  * Mutable storage interface
  */
-class ChipMutableStorage : public ChipStorage {
+class ChipMutableStorage : public ChipStorage
+{
 public:
-    virtual CHIP_ERROR WriteValue(Key key, bool val) = 0;
-    virtual CHIP_ERROR WriteValue(Key key, uint32_t val) = 0;
-    virtual CHIP_ERROR WriteValue(Key key, uint64_t val) = 0;
-    virtual CHIP_ERROR WriteValueStr(Key key, const char * str) = 0;
+    virtual CHIP_ERROR WriteValue(Key key, bool val)                                = 0;
+    virtual CHIP_ERROR WriteValue(Key key, uint32_t val)                            = 0;
+    virtual CHIP_ERROR WriteValue(Key key, uint64_t val)                            = 0;
+    virtual CHIP_ERROR WriteValueStr(Key key, const char * str)                     = 0;
     virtual CHIP_ERROR WriteValueBin(Key key, const uint8_t * data, size_t dataLen) = 0;
-    virtual CHIP_ERROR ClearValue(Key key) = 0;
-    virtual CHIP_ERROR ClearAll() = 0;
-    virtual CHIP_ERROR Commit() = 0;
+    virtual CHIP_ERROR ClearValue(Key key)                                          = 0;
+    virtual CHIP_ERROR ClearAll()                                                   = 0;
+    virtual CHIP_ERROR Commit()                                                     = 0;
 
 protected:
     ~ChipMutableStorage() override = 0;
 };
 
-inline ChipMutableStorage::~ChipMutableStorage() { }
+inline ChipMutableStorage::~ChipMutableStorage() {}
 
 } // namespace Internal
 } // namespace DeviceLayer

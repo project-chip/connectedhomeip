@@ -24,8 +24,8 @@
 #ifndef CHIP_STORAGE_IMPL_H
 #define CHIP_STORAGE_IMPL_H
 
-#include <string>
 #include <platform/Linux/ChipStorage.h>
+#include <string>
 
 #ifndef SYSCONFDIR
 #define SYSCONFDIR "/etc"
@@ -42,12 +42,10 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class PosixStorage {
+class PosixStorage
+{
 public:
-    static void SetConfigPath(const char *path)
-    {
-        sConfigPath = path;
-    }
+    static void SetConfigPath(const char * path) { sConfigPath = path; }
 
     static std::string GetConfigPath()
     {
@@ -57,10 +55,7 @@ public:
             return sConfigPath;
     }
 
-    static void SetDataPath(const char *path)
-    {
-        sDataPath = path;
-    }
+    static void SetDataPath(const char * path) { sDataPath = path; }
 
     static std::string GetDataPath()
     {
@@ -70,9 +65,9 @@ public:
             return sDataPath;
     }
 
-    static ChipStorage *GetFacotryStorage();
-    static ChipMutableStorage *GetConfigStorage();
-    static ChipMutableStorage *GetCountersStorage();
+    static ChipStorage * GetFacotryStorage();
+    static ChipMutableStorage * GetConfigStorage();
+    static ChipMutableStorage * GetCountersStorage();
 
 private:
     static std::string sConfigPath;

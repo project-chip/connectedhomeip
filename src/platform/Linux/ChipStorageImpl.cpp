@@ -22,12 +22,12 @@
  */
 
 #include <cstddef>
-#include <string>
 #include <gdbm.h>
+#include <string>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/Linux/ChipStorage.h>
 #include <platform/Linux/ChipStorageImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -38,17 +38,20 @@ namespace Internal {
 
 using namespace ::chip::Platform::PersistedStorage;
 
-class GdbmStorage : public ChipMutableStorage {
+class GdbmStorage : public ChipMutableStorage
+{
 private:
-    GdbmStorage(const char *name) : mName(name) { }
+    GdbmStorage(const char * name) : mName(name) {}
     friend class PosixStorage;
 
 public:
-    ~GdbmStorage() override {
-        if (state == DB_READY) gdbm_close(mDatabase);
+    ~GdbmStorage() override
+    {
+        if (state == DB_READY)
+            gdbm_close(mDatabase);
     }
 
-    const char *GetName() override;
+    const char * GetName() override;
 
     CHIP_ERROR Open();
     bool IsExists(Key key) override;
@@ -67,14 +70,16 @@ public:
     CHIP_ERROR Commit() override;
 
 private:
-    static void GdbmFail(const char *err);
-    enum {
+    static void GdbmFail(const char * err);
+    enum
+    {
         DB_UNINITIALIZED,
         DB_ERROR,
         DB_READY
     } state = DB_UNINITIALIZED;
 
-    enum Type {
+    enum Type
+    {
         TYPE_BOOL_TRUE,
         TYPE_BOOL_FALSE,
         TYPE_UINT32,
@@ -83,32 +88,35 @@ private:
         TYPE_BLOB,
     };
 
-    class DataInt32 {
+    class DataInt32
+    {
     public:
         Type type;
         uint32_t int32;
     };
-    class DataInt64 {
+    class DataInt64
+    {
     public:
         Type type;
         uint64_t int64;
     };
-    class DataString {
+    class DataString
+    {
     public:
         Type type;
         char s[0];
     };
 
-    const char *mName;
+    const char * mName;
     GDBM_FILE mDatabase;
 };
 
-const char *GdbmStorage::GetName()
+const char * GdbmStorage::GetName()
 {
     return mName;
 }
 
-void GdbmStorage::GdbmFail(const char *err)
+void GdbmStorage::GdbmFail(const char * err)
 {
     ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage error %s", err);
 }
@@ -127,7 +135,7 @@ CHIP_ERROR GdbmStorage::Open()
 
     std::string file = PosixStorage::GetDataPath() + "/" + GetName() + ".gdbm";
 
-    mDatabase = gdbm_open(file.c_str(), 512, GDBM_WRCREAT, S_IRUSR|S_IWUSR, GdbmStorage::GdbmFail);
+    mDatabase = gdbm_open(file.c_str(), 512, GDBM_WRCREAT, S_IRUSR | S_IWUSR, GdbmStorage::GdbmFail);
     VerifyOrExit(mDatabase != NULL, {
         ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage error %s", gdbm_strerror(gdbm_errno));
         err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
@@ -145,7 +153,7 @@ exit:
 bool GdbmStorage::IsExists(Key key)
 {
     datum k;
-    k.dptr = (char*)key;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
     bool exist = gdbm_exists(mDatabase, k);
@@ -161,8 +169,8 @@ CHIP_ERROR GdbmStorage::ReadValue(Key key, bool & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     datum k;
-    Type *data;
-    k.dptr = (char*)key;
+    Type * data;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
     datum v = gdbm_fetch(mDatabase, k);
@@ -171,7 +179,7 @@ CHIP_ERROR GdbmStorage::ReadValue(Key key, bool & val)
         err = CHIP_ERROR_KEY_NOT_FOUND;
     });
 
-    data = (Type*)v.dptr;
+    data = (Type *) v.dptr;
     if (*data == Type::TYPE_BOOL_TRUE)
     {
         val = true;
@@ -196,17 +204,18 @@ CHIP_ERROR GdbmStorage::ReadValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     datum k;
-    DataInt32 *data;
-    k.dptr = (char*)key;
+    DataInt32 * data;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
     datum v = gdbm_fetch(mDatabase, k);
     VerifyOrExit(v.dptr != NULL, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read uint32_t %s:%s error %s", GetName(), key, gdbm_strerror(gdbm_errno));
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read uint32_t %s:%s error %s", GetName(), key,
+                     gdbm_strerror(gdbm_errno));
         err = CHIP_ERROR_KEY_NOT_FOUND;
     });
 
-    data = (DataInt32*)v.dptr;
+    data = (DataInt32 *) v.dptr;
     VerifyOrExit(data->type == Type::TYPE_UINT32, {
         ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read uint32_t %s:%s type mismatch %d", GetName(), key, data->type);
         err = CHIP_ERROR_KEY_NOT_FOUND;
@@ -230,17 +239,18 @@ CHIP_ERROR GdbmStorage::ReadValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     datum k;
-    DataInt64 *data;
-    k.dptr = (char*)key;
+    DataInt64 * data;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
     datum v = gdbm_fetch(mDatabase, k);
     VerifyOrExit(v.dptr != NULL, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read uint64_t %s:%s error %s", GetName(), key, gdbm_strerror(gdbm_errno));
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read uint64_t %s:%s error %s", GetName(), key,
+                     gdbm_strerror(gdbm_errno));
         err = CHIP_ERROR_KEY_NOT_FOUND;
     });
 
-    data = (DataInt64*)v.dptr;
+    data = (DataInt64 *) v.dptr;
     VerifyOrExit(data->type == Type::TYPE_UINT64, {
         ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read uint64_t %s:%s type mismatch %d", GetName(), key, data->type);
         err = CHIP_ERROR_KEY_NOT_FOUND;
@@ -264,8 +274,8 @@ CHIP_ERROR GdbmStorage::ReadValueStr(Key key, char * buf, size_t bufSize, size_t
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     datum k;
-    DataString *data;
-    k.dptr = (char*)key;
+    DataString * data;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
     datum v = gdbm_fetch(mDatabase, k);
@@ -274,7 +284,7 @@ CHIP_ERROR GdbmStorage::ReadValueStr(Key key, char * buf, size_t bufSize, size_t
         err = CHIP_ERROR_KEY_NOT_FOUND;
     });
 
-    data = (DataString*)v.dptr;
+    data = (DataString *) v.dptr;
     VerifyOrExit(data->type == Type::TYPE_STRING, {
         ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read string %s:%s type mismatch %d", GetName(), key, data->type);
         err = CHIP_ERROR_KEY_NOT_FOUND;
@@ -282,7 +292,8 @@ CHIP_ERROR GdbmStorage::ReadValueStr(Key key, char * buf, size_t bufSize, size_t
 
     outLen = v.dsize - offsetof(DataString, s) + 1;
     VerifyOrExit(bufSize >= outLen, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read string %s:%s error buffer too small %d < %d", GetName(), key, bufSize, outLen);
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read string %s:%s error buffer too small %d < %d", GetName(), key,
+                     bufSize, outLen);
         err = CHIP_ERROR_BUFFER_TOO_SMALL;
     });
 
@@ -300,8 +311,8 @@ CHIP_ERROR GdbmStorage::ReadValueBin(Key key, uint8_t * buf, size_t bufSize, siz
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     datum k;
-    DataString *data;
-    k.dptr = (char*)key;
+    DataString * data;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
     datum v = gdbm_fetch(mDatabase, k);
@@ -310,7 +321,7 @@ CHIP_ERROR GdbmStorage::ReadValueBin(Key key, uint8_t * buf, size_t bufSize, siz
         err = CHIP_ERROR_KEY_NOT_FOUND;
     });
 
-    data = (DataString*)v.dptr;
+    data = (DataString *) v.dptr;
     VerifyOrExit(data->type == Type::TYPE_BLOB, {
         ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read bin %s:%s type mismatch %d", GetName(), key, data->type);
         err = CHIP_ERROR_KEY_NOT_FOUND;
@@ -319,7 +330,8 @@ CHIP_ERROR GdbmStorage::ReadValueBin(Key key, uint8_t * buf, size_t bufSize, siz
     outLen = v.dsize - offsetof(DataString, s);
 
     VerifyOrExit(bufSize >= outLen, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read bin %s:%s error buffer too small %d < %d", GetName(), key, bufSize, outLen);
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage read bin %s:%s error buffer too small %d < %d", GetName(), key, bufSize,
+                     outLen);
         err = CHIP_ERROR_BUFFER_TOO_SMALL;
     });
 
@@ -339,17 +351,20 @@ CHIP_ERROR GdbmStorage::WriteValue(Key key, bool val)
     datum v;
 
     Type data;
-    k.dptr = (char*)key;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
-    if (val) data = Type::TYPE_BOOL_TRUE;
-    else data = Type::TYPE_BOOL_FALSE;
-    v.dptr = (char*)&data;
+    if (val)
+        data = Type::TYPE_BOOL_TRUE;
+    else
+        data = Type::TYPE_BOOL_FALSE;
+    v.dptr  = (char *) &data;
     v.dsize = sizeof(data);
 
     err = gdbm_store(mDatabase, k, v, GDBM_REPLACE);
     VerifyOrExit(err == 0, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write bool %s:%s error %d,%s", GetName(), key, err, gdbm_strerror(gdbm_errno));
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write bool %s:%s error %d,%s", GetName(), key, err,
+                     gdbm_strerror(gdbm_errno));
         err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
     });
 
@@ -364,17 +379,18 @@ CHIP_ERROR GdbmStorage::WriteValue(Key key, uint32_t val)
     datum v;
 
     DataInt32 data;
-    k.dptr = (char*)key;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
-    data.type = Type::TYPE_UINT32;
+    data.type  = Type::TYPE_UINT32;
     data.int32 = val;
-    v.dptr = (char*)&data;
-    v.dsize = sizeof(data);
+    v.dptr     = (char *) &data;
+    v.dsize    = sizeof(data);
 
     err = gdbm_store(mDatabase, k, v, GDBM_REPLACE);
     VerifyOrExit(err == 0, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write uint32 %s:%s error %d,%s", GetName(), key, err, gdbm_strerror(gdbm_errno));
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write uint32 %s:%s error %d,%s", GetName(), key, err,
+                     gdbm_strerror(gdbm_errno));
         err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
     });
 
@@ -389,17 +405,18 @@ CHIP_ERROR GdbmStorage::WriteValue(Key key, uint64_t val)
     datum v;
 
     DataInt64 data;
-    k.dptr = (char*)key;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
-    data.type = Type::TYPE_UINT64;
+    data.type  = Type::TYPE_UINT64;
     data.int64 = val;
-    v.dptr = (char*)&data;
-    v.dsize = sizeof(data);
+    v.dptr     = (char *) &data;
+    v.dsize    = sizeof(data);
 
     err = gdbm_store(mDatabase, k, v, GDBM_REPLACE);
     VerifyOrExit(err == 0, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write uint64 %s:%s error %d,%s", GetName(), key, err, gdbm_strerror(gdbm_errno));
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write uint64 %s:%s error %d,%s", GetName(), key, err,
+                     gdbm_strerror(gdbm_errno));
         err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
     });
 
@@ -413,20 +430,21 @@ CHIP_ERROR GdbmStorage::WriteValueStr(Key key, const char * str)
     datum k;
     datum v;
 
-    DataString *data;
-    k.dptr = (char*)key;
+    DataString * data;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
     size_t strLen = strlen(str);
-    v.dsize = sizeof(DataString) + strLen;
-    data = (DataString*)malloc(v.dsize);
-    data->type = Type::TYPE_STRING;
+    v.dsize       = sizeof(DataString) + strLen;
+    data          = (DataString *) malloc(v.dsize);
+    data->type    = Type::TYPE_STRING;
     memcpy(data->s, str, strLen);
-    v.dptr = (char*)data;
+    v.dptr = (char *) data;
 
     err = gdbm_store(mDatabase, k, v, GDBM_REPLACE);
     VerifyOrExit(err == 0, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write string %s:%s error %d,%s", GetName(), key, err, gdbm_strerror(gdbm_errno));
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write string %s:%s error %d,%s", GetName(), key, err,
+                     gdbm_strerror(gdbm_errno));
         err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
     });
 
@@ -441,19 +459,20 @@ CHIP_ERROR GdbmStorage::WriteValueBin(Key key, const uint8_t * bin, size_t dataL
     datum k;
     datum v;
 
-    DataString *data;
-    k.dptr = (char*)key;
+    DataString * data;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
-    v.dsize = sizeof(DataString) + dataLen;
-    data = (DataString*)malloc(v.dsize);
+    v.dsize    = sizeof(DataString) + dataLen;
+    data       = (DataString *) malloc(v.dsize);
     data->type = Type::TYPE_BLOB;
     memcpy(data->s, bin, dataLen);
-    v.dptr = (char*)data;
+    v.dptr = (char *) data;
 
     err = gdbm_store(mDatabase, k, v, GDBM_REPLACE);
     VerifyOrExit(err == 0, {
-        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write bin %s:%s error %d,%s", GetName(), key, err, gdbm_strerror(gdbm_errno));
+        ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage write bin %s:%s error %d,%s", GetName(), key, err,
+                     gdbm_strerror(gdbm_errno));
         err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
     });
 
@@ -466,14 +485,17 @@ CHIP_ERROR GdbmStorage::ClearValue(Key key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     datum k;
-    k.dptr = (char*)key;
+    k.dptr  = (char *) key;
     k.dsize = strlen(key);
 
     err = gdbm_delete(mDatabase, k);
     VerifyOrExit(err == 0, {
-        if (gdbm_errno == GDBM_ITEM_NOT_FOUND) {
+        if (gdbm_errno == GDBM_ITEM_NOT_FOUND)
+        {
             err = CHIP_ERROR_KEY_NOT_FOUND;
-        } else {
+        }
+        else
+        {
             ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage clear %s:%s error %s", GetName(), key, gdbm_strerror(gdbm_errno));
             err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
         }
@@ -486,17 +508,20 @@ exit:
 CHIP_ERROR GdbmStorage::ClearAll()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    datum current = gdbm_firstkey(mDatabase);
-    while (current.dptr) {
+    datum current  = gdbm_firstkey(mDatabase);
+    while (current.dptr)
+    {
         CHIP_ERROR err_inner = gdbm_delete(mDatabase, current);
-        if (err_inner != CHIP_NO_ERROR) {
-            ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage clear all %s:%s error %s", GetName(), current.dptr, gdbm_strerror(gdbm_errno));
+        if (err_inner != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ChipStorage: GdbmStorage clear all %s:%s error %s", GetName(), current.dptr,
+                         gdbm_strerror(gdbm_errno));
             err = CHIP_ERROR_PERSISTED_STORAGE_FAIL;
             // continue clear and return first error
         }
 
         datum previous = current;
-        current = gdbm_nextkey(mDatabase, previous);
+        current        = gdbm_nextkey(mDatabase, previous);
         free(previous.dptr);
     }
     return err;
@@ -518,7 +543,7 @@ exit:
 
 std::string PosixStorage::sConfigPath;
 
-ChipMutableStorage *PosixStorage::GetConfigStorage()
+ChipMutableStorage * PosixStorage::GetConfigStorage()
 {
     static GdbmStorage instance("config");
     CHIP_ERROR err = instance.Open();
@@ -528,7 +553,7 @@ ChipMutableStorage *PosixStorage::GetConfigStorage()
         return NULL;
 }
 
-ChipMutableStorage *PosixStorage::GetCountersStorage()
+ChipMutableStorage * PosixStorage::GetCountersStorage()
 {
     static GdbmStorage instance("counters");
     CHIP_ERROR err = instance.Open();

@@ -27,8 +27,8 @@
 #include <functional>
 #include <inttypes.h>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/Linux/ChipStorage.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -102,8 +102,8 @@ protected:
     static CHIP_ERROR ClearNamespace(const char * ns);
 
 private:
-    static ChipStorage *GetStorageForNamespace(Key key);
-    static ChipMutableStorage *GetMutableStorageForNamespace(Key key);
+    static ChipStorage * GetStorageForNamespace(Key key);
+    static ChipMutableStorage * GetMutableStorageForNamespace(Key key);
 };
 
 struct PosixConfig::Key
