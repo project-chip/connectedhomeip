@@ -480,6 +480,7 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
+#if CHIP_CRYPTO_OPENSSL // Following tests are currently supported only for OpenSSL
 static void TestAES_CCM_Streaming_128EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
@@ -743,6 +744,7 @@ static void TestAES_CCM_Streaming_128DecryptInvalidIVLen(nlTestSuite * inSuite, 
     }
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
+#endif
 
 static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
