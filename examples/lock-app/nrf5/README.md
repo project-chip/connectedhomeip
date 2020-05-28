@@ -139,7 +139,7 @@ Alternatively, you can run `Build nRF5 Lock App` VSCode task.
 
           export NRF5_SDK_ROOT=${HOME}/tools/nRF5_SDK_for_Thread_and_Zigbee_v3.1.0
           export NRF5_TOOLS_ROOT=${HOME}/tools/nRF-Command-Line-Tools
-          export GNU_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-7-2018-q2-update/bin/
+          export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
           export PATH=${PATH}:${NRF5_TOOLS_ROOT}/nrfjprog
 
 <p style="margin-left: 40px">For convenience, place these settings in local script file (e.g. setup-env.sh) so that they can be loaded into the environment as needed (e.g. by running 'source ./setup-env.sh').</p>
