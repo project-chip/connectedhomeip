@@ -28,7 +28,7 @@ template("arm_toolchain") {
     forward_variables_from(_arm_gcc_toolchain_tools, "*")
     defaults = {
       current_cpu = "arm"
-      current_os = "none"
+      current_os = invoker.current_os
 
       if (defined(invoker.toolchain_args_file)) {
         import(invoker.toolchain_args_file)

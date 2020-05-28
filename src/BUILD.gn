@@ -33,6 +33,7 @@ static_library("chip") {
     "inet",
     "lib/core",
     "lib/support",
+    "platform",
     "system",
     "transport",
   ]

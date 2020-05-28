@@ -338,7 +338,9 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
+#if CHIP_ENABLE_OPENTHREAD
         ThreadStackMgr().FactoryReset();
+#endif
     }
 }
 

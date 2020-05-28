@@ -12,27 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/device.gni")
-
 declare_args() {
-  # Enable IPv4 support.
-  inet_config_enable_ipv4 = true
-
-  # Enable DNS resolver.
-  inet_config_enable_dns_resolver = true
-
-  # Enable async DNS.
-  inet_config_enable_async_dns_sockets = true
-
-  # Enable raw endpoint.
-  inet_config_enable_raw_endpoint = true
-
-  # Enable UDP endpoint.
-  inet_config_enable_udp_endpoint = true
-
-  # Enable TCP endpoint.
-  inet_config_enable_tcp_endpoint = true
-
-  # Enable TUN endpoint.
-  inet_config_enable_tun_endpoint = current_os == "linux"
+  # Enable nRF5 lock app example.
+  build_nrf5_lock_app = false
 }
