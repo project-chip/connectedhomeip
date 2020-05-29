@@ -137,9 +137,9 @@ void CheckSimpleConnectTest(nlTestSuite * inSuite, void * inContext)
 
     UdpTransport conn;
     conn.Init(&ctx.mInetLayer);
-    err = conn.Connect(0, addr, 0);
+    err = conn.Connect(addr, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = conn.Connect(0, addr, 0);
+    err = conn.Connect(addr, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     err = conn.Close();
@@ -166,7 +166,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     conn.OnMessageReceived = MessageReceiveHandler;
     conn.OnReceiveError    = ReceiveErrorHandler;
 
-    err = conn.Connect(0, addr, 0);
+    err = conn.Connect(addr, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Should be able to send a message to itself by just calling send.

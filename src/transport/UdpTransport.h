@@ -68,12 +68,11 @@ public:
      * @brief
      *   Attempt to establish a connection to the given peer
      *
-     * @param peerNodeId    Currently unused; a NodeId to identify this peer
      * @param peerAddr      The <tt>chip::Inet::IPAddress</tt> of the requested peer
      * @param peerPort      The port of the requested peer
      * @return CHIP_ERROR   The connection result
      */
-    CHIP_ERROR Connect(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort = 0);
+    CHIP_ERROR Connect(const IPAddress & peerAddr, uint16_t peerPort = 0);
 
     /**
      * @brief
@@ -132,7 +131,6 @@ public:
 private:
     Inet::InetLayer * mInetLayer;
     UDPEndPoint * mUDPEndPoint;
-    uint64_t mPeerNodeId;
     IPAddress mPeerAddr;
     uint16_t mPeerPort;
     State mState;

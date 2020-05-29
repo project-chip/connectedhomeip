@@ -24,9 +24,9 @@
  *
  */
 
-#include <transport/UdpTransport.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/UdpTransport.h>
 
 #include <inttypes.h>
 
@@ -40,7 +40,6 @@ UdpTransport::UdpTransport() : mState(kState_NotReady), mRefCount(1)
     mRefCount         = 1;
     OnMessageReceived = NULL;
     OnReceiveError    = NULL;
-    mPeerNodeId       = 0;
     mPeerAddr         = IPAddress::Any;
     mPeerPort         = 0;
 }
@@ -57,15 +56,14 @@ void UdpTransport::Init(Inet::InetLayer * inetLayer)
 
 } // namespace chip
 
-CHIP_ERROR UdpTransport::Connect(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort)
+CHIP_ERROR UdpTransport::Connect(const IPAddress & peerAddr, uint16_t peerPort)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == kState_ReadyToConnect, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mPeerNodeId = peerNodeId;
-    mPeerAddr   = peerAddr;
-    mPeerPort   = (peerPort != 0) ? peerPort : CHIP_PORT;
+    mPeerAddr = peerAddr;
+    mPeerPort = (peerPort != 0) ? peerPort : CHIP_PORT;
 
     // Bump the reference count when we start the connection process. The corresponding decrement happens when the
     // DoClose() method is called. This ensures the object stays live while there's the possibility of a callback
@@ -145,7 +143,7 @@ exit:
 
 void UdpTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg, const IPPacketInfo * pktInfo)
 {
-    UDPEndPoint * udpEndPoint   = static_cast<UDPEndPoint *>(endPoint);
+    UDPEndPoint * udpEndPoint = static_cast<UDPEndPoint *>(endPoint);
     UdpTransport * connection = (UdpTransport *) udpEndPoint->AppState;
 
     // TODO this where where messages should be decoded
@@ -157,7 +155,7 @@ void UdpTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::System::
 
 void UdpTransport::HandleReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo)
 {
-    UDPEndPoint * udpEndPoint   = static_cast<UDPEndPoint *>(endPoint);
+    UDPEndPoint * udpEndPoint = static_cast<UDPEndPoint *>(endPoint);
     UdpTransport * connection = (UdpTransport *) udpEndPoint->AppState;
     if (connection->StateAllowsReceive())
     {
