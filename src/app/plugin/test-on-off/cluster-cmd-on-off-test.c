@@ -86,6 +86,7 @@ int testClusterCmdOnOff(void)
 {
     // First construct an incoming buffer for test, give it 1024 bytes for no good reason.
     ChipZclBuffer_t * buffer = chipZclBufferAlloc(1024);
+    ChipZclStatus_t status;
 
     ChipZclCommandContext_t context;
     testInitCommandContext(&context);
@@ -100,12 +101,22 @@ int testClusterCmdOnOff(void)
 
     uint8_t * rawBuffer   = chipZclBufferPointer(buffer);
     uint16_t bufferLength = chipZclBufferDataLength(buffer);
+    bool onOff;
 
     printf("Buffer for processing is ready, length: %d\n", bufferLength);
 
+    // Make sure initial value of the attribute is false.
+    status = chipZclReadAttribute(1, &chipZclClusterOnOffServerSpec, CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF, &onOff,
+                                  sizeof(onOff));
+    if (status != CHIP_ZCL_STATUS_SUCCESS || onOff != false)
+    {
+        printf("ERROR: initial value of the attribute should be false.\n");
+        return 1;
+    }
+
     // At this point, we have a buffer encoded with the command context that contains the command.
     // So we will be testing top-level entry API.
-    ChipZclStatus_t status = chipZclProcessIncoming(rawBuffer, bufferLength);
+    status = chipZclProcessIncoming(rawBuffer, bufferLength);
 
     if (status == CHIP_ZCL_STATUS_SUCCESS)
     {
@@ -116,7 +127,6 @@ int testClusterCmdOnOff(void)
         }
         else
         {
-            bool onOff;
             printf("SUCCESS: attribute got changed and attrribute change callback did fire.\n");
 
             // Now let's read the attribute to make sure it has the right value!
