@@ -16,6 +16,13 @@
  *    limitations under the License.
  */
 
+/**
+ * @file QRCodeWidget.cpp
+ *
+ * This file describes the QRCodeWidget that displays a QRCode centered on the screen
+ *
+ */
+
 #ifndef QRCODE_WIDGET_H
 #define QRCODE_WIDGET_H
 
@@ -28,9 +35,13 @@ class QRCodeWidget
 public:
     color_t QRCodeColor;
     uint16_t VMargin;
-
-    void Init();
+    /**
+     * @brief
+     *  Initializes the QRCode by generating a CHIP SetupPayload
+     *  and draws it onto the display
+     */
     void Display();
+    QRCodeWidget();
 };
 
 #endif // CONFIG_HAVE_DISPLAY

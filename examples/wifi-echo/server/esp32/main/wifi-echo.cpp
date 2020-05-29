@@ -190,8 +190,7 @@ extern "C" void app_main()
         return;
     }
 
-    // Initialize the UI widgets.
-    sQRCodeWidget.Init();
+    // Display the UI widgets.
     ClearDisplay();
     sQRCodeWidget.Display();
 
