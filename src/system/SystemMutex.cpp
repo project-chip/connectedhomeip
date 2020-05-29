@@ -39,7 +39,7 @@ namespace System {
 /**
  * Initialize the mutual exclusion lock instance.
  *
- *  @param[inout]   aThis   A zero-initialized object.
+ *  @param[in,out]  aThis   A zero-initialized object.
  *
  *  @retval         #CHIP_SYSTEM_NO_ERROR                  The mutual exclusion lock is ready to use.
  *  @retval         #CHIP_SYSTEM_ERROR_NO_MEMORY           Insufficient system memory to allocate the mutual exclusion lock.

@@ -100,7 +100,7 @@ private:
      *  @brief
      *    Read our starting counter value (if we have one) in from persistent storage.
      *
-     *  @param[inout] aStartValue  The value read out.
+     *  @param[in,out] aStartValue  The value read out.
      *
      *  @return Any error returned by a read from persistent storage.
      */

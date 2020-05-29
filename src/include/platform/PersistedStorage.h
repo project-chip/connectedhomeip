@@ -60,8 +60,8 @@ constexpr Key kEmptyKey = internal::EmptyKey<Key>::value;
  *    Read integer value of a key from persistent storage.
  *    Platform is responsible for validating aKey.
  *
- *  @param[in]    aKey      A key to a persistently-stored value.
- *  @param[inout] aValue    A reference to an integer value.
+ *  @param[in]     aKey      A key to a persistently-stored value.
+ *  @param[in,out] aValue    A reference to an integer value.
  *
  *  @return CHIP_ERROR_INVALID_ARGUMENT if aKey is NULL
  *          CHIP_ERROR_INVALID_STRING_LENGTH if aKey exceeds

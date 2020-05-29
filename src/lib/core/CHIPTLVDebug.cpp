@@ -322,7 +322,7 @@ CHIP_ERROR DumpIterator(DumpWriter aWriter, const TLVReader & aReader)
  *  @param[in]     aReader   A read-only reference to the TLV reader containing
  *                           the TLV data to log.
  *  @param[in]     aDepth    The current depth into the TLV data.
- *  @param[inout]  aContext  A pointer to the handler-specific context.
+ *  @param[in,out] aContext  A pointer to the handler-specific context.
  *
  *  @retval  #CHIP_NO_ERROR                On success.
  *

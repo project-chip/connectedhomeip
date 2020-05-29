@@ -132,7 +132,7 @@ inline void Put8(uint8_t * p, uint8_t v)
  * from the specified pointer address and increment the pointer by
  * 8-bits (1 byte).
  *
- * @param[inout]  p   A reference to a pointer address, potentially
+ * @param[in,out] p   A reference to a pointer address, potentially
  *                    unaligned, to read the 8-bit value from and to
  *                    then increment by 8-bits (1 byte).
  *
@@ -148,7 +148,7 @@ inline uint8_t Read8(uint8_t *& p)
  * from the specified pointer address and increment the pointer by
  * 8-bits (1 byte).
  *
- * @param[inout]  p   A reference to a constant pointer address,
+ * @param[in,out] p   A reference to a constant pointer address,
  *                    potentially unaligned, to read the 8-bit value
  *                    from and to then increment by 8-bits (1 byte).
  *
@@ -164,7 +164,7 @@ inline uint8_t Read8(const uint8_t *& p)
  * to the specified pointer address and increment the pointer by
  * 8-bits (1 byte).
  *
- * @param[inout]  p   A reference to a pointer address, potentially
+ * @param[in,out] p   A reference to a pointer address, potentially
  *                    unaligned, to read the 8-bit value from and to
  *                    then increment by 8-bits (1 byte).
  *
@@ -365,7 +365,7 @@ inline void Put64(uint8_t * p, uint64_t v)
  * the value in target system byte ordering, and increment the pointer
  * by 16-bits (2 bytes).
  *
- * @param[inout]  p   A reference to a pointer address, potentially
+ * @param[in,out] p   A reference to a pointer address, potentially
  *                    unaligned, to read the 16-bit little endian byte
  *                    ordered value from and to then increment by 16-
  *                    bits (2 bytes).
@@ -385,7 +385,7 @@ inline uint16_t Read16(uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 32-bits (4 bytes).
  *
- * @param[inout]  p   A reference to a pointer address, potentially
+ * @param[in,out] p   A reference to a pointer address, potentially
  *                    unaligned, to read the 32-bit little endian byte
  *                    ordered value from and to then increment by 32-
  *                    bits (4 bytes).
@@ -405,7 +405,7 @@ inline uint32_t Read32(uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 64-bits (8 bytes).
  *
- * @param[inout]  p   A reference to a pointer address, potentially
+ * @param[in,out] p   A reference to a pointer address, potentially
  *                    unaligned, to read the 64-bit little endian byte
  *                    ordered value from and to then increment by 64-
  *                    bits (8 bytes).
@@ -425,7 +425,7 @@ inline uint64_t Read64(uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 16-bits (2 bytes).
  *
- * @param[inout]  p   A reference to a constant pointer address, potentially
+ * @param[in,out] p   A reference to a constant pointer address, potentially
  *                    unaligned, to read the 16-bit little endian byte
  *                    ordered value from and to then increment by 16-
  *                    bits (2 bytes).
@@ -445,7 +445,7 @@ inline uint16_t Read16(const uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 32-bits (4 bytes).
  *
- * @param[inout]  p   A reference to a constant pointer address, potentially
+ * @param[in,out] p   A reference to a constant pointer address, potentially
  *                    unaligned, to read the 32-bit little endian byte
  *                    ordered value from and to then increment by 32-
  *                    bits (4 bytes).
@@ -465,7 +465,7 @@ inline uint32_t Read32(const uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 64-bits (8 bytes).
  *
- * @param[inout]  p   A reference to a constant pointer address, potentially
+ * @param[in,out] p   A reference to a constant pointer address, potentially
  *                    unaligned, to read the 64-bit little endian byte
  *                    ordered value from and to then increment by 64-
  *                    bits (8 bytes).
@@ -738,7 +738,7 @@ inline void Put64(uint8_t * p, uint64_t v)
  * the value in target system byte ordering, and increment the pointer
  * by 16-bits (2 bytes).
  *
- * @param[inout]  p   A reference to a pointer address, potentially
+ * @param[in,out] p   A reference to a pointer address, potentially
  *                    unaligned, to read the 16-bit big endian byte
  *                    ordered value from and to then increment by 16-
  *                    bits (2 bytes).
@@ -758,7 +758,7 @@ inline uint16_t Read16(uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 32-bits (4 bytes).
  *
- * @param[inout]  p   A reference to a pointer address, potentially
+ * @param[in,out] p   A reference to a pointer address, potentially
  *                    unaligned, to read the 32-bit big endian byte
  *                    ordered value from and to then increment by 32-
  *                    bits (4 bytes).
@@ -778,7 +778,7 @@ inline uint32_t Read32(uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 64-bits (8 bytes).
  *
- * @param[inout]  p   A reference to a pointer address, potentially
+ * @param[in,out] p   A reference to a pointer address, potentially
  *                    unaligned, to read the 64-bit big endian byte
  *                    ordered value from and to then increment by 64-
  *                    bits (8 bytes).
@@ -798,7 +798,7 @@ inline uint64_t Read64(uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 16-bits (2 bytes).
  *
- * @param[inout]  p   A reference to a constant pointer address, potentially
+ * @param[in,out] p   A reference to a constant pointer address, potentially
  *                    unaligned, to read the 16-bit big endian byte
  *                    ordered value from and to then increment by 16-
  *                    bits (2 bytes).
@@ -818,7 +818,7 @@ inline uint16_t Read16(const uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 32-bits (4 bytes).
  *
- * @param[inout]  p   A reference to a constant pointer address, potentially
+ * @param[in,out] p   A reference to a constant pointer address, potentially
  *                    unaligned, to read the 32-bit big endian byte
  *                    ordered value from and to then increment by 32-
  *                    bits (4 bytes).
@@ -838,7 +838,7 @@ inline uint32_t Read32(const uint8_t *& p)
  * the value in target system byte ordering, and increment the pointer
  * by 64-bits (8 bytes).
  *
- * @param[inout]  p   A reference to a constant pointer address, potentially
+ * @param[in,out] p   A reference to a constant pointer address, potentially
  *                    unaligned, to read the 64-bit big endian byte
  *                    ordered value from and to then increment by 64-
  *                    bits (8 bytes).

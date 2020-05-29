@@ -158,7 +158,7 @@ uint16_t PacketBuffer::DataLength() const
  *
  *  @param[in] aNewLen - new length, in bytes, of this buffer.
  *
- *  @param[inout] aChainHead - the head of the buffer chain the current buffer belongs to.  May be NULL if the current buffer is
+ *  @param[in,out] aChainHead - the head of the buffer chain the current buffer belongs to.  May be NULL if the current buffer is
  *      the head of the buffer chain.
  */
 void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)

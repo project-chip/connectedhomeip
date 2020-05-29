@@ -946,12 +946,12 @@ bool ParseFabricId(const char * str, uint64_t & fabricId, bool allowReserved)
  * Parse and attempt to convert a string to a 16-bit unsigned subnet
  * ID, interpretting the string as hexadecimal.
  *
- * @param[in]    str       A pointer to a NULL-terminated C string
- *                         representing the subnet ID, formatted as a
- *                         hexadecimal, to parse.
- * @param[inout] subnetId  A reference to storage for a 16-bit unsigned
- *                         integer to which the parsed subnet ID value
- *                         will be stored on success.
+ * @param[in]     str       A pointer to a NULL-terminated C string
+ *                          representing the subnet ID, formatted as a
+ *                          hexadecimal, to parse.
+ * @param[in,out] subnetId  A reference to storage for a 16-bit unsigned
+ *                          integer to which the parsed subnet ID value
+ *                          will be stored on success.
  *
  * @return true on success; otherwise, false on failure.
  */

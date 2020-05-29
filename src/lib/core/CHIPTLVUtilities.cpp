@@ -49,7 +49,7 @@ struct FindContext
  *  @param[in]     aDepth       The current depth into the TLV data.
  *  @param[in]     aHandler     A callback to invoke for the current TLV element
  *                              being visited.
- *  @param[inout]  aContext     An optional pointer to caller-provided context data.
+ *  @param[in,out] aContext     An optional pointer to caller-provided context data.
  *  @param[in]     aRecurse     A Boolean indicating whether (true) or not (false)
  *                              any encountered arrays or structures should be
  *                              descended into.
@@ -105,7 +105,7 @@ exit:
  *                              data to iterate.
  *  @param[in]     aHandler     A callback to invoke for the current TLV element
  *                              being visited.
- *  @param[inout]  aContext     An optional pointer to caller-provided context data.
+ *  @param[in,out] aContext     An optional pointer to caller-provided context data.
  *
  *  @retval  #CHIP_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
  *                              or to the end of a TLV container.
@@ -134,7 +134,7 @@ CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aC
  *                              data to iterate.
  *  @param[in]     aHandler     A callback to invoke for the current TLV element
  *                              being visited.
- *  @param[inout]  aContext     An optional pointer to caller-provided context data.
+ *  @param[in,out] aContext     An optional pointer to caller-provided context data.
  *  @param[in]     aRecurse     A Boolean indicating whether (true) or not (false)
  *                              any encountered arrays or structures should be
  *                              descended into.
@@ -169,7 +169,7 @@ exit:
  *  @param[in]     aReader      A reference to the TLV reader containing the TLV
  *                              data to count the number of TLV elements.
  *  @param[in]     aDepth       The current depth into the TLV data.
- *  @param[inout]  aContext     A pointer to the handler-specific context which
+ *  @param[in,out] aContext     A pointer to the handler-specific context which
  *                              is a pointer to storage for the count value.
  *
  *  @retval  #CHIP_NO_ERROR                On success.
@@ -195,7 +195,7 @@ exit:
  *
  *  @param[in]     aReader      A read-only reference to the TLV reader for
  *                              which to count the number of TLV elements.
- *  @param[inout]  aCount       A reference to storage for the returned count.
+ *  @param[in,out] aCount       A reference to storage for the returned count.
  *                              This is initialized to zero (0) prior to counting
  *                              and is set to the number of elements counted on
  *                              success.
@@ -219,7 +219,7 @@ CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount)
  *
  *  @param[in]     aReader      A read-only reference to the TLV reader for
  *                              which to count the number of TLV elements.
- *  @param[inout]  aCount       A reference to storage for the returned count.
+ *  @param[in,out] aCount       A reference to storage for the returned count.
  *                              This is initialized to zero (0) prior to counting
  *                              and is set to the number of elements counted on
  *                              success.
@@ -250,7 +250,7 @@ CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount, const bool aRecurse
  *  @param[in]     aReader      A read-only reference to the TLV reader in
  *                              which to find the specified tag.
  *  @param[in]     aDepth       The current depth into the TLV data.
- *  @param[inout]  aContext     A pointer to the handler-specific context.
+ *  @param[in,out] aContext     A pointer to the handler-specific context.
  *
  *  @retval  #CHIP_NO_ERROR                On success.
  *
