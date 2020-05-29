@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "ChipZclOnOffTest.h"
+#include "ChipZclUnitTests.h"
 
 #include "chip-zcl.h"
 
@@ -73,7 +73,7 @@ int testEncodingDecoding(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * con
     return 0;
 }
 
-bool globalAttributeChangedFlag = false;
+static bool globalAttributeChangedFlag = false;
 
 void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)

@@ -2071,8 +2071,7 @@ src/app/Makefile
 src/app/chip-zcl/Makefile
 src/app/gen/Makefile
 src/app/plugin/Makefile
-src/app/plugin/test-unit/Makefile
-src/app/plugin/test-on-off/Makefile
+src/app/plugin/tests/Makefile
 src/ble/Makefile
 src/ble/tests/Makefile
 src/crypto/Makefile

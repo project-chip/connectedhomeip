@@ -62,6 +62,7 @@ libChipZclUnitTests_a_SOURCES                           += \
     cluster-server-identify-test.c                         \
     cluster-server-level-control-test.c                    \
     cluster-server-on-off-test.c                           \
+    cluster-cmd-on-off-test.c                              \
     codec-simple-test.c                                    \
     core-data-model-test.c                                 \
     core-message-dispatch-test.c                           \
