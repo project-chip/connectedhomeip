@@ -139,7 +139,7 @@
         self->_discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
         self->_setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
         self->_rendezVousInformation.text = NOT_APPLICABLE_STRING;
-
+        self->_serialNumber.text = NOT_APPLICABLE_STRING;
         // TODO: Only display vid and pid if present
         self->_vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
         self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];
@@ -149,7 +149,11 @@
         self->_discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
         self->_setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
         self->_rendezVousInformation.text = [NSString stringWithFormat:@"%@", payload.rendezvousInformation];
-
+        if ([payload.serialNumber length] > 0) {
+            self->_serialNumber.text = payload.serialNumber;
+        } else {
+            self->_serialNumber.text = NOT_APPLICABLE_STRING;
+        }
         // TODO: Only display vid and pid if present
         self->_vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
         self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];

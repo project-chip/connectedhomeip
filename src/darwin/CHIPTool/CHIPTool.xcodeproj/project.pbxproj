@@ -194,7 +194,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPTool" */;
+			buildConfigurationList = B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "chiptool" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -476,7 +476,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPTool" */ = {
+		B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "chiptool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B204A649244E1D0700C7C0E1 /* Debug iOS */,

@@ -47,6 +47,10 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeInvalidState
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Invalid object state.", nil) }];
+    case CHIP_ERROR_INTEGRITY_CHECK_FAILED:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeIntegrityCheckFailed
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
     default:
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeUndefinedError
