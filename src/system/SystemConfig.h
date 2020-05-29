@@ -38,7 +38,9 @@
 #define SYSTEMCONFIG_H
 
 /* Platform include headers */
+#ifdef HAVE_CONFIG_H
 #include <BuildConfig.h>
+#endif
 
 /* Include a CHIP project-specific configuration file, if defined.
  *
