@@ -316,7 +316,7 @@ static struct pbuf * TapInterface_low_level_input(TapInterface * tapif, struct n
  *  should have been called prior to invoking netif_add with this
  *  callback.
  *
- *  @param[inout]  netif  A pointer to the LwIP netif associated with the
+ *  @param[in,out] netif  A pointer to the LwIP netif associated with the
  *                        TUN/TAP shim interface.
  *
  *  @retval  #ERR_OK  on successfully setting up the TUN/TAP interface.

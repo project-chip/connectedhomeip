@@ -696,9 +696,9 @@ LwIPEventHandlerDelegate Layer::sSystemEventHandlerDelegate;
 /**
  * This is the dispatch handler for system layer events.
  *
- *  @param[inout]   aTarget     A pointer to the CHIP System Layer object making the post request.
+ *  @param[in,out]  aTarget     A pointer to the CHIP System Layer object making the post request.
  *  @param[in]      aEventType  The type of event to post.
- *  @param[inout]   aArgument   The argument associated with the event to post.
+ *  @param[in,out]  aArgument   The argument associated with the event to post.
  */
 Error Layer::HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
@@ -747,9 +747,9 @@ exit:
 /**
  * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event queue.
  *
- *  @param[inout]   aTarget     A pointer to the CHIP System Layer object making the post request.
+ *  @param[in,out]  aTarget     A pointer to the CHIP System Layer object making the post request.
  *  @param[in]      aEventType  The type of event to post.
- *  @param[inout]   aArgument   The argument associated with the event to post.
+ *  @param[in,out]  aArgument   The argument associated with the event to post.
  *
  *  @retval    CHIP_SYSTEM_NO_ERROR                   On success.
  *  @retval    CHIP_SYSTEM_ERROR_UNEXPECTED_STATE     If the state of the Layer object is incorrect.
@@ -819,7 +819,7 @@ exit:
 /**
  * This implements the actual dispatch and handling of a CHIP System Layer event.
  *
- *  @param[inout]   aTarget     A reference to the layer object to which the event is targeted.
+ *  @param[in,out]  aTarget     A reference to the layer object to which the event is targeted.
  *  @param[in]      aEventType  The event / message type to handle.
  *  @param[in]      aArgument   The argument associated with the event / message.
  *
@@ -934,9 +934,9 @@ namespace Layer {
  * This is a platform-specific CHIP System Layer pre-initialization hook. This may be overridden by assserting the preprocessor
  * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
- *  @param[inout]  aLayer    A reference to the CHIP System Layer instance being initialized.
+ *  @param[in,out] aLayer    A reference to the CHIP System Layer instance being initialized.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  *      Returning non-successful status will abort initialization.
@@ -953,9 +953,9 @@ DLL_EXPORT Error WillInit(Layer & aLayer, void * aContext)
  * This is a platform-specific CHIP System Layer pre-shutdown hook. This may be overridden by assserting the preprocessor
  * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
- *  @param[inout]  aLayer    A pointer to the CHIP System Layer instance being shutdown.
+ *  @param[in,out] aLayer    A pointer to the CHIP System Layer instance being shutdown.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
@@ -972,9 +972,9 @@ DLL_EXPORT Error WillShutdown(Layer & aLayer, void * aContext)
  * This is a platform-specific CHIP System Layer post-initialization hook. This may be overridden by assserting the preprocessor
  * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
- *  @param[inout]  aLayer    A reference to the CHIP System Layer instance being initialized.
+ *  @param[in,out] aLayer    A reference to the CHIP System Layer instance being initialized.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
  *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Init method.
  */
@@ -989,9 +989,9 @@ DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, Error aStatus)
  * This is a platform-specific CHIP System Layer pre-shutdown hook. This may be overridden by assserting the preprocessor
  * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
- *  @param[inout]  aLayer    A reference to the CHIP System Layer instance being shutdown.
+ *  @param[in,out] aLayer    A reference to the CHIP System Layer instance being shutdown.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Shutdown.
  *
  *  @param[in]     anError   The overall status being returned via the CHIP System Layer ::Shutdown method.
  *
@@ -1022,15 +1022,15 @@ using chip::System::LwIPEvent;
  *  @note
  *    This is an implementation for LwIP.
  *
- *  @param[inout]  aLayer    A pointer to the layer instance to which the event / message is being posted.
+ *  @param[in,out] aLayer    A pointer to the layer instance to which the event / message is being posted.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
- *  @param[inout]  aTarget   A pointer to the CHIP System Layer object making the post request.
+ *  @param[in,out] aTarget   A pointer to the CHIP System Layer object making the post request.
  *
  *  @param[in]     aType     The type of event to post.
  *
- *  @param[inout]  anArg     The argument associated with the event to post.
+ *  @param[in,out] anArg     The argument associated with the event to post.
  *
  *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
@@ -1068,9 +1068,9 @@ exit:
  *  @note
  *    This is an implementation for LwIP.
  *
- *  @param[inout]  aLayer    A reference to the layer instance for which events / messages are being dispatched.
+ *  @param[in,out] aLayer    A reference to the layer instance for which events / messages are being dispatched.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *
  *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If #aLayer or #aContext is NULL.
  *  @retval   #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE  If the state of the CHIP System Layer object is unexpected.
@@ -1117,8 +1117,8 @@ exit:
  *  @note
  *    This is an implementation for LwIP.
  *
- *  @param[inout]  aLayer    A reference to the layer instance for which events / messages are being dispatched.
- *  @param[inout]  aContext  Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aLayer    A reference to the layer instance for which events / messages are being dispatched.
+ *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, ::Init.
  *  @param[in]     anEvent   The platform-specific event object to dispatch for handling.
  *
  *  @retval   #CHIP_SYSTEM_ERROR_BAD_ARGS          If #aLayer or the event target is NULL.
@@ -1151,8 +1151,8 @@ exit:
  *  @note
  *    This is an implementation for LwIP.
  *
- *  @param[inout]  aLayer               A reference to the layer instance for which events / messages are being dispatched.
- *  @param[inout]  aContext             Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aLayer               A reference to the layer instance for which events / messages are being dispatched.
+ *  @param[in,out] aContext             Platform-specific context data passed to the layer initialization method, ::Init.
  *  @param[in]     aMilliseconds        The number of milliseconds to set for the timer.
  *
  *  @retval   #CHIP_SYSTEM_NO_ERROR    Always succeeds unless overridden.

@@ -564,7 +564,7 @@ out:
  *
  *  @param[in]      ipProto        A protocol within the IP family (e.g., ICMPv4 or ICMPv6).
  *
- *  @param[inout]   retEndPoint    A pointer to a pointer of the RawEndPoint object that is
+ *  @param[in,out]  retEndPoint    A pointer to a pointer of the RawEndPoint object that is
  *                                 a return parameter upon completion of the object creation.
  *                                 *retEndPoint is NULL if creation fails.
  *
@@ -606,7 +606,7 @@ exit:
  *    This function gets a free TCPEndPoint object from a pre-allocated pool
  *    and also calls the explicit initializer on the new object.
  *
- *  @param[inout]   retEndPoint    A pointer to a pointer of the TCPEndPoint object that is
+ *  @param[in,out]  retEndPoint    A pointer to a pointer of the TCPEndPoint object that is
  *                                 a return parameter upon completion of the object creation.
  *                                 *retEndPoint is NULL if creation fails.
  *
@@ -648,7 +648,7 @@ exit:
  *    This function gets a free UDPEndPoint object from a pre-allocated pool
  *    and also calls the explicit initializer on the new object.
  *
- *  @param[inout]   retEndPoint    A pointer to a pointer of the UDPEndPoint object that is
+ *  @param[in,out]  retEndPoint    A pointer to a pointer of the UDPEndPoint object that is
  *                                 a return parameter upon completion of the object creation.
  *                                 *retEndPoint is NULL if creation fails.
  *
@@ -690,7 +690,7 @@ exit:
  *    This function gets a free TunEndPoint object from a pre-allocated pool
  *    and also calls the explicit initializer on the new object.
  *
- *  @param[inout]   retEndPoint    A pointer to a pointer of the TunEndPoint object that is
+ *  @param[in,out]  retEndPoint    A pointer to a pointer of the TunEndPoint object that is
  *                                 a return parameter upon completion of the object creation.
  *                                 *retEndPoint is NULL if creation fails.
  *
@@ -1280,12 +1280,12 @@ exit:
  *  provided argument to this instance's platform-specific event /
  *  message queue.
  *
- *  @param[inout]  target  A pointer to the InetLayer object making the
+ *  @param[in,out] target  A pointer to the InetLayer object making the
  *                         post request.
  *
  *  @param[in]     type    The type of event to post.
  *
- *  @param[inout]  arg     The argument associated with the event to post.
+ *  @param[in,out] arg     The argument associated with the event to post.
  *
  *  @retval    #INET_ERROR_INCORRECT_STATE      If the state of the InetLayer
  *                                              object is incorrect.
@@ -1643,10 +1643,10 @@ namespace InetLayer {
  * may be overridden by assserting the preprocessor definition,
  * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
  *
- * @param[inout]  aLayer    A pointer to the InetLayer instance being
+ * @param[in,out] aLayer    A pointer to the InetLayer instance being
  *                          initialized.
  *
- * @param[inout]  aContext  Platform-specific context data passed to
+ * @param[in,out] aContext  Platform-specific context data passed to
  *                          the layer initialization method, ::Init.
  *
  * @return #INET_NO_ERROR on success; otherwise, a specific error indicating
@@ -1667,10 +1667,10 @@ DLL_EXPORT INET_ERROR WillInit(Inet::InetLayer * aLayer, void * aContext)
  * may be overridden by assserting the preprocessor definition,
  * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
  *
- * @param[inout]  aLayer    A pointer to the InetLayer instance being
+ * @param[in,out] aLayer    A pointer to the InetLayer instance being
  *                          initialized.
  *
- * @param[inout]  aContext  Platform-specific context data passed to
+ * @param[in,out] aContext  Platform-specific context data passed to
  *                          the layer initialization method, ::Init.
  *
  * @param[in]     anError   The overall status being returned via the
@@ -1691,10 +1691,10 @@ DLL_EXPORT void DidInit(Inet::InetLayer * aLayer, void * aContext, INET_ERROR an
  * may be overridden by assserting the preprocessor definition,
  * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
  *
- * @param[inout]  aLayer    A pointer to the InetLayer instance being
+ * @param[in,out] aLayer    A pointer to the InetLayer instance being
  *                          shutdown.
  *
- * @param[inout]  aContext  Platform-specific context data passed to
+ * @param[in,out] aContext  Platform-specific context data passed to
  *                          the layer initialization method, ::Init.
  *
  * @return #INET_NO_ERROR on success; otherwise, a specific error indicating
@@ -1715,10 +1715,10 @@ DLL_EXPORT INET_ERROR WillShutdown(Inet::InetLayer * aLayer, void * aContext)
  * may be overridden by assserting the preprocessor definition,
  * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
  *
- * @param[inout]  aLayer    A pointer to the InetLayer instance being
+ * @param[in,out] aLayer    A pointer to the InetLayer instance being
  *                          shutdown.
  *
- * @param[inout]  aContext  Platform-specific context data passed to
+ * @param[in,out] aContext  Platform-specific context data passed to
  *                          the layer initialization method, ::Init.
  *
  * @param[in]     anError   The overall status being returned via the
@@ -1748,18 +1748,18 @@ DLL_EXPORT void DidShutdown(Inet::InetLayer * aLayer, void * aContext, INET_ERRO
  *  @note
  *    This is an implementation for LwIP.
  *
- *  @param[inout]  aLayer    A pointer to the layer instance to which the
+ *  @param[in,out] aLayer    A pointer to the layer instance to which the
  *                           event / message is being posted.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to
+ *  @param[in,out] aContext  Platform-specific context data passed to
  *                           the layer initialization method, ::Init.
  *
- *  @param[inout]  aTarget   A pointer to the InetLayer object making the
+ *  @param[in,out] aTarget   A pointer to the InetLayer object making the
  *                           post request.
  *
  *  @param[in]     aType     The type of event to post.
  *
- *  @param[inout]  anArg     The argument associated with the event to post.
+ *  @param[in,out] anArg     The argument associated with the event to post.
  *
  *  @return #INET_NO_ERROR on success; otherwise, a specific error indicating
  *          the reason for initialization failure.
@@ -1787,10 +1787,10 @@ INET_ERROR PostEvent(Inet::InetLayer * aInetLayer, void * aContext, InetLayerBas
  *  @note
  *    This is an implementation for LwIP.
  *
- *  @param[inout]  aInetLayer   A pointer to the layer instance for which
+ *  @param[in,out] aInetLayer   A pointer to the layer instance for which
  *                              events / messages are being dispatched.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to
+ *  @param[in,out] aContext  Platform-specific context data passed to
  *                           the layer initialization method, ::Init.
  *
  *  @retval   #INET_ERROR_BAD_ARGS          If #aLayer or #aContext is NULL.
@@ -1820,10 +1820,10 @@ INET_ERROR DispatchEvents(Inet::InetLayer * aInetLayer, void * aContext)
  *  @note
  *    This is an implementation for LwIP.
  *
- *  @param[inout]  aInetLayer   A pointer to the layer instance for which
+ *  @param[in,out] aInetLayer   A pointer to the layer instance for which
  *                              events / messages are being dispatched.
  *
- *  @param[inout]  aContext  Platform-specific context data passed to
+ *  @param[in,out] aContext  Platform-specific context data passed to
  *                           the layer initialization method, ::Init.
  *
  *  @param[in]     aEvent    The platform-specific event object to
@@ -1852,8 +1852,8 @@ INET_ERROR DispatchEvent(Inet::InetLayer * aInetLayer, void * aContext, InetEven
  *  @note
  *    This is an implementation for LwIP.
  *
- *  @param[inout]  aInetLayer           A reference to the layer instance for which events / messages are being dispatched.
- *  @param[inout]  aContext             Platform-specific context data passed to the layer initialization method, ::Init.
+ *  @param[in,out] aInetLayer           A reference to the layer instance for which events / messages are being dispatched.
+ *  @param[in,out] aContext             Platform-specific context data passed to the layer initialization method, ::Init.
  *  @param[in]     aMilliseconds        The number of milliseconds to set for the timer.
  *
  *  @retval   #INET_NO_ERROR    Always succeeds unless overridden.

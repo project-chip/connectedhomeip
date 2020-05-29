@@ -352,7 +352,7 @@ public:
     /**
      * @brief   Emit the IP address in standard network representation.
      *
-     * @param[inout]    p   Reference to the cursor to use for writing.
+     * @param[in,out]   p   Reference to the cursor to use for writing.
      *
      * @details
      *  Use <tt>WriteAddress(uint8_t *&p)</tt> to encode the IP address in
@@ -365,7 +365,7 @@ public:
     /**
      * @brief   Emit the IP address in standard network representation.
      *
-     * @param[inout]    p       Reference to the cursor to use for reading.
+     * @param[in,out]   p       Reference to the cursor to use for reading.
      * @param[out]      output  Object to receive decoded IP address.
      *
      * @details
