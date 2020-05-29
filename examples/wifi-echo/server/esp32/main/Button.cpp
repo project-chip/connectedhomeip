@@ -34,12 +34,12 @@
 
 extern const char * TAG;
 
-esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t mDebouncePeriod)
+esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
 {
     esp_err_t err;
 
     mGPIONum         = gpioNum;
-    mDebouncePeriod  = mDebouncePeriod / portTICK_PERIOD_MS;
+    mDebouncePeriod  = debouncePeriod / portTICK_PERIOD_MS;
     mState           = false;
     mLastPolledState = false;
 

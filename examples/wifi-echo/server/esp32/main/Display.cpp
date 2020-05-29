@@ -63,7 +63,7 @@ TimerHandle_t displayTimer = NULL;
 
 static void TimerCallback(TimerHandle_t xTimer);
 static void SetupBrightnessControl();
-static void SetBrightness(uint16_t brightness);
+static void SetBrightness(uint16_t brightness_percent);
 
 esp_err_t InitDisplay()
 {
