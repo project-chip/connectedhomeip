@@ -116,8 +116,27 @@ int testClusterCmdOnOff(void)
         }
         else
         {
+            bool onOff;
             printf("SUCCESS: attribute got changed and attrribute change callback did fire.\n");
-            return 0;
+
+            // Now let's read the attribute to make sure it has the right value!
+            status = chipZclReadAttribute(1, &chipZclClusterOnOffServerSpec, CHIP_ZCL_CLUSTER_ON_OFF_SERVER_ATTRIBUTE_ON_OFF,
+                                          &onOff, sizeof(onOff));
+            if (status != CHIP_ZCL_STATUS_SUCCESS)
+            {
+                printf("ERROR: could not read attribute.\n");
+                return 1;
+            }
+            else if (onOff != true)
+            {
+                printf("ERROR: attribute value was not changed.\n");
+                return 1;
+            }
+            else
+            {
+                printf("SUCCESS: attribute value was toggled.\n");
+                return 0;
+            }
         }
     }
     else
