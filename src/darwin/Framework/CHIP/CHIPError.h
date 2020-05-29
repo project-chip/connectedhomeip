@@ -29,7 +29,8 @@ typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
     CHIPErrorCodeInvalidArgument = 3,
     CHIPErrorCodeInvalidMessageLength = 4,
     CHIPErrorCodeInvalidState = 5,
-    CHIPERRORCodeWrongAddressType = 6,
+    CHIPErrorCodeWrongAddressType = 6,
+    CHIPErrorCodeIntegrityCheckFailed = 7,
 };
 
 @interface CHIPError : NSObject
