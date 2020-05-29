@@ -141,7 +141,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
     mDeviceCon   = new UdpTransport();
 
     mDeviceCon->Init(mInetLayer);
-    err = mDeviceCon->Connect(mDeviceId, mDeviceAddr, mDevicePort);
+    err = mDeviceCon->Connect(mDeviceAddr, mDevicePort);
     SuccessOrExit(err);
 
     mDeviceCon->OnMessageReceived = OnReceiveMessage;
