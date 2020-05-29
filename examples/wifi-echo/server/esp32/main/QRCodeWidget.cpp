@@ -17,6 +17,15 @@
  *    limitations under the License.
  */
 
+/**
+ * @file QRCodeWidget.cpp
+ *
+ * This file implements the QRCodeWidget that displays a QRCode centered on the screen
+ * It generates a CHIP SetupPayload containing the device's Soft-AP SSID and then
+ * encodes that into a QRCode.
+ *
+ */
+
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
@@ -37,7 +46,6 @@
 #if CONFIG_HAVE_DISPLAY
 
 extern const char * TAG;
-const char * const QRCODE_DATA = "https://github.com/project-chip/connectedhomeip";
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -88,7 +96,7 @@ string createSetupPayload()
     return result;
 };
 
-void QRCodeWidget::Init()
+QRCodeWidget::QRCodeWidget()
 {
     QRCodeColor = TFT_DARKGREY;
     VMargin     = 10;
@@ -101,19 +109,23 @@ void QRCodeWidget::Display()
     {
         kMaxQRCodeStrLength = 120
     };
+
+    string generatedQRCodeData;
     char * qrCodeStr        = NULL;
-    uint8_t * qrCodeDataBuf = NULL;
+    uint8_t * qrCodeTempBuf = NULL;
     uint8_t * qrCode        = NULL;
     uint16_t qrCodeDisplaySize, qrCodeX, qrCodeY, qrCodeXOffset, qrCodeYOffset;
 
-    qrCodeStr = (char *) createSetupPayload().c_str();
+    generatedQRCodeData = createSetupPayload();
+    qrCodeStr           = (char *) generatedQRCodeData.c_str();
 
     // Generate the QR code.
     uint16_t qrCodeSize = qrcodegen_BUFFER_LEN_FOR_VERSION(kQRCodeVersion);
-    qrCodeDataBuf       = (uint8_t *) malloc(qrCodeSize);
+    qrCodeTempBuf       = (uint8_t *) malloc(qrCodeSize);
     qrCode              = (uint8_t *) malloc(qrCodeSize);
-    VerifyOrExit(qrCodeDataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
-    if (!qrcodegen_encodeText(qrCodeStr, qrCodeDataBuf, qrCode, qrcodegen_Ecc_LOW, kQRCodeVersion, kQRCodeVersion,
+    VerifyOrExit(qrCodeTempBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(qrCode != NULL, err = CHIP_ERROR_NO_MEMORY);
+    if (!qrcodegen_encodeText(qrCodeStr, qrCodeTempBuf, qrCode, qrcodegen_Ecc_LOW, kQRCodeVersion, kQRCodeVersion,
                               qrcodegen_Mask_AUTO, true))
     {
         ESP_LOGE(TAG, "qrcodegen_encodeText() failed");
@@ -144,9 +156,9 @@ exit:
     {
         free(qrCode);
     }
-    if (qrCodeDataBuf != NULL)
+    if (qrCodeTempBuf != NULL)
     {
-        free(qrCodeDataBuf);
+        free(qrCodeTempBuf);
     }
     if (err != CHIP_NO_ERROR)
     {

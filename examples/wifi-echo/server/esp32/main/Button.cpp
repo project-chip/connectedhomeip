@@ -17,6 +17,13 @@
  *    limitations under the License.
  */
 
+/**
+ * @file Button.cpp
+ *
+ * Implements a Button tied to a GPIO and provides debouncing and polling
+ *
+ **/
+
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "esp_system.h"
@@ -31,10 +38,10 @@ esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
 {
     esp_err_t err;
 
-    mGPIONum        = gpioNum;
-    mDebouncePeriod = debouncePeriod / portTICK_PERIOD_MS;
-    mState          = false;
-    mLastState      = false;
+    mGPIONum         = gpioNum;
+    mDebouncePeriod  = debouncePeriod / portTICK_PERIOD_MS;
+    mState           = false;
+    mLastPolledState = false;
 
     err = gpio_set_direction(gpioNum, GPIO_MODE_INPUT);
     SuccessOrExit(err);
@@ -51,10 +58,10 @@ bool Button::Poll()
 
     bool newState = gpio_get_level(mGPIONum) == 0;
 
-    if (newState != mLastState)
+    if (newState != mLastPolledState)
     {
-        mLastState    = newState;
-        mLastReadTime = now;
+        mLastPolledState = newState;
+        mLastReadTime    = now;
     }
 
     else if (newState != mState && (now - mLastReadTime) >= mDebouncePeriod)

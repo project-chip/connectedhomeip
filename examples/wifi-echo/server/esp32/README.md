@@ -137,8 +137,8 @@ your network configuration. To erase it, simply run.
 
 Alternatively, you can connect to the ESP32's Soft-AP directly.
 
-1.  After the application has been flashed, connect the ESP32's Soft-AP. If you
-    use the M5Stack, the Soft-AP's SSID is encoded in the TLV section of the
+1.  After the application has been flashed, connect to the ESP32's Soft-AP. If
+    you use the M5Stack, the Soft-AP's SSID is encoded in the TLV section of the
     QRCode on screen. It's usually something like `CHIP_DEMO-XXXX` where the
     last 4 digits are from the device's MAC address.
 
