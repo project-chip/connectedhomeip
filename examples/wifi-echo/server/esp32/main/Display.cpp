@@ -41,7 +41,7 @@
 
 // 8MHz is the recommended SPI speed to init the driver with
 // It later gets set to the preconfigured defaults within the driver
-#define TFT_SPI_CLOCK_HZ 8000000
+#define TFT_SPI_CLOCK_INIT_HZ 8000000
 
 // The frequency used by the ledc timer
 // value chosen to eliminate flicker
@@ -81,12 +81,12 @@ esp_err_t InitDisplay()
 
     spi_lobo_device_interface_config_t devcfg;
     memset((void *) &devcfg, 0, sizeof(devcfg));
-    devcfg.clock_speed_hz   = TFT_SPI_CLOCK_HZ;
+    devcfg.clock_speed_hz   = TFT_SPI_CLOCK_INIT_HZ;
     devcfg.mode             = 0;                        // SPI mode 0
     devcfg.spics_io_num     = -1;                       // we will use external CS pin
     devcfg.spics_ext_io_num = PIN_NUM_CS;               // external CS pin
     devcfg.flags            = LB_SPI_DEVICE_HALFDUPLEX; // ALWAYS SET  to HALF DUPLEX MODE!! for display spi
-    tft_max_rdclock         = TFT_SPI_CLOCK_HZ;
+    tft_max_rdclock         = TFT_SPI_CLOCK_INIT_HZ;
 
     // Initialize all pins used by display driver.
     TFT_PinsInit();
