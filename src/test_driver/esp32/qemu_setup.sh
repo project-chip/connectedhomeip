@@ -34,5 +34,5 @@ die() {
 cd "$here" || die 'ack!, where am I?!?'
 
 source idf.sh
-SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
-idf make esp32_elf_builder
+SDKCONFIG=./build/sdkconfig SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
+SDKCONFIG=./build/sdkconfig idf make esp32_elf_builder
