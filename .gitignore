@@ -34,6 +34,9 @@ examples/common/QRCode/repo
 examples/**/sdkconfig
 examples/**/sdkconfig.old
 
+# ESP32 QEMU build
+src/test_driver/esp32/build
+
 # Temporary Directories
 .tmp/
 
