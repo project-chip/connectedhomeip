@@ -70,7 +70,7 @@ CHIP_ERROR UdpTransport::Connect(const IPAddress & peerAddr, uint16_t peerPort)
     // happening from an underlying layer.
     mRefCount++;
 
-    ChipLogProgress(Inet, "Connection start %016llX", peerNodeId);
+    ChipLogProgress(Inet, "Connection start");
     err = DoConnect();
 exit:
     return err;
