@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 int TestMessageHeader(void);
+int TestUdpTransport(void);
 
 #ifdef __cplusplus
 }

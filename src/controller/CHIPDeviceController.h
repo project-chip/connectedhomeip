@@ -29,10 +29,10 @@
 #ifndef __CHIPDEVICECONTROLLER_H
 #define __CHIPDEVICECONTROLLER_H
 
-#include <core/CHIPConnection.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
+#include <transport/UdpTransport.h>
 
 namespace chip {
 namespace DeviceController {
@@ -144,7 +144,7 @@ private:
 
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
-    ChipConnection * mDeviceCon;
+    UdpTransport * mDeviceCon;
 
     ConnectionState mConState;
     void * mAppReqState;
@@ -165,8 +165,8 @@ private:
     void ClearRequestState();
     void ClearOpState();
 
-    static void OnReceiveMessage(ChipConnection * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
-    static void OnReceiveError(ChipConnection * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    static void OnReceiveMessage(UdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
+    static void OnReceiveError(UdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 };
 
 } // namespace DeviceController

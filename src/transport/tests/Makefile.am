@@ -42,6 +42,7 @@ lib_LIBRARIES                                         = \
 
 libTransportLayerTests_a_SOURCES                      = \
     TestMessageHeader.cpp                               \
+    TestUdpTransport.cpp                                \
     $(NULL)
 
 libTransportLayerTests_adir                           = $(includedir)/transport
@@ -56,6 +57,7 @@ dist_libTransportLayerTests_a_HEADERS                 = \
 AM_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                 \
     -I$(top_srcdir)/src/lib                             \
+    $(NLASSERT_CPPFLAGS)                                \
     $(NLIO_CPPFLAGS)                                    \
     $(NLUNIT_TEST_CPPFLAGS)                             \
     $(LWIP_CPPFLAGS)                                    \
@@ -64,14 +66,15 @@ AM_CPPFLAGS                                           = \
     $(NULL)
 
 CHIP_LDADD                                            = \
-    $(top_builddir)/src/transport/libTransportLayer.a   \
-    $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(top_builddir)/src/lib/libCHIP.a                   \
+    $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(NULL)
 
 COMMON_LDADD                                          = \
     libTransportLayerTests.a                            \
     $(COMMON_LDFLAGS)                                   \
     $(CHIP_LDADD)                                       \
+    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS) \
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
@@ -82,6 +85,7 @@ COMMON_LDADD                                          = \
 
 check_PROGRAMS             = \
     TestMessageHeader        \
+    TestUdpTransport         \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -101,6 +105,9 @@ TESTS_ENVIRONMENT             = \
 
 TestMessageHeader_SOURCES     = TestMessageHeaderDriver.cpp
 TestMessageHeader_LDADD       = $(COMMON_LDADD)
+
+TestUdpTransport_SOURCES     = TestUdpTransportDriver.cpp
+TestUdpTransport_LDADD       = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

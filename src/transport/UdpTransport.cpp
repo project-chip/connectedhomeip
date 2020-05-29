@@ -24,7 +24,7 @@
  *
  */
 
-#include <core/CHIPConnection.h>
+#include <transport/UdpTransport.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -32,7 +32,7 @@
 
 namespace chip {
 
-ChipConnection::ChipConnection() : mState(kState_NotReady), mRefCount(1)
+UdpTransport::UdpTransport() : mState(kState_NotReady), mRefCount(1)
 {
     mState            = kState_NotReady;
     mRefCount         = 1;
@@ -45,7 +45,7 @@ ChipConnection::ChipConnection() : mState(kState_NotReady), mRefCount(1)
     mPeerPort         = 0;
 }
 
-void ChipConnection::Init(Inet::InetLayer * inetLayer)
+void UdpTransport::Init(Inet::InetLayer * inetLayer)
 {
     if (mState != kState_NotReady)
     {
@@ -57,7 +57,7 @@ void ChipConnection::Init(Inet::InetLayer * inetLayer)
 
 } // namespace chip
 
-CHIP_ERROR ChipConnection::Connect(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort)
+CHIP_ERROR UdpTransport::Connect(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -78,7 +78,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipConnection::DoConnect()
+CHIP_ERROR UdpTransport::DoConnect()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -119,7 +119,7 @@ CHIP_ERROR ChipConnection::DoConnect()
     return err;
 }
 
-CHIP_ERROR ChipConnection::SendMessage(PacketBuffer * msgBuf)
+CHIP_ERROR UdpTransport::SendMessage(PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -143,10 +143,10 @@ exit:
     return err;
 }
 
-void ChipConnection::HandleDataReceived(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg, const IPPacketInfo * pktInfo)
+void UdpTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg, const IPPacketInfo * pktInfo)
 {
     UDPEndPoint * udpEndPoint   = static_cast<UDPEndPoint *>(endPoint);
-    ChipConnection * connection = (ChipConnection *) udpEndPoint->AppState;
+    UdpTransport * connection = (UdpTransport *) udpEndPoint->AppState;
 
     // TODO this where where messages should be decoded
     if (connection->StateAllowsReceive() && msg != NULL)
@@ -155,25 +155,25 @@ void ChipConnection::HandleDataReceived(IPEndPointBasis * endPoint, chip::System
     }
 }
 
-void ChipConnection::HandleReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo)
+void UdpTransport::HandleReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo)
 {
     UDPEndPoint * udpEndPoint   = static_cast<UDPEndPoint *>(endPoint);
-    ChipConnection * connection = (ChipConnection *) udpEndPoint->AppState;
+    UdpTransport * connection = (UdpTransport *) udpEndPoint->AppState;
     if (connection->StateAllowsReceive())
     {
         connection->OnReceiveError(connection, err, pktInfo);
     }
 }
 /**
- *  Performs a non-blocking graceful close of the UDP based ChipConnection, delivering any
+ *  Performs a non-blocking graceful close of the UDP based UdpTransport, delivering any
  *  remaining outgoing data before resetting the connection.
  *
  *  This method provides no strong guarantee that any outgoing message not acknowledged at the application
  *  protocol level has been received by the remote peer.
  *
- *  Once Close() has been called, the ChipConnection object can no longer be used for further communication.
+ *  Once Close() has been called, the UdpTransport object can no longer be used for further communication.
  *
- *  Calling Close() decrements the reference count associated with the ChipConnection object, whether or not
+ *  Calling Close() decrements the reference count associated with the UdpTransport object, whether or not
  *  the connection is open/active at the time the method is called.  If this results in the reference count
  *  reaching zero, the resources associated with the connection object are freed.  When this happens, the
  *  application must have no further interactions with the object.
@@ -183,12 +183,12 @@ void ChipConnection::HandleReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR e
  *  @return #CHIP_NO_ERROR unconditionally.
  *
  */
-CHIP_ERROR ChipConnection::Close()
+CHIP_ERROR UdpTransport::Close()
 {
     // Perform a graceful close.
     DoClose(CHIP_NO_ERROR);
 
-    // Decrement the ref count that was added when the ChipConnection object
+    // Decrement the ref count that was added when the UdpTransport object
     // was allocated.
     VerifyOrDie(mRefCount != 0);
     mRefCount--;
@@ -196,7 +196,7 @@ CHIP_ERROR ChipConnection::Close()
     return CHIP_NO_ERROR;
 }
 
-void ChipConnection::DoClose(CHIP_ERROR err)
+void UdpTransport::DoClose(CHIP_ERROR err)
 {
     if (mState != kState_Closed)
     {
@@ -223,26 +223,26 @@ void ChipConnection::DoClose(CHIP_ERROR err)
 }
 
 /**
- * Reserve a reference to the ChipConnection object.
+ * Reserve a reference to the UdpTransport object.
  *
- * The Retain() method increments the reference count associated with the ChipConnection object.  For every
+ * The Retain() method increments the reference count associated with the UdpTransport object.  For every
  * call to Retain(), the application is responsible for making a corresponding call to either Release(), Close()
  * or Abort().
  */
-void ChipConnection::Retain()
+void UdpTransport::Retain()
 {
     VerifyOrDie(mRefCount < UINT8_MAX);
     ++mRefCount;
 }
 
 /**
- *  Decrement the reference count on the ChipConnection object.
+ *  Decrement the reference count on the UdpTransport object.
  *
- *  The Release() method decrements the reference count associated with the ChipConnection object.  If
+ *  The Release() method decrements the reference count associated with the UdpTransport object.  If
  *  this results in the reference count reaching zero, the connection is closed and the connection object
  *  is freed.  When this happens, the application must have no further interactions with the object.
  */
-void ChipConnection::Release()
+void UdpTransport::Release()
 {
     // If the only reference that will remain after this call is the one that was automatically added
     // when the connection started, close the connection.
