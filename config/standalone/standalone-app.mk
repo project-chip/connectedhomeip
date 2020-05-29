@@ -91,8 +91,6 @@ STD_LIBS = \
     -lm \
     -lpthread
 
-STD_DEFINES = HAVE_CONFIG_H
-
 DEFINE_FLAGS = $(addprefix -D,$(STD_DEFINES) $(DEFINES))
 
 INC_FLAGS = $(addprefix -I,$(INC_DIRS) $(STD_INC_DIRS))
