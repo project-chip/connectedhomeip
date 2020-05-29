@@ -163,7 +163,7 @@ exit:
  *   function evicts an element from the circular buffer, and adjusts
  *   the head of this buffer queue
  *
- * @param[inout] ioWriter  TLVWriter calling this function
+ * @param[in,out] ioWriter  TLVWriter calling this function
  *
  * @param[out] outBufStart The pointer to the new buffer
  *
@@ -209,7 +209,7 @@ exit:
  *   completion of output from the TLVWriter.  This function affects
  *   the position of the queue tail.
  *
- * @param[inout] ioWriter TLVWriter calling this function
+ * @param[in,out] ioWriter TLVWriter calling this function
  *
  * @param[in] inBufStart pointer to the start of data (from `TLVWriter`
  *                       perspective)
@@ -248,16 +248,16 @@ CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBuffer(TLVWriter & ioWriter, uint8_t *
  *  TLVReader constraints.  The reader will read at most `mQueueSize`
  *  bytes from the buffer.
  *
- * @param[in] ioReader        TLVReader calling this function.
+ * @param[in] ioReader         TLVReader calling this function.
  *
- * @param[inout] outBufStart  The reference to the data buffer.  On
- *                            return, it is set to a value within this
- *                            buffer.
+ * @param[in,out] outBufStart  The reference to the data buffer.  On
+ *                             return, it is set to a value within this
+ *                             buffer.
  *
- * @param[out] outBufLen      On return, set to the number of continuous
- *                            bytes that could be read out of the buffer.
+ * @param[out] outBufLen       On return, set to the number of continuous
+ *                             bytes that could be read out of the buffer.
  *
- * @retval #CHIP_NO_ERROR    Succeeds unconditionally.
+ * @retval #CHIP_NO_ERROR      Succeeds unconditionally.
  */
 CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader & ioReader, const uint8_t *& outBufStart, uint32_t & outBufLen)
 {
@@ -308,9 +308,9 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader & ioReader, const uint
  * @brief
  *   A trampoline to fetch more space for the TLVWriter.
  *
- * @param[inout] ioWriter TLVWriter calling this function
+ * @param[in,out] ioWriter TLVWriter calling this function
  *
- * @param[inout] inBufHandle A handle to the `CircularTLVWriter` object
+ * @param[in,out] inBufHandle A handle to the `CircularTLVWriter` object
  *
  * @param[out] outBufStart The pointer to the new buffer
  *
@@ -341,9 +341,9 @@ exit:
  * @brief
  *   A trampoline to CHIPCircularTLVBuffer::FinalizeBuffer
  *
- * @param[inout] ioWriter TLVWriter calling this function
+ * @param[in,out] ioWriter TLVWriter calling this function
  *
- * @param[inout] inBufHandle A handle to the `CircularTLVWriter` object
+ * @param[in,out] inBufHandle A handle to the `CircularTLVWriter` object
  *
  * @param[in] inBufStart pointer to the start of data (from `TLVWriter`
  *                       perspective)
@@ -373,18 +373,18 @@ exit:
  * @brief
  *   A trampoline to CHIPCircularTLVBuffer::GetNextBuffer
  *
- * @param[inout] ioReader TLVReader calling this function
+ * @param[in,out] ioReader TLVReader calling this function
  *
- * @param[inout] inBufHandle A handle to the `CircularTLVWriter` object
+ * @param[in,out] inBufHandle A handle to the `CircularTLVWriter` object
  *
- * @param[inout] outBufStart  The reference to the data buffer.  On
- *                            return, it is set to a value within this
- *                            buffer.
+ * @param[in,out] outBufStart  The reference to the data buffer.  On
+ *                             return, it is set to a value within this
+ *                             buffer.
  *
- * @param[out] outBufLen      On return, set to the number of continuous
- *                            bytes that could be read out of the buffer.
+ * @param[out] outBufLen       On return, set to the number of continuous
+ *                             bytes that could be read out of the buffer.
  *
- * @retval #CHIP_NO_ERROR    Succeeds unconditionally.
+ * @retval #CHIP_NO_ERROR      Succeeds unconditionally.
  */
 CHIP_ERROR CHIPCircularTLVBuffer::GetNextBufferFunct(TLVReader & ioReader, uintptr_t & inBufHandle, const uint8_t *& outBufStart,
                                                      uint32_t & outBufLen)
