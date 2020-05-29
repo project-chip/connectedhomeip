@@ -205,7 +205,8 @@ void TestSimpleRead(nlTestSuite * inSuite, void * inContext)
 
 void TestOptionalDataWriteSerial(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload inPayload = GetDefaultPayloadWithSerialNumber();
+    SetupPayload inPayload = GetDefaultPayload();
+    inPayload.serialNumber = "1";
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
