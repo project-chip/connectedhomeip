@@ -59,7 +59,7 @@ configure_OPTIONS+=(
 }
 
 [[ ${PLATFORM_FAMILY_NAME} == macOS ]] && {
-  configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/standalone)
+    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/standalone)
 }
 
 configure_OPTIONS+=(
