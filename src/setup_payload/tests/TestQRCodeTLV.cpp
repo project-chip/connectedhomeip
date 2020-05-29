@@ -225,7 +225,7 @@ void TestOptionalDataWrite(nlTestSuite * inSuite, void * inContext)
     string result;
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
     CHIP_ERROR err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 void TestOptionalDataRead(nlTestSuite * inSuite, void * inContext)
