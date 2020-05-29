@@ -43,27 +43,27 @@
 
 - (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalData:(NSError * __autoreleasing *)error
 {
-    NSMutableArray<CHIPOptionalQRCodeInfo *> *allOptionalData = [NSMutableArray new];
+    NSMutableArray<CHIPOptionalQRCodeInfo *> * allOptionalData = [NSMutableArray new];
     vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalData();
-    for (chip::OptionalQRCodeInfo chipInfo :  chipOptionalData) {
-        CHIPOptionalQRCodeInfo *info = [CHIPOptionalQRCodeInfo new];
+    for (chip::OptionalQRCodeInfo chipInfo : chipOptionalData) {
+        CHIPOptionalQRCodeInfo * info = [CHIPOptionalQRCodeInfo new];
         info.tag = [NSNumber numberWithUnsignedLongLong:chipInfo.tag];
         switch (chipInfo.type) {
-            case chip::optionalQRCodeInfoTypeString:
-                info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeString];
-                info.stringValue = [NSString stringWithUTF8String:chipInfo.data.c_str()];
-                break;
-            case chip::optionalQRCodeInfoTypeInt:
-                info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt];
-                info.integerValue =  [NSNumber numberWithInt:chipInfo.integer];
-                break;
-            default:
-                if (error) {
-                    *error = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeInvalidArgument userInfo:nil];
-                }
-                return @[];
+        case chip::optionalQRCodeInfoTypeString:
+            info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeString];
+            info.stringValue = [NSString stringWithUTF8String:chipInfo.data.c_str()];
+            break;
+        case chip::optionalQRCodeInfoTypeInt:
+            info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt];
+            info.integerValue = [NSNumber numberWithInt:chipInfo.integer];
+            break;
+        default:
+            if (error) {
+                *error = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeInvalidArgument userInfo:nil];
+            }
+            return @[];
         }
-        [allOptionalData  addObject:info];
+        [allOptionalData addObject:info];
     }
     return allOptionalData;
 }
@@ -71,7 +71,7 @@
 + (NSNumber *)vendorTag:(NSNumber *)tagNumber error:(NSError * __autoreleasing *)error
 {
     uint64_t outTag;
-    NSNumber *vendorTag;
+    NSNumber * vendorTag;
     CHIP_ERROR chipError = chip::VendorTag(tagNumber.unsignedShortValue, outTag);
     if (chipError == CHIP_NO_ERROR) {
         vendorTag = [NSNumber numberWithUnsignedLongLong:outTag];

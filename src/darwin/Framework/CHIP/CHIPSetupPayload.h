@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import "CHIPError.h"
+#import <Foundation/Foundation.h>
 
 #ifdef __cplusplus
 #import <setup_payload/SetupPayload.h>
@@ -24,10 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, OptionalQRCodeInfoType) {
-    kOptionalQRCodeInfoTypeString,
-    kOptionalQRCodeInfoTypeInt
-};
+typedef NS_ENUM(NSUInteger, OptionalQRCodeInfoType) { kOptionalQRCodeInfoTypeString, kOptionalQRCodeInfoTypeInt };
 
 @interface CHIPOptionalQRCodeInfo : NSObject
 @property (nonatomic, strong) NSNumber * infoType;
