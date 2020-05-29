@@ -58,7 +58,9 @@ configure_OPTIONS+=(
     configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/ios)
 }
 
-[[ ${PLATFORM_FAMILY_NAME} == macOS ]] && configure_OPTIONS+=(--with-chip-project-includes=no)
+[[ ${PLATFORM_FAMILY_NAME} == macOS ]] && {
+    configure_OPTIONS+=(--with-chip-project-includes="$CHIP_ROOT"/config/standalone)
+}
 
 configure_OPTIONS+=(
     --prefix="$CHIP_PREFIX"

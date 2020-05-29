@@ -263,6 +263,7 @@ endif
 endif
 
 STD_DEFINES = \
+    HAVE_CONFIG_H \
     __STARTUP_CLEAR_BSS \
     $(MCU)
 
