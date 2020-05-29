@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/sagar_dhawan/Work/connectedhomeip/src/darwin/CHIPTool/CHIPTool.xcodeproj">
+      location = "group:CHIPTool/CHIPTool.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Framework/CHIP.xcodeproj">
