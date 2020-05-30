@@ -185,14 +185,14 @@
     }
 }
 
-
-- (void)RequestConnectSoftAPWithSSID:(NSString*)ssid {
-    NSString* message = [NSString stringWithFormat:@"The scanned CHIP accessory supports a SoftAP.\n\nSSID: %@\n\nUse WiFi Settings to connect to it.", ssid];
-    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"SoftAP Detected"
-                                                                   message:message
-                                                            preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel
-                                                         handler:nil];
+- (void)RequestConnectSoftAPWithSSID:(NSString *)ssid
+{
+    NSString * message = [NSString
+        stringWithFormat:@"The scanned CHIP accessory supports a SoftAP.\n\nSSID: %@\n\nUse WiFi Settings to connect to it.", ssid];
+    UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"SoftAP Detected"
+                                                                    message:message
+                                                             preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel handler:nil];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
 }
