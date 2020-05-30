@@ -142,12 +142,18 @@ INC_DIRS = \
     $(NRF5_SDK_ROOT)/components/softdevice/mbr/nrf52840/headers \
     $(NRF5_SDK_ROOT)/components/thread/freertos_mbedtls_mutex \
     $(NRF5_SDK_ROOT)/components/toolchain/cmsis/include \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/config \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/mbedtls_plat_config \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/nrf_cc310_plat/include \
+    $(NRF5_SDK_ROOT)/external/openthread/project/config \
+    $(NRF5_SDK_ROOT)/external/openthread/project/nrf52840 \
     $(NRF5_SDK_ROOT)/config/nrf52840/config \
     $(NRF5_SDK_ROOT)/external/fprintf \
     $(NRF5_SDK_ROOT)/external/freertos/config \
     $(NRF5_SDK_ROOT)/external/freertos/portable/CMSIS/nrf52 \
     $(NRF5_SDK_ROOT)/external/freertos/portable/GCC/nrf52 \
     $(NRF5_SDK_ROOT)/external/freertos/source/include \
+    $(NRF5_SDK_ROOT)/external/openthread/include \
     $(NRF5_SDK_ROOT)/external/segger_rtt \
     $(NRF5_SDK_ROOT)/integration/nrfx \
     $(NRF5_SDK_ROOT)/integration/nrfx/legacy \
@@ -162,12 +168,26 @@ DEFINES = \
     BSP_DEFINES_ONLY \
     CONFIG_GPIO_AS_PINRESET \
     FLOAT_ABI_HARD \
+    MBEDTLS_CONFIG_FILE=\"nrf-config.h\" \
+    MBEDTLS_USER_CONFIG_FILE=\"nrf52840-mbedtls-config.h\" \
+    OPENTHREAD_CONFIG_FILE=\"openthread-config-wrap.h\" \
     USE_APP_CONFIG \
     __HEAP_SIZE=40960 \
     __STACK_SIZE=8192 \
     SOFTDEVICE_PRESENT \
     PRINTF_DISABLE_SUPPORT_EXPONENTIAL \
     S140
+
+LIBS = \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_cc310.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_cc310_backend.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_base_vanilla.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_tls_vanilla.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libmbedtls_x509_vanilla.a \
+    $(NRF5_SDK_ROOT)/external/openthread/nrf_security/lib/libnrf_cc310_platform_0.9.1.a \
 
 CFLAGS = \
     --specs=nano.specs
