@@ -95,6 +95,7 @@ CHIP_CONFIGURE_OPTIONS = \
     --exec-prefix=$(CHIP_OUTPUT_DIR) \
     --host=$(CHIP_HOST_ARCH) \
     --build=$(CHIP_BUILD_ARCH) \
+    --with-target-style=embedded \
     --with-device-layer=nrf5 \
     --with-network-layer=all \
     --with-target-network=lwip \
