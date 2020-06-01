@@ -14,7 +14,8 @@
 
 @implementation OnOffViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 }
@@ -28,15 +29,18 @@
     // Pass the selected object to the new view controller.
 }
 */
-- (IBAction)onButtonTapped:(id)sender {
+- (IBAction)onButtonTapped:(id)sender
+{
     NSLog(@"On tapped");
 }
 
-- (IBAction)offButtonTapped:(id)sender {
+- (IBAction)offButtonTapped:(id)sender
+{
     NSLog(@"Off tapped");
 }
 
-- (IBAction)toggleButtonTapped:(id)sender {
+- (IBAction)toggleButtonTapped:(id)sender
+{
     NSLog(@"Toggle tapped");
 }
 
