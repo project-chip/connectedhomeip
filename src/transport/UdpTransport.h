@@ -163,18 +163,20 @@ public:
     /// Typesafe equivalent of UdpTransport::ReceiveErrorHandler
     typedef void (*StatefulReceiveErrorHandler)(StatefulUdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 
+    /// Sets the OnMessageReceived callback using a stateful callback
     void SetMessageReceiveHandler(StatefulMessageReceiveHandler handler)
     {
         OnMessageReceived = reinterpret_cast<MessageReceiveHandler>(handler);
     }
 
+    /// Sets the OnMessageReceived callback using a stateful callback
     void SetReceiveErrorHandler(StatefulReceiveErrorHandler handler)
     {
         OnReceiveError = reinterpret_cast<ReceiveErrorHandler>(handler);
     }
 
 private:
-    StateType mState;
+    StateType mState; ///< State for this transport. Often a pointer.
 };
 
 } // namespace chip
