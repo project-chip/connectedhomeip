@@ -17,12 +17,21 @@
 #ifndef CHIP_ZCL_TEST_UNIT
 #define CHIP_ZCL_TEST_UNIT
 
-int testClusterServerBasic();
-int testClusterServerIdentify();
-int testClusterServerLevelControl();
-int testClusterServerOnOff();
-int testCodecSimple();
-int testCoreDataModel();
-int testCoreMessageDispatch();
+#ifdef __cplusplus
+extern "C" {
+#endif /* #ifdef __cplusplus */
+
+int testClusterServerBasic(void);
+int testClusterServerIdentify(void);
+int testClusterServerLevelControl(void);
+int testClusterServerOnOff(void);
+int testCodecSimple(void);
+int testCoreDataModel(void);
+int testCoreMessageDispatch(void);
+int testClusterCmdOnOff(void);
+
+#ifdef __cplusplus
+}
+#endif /* #ifdef __cplusplus */
 
 #endif // CHIP_ZCL_TEST_UNIT

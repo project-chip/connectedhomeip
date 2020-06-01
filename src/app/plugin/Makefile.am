@@ -24,8 +24,7 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 SUBDIRS                               = \
-    test-on-off                         \
-    test-unit                           \
+    tests                               \
     $(NULL)
 
 # this tree isn't included in a library, files are pulled into applications

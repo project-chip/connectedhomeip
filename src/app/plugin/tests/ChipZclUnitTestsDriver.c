@@ -19,12 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{
-    printf("Attribute change callback: ep=%d clusterId=%d attributeId=%d\n", endpoint, clusterId, attributeId);
-}
-
 int main(int argc, char ** argv)
 {
     printf("%s: === start ===\n", argv[0]);
@@ -35,6 +29,7 @@ int main(int argc, char ** argv)
     testCodecSimple();
     testCoreDataModel();
     testCoreMessageDispatch();
+    testClusterCmdOnOff();
     printf("%s: === end ===\n", argv[0]);
     return 0;
 }
