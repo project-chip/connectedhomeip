@@ -27,6 +27,8 @@
 #ifndef __UDPTRANSPORT_H__
 #define __UDPTRANSPORT_H__
 
+#include <utility>
+
 #include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
@@ -53,8 +55,6 @@ public:
         kState_Connected      = 2, /**< State when the connection has been established. */
         kState_Closed         = 3  /**< State when the connection is closed. */
     };
-
-    void * AppState; /**< A pointer to the application-specific state object. */
 
     /**
      * @brief
@@ -127,6 +127,7 @@ public:
     ReceiveErrorHandler OnReceiveError;
 
     UdpTransport();
+    virtual ~UdpTransport() {}
 
 private:
     Inet::InetLayer * mInetLayer;
@@ -143,6 +144,39 @@ private:
 
     static void HandleDataReceived(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg, const IPPacketInfo * pktInfo);
     static void HandleReceiveError(IPEndPointBasis * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo);
+};
+
+/// Associates a UDP transport with a state at creation time
+template <typename StateType>
+class StatefulUdpTransport : public UdpTransport
+{
+public:
+    StatefulUdpTransport(const StateType & state) : mState(state) {}
+    StatefulUdpTransport(StateType && state) : mState(std::move(state)) {}
+
+    StateType & State(void) { return mState; }
+    const StateType & State(void) const { return mState; }
+
+    /// Typesafe equivalent of UdpTransport::MessageReceivehandler
+    typedef void (*StatefulMessageReceiveHandler)(StatefulUdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
+
+    /// Typesafe equivalent of UdpTransport::ReceiveErrorHandler
+    typedef void (*StatefulReceiveErrorHandler)(StatefulUdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+
+    /// Sets the OnMessageReceived callback using a stateful callback
+    void SetMessageReceiveHandler(StatefulMessageReceiveHandler handler)
+    {
+        OnMessageReceived = reinterpret_cast<MessageReceiveHandler>(handler);
+    }
+
+    /// Sets the OnMessageReceived callback using a stateful callback
+    void SetReceiveErrorHandler(StatefulReceiveErrorHandler handler)
+    {
+        OnReceiveError = reinterpret_cast<ReceiveErrorHandler>(handler);
+    }
+
+private:
+    StateType mState; ///< State for this transport. Often a pointer.
 };
 
 } // namespace chip
