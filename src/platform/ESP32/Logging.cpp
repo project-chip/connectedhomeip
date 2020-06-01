@@ -51,12 +51,8 @@ void GetModuleName(char * buf, uint8_t module)
 namespace chip {
 namespace Logging {
 
-void Log(uint8_t module, uint8_t category, const char * msg, ...)
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
-    va_list v;
-
-    va_start(v, msg);
-
     if (IsCategoryEnabled(category))
     {
         enum
@@ -91,9 +87,18 @@ void Log(uint8_t module, uint8_t category, const char * msg, ...)
             break;
         }
     }
+}
 
+void Log(uint8_t module, uint8_t category, const char * msg, ...)
+{
+    va_list v;
+
+    va_start(v, msg);
+    LogV(module, category, msg, v);
     va_end(v);
 }
 
 } // namespace Logging
+
+} // namespace chip
 } // namespace chip

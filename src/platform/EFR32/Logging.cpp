@@ -161,13 +161,10 @@ namespace chip {
 namespace Logging {
 
 /**
- * CHIP log output function.
+ * CHIP log output functions.
  */
-void Log(uint8_t module, uint8_t category, const char * aFormat, ...)
+void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
 {
-    va_list v;
-
-    va_start(v, aFormat);
 #if EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
     if (IsCategoryEnabled(category))
     {
@@ -214,6 +211,14 @@ void Log(uint8_t module, uint8_t category, const char * aFormat, ...)
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
 #endif // EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
+}
+
+void Log(uint8_t module, uint8_t category, const char * aFormat, ...)
+{
+    va_list v;
+
+    va_start(v, aFormat);
+    LogV(module, category, aFormat, v);
     va_end(v);
 }
 

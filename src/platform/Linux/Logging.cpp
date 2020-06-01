@@ -55,13 +55,10 @@ namespace chip {
 namespace Logging {
 
 /**
- * CHIP log output function.
+ * CHIP log output functions.
  */
-void Log(uint8_t module, uint8_t category, const char * msg, ...)
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
-    va_list v;
-    va_start(v, msg);
-
     if (IsCategoryEnabled(category))
     {
         vsyslog(LOG_INFO, msg, v);
@@ -69,7 +66,12 @@ void Log(uint8_t module, uint8_t category, const char * msg, ...)
         // Let the application know that a log message has been emitted.
         DeviceLayer::OnLogOutput();
     }
-
+}
+void Log(uint8_t module, uint8_t category, const char * msg, ...)
+{
+    va_list v;
+    va_start(v, msg);
+    LogV(module, category, msg, v);
     va_end(v);
 }
 

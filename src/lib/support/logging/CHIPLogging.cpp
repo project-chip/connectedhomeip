@@ -190,12 +190,8 @@ uint8_t gLogFilter = kLogCategory_Max;
 #define __CHIP_LOGGING_LINK_ATTRIBUTE
 #endif
 
-DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t category, const char * msg, ...)
+DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
-    va_list v;
-
-    va_start(v, msg);
-
     if (IsCategoryEnabled(category))
     {
 
@@ -220,6 +216,15 @@ DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t catego
 
 #endif /* CHIP_LOGGING_STYLE_ANDROID */
     }
+}
+
+DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void Log(uint8_t module, uint8_t category, const char * msg, ...)
+{
+    va_list v;
+
+    va_start(v, msg);
+
+    LogV(module, category, msg, v);
 
     va_end(v);
 }
