@@ -649,11 +649,10 @@ ChipZclStatus_t chipZclWriteAttribute(ChipZclEndpointId_t endpointId, const Chip
                                          ZCL_BOOLEAN_ATTRIBUTE_TYPE, true, false);
 }
 
-#if 0  // this function needs more dispatch information to be consumed by the public Read/Write functions
-// If dataPtr is NULL, no data is copied to the caller.
-// readLength should be 0 in that case.
 //
 // This function populates the dataPtr with the data from the attribute, and dataType (if not-NULL) with the correct type.
+// If dataPtr is NULL, no data is copied to the caller.
+// readLength should be 0 in that case.
 static ChipZclStatus_t chipZclInternalReadAttribute(ChipZclEndpointId_t endpoint, ChipZclClusterId cluster,
                                                     ChipZclAttributeId attributeID, uint8_t mask, uint16_t manufacturerCode,
                                                     uint8_t * dataPtr, uint16_t readLength, ChipZclAttributeType * dataType)
@@ -688,12 +687,12 @@ static ChipZclStatus_t chipZclInternalReadAttribute(ChipZclEndpointId_t endpoint
 
     return status;
 }
-#endif // if 0
 
 ChipZclStatus_t chipZclReadAttribute(ChipZclEndpointId_t endpointId, const ChipZclClusterSpec_t * clusterSpec,
                                      ChipZclAttributeId_t attributeId, void * buffer, size_t bufferLength)
 {
-    return CHIP_ZCL_STATUS_SUCCESS;
+    uint8_t mask = (clusterSpec->role == CHIP_ZCL_ROLE_CLIENT ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER);
+    return chipZclInternalReadAttribute(endpointId, clusterSpec->id, attributeId, mask, 0, (uint8_t *) buffer, bufferLength, NULL);
 }
 
 // Initial configuration
