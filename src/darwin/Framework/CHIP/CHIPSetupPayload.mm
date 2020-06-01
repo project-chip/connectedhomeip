@@ -16,12 +16,19 @@
  */
 
 #import "CHIPSetupPayload.h"
+#import <setup_payload/SetupPayload.h>
 
-@implementation CHIPSetupPayload
+@implementation CHIPOptionalQRCodeInfo
+@end
+
+@implementation CHIPSetupPayload {
+    chip::SetupPayload _chipSetupPayload;
+}
 
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload
 {
     if (self = [super init]) {
+        _chipSetupPayload = setupPayload;
         _version = [NSNumber numberWithUnsignedChar:setupPayload.version];
         _vendorID = [NSNumber numberWithUnsignedShort:setupPayload.vendorID];
         _productID = [NSNumber numberWithUnsignedShort:setupPayload.productID];
@@ -29,8 +36,48 @@
         _rendezvousInformation = [NSNumber numberWithUnsignedShort:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
         _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
+        _serialNumber = [NSString stringWithUTF8String:setupPayload.serialNumber.c_str()];
     }
     return self;
 }
 
+- (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalData:(NSError * __autoreleasing *)error
+{
+    NSMutableArray<CHIPOptionalQRCodeInfo *> * allOptionalData = [NSMutableArray new];
+    vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalData();
+    for (chip::OptionalQRCodeInfo chipInfo : chipOptionalData) {
+        CHIPOptionalQRCodeInfo * info = [CHIPOptionalQRCodeInfo new];
+        info.tag = [NSNumber numberWithUnsignedLongLong:chipInfo.tag];
+        switch (chipInfo.type) {
+        case chip::optionalQRCodeInfoTypeString:
+            info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeString];
+            info.stringValue = [NSString stringWithUTF8String:chipInfo.data.c_str()];
+            break;
+        case chip::optionalQRCodeInfoTypeInt:
+            info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt];
+            info.integerValue = [NSNumber numberWithInt:chipInfo.integer];
+            break;
+        default:
+            if (error) {
+                *error = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeInvalidArgument userInfo:nil];
+            }
+            return @[];
+        }
+        [allOptionalData addObject:info];
+    }
+    return allOptionalData;
+}
+
++ (NSNumber *)vendorTag:(NSNumber *)tagNumber error:(NSError * __autoreleasing *)error
+{
+    uint64_t outTag;
+    NSNumber * vendorTag;
+    CHIP_ERROR chipError = chip::VendorTag(tagNumber.unsignedShortValue, outTag);
+    if (chipError == CHIP_NO_ERROR) {
+        vendorTag = [NSNumber numberWithUnsignedLongLong:outTag];
+    } else if (error) {
+        *error = [CHIPError errorForCHIPErrorCode:chipError];
+    }
+    return vendorTag;
+}
 @end

@@ -37,6 +37,7 @@
 @property (weak, nonatomic) IBOutlet UILabel * rendezVousInformation;
 @property (weak, nonatomic) IBOutlet UILabel * vendorID;
 @property (weak, nonatomic) IBOutlet UILabel * productID;
+@property (weak, nonatomic) IBOutlet UILabel * serialNumber;
 
 - (IBAction)startScanningQRCode:(id)sender;
 - (IBAction)stopScanningQRCode:(id)sender;

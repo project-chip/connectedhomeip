@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "CHIPError.h"
 #import <Foundation/Foundation.h>
 
 #ifdef __cplusplus
@@ -22,6 +23,15 @@
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSUInteger, OptionalQRCodeInfoType) { kOptionalQRCodeInfoTypeString, kOptionalQRCodeInfoTypeInt };
+
+@interface CHIPOptionalQRCodeInfo : NSObject
+@property (nonatomic, strong) NSNumber * infoType;
+@property (nonatomic, strong) NSNumber * tag;
+@property (nonatomic, strong) NSNumber * integerValue;
+@property (nonatomic, strong) NSString * stringValue;
+@end
 
 @interface CHIPSetupPayload : NSObject
 
@@ -32,6 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSNumber * rendezvousInformation;
 @property (nonatomic, strong) NSNumber * discriminator;
 @property (nonatomic, strong) NSNumber * setUpPINCode;
+
+@property (nonatomic, strong) NSString * serialNumber;
+- (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalData:(NSError * __autoreleasing *)error;
++ (NSNumber *)vendorTag:(NSNumber *)tagNumber error:(NSError * __autoreleasing *)error;
 
 #ifdef __cplusplus
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload;

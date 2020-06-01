@@ -27,6 +27,12 @@
 #define ERROR_DISPLAY_TIME 2.0 * NSEC_PER_SEC
 #define QR_CODE_FREEZE 1.0 * NSEC_PER_SEC
 
+// The expected Vendor ID for CHIP demos
+// Spells CHIP on a dialer
+#define EXAMPLE_VENDOR_ID 3447
+#define EXAMPLE_VENDOR_TAG 1
+#define MAX_SSID_LEN 32
+
 #define NOT_APPLICABLE_STRING @"N/A"
 
 @interface QRCodeViewController ()
@@ -139,7 +145,7 @@
         self->_discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
         self->_setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
         self->_rendezVousInformation.text = NOT_APPLICABLE_STRING;
-
+        self->_serialNumber.text = NOT_APPLICABLE_STRING;
         // TODO: Only display vid and pid if present
         self->_vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
         self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];
@@ -149,12 +155,46 @@
         self->_discriminatorLabel.text = [NSString stringWithFormat:@"%@", payload.discriminator];
         self->_setupPinCodeLabel.text = [NSString stringWithFormat:@"%@", payload.setUpPINCode];
         self->_rendezVousInformation.text = [NSString stringWithFormat:@"%@", payload.rendezvousInformation];
-
+        if ([payload.serialNumber length] > 0) {
+            self->_serialNumber.text = payload.serialNumber;
+        } else {
+            self->_serialNumber.text = NOT_APPLICABLE_STRING;
+        }
         // TODO: Only display vid and pid if present
         self->_vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
         self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];
     }
     self->_setupPayloadView.hidden = NO;
+
+    if ([payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]]) {
+        NSArray * optionalInfo = [payload getAllOptionalData:nil];
+        for (CHIPOptionalQRCodeInfo * info in optionalInfo) {
+            NSNumber * tag = [CHIPSetupPayload vendorTag:info.tag error:nil];
+            if (tag && tag.intValue == EXAMPLE_VENDOR_TAG) {
+                // If the vendor id and tag match the example values, there should be an ssid encoded
+                if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
+                    if ([info.stringValue length] > MAX_SSID_LEN) {
+                        NSLog(@"Unexpected SSID String...");
+                    } else {
+                        // show SoftAP detection
+                        [self RequestConnectSoftAPWithSSID:info.stringValue];
+                    }
+                }
+            }
+        }
+    }
+}
+
+- (void)RequestConnectSoftAPWithSSID:(NSString *)ssid
+{
+    NSString * message = [NSString
+        stringWithFormat:@"The scanned CHIP accessory supports a SoftAP.\n\nSSID: %@\n\nUse WiFi Settings to connect to it.", ssid];
+    UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"SoftAP Detected"
+                                                                    message:message
+                                                             preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:cancelAction];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 // MARK: QR Code
