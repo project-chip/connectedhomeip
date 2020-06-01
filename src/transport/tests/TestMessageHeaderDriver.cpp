@@ -17,24 +17,18 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP core library
- *      unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP Transport Layer Message header unit
+ *      tests.
  *
  */
 
-#ifndef TESTCORE_H
-#define TESTCORE_H
+#include "TestTransportLayer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <nlunit-test.h>
 
-int TestCHIPErrorStr(void);
-int TestCHIPTLV(void);
-int TestCHIPSecureChannel(void);
-
-#ifdef __cplusplus
+int main(void)
+{
+    nlTestSetOutputStyle(OUTPUT_CSV);
+    return TestMessageHeader();
 }
-#endif
-
-#endif // TESTCORE_H

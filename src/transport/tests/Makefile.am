@@ -17,7 +17,7 @@
 #
 #    Description:
 #      This file is the GNU automake template for the Project CHIP
-#      Core layer library unit tests.
+#      transport layer library unit tests.
 #
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
@@ -37,19 +37,18 @@ EXTRA_DIST                                            = \
 
 if CHIP_BUILD_TESTS
 lib_LIBRARIES                                         = \
-    libCoreTests.a                                      \
+    libTransportLayerTests.a                            \
     $(NULL)
 
-libCoreTests_a_SOURCES                                = \
-    TestCHIPErrorStr.cpp                                \
-    TestCHIPTLV.cpp                                     \
-    TestCHIPSecureChannel.cpp                           \
+libTransportLayerTests_a_SOURCES                      = \
+    TestMessageHeader.cpp                               \
+    TestUdpTransport.cpp                                \
     $(NULL)
 
-libCoreTests_adir                                     = $(includedir)/core
+libTransportLayerTests_adir                           = $(includedir)/transport
 
-dist_libCoreTests_a_HEADERS                           = \
-    TestCore.h                                          \
+dist_libTransportLayerTests_a_HEADERS                 = \
+    TestTransportLayer.h                                \
     $(NULL)
 
 # C/C++ preprocessor option flags that will apply to all compiled
@@ -68,52 +67,47 @@ AM_CPPFLAGS                                           = \
 
 CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/libCHIP.a                   \
-    $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(NULL)
 
-COMMON_LDADD                                          =  \
-    libCoreTests.a                                       \
-    $(COMMON_LDFLAGS)                                    \
-    $(CHIP_LDADD)                                        \
+COMMON_LDADD                                          = \
+    libTransportLayerTests.a                            \
+    $(COMMON_LDFLAGS)                                   \
+    $(CHIP_LDADD)                                       \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS) \
-    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)           \
-    $(LWIP_LDFLAGS) $(LWIP_LIBS)                         \
-    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                   \
-    $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                    \
+    $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
+    $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
+    $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
+    $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)
 
 # Test applications that should be run when the 'check' target is run.
 
-check_PROGRAMS                                        = \
-    TestCHIPErrorStr                                    \
-    TestCHIPTLV                                         \
-    TestCHIPSecureChannel                               \
+check_PROGRAMS             = \
+    TestMessageHeader        \
+    TestUdpTransport         \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
 
-TESTS                                                 = \
-    $(check_PROGRAMS)                                   \
+TESTS                       = \
+    $(check_PROGRAMS)         \
     $(NULL)
 
 # The additional environment variables and their values that will be
 # made available to all programs and scripts in TESTS.
 
-TESTS_ENVIRONMENT                                     = \
+TESTS_ENVIRONMENT             = \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
 
-TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStrDriver.cpp
-TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)
+TestMessageHeader_SOURCES     = TestMessageHeaderDriver.cpp
+TestMessageHeader_LDADD       = $(COMMON_LDADD)
 
-TestCHIPTLV_SOURCES                                   = TestCHIPTLVDriver.cpp
-TestCHIPTLV_LDADD                                     = $(COMMON_LDADD)
-
-TestCHIPSecureChannel_SOURCES                         = TestCHIPSecureChannelDriver.cpp
-TestCHIPSecureChannel_LDADD                           = $(COMMON_LDADD)
+TestUdpTransport_SOURCES     = TestUdpTransportDriver.cpp
+TestUdpTransport_LDADD       = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies
@@ -125,7 +119,6 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
    $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
-   $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)
 

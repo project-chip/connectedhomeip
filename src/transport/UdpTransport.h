@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef __CHIPCONNECTION_H__
-#define __CHIPCONNECTION_H__
+#ifndef __UDPTRANSPORT_H__
+#define __UDPTRANSPORT_H__
 
 #include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
@@ -35,7 +35,7 @@ namespace chip {
 
 using namespace System;
 
-class DLL_EXPORT ChipConnection
+class DLL_EXPORT UdpTransport
 {
 public:
     /**
@@ -68,12 +68,11 @@ public:
      * @brief
      *   Attempt to establish a connection to the given peer
      *
-     * @param peerNodeId    Currently unused; a NodeId to identify this peer
      * @param peerAddr      The <tt>chip::Inet::IPAddress</tt> of the requested peer
      * @param peerPort      The port of the requested peer
      * @return CHIP_ERROR   The connection result
      */
-    CHIP_ERROR Connect(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort = 0);
+    CHIP_ERROR Connect(const IPAddress & peerAddr, uint16_t peerPort = 0);
 
     /**
      * @brief
@@ -90,7 +89,7 @@ public:
 
     /**
      * @brief
-     *   Close an existing connection. Once close is called, the ChipConnection object can no longer be used
+     *   Close an existing connection. Once close is called, the UdpTransport object can no longer be used
      *
      * @return CHIP_ERROR   The close result
      */
@@ -103,36 +102,35 @@ public:
      *  This function is the application callback that is invoked when a message is received over a
      *  Chip connection.
      *
-     *  @param[in]    con           A pointer to the ChipConnection object.
+     *  @param[in]    con           A pointer to the UdpTransport object.
      *
      *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
      *
      *  @param[in]    pktInfo       A pointer to the IPPacketInfo object carrying sender details.
      *
      */
-    typedef void (*MessageReceiveHandler)(ChipConnection * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
+    typedef void (*MessageReceiveHandler)(UdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
     MessageReceiveHandler OnMessageReceived;
 
     /**
      *  This function is the application callback invoked upon encountering an error when receiving
      *  a Chip message.
      *
-     *  @param[in]     con            A pointer to the ChipConnection object.
+     *  @param[in]     con            A pointer to the UdpTransport object.
      *
      *  @param[in]     err            The CHIP_ERROR encountered when receiving data over the connection.
      *
      *  @param[in]    pktInfo         A pointer to the IPPacketInfo object carrying sender details.
      *
      */
-    typedef void (*ReceiveErrorHandler)(ChipConnection * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    typedef void (*ReceiveErrorHandler)(UdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
     ReceiveErrorHandler OnReceiveError;
 
-    ChipConnection();
+    UdpTransport();
 
 private:
     Inet::InetLayer * mInetLayer;
     UDPEndPoint * mUDPEndPoint;
-    uint64_t mPeerNodeId;
     IPAddress mPeerAddr;
     uint16_t mPeerPort;
     State mState;
@@ -149,4 +147,4 @@ private:
 
 } // namespace chip
 
-#endif // __CHIPCONNECTION_H__
+#endif // __UDPTRANSPORT_H__

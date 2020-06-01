@@ -138,10 +138,10 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
     mDeviceAddr  = deviceAddr;
     mDevicePort  = devicePort;
     mAppReqState = appReqState;
-    mDeviceCon   = new ChipConnection();
+    mDeviceCon   = new UdpTransport();
 
     mDeviceCon->Init(mInetLayer);
-    err = mDeviceCon->Connect(mDeviceId, mDeviceAddr, mDevicePort);
+    err = mDeviceCon->Connect(mDeviceAddr, mDevicePort);
     SuccessOrExit(err);
 
     mDeviceCon->OnMessageReceived = OnReceiveMessage;
@@ -299,7 +299,7 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnReceiveMessage(ChipConnection * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
+void ChipDeviceController::OnReceiveMessage(UdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
 {
     ChipDeviceController * mgr = (ChipDeviceController *) con->AppState;
     if (mgr->mConState == kConnectionState_Connected && mgr->mOnComplete.Response != NULL && pktInfo != NULL)
@@ -308,7 +308,7 @@ void ChipDeviceController::OnReceiveMessage(ChipConnection * con, PacketBuffer *
     }
 }
 
-void ChipDeviceController::OnReceiveError(ChipConnection * con, CHIP_ERROR err, const IPPacketInfo * pktInfo)
+void ChipDeviceController::OnReceiveError(UdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo)
 {
     ChipDeviceController * mgr = (ChipDeviceController *) con->AppState;
     if (mgr->mConState == kConnectionState_Connected && mgr->mOnError != NULL && pktInfo != NULL)

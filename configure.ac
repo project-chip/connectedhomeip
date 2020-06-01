@@ -2092,6 +2092,8 @@ src/lib/support/tests/Makefile
 src/platform/Makefile
 src/platform/tests/Makefile
 src/qrcodetool/Makefile
+src/transport/Makefile
+src/transport/tests/Makefile
 tests/Makefile
 ])
 

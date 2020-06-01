@@ -17,24 +17,23 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP core library
- *      unit tests.
+ *      This file declares test entry points for CHIP Transport layer
+ *      layer library unit tests.
  *
  */
 
-#ifndef TESTCORE_H
-#define TESTCORE_H
+#ifndef TESTTRANSPORTLAYER_H
+#define TESTTRANSPORTLAYER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int TestCHIPErrorStr(void);
-int TestCHIPTLV(void);
-int TestCHIPSecureChannel(void);
+int TestMessageHeader(void);
+int TestUdpTransport(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // TESTCORE_H
+#endif // TESTTRANSPORTLAYER_H
