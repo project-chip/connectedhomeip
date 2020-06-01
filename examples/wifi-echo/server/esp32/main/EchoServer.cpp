@@ -111,7 +111,7 @@ static void error(IPEndPointBasis * ep, INET_ERROR error, const IPPacketInfo * p
 }
 
 // The echo server assumes the platform's networking has been setup already
-void startServer(UDPEndPoint * endpoint)
+void startServer(UDPEndPoint *& endpoint)
 {
     ESP_LOGI(TAG, "Trying to get Inet");
     INET_ERROR err = DeviceLayer::InetLayer.NewUDPEndPoint(&endpoint);

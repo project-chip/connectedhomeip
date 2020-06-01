@@ -39,7 +39,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(UDPEndPoint * endpoint);
+extern void startServer(UDPEndPoint *& endpoint);
 extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
