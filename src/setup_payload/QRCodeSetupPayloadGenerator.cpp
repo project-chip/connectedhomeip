@@ -187,8 +187,7 @@ exit:
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation)
 {
-    uint8_t tlvDataStart[kTotalPayloadDataSizeInBytes];
-    return payloadBinaryRepresentation(binaryRepresentation, tlvDataStart, sizeof(tlvDataStart));
+    return payloadBinaryRepresentation(binaryRepresentation, NULL, 0);
 }
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation, uint8_t * tlvDataStart,
@@ -227,8 +226,9 @@ exit:
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(string & base41Representation)
 {
-    uint8_t tlvDataStart[kTotalPayloadDataSizeInBytes];
-    return payloadBase41Representation(base41Representation, tlvDataStart, sizeof(tlvDataStart));
+    // 6.1.2.2. Table: Packed Binary Data Structure
+    // The TLV Data should be 0 length if TLV is not included.
+    return payloadBase41Representation(base41Representation, NULL, 0);
 }
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(string & base41Representation, uint8_t * tlvDataStart,

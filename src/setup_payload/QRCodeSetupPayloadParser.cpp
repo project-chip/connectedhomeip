@@ -174,7 +174,7 @@ static CHIP_ERROR populateTLV(SetupPayload & outPayload, const vector<uint8_t> &
     }
     size_t bitsLeftToRead = (buf.size() * 8) - index;
     size_t tlvBytesLength = ceil(double(bitsLeftToRead) / 8);
-    uint8_t * tlvArray    = new uint8_t[tlvBytesLength]; // TODO: Allow caller to allocate buffer #825
+    uint8_t * tlvArray    = new uint8_t[tlvBytesLength];
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest;
