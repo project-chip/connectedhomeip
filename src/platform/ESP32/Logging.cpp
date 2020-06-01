@@ -101,4 +101,3 @@ void Log(uint8_t module, uint8_t category, const char * msg, ...)
 } // namespace Logging
 
 } // namespace chip
-} // namespace chip
