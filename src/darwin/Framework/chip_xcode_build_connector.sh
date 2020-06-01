@@ -14,7 +14,7 @@ export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
 
 set -ex
 
-if [[ ${ARCHS} = arm64 ]]; then
+if [ ${ARCHS} = arm64 ] ; then
     target=aarch64-apple-darwin
 else
     target=$ARCHS-apple-darwin
