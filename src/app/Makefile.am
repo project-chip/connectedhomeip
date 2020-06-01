@@ -36,6 +36,8 @@ lib_LIBRARIES                         = libCHIPDataModel.a
 libCHIPDataModel_a_CPPFLAGS           = \
     -I$(top_srcdir)/src/app/chip-zcl    \
     -I$(top_srcdir)/src/app/gen         \
+    -I$(top_srcdir)/src                 \
+    -I$(top_srcdir)/src/lib             \
     $(NULL)
 
 libCHIPDataModel_a_SOURCES            = $(CHIP_BUILD_DATA_MODEL_SOURCE_FILES)
