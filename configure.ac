@@ -2085,6 +2085,8 @@ src/crypto/Makefile
 src/crypto/tests/Makefile
 src/lwip/Makefile
 src/lwip/tests/Makefile
+src/shell/Makefile
+src/shell/tests/Makefile
 src/system/Makefile
 src/system/tests/Makefile
 src/setup_payload/Makefile

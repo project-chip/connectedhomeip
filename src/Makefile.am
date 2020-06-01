@@ -67,6 +67,7 @@ DIST_SUBDIRS                      = \
     inet                            \
     lib                             \
     setup_payload                   \
+    shell                           \
     crypto                          \
     platform                        \
     qrcodetool                      \
@@ -83,6 +84,7 @@ SUBDIRS                           = \
     inet                            \
     lib                             \
     setup_payload                   \
+    shell                           \
     crypto                          \
     transport                       \
     $(MAYBE_BLE_SUBDIRS)            \
