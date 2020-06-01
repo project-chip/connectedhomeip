@@ -130,6 +130,8 @@ public:
     CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
 
 private:
+    using StatefulTransport = StatefulUdpTransport<ChipDeviceController *>;
+
     enum
     {
         kState_NotInitialized = 0,
@@ -144,7 +146,7 @@ private:
 
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
-    UdpTransport * mDeviceCon;
+    StatefulTransport * mDeviceCon;
 
     ConnectionState mConState;
     void * mAppReqState;
@@ -165,8 +167,8 @@ private:
     void ClearRequestState();
     void ClearOpState();
 
-    static void OnReceiveMessage(UdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
-    static void OnReceiveError(UdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    static void OnReceiveMessage(StatefulTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
+    static void OnReceiveError(StatefulTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 };
 
 } // namespace DeviceController

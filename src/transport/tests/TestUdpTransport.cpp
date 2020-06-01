@@ -34,6 +34,8 @@
 
 using namespace chip;
 
+using NlTestUdpTransport = StatefulUdpTransport<nlTestSuite *>;
+
 static int Initialize(void * aContext);
 static int Finalize(void * aContext);
 
@@ -48,17 +50,17 @@ struct TestContext sContext;
 
 static const char PAYLOAD[] = "Hello!";
 
-static void MessageReceiveHandler(UdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
+static void MessageReceiveHandler(NlTestUdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
 {
     size_t data_len = msgBuf->DataLength();
 
     int compare = memcmp(msgBuf->Start(), PAYLOAD, data_len);
-    NL_TEST_ASSERT(reinterpret_cast<nlTestSuite *>(con->AppState), compare == 0);
+    NL_TEST_ASSERT(con->State(), compare == 0);
 };
 
-static void ReceiveErrorHandler(UdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo)
+static void ReceiveErrorHandler(NlTestUdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo)
 {
-    NL_TEST_ASSERT(reinterpret_cast<nlTestSuite *>(con->AppState), false);
+    NL_TEST_ASSERT(con->State(), false);
 };
 
 static void DriveIO(TestContext & ctx)
@@ -121,7 +123,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    UdpTransport conn;
+    NlTestUdpTransport conn(inSuite);
     conn.Init(&ctx.mInetLayer);
     CHIP_ERROR err = conn.Close();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -135,7 +137,7 @@ void CheckSimpleConnectTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    UdpTransport conn;
+    NlTestUdpTransport conn(inSuite);
     conn.Init(&ctx.mInetLayer);
     err = conn.Connect(addr, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -160,11 +162,10 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    UdpTransport conn;
+    NlTestUdpTransport conn(inSuite);
     conn.Init(&ctx.mInetLayer);
-    conn.AppState          = inSuite;
-    conn.OnMessageReceived = MessageReceiveHandler;
-    conn.OnReceiveError    = ReceiveErrorHandler;
+    conn.SetMessageReceiveHandler(MessageReceiveHandler);
+    conn.SetReceiveErrorHandler(ReceiveErrorHandler);
 
     err = conn.Connect(addr, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
