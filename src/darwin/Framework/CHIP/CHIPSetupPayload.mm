@@ -47,7 +47,7 @@
     vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalData();
     for (chip::OptionalQRCodeInfo chipInfo : chipOptionalData) {
         CHIPOptionalQRCodeInfo * info = [CHIPOptionalQRCodeInfo new];
-        info.tag = [NSNumber numberWithUnsignedLongLong:chipInfo.tag];
+        info.tag = [NSNumber numberWithUnsignedChar:chipInfo.tag];
         switch (chipInfo.type) {
         case chip::optionalQRCodeInfoTypeString:
             info.infoType = [NSNumber numberWithInt:kOptionalQRCodeInfoTypeString];
@@ -66,18 +66,5 @@
         [allOptionalData addObject:info];
     }
     return allOptionalData;
-}
-
-+ (NSNumber *)vendorTag:(NSNumber *)tagNumber error:(NSError * __autoreleasing *)error
-{
-    uint64_t outTag;
-    NSNumber * vendorTag;
-    CHIP_ERROR chipError = chip::VendorTag(tagNumber.unsignedShortValue, outTag);
-    if (chipError == CHIP_NO_ERROR) {
-        vendorTag = [NSNumber numberWithUnsignedLongLong:outTag];
-    } else if (error) {
-        *error = [CHIPError errorForCHIPErrorCode:chipError];
-    }
-    return vendorTag;
 }
 @end

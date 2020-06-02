@@ -122,6 +122,10 @@ void TestOptionalTagValues(nlTestSuite * inSuite, void * inContext)
     err = payload.addVendorOptionalData(stringInfo);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    stringInfo.tag = 0;
+    err            = payload.addVendorOptionalData(stringInfo);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     stringInfo.tag = 128;
     err            = payload.addVendorOptionalData(stringInfo);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);

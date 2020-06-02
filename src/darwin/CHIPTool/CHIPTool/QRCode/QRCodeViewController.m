@@ -169,8 +169,8 @@
     if ([payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]]) {
         NSArray * optionalInfo = [payload getAllOptionalData:nil];
         for (CHIPOptionalQRCodeInfo * info in optionalInfo) {
-            NSNumber * tag = [CHIPSetupPayload vendorTag:info.tag error:nil];
-            if (tag && tag.intValue == EXAMPLE_VENDOR_TAG) {
+            NSNumber * tag = info.tag;
+            if (tag && tag.unsignedCharValue == EXAMPLE_VENDOR_TAG) {
                 // If the vendor id and tag match the example values, there should be an ssid encoded
                 if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
                     if ([info.stringValue length] > MAX_SSID_LEN) {
