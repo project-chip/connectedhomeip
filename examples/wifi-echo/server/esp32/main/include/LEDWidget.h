@@ -20,6 +20,8 @@
 #ifndef LED_WIDGET_H
 #define LED_WIDGET_H
 
+#include "Display.h"
+
 #include "driver/gpio.h"
 
 class LEDWidget
@@ -30,6 +32,9 @@ public:
     void Blink(uint32_t changeRateMS);
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
     void Animate();
+#if CONFIG_HAVE_DISPLAY
+    void Display();
+#endif
 
 private:
     int64_t mLastChangeTimeUS;

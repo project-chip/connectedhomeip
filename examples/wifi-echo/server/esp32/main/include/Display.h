@@ -67,6 +67,19 @@ extern esp_err_t InitDisplay();
 extern void ClearDisplay();
 /**
  * @brief
+ *  Clear a portion of the display by drawing a black rectangle based on the given arguments
+ *
+ *  Calling this with default arguments is the same as calling `ClearDisplay()`.
+ *
+ * @param x_percent_start   The starting x coordinate specified as a percentage of the screen's width.
+ * @param y_percent_start   The starting y coordinate specified as a percentage of the screen's height.
+ * @param x_percent_end     The end x coordinate specified as a percentage of the screen's width.
+ * @param y_percent_end     The end y coordinate specified as a percentage of the screen's height.
+ */
+extern void ClearRect(uint16_t x_percent_start = 0, uint16_t y_percent_start = 0, uint16_t x_percent_end = 100,
+                      uint16_t y_percent_end = 100);
+/**
+ * @brief
  *  Display a status message at a given vertical position
  *
  *  The status message will be drawn from the left edge of the screen
