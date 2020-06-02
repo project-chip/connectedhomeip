@@ -15,20 +15,26 @@
  *    limitations under the License.
  */
 
-// pull together CHIP headers
-#import <CHIP/CHIPDeviceController.h>
-#import <CHIP/CHIPEchoClient.h>
-#import <CHIP/CHIPError.h>
-#import <CHIP/CHIPManualSetupPayloadParser.h>
-#import <CHIP/CHIPOnOff.h>
-#import <CHIP/CHIPQRCodeSetupPayloadParser.h>
-#import <CHIP/CHIPSetupPayload.h>
+#ifndef CHIP_ONOFF_H
+#define CHIP_ONOFF_H
 
+#import "CHIPDeviceController.h"
 #import <Foundation/Foundation.h>
-//! Project version number for CHIP.
-FOUNDATION_EXPORT double CHIPVersionNumber;
 
-//! Project version string for CHIP.
-FOUNDATION_EXPORT const unsigned char CHIPVersionString[];
+NS_ASSUME_NONNULL_BEGIN
 
-// In this header, you should import all the public headers of your framework using statements like #import <CHIP/PublicHeader.h>
+@interface CHIPOnOff : NSObject
+
+- (nullable instancetype)initWithDeviceController:(CHIPDeviceController *)deviceController;
+- (BOOL)lightOn;
+- (BOOL)lightOff;
+- (BOOL)toggleLight;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+#endif /* CHIP_DEVICE_CONTROLLER_H */

@@ -7,11 +7,13 @@
 //
 
 #import "OnOffViewController.h"
+#import <CHIP/CHIP.h>
 
 @interface OnOffViewController ()
 @property (weak, nonatomic) IBOutlet UIButton * onButton;
 @property (weak, nonatomic) IBOutlet UIButton * offButton;
 @property (weak, nonatomic) IBOutlet UIButton * toggleButton;
+@property (readwrite) CHIPOnOff * onOff;
 
 @end
 
@@ -20,6 +22,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    self.onOff = [[CHIPOnOff alloc] initWithDeviceController:self.chipController];
+
     // make the buttons slightly prettier
     self.onButton.layer.cornerRadius = 5;
     self.onButton.clipsToBounds = YES;
@@ -40,17 +45,29 @@
 */
 - (IBAction)onButtonTapped:(id)sender
 {
-    NSLog(@"On tapped");
+    [self reconnectIfNeeded];
+
+    [self.onOff lightOn];
+
+    [self postResult:@"Turning light on"];
 }
 
 - (IBAction)offButtonTapped:(id)sender
 {
-    NSLog(@"Off tapped");
+    [self reconnectIfNeeded];
+
+    [self.onOff lightOff];
+
+    [self postResult:@"Turning light off"];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
 {
-    NSLog(@"Toggle tapped");
+    [self reconnectIfNeeded];
+
+    [self.onOff toggleLight];
+
+    [self postResult:@"Toggling light"];
 }
 
 @end
