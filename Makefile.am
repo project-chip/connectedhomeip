@@ -54,10 +54,10 @@ EXTRA_DIST                               = \
     bootstrap-configure                    \
     repos.conf                             \
     $(srcdir)/build/autoconf               \
-    $(srcdir)/config                 \
-    $(srcdir)/config/efr32                  \
-    $(srcdir)/config/nrf5                   \
-    $(srcdir)/scripts                       \
+    $(srcdir)/config                       \
+    $(srcdir)/config/efr32                 \
+    $(srcdir)/config/nrf5                  \
+    $(srcdir)/scripts                      \
     $(NULL)
 
 BUILT_SOURCES                            = \
@@ -70,6 +70,7 @@ dist_doc_DATA                            = \
 
 DISTCLEANFILES                           = \
     .local-version                         \
+    .local-version.min                     \
     $(NULL)
 
 # There are no source files to lint or prettify in this subdirectory.
@@ -102,23 +103,27 @@ PRETTY_FILES                            := $(NULL)
 # during makefile execution.
 
 VERSION_FILE                      := $(if $(wildcard $(builddir)/.local-version),$(builddir)/.local-version,$(if $(wildcard $(srcdir)/.dist-version),$(srcdir)/.dist-version,$(srcdir)/.default-version))
+
 #
 # Override autotool's default notion of the package version variables.
 # This ensures that when we create a source distribution the
 # version is always the current version, not the package bootstrap
 # version.
 #
-# The two-level variables ensures that not only can the package version
-# be overridden from the command line but also when the version is NOT
+# The include ensures that we update CHIP_VERSION and VERSION once
+# we've built .local-version (the source of truth unless CHIP_VERSION
+# is specified on the make command line).
+#
+# CHIP_VERSION can be overridden from the command line, but when the version is NOT
 # overridden that we bind the version once and only once across potential
 # sub-makes to prevent the version from flapping as VERSION_FILE changes.
 #
-export MAYBE_CHIP_VERSION        := $(shell cat $(VERSION_FILE) 2> /dev/null)
-
-CHIP_VERSION                     ?= $(MAYBE_CHIP_VERSION)
+# .local-version.min sets CHIP_VERSION
+-include .local-version.min
 
 PACKAGE_VERSION                    = $(CHIP_VERSION)
 VERSION                            = $(PACKAGE_VERSION)
+
 
 #
 # check-file-.local-version
@@ -139,6 +144,7 @@ $(if $(filter-out file,$(origin CHIP_VERSION)),\
         -b "$(CHIP_VERSION)" "$(top_srcdir)"          \
         > "$(2)")
 endef
+
 
 #
 # check-file-.dist-version
@@ -171,6 +177,10 @@ $(distdir)/.dist-version: $(builddir)/.local-version force
 
 $(distdir)/.dist-version $(builddir)/.local-version:
 	$(call check-file,$(@F))
+
+$(builddir)/.local-version.min: $(builddir)/.local-version
+	(printf "export CHIP_VERSION=" ; cat) < "$(VERSION_FILE)" > $@
+
 
 #
 # When we run 'distcheck' and --with-<any of the third-party packages
