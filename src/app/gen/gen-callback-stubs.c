@@ -1,5 +1,4 @@
 #include "chip-zcl.h"
-#include <stdio.h>
 
 // Callback implementations
 
