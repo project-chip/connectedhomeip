@@ -24,14 +24,7 @@
 
 @interface EchoViewController ()
 
-@property (readwrite) CHIPDeviceController * chipController;
-@property (readwrite) dispatch_queue_t chipCallbackQueue;
-@property (readwrite) BOOL reconnectOnForeground;
-
-@property (weak, nonatomic) IBOutlet UITextField * serverIPTextField;
-@property (weak, nonatomic) IBOutlet UITextField * serverPortTextField;
 @property (weak, nonatomic) IBOutlet UITextField * messageTextField;
-@property (weak, nonatomic) IBOutlet UILabel * resultLabel;
 @property (weak, nonatomic) IBOutlet UIButton * sendButton;
 
 @end
@@ -42,116 +35,25 @@
 {
     [super viewDidLoad];
 
-    // listen for taps to dismiss the keyboard
-    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_dismissKeyboard)];
-    [self.view addGestureRecognizer:tap];
-
     // make the send button slightly prettier
     self.sendButton.layer.cornerRadius = 5;
     self.sendButton.clipsToBounds = YES;
-
-    // auto resize the results on screen
-    self.resultLabel.adjustsFontSizeToFitWidth = YES;
-
-    self.chipCallbackQueue = dispatch_queue_create("com.zigbee.chip.example.callback", DISPATCH_QUEUE_SERIAL);
-    // initialize the device controller
-    self.chipController = [[CHIPDeviceController alloc] initWithCallbackQueue:self.chipCallbackQueue];
-
-    // need to restart connections on background/foreground transitions otherwise the socket can be closed without CHIP knowing
-    // about it.
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(_appEnteredBackground:)
-                                                 name:UISceneDidEnterBackgroundNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(_appEnteringForeground:)
-                                                 name:UISceneWillEnterForegroundNotification
-                                               object:nil];
 }
 
-- (void)_appEnteredBackground:(NSNotification *)notification
+- (void)dismissKeyboard
 {
-    if ([self.chipController isConnected]) {
-        [self.chipController disconnect:nil];
-        self.reconnectOnForeground = YES;
-    }
-}
-
-- (void)_appEnteringForeground:(NSNotification *)notification
-{
-    if (self.reconnectOnForeground) {
-        [self _connect];
-    }
-}
-
-- (void)_connect
-{
-    NSError * error;
-    NSString * inputIPAddress = self.serverIPTextField.text;
-    UInt16 inputPort = [self.serverPortTextField.text intValue];
-    BOOL didConnect = [self.chipController connect:inputIPAddress
-        port:inputPort
-        error:&error
-        onMessage:^(NSData * _Nonnull message, NSString * _Nonnull ipAddress, UInt16 port) {
-            NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-            [self _postResult:[@"Echo Response: " stringByAppendingFormat:@"%@\nFrom: %@:%d", strMessage, ipAddress, port]];
-        }
-        onError:^(NSError * _Nonnull error) {
-            [self _postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
-        }];
-    if (!didConnect) {
-        [self _postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
-    }
-}
-
-- (void)_dismissKeyboard
-{
+    [super dismissKeyboard];
     [self.messageTextField resignFirstResponder];
-    [self.serverIPTextField resignFirstResponder];
-    [self.serverPortTextField resignFirstResponder];
-}
-
-- (void)_postResult:(NSString *)result
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.resultLabel.text = result;
-        self.resultLabel.hidden = NO;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, RESULT_DISPLAY_DURATION), dispatch_get_main_queue(), ^{
-            self.resultLabel.hidden = YES;
-        });
-    });
 }
 
 - (IBAction)sendAction:(id)sender
 {
-    // collect fields
-    NSString * inputIPAddress = self.serverIPTextField.text;
-    UInt16 inputPort = [self.serverPortTextField.text intValue];
-    BOOL needsReconnect = NO;
-
     if (self.messageTextField.text.length == 0) {
-        [self _postResult:@"Error: Message cannot be empty"];
+        [self postResult:@"Error: Message cannot be empty"];
         return;
     }
 
-    // check the addr of the connected device
-    AddressInfo * addrInfo = [self.chipController getAddressInfo];
-    if (addrInfo) {
-        // check if the addr changed
-        if (![addrInfo.ip isEqualToString:inputIPAddress] || addrInfo.port != inputPort) {
-            NSError * error;
-            // stop current connection
-            if (![self.chipController disconnect:&error]) {
-                // post error
-                [self _postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
-            }
-            needsReconnect = YES;
-        }
-    }
-
-    if (!addrInfo || needsReconnect) {
-        [self _connect];
-    }
+    [self reconnectIfNeeded];
 
     // send message
     if ([self.chipController isConnected]) {
@@ -159,10 +61,12 @@
         BOOL didSend = [self.chipController sendMessage:[self.messageTextField.text dataUsingEncoding:NSUTF8StringEncoding]
                                                   error:&error];
         if (!didSend) {
-            [self _postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
+            [self postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
         } else {
-            [self _postResult:@"Message Sent"];
+            [self postResult:@"Message Sent"];
         }
+    } else {
+      [self postResult:@"Controller not connected"];
     }
 }
 @end

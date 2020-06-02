@@ -15,14 +15,19 @@
  *    limitations under the License.
  */
 
+#import <CHIP/CHIP.h>
 #import <UIKit/UIKit.h>
-#import "CHIPViewControllerBase.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface EchoViewController : CHIPViewControllerBase
+@interface CHIPViewControllerBase : UIViewController
 
-- (IBAction)sendAction:(id)sender;
+@property (readwrite) CHIPDeviceController * chipController;
+@property (weak, nonatomic) IBOutlet UILabel * resultLabel;
+
+- (void)reconnectIfNeeded;
+- (void)dismissKeyboard;
+- (void)postResult:(NSString *)result;
 
 @end
 
