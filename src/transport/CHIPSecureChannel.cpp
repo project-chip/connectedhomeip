@@ -22,9 +22,9 @@
  *
  */
 
-#include <core/CHIPSecureChannel.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CodeUtils.h>
+#include <transport/CHIPSecureChannel.h>
 
 #include <string.h>
 
