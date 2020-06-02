@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
 #import "CHIPViewControllerBase.h"
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

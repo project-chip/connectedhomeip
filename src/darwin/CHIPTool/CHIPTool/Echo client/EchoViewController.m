@@ -66,7 +66,7 @@
             [self postResult:@"Message Sent"];
         }
     } else {
-      [self postResult:@"Controller not connected"];
+        [self postResult:@"Controller not connected"];
     }
 }
 @end
