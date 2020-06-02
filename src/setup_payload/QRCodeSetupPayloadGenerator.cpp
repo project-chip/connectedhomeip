@@ -162,52 +162,6 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
     return err;
 }
 
-static CHIP_ERROR payloadBinaryRepresentationWithTLV(SetupPayload & setupPayload, string & binaryRepresentation, size_t bitsetSize,
-                                                     uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    string binary;
-    uint8_t bits[bitsetSize];
-    memset(bits, 0, bitsetSize);
-    err = generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes);
-    SuccessOrExit(err);
-
-    for (int i = ArraySize(bits) - 1; i >= 0; i--)
-    {
-        for (unsigned j = 1 << 7; j != 0;)
-        {
-            binary += bits[i] & j ? "1" : "0";
-            j >>= 1;
-        }
-    }
-    binaryRepresentation = binary;
-exit:
-    return err;
-}
-
-CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation)
-{
-    return payloadBinaryRepresentation(binaryRepresentation, NULL, 0);
-}
-
-CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBinaryRepresentation(string & binaryRepresentation, uint8_t * tlvDataStart,
-                                                                    size_t tlvDataStartSize)
-{
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    uint32_t tlvDataLengthInBytes = 0;
-
-    VerifyOrExit(mPayload.isValidQRCodePayload(), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    err = generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes);
-    SuccessOrExit(err);
-
-    err = payloadBinaryRepresentationWithTLV(mPayload, binaryRepresentation, kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes,
-                                             tlvDataStart, tlvDataLengthInBytes);
-    SuccessOrExit(err);
-exit:
-    return err;
-}
-
 static CHIP_ERROR payloadBase41RepresentationWithTLV(SetupPayload & setupPayload, string & base41Representation, size_t bitsetSize,
                                                      uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
