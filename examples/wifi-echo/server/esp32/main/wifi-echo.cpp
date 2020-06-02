@@ -39,7 +39,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(UDPEndPoint *& endpoint);
+extern void startServer(UDPEndPoint *& endpoint_ipv4, UDPEndPoint *& endpoint_ipv6);
 extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
@@ -68,6 +68,10 @@ extern void startClient(void);
 
 static QRCodeWidget sQRCodeWidget;
 
+// Where to draw the connection status message
+#define CONNECTION_MESSAGE 75
+// Where to draw the IPv6 information
+#define IPV6_INFO 85
 #endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED;
@@ -165,8 +169,9 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    UDPEndPoint * sEndpoint = NULL;
-    startServer(sEndpoint);
+    UDPEndPoint * sEndpointIPv4 = NULL;
+    UDPEndPoint * sEndpointIPv6 = NULL;
+    startServer(sEndpointIPv4, sEndpointIPv6);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
 #endif
@@ -235,7 +240,15 @@ void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
         {
-            ESP_LOGE(TAG, "Lost IPv4 address...");
+            ESP_LOGE(TAG, "Lost IPv4 connectivity...");
+        }
+        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+        {
+            ESP_LOGI(TAG, "IPv6 Server ready...");
+        }
+        else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
+        {
+            ESP_LOGE(TAG, "Lost IPv6 connectivity...");
         }
     }
     if (event->Type == DeviceEventType::kSessionEstablished && event->SessionEstablished.IsCommissioner)
