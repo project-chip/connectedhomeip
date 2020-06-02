@@ -37,7 +37,8 @@
 
 #if CONFIG_HAVE_DISPLAY
 
-#define DEFFAULT_BRIGHTNESS_PERCENT 80
+// Brightness picked such that it's easy for cameras to focus on
+#define DEFFAULT_BRIGHTNESS_PERCENT 10
 
 // 8MHz is the recommended SPI speed to init the driver with
 // It later gets set to the preconfigured defaults within the driver
@@ -162,7 +163,24 @@ void WakeDisplay()
 
 void ClearDisplay()
 {
-    TFT_fillRect(0, 0, (int) DisplayWidth, (int) DisplayHeight, TFT_BLACK);
+    ClearRect();
+}
+
+void ClearRect(uint16_t x_percent_start, uint16_t y_percent_start, uint16_t x_percent_end, uint16_t y_percent_end)
+{
+    if (x_percent_end < x_percent_start)
+    {
+        x_percent_end = x_percent_start;
+    }
+    if (y_percent_end < y_percent_start)
+    {
+        y_percent_end = y_percent_start;
+    }
+    uint16_t start_x = (DisplayWidth * x_percent_start) / 100;
+    uint16_t start_y = (DisplayHeight * y_percent_start) / 100;
+    uint16_t end_x   = (DisplayWidth * x_percent_end) / 100;
+    uint16_t end_y   = (DisplayHeight * y_percent_end) / 100;
+    TFT_fillRect(start_x, start_y, end_x, end_y, TFT_BLACK);
 }
 
 void DisplayStatusMessage(char * msg, uint16_t vpos)
