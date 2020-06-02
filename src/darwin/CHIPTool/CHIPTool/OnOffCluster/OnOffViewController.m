@@ -9,6 +9,9 @@
 #import "OnOffViewController.h"
 
 @interface OnOffViewController ()
+@property (weak, nonatomic) IBOutlet UIButton * onButton;
+@property (weak, nonatomic) IBOutlet UIButton * offButton;
+@property (weak, nonatomic) IBOutlet UIButton * toggleButton;
 
 @end
 
@@ -17,7 +20,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    // make the buttons slightly prettier
+    self.onButton.layer.cornerRadius = 5;
+    self.onButton.clipsToBounds = YES;
+    self.offButton.layer.cornerRadius = 5;
+    self.offButton.clipsToBounds = YES;
+    self.toggleButton.layer.cornerRadius = 5;
+    self.toggleButton.clipsToBounds = YES;
 }
 
 /*
