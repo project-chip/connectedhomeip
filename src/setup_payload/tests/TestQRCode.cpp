@@ -25,9 +25,9 @@
 #include "TestQRCode.h"
 
 #include <assert.h>
+#include <bitset>
 #include <stdio.h>
 #include <unistd.h>
-#include <bitset>
 
 #include <iostream>
 #include <nlbyteorder.h>
@@ -69,7 +69,7 @@ string toBinaryRepresentation(string base41Result)
     string binaryResult;
     for (int i = buffer.size() - 1; i >= 0; i--)
     {
-      binaryResult += bitset<8>(buffer[i]).to_string();
+        binaryResult += bitset<8>(buffer[i]).to_string();
     }
 
     // Insert spaces after each block
@@ -243,7 +243,7 @@ void TestInvalidQRCodePayload_WrongLength(nlTestSuite * inSuite, void * inContex
 
 void TestPayloadEquality(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload = GetDefaultPayload();
+    SetupPayload payload      = GetDefaultPayload();
     SetupPayload equalPayload = GetDefaultPayload();
 
     bool result = payload == equalPayload;
@@ -254,9 +254,9 @@ void TestPayloadInEquality(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
 
-    SetupPayload unequalPayload = GetDefaultPayload();
-    unequalPayload.discriminator         = 28;
-    unequalPayload.setUpPINCode          = 121233;
+    SetupPayload unequalPayload  = GetDefaultPayload();
+    unequalPayload.discriminator = 28;
+    unequalPayload.setUpPINCode  = 121233;
 
     bool result = payload == unequalPayload;
     NL_TEST_ASSERT(inSuite, result == false);
