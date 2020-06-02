@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="lXE-RO-59g">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16085" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="lXE-RO-59g">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16078.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -404,7 +404,9 @@
                     <tabBarItem key="tabBarItem" title="Echo" image="repeat" catalog="system" selectedImage="repeat" id="0Dy-Fp-mle"/>
                     <navigationItem key="navigationItem" id="gdO-P7-Ere"/>
                     <connections>
+                        <outlet property="IPLabel" destination="Tzm-Xh-QOZ" id="lYU-0W-rNa"/>
                         <outlet property="messageTextField" destination="lvN-Eg-W6F" id="I9L-eN-4b6"/>
+                        <outlet property="portLabel" destination="Sg4-Qo-For" id="PmK-2R-RF6"/>
                         <outlet property="resultLabel" destination="6Z1-j3-AvT" id="mMP-KW-l7u"/>
                         <outlet property="sendButton" destination="cfO-gM-sug" id="jSr-fh-7Y0"/>
                         <outlet property="serverIPTextField" destination="tC3-Jk-Opv" id="5IZ-oS-hdt"/>

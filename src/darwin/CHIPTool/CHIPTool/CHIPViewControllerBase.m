@@ -22,6 +22,9 @@
 
 #define RESULT_DISPLAY_DURATION 5.0 * NSEC_PER_SEC
 
+static const NSString *ipKey = @"ipk";
+static const NSString *portKey = @"pk";
+
 @interface CHIPViewControllerBase ()
 
 @property (readwrite) dispatch_queue_t chipCallbackQueue;
@@ -29,10 +32,24 @@
 
 @property (weak, nonatomic) IBOutlet UITextField * serverIPTextField;
 @property (weak, nonatomic) IBOutlet UITextField * serverPortTextField;
+@property (weak, nonatomic) IBOutlet UILabel *IPLabel;
+@property (weak, nonatomic) IBOutlet UILabel *portLabel;
 
 @end
 
 @implementation CHIPViewControllerBase
+
+- (NSString *)_getScannedIP
+{
+    return [[NSUserDefaults standardUserDefaults] stringForKey:ipKey];
+}
+
+- (NSInteger)_getScannedPort
+{
+    return [[NSUserDefaults standardUserDefaults] integerForKey:portKey];
+}
+
+
 
 - (void)viewDidLoad
 {
@@ -59,6 +76,16 @@
                                              selector:@selector(_appEnteringForeground:)
                                                  name:UISceneWillEnterForegroundNotification
                                                object:nil];
+    
+    BOOL shouldHide = NO;
+    if ([[self _getScannedIP] length] > 0 && [self _getScannedPort] > 0)
+    {
+        shouldHide = YES;
+    }
+    [self.serverIPTextField setHidden:shouldHide];
+    [self.serverPortTextField setHidden:shouldHide];
+    [self.portLabel setHidden:shouldHide];
+    [self.IPLabel setHidden:shouldHide];
 }
 
 - (void)_appEnteredBackground:(NSNotification *)notification
@@ -79,8 +106,11 @@
 - (void)_connect
 {
     NSError * error;
-    NSString * inputIPAddress = self.serverIPTextField.text;
-    UInt16 inputPort = [self.serverPortTextField.text intValue];
+    
+    
+    NSString * inputIPAddress = [[self _getScannedIP] length] > 0 ? [self _getScannedIP] : self.serverIPTextField.text;
+    UInt16 inputPort =  [self _getScannedPort] > 0 ? [self _getScannedPort] : [self.serverPortTextField.text intValue];
+    
     BOOL didConnect = [self.chipController connect:inputIPAddress
         port:inputPort
         error:&error

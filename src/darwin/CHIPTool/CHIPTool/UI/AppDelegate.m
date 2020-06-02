@@ -17,6 +17,9 @@
 
 #import "AppDelegate.h"
 
+static const NSString *ipKey = @"ipk";
+static const NSString *portKey = @"pk";
+
 @interface AppDelegate ()
 
 @end
@@ -26,6 +29,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:portKey];
     return YES;
 }
 

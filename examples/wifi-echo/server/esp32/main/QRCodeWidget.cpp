@@ -46,7 +46,10 @@
 // Spells CHIP on a dialer
 #define EXAMPLE_VENDOR_ID 3447
 // Used to indicate that an SSID has been added to the QRCode
-#define EXAMPLE_VENDOR_TAG 1
+#define EXAMPLE_VENDOR_TAG_SSID 1
+
+#define EXAMPLE_VENDOR_TAG_IP 2 
+#define MAX_IP_LEN 15
 
 #if CONFIG_HAVE_DISPLAY
 
@@ -75,6 +78,11 @@ void GetAPName(char * ssid, size_t ssid_len)
     snprintf(ssid, ssid_len, "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
 }
 
+void GetGatewayIP(char *ip, size_t ip_len)
+{
+    snprintf(ip, ip_len, "192.168.1.1");
+}
+
 string createSetupPayload()
 {
     char ap_ssid[MAX_SSID_LEN];
@@ -83,15 +91,27 @@ string createSetupPayload()
     payload.version   = 1;
     payload.vendorID  = EXAMPLE_VENDOR_ID;
     payload.productID = 1;
-    OptionalQRCodeInfo stringInfo;
-    stringInfo.tag  = EXAMPLE_VENDOR_TAG;
-    stringInfo.type = optionalQRCodeInfoTypeString;
-    stringInfo.data = ap_ssid;
-    payload.addVendorOptionalData(stringInfo);
+    
+    
+    OptionalQRCodeInfo ssidInfo;
+    ssidInfo.tag  = EXAMPLE_VENDOR_TAG_SSID;
+    ssidInfo.type = optionalQRCodeInfoTypeString;
+    ssidInfo.data = ap_ssid;
+    payload.addVendorOptionalData(ssidInfo);
+
+    char gw_ip[MAX_IP_LEN];
+    GetGatewayIP(gw_ip, sizeof(gw_ip));
+    OptionalQRCodeInfo ipInfo;
+    ipInfo.tag  = EXAMPLE_VENDOR_TAG_IP;
+    ipInfo.type = optionalQRCodeInfoTypeString;
+    ipInfo.data = gw_ip;
+    payload.addVendorOptionalData(ipInfo);
+
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
-    uint8_t tlvDataStart[sizeof(ap_ssid)];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, sizeof(tlvDataStart));
+    size_t tlvDataLen = sizeof(ap_ssid) + sizeof(gw_ip);
+    uint8_t tlvDataStart[tlvDataLen];
+    CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Couldn't get payload string %d", generator.payloadBase41Representation(result));
