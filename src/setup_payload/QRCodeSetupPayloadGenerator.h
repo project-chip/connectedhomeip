@@ -22,9 +22,9 @@
  *
  *      The encoding of the binary data to a base41 string is as follows:
  *      - Every 2 bytes (16 bits) of binary source data are encoded to 3
- *        characters of the Base-45 alphabet.
+ *        characters of the Base-41 alphabet.
  *      - If an odd number of bytes are to be encoded, the remaining
- *        single byte is encoded to 2 characters of the Base-45 alphabet.
+ *        single byte is encoded to 2 characters of the Base-41 alphabet.
  */
 
 #include "SetupPayload.h"
@@ -83,10 +83,6 @@ public:
      *               producing the requested string.
      */
     CHIP_ERROR payloadBase41Representation(string & base41Representation, uint8_t * tlvDataStart, size_t tlvDataStartSize);
-
-    // These methods are only used for testing purposes.
-    CHIP_ERROR payloadBinaryRepresentation(string & binaryRepresentation);
-    CHIP_ERROR payloadBinaryRepresentation(string & binaryRepresentation, uint8_t * tlvDataStart, size_t tlvDataStartSize);
 };
 
 }; // namespace chip
