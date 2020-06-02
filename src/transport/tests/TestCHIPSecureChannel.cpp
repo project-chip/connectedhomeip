@@ -21,14 +21,13 @@
  *      This file implements unit tests for the CHIPSecureChannel implementation.
  */
 
-#include "TestCore.h"
+#include "TestTransportLayer.h"
 
 #include <errno.h>
-#include <nlbyteorder.h>
 #include <nlunit-test.h>
 
 #include <core/CHIPCore.h>
-#include <core/CHIPSecureChannel.h>
+#include <transport/CHIPSecureChannel.h>
 
 #include <stdarg.h>
 #include <support/CodeUtils.h>

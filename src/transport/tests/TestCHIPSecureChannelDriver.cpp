@@ -22,7 +22,7 @@
  *
  */
 
-#include "TestCore.h"
+#include "TestTransportLayer.h"
 
 #include <nlunit-test.h>
 
