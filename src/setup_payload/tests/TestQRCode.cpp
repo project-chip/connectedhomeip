@@ -161,22 +161,27 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
 
     // test invalid version
     SetupPayload test_payload = payload;
-    test_payload.version      = 2 << kVersionFieldLengthInBits;
+    test_payload.version      = 1 << kVersionFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid rendezvousInformation
     test_payload                       = payload;
-    test_payload.rendezvousInformation = 512;
+    test_payload.rendezvousInformation = 1 << kRendezvousInfoFieldLengthInBits;
+    NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
+
+    // test invalid rendezvousInformation
+    test_payload                       = payload;
+    test_payload.rendezvousInformation = 1 << (kRendezvousInfoFieldLengthInBits - kRendezvousInfoReservedFieldLengthInBits);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid discriminator
     test_payload               = payload;
-    test_payload.discriminator = 2 << kPayloadDiscriminatorFieldLengthInBits;
+    test_payload.discriminator = 1 << kPayloadDiscriminatorFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid stetup PIN
     test_payload              = payload;
-    test_payload.setUpPINCode = 2 << kSetupPINCodeFieldLengthInBits;
+    test_payload.setUpPINCode = 1 << kSetupPINCodeFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 }
 
