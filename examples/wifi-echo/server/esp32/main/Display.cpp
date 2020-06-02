@@ -58,8 +58,10 @@ extern const char * TAG;
 uint16_t DisplayHeight = 0;
 uint16_t DisplayWidth  = 0;
 
+#if CONFIG_DISPLAY_AUTO_OFF
 // FreeRTOS timer used to turn the display off after a short while
 TimerHandle_t displayTimer = NULL;
+#endif
 
 static void TimerCallback(TimerHandle_t xTimer);
 static void SetupBrightnessControl();
@@ -130,7 +132,9 @@ esp_err_t InitDisplay()
     // prepare the display for brightness control
     SetupBrightnessControl();
 
+#if CONFIG_DISPLAY_AUTO_OFF
     displayTimer = xTimerCreate("DisplayTimer", pdMS_TO_TICKS(DISPLAY_TIMEOUT_MS), false, NULL, TimerCallback);
+#endif
     // lower the brightness of the screen
     WakeDisplay();
 
@@ -150,8 +154,10 @@ void SetBrightness(uint16_t brightness_percent)
 void WakeDisplay()
 {
     SetBrightness(DEFFAULT_BRIGHTNESS_PERCENT);
+#if CONFIG_DISPLAY_AUTO_OFF
     xTimerStart(displayTimer, 0);
     ESP_LOGI(TAG, "Display awake but will switch off automatically in %d seconds", DISPLAY_TIMEOUT_MS / 1000);
+#endif
 }
 
 void ClearDisplay()
