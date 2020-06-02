@@ -6,3 +6,11 @@ steps:
     - run:
           name: Build example Echo App
           command: scripts/examples/esp_echo_app.sh
+    - run:
+          name: Preserve artifacts
+          command: |
+              mkdir -p example_binaries/esp32-build
+              cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
+                 example_binaries/esp32-build/chip-wifi-echo.elf
+    - store_artifacts:
+          path: example_binaries/esp32-build

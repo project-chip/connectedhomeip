@@ -6,3 +6,11 @@ steps:
     - run:
           name: Build example nRF5 Lock App
           command: scripts/examples/nrf_lock_app.sh
+    - run:
+          name: Preserve artifacts
+          command: |
+              mkdir -p example_binaries/nrf-build
+              cp examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out \
+                 example_binaries/nrf-build/chip-nrf52840-lock-example.out
+    - store_artifacts:
+          path: example_binaries/nrf-build
