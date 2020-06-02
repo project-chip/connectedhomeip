@@ -87,9 +87,9 @@ static void addCHIPInfoToOptionalData(SetupPayload & outPayload)
     {
         OptionalQRCodeInfo info;
         info.type = optionalQRCodeInfoTypeString;
-        info.tag  = ContextTag(kSerialNumberTag);
+        info.tag  = kSerialNumberTag;
         info.data = outPayload.serialNumber;
-        outPayload.addOptionalData(info);
+        outPayload.addCHIPOptionalData(info);
     }
 }
 
@@ -100,12 +100,12 @@ CHIP_ERROR writeOptionaData(TLVWriter & writer, vector<OptionalQRCodeInfo> optio
     {
         if (info.type == optionalQRCodeInfoTypeString)
         {
-            err = writer.PutString(info.tag, info.data.c_str());
+            err = writer.PutString(ContextTag(info.tag), info.data.c_str());
             SuccessOrExit(err);
         }
         else if (info.type == optionalQRCodeInfoTypeInt)
         {
-            err = writer.Put(info.tag, static_cast<int64_t>(info.integer));
+            err = writer.Put(ContextTag(info.tag), static_cast<int64_t>(info.integer));
             SuccessOrExit(err);
         }
     }
