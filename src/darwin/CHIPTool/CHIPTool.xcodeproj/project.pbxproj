@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
+		515C401924868BF0004C4DB3 /* CHIPViewControllerBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 515C401724868BF0004C4DB3 /* CHIPViewControllerBase.m */; };
 		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
@@ -47,6 +48,8 @@
 /* Begin PBXFileReference section */
 		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
+		515C401724868BF0004C4DB3 /* CHIPViewControllerBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPViewControllerBase.m; sourceTree = "<group>"; };
+		515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPViewControllerBase.h; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
 		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,6 +150,8 @@
 				B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */,
 				B204A630244E1D0700C7C0E1 /* Info.plist */,
 				B204A631244E1D0700C7C0E1 /* main.m */,
+				515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */,
+				515C401724868BF0004C4DB3 /* CHIPViewControllerBase.m */,
 				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
 				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
 				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
@@ -272,6 +277,7 @@
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
+				515C401924868BF0004C4DB3 /* CHIPViewControllerBase.m in Sources */,
 				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
