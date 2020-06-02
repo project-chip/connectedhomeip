@@ -98,7 +98,7 @@ void LEDWidget::Animate()
 
 void LEDWidget::DoSet(bool state)
 {
-    bool stateChange = mState != state;
+    bool stateChange = (mState != state);
     mState           = state;
     if (mGPIONum < GPIO_NUM_MAX)
     {
