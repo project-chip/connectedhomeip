@@ -452,6 +452,7 @@
 					"@loader_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -481,6 +482,7 @@
 					"@loader_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -588,6 +590,7 @@
 		BA09EB742474881D00605257 /* Debug iOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CHIP_PREFIX = "$(BUILT_PRODUCTS_DIR)";
 				CHIP_ROOT = "$(SRCROOT)/../../..";
 				CODE_SIGN_STYLE = Automatic;
@@ -607,11 +610,13 @@
 					"@loader_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv4t armv5 armv6 armv6m armv7 armv7em armv7f armv7k armv7m armv7s xscale";
 			};
 			name = "Debug iOS";
 		};
@@ -692,6 +697,7 @@
 		BA09EB782474882200605257 /* Release iOS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				CHIP_PREFIX = "$(BUILT_PRODUCTS_DIR)";
 				CHIP_ROOT = "$(SRCROOT)/../../..";
 				CODE_SIGN_STYLE = Automatic;
@@ -711,11 +717,13 @@
 					"@loader_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(CHIP_PREFIX)/lib";
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv4t armv5 armv6 armv6m armv7 armv7em armv7f armv7k armv7m armv7s xscale";
 			};
 			name = "Release iOS";
 		};
