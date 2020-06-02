@@ -37,6 +37,7 @@
 
 #include <core/CHIPConfig.h>
 
+#include <stdarg.h>
 #include <stdint.h>
 
 /**
@@ -106,6 +107,7 @@ enum LogModule
     kLogModule_EventLogging,
     kLogModule_Support,
     kLogModule_chipTool,
+    kLogModule_Zcl,
 
     kLogModule_Max
 };
@@ -184,6 +186,7 @@ enum LogCategory
     kLogCategory_Max = kLogCategory_Retain
 };
 
+extern void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
 extern void Log(uint8_t module, uint8_t category, const char * msg, ...);
 extern uint8_t GetLogFilter(void);
 extern void SetLogFilter(uint8_t category);

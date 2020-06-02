@@ -78,17 +78,10 @@ NRF_LOG_MODULE_REGISTER();
 namespace chip {
 namespace Logging {
 
-/**
- * Openchip log output function.
- */
-void Log(uint8_t module, uint8_t category, const char * msg, ...)
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
-    va_list v;
-
     (void) module;
     (void) category;
-
-    va_start(v, msg);
 
 #if NRF_LOG_ENABLED
 
@@ -131,9 +124,21 @@ void Log(uint8_t module, uint8_t category, const char * msg, ...)
         // Let the application know that a log message has been emitted.
         DeviceLayer::OnLogOutput();
     }
-
+#else  // NRF_LOG_ENABLED
+    (void) msg;
+    (void) v;
 #endif // NRF_LOG_ENABLED
+}
 
+/**
+ * Openchip log output function.
+ */
+void Log(uint8_t module, uint8_t category, const char * msg, ...)
+{
+    va_list v;
+
+    va_start(v, msg);
+    LogV(module, category, msg, v);
     va_end(v);
 }
 
