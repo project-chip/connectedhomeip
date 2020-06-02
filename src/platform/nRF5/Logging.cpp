@@ -78,7 +78,7 @@ NRF_LOG_MODULE_REGISTER();
 namespace chip {
 namespace Logging {
 
-void LogV(uint8_t module, uint8_t category, const char * msg, ...)
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
     (void) module;
     (void) category;
