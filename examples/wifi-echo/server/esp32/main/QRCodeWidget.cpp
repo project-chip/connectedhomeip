@@ -78,9 +78,13 @@ void GetAPName(char * ssid, size_t ssid_len)
     snprintf(ssid, ssid_len, "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
 }
 
-void GetGatewayIP(char *ip, size_t ip_len)
+void GetGatewayIP(char *ip_buf, size_t ip_len)
 {
-    snprintf(ip, ip_len, "192.168.1.1");
+    
+    tcpip_adapter_ip_info_t ip;
+    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
+    IPAddress::FromIPv4(ip.ip).ToString(ip_buf, ip_len);
+    ESP_LOGE(TAG, "Got gateway ip %s", ip_buf);
 }
 
 string createSetupPayload()
