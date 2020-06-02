@@ -22,20 +22,25 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+gendir = $(includedir)/gen
+
+gen_HEADERS = \
+    gen-cluster-id.h             \
+    gen-command-id.h             \
+    gen-types.h                  \
+    $(NULL)
+
 EXTRA_DIST                    =  \
     gen-attribute-storage.h      \
     gen-attribute-type.h         \
     gen-callback-stubs.c         \
     gen-callbacks.h              \
-    gen-cluster-id.h             \
     gen-command-handler.c        \
     gen-command-handler.h        \
-    gen-command-id.h             \
     gen-endpoint-config.h        \
     gen-global-command-handler.c \
     gen-global-command-handler.h \
     gen-specs.c                  \
-    gen-types.h                  \
     gen.h                        \
     README.md                    \
     $(NULL)
