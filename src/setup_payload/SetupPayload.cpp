@@ -45,14 +45,18 @@ bool SetupPayload::isValidQRCodePayload()
     {
         return false;
     }
-    if (rendezvousInformation >= 1 << kRendezvousInfoFieldLengthInBits)
+
+    size_t rendezvousInfoAllowedFieldLengthInBits = kRendezvousInfoFieldLengthInBits - kRendezvousInfoReservedFieldLengthInBits;
+    if (rendezvousInformation >= 1 << rendezvousInfoAllowedFieldLengthInBits)
     {
         return false;
     }
+
     if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
     {
         return false;
     }
+
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
         return false;

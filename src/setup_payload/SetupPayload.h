@@ -46,8 +46,9 @@ const int kManualSetupDiscriminatorFieldLengthInBits = 4;
 const int kSetupPINCodeFieldLengthInBits             = 27;
 const int kReservedFieldLengthInBits                 = 1;
 
-const int kRawVendorTagLengthInBits = 7;
-const uint16_t kSerialNumberTag     = 128;
+const int kRendezvousInfoReservedFieldLengthInBits = 4;
+const int kRawVendorTagLengthInBits                = 7;
+const uint16_t kSerialNumberTag                    = 128;
 
 const int kManualSetupShortCodeCharLength = 10;
 const int kManualSetupLongCodeCharLength  = 20;
