@@ -78,6 +78,10 @@ NRF_LOG_MODULE_REGISTER();
 namespace chip {
 namespace Logging {
 
+/**
+ * CHIP log output function.
+ */
+
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 {
     (void) module;
@@ -128,18 +132,6 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
     (void) msg;
     (void) v;
 #endif // NRF_LOG_ENABLED
-}
-
-/**
- * Openchip log output function.
- */
-void Log(uint8_t module, uint8_t category, const char * msg, ...)
-{
-    va_list v;
-
-    va_start(v, msg);
-    LogV(module, category, msg, v);
-    va_end(v);
 }
 
 } // namespace Logging

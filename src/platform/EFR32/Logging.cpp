@@ -213,15 +213,6 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
 #endif // EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
 }
 
-void Log(uint8_t module, uint8_t category, const char * aFormat, ...)
-{
-    va_list v;
-
-    va_start(v, aFormat);
-    LogV(module, category, aFormat, v);
-    va_end(v);
-}
-
 } // namespace Logging
 } // namespace chip
 
