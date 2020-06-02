@@ -17,25 +17,24 @@
 
 /**
  *    @file
- *      This file provides a stub implementation of functions required
+ *      This file provides the CHIP implementation of functions required
  *      by the CHIP ZCL Application Layer
  *
  */
 
-#include <memory.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "chip-zcl.h"
+
+#include <support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+
+#include <stdarg.h>
 
 void chipZclCorePrintln(const char * formatString, ...)
 {
-    va_list ap;
-    va_start(ap, formatString);
-    vprintf(formatString, ap);
-    printf("\n");
-    va_end(ap);
+    va_list args;
+    va_start(args, formatString);
+    chip::Logging::LogV(chip::Logging::kLogModule_Zcl, chip::Logging::kLogCategory_Detail, formatString, args);
+    va_end(args);
 }
 
 // Default Response Stubs
@@ -95,23 +94,11 @@ void chipZclReverseClusterSpec(const ChipZclClusterSpec_t * s1, ChipZclClusterSp
     return;
 }
 
-struct ChipZclBuffer_t
+/**
+ * ChipZclBuffer_t is merely a type alias
+ */
+struct ChipZclBuffer_t : public chip::System::PacketBuffer
 {
-    /**
-     * The data storage for our buffer.
-     */
-    void * buffer;
-
-    /**
-     * The size of our buffer above.
-     */
-    uint16_t bufferLength;
-
-    /**
-     * The length of the data that can be read from this buffer; nonzero only
-     * when it's ready to be read from.
-     */
-    uint16_t dataLength;
 };
 
 /**
@@ -119,14 +106,7 @@ struct ChipZclBuffer_t
  */
 ChipZclBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
 {
-    ChipZclBuffer_t * buffer = (ChipZclBuffer_t *) malloc(sizeof(ChipZclBuffer_t) + allocatedLength);
-    if (NULL != buffer)
-    {
-        buffer->buffer       = (buffer + 1);
-        buffer->dataLength   = 0;
-        buffer->bufferLength = allocatedLength;
-    }
-    return buffer;
+    return static_cast<ChipZclBuffer_t *>(chip::System::PacketBuffer::NewWithAvailableSize(allocatedLength));
 }
 
 /**
@@ -134,7 +114,7 @@ ChipZclBuffer_t * chipZclBufferAlloc(uint16_t allocatedLength)
  */
 void chipZclBufferFree(ChipZclBuffer_t * buffer)
 {
-    free(buffer);
+    chip::System::PacketBuffer::Free(buffer);
 }
 
 /**
@@ -142,7 +122,7 @@ void chipZclBufferFree(ChipZclBuffer_t * buffer)
  */
 uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer)
 {
-    return buffer->buffer;
+    return buffer->Start();
 }
 
 /**
@@ -150,7 +130,7 @@ uint8_t * chipZclBufferPointer(ChipZclBuffer_t * buffer)
  */
 uint16_t chipZclBufferDataLength(ChipZclBuffer_t * buffer)
 {
-    return buffer->dataLength;
+    return buffer->DataLength();
 }
 
 /**
@@ -158,7 +138,7 @@ uint16_t chipZclBufferDataLength(ChipZclBuffer_t * buffer)
  */
 uint16_t chipZclBufferAvailableLength(ChipZclBuffer_t * buffer)
 {
-    return buffer->bufferLength - buffer->dataLength;
+    return buffer->AvailableDataLength();
 }
 
 /**
@@ -166,5 +146,5 @@ uint16_t chipZclBufferAvailableLength(ChipZclBuffer_t * buffer)
  */
 void chipZclBufferSetDataLength(ChipZclBuffer_t * buffer, uint16_t newLength)
 {
-    buffer->dataLength = newLength;
+    buffer->SetDataLength(newLength);
 }

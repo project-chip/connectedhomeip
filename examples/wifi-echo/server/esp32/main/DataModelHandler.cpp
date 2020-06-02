@@ -45,7 +45,7 @@ void InitDataModelHandler()
 
 void HandleDataModelMessage(System::PacketBuffer * buffer)
 {
-    ChipZclStatus_t zclStatus = chipZclProcessIncoming(buffer->Start(), buffer->DataLength());
+    ChipZclStatus_t zclStatus = chipZclProcessIncoming((ChipZclBuffer_t *) buffer);
     if (zclStatus == CHIP_ZCL_STATUS_SUCCESS)
     {
         ESP_LOGI(TAG, "Data model processing success!");

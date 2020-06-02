@@ -31,6 +31,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* #ifdef __cplusplus */
+
 /**
  * Codec keeps track of an ongoing encode/decode session of a Buffer
  */
@@ -83,5 +87,9 @@ ChipZclStatus_t chipZclCodecDecode(ChipZclCodec_t * codec, ChipZclType_t type, v
  * @brief Call after decoding to verify that everything has been decoded
  */
 ChipZclStatus_t chipZclCodecDecodeEnd(ChipZclCodec_t * me);
+
+#ifdef __cplusplus
+}
+#endif /* #ifdef __cplusplus */
 
 #endif // CHIP_ZCL_CODEC

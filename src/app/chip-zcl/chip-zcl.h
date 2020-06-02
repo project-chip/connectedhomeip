@@ -24,12 +24,16 @@
 #ifndef CHIP_ZCL_MASTER_HEADER
 #define CHIP_ZCL_MASTER_HEADER
 
+#include "chip-zcl-buffer.h"
+
 #include <memory.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "chip-zcl-buffer.h"
+#ifdef __cplusplus
+extern "C" {
+#endif /* #ifdef __cplusplus */
 
 typedef uint64_t bitmap64_t;
 typedef uint8_t enum8_t;
@@ -833,6 +837,7 @@ typedef struct
 void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 
 void chEventControlSetDelayMS(ChipZclEventControl * event, uint32_t delay);
+
 /** @brief Sets this ::EmberEventControl to run "delay" milliseconds in the future.
  *  NOTE: To avoid rollover errors in event calculation, the delay must be
  *  less than ::EMBER_MAX_EVENT_CONTROL_DELAY_MS.
@@ -976,15 +981,6 @@ void chipZclEventSetDelayMs(Event * event, uint32_t delay);
 // Endpoint Management
 ChipZclEndpointId_t chipZclEndpointIndexToId(ChipZclEndpointIndex_t index, const ChipZclClusterSpec_t * clusterSpec);
 
-// Some platform CHIP_ZCL_STATUS_INSUFFICIENT_SPACE
-#define MEMSET(d, v, l) memset(d, v, l)
-#define MEMCOPY(d, s, l) memcpy(d, s, l)
-#define MEMMOVE(d, s, l) memmove(d, s, l)
-#define MEMCOMPARE(s0, s1, l) memcmp(s0, s1, l)
-#define MEMPGMCOMPARE(s0, s1, l) memcmp(s0, s1, l)
-#define LOW_BYTE(n) ((uint8_t)((n) &0xFF))
-#define HIGH_BYTE(n) ((uint8_t)(LOW_BYTE((n) >> 8)))
-#define IS_BIG_ENDIAN() false
 /**
  * @brief Returns the value built from the two \c uint8_t
  * values \c high and \c low.
@@ -1113,6 +1109,9 @@ void chipZclEncodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * 
  */
 void chipZclDecodeZclHeader(ChipZclBuffer_t * buffer, ChipZclCommandContext_t * context);
 
-ChipZclStatus_t chipZclProcessIncoming(uint8_t * buffer, uint16_t bufferLength);
+ChipZclStatus_t chipZclProcessIncoming(ChipZclBuffer_t * buffer);
 
+#ifdef __cplusplus
+}
+#endif /* #ifdef __cplusplus */
 #endif // CHIP_ZCL_MASTER_HEADER

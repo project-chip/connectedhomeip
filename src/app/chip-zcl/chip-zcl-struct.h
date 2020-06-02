@@ -28,6 +28,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* #ifdef __cplusplus */
+
 /**
  * Base types for the codec. This is a smaller subset than the actual ZCL types, and the
  * generated layer for a specific code is responsible for mapping ZCL types onto these
@@ -250,4 +254,7 @@ void chipZclStoreInt32uValue(uint8_t * valueLoc, uint32_t value, uint8_t valueSi
 
 /** @} end addtogroup */
 
+#ifdef __cplusplus
+}
+#endif /* #ifdef __cplusplus */
 #endif // CHIP_ZCL_STRUCT
