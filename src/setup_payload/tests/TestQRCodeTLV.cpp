@@ -58,11 +58,8 @@ SetupPayload GetDefaultPayloadWithSerialNumber()
 
 OptionalQRCodeInfo GetOptionalDefaultString()
 {
-    uint64_t tag;
-    VendorTag(2, tag);
-
     OptionalQRCodeInfo info;
-    info.tag  = tag;
+    info.tag  = 2;
     info.type = optionalQRCodeInfoTypeString;
     info.data = "myData";
 
@@ -71,11 +68,8 @@ OptionalQRCodeInfo GetOptionalDefaultString()
 
 OptionalQRCodeInfo GetOptionalDefaultInt()
 {
-    uint64_t tag;
-    VendorTag(3, tag);
-
     OptionalQRCodeInfo info;
-    info.tag     = tag;
+    info.tag     = 3;
     info.type    = optionalQRCodeInfoTypeInt;
     info.integer = 12;
 
@@ -89,8 +83,8 @@ SetupPayload GetDefaultPayloadWithOptionalDefaults()
     OptionalQRCodeInfo stringInfo = GetOptionalDefaultString();
     OptionalQRCodeInfo intInfo    = GetOptionalDefaultInt();
 
-    payload.addOptionalData(stringInfo);
-    payload.addOptionalData(intInfo);
+    payload.addVendorOptionalData(stringInfo);
+    payload.addVendorOptionalData(intInfo);
 
     return payload;
 }
@@ -119,13 +113,38 @@ void ComparePayloads(nlTestSuite * inSuite, void * inContext, SetupPayload & inP
     }
 }
 
-void TestVendorTag(nlTestSuite * inSuite, void * inContext)
+void TestOptionalTagValues(nlTestSuite * inSuite, void * inContext)
 {
-    uint64_t tag;
-    NL_TEST_ASSERT(inSuite, VendorTag(128, tag) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, VendorTag(255, tag) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, VendorTag(127, tag) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, tag == ContextTag(127));
+    SetupPayload payload          = GetDefaultPayload();
+    OptionalQRCodeInfo stringInfo = GetOptionalDefaultString();
+    CHIP_ERROR err;
+
+    err = payload.addVendorOptionalData(stringInfo);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    stringInfo.tag = 128;
+    err            = payload.addVendorOptionalData(stringInfo);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+
+    stringInfo.tag = 255;
+    err            = payload.addVendorOptionalData(stringInfo);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+
+    stringInfo.tag = 127;
+    err            = payload.addVendorOptionalData(stringInfo);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    stringInfo.tag = 128;
+    err            = payload.addCHIPOptionalData(stringInfo);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    stringInfo.tag = 127;
+    err            = payload.addCHIPOptionalData(stringInfo);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+
+    stringInfo.tag = 255;
+    err            = payload.addCHIPOptionalData(stringInfo);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 void TestOptionalDataAddRemove(nlTestSuite * inSuite, void * inContext)
@@ -139,13 +158,13 @@ void TestOptionalDataAddRemove(nlTestSuite * inSuite, void * inContext)
     optionalData = payload.getAllOptionalData();
     NL_TEST_ASSERT(inSuite, optionalData.size() == 0);
 
-    err = payload.addOptionalData(stringInfo);
+    err = payload.addVendorOptionalData(stringInfo);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     optionalData = payload.getAllOptionalData();
     NL_TEST_ASSERT(inSuite, optionalData.size() == 1);
 
-    err = payload.addOptionalData(intInfo);
+    err = payload.addVendorOptionalData(intInfo);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     optionalData = payload.getAllOptionalData();
@@ -276,7 +295,6 @@ void TestOptionalDataWriteSmallBuffer(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("Test Vendor Tag",                  TestVendorTag),
     NL_TEST_DEF("Test Simple Write",                TestSimpleWrite),
     NL_TEST_DEF("Test Simple Read",                 TestSimpleRead),
     NL_TEST_DEF("Test Optional Add Remove",         TestOptionalDataAddRemove),
@@ -285,6 +303,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test Optional Write No Buffer",    TestOptionalDataWriteNoBuffer),
     NL_TEST_DEF("Test Optional Write Small Buffer", TestOptionalDataWriteSmallBuffer),
     NL_TEST_DEF("Test Optional Read",               TestOptionalDataRead),
+    NL_TEST_DEF("Test Optional Tag Values",         TestOptionalTagValues),
 
     NL_TEST_SENTINEL()
 };

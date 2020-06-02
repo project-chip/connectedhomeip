@@ -83,13 +83,11 @@ string createSetupPayload()
     payload.version   = 1;
     payload.vendorID  = EXAMPLE_VENDOR_ID;
     payload.productID = 1;
-    uint64_t tag;
-    VendorTag(EXAMPLE_VENDOR_TAG, tag);
     OptionalQRCodeInfo stringInfo;
-    stringInfo.tag  = tag;
+    stringInfo.tag  = EXAMPLE_VENDOR_TAG;
     stringInfo.type = optionalQRCodeInfoTypeString;
     stringInfo.data = ap_ssid;
-    payload.addOptionalData(stringInfo);
+    payload.addVendorOptionalData(stringInfo);
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
     uint8_t tlvDataStart[sizeof(ap_ssid)];
