@@ -23,6 +23,12 @@
  */
 
 #include "TestQRCode.h"
+
+#include <assert.h>
+#include <bitset>
+#include <stdio.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -32,15 +38,10 @@
 #include "QRCodeSetupPayloadParser.cpp"
 #include "SetupPayload.cpp"
 
-#include <assert.h>
-#include <iostream>
-#include <stdio.h>
-#include <unistd.h>
-
 using namespace chip;
 using namespace std;
 
-void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
+SetupPayload GetDefaultPayload()
 {
     SetupPayload payload;
 
@@ -52,27 +53,72 @@ void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
     payload.discriminator         = 128;
     payload.setUpPINCode          = 2048;
 
+    return payload;
+}
+
+string toBinaryRepresentation(string base41Result)
+{
+    // Remove the kQRCodePrefix
+    base41Result.erase(0, strlen(kQRCodePrefix));
+
+    // Decode the base41 encoded string
+    vector<uint8_t> buffer;
+    base41Decode(base41Result, buffer);
+
+    // Convert it to binary
+    string binaryResult;
+    for (int i = buffer.size() - 1; i >= 0; i--)
+    {
+        binaryResult += bitset<8>(buffer[i]).to_string();
+    }
+
+    // Insert spaces after each block
+    size_t pos = binaryResult.size();
+
+    pos -= kVersionFieldLengthInBits;
+    binaryResult.insert(pos, " ");
+
+    pos -= kVendorIDFieldLengthInBits;
+    binaryResult.insert(pos, " ");
+
+    pos -= kProductIDFieldLengthInBits;
+    binaryResult.insert(pos, " ");
+
+    pos -= kCustomFlowRequiredFieldLengthInBits;
+    binaryResult.insert(pos, " ");
+
+    pos -= kRendezvousInfoFieldLengthInBits;
+    binaryResult.insert(pos, " ");
+
+    pos -= kPayloadDiscriminatorFieldLengthInBits;
+    binaryResult.insert(pos, " ");
+
+    pos -= kSetupPINCodeFieldLengthInBits;
+    binaryResult.insert(pos, " ");
+
+    pos -= kReservedFieldLengthInBits;
+    binaryResult.insert(pos, " ");
+
+    return binaryResult;
+}
+
+void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
+{
+    SetupPayload payload = GetDefaultPayload();
+
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
-    CHIP_ERROR err  = generator.payloadBinaryRepresentation(result);
+    CHIP_ERROR err  = generator.payloadBase41Representation(result);
     bool didSucceed = err == CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, didSucceed == true);
 
-    string expected = "00000000000000001000000000001000000000000001000000000000000010000000000001100101";
-    NL_TEST_ASSERT(inSuite, result == expected);
+    string expected = " 0 000000000000000100000000000 10000000 00000001 0 0000000000000001 0000000000001100 101";
+    NL_TEST_ASSERT(inSuite, toBinaryRepresentation(result) == expected);
 }
 
 void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
-
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
+    SetupPayload payload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
@@ -148,15 +194,7 @@ void TestBitsetLen(nlTestSuite * inSuite, void * inContext)
 
 void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
-
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
+    SetupPayload payload = GetDefaultPayload();
     NL_TEST_ASSERT(inSuite, payload.isValidQRCodePayload() == true);
 
     // test invalid version
@@ -205,24 +243,8 @@ void TestInvalidQRCodePayload_WrongLength(nlTestSuite * inSuite, void * inContex
 
 void TestPayloadEquality(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
-
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
-
-    SetupPayload equalPayload;
-    equalPayload.version               = 5;
-    equalPayload.vendorID              = 12;
-    equalPayload.productID             = 1;
-    equalPayload.requiresCustomFlow    = 0;
-    equalPayload.rendezvousInformation = 1;
-    equalPayload.discriminator         = 128;
-    equalPayload.setUpPINCode          = 2048;
+    SetupPayload payload      = GetDefaultPayload();
+    SetupPayload equalPayload = GetDefaultPayload();
 
     bool result = payload == equalPayload;
     NL_TEST_ASSERT(inSuite, result == true);
@@ -230,24 +252,11 @@ void TestPayloadEquality(nlTestSuite * inSuite, void * inContext)
 
 void TestPayloadInEquality(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
+    SetupPayload payload = GetDefaultPayload();
 
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
-
-    SetupPayload unequalPayload;
-    unequalPayload.version               = 5;
-    unequalPayload.vendorID              = 12;
-    unequalPayload.productID             = 1;
-    unequalPayload.requiresCustomFlow    = 0;
-    unequalPayload.rendezvousInformation = 1;
-    unequalPayload.discriminator         = 28;
-    unequalPayload.setUpPINCode          = 121233;
+    SetupPayload unequalPayload  = GetDefaultPayload();
+    unequalPayload.discriminator = 28;
+    unequalPayload.setUpPINCode  = 121233;
 
     bool result = payload == unequalPayload;
     NL_TEST_ASSERT(inSuite, result == false);
@@ -255,14 +264,7 @@ void TestPayloadInEquality(nlTestSuite * inSuite, void * inContext)
 
 void TestQRCodeToPayloadGeneration(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload;
-    payload.version               = 3;
-    payload.vendorID              = 100;
-    payload.productID             = 12;
-    payload.requiresCustomFlow    = 1;
-    payload.rendezvousInformation = 4;
-    payload.discriminator         = 233;
-    payload.setUpPINCode          = 5221133;
+    SetupPayload payload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(payload);
     string base41Rep;
