@@ -44,6 +44,9 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
         onError:(ControllerOnErrorBlock)onError;
 - (nullable AddressInfo *)getAddressInfo;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
+// We can't include definitions of ChipZclClusterId_t and ChipZclCommandId_t
+// here, but they're just integers, so pass them that way.
+- (BOOL)sendCHIPCommand:(uint16_t)cluster command:(uint16_t)command;
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
 - (BOOL)isConnected;
 

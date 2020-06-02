@@ -17,6 +17,12 @@
 
 #import <Foundation/Foundation.h>
 
+extern "C" {
+#include "chip-zcl/chip-zcl-buffer.h"
+#include "chip-zcl/chip-zcl.h"
+#include "gen/gen-command-id.h"
+} // extern "C"
+
 #import "CHIPDeviceController.h"
 #import "CHIPError.h"
 #import "CHIPLogging.h"
@@ -231,6 +237,42 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     return YES;
 }
 
+- (BOOL)sendCHIPCommand:(ChipZclClusterId_t)cluster command:(ChipZclCommandId_t)command
+{
+    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    dispatch_sync(self.chipWorkQueue, ^() {
+        // FIXME: This needs a better buffersizing setup!
+        static const size_t bufferSize = 1024;
+        chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(bufferSize);
+
+        ChipZclBuffer_t * zcl_buffer = (ChipZclBuffer_t *) buffer;
+        ChipZclCommandContext_t ctx = {
+            1, // endpointId
+            cluster, // clusterId
+            true, // clusterSpecific
+            false, // mfgSpecific
+            0, // mfgCode
+            command, // commandId
+            ZCL_DIRECTION_CLIENT_TO_SERVER, // direction
+            0, // payloadStartIndex
+            nullptr, // request
+            nullptr // response
+        };
+        chipZclEncodeZclHeader(zcl_buffer, &ctx);
+
+        const size_t data_len = chipZclBufferDataLength(zcl_buffer);
+
+        buffer->SetDataLength(data_len);
+
+        err = self.cppController->SendMessage((__bridge void *) self, buffer);
+    });
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error(%d): %@, send failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        return NO;
+    }
+    return YES;
+}
+
 - (BOOL)disconnect:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
@@ -320,3 +362,11 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 }
 
 @end
+
+extern "C" {
+// We have to have this empty callback, because the ZCL code links against it.
+void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
+    uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+{
+}
+} // extern "C"

@@ -67,7 +67,15 @@ namespace Logging {
         va_list v;
 
         va_start(v, aMsg);
+        LogV(aModule, aCategory, aMsg, v);
+        va_end(v);
+    }
 
+    /**
+     * A version of Log() that uses a va_list instead of varargs.
+     */
+    void LogV(uint8_t aModule, uint8_t aCategory, const char * aMsg, va_list aV)
+    {
         if (IsCategoryEnabled(aCategory)) {
             char formattedMsg[512];
             size_t prefixLen;
@@ -80,12 +88,10 @@ namespace Logging {
             if (prefixLen >= sizeof(formattedMsg))
                 prefixLen = sizeof(formattedMsg) - 1;
 
-            vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aMsg, v);
+            vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aMsg, aV);
 
             os_log(OS_LOG_DEFAULT, "%s", formattedMsg);
         }
-
-        va_end(v);
     }
 
 } // namespace Logging
