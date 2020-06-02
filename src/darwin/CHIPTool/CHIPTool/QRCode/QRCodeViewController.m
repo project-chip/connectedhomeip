@@ -197,7 +197,6 @@ static const NSString *portKey = @"pk";
                             if ([info.stringValue length] > MAX_IP_LEN) {
                                 NSLog(@"Unexpected IP String... %@", info.stringValue);
                             } else {
-                                // show SoftAP detection
                                 NSLog(@"Got IP String... %@", info.stringValue);
                                 [[NSUserDefaults standardUserDefaults] setObject:info.stringValue forKey:ipKey];
                                 [[NSUserDefaults standardUserDefaults] setInteger:8000 forKey:portKey];
