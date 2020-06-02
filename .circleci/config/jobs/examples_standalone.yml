@@ -16,3 +16,11 @@ steps:
     - run:
           name: Build example Standalone Echo Client
           command: scripts/examples/standalone_echo_client.sh
+    - run:
+          name: Preserve artifacts
+          command: |
+              mkdir -p example_binaries/<<parameters.builder>>
+              cp examples/chip-tool/build/chip-standalone-demo.out \
+                 example_binaries/<<parameters.builder>>/chip-standalone-demo.out
+    - store_artifacts:
+          path: example_binaries/<<parameters.builder>>
