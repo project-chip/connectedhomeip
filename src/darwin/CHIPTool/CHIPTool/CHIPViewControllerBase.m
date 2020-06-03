@@ -22,8 +22,8 @@
 
 #define RESULT_DISPLAY_DURATION 5.0 * NSEC_PER_SEC
 
-static const NSString * ipKey = @"ipk";
-static const NSString * portKey = @"pk";
+static NSString * const ipKey = @"ipk";
+static NSString * const portKey = @"pk";
 
 @interface CHIPViewControllerBase ()
 
@@ -112,7 +112,7 @@ static const NSString * portKey = @"pk";
         error:&error
         onMessage:^(NSData * _Nonnull message, NSString * _Nonnull ipAddress, UInt16 port) {
             NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-            [self postResult:[@"Echo Response: " stringByAppendingFormat:@"%@\nFrom: %@:%d", strMessage, ipAddress, port]];
+            [self postResult:[@"Echo Response: " stringByAppendingFormat:@"%@", strMessage]];
         }
         onError:^(NSError * _Nonnull error) {
             [self postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];

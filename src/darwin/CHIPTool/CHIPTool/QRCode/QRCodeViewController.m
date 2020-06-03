@@ -38,8 +38,8 @@
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
-static const NSString * ipKey = @"ipk";
-static const NSString * portKey = @"pk";
+static NSString * const ipKey = @"ipk";
+static NSString * const portKey = @"pk";
 
 @interface QRCodeViewController ()
 
