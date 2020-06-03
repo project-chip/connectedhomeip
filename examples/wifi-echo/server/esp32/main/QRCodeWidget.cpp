@@ -78,7 +78,7 @@ void GetAPName(char * ssid, size_t ssid_len)
     snprintf(ssid, ssid_len, "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
 }
 
-void GetGatewayIP(char *ip_buf, size_t ip_len)
+void GetGatewayIP(char * ip_buf, size_t ip_len)
 {
 
     tcpip_adapter_ip_info_t ip;
@@ -95,7 +95,6 @@ string createSetupPayload()
     payload.version   = 1;
     payload.vendorID  = EXAMPLE_VENDOR_ID;
     payload.productID = 1;
-
 
     OptionalQRCodeInfo ssidInfo;
     ssidInfo.tag  = EXAMPLE_VENDOR_TAG_SSID;
