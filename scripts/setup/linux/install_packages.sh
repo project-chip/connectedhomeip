@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
+set -x
 env
 
-set -x
 apt-get update
 apt-get install -fy \
     git \

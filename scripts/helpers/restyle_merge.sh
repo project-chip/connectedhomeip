@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -x
 env
 
 git remote add upstream https://github.com/project-chip/connectedhomeip.git

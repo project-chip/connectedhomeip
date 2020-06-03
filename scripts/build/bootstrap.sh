@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -x
 env
 
 if [[ ! -f build/default/config.status ]]; then
