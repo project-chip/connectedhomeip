@@ -17,6 +17,6 @@ echo "BLOAT REPORT" >${REPORTFILE}
 
 for masterbinary in ${OUTPUTDIR}/*; do
     newbinary=${SOURCEDIR}/$(basename $masterbinary)
-    echo "Checking $newbinary against $masterbinary" >${REPORTFILE}
-    bloaty $newbinary -- $masterbinary >${REPORTFILE}
+    echo "Checking $newbinary against $masterbinary" >>${REPORTFILE}
+    bloaty $newbinary -- $masterbinary 2>&1 >>${REPORTFILE}
 done
