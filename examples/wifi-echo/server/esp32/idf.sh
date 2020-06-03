@@ -23,13 +23,16 @@
 me=${0##*/}
 die() {
     echo "$me: *** ERROR: " "${*}"
-    exit 1
+    return 1
 }
 idf() {
-    [[ -d $IDF_PATH && -r $IDF_PATH/export.sh ]] || die "can't find IDF's export.sh"
+    [[ -d $IDF_PATH && -r $IDF_PATH/export.sh ]] || die "can't find IDF's export.sh, please set IDF_PATH"
     . "$IDF_PATH/export.sh"
+    export IDF_PATH
     "$@"
 }
 if [[ ${0} == ${BASH_SOURCE[0]} ]]; then
     idf "${@}"
+else
+    [[ $PS1 =~ \[idf\].* ]] || PS1="[idf]$PS1"
 fi
