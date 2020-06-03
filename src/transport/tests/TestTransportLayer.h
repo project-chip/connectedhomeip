@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 int TestMessageHeader(void);
-int TestUdpTransport(void);
+int TestSecureTransport(void);
 int TestCHIPSecureChannel(void);
 
 #ifdef __cplusplus

@@ -24,20 +24,21 @@
  *
  */
 
-#ifndef __UDPTRANSPORT_H__
-#define __UDPTRANSPORT_H__
+#ifndef __SECURETRANSPORT_H__
+#define __SECURETRANSPORT_H__
 
 #include <utility>
 
 #include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
+#include <transport/CHIPSecureChannel.h>
 
 namespace chip {
 
 using namespace System;
 
-class DLL_EXPORT UdpTransport
+class DLL_EXPORT SecureTransport
 {
 public:
     /**
@@ -50,10 +51,11 @@ public:
     enum State
     {
         // TODO need more modes when TCP support is added
-        kState_NotReady       = 0, /**< State before initialization. */
-        kState_ReadyToConnect = 1, /**< State after initialization of the CHIP connection. */
-        kState_Connected      = 2, /**< State when the connection has been established. */
-        kState_Closed         = 3  /**< State when the connection is closed. */
+        kState_NotReady        = 0, /**< State before initialization. */
+        kState_ReadyToConnect  = 1, /**< State after initialization of the CHIP connection. */
+        kState_Connected       = 2, /**< State when the connection has been established. */
+        kState_SecureConnected = 3, /**< State when the security of the connection has been established. */
+        kState_Closed          = 4  /**< State when the connection is closed. */
     };
 
     /**
@@ -72,7 +74,22 @@ public:
      * @param peerPort      The port of the requested peer
      * @return CHIP_ERROR   The connection result
      */
-    CHIP_ERROR Connect(const IPAddress & peerAddr, uint16_t peerPort = 0);
+    CHIP_ERROR Connect(IPAddressType addrType = kIPAddressType_IPv6);
+
+    /**
+     * @brief
+     *   The keypair for the secure channel. This is a utility function that will be used
+     *   until we have automatic key exchange in place. The function is useful only for
+     *   example applications for now. It will eventually be removed.
+     *
+     * @param remote_public_key  A pointer to peer's public key
+     * @param public_key_length  Length of remote_public_key
+     * @param local_private_key  A pointer to local private key
+     * @param private_key_length Length of local_private_key
+     * @return CHIP_ERROR        The result of key derivation
+     */
+    CHIP_ERROR ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
+                                 const unsigned char * local_private_key, const size_t private_key_length);
 
     /**
      * @brief
@@ -85,11 +102,11 @@ public:
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
      */
-    CHIP_ERROR SendMessage(PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(PacketBuffer * msgBuf, const IPAddress & peerAddr, uint32_t msg_id = 0);
 
     /**
      * @brief
-     *   Close an existing connection. Once close is called, the UdpTransport object can no longer be used
+     *   Close an existing connection. Once close is called, the SecureTransport object can no longer be used
      *
      * @return CHIP_ERROR   The close result
      */
@@ -102,32 +119,32 @@ public:
      *  This function is the application callback that is invoked when a message is received over a
      *  Chip connection.
      *
-     *  @param[in]    con           A pointer to the UdpTransport object.
+     *  @param[in]    con           A pointer to the SecureTransport object.
      *
      *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
      *
      *  @param[in]    pktInfo       A pointer to the IPPacketInfo object carrying sender details.
      *
      */
-    typedef void (*MessageReceiveHandler)(UdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
+    typedef void (*MessageReceiveHandler)(SecureTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
     MessageReceiveHandler OnMessageReceived;
 
     /**
      *  This function is the application callback invoked upon encountering an error when receiving
      *  a Chip message.
      *
-     *  @param[in]     con            A pointer to the UdpTransport object.
+     *  @param[in]     con            A pointer to the SecureTransport object.
      *
      *  @param[in]     err            The CHIP_ERROR encountered when receiving data over the connection.
      *
      *  @param[in]    pktInfo         A pointer to the IPPacketInfo object carrying sender details.
      *
      */
-    typedef void (*ReceiveErrorHandler)(UdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    typedef void (*ReceiveErrorHandler)(SecureTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
     ReceiveErrorHandler OnReceiveError;
 
-    UdpTransport();
-    virtual ~UdpTransport() {}
+    SecureTransport();
+    virtual ~SecureTransport() {}
 
 private:
     Inet::InetLayer * mInetLayer;
@@ -136,11 +153,12 @@ private:
     uint16_t mPeerPort;
     State mState;
     uint8_t mRefCount;
+    ChipSecureChannel mSecureChannel;
 
-    CHIP_ERROR DoConnect();
+    CHIP_ERROR DoConnect(IPAddressType addrType);
     void DoClose(CHIP_ERROR err);
-    bool StateAllowsSend(void) const { return mState == kState_Connected; }
-    bool StateAllowsReceive(void) const { return mState == kState_Connected; }
+    bool StateAllowsSend(void) const { return mState == kState_SecureConnected; }
+    bool StateAllowsReceive(void) const { return mState == kState_SecureConnected; }
 
     static void HandleDataReceived(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg, const IPPacketInfo * pktInfo);
     static void HandleReceiveError(IPEndPointBasis * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo);
@@ -148,20 +166,21 @@ private:
 
 /// Associates a UDP transport with a state at creation time
 template <typename StateType>
-class StatefulUdpTransport : public UdpTransport
+class StatefulSecureTransport : public SecureTransport
 {
 public:
-    StatefulUdpTransport(const StateType & state) : mState(state) {}
-    StatefulUdpTransport(StateType && state) : mState(std::move(state)) {}
+    StatefulSecureTransport(const StateType & state) : mState(state) {}
+    StatefulSecureTransport(StateType && state) : mState(std::move(state)) {}
 
     StateType & State(void) { return mState; }
     const StateType & State(void) const { return mState; }
 
-    /// Typesafe equivalent of UdpTransport::MessageReceivehandler
-    typedef void (*StatefulMessageReceiveHandler)(StatefulUdpTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
+    /// Typesafe equivalent of SecureTransport::MessageReceivehandler
+    typedef void (*StatefulMessageReceiveHandler)(StatefulSecureTransport * con, PacketBuffer * msgBuf,
+                                                  const IPPacketInfo * pktInfo);
 
-    /// Typesafe equivalent of UdpTransport::ReceiveErrorHandler
-    typedef void (*StatefulReceiveErrorHandler)(StatefulUdpTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    /// Typesafe equivalent of SecureTransport::ReceiveErrorHandler
+    typedef void (*StatefulReceiveErrorHandler)(StatefulSecureTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 
     /// Sets the OnMessageReceived callback using a stateful callback
     void SetMessageReceiveHandler(StatefulMessageReceiveHandler handler)
@@ -181,4 +200,4 @@ private:
 
 } // namespace chip
 
-#endif // __UDPTRANSPORT_H__
+#endif // __SECURETRANSPORT_H__

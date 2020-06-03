@@ -81,6 +81,8 @@ public:
      */
     size_t EncryptionOverhead(void);
 
+    void Close(void);
+
     ChipSecureChannel(void);
 
 private:

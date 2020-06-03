@@ -26,12 +26,12 @@
 
 CHIP_BUILD_TRANSPORT_LAYER_SOURCE_FILES                  = \
     @top_builddir@/src/transport/MessageHeader.cpp         \
-    @top_builddir@/src/transport/UdpTransport.cpp          \
+    @top_builddir@/src/transport/SecureTransport.cpp       \
     @top_builddir@/src/transport/CHIPSecureChannel.cpp     \
     $(NULL)
 
 CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES             = \
     @top_builddir@/src/transport/MessageHeader.h      \
-    @top_builddir@/src/transport/UdpTransport.h       \
+    @top_builddir@/src/transport/SecureTransport.h       \
     @top_builddir@/src/transport/CHIPSecureChannel.h  \
     $(NULL)

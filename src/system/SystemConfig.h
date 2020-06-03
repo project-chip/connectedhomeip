@@ -300,6 +300,25 @@
  *
  *      This number was calculated as follows:
  *
+ *      CHIP Crypto Header:
+ *
+ *          4 -- Length of encrypted block
+ *          8 -- Initialization Vector
+ *          8 -- Encryption Tag
+ */
+#ifndef CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE
+#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 20
+#endif
+
+/**
+ *  @def CHIP_SYSTEM_HEADER_RESERVE_SIZE
+ *
+ *  @brief
+ *      The number of bytes to reserve in a network packet buffer to contain
+ *      the CHIP message and exchange headers.
+ *
+ *      This number was calculated as follows:
+ *
  *      CHIP Message Header:
  *
  *          2 -- Frame Length
@@ -320,7 +339,7 @@
  *    @note A number of these fields are optional or not presently used. So most headers will be considerably smaller than this.
  */
 #ifndef CHIP_SYSTEM_HEADER_RESERVE_SIZE
-#define CHIP_SYSTEM_HEADER_RESERVE_SIZE 38
+#define CHIP_SYSTEM_HEADER_RESERVE_SIZE (38 + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE)
 #endif /* CHIP_SYSTEM_HEADER_RESERVE_SIZE */
 
 /**

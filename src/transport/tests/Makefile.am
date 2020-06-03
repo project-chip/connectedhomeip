@@ -42,7 +42,7 @@ lib_LIBRARIES                                         = \
 
 libTransportLayerTests_a_SOURCES                      = \
     TestMessageHeader.cpp                               \
-    TestUdpTransport.cpp                                \
+    TestSecureTransport.cpp                             \
     TestCHIPSecureChannel.cpp                           \
     $(NULL)
 
@@ -85,7 +85,7 @@ COMMON_LDADD                                          = \
 
 check_PROGRAMS             = \
     TestMessageHeader        \
-    TestUdpTransport         \
+    TestSecureTransport      \
     TestCHIPSecureChannel    \
     $(NULL)
 
@@ -107,8 +107,8 @@ TESTS_ENVIRONMENT             = \
 TestMessageHeader_SOURCES     = TestMessageHeaderDriver.cpp
 TestMessageHeader_LDADD       = $(COMMON_LDADD)
 
-TestUdpTransport_SOURCES     = TestUdpTransportDriver.cpp
-TestUdpTransport_LDADD       = $(COMMON_LDADD)
+TestSecureTransport_SOURCES   = TestSecureTransportDriver.cpp
+TestSecureTransport_LDADD     = $(COMMON_LDADD)
 
 TestCHIPSecureChannel_SOURCES                         = TestCHIPSecureChannelDriver.cpp
 TestCHIPSecureChannel_LDADD                           = $(COMMON_LDADD)

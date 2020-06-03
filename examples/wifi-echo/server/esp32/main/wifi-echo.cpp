@@ -35,11 +35,12 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
+#include <transport/SecureTransport.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(UDPEndPoint *& endpoint);
+extern void startServer(SecureTransport * transport);
 extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
@@ -165,8 +166,8 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    UDPEndPoint * sEndpoint = NULL;
-    startServer(sEndpoint);
+    SecureTransport sTransport;
+    startServer(&sTransport);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
 #endif
