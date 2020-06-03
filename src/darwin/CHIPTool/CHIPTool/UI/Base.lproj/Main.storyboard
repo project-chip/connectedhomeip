@@ -637,8 +637,10 @@
                     </view>
                     <navigationItem key="navigationItem" id="X3a-IB-ct7"/>
                     <connections>
+                        <outlet property="IPLabel" destination="XIj-Oo-qmz" id="MW7-GN-hns"/>
                         <outlet property="offButton" destination="cwX-vi-vgG" id="ctm-j9-5Vj"/>
                         <outlet property="onButton" destination="jhI-Pt-QaG" id="qUw-MV-lYT"/>
+                        <outlet property="portLabel" destination="Ezc-du-JDZ" id="olk-be-Huo"/>
                         <outlet property="resultLabel" destination="ERS-fv-Yhs" id="Jgg-GZ-RIs"/>
                         <outlet property="serverIPTextField" destination="WTA-xG-Iyv" id="704-EI-lpg"/>
                         <outlet property="serverPortTextField" destination="23l-Oa-cls" id="Vtc-FU-O8a"/>
