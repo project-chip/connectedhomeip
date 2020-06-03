@@ -339,10 +339,11 @@ void TestExtractPayload(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
+
+    NL_TEST_DEF("Test Base 41",                                                     TestBase41),
     NL_TEST_DEF("Test Bitset Length",                                               TestBitsetLen),
     NL_TEST_DEF("Test Payload Byte Array Representation",                           TestPayloadByteArrayRep),
     NL_TEST_DEF("Test Payload Base 41 Representation",                              TestPayloadBase41Rep),
-    NL_TEST_DEF("Test Payload Base 41",                                             TestBase41),
     NL_TEST_DEF("Test Setup Payload Verify",                                        TestSetupPayloadVerify),
     NL_TEST_DEF("Test Payload Equality",                                            TestPayloadEquality),
     NL_TEST_DEF("Test Payload Inequality",                                          TestPayloadInEquality),
