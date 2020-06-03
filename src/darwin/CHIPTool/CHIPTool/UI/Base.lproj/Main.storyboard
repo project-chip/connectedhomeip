@@ -559,7 +559,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jhI-Pt-QaG">
                                 <rect key="frame" x="16" y="310" width="62" height="40"/>
                                 <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <state key="normal" title="On">
                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="default" weight="bold"/>
                                 </state>
@@ -583,7 +583,7 @@
                                     <constraint firstAttribute="width" constant="62" id="Aps-iV-q27"/>
                                     <constraint firstAttribute="height" constant="40" id="fC7-42-Oyl"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <state key="normal" title="Toggle"/>
                                 <connections>
                                     <action selector="toggleButtonTapped:" destination="UgW-Ob-0KX" eventType="touchUpInside" id="tnj-3E-KKW"/>
@@ -592,7 +592,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cwX-vi-vgG">
                                 <rect key="frame" x="88" y="310" width="62" height="40"/>
                                 <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <state key="normal" title="Off">
                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="default" weight="bold"/>
                                 </state>
