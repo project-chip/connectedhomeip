@@ -19,7 +19,7 @@ for masterbinary in "$OUTPUTDIR"/*; do
     newbinary=$SOURCEDIR/$(basename "$masterbinary")
     echo "Checking $newbinary against $masterbinary" >>"$REPORTFILE"
 
-    if [-f $newbinary]; then
+    if [-f "$newbinary"]; then
         bloaty "$newbinary" -- "$masterbinary" 2>&1 >>"$REPORTFILE"
     else
         echo "$newbinary WAS NOT FOUND" >>"$REPORTFILE"
