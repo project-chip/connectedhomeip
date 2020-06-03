@@ -126,7 +126,7 @@ void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
     bool didSucceed = err == CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, didSucceed == true);
 
-    string expected = "CH:J20800G0080080000";
+    string expected = "CH:J20800G008008000";
     NL_TEST_ASSERT(inSuite, result == expected);
 }
 
@@ -136,11 +136,11 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, base41Encode(input, 0).compare("") == 0);
 
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 1).compare("A0") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 1).compare("A") == 0);
 
     NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("SL1") == 0);
 
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1A0") == 0);
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1A") == 0);
 
     NL_TEST_ASSERT(inSuite,
                    base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1).compare("GHF.KGL+48-G5LGK35") == 0);
@@ -162,8 +162,11 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     // empty == empty
     NL_TEST_ASSERT(inSuite, base41Decode("", decoded) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, decoded.size() == 0);
-    // too short
-    NL_TEST_ASSERT(inSuite, base41Decode("A", decoded) == CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    // single base41 means one byte of output
+    NL_TEST_ASSERT(inSuite, base41Decode("A", decoded) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, decoded.size() == 1);
+    NL_TEST_ASSERT(inSuite, decoded[0] == 10);
 
     // outside valid chars
     NL_TEST_ASSERT(inSuite, base41Decode("0\001", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
@@ -189,8 +192,14 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     // overflow of odd byte
     NL_TEST_ASSERT(inSuite, base41Decode("96", decoded) == CHIP_NO_ERROR); // this is 255
     NL_TEST_ASSERT(inSuite, decoded.size() == 1);
-    NL_TEST_ASSERT(
-        inSuite, base41Decode("A6", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE); // this is 256, something we should never encode
+    NL_TEST_ASSERT(inSuite, base41Decode("A6", decoded) == CHIP_NO_ERROR); // this is 256, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, decoded.size() == 2);
+    NL_TEST_ASSERT(inSuite, base41Decode("..", decoded) == CHIP_NO_ERROR); // this is 41^2-1, or 1680, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, decoded.size() == 2);
+    if (decoded.size() == 2)
+    {
+        NL_TEST_ASSERT(inSuite, (kRadix * kRadix) - 1 == decoded[0] + decoded[1] * 256);
+    }
 }
 
 void TestBitsetLen(nlTestSuite * inSuite, void * inContext)
