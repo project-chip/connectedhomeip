@@ -37,6 +37,23 @@ RUN set -x \
     zlib1g-dev \
     libglib2.0-dev \
     libpixman-1-dev \
+    cmake \
     && rm -rf /var/lib/apt/lists/ \
+    && : # last line
+
+# install python dependencies
+RUN set -x \
     && pip3 install circleci attrs coloredlogs \
+    && : # last line
+
+# Install bloat comparison tools
+RUN set -x \
+    && git clone https://github.com/google/bloaty.git \
+    && mkdir -p bloaty/build \
+    && cd bloaty/build \
+    && cmake ../ \
+    && make -j \
+    && make install \
+    && cd ../.. \
+    && rm -rf bloaty \
     && : # last line

@@ -12,5 +12,12 @@ steps:
               mkdir -p example_binaries/esp32-build
               cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
                  example_binaries/esp32-build/chip-wifi-echo.elf
+    - run:
+          name: Bloat check
+          command: |
+              scripts/helpers/bloat-check.sh   \
+                  'Build Examples [ESP32]'     \
+                  example_binaries/esp32-build \
+                  master_binaries/esp32-build
     - store_artifacts:
           path: example_binaries/esp32-build
