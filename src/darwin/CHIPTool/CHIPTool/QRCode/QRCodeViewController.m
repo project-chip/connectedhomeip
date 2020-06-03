@@ -36,12 +36,10 @@
 #define EXAMPLE_VENDOR_TAG_IP 2
 #define MAX_IP_LEN 15
 
-
 #define NOT_APPLICABLE_STRING @"N/A"
 
-static const NSString *ipKey = @"ipk";
-static const NSString *portKey = @"pk";
-
+static const NSString * ipKey = @"ipk";
+static const NSString * portKey = @"pk";
 
 @interface QRCodeViewController ()
 
@@ -182,26 +180,26 @@ static const NSString *portKey = @"pk";
             NSNumber * tag = info.tag;
             if (tag) {
                 switch (tag.unsignedCharValue) {
-                    case EXAMPLE_VENDOR_TAG_SSID:
-                        if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
-                            if ([info.stringValue length] > MAX_SSID_LEN) {
-                                NSLog(@"Unexpected SSID String...");
-                            } else {
-                                // show SoftAP detection
-                                [self RequestConnectSoftAPWithSSID:info.stringValue];
-                            }
+                case EXAMPLE_VENDOR_TAG_SSID:
+                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
+                        if ([info.stringValue length] > MAX_SSID_LEN) {
+                            NSLog(@"Unexpected SSID String...");
+                        } else {
+                            // show SoftAP detection
+                            [self RequestConnectSoftAPWithSSID:info.stringValue];
                         }
+                    }
                     break;
-                    case EXAMPLE_VENDOR_TAG_IP:
-                        if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
-                            if ([info.stringValue length] > MAX_IP_LEN) {
-                                NSLog(@"Unexpected IP String... %@", info.stringValue);
-                            } else {
-                                NSLog(@"Got IP String... %@", info.stringValue);
-                                [[NSUserDefaults standardUserDefaults] setObject:info.stringValue forKey:ipKey];
-                                [[NSUserDefaults standardUserDefaults] setInteger:8000 forKey:portKey];
-                            }
+                case EXAMPLE_VENDOR_TAG_IP:
+                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
+                        if ([info.stringValue length] > MAX_IP_LEN) {
+                            NSLog(@"Unexpected IP String... %@", info.stringValue);
+                        } else {
+                            NSLog(@"Got IP String... %@", info.stringValue);
+                            [[NSUserDefaults standardUserDefaults] setObject:info.stringValue forKey:ipKey];
+                            [[NSUserDefaults standardUserDefaults] setInteger:8000 forKey:portKey];
                         }
+                    }
                     break;
                 }
                 // If the vendor id and tag match the example values, there should be an ssid encoded

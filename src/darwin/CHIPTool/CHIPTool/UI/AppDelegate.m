@@ -17,8 +17,8 @@
 
 #import "AppDelegate.h"
 
-static const NSString *ipKey = @"ipk";
-static const NSString *portKey = @"pk";
+static const NSString * ipKey = @"ipk";
+static const NSString * portKey = @"pk";
 
 @interface AppDelegate ()
 
