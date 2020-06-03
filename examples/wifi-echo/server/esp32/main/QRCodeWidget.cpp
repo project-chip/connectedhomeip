@@ -46,7 +46,11 @@
 // Spells CHIP on a dialer
 #define EXAMPLE_VENDOR_ID 3447
 // Used to indicate that an SSID has been added to the QRCode
-#define EXAMPLE_VENDOR_TAG 1
+#define EXAMPLE_VENDOR_TAG_SSID 1
+// Used to indicate that an IP address has been added to the QRCode
+#define EXAMPLE_VENDOR_TAG_IP 2
+// Used to indicate that a Port has been added to the QRCode
+#define EXAMPLE_VENDOR_TAG_PORT 3
 
 #if CONFIG_HAVE_DISPLAY
 
@@ -75,6 +79,15 @@ void GetAPName(char * ssid, size_t ssid_len)
     snprintf(ssid, ssid_len, "%s%02X%02X", "CHIP_DEMO-", mac[4], mac[5]);
 }
 
+void GetGatewayIP(char * ip_buf, size_t ip_len)
+{
+
+    tcpip_adapter_ip_info_t ip;
+    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
+    IPAddress::FromIPv4(ip.ip).ToString(ip_buf, ip_len);
+    ESP_LOGE(TAG, "Got gateway ip %s", ip_buf);
+}
+
 string createSetupPayload()
 {
     char ap_ssid[MAX_SSID_LEN];
@@ -83,15 +96,32 @@ string createSetupPayload()
     payload.version   = 1;
     payload.vendorID  = EXAMPLE_VENDOR_ID;
     payload.productID = 1;
-    OptionalQRCodeInfo stringInfo;
-    stringInfo.tag  = EXAMPLE_VENDOR_TAG;
-    stringInfo.type = optionalQRCodeInfoTypeString;
-    stringInfo.data = ap_ssid;
-    payload.addVendorOptionalData(stringInfo);
+
+    OptionalQRCodeInfo ssidInfo;
+    ssidInfo.tag  = EXAMPLE_VENDOR_TAG_SSID;
+    ssidInfo.type = optionalQRCodeInfoTypeString;
+    ssidInfo.data = ap_ssid;
+    payload.addVendorOptionalData(ssidInfo);
+
+    char gw_ip[INET6_ADDRSTRLEN];
+    GetGatewayIP(gw_ip, sizeof(gw_ip));
+    OptionalQRCodeInfo ipInfo;
+    ipInfo.tag  = EXAMPLE_VENDOR_TAG_IP;
+    ipInfo.type = optionalQRCodeInfoTypeString;
+    ipInfo.data = gw_ip;
+    payload.addVendorOptionalData(ipInfo);
+
+    OptionalQRCodeInfo portInfo;
+    portInfo.tag     = EXAMPLE_VENDOR_TAG_PORT;
+    portInfo.type    = optionalQRCodeInfoTypeInt;
+    portInfo.integer = CONFIG_ECHO_PORT;
+    payload.addVendorOptionalData(portInfo);
+
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
-    uint8_t tlvDataStart[sizeof(ap_ssid)];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, sizeof(tlvDataStart));
+    size_t tlvDataLen = sizeof(ap_ssid) + sizeof(gw_ip);
+    uint8_t tlvDataStart[tlvDataLen];
+    CHIP_ERROR err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Couldn't get payload string %d", generator.payloadBase41Representation(result));

@@ -30,10 +30,17 @@
 // The expected Vendor ID for CHIP demos
 // Spells CHIP on a dialer
 #define EXAMPLE_VENDOR_ID 3447
-#define EXAMPLE_VENDOR_TAG 1
+#define EXAMPLE_VENDOR_TAG_SSID 1
 #define MAX_SSID_LEN 32
 
+#define EXAMPLE_VENDOR_TAG_IP 2
+#define MAX_IP_LEN 46
+#define EXAMPLE_VENDOR_TAG_PORT 3
+
 #define NOT_APPLICABLE_STRING @"N/A"
+
+static NSString * const ipKey = @"ipk";
+static NSString * const portKey = @"pk";
 
 @interface QRCodeViewController ()
 
@@ -166,19 +173,40 @@
     }
     self->_setupPayloadView.hidden = NO;
 
+    NSLog(@"Payload vendorID %@", payload.vendorID);
     if ([payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]]) {
         NSArray * optionalInfo = [payload getAllOptionalData:nil];
+        NSLog(@"Count of payload info %@", @(optionalInfo.count));
         for (CHIPOptionalQRCodeInfo * info in optionalInfo) {
             NSNumber * tag = info.tag;
-            if (tag && tag.unsignedCharValue == EXAMPLE_VENDOR_TAG) {
-                // If the vendor id and tag match the example values, there should be an ssid encoded
-                if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
-                    if ([info.stringValue length] > MAX_SSID_LEN) {
-                        NSLog(@"Unexpected SSID String...");
-                    } else {
-                        // show SoftAP detection
-                        [self RequestConnectSoftAPWithSSID:info.stringValue];
+            if (tag) {
+                switch (tag.unsignedCharValue) {
+                case EXAMPLE_VENDOR_TAG_SSID:
+                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
+                        if ([info.stringValue length] > MAX_SSID_LEN) {
+                            NSLog(@"Unexpected SSID String...");
+                        } else {
+                            // show SoftAP detection
+                            [self RequestConnectSoftAPWithSSID:info.stringValue];
+                        }
                     }
+                    break;
+                case EXAMPLE_VENDOR_TAG_IP:
+                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeString]]) {
+                        if ([info.stringValue length] > MAX_IP_LEN) {
+                            NSLog(@"Unexpected IP String... %@", info.stringValue);
+                        } else {
+                            NSLog(@"Got IP String... %@", info.stringValue);
+                            [[NSUserDefaults standardUserDefaults] setObject:info.stringValue forKey:ipKey];
+                        }
+                    }
+                    break;
+                case EXAMPLE_VENDOR_TAG_PORT:
+                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt]]) {
+                        NSLog(@"Got Port number... %@", info.integerValue);
+                        [[NSUserDefaults standardUserDefaults] setInteger:info.integerValue.integerValue forKey:portKey];
+                    }
+                    break;
                 }
             }
         }
