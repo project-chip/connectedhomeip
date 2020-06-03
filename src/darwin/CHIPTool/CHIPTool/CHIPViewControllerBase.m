@@ -76,7 +76,7 @@ static const NSString *portKey = @"pk";
                                              selector:@selector(_appEnteringForeground:)
                                                  name:UISceneWillEnterForegroundNotification
                                                object:nil];
-    
+
     BOOL shouldHide = NO;
     if ([[self _getScannedIP] length] > 0 && [self _getScannedPort] > 0)
     {
@@ -106,11 +106,11 @@ static const NSString *portKey = @"pk";
 - (void)_connect
 {
     NSError * error;
-    
-    
+
+
     NSString * inputIPAddress = [[self _getScannedIP] length] > 0 ? [self _getScannedIP] : self.serverIPTextField.text;
     UInt16 inputPort =  [self _getScannedPort] > 0 ? [self _getScannedPort] : [self.serverPortTextField.text intValue];
-    
+
     BOOL didConnect = [self.chipController connect:inputIPAddress
         port:inputPort
         error:&error

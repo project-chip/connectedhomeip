@@ -48,7 +48,7 @@
 // Used to indicate that an SSID has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_SSID 1
 
-#define EXAMPLE_VENDOR_TAG_IP 2 
+#define EXAMPLE_VENDOR_TAG_IP 2
 #define MAX_IP_LEN 15
 
 #if CONFIG_HAVE_DISPLAY
@@ -80,7 +80,7 @@ void GetAPName(char * ssid, size_t ssid_len)
 
 void GetGatewayIP(char *ip_buf, size_t ip_len)
 {
-    
+
     tcpip_adapter_ip_info_t ip;
     tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
     IPAddress::FromIPv4(ip.ip).ToString(ip_buf, ip_len);
@@ -95,8 +95,8 @@ string createSetupPayload()
     payload.version   = 1;
     payload.vendorID  = EXAMPLE_VENDOR_ID;
     payload.productID = 1;
-    
-    
+
+
     OptionalQRCodeInfo ssidInfo;
     ssidInfo.tag  = EXAMPLE_VENDOR_TAG_SSID;
     ssidInfo.type = optionalQRCodeInfoTypeString;

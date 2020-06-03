@@ -33,7 +33,7 @@
 #define EXAMPLE_VENDOR_TAG_SSID 1
 #define MAX_SSID_LEN 32
 
-#define EXAMPLE_VENDOR_TAG_IP 2 
+#define EXAMPLE_VENDOR_TAG_IP 2
 #define MAX_IP_LEN 15
 
 
@@ -173,7 +173,7 @@ static const NSString *portKey = @"pk";
         self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];
     }
     self->_setupPayloadView.hidden = NO;
-    
+
     NSLog(@"Payload vendorID %@", payload.vendorID);
     if ([payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]]) {
         NSArray * optionalInfo = [payload getAllOptionalData:nil];
