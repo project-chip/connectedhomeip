@@ -20,19 +20,23 @@
 # a command presented as arguments
 #
 # This file can also be used as an executable
-me=${0##*/}
-die() {
+
+error() {
     echo "$me: *** ERROR: " "${*}"
-    return 1
 }
 idf() {
-    [[ -d $IDF_PATH && -r $IDF_PATH/export.sh ]] || die "can't find IDF's export.sh, please set IDF_PATH"
+    [[ -d $IDF_PATH && -r $IDF_PATH/export.sh ]] || {
+        error "can't find IDF's export.sh, please set IDF_PATH"
+        return 1
+    }
     . "$IDF_PATH/export.sh"
     export IDF_PATH
     "$@"
 }
 if [[ ${0} == ${BASH_SOURCE[0]} ]]; then
+    me=${0##*/}
     idf "${@}"
 else
+    me=idf
     [[ $PS1 =~ \[idf\].* ]] || PS1="[idf]$PS1"
 fi
