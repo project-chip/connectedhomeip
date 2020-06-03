@@ -220,9 +220,9 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
     };
     chipZclEncodeZclHeader(zcl_buffer, &ctx);
 
+#ifdef DEBUG
     const size_t data_len = chipZclBufferDataLength(zcl_buffer);
 
-#ifdef DEBUG
     fprintf(stderr, "SENDING: %zu ", data_len);
     for (size_t i = 0; i < data_len; ++i)
     {
