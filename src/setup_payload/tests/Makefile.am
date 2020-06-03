@@ -87,15 +87,6 @@ COMMON_LDADD                                           = \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                    \
     $(NULL)
 
-PHONY: debugging
-
-debugging:
-	ls -l $(top_srcdir)/src/setup_payload/Base41.cpp TestQRCode.o
-	strings TestQRCode.o | grep 96 # this needs to be in there
-	strings TestQRCode.o | grep A6 # this needs to be in there, new test
-
-TestQRCode: debugging
-
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \
