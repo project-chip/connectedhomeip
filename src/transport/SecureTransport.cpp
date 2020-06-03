@@ -26,25 +26,20 @@
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/UdpTransport.h>
+#include <transport/SecureTransport.h>
 
 #include <inttypes.h>
 
 namespace chip {
 
-UdpTransport::UdpTransport() : mState(kState_NotReady), mRefCount(1)
+SecureTransport::SecureTransport() : mState(kState_NotReady), mRefCount(1)
 {
-    mState            = kState_NotReady;
-    mRefCount         = 1;
     mUDPEndPoint      = NULL;
-    mRefCount         = 1;
     OnMessageReceived = NULL;
     OnReceiveError    = NULL;
-    mPeerAddr         = IPAddress::Any;
-    mPeerPort         = 0;
 }
 
-void UdpTransport::Init(Inet::InetLayer * inetLayer)
+void SecureTransport::Init(Inet::InetLayer * inetLayer)
 {
     if (mState != kState_NotReady)
     {
@@ -56,14 +51,26 @@ void UdpTransport::Init(Inet::InetLayer * inetLayer)
 
 } // namespace chip
 
-CHIP_ERROR UdpTransport::Connect(const IPAddress & peerAddr, uint16_t peerPort)
+CHIP_ERROR SecureTransport::ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
+                                              const unsigned char * local_private_key, const size_t private_key_length)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == kState_Connected, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = mSecureChannel.Init(remote_public_key, public_key_length, local_private_key, private_key_length,
+                              (const unsigned char *) "", 0, (const unsigned char *) "", 0);
+    SuccessOrExit(err);
+    mState = kState_Connected;
+exit:
+    return err;
+}
+
+CHIP_ERROR SecureTransport::Connect(IPAddressType addrType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == kState_ReadyToConnect, err = CHIP_ERROR_INCORRECT_STATE);
-
-    mPeerAddr = peerAddr;
-    mPeerPort = (peerPort != 0) ? peerPort : CHIP_PORT;
 
     // Bump the reference count when we start the connection process. The corresponding decrement happens when the
     // DoClose() method is called. This ensures the object stays live while there's the possibility of a callback
@@ -71,62 +78,66 @@ CHIP_ERROR UdpTransport::Connect(const IPAddress & peerAddr, uint16_t peerPort)
     mRefCount++;
 
     ChipLogProgress(Inet, "Connection start");
-    err = DoConnect();
-exit:
-    return err;
-}
-
-CHIP_ERROR UdpTransport::DoConnect()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = mInetLayer->NewUDPEndPoint(&mUDPEndPoint);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Inet, "Error: %s\n Couldn't create connection\n", ErrorStr(err));
-        return err;
+        SuccessOrExit(err);
     }
 
-    err = mUDPEndPoint->Bind(mPeerAddr.Type(), IPAddress::Any, CHIP_PORT);
+    err = mUDPEndPoint->Bind(addrType, IPAddress::Any, CHIP_PORT);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Inet, "Error: %s\n Bind failed\n", ErrorStr(err));
-        return err;
+        SuccessOrExit(err);
     }
 
     err = mUDPEndPoint->Listen();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Inet, "Error: %s\n Listen failed\n", ErrorStr(err));
-        return err;
+        SuccessOrExit(err);
     }
 
     mUDPEndPoint->AppState          = this;
     mUDPEndPoint->OnMessageReceived = HandleDataReceived;
     mUDPEndPoint->OnReceiveError    = HandleReceiveError;
-
-#if CHIP_PROGRESS_LOGGING
-    {
-        char ipAddrStr[64];
-        mPeerAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
-        ChipLogProgress(Inet, "Connection started %s %d", ipAddrStr, (int) mPeerPort);
-    }
-#endif
-    mState = kState_Connected;
-
+    mState                          = kState_Connected;
+exit:
     return err;
 }
 
-CHIP_ERROR UdpTransport::SendMessage(PacketBuffer * msgBuf)
+CHIP_ERROR SecureTransport::SendMessage(PacketBuffer * msgBuf, const IPAddress & peerAddr, uint32_t msg_id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(StateAllowsSend(), err = CHIP_ERROR_INCORRECT_STATE);
 
+    VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msgBuf->Next() == NULL, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(msgBuf->TotalLength() < 1024, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
     IPPacketInfo addrInfo;
     addrInfo.Clear();
-    addrInfo.DestAddress = mPeerAddr;
-    addrInfo.DestPort    = mPeerPort;
+    addrInfo.DestAddress = peerAddr;
+    addrInfo.DestPort    = CHIP_PORT;
+
+    {
+        uint8_t * plain_text    = msgBuf->Start();
+        uint16_t plain_text_len = msgBuf->DataLength();
+
+        uint8_t * encrypted_text = plain_text - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        uint16_t encrypted_len   = plain_text_len + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+
+        err = mSecureChannel.Encrypt(plain_text, plain_text_len, encrypted_text, encrypted_len);
+        SuccessOrExit(err);
+
+        msgBuf->SetStart(encrypted_text);
+        msgBuf->SetDataLength(encrypted_len, msgBuf);
+
+        ChipLogProgress(Inet, "Secure transport transmitting msg %d after encryption", msg_id);
+    }
 
     err    = mUDPEndPoint->SendMsg(&addrInfo, msgBuf);
     msgBuf = NULL;
@@ -134,6 +145,7 @@ CHIP_ERROR UdpTransport::SendMessage(PacketBuffer * msgBuf)
 exit:
     if (msgBuf != NULL)
     {
+        ChipLogProgress(Inet, "Secure transport failed to encrypt msg %d", msg_id);
         PacketBuffer::Free(msgBuf);
         msgBuf = NULL;
     }
@@ -141,37 +153,51 @@ exit:
     return err;
 }
 
-void UdpTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg, const IPPacketInfo * pktInfo)
+void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg, const IPPacketInfo * pktInfo)
 {
-    UDPEndPoint * udpEndPoint = static_cast<UDPEndPoint *>(endPoint);
-    UdpTransport * connection = (UdpTransport *) udpEndPoint->AppState;
+    UDPEndPoint * udpEndPoint    = static_cast<UDPEndPoint *>(endPoint);
+    SecureTransport * connection = (SecureTransport *) udpEndPoint->AppState;
 
-    // TODO this where where messages should be decoded
+    // TODO this is where messages should be decoded
     if (connection->StateAllowsReceive() && msg != NULL)
     {
-        connection->OnMessageReceived(connection, msg, pktInfo);
+        uint8_t * encrypted_text = msg->Start();
+        uint16_t encrypted_len   = msg->DataLength();
+
+        uint8_t * plain_text  = encrypted_text + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        size_t plain_text_len = encrypted_len - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+
+        CHIP_ERROR err = connection->mSecureChannel.Decrypt(encrypted_text, encrypted_len, plain_text, plain_text_len);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            msg->SetStart(plain_text);
+            msg->SetDataLength(plain_text_len, msg);
+
+            connection->OnMessageReceived(connection, msg, pktInfo);
+        }
     }
 }
 
-void UdpTransport::HandleReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo)
+void SecureTransport::HandleReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo)
 {
-    UDPEndPoint * udpEndPoint = static_cast<UDPEndPoint *>(endPoint);
-    UdpTransport * connection = (UdpTransport *) udpEndPoint->AppState;
+    UDPEndPoint * udpEndPoint    = static_cast<UDPEndPoint *>(endPoint);
+    SecureTransport * connection = (SecureTransport *) udpEndPoint->AppState;
     if (connection->StateAllowsReceive())
     {
         connection->OnReceiveError(connection, err, pktInfo);
     }
 }
 /**
- *  Performs a non-blocking graceful close of the UDP based UdpTransport, delivering any
+ *  Performs a non-blocking graceful close of the UDP based SecureTransport, delivering any
  *  remaining outgoing data before resetting the connection.
  *
  *  This method provides no strong guarantee that any outgoing message not acknowledged at the application
  *  protocol level has been received by the remote peer.
  *
- *  Once Close() has been called, the UdpTransport object can no longer be used for further communication.
+ *  Once Close() has been called, the SecureTransport object can no longer be used for further communication.
  *
- *  Calling Close() decrements the reference count associated with the UdpTransport object, whether or not
+ *  Calling Close() decrements the reference count associated with the SecureTransport object, whether or not
  *  the connection is open/active at the time the method is called.  If this results in the reference count
  *  reaching zero, the resources associated with the connection object are freed.  When this happens, the
  *  application must have no further interactions with the object.
@@ -181,12 +207,12 @@ void UdpTransport::HandleReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR err
  *  @return #CHIP_NO_ERROR unconditionally.
  *
  */
-CHIP_ERROR UdpTransport::Close()
+CHIP_ERROR SecureTransport::Close()
 {
     // Perform a graceful close.
     DoClose(CHIP_NO_ERROR);
 
-    // Decrement the ref count that was added when the UdpTransport object
+    // Decrement the ref count that was added when the SecureTransport object
     // was allocated.
     VerifyOrDie(mRefCount != 0);
     mRefCount--;
@@ -194,7 +220,7 @@ CHIP_ERROR UdpTransport::Close()
     return CHIP_NO_ERROR;
 }
 
-void UdpTransport::DoClose(CHIP_ERROR err)
+void SecureTransport::DoClose(CHIP_ERROR err)
 {
     if (mState != kState_Closed)
     {
@@ -221,26 +247,26 @@ void UdpTransport::DoClose(CHIP_ERROR err)
 }
 
 /**
- * Reserve a reference to the UdpTransport object.
+ * Reserve a reference to the SecureTransport object.
  *
- * The Retain() method increments the reference count associated with the UdpTransport object.  For every
+ * The Retain() method increments the reference count associated with the SecureTransport object.  For every
  * call to Retain(), the application is responsible for making a corresponding call to either Release(), Close()
  * or Abort().
  */
-void UdpTransport::Retain()
+void SecureTransport::Retain()
 {
     VerifyOrDie(mRefCount < UINT8_MAX);
     ++mRefCount;
 }
 
 /**
- *  Decrement the reference count on the UdpTransport object.
+ *  Decrement the reference count on the SecureTransport object.
  *
- *  The Release() method decrements the reference count associated with the UdpTransport object.  If
+ *  The Release() method decrements the reference count associated with the SecureTransport object.  If
  *  this results in the reference count reaching zero, the connection is closed and the connection object
  *  is freed.  When this happens, the application must have no further interactions with the object.
  */
-void UdpTransport::Release()
+void SecureTransport::Release()
 {
     // If the only reference that will remain after this call is the one that was automatically added
     // when the connection started, close the connection.

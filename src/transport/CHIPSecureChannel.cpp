@@ -69,6 +69,12 @@ exit:
     return error;
 }
 
+void ChipSecureChannel::Close(void)
+{
+    mKeyAvailable = false;
+    mNextIV       = 0;
+}
+
 CHIP_ERROR ChipSecureChannel::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output,
                                       size_t output_length)
 {

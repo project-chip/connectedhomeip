@@ -34,10 +34,10 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
-#include <inet/UDPEndPoint.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SecureTransport.h>
 
 #include "DataModelHandler.h"
 
@@ -48,10 +48,10 @@ static const char * TAG = "echo_server";
 using namespace ::chip;
 using namespace ::chip::Inet;
 
-// UDP Endpoint Callbacks
-static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, const IPPacketInfo * packet_info)
+// Transport Callbacks
+static void echo(SecureTransport * transport, System::PacketBuffer * buffer, const IPPacketInfo * packet_info)
 {
-    bool status = endpoint != NULL && buffer != NULL && packet_info != NULL;
+    bool status = transport != NULL && buffer != NULL && packet_info != NULL;
 
     if (status)
     {
@@ -79,9 +79,8 @@ static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, cons
         ESP_LOGI(TAG, "Client sent: \"%s\"", msg_buffer);
 
         // Attempt to echo back
-        UDPEndPoint * udp_endpoint = static_cast<UDPEndPoint *>(endpoint);
-        INET_ERROR err             = udp_endpoint->SendTo(packet_info->SrcAddress, packet_info->SrcPort, buffer);
-        if (err != INET_NO_ERROR)
+        CHIP_ERROR err = transport->SendMessage(buffer, packet_info->SrcAddress);
+        if (err != CHIP_NO_ERROR)
         {
             ESP_LOGE(TAG, "Unable to echo back to client: %s", ErrorStr(err));
             // Note the failure status
@@ -105,37 +104,43 @@ static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, cons
     }
 }
 
-static void error(IPEndPointBasis * ep, INET_ERROR error, const IPPacketInfo * pi)
+static void error(SecureTransport * ep, CHIP_ERROR error, const IPPacketInfo * pi)
 {
     ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
 }
 
+static const unsigned char local_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
+                                                                  0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
+                                                                  0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
+
+static const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 0x0a, 0xf2, 0xf3, 0x19, 0xbd,
+                                                                 0xfb, 0x1f, 0xcc, 0x88, 0xd9, 0x83, 0x25, 0x89, 0xf2, 0x09, 0xf3,
+                                                                 0xab, 0xe4, 0x33, 0xb6, 0x7a, 0xff, 0x73, 0x3b, 0x01, 0x35, 0x34,
+                                                                 0x92, 0x73, 0x14, 0x59, 0x0b, 0xbd, 0x44, 0x72, 0x1b, 0xcd, 0xb9,
+                                                                 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae, 0xe8, 0x87, 0x2e,
+                                                                 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
+
 // The echo server assumes the platform's networking has been setup already
-void startServer(UDPEndPoint *& endpoint)
+void startServer(SecureTransport * transport)
 {
     ESP_LOGI(TAG, "Trying to get Inet");
-    INET_ERROR err = DeviceLayer::InetLayer.NewUDPEndPoint(&endpoint);
-    if (err != INET_NO_ERROR)
+    transport->Init(&DeviceLayer::InetLayer);
+    CHIP_ERROR err = transport->Connect(kIPAddressType_IPv4);
+    if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "ERROR: %s\n Couldn't create UDP Endpoint, server will not start.", ErrorStr(err));
+        ESP_LOGE(TAG, "ERROR: %s\n Couldn't create transport, server will not start.", ErrorStr(err));
         return;
     }
 
-    endpoint->OnMessageReceived = echo;
-    endpoint->OnReceiveError    = error;
+    transport->OnMessageReceived = echo;
+    transport->OnReceiveError    = error;
 
-    err = endpoint->Bind(kIPAddressType_IPv4, IPAddress::Any, PORT);
-    if (err != INET_NO_ERROR)
+    err = transport->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Socket unable to bind: Error %s", ErrorStr(err));
+        ESP_LOGE(TAG, "ERROR: %s\n Couldn't establish security keys.", ErrorStr(err));
         return;
     }
 
-    err = endpoint->Listen();
-    if (err != INET_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Socket unable to Listen: Error %s", ErrorStr(err));
-        return;
-    }
     ESP_LOGI(TAG, "Echo Server Listening on PORT:%d...", PORT);
 }
