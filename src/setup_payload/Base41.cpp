@@ -40,7 +40,7 @@ static const char codes[]        = { '0', '1', '2', '3', '4', '5', '6', '7', '8'
                               'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '*', '+', '-', '.' };
 static const int kBase41ChunkLen = 3;
 static const int kBytesChunkLen  = 2;
-static const int radix           = sizeof(codes) / sizeof(codes[0]);
+static const int kRadix          = sizeof(codes) / sizeof(codes[0]);
 
 string base41Encode(const uint8_t * buf, size_t buf_len)
 {
@@ -55,8 +55,8 @@ string base41Encode(const uint8_t * buf, size_t buf_len)
 
         for (int _ = 0; _ < kBase41ChunkLen; _++)
         {
-            result += codes[next % radix];
-            next /= radix;
+            result += codes[next % kRadix];
+            next /= kRadix;
         }
         buf += kBytesChunkLen;
         buf_len -= kBytesChunkLen;
@@ -67,8 +67,8 @@ string base41Encode(const uint8_t * buf, size_t buf_len)
         int next = buf[0];
         for (int _ = 0; _ < kBase41ChunkLen - 1; _++)
         {
-            result += codes[next % radix];
-            next /= radix;
+            result += codes[next % kRadix];
+            next /= kRadix;
         }
     }
     return result;
@@ -177,13 +177,14 @@ CHIP_ERROR base41Decode(string base41, vector<uint8_t> & result)
                 return err;
             }
 
-            value *= radix;
+            value *= kRadix;
             value += v;
         }
 
         result.push_back(value % 256);
         result.push_back(value / 256);
     }
+
     if (base41.length() % kBase41ChunkLen == kBase41ChunkLen - 1)
     {
         int i          = base41.length() - (kBase41ChunkLen - 1);
@@ -199,10 +200,13 @@ CHIP_ERROR base41Decode(string base41, vector<uint8_t> & result)
                 return err;
             }
 
-            value *= radix;
+            value *= kRadix;
             value += v;
         }
-
+        if (value > 255)
+        {
+            return CHIP_ERROR_INVALID_INTEGER_VALUE;
+        }
         result.push_back(value);
     }
     return CHIP_NO_ERROR;
