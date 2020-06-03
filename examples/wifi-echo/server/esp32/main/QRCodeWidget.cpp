@@ -47,8 +47,10 @@
 #define EXAMPLE_VENDOR_ID 3447
 // Used to indicate that an SSID has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_SSID 1
-
+// Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 2
+// Used to indicate that a Port has been added to the QRCode
+#define EXAMPLE_VENDOR_TAG_PORT 3
 
 #if CONFIG_HAVE_DISPLAY
 
@@ -108,6 +110,12 @@ string createSetupPayload()
     ipInfo.type = optionalQRCodeInfoTypeString;
     ipInfo.data = gw_ip;
     payload.addVendorOptionalData(ipInfo);
+
+    OptionalQRCodeInfo portInfo;
+    portInfo.tag     = EXAMPLE_VENDOR_TAG_PORT;
+    portInfo.type    = optionalQRCodeInfoTypeInt;
+    portInfo.integer = CONFIG_ECHO_PORT;
+    payload.addVendorOptionalData(portInfo);
 
     QRCodeSetupPayloadGenerator generator(payload);
     string result;

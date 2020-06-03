@@ -35,6 +35,7 @@
 
 #define EXAMPLE_VENDOR_TAG_IP 2
 #define MAX_IP_LEN 46
+#define EXAMPLE_VENDOR_TAG_PORT 3
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
@@ -197,10 +198,15 @@ static NSString * const portKey = @"pk";
                         } else {
                             NSLog(@"Got IP String... %@", info.stringValue);
                             [[NSUserDefaults standardUserDefaults] setObject:info.stringValue forKey:ipKey];
-                            [[NSUserDefaults standardUserDefaults] setInteger:8000 forKey:portKey];
                         }
                     }
                     break;
+                    case EXAMPLE_VENDOR_TAG_PORT:
+                        if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt]]) {
+                            NSLog(@"Got Port number... %@", info.integerValue);
+                            [[NSUserDefaults standardUserDefaults] setInteger:info.integerValue.integerValue forKey:portKey];
+                        }
+                        break;
                 }
             }
         }
