@@ -134,10 +134,12 @@ static NSString * const portKey = @"pk";
     NSString * inputIPAddress = self.serverIPTextField.text;
     UInt16 inputPort = [self.serverPortTextField.text intValue];
     BOOL needsReconnect = NO;
+    // Don't rely on the text fields if we have scanned connection info from a QRCode
+    BOOL hasScannedConnectionInfo = ([[self _getScannedIP] length] > 0 && [self _getScannedPort] > 0);
 
     // check the addr of the connected device
     AddressInfo * addrInfo = [self.chipController getAddressInfo];
-    if (addrInfo) {
+    if (addrInfo && !hasScannedConnectionInfo) {
         // check if the addr changed
         if (![addrInfo.ip isEqualToString:inputIPAddress] || addrInfo.port != inputPort) {
             NSError * error;
