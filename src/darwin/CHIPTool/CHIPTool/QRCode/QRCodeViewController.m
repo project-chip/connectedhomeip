@@ -34,7 +34,7 @@
 #define MAX_SSID_LEN 32
 
 #define EXAMPLE_VENDOR_TAG_IP 2
-#define MAX_IP_LEN 15
+#define MAX_IP_LEN 46
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
@@ -202,7 +202,6 @@ static NSString * const portKey = @"pk";
                     }
                     break;
                 }
-                // If the vendor id and tag match the example values, there should be an ssid encoded
             }
         }
     }
