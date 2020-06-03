@@ -135,7 +135,8 @@ static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataSta
     SuccessOrExit(err);
     {
         TLVReader innerStructureReader;
-        err = openTLVContainer(rootReader, kTLVType_Structure, ProfileTag(2, 1), innerStructureReader);
+        err = openTLVContainer(rootReader, kTLVType_Structure, ProfileTag(outPayload.productID, kTag_QRCodeExensionDescriptor),
+                               innerStructureReader);
         SuccessOrExit(err);
         err = innerStructureReader.Next();
         while (err == CHIP_NO_ERROR)

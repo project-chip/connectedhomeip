@@ -123,10 +123,11 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
+    rootWriter.ImplicitProfileId = outPayload.productID;
 
     TLVWriter innerStructureWritter;
 
-    err = rootWriter.OpenContainer(ProfileTag(2, 1), kTLVType_Structure,
+    err = rootWriter.OpenContainer(ProfileTag(outPayload.productID, kTag_QRCodeExensionDescriptor), kTLVType_Structure,
                                    innerStructureWritter); // TODO: Remove outer nest of QR code TLV encoding #728
     SuccessOrExit(err);
 
