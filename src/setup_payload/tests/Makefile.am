@@ -91,6 +91,8 @@ PHONY: debugging
 
 debugging:
 	ls -l $(top_srcdir)/src/setup_payload/Base41.cpp TestQRCode.o
+	strings TestQRCode.o | grep 96 # this needs to be in there
+	strings TestQRCode.o | grep A6 # this needs to be in there, new test
 
 TestQRCode: debugging
 
