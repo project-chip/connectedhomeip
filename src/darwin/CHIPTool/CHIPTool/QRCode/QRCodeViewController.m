@@ -201,12 +201,12 @@ static NSString * const portKey = @"pk";
                         }
                     }
                     break;
-                    case EXAMPLE_VENDOR_TAG_PORT:
-                        if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt]]) {
-                            NSLog(@"Got Port number... %@", info.integerValue);
-                            [[NSUserDefaults standardUserDefaults] setInteger:info.integerValue.integerValue forKey:portKey];
-                        }
-                        break;
+                case EXAMPLE_VENDOR_TAG_PORT:
+                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt]]) {
+                        NSLog(@"Got Port number... %@", info.integerValue);
+                        [[NSUserDefaults standardUserDefaults] setInteger:info.integerValue.integerValue forKey:portKey];
+                    }
+                    break;
                 }
             }
         }
