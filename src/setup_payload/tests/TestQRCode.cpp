@@ -191,7 +191,6 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, decoded.size() == 1);
     NL_TEST_ASSERT(
         inSuite, base41Decode("A6", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE); // this is 256, something we should never encode
-    NL_TEST_ASSERT(inSuite, decoded.size() == 1);
 }
 
 void TestBitsetLen(nlTestSuite * inSuite, void * inContext)
