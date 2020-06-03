@@ -49,7 +49,6 @@
 #define EXAMPLE_VENDOR_TAG_SSID 1
 
 #define EXAMPLE_VENDOR_TAG_IP 2
-#define MAX_IP_LEN 15
 
 #if CONFIG_HAVE_DISPLAY
 
@@ -102,7 +101,7 @@ string createSetupPayload()
     ssidInfo.data = ap_ssid;
     payload.addVendorOptionalData(ssidInfo);
 
-    char gw_ip[MAX_IP_LEN];
+    char gw_ip[INET6_ADDRSTRLEN];
     GetGatewayIP(gw_ip, sizeof(gw_ip));
     OptionalQRCodeInfo ipInfo;
     ipInfo.tag  = EXAMPLE_VENDOR_TAG_IP;
