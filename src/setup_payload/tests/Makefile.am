@@ -86,7 +86,14 @@ COMMON_LDADD                                           = \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                   \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                    \
     $(NULL)
-    
+
+PHONY: debugging
+
+debugging:
+	ls -l $(top_srcdir)/src/setup_payload/Base41.cpp TestQRCode.o
+
+TestQRCode: debugging
+
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \

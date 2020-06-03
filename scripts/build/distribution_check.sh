@@ -1,3 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-make -C build/default distcheck
+env
+
+make V=1 -C build/default distcheck

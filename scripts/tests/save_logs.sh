@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+env
 
 TARGET_DIR=$1
 

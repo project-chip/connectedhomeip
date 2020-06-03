@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+env
 
 set -x
 apt-get update

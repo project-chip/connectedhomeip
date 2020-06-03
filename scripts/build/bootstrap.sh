@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+env
 
 if [[ ! -f build/default/config.status ]]; then
     mkdir -p build/default
