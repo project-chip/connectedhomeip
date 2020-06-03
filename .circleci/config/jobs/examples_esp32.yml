@@ -18,6 +18,9 @@ steps:
               scripts/helpers/bloat-check.sh   \
                   'Build Examples [ESP32]'     \
                   example_binaries/esp32-build \
-                  master_binaries/esp32-build
+                  master_binaries/esp32-build  \
+                  bloat_report.txt
     - store_artifacts:
           path: example_binaries/esp32-build
+    - store_artifacts:
+          path: bloat_report.txt

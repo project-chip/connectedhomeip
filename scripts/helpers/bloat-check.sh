@@ -5,6 +5,7 @@ set -x
 JOBNAME=$1
 SOURCEDIR=$2
 OUTPUTDIR=$3
+REPORTFILE=$4
 
 mkdir -p ${OUTPUTDIR}
 scripts/helpers/ci-fetch-artifacts.py \
@@ -12,11 +13,10 @@ scripts/helpers/ci-fetch-artifacts.py \
     --job "${JOBNAME}" \
     --download-dir "${OUTPUTDIR}"
 
+echo "BLOAT REPORT" >${REPORTFILE}
+
 for masterbinary in ${OUTPUTDIR}/*; do
     newbinary=${SOURCEDIR}/$(basename $masterbinary)
-    echo "Checking $newbinary against $masterbinary"
-    echo "Size difference:"
-    bloaty $newbinary -- $masterbinary
-    echo "Largest symbols information:"
-    bloaty -d symbols -C short $newbinary | head -n 20
+    echo "Checking $newbinary against $masterbinary" >${REPORTFILE}
+    bloaty $newbinary -- $masterbinary >${REPORTFILE}
 done

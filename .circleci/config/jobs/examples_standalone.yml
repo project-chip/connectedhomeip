@@ -1,26 +1,36 @@
 parameters:
-    builder:
-        type: string
+      builder:
+            type: string
 environment:
-    BUILD_TYPE: "<< parameters.builder >>"
+      BUILD_TYPE: "<< parameters.builder >>"
 executor: << parameters.builder >>
 steps:
-    - load-built-tree:
-          builder: << parameters.builder >>
-    - load-build-environment:
-          builder: << parameters.builder >>
-    - load-persistent-ci-cache:
-          builder: << parameters.builder >>
-    - setup-environment:
-          builder: << parameters.builder >>
-    - run:
-          name: Build example Standalone Echo Client
-          command: scripts/examples/standalone_echo_client.sh
-    - run:
-          name: Preserve artifacts
-          command: |
-              mkdir -p example_binaries/<<parameters.builder>>
-              cp examples/chip-tool/build/chip-standalone-demo.out \
-                 example_binaries/<<parameters.builder>>/chip-standalone-demo.out
-    - store_artifacts:
-          path: example_binaries/<<parameters.builder>>
+      - load-built-tree:
+              builder: << parameters.builder >>
+      - load-build-environment:
+              builder: << parameters.builder >>
+      - load-persistent-ci-cache:
+              builder: << parameters.builder >>
+      - setup-environment:
+              builder: << parameters.builder >>
+      - run:
+              name: Build example Standalone Echo Client
+              command: scripts/examples/standalone_echo_client.sh
+      - run:
+              name: Preserve artifacts
+              command: |
+                    mkdir -p example_binaries/<<parameters.builder>>
+                    cp examples/chip-tool/build/chip-standalone-demo.out \
+                       example_binaries/<<parameters.builder>>/chip-standalone-demo.out
+      - run:
+              name: Bloat check
+              command: |
+                    scripts/helpers/bloat-check.sh   \
+                        'Build Examples [<< parameters.builder >>]' \
+                        example_binaries/<<parameters.builder>>     \
+                        master_binaries/<<parameters.builder>>      \
+                        bloat_report.txt
+      - store_artifacts:
+              path: example_binaries/<<parameters.builder>>
+      - store_artifacts:
+              path: bloat_report.txt

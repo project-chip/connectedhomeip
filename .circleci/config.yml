@@ -60,8 +60,18 @@ jobs:
           cp examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out \
              example_binaries/nrf-build/chip-nrf52840-lock-example.out
         name: Preserve artifacts
+    - run:
+        command: |
+          scripts/helpers/bloat-check.sh   \
+              'Build Examples [nRF]'     \
+              example_binaries/esp32-build \
+              master_binaries/esp32-build  \
+              bloat_report.txt
+        name: Bloat check
     - store_artifacts:
         path: example_binaries/nrf-build
+    - store_artifacts:
+        path: bloat_report.txt
   Deploy [main-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.13
@@ -104,8 +114,18 @@ jobs:
           cp examples/chip-tool/build/chip-standalone-demo.out \
              example_binaries/main-build/chip-standalone-demo.out
         name: Preserve artifacts
+    - run:
+        command: |
+          scripts/helpers/bloat-check.sh   \
+              'Build Examples [main-build]' \
+              example_binaries/main-build     \
+              master_binaries/main-build      \
+              bloat_report.txt
+        name: Bloat check
     - store_artifacts:
         path: example_binaries/main-build
+    - store_artifacts:
+        path: bloat_report.txt
   Run Tests [ESP32-QEMU]:
     docker:
     - image: connectedhomeip/chip-build-esp32-qemu:0.2.13
@@ -281,10 +301,13 @@ jobs:
           scripts/helpers/bloat-check.sh   \
               'Build Examples [ESP32]'     \
               example_binaries/esp32-build \
-              master_binaries/esp32-build
+              master_binaries/esp32-build  \
+              bloat_report.txt
         name: Bloat check
     - store_artifacts:
         path: example_binaries/esp32-build
+    - store_artifacts:
+        path: bloat_report.txt
   Run Tests [clang-build]:
     docker:
     - image: connectedhomeip/chip-build:0.2.13

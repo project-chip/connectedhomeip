@@ -12,5 +12,15 @@ steps:
               mkdir -p example_binaries/nrf-build
               cp examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out \
                  example_binaries/nrf-build/chip-nrf52840-lock-example.out
+    - run:
+          name: Bloat check
+          command: |
+              scripts/helpers/bloat-check.sh   \
+                  'Build Examples [nRF]'     \
+                  example_binaries/esp32-build \
+                  master_binaries/esp32-build  \
+                  bloat_report.txt
     - store_artifacts:
           path: example_binaries/nrf-build
+    - store_artifacts:
+          path: bloat_report.txt
