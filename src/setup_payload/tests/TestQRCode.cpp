@@ -96,7 +96,7 @@ string toBinaryRepresentation(string base41Result)
     pos -= kSetupPINCodeFieldLengthInBits;
     binaryResult.insert(pos, " ");
 
-    pos -= kReservedFieldLengthInBits;
+    pos -= kPaddingFieldLengthInBits;
     binaryResult.insert(pos, " ");
 
     return binaryResult;
@@ -112,7 +112,7 @@ void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
     bool didSucceed = err == CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, didSucceed == true);
 
-    string expected = " 0 000000000000000100000000000 10000000 00000001 0 0000000000000001 0000000000001100 101";
+    string expected = " 00000 000000000000000100000000000 000010000000 00000001 0 0000000000000001 0000000000001100 101";
     NL_TEST_ASSERT(inSuite, toBinaryRepresentation(result) == expected);
 }
 
@@ -126,7 +126,7 @@ void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
     bool didSucceed = err == CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, didSucceed == true);
 
-    string expected = "CH:J20800G00HKJ000";
+    string expected = "CH:J20800G0080080000";
     NL_TEST_ASSERT(inSuite, result == expected);
 }
 
@@ -157,7 +157,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
 
     // short input
     NL_TEST_ASSERT(inSuite, base41Decode("A0", decoded) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, decoded.size() == 2);
+    NL_TEST_ASSERT(inSuite, decoded.size() == 1);
 
     // empty == empty
     NL_TEST_ASSERT(inSuite, base41Decode("", decoded) == CHIP_NO_ERROR);

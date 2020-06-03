@@ -269,7 +269,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     SuccessOrExit(err);
     outPayload.setUpPINCode = dest;
 
-    err = readBits(buf, indexToReadFrom, dest, kReservedFieldLengthInBits);
+    err = readBits(buf, indexToReadFrom, dest, kPaddingFieldLengthInBits);
     SuccessOrExit(err);
 
     err = populateTLV(outPayload, buf, indexToReadFrom);

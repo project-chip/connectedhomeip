@@ -32,6 +32,7 @@
 using namespace chip;
 using namespace std;
 
+const uint16_t kSmallBufferSizeInBytes   = 1;
 const uint16_t kDefaultBufferSizeInBytes = 512;
 
 SetupPayload GetDefaultPayload()
@@ -286,7 +287,7 @@ void TestOptionalDataWriteSmallBuffer(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    uint8_t optionalInfo[kTotalPayloadDataSizeInBytes];
+    uint8_t optionalInfo[kSmallBufferSizeInBytes];
     CHIP_ERROR err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
