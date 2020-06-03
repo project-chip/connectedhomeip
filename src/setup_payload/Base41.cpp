@@ -203,8 +203,7 @@ CHIP_ERROR base41Decode(string base41, vector<uint8_t> & result)
             value += v;
         }
 
-        result.push_back(value % 256);
-        result.push_back(value / 256);
+        result.push_back(value);
     }
     return CHIP_NO_ERROR;
 }

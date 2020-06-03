@@ -41,10 +41,10 @@ const int kVendorIDFieldLengthInBits                 = 16;
 const int kProductIDFieldLengthInBits                = 16;
 const int kCustomFlowRequiredFieldLengthInBits       = 1;
 const int kRendezvousInfoFieldLengthInBits           = 8;
-const int kPayloadDiscriminatorFieldLengthInBits     = 8;
+const int kPayloadDiscriminatorFieldLengthInBits     = 12;
 const int kManualSetupDiscriminatorFieldLengthInBits = 4;
 const int kSetupPINCodeFieldLengthInBits             = 27;
-const int kReservedFieldLengthInBits                 = 1;
+const int kPaddingFieldLengthInBits                  = 5;
 
 const int kRendezvousInfoReservedFieldLengthInBits = 4;
 const int kRawVendorTagLengthInBits                = 7;
@@ -55,11 +55,19 @@ const int kManualSetupLongCodeCharLength  = 20;
 const int kManualSetupVendorIdCharLength  = 5;
 const int kManualSetupProductIdCharLength = 5;
 
+// clang-format off
 const int kTotalPayloadDataSizeInBits =
-    (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits + kCustomFlowRequiredFieldLengthInBits +
-     kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits + kSetupPINCodeFieldLengthInBits +
-     kReservedFieldLengthInBits);
-const int kTotalPayloadDataSizeInBytes = (kTotalPayloadDataSizeInBits + 7) / 8;
+    kVersionFieldLengthInBits +
+    kVendorIDFieldLengthInBits +
+    kProductIDFieldLengthInBits +
+    kCustomFlowRequiredFieldLengthInBits +
+    kRendezvousInfoFieldLengthInBits +
+    kPayloadDiscriminatorFieldLengthInBits +
+    kSetupPINCodeFieldLengthInBits +
+    kPaddingFieldLengthInBits;
+// clang-format on
+
+const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 
 const char * const kQRCodePrefix = "CH:";
 
