@@ -26,6 +26,8 @@ RUN set -x \
     wget \
     libmbedtls-dev \
     python-pip \
+    python3 \
+    python3-pip \
     libusb-1.0 \
     libncurses5-dev \
     libncursesw5-dev \
@@ -36,4 +38,5 @@ RUN set -x \
     libglib2.0-dev \
     libpixman-1-dev \
     && rm -rf /var/lib/apt/lists/ \
+    && pip3 install circleci attrs coloredlogs \
     && : # last line
