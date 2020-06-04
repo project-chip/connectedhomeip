@@ -136,7 +136,6 @@ STD_LDFLAGS += $(shell pkg-config --libs openssl)
 # Add CHIP libraries to standard libraries list.
 STD_LIBS += \
     -lCHIP \
-    -lChipCrypto \
     -lInetLayer \
     -lnlfaultinjection \
     -lSystemLayer
@@ -149,7 +148,6 @@ STD_COMPILE_PREREQUISITES += install-chip
 # Add the CHIP libraries as prerequisites for linking the application.
 STD_LINK_PREREQUISITES += \
     $(CHIP_OUTPUT_DIR)/lib/libCHIP.a \
-    $(CHIP_OUTPUT_DIR)/lib/libChipCrypto.a \
     $(CHIP_OUTPUT_DIR)/lib/libInetLayer.a \
     $(CHIP_OUTPUT_DIR)/lib/libnlfaultinjection.a \
     $(CHIP_OUTPUT_DIR)/lib/libSystemLayer.a
