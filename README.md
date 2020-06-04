@@ -1,6 +1,7 @@
 # Connected Home over IP
 
 [![Build Status](https://travis-ci.com/project-chip/connectedhomeip.svg?token=hBypqqXx6Ha9n3zZgyp7&branch=master)](https://travis-ci.com/project-chip/connectedhomeip)
+
 [![codecov](https://codecov.io/gh/project-chip/connectedhomeip/branch/master/graph/badge.svg?token=KP9791CN9W)](https://codecov.io/gh/project-chip/connectedhomeip)
 
 # Getting started with CHIP
