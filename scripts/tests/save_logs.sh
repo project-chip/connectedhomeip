@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -x
+env
 
 TARGET_DIR=$1
 

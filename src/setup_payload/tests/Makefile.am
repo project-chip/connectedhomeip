@@ -86,7 +86,7 @@ COMMON_LDADD                                           = \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                   \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                    \
     $(NULL)
-    
+
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                 = \

@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -x
+env
 
 make -f Makefile-bootstrap repos
 source examples/wifi-echo/server/esp32/idf.sh
