@@ -49,8 +49,8 @@ restylers:
       arguments: []
       include:
           - "**/Dockerfile"
-          - "**/.yml"
-          - "**/.yaml"
+          - "**/*.yml"
+          - "**/*.yaml"
           - "**/*.sh"
           - "**/*.c"
           - "**/*.cc"
@@ -67,7 +67,7 @@ restylers:
           - "**/*.H"
           - "**/*.java"
           - "**/*.js"
-          - "**/.json"
+          - "**/*.json"
           - "**/*.m"
           - "**/*.mm"
     - name: clang-format
