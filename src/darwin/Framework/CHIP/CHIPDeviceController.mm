@@ -54,19 +54,29 @@ static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 // primarily used to not block the work queue
 @property (atomic, readonly) dispatch_queue_t chipSelectQueue;
 // queue used to signal callbacks to the application
-@property (readonly) dispatch_queue_t appCallbackQueue;
-@property (readonly) ControllerOnMessageBlock onMessageHandler;
-@property (readonly) ControllerOnErrorBlock onErrorHandler;
+@property (readwrite) dispatch_queue_t appCallbackQueue;
+@property (readwrite) ControllerOnMessageBlock onMessageHandler;
+@property (readwrite) ControllerOnErrorBlock onErrorHandler;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
 
 @end
 
 @implementation CHIPDeviceController
 
-- (instancetype)initWithCallbackQueue:(dispatch_queue_t)appCallbackQueue
++ (CHIPDeviceController *)sharedController
+{
+    static CHIPDeviceController * controller = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // initialize the device controller
+        controller = [[CHIPDeviceController alloc] init];
+    });
+    return controller;
+}
+
+- (instancetype)init
 {
     if (self = [super init]) {
-        _appCallbackQueue = appCallbackQueue;
         _chipWorkQueue = dispatch_queue_create(CHIP_WORK_QUEUE, DISPATCH_QUEUE_SERIAL);
         if (!_chipWorkQueue) {
             return nil;
@@ -151,11 +161,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 }
 
-- (BOOL)connect:(NSString *)ipAddress
-           port:(UInt16)port
-          error:(NSError * __autoreleasing *)error
-      onMessage:(ControllerOnMessageBlock)onMessage
-        onError:(ControllerOnErrorBlock)onError
+- (BOOL)connect:(NSString *)ipAddress port:(UInt16)port error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -176,14 +182,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
         return NO;
-    }
-
-    // Set the callback handlers
-    if (onMessage) {
-        _onMessageHandler = onMessage;
-    }
-    if (onError) {
-        _onErrorHandler = onError;
     }
 
     // Start the IO pump
@@ -353,12 +351,11 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 }
 
-- (void)dealloc
+- (void)registerCallbacks:appCallbackQueue onMessage:(ControllerOnMessageBlock)onMessage onError:(ControllerOnErrorBlock)onError
 {
-    // no more references to this object so immediately stop the inner controller
-    _cppController->Shutdown();
-    delete _cppController;
-    _cppController = NULL;
+    self.appCallbackQueue = appCallbackQueue;
+    self.onMessageHandler = onMessage;
+    self.onErrorHandler = onError;
 }
 
 @end

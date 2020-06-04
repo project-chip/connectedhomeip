@@ -60,9 +60,20 @@ static NSString * const portKey = @"pk";
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
-    self.chipCallbackQueue = dispatch_queue_create("com.zigbee.chip.example.callback", DISPATCH_QUEUE_SERIAL);
     // initialize the device controller
-    self.chipController = [[CHIPDeviceController alloc] initWithCallbackQueue:self.chipCallbackQueue];
+    __weak typeof(self) weakSelf = self;
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.example.callback", DISPATCH_QUEUE_SERIAL);
+    self.chipController = [CHIPDeviceController sharedController];
+    [self.chipController registerCallbacks:callbackQueue
+        onMessage:^(NSData * _Nonnull message, NSString * _Nonnull ipAddress, UInt16 port) {
+            typeof(self) strongSelf = weakSelf;
+            NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
+            [strongSelf postResult:[@"Echo Response: " stringByAppendingFormat:@"%@", strMessage]];
+        }
+        onError:^(NSError * _Nonnull error) {
+            typeof(self) strongSelf = weakSelf;
+            [strongSelf postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
+        }];
 
     // need to restart connections on background/foreground transitions otherwise the socket can be closed without CHIP knowing
     // about it.
@@ -107,16 +118,7 @@ static NSString * const portKey = @"pk";
     NSString * inputIPAddress = [[self _getScannedIP] length] > 0 ? [self _getScannedIP] : self.serverIPTextField.text;
     UInt16 inputPort = [self _getScannedPort] > 0 ? [self _getScannedPort] : [self.serverPortTextField.text intValue];
 
-    BOOL didConnect = [self.chipController connect:inputIPAddress
-        port:inputPort
-        error:&error
-        onMessage:^(NSData * _Nonnull message, NSString * _Nonnull ipAddress, UInt16 port) {
-            NSString * strMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
-            [self postResult:[@"Echo Response: " stringByAppendingFormat:@"%@", strMessage]];
-        }
-        onError:^(NSError * _Nonnull error) {
-            [self postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
-        }];
+    BOOL didConnect = [self.chipController connect:inputIPAddress port:inputPort error:&error];
     if (!didConnect) {
         [self postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
     }

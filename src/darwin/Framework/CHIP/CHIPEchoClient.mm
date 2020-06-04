@@ -39,11 +39,8 @@ static NSString * const kEchoString = @"Hello from darwin!";
     if (self = [super init]) {
         NSError * error;
         _echoCallbackQueue = dispatch_queue_create("com.zigbee.chip.echo", NULL);
-        _chipController = [[CHIPDeviceController alloc] initWithCallbackQueue:_echoCallbackQueue];
-
-        BOOL didInit = [_chipController connect:ipAddress
-            port:port
-            error:&error
+        _chipController = [CHIPDeviceController sharedController];
+        [self.chipController registerCallbacks:_echoCallbackQueue
             onMessage:^(NSData * _Nonnull message, NSString * _Nonnull ipAddress, UInt16 port) {
                 NSData * sentMessage = [kEchoString dataUsingEncoding:NSUTF8StringEncoding];
                 if ([sentMessage isEqualToData:message]) {
@@ -56,6 +53,8 @@ static NSString * const kEchoString = @"Hello from darwin!";
                 os_log(OS_LOG_DEFAULT, "Received error %@. Stopping...", error);
                 [self stop];
             }];
+
+        BOOL didInit = [_chipController connect:ipAddress port:port error:&error];
 
         if (!didInit) {
             os_log(OS_LOG_DEFAULT, "Failed to init with error %@", error);

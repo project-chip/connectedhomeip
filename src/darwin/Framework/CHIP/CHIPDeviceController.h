@@ -36,12 +36,7 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @interface CHIPDeviceController : NSObject
 
-- (nullable instancetype)initWithCallbackQueue:(dispatch_queue_t)appCallbackQueue;
-- (BOOL)connect:(NSString *)ipAddress
-           port:(UInt16)port
-          error:(NSError * __autoreleasing *)error
-      onMessage:(ControllerOnMessageBlock)onMessage
-        onError:(ControllerOnErrorBlock)onError;
+- (BOOL)connect:(NSString *)ipAddress port:(UInt16)port error:(NSError * __autoreleasing *)error;
 - (nullable AddressInfo *)getAddressInfo;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 // We can't include definitions of ChipZclClusterId_t and ChipZclCommandId_t
@@ -52,6 +47,26 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Return the single CHIPDeviceController we support existing.
+ */
++ (CHIPDeviceController *)sharedController;
+
+/**
+ * Register callbacks for network activity.
+ *
+ * @param[in] appCallbackQueue the queue that should be used to deliver the
+ *                             message/error callbacks for this consumer.
+ *
+ * @param[in] onMessage the block to call when the controller gets a message
+ *                      from the network.
+ *
+ * @param[in] onError the block to call when there is a network error.
+ */
+- (void)registerCallbacks:(dispatch_queue_t)appCallbackQueue
+                onMessage:(ControllerOnMessageBlock)onMessage
+                  onError:(ControllerOnErrorBlock)onError;
 
 @end
 
