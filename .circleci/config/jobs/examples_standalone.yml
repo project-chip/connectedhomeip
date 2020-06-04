@@ -17,6 +17,9 @@ steps:
           name: Build example Standalone Echo Client
           command: scripts/examples/standalone_echo_client.sh
     - run:
+          name: Build example Standalone Shell
+          command: scripts/examples/standalone_shell.sh
+    - run:
           name: Preserve artifacts
           command: |
               mkdir -p example_binaries/<<parameters.builder>>
