@@ -182,7 +182,7 @@ void chip_shell_task(void * arg)
                 if (strcmp(argv[0], the_cmd_set[i][j].cmd_name) == 0)
                 {
                     // Execute the command!
-                    retval = the_cmd_set[i][j].cmd_func(argc, argv);
+                    retval = the_cmd_set[i][j].cmd_func(argc - 1, argv + 1);
 
                     if (retval)
                     {

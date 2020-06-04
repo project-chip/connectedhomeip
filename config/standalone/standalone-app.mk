@@ -202,7 +202,7 @@ $(APP) : $(APP_EXE)
 # Rule to link the application executable
 $(APP_EXE) : $(OBJS) $(STD_LINK_PREREQUISITES) | $(OUTPUT_DIR)
 	@echo "$$(HDR_PREFIX)LD $$@"
-	$(NO_ECHO)$$(CC) $$(STD_LDFLAGS) $$(LDFLAGS) $$(DEBUG_FLAGS) $$(OPT_FLAGS) $$(OBJS) $$(LIBS) $$(STD_LIBS) -o $$@
+	$(NO_ECHO)$$(CXX) $$(STD_LDFLAGS) $$(LDFLAGS) $$(DEBUG_FLAGS) $$(OPT_FLAGS) $$(OBJS) $$(LIBS) $$(STD_LIBS) -o $$@
 	$(NO_ECHO)$$(SIZE) $$@
 
 # Individual build rules for each application source file
