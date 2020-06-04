@@ -68,7 +68,6 @@ AM_CPPFLAGS                                           = \
 
 CHIP_LDADD                                            = \
     $(top_builddir)/src/lib/libCHIP.a                   \
-    $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(NULL)
 
 COMMON_LDADD                                          = \
@@ -124,6 +123,7 @@ NLFOREIGN_FILE_DEPENDENCIES                           = \
 
 NLFOREIGN_SUBDIR_DEPENDENCIES                         = \
    $(LWIP_FOREIGN_SUBDIR_DEPENDENCY)                    \
+   $(NLFAULTINJECTION_FOREIGN_SUBDIR_DEPENDENCY)        \
    $(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY)             \
    $(NULL)
 

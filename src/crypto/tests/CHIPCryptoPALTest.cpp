@@ -789,13 +789,6 @@ void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
     (void) module, (void) category;
     vfprintf(stderr, format, argptr);
 }
-void Log(uint8_t module, uint8_t category, const char * format, ...)
-{
-    va_list argptr;
-    va_start(argptr, format);
-    LogV(module, category, format, argptr);
-    va_end(argptr);
-}
 } // namespace Logging
 } // namespace chip
 
