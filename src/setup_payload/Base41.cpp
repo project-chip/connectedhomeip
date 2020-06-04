@@ -60,7 +60,27 @@ string base41Encode(const uint8_t * buf, size_t buf_len)
         buf_len -= kBytesChunkLen;
         buf += kBytesChunkLen;
 
-        for (int _ = 0; _ < kBase41ChunkLen; _++)
+        // This code needs to correctly convey to the decoder
+        //  the length of data encoded, so normally emits 3 chars for
+        //  2 bytes.
+        // But there's a special case possible where the last
+        //  two bytes would fit in exactly 2 chars.
+        // The following conditions must be met:
+        //   1. this must be the last value
+        //   2. the value doesn't fit in a single byte, if we encode a
+        //        small value at the end of the encoded string with a
+        //        shortened chunk, the decoder will think only one byte
+        //        was encoded
+        //   3. the value can be encoded in 2 base41 chars
+        //
+        int encodeLen = kBase41ChunkLen;
+        if (buf_len == 0 &&            // the very last value, i.e. not an odd byte
+            (value > 255) &&           // the value wouldn't fit in one byte
+            (value < kRadix * kRadix)) // the value can be encoded with 2 base41 chars
+        {
+            encodeLen--;
+        }
+        for (int _ = 0; _ < encodeLen; _++)
         {
             result += codes[value % kRadix];
             value /= kRadix;
