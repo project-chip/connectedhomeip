@@ -23,14 +23,14 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
+
 SUBDIRS                    = tests
 
 lib_LIBRARIES              = libChipCrypto.a
 
-libChipCrypto_adir             = $(includedir)/crypto
+libChipCrypto_adir         = $(includedir)/crypto
 
 libChipCrypto_a_CPPFLAGS            = \
-    $(LWIP_CPPFLAGS)                  \
     $(NLASSERT_CPPFLAGS)              \
     -I$(top_srcdir)/src               \
     -I$(top_srcdir)/src/lib           \
@@ -38,23 +38,14 @@ libChipCrypto_a_CPPFLAGS            = \
     -I$(top_srcdir)/src/include/      \
     $(NULL)
 
-libChipCrypto_a_SOURCES                                       = \
+include Crypto.am
+
+libChipCrypto_a_SOURCES                                      = \
+    $(CHIP_BUILD_CRYPTO_SOURCE_FILES)                          \
     $(NULL)
 
 dist_libChipCrypto_a_HEADERS                                 = \
-    CHIPCryptoPAL.h                                            \
+    $(CHIP_BUILD_CRYPTO_HEADER_FILES)                          \
     $(NULL)
-
-if CHIP_CRYPTO_OPENSSL
-libChipCrypto_a_SOURCES                                      += \
-    CHIPCryptoPALOpenSSL.cpp                                    \
-    $(NULL)
-endif
-
-if CHIP_CRYPTO_MBEDTLS
-libChipCrypto_a_SOURCES                                      += \
-    CHIPCryptoPALmbedTLS.cpp                                    \
-    $(NULL)
-endif
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

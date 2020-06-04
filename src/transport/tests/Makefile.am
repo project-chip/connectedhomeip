@@ -67,7 +67,6 @@ AM_CPPFLAGS                                           = \
     $(NULL)
 
 CHIP_LDADD                                            = \
-    $(top_builddir)/src/crypto/libChipCrypto.a          \
     $(top_builddir)/src/lib/libCHIP.a                   \
     $(NULL)
 

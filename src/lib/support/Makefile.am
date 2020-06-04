@@ -28,7 +28,6 @@ SUBDIRS                             = \
 
 include SupportLayer.am
 
-
 lib_LIBRARIES                       = libSupportLayer.a
 
 libSupportLayer_a_CPPFLAGS                    = \

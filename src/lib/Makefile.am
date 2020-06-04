@@ -37,6 +37,7 @@ include ../system/SystemLayer.am
 include ../transport/TransportLayer.am
 include core/CoreLayer.am
 include support/SupportLayer.am
+include ../crypto/Crypto.am
 include ../app/DataModel.am
 
 # install headers for core layer
@@ -75,6 +76,7 @@ libCHIP_a_SOURCES                  += $(CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_DEVICE_CONTROLLER_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_DATA_MODEL_SOURCE_FILES)
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_TRANSPORT_LAYER_SOURCE_FILES)
+libCHIP_a_SOURCES                  += $(CHIP_BUILD_CRYPTO_SOURCE_FILES)
 
 if CONFIG_NETWORK_LAYER_BLE
 libCHIP_a_SOURCES                  += $(CHIP_BUILD_BLE_LAYER_SOURCE_FILES)

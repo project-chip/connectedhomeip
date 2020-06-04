@@ -22,9 +22,6 @@
 #      must be anchored relative to the top build directory.
 #
 
-AM_CXXFLAGS = \
-    $(NLUNIT_TEST_CPPFLAGS)                                 \
-    $(NULL)
 
 CHIP_BUILD_SUPPORT_LAYER_SOURCE_FILES                     = \
     @top_builddir@/src/lib/support/Base64.cpp               \

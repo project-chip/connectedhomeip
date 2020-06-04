@@ -24,31 +24,31 @@
 #
 
 CHIP_BUILD_CORE_LAYER_SOURCE_FILES                        = \
-    core/CHIPCircularTLVBuffer.cpp                          \
-    core/CHIPError.cpp                                      \
-    core/CHIPTLVDebug.cpp                                   \
-    core/CHIPTLVReader.cpp                                  \
-    core/CHIPTLVUtilities.cpp                               \
-    core/CHIPTLVWriter.cpp                                  \
-    core/CHIPTLVUpdater.cpp                                 \
-    core/CHIPKeyIds.cpp                                     \
+    @top_builddir@/src/lib/core/CHIPCircularTLVBuffer.cpp   \
+    @top_builddir@/src/lib/core/CHIPError.cpp               \
+    @top_builddir@/src/lib/core/CHIPTLVDebug.cpp            \
+    @top_builddir@/src/lib/core/CHIPTLVReader.cpp           \
+    @top_builddir@/src/lib/core/CHIPTLVUtilities.cpp        \
+    @top_builddir@/src/lib/core/CHIPTLVWriter.cpp           \
+    @top_builddir@/src/lib/core/CHIPTLVUpdater.cpp          \
+    @top_builddir@/src/lib/core/CHIPKeyIds.cpp              \
     $(NULL)
 
 CHIP_BUILD_CORE_LAYER_HEADER_FILES                        = \
-    core/CHIPCircularTLVBuffer.h                            \
-    core/CHIPConfig.h                                       \
-    core/CHIPCore.h                                         \
-    core/CHIPEncoding.h                                     \
-    core/CHIPError.h                                        \
-    core/CHIPEventLoggingConfig.h                           \
-    core/CHIPTLV.h                                          \
-    core/CHIPTLVData.hpp                                    \
-    core/CHIPTLVDebug.hpp                                   \
-    core/CHIPTLVTags.h                                      \
-    core/CHIPTLVTypes.h                                     \
-    core/CHIPTLVUtilities.hpp                               \
-    core/CHIPTimeConfig.h                                   \
-    core/CHIPTunnelConfig.h                                 \
-    core/CHIPKeyIds.h                                       \
-    core/Optional.h                                         \
+    @top_builddir@/src/lib/core/CHIPCircularTLVBuffer.h     \
+    @top_builddir@/src/lib/core/CHIPConfig.h                \
+    @top_builddir@/src/lib/core/CHIPCore.h                  \
+    @top_builddir@/src/lib/core/CHIPEncoding.h              \
+    @top_builddir@/src/lib/core/CHIPError.h                 \
+    @top_builddir@/src/lib/core/CHIPEventLoggingConfig.h    \
+    @top_builddir@/src/lib/core/CHIPTLV.h                   \
+    @top_builddir@/src/lib/core/CHIPTLVData.hpp             \
+    @top_builddir@/src/lib/core/CHIPTLVDebug.hpp            \
+    @top_builddir@/src/lib/core/CHIPTLVTags.h               \
+    @top_builddir@/src/lib/core/CHIPTLVTypes.h              \
+    @top_builddir@/src/lib/core/CHIPTLVUtilities.hpp        \
+    @top_builddir@/src/lib/core/CHIPTimeConfig.h            \
+    @top_builddir@/src/lib/core/CHIPTunnelConfig.h          \
+    @top_builddir@/src/lib/core/CHIPKeyIds.h                \
+    @top_builddir@/src/lib/core/Optional.h                  \
     $(NULL)
