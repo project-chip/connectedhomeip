@@ -104,7 +104,7 @@ static void echo(SecureTransport * transport, System::PacketBuffer * buffer, con
     }
 }
 
-static void error(SecureTransport * ep, CHIP_ERROR error, const IPPacketInfo * pi)
+static void error(SecureTransport * st, CHIP_ERROR error, const IPPacketInfo * pi)
 {
     ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
 }

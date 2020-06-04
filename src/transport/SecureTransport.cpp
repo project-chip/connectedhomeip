@@ -32,6 +32,11 @@
 
 namespace chip {
 
+// Maximum length of application data that can be encrypted as one block.
+// The limit is derived from IPv6 MTU (1280 bytes) - expected header overheads.
+// This limit would need additional reviews once we have formalized Secure Transport header. 
+const size_t kMax_SecureSDU_Length = 1024;
+
 SecureTransport::SecureTransport() : mState(kState_NotReady), mRefCount(1)
 {
     mUDPEndPoint      = NULL;
@@ -116,7 +121,7 @@ CHIP_ERROR SecureTransport::SendMessage(PacketBuffer * msgBuf, const IPAddress &
 
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == NULL, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrExit(msgBuf->TotalLength() < 1024, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     IPPacketInfo addrInfo;
     addrInfo.Clear();
