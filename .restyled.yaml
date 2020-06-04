@@ -48,6 +48,10 @@ restylers:
           - whitespace
       arguments: []
       include:
+          - "**/Dockerfile"
+          - "**/.yml"
+          - "**/.yaml"
+          - "**/*.sh"
           - "**/*.c"
           - "**/*.cc"
           - "**/*.cpp"
@@ -63,6 +67,7 @@ restylers:
           - "**/*.H"
           - "**/*.java"
           - "**/*.js"
+          - "**/.json"
           - "**/*.m"
           - "**/*.mm"
     - name: clang-format
