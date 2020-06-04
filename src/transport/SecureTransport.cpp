@@ -34,7 +34,7 @@ namespace chip {
 
 // Maximum length of application data that can be encrypted as one block.
 // The limit is derived from IPv6 MTU (1280 bytes) - expected header overheads.
-// This limit would need additional reviews once we have formalized Secure Transport header. 
+// This limit would need additional reviews once we have formalized Secure Transport header.
 const size_t kMax_SecureSDU_Length = 1024;
 
 SecureTransport::SecureTransport() : mState(kState_NotReady), mRefCount(1)
