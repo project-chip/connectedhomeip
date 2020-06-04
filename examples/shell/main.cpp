@@ -15,15 +15,15 @@
  *    limitations under the License.
  */
 
+#include <shell/shell.h>
+#include <support/CodeUtils.h>
+#include <support/RandUtils.h>
+
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <shell/shell.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
 
 using namespace chip;
 using namespace chip::Logging;

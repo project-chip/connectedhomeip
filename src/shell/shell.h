@@ -23,10 +23,10 @@
 
 #pragma once
 
+#include "streamer.h"
+
 #include <stdarg.h>
 #include <stddef.h>
-
-#include "streamer.h"
 
 #ifdef __cplusplus
 extern "C" {

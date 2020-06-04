@@ -21,15 +21,15 @@
  *      Source implementation for a generic shell API for CHIP examples.
  */
 
+#include "shell.h"
+#include "commands.h"
+
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-
-#include "commands.h"
-#include "shell.h"
 
 #ifndef CHIP_SHELL_PROMPT
 #define CHIP_SHELL_PROMPT "> "

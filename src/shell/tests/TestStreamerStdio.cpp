@@ -15,15 +15,15 @@
  *    limitations under the License.
  */
 
+#include <nlunit-test.h>
+#include <shell/shell.h>
+#include <support/CodeUtils.h>
+
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <nlunit-test.h>
-#include <shell/shell.h>
-#include <support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::Logging;

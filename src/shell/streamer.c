@@ -21,9 +21,9 @@
  *      Source implementation for a output stream abstraction.
  */
 
-#include <stdio.h>
-
 #include "shell.h"
+
+#include <stdio.h>
 
 #ifndef CONSOLE_DEFAULT_MAX_LINE
 #define CONSOLE_DEFAULT_MAX_LINE 80

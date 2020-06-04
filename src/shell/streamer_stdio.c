@@ -20,13 +20,13 @@
  *      Source implementation for an output stream for stdio targets.
  */
 
+#include "shell.h"
+
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termio.h>
 #include <unistd.h>
-
-#include "shell.h"
 
 static struct termios the_original_stdin_termios;
 

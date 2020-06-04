@@ -20,17 +20,17 @@
  *      Source implementation for a generic shell API for CHIP examples.
  */
 
+#include "CHIPVersion.h"
+
+#include "commands.h"
+#include "shell.h"
+
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <shell/commands.h>
-#include <shell/shell.h>
-
-#include "CHIPVersion.h"
 
 static const struct chip_shell_cmd cmds[] = {
     { &cmd_echo, "echo", "Echo back provided inputs" },
