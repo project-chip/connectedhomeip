@@ -23,18 +23,11 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-SUBDIRS                                                           = tests
+SUBDIRS                                                           = $(NULL)
 
 lib_LIBRARIES                                                     = libChipShell.a
 
 libChipShell_adir                                                 = $(includedir)/shell
-
-nodist_libChipShell_a_SOURCES                                     = \
-    commands.c                                                      \
-    shell.c                                                         \
-    streamer.c                                                      \
-    streamer_stdio.c                                                \
-    $(NULL)
 
 libChipShell_a_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                             \
@@ -46,5 +39,21 @@ dist_libChipShell_a_HEADERS                                       = \
     @top_builddir@/src/shell/streamer.h                             \
     @top_builddir@/src/shell/commands.h                             \
     $(NULL)
+
+libChipShell_a_SOURCES                                            = \
+    commands.c                                                      \
+    shell.c                                                         \
+    streamer.c                                                      \
+    $(NULL)
+
+if CHIP_TARGET_STYLE_UNIX
+
+SUBDIRS                                                          += tests
+
+libChipShell_a_SOURCES                                           += \
+    streamer_stdio.c                                                \
+    $(NULL)
+
+endif
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am
