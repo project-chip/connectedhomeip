@@ -121,7 +121,8 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
     rootWriter.Init(tlvDataStart, maxLen);
     rootWriter.ImplicitProfileId = outPayload.productID;
 
-    if (optionalData.size() > 1)
+    // The cost (in bytes) of the top-level container is amortized as soon as there is at least 4 optionals elements.
+    if (optionalData.size() >= 4)
     {
 
         TLVWriter innerStructureWriter;
@@ -141,9 +142,11 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
     }
     else
     {
-        OptionalQRCodeInfo info = optionalData.front();
-        err                     = writeTag(rootWriter, ProfileTag(outPayload.productID, info.tag), info);
-        SuccessOrExit(err);
+        for (OptionalQRCodeInfo info : optionalData)
+        {
+            err = writeTag(rootWriter, ProfileTag(outPayload.productID, info.tag), info);
+            SuccessOrExit(err);
+        }
     }
     err = rootWriter.Finalize();
     SuccessOrExit(err);

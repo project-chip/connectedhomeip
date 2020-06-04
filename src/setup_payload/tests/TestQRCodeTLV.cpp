@@ -15,80 +15,14 @@
  *    limitations under the License.
  */
 #include "TestQRCodeTLV.h"
-
-#include <assert.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "TestHelpers.h"
 
 #include <iostream>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include "Base41.cpp"
-#include "QRCodeSetupPayloadGenerator.cpp"
-#include "QRCodeSetupPayloadParser.cpp"
-#include "SetupPayload.cpp"
-
 using namespace chip;
 using namespace std;
-
-const uint16_t kSmallBufferSizeInBytes   = 1;
-const uint16_t kDefaultBufferSizeInBytes = 512;
-
-SetupPayload GetDefaultPayload()
-{
-    SetupPayload payload;
-    payload.version               = 1;
-    payload.vendorID              = 2;
-    payload.productID             = 3;
-    payload.requiresCustomFlow    = 1;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 5;
-    payload.setUpPINCode          = 13;
-
-    return payload;
-}
-
-SetupPayload GetDefaultPayloadWithSerialNumber()
-{
-    SetupPayload payload = GetDefaultPayload();
-    payload.serialNumber = "123456789QWDHANTYUIOP";
-
-    return payload;
-}
-
-OptionalQRCodeInfo GetOptionalDefaultString()
-{
-    OptionalQRCodeInfo info;
-    info.tag  = 2;
-    info.type = optionalQRCodeInfoTypeString;
-    info.data = "myData";
-
-    return info;
-}
-
-OptionalQRCodeInfo GetOptionalDefaultInt()
-{
-    OptionalQRCodeInfo info;
-    info.tag     = 3;
-    info.type    = optionalQRCodeInfoTypeInt;
-    info.integer = 12;
-
-    return info;
-}
-
-SetupPayload GetDefaultPayloadWithOptionalDefaults()
-{
-    SetupPayload payload = GetDefaultPayloadWithSerialNumber();
-
-    OptionalQRCodeInfo stringInfo = GetOptionalDefaultString();
-    OptionalQRCodeInfo intInfo    = GetOptionalDefaultInt();
-
-    payload.addVendorOptionalData(stringInfo);
-    payload.addVendorOptionalData(intInfo);
-
-    return payload;
-}
 
 void ComparePayloads(nlTestSuite * inSuite, void * inContext, SetupPayload & inPayload, SetupPayload & outPayload)
 {
@@ -323,6 +257,42 @@ void TestOptionalDataWriteSmallBuffer(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
+void TestPayloadBinary(nlTestSuite * inSuite, void * inContext)
+{
+    SetupPayload payload = GetDefaultPayload();
+    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 0));
+
+    OptionalQRCodeInfo info = GetOptionalDefaultString();
+    info.data               = "1";
+
+    payload.addVendorOptionalData(info);
+    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 5));
+    payload.removeOptionalData(info.tag);
+
+    info         = GetOptionalDefaultInt();
+    info.integer = 1;
+
+    info.tag = 1;
+    payload.addVendorOptionalData(info);
+    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 4));
+
+    info.tag = 2;
+    payload.addVendorOptionalData(info);
+    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 8));
+
+    info.tag = 3;
+    payload.addVendorOptionalData(info);
+    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 12));
+
+    info.tag = 4;
+    payload.addVendorOptionalData(info);
+    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 16));
+
+    info.tag = 5;
+    payload.addVendorOptionalData(info);
+    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 19));
+}
+
 // Test Suite
 
 /**
@@ -343,6 +313,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test Optional Read Vendor Int",    TestOptionalDataReadVendorInt),
     NL_TEST_DEF("Test Optional Read",               TestOptionalDataRead),
     NL_TEST_DEF("Test Optional Tag Values",         TestOptionalTagValues),
+    NL_TEST_DEF("Test Payload Binary",              TestPayloadBinary),
 
     NL_TEST_SENTINEL()
 };

@@ -23,97 +23,21 @@
  */
 
 #include "TestQRCode.h"
-
-#include <assert.h>
-#include <bitset>
-#include <stdio.h>
-#include <unistd.h>
+#include "TestHelpers.h"
 
 #include <iostream>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include "Base41.cpp"
-#include "QRCodeSetupPayloadGenerator.cpp"
-#include "QRCodeSetupPayloadParser.cpp"
-#include "SetupPayload.cpp"
-
 using namespace chip;
 using namespace std;
-
-SetupPayload GetDefaultPayload()
-{
-    SetupPayload payload;
-
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
-
-    return payload;
-}
-
-string toBinaryRepresentation(string base41Result)
-{
-    // Remove the kQRCodePrefix
-    base41Result.erase(0, strlen(kQRCodePrefix));
-
-    // Decode the base41 encoded string
-    vector<uint8_t> buffer;
-    base41Decode(base41Result, buffer);
-
-    // Convert it to binary
-    string binaryResult;
-    for (int i = buffer.size() - 1; i >= 0; i--)
-    {
-        binaryResult += bitset<8>(buffer[i]).to_string();
-    }
-
-    // Insert spaces after each block
-    size_t pos = binaryResult.size();
-
-    pos -= kVersionFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kVendorIDFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kProductIDFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kCustomFlowRequiredFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kRendezvousInfoFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kPayloadDiscriminatorFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kSetupPINCodeFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kPaddingFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    return binaryResult;
-}
 
 void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
 
-    QRCodeSetupPayloadGenerator generator(payload);
-    string result;
-    CHIP_ERROR err  = generator.payloadBase41Representation(result);
-    bool didSucceed = err == CHIP_NO_ERROR;
-    NL_TEST_ASSERT(inSuite, didSucceed == true);
-
     string expected = " 00000 000000000000000100000000000 000010000000 00000001 0 0000000000000001 0000000000001100 101";
-    NL_TEST_ASSERT(inSuite, toBinaryRepresentation(result) == expected);
+    NL_TEST_ASSERT(inSuite, CompareBinary(payload, expected));
 }
 
 void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
