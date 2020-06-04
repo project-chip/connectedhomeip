@@ -30,7 +30,7 @@ here=${0%/*}
 
 set -e
 
-${here}/../build/autoconf/test-driver "$@"
+"$here"/../build/autoconf/test-driver "$@"
 
 while ((${#@})); do
     [[ $1 == "--log-file" ]] && {
