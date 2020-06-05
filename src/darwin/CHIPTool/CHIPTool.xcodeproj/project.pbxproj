@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */; };
 		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
-		515C401924868BF0004C4DB3 /* CHIPViewControllerBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 515C401724868BF0004C4DB3 /* CHIPViewControllerBase.m */; };
 		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
@@ -46,9 +46,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPViewControllerBase.m; sourceTree = "<group>"; };
 		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
-		515C401724868BF0004C4DB3 /* CHIPViewControllerBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPViewControllerBase.m; sourceTree = "<group>"; };
 		515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPViewControllerBase.h; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
@@ -149,13 +149,13 @@
 				B2F53AEC245B0D190010745E /* Main.storyboard */,
 				B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */,
 				B204A630244E1D0700C7C0E1 /* Info.plist */,
-				B204A631244E1D0700C7C0E1 /* main.m */,
 				515C401824868BF0004C4DB3 /* CHIPViewControllerBase.h */,
-				515C401724868BF0004C4DB3 /* CHIPViewControllerBase.m */,
-				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
+				0C47BE4324885B97005E97F6 /* CHIPViewControllerBase.m */,
 				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
+				B204A631244E1D0700C7C0E1 /* main.m */,
 				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
 				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
+				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
 				0C79937824858B3B0047A373 /* QRCode */,
 				0C79937924858B4F0047A373 /* Echo client */,
 				0CA0E0D0248599C4009087B9 /* OnOffCluster */,
@@ -277,7 +277,7 @@
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
-				515C401924868BF0004C4DB3 /* CHIPViewControllerBase.m in Sources */,
+				0C47BE4424885B97005E97F6 /* CHIPViewControllerBase.m in Sources */,
 				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -440,7 +440,7 @@
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -453,7 +453,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
+				SDKROOT = iphoneos.internal;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv4t armv5 armv6 armv6m armv7 armv7em armv7f armv7k armv7m armv7s xscale";
 			};
@@ -464,7 +464,7 @@
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -477,7 +477,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
+				SDKROOT = iphoneos.internal;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv4t armv5 armv6 armv6m armv7 armv7em armv7f armv7k armv7m armv7s xscale";
 			};
