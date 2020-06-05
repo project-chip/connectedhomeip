@@ -119,7 +119,7 @@ def main():
       '--github-repository', type=str, help='Repository to use for PR comments')
   parser.add_argument(
       '--github-comment-pr-number',
-      type=int,
+      type=str,
       default=None,
       help='To what PR to comment in github')
   parser.add_argument(
@@ -155,7 +155,7 @@ def main():
        args.report_file,
        args.github_api_token,
        args.github_repository,
-       args.github_comment_pr_number,
+       int(args.github_comment_pr_number),
     )
 
 if __name__ == '__main__':
