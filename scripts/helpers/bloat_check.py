@@ -3,6 +3,7 @@
 import argparse
 import attr
 import coloredlogs
+import github
 import logging
 import os
 import stat
@@ -71,6 +72,24 @@ def generateBloatReport(outputFileName,
                            os.path.join(buildOutputDir, name))
 
 
+def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number):
+  """Generates a PR comment conaining the specified file content."""
+
+  logging.info('Uploading report to "%s", PR %d' % (gh_repo, gh_pr_number))
+
+  api = github.Github(gh_token)
+  repo = api.get_repo(gh_repo)
+  pull = repo.get_pull(gh_pr_number)
+
+  # NOTE: PRs are issues with attached patches, hence the API naming
+  pull.create_issue_comment('''Bloat report for job "%s":
+
+  ```
+  %s
+  ```
+  ''' % (job_name, open(filename, 'rt').read()))
+
+
 def main():
   """Main task if executed standalone."""
   parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
@@ -92,6 +111,17 @@ def main():
       type=str,
       default='report.txt',
       help='From what job to fetch artifacts from')
+  parser.add_argument(
+      '--github-api-token',
+      type=str,
+      help='Github API token to upload the report as a comment')
+  parser.add_argument(
+      '--github-repository', type=str, help='Repository to use for PR comments')
+  parser.add_argument(
+      '--github-comment-pr-number',
+      type=int,
+      default=None,
+      help='To what PR to comment in github')
   parser.add_argument(
       '--log-level',
       default=logging.INFO,
@@ -119,6 +149,14 @@ def main():
       args.build_output_dir,
       title="Bloat report for job '%s'" % args.job)
 
+  if args.github_api_token and args.github_repository and args.github_comment_pr_number:
+    sendFileAsPrComment(
+       args.job,
+       args.report_file,
+       args.github_api_token,
+       args.github_repository,
+       args.github_comment_pr_number,
+    )
 
 if __name__ == '__main__':
   # execute only if run as a script
