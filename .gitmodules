@@ -34,3 +34,7 @@
         path = third_party/openthread/repo
         url = https://github.com/openthread/openthread
         ignore = dirty
+[submodule "third_party/ot-br-posix/repo"]
+        path = third_party/ot-br-posix/repo
+        url = https://github.com/openthread/ot-br-posix.git
+        ignore = dirty
