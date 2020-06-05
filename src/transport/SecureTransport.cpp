@@ -24,6 +24,7 @@
  *
  */
 
+#include <string.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/SecureTransport.h>
@@ -60,15 +61,15 @@ void SecureTransport::Init(Inet::InetLayer * inetLayer)
 CHIP_ERROR SecureTransport::ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
                                               const unsigned char * local_private_key, const size_t private_key_length)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    size_t info_len = strlen(kManualKeyExchangeChannelInfo);
 
     VerifyOrExit(mState == kState_Connected, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err =
-        mSecureChannel.Init(remote_public_key, public_key_length, local_private_key, private_key_length, (const unsigned char *) "",
-                            0, (const unsigned char *) kManualKeyExchangeChannelInfo, sizeof(kManualKeyExchangeChannelInfo));
+    err = mSecureChannel.Init(remote_public_key, public_key_length, local_private_key, private_key_length, NULL, 0,
+                              (const unsigned char *) kManualKeyExchangeChannelInfo, info_len);
     SuccessOrExit(err);
-    mState = kState_Connected;
+    mState = kState_SecureConnected;
 exit:
     return err;
 }
@@ -131,17 +132,16 @@ CHIP_ERROR SecureTransport::SendMessage(PacketBuffer * msgBuf, const IPAddress &
     addrInfo.DestPort    = CHIP_PORT;
 
     {
-        uint8_t * plain_text    = msgBuf->Start();
-        uint16_t plain_text_len = msgBuf->DataLength();
+        uint8_t * plainText = msgBuf->Start();
+        size_t plainTextlen = msgBuf->DataLength();
 
-        uint8_t * encrypted_text = plain_text - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-        uint16_t encrypted_len   = plain_text_len + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        uint8_t * encryptedText = plainText - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        size_t encryptedLen     = plainTextlen + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
 
-        err = mSecureChannel.Encrypt(plain_text, plain_text_len, encrypted_text, encrypted_len);
+        err = mSecureChannel.Encrypt(plainText, plainTextlen, encryptedText, encryptedLen);
         SuccessOrExit(err);
 
-        msgBuf->SetStart(encrypted_text);
-        msgBuf->SetDataLength(encrypted_len, msgBuf);
+        msgBuf->SetStart(encryptedText);
 
         ChipLogProgress(Inet, "Secure transport transmitting msg %d after encryption", msg_id);
     }
@@ -168,20 +168,35 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
     // TODO this is where messages should be decoded
     if (connection->StateAllowsReceive() && msg != NULL)
     {
-        uint8_t * encrypted_text = msg->Start();
-        uint16_t encrypted_len   = msg->DataLength();
+        uint8_t * encryptedText = msg->Start();
+        uint16_t encryptedLen   = msg->DataLength();
 
-        uint8_t * plain_text  = encrypted_text + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-        size_t plain_text_len = encrypted_len - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        uint8_t * plainText = encryptedText + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        size_t plainTextlen = encryptedLen - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
 
-        CHIP_ERROR err = connection->mSecureChannel.Decrypt(encrypted_text, encrypted_len, plain_text, plain_text_len);
+        chip::System::PacketBuffer * origMsg = NULL;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        origMsg   = msg;
+        msg       = PacketBuffer::NewWithAvailableSize(plainTextlen);
+        plainText = msg->Start();
+        msg->SetDataLength(plainTextlen, msg);
+#endif
+        CHIP_ERROR err = connection->mSecureChannel.Decrypt(encryptedText, encryptedLen, plainText, plainTextlen);
+
+        if (origMsg != NULL)
+        {
+            PacketBuffer::Free(origMsg);
+        }
 
         if (err == CHIP_NO_ERROR)
         {
-            msg->SetStart(plain_text);
-            msg->SetDataLength(plain_text_len, msg);
-
+            msg->SetStart(plainText);
             connection->OnMessageReceived(connection, msg, pktInfo);
+        }
+        else
+        {
+            PacketBuffer::Free(msg);
+            ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err);
         }
     }
 }

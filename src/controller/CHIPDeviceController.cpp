@@ -227,7 +227,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
 
     mAppReqState = appReqState;
-    if (mConState == kConnectionState_Connected)
+    if (mConState == kConnectionState_SecureConnected)
     {
         err = mDeviceCon->SendMessage(buffer, mDeviceAddr);
     }
@@ -319,7 +319,7 @@ void ChipDeviceController::ClearRequestState()
 void ChipDeviceController::OnReceiveMessage(StatefulTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
 {
     ChipDeviceController * mgr = con->State();
-    if (mgr->mConState == kConnectionState_Connected && mgr->mOnComplete.Response != NULL && pktInfo != NULL)
+    if (mgr->mConState == kConnectionState_SecureConnected && mgr->mOnComplete.Response != NULL && pktInfo != NULL)
     {
         mgr->mOnComplete.Response(mgr, mgr->mAppReqState, msgBuf, pktInfo);
     }

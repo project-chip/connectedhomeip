@@ -41,8 +41,6 @@
 
 #include "DataModelHandler.h"
 
-#define PORT CONFIG_ECHO_PORT
-
 static const char * TAG = "echo_server";
 
 using namespace ::chip;
@@ -73,9 +71,10 @@ static void echo(SecureTransport * transport, System::PacketBuffer * buffer, con
         }
 
         // attempt to print the incoming message
-        char msg_buffer[data_len + 1];
-        msg_buffer[data_len] = 0; // Null-terminate whatever we received and treat like a string...
+        char msg_buffer[data_len];
+        msg_buffer[0] = '\0';
         memcpy(msg_buffer, buffer->Start(), data_len);
+        msg_buffer[data_len - 1] = 0; // Null-terminate whatever we received and treat like a string...
         ESP_LOGI(TAG, "Client sent: \"%s\"", msg_buffer);
 
         // Attempt to echo back
@@ -149,7 +148,7 @@ void setupTransport(IPAddressType type, SecureTransport * transport)
         return;
     }
 
-    ESP_LOGI(TAG, "Echo Server Listening on PORT:%d...", PORT);
+    ESP_LOGI(TAG, "Echo Server Listening...");
 }
 
 // The echo server assumes the platform's networking has been setup already

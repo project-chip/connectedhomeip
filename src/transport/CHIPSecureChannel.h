@@ -90,7 +90,7 @@ private:
 
     typedef struct
     {
-        size_t payload_length;
+        uint64_t payload_length;
         uint64_t IV;
         uint64_t tag;
     } security_header_t;
