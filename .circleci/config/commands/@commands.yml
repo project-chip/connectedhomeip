@@ -118,11 +118,14 @@ bloat-check:
               name: Generate bloat report
               command: |
                   mkdir -p "<<parameters.baseline_download_dir>>"
-                  scripts/helpers/bloat_check.py                                    \
-                     --token $CIRCLECI_API_TOKEN                                    \
-                     --job "<<parameters.job_name>>"                                \
-                     --artifact-download-dir "<<parameters.baseline_download_dir>>" \
-                     --build-output-dir "<<parameters.build_output_dir>>"           \
-                     --report-file bloat_report.txt
+                  scripts/helpers/bloat_check.py                                             \
+                     --token "$CIRCLECI_API_TOKEN"                                           \
+                     --job "<<parameters.job_name>>"                                         \
+                     --artifact-download-dir "<<parameters.baseline_download_dir>>"          \
+                     --build-output-dir "<<parameters.build_output_dir>>"                    \
+                     --report-file bloat_report.txt                                          \
+                     --github-repository "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME" \
+                     --github-comment-pr-number "$CIRCLE_PR_NUMBER"                          \
+                     --github-api-token "$GITHUB_BLOAT_API_TOKEN"
         - store_artifacts:
               path: bloat_report.txt

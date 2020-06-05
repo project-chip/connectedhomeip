@@ -42,7 +42,7 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install circleci attrs coloredlogs \
+    && pip3 install circleci attrs coloredlogs PyGithub \
     && : # last line
 
 # Install bloat comparison tools
