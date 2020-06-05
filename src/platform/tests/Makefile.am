@@ -68,12 +68,30 @@ AM_CPPFLAGS                                    = \
     $(NLUNIT_TEST_CPPFLAGS)                      \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OTBR_CLIENT
+AM_CPPFLAGS                                   += \
+    $(DBUS_CFLAGS)                               \
+    -I$(top_srcdir)/third_party/ot-br-posix/repo/include    \
+    -I$(top_srcdir)/third_party/ot-br-posix/repo/src        \
+    $(NULL)
+libPlatformTests_a_SOURCES += TestThreadStackMgr.cpp
+endif
+endif
+
 CHIP_LDADD                                      = \
     $(top_builddir)/src/platform/libDeviceLayer.a \
     $(top_builddir)/src/inet/libInetLayer.a       \
     $(top_builddir)/src/system/libSystemLayer.a   \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+CHIP_LDADD                                    += \
+    $(DBUS_LIBS)                                 \
+    $(top_builddir)/third_party/ot-br-posix/libotbrclient.a \
+    $(NULL)
+endif
 
 COMMON_LDADD                                          = \
     libPlatformTests.a                                  \
@@ -92,6 +110,15 @@ check_PROGRAMS                                 = \
     TestPlatformMgr                              \
     TestConfigurationMgr                         \
     $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+if CHIP_WITH_OTBR_CLIENT
+check_PROGRAMS += TestThreadStackMgr
+
+TestThreadStackMgr_LDADD                       = $(COMMON_LDADD)
+TestThreadStackMgr_SOURCES                     = TestThreadStackMgrDriver.cpp
+endif
+endif
 
 # TODO Add TestConfigurationMgr to check_PROGRAMS when dependent core profile are merged 
 

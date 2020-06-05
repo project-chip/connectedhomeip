@@ -38,6 +38,7 @@ apt-get install -fy \
     libssl-dev \
     unzip \
     wget \
+    libdbus-1-dev \
     libmbedtls-dev
 
 if [[ ! -f 'ci-cache-persistent/openssl/open_ssl_1.1.1f_installed' ]]; then
