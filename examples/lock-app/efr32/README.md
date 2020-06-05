@@ -59,7 +59,7 @@ following SDKs are installed (as of January 2020).
 -   Install some additional tools(likely already present for CHIP developers):
 
            # Linux
-           $ sudo apt-get install git make automake libtool ccache
+           $ sudo apt-get install git make automake libtool ccache libwebkitgtk-1.0-0
 
            # Mac OS X
            $ brew install automake libtool ccache
