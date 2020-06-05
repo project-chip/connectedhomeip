@@ -87,4 +87,3 @@ extern template class GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerI
 } // namespace chip
 
 #endif // GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_H
-
