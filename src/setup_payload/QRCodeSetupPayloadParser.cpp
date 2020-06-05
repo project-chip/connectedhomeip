@@ -34,6 +34,7 @@
 #include <core/CHIPTLV.h>
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
+#include <profiles/CHIPProfiles.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
@@ -166,15 +167,15 @@ static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataSta
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVReader rootReader;
     rootReader.Init(tlvDataStart, tlvDataLengthInBytes);
-    rootReader.ImplicitProfileId = outPayload.productID;
+    rootReader.ImplicitProfileId = chip::Profiles::kChipProfile_ServiceProvisioning;
     err                          = rootReader.Next();
     SuccessOrExit(err);
 
     if (rootReader.GetType() == kTLVType_Structure)
     {
         TLVReader innerStructureReader;
-        err = openTLVContainer(rootReader, kTLVType_Structure, ProfileTag(outPayload.productID, kTag_QRCodeExensionDescriptor),
-                               innerStructureReader);
+        err = openTLVContainer(rootReader, kTLVType_Structure,
+                               ProfileTag(rootReader.ImplicitProfileId, kTag_QRCodeExensionDescriptor), innerStructureReader);
         SuccessOrExit(err);
         err = innerStructureReader.Next();
         SuccessOrExit(err);
