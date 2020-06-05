@@ -30,6 +30,7 @@
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
+#include <profiles/CHIPProfiles.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
@@ -119,7 +120,7 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
-    rootWriter.ImplicitProfileId = outPayload.productID;
+    rootWriter.ImplicitProfileId = chip::Profiles::kChipProfile_ServiceProvisioning;
 
     // The cost (in bytes) of the top-level container is amortized as soon as there is at least 4 optionals elements.
     if (optionalData.size() >= 4)
@@ -127,7 +128,7 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
 
         TLVWriter innerStructureWriter;
 
-        err = rootWriter.OpenContainer(ProfileTag(outPayload.productID, kTag_QRCodeExensionDescriptor), kTLVType_Structure,
+        err = rootWriter.OpenContainer(ProfileTag(rootWriter.ImplicitProfileId, kTag_QRCodeExensionDescriptor), kTLVType_Structure,
                                        innerStructureWriter);
         SuccessOrExit(err);
 
@@ -144,7 +145,7 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
     {
         for (OptionalQRCodeInfo info : optionalData)
         {
-            err = writeTag(rootWriter, ProfileTag(outPayload.productID, info.tag), info);
+            err = writeTag(rootWriter, ProfileTag(rootWriter.ImplicitProfileId, info.tag), info);
             SuccessOrExit(err);
         }
     }
