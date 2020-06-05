@@ -158,19 +158,19 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
 // Handle the echo case, where we just send a string and expect to get it back.
 void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress & host_addr, uint16_t port)
 {
-    size_t payload_len = strlen(PAYLOAD);
-
-    auto * buffer = System::PacketBuffer::NewWithAvailableSize(payload_len);
-    snprintf((char *) buffer->Start(), payload_len + 1, "%s", PAYLOAD);
-    buffer->SetDataLength(payload_len);
+    size_t payload_len = strlen(PAYLOAD) + 1;
 
     // Run the client
     char host_ip_str[40];
     host_addr.ToString(host_ip_str, sizeof(host_ip_str));
     while (1)
     {
-        // Send calls release on this buffer, so bump up the ref because we want to reuse it
-        buffer->AddRef();
+        // Reallocate buffer on each run, as the secure transport encrypts and
+        // overwrites the buffer from previous iteration.
+        auto * buffer = System::PacketBuffer::NewWithAvailableSize(payload_len);
+        snprintf((char *) buffer->Start(), payload_len, "%s", PAYLOAD);
+        buffer->SetDataLength(payload_len);
+
         controller->SendMessage(NULL, buffer);
         printf("Msg sent to server at %s:%d\n", host_ip_str, port);
 

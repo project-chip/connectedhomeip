@@ -303,11 +303,12 @@
  *      CHIP Crypto Header:
  *
  *          4 -- Length of encrypted block
+ *          4 -- Reserve
  *          8 -- Initialization Vector
  *          8 -- Encryption Tag
  */
 #ifndef CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE
-#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 20
+#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 24
 #endif
 
 /**
