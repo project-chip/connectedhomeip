@@ -46,6 +46,7 @@ class PlatformManagerImpl;
 class ConnectivityManagerImpl;
 class ConfigurationManagerImpl;
 class TraitManager;
+class ThreadStackManagerImpl;
 class TimeSyncManager;
 namespace Internal {
 class FabricProvisioningServer;
@@ -97,6 +98,7 @@ private:
     friend class ConnectivityManagerImpl;
     friend class ConfigurationManagerImpl;
     friend class TraitManager;
+    friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
     friend class Internal::FabricProvisioningServer;
     friend class Internal::ServiceProvisioningServer;

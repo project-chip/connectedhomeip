@@ -1784,6 +1784,52 @@ if test "${nl_cv_build_tests}" = "yes"; then
     fi
 fi
 
+#
+# otbr-client
+#
+
+AC_ARG_ENABLE(otbr-client,
+    [AS_HELP_STRING([--enable-otbr-client], [Enable OpenThread Linux client])],
+    [
+        case "${enableval}" in
+
+        no|yes)
+            enable_otbr_client=${enableval}
+            ;;
+
+        *)
+            AC_MSG_ERROR([Invalid value ${enableval} for --enable-java])
+            ;;
+
+        esac
+    ],
+    [ enable_otbr_client="no" ]
+)
+
+AC_MSG_NOTICE("enable_otbr_client=${enable_otbr_client}")
+
+if test "${enable_otbr_client}" = "yes"; then
+    maybe_otbr_client_dirstem="ot-br-posix"
+    otbr_client_dirstem="third_party/${maybe_otbr_client_dirstem}/repo"
+
+    AC_MSG_NOTICE([attempting to create internal ${otbrclient_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${otbr_client_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${otbr_client_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
+
+    # otbrclient requires dbus
+    PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.4)
+    AC_SUBST([DBUS_CFLAGS])
+    AC_SUBST([DBUS_LIBS])
+else
+    maybe_otbr_client_dirstem=
+fi
+
+AC_SUBST(OTBR_CLIENT_SUBDIRS, [${maybe_otbr_client_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_OTBR_CLIENT], [test "${enable_otbr_client}" != "no"])
 
 #
 # Nlunit-test
@@ -2147,6 +2193,7 @@ examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
 third_party/mbedtls/Makefile
+third_party/ot-br-posix/Makefile
 src/Makefile
 src/include/Makefile
 src/app/Makefile
