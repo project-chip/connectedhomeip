@@ -27,14 +27,18 @@
 
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
+#include <map>
+#include <memory>
+#include <queue>
+
 #include <fcntl.h>
+#include <pthread.h>
 #include <sched.h>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <unistd.h>
 
-#include <pthread.h>
-#include <queue>
+#include <dbus/dbus.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -51,6 +55,10 @@ namespace Internal {
 template <class ImplClass>
 class GenericPlatformManagerImpl_POSIX : public GenericPlatformManagerImpl<ImplClass>
 {
+public:
+    // ===== Public methods
+    DBusConnection &GetSystemDBusConnection();
+
 protected:
     // Members for select loop
     int mMaxFd;
@@ -79,8 +87,6 @@ protected:
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StartChipTimer(uint32_t durationMS);
 
-    // ===== Methods available to the implementation subclass.
-
 private:
     // ===== Private members for use by this class only.
 
@@ -93,6 +99,26 @@ private:
     void ProcessDeviceEvents();
 
     static void * EventLoopTaskMain(void * arg);
+
+    static dbus_bool_t AddDBusWatch(struct DBusWatch *aWatch, void *aContext);
+    static void        RemoveDBusWatch(struct DBusWatch *aWatch, void *aContext);
+    static void        ToggleDBusWatch(struct DBusWatch *aWatch, void *aContext);
+
+    void UpdateDBusFdSet();
+    void ProcessDBus();
+
+    struct DBusConnectionDeleter
+    {
+        void operator()(DBusConnection *aConnection) { dbus_connection_unref(aConnection); }
+    };
+    using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
+    UniqueDBusConnection mDBusConnection;
+    /**
+     * This map is used to track DBusWatch-es.
+     *
+     */
+    using WatchMap = std::map<DBusWatch *, bool>;
+    WatchMap mWatches;
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.

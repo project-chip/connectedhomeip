@@ -43,6 +43,7 @@ lib_LIBRARIES                                  = \
 libPlatformTests_a_SOURCES                     = \
     TestPlatformMgr.cpp                          \
     TestPlatformTime.cpp                         \
+    TestThreadStackMgr.cpp                       \
     $(NULL)
 
 libPlatformTests_adir                          = $(includedir)/platform
@@ -66,12 +67,27 @@ AM_CPPFLAGS                                    = \
     $(NLUNIT_TEST_CPPFLAGS)                      \
     $(NULL)
 
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+AM_CPPFLAGS                                   += \
+    $(DBUS_CFLAGS)                               \
+    -I$(top_srcdir)/third_party/ot-br-posix/repo/include    \
+    -I$(top_srcdir)/third_party/ot-br-posix/repo/src        \
+    $(NULL)
+endif
+
 CHIP_LDADD                                      = \
     $(top_builddir)/src/platform/libDeviceLayer.a \
     $(top_builddir)/src/inet/libInetLayer.a       \
     $(top_builddir)/src/system/libSystemLayer.a   \
     $(top_builddir)/src/lib/support/libSupportLayer.a   \
     $(NULL)
+
+if CHIP_DEVICE_LAYER_TARGET_LINUX
+CHIP_LDADD                                    += \
+    $(DBUS_LIBS)                                 \
+    $(top_builddir)/third_party/ot-br-posix/libotbrclient.a \
+    $(NULL)
+endif
 
 COMMON_LDADD                                          = \
     libPlatformTests.a                                  \
@@ -88,6 +104,7 @@ COMMON_LDADD                                          = \
 check_PROGRAMS                                 = \
     TestPlatformTime                             \
     TestPlatformMgr                              \
+    TestThreadStackMgr                           \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -110,6 +127,9 @@ TestPlatformTime_SOURCES                       = TestPlatformTimeDriver.cpp
 
 TestPlatformMgr_LDADD                          = $(COMMON_LDADD)
 TestPlatformMgr_SOURCES                        = TestPlatformMgrDriver.cpp
+
+TestThreadStackMgr_LDADD                       = $(COMMON_LDADD)
+TestThreadStackMgr_SOURCES                     = TestThreadStackMgrDriver.cpp
 
 #
 # Foreign make dependencies

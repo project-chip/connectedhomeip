@@ -67,7 +67,7 @@ public:
     void LockThreadStack(void);
     bool TryLockThreadStack(void);
     void UnlockThreadStack(void);
-    bool HaveRouteToAddress(const IPAddress & destAddr);
+    bool HaveRouteToAddress(const Inet::IPAddress & destAddr);
     CHIP_ERROR GetAndLogThreadStatsCounters(void);
     CHIP_ERROR GetAndLogThreadTopologyMinimal(void);
     CHIP_ERROR GetAndLogThreadTopologyFull(void);

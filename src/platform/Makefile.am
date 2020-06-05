@@ -130,6 +130,13 @@ libDeviceLayer_a_SOURCES               += \
     Linux/PosixConfig.cpp                 \
     Linux/PlatformManagerImpl.cpp         \
     Linux/SystemTimeSupport.cpp           \
+    Linux/ThreadStackManagerImpl.cpp      \
+    $(NULL)
+
+libDeviceLayer_a_CPPFLAGS              += \
+    -I$(top_srcdir)/third_party/ot-br-posix/repo/include    \
+    -I$(top_srcdir)/third_party/ot-br-posix/repo/src        \
+    $(DBUS_CFLAGS)                                          \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
@@ -186,5 +193,34 @@ libDeviceLayer_a_SOURCES               +=       \
 endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 endif # CONFIG_DEVICE_LAYER
+
+bin_PROGRAMS = otbr_client_test
+
+otbr_client_test_SOURCES = Linux/ThreadStackManagerTest.cpp
+
+otbr_client_test_CPPFLAGS = \
+    -I$(top_srcdir)/src/include           \
+    -I$(top_srcdir)/src/lib               \
+    -I$(top_srcdir)/src/system            \
+    -I$(top_srcdir)/src                   \
+    -I$(top_srcdir)/third_party/ot-br-posix/repo/include    \
+    -I$(top_srcdir)/third_party/ot-br-posix/repo/src        \
+    $(DBUS_CFLAGS)                                          \
+    $(NLASSERT_CPPFLAGS)                  \
+    $(NLIO_CPPFLAGS)                      \
+    $(LWIP_CPPFLAGS)                      \
+    $(SOCKETS_CPPFLAGS)                   \
+    $(NULL)
+
+otbr_client_test_LDADD = \
+    $(top_builddir)/src/platform/libDeviceLayer.a \
+    $(top_builddir)/src/inet/libInetLayer.a       \
+    $(top_builddir)/src/system/libSystemLayer.a   \
+    $(top_builddir)/src/lib/support/libSupportLayer.a   \
+    $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
+    $(top_builddir)/third_party/ot-br-posix/libotbrclient.a \
+    $(DBUS_LIBS)                                            \
+    -lpthread                                               \
+    $(NULL)
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

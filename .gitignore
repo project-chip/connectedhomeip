@@ -29,6 +29,7 @@ third_party/nlunit-test/
 third_party/mbedtls/
 examples/common/m5stack-tft/
 examples/common/QRCode/repo/
+third_party/ot-br-posix/repo
 
 # Example specific rules
 examples/**/sdkconfig

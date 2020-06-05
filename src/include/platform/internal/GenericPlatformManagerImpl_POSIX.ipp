@@ -24,8 +24,8 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/PlatformManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
@@ -34,13 +34,13 @@
 
 #include <system/SystemLayer.h>
 
-#include <poll.h>
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sched.h>
-#include <unistd.h>
 #include <sys/select.h>
+#include <unistd.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 
@@ -55,6 +55,14 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    DBusError dbusError;
+
+    dbus_error_init(&dbusError);
+    mDBusConnection = UniqueDBusConnection(dbus_bus_get(DBUS_BUS_SYSTEM, &dbusError));
+    VerifyOrExit(mDBusConnection != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(dbus_bus_register(mDBusConnection.get(), &dbusError) == true, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(
+        dbus_connection_set_watch_functions(mDBusConnection.get(), AddDBusWatch, RemoveDBusWatch, ToggleDBusWatch, this, NULL), err = CHIP_ERROR_INTERNAL);
 
     mChipStackLock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 
@@ -63,6 +71,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
     SuccessOrExit(err);
 
 exit:
+    dbus_error_free(&dbusError);
     return err;
 }
 
@@ -126,6 +135,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysUpdate()
     mNextTimeout.tv_sec  = DEFAULT_MIN_SLEEP_PERIOD;
     mNextTimeout.tv_usec = 0;
 
+    UpdateDBusFdSet();
     if (SystemLayer.State() == System::kLayerState_Initialized)
     {
         SystemLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
@@ -144,7 +154,6 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
     uint32_t nextTimeoutMs;
 
     nextTimeoutMs = mNextTimeout.tv_sec * 1000 + mNextTimeout.tv_usec / 1000;
-    ChipLogDetail(DeviceLayer, "Timer: %ld", nextTimeoutMs);
     _StartChipTimer(nextTimeoutMs);
 
     Impl()->UnlockChipStack();
@@ -156,6 +165,8 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
         ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
         return;
     }
+
+    ProcessDBus();
 
     if (SystemLayer.State() == System::kLayerState_Initialized)
     {
@@ -207,6 +218,125 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask(void
     SuccessOrExit(err);
 exit:
     return System::MapErrorPOSIX(err);
+}
+
+template <class ImplClass>
+DBusConnection & GenericPlatformManagerImpl_POSIX<ImplClass>::GetSystemDBusConnection(void)
+{
+    return *mDBusConnection.get();
+}
+
+template <class ImplClass>
+dbus_bool_t GenericPlatformManagerImpl_POSIX<ImplClass>::AddDBusWatch(struct DBusWatch * aWatch, void * aContext)
+{
+    static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(aContext)->mWatches[aWatch] = true;
+    return TRUE;
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl_POSIX<ImplClass>::RemoveDBusWatch(struct DBusWatch * aWatch, void * aContext)
+{
+    static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(aContext)->mWatches.erase(aWatch);
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl_POSIX<ImplClass>::ToggleDBusWatch(struct DBusWatch * aWatch, void * aContext)
+{
+    static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(aContext)->mWatches[aWatch] =
+        (dbus_watch_get_enabled(aWatch) ? true : false);
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl_POSIX<ImplClass>::UpdateDBusFdSet()
+{
+    if (dbus_connection_get_dispatch_status(mDBusConnection.get()) == DBUS_DISPATCH_DATA_REMAINS)
+    {
+        mNextTimeout = { 0, 0 };
+    }
+
+    for (const auto & p : mWatches)
+    {
+        DBusWatch * watch = NULL;
+        unsigned int flags;
+        int fd;
+
+        if (!p.second)
+        {
+            continue;
+        }
+
+        watch = p.first;
+        flags = dbus_watch_get_flags(watch);
+        fd    = dbus_watch_get_unix_fd(watch);
+
+        if (fd < 0)
+        {
+            continue;
+        }
+
+        if (flags & DBUS_WATCH_READABLE)
+        {
+            FD_SET(fd, &mReadSet);
+        }
+
+        if ((flags & DBUS_WATCH_WRITABLE) && dbus_connection_has_messages_to_send(mDBusConnection.get()))
+        {
+            FD_SET(fd, &mWriteSet);
+        }
+
+        FD_SET(fd, &mErrorSet);
+
+        if (fd > mMaxFd)
+        {
+            mMaxFd = fd;
+        }
+    }
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDBus()
+{
+    for (const auto & p : mWatches)
+    {
+        DBusWatch * watch = NULL;
+        unsigned int flags;
+        int fd;
+
+        if (!p.second)
+        {
+            continue;
+        }
+
+        watch = p.first;
+        flags = dbus_watch_get_flags(watch);
+        fd    = dbus_watch_get_unix_fd(watch);
+
+        if (fd < 0)
+        {
+            continue;
+        }
+
+        if ((flags & DBUS_WATCH_READABLE) && !FD_ISSET(fd, &mReadSet))
+        {
+            flags &= static_cast<unsigned int>(~DBUS_WATCH_READABLE);
+        }
+
+        if ((flags & DBUS_WATCH_WRITABLE) && !FD_ISSET(fd, &mWriteSet))
+        {
+            flags &= static_cast<unsigned int>(~DBUS_WATCH_WRITABLE);
+        }
+
+        if (FD_ISSET(fd, &mErrorSet))
+        {
+            flags |= DBUS_WATCH_ERROR;
+        }
+
+        dbus_watch_handle(watch, flags);
+    }
+
+    while (DBUS_DISPATCH_DATA_REMAINS == dbus_connection_get_dispatch_status(mDBusConnection.get()) &&
+           dbus_connection_read_write_dispatch(mDBusConnection.get(), 0))
+        ;
 }
 
 } // namespace Internal

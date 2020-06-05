@@ -1773,6 +1773,63 @@ if test "${nl_cv_build_tests}" = "yes"; then
     fi
 fi
 
+#
+# otbr-client
+#
+
+NL_WITH_PACKAGE(
+    [otbrclient],
+    [OTBRCLIENT],
+    [otbrclient],
+    [],
+    [
+        OTBRCLIENT_CPPFLAGS=
+        OTBRCLIENT_LDFLAGS=
+        OTBRCLIENT_LIBS=
+    ],
+    [
+        AC_LANG_PUSH([C++])
+        AC_LANG_POP([C++])
+    ]
+)
+
+AC_MSG_NOTICE("nl_with_otbrclient=${nl_with_otbrclient}")
+
+# Depending on whether nlfaultinjection has been configured for an internal
+# location, its directory stem within this package needs to be set
+# accordingly. In addition, if the location is internal, then we need
+# to attempt to pull it down using the bootstrap makefile.
+
+if test "${nl_with_otbrclient}" = "internal"; then
+    maybe_otbrclient_dirstem="ot-br-posix"
+    otbrclient_dirstem="third_party/${maybe_otbrclient_dirstem}/repo"
+
+    AC_MSG_NOTICE([attempting to create internal ${otbrclient_dirstem}])
+
+    ${MAKE-make} --no-print-directory -C ${srcdir} -f Makefile-bootstrap ${otbrclient_dirstem}
+
+    if test $? -ne 0; then
+        AC_MSG_ERROR([failed to create ${otbrclient_dirstem}. Please check your network connection or the correctness of 'repos.conf'])
+    fi
+
+    # otbrclient requires dbus
+    PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.4)
+    AC_SUBST([DBUS_CFLAGS])
+    AC_SUBST([DBUS_LIBS])
+else
+    AC_MSG_ERROR("not copying!! nl_with_otbrclient=${nl_with_otbrclient}")
+    maybe_otbrclient_dirstem=""
+fi
+
+AC_SUBST(OTBRCLIENT_SUBDIRS, [${maybe_otbrclient_dirstem}])
+AM_CONDITIONAL([CHIP_WITH_OTBRCLIENT], [test "${nl_with_otbrclient}" != "no"])
+AM_CONDITIONAL([CHIP_WITH_OTBRCLIENT_INTERNAL], [test "${nl_with_otbrclient}" = "internal"])
+
+if test "${nl_with_otbrclient}" = "no"; then
+    AC_DEFINE([CHIP_WITH_OTBRCLIENT], [0], [Define to 1 to build CHIP with otbr client features])
+else
+    AC_DEFINE([CHIP_WITH_OTBRCLIENT], [1], [Define to 1 to build CHIP with otbr client features])
+fi
 
 #
 # Nlunit-test
@@ -2102,6 +2159,7 @@ examples/Makefile
 third_party/Makefile
 third_party/lwip/Makefile
 third_party/mbedtls/Makefile
+third_party/ot-br-posix/Makefile
 src/Makefile
 src/include/Makefile
 src/app/Makefile
