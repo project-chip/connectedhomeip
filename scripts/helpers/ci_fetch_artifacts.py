@@ -61,30 +61,48 @@ class ApiHandler:
       yield ArtifactInfo(path=artifact['path'], url=artifact['url'])
 
 
-parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
-parser.add_argument('--token', type=str, help='API token to use')
-parser.add_argument('--job', type=str, help='What job to search for')
-parser.add_argument(
-    '--download-dir',
-    type=str,
-    default='.',
-    help='Where to download the artifacts')
-parser.add_argument(
-    '--log-level',
-    default=logging.INFO,
-    type=lambda x: getattr(logging, x),
-    help='Configure the logging level.')
-args = parser.parse_args()
+def fetchArtifactsForJob(token, job_name, download_dir):
+  """Download all job artifacts in to the specified directory."""
+  # actual processing: downloads all the given artifacts
+  handler = ApiHandler(token)
+  for artifact in handler.getArtifacts(
+      handler.fetchLatestBuildNumber(job_name)):
+    logging.info('Downloading artifact %r...', artifact)
+    handler.api.download_artifact(artifact.url, download_dir)
+    logging.info('Download complete')
 
-# Ensures somewhat pretty logging of what is going on
-logging.basicConfig(
-    level=args.log_level,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-coloredlogs.install()
 
-# actual processing: downloads all the given artifacts
-handler = ApiHandler(args.token)
-for artifact in handler.getArtifacts(handler.fetchLatestBuildNumber(args.job)):
-  logging.info('Downloading artifact %r...', artifact)
-  handler.api.download_artifact(artifact.url, args.download_dir)
-  logging.info('Download complete')
+def main():
+  """Main task if executed standalone."""
+  parser = argparse.ArgumentParser(description='Fetch master build artifacts.')
+  parser.add_argument('--token', type=str, help='API token to use')
+  parser.add_argument('--job', type=str, help='What job to search for')
+  parser.add_argument(
+      '--download-dir',
+      type=str,
+      default='.',
+      help='Where to download the artifacts')
+  parser.add_argument(
+      '--log-level',
+      default=logging.INFO,
+      type=lambda x: getattr(logging, x),
+      help='Configure the logging level.')
+  args = parser.parse_args()
+
+  # Ensures somewhat pretty logging of what is going on
+  logging.basicConfig(
+      level=args.log_level,
+      format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  coloredlogs.install()
+
+  if not args.token or not args.job:
+    logging.error(
+        'Required arguments missing. Please specify at least job and token.')
+    return
+
+  fetchArtifactsForJob(args.token, args.job, args.download_dir)
+
+
+if __name__ == '__main__':
+  # execute only if run as a script
+  main()
