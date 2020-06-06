@@ -23,7 +23,6 @@
 #include "CHIPVersion.h"
 
 #include "commands.h"
-#include "shell.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -32,21 +31,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const struct chip_shell_cmd cmds[] = {
-    { &cmd_echo, "echo", "Echo back provided inputs" },
-    { &cmd_exit, "exit", "Exit the shell application" },
-    { &cmd_help, "help", "List out all top level commands" },
-    { &cmd_version, "version", "Output the software version" },
-};
-
-void chip_shell_cmd_init()
-{
-    chip_shell_register(cmds, ARRAY_SIZE(cmds));
-}
+namespace chip {
+namespace Shell {
 
 int cmd_echo(int argc, char ** argv)
 {
-    int i = 1;
+    int i = 0;
     while (i < argc)
     {
         streamer_printf(streamer_get(), "%s ", argv[i++]);
@@ -57,12 +47,12 @@ int cmd_echo(int argc, char ** argv)
 
 int cmd_exit(int argc, char ** argv)
 {
-    streamer_printf(streamer_get(), "Goodbye\n\r", cmds[1].cmd_help);
+    streamer_printf(streamer_get(), "Goodbye\n\r");
     exit(0);
     return 0;
 }
 
-int cmd_help_iterator(const struct chip_shell_cmd * command, void * arg)
+int cmd_help_iterator(const struct shell_cmd * command, void * arg)
 {
     streamer_printf(streamer_get(), "  %-15s %s\n\r", command->cmd_name, command->cmd_help);
     return 0;
@@ -70,7 +60,7 @@ int cmd_help_iterator(const struct chip_shell_cmd * command, void * arg)
 
 int cmd_help(int argc, char ** argv)
 {
-    chip_shell_command_foreach(cmd_help_iterator, NULL);
+    shell_command_foreach(cmd_help_iterator, NULL);
     return 0;
 }
 
@@ -79,3 +69,18 @@ int cmd_version(int argc, char ** argv)
     streamer_printf(streamer_get(), "CHIP %s\n\r", CHIP_VERSION_STRING);
     return 0;
 }
+
+static const struct shell_cmd cmds[] = {
+    { &cmd_echo, "echo", "Echo back provided inputs" },
+    { &cmd_exit, "exit", "Exit the shell application" },
+    { &cmd_help, "help", "List out all top level commands" },
+    { &cmd_version, "version", "Output the software version" },
+};
+
+void shell_default_cmds_init()
+{
+    shell_register(cmds, ARRAY_SIZE(cmds));
+}
+
+} // namespace Shell
+} // namespace chip

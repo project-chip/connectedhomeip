@@ -24,6 +24,8 @@
 #include "shell.h"
 #include "commands.h"
 
+#include <support/logging/CHIPLogging.h>
+
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
@@ -47,22 +49,27 @@
 #define CHIP_SHELL_MAX_TOKENS 10
 #endif // CHIP_SHELL_MAX_TOKENS
 
-static const struct chip_shell_cmd * the_cmd_set[CHIP_SHELL_MAX_MODULES];
+using namespace chip::Logging;
+
+namespace chip {
+namespace Shell {
+
+static const struct shell_cmd * the_cmd_set[CHIP_SHELL_MAX_MODULES];
 static unsigned the_cmd_set_size[CHIP_SHELL_MAX_MODULES];
 static unsigned the_cmd_set_count;
 
 int shell_line_read(char * buffer, size_t max)
 {
-    char * inptr = buffer;
     int read     = 0;
     bool done    = false;
+    char * inptr = buffer;
 
     // Read in characters until we get a new line or we hit our max size.
-    while (((inptr - buffer) < max) && !done)
+    while (((inptr - buffer) < (int) max) && !done)
     {
         if (read == 0)
         {
-            read = streamer_read(streamer_get(), (uint8_t *) inptr, 1);
+            read = streamer_read(streamer_get(), inptr, 1);
         }
 
         // Process any characters we just read in.
@@ -128,33 +135,34 @@ int shell_line_tokenize(char * buffer, char ** tokens, int max_tokens)
     return cursor;
 }
 
-void chip_shell_command_foreach(on_command_t * on_command, void * arg)
+void shell_command_foreach(shell_cmd_iterator_t * on_command, void * arg)
 {
     for (unsigned i = 0; i < the_cmd_set_count; i++)
     {
         for (unsigned j = 0; j < the_cmd_set_size[i]; j++)
         {
-            on_command(&the_cmd_set[i][j], arg);
+            if (on_command(&the_cmd_set[i][j], arg))
+            {
+                return;
+            }
         }
     }
 }
 
-int chip_shell_register(const struct chip_shell_cmd * command_set, unsigned count)
+void shell_register(const struct shell_cmd * command_set, unsigned count)
 {
     if (the_cmd_set_count >= CHIP_SHELL_MAX_MODULES)
     {
-        // DFLT_LOG_ERROR("Max number of modules reached\n");
+        ChipLogError(Shell, "Max number of modules reached\n");
         assert(0);
     }
 
     the_cmd_set[the_cmd_set_count]      = command_set;
     the_cmd_set_size[the_cmd_set_count] = count;
     ++the_cmd_set_count;
-
-    return 0;
 }
 
-void chip_shell_task(void * arg)
+void shell_task(void * arg)
 {
     int retval;
     int argc;
@@ -165,7 +173,7 @@ void chip_shell_task(void * arg)
     streamer_init(streamer_get());
 
     // Register default commands.
-    chip_shell_cmd_init();
+    shell_default_cmds_init();
 
     while (1)
     {
@@ -198,3 +206,6 @@ void chip_shell_task(void * arg)
         }
     }
 }
+
+} // namespace Shell
+} // namespace chip

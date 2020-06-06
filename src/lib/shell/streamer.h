@@ -25,31 +25,31 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace chip {
+namespace Shell {
 
 struct streamer;
 
-typedef int streamer_init_fn(const struct streamer * streamer);
-typedef int streamer_read_fn(const struct streamer * streamer, char * buf, size_t len);
-typedef int streamer_write_fn(const struct streamer * streamer, const char * buf, size_t len);
+typedef int streamer_init_fn(const struct streamer * self);
+typedef int streamer_read_fn(const struct streamer * self, char * buf, size_t len);
+typedef int streamer_write_fn(const struct streamer * self, const char * buf, size_t len);
 
-struct streamer
+typedef struct streamer
 {
     streamer_init_fn * init_cb;
     streamer_read_fn * read_cb;
     streamer_write_fn * write_cb;
-};
+} streamer_t;
 
-int streamer_init(const struct streamer * streamer);
-int streamer_read(const struct streamer * streamer, void * buf, size_t len);
-int streamer_write(const struct streamer * streamer, const void * buf, size_t len);
-int streamer_vprintf(const struct streamer * streamer, const char * fmt, va_list ap);
-int streamer_printf(const struct streamer * streamer, const char * fmt, ...);
+int streamer_init(const struct streamer * self);
+int streamer_read(const struct streamer * self, char * buf, size_t len);
+int streamer_write(const struct streamer * self, const char * buf, size_t len);
+int streamer_vprintf(const struct streamer * self, const char * fmt, va_list ap);
+int streamer_printf(const struct streamer * self, const char * fmt, ...);
+void streamer_print_hex(const struct streamer * self, const uint8_t * data, int len);
 const struct streamer * streamer_get(void);
 
-#ifdef __cplusplus
-}
-#endif
+} // namespace Shell
+} // namespace chip

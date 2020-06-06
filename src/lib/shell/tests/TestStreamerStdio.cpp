@@ -26,6 +26,7 @@
 #include <string.h>
 
 using namespace chip;
+using namespace chip::Shell;
 using namespace chip::Logging;
 
 // =================================

@@ -23,27 +23,30 @@
 
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
-SUBDIRS                                                           = $(NULL)
+lib_LIBRARIES         = libChipShell.a
 
-lib_LIBRARIES                                                     = libChipShell.a
+SUBDIRS               = $(NULL)
 
-libChipShell_adir                                                 = $(includedir)/shell
+BUILT_SOURCES         = $(top_builddir)/src/include/CHIPVersion.h 
+
+libChipShell_adir     = $(includedir)/shell
 
 libChipShell_a_CPPFLAGS                                           = \
     -I$(top_srcdir)/src                                             \
-    -I$(top_srcdir)/src/shell                                       \
+    -I$(top_srcdir)/src/lib                                         \
+    -I$(top_srcdir)/src/lib/shell                                   \
     $(NULL)
 
 dist_libChipShell_a_HEADERS                                       = \
-    @top_builddir@/src/shell/shell.h                                \
-    @top_builddir@/src/shell/streamer.h                             \
-    @top_builddir@/src/shell/commands.h                             \
+    @top_builddir@/src/lib/shell/shell.h                            \
+    @top_builddir@/src/lib/shell/streamer.h                         \
+    @top_builddir@/src/lib/shell/commands.h                         \
     $(NULL)
 
 libChipShell_a_SOURCES                                            = \
-    commands.c                                                      \
-    shell.c                                                         \
-    streamer.c                                                      \
+    commands.cc                                                     \
+    shell.cc                                                        \
+    streamer.cc                                                     \
     $(NULL)
 
 if CHIP_TARGET_STYLE_UNIX
@@ -51,7 +54,7 @@ if CHIP_TARGET_STYLE_UNIX
 SUBDIRS                                                          += tests
 
 libChipShell_a_SOURCES                                           += \
-    streamer_stdio.c                                                \
+    streamer_stdio.cc                                               \
     $(NULL)
 
 endif

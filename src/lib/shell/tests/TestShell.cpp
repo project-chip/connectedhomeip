@@ -16,7 +16,6 @@
  */
 
 #include <nlunit-test.h>
-#include <shell/commands.h>
 #include <shell/shell.h>
 #include <support/CodeUtils.h>
 
@@ -27,6 +26,7 @@
 #include <string.h>
 
 using namespace chip;
+using namespace chip::Shell;
 using namespace chip::Logging;
 
 // =================================
@@ -49,8 +49,6 @@ static const struct test_shell_vector test_vector_shell_tokenizer[] = {
 // =================================
 
 #define TEST_SHELL_MAX_TOKENS 5
-
-extern "C" int shell_line_tokenize(char * buffer, char ** tokens, int max_tokens);
 
 static void TestShell_Tokenizer(nlTestSuite * inSuite, void * inContext)
 {
@@ -98,10 +96,7 @@ int tests_run(void)
     return nlTestRunnerStats(&theSuite);
 }
 
-extern "C" void cmd_init();
-
 int main(void)
 {
-    chip_shell_cmd_init();
     tests_run();
 }

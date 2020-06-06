@@ -22,17 +22,19 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "shell.h"
 
-int cmd_echo(int argc, char ** argv);
-int cmd_exit(int argc, char ** argv);
-int cmd_help(int argc, char ** argv);
-int cmd_version(int argc, char ** argv);
+namespace chip {
+namespace Shell {
 
-void chip_shell_cmd_init();
+/**
+ * Registers a set of default commands with the shell:
+ *    help      - list the top-level brief of all registered commands
+ *    echo      - echo back all argument characters passed
+ *    exit      - quit out of the shell
+ *    version   - return the version of the CHIP library
+ */
+void shell_default_cmds_init();
 
-#ifdef __cplusplus
-}
-#endif
+} // namespace Shell
+} // namespace chip

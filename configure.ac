@@ -2085,8 +2085,6 @@ src/crypto/Makefile
 src/crypto/tests/Makefile
 src/lwip/Makefile
 src/lwip/tests/Makefile
-src/shell/Makefile
-src/shell/tests/Makefile
 src/system/Makefile
 src/system/tests/Makefile
 src/setup_payload/Makefile
@@ -2095,6 +2093,8 @@ src/inet/Makefile
 src/inet/tests/Makefile
 src/lib/Makefile
 src/lib/core/tests/Makefile
+src/lib/shell/Makefile
+src/lib/shell/tests/Makefile
 src/lib/support/Makefile
 src/lib/support/tests/Makefile
 src/platform/Makefile

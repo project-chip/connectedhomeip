@@ -21,50 +21,64 @@
  *      Source implementation for a output stream abstraction.
  */
 
-#include "shell.h"
+#include "streamer.h"
 
 #include <stdio.h>
 
 #ifndef CONSOLE_DEFAULT_MAX_LINE
-#define CONSOLE_DEFAULT_MAX_LINE 80
+#define CONSOLE_DEFAULT_MAX_LINE 256
 #endif
 
-int streamer_init(const struct streamer * streamer)
+namespace chip {
+namespace Shell {
+
+int streamer_init(const struct streamer * self)
 {
-    return streamer->init_cb(streamer);
+    return self->init_cb(self);
 }
 
-int streamer_read(const struct streamer * streamer, void * buf, size_t len)
+int streamer_read(const struct streamer * self, char * buf, size_t len)
 {
-    return streamer->read_cb(streamer, buf, len);
+    return self->read_cb(self, buf, len);
 }
 
-int streamer_write(const struct streamer * streamer, const void * buf, size_t len)
+int streamer_write(const struct streamer * self, const char * buf, size_t len)
 {
-    return streamer->write_cb(streamer, buf, len);
+    return self->write_cb(self, buf, len);
 }
 
-int streamer_vprintf(const struct streamer * streamer, const char * fmt, va_list ap)
+int streamer_vprintf(const struct streamer * self, const char * fmt, va_list ap)
 {
     char buf[CONSOLE_DEFAULT_MAX_LINE];
-    int len;
+    unsigned len;
 
     len = vsnprintf(buf, sizeof(buf), fmt, ap);
     if (len >= sizeof(buf))
     {
         len = sizeof(buf) - 1;
     }
-    return streamer_write(streamer, buf, len);
+    return streamer_write(self, buf, len);
 }
 
-int streamer_printf(const struct streamer * streamer, const char * fmt, ...)
+int streamer_printf(const struct streamer * self, const char * fmt, ...)
 {
     va_list ap;
     int rc;
 
     va_start(ap, fmt);
-    rc = streamer_vprintf(streamer, fmt, ap);
+    rc = streamer_vprintf(self, fmt, ap);
     va_end(ap);
 
     return rc;
 }
+
+void streamer_print_hex(const struct streamer * self, const uint8_t * bytes, int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        streamer_printf(streamer_get(), "%02x", bytes[i]);
+    }
+}
+
+} // namespace Shell
+} // namespace chip

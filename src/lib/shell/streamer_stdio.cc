@@ -28,6 +28,9 @@
 #include <termio.h>
 #include <unistd.h>
 
+namespace chip {
+namespace Shell {
+
 static struct termios the_original_stdin_termios;
 
 static void streamer_restore_termios(void)
@@ -76,3 +79,6 @@ const struct streamer * streamer_get(void)
 {
     return &streamer_stdio;
 }
+
+} // namespace Shell
+} // namespace chip
