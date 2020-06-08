@@ -175,8 +175,8 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not allocated
            as an inline buffer to PacketBuffer structure */
-        origMsg   = msg;
-        msg       = PacketBuffer::NewWithAvailableSize(encryptedLen);
+        origMsg = msg;
+        msg     = PacketBuffer::NewWithAvailableSize(encryptedLen);
         msg->SetDataLength(encryptedLen, msg);
 #endif
 
