@@ -36,65 +36,57 @@ Currently these are the requirements to becoming a member of the
 
 ## Getting Started
 
-This repository contains the source code that implements the CHIP
-specification. It implements both the sides of the specification: the
-controller (iOS/Android/Desktop), and the accessory (the _smart_
-device).
+This repository contains the source code that implements the CHIP specification.
+It implements both the sides of the specification: the controller
+(iOS/Android/Desktop), and the accessory (the _smart_ device).
 
 The source code can be built to generate:
 
-- **Libraries** that can be built for iOS, Android or desktop
-  (Linux/Mac) targets. These libraries could further be integrated
-  into applications that talk _CHIP_. These will typically be
-  implemented for building the controller. But of course, you can also
-  build the accessory side for testing and such.
-- **Firmwares/Embedded Applications** that can be built for the
-  supported embedded platforms.
-- **Desktop Application** that can be used in conjunction with the
-  embedded applications above to validate the end-to-end CHIP
-  workflow.
+-   **Libraries** that can be built for iOS, Android or desktop (Linux/Mac)
+    targets. These libraries could further be integrated into applications that
+    talk _CHIP_. These will typically be implemented for building the
+    controller. But of course, you can also build the accessory side for testing
+    and such.
+-   **Firmwares/Embedded Applications** that can be built for the supported
+    embedded platforms.
+-   **Desktop Application** that can be used in conjunction with the embedded
+    applications above to validate the end-to-end CHIP workflow.
 
 ### Building your first application
 
-- Building the firmware: This repository implements the CHIP
-  specification on 3 transports: 802.15.4, BLE and Wi-Fi. The
-  examples/ directory contains example applications for all these 3
-  transports using 3 embedded platforms. Please visit their respective
-  directories for instructions on how to build and deploy on these
-  platforms.
-  - NRF5 (for 802.15.4): in
-  [examples/lock-app/nrf5](examples/lock-app/nrf5) 
-  - EFR32 (for BLE): in
-  [examples/lock-app/efr32](examples/lock-app/efr32) 
-  - ESP32 (for Wi-Fi or BLE): in
-  [examples/wifi-echo/server/esp32](examples/wifi-echo/server/esp32) 
-- Building the controller: The controller can be used in conjunction
-  with the embedded platform for validation. Please visit the
-  [examples/chip-tool](examples/chip-tool) directory for further
-  instructions. 
+-   Building the firmware: This repository implements the CHIP specification on
+    3 transports: 802.15.4, BLE and Wi-Fi. The examples/ directory contains
+    example applications for all these 3 transports using 3 embedded platforms.
+    Please visit their respective directories for instructions on how to build
+    and deploy on these platforms.
+    -   NRF5 (for 802.15.4): in [examples/lock-app/nrf5](examples/lock-app/nrf5)
+    -   EFR32 (for BLE): in [examples/lock-app/efr32](examples/lock-app/efr32)
+    -   ESP32 (for Wi-Fi or BLE): in
+        [examples/wifi-echo/server/esp32](examples/wifi-echo/server/esp32)
+-   Building the controller: The controller can be used in conjunction with the
+    embedded platform for validation. Please visit the
+    [examples/chip-tool](examples/chip-tool) directory for further instructions.
 
 ### Where should I begin?
 
-- Good First Issue: Certain issues are marked with a label [Good First
-  Issue](https://github.com/project-chip/connectedhomeip/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22). These
-  issues are what we believe may be good starting points for getting
-  your hands dirty.
-- TODOs: Most items that will require work are captured in the GitHub
-  issues of this project. This serves as a good TODO list for the next
-  steps.
-- Milestones: A list of
-  [milestones](https://github.com/project-chip/connectedhomeip/milestones)
-  are maintained in this project. This should provide some idea of
-  where things are headed. Note that given the early days of this
-  project, most of these are not hard deadlines.
+-   Good First Issue: Certain issues are marked with a label
+    [Good First Issue](https://github.com/project-chip/connectedhomeip/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+    These issues are what we believe may be good starting points for getting
+    your hands dirty.
+-   TODOs: Most items that will require work are captured in the GitHub issues
+    of this project. This serves as a good TODO list for the next steps.
+-   Milestones: A list of
+    [milestones](https://github.com/project-chip/connectedhomeip/milestones) are
+    maintained in this project. This should provide some idea of where things
+    are headed. Note that given the early days of this project, most of these
+    are not hard deadlines.
 
 ### Where is the spec?
 
-- The specification is evolving in various tiger teams. Members
-  belonging to various tiger teams may contribute experimental code
-  for the general direction where the spec is headed. Once a
-  specification is fairly finalised, it will be available/committed in
-  the [docs/specs](docs/specs).
+-   The specification is evolving in various tiger teams. Members belonging to
+    various tiger teams may contribute experimental code for the general
+    direction where the spec is headed. Once a specification is fairly
+    finalised, it will be available/committed in the [docs/specs](docs/specs).
 
 ## Bugs
 
