@@ -133,7 +133,7 @@ CHIP_ERROR SecureTransport::SendMessage(PacketBuffer * msgBuf, const IPAddress &
 
     {
         uint8_t * plainText = msgBuf->Start();
-        size_t plainTextlen = msgBuf->DataLength();
+        size_t plainTextlen = msgBuf->TotalLength();
 
         uint8_t * encryptedText = plainText - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
         size_t encryptedLen     = plainTextlen + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
@@ -169,18 +169,20 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
     if (connection->StateAllowsReceive() && msg != NULL)
     {
         uint8_t * encryptedText = msg->Start();
-        uint16_t encryptedLen   = msg->DataLength();
-
-        uint8_t * plainText = encryptedText + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-        size_t plainTextlen = encryptedLen - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        uint16_t encryptedLen   = msg->TotalLength();
 
         chip::System::PacketBuffer * origMsg = NULL;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+        /* This is a workaround for the case where PacketBuffer payload is not allocated
+           as an inline buffer to PacketBuffer structure */
         origMsg   = msg;
-        msg       = PacketBuffer::NewWithAvailableSize(plainTextlen);
-        plainText = msg->Start();
-        msg->SetDataLength(plainTextlen, msg);
+        msg       = PacketBuffer::NewWithAvailableSize(encryptedLen);
+        msg->SetDataLength(encryptedLen, msg);
 #endif
+
+        uint8_t * plainText = msg->Start() + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        size_t plainTextlen = encryptedLen - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+
         CHIP_ERROR err = connection->mSecureChannel.Decrypt(encryptedText, encryptedLen, plainText, plainTextlen);
 
         if (origMsg != NULL)
@@ -190,7 +192,7 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
 
         if (err == CHIP_NO_ERROR)
         {
-            msg->SetStart(plainText);
+            msg->Consume(CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE);
             connection->OnMessageReceived(connection, msg, pktInfo);
         }
         else
