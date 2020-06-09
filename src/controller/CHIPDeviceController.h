@@ -67,10 +67,11 @@ public:
      * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
      * @param[in] onMessageReceived     Callback for when a message is received
      * @param[in] onError               Callback for when an error occurs
+     * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
      * @return CHIP_ERROR           The connection status
      */
     CHIP_ERROR ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState, MessageReceiveHandler onMessageReceived,
-                             ErrorHandler onError);
+                             ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
 
     /**
      * @brief
@@ -92,9 +93,10 @@ public:
      *   Get the address and port of a connected device
      *
      * @param[out] deviceAddr   The IPAddress of the connected device
+     * @param[out] devicePort   The port of the econnected device
      * @return CHIP_ERROR   An error if there's no active connection
      */
-    CHIP_ERROR GetDeviceAddress(IPAddress * deviceAddr);
+    CHIP_ERROR GetDeviceAddress(IPAddress * deviceAddr, uint16_t * devicePort);
 
     /**
      * @brief
@@ -176,6 +178,7 @@ private:
 
     uint64_t mDeviceId;
     IPAddress mDeviceAddr;
+    uint16_t mDevicePort;
 
     void ClearRequestState();
     void ClearOpState();

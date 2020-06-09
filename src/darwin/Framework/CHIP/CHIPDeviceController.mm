@@ -172,7 +172,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     dispatch_sync(self.chipWorkQueue, ^() {
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
-        err = self.cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError);
+        err = self.cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError, CHIP_PORT);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -193,14 +193,18 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
     __block chip::IPAddress ipAddr;
+    __block uint16_t port;
 
     dispatch_sync(self.chipWorkQueue, ^() {
-        err = self.cppController->GetDeviceAddress(&ipAddr);
+        err = self.cppController->GetDeviceAddress(&ipAddr, &port);
     });
 
     if (err != CHIP_NO_ERROR) {
         return nil;
     }
+
+    // ignore the unused port
+    (void)port;
     // A buffer big enough to hold ipv4 and ipv6 addresses
     char ipAddrStr[64];
     ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
