@@ -156,7 +156,10 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 }
 
-- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
+- (BOOL)connect:(NSString *)ipAddress
+      local_key:(NSData *)local_key
+       peer_key:(NSData *)peer_key
+          error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -174,6 +177,20 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
+        return NO;
+    }
+
+    dispatch_sync(self.chipWorkQueue, ^() {
+        const unsigned char * local_key_bytes = (const unsigned char *) [local_key bytes];
+        const unsigned char * peer_key_bytes = (const unsigned char *) [peer_key bytes];
+        err = self.cppController->ManualKeyExchange(peer_key_bytes, peer_key.length, local_key_bytes, local_key.length);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Error(%d): %@, key exchange failed", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
