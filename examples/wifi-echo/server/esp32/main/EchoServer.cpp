@@ -70,19 +70,7 @@ static void echo(SecureTransport * transport, System::PacketBuffer * buffer, con
             return;
         }
 
-        if (data_len == 0)
-        {
-            ESP_LOGI(TAG, "Client sent an empty message");
-        }
-        else
-        {
-            // attempt to print the incoming message
-            char msg_buffer[data_len];
-            msg_buffer[0] = '\0';
-            memcpy(msg_buffer, buffer->Start(), data_len);
-            msg_buffer[data_len - 1] = 0; // Null-terminate whatever we received and treat like a string...
-            ESP_LOGI(TAG, "Client sent: \"%s\"", msg_buffer);
-        }
+        ESP_LOGI(TAG, "Client sent: \"%.*s\"", data_len, buffer->Start());
 
         // Attempt to echo back
         CHIP_ERROR err = transport->SendMessage(buffer, packet_info->SrcAddress);
