@@ -53,10 +53,10 @@ The source code can be built to generate:
 ### Building your first application
 
 -   Building the firmware: This repository implements the CHIP specification on
-    3 transports: 802.15.4 Thread, BLE and Wi-Fi. The examples/ directory contains
-    example applications for all these 3 transports using 3 embedded platforms.
-    Please visit their respective directories for instructions on how to build
-    and deploy on these platforms.
+    3 transports: 802.15.4 Thread, BLE and Wi-Fi. The examples/ directory
+    contains example applications for all these 3 transports using 3 embedded
+    platforms. Please visit their respective directories for instructions on how
+    to build and deploy on these platforms.
     -   NRF5 (for 802.15.4 Thread): in
         [examples/lock-app/nrf5](examples/lock-app/nrf5)
     -   EFR32 (for BLE): in [examples/lock-app/efr32](examples/lock-app/efr32)
