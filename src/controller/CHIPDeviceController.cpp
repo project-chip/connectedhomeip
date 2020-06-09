@@ -184,7 +184,7 @@ CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState != kState_Initialized || mConState != kConnectionState_Connected)
+    if (mState != kState_Initialized || mConState != kConnectionState_Connected || mConState != kConnectionState_SecureConnected)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -203,14 +203,14 @@ CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16
 
 bool ChipDeviceController::IsConnected()
 {
-    return kState_Initialized && mConState == kConnectionState_Connected;
+    return kState_Initialized && (mConState == kConnectionState_Connected || mConState == kConnectionState_SecureConnected);
 }
 
 CHIP_ERROR ChipDeviceController::DisconnectDevice()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState != kState_Initialized || mConState != kConnectionState_Connected)
+    if (mState != kState_Initialized || mConState != kConnectionState_Connected || mConState != kConnectionState_SecureConnected)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -328,7 +328,8 @@ void ChipDeviceController::OnReceiveMessage(StatefulTransport * con, PacketBuffe
 void ChipDeviceController::OnReceiveError(StatefulTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo)
 {
     ChipDeviceController * mgr = con->State();
-    if (mgr->mConState == kConnectionState_Connected && mgr->mOnError != NULL && pktInfo != NULL)
+    if ((mgr->mConState == kConnectionState_Connected || mgr->mConState == kConnectionState_Connected) && mgr->mOnError != NULL &&
+        pktInfo != NULL)
     {
         mgr->mOnError(mgr, mgr->mAppReqState, err, pktInfo);
     }
