@@ -72,6 +72,14 @@ public:
         return *this;
     }
 
+    /** Set the source node id for this header. */
+    MessageHeader & SetSourceNodeId(Optional<uint64_t> id)
+    {
+        mSourceNodeId = id;
+
+        return *this;
+    }
+
     /** Clear the source node id for this header. */
     MessageHeader & ClearSourceNodeId()
     {
@@ -85,6 +93,13 @@ public:
     {
         mDestinationNodeId.SetValue(id);
 
+        return *this;
+    }
+
+    /** Set the destination node id for this header. */
+    MessageHeader & SetDestinationNodeId(Optional<uint64_t> id)
+    {
+        mDestinationNodeId = id;
         return *this;
     }
 
@@ -132,7 +147,7 @@ public:
      * Possible failures:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
-    CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size);
+    CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size) const;
 
 private:
     /// Represents the current encode/decode header version

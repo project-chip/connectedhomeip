@@ -43,6 +43,7 @@ lib_LIBRARIES                                         = \
 libTransportLayerTests_a_SOURCES                      = \
     TestMessageHeader.cpp                               \
     TestSecureTransport.cpp                             \
+    TestUdp.cpp                                         \
     TestCHIPSecureChannel.cpp                           \
     $(NULL)
 
@@ -110,8 +111,11 @@ TestMessageHeader_LDADD       = $(COMMON_LDADD)
 TestSecureTransport_SOURCES   = TestSecureTransportDriver.cpp
 TestSecureTransport_LDADD     = $(COMMON_LDADD)
 
-TestCHIPSecureChannel_SOURCES                         = TestCHIPSecureChannelDriver.cpp
-TestCHIPSecureChannel_LDADD                           = $(COMMON_LDADD)
+TestCHIPSecureChannel_SOURCES = TestCHIPSecureChannelDriver.cpp
+TestCHIPSecureChannel_LDADD   = $(COMMON_LDADD)
+
+TestUdp_SOURCES               = TestUdpDriver.cpp
+TestUdp_LDADD                 = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

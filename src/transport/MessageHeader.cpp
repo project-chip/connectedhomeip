@@ -124,7 +124,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_size)
+CHIP_ERROR MessageHeader::Encode(uint8_t * data, size_t size, size_t * encode_size) const
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     uint8_t * p     = data;
