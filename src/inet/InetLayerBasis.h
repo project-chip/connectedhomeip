@@ -93,10 +93,6 @@ inline void InetLayerBasis::InitInetLayerBasis(InetLayer & aInetLayer, void * aA
     mInetLayer = &aInetLayer;
 }
 
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-typedef InetLayerBasis InetLayerObject;
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**

@@ -46,9 +46,7 @@ lib_LIBRARIES                                         = \
 
 libInetLayerTests_a_SOURCES                           = \
     TestInetAddress.cpp                                 \
-    TestInetBuffer.cpp                                  \
     TestInetErrorStr.cpp                                \
-    TestInetTimer.cpp                                   \
     $(NULL)
 
 libInetLayerTests_adir                                = $(includedir)/inet
@@ -162,9 +160,7 @@ noinst_PROGRAMS                                       = \
 
 check_PROGRAMS                                       += \
     TestInetAddress                                     \
-    TestInetBuffer                                      \
     TestInetErrorStr                                    \
-    TestInetTimer                                       \
     $(NULL)
 
 endif # CHIP_TARGET_STYLE_EMBEDDED
@@ -185,10 +181,6 @@ TestLwIPDNS_LDADD                                     = libTestInetCommon.a $(CO
 TestInetAddress_SOURCES                               = TestInetAddressDriver.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
 
-TestInetBuffer_SOURCES                                = TestInetBufferDriver.cpp      \
-                                                        $(NULL)
-TestInetBuffer_LDADD                                  = $(COMMON_LDADD)
-
 TestInetEndPoint_SOURCES                              = TestInetEndPoint.cpp    \
                                                         $(NULL)
 TestInetEndPoint_LDADD                                = libTestInetCommon.a $(COMMON_LDADD)
@@ -207,10 +199,6 @@ TestInetLayer_LDADD                                   = libTestInetCommon.a $(CO
 TestInetLayerMulticast_SOURCES                        = TestInetLayerMulticast.cpp    \
                                                         $(NULL)
 TestInetLayerMulticast_LDADD                          = libTestInetCommon.a $(COMMON_LDADD)
-
-TestInetTimer_SOURCES                                 = TestInetTimerDriver.cpp       \
-                                                        $(NULL)
-TestInetTimer_LDADD                                   = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies
