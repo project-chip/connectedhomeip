@@ -38,7 +38,6 @@
         _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
 
         [self retrieveSerialNumber:setupPayload];
-
     }
     return self;
 }

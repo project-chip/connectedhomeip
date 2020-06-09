@@ -122,7 +122,7 @@ void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
-    CHIP_ERROR err = generator.payloadBase41Representation(result);
+    CHIP_ERROR err  = generator.payloadBase41Representation(result);
     bool didSucceed = err == CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, didSucceed == true);
 

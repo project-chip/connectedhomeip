@@ -76,7 +76,8 @@
 - (void)testQRCodeParser
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008000"];
+    CHIPQRCodeSetupPayloadParser * parser =
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
@@ -94,7 +95,8 @@
 - (void)testQRCodeParserWithOptionalData
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:H00O0048C7.1000-HW000200100ND0UOGMHARTH7+40Y1CLJJJ7RW7848UG8BT88CD90BP*BVOD 6BI9CO"];
+    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc]
+        initWithBase41Representation:@"CH:H00O0048C7.1000-HW000200100ND0UOGMHARTH7+40Y1CLJJJ7RW7848UG8BT88CD90BP*BVOD 6BI9CO"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
@@ -109,15 +111,15 @@
     XCTAssertEqual(payload.rendezvousInformation.unsignedIntegerValue, 1);
     XCTAssertTrue([payload.serialNumber isEqualToString:@"123456789QWDHANTYUIOP"]);
 
-    NSArray<CHIPOptionalQRCodeInfo *> *vendorOptionalInfo = [payload getAllVendorOptionalData:&error];
+    NSArray<CHIPOptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllVendorOptionalData:&error];
     XCTAssertNil(error);
     XCTAssertEqual([vendorOptionalInfo count], 2);
-    for (CHIPOptionalQRCodeInfo *info in vendorOptionalInfo) {
+    for (CHIPOptionalQRCodeInfo * info in vendorOptionalInfo) {
         if (info.tag.intValue == 2) {
             XCTAssertEqual(info.infoType.intValue, kOptionalQRCodeInfoTypeString);
             XCTAssertTrue([info.stringValue isEqualToString:@"myData"]);
         } else if (info.tag.intValue == 3) {
-            XCTAssertEqual(info.infoType.intValue, kOptionalQRCodeInfoTypeInt);\
+            XCTAssertEqual(info.infoType.intValue, kOptionalQRCodeInfoTypeInt);
             XCTAssertEqual(info.integerValue.intValue, 12);
         }
     }
