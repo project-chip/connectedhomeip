@@ -88,13 +88,6 @@ public:
 private:
     static const size_t kAES_CCM128_Key_Length = 16;
 
-    typedef struct
-    {
-        uint64_t payload_length;
-        uint64_t IV;
-        uint64_t tag;
-    } security_header_t;
-
     bool mKeyAvailable;
     uint64_t mNextIV;
     uint8_t mKey[kAES_CCM128_Key_Length];

@@ -22,6 +22,7 @@
  *
  */
 
+#include <core/CHIPEncoding.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CodeUtils.h>
 #include <transport/CHIPSecureChannel.h>
@@ -31,6 +32,13 @@
 namespace chip {
 
 using namespace Crypto;
+
+typedef struct
+{
+    uint64_t payload_length;
+    uint64_t IV;
+    uint64_t tag;
+} security_header_t;
 
 ChipSecureChannel::ChipSecureChannel() : mKeyAvailable(false), mNextIV(0) {}
 
@@ -78,10 +86,11 @@ void ChipSecureChannel::Close(void)
 CHIP_ERROR ChipSecureChannel::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output,
                                       size_t output_length)
 {
+    security_header_t header;
+
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint64_t tag     = 0;
-    security_header_t header;
-    size_t overhead = EncryptionOverhead();
+    size_t overhead  = EncryptionOverhead();
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -89,9 +98,11 @@ CHIP_ERROR ChipSecureChannel::Encrypt(const unsigned char * input, size_t input_
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output_length >= overhead + input_length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    header.payload_length = input_length;
-    header.IV             = mNextIV;
-    header.tag            = 0;
+    chip::Encoding::LittleEndian::Put64((uint8_t *) &header.payload_length, input_length);
+
+    // Tag and IV values are byte buffers, and are not byteorder specific.
+    header.IV  = mNextIV;
+    header.tag = 0;
 
     error = AES_CCM_encrypt(input, input_length, (const unsigned char *) &header, sizeof(header), mKey, sizeof(mKey),
                             (const unsigned char *) &header.IV, sizeof(header.IV), &output[overhead], (unsigned char *) &tag,
@@ -110,10 +121,12 @@ exit:
 CHIP_ERROR ChipSecureChannel::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output,
                                       size_t & output_length)
 {
+    security_header_t header;
+
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint64_t tag     = 0;
-    security_header_t header;
-    size_t overhead = EncryptionOverhead();
+    size_t overhead  = EncryptionOverhead();
+    uint64_t length  = 0;
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -121,18 +134,20 @@ CHIP_ERROR ChipSecureChannel::Decrypt(const unsigned char * input, size_t input_
     VerifyOrExit(output != NULL, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     memcpy(&header, input, sizeof(header));
-    tag        = header.tag;
+    length = chip::Encoding::LittleEndian::Get64((const uint8_t *) &header.payload_length);
+    tag    = header.tag;
+
+    // The tag is not used in the AAD buffer. So 0 it out.
     header.tag = 0;
 
-    VerifyOrExit(output_length >= header.payload_length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(input_length >= header.payload_length + overhead, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(output_length >= length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(input_length >= length + overhead, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = AES_CCM_decrypt(&input[overhead], header.payload_length, (const unsigned char *) &header, sizeof(header),
-                            (const unsigned char *) &tag, sizeof(tag), mKey, sizeof(mKey), (const unsigned char *) &header.IV,
-                            sizeof(header.IV), output);
+    error = AES_CCM_decrypt(&input[overhead], length, (const unsigned char *) &header, sizeof(header), (const unsigned char *) &tag,
+                            sizeof(tag), mKey, sizeof(mKey), (const unsigned char *) &header.IV, sizeof(header.IV), output);
     if (error == CHIP_NO_ERROR)
     {
-        output_length = header.payload_length;
+        output_length = length;
     }
 exit:
     return error;

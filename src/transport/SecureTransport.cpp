@@ -171,12 +171,19 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
         uint8_t * encryptedText = msg->Start();
         uint16_t encryptedLen   = msg->TotalLength();
 
+        if (encryptedLen < CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE)
+        {
+            PacketBuffer::Free(msg);
+            ChipLogProgress(Inet, "Secure transport received smaller than encryption header, discarding");
+            return;
+        }
+
         chip::System::PacketBuffer * origMsg = NULL;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not allocated
            as an inline buffer to PacketBuffer structure */
-        origMsg   = msg;
-        msg       = PacketBuffer::NewWithAvailableSize(encryptedLen);
+        origMsg = msg;
+        msg     = PacketBuffer::NewWithAvailableSize(encryptedLen);
         msg->SetDataLength(encryptedLen, msg);
 #endif
 
