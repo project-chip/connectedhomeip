@@ -172,7 +172,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     err = self.cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError, CHIP_PORT);
     [self.lock unlock];
 
-
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
@@ -180,7 +179,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         }
         return NO;
     }
-
 
     // Start the IO pump
     [self _serviceEvents];
