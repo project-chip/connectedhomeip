@@ -58,7 +58,6 @@ ChipDeviceController::ChipDeviceController()
     mCurReqMsg  = NULL;
     mOnError    = NULL;
     mDeviceAddr = IPAddress::Any;
-    mDevicePort = CHIP_PORT;
     mDeviceId   = 0;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
 }
@@ -125,7 +124,7 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 }
 
 CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState,
-                                               MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort)
+                                               MessageReceiveHandler onMessageReceived, ErrorHandler onError)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -136,7 +135,6 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
 
     mDeviceId    = deviceId;
     mDeviceAddr  = deviceAddr;
-    mDevicePort  = devicePort;
     mAppReqState = appReqState;
     mDeviceCon   = new StatefulTransport(this);
 
@@ -180,7 +178,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16_t * devicePort)
+CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddrt)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -192,10 +190,6 @@ CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16
     if (deviceAddr)
     {
         *deviceAddr = mDeviceAddr;
-    }
-    if (devicePort)
-    {
-        *devicePort = mDevicePort;
     }
 
     return err;
