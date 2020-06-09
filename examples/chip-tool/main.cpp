@@ -83,7 +83,7 @@ void ShowUsage(const char * executable)
 
 bool DetermineAddress(int argc, char * argv[], IPAddress * hostAddr)
 {
-    if (argc < 3)
+    if (argc < 2)
     {
         return false;
     }
@@ -113,7 +113,7 @@ bool EqualsLiteral(const char * str, const char (&literal)[N])
 
 bool DetermineCommand(int argc, char * argv[], Command * command)
 {
-    if (argc < 4)
+    if (argc < 3)
     {
         return false;
     }
@@ -252,7 +252,7 @@ int main(int argc, char * argv[])
     auto * controller = new DeviceController::ChipDeviceController();
     controller->Init();
 
-    controller->ConnectDevice(1, host_addr, NULL, EchoResponse, ReceiveError, CHIP_PORT);
+    controller->ConnectDevice(1, host_addr, NULL, EchoResponse, ReceiveError);
     controller->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
 
     if (command == Command::Echo)
