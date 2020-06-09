@@ -21,7 +21,7 @@
  *      This file defines classes for abstracting access to and
  *      interactions with a platform- and system-specific Internet
  *      Protocol stack which, as of this implementation, may be either
- *      BSD/POSIX Sockets or LwIP.
+ *      BSD/POSIX Sockets, LwIP or Network.framework.
  *
  *      Major abstractions provided are:
  *
