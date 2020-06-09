@@ -178,7 +178,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddrt)
+CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

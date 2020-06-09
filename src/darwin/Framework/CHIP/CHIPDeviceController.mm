@@ -35,11 +35,10 @@ static const char * const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
 @implementation AddressInfo
-- (instancetype)initWithIP:(NSString *)ip andPort:(UInt16)port
+- (instancetype)initWithIP:(NSString *)ip
 {
     if (self = [super init]) {
         _ip = ip;
-        _port = port;
     }
     return self;
 }
@@ -161,7 +160,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     });
 }
 
-- (BOOL)connect:(NSString *)ipAddress port:(UInt16)port error:(NSError * __autoreleasing *)error
+- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -173,7 +172,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     dispatch_sync(self.chipWorkQueue, ^() {
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
-        err = self.cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError, port);
+        err = self.cppController->ConnectDevice(0, addr, NULL, onMessageReceived, onInternalError);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -194,10 +193,9 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
     __block chip::IPAddress ipAddr;
-    __block uint16_t port;
 
     dispatch_sync(self.chipWorkQueue, ^() {
-        err = self.cppController->GetDeviceAddress(&ipAddr, &port);
+        err = self.cppController->GetDeviceAddress(&ipAddr);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -207,7 +205,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     char ipAddrStr[64];
     ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
     NSString * ipAddress = [NSString stringWithUTF8String:ipAddrStr];
-    return [[AddressInfo alloc] initWithIP:ipAddress andPort:port];
+    return [[AddressInfo alloc] initWithIP:ipAddress];
 }
 
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error

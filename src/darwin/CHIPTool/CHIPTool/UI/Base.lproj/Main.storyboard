@@ -336,18 +336,6 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Port" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sg4-Qo-For">
-                                <rect key="frame" x="16.000000000000004" y="257.66666666666669" width="32.333333333333343" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="8000" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="TTw-Rm-60d">
-                                <rect key="frame" x="144.33333333333337" y="251" width="214.66666666666663" height="34"/>
-                                <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="decimalPad"/>
-                            </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Hello from iOS!" textAlignment="natural" adjustsFontSizeToFit="NO" minimumFontSize="14" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="lvN-Eg-W6F">
                                 <rect key="frame" x="16" y="323" width="263" height="34"/>
                                 <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -377,27 +365,22 @@
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="TTw-Rm-60d" firstAttribute="leading" secondItem="Sg4-Qo-For" secondAttribute="trailing" constant="96" id="ASr-vD-bxL"/>
                             <constraint firstItem="7aI-Vo-UyO" firstAttribute="top" secondItem="UPn-Qe-uvu" secondAttribute="top" constant="40" id="B9Y-y5-JFG"/>
                             <constraint firstItem="tC3-Jk-Opv" firstAttribute="centerY" secondItem="Tzm-Xh-QOZ" secondAttribute="centerY" id="Egc-2k-Dph"/>
                             <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="tC3-Jk-Opv" secondAttribute="trailing" constant="16" id="JXz-FF-C88"/>
                             <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="cfO-gM-sug" secondAttribute="trailing" constant="16" id="SN2-ii-WwN"/>
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="top" secondItem="cfO-gM-sug" secondAttribute="bottom" constant="40" id="SQh-l6-Flp"/>
-                            <constraint firstItem="TTw-Rm-60d" firstAttribute="centerY" secondItem="Sg4-Qo-For" secondAttribute="centerY" id="TUA-7f-LFZ"/>
                             <constraint firstItem="7aI-Vo-UyO" firstAttribute="centerX" secondItem="UPn-Qe-uvu" secondAttribute="centerX" id="VC8-BO-IEv"/>
                             <constraint firstItem="lvN-Eg-W6F" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="W4W-Dd-ToZ"/>
                             <constraint firstItem="cfO-gM-sug" firstAttribute="centerY" secondItem="lvN-Eg-W6F" secondAttribute="centerY" id="X9D-cX-Tfp"/>
+                            <constraint firstItem="cfO-gM-sug" firstAttribute="top" secondItem="tC3-Jk-Opv" secondAttribute="bottom" constant="81" id="YEL-hV-fAu"/>
                             <constraint firstItem="tC3-Jk-Opv" firstAttribute="leading" secondItem="Tzm-Xh-QOZ" secondAttribute="trailing" constant="60" id="ZOK-rV-kgH"/>
                             <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="6Z1-j3-AvT" secondAttribute="trailing" constant="16" id="aLa-hO-VEm"/>
                             <constraint firstItem="cfO-gM-sug" firstAttribute="leading" secondItem="lvN-Eg-W6F" secondAttribute="trailing" constant="10" id="bhi-uu-Fg7"/>
-                            <constraint firstItem="cfO-gM-sug" firstAttribute="top" secondItem="TTw-Rm-60d" secondAttribute="bottom" constant="38" id="ehg-WY-XRO"/>
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="fdf-Mv-mqP"/>
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="top" secondItem="lvN-Eg-W6F" secondAttribute="bottom" constant="40" id="keR-8B-8EU"/>
-                            <constraint firstItem="TTw-Rm-60d" firstAttribute="top" secondItem="tC3-Jk-Opv" secondAttribute="bottom" constant="9" id="kho-gt-Y54"/>
                             <constraint firstItem="Tzm-Xh-QOZ" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="oFI-15-MgQ"/>
-                            <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="TTw-Rm-60d" secondAttribute="trailing" constant="16" id="tIh-eZ-gIF"/>
                             <constraint firstItem="tC3-Jk-Opv" firstAttribute="top" secondItem="7aI-Vo-UyO" secondAttribute="bottom" constant="8" id="xkI-6e-Plp"/>
-                            <constraint firstItem="Sg4-Qo-For" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="zSh-Fa-PNn"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="UPn-Qe-uvu"/>
                     </view>
@@ -406,11 +389,9 @@
                     <connections>
                         <outlet property="IPLabel" destination="Tzm-Xh-QOZ" id="lYU-0W-rNa"/>
                         <outlet property="messageTextField" destination="lvN-Eg-W6F" id="I9L-eN-4b6"/>
-                        <outlet property="portLabel" destination="Sg4-Qo-For" id="PmK-2R-RF6"/>
                         <outlet property="resultLabel" destination="6Z1-j3-AvT" id="mMP-KW-l7u"/>
                         <outlet property="sendButton" destination="cfO-gM-sug" id="jSr-fh-7Y0"/>
                         <outlet property="serverIPTextField" destination="tC3-Jk-Opv" id="5IZ-oS-hdt"/>
-                        <outlet property="serverPortTextField" destination="TTw-Rm-60d" id="YGY-Q4-APN"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aHI-P9-vIn" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

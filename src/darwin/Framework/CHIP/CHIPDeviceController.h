@@ -29,14 +29,13 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 @interface AddressInfo : NSObject
 
 @property (readonly, copy) NSString * ip;
-@property (readonly) UInt16 port;
-- (instancetype)initWithIP:(NSString *)ip andPort:(UInt16)port;
+- (instancetype)initWithIP:(NSString *)ip;
 
 @end
 
 @interface CHIPDeviceController : NSObject
 
-- (BOOL)connect:(NSString *)ipAddress port:(UInt16)port error:(NSError * __autoreleasing *)error;
+- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error;
 - (nullable AddressInfo *)getAddressInfo;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 // We can't include definitions of ChipZclClusterId_t and ChipZclCommandId_t
