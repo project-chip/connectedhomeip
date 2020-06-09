@@ -107,7 +107,6 @@ static NSString * const ipKey = @"ipk";
 
     NSString * inputIPAddress = [[self _getScannedIP] length] > 0 ? [self _getScannedIP] : self.serverIPTextField.text;
 
-
     BOOL didConnect = [self.chipController connect:inputIPAddress error:&error];
     if (!didConnect) {
         [self postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
@@ -118,7 +117,6 @@ static NSString * const ipKey = @"ipk";
 {
     [self.serverIPTextField resignFirstResponder];
 }
-
 
 - (void)reconnectIfNeeded
 {
@@ -162,13 +160,13 @@ static NSString * const ipKey = @"ipk";
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    NSError *error = nil;
+    NSError * error = nil;
     // This disconnect is needed to make sure the connection goes away.
     // The VC deallocation doesnt sometimes happen right away.
-    // So if one goes back out of the VC and back in, and send an echo msg right away, then the first reponse at times gets dropped as the first VC was not deallocated on time.
+    // So if one goes back out of the VC and back in, and send an echo msg right away, then the first reponse at times gets dropped
+    // as the first VC was not deallocated on time.
     [self.chipController disconnect:&error];
-    if (error)
-    {
+    if (error) {
         NSLog(@"Error disconnecting on view disappearing %@", error);
     }
 }
