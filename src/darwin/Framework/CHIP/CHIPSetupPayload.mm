@@ -36,9 +36,9 @@
         _rendezvousInformation = [NSNumber numberWithUnsignedShort:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
         _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
-        
+
         [self retrieveSerialNumber:setupPayload];
-        
+
     }
     return self;
 }

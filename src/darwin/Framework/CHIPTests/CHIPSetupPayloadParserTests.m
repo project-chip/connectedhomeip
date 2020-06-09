@@ -108,7 +108,7 @@
     XCTAssertEqual(payload.version.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.rendezvousInformation.unsignedIntegerValue, 1);
     XCTAssertTrue([payload.serialNumber isEqualToString:@"123456789QWDHANTYUIOP"]);
-    
+
     NSArray<CHIPOptionalQRCodeInfo *> *vendorOptionalInfo = [payload getAllVendorOptionalData:&error];
     XCTAssertNil(error);
     XCTAssertEqual([vendorOptionalInfo count], 2);
