@@ -30,28 +30,25 @@
 #include <transport/MessageHeader.h>
 
 namespace chip {
-namespace transport {
+namespace Transport {
 
 /**
- * Communication path defines how two devices communicate.
+ * Communication path defines how two peers communicate.
  *
- * When a device contacts a server, it defines how to talk to the device.
+ * When a peer contacts another peer, it defines how the peers communicate.
  *
- * Once communication between two devices is established, the same transport
+ * Once communication between two peers is established, the same transport
  * path should be used: a client contacting a server over UDP will receive
  * messages back over UDP. A communication channel established over TCP
  * will keep the same TCP channel.
  *
  */
-enum class Path
+enum class Type
 {
     kUndefined,
     kUdp,
-    kTcp,
-    // More constants to be added later, such as BLE and Thread
+    // More constants to be added later, such as TCP and BLE
 };
-
-typedef uint64_t NodeId;
 
 /**
  * Transport class base, defining common methods among transports (message
@@ -101,7 +98,7 @@ public:
      *
      * Within a system, only one transport should be associated with a path.
      */
-    virtual Path GetPath() = 0;
+    virtual Type GetType() = 0;
 
 protected:
     /**
@@ -129,7 +126,7 @@ protected:
     void * mMessageReceivedArgument         = nullptr; ///< Argument for callback
 };
 
-} // namespace transport
+} // namespace Transport
 } // namespace chip
 
 #endif // TRANSPORT_BASE_H_

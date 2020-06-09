@@ -39,9 +39,9 @@ static int Finalize(void * aContext);
 
 namespace {
 
-constexpr transport::NodeId kSourceNodeId      = 123654;
-constexpr transport::NodeId kDestinationNodeId = 111222333;
-constexpr uint32_t kMessageId                  = 18;
+constexpr NodeId kSourceNodeId      = 123654;
+constexpr NodeId kDestinationNodeId = 111222333;
+constexpr uint32_t kMessageId       = 18;
 
 struct TestContext
 {
@@ -58,8 +58,8 @@ int ReceiveHandlerCallCount = 0;
 void MessageReceiveHandler(const MessageHeader & header, const Inet::IPPacketInfo & source, System::PacketBuffer * msgBuf,
                            nlTestSuite * inSuite)
 {
-    NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<transport::NodeId>::Value(kSourceNodeId));
-    NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<transport::NodeId>::Value(kDestinationNodeId));
+    NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
+    NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == kMessageId);
 
     size_t data_len = msgBuf->DataLength();
@@ -131,7 +131,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    transport::Udp udp;
+    Transport::Udp udp;
 
     CHIP_ERROR err = udp.Init(&ctx.mInetLayer, kIPAddressType_IPv4);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -151,7 +151,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    transport::Udp udp;
+    Transport::Udp udp;
 
     err = udp.Init(&ctx.mInetLayer, kIPAddressType_IPv4);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

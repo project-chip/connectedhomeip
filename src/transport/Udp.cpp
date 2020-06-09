@@ -32,7 +32,7 @@
 #include <inttypes.h>
 
 namespace chip {
-namespace transport {
+namespace Transport {
 
 Udp::~Udp()
 {
@@ -141,5 +141,5 @@ exit:
     }
 }
 
-} // namespace transport
+} // namespace Transport
 } // namespace chip

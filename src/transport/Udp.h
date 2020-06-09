@@ -35,7 +35,7 @@
 #include <transport/Base.h>
 
 namespace chip {
-namespace transport {
+namespace Transport {
 
 class DLL_EXPORT Udp : public Base
 {
@@ -68,7 +68,7 @@ public:
     CHIP_ERROR Init(Inet::InetLayer * inetLayer, Inet::IPAddressType addrType = kIPAddressType_IPv6, uint16_t sendPort = CHIP_PORT,
                     uint16_t receivePort = CHIP_PORT);
 
-    Path GetPath() override { return Path::kUdp; }
+    Type GetType() override { return Type::kUdp; }
     CHIP_ERROR SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf) override;
 
 private:
@@ -80,7 +80,7 @@ private:
     uint16_t mSendPort               = 0;                ///< Port where packets are sent by default
 };
 
-} // namespace transport
+} // namespace Transport
 } // namespace chip
 
 #endif // __UDPTRANSPORT_H__

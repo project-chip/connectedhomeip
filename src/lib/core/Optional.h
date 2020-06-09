@@ -64,11 +64,7 @@ public:
     /** Comparison operator, hadling missing values. */
     bool operator==(const Optional & other) const
     {
-        if (!mHasValue)
-        {
-            return !other.mHasValue;
-        }
-        return other.mHasValue && (mValue == other.mValue);
+        return (mHasValue == other.mHasValue) && (!other.mHasValue || (mValue == other.mValue));
     }
 
     /** Comparison operator, hadling missing values. */
