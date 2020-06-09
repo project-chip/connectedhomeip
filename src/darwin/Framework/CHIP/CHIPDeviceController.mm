@@ -46,8 +46,7 @@ static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
 @interface CHIPDeviceController ()
 
-
-@property (nonatomic, readonly, strong, nonnull) NSRecursiveLock *lock;
+@property (nonatomic, readonly, strong, nonnull) NSRecursiveLock * lock;
 
 // queue used to call select on the system and inet layer fds., remove this with NW Framework.
 // primarily used to not block the work queue
@@ -101,7 +100,7 @@ static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 }
 
 static void onMessageReceived(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState,
-                              chip::System::PacketBuffer * buffer, const chip::IPPacketInfo * packet_info)
+    chip::System::PacketBuffer * buffer, const chip::IPPacketInfo * packet_info)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
 
@@ -129,7 +128,7 @@ static void onMessageReceived(chip::DeviceController::ChipDeviceController * dev
 }
 
 static void onInternalError(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
-                            const chip::IPPacketInfo * pi)
+    const chip::IPPacketInfo * pi)
 {
     CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
     [controller _dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:error]];
@@ -166,7 +165,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     // this could be done async but the error we care about is sync. However, I think this could be restructured such that
     // the request is fired async and that Block can then return an error to the caller. This function would then never error out.
     // the only drawback is that it complicates the api where the user must handle async errors on every function
-
 
     [self.lock lock];
     chip::Inet::IPAddress addr;
@@ -278,7 +276,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     __block CHIP_ERROR err = CHIP_NO_ERROR;
 
-
     [self.lock lock];
 
     err = self.cppController->DisconnectDevice();
@@ -339,7 +336,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
             inetLayer->PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
         }
 
-
         [self.lock unlock];
 
         int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, const_cast<struct timeval *>(&aSleepTime));
@@ -364,7 +360,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         [self.lock unlock];
         [self _serviceEvents];
     });
-
 }
 
 - (void)registerCallbacks:appCallbackQueue onMessage:(ControllerOnMessageBlock)onMessage onError:(ControllerOnErrorBlock)onError
@@ -379,7 +374,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 extern "C" {
 // We have to have this empty callback, because the ZCL code links against it.
 void chipZclPostAttributeChangeCallback(uint8_t endpoint, ChipZclClusterId clusterId, ChipZclAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+    uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
 }
 } // extern "C"
