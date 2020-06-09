@@ -84,8 +84,6 @@ static void echo(IPEndPointBasis * endpoint, System::PacketBuffer * buffer, cons
         if (err != INET_NO_ERROR)
         {
             ESP_LOGE(TAG, "Unable to echo back to client: %s", ErrorStr(err));
-            // Note the failure status
-            status = !status;
         }
         else
         {
@@ -110,10 +108,8 @@ static void error(IPEndPointBasis * ep, INET_ERROR error, const IPPacketInfo * p
     ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
 }
 
-// The echo server assumes the platform's networking has been setup already
-void startServer(UDPEndPoint *& endpoint)
+void setupEndpoint(IPAddressType type, UDPEndPoint *& endpoint)
 {
-    ESP_LOGI(TAG, "Trying to get Inet");
     INET_ERROR err = DeviceLayer::InetLayer.NewUDPEndPoint(&endpoint);
     if (err != INET_NO_ERROR)
     {
@@ -123,8 +119,18 @@ void startServer(UDPEndPoint *& endpoint)
 
     endpoint->OnMessageReceived = echo;
     endpoint->OnReceiveError    = error;
+    // only listen on the station interface to handle Soft-AP LLA and overall GUA
+    if (type == kIPAddressType_IPv6)
+    {
+        struct netif * netif;
+        tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
+        err = endpoint->Bind(type, IPAddress::Any, PORT, netif);
+    }
+    else
+    {
 
-    err = endpoint->Bind(kIPAddressType_IPv4, IPAddress::Any, PORT);
+        err = endpoint->Bind(type, IPAddress::Any, PORT);
+    }
     if (err != INET_NO_ERROR)
     {
         ESP_LOGE(TAG, "Socket unable to bind: Error %s", ErrorStr(err));
@@ -138,4 +144,11 @@ void startServer(UDPEndPoint *& endpoint)
         return;
     }
     ESP_LOGI(TAG, "Echo Server Listening on PORT:%d...", PORT);
+}
+
+// The echo server assumes the platform's networking has been setup already
+void startServer(UDPEndPoint *& endpoint_ipv4, UDPEndPoint *& endpoint_ipv6)
+{
+    setupEndpoint(kIPAddressType_IPv4, endpoint_ipv4);
+    setupEndpoint(kIPAddressType_IPv6, endpoint_ipv6);
 }
