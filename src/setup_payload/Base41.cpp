@@ -75,7 +75,7 @@ string base41Encode(const uint8_t * buf, size_t buf_len)
         //
         int encodeLen = kBase41ChunkLen;
         if (buf_len == 0 &&            // the very last value, i.e. not an odd byte
-            (value > 255) &&           // the value wouldn't fit in one byte
+            (value > UINT8_MAX) &&     // the value wouldn't fit in one byte
             (value < kRadix * kRadix)) // the value can be encoded with 2 base41 chars
         {
             encodeLen--;
