@@ -17,10 +17,9 @@
  */
 
 /**
- *    @file
- *      This file defines the CHIP Connection object that maintains a UDP connection.
- *      It binds to any avaiable local addr and port and begins listening.
- *      TODO This class should be extended to support TCP as well...
+ * @file
+ *   This file defines a secure transport layer which adds encryption to data
+ *   sent over a transport.
  *
  */
 
@@ -30,15 +29,17 @@
 #include <utility>
 
 #include <core/CHIPCore.h>
+#include <core/ReferenceCounted.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
+#include <transport/Base.h>
 #include <transport/CHIPSecureChannel.h>
 
 namespace chip {
 
 using namespace System;
 
-class DLL_EXPORT SecureTransport
+class DLL_EXPORT SecureTransport : public ReferenceCounted<SecureTransport>
 {
 public:
     /**
@@ -60,11 +61,11 @@ public:
 
     /**
      * @brief
-     *   Initialize a CHIP Connection
+     *   Initialize a Secure Transport
      *
-     * @param inetLayer     A pointer to the <tt>chip::Inet::InetLayer</tt>
+     * @param transport  The transport to use.
      */
-    void Init(Inet::InetLayer * inetLayer);
+    CHIP_ERROR Init(Transport::Base * transport);
 
     /**
      * @brief
@@ -95,14 +96,11 @@ public:
      * @brief
      *   Send a message to the currently connected peer
      *
-     * @param msgBuf        A PacketBuffer containing the message to be sent
-     * @return CHIP_ERROR   The send result
-     *
      * @details
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
      */
-    CHIP_ERROR SendMessage(PacketBuffer * msgBuf, const IPAddress & peerAddr, uint32_t msg_id = 0);
+    CHIP_ERROR SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf);
 
     /**
      * @brief
@@ -112,90 +110,54 @@ public:
      */
     CHIP_ERROR Close(void);
 
-    void Retain(void);
-    void Release(void);
-
-    /**
-     *  This function is the application callback that is invoked when a message is received over a
-     *  Chip connection.
-     *
-     *  @param[in]    con           A pointer to the SecureTransport object.
-     *
-     *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
-     *
-     *  @param[in]    pktInfo       A pointer to the IPPacketInfo object carrying sender details.
-     *
-     */
-    typedef void (*MessageReceiveHandler)(SecureTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
-    MessageReceiveHandler OnMessageReceived;
-
-    /**
-     *  This function is the application callback invoked upon encountering an error when receiving
-     *  a Chip message.
-     *
-     *  @param[in]     con            A pointer to the SecureTransport object.
-     *
-     *  @param[in]     err            The CHIP_ERROR encountered when receiving data over the connection.
-     *
-     *  @param[in]    pktInfo         A pointer to the IPPacketInfo object carrying sender details.
-     *
-     */
-    typedef void (*ReceiveErrorHandler)(SecureTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
-    ReceiveErrorHandler OnReceiveError;
-
     SecureTransport();
     virtual ~SecureTransport() {}
 
+    /**
+     * Sets the message receive handler and associated argument
+     *
+     * @param[in] handler The callback to call when a message is received
+     * @param[in] param   The argument to pass in to the handler function
+     *
+     */
+    template <class T>
+    void SetMessageReceiveHandler(void (*handler)(const MessageHeader &, const Inet::IPPacketInfo &, System::PacketBuffer *, T *),
+                                  T * param)
+    {
+        mMessageReceivedArgument = param;
+        OnMessageReceived        = reinterpret_cast<MessageReceiveHandler>(handler);
+    }
+
 private:
-    Inet::InetLayer * mInetLayer;
-    UDPEndPoint * mUDPEndPoint;
+    Transport::Base * mTransport;
+
     IPAddress mPeerAddr;
     uint16_t mPeerPort;
     State mState;
     uint8_t mRefCount;
     ChipSecureChannel mSecureChannel;
 
+    /// FIXME: callbacks
+
     CHIP_ERROR DoConnect(IPAddressType addrType);
     void DoClose(CHIP_ERROR err);
     bool StateAllowsSend(void) const { return mState == kState_SecureConnected; }
     bool StateAllowsReceive(void) const { return mState == kState_SecureConnected; }
 
-    static void HandleDataReceived(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg, const IPPacketInfo * pktInfo);
-    static void HandleReceiveError(IPEndPointBasis * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo);
-};
+    /**
+     * This function is the application callback that is invoked when a message is received over a
+     * Chip connection.
+     *
+     * @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
+     */
+    typedef void (*MessageReceiveHandler)(const MessageHeader & header, const Inet::IPPacketInfo & source,
+                                          System::PacketBuffer * msgBuf, void * param);
 
-/// Associates a UDP transport with a state at creation time
-template <typename StateType>
-class StatefulSecureTransport : public SecureTransport
-{
-public:
-    StatefulSecureTransport(const StateType & state) : mState(state) {}
-    StatefulSecureTransport(StateType && state) : mState(std::move(state)) {}
+    MessageReceiveHandler OnMessageReceived = nullptr; ///< Callback on message receiving
+    void * mMessageReceivedArgument         = nullptr; ///< Argument for callback
 
-    StateType & State(void) { return mState; }
-    const StateType & State(void) const { return mState; }
-
-    /// Typesafe equivalent of SecureTransport::MessageReceivehandler
-    typedef void (*StatefulMessageReceiveHandler)(StatefulSecureTransport * con, PacketBuffer * msgBuf,
-                                                  const IPPacketInfo * pktInfo);
-
-    /// Typesafe equivalent of SecureTransport::ReceiveErrorHandler
-    typedef void (*StatefulReceiveErrorHandler)(StatefulSecureTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
-
-    /// Sets the OnMessageReceived callback using a stateful callback
-    void SetMessageReceiveHandler(StatefulMessageReceiveHandler handler)
-    {
-        OnMessageReceived = reinterpret_cast<MessageReceiveHandler>(handler);
-    }
-
-    /// Sets the OnMessageReceived callback using a stateful callback
-    void SetReceiveErrorHandler(StatefulReceiveErrorHandler handler)
-    {
-        OnReceiveError = reinterpret_cast<ReceiveErrorHandler>(handler);
-    }
-
-private:
-    StateType mState; ///< State for this transport. Often a pointer.
+    static void HandleDataReceived(const MessageHeader & header, const Inet::IPPacketInfo & source, System::PacketBuffer * msgBuf,
+                                   SecureTransport * transport);
 };
 
 } // namespace chip

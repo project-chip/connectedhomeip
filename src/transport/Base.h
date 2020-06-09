@@ -24,6 +24,7 @@
 #define TRANSPORT_BASE_H_
 
 #include <core/CHIPError.h>
+#include <core/ReferenceCounted.h>
 #include <inet/IPAddress.h>
 #include <inet/UDPEndPoint.h>
 #include <system/SystemPacketBuffer.h>
@@ -55,7 +56,7 @@ enum class Type
  * packing by encoding and decoding headers) and generic message transport
  * methods.
  */
-class Base
+class Base : public ReferenceCounted<Base>
 {
 public:
     virtual ~Base() {}
@@ -124,6 +125,8 @@ protected:
 
     MessageReceiveHandler OnMessageReceived = nullptr; ///< Callback on message receiving
     void * mMessageReceivedArgument         = nullptr; ///< Argument for callback
+
+    uint8_t mRefCount = 0;
 };
 
 } // namespace Transport

@@ -119,7 +119,9 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 
     mConState = kConnectionState_NotConnected;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
-    mOnError = NULL;
+    mOnError       = NULL;
+    mMessageNumber = 0;
+    mRemoteDeviceId.ClearValue();
 
     return err;
 }
@@ -127,37 +129,56 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState,
                                                MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    Transport::Udp * udpTransport = NULL;
 
     if (mState != kState_Initialized || mDeviceCon != NULL || mConState != kConnectionState_NotConnected)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    udpTransport = new Transport::Udp();
+
     mDeviceId    = deviceId;
     mDeviceAddr  = deviceAddr;
     mDevicePort  = devicePort;
     mAppReqState = appReqState;
-    mDeviceCon   = new StatefulTransport(this);
+    mDeviceCon   = new SecureTransport();
 
-    mDeviceCon->Init(mInetLayer);
+    err = udpTransport->Init(mInetLayer);
+    SuccessOrExit(err);
+
+    err = mDeviceCon->Init(udpTransport);
+    SuccessOrExit(err);
+
     err = mDeviceCon->Connect(mDeviceAddr.Type());
     SuccessOrExit(err);
 
-    mDeviceCon->SetMessageReceiveHandler(OnReceiveMessage);
-    mDeviceCon->SetReceiveErrorHandler(OnReceiveError);
+    mDeviceCon->SetMessageReceiveHandler(OnReceiveMessage, this);
 
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
-    mConState = kConnectionState_Connected;
+    mConState      = kConnectionState_Connected;
+    mMessageNumber = 1;
 
 exit:
-    if (err != CHIP_NO_ERROR && mDeviceCon != NULL)
+
+    if (udpTransport != NULL)
     {
-        mDeviceCon->Close();
-        delete mDeviceCon;
-        mDeviceCon = NULL;
+        // UDP transport lifetime is managed by the device connection.
+        // This releases the reference held at construction time.
+        udpTransport->Release();
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        if (mDeviceCon != NULL)
+        {
+            mDeviceCon->Close();
+            delete mDeviceCon;
+            mDeviceCon = NULL;
+        }
     }
     return err;
 }
@@ -229,7 +250,14 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     mAppReqState = appReqState;
     if (mConState == kConnectionState_SecureConnected)
     {
-        err = mDeviceCon->SendMessage(buffer, mDeviceAddr);
+        MessageHeader header;
+
+        header
+            .SetSourceNodeId(mDeviceId)            //
+            .SetDestinationNodeId(mRemoteDeviceId) //
+            .SetMessageId(mMessageNumber++);
+
+        err = mDeviceCon->SendMessage(header, mDeviceAddr, buffer);
     }
 
     return err;
@@ -316,21 +344,25 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnReceiveMessage(StatefulTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
+void ChipDeviceController::OnReceiveMessage(const MessageHeader & header, const IPPacketInfo & pktInfo,
+                                            System::PacketBuffer * msgBuf, ChipDeviceController * mgr)
 {
-    ChipDeviceController * mgr = con->State();
-    if (mgr->mConState == kConnectionState_SecureConnected && mgr->mOnComplete.Response != NULL && pktInfo != NULL)
+    if (header.GetSourceNodeId().HasValue())
     {
-        mgr->mOnComplete.Response(mgr, mgr->mAppReqState, msgBuf, pktInfo);
+        if (!mgr->mRemoteDeviceId.HasValue())
+        {
+            ChipLogProgress(Controller, "Learned remote device id");
+            mgr->mRemoteDeviceId = header.GetSourceNodeId();
+        }
+        else if (mgr->mRemoteDeviceId != header.GetSourceNodeId())
+        {
+            ChipLogError(Controller, "Received message from an unexpected source node id.");
+        }
     }
-}
 
-void ChipDeviceController::OnReceiveError(StatefulTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo)
-{
-    ChipDeviceController * mgr = con->State();
-    if (mgr->mConState == kConnectionState_Connected && mgr->mOnError != NULL && pktInfo != NULL)
+    if (mgr->mConState == kConnectionState_SecureConnected && mgr->mOnComplete.Response != NULL)
     {
-        mgr->mOnError(mgr, mgr->mAppReqState, err, pktInfo);
+        mgr->mOnComplete.Response(mgr, mgr->mAppReqState, msgBuf, &pktInfo);
     }
 }
 

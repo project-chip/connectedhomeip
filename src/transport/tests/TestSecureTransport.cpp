@@ -26,6 +26,7 @@
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureTransport.h>
+#include <transport/Udp.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -33,8 +34,6 @@
 #include <errno.h>
 
 using namespace chip;
-
-using NlTestSecureTransport = StatefulSecureTransport<nlTestSuite *>;
 
 static int Initialize(void * aContext);
 static int Finalize(void * aContext);
@@ -48,19 +47,26 @@ struct TestContext
 
 struct TestContext sContext;
 
-static const char PAYLOAD[] = "Hello!";
+static const char PAYLOAD[]         = "Hello!";
+constexpr NodeId kSourceNodeId      = 123654;
+constexpr NodeId kDestinationNodeId = 111222333;
+constexpr uint32_t kMessageId       = 18;
 
-static void MessageReceiveHandler(NlTestSecureTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
+int ReceiveHandlerCallCount = 0;
+
+static void MessageReceiveHandler(const MessageHeader & header, const Inet::IPPacketInfo & source, System::PacketBuffer * msgBuf,
+                                  nlTestSuite * inSuite)
 {
+    NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
+    NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
+    NL_TEST_ASSERT(inSuite, header.GetMessageId() == kMessageId);
+
     size_t data_len = msgBuf->DataLength();
 
     int compare = memcmp(msgBuf->Start(), PAYLOAD, data_len);
-    NL_TEST_ASSERT(con->State(), compare == 0);
-};
+    NL_TEST_ASSERT(inSuite, compare == 0);
 
-static void ReceiveErrorHandler(NlTestSecureTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo)
-{
-    NL_TEST_ASSERT(con->State(), false);
+    ReceiveHandlerCallCount++;
 };
 
 static void DriveIO(TestContext & ctx)
@@ -123,9 +129,17 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    NlTestSecureTransport conn(inSuite);
-    conn.Init(&ctx.mInetLayer);
-    CHIP_ERROR err = conn.Close();
+    Transport::Udp udp;
+    SecureTransport conn;
+    CHIP_ERROR err;
+
+    err = udp.Init(&ctx.mInetLayer);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = conn.Init(&udp);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = conn.Close();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -137,12 +151,17 @@ void CheckSimpleConnectTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    NlTestSecureTransport conn(inSuite);
-    conn.Init(&ctx.mInetLayer);
+    Transport::Udp udp;
+    SecureTransport conn;
+
+    err = udp.Init(&ctx.mInetLayer);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = conn.Init(&udp);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     err = conn.Connect(addr.Type());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = conn.Connect(addr.Type());
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     err = conn.Close();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -162,21 +181,33 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    NlTestSecureTransport conn(inSuite);
-    conn.Init(&ctx.mInetLayer);
-    conn.SetMessageReceiveHandler(MessageReceiveHandler);
-    conn.SetReceiveErrorHandler(ReceiveErrorHandler);
+    Transport::Udp udp;
+    SecureTransport conn;
+
+    err = udp.Init(&ctx.mInetLayer);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = conn.Init(&udp);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    conn.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
 
     err = conn.Connect(addr.Type());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    MessageHeader header;
+    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+
     // Should be able to send a message to itself by just calling send.
-    conn.SendMessage(buffer, addr);
+    ReceiveHandlerCallCount = 0;
+    conn.SendMessage(header, addr, buffer);
 
     // allow the send and recv enough time
     DriveIO(ctx);
     sleep(1);
     DriveIO(ctx);
+
+    NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
 
     err = conn.Close();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
