@@ -36,15 +36,26 @@
         _rendezvousInformation = [NSNumber numberWithUnsignedShort:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
         _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
-        _serialNumber = [NSString stringWithUTF8String:setupPayload.serialNumber.c_str()];
+        
+        [self retrieveSerialNumber:setupPayload];
+        
     }
     return self;
 }
 
-- (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalData:(NSError * __autoreleasing *)error
+- (void)retrieveSerialNumber:(chip::SetupPayload)setupPayload
+{
+    std::string serialNumberC;
+    CHIP_ERROR err = setupPayload.retrieveSerialNumber(serialNumberC);
+    if (err == CHIP_NO_ERROR) {
+        _serialNumber = [NSString stringWithUTF8String:serialNumberC.c_str()];
+    }
+}
+
+- (NSArray<CHIPOptionalQRCodeInfo *> *)getAllVendorOptionalData:(NSError * __autoreleasing *)error
 {
     NSMutableArray<CHIPOptionalQRCodeInfo *> * allOptionalData = [NSMutableArray new];
-    vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalData();
+    vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllVendorOptionalData();
     for (chip::OptionalQRCodeInfo chipInfo : chipOptionalData) {
         CHIPOptionalQRCodeInfo * info = [CHIPOptionalQRCodeInfo new];
         info.tag = [NSNumber numberWithUnsignedChar:chipInfo.tag];

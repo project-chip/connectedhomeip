@@ -81,7 +81,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR retrieveStringOptionalInfo(TLVReader & reader, OptionalQRCodeInfo & info)
+static CHIP_ERROR retrieveStringOptionaVendorlInfo(TLVReader & reader, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint64_t tag       = reader.GetTag();
@@ -98,7 +98,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader & reader, OptionalQRCodeInfo & info)
+static CHIP_ERROR retrieveSignedIntegerOptionalVendorInfo(TLVReader & reader, OptionalQRCodeInfo & info)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint64_t tag   = reader.GetTag();
@@ -113,16 +113,89 @@ exit:
     return err;
 }
 
-static void populatePayloadTLVField(SetupPayload & outPayload, OptionalQRCodeInfo info)
+static CHIP_ERROR retrieveStringCHIPInfo(TLVReader & reader, CHIPQRCodeInfo & info)
 {
-    if (info.tag == kSerialNumberTag)
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint64_t tag       = reader.GetTag();
+    uint32_t valLength = reader.GetLength();
+    char * val         = new char[valLength + 1];
+    err                = reader.GetString(val, valLength + 1);
+    SuccessOrExit(err);
+    VerifyOrExit(IsContextTag(tag) == true, err = CHIP_ERROR_INVALID_TLV_TAG);
+    info.type       = chipQRCodeInfoTypeString;
+    info.tag        = (uint8_t) TagNumFromTag(tag);
+    info.stringData = string(val);
+exit:
+    delete[] val;
+    return err;
+}
+
+static CHIP_ERROR retrieveUnsignedCHIPInfo(TLVReader & reader, CHIPQRCodeInfo & info)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint64_t tag   = reader.GetTag();
+    uint32_t storedUInt32;
+    err = reader.Get(storedUInt32);
+    SuccessOrExit(err);
+    VerifyOrExit(IsContextTag(tag) == true, err = CHIP_ERROR_INVALID_TLV_TAG);
+    info.type          = chipQRCodeInfoTypeUInt32;
+    info.tag           = (uint8_t) TagNumFromTag(tag);
+    info.unsignedInt32 = storedUInt32;
+exit:
+    return err;
+}
+
+static CHIP_ERROR populatePayloadVendorTLVField(SetupPayload & outPayload, TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLVType type   = reader.GetType();
+    OptionalQRCodeInfo info;
+    if (type == kTLVType_SignedInteger)
     {
-        outPayload.serialNumber = info.data;
+        err = retrieveSignedIntegerOptionalVendorInfo(reader, info);
+        SuccessOrExit(err);
+    }
+    else if (type == kTLVType_UTF8String)
+    {
+        err = retrieveStringOptionaVendorlInfo(reader, info);
+        SuccessOrExit(err);
     }
     else
     {
-        outPayload.addVendorOptionalData(info);
+        err = CHIP_ERROR_WRONG_TLV_TYPE;
+        SuccessOrExit(err);
     }
+    err = outPayload.addVendorOptionalData(info);
+
+exit:
+    return err;
+}
+
+static CHIP_ERROR populatePayloadCHIPTLVField(SetupPayload & outPayload, TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLVType type   = reader.GetType();
+    CHIPQRCodeInfo info;
+    if (type == kTLVType_UnsignedInteger)
+    {
+        err = retrieveUnsignedCHIPInfo(reader, info);
+        SuccessOrExit(err);
+    }
+    else if (type == kTLVType_UTF8String)
+    {
+        err = retrieveStringCHIPInfo(reader, info);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        err = CHIP_ERROR_WRONG_TLV_TYPE;
+        SuccessOrExit(err);
+    }
+    err = outPayload.addCHIPOptionalData(info);
+
+exit:
+    printf("\nReturning\n");
+    return err;
 }
 
 static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t tlvDataLengthInBytes)
@@ -140,23 +213,16 @@ static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataSta
         err = innerStructureReader.Next();
         while (err == CHIP_NO_ERROR)
         {
-            TLVType type = innerStructureReader.GetType();
-            OptionalQRCodeInfo info;
-            if (type != kTLVType_UTF8String && type != kTLVType_SignedInteger)
+            uint8_t tag = (uint8_t) TagNumFromTag(innerStructureReader.GetTag());
+            if (IsCHIPTag(tag))
             {
-                err = innerStructureReader.Next();
-                continue;
+                err = populatePayloadCHIPTLVField(outPayload, innerStructureReader);
             }
-            if (type == kTLVType_UTF8String)
+            else
             {
-                err = retrieveStringOptionalInfo(innerStructureReader, info);
-            }
-            else if (type == kTLVType_SignedInteger)
-            {
-                err = retrieveIntegerOptionalInfo(innerStructureReader, info);
+                err = populatePayloadVendorTLVField(outPayload, innerStructureReader);
             }
             SuccessOrExit(err);
-            populatePayloadTLVField(outPayload, info);
             err = innerStructureReader.Next();
         }
     }

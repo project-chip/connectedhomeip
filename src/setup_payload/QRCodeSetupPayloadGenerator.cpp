@@ -81,19 +81,7 @@ static CHIP_ERROR populateTLVBits(uint8_t * bits, int & offset, uint8_t * tlvBuf
     return err;
 }
 
-static void addCHIPInfoToOptionalData(SetupPayload & outPayload)
-{
-    if (outPayload.serialNumber.length() > 0)
-    {
-        OptionalQRCodeInfo info;
-        info.type = optionalQRCodeInfoTypeString;
-        info.tag  = kSerialNumberTag;
-        info.data = outPayload.serialNumber;
-        outPayload.addCHIPOptionalData(info);
-    }
-}
-
-CHIP_ERROR writeOptionaData(TLVWriter & writer, vector<OptionalQRCodeInfo> optionalData)
+CHIP_ERROR writeVendorOptionaData(TLVWriter & writer, vector<OptionalQRCodeInfo> optionalData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     for (OptionalQRCodeInfo info : optionalData)
@@ -113,13 +101,33 @@ exit:
     return err;
 }
 
+CHIP_ERROR writeCHIPOptionaData(TLVWriter & writer, vector<CHIPQRCodeInfo> optionalData)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    for (CHIPQRCodeInfo info : optionalData)
+    {
+        if (info.type == chipQRCodeInfoTypeString)
+        {
+            err = writer.PutString(ContextTag(info.tag), info.stringData.c_str());
+            SuccessOrExit(err);
+        }
+        else if (info.type == chipQRCodeInfoTypeUInt32)
+        {
+            err = writer.Put(ContextTag(info.tag), info.unsignedInt32);
+            SuccessOrExit(err);
+        }
+    }
+exit:
+    return err;
+}
+
 CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
                                        uint32_t & tlvDataLengthInBytes)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    addCHIPInfoToOptionalData(outPayload);
-    vector<OptionalQRCodeInfo> optionalData = outPayload.getAllOptionalData();
-    VerifyOrExit(optionalData.size() != 0, err = CHIP_NO_ERROR);
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    vector<OptionalQRCodeInfo> vendorOptionalData = outPayload.getAllVendorOptionalData();
+    vector<CHIPQRCodeInfo> chipOptionalData       = outPayload.getAllCHIPOptionalData();
+    VerifyOrExit(vendorOptionalData.size() != 0 || chipOptionalData.size() != 0, err = CHIP_NO_ERROR);
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
@@ -130,7 +138,10 @@ CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvD
                                    innerStructureWritter); // TODO: Remove outer nest of QR code TLV encoding #728
     SuccessOrExit(err);
 
-    err = writeOptionaData(innerStructureWritter, optionalData);
+    err = writeVendorOptionaData(innerStructureWritter, vendorOptionalData);
+    SuccessOrExit(err);
+
+    err = writeCHIPOptionaData(innerStructureWritter, chipOptionalData);
     SuccessOrExit(err);
 
     err = rootWriter.CloseContainer(innerStructureWritter);

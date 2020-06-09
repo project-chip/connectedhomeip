@@ -48,12 +48,13 @@ const int kPaddingFieldLengthInBits                  = 5;
 
 const int kRendezvousInfoReservedFieldLengthInBits = 4;
 const int kRawVendorTagLengthInBits                = 7;
-const uint16_t kSerialNumberTag                    = 128;
 
 const int kManualSetupShortCodeCharLength = 10;
 const int kManualSetupLongCodeCharLength  = 20;
 const int kManualSetupVendorIdCharLength  = 5;
 const int kManualSetupProductIdCharLength = 5;
+
+const uint8_t kSerialNumberTag = 128;
 
 // clang-format off
 const int kTotalPayloadDataSizeInBits =
@@ -77,6 +78,12 @@ enum optionalQRCodeInfoType
     optionalQRCodeInfoTypeInt
 };
 
+enum chipQRCodeInfoType
+{
+    chipQRCodeInfoTypeString,
+    chipQRCodeInfoTypeUInt32
+};
+
 /**
  * @brief A struct to hold optional QR Code Info
  * @param tag The tag number of the optional info
@@ -96,6 +103,16 @@ struct OptionalQRCodeInfo
     string data;
 };
 
+struct CHIPQRCodeInfo
+{
+    uint8_t tag;
+    enum chipQRCodeInfoType type;
+    uint32_t unsignedInt32;
+    string stringData;
+};
+
+bool IsCHIPTag(uint8_t tag);
+bool IsVendorTag(uint8_t tag);
 class SetupPayload
 {
 public:
@@ -106,13 +123,57 @@ public:
     uint16_t rendezvousInformation;
     uint16_t discriminator;
     uint32_t setUpPINCode;
-    string serialNumber;
 
     /**
      * @brief A function to retrieve the vector of OptionalQRCodeInfo infos
      * @return Returns a vector of optionalQRCodeInfos
      **/
-    vector<OptionalQRCodeInfo> getAllOptionalData();
+    vector<OptionalQRCodeInfo> getAllVendorOptionalData();
+
+    /**
+     * @brief A function to retrieve the vector of CHIPQRCodeInfo infos
+     * @return Returns a vector of CHIPQRCodeInfos
+     **/
+    vector<CHIPQRCodeInfo> getAllCHIPOptionalData();
+
+    /** @brief A function to add a string serial number
+     * @param serialNumber string serial number
+     * @return Returns CHIP_ERROR_KEY_NOT_FOUND if serial number not set,
+     *                 CHIP_ERROR on error
+     *                 CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR addSerialNumber(string serialNumber);
+
+    /** @brief A function to add a uint32_t serial number
+     * @param serialNumber uint32_t serial number
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR addSerialNumber(uint32_t serialNumber);
+
+    /** @brief A function to remove the serial number from the payload
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR removeSerialNumber(void);
+
+    /** @brief A function to retrieve serial number as a string
+     * @param outSerialNumber retrieved string serial number
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR retrieveSerialNumber(string & outSerialNumber);
+
+    /** @brief A function to add an optional vendor data
+     * @param tag 7 bit [0-127] tag number
+     * @param data String representation of data to add
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR addVendorOptionalData(uint8_t tag, string data);
+
+    /** @brief A function to add an optional vendor data
+     * @param tag 7 bit [0-127] tag number
+     * @param data Integer representation of data to add
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR addVendorOptionalData(uint8_t tag, int data);
 
     /** @brief A function to add an optional QR Code info vendor object
      * @param info Optional QR code info object to add
@@ -124,14 +185,21 @@ public:
      * @param info Optional QR code info object to add
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addCHIPOptionalData(OptionalQRCodeInfo info);
+    CHIP_ERROR addCHIPOptionalData(CHIPQRCodeInfo info);
 
-    /** @brief A function to remove an optional QR Code info object
+    /** @brief A function to remove an optional QR Code vendor info object
+     * @param tag Optional QR code vendor info tag number to remove
+     * @return Returns CHIP_ERROR_KEY_NOT_FOUND if info could not be found in existing optional data structs,
+     *                 CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR removeVendorOptionalData(uint8_t tag);
+
+    /** @brief A function to remove an optional QR Code chip info object
      * @param tag Optional QR code info tag number to remove
      * @return Returns CHIP_ERROR_KEY_NOT_FOUND if info could not be found in existing optional data structs,
      *                 CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR removeOptionalData(uint8_t tag);
+    CHIP_ERROR removeCHIPOptionalData(uint8_t tag);
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :
@@ -142,7 +210,8 @@ public:
     bool operator==(const SetupPayload & input);
 
 private:
-    map<uint64_t, OptionalQRCodeInfo> optionalData;
+    map<uint8_t, OptionalQRCodeInfo> vendorOptionalData;
+    map<uint8_t, CHIPQRCodeInfo> chipOptionalData;
 };
 
 }; // namespace chip
