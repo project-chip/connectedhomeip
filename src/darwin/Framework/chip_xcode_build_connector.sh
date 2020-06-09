@@ -78,6 +78,7 @@ configure_OPTIONS+=(
     --with-chip-ble-project-includes=no
     --with-chip-warm-project-includes=no
     --with-chip-device-project-includes=no
+    --with-crypto=mbedtls
 )
 
 (
@@ -94,7 +95,8 @@ configure_OPTIONS+=(
         done
     fi
 
-    make V=1 install-data                 # all the headers
-    make V=1 -C src/lib install           # libCHIP.a
-    make V=1 -C src/setup_payload install # libSetupPayload.a
+    make V=1 install-data                   # all the headers
+    make V=1 -C src/lib install             # libCHIP.a
+    make V=1 -C src/setup_payload install   # libSetupPayload.a
+    make V=1 -C third_party/mbedtls install # libmbedtls.a
 )

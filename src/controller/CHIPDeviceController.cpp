@@ -141,7 +141,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
     mDeviceCon   = new StatefulTransport(this);
 
     mDeviceCon->Init(mInetLayer);
-    err = mDeviceCon->Connect(mDeviceAddr, mDevicePort);
+    err = mDeviceCon->Connect(mDeviceAddr.Type());
     SuccessOrExit(err);
 
     mDeviceCon->SetMessageReceiveHandler(OnReceiveMessage);
@@ -159,6 +159,24 @@ exit:
         delete mDeviceCon;
         mDeviceCon = NULL;
     }
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
+                                                   const unsigned char * local_private_key, const size_t private_key_length)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mState != kState_Initialized || mDeviceCon == NULL || mConState != kConnectionState_Connected)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    err = mDeviceCon->ManualKeyExchange(remote_public_key, public_key_length, local_private_key, private_key_length);
+    SuccessOrExit(err);
+    mConState = kConnectionState_SecureConnected;
+
+exit:
     return err;
 }
 
@@ -209,9 +227,9 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
 
     mAppReqState = appReqState;
-    if (mConState == kConnectionState_Connected)
+    if (mConState == kConnectionState_SecureConnected)
     {
-        err = mDeviceCon->SendMessage(buffer);
+        err = mDeviceCon->SendMessage(buffer, mDeviceAddr);
     }
 
     return err;
@@ -301,7 +319,7 @@ void ChipDeviceController::ClearRequestState()
 void ChipDeviceController::OnReceiveMessage(StatefulTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo)
 {
     ChipDeviceController * mgr = con->State();
-    if (mgr->mConState == kConnectionState_Connected && mgr->mOnComplete.Response != NULL && pktInfo != NULL)
+    if (mgr->mConState == kConnectionState_SecureConnected && mgr->mOnComplete.Response != NULL && pktInfo != NULL)
     {
         mgr->mOnComplete.Response(mgr, mgr->mAppReqState, msgBuf, pktInfo);
     }

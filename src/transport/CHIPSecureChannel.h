@@ -81,17 +81,12 @@ public:
      */
     size_t EncryptionOverhead(void);
 
+    void Close(void);
+
     ChipSecureChannel(void);
 
 private:
     static const size_t kAES_CCM128_Key_Length = 16;
-
-    typedef struct
-    {
-        size_t payload_length;
-        uint64_t IV;
-        uint64_t tag;
-    } security_header_t;
 
     bool mKeyAvailable;
     uint64_t mNextIV;

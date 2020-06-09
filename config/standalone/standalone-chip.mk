@@ -131,7 +131,6 @@ STD_INC_DIRS += \
 
 # Add the location of CHIP libraries to application link action.
 STD_LDFLAGS += -L$(CHIP_OUTPUT_DIR)/lib
-STD_LDFLAGS += $(shell pkg-config --libs openssl)
 
 # Add CHIP libraries to standard libraries list.
 STD_LIBS += \
@@ -139,6 +138,8 @@ STD_LIBS += \
     -lInetLayer \
     -lnlfaultinjection \
     -lSystemLayer
+
+STD_LIBS += $(shell pkg-config --libs openssl)
 
 # Add the appropriate CHIP target as a prerequisite to all application
 # compilation targets to ensure that CHIP gets built and its header

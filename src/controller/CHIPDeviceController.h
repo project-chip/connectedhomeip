@@ -32,7 +32,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
-#include <transport/UdpTransport.h>
+#include <transport/SecureTransport.h>
 
 namespace chip {
 namespace DeviceController {
@@ -72,6 +72,21 @@ public:
      */
     CHIP_ERROR ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState, MessageReceiveHandler onMessageReceived,
                              ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+
+    /**
+     * @brief
+     *   The keypair for the secure channel. This is a utility function that will be used
+     *   until we have automatic key exchange in place. The function is useful only for
+     *   example applications for now. It will eventually be removed.
+     *
+     * @param remote_public_key  A pointer to peer's public key
+     * @param public_key_length  Length of remote_public_key
+     * @param local_private_key  A pointer to local private key
+     * @param private_key_length Length of local_private_key
+     * @return CHIP_ERROR        The result of key derivation
+     */
+    CHIP_ERROR ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
+                                 const unsigned char * local_private_key, const size_t private_key_length);
 
     /**
      * @brief
@@ -130,7 +145,7 @@ public:
     CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
 
 private:
-    using StatefulTransport = StatefulUdpTransport<ChipDeviceController *>;
+    using StatefulTransport = StatefulSecureTransport<ChipDeviceController *>;
 
     enum
     {
@@ -140,8 +155,9 @@ private:
 
     enum ConnectionState
     {
-        kConnectionState_NotConnected = 0,
-        kConnectionState_Connected    = 1,
+        kConnectionState_NotConnected    = 0,
+        kConnectionState_Connected       = 1,
+        kConnectionState_SecureConnected = 2,
     };
 
     System::Layer * mSystemLayer;
