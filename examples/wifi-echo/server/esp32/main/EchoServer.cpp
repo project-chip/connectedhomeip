@@ -126,7 +126,7 @@ void setupTransport(IPAddressType type, SecureTransport * transport)
     {
         err = transport->Connect(type);
     }
- 
+
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "ERROR: %s\n Couldn't create transport, server will not start.", ErrorStr(err));
