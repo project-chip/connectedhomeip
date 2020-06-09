@@ -65,8 +65,12 @@ public:
      *   The class allows separate definitions to allow local execution of several
      *   Nodes.
      */
-    CHIP_ERROR Init(Inet::InetLayer * inetLayer, Inet::IPAddressType addrType = kIPAddressType_IPv6, uint16_t sendPort = CHIP_PORT,
-                    uint16_t receivePort = CHIP_PORT);
+    CHIP_ERROR Init(Inet::InetLayer * inetLayer, Inet::IPAddressType addrType, uint16_t sendPort, uint16_t receivePort);
+
+    /**
+     * Convenience method to listen on IPv6 on chip standard ports
+     */
+    CHIP_ERROR Init(Inet::InetLayer * inetLayer) { return Init(inetLayer, kIPAddressType_IPv6, CHIP_PORT, CHIP_PORT); }
 
     Type GetType() override { return Type::kUdp; }
     CHIP_ERROR SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf) override;

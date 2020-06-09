@@ -133,7 +133,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     Transport::Udp udp;
 
-    CHIP_ERROR err = udp.Init(&ctx.mInetLayer, kIPAddressType_IPv4);
+    CHIP_ERROR err = udp.Init(&ctx.mInetLayer, kIPAddressType_IPv4, CHIP_PORT, CHIP_PORT);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -153,7 +153,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     Transport::Udp udp;
 
-    err = udp.Init(&ctx.mInetLayer, kIPAddressType_IPv4);
+    err = udp.Init(&ctx.mInetLayer, kIPAddressType_IPv4, CHIP_PORT, CHIP_PORT);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
