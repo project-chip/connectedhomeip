@@ -77,11 +77,11 @@ void ShowUsage(const char * executable)
 {
     fprintf(stderr,
             "Usage: \n"
-            "  %s device-ip-address device-port echo|off|on|toggle\n",
+            "  %s device-ip-address echo|off|on|toggle\n",
             executable);
 }
 
-bool DetermineAddress(int argc, char * argv[], IPAddress * hostAddr, uint16_t * port)
+bool DetermineAddress(int argc, char * argv[], IPAddress * hostAddr)
 {
     if (argc < 3)
     {
@@ -91,15 +91,6 @@ bool DetermineAddress(int argc, char * argv[], IPAddress * hostAddr, uint16_t * 
     if (!IPAddress::FromString(argv[1], *hostAddr))
     {
         fputs("Error: Invalid device IP address", stderr);
-        return false;
-    }
-
-    std::string port_str(argv[2]);
-    std::stringstream ss(port_str);
-    ss >> *port;
-    if (ss.fail() || !ss.eof())
-    {
-        fputs("Error: Invalid device port", stderr);
         return false;
     }
 
@@ -127,36 +118,36 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
         return false;
     }
 
-    if (EqualsLiteral(argv[3], "off"))
+    if (EqualsLiteral(argv[2], "off"))
     {
         *command = Command::Off;
         return true;
     }
 
-    if (EqualsLiteral(argv[3], "on"))
+    if (EqualsLiteral(argv[2], "on"))
     {
         *command = Command::On;
         return true;
     }
 
-    if (EqualsLiteral(argv[3], "toggle"))
+    if (EqualsLiteral(argv[2], "toggle"))
     {
         *command = Command::Toggle;
         return true;
     }
 
-    if (EqualsLiteral(argv[3], "echo"))
+    if (EqualsLiteral(argv[2], "echo"))
     {
         *command = Command::Echo;
         return true;
     }
 
-    fprintf(stderr, "Unknown command: %s\n", argv[3]);
+    fprintf(stderr, "Unknown command: %s\n", argv[2]);
     return false;
 }
 
 // Handle the echo case, where we just send a string and expect to get it back.
-void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress & host_addr, uint16_t port)
+void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress & host_addr)
 {
     size_t payload_len = strlen(PAYLOAD) + 1;
 
@@ -172,7 +163,7 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress
         buffer->SetDataLength(payload_len);
 
         controller->SendMessage(NULL, buffer);
-        printf("Msg sent to server at %s:%d\n", host_ip_str, port);
+        printf("Msg sent to server at %s:%d\n", host_ip_str, CHIP_PORT);
 
         controller->ServiceEvents();
 
@@ -251,9 +242,8 @@ static const unsigned char remote_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff,
 int main(int argc, char * argv[])
 {
     IPAddress host_addr;
-    uint16_t port;
     Command command;
-    if (!DetermineAddress(argc, argv, &host_addr, &port) || !DetermineCommand(argc, argv, &command))
+    if (!DetermineAddress(argc, argv, &host_addr) || !DetermineCommand(argc, argv, &command))
     {
         ShowUsage(argv[0]);
         return -1;
@@ -262,12 +252,12 @@ int main(int argc, char * argv[])
     auto * controller = new DeviceController::ChipDeviceController();
     controller->Init();
 
-    controller->ConnectDevice(1, host_addr, NULL, EchoResponse, ReceiveError, port);
+    controller->ConnectDevice(1, host_addr, NULL, EchoResponse, ReceiveError, CHIP_PORT);
     controller->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
 
     if (command == Command::Echo)
     {
-        DoEcho(controller, host_addr, port);
+        DoEcho(controller, host_addr);
     }
     else
     {

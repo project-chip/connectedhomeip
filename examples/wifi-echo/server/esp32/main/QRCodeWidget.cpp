@@ -114,7 +114,7 @@ string createSetupPayload()
     OptionalQRCodeInfo portInfo;
     portInfo.tag     = EXAMPLE_VENDOR_TAG_PORT;
     portInfo.type    = optionalQRCodeInfoTypeInt;
-    portInfo.integer = CONFIG_ECHO_PORT;
+    portInfo.integer = CHIP_PORT;
     payload.addVendorOptionalData(portInfo);
 
     QRCodeSetupPayloadGenerator generator(payload);
