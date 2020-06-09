@@ -204,7 +204,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     }
 
     // ignore the unused port
-    (void)port;
+    (void) port;
     // A buffer big enough to hold ipv4 and ipv6 addresses
     char ipAddrStr[64];
     ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
