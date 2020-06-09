@@ -23,7 +23,6 @@
 #define RESULT_DISPLAY_DURATION 5.0 * NSEC_PER_SEC
 
 static NSString * const ipKey = @"ipk";
-static NSString * const portKey = @"pk";
 
 @interface CHIPViewControllerBase ()
 
