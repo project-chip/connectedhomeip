@@ -235,7 +235,7 @@ void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             {
                 char ipAddrStr[INET_ADDRSTRLEN];
                 IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
-                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CONFIG_ECHO_PORT);
+                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
             }
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)

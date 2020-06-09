@@ -35,12 +35,10 @@
 
 #define EXAMPLE_VENDOR_TAG_IP 2
 #define MAX_IP_LEN 46
-#define EXAMPLE_VENDOR_TAG_PORT 3
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
 static NSString * const ipKey = @"ipk";
-static NSString * const portKey = @"pk";
 
 @interface QRCodeViewController ()
 
@@ -199,12 +197,6 @@ static NSString * const portKey = @"pk";
                             NSLog(@"Got IP String... %@", info.stringValue);
                             [[NSUserDefaults standardUserDefaults] setObject:info.stringValue forKey:ipKey];
                         }
-                    }
-                    break;
-                case EXAMPLE_VENDOR_TAG_PORT:
-                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt]]) {
-                        NSLog(@"Got Port number... %@", info.integerValue);
-                        [[NSUserDefaults standardUserDefaults] setInteger:info.integerValue.integerValue forKey:portKey];
                     }
                     break;
                 }

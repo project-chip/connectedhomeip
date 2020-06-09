@@ -23,7 +23,6 @@
 #define RESULT_DISPLAY_DURATION 5.0 * NSEC_PER_SEC
 
 static NSString * const ipKey = @"ipk";
-static NSString * const portKey = @"pk";
 
 @interface CHIPViewControllerBase ()
 
@@ -31,9 +30,7 @@ static NSString * const portKey = @"pk";
 @property (readwrite) BOOL reconnectOnForeground;
 
 @property (weak, nonatomic) IBOutlet UITextField * serverIPTextField;
-@property (weak, nonatomic) IBOutlet UITextField * serverPortTextField;
 @property (weak, nonatomic) IBOutlet UILabel * IPLabel;
-@property (weak, nonatomic) IBOutlet UILabel * portLabel;
 
 @end
 
@@ -42,11 +39,6 @@ static NSString * const portKey = @"pk";
 - (NSString *)_getScannedIP
 {
     return [[NSUserDefaults standardUserDefaults] stringForKey:ipKey];
-}
-
-- (NSInteger)_getScannedPort
-{
-    return [[NSUserDefaults standardUserDefaults] integerForKey:portKey];
 }
 
 - (void)viewDidLoad
@@ -87,12 +79,10 @@ static NSString * const portKey = @"pk";
                                                object:nil];
 
     BOOL shouldHide = NO;
-    if ([[self _getScannedIP] length] > 0 && [self _getScannedPort] > 0) {
+    if ([[self _getScannedIP] length] > 0) {
         shouldHide = YES;
     }
     [self.serverIPTextField setHidden:shouldHide];
-    [self.serverPortTextField setHidden:shouldHide];
-    [self.portLabel setHidden:shouldHide];
     [self.IPLabel setHidden:shouldHide];
 }
 
@@ -116,9 +106,8 @@ static NSString * const portKey = @"pk";
     NSError * error;
 
     NSString * inputIPAddress = [[self _getScannedIP] length] > 0 ? [self _getScannedIP] : self.serverIPTextField.text;
-    UInt16 inputPort = [self _getScannedPort] > 0 ? [self _getScannedPort] : [self.serverPortTextField.text intValue];
 
-    BOOL didConnect = [self.chipController connect:inputIPAddress port:inputPort error:&error];
+    BOOL didConnect = [self.chipController connect:inputIPAddress error:&error];
     if (!didConnect) {
         [self postResult:[@"Error: " stringByAppendingString:error.localizedDescription]];
     }
@@ -127,23 +116,21 @@ static NSString * const portKey = @"pk";
 - (void)dismissKeyboard
 {
     [self.serverIPTextField resignFirstResponder];
-    [self.serverPortTextField resignFirstResponder];
 }
 
 - (void)reconnectIfNeeded
 {
     // collect fields
     NSString * inputIPAddress = self.serverIPTextField.text;
-    UInt16 inputPort = [self.serverPortTextField.text intValue];
     BOOL needsReconnect = NO;
     // Don't rely on the text fields if we have scanned connection info from a QRCode
-    BOOL hasScannedConnectionInfo = ([[self _getScannedIP] length] > 0 && [self _getScannedPort] > 0);
+    BOOL hasScannedConnectionInfo = ([[self _getScannedIP] length] > 0);
 
     // check the addr of the connected device
     AddressInfo * addrInfo = [self.chipController getAddressInfo];
     if (addrInfo && !hasScannedConnectionInfo) {
         // check if the addr changed
-        if (![addrInfo.ip isEqualToString:inputIPAddress] || addrInfo.port != inputPort) {
+        if (![addrInfo.ip isEqualToString:inputIPAddress]) {
             NSError * error;
             // stop current connection
             if (![self.chipController disconnect:&error]) {

@@ -18,7 +18,6 @@
 #import "AppDelegate.h"
 
 static NSString * const ipKey = @"ipk";
-static NSString * const portKey = @"pk";
 
 @interface AppDelegate ()
 
@@ -31,7 +30,6 @@ static NSString * const portKey = @"pk";
     // Override point for customization after application launch.
 
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:portKey];
     return YES;
 }
 
