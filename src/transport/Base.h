@@ -39,7 +39,7 @@ namespace Transport {
  * When a peer contacts another peer, it defines how the peers communicate.
  *
  * Once communication between two peers is established, the same transport
- * path should be used: a client contacting a server over UDP will receive
+ * path should be used: a peer contacting another peer over UDP will receive
  * messages back over UDP. A communication channel established over TCP
  * will keep the same TCP channel.
  *
