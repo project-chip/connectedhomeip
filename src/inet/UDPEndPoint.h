@@ -34,6 +34,10 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#include <Network/Network.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
 namespace chip {
 namespace Inet {
 
@@ -84,12 +88,20 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    uint16_t mBoundPort;
-
     INET_ERROR GetSocket(IPAddressType addrType);
     SocketEvents PrepareIO(void);
     void HandlePendingIO(void);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    nw_connection_t mConnection;
+    dispatch_queue_t mDispatchQueue;
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    uint16_t mBoundPort;
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
 };
 
 } // namespace Inet
