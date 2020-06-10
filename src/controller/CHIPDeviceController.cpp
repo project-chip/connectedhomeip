@@ -129,14 +129,14 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
                                                MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort)
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
-    Transport::Udp * udpTransport = NULL;
+    Transport::UDP * udpTransport = NULL;
 
     if (mState != kState_Initialized || mDeviceCon != NULL || mConState != kConnectionState_NotConnected)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    udpTransport = new Transport::Udp();
+    udpTransport = new Transport::UDP();
 
     mDeviceId    = deviceId;
     mDeviceAddr  = deviceAddr;

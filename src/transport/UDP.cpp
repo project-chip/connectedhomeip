@@ -23,7 +23,7 @@
  *      TODO This class should be extended to support TCP as well...
  *
  */
-#include <transport/Udp.h>
+#include <transport/UDP.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -34,7 +34,7 @@
 namespace chip {
 namespace Transport {
 
-Udp::~Udp()
+UDP::~UDP()
 {
     if (mUDPEndPoint)
     {
@@ -45,7 +45,7 @@ Udp::~Udp()
     }
 }
 
-CHIP_ERROR Udp::Init(Inet::InetLayer * inetLayer, Inet::IPAddressType addrType, uint16_t sendPort, uint16_t receivePort)
+CHIP_ERROR UDP::Init(Inet::InetLayer * inetLayer, Inet::IPAddressType addrType, uint16_t sendPort, uint16_t receivePort)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -81,7 +81,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Udp::SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf)
+CHIP_ERROR UDP::SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf)
 {
     const size_t headerSize = header.EncodeSizeBytes();
     size_t actualEncodedHeaderSize;
@@ -121,10 +121,10 @@ exit:
     return err;
 }
 
-void Udp::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const IPPacketInfo * pktInfo)
+void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    Udp * udp         = reinterpret_cast<Udp *>(endPoint->AppState);
+    UDP * udp         = reinterpret_cast<UDP *>(endPoint->AppState);
     size_t headerSize = 0;
 
     MessageHeader header;

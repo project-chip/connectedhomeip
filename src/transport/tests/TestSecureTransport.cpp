@@ -26,7 +26,7 @@
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureTransport.h>
-#include <transport/Udp.h>
+#include <transport/UDP.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -139,7 +139,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    Transport::Udp udp;
+    Transport::UDP udp;
     SecureTransport conn;
     CHIP_ERROR err;
 
@@ -164,7 +164,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::Udp udp;
+    Transport::UDP udp;
     SecureTransport conn;
 
     err = udp.Init(&ctx.mInetLayer, addr.Type(), CHIP_PORT, CHIP_PORT);

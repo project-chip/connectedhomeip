@@ -37,10 +37,10 @@
 namespace chip {
 namespace Transport {
 
-class DLL_EXPORT Udp : public Base
+class DLL_EXPORT UDP : public Base
 {
     /**
-     *  The State of the Udp connection
+     *  The State of the UDP connection
      *
      */
     enum class State
@@ -50,7 +50,7 @@ class DLL_EXPORT Udp : public Base
     };
 
 public:
-    virtual ~Udp();
+    virtual ~UDP();
 
     /**
      * Initialize a UDP transport on a given port.

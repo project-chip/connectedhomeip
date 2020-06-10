@@ -33,7 +33,7 @@
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
 #include <transport/SecureTransport.h>
-#include <transport/Udp.h>
+#include <transport/UDP.h>
 
 namespace chip {
 namespace DeviceController {

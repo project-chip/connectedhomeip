@@ -38,7 +38,7 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureTransport.h>
-#include <transport/Udp.h>
+#include <transport/UDP.h>
 
 #include "DataModelHandler.h"
 
@@ -121,7 +121,7 @@ static const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7,
 void setupTransport(IPAddressType type, SecureTransport * transport)
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
-    Transport::Udp * udpTransport = new Transport::Udp();
+    Transport::UDP * udpTransport = new Transport::UDP();
 
     // TODO: add IPV6 support back by getting TCP adapter information:
     //
