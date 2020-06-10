@@ -139,7 +139,7 @@ AM_SILENT_RULES([yes])
 #
 # Use the included 'bootstrap' script instead when necessary.
 #
-AM_MAINTAINER_MODE
+#AM_MAINTAINER_MODE
 
 #
 # Check for the target style
