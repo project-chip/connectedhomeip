@@ -83,7 +83,7 @@ using PropertiesChangeCallbackType = void(GDBusProxy *, GVariant *, const gchar*
 /*
  * The WiFi state machine, _WiFiState can only be modified in this function.
  *
- * This function is reentrancy, 
+ * This function is reentrancy,
  */
 void ConnectivityManagerImpl::_WiFiStateMachine()
 {
