@@ -114,6 +114,9 @@ jobs:
         command: scripts/examples/standalone_echo_client.sh
         name: Build example Standalone Echo Client
     - run:
+        command: scripts/examples/standalone_shell.sh
+        name: Build example Standalone Shell
+    - run:
         command: |
           mkdir -p example_binaries/main-build
           cp examples/chip-tool/build/chip-standalone-demo.out \
