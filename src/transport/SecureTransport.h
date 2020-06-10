@@ -66,16 +66,6 @@ public:
 
     /**
      * @brief
-     *   Attempt to establish a connection to the given peer
-     *
-     * @param addrType      IPV4 or IPv6 address
-     * @param intfId        Indicator for system network interfaces
-     * @return CHIP_ERROR   The connection result
-     */
-    CHIP_ERROR Connect();
-
-    /**
-     * @brief
      *   The keypair for the secure channel. This is a utility function that will be used
      *   until we have automatic key exchange in place. The function is useful only for
      *   example applications for now. It will eventually be removed.
