@@ -176,6 +176,14 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     // Should be able to send a message to itself by just calling send.
     err = udp.SendMessage(header, addr, buffer);
+    if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
+    {
+        // TODO: the underlying system does not support IPV6. This early return should
+        // be removed and error should be made fatal.
+        printf("%s:%u: System does NOT support IPV6.\n", __FILE__, __LINE__);
+        return;
+    }
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // allow the send and recv enough time
