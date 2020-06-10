@@ -25,6 +25,8 @@
 
 #include "level-control-server.h"
 
+#include <stdlib.h> /* for abs() */
+
 // User options for plugin Level Control Server
 #define CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL 255
 #define CHIP_AF_PLUGIN_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL 0
@@ -57,7 +59,6 @@ ChipZclLevelControlSceneSubTableEntry_t zapPluginLevelControlServerSceneSubTable
 #endif
 #endif
 
-int abs(int I);
 static void moveToLevelHandler(const ChipZclCommandContext_t * context,
                                const ChipZclClusterLevelControlServerCommandMoveToLevelRequest_t * request, bool withOnOff);
 static void moveHandler(const ChipZclCommandContext_t * context,

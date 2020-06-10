@@ -35,11 +35,6 @@
 #include <inet/InetLayer.h>
 #include <inet/InetLayerEvents.h>
 
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#include <inet/InetBuffer.h>
-#include <inet/InetTimer.h>
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
 #include <inet/DNSResolver.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER

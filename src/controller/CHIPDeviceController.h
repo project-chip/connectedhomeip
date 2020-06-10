@@ -115,6 +115,14 @@ public:
      */
     bool IsConnected();
 
+    /**
+     * @brief
+     *   Check if the connection is active and security context is established
+     *
+     * @return bool   If the connection is active and security context is established
+     */
+    bool IsSecurelyConnected();
+
     // ----- Messaging -----
     /**
      * @brief

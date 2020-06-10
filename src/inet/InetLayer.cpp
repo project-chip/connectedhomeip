@@ -72,21 +72,6 @@
 #endif // __ANDROID__
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
-
-// MARK: InetLayer platform- and system-specific functions for LwIP-native eventing.
-
-struct LwIPInetEvent
-{
-    Inet::InetEventType Type;
-    Inet::InetLayerBasis * Target;
-    uintptr_t Arg;
-};
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 namespace chip {
 namespace Inet {
 
@@ -123,10 +108,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  *
  */
 InetLayer::InetLayer(void)
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    :
-    mImplicitSystemLayer()
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 {
     State = kState_NotInitialized;
 
@@ -286,14 +267,6 @@ INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     Platform::InetLayer::WillInit(this, aContext);
     SuccessOrExit(err);
 
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    if (&aSystemLayer == &mImplicitSystemLayer)
-    {
-        err = mImplicitSystemLayer.Init(aContext);
-        SuccessOrExit(err);
-    }
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
     mSystemLayer = &aSystemLayer;
     mContext     = aContext;
 
@@ -397,14 +370,6 @@ INET_ERROR InetLayer::Shutdown(void)
             }
         }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-        if (mSystemLayer == &mImplicitSystemLayer)
-        {
-            err = mImplicitSystemLayer.Shutdown();
-            SuccessOrExit(err);
-        }
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
     }
 
     State = kState_NotInitialized;
@@ -998,102 +963,6 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
 
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-static void SystemTimerComplete(chip::System::Layer * aLayer, void * aAppState, chip::System::Error aError)
-{
-    chip::System::Timer & lTimer            = *reinterpret_cast<chip::System::Timer *>(aAppState);
-    InetLayer & lInetLayer                  = *lTimer.InetLayer();
-    InetLayer::TimerCompleteFunct lComplete = reinterpret_cast<InetLayer::TimerCompleteFunct>(lTimer.OnCompleteInetLayer());
-    void * lAppState                        = lTimer.AppStateInetLayer();
-
-    lComplete(&lInetLayer, lAppState, static_cast<INET_ERROR>(aError));
-}
-
-/**
- *  @brief
- *    This method registers a one-shot timer(to fire at a specified offset relative to the time
- *    of registration) with the underlying timer mechanism, through this InetLayer instance.
- *
- *  @note
- *    Each InetLayer instance could have its own set of timers. This might not be
- *    significant to applications, as each application usually works with one singleton
- *    InetLayer instance.
- *
- *  @param[in]    aMilliseconds  Number of milliseconds before this timer should fire.
- *
- *  @param[in]    aComplete      A pointer to a callback function to be called when this
- *                               timer fires.
- *
- *  @param[in]    aAppState      A pointer to an application state object to be passed
- *                               to the callback function as argument.
- *
- *  @retval #INET_ERROR_INCORRECT_STATE  If the InetLayer instance is not initialized.
- *  @retval #INET_ERROR_NO_MEMORY        If the InetLayer runs out of resource for this
- *                                           request for a new timer.
- *  @retval #INET_NO_ERROR               On success.
- *
- */
-INET_ERROR InetLayer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState)
-{
-    INET_ERROR lReturn;
-
-    if (State != kState_Initialized)
-    {
-        return INET_ERROR_INCORRECT_STATE;
-    }
-
-    chip::System::Timer * lTimer;
-
-    lReturn = mSystemLayer->NewTimer(lTimer);
-    SuccessOrExit(lReturn);
-
-    lTimer->AttachInetLayer(*this, reinterpret_cast<void *>(aComplete), aAppState);
-
-    lReturn = lTimer->Start(aMilliseconds, SystemTimerComplete, lTimer);
-
-    if (lReturn != CHIP_SYSTEM_NO_ERROR)
-    {
-        lTimer->Cancel();
-    }
-
-exit:
-    switch (lReturn)
-    {
-    case CHIP_SYSTEM_ERROR_NO_MEMORY:
-        lReturn = INET_ERROR_NO_MEMORY;
-        break;
-    case CHIP_SYSTEM_NO_ERROR:
-        lReturn = INET_NO_ERROR;
-        break;
-    }
-
-    return lReturn;
-}
-
-/**
- *  @brief
- *    This method cancels an one-shot timer, started earlier through @p StartTimer().
- *
- *    @note
- *      The cancellation could fail silently in two different ways. If the timer
- *      specified by the combination of the callback function and application state object
- *      couldn't be found, cancellation could fail. If the timer has fired, but not yet
- *      removed from memory, cancellation could also fail.
- *
- *  @param[in]   aComplete   A pointer to the callback function used in calling @p StartTimer().
- *  @param[in]   aAppState   A pointer to the application state object used in calling
- *                            @p StartTimer().
- *
- */
-void InetLayer::CancelTimer(TimerCompleteFunct aComplete, void * aAppState)
-{
-    if (State == kState_Initialized)
-    {
-        mSystemLayer->CancelAllMatchingInetTimers(*this, reinterpret_cast<void *>(aComplete), aAppState);
-    }
-}
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 /**
  *  Get the interface identifier for the specified IP address. If the
  *  interface identifier cannot be derived it is set to the
@@ -1273,145 +1142,6 @@ exit:
     return lReturn;
 }
 
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-/**
- *  This posts an event / message of the specified type with the
- *  provided argument to this instance's platform-specific event /
- *  message queue.
- *
- *  @param[in,out] target  A pointer to the InetLayer object making the
- *                         post request.
- *
- *  @param[in]     type    The type of event to post.
- *
- *  @param[in,out] arg     The argument associated with the event to post.
- *
- *  @retval    #INET_ERROR_INCORRECT_STATE      If the state of the InetLayer
- *                                              object is incorrect.
- *  @retval    #INET_ERROR_BAD_ARGS             If #target is NULL.
- *  @retval    #INET_ERROR_NO_MEMORY            If the EventQueue is already
- *                                              full.
- *  @retval    other platform-specific errors generated indicating the reason
- *             for failure.
- *  @retval    #INET_NO_ERROR                   On success.
- *
- */
-INET_ERROR InetLayer::PostEvent(InetLayerBasis * target, InetEventType type, uintptr_t arg)
-{
-    chip::System::Layer & lSystemLayer = *mSystemLayer;
-    INET_ERROR retval                  = INET_NO_ERROR;
-
-    VerifyOrExit(State == kState_Initialized, retval = INET_ERROR_INCORRECT_STATE);
-    VerifyOrExit(target != NULL, retval = INET_ERROR_BAD_ARGS);
-
-    {
-        chip::System::Layer & lTargetSystemLayer = target->SystemLayer();
-
-        VerifyOrDieWithMsg(target->IsRetained(lSystemLayer), Inet, "wrong system layer! [target %p != instance %p]",
-                           &lTargetSystemLayer, &lSystemLayer);
-    }
-
-    // Sanity check that this instance and the target layer haven't
-    // been "crossed".
-
-    {
-        InetLayer & lTargetInetLayer = target->Layer();
-
-        VerifyOrDieWithMsg(this == &lTargetInetLayer, Inet, "target layer %p != instance layer %p", &lTargetInetLayer, this);
-    }
-
-    if (IsDroppableEvent(type) && !CanEnqueueDroppableEvent())
-    {
-        ChipLogProgress(Inet, "Dropping incoming packet (type %d)", (int) type);
-        ExitNow(retval = INET_ERROR_NO_MEMORY);
-    }
-
-    retval = Platform::InetLayer::PostEvent(this, mContext, target, type, arg);
-    if (retval != INET_NO_ERROR)
-    {
-        ChipLogError(Inet, "Failed to queue InetLayer event (type %d): %s", (int) type, ErrorStr(retval));
-    }
-    SuccessOrExit(retval);
-
-exit:
-    return retval;
-}
-
-/**
- *  This is a syntactic wrapper around a platform-specific hook that
- *  effects an event loop, waiting on a queue that services this
- *  instance, pulling events off of that queue, and then dispatching
- *  them for handling.
- *
- *  @return #INET_NO_ERROR on success; otherwise, a specific error
- *          indicating the reason for initialization failure.
- *
- */
-INET_ERROR InetLayer::DispatchEvents(void)
-{
-    INET_ERROR retval = INET_NO_ERROR;
-
-    VerifyOrExit(State == kState_Initialized, retval = INET_ERROR_INCORRECT_STATE);
-
-    retval = Platform::InetLayer::DispatchEvents(this, mContext);
-    SuccessOrExit(retval);
-
-exit:
-    return retval;
-}
-
-/**
- *  Start the platform timer with specified msec duration.
- *
- *  @brief
- *    Calls the Platform specific API to start a platform timer.
- *    This API is called by the chip::System::Timer class when one or more
- *    system timers are active and require deferred execution.
- *
- *  @param[in]  inDurMS  The timer duration in milliseconds.
- *
- *  @return INET_NO_ERROR on success, error code otherwise.
- *
- */
-INET_ERROR InetLayer::StartPlatformTimer(uint32_t inDurMS)
-{
-    INET_ERROR retval;
-
-    VerifyOrExit(State == kState_Initialized, retval = INET_ERROR_INCORRECT_STATE);
-
-    retval = Platform::InetLayer::StartTimer(this, mContext, inDurMS);
-
-exit:
-    return retval;
-}
-
-/**
- *  Handle the platform timer expiration event.
- *
- *  @brief
- *    Calls chip::System::Timer::HandleExpiredTimers to handle any expired
- *    system timers.  It is assumed that this API is called only while
- *    on the thread which owns the InetLayer object.
- *
- *  @return INET_NO_ERROR on success, error code otherwise.
- *
- */
-INET_ERROR InetLayer::HandlePlatformTimer(void)
-{
-    INET_ERROR lReturn;
-    chip::System::Error lSystemError;
-
-    VerifyOrExit(State == kState_Initialized, lReturn = INET_ERROR_INCORRECT_STATE);
-
-    lSystemError = mSystemLayer->HandlePlatformTimer();
-    lReturn      = static_cast<INET_ERROR>(lSystemError);
-
-exit:
-    return lReturn;
-}
-
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -1470,13 +1200,6 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
             lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
-
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    if (mSystemLayer == &mImplicitSystemLayer)
-    {
-        mSystemLayer->PrepareSelect(nfds, readfds, writefds, exceptfds, sleepTimeTV);
-    }
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 }
 
 /**
@@ -1606,13 +1329,6 @@ void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * wri
         }
 #endif // INET_CONFIG_ENABLE_TUN_ENDPOINT
     }
-
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    if (mSystemLayer == &mImplicitSystemLayer)
-    {
-        mSystemLayer->HandleSelectResult(selectRes, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -1733,141 +1449,6 @@ DLL_EXPORT void DidShutdown(Inet::InetLayer * aLayer, void * aContext, INET_ERRO
 
     return;
 }
-
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
-/**
- *  This is a platform-specific event / message post hook. This may be
- *  overridden by assserting the preprocessor definition,
- *  #INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS.
- *
- *  This posts an event / message of the specified type with the
- *  provided argument to this instance's platform-specific event /
- *  message queue.
- *
- *  @note
- *    This is an implementation for LwIP.
- *
- *  @param[in,out] aLayer    A pointer to the layer instance to which the
- *                           event / message is being posted.
- *
- *  @param[in,out] aContext  Platform-specific context data passed to
- *                           the layer initialization method, ::Init.
- *
- *  @param[in,out] aTarget   A pointer to the InetLayer object making the
- *                           post request.
- *
- *  @param[in]     aType     The type of event to post.
- *
- *  @param[in,out] anArg     The argument associated with the event to post.
- *
- *  @return #INET_NO_ERROR on success; otherwise, a specific error indicating
- *          the reason for initialization failure.
- *
- */
-INET_ERROR PostEvent(Inet::InetLayer * aInetLayer, void * aContext, InetLayerBasis * aTarget, InetEventType aEventType,
-                     uintptr_t aArgument)
-{
-    chip::System::Layer & lSystemLayer = *aInetLayer->mSystemLayer;
-    chip::System::Object & lObject     = *aTarget;
-    chip::System::Error lReturn = chip::System::Platform::Layer::PostEvent(lSystemLayer, aContext, lObject, aEventType, aArgument);
-
-    return static_cast<INET_ERROR>(lReturn);
-}
-
-/**
- *  This is a platform-specific event / message dispatch hook. This may
- *  be overridden by assserting the preprocessor definition,
- *  INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS.
- *
- *  This effects an event loop, waiting on a queue that services this
- *  instance, pulling events off of that queue, and then dispatching
- *  them for handling.
- *
- *  @note
- *    This is an implementation for LwIP.
- *
- *  @param[in,out] aInetLayer   A pointer to the layer instance for which
- *                              events / messages are being dispatched.
- *
- *  @param[in,out] aContext  Platform-specific context data passed to
- *                           the layer initialization method, ::Init.
- *
- *  @retval   #INET_ERROR_BAD_ARGS          If #aLayer or #aContext is NULL.
- *  @retval   #INET_ERROR_INCORRECT_STATE   If the state of the InetLayer
- *                                          object is incorrect.
- *  @retval   #INET_ERROR_UNEXPECTED_EVENT  If an event type is unrecognized.
- *  @retval   #INET_NO_ERROR                On success.
- *
- */
-INET_ERROR DispatchEvents(Inet::InetLayer * aInetLayer, void * aContext)
-{
-    chip::System::Layer & lSystemLayer = *aInetLayer->mSystemLayer;
-    chip::System::Error lReturn        = chip::System::Platform::Layer::DispatchEvents(lSystemLayer, aContext);
-
-    return static_cast<INET_ERROR>(lReturn);
-}
-
-/**
- *  This is a platform-specific event / message dispatch hook. This may
- *  be overridden by assserting the preprocessor definition,
- *  INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS.
- *
- *  This dispatches the specified event for handling, unmarshalling the
- *  type and arguments from the event for hand off to
- *  InetLayer::HandleEvent for the actual dispatch.
- *
- *  @note
- *    This is an implementation for LwIP.
- *
- *  @param[in,out] aInetLayer   A pointer to the layer instance for which
- *                              events / messages are being dispatched.
- *
- *  @param[in,out] aContext  Platform-specific context data passed to
- *                           the layer initialization method, ::Init.
- *
- *  @param[in]     aEvent    The platform-specific event object to
- *                           dispatch for handling.
- *
- *  @retval   #INET_ERROR_BAD_ARGS          If #aLayer or the event target is
- *                                          NULL.
- *  @retval   #INET_ERROR_UNEXPECTED_EVENT  If the event type is unrecognized.
- *  @retval   #INET_ERROR_INCORRECT_STATE   If the state of the InetLayer
- *                                          object is incorrect.
- *  @retval   #INET_NO_ERROR                On success.
- *
- */
-INET_ERROR DispatchEvent(Inet::InetLayer * aInetLayer, void * aContext, InetEvent aEvent)
-{
-    chip::System::Layer & lSystemLayer = *aInetLayer->mSystemLayer;
-    chip::System::Error lReturn        = chip::System::Platform::Layer::DispatchEvent(lSystemLayer, aContext, aEvent);
-
-    return static_cast<INET_ERROR>(lReturn);
-}
-
-/**
- *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS.
- *
- *  @note
- *    This is an implementation for LwIP.
- *
- *  @param[in,out] aInetLayer           A reference to the layer instance for which events / messages are being dispatched.
- *  @param[in,out] aContext             Platform-specific context data passed to the layer initialization method, ::Init.
- *  @param[in]     aMilliseconds        The number of milliseconds to set for the timer.
- *
- *  @retval   #INET_NO_ERROR    Always succeeds unless overridden.
- */
-INET_ERROR StartTimer(Inet::InetLayer * aInetLayer, void * aContext, uint32_t aMilliseconds)
-{
-    chip::System::Layer & lSystemLayer = *aInetLayer->mSystemLayer;
-    chip::System::Error lReturn        = chip::System::Platform::Layer::StartTimer(lSystemLayer, aContext, aMilliseconds);
-
-    return static_cast<INET_ERROR>(lReturn);
-}
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !INET_CONFIG_WILL_OVERRIDE_PLATFORM_EVENT_FUNCS
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 } // namespace InetLayer
 } // namespace Platform

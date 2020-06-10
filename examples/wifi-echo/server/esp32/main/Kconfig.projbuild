@@ -35,13 +35,6 @@ menu "WiFi Echo Demo"
             bool "M5Stack"
     endchoice
 
-    config ECHO_PORT
-        int "Port"
-        range 0 65535
-        default 8000
-        help
-            Local port the example server will listen on.
-
     config USE_ECHO_CLIENT
         bool "Enable the built-in Echo Client"
         default "n"

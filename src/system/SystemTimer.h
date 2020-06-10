@@ -37,18 +37,6 @@
 #include <system/SystemObject.h>
 #include <system/SystemStats.h>
 
-#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-namespace chip {
-namespace Inet {
-
-class InetLayer;
-
-} // namespace Inet
-} // namespace chip
-
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 namespace chip {
 namespace System {
 
@@ -86,23 +74,10 @@ public:
 
     static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
-#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    void AttachInetLayer(Inet::InetLayer & aInetLayer, void * aOnCompleteInetLayer, void * aAppStateInetLayer);
-    Inet::InetLayer * InetLayer(void) const;
-    void * OnCompleteInetLayer(void) const;
-    void * AppStateInetLayer(void) const;
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 private:
     static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
 
     Epoch mAwakenEpoch;
-
-#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    Inet::InetLayer * mInetLayer;
-    void * mOnCompleteInetLayer;
-    void * mAppStateInetLayer;
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
     void HandleComplete(void);
 
@@ -123,30 +98,6 @@ inline void Timer::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip:
 {
     sPool.GetStatistics(aNumInUse, aHighWatermark);
 }
-
-#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-inline void Timer::AttachInetLayer(Inet::InetLayer & aInetLayer, void * aOnCompleteInetLayer, void * aAppStateInetLayer)
-{
-    this->mInetLayer           = &aInetLayer;
-    this->mOnCompleteInetLayer = aOnCompleteInetLayer;
-    this->mAppStateInetLayer   = aAppStateInetLayer;
-}
-
-inline Inet::InetLayer * Timer::InetLayer(void) const
-{
-    return this->mInetLayer;
-}
-
-inline void * Timer::OnCompleteInetLayer(void) const
-{
-    return this->mOnCompleteInetLayer;
-}
-
-inline void * Timer::AppStateInetLayer(void) const
-{
-    return this->mAppStateInetLayer;
-}
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 } // namespace System
 } // namespace chip

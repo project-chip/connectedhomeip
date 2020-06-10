@@ -304,23 +304,6 @@ void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void * aAppState)
     }
 }
 
-#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-void Layer::CancelAllMatchingInetTimers(Inet::InetLayer & aInetLayer, void * aOnCompleteInetLayer, void * aAppState)
-{
-    for (size_t i = 0; i < Timer::sPool.Size(); ++i)
-    {
-        Timer * lTimer = Timer::sPool.Get(*this, i);
-
-        if (lTimer != NULL && lTimer->mInetLayer == &aInetLayer && lTimer->mOnCompleteInetLayer == aOnCompleteInetLayer &&
-            lTimer->mAppStateInetLayer == aAppState)
-        {
-            lTimer->Cancel();
-            break;
-        }
-    }
-}
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 /**
  * @brief
  *   Schedules a function with a signature identical to

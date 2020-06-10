@@ -183,7 +183,7 @@ CHIP_ERROR ChipDeviceController::ManualKeyExchange(const unsigned char * remote_
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState != kState_Initialized || mDeviceCon == NULL || mConState != kConnectionState_Connected)
+    if (!IsConnected() || mDeviceCon == NULL)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -200,7 +200,7 @@ CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState != kState_Initialized || mConState != kConnectionState_Connected)
+    if (!IsSecurelyConnected())
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -219,14 +219,19 @@ CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16
 
 bool ChipDeviceController::IsConnected()
 {
-    return kState_Initialized && mConState == kConnectionState_Connected;
+    return kState_Initialized && (mConState == kConnectionState_Connected || mConState == kConnectionState_SecureConnected);
+}
+
+bool ChipDeviceController::IsSecurelyConnected()
+{
+    return kState_Initialized && mConState == kConnectionState_SecureConnected;
 }
 
 CHIP_ERROR ChipDeviceController::DisconnectDevice()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState != kState_Initialized || mConState != kConnectionState_Connected)
+    if (!IsConnected())
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -242,7 +247,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
 
     mAppReqState = appReqState;
-    if (mConState == kConnectionState_SecureConnected)
+    if (IsSecurelyConnected())
     {
         MessageHeader header;
 
@@ -353,8 +358,7 @@ void ChipDeviceController::OnReceiveMessage(const MessageHeader & header, const 
             ChipLogError(Controller, "Received message from an unexpected source node id.");
         }
     }
-
-    if (mgr->mConState == kConnectionState_SecureConnected && mgr->mOnComplete.Response != NULL)
+    if (mgr->IsSecurelyConnected() && mgr->mOnComplete.Response != NULL)
     {
         mgr->mOnComplete.Response(mgr, mgr->mAppReqState, msgBuf, &pktInfo);
     }

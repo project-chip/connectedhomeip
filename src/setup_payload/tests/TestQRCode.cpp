@@ -134,12 +134,10 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t input[] = { 10, 10, 10 };
 
+    // basic stuff
     NL_TEST_ASSERT(inSuite, base41Encode(input, 0).compare("") == 0);
-
     NL_TEST_ASSERT(inSuite, base41Encode(input, 1).compare("A") == 0);
-
     NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("SL1") == 0);
-
     NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1A") == 0);
 
     // test single odd byte corner conditions
@@ -152,6 +150,25 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     input[2] = 255;
     NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL196") == 0);
 
+    // testing optimized encoding
+    // verify that we can't optimize a low value, need 3 chars
+    input[0] = 255;
+    input[1] = 0;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("960") == 0);
+    // smallest optimized encoding, 256
+    input[0] = 256 % 256;
+    input[1] = 256 / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("A6") == 0);
+    // largest optimizated encoding value
+    input[0] = ((kRadix * kRadix) - 1) % 256;
+    input[1] = ((kRadix * kRadix) - 1) / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("..") == 0);
+    // can't optimize
+    input[0] = ((kRadix * kRadix)) % 256;
+    input[1] = ((kRadix * kRadix)) / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("001") == 0);
+
+    // fun with strings
     NL_TEST_ASSERT(inSuite,
                    base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1).compare("GHF.KGL+48-G5LGK35") == 0);
 
@@ -204,7 +221,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, decoded.size() == 1 && decoded[0] == 255);
     NL_TEST_ASSERT(inSuite, base41Decode("A6", decoded) == CHIP_NO_ERROR); // this is 256, needs 2 output bytes
     NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == 256);
-    NL_TEST_ASSERT(inSuite, base41Decode("..", decoded) == CHIP_NO_ERROR); // this is 41^2-1, or 1680, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, base41Decode("..", decoded) == CHIP_NO_ERROR); // this is (41*41)-1, or 1680, needs 2 output bytes
     NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == (kRadix * kRadix) - 1);
 }
 

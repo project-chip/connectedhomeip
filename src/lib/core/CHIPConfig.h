@@ -70,17 +70,6 @@
 
 // clang-format off
 
-/**
- *  @def CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
- *
- *  @brief
- *    This boolean configuration option is (1) if the obsolescent interfaces
- *    of the chip layer are still available for transitional purposes.
- *
- */
-#ifndef CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#define CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES         0
-#endif //  CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 // Profile-specific Configuration Headers
 /*

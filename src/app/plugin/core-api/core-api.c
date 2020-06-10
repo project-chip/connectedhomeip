@@ -18,6 +18,7 @@
 #include <memory.h>
 
 #include "chip-zcl.h"
+#include "gen-global-command-handler.h"
 
 ChipZclStatus_t chipZclClusterCommandParse(ChipZclCommandContext_t * context);
 
@@ -27,5 +28,6 @@ ChipZclStatus_t chipZclProcessIncoming(ChipZclBuffer_t * message)
 
     chipZclDecodeZclHeader(message, &context);
 
-    return chipZclClusterCommandParse(&context);
+    // Should this just use chipZclCommandParse?
+    return context.clusterSpecific ? chipZclClusterCommandParse(&context) : chipZclGeneralCommandParse(&context);
 }

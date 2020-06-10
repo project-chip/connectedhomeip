@@ -182,19 +182,7 @@ protected:
 
     static CHIP_ERROR GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen);
     static CHIP_ERROR FailGetNextBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen);
-
-#if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    static CHIP_ERROR GetNextInetBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen);
-#endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 };
-
-#if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-inline CHIP_ERROR TLVReader::GetNextInetBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart,
-                                               uint32_t & bufLen)
-{
-    return GetNextPacketBuffer(reader, bufHandle, bufStart, bufLen);
-}
-#endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 /**
  * Provides a memory efficient encoder for writing data in CHIP TLV format.
@@ -278,11 +266,6 @@ public:
     static CHIP_ERROR GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen);
     static CHIP_ERROR FinalizePacketBuffer(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t dataLen);
 
-#if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    static CHIP_ERROR GetNewInetBuffer(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen);
-    static CHIP_ERROR FinalizeInetBuffer(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t dataLen);
-#endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 protected:
     uintptr_t mBufHandle;
     uint8_t * mBufStart;
@@ -328,18 +311,6 @@ protected:
     CHIP_ERROR WriteElementWithData(TLVType type, uint64_t tag, const uint8_t * data, uint32_t dataLen);
     CHIP_ERROR WriteData(const uint8_t * p, uint32_t len);
 };
-
-#if CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-inline CHIP_ERROR TLVWriter::GetNewInetBuffer(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen)
-{
-    return GetNewPacketBuffer(writer, bufHandle, bufStart, bufLen);
-}
-
-inline CHIP_ERROR TLVWriter::FinalizeInetBuffer(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t dataLen)
-{
-    return FinalizePacketBuffer(writer, bufHandle, bufStart, dataLen);
-}
-#endif // CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 
 /**
  * Provides a unified Reader/Writer interface for editing/adding/deleting elements in TLV encoding.
