@@ -183,9 +183,9 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         return NO;
     }
     [self.lock lock];
-        const unsigned char * local_key_bytes = (const unsigned char *) [local_key bytes];
-        const unsigned char * peer_key_bytes = (const unsigned char *) [peer_key bytes];
-        err = self.cppController->ManualKeyExchange(peer_key_bytes, peer_key.length, local_key_bytes, local_key.length);
+    const unsigned char * local_key_bytes = (const unsigned char *) [local_key bytes];
+    const unsigned char * peer_key_bytes = (const unsigned char *) [peer_key bytes];
+    err = self.cppController->ManualKeyExchange(peer_key_bytes, peer_key.length, local_key_bytes, local_key.length);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
