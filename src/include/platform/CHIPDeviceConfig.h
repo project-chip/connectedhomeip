@@ -248,6 +248,15 @@
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_STATION_IF_NAME "wl"
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME
+ *
+ * Name of the WiFi station interface
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME
+#define CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME "wlan0"
+#endif
+
 // -------------------- WiFi AP Configuration --------------------
 
 /**

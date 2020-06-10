@@ -1798,6 +1798,11 @@ fi
 AC_SUBST(NLUNIT_TEST_SUBDIRS, [${maybe_nlunit_test_dirstem}])
 AM_CONDITIONAL([CHIP_WITH_NLUNIT_TEST_INTERNAL], [test "${nl_with_nlunit_test}" = "internal"])
 
+if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
+	PKG_CHECK_MODULES([GIO], [gio-2.0])
+	PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0])
+fi
+
 #
 # Sockets
 #

@@ -40,6 +40,7 @@ if CHIP_BUILD_TESTS
 # objects in this makefile.
 
 AM_CPPFLAGS                                    = \
+    -I$(builddir)/../gen                         \
     -I$(top_srcdir)/src/                         \
     -I$(top_srcdir)/src/lib                      \
     -I$(top_srcdir)/src/system                   \
@@ -48,6 +49,8 @@ AM_CPPFLAGS                                    = \
     $(NLASSERT_CPPFLAGS)                         \
     $(NLFAULTINJECTION_CPPFLAGS)                 \
     $(NLUNIT_TEST_CPPFLAGS)                      \
+    $(GIO_CFLAGS)                                \
+    $(GIO_UNIX_CFLAGS)                           \
     $(NULL)
 
 CHIP_LDADD                                      = \
@@ -62,6 +65,8 @@ COMMON_LDADD                                   = \
     $(NLFAULTINJECTION_LDFLAGS) $(NLFAULTINJECTION_LIBS)\
     $(NLUNIT_TEST_LDFLAGS) $(NLUNIT_TEST_LIBS)          \
     $(LWIP_LDFLAGS) $(LWIP_LIBS)                        \
+    $(GIO_CFLAGS) $(GIO_LIBS)                           \
+    $(GIO_UNIX_CFLAGS) $(GIO_UNIX_LIBS)                 \
     $(SOCKETS_LDFLAGS) $(SOCKETS_LIBS)                  \
     $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)                   \
     $(NULL)

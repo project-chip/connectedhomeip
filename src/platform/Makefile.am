@@ -95,6 +95,7 @@ if CONFIG_DEVICE_LAYER
 lib_LIBRARIES                           = libDeviceLayer.a
 
 libDeviceLayer_a_CPPFLAGS               = \
+    -I$(builddir)/gen                     \
     -I$(top_srcdir)/src/include           \
     -I$(top_srcdir)/src/lib               \
     -I$(top_srcdir)/src/system            \
@@ -113,9 +114,58 @@ libDeviceLayer_a_SOURCES                = \
     Globals.cpp                           \
     $(NULL)
 
+nodist_libDeviceLayer_a_SOURCES         = \
+    $(NULL)
+
 if CHIP_DEVICE_LAYER_TARGET_LINUX
 
+BUILT_SOURCES                         = \
+    gen                                 \
+    gen/DBusWpaInterface.h              \
+    gen/DBusWpa.h                       \
+    gen/DBusWpaNetwork.h                \
+    gen/DBusWpa.c                       \
+    gen/DBusWpaInterface.c              \
+    gen/DBusWpaNetwork.c                \
+    $(NULL)
+
+.PHONY: gen
+gen:
+	mkdir -p gen
+
+gen/DBusWpa.h: Linux/wpa.xml
+	gdbus-codegen --header --output $@ --c-namespace WeaveDBus $<
+
+gen/DBusWpaNetwork.h: Linux/wpa_network.xml
+	gdbus-codegen --header --output $@ --c-namespace WeaveDBus $<
+
+gen/DBusWpaInterface.h: Linux/wpa_interface.xml
+	gdbus-codegen --header --output $@ --c-namespace WeaveDBus $<
+
+gen/DBusWpa.c: Linux/wpa.xml
+	gdbus-codegen --body --output $@ --c-namespace WeaveDBus $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+gen/DBusWpaNetwork.c: Linux/wpa_network.xml
+	gdbus-codegen --body --output $@ --c-namespace WeaveDBus $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
+gen/DBusWpaInterface.c: Linux/wpa_interface.xml
+	gdbus-codegen --body --output $@ --c-namespace WeaveDBus $<
+	sed -i 's/config\.h/BuildConfig.h/g' $@
+
 SUBDIRS                                += tests
+
+libDeviceLayer_a_CPPFLAGS              += \
+    $(GIO_CFLAGS)                         \
+    $(GIO_UNIX_CFLAGS)                    \
+    $(NULL)
+
+nodist_libDeviceLayer_a_SOURCES        += \
+    gen/DBusWpa.c                         \
+    gen/DBusWpaInterface.c                \
+    gen/DBusWpaNetwork.c                  \
+    $(NULL)
 
 libDeviceLayer_a_SOURCES               += \
     Linux/BLEManagerImpl.cpp              \
@@ -124,6 +174,9 @@ libDeviceLayer_a_SOURCES               += \
     Linux/PosixConfig.cpp                 \
     Linux/PlatformManagerImpl.cpp         \
     Linux/SystemTimeSupport.cpp           \
+    gen/DBusWpa.c                         \
+    gen/DBusWpaInterface.c                \
+    gen/DBusWpaNetwork.c                  \
     $(NULL)
 
 endif # CHIP_DEVICE_LAYER_TARGET_LINUX
