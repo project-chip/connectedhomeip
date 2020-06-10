@@ -15,6 +15,15 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file implements a unit test suite for the Platform Manager
+ *      code functionality.
+ *
+ */
+
+#include "TestPlatformMgr.h"
+
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -95,7 +104,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int main(void)
+int TestPlatformMgr(void)
 {
     nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], NULL, NULL };
 
