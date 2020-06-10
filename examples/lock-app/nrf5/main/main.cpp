@@ -33,6 +33,7 @@
 #include "nrf_crypto.h"
 #endif
 #include "mem_manager.h"
+#if CHIP_ENABLE_OPENTHREAD
 extern "C" {
 #include "multiprotocol_802154_config.h"
 #include "nrf_802154.h"
@@ -40,6 +41,7 @@ extern "C" {
 #include "nrf_cc310_platform_mutex.h"
 #include <openthread/platform/platform-softdevice.h>
 }
+#endif // CHIP_ENABLE_OPENTHREAD
 
 #if NRF_LOG_ENABLED
 #include "nrf_log_backend_uart.h"
@@ -48,6 +50,7 @@ extern "C" {
 #endif // NRF_LOG_ENABLED
 
 #include <AppTask.h>
+#if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
@@ -61,6 +64,7 @@ extern "C" {
 #include <openthread/thread.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
+#endif // CHIP_ENABLE_OPENTHREAD
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -101,7 +105,9 @@ uint32_t LogTimestamp(void)
 
 static void OnSoCEvent(uint32_t sys_evt, void * p_context)
 {
+#if CHIP_ENABLE_OPENTHREAD
     otSysSoftdeviceSocEvtHandler(sys_evt);
+#endif
     UNUSED_PARAMETER(p_context);
 }
 
@@ -215,6 +221,7 @@ int main(void)
         APP_ERROR_HANDLER(ret);
     }
 
+#if CHIP_ENABLE_OPENTHREAD
     NRF_LOG_INFO("Initializing OpenThread stack");
 
     mbedtls_platform_set_calloc_free(calloc, free);
@@ -250,6 +257,7 @@ int main(void)
         NRF_LOG_INFO("ConnectivityMgr().SetThreadDeviceType() failed");
         APP_ERROR_HANDLER(ret);
     }
+#endif // CHIP_ENABLE_OPENTHREAD
 
     NRF_LOG_INFO("Starting CHIP task");
     ret = PlatformMgr().StartEventLoopTask();
@@ -259,6 +267,7 @@ int main(void)
         APP_ERROR_HANDLER(ret);
     }
 
+#if CHIP_ENABLE_OPENTHREAD
     NRF_LOG_INFO("Starting OpenThread task");
 
     // Start OpenThread task
@@ -268,6 +277,7 @@ int main(void)
         NRF_LOG_INFO("ThreadStackMgr().StartThreadTask() failed");
         APP_ERROR_HANDLER(ret);
     }
+#endif // CHIP_ENABLE_OPENTHREAD
 
     ret = GetAppTask().StartAppTask();
     if (ret != NRF_SUCCESS)

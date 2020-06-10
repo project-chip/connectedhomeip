@@ -143,9 +143,14 @@ libDeviceLayer_a_SOURCES               +=       \
     nRF5/nRF5Config.cpp                         \
     nRF5/nRF5Utils.cpp                          \
     nRF5/Logging.cpp                            \
-    nRF5/ThreadStackManagerImpl.cpp             \
     FreeRTOS/SystemTimeSupport.cpp              \
     $(NULL)
+
+if CHIP_ENABLE_OPENTHREAD
+libDeviceLayer_a_SOURCES               +=       \
+    nRF5/ThreadStackManagerImpl.cpp             \
+    $(NULL)
+endif
 
 endif # CHIP_DEVICE_LAYER_TARGET_NRF5
 
