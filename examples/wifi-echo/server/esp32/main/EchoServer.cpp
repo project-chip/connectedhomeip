@@ -121,14 +121,15 @@ static const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7,
 void setupTransport(IPAddressType type, SecureTransport * transport)
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
+    struct netif * netif          = NULL;
     Transport::UDP * udpTransport = new Transport::UDP();
 
-    // TODO: add IPV6 support back by getting TCP adapter information:
-    //
-    //    struct netif * netif;
-    //    tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
-    //
-    err = udpTransport->Init(&DeviceLayer::InetLayer, type, CHIP_PORT, CHIP_PORT);
+    if (type == kIPAddressType_IPv6)
+    {
+            tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
+    }
+
+    err = udpTransport->Init(&DeviceLayer::InetLayer, Transport::UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
     SuccessOrExit(err);
 
     err = transport->Init(udpTransport);

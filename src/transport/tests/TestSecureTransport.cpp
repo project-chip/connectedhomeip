@@ -167,7 +167,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     Transport::UDP udp;
     SecureTransport conn;
 
-    err = udp.Init(&ctx.mInetLayer, addr.Type(), CHIP_PORT, CHIP_PORT);
+    err = udp.Init(&ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = conn.Init(&udp);

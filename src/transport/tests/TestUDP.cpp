@@ -135,7 +135,8 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     Transport::UDP udp;
 
-    CHIP_ERROR err = udp.Init(&ctx.mInetLayer, type, CHIP_PORT, CHIP_PORT);
+    CHIP_ERROR err = udp.Init(&ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(type));
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -165,7 +166,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     Transport::UDP udp;
 
-    err = udp.Init(&ctx.mInetLayer, addr.Type(), CHIP_PORT, CHIP_PORT);
+    err = udp.Init(&ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);

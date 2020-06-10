@@ -45,18 +45,18 @@ UDP::~UDP()
     }
 }
 
-CHIP_ERROR UDP::Init(Inet::InetLayer * inetLayer, Inet::IPAddressType addrType, uint16_t sendPort, uint16_t receivePort)
+CHIP_ERROR UDP::Init(Inet::InetLayer * inetLayer, const UdpListenParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSendPort = sendPort;
+    mSendPort = params.GetMessageSendPort();
 
     err = inetLayer->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
-    err = mUDPEndPoint->Bind(addrType, IPAddress::Any, receivePort);
+    err = mUDPEndPoint->Bind(params.GetAddressType(), IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
     SuccessOrExit(err);
 
     err = mUDPEndPoint->Listen();

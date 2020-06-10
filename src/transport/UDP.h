@@ -32,11 +32,60 @@
 #include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
+#include <inet/InetInterface.h>
 #include <transport/Base.h>
 
 namespace chip {
 namespace Transport {
 
+/** Defines listening parameters for setting up a UDP transport */
+class UdpListenParameters
+{
+public:
+    UdpListenParameters() {}
+    UdpListenParameters(const UdpListenParameters &) = default;
+    UdpListenParameters(UdpListenParameters &&)      = default;
+
+    Inet::IPAddressType GetAddressType() const { return mAddressType; }
+    UdpListenParameters & SetAddressType(Inet::IPAddressType type)
+    {
+        mAddressType = type;
+
+        return *this;
+    }
+
+    uint16_t GetMessageSendPort() const { return mMessageSendPort; }
+    UdpListenParameters & SetMessageSendPort(uint16_t port)
+    {
+        mMessageSendPort = port;
+
+        return *this;
+    }
+
+    uint16_t GetListenPort() const { return mListenPort; }
+    UdpListenParameters & SetListenPort(uint16_t port)
+    {
+        mListenPort = port;
+
+        return *this;
+    }
+
+    InterfaceId GetInterfaceId() const { return mInterfaceId; }
+    UdpListenParameters & SetInterfaceId(InterfaceId id)
+    {
+        mInterfaceId = id;
+
+        return *this;
+    }
+
+private:
+    Inet::IPAddressType mAddressType = kIPAddressType_IPv6;   ///< type of listening socket
+    uint16_t mMessageSendPort        = CHIP_PORT;             ///< over what port to send requests
+    uint16_t mListenPort             = CHIP_PORT;             ///< UDP listen port
+    InterfaceId mInterfaceId         = INET_NULL_INTERFACEID; ///< Interface to listen on
+};
+
+/** Implements a transport using UDP. */
 class DLL_EXPORT UDP : public Base
 {
     /**
@@ -56,21 +105,19 @@ public:
      * Initialize a UDP transport on a given port.
      *
      * @param inetLayer    underlying communication channel
-     * @param addrType     IP Type for listening. IPV6 except for testing ipv4;
-     * @param sendPort     messages to other peers are sent at this port
-     * @param receivePort  listening port to receive messages
+     * @param parms        UDP configuration parameters for this transport
      *
      * @details
      *   Generally send and receive ports should be the same and equal to CHIP_PORT.
      *   The class allows separate definitions to allow local execution of several
      *   Nodes.
      */
-    CHIP_ERROR Init(Inet::InetLayer * inetLayer, Inet::IPAddressType addrType, uint16_t sendPort, uint16_t receivePort);
+    CHIP_ERROR Init(Inet::InetLayer * inetLayer, const UdpListenParameters & params);
 
     /**
      * Convenience method to listen on IPv6 on chip standard ports
      */
-    CHIP_ERROR Init(Inet::InetLayer * inetLayer) { return Init(inetLayer, kIPAddressType_IPv6, CHIP_PORT, CHIP_PORT); }
+    CHIP_ERROR Init(Inet::InetLayer * inetLayer) { return Init(inetLayer, UdpListenParameters()); }
 
     Type GetType() override { return Type::kUdp; }
     CHIP_ERROR SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf) override;

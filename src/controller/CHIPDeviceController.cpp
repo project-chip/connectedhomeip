@@ -144,7 +144,8 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
     mAppReqState = appReqState;
     mDeviceCon   = new SecureTransport();
 
-    err = udpTransport->Init(mInetLayer, deviceAddr.Type(), CHIP_PORT, CHIP_PORT);
+    err = udpTransport->Init(mInetLayer, Transport::UdpListenParameters().SetAddressType(deviceAddr.Type()));
+
     SuccessOrExit(err);
 
     err = mDeviceCon->Init(udpTransport);
