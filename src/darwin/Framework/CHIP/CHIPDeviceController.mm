@@ -182,12 +182,11 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         }
         return NO;
     }
-
-    dispatch_sync(self.chipWorkQueue, ^() {
+    [self.lock lock];
         const unsigned char * local_key_bytes = (const unsigned char *) [local_key bytes];
         const unsigned char * peer_key_bytes = (const unsigned char *) [peer_key bytes];
         err = self.cppController->ManualKeyExchange(peer_key_bytes, peer_key.length, local_key_bytes, local_key.length);
-    });
+    [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%d): %@, key exchange failed", err, [CHIPError errorForCHIPErrorCode:err]);
