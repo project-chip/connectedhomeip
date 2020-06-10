@@ -126,7 +126,7 @@ void setupTransport(IPAddressType type, SecureTransport * transport)
 
     if (type == kIPAddressType_IPv6)
     {
-            tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
+        tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
     }
 
     err = udpTransport->Init(&DeviceLayer::InetLayer, Transport::UdpListenParameters().SetAddressType(type).SetInterfaceId(netif));
