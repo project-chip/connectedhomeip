@@ -107,8 +107,10 @@ private:
     static const char * _WiFiAPModeToStr(WiFiAPMode mode);
 
     // Wifi station state machine, the struct can only be modified inside _WiFiStateMachine
-    struct _WiFiState {
-        enum {
+    struct _WiFiState
+    {
+        enum
+        {
             INIT,
             DISABLED,
             ENABLED,
@@ -124,12 +126,14 @@ private:
         } state = INIT;
 
         // two nested state in DBUS_GOT_INTERFACE
-        enum {
+        enum
+        {
             WIFI_SCANNING_IDLE,
             WIFI_SCANNING,
         } scanState = WIFI_SCANNING_IDLE;
 
-        enum {
+        enum
+        {
             WIFI_IDLE,
             WIFI_ADDING_NETWORK,
             WIFI_ADDED_NETWORK,
@@ -140,10 +144,10 @@ private:
             WIFI_ERROR,
         } connectState = WIFI_IDLE;
 
-        WeaveDBusFiW1Wpa_supplicant1 *wpa = nullptr;
-        gchar *interfacePath = nullptr;
-        WeaveDBusFiW1Wpa_supplicant1Interface *iface = nullptr;
-        gchar *networkPath = nullptr;
+        WeaveDBusFiW1Wpa_supplicant1 * wpa            = nullptr;
+        gchar * interfacePath                         = nullptr;
+        WeaveDBusFiW1Wpa_supplicant1Interface * iface = nullptr;
+        gchar * networkPath                           = nullptr;
     } _WiFiState;
     void _WiFiThread();
     void _WiFiStateMachine();
@@ -164,9 +168,9 @@ private:
 
     enum Flags
     {
-        kFlag_HaveIPv4InternetConnectivity      = 0x0001,
-        kFlag_HaveIPv6InternetConnectivity      = 0x0002,
-        kFlag_AwaitingConnectivity              = 0x0010,
+        kFlag_HaveIPv4InternetConnectivity = 0x0001,
+        kFlag_HaveIPv6InternetConnectivity = 0x0002,
+        kFlag_AwaitingConnectivity         = 0x0010,
     };
 
     WiFiStationMode mWiFiStationMode;
