@@ -106,7 +106,6 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 
     if (mDeviceCon != NULL)
     {
-        mDeviceCon->Close();
         delete mDeviceCon;
         mDeviceCon = NULL;
     }
@@ -145,13 +144,10 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(uint64_t deviceId, IPAddress devi
     mAppReqState = appReqState;
     mDeviceCon   = new SecureTransport();
 
-    err = udpTransport->Init(mInetLayer);
+    err = udpTransport->Init(mInetLayer, deviceAddr.Type(), CHIP_PORT, CHIP_PORT);
     SuccessOrExit(err);
 
     err = mDeviceCon->Init(udpTransport);
-    SuccessOrExit(err);
-
-    err = mDeviceCon->Connect(mDeviceAddr.Type());
     SuccessOrExit(err);
 
     mDeviceCon->SetMessageReceiveHandler(OnReceiveMessage, this);
@@ -175,7 +171,6 @@ exit:
     {
         if (mDeviceCon != NULL)
         {
-            mDeviceCon->Close();
             delete mDeviceCon;
             mDeviceCon = NULL;
         }
@@ -236,7 +231,6 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    err = mDeviceCon->Close();
     delete mDeviceCon;
     mDeviceCon = NULL;
     mConState  = kConnectionState_NotConnected;

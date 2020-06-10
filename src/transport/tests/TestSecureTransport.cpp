@@ -138,33 +138,6 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     err = conn.Init(&udp);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = conn.Close();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-}
-
-void CheckSimpleConnectTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    Transport::Udp udp;
-    SecureTransport conn;
-
-    err = udp.Init(&ctx.mInetLayer);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = conn.Init(&udp);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = conn.Connect(addr.Type());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = conn.Close();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
@@ -184,16 +157,13 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     Transport::Udp udp;
     SecureTransport conn;
 
-    err = udp.Init(&ctx.mInetLayer);
+    err = udp.Init(&ctx.mInetLayer, addr.Type(), CHIP_PORT, CHIP_PORT);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = conn.Init(&udp);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     conn.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
-
-    err = conn.Connect(addr.Type());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MessageHeader header;
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
@@ -208,9 +178,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     DriveIO(ctx);
 
     NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
-
-    err = conn.Close();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 // Test Suite
@@ -222,7 +189,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 static const nlTest sTests[] =
 {
     NL_TEST_DEF("Simple Init Test",              CheckSimpleInitTest),
-    NL_TEST_DEF("Simple Connect Test",           CheckSimpleConnectTest),
     NL_TEST_DEF("Message Self Test",             CheckMessageTest),
 
     NL_TEST_SENTINEL()

@@ -39,7 +39,7 @@ namespace chip {
 static const size_t kMax_SecureSDU_Length         = 1024;
 static const char * kManualKeyExchangeChannelInfo = "Manual Key Exchanged Channel";
 
-SecureTransport::SecureTransport() : mState(kState_NotReady), mRefCount(1)
+SecureTransport::SecureTransport() : mState(State::kNotReady), mRefCount(1)
 {
     mTransport        = NULL;
     OnMessageReceived = NULL;
@@ -48,10 +48,12 @@ SecureTransport::SecureTransport() : mState(kState_NotReady), mRefCount(1)
 CHIP_ERROR SecureTransport::Init(Transport::Base * transport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(mState != kState_NotReady, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
     mTransport = transport->Retain();
     mTransport->SetMessageReceiveHandler(HandleDataReceived, this);
+
+    mState = State::kInitialized;
 
 exit:
     return err;
@@ -63,28 +65,12 @@ CHIP_ERROR SecureTransport::ManualKeyExchange(const unsigned char * remote_publi
     CHIP_ERROR err  = CHIP_NO_ERROR;
     size_t info_len = strlen(kManualKeyExchangeChannelInfo);
 
-    VerifyOrExit(mState == kState_Connected, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = mSecureChannel.Init(remote_public_key, public_key_length, local_private_key, private_key_length, NULL, 0,
                               (const unsigned char *) kManualKeyExchangeChannelInfo, info_len);
     SuccessOrExit(err);
-    mState = kState_SecureConnected;
-exit:
-    return err;
-}
-
-CHIP_ERROR SecureTransport::Connect(IPAddressType addrType, InterfaceId intfId)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mState == kState_ReadyToConnect, err = CHIP_ERROR_INCORRECT_STATE);
-
-    Retain();
-
-    ChipLogProgress(Inet, "Connection start");
-
-    mTransport->SetMessageReceiveHandler(HandleDataReceived, this);
-    mState = kState_Connected;
+    mState = State::kSecureConnected;
 exit:
     return err;
 }
@@ -120,7 +106,7 @@ CHIP_ERROR SecureTransport::SendMessage(const MessageHeader & header, Inet::IPAd
 exit:
     if (msgBuf != NULL)
     {
-        ChipLogProgress(Inet, "Secure transport failed to encrypt msg %d", header.GetMessageId());
+        ChipLogProgress(Inet, "Secure transport failed to encrypt msg %d: %s", header.GetMessageId(), ErrorStr(err));
         PacketBuffer::Free(msgBuf);
         msgBuf = NULL;
     }

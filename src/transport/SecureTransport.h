@@ -49,14 +49,11 @@ public:
      *    The State of the CHIP connection object.
      *
      */
-    enum State
+    enum class State
     {
-        // TODO need more modes when TCP support is added
-        kState_NotReady        = 0, /**< State before initialization. */
-        kState_ReadyToConnect  = 1, /**< State after initialization of the CHIP connection. */
-        kState_Connected       = 2, /**< State when the connection has been established. */
-        kState_SecureConnected = 3, /**< State when the security of the connection has been established. */
-        kState_Closed          = 4  /**< State when the connection is closed. */
+        kNotReady,        /**< State before initialization. */
+        kInitialized,     /**< State when the connection has been established. */
+        kSecureConnected, /**< State when the security of the connection has been established. */
     };
 
     /**
@@ -75,7 +72,7 @@ public:
      * @param intfId        Indicator for system network interfaces
      * @return CHIP_ERROR   The connection result
      */
-    CHIP_ERROR Connect(IPAddressType addrType = kIPAddressType_IPv6, InterfaceId intfId = INET_NULL_INTERFACEID);
+    CHIP_ERROR Connect();
 
     /**
      * @brief
@@ -101,14 +98,6 @@ public:
      *   behalf of the caller regardless of the return status.
      */
     CHIP_ERROR SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf);
-
-    /**
-     * @brief
-     *   Close an existing connection. Once close is called, the SecureTransport object can no longer be used
-     *
-     * @return CHIP_ERROR   The close result
-     */
-    CHIP_ERROR Close(void);
 
     SecureTransport();
     virtual ~SecureTransport() {}
@@ -137,12 +126,8 @@ private:
     uint8_t mRefCount;
     ChipSecureChannel mSecureChannel;
 
-    /// FIXME: callbacks
-
-    CHIP_ERROR DoConnect(IPAddressType addrType);
-    void DoClose(CHIP_ERROR err);
-    bool StateAllowsSend(void) const { return mState == kState_SecureConnected; }
-    bool StateAllowsReceive(void) const { return mState == kState_SecureConnected; }
+    bool StateAllowsSend(void) const { return mState != State::kNotReady; }
+    bool StateAllowsReceive(void) const { return mState == State::kSecureConnected; }
 
     /**
      * This function is the application callback that is invoked when a message is received over a
