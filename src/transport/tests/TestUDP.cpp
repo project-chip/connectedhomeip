@@ -127,17 +127,31 @@ exit:
     return err;
 }
 
-void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
+/////////////////////////// Init test
+
+void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddressType type)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     Transport::UDP udp;
 
-    CHIP_ERROR err = udp.Init(&ctx.mInetLayer, kIPAddressType_IPv4, CHIP_PORT, CHIP_PORT);
+    CHIP_ERROR err = udp.Init(&ctx.mInetLayer, type, CHIP_PORT, CHIP_PORT);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
+void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
+{
+    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv4);
+}
+
+void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
+{
+    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv6);
+}
+
+/////////////////////////// Messaging test
+
+void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress & addr)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -147,13 +161,11 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     memmove(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
 
-    IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Transport::UDP udp;
 
-    err = udp.Init(&ctx.mInetLayer, kIPAddressType_IPv4, CHIP_PORT, CHIP_PORT);
+    err = udp.Init(&ctx.mInetLayer, addr.Type(), CHIP_PORT, CHIP_PORT);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
@@ -174,6 +186,20 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
 }
 
+void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    CheckMessageTest(inSuite, inContext, addr);
+}
+
+void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CheckMessageTest(inSuite, inContext, addr);
+}
+
 // Test Suite
 
 /**
@@ -182,8 +208,11 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("Simple Init Test",              CheckSimpleInitTest),
-    NL_TEST_DEF("Message Self Test",             CheckMessageTest),
+    NL_TEST_DEF("Simple Init Test IPV4",   CheckSimpleInitTest4),
+    NL_TEST_DEF("Simple Init Test IPV6",   CheckSimpleInitTest6),
+
+    NL_TEST_DEF("Message Self Test IPV4",  CheckMessageTest4),
+    NL_TEST_DEF("Message Self Test IPV6",  CheckMessageTest6),
 
     NL_TEST_SENTINEL()
 };
@@ -243,7 +272,7 @@ static int Finalize(void * aContext)
 /**
  *  Main
  */
-int TestUdp()
+int TestUDP()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);

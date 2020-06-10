@@ -43,7 +43,7 @@ lib_LIBRARIES                                         = \
 libTransportLayerTests_a_SOURCES                      = \
     TestMessageHeader.cpp                               \
     TestSecureTransport.cpp                             \
-    TestUdp.cpp                                         \
+    TestUDP.cpp                                         \
     TestCHIPSecureChannel.cpp                           \
     $(NULL)
 
@@ -88,6 +88,7 @@ check_PROGRAMS             = \
     TestMessageHeader        \
     TestSecureTransport      \
     TestCHIPSecureChannel    \
+    TestUDP                  \
     $(NULL)
 
 # Test applications and scripts that should be built and run when the
@@ -114,8 +115,8 @@ TestSecureTransport_LDADD     = $(COMMON_LDADD)
 TestCHIPSecureChannel_SOURCES = TestCHIPSecureChannelDriver.cpp
 TestCHIPSecureChannel_LDADD   = $(COMMON_LDADD)
 
-TestUdp_SOURCES               = TestUdpDriver.cpp
-TestUdp_LDADD                 = $(COMMON_LDADD)
+TestUDP_SOURCES               = TestUDPDriver.cpp
+TestUDP_LDADD                 = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

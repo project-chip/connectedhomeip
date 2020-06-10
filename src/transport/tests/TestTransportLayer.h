@@ -32,7 +32,7 @@ extern "C" {
 int TestMessageHeader(void);
 int TestSecureTransport(void);
 int TestCHIPSecureChannel(void);
-int TestUdp(void);
+int TestUDP(void);
 
 #ifdef __cplusplus
 }

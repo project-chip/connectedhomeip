@@ -31,5 +31,5 @@ int main(void)
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestUdp());
+    return (TestUDP());
 }

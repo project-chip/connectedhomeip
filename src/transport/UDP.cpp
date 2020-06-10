@@ -105,11 +105,9 @@ CHIP_ERROR UDP::SendMessage(const MessageHeader & header, Inet::IPAddress addres
     // This is unexpected and means header changed while encoding
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mUDPEndPoint->SendMsg(&addrInfo, msgBuf);
-    SuccessOrExit(err);
-
-    // on success, sendmsg will free the buffer.
+    err    = mUDPEndPoint->SendMsg(&addrInfo, msgBuf);
     msgBuf = nullptr;
+    SuccessOrExit(err);
 
 exit:
     if (msgBuf != NULL)
