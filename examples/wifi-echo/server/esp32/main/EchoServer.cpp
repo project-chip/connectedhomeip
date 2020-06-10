@@ -38,6 +38,7 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureTransport.h>
+#include <transport/Udp.h>
 
 #include "DataModelHandler.h"
 
@@ -46,10 +47,13 @@ static const char * TAG = "echo_server";
 using namespace ::chip;
 using namespace ::chip::Inet;
 
+constexpr NodeId kLocalNodeId = 12344321;
+
 // Transport Callbacks
-static void echo(SecureTransport * transport, System::PacketBuffer * buffer, const IPPacketInfo * packet_info)
+static void echo(const MessageHeader & header, const IPPacketInfo & packet_info, System::PacketBuffer * buffer,
+                 SecureTransport * transport)
 {
-    bool status = transport != NULL && buffer != NULL && packet_info != NULL;
+    bool status = transport != NULL && buffer != NULL;
 
     if (status)
     {
@@ -57,11 +61,11 @@ static void echo(SecureTransport * transport, System::PacketBuffer * buffer, con
         char dest_addr[INET_ADDRSTRLEN];
         const size_t data_len = buffer->DataLength();
 
-        packet_info->SrcAddress.ToString(src_addr, sizeof(src_addr));
-        packet_info->DestAddress.ToString(dest_addr, sizeof(dest_addr));
+        packet_info.SrcAddress.ToString(src_addr, sizeof(src_addr));
+        packet_info.DestAddress.ToString(dest_addr, sizeof(dest_addr));
 
-        ESP_LOGI(TAG, "UDP packet received from %s:%u to %s:%u (%zu bytes)", src_addr, packet_info->SrcPort, dest_addr,
-                 packet_info->DestPort, static_cast<size_t>(data_len));
+        ESP_LOGI(TAG, "UDP packet received from %s:%u to %s:%u (%zu bytes)", src_addr, packet_info.SrcPort, dest_addr,
+                 packet_info.DestPort, static_cast<size_t>(data_len));
 
         if (data_len > 0 && buffer->Start()[0] < 0x20)
         {
@@ -72,8 +76,15 @@ static void echo(SecureTransport * transport, System::PacketBuffer * buffer, con
 
         ESP_LOGI(TAG, "Client sent: \"%.*s\"", data_len, buffer->Start());
 
+        MessageHeader sendHeader;
+
+        sendHeader
+            .SetSourceNodeId(kLocalNodeId)                  //
+            .SetDestinationNodeId(header.GetSourceNodeId()) //
+            .SetMessageId(header.GetMessageId());
+
         // Attempt to echo back
-        CHIP_ERROR err = transport->SendMessage(buffer, packet_info->SrcAddress);
+        CHIP_ERROR err = transport->SendMessage(sendHeader, packet_info.SrcAddress, buffer);
         if (err != CHIP_NO_ERROR)
         {
             ESP_LOGE(TAG, "Unable to echo back to client: %s", ErrorStr(err));
@@ -96,11 +107,6 @@ static void echo(SecureTransport * transport, System::PacketBuffer * buffer, con
     }
 }
 
-static void error(SecureTransport * st, CHIP_ERROR error, const IPPacketInfo * pi)
-{
-    ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
-}
-
 static const unsigned char local_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
                                                    0x11, 0x0e, 0x34, 0x15, 0x81, 0x81, 0x12, 0xfc, 0x36, 0xeb, 0x65,
                                                    0x61, 0x07, 0xaa, 0x63, 0xe8, 0xc5, 0x22, 0xac, 0x52, 0xa1 };
@@ -114,36 +120,36 @@ static const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7,
 // The echo server assumes the platform's networking has been setup already
 void setupTransport(IPAddressType type, SecureTransport * transport)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    transport->Init(&DeviceLayer::InetLayer);
-    if (type == kIPAddressType_IPv6)
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    Transport::Udp * udpTransport = new Transport::Udp();
+
+    // TODO: add IPV6 support back by getting TCP adapter information:
+    //
+    //    struct netif * netif;
+    //    tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
+    //
+    err = udpTransport->Init(&DeviceLayer::InetLayer, type, CHIP_PORT, CHIP_PORT);
+    SuccessOrExit(err);
+
+    err = transport->Init(udpTransport);
+    SuccessOrExit(err);
+
+    transport->SetMessageReceiveHandler(echo, transport);
+
+    err = transport->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    SuccessOrExit(err);
+
+exit:
+    udpTransport->Release();
+
+    if (err != CHIP_NO_ERROR)
     {
-        struct netif * netif;
-        tcpip_adapter_get_netif(TCPIP_ADAPTER_IF_AP, (void **) &netif);
-        err = transport->Connect(type, netif);
+        ESP_LOGE(TAG, "ERROR setting up transport: %s", ErrorStr(err));
     }
     else
     {
-        err = transport->Connect(type);
+        ESP_LOGI(TAG, "Echo Server Listening...");
     }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "ERROR: %s\n Couldn't create transport, server will not start.", ErrorStr(err));
-        return;
-    }
-
-    transport->OnMessageReceived = echo;
-    transport->OnReceiveError    = error;
-
-    err = transport->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "ERROR: %s\n Couldn't establish security keys.", ErrorStr(err));
-        return;
-    }
-
-    ESP_LOGI(TAG, "Echo Server Listening...");
 }
 
 // The echo server assumes the platform's networking has been setup already
