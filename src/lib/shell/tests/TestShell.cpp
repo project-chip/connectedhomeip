@@ -43,6 +43,12 @@ struct test_shell_vector
 static const struct test_shell_vector test_vector_shell_tokenizer[] = {
     { .line = "hello how are you?", .argv = (const char *[]){ "hello", "how", "are", "you?" } },
     { .line = "hey yo yo", .argv = (const char *[]){ "hey", "yo", "yo" } },
+    { .line = "This  has  double  spaces", .argv = (const char *[]){ "This", "has", "double", "spaces" } },
+    { .line = " leading space", .argv = (const char *[]){ "leading", "space" } },
+    { .line = "trailing space ", .argv = (const char *[]){ "trailing", "space", "" } },
+    { .line = "no_space", .argv = (const char *[]){ "no_space" } },
+    { .line = " ", .argv = (const char *[]){ "" } },
+    { .line = "", .argv = (const char *[]){} },
 };
 
 // =================================

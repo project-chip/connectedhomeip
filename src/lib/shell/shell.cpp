@@ -151,20 +151,32 @@ int Shell::TokenizeLine(char * buffer, char ** tokens, int max_tokens)
 {
     int len    = strlen(buffer);
     int cursor = 0;
+    int i      = 0;
 
-    VerifyOrExit(len > 0, cursor = 0);
+    // Strip leading spaces
+    while (buffer[i] && buffer[i] == ' ')
+    {
+        i++;
+    }
+
+    VerifyOrExit((len - i) > 0, cursor = 0);
 
     // The first token starts at the beginning.
-    tokens[cursor++] = &buffer[0];
+    tokens[cursor++] = &buffer[i];
 
-    for (int i = 0; i < len && cursor < max_tokens; i++)
+    for (; i < len && cursor < max_tokens; i++)
     {
         if (buffer[i] == ' ')
         {
-            buffer[i]        = 0;
-            tokens[cursor++] = &buffer[i + 1];
+            buffer[i] = 0;
+            if (buffer[i + 1] != ' ')
+            {
+                tokens[cursor++] = &buffer[i + 1];
+            }
         }
     }
+
+    tokens[cursor] = 0;
 
 exit:
     return cursor;

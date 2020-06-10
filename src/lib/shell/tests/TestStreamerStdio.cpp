@@ -61,7 +61,6 @@ static void TestStreamer_Output(nlTestSuite * inSuite, void * inContext)
         test_params = &test_vector_streamer_out[vectorIndex];
         output      = test_params->output;
 
-        // ChipLogProgress(chipTool, "%s", output);
         num_chars = streamer_write(streamer_get(), output, strlen(output));
         NL_TEST_ASSERT(inSuite, num_chars == (int) strlen(output));
         numOfTestsRan++;

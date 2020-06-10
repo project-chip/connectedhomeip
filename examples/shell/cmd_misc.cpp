@@ -35,10 +35,9 @@ using namespace chip::Logging;
 
 int cmd_echo(int argc, char ** argv)
 {
-    int i = 0;
-    while (i < argc)
+    for (int i = 0; i < argc; i++)
     {
-        streamer_printf(streamer_get(), "%s ", argv[i++]);
+        streamer_printf(streamer_get(), "%s ", argv[i]);
     }
     streamer_printf(streamer_get(), "\n\r");
     return 0;
@@ -46,10 +45,9 @@ int cmd_echo(int argc, char ** argv)
 
 int cmd_log(int argc, char ** argv)
 {
-    int i = 0;
-    while (i < argc)
+    for (int i = 0; i < argc; i++)
     {
-        ChipLogProgress(chipTool, "%s", argv[i++]);
+        ChipLogProgress(chipTool, "%s", argv[i]);
     }
     return 0;
 }
