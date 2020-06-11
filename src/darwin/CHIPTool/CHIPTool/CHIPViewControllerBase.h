@@ -22,12 +22,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPViewControllerBase : UIViewController
 
+@property (readwrite) BOOL useCorrectKey;
+@property (readwrite) BOOL useCorrectKeyStateChanged;
 @property (readwrite) CHIPDeviceController * chipController;
 @property (weak, nonatomic) IBOutlet UILabel * resultLabel;
+@property (weak, nonatomic) IBOutlet UISwitch * encryptionKeySwitch;
 
 - (void)reconnectIfNeeded;
 - (void)dismissKeyboard;
 - (void)postResult:(NSString *)result;
+- (IBAction)encryptionKey:(id)sender;
 
 @end
 
