@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="vbD-2y-iuf">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="vbD-2y-iuf">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -384,9 +384,22 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN9-8p-BcA">
+                                <rect key="frame" x="312" y="268" width="51" height="31"/>
+                                <connections>
+                                    <action selector="encryptionKey:" destination="NR6-8N-IDd" eventType="valueChanged" id="Ggg-GX-tuM"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Use Correct Encryption Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="778-me-ArK">
+                                <rect key="frame" x="16" y="273" width="220" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="dN9-8p-BcA" firstAttribute="leading" secondItem="778-me-ArK" secondAttribute="trailing" constant="76" id="2Sd-Om-GgK"/>
                             <constraint firstItem="7aI-Vo-UyO" firstAttribute="top" secondItem="UPn-Qe-uvu" secondAttribute="top" constant="40" id="B9Y-y5-JFG"/>
                             <constraint firstItem="tC3-Jk-Opv" firstAttribute="centerY" secondItem="Tzm-Xh-QOZ" secondAttribute="centerY" id="Egc-2k-Dph"/>
                             <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="tC3-Jk-Opv" secondAttribute="trailing" constant="16" id="JXz-FF-C88"/>
@@ -402,6 +415,9 @@
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="fdf-Mv-mqP"/>
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="top" secondItem="lvN-Eg-W6F" secondAttribute="bottom" constant="40" id="keR-8B-8EU"/>
                             <constraint firstItem="Tzm-Xh-QOZ" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="oFI-15-MgQ"/>
+                            <constraint firstItem="cfO-gM-sug" firstAttribute="top" secondItem="dN9-8p-BcA" secondAttribute="bottom" constant="24" id="saZ-AN-sAV"/>
+                            <constraint firstItem="dN9-8p-BcA" firstAttribute="centerY" secondItem="778-me-ArK" secondAttribute="centerY" id="sdZ-Gs-zic"/>
+                            <constraint firstItem="UPn-Qe-uvu" firstAttribute="trailing" secondItem="dN9-8p-BcA" secondAttribute="trailing" constant="14" id="uPg-5a-mJj"/>
                             <constraint firstItem="tC3-Jk-Opv" firstAttribute="top" secondItem="7aI-Vo-UyO" secondAttribute="bottom" constant="8" id="xkI-6e-Plp"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="UPn-Qe-uvu"/>
@@ -410,6 +426,7 @@
                     <navigationItem key="navigationItem" id="gdO-P7-Ere"/>
                     <connections>
                         <outlet property="IPLabel" destination="Tzm-Xh-QOZ" id="lYU-0W-rNa"/>
+                        <outlet property="encryptionKeySwitch" destination="dN9-8p-BcA" id="geC-Ed-VOi"/>
                         <outlet property="messageTextField" destination="lvN-Eg-W6F" id="I9L-eN-4b6"/>
                         <outlet property="resultLabel" destination="6Z1-j3-AvT" id="mMP-KW-l7u"/>
                         <outlet property="sendButton" destination="cfO-gM-sug" id="jSr-fh-7Y0"/>
@@ -591,6 +608,21 @@
                                     <action selector="offButtonTapped:" destination="UgW-Ob-0KX" eventType="touchUpInside" id="JJt-5D-6pb"/>
                                 </connections>
                             </button>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kmC-Kl-vj2">
+                                <rect key="frame" x="312" y="255" width="49" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="encryptionKey:" destination="UgW-Ob-0KX" eventType="valueChanged" id="WaE-yH-elT"/>
+                                </connections>
+                            </switch>
+                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Use Correct Encryption Keys" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="3QC-6I-Apf">
+                                <rect key="frame" x="16" y="253" width="251" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -622,6 +654,7 @@
                     <navigationItem key="navigationItem" id="X3a-IB-ct7"/>
                     <connections>
                         <outlet property="IPLabel" destination="XIj-Oo-qmz" id="MW7-GN-hns"/>
+                        <outlet property="encryptionKeySwitch" destination="kmC-Kl-vj2" id="vlU-GK-77e"/>
                         <outlet property="offButton" destination="cwX-vi-vgG" id="ctm-j9-5Vj"/>
                         <outlet property="onButton" destination="jhI-Pt-QaG" id="qUw-MV-lYT"/>
                         <outlet property="resultLabel" destination="ERS-fv-Yhs" id="Jgg-GZ-RIs"/>
