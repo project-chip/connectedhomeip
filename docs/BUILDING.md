@@ -1,11 +1,11 @@
 ## Build Documentation
 
 The CHIP build system uses GNU autotools to build various platform images on
-Linux or MacOS.
+Linux or macOS.
 
 Tested on:
 
--   MacOS
+-   macOS
 -   Ubuntu 18.04
 
 Build system features:
@@ -32,6 +32,7 @@ want:
 -   C and C++ compilers
 -   clang-format-9
 -   gcov
+-   pkg-config
 
 #### How to install tool prerequisites on Linux
 
@@ -39,7 +40,7 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
 
 ```
-sudo apt-get install make autoconf automake libtool
+sudo apt-get install make autoconf automake libtool pkg-config
 sudo apt-get install clang-format-9
 sudo apt-get install lcov
 ```
@@ -50,10 +51,47 @@ On macOS, these dependencies can be installed and satisfied using
 [Brew](https://brew.sh/):
 
 ```
-brew install make autoconf automake libtool
+brew install make autoconf automake libtool pkg-config
 brew install llvm@9
 brew install lcov
 ```
+
+### Library Prerequisites
+
+The CHIP build currently requires the OpenSSL. This should be installed and
+visible to `pkg-config`.
+
+#### How to install library prerequisites on Linux
+
+On Debian-based Linux distributions such as Ubuntu, these dependencies can be
+satisfied with the following:
+
+```
+sudo apt-get install openssl
+```
+
+#### How to install library prerequisites on macOS
+
+On macOS, these dependencies can be satisfied using [Brew](https://brew.sh/):
+
+```
+brew install openssl
+
+```
+
+However, that does not expose the package to `pkg-config`. To fix that, one
+needs to run something like the following:
+
+```
+cd /usr/local/lib/pkgconfig
+ln -s ../../Cellar/openssl@1.1/1.1.1g/lib/pkgconfig/* .
+```
+
+where `openssl@1.1/1.1.1g` may need to be replaced with the actual version of
+OpenSSL installed by Brew.
+
+Note: If using MacPorts, `port install openssl` is sufficient to satisfy this
+dependency.
 
 ### Autotools Build Preparation
 
@@ -65,7 +103,7 @@ from the top-level.
 ./bootstrap
 ```
 
-### Build Standalone (Native Linux or MacOS)
+### Build Standalone (Native Linux or macOS)
 
 This will build all sources, libraries, and tests for the given platform:
 
@@ -229,7 +267,7 @@ make -f Makefile-iOS
 Install Android Studio, Java, and NDK.
 
 ```
-# Update these paths based on your environment and version of the tools (MacOS examples):
+# Update these paths based on your environment and version of the tools (macOS examples):
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-12.0.1.jdk/Contents/Home
 export ANDROID_HOME=~/Library/Android/sdk
 export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.0.6113669
