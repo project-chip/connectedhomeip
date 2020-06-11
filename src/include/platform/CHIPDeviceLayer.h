@@ -39,7 +39,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-struct chipDeviceEvent;
+struct ChipDeviceEvent;
 extern chip::System::Layer SystemLayer;
 extern Inet::InetLayer InetLayer;
 

@@ -904,6 +904,36 @@ NL_ENABLE_DOCS([auto],[NO])
 AM_CONDITIONAL(CHIP_BUILD_DOCS, [test "${nl_cv_build_docs}" = "yes"])
 
 #
+# OpenThread
+#
+
+NL_WITH_OPTIONAL_INTERNAL_PACKAGE(
+    [OpenThread],
+    [OPENTHREAD],
+    [openthread],
+    [],
+    [
+        AC_MSG_NOTICE([No internal OpenThread support yet!])
+        with_openthread=no
+    ],
+    [
+        # Check for required OpenThread headers.
+        AC_CHECK_HEADERS([openthread/dataset.h] [openthread/dataset_ftd.h] [openthread/error.h] [openthread/icmp6.h] [openthread/instance.h] [openthread/ip6.h] [openthread/link.h] [openthread/message.h] [openthread/netdata.h] [openthread/tasklet.h] [openthread/thread.h],
+        [],
+        [
+            AC_MSG_ERROR(The nlio header "$ac_header" is required but cannot be found.)
+        ])
+    ]
+)
+AM_CONDITIONAL([CHIP_ENABLE_OPENTHREAD], [test "${with_openthread}" != "no"])
+if test "${with_openthread}" != "no"; then
+    CHIP_ENABLE_OPENTHREAD=1
+else
+    CHIP_ENABLE_OPENTHREAD=0
+fi
+AC_DEFINE_UNQUOTED([CHIP_ENABLE_OPENTHREAD],[${CHIP_ENABLE_OPENTHREAD}],[Define to 1 if you want to enable OpenThread.])
+
+#
 # Network Technology Layer
 #
 AC_MSG_CHECKING([network layer])

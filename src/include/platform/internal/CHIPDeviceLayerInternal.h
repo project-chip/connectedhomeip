@@ -20,17 +20,6 @@
 #ifndef CHIP_DEVICE_INTERNAL_H
 #define CHIP_DEVICE_INTERNAL_H
 
-namespace chip {
-namespace Logging {
-
-enum
-{
-    kLogModule_DeviceLayer = 255,
-};
-
-} // namespace Logging
-} // namespace chip
-
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {

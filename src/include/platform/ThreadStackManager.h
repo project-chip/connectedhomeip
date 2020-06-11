@@ -195,7 +195,7 @@ inline bool ThreadStackManager::HaveRouteToAddress(const IPAddress & destAddr)
     return static_cast<ImplClass *>(this)->_HaveRouteToAddress(destAddr);
 }
 
-inline void ThreadStackManager::OnPlatformEvent(const chipDeviceEvent * event)
+inline void ThreadStackManager::OnPlatformEvent(const ChipDeviceEvent * event)
 {
     static_cast<ImplClass *>(this)->_OnPlatformEvent(event);
 }
