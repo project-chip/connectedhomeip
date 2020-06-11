@@ -149,6 +149,6 @@ void setupTransport(IPAddressType type, SecureTransport * transport)
 // The echo server assumes the platform's networking has been setup already
 void startServer(SecureTransport * transport_ipv4, SecureTransport * transport_ipv6)
 {
-    setupTransport(kIPAddressType_IPv4, transport_ipv4);
     setupTransport(kIPAddressType_IPv6, transport_ipv6);
+    setupTransport(kIPAddressType_IPv4, transport_ipv4);
 }
