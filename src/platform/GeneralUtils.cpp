@@ -135,7 +135,7 @@ const char * CharacterizeIPv6Address(const IPAddress & ipAddr)
     {
         return "IPv6 unique local address";
     }
-    else if ((ntohl(ipAddr.Addr[0]) & 0xE0000000U) == 0x20000000U)
+    else if (ipAddr.IsIPv6GlobalUnicast())
     {
         return "IPv6 global unicast address";
     }
