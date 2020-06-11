@@ -15,6 +15,15 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file implements a unit test suite for the Platform Time
+ *      code functionality.
+ *
+ */
+
+#include "TestPlatformTime.h"
+
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -193,7 +202,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int main(void)
+int TestPlatformTime(void)
 {
     nlTestSuite theSuite = { "CHIP DeviceLayer tests", &sTests[0], NULL, NULL };
 
