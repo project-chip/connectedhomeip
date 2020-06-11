@@ -204,6 +204,7 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
         }
         else
         {
+            connection->OnReceiveError(connection, CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE_FROM_PEER, pktInfo);
             PacketBuffer::Free(msg);
             ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err);
         }
