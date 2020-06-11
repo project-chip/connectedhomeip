@@ -24,6 +24,10 @@
 
 #include "driver/gpio.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/timers.h"
+
 class LEDWidget
 {
 public:
@@ -31,10 +35,13 @@ public:
     void Set(bool state);
     void Blink(uint32_t changeRateMS);
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
+    void BlinkOnError();
     void Animate();
 #if CONFIG_HAVE_DISPLAY
     void Display();
 #endif
+    bool mError;
+    TimerHandle_t errorTimer;
 
 private:
     int64_t mLastChangeTimeUS;

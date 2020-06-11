@@ -55,6 +55,8 @@ void LEDWidget::Init(gpio_num_t gpioNum)
     mBlinkOffTimeMS   = 0;
     mGPIONum          = gpioNum;
     mState            = false;
+    mError            = false;
+    errorTimer        = NULL;
 
     if (gpioNum < GPIO_NUM_MAX)
     {
@@ -78,6 +80,33 @@ void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
     mBlinkOnTimeMS  = onTimeMS;
     mBlinkOffTimeMS = offTimeMS;
     Animate();
+}
+
+void ClearErrorState(TimerHandle_t handle)
+{
+#if CONFIG_HAVE_DISPLAY
+    LEDWidget* pWidget = (LEDWidget*) pvTimerGetTimerID(handle);
+    pWidget->mError = false;
+    pWidget->Display();
+    // If a status change occured, wake the display
+    WakeDisplay();
+#endif
+}
+
+void LEDWidget::BlinkOnError()
+{
+#if CONFIG_HAVE_DISPLAY
+    mError = true;
+    if (errorTimer != NULL)
+    {
+        xTimerDelete(errorTimer, 0);
+    }
+    errorTimer = xTimerCreate("ErrorTimer", pdMS_TO_TICKS(2000), false, this, ClearErrorState);
+    xTimerStart(errorTimer, 0);
+    Display();
+    // If a status change occured, wake the display
+    WakeDisplay();
+#endif
 }
 
 void LEDWidget::Animate()
@@ -131,15 +160,25 @@ void LEDWidget::Display()
     TFT_setFont(DEJAVU24_FONT, NULL);
     // Draw the default "Off" indicator
     TFT_drawCircle(circleX, circleY, LED_INDICATOR_R_PX, TFT_DARKGREY);
-    if (mState)
+
+    if (mError)
     {
-        TFT_print((char *) onMsg, msgX, msgY);
-        // Draw the "ON" indicator
-        TFT_fillCircle(circleX, circleY, LED_INDICATOR_R_PX, TFT_GREEN);
+        TFT_print((char *) "Recv Error", msgX, msgY);
+        // Draw the "Error" indicator
+        TFT_fillCircle(circleX, circleY, LED_INDICATOR_R_PX, TFT_RED);
     }
     else
     {
-        TFT_print((char *) offMsg, msgX, msgY);
+        if (mState)
+        {
+            TFT_print((char *) onMsg, msgX, msgY);
+            // Draw the "ON" indicator
+            TFT_fillCircle(circleX, circleY, LED_INDICATOR_R_PX, TFT_GREEN);
+        }
+        else
+        {
+            TFT_print((char *) offMsg, msgX, msgY);
+        }
     }
 }
 #endif

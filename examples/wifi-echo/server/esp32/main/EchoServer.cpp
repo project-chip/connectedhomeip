@@ -40,11 +40,14 @@
 #include <transport/SecureTransport.h>
 
 #include "DataModelHandler.h"
+#include "LEDWidget.h"
 
 static const char * TAG = "echo_server";
 
 using namespace ::chip;
 using namespace ::chip::Inet;
+
+extern LEDWidget statusLED; // In wifi-echo.cpp
 
 // Transport Callbacks
 static void echo(SecureTransport * transport, System::PacketBuffer * buffer, const IPPacketInfo * packet_info)
@@ -99,6 +102,7 @@ static void echo(SecureTransport * transport, System::PacketBuffer * buffer, con
 static void error(SecureTransport * st, CHIP_ERROR error, const IPPacketInfo * pi)
 {
     ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
+    statusLED.BlinkOnError();
 }
 
 static const unsigned char local_private_key[] = { 0xc6, 0x1a, 0x2f, 0x89, 0x36, 0x67, 0x2b, 0x26, 0x12, 0x47, 0x4f,
