@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) BOOL useCorrectKeyStateChanged;
 @property (readwrite) CHIPDeviceController * chipController;
 @property (weak, nonatomic) IBOutlet UILabel * resultLabel;
-@property (weak, nonatomic) IBOutlet UISwitch *encryptionKeySwitch;
+@property (weak, nonatomic) IBOutlet UISwitch * encryptionKeySwitch;
 
 - (void)reconnectIfNeeded;
 - (void)dismissKeyboard;
