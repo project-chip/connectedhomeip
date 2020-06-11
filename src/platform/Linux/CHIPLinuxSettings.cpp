@@ -388,7 +388,7 @@ static PRIntn settings_writer(PLHashEntry * he, PRIntn index, void * arg)
         }
         else
         {
-            len = PR_snprintf(buf, sizeof(buf), "  <s key=\"%s\" value=\"%s\"/>\n", he->key, esc);
+            len        = PR_snprintf(buf, sizeof(buf), "  <s key=\"%s\" value=\"%s\"/>\n", he->key, esc);
             numwritten = PR_Write(file, buf, len);
 
             if (len != numwritten)
@@ -429,15 +429,15 @@ CHIP_ERROR ChipLinuxSettings::Commit(void)
             ChipLogProgress(DeviceLayer, "writing settings to file (%s)", path);
 
             const char * s = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<settings>\n";
-            len = strlen(s);
-            numwritten = PR_Write(file, s, len);
+            len            = strlen(s);
+            numwritten     = PR_Write(file, s, len);
 
             if (len == numwritten)
             {
                 if (mConfigStore != NULL)
                     HASHTABLE_ENUMERATE(mConfigStore, settings_writer, file);
 
-                s = "</settings>\n";
+                s   = "</settings>\n";
                 len = strlen(s);
 
                 numwritten = PR_Write(file, s, len);
