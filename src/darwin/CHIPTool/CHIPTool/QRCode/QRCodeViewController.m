@@ -226,8 +226,9 @@ static NSString * const ipKey = @"ipk";
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-- (BOOL)hasScannedConnectionInfo {
-    NSString* ipAddress = [[NSUserDefaults standardUserDefaults] stringForKey:ipKey];
+- (BOOL)hasScannedConnectionInfo
+{
+    NSString * ipAddress = [[NSUserDefaults standardUserDefaults] stringForKey:ipKey];
     return (ipAddress.length > 0);
 }
 
@@ -332,7 +333,8 @@ static NSString * const ipKey = @"ipk";
     [self qrCodeInitialState];
 }
 
-- (IBAction)resetView:(id)sender {
+- (IBAction)resetView:(id)sender
+{
     // reset the view and remove any preferences that were stored from scanning the QRCode
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
     [self manualCodeInitialState];
