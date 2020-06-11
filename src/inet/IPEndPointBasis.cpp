@@ -1117,5 +1117,23 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+const IPPacketInfo * IPEndPointBasis::GetPacketInfo(nw_connection_t connection)
+{
+    IPPacketInfo packetInfo;
+    nw_endpoint_t local_endpoint = nw_connection_copy_endpoint(mConnection);
+    nw_endpoint_t remote_endpoint = nw_connection_copy_endpoint(connection);
+
+    packetInfo.SrcAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
+    packetInfo.DestAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(local_endpoint));
+    packetInfo.SrcPort = nw_endpoint_get_port(remote_endpoint);
+    packetInfo.DestPort = nw_endpoint_get_port(local_endpoint);
+
+    return &packetInfo;
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
 } // namespace Inet
 } // namespace chip

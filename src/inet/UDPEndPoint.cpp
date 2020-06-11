@@ -311,9 +311,11 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
     mBoundPort = nw_endpoint_get_port(endpoint);
     mConnection = connection;
-    mDispatchQueue = dispatch_queue_create("org.chip.inet", DISPATCH_QUEUE_SERIAL);
+    mDispatchQueue = dispatch_queue_create("org.chip.inet", DISPATCH_QUEUE_CONCURRENT);
+    mDispatchSemaphore = dispatch_semaphore_create(0);
 
     nw_retain(connection);
+
     nw_connection_set_queue(connection, mDispatchQueue);
     nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
         if (state == nw_connection_state_waiting)
@@ -335,6 +337,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
         }
     });
 
+    HandleDataReceived(connection);
     nw_connection_start(connection);
     nw_release(endpoint);
     nw_release(parameters);
@@ -348,6 +351,43 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
 exit:
     return res;
+}
+
+void UDPEndPoint::HandleDataReceived(nw_connection_t connection)
+{
+    nw_connection_receive(connection, 1, UINT32_MAX, ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
+        dispatch_block_t schedule_next_receive = ^{
+            bool is_final = nw_content_context_get_is_final(context);
+            if (is_complete && context != NULL && is_final)
+            {
+                Close();
+            }
+            else if (receive_error == NULL)
+            {
+                HandleDataReceived(connection);
+            }
+            else if (receive_error != NULL && OnReceiveError != NULL)
+            {
+                INET_ERROR error = INET_ERROR_UNEXPECTED_EVENT;
+                const IPPacketInfo * packetInfo = GetPacketInfo(connection);
+                OnReceiveError((IPEndPointBasis *)this, error, packetInfo);
+            }
+        };
+
+        if (content != NULL && OnMessageReceived != NULL) {
+            size_t count = dispatch_data_get_size(content);
+            System::PacketBuffer * packetBuffer = PacketBuffer::NewWithAvailableSize(count);
+            dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void *buffer, size_t size) {
+                memmove(packetBuffer->Start() + offset, buffer, size);
+                return true;
+            });
+            packetBuffer->SetDataLength(count);
+            const IPPacketInfo * packetInfo = GetPacketInfo(connection);
+            OnMessageReceived((IPEndPointBasis *)this, packetBuffer, packetInfo);
+        }
+
+        schedule_next_receive();
+    });
 }
 
 /**
@@ -612,11 +652,9 @@ INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId
 INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg, uint16_t sendFlags)
 {
     INET_ERROR res             = INET_NO_ERROR;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     const IPAddress & destAddr = pktInfo->DestAddress;
-
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    dispatch_semaphore_t semaphore;
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     INET_FAULT_INJECT(FaultInjection::kFault_Send, if ((sendFlags & kSendFlag_RetainBuffer) == 0) PacketBuffer::Free(msg);
                       return INET_ERROR_UNKNOWN_INTERFACE;);
@@ -780,14 +818,13 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
         goto exit;
     }
 
-    semaphore = dispatch_semaphore_create(0);
     content = dispatch_data_create(msg->Start(), msg->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
-    nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t  _Nullable error) {
-        dispatch_semaphore_signal(semaphore);
+    nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
+        dispatch_semaphore_signal(mDispatchSemaphore);
     });
     dispatch_release(content);
 
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    dispatch_semaphore_wait(mDispatchSemaphore, DISPATCH_TIME_FOREVER);
 
     if ((sendFlags & kSendFlag_RetainBuffer) == 0)
         PacketBuffer::Free(msg);
@@ -857,11 +894,15 @@ INET_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId
     SuccessOrExit(err);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    err = INET_ERROR_UNKNOWN_INTERFACE;
+    SuccessOrExit(err);
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
     if (err == INET_NO_ERROR)
     {
         mState = kState_Bound;
     }
-
 exit:
     return err;
 }
@@ -889,6 +930,10 @@ InterfaceId UDPEndPoint::GetBoundInterface(void)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return mBoundIntfId;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    return INET_NULL_INTERFACEID;
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 uint16_t UDPEndPoint::GetBoundPort(void)

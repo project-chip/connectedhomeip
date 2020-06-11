@@ -34,10 +34,6 @@
 
 #include <system/SystemPacketBuffer.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#include <Network/Network.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
 namespace chip {
 namespace Inet {
 
@@ -94,8 +90,9 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    nw_connection_t mConnection;
+    void HandleDataReceived(nw_connection_t connection);
     dispatch_queue_t mDispatchQueue;
+    dispatch_semaphore_t mDispatchSemaphore;
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK

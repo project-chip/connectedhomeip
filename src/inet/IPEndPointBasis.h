@@ -36,6 +36,10 @@
 #include <lwip/netif.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#include <Network/Network.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
 namespace chip {
 namespace Inet {
 
@@ -150,6 +154,12 @@ protected:
     SocketEvents PrepareIO(void);
     void HandlePendingIO(uint16_t aPort);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+protected:
+    nw_connection_t mConnection;
+    const IPPacketInfo * GetPacketInfo(nw_connection_t connection);
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 private:
     IPEndPointBasis(void);                    // not defined
