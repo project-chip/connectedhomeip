@@ -10,7 +10,7 @@
 Due to Project CHIP’s infrastructure nature, it will be consumed by
 other teams, both inside and outside Project CHIP. Therefore it is
 critical that how it works, how it behaves, and how it is
-interfaced with are clearly documented.
+interfaced with are **clearly** documented.
 
 In support of this effort Project CHIP uses
 http://www.doxygen.org/[Doxygen] to
@@ -130,15 +130,23 @@ to and is authored by Project CHIP and what is not.
 
 ==== Functions and Methods
 
-Every public, and ideally private, free function and class method should
-likewise have a prologue comment that:
+Every non-trival or non-default public, and ideally private, free function
+and class method should likewise have a prologue comment that:
 
 * Briefly describes what it is and what it does.
 * Describes in detail, optionally, what it is and what it does.
 * Describes the purpose, function, and influence of each parameter as
 well as whether it is an input, an output, or both.
-* Describes the return value, if present, and the expected range or
+* Describes the return value or values, if present, and the expected range or
 constraints of it.
+
+The goal of function and method comments are to not simply echo back to the
+reader what is in the API signature but to provide value-added insight. Also,
+remember that what may be intuitive and self-evident to you as a domain expert
+today may not be to your future self or others who are uninitiated in the domain.
+The project's success will be measured by the ease, speed, and breadth of its adoption.
+Your comments, alongside examples, will contribute toward this goal. When in doubt,
+err on the side of being generous with your comments rather than parsimonious.
 
 An example is shown in Listing 3 below for C, C{plusplus}, Objective C, and
 Objective C{plusplus}. Adapt as appropriate for Perl, Python and Shell.
@@ -159,7 +167,10 @@ Objective C{plusplus}. Adapt as appropriate for Perl, Python and Shell.
  *                     is implied as 10 unless a leading 0 is encountered in
  *                     which 8 is implied.
  *
- * @return true on success; otherwise, false on failure.
+ * @retval  0 on success.
+ * @retval  #EINVAL if the given base contains an unsupported value or if no
+ *          conversion was performed.
+ * @retval  #ERANGE if the resulting value was out of range.
  */
 ----
 [.text-center]
@@ -222,7 +233,7 @@ CHIP community, and the general public.
 [cols="^1,^1,<2,<3",options="header"]
 |===
 |Revision |Date |Modified By |Description
-|1 |2020-05-28 |Grant Erickson |Initial revision.
+|1 |2020-06-11 |Grant Erickson |Initial revision.
 |===
 
 [.text-center]
