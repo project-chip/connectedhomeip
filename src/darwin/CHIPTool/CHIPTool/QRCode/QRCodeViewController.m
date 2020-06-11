@@ -57,6 +57,8 @@ static NSString * const ipKey = @"ipk";
 
     _doneManualCodeButton.layer.cornerRadius = 5;
     _doneManualCodeButton.clipsToBounds = YES;
+    _resetButton.layer.cornerRadius = 5;
+    _resetButton.clipsToBounds = YES;
     _manualCodeTextField.keyboardType = UIKeyboardTypeNumberPad;
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
@@ -88,6 +90,8 @@ static NSString * const ipKey = @"ipk";
     if ([_activityIndicator isAnimating]) {
         [_activityIndicator stopAnimating];
     }
+    // show the reset button if there's scanned data saved
+    _resetButton.hidden = ![self hasScannedConnectionInfo];
     _qrCodeButton.hidden = NO;
     _doneQrCodeButton.hidden = YES;
     _activityIndicator.hidden = YES;
@@ -142,6 +146,10 @@ static NSString * const ipKey = @"ipk";
     [self->_activityIndicator stopAnimating];
     self->_activityIndicator.hidden = YES;
     self->_errorLabel.hidden = YES;
+    // reset the view and remove any preferences that were stored from a previous scan
+    if ([self hasScannedConnectionInfo]) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
+    }
 
     if (decimalString) {
         self->_manualCodeLabel.hidden = NO;
@@ -170,6 +178,7 @@ static NSString * const ipKey = @"ipk";
         self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];
     }
     self->_setupPayloadView.hidden = NO;
+    self->_resetButton.hidden = NO;
 
     NSLog(@"Payload vendorID %@", payload.vendorID);
     if ([payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]]) {
@@ -215,6 +224,12 @@ static NSString * const ipKey = @"ipk";
     UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel handler:nil];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (BOOL)hasScannedConnectionInfo
+{
+    NSString * ipAddress = [[NSUserDefaults standardUserDefaults] stringForKey:ipKey];
+    return (ipAddress.length > 0);
 }
 
 // MARK: QR Code
@@ -315,6 +330,14 @@ static NSString * const ipKey = @"ipk";
 
 - (IBAction)stopScanningQRCode:(id)sender
 {
+    [self qrCodeInitialState];
+}
+
+- (IBAction)resetView:(id)sender
+{
+    // reset the view and remove any preferences that were stored from scanning the QRCode
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
+    [self manualCodeInitialState];
     [self qrCodeInitialState];
 }
 

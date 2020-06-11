@@ -25,6 +25,7 @@
 @property (weak, nonatomic) IBOutlet UIButton * qrCodeButton;
 @property (weak, nonatomic) IBOutlet UIButton * doneQrCodeButton;
 @property (weak, nonatomic) IBOutlet UIButton * doneManualCodeButton;
+@property (weak, nonatomic) IBOutlet UIButton * resetButton;
 
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView * activityIndicator;
 @property (weak, nonatomic) IBOutlet UILabel * errorLabel;
@@ -42,4 +43,5 @@
 - (IBAction)startScanningQRCode:(id)sender;
 - (IBAction)stopScanningQRCode:(id)sender;
 - (IBAction)enteredManualCode:(id)sender;
+- (IBAction)resetView:(id)sender;
 @end
