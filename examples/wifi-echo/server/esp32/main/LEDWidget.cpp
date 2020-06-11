@@ -85,8 +85,8 @@ void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
 void ClearErrorState(TimerHandle_t handle)
 {
 #if CONFIG_HAVE_DISPLAY
-    LEDWidget* pWidget = (LEDWidget*) pvTimerGetTimerID(handle);
-    pWidget->mError = false;
+    LEDWidget * pWidget = (LEDWidget *) pvTimerGetTimerID(handle);
+    pWidget->mError     = false;
     pWidget->Display();
     // If a status change occured, wake the display
     WakeDisplay();
