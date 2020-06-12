@@ -12,14 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/chip_test.gni")
-import("//build/chip_test_group.gni")
+import("//build/tests.gni")
 
-chip_test("TestLwIP") {
-  sources = [ "tests.c" ]
-  deps = [ "//src/lwip" ]
-}
+assert(chip_build_tests)
 
-chip_test_group("tests") {
-  deps = [ ":TestLwIP" ]
+template("chip_test_group") {
+  _test_group_name = target_name
+
+  group("${_test_group_name}") {
+    deps = invoker.deps
+  }
+
+  group("${_test_group_name}_run") {
+    deps = []
+    foreach(_test, invoker.deps) {
+      deps += [ get_label_info(_test, "label_no_toolchain") + "_run" ]
+    }
+  }
 }
