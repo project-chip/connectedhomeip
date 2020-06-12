@@ -160,6 +160,10 @@ protected:
     INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
     void GetPacketInfo(nw_connection_t aConnection, IPPacketInfo * aPacketInfo);
     void HandleDataReceived(nw_connection_t aConnection);
+    INET_ERROR GetConnection(const IPPacketInfo * aPktInfo, nw_connection_t * aConnection);
+    void AddConnection(nw_connection_t connection);
+    void ReleaseConnection(nw_connection_t connection);
+    void ReleaseConnections();
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 private:
