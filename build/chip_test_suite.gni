@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/chip_test.gni")
 import("//build/tests.gni")
+import("//third_party/pigweed/pw_unit_test/test.gni")
 
 assert(chip_build_tests)
 
 template("chip_test_suite") {
-  suite_name = target_name
+  _suite_name = target_name
 
-  static_library("${suite_name}_common") {
+  static_library("${_suite_name}_common") {
     forward_variables_from(invoker,
                            [
                              "deps",
@@ -32,30 +34,40 @@ template("chip_test_suite") {
 
   tests = []
   if (defined(invoker.tests)) {
-    foreach(test, invoker.tests) {
-      executable(test) {
-        sources = [ "${test}Driver.cpp" ]
+    foreach(_test, invoker.tests) {
+      chip_test(_test) {
+        sources = [ "${_test}Driver.cpp" ]
 
-        public_deps = [ ":${suite_name}_common" ]
+        public_deps = [ ":${_suite_name}_common" ]
       }
 
-      tests += [ ":${test}" ]
+      tests += [ _test ]
     }
   }
 
   if (defined(invoker.c_tests)) {
-    foreach(test, invoker.c_tests) {
-      executable(test) {
-        sources = [ "${test}Driver.c" ]
+    foreach(_test, invoker.c_tests) {
+      chip_test(_test) {
+        sources = [ "${_test}Driver.c" ]
 
-        public_deps = [ ":${suite_name}_common" ]
+        public_deps = [ ":${_suite_name}_common" ]
       }
 
-      tests += [ ":${test}" ]
+      tests += [ _test ]
     }
   }
 
-  group(suite_name) {
-    deps = tests
+  group(_suite_name) {
+    deps = []
+    foreach(_test, tests) {
+      deps += [ ":${_test}" ]
+    }
+  }
+
+  group("${_suite_name}_run") {
+    deps = []
+    foreach(_test, tests) {
+      deps += [ ":${_test}_run" ]
+    }
   }
 }

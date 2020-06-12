@@ -16,7 +16,7 @@ import("build/examples.gni")
 import("build/tests.gni")
 import("build/tools.gni")
 
-group("all") {
+group("default") {
   deps = [
     "src",
     "src/app",
@@ -37,17 +37,7 @@ group("all") {
   ]
 
   if (chip_build_tests) {
-    deps += [
-      "src/app/plugin/tests",
-      "src/ble/tests",
-      "src/crypto/tests",
-      "src/inet/tests",
-      "src/lib/core/tests",
-      "src/lib/support/tests",
-      "src/lwip/tests",
-      "src/setup_payload/tests",
-      "src/system/tests",
-    ]
+    deps += [ ":tests" ]
   }
 
   if (chip_build_tools) {
@@ -61,5 +51,27 @@ group("all") {
     deps += [
       "examples/lock-app/nrf5(examples/lock-app/nrf5/toolchain:nrf5_lock_app)",
     ]
+  }
+}
+
+if (chip_build_tests) {
+  import("build/chip_test_group.gni")
+
+  chip_test_group("tests") {
+    deps = [
+      "src/app/plugin/tests",
+      "src/ble/tests",
+      "src/crypto/tests",
+      "src/inet/tests",
+      "src/lib/core/tests",
+      "src/lib/support/tests",
+      "src/lwip/tests",
+      "src/setup_payload/tests",
+      "src/system/tests",
+    ]
+  }
+
+  group("check") {
+    deps = [ ":tests_run" ]
   }
 }
