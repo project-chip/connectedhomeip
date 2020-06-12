@@ -31,10 +31,12 @@ CHIP_BUILD_TRANSPORT_LAYER_SOURCE_FILES                  = \
     @top_builddir@/src/transport/UDP.cpp                   \
     $(NULL)
 
-CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES             = \
-    @top_builddir@/src/transport/Base.h               \
-    @top_builddir@/src/transport/CHIPSecureChannel.h  \
-    @top_builddir@/src/transport/MessageHeader.h      \
-    @top_builddir@/src/transport/SecureTransport.h    \
-    @top_builddir@/src/transport/UDP.h                \
+CHIP_BUILD_TRANSPORT_LAYER_HEADER_FILES              = \
+    @top_builddir@/src/transport/Base.h                \
+    @top_builddir@/src/transport/CHIPSecureChannel.h   \
+    @top_builddir@/src/transport/MessageHeader.h       \
+    @top_builddir@/src/transport/PeerAddress.h         \
+    @top_builddir@/src/transport/PeerConnectionState.h \
+    @top_builddir@/src/transport/SecureTransport.h     \
+    @top_builddir@/src/transport/UDP.h                 \
     $(NULL)

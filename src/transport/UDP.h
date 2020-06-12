@@ -120,7 +120,8 @@ public:
     CHIP_ERROR Init(Inet::InetLayer * inetLayer) { return Init(inetLayer, UdpListenParameters()); }
 
     Type GetType() override { return Type::kUdp; }
-    CHIP_ERROR SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
+                           System::PacketBuffer * msgBuf) override;
 
 private:
     // UDP message receive handler.

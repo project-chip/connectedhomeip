@@ -176,7 +176,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(header, addr, buffer);
+    err = udp.SendMessage(header, Transport::PeerAddress::UDP(addr), buffer);
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO: the underlying system does not support IPV6. This early return should

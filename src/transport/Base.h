@@ -29,27 +29,10 @@
 #include <inet/UDPEndPoint.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/MessageHeader.h>
+#include <transport/PeerAddress.h>
 
 namespace chip {
 namespace Transport {
-
-/**
- * Communication path defines how two peers communicate.
- *
- * When a peer contacts another peer, it defines how the peers communicate.
- *
- * Once communication between two peers is established, the same transport
- * path should be used: a peer contacting another peer over UDP will receive
- * messages back over UDP. A communication channel established over TCP
- * will keep the same TCP channel.
- *
- */
-enum class Type
-{
-    kUndefined,
-    kUdp,
-    // More constants to be added later, such as TCP and BLE
-};
 
 /**
  * Transport class base, defining common methods among transports (message
@@ -82,17 +65,9 @@ public:
      * @details
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
-     *
-     * @details
-     *   Point to Point transports (e.g. TCP) MUST have a connection already
-     *   established and the send will occur over an existing connection.
-     *   Connectionless transports (e.g. UDP) are able to attempt a message send
-     *   at any time.
-     *
-     * TODO: if CHIP decides to use ULA, we may be able to remove redundant bits
-     *       as node and address could be interchangeable (although some fabric logic may be needed).
      */
-    virtual CHIP_ERROR SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf) = 0;
+    virtual CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
+                                   System::PacketBuffer * msgBuf) = 0;
 
     /**
      * Get the path that this transport is associated with.
