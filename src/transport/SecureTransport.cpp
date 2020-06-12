@@ -39,8 +39,7 @@ namespace chip {
 static const size_t kMax_SecureSDU_Length         = 1024;
 static const char * kManualKeyExchangeChannelInfo = "Manual Key Exchanged Channel";
 
-SecureTransport::SecureTransport() :
-    mConnectionState(Transport::PeerAddress::Uninitialized()), mState(State::kNotReady)
+SecureTransport::SecureTransport() : mConnectionState(Transport::PeerAddress::Uninitialized()), mState(State::kNotReady)
 {
     OnMessageReceived = NULL;
 }
