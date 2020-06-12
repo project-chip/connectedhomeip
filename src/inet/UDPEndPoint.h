@@ -89,11 +89,6 @@ private:
     void HandlePendingIO(void);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    void HandleDataReceived(nw_connection_t connection);
-    dispatch_queue_t mDispatchQueue;
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     uint16_t mBoundPort;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

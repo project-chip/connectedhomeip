@@ -36,10 +36,6 @@
 #include <lwip/netif.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#include <Network/Network.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
 namespace chip {
 namespace Inet {
 
@@ -157,10 +153,13 @@ protected:
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 protected:
-    nw_parameters_t mParameters;
     nw_connection_t mConnection;
+    dispatch_queue_t mDispatchQueue;
+
     INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters);
+    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
     void GetPacketInfo(nw_connection_t aConnection, IPPacketInfo * aPacketInfo);
+    void HandleDataReceived(nw_connection_t aConnection);
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 private:

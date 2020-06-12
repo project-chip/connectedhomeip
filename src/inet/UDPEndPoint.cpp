@@ -273,7 +273,6 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
     res = IPEndPointBasis::Bind(addrType, addr, port, parameters);
     SuccessOrExit(res);
 
-    mDispatchQueue = dispatch_queue_create("org.chip.inet", DISPATCH_QUEUE_CONCURRENT);
     mParameters = parameters;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -285,46 +284,6 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
 exit:
     return res;
-}
-
-void UDPEndPoint::HandleDataReceived(nw_connection_t connection)
-{
-    nw_connection_receive(connection, 1, UINT32_MAX, ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
-        dispatch_block_t schedule_next_receive = ^{
-            bool is_final = nw_content_context_get_is_final(context);
-            if (is_complete && context != NULL && is_final)
-            {
-                Close();
-            }
-            else if (receive_error == NULL)
-            {
-                HandleDataReceived(connection);
-            }
-            else if (receive_error != NULL && OnReceiveError != NULL)
-            {
-                INET_ERROR error = INET_ERROR_UNEXPECTED_EVENT;
-                IPPacketInfo packetInfo;
-                GetPacketInfo(connection, &packetInfo);
-                OnReceiveError((IPEndPointBasis *)this, error, &packetInfo);
-            }
-        };
-
-        if (content != NULL && OnMessageReceived != NULL) {
-            size_t count = dispatch_data_get_size(content);
-            System::PacketBuffer * packetBuffer = PacketBuffer::NewWithAvailableSize(count);
-            dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void *buffer, size_t size) {
-                memmove(packetBuffer->Start() + offset, buffer, size);
-                return true;
-            });
-            packetBuffer->SetDataLength(count);
-
-            IPPacketInfo packetInfo;
-            GetPacketInfo(connection, &packetInfo);
-            OnMessageReceived((IPEndPointBasis *)this, packetBuffer, &packetInfo);
-        }
-
-        schedule_next_receive();
-    });
 }
 
 /**
@@ -751,92 +710,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-    dispatch_data_t content;
-    nw_endpoint_t endpoint;
-    nw_connection_t connection;
-    nw_endpoint_type_t type;
-    dispatch_semaphore_t send_semaphore = dispatch_semaphore_create(0);
-
-    // For now the entire message must fit within a single buffer.
-    if (msg->Next() != NULL)
-    {
-        res = INET_ERROR_MESSAGE_TOO_LONG;
-        goto exit;
-    }
-
-    if (!mConnection) {
-
-    char addrStr[INET_ADDRSTRLEN];
-    destAddr.ToString(addrStr, sizeof(addrStr));
-
-    char portStr[6];
-    sprintf(portStr, "%d", pktInfo->DestPort);
-
-    endpoint = nw_endpoint_create_host(addrStr, portStr);
-    if (endpoint == NULL)
-    {
-        res = INET_ERROR_INCORRECT_STATE;
-        goto exit;
-    }
-
-    type = nw_endpoint_get_type(endpoint);
-    if (type != nw_endpoint_type_address && type != nw_endpoint_type_host)
-    {
-        res = INET_ERROR_INCORRECT_STATE;
-        goto exit;
-    }
-
-    connection = nw_connection_create(endpoint, mParameters);
-    if (connection == NULL)
-    {
-        nw_release(endpoint);
-        res = INET_ERROR_INCORRECT_STATE;
-        goto exit;
-    }
-
-    mConnection = connection;
-
-    nw_retain(connection);
-
-    nw_connection_set_queue(connection, mDispatchQueue);
-    nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
-        if (state == nw_connection_state_waiting)
-        {
-            printf("State: Waiting\n");
-        }
-        else if (state == nw_connection_state_failed)
-        {
-            printf("State: Failed\n");
-        }
-        else if (state == nw_connection_state_ready)
-        {
-            printf("State: Ready\n");
-        }
-        else if (state == nw_connection_state_cancelled)
-        {
-            printf("State: Cancelled\n");
-            nw_release(connection);
-        }
-    });
-
-    HandleDataReceived(connection);
-    nw_connection_start(connection);
-    nw_release(endpoint);
-
-    } // !mConnection
-
-    content = dispatch_data_create(msg->Start(), msg->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
-    nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
-        dispatch_semaphore_signal(send_semaphore);
-    });
-    dispatch_release(content);
-
-    dispatch_semaphore_wait(send_semaphore, DISPATCH_TIME_FOREVER);
+    res = IPEndPointBasis::SendMsg(pktInfo, msg, sendFlags);
 
     if ((sendFlags & kSendFlag_RetainBuffer) == 0)
         PacketBuffer::Free(msg);
-
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 exit:
