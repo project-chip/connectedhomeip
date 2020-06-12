@@ -33,6 +33,7 @@
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
 #include <transport/SecureTransport.h>
+#include <transport/UDP.h>
 
 namespace chip {
 namespace DeviceController {
@@ -43,7 +44,7 @@ extern "C" {
 typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * appReqState);
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const IPPacketInfo * pktInfo);
-typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, PacketBuffer * payload,
+typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload,
                                       const IPPacketInfo * pktInfo);
 };
 
@@ -131,7 +132,7 @@ public:
      * @param[in] buffer        The Data Buffer to trasmit to the deviec
      * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR SendMessage(void * appReqState, PacketBuffer * buffer);
+    CHIP_ERROR SendMessage(void * appReqState, System::PacketBuffer * buffer);
 
     // ----- IO -----
     /**
@@ -153,8 +154,6 @@ public:
     CHIP_ERROR GetLayers(Layer ** systemLayer, InetLayer ** inetLayer);
 
 private:
-    using StatefulTransport = StatefulSecureTransport<ChipDeviceController *>;
-
     enum
     {
         kState_NotInitialized = 0,
@@ -170,7 +169,7 @@ private:
 
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
-    StatefulTransport * mDeviceCon;
+    SecureTransport * mDeviceCon;
 
     ConnectionState mConState;
     void * mAppReqState;
@@ -182,17 +181,19 @@ private:
     } mOnComplete;
 
     ErrorHandler mOnError;
-    PacketBuffer * mCurReqMsg;
+    System::PacketBuffer * mCurReqMsg;
 
-    uint64_t mDeviceId;
+    NodeId mDeviceId;
     IPAddress mDeviceAddr;
     uint16_t mDevicePort;
+    Optional<NodeId> mRemoteDeviceId;
+    uint32_t mMessageNumber = 0;
 
     void ClearRequestState();
     void ClearOpState();
 
-    static void OnReceiveMessage(StatefulTransport * con, PacketBuffer * msgBuf, const IPPacketInfo * pktInfo);
-    static void OnReceiveError(StatefulTransport * con, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+    static void OnReceiveMessage(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msgBuf,
+                                 ChipDeviceController * controller);
 };
 
 } // namespace DeviceController

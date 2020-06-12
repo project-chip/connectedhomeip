@@ -18,14 +18,14 @@
 
 /**
  *    @file
- *      This file implements unit tests for the SecureTransport implementation.
+ *      This file implements unit tests for the UdpTransport implementation.
  */
 
 #include "TestTransportLayer.h"
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
-#include <transport/SecureTransport.h>
+#include <transport/UDP.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -37,6 +37,12 @@ using namespace chip;
 static int Initialize(void * aContext);
 static int Finalize(void * aContext);
 
+namespace {
+
+constexpr NodeId kSourceNodeId      = 123654;
+constexpr NodeId kDestinationNodeId = 111222333;
+constexpr uint32_t kMessageId       = 18;
+
 struct TestContext
 {
     nlTestSuite * mSuite;
@@ -46,39 +52,24 @@ struct TestContext
 
 struct TestContext sContext;
 
-static const unsigned char local_private_key[] = { 0x00, 0xd1, 0x90, 0xd9, 0xb3, 0x95, 0x1c, 0x5f, 0xa4, 0xe7, 0x47,
-                                                   0x92, 0x5b, 0x0a, 0xa9, 0xa7, 0xc1, 0x1c, 0xe7, 0x06, 0x10, 0xe2,
-                                                   0xdd, 0x16, 0x41, 0x52, 0x55, 0xb7, 0xb8, 0x80, 0x8d, 0x87, 0xa1 };
-
-static const unsigned char remote_public_key[] = { 0x04, 0xe2, 0x07, 0x64, 0xff, 0x6f, 0x6a, 0x91, 0xd9, 0xc2, 0xc3, 0x0a, 0xc4,
-                                                   0x3c, 0x56, 0x4b, 0x42, 0x8a, 0xf3, 0xb4, 0x49, 0x29, 0x39, 0x95, 0xa2, 0xf7,
-                                                   0x02, 0x8c, 0xa5, 0xce, 0xf3, 0xc9, 0xca, 0x24, 0xc5, 0xd4, 0x5c, 0x60, 0x79,
-                                                   0x48, 0x30, 0x3c, 0x53, 0x86, 0xd9, 0x23, 0xe6, 0x61, 0x1f, 0x5a, 0x3d, 0xdf,
-                                                   0x9f, 0xdc, 0x35, 0xea, 0xd0, 0xde, 0x16, 0x7e, 0x64, 0xde, 0x7f, 0x3c, 0xa6 };
-
-static const char PAYLOAD[]         = "Hello!";
-constexpr NodeId kSourceNodeId      = 123654;
-constexpr NodeId kDestinationNodeId = 111222333;
-constexpr uint32_t kMessageId       = 18;
-
+const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
 
-static void MessageReceiveHandler(const MessageHeader & header, const Inet::IPPacketInfo & source, System::PacketBuffer * msgBuf,
-                                  nlTestSuite * inSuite)
+void MessageReceiveHandler(const MessageHeader & header, const Inet::IPPacketInfo & source, System::PacketBuffer * msgBuf,
+                           nlTestSuite * inSuite)
 {
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
     NL_TEST_ASSERT(inSuite, header.GetMessageId() == kMessageId);
 
     size_t data_len = msgBuf->DataLength();
-
-    int compare = memcmp(msgBuf->Start(), PAYLOAD, data_len);
+    int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
     NL_TEST_ASSERT(inSuite, compare == 0);
 
     ReceiveHandlerCallCount++;
-};
+}
 
-static void DriveIO(TestContext & ctx)
+void DriveIO(TestContext & ctx)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Set the select timeout to 100ms
@@ -119,6 +110,8 @@ static void DriveIO(TestContext & ctx)
 #endif
 }
 
+} // namespace
+
 CHIP_ERROR InitLayers(System::Layer & systemLayer, InetLayer & inetLayer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -134,18 +127,32 @@ exit:
     return err;
 }
 
-void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
+/////////////////////////// Init test
+
+void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddressType type)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    SecureTransport conn;
-    CHIP_ERROR err;
+    Transport::UDP udp;
 
-    err = conn.Init(&ctx.mInetLayer, Transport::UdpListenParameters());
+    CHIP_ERROR err = udp.Init(&ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(type));
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
+void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
+{
+    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv4);
+}
+
+void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
+{
+    CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv6);
+}
+
+/////////////////////////// Messaging test
+
+void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress & addr)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -155,26 +162,30 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     memmove(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
 
-    IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SecureTransport conn;
+    Transport::UDP udp;
 
-    err = conn.Init(&ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(addr.Type()));
+    err = udp.Init(&ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = conn.ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    conn.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
+    udp.SetMessageReceiveHandler(MessageReceiveHandler, inSuite);
+    ReceiveHandlerCallCount = 0;
 
     MessageHeader header;
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    ReceiveHandlerCallCount = 0;
-    conn.SendMessage(header, addr, buffer);
+    err = udp.SendMessage(header, addr, buffer);
+    if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
+    {
+        // TODO: the underlying system does not support IPV6. This early return should
+        // be removed and error should be made fatal.
+        printf("%s:%u: System does NOT support IPV6.\n", __FILE__, __LINE__);
+        return;
+    }
+
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // allow the send and recv enough time
     DriveIO(ctx);
@@ -182,6 +193,20 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     DriveIO(ctx);
 
     NL_TEST_ASSERT(inSuite, ReceiveHandlerCallCount == 1);
+}
+
+void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    CheckMessageTest(inSuite, inContext, addr);
+}
+
+void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CheckMessageTest(inSuite, inContext, addr);
 }
 
 // Test Suite
@@ -192,8 +217,11 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("Simple Init Test",              CheckSimpleInitTest),
-    NL_TEST_DEF("Message Self Test",             CheckMessageTest),
+    NL_TEST_DEF("Simple Init Test IPV4",   CheckSimpleInitTest4),
+    NL_TEST_DEF("Simple Init Test IPV6",   CheckSimpleInitTest6),
+
+    NL_TEST_DEF("Message Self Test IPV4",  CheckMessageTest4),
+    NL_TEST_DEF("Message Self Test IPV6",  CheckMessageTest6),
 
     NL_TEST_SENTINEL()
 };
@@ -202,7 +230,7 @@ static const nlTest sTests[] =
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-Connection",
+    "Test-CHIP-Udp",
     &sTests[0],
     Initialize,
     Finalize
@@ -253,7 +281,7 @@ static int Finalize(void * aContext)
 /**
  *  Main
  */
-int TestSecureTransport()
+int TestUDP()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
