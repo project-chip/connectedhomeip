@@ -423,7 +423,7 @@ void UDPEndPoint::Close(void)
             mDispatchQueue = NULL;
         }
 
-        ReleaseConnections();
+        ReleaseConnection(mConnection);
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
         mState = kState_Closed;

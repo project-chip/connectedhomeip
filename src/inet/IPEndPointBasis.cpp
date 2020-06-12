@@ -1167,7 +1167,6 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 {
     INET_ERROR res = INET_NO_ERROR;
     dispatch_data_t content;
-    nw_connection_t connection;
     __block int send_error_code;
     dispatch_semaphore_t send_semaphore = dispatch_semaphore_create(0);
 
@@ -1177,11 +1176,11 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     // For now the entire message must fit within a single buffer.
     VerifyOrExit(aBuffer->Next() == NULL, res = INET_ERROR_MESSAGE_TOO_LONG);
 
-    res = GetConnection(aPktInfo, &connection);
+    res = GetConnection(aPktInfo, &mConnection);
     SuccessOrExit(res);
 
     content = dispatch_data_create(aBuffer->Start(), aBuffer->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
-    nw_connection_send(connection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
+    nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
         send_error_code = nw_error_get_error_code(error);
         dispatch_semaphore_signal(send_semaphore);
     });
@@ -1208,10 +1207,15 @@ void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
             }
             else if (receive_error != NULL && OnReceiveError != NULL)
             {
-                INET_ERROR error = INET_ERROR_UNEXPECTED_EVENT;
-                IPPacketInfo packetInfo;
-                GetPacketInfo(aConnection, &packetInfo);
-                OnReceiveError((IPEndPointBasis *)this, error, &packetInfo);
+                nw_error_domain_t error_domain = nw_error_get_error_domain(receive_error);
+                int error_code = nw_error_get_error_code(receive_error);
+                if (!(error_domain == nw_error_domain_posix && error_code == ECANCELED))
+                {
+                  INET_ERROR error = INET_ERROR_UNEXPECTED_EVENT;
+                  IPPacketInfo packetInfo;
+                  GetPacketInfo(aConnection, &packetInfo);
+                  OnReceiveError((IPEndPointBasis *)this, error, &packetInfo);
+                }
             }
         };
 
@@ -1249,84 +1253,93 @@ void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo * 
 INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo, nw_connection_t * aConnection)
 {
     INET_ERROR res = INET_NO_ERROR;
+    nw_endpoint_t endpoint;
+    nw_connection_t connection;
+
+    size_t addrLength;
+    switch (aPktInfo->DestAddress.Type())
+    {
+        case kIPAddressType_IPv6:
+            addrLength = INET6_ADDRSTRLEN;
+            break;
+#if INET_CONFIG_ENABLE_IPV4
+        case kIPAddressType_IPv4:
+            addrLength = INET_ADDRSTRLEN;
+            break;
+#endif // INET_CONFIG_ENABLE_IPV4
+        default:
+            res = INET_ERROR_WRONG_ADDRESS_TYPE;
+            return res;
+    }
+
+    char addrStr[addrLength];
+    aPktInfo->DestAddress.ToString(addrStr, sizeof(addrStr));
+
+    char portStr[6];
+    sprintf(portStr, "%u", aPktInfo->DestPort);
 
     if (mConnection) {
-        *aConnection = mConnection;
-        goto exit;
-    }
-    else
-    {
-        nw_endpoint_t endpoint;
-        nw_connection_t connection;
+        nw_endpoint_t remote_endpoint = nw_connection_copy_endpoint(mConnection);
+        const IPAddress remote_address = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
+        const uint16_t remote_port = nw_endpoint_get_port(remote_endpoint); 
 
-        size_t addrLength;
-        switch (aPktInfo->DestAddress.Type())
+        if (aPktInfo->DestPort == remote_port && aPktInfo->DestAddress == remote_address)
         {
-            case kIPAddressType_IPv6:
-                addrLength = INET6_ADDRSTRLEN;
-                break;
-#if INET_CONFIG_ENABLE_IPV4
-            case kIPAddressType_IPv4:
-                addrLength = INET_ADDRSTRLEN;
-                break;
-#endif // INET_CONFIG_ENABLE_IPV4
-            default:
-                res = INET_ERROR_WRONG_ADDRESS_TYPE;
-                goto exit;
-        }
-
-        char addrStr[addrLength];
-        aPktInfo->DestAddress.ToString(addrStr, sizeof(addrStr));
-
-        char portStr[6];
-        sprintf(portStr, "%d", aPktInfo->DestPort);
-
-        endpoint = nw_endpoint_create_host(addrStr, portStr);
-        VerifyOrExit(endpoint != NULL, res = INET_ERROR_INCORRECT_STATE);
-
-        connection = nw_connection_create(endpoint, mParameters);
-        if (connection == NULL)
-        {
-            nw_release(endpoint);
-            res = INET_ERROR_INCORRECT_STATE;
+            aConnection = &mConnection;
             goto exit;
         }
-
-        nw_connection_set_queue(connection, mDispatchQueue);
-        nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
-            if (state == nw_connection_state_waiting)
-            {
-                printf("State: Waiting\n");
-            }
-            else if (state == nw_connection_state_failed)
-            {
-                printf("State: Failed\n");
-            }
-            else if (state == nw_connection_state_ready)
-            {
-                printf("State: Ready\n");
-            }
-            else if (state == nw_connection_state_cancelled)
-            {
-                printf("State: Cancelled\n");
-                nw_release(connection);
-            }
-        });
-
-        *aConnection = connection;
-        mConnection = connection;
-        HandleDataReceived(connection);
-        nw_connection_start(connection);
-        nw_release(endpoint);
+        else
+        {
+          ReleaseConnection(mConnection);
+        }
     }
+
+    endpoint = nw_endpoint_create_host(addrStr, portStr);
+    VerifyOrExit(endpoint != NULL, res = INET_ERROR_INCORRECT_STATE);
+
+    connection = nw_connection_create(endpoint, mParameters);
+    if (connection == NULL)
+    {
+        nw_release(endpoint);
+        res = INET_ERROR_INCORRECT_STATE;
+        goto exit;
+    }
+
+    nw_connection_set_queue(connection, mDispatchQueue);
+    nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
+        if (state == nw_connection_state_waiting)
+        {
+            printf("State: Waiting\n");
+        }
+        else if (state == nw_connection_state_failed)
+        {
+            printf("State: Failed\n");
+        }
+        else if (state == nw_connection_state_ready)
+        {
+            printf("State: Ready\n");
+        }
+        else if (state == nw_connection_state_cancelled)
+        {
+            printf("State: Cancelled\n");
+        }
+    });
+
+    *aConnection = connection;
+    HandleDataReceived(connection);
+    nw_connection_start(connection);
+    nw_release(endpoint);
 exit:
     return res;
 }
 
-void IPEndPointBasis::ReleaseConnections()
+void IPEndPointBasis::ReleaseConnection(nw_connection_t aConnection)
 {
-    nw_release(mConnection);
-    mConnection = NULL;
+    if (aConnection)
+    {
+      nw_connection_cancel(aConnection);
+      aConnection = NULL;
+    }
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
