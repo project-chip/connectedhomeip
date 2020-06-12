@@ -155,9 +155,6 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
 
     nw_parameters_configure_protocol_block_t configure_tls;
     nw_parameters_t parameters;
-    nw_endpoint_t endpoint;
-    nw_connection_t connection;
-    nw_endpoint_type_t type;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
@@ -272,75 +269,12 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
         configure_tls,
         NW_PARAMETERS_DEFAULT_CONFIGURATION
     );
-    if (parameters == NULL)
-    {
-        res = INET_ERROR_INCORRECT_STATE;
-        goto exit;
-    }
 
-    char addrStr[INET6_ADDRSTRLEN];
-    addr.ToString(addrStr, sizeof(addrStr));
+    res = IPEndPointBasis::Bind(addrType, addr, port, parameters);
+    SuccessOrExit(res);
 
-    char portStr[6];
-    sprintf(portStr, "%d", port);
-
-    endpoint = nw_endpoint_create_host(addrStr, portStr);
-    if (endpoint == NULL)
-    {
-        nw_release(parameters);
-        res = INET_ERROR_INCORRECT_STATE;
-        goto exit;
-    }
-
-    type = nw_endpoint_get_type(endpoint);
-    if (type != nw_endpoint_type_address && type != nw_endpoint_type_host)
-    {
-        nw_release(parameters);
-        res = INET_ERROR_INCORRECT_STATE;
-        goto exit;
-    }
-
-    connection = nw_connection_create(endpoint, parameters);
-    if (connection == NULL)
-    {
-        nw_release(parameters);
-        nw_release(endpoint);
-        res = INET_ERROR_INCORRECT_STATE;
-        goto exit;
-    }
-
-    mBoundPort = nw_endpoint_get_port(endpoint);
-    mConnection = connection;
     mDispatchQueue = dispatch_queue_create("org.chip.inet", DISPATCH_QUEUE_CONCURRENT);
-    mDispatchSemaphore = dispatch_semaphore_create(0);
-
-    nw_retain(connection);
-
-    nw_connection_set_queue(connection, mDispatchQueue);
-    nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
-        if (state == nw_connection_state_waiting)
-        {
-            printf("State: Waiting\n");
-        }
-        else if (state == nw_connection_state_failed)
-        {
-            printf("State: Failed\n");
-        }
-        else if (state == nw_connection_state_ready)
-        {
-            printf("State: Ready\n");
-        }
-        else if (state == nw_connection_state_cancelled)
-        {
-            printf("State: Cancelled\n");
-            nw_release(connection);
-        }
-    });
-
-    HandleDataReceived(connection);
-    nw_connection_start(connection);
-    nw_release(endpoint);
-    nw_release(parameters);
+    mParameters = parameters;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
@@ -369,8 +303,9 @@ void UDPEndPoint::HandleDataReceived(nw_connection_t connection)
             else if (receive_error != NULL && OnReceiveError != NULL)
             {
                 INET_ERROR error = INET_ERROR_UNEXPECTED_EVENT;
-                const IPPacketInfo * packetInfo = GetPacketInfo(connection);
-                OnReceiveError((IPEndPointBasis *)this, error, packetInfo);
+                IPPacketInfo packetInfo;
+                GetPacketInfo(connection, &packetInfo);
+                OnReceiveError((IPEndPointBasis *)this, error, &packetInfo);
             }
         };
 
@@ -382,8 +317,10 @@ void UDPEndPoint::HandleDataReceived(nw_connection_t connection)
                 return true;
             });
             packetBuffer->SetDataLength(count);
-            const IPPacketInfo * packetInfo = GetPacketInfo(connection);
-            OnMessageReceived((IPEndPointBasis *)this, packetBuffer, packetInfo);
+
+            IPPacketInfo packetInfo;
+            GetPacketInfo(connection, &packetInfo);
+            OnMessageReceived((IPEndPointBasis *)this, packetBuffer, &packetInfo);
         }
 
         schedule_next_receive();
@@ -519,10 +456,18 @@ void UDPEndPoint::Close(void)
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
+        if (mParameters)
+        {
+            nw_release(mParameters);
+            mParameters = NULL;
+            dispatch_release(mDispatchQueue);
+            mDispatchQueue = NULL;
+        }
+
         if (mConnection)
         {
             nw_release(mConnection);
-            dispatch_release(mDispatchQueue);
+            mConnection = NULL;
         }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -652,9 +597,7 @@ INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId
 INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg, uint16_t sendFlags)
 {
     INET_ERROR res             = INET_NO_ERROR;
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
     const IPAddress & destAddr = pktInfo->DestAddress;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     INET_FAULT_INJECT(FaultInjection::kFault_Send, if ((sendFlags & kSendFlag_RetainBuffer) == 0) PacketBuffer::Free(msg);
                       return INET_ERROR_UNKNOWN_INTERFACE;);
@@ -810,6 +753,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     dispatch_data_t content;
+    nw_endpoint_t endpoint;
+    nw_connection_t connection;
+    nw_endpoint_type_t type;
+    dispatch_semaphore_t send_semaphore = dispatch_semaphore_create(0);
 
     // For now the entire message must fit within a single buffer.
     if (msg->Next() != NULL)
@@ -818,13 +765,74 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
         goto exit;
     }
 
+    if (!mConnection) {
+
+    char addrStr[INET_ADDRSTRLEN];
+    destAddr.ToString(addrStr, sizeof(addrStr));
+
+    char portStr[6];
+    sprintf(portStr, "%d", pktInfo->DestPort);
+
+    endpoint = nw_endpoint_create_host(addrStr, portStr);
+    if (endpoint == NULL)
+    {
+        res = INET_ERROR_INCORRECT_STATE;
+        goto exit;
+    }
+
+    type = nw_endpoint_get_type(endpoint);
+    if (type != nw_endpoint_type_address && type != nw_endpoint_type_host)
+    {
+        res = INET_ERROR_INCORRECT_STATE;
+        goto exit;
+    }
+
+    connection = nw_connection_create(endpoint, mParameters);
+    if (connection == NULL)
+    {
+        nw_release(endpoint);
+        res = INET_ERROR_INCORRECT_STATE;
+        goto exit;
+    }
+
+    mConnection = connection;
+
+    nw_retain(connection);
+
+    nw_connection_set_queue(connection, mDispatchQueue);
+    nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
+        if (state == nw_connection_state_waiting)
+        {
+            printf("State: Waiting\n");
+        }
+        else if (state == nw_connection_state_failed)
+        {
+            printf("State: Failed\n");
+        }
+        else if (state == nw_connection_state_ready)
+        {
+            printf("State: Ready\n");
+        }
+        else if (state == nw_connection_state_cancelled)
+        {
+            printf("State: Cancelled\n");
+            nw_release(connection);
+        }
+    });
+
+    HandleDataReceived(connection);
+    nw_connection_start(connection);
+    nw_release(endpoint);
+
+    } // !mConnection
+
     content = dispatch_data_create(msg->Start(), msg->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
     nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
-        dispatch_semaphore_signal(mDispatchSemaphore);
+        dispatch_semaphore_signal(send_semaphore);
     });
     dispatch_release(content);
 
-    dispatch_semaphore_wait(mDispatchSemaphore, DISPATCH_TIME_FOREVER);
+    dispatch_semaphore_wait(send_semaphore, DISPATCH_TIME_FOREVER);
 
     if ((sendFlags & kSendFlag_RetainBuffer) == 0)
         PacketBuffer::Free(msg);
@@ -942,9 +950,14 @@ uint16_t UDPEndPoint::GetBoundPort(void)
     return mUDP->local_port;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     return mBoundPort;
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    nw_endpoint_t endpoint = nw_parameters_copy_local_endpoint(mParameters);
+    return nw_endpoint_get_port(endpoint);
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

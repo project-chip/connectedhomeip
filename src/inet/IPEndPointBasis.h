@@ -157,8 +157,10 @@ protected:
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 protected:
+    nw_parameters_t mParameters;
     nw_connection_t mConnection;
-    const IPPacketInfo * GetPacketInfo(nw_connection_t connection);
+    INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters);
+    void GetPacketInfo(nw_connection_t aConnection, IPPacketInfo * aPacketInfo);
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 private:

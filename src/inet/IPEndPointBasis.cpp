@@ -1118,19 +1118,59 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-const IPPacketInfo * IPEndPointBasis::GetPacketInfo(nw_connection_t connection)
+INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters)
 {
-    IPPacketInfo packetInfo;
-    nw_endpoint_t local_endpoint = nw_connection_copy_endpoint(mConnection);
+    if (aParameters == NULL)
+    {
+        return INET_ERROR_BAD_ARGS;
+    }
+
+    size_t addrLength;
+    switch (aAddressType)
+    {
+    case kIPAddressType_IPv6:
+        addrLength = INET6_ADDRSTRLEN;
+        break;
+
+#if INET_CONFIG_ENABLE_IPV4
+    case kIPAddressType_IPv4:
+        addrLength = INET_ADDRSTRLEN;
+        break;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    default:
+        return INET_ERROR_WRONG_ADDRESS_TYPE;
+    }
+
+    char addrStr[addrLength];
+    aAddress.ToString(addrStr, sizeof(addrStr));
+
+    char portStr[6];
+    sprintf(portStr, "%u", aPort);
+
+    nw_endpoint_t endpoint = nw_endpoint_create_host(addrStr, portStr);
+    if (endpoint == NULL)
+    {
+        return INET_ERROR_INCORRECT_STATE;
+    }
+
+    nw_parameters_set_local_endpoint(aParameters, endpoint);
+    nw_release(endpoint);
+
+    return INET_NO_ERROR;
+}
+
+void IPEndPointBasis::GetPacketInfo(nw_connection_t connection, IPPacketInfo * packetInfo)
+{
+    nw_parameters_t parameters = nw_connection_copy_parameters(connection);
+    nw_endpoint_t local_endpoint = nw_parameters_copy_local_endpoint(parameters);
     nw_endpoint_t remote_endpoint = nw_connection_copy_endpoint(connection);
 
-    packetInfo.SrcAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
-    packetInfo.DestAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(local_endpoint));
-    packetInfo.SrcPort = nw_endpoint_get_port(remote_endpoint);
-    packetInfo.DestPort = nw_endpoint_get_port(local_endpoint);
-
-    return &packetInfo;
+    packetInfo->Clear();
+    packetInfo->SrcAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
+    packetInfo->DestAddress = IPAddress::FromSockAddr(*nw_endpoint_get_address(local_endpoint));
+    packetInfo->SrcPort = nw_endpoint_get_port(remote_endpoint);
+    packetInfo->DestPort = nw_endpoint_get_port(local_endpoint);
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
