@@ -33,7 +33,9 @@
 #include "TestSystemLayer.h"
 
 #include <nlunit-test.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/TestUtils.h>
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 #include <system/SystemTimer.h>
@@ -224,11 +226,13 @@ static int TestSetup(void * aContext)
     void * lLayerContext   = NULL;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !CHIP_DEVICE_LAYER_TARGET_ESP32
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     sys_mbox_new(sLwIPEventQueue, 100);
-    tcpip_init(NULL, NULL);
     lLayerContext = &sLwIPEventQueue;
+#endif
+    tcpip_init(NULL, NULL);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     sLayer.Init(lLayerContext);
@@ -264,4 +268,9 @@ int TestSystemTimer(void)
     nlTestRunner(&kTheSuite, &sContext);
 
     return nlTestRunnerStats(&kTheSuite);
+}
+
+static void __attribute__((constructor)) TestSystemTimerCtor(void)
+{
+    VerifyOrDie(chip::RegisterUnitTests(&TestSystemTimer) == CHIP_NO_ERROR);
 }

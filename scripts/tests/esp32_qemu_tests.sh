@@ -26,7 +26,9 @@ chip_dir="$here"/../..
 source "$chip_dir"/src/test_driver/esp32/idf.sh
 "$chip_dir"/src/test_driver/esp32/qemu_setup.sh
 
-# Currently only crypto tests are configured to run on QEMU.
-# The "src/crypto" qualifier will be removed, once all CHIP unit tests are
+# Currently only crypto, inet, and system tests are configured to run on QEMU.
+# The specific qualifiers will be removed, once all CHIP unit tests are
 # updated to run on QEMU.
 idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/crypto check
+idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/inet check
+idf make V=1 -C "$chip_dir"/src/test_driver/esp32/build/chip/src/system check
