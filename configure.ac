@@ -1829,6 +1829,32 @@ AC_SUBST(NLUNIT_TEST_SUBDIRS, [${maybe_nlunit_test_dirstem}])
 AM_CONDITIONAL([CHIP_WITH_NLUNIT_TEST_INTERNAL], [test "${nl_with_nlunit_test}" = "internal"])
 
 #
+#
+# IniPP
+#
+
+if test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1; then
+    NL_WITH_PACKAGE(
+        [IniPP],
+        [INIPP],
+        [],
+        [],
+        [
+            INIPP_CPPFLAGS="-I\${abs_top_srcdir}/third_party/inipp/repo/inipp"
+        ],
+        [
+            # Check for required IniPP headers.
+
+            AC_CHECK_HEADERS([inipp.h],
+            [],
+            [
+                AC_MSG_ERROR(The IniPP header "inipp.h" is required but cannot be found.)
+            ])
+        ]
+    )
+fi
+
+#
 # Sockets
 #
 
@@ -2242,6 +2268,7 @@ AC_MSG_NOTICE([
   Sockets link libraries                           : ${SOCKETS_LIBS:--}
   PThreads compile flags                           : ${PTHREAD_CFLAGS:--}
   PThreads link libraries                          : ${PTHREAD_LIBS:--}
+  IniPP compile flags                              : ${INIPP_CPPFLAGS:--}
   C Preprocessor                                   : ${CPP}
   C Compiler                                       : ${CC}
   C++ Preprocessor                                 : ${CXXCPP}
