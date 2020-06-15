@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-source_set("setup_payload") {
+config("setup_payload_config") {
+  include_dirs = [ "." ]
+}
+
+static_library("setup_payload") {
   sources = [
     "Base41.cpp",
     "Base41.h",
@@ -34,4 +38,6 @@ source_set("setup_payload") {
     "//src/lib/core",
     "//src/lib/support",
   ]
+
+  public_configs = [ ":setup_payload_config" ]
 }
