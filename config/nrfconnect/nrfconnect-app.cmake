@@ -144,6 +144,7 @@ endfunction(get_zephyr_compilation_flags)
 # Inherit Zephyr build settings and add some extra ones
 get_zephyr_compilation_flags(CHIP_CFLAGS C)
 get_zephyr_compilation_flags(CHIP_CXXFLAGS CXX)
+list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*) # CHIP adds gnu++11 anyway...
 
 set(CHIP_COMMON_FLAGS
     ${CHIP_INCLUDE_DIRS}
@@ -177,6 +178,7 @@ set(CHIP_CONFIGURE_ARGS
     --with-lwip-target=nrf5
     --with-inet-endpoint=tcp,udp
     --with-logging-style=external
+    --with-target-style=embedded
     --with-chip-project-includes=${CHIP_PROJECT_CONFIG}
     --with-chip-system-project-includes=${CHIP_PROJECT_CONFIG}
     --with-chip-inet-project-includes=${CHIP_PROJECT_CONFIG}
