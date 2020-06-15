@@ -1282,7 +1282,7 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
     if (mConnection) {
         nw_endpoint_t remote_endpoint = nw_connection_copy_endpoint(mConnection);
         const IPAddress remote_address = IPAddress::FromSockAddr(*nw_endpoint_get_address(remote_endpoint));
-        const uint16_t remote_port = nw_endpoint_get_port(remote_endpoint); 
+        const uint16_t remote_port = nw_endpoint_get_port(remote_endpoint);
 
         if (aPktInfo->DestPort == remote_port && aPktInfo->DestAddress == remote_address)
         {
