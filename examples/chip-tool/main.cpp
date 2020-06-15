@@ -77,7 +77,12 @@ void ShowUsage(const char * executable)
 {
     fprintf(stderr,
             "Usage: \n"
-            "  %s device-ip-address device-port echo|off|on|toggle\n",
+            "  %s device-ip-address device-port command [params]\n"
+            "  Supported commands and their parameters:\n"
+            "    echo\n"
+            "    off endpoint-id\n"
+            "    on endpoint-id\n"
+            "    toggle endpoint-id\n",
             executable);
 }
 
@@ -155,6 +160,45 @@ bool DetermineCommand(int argc, char * argv[], Command * command)
     return false;
 }
 
+union CommandArgs
+{
+    ChipZclEndpointId_t endpointId;
+};
+
+bool DetermineCommandArgs(int argc, char * argv[], Command command, CommandArgs * commandArgs)
+{
+    if (command == Command::Echo)
+    {
+        // No args.
+        return true;
+    }
+
+    if (command != Command::On && command != Command::Off && command != Command::Toggle)
+    {
+        fprintf(stderr, "Need to define arg handling for command '%d'\n", int(command));
+        return false;
+    }
+
+    if (argc < 5)
+    {
+        return false;
+    }
+
+    std::string endpoint_str(argv[4]);
+    std::stringstream ss(endpoint_str);
+    // stringstream treats uint8_t as char, which is not what we want here.
+    uint16_t endpoint;
+    ss >> endpoint;
+    if (ss.fail() || !ss.eof() || endpoint > UINT8_MAX)
+    {
+        fprintf(stderr, "Error: Invalid endpoint id '%s'", argv[4]);
+        return false;
+    }
+    commandArgs->endpointId = endpoint;
+
+    return true;
+}
+
 // Handle the echo case, where we just send a string and expect to get it back.
 void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress & host_addr, uint16_t port)
 {
@@ -182,7 +226,7 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress
 
 // Handle the on/off/toggle case, where we are sending a ZCL command and not
 // expecting a response at all.
-void DoOnOff(DeviceController::ChipDeviceController * controller, Command command)
+void DoOnOff(DeviceController::ChipDeviceController * controller, Command command, ChipZclEndpointId_t endpoint)
 {
     ChipZclCommandId_t zclCommand;
     switch (command)
@@ -207,7 +251,7 @@ void DoOnOff(DeviceController::ChipDeviceController * controller, Command comman
 
     ChipZclBuffer_t * zcl_buffer = (ChipZclBuffer_t *) buffer;
     ChipZclCommandContext_t ctx  = {
-        1,                              // endpointId
+        endpoint,                       // endpointId
         CHIP_ZCL_CLUSTER_ON_OFF,        // clusterId
         true,                           // clusterSpecific
         false,                          // mfgSpecific
@@ -253,7 +297,9 @@ int main(int argc, char * argv[])
     IPAddress host_addr;
     uint16_t port;
     Command command;
-    if (!DetermineAddress(argc, argv, &host_addr, &port) || !DetermineCommand(argc, argv, &command))
+    CommandArgs commandArgs;
+    if (!DetermineAddress(argc, argv, &host_addr, &port) || !DetermineCommand(argc, argv, &command) ||
+        !DetermineCommandArgs(argc, argv, command, &commandArgs))
     {
         ShowUsage(argv[0]);
         return -1;
@@ -271,7 +317,7 @@ int main(int argc, char * argv[])
     }
     else
     {
-        DoOnOff(controller, command);
+        DoOnOff(controller, command, commandArgs.endpointId);
     }
 
     controller->Shutdown();
