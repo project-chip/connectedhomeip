@@ -226,7 +226,7 @@ static int TestSetup(void * aContext)
     void * lLayerContext   = NULL;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !CHIP_DEVICE_LAYER_TARGET_ESP32
+#if LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     sys_mbox_new(sLwIPEventQueue, 100);

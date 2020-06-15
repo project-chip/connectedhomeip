@@ -46,6 +46,7 @@
 #include <nlunit-test.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/init.h>
 #include <lwip/tcpip.h>
 #include <lwip/sys.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -492,8 +493,7 @@ static int Initialize(void * aContext)
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
     void * lLayerContext   = NULL;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !CHIP_DEVICE_LAYER_TARGET_ESP32
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     if (sLwIPEventQueue == NULL)
@@ -502,7 +502,6 @@ static int Initialize(void * aContext)
     }
 
     lLayerContext = &sLwIPEventQueue;
-#endif // CHIP_DEVICE_LAYER_TARGET_ESP32
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     lContext.mTestSuite    = &sTestSuite;
