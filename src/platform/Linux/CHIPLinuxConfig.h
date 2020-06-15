@@ -50,8 +50,7 @@ protected:
 
 private:
     CHIP_ERROR GetDefaultSession(std::map<std::string, std::string> & section);
-    CHIP_ERROR GetBinaryBlobDataAndLengths(const char * key, char *& encodedData, size_t & encodedDataLen,
-                                           size_t & decodedDataLen);
+    CHIP_ERROR GetBinaryBlobDataAndLengths(const char * key, char *& encodedData, size_t & encodedDataLen, size_t & decodedDataLen);
     inipp::Ini<char> mConfigStore;
 };
 

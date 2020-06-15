@@ -22,8 +22,8 @@
  *
  */
 
-#include <string>
 #include <fstream>
+#include <string>
 #include <unistd.h>
 
 #include <platform/Linux/CHIPLinuxConfig.h>
@@ -35,7 +35,6 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
 
 CHIP_ERROR ChipLinuxConfig::Init(void)
 {
@@ -65,7 +64,7 @@ CHIP_ERROR ChipLinuxConfig::AddConfig(const char * configFile)
     CHIP_ERROR retval = CHIP_NO_ERROR;
     std::ifstream ifs;
 
-    ifs.open (configFile, std::ifstream::in);
+    ifs.open(configFile, std::ifstream::in);
 
     if (ifs.is_open())
     {
@@ -85,7 +84,7 @@ CHIP_ERROR ChipLinuxConfig::CommitConfig(const char * configFile)
     CHIP_ERROR retval = CHIP_NO_ERROR;
     std::ofstream ofs;
 
-    ofs.open (configFile, std::ofstream::out | std::ofstream::trunc);
+    ofs.open(configFile, std::ofstream::out | std::ofstream::trunc);
 
     if (ofs.is_open())
     {
@@ -175,8 +174,8 @@ CHIP_ERROR ChipLinuxConfig::GetBinaryBlobDataAndLengths(const char * key, char *
             {
                 size_t len = value.size();
 
-                encodedData = (char *)malloc(len + 1);
-                encodedDataLen = value.copy(encodedData, len);
+                encodedData                 = (char *) malloc(len + 1);
+                encodedDataLen              = value.copy(encodedData, len);
                 encodedData[encodedDataLen] = '\0';
 
                 // Check if encoded data was padded. Only "=" or "==" padding combinations are allowed.
@@ -203,8 +202,7 @@ CHIP_ERROR ChipLinuxConfig::GetBinaryBlobDataAndLengths(const char * key, char *
     return retval;
 }
 
-CHIP_ERROR ChipLinuxConfig::GetBinaryBlobValue(const char * key, uint8_t * decodedData, size_t bufSize,
-                                               size_t & decodedDataLen)
+CHIP_ERROR ChipLinuxConfig::GetBinaryBlobValue(const char * key, uint8_t * decodedData, size_t bufSize, size_t & decodedDataLen)
 {
     CHIP_ERROR retval  = CHIP_NO_ERROR;
     char * encodedData = NULL;

@@ -24,9 +24,9 @@
  */
 
 #include <errno.h>
+#include <fstream>
 #include <libgen.h>
 #include <string>
-#include <fstream>
 #include <unistd.h>
 
 #include <platform/Linux/CHIPLinuxSettings.h>
@@ -45,9 +45,7 @@ ChipLinuxSettings::ChipLinuxSettings()
     mWritable = true;
 }
 
-ChipLinuxSettings::~ChipLinuxSettings()
-{
-}
+ChipLinuxSettings::~ChipLinuxSettings() {}
 
 CHIP_ERROR ChipLinuxSettings::Init(const char * configFile)
 {
@@ -60,7 +58,7 @@ CHIP_ERROR ChipLinuxSettings::Init(const char * configFile)
         retval = ChipLinuxConfig::Init();
     }
 
-    ifs.open (configFile, std::ifstream::in);
+    ifs.open(configFile, std::ifstream::in);
 
     if (retval == CHIP_NO_ERROR && !ifs.good())
     {
