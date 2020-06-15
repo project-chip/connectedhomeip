@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("build/tests.gni")
+import("build/tools.gni")
 
 group("all") {
   deps = [
@@ -45,5 +46,9 @@ group("all") {
       "src/lwip/tests",
       "src/system/tests",
     ]
+  }
+
+  if (chip_build_tools) {
+    deps += [ "src/setup_payload" ]
   }
 }
