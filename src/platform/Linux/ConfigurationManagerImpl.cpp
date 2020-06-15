@@ -45,6 +45,15 @@ ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 CHIP_ERROR ConfigurationManagerImpl::_Init()
 {
     CHIP_ERROR err;
+    bool failSafeArmed;
+
+    // Force initialization of NVS namespaces if they doesn't already exist.
+    err = EnsureNamespace(kConfigNamespace_ChipFactory);
+    SuccessOrExit(err);
+    err = EnsureNamespace(kConfigNamespace_ChipConfig);
+    SuccessOrExit(err);
+    err = EnsureNamespace(kConfigNamespace_ChipCounters);
+    SuccessOrExit(err);
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
