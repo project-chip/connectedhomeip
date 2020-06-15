@@ -1,1 +1,0 @@
-"java" -jar "$4/plugins/com.silabs.external.jython_2.7.0.qualifier/external_jython/2.7.0/jython-2.7.0.jar"  "$(dirname "$0")/MnIpdEsi-postbuild.py" "$1" "$2" "" "$4/../../../../../../../../../../usr/local/Cellar/wine/1.7.51/bin/wine cmd /C " "$3"

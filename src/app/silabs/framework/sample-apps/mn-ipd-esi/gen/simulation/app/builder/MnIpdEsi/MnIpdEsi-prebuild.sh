@@ -1,1 +1,0 @@
-"java" -jar "$4/plugins/com.silabs.external.jython_2.7.0.qualifier/external_jython/2.7.0/jython-2.7.0.jar"  "$(dirname "$0")/MnIpdEsi-prebuild.py"
