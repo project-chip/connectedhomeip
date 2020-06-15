@@ -48,6 +48,8 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/include/platform/CHIPDeviceLayer.h \
     @top_srcdir@/src/include/platform/internal/BLEManager.h \
     @top_srcdir@/src/include/platform/internal/EventLogging.h \
+    @top_srcdir@/src/include/platform/internal/GenericConfigurationManagerImpl.h \
+    @top_srcdir@/src/include/platform/internal/GenericConfigurationManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.h \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl.ipp \
     @top_srcdir@/src/include/platform/internal/GenericPlatformManagerImpl_POSIX.h \
@@ -87,6 +89,7 @@ noinst_HEADERS                          = \
     @top_srcdir@/src/platform/ESP32/ESP32Config.h \
     @top_srcdir@/src/platform/Linux/CHIPDevicePlatformConfig.h \
     @top_srcdir@/src/platform/Linux/CHIPDevicePlatformEvent.h \
+    @top_srcdir@/src/platform/Linux/ConfigurationManagerImpl.h \
     @top_srcdir@/src/platform/Linux/PlatformManagerImpl.h \
     $(NULL)
 
@@ -123,11 +126,17 @@ if CHIP_DEVICE_LAYER_TARGET_LINUX
 
 SUBDIRS                                += tests
 
+libDeviceLayer_a_CPPFLAGS              += \
+    $(INIPP_CPPFLAGS)                     \
+    $(NULL)
+
 libDeviceLayer_a_SOURCES               += \
     Linux/BLEManagerImpl.cpp              \
     Linux/ConnectivityManagerImpl.cpp     \
     Linux/Logging.cpp                     \
     Linux/PosixConfig.cpp                 \
+    Linux/CHIPLinuxConfig.cpp             \
+    Linux/CHIPLinuxSettings.cpp           \
     Linux/PlatformManagerImpl.cpp         \
     Linux/SystemTimeSupport.cpp           \
     $(NULL)
