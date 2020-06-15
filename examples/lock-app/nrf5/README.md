@@ -5,15 +5,15 @@ An example application showing the use
 
 <hr>
 
-- [CHIP nRF52840 Lock Example Application](#chip-nrf52840-lock-example-application)
-  - [Introduction](#introduction)
-  - [Device UI](#device-ui)
-  - [Building](#building)
-    - [Using CHIP's VSCode `devcontainer`](#using-chips-vscode-devcontainer)
-    - [Using Native Shell](#using-native-shell)
-  - [Initializing the nRF52840 DK](#initializing-the-nrf52840-dk)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
+-   [CHIP nRF52840 Lock Example Application](#chip-nrf52840-lock-example-application)
+    -   [Introduction](#introduction)
+    -   [Device UI](#device-ui)
+    -   [Building](#building)
+        -   [Using CHIP's VSCode `devcontainer`](#using-chips-vscode-devcontainer)
+        -   [Using Native Shell](#using-native-shell)
+    -   [Initializing the nRF52840 DK](#initializing-the-nrf52840-dk)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
 
 <hr>
 
