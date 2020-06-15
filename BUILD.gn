@@ -44,6 +44,7 @@ group("all") {
       "src/lib/core/tests",
       "src/lib/support/tests",
       "src/lwip/tests",
+      "src/setup_payload/tests",
       "src/system/tests",
     ]
   }
