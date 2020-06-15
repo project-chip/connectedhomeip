@@ -50,6 +50,9 @@ group("all") {
   }
 
   if (chip_build_tools) {
-    deps += [ "src/setup_payload" ]
+    deps += [
+      "src/qrcodetool",
+      "src/setup_payload",
+    ]
   }
 }
