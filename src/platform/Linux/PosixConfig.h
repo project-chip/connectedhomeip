@@ -33,6 +33,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+class ChipLinuxStorage;
+
 /**
  * Provides functions and definitions for accessing device configuration information on the Posix.
  *
@@ -43,6 +45,39 @@ class PosixConfig
 {
 public:
     struct Key;
+
+    // Maximum length of an NVS key name.
+    static constexpr size_t kMaxConfigKeyNameLength = 15;
+
+    // NVS namespaces used to store device configuration information.
+    static const char kConfigNamespace_ChipFactory[];
+    static const char kConfigNamespace_ChipConfig[];
+    static const char kConfigNamespace_ChipCounters[];
+
+    // Key definitions for well-known keys.
+    static const Key kConfigKey_SerialNum;
+    static const Key kConfigKey_MfrDeviceId;
+    static const Key kConfigKey_MfrDeviceCert;
+    static const Key kConfigKey_MfrDeviceICACerts;
+    static const Key kConfigKey_MfrDevicePrivateKey;
+    static const Key kConfigKey_ProductRevision;
+    static const Key kConfigKey_ManufacturingDate;
+    static const Key kConfigKey_PairingCode;
+    static const Key kConfigKey_FabricId;
+    static const Key kConfigKey_ServiceConfig;
+    static const Key kConfigKey_PairedAccountId;
+    static const Key kConfigKey_ServiceId;
+    static const Key kConfigKey_FabricSecret;
+    static const Key kConfigKey_GroupKeyIndex;
+    static const Key kConfigKey_LastUsedEpochKeyId;
+    static const Key kConfigKey_FailSafeArmed;
+    static const Key kConfigKey_WiFiStationSecType;
+    static const Key kConfigKey_OperationalDeviceId;
+    static const Key kConfigKey_OperationalDeviceCert;
+    static const Key kConfigKey_OperationalDeviceICACerts;
+    static const Key kConfigKey_OperationalDevicePrivateKey;
+
+    static const char kGroupKeyNamePrefix[];
 
     static CHIP_ERROR Init(void);
 
@@ -62,10 +97,15 @@ public:
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
 
+    static void RunConfigUnitTest(void);
+
 protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
+
+private:
+    static ChipLinuxStorage * GetStorageForNamespace(Key key);
 };
 
 struct PosixConfig::Key
