@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-meter-mirror" name="Plugin Commands: Meter Mirror">
+    <description>
+      The Meter mirror plugin provides commands for managing the meter devices whose attributes are mirrorred locally.
+    </description>
+  </group>
+  <command cli="plugin meter-mirror status" functionName="emAfPluginMeterMirrorStatusCommand" group="plugin-meter-mirror">
+    <description>
+      Prints the status of all mirrors.
+    </description>
+  </command>
+  <command cli="plugin meter-mirror remove" functionName="emAfPluginMeterMirrorRemoveCommand" group="plugin-meter-mirror">
+    <description>
+      Manually removes a registered mirror at the specified endpoint.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint of the mirror to remove."/>
+  </command>
+</cli>

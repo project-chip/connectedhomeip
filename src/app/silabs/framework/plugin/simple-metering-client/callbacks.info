@@ -1,0 +1,27 @@
+/** @brief Request Mirror
+ *
+ * This function is called by the Simple Metering client plugin whenever a
+ * Request Mirror command is received. The application should return the
+ * endpoint to which the mirror has been assigned. If no mirror could be
+ * assigned, the application should return 0xFFFF.
+ *
+ * @param requestingDeviceIeeeAddress   Ver.: always
+ */
+uint16_t emberAfPluginSimpleMeteringClientRequestMirrorCallback(EmberEUI64 requestingDeviceIeeeAddress)
+{
+  return 0xFFFF;
+}
+
+/** @brief Remove Mirror
+ *
+ * This function is called by the Simple Metering client plugin whenever a
+ * Remove Mirror command is received. The application should return the
+ * endpoint on which the mirror has been removed. If the mirror could not be
+ * removed, the application should return 0xFFFF.
+ *
+ * @param requestingDeviceIeeeAddress   Ver.: always
+ */
+uint16_t emberAfPluginSimpleMeteringClientRemoveMirrorCallback(EmberEUI64 requestingDeviceIeeeAddress)
+{
+  return 0xFFFF;
+}

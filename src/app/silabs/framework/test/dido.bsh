@@ -1,0 +1,306 @@
+import com.ember.peek.SimulatedNetwork;
+import java.util.Random;
+
+source("zigbee-event-logger-events.bsh");
+
+int NUM_EXPECTED_TEST_EVENTS = 8;
+
+int DIDO_HEADER_DEBUG = 0;
+int TLV_HEADER_DEBUG = 0;
+int EVENT_LOG_HEADER_DEBUG = 0;
+int EVENT_LOG_DATA_DEBUG = 0;
+int COUNTER_DATA_DEBUG = 0;
+
+String getDidoHeader(){
+  String magicNumber = "3A 46 FA DB C8 69 FE 50 ";
+  String didoVersion = "01";
+
+  //reportIdStr = String.format("%02X", new Object[] { reportId });
+  didoHeader = magicNumber + didoVersion;
+  if (DIDO_HEADER_DEBUG > 0) {
+    std.print(" [DIDO-HDR] " + didoHeader + "\n");
+  }
+  return didoHeader;
+}
+
+String getTlvHeader( int type, String tlvData ){
+  len = getNumHexBytes( tlvData );
+  tlvHeader = String.format("%02X 00 %02X %02X",
+                  new Object[]{
+                    type,
+                    (len & 0xFF),
+                    ((len >> 8) & 0xFF)
+                  });
+  if (TLV_HEADER_DEBUG > 0) {
+    std.print(" [TLV-HDR][" + type + "] " + tlvHeader + "\n");
+  }
+  return tlvHeader;
+}
+
+String getEventLogDataHeader( int bootCount, int numEntries, int loggerVersion ){
+  String logDataHeader = String.format("%02X %02X %02X %02X %02X %02X %02X", 
+                      new Object[]{
+                        (bootCount & 0xFF),
+                        ((bootCount >> 8) & 0xFF),
+                        ((bootCount >> 16) & 0xFF),
+                        ((bootCount >> 24) & 0xFF),
+                        (numEntries & 0xFF),
+                        ((numEntries >> 8) & 0xFF),
+                        (loggerVersion & 0xFF)
+                       } );
+  if (EVENT_LOG_HEADER_DEBUG > 0) {
+    std.print(" [EVTLOG-HDR] " + logDataHeader + "\n");
+  }
+  return logDataHeader;
+}
+
+String getEventLogData( String channel, String panId, String extendedPanId ){
+  String data = "";
+  String sep = " ";
+
+  data = data + getZigBeeEventLogMessage( 0, 0, getEventDataReset(2,0) ) + " ";
+  data = data + getZigBeeEventLogMessage( 0, 0, getEventDataBoot(1,0x200) ) + " ";
+  data = data + getZigBeeEventLogMessage( 0, 0, getEventDataParentChange("0000", "0000000000000002") ) + " ";
+  data = data + getZigBeeEventLogMessage( 0, 0, getEventDataStackStatus("AF") ) + " ";
+  data = data + getZigBeeEventLogMessage( 0, 0, getEventDataParentChange("0000", "0000000000000002") ) + " ";
+  data = data + getZigBeeEventLogMessage( 0, 0, getEventDataJoinNetwork(panId, channel, "00", extendedPanId) ) + " ";
+  data = data + getZigBeeEventLogMessage( 0, 0, getEventDataStackStatus("90") ) + " ";
+  data = data + getZigBeeEventLogMessage( 0, 0, getEventDataTrustCenterLinkKeyChange() );
+  if( EVENT_LOG_DATA_DEBUG > 0 ){
+    std.print(" [EVTLOG-DATA] " + data + "\n");
+  }
+  return data;
+}
+
+String getCountersData( int numCounters ){
+  int i;
+  counters = String.format("%02X ", new Object[]{numCounters});
+  // It will be difficult to test the values of each counter, but we can make sure
+  // all the counter ID values are correct and insert .. placeholders for the values.
+  for( i=0; i<numCounters; i++ ){
+    counters = counters + String.format("%02X .. .. ", new Object[]{i});
+  }
+  counterData = counters.trim();
+  if( COUNTER_DATA_DEBUG > 0 ){
+    std.print(" [COUNTER-DATA] " + counterData + "\n");
+  }
+  return counterData;
+}
+
+String getVersionData(){
+  // Most of the version values will change over time, making it
+  // hard to test with hard values.
+  return "00 .. .. .. .. .. .. .. ..";
+}
+
+String getCrcData(){
+  // CRC is unknown, but the header is known.
+  return ".. .. .. ..";
+}
+
+void testQueryDebugReport(String device, String expectStr, int reportId) {
+  send("gateway", "zcl mfg-code 0x1217");
+  send("gateway", "zcl sl-wwah query-debug-report " + reportId);
+  send("gateway", "send " + nodeId(device) + " 1 1" );
+
+  networkWait(100);
+
+  expectMultiline("gateway",
+         new String[] {
+          "Rx ReportId=" + reportId + ".*",
+          expectStr,
+         },
+         timeout*2);
+
+  networkWait(2000);
+}
+
+// The purpose of this test is to exercise WWAH connectivity functionality.
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  // The Z3 Gateway can only be compiled as a host
+  std.print("** this test is only run in host mode ** ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+
+// Load Z3Gateway app as HOST.
+Location gatewayLocation = gridLocations[0];
+TestNode gateway = new TestNode("gateway",
+                                "", // no SoC image
+                                "build/af-test-apps/Z3GatewayWithWwah-simulation-ezsp/Z3GatewayWithWwah",
+                                "app/ncp/sample-app/ncp-uart-sw/simulation/build/exe/ncp-uart-sw",
+                                gatewayLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { gateway }, true, false); // useHost, don't useSpi
+
+// Load Z3LightWithWwah as a SoC device
+Location routerLocation = gridLocations[1];
+TestNode light = new TestNode("light",
+                              "build/af-test-apps/Z3LightWithWwah-simulation/Z3LightWithWwah",
+                              "", // no HOST image
+                              "", // no NCP image
+                              routerLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { light }, false); // don't useHost
+
+// Load Z3DoorLockWithWwah app as a SoC device.
+Location endDeviceLocation = gridLocations[2];
+TestNode doorlock = new TestNode("doorlock",
+                                 "build/af-test-apps/Z3DoorLockWithWwah-simulation/Z3DoorLockWithWwah",
+                                 "", // no HOST image
+                                 "", // no NCP image
+                                 endDeviceLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { doorlock }, false); // don't useHost
+
+// Load Z3SleepyDoorLockWithWwah app as a SoC device.
+Location sleepyEndDeviceLocation = gridLocations[3];
+TestNode sleepyDoorlock = new TestNode("sleepy-doorlock",
+                                  "build/af-test-apps/Z3SleepyDoorLockWithWwah-simulation/Z3SleepyDoorLockWithWwah",
+                                  "", // no HOST image
+                                  "", // no NCP image
+                                  sleepyEndDeviceLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { sleepyDoorlock }, false); // don't useHost
+
+setupEncryption();
+
+// The light tries to do network steering on startup. When it doesn't find a
+// network, it forms its own. Wait, then have it leave the network it formed
+networkWait(10000);
+expect("light",
+       "network leave",
+       ".*EMBER_NETWORK_DOWN");
+
+// Turn off some prints
+send("gateway", "option print disable");
+send("light", "option print disable");
+send("doorlock", "option print disable");
+send("sleepy-doorlock", "option print disable");
+
+// Make sure we have a reset and boot event message first
+expectMultiline("light",
+                "plugin zigbee-event-logger print",
+                new String[] {
+                  ".*] Reset code: 2, ext: 0",    // Reset Type 0x0200 -> BOOTLOADER, UNKNOWN
+                  ".*] Boot Cnt: 1. Type: 0x0200"
+                });
+networkWait(2000);
+
+expectMultiline("doorlock",
+                "plugin zigbee-event-logger print",
+                new String[] {
+                  ".*] Reset code: 2, ext: 0",    // Reset Type 0x0200 -> BOOTLOADER, UNKNOWN
+                  ".*] Boot Cnt: 1. Type: 0x0200"
+                });
+networkWait(2000);
+
+// Form the network and join the light. We should get a join message, which we
+// check after verifying that the TC link key is updated. We'll also check for a
+// stackStatus message with EMBER_NETWORK_UP
+expect("gateway",
+       "plugin network-creator start 1",
+       "EMBER_NETWORK_UP 0x0000",5000);
+expect("gateway",
+       "plugin network-creator-security open-network",
+       "NWK Creator Security: Open network: 0x00");
+expect("doorlock",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP 0x....",
+       30000);
+
+// Select a random reportId to ensure it is received by the remote
+// and sent back in the response.
+Random ran = new Random();
+int reportId = ran.nextInt(255);
+networkWait(DEFAULT_TIMEOUT);
+
+String myChannel = channel("gateway");
+String myPanId = panId("gateway");
+String myExtendedPanId = extendedPanId("gateway");
+
+
+// The DIDO Report will be of the form:
+// [DIDO_Header] + [TlvHeader1] + [TlvData1] + ... + [TlvHeaderN ] + [TlvDataN]
+
+// DIDO HEADER:
+// [ReportId* (1)] + [MagicNumber (8)] + [Version (1)]
+//
+didoHeader = getDidoHeader();
+
+// TLV HEADER
+// [TlvType (2)] + [TlvLength (2)]
+//   The TlvLength is the size of the TlvData
+int TLV_TYPE_CRC         = 0;
+int TLV_TYPE_LOG_DATA    = 1;
+int TLV_TYPE_STACK_TRACE = 2;
+int TLV_TYPE_EMBER_COUNTERS = 3;
+int TLV_TYPE_NMV3_STATS  = 4;
+int TLV_TYPE_VERSION     = 5;
+
+//String getTlvHeader( int type, String tlvData );
+
+/********************** EVENT LOG_TLV RECORD **********************/
+// EVENT_LOG_HEADER + EVENT_LOG_ENTRIES
+// [BootCount (4)] + [NumEntries (2)] + [LoggerVersion (1)]
+// String getEventLogDataHeader( int bootCount, int numEntries, int loggerVersion );
+
+logDataHeader = getEventLogDataHeader( 1, NUM_EXPECTED_TEST_EVENTS, 1 );
+logDataEvents = getEventLogData( myChannel, myPanId, myExtendedPanId );
+tlvData = logDataHeader + " " + logDataEvents;
+logDataTlvHeader = getTlvHeader( TLV_TYPE_LOG_DATA, tlvData );
+logData = logDataTlvHeader + " " + logDataHeader + " " + logDataEvents;
+
+
+/********************** EMBER_COUNTERS TLV RECORD **********************/
+// EMBER_COUNTERS
+// [Counter0Id (2)] + [Counter0Data (1)] + ... + [CounterNId (2)] + [CounterNData (1)]
+// String getCountersData(void);
+int NUMBER_EMBER_COUNTERS = 41;
+counters = getCountersData( NUMBER_EMBER_COUNTERS );
+countersTlvHeader = getTlvHeader( TLV_TYPE_EMBER_COUNTERS, counters );
+countersData = countersTlvHeader + " " + counters;
+
+
+/********************** VERSION TLV RECORD **********************/
+// [StackId(1)] + [StackVersion(2)] + [VersionType(1)] +
+// [CustomerVersion(2)] + [BootloaderType(1)] + [BootloaderVersion(2)]
+versionData = getVersionData();
+versionTlvHeader = getTlvHeader( TLV_TYPE_VERSION, versionData );
+versionData = versionTlvHeader + " " + versionData;
+
+
+/********************** CRC TLV RECORD **********************/
+// [Crc(4)]
+crcData = getCrcData();
+crcTlvHeader = getTlvHeader( TLV_TYPE_CRC, crcData );
+crcData = crcTlvHeader + " " + crcData;
+
+// Construct the expected match string.
+expectStr = didoHeader + " " + logData + " " + countersData + " " + versionData +
+            " " + crcData + ".*";
+testQueryDebugReport("doorlock", expectStr, reportId);
+
+expect("gateway",
+       "plugin network-creator-security open-network",
+       "NWK Creator Security: Open network: 0x00");
+networkWait(2000);
+
+expect("light",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP 0x....",
+       30000);
+networkWait(10000);
+
+expect("sleepy-doorlock",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP 0x....",
+       30000);
+networkWait(10000);
+
+// Log data for the Light and SleepyDoorLock will be different
+// compared to the door lock so that has been regexed here.
+expectStr = didoHeader + " " + ".*" + " " + countersData + " " + versionData +
+            " " + crcData + ".*";
+testQueryDebugReport("light", expectStr, reportId);
+testQueryDebugReport("sleepy-doorlock", expectStr, reportId);

@@ -1,0 +1,13 @@
+/** @brief Device Removed
+ *
+ * This callback is called by the plugin when a device is removed from the
+ * device log.
+ *
+ * @param deviceId Identifier of the device removed Ver.: always
+ */
+void emberAfPluginGbcsDeviceLogDeviceRemovedCallback(EmberEUI64 deviceId)
+{
+  emberAfAppPrint("GBCS emberAfPluginGbcsDeviceLogDeviceRemovedCallback: EUI64=");
+  emberAfAppDebugExec(emberAfPrintBigEndianEui64(deviceId));
+  emberAfAppPrintln("");
+}

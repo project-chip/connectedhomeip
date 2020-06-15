@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-smart-energy-registration" name="Plugin Commands: Smart Energy Registration">
+    <description>
+      The Smart Energy Registration plugin contributes several CLI commands to the application framework to be used in managing registration.
+    </description>
+  </group>
+  <command cli="plugin smart-energy-registration set-period" functionName="setRegistrationDelayPeriod" group="plugin-smart-energy-registration">
+    <description>
+      Sets the discovery period (in seconds)
+    </description>
+    <arg name="discoveryPeriod" type="INT32U" description="The discovery period (in seconds)." />
+  </command>
+</cli>

@@ -1,0 +1,129 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"bridge", "light", "switch"};
+String[] socImages = new String[] {
+  "build/af-test-apps/ZllControlBridgeZ3-simulation/ZllControlBridgeZ3",
+  "build/af-test-apps/Z3Light-simulation/Z3Light",
+  "build/af-test-apps/Z3Switch-simulation/Z3Switch",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/ZllControlBridgeZ3-simulation-ezsp/ZllControlBridgeZ3",
+  "build/af-test-apps/Z3Light-simulation-ezsp/Z3Light",
+  "build/af-test-apps/Z3Switch-simulation-ezsp/Z3Switch",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+lazyExpect = true;
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices,
+                  socImages,
+                  hostImages,
+                  ncpImage);
+setupEncryption();
+
+// The light will perform network steering on boot. Since there are no
+// other networks to join, it will form its own distributed network. As soon as
+// it does so, it will also start identifying as a find and bind target.
+// The light will initialize its ZLL security on network formation.
+expect("light", "Form distributed network complete: 0x00",  30000);
+expect("light", "Find and bind target start: 0x00", DEFAULT_TIMEOUT << 5);
+
+// The short address of the light should not be 0.
+assert(!nodeId("light").equals("0x0000"));
+
+// Touch link the network with the switch as an initiator.
+network.pressButton("switch", "1");
+network.releaseButton("switch", "1");
+expect("switch", "Touchlink network start: 0x00");
+expect("light", "EMBER_NETWORK_UP", DEFAULT_TIMEOUT << 2); // allow for sec ch scan
+expect("switch", "EMBER_NETWORK_UP", DEFAULT_TIMEOUT << 2);
+
+// The switch should perform finding and binding for an initiator.
+expect("switch", "Find and bind initiator start: 0x00");
+expect("switch", "Find and bind initiator complete: 0x00");
+expect("switch",
+       "option binding-table print",
+       "UNICA.*0x0006.*" + nodeId("light"));
+
+//EMZIGBEE-3619, EMZIGBEE-3620  
+expect("switch",
+       "zdo route " + nodeId("light") + " 0",
+       ".*RX: ZDO, command 0x8032, status: 0x00");
+
+expect("light",
+       "zdo route " + nodeId("switch") + " 0",
+       ".*RX: ZDO, command 0x8032, status: 0x84");
+
+
+// We should be able to turn the light ON...
+send("switch", "zcl on-off on");
+send("switch", "bsend 1");
+networkWait(1000); // wait
+expect("light", "read 1 6 0 1", "^01 $");
+
+// ...and we should be able to turn the light OFF.
+send("switch", "zcl on-off off");
+send("switch", "bsend 1");
+networkWait(1000); // wait
+expect("light", "read 1 6 0 1", "^00 $");
+
+// -----------------------------------------------------------------------------
+// EMAPPFWKV2-1477 - per the BDB, factory new router initiator devices should
+// form a network before touchlinking with a target.
+
+send("bridge", "plugin zll-commissioning link");
+
+// The bridge will bring up a network with a node ID 0x0001, since it is just
+// starting a new network.
+expect("bridge", "EMBER_NETWORK_UP 0x0001", DEFAULT_TIMEOUT << 3);
+
+// The bridge should touchlink with the light. The light should get address
+// 0x0002 since the bridge reset its address assignment stuff before it issued
+// the network join request.
+expect("light", "EMBER_NETWORK_UP 0x0002");
+expect("bridge", "Touch link with 0x0002 \\(\\(>\\)" + eui64("light") + "\\) complete", DEFAULT_TIMEOUT << 1);
+
+// The bridge's ZLL tokens should reflect the initialization made when it
+// brought up its network, bearing in mind that node id's 0x0001 and 0x0002
+// are now spoken for.
+expectMultiline("bridge", 
+                "plugin zll-commissioning status",
+                new String[] {
+                "Primary channels: 11, 15, 20, 25 \\(0x02108800\\)",
+                "Secondary channels: 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26 \\(0x05EF7000\\)",
+                "ZLL Tokens",
+                "Bitmask: 0x00000092",  // initiator bit now s
+                "Free Node IDs,  Min: 0x0003, Max: 0xFFF7",
+                "Free Group IDs, Min: 0x0001, Max: 0xFEFF",
+                "My Group ID Min: 0x0000",
+                "RSSI Correction: 0",
+                "Security Bitmask: 0x00000000",
+                "Security Key Index: 15",
+                "Security Encryption Key: C0 C1 C2 C3 C4 C5 C6 C7  C8 C9 CA CB CC CD CE CF  "
+                });
+
+// The Z3Light is not address assignment capable, so most of its min/max values
+// should be 0. It's group ID min should be 0 because the Z3Light has its
+// EMBER_ZLL_GROUP_ADDRESSES set to that.
+expectMultiline("light",
+                "plugin zll-commissioning status",
+                new String[] {
+                "Primary channels: 11, 15, 20, 25 \\(0x02108800\\)",
+                "Secondary channels: 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26 \\(0x05EF7000\\)",
+                "ZLL Tokens",
+                "Bitmask: 0x00000080",
+                "Free Node IDs,  Min: 0x0000, Max: 0x0000",
+                "Free Group IDs, Min: 0x0000, Max: 0x0000",
+                "My Group ID Min: 0x0000",
+                "RSSI Correction: 0",
+                "Security Bitmask: 0x00000000",
+                "Security Key Index: 15",
+                "Security Encryption Key: C0 C1 C2 C3 C4 C5 C6 C7  C8 C9 CA CB CC CD CE CF  "
+                });
+
+// EMAPPFWKV2-1477
+// -----------------------------------------------------------------------------

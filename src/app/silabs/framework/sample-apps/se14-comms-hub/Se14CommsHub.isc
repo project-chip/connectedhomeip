@@ -1,0 +1,1199 @@
+#ISD afv6
+# Simplicity Studio version: 5.16.1.qualifier
+
+FrameworkDirectory:app/framework
+
+appId: znet
+frameworkVariant: simulation
+GenerationDirectory:__SAMPLE_APPLICATION__
+
+DeviceName:Se14CommsHub
+
+Host:atmega32
+
+Platform:simulation
+
+
+# Setup configurations
+{setupId:additionalFiles
+}
+{setupId:boardHeader
+allowMissingHeader:false
+useHeaderInPlace:false
+}
+{setupId:bookkeeping
+}
+{setupId:bootloader
+}
+{setupId:callbackConfiguration
+}
+{setupId:commandLineConfiguration
+on
+}
+{setupId:debugConfiguration
+on
+area name off
+appSerial=1
+compile,CALENDAR_CLUSTER
+compile,EVENTS_CLUSTER
+compile,KEY_ESTABLISHMENT_CLUSTER
+compile,MESSAGING_CLUSTER
+compile,PRICE_CLUSTER
+compile,SIMPLE_METERING_CLUSTER
+compile,TUNNELING_CLUSTER
+enable,CALENDAR_CLUSTER
+enable,DEBUG
+enable,EVENTS_CLUSTER
+enable,KEY_ESTABLISHMENT_CLUSTER
+enable,MESSAGING_CLUSTER
+enable,PRICE_CLUSTER
+enable,SIMPLE_METERING_CLUSTER
+enable,TUNNELING_CLUSTER
+}
+{setupId:eventConfiguration
+}
+{setupId:halOptions
+}
+{setupId:hwConfig
+featureLevel=1
+active=true
+}
+{setupId:information
+}
+{setupId:macros
+-DEMBER_RETRY_QUEUE_SIZE=20
+}
+{setupId:pluginService
+}
+{setupId:quizz
+}
+{setupId:serial
+}
+{setupId:template
+--version:2
+--backupValues:
+simeepromSize=8192
+headerSize=256
+}
+{setupId:token
+}
+{setupId:zclAfv2
+intMap:ManufacturingCode = 4098
+intMap:ReportTableSize = 5
+intMap:Endpoint = 10
+intMap:DeviceVersion = 0
+intMap:DefaultDestinationEndpoint = 10
+intMap:ProfileId = -1
+intMap:DeviceId = -1
+intMap:DefaultResponsePolicy = 0
+boolMap:EnableStandardReporting = false
+boolMap:EnableInterPanSend = false
+boolMap:EnableInterPanReceive = false
+boolMap:SupportCommandDiscovery = true
+boolMap:EnableKeySwitch = false
+boolMap:LowRamConcentrator = true
+boolMap:EnableAttributeRangeChecking = false
+boolMap:ReceiveSupportedZdoRequests = false
+boolMap:HandleUnsupportedZdoRequests = false
+boolMap:HandleEndpointZdoRequests = false
+boolMap:HandleBindingZdoRequests = false
+boolMap:LegacyCli = false
+boolMap:AddCustomCli = false
+boolMap:IncludeCommandDescriptions = false
+boolMap:GenerateCallbacksFile = false
+boolMap:ManufacturerCodeDefaultIsZero = true
+beginAttrList:OPTIONAL
+  cl:0x0708, at:0x0100, di:server, mf:0x0000
+  cl:0x0708, at:0x0101, di:server, mf:0x0000
+  cl:0x0708, at:0x0102, di:server, mf:0x0000
+  cl:0x0708, at:0x0110, di:server, mf:0x0000
+  cl:0x0708, at:0x0111, di:server, mf:0x0000
+  cl:0x0708, at:0x0112, di:server, mf:0x0000
+  cl:0x0708, at:0x0113, di:server, mf:0x0000
+  cl:0x0708, at:0x0120, di:server, mf:0x0000
+  cl:0x0708, at:0x0121, di:server, mf:0x0000
+  cl:0x0708, at:0x0122, di:server, mf:0x0000
+  cl:0x0708, at:0x0130, di:server, mf:0x0000
+  cl:0x0708, at:0x0131, di:server, mf:0x0000
+  cl:0x0708, at:0x0132, di:server, mf:0x0000
+  cl:0x0708, at:0x0133, di:server, mf:0x0000
+  cl:0x0708, at:0x0200, di:server, mf:0x0000
+  cl:0x0708, at:0x0201, di:server, mf:0x0000
+  cl:0x0708, at:0x0300, di:server, mf:0x0000
+  cl:0x0708, at:0x0400, di:server, mf:0x0000
+  cl:0x0708, at:0x0401, di:server, mf:0x0000
+  cl:0x0708, at:0x0000, di:client, mf:0x0000
+  cl:0x0708, at:0x0010, di:client, mf:0x0000
+  cl:0x0708, at:0x0100, di:client, mf:0x0000
+  cl:0x0708, at:0x0101, di:client, mf:0x0000
+  cl:0x0708, at:0x0102, di:client, mf:0x0000
+  cl:0x0708, at:0x0103, di:client, mf:0x0000
+  cl:0x0708, at:0x0104, di:client, mf:0x0000
+  cl:0x0708, at:0x0105, di:client, mf:0x0000
+  cl:0x0708, at:0x0106, di:client, mf:0x0000
+  cl:0x0708, at:0x0107, di:client, mf:0x0000
+  cl:0x0708, at:0x0108, di:client, mf:0x0000
+  cl:0x0708, at:0x0109, di:client, mf:0x0000
+  cl:0x0708, at:0x010A, di:client, mf:0x0000
+  cl:0x0708, at:0x010B, di:client, mf:0x0000
+  cl:0x0708, at:0x010C, di:client, mf:0x0000
+  cl:0x0708, at:0x010D, di:client, mf:0x0000
+  cl:0x0708, at:0x01B0, di:client, mf:0x0000
+  cl:0x0708, at:0x01B1, di:client, mf:0x0000
+  cl:0x0708, at:0x01B2, di:client, mf:0x0000
+  cl:0x0708, at:0x01B3, di:client, mf:0x0000
+  cl:0x0708, at:0x01B4, di:client, mf:0x0000
+  cl:0x0708, at:0x01B5, di:client, mf:0x0000
+  cl:0x0708, at:0x01B6, di:client, mf:0x0000
+  cl:0x0708, at:0x01B7, di:client, mf:0x0000
+  cl:0x0708, at:0x01B8, di:client, mf:0x0000
+  cl:0x0708, at:0x01B9, di:client, mf:0x0000
+  cl:0x0708, at:0x01BA, di:client, mf:0x0000
+  cl:0x0708, at:0x01BB, di:client, mf:0x0000
+  cl:0x0708, at:0x01BC, di:client, mf:0x0000
+  cl:0x0708, at:0x01BD, di:client, mf:0x0000
+  cl:0x0708, at:0x01BE, di:client, mf:0x0000
+  cl:0x0708, at:0x01BF, di:client, mf:0x0000
+  cl:0x0708, at:0x01C0, di:client, mf:0x0000
+  cl:0x0708, at:0x01C1, di:client, mf:0x0000
+  cl:0x0708, at:0x01C2, di:client, mf:0x0000
+  cl:0x0708, at:0x01C3, di:client, mf:0x0000
+  cl:0x0708, at:0x01C4, di:client, mf:0x0000
+  cl:0x0708, at:0x01C5, di:client, mf:0x0000
+  cl:0x0708, at:0x01C6, di:client, mf:0x0000
+  cl:0x0708, at:0x01C7, di:client, mf:0x0000
+  cl:0x0708, at:0x01C8, di:client, mf:0x0000
+  cl:0x0708, at:0x01C9, di:client, mf:0x0000
+  cl:0x0708, at:0x01CA, di:client, mf:0x0000
+  cl:0x0708, at:0x01CB, di:client, mf:0x0000
+  cl:0x0708, at:0x01CC, di:client, mf:0x0000
+  cl:0x0708, at:0x01CD, di:client, mf:0x0000
+  cl:0x0708, at:0x01CE, di:client, mf:0x0000
+  cl:0x0708, at:0x01CF, di:client, mf:0x0000
+  cl:0x0708, at:0x01D0, di:client, mf:0x0000
+  cl:0x0708, at:0x01D1, di:client, mf:0x0000
+  cl:0x0708, at:0x01D2, di:client, mf:0x0000
+  cl:0x0708, at:0x01D3, di:client, mf:0x0000
+  cl:0x0708, at:0x01D4, di:client, mf:0x0000
+  cl:0x0708, at:0x01D5, di:client, mf:0x0000
+  cl:0x0708, at:0x01D6, di:client, mf:0x0000
+  cl:0x0708, at:0x01D7, di:client, mf:0x0000
+  cl:0x0708, at:0x01D8, di:client, mf:0x0000
+  cl:0x0708, at:0x01D9, di:client, mf:0x0000
+  cl:0x0708, at:0x01DA, di:client, mf:0x0000
+  cl:0x0708, at:0x01DB, di:client, mf:0x0000
+  cl:0x0708, at:0x01DC, di:client, mf:0x0000
+  cl:0x0708, at:0x01DD, di:client, mf:0x0000
+  cl:0x0708, at:0x01DE, di:client, mf:0x0000
+  cl:0x0708, at:0x01DF, di:client, mf:0x0000
+  cl:0x0708, at:0x01E0, di:client, mf:0x0000
+  cl:0x0708, at:0x01E1, di:client, mf:0x0000
+  cl:0x0708, at:0x01E2, di:client, mf:0x0000
+  cl:0x0708, at:0x01E3, di:client, mf:0x0000
+  cl:0x0708, at:0x01E4, di:client, mf:0x0000
+  cl:0x0708, at:0x01E5, di:client, mf:0x0000
+  cl:0x0708, at:0x01E6, di:client, mf:0x0000
+  cl:0x0708, at:0x01E7, di:client, mf:0x0000
+  cl:0x0708, at:0x0200, di:client, mf:0x0000
+  cl:0x0708, at:0x0201, di:client, mf:0x0000
+  cl:0x0708, at:0x0202, di:client, mf:0x0000
+  cl:0x0708, at:0x0203, di:client, mf:0x0000
+  cl:0x0708, at:0x0204, di:client, mf:0x0000
+  cl:0x0708, at:0x0205, di:client, mf:0x0000
+  cl:0x0708, at:0x0206, di:client, mf:0x0000
+  cl:0x0708, at:0x0207, di:client, mf:0x0000
+  cl:0x0708, at:0x0208, di:client, mf:0x0000
+  cl:0x0708, at:0x0209, di:client, mf:0x0000
+  cl:0x0708, at:0x020A, di:client, mf:0x0000
+  cl:0x0708, at:0x020B, di:client, mf:0x0000
+  cl:0x0708, at:0x020C, di:client, mf:0x0000
+  cl:0x0708, at:0x020D, di:client, mf:0x0000
+  cl:0x0708, at:0x020E, di:client, mf:0x0000
+  cl:0x0708, at:0x020F, di:client, mf:0x0000
+  cl:0x0708, at:0x0210, di:client, mf:0x0000
+  cl:0x0708, at:0x0211, di:client, mf:0x0000
+  cl:0x0708, at:0x0212, di:client, mf:0x0000
+  cl:0x0708, at:0x0213, di:client, mf:0x0000
+  cl:0x0708, at:0x0214, di:client, mf:0x0000
+  cl:0x0708, at:0x0215, di:client, mf:0x0000
+  cl:0x0708, at:0x0216, di:client, mf:0x0000
+  cl:0x0708, at:0x0217, di:client, mf:0x0000
+  cl:0x0708, at:0x0218, di:client, mf:0x0000
+  cl:0x0708, at:0x0219, di:client, mf:0x0000
+  cl:0x0708, at:0x021A, di:client, mf:0x0000
+  cl:0x0708, at:0x021B, di:client, mf:0x0000
+  cl:0x0708, at:0x021C, di:client, mf:0x0000
+  cl:0x0708, at:0x021D, di:client, mf:0x0000
+  cl:0x0708, at:0x021E, di:client, mf:0x0000
+  cl:0x0708, at:0x021F, di:client, mf:0x0000
+  cl:0x0708, at:0x0220, di:client, mf:0x0000
+  cl:0x0708, at:0x0221, di:client, mf:0x0000
+  cl:0x0708, at:0x0222, di:client, mf:0x0000
+  cl:0x0708, at:0x0223, di:client, mf:0x0000
+  cl:0x0708, at:0x0224, di:client, mf:0x0000
+  cl:0x0708, at:0x0225, di:client, mf:0x0000
+  cl:0x0708, at:0x0226, di:client, mf:0x0000
+  cl:0x0708, at:0x0227, di:client, mf:0x0000
+  cl:0x0708, at:0x0228, di:client, mf:0x0000
+  cl:0x0708, at:0x0229, di:client, mf:0x0000
+  cl:0x0708, at:0x0230, di:client, mf:0x0000
+  cl:0x0708, at:0x0231, di:client, mf:0x0000
+  cl:0x0708, at:0x0232, di:client, mf:0x0000
+  cl:0x0708, at:0x0233, di:client, mf:0x0000
+  cl:0x0708, at:0x0234, di:client, mf:0x0000
+  cl:0x0708, at:0x0235, di:client, mf:0x0000
+  cl:0x0708, at:0x0236, di:client, mf:0x0000
+  cl:0x0708, at:0x0237, di:client, mf:0x0000
+  cl:0x0708, at:0x0250, di:client, mf:0x0000
+  cl:0x0708, at:0x0251, di:client, mf:0x0000
+  cl:0x0708, at:0x0260, di:client, mf:0x0000
+  cl:0x0708, at:0x0261, di:client, mf:0x0000
+  cl:0x0708, at:0x0262, di:client, mf:0x0000
+  cl:0x0708, at:0x0263, di:client, mf:0x0000
+  cl:0x0708, at:0x0264, di:client, mf:0x0000
+  cl:0x0708, at:0x0265, di:client, mf:0x0000
+  cl:0x0708, at:0x0270, di:client, mf:0x0000
+  cl:0x0708, at:0x0271, di:client, mf:0x0000
+  cl:0x0708, at:0x0272, di:client, mf:0x0000
+  cl:0x0708, at:0x0273, di:client, mf:0x0000
+  cl:0x0708, at:0x0274, di:client, mf:0x0000
+  cl:0x0708, at:0x0275, di:client, mf:0x0000
+  cl:0x0708, at:0x0276, di:client, mf:0x0000
+  cl:0x0708, at:0x0277, di:client, mf:0x0000
+  cl:0x0708, at:0x0278, di:client, mf:0x0000
+  cl:0x0708, at:0x0279, di:client, mf:0x0000
+  cl:0x0708, at:0x027A, di:client, mf:0x0000
+  cl:0x0708, at:0x027B, di:client, mf:0x0000
+  cl:0x0708, at:0x027C, di:client, mf:0x0000
+  cl:0x0708, at:0x027D, di:client, mf:0x0000
+  cl:0x0708, at:0x027E, di:client, mf:0x0000
+  cl:0x0708, at:0x027F, di:client, mf:0x0000
+  cl:0x0708, at:0x0280, di:client, mf:0x0000
+  cl:0x0708, at:0x0281, di:client, mf:0x0000
+  cl:0x0708, at:0x0282, di:client, mf:0x0000
+  cl:0x0708, at:0x0283, di:client, mf:0x0000
+  cl:0x0708, at:0x0284, di:client, mf:0x0000
+  cl:0x0708, at:0x0285, di:client, mf:0x0000
+  cl:0x0708, at:0x0286, di:client, mf:0x0000
+  cl:0x0708, at:0x0287, di:client, mf:0x0000
+  cl:0x0708, at:0x0288, di:client, mf:0x0000
+  cl:0x0708, at:0x0289, di:client, mf:0x0000
+  cl:0x0708, at:0x028A, di:client, mf:0x0000
+  cl:0x0708, at:0x028B, di:client, mf:0x0000
+  cl:0x0708, at:0x028C, di:client, mf:0x0000
+  cl:0x0708, at:0x028D, di:client, mf:0x0000
+  cl:0x0708, at:0x028E, di:client, mf:0x0000
+  cl:0x0708, at:0x028F, di:client, mf:0x0000
+  cl:0x0708, at:0x0290, di:client, mf:0x0000
+  cl:0x0708, at:0x0291, di:client, mf:0x0000
+  cl:0x0708, at:0x0292, di:client, mf:0x0000
+  cl:0x0708, at:0x0293, di:client, mf:0x0000
+  cl:0x0708, at:0x0294, di:client, mf:0x0000
+  cl:0x0708, at:0x0295, di:client, mf:0x0000
+  cl:0x0708, at:0x0296, di:client, mf:0x0000
+  cl:0x0708, at:0x0297, di:client, mf:0x0000
+  cl:0x0708, at:0x0298, di:client, mf:0x0000
+  cl:0x0708, at:0x0299, di:client, mf:0x0000
+  cl:0x0708, at:0x029A, di:client, mf:0x0000
+  cl:0x0708, at:0x029B, di:client, mf:0x0000
+  cl:0x0708, at:0x029C, di:client, mf:0x0000
+  cl:0x0708, at:0x029D, di:client, mf:0x0000
+  cl:0x0708, at:0x029E, di:client, mf:0x0000
+  cl:0x0708, at:0x029F, di:client, mf:0x0000
+  cl:0x0708, at:0x02B0, di:client, mf:0x0000
+  cl:0x0708, at:0x02B1, di:client, mf:0x0000
+  cl:0x0708, at:0x02B2, di:client, mf:0x0000
+  cl:0x0708, at:0x02B3, di:client, mf:0x0000
+  cl:0x0708, at:0x02B4, di:client, mf:0x0000
+  cl:0x0708, at:0x02B5, di:client, mf:0x0000
+  cl:0x0708, at:0x02B6, di:client, mf:0x0000
+  cl:0x0708, at:0x02B7, di:client, mf:0x0000
+  cl:0x0708, at:0x02B8, di:client, mf:0x0000
+  cl:0x0708, at:0x02C0, di:client, mf:0x0000
+  cl:0x0708, at:0x02C1, di:client, mf:0x0000
+  cl:0x0708, at:0x02C2, di:client, mf:0x0000
+  cl:0x0708, at:0x02C3, di:client, mf:0x0000
+  cl:0x0708, at:0x02C4, di:client, mf:0x0000
+  cl:0x0708, at:0x02C5, di:client, mf:0x0000
+  cl:0x0708, at:0x02C6, di:client, mf:0x0000
+  cl:0x0708, at:0x02C7, di:client, mf:0x0000
+  cl:0x0708, at:0x02C8, di:client, mf:0x0000
+  cl:0x0708, at:0x02C9, di:client, mf:0x0000
+  cl:0x0708, at:0x02CA, di:client, mf:0x0000
+  cl:0x0708, at:0x02CB, di:client, mf:0x0000
+  cl:0x0708, at:0x02CC, di:client, mf:0x0000
+  cl:0x0708, at:0x02CD, di:client, mf:0x0000
+  cl:0x0708, at:0x02CE, di:client, mf:0x0000
+  cl:0x0708, at:0x02CF, di:client, mf:0x0000
+  cl:0x0708, at:0x02D0, di:client, mf:0x0000
+  cl:0x0708, at:0x02D1, di:client, mf:0x0000
+  cl:0x0708, at:0x02D2, di:client, mf:0x0000
+  cl:0x0708, at:0x02D3, di:client, mf:0x0000
+  cl:0x0708, at:0x02D4, di:client, mf:0x0000
+  cl:0x0708, at:0x02D5, di:client, mf:0x0000
+  cl:0x0708, at:0x02D6, di:client, mf:0x0000
+  cl:0x0708, at:0x02D7, di:client, mf:0x0000
+  cl:0x0708, at:0x02D8, di:client, mf:0x0000
+  cl:0x0708, at:0x02D9, di:client, mf:0x0000
+  cl:0x0708, at:0x02DA, di:client, mf:0x0000
+  cl:0x0708, at:0x02DB, di:client, mf:0x0000
+  cl:0x0708, at:0x02DC, di:client, mf:0x0000
+  cl:0x0708, at:0x02DD, di:client, mf:0x0000
+  cl:0x0708, at:0x02DE, di:client, mf:0x0000
+  cl:0x0708, at:0x02DF, di:client, mf:0x0000
+  cl:0x0708, at:0x02E0, di:client, mf:0x0000
+  cl:0x0708, at:0x02E1, di:client, mf:0x0000
+  cl:0x0708, at:0x02E2, di:client, mf:0x0000
+  cl:0x0708, at:0x02E3, di:client, mf:0x0000
+  cl:0x0708, at:0x02E4, di:client, mf:0x0000
+  cl:0x0708, at:0x02E5, di:client, mf:0x0000
+  cl:0x0708, at:0x02E6, di:client, mf:0x0000
+  cl:0x0708, at:0x02E7, di:client, mf:0x0000
+  cl:0x0708, at:0x02E8, di:client, mf:0x0000
+  cl:0x0708, at:0x02E9, di:client, mf:0x0000
+  cl:0x0708, at:0x02EA, di:client, mf:0x0000
+  cl:0x0708, at:0x02EB, di:client, mf:0x0000
+  cl:0x0708, at:0x02EC, di:client, mf:0x0000
+  cl:0x0708, at:0x02ED, di:client, mf:0x0000
+  cl:0x0708, at:0x02EE, di:client, mf:0x0000
+  cl:0x0708, at:0x02EF, di:client, mf:0x0000
+  cl:0x0708, at:0x02F0, di:client, mf:0x0000
+  cl:0x0708, at:0x02F1, di:client, mf:0x0000
+  cl:0x0708, at:0x02F2, di:client, mf:0x0000
+  cl:0x0708, at:0x02F3, di:client, mf:0x0000
+  cl:0x0708, at:0x02F4, di:client, mf:0x0000
+  cl:0x0708, at:0x02F5, di:client, mf:0x0000
+  cl:0x0708, at:0x02F6, di:client, mf:0x0000
+  cl:0x0708, at:0x02F7, di:client, mf:0x0000
+  cl:0x0708, at:0x02F8, di:client, mf:0x0000
+  cl:0x0708, at:0x02F9, di:client, mf:0x0000
+  cl:0x0708, at:0x0300, di:client, mf:0x0000
+  cl:0x0708, at:0x03C0, di:client, mf:0x0000
+  cl:0x0708, at:0x03C1, di:client, mf:0x0000
+  cl:0x0708, at:0x03C2, di:client, mf:0x0000
+  cl:0x0708, at:0x03C3, di:client, mf:0x0000
+  cl:0x0708, at:0x03C4, di:client, mf:0x0000
+  cl:0x0708, at:0x03C5, di:client, mf:0x0000
+  cl:0x0708, at:0x03C6, di:client, mf:0x0000
+  cl:0x0708, at:0x03C7, di:client, mf:0x0000
+  cl:0x0708, at:0x0400, di:client, mf:0x0000
+  cl:0x0708, at:0x0401, di:client, mf:0x0000
+  cl:0x0708, at:0x0402, di:client, mf:0x0000
+  cl:0x0708, at:0x0403, di:client, mf:0x0000
+  cl:0x0708, at:0x0404, di:client, mf:0x0000
+  cl:0x0708, at:0x0405, di:client, mf:0x0000
+  cl:0x0708, at:0x0420, di:client, mf:0x0000
+  cl:0x0708, at:0x0421, di:client, mf:0x0000
+  cl:0x0708, at:0x0422, di:client, mf:0x0000
+  cl:0x0708, at:0x0423, di:client, mf:0x0000
+  cl:0x0708, at:0x0424, di:client, mf:0x0000
+  cl:0x0708, at:0x0425, di:client, mf:0x0000
+  cl:0x0708, at:0x0426, di:client, mf:0x0000
+  cl:0x0708, at:0x0427, di:client, mf:0x0000
+  cl:0x0708, at:0x0428, di:client, mf:0x0000
+  cl:0x0708, at:0x0429, di:client, mf:0x0000
+  cl:0x0708, at:0x042A, di:client, mf:0x0000
+  cl:0x0708, at:0x042B, di:client, mf:0x0000
+  cl:0x0708, at:0x042C, di:client, mf:0x0000
+  cl:0x0708, at:0x042D, di:client, mf:0x0000
+  cl:0x0708, at:0x042E, di:client, mf:0x0000
+  cl:0x0708, at:0x042F, di:client, mf:0x0000
+  cl:0x0708, at:0x0430, di:client, mf:0x0000
+  cl:0x0708, at:0x0431, di:client, mf:0x0000
+  cl:0x0708, at:0x0432, di:client, mf:0x0000
+  cl:0x0708, at:0x0433, di:client, mf:0x0000
+  cl:0x0708, at:0x0441, di:client, mf:0x0000
+  cl:0x0708, at:0x0442, di:client, mf:0x0000
+  cl:0x0708, at:0x0443, di:client, mf:0x0000
+  cl:0x0708, at:0x04C0, di:client, mf:0x0000
+  cl:0x0708, at:0x04C1, di:client, mf:0x0000
+  cl:0x0708, at:0x04C2, di:client, mf:0x0000
+  cl:0x0708, at:0x04C3, di:client, mf:0x0000
+  cl:0x0708, at:0x04C4, di:client, mf:0x0000
+  cl:0x0708, at:0x04C5, di:client, mf:0x0000
+  cl:0x0708, at:0x04C6, di:client, mf:0x0000
+  cl:0x0708, at:0x04C7, di:client, mf:0x0000
+  cl:0x0708, at:0x04C8, di:client, mf:0x0000
+  cl:0x0708, at:0x04C9, di:client, mf:0x0000
+  cl:0x0708, at:0x04CA, di:client, mf:0x0000
+  cl:0x0708, at:0x04CB, di:client, mf:0x0000
+  cl:0x0708, at:0x04CC, di:client, mf:0x0000
+  cl:0x0708, at:0x04CD, di:client, mf:0x0000
+  cl:0x0708, at:0x04CE, di:client, mf:0x0000
+  cl:0x0708, at:0x04CF, di:client, mf:0x0000
+  cl:0x0708, at:0x04D0, di:client, mf:0x0000
+  cl:0x0708, at:0x04D1, di:client, mf:0x0000
+  cl:0x0708, at:0x04D2, di:client, mf:0x0000
+  cl:0x0708, at:0x04D3, di:client, mf:0x0000
+  cl:0x0708, at:0x04D4, di:client, mf:0x0000
+  cl:0x0708, at:0x04D5, di:client, mf:0x0000
+  cl:0x0708, at:0x04D6, di:client, mf:0x0000
+  cl:0x0708, at:0x04D7, di:client, mf:0x0000
+  cl:0x0708, at:0x04D8, di:client, mf:0x0000
+  cl:0x0708, at:0x04D9, di:client, mf:0x0000
+  cl:0x0708, at:0x04DA, di:client, mf:0x0000
+  cl:0x0708, at:0x04DB, di:client, mf:0x0000
+  cl:0x0708, at:0x04DC, di:client, mf:0x0000
+  cl:0x0708, at:0x04DD, di:client, mf:0x0000
+  cl:0x0708, at:0x04DE, di:client, mf:0x0000
+  cl:0x0708, at:0x04DF, di:client, mf:0x0000
+  cl:0x0708, at:0x04E0, di:client, mf:0x0000
+  cl:0x0708, at:0x04E1, di:client, mf:0x0000
+  cl:0x0708, at:0x04E2, di:client, mf:0x0000
+  cl:0x0708, at:0x04E3, di:client, mf:0x0000
+  cl:0x0708, at:0x04E4, di:client, mf:0x0000
+  cl:0x0708, at:0x04E5, di:client, mf:0x0000
+  cl:0x0708, at:0x04E6, di:client, mf:0x0000
+  cl:0x0708, at:0x04E7, di:client, mf:0x0000
+  cl:0x0708, at:0x04E8, di:client, mf:0x0000
+  cl:0x0708, at:0x04E9, di:client, mf:0x0000
+  cl:0x0708, at:0x04EA, di:client, mf:0x0000
+  cl:0x0708, at:0x04EB, di:client, mf:0x0000
+  cl:0x0708, at:0x04EC, di:client, mf:0x0000
+  cl:0x0708, at:0x04ED, di:client, mf:0x0000
+  cl:0x0708, at:0x04EE, di:client, mf:0x0000
+  cl:0x0708, at:0x04EF, di:client, mf:0x0000
+  cl:0x0708, at:0x0500, di:client, mf:0x0000
+  cl:0x0708, at:0x0501, di:client, mf:0x0000
+  cl:0x0708, at:0x0502, di:client, mf:0x0000
+  cl:0x0708, at:0x05C0, di:client, mf:0x0000
+  cl:0x0708, at:0x05C1, di:client, mf:0x0000
+  cl:0x0708, at:0x05C2, di:client, mf:0x0000
+  cl:0x0708, at:0x05C3, di:client, mf:0x0000
+  cl:0x0708, at:0x05C4, di:client, mf:0x0000
+  cl:0x0708, at:0x05C5, di:client, mf:0x0000
+  cl:0x0708, at:0x05C6, di:client, mf:0x0000
+  cl:0x0708, at:0x05C7, di:client, mf:0x0000
+  cl:0x0708, at:0x05C8, di:client, mf:0x0000
+  cl:0x0708, at:0x05C9, di:client, mf:0x0000
+  cl:0x0708, at:0x05CA, di:client, mf:0x0000
+  cl:0x0708, at:0x05CB, di:client, mf:0x0000
+  cl:0x0708, at:0x05CC, di:client, mf:0x0000
+  cl:0x0708, at:0x05CD, di:client, mf:0x0000
+  cl:0x0708, at:0x05CE, di:client, mf:0x0000
+  cl:0x0708, at:0x05CF, di:client, mf:0x0000
+  cl:0x0708, at:0x05D0, di:client, mf:0x0000
+  cl:0x0708, at:0x05D1, di:client, mf:0x0000
+  cl:0x0708, at:0x05D2, di:client, mf:0x0000
+  cl:0x0708, at:0x05D3, di:client, mf:0x0000
+  cl:0x0708, at:0x0600, di:client, mf:0x0000
+  cl:0x0708, at:0x0601, di:client, mf:0x0000
+  cl:0x0708, at:0x0602, di:client, mf:0x0000
+  cl:0x0708, at:0x0603, di:client, mf:0x0000
+  cl:0x0708, at:0x0604, di:client, mf:0x0000
+  cl:0x0708, at:0x0610, di:client, mf:0x0000
+  cl:0x0708, at:0x0611, di:client, mf:0x0000
+  cl:0x0708, at:0x0612, di:client, mf:0x0000
+  cl:0x0708, at:0x0613, di:client, mf:0x0000
+  cl:0x0708, at:0x0614, di:client, mf:0x0000
+  cl:0x0708, at:0x0615, di:client, mf:0x0000
+  cl:0x0708, at:0x06C0, di:client, mf:0x0000
+  cl:0x0708, at:0x06C1, di:client, mf:0x0000
+  cl:0x0708, at:0x06C2, di:client, mf:0x0000
+  cl:0x0708, at:0x06C3, di:client, mf:0x0000
+  cl:0x0708, at:0x06C4, di:client, mf:0x0000
+  cl:0x0708, at:0x06C5, di:client, mf:0x0000
+  cl:0x0708, at:0x06C6, di:client, mf:0x0000
+  cl:0x0708, at:0x06C7, di:client, mf:0x0000
+  cl:0x0708, at:0x06C8, di:client, mf:0x0000
+  cl:0x0708, at:0x06C9, di:client, mf:0x0000
+  cl:0x0708, at:0x06CA, di:client, mf:0x0000
+  cl:0x0708, at:0x06CB, di:client, mf:0x0000
+  cl:0x0708, at:0x06CC, di:client, mf:0x0000
+  cl:0x0708, at:0x06CD, di:client, mf:0x0000
+  cl:0x0708, at:0x06CE, di:client, mf:0x0000
+  cl:0x0708, at:0x06CF, di:client, mf:0x0000
+  cl:0x0708, at:0x06D0, di:client, mf:0x0000
+  cl:0x0708, at:0x06D1, di:client, mf:0x0000
+  cl:0x0708, at:0x06D2, di:client, mf:0x0000
+  cl:0x0708, at:0x06D3, di:client, mf:0x0000
+  cl:0x0708, at:0x06D4, di:client, mf:0x0000
+  cl:0x0708, at:0x06D5, di:client, mf:0x0000
+  cl:0x0708, at:0x06D6, di:client, mf:0x0000
+  cl:0x0708, at:0x06D7, di:client, mf:0x0000
+  cl:0x0708, at:0x0700, di:client, mf:0x0000
+  cl:0x0708, at:0x0701, di:client, mf:0x0000
+  cl:0x0708, at:0x0702, di:client, mf:0x0000
+  cl:0x0708, at:0x07C0, di:client, mf:0x0000
+  cl:0x0708, at:0x07C1, di:client, mf:0x0000
+  cl:0x0708, at:0x07C2, di:client, mf:0x0000
+  cl:0x0708, at:0x07C3, di:client, mf:0x0000
+  cl:0x0708, at:0x07C4, di:client, mf:0x0000
+  cl:0x0708, at:0x07C5, di:client, mf:0x0000
+  cl:0x0708, at:0x07C6, di:client, mf:0x0000
+  cl:0x0708, at:0x07C7, di:client, mf:0x0000
+  cl:0x0708, at:0x07C8, di:client, mf:0x0000
+  cl:0x0708, at:0x07C9, di:client, mf:0x0000
+  cl:0x0708, at:0x07CA, di:client, mf:0x0000
+  cl:0x0708, at:0x07CB, di:client, mf:0x0000
+  cl:0x0708, at:0x07CC, di:client, mf:0x0000
+  cl:0x0708, at:0x07CD, di:client, mf:0x0000
+  cl:0x0708, at:0x07CE, di:client, mf:0x0000
+  cl:0x0708, at:0x07CF, di:client, mf:0x0000
+  cl:0x0708, at:0x07D0, di:client, mf:0x0000
+  cl:0x0708, at:0x07D1, di:client, mf:0x0000
+  cl:0x0708, at:0x07D2, di:client, mf:0x0000
+  cl:0x0708, at:0x07D3, di:client, mf:0x0000
+  cl:0x0708, at:0x07D4, di:client, mf:0x0000
+  cl:0x0708, at:0x0800, di:client, mf:0x0000
+  cl:0x0708, at:0x0801, di:client, mf:0x0000
+  cl:0x0708, at:0x0802, di:client, mf:0x0000
+  cl:0x0708, at:0x0803, di:client, mf:0x0000
+  cl:0x0708, at:0x0804, di:client, mf:0x0000
+  cl:0x0708, at:0x0805, di:client, mf:0x0000
+  cl:0x0708, at:0x08C0, di:client, mf:0x0000
+  cl:0x0708, at:0x08C1, di:client, mf:0x0000
+  cl:0x0708, at:0x08C2, di:client, mf:0x0000
+  cl:0x0708, at:0x08C3, di:client, mf:0x0000
+  cl:0x0708, at:0x08C4, di:client, mf:0x0000
+  cl:0x0708, at:0x08C5, di:client, mf:0x0000
+  cl:0x0708, at:0x08C6, di:client, mf:0x0000
+  cl:0x0708, at:0x08C7, di:client, mf:0x0000
+  cl:0x0708, at:0x08C8, di:client, mf:0x0000
+  cl:0x0708, at:0x08C9, di:client, mf:0x0000
+  cl:0x0708, at:0x08CA, di:client, mf:0x0000
+  cl:0x0708, at:0x08CB, di:client, mf:0x0000
+  cl:0x0708, at:0x08CC, di:client, mf:0x0000
+  cl:0x0708, at:0x08CD, di:client, mf:0x0000
+  cl:0x0708, at:0x08CE, di:client, mf:0x0000
+  cl:0x0702, at:0x0000, di:client, mf:0x0000
+  cl:0x0700, at:0x0304, di:server, mf:0x0000
+  cl:0x0700, at:0x0305, di:server, mf:0x0000
+  cl:0x0700, at:0x0306, di:server, mf:0x0000
+  cl:0x0700, at:0x0302, di:server, mf:0x0000
+  cl:0x0700, at:0x0303, di:server, mf:0x0000
+  cl:0x0702, at:0x0301, di:server, mf:0x0000
+  cl:0x0702, at:0x0302, di:server, mf:0x0000
+  cl:0x0702, at:0x0100, di:server, mf:0x0000
+  cl:0x0702, at:0x0102, di:server, mf:0x0000
+  cl:0x0702, at:0x0104, di:server, mf:0x0000
+  cl:0x0702, at:0x0106, di:server, mf:0x0000
+  cl:0x0702, at:0x0700, di:server, mf:0x0000
+  cl:0x0702, at:0x0701, di:server, mf:0x0000
+  cl:0x0702, at:0x0702, di:server, mf:0x0000
+  cl:0x0702, at:0x0703, di:server, mf:0x0000
+  cl:0x0700, at:0x0617, di:server, mf:0x0000
+  cl:0x0700, at:0x0616, di:server, mf:0x0000
+  cl:0x0702, at:0x0C01, di:server, mf:0x0000
+  cl:0x0702, at:0x0C03, di:server, mf:0x0000
+  cl:0x0702, at:0x0C20, di:server, mf:0x0000
+  cl:0x0702, at:0x0C22, di:server, mf:0x0000
+  cl:0x0702, at:0x0C24, di:server, mf:0x0000
+  cl:0x0702, at:0x0C26, di:server, mf:0x0000
+  cl:0x0702, at:0x0C28, di:server, mf:0x0000
+  cl:0x0702, at:0x0C2A, di:server, mf:0x0000
+  cl:0x0702, at:0x0C2C, di:server, mf:0x0000
+  cl:0x0702, at:0x0C30, di:server, mf:0x0000
+  cl:0x0702, at:0x0C32, di:server, mf:0x0000
+  cl:0x0702, at:0x0C34, di:server, mf:0x0000
+  cl:0x0702, at:0x0C36, di:server, mf:0x0000
+  cl:0x0702, at:0x0C38, di:server, mf:0x0000
+  cl:0x0702, at:0x0C3A, di:server, mf:0x0000
+  cl:0x0702, at:0x0C40, di:server, mf:0x0000
+  cl:0x0702, at:0x0C42, di:server, mf:0x0000
+  cl:0x0702, at:0x0C44, di:server, mf:0x0000
+  cl:0x0702, at:0x0C46, di:server, mf:0x0000
+  cl:0x0702, at:0x0C48, di:server, mf:0x0000
+  cl:0x0702, at:0x0C4A, di:server, mf:0x0000
+  cl:0x0702, at:0x0C4C, di:server, mf:0x0000
+  cl:0x0702, at:0x0C4E, di:server, mf:0x0000
+  cl:0x0702, at:0x0C50, di:server, mf:0x0000
+  cl:0x0702, at:0x0C52, di:server, mf:0x0000
+  cl:0x0702, at:0x0C54, di:server, mf:0x0000
+  cl:0x0702, at:0x0C56, di:server, mf:0x0000
+  cl:0x0702, at:0x0C58, di:server, mf:0x0000
+  cl:0x0702, at:0x0C5A, di:server, mf:0x0000
+  cl:0x0702, at:0x0307, di:server, mf:0x0000
+  cl:0x0702, at:0x0314, di:server, mf:0x0000
+  cl:0x0702, at:0x0312, di:server, mf:0x0000
+  cl:0x0702, at:0x0311, di:server, mf:0x0000
+  cl:0x0702, at:0x0A04, di:server, mf:0x0000
+  cl:0x0702, at:0x0A00, di:server, mf:0x0000
+  cl:0x0702, at:0x0206, di:server, mf:0x0000
+  cl:0x0702, at:0x0205, di:server, mf:0x0000
+  cl:0x0702, at:0x0014, di:server, mf:0x0000
+  cl:0x0702, at:0x0607, di:server, mf:0x0000
+  cl:0x0702, at:0x0608, di:server, mf:0x0000
+  cl:0x0705, at:0x0400, di:server, mf:0x0000
+  cl:0x0705, at:0x0211, di:server, mf:0x0000
+  cl:0x0705, at:0x0221, di:server, mf:0x0000
+  cl:0x0705, at:0x0231, di:server, mf:0x0000
+  cl:0x0705, at:0x0217, di:server, mf:0x0000
+  cl:0x0705, at:0x0227, di:server, mf:0x0000
+  cl:0x0705, at:0x0216, di:server, mf:0x0000
+  cl:0x0705, at:0x0226, di:server, mf:0x0000
+  cl:0x0705, at:0x0239, di:server, mf:0x0000
+  cl:0x0705, at:0x0500, di:server, mf:0x0000
+  cl:0x0705, at:0x0501, di:server, mf:0x0000
+  cl:0x0705, at:0x0502, di:server, mf:0x0000
+  cl:0x0705, at:0x0503, di:server, mf:0x0000
+  cl:0x0705, at:0x051C, di:server, mf:0x0000
+  cl:0x0705, at:0x051E, di:server, mf:0x0000
+  cl:0x0705, at:0x0520, di:server, mf:0x0000
+  cl:0x0705, at:0x0522, di:server, mf:0x0000
+  cl:0x0705, at:0x0524, di:server, mf:0x0000
+  cl:0x0705, at:0x0526, di:server, mf:0x0000
+  cl:0x0705, at:0x0528, di:server, mf:0x0000
+  cl:0x0705, at:0x052A, di:server, mf:0x0000
+  cl:0x0705, at:0x052C, di:server, mf:0x0000
+  cl:0x0705, at:0x0530, di:server, mf:0x0000
+  cl:0x0705, at:0x0532, di:server, mf:0x0000
+  cl:0x0705, at:0x0534, di:server, mf:0x0000
+  cl:0x0705, at:0x0536, di:server, mf:0x0000
+  cl:0x0705, at:0x0538, di:server, mf:0x0000
+  cl:0x0705, at:0x053A, di:server, mf:0x0000
+  cl:0x0705, at:0x0540, di:server, mf:0x0000
+  cl:0x0705, at:0x0542, di:server, mf:0x0000
+  cl:0x0705, at:0x0544, di:server, mf:0x0000
+  cl:0x0705, at:0x0546, di:server, mf:0x0000
+  cl:0x0705, at:0x0548, di:server, mf:0x0000
+  cl:0x0705, at:0x054A, di:server, mf:0x0000
+  cl:0x0705, at:0x054C, di:server, mf:0x0000
+  cl:0x0705, at:0x054E, di:server, mf:0x0000
+  cl:0x0705, at:0x0550, di:server, mf:0x0000
+  cl:0x0705, at:0x0552, di:server, mf:0x0000
+  cl:0x0705, at:0x0554, di:server, mf:0x0000
+  cl:0x0705, at:0x0556, di:server, mf:0x0000
+  cl:0x0705, at:0x0558, di:server, mf:0x0000
+  cl:0x0705, at:0x055A, di:server, mf:0x0000
+  cl:0x0705, at:0x0005, di:server, mf:0x0000
+  cl:0x0705, at:0x0001, di:server, mf:0x0000
+  cl:0x0705, at:0x0040, di:server, mf:0x0000
+  cl:0x0705, at:0x0002, di:server, mf:0x0000
+  cl:0x0705, at:0x0010, di:server, mf:0x0000
+  cl:0x0705, at:0x0011, di:server, mf:0x0000
+  cl:0x0705, at:0x0031, di:server, mf:0x0000
+  cl:0x0705, at:0x0021, di:server, mf:0x0000
+  cl:0x0705, at:0x0022, di:server, mf:0x0000
+  cl:0x0705, at:0x0006, di:server, mf:0x0000
+  cl:0x0000, at:0x0003, di:server, mf:0x0000
+  cl:0x0000, at:0x0004, di:server, mf:0x0000
+  cl:0x0000, at:0x0005, di:server, mf:0x0000
+  cl:0x0000, at:0x0011, di:server, mf:0x0000
+  cl:0x0702, at:0x0001, di:client, mf:0x0000
+  cl:0x0702, at:0x0002, di:client, mf:0x0000
+  cl:0x0702, at:0x0003, di:client, mf:0x0000
+  cl:0x0702, at:0x0004, di:client, mf:0x0000
+  cl:0x0700, at:0x0610, di:server, mf:0x0000
+  cl:0x0700, at:0x0611, di:server, mf:0x0000
+  cl:0x0700, at:0x0612, di:server, mf:0x0000
+  cl:0x0700, at:0x0613, di:server, mf:0x0000
+  cl:0x0700, at:0x0615, di:server, mf:0x0000
+  cl:0x0700, at:0x0301, di:server, mf:0x0000
+  cl:0x0700, at:0x0202, di:server, mf:0x0000
+  cl:0x0700, at:0x0203, di:server, mf:0x0000
+  cl:0x0700, at:0x0100, di:server, mf:0x0000
+  cl:0x0700, at:0x0101, di:server, mf:0x0000
+  cl:0x0700, at:0x0102, di:server, mf:0x0000
+  cl:0x0700, at:0x0400, di:server, mf:0x0000
+  cl:0x0700, at:0x0403, di:server, mf:0x0000
+  cl:0x0700, at:0x0402, di:server, mf:0x0000
+  cl:0x0700, at:0x0401, di:server, mf:0x0000
+  cl:0x0700, at:0x0410, di:server, mf:0x0000
+  cl:0x0700, at:0x0420, di:server, mf:0x0000
+  cl:0x0700, at:0x0430, di:server, mf:0x0000
+  cl:0x0700, at:0x0440, di:server, mf:0x0000
+  cl:0x0700, at:0x0200, di:server, mf:0x0000
+  cl:0x0700, at:0x0201, di:server, mf:0x0000
+  cl:0x0700, at:0x0204, di:server, mf:0x0000
+endAttrList:OPTIONAL
+beginAttrList:SINGLETON
+  cl:0x0000, at:0x0003, di:server, mf:0x0000
+  cl:0x0000, at:0x0004, di:server, mf:0x0000
+  cl:0x0000, at:0x0005, di:server, mf:0x0000
+endAttrList:SINGLETON
+configuredNetwork:*type:ZIGBEE_PRO, name:Primary
+beginEndpointType:Primary
+device:SE1.4-ESP
+deviceId:1280
+profileId:265
+overrideClientCluster:0x0700,no
+overrideClientCluster:0x0702,yes
+overrideClientCluster:0x0704,no
+overrideClientCluster:0x0705,yes
+overrideClientCluster:0x0708,no
+overrideClientCluster:0x070B,yes
+overrideServerCluster:0x0705,yes
+overrideServerCluster:0x0707,yes
+overrideServerCluster:0x0708,yes
+overrideServerCluster:0x0709,yes
+overrideServerCluster:0x070B,yes
+endEndpointType
+beginEndpointType:Mirror
+device:SE1.4-Meter-Mirror
+deviceId:1281
+profileId:265
+overrideClientCluster:0x0700,no
+overrideClientCluster:0x0702,yes
+overrideClientCluster:0x0703,no
+overrideClientCluster:0x0705,yes
+overrideClientCluster:0x0708,no
+overrideClientCluster:0x0709,yes
+overrideServerCluster:0x0704,no
+overrideServerCluster:0x0705,yes
+overrideServerCluster:0x0709,yes
+endEndpointType
+beginEndpointType:Remote
+device:SE1.4-rcd
+deviceId:1288
+profileId:265
+overrideClientCluster:0x0704,yes
+overrideServerCluster:0x0704,yes
+overrideServerCluster:0x0709,yes
+endEndpointType
+beginEndpointType:IHD
+device:SE1.2-In-Home-Display
+deviceId:1282
+profileId:265
+overrideClientCluster:0x0700,yes
+endEndpointType
+beginEndpointType:hidden endpoint for GPF
+device:zcustom
+deviceId:-1
+profileId:-1
+overrideClientCluster:0x0700,yes
+overrideClientCluster:0x0703,yes
+overrideClientCluster:0x0707,yes
+overrideClientCluster:0x0708,yes
+overrideServerCluster:0x0000,yes
+overrideServerCluster:0x0708,yes
+endEndpointType
+configuredEndpoint:*ep:1,pi: -1,di:-1,dv:0,ept:Primary,nwk:Primary
+configuredEndpoint:ep:2,pi: -1,di:-1,dv:0,ept:Mirror,nwk:Primary
+configuredEndpoint:ep:3,pi: -1,di:-1,dv:0,ept:Remote,nwk:Primary
+configuredEndpoint:ep:4,pi: 265,di:1282,dv:0,ept:hidden endpoint for GPF,nwk:Primary
+callbacks:emberAfPluginConcentratorBroadcastSentCallback
+callbacks:emberAfPluginIdentifyStartFeedbackCallback
+callbacks:emberAfPluginIdentifyStopFeedbackCallback
+callbacks:emberAfPluginNetworkFindFinishedCallback
+callbacks:emberAfPluginNetworkFindGetRadioPowerForChannelCallback
+callbacks:emberAfPluginNetworkFindJoinCallback
+callbacks:emberAfPluginCommsHubFunctionReceivedCallback
+callbacks:emberAfPluginCommsHubFunctionSendCallback
+callbacks:emberAfPluginGbzMessageControllerEncryptDataCallback
+callbacks:emberAfPluginEventsServerLogDataUpdatedCallback
+callbacks:emberAfPluginGasProxyFunctionDataLogAccessRequestCallback
+callbacks:emberAfNcpInitCallback
+}
+{setupId:zclCustomizer
+}
+{setupId:zigbeeStack
+boolMap:EnableZdoSerialCommands = false
+boolMap:EnableBindings = true
+boolMap:EnableEndDeviceBind = false
+boolMap:EnableReceiveStatistics = false
+boolMap:UseEcc163k1 = true
+boolMap:UseEcc283k1 = true
+boolMap:PreconfiguredKeyEnabled = false
+boolMap:NetworkKeyEnabled = false
+boolMap:FragmentationEnable = false
+boolMap:EnableConcentrator = true
+boolMap:UseSeInstallCodes = false
+boolMap:TxPowerModeUseToken = true
+boolMap:BoostMode = false
+boolMap:AlternatePowerMode = false
+byteArrayMap:PreconfiguredKey = 56 77 77 77 77 77 77 77 77 77 77 77 77 77 77 77
+byteArrayMap:NetworkKey = 12 33 33 33 33 33 33 33 33 33 33 33 33 33 33 33
+byteArrayMap:NetworkKey2 = AB CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC
+intMap:NumberOfBindings = 2
+intMap:AddressTableSize = 2
+intMap:TrustCenterCacheSize = 2
+intMap:LinkKeyMode = 2
+intMap:FragmentationMaxSize = 255
+intMap:HeartbeatLed = 2
+configuredNetworkSecurity:Primary|ZIGBEE_PRO=SE_TEST
+configuredNetworkZigbeeDeviceType:Primary|ZIGBEE_PRO=ZA_COORDINATOR
+ecc163k1FileLocation:PATH(STACK_RELATIVE):build/ecc-library-internal-unix-gcc-simulation-simulation/ecc-library-internal.a
+ecc283k1FileLocation:PATH(STACK_RELATIVE):build/ecc-library-283k1-internal-unix-gcc-simulation-simulation/ecc-library-283k1-internal.a
+CliCommandSet:Full
+}
+appPlugin:adc,true
+
+appPlugin:address-table,true
+
+appPlugin:aes-cmac,false
+appPlugin:antenna,false
+appPlugin:antenna-cli,false
+appPlugin:antenna-stub,true
+
+appPlugin:aps-link-key-authorization,false
+appPlugin:barrier-control-server,false
+appPlugin:basic,false
+appPlugin:battery-monitor,false
+appPlugin:battery-monitor-stub,false
+appPlugin:binding-table-library,true
+
+appPlugin:ble,false
+appPlugin:bulb-pwm-cli,false
+appPlugin:bulb-pwm-driver,false
+appPlugin:bulb-ui,false
+appPlugin:button-interface,false
+appPlugin:button-interface-stub,false
+appPlugin:button-joining,false
+appPlugin:calendar-client,false
+appPlugin:calendar-common,true
+
+appPlugin:calendar-server,true
+
+appPlugin:cbke-163k1-library,true
+
+appPlugin:cbke-283k1-library,true
+
+appPlugin:cbke-library-core,true
+
+appPlugin:cbke-library-dsa-sign,false
+appPlugin:cbke-library-dsa-verify,false
+appPlugin:cbke-library-dsa-verify-283k1,false
+appPlugin:ccm-encryption,true
+
+appPlugin:cjson,false
+appPlugin:cli-password-protection,false
+appPlugin:coexistence,false
+appPlugin:coexistence-cli,false
+appPlugin:coexistence-stub,true
+
+appPlugin:color-control,false
+appPlugin:color-control-server,false
+appPlugin:command-relay,false
+appPlugin:comms-hub-function,true
+
+appPlugin:comms-hub-function-sub-ghz,true
+
+appPlugin:compact-logger,false
+appPlugin:concentrator,true
+
+appPlugin:configuration-server,false
+appPlugin:connection-manager,false
+appPlugin:coulomb-counter,false
+appPlugin:counters,false
+appPlugin:critical-message-queue,false
+appPlugin:debug-basic-library,true
+
+appPlugin:debug-extended-library,false
+appPlugin:debug-jtag,true
+
+appPlugin:debug-jtag-stub,false
+appPlugin:delayed-join,false
+appPlugin:device-database,false
+appPlugin:device-management-client,false
+appPlugin:device-management-server,true
+
+appPlugin:device-query-service,false
+appPlugin:device-table,false
+appPlugin:diagnostic-server,false
+appPlugin:dido,false
+appPlugin:dmp-demo-ui,false
+appPlugin:dmp-tuning,false
+appPlugin:dmp-ui-demo,false
+appPlugin:dmp-ui-demo-stub,false
+appPlugin:door-lock-server,false
+appPlugin:dotdot-mfg-certs,false
+appPlugin:drlc,false
+appPlugin:drlc-server,false
+appPlugin:ecc-library-163k1,true
+
+appPlugin:ecc-library-283k1,true
+
+appPlugin:eeprom,false
+appPlugin:eeprom-powerdown,false
+appPlugin:electrical-measurement-server,false
+appPlugin:em4,false
+appPlugin:ember-minimal-printf,true
+
+appPlugin:end-device-bind-library,false
+appPlugin:end-device-support,false
+appPlugin:esi-management,true
+
+appPlugin:events-client,true
+
+appPlugin:events-server,true
+
+appPlugin:exosite-demo,false
+appPlugin:extdev,false
+appPlugin:ezmode-commissioning,false
+appPlugin:ezradiopro,false
+appPlugin:fem-control,false
+appPlugin:find-and-bind-initiator,false
+appPlugin:find-and-bind-target,false
+appPlugin:flash-data,false
+appPlugin:form-and-join,true
+
+appPlugin:fragmentation,true
+
+appPlugin:gas-proxy-function,true
+
+appPlugin:gbcs-compatibility,true
+
+appPlugin:gbcs-device-log,true
+
+appPlugin:gbcs-gas-meter,false
+appPlugin:gbz-message-controller,true
+
+appPlugin:general-response-commands,false
+appPlugin:generic-interrupt-control,false
+appPlugin:generic-interrupt-control-stub,false
+appPlugin:glib,false
+appPlugin:gp-library,false
+appPlugin:gpio-sensor,false
+appPlugin:gpio-sensor-stub,false
+appPlugin:green-power-client,false
+appPlugin:green-power-common,false
+appPlugin:green-power-server,false
+appPlugin:green-power-test-device,false
+appPlugin:green-power-translation-table,false
+appPlugin:groups-client,false
+appPlugin:groups-server,false
+appPlugin:hal-library,true
+
+appPlugin:hal-library-rtos,false
+appPlugin:hc-11073-tunnel,false
+appPlugin:heartbeat,true
+
+appPlugin:humidity-si7021,false
+appPlugin:humidity-si7021-stub,false
+appPlugin:i2c-driver,false
+appPlugin:i2c-driver-stub,false
+appPlugin:ias-zone-client,false
+appPlugin:ias-zone-server,false
+appPlugin:identify,false
+appPlugin:identify-feedback,false
+appPlugin:idle-sleep,false
+appPlugin:illuminance-measurement-server,false
+appPlugin:illuminance-si1141,false
+appPlugin:illuminance-si1141-stub,false
+appPlugin:install-code-library,false
+appPlugin:install-code-read,false
+appPlugin:interpan,true
+
+appPlugin:key-establishment,true
+
+appPlugin:led-blink,false
+appPlugin:led-blink-stub,false
+appPlugin:led-dim-pwm,false
+appPlugin:led-rgb-pwm,false
+appPlugin:led-temp-pwm,false
+appPlugin:level-control,false
+appPlugin:libcoap,false
+appPlugin:linked-list,false
+appPlugin:low-voltage-shutdown,false
+appPlugin:lqi-override,false
+appPlugin:lwip,false
+appPlugin:lwip-callback-tests,false
+appPlugin:lwip-interface,false
+appPlugin:lwip-stats,false
+appPlugin:mac-address-filtering,false
+appPlugin:manufacturing-library,false
+appPlugin:manufacturing-library-cli,false
+appPlugin:manufacturing-library-ota,false
+appPlugin:mbedtls,true
+
+appPlugin:mbedtls-multiprotocol,false
+appPlugin:messaging-client,false
+appPlugin:messaging-server,true
+
+appPlugin:meter-mirror,true
+
+appPlugin:meter-snapshot-client,false
+appPlugin:meter-snapshot-server,false
+appPlugin:meter-snapshot-storage,false
+appPlugin:metering-server,false
+appPlugin:micrium-rtos,false
+appPlugin:mn-price-passthrough,false
+appPlugin:mpsi,false
+appPlugin:mpsi-ipc,false
+appPlugin:mpsi-storage,false
+appPlugin:multi-network-library,false
+appPlugin:network-creator,false
+appPlugin:network-creator-security,false
+appPlugin:network-find,true
+
+appPlugin:network-find-sub-ghz,false
+appPlugin:network-steering,false
+appPlugin:nvm3,false
+appPlugin:nvm3-extflash,false
+appPlugin:nvm3-simulation,false
+appPlugin:occupancy-pyd1698,false
+appPlugin:occupancy-pyd1698-cli,false
+appPlugin:occupancy-pyd1698-stub,false
+appPlugin:occupancy-sensor-server,false
+appPlugin:on-off,false
+appPlugin:ota-bootload,false
+appPlugin:ota-client,false
+appPlugin:ota-client-policy,false
+appPlugin:ota-common,false
+appPlugin:ota-server,false
+appPlugin:ota-server-policy,false
+appPlugin:ota-storage-common,false
+appPlugin:ota-storage-posix-filesystem,false
+appPlugin:ota-storage-simple,false
+appPlugin:ota-storage-simple-eeprom,false
+appPlugin:ota-storage-simple-ram,false
+appPlugin:pa,true
+
+appPlugin:packet-handoff,false
+appPlugin:packet-validate-library,true
+
+appPlugin:paho.mqtt.c,false
+appPlugin:partner-link-key-exchange,true
+
+appPlugin:permit-join-manager,false
+appPlugin:poll-control-client,false
+appPlugin:poll-control-server,false
+appPlugin:power-configuration-server,false
+appPlugin:power-consumption-model,false
+appPlugin:power-meter-cs5463,false
+appPlugin:power-meter-cs5463-stub,false
+appPlugin:prepayment-client,false
+appPlugin:prepayment-server,false
+appPlugin:prepayment-snapshot-storage,false
+appPlugin:price-client,false
+appPlugin:price-common,true
+
+appPlugin:price-server,true
+
+appPlugin:psstore,false
+appPlugin:pti,true
+
+appPlugin:rail-library,true
+
+appPlugin:rail-library-internal,false
+appPlugin:rail-library-mp,false
+appPlugin:rail-library-mp-internal,false
+appPlugin:relative-humidity-measurement-server,false
+appPlugin:relay-control-client,false
+appPlugin:relay-control-server,false
+appPlugin:reporting,false
+appPlugin:ring-buffer,false
+appPlugin:sb1-gesture-sensor,false
+appPlugin:sb1-gesture-sensor-stub,false
+appPlugin:scan-dispatch,false
+appPlugin:scenes,false
+appPlugin:scenes-client,false
+appPlugin:security-link-keys-library,true
+
+appPlugin:security-sensor,false
+appPlugin:serial,true
+
+appPlugin:silabs-device-ui,false
+appPlugin:sim-eeprom1,true
+
+appPlugin:sim-eeprom2,false
+appPlugin:sim-eeprom2-1to2-upgrade,false
+appPlugin:sim-eeprom2-1to2-upgrade-stub,false
+appPlugin:sim-eeprom2-to-nvm3-upgrade,false
+appPlugin:sim-eeprom2-to-nvm3-upgrade-stub,false
+appPlugin:simple-clock,false
+appPlugin:simple-main,true
+
+appPlugin:simple-metering-client,false
+appPlugin:simple-metering-server,false
+appPlugin:sleepy-message-queue,true
+
+appPlugin:slot-manager,false
+appPlugin:smart-energy-registration,false
+appPlugin:source-route-library,true
+
+appPlugin:stack-diagnostics,true
+
+appPlugin:stack-protection-iar,false
+appPlugin:standalone-bootloader-client,false
+appPlugin:standalone-bootloader-common,false
+appPlugin:standalone-bootloader-server,false
+appPlugin:standard-printf-support,false
+appPlugin:strong-random,true
+
+appPlugin:sub-ghz-client,true
+
+appPlugin:sub-ghz-server,true
+
+appPlugin:tamper-switch,false
+appPlugin:tamper-switch-stub,false
+appPlugin:temperature-measurement-server,false
+appPlugin:temperature-si7021,false
+appPlugin:temperature-si7021-stub,false
+appPlugin:temperature-si7053,false
+appPlugin:temperature-si7053-stub,false
+appPlugin:test-harness,false
+appPlugin:test-harness-z3,false
+appPlugin:throughput,false
+appPlugin:throughput-legacy,false
+appPlugin:time-server,true
+
+appPlugin:transport-mqtt,false
+appPlugin:trust-center-backup,false
+appPlugin:trust-center-keepalive,false
+appPlugin:trust-center-nwk-key-update-broadcast,false
+appPlugin:trust-center-nwk-key-update-periodic,false
+appPlugin:trust-center-nwk-key-update-unicast,false
+appPlugin:tunneling-client,true
+
+appPlugin:tunneling-server,true
+
+appPlugin:update-ha-tc-link-key,false
+appPlugin:update-tc-link-key,false
+appPlugin:wstk-display,false
+appPlugin:wwah-app-event-retry-manager,false
+appPlugin:wwah-client-silabs,false
+appPlugin:wwah-connectivity-manager,false
+appPlugin:wwah-end-device-extension,false
+appPlugin:wwah-server-silabs,false
+appPlugin:xmodem-sender,false
+appPlugin:zcl-framework-core,true
+
+appPlugin:zcl-ip,false
+appPlugin:zigbee-event-logger,false
+appPlugin:zigbee-event-logger-stub,false
+appPlugin:zigbee-pro-leaf-library,false
+appPlugin:zigbee-pro-library,true
+
+appPlugin:zigbee-pro-stack-alt-mac-library,false
+appPlugin:zigbee-r22-support-library,false
+appPlugin:zll-commissioning-client,false
+appPlugin:zll-commissioning-common,false
+appPlugin:zll-commissioning-network,false
+appPlugin:zll-commissioning-server,false
+appPlugin:zll-identify-server,false
+appPlugin:zll-level-control-server,false
+appPlugin:zll-library,false
+appPlugin:zll-on-off-server,false
+appPlugin:zll-scenes-client,false
+appPlugin:zll-scenes-server,false
+appPlugin:zll-utility-client,false
+appPlugin:zll-utility-server,false
+AppPluginOption(simulation):EMBER_AF_PLUGIN_CALENDAR_COMMON_SEASON_PROFILE_MAX,11
+AppPluginOption(simulation):EMBER_AF_PLUGIN_KEY_ESTABLISHMENT_SE_VERSION,1.2 and later
+AppPluginOption(simulation):EMBER_BINDING_TABLE_SIZE,2
+AppPluginOption(simulation):EMBER_KEY_TABLE_SIZE,6
+AppPluginOption(simulation):EMBER_AF_PLUGIN_PRICE_SERVER_TARIFF_MATRIX_SUPPORT,true
+AppPluginOption(simulation):EMBER_AF_PLUGIN_TUNNELING_CLIENT_MAXIMUM_INCOMING_TRANSFER_SIZE,1500
+AppPluginOption(simulation):EMBER_AF_PLUGIN_FRAGMENTATION_BUFFER_SIZE,1500
+AppPluginOption(simulation):EMBER_AF_PLUGIN_TUNNELING_SERVER_MAXIMUM_INCOMING_TRANSFER_SIZE,1500
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_GSME_EUI,00 00 00 00 00 00 00 03
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_ESME_EUI,00 00 00 00 00 00 00 02
+AppPluginOption(simulation):EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_COMMSHUB_TUNNEL_CLIENT_ENDPOINT,3
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE1_EUI,03 00 00 00 00 00 00 00
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE2_EUI,02 00 00 00 00 00 00 00
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE2_TYPE,ESME
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE3_EUI,06 00 00 00 00 00 00 00
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE4_EUI,05 00 00 00 00 00 00 00
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GBCS_DEVICE_LOG_DEVICE4_TYPE,ESME
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GAS_PROXY_FUNCTION_MSG_REPLAY_SRC_ENDPOINT,3
+AppPluginOption(simulation):EMBER_AF_PLUGIN_GAS_PROXY_FUNCTION_REMOTE_COMMSHUB_ENDPOINT,3
+AppPluginOption(simulation):EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_BATTERY_RATE,5
+AppPluginOption(simulation):EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ERRORS,false
+AppPluginOption(simulation):EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_PROFILES,5
+AppPluginOption(simulation):EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_TYPE,Gas meter
+AppPluginOption(simulation):EMBER_AF_PLUGIN_TIME_SERVER_MASTER,true
+AppPluginOption(simulation):EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE,false
+AppPluginOption(simulation):EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_GBZ_OFFSET,0
+AppPluginOption(simulation):EMBER_AF_PLUGIN_EVENTS_SERVER_TAMPER_LOG_SIZE,0
+AppPluginOption(simulation):EMBER_AF_PLUGIN_EVENTS_SERVER_FAULT_LOG_SIZE,0
+AppPluginOption(simulation):EMBER_AF_PLUGIN_EVENTS_SERVER_GENERAL_LOG_SIZE,100
+AppPluginOption(simulation):EMBER_AF_PLUGIN_EVENTS_SERVER_SECURITY_LOG_SIZE,100
+AppPluginOption(simulation):EMBER_AF_PLUGIN_EVENTS_SERVER_NETWORK_LOG_SIZE,0
+AppPluginOption(simulation):EMBER_AF_PLUGIN_ADDRESS_TABLE_SIZE,4
+AppPluginOption(simulation):EMBER_AF_PLUGIN_ECC_LIBRARY_163K1_LIBRARY_PATH,PATH(STACK_RELATIVE):build/ecc-library-internal-unix-gcc-simulation-simulation/ecc-library-internal.a
+AppPluginOption(simulation):EMBER_AF_PLUGIN_ECC_LIBRARY_283K1_LIBRARY_PATH,PATH(STACK_RELATIVE):build/ecc-library-283k1-internal-unix-gcc-simulation-simulation/ecc-library-283k1-internal.a
+AppPluginOption(simulation):EMBER_AF_PLUGIN_INTERPAN_ALLOW_KEY_ESTABLISHMENT,TRUE
+AppPluginOption(simulation):EMBER_AF_PLUGIN_INTERPAN_ALLOW_FRAGMENTATION,TRUE
+AppPluginOption(simulation):EMBER_APS_UNICAST_MESSAGE_COUNT,20

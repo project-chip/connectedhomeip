@@ -1,0 +1,16 @@
+#include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz-types.h"
+
+/** @brief Sub-GHz channel change request outcome callback
+ *
+ * This callback is called by the Comms Hub Function (Sub-GHz) plugin to report
+ * the outcome of the channel change request.
+ *
+ * @param outcome  Channel change request outcome
+ * @param status   Ember status code if the outcome is negative
+ */
+void emberAfPluginCommsHubFunctionSubGhzChannelChangeCallback(EmberAfPluginCommsHubFunctionSubGhzChannelChangeOutcome outcome,
+                                                              EmberAfStatus status)
+{
+  emberAfAppPrintln("GBCS emberAfPluginCommsHubFunctionSubGhzChannelChangeCallback: outcome=%d",
+                    outcome);
+}

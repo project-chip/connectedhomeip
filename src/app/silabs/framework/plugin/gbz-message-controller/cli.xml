@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-gbz-message-controller" name="Plugin Commands: GBZ Message Controller">
+    <description>
+      The reporting plugin contributes several CLI commands to the application framework to be used in the construction of GBZ message, deconstructin of GBZ message into ZCL messages, sending the ZCL message, and reconstructing the ZCL message responses into GBZ messages.
+    </description>
+  </group>
+
+<!--  Leaving this here if we ever have to compose a gbz message.
+  <command cli="plugin gbz-message-controller append" functionName="emAfPluginGbzMessageControllerCliAppend" group="plugin-gbz-message-controller">
+    <description>
+      Append the current buffered zcl command to the GBZ message payload buffer.
+    </description>
+  </command>
+
+  <command cli="plugin gbz-message-controller clear" functionName="emAfPluginGbzMessageControllerCliClear" group="plugin-gbz-message-controller">
+    <description>
+      Clear GBZ message payload buffer.
+    </description>
+    <arg name="msgIndex"       type="INT8U" />
+  </command>
+
+  <command cli="plugin gbz-message-controller encryption" functionName="emAfPluginGbzMessageControllerCliEncryption" group="plugin-gbz-message-controller">
+    <description>
+      Set the encryption flag of the GBZ message. 0 - not encrypted (default), 1 - encrypted (not supported).
+    </description>
+    <arg name="encryptionEnabled"       type="INT8U" />
+  </command>
+-->  
+
+</cli>

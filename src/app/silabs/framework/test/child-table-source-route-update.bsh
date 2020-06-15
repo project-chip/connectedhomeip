@@ -1,0 +1,102 @@
+//This script helps us verify items 1 and 3 in emzigbee-241
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps || !runArgument.runUsingMultihop) {          
+    System.out.print("**** Only runs for host multi-hop configuration ****");   
+    return;                                                                     
+} 
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+
+// original Network topology:                                                            
+                                                                                
+//          full1 (coordinator)                                                 
+//             |                                                                
+//          full2                                                                        
+//          /                                                            
+//        full3
+//          |
+//        sleepy                                           
+     
+
+TestNode[] allNodes = {                                                         
+    new TestNode("full1",                                                       
+                   "", // SOC image (unused)                                    
+                   "build/af-test-apps/FullTh-simulation-ezsp/FullTh",         
+                   "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",                  
+                   gridLocations[0]),                                            
+                                                                                
+    new TestNode("full2",                                            
+                   "", // SOC image (unused)                                    
+                   "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+                   "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",                  
+                   gridLocations[1]),                                           
+                                                                                
+    new TestNode("full3",                                            
+                   "", // SOC image (unused)                                    
+                   "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+                   "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",                  
+                   gridLocations[4]),                                           
+                                                                                
+    new TestNode("sleepy",                                            
+                   "", // SOC image (unused)                                    
+                   "build/af-test-apps/SeMeterGasSleepy-simulation-ezsp/SeMeterGasSleepy",
+                   "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",                  
+                   gridLocations[3]),                                           
+}; 
+
+String[] devices = addAndLoadDevicesWithLocation(allNodes,                   
+                                                      true);   // use host?
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevicesWithAddedDelay(devices, false, 1500);
+
+String full2NodeId = nodeId("full2");
+String full3NodeId = nodeId("full3");
+String sleepyNodeId = nodeId("sleepy");
+
+send("full1","plugin stack-diagnostic child-table");                 
+expect("full1",".*0 of 6 entries used.*");
+
+send("full2","plugin stack-diagnostic child-table");                            
+expect("full2",".*0 of 6 entries used.*");
+
+send("full3","plugin stack-diagnostic child-table");                            
+expect("full3",".*1 of 6 entries used.*");  
+
+expect("full1",                                                                 
+       "plugin concentrator print-table",                                       
+       ".*" + sleepyNodeId + " -> " + full3NodeId + " -> " + full2NodeId + " -> 0x0000.*");
+
+power("full3", false);// our sleepy node was originally child of this 
+power("full2", false);// power off full2 so we don't rejoin to it
+
+networkWait(2000);
+power("sleepy", false);
+networkWait(5000);
+power("sleepy", true); 
+expect("sleepy", "network rejoin 1 0", ".*EMBER_NETWORK_UP.*"); 
+
+networkWait(2000); 
+
+power("full2", true); // come back up
+
+send("full1","plugin stack-diagnostic child-table"); 
+expect("full1",".*1 of 6 entries used.*"); 
+send("full2","plugin stack-diagnostic child-table"); 
+expect("full2",".*0 of 6 entries used.*");
+//end of test for emzigbee-241-1
+//start of test for emzigbee-241-3, somehow we don't see the new join affecting
+//here  
+//the updated entry of the table should be 2: <sleepy> -> 0x0000 (Me)
+expect("full1",
+       "plugin concentrator print-table",
+       ".*" + sleepyNodeId + " -> 0x0000.*"); 

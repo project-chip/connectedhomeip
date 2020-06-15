@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-delayed-join" name="Plugin Commands: Delayed join">
+    <description>
+      The Delayed join plugin contributes several CLI commands to the application framework to be used in handlying delayed join and sending the network key.
+    </description>
+  </group>
+  <command cli="plugin delayed-join activate" functionName="emAfDelayedJoinActivateCommand" group="plugin-delayed-join">
+    <description>
+      Sets the TC join policy to delayed-join
+    </description>
+  </command>
+  <command cli="plugin delayed-join send-network-key" functionName="emAfDelayedJoinSendNetworkKeyCommand" group="plugin-delayed-join">
+    <description>
+      Triggers sending the encrypted network key to the joining node
+    </description>
+    <arg name="nodeId"        type="INT16U"        description="Short address of the key destination" />
+    <arg name="EUI64" type="IEEE_ADDRESS" description="Long address of the key destination" />
+    
+    <arg name="parentNodeId"        type="INT16U"        description="address of the key destination" />
+    <arg name="newKey" type="OCTET_STRING" description="The network key" />
+  </command>
+  <command cli="plugin delayed-join set-key-timeout" functionName="emAfDelayedJoinSetNetworkKeyTimeoutCommand" group="plugin-delayed-join">
+    <description>
+      Extends the joiner timeout to wait for the network key during join
+    </description>
+    <arg name="seconds" type="INT8U"        />
+  </command>
+</cli>

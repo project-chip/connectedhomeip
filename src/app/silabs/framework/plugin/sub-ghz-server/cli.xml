@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-sub-ghz-server" name="Plugin Commands: Sub-GHz Server">
+    <description>
+      The Sub-GHz commands provide commands for sub-GHz duty cycle, power management and frequency agility.
+    </description>
+  </group>
+  <command cli="plugin sub-ghz channel-change print" functionName="emAfSubGhzServerCliChannelChangePrint" group="plugin-sub-ghz-server">
+    <description>
+      Print out the status of the sub-GHz channel change attribute.
+    </description>
+  </command>
+  <command cli="plugin sub-ghz channel-change set" functionName="emAfSubGhzServerCliChannelChangeSet" group="plugin-sub-ghz-server">
+    <description>
+      Set the status of the sub-GHz channel change attribute.
+    </description>
+    <arg name="value" type="INT32U" description="Channel change attribute (bit mask)"/>
+  </command>
+  <command cli="plugin sub-ghz channel-mask print" functionName="emAfSubGhzServerCliChannelMaskPrint" group="plugin-sub-ghz-server">
+    <description>
+      Print out the status of all sub-GHz channel masks.
+    </description>
+  </command>
+  <command cli="plugin sub-ghz channel-mask set" functionName="emAfSubGhzServerCliChannelMaskSet" group="plugin-sub-ghz-server">
+    <description>
+      Set one or more sub-GHz channel mask(s).
+    </description>
+    <arg name="mask1" type="INT32U" description="Channel 28 mask"/>
+    <arg name="mask2" type="INT32U" description="Channel 29 mask"/>
+    <arg name="mask3" type="INT32U" description="Channel 30 mask"/>
+    <arg name="mask4" type="INT32U" description="Channel 31 mask"/>
+  </command>
+  <command cli="plugin sub-ghz limits print" functionName="emAfSubGhzServerCliDutyCycleLimitsPrint" group="plugin-sub-ghz-server">
+    <description>
+      Print the current Duty Cycle limits.
+    </description>
+  </command>
+  <command cli="plugin sub-ghz limits set" functionName="emAfSubGhzServerCliDutyCycleLimitsSet" group="plugin-sub-ghz-server">
+    <description>
+      Set the Duty Cycle limits.
+    </description>
+    <arg name="limited" type="INT16U" description="'Limited' Duty Cycle state threshold in % * 100 (i.e. 150 = 1.5%)"/>
+    <arg name="critical" type="INT16U" description="'Critical' Duty Cycle state threshold in % * 100"/>
+    <arg name="suspended" type="INT16U" description="'Suspended' Duty Cycle state threshold in % * 100"/>
+  </command>
+  <command cli="plugin sub-ghz suspend-zcl-messages" functionName="emAfSubGhzServerCliSuspendZclMessages" group="plugin-sub-ghz-server">
+    <description>
+      Send the SuspendZCLMessages command to the given client.
+    </description>
+    <arg name="nodeId" type="INT16U" description="Node ID of the given client"/>
+    <arg name="ep" type="INT8U" description="Endpoint of the given client"/>
+    <arg name="period" type="INT8U" description="Period in minutes"/>
+  </command>
+  <command cli="plugin sub-ghz client-status" functionName="emAfSubGhzServerCliClientStatus" group="plugin-sub-ghz-server">
+    <description>
+      Print the given Sub-GHZ given client's current status.
+    </description>
+    <arg name="nodeId" type="INT16U" description="Client's Node ID of the given client"/>
+  </command>
+</cli>

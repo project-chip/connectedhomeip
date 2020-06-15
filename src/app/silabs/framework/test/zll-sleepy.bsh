@@ -1,0 +1,64 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multi-hop****");
+  return;
+} else if (runArgument.runUsingHostApps) {
+  std.print("****TODO: Fix for host****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "remote"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/ZllColorLight-simulation/ZllColorLight",
+  "build/af-test-apps/ZllColorSceneRemoteSleepy-simulation/ZllColorSceneRemoteSleepy",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/ZllColorLight-simulation-ezsp/ZllColorLight",
+  "build/af-test-apps/ZllColorSceneRemoteSleepy-simulation-ezsp/ZllColorSceneRemoteSleepy",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Set up encryption and touch link the network.
+setupEncryption();
+touchlinkZllDevices("remote", "light");
+
+// We expect a success callback, and the identify mode cancel, but no network up.
+network.pressButton("remote", "1");
+expect("light", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", timeout * 10);
+expect("remote", "Touch link with 0x0002 \\(\\(>\\)" + eui64("light") + "\\) complete");
+expect("light", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0x0000", timeout * 10);
+nexpect("remote", "EMBER_NETWORK_UP 0x....", timeout * 10);
+network.releaseButton("remote", "1");
+network.sleep(timeout);
+
+dbg.println("*** TEST 1: Send on and off commands ***");
+buttonPress("remote", 1);
+expect("light", ".*is now ON");
+buttonPress("remote", 0);
+expect("light", ".*is now OFF");
+
+dbg.println("*** TEST 2: Sleep past end device timeout, send on and off commands***");
+networkWait(5 * 60 * 60 * 1000);
+buttonPress("remote", 1);
+//Note here,that while this expect is met while MAC_DATA_POLLS are the keep alive 
+//mechanism, this expect will fail for ORPHAN_NOTIFICATIONS because these keep alives
+//are sent independent of the application and the node does not timeout on the networkWait.
+expect("remote", ".*EMBER_NETWORK_UP.*");
+expect("light", ".*is now ON");
+buttonPress("remote", 0);
+expect("light", ".*is now OFF");
+
+dbg.println("*** TEST 3: Remote should rx network down state before going to sleep***");
+buttonPress("remote",
+            0, 
+            ".*EMBER_NETWORK_DOWN",  // button press expect string
+            null);                   // button release expect string

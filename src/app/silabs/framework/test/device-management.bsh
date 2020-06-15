@@ -1,0 +1,374 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = { "esi", "meter" };
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+String nodeIdMeter = findNodeByName("meter").nodeIdHex;
+
+// Tests from SE 1.2 Test Specification
+
+// 22.3 Get Supplier Control Attribute Set
+
+// 22.4  Get Tenancy Control Attribute Set
+
+// 22.5 Get Backhaul Control Attribute Set
+
+// ...
+
+// 22.15  Get OTA Event Configuration Attribute Set (Client)
+
+// 22.16  ChangeOfTenancy
+//
+// Initial Conditions
+send("esi", "plugins device-management-server tenancy " + timeSinceZigBeeEpoch(0) + "0x0");
+send("esi", "plugins device-management-server pending-updates 0x00");
+
+// Item 1: GetChangeOfTenancy: no tenancy info
+send("meter", "zcl dm get-chg-of-tenancy");
+send("meter", "send 0 1 1 ");
+expect("esi", ".*clus 0x0708 \\(Device Management\\) FC 01 seq .. cmd 00 payload\\[\\]");
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]"); 
+
+// GetChangeOfTenancy: with tenancy info
+send("esi", "plugins device-management-server tenancy 0x579E1594 0x579E1594");
+send("esi", "plugins device-management-server pending-updates 0x01");
+
+send("meter", "zcl dm get-chg-of-tenancy");
+send("meter", "send 0 1 1 ");
+expect("esi", ".*clus 0x0708 \\(Device Management\\) FC 01 seq .. cmd 00 payload\\[\\]");
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 09 seq .. cmd 00 payload\\[00 00 00 00 00 00 00 00 00 94 15 9E 57 94 15 9E 57 \\]"); 
+networkWait(timeout*10);
+
+// 22.17 Unsolicited PublishChangeOfTenancy
+
+// Unsolicited GetChangeOfTenancy: with tenancy info
+send("esi", "plugins device-management-server pub-chg-of-tenancy " + nodeIdMeter + " 1 1"); 
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 09 seq .. cmd 00 payload\\[00 00 00 00 00 00 00 00 00 94 15 9E 57 94 15 9E 57 \\]"); 
+networkWait(timeout*10);
+
+// 22.18 ChangeOfSupplier
+
+// PublishChangeOfSupplier: no supplier info
+send("meter", "zcl dm get-chg-of-supplier");
+send("meter", "send 0 1 1 ");
+expect("esi", ".*clus 0x0708 \\(Device Management\\) FC 01 seq .. cmd 01 payload\\[\\]");
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 08 seq .. cmd 0B payload\\[01 8B \\]"); 
+
+// PublishChangeOfSupplier: with supplier info
+send("esi", "plugins device-management-server supplier 1 0x0000AABB 0x00001000 0xCCDD \"providerName\" \"contactDetails\"");
+send("esi", "plugins device-management-server pending-updates 0x02");
+networkWait(timeout*10);
+
+send("meter", "zcl dm get-chg-of-supplier");
+send("meter", "send 0 1 1 ");
+expect("esi", ".*clus 0x0708 \\(Device Management\\) FC 01 seq .. cmd 01 payload\\[\\]");
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 09 seq .. cmd 01 payload\\[00 00 00 00 00 00 00 00 00 BB AA 00 00 00 10 00 00 DD CC 00 00 0C 70 72 6F 76 69 64 65 72 4E 61 6D 65 0E 63 6F 6E 74 61 63 74 44 65 74 61 69 6C 73 \\]");
+networkWait(timeout*10);
+
+// Test 22.19
+// Unsolicited PublishChangeOfSupplier: with supplier info
+send("esi", "plugins device-management-server pub-chg-of-supplier " + nodeIdMeter + " 1 1"); 
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 09 seq .. cmd 01 payload\\[00 00 00 00 00 00 00 00 00 BB AA 00 00 00 10 00 00 DD CC 00 00 0C 70 72 6F 76 69 64 65 72 4E 61 6D 65 0E 63 6F 6E 74 61 63 74 44 65 74 61 69 6C 73 \\]");
+expect("esi", ".*clus 0x0708 \\(Device Management\\) FC 00 seq .. cmd 0B payload\\[01 00 \\]");
+
+
+//Test 22.20 Request New Password
+
+// RequestNewPassword: no password info
+send("meter", "zcl dm req-new-pass 0x01");
+send("meter", "send 0 1 1 ");
+expect("esi", ".*clus 0x0708 \\(Device Management\\) FC 01 seq .. cmd 02 payload\\[01 \\]");
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 08 seq .. cmd 0B payload\\[02 8B \\]");
+networkWait(timeout*10);
+
+// RequestNewPassword: password infos for both service / consumer
+// NOTE: we should be checking the time received on the meter but there isn't
+//       a function to reverse all the bytes. so it is ".. .. .. .." for now. 
+
+// service
+time1 = utcTime("esi") + 5;
+time2 = utcTime("esi") + 20;
+
+send("esi", "plugin device-management-server password \"muffins\" " + time1 + " 0x0006 0x01");
+// consumer
+send("esi", "plugin device-management-server password \"cookies\"  0 0x0006 0x02");
+
+send("meter", "zcl dm req-new-pass 0x01");
+send("meter", "send 0 1 1 ");
+expect("esi", ".*clus 0x0708 \\(Device Management\\) FC 01 seq .. cmd 02 payload\\[01 \\]");
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 09 seq .. cmd 02 payload\\[00 00 00 00 .. .. .. .. 06 00 01 07 6D 75 66 66 69 6E 73 \\]");
+networkWait(timeout*10);
+
+send("meter", "zcl dm req-new-pass 0x02");
+send("meter", "send 0 1 1 ");
+expect("esi", ".*clus 0x0708 \\(Device Management\\) FC 01 seq .. cmd 02 payload\\[02 \\]");
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 09 seq .. cmd 02 payload\\[00 00 00 00 .. .. .. .. 06 00 02 07 63 6F 6F 6B 69 65 73 \\]");
+networkWait(timeout*10);
+
+networkWait(10000);
+expect("meter", "plugin device-management-client print",".*muffins.*");
+networkWait(15000);
+expect("meter", "plugin device-management-client print",".*cookies.*");
+
+// Check after 60 seconds.
+int time = utcTime("esi") + 60;
+send("esi", "plugin device-management-server password \"applepie\" " + time + " 0x0006 0x01");
+send("meter", "zcl dm req-new-pass 0x01");
+send("meter", "send 0 1 1 ");
+expect("meter", "plugin device-management-client print",".*muffins.*");
+networkWait(65000);
+expect("meter", "plugin device-management-client print",".*applepie.*");
+
+networkWait(1000000);
+//Change password to 3 days ago.
+/** @brief <b>zcl dm req-new-pass-resp [issuerEventId:4] [implementationDateTime:4] [durationInMinutes:2] [passwordType:1] [password:-1] </b>*/
+int time = utcTime("esi") - 100;
+send("esi", "plugin device-management-server password \"cosmos\" " + time + " 0x0006 0x01");
+send("meter", "zcl dm req-new-pass 0x01");
+send("meter", "send 0 1 1 ");
+networkWait(10000);
+expect("meter", "plugin device-management-client print",".*applepie.*");
+networkWait(10000);
+
+
+//Test 22.21 Send unsolicited RequestNewPasswordResponse.
+send("esi", "plugin device-management-server password \"unsolicite\" " + utcTime("esi") + " 0x0006 0x01");
+send ("esi","plugin device-management-server send-req-new-pass-resp 0x01 " + nodeIdMeter + " 0x01 0x01");
+networkWait(10000);
+expect("meter", "plugin device-management-client print",".*unsolicite.*");
+
+//Test 22.22 SetID
+
+// GetSiteID
+// GetSiteID - No SiteID present
+send("esi", "plugin device-management-server pending-updates 0x00");
+send("meter", "zcl dm get-site-id");
+send("meter", "send 0 1 1 ");
+expect("meter", ".*clus 0x0708 \\(Device Management\\) FC 08 seq .. cmd 0B payload\\[03 8B \\]"); 
+networkWait(timeout*10);
+
+send("esi", "zcl global read 0x0702 0x0311");
+send("esi", "send " + nodeIdMeter + " 1 1 ");
+expect("esi", ".*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 01 payload\\[11 03 00 41 00 \\]");
+
+// GetSiteID - Setup sample SiteId
+send("esi", "plugin device-management-server provider-id 0x00000000");
+send("esi", "plugin device-management-server issuer-event-id 0x00100000");
+send("esi", "plugin device-management-server site-id \"dummySiteId\" 0x00000000");
+send("esi", "plugin device-management-server pending-updates 0x04");
+send("meter", "zcl dm get-site-id");
+send("meter", "send 0 1 1 ");
+networkWait(timeout*10);
+
+// make sure siteId is updated
+send("esi", "zcl global read 0x0702 0x0307");
+send("esi", "send " + nodeIdMeter + " 1 1 ");
+expect("esi", "*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 01 payload\\[07 03 00 41 0B 64 75 6D 6D 79 53 69 74 65 49 64 \\]");
+networkWait(timeout*10);
+
+// UpdateSiteId - update in 5min from now
+send("esi", "plugin device-management-server issuer-event-id 0x00100011");
+send("esi", "plugin device-management-server site-id \"dummySiteId2\" " + epochTimeInFuture(5));
+send("meter", "");
+send("meter", "plugin device-management-client print");
+send("meter", "zcl dm get-site-id");
+send("meter", "send 0 1 1");
+networkWait(timeout*10);
+
+// making sure site was not changed.
+send("esi", "zcl global read 0x0702 0x0307");
+send("esi", "send " + nodeIdMeter + " 1 1 ");
+expect("esi", ".*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 01 payload\\[07 03 00 41 0B 64 75 6D 6D 79 53 69 74 65 49 64 \\]");
+networkWait(timeout*10);
+
+// UpdateSiteId - cancel pending change on meter
+send("esi", "plugin device-management-server issuer-event-id 0x00100011");
+send("esi", "plugin device-management-server site-id \"dummySiteId2\" 0xFFFFFFFF");
+send("esi", "plugin device-management-server pending-updates 0x04");
+send("meter", "zcl dm get-site-id");
+send("meter", "send 0 1 1");
+networkWait(timeout*10);
+send("meter", "plugin device-management-client print");
+
+// UpdateSiteId - cancel all pending changes on ESI
+send("esi", "plugin device-management-server pending-updates 0x00");
+send("meter", "zcl dm get-cin");
+send("meter", "send 0 1 1 ");
+networkWait(timeout*10);
+
+
+
+// Test 22.23  GetEventConfiguration and ReportEventConfiguration
+
+//One event
+//Non existent event id. We need to return 
+send("esi","zcl dm get-event-config 0x0000");
+send("esi","send " + nodeIdMeter +" 1 1");  
+expect("esi",".*RX len 5, ep 01, clus 0x0708 \\(Device Management\\) FC 00 seq [0-9A-F]{2} cmd 0B payload\\[05 8B \\]");
+
+
+send("esi","zcl dm get-event-config 0x0100");
+send("esi","send " + nodeIdMeter +" 1 1");  
+expect("esi",".*RX len 8, ep 01, clus 0x0708 \\(Device Management\\) FC 01 seq [0-9A-F]{2} cmd 04 payload\\[00 01 00 01 00 \\]");
+
+//Group ID 0x00FF invalid group Id
+send("esi","zcl dm get-event-config 0x00FF");
+send("esi","send " + nodeIdMeter +" 1 1");
+expect("esi",".*RX len 5, ep 01, clus 0x0708 \\(Device Management\\) FC 00 seq [0-9A-F]{2} cmd 0B payload\\[05 8B \\]");
+
+//Group ID 0x01FF
+send("esi","zcl dm get-event-config 0x01FF");
+send("esi","send " + nodeIdMeter +" 1 1");
+expect("esi",".*RX len 152, ep 01, clus 0x0708 \\(Device Management\\).*");
+//expect("esi",".*RX len 29, ep 01, clus 0x0708 \\(Device Management\\) FC 01 seq [0-9A-F]{2} cmd 04 payload\\[00 01 00 01 00 01 01 00 02 01 00 03 01 00 04 01 00 05 01 00 06 01 00 07 01 00 \\]");
+
+//Group ID 0x02FF
+send("esi","zcl dm get-event-config 0x02FF");
+send("esi","send " + nodeIdMeter +" 1 1");  
+expect("esi",".*RX len 335, ep 01, clus 0x0708 \\(Device Management\\).*");
+
+//Group ID 0x03FF
+send("esi","zcl dm get-event-config 0x08FF");
+send("esi","send " + nodeIdMeter +" 1 1");  
+expect("esi",".*RX len 5, ep 01, clus 0x0708 \\(Device Management\\) FC 00 seq [0-9A-F]{2} cmd 0B payload\\[05 8B \\]");
+
+
+networkWait(10000);
+
+//All events
+send("esi","zcl dm get-event-config 0xFFFF");
+send("esi","send " + nodeIdMeter +" 1 1");
+expect("esi",".*RX len .*, ep 01, clus 0x0708 \\(Device Management\\).*");
+
+networkWait(10000);
+
+
+networkWait(5000);
+
+// Test 22.24 Set Event Configuration
+
+//Push to WAN = 0x08
+//Apply by List = 0x00
+//Tou Tariff Activation =0x100
+send("esi","zcl dm set-event-config 0x00000001 0x12345678 0x08 0x00 0x03 0x00 0x01 0x02 0x01 0x03 0x01");
+send("esi","send " + nodeIdMeter +" 1 1");
+
+send("esi","zcl dm get-event-config 0x0100");
+send("esi","send " + nodeIdMeter +" 1 1");
+expect("esi",".*RX len 8, ep 01, clus 0x0708 \\(Device Management\\) FC 01 seq [0-9A-F]{2} cmd 04 payload\\[00 01 00 01 08 \\]");
+
+
+networkWait(5000);
+
+//Apply by event group
+send("esi","zcl dm set-event-config 0x00000001 0x12345678 0x7D 0x01 0xFF 0x01");
+send("esi","send " + nodeIdMeter +" 1 1");
+
+send("esi","zcl dm get-event-config 0x01FF");
+send("esi","send " + nodeIdMeter +" 1 1");
+expect("esi",".*RX len .*, ep 01, clus 0x0708 \\(Device Management\\) FC 01 seq [0-9A-F]{2} cmd 04 payload\\[00 01 00 01 7D 01 01 7D 02 01 7D 03 01 7D 04 01 7D 05 01 7D 06 01 7D 07 01 7D 08 01 7D C0 01 7D C1 01 7D C2 01 7D C3 01 7D C4 01 7D C5 01 7D C6 01 7D C7 01 7D C8 01 7D C9 01 7D CA 01 7D CB 01 7D CC 01 7D CD 01 7D CE 01 7D CF 01 7D D0 01 7D D1 01 7D D2 01 7D D3 01 7D D4 01 7D D5 01 7D D6 01 7D D7 01 7D D8 01 7D D9 01 7D DA 01 7D DB 01 7D DC 01 7D DD 01 7D DE 01 7D DF 01 7D E0 01 7D E1 01 7D E2 01 7D E3 01 7D E4 01 7D E5 01 7D E6 01 7D E7 01 7D \\]");
+
+networkWait(5000);
+
+//Apply by LogId
+send("esi","zcl dm set-event-config 0x00000001 0x12345678 0x04 0x02 0x01");
+send("esi","send " + nodeIdMeter +" 1 1");
+
+send("esi","zcl dm get-event-config 0x0100");
+send("esi","send " + nodeIdMeter +" 1 1");
+expect("esi",".*RX len 8, ep 01, clus 0x0708 \\(Device Management\\) FC 01 seq [0-9A-F]{2} cmd 04 payload\\[00 01 00 01 04 \\]");
+
+networkWait(5000);
+
+//Apply by Configuration Match
+send("esi","zcl dm set-event-config 0x00000001 0x12345678 0x06 0x03 0x04");
+send("esi","send " + nodeIdMeter +" 1 1");
+
+send("esi","zcl dm get-event-config 0x0100");
+send("esi","send " + nodeIdMeter +" 1 1");
+expect("esi",".*RX len 8, ep 01, clus 0x0708 \\(Device Management\\) FC 01 seq [0-9A-F]{2} cmd 04 payload\\[00 01 00 01 06 \\]");
+
+networkWait(5000);
+
+//Test Case 22.25
+// UpdateCIN - update CIN immediately
+send("meter", "plugin device-management-client print");
+send("esi", "zcl global read 0x0702 0x0307");
+send("esi", "send " + nodeIdMeter + " 1 1 ");
+networkWait(timeout*10);
+
+
+// Test 22.25 UpdateCIN and getCIN command
+
+send("esi", "plugin device-management-server provider-id 0x00000000");
+send("esi", "plugin device-management-server issuer-event-id 0x00100020");
+send("esi", "plugin device-management-server cin \"spicyfish\" 0x00000000");
+send("esi", "plugin device-management-server pending-updates 0x08");
+
+send("meter", "zcl dm get-cin");
+
+send("meter", "send 0 1 1");
+networkWait(timeout*10);
+
+// making sure CIN was written
+send("esi", "zcl global read 0x0702 0x0311");
+send("esi", "send " + nodeIdMeter + " 1 1 ");
+expect("esi", "*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 01 payload\\[11 03 00 41 09 73 70 69 63 79 66 69 73 68 \\]");
+networkWait(timeout*10);
+
+networkWait(5000);
+// UpdateCIN - update in 5min from now
+send("esi", "plugin device-management-server issuer-event-id 0x00100021");
+send("esi", "plugin device-management-server cin \"shrimp\" " + epochTimeInFuture(5));
+send("meter", "");
+send("meter", "plugin device-management-client print");
+send("meter", "zcl dm get-cin");  
+send("meter", "send 0 1 1");
+networkWait(timeout*10);
+
+// making sure CIN was not changed.
+send("esi", "zcl global read 0x0702 0x0311");
+send("esi", "send " + nodeIdMeter + " 1 1 ");
+expect("esi", "*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 01 payload\\[11 03 00 41 09 73 70 69 63 79 66 69 73 68 \\]");
+networkWait(timeout*10);
+
+// UpdateCIN - cancel pending change on meter
+send("esi", "plugin device-management-server issuer-event-id 0x00100021");
+send("esi", "plugin device-management-server cin \"shrimp\" 0xFFFFFFFF");
+send("esi", "plugin device-management-server pending-updates 0x08");
+send("meter", "plugin device-management-client print");
+send("meter", "zcl dm get-cin");
+send("meter", "send 0 1 1");
+networkWait(timeout*10);
+
+// UpdateCin - cancel all pending changes on ESI
+send("esi", "plugin device-management-server pending-updates 0x00");
+send("meter", "zcl dm get-cin");
+send("meter", "send 0 1 1 ");
+expect("meter",".*RX len 5, ep 01, clus 0x0708 \\(Device Management\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[05 8B\\ ]");
+networkWait(timeout*10);
+

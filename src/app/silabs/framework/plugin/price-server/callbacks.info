@@ -1,0 +1,69 @@
+#include  "app/framework/plugin/price-server/price-server.h"
+
+/** @brief New Active Price Matrix
+ *
+ * This callback is used to notify the application that a new PriceMatrix has
+ * become active. The application is responsible for updating proper ZCL
+ * attributes to reflect the necessary vendor specific behaviors. Argument,
+ * priceCommonInfo, would contain common informations such as startTime and
+ * etc. Argument, priceMatrix, would contain the PriceMatrix information
+ * itself.
+ *
+ * @param priceCommonInfo   Ver.: always
+ * @param priceMatrix   Ver.: always
+ */
+void emberAfPluginPriceServerNewActivePriceMatrixCallback(const EmberAfPriceCommonInfo *priceCommonInfo,
+                                                          const EmberAfScheduledPriceMatrix *priceMatrix)
+{
+}
+
+/** @brief New Active Tariff Information
+ *
+ * This callback is used to notify the application that a new Tariff
+ * Information has become active. The application is responsible for updating
+ * proper ZCL attributes to reflect the necessary vendor specific behaviors.
+ * Argument, priceCommonInfo, would contain common informations such as
+ * startTime and etc. Argument, priceTariffInfo, would contain the PriceMatrix
+ * information itself.
+ *
+ * @param priceCommonInfo   Ver.: always
+ * @param priceTariffInfo   Ver.: always
+ */
+void emberAfPluginPriceServerNewActiveTariffInformationCallback(const EmberAfPriceCommonInfo *priceCommonInfo,
+                                                                const EmberAfScheduledTariff *priceTariffInfo)
+{
+}
+
+/** @brief New Active Block Thresholds Information
+ *
+ * This callback is used to notify the application that a new Block Thresholds
+ * Information has become active. The application is responsible for updating
+ * proper ZCL attributes to reflect the necessary vendor specific behaviors.
+ * Argument, priceCommonInfo, would contain common informations such as
+ * startTime and etc. Argument, priceTariffInfo, would contain the
+ * BlockThresholds information itself.
+ *
+ * @param priceCommonInfo   Ver.: always
+ * @param priceBlockThresholds   Ver.: always
+ */
+void emberAfPluginPriceServerNewActiveBlockThresholdsInformationCallback(const EmberAfPriceCommonInfo *priceCommonInfo,
+                                                                         const EmberAfScheduledBlockThresholds *priceBlockThresholds)
+{
+}
+
+/** @brief New Active Block Period Information
+ *
+ * This callback is used to notify the application that a new Block Period
+ * Information has become active. The application is responsible for updating
+ * proper ZCL attributes to reflect the necessary vendor specific behaviors.
+ * Argument, priceCommonInfo, would contain common informations such as
+ * startTime and etc. Argument, priceBlockPeriod, would contain the BlockPeriod
+ * information itself.
+ *
+ * @param priceCommonInfo   Ver.: always
+ * @param priceBlockPeriods   Ver.: always
+ */
+void emberAfPluginPriceServerNewActiveBlockPeriodInformationCallback(const EmberAfPriceCommonInfo *priceCommonInfo,
+                                                                     const EmberAfPriceBlockPeriod *priceBlockPeriods)
+{
+}

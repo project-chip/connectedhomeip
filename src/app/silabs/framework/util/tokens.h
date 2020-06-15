@@ -1,0 +1,47 @@
+/**
+ *
+ *    Copyright (c) 2020 Silicon Labs
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+/***************************************************************************//**
+ * @brief Framework header file, responsible for including generated tokens
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2018 Silicon Laboratories, Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * The licensor of this software is Silicon Laboratories Inc.  Your use of this
+ * software is governed by the terms of  Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement.  This
+ * software  is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ ******************************************************************************/
+
+#include "app/framework/include/af-types.h"
+
+#ifdef GENERATED_TOKEN_HEADER
+
+// If we have generated header, use it.
+#include GENERATED_TOKEN_HEADER
+
+#else
+
+// We don't have generated header. Default is to have no tokens.
+
+#define GENERATED_TOKEN_LOADER(endpoint) {}
+#define GENERATED_TOKEN_SAVER {}
+
+#endif // GENERATED_TOKEN_HEADER

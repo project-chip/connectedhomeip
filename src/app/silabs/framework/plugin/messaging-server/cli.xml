@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-messaging-server" name="Plugin Commands: Messaging Server">
+    <description>
+      The messaging-server plugin contributes CLI commands to the application framework to be used for manipulating messages in a server context.
+    </description>
+  </group>
+  <command cli="plugin messaging-server message" functionName="emAfMessagingServerCliMsg" group="plugin-messaging-server">
+    <description>
+      Set the message used by the message plugin.
+    </description>
+    <arg name="message" type="OCTET_STRING" description="The message to set" />
+  </command>
+  <command cli="plugin messaging-server append" functionName="emAfMessagingServerCliAppend" group="plugin-messaging-server">
+    <description>
+      Append an additional string to the message contained in the message plugin
+    </description>
+    <arg name="message" type="OCTET_STRING" description="the string to append to the current message" />
+  </command>
+  <command cli="plugin messaging-server id" functionName="emAfMessagingServerCliId" group="plugin-messaging-server">
+    <description>
+      Set the message id for the message contained in the messaging plugin
+    </description>
+    <arg name="messageId" type="INT32U" description="message id" />
+  </command>
+  <command cli="plugin messaging-server time" functionName="emAfMessagingServerCliTime" group="plugin-messaging-server">
+    <description>
+      Set the start time and duration for the message used by the message plugin.
+    </description>
+    <arg name="time" type="INT32U" description="start time" />
+    <arg name="duration" type="INT16U" description="duration" />
+  </command>
+  <command cli="plugin messaging-server relative-time" functionName="emAfMessagingServerCliRelativeTime" group="plugin-messaging-server">
+    <description>
+      Set the relative time on the message.
+    </description>
+    <arg name="time" type="INT32U" description="number of minutes to add to the message time above the current time" />
+    <arg name="duration" type="INT32U" description="duration in minutes for the message to be valid" />
+  </command>
+  <command cli="plugin messaging-server transmission normal" functionName="emAfMessagingServerCliTransmission" group="plugin-messaging-server">
+    <description>
+      Sets the message control bit mask to normal transmission.
+    </description>
+  </command>
+  <command cli="plugin messaging-server transmission ipan" functionName="emAfMessagingServerCliTransmission" group="plugin-messaging-server">
+    <description>
+      Set the message control bit mask in the message to anonymous.
+    </description>
+  </command>
+  <command cli="plugin messaging-server transmission both" functionName="emAfMessagingServerCliTransmission" group="plugin-messaging-server">
+    <description>
+      Set the message control bit mask in the message to normal and anonymous.
+    </description>
+  </command>
+  <command cli="plugin messaging-server importance low" functionName="emAfMessagingServerCliImportance" group="plugin-messaging-server">
+    <description>
+      Set the message importance to low.
+    </description>
+  </command>
+  <command cli="plugin messaging-server importance medium" functionName="emAfMessagingServerCliImportance" group="plugin-messaging-server">
+    <description>
+      Set the message importance to medium.
+    </description>
+  </command>
+  <command cli="plugin messaging-server importance high" functionName="emAfMessagingServerCliImportance" group="plugin-messaging-server">
+    <description>
+      Set the message importance to high.
+    </description>
+  </command>
+  <command cli="plugin messaging-server importance critical" functionName="emAfMessagingServerCliImportance" group="plugin-messaging-server">
+    <description>
+      Set the message importance to critical.
+    </description>
+  </command>
+  <command cli="plugin messaging-server confirm not" functionName="emAfMessagingServerCliConfirm" group="plugin-messaging-server">
+    <description>
+      Set the message confirmation to not used.
+    </description>
+  </command>
+  <command cli="plugin messaging-server confirm req" functionName="emAfMessagingServerCliConfirm" group="plugin-messaging-server">
+    <description>
+      Set message confirmation to required.
+    </description>
+  </command>
+  <command cli="plugin messaging-server valid" functionName="emAfMessagingServerCliValid" group="plugin-messaging-server">
+    <description>
+      Set the message validity to valid.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+  </command>
+  <command cli="plugin messaging-server invalid" functionName="emAfMessagingServerCliValid" group="plugin-messaging-server">
+    <description>
+      Set the message validity to invalid.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+  </command>
+  <command cli="plugin messaging-server display" functionName="emAfMessagingServerCliDisplay" group="plugin-messaging-server">
+    <description>
+      Display the message.
+    </description>
+    <arg name="nodeId"      type="INT16U" description = "The destination of the message." />
+    <arg name="srcEndpoint" type="INT8U"  description = "The source endpoint of the message." />
+    <arg name="dstEndpoint" type="INT8U"  description = "The destination endpoint of the message." />
+  </command>
+  <command cli="plugin messaging-server cancel" functionName="emAfMessagingServerCliCancel" group="plugin-messaging-server">
+    <description>
+      Cancel the message.
+    </description>
+    <arg name="nodeId"      type="INT16U" description = "The destination of the message." />
+    <arg name="srcEndpoint" type="INT8U"  description = "The source endpoint of the message." />
+    <arg name="dstEndpoint" type="INT8U"  description = "The destination endpoint of the message." />
+  </command>
+  <command cli="plugin messaging-server print" functionName="emAfMessagingServerCliPrint" group="plugin-messaging-server">
+    <description>
+      Print the message info.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+  </command>
+</cli>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-compact-logger" name="Plugin Commands: Compact Logger">
+    <description>
+      The compact-logger plugin contributes CLI commands to the application framework to be used for storing information.
+    </description>
+  </group>
+  <command cli="plugin compact-logger clear" functionName="emAfCompactLoggerClearLog" group="plugin-compact-logger">
+    <description>
+      Clear the log
+    </description>
+  </command>
+  <command cli="plugin compact-logger set-severity" functionName="emAfCompactLoggerSetSeverity" group="plugin-compact-logger">
+    <arg name="severity" type="INT8U" description="The new severity level." />
+    <description>
+      Sets the minimum severity level messages must meet in order to be logged
+    </description>
+  </command>
+  <command cli="plugin compact-logger set-facility" functionName="emAfCompactLoggerSetFacility" group="plugin-compact-logger">
+    <arg name="facility" type="INT16U" description="The new facility value." />
+    <description>
+      Set the facility values messages must meet in order to be logged
+    </description>
+  </command>
+</cli>

@@ -1,0 +1,500 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  System.out.print("****TODO: FIX for multihop ****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices = {
+  "server",
+  "router",
+  "client"
+};
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh"
+};
+String ncpImage = "app/ncp/sample-app/xncp-test-harness-ecc-spi/simulation/build/exe/xncp-test-harness-ecc-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+expect("client",
+       "option print-rx-msgs disable",
+       "disabled print");
+expect("server",
+       "option print-rx-msgs disable",
+       "disabled print");
+expect("router",
+       "option print-rx-msgs disable",
+       "disabled print");
+
+// Disable auto-registration to test initial bring up.
+expectNoResponse("server", "plugin test-harness registration off");
+expectNoResponse("client", "plugin test-harness registration off");
+expectNoResponse("router", "plugin test-harness registration off");
+
+send("client", "libs");
+send("client", "info");
+
+formAndJoinDevices(allDevices);
+
+// Disable keep-alive as it periodically prints READ_ATTR messages on the
+// coordinator, killing the expectNoResponse calls
+send("router", "plugin test-harness tc-keepalive stop");
+send("client", "plugin test-harness tc-keepalive stop");
+networkWait(2000);
+
+expect("client",
+       "plugin concentrator print-table",
+       ".* total entries.*");
+
+//Force all devices to use the ECC 163k1 curve
+expectNoResponse("server", "plugin test-harness key-establishment suite 0x0001");
+expectNoResponse("client", "plugin test-harness key-establishment suite 0x0001");
+expectNoResponse("router", "plugin test-harness key-establishment suite 0x0001");
+//Ember test case
+//Verify bug 13554.  This seems to occur when
+//the node ID of the partner is uninitialized.
+debugPrintln("*** Ember Test: Bug 13554 ***");
+expectNoResponse("client",
+                 "plugin test-harness key-establishment out-of-sequence 0");
+expect("client",
+       "plugin key-establishment start 0 1",
+       ".*Terminate Received, Status.*Bad Message");
+network.sleep(2000);
+
+// Have the router do KE so it is ready to go in a later test.
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expect("router",
+       "plugin key-establishment start 0 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");
+
+// Test 15.5 - the canonical case
+debugPrintln("*** Test Case 15.5 Canonical Case ***");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expect("client",
+       "plugin key-establishment start 0 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");
+
+String clientNodeId = nodeId("client");
+network.sleep(500);
+
+// Test 15.6 - Multihop
+debugPrintln("*** Test Case 15.6 Multi-hop (Not Yet implemented) ***");
+//   Test case not yet implemented
+
+// Now we try to create problems and check that the device responds correctly.
+
+// Test 15.7 Unknown issuer (TC)
+debugPrintln("*** Test Case 15.7 Unknown issuer (TC) ***");
+expectNoResponse("client", "plugin test-harness key-establishment cert-mangle issuer {0102030405060708}");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Initiator: Key Establish Error: Partner sent terminate.*");
+
+// Test 15.8 Unknown issuer (DEVx)
+debugPrintln("*** Test Case 15.8 Unknown issuer (DEVx) ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment cert-mangle issuer {0102030405060708}");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Bad Certificate Issuer");
+network.sleep(2000);
+
+// Test 15.9 -  DELETED
+debugPrintln("*** Test Case 15.9 DELETED from spec. ***");
+// Test 15.10 - DELETED
+debugPrintln("*** Test Case 15.10 DELETED from spec. ***");
+// Test 15.11 - DELETED
+debugPrintln("*** Test Case 15.11 DELETED from spec. ***");
+
+// Test 15.12 - Key Establishment 2 non-TC devices.
+debugPrintln("*** Test Case 15.12 Key Establishment 2 non-TC devices ***");
+expect("router",
+       "plugin partner-link-key-exchange partner " + clientNodeId + " 1",
+       "Key established: 1");
+ // let other cli messages for other nodes get a chance to print (such as "key established:")
+networkWait(5000);
+networkWait(20000);
+ // Added in ZSE 1.4 - direct CBKE between 2 non-TC devices
+ // NB: direct CBKE only allowed once partner link key established
+expectNoResponse("client", "keys delete 0");
+expectNoResponse("client", "plugin test-harness key-establishment new-key-policy 0");
+expectNoResponse("router", "keys delete 0");
+expectNoResponse("router", "plugin test-harness key-establishment new-key-policy 0");
+
+String routerNodeId = nodeId("router");
+
+expect("router",
+       "plugin key-establishment start " + clientNodeId + " 1",
+       ".*Starting Key Establishment.*");
+expect("client",
+       "Error: Unknown EUI64 trying to perform CBKE\\.");
+expect("router",
+       "Initiator: Key Establish Error: Partner sent terminate .*");
+networkWait(2000);
+
+expect("client",
+       "plugin key-establishment start " + routerNodeId + " 1",
+       ".*Starting Key Establishment.*");
+expect("router",
+       "Error: Unknown EUI64 trying to perform CBKE\\.");
+expect("client",
+       "Initiator: Key Establish Error: Partner sent terminate .*");
+networkWait(2000);
+
+ // Establish a partner link key and check that a direct CBKE afterwards succeeds
+expect("router",
+       "plugin partner-link-key-exchange partner " + clientNodeId + " 1",
+       "Key established: 1");
+networkWait(5000);
+
+expect("router",
+       "plugin key-establishment start " + clientNodeId + " 1",
+       "Initiator: Key Establish Success: Link key verified .*",
+       10000);
+networkWait(3000);
+
+expect("client",
+       "plugin key-establishment start " + routerNodeId + " 1",
+       "Initiator: Key Establish Success: Link key verified .*",
+       10000);
+networkWait(3000);
+
+// Test 15.13 - DELETED
+debugPrintln("*** Test Case 15.13 DELETED from spec. ***");
+
+// Test 15.14 - Out of Sequence Mesasge (TC)
+debugPrintln("*** Test Case 15.14 out of sequence message (TC) ***");
+expectNoResponse("client", "plugin test-harness key-establishment out-of-sequence 0");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Initiator: Key Establish Error: Partner sent terminate.*");
+network.sleep(2000);
+
+// Test 15.15 - Installation Code
+debugPrintln("*** Test Case 15.15 Installation Code (Will not implement) ***");
+//   Test Case not implemented.  This requires a different configuration
+//   of the device, where we build with "SE Full Security".  This is not normally
+//   done for our test applications.  Plus it uses MFG tokens which have a very
+//   unusual setup in simulated targets.
+
+// Test 15.16 - Unauthorized PAN Interpan communication
+debugPrintln("*** Test Case 15.16 Unauthorized PAN Interpan communication (Not yet implemented) ***");
+//   Test case not yet implemented
+
+// Test 15.17 - DELETED
+debugPrintln("*** Test Case 15.17 DELETED from spec. ***");
+
+// Test 15.18 - Unauthorized Communication prior to key establishment (TC)
+debugPrintln("*** Test Case 15.18 Unauthorized Communication prior to key establishment (TC) (Not yet implemented) ***");
+//   Test case not yet implemented
+
+// Test 15.19 - Unauthorized Communication prior to key establishment (DEVx)
+debugPrintln("*** Test Case 15.18 Unauthorized Communication prior to key establishment (DEVx) (Not yet implemented) ***");
+//   Test case not yet implemented
+
+// Test 15.20 - DELETED
+debugPrintln("*** Test Case 15.20 DELETED from spec. ***");
+
+networkWait(20000);
+// Test 15.21 - Corrupt Certificate (TC)
+debugPrintln("*** Test Case 15.21 Corrupt Certificate (TC) ***");
+expectNoResponse("client", "plugin test-harness key-establishment cert-mangle corrupt 47");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+send("client",
+     "plugin key-establishment start 0 1");
+expect("server",
+       "",
+       "Responder: Key Establish Error: Key confirm failure.*",
+       20000);
+network.sleep(2000);
+
+// Test 15.22 - No Resources (DEVx)
+debugPrintln("*** Test Case 15.22 No Resources (DEVx) ***");
+//   Although this test calls for the partner to retry the operation later,
+//   that isn't possible the way the code is setup.  The registration code
+//   controls the retry operation, not key establishment cluster itself.
+//   So we just test that the client detects the condition and aborts.
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment no-resources");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Initiator: Key Establish Error: Partner sent terminate.*");
+// Because the Test harness rewrites the outgoing mesasge, we need to allow time for
+// the actual cluster code to timeout itself.
+network.sleep(30000);
+
+// Test 15.23 - DELETED
+debugPrintln("*** Test Case 15.23 DELETED from spec. ***");
+
+// Test 15.24 - Timeout (TC)
+debugPrintln("*** Test Case 15.24 Timeout (TC) ***");
+expectNoResponse("client", "plugin test-harness key-establishment delay-cbke 30 10");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("client",
+       "plugin key-establishment start 0 1",
+       40000,
+       "Terminate Received, Status.*Bad Message");
+// Because the Test harness suppresses the mesasge, we need to allow time for
+// the actual cluster code to timeout itself.
+network.sleep(10000);
+
+// Test 15.25 - Timeout (DEVx)
+debugPrintln("*** Test Case 15.25 Timeout (DEVx) ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment delay-cbke 30 10");
+send("client",
+     "plugin key-establishment start 0 1");
+expect("server",
+       "",
+       40000,
+       "Terminate Received, Status.*Bad Message");
+// Because the Test harness suppresses the mesasge, we need to allow time for
+// the actual cluster code to timeout itself.
+network.sleep(20000);
+
+// Test 15.26 - Long Generate Time (TC)
+debugPrintln("*** Test Case 15.26 Long Generate Time (TC) ***");
+expectNoResponse("client", "plugin test-harness key-establishment delay-cbke 240 240");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "TEST HARNESS: Delaying ephemeral key callback for 240 seconds",
+       10000);
+expect("server",
+       "",
+       "Responder: Key Establish Success: Link key verified .*",
+       (2 * 240 * 1000) + (20000));  // extra 20000 is the fudge factor
+network.sleep(2000);
+
+// Test 15.27 - Long Generate Time (DEVx)
+debugPrintln("*** Test Case 15.27 Long Generate Time (DEVx) ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment delay-cbke 240 240");
+send("client",
+       "plugin key-establishment start 0 1");
+expect("server",
+       "",
+       "TEST HARNESS: Delaying ephemeral key callback for 240 seconds",
+       10000);
+expect("client",
+       "",
+       (2 * 240 * 1000) + (20000),  // extra 20000 is the fudge factor
+       "Initiator: Key Establish Success: Link key verified .*");
+network.sleep(2000);
+
+// Test 15.28 - Initiate Key Estabishment by Sleeping End Device (TC)
+debugPrintln("*** Test Case 15.28 Initiate Key Establishment by Sleeping End Device (TC) (Not yet implemented) ***");
+//   Test case not yet implemented
+
+// Test 15.29 - DELETED
+debugPrintln("*** Test Case 15.29 DELETED from spec. ***");
+
+// Test 15.30 - Link Key Update
+debugPrintln("*** Test Case 15.30 Link Key Update ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("server",
+       "plugin key-establishment start " + clientNodeId + " 1",
+       "Initiator: Key Establish Success: Link key verified .*",
+       10000);
+network.sleep(2000);
+
+// Test 15.31 - DELETED
+debugPrintln("*** Test Case 15.31 DELETED from spec. ***");
+
+// Test 15.32 - Too Short Certificate (TC)
+debugPrintln("*** Test Case 15.32 Too Short Certificate (TC) ***");
+expectNoResponse("client", "plugin test-harness key-establishment cert-mangle length -10");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+send("client",
+     "plugin key-establishment start 0 1");
+expect("server",
+       "",
+       ".*Invalid length for KE command: 0 .*");
+network.sleep(35000);
+
+// Test 15.33 - Too Short Certificate (DEVx)
+debugPrintln("*** Test Case 15.32 Too Short Certificate (DEVx) ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment cert-mangle length -10");
+expect("client",
+       "plugin key-establishment start 0 1",
+       ".*Invalid length for KE command: 0 .*");
+
+// The ZCL layer will send a default response but the cluster will
+// not actually be notified.  So we need to allow the cluster to
+// timeout the operation separately.
+network.sleep(30000);
+
+// Test 15.34 - Too Long Certificate (TC)
+debugPrintln("*** Test Case 15.32 Too Long Certificate (TC) ***");
+expectNoResponse("client", "plugin test-harness key-establishment cert-mangle length 10");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Initiator: Key Establish Success: Link key verified .*",
+       10000);
+network.sleep(2000);
+
+
+// Test 15.35 - Too Long Certificate (DEVx)
+debugPrintln("*** Test Case 15.35 Too Long Certificate (DEVx) ***");
+//   Extra bytes should not affect the operation of the cluster.
+nexpect("client", "plugin test-harness key-establishment normal-mode", "Error: Unknown command.");
+nexpect("server", "plugin test-harness key-establishment cert-mangle length 10", "Error: Unknown command.");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Initiator: Key Establish Success: Link key verified .*",
+       10000);
+network.sleep(2000);
+
+// Test 15.36 - Rejected Partner link key
+debugPrintln("*** Test Case 15.36 Rejected Partner Link key ***");
+if (runArgument.runUsingHostApps) {
+  expect("client",
+         "plugin partner-link-key-exchange allow-partner 0",
+         ".*Ezsp Policy: set App Link Key Request Policy to \"Deny\":Success: set");
+} else {
+  expectNoResponse("client",
+                   "plugin partner-link-key-exchange allow-partner 0");
+}
+network.sleep(1000);
+expect("router",
+       "plugin partner-link-key-exchange partner " + clientNodeId + " 1",
+       "Error: Node " + clientNodeId + " rejected partner link key request: 0x.*",10000);
+network.sleep(2000);
+if (runArgument.runUsingHostApps) {
+  expect("client",
+         "plugin partner-link-key-exchange allow-partner 1",
+         ".*Ezsp Policy: set App Link Key Request Policy to \"Allow\":Success: set");
+} else {
+  expectNoResponse("client",
+                   "plugin partner-link-key-exchange allow-partner 1");
+}
+
+// Test 15.37 - Out of sequence Message (DEVx)
+debugPrintln("*** Test Case 15.37 Out of Sequence message (DEVx) ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment out-of-sequence 0");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Initiator: Key Establish Error: Bad message.*");
+network.sleep(2000);
+
+// Test 15.38 - Corrupt Certificate (DEVx)
+debugPrintln("*** Test Case 15.38 Corrupt Certificate (DEVx) ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment cert-mangle corrupt 47");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Initiator: Key Establish Error: Key confirm failure.*",
+       20000);
+network.sleep(2000);
+
+// Test 15.39 - Frame Counter Synchronization - Reset after KE
+debugPrintln("*** Test Case 15.39 Frame Counter Synchronization - Reset after KE ***");
+
+// DUT = Server (TC)
+
+// Jump the Frame counter ahead so server records this.
+expectNoResponse("client", "plugin test-harness key-establishment adv-aps-fc");
+
+// Test APS encryption before FC reset.  Assumes previous CBKE key was established.
+send("client", "zcl msg get");
+expect("client",
+       "send 0 1 1",
+       ".*Msg: clus 0x0703, cmd 0x00, len 3");
+networkWait(1000);
+
+expectNoResponse("client", "plugin test-harness key-establishment reset-aps-fc");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("client",
+       "plugin key-establishment start 0 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");
+// Test APS encryption after FC reset
+send("client", "zcl msg get");
+expect("client",
+       "send 0 1 1",
+       "Msg: clus 0x0703, cmd 0x00, len 3");
+network.sleep(2000);
+
+// Test 15.40 - Frame Counter Synchronization - No Reset after Key Establishment
+//   Unnecessary.  By default Our stack doesn't reset outgoing APS frame counter.
+
+// Test 15.41 - Key Establishment Fraudulent Trust Center Certificate (DEVx)
+debugPrintln("*** Test 15.41 - Key Establishment Fraudulent Trust Center Certificate (DEVx) ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment cert-mangle subject {0102030405060708}");
+expect("client",
+       "plugin key-establishment start 0 1",
+       "Error: EUI64 of TC does not match its cert.");
+network.sleep(2000);
+
+// Test 15.42 - Unknown EUI64 in device certificate
+debugPrintln("*** Test 15.42 - Unknown EUI64 in device certificate (TC) ***");
+expectNoResponse("client", "plugin test-harness key-establishment cert-mangle subject {0102030405060708}");
+expectNoResponse("server", "plugin test-harness key-establishment new-key-policy 0");
+send("client",
+     "plugin key-establishment start 0 1");
+expect("server",
+       "",
+       ".*Unknown EUI64 trying to perform CBKE.*");
+network.sleep(2000);
+
+// EMBER INTERNAL TESTS
+
+// The spec. allows for Default Response (Failure) instead of the Terminate KE.
+// message.  We test that a Default Response is handled by our code.
+debugPrintln("*** Ember Test Case - Check Default Response ***");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("server", "plugin test-harness key-establishment default-resp");
+expect("client",
+       "plugin key-establishment start 0 1",
+       ".*Got Default Response with error code: 1");
+// The server doesn't know its commands were rewritten to terminate
+// KE.  So we must wait until it times out the operation.
+network.sleep(30000);
+
+//Test that we can join even with the Key Establishment Attribute set to 0, as
+//it is in stacks 4.6 or older.
+debugPrintln("*** Test that the KE attribute of 0 is acceptable to do  163k1 CBKE***");
+expectNoResponse("server", "plugin test-harness key-establishment suite 0x0000");
+expectNoResponse("client", "plugin test-harness key-establishment suite 0x0000");
+send("server","plugin test-harness key-establishment set-available-suite 0");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("client", "plugin test-harness key-establishment normal-mode");
+expect("client",
+       "plugin key-establishment start 0 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");

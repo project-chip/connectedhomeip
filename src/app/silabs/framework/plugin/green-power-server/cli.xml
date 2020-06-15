@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-green-power-server" name="Plugin Commands: Green Power Server">
+    <description>
+      The Green Power Server plugin contributes CLI commands to the application framework to be used for getting, setting, and displaying information relevant to the Green Power Server cluster.
+    </description>
+  </group>
+  <command cli="plugin green-power-server commission" functionName="emberAfPluginGreenPowerServerCommissioningMode" group="plugin-green-power-server">
+    <description>
+      Put the GPS in commissioning mode
+    </description>
+    <arg name="options"                type="INT8U"         description="1 to enter, 0 to leave"                           />
+    <arg name="gpmAddressSecurity"     type="INT16U"        description="Green Power Manager (GPM) address for security"   />
+    <arg name="gpmAddressPairing"      type="INT16U"        description="Green Power Manager (GPM) address for pairing"    />
+    <arg name="endpoint"               type="INT8U"         description="Sink endpoint"                                    />
+  </command>
+  <command cli="plugin green-power-server extend-comm" functionName="emberAfGreenPowerClusterGpSinkCliCommissioningWindowExtend" group="plugin-green-power-server">
+    <description>
+      Extends commissioning window.
+    </description>
+    <arg name="commissioningWindow"    type="INT16U"         description="time in miliseconds "                           />
+  </command>
+  <command cli="plugin green-power-server sink-table-print" functionName="emberAfPluginGreenPowerServerCliSinkTablePrint" group="plugin-green-power-server">
+    <description>
+      Print all entries of the sink table.
+    </description>
+  </command>
+  <command cli="plugin green-power-server sink-table-clear" functionName="emberAfPluginGreenPowerServerCliClearSinkTable" group="plugin-green-power-server">
+    <description>
+      Clear sink table.
+    </description>
+  </command>
+</cli>

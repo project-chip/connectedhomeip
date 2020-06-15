@@ -1,0 +1,1355 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to make sure our Z3 sample apps can
+// be used for a TRaC test harness. This means that the sample-apps
+// not only conform to the latest ZigBee Base Device specification,
+// but also that the TRaC stack hooks are working.
+
+// There are a couple of payload expect() calls where device2 node id
+// is hardcoded to be 0x1234. I have done this as a shortcut, but they can
+// be changed to use something like nodeId("switch") if need be.
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {
+  std.print("*** HOSTs do not have access to emberIncomingCommandHandler ***");
+  return;
+}
+
+if (runArgument.runUsingMultihop) {
+  std.print("*** P2 network, multihop doesn't make sense ***");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[] { "light", "gateway", "switch", "sleepy_switch" };
+
+String[] socImages = new String[] {
+  "build/af-test-apps/TRaC_TestHarnessZ3-simulation/TRaC_TestHarnessZ3",
+  "build/af-test-apps/TRaC_TestHarnessZ3-simulation/TRaC_TestHarnessZ3",
+  "build/af-test-apps/TRaC_TestHarnessZ3EndDevice-simulation/TRaC_TestHarnessZ3EndDevice",
+  "build/af-test-apps/TRaC_TestHarnessZ3SleepyEndDevice-simulation/TRaC_TestHarnessZ3SleepyEndDevice",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+  "",
+  "",
+};
+String ncpImage = "";
+
+lazyExpect = true;
+
+// There are some places that we need to nexpect a message, but we need to do
+// so quickly so that we can catch other messages. A lot of over the air
+// commands happen less than 10 milliseconds after a CLI command, so we will
+// use this amount for the time being.
+int NEXPECT_TIMING_SLOP_MS = 10;
+
+String extendedPanIdLE(String node)
+{
+  String eidBE = extendedPanId(node);
+  int length = eidBE.length();
+  char[] eidLE = new char[length];
+  for (int i = 0; i < length; i += 2) {
+    eidLE[i + 0] = eidBE.charAt(length - i - 2);
+    eidLE[i + 1] = eidBE.charAt(length - i - 1);
+  }
+  return new String(eidLE);
+}
+
+String networkKey(String node)
+{
+  String key = getCurrentNetworkKey(node);
+  key = key.replaceAll("  ", " ");
+}
+
+String nwkUpdateId(String node)
+{
+  send(node,
+       "plugin test-harness z3 nwk get-network-update-id");
+  String info = expect(node, "Network Update Id:");
+  int i = info.indexOf("Id:");
+  return info.substring(i + 4, i + 8);
+}
+
+void enablePrinting(String device, String type)
+{
+  dbg.println("enablePrinting():" + this.namespace.getInvocationLine());
+  expect(device,
+         "plugin test-harness packet-printing " + type + "-printing enable",
+         "Successfully enabled printing.");
+}
+void disablePrinting(String device, String type)
+{
+  dbg.println("disablePrinting():" + this.namespace.getInvocationLine());
+  expect(device,
+         "plugin test-harness packet-printing " + type + "-printing disable",
+         "Successfully disabled printing.");
+}
+
+// -----------------------------------------------------------------------------
+// Reset device
+
+void reset_device(String device)
+{
+  // plugin test-harness z3 reset
+  expect(device,
+         "plugin test-harness z3 reset",
+         "TestHarnessZ3: Reset: 0x00");
+
+  // allow time for NETWORK DOWN, but don't 'expect' it
+  networkWait(6000);
+}
+
+// -----------------------------------------------------------------------------
+// Printing and Joining
+
+void printing_and_joining_commands(device1, device2)
+{
+  // Try to set the PAN ID and extended PAN ID to be used by the
+  // network-creator plugin
+  expect(device1,
+         "plugin test-harness z3 set-pan-id 0x1234",
+         "Network Creator PAN ID = 0x1234");
+  send(device1,
+       "network extpanid {0102030405060708}");
+
+  // Form a centralized network with device1.
+  expect(device1,
+         "plugin network-creator start 1",
+         "EMBER_NETWORK_UP 0x0000");
+  expect(device1,
+         "NWK Creator: Stop. Status: 0x00. State: 0x00");
+
+  String xpanLe = extendedPanIdLE(device1).replaceAll("(..)", "$1 ");
+  networkWait(2000);
+
+  // Make sure the PAN ID and extended PAN ID are what we set them to.
+  assert(panId(device1).equals("0x1234"));
+  assert(extendedPanId(device1).equals("0102030405060708"));
+
+  // Enable permit joining on device1.
+  expect(device1,
+         "net pjoin 180",
+         "pJoin for 180 sec: 0x00");
+
+  // Turn the zdo printing on here so that we can catch everything during joining.
+  enablePrinting(device2, "zdo");
+
+  // plugin test-harness packet-printing beacon-printing enable
+  // plugin test-harness packet-printing beacon-printing disable
+  enablePrinting(device1, "beacon");
+  enablePrinting(device2, "beacon");
+
+  // Tell device2 to start the joining process.
+  send(device2, "plugin network-steering start 0");
+
+  expect(device1, "beacon-req:rx", 15000);
+  expect(device2,
+         ("beacon:rx "
+          + "0x1234, "                                            // pan id
+          + "AP 0x1, "                                            // permit join
+          + "EP "                                                 // extended pan
+          + xpanLe));                                             // extended pan
+  disablePrinting(device1, "beacon");
+  disablePrinting(device2, "beacon");
+  nexpect(device1, "beacon-req:rx", NEXPECT_TIMING_SLOP_MS);
+  nexpect(device2,
+          ("beacon:rx "
+           + "0x1234, "                                            // pan id
+           + "AP 0x1, "                                            // permit join
+           + "EP "
+           + extendedPanIdLE(device1).replaceAll("(..)", "$1 ")),  // extended pan
+          NEXPECT_TIMING_SLOP_MS);
+
+  // plugin test-harness packet-printing aps-printing enable
+  enablePrinting(device2, "aps");
+  // Catch the transport key command for the network key.
+  // I had to make it a multiline so that it could catch these two messages
+  // in quick succession.
+  expectMultiline(device2,
+                  new String[] {
+    ("aps:rx "
+     + "seq AC "                   // cheat on the sequence
+     + "fc 21 "                    // aps frame control
+     + "cmd 05 "                   // transport key command
+     + "payload\\["
+     + "01 "                       // key type = network key
+     + networkKey(device1)         // data = network key
+     + " .. "                      // sequence
+     + getEui64LittleEndian(device2).replaceAll("(\\d\\d)", "$1 ")        // dest
+     + getEui64LittleEndian(device1).replaceAll("(\\d\\d)", "$1 ")         // src
+     + "\\]"),
+    "EMBER_NETWORK_UP 0x....",
+  },
+                  DEFAULT_TIMEOUT << 3);
+
+  // Catch the device announce. Printing was turned on above.
+  // There was a bug here where we were printing out FFFF for the command.
+  expect(device2, "zdo:t........:rx seq .. cmd 0013 payload\\[.* \\]");
+
+  // plugin test-harness packet-printing aps-printing disable
+  disablePrinting(device1, "aps");
+  // Make sure we don't see the request key command printed out.
+  nexpect(device1, "aps:rx .* cmd 08");
+
+  // Wait for commissioning dust to settle and routes to be learned.
+  networkWait(DEFAULT_TIMEOUT << 5);
+
+  // plugin test-harness packet-printing zdo-printing enable
+  // plugin test-harness packet-printing zdo-printing disable
+  enablePrinting(device1, "zdo");
+  send(device2,
+       "zdo ieee 0x0000");
+  expect(device1,
+         ("zdo:t........:rx seq .. cmd 0001 payload\\["
+          + "00 00 " // NWKAddrOfInterest
+          + "00 "    // RequestType (Single device response)
+          + "00 "    // StartIndex
+          + "\\]"));
+  disablePrinting(device1, "zdo");
+  send(device2,
+       "zdo ieee 0x0000");
+  nexpect(device1,
+          ("zdo:t........:rx seq .. cmd 0002 payload\\["
+           + "00 00 " // NWKAddrOfInterest
+           + "00 "    // RequestType (Single device response)
+           + "00 "    // StartIndex
+           + "\\]"));
+
+  // save the node id's
+  nodeIdDevice1 = nodeId(device1);
+  nodeIdDevice2 = nodeId(device2);
+
+  dbg.println("nodeIdDevice1 = " + nodeIdDevice1);
+  dbg.println("nodeIdDevice2 = " + nodeIdDevice2);
+}
+
+// -----------------------------------------------------------------------------
+// Beacon Commands
+
+void beacon_commands(device1, device2)
+{
+  enablePrinting(device1, "beacon");
+  enablePrinting(device2, "beacon");
+
+  // plugin test-harness z3 beacon beacon-req
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000000",
+         "Beacon: 0x00");
+  expect(device1,
+         "net pjoin 0",
+         "pJoin for 0 sec: 0x00");
+  networkWait(DEFAULT_TIMEOUT);
+
+  send(device2,
+       "plugin test-harness z3 beacon beacon-req");
+  expect(device1,
+         "beacon-req:rx");
+  expectMultiline(device2,
+                  new String[] {
+                    "beacon:rx 0x1234, AP 0x0, EP 08 07 06 05 04 03 02 01",
+                    "payload\\[FF 4F 00 00 00 22 84 08 07 06 05 04 03 02 01 .*\\]"
+                  });
+  networkWait(DEFAULT_TIMEOUT); // wait for the mac to stop scanning
+
+  // expect association permit bit to be set
+  expect(device1,
+         "net pjoin 10",
+         "pJoin for 10 sec: 0x00");
+  send(device2,
+        "plugin test-harness z3 beacon beacon-req");
+  expectMultiline(device2,
+                  new String[] {
+                    "beacon:rx 0x1234, AP 0x1, EP 08 07 06 05 04 03 02 01",
+                    "payload\\[FF CF 00 00 00 22 84 08 07 06 05 04 03 02 01 .*\\]"
+                  });
+  networkWait(DEFAULT_TIMEOUT);
+
+  expect(device1,
+         "net pjoin 0",
+         "pJoin for 0 sec: 0x00");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // plugin test-harness z3 beacon beacons-config <options:4>
+  // we'll run through the negative behaviour options, then the valid one
+  // options = 0x00000001 (incorrect nwk protocol version)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000001",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 08 22 84 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(50000);
+
+  // options = 0x00000002 (no router capacity)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000002",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 80 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000004 (no end device capacity)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000004",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 04 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000006 (no router or end device capacity)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000006",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 00 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000008 (incorrect stack profile)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000008",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 23 84 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000010 (incorrect protocol id)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000010",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 12 84 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000020 (reserved bit 16 set)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000020",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 85 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000040 (reserved bit 17 set)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000040",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 86 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000080 (2 byte payload)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000080",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+
+  // NOTE - the source PAN id gets changed, because the (missing) extended PAN ID
+  // in the beacon causes a PAN ID conflict
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 \\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000100 (11 byte payload)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000100",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 84 08 07 06 05 04 03 02 01 \\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // options = 0x00000200 (extra 5 bytes)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000200",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  // the following line would break, after we disabled auto PAN ID update, is
+  // it neccessary, to enable auto update for this test? 
+  expect(device2,
+        "payload\\[.*03 02 01 FF FF FF 00 00 00 00 00 00 \\]");
+
+  // extra delay required here, for some reason, else the next scan fails
+  networkWait(DEFAULT_TIMEOUT<<1);
+
+  // options = 0x00000400 (radio off after tx)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000400",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 84 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // Try another scan, but the radio is off now
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  nexpect(device2,
+         "payload\\[FF 4F 00 00 00 22 84 08 07 06 05 04 03 02 01 .*\\]");
+
+  send(device1, "plugin test-harness radio on");
+
+  // options = 0x00000000 (valid configuration)
+  expect(device1,
+         "plugin test-harness z3 beacon beacons-config 0x00000000",
+         "Beacon: 0x00");
+  expect(device2,
+         "plugin test-harness z3 beacon beacon-req",
+         "Beacon request: 0x00");
+  expect(device2,
+         "payload\\[FF 4F 00 00 00 22 84 08 07 06 05 04 03 02 01 .*\\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  reset_device(device1);
+  reset_device(device2);
+
+  // Form a centralized network with device1.
+  expect(device1,
+         "plugin network-creator start 1",
+         "EMBER_NETWORK_UP 0x0000");
+
+  // Enable permit joining on device1.
+  expect(device1,
+         "net pjoin 180",
+         "pJoin for 180 sec: 0x00");
+
+  // Tell device2 to start the joining process.
+  expect(device2,
+         "plugin network-steering start 0",
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT << 3);
+         
+  // Wait until we're finished.
+  expect(device2, "Network Steering Completed: Join Success \\(0x00\\)",
+         DEFAULT_TIMEOUT << 3);
+}
+
+// -----------------------------------------------------------------------------
+// NWK Commands
+
+void nwk_commands(device1, device2)
+{
+  enablePrinting(device1, "nwk");
+  nodeIdDevice2 = nodeId(device2);
+
+  // plugin test-harness z3 nwk nwk-rejoin-request
+  send(device2, "plugin test-harness z3 nwk nwk-rejoin-request 0x0000");
+  expect(device2, "Rejoin request: 0x00");
+  expect(device1,
+         "nwk:rx seq .. sec 28 cmd 06 payload\\[.. \\]");
+
+  expect(device1,
+         ("plugin test-harness z3 nwk nwk-rejoin-response "
+          + "0x1234 "
+          + "0x00 "
+          + nodeIdDevice2),
+         "Rejoin response: 0x00");
+         
+  // The switch gets a new node id.
+  networkWait(20000);
+  nodeIdDevice2 = nodeId(device2);
+
+  // Since we rejoined, we need to find routes again or whatever.
+  expect(device1,
+         "plugin concentrator start",
+         "sec until next MTORR broadcast");
+  networkWait(DEFAULT_TIMEOUT << 2);
+
+  // plugin test-harness z3 nwk nwk-leave <rejoin:1> <request:1>
+  // <removeChildren:1> <dstShort:2> <options:4>
+  expect(device2,
+         "plugin test-harness z3 nwk nwk-leave 0 0 0 0xFFFD 1",
+         "Leave: 0x00");
+  expect(device1,
+         "nwk:rx seq .. sec 28 cmd 04 payload\\[00 \\]");
+
+  // Since the switch faked like it left, we need to find routes again or whatever.
+  expect(device1,
+         "plugin concentrator start",
+         "sec until next MTORR broadcast");
+  networkWait(DEFAULT_TIMEOUT << 2);
+
+  // plugin test-harness z3 nwk nwk-leave-supression on
+  // plugin test-harness z3 nwk nwk-leave-supression off
+ 
+  // TODO: Disabled pending fix for EMZIGBEE-2248
+  // expect(device2,
+         // "plugin test-harness z3 nwk nwk-leave-supression on",
+         // "Supress network leave: YES");
+  // expect(device1,
+         // "plugin test-harness z3 nwk nwk-leave 1 1 0 " + nodeIdDevice2 + " 0",
+         // "Leave: 0x00");
+  // nexpect(device2,
+          // "EMBER_NETWORK_DOWN");
+  // expect(device2,
+         // "plugin test-harness z3 nwk nwk-leave-supression off",
+         // "Supress network leave: NO");
+  // expect(device1,
+         // "plugin test-harness z3 nwk nwk-leave 1 1 0 " + nodeIdDevice2 + " 0",
+         // "Leave: 0x00");
+  // expect(device2,
+         // "EMBER_NETWORK_DOWN");
+  // expect(device2,
+         // "EMBER_NETWORK_UP");
+
+  // Wait for device announces to go out and network to quiet down.
+  networkWait(DEFAULT_TIMEOUT << 2);
+
+  // plugin test-harness z3 nwk nwk-key-supression on
+  // plugin test-harness z3 nwk nwk-key-supression off
+
+  // TODO:
+}
+
+// -----------------------------------------------------------------------------
+// APS Commands
+
+void aps_commands(device1, device2)
+{
+  enablePrinting(device1, "aps");
+  enablePrinting(device2, "aps");
+
+  // plugin test-harness z3 aps aps-remove-device <parentLong:8> <dstLong:8>
+  // plugin test-harness z3 aps aps-remove-device-config <options:4>
+  
+  if (device2.equals("switch") || device2.equals("sleepy_switch")) {
+    // We send the command to the light, if the target is an end device
+    expect(device1,
+           ("plugin test-harness z3 aps aps-remove-device "
+            + "{" + eui64(device1) + "} "
+            + "{" + eui64(device2) + "} "
+            + "0"),
+           "Remove device: 0x00");
+  } else {
+    expect(device1,
+           ("plugin test-harness z3 aps aps-remove-device "
+            + "{" + eui64(device2) + "} "
+            + "{" + eui64(device2) + "} "
+            + "0"),
+           "Remove device: 0x00");
+  }
+  expect(device2,
+         "EMBER_NETWORK_DOWN",
+         DEFAULT_TIMEOUT << 2);  // extra delay for sleepy end device
+
+  // Rejoin with the switch, testing the no tclk update.
+  // plugin network-steering start
+  send(device1,
+       "net pjoin 123");
+  expect(device2,
+         "plugin network-steering start 1",
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT << 5);
+  expect(device2,
+         "Network Steering Completed: Join Success \\(0x00\\)",
+         DEFAULT_TIMEOUT << 5);
+  nexpect(device1,
+          "aps:rx seq .. fc 21 cmd 08 payload\\[04 \\]",
+          DEFAULT_TIMEOUT << 2);
+
+  // Send the switch a remove device with APS security.
+  expectMultiline(device1,
+                  ("plugin test-harness z3 aps aps-remove-device "
+                   + "{" + eui64(device2) + "} "
+                   + "{" + eui64(device2) + "} "
+                   + "1"), // use the default link key
+                  new String[] {
+    "Remove device: 0x00",
+    "Reset key handler: 0x00",
+  });
+  expect(device2,
+         "EMBER_NETWORK_DOWN");
+          
+  // Rejoin with the switch
+  send(device1,
+       "net pjoin 123");
+  expect(device2,
+         "plugin network-steering start 1",
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT << 5);
+  expect(device2, "Network Steering Completed: Join Success \\(0x00\\)",
+         DEFAULT_TIMEOUT << 5);
+
+  // TODO: not fully implemented in plugin yet
+  // First, configure the switch to ignore APS remove commands
+  // send(device2,
+       // "plugin test-harness z3 aps aps-remove-device-config " + "1");
+  // nexpect(device2, "network leave", "EMBER_NETWORK_DOWN");
+
+  // Now, configure the switch to leave on receipt of APS remove commands
+  // send(device2,
+       // "plugin test-harness z3 aps aps-remove-device-config " + "0");
+
+  // Leave and rejoin with the switch to update to the linked hash key. We need
+  // it for the reset of the aps test.
+  expect(device2, "network leave", "EMBER_NETWORK_DOWN");
+  networkWait(5000); // now required since leave delay is disabled for test harness apps
+  expect(device1, "plugin network-creator-security open-network", "Open network: 0x00");
+  send(device1, "network pjoin 123");
+  expect(device2,
+         "plugin network-steering start 0",
+         "Broadcasting permit join: 0x00",
+         DEFAULT_TIMEOUT << 5);
+  expect(device2, "Network Steering Completed: Join Success \\(0x00\\)",
+         DEFAULT_TIMEOUT << 5);
+
+  // plugin test-harness z3 aps aps-request-key <dstShort:2> <keyType:1>
+  // <parentLong:8> <options:4>
+  expect(device2,
+         ("plugin test-harness z3 aps aps-request-key 0x0000 0x04 "
+          + "{" + eui64(device1) + "} 0"),
+         "Request key: 0x00");
+  expect(device1,
+         "aps:rx seq .. fc 21 cmd 08 payload\\[04 \\]");
+  expect(device2,
+         ("aps:rx seq .. fc 21 cmd 05 payload\\[04 "
+          + ".. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. " // key
+          + getEui64LittleEndian(device2).replaceAll("(\\d\\d)", "$1 ") // dest
+          + getEui64LittleEndian(device1).replaceAll("(\\d\\d)", "$1 ")  // src
+          + "\\]"), 5000); // allow for sleepy device2
+}
+
+// -----------------------------------------------------------------------------
+// MGMT Commands (really ZDO commands, but 'mgmt' in ZTT API doc)
+
+void mgmt_commands(device1, device2)
+{
+  enablePrinting(device1, "zdo");
+  enablePrinting(device2, "zdo");
+
+  // plugin test-harness z3 mgmt permit-joining-req
+  nodeIdDevice1 = nodeId(device1);
+  nodeIdDevice2 = nodeId(device2);
+  
+  expect(device1,
+         "plugin test-harness z3 mgmt permit-joining-req 123 " + nodeIdDevice2 + " 0",
+         "Permit joining request: 0x00");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 0036 payload\\[7B 01 \\]",
+         5000);  // allow for sleepy device2
+
+  expect(device1,
+         "plugin test-harness z3 mgmt permit-joining-req 123 " + nodeIdDevice2 + " 1",
+         "Permit joining request: 0x00");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 0036 payload\\[7B 00 \\]",
+         5000);  // allow for sleepy device2
+
+  // Our Trust Center implementation does not allow remotely changing the
+  // policy so device responds with INVALID_REQUEST status for unicast
+  // Mgmt_Permit_Joining_req to indicate operation is not permitted.
+  expect(device2,
+        "plugin test-harness z3 mgmt permit-joining-req 123 " + nodeIdDevice1 + " 1",
+         "zdo:t........:rx seq .. cmd 8036 payload\\[80 \\]");
+
+  // plugin test-harness z3 mgmt leave <dstShort:2> <removeChildren:1>
+  // <rejoin:1> <optionBitmask:4>
+  expect(device1,
+         "plugin test-harness z3 mgmt leave " + nodeIdDevice2 + " 0 1 0",
+         "Mgmt leave: 0x00");
+  expect(device2,
+         ("zdo:t........:rx seq .. cmd 0034 "
+          + "payload\\["
+          + getEui64LittleEndian(device2).replaceAll("(\\d\\d)", "$1 ")
+          + "80 \\]"), 5000);
+  expect(device2,
+         "EMBER_NETWORK_DOWN");
+  expect(device2,
+         "EMBER_NETWORK_UP");
+  nodeIdDevice2 = nodeId(device2);
+  networkWait(2000);
+  // plugin test-harness z3 mgmt nwk-update-request <scanChannel:2> <scanDuration:1>
+  // <scanCount:1> <shortAddress:2> <optionBitmask:4>
+
+  // - change channel (switch -> light)
+  // case 1 - use the current network update id
+
+  // we should be on the same channel both ends
+  dbg.println("channel light: " + channel(device1));
+  dbg.println("channel switch: " + channel(device2));
+  String newChan = new String("14"); // chose a non-primary channel
+
+  // set the light's network update id to a known value
+  expect(device1,
+         "plugin test-harness z3 nwk set-network-update-id 0x30",
+         "Set network update id: 0x30");
+  dbg.println("nwkUpdateId light: " + nwkUpdateId(device1));
+  dbg.println("nwkUpdateId switch: " + nwkUpdateId(device2));
+
+  // update the light - the light is network manager, so requests
+  // must come from the light
+  expect(device1,
+         "plugin test-harness z3 mgmt nwk-update-request "
+         + newChan
+         + " 0xfe 0 "
+         + nodeIdDevice1
+         + " 0",
+         "Network update request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0038 payload\\[00 40 00 00 FE 30 \\]");
+
+  // update the switch
+  expect(device1,
+         "plugin test-harness z3 mgmt nwk-update-request "
+         + newChan
+         + " 0xfe 0 "
+         + nodeIdDevice2
+         + " 0",
+         "Network update request: 0x00");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 0038 payload\\[00 40 00 00 FE 30 \\]",5000);
+
+  // wait, then check that we are on correct channel both ends
+  networkWait(50000);
+  assert(newChan.equals(channel(device1)));
+  assert(newChan.equals(channel(device2)));
+
+  // (double-)check that the light's update id has been updated
+  dbg.println("nwkUpdateId light: " + nwkUpdateId(device1));
+  dbg.println("nwkUpdateId switch: " + nwkUpdateId(device2));
+  assert(nwkUpdateId(device1).equals(nwkUpdateId(device2)));
+
+  // case 2 - subtract one from nwk update id before sending update
+  String newChan = new String("13");
+  expect(device1,
+         "plugin test-harness z3 mgmt nwk-update-request "
+         + newChan
+         + " 0xfe 0 "
+         + nodeIdDevice2
+         + " 1",
+         "Network update request: 0x00");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 0038 payload\\[00 20 00 00 FE 2F \\]",6000);
+
+  // - change channel (light -> light)
+  expect(device1,
+         "plugin test-harness z3 mgmt nwk-update-request "
+         + newChan
+         + " 0xfe 0 "
+         + nodeIdDevice1
+         + " 1",
+         "Network update request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0038 payload\\[00 20 00 00 FE 2F \\]");
+
+  // wait, then check that we are on correct channel both ends
+  networkWait(50000);
+  assert(newChan.equals(channel(device1)));
+  assert(newChan.equals(channel(device2)));
+
+  // case 3 - high nwkUpdateId, value set to 0x55
+
+  String newChan = new String("15");  // back to 15 for other tests
+  expect(device1,
+         "plugin test-harness z3 mgmt nwk-update-request "
+         + newChan
+         + " 0xfe 0 "
+         + nodeIdDevice2
+         + " 2",
+         "Network update request: 0x00");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 0038 payload\\[00 80 00 00 FE 55 \\]");
+
+  // - change channel (light -> light)
+  expect(device1,
+         "plugin test-harness z3 mgmt nwk-update-request "
+         + newChan
+         + " 0xfe 0 "
+         + nodeIdDevice1
+         + " 2",
+         "Network update request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0038 payload\\[00 80 00 00 FE 55 \\]");
+
+  // wait, then check that we are on correct channel both ends
+  networkWait(50000);
+  assert(newChan.equals(channel(device1)));
+  assert(newChan.equals(channel(device2)));
+  
+  // - change channel mask (light -> switch)
+  // NOTE - the test-harness z3 command only permits specifying a scan mask
+  // containing a single channel
+  expect(device1,
+         "plugin test-harness z3 mgmt nwk-update-request 20 0xff 0 "
+         + nodeIdDevice2
+         + " 0",
+         "Network update request: 0x00");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 0038 payload\\[00 00 10 00 FF 55 00 00 \\]");
+
+  // - reset channel mask to all channels (light -> switch)
+  send(device1,
+       "zdo nwk-upd set 0 0x07fff800");
+  expect(device1,
+         "send 0 0 0",
+         "network update set status 0x00");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 0038 payload\\[00 F8 FF 07 FF 55 00 00 \\]");
+
+  // - scan a channel (light -> switch)
+  expect(device1,
+         "plugin test-harness z3 mgmt nwk-update-request 20 0x01 1 "
+         + nodeIdDevice2
+         + " 0x00000001",
+         "Network update request: 0x00");
+         
+  expect(device2, "zdo:t........:rx seq .. cmd 0038 payload\\[00 00 10 00 01 01 \\]");
+  expect(device1, "zdo:t........:rx seq .. cmd 8038 payload\\[00 00 00 10 00 0. 00 00 00 01 00 \\]");
+
+  // plugin test-harness z3 mgmt leave <dstShort:2> <removeChildren:1>
+  // <rejoin:1> <optionBitmask:4>
+  // - negative cases
+  expect(device1,
+  "plugin test-harness z3 mgmt leave " + nodeId(device2) + " 0 1 1",
+  "Mgmt leave: 0x00");
+  expect(device2,
+  ("zdo:t........:rx seq .. cmd 0034 "
+  + "payload\\["
+  + "80 \\]"));
+  nexpect(device2,
+  "EMBER_NETWORK_DOWN");
+  nexpect(device2,
+  "EMBER_NETWORK_UP");
+
+  expect(device1,
+  "plugin test-harness z3 mgmt leave " + nodeId(device2) + " 0 1 2",
+  "Mgmt leave: 0x00");
+  expect(device2,
+  ("zdo:t........:rx seq .. cmd 0034 "
+  + "payload\\["
+  + getEui64LittleEndian(device2).replaceAll("(\\d\\d)", "$1 ")
+  + "\\]"));
+  networkWait(DEFAULT_TIMEOUT << 2); // should we be ignoring this bad command...?
+}
+
+// -----------------------------------------------------------------------------
+// ZDO Commands
+
+void zdo_commands(device1, device2)
+{
+  enablePrinting(device1, "zdo");
+  enablePrinting(device2, "zdo");
+
+  // plugin test-harness z3 zdo zdo-reset
+  expect(device1,
+         "plugin test-harness z3 zdo zdo-reset",
+         "ZDO reset: 0x00");
+
+  // plugin test-harness z3 zdo zdo-node-desc-rsp-config <options:4>
+  expect(device1,
+         "plugin test-harness z3 zdo zdo-node-desc-rsp-config 1",
+         "Node descriptor response config: 0x00");
+  expect(device2,
+         "plugin test-harness z3 zdo node 0x0000",
+         "ZDO node desc req 00");
+  expect(device2,
+         ("zdo:t........:rx seq .. cmd 8002 payload\\["
+          + ".. .. .. .. .. .. .. .. .. .. .. .. 00 .. .. .."
+          + " \\]"));
+
+  send(device1,
+       "plugin test-harness z3 zdo zdo-reset");
+  expect(device2,
+         "plugin test-harness z3 zdo node 0x0000",
+         "ZDO node desc req 00");
+  expect(device2,
+         ("zdo:t........:rx seq .. cmd 8002 payload\\["
+          + ".. .. .. .. .. .. .. .. .. .. .. .. 2C .. .. .."
+          + " \\]"));
+
+  // plugin test-harness z3 zdo active-endpoint-request <dstShort:2>
+  // <nwkAddrOfInterest:2> <options:4>
+  expect(device2,
+         "plugin test-harness z3 zdo active-endpoint-request 0x0000 0x0000 0",
+         "Active endpoint request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0005 payload\\[00 00 \\]");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 8005 payload\\[.* \\]");
+
+  expect(device2,
+         "plugin test-harness z3 zdo active-endpoint-request 0x0000 0x0000 0x1",
+         "Active endpoint request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0005 payload\\[\\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  // plugin test-harness z3 zdo match-desc-req <dstShort:2>
+  // <nwkAddrOfInterest:2> <profileId:4> <options:4>
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0001");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list add 0x0101");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list add 0x0102");
+  expect(device2,
+         "plugin test-harness z3 zdo match-desc-req 0x0000 0x0000 0x0104 0",
+         "Match descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0006 payload\\[00 00 04 01 01 01 00 02 01 01 02 01 \\]");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 8006 payload\\[.* \\]");
+
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0001");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0002");
+  expect(device2,
+         "plugin test-harness z3 zdo match-desc-req 0x0000 0x0000 0x0104 0x1",
+         "Match descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0006 payload\\[04 01 02 01 00 02 00 00 \\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0001");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list add 0x0101");
+  expect(device2,
+         "plugin test-harness z3 zdo match-desc-req 0x0000 0x0000 0x0104 0x2",
+         "Match descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0006 payload\\[00 00 04 01 01 01 \\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0001");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list add 0x0101");
+  expect(device2,
+         "plugin test-harness z3 zdo match-desc-req 0x0000 0x0000 0xACCA 0",
+         "Match descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0006 payload\\[00 00 CA AC 01 01 00 01 01 01 \\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0001");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0002");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list add 0x0101");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list add 0x0102");
+  expect(device2,
+         "plugin test-harness z3 zdo match-desc-req 0x0000 0x0000 0xACCA 0x04",
+         "Match descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0006 payload\\[00 00 CA AC 02 01 00 02 01 01 02 01 \\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list clear");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0001");
+  send(device2,
+       "plugin test-harness z3 zdo in-cl-list add 0x0002");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list add 0x0101");
+  send(device2,
+       "plugin test-harness z3 zdo out-cl-list add 0x0102");
+  expect(device2,
+         "plugin test-harness z3 zdo match-desc-req 0x0000 0x0000 0xACCA 0x08",
+         "Match descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0006 payload\\[00 00 CA AC 02 01 00 02 00 02 01 01 \\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  // plugin test-harness z3 zdo match-desc-rsp-config <nwkAddrOfInterest:2>
+  // <status:1> <options:4>
+  expect(device1,
+         "plugin test-harness z3 zdo match-desc-rsp-config 0x0000 0x00 1",
+         "Match descriptor response config: 0x00");
+  expect(device2,
+         "zdo match 0x0000 0x0104",
+         "zdo:t........:rx seq .. cmd 8006 payload\\[00 00 00 00 \\]");
+
+  // TODO: these are not implemented in the plugin yet
+  // expect(device2,
+  // "plugin test-harness z3 zdo match-desc-rsp-config 0x1234 0x00 2",
+  // "Match descriptor response config: 0x00");
+
+  // expectMultiline(device1,
+  // "zdo match 0x1234 0x0104",
+  // new String[] {
+  // "zdo:t........:rx seq .. cmd 8006 payload\\[00 34 12 .* \\]",
+  // "zdo:t........:rx seq .. cmd 8006 payload\\[81 34 12 00 \\]",
+  // });
+
+  // expect(device1,
+  // "plugin test-harness z3 zdo match-desc-rsp-config 0x0000 0x00 4",
+  // "Match descriptor response config: 0x00");
+  // expectMultiline(device2,
+  // "zdo match 0x0000 0x0104",
+  // new String[] {
+  // "zdo:t........:rx seq .. cmd 8006 payload\\[00 00 00 .* \\]",
+  // "zdo:t........:rx seq .. cmd 8006 payload\\[89 00 00 00 \\]",
+  // });
+
+  // plugin test-harness z3 simple-desc-req <dstShort:2> <dstEndpoint:1>
+  // <nwkAddrOfInterest:2> <options:4>
+  expect(device2,
+         "plugin test-harness z3 zdo simple-desc-req 0x0000 1 0x0000 0",
+         "Simple descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0004 payload\\[00 00 01 \\]");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 8004 payload\\[.* \\]");
+
+  expect(device2,
+         "plugin test-harness z3 zdo simple-desc-req 0x0000 1 0x0000 0x1",
+         "Simple descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0004 payload\\[01 \\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  expect(device2,
+         "plugin test-harness z3 zdo simple-desc-req 0x0000 1 0x0000 0x2",
+         "Simple descriptor request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0004 payload\\[00 00 \\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  // TODO: these are not implemented in the plugin yet
+  // plugin test-harness z3 simple-desc-rsp-config <nwkAddrOfInterest:2>
+  // <status:1> <length:1> <options:4>
+  // expect(device1,
+         // "plugin test-harness z3 zdo simple-desc-rsp-config 0x0000 0x00 14 0x01",
+         // "Simple descriptor response config: 0x00");
+  // expectMultiline(device2,
+                  // "zdo simple 0x0000 1",
+                  // new String[] {
+    // "zdo:t........:rx seq .. cmd 8004 payload\\[00 00 00 0E \\]",
+    // "RX: Simple Desc Resp",
+  // });
+
+  // expect(device2,
+  // "plugin test-harness z3 zdo simple-desc-rsp-config 0x1234 0x00 14 0x04",
+  // "Simple descriptor response config: 0x00");
+  // expectMultiline(device1,
+  // "zdo simple 0x1234 1",
+  // new String[] {
+  // ("zdo:t........:rx seq .. cmd 8004"
+  // + " payload\\[00 34 12 0E 01 04 01 .. .. .."
+  // + " 01 00 08 02 00 08 00 08 \\]"),
+  // "RX: Simple Desc Resp",
+  // });
+
+  // expect(device1,
+  // "plugin test-harness z3 zdo simple-desc-rsp-config 0x0000 0x00 14 0x08",
+  // "Simple descriptor response config: 0x00");
+  // expectMultiline(device2,
+  // "zdo simple 0x0000 1",
+  // new String[] {
+  // ("zdo:t........:rx seq .. cmd 8004"
+  // + " payload\\[00 00 00 0E 01 04 01 .. .. .."
+  // + " 02 00 01 01 01 01 00 00 \\]"),
+  // "RX: Simple Desc Resp",
+  // });
+
+  // expect(device1,
+  // "plugin test-harness z3 zdo simple-desc-rsp-config 0x0000 0x00 8 0x10",
+  // "Simple descriptor response config: 0x00");
+  // expectMultiline(device2,
+  // "zdo simple 0x0000 1",
+  // new String[] {
+  // ("zdo:t........:rx seq .. cmd 8004"
+  // + " payload\\[00 00 00 08 01 04 01 .. .. .."
+  // + " 01 02 \\]"),
+  // "RX: Simple Desc Resp",
+  // });
+
+  // expect(device2,
+  // "plugin test-harness z3 zdo simple-desc-rsp-config 0x1234 0x00 14 0x20",
+  // "Simple descriptor response config: 0x00");
+  // expectMultiline(device1,
+  // "zdo simple 0x1234 1",
+  // new String[] {
+  // "zdo:t........:rx seq .. cmd 8004 payload\\[00 34 12 .* \\]",
+  // "zdo:t........:rx seq .. cmd 8004 payload\\[81 34 12 00 \\]",
+  // "RX: Simple Desc Resp",
+  // });
+
+  // expect(device1,
+  // "plugin test-harness z3 zdo simple-desc-rsp-config 0x0000 0x00 13 0x40",
+  // "Simple descriptor response config: 0x00");
+  // expectMultiline(device2,
+  // "zdo simple 0x0000 1",
+  // new String[] {
+  // ("zdo:t........:rx seq .. cmd 8004"
+  // + " payload\\[00 00 00 0D 04 01 .. .. .."
+  // + " 01 00 00 02 00 01 01 01 \\]"),
+  // "RX: Simple Desc Resp",
+  // });
+
+  // expect(device2,
+  // "plugin test-harness z3 zdo simple-desc-rsp-config 0x1234 0x00 14 0x80",
+  // "Simple descriptor response config: 0x00");
+  // expectMultiline(device1,
+  // "zdo simple 0x1234 1",
+  // new String[] {
+  // ("zdo:t........:rx seq .. cmd 8004"
+  // + " payload\\[00 0E 01 04 01 .. .. .."
+  // + " 01 00 00 02 00 01 01 01"),
+  // "RX: Simple Desc Resp",
+  // });
+
+  // plugin test-harness z3 zdo bind-group <shortAddress:2> <srcEndpoint:1>
+  // <dstEndpoint:1> <dstAddress:2> <cluster:2>
+  expect(device2,
+         "plugin test-harness z3 zdo bind-group 0x0000 1 2 0x1234 0xABCD {AC00000000000000}",
+         "ZDO bind group: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0021 payload\\[00 00 00 00 00 00 00 AC"
+         + " 01 CD AB 01 34 12 \\]");
+
+  // plugin test-harness z3 zdo nwk-addr-req <ieee:8> <requestType:1>
+  // <startIndex:1> <dstShort:2> <options:4>
+  expect(device1,
+         ("plugin test-harness z3 zdo nwk-addr-req "
+          + "{" + eui64(device2) + "} "
+          + "0 " // start index
+          + "0 " // request type
+          + nodeId(device2)
+          + " 0"), // options
+         "Network address request: 0x00");
+  expect(device2,
+         ("zdo:t........:rx seq .. cmd 0000"
+          + " payload\\[.. .. .. .. .. .. .. .. 00 00 \\]"), 10000);
+          
+  // plugin test-harness z3 zdo ieee-addr-req <nwkAddrOfInterest:2>
+  // <requestType:1> <startIndex:1> <dstShort:2> <options:4>
+  expect(device1,
+         ("plugin test-harness z3 zdo nwk-addr-req "
+          + "{" + eui64(device2) + "} "
+          + "0 " // start index
+          + "0 " // request type
+          + nodeId(device2)
+          + " 0x1"), // options
+         "Network address request: 0x00");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 0000 payload\\[\\]");
+
+  expect(device2,
+         "plugin test-harness z3 zdo ieee-addr-req 0x0000 0 0 0x0000 0",
+         "IEEE address request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0001 payload\\[00 00 00 00 \\]");
+  expect(device2,
+         "zdo:t........:rx seq .. cmd 8001 payload\\[.* \\]");
+
+  expect(device2,
+         "plugin test-harness z3 zdo ieee-addr-req 0x0000 0 0 0x0000 0x1",
+         "IEEE address request: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0001 payload\\[\\]");
+  networkWait(DEFAULT_TIMEOUT); // We might not send back a response.
+
+  // plugin test-harness z3 nwk ieee-addr-rsp-config reset
+  // plugin test-harness z3 nwk ieee-addr-rsp-config issuer-nwk-address-remote-dev
+  // plugin test-harness z3 nwk ieee-addr-rsp-config status-device-not-found
+  expect(device1,
+         "plugin test-harness z3 nwk ieee-addr-rsp-config issuer-nwk-address-remote-dev",
+         "IEEE address response config: 0x00");
+  expectMultiline(device2,
+                  "zdo ieee 0x0000",
+                  new String[] {
+    ("zdo:t........:rx seq .. cmd 8001 "
+     + "payload\\[00 00 00 00 00 00 00 00 01 00 00 \\]"),
+    "Service discovery done.",
+  });
+
+  expect(device1,
+         "plugin test-harness z3 nwk ieee-addr-rsp-config status-device-not-found",
+         "IEEE address response config: 0x00");
+  expectMultiline(device2,
+                  "zdo ieee 0x0000",
+                  new String[] {
+    "zdo:t........:rx seq .. cmd 8001 payload\\[81 .* \\]",
+    "Service discovery done.",
+  });
+
+  expect(device1,
+         "plugin test-harness z3 nwk ieee-addr-rsp-config status-device-not-found",
+         "IEEE address response config: 0x00");
+  expect(device1,
+         "plugin test-harness z3 nwk ieee-addr-rsp-config reset",
+         "IEEE address response config: 0x00");
+  expectMultiline(device2,
+                  "zdo ieee 0x0000",
+                  new String[] {
+    "zdo:t........:rx seq .. cmd 8001 payload\\[00 00 00 00 00 00 00 00 01 00 00 \\]",
+    "Service discovery done.",
+  });
+
+  // plugin test-harness z3 zdo bc-device-announce <shortAddress:2> <ieeeAddress:8>
+  expect(device2,
+         "plugin test-harness z3 zdo bc-device-announce 0xACCA {1234567812345678}",
+         "Broadcast device announce: 0x00");
+  expect(device1,
+         "zdo:t........:rx seq .. cmd 0013 payload\\[CA AC 78 56 34 12 78 56 34 12 E0 \\]");
+}
+
+// -----------------------------------------------------------------------------
+// ZCL
+
+void zcl_commands(device1, device2)
+{
+  // plugin test-harness z3 read <cluster:2> <attribute:2> <dstShort:2>
+  // <srcEndpoint:1> <dstEndpoint:1> <profileId:2>
+  expect(device1,
+         "plugin test-harness z3 zcl read 1 2 " + nodeId(device2) + " 4 5 6",
+         "Read: 0x00");
+  expect(device2,
+         "RX len 5, ep 05, clus 0x0001 .* payload\\[02 00 \\]",6000);
+
+  // plugin groups-server clear
+  expect(device1,
+         "plugin groups-server clear",
+         "Clearing all groups.");
+
+  // plugin scenes clear
+  expect(device1,
+         "plugin scenes clear",
+         "Clearing all scenes.");
+}
+
+// -----------------------------------------------------------------------------
+// Other
+
+void other_commands(device1, device2)
+{
+  // plugin test-harness z3 set-device-mode <mode:1>
+  expect(device1,
+         "plugin test-harness z3 set-device-mode 0x00",
+         "Set device mode: 0x00");
+
+  expect(device1,
+         "plugin test-harness z3 set-device-mode 0x06",
+         "Set device mode: 0x02");
+
+  // plugin test-harness z3 install-code set
+  expect(device2,
+         "plugin test-harness z3 install-code set {11 22 33 44 55 66 5A 60}",
+         "Success: Set joining link key");
+  
+  // plugin test-harness z3 install-code clear
+  expect(device2,
+         "plugin test-harness z3 install-code clear",
+         "Success: Clear joining link key");
+}
+
+// -----------------------------------------------------------------------------
+// Start the test
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+networkWait(3000);
+
+// plugin test-harness z3 platform
+expect("light",
+       "plugin test-harness z3 platform",
+       "EmberZNet stack ver. \\[\\d.\\d.\\d");
+
+// switch off the devices we're not using
+send("switch", "plugin test-harness radio off");
+send("sleepy_switch", "plugin test-harness radio off");
+
+// Run tests with router as second device (first device must be router/coordinator)
+printing_and_joining_commands ("light", "gateway"); // This is a pre-requisite for all tests
+
+beacon_commands ("light", "gateway");
+nwk_commands ("light", "gateway");
+aps_commands ("light", "gateway");
+mgmt_commands ("light", "gateway");
+zdo_commands ("light", "gateway");
+zcl_commands ("light", "gateway");
+other_commands ("light", "gateway");
+
+// Run tests with non-sleepy end device as second device
+reset_device ("light");
+send("gateway", "plugin test-harness radio off");
+send("switch", "plugin test-harness radio on");
+
+printing_and_joining_commands ("light", "switch"); // This is a pre-requisite for all tests
+
+beacon_commands ("light", "switch");
+nwk_commands ("light", "switch");
+aps_commands ("light", "switch");
+mgmt_commands ("light", "switch");
+zdo_commands ("light", "switch");
+zcl_commands ("light", "switch");
+other_commands ("light", "switch");
+
+// Run tests with sleepy end device as second device
+reset_device ("light");
+reset_device ("switch");  // stop it trying to rejoin
+send("switch", "plugin test-harness radio off");
+send("sleepy_switch", "plugin test-harness radio on");
+
+printing_and_joining_commands ("light", "sleepy_switch"); // This is a pre-requisite for all tests
+
+// Skip beacon commands for sleepy switch, as it will sleep if it is not joining.
+nwk_commands ("light", "sleepy_switch");
+aps_commands ("light", "sleepy_switch");
+mgmt_commands ("light", "sleepy_switch");
+zdo_commands ("light", "sleepy_switch");
+zcl_commands ("light", "sleepy_switch");
+other_commands ("light", "sleepy_switch");

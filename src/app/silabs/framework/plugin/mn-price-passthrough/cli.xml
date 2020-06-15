@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-mn-price-passthrough" name="Plugin Commands: Multi-Network Price Passthrough">
+    <description>
+      The Multi-Network Price Passthrough plugin is a plugin designed to demonstrate multi-network functionality by passing data from a "real" ESI on one network to a "proxy" ESI on another network via periodic polling and forwarding.
+    </description>
+  </group>
+  <command cli="plugin mn-price-passthrough start" functionName="start" group="plugin-mn-price-passthrough">
+    <description>
+      Starts polling and forwarding.
+    </description>
+  </command>
+  <command cli="plugin mn-price-passthrough stop" functionName="stop" group="plugin-mn-price-passthrough">
+    <description>
+      Stops polling and forwarding.
+    </description>
+  </command>
+  <command cli="plugin mn-price-passthrough set-routing" functionName="setRouting" group="plugin-mn-price-passthrough">
+    <description>
+      Set the routing parameters.
+    </description>
+    <arg name="fwdId" type="INT16U" description="The node id of the forwarding endpoint." />
+    <arg name="fwdEndpoint" type="INT8U" description="The forwarding endpoint." />
+    <arg name="esiEndpoint" type="INT8U" description="The endpoint of the proxy ESI." />
+  </command>
+  <command cli="plugin mn-price-passthrough print" functionName="print" group="plugin-mn-price-passthrough">
+    <description>
+      Print the current price known to the proxy esi.
+    </description>
+  </command>
+</cli>

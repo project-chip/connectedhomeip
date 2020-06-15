@@ -1,0 +1,305 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices  = { "server", "client1", "client2", "client3", "client4", "client5", "client6" };
+String[] allClients  = { "client1", "client2", "client3", "client4", "client5", "client6" };
+String[] clients1to5 = { "client1", "client2", "client3", "client4", "client5" };
+String[] socImages = new String[] {
+  "build/af-test-apps/DynamicOtaServer-simulation/DynamicOtaServer",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS-EMBER_TEST_BLOCK_PERIOD_IN_SECONDS/SeFullTh",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/DynamicOtaServer-simulation-ezsp/DynamicOtaServer",
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS-EMBER_TEST_BLOCK_PERIOD_IN_SECONDS/SeFullTh",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+formAndJoinDevicesWithAddedDelay(allDevices,
+                                 false,  // wait for key establishment to complete?
+                                 15000);   
+
+String client1NodeId = nodeId("client1");
+String client2NodeId = nodeId("client2");
+String client3NodeId = nodeId("client3");
+String client4NodeId = nodeId("client4");
+String client5NodeId = nodeId("client5");
+String client6NodeId = nodeId("client6");
+
+// Let registration complete.
+networkWait(30000);
+
+// Disable keep-alive as it periodically prints READ_ATTR messages on the
+// coordinator, killing the expectNoResponse calls
+expectMultipleHosts(allClients,
+                    "plugin test-harness tc-keepalive stop",
+                    ".*Setting trust center keepalive inactive.");
+networkWait(2000);
+
+// Disable page request.  It is enabled by default when the OTA client
+// plugin is configured to use it.  We want to test the normal
+// block request stuff here.
+expectNoResponseMultipleHosts(allClients,
+                              "plugin ota-client page-request 0");
+
+// Turn off prints when we receive messages. We don't care about them and OTA
+// transfers generate a lot of them
+expectMultipleHosts(allDevices,
+                    "option print-rx-msgs disable",
+                    ".*disabled print");
+
+// If the client has a previously downloaded file it will use that
+// to upgrade rather than start a new download.  So deleting it
+// will cause a fresh download.
+expectMultipleHosts(allClients,
+                    "plugin ota-storage-common delete 0",
+                    ".*Image deleted\\.");
+networkWait(5000);
+
+// Slow down downloads so that we can test max OTA transfers
+int minBlockPeriodDelayMs = 10000;
+expectNoResponse("server",
+                 "plugin ota-server policy image-req-min-period "
+                 + minBlockPeriodDelayMs);
+
+// Have no clients apply an upgrade image (it's not what we want to test)
+send("server",
+     "plugin ota-server policy upgrade 2");
+
+// Begin consuming an entry of the OTA downloads array by having each client
+// start an OTA download. Each client should be told to delay by 10 seconds
+// while its OTA cluster revision is read
+// There are five indices in the array by default. The sixth client should get
+// a WAIT_FOR_DATA response
+expect("client1",
+       "plugin ota-client start",
+       "Download delay by server 60 ms",
+       10000);
+expect("server",
+       "OTA client " + client1NodeId + " uses milliseconds",
+       10000);
+expect("client2",
+       "plugin ota-client start",
+       "Download delay by server 60 ms",
+       10000);
+expect("server",
+       "OTA client " + client2NodeId + " uses milliseconds",
+       10000);
+expect("client3",
+       "plugin ota-client start",
+       "Download delay by server 60 ms",
+       10000);
+expect("server",
+       "OTA client " + client3NodeId + " uses milliseconds",
+       10000);
+expect("client4",
+       "plugin ota-client start",
+       "Download delay by server 60 ms",
+       10000);
+expect("server",
+       "OTA client " + client4NodeId + " uses milliseconds",
+       10000);
+expect("client5",
+       "plugin ota-client start",
+       "Download delay by server 60 ms",
+       10000);
+expect("server",
+       "OTA client " + client5NodeId + " uses milliseconds",
+       10000);
+// There's no room for client6. It should be told to wait for a minute
+expect("client6",
+       "plugin ota-client start",
+       "Download delay by server 60000 ms",
+       10000);
+
+// client1 should complete at some point
+expect("client1",
+       "Custom verification passed: 0x00",
+       50000);
+
+// With a free spot in the active OTA downloads array, client6 can finally begin
+// and complete its OTA transfer
+// It first will be tested for its minimum block period units, so it will be
+// told to delay 60, which it thinks are seconds
+expect("client6",
+       "Download delay by server 60000 ms",
+       62000);
+expect("server",
+       "OTA client " + client6NodeId + " uses seconds",
+       65000);
+expect("client6",
+       "Custom verification passed: 0x00",
+       120000);
+
+// Now a test where all clients take an entry in the array and then disappear,
+// which tests the timeout feature
+expectMultipleHosts(allClients,
+                    "plugin ota-client stop",
+                    ".*stopping OTA client state machine");
+
+networkWait(10000);
+
+// Partially through the OTA download process, we silently disable the clients
+// We power off the node rather than calling 'plugin ota-client stop' (which
+// has the undesired effect of sending an UpgradeEndRequest to the server)
+
+send("client1",
+       "plugin ota-client start");
+networkWait(600);
+send("client2",
+       "plugin ota-client start");
+networkWait(600);
+send("client3",
+       "plugin ota-client start");
+networkWait(600);
+send("client4",
+       "plugin ota-client start");
+networkWait(600);
+send("client5",
+       "plugin ota-client start");
+
+expect("client1",
+       ".*Download: ..% complete",
+       30000);
+power("client1", false);
+
+expect("client2",
+       ".*Download: ..% complete",
+       30000);
+power("client2", false);
+
+expect("client3",
+       ".*Download: ..% complete",
+       30000);
+power("client3", false);
+
+expect("client4",
+       ".*Download: ..% complete",
+       30000);
+power("client4", false);
+
+expect("client5",
+       ".*Download: ..% complete",
+       30000);
+power("client5", false);
+
+
+// There's no room for client6. It should be told to wait for a minute
+expect("client6",
+       "plugin ota-client start",
+       "Download delay by server 60000 ms",
+       5000);
+
+// After the timeout threshold (120 seconds), it should find a free spot because
+// one of the OTA sessions should be purged, which frees up a spot in the array
+
+expect("server",
+       ".*OTA: purging 0x.... from active downloads due to inactivity",
+       120000);
+
+// The test delay again
+expect("client6",
+       "Download delay by server 60000 ms",
+       62000);
+// The server figures out he's using seconds again
+expect("server",
+       "OTA client " + client6NodeId + " uses seconds",
+       65000);
+// And we're done!
+expect("client6",
+       "Custom verification passed: 0x00",
+       120000);
+
+networkWait(5000);
+
+// Now we'll test the server to treat the client in different configurations
+// (e.g. use no delay, use ms, use seconds, perform discovery)
+
+// Make the server think client6 should have no delay
+
+expect("client6",
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+networkWait(2000);
+
+send("server",
+     "plugin ota-server policy client-delay-units 0"); // OTA_SERVER_NO_RATE_LIMITING_FOR_CLIENT
+nexpect("client6",
+        "plugin ota-client start",
+        "Download delay by server .* ms",
+        65000);
+
+expect("client6",
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+networkWait(2000);
+
+send("server",
+     "plugin ota-server policy client-delay-units 1"); // OTA_SERVER_CLIENT_USES_MILLISECONDS
+// No discovery piece; server says delay by 10000 ms, client6 (using seconds)
+// assumes this is 10000*1000 seconds
+expect("client6",
+       "plugin ota-client start",
+       "Download delay by server 10000000 ms",
+       5000);
+
+expect("client6",
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+networkWait(2000);
+
+send("server",
+     "plugin ota-server policy client-delay-units 2"); // OTA_SERVER_CLIENT_USES_SECONDS
+expect("client6",
+       "plugin ota-client start",
+       "Download delay by server 10000 ms",
+       5000);
+
+expect("client6",
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+networkWait(2000);
+
+send("server",
+     "plugin ota-server policy client-delay-units 3"); // OTA_SERVER_DISCOVER_CLIENT_DELAY_UNITS
+expect("client6",
+       "plugin ota-client start",
+       "Download delay by server 60000 ms",
+       5000);
+expect("client6",
+       "plugin ota-client start",
+       "Download delay by server 10000 ms",
+       65000);
+
+
+networkWait(2000);

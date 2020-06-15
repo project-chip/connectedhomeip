@@ -1,0 +1,380 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to verify behavior of the Color Control Option attribute's
+// executeIfOff control bit and mask/override fields that may override this bit setting.
+
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop
+    || runArgument.runUsingHostApps) {
+  // Multi-hop is disabled due to many weird failures due to timing issue.
+
+  // I am disabling host because it is failing in a very bizarre
+  // way in the Key Establishment.  I would love to debug this issue,
+  // but do not currently have time.  The IHD is failing to succeed on
+  // key establishment on host, the confirm key is seeing a different value
+  // on both sides.  In theory this should not happen under idealized
+  // (simulation) circumstances.  So my suspicion is that it is memory
+  // corruption.
+  dbg.print("****Multi-hop and Host disabled****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "controller", "bulb-rgb"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/Z3ColorControlLight-simulation/Z3ColorControlLight",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+};
+
+String[] ncpImages = new String[] {
+  "",
+  "",
+};
+
+// Note: the following call creates a flat network (i.e. every node can
+// hear every other node.
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImages,
+                  false, false, false);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0xdc04;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Note: reference designs can not use the formAndJoinDevices() API
+// because they will all try to join on their own.  As such, calls
+// beyond the first to attempt to join to a network will fail (devices
+// already joined).
+
+// Coodinator is device [0]
+networkForm(allDevices[0]);
+send(allDevices[0], "network pjoin 150");
+
+// Allow TC and link key requests on the trust center
+send("controller", "option security set-key-request-policy 1 1");
+
+// Let registration complete.
+networkWait(75000);
+
+String bulbRgbNodeId = nodeId("bulb-rgb");
+
+lazyExpect = true;
+
+public static final int UP = 0x00;
+public static final int DOWN = 0x01;
+
+void sendToBulb()
+{
+  send("controller", "send " + bulbRgbNodeId + " 1 1");
+}
+
+String format8(int value8)
+{
+  return String.format("%02X", new Object[] { value8 });
+}
+
+String format16(int value16)
+{
+  return String.format("%02X %02X",
+                       new Object[] {
+                         value16 & 0xFF,
+                         (value16 >> 8) & 0xFF,
+                       });
+}
+
+String formatTransitionTime(int transitionTimeS)
+{
+  int transitionTimeDs = transitionTimeS * 10;
+  return format16(transitionTimeDs);
+}
+
+String formatOnOff(boolean onOff)
+{
+  return (onOff ? "01" : "00");
+}
+
+void setOnOffState(boolean onOff)
+{
+  expect("bulb-rgb", "write 1 0x0006 0x0000 1 0x10 {" + formatOnOff(onOff) + "}", "Success: write");
+}
+
+void setColorControlExecuteIfOff(boolean on)
+{
+  String xifoff = on ? "01" : "00";
+  expect("bulb-rgb", "write 1 0x0300 0x000F 1 0x18 {" + xifoff + "}", "Success: write");
+}
+
+void checkHueSat(int hue, int sat)
+{
+  expect("bulb-rgb", "read 1 0x0300 0x0000 1", "^" + format8(hue) + " $");
+  expect("bulb-rgb", "read 1 0x0300 0x0001 1", "^" + format8(sat) + " $");
+}
+
+void setHueSat(int hue, int sat)
+{
+  moveToHueAndSat(hue, sat, 1, 1, 1);
+  checkHueSat(hue, sat);
+}
+
+void moveToHue(int hue, int dir, int transitionTimeS, int mask, int override)
+{
+  String payload = format8(hue) + " " + format8(dir) + " " + formatTransitionTime(transitionTimeS)
+                   + " " + format8(mask) + " " + format8(override);
+  expectMultiline("controller",
+                  "zcl color-control movetohue " + hue + " " + dir + " " + (transitionTimeS * 10)
+                    + " 0x" + format8(mask) + " 0x" + format8(override) + "",
+                  new String[] {
+                    "Msg: clus 0x0300, cmd 0x00, len 9",
+                    "buffer: 01 [0-9a-fA-F]{2} 00 " + payload,
+                  });
+  sendToBulb();
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void moveHue()
+{
+  
+}
+
+void stepHue()
+{
+  
+}
+
+void moveToSat(int sat, int transitionTimeS, int mask, int override)
+{
+  String payload = format8(sat) + " " + formatTransitionTime(transitionTimeS)
+                   + " " + format8(mask) + " " + format8(override);
+  expectMultiline("controller",
+                  "zcl color-control movetosat " + sat + " " + (transitionTimeS * 10)
+                    + " 0x" + format8(mask) + " 0x" + format8(override) + "",
+                  new String[] {
+                    "Msg: clus 0x0300, cmd 0x03, len 8",
+                    "buffer: 01 [0-9a-fA-F]{2} 03 " + payload,
+                  });
+  sendToBulb();
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void moveSat()
+{
+  
+}
+
+void stepSat()
+{
+  
+}
+
+void moveToHueAndSat(int hue, int sat, int transitionTimeS, int mask, int override)
+{
+  String payload = format8(hue) + " " + format8(sat) + " " + formatTransitionTime(transitionTimeS)
+                   + " " + format8(mask) + " " + format8(override);
+  expectMultiline("controller",
+                  "zcl color-control movetohueandsat " + hue + " " + sat + " " + (transitionTimeS * 10)
+                    + " 0x" + format8(mask) + " 0x" + format8(override) + "",
+                  new String[] {
+                    "Msg: clus 0x0300, cmd 0x06, len 9",
+                    "buffer: 01 [0-9a-fA-F]{2} 06 " + payload,
+                  });
+  sendToBulb();
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void checkColor(int x, int y)
+{
+  expect("bulb-rgb", "read 1 0x0300 0x0003 1", "^" + format16(x) + " $");
+  expect("bulb-rgb", "read 1 0x0300 0x0004 1", "^" + format16(y) + " $");
+}
+
+void setColor(int x, int y)
+{
+  moveToColor(x, y, 1, 1, 1);
+  checkColor(x, y);
+}
+
+void moveToColor(int x, int y, int transitionTimeS, int mask, int override)
+{
+  String payload = format16(x) + " " + format16(y) + " " + formatTransitionTime(transitionTimeS)
+                   + " " + format8(mask) + " " + format8(override);
+  expectMultiline("controller",
+                  "zcl color-control movetocolor " + x + " " + y + " " + (transitionTimeS * 10)
+                    + " 0x" + format8(mask) + " 0x" + format8(override) + "",
+                  new String[] {
+                    "Msg: clus 0x0300, cmd 0x07, len 11",
+                    "buffer: 01 [0-9a-fA-F]{2} 07 " + payload,
+                  });
+  sendToBulb();
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void moveColor()
+{
+  
+}
+
+void stepColor()
+{
+  
+}
+
+void checkColorTempMinMax(int min, int max)
+{
+  expect("bulb-rgb", "read 1 0x0300 0x400B 1", "^" + format16(min) + " $");
+  expect("bulb-rgb", "read 1 0x0300 0x400C 1", "^" + format16(max) + " $");
+}
+
+void checkColorTemp(int mireds)
+{
+  expect("bulb-rgb", "read 1 0x0300 0x0007 1", "^" + format16(mireds) + " $");
+}
+
+void setColorTemp(int mireds)
+{
+  moveToColorTemp(mireds, 1, 1, 1);
+  checkColorTemp(mireds);
+}
+
+void moveToColorTemp(int mireds, int transitionTimeS, int mask, int override)
+{
+  String payload = format16(mireds) + " " + formatTransitionTime(transitionTimeS)
+                   + " " + format8(mask) + " " + format8(override);
+  expectMultiline("controller",
+                  "zcl color-control movetocolortemp " + mireds + " " + (transitionTimeS * 10)
+                    + " 0x" + format8(mask) + " 0x" + format8(override) + "",
+                  new String[] {
+                    "Msg: clus 0x0300, cmd 0x0A, len 9",
+                    "buffer: 01 [0-9a-fA-F]{2} 0A " + payload,
+                  });
+  sendToBulb();
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void stopMoveStep()
+{
+  
+}
+
+void moveColorTemp()
+{
+  
+}
+
+void stepColorTemp()
+{
+  
+}
+
+// ------------------------------------------------------------------------------
+// Test Categories
+// 
+// OnOff state is ON.
+// - All color commands should operate regardless of Color Control Options attribute setting
+//   and settings of command optionsMask / optionsOverride fields.
+//
+// OnOff state is OFF.
+// - If Color Control Options attribute has executeIfOff bit set, execute color commands
+//   if not overridden to the contrary by optionsMask (set) and optionsOverride (clear).
+// - If Color Control Options attribute has executeIfOff bit clear, execute color commands
+//   only if overridden to the contrary by optionsMask (set) and optionsOverride (set).
+//
+// ------------------------------------------------------------------------------
+
+class ExecuteIfOffTestCase {
+  boolean onOff;  // OnOff state
+  boolean xIfOff; // Color Control Options executeIfOff bit
+  int mask;       // Color Control command optionsMask field
+  int ovrd;       // Color Control command optionsOverride field
+  ExecuteIfOffTestCase(boolean onOff, boolean xIfOff, int mask, int ovrd) {
+    this.onOff = onOff;
+    this.xIfOff = xIfOff;
+    this.mask = mask;
+    this.ovrd = ovrd;
+  }
+};
+
+ExecuteIfOffTestCase[] testCases =
+{
+  // These combinations should cause color ops to execute.
+  //
+  // OnOff is on, the rest are don't cares.
+  new ExecuteIfOffTestCase(true,  true,  0x00, 0x00),
+  new ExecuteIfOffTestCase(true,  true,  0x00, 0x01),
+  new ExecuteIfOffTestCase(true,  true,  0x01, 0x00),
+  new ExecuteIfOffTestCase(true,  true,  0x01, 0x01),
+  new ExecuteIfOffTestCase(true,  false, 0x00, 0x00),
+  new ExecuteIfOffTestCase(true,  false, 0x00, 0x01),
+  new ExecuteIfOffTestCase(true,  false, 0x01, 0x00),
+  new ExecuteIfOffTestCase(true,  false, 0x01, 0x01),
+  // OnOff is off, option bit is true and is not overridden to be false.
+  new ExecuteIfOffTestCase(false, true,  0x00, 0x00),
+  new ExecuteIfOffTestCase(false, true,  0x00, 0x01),
+  new ExecuteIfOffTestCase(false, true,  0x01, 0x01),
+  // OnOff is off, option bit if false bit is overridden to be true.
+  new ExecuteIfOffTestCase(false, false, 0x01, 0x01),
+
+  // These combinations should cause color ops to be ignored.
+  // OnOff is off, option bit is either false and/or overridden to be false.
+  new ExecuteIfOffTestCase(false, true,  0x01, 0x00),
+  new ExecuteIfOffTestCase(false, false, 0x00, 0x00),
+  new ExecuteIfOffTestCase(false, false, 0x00, 0x01),
+  new ExecuteIfOffTestCase(false, false, 0x01, 0x00),
+    
+};
+
+for (ExecuteIfOffTestCase tc : testCases) {
+  setOnOffState(tc.onOff);
+  setColorControlExecuteIfOff(tc.xIfOff);
+
+  if (tc.onOff
+      || (tc.xIfOff && (tc.mask == 0x00 || tc.ovrd == 0x01))
+      || (!tc.xIfOff && tc.mask == 0x01 && tc.ovrd == 0x01)) {
+    // Color Control commands should execute.
+    setHueSat(64, 128);
+    moveToHueAndSat(32, 16, 1, tc.mask, tc.ovrd);
+    checkHueSat(32, 16);
+    moveToHue(128, 0, 1, tc.mask, tc.ovrd);
+    checkHueSat(128, 16);
+    moveToSat(64, 1, tc.mask, tc.ovrd);
+    checkHueSat(128, 64);
+
+    setColor(0x0001, 0x0002);
+    moveToColor(0x0FFF, 0x0EFD, 1, tc.mask, tc.ovrd);
+    checkColor(0x0FFF, 0x0EFD);
+
+    //checkColorTempMinMax(0x00C8, 0x01C6);
+    setColorTemp(0x0100);
+    moveToColorTemp(0x0180, 1, tc.mask, tc.ovrd);
+    checkColorTemp(0x0180);
+  } else {
+    // Color Control commands should be ignored.
+    setHueSat(64, 128);
+    moveToHueAndSat(32, 16, 1, tc.mask, tc.ovrd);
+    checkHueSat(64, 128);
+    moveToHue(128, 0, 1, tc.mask, tc.ovrd);
+    checkHueSat(64, 128);
+    moveToSat(64, 1, tc.mask, tc.ovrd);
+    checkHueSat(64, 128);
+
+    setColor(0x0001, 0x0002);
+    moveToColor(0x0FFF, 0x0EFD, 1, tc.mask, tc.ovrd);
+    checkColor(0x0001, 0x0002);
+
+    //checkColorTempMinMax(0x00C8, 0x01C6);
+    setColorTemp(0x0100);
+    moveToColorTemp(0x180, 1, tc.mask, tc.ovrd);
+    checkColorTemp(0x0100);
+  }
+}

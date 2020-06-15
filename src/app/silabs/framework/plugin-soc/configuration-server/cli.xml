@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-configuration-server" name="Plugin Commands: Manufacturing Library">
+    <description>CLI commands related to the manufacturing library.</description>
+  </group>
+  <command cli="plugin configuration-server lock" functionName="emAfConfigurationServerLockCommand" group="plugin-configuration-server">
+    <description>
+      Lock/unlock the configuration cluster.      
+    </description>
+    <arg name="lock" type="BOOLEAN" description="True means lock, false means unlock."/>
+  </command>
+  <command cli="plugin configuration-server set" functionName="emAfConfigurationServerSetCommand" group="plugin-configuration-server">
+    <description>
+      Set a token supported by the configuration server.      
+    </description>
+    <arg name="creator" type="INT16U" description="True means lock, false means unlock."/>
+    <arg name="data" type="OCTET_STRING" description="Data to use to write the token."/>
+  </command>
+  <command cli="plugin configuration-server read" functionName="emAfConfigurationServerReadCommand" group="plugin-configuration-server">
+    <description>
+      Read a token supported by the configuration server.      
+    </description>
+  </command>
+</cli>

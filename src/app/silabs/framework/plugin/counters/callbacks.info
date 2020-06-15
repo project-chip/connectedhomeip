@@ -1,0 +1,9 @@
+/** @brief Rollover
+ *
+ * This function is called every time a counter exceeds its threshold.
+ *
+ * @param type The counter that rolled over Ver.: always
+ */
+void emberAfPluginCountersRolloverCallback(EmberCounterType type)
+{
+}

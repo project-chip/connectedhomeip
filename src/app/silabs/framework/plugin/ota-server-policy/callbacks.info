@@ -1,0 +1,25 @@
+#include "app/framework/plugin/ota-server-policy/ota-server-policy.h"
+
+/** @brief GetClientDelayUnits
+ *
+ * Called when the server receives an Image Block Request from a client that
+ * supports rate limiting using the Minimum Block Period feature. This callback
+ * gives the server a chance to decide which units the client uses for the
+ * Minimum Block Period, seconds or milliseconds. The server can also return
+ * OTA_SERVER_DISCOVER_CLIENT_DELAY_UNITS, which causes the plugin code to test
+ * the client by sending it a preset delay value. The length of time the client
+ * delays determines which units it uses. For more information on this feature,
+ * please read the plugin option descriptions under the OTA Server plugin.
+ *
+ * @param clientNodeId     Ver.: always
+ * @param clientEui64      Ver.: always
+ *
+ * For return values, see ota-server-policy.h. An unknown return value will
+ * result in the same behavior as if OTA_SERVER_CLIENT_USES_MILLISECONDS had
+ * been returned.
+ */
+uint8_t emberAfPluginOtaServerPolicyGetClientDelayUnits(EmberNodeId clientNodeId,
+                                                        EmberEUI64 clientEui64)
+{
+  return OTA_SERVER_DISCOVER_CLIENT_DELAY_UNITS;
+}

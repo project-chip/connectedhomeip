@@ -1,0 +1,775 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"server", "client"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12Ihd-simulation/Se12Ihd"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12Ihd-simulation-ezsp/Se12Ihd"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+int channel = 21;
+int power = 2;
+int panId = 0xDEAD;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+networkWait(timeout * 10); 
+
+String serverNodeId = nodeId("server");
+String clientNodeId = nodeId("client");
+
+expect("server", "plugin calendar-common test-init", ".*Calendars initialized with test-data.");
+networkWait(1000);
+
+send("server", "plugin calendar-common select 0");
+networkWait(1000);
+
+expectMultiline("server",
+                "plugin calendar-common print summary",
+                new String[] {
+                  ".*Selected Calendar Index: 0",
+                  "Name: abcdefghijkl",
+                  "ID:              0x00000000",
+                  "Issuer Event ID: 0x0000B000",
+                  "Provider ID:     0x0000A000",
+                  "Type:            0 \\(Delivered\\)",
+                  "Start Time:      00000000 \\(2000/01/01, 00:00:00\\)",
+                  "Season Profiles:      4",
+                  "Week Profiles:        4",
+                  "Day Profiles:         7",
+                  "Special Day Profiles: 5",
+                });
+networkWait(1000);
+
+expectMultiline("server",
+                "plugin calendar-common print days",
+                new String[] {
+                  ".*Selected Calendar Index: 0",
+                  "Normal Day Profiles",
+                  "Day ID: 1 - Schedule",
+                  "  00:00 - Price Tier: 0xC0",
+                  "  01:00 - Price Tier: 0xC1",
+                  "  02:00 - Price Tier: 0xC2",
+                  "  03:00 - Price Tier: 0xC3",
+                  "  04:00 - Price Tier: 0xC4",
+                  "Day ID: 2 - Schedule",
+                  "  00:01 - Price Tier: 0xC0",
+                  "  01:01 - Price Tier: 0xC1",
+                  "  02:01 - Price Tier: 0xC2",
+                  "  03:01 - Price Tier: 0xC3",
+                  "  04:01 - Price Tier: 0xC4",
+                  "Day ID: 3 - Schedule",
+                  "  00:02 - Price Tier: 0xC0",
+                  "  01:02 - Price Tier: 0xC1",
+                  "  02:02 - Price Tier: 0xC2",
+                  "  03:02 - Price Tier: 0xC3",
+                  "  04:02 - Price Tier: 0xC4",
+                  "Day ID: 4 - Schedule",
+                  "  00:03 - Price Tier: 0xC0",
+                  "  01:03 - Price Tier: 0xC1",
+                  "  02:03 - Price Tier: 0xC2",
+                  "  03:03 - Price Tier: 0xC3",
+                  "  04:03 - Price Tier: 0xC4",
+                  "Day ID: 5 - Schedule",
+                  "  00:04 - Price Tier: 0xC0",
+                  "  01:04 - Price Tier: 0xC1",
+                  "  02:04 - Price Tier: 0xC2",
+                  "  03:04 - Price Tier: 0xC3",
+                  "  04:04 - Price Tier: 0xC4",
+                  "Day ID: 6 - Schedule",
+                  "  00:05 - Price Tier: 0xC0",
+                  "  01:05 - Price Tier: 0xC1",
+                  "  02:05 - Price Tier: 0xC2",
+                  "  03:05 - Price Tier: 0xC3",
+                  "  04:05 - Price Tier: 0xC4",
+                  "Day ID: 7 - Schedule",
+                  "  00:06 - Price Tier: 0xC0",
+                  "  01:06 - Price Tier: 0xC1",
+                  "  02:06 - Price Tier: 0xC2",
+                  "  03:06 - Price Tier: 0xC3",
+                  "  04:06 - Price Tier: 0xC4",
+                });
+networkWait(1000);
+
+expectMultiline("server",
+                "plugin calendar-common print special-days",
+                new String[] {
+                  ".*Selected Calendar Index: 0",
+                  "Special Day Profiles",
+                  "Special Day: 0",
+                  "  Date: 0x72010101 \\(2014/01/01\\)",
+                  "  Day ID: 7",
+                  "Special Day: 1",
+                  "  Date: 0x73020201 \\(2015/02/02\\)",
+                  "  Day ID: 7",
+                  "Special Day: 2",
+                  "  Date: 0x74030301 \\(2016/03/03\\)",
+                  "  Day ID: 7",
+                  "Special Day: 3",
+                  "  Date: 0x75040401 \\(2017/04/04\\)",
+                  "  Day ID: 7",
+                  "Special Day: 4",
+                  "  Date: 0x76050501 \\(2018/05/05\\)",
+                  "  Day ID: 7",
+                });
+networkWait(1000);
+
+expectMultiline("server",
+                "plugin calendar-common print weeks",
+                new String[] {
+                  "Se12Esi>Selected Calendar Index: 0",
+                  "Week Profiles",
+                  "  Week ID: 1",
+                  "    Monday    \\(Day ID Ref\\):      0x01",
+                  "    Tuesday   \\(Day ID Ref\\):      0x02",
+                  "    Wednesday \\(Day ID Ref\\):      0x03",
+                  "    Thursday  \\(Day ID Ref\\):      0x04",
+                  "    Friday    \\(Day ID Ref\\):      0x05",
+                  "    Saturday  \\(Day ID Ref\\):      0x06",
+                  "    Sunday    \\(Day ID Ref\\):      0x07",
+                  "  Week ID: 2",
+                  "    Monday    \\(Day ID Ref\\):      0x01",
+                  "    Tuesday   \\(Day ID Ref\\):      0x02",
+                  "    Wednesday \\(Day ID Ref\\):      0x03",
+                  "    Thursday  \\(Day ID Ref\\):      0x04",
+                  "    Friday    \\(Day ID Ref\\):      0x05",
+                  "    Saturday  \\(Day ID Ref\\):      0x06",
+                  "    Sunday    \\(Day ID Ref\\):      0x07",
+                  "  Week ID: 3",
+                  "    Monday    \\(Day ID Ref\\):      0x01",
+                  "    Tuesday   \\(Day ID Ref\\):      0x02",
+                  "    Wednesday \\(Day ID Ref\\):      0x03",
+                  "    Thursday  \\(Day ID Ref\\):      0x04",
+                  "    Friday    \\(Day ID Ref\\):      0x05",
+                  "    Saturday  \\(Day ID Ref\\):      0x06",
+                  "    Sunday    \\(Day ID Ref\\):      0x07",
+                  "  Week ID: 4",
+                  "    Monday    \\(Day ID Ref\\):      0x01",
+                  "    Tuesday   \\(Day ID Ref\\):      0x02",
+                  "    Wednesday \\(Day ID Ref\\):      0x03",
+                  "    Thursday  \\(Day ID Ref\\):      0x04",
+                  "    Friday    \\(Day ID Ref\\):      0x05",
+                  "    Saturday  \\(Day ID Ref\\):      0x06",
+                  "    Sunday    \\(Day ID Ref\\):      0x07",
+                });
+networkWait(1000);
+
+expectMultiline("server",
+                "plugin calendar-common print seasons",
+                new String[] {
+                  "Se12Esi>Selected Calendar Index: 0",
+                  "Seasons",
+                  "Season: 0",
+                  "  Start Date:  0x72010101 \\(2014/01/01\\)",
+                  "  Week ID: 1",
+                  "Season: 1",
+                  "  Start Date:  0x73020201 \\(2015/02/02\\)",
+                  "  Week ID: 2",
+                  "Season: 2",
+                  "  Start Date:  0x74030301 \\(2016/03/03\\)",
+                  "  Week ID: 3",
+                  "Season: 3",
+                  "  Start Date:  0x75040401 \\(2017/04/04\\)",
+                  "  Week ID: 4",
+                });
+networkWait(1000);
+
+// zcl calendar get-calendar <earliestStartTime:4> <minIssuerEventId:4> <numberOfCalendars:1> <calendarType:1> <providerId:4>
+send("client", "zcl calendar get-calendar 0 0xFFFFFFFF 0 0xFF 0xFFFFFFFF");
+expectMultiline("client",
+                "send 0 1 1",
+                new String[] {
+                  "RX: PublishCalendar 0x0000A000, 0x0000B000, 0x00000000, 0x00000000, 0x00, \"abcdefghijkl\", 4, 4, 7",
+                  "RX: PublishCalendar 0x0000A001, 0x0000B001, 0x00000001, 0x000003E8, 0x00, \"mnopqrstuvwx\", 4, 4, 7",
+                });
+networkWait(1000);
+expectMultiline("client",
+                "plugin calendar-client print 1",
+                new String[] {
+                  "calendar:                       0",
+                  "  providerId:                   0x0000A000",
+                  "  issuerEventId:                0x0000B000",
+                  "  issuerCalendarId:             0x00000000",
+                  "  startTimeUtc:                 0x[0-9A-F]{8}",
+                  "  calendarType:                 0x00",
+                  "  calendarName:                 \"abcdefghijkl\"",
+                  "  numberOfSeasons:              4",
+                  "  receivedSeasons:              0",
+                  "  numberOfWeekProfiles:         4",
+                  "  numberOfDayProfiles:          7",
+                  "calendar:                       1",
+                  "  providerId:                   0x0000A001",
+                  "  issuerEventId:                0x0000B001",
+                  "  issuerCalendarId:             0x00000001",
+                  "  startTimeUtc:                 0x000003E8",
+                  "  calendarType:                 0x00",
+                  "  calendarName:                 \"mnopqrstuvwx\"",
+                  "  numberOfSeasons:              4",
+                  "  receivedSeasons:              0",
+                  "  numberOfWeekProfiles:         4",
+                  "  numberOfDayProfiles:          7",
+                });
+networkWait(1000);
+
+// zcl calendar get-day-profiles <providerId:4> <issuerCalendarId:4> <startDayId:1> <numberOfDays:1>
+send("client", "zcl calendar get-day-profiles 0xFFFFFFFF 0x00000000 1 2");
+expectMultiline("client",
+                "send 0 1 1",
+                new String[] {
+                  "RX: PublishDayProfile 0x0000A000, 0x0000B000, 0x00000000, 1, 5, 0, 1, 0x00, \\[.*\\]",
+                  "RX: PublishDayProfile 0x0000A000, 0x0000B000, 0x00000000, 2, 5, 0, 1, 0x00, \\[.*\\]",
+                });
+networkWait(1000);
+send("client", "zcl calendar get-day-profiles 0x0000A000 0x00000000 3 2");
+expectMultiline("client",
+                "send 0 1 1",
+                new String[] {
+                  "RX: PublishDayProfile 0x0000A000, 0x0000B000, 0x00000000, 3, 5, 0, 1, 0x00, \\[.*\\]",
+                  "RX: PublishDayProfile 0x0000A000, 0x0000B000, 0x00000000, 4, 5, 0, 1, 0x00, \\[.*\\]",
+                });
+networkWait(1000);
+send("client", "zcl calendar get-day-profiles 0x0000A000 0x00000000 5 2");
+expectMultiline("client",
+                "send 0 1 1",
+                new String[] {
+                  "RX: PublishDayProfile 0x0000A000, 0x0000B000, 0x00000000, 5, 5, 0, 1, 0x00, \\[.*\\]",
+                  "RX: PublishDayProfile 0x0000A000, 0x0000B000, 0x00000000, 6, 5, 0, 1, 0x00, \\[.*\\]",
+                });
+networkWait(1000);
+send("client", "zcl calendar get-day-profiles 0x0000A000 0x00000000 7 2");
+expectMultiline("client",
+                "send 0 1 1",
+                new String[] {
+                  "RX: PublishDayProfile 0x0000A000, 0x0000B000, 0x00000000, 7, 5, 0, 1, 0x00, \\[.*\\]",
+                });
+networkWait(1000);
+// TODO
+//send("client", "plugin calendar-client print 1");
+//networkWait(1000);
+
+// zcl calendar get-week-profiles <providerId:4> <issuerCalendarId:4> <startWeekId:1> <numberOfWeeks:1>
+send("client", "zcl calendar get-week-profiles 0x0000A000 0x00000000 1 0");
+expectMultiline("client",
+                "send 0 1 1",
+                new String[] {
+                  "RX: PublishWeekProfile 0x0000A000, 0x0000B000, 0x00000000, 1, 1, 2, 3, 4, 5, 6, 7",
+                  "RX: PublishWeekProfile 0x0000A000, 0x0000B000, 0x00000000, 2, 1, 2, 3, 4, 5, 6, 7",
+                  "RX: PublishWeekProfile 0x0000A000, 0x0000B000, 0x00000000, 3, 1, 2, 3, 4, 5, 6, 7",
+                  "RX: PublishWeekProfile 0x0000A000, 0x0000B000, 0x00000000, 4, 1, 2, 3, 4, 5, 6, 7",
+                });
+networkWait(1000);
+// TODO
+//send("client", "plugin calendar-client print 1");
+//networkWait(1000);
+
+// zcl calendar get-seasons <providerId:4> <issuerCalendarId:4>
+send("client", "zcl calendar get-seasons 0x0000A000 0x00000000");
+expectMultiline("client",
+                "send 0 1 1",
+                new String[] {
+                  "RX: PublishSeasons 0x0000A000, 0x0000B000, 0x00000000, 0, 1, .*",
+                });
+networkWait(1000);
+// TODO
+//send("client", "plugin calendar-client print 1");
+//networkWait(1000);
+
+// zcl calendar get-special-days <startTime:4> <numberOfEvents:1> <calendarType:1> <providerId:4> <issuerCalendarId:4>
+send("client", "zcl calendar get-special-days 0x00000000 0 0xFF 0x0000A000 0x00000000");
+send("client", "send 0 1 1");
+networkWait(1000);
+// TODO
+//send("client", "plugin calendar-client print 1");
+//networkWait(1000);
+
+// zcl calendar get-cancellation
+//send("client", "zcl calendar get-cancellation");
+//send("client", "send 0 1 1");
+//networkWait(1000);
+//send("client", "plugin calendar-client print 1");
+//networkWait(1000);
+
+// Tests from SE 1.2 Test Specification
+
+// Test 21.4 from Test Spec
+
+// Initial Conditions
+
+// make sure to set the time on the calendar server then have the client sync to it
+send("server", "zcl time " + timeSinceZigBeeEpoch(0)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+
+// First let's clear the client and server calendars
+send("client", "plugin calendar-client clear 1");
+networkWait(1000);
+send("server", "plugin calendar-common clear");
+networkWait(1000);
+
+// Test Procedure
+
+// Item 1 
+send("client", "zcl calendar get-calendar 0x00000000 0xFFFFFFFF 1 0xFF 0xFFFFFFFF");
+send("client", "send 0 1 1");
+// Item 2
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+// Item 3
+String cal1StartTime = timeSinceZigBeeEpoch(0);
+send("server", "plugin calendar-common load-simple-calendar 0 0xAAAAAAAA 0x00000001 0x00000001 " + cal1StartTime + " 0x00 \"CALENDAR 1\"");
+// Item 4
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 0");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000001, 0x00000001, " + cal1StartTime + ", 0x00, \"CALENDAR 1\", 4, 2, 3");
+// Item 5 - says to wait 5 minutes - so we simulate that here
+send("server", "zcl time " + timeSinceZigBeeEpoch(5)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+// Item 6
+send("server", "plugin calendar-common load-enhanced-calendar 1 0xAAAAAAAA 0x00000002 0x00000002 0x00000000 0x00 \"CALENDAR 2\"");
+// Item 7
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 1");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000002, 0x00000002, 0x.*, 0x00, \"CALENDAR 2\", 11, 2, 6");
+// Item 8 
+send("client", "zcl calendar get-calendar 0x00000000 0xFFFFFFFF 0 0xFF 0xFFFFFFFF");
+send("client", "send 0 1 1");
+// Item 9
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000001, 0x00000001, " + cal1StartTime + ", 0x00, \"CALENDAR 1\", 4, 2, 3");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000002, 0x00000002, 0x.*, 0x00, \"CALENDAR 2\", 11, 2, 6");
+// Item 10 - since we simulated 5 minutes going by earlier we need to get the current utc from the node
+//           rather than calling timeSinceZigBeeEpoch(0) again as that would represent real time and ends
+//           matching the original load time.
+String currentUtcTime = "0x" + Long.toHexString(utcTime("client")).toUpperCase();
+send("client", "zcl calendar get-calendar " + currentUtcTime + " 0xFFFFFFFF 0 0xFF 0xFFFFFFFF");
+send("client", "send 0 1 1");
+// Item 11
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000002, 0x00000002, 0x.*, 0x00, \"CALENDAR 2\", 11, 2, 6");
+// Item 12
+String cal2StartTime = timeSinceZigBeeEpoch(10080 + 5); // now + 1 week + the 5 minute simulated time
+send("server", "plugin calendar-common load-simple-calendar 2 0xAAAAAAAA 0x00000003 0x00000003 " + cal2StartTime + " 0x00 \"CALENDAR 3\"");
+// Item 13
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 2");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000003, 0x00000003, " + cal2StartTime + ", 0x00, \"CALENDAR 3\", 4, 2, 3");
+// Item 14 - since we simulated 5 minutes going by earlier we need to get the current utc from the node
+//           rather than calling timeSinceZigBeeEpoch(0) again as that would represent real time and ends
+//           matching the original load time.
+currentUtcTime = "0x" + Long.toHexString(utcTime("client")).toUpperCase();
+send("client", "zcl calendar get-calendar " + currentUtcTime + " 0xFFFFFFFF 1 0xFF 0xFFFFFFFF");
+send("client", "send 0 1 1");
+// Item 15
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000002, 0x00000002, 0x.*, 0x00, \"CALENDAR 2\", 11, 2, 6");
+// Item 16 - since we simulated 5 minutes going by earlier we need to get the current utc from the node
+//           rather than calling timeSinceZigBeeEpoch(0) again as that would represent real time and ends
+//           matching the original load time.
+currentUtcTime = "0x" + Long.toHexString(utcTime("client")).toUpperCase();
+send("client", "zcl calendar get-calendar " + currentUtcTime + " 0x00000003 1 0xFF 0xFFFFFFFF");
+send("client", "send 0 1 1");
+// Item 17
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000003, 0x00000003, " + cal2StartTime + ", 0x00, \"CALENDAR 3\", 4, 2, 3");
+// Item 18 - since we simulated 5 minutes going by earlier we need to get the current utc from the node
+//           rather than calling timeSinceZigBeeEpoch(0) again as that would represent real time and ends
+//           matching the original load time.
+currentUtcTime = "0x" + Long.toHexString(utcTime("client")).toUpperCase();
+send("client", "zcl calendar get-calendar " + currentUtcTime + " 0xFFFFFFFF 0 0xFF 0xFFFFFFFF");
+send("client", "send 0 1 1");
+// Item 19
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000002, 0x00000002, 0x.*, 0x00, \"CALENDAR 2\", 11, 2, 6");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000003, 0x00000003, " + cal2StartTime + ", 0x00, \"CALENDAR 3\", 4, 2, 3");
+// Item 20
+send("client", "zcl calendar get-calendar 0x00000000 0xFFFFFFFF 0 0xFF 0xFFFFFFFF");
+send("client", "send 0 1 1");
+// Item 21
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000001, 0x00000001, " + cal1StartTime + ", 0x00, \"CALENDAR 1\", 4, 2, 3");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000002, 0x00000002, 0x.*, 0x00, \"CALENDAR 2\", 11, 2, 6");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000003, 0x00000003, " + cal2StartTime + ", 0x00, \"CALENDAR 3\", 4, 2, 3");
+// Item 22
+send("client", "zcl calendar get-calendar 0x00000000 0xFFFFFFFF 0 0xFF 0xBBBBBBBB");
+send("client", "send 0 1 1");
+// Item 23
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+// Item 24
+send("client", "zcl calendar get-calendar 0x00000000 0xFFFFFFFF 0 0x01 0xFFFFFFFF");
+send("client", "send 0 1 1");
+// Item 25
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+// Test 21.5 from Test Spec
+
+// Initial Conditions
+
+// make sure to set the time on the calendar server then have the client sync to it
+send("server", "zcl time " + timeSinceZigBeeEpoch(0)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+
+// First let's clear the client and server calendars
+send("client", "plugin calendar-client clear 1");
+networkWait(1000);
+send("server", "plugin calendar-common clear");
+networkWait(1000);
+
+send("server", "plugin calendar-common load-enhanced-calendar 0 0xAAAAAAAA 0x00000001 0x00000001 0x00000000 0x00 \"CALENDAR 1\"");
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 0");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, \"CALENDAR 1\", 11, 2, 6");
+
+// Test Procedure
+
+// Item 1 
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x12345678 1 0");
+send("client", "send 0 1 1");
+// Item 2
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[01 8B \\]");
+// Item 3 
+send("client", "zcl calendar get-day-profiles 0xBBBBBBBB 0x00000001 1 0");
+send("client", "send 0 1 1");
+// Item 4
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[01 8B \\]");
+// Item 5 
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 1 1");
+send("client", "send 0 1 1");
+// Item 6 - no application layer fragmentation so 1 publish command
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 1, 48, 0, 1, 0x00.*");
+// Item 7 
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 2 1");
+send("client", "send 0 1 1");
+// Item 8
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 2, 5, 0, 1, 0x00.*");
+// Item 9
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 3 1");
+send("client", "send 0 1 1");
+// Item 10
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 3, 1, 0, 1, 0x00.*");
+// Item 11
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 4 1");
+send("client", "send 0 1 1");
+// Item 12 - no application layer fragmentation so 1 publish command
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 4, 48, 0, 1, 0x00.*");
+// Item 13
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 5 1");
+send("client", "send 0 1 1");
+// Item 14
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 5, 5, 0, 1, 0x00.*");
+// Item 15
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 6 1");
+send("client", "send 0 1 1");
+// Item 16
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 6, 1, 0, 1, 0x00.*");
+// Item 17
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 7 1");
+send("client", "send 0 1 1");
+// Item 18
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[01 8B \\]");
+// Item 19
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 1 3");
+send("client", "send 0 1 1");
+// Item 20 - order shouldn't matter 
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 1, 48, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 2, 5, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 3, 1, 0, 1, 0x00.*");
+// Item 21
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 1 0");
+send("client", "send 0 1 1");
+// Item 20 - order shouldn't matter 
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 1, 48, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 2, 5, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 3, 1, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 4, 48, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 5, 5, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 6, 1, 0, 1, 0x00.*");
+
+// Test 21.6 from Test Spec
+
+// Initial Conditions
+
+// make sure to set the time on the calendar server then have the client sync to it
+send("server", "zcl time " + timeSinceZigBeeEpoch(0)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+
+// First let's clear the client and server calendars
+send("client", "plugin calendar-client clear 1");
+networkWait(1000);
+send("server", "plugin calendar-common clear");
+networkWait(1000);
+
+send("server", "plugin calendar-common load-enhanced-calendar 0 0xAAAAAAAA 0x00000001 0x00000001 0x00000000 0x00 \"CALENDAR 1\"");
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 0");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, \"CALENDAR 1\", 11, 2, 6");
+
+// Test Procedure
+
+// Item 1 
+send("client", "zcl calendar get-week-profiles 0xAAAAAAAA 0x12345678 1 0");
+send("client", "send 0 1 1");
+// Item 2
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[02 8B \\]");
+// Item 3 
+send("client", "zcl calendar get-week-profiles 0xBBBBBBBB 0x00000001 1 0");
+send("client", "send 0 1 1");
+// Item 4
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[02 8B \\]");
+// Item 5 
+send("client", "zcl calendar get-week-profiles 0xAAAAAAAA 0x00000001 1 1");
+send("client", "send 0 1 1");
+// Item 6
+expect("client", ".*RX: PublishWeekProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 1, 1, 1, 1, 1, 1, 2, 3");
+// Item 7 
+send("client", "zcl calendar get-week-profiles 0xAAAAAAAA 0x00000001 2 1");
+send("client", "send 0 1 1");
+// Item 8 
+expect("client", ".*RX: PublishWeekProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 2, 4, 4, 4, 4, 4, 5, 6");
+// Item 9 
+send("client", "zcl calendar get-week-profiles 0xAAAAAAAA 0x00000001 3 1");
+send("client", "send 0 1 1");
+// Item 10 
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[02 8B \\]");
+// Item 11 
+send("client", "zcl calendar get-week-profiles 0xAAAAAAAA 0x00000001 1 0");
+send("client", "send 0 1 1");
+// Item 12 
+expect("client", ".*RX: PublishWeekProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 1, 1, 1, 1, 1, 1, 2, 3");
+expect("client", ".*RX: PublishWeekProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 2, 4, 4, 4, 4, 4, 5, 6");
+
+// Test 21.7 from Test Spec
+
+// Initial Conditions
+
+// make sure to set the time on the calendar server then have the client sync to it
+send("server", "zcl time " + timeSinceZigBeeEpoch(0)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+
+// First let's clear the client and server calendars
+send("client", "plugin calendar-client clear 1");
+networkWait(1000);
+send("server", "plugin calendar-common clear");
+networkWait(1000);
+
+send("server", "plugin calendar-common load-enhanced-calendar 0 0xAAAAAAAA 0x00000001 0x00000001 0x00000000 0x00 \"CALENDAR 1\"");
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 0");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, \"CALENDAR 1\", 11, 2, 6");
+
+// Test Procedure
+
+// Item 1 
+send("client", "zcl calendar get-seasons 0xAAAAAAAA 0x12345678");
+send("client", "send 0 1 1");
+// Item 2
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[03 8B \\]");
+// Item 3 
+send("client", "zcl calendar get-seasons 0xBBBBBBBB 0x00000001");
+send("client", "send 0 1 1");
+// Item 4
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[03 8B \\]");
+// Item 5
+send("client", "zcl calendar get-seasons 0xAAAAAAAA 0x00000001");
+send("client", "send 0 1 1");
+// Item 6 - no application layer fragmentation so 1 publish command
+expect("client", ".*RX: PublishSeasons 0xAAAAAAAA, 0x00000001, 0x00000001, 0, 1.*");
+
+// Test 21.8 from Test Spec
+
+// Initial Conditions
+
+// make sure to set the time on the calendar server then have the client sync to it
+send("server", "zcl time " + timeSinceZigBeeEpoch(0)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+
+// First let's clear the client and server calendars
+send("client", "plugin calendar-client clear 1");
+networkWait(1000);
+send("server", "plugin calendar-common clear");
+networkWait(1000);
+
+send("server", "plugin calendar-common load-enhanced-calendar 0 0xAAAAAAAA 0x00000001 0x00000001 0x00000000 0x00 \"CALENDAR 1\"");
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 0");
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, \"CALENDAR 1\", 11, 2, 6");
+
+// Test Procedure
+
+// Item 1 
+send("client", "zcl calendar get-special-days 0x00000000 0 0xFF 0xFFFFFFFF 0x00000000");
+send("client", "send 0 1 1");
+// Item 2
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[04 8B \\]");
+// Item 3
+send("server", "plugin calendar-common load-simple-special-days 0");
+send("server", "plugin calendar-server publish-special-days " + clientNodeId + " 1 1 0");
+// Item 4
+expect("client", ".*RX: PublishSpecialDays 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, 7, 0, 1.*");
+// Item 5
+send("client", "zcl calendar get-special-days 0x00000000 0 0xFF 0xFFFFFFFF 0x00000000");
+send("client", "send 0 1 1");
+// Item 6
+expect("client", ".*RX: PublishSpecialDays 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, 7, 0, 1.*");
+// Item 7
+send("server", "plugin calendar-common load-enhanced-special-days 0");
+send("server", "plugin calendar-server publish-special-days " + clientNodeId + " 1 1 0");
+// Item 8 - note we fragment instead of sending multiple commands
+expect("client", ".*RX: PublishSpecialDays 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, 50, 0, 1.*");
+// Item 9 
+send("client", "zcl calendar get-special-days 0x00000000 1 0xFF 0xFFFFFFFF 0x00000000");
+send("client", "send 0 1 1");
+// Item 10 
+expect("client", ".*RX: PublishSpecialDays 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, 1, 0, 1.*");
+// Item 11 
+send("client", "zcl calendar get-special-days 0x00000000 0 0xFF 0xFFFFFFFF 0x00000000");
+send("client", "send 0 1 1");
+// Item 12 
+expect("client", ".*RX: PublishSpecialDays 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, 50, 0, 1.*");
+// Item 13 
+send("client", "zcl calendar get-special-days " + timeSinceZigBeeEpoch(10080) + " 0 0xFF 0xFFFFFFFF 0x00000000");
+send("client", "send 0 1 1");
+// Item 14 
+expect("client", ".*RX: PublishSpecialDays 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, 50, 0, 1.*");
+// Item 15 
+send("client", "zcl calendar get-special-days 0x00000000 0 0x01 0xFFFFFFFF 0x00000000");
+send("client", "send 0 1 1");
+// Item 16
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[04 8B \\]");
+// Item 17 
+send("client", "zcl calendar get-special-days 0x00000000 0 0xFF 0xBBBBBBBB 0x00000000");
+send("client", "send 0 1 1");
+// Item 18
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[04 8B \\]");
+// Item 19 
+send("client", "zcl calendar get-special-days 0x00000000 0 0xFF 0xFFFFFFFF 0xBBBBBBBB");
+send("client", "send 0 1 1");
+// Item 20
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[04 8B \\]");
+
+// Test 21.9 from Test Spec
+
+// Initial Conditions
+
+// make sure to set the time on the calendar server then have the client sync to it
+send("server", "zcl time " + timeSinceZigBeeEpoch(0)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+
+// First let's clear the client and server calendars
+send("client", "plugin calendar-client clear 1");
+networkWait(1000);
+send("server", "plugin calendar-common clear");
+networkWait(1000);
+
+// Test Procedure
+
+// Item 1 
+send("server", "plugin calendar-common load-flat-calendar 0 0xAAAAAAAA 0x00000001 0x00000001 0x00000000 0x00 \"CALENDAR 3\"");
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 0");
+// Item 2 - TODO: skipping part about battery powered devices 
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000001, 0x00000001, 0x.*, 0x00, \"CALENDAR 3\", 0, 1, 1");
+// Item 3 - TODO: skipping part about battery powered devices 
+// Item 4 - TODO: skipping part about battery powered devices 
+// Item 5
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000001 1 0");
+send("client", "send 0 1 1");
+// Item 6
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 1, 1, 0, 1, 0x00.*");
+// Item 7 
+send("client", "zcl calendar get-week-profiles 0xAAAAAAAA 0x00000001 1 0");
+send("client", "send 0 1 1");
+// Item 8 
+expect("client", ".*RX: PublishWeekProfile 0xAAAAAAAA, 0x00000001, 0x00000001, 1, 1, 1, 1, 1, 1, 1, 1");
+// Item 9 
+send("server", "plugin calendar-common load-enhanced-calendar 1 0xAAAAAAAA 0x00000002 0x00000002 0x00000000 0x00 \"CALENDAR 4\"");
+send("server", "plugin calendar-server publish-calendar " + clientNodeId + " 1 1 1");
+// Item 10 - TODO: skipping part about battery powered devices 
+expect("client", ".*RX: PublishCalendar 0xAAAAAAAA, 0x00000002, 0x00000002, 0x.*, 0x00, \"CALENDAR 4\", 11, 2, 6");
+// Item 11 - TODO: skipping part about battery powered devices 
+// Item 12 - TODO: skipping part about battery powered devices 
+// Item 13
+send("client", "zcl calendar get-day-profiles 0xAAAAAAAA 0x00000002 1 0");
+send("client", "send 0 1 1");
+// Item 14
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000002, 0x00000002, 1, 48, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000002, 0x00000002, 2, 5, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000002, 0x00000002, 3, 1, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000002, 0x00000002, 4, 48, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000002, 0x00000002, 5, 5, 0, 1, 0x00.*");
+expect("client", ".*RX: PublishDayProfile 0xAAAAAAAA, 0x00000002, 0x00000002, 6, 1, 0, 1, 0x00.*");
+// Item 15 
+send("client", "zcl calendar get-week-profiles 0xAAAAAAAA 0x00000002 1 0");
+send("client", "send 0 1 1");
+// Item 16 
+expect("client", ".*RX: PublishWeekProfile 0xAAAAAAAA, 0x00000002, 0x00000002, 1, 1, 1, 1, 1, 1, 2, 3");
+expect("client", ".*RX: PublishWeekProfile 0xAAAAAAAA, 0x00000002, 0x00000002, 2, 4, 4, 4, 4, 4, 5, 6");
+// Item 17
+send("client", "zcl calendar get-seasons 0xAAAAAAAA 0x00000002");
+send("client", "send 0 1 1");
+// Item 18 - no application layer fragmentation so 1 publish command
+expect("client", ".*RX: PublishSeasons 0xAAAAAAAA, 0x00000002, 0x00000002, 0, 1.*");
+// Item 19
+// send("client", "plugin calendar-client print 1");
+
+// Test 21.10 from Test Spec
+
+// Initial Conditions
+
+// make sure to set the time on the calendar server then have the client sync to it
+send("server", "zcl time " + timeSinceZigBeeEpoch(0)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+
+// First let's clear the client and server calendars
+send("client", "plugin calendar-client clear 1");
+networkWait(1000);
+send("server", "plugin calendar-common clear");
+networkWait(1000);
+
+// Test Procedure
+
+// Item 1 
+send("client", "zcl calendar get-cancellation");
+send("client", "send 0 1 1");
+expect("server", ".*RX: GetCalendarCancellation");
+expect("client", ".*clus 0x0707 \\(Calendar\\) FC 08 seq .. cmd 0B payload\\[05 8B \\]");
+
+// Test 21.11 from Test Spec
+
+// Initial Conditions
+
+// make sure to set the time on the calendar server then have the client sync to it
+send("server", "zcl time " + timeSinceZigBeeEpoch(0)); 
+networkWait(1000);
+send("client", "timesync 0 1 1");
+networkWait(1000);
+
+// First let's clear the client and server calendars
+send("client", "plugin calendar-client clear 1");
+networkWait(1000);
+send("server", "plugin calendar-common clear");
+networkWait(1000);
+
+// Test Procedure
+
+// Item 1 
+send("server", "plugin calendar-common load-flat-calendar 0 0xAAAAAAAA 0x00000001 0x00000001 0x00000000 0x00 \"CALENDAR 3\"");
+send("server", "plugin calendar-server cancel-calendar " + clientNodeId + " 1 1 0");
+expect("client", ".*RX: CancelCalendar 0xAAAAAAAA, 0x00000001, 0x00");
+// Item 2
+send("client", "zcl calendar get-cancellation");
+send("client", "send 0 1 1");
+expect("server", ".*RX: GetCalendarCancellation");
+// Item 3
+expect("client", ".*RX: CancelCalendar 0xAAAAAAAA, 0x00000001, 0x00");
+
+networkWait(5000);

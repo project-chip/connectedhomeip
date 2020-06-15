@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ota-bootload" name="Plugin Commands: OTA Bootload">
+    <description>
+      The OTA Bootload Plugin provides information on the installed bootloader.
+    </description>
+  </group>
+  <command cli="plugin ota-bootload info" functionName="printBootloaderInfoCommand" group="plugin-ota-bootload">
+    <description>
+      Prints info about the installed bootloader.
+    </description>
+  </command>
+</cli>

@@ -1,0 +1,1691 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"client", "server"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaDoorLock-simulation/HaDoorLock"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation-ezsp/HaHomeGateway",
+  "build/af-test-apps/HaDoorLock-simulation-ezsp/HaDoorLock"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+lazyExpect=true;
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+networkWait(DEFAULT_TIMEOUT << 2);
+
+String clientEui64 = eui64("client");
+String clientNodeId = nodeId("client");
+String serverNodeId = nodeId("server");
+
+void checkAttributeRead(String id, String value)
+{
+  String idNo0x = id.substring(2);
+  send("client", "zcl global read 0x0101 " + id);
+  _expectMultiline("client",
+                   "send " + serverNodeId + " 1 1",
+                   new String[] {
+                     "READ_ATTR_RESP: \\(Door Lock\\)",
+                     " - attr:" + idNo0x + ", status:00",
+                     "   type:[0-9A-Z]{2}, val:" + value,
+                   },
+                   (DEFAULT_TIMEOUT << 1),
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+}
+
+void checkAttributeWrite(String sendingNodeName,
+                         String receivingNodeId,
+                         String clusterName,
+                         String clusterInHex,
+                         String attrInHex,
+                         String attrTypeInHex,
+                         String attrDataInHex,
+                         String returnStatusInHex,  // no 0x prefix
+                         int timeout, // to override default timeout
+                         String file,
+                         int lineNumberOfCaller)
+{
+  send(sendingNodeName,
+       "zcl global write "
+       + clusterInHex + " "
+       + attrInHex + " "
+       + attrTypeInHex
+       + " {"
+       + attrDataInHex
+       + "}");
+
+  // This assumes source and dest endpoints are both 1 (the default for our apps).
+  _expectMultiline(sendingNodeName,
+                   "send " + receivingNodeId + " 1 1",
+                   new String[] {
+                     "WRITE_ATTR_RESP: \\(" + clusterName + "\\)",
+                     " - status:" + returnStatusInHex,
+                   },
+                   timeout,
+                   file,
+                   lineNumberOfCaller);
+}
+
+void checkAttributeWrite(String id,
+                         String type,
+                         String value,
+                         String status)
+{
+  checkAttributeWrite("client",          // sendingNodeName
+                      serverNodeId,      // receivingNodeId
+                      "Door Lock",       // clusterName
+                      "0x0101",          // clusterInHex
+                      id,                // attrInHex
+                      type,              // attrTypeInHex
+                      value,             // attrDataInHex
+                      status,            // returnStatusInHex (no 0x prefix)
+                      (DEFAULT_TIMEOUT << 1),
+                      getSourceFileInfo(),
+                      this.namespace.getInvocationLine());
+}
+
+void checkAttributeWrite(String id, String type, String value)
+{
+  checkAttributeWrite("client",          // sendingNodeName
+                      serverNodeId,      // receivingNodeId
+                      "Door Lock",       // clusterName
+                      "0x0101",          // clusterInHex
+                      id,                // attrInHex
+                      type,              // attrTypeInHex
+                      value,             // attrDataInHex
+                      "00",              // returnStatusInHex (no 0x prefix)
+                      (DEFAULT_TIMEOUT << 1),
+                      getSourceFileInfo(),
+                      this.namespace.getInvocationLine());
+}
+
+void sendCommand(String cmdNo0x, String payloadBytesNo0x, String file, int line)
+{
+  _expect("client",
+          "send " + serverNodeId + " 1 1",
+          ".*RX .* clus 0x0101 .* FC 19 seq .. cmd " + cmdNo0x + " payload\\[" + payloadBytesNo0x + " \\]",
+          (DEFAULT_TIMEOUT << 1),
+          file,
+          line);
+}
+
+void sendLockDoor(String pin)
+{
+  send("client", "zcl lock lock {" + pin + "}");
+  sendCommand("00",
+              "00",
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendUnlockDoor(String pin, String expectedStatusNo0x)
+{
+  send("client", "zcl lock unlock {" + pin + "}");
+  sendCommand("01",
+              expectedStatusNo0x,
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendUnlockWithTimeout(String timeoutS, String pin)
+{
+  send("client", "zcl lock unlock-with-timeout " + timeoutS + " {" + pin + "}");
+  sendCommand("03",
+              "00", // status
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendGetLogRecord(String logIndex, String expectedResponsePayload)
+{
+  send("client", "zcl lock get-log-record " + logIndex);
+  sendCommand("04",
+              expectedResponsePayload,
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendSetPin(String userId,
+                String userType,
+                String userStatus,
+                String pinCodeString)
+{
+  send("client",
+       ("zcl lock set-pin "
+        + userId + " "
+        + userType + " "
+        + userStatus + " "
+        + "\"" + pinCodeString + "\""));
+  sendCommand("05",
+              "00",
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendGetPin(String userId,
+                String expectedUserIdNo0x,
+                String expectedUserStatusNo0x,
+                String expectedPinCodeNo0x)
+{
+  send("client", "zcl lock get-pin " + userId);
+  sendCommand("06",
+              (expectedUserIdNo0x + " "
+               + expectedUserStatusNo0x + " "
+               + "00 "
+               + expectedPinCodeNo0x),
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendClearPin(String userId)
+{
+  send("client", "zcl lock clear-pin " + userId);
+  sendCommand("07",
+              "00",
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendSetWeekdaySchedule(String scheduleId,
+                            String userId,
+                            String daysMask,
+                            String startHour,
+                            String startMinute,
+                            String endHour,
+                            String endMinute)
+{
+  send("client",
+       ("zcl lock set-weekday-schedule "
+        + scheduleId + " "
+        + userId + " "
+        + daysMask + " "
+        + startHour + " "
+        + startMinute + " "
+        + endHour + " "
+        + endMinute));
+  sendCommand("0B",
+              "00",
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendGetWeekdaySchedule(String scheduleId, String userId, String responsePayloadBytes)
+{
+  send("client", "zcl lock get-weekday-schedule " + scheduleId + " " + userId);
+  sendCommand("0C",
+              responsePayloadBytes,
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendClearWeekdaySchedule(String scheduleId, String userId)
+{
+  send("client", "zcl lock clear-weekday-schedule " + scheduleId + " " + userId);
+  sendCommand("0D",
+              "00",
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendSetYeardaySchedule(String scheduleId,
+                            String userId,
+                            String localStartTime,
+                            String localEndTime)
+{
+  send("client",
+       ("zcl lock set-yearday-schedule "
+        + scheduleId + " "
+        + userId + " "
+        + localStartTime + " "
+        + localEndTime));
+  sendCommand("0E",
+              "00",
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendGetYeardaySchedule(String scheduleId,
+                            String userId,
+                            String expectedScheduleIdNo0x,
+                            String expectedUserIdNo0x,
+                            String expectedStatusNo0x,
+                            String expectedLocalStartTimeNo0x,
+                            String expectedLocalEndTimeNo0x)
+{
+  send("client", "zcl lock get-yearday-schedule " + scheduleId + " " + userId);
+  sendCommand("0F",
+              (expectedScheduleIdNo0x + " "
+               + expectedUserIdNo0x + " "
+               + expectedStatusNo0x + " "
+               + expectedLocalStartTimeNo0x + " "
+               + expectedLocalEndTimeNo0x),
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendClearYeardaySchedule(String scheduleId, String userId)
+{
+  send("client", "zcl lock clear-yearday-schedule " + scheduleId + " " + userId);
+  sendCommand("10",
+              "00", // status
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendSetHolidaySchedule(String holidayScheduleId,
+                            String localStartTime,
+                            String localEndTime,
+                            String operatingModeDuringVacation)
+{
+  send("client",
+       ("zcl lock set-holiday-schedule "
+        + holidayScheduleId + " "
+        + localStartTime + " "
+        + localEndTime + " "
+        + operatingModeDuringVacation));
+  sendCommand("11",
+              "00", // status
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+                            
+void sendGetHolidaySchedule(String holidayScheduleId,
+                            String expectedHolidayScheduleIdNo0x,
+                            String expectedLocalStartTimeNo0x,
+                            String expectedLocalEndTimeNo0x,
+                            String expectedOperatingModeDuringVacationNo0x)
+{
+  send("client", "zcl lock get-holiday-schedule " + holidayScheduleId);
+  sendCommand("12",
+              (expectedHolidayScheduleIdNo0x + " "
+               + "00 " // status
+               + expectedLocalStartTimeNo0x + " "
+               + expectedLocalEndTimeNo0x + " "
+               + expectedOperatingModeDuringVacationNo0x),
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendClearHolidaySchedule(String holidayScheduleId)
+{
+  send("client", "zcl lock clear-holiday-schedule " + holidayScheduleId);
+  sendCommand("13",
+              "00", // status
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendGetUserType(String userId,
+                     String expectedUserIdNo0x,
+                     String expectedUserTypeNo0x)
+{
+  send("client", "zcl lock get-user-type " + userId);
+  sendCommand("15",
+              expectedUserIdNo0x + " " + expectedUserTypeNo0x,
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendSetRfid(String userId, String userStatus, String userType, String id)
+{
+  send("client",
+       ("zcl lock set-rfid "
+        + userId + " "
+        + userStatus + " "
+        + userType + " "
+        + id));
+  sendCommand("16",
+              "00", // status
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendGetRfid(String userId,
+                 String expectedUserIdNo0x,
+                 String expectedUserStatusNo0x,
+                 String expectedUserTypeNo0x,
+                 String expectedIdNo0x)
+{
+  send("client", "zcl lock get-rfid " + userId);
+  sendCommand("17",
+              (expectedUserIdNo0x + " "
+               + expectedUserStatusNo0x + " "
+               + expectedUserTypeNo0x + " "
+               + expectedIdNo0x),
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendClearRfid(String userId)
+{
+  send("client", "zcl lock clear-rfid " + userId);
+  sendCommand("18",
+              "00", // status
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void sendClearAllRfids()
+{
+  send("client", "zcl lock clear-all-rfids");
+  sendCommand("19",
+              "00", // status
+              getSourceFileInfo(),
+              this.namespace.getInvocationLine());
+}
+
+void tc02S()
+{
+  dbg.println("!!! DRLK-TC-02S Primary functionality");
+
+  // PX: put the door in a "locked" state for this test. Note that this step is
+  // not currently in the test spec.
+  expect("server",
+         "plugin door-lock-server lock 0xACAC",
+         "Door is now locked");
+
+  // PY: add a user so that we will successfully unlock below.
+  sendSetPin("0x0001", "0x00", "0x00", "abcd");
+
+  // 0: TH CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to
+  // set the AutoRelockTime attribute to 0x00000000 (disabled).  DUT SERVER
+  // unicasts a ZCL write attributes response command frame to TH CLIENT with the
+  // Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "0000000000");
+
+  // 1: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the LockState, LockType and ActuatorEnabled attributes.  DUT SERVER
+  // unicasts a ZCL read attributes response command frame to TH CLIENT. The
+  // LockState and LockType attributes have values that reflect the physical
+  // state of the door.  The ActuatorEnabled attribute has the value 1 (true).
+  checkAttributeRead("0x0000", "01"); // LockState = locked
+  checkAttributeRead("0x0001", ".*"); // LockType = whatever
+  checkAttributeRead("0x0002", "01"); // ActuatorEnabled = true
+
+  // 2: Regardless of the state of the LockState attribute, TH CLIENT unicasts a
+  // ZCL unlock door command frame to DUT SERVER.  If DUT SERVER is already
+  // unlocked it does nothing. If DUT SERVER is locked it unicasts a ZCL unlock
+  // door response command frame to TH CLIENT with the Status field equal to 0x00
+  // (SUCCESS).
+  sendUnlockDoor("61626364", "00"); // "abcd"
+  expect("server", "plugin door-lock-server status", ".*State: Unlocked");
+
+  // 3a: TH CLIENT unicasts a ZCL lock door command frame to DUT SERVER.
+  // DUT SERVER unicasts a ZCL lock door response command frame to TH CLIENT with
+  // the Status field equal to 0x00 (SUCCESS).
+  sendLockDoor("61626364"); // "abcd"
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+
+  // 3b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the LockState attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The LockState attribute has the value 1 (locked).
+  checkAttributeRead("0x0000", "01");
+
+  // 4a: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendUnlockDoor("61626364", "00"); // "abcd"
+
+  // 4b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the LockState attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The LockState attribute has the value 2 (unlocked).
+  checkAttributeRead("0x0000", "02");
+}
+
+void tc03S()
+{
+  dbg.println("!!! DRLK-TC-03S Get log records");
+
+  // PX: put the door in a "locked" state for this test. Note that this step is not
+  // currently in the test spec.
+  expect("server",
+         "plugin door-lock-server lock 0xACAC",
+         "Door is now locked");
+
+  // PY: make sure to enable logging for this test.
+  checkAttributeWrite("0x0020", "0x10", "01");
+
+  // 0: TH CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to
+  // set the AutoRelockTime attribute to 0x00000000.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "0000000000");
+
+  // 1a: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the LockState attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The LockState attributes has the value 0x01 (locked).
+  checkAttributeRead("0x0000", "01");
+
+  // 1b: Either TH CLIENT unicasts a ZCL unlock door command frame to
+  // DUT SERVER with the PIN/RFID code field set to a valid PIN/RFID
+  // code or the door is unlocked manually.
+  // If an unlock door command was sent, DUT SERVER unicasts a ZCL
+  // unlock door response command frame to TH CLIENT with the Status
+  // field equal to 0x00 (SUCCESS).
+  expect("server",
+         "plugin door-lock-server unlock 0xACAC",
+         "Door is now unlocked");
+
+  // 1c: TH CLIENT unicasts a ZCL read attributes command frame to DUT
+  // SERVER to read the LockState attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to
+  // TH CLIENT. The LockState attribute has the value 2 (unlocked).
+  checkAttributeRead("0x0000", "02");
+
+  // 2: TH CLIENT unicasts a ZCL get log record command frame to DUT
+  // SERVER with the log index field set to 0x0000.
+  sendGetLogRecord("0x0000",
+                   ("01 00 "         // log entry ID
+                    + ".. .. .. .. " // timestamp
+                    + "00 "          // event type OPERATION
+                    + "02 "          // event source MANUAL
+                    + "02 "          // event ID UNLOCK
+                    + "AC AC "       // user ID
+                    + ".*"));        // pin...
+
+  // 3: TH CLIENT unicasts a ZCL get log record command frame to DUT
+  // SERVER with the log index field set to 0x0001.
+  sendGetLogRecord("0x0001",
+                   ("01 00 "         // log entry ID
+                    + ".. .. .. .. " // timestamp
+                    + "00 "          // event type OPERATION
+                    + "02 "          // event source MANUAL
+                    + "02 "          // event ID LOCK
+                    + "AC AC "       // user ID
+                    + ".*"));        // pin...
+}
+
+void tc04S()
+{
+  dbg.println("!!! DRLK-TC-04S Weekday schedule");
+
+  // 0a: TH CLIENT unicasts a ZCL set PIN code command frame to DUT SERVER with the
+  // User ID field set to 0x0001, the User Status field set to 1
+  // (occupied/enabled), the User Type field set to 2 (week day schedule user) and
+  // the PIN field set to a valid code (if applicable): “1111” (0x04, 0x31, 0x31,
+  // 0x31, 0x31).  DUT SERVER unicasts a ZCL set PIN code response command frame to
+  // TH CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendSetPin("0x0001", "0x01", "0x02", "1111");
+
+  // 0b: TH CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to
+  // set the AutoRelockTime attribute to 0x00000000.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "0000000000");
+
+  // 0c: TH CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to
+  // set the RequirePINforRFOperation attribute to 0x01 (enabled).  DUT SERVER
+  // unicasts a ZCL write attributes response command frame to TH CLIENT with the
+  // Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0033", "0x10", "01");
+
+  // 0d: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the NumberOfWeekDaySchedulesSupportedPerUser attribute.
+  checkAttributeRead("0x0014", "04");
+
+  // 0e: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the NumberOfTotalUsersSupported attribute.
+  checkAttributeRead("0x0011", "0800");
+
+  // 1: TH CLIENT unicasts a ZCL set week day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x01, the User ID field set to 0x0001, the
+  // Days Mask field set to the current day mask only, the Start Hour/Start Minute
+  // fields set to the current local time – 30 minutes and the End Hour/End Minute
+  // fields set to the current local time + 30 minutes.
+  // DUT SERVER unicasts a ZCL set week day schedule response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendSetWeekdaySchedule("0x01", "0x0001", "0x01", "1", "15", "1", "45");
+
+  // 2: TH CLIENT unicasts a ZCL get user type command frame to DUT SERVER with the
+  // User ID field set to 0x0001.
+  // DUT SERVER unicasts a ZCL get user type response command frame to TH CLIENT
+  // with the User ID field equal to 0x0001 and the User Type field equal to 2
+  // (week day schedule user).
+  sendGetUserType("0x0001", "01 00", "02");
+
+  // 3: TH CLIENT unicasts a ZCL get week day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x01 and the User ID field set to 0x0001.
+  // DUT SERVER unicasts a ZCL get week day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x01, the User ID field equal to
+  // 0x0001, the Status field equal to 0x00 (SUCCESS) and the remaining fields
+  // equal to the schedule configured in step 1.
+  sendGetWeekdaySchedule("0x01", "0x0001", "01 01 00 00 01 01 0F 01 2D");
+
+  // 4: TH CLIENT unicasts a ZCL get week day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to (Smax + 1) and the User ID field set to
+  // 0x0001.
+  // DUT SERVER unicasts a ZCL get week day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x0f, the User ID field equal to
+  // 0x0001 and the Status field not equal to 0x00 (SUCCESS).
+  // Note: we are using this 0xFE value because we are sure it will be greater than
+  // the number of schedule entries we support.
+  sendGetWeekdaySchedule("0xFE", "0x0001", "FE 01 00 85 .*");
+
+  // 5: TH CLIENT unicasts a ZCL get week day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x01 and the User ID field set to (Umax + 1)
+  // (invalid).
+  // DUT SERVER unicasts a ZCL get week day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x01, the User ID field equal to
+  // (Umax + 1) and the Status field not equal to 0x00 (SUCCESS).
+  // Note: we are using this 0xFFFE value because we are sure it will be greater
+  // than the number of user entries we support.
+  sendGetWeekdaySchedule("0x01", "0xFFFE", "01 FE FF 8. .*");
+
+  // 6: TH CLIENT unicasts a ZCL get week day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x01 and the User ID field set to 0x0000
+  // (valid but non-existing).
+  // DUT SERVER unicasts a ZCL get week day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x01, the User ID field equal to
+  // 0x0000 and the Status field not equal to 0x00 (SUCCESS).
+  sendGetWeekdaySchedule("0x01", "0x0000", "01 00 00 8. .*");
+
+  // 7: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER with the
+  // PIN/RFID code field set to the PIN configured in step 0a.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendUnlockDoor("31 31 31 31", "00");
+
+  // 8: TH CLIENT unicasts a ZCL clear week day schedule command frame to DUT
+  // SERVER with the Schedule ID field set to 0x01 and the User ID field set to
+  // 0x0001.
+  // DUT SERVER unicasts a ZCL clear week day schedule response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendClearWeekdaySchedule("0x01", "0x0001");
+
+  // 9a: TH CLIENT unicasts a ZCL get week day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x01 and the User ID field set to 0x0001.
+  // DUT SERVER unicasts a ZCL get week day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x01, the User ID field equal to
+  // 0x0001 and the Status field not equal to 0x00 (SUCCESS).
+  sendGetWeekdaySchedule("0x01", "0x0001", "01 01 00 8. .*");
+
+  // 9b: TH CLIENT unicasts a ZCL get PIN code command frame to DUT SERVER with the
+  // User ID field set to 0x0001.
+  // DUT SERVER unicasts a ZCL get PIN code response command frame to TH CLIENT
+  // with the User ID field equal to 0x0001, the User Status field equal to 0x01
+  // (Occupied/Enabled), the User Type field set to 0x00 (Unrestricted User) and
+  // the Code field set to the PIN configured in step 0a.
+  sendGetPin("0x0001", "01 00", "01", "04 31 31 31 31");
+
+  // 10: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER with the
+  // PIN/RFID code field set to the PIN configured in step 0a.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT with
+  // the Status field equal to 0x00 (SUCCESS).
+  sendUnlockDoor("31 31 31 31", "00");
+}
+
+void tc05S()
+{
+  dbg.println("!!! DRLK-TC-05S Year day schedule");
+
+  // 0a: TH CLIENT unicasts a ZCL set PIN code command frame to DUT SERVER with the
+  // User ID field set to 0x0007, the User Status field set to 1
+  // (occupied/enabled), the User Type field set to 1 (year day schedule user) and
+  // the PIN field set to a valid code (if applicable): “7777” (0x04, 0x37, 0x37,
+  // 0x37, 0x37).
+  // DUT SERVER unicasts a ZCL set PIN code response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendSetPin("0x0007", "0x01", "0x01", "7777");
+
+  // 0b: TH CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to
+  // set the AutoRelockTime attribute to 0x00000000.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "0000000000");
+
+  // 0c: TH CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to
+  // set the RequirePINforRFOperation attribute to 0x01 (enabled).  DUT SERVER
+  // unicasts a ZCL write attributes response command frame to TH CLIENT with the
+  // Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0033", "0x10", "01");
+
+  // 0d: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the NumberOfYearDaySchedulesSupportedPerUser attribute.
+  checkAttributeRead("0x0015", "08");
+
+  // 0e: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the NumberOfTotalUsersSupported attribute.
+  checkAttributeRead("0x0011", "0800");
+
+  // 1: TH CLIENT unicasts a ZCL set year day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x00, the User ID field set to 0x0007, the
+  // ZigBee Local Start Time field set to the current local time – 30 minutes and
+  // the ZigBee Local End Time field set to the current local time + 30 minutes.
+  // DUT SERVER unicasts a ZCL set year day schedule response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendSetYeardaySchedule("0x00", "0x0007", "15", "45");
+
+  // 2: TH CLIENT unicasts a ZCL get user type command frame to DUT SERVER with the
+  // User ID field set to 0x0007.
+  // DUT SERVER unicasts a ZCL get user type response command frame to TH CLIENT
+  // with the User ID field equal to 0x0007 and the User Type field equal to 1
+  // (year day schedule user).
+  sendGetUserType("0x0007", "07 00", "01");
+
+  // 3: TH CLIENT unicasts a ZCL get year day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x00 and the User ID field set to 0x0007.
+  // DUT SERVER unicasts a ZCL get year day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x00, the User ID field equal to
+  // 0x0007, the Status field equal to 0x00 (SUCCESS) and the remaining fields
+  // equal to the schedule configured in step 1.
+  sendGetYeardaySchedule("0x00",         // scheduleId
+                         "0x0007",       // userId
+                         "00",           // expectedScheduleIdNo0x
+                         "07 00",        // expectedUserIdNo0x
+                         "00",           // expectedStatusNo0x
+                         "0F 00 00 00",  // expectedLocalStartTimeNo0x
+                         "2D 00 00 00"); // expectedLocalEndTimeNo0x
+
+  // 4: TH CLIENT unicasts a ZCL get year day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to (Smax + 1) and the User ID field set to
+  // 0x0007.
+  // DUT SERVER unicasts a ZCL get year day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x10, the User ID field equal to
+  // 0x0007 and the Status field equal to 0x85 (INVALID_FIELD).
+  // Note: we are using 0xFE as a schedule ID because I am pretty sure that it
+  // won't be valid.
+  sendGetYeardaySchedule("0xFE",         // scheduleId
+                         "0x0007",       // userId
+                         "FE",           // expectedScheduleIdNo0x
+                         "07 00",        // expectedUserIdNo0x
+                         "85",           // expectedStatusNo0x
+                         "0F 00 00 00",  // expectedLocalStartTimeNo0x
+                         "2D 00 00 00"); // expectedLocalEndTimeNo0x
+
+  // 5: TH CLIENT unicasts a ZCL get year day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x00 and the User ID field set to (Umax + 1)
+  // (invalid).
+  // DUT SERVER unicasts a ZCL get year day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x00, the User ID field equal to
+  // (Umax + 1) and the Status field equal to 0x85 (INVALID_VALUE).
+  // Note: we are using 0xFFFE as a user ID because I am pretty sure that it won't
+  // be valid.
+  sendGetYeardaySchedule("0x00",         // scheduleId
+                         "0xFFFE",       // userId
+                         "00",           // expectedScheduleIdNo0x
+                         "FE FF",        // expectedUserIdNo0x
+                         "85",           // expectedStatusNo0x
+                         "0F 00 00 00",  // expectedLocalStartTimeNo0x
+                         "2D 00 00 00"); // expectedLocalEndTimeNo0x
+
+  // 6: TH CLIENT unicasts a ZCL get year day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x00 and the User ID field set to 0x0000
+  // (valid but non-existing).
+  // DUT SERVER unicasts a ZCL get year day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x00, the User ID field equal to
+  // 0x0000 and the Status field equal to 0x8B (NOT_FOUND).
+  sendGetYeardaySchedule("0x00",         // scheduleId
+                         "0x0000",       // userId
+                         "00",           // expectedScheduleIdNo0x
+                         "00 00",        // expectedUserIdNo0x
+                         "8B",           // expectedStatusNo0x
+                         "0F 00 00 00",  // expectedLocalStartTimeNo0x
+                         "2D 00 00 00"); // expectedLocalEndTimeNo0x
+
+  // 7: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER with the
+  // PIN/RFID code field set to the PIN configured in step 0a.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT with
+  // the Status field equal to 0x00 (SUCCESS).
+  sendUnlockDoor("37 37 37 37", "00"); // "777"
+
+  // 8: TH CLIENT unicasts a ZCL clear year day schedule command frame to DUT
+  // SERVER with the Schedule ID field set to 0x00 and the User ID field set to
+  // 0x0007.
+  // DUT SERVER unicasts a ZCL clear year day schedule response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendClearYeardaySchedule("0x00", "0x0007");
+
+  // 9a: TH CLIENT unicasts a ZCL get year day schedule command frame to DUT SERVER
+  // with the Schedule ID field set to 0x00 and the User ID field set to 0x0007.
+  // DUT SERVER unicasts a ZCL get year day schedule response command frame to TH
+  // CLIENT with the Schedule ID field equal to 0x00, the User ID field equal to
+  // 0x0007 and the Status field not equal to 0x00 (SUCCESS).
+  sendGetYeardaySchedule("0x00",         // scheduleId
+                         "0x0007",       // userId
+                         "00",           // expectedScheduleIdNo0x
+                         "07 00",        // expectedUserIdNo0x
+                         "8.",           // expectedStatusNo0x
+                         "0F 00 00 00",  // expectedLocalStartTimeNo0x
+                         "2D 00 00 00"); // expectedLocalEndTimeNo0x
+
+  // 9b: TH CLIENT unicasts a ZCL get PIN code command frame to DUT SERVER with the
+  // User ID field set to 0x0007.
+  // DUT SERVER unicasts a ZCL get PIN code response command frame to TH CLIENT
+  // with the User ID field equal to 0x0007, the User Status field equal to 0x01
+  // (Occupied/Enabled), the User Type field set to 0x00 (Unrestricted User) and
+  // the Code field set to the PIN configured in step 0a.
+  sendGetPin("0x0007", "07 00", "01", "04 37 37 37 37");
+
+  // 10: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER with the
+  // PIN/RFID code field set to the PIN configured in step 0a.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT with
+  // the Status field equal to 0x00 (SUCCESS).
+  sendUnlockDoor("37 37 37 37", "00"); // "777"
+}
+
+void tc06S()
+{
+  dbg.println("!!! DRLK-TC-06S User interface");
+
+  // PX: write the EnableLogging attribute so we make sure we know what it is.
+  checkAttributeWrite("0x0020", "0x10", "01");
+
+  // 0a: TH CLIENT unicasts a ZCL set PIN code command frame to DUT SERVER with
+  // the User ID field set to 0x0001, the User Status field set to 0 (available),
+  // the User Type field set to 0 (unrestricted user) and the PIN field set to a
+  // valid code (if applicable): “1111” (0x04, 0x31, 0x31, 0x31, 0x31).
+  // DUT SERVER unicasts a ZCL set PIN code response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendSetPin("0x0001", "0x00", "0x00", "1111");
+
+  // 1: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the EnableLogging, Language, LEDSettings, AutoRelockTime, SoundVolume
+  // and OperatingMode attributes.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. If supported on DUT SERVER the values are in the permitted range.
+  // If not supported on DUT SERVER the respective Status fields are equal to
+  // 0x86 (UNSUPPORTED_ATTRIBUTE).
+  checkAttributeRead("0x0020", "01");
+  checkAttributeRead("0x0021", "en");
+  checkAttributeRead("0x0023", "00000000");
+  checkAttributeRead("0x0024", "00");
+  checkAttributeRead("0x0025", "00");
+
+  // 2a: If the Language attribute is supported on DUT SERVER: TH CLIENT unicasts
+  // a ZCL write attributes command frame to DUT SERVER to set the Language
+  // attribute to “fr” (French).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0021", "0x42", "6672");
+
+  // 2b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the Language attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The Language attribute has the value “fr” (French).  DUT SERVER
+  // operates in the French language mode.
+  checkAttributeRead("0x0021", "fr");
+  expect("server", "plugin door-lock-server status", ".*Language: fr");
+
+  // 3a: If the Language attribute is supported on DUT SERVER: TH CLIENT unicasts
+  // a ZCL write attributes command frame to DUT SERVER to set the Language
+  // attribute to “es” (Spanish).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0021", "0x42", "6573");
+
+  // 3b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the Language attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The Language attribute has the value “es” (Spanish). DUT SERVER
+  // operates in the Spanish language mode.
+  checkAttributeRead("0x0021", "es");
+  expect("server", "plugin door-lock-server status", ".*Language: es");
+
+  // 4a: If the Language attribute is supported on DUT SERVER: TH CLIENT unicasts
+  // a ZCL write attributes command frame to DUT SERVER to set the Language
+  // attribute to “en” (English).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0021", "0x42", "656E");
+
+  // 4b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the Language attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The Language attribute has the value “en” (English). DUT SERVER
+  // operates in the English language mode.
+  checkAttributeRead("0x0021", "en");
+  expect("server", "plugin door-lock-server status", ".*Language: en");
+
+  // 5a: If the Language attribute is supported on DUT SERVER: TH CLIENT unicasts
+  // a ZCL write attributes command frame to DUT SERVER to set the Language
+  // attribute to “aa” (English).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x87 (INVALID_VALUE).
+  // TODO:
+
+  // 5b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the Language attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The Language attribute has the value “en” (English). DUT SERVER
+  // operates in the English language mode.
+  checkAttributeRead("0x0021", "en");
+  expect("server", "plugin door-lock-server status", ".*Language: en");
+
+  // 6a: If the LEDSettings attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // LEDSettings attribute to 0x00 (never use LED for signalization).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0022", "0x20", "00");
+
+  // 6b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the LEDSettings attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The LEDSettings attribute has the value 0x00 (never use LED for
+  // signalization). DUT SERVER operates under LED settings mode 0x00.
+  checkAttributeRead("0x0022", "00");
+
+  // 7a: If the LEDSettings attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // LEDSettings attribute to 0x01 (use LED signalization except for access
+  // allowed events).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0022", "0x20", "01");
+
+  // 7b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the LEDSettings attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The LEDSettings attribute has the value 0x01 (use LED signalization
+  // except for access allowed events). DUT SERVER operates under LED settings
+  // mode 0x01.
+  checkAttributeRead("0x0022", "01");
+
+  // 8a: If the LEDSettings attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // LEDSettings attribute to 0x02 (use LED signalization for all events).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0022", "0x20", "02");
+
+  // 8b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the LEDSettings attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The LEDSettings attribute has the value 0x02 (use LED signalization
+  // for all events). DUT SERVER operates under LED settings mode 0x02.
+  checkAttributeRead("0x0022", "02");
+
+  // 9a: If the LEDSettings attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // LEDSettings attribute to 0x03 (invalid).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x87 (INVALID_VALUE).
+  checkAttributeWrite("0x0022", "0x20", "03", "87");
+
+  // 9b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the LEDSettings attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The LEDSettings attribute has the value 0x02 (use LED signalization
+  // for all events). DUT SERVER operates under LED settings mode 0x02.
+  checkAttributeRead("0x0022", "02");
+
+  // 10a: If the SoundVolume attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // SoundVolume attribute to 0x00 (silent mode).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0024", "0x20", "00");
+
+  // 10b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the SoundVolume attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The SoundVolume attribute has the value 0x00 (silent mode). DUT
+  // SERVER operates in silent mode.
+  checkAttributeRead("0x0024", "00");
+  expect("server", "plugin door-lock-server status", "Volume: Silent");
+
+  // 11a: If the SoundVolume attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // SoundVolume attribute to 0x01 (low volume).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0024", "0x20", "01");
+
+  // 11b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the SoundVolume attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The SoundVolume attribute has the value 0x01 (low volume). DUT
+  // SERVER operates in low volume mode.
+  checkAttributeRead("0x0024", "01");
+  expect("server", "plugin door-lock-server status", "Volume: Low");
+
+  // 12a: If the SoundVolume attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // SoundVolume attribute to 0x02 (high volume).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS) or 0x87
+  // (INVALID_VALUE).
+  checkAttributeWrite("0x0024", "0x20", "02");
+
+  // 12b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the SoundVolume attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The SoundVolume attribute has the value 0x02 (high volume). DUT
+  // SERVER operates in high volume mode.
+  checkAttributeRead("0x0024", "02");
+  expect("server", "plugin door-lock-server status", "Volume: High");
+
+  // 13a: If the SoundVolume attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // SoundVolume attribute to 0x03 (invalid).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x87 (INVALID_VALUE).
+  checkAttributeWrite("0x0024", "0x20", "03", "87");
+
+  // 13b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the SoundVolume attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The SoundVolume attribute has the value 0x02 (high volume). DUT
+  // SERVER operates in high volume mode.
+  checkAttributeRead("0x0024", "02");
+  expect("server", "plugin door-lock-server status", "Volume: High");
+
+  // 14a: If the WrongCodeEntryLimit attribute is supported on DUT SERVER: TH
+  // CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to set
+  // the WrongCodeEntryLimit attribute to DRLK.PIXIT01.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0030", "0x20", "03");
+
+  // 14c: Test engineer enters DRLK.PIXIT01 invalid PINs at DUT SERVER.
+  // DUT SERVER goes into lockout mode after the last invalid PIN is entered.
+  expect("server",
+         "plugin door-lock-server apply-pin \"1\"",
+         ".*Apply PIN: 0x01");
+  expect("server",
+         "plugin door-lock-server apply-pin \"2\"",
+         ".*Apply PIN: 0x01");
+  expect("server",
+         "plugin door-lock-server apply-pin \"3\"",
+         ".*Door lock entering lockout mode");
+
+  // 15a: If the WrongCodeEntryLimit attribute is supported on DUT SERVER: TH
+  // CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to set
+  // the WrongCodeEntryLimit attribute to 0x01.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0030", "0x20", "01");
+
+  // 15b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the WrongCodeEntryLimit attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The WrongCodeEntryLimit attribute has the value 0x01.
+  checkAttributeRead("0x0030", "01");
+
+  // 15c: Test engineer enters one invalid PIN at DUT SERVER.
+  // DUT SERVER goes into lockout mode after the invalid PIN is entered.
+  expect("server",
+         "plugin door-lock-server apply-pin \"3\"",
+         ".*Door lock entering lockout mode");
+
+  // 16a: If the WrongCodeEntryLimit attribute is supported on DUT SERVER: TH
+  // CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to set
+  // the WrongCodeEntryLimit attribute to (DRLK.PIXIT01 + 1).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field not equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0030", "0x20", "04");
+
+  // 16b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the WrongCodeEntryLimit attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The WrongCodeEntryLimit attribute has the value 0x01.
+  // FIXME: I don't understand this test step...why shouldn't we be able to write
+  // this value to whatever we want?
+  //checkAttributeRead("0x0030", "01");
+
+  // 16c: Test engineer enters one invalid PIN at DUT SERVER.
+  // DUT SERVER goes into lockout mode after the invalid PIN is entered.
+  expect("server",
+         "plugin door-lock-server apply-pin \"3\"",
+         ".*Door lock entering lockout mode");
+
+  // 17a: If the UserCodeTemperaryDisableTime attribute is supported on DUT
+  // SERVER: TH CLIENT unicasts a ZCL write attributes command frame to DUT
+  // SERVER to set the UserCodeTemporaryDisableTime attribute to 0x01.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0031", "0x20", "01");
+
+  // 17b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the UserCodeTemporaryDisableTime attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The UserCodeTemporaryDisableTime attribute has the value 0x01.
+  checkAttributeRead("0x0031", "01");
+
+  // 17c: Test engineer enters one invalid PIN at DUT SERVER.
+  // DUT SERVER goes into lockout mode after the invalid PIN is entered. After 1
+  // second DUT SERVER goes into normal mode.
+  expect("server",
+         "plugin door-lock-server apply-pin \"3\"",
+         ".*Door lock entering lockout mode");
+  expect("server", ".*Door lock entering normal mode", 1000 + DEFAULT_TIMEOUT);
+
+  // 18a: If the UserCodeTemperaryDisableTime attribute is supported on DUT
+  // SERVER: TH CLIENT unicasts a ZCL write attributes command frame to DUT
+  // SERVER to set the UserCodeTemporary-DisableTime attribute to 0x3c.
+  checkAttributeWrite("0x0031", "0x20", "3C");
+
+  // 18b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the UserCodeTemporaryDisableTime attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The UserCodeTemporaryDisableTime attribute has the value 0x3c.
+  checkAttributeRead("0x0031", "3C");
+
+  // 18c: Test engineer enters one invalid PIN at DUT SERVER.
+  // DUT SERVER goes into lockout mode after the invalid PIN is entered. After 60
+  // seconds DUT SERVER goes into normal mode.
+  expect("server",
+         "plugin door-lock-server apply-pin \"3\"",
+         ".*Door lock entering lockout mode");
+  expect("server",
+         ".*Door lock entering normal mode",
+         (1000 * 60) + DEFAULT_TIMEOUT);
+
+  // 19a: If the UserCodeTemperaryDisableTime attribute is supported on DUT
+  // SERVER: TH CLIENT unicasts a ZCL write attributes command frame to DUT
+  // SERVER to set the UserCodeTemporaryDisableTime attribute to DRLK.PIXIT02.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field not equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0031", "0x20", "1E"); // 30
+
+  // 19b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the UserCodeTemporaryDisableTime attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The UserCodeTemporaryDisableTime attribute has the value 0x3c.
+  //checkAttributeRead("0x0031", "3C");
+  // FIXME: this must be a typo. Same thing that happened in 16b.
+
+  // 19c: Test engineer enters one invalid PIN at DUT SERVER.
+  // DUT SERVER goes into lockout mode after the invalid PIN is entered. After 60
+  // seconds DUT SERVER goes into normal mode.
+  // FIXME: again, I think this is a type. See 19b.
+  expect("server",
+         "plugin door-lock-server apply-pin \"3\"",
+         ".*Door lock entering lockout mode");
+  expect("server",
+         ".*Door lock entering normal mode",
+         (1000 * 60) + DEFAULT_TIMEOUT);
+
+  // 20a: If the SendPINOverTheAir attribute is supported on DUT SERVER: TH
+  // CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to set
+  // the SendPINOverTheAir attribute to 0x00 (FALSE).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0032", "0x10", "00");
+
+  // 20b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the SendPINOverTheAir attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The SendPINOverTheAir attribute has the value 0x00 (FALSE).
+  checkAttributeRead("0x0032", "00");
+
+  // 20c: TH CLIENT unicasts a ZCL get PIN code command frame to DUT SERVER with
+  // the User ID fields set to a known user identifier.
+  // DUT SERVER unicasts a ZCL get PIN code response command frame with the User
+  // ID, User Status and User Type fields corresponding to a known user.  The
+  // Code field is not included.
+  sendGetPin("0x0001", "01 00", "00", "00");
+
+  // 21a: If the SendPINOverTheAir attribute is supported on DUT SERVER: TH
+  // CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to set
+  // the SendPINOverTheAir attribute to 0x01 (TRUE).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0032", "0x10", "01");
+
+  // 21b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the SendPINOverTheAir attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The SendPINOverTheAir attribute has the value 0x01 (TRUE).
+  checkAttributeRead("0x0032", "01");
+
+  // 21c: TH CLIENT unicasts a ZCL get PIN code command frame to DUT SERVER with
+  // the User ID fields set to a known user identifier.
+  // DUT SERVER unicasts a ZCL get PIN code response command frame with the User
+  // ID, User Status and User Type and Code fields corresponding to a known user.
+  sendGetPin("0x0001", "01 00", "00", "04 31 31 31 31"); // "1111"
+}
+
+void tc07S()
+{
+  dbg.println("!!! DRLK-TC-07S RFID");
+
+  // PX: put the door in a "locked" state for this test. Note that this step is not
+  // currently in the test spec.
+  expect("server",
+         "plugin door-lock-server lock 0xACAC",
+         "Door is now locked");
+
+  // 0a: If the DoorOpenEvents attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // DoorOpenEvents attribute to 0x00000000.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0004", "0x23", "00000000");
+
+  // 0b: If the DoorClosedEvents attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // DoorClosedEvents attribute to 0x00000000.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0005", "0x23", "00000000");
+
+  // 0c: If the AutoRelockTime attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // AutoRelockTime attribute to 0x00000000 (disabled).  DUT SERVER unicasts a ZCL
+  // write attributes response command frame to TH CLIENT with the Status field
+  // equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "0000000000");
+
+  // 1: TH CLIENT unicasts a ZCL clear all RFID codes command frame to DUT SERVER.
+  // DUT SERVER unicasts a ZCL clear all RFID codes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendClearAllRfids();
+
+  // 2: Attempt to unlock DUT SERVER with at least 3 RFID cards provided with the
+  // lock. DUT SERVER does not unlock with any of the cards.
+  expect("server",
+         "plugin door-lock-server apply-rfid {11111111}",
+         ".*Apply RFID: 0x01");
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+  expect("server",
+         "plugin door-lock-server apply-rfid {22222222}",
+         ".*Apply RFID: 0x01");
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+  expect("server",
+         "plugin door-lock-server apply-rfid {33333333}",
+         ".*Apply RFID: 0x01");
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+
+  // 3a: TH CLIENT unicasts a ZCL set RFID code command frame to DUT SERVER with
+  // the User ID field set to 0x0001, the User Status field set to 0x01
+  // (occupied/enabled), the User Type field set to 0x00 (unrestricted user) and
+  // the RFID Code field set to a suitable value for this user.
+  // DUT SERVER unicasts a ZCL set RFID code response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendSetRfid("0x0001", "0x01", "0x00", "{11111111}");
+
+  // 3b: TH CLIENT unicasts a ZCL set RFID code command frame to DUT SERVER with
+  // the User ID field set to 0x0002, the User Status field set to 0x01
+  // (occupied/enabled), the User Type field set to 0x00 (unrestricted user) and
+  // the RFID Code field set to a suitable value for this user.
+  // DUT SERVER unicasts a ZCL set RFID code response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendSetRfid("0x0002", "0x01", "0x00", "{22222222}");
+
+  // 3c: TH CLIENT unicasts a ZCL set RFID code command frame to DUT SERVER with
+  // the User ID field set to 0x0003, the User Status field set to 0x01
+  // (occupied/enabled), the User Type field set to 0x00 (unrestricted user) and
+  // the RFID Code field set to a suitable value for this user.
+  // DUT SERVER unicasts a ZCL set RFID code response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendSetRfid("0x0003", "0x01", "0x00", "{33333333}");
+
+  // 4: Attempt to unlock DUT SERVER with one of the RFID cards programmed in steps
+  // 3a-3c.
+  // DUT SERVER unlocks. DUT SERVER unlocks. AutoRelockTime is disabled so will not
+  // relock.
+  expect("server",
+         "plugin door-lock-server apply-rfid {22222222}",
+         "Apply RFID: 0x00");
+  expect("server", "plugin door-lock-server status", ".*State: Unlocked");
+
+  // 5: TH CLIENT unicasts a ZCL get RFID code command frame to DUT SERVER with the
+  // User ID field set to 0x0001.
+  // DUT SERVER unicasts a ZCL get RFID code response command frame to TH CLIENT
+  // with the User ID field equal to 0x0001, the User Status field equal to 0x01
+  // (occupied/enabled), the User Type field equal to 0x00 (unrestricted user) and
+  // the RFID Code field equal to the corresponding code set for this user in step
+  // 3a.
+  sendGetRfid("0x0001", "01 00", "01", "00", "04 11 11 11 11");
+
+  // 6: TH CLIENT unicasts a ZCL clear RFID code command frame to DUT SERVER with
+  // the User ID field set to 0x0001.
+  sendClearRfid("0x0001");
+
+  // 7: TH CLIENT unicasts a ZCL get RFID code command frame to DUT SERVER with the
+  // User ID field set to 0x0001.
+  // DUT SERVER unicasts a ZCL get RFID code response command frame to TH CLIENT
+  // with the User ID field equal to 0x0001, the User Status field equal to 0x00
+  // (available), the User Type field equal to a value within range and the RFID
+  // Code field equal to an empty string.
+  sendGetRfid("0x0001", "01 00", "01", "00", "00");
+
+  // I think we need a step in here that forces to door to relock...
+  expect("server",
+         "plugin door-lock-server lock 0xACAC",
+         "Door is now locked");
+
+  // 8: Attempt to unlock DUT SERVER with at the first RFID card that was
+  // configured in step 3a.
+  // DUT SERVER remains locked.
+  expect("server",
+         "plugin door-lock-server apply-rfid {111111}",
+         ".*Apply RFID: 0x01");
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+
+  // 9: TH CLIENT unicasts a ZCL clear all RFID codes command frame to DUT SERVER.
+  // DUT SERVER unicasts a ZCL clear all RFID codes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendClearAllRfids();
+
+  // 10: Attempt to unlock DUT SERVER with at least 3 RFID cards provided with the
+  // lock.
+  // DUT SERVER does not unlock with any of the cards.
+  expect("server",
+         "plugin door-lock-server apply-rfid {11111111}",
+         ".*Apply RFID: 0x01");
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+  expect("server",
+         "plugin door-lock-server apply-rfid {22222222}",
+         ".*Apply RFID: 0x01");
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+  expect("server",
+         "plugin door-lock-server apply-rfid {33333333}",
+         ".*Apply RFID: 0x01");
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+}
+
+void tc09S()
+{
+  dbg.println("!!! DRLK-TC-09S Door state");
+
+  // PX: add a pin code into the door so that we can unlock it below.
+  sendSetPin("0x0001", "0x01", "0x00", "1111");
+
+  // 0a: If the DoorOpenEvents attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // DoorOpenEvents attribute to 0x00000000.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0004", "0x23", "00000000");
+
+  // 0b: If the DoorClosedEvents attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // DoorClosedEvents attribute to 0x00000000.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0005", "0x23", "00000000");
+
+  // 0c: If the AutoRelockTime attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // AutoRelockTime attribute to 0x00000000 (disabled).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "0000000000");
+
+  // 1: For those attributes supported on DUT SERVER: TH CLIENT unicasts a ZCL
+  // read attributes command frame to DUT SERVER to read the DoorState,
+  // DoorOpenEvents, DoorClosedEvents and OpenPeriod attributes.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The DoorState attribute has a value appropriate to DUT SERVER. The
+  // DoorOpenEvents and DoorClosedEvents attributes each have the value
+  // 0x00000000. The OpenPeriods attribute has a value appropriate to the state
+  // of the door.
+  checkAttributeRead("0x0003", "04"); // unspecified, the default at boot
+  checkAttributeRead("0x0004", "00000000");
+  checkAttributeRead("0x0005", "00000000");
+  checkAttributeRead("0x0006", "0000");
+
+  // 2a: Test engineer physically closes the door if it is not closed.
+  // DUT SERVER does nothing.
+  expect("server", "plugin door-lock-server close", ".*Door is now closed");
+
+  // 2b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the DoorState attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The DoorState attribute has the value 0x01 (closed).
+  checkAttributeRead("0x0003", "01");
+
+  // 3: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS). DUT SERVER unlocks.
+  sendUnlockDoor("31313131", "00"); // "1111"
+  expect("server", "plugin door-lock-server status", ".*State: Unlocked");
+
+  // 4a: Test engineer physically opens the door.
+  // DUT SERVER does nothing.
+  expect("server", "plugin door-lock-server open", ".*Door is now open");
+
+  // 4b: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the DoorState and DoorOpenEvents attributes.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The DoorState attribute has the value 0x00 (open). The
+  // DoorOpenEvents attribute has the value 0x00000001.
+  checkAttributeRead("0x0003", "00");
+  checkAttributeRead("0x0004", "01000000");
+
+  // 5a: After 3 minutes, test engineer physically closed the door.
+  // DUT SERVER does nothing.
+  networkWait(1000 * 60 * 3);
+  expect("server", "plugin door-lock-server close", ".*Door is now closed");
+
+  // 5b: Test engineer physically opens the door.
+  // DUT SERVER does nothing.
+  expect("server", "plugin door-lock-server open", ".*Door is now open");
+
+  // 5c: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the DoorState attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The DoorState attribute has the value 0x00 (open).
+  checkAttributeRead("0x0003", "00");
+
+  // 5d: After 3 minutes, test engineer physically closed the door.
+  // DUT SERVER does nothing.
+  networkWait(1000 * 60 * 3);
+  expect("server", "plugin door-lock-server close", ".*Door is now closed");
+
+  // 5e: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the DoorState, DoorOpenEvents and DoorCloseEvents attributes.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The DoorState attribute has the value 0x01 (closed). The
+  // DoorOpenEvents and DoorClosedEvents attributes have increased in value from
+  // when they were read in step 1.
+  checkAttributeRead("0x0003", "01");
+  checkAttributeRead("0x0004", "02000000");
+  checkAttributeRead("0x0005", "03000000");
+}
+
+void tc10S()
+{
+  dbg.println("!!! DRLK-TC-10S PIN");
+
+  // PX: put the door in a "locked" state for this test. Note that this step is not
+  // currently in the test spec.
+  expect("server",
+         "plugin door-lock-server lock 0xACAC",
+         ".*Door is now locked");
+
+  // PY: create a binding from the server to the client so that we can send our
+  // notifications.
+  send("server", "option binding-table set 0 0x0101 1 1 {" + clientEui64 + "}");
+
+  // 0a: If the AutoRelockTime attribute is supported on DUT SERVER: TH CLIENT
+  // unicasts a ZCL write attributes command frame to DUT SERVER to set the
+  // AutoRelockTime attribute to 0x00000000 (disabled).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "0000000000");
+
+  // 1a: If the RequirePINForRFOperation attribute is supported on DUT SERVER: TH
+  // CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to set
+  // the RequirePINForRFOperation attribute to 1 (PIN required).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0033", "0x10", "01");
+
+  // 1b: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER without
+  // including the PIN/RFID Code field.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x01 (FAILURE).
+  sendUnlockDoor("00", "01");
+
+  // 2a: TH CLIENT unicasts a ZCL set PIN code command frame to DUT SERVER with
+  // the User ID field set to 0x0001, the User Status field set to 0x01
+  // (occupied/enabled), the User Type field set to 0x00 (unrestricted user) and
+  // the PIN Code field set to a suitable value for this user.
+  // If reception of the set PIN code command is supported on DUT SERVER: DUT
+  // SERVER unicasts a ZCL set PIN code response command frame to TH CLIENT with
+  // the Status field equal to 0x00 (SUCCESS).
+  sendSetPin("0x0001", "0x01", "0x00", "1111");
+
+  // 2b: TH bCLIENT unicasts a ZCL unlock door command frame to DUT SERVER with
+  // the PIN/RFID Code field set to the PIN configured in step 2a.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS). DUT SERVER unlocks.
+  sendUnlockDoor("31313131", "00"); // "1111"
+  expect("server", "plugin door-lock-server status", ".*State: Unlocked");
+
+  // 3a: TH CLIENT unicasts a ZCL lock door command frame to DUT SERVER with the
+  // PIN/RFID Code field set to the PIN configured in step 2a.
+  // DUT SERVER unicasts a ZCL lock door response command frame to TH CLIENT with
+  // the Status field equal to 0x00 (SUCCESS). DUT SERVER locks.
+  sendLockDoor("31313131"); // "1111"
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+
+  // 3b: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER with
+  // the PIN/RFID Code field set to a value other than the PIN configured in step
+  // 2a.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x01 (FAILURE). DUT SERVER does not unlock.
+  sendUnlockDoor("32323232", "01"); // "2222"
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+
+  // 4a: TH CLIENT unicasts a ZCL clear PIN code command frame to DUT SERVER with
+  // the User ID field set to 0x0001.
+  // DUT SERVER unicasts a ZCL clear PIN code response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendClearPin("0x0001");
+
+  // 4b: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER with
+  // the PIN/RFID Code field set to the PIN configured in step 2a.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x01 (FAILURE). DUT SERVER does not unlock.
+  sendUnlockDoor("31313131", "01"); // "1111"
+  expect("server", "plugin door-lock-server status", ".*State: Locked");
+
+  // 5a: For those attributes supported on DUT SERVER: TH CLIENT unicasts a ZCL
+  // write attributes command frame to DUT SERVER to set the
+  // KeypadOperationEventMask, RFOperationEventMask, ManualOperationEventMask,
+  // KeypadProgrammingEventMask, RFProgrammingEventMask attributes all to
+  // 0xffff (turn on event reporting).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  // Note: as of right now, we only support events for these attributes (mainly
+  // because I am lazy...).
+  checkAttributeWrite("0x0041", "0x19", "FFFFFFFF"); // KeypadOperationEventM
+  checkAttributeWrite("0x0045", "0x19", "FFFFFFFF"); // KeypadProgrammingEventM
+
+  // 5b: TH CLIENT unicasts a ZCL set PIN code command frame to DUT SERVER with
+  // the User ID field set to 0x0001, the User Status field set to 0x01
+  // (occupied/enabled), the User Type field set to 0x00 (unrestricted user) and
+  // the PIN Code field set to a suitable value for this user.
+  // If reception of the set PIN code command is supported on DUT SERVER: DUT
+  // SERVER unicasts a ZCL set PIN code response command frame to TH CLIENT with
+  // the Status field equal to 0x00 (SUCCESS).
+  sendSetPin("0x0001", "0x01", "0x00", "1111");
+
+  // 5c: If transmission of the programming event notification command is
+  // supported on DUT SERVER: DUT SERVER unicasts a ZCL programming event
+  // notification command frame to TH CLIENT indicating that a user was created.
+  // FIXME: Am not seeing this notification being sent.
+  /*
+  expect("client",
+         (".*RX .* clus 0x0101 .* FC 09 seq .. cmd 21 payload\\["
+          + "01 "    // RF
+          + "02 "    // pin code added
+          + "01 00 " // user ID
+          + ".* "    // PIN
+          + "00 "    // user type
+          + "01 "    // user status
+          + ".* "    // time
+          + "\\]"));
+  */
+
+  // 6a: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER with
+  // the PIN/RFID Code field set to the PIN configured in step 5b.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS). DUT SERVER unlocks.
+  sendUnlockDoor("31313131", "00"); // "1111"
+
+  // 6b: If transmission of the operation event notification command is supported
+  // on DUT SERVER: DUT SERVER unicasts a ZCL operation event notification
+  // command frame to TH CLIENT indicating that the door was unlocked
+  // successfully.
+  // FIXME: Am not seeing this notification being sent.
+  /*
+  expect("client",
+         (".*RX .* clus 0x0101 .* FC 09 seq .. cmd 20 payload\\["
+          + "01 "    // RF
+          + "02 "    // unlock
+          + "01 00 " // user ID
+          + ".* "    // PIN
+          + ".* "    // time
+          + "\\]"));
+  */
+}
+
+void tc11S()
+{
+  dbg.println("!!! DRLK-TC-11S Holiday schedule");
+
+  // PX: I am adding an extra test step here which validates our storage of the
+  // NumberOfHolidaySchedulesSupported attribute.
+  checkAttributeRead("0x0016", "08");
+
+  // 0: TH CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to
+  // set the AutoRelockTime attribute to 0x00000000.
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "0000000000");
+
+  // 1: TH CLIENT unicasts a ZCL set holiday schedule command frame to DUT SERVER
+  // with the Holiday Schedule ID set to 0x00 and the remaining fields set to
+  // configure an appropriate holiday schedule.
+  // If reception of the set holiday schedule command is supported on DUT SERVER:
+  // DUT SERVER unicasts a ZCL set holiday schedule response command frame to TH
+  // CLIENT.
+  sendSetHolidaySchedule("0x00", "15", "45", "0x01");
+
+  // 2: TH CLIENT unicasts a ZCL get holiday schedule command frame to DUT SERVER
+  // with the Holiday Schedule ID set to 0x00.
+  // TH CLIENT unicasts a ZCL get holiday schedule command frame to DUT SERVER with
+  // the Holiday Schedule ID set to 0x00.
+  sendGetHolidaySchedule("0x00", "00", "0F 00 00 00", "2D 00 00 00", "01");
+
+  // 3: TH CLIENT unicasts a ZCL clear holiday schedule command frame to DUT SERVER
+  // with the Holiday Schedule ID set to 0x00.
+  // DUT SERVER unicasts a ZCL clear holiday schedule response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendClearHolidaySchedule("0x00");
+}
+
+void tc12S()
+{
+  dbg.println("!!! DRLK-TC-12S Auto-relock");
+
+  // PX: add a pin code into the door so that we can unlock it below.
+  sendSetPin("0x0001", "0x01", "0x00", "1111");
+
+  // PY: add a RFID code into the door so that we can unlock it in step 4a.
+  sendSetRfid("0x0003", "0x01", "0x00", "{7272}"); // "rr"
+
+  // 1a: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the AutoRelockTime attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The AutoRelockTime attribute has some initial value.
+  checkAttributeRead("0x0023", "00000000");
+
+  // 1b: TH CLIENT unicasts a ZCL write attributes command frame to DUT SERVER to
+  // set the AutoRelockTime attribute to 0x0000001e (30s).
+  // DUT SERVER unicasts a ZCL write attributes response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  checkAttributeWrite("0x0023", "0x23", "1E000000");
+
+  // 1c: TH CLIENT unicasts a ZCL read attributes command frame to DUT SERVER to
+  // read the AutoRelockTime attribute.
+  // DUT SERVER unicasts a ZCL read attributes response command frame to TH
+  // CLIENT. The AutoRelockTime attribute has the value 0x0000001e (30s).
+  checkAttributeRead("0x0023", "1E000000");
+
+  // 1d: Test engineer ensures door is closed.
+  // DUT SERVER does nothing.
+  expect("server", "plugin door-lock-server close", ".*Door is now closed");
+
+  // 1e: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendUnlockDoor("31313131", "00"); // "1111"
+
+  // 1f: None.
+  // After 30s door re-locks.
+  expect("server",
+         "Door automatically relocked: 0x00",
+         ((1000 * 30) + DEFAULT_TIMEOUT));
+
+  // 2a: TH CLIENT unicasts a ZCL unlock with timeout command frame to DUT SERVER
+  // with the Timeout in Seconds field set to a value other than the value of the
+  // AutoRelockTime attribute.
+  // DUT SERVER unicasts a ZCL unlock with timeout response command frame to TH
+  // CLIENT with the Status field equal to 0x00 (SUCCESS).
+  sendUnlockWithTimeout("0x000F", "31313131"); // 15 seconds, "1111"
+
+  // 2b: None.
+  // After a time equal to that requested in step 2a, door re-locks.
+  expect("server",
+         ".*Door automatically relocked: 0x00",
+         ((1000 * 15) + DEFAULT_TIMEOUT));
+
+  // 3a: TH CLIENT unicasts a ZCL unlock door command frame to DUT SERVER.
+  // DUT SERVER unicasts a ZCL unlock door response command frame to TH CLIENT
+  // with the Status field equal to 0x00 (SUCCESS).
+  sendUnlockDoor("31313131", "00"); // "1111"
+
+  // 3b: None.
+  // After 30s door re-locks.
+  expect("server",
+         ".*Door automatically relocked: 0x00",
+         ((1000 * 30) + DEFAULT_TIMEOUT));
+
+  // 4a: If an RFID card or PIN code has been configured on DUT SERVER: Test
+  // engineer unlocks the door using the RFID card or PIN code.
+  // Door unlocks.
+  expect("server",
+         "plugin door-lock-server apply-rfid \"rr\"",
+         ".*Apply RFID: 0x00");
+  expect("server",
+         "plugin door-lock-server status",
+         ".*State: Unlocked");
+
+  // 4b: None.
+  // After 30s door re-locks.
+  expect("server",
+         ".*Door automatically relocked: 0x00",
+         ((1000 * 30) + DEFAULT_TIMEOUT));
+
+  // 5a: Without using an RF command, RFID card or PIN code, test engineer
+  // physically unlocks the door.
+  // Door unlocks.
+  expect("server",
+         "plugin door-lock-server unlock 0xACAC",
+         ".*Door is now unlocked");
+  expect("server",
+         "plugin door-lock-server status",
+         ".*State: Unlocked");
+
+  // 5b: None.
+  // After 30s door re-locks.
+  expect("server",
+         ".*Door automatically relocked: 0x00",
+         ((1000 * 30) + DEFAULT_TIMEOUT));
+}
+
+tc02S();
+tc03S();
+tc04S();
+tc05S();
+tc06S();
+tc07S();
+tc09S();
+tc10S();
+tc11S();
+tc12S();

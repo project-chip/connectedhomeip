@@ -1,0 +1,65 @@
+/** @brief Enact Change Of Tenancy
+ *
+ * This callback will be implemented by a meter to enact a change of tenancy at
+ * the requested time of implementation.
+ *
+ * @param endpoint   Ver.: always
+ * @param tenancy   Ver.: always
+ */
+void emberAfPluginDeviceManagementClientEnactChangeOfTenancyCallback(uint8_t endpoint,
+                                                                     EmberAfDeviceManagementTenancy *tenancy)
+{
+}
+
+/** @brief Enact Change Of Supplier
+ *
+ * This callback will be implemented by a meter to enact a change of supplier
+ * at the requested time of implementation.
+ *
+ * @param endpoint   Ver.: always
+ * @param supplier   Ver.: always
+ */
+void emberAfPluginDeviceManagementClientEnactChangeOfSupplierCallback(uint8_t endpoint,
+                                                                      EmberAfDeviceManagementSupplier *supplier)
+{
+}
+
+/** @brief Enact Change Supply
+ *
+ * This callback will be implemented by a meter to enact a supply change at the
+ * requested time of implementation.
+ *
+ * @param endpoint   Ver.: always
+ * @param supply   Ver.: always
+ */
+EmberStatus emberAfPluginDeviceManagementClientEnactChangeSupplyCallback(uint8_t endpoint,
+                                                                         EmberAfDeviceManagementSupply *supply)
+{
+  return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+/** @brief Set Supply Status
+ *
+ * This callback will be implemented by a meter to appropriately set the supply
+ * status.
+ *
+ * @param endpoint   Ver.: always
+ * @param supplyStatus   Ver.: always
+ */
+void emberAfPluginDeviceManagementClientSetSupplyStatusCallback(uint8_t endpoint,
+                                                                EmberAfDeviceManagementSupplyStatusFlags *supplyStatus)
+{
+}
+
+/** @brief Enact Update Uncontrolled Flow Threshold
+ *
+ * This callback will be implemented by a meter to enact an update to the
+ * uncontrolled flow threshold as specified.
+ *
+ * @param endpoint   Ver.: always
+ * @param supplier   Ver.: always
+ */
+void emberAfPluginDeviceManagementClientEnactUpdateUncontrolledFlowThresholdCallback(uint8_t endpoint,
+                                                                                     EmberAfDeviceManagementUncontrolledFlowThreshold *supplier)
+{
+}

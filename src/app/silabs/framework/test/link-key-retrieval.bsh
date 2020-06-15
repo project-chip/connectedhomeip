@@ -1,0 +1,220 @@
+//This beanshell tests the functioning of the link-key-retrieval design
+//https://confluence.silabs.com/pages/viewpage.action?pageId=112034846
+//https://jira.silabs.com/browse/EMZIGBEE-4788
+
+//Multihop, host / SoC mixed network
+//Network configuration for this test is as below:
+//                Network topology:
+//
+//          gateway (coordinator)   --> loc0
+//                  |
+//           range-extender-1       --> loc1
+//            /             \
+//      range-extender-2.   lock1   --> loc4, loc5    
+//          /    \     \ 
+//      lock2  lock3 lock4          --> loc7, loc8, loc9
+
+// Once the network is formed, Gateway attempts to send to all the end devices
+// an APS encrypted message. Since the end devices aren't directly known to the 
+// gateway, the first attempt at this communication results in an error (0xBE)
+
+//During this first attempt, an IEEE address discovery is attempted. Results 
+//from this discovery are stored in the address table and the following retry 
+//should result in a success. The stipulation to this is that there is at least 
+//2 seconds between tries. This tests the main feature of this implementation
+
+//Additionally, I also check to make sure that a node that isn't on the network
+//fails both tries
+
+import com.ember.peek.SimulatedNetwork;
+source("util.bsh");
+
+if (!runArgument.runUsingMultihop) {
+  System.out.print("**** Only runs for host multi-hop configuration ****");
+  return;
+}
+
+if (!runArgument.runUsingHostApps) {
+  System.out.print("** this test uses a mixture of Host/SoC devices, so only run in host mode ** ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+int endDeviceStartIndex = 2;
+TestNode gateway = 
+  new TestNode("gateway",
+                "",  
+                "build/af-test-apps/Z3GatewayWithWwah-simulation-ezsp/Z3GatewayWithWwah",
+                "app/ncp/sample-app/mn-ncp-uart/simulation/build/exe/mn-ncp-uart",
+                gridLocations[0]);
+
+TestNode[] nonGatewayNodes = {
+  new TestNode("range-extender-1",
+              "build/af-test-apps/Z3LightWithWwah-simulation/Z3LightWithWwah",
+               "",
+               "",
+              gridLocations[1]),
+  new TestNode("range-extender-2",
+             "build/af-test-apps/Z3LightWithWwah-simulation/Z3LightWithWwah",
+               "",
+               "",
+              gridLocations[4]),
+  new TestNode("lock-1",
+             "build/af-test-apps/Z3DoorLockWithWwah-simulation/Z3DoorLockWithWwah",
+               "",
+               "",
+              gridLocations[5]),
+  new TestNode("lock-2",
+              "build/af-test-apps/Z3DoorLockWithWwah-simulation/Z3DoorLockWithWwah",
+               "",
+               "",
+              gridLocations[7]),
+  new TestNode("lock-3",
+               "build/af-test-apps/Z3DoorLockWithWwah-simulation/Z3DoorLockWithWwah",
+               "",
+               "",
+              gridLocations[8]),
+  new TestNode("lock-4",
+              "build/af-test-apps/Z3DoorLockWithWwah-simulation/Z3DoorLockWithWwah",
+               "",
+               "",
+              gridLocations[9]),
+};
+
+
+String[] allNonGatewayDeviceNames;
+String[] gatewayDeviceNames;
+
+gatewayDeviceNames = addAndLoadDevicesWithLocation(new TestNode[] { gateway }, true, false);
+allNonGatewayDeviceNames = addAndLoadDevicesWithLocation(nonGatewayNodes, false);
+
+
+// Get all nodes to a "factory new" (OR) not joined state
+// Wait for the nodes to reset. The Z3 Light will automatically start a network on boot
+// if its network steering fails. Since it starts this process before we form our centralized
+// network, we need to wait for all the the steering to end, leave all the formed networks,
+// create a centralized network, and then restart the steering process on each node.
+void setInitialState( String[] deviceList )
+{
+  int i;
+  for (i=0; i < deviceList.length; i++) {
+    expect(deviceList[i],
+        "plugin network-steering stop",
+        "NWK Steering: Stop",
+        DEFAULT_TIMEOUT);
+  }
+  
+  networkWait(10000);
+
+  for (i=0; i < deviceList.length; i++) {
+    expect(deviceList[i],
+        "network leave",
+        "leave",
+        DEFAULT_TIMEOUT);
+  }
+}
+
+//Setup a network - Given a gateway and a list of devices, 
+//use a utility function to add nodes to network in a controlled
+//fashion to create network topology at the top of the file
+//Network configuration for this test is as below:
+//                Network topology:
+//
+//          gateway (coordinator)   --> loc0
+//                  |
+//           range-extender-1       --> loc1
+//            /             \
+//      range-extender-2.   lock1   --> loc4, loc5    
+//          /    \     \ 
+//      lock2  lock3 lock4          --> loc7, loc8, loc9
+void setupNetwork( String[] gatewayList, String[] deviceList )
+{
+  //Form centralized network on coordinator
+  networkCreatorStart(gatewayList[0], true);
+
+  //Join range extender 1 / light to coordinator
+  networkZ3JoinDeviceViaParent(gatewayList[0], deviceList[0], gatewayList[0]);
+
+  //Join range extender 2 & lock 1 to range extender 1
+  networkZ3JoinDeviceViaParent(gatewayList[0], deviceList[1], deviceList[0]);
+  networkZ3JoinDeviceViaParent(gatewayList[0], deviceList[2], deviceList[0]);  
+
+  //Join lock 2,3,4 to range extender 2
+  networkZ3JoinDeviceViaParent(gatewayList[0], deviceList[3], deviceList[1]);
+  networkZ3JoinDeviceViaParent(gatewayList[0], deviceList[4], deviceList[1]);  
+  networkZ3JoinDeviceViaParent(gatewayList[0], deviceList[5], deviceList[1]);
+}
+
+//Send info command to all nodes and save nodeIds
+void collectNodeId ( String[] deviceList )
+{
+  int i;
+  for (i=0; i < deviceList.length; i++) {
+    nonGatewayNodes[i].nodeIdHex = nodeId(deviceList[i]);
+  }
+}
+
+//Function to send readAttribute request from one sender to receiver(s)
+void readAttributeOneSenderManyReceivers(String sender, TestNode[] receiver, String mfgCode, String cluster, String attribute)
+{
+  for (int i=endDeviceStartIndex; i < receiver.length; i++) {
+    //Try 1 : Send APS Encrypted message when no EUI64 lookup exists
+    send(sender, "zcl mfg-code " + mfgCode);
+    send(sender, "zcl global read " + cluster + " " + attribute);
+    send(sender, "send " + receiver[i].nodeIdHex + " 1 1");
+
+    networkWait(DEFAULT_TIMEOUT);
+
+    send(sender, "zcl mfg-code " + mfgCode);
+    send(sender, "zcl global read " + cluster + " " + attribute);
+    expect(sender, "send " + receiver[i].nodeIdHex + " 1 1",
+      "READ_ATTR_RESP",DEFAULT_TIMEOUT);
+  }
+  String strayNodeId = "0x0002";
+
+  //Try 1: Send APS Encrypted message when no EUI64 lookup exists
+  send(sender, "zcl mfg-code " + mfgCode);
+  send(sender, "zcl global read " + cluster + " " + attribute);
+  expect(sender, "send " + strayNodeId + " 1 1",
+    "status: 0xBE",DEFAULT_TIMEOUT);
+
+  networkWait(DEFAULT_TIMEOUT);
+
+  //Try 2: Send APS Encrypted message after IEEE lookup complete
+  send(sender, "zcl mfg-code " + mfgCode);
+  send(sender, "zcl global read " + cluster + " " + attribute);
+  expect(sender, "send " + strayNodeId + " 1 1",
+    "status: (0xBE)",DEFAULT_TIMEOUT);
+}
+
+//Main test
+lazyExpect = true;
+setupEncryption();
+
+setInitialState(allNonGatewayDeviceNames);
+
+setupNetwork (gatewayDeviceNames, allNonGatewayDeviceNames);
+collectNodeId (allNonGatewayDeviceNames);
+
+//Read proprietary WWAH cluster attribute
+readAttributeOneSenderManyReceivers(gatewayDeviceNames[0], nonGatewayNodes, "0x1217", "0xFC57", "0x0008");
+
+networkWait(DEFAULT_TIMEOUT);
+
+//SoC Test does not work for other reasons
+//There is an APS link key between the TC and locks, but not the range-extender and locksgd 
+//send(allNonGatewayDeviceNames[0], "zcl mfg-code " + "0x1217");
+//send(allNonGatewayDeviceNames[0], "zcl global read " + "0xFC57" + " " + "0x0008");
+//expect(allNonGatewayDeviceNames[0], "send " + nonGatewayNodes[3].nodeIdHex + " 1 1",
+//	"status: 0xBE",DEFAULT_TIMEOUT);
+//
+//networkWait(DEFAULT_TIMEOUT<<4);
+//
+//
+//send(allNonGatewayDeviceNames[0], "zcl mfg-code " + "0x1217");
+//send(allNonGatewayDeviceNames[0], "zcl global read " + "0xFC57" + " " + "0x0008");
+//expect(allNonGatewayDeviceNames[0], "send " + nonGatewayNodes[3].nodeIdHex + " 1 1",
+//  "READ_ATTR_RESP",DEFAULT_TIMEOUT<<4);
+//
+//networkWait(DEFAULT_TIMEOUT);
+

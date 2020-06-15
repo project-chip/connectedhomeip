@@ -1,0 +1,1844 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to be able to verify GBCS functionality
+// with real ECC security. Please see gbcs-no_ecc.bsh for a unit test
+// that can be run on Mac OS X.
+
+source("util.bsh");
+
+if(!runArgument.runUsingHostApps || runArgument.runUsingMultihop) {
+  // Multi-hop is disabled due to many weird failures due to timing issue.
+  std.print("****Intended only for host-ncp model****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+// commshub: events client, emeter: events server
+String[] devices = { "commshub", "emeter", "gmeter","ihd"};
+String[] socImages;
+String ncpImage;
+boolean noEcc = shouldSkipEccTest();
+if (noEcc) {
+  socImages = new String[] {
+    "build/af-test-apps/Se12CommsHub-simulation/Se12CommsHub",
+    "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+    "build/af-test-apps/Se12MeterGas-simulation/Se12MeterGas",
+    "build/af-test-apps/Se12Ihd-simulation/Se12Ihd",
+  };
+  ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+} else {
+  socImages = new String[] {
+    "build/af-test-apps/Se12CommsHub-simulation-REAL_ECC/Se12CommsHub",
+    "build/af-test-apps/Se12MeterElectric-simulation-REAL_ECC/Se12MeterElectric",
+    "build/af-test-apps/Se12MeterGas-simulation-REAL_ECC/Se12MeterGas",
+    "build/af-test-apps/Se12Ihd-simulation-REAL_ECC/Se12Ihd",
+  };
+  ncpImage = "app/ncp/sample-app/ncp-spi-real_ecc/simulation/build/exe/ncp-spi";
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12CommsHub-simulation-ezsp/Se12CommsHub",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterGas-simulation-ezsp/Se12MeterGas",
+  "build/af-test-apps/Se12Ihd-simulation-ezsp/Se12Ihd",
+};
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Verify the tunneling endpoint table is initialized correctly.
+send("commshub", "plugin comms-hub-function get-tunnel-endpoint " + nodeId("emeter") );
+expect("commshub", ".*Invalid Tunneling Endpoint.*" );
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevicesWithAddedDelay(devices,
+                                 !noEcc,   // wait for key establishment to complete?
+                                 12000);   // time between joins, to let SE registration complete
+
+String commshubNodeId = nodeId("commshub");
+String emeterNodeId = nodeId("emeter");
+String gmeterNodeId = nodeId("gmeter");
+
+// std.print("commshubNodeId " + commshubNodeId + "\n");
+// std.print("emeterNodeId " + emeterNodeId + "\n");
+// std.print("gmeterNodeId " + gmeterNodeId + "\n");
+
+String commshubEUI64 = eui64("commshub");
+String emeterEUI64   = eui64("emeter");
+String gmeterEUI64   = eui64("gmeter");
+String ihdEUI64      = eui64("ihd");
+
+debugPrintln("Comms Hub: " + commshubEUI64);
+debugPrintln("E-Meter:   " + emeterEUI64);
+debugPrintln("G-Meter:   " + gmeterEUI64);
+debugPrintln("IHD:       " + ihdEUI64);
+
+// std.print("commshubEUI64 " + commshubEUI64 + "\n");
+// std.print("emeterEUI64 " + emeterEUI64 + "\n");
+// std.print("gmeterEUI64 " + gmeterEUI64 + "\n");
+
+
+// Make sure we've discovered the endpoints for the emeter after the tunnel is established.
+// It appears this is a fine spot to run this check.
+send("commshub", "plugin comms-hub-function get-tunnel-endpoint " + emeterNodeId );
+expect("commshub", ".*Tunnel Endpoint=.*");
+
+// Hiding endpoints only works in host mode.
+if (runArgument.runUsingHostApps){
+  expectMultiline("emeter",
+      "zdo simple 0x0000 0x04",
+      new String[]{
+        ".*ZDO simple desc req 00",
+        ".*RX: ZDO, command 0x8004, status: 0x83",
+      });
+}
+
+expectMultiline("commshub",
+                "plugin meter-mirror status",
+                new String[]{
+                  ".*Known meters",
+                  "ep: 2  ieee:\\(>\\)" + gmeterEUI64 + "  type: 0x..",
+                  "1 of 1 mirrors used\\."
+                });
+
+expect("commshub",
+       "plugin gas-proxy-function print-log-catchups-in-progress",
+       ".*GPF: Log catch-ups 8",
+       timeout * 100);
+
+// Report just the attribute reporting attribute so that we receive the notification
+// flags in response
+send("gmeter","write 0x01 0x0702 0xFFFE 0x01 0x30 {01}");
+expect("gmeter", ".*write: ep: 1, cl: 0x0702, attr: 0xFFFE, svr: y, dtype: 0x30");
+send("gmeter", "zcl global report 1 0x0702 0xFFFE 1");
+expectMultiline("gmeter",
+                "send 0 1 2",
+                new String[]{
+                  "functionalFlags 0x00C00FC0 notificationFlags2-5 0x00000000 0x00000000 0x000002C0 0x00000000",
+                  "GSME: ProcessNotificationFlags: 0x0000, 0x00C00FC0",
+                  "GSME: GetNotifiedMessage: 0x0000, 0x00C00000",
+                  "GSME: ProcessNotificationFlags: 0x0001, 0x00000000",
+                  "GSME: ProcessNotificationFlags: 0x0002, 0x00000000",
+                  "GSME: ProcessNotificationFlags: 0x0003, 0x000002C0",
+                  "GSME: GetNotifiedMessage: 0x0003, 0x000002C0",
+                  "GSME: ProcessNotificationFlags: 0x0004, 0x00000000",
+                  "REPORT: clus 0x0705, attr 0x0000: 0x00",
+                  "REPORT: clus 0x0702, attr 0x0000: 0x00",
+                  "REPORT: clus 0x0702, attr 0xFFFE: 0x00",
+                },
+                timeout * 100);
+
+// Add delay to ensure catch-up processing completes in multihop tests
+networkWait(timeout * 10);
+
+send("gmeter","write 0x01 0x0702 0xFFFE 0x01 0x30 {01}");
+expect("gmeter", ".*write: ep: 1, cl: 0x0702, attr: 0xFFFE, svr: y, dtype: 0x30");
+send("gmeter", "zcl global report 1 0x0702 0xFFFE 1");
+expectMultiline("gmeter",
+                "send 0 1 2",
+                new String[]{
+                  "functionalFlags 0x00000000 notificationFlags2-5 0x00000000 0x00000000 0x00000000 0x00000000",
+                  "GSME: ProcessNotificationFlags: 0x0000, 0x00000000",
+                  "GSME: ProcessNotificationFlags: 0x0001, 0x00000000",
+                  "GSME: ProcessNotificationFlags: 0x0002, 0x00000000",
+                  "GSME: ProcessNotificationFlags: 0x0003, 0x00000000",
+                  "GSME: ProcessNotificationFlags: 0x0004, 0x00000000",
+                },
+                timeout * 100);
+
+send("gmeter","write 0x01 0x0702 0xFFFE 0x01 0x30 {00}");
+expect("gmeter", ".*write: ep: 1, cl: 0x0702, attr: 0xFFFE, svr: y, dtype: 0x30");
+
+expect("commshub",
+       "plugin gas-proxy-function print-log-catchups-in-progress",
+       ".*GPF: Log catch-ups 0",
+       timeout * 100);
+
+// Use case: GCS25 Set Billing Calendar on the GSME
+send("commshub", "zcl global read 0x0700 0x0200 ");
+send("commshub", "send 0 4 1");
+networkWait(timeout*5);
+
+// Confirm that the comms hub doesn't have any valid (current) billing periods.
+expectMultiline("commshub",
+                "plugin price-server billing-period print 1",
+                new String[] {
+                  "  \\[0\\]: valid: 0x00",
+                  "  \\[1\\]: valid: 0x00",
+                });
+
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x007E",
+                new String[] {
+                  "GPF: RX: PublishBillingPeriod 0x00000000, 0x........, 0x00000000, 0x00000001, 0x01, 0x00",
+                  "GPF: RX: PublishBlockPeriod 0x00000000, 0x........, 0x00000000, 0x00000001, 0x02, 0x01, 0x00, 0x00" });
+
+networkWait(timeout*5);
+
+// EMAPPFWKV2-1469: the commshub should already have the next billing period
+// scheduled in the table. It should be using the same duration as the current
+// (index 0) billing period.
+expectMultiline("commshub",
+                "plugin price-server billing-period print 1",
+                new String[] {
+                  "  \\[0\\]: valid: 0x01",
+                  "  \\[0\\]: billingPeriodDuration: 0x00000001",
+                  "  \\[1\\]: valid: 0x01",
+                  "  \\[1\\]: billingPeriodDuration: 0x00000001",
+                });
+
+send("commshub", "zcl global read 0x0700 0x0200 ");
+send("commshub", "send 0 4 1");
+
+//------------------------------------------------------------------------------
+// Salesforce: 00071368 Request new tunnel if:
+//                      1) CH sends command to ESME with no valid tunnel
+//                      2) When ESME reboots and CH tries to send a command to it
+
+// reproduce issue 1 when there is no valid tunnel for ESME
+send("commshub", "plugin comms-hub-function close-tunnel {" + emeterEUI64 + "}");
+send("commshub", "plugin tunneling-client close 0x00");
+networkWait(timeout);
+
+// send data, expect failure and request new tunnel
+expectMultiline("commshub",
+                "plugin comms-hub-function send {" + emeterEUI64 + "} {11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF}",
+                new String[]{
+                  ".*Tunnel Closed: New tunnel is requested for the device.*",
+                  ".*Error: Tunnel SendData failed: Tunneling Status: 0x01.*",
+                  ".*RX: RequestTunnelResponse.*",
+                  ".*GBCS emberAfPluginCommsHubFunctionTunnelOpenedCallback: remoteDeviceId=\\(>\\)" + emeterEUI64 + ".*"
+                }, timeout*10);
+
+// send again, expect success as tunnel was established
+expectMultiline("commshub",
+                "plugin comms-hub-function send {" + emeterEUI64 + "} {11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF}",
+                new String[]{
+                  ".*RX: TransferData.*",
+                  ".*CHF: TunnelDataReceived.*"
+                });
+
+// reproduce issue 2 when ESME reboots
+reboot("emeter");
+networkWait(timeout);
+
+// send data, expect failure and request new tunnel
+expectMultiline("commshub",
+                "plugin comms-hub-function send {" + emeterEUI64 + "} {11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF}",
+                new String[]{
+                  ".*CHF: ClientDataError: 0x00, 0x00.*",
+                  ".*No Tunnel Found: New tunnel is requested for the device.*",
+                  ".*RX: RequestTunnelResponse.*",
+                  ".*GBCS emberAfPluginCommsHubFunctionTunnelOpenedCallback: remoteDeviceId=\\(>\\)" + emeterEUI64 + ".*"
+                }, timeout*10);
+
+// send again, expect success as tunnel was established
+expectMultiline("commshub",
+                "plugin comms-hub-function send {" + emeterEUI64 + "} {11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF}",
+                new String[]{
+                  ".*RX: TransferData.*",
+                  ".*CHF: TunnelDataReceived.*"
+                });
+
+networkWait(timeout);
+
+// EMAPPFWKV2-1470 - if a fragmented tunnel data unicast fails, make sure the
+// application is notified. Power off the emeter so we know the unicast will
+// fail.
+power("emeter", false);
+expect("commshub",
+       ("plugin comms-hub-function send {" + emeterEUI64 + "} "
+        + "\"here is a message that should be fragmented it is longer SDU\""),
+       ".*GBCS emberAfPluginCommsHubFunctionSendCallback: status=0x00.*");
+expect("commshub", "ERR: ClientTransferData failure \\(0x..\\) for APS SEQ.*", timeout << 1);
+power("emeter", true);
+
+// Send data again to request a new tunnel.
+expectMultiline("commshub",
+                "plugin comms-hub-function send {" + emeterEUI64 + "} {11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF}",
+                new String[]{
+                  ".*CHF: ClientDataError: 0x00, 0x00.*",
+                  ".*No Tunnel Found: New tunnel is requested for the device.*",
+                  ".*RX: RequestTunnelResponse.*",
+                  ".*GBCS emberAfPluginCommsHubFunctionTunnelOpenedCallback: remoteDeviceId=\\(>\\)" + emeterEUI64 + ".*"
+                }, timeout*10);
+
+networkWait(timeout);
+
+//------------------------------------------------------------------------------
+
+// Let's check that the proper thing is done when the supported notification
+// flags are set.
+//
+// From GBCS
+//
+// For clarity, the GSME:
+//
+//  - shall not action ZSE / ZCL commands received from the GPF in relation
+//    to any of the flags within NotificationFlags2, NotificationFlags3 and
+//    NotificationFlags5;
+//
+//  - for NotificationFlags4, shall only action ZSE / ZCL commands received
+//    from the GPF in relation to the flags specified below.
+//
+//      Bit Number    Waiting Command
+//      6             Get Prepay Snapshot
+//      7             Get Top Up Log
+//      9             Get Debt Repayment Log
+//
+//  - for FunctionalNotificationFlags, shall only action ZSE / ZCL commands
+//    received from the GPF in relation to the flags specified below
+//
+//      Bit Number   Waiting Command
+//      0            New OTA Firmware
+//      1            CBKE Update Request
+//      4            Stay Awake Request HAN
+//      5            Stay Awake Request WAN
+//      6-8          Push Historical Metering Data Attribute Set
+//      9-11         Push Historical Prepayment Data Attribute Set
+//      12           Push All Static Data - Basic Cluster
+//      13           Push All Static Data - Metering Cluster
+//      14           Push All Static Data - Prepayment Cluster
+//      15           NetworkKeyActive
+//      21           Tunnel Message Pending
+//      22           GetSnapshot
+//      23           GetSampledData
+send("commshub","write 0x02 0x0702 0x0000 0x00 0x1B {FF FF FF FF}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0000, svr: n, dtype: 0x1B");
+send("commshub","write 0x02 0x0702 0x0001 0x00 0x1B {FF FF FF FF}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0001, svr: n, dtype: 0x1B");
+send("commshub","write 0x02 0x0702 0x0002 0x00 0x1B {FF FF FF FF}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0002, svr: n, dtype: 0x1B");
+send("commshub","write 0x02 0x0702 0x0003 0x00 0x1B {FF FF FF FF}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0003, svr: n, dtype: 0x1B");
+send("commshub","write 0x02 0x0702 0x0004 0x00 0x1B {FF FF FF FF}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0004, svr: n, dtype: 0x1B");
+expectMultiline("gmeter",
+                "plugin gbcs-gas-meter report-attributes",
+                new String[]{
+                  ".*REPORT: clus 0x0000, attr 0x0000: 0x00",
+                  "REPORT: clus 0x0705, attr 0x0000: 0x00",
+                  "REPORT: clus 0x0702, attr 0x0000: 0x00",
+                  "REPORT: clus 0x0702, attr 0xFFFE: 0x00",
+                  "functionalFlags 0xFFFFFFFF notificationFlags2-5 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF",
+                  "GSME: TunnelSendData \\[01\\]",
+                  "GSME: GetNotifiedMessage: 0x0000, 0x00C00000",
+                  "GSME: GetNotifiedMessage: 0x0003, 0x000002C0",
+                  "REPORT: clus 0x0000, attr 0x0000: 0x00",
+                  "REPORT: clus 0x0705, attr 0x0000: 0x00",
+                  "REPORT: clus 0x0702, attr 0x0000: 0x00",
+                  "REPORT: clus 0x0702, attr 0xFFFE: 0x00"
+                },
+                timeout * 100);
+send("commshub","write 0x02 0x0702 0x0000 0x00 0x1B {00 00 00 00}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0000, svr: n, dtype: 0x1B");
+send("commshub","write 0x02 0x0702 0x0001 0x00 0x1B {00 00 00 00}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0001, svr: n, dtype: 0x1B");
+send("commshub","write 0x02 0x0702 0x0002 0x00 0x1B {00 00 00 00}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0002, svr: n, dtype: 0x1B");
+send("commshub","write 0x02 0x0702 0x0003 0x00 0x1B {00 00 00 00}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0003, svr: n, dtype: 0x1B");
+send("commshub","write 0x02 0x0702 0x0004 0x00 0x1B {00 00 00 00}");
+expect("commshub", ".*write: ep: 2, cl: 0x0702, attr: 0x0004, svr: n, dtype: 0x1B");
+
+// Unit test for GBZ plugin's GBZ message creation functionality
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg-creation",
+                new String[]{
+                  ".*GPF: In Place message construction",
+                  ".*GPF: GBZ command message len: 45",
+                  "GPF: GBZ command message: 01 09 02 00 07 00 00 14 09 00 09 40 30 20 10 .. .. .. .. 80 70 60 50 B0 A0 90 00 00 01 07 02 00 0C 09 01 06 40 30 20 10 .. .. .. .. 80 ",
+                  "GPF: In New Memory message construction",
+                  "GPF: GBZ command message len: 45",
+                  "GPF: GBZ command message: 01 09 02 00 07 00 00 14 09 00 09 40 30 20 10 .. .. .. .. 80 70 60 50 B0 A0 90 00 00 01 07 02 00 0C 09 01 06 40 30 20 10 .. .. .. .. 80 ",
+
+                  // Test In-place append
+                  "GPF: GBZ command encrypted message len: 34",
+                  "GPF: GBZ command encrypted message: 01 09 01 03 07 02 00 1A 00 00 09 00 06 00 13 40 30 20 10 .. .. .. .. 80 70 60 50 B0 A0 90 00 00 DE AD ",
+
+                  // Test In-new malloc'ed bufffer append
+                  "GPF: GBZ command encrypted message len: 34",
+                  "GPF: GBZ command encrypted message: 01 09 01 03 07 02 00 1A 00 00 09 00 06 00 13 40 30 20 10 .. .. .. .. 80 70 60 50 B0 A0 90 00 00 DE AD ",
+
+                  ".*GPF: GBZ alert message len: 51",
+                  "GPF: GBZ alert message: 01 09 02 12 34 .. .. .. .. 00 07 02 00 14 09 00 06 40 30 20 10 .. .. .. .. 80 70 60 50 B0 A0 90 00 00 01 07 02 00 0C 09 01 06 40 30 20 10 .. .. .. .. 80 ",
+                });
+
+// Make sure we ignore future dated embedded ZCL commands with TOM message
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-future-dated-msg",
+                new String[] {
+                 "GPF: Ignoring future dated command."
+                });
+
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0072",
+                new String[] {
+                  "GPF: Updated: Tenancy",
+                  "              implementationTime: 0x00000000",
+                  "              tenancy: 0x11223344",
+                  "GPF: Intercepting ZCL cmd\\(0x0B\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0708",
+                  "GBZ: ZCL command: command id: 0x0B",
+                  "GBZ: ZCL command: payload: 00 00 ",
+                });
+
+// Use Case: GCS23 Set CV and Conversion Factor Value(s) on the GSME
+// read original attribute values
+send("emeter", "zcl global read 0x0700 0x0302");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1 ",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[02 03 00 23 00 00 00 10 \\]");
+
+send("emeter", "zcl global read 0x0700 0x0303");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1 ",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[03 03 00 18 70 \\]");
+send("emeter", "zcl global read 0x0700 0x0304");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1 ",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[04 03 00 23 00 5A 62 02 \\]");
+send("emeter", "zcl global read 0x0700 0x0305");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1 ",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[05 03 00 30 01 \\]");
+send("emeter", "zcl global read 0x0700 0x0306");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1 ",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[06 03 00 18 60 \\]");
+
+send("commshub", "plugin gas-proxy-function simulate-gbz-msg 0x007C");
+
+// check TOM message is being logged.
+// check Event Log Data Updated callback is fired.
+// EMAPPFWKV2-1315 - only write the 2 byte message code to the event log.
+expectMultiline("commshub",
+                "plugin events-server print 0x01 0x03",
+                new String[] {
+                  "emberAfPluginEventsServerLogDataUpdatedCallback:.*",
+                  ".*Index: 0x..",
+                  "       eventId: 0x8054",
+                  "     eventTime: 0x........",
+                  "  eventDataLen: 0x02",
+                  "     eventData: .*",
+                });
+
+// make sure new attribute values are updated
+send("emeter", "zcl global read 0x0700 0x0302");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[02 03 00 23 0D 0C 0B 0A \\]");
+send("emeter", "zcl global read 0x0700 0x0303");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[03 03 00 18 50 \\]");
+send("emeter", "zcl global read 0x0700 0x0304");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[04 03 00 23 04 03 02 01 \\]");
+send("emeter", "zcl global read 0x0700 0x0305");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[05 03 00 30 01 \\]");
+send("emeter", "zcl global read 0x0700 0x0306");
+expect("emeter",
+       "send " + commshubNodeId + " 1 1 ",
+       ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[06 03 00 18 10 \\]");
+
+networkWait(timeout*50);
+
+send("commshub", "plugin events-server clear 0x01 0x03");
+send("commshub", "plugin events-server clear 0x02 0x03");
+
+// Use Case: GCS01a Set Tariff and Price on GSME
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x006B",
+                new String[] {
+                  "GPF: Updated: Calendar",
+                  "GPF:          providerId: 0x00000000",
+                  "GPF:          issuerEventId: 0x........",
+                  "GPF:          issuerCalendarId: 0x........",
+                  "GPF:          startTimeUtc: 0x00000000",
+                  "GPF:          calendarType: 0x00",
+                  "GPF:          calendarName: ",
+                  "GPF:          numberOfSeasons: 0x04",
+                  "GPF:          numberOfWeekProfiles: 0x02",
+                  "GPF:          numberOfDayProfiles: 0x02"});
+expectMultiline("commshub",
+                new String[] {
+                  "Updated: DayProfile\\[0\\]",
+                  "           DayId=1",
+                  "           ScheduledEntries\\[0\\]",
+                  "             startTime: 0x0000 from midnight",
+                  "             price tier: 0x01",
+                  "           ScheduledEntries\\[1\\]",
+                  "             startTime: 0x01E0 from midnight",
+                  "             price tier: 0x02",
+                  "           ScheduledEntries\\[2\\]",
+                  "             startTime: 0x03C0 from midnight",
+                  "             price tier: 0x03"});
+expectMultiline("commshub",
+                new String[] {
+                  "Updated: DayProfile\\[1\\]",
+                  "           DayId=2",
+                  "           ScheduledEntries\\[0\\]",
+                  "             startTime: 0x0000 from midnight",
+                  "             price tier: 0x04",
+                  "           ScheduledEntries\\[1\\]",
+                  "             startTime: 0x01E0 from midnight",
+                  "             price tier: 0x05",
+                  "           ScheduledEntries\\[2\\]",
+                  "             startTime: 0x03C0 from midnight",
+                  "             price tier: 0x06",});
+
+expectMultiline("commshub",
+                new String[] {
+                  "Updated: WeekProfile\\[0\\]",
+                  "           weekId=1",
+                  "           normalDayIndexes\\[0\\]=0",
+                  "           normalDayIndexes\\[1\\]=0",
+                  "           normalDayIndexes\\[2\\]=0",
+                  "           normalDayIndexes\\[3\\]=0",
+                  "           normalDayIndexes\\[4\\]=0",
+                  "           normalDayIndexes\\[5\\]=0",
+                  "           normalDayIndexes\\[6\\]=0",
+                  "Updated: WeekProfile\\[1\\]",
+                  "           weekId=2",
+                  "           normalDayIndexes\\[0\\]=1",
+                  "           normalDayIndexes\\[1\\]=1",
+                  "           normalDayIndexes\\[2\\]=1",
+                  "           normalDayIndexes\\[3\\]=1",
+                  "           normalDayIndexes\\[4\\]=1",
+                  "           normalDayIndexes\\[5\\]=1",
+                  "           normalDayIndexes\\[6\\]=1",});
+
+expectMultiline("commshub",
+                new String[] {
+                  "Updated: Seasons\\[0\\]",
+                  "            startDate: 0x75010100 \\(2017/01/01\\)",
+                  "            weekIndex: 0",
+                  "Updated: Seasons\\[1\\]",
+                  "            startDate: 0x75040100 \\(2017/04/01\\)",
+                  "            weekIndex: 1",
+                  "Updated: Seasons\\[2\\]",
+                  "            startDate: 0x75070100 \\(2017/07/01\\)",
+                  "            weekIndex: 1",
+                  "Updated: Seasons\\[3\\]",
+                  "            startDate: 0x750A0100 \\(2017/10/01\\)",
+                  "            weekIndex: 0", });
+
+expectMultiline("commshub",
+                new String[] {
+                  "Updated: Calendar\\(calId=0x........\\)",
+                  "         SpecialDays\\[0\\]",
+                  "           startDate: 0x75010200 \\(2017/01/02\\)",
+                  "           normalDayIndex: 0",
+                  "Updated: Calendar\\(calId=0x........\\)",
+                  "         SpecialDays\\[1\\]",
+                  "           startDate: 0x75040200 \\(2017/04/02\\)",
+                  "           normalDayIndex: 1", });
+
+// sanity check for app level new PriceMatrix notification.
+expect("commshub", "Price Tick: BlockThresholds activated");
+expect("commshub", "Price Tick: PriceMatrix Information activated");
+
+// sanity check for day/week/seasons
+send("ihd", "zcl calendar get-calendar 0x00000000 0xFFFFFFFF 0x00 0xFF 0xFFFFFFFF");
+expectMultiline("ihd",
+       "send 0 1 1",
+       new String[] {
+        "RX: PublishCalendar 0x00000000, 0x........, 0x........, 0x00000000, 0x00, \\\"\\\", 4, 2, 2",
+       });
+
+send("ihd", "zcl calendar get-day-profiles 0x00000000 0xFFFFFFFF 1 2");
+expectMultiline("ihd",
+       "send 0 1 1",
+       new String[] {
+        "RX: PublishDayProfile 0x00000000, 0x........, 0x........, 1, 3, 0, 1, 0x00, \\[\\]",
+        "RX: PublishDayProfile 0x00000000, 0x........, 0x........, 2, 3, 0, 1, 0x00, \\[\\]"
+       });
+
+send("ihd", "zcl calendar get-week-profiles 0x00000000 0xFFFFFFFF 1 2");
+expectMultiline("ihd",
+       "send 0 1 1",
+       new String[] {
+        "RX: PublishWeekProfile 0x00000000, 0x........, 0x........, 1, 1, 1, 1, 1, 1, 1, 1",
+        "RX: PublishWeekProfile 0x00000000, 0x........, 0x........, 2, 2, 2, 2, 2, 2, 2, 2"
+       });
+
+send("ihd", "zcl calendar get-seasons 0x00000000 0xFFFFFFFF");
+expectMultiline("ihd",
+       "send 0 1 1",
+       new String[] {
+        "RX: PublishSeasons 0x00000000, 0x........, 0x........, 0, 1, .*"
+       });
+
+send("ihd", "zcl calendar get-special-days 0x00000000 0x02 0x00 0x00000000 0xFFFFFFFF");
+expectMultiline("ihd",
+       "send 0 1 1",
+       new String[] {
+        "RX: PublishSpecialDays 0x00000000, 0x........, 0x........, 0x00000000, 0x00, 2, 0, 1, \\[\\]"
+       });
+
+// sanity check for block thresholds
+send("commshub", "plugin price-server bt print 0");
+send("commshub", "plugin price-server bt print 2");
+networkWait(timeout*10);
+expectMultiline("commshub",
+                "plugin price-server bt print 1",
+                new String[] {
+                  "  == thresholds contents == ",
+                  "  block threshold 0: 0xAAAAAAAAAAAA",
+                  "  block threshold 1: 0xBBBBBBBBBBBB",
+                });
+
+// sanity check for tariff info
+expectMultiline("commshub",
+                "plugin price-server tariff print 1",
+                new String[] {
+                  "= TARIFF . =",
+                  " label: ",
+                  " uom/cur: 0x00/0x033A",
+                  " pid/eid/etid: 0x00000000/0x......../0x00000001",
+                  " st/tt: 0x00000000/0x10",
+                  " ptu/btu: 0x01/0x02",
+                  " ptd/sc/tbm: 0x50/0x00000000/0xFF",
+                  " btm/btd: 0x00000001/0x000003E8"});
+
+// sanity check for new Event log.
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0014",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0709",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x19",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x01",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x..",
+                  "GPF: GBZ response payload: .* 00 6B ",
+                });
+networkWait(timeout*5);
+
+// Use Case: GCS01b Set Price on GSME
+expectMultiline("commshub",
+     "plugin gas-proxy-function simulate-gbz-msg 0x00A3",
+     new String[] {
+        "Info: Updated TariffInfo\\(index=.\\) with tariff infos below.",
+        " label: ",
+        " uom/cur: 0x00/0x033A",
+        " pid/eid/etid: 0x00000000/0x......../0x00000001",
+        " st/tt: 0x00000000/0x00",
+        " ptu/btu: 0x01/0x02",
+        " ptd/sc/tbm: 0x50/0x00000000/0x00",
+        " btm/btd: 0x00000001/0x000003E8",
+        "GPF: RX: PublishBlockThresholds 0x00000000, 0x........, 0x00000000, 0x00000001, 0x00, 0x01, 0x01",
+        "Info: Updating block\\[0\\] = 0xAAAAAAAAAAAA",
+        "Info: Updating block\\[1\\] = 0xBBBBBBBBBBBB",
+        "GPF: RX: PublishPriceMatrix 0x00000000, 0x........, 0x00000000, 0x00000001, 0x00, 0x01, 0x01",
+        "Info: Updating PriceMatrix tier\\[0\\] = 0x01020304",
+     });
+
+// EMAPPFWKV2-1319: a GSME GetBlockThresholds command should return the stuff
+// that we published above through GCS01b.
+send("gmeter", "zcl price get-block-thresholds 0x00000001");
+expect("gmeter",
+       "send " + commshubNodeId + " 1 1",
+       (".*RX .* clus 0x0700 \\(Price\\) .* payload\\[.* "
+        + "AA AA AA AA AA AA "
+        + "BB BB BB BB BB BB \\]"));
+
+// EMAPPFWKV2-1319: a GSME GetPriceMatrix command should return the price
+// that we published above through GCS01b.
+send("gmeter", "zcl price get-price-matrix 1");
+expect("gmeter",
+       "send " + commshubNodeId + " 1 1",
+       ".*RX .* clus 0x0700 \\(Price\\) .* payload\\[.* 04 03 02 01 \\]");
+
+// Use Case: GCS44 Write Contact Details on GSME
+// read original attribute values
+send("emeter", "zcl global read 0x0708 0x0101");
+send("emeter", "send " + commshubNodeId + " 1 1 ");
+expect("emeter", ".*clus 0x0708 \\(Device Management\\) FC 08 seq .. cmd 01 payload\\[01 01 00 41 00 \\]");
+send("emeter", "zcl global read 0x0708 0x0102");
+send("emeter", "send " + commshubNodeId + " 1 1 ");
+expect("emeter", ".*clus 0x0708 \\(Device Management\\) FC 08 seq .. cmd 01 payload\\[02 01 00 41 00 \\]");
+
+send("commshub", "plugin gas-proxy-function simulate-gbz-msg 0x0088");
+
+send("emeter", "zcl global read 0x0708 0x0101");
+send("emeter", "send " + commshubNodeId + " 1 1 ");
+expect("emeter", ".*clus 0x0708 \\(Device Management\\) FC 08 seq .. cmd 01 payload\\[01 01 00 41 09 88 77 66 55 44 33 22 11 00 \\]");
+send("emeter", "zcl global read 0x0708 0x0102");
+send("emeter", "send " + commshubNodeId + " 1 1 ");
+expect("emeter", ".*clus 0x0708 \\(Device Management\\) FC 08 seq .. cmd 01 payload\\[02 01 00 41 03 CC BB AA \\]");
+
+networkWait(timeout*100);
+
+// Use case: GCS25 Set Billing Calendar on the GSME
+send("commshub", "zcl global read 0x0700 0x0200 ");
+send("commshub", "send 0 4 1");
+networkWait(timeout*5);
+
+send("commshub", "plugin price-server block-period clear 1");
+
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x007E",
+                new String[] {
+                  "GPF: RX: PublishBillingPeriod 0x00000000, 0x........, 0x00000000, 0x00000001, 0x01, 0x00",
+                  "GPF: RX: PublishBlockPeriod 0x00000000, 0x........, 0x00000000, 0x00000001, 0x02, 0x01, 0x00, 0x00" });
+
+networkWait(timeout*5);
+send("commshub", "zcl global read 0x0700 0x0200 ");
+send("commshub", "send 0 4 1");
+
+expectMultiline("commshub",
+    "plugin price-server billing-period print 1",
+    new String[] {"  \\[.\\]: valid: 0x01",
+                  "  \\[.\\]: startTime: 0x........",
+                  "  \\[.\\]: issuerEventId: 0x........",
+                  "  \\[.\\]: providerId: 0x00000000",
+                  "  \\[.\\]: billingPeriodDuration: 0x00000001",
+                  "  \\[.\\]: billingPeriodDurationType: 0x01",
+                  "  \\[.\\]: tariffType: 0x00"});
+
+// EMAPPFWKV2-1469: the next block period has already been sceduled.
+expectMultiline("commshub",
+                "plugin price-server block-period print 1 0",
+                new String[] {"  providerId=0x00000000",
+                              "  issuerEventId=0x........",
+                              "  startTime=0x........",
+                              "  duration=0x........",
+                              "  rawBlkPeriodStartTime=0x........",
+                              "  rawBlkPeriodDuration=0x00000001",
+                              "  durationType=0x01",
+                              "  blockPeriodControl=0x02",
+                              "  tariffType=0x00",
+                              "  tariffResolutionPeriod=0x00"});
+expectMultiline("commshub",
+                "plugin price-server block-period print 1 1",
+                new String[] {"  providerId=0x00000000",
+                              "  issuerEventId=0x........",
+                              "  startTime=0x........",
+                              "  duration=0x00015180", // 1 day
+                              "  rawBlkPeriodStartTime=0x........",
+                              "  rawBlkPeriodDuration=0x00000001",
+                              "  durationType=0x01",
+                              "  blockPeriodControl=0x02",
+                              "  tariffType=0x00",
+                              "  tariffResolutionPeriod=0x00"});
+
+networkWait(timeout*5);
+// Use Case: GCS21d Read GSME Configuration Data Device Information (BillingCalendar)
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x009D",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x09\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0700",
+                  "GBZ: ZCL command: command id: 0x09",
+                  "GBZ: ZCL command: frame control: 0x09",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x01",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 00 00 00 00 .. .. .. .. 00 00 00 00 01 00 00 01 00 "});
+networkWait(timeout*5);
+
+// Use Case: GCS05 Update Prepayment Configurations on GSME
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x006F",
+                new String[] {
+                  "GPF: Info: Command ignored: ZCL command\\(clus 0x0705, cmd 0x03\\) embedded within Tap Off Message.",
+                  "GPF: Info: Command ignored: ZCL command\\(clus 0x0705, cmd 0x0C\\) embedded within Tap Off Message.",
+                  "GPF: Info: Command ignored: ZCL command\\(clus 0x0705, cmd 0x09\\) embedded within Tap Off Message.",
+                  "GPF: Info: Command ignored: ZCL command\\(clus 0x0705, cmd 0x0B\\) embedded within Tap Off Message.",
+                  "GPF: Updated: Calendar",
+                  "GPF:          providerId: 0x00000000",
+                  "GPF:          issuerEventId: 0x........",
+                  "GPF:          issuerCalendarId: 0x........",
+                  "GPF:          startTimeUtc: 0x00000000",
+                  "GPF:          calendarType: 0x03",
+                  "GPF:          calendarName: ",
+                  "GPF:          numberOfSeasons: 0x04",
+                  "GPF:          numberOfWeekProfiles: 0x02",
+                  "GPF:          numberOfDayProfiles: 0x02",
+                  "Updated: DayProfile\\[0\\]",
+                  "           DayId=1",
+                  "           ScheduledEntries\\[0\\]",
+                  "             startTime: 0x0000 from midnight",
+                  "             price tier: 0x01",
+                  "           ScheduledEntries\\[1\\]",
+                  "             startTime: 0x01E0 from midnight",
+                  "             price tier: 0x02",
+                  "           ScheduledEntries\\[2\\]",
+                  "             startTime: 0x03C0 from midnight",
+                  "             price tier: 0x03",
+                  "Updated: DayProfile\\[1\\]",
+                  "           DayId=2",
+                  "           ScheduledEntries\\[0\\]",
+                  "             startTime: 0x0000 from midnight",
+                  "             price tier: 0x04",
+                  "           ScheduledEntries\\[1\\]",
+                  "             startTime: 0x01E0 from midnight",
+                  "             price tier: 0x05",
+                  "           ScheduledEntries\\[2\\]",
+                  "             startTime: 0x03C0 from midnight",
+                  "             price tier: 0x06"});
+
+expectMultiline("commshub",
+                new String[] {
+                  "Updated: WeekProfile\\[0\\]",
+                  "           weekId=1",
+                  "           normalDayIndexes\\[0\\]=0",
+                  "           normalDayIndexes\\[1\\]=0",
+                  "           normalDayIndexes\\[2\\]=0",
+                  "           normalDayIndexes\\[3\\]=0",
+                  "           normalDayIndexes\\[4\\]=0",
+                  "           normalDayIndexes\\[5\\]=0",
+                  "           normalDayIndexes\\[6\\]=0",
+                  "Updated: WeekProfile\\[1\\]",
+                  "           weekId=2",
+                  "           normalDayIndexes\\[0\\]=1",
+                  "           normalDayIndexes\\[1\\]=1",
+                  "           normalDayIndexes\\[2\\]=1",
+                  "           normalDayIndexes\\[3\\]=1",
+                  "           normalDayIndexes\\[4\\]=1",
+                  "           normalDayIndexes\\[5\\]=1",
+                  "           normalDayIndexes\\[6\\]=1",
+                  "Updated: Seasons\\[0\\]",
+                  "            startDate: 0x75010100 \\(2017/01/01\\)",
+                  "            weekIndex: 0",
+                  "Updated: Seasons\\[1\\]",
+                  "            startDate: 0x75040100 \\(2017/04/01\\)",
+                  "            weekIndex: 1",
+                  "Updated: Seasons\\[2\\]",
+                  "            startDate: 0x75070100 \\(2017/07/01\\)",
+                  "            weekIndex: 1",
+                  "Updated: Seasons\\[3\\]",
+                  "            startDate: 0x750A0100 \\(2017/10/01\\)",
+                  "            weekIndex: 0",
+                  "Updated: Calendar\\(calId=0x........\\)",
+                  "         SpecialDays\\[0\\]",
+                  "           startDate: 0x75060100 \\(2017/06/01\\)",
+                  "           normalDayIndex: 0",
+                });
+
+// Use case: GCS07 Send Message to GSME
+send("commshub", "plugin gas-proxy-function simulate-gbz-msg 0x0071");
+expectMultiline("commshub",
+                "plugin messaging-server print 1",
+                new String[] {"= Server Message =",
+                              " vld: YES",
+                              " act: YES",
+                              "  id: 0x........",
+                              "  mc: 0x00",
+                              "  st: 0x........",
+                              " now: YES",
+                              "time: 0x........",
+                              " dur: 0x000A",
+                              " mes: \\\"dumplings\\\""});
+
+// Use Case: CS11 Clear ZigBee Device Event Log
+// Since CS11 can be both a TOM and a non-TOM the CLI code will test both by first
+// treating it as a TOM then treating it as a non-TOM.  The code below then expects
+// to see the results of both executions.
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0015",
+                new String[] {
+                  // TOM test
+                  // ClearEventLogRequest directed at GSME mirror endpoint,
+                  "RX: ClearEventLogRequest 0x03",
+                  "INFO: Clear Event Log event added to Security Event Log on ep\\(0x02\\) at index\\(0x..\\)",
+
+                  // Non-TOM Test
+                  // make sure we redirect logId 0x06 to
+                  // clear event log on GSME endpoint
+                  "RX: ClearEventLogRequest 0x03",
+                  "Redirecting to GPF esi endpoint\\(0x01\\) with logId\\(0x03\\)",
+                  "INFO: Clear Event Log event added to Security Event Log on ep\\(0x01\\) at index\\(0x..\\)",
+
+                  "RX: ClearEventLogRequest 0x04",
+                  "Redirecting to GPF esi endpoint\\(0x01\\) with logId\\(0x04\\)",
+                  "ERR: Modifying or deleting entries from the GPF Security Log is not allowed.",
+
+                  "RX: ClearEventLogRequest 0x06",
+                  "Redirecting to GPF meter mirror endpoint\\(0x02\\) with logId\\(0x06\\)",
+                  "INFO: Clear Event Log event added to Security Event Log on ep\\(0x02\\) at index\\(0x..\\)",
+
+                  "RX: ClearEventLogRequest 0x07",
+                  "Redirecting to GPF meter mirror endpoint\\(0x02\\) with logId\\(0x07\\)"
+});
+
+// check Security Log for Event Log  cleared entry.
+// EMAPPFWKV2-1315 - don't write any optional data to the security log.
+expectMultiline("commshub",
+                "plugin events-server print 0x01 0x04",
+                new String[] {
+                  "Index: 0x..",
+                  "       eventId: 0x8052",
+                  "     eventTime: 0x........",
+                  "  eventDataLen: 0x00",
+                  "     eventData: ",
+});
+
+// clear previous test's breadcrumbs for the next test.
+send("commshub", "plugin events-server clear 0x01 0x04");
+send("commshub", "plugin events-server clear 0x02 0x04");
+
+// Use Case: CS10a Read ZigBee Device Event Log
+// This use case can be used to get the event log associated with the GPF
+// or the proxy copy of the GSME event log stored in the mirror. Since there
+// are two we will create a single gbz command for this use case and execute
+// them both.
+
+// setting up existing log for Get commands
+send("commshub", "plugin events-server clear 0x01 0x03");
+send("commshub", "plugin events-server clear 0x02 0x03");
+send("commshub", "plugin events-server add 0x01 0x03 0x1234 0x00001000 \"hotpot\"");
+send("commshub", "plugin events-server add 0x02 0x03 0x1234 0x00001000 \"orangechicken\"");
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0014",
+                new String[] {
+                  "RX: GetEventLog 0x13, 0x...., 0x.......0, 0x........, 0x.., 0x....",
+                  "Redirecting to GPF esi endpoint\\(0x01\\) with logId\\(0x03\\)",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0709",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x19",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x01",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x..",
+                  "GBZ: ZCL command: payload: 01 00 .. 01 0. 03 34 12 00 10 00 00 06 68 6F 74 70 6F 74 ",
+                });
+
+expectMultiline("commshub",
+                new String[] {
+                  "RX: GetEventLog 0x16, 0x...., 0x........, 0x........, 0x.., 0x....",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0709",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x19",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x01",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x01",
+                  "GBZ: ZCL command: payload: 01 00 .. 01 0. 06 34 12 00 10 00 00 0D 6F 72 61 6E 67 65 63 68 69 63 6B 65 6E "});
+
+send("ihd", "zcl events get-event-log 0x13 0x0000 0x00000000 0xfffffffe 0 0");
+expectMultiline("ihd",
+                "send 0 1 2",
+                new String[] {
+                  "RX: PublishEventLog 0x0001, 0x.., 0x01, 0x1. \\[0x.., 0x1234, 0x00001000, 0x0D, orangechicken\\]"
+                });
+
+// Use Case: CS10b Read ZigBee Device Security Log
+// This use case can be used to get the security log associated with the GPF
+// or the proxy copy of the GSME security log stored in the mirror. Since there
+// are two we will create a single gbz command for this use case and execute
+// them both.
+// EMAPPFWKV2-1315 - make sure we don't request the extended data here.
+send("commshub", "plugin events-server clear 0x01 0x04");
+send("commshub", "plugin events-server clear 0x02 0x04");
+send("commshub", "plugin events-server add 0x01 0x04 0x1234 0x00001000 \"hotpot\"");
+send("commshub", "plugin events-server add 0x02 0x04 0x1234 0x00001000 \"orangechicken\"");
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x00A1",
+                new String[] {
+                  "RX: GetEventLog 0x04, 0x...., 0x.......0, 0x........, 0x.., 0x....",
+                  "Redirecting to GPF esi endpoint\\(0x01\\) with logId\\(0x04\\)",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0709",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x19",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x01",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x..",
+                  "GBZ: ZCL command: payload: 01 00 .. 01 .. 04 34 12 00 10 00 00 00 ",
+                });
+
+expectMultiline("commshub",
+                new String[] {
+                  "RX: GetEventLog 0x07, 0x...., 0x........, 0x........, 0x.., 0x....",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0709",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x19",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x01",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x01",
+                  "GBZ: ZCL command: payload: 01 00 .. 01 .. 07 34 12 00 10 00 00 00 "});
+
+// Use Case: GCS13a Read GSME Consumption Register
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0074",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 02 03 00 22 .. .. .. 01 03 00 22 .. .. .. 00 03 00 30 .. 00 00 00 25 .. .. .. .. .. .. ",
+                  "GPF: Total length for GBZ response: 46",
+                  // encrypted payload
+                  "GPF: GBZ response payload: 01 09 01 03 07 02 00 26 .. 00 08 00 01 .. .. 02 03 00 22 .. .. .. 01 03 00 22 .. .. .. 00 03 00 30 .. 00 00 00 25 .. .. .. .. .. .. DE AD ",
+                });
+
+// Use Case: GCS13c Read GSME Register (TOU)
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x00B6",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 02 03 00 22 .. .. .. 01 03 00 22 .. .. .. 00 03 00 30 .. 00 00 00 25 .. .. .. .. .. .. 00 01 00 25 .. .. .. .. .. .. 02 01 00 25 .. .. .. .. .. .. 04 01 00 25 .. .. .. .. .. .. 06 01 00 25 .. .. .. .. .. .. ",
+                  "GPF: Total length for GBZ response: 86",
+                  // encrypted
+                  "GPF: GBZ response payload: 01 09 01 03 07 02 00 4E .. 00 08 00 01 .. .. 02 03 00 22 .. .. .. 01 03 00 22 .. .. .. 00 03 00 30 .. 00 00 00 25 .. .. .. .. .. .. 00 01 00 25 .. .. .. .. .. .. 02 01 00 25 .. .. .. .. .. .. 04 01 00 25 .. .. .. .. .. .. 06 01 00 25 .. .. .. .. .. .. .. .. ",
+                });
+
+// Use Case: GCS13b Read GSME Block Counters
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x00B8",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 00 07 00 25 .. .. .. .. .. .. 01 07 00 25 .. .. .. .. .. .. 02 07 00 25 .. .. .. .. .. .. 03 07 00 25 .. .. .. .. .. .. 02 03 00 22 .. .. .. 01 03 00 22 .. .. .. 00 03 00 30 .. ",
+                  "GPF: Total length for GBZ response: 76",
+                  "GPF: GBZ response payload: 01 09 01 03 07 02 00 44 .. .. 08 00 01 .. .. 00 07 00 25 .. .. .. .. .. .. 01 07 00 25 .. .. .. .. .. .. 02 07 00 25 .. .. .. .. .. .. 03 07 00 25 .. .. .. .. .. .. 02 03 00 22 .. .. .. 01 03 00 22 .. .. .. 00 03 00 30 .. .. .. ",
+                });
+
+// Use Case: GCS14 Read GSME Prepayment Register(s)
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0075",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0700",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 17 06 00 18 .. 16 06 00 21 .. .. ",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0705",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x01",
+                  "GBZ: ZCL command: payload: 05 00 00 2B .. .. .. .. 02 00 00 2B .. .. .. .. 01 00 00 2B .. .. .. .. 31 02 00 23 .. .. .. .. 11 02 00 23 .. .. .. .. 21 02 00 23 .. .. .. .. ",
+                  "GPF: Total length for GBZ response: 84",
+                  "GPF: GBZ response payload: 01 09 02 00 07 00 00 0E 08 00 01 17 06 00 18 .. 16 06 00 21 .. .. 03 07 05 00 39 .. 00 08 01 01 00 32 05 00 00 2B .. .. .. .. 02 00 00 2B .. .. .. .. 01 00 00 2B .. .. .. .. 31 02 00 23 .. .. .. .. 11 02 00 23 .. .. .. .. 21 02 00 23 .. .. .. .. .. .. ",
+                });
+networkWait(timeout*5);
+
+// Use Case: GCS21j Read GSME Configuration Data Device Information (Payment Mode)
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x00BF",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0705",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 00 00 00 19 00 00 ",
+                  "GPF: Total length for GBZ response: 17",
+                  "GPF: GBZ response payload: 01 09 01 01 07 05 00 09 08 00 01 00 00 00 19 00 00 ",
+                });
+
+// Use Case: GCS46 Read MPRN on the GSME
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0089",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 07 03 00 41 00 ",
+                  "GPF: Total length for GBZ response: 16",
+                  "GPF: GBZ response payload: 01 09 01 01 07 02 00 08 08 00 01 07 03 00 41 00 ",
+                });
+
+// Use Case: GCS33 Read GSME Valve Status
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0082",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 05 02 00 21 00 00 14 00 00 30 00 ",
+                  "GPF: Total length for GBZ response: 22",
+                  "GPF: GBZ response payload: 01 09 01 01 07 02 00 0E 08 00 01 05 02 00 21 00 00 14 00 00 30 00 ",
+                });
+
+// Use Case: GCS38 Read GSME Firmware Version
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x0084",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 06 02 00 41 00 ",
+                  "GPF: Total length for GBZ response: 16",
+                  "GPF: GBZ response payload: 01 09 01 01 07 02 00 08 08 00 01 06 02 00 41 00 ",
+                });
+
+// Use Case: GCS60 Read Meter Balance for GSME
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x008D",
+                new String[] {
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 00 0A 00 23 00 00 00 00 ",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0705",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x01",
+                  "GBZ: ZCL command: payload: 01 00 00 2B 00 00 00 00 ",
+                  "GPF: Total length for GBZ response: 35",
+                  "GPF: GBZ response payload: 01 09 02 00 07 02 00 0B 08 00 01 00 0A 00 23 00 00 00 00 01 07 05 00 0B 08 01 01 01 00 00 2B 00 00 00 00 ",
+                });
+
+// Use Case: GCS61 Read gas Daily Consumption Log
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x00A0",
+    new String[] {
+                  "GPF: Publish Daily Consumption Log",
+                  "GPF: Intercepting ZCL cmd\\(0x0B\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x0B",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 08 8B ",
+                  "GPF: Total length for GBZ response: 13",
+                  "GPF: GBZ response payload: 01 09 01 01 07 02 00 05 08 00 0B 08 8B " });
+
+// Use Case: GCS16a Read GSME Daily Read log(s)
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x0077",
+    new String[] {
+                  "GPF: Publish Daily Read Log",
+                  "GPF: Intercepting ZCL cmd\\(0x0B\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x0B",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 06 8B ",
+                  "GPF: Total length for GBZ response: 13",
+                  "GPF: GBZ response payload: 01 09 01 01 07 02 00 05 08 00 0B 06 8B " });
+
+// Use Case: GCS16b Read GSME Daily Read log(s) (prepayment)
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x0096",
+    new String[] {
+                  "GPF: Publish Prepay Daily Read Log",
+                  "GPF: Intercepting ZCL cmd\\(0x0B\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0705",
+                  "GBZ: ZCL command: command id: 0x0B",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 07 8B ",
+                  "GPF: Total length for GBZ response: 13",
+                  "GPF: GBZ response payload: 01 09 01 01 07 05 00 05 08 00 0B 07 8B " });
+networkWait(timeout*5);
+
+// Use Case: GCS15c Read GSME Billing Data Log (billing calendar triggered)
+send("gmeter", "plugin prepayment-server addSnapshotEvent 0x01 0x00000002");
+send("gmeter", "plugin prepayment-server publishPrepaySnapshot 0x0000 0x01 0x02 0x01");
+networkWait(timeout*10);
+
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x0076",
+    new String[] {
+                  "GPF: GBCS Use Case: GCS15c Read GSME Billing Data Log \\(billing calendar triggered\\)",
+                  "GPF: GBZ response payload: 01 09 18 02 07 05 00 31 00 00 19 00 01 00 2A .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. 00 07 05 00 05 08 01 0B 07 8B 00 07 05 00 05 08 02 0B 07 8B 00 07 05 00 05 08 03 0B 07 8B 00 07 05 00 05 08 04 0B 07 8B 00 07 05 00 05 08 05 0B 07 8B 00 07 05 00 05 08 06 0B 07 8B 00 07 05 00 05 08 07 0B 07 8B 00 07 05 00 05 08 08 0B 07 8B 00 07 05 00 05 08 09 0B 07 8B 00 07 05 00 05 08 0A 0B 07 8B 00 07 05 00 05 08 0B 0B 07 8B 00 07 02 00 05 08 0C 0B 06 8B 00 07 02 00 05 08 0D 0B 06 8B 00 07 02 00 05 08 0E 0B 06 8B 00 07 02 00 05 08 0F 0B 06 8B 00 07 02 00 05 08 10 0B 06 8B 00 07 02 00 05 08 11 0B 06 8B 00 07 02 00 05 08 12 0B 06 8B 00 07 02 00 05 08 13 0B 06 8B 00 07 02 00 05 08 14 0B 06 8B 00 07 02 00 05 08 15 0B 06 8B 00 07 02 00 05 08 16 0B 06 8B 01 07 02 00 05 08 17 0B 06 8B ",
+                  });
+networkWait(timeout*10);
+
+// Use Case: GCS15d Read GSME Billing Data Log (payment-based debt payments)
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x00C4",
+    new String[] {
+                  "GPF: GBCS Use Case: GCS15d Read GSME Billing Data Log \\(payment-based debt payments\\)",
+                  "GPF: GBZ response payload: 01 09 01 01 07 05 00 05 08 00 0B 0A 8B ",
+                 });
+
+// Use Case: GCS15e Read GSME Billing Data Log (prepayment credits)
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x00C5",
+    new String[] {
+                  "GPF: GBCS Use Case: GCS15e Read GSME Billing Data Log \\(prepayment credits\\)",
+                  "GPF: GBZ response payload: 01 09 01 01 07 05 00 05 08 00 0B 08 8B ",
+                 });
+
+// Use Case: GCS21f Read GSME Tariff Data
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x009F",
+    new String[] {
+                  "GPF: GBCS Use Case: GCS21f Read GSME Tariff Data",
+"GPF: GBZ response payload: 01 09 08 00 07 00 00 8C 08 00 01 03 02 00 22 .. .. .. 02 02 00 22 .. .. .. 00 01 00 25 .. .. .. .. .. .. 01 01 00 25 .. .. .. .. .. .. 02 01 00 25 .. .. .. .. .. .. 15 06 00 30 00 12 06 00 20 .. 00 04 00 23 .. .. .. .. 01 04 00 23 .. .. .. .. 02 04 00 23 .. .. .. .. 03 04 00 23 .. .. .. .. 10 04 00 23 .. .. .. .. 20 04 00 23 .. .. .. .. 30 04 00 23 .. .. .. .. 40 04 00 23 .. .. .. .. 16 06 00 21 .. .. 17 06 00 18 50 01 03 00 23 .. .. .. .. 00 07 07 00 1D 19 01 01 00 00 00 00 .. .. .. .. .. .. .. .. 01 03 00 01 00 00 00 01 E0 01 02 C0 03 03 00 07 07 00 1D 19 02 01 00 00 00 00 .. .. .. .. .. .. .. .. 02 03 00 01 00 00 00 04 E0 01 05 C0 03 06 00 07 07 00 17 19 03 02 00 00 00 00 .. .. .. .. .. .. .. .. 01 01 01 01 01 01 01 01 00 07 07 00 17 19 04 02 00 00 00 00 .. .. .. .. .. .. .. .. 02 02 02 02 02 02 02 02 00 07 07 00 25 19 05 03 00 00 00 00 .. .. .. .. .. .. .. .. 00 01 75 01 01 00 01 75 04 01 00 02 75 07 01 00 02 75 0A 01 00 01 00 07 07 00 21 19 06 04 00 00 00 00 .. .. .. .. .. .. .. .. 00 00 00 00 00 02 00 01 75 01 02 00 01 75 04 02 00 02 01 07 00 00 38 09 07 00 01 00 00 00 06 4E 6F 72 6D 61 6C 01 00 00 00 .. .. 00 00 00 48 03 21 50 00 00 00 00 .. 00 09 00 00 00 FF FF FF FF FF FF FF FF FF FF FF FF FF 00 00 01 00 00 00 " });
+
+
+// Use Case: GCS21b Read GSME Configuration Data Prepayment
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x00B5",
+    new String[] {
+                  "GPF: GBCS Use Case: GCS21b Read GSME Configuration Data Prepayment",
+"GPF: GBZ response payload: 01 09 08 00 07 05 00 5B 08 00 01 39 02 00 21 00 00 06 00 00 2B 00 00 00 00 16 02 00 30 00 26 02 00 30 00 40 00 00 2B 00 00 00 00 10 00 00 23 00 00 00 00 11 00 00 23 00 00 00 00 31 00 00 23 00 00 00 00 21 00 00 23 00 00 00 00 22 00 00 23 00 00 00 00 17 02 00 23 00 00 00 00 27 02 00 23 00 00 00 00 00 07 00 00 08 08 01 01 17 06 00 18 50 00 07 07 00 1D 19 02 01 00 00 00 00 .. .. .. .. .. .. .. .. 01 03 00 01 03 00 00 01 E0 01 02 C0 03 03 00 07 07 00 1D 19 03 01 00 00 00 00 .. .. .. .. .. .. .. .. 02 03 00 01 03 00 00 04 E0 01 05 C0 03 06 00 07 07 00 17 19 04 02 00 00 00 00 .. .. .. .. .. .. .. .. 01 01 01 01 01 01 01 01 00 07 07 00 17 19 05 02 00 00 00 00 .. .. .. .. .. .. .. .. 02 02 02 02 02 02 02 02 00 07 07 00 25 19 06 03 00 00 00 00 .. .. .. .. .. .. .. .. 00 01 75 01 01 00 01 75 04 01 00 02 75 07 01 00 02 75 0A 01 00 01 01 07 07 00 1C 19 07 04 00 00 00 00 .. .. .. .. .. .. .. .. 00 00 00 00 03 01 00 01 75 06 01 00 01 ",
+                 });
+
+// Test that when changes have been made to the GSME Billing Data Log in
+// accordance with the timetable set-out in the GSME Billing Calendar that the
+// GPF generates and sends an Alert containing the most recent entries of the
+// GSME Tariff TOU Register Matrix, the GSME Tariff Block Counter Matrix
+// and the GSME Consumption Register in the GSME Billing Data Log.
+send("gmeter", "plugin meter-snapshot-server take 0x01 0x00000002");
+send("gmeter", "plugin meter-snapshot-server publish " + commshubNodeId + " 0x01 0x02 0x00000000 0xFFFFFFFF 0x00 0x00000002");
+expectMultiline("commshub",
+    new String[] {
+                  "GPF: PublishSnapshot 0x00000001 0x........ 0x01 0x00 0x01 0x00000402 0x00",
+                  "GPF: Receive Billing Data Log - Tariff TOU Register Matrix, the Consumption Register and Tariff Block Counter Matrix",
+                  "GBCS emberAfPluginGasProxyFunctionAlertWANCallback: alertCode=0x800A, gbzAlertLength=0x0057",
+                 });
+
+// Make sure the GPF prevents two non-TOMs from being processed at same time
+send("commshub", "plugin gas-proxy-function simulate-gbz-msg 0x00B5");
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x009F",
+    new String[] {
+                  "GPF: GBCS Use Case: GCS21b Read GSME Configuration Data Prepayment",
+                  "GPF: GBCS Use Case: GCS21f Read GSME Tariff Data",
+                  "GPF: cannot process two non tap off messages at the same time",
+"GPF: GBZ response payload: 01 09 08 00 07 05 00 5B 08 00 01 39 02 00 21 00 00 06 00 00 2B 00 00 00 00 16 02 00 30 00 26 02 00 30 00 40 00 00 2B 00 00 00 00 10 00 00 23 00 00 00 00 11 00 00 23 00 00 00 00 31 00 00 23 00 00 00 00 21 00 00 23 00 00 00 00 22 00 00 23 00 00 00 00 17 02 00 23 00 00 00 00 27 02 00 23 00 00 00 00 00 07 00 00 08 08 01 01 17 06 00 18 50 00 07 07 00 1D 19 02 01 00 00 00 00 .. .. .. .. .. .. .. .. 01 03 00 01 03 00 00 01 E0 01 02 C0 03 03 00 07 07 00 1D 19 03 01 00 00 00 00 .. .. .. .. .. .. .. .. 02 03 00 01 03 00 00 04 E0 01 05 C0 03 06 00 07 07 00 17 19 04 02 00 00 00 00 .. .. .. .. .. .. .. .. 01 01 01 01 01 01 01 01 00 07 07 00 17 19 05 02 00 00 00 00 .. .. .. .. .. .. .. .. 02 02 02 02 02 02 02 02 00 07 07 00 25 19 06 03 00 00 00 00 .. .. .. .. .. .. .. .. 00 01 75 01 01 00 01 75 04 01 00 02 75 07 01 00 02 75 0A 01 00 01 01 07 07 00 1C 19 07 04 00 00 00 00 .. .. .. .. .. .. .. .. 00 00 00 00 03 01 00 01 75 06 01 00 01 ",
+                 });
+
+// After rejecting the first attempt make sure a second attempt works after the first completes
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x009F",
+    new String[] {
+                  "GPF: GBCS Use Case: GCS21f Read GSME Tariff Data",
+"GPF: GBZ response payload: 01 09 08 00 07 00 00 8C 08 00 01 03 02 00 22 .. .. .. 02 02 00 22 .. .. .. 00 01 00 25 00 00 00 00 00 00 01 01 00 25 00 00 00 00 00 00 02 01 00 25 00 00 00 00 00 00 15 06 00 30 00 12 06 00 20 02 00 04 00 23 00 00 00 00 01 04 00 23 00 00 00 00 02 04 00 23 00 00 00 00 03 04 00 23 00 00 00 00 10 04 00 23 00 00 00 00 20 04 00 23 00 00 00 00 30 04 00 23 00 00 00 00 40 04 00 23 00 00 00 00 16 06 00 21 3A 03 17 06 00 18 50 01 03 00 23 00 00 00 00 00 07 07 00 1D 19 01 01 00 00 00 00 .. .. .. .. .. .. .. .. 01 03 00 01 00 00 00 01 E0 01 02 C0 03 03 00 07 07 00 1D 19 02 01 00 00 00 00 .. .. .. .. .. .. .. .. 02 03 00 01 00 00 00 04 E0 01 05 C0 03 06 00 07 07 00 17 19 03 02 00 00 00 00 .. .. .. .. .. .. .. .. 01 01 01 01 01 01 01 01 00 07 07 00 17 19 04 02 00 00 00 00 .. .. .. .. .. .. .. .. 02 02 02 02 02 02 02 02 00 07 07 00 25 19 05 03 00 00 00 00 .. .. .. .. .. .. .. .. 00 01 75 01 01 00 01 75 04 01 00 02 75 07 01 00 02 75 0A 01 00 01 00 07 07 00 21 19 06 04 00 00 00 00 .. .. .. .. .. .. .. .. 00 00 00 00 00 02 00 01 75 01 02 00 01 75 04 02 00 02 01 07 00 00 38 09 07 00 01 00 00 00 06 4E 6F 72 6D 61 6C 01 00 00 00 .. .. .. .. 00 48 03 21 50 00 00 00 00 .. 00 09 00 00 00 FF FF FF FF FF FF FF FF FF FF FF FF FF 00 00 01 00 00 00 ",
+                 });
+
+// Use Case: GCS15b Read GSME Billing Data Log (change of mode / tariff triggered)
+//
+// Simulate GSME taking snapshot and publishing to GPF
+send("gmeter", "plugin prepayment-server addSnapshotEvent 0x01 0x00006008");
+send("gmeter", "plugin prepayment-server publishPrepaySnapshot 0x0000 0x01 0x02 0x02");
+networkWait(timeout*10);
+
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x00C3",
+    new String[] {"GPF: GBCS Use Case: GCS15b Read GSME Billing Data Log \\(change of mode / tariff triggered\\)",
+"GPF: GBZ response payload: 01 09 18 02 07 05 00 31 00 00 19 00 01 00 2A .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. 00 07 05 00 05 08 01 0B 07 8B 00 07 05 00 05 08 02 0B 07 8B 00 07 05 00 05 08 03 0B 07 8B 00 07 05 00 05 08 04 0B 07 8B 00 07 05 00 05 08 05 0B 07 8B 00 07 05 00 05 08 06 0B 07 8B 00 07 05 00 05 08 07 0B 07 8B 00 07 05 00 05 08 08 0B 07 8B 00 07 05 00 05 08 09 0B 07 8B 00 07 05 00 05 08 0A 0B 07 8B 00 07 05 00 05 08 0B 0B 07 8B 00 07 02 00 05 08 0C 0B 06 8B 00 07 02 00 05 08 0D 0B 06 8B 00 07 02 00 05 08 0E 0B 06 8B 00 07 02 00 05 08 0F 0B 06 8B 00 07 02 00 05 08 10 0B 06 8B 00 07 02 00 05 08 11 0B 06 8B 00 07 02 00 05 08 12 0B 06 8B 00 07 02 00 05 08 13 0B 06 8B 00 07 02 00 05 08 14 0B 06 8B 00 07 02 00 05 08 15 0B 06 8B 00 07 02 00 05 08 16 0B 06 8B 01 07 02 00 05 08 17 0B 06 8B ",
+                 });
+networkWait(timeout*10);
+
+// Use Case: GCS17 Read GSME Profile Data Log
+//
+// Simulate time passing and the GSME reporting attributes 3 times.  This should result in 2 entries being
+// added to the profile data log.
+expect("gmeter", "plugin gbcs-gas-meter report-attributes", "GSME: ProcessNotificationFlags: 0x0004, 0x00000000", timeout * 100);
+send("commshub", "zcl time " + (utcTime("commshub") + 1800));
+expect("gmeter", "plugin gbcs-gas-meter report-attributes", "GSME: ProcessNotificationFlags: 0x0004, 0x00000000", timeout * 100);
+send("commshub", "zcl time " + (utcTime("commshub") + 1800));
+expect("gmeter", "plugin gbcs-gas-meter report-attributes", "GSME: ProcessNotificationFlags: 0x0004, 0x00000000", timeout * 100);
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x0078",
+    new String[] {
+                  "GPF: Publish Profile Data Log",
+                  "GPF: Intercepting ZCL cmd\\(0x07\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x07",
+                  "GBZ: ZCL command: frame control: 0x19",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x01",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 00 00 .. .. .. .. 00 08 07 02 00 00 00 00 00 00 00 ",
+                  "GPF: Total length for GBZ response: 34",
+                  "GPF: GBZ response payload: 01 09 01 03 07 02 00 1A 00 00 19 00 07 00 13 00 00 .. .. .. .. 00 08 07 02 00 00 00 00 00 00 00 .. .. " });
+
+// EMAPPFWKV2-1333 - every 30 minutes, check to make sure all of our logs are
+// up to date with the latest and greatest data from the GSME.
+// We should have 4 catchups to perform here since a simulated day has passed and
+// we haven't heard from our GSME friend. These catch-ups are for the profile
+// data log, the daily gas consumption log, the daily read log, and the
+// prepayment daily read log.
+send("commshub", "zcl time " + (utcTime("commshub") + (3600 * 24))); // seconds in a day
+networkWait(1800000); // wait 30 minutes for the event to fire on the GPF
+expect("commshub",
+       "plugin gas-proxy-function print-log-catchups-in-progress",
+       ".*GPF: Log catch-ups 4");
+
+// After the GSME checks in, we should start sending it our catchup commands:
+//   GetSnapshot       (Daily Read Log)
+//   GetSampledData    (Daily Gas Consumption Log)
+//   GetSampledData    (Profile Data Log)
+//   GetPrepaySnapshot (Prepayment Daily Read Log)
+expect("gmeter", "plugin gbcs-gas-meter report-attributes", "GSME: ProcessNotificationFlags: 0x0004, 0x00000000", timeout * 100);
+expect("gmeter", ".*RX len 16, ep 01, clus 0x0702 \\(Simple Metering\\) FC 01 seq .. cmd 06 payload\\[00 00 00 00 FF FF FF FF 00 01 00 00 00 \\]");
+expect("gmeter", ".*RX len 12, ep 01, clus 0x0702 \\(Simple Metering\\) FC 01 seq .. cmd 08 payload\\[01 00 .. .. .. .. 00 .. .. \\]");
+expect("gmeter", ".*RX len 12, ep 01, clus 0x0702 \\(Simple Metering\\) FC 01 seq .. cmd 08 payload\\[00 00 .. .. .. .. 00 .. .. \\]");
+expect("gmeter", ".*RX len 16, ep 01, clus 0x0705 \\(Prepayment\\) FC 01 seq .. cmd 07 payload\\[00 00 00 00 FF FF FF FF .. 01 00 00 00 \\]");
+
+// Eventually, we should be all caught up with the GSME.
+expect("commshub",
+       "plugin gas-proxy-function print-log-catchups-in-progress",
+       ".*GPF: Log catch-up complete",
+       DEFAULT_TIMEOUT << 1);
+
+// Use Case: GCS21e Read GSME/GPF Configuration Data Device Information (device identity) // EMAPPFWKV2-1308 - we ask the mirror for the Basic cluster information about
+// the meter, not the ESI.
+// Make sure the gas meter attribute is not what we are about to set it to, and
+// then set the MANUFACTURER_NAME server attribute of the Basic cluster. Then,
+// force it to report the mirror.
+nexpect("gmeter",
+        "read 1 0x0000 0x0004 1",
+        "01 02 03 04 05");
+expect("gmeter",
+       "write 1 0x0000 0x0004 1 0x42 {01 02 03 04 05}",
+       "Success: write");
+expect("gmeter",
+       "plugin gbcs-gas-meter report-attributes",
+       "REPORT: clus 0x0000, attr 0x0004: 0x00");
+networkWait(60000);
+
+// Let the comms hub do its thing with the incoming GBZ message.
+expectMultiline("commshub",
+                "plugin gas-proxy-function simulate-gbz-msg 0x009E",
+                new String[] {
+                  "GPF: Replaying following command from endpoint\\(4\\) to \\(2\\)",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0000",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x00",
+                  "GBZ: ZCL command: payload: 04 00 00 42 05 01 02 03 04 05 05 00 00 42 00 03 00 00 20 00 .*"});
+expectMultiline("commshub",
+                null,
+                new String[] {
+                  "GPF: Replaying following command from endpoint\\(4\\) to \\(1\\)",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0708",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x01",
+                  "GBZ: ZCL command: payload: 01 01 00 41 .* "});
+expectMultiline("commshub",
+                null,
+                new String[] {
+                  "GPF: Replaying following command from endpoint\\(4\\) to \\(2\\)",
+                  "GPF: Intercepting ZCL cmd\\(0x01\\) on endpoint: 4",
+                  "GPF: Saving following ZCL response for Non-TOM message response.",
+                  "GBZ: ZCL command: cluster id: 0x0702",
+                  "GBZ: ZCL command: command id: 0x01",
+                  "GBZ: ZCL command: frame control: 0x08",
+                  "GBZ: ZCL command: direction: 0x01",
+                  "GBZ: ZCL command: cluster specific: 0x00",
+                  "GBZ: ZCL command: mfg specific: 0x00",
+                  "GBZ: ZCL command: trans. seq. number: 0x02",
+                  "GBZ: ZCL command: payload: 08 06 00 30 .. 07 06 00 30 .. ",
+                  "GPF: Total length for GBZ response: ..",
+                  "GPF: GBZ response payload: 01 09 03 00 00 00 00 17 08 00 01 04 00 00 42 05 01 02 03 04 05 05 00 00 42 00 03 00 00 20 .. 00 07 08 00 11 08 01 01 01 01 00 41 09 88 77 66 55 44 33 22 11 .* 01 07 02 00 0D 08 02 01 08 06 00 30 .. 07 06 00 30 .. ",
+                });
+
+// Tests for Comms Hub Function plugin
+networkWait(DEFAULT_TIMEOUT);
+
+// There was a make test failure where the electric meter was closing it's tunnel
+// with the commshub because it had not talked to it in too long. This was passing
+// on my Mac, but failing on Jenkins. Let's try sending some data to the
+// electric meter here, to ensure that the tunnel is active. -- agkeesle
+send("commshub", "plugin comms-hub-function send {" + emeterEUI64 + "} {11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF}");
+networkWait(DEFAULT_TIMEOUT);
+
+// Send to electric meter and ensure it is received.  The emeter sample app is
+// setup with a callback for received tunnel data that just sends the same data
+// back.
+expectMultiline("commshub",
+                "plugin comms-hub-function send {" + emeterEUI64 + "} {11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF}",
+                new String[]{
+                  ".*Message has been successfully sent or queued to be sent to the destination",
+                  ".*GBCS emberAfPluginCommsHubFunctionDataReceivedCallback: senderDeviceId=\\(>\\)" + emeterEUI64 + ", dataLen=0x000F.*"
+                });
+
+// now we'll test sending a message to the sleepy gas meter
+
+// Before sending the data lets make sure the functional notification flags in
+// the meter mirror endpoint is clear indicating no tunnel data pending
+send("gmeter", "zcl global direction 1");
+send("gmeter", "zcl global read 0x0702 0x0000");
+expect("gmeter",
+       "send " + commshubNodeId + " 1 2",
+       ".*RX len 11, ep 01, clus 0x0702 \\(Simple Metering\\) FC 00 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 1B 00 00 00 00 \\].*", timeout * 100);
+
+// Send to gas meter and ensure it is successfully queued for transmission
+send("commshub", "plugin comms-hub-function simulate-gbz-msg {" + gmeterEUI64 + "} 0x006F");
+expect("commshub", ".*Message has been successfully sent or queued to be sent to the destination");
+
+// Now read the functional notification flags from the mirror and ensure the
+// tunnel data is set bit. A sequence of messages between the GSME and the CHF
+// should then automatically occur. A "GET" message from the GSME to the CHF,
+// followed by a a "GET-RESPONSE" from the CHF to the GSME, and finally a "PUT"
+// from the GSME to the CHF including the response to the GBZ message received.
+send("gmeter", "zcl global direction 1");
+send("gmeter", "zcl global read 0x0702 0x0000");
+expectMultiline("gmeter",
+                "send " + commshubNodeId + " 1 2",
+                new String[] {
+                  ".*RX len 11, ep 01, clus 0x0702 \\(Simple Metering\\) FC 00 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 1B 00 00 20 00 \\].*",
+                  "GSME: ClientDataReceived:00,\\[020001090B0007050013010003........000000000000000000000000000705001301010C00000000........0000000044332211000705000701020944332211000705001701030B00000000........000000004433221100332211000707001909040000000000................00000000030000040202000707001D09050100000000................0103000103000001E00102C00303000707001D09060100000000................0203000103000004E00105C00306000707001709070200000000................0101010101010101000707001709080200000000................0202020202020202000707002509090300000000................0001750101000175040100027507010002750A010001010707001C090A0400000000................00000000030100017506010001\\]",
+                  "GSME: TunnelSendData \\[0301090B000705000508000B0300000705000508010B0C00000705000508020B0900000705000508030B0B00000707000500040B0000000707000500050B0100000707000500060B0100000707000500070B0200000707000500080B0200000707000500090B03000107070005000A0B0400\\]"
+
+                },
+                timeout * 100);
+
+// check that the notification flags are clear again.
+send("gmeter", "zcl global direction 1");
+send("gmeter", "zcl global read 0x0702 0x0000");
+send("gmeter", "send " + commshubNodeId + " 1 2");
+expect("commshub", "READ_ATTR: clus 0702");
+expect("commshub", "READ: clus 0702, attr 0000, dataLen: 04, OK");
+expect("gmeter",".*RX len 11, ep 01, clus 0x0702 \\(Simple Metering\\) FC 00 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 1B 00 00 00 00 \\].*", timeout * 100);
+
+// now queue up three message for the gas meter
+send("commshub", "plugin comms-hub-function simulate-gbz-msg {" + gmeterEUI64 + "} 0x0070");
+expect("commshub", ".*Message has been successfully sent or queued to be sent to the destination");
+send("commshub", "plugin comms-hub-function simulate-gbz-msg {" + gmeterEUI64 + "} 0x0071");
+expect("commshub", ".*Message has been successfully sent or queued to be sent to the destination");
+send("commshub", "plugin comms-hub-function simulate-gbz-msg {" + gmeterEUI64 + "} 0x0073");
+expect("commshub", ".*Message has been successfully sent or queued to be sent to the destination");
+
+// Now read the functional notification flags from the mirror and ensure the
+// tunnel data is set bit. A sequence of messages between the GSME and the CHF
+// should then automatically occur. A "GET" message from the GSME to the CHF,
+// followed by a a "GET-RESPONSE" from the CHF to the GSME, and finally a "PUT"
+// from the GSME to the CHF including the response to the GBZ message received.
+// This should be repeated for eahc of the three messges.
+send("gmeter", "zcl global direction 1");
+send("gmeter", "zcl global read 0x0702 0x0000");
+expectMultiline("gmeter",
+                "send " + commshubNodeId + " 1 2",
+                new String[] {
+                  ".*RX len 11, ep 01, clus 0x0702 \\(Simple Metering\\) FC 00 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 1B 00 00 20 00 \\].*",
+                  "GSME: ClientDataReceived:00,\\[020201090101070500080100000000000000\\]",
+                  "GSME: TunnelSendData \\[03010901010705000508000B0000\\]",
+                  "GSME: ClientDataReceived:00,\\[02010109010107030012090000........0000000000FFFF03414243\\]",
+                  "GSME: TunnelSendData \\[03010901010703000500000B0000\\]",
+                  "GSME: ClientDataReceived:00,\\[0200010901010708000F090002........0000000000000200\\]",
+                  "GSME: TunnelSendData \\[03010901010708000500000B0200\\]"
+                },
+                timeout * 100);
+
+// check that the notification flags are clear again.
+send("gmeter", "zcl global direction 1");
+send("gmeter", "zcl global read 0x0702 0x0000");
+send("gmeter", "send " + commshubNodeId + " 1 2");
+expect("commshub", "READ_ATTR: clus 0702");
+expect("commshub", "READ: clus 0702, attr 0000, dataLen: 04, OK");
+expect("gmeter",".*RX len 11, ep 01, clus 0x0702 \\(Simple Metering\\) FC 00 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 1B 00 00 00 00 \\].*");
+
+// Finally check to make sure the timeout is called when a message times out
+// normally the timeout is 24 hours but we set it to 2 minutes here for testing
+// purposes. An error log is also added to the CHF Event log.
+send("commshub", "plugin comms-hub-function timeout 120");
+expectMultiline("commshub",
+                "plugin comms-hub-function simulate-gbz-msg {" + gmeterEUI64 + "} 0x007C",
+                new String[] {
+                  ".*Message has been successfully sent or queued to be sent to the destination",
+                  "Event added to log 0x03 at index 0x..",
+                  ".*GBCS emberAfPluginCommsHubFunctionSendCallback: status=0xFF, destinationDeviceId=\\(>\\)" + gmeterEUI64 + " dataLen=0x002E.*"
+                },
+                150000);
+
+
+// EMAPPFWKV2-1354 - if the GSME removes itself from being a mirror, the GPF
+// should clear its structured data.
+// Once the mirror is added again, the GPF should start with cleared
+// structured data.
+expectMultiline("commshub",
+                "plugin meter-mirror status",
+                new String[]{
+                  ".*Known meters",
+                  "ep: 2  ieee:\\(>\\)" + gmeterEUI64 + "  type: 0x..",
+                  "1 of 1 mirrors used\\."
+                });
+expect("gmeter", "zcl metering remove-mirror", ".*Msg: clus 0x0702, cmd 0x02, len \\d+");
+send("gmeter", "send 0 1 2");
+expect("commshub", "GPF: Structured Data removed on endpoint 0x02");
+
+expect("gmeter", "zcl metering request-mirror", ".*Msg: clus 0x0702, cmd 0x01, len \\d+");
+send("gmeter", "send 0 1 2");
+expect("commshub", "GPF: Structured Data initialized on endpoint 0x02");
+
+// Test for EMAPPFWKV2-1288, The gas-proxy-function can get stuck in a state
+// where it constantly returns an error and prints "GPF: cannot process two non
+// tap off messages at the same time"
+
+// reboot the comms hub so that it loses its knowledge of the mirror.
+reboot("commshub");
+expectMultiline("commshub",
+                "plugin meter-mirror status",
+                new String[]{
+                  ".*Known meters",
+                  "ep: 2  ieee:\\(>\\)FFFFFFFFFFFFFFFF  type: 0x..",
+                  "0 of 1 mirrors used\\."
+                });
+
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x0078",
+    new String[] {
+                  ".*GPF: GBCS Use Case: GCS17 Read GSME Profile Data Log",
+                  "GPF: GBZ Command: 01 09 01 01 07 02 00 0C 11 00 08 00 00 00 00 00 00 00 70 4A ",
+                  "GPF: Replaying following command from endpoint\\(4\\) to \\(2\\)",
+                  "GPF: Intercepting ZCL cmd\\(0x0B\\) on endpoint: 4",
+                  "GPF: GBZ response payload: 01 09 01 01 07 02 00 05 08 00 0B 08 01 ",
+                 });
+networkWait(timeout);
+
+// new reboot the gsme so that it restatablishes the mirror
+reboot("gmeter");
+networkWait(timeout * 12);
+
+expectMultiline("commshub",
+                "plugin meter-mirror status",
+                new String[]{
+                  ".*Known meters",
+                  "ep: 2  ieee:\\(>\\)" + gmeterEUI64 + "  type: 0x..",
+                  "1 of 1 mirrors used\\."
+                });
+
+expectMultiline("commshub",
+    "plugin gas-proxy-function simulate-gbz-msg 0x0078",
+    new String[] {
+                  "GPF: Publish Profile Data Log",
+                  "GPF: Intercepting ZCL cmd\\(0x0B\\) on endpoint: 4",
+                  "GPF: GBZ response payload: 01 09 01 01 07 02 00 05 08 00 0B 08 8B ",
+                 });
+
+// Tests for GBCS Device Log plugin
+// NOTE: make sure these tests are run after the Comms Hub Test as they manipulate
+// the device log which will result in tunnels being torn down.
+
+// The se12-comms-hub application is preconfigured with 4 entries in the device log
+// Check to make sure they are there.
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 4 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 0. EUI64=\\(>\\)0300000000000000, type=0",
+                  ".*Device info at index 1. EUI64=\\(>\\)0200000000000000, type=1",
+                  ".*Device info at index 2. EUI64=\\(>\\)0600000000000000, type=0",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1"
+                });
+
+// Clear the log an make sure it is now empty
+send("commshub", "plugin gbcs-device-log clear");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 0 entries");
+
+send("commshub", "plugin gbcs-device-log print");
+expect("commshub", ".*There are currently no entries in the GBCS Device Log");
+
+// Reset the log so that the 4 preconfigured devices are now back in the log
+send("commshub", "plugin gbcs-device-log reset");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 4 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 0. EUI64=\\(>\\)0300000000000000, type=0",
+                  ".*Device info at index 1. EUI64=\\(>\\)0200000000000000, type=1",
+                  ".*Device info at index 2. EUI64=\\(>\\)0600000000000000, type=0",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1"
+                });
+
+// Add another entry
+send("commshub", "plugin gbcs-device-log store {0A00000000000000} 2");
+expect("commshub", ".*Device has been successfully stored in the device log");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 5 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 0. EUI64=\\(>\\)0300000000000000, type=0",
+                  ".*Device info at index 1. EUI64=\\(>\\)0200000000000000, type=1",
+                  ".*Device info at index 2. EUI64=\\(>\\)0600000000000000, type=0",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1",
+                  ".*Device info at index 4. EUI64=\\(>\\)0A00000000000000, type=2"
+                });
+
+// Remove the second entry another entry
+send("commshub", "plugin gbcs-device-log remove {0200000000000000}");
+expect("commshub", ".*Device has been successfully removed from the device log");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 4 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 0. EUI64=\\(>\\)0300000000000000, type=0",
+                  ".*Device info at index 2. EUI64=\\(>\\)0600000000000000, type=0",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1",
+                  ".*Device info at index 4. EUI64=\\(>\\)0A00000000000000, type=2"
+                });
+
+// Remove the first entry another entry
+send("commshub", "plugin gbcs-device-log remove {0300000000000000}");
+expect("commshub", ".*Device has been successfully removed from the device log");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 3 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 2. EUI64=\\(>\\)0600000000000000, type=0",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1",
+                  ".*Device info at index 4. EUI64=\\(>\\)0A00000000000000, type=2"
+                });
+
+// Try to remove the first entry again
+send("commshub", "plugin gbcs-device-log remove {0300000000000000}");
+expect("commshub", ".*Error: Cannot remove device from GBCS Device Log: Device does not exist");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 3 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 2. EUI64=\\(>\\)0600000000000000, type=0",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1",
+                  ".*Device info at index 4. EUI64=\\(>\\)0A00000000000000, type=2"
+                });
+
+// Add another entry
+send("commshub", "plugin gbcs-device-log store {05 00 00 00 00 00 00 00} 3");
+expect("commshub", ".*Device has been successfully stored in the device log");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 4 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 0. EUI64=\\(>\\)0500000000000000, type=3",
+                  ".*Device info at index 2. EUI64=\\(>\\)0600000000000000, type=0",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1",
+                  ".*Device info at index 4. EUI64=\\(>\\)0A00000000000000, type=2"
+                });
+
+// Update the entry at index 3
+send("commshub", "plugin gbcs-device-log store {0400000000000000} 1");
+expect("commshub", ".*Device has been successfully stored in the device log");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 4 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 0. EUI64=\\(>\\)0500000000000000, type=3",
+                  ".*Device info at index 2. EUI64=\\(>\\)0600000000000000, type=0",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1",
+                  ".*Device info at index 4. EUI64=\\(>\\)0A00000000000000, type=2"
+                });
+
+// Get the entry at index 2
+send("commshub", "plugin gbcs-device-log get {0400000000000000}");
+expect("commshub", ".*EUI64=\\(>\\)0400000000000000, type=1");
+
+// Attempt to get an entry that does not exist
+send("commshub", "plugin gbcs-device-log get {0300000000000000}");
+expect("commshub", ".*Error: Cannot retrieve device info from GBCS Device Log: Device does not exist");
+
+// Check the Exists API
+send("commshub", "plugin gbcs-device-log exists {0400000000000000} 1");
+expect("commshub", ".*Device exists in the device log");
+
+send("commshub", "plugin gbcs-device-log exists {0400000000000000} 2");
+expect("commshub", ".*Device does not exist in the device log");
+
+send("commshub", "plugin gbcs-device-log exists {0404040404040404} 1");
+expect("commshub", ".*Device does not exist in the device log");
+
+send("commshub", "plugin gbcs-device-log store {0404040404040404} 2");
+expect("commshub", ".*Device has been successfully stored in the device log");
+send("commshub", "plugin gbcs-device-log exists {0404040404040404} 2");
+expect("commshub", ".*Device exists in the device log");
+
+send("commshub", "plugin gbcs-device-log store {0404040404040404} 3");
+expect("commshub", ".*Device has been successfully stored in the device log");
+send("commshub", "plugin gbcs-device-log exists {0404040404040404} 3");
+expect("commshub", ".*Device exists in the device log");
+
+// Test to make sure GSME is sleepy and ESME is not
+send("commshub", "plugin gbcs-device-log is-sleepy 0");
+expect("commshub", ".*Device type 0 is a sleepy device type");
+send("commshub", "plugin gbcs-device-log is-sleepy 1");
+expect("commshub", ".*Device type 1 is not a sleepy device type");
+
+// Test for too many entries.
+send("commshub", "plugin gbcs-device-log fill");
+send("commshub", "plugin gbcs-device-log count");
+expect("commshub", ".*The GBCS Device Log currently has 16 entries");
+
+expectMultiline("commshub",
+                "plugin gbcs-device-log print",
+                new String[] {
+                  ".*Device info at index 0. EUI64=\\(>\\)0100000000000000, type=1",
+                  ".*Device info at index 1. EUI64=\\(>\\)0200000000000000, type=1",
+                  ".*Device info at index 2. EUI64=\\(>\\)0300000000000000, type=1",
+                  ".*Device info at index 3. EUI64=\\(>\\)0400000000000000, type=1",
+                  ".*Device info at index 4. EUI64=\\(>\\)0500000000000000, type=1",
+                  ".*Device info at index 5. EUI64=\\(>\\)0600000000000000, type=1",
+                  ".*Device info at index 6. EUI64=\\(>\\)0700000000000000, type=1",
+                  ".*Device info at index 7. EUI64=\\(>\\)0800000000000000, type=1",
+                  ".*Device info at index 8. EUI64=\\(>\\)0900000000000000, type=1",
+                  ".*Device info at index 9. EUI64=\\(>\\)0A00000000000000, type=1",
+                  ".*Device info at index 10. EUI64=\\(>\\)0B00000000000000, type=1",
+                  ".*Device info at index 11. EUI64=\\(>\\)0C00000000000000, type=1",
+                  ".*Device info at index 12. EUI64=\\(>\\)0D00000000000000, type=1",
+                  ".*Device info at index 13. EUI64=\\(>\\)0E00000000000000, type=1",
+                  ".*Device info at index 14. EUI64=\\(>\\)0F00000000000000, type=1",
+                  ".*Device info at index 15. EUI64=\\(>\\)1000000000000000, type=1"
+                });
+
+send("commshub", "plugin gbcs-device-log store {00 00 00 00 00 00 00 11} 1");
+expect("commshub", ".*Error: Cannot add device to GBCS Device Log: Too many entries");
+
+// Comms Hub reboot to test bug:  EMAPPFWKV2-1267
+reboot("commshub");
+networkWait(5000);
+
+// There should be no tunnels.
+expect("commshub",
+       "plugin tunneling-client print",
+       "0 of \\d+ tunnels in use.");
+
+// Normally the Device log would be stored across reboot but our simple
+// implementation is not persisent.  Thus we add it to the list again after
+// reboot.
+send("commshub", "plugin gbcs-device-log store {" + emeterEUI64 + "} 1");
+
+// Every 10 seconds we examine the device log to see if there is a tunnel
+// to an emeter that needs to be created.
+networkWait(12000);
+
+// There should be a new tunnel.
+expect("commshub",
+       "plugin tunneling-client print",
+       "1 of \\d+ tunnels in use.");
+
+//------------------------------------------------------------------------------
+// JIRA EMAPPFWKV2-1392: CH Event handler was not registered and was not working properly
+// JIRA EMAPPFWKV2-1421: CH is not requesting for new tunnel when it receives request
+//response with status busy.
+
+send("commshub", "plugin comms-hub-function close-tunnel {" + emeterEUI64 + "}");
+expect("emeter", "plugin tunneling-server busy", ".*current status is BUSY.*"); //set server-busy status
+expectMultiline("commshub",
+                "plugin comms-hub-function create-tunnel {" + emeterEUI64 + "} 0x01",
+                new String[]{
+                ".*CHF: Busy status received from node ID.*"
+                },timeout*10);
+
+expect("commshub", "plugin comms-hub-function print", ".*" + emeterNodeId + ".*request-pending.*"); //request-pending
+expect("emeter", "plugin tunneling-server busy", ".*current status is NOT BUSY.*"); //toggle status back
+networkWait(200000);	//wait atleast 3 mins to re-request tunnel
+expect("commshub", "plugin comms-hub-function print", ".*" + emeterNodeId + ".*active.*");
+//-----------------------------------------------------------------------------

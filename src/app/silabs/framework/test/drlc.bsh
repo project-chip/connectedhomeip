@@ -1,0 +1,2104 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for host and multihop****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"esi", "router", "pct", "ihd"};
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/SePct-simulation/SePct",
+  "build/af-test-apps/Se12Ihd-simulation/Se12Ihd"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/SePct-simulation-ezsp/SePct",
+  "build/af-test-apps/Se12Ihd-simulation-ezsp/Se12Ihd"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 0;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+networkWait(timeout*5);
+
+String esiId = nodeId("esi");
+String pctId = nodeId("pct");
+String ihdId = nodeId("ihd");
+
+
+void checkReportEventStatus(String transmitter,
+                            String eventIdInHex,
+                            String commandStatus,
+                            String criticalLevel,
+                            String eventControl,
+                            int timeout)
+{
+  _expectMultiline(transmitter,
+                   "",    // command
+                   new String[] {
+                     ".*= TX Report Event Status =",
+                     "  eid: " + eventIdInHex,
+                     // If no commandStatus is passed, we must add a regex so we match
+                     // to the end of the line.  expectMultiline() doesn't allow
+                     // unmatched characters before the next line (by design). 
+                     "   es: " + (commandStatus == null ? ".*" : commandStatus),
+                     "  cla: " + criticalLevel,
+                     "   ec: " + eventControl,
+                   },
+                   timeout,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+}
+
+
+void checkReportEventStatusTransmitted(String transmitter,
+                                       String eventIdInHex,
+                                       String commandStatus,
+                                       int timeout)
+{
+  _expectMultiline(transmitter,
+                   "",    // command
+                   new String[] {
+                     "= TX Report Event Status =",
+                     "  eid: " + eventIdInHex,
+                     // If no commandStatus is passed, we must add a regex so we match
+                     // to the end of the line.  expectMultiline() doesn't allow
+                     // unmatched characters before the next line (by design). 
+                     "   es: " + (commandStatus == null ? ".*" : commandStatus),
+                   },
+                   timeout,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+}
+
+void checkReportEventStatusReceived(String receiver,
+                                    String eventIdInHex,
+                                    int timeout)
+{
+  _expectMultiline(receiver,
+                   "",    // command
+                   new String[] {
+                     "= RX Event Status =",
+                     "  eid: " + eventIdInHex
+                   },
+                   timeout,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+}
+
+
+//Test Demand Response Load Control
+send("pct", "write 0x01 0x0701 0x0003 0x00 0x21 {00 01}");
+send("esi", "zcl drlc lce 0 0 0 1 0");
+send("esi", "send " + pctId  + " 1 1");
+
+expectMultiline("pct",
+                "",    // command
+                new String[] {
+                  "= TX Report Event Status =",
+                  "  eid: 00000000",
+                  "   es: 01",
+                  "= TX Report Event Status =",
+                  "  eid: 00000000",
+                  "   es: 02",
+                  "= TX Report Event Status =",
+                  "  eid: 00000000",
+                  "   es: 03",
+                },
+                100000);
+
+networkWait(timeout*10);
+
+//Check scheduling of events on esi and retrieval from pct
+send("esi", "plugin drlc-server slce 0x01 0 23 { aa 00 00 00 ff 0f 00 00 00 00 00 01 00 01 00 00 09 1a 09 1a 0a 00 00 }");
+expect("esi", ".*DRLC event scheduled.*");
+
+networkWait(timeout*15); //let previous clear
+
+send("pct", "zcl drlc gse 0 1 0xFFFFFFFF");
+send("pct", "send 0 1 1");
+checkReportEventStatusTransmitted("pct",
+                                  "000000AA", // event id
+                                  null,       // command status (don't care)
+                                  3000);
+checkReportEventStatusReceived("esi",
+                               "000000AA", // event id
+                               3000);
+
+networkWait(timeout*10);
+
+//Check to make sure that clearing the scheduled table works as well.
+send("esi", "plugin drlc-server slce 0x01 0 23 { ab 00 00 00 ff 0f 00 00 00 00 00 01 00 01 00 00 09 1a 09 1a 0a 00 00 }");
+expect("esi", ".*DRLC event scheduled.*");
+send("esi",  "plugin drlc-server cslce 0x01");
+send("pct",  "zcl drlc gse 1 1 0xFFFFFFFF");
+send("pct",  "send 0 1 1");
+networkWait(timeout); 
+assert(network.expect("pct", port, null, "= TX Report Event Status =") == null);
+assert(network.expect("pct", port, null, "  eid: 000000AB") == null);
+
+networkWait(timeout*10);
+
+//Check scheduling and sending of scheduled load control event
+send("esi", "plugin drlc-server slce 0x01 0 23 { bb 00 00 00 ff 0f 00 00 00 00 00 01 00 01 00 00 09 1a 09 1a 0a 00 00 }");
+expect("esi", ".*DRLC event scheduled.*");
+send("esi", "plugin drlc-server sslce " + pctId + " 0x01 0x01 0");
+checkReportEventStatusTransmitted("pct",
+                                  "000000BB", // event id
+                                  null,       // command status (don't care)
+                                  3000);
+checkReportEventStatusReceived("esi",
+                               "000000BB", // event id
+                               3000);
+
+networkWait(timeout*10);
+
+// Test BUGZID 11958
+// Schedule an event to occur at time 800
+send("esi", "plugin drlc-server slce 0x01 0 23 { bc 00 00 00 ff 0f 00 20 03 00 00 FF 00 01 00 00 09 1a 09 1a 0a 00 00 }");
+expect("esi", ".*DRLC event scheduled.*");
+send("esi", "plugin drlc-server sslce " + pctId + " 0x01 0x01 0");
+checkReportEventStatusTransmitted("pct",
+                                  "000000BC", // event id
+                                  null,       // command status (don't care)
+                                  3000);
+checkReportEventStatusReceived("esi",
+                               "000000BC", // event id
+                               3000);
+
+// Schedule the event to be canceled at time 1000
+send("esi", "zcl drlc cl 0x000000bc 0xffff 0x00 0x00 0x000003E8");
+send("esi", "send " + pctId  + " 1 1");
+networkWait(timeout); assert(true);
+
+networkWait(timeout*10); //clear previous
+
+
+// Schedule the same event to occur at time 900
+send("esi", "plugin drlc-server slce 0x01 0 23 { bd 00 00 00 ff 0f 00 84 03 00 00 05 00 01 00 00 09 1a 09 1a 0a 00 00 }");
+expect("esi", ".*DRLC event scheduled.*");
+send("esi", "plugin drlc-server sslce " + pctId + " 0x01 0x01 0");
+expect("pct", "= TX Report Event Status =");
+expect("pct", "  eid: 000000BD");
+expect("esi", "= RX Event Status =");
+expect("esi", "  eid: 000000BD");
+
+networkWait(timeout*10); //clear previous
+
+//Check that event opt in and out works properly
+send("esi", "zcl drlc ca 0x00"); //clear
+send("esi", "send " + pctId  + " 1 1");
+send("esi", "zcl drlc lce 0x000000be 0 0 1 0");
+send("esi", "send " + pctId  + " 1 1");
+
+checkReportEventStatusTransmitted("pct",
+                                  "000000BE", // event id
+                                  null,       // command status (don't care)
+                                  3000);
+send("pct", "plugin drlc opt out 0x000000be");
+checkReportEventStatusReceived("esi",
+                               "000000BE", // event id
+                               3000);
+
+
+networkWait(timeout*10); 
+
+debugPrintln(" *** Test fail cases *** ");
+
+// schedule lce
+send("pct", "write 0x01 0x0701 0x0003 0x00 0x21 {00 01}");
+send("esi", "zcl drlc lce 0xbf 0 0 1 0");
+send("esi", "send " + pctId  + " 1 1");
+checkReportEventStatusTransmitted("pct",
+                                  "000000BF", // event id
+                                  "01",       // command status
+                                  3000);
+
+// schedule another with same eventid, should get default response and 
+// silent rejection.
+send("pct", "write 0x01 0x0701 0x0003 0x00 0x21 {00 01}");
+send("esi", "zcl drlc lce 0xbf 0 0 1 0");
+send("esi", "send " + pctId  + " 1 1");
+
+// We may get RES commands for the previous event but we should not get
+// "Rejected", as that is no longer the behavior for receipt of a duplicate
+// event.  Duplicate events are dropped and a
+// default response is sent with "duplicate exists".
+assert(network.expect("pct", port, null, "   ec: FE") == null);
+
+networkWait(50000); //let clear
+
+// clear all
+send("esi", "zcl drlc ca 0x00"); //clear all
+send("esi", "send " + pctId  + " 1 1");
+
+checkReportEventStatusTransmitted("pct",
+                                  "000000BF", // event id
+                                  "06",       // command status
+                                  20000);
+
+// clear all again should get default response
+send("esi", "zcl drlc ca 0x00"); //clear all
+send("esi", "send " + pctId  + " 1 1");
+expect("esi", ".*02 00.*");
+
+// change pct device class to 0x00 so it will reject drlc messages
+// pct and send nothing back.
+send("pct", "write 0x01 0x0701 0x0003 0x00 0x21 {00 00}");
+send("esi", "zcl drlc lce 0xc0 0 0 1 0");
+send("esi", "send " + pctId  + " 1 1");
+
+
+//// TESTS FOR GOLDEN UNIT STATUS - IHD, ESI
+String DRLC_EVENT_STATUS_RECEIVED   = "01";
+String DRLC_EVENT_STATUS_STARTED    = "02";
+String DRLC_EVENT_STATUS_COMPLETED  = "03";
+String DRLC_EVENT_STATUS_OPT_OUT    = "04";
+String DRLC_EVENT_STATUS_OPT_IN     = "05";
+String DRLC_EVENT_STATUS_CANCELLED  = "06";
+String DRLC_EVENT_STATUS_SUPERSEDED = "07";
+String DRLC_EVENT_STATUS_PART_OPT_OUT = "08";
+String DRLC_EVENT_STATUS_PART_OPT_IN  = "09";
+String DRLC_EVENT_STATUS_NO_PARTICIPATE = "0A";
+
+String DRLC_EVENT_STATUS_REJECT_INV_CMD   = "F8";
+String DRLC_EVENT_STATUS_REJECT_INV_TIME  = "F9";
+String DRLC_EVENT_STATUS_REJECT_EXPIRED_EVENT = "FB";
+String DRLC_EVENT_STATUS_REJECT_INV_CMD_UNDEF_EVT = "FD";
+String DRLC_EVENT_STATUS_REJECT_LCE_0xFE = "FE";
+
+
+String timeNow = timeSinceZigBeeEpoch( 0 );
+String timeIn1Min = timeSinceZigBeeEpoch( 1 );
+String timeIn2Mins = timeSinceZigBeeEpoch( 2 );
+String timeIn4Mins = timeSinceZigBeeEpoch( 4 );
+String timeIn5Mins = timeSinceZigBeeEpoch( 5 );
+String timeIn10Mins = timeSinceZigBeeEpoch( 10 );
+String timeIn15Mins = timeSinceZigBeeEpoch (15 );
+String timeIn20Mins = timeSinceZigBeeEpoch( 20 );
+
+void SendLoadControlEvent( String destNode, int srcEndpoint, int dstEndpoint, int index,
+                           int eventId, int deviceClass, int utilityEnrollmentGroup, 
+                           String startTime, int durationMins, 
+                           int criticalityLevel, int eventControl ){
+  send( "esi",
+        "plugin drlc-server lce-schedule-mand " + srcEndpoint + " " + index +
+        " " + eventId + " " + deviceClass + " " + utilityEnrollmentGroup +
+        " " + startTime + " " + durationMins + " " + criticalityLevel +
+        " " + eventControl);
+  expect("esi", ".*DRLC event scheduled.*");
+  send("esi", "plugin drlc-server sslce " + destNode + " " + srcEndpoint + " " + dstEndpoint + " " + index);
+}
+
+void ResetLoadControlEventTables(){
+  send("esi", "plugin drlc-server cslce 0x01");
+  send("ihd", "plugin drlc clear 0x01");
+  networkWait( 100 );
+}
+
+
+
+void ResyncTime( int updateZigBee ){
+  // Update time on all devices to current time.
+  //if( updateZigBee > 0 ){
+    send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+    networkWait(1000);
+    send("ihd", "timesync 0 1 1");
+    send("pct", "timesync 0 1 1");
+  //}
+
+  timeNow     = timeSinceZigBeeEpoch( 0 );
+  timeIn1Min  = timeSinceZigBeeEpoch( 1 );
+  timeIn2Mins = timeSinceZigBeeEpoch( 2 );
+  timeIn4Mins = timeSinceZigBeeEpoch( 4 );
+  timeIn5Mins = timeSinceZigBeeEpoch( 5 );
+  timeIn10Mins = timeSinceZigBeeEpoch( 10 );
+  timeIn15Mins = timeSinceZigBeeEpoch (15 );
+  timeIn20Mins = timeSinceZigBeeEpoch( 20 );
+  networkWait( 2000 );
+}
+
+
+//  Test 10.5 - Load Control Event
+// =============================================================
+
+// Item 1 - ESI sends an LCE, start=0, duration=2mins
+//send("esi", "plugin drlc-server cslce 0x01");
+//send("ihd", "plugin drlc clear 0x01");
+//networkWait( 100 );
+ResetLoadControlEventTables();
+
+SendLoadControlEvent( ihdId, 1, 1, 0, 0x00050001, 0x7FF, 0x00, "0x00000000", 2, 1, 0x00 );
+
+// Item 2 - IHD sends Report Status, stat=01 (RX), crit=1, evtCtrl=0
+//checkReportEventStatusTransmitted("ihd", "00050001", DRLC_EVENT_STATUS_RECEIVED, 3000);
+//checkReportEventStatusReceived("esi", "00050001", 3000);
+
+checkReportEventStatus( "ihd",
+                        "00050001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00050001", 3000);
+
+// Item 3 - IHD sends Report Status, stat=2 (START), crit=1, evtCtrl=0.
+checkReportEventStatus( "ihd",
+                        "00050001",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00050001", 3000);
+
+// Item 4 - 2 mins later, IHD sends Report Status, stat=03 (COMPLETED), crit=1, evtCtrl=0.
+networkWait( 119 * 1000);
+checkReportEventStatus( "ihd",
+                        "00050001",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        5000 );
+checkReportEventStatusReceived("esi", "00050001", 3000);
+
+
+
+
+//  Test 10.6 - LCE with Mismatched Device Class
+// =============================================================
+
+// Item 1 - ESI sends LCE, class mismatched, start=NOW, duration=2mins.
+//ResetLoadControlEventTables();
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00060001, 0x400, 0x00, "0x00000000", 2, 1, 0x00 );
+expect("ihd", ".*Neither UEG nor Device class matched.  Ignoring.*");
+
+// Item 2 - No Report Event Status returned.
+
+
+
+//  Test 10.7 - Cancelled LCE
+// =============================================================
+
+// Item 1 - ESI sends LCE, start in 1 minute, duration=2 mins.
+ResyncTime( 1 );
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00070001, 0x7FF, 0x00, timeIn1Min, 2, 1, 0x00 );
+
+// Item 2 - Client sends Report Event Status, stat=0x01 (RECVD).
+checkReportEventStatus( "ihd",
+                        "00070001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00070001", 3000);
+
+// Item 3 - 1 min later, Client sends Report Stat, stat=0x02 (START).
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "00070001",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        8000 );
+checkReportEventStatusReceived("esi", "00070001", 3000);
+
+// Item 4 - Server sends Cancel LCE, start=NOW.
+// Zcl Cancel CLI:  evtId, class, UEG, cancelCtrl, effectTime
+send("esi", "zcl drlc cl 0x00070001 0x7FF 0x00 0x00 0x00000000");
+send("esi", "send " + ihdId + " 1 1");
+
+// Item 5 - Client sends Report Evt Status - stat=0x06 (Cancelled)
+checkReportEventStatus( "ihd",
+                        "00070001",
+                        DRLC_EVENT_STATUS_CANCELLED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00070001", 3000);
+
+
+//--------------------  NEXT EVENT
+
+// Item 6 - ESI sends LCE, start in 1 minute, duration=2 mins.
+ResyncTime( 1 );
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00070006, 0x7FF, 0x00, timeIn1Min, 2, 1, 0x00 );
+
+// Item 7 - Client sends Report Evt Status, stat=0x01 (Recvd)
+checkReportEventStatus( "ihd",
+                        "00070006",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00070006", 3000);
+
+
+// Item 8 - 1 min later, Client sends Report Stat, stat=0x02 (START).
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "00070006",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "00070006", 3000);
+
+// Item 9 - Server sends Cancel LCE, start=NOW, class MISMATCH
+// Zcl Cancel CLI:  evtId, class, UEG, cancelCtrl, effectTime
+send("esi", "zcl drlc cl 0x00700006 0x400 0x00 0x00 0x00000000");
+send("esi", "send " + ihdId + " 1 1");
+
+// Item 10 - After 2 mins, client sends Report Stat, stat=0x03 (Completed)
+networkWait( 118 * 1000 );
+checkReportEventStatus( "ihd",
+                        "00070006",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        7000 );
+checkReportEventStatusReceived("esi", "00070006", 3000);
+
+
+
+//  Test 10.9 - Multiple LCEs
+// =============================================================
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+
+// Item 1 - Server sends LCE, start=NOW, dur=2mins
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00090001, 0x7FF, 0x00, timeNow, 2, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "00090001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00090001", 3000);
+
+// Item 3 - Client sends Report, stat=0x02 (STARTED)
+checkReportEventStatus( "ihd",
+                        "00090001",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00090001", 3000);
+
+// Item 4 - Server sends LCE, start=NOW+4mins, dur=2mins
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00090004, 0x7FF, 0x00, timeIn4Mins, 2, 1, 0x00 );
+
+// Item 5 - Client sends RES, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "00090004",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00090004", 3000);
+
+// Item 6 - After 2 mins, Client sends RES, stat=0x03 (COMPLT)
+networkWait( 118 * 1000 );
+checkReportEventStatus( "ihd",
+                        "00090001",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        7000 );
+checkReportEventStatusReceived("esi", "00090001", 3000);
+
+
+// Item 7 - After 2 more mins, Client sends RES, stat=0x02 (STARTED)
+networkWait( 115 * 1000 );
+checkReportEventStatus( "ihd",
+                        "00090004",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "00090004", 3000);
+
+// Item 8 - After 2 more mins, Client sends RES, stat=0x03 (COMPLT)
+networkWait( 118 * 1000 );
+checkReportEventStatus( "ihd",
+                        "00090004",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        7000 );
+checkReportEventStatusReceived("esi", "00090004", 3000);
+
+
+
+//  Test 10.10 - Overlap Running LCEs
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+
+// Item 1 - Server sends LCE, start=NOW, dur=2mins
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000A0001, 0x7FF, 0x00, "0x00000000", 2, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000A0001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000A0001", 3000);
+
+// Item 3 - Client sends Report, stat=0x02 (STARTED)
+checkReportEventStatus( "ihd",
+                        "000A0001",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000A0001", 3000);
+
+
+//-------------------    SUPERSEDING EVENT
+// Item 4 - Server sends another LCE, start<10sec from now, dur=2mins
+///  Not sure how to get "NOW + 10 sec" timestamp, so make 1 minute from now...
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000A0004, 0x7FF, 0x00, timeIn1Min, 2, 1, 0x00 );
+
+// Item 5 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000A0004",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000A0004", 3000);
+
+
+// Item 6 - Client sends Report, stat=0x07 (SUPERSED)
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "000A0001",
+                        DRLC_EVENT_STATUS_SUPERSEDED,
+                        "01",
+                        "00",
+                        8000 );
+checkReportEventStatusReceived("esi", "000A0001", 3000);
+
+// Item 7 - Client sends Report, stat=0x02 (STARTED)
+checkReportEventStatus( "ihd",
+                        "000A0004",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000A0004", 3000);
+
+// Item 8 - After 2 mins, client sends RES, stat=0x03 (COMPLT)
+networkWait( 118 * 1000 );
+checkReportEventStatus( "ihd",
+                        "000A0004",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        7000 );
+checkReportEventStatusReceived("esi", "000A0004", 3000);
+
+
+
+
+
+//  Test 10.11 - Overlap Future LCE
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+
+// Item 1 - Server sends LCE, start=NOW+4mins, dur=2mins
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000B0001, 0x7FF, 0x00, timeIn4Mins, 2, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000B0001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000B0001", 3000);
+
+// Item 3 - Before 4 mins, send LCE start 1 min after event in #1, dur=1min
+networkWait( 15 * 1000 );
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000B0003, 0x7FF, 0x00, timeIn5Mins, 1, 1, 0x00 );
+
+// Item 4 - Client sends RES, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000B0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+// Since client is sending RECV + SUPERSEDED, this is not reliable - may arrive after SUPERSEDED is sent.
+//checkReportEventStatusReceived("esi", "000B0003", 3000);
+
+
+
+// Item 5 - Client sends RES, stat=0x07 (SUPERSED)
+// Note first event (id=0x0B0001) has not started yet - it was scheduled to start in the future.
+checkReportEventStatus( "ihd",
+                        "000B0001",
+                        DRLC_EVENT_STATUS_SUPERSEDED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000B0001", 3000);
+
+// Item 6 - Once time in #3 is reached, client sends RES, stat=0x02 (STARTD)
+// 15 seconds elapsed in #3 already, still need 4.75 mins, or 285 seconds
+networkWait( 280 * 1000 );
+checkReportEventStatus( "ihd",
+                        "000B0003",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "000B0003", 3000);
+
+// Item 7 - After 1 min, client sends RES, stat=0x03 (COMPLT)
+networkWait( 58000 );
+checkReportEventStatus( "ihd",
+                        "000B0003",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        7000 );
+checkReportEventStatusReceived("esi", "000B0003", 3000);
+
+
+
+//  Test 10.12 - LCE with User Opt-Out
+// =============================================================
+
+//ResetLoadControlEventTables();
+ResyncTime( 0 );
+// Item 1 - Server sends LCE, start=NOW+1min, dur=1min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000C0001, 0x7FF, 0x00, timeIn1Min, 1, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000C0001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000C0001", 3000);
+
+// Item 3 - Client sends RES, stat=0x04 (Opt-Out)
+send("ihd", "plugin drlc opt out 1 0x000C0001");
+checkReportEventStatus( "ihd",
+                        "000C0001",
+                        DRLC_EVENT_STATUS_OPT_OUT,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000C0001", 3000);
+
+// Item 4 - 1 min after start time, Client sends RES, stat=0x0A (NO_PARTICIP)
+networkWait( 115 * 1000 );
+checkReportEventStatus( "ihd",
+                        "000C0001",
+                        DRLC_EVENT_STATUS_NO_PARTICIPATE,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "000C0001", 3000);
+
+
+
+
+
+
+//  Test 10.13 - Cancel All LCEs
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+
+// Item 1 - Server sends LCE, start=NOW+2mins, dur=1min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000D0001, 0x7FF, 0x00, timeIn2Mins, 1, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000D0001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000D0001", 3000);
+
+// Item 3 - Server sends LCE, start=NOW+10mins, dur=1min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000D0003, 0x7FF, 0x00, timeIn10Mins, 1, 1, 0x00 );
+
+// Item 4 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000D0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000D0003", 3000);
+
+// Item 5 - Server sends LCE, start=NOW+20mins, dur=1min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000D0005, 0x7FF, 0x00, timeIn20Mins, 1, 1, 0x00 );
+
+// Item 6 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000D0005",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000D0005", 3000);
+
+// Item 7 - Server sends Cancel ALL LCEs, ctrl=0x00 (terminate immediately)
+send("esi", "zcl drlc ca 0");
+send("esi", "send " + ihdId + " 1 1");
+
+// Item 8 - Client sends 3 RES with stat=0x06 (CANCELLED) - one for each event.
+// NOTE:  The RES msgs can be sent in any order.  The following is from quick observation
+// on how our system behaves.
+
+checkReportEventStatus( "ihd",
+                        "000D0001",
+                        DRLC_EVENT_STATUS_CANCELLED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000D0001", 3000);
+
+checkReportEventStatus( "ihd",
+                        "000D0003",
+                        DRLC_EVENT_STATUS_CANCELLED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000D0003", 3000);
+
+checkReportEventStatus( "ihd",
+                        "000D0005",
+                        DRLC_EVENT_STATUS_CANCELLED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000D0005", 3000);
+
+
+
+
+//  Test 10.14 - LCE and Cancel Event Out of Order
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+
+// Item 1 - Server sends LCE, start=NOW+1min, dur=2mins
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x000E0001, 0x7FF, 0x00, "0x00000000" , 2, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "000E0001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000E0001", 3000);
+
+// Item 3 - Clent sends RES, stat=0x02 (STARTED)
+checkReportEventStatus( "ihd",
+                        "000E0001",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000E0001", 3000);
+
+
+// Item 4 - After 2 mins, Client sends RES, stat=0x03 (COMPLETED)
+networkWait( 118 * 1000 );
+checkReportEventStatus( "ihd",
+                        "000E0001",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        7000 );
+checkReportEventStatusReceived("esi", "000E0001", 3000);
+
+// Item 5 - Server sends Cancel LCE, time=0 (NOW), ctrl=0.
+send("esi", "zcl drlc cl 0x000E0001 0x7FF 0x00 0x00 0x00000000");
+send("esi", "send " + ihdId + " 1 1");
+
+// Item 6 - Client sends RES, stat=0xFD (reject - inv cancel cmd)
+checkReportEventStatus( "ihd",
+                        "000E0001",
+                        DRLC_EVENT_STATUS_REJECT_INV_CMD_UNDEF_EVT,
+                        "00",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000E0001", 3000);
+
+// Item 7 - Server sends Cancel LCE, time=0 (NOW), ctrl=0.   This time use random event ID.
+send("esi", "zcl drlc cl 0x000E0007 0x7FF 0x00 0x00 0x00000000");
+send("esi", "send " + ihdId + " 1 1");
+
+// Item 6 - Client sends RES, stat=0xFD (reject - inv cancel cmd)
+checkReportEventStatus( "ihd",
+                        "000E0007",
+                        DRLC_EVENT_STATUS_REJECT_INV_CMD_UNDEF_EVT,
+                        "00",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "000E0007", 3000);
+
+
+//  Test 10.16 - LCEs Out of Order
+// =============================================================
+//   NOTE:  The test spec uses start times that are being replaced to land on minute boundaries.
+//   These replacements are as follows:
+//   TEST SPEC        ||  IMPLEMENTATION
+//   NOW + 210 sec    ||  NOW + 4 mins
+//   NOW + 140 sec    ||  NOW + 2 mins
+//   NOW              ||  NOW
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+
+// Item 1 - Server sends LCE, start=NOW+4min, dur=1min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00100001, 0x7FF, 0x00, timeIn4Mins, 1, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "00100001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00100001", 3000);
+
+
+// Item 3 - Server sends LCE, start=NOW+4min, dur=1min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00100003, 0x7FF, 0x00, timeIn2Mins, 1, 1, 0x00 );
+
+// Item 4 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "00100003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00100003", 3000);
+
+
+// Item 5 - Server sends LCE, start=NOW+4min, dur=1min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00100005, 0x7FF, 0x00, "0x00000000", 1, 1, 0x00 );
+
+// Item 6 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "00100005",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+// Since client is sending RECV + STARTED, this may arrive out of order.   Not reliable, so remove.
+//checkReportEventStatusReceived("esi", "00100005", 3000);
+
+// Item 7 - Client sends Report, stat=0x02 (STARTD)
+checkReportEventStatus( "ihd",
+                        "00100005",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00100005", 3000);
+
+// Item 8 - After 1 min, Client sends Report, stat=0x03 (COMPLTD)
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "00100005",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "00100005", 3000);
+
+// Item 9 - After 1 more min, 2nd event starts
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "00100003",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "00100003", 3000);
+
+// Item 10 - After 1 min, 2nd event completes.
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "00100003",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "00100003", 3000);
+
+
+// Item 11 - After 1 more min, 3rd event starts
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "00100001",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "00100001", 3000);
+
+// Item 12 - After 1 min, 3rd event completes.
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "00100001",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "00100001", 3000);
+
+
+
+//  Test 10.17 - LCEs with Duplicate Event IDs
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+
+// Item 1 - Server sends LCE, start=NOW, dur=1min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00110001, 0x7FF, 0x00, "0x00000000" , 1, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "00110001",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00110001", 3000);
+
+// Item 3 - Clent sends RES, stat=0x02 (STARTED)
+checkReportEventStatus( "ihd",
+                        "00110001",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00110001", 3000);
+
+// Item 4 - Server sends LCE, start=NOW+1min, dur=1min.  Same event ID as in #1.
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00110001, 0x7FF, 0x00, timeIn1Min , 1, 1, 0x00 );
+
+// Item 5 - After 1 min, Clent sends RES, stat=0x03 (COMPLETED)
+networkWait( 55000 );
+checkReportEventStatus( "ihd",
+                        "00110001",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        10000 );
+checkReportEventStatusReceived("esi", "00110001", 3000);
+
+
+
+//  Test 10.18 - LCEs with Reserved Device Class
+// =============================================================
+
+ResetLoadControlEventTables();
+
+// Item 1 - Server sends LCE, start=NOW, dur=2mins.   Invalid Device Class.
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00120001, 0xF000, 0x00, "0x00000000", 2, 1, 0x00 );
+
+// Client MAY send default response, but no Report Event Status.
+expect("ihd", ".*Neither UEG nor Device class matched.  Ignoring.*");
+
+
+
+//  Test 10.19 - LCE with Reserved Criticality Level
+// =============================================================
+
+ResetLoadControlEventTables();
+
+// Item 1 - Server sends LCE, start=NOW, dur=1min.  CriticalLevel=0x2F (Reserved)
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00130001, 0x7FF, 0x00, "0x00000000", 1, 0x2F, 0x00 );
+
+// Client MAY send default response, but no Report Event Status.
+expect("ihd", ".*Reserved criticality level.  Ignoring.*");
+
+
+
+//  Test 10.23 - LCE with Erroneous End Time
+// =============================================================
+
+String time3MinsAgo = timeSinceZigBeeEpoch( -3 );
+
+// Item 1 - Server sends LCE, start=3 mins ago, dur=2min
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00170001, 0x7FF, 0x00, time3MinsAgo, 2, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0xFB (EXPIRED_EVENT)
+checkReportEventStatus( "ihd",
+                        "00170001",
+                        DRLC_EVENT_STATUS_REJECT_EXPIRED_EVENT,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00170001", 3000);
+
+
+
+//  Test 10.24 - LCE with Erroneous Duration
+// =============================================================
+
+// Item 1 - Server sends LCE, start=NOW, dur=1500min (0x5DC)
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00180001, 0x7FF, 0x00, "0x00000000", 0x5DC, 1, 0x00 );
+
+// Item 2 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "00180001",
+                        DRLC_EVENT_STATUS_REJECT_LCE_0xFE,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00180001", 3000);
+
+
+//  Test 10.25 - LCE with UEG Codes
+// =============================================================
+
+//ResetLoadControlEventTables();
+ResyncTime( 0 );
+
+
+// Item 1 - Write UEG on Client to 0x01   (attribId=0x0000, type=U8=0x20)
+send("esi", "zcl global direction 1");
+send("esi", "zcl global write 0x0701 0x0000 0x20 {01}");
+send("esi", "send " + ihdId + " 1 1");
+
+// Item 2 - Read UEG from Client.  Ensure it returns 0x00.
+send("esi", "zcl global read 0x0701 0x0000");
+send("esi", "send " + ihdId + " 1 1");
+expect("esi", ".*RX len 8, ep 01, clus 0x0701 \\(Demand Response and Load Control\\) FC 00 seq .. cmd 01 payload\\[00 00 00 .. 01.*");
+
+
+// Item 3 - Server sends LCE, start=NOW, dur=2mins, UEG=0
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x00190003, 0x7FF, 0x00, "0x00000000" , 2, 1, 0x00 );
+
+// Item 4 - Client sends Report, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "00190003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+// Since client is sending RECV + STARTED, this may arrive out of order.   Not reliable, so remove.
+//checkReportEventStatusReceived("esi", "00190003", 3000);
+
+// Item 5 - Clent sends RES, stat=0x02 (STARTED)
+checkReportEventStatus( "ihd",
+                        "00190003",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00190003", 3000);
+
+// Item 6 - Server sends Cancel Load Control Event
+send("esi", "zcl drlc cl 0x00190003 0x7FF 0x00 0x00 0x00000000");
+send("esi", "send " + ihdId + " 1 1");
+
+// Item 7 - Client sends RES, stat=0x06 (CANCELLED)
+checkReportEventStatus( "ihd",
+                        "00190003",
+                        DRLC_EVENT_STATUS_CANCELLED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "00190003", 3000);
+
+// Item 8-9, DELETED
+
+// Item 10 - Server sends LCE, start=now, dur=2mins, UEG=0x01
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x0019000A, 0x7FF, 0x01, "0x00000000" , 2, 1, 0x00 );
+
+// Item 11 - Client sends RES, stat=0x01 (RECVD)
+checkReportEventStatus( "ihd",
+                        "0019000A",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "0019000A", 3000);
+
+// Item 12 - Clent sends RES, stat=0x02 (STARTED)
+checkReportEventStatus( "ihd",
+                        "0019000A",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "0019000A", 3000);
+
+// Item 13 - Server sends Cancel Load Control Event
+send("esi", "zcl drlc cl 0x0019000A 0x7FF 0x01 0x00 0x00000000");
+send("esi", "send " + ihdId + " 1 1");
+
+// Item 14 - Client sends RES, stat=0x06 (CANCELLED)
+checkReportEventStatus( "ihd",
+                        "0019000A",
+                        DRLC_EVENT_STATUS_CANCELLED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "0019000A", 3000);
+
+
+// Item 15 - Write UEG on Client to 0x02   (attribId=0x0000, type=U8=0x20)
+send("esi", "zcl global direction 1");
+send("esi", "zcl global write 0x0701 0x0000 0x20 {02}");
+send("esi", "send " + ihdId + " 1 1");
+expect("esi", ".*RX len 4, ep 01, clus 0x0701 \\(Demand Response and Load Control\\) FC 00 seq .. cmd 04 payload\\[00 \\]");
+
+// Item 16 - Read UEG from Client.  Ensure it returns 0x00.
+send("esi", "zcl global read 0x0701 0x0000");
+send("esi", "send " + ihdId + " 1 1");
+expect("esi", ".*RX len 8, ep 01, clus 0x0701 \\(Demand Response and Load Control\\) FC 00 seq .. cmd 01 payload\\[00 00 00 .. 02.*");
+
+// Item 17 - Send LCE with start=NOW, dur=1min, UEG=0xAA
+SendLoadControlEvent( ihdId, 1, 1, 0,  0x0019000A, 0x7FF, 0xAA, "0x00000000" , 2, 1, 0x00 );
+expect("ihd", ".*Neither UEG nor Device class matched.  Ignoring.*");
+
+
+// Restore Default UEG, and set ZCL Global Direction for future read/write commands.
+send("esi", "zcl global write 0x0701 0x0000 0x20 {00}");
+send("esi", "send " + ihdId + " 1 1");
+send("esi", "zcl global direction 0");
+
+
+
+//  Test 10.26 - Get Scheduled Events
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+  //send( "esi",
+    //    "plugin drlc-server lce-schedule-mand " + srcEndpoint + " " + index +
+      //  " " + eventId + " " + deviceClass + " " + utilityEnrollmentGroup +
+        //" " + startTime + " " + durationMins + " " + criticalityLevel +
+        //" " + eventControl);
+
+String timeIn1Day = timeSinceZigBeeEpoch( 60 * 24 );
+String timeIn2Days = timeSinceZigBeeEpoch( 60 * 48 );
+String timeIn3Days = timeSinceZigBeeEpoch( 60 * 72 );
+
+// Item 0.2 - Schedule LCE start=NOW+1day, dur=10mins
+send("esi", "plugin drlc-server lce-schedule-mand 1 0 0x001A0002 0x7FF 0x00 " + timeIn1Day + " 10 1 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+
+// Item 0.3 - Schedule LCE start=NOW+3days, dur=10mins
+send("esi", "plugin drlc-server lce-schedule-mand 1 1 0x001A0003 0x7FF 0x00 " + timeIn3Days + " 10 1 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+networkWait( 3000 );
+
+// Item 1 - Client sends GSE, start=NOW, num=0
+send("ihd", "zcl drlc gse 0x00000000 0x00 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// Items 2-3 - Client recieves both events, 
+checkReportEventStatus( "ihd",
+                        "001A0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+
+if (!runArgument.runUsingMultihop){
+  // Since client is sending RECV + STARTED, this may arrive out of order.   Not reliable, so remove.
+  checkReportEventStatus( "ihd",
+                          "001A0003",
+                          DRLC_EVENT_STATUS_RECEIVED,
+                          "01",
+                          "00",
+                          3000 );
+
+  // This may arrive out-of-order - remove it.
+  //checkReportEventStatusReceived("esi", "001A0002", 3000);
+
+  checkReportEventStatusReceived("esi", "001A0003", 3000);
+}
+
+// Item 4 - Client sends GSE, start=NOW, num=1
+// First, clear client LCE table to make sure it sends "Received" status so we know it go the event.
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+send("ihd", "zcl drlc gse 0x00000000 0x01 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// Item 5 - Server sends LCE from step 0.2
+checkReportEventStatus( "ihd",
+                        "001A0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001A0002", 3000);
+
+// Item 6 - Client sends GSE, start=NOW, num=1
+// First, clear client LCE table to make sure it sends "Received" status so we know it go the event.
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+send("ihd", "zcl drlc gse " + timeIn2Days + " 0x00 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// Item 7 - Server sends LCE from step 0.3
+checkReportEventStatus( "ihd",
+                        "001A0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001A0003", 3000);
+
+
+
+
+//  Test 10.28 - Get Scheduled Events Start Time
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+String timeIn1Hr = timeSinceZigBeeEpoch( 60 );
+networkWait( 100 );
+
+  //send( "esi",
+    //    "plugin drlc-server lce-schedule-mand " + srcEndpoint + " " + index +
+      //  " " + eventId + " " + deviceClass + " " + utilityEnrollmentGroup +
+        //" " + startTime + " " + durationMins + " " + criticalityLevel +
+        //" " + eventControl);
+
+// Item 0.2 - Configure LCE start=NOW, duration=10
+// NOW is no longer 0 (CCB 1297)
+send("esi", "plugin drlc-server lce-schedule-mand 1 0 0x001C0002 0x7FF 0x00 " + timeNow + " 10 1 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+
+// Item 0.3 - Configure LCE start=NOW+1hr, dur=10 mins, crit=2
+send("esi", "plugin drlc-server lce-schedule-mand 1 1 0x001C0003 0x7FF 0x00 " + timeIn1Hr + " 10 2 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+networkWait( 100 );
+
+// Item 1 - Client sends GSE, start=0, num=1
+send("ihd", "zcl drlc gse 0x00000000 0x01 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// Item 2 - Server sends LCE from 0.2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Item 3 - Client sends GSE, start=currTime, num=1
+// First, clear client LCE table to make sure it sends "Received" status so we know it go the event.
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+send("ihd", "zcl drlc gse " + timeNow + " 0x01 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// Item 4 - Server sends LCE from 0.2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+
+//  Test 10.29 - Get Scheduled Events + 1
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+String time1MinAgo = timeSinceZigBeeEpoch(-1);
+String time2MinAgo = timeSinceZigBeeEpoch(-2);
+networkWait( 100 );
+
+// 10.29.2 Item 2 - Configure LCE start=NOW-1minute, duration=10
+send("esi", "plugin drlc-server lce-schedule-mand 1 0 0x001C0002 0x7FF 0x00 " + time1MinAgo + " 10 1 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+
+// 10.29.3 Item 1 - Client sends GSE, start=0, num=0
+send("ihd", "zcl drlc gse 0x00000000 0x00 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.29.3 Item 2 - Server sends LCE from 10.29.2 Item 2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.29.3 Item 3 - Client sends GSE, start=NOW-2minutes, num=0
+send("ihd", "zcl drlc gse " + time2MinAgo + " 0x00 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.29.3 Item 4 - Server sends LCE from 10.29.2 Item 2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.29.3 Item 5 - Client sends GSE, start=10.29.2 Item 2, num=0
+send("ihd", "zcl drlc gse " + time1MinAgo + " 0x00 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.29.3 Item 6 - Server sends LCE from 10.29.2 Item 2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.29.3 Item 7 - Client sends GSE, start=NOW, num=0
+send("ihd", "zcl drlc gse " + timeNow + " 0x00 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.29.3 Item 8 - Server sends DefaultResponse with NOT_FOUND
+// TODO: nothing is printed, can't check
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.29.3 Item 9 - already done in Item 5
+
+// 10.29.3 Item 10 - already done in Item 6
+
+// 10.29.3 Item 11 - Client sends GSE, start=10.29.2 Item 2, num=0, eventId=10.29.2 Item 2
+send("ihd", "zcl drlc gse " + time1MinAgo + " 0x00 0x001C0002");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.29.3 Item 12 - Server sends LCE from 10.29.2 Item 2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.29.3 Item 13 - Client sends GSE, start=10.29.2 Item 2, num=0, eventId>10.29.2 Item 2
+send("ihd", "zcl drlc gse " + time1MinAgo + " 0x00 0x001C0003");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.29.3 Item 8 - Server sends DefaultResponse with NOT_FOUND
+// Nothing is printed, can't check
+
+//  Test 10.30 - Get Scheduled Events + 2
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.30.2 Item 2 - Configure LCE start=NOW+1hr, duration=10
+send("esi", "plugin drlc-server lce-schedule-mand 1 0 0x001C0002 0x01 0x01 " + timeIn1Hr + " 10 1 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+networkWait(100);
+
+// 10.30.2 Item 3 - Configure LCE start=NOW+1hr, duration=10, higher event ID, different Device Class and UEG
+send("esi", "plugin drlc-server lce-schedule-mand 1 1 0x001C0003 0x02 0x02 " + timeIn1Hr + " 10 1 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+networkWait(100);
+
+// 10.30.3 Item 1 - Client sends GSE, start=now, num=0
+send("ihd", "zcl drlc gse " + timeNow + " 0x00 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.30.3 Item 2 - Server sends LCE from 10.30.2 Item 2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+
+// 10.30.3 Item 3 - Server sends LCE from 10.30.2 Item 3
+// The second event will print a message indicating that the Device Class and/or
+// UEG doesn't apply. Ignore it, as timing will sometimes put it after the next
+// checkReportEventStatusReceived that we're about to expect
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.30.3 Item 4 - Client sends GSE, start=now, num=1
+send("ihd", "zcl drlc gse " + timeNow + " 0x01 0xFFFFFFFF");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.30.3 Item 5 - Server sends LCE from 10.30.2 Item 2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.30.3 Item 6 - Client sends GSE, start=IC2, num=1, eventId=IC2
+send("ihd", "zcl drlc gse " + timeIn1Hr + " 0x01 0x001C0002");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.30.3 Item 7 - Server sends LCE from 10.30.2 Item 2
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.30.3 Item 8 - Client sends GSE, start=IC2, num=1, eventId=IC3
+send("ihd", "zcl drlc gse " + timeIn1Hr + " 0x01 0x001C0003");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.30.3 Item 9 - Server sends LCE from 10.30.2 Item 3
+// Having a different Device Class and UEG, check for the ignore message instead
+expect("ihd", "Neither UEG nor Device class matched.  Ignoring.", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.30.3 Item 10 - Client sends GSE, start=IC2, num=1, eventId>IC3
+send("ihd", "zcl drlc gse " + timeIn1Hr + " 0x00 0x001C0004");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.30.3 Item 11 - Server sends DefaultResponse with NOT_FOUND
+// Nothing is printed, can't check
+
+//  Test 10.31 - Get Scheduled Events + 3
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.31.2 Item 2 - Configure LCE start=NOW+2min, duration=10
+send("esi", "plugin drlc-server lce-schedule-mand 1 0 0x001C0002 0x7FF 0x00 " + timeIn2Mins + " 10 1 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+networkWait(100);
+
+// 10.31.2 Item 3 - Configure LCE start=NOW+1min, duration=10, higher event ID
+send("esi", "plugin drlc-server lce-schedule-mand 1 1 0x001C0003 0x7FF 0x00 " + timeIn1Min + " 10 1 0x00");
+expect("esi", ".*DRLC event scheduled.*");
+networkWait(100);
+
+// 10.31.3 Item 1 - Client sends GSE, start=IC3, num=1, eventId=IC3
+send("ihd", "zcl drlc gse " + timeIn1Min + " 0x01 0x001C0003");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.31.3 Item 2 - Server sends LCE from IC3
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+send("ihd", "plugin drlc clear 0x01");
+networkWait( 100 );
+
+// 10.31.3 Item 3 - Client sends GSE, start=IC3, num=1, eventId>IC3
+send("ihd", "zcl drlc gse " + timeIn1Min + " 0x01 0x001C0004");
+send("ihd", "send " + esiId + " 1 1");
+
+// 10.31.3 Item 4 - Server sends LCE from IC2 (I disagree with IC3)
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+//  Test 10.32 - Supersede a LCE having a Lower Event ID
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.32.3 Item 1 - Server sends LCE with start=0, dur=20
+send("esi", "zcl drlc lce 0x001C0002 0x00 0x00000000 20 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.32.3 Item 2 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+// When run as multihop, the following frame can be printed mixed in with the
+// superseded frame below, so let's just ignore the following
+//checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.32.3 Item 3 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.32.3 Item 4 - Server sends LCE with start=0, dur=10, higher event ID
+send("esi", "zcl drlc lce 0x001C0003 0x00 0x00000000 10 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.32.3 Item 5 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// 10.32.3 Item 6 - Client sends Report Event Status: superseded
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_SUPERSEDED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.32.3 Item 7 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// Wait for 10 minutes, minus 15 seconds
+networkWait((600 - 15) * 1000);
+
+// 10.32.3 Item 8 - Client sends Report Event Status: completed
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        60 * 1000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+//  Test 10.33 - Supersede a LCE having a Lower Event ID with One having a
+//               Subset of Device Classes and UEGs
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.33.3 Item 1 - Server sends LCE with start=0, dur=20
+send("esi", "zcl drlc lce 0x001C0002 0x00 0x00000000 20 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.33.3 Item 2 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.33.3 Item 3 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.33.3 Item 4 - Server sends LCE with start=0, dur=10, higher event ID, Device Class=applicable bit, UEG=1
+send("esi", "zcl drlc lce 0x001C0003 0x01 0x00000000 10 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.33.3 Item 5 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// 10.33.3 Item 6 - Client sends Report Event Status: superseded
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_SUPERSEDED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.33.3 Item 7 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// Wait for 10 minutes, minus 15 seconds
+networkWait((600 - 15) * 1000);
+
+// 10.33.3 Item 8 - Client sends Report Event Status: completed
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        60 * 1000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+//  Test 10.34 - Supersede a LCE having a Lower Event ID with One having a
+//               Subset of Device Classes and UEGs
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.34.3 Item 1 - Server sends LCE with start=now+5min, dur=5
+send("esi", "zcl drlc lce 0x001C0002 0x00 " + timeIn5Mins + " 5 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// This is part of Item 3, but must be done now
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.34.3 Item 2 - Server sends LCE with start=now+10min, dur=5
+send("esi", "zcl drlc lce 0x001C0003 0x00 " + timeIn10Mins + " 5 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.34.3 Item 3 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// 10.34.3 Item 4 - Server sends LCE with start=0, dur=20
+send("esi", "zcl drlc lce 0x001C0004 0x00 0x00000000 20 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.34.3 Item 5 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0004",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+//checkReportEventStatusReceived("esi", "001C0004", 3000);
+
+// 10.34.3 Item 6 - Client sends Report Event Status: superseded
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_SUPERSEDED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// also 10.34.3 Item 6 - Client sends Report Event Status: superseded
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_SUPERSEDED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// 10.34.3 Item 7 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0004",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0004", 3000);
+
+// Wait for 20 minutes, minus 15 seconds
+networkWait((1200 - 15) * 1000);
+
+// 10.34.3 Item 8 - Client sends Report Event Status: completed
+checkReportEventStatus( "ihd",
+                        "001C0004",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        60 * 1000 );
+checkReportEventStatusReceived("esi", "001C0004", 3000);
+
+//  Test 10.35 - Supersede a Subset of Active LCEs
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.35.3 Item 1 - Server sends LCE with start=now+5min, dur=5
+send("esi", "zcl drlc lce 0x001C0002 0x00 " + timeIn5Mins + " 5 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// This is part of Item 3, but must be done now
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.35.3 Item 2 - Server sends LCE with start=now+15min, dur=5
+send("esi", "zcl drlc lce 0x001C0003 0x00 " + timeIn15Mins + " 5 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.35.3 Item 3 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// Wait until 2 minutes into event 1's start, or 7 minutes (5+2)
+networkWait(7 * 60 * 1000);
+
+// 10.35.3 Item 4 - Server sends LCE with start=0, dur=7
+send("esi", "zcl drlc lce 0x001C0004 0x00 0x00000000 7 0x00");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.35.3 Item 5 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0004",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "00",
+                        3000 );
+// When run as multihop, the following frame can be printed mixed in with the
+// superseded frame below, so let's just ignore the following
+//checkReportEventStatusReceived("esi", "001C0004", 3000);
+
+// 10.35.3 Item 6 - Client sends Report Event Status: superseded
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_SUPERSEDED,
+                        "01",
+                        "00",
+                        3000 );
+// When run as multihop, the following frame can be printed mixed in with the
+// started frame below, so let's just ignore the following
+//checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.35.3 Item 7 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0004",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        3000 );
+// When run as multihop, the following frame can be printed mixed in with the
+// superseded frame above, so let's just ignore the following
+//checkReportEventStatusReceived("esi", "001C0004", 3000);
+
+// Wait for the event to finish
+networkWait((420 - 5) * 1000);
+
+// 10.35.3 Item 8 - Client sends Report Event Status: completed
+checkReportEventStatus( "ihd",
+                        "001C0004",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        60*1000 );
+checkReportEventStatusReceived("esi", "001C0004", 3000);
+
+// Wait a minute for the next event to start
+networkWait(50 * 1000);
+
+// 10.35.3 Item 9 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "00",
+                        30 * 1000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// Wait for the event to finish
+networkWait((300 - 5) * 1000);
+
+// 10.35.3 Item 10 - Client sends Report Event Status: completed
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "00",
+                        30 * 1000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+//  Test 10.36 - LCE Start Randomization
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.36.2 Item 2 - Client StartRandomizationMinutes attribute to 5 minutes
+send("ihd", "write 0x01 0x0701 0x0001 0x00 0x20 {05}");
+
+// 10.36.3 Item 1 - Server sends LCE with start=now+5min, dur=10, delay start
+send("esi", "zcl drlc lce 0x001C0002 0x00 " + timeIn5Mins + " 10 0x01");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.36.3 Item 2 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "01",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Wait for the scheduled start of the event, then monitor for the real start
+networkWait((300-10) * 1000);
+
+// 10.36.3 Item 3 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "01",
+                        360 * 1000 );   // Can be delayed up to 5 minutes
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Wait for the event to almost end
+networkWait((600-10) * 1000);
+
+// 10.36.3 Item 4 - Client sends Report Event Status: completed
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "01",
+                        60 * 1000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Back to defaults
+send("ihd", "write 0x01 0x0701 0x0001 0x00 0x20 {1E}");
+
+//  Test 10.37 - LCE Duration Randomization
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.37.2 Item 2 - Client DurationRandomizationMinutes attribute to 10 minutes
+send("ihd", "write 0x01 0x0701 0x0002 0x00 0x20 {0A}");
+
+// 10.37.3 Item 1 - Server sends LCE with start=now+5min, dur=10, delay duration
+send("esi", "zcl drlc lce 0x001C0002 0x00 " + timeIn5Mins + " 10 0x02");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.37.3 Item 2 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "02",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Wait for the scheduled start of the event, then monitor for the real start
+networkWait((300-10) * 1000);
+
+// 10.37.3 Item 3 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "02",
+                        60 * 1000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Wait for the event to almost reach its scheduled end
+networkWait((600-10) * 1000);
+
+// 10.37.3 Item 4 - Client sends Report Event Status: completed
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "02",
+                        660 * 1000 );  // Event can be delayed up to 10 minutes
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Back to defaults
+send("ihd", "write 0x01 0x0701 0x0002 0x00 0x20 {00}");
+
+//  Test 10.38 - Two Consecutive LCE Events with Start Randomization that Touch
+//               create Continuous Event
+// =============================================================
+
+ResetLoadControlEventTables();
+ResyncTime( 0 );
+networkWait( 100 );
+
+// 10.38.2 Item 2 - Client StartRandomizationMinutes attribute to 5 minutes
+send("ihd", "write 0x01 0x0701 0x0001 0x00 0x20 {05}");
+
+// 10.38.3 Item 1 - Server sends LCE with start=now+5min, dur=10, delay start
+send("esi", "zcl drlc lce 0x001C0002 0x00 " + timeIn5Mins + " 10 0x01");
+send("esi", "send " + ihdId + " 1 1");
+
+// (Part of Item 3) - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "01",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// 10.38.3 Item 2 - Server sends LCE with start=now+15min, dur=10, delay start
+send("esi", "zcl drlc lce 0x001C0003 0x00 " + timeIn15Mins + " 10 0x01");
+send("esi", "send " + ihdId + " 1 1");
+
+// 10.38.3 Item 3 - Client sends Report Event Status: received
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_RECEIVED,
+                        "01",
+                        "01",
+                        3000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// Wait for the scheduled start of the event, then monitor for the real start
+networkWait((300-10) * 1000);
+
+// 10.38.3 Item 4 - Client sends Report Event Status: started
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "01",
+                        360 * 1000 ); // Can be delayed up to 5 minutes
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Wait for the event to almost reach its scheduled end
+networkWait((600-10) * 1000);
+
+// 10.37.3 Item 5 - Client sends Report Event Status: completed and Client sends
+// Report Event Status: started for next event
+checkReportEventStatus( "ihd",
+                        "001C0002",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "01",
+                        60 * 1000 );
+checkReportEventStatusReceived("esi", "001C0002", 3000);
+
+// Again, another poorly written test
+// If Event B's start delay is longer than Event A's start delay, then B will
+// not immediately start after A ends. The writers should have had Event B not
+// have a randomized start delay
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_STARTED,
+                        "01",
+                        "01",
+                        360 * 1000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+
+// Wait for the event to almost reach its scheduled end
+networkWait((600-10) * 1000);
+
+// 10.38.3 Item 6 - Client sends Report Event Status: completed
+checkReportEventStatus( "ihd",
+                        "001C0003",
+                        DRLC_EVENT_STATUS_COMPLETED,
+                        "01",
+                        "01",
+                        60 * 1000 );
+checkReportEventStatusReceived("esi", "001C0003", 3000);
+

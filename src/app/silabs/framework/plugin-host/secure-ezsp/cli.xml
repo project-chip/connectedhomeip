@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-secure-ezsp" name="Plugin Commands:  Secure Ezsp">
+    <description>This plugin provides a set of CLI commands for sending secure EZSP commands</description>
+  </group>
+  <command cli="plugin secure-ezsp set_security_key" functionName="emberAfPluginSecureEzspSetSecurityKeyCommand" group="plugin-secure-ezsp">
+    <description>
+      Set the Security Key of the Secure EZSP Protocol.
+    </description>
+    <arg name="securityType" type="INT32U" description="The security type to be used for the Secure EZSP Protocol." />
+  </command>
+  <command cli="plugin secure-ezsp set_security_parameters" functionName="emberAfPluginSecureEzspSetSecurityParametersCommand" group="plugin-secure-ezsp">
+    <description>
+      Set the Host-side Security Parameters of the Secure EZSP Protocol.
+    </description>
+    <arg name="securityLevel" type="INT32U" description="The security level to be used for the Secure EZSP communication." />
+  </command>
+  <command cli="plugin secure-ezsp reset_to_factory_defaults" functionName="emberAfPluginSecureEzspResetToFactoryDefaultsCommand" group="plugin-secure-ezsp">
+    <description>
+      Reset the NCP to factory default.
+    </description>
+  </command>
+</cli>

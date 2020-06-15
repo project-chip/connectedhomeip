@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ota-client" name="Plugin Commands: OTA Client">
+    <description>
+      The OTA Client plugin provides Over-the-air commands for upgrading firmware and downloading specific files on the client side.
+    </description>
+  </group>
+  <command cli="plugin ota-client bootload" functionName="otaCliBootload" group="plugin-ota-client">
+    <description>
+      Bootloads the image at the specified index by calling the OTA bootload callback.
+    </description>
+    <arg name="index" type="INT8U" description="The index at which to begin bootloading the image" />
+  </command>
+  <command cli="plugin ota-client verify" functionName="otaCliVerify" group="plugin-ota-client">
+    <description>
+      Perform signature verification on the image at the specified index
+    </description>
+    <arg name="index" type="INT8U" description="The index at which to begin verification of the image" />
+  </command>
+  <command cli="plugin ota-client info" functionName="otaPrintClientInfo" group="plugin-ota-client">
+    <description>
+      Prints the manufacturer ID, Image Type ID, and Version information that are used when a query next image is sent to the server by the client
+    </description>
+  </command>
+  <command cli="plugin ota-client start" functionName="otaStartClientCommand" group="plugin-ota-client">
+    <description>
+      Starts the ota client state machine. The state machine discovers the OTA server, queries for new images, downloads the images and waits for the server command to upgrade
+    </description>
+  </command>
+  <command cli="plugin ota-client stop" functionName="otaStopClientCommand" group="plugin-ota-client">
+    <description>
+      Stops the OTA state machine
+    </description>
+  </command>
+  <command cli="plugin ota-client status" functionName="emAfOtaClientPrintState" group="plugin-ota-client">
+    <description>
+      Prints information on the current state of the OTA client download.
+    </description>
+  </command>
+  <command cli="plugin ota-client block-test" functionName="emAfSendImageBlockRequestTest" group="plugin-ota-client">
+    <description>
+      Sends an image block request for a file the server should not have.  Test harness only (test case 9.5.6 - Missing File)
+    </description>
+  </command>
+  <command cli="plugin ota-client page-request" functionName="setPageRequest" group="plugin-ota-client">
+    <description>
+    </description>
+    <arg name="pageRequest" type="INT8U" description="boolean value turning on (1) or off (0) the page request flag" />
+  </command>
+  <command cli="plugin ota-client pause-at" functionName="setPausePercentage" group="plugin-ota-client" >
+    <description>
+    </description>
+    <arg name="stopDownloadPercentage" type="INT8U" description="" />
+  </command>
+    <command cli="plugin ota-client upgrade-request" functionName="otaSendUpgradeRequest" group="plugin-ota-client" >
+    <description>
+      Send an OTA server an UpgradeEndRequest
+    </description>
+  </command>
+  <command cli="plugin ota-client disable-downgrades" functionName="emAfOtaClientDisableDowngrades" group="plugin-ota-client" >
+    <description>
+      Disable OTA downgrades
+    </description>
+  </command>
+  <command cli="plugin ota-client enable-downgrades" functionName="emAfOtaClientEnableDowngrades" group="plugin-ota-client">
+    <description>
+      Enable OTA downgrades
+    </description>
+  </command>
+</cli>

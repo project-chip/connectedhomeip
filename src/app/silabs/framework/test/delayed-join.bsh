@@ -1,0 +1,71 @@
+/*
+* this is to test the delayed join IOTREQ-1147 (EMZIGBEE-)
+* it is by default disabled. In order to use it 
+* Ha-ligh and ha-switch apps need to be re-generated with delayd-join plugin
+* enabled 
+*/
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "light1", "light2", "switch"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",  
+  "build/af-test-apps/HaSwitch-simulation/HaSwitch",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaSwitch-simulation-ezsp/HaSwitch",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+int timeout = 50000;
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+networkWait(timeout * 10);
+
+expect("light",                                                                
+       "network form " + channel + " " + power + " " + panId,                   
+       ".*EMBER_NETWORK_UP.*"); 
+
+send("light1","plugin delayed-join set-key-timeout 100"); 
+networkWait(1000);
+send("light","net pjoin 255");    
+
+nexpect("light1",                                                               
+       "network join " + channel + " " + power + " " + panId,                   
+       ".*EMBER_NETWORK.*");  
+
+send("light","plugin delayed-join send-network-key "+nodeId("light1")+" {" +
+eui64("light1") + "} "+nodeId("light") + " {}");
+
+expect("light1","",".*EMBER_NETWORK.*",10000);
+
+send("light2","plugin delayed-join set-key-timeout 200");                       
+networkWait(1000); 
+send("light1","net pjoin 255");                                                  
+                                                                                
+nexpect("light2",                                                               
+       "network join " + channel + " " + power + " " + panId,                   
+       ".*EMBER_NETWORK.*");                                                    
+                                                                                
+send("light","plugin delayed-join send-network-key "+nodeId("light2")+" {" +
+eui64("light2") + "} "+nodeId("light1") + " {}");
+                                                                                
+expect("light2","",".*EMBER_NETWORK.*",10000); 

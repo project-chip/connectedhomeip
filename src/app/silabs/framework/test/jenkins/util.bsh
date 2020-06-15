@@ -1,0 +1,356 @@
+import com.ember.peek.*;
+import java.util.*;
+import com.ember.peek.TestNetwork;
+import com.ember.util.Ansi;
+import java.text.NumberFormat;
+
+final int DEFAULT_PORT = 1;
+final int DEFAULT_TIMEOUT = 3100; // ms.
+final int DEFAULT_EXPECT_ATTEMPTS = 5;
+final boolean DEFAULT_COLLECT = true;
+final boolean DEFAULT_LAZY_EXPECT = true;
+
+final String cliCorruptionDetect = "Usage:";
+
+PrintStream std = System.out;
+PrintStream dbg = System.err;
+
+PrintWriter outWriter = null;
+
+TestNetwork network;
+
+void initNetwork(String[] nodes) {
+  network = new TestNetwork(nodes);
+  String[] result = network.connect(4901);
+
+  if (result.length > 0) {
+    System.exit(-1);
+  }
+
+  network.echo(true);
+
+  if (outFile != null) {
+    String filename = getSourceFileInfo();
+    int i = filename.indexOf('.');
+    filename = filename.substring(0, i);
+    filename = filename + ".log";
+    try  
+    {
+      FileWriter fstream = new FileWriter(filename, false);
+      outWriter = new PrintWriter(fstream);
+    }
+    catch (IOException e)
+    {
+      System.err.println("Error: " + e.getMessage());
+      System.exit(-1);
+    }
+  }
+}
+
+void logToFile(String out)
+{
+  outWriter.println(out);
+  outWriter.flush();
+}
+
+void sleep(int time)
+{
+  network.sleep(time);
+}
+
+void send(String node, String command) 
+{
+  network.send(node, 1, command);
+  network.sleep(100);
+}
+
+void printCommand(String node, int port, String command)
+{
+  printData(node, "SERIAL" + port, "[" + Ansi.debugCmdTxt.colorize(command) + "]");
+}
+
+void printData(String node, String type, String data)
+{
+  NumberFormat format = NumberFormat.getInstance();
+  format.setMaximumFractionDigits(6);
+  format.setMinimumFractionDigits(6);
+  format.setGroupingUsed(false);
+  String time = format.format(network.currentTimeSeconds());
+  dbg.println("[" + Ansi.debugTime.colorize(time) + " "
+              + (node != null
+                 ? node + " "
+                 : "")
+                 + Ansi.debugSerial.colorize(type) + "] " + data);
+}
+
+String _expectOrNexpect(String node,
+                        int port,
+                        String message,
+                        String regex,
+                        int timeout,
+                        boolean collect,
+                        String file,
+                        int lineNumberOfCaller,
+                        boolean doExpect,
+                        boolean exitOnFail)
+{
+  String match;
+
+  if (message != null) {
+    printCommand(node, port, message);
+  }
+
+  if (DEFAULT_LAZY_EXPECT) {
+    regex = ".*" + regex + ".*";
+  }
+
+  // This is due to the UART issues described in EMZIGBEE-1840.
+  // Basically, if the CLI command gets corrupted, the node will print out 
+  // some help output, including the string "Usage:" which we use here to detect
+  // whether a CLI command got actually corrupted. In that case, we simply 
+  // resend the CLI command.
+  String workAroundRegex = regex + "|.*" + cliCorruptionDetect + ".*";
+  do {
+    match = network.expect(node,
+                           port,
+                           message,
+                           workAroundRegex,
+                           timeout,
+                           collect);
+  } while(match != null && match.contains(cliCorruptionDetect));
+
+  if (exitOnFail
+      && ((match == null && doExpect) || (match != null && !doExpect))) {
+    String error = (doExpect ?
+                    "Failed to get \"" + regex + "\" from " + node
+                    : "Got \"" + regex + "\" from " + node);
+    if (message != null) {
+      error += " to command \"" + message + "\"";
+    }
+    error += ": file " + file
+             + ", line " + lineNumberOfCaller;
+    dbg.println(Ansi.debugError.colorize(error));
+    System.exit(-1);
+  }
+
+  if (!((match == null && doExpect) || (match != null && !doExpect))) {
+    dbg.println("   Expect matched: [ " + regex + " ]");
+  }
+  return match;
+}
+
+String expect(String node, String message, String regex, int timeout, boolean exitOnFail)
+{
+  return _expectOrNexpect(node,
+                          DEFAULT_PORT,
+                          message,
+                          regex,
+                          timeout,
+                          DEFAULT_COLLECT,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine(),
+                          true,
+                          exitOnFail);
+}
+
+String expect(String node, String message, String regex, int timeout)
+{
+  return _expectOrNexpect(node,
+                          DEFAULT_PORT,
+                          message,
+                          regex,
+                          timeout,
+                          DEFAULT_COLLECT,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine(),
+                          true,
+                          true);
+}
+
+String expect(String node, String message, String regex)
+{
+  return _expectOrNexpect(node,
+                          DEFAULT_PORT,
+                          message,
+                          regex,
+                          DEFAULT_TIMEOUT,
+                          DEFAULT_COLLECT,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine(),
+                          true,
+                          true);
+}
+
+String expectX(String node, String message, String regex, int timeout, int attempts)
+{
+  String match;
+  for(i=1; i<=attempts; i++) {
+    // Fail only on the last attempt.
+    match = _expectOrNexpect(node,
+                             DEFAULT_PORT,
+                             message,
+                             regex,
+                             timeout,
+                             DEFAULT_COLLECT,
+                             getSourceFileInfo(),
+                             this.namespace.getInvocationLine(),
+                             true,
+                             (i == attempts));
+    if (match != null) {
+      break;
+    }
+  }
+  return match;
+}
+
+String expectX(String node, String message, String regex, int timeout)
+{
+  String match;
+  for(i=1; i<=DEFAULT_EXPECT_ATTEMPTS; i++) {
+    // Fail only on the last attempt.
+    match = _expectOrNexpect(node,
+                             DEFAULT_PORT,
+                             message,
+                             regex,
+                             timeout,
+                             DEFAULT_COLLECT,
+                             getSourceFileInfo(),
+                             this.namespace.getInvocationLine(),
+                             true,
+                             (i == DEFAULT_EXPECT_ATTEMPTS));
+    if (match != null) {
+      break;
+    }
+  }
+  return match;
+}
+
+String expectX(String node, String message, String regex)
+{
+  String match;
+  for(i=1; i<=DEFAULT_EXPECT_ATTEMPTS; i++) {
+    // Fail only on the last attempt.
+    match = _expectOrNexpect(node,
+                             DEFAULT_PORT,
+                             message,
+                             regex,
+                             DEFAULT_TIMEOUT,
+                             DEFAULT_COLLECT,
+                             getSourceFileInfo(),
+                             this.namespace.getInvocationLine(),
+                             true,
+                             (i == DEFAULT_EXPECT_ATTEMPTS));
+    if (match != null) {
+      break;
+    }
+  }
+  return match;  
+}
+
+String getZigbeeShortId(String node)
+{
+  String cmd = "network id";
+  String match;
+  int i;
+  printCommand(node, DEFAULT_PORT, cmd);
+  match = network.expect(node,
+                         DEFAULT_PORT,
+                         cmd,
+                         ".*Short ID:.*",
+                         DEFAULT_TIMEOUT,
+                         false);
+  if (match == null) {
+    dbg.println(Ansi.debugError.colorize("Failed to read ZigBee short ID: file " + getSourceFileInfo() + ", line " + this.namespace.getInvocationLine()));
+    System.exit(-1);
+  }
+  i = match.indexOf("Short ID: ");
+  String nodeId = match.substring(i + 10, i + 16);
+  return nodeId;
+}
+
+String getZigbeePanId(String node)
+{
+  String cmd = "network id";
+  String match;
+  int i;
+  printCommand(node, DEFAULT_PORT, cmd);
+  match = network.expect(node,
+                         DEFAULT_PORT,
+                         cmd,
+                         ".*Pan ID:.*",
+                         DEFAULT_TIMEOUT,
+                         false);
+  if (match == null) {
+    dbg.println(Ansi.debugError.colorize("Failed to read ZigBee Pan ID: file " + getSourceFileInfo() + ", line " + this.namespace.getInvocationLine()));
+    System.exit(-1);
+  }
+  i = match.indexOf("Pan ID: ");
+  String nodeId = match.substring(i + 8, i + 14);
+  return nodeId;
+}
+
+String getBleAddress(String node)
+{
+  String cmd = "plugin ble get address";
+  String match;
+  int i;
+  printCommand(node, DEFAULT_PORT, cmd);
+  match = network.expect(node,
+                         DEFAULT_PORT,
+                         cmd,
+                         ".*BLE address:.*",
+                         DEFAULT_TIMEOUT,
+                         false);
+  if (match == null) {
+    dbg.println(Ansi.debugError.colorize("Failed to read BLE address: file " + getSourceFileInfo() + ", line " + this.namespace.getInvocationLine()));
+    System.exit(-1);
+  }
+  i = match.indexOf("BLE address: ");
+  String address = match.substring(i + 14, i + 31);
+  dbg.println(address);
+  return address;
+}
+
+String getBleServiceId(String node, String connection, String serviceUuid)
+{
+  String cmd = "plugin ble gatt discover-primary-services " + connection;
+  String match;
+  int i;
+  printCommand(node, DEFAULT_PORT, cmd);
+  match = network.expect(node,
+                         DEFAULT_PORT,
+                         cmd,
+                         ".*UUID.*" + serviceUuid + " .*\n.*conn_handle.*\n.*service_handle.*",
+                         DEFAULT_TIMEOUT,
+                         false);
+  if (match == null) {
+    dbg.println(Ansi.debugError.colorize("Failed to match serviceUuid:\n - " + serviceUuid + "\n - file " + getSourceFileInfo() + ", line " + this.namespace.getInvocationLine()));
+    System.exit(-1);
+  }
+  i = match.indexOf("service_handle=");
+  String serviceId = match.substring(i + 15, i + 25);
+  dbg.println(serviceId);
+  return serviceId;
+}
+
+String getBleCharacteristicId(String node, String connection, String serviceId, String characteristicUuid)
+{
+  String cmd = "plugin ble gatt discover-characteristics " + connection + " " + serviceId;
+  String match;
+  int i;
+  printCommand(node, DEFAULT_PORT, cmd);
+  match = network.expect(node,
+                         DEFAULT_PORT,
+                         cmd,
+                         ".*UUID.*" + characteristicUuid + " .*\n.*conn_handle.*\n.*char_handle.*",
+                         DEFAULT_TIMEOUT,
+                         false);
+  if (match == null) {
+    dbg.println(Ansi.debugError.colorize("Failed to match characteristicUuid:\n - " + characteristicUuid + "\n - file " + getSourceFileInfo() + ", line " + this.namespace.getInvocationLine()));
+    System.exit(-1);
+  }
+  i = match.indexOf("char_handle=");
+  String serviceId = match.substring(i + 12, i + 18);
+  dbg.println(serviceId);
+  return serviceId;
+}

@@ -1,0 +1,38 @@
+/** @brief EM4 Enter
+ *
+ * This function is called from idle-sleep plugin before going into em4 sleep mode.
+ * This should be implemented by app to store restart sensitive app/stack variables
+ * in RTCC RAM, check/change the sleep duration.
+ *
+ * @param durationMs The maximum duration in milliseconds that the device will
+ * sleep. Ver.: always
+ */
+bool emberAfPluginEm4EnterCallback(uint32_t* durationMs)
+{
+  /*
+   * e.g.
+   * if(emberOkToHibernate() && !(emberCurrentStackTasks() & EMBER_ASSOCIATING))
+   * {
+   *    // if no active/saved app level events
+   *    *durationMs = EMBER_AF_PLUGIN_END_DEVICE_SUPPORT_LONG_POLL_INTERVAL_SECONDS * 1000;
+   *    return true;
+   * }
+   *
+   */
+  return false;
+}
+
+/** @brief EM4 Exit
+ *
+ * This function is called from idle-sleep plugin after coming back from em4 sleep
+ * mode. This should be implemented by app, if it requires any additional variable
+ * restoration and network/app-initialization steps other than what is implemented
+ * in emberAfPostEm4ResetCallback()
+ */
+void emberAfPluginEm4ExitCallback(void)
+{
+  /*
+   * e.g. do a poll/etc
+   *
+   */
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-electrical-measurement-server" name="Plugin Commands: Electrical Measurement Server commands">
+    <description>
+      Runtime configuration CLI commands for electrical measurements.
+    </description>
+  </group>
+  <command cli="plugin electrical-measurement-server read-active-power" functionName="emAfElectricalMeasurementServerReadActivePower" group="plugin-electrical-measurement-server">
+    <description>
+      Read Active Power.
+    </description>
+   </command>
+  <command cli="plugin electrical-measurement-server read-power-factor" functionName="emAfElectricalMeasurementServerReadPowerFactor" group="plugin-electrical-measurement-server">
+    <description>
+      Read Power Factor.
+    </description>
+  </command>
+  <command cli="plugin electrical-measurement-server read-vrms" functionName="emAfElectricalMeasurementServerReadVrms" group="plugin-electrical-measurement-server">
+    <description>
+      Read RMS Voltage.
+    </description>
+  </command>
+  <command cli="plugin electrical-measurement-server read-irms" functionName="emAfElectricalMeasurementServerReadIrms" group="plugin-electrical-measurement-server">
+    <description>
+      Read RMS Current.
+    </description>
+  </command>
+  <command cli="plugin electrical-measurement-server calibrate" functionName="emAfElectricalMeasurementServerCalibrate" group="plugin-electrical-measurement-server">
+    <description>
+      Perform Power Meter calibration.
+    </description>
+    <arg name="temperature" type="INT8S" description = "current temperature, in Degree C" />
+   </command>
+</cli>

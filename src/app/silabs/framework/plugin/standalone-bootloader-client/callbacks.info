@@ -1,0 +1,31 @@
+/** @brief Allow Incoming Message
+ *
+ * Allows the application to control whether the plugin can respond to incoming
+ * bootload messages.
+ *
+ * @param sourceEui64 The EUI64 of the sending node. Ver.: always
+ * @param command The incoming command ID Ver.: always
+ */
+bool emberAfPluginStandaloneBootloaderClientAllowIncomingMessageCallback(EmberEUI64 sourceEui64,
+                                                                         uint8_t command)
+{
+  // Return true to tell the standalone bootloader client plugin to respond per normal.
+  // Return false to tell it to drop the message on the floor.
+  return true;
+}
+
+/** @brief Allow Bootload Launch
+ *
+ * This function is a callback when the client is being told to launch the
+ * standalone bootloader. This is done after authentication has completed
+ * successfully.
+ *
+ * @param sourceEui64 The EUI64 of the node requesting the bootload.
+ * Ver.: always
+ */
+bool emberAfPluginStandaloneBootloaderClientAllowBootloadLaunchCallback(EmberEUI64 sourceEui64)
+{
+  // Return true to allow the plugin to launch the standalone bootloader and continue with the over-the-air bootload.
+  // Return false to disallow the plugin from launching the standalone bootloader.
+  return true;
+}

@@ -1,0 +1,19 @@
+/** @brief Join
+ *
+ * This callback is called by the ZLL Commissioning Network plugin when a joinable
+ * network has been found. If the application returns true, the plugin will
+ * attempt to join the network. Otherwise, the plugin will ignore the network
+ * and continue searching. Applications can use this callback to implement a
+ * network blacklist. Note that this callback is not called during touch
+ * linking.
+ *
+ * @param networkFound   Ver.: always
+ * @param lqi   Ver.: always
+ * @param rssi   Ver.: always
+ */
+bool emberAfPluginZllCommissioningNetworkJoinCallback(EmberZigbeeNetwork *networkFound,
+                                                      uint8_t lqi,
+                                                      int8_t rssi)
+{
+  return true;
+}

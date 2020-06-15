@@ -1,0 +1,343 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  std.print("****TEST only for HOST, nothing to test on SoC****");
+  return;
+} else if (runArgument.runUsingMultihop) {
+  std.print("****2 Nodes, no need to run multi-hop****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"secure-ezsp-host0", "secure-ezsp-host1"};
+
+String[] socImages = new String[] {
+  "PLACE_HOLDER", 
+  "PLACE_HOLDER"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SecureEzsp-simulation-ezsp/SecureEzsp",
+  "build/af-test-apps/SecureEzsp-simulation-ezsp/SecureEzsp",
+};
+
+String ncpImage =
+"app/ncp/sample-app/secure-ezsp/simulation/build/exe/SecureEzspNcp";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage,
+                  runArgument.runUsingHostApps,
+                  runArgument.runUsingMultihop,
+                  false);
+
+int timeout = 10000;
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+
+int port = 0;
+
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+String security_type = "0";
+String security_level = "5";
+
+//------------------------------------------------------------------------------
+// Host 1 (unsecure) communicates to Host 0 (secure)
+//------------------------------------------------------------------------------
+
+expect("secure-ezsp-host0",port,
+       "plugin secure-ezsp reset_to_factory_defaults",
+       ".*Failed to Reset Security, status:0x47.*",timeout,true);
+
+// set security key
+expect("secure-ezsp-host0",port, "plugin secure-ezsp set_security_key " +
+security_type, ".*Security Key set.*",timeout,true);
+
+// set security parameters
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_parameters "
++ security_level, ".*Security Parameters set.*",timeout,true);
+
+expect("secure-ezsp-host0",port,
+                "network form " + channel + " " + power + " " + panId + "",
+                  ".*EMBER_NETWORK_UP.*"
+                , timeout, true);
+
+
+expect("secure-ezsp-host0",port,
+                "network pjoin 255",
+                
+                  ".*pJoin for 255 sec: 0x00.*", timeout, true
+                );
+
+
+expect("secure-ezsp-host1",port,
+                "network join " + channel + " " + power + " " + panId + "",
+                
+                  ".*EMBER_NETWORK_UP.*",timeout, true);
+
+// info command to make sure EZSP is working properly
+expect("secure-ezsp-host1",port,                                                
+                "info",                                                         
+                  ".*securityProfile.*",timeout,true);   
+
+
+// info command to make sure EZSP is working properly
+expect("secure-ezsp-host0",port,                                                
+                "info",                                                         
+                  ".*securityProfile.*",timeout,true);   
+
+// info command to make sure EZSP is working properly
+expect("secure-ezsp-host1",port,
+                "info",
+                  ".*securityProfile.*",timeout,true);
+
+expect("secure-ezsp-host1", port,"zcl global read 0 0",".*buffer.*",timeout, 
+true);
+
+expect("secure-ezsp-host1", port,"send " + nodeId("secure-ezsp-host0",port) + " 1 1",
+".*RX.*",timeout,true);
+expect("secure-ezsp-host0", port,"", ".*RX.*",timeout,true);
+
+
+expect("secure-ezsp-host0", port,"zcl global read 0 0",
+".*buffer.*",timeout,true);
+expect("secure-ezsp-host0", port,"send " + nodeId("secure-ezsp-host1",port) + " 1 1", ".*RX.*",timeout,true);
+expect("secure-ezsp-host1",port, "", ".*RX.*",timeout,true);
+
+expect("secure-ezsp-host1", port, "zcl global read 0 0", ".*buffer.*",timeout,true);
+expect("secure-ezsp-host1", port, "send " + nodeId("secure-ezsp-host0",port) + " 1 1", ".*RX.*",timeout,true);
+expect("secure-ezsp-host0", port, "", ".*RX.*",timeout,true);
+
+expectMultiline("secure-ezsp-host0",
+                "plugin secure-ezsp reset_to_factory_defaults",
+                new String[] {
+                  ".*Reset Security.*",
+                  ".*EMBER_NETWORK_DOWN.*"
+                }, timeout);
+networkWait(1000);
+expect("secure-ezsp-host1", port, "network leave", ".*EMBER_NETWORK_DOWN.*",timeout,true);
+expect("secure-ezsp-host0", port, "reset", ".*.*",timeout,true);
+expect("secure-ezsp-host1", port, "reset", ".*.*",timeout,true);
+
+formAndJoinDevices(devices);
+
+//------------------------------------------------------------------------------
+// Test normal info command without any security
+//------------------------------------------------------------------------------
+
+// info command to make sure EZSP is working properly
+expectMultiline("secure-ezsp-host0",
+                "info",
+                new String[] {
+                  "node \\[\\(>\\)" + eui64("secure-ezsp-host0") + "\\] chan \\[" + channel + "\\] pwr \\[" + power + "\\]",
+                  "panID.*",
+                  "network state \\[02\\].*",
+                  ".*securityProfile.*"
+                }, timeout);
+
+//------------------------------------------------------------------------------
+// Test API errors and network activity
+// Set up security key and security parameters
+//------------------------------------------------------------------------------
+
+// set security parameters should fail as security key is not set
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_parameters " + security_level, ".*Failed to set Security Parameters, status:0x47.*",timeout,true);
+
+// set security key with incorrect type should fail
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_key 1", ".*Failed to set Security Key, status:0x44.*",timeout,true);
+
+// set security key
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_key " + security_type, ".*Security Key set.*",timeout,true);
+
+// set security key should fail as security key is already set
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_key " + security_type, ".*Failed to set Security Key, status:0x43.*",timeout,true);
+
+// set security parameters
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_parameters " + security_level, ".*Security Parameters set.*",timeout,true);
+
+// set security parameters should fail as they are already set
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_parameters " + security_level, ".*Failed to set Security Parameters, status:0x46*",timeout,true);
+
+// info command to make sure EZSP is working properly
+expectMultiline("secure-ezsp-host0",
+                "info",
+                new String[] {
+                  "node \\[\\(>\\)" + eui64("secure-ezsp-host0") + "\\] chan \\[" + channel + "\\] pwr \\[" + power + "\\]",
+                  "panID \\[.*",
+                  "network state \\[02\\].*",
+                  ".*securityProfile.*"
+                }, timeout);
+
+// Some network activity
+expect("secure-ezsp-host1", port, "zcl global read 0 0", ".*buffer.*",timeout,true);
+expect("secure-ezsp-host1", port, "send " + nodeId("secure-ezsp-host0",port) + " 1 1", ".*RX.*",timeout,true);
+expect("secure-ezsp-host0", port, "", ".*RX.*",timeout,true);
+
+expect("secure-ezsp-host0", port, "zcl global read 0 0", ".*buffer.*",timeout,true);
+expect("secure-ezsp-host0", port, "send " + nodeId("secure-ezsp-host1",port) + " 1 1",".*RX.*", timeout,true);
+expect("secure-ezsp-host1", port, "", ".*RX.*",timeout,true);
+
+expect("secure-ezsp-host1", port, "zcl global read 0 0", ".*buffer.*",timeout,true);
+expect("secure-ezsp-host1", port, "send " + nodeId("secure-ezsp-host0",port) + " 1 1", ".*RX.*",timeout,true);
+expect("secure-ezsp-host0", port, "", ".*RX.*",timeout,true);
+
+expect("secure-ezsp-host1", port, "zcl global read 0 0", ".*buffer.*",timeout,true);
+expect("secure-ezsp-host1", port,"send 0xFFFF 1 1",".*RX.*",timeout,true);
+expect("secure-ezsp-host0", port, "", ".*RX.*",timeout,true);
+
+expect("secure-ezsp-host0", port, "zcl global read 0 0", ".*buffer.*",timeout,true);
+expect("secure-ezsp-host0", port, "send 0xFFFF 1 1",".*RX.*",timeout,true);
+expect("secure-ezsp-host1", port, "", ".*RX.*",timeout,true);
+
+networkWait(timeout);
+
+//------------------------------------------------------------------------------
+// Reset security
+// Set security key should be followed by set security params, if not we reset
+//------------------------------------------------------------------------------
+
+// Reset security to factory defaults, leaves network
+expectMultiline("secure-ezsp-host0",
+                "plugin secure-ezsp reset_to_factory_defaults",
+                new String[] {
+                  ".*Reset Security.*",
+                  ".*EMBER_NETWORK_DOWN.*"
+                }, timeout);
+
+// Reset other node manually
+expect("secure-ezsp-host1", port, "network leave", ".*EMBER_NETWORK_DOWN.*",timeout,true);
+
+// set security key
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_key " + security_type, ".*Security Key set.*",timeout,true);
+
+// info command should fail as security parameters are not set
+expectMultiline("secure-ezsp-host0",
+                "info",
+                new String[] {
+                  "ERROR: ezspErrorHandler 0x48",
+                  "ERROR: ezspErrorHandler 0x48",
+                  ".*securityProfile.*"
+                }, timeout);
+
+// above failure will trigger reset and set up security automatically
+expectMultiline("secure-ezsp-host0",
+                "reset",
+                new String[] {
+                  ".*Ezsp Policy: set Trust Center Policy.*",
+                },timeout);
+
+networkWait(5000);
+// set security parameters, already set upon reset
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_parameters " + security_level, ".*Failed to set Security Parameters, status:0x46*",timeout,true);
+
+// info command to make sure EZSP is working properly
+expectMultiline("secure-ezsp-host0",
+                "info",
+                new String[] {
+                  "node \\[\\(>\\)" + eui64("secure-ezsp-host0") + "\\] chan \\[" + channel + "\\] pwr \\[" + power + "\\]",
+                  "panID.*",
+                  "network state \\[00\\].*",
+                  ".*securityProfile.*"
+                }, timeout);
+
+//------------------------------------------------------------------------------
+// Reset device
+// Form network and check info
+// Then setup security and check info
+//------------------------------------------------------------------------------
+
+// reset the device, key should already be set
+expectMultiline("secure-ezsp-host0",
+                "reset",
+                new String[] {
+                  "Security Key Already Set, type:0x00",
+                  "Security Parameters set.*",
+                  ".*Ezsp Policy: set Trust Center Policy.*",
+                }, timeout);
+
+// form network again
+setupEncryption();
+formAndJoinDevices(devices);
+
+// info command to make sure EZSP is working properly
+expectMultiline("secure-ezsp-host0",
+                "info",
+                new String[] {
+                  "node \\[\\(>\\)" + eui64("secure-ezsp-host0") + "\\] chan \\[" + channel + "\\] pwr \\[" + power + "\\]",
+                  "panID.*",
+                  "network state \\[02\\].*",
+                  ".*securityProfile.*"
+                }, timeout);
+
+// set security parameters, should be already set upon reset
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_parameters " + security_level, ".*Failed to set Security Parameters, status:0x46*",timeout,true);
+
+// info command to make sure EZSP is working properly
+expectMultiline("secure-ezsp-host0",
+                "info",
+                new String[] {
+                  "node \\[\\(>\\)" + eui64("secure-ezsp-host0") + "\\] chan \\[" + channel + "\\] pwr \\[" + power + "\\]",
+                  "panID.*",
+                  "network state \\[02\\].*",
+                  ".*securityProfile.*"
+                }, timeout);
+//------------------------------------------------------------------------------
+// Reset device
+// Reset to factory defaults
+// Reset security
+//------------------------------------------------------------------------------
+
+// reset the device, key should already be set
+expectMultiline("secure-ezsp-host0",
+                "reset",
+                new String[] {
+                  ".*Ezsp Policy: set Trust Center Policy.*",
+                  ".*EMBER_NETWORK_UP.*"
+                },timeout);
+
+// set security key should fail as security key is already set
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_key " + security_type, ".*Failed to set Security Key, status:0x43.*",timeout,true);
+
+// Reset security to factory defaults
+expectMultiline("secure-ezsp-host0",
+                "plugin secure-ezsp reset_to_factory_defaults",
+                new String[] {
+                  ".*Reset Security.*",
+                  ".*EMBER_NETWORK_DOWN.*"
+                }, timeout);
+
+// info command to make sure EZSP is working properly
+expectMultiline("secure-ezsp-host0",
+                "info",
+                new String[] {
+                  "node \\[\\(>\\)" + eui64("secure-ezsp-host0") + "\\] chan \\[" + channel + "\\] pwr \\[" + power + "\\]",
+                  "panID.*",
+                  "network state \\[00\\].*",
+                  ".*securityProfile.*"
+                }, timeout);
+
+// set security key
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_key " + security_type, ".*Security Key set.*",timeout,true);
+
+// set security parameters
+expect("secure-ezsp-host0", port, "plugin secure-ezsp set_security_parameters " + security_level, ".*Security Parameters set.*",timeout,true);
+
+// info command to make sure EZSP is working properly
+expect("secure-ezsp-host1",port,                                                
+                "info",                                                         
+                  ".*securityProfile.*",timeout,true);   
+// info command to make sure EZSP is working properly
+expectMultiline("secure-ezsp-host0",
+"info",
+new String[] {
+"node \\[\\(>\\)" + eui64("secure-ezsp-host0") + "\\] chan \\[" + channel + "\\] pwr \\[" + power + "\\]",
+"panID.*",
+"network state \\[00\\].*",
+".*securityProfile.*"
+}, timeout);

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-command-relay" name="Plugin Commands: Command Relay">
+    <description>
+      The command relay plugin allows the forwarding of commands from one device to another.
+    </description>
+  </group>
+  <command cli="plugin command-relay add" functionName="emAfPluginCommandRelayAddCommand" group="plugin-command-relay">
+    <description>
+      Retransmit commands from inDevice to outDevice.
+    </description>
+    <arg name="inDeviceEui" type="IEEE_ADDRESS" description = "Incoming device EUI64." />
+    <arg name="inDeviceEndpoint" type="INT8U" description = "Incoming device endpoint." />
+    <arg name="inClusterId" type="INT16U" description = "Incoming cluster ID." />
+    <arg name="outDeviceEui" type="IEEE_ADDRESS" description = "Outgoing device EUI64." />
+    <arg name="outDeviceEndpoint" type="INT8U" description = "Outgoing device endpoint." />
+    <arg name="outClusterId" type="INT16U" description = "Outgoing cluster ID." />
+  </command>
+  <command cli="plugin command-relay remove" functionName="emAfPluginCommandRelayRemoveCommand" group="plugin-command-relay">
+    <description>
+      Deletes a relay between devices.
+    </description>
+    <arg name="inDeviceEui" type="IEEE_ADDRESS" description = "Incoming device EUI64." />
+    <arg name="inDeviceEndpoint" type="INT8U" description = "Incoming device endpoint." />
+    <arg name="inClusterId" type="INT16U" description = "Incoming cluster ID." />
+    <arg name="outDeviceEui" type="IEEE_ADDRESS" description = "Outgoing device EUI64." />
+    <arg name="outDeviceEndpoint" type="INT8U" description = "Outgoing device endpoint." />
+    <arg name="outClusterId" type="INT16U" description = "Outgoing cluster ID." />
+  </command>
+  <command cli="plugin command-relay clear" functionName="emAfPluginCommandRelayClearCommand" group="plugin-command-relay">
+    <description>
+      Clear all relays.
+    </description>
+  </command>
+  <command cli="plugin command-relay save" functionName="emAfPluginCommandRelaySaveCommand" group="plugin-command-relay">
+    <description>
+      Save to disk.
+    </description>
+  </command>
+  <command cli="plugin command-relay load" functionName="emAfPluginCommandRelayLoadCommand" group="plugin-command-relay">
+    <description>
+      Load from disk.
+    </description>
+  </command>
+  <command cli="plugin command-relay print" functionName="emAfPluginCommandRelayPrintCommand" group="plugin-command-relay">
+    <description>
+      Print relays.
+    </description>
+  </command>
+</cli>
+

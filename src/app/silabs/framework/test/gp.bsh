@@ -1,0 +1,331 @@
+import java.lang.Math;
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+if (!runArgument.runUsingMultihop) {
+  std.print("Only runs multihop");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+
+TestNode[] allNodes = {
+  new TestNode("sink",
+      "build/af-test-apps/GpComboBasic-simulation/GpComboBasic",
+      "build/af-test-apps/GpComboBasic-simulation-ezsp/GpComboBasic",
+      "app/ncp/sample-app/ncp-spi-gp-sink/simulation/build/exe/ncp-spi",
+      gridLocations[0]),
+  new TestNode("proxy1",
+      "build/af-test-apps/GpProxyBasic-simulation/GpProxyBasic",
+      "build/af-test-apps/GpProxyBasic-simulation-ezsp/GpProxyBasic",
+      "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+      gridLocations[1]),
+  new TestNode("proxy2",
+      "build/af-test-apps/GpProxyBasic-simulation/GpProxyBasic",
+      "build/af-test-apps/GpProxyBasic-simulation-ezsp/GpProxyBasic",
+      "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+      gridLocations[4]),
+  new TestNode("gpd1",
+      "build/af-test-apps/GpTestDevice-simulation/GpTestDevice",
+      "",
+      "",
+      gridLocations[2]), //in range of sink (and proxy1 and proxy2)
+  new TestNode("gpd2",
+      "build/af-test-apps/GpTestDevice-simulation/GpTestDevice",
+      "",
+      "",
+      gridLocations[5]),//in range of proxy1 and proxy2
+  new TestNode("gpd3",
+      "build/af-test-apps/GpTestDevice-simulation/GpTestDevice",
+      "",
+      "",
+      gridLocations[7]),//in range of proxy2 only
+};
+
+TestNode[] realNodes = Arrays.copyOfRange(allNodes,0,3);
+TestNode[] testNodes = Arrays.copyOfRange(allNodes,3,6);
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevicesWithLocation(realNodes,runArgument.runUsingHostApps);
+addAndLoadDevicesWithLocation(testNodes,false);
+
+
+String[] someDevices = new String[]{"sink", "proxy1", "proxy2"};
+
+// Allow for a little bit of drift in the clocks.
+int tolerance = 3;
+
+// Form and join a network and set up encryption.
+int channel = 21;
+int power = 2;
+int panId = 0xDEAD;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(someDevices);
+
+printNodeIds(allNodes);
+networkWait(5000);
+networkWait(25000);
+
+/*
+send("sink","plugin green-power-server cryptotest");
+
+send("proxy1", "plugin green-power-client set-proxy-entry 0 0x12345678 0xBEEF 0x00");
+
+// add for sequential numbering
+expect("proxy1",
+       "plugin green-power-client duplicate-filter-test 0xF2 0x12345678 1",
+       ".*Accepting frame with sequence number: 0x00000001");
+
+send("proxy1", "plugin green-power-client set-proxy-entry 0 0x12345678 0xBEEF 0x100");
+
+// add for random numbering
+expect("proxy1",
+       "plugin green-power-client duplicate-filter-test 0xF2 0x12345678 1",
+       ".*sequenceNumber\\(1\\), expirationTime\\(0x........\\) is added to addr\\[.\\], entry\\[.\\].*");
+
+// confirm we reject duplicate messages
+expect("proxy1",
+       "plugin green-power-client duplicate-filter-test 0xF2 0x12345678 1",
+       ".*drop frame due to active duplicate sequence number.*");
+
+networkWait(2*60*1000 + 3000); // sleep for 2min in order to expire the existing entries
+expect("proxy1",
+       "plugin green-power-client duplicate-filter-test 0xF2 0x12345678 1",
+       ".*sequenceNumber\\(1\\), expirationTime\\(0x........\\) is added to addr\\[.\\], entry\\[.\\].*");
+
+networkWait(100);
+*/
+send("gpd1", "plugin green-power-test-device set-phy-channel 21");
+send("sink", "plugin green-power-client clear-proxy-table");
+send("proxy1", "plugin green-power-client clear-proxy-table");
+send("proxy2", "plugin green-power-client clear-proxy-table");
+//send("proxy1", "plugin green-power-client print-proxy-table");
+networkWait(1000);
+// Write GPS Functionality to its appropriate values
+// write the gpsSecuritylevel back to 1 as gpd test devices is coded, however the sink
+// security tests are done as part of the compliance tests in gp-testcases.sh file.
+send ("sink", "write 242 0x0021 0x0005 1 0x18 {01}");
+send("sink", "write 242 0x21 6 1 0x1A {0FAE2F}");
+send("sink", "plugin green-power-server commission 9 0xffff 0xffff 1");
+networkWait(5000);
+networkWait(25000);
+
+send("gpd1", "plugin green-power-test-device set-phy-channel 21");
+send("gpd1", "plugin green-power-test-device send-comm 0");
+networkWait(5000);
+//send("proxy1", "plugin green-power-client print-proxy-table");
+//send("gpd1", "plugin green-power-test-device send-test 0");
+send("gpd1", "plugin green-power-test-device send-test 0x13 { }");
+expect("sink",".*command 19.*");
+networkWait(500);
+printNodeIds(allNodes);
+
+send("sink", "plugin green-power-server commission 9 0xffff 0xffff 1");
+//send("proxy", "plugin green-power-client clear-proxy-table");
+networkWait(5000); // settle down the BCASTS
+//set the channel different from the current zigbee network channel 21
+send("gpd2", "plugin green-power-test-device set-phy-channel 24");
+networkWait(250);
+//scan the channels twice - should get a channel reply on the operational channel with in 5 seconds -
+//if 16 channels are scanned with 500 msec it would take 8 seconds.
+// gpd in different channel,
+// starts channel req with next appempt = 24 and second attempt = 24, and sends on channel i
+// In the following loop , when i =  21 (the zigbee channel) - the proxies will switch to 24 to deliver the channel reply
+// and stay there for 5 sec timeout, with in that time there should be another request to get a channel reply
+for(int i = 0; i < 2; i++)
+{
+  for(int ch = 11; ch <= 26; ch++) {
+    send("gpd2", "plugin green-power-test-device send-channel-request "+ ch);
+    // wait for the reply before next scan .
+    // this delay must be such that 16 * 200 = 3200 msec , i.e < 5 sec, else the proxy will go back to channel 21.
+    networkWait(200);
+  }
+}
+networkWait(5000);
+send("gpd2", "plugin green-power-test-device set-phy-channel 255");
+//This was send-comm 1, but the test device doesn't really handle bidir
+send("gpd2", "plugin green-power-test-device setup-gpd 0x12345678 { 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF }");
+send("gpd2", "plugin green-power-test-device send-comm 1");
+networkWait(25000);
+//send("gpd2", "plugin green-power-test-device send-comm 1");
+//networkWait(1000);
+
+//send("sink", "plugin green-power-server table-clear");
+send("sink", "plugin green-power-server commission 0 0xffff 0xffff 1");
+networkWait(5000);
+// write the security level attribute in the sink
+send("sink", "write 242 0x0021 0x0005 1 0x18 {00}");
+send("sink", "plugin green-power-server commission 9 0xffff 0xffff 1");
+networkWait(5000);
+send("gpd3","plugin green-power-test-device set-phy-channel 21");
+send("gpd3","plugin green-power-test-device send-comm 2");
+networkWait(25000);
+send("sink", "plugin green-power-server commission 0 0xffff 0xffff 1");
+networkWait(25000);
+
+
+networkWait(3000);
+
+send("gpd3","plugin green-power-test-device send-ieee-test 0x13 { }");
+expectMultiline("sink",
+                "",
+                new String[]{".*command 19.*",
+                             "RX: RecallScene 0x...., 0x03"
+                });
+networkWait(5000);
+
+// test Recall Scene
+send("gpd2", "plugin green-power-test-device send-test 0x13 { }");
+expectMultiline("sink",
+                "",
+                new String[]{".*command 19.*",
+                             "RX: RecallScene 0x...., 0x03"
+                });
+networkWait(500);
+
+// test Store Scene
+send("gpd2", "plugin green-power-test-device send-test 0x1B { }");
+expect("sink","command 27");
+expectMultiline("sink",
+                "",
+                new String[]{"*clus 0x0005 \\(Scenes\\) FC 01 seq .. cmd 04 payload\\[78 56 03 \\]",
+                             "RX: StoreScene 0x5678, 0x03"
+                });
+networkWait(500);
+
+// test Identify
+send("gpd2", "plugin green-power-test-device send-test 0x00 { } ");
+expectMultiline("sink",
+                "",
+                new String[]{
+                  "RX identify:IDENTIFY 0x3C00"
+                });
+networkWait(500);
+
+// test Off message.
+send("gpd2", "plugin green-power-test-device send-test 0x20 { }");
+expectMultiline("sink",
+                "",
+                new String[]{
+                  "On/Off set value: .*"
+                });
+networkWait(500);
+
+// test On Message
+send("gpd2", "plugin green-power-test-device send-test 0x21 { }");
+expectMultiline("sink",
+                "",
+                new String[]{
+                  "On/Off set value: .*"
+                });
+networkWait(10000);
+// test Move Hue Stop message.
+send("gpd2", "plugin green-power-test-device send-test 0x40 { }");
+expectMultiline("sink",
+                "",
+                new String[]{
+                  "ColorControl: MoveHue \\(00, FF\\)"
+                });
+networkWait(10000);
+// test Level Control/ Move Up message.
+send("gpd2", "plugin green-power-test-device send-test 0x30 { FF }");
+expectMultiline("sink",
+                "",
+                new String[]{
+                  "RX level-control:MOVE 00 FF",
+                  ".*Event: move from 0 to 255.*",
+                });
+networkWait(500);
+
+send("sink", "plugin green-power-server commission 0 0xffff 0xffff 1");
+networkWait(500);
+send("sink", "plugin green-power-client print-proxy-table");
+send("proxy1", "plugin green-power-client print-proxy-table");
+send("proxy2", "plugin green-power-client print-proxy-table");
+networkWait(10000);
+send("sink", "plugin green-power-server table-print");
+networkWait(40000);
+
+                                              //  idx opt  ieee EP    srcId      ep   gpdCommandId profile cluster cmdId-RecallScene0 len  payload
+send("sink", "plugin green-power-server table-set 0   0x00 {00} 0xFF  0x12345678 0x01 0x40         0x0104  0x0005  0x05               0x03 {FF FF 00} 0 {00}"); // recall scene 3
+send("sink", "plugin green-power-server table-set 1   0x00 {00} 0xFF  0x12345678 0x01 0x1B         0x0104  0x0005  0x05               0x03 {AA BB CC} 0 {00}"); // store scene 3
+
+networkWait(10000);
+send("sink", "plugin green-power-server table-print");
+
+//reboot("proxy2"); //to check for tokens
+
+networkWait(10000);
+
+// test Recall Scene
+send("gpd2", "plugin green-power-test-device send-test 0x40 { }");
+expectMultiline("sink",
+                "",
+                new String[]{".*command 64.*",
+                             ".*RX: RecallScene 0x...., 0x00.*"
+                });
+networkWait(500);
+
+send("proxy2", "zcl global read 0x0021 0x0011");
+send("proxy2", "send " + findNodeByName("proxy1").nodeIdHex + " 242 242");
+
+networkWait(2000);
+
+send("proxy1", "plugin green-power-client print-proxy-table");
+//send("proxy1", "plugin green-power-client clear-proxy-table");
+networkWait(10000);
+send("sink", "plugin green-power-client print-proxy-table");
+
+networkWait(10000);
+send("sink", "plugin green-power-server sink-table-print");
+networkWait(10000);
+networkWait(10000);
+networkWait(10000);
+// Running reset on host does not work, so skip the reset test
+if (runArgument.runUsingHostApps) {
+  std.print("No Reset Test for Host App\n");
+  return;
+}
+reboot("sink");
+networkWait(10000);
+send("sink", "plugin green-power-client print-proxy-table");
+networkWait(10000);
+send("sink", "plugin green-power-server sink-table-print");
+expectMultiline("sink",
+                "",
+                new String[]{
+                  "01 02A8 00 0050007F .. 02 007F 00 12 00000012",  // gpd endpoint matching for appId 0 (i.e 4 byte SrcId ) is not a valid check
+                  "01 02A8 00 12345678 .. 02 5678 00 12 00000019",  // gpd endpoint matching for appId 0 (i.e 4 byte SrcId ) is not a valid check
+                  "01 00AA 02 04030201 99 02 0201 00 00 000000.."   // when security level 0, it will use MAC sequenec number so keeps changing
+                });
+networkWait(10000);
+send("sink", "plugin green-power-server table-print");
+// TODO: Using reboot("sink") to reset the sink for POR,
+// the following command works fine but not with the send("sink", "reset");
+// test Recall Scene
+send("gpd2", "plugin green-power-test-device send-test 0x40 { }");
+expectMultiline("sink",
+                "",
+                new String[]{".*command 64.*",
+                             ".*RX: RecallScene 0x...., 0x00.*"
+                });
+networkWait(500);
+// Sink leaves the network - check if the tables are empty
+send("sink", "net leave");
+networkWait(10000);
+send("sink", "plugin green-power-server table-print");
+expect("sink","translation table is Empty");
+networkWait(10000);
+send("sink", "plugin green-power-client print-proxy-table");
+expect("sink","No Proxy Entries");
+networkWait(10000);
+send("sink", "plugin green-power-server sink-table-print");
+expectMultiline("sink",
+                "",
+                new String[]{
+                  "Sink Table Empty"
+                });
+networkWait(10000);

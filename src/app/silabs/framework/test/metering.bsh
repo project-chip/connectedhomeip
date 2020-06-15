@@ -1,0 +1,847 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for host and multihop****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = { "esi", "meter1", "ihd", "meter2"};
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12Ihd-simulation/Se12Ihd",
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12Ihd-simulation-ezsp/Se12Ihd",
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+networkWait(timeout * 10); 
+String meterId = nodeId("meter1");
+
+send("meter1","plugin simple-metering-server gas 1 ");
+send("meter1","plugin simple-metering-server profiles 1");
+send("meter1",
+     "plugin simple-metering-server rate 0x10 1");
+send("meter1",
+     "plugin simple-metering-server variance 0xFFFF");
+
+//Basic tests for Get profile Request and Response. 
+//Test 11.3 Test the basic operation of the GetProfile Command and Response.
+send("esi","plugin simple-metering-server electric 1 ");
+send("esi","plugin simple-metering-server profiles 1");
+send("esi",
+     "plugin simple-metering-server rate 0x10 1");
+send("esi",
+     "plugin simple-metering-server variance 0xFFFF");
+networkWait(930*1000);
+
+expect("ihd", 
+       "zcl metering get-profile 0 0 1",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00000384, 0x00, 0x03, 0x01.*");
+
+networkWait(930*1000);
+
+expect("ihd", 
+       "zcl metering get-profile 0 0 2",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00000708, 0x00, 0x03, 0x02.*");
+
+networkWait(2800*1000);//15 minute interval in seconds * number of profiles supported(5)
+
+
+expect("ihd", 
+       "zcl metering get-profile 0 0 5",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00001194, 0x00, 0x03, 0x05.*");
+
+expect("ihd", 
+       "zcl metering get-profile 0 2000 2",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00000708, 0x00, 0x03, 0x02.*");
+
+
+//Test 11.5 Test the operation of the GetProfile command Channel 1
+expect("ihd", 
+       "zcl metering get-profile 1 0 5",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00001194, 0x00, 0x03, 0x05.*");
+
+expect("ihd", 
+       "zcl metering get-profile 1 901 5",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00000384, 0x00, 0x03, 0x01.*");
+
+//Test Invalid Channel
+expect("ihd", 
+       "zcl metering get-profile 2 0 5",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00001194, 0x01, 0x03, 0x05.*");
+
+
+//Test 11.6 This test case tests the response of a metering device when queried with an invalid End Time
+expect("ihd", 
+       "zcl metering get-profile 1 5410 1",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00001194, 0x00, 0x03, 0x01.*");
+
+
+expect("ihd", 
+       "zcl metering get-profile 1 5410 2",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00001194, 0x00, 0x03, 0x02.*");
+
+
+//Test 11.7 End Time = less than oldest interval end time stored 
+expect("ihd", 
+       "zcl metering get-profile 1 10 1",
+       ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse 0x00000000, 0x05, 0x00, 0x00.*");
+
+
+//Test 11.4 Test the operation of the GetProfile command when requesting information 
+// about a past time interval and of the corresponding response. 
+expect("ihd",
+       "zcl metering get-profile 0 928  5",
+       ".*Msg: clus 0x0702, cmd 0x00.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse.*",10000);
+
+networkWait(16*60*1000);
+//Test 11.4 Test the operation of the GetProfile command when requesting information 
+// about a past time interval and of the corresponding response. 
+expect("ihd",
+       "zcl metering get-profile 0 1856  5",
+       ".*Msg: clus 0x0702, cmd 0x00.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse.*",10000);
+
+networkWait(16*60*1000);
+expect("ihd",
+       "zcl metering get-profile 0 2784  5",
+       ".*Msg: clus 0x0702, cmd 0x00.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse.*",10000);
+
+//Test 11.4 Test the operation of the GetProfile command when requesting information 
+// about a past time interval and of the corresponding response. 
+
+expect("ihd",
+       "zcl metering get-profile 0 0 5",
+       ".*Msg: clus 0x0702, cmd 0x00.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*RX: GetProfileResponse.*");
+
+
+send("meter1",
+     "plugin simple-metering-server adjust 1");
+
+networkWait(15*60*1000);
+// //Test 11.8 Get Reading Information Attributes
+// // ... more attribute reads
+// //Test 11.15 to 11.17 DELETED
+// //Test 11.18 Get Supply Limit Attributes
+// //Test 11.19-11.20 DELETED
+
+// //Test 11.21 Fall Polling Request Default Response
+send("esi","plugin simple-metering-server toggle-fast-poll-mode 0");
+networkWait(1000);
+send("ihd","zcl metering req-fast-poll-mode 2 25");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[03 81 \\]");
+networkWait(5000);
+// // TO BE IMPLEMENTED
+
+
+//Test 11.22 Fast Polling Request Applied and Response
+send("esi","plugin simple-metering-server toggle-fast-poll-mode 1");
+send("ihd","zcl metering req-fast-poll-mode 2 25");
+send("ihd","send 0 1 1");
+expect("ihd","",".*RequestFastPollModeResponse 0x05, 0x[0-9A-F]{8} 0x[0-9A-F]{8} 0x0000038[4-5]{1}.*");
+
+networkWait(15*60*1000);
+networkWait(30000);
+
+//Test 11.23 Fast Polling Request Applied and Response with Requested Rate
+send("ihd","zcl metering req-fast-poll-mode 8 10");
+send("ihd","send 0 1 1");
+expect("ihd","",".*RequestFastPollModeResponse 0x08, 0x[0-9A-F]{8} 0x[0-9A-F]{8} 0x0000025[0-9A-F]{1}.*");
+
+networkWait(15*60*1000);
+networkWait(30000);
+
+//Test 11.24 Fast Polling Multiple Request and Response
+send("ihd","zcl metering req-fast-poll-mode 5 15");
+send("ihd","send 0 1 1");
+expect("ihd","",".*RX: RequestFastPollModeResponse 0x05, 0x[0-9A-F]{8} 0x[0-9A-F]{8} 0x0000038[0-9A-F]{1}.*");
+
+networkWait(120 * 1000);
+
+//The same end time is returned, which is about 780 seconds because we waited 120 seconds.
+send("ihd","zcl metering req-fast-poll-mode 5 15");
+send("ihd","send 0 1 1");
+expect("ihd","",".*RequestFastPollModeResponse 0x05, 0x[0-9A-F]{8} 0x[0-9A-F]{8} 0x000003[0-9A-F]{2}.*");
+
+networkWait(15*60*1000);
+networkWait(30000);
+
+//Test 11.25 Fall Polling Read Attributes not avalable.
+// TO BE IMPLEMENTED IN TEST HARNESS
+
+//Test 11.26.1 Request Mirror and Request Mirror Response
+send("esi","write 0x01 0x0000 0x0011 0x01 0x30 {01}");
+send("meter1","zcl global read 0x0000 0x0011");
+send("meter1","send 0 1 1");
+expect("meter1",".*RX len 8, ep 01, clus 0x0000 \\(Basic\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[11 00 00 30 01 \\]");
+
+networkWait(1000);
+
+send("meter1","zcl metering request-mirror");
+
+send("meter1","send 0 1 1");
+expect("meter1",".*Mirror ADDED on 02.*");
+
+send("meter1","zcl global report 1 0x0000 0x0000 0xFF");
+send("meter1","send 0 1 2");
+networkWait(1000);
+send("meter1","zcl global report 1 0x0000 0x0007 0xFF");
+send("meter1","send 0 1 2");
+networkWait(1000);
+send("meter1","zcl global report 1 0x0702 0x0000 0xFF");
+send("meter1","send 0 1 2");
+networkWait(1000);
+send("meter1","zcl global report 1 0x0702 0x0000 0xFF");
+send("meter1","send 0 1 2");
+networkWait(1000);
+send("meter1","zcl global report 1 0x0702 0x0200 0xFF");
+send("meter1","send 0 1 2");
+networkWait(10000);
+send("meter1","zcl global report 1 0x0702 0x0300 0xFF");
+send("meter1","send 0 1 2");
+networkWait(10000);
+send("meter1","zcl global report 1 0x0702 0x0306 1");
+send("meter1","send 0 1 2");
+networkWait(10000);
+
+// //Test 11.26.2
+send("esi","info");
+networkWait(10000);
+
+//Step 1: Send a match descriptor Request. ESI returns 2 endpoints: 1 for Electric and 2 for Gas Mirror.
+
+send("ihd",
+       "zdo match 0xFFFD 0xFFFF");
+expect("ihd",".*RX: Match Desc Resp, Matches: 2.*",1000);
+
+//Step 2: Read MeterDeviceType. It should be 0x80 for EMBER_ZCL_METERING_DEVICE_TYPE_MIRRORED_GAS_METERING
+send("ihd","zcl global read 0x0702 0x0306");
+send("ihd","send 0 1 2");
+expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[06 03 00 18 80 \\]");
+networkWait(5000);
+
+//Step 3: Read all mandatory attributes in Basic and Metering Clusters.
+send("ihd","zcl global read 0x0000 0x0000");
+send("ihd","send 0 1 2");
+expect("ihd",".*RX len 8, ep 01, clus 0x0000 \\(Basic\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 20 03 \\].*");
+networkWait(3000);
+
+send("ihd","zcl global read 0x0000 0x0007");
+send("ihd","send 0 1 2");
+expect("ihd",".*RX len 8, ep 01, clus 0x0000 \\(Basic\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[07 00 00 30 00 \\].*");
+networkWait(3000);
+
+send("ihd","zcl global read 0x0702 0x0000");
+send("ihd","send 0 1 2");
+expect("ihd",".*RX len 13, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01.*");
+networkWait(3000);
+
+send("ihd","zcl global read 0x0702 0x0200");
+send("ihd","send 0 1 2");
+expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[00 02 00 18 00 \\].*");
+networkWait(3000);
+
+send("ihd","zcl global read 0x0702 0x0300");
+send("ihd","send 0 1 2");
+expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[00 03 00 30 06 \\].*");
+networkWait(3000);
+
+//Step 4: Meter 2 sends an unsolicited ZCL Report attributes command
+send("meter2","zcl global report 1 0x0702 0x0000 0xFF");
+send("meter2","send 0 1 2");
+expect("meter2",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 00 seq [0-9A-F]{2} cmd 0B payload\\[0A 7E \\].*");
+networkWait(3000);
+
+//Step 5: Read the same metering attribute as above and make sure it hasn't changed.
+send("ihd","zcl global read 0x0000 0x0000");
+send("ihd","send 0 1 2");
+expect("ihd",".*RX len 8, ep 01, clus 0x0000 \\(Basic\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 20 03 \\].*");
+networkWait(3000)3
+
+
+//Test 11.27 No Mirror available.
+send("meter2","zcl global read 0x0000 0x0011");
+send("meter2","send 0 1 1");
+expect("meter2",".*RX len 8, ep 01, clus 0x0000 \\(Basic\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[11 00 00 30 00 \\]");
+networkWait(10000);
+
+send("meter2","zcl metering request-mirror");
+send("meter2","send 0 1 1");
+expect("meter2",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 01 seq [0-9A-F]{2} cmd 01 payload\\[FF FF \\]");
+networkWait(10000);
+
+//Test 11.28 RemoveMirror and RemoveMirrorResponse with ESI
+//Following from Step 5
+send("meter2",
+       "zdo match 0xFFFD 0xFFFF");
+expect("meter2",".*RX: Match Desc Resp, Matches: 2.*",2000);
+
+send("meter2","zcl metering remove-mirror");
+send("meter2","send 0 1 1");
+expect("meter2",".*Mirror remove FAILED.*",2000);
+networkWait(5000);
+
+send("meter1","zcl metering remove-mirror");
+send("meter1","send 0 1 1");
+expect("meter1",".*Mirror REMOVED from 02.*",5000);
+networkWait(5000);
+
+send("esi","keys print");
+networkWait(10000);
+send("ihd","keys print");
+networkWait(10000);
+send("meter2","zcl global read 0x0000 0x0011");
+send("meter2","send 0 1 2");
+//expect("meter1",".*RX len 5, ep 01, clus 0x0000 \\(Basic\\) FC 00 seq [0-9A-F]{2} cmd 01 payload\\[01 00 \\]");
+networkWait(10000);
+
+//Test 11.29-11.33 Deleted.
+//Test 11.34 Get Attributes.
+
+// 11.36 GetProfile with fragmented GetProfileResponse
+// Test 11.36 placed at the end of the file.
+
+
+// Test 11.37 Zero value Multiplier and Divisor
+// send("esi","write 0x01 0x0702 0x0000 0x01 0x25 {BE 5F}");
+// send("esi",
+//      "plugin simple-metering-server variance 0");
+// networkWait(1000);
+// send("esi","write 0x01 0x0702 0x0300 0x01 0x30 {00}");
+
+// //Multiplier and Divisor
+send("esi","SKIPPING TESTS 11.37 and 11.38 because they test the formatting display on the metering client side");
+// send("esi","write 0x01 0x0702 0x0301 0x01 0x22 {00 00 00}");
+// send("esi","write 0x01 0x0702 0x0302 0x01 0x22 {00 00 00}");
+// // summationFormatting: 0 0101 000
+// send("esi","write 0x01 0x0702 0x0303 0x01 0x18 {28}");
+
+// networkWait(1000);
+// send("ihd","zcl global read 0x0702 0x0000");
+// send("ihd","send 0 1 1");
+// expect("ihd",".*RX len 13, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 25 DE 5F 00 00 00 00 \\]*");
+// networkWait(3000);
+// expect("ihd", 
+//        "zcl metering get-profile 0 0 1",
+//        ".*Msg: clus 0x0702, cmd 0x00, len 9.*");
+// expect("ihd",
+//        "send 0 1 1",
+//        ".*RX: GetProfileResponse 0x000026AC, 0x00, 0x03, 0x01.*");
+
+// networkWait(10000);
+
+// send("ihd","zcl global read 0x0702 0x0300");
+// send("ihd","send 0 1 1");
+// expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[00 03 00 30 00 \\].*");
+// networkWait(3000);
+
+// send("ihd","zcl global read 0x0702 0x0301");
+// send("ihd","send 0 1 1");
+// expect("ihd",".*RX len 10, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[01 03 00 22 00 00 00 \\].*");
+// networkWait(3000);
+
+// send("ihd","zcl global read 0x0702 0x0302");
+// send("ihd","send 0 1 1");
+// expect("ihd",".*RX len 10, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[02 03 00 22 00 00 00 \\].*");
+// networkWait(3000);
+
+// send("ihd","zcl global read 0x0702 0x0303");
+// send("ihd","send 0 1 1");
+// expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[03 03 00 18 28 \\].*");
+// networkWait(3000);
+
+// send("ihd","zcl global read 0x0702 0x0304");
+// send("ihd","send 0 1 1");
+// expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[04 03 00 18 00 \\].*");
+// networkWait(3000);
+
+// send("ihd","zcl global read 0x0702 0x0305");
+// send("ihd","send 0 1 1");
+// expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[05 03 00 18 00 \\].*");
+// networkWait(3000);
+
+// send("ihd","zcl global read 0x0702 0x0000");
+// send("ihd","send 0 1 1");
+// expect("ihd",".*RX len 13, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 25 DE 5F 00 00 00 00 \\]*");
+//  networkWait(3000);
+
+
+// Test 11.38 Zero value Multiplier and Divisor 
+// NOt IMPLEMENTED  
+
+networkWait(10000);
+
+//Test 11.39 GetSnapshot and Publish Snapshot
+int time = utcTime("esi");
+send("ihd","zcl metering get-snapshot 0x00000000 " + time + " 0x00 0x0007FFFF") ;
+send("ihd","send 0 1 1");
+//expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[06 8B \\]");
+//expect("ihd",".*RX len 55, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 06 payload\\[00 00 00 00 00 00 00 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \\]");
+networkWait(3000);
+
+
+
+//Tests 11.40, 11.41, 11.42 and 11.43
+//Test 11.40 Publish Snapshot-Snapshots available: Steps 0 and 1.
+//Test 11.41 Publish Snaphot-No Snapshots available. Steps 0,1,2,3 and 4.
+//Test 11.42 and  11.43. Steps 0 and 1.
+
+//Step 0: Populate the snapshot. The test requests us to do this by manufacture specific means.
+send("ihd","zcl metering take-snapshot 0x0007FFFF");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 05 payload\\[01 00 00 00 00 \\]");
+networkWait(3000);
+
+//Step 1: GetSnapshot with snapshot available.
+int time = utcTime("esi");
+send("ihd","zcl metering get-snapshot 0x00000000 " + time + " 0x00 0x0007FFFF");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 55, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 06.*");
+networkWait(5000);
+
+//Step 2: Get snapshot with EndTime before snapshot time. No shapshot available.
+send("ihd","zcl metering get-snapshot 0x00000000 0x00000001 0x00 0x0007FFFF") ;
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[06 8B \\]");
+networkWait(5000);
+
+//Step 3: Get snapshot with start time after snapshot time. No shapshot available.
+send("ihd","zcl metering get-snapshot 0x0000FFFF 0xFFFFFFFF 0x00 0x0007FFFF") ;
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[06 8B \\]");
+networkWait(5000);
+
+//Step 4: Get snapshot with start time no snapshot cause. No shapshot available.
+send("ihd","zcl metering get-snapshot 0x00000000 0xFFFFFFFF 0x00 0x00000000") ;
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[06 8B \\]");
+networkWait(5000);
+
+//Test 11.44 and 11.45 Schedule Snapshot
+//send("ihd"," " + utcTime("esi"));
+send("ihd","plugin simple-metering-client sch-snapshot 0 0x01 0x01 0x12345678 0x00 0x01 0x0A " + utcTime("esi") + " 0x400002 0x01 0x00010000");
+expect("ihd",".*RX len 9, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 04 payload\\[78 56 34 12 0A 00 \\]");
+//send("ihd","zcl metering sch-snapshot 0x12345678 0x00 0x01 {58 28 00 00 02 00 40 01 00 00 01 00}");
+networkWait(5000);
+
+//Test 11.51
+send("esi",
+     "plugin simple-metering-server rate 0x10 1");
+send("esi",
+     "plugin simple-metering-server variance 0xFFFF");
+send("ihd","plugin simple-metering-client start-sampling 0 0x01 0x01 0x12345678 0x00000000 0x00 0x0010 5");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 0D payload\\[01 00 \\]");
+
+//Get no valid samples. Expect ZCL_NOT_FOUND.
+networkWait(1000);
+send("ihd","plugin simple-metering-client get-sampled-data 0 0x01 0x01 0x0001 0x00000000 0x00 3");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B .*");
+networkWait(1000);
+
+networkWait(16000 * 3);
+networkWait(1000);
+
+
+send("ihd","plugin simple-metering-client get-sampled-data 0 0x01 0x01 0x0001 0x00000000 0x00 3");
+expect("ihd",".*RX len 23, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 07 .*");
+networkWait(3000);
+
+//Bug: SE1P2-18
+//This checks that we can get 5 intervals, the max allowed by our configuration.
+networkWait(16000*4);
+networkWait(1000);
+send("ihd","plugin simple-metering-client get-sampled-data 0 0x01 0x01 0x0001 0x00000000 0x00 5");
+expect("ihd",".*RX len 29, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 07 .*");
+
+
+////Bug: SE1P2-17 Part 2: Check an invalid issuerEventId.
+send("ihd","plugin simple-metering-client start-sampling 0 0x01 0x01 0x12345671 0x00000000 0x00 0x0010 3");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[07 01 \\]");
+
+send("ihd","plugin simple-metering-client start-sampling 0 0x01 0x01 0x12345678 0xFFFFFFFF 0x00 0x0010 3");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[07 00 \\]");
+
+//Test 11.52 
+
+send("ihd","plugin simple-metering-client get-sampled-data 0 0x01 0x01 0x0000 0x00000000 0x00 3");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[08 8B \\]");
+
+//Test 11.53
+send("ihd","zcl global read 0x0702 0x0401");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 10, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[01 04 00 22 00 00 00 \\]");
+networkWait(2000);
+
+send("ihd","plugin simple-metering-client start-sampling 0 0x01 0x01 0x12345680 0x00000000 0x00 0x0078 2");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 0D payload\\[02 00 \\]");
+networkWait(125*1000);
+
+int time = utcTime("esi") - 130;
+send("ihd","plugin simple-metering-client get-sampled-data 0 0x01 0x01 0x0002 " + time + " 0x00 1");
+expect("ihd",".*RX len 17, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 07 payload\\[02 00 00 00 00 00 00 78 00 01.*");
+
+networkWait(125 *1000);
+int time = utcTime("esi") - 260;
+send("ihd","plugin simple-metering-client get-sampled-data 0 0x01 0x01 0x0002 " + time + " 0x00 2");
+expect("ihd",".*RX len 20, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 07 payload\\[02 00 00 00 00 00 00 78 00 02.*");
+
+// Bug: SE1P2-17: Ensure we're not overwriting our max limit on samples per session.
+send("ihd","plugin simple-metering-client start-sampling 0 0x01 0x01 0x12345690 0x00000000 0x00 0x0010 10");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 0D payload\\[03 00 \\]");
+networkWait(16000*9);
+networkWait(1000);
+send("ihd","plugin simple-metering-client get-sampled-data 0 0x01 0x01 0x0003 0x00000000 0x00 10");
+expect("ihd",".*RX len 32, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 07 .*");
+
+
+//Test 11.54 ResetLoadLimitCounter
+send("ihd","zcl global read 0x0702 0x0606");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[06 06 00 20 01 \\].*");
+networkWait(3000);
+send("ihd","zcl metering rst-load-limit-ctr 0x00001111 0x12345678");
+send("ihd","send 0 1 1");
+networkWait(4000);
+send("ihd","zcl global read 0x0702 0x0606");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[06 06 00 20 00 \\].*");
+
+// Test 11.55 Testing Two Way Mirror Reporting
+send("meter1","zcl metering request-mirror");
+
+send("meter1","send 0 1 1");
+expect("meter1",".*Mirror ADDED on 02.*");
+networkWait(5000);
+send("meter1","plugin simple-metering-server configure-mirror 0 0x01 0x02 0x00000001 0x0000003C 0x01 0x01");
+networkWait(61000);
+send("meter1","write 1 0x0702 0xFFFE 0x01 0x30 {01}");
+send("meter1","zcl global report 1 0x0702 0xFFFE 0x01");
+send("meter1","send 0 1 2");
+expect("meter1",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 01 seq [0-9A-F]{2} cmd 09 payload\\[01 00 00 00 00 \\]");
+
+networkWait(5000);
+send("meter1","plugin simple-metering-server configure-mirror 0 0x01 0x02 0x00000002 0x0000003C 0x00 0x01");
+networkWait(5000);
+send("meter1","zcl global report 1 0x0702 0xFFFE 0x01");
+send("meter1","send 0 1 2");
+networkWait(5000);
+//Read functionalFlags attribute
+send("meter1","zcl global direction 1");
+send("meter1","zcl global read 0x0702 0x0000");
+send("meter1","send 0 1 2");
+expect("meter1",".*RX len 11, ep 01, clus 0x0702 \\(Simple Metering\\) FC 00 seq [0-9A-F]{2} cmd 01 payload\\[00 00 00 1B 00 00 00 00 \\]");
+networkWait(5000);
+//Ideally at this point we check to make sure that do not receive a mirror response. I imagine the networking scripted
+//tests lend themselves better to this sort of check.
+
+send("meter1","plugin simple-metering-server configure-mirror 0 0x01 0x02 0x00000003 0x0000003C 0x00 0x03");
+expect("meter1",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 00 seq [0-9A-F]{2} cmd 0B payload\\[08 85 \\]");
+networkWait(5000);
+
+//Test 11.56  MirrorReporting with NotificationScheme Follow Steps 2 through 4.
+
+//Test 11.57 Acquiring Buffered Commands via Mirror (BOMD)
+
+//Run steps above to request mirror.
+
+//Step 2:
+send("meter1","plugin simple-metering-server configure-mirror 0 0x01 0x02 0x00000004 0x0000003C 0x00 0x01");
+networkWait(1000);
+//send("esi","write 0x01 0x0000 0x0011 0x01 0x30 {01}");
+//Step 3:
+send("esi","write 0x02 0x0702 0x0000 00 0x1B {04 00 04 00 }");
+networkWait(1000);
+//Step 4 to 8 below:
+send("meter1","zcl global report 1 0x0000 0x0000 0xFF");
+send("meter1","send 0 1 2");
+networkWait(5000);
+send("meter1","zcl global report 1 0x0702 0xFFFE 0x01");
+send("meter1","send 0 1 2");
+networkWait(5000);
+// After the report below, a ton of stuff happens.
+// The esi sends the functional flags attribute as 0x00040004. 
+// The meter sends a readAttributes Request for the time cluster and
+// a get notify message for the ChangeSupply command.
+// The esi then sends a change supply command, to which the meter responds
+// with a SupplyChangeStatus command. 
+// We check for just this command because the meter sends the time read attribute
+// and getNotifyMessage one after the other. There is no garuntee of the
+// receiving order.
+//Step 5:
+send("meter1","zcl global direction 1");
+send("meter1","zcl global read 0x0702 0x0000");
+send("meter1","send 0 1 2");
+expect("esi",".*Supply Status Callback.*",5000);
+
+networkWait(10000);
+// Now we repeat everything above with the MeterNotificationReporting to true.
+send("esi","write 0x02 0x0702 0x0001 00 0x1B {01 00 00 00 }");
+send("meter1","plugin simple-metering-server configure-mirror 0 0x01 0x02 0x00000005 0x0000003C 0x01 0x01");
+networkWait(1000);
+send("meter1","zcl global report 1 0x0000 0x0000 0xFF");
+send("meter1","send 0 1 2");
+networkWait(5000);
+send("meter1","zcl global report 1 0x0702 0xFFFE 0x01");
+send("meter1","send 0 1 2");
+networkWait(5000);
+
+
+// Now we repeat for Scheme NOtification B
+//Expect a read attribute for time, a getnotifymessage for supplyChange and a getCurrentPrice for PublishPrice.
+send("meter1","plugin simple-metering-server configure-mirror 0 0x01 0x02 0x00000006 0x0000003C 0x00 0x02");
+networkWait(1000);
+send("meter1","zcl global direction 1");
+send("meter1","zcl global read 0x0702 0x0000");
+send("meter1","send 0 1 2");
+expect("esi",".*Supply Status Callback.*",5000);
+networkWait(2000);
+
+send("meter1","zcl global read 0x0702 0x0001");
+send("meter1","send 0 1 2");
+expect("meter1",".*RX len 56, ep 01, clus 0x0700 \\(Price\\) FC 09 seq [0-9A-F]{2} cmd 00 .*",5000);
+
+networkWait(10000);
+//Repeat Scheme B with the MirrorResponseEnabled.
+//Expect a read attribute for time, a getnotifymessage for supplyChange and a getCurrentPrice for PublishPrice.
+send("meter1","plugin simple-metering-server configure-mirror 0 0x01 0x02 0x00000007 0x0000003C 0x01 0x02");
+networkWait(1000);
+send("meter1","zcl global report 1 0x0000 0x0000 0xFF");
+send("meter1","send 0 1 2");
+send("meter1","zcl global report 1 0x0702 0xFFFE 0x01");
+send("meter1","send 0 1 2");
+expect("meter1",".*RX len 56, ep 01, clus 0x0700 \\(Price\\) FC 09 seq [0-9A-F]{2} cmd 00 .*",5000);
+networkWait(10000);
+
+// //Test 11.58 Skipped because the test case states that it is uncertifiable.
+
+
+//Test 11.59 SupplyStatus Response
+send("ihd","zcl metering chg-supply 0x00112233 0x12345678 " + utcTime("esi") + " 0x00000000 0x00 0x01");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0B 7E \\]");
+networkWait(5000);
+//The test spec says currentTime-1 day. This'll do the job though.
+int time = utcTime("esi") - 5000;
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678 " + utcTime("esi") + " " + time +" 0x00 0x01");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0B 87 \\]");
+//Valid case. Send SupplyStatus Command
+int time = utcTime("esi") + 300;
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678 0x00000000 " + time + " 0x00 0x01");
+send("ihd","send 0 1 1");
+networkWait(10000);
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678 0x00000000 0x00000000 0x00 0x01");
+send("ihd","send 0 1 1");
+//expect("ihd",".*RX len 16, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 0C payload.*",1000);
+//expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0B 87 \\]");
+// networkWait(300*1000);
+expect("ihd",".*Supply Status Callback.*",1000);
+expect("ihd",".*Supply Status Callback.*",360000);
+assert(utcTime("esi") >= time);
+
+networkWait(10000);
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678 " + utcTime("esi") + " 0x00000000 0x02 0x00");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 16, ep 01, clus 0x0702 \\(Simple Metering\\) FC 09 seq [0-9A-F]{2} cmd 0C payload\\[77 66 55 44 78 56 34 12 00 00 00 00 02 \\]",1000);
+networkWait(10000);
+
+int time = utcTime("esi") + 300;
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678  0x00000000 " + time + " 0x01 0x00");
+send("ihd","send 0 1 1");
+networkWait(10000);
+
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678  0x00000000 0xFFFFFFFF 0x01 0x00");
+send("ihd","send 0 1 1");
+
+networkWait(10000);
+
+
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678 0x00000000 0x00000000 0x00 0x00");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0B 00 \\]");
+networkWait(340000);
+
+//Test 11.60 This is literally just testing the change supply command above. 
+
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678 0x00000000 0x00000000 0x00 0x00");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0B 00 \\]");
+networkWait(10000);
+
+int time = utcTime("esi") + 300;
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678  0x00000000 " + time + " 0x01 0x00");
+send("ihd","send 0 1 1");
+networkWait(10000);
+
+send("ihd","zcl metering chg-supply 0x44556677 0x12345678  0x00000000 0xFFFFFFFF 0x01 0x00");
+send("ihd","send 0 1 1");
+expect("esi",".*Canceling change supply.*");
+networkWait(10000);
+
+
+//Test 11.61
+
+send("ihd","plugin simple-metering-client local-change-supply 0 0x01 0x01 0x01");
+//expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0B 00 \\]");
+networkWait(5000);
+
+send("ihd","plugin simple-metering-client local-change-supply 0 0x01 0x01 0x02");
+//expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0B 00 \\]");
+networkWait(5000);
+
+//Test 11.62
+send("ihd","plugin simple-metering-client local-change-supply 0 0x01 0x01 0x00");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0C 7E \\]");
+
+networkWait(5000);
+
+send("ihd","plugin simple-metering-client local-change-supply 0 0x01 0x01 0x01");
+expect("esi",".*Setting localSupply Status 1.*");
+networkWait(5000);
+
+send("ihd","plugin simple-metering-client local-change-supply 0 0x01 0x01 0x02");
+expect("esi",".*Setting localSupply Status 2.*");
+networkWait(5000);
+
+//Default Response enabled.
+send("ihd","zcl metering local-chg-supply 0x01");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0C 00 \\]");
+networkWait(5000);
+
+send("ihd","zcl metering local-chg-supply 0x02");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0C 00 \\]");
+networkWait(5000);
+
+//Test 11.63 
+send("ihd","zcl metering set-supply-status 0x12345678 0x02 0x02 0x02 0x02");
+send("ihd","send 0 1 1");
+networkWait(5000);
+send("ihd","zcl global read 0x0702 0x0609");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[09 06 00 30 02 \\]");
+networkWait(2000);
+
+send("ihd","zcl metering set-supply-status 0x12345678 0x00 0x00 0x00 0x00");
+send("ihd","send 0 1 1");
+networkWait(5000);
+send("ihd","zcl global read 0x0702 0x0609");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 8, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 01 payload\\[09 06 00 30 00 \\]");
+networkWait(2000);
+
+//Test 11.64 SetUncontrolledFlowThreshold
+send("ihd","zcl metering set-uncntrl-flow-threshold 0x44556677 0x12345678 0x0001 0x00 0x0005 0x0001 0x01 0x01");
+send("ihd","send 0 1 1");
+expect("ihd",".*RX len 5, ep 01, clus 0x0702 \\(Simple Metering\\) FC 08 seq [0-9A-F]{2} cmd 0B payload\\[0E 00 \\]");
+networkWait(5000);
+
+
+
+networkWait(10000);
+
+//******Test 11.36*************
+send("ihd","zcl global read 0x0702 0x500"); 
+send("ihd","send 0 1 1");
+networkWait(5000);
+
+networkWait(910*12*2000);
+
+expect("ihd",
+       "zcl metering get-profile 0 0  24",
+       ".*Msg: clus 0x0702, cmd 0x00.*");
+expect("ihd",
+       "send 0 1 1",
+       ".*GetProfileResponse 0x[0-9A-F]{8}, 0x00, 0x03, 0x18.*",10000);
+
+//------------------------------------------------------------------------------
+// EMAPPFWKV2-1098
+// Meter Snapshot Client Plugin was pointless; now it is for debugging only
+expect("esi",
+       "zcl metering sch-snapshot-resp 0x00000001 0x02 0x04",
+       ".*Msg: clus 0x0702, cmd 0x04, len 11.*");
+expect("esi",
+       "send 0 1 1",
+       ".*RX: ScheduleSnapshotResponse 0x00000001.*");
+
+expect("esi",
+       "zcl metering take-snapshot-resp 0x00000001 0x02",
+       ".*Msg: clus 0x0702, cmd 0x05, len 8.*");
+expect("esi",
+       "send 0 1 1",
+       ".*RX: TakeSnapshotResponse 0x00000001, 0x02.*");
+
+expect("esi",
+       "zcl metering pub-ss 0x00000001 0x00000002 0x01 0x00 0x01 0x00000000 0x00 " +
+       "0x20 0x21 0x22 0x23",
+       ".*Msg: clus 0x0702, cmd 0x06, len 23.*");
+expect("esi",
+       "send 0 1 1",
+       ".*RX: PublishSnapshotResponse 0x00000001, 0x00000002, 0x01, 0x00, 0x01, " +
+       "0x00000000, 0x00.*");
+networkWait(5000);
+//------------------------------------------------------------------------------

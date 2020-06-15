@@ -1,0 +1,10 @@
+/** @brief Touch Link Failed
+ *
+ * This function is called by the ZLL Commissioning Client plugin if touch linking
+ * fails.
+ *
+ * @param status The reason the touch link failed. Ver.: always
+ */
+void emberAfPluginZllCommissioningClientTouchLinkFailedCallback(EmberAfZllCommissioningStatus status)
+{
+}

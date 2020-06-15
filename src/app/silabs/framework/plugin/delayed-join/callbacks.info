@@ -1,0 +1,17 @@
+/** @brief Consumer App can implement this callback to be notified when there is a new join attempt
+ * that is waiting on the network key
+ *
+ *  @param nodeId  of the joining device
+ *  @param newNodeEui64 longId of the joing device
+ *  @param parentOfNewNode nodeId of the parent
+ *  @param status type of join attempt, if it is secure Join etc.
+ *  @param decision stacks decision on how to handle this join attempt
+ *
+ */
+void emberAfPluginDelayedJoinCallback(EmberNodeId newNodeId,
+                                      EmberEUI64 newNodeEui64,
+                                      EmberNodeId parentOfNewNode,
+                                      EmberDeviceUpdate status,
+                                      EmberJoinDecision decision)
+{
+}

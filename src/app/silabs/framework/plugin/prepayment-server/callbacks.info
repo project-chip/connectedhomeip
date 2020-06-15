@@ -1,0 +1,15 @@
+/** @brief Consumer Top Up
+ *
+ * This function is called when a Consumer Top Up command is received. This
+ * callback must evaluate the command data and determine if it is a valid Top
+ * Up command.
+ *
+ * @param originatingDevice   Ver.: always
+ * @param topUpCode   Ver.: always
+ */
+bool emberAfPluginPrepaymentServerConsumerTopUpCallback(uint8_t originatingDevice,
+                                                        uint8_t *topUpCode)
+{
+  // Return true if the top up command is valid, false if not.
+  return true;
+}

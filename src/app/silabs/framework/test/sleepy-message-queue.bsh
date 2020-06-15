@@ -1,0 +1,700 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+// esi: events client, meter: events server
+String[] devices = { "commshub" };
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12CommsHub-simulation/Se12CommsHub",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12CommsHub-simulation-ezsp/Se12CommsHub",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices,
+                  socImages,
+                  hostImages,
+                  ncpImage,
+                  runArgument.runUsingHostApps,
+                  runArgument.runUsingMultihop,
+                  runArgument.runUsingSpiNcp);
+
+// Setting up a network is not required for this test.
+
+
+int QUEUE_ENTRIES = 5;
+
+// TIMER_WINDOW_SEC -- Number of seconds of a window around the sleepy msg queue timeout.
+//   For example, if a queue entry should timeout after 1 hour, and if the window is 20 seconds,
+//   the test will allow the timer to timeout +/- (window / 2) seconds relative to that timeout.
+int TIMER_WINDOW_SEC = 20;
+int TIMER_WINDOW_MSEC = (TIMER_WINDOW_SEC * 1000);
+int TIMER_HALF_WINDOW_MSEC = (TIMER_WINDOW_MSEC / 2);
+
+// Values used in tests below.
+String[] euis = {
+  // NOTE:  These should be upper case for remove-all test to work.
+  "{00 0D 6F 00 40 01 24 4B}", 
+  "{00 0D 6F 00 40 11 23 3C}", 
+  "{00 0D 6F 00 40 21 24 2B}", 
+  "{00 0D 6F 00 40 31 23 1C}", 
+  "{00 0D 6F 00 40 41 24 0B}", 
+  "{00 0D 6F 00 40 51 23 FC}" };
+
+int[] msgTmout = { 20, 30, 40, 50, 60 };
+int[] msgPtr   = { 0x00008000, 0x1111F111, 0x22223222, 0x33335333, 0x4444A444 };
+int[] msgLen   = { 10, 100, 1000, 10000, 50000 };
+int[] msgPlid  = { 23234, 45454, 56654, 112, 0 };
+
+int[] expMsgIds = { 0,1,2,3,4 };
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #1 - Initialize and fill the queue with valid entries.
+//std.print("========  RUNNING TEST #1 - INIT\n");
+//         - Ensure all CLIs report expected values.
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  send("commshub", "plugin sleepy-message-queue unusedCnt ");
+    expect("commshub", ".*Unused Message Queue Entries=" + QUEUE_ENTRIES );
+
+  for( i=0; i<QUEUE_ENTRIES; i++ ){
+    send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[i] );
+      expect("commshub", ".*Message Stored, msgID=" + i + ", payloadID=" + msgPlid[i] + ".*");
+    send("commshub", "plugin sleepy-message-queue getNumMsg " + euis[i] );
+      expect("commshub", ".*Pending Msg Count=1");
+    send("commshub", "plugin sleepy-message-queue getPendingMsg " + i);
+      expect("commshub", ".*Pending Msg Found=1");
+    send("commshub", "plugin sleepy-message-queue getPendingMsgId " + euis[i]);
+      expect("commshub", ".*Message Pending ID=" + expMsgIds[i]);
+  }
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #2 - Now add one more to the queue and make sure it fails
+//std.print("========  RUNNING TEST #2 - FULL QUEUE\n");
+  i = 0;
+  send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[i] );
+  expect( "commshub", ".*ERROR - Message not stored");
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #3 - // Init queue, fill with 4 messages from 1 EUI, 1 from another, 1 from 3rd EUI (which won't fit)
+//std.print("========  RUNNING TEST #3 - SINGLE-EUI, MULT-ENTRIES\n");
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  for( i=0; i<QUEUE_ENTRIES-1; i++ ){
+    send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[0] );
+      expect("commshub", ".*Message Stored, msgID=" + i + ", payloadID=" + msgPlid[i] + ".*");
+    send("commshub", "plugin sleepy-message-queue getNumMsg " + euis[0] );
+      expect("commshub", ".*Pending Msg Count=" + (i+1) );
+  }
+  send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[1] );
+    expect("commshub", ".*Message Stored, msgID=" + i + ", payloadID=" + msgPlid[i] + ".*");
+  send("commshub", "plugin sleepy-message-queue getNumMsg " + euis[1] );
+    expect("commshub", ".*Pending Msg Count=1" );
+  send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[i] );
+  expect( "commshub", ".*ERROR - Message not stored");
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #4 - Remove messages from queue
+//std.print("========  RUNNING TEST #4 - REMOVE MSG\n");
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  // Remove should pass if index is valid.
+    send( "commshub", "plugin sleepy-message-queue remove 0" );
+      expect( "commshub", ".*Removed Msg ID=0" );
+  
+  // Populate queue
+  for( i=0; i<QUEUE_ENTRIES-1; i++ ){
+    send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[0] );
+      expect("commshub", ".*Message Stored, msgID=" + i + ", payloadID=" + msgPlid[i] + ".*");
+    send("commshub", "plugin sleepy-message-queue unusedCnt ");
+      expect("commshub", ".*Unused Message Queue Entries=" + (4-i) );
+  }
+  send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[1] );
+    expect("commshub", ".*Message Stored, msgID=" + i + ", payloadID=" + msgPlid[i] + ".*");
+
+  // Remove out-of-bounds entry should fail
+  send( "commshub", "plugin sleepy-message-queue remove " + QUEUE_ENTRIES );
+    expect( "commshub", ".*ERROR - Msg Remove Failed" );
+
+  send("commshub", "plugin sleepy-message-queue unusedCnt ");
+    expect("commshub", ".*Unused Message Queue Entries=0" );
+  // Now try removing each of the created entries
+  for( i=0; i<QUEUE_ENTRIES; i++ ){
+    send( "commshub", "plugin sleepy-message-queue remove " + i );
+      expect( "commshub", ".*Removed Msg ID=" + i );
+    send("commshub", "plugin sleepy-message-queue unusedCnt ");
+      expect("commshub", ".*Unused Message Queue Entries=" + (i+1) );
+  }
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #5 - Remove All messages from queue
+//std.print("========  RUNNING TEST #5 - REMOVE ALL\n");
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  // Populate queue
+  for( i=0; i<QUEUE_ENTRIES-1; i++ ){
+    send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[0] );
+      expect("commshub", ".*Message Stored, msgID=" + i + ", payloadID=" + msgPlid[i] + ".*");
+    send("commshub", "plugin sleepy-message-queue unusedCnt ");
+      expect("commshub", ".*Unused Message Queue Entries=" + (4-i) );
+  }
+  send("commshub", "plugin sleepy-message-queue store " + msgTmout[i] + " " + msgPtr[i] + " " + msgLen[i] + " " + msgPlid[i] + " " + euis[1] );
+    expect("commshub", ".*Message Stored, msgID=" + i + ", payloadID=" + msgPlid[i] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue unusedCnt ");
+    expect("commshub", ".*Unused Message Queue Entries=0" );
+  // Now try removing the first EUI
+  send("commshub", "plugin sleepy-message-queue removeAll " + euis[0]);
+    //expect("commshub", ".*Removed All Msgs from " + euis[0] );
+  send("commshub", "plugin sleepy-message-queue unusedCnt ");
+    expect("commshub", ".*Unused Message Queue Entries=4" );
+  // Remove from an EUI that is not in the list
+  send("commshub", "plugin sleepy-message-queue removeAll " + euis[2]);
+    //expect("commshub", ".*Removed All Msgs from " + euis[2] );
+  send("commshub", "plugin sleepy-message-queue unusedCnt ");
+    expect("commshub", ".*Unused Message Queue Entries=4" );
+
+  // Now remove for the last EUI
+  send("commshub", "plugin sleepy-message-queue removeAll " + euis[1]);
+    //expect("commshub", ".*Removed All Msgs from " + euis[1] );
+  send("commshub", "plugin sleepy-message-queue unusedCnt ");
+    expect("commshub", ".*Unused Message Queue Entries=" + QUEUE_ENTRIES );
+ 
+
+
+ 
+//////////////////////////////////////////////////////////////////////////////
+// TEST #6 - Simple Msg Timeout
+//std.print("========  RUNNING TEST #6 - SIMPLE MSG TIMEOUT\n");
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+  
+// Setup message timeout for 20 seconds.
+  send("commshub", "plugin sleepy-message-queue store 20 " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored, msgID=0" + ", payloadID=" + msgPlid[0] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+
+// Sleep for 5 sec at a time, optionally query how much time is left on timer
+
+  network.sleep( 5 * 1024 );
+
+  network.sleep( 5 * 1024 );
+
+  network.sleep( 5 * 1024 );
+
+  network.sleep( (4 * 1024) + 512 );
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+  //  expect("commshub", ".*Remaining Time.*");
+
+// Check if we still have a pending message.
+  send("commshub", "plugin sleepy-message-queue getPendingMsg " + 0 );
+    expect("commshub", ".*Pending Msg Found=1");
+
+// Now sleep for a few more ms - this should expire the event.
+  network.sleep( 1024 );
+
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+
+  send("commshub", "plugin sleepy-message-queue getPendingMsg " + 0 );
+    expect("commshub", ".*Pending Msg Found=0");
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #7 - Long Msg Timeout
+
+// Current implementation shifts "seconds" timeout << 10, which multiplies 
+// each second by 1024 ms.  So a single second takes 1024ms.
+// Thus, we will calculate (1024 * 60) seconds in an hour to generate our delays.
+
+int MSEC_PER_MIN = (1024 * 60);
+
+
+//std.print("========  RUNNING TEST #7 - LONG MSG TIMEOUT\n");
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+  
+// Setup message timeout for 24 hours.
+// 24 hours = 86400 seconds
+
+  // Advance initial clock past a few seconds.
+  network.sleep(  240 * MSEC_PER_MIN );
+
+  send("commshub", "plugin sleepy-message-queue store 86400 " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored, msgID=0" + ", payloadID=" + msgPlid[0] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+
+// Check if we still have a pending message.
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  // Check every couple hours to make sure message is still queued.
+  network.sleep( 120 * MSEC_PER_MIN );				// 2 hours
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+
+  network.sleep( 240 * MSEC_PER_MIN );				// 4 hours
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( 720 * MSEC_PER_MIN );				// 12 hours, 6 left
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+
+
+  network.sleep( (360 * MSEC_PER_MIN) - TIMER_HALF_WINDOW_MSEC );	// < 6 hours, small time left
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+
+
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #8 - Multiple Msg Timeouts
+
+int TWO_HOUR_SEC =     (60 * 60 * 2);
+int THREE_HOUR_SEC =   (60 * 60 * 3);
+int FOUR_HOUR_SEC =    (60 * 60 * 4);
+int SIXTEEN_HOUR_SEC = (60 * 60 * 16);
+int EIGHTEEN_HOUR_SEC = (60 * 60 * 18);
+int TWENTY_HOUR_SEC =  (60 * 60 * 20);
+
+//std.print("========  RUNNING TEST #8 - MULTIPLE MSG TIMEOUTS\n");
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Setup 3 messages with the following timeouts:  2hr, 16 hr, 20 hr.
+// Just before the 20 hr expires, add two more with 1hr and 3hr expirations.
+// Ensure all messages expire at the right time.
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  send("commshub", "plugin sleepy-message-queue store " + TWO_HOUR_SEC + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored, msgID=0" + ", payloadID=" + msgPlid[0] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + SIXTEEN_HOUR_SEC + " " + msgPtr[1] + " " + msgLen[1] + " " + msgPlid[1] + " " + euis[1] );
+    expect("commshub", ".*Message Stored, msgID=1" + ", payloadID=" + msgPlid[1] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + TWENTY_HOUR_SEC + " " + msgPtr[2] + " " + msgLen[2] + " " + msgPlid[2] + " " + euis[2] );
+    expect("commshub", ".*Message Stored, msgID=2" + ", payloadID=" + msgPlid[2] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=0");
+
+  // EXPIRE THE FIRST - check just before and just after expiration
+  network.sleep( (120 * MSEC_PER_MIN) - TIMER_HALF_WINDOW_MSEC );		// almost 2 hours
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  // EXPIRE THE SECOND - check just before and just after expiration
+  network.sleep( (840 * MSEC_PER_MIN) - TIMER_WINDOW_MSEC );				// almost 14 hours
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+
+
+  // EXPIRE THE THIRD, but just before, add 2 new messages
+  network.sleep( (240 * MSEC_PER_MIN) - TIMER_WINDOW_MSEC );				// almost 4 hours
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+
+
+  send("commshub", "plugin sleepy-message-queue store " + THREE_HOUR_SEC + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored, msgID=0" + ", payloadID=" + msgPlid[0] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue store " + TWO_HOUR_SEC + " " + msgPtr[4] + " " + msgLen[4] + " " + msgPlid[4] + " " + euis[4] );
+    expect("commshub", ".*Message Stored, msgID=1" + ", payloadID=" + msgPlid[4] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue remainTime 0");
+    expect("commshub", ".*Remaining Time.*");
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=0");
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Setup 3 messages, 2 of which expire at the same time, before the third.
+// Verify the expiration of each happens as expected.
+
+//std.print("========  RUNNING TEST #8 - MULTIPLE MSG TIMEOUTS\n");
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  send("commshub", "plugin sleepy-message-queue store " + TWO_HOUR_SEC + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored, msgID=0" + ", payloadID=" + msgPlid[0] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + FOUR_HOUR_SEC + " " + msgPtr[1] + " " + msgLen[1] + " " + msgPlid[1] + " " + euis[1] );
+    expect("commshub", ".*Message Stored, msgID=1" + ", payloadID=" + msgPlid[1] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + TWO_HOUR_SEC + " " + msgPtr[2] + " " + msgLen[2] + " " + msgPlid[2] + " " + euis[2] );
+    expect("commshub", ".*Message Stored, msgID=2" + ", payloadID=" + msgPlid[2] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=0");
+
+  // Sleep until just before expiration of the first two.
+  network.sleep( (120 * MSEC_PER_MIN) - TIMER_HALF_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=0"); 
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #9 - Remove Msg Timeouts
+
+//std.print("========  RUNNING TEST #9 - REMOVE MSG, ADJ TIMEOUTS\n");
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Configure 3 messages, with the shortest timeout second.
+// Remove the 2nd message.  Ensure the 1st & 3rd time out at the correct time.
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  send("commshub", "plugin sleepy-message-queue store " + THREE_HOUR_SEC + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored, msgID=0" + ", payloadID=" + msgPlid[0] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + TWO_HOUR_SEC + " " + msgPtr[1] + " " + msgLen[1] + " " + msgPlid[1] + " " + euis[1] );
+    expect("commshub", ".*Message Stored, msgID=1" + ", payloadID=" + msgPlid[1] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + FOUR_HOUR_SEC + " " + msgPtr[2] + " " + msgLen[2] + " " + msgPlid[2] + " " + euis[2] );
+    expect("commshub", ".*Message Stored, msgID=2" + ", payloadID=" + msgPlid[2] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=0");
+
+
+
+  // Sleep until just before the first expires.
+  network.sleep( (120 * MSEC_PER_MIN) - TIMER_HALF_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue remove 1");
+    expect("commshub", ".*Removed Msg ID=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  // Sleep until just before the second expires.
+  network.sleep( (60 * MSEC_PER_MIN) );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( (60 * MSEC_PER_MIN) );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=0");
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Configure 4 messages, two from the same EUI, and one of these 2 has the shortest timeout.
+// Remove all message from the EUI with 2.  Ensure the remaining time out at the correct time.
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  send("commshub", "plugin sleepy-message-queue store " + SIXTEEN_HOUR_SEC + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored, msgID=0" + ", payloadID=" + msgPlid[0] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + EIGHTEEN_HOUR_SEC + " " + msgPtr[1] + " " + msgLen[1] + " " + msgPlid[1] + " " + euis[1] );
+    expect("commshub", ".*Message Stored, msgID=1" + ", payloadID=" + msgPlid[1] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + FOUR_HOUR_SEC + " " + msgPtr[2] + " " + msgLen[2] + " " + msgPlid[2] + " " + euis[1] );
+    expect("commshub", ".*Message Stored, msgID=2" + ", payloadID=" + msgPlid[2] + ".*");
+  send("commshub", "plugin sleepy-message-queue store " + TWENTY_HOUR_SEC + " " + msgPtr[3] + " " + msgLen[3] + " " + msgPlid[3] + " " + euis[3] );
+    expect("commshub", ".*Message Stored, msgID=3" + ", payloadID=" + msgPlid[3] + ".*");
+
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  // Sleep until just before the first expires.
+  network.sleep( (240 * MSEC_PER_MIN) - TIMER_HALF_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue removeAll " + euis[1]);
+    expect("commshub", ".*Removed All Msgs from .*");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 1");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 2");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  // Sleep until just before the next expires
+  network.sleep( (720 * MSEC_PER_MIN) );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=1");
+  
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  // Sleep until the next expires
+  network.sleep( (240 * MSEC_PER_MIN) - TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 3");
+    expect("commshub", ".*Pending Msg Found=0");
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #10 - Test adding a message with a timeout that is too long.
+
+//std.print("========  RUNNING TEST #10 - EXCEED MAX MESSAGE TIMEOUT\n");
+
+  int MAX_TIMEOUT_SEC_U32 = (0x7fffffff >> 10);
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  send("commshub", "plugin sleepy-message-queue store " + (MAX_TIMEOUT_SEC_U32) + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored.*");
+
+  // Try to store, this time exceeding the max timeout.
+  send("commshub", "plugin sleepy-message-queue store " + (MAX_TIMEOUT_SEC_U32+1) + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*ERROR - Message not stored.*");
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #11 - Test wrap on timer.  Ensure timeouts work fine.
+
+//std.print("========  RUNNING TEST #11 - TIMER WRAP\n");
+
+
+/****************************************************************************
+
+//// NOTE - THIS TEST TAKES 5 MINUTES TO RUN IN CYGWIN!!!
+//          It will be commented out for now, but should be run at our desks periodically.
+
+
+
+int MSEC_PER_HOUR = (MSEC_PER_MIN * 60);
+int MSEC_PER_DAY  = (MSEC_PER_HOUR * 24);
+
+// The timer used in the sleepy message queue is a u32 millisecond timer.  It will wrap after 0xffffffff ms, or 1193 hours, or 49 days.
+// A single message can be buffered up to 0x1fffff seconds, or 582 hours, or 24.272 days.
+// 24 days = (24 * (24 * 60 * 60)) seconds = 2073600 seconds = 0x1FA400, leaving 0x5bff seconds, or 23,551 seconds
+// So, if we queue up multiple 24-hour messages in series, wrap will eventually occur.
+
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+
+  // Store a message for 24 days.
+  send("commshub", "plugin sleepy-message-queue store " + (MAX_TIMEOUT_SEC_U32) + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored.*");
+
+  network.sleep( (24 * MSEC_PER_DAY) +  23550000 );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( 713000 );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+
+
+  // Store a 2nd message for 24 days.
+  send("commshub", "plugin sleepy-message-queue store " + (MAX_TIMEOUT_SEC_U32) + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored.*");
+  
+
+  std.print("____ SLEEPING msec " + (MSEC_PER_DAY) + "\n" );
+  network.sleep( (24 * MSEC_PER_DAY) +  23550000 );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( 713000 );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+
+
+  // Store a 3rd message for 24 days.
+  send("commshub", "plugin sleepy-message-queue store " + (MAX_TIMEOUT_SEC_U32) + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored.*");
+  
+
+  std.print("____ SLEEPING msec " + (MSEC_PER_DAY) + "\n" );
+  network.sleep( (24 * MSEC_PER_DAY) +  23550000 );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( 713000 );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+****************************************************************************/
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #12 - Test wrap on timer.  Ensure timeouts work fine.
+
+//std.print("========  RUNNING TEST #12 - TIMER WRAP\n");
+
+
+//// NOTE - This test is similar to TEST #11, but it takes 3 minutes to run in Cygwin!
+//          So it will also be commented out.
+
+/****************************************************************************
+
+  send("commshub", "plugin sleepy-message-queue init");
+  expect("commshub", ".*Initialized Sleepy.*");
+
+  send("commshub", "plugin sleepy-message-queue timestamp");
+  String data = expect("commshub", ".*MS Tick=.*");
+  int startIdx = data.lastIndexOf('=');
+  data = data.substring((startIdx+1));
+  data = data.trim();
+  std.print("====  MS Tick= " + data + "\n");
+
+  int n = Integer.parseInt(data);
+  if( n < 0 ){
+    // n = remaining # msec until wrap
+    n = abs(n);
+    n -= 10000;  // Reduce the time to be sure we wake before wrap.
+    network.sleep( n );
+  }
+  else{
+    // time to wrap = 2147483647 + (2147483647 - n)
+    n = (2147483647 - n);
+    network.sleep( n );
+    network.sleep( (2147483647 - 10000) );
+  }
+  // Now awake and ready - msTick should be close to wrapping.
+  send("commshub", "plugin sleepy-message-queue timestamp");
+  String data = expect("commshub", ".*MS Tick=.*");
+  int startIdx = data.lastIndexOf('=');
+  data = data.substring((startIdx+1));
+  data = data.trim();
+  std.print("====  MS Tick= " + data + "\n");
+
+
+  send("commshub", "plugin sleepy-message-queue store " + TWO_HOUR_SEC + " " + msgPtr[0] + " " + msgLen[0] + " " + msgPlid[0] + " " + euis[0] );
+    expect("commshub", ".*Message Stored.*");
+
+
+  network.sleep( (120 * MSEC_PER_MIN) - TIMER_HALF_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=1");
+
+  network.sleep( TIMER_WINDOW_MSEC );
+  send("commshub", "plugin sleepy-message-queue getPendingMsg 0");
+    expect("commshub", ".*Pending Msg Found=0");
+
+****************************************************************************/
+
+

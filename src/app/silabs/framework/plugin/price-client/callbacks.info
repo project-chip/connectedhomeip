@@ -1,0 +1,39 @@
+/** @brief Price Started
+ *
+ * This function is called by the Price client plugin whenever a price starts.
+ *
+ * @param price The price that has started. Ver.: always
+ */
+void emberAfPluginPriceClientPriceStartedCallback(EmberAfPluginPriceClientPrice *price)
+{
+}
+
+/** @brief Price Expired
+ *
+ * This function is called by the Price client plugin whenever a price expires.
+ *
+ * @param price The price that has expired. Ver.: always
+ */
+void emberAfPluginPriceClientPriceExpiredCallback(EmberAfPluginPriceClientPrice *price)
+{
+}
+
+/** @brief Pending Cpp Event
+ *
+ * This function is called by the Price client plugin when a CPP event is
+ * received with pending status.
+ *
+ * @param cppAuth The CPP Auth status. Ver.: always
+ */
+uint8_t emberAfPluginPriceClientPendingCppEventCallback(uint8_t cppAuth)
+{
+  extern uint8_t emberAfPriceClusterDefaultCppEventAuthorization;
+
+  /* This callback should decide which CPP Auth status to send in response to the pending status.
+     It may return EMBER_AF_PLUGIN_PRICE_CPP_AUTH_ACCEPTED or EMBER_AF_PLUGIN_PRICE_CPP_AUTH_REJECTED. */
+  if ( cppAuth != EMBER_AF_PLUGIN_PRICE_CPP_AUTH_FORCED ) {
+    return emberAfPriceClusterDefaultCppEventAuthorization;
+  } else {
+    return EMBER_AF_PLUGIN_PRICE_CPP_AUTH_ACCEPTED;
+  }
+}

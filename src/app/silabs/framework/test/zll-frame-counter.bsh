@@ -1,0 +1,228 @@
+import com.ember.peek.SimulatedNetwork;
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multi-hop****");
+  return;
+} 
+
+// After joining a network that was found during a scan, the Network Find and
+// ZLL Commissioning plugins wait a bit to give the application time to decide
+// whether it wants to stay on the network.  If the application leaves, the
+// plugins will continue scanning.  Otherwise, they will clean up their state
+// machines and the form and join state machine.  So that we do not trigger
+// the
+// automatic continuation of the scan, wait for two minutes (the default
+// timeout is one minute) after a joinable scan.
+final int JOINABLE_SCAN_TIMEOUT = 120000;
+
+// Create 2 lights and 1 remote in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"zll-light1", "zll-light2", "zll-remote1", "ha-light", "ha-switch"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/ZllColorLight-simulation/ZllColorLight",
+  "build/af-test-apps/ZllColorLight-simulation/ZllColorLight",
+  "build/af-test-apps/ZllColorSceneRemote-simulation/ZllColorSceneRemote",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaSwitch-simulation/HaSwitch",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/ZllColorLight-simulation-ezsp/ZllColorLight",
+  "build/af-test-apps/ZllColorLight-simulation-ezsp/ZllColorLight",
+  "build/af-test-apps/ZllColorSceneRemote-simulation-ezsp/ZllColorSceneRemote",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaSwitch-simulation-ezsp/HaSwitch",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Initial setup
+setupEncryption();
+lazyExpect = true;
+int fc1, fc2;
+
+// Setting a channel before touchlink because sometime remote1 always tries to touch
+// link with light 1 depending on which channel light 1 and light 2 form the zll network.
+dbg.println("\n--- zll-light1 forms ZLL network & zll-remote1 touchlinks it. ---");
+expect("zll-light1", "plugin zll-commissioning channel 11", "Primary channels: 11 \\(0x00000800\\)");
+expect("zll-remote1", "plugin zll-commissioning channel 11", "Primary channels: 11 \\(0x00000800\\)");
+
+// light2 will also now reply to the scan request, so disable in case remote1
+// choses to link with it
+send("zll-light2", "plugin zll-commissioning disable");
+startZllNetwork("zll-light1", "11", "0", "0x1234", timeout * 10);
+touchlinkZllDevices("zll-remote1", "zll-light1");
+
+send("zll-remote1", "network id");
+send("zll-light1", "network id");
+networkWait(5000);
+
+dbg.println("\n--- zll-light2 forms ZLL network & zll-remote1 touchlinks it. ---");
+send("zll-light2", "plugin zll-commissioning enable");
+expect("zll-light2", "plugin zll-commissioning channel 12", "Primary channels: 12 \\(0x00001000\\)");
+expect("zll-remote1", "plugin zll-commissioning channel 12", "Primary channels: 12 \\(0x00001000\\)");
+startZllNetwork("zll-light2", "12", "0", "0x5678", timeout * 10);
+touchlinkZllDevices("zll-remote1", "zll-light2");
+
+networkWait(5000);
+
+// The three devices should now be on the same PAN (on channel 11, not channel 12)
+assertSameNetwork("zll-remote1", "zll-light1");
+assertSameNetwork("zll-remote1", "zll-light2");
+assert(channel("zll-remote1").equals("11"));
+
+dbg.println("\n--- zll-light2 reads zll-light1's attribute. ---");
+send("zll-light2", "zcl global read 0x0006 0x4000");
+send("zll-light2", "send 0x0002 1 1");
+expectMultiline("zll-light1",
+                new String[] {
+                  "READ_ATTR: clus 0006",
+                  "OTA READ: ep:01 cid:0006 attid:4000 msk:40 mfcode:0000",
+                  "READ: clus 0006, attr 4000, dataLen: 01, OK",
+                });
+expectMultiline("zll-light2",
+                new String[] {
+                  "READ_ATTR_RESP: \\(On/off\\)",
+                  " - attr:4000, status:00",
+                  "   type:10, val:01",
+                });
+expect("zll-light1", "DEFAULT_RESP: \\(On/off\\) cmd 01 status 00");
+networkWait(10000);
+
+dbg.println("\n--- bump up zll-light2's network frame counter. ---");
+reboot("zll-light2");
+reboot("zll-light2");
+reboot("zll-light2");
+networkWait(10000);
+
+dbg.println("\n--- zll-light1 reads zll-light2's attribute. ---");
+send("zll-light1", "zcl global read 0x0006 0x4000");
+send("zll-light1", "send 0x0003 1 1");
+expectMultiline("zll-light2",
+                new String[] {
+                  "READ_ATTR: clus 0006",
+                  "OTA READ: ep:01 cid:0006 attid:4000 msk:40 mfcode:0000",
+                  "READ: clus 0006, attr 4000, dataLen: 01, OK",
+                });
+expectMultiline("zll-light1",
+                new String[] {
+                  "READ_ATTR_RESP: \\(On/off\\)",
+                  " - attr:4000, status:00",
+                  "   type:10, val:01",
+                });
+expect("zll-light2", "DEFAULT_RESP: \\(On/off\\) cmd 01 status 00");
+networkWait(10000);
+
+fc1 = nwkFrameCounter("zll-light2");
+networkWait(10000);
+
+dbg.println("\n--- zll-light2 discards its network frame counter and tries to rejoin network. ---");
+expect("zll-light2", "plugin zll-commissioning reset", "EMBER_NETWORK_DOWN");
+fc2 = nwkFrameCounter("zll-light2");
+
+// network frame counter shouldn't be set to zero during reset to factory new
+assert(fc2 > fc1 );
+
+dbg.print(nwkFrameCounter("zll-light2"));
+expect("zll-light2", "plugin zll-commissioning channel 20", "Primary channels: 20 \\(0x00100000\\)");
+expect("zll-remote1", "plugin zll-commissioning channel 20", "Primary channels: 20 \\(0x00100000\\)");
+fc1 = nwkFrameCounter("zll-light2");
+startZllNetwork("zll-light2", "20", "0", "0x9abc", timeout * 10);
+touchlinkZllDevices("zll-remote1", "zll-light2");
+fc2 = nwkFrameCounter("zll-light2");
+
+// zll-light2's think it is joining a new network due to being "reset"
+// however it shouldn't reset its network frame counter when forming a network
+// or touchlinking.
+assert(fc2 > fc1);
+
+dbg.println("\n--- reset all for HA / ZLL testing ---");
+expect("zll-light1", "plugin zll-commissioning reset", ".*EMBER_NETWORK_DOWN", timeout * 10);
+expect("zll-light2", "plugin zll-commissioning reset", ".*EMBER_NETWORK_DOWN", timeout * 10);
+expect("zll-remote1", "plugin zll-commissioning reset", ".*EMBER_NETWORK_DOWN", timeout * 10);
+
+// 'plugin zll-commissioning reset' cli does not reset emAfZllPrimaryChannelMask, resetting
+// channel mask of light1 and remote1 to default so that they can scan on other channels to
+// join ha-light, not required for light2 as we are not using it anywhere below in the test.
+expect("zll-light1", "plugin zll-commissioning mask 0", "Primary channels: .*\\(0x02108800\\)");
+expect("zll-remote1", "plugin zll-commissioning mask 0", "Primary channels: .*\\(0x02108800\\)");
+
+dbg.println("\n--- Using an HA light, start an HA network  ---");
+networkFindUnused("ha-light", timeout * 10);
+permitJoin("ha-light", true);
+
+fc1 = nwkFrameCounter("zll-light1");
+dbg.println("\n--- ZLL light should find the HA network and join to it. ---");
+expect("zll-light1", "plugin zll-commissioning joinable", "EMBER_NETWORK_UP");
+expect("zll-light1", "keys print", ".*5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39.*");
+assertSameNetwork("ha-light", "zll-light1");
+networkWait(JOINABLE_SCAN_TIMEOUT);
+
+fc2 = nwkFrameCounter("zll-light1");
+assert(fc2 > fc1);
+
+dbg.println("\n--- Join HA switch to HA network and make sure it can control the ZLL light ---");
+expect("ha-switch", "network find joinable", "EMBER_NETWORK_UP");
+assertSameNetwork("ha-light", "ha-switch");
+networkWait(timeout);
+
+send("ha-switch", "zcl on-off toggle");
+send("ha-switch", "send 0xFFFF 0x01 0xFF");
+assert(network.expect(new String[]{"zll-light1"}, port, "Light on 0x0[16] is now ON").length == 0);
+dbg.println("\n--- HA switch turned on ZLL light ---");
+networkWait(JOINABLE_SCAN_TIMEOUT);
+
+dbg.println("\n--- Reset the first ZLL remote. This will cause it to leave the HA network ---");
+expect("zll-light1", "plugin zll-commissioning reset", ".*EMBER_NETWORK_DOWN");
+networkWait(timeout * 10);
+
+dbg.println("\n--- Rejoin ZLL Light to HA network ---");
+networkWait(10000);//Workaround beacon collision
+expect("zll-light1", "plugin zll-commissioning joinable", "EMBER_NETWORK_UP");
+assertSameNetwork("ha-light", "zll-light1");
+networkWait(JOINABLE_SCAN_TIMEOUT);
+
+fc2 = nwkFrameCounter("zll-light1");
+
+dbg.println("\n-- Check if the HA light is still able to control the rejoined ZLL Light ---");
+send("ha-switch", "zcl on-off on");
+send("ha-switch", "send 0xFFFF 0x01 0xFF");
+assert(network.expect(new String[]{"zll-light1"}, port, "Light on 0x0[16] is now ON").length == 0);
+
+fc1 = nwkFrameCounter("zll-remote1");
+networkWait((timeout * 3)+ 10000); // to avoid beacon collision.
+zllJoin("zll-remote1", timeout * 10);
+expect("zll-remote1", "keys print", ".*5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39.*");
+assertSameNetwork("ha-light", "zll-remote1");
+networkWait(JOINABLE_SCAN_TIMEOUT);
+
+dbg.println("\n--- Make sure the ZLL remote can control the HA and ZLL lights ---");
+buttonPress("zll-remote1", 
+            0,
+            null,                              // press button expect 
+            ".*Broadcasting \"off\" command");  // release button expect
+
+assert(network.expect(new String[]{"ha-light", "zll-light1"}, port, "Light on 0x0[16] is now OFF").length == 0);
+fc2 = nwkFrameCounter("zll-remote1");
+assert(fc2 > fc1);
+
+dbg.println("\n--- Reset ZLL remote & rejoin network ---");
+expect("zll-remote1", "plugin zll-commissioning reset", ".*EMBER_NETWORK_DOWN", timeout * 10);
+networkWait(20000); // to avoid beacon collision.
+zllJoin("zll-remote1", timeout * 10);
+assertSameNetwork("ha-light", "zll-remote1");
+networkWait(JOINABLE_SCAN_TIMEOUT);
+
+dbg.println("\n--- Make sure rejoined ZLL remote can control the HA and ZLL lights ---");
+buttonPress("zll-remote1", 
+            1,
+            null,                              // press button expect 
+            ".*Broadcasting \"on\" command");  // release button expect
+
+assert(network.expect(new String[]{"ha-light", "zll-light1"}, port, "Light on 0x0[16] is now ON").length == 0);
+fc2 = nwkFrameCounter("zll-remote1");
+assert(fc2 > fc1);
+

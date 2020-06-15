@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-device-database" name="Plugin Commands: Device Database">
+    <description>This plugin provides a set of CLI commands for printing and manipulating the device database.</description>
+  </group>
+  <command cli="plugin device-database print-all" functionName="emAfPluginDeviceDatabasePrintAll" group="plugin-device-database">
+    <description>
+      Print all devices in the database.
+    </description>
+  </command>
+  <command cli="plugin device-database device print" functionName="emAfPluginDeviceDatabasePrintDevice" group="plugin-device-database">
+    <description>
+      Print all the clusters and endpoints known about the specified device in the database.
+    </description>
+    <arg name="eui64" type="IEEE_ADDRESS" description="The address of the device to be looked up (little endian)"/>
+  </command>
+  <command cli="plugin device-database device erase" functionName="emAfPluginDeviceDatabaseErase" group="plugin-device-database">
+    <description>
+      Erase the device with specified EUI64 from the database.
+    </description>
+    <arg name="eui64" type="IEEE_ADDRESS" description="The address of the device to erase from the database."/>
+  </command>
+  <command cli="plugin device-database device add-dummy" functionName="emAfPluginDeviceDatabaseAddDummyDevice" group="plugin-device-database">
+    <description>
+      Add a device with specified EUI64 and a sequential number of clusters and endpoints.
+    </description>
+    <arg name="eui64" type="IEEE_ADDRESS" description="The address of the dummy device to add."/>
+    <arg name="endpoints" type="INT8U" description="The number of dummy endpoints to add."/>
+    <arg name="clusters" type="INT16U" description="The number of dummy clusters to add."/>
+  </command>
+</cli>

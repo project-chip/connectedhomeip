@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-calendar-client" name="Plugin Commands: Calendar Client">
+    <description>
+      The Calendar Client plugin contributes several commands to the application framework's CLI.  These commands are used for interacting with calendars.
+    </description>
+  </group>
+  <command cli="plugin calendar-client clear" functionName="emberAfPluginCalendarClientClearCommand" group="plugin-calendar-client">
+    <description>
+      Clear the calendars.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint." />
+  </command>
+  <command cli="plugin calendar-client print" functionName="emberAfPluginCalendarClientPrintCommand" group="plugin-calendar-client">
+    <description>
+      Print the calendars.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint." />
+  </command>
+</cli>

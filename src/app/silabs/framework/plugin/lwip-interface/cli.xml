@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<cli>
+	<group id="plugin-lwip-interface" name="Plugin Commands: lwip-interface">
+    <description>
+      A set of CLI commands for configuring and managing the lwip network interface.
+    </description>
+  </group>
+  <command cli="plugin lwip-interface set-ipv4-address" functionName="emberAfPluginLwipSetIpv4AddressCommand" group="plugin-lwip-interface"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Set the Local IP address, default gateway and netmask.
+    </description>
+    <arg name="ipAddress" type="CHAR_STRING" description="Local Ipv4 address" />
+    <arg name="netmask" type="CHAR_STRING" description="network mask" />
+    <arg name="defaultGateway" type="CHAR_STRING" description="Default gateway address" />
+  </command>
+  <command cli="plugin lwip-interface status" functionName="emberAfPluginLwipStatusCommand" group="plugin-lwip-interface"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Print build and interface configuration information.
+    </description>
+   </command>
+    <command cli="plugin lwip-interface set-mac-address" functionName="emberAfPluginLwipSetMacAddressCommand" group="plugin-lwip-interface"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Set local Ethernet MAC address. 
+    </description>
+    <arg name="ethernetAddress" type="OCTET_STRING" description="MAC Address" />
+   </command>
+   <command cli="plugin lwip-interface ifconfig" functionName="emberAfPluginLwipIfconfigCommand" group="plugin-lwip-interface"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Print local Ethernet hardware configuration. 
+    </description>
+   </command>
+   <command cli="plugin lwip-interface ifup" functionName="emberAfPluginLwipIfupCommand" group="plugin-lwip-interface"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Enable local Ethernet interface.
+    </description>
+  </command>
+   <command cli="plugin lwip-interface ifdown" functionName="emberAfPluginLwipIfdownCommand" group="plugin-lwip-interface"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Disable local Ethernet interface
+    </description>
+  </command>
+  <command cli="plugin lwip-interface set-enet-debug" group="plugin-lwip-interface"
+  	functionName="emberAfPluginLwipPrintEnetCommand"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+  	<description>
+  		set debug print level for ethernet driver
+  	</description>
+  	<arg name="level" description="0=None, 1=Some, 2=All"
+  		type="INT8U">
+  	</arg>
+  </command>
+  <command cli="plugin lwip-interface enable-dhcp" group="plugin-lwip-interface"
+    functionName="emberAfPluginLwipEnableDhcpCommand"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+     Enable or disable DHCP. If disabled, the device will revert to the static address stored in tokens. The device needs to be restarted for the change to take effect.
+   </description>
+   <arg name="enable" description="0=Disable, 1=Enable" type="INT8U">
+   </arg>
+  </command>
+</cli>

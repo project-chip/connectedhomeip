@@ -1,0 +1,64 @@
+// This test is a beanshell test if an sleepy end-device actually goes to sleep
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {                                             
+  std.print("**** Sleep mode is broken for host NCP mode");
+  return;                                                                       
+ } 
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"gateway","gas-meter"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+  "build/af-test-apps/SeMeterGasSleepy-simulation/SeMeterGasSleepy",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/SeMeterGasSleepy-simulation-ezsp/SeMeterGasSleepy",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 1000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+networkForm("gateway");
+networkWait(5000);
+ 
+networkJoinTo("gas-meter", "gateway");
+
+networkWait(5000);
+
+
+//-----------------------------------------------------------------------------
+
+String nodeIdMeter = findNodeByName("gas-meter").nodeIdHex;
+
+//wait for some time, for some sleep cycles and events be triggered
+networkWait(29000);                                                             
+                                                                                
+power("gateway",false);                                                         
+networkWait(1000);                                                              
+ 
+expect("gas-meter",".*slept for.*");                                                                                
+send("gas-meter", "zcl global read 0 0");                                     
+expect("gas-meter",                                                          
+         "send 0x0000 1 1",                                                     
+         ".*slept for.*",                                    
+         2000);      
+networkWait(1000); 
+expect("gas-meter",                                                             
+         "",                                                     
+         ".*slept for.*",                                                       
+         5000);                                                           

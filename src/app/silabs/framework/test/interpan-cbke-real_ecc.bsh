@@ -1,0 +1,117 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {
+  std.print("****TODO: Convert for host****");
+  return;
+} else if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Convert for multihop****");
+  return;
+}
+
+// Create three nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"node1", "node2", "node3"};
+network.add(devices);
+network.bootload(devices, "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh");
+
+network.sleep(timeout);
+network.setEncryption(network.hosts());
+
+String panId1 = "0x0001";
+String panId2 = "0x0002";
+String panId3 = "0x0003";
+
+
+// Form three separate networks.
+expect("node1", "network form 11 0 " + panId1, ".*EMBER_NETWORK_UP.*");
+expect("node2", "network form 11 0 " + panId2, ".*EMBER_NETWORK_UP.*");
+expect("node3", "network form 11 0 " + panId3, ".*EMBER_NETWORK_UP.*");
+
+// Initiate inter-PAN key establishment between the first and second nodes.
+send("node1", "plugin key-establishment interpan 0xFFFF {" + eui64("node2") + "}");
+expect("node2", "Responder: Key Establish Success.*", timeout * 300);
+expect("node1", "Initiator: Key Establish Success.*", timeout * 300);
+
+// Initiate inter-PAN key establishment between the first and third nodes.
+send("node1", "plugin key-establishment interpan 0xFFFF {" + eui64("node3") + "}");
+expect("node3", "Responder: Key Establish Success.*", timeout * 300);
+expect("node1", "Initiator: Key Establish Success.*", timeout * 300);
+
+// Initiate inter-PAN key establishment between the second and third nodes.
+send("node2", "plugin key-establishment interpan 0xFFFF {" + eui64("node3") + "}");
+expect("node3", "Responder: Key Establish Success.*", timeout * 300);
+expect("node2", "Initiator: Key Establish Success.*", timeout * 300);
+
+// Verify that each node in the all pairs of nodes ends up with the same link
+// key and that none of the pairs share the same link key with any other pairs.
+send("node1", "keys print");
+String key12 = expect("node1", ".*" + eui64("node2") + "  [0-9a-fA-F]{8}  L     y     (([0-9a-fA-F]{2} ){8} ){2}");
+key12 = key12.substring(key12.indexOf("y") + 6);
+String key13 = expect("node1", ".*" + eui64("node3") + "  [0-9a-fA-F]{8}  L     y     (([0-9a-fA-F]{2} ){8} ){2}");
+key13 = key13.substring(key13.indexOf("y") + 6);
+send("node2", "keys print");
+expect("node2", ".*" + eui64("node1") + "  [0-9a-fA-F]{8}  L     y     " + key12);
+String key23 = expect("node2", ".*" + eui64("node3") + "  [0-9a-fA-F]{8}  L     y     (([0-9a-fA-F]{2} ){8} ){2}");
+key23 = key23.substring(key23.indexOf("y") + 6);
+send("node3", "keys print");
+expect("node3", ".*" + eui64("node1") + "  [0-9a-fA-F]{8}  L     y     " + key13);
+expect("node3", ".*" + eui64("node2") + "  [0-9a-fA-F]{8}  L     y     " + key23);
+assert(!key12.equals(key13));
+assert(!key12.equals(key23));
+assert(!key13.equals(key23));
+
+network.sleep(2000);
+
+String smartEnergyProfile = "0x0109";
+String clusterToRead      = "0x0703";
+String attributeToRead    = "0x0702";
+
+send("node1", "zcl price current 0x00");
+
+// We expect that node1 will send the 'get current price' to node2
+// device, and that the node2 will respond with a default response. 
+// However node1 will filter out the default response message since it is not 
+// allowed by the interpan plugin.  Therefore the error message below is the
+// expected response.
+expect("node1",
+       "interpan long {" + eui64("node2") + "} " + panId2 + " " + smartEnergyProfile + " 0",
+       ".*ERR: Inter-PAN profile 0x0109, cluster 0x0700, command 0x00 not permitted");
+
+expect("node1",
+       "zcl global read " + clusterToRead + " " + attributeToRead,
+       "Msg: clus " + clusterToRead + ", cmd 0x00, len 5");
+
+// Without APS security, should be rejected.
+send("node1",
+     "interpan long {" + eui64("node2") + "} " + panId2 + " " + smartEnergyProfile + " 0");
+expect("node2",
+       "ERR: Inter-PAN profile 0x0109, cluster " + clusterToRead + ", command 0x00 not permitted");
+
+if (runArgument.runUsingHostApps) {
+  // APS encryption over interpan is not supported on the host.
+  return;
+}
+
+expect("node1",
+       "zcl global read " + clusterToRead + " " + attributeToRead,
+       ".*Msg: clus " + clusterToRead + ", cmd 0x00, len 5");
+
+expect("node1",
+       "interpan long {" + eui64("node2") +  "} " + panId2 + " " + smartEnergyProfile + " 0x0001",
+       "  cluster id: " + clusterToRead + ".*",
+       10000);
+network.sleep(5000);
+
+// Same thing, but to an unknown EUI 64
+// Only the debug code prints an error, so nothing will happen.
+expect("node1",
+       "zcl global read " + clusterToRead + " " + attributeToRead,
+       ".*Msg: clus " + clusterToRead + ", cmd 0x00, len 5");
+assert(network.expect("node1",
+                      port,
+                      "interpan long {ABCDEF0123456789} " + panId2 + " " + smartEnergyProfile + " 0x0001",
+                      ".*cluster id: " + clusterToRead + ".*",
+                      timeout * 10,
+                      true) == null);

@@ -1,0 +1,142 @@
+// This test is a generic beanshell test to be used for testing stack changes on app framework host
+// and SoC applications.
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {
+  std.print("****TODO: Fix for host ");
+  return;
+}
+
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for host and multihop****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"gateway","door-lock","light"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaDoorLock-simulation/HaDoorLock",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation-ezsp/HaHomeGateway",
+  "build/af-test-apps/HaDoorLock-simulation-ezsp/HaDoorLock",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 1000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+networkForm("gateway");
+networkWait(5000);
+
+networkJoinTo("door-lock", "gateway");
+
+networkWait(5000);
+
+//-----------------------------------------------------------------------------
+
+// This tests the ability to rejoin as a different device type. Here, we rejoin 
+// from a sleepy end device to an always on end device and check that the 
+// read attributes request are sent directly(without the indirect queue.)
+
+String nodeIdMeter = findNodeByName("door-lock").nodeIdHex;
+
+// This message is sent to a sleepy end device. It is received because our end device polls
+// every 5 second(long poll).
+send("door-lock","keys print");
+networkWait(5000);
+send("gateway","keys print");
+networkWait(5000);
+send("gateway", "zcl global read 0x0000 0x0001");
+send("gateway", "send " + nodeIdMeter + " 1 1 ");
+expect("gateway",".*RX len 6, ep 01, clus 0x0000.*",6000);
+
+send("gateway","option security aps on");
+send("door-lock","option security aps on");
+send("gateway", "zcl on-off on");
+send("gateway", "send " + nodeIdMeter + " 1 1 ");
+expect("gateway",".*RX len 5, ep 01, clus 0x0006 \\(On\\/off\\).*",5000);
+
+networkWait(5000);
+
+send("door-lock","keys print");
+networkWait(1000);
+send("gateway","keys print");
+networkWait(1000);
+
+//We rejoin as an always on end device.
+expect("door-lock","network rejoin-diff-device-type 1 0 3",".*EMBER_NETWORK_UP "+ nodeIdMeter);
+networkWait(5000);
+
+send("door-lock","keys print");
+networkWait(1000);
+send("gateway","keys print");
+networkWait(1000);
+
+// This message should be sent *directly* to the now always on end device.
+// In simulation, the only test for this is the fact that it's responded to under 500 ms. If the mode
+// hadn't changed, the device would have taken much longer to poll for data and then respond. 
+// The ideal test would be to fail if the end device polls for data or the parent puts the
+// message in the indirect queue. 
+send("gateway", "zcl global read 0x0000 0x0001");
+send("gateway", "send " + nodeIdMeter + " 1 1 ");
+expect("gateway",".*RX len 6, ep 01, clus 0x0000.*",500);
+
+networkWait(5000);
+
+//This just ensures the end device can still initiate messages to the coordinator.
+send("door-lock", "zcl global read 0x0000 0x0001");
+send("door-lock", "send 0 1 1 ");
+expect("door-lock",".*RX len 6, ep 01, clus 0x0000.*",500);
+networkWait(5000);
+
+
+//We rejoin as a sleepy end device. Again, the read attributes should take about 5 seconds to get
+// a response.
+expect("door-lock","network rejoin-diff-device-type 1 0 4",".*EMBER_NETWORK_UP "+ nodeIdMeter);
+
+if (!runArgument.runUsingHostApps) {
+//We re-use a small part of the join to see an R21 device is found and R21 transient link key behavior is triggered.
+//expect("door-lock",".*R21 device found. Requesting new link key..*",10000);	
+}
+
+send("gateway", "zcl global read 0x0000 0x0001");
+send("gateway", "send " + nodeIdMeter + " 1 1 ");
+expect("gateway",".*RX len 6, ep 01, clus 0x0000.*",5000);
+
+//-----------------------------------------------------------------------------
+
+networkJoinTo("light", "gateway");
+
+networkWait(20000);
+
+String nodeIdLight = nodeId("light");
+String euiLight = eui64("light");
+
+send("light", "zcl global read 0 0");
+send("light", "send 0 0 0");
+networkWait(1000);
+
+expectMultiline("gateway",
+                "plugin stack-diagnostics neighbor-table",
+                new String[] {
+                  "#  id     lqi  in  out  age  lastRssi lastLqi framecounter eui",
+                  ".*0\\: " + nodeIdLight + " 255  1   1    3   .*  \\(\\>\\)" + euiLight
+                });
+networkWait(2000);

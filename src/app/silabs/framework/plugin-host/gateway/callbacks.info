@@ -1,0 +1,19 @@
+/** @brief Select File Descriptors
+ *
+ * This function is called when the Gateway plugin will do a select() call to
+ * yield the processor until it has a timed event that needs to execute. The
+ * function implementor may add additional file descriptors that the
+ * application will monitor with select() for data ready. These file
+ * descriptors must be read file descriptors. The number of file descriptors
+ * added must be returned by the function (0 for none added).
+ *
+ * @param list A pointer to a list of File descriptors that the function
+ * implementor may append to Ver.: always
+ * @param maxSize The maximum number of elements that the function implementor
+ * may add. Ver.: always
+ */
+int emberAfPluginGatewaySelectFileDescriptorsCallback(int*list,
+                                                      int maxSize)
+{
+  return 0;
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-illuminance-measurement-server" name="Plugin Commands: Illuminance Measurement Server commands">
+    <description>
+      Run time CLI for reading the illuminance sensor
+    </description>
+  </group>
+  <command cli="plugin illuminance-measurement-server read" functionName="emberAfPluginIlluminanceMeasurementServerReadEventHandler" group="plugin-illuminance-measurement-server">
+    <description>
+      Read the illuminance sensor.
+    </description>
+   </command>
+  <command cli="plugin illuminance-measurement-server calibrate" functionName="emAfIlluminanceMeasurementServerCalibrateCommand" group="plugin-illuminance-measurement-server">
+    <description>
+      Calibrate the gain multipier of the illuminance sensor.
+    </description>
+    <arg name="extLux" type="INT32U" description="reading from reference external Lux meter"/>
+  </command>
+</cli>

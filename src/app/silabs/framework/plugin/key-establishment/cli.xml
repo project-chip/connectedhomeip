@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-key-establishment" name="Plugin Commands: Key Establishment">
+    <description>
+      The Key Establishment commands provide commands to initiate key establishment with a remote target.
+    </description>
+  </group>
+  <command cli="plugin key-establishment start" functionName="emAfKeyEstablishmentStartCommand" group="plugin-key-establishment">
+    <description>
+      Initiates key establishment with the target node ID.
+    </description>
+    <arg name="nodeId" type="INT16U" description="Target node ID."/>
+    <arg name="endpoint" type="INT8U" description="Target node's endpoint."/>
+  </command>
+  <command cli="plugin key-establishment interpan" functionName="emAfKeyEstablishmentInterpanCommand" group="plugin-key-establishment">
+    <description>
+      Initiate key establishment with the target device over interpan.
+    </description>
+    <arg name="panId" type="INT16U" description="The PAN ID that the target is located on."/>
+    <arg name="eui64" type="OCTET_STRING" description="The target's EUI64 (big endian)"/>
+  </command>
+</cli>

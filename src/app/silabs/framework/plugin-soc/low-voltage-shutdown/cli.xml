@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-low-voltage-shutdown" name="Plugin Commands: Low Voltage Shutdown">
+    <description>
+      The Low Voltage Shutdown plugin provides a few commands to monitor the VDD voltage or disable the checking and shutdown logic.
+    </description>
+  </group>
+  <command cli="plugin low-voltage-shutdown status" functionName="emberAfPluginLowVoltageShutdownStatusCommand" group="plugin-low-voltage-shutdown">
+    <description>
+      Display the status of the check and shutdown behavior.
+    </description>
+  </command>
+  <command cli="plugin low-voltage-shutdown enable" functionName="emberAfPluginLowVoltageShutdownEnableCommand" group="plugin-low-voltage-shutdown">
+    <description>
+      Sets whether the plugin's check and shutdown logic is enabled or disabled.
+    </description>
+    <arg name="forceDisable" type="BOOLEAN" description="The value indicating whether the shutdown logic should be disabled."/>
+  </command>
+  <command cli="plugin low-voltage-shutdown print-vdd" functionName="emberAfPluginLowVoltageShutdownPrintVddCommand" group="plugin-low-voltage-shutdown">
+    <description>
+      Report the current VDD voltage as checked by the shutdown logic.  (Doesn't do any shutdown logic if VDD is below threshold; this is just informational.)
+    </description>
+  </command>
+  <command cli="plugin low-voltage-shutdown shutdown" functionName="emberAfPluginLowVoltageShutdownForceShutdown" group="plugin-low-voltage-shutdown">
+    <description>
+      Force the shutdown logic to engage immediately, regardless of VDD voltage.
+    </description>
+  </command>
+</cli>

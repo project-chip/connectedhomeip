@@ -1,0 +1,289 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to verify as much of the functionality of the
+// IST-a51 smart outlet as possible.  For the moment, this includes:
+//  Network join behavior
+//  Network leave behavior
+//  Button short press behavior
+//  Button long press behavior
+//  Attribute reporting
+//  Network orphan state handling
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps || runArgument.runUsingMultihop) {
+  std.print("Only runs single hop SoC (P2 network)");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "controller", "outlet"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaCombinedInterface-simulation/HaCombinedInterface",
+  "build/af-test-apps/Z3SmartOutlet-simulation/Z3SmartOutlet",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+};
+
+String[] ncpImages = new String[] {
+  "",
+  "",
+};
+
+// Note: the following call creates a flat network (i.e. every node can
+// hear every other node.
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImages,
+                  false, false, false);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0xdc04;
+int i;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Coodinator is device [0]
+networkForm(allDevices[0]);
+send(allDevices[0], "network pjoin 150");
+
+// Allow TC and link key requests on the trust center
+send("controller", "option security set-key-request-policy 1 1");
+
+// Let registration complete.
+networkWait(30000);
+
+// Verify that holding the button for > 3 second will cause a network leave,
+// then attempt to rejoin (and succeed, since pjoin is still active)
+
+buttonPressAndHold("outlet", 0, null);
+networkWait(3500);
+buttonRelease("outlet", 0, ".*EMBER_NETWORK_DOWN");
+
+// The network to join may be on the primary or secondary channel mask, so we
+// expect with a wildcard
+expect("outlet", ".*NWK Steering State: Scan .* Channels and use Install Code.*", 25000);
+expect("outlet", ".*EMBER_NETWORK_UP.*", 30000);
+
+// Verify that a button press of < 1 second will not cause a network leave
+buttonPressAndHold("outlet", 0, null);
+networkWait(999);
+buttonRelease("outlet", 0, null);
+nexpect("outlet", ".*EMBER_NETWORK_DOWN", 10000);
+
+// Verify that two short button presses will cause an identify for 3 minutes
+for(i=0;i<2;i++) {
+  buttonPressAndHold("outlet", 0, null);
+  networkWait(400);
+  buttonRelease("outlet", 0, null);
+  networkWait(400);
+}
+expect("outlet", ".*Beginning identify blink pattern", 2000);
+nexpect("outlet", ".*Identify has finished", 179999);
+expect("outlet", ".*Identify has finished", 5000);
+
+// Verify that three button short presses will cause the network status to blink
+for(i=0;i<3;i++) {
+  buttonPressAndHold("outlet", 0, null);
+  networkWait(400);
+  buttonRelease("outlet", 0, null);
+  networkWait(400);
+}
+expect("outlet", "Blinking user requested network status", 10000);
+
+send("controller", "network pjoin 0");
+// Verify that holding the button for > 3 second will cause the device to leave and search again
+
+buttonPressAndHold("outlet", 0, null);
+networkWait(3500);
+buttonRelease("outlet", 0, null);
+
+expect("outlet", ".*Connection Manager: search for joinable network", 5000);
+
+
+// Rejoin timeout test.  Verify that if the device is unable to rejoin the
+// network after leaving, it will stop attempting to join after 20 attempts in
+
+// wait for 20 more connect attempts, this time on all channels
+for(i=0; i< 20; i++) {
+  expect("outlet", ".*NWK Steering: Start: 0x00.*", 40000);
+  expect("outlet", ".*Connection Manager:  Network Find status ..*", 60000);
+}
+expect("outlet", ".*Failed to find network to join within .*", 10000);
+
+// Verify that the device will start searching again after a > 3 second button
+// press, and rejoin a network after the attempt timeout
+send("controller", "network pjoin 150");
+buttonPressAndHold("outlet", 0, null);
+networkWait(3500);
+buttonRelease("outlet", 0, null);
+// The network to join may be on the primary or secondary channel mask, so we
+// expect with a wildcard
+expect("outlet", ".*NWK Steering State: Scan .* Channels and use Install Code.*", 25000);
+expect("outlet", ".*EMBER_NETWORK_UP.*", 30000);
+
+// Test occupancy reporting.  To start, add binding entries for all reporting
+// attributes:
+//   Electrical Measurement (0x0B04)
+//   Temperature Measurement (0x0402)
+//   Humidity Measurement (0x0405)
+//   Illuminance Measurement (0x0400)
+
+expect("outlet", "option binding-table set 0 0x0b04 0x01 0x01 {" + eui64("controller") + "}",
+       "*set bind 0: 0x00", 3000);
+expect("outlet", "option binding-table set 1 0x0402 0x01 0x01 {" + eui64("controller") + "}",
+       "*set bind 1: 0x00", 3000);
+expect("outlet", "option binding-table set 2 0x0405 0x01 0x01 {" + eui64("controller") + "}",
+       "*set bind 2: 0x00", 3000);
+expect("outlet", "option binding-table set 3 0x0400 0x01 0x01 {" + eui64("controller") + "}",
+       "*set bind 3: 0x00", 3000);
+
+// Next, set up reporting for each of the four reportable attributes
+send("controller", "zcl global send-me-a-report 0x0b04 0x0505 0x21 0x0001 0x012c {00 01}");
+expectMultiline("controller",
+                 "send " + nodeId("outlet") + " 1 1",
+                 new String[] {
+                   "CFG_RPT_RESP: \\(Unknown clus. \\[0x0B04\\]\\)",
+                   " - status:00",
+                   }, 3000);
+send("controller", "zcl global send-me-a-report 0x0402 0x0000 0x29 0x0001 0x012c {00 01}");
+expectMultiline("controller",
+                "send " + nodeId("outlet") + " 1 1",
+                new String[] {
+                   "CFG_RPT_RESP: \\(Unknown clus. \\[0x0402\\]\\)",
+                   " - status:00",
+                }, 3000);
+
+send("controller", "zcl global send-me-a-report 0x0405 0x0000 0x21 0x0001 0x012c {00 01}");
+expectMultiline("controller",
+                "send " + nodeId("outlet") + " 1 1",
+                new String[] {
+                   "CFG_RPT_RESP: \\(Unknown clus. \\[0x0405\\]\\)",
+                   " - status:00",
+                }, 3000);
+send("controller", "zcl global send-me-a-report 0x0400 0x0000 0x21 0x0001 0x012c {00 01}");
+expectMultiline("controller",
+                "send " + nodeId("outlet") + " 1 1",
+                new String[] {
+                   "CFG_RPT_RESP: \\(Unknown clus. \\[0x0400\\]\\)",
+                   " - status:00",
+                }, 3000);
+
+networkWait(5000);
+send("outlet", "write 1 0x0b04 0x0505 1 0x21 {12 34}");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0B04\\]\\)",
+                  " - attr:0505",
+                  "   type:21, val:1234",
+                },
+                1000);
+send("outlet", "write 1 0x0402 0 1 0x29 {FE ED}");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0402\\]\\)",
+                  " - attr:0000",
+                  "   type:29, val:FEED",
+                },
+                1000);
+
+send("outlet", "write 1 0x0405 0 1 0x21 {56 78}");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0405\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:5678",
+                },
+                1000);
+send("outlet", "write 1 0x0400 0 1 0x21 {87 65}");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0400\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:8765",
+                },
+                1000);
+
+// Verify that when the maximum reporting interval expires, the attributes will
+// be reported.  0x012c is about 5 minutes, or 300000 mS.
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0B04\\]\\)",
+                  " - attr:0505",
+                  "   type:21, val:0000",
+                },
+                310000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0402\\]\\)",
+                  " - attr:0000",
+                  "   type:29, val:FEED",
+                },
+                310000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0405\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:5678",
+                },
+                5000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0400\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:8765",
+                },
+                5000);
+
+// Power cycle the device.  This should cause an attribute report for each
+// reportable attribute in the system.  They should come in the order in which
+// they were set up in the report table: electrical, temperature, humidity, illu
+// the defaults should be what is returned from the stub hal driver code
+networkWait(20000);
+reboot("outlet");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0400\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:EFBE",
+                },
+                3000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0402\\]\\)",
+                  " - attr:0000",
+                  "   type:29, val:0000",
+                },
+                3000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0405\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:E110", // 4321 decimal
+                },
+                3000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0B04\\]\\)",
+                  " - attr:0505",
+                  "   type:21, val:0000",
+                },
+                7000);

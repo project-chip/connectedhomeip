@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-bulb-pwm-cli" name="Plugin Commands for Bulb Pwm Driver">
+    <description>CLI commands related to the manufacturing library.</description>
+  </group>
+  <command cli="plugin bulb-pwm set" functionName="emAfBulbPwmSetCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Set the channel to the specific value.      
+    </description>
+    <arg name="channel"  type="INT8U" description="Channel"/>
+    <arg name="value"  type="INT16U" description="Value"/>
+  </command>
+  <command cli="plugin bulb-pwm ledOn" functionName="emAfBulbPwmLedOnCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Exercise the blink led on command.      
+    </description>
+    <arg name="time"  type="INT8U" description="time"/>
+  </command>
+  <command cli="plugin bulb-pwm statusOn" functionName="emAfBulbPwmStatusOnCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Exercise the blink status on command.      
+    </description>
+    <arg name="time"  type="INT8U" description="time"/>
+  </command>
+  <command cli="plugin bulb-pwm ledOff" functionName="emAfBulbPwmLedOffCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Exercise the blink led off command.      
+    </description>
+    <arg name="time"  type="INT8U" description="time"/>
+  </command>
+  <command cli="plugin bulb-pwm statusOff" functionName="emAfBulbPwmStatusOffCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Exercise the blink status off command.      
+    </description>
+    <arg name="time"  type="INT8U" description="time"/>
+  </command>
+  <command cli="plugin bulb-pwm ledBlink" functionName="emAfBulbPwmLedBlinkCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Exercise the blink led command.      
+    </description>
+    <arg name="count"  type="INT8U" description="count"/>
+    <arg name="time"  type="INT16U" description="time"/>
+  </command>
+  <command cli="plugin bulb-pwm statusBlink" functionName="emAfBulbPwmStatusBlinkCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Exercise the blink status command.      
+    </description>
+    <arg name="count"  type="INT8U" description="count"/>
+    <arg name="time"  type="INT16U" description="time"/>
+  </command>
+  <command cli="plugin bulb-pwm ledPattern" functionName="emAfBulbPwmLedPatternCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Exercise the blink led pattern command.      
+    </description>
+    <arg name="count"  type="INT8U" description="count"/>
+    <arg name="pattern"  type="OCTET_STRING" description="pattern"/>
+  </command>
+  <command cli="plugin bulb-pwm statusPattern" functionName="emAfBulbPwmStatusPatternCommand" group="plugin-bulb-pwm-cli">
+    <description>
+      Exercise teh blink status pattern command.      
+    </description>
+    <arg name="count"  type="INT8U" description="count"/>
+    <arg name="pattern"  type="OCTET_STRING" description="pattern"/>
+  </command>
+</cli>

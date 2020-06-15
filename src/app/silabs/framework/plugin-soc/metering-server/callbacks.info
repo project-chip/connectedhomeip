@@ -1,0 +1,15 @@
+/** @brief Server Process Notification
+ *
+ * This function is called by the metering server plugin when any of the
+ * Notification Attribute Set attributes are read or reported by the metering
+ * client.
+ *
+ * @param attributeId ID of the attribute being proccessed Ver.: always
+ *
+ * @param attributeValue value of the attribute being proccessed Ver.: always
+ */
+void emberAfPluginMeteringServerProcessNotificationFlagsCallback(
+  uint16_t attributeId,
+  uint32_t attributeValue)
+{
+}

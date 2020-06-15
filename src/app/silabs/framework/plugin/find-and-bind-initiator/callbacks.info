@@ -1,0 +1,32 @@
+/** @brief Bind Target
+ *
+ * This callback with enable the user to programmatically decide if they want
+ * to bind with a potential target. The plugin will try to bind with this
+ * target if and only if the function returns true. By default, the callback
+ * tells the plugin to try to bind with the target. If the binding type is
+ * changed to ::EMBER_MULTICAST_BINDING, a multicast binding will be created.
+ *
+ * @param nodeId short ID of the potential target Ver.: always
+ * @param bindingEntry The binding entry for that target. Ver.: always
+ * @param groupName The name of the group if a multicast binding is created.
+ * Ver.: always
+ */
+bool emberAfPluginFindAndBindInitiatorBindTargetCallback(EmberNodeId nodeId,
+                                                         EmberBindingTableEntry *bindingEntry,
+                                                         uint8_t *groupName)
+{
+  return true;
+}
+
+/** @brief Complete
+ *
+ * This callback is fired by the initiator when the Find and Bind process is
+ * complete.
+ *
+ * @param status Status code describing the completion of the find and bind
+ * process Ver.: always
+ */
+void emberAfPluginFindAndBindInitiatorCompleteCallback(EmberStatus status)
+{
+  emberAfCorePrintln("Find and Bind Initiator: Complete: 0x%X", status);
+}

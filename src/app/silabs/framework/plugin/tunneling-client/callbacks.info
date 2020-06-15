@@ -1,0 +1,84 @@
+/** @brief Tunnel Opened
+ *
+ * This function is called by the Tunneling client plugin whenever a tunnel is
+ * opened. Clients may open tunnels by sending a Request Tunnel command.
+ *
+ * @param tunnelIndex The index of the tunnel that has been opened.
+ * Ver.: always
+ * @param tunnelStatus The status of the request. Ver.: always
+ * @param maximumIncomingTransferSize The maximum incoming transfer size of the
+ * server. Ver.: always
+ */
+void emberAfPluginTunnelingClientTunnelOpenedCallback(uint8_t tunnelIndex,
+                                                      EmberAfPluginTunnelingClientStatus tunnelStatus,
+                                                      uint16_t maximumIncomingTransferSize)
+{
+}
+
+/** @brief Data Received
+ *
+ * This function is called by the Tunneling client plugin whenever data is
+ * received from a server through a tunnel.
+ *
+ * @param tunnelIndex The index of the tunnel through which the data was
+ * received. Ver.: always
+ * @param data Buffer containing the raw octets of the data. Ver.: always
+ * @param dataLen The length in octets of the data. Ver.: always
+ */
+void emberAfPluginTunnelingClientDataReceivedCallback(uint8_t tunnelIndex,
+                                                      uint8_t *data,
+                                                      uint16_t dataLen)
+{
+}
+
+/** @brief Data Error
+ *
+ * This function is called by the Tunneling client plugin whenever a data error
+ * occurs on a tunnel. Errors occur if a device attempts to send data on tunnel
+ * that is no longer active or if the tunneling does not belong to the device.
+ *
+ * @param tunnelIndex The index of the tunnel on which this data error
+ * occurred. Ver.: always
+ * @param transferDataStatus The error that occurred. Ver.: always
+ */
+void emberAfPluginTunnelingClientDataErrorCallback(uint8_t tunnelIndex,
+                                                   EmberAfTunnelingTransferDataStatus transferDataStatus)
+{
+}
+
+/** @brief Tunnel Closed
+ *
+ * This function is called by the Tunneling client plugin whenever a server
+ * sends a notification that it preemptively closed an inactive tunnel. Servers
+ * are not required to notify clients of tunnel closures, so applications
+ * cannot rely on this callback being called for all tunnels.
+ *
+ * @param tunnelIndex The index of the tunnel that has been closed.
+ * Ver.: always
+ */
+void emberAfPluginTunnelingClientTunnelClosedCallback(uint8_t tunnelIndex)
+{
+}
+
+/** @brief Transfer Data Failure
+ *
+ * This function is called when a TransferData command fails to be sent to the
+ * intended destination.
+ *
+ * @param indexOfDestination The index or destination address of the
+ * TransferData command. Ver.: always
+ * @param apsFrame The ::EmberApsFrame of the command. Ver.: always
+ * @param msgLen The length of the payload sent in the command. Ver.: always
+ * @param message The payload that was sent in the command. Ver.: always
+ * @param status The non-success status code from the transmission of the
+ * command. Ver.: always
+ */
+void emberAfPluginTunnelingClientTransferDataFailureCallback(uint16_t indexOfDestination,
+                                                             EmberApsFrame*apsFrame,
+                                                             uint16_t msgLen,
+                                                             uint8_t*message,
+                                                             EmberStatus status)
+{
+  emberAfCorePrintln("ERR: ClientTransferData failure (0x%X) for APS SEQ %d",
+                     apsFrame->sequence, status);
+}

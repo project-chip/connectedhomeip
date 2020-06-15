@@ -1,0 +1,156 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "switch", "combIf"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaSwitch-simulation/HaSwitch",
+  "build/af-test-apps/HaCombinedInterface-simulation/HaCombinedInterface",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaSwitch-simulation-ezsp/HaSwitch",
+  "build/af-test-apps/HaCombinedInterface-simulation-ezsp/HaCombinedInterface",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+int timeout = 50000;
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+networkWait(timeout);
+formAndJoinDevices(devices);
+
+String combIfNodeId = nodeId("combIf");
+
+// Read on/off attribute and make sure it starts off.
+send("switch", "zcl global read 0x0006 0x0000");
+expect("switch", 
+       "send 0 1 6",
+       ".*On.*10 00 \\]");
+
+// Send an unsolicited report attribute from the light to the combined interface.
+send("light", "zcl global report 6 0x0006 0x0000 1");
+send("light", "send " + combIfNodeId + " 6 1");
+expectMultiline("combIf",
+                "", // command
+                new String[] {
+                  "RPT_ATTR: \\(On/off\\)",
+                  " - attr:0000",
+                  "   type:10, val:00",
+                });
+
+// Request that the light reports its on/off attribute.
+send("combIf", "zcl global send-me-a-report 0x0006 0x0000 0x10 0x000A 0x0014 {00}");
+send("combIf", "send 0 1 6");
+expectMultiline("light",
+                "",      // command
+                new String[] {
+                  "CFG_RPT: \\(On/off\\)",
+                  " - direction:00, attr:0000",
+                  "   type:10, min:000A, max:0014",
+                });
+expectMultiline("combIf",
+                "",    // command
+                new String[] {
+                  "CFG_RPT_RESP: \\(On/off\\)",
+                  " - status:00"
+                });
+
+// Create a binding from the light to the combined interface.  This is where
+// reports will be sent.
+send("light", "option binding-table clear");
+send("light", "option binding-table set 0 0x0006 0x06 0x01 {" + eui64("combIf") + "}");
+
+expect("light", "option binding-table print", ".*bindings used");
+send("light", "plugin concentrator-support print-table");
+
+// Turn the light on and make sure the attribute flips.
+send("switch", "zcl on-off on");
+send("switch", "send 0 1 6");
+expect("light", "Light.*0x06.*ON");
+send("switch", "zcl global read 0x0006 0x0000");
+send("switch", "send 0 1 6");
+expect("light", "READ.*OK");
+expect("switch", ".*On.*10 01 \\]");
+
+debugPrintln("*** Watch for a series of automatic reports. ***");
+debugPrintln("NOTE:  Any tx 66 errors are due to Bug: EMSTACK-2692");
+expectMultiline("combIf",
+                "", // command
+                new String[] {
+                  "RPT_ATTR: \\(On/off\\)",
+                  " - attr:0000",
+                  "   type:10, val:01",
+                },
+                // Added 10000 ms due to bug: EMSTACK-2692
+                timeout + 10000);
+
+// Turn the light off and make sure the attribute flips.
+send("switch", "zcl on-off off");
+send("switch", "send 0 1 6");
+expect("light", "Light.*0x06.*OFF");
+send("switch", "zcl global read 6 0");
+send("switch", "send 0 1 6");
+expect("light", "READ.*OK");
+
+// This is unreliable on the host.  It assumes an ordering of the print output.
+// for 2 different nodes that simulation cannot guarantee.   The above expect()
+// statement could happen AFTER this one.
+// expect("switch", ".*On.*10 00 \\]");
+
+// Watch for a series of automatic reports.
+expectMultiline("combIf",
+                "", // command
+                new String[] {
+                  "RPT_ATTR: \\(On/off\\)",
+                  " - attr:0000",
+                  "   type:10, val:00",
+                },
+                timeout);
+
+// Toggle the light on and make sure the attribute flips.
+send("switch", "zcl on-off toggle");
+send("switch", "send 0 1 6");
+expect("light", "Light.*0x06.*ON");
+send("switch", "zcl global read 6 0");
+expect("switch", 
+       "send 0 1 6",
+       ".*On.*10 01 \\]");
+// Watch for a series of automatic reports.
+expectMultiline("combIf",
+                "", // command
+                new String[] {
+                  "RPT_ATTR: \\(On/off\\)",
+                  " - attr:0000",
+                  "   type:10, val:01",
+                },
+                timeout);
+
+// Toggle the light of and make sure the attribute flips.
+send("switch", "zcl on-off toggle");
+send("switch", "send 0 1 6");
+expect("light", "Light.*0x06.*OFF");
+send("switch", "zcl global read 6 0");
+expect("switch", "send 0 1 6", ".*On.*10 00 \\]");
+// Watch for a series of automatic reports.
+expectMultiline("combIf",
+                "", // command
+                new String[] {
+                  "RPT_ATTR: \\(On/off\\)",
+                  " - attr:0000",
+                  "   type:10, val:00",
+                },
+                timeout);

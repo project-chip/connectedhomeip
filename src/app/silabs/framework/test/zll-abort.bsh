@@ -1,0 +1,119 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multi-hop****");
+  return;
+}
+
+// Create nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"remote1", "remote2", "light"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/ZllColorSceneRemote-simulation/ZllColorSceneRemote",
+  "build/af-test-apps/ZllColorSceneRemote-simulation/ZllColorSceneRemote",
+  "build/af-test-apps/ZllColorLight-simulation/ZllColorLight",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/ZllColorSceneRemote-simulation-ezsp/ZllColorSceneRemote",
+  "build/af-test-apps/ZllColorSceneRemote-simulation-ezsp/ZllColorSceneRemote",
+  "build/af-test-apps/ZllColorLight-simulation-ezsp/ZllColorLight",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+// Both remotes should start factory new with null address ranges.
+send("remote1", "plugin zll-commissioning status");
+expect("remote1", "Bitmask: 0x00000083");  // addr assignment capable + interop bits now set
+expect("remote1", "Free Node IDs,  Min: 0x0000, Max: 0x0000");
+expect("remote1", "Free Group IDs, Min: 0x0000, Max: 0x0000");
+expect("remote1", "My Group ID Min: 0x0000");
+send("remote2", "plugin zll-commissioning status");
+expect("remote2", "Bitmask: 0x00000083");  // addr assignment capable + interop bits now set
+expect("remote2", "Free Node IDs,  Min: 0x0000, Max: 0x0000");
+expect("remote2", "Free Group IDs, Min: 0x0000, Max: 0x0000");
+expect("remote2", "My Group ID Min: 0x0000");
+send("light", "plugin zll-commissioning status");
+expect("light", "Bitmask: 0x00000081");  // addr assignment capable not set
+expect("light", "Free Node IDs,  Min: 0x0000, Max: 0x0000");
+expect("light", "Free Group IDs, Min: 0x0000, Max: 0x0000");
+expect("light", "My Group ID Min: 0x0000");
+
+send("light", "plugin zll-commissioning disable");
+
+//-----------------------------------------------------------------------------
+// 1) Attempt to touchlink the two remotes. The touchlink will fail, since both
+// nodes are end devices. Check that the channel is set correctly after the
+// touchlink is aborted (EMZIGBEE-3785).
+expect("remote1", "plugin zll-commissioning link", "Touch link failed: 0x03", timeout*2);
+expect("remote1", "plugin zll-commissioning status", "Current channel: 11");
+
+//-----------------------------------------------------------------------------
+// 2) Repeat, but set remote1 to scan on a single channel.
+expect("remote1", "plugin zll-commissioning channel 25", ".*Setting default channel to 25");
+expect("remote1", "plugin zll-commissioning link", "Touch link failed: 0x03", timeout*2);
+expect("remote1", "plugin zll-commissioning status", "Current channel: 25");
+
+//-----------------------------------------------------------------------------
+// 3) Disable touchlink on second remote, and repeat test.
+send("remote1", "reset"); // reset channel masks
+networkWait(1000);
+send("remote2", "plugin zll-commissioning disable");
+expect("remote1", "plugin zll-commissioning link", "Touch link failed: 0x03", timeout*2);
+expect("remote1", "plugin zll-commissioning status", "Current channel: 11");
+
+//-----------------------------------------------------------------------------
+// 4) Repeat, but set remote1 to scan on a single channel.
+expect("remote1", "plugin zll-commissioning channel 25", ".*Setting default channel to 25");
+expect("remote1", "plugin zll-commissioning link", "Touch link failed: 0x03", timeout*2);
+expect("remote1", "plugin zll-commissioning status", "Current channel: 25");
+
+//-----------------------------------------------------------------------------
+// 5) Manual client abort with router target, and repeat test.
+networkWait(1000);
+send("remote1", "reset"); // reset channel masks
+send("light", "reset"); // ensure target radio is on
+networkWait(1000);
+send("remote1", "plugin zll-commissioning link");
+expect("light", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", timeout * 3);
+expect("remote1", "plugin zll-commissioning abort", "Touch link failed: 0x00");
+expect("remote1", "plugin zll-commissioning status", "Current channel: 11");
+
+//-----------------------------------------------------------------------------
+// 6) Repeat, but set remote1 (and light) to scan on a single channel.
+expect("remote1", "plugin zll-commissioning channel 25", ".*Setting default channel to 25");
+expect("light", "plugin zll-commissioning channel 25", ".*Setting default channel to 25");
+send("remote1", "plugin zll-commissioning link");
+expect("light", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", timeout * 3);
+expect("remote1", "plugin zll-commissioning abort", "Touch link failed: 0x00");
+expect("remote1", "plugin zll-commissioning status", "Current channel: 25");
+
+//-----------------------------------------------------------------------------
+// 7) Manual server reset with router target, and repeat test.
+send("remote1", "reset"); // reset channel masks
+send("light", "reset"); // reset channel masks
+networkWait(1000);
+network.pressButton("remote1", "1");
+expect("light", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", 10000);
+network.releaseButton("remote1", "1");
+expect("remote1", "Aborting touch link");
+expect("remote1", "Error: Touch linking failed: aborted by application");
+expect("remote1", "Touch link failed: 0x00", timeout * 3);
+expect("remote1", "plugin zll-commissioning status", "Current channel: 11");
+
+//-----------------------------------------------------------------------------
+// 8) Repeat, but set remote1 (and light) to scan on a single channel.
+expect("remote1", "plugin zll-commissioning channel 25", ".*Setting default channel to 25");
+expect("light", "plugin zll-commissioning channel 25", ".*Setting default channel to 25");
+network.pressButton("remote1", "1");
+expect("light", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", 10000);
+network.releaseButton("remote1", "1");
+expect("remote1", "Aborting touch link");
+expect("remote1", "Error: Touch linking failed: aborted by application");
+expect("remote1", "Touch link failed: 0x00", timeout * 3);
+expect("remote1", "plugin zll-commissioning status", "Current channel: 25");

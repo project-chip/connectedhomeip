@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-comms-hub-function-sub-ghz" name="Plugin Commands: Comms Hub Function (SubGhz)">
+  </group>
+  <command cli="plugin comms-hub-function-sub-ghz channel-change-start" functionName="emAfPluginCommsHubFunctionSubGhzCliChannelChangeStart" group="plugin-comms-hub-function-sub-ghz">
+    <description>
+      Initiate the channel change sequence.
+    </description>
+  </command>
+  <command cli="plugin comms-hub-function-sub-ghz channel-change-complete" functionName="emAfPluginCommsHubFunctionSubGhzCliChannelChangeComplete" group="plugin-comms-hub-function-sub-ghz">
+    <description>
+      Complete the channel change sequence.
+    </description>
+    <arg name="page"    type="INT8U" description="Requested new page [28-31]"/>
+    <arg name="channel" type="INT8U" description="Requested new channel"/>
+  </command>
+</cli>

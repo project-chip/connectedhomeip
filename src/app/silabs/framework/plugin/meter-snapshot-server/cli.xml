@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-meter-snapshot-server" name="Plugin Commands: Meter Snapshot Server">
+    <description>
+      The meter-snapshot-server plugin contributes several commands to the application framework's CLI. These commands are used for taking and publishing snapshots.
+    </description>
+  </group>
+
+  <command cli="plugin meter-snapshot-server take" functionName="emAfMeterSnapshotServerCliTake" group="plugin-meter-snapshot-server">
+    <description>
+      Take a snapshot. 
+    </description>
+    <arg name="endpoint"     type="INT8U"  description="the source endpoint" />
+    <arg name="cause"        type="INT32U" description="the cause of the snapshot" />
+  </command>
+
+  <command cli="plugin meter-snapshot-server publish" functionName="emAfMeterSnapshotServerCliPublish" group="plugin-meter-snapshot-server">
+    <description>
+      Publish a snapshot. 
+    </description>
+    <arg name="nodeId"       type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint"  type="INT8U"  description="the source endpoint" />
+    <arg name="dstEndpoint"  type="INT8U"  description="the destination endpoint" />
+    <arg name="startTime"    type="INT32U" description="the earliest time of a snapshot to be published" />
+    <arg name="endTime"      type="INT32U" description="the latest time of a snapshot to be published" />
+    <arg name="offset"       type="INT8U"  description="identifies the snapshot to be published" />
+    <arg name="cause"        type="INT32U" description="select only snapshots that were taken due to a specific cause" />
+  </command>
+</cli>

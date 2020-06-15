@@ -1,0 +1,317 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("**** Nothing to do for multi-hop");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+
+// This must be the super-set of SOC and client devices
+String[] allDevices = { "server", "client1", "client2", "client3", "client4" };
+
+String[] socClients = { "client1", "client2", "client3", "client4" };
+String[] socImages = new String[] {
+  // Server
+  "build/af-test-apps/SeOtaEepromTest-simulation-REAL_ECC/SeOtaEepromTest",
+
+  // No SOC bootloading, Normal read-modify-write flash part
+  "build/af-test-apps/SeOtaEepromTest-simulation-REAL_ECC/SeOtaEepromTest",
+
+  // SOC bootloading, Normal read-modify-write flash part
+  "build/af-test-apps/SeOtaEepromTest-simulation-EMBER_TEST_OTA_EEPROM_SOC_BOOTLOAD-REAL_ECC/SeOtaEepromTest",
+
+  // No SOC bootloading, Page Erase required flash part
+  "build/af-test-apps/SeOtaEepromTest-simulation-EMBER_TEST_OTA_EEPROM_PAGE_ERASE-REAL_ECC/SeOtaEepromTest",
+
+  // SOC bootloading, Page Erase required flash part
+  "build/af-test-apps/SeOtaEepromTest-simulation-EMBER_TEST_OTA_EEPROM_PAGE_ERASE-EMBER_TEST_OTA_EEPROM_SOC_BOOTLOAD-REAL_ECC/SeOtaEepromTest",
+};
+
+String[] socClientTests = {
+  "No SOC bootload support, normal read-modify-write flash support",
+  "SOC bootolad support, normal read-modify-write flash support",
+  "No SOC bootload support, page-erase-required flash support",
+  "SOC bootload support, page-erase-required flash support",
+};
+
+boolean[] socClientTestsEnabled = {
+  true,
+  true,
+  true,
+  true,
+};
+
+String[] hostClients = { "client1", "client2" };
+String[] hostImages = new String[] {
+  // Server
+  "build/af-test-apps/SeOtaEepromTest-simulation-ezsp/SeOtaEepromTest",
+
+  // No SOC bootloading (duh host image), Normal read-modify-write
+  "build/af-test-apps/SeOtaEepromTest-simulation-ezsp/SeOtaEepromTest",
+
+  // No SOC bootloading (duh host image), Page erase required flash part
+  "build/af-test-apps/SeOtaEepromTest-simulation-ezsp-EMBER_TEST_OTA_EEPROM_PAGE_ERASE-REAL_ECC/SeOtaEepromTest",
+
+  // These other images don't matter since we don't need as many configurations as we do for the SOC.
+  // But addAndLoadDevices() requires the number of host and SOC images to be the same.
+  "build/af-test-apps/SeOtaEepromTest-simulation-ezsp/SeOtaEepromTest",
+  "build/af-test-apps/SeOtaEepromTest-simulation-ezsp/SeOtaEepromTest",
+};
+String[] hostClientTests = {
+  "No SOC bootloading, normal read-modify-write part",
+  "No SOC bootloading, page-erase-required part",
+  "",
+  "",
+};
+
+boolean[] hostClientTestsEnabled = {
+  true,
+  true,
+};
+
+String ncpImage = "app/ncp/sample-app/ncp-spi-real_ecc/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+String[] serverOnly = { "server" };
+
+expect("server", 
+       "plugin ota-storage-common printImages",
+       "0 images in OTA storage.");
+
+String file = "app/framework/plugin/ota-storage-simple/test-file.ota";
+
+void initialNodeSetup(String node, boolean usePageRequest)
+{
+  expect(node,
+         "info",
+         ".*");
+  networkWait(1000);
+
+  expectNoResponse(node,
+                   "plugin ota-client page-request "
+                   + (usePageRequest ? "1" : "0"));
+  
+  expect(node,
+         "option print-rx-msgs disable",
+         ".*disabled print");
+
+  expect(node,
+         "plugin ota-storage-common storage-info",
+         "Word size.*");
+  networkWait(1000);
+}
+
+void eraseImage(String node, int imageIndex)
+{
+  if ((runArgument.runUsingHostApps && imageIndex == 0)
+      || (!runArgument.runUsingHostApps && imageIndex < 2)) {
+    expect(node,
+           "plugin ota-storage-common delete 0",
+           ".*Image deleted.");
+  } else {
+    // The page erase required parts take time to erase the image.
+    // So we add an extra delay to catch when they are done.
+    // Unfortunately the best way to catch this is to assume that tests
+    // 2 & 3 are using page-erase required images.
+    expect(node,
+           "plugin ota-storage-common delete 0",
+           ".*EEPROM Erase complete",
+           20000);
+  }
+}
+
+String[] client;
+boolean[] testEnabled;
+String[] testDescription;
+
+if (runArgument.runUsingHostApps) {
+  client = hostClients;
+  testDescription = hostClientTests;
+  testEnabled = hostClientTestsEnabled;
+} else{
+  client = socClients;
+  testDescription = socClientTests;
+  testEnabled = socClientTestsEnabled;
+}
+
+expect("server", 
+       "plugin ota-server load-file \"" + file + "\"",
+       ".*Loaded image successfully.",
+       5000);
+
+expect("server", 
+       "plugin ota-storage-common printImages",
+       "1 images in OTA storage.");
+
+// Verify that the OTA image is intact.
+expect("server",
+       "plugin ota-client verify 0",
+       ".*DSA Verify returned: 0x00.*",
+       5000);
+
+// To check that the OTA image correctly survives
+// a reboot in simulation, reboot and verify again.
+
+if (!runArgument.runUsingHostApps) {
+  // Reboot doesn't work properly for NCP so we are skipping this
+  // for now.
+  reboot("server");
+  networkWait(2000);
+ }
+
+expect("server",
+       "plugin ota-client verify 0",
+       ".*DSA Verify returned: 0x00.*",
+       5000);
+
+// Set the Master clock bit. Not strictly necessary since this test does not
+// rely on the SE registration being completed successfully but debug prints
+// coming from retries during the registration process may interfere with
+// following test steps.
+expect("server",
+       "write 1 0x000A 0x01 1 0x18 {01}",
+      "Success: write");
+
+formAndJoinDevices(serverOnly);
+
+expect("server", 
+       "option print-rx-msgs disable",
+       ".*disabled print");
+
+for (int i = 0; i < client.length; i++) {
+  debugPrintln("\n*** Test " + (i+1) + ": " + testDescription[i]);
+  debugPrintln("***   Client: " + client[i]);
+  debugPrintln("***   Enabled: " + (testEnabled[i] ? "Yes" : "No") + "\n");
+
+  if (testEnabled[i] != true) {
+    continue;
+  }
+
+  networkWait(1000);
+  
+  // Disable page request.  It is enabled by default when the OTA client
+  // plugin is configured to use it.  We want to test the normal
+  // block request stuff here.
+  initialNodeSetup(client[i],
+                   false);     // use page request?
+  
+  networkJoinTo(client[i],
+                "server");
+
+  // Let registration complete
+  expect(client[i],
+         "",
+         "Initiator: Key Establish Success: Link key verified.*",
+         20000);
+  // There are a few more steps: binding, determining time source...
+  networkWait(12000);
+
+  // For purposes of decoding the trace, print the keys.
+  send(client[i],
+       "keys print");
+  networkWait(2000);
+
+  if (!runArgument.runUsingHostApps) {
+    // Reboot doesn't work properly for host/NCP so skip this
+    // for now.
+    expectNoResponse(client[i],
+                     "plugin ota-client pause-at 50");
+
+    expect(client[i],
+           "plugin ota-client start",
+           "Artificially stopping download at.*",
+           50000);          // timeout
+
+ 
+    reboot(client[i]);
+    networkWait(16000);        // wait until the registration is over
+
+    initialNodeSetup(client[i],
+                     false);   // use page request?
+  }
+
+  expect(client[i],
+         "plugin ota-client start",
+         (runArgument.runUsingHostApps
+          ? "Starting download.*"
+          : "Partial file download found, .*"),
+         3000);
+  networkWait(4000);
+  expect(client[i],
+         "",
+         "Applying upgrade",
+         70000);          // timeout
+
+  // Client code may have some additional print-outs after 'Applying upgrade'
+  // let them expire.
+  networkWait(3000);
+
+  expect(client[i],
+         "plugin ota-client stop",
+         ".*stopping OTA client state machine");
+
+  eraseImage(client[i], i);
+
+  debugPrintln("\n  *** Re-running test with page request support (also with an un-erased EEPROM). ***\n");
+
+  expectNoResponse(client[i],
+                   "plugin ota-client page-request 1");
+
+  expect(client[i],
+         "plugin ota-client start",
+         ".*Applying upgrade",
+         120000);          // timeout
+
+  networkWait(3000);
+
+
+  debugPrintln("\n  *** Aborting download to verify client deletes partial image. ***");
+  eraseImage(client[i], i);
+  networkWait(3000);
+  // Server will abort the download.
+  expectNoResponse("server",
+                   "plugin ota-server policy block-request 2");
+
+  // Check for failed download that deletes image
+  if ((runArgument.runUsingHostApps && imageIndex == 1)
+      || (!runArgument.runUsingHostApps && i >= 2)) {
+    expectNoResponse(client[i],
+                     "plugin ota-client page-request 0");
+    expect(client[i],
+           "plugin ota-client stop",
+           ".*stopping OTA client state machine");
+    expect(client[i],
+           "plugin ota-client start",
+           ".*EEPROM Erase complete",
+           20000);
+  } else {
+    debugPrintln("  *** NOTE: Skipping this test since client isn't a page-erase required device.");
+  }
+  networkWait(3000);
+  // Reset server back to normal behavior.
+  expectNoResponse("server",
+                   "plugin ota-server policy block-request 0");
+
+  expect(client[i],
+         "network leave",
+         ".*EMBER_NETWORK_DOWN",
+         5000);
+}
+
+

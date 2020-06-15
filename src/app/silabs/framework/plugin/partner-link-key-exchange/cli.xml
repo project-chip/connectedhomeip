@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-partner-link-key-exchange" name="Plugin Commands: Partner Link Key Exchange">
+    <description>
+      The partner link key exchange plugin contributes CLI commands to the application framework to be used for controlling facets of link key exchanges among partners.
+    </description>
+  </group>
+  <command cli="plugin partner-link-key-exchange partner" functionName="cbkePartnerCommand" group="plugin-partner-link-key-exchange">
+    <description>
+      Initiate partner link key exchange.
+    </description>
+    <arg name="nodeId" type="INT16U" description="The 2 byte short address of the node" />
+    <arg name="endpoint" type="INT8U" description="The endpoint of the device with whom ot start cbke." />
+  </command>
+  <command cli="plugin partner-link-key-exchange allow-partner" functionName="cbkeAllowPartner" group="plugin-partner-link-key-exchange">
+    <description>
+      Set the allow partner flag within the device for Certificate Based Key Exchange
+    </description>
+    <arg name="allowPartner" type="INT8U" description="Boolean value to allow or disallow partner based key exchange" />
+  </command>
+</cli>

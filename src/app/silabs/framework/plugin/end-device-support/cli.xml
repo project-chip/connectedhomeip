@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-end-device-support" name="Plugin Commands: End Device Support">
+    <description>
+      The End Device Support plugin contributes commands for controlling the polling behavior of the device.
+    </description>
+  </group>
+  <command cli="plugin end-device-support status" functionName="emberAfPluginEndDeviceSupportStatusCommand" group="plugin-end-device-support">
+    <description>
+      Display the status of the End Device's polling.
+    </description>
+  </command>
+  <command cli="plugin end-device-support poll-completed-callback" functionName="emberAfPluginEndDeviceSupportPollCompletedCallbackCommand" group="plugin-end-device-support">
+    <description>
+      Sets whether the device's poll completed callback function is enabled.
+    </description>
+    <arg name="pollCompletedCallbackCommand" type="BOOLEAN" description="The value indicating whether the device's poll completed callback function is enabled."/>
+  </command>
+  <command cli="plugin end-device-support force-short-poll" functionName="emberAfPluginEndDeviceSupportForceShortPollCommand" group="plugin-end-device-support">
+    <description>
+      Sets whether the CLI forces the device to short poll.
+    </description>
+    <arg name="shortPoll" type="BOOLEAN" description="The value indicating whether the device should short poll."/>
+  </command>
+</cli>

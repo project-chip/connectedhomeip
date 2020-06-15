@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-fragmentation" name="Plugin Commands: Fragmentation">
+    <description>
+      The Fragmentation Plugin provides the ability to supported fragmentation transmissions.  The CLI allows it to introduce negative behavior to foster testing.
+    </description>
+  </group>
+  <command cli="plugin fragmentation set-rx-window-size" functionName="emAfPluginFragmentationSetWindowSizeCommand" group="plugin-fragmentation" restriction="defined(EMBER_TEST)">
+    <description>
+      Sets the receive window size.  By definition in the Smart Energy profile it must be set to 1 but this allows to be changed.
+    </description>
+    <arg name="window-size" type="INT8U" description="The max number of the blocks received before an APS ack is generated."/>
+  </command>
+  <command cli="plugin fragmentation artificial-block-drop" functionName="emAfPluginFragmentationArtificialBlockDropCommand" group="plugin-fragmentation" restriction="defined(EMBER_TEST)">
+    <description>
+      Artificially drops the block number defined by the passed argument only once, and then allows it upon a retry.
+    </description>
+    <arg name="block-number" type="INT8U" description="The block number to artificially drop to force a retry.  Set to 0xFF to disable."/>
+  </command>
+</cli>

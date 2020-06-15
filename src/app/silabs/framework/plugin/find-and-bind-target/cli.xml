@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-find-and-bind-target"
+         name="Plugin Commands: Find and Bind Target">
+    <description>
+      Commands for the finding and binding target process from the Base Device Behavior spec.
+    </description>
+  </group>
+
+  <command cli="plugin find-and-bind target"
+           functionName="emberAfPluginFindAndBindTargetStartCommand" 
+           group="plugin-find-and-bind-target">
+    <arg name="endpoint"
+         type="INT8U"
+         description="The endpoint on which to begin the Finding and Binding target process." />
+    <description>
+      Makes this node start identifying as a target for binding with an initiator node.
+    </description>
+  </command>
+           
+</cli>

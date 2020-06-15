@@ -1,0 +1,13 @@
+/** @brief Message Timed Out
+ *
+ * This function is called by the sleepy message queue when a message times
+ * out. The plugin will invalidate the entry in the queue after giving the
+ * application a chance to perform any actions on the timed-out message.
+ *
+ * @param sleepyMsgId   Ver.: always
+ */
+void emberAfPluginSleepyMessageQueueMessageTimedOutCallback(uint8_t sleepyMsgId)
+{
+  // The application may call emberAfPluginSleepyMessageGetPendingMessage() to retrieve the
+  // emberAfSleepyMessage in this callback before it is invalidated by the plugin.
+}

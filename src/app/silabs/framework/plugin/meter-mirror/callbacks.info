@@ -1,0 +1,38 @@
+/** @brief Mirror Added
+ *
+ * This function is called by the Meter Mirror plugin whenever a RequestMirror
+ * command is successfully processed.
+ *
+ * @param requestingDeviceIeeeAddress   Ver.: always
+ * @param endpoint   Ver.: always
+ */
+void emberAfPluginMeterMirrorMirrorAddedCallback(const EmberEUI64 requestingDeviceIeeeAddress,
+                                                 uint8_t endpoint)
+{
+}
+
+/** @brief Mirror Removed
+ *
+ * This function is called by the Meter Mirror plugin whenever a RemoveMirror
+ * command is successfully processed.
+ *
+ * @param requestingDeviceIeeeAddress   Ver.: always
+ * @param endpoint   Ver.: always
+ */
+void emberAfPluginMeterMirrorMirrorRemovedCallback(const EmberEUI64 requestingDeviceIeeeAddress,
+                                                   uint8_t endpoint)
+{
+}
+
+/** @brief Reporting Complete
+ *
+ * This function is called by the Meter Mirror plugin after processing an
+ * AttributeReportingStatus attribute set to ReportingComplete. If the
+ * application needs to do any post attribute reporting processing it can do it
+ * from within this callback.
+ *
+ * @param endpoint   Ver.: always
+ */
+void emberAfPluginMeterMirrorReportingCompleteCallback(uint8_t endpoint)
+{
+}

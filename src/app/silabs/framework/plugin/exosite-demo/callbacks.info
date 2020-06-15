@@ -1,0 +1,11 @@
+/** @brief Light Changed State
+ *
+ * This function indicates the light state on the Exosite website has changed
+ * its state from the local cache.
+ *
+ * @param lightOn True if the light is now on. False if it is off. Ver.: always
+ */
+void emberAfPluginExositeDemoLightChangedStateCallback(bool lightOn)
+{
+  return;
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-standalone-bootloader-client" name="Plugin Commands: Standalone Bootloader Client">
+    <description>
+      The Standalone Bootloader Client contributes commands about its current status.
+    </description>
+  </group>
+  <command cli="plugin standalone-bootloader-client status" functionName="emAfStandaloneBootloaderClientPrintStatus" group="plugin-standalone-bootloader-client">
+    <description>
+      Print the standalone bootload client's current status.
+    </description>
+  </command>
+</cli>

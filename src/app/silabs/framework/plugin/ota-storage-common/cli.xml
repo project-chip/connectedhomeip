@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ota-storage-common" name="Plugin Commands: OTA Storage Common">
+    <description>
+      The OTA Storage Common plugin provides Over-the-air commands for upgrading firmware and 
+      downloading specific files common to both server and client.
+    </description>
+  </group>
+  <command cli="plugin ota-storage-common printImages" functionName="emAfOtaPrintAllImages" group="plugin-ota-storage-common">
+    <description>
+      Prints the images.
+    </description>
+  </command>
+  <command cli="plugin ota-storage-common delete" functionName="emAfOtaImageDelete" group="plugin-ota-storage-common">
+    <description>
+      Deletes the image at the specified index.
+    </description>
+    <arg name="index" type="INT8U" description="The index at which to begin bootloading the image" />
+  </command>
+  <command cli="plugin ota-storage-common reload" functionName="emAfOtaReloadStorageDevice" group="plugin-ota-storage-common">
+    <description>
+      Reload the storage device.
+    </description>
+  </command>
+  <command cli="plugin ota-storage-common storage-info" functionName="emAfOtaStorageInfoPrint" group="plugin-ota-storage-common">
+    <description>
+      Print information about the storage device.
+    </description>
+  </command>
+  <command cli="plugin ota-storage-common data-print" functionName="emAfOtaStorageDataPrint" group="plugin-ota-storage-common">
+    <description>
+      Print arbitray bytes of the OTA image on disk.
+    </description>
+    <arg name="index" type="INT8U" description="The index of the image to print its data."/>
+    <arg name="offset" type="INT32U" description="The offset into the OTA image that will be printed."/>
+  </command>
+</cli>

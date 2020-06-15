@@ -1,0 +1,290 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingMultihop) {
+  // This test needs to run with multi-hop. The P4 network topology tests both
+  // point-to-point client-server communication (server1 -> client) and
+  // multi-hop communication (server2 -> router -> client).
+  std.print("****This test only runs with multi-hop****");
+  return;
+}
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"server1", "client", "router", "server2"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaDoorLock-simulation/HaDoorLock",
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaDoorLock-simulation/HaDoorLock",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaDoorLock-simulation-ezsp/HaDoorLock",
+  "build/af-test-apps/HaHomeGateway-simulation-ezsp/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaDoorLock-simulation-ezsp/HaDoorLock",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+lazyExpect = true;
+
+// Load devices and wait for the dust to settle.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+// Form and open a network with the client.
+expect("client", "network form 11 2 0x1234", "EMBER_NETWORK_UP 0x0000");
+expect("client", "network pjoin 123", "pJoin for 123 sec: 0x00");
+
+// Join and open the network with the router.
+expect("router", "network join 11 2 0x1234", "EMBER_NETWORK_UP");
+expect("router", "network pjoin 123", "pJoin for 123 sec: 0x00");
+
+// If this wait isn't here, then the expectNetworkUp() call below fails.
+networkWait(DEFAULT_TIMEOUT);
+
+String runIasJoinTest(String server, String zoneId)
+{
+  dbg.println("=== Testing IAS Commissioning with " + server + " ===");
+
+  // Initialize enrollment mode to Auto-Enroll-Request.
+  // This causes the server to send an Enroll Request command
+  // once the CIE address is set.
+  expect(server, "plugin ias-zone-server set-enrollment-mode 1 2",
+          "IAS Zone Server Enrollment Mode: 2");
+
+  // Join the network.
+  send(server, "network join 11 2 0x1234");
+  String shortId = expectNetworkUp(server, DEFAULT_TIMEOUT);
+
+  //Force the device to short poll to work around EMZIGBEE-1120
+  send(server,"plugin end-device-support force-short-poll 1");
+
+  // The client should see that the joining server supports the
+  // IAS Zone Server cluster on the client side. It should then write
+  // its long address to the server.
+  expectMultiline("client",
+                  new String[] {
+                    "Device " + shortId + " supports IAS Zone Server",
+                    "Writing CIE Address to IAS Zone Server",
+                  },50000);
+  expect(server, "WRITE: clus 0500 attr 0010 OK", DEFAULT_TIMEOUT * 2);
+
+  // EMAPPFWKV2-1217 - the client was giving every server the same Zone ID.
+  // The HA spec that I am looking at (05-3520-29) says that the Zone ID
+  // attribute is "A unique reference number allocated by the CIE at zone
+  // enrollment time." Therefore, we should make sure the two servers are
+  // given different Zone ID values.
+  expect("client",
+         "Sent enroll response with "
+         + "responseCode: 0x00, zoneId: " + zoneId + ", status: 0x00",
+         15000);
+  expectMultiline(server,
+                  new String[] {
+                    "IAS Zone Server State: Enrolled",
+                    "IAS Zone Server Zone ID: " + zoneId,
+                  });
+
+  // Add a wait so that enrollment can die down.
+  networkWait(DEFAULT_TIMEOUT);
+
+  return shortId;
+}
+
+// Verify that the servers join correctly.
+String server1ShortId = runIasJoinTest("server1", "0x01");
+String server1LongId  = eui64("server1");
+networkWait(DEFAULT_TIMEOUT);
+String server2ShortId = runIasJoinTest("server2", "0x02");
+String server2LongId  = eui64("server2");
+
+// Sanity check for EMAPPFWKV2-1217 (see explanation above).
+expectMultiline("client",
+                "plugin ias-zone-client print-servers",
+                new String[] {
+                  "Index.*IEEE.*EP.*Type.*Status.*State",
+                  "1.*" + server1LongId + ".*1.*0x.... 0x.... 0x.. 0x01",
+                  "2.*" + server2LongId + ".*1.*0x.... 0x.... 0x.. 0x02",
+                });
+networkWait(DEFAULT_TIMEOUT);
+
+// If a server tries to re-enroll, their Zone ID should stay the same.
+send("server1", "zcl ias-zone enroll 0x021D 0x1234");
+send("server1", "send 0x0000 1 1");
+networkWait(DEFAULT_TIMEOUT * 2);
+expectMultiline("client",
+                "plugin ias-zone-client print-servers",
+                new String[] {
+                  "Index.*IEEE.*EP.*Type.*Status.*State",
+                  "1.*" + server1LongId + ".*1.*0x.... 0x.... 0x.. 0x01",
+                  "2.*" + server2LongId + ".*1.*0x.... 0x.... 0x.. 0x02",
+                });
+
+// If a server really does un-enroll, then it may get a new ID.
+send("client", "plugin ias-zone-client clear-all");
+expect("server1", "network leave", "EMBER_NETWORK_DOWN");
+expect("server1", "IAS Zone Server State: NOT Enrolled");
+expect("server2", "network leave", "EMBER_NETWORK_DOWN");
+expect("server2", "IAS Zone Server State: NOT Enrolled");
+runIasJoinTest("server2", "0x00");
+runIasJoinTest("server1", "0x01");
+
+// Sanity check for EMAPPFWKV2-1217 (see explanation above).
+expectMultiline("client",
+                "plugin ias-zone-client print-servers",
+                new String[] {
+                  "Index.*IEEE.*EP.*Type.*Status.*State",
+                  "0.*" + server2LongId + ".*1.*0x.... 0x.... 0x.. 0x00",
+                  "1.*" + server1LongId + ".*1.*0x.... 0x.... 0x.. 0x01",
+                });
+networkWait(DEFAULT_TIMEOUT);
+
+// -----------------------------------------------------------------------------
+// EMAPPFWKV2-1530: don't unregister yourself if you lose your parent. If you
+// find a new parent, hopefully they will be on the same network, and you can
+// continue about your business.
+
+// The parent (client) and router say see ya.
+power("client", false);
+power("router", false);
+expect("server1", "Schedule move nwk 0: 0", DEFAULT_TIMEOUT << 4);
+expect("server1", "Max move limit reached nwk 0: 3", DEFAULT_TIMEOUT << 4);
+
+// But the server is still enrolled.
+expect("server1", "plugin ias-zone-server info 1", "Zone State:.*Enrolled.*");
+
+// EMAPPFWKV2-1530
+// -----------------------------------------------------------------------------
+
+void powerUpNetwork(){
+  power("client", true);
+  power("router", true);
+}
+
+void resetNetwork(){
+  send("client", "plugin ias-zone-client clear-all");
+  expect("server1", "network leave", "EMBER_NETWORK_DOWN");
+  expect("server1", "IAS Zone Server State: NOT Enrolled");
+  expect("server2", "network leave", "EMBER_NETWORK_DOWN");
+  expect("server2", "IAS Zone Server State: NOT Enrolled");
+}
+
+void joinNode(String server){
+  // Join the network.
+  expect("client", "network pjoin 123", "pJoin for 123 sec: 0x00");
+  expect("router", "network pjoin 123", "pJoin for 123 sec: 0x00");
+  networkWait(5000);
+  send(server, "network join 11 2 0x1234");
+  String shortId = expectNetworkUp(server, DEFAULT_TIMEOUT);
+
+  //Force the device to short poll to work around EMZIGBEE-1120
+  send(server,"plugin end-device-support force-short-poll 1");
+
+  // The client should see that the joining server supports the
+  // IAS Zone Server cluster on the client side. It should then write
+  // its long address to the server.
+  expectMultiline("client",
+                  new String[] {
+                    "Device " + shortId + " supports IAS Zone Server",
+                    "Writing CIE Address to IAS Zone Server",
+                  },50000);
+  expect(server, "WRITE: clus 0500 attr 0010 OK", DEFAULT_TIMEOUT * 8);
+}
+
+void verifyEnrollment(String server, String zoneId){
+  expect("client",
+         "Sent enroll response with "
+         + "responseCode: 0x00, zoneId: " + zoneId + ", status: 0x00",
+         15000);
+  expectMultiline(server,
+                  new String[] {
+                    "IAS Zone Server State: Enrolled",
+                    "IAS Zone Server Zone ID: " + zoneId,
+                  });
+
+  expect(server, "plugin ias-zone-server info 1", "Zone State:.*\\(Enrolled.*");
+}
+
+void testEnrollmentModeTripToPair(){
+  dbg.println("=== Testing Enrollment - Trip to Pair ===");
+  resetNetwork();
+  networkWait(10000);//to cover host reset time
+
+  // The trip-to-pair enrollment mode should not enroll the sensor
+  // until the status changes.
+  expect("server1", "plugin ias-zone-server set-enrollment-mode 1 0",
+          "IAS Zone Server Enrollment Mode: 0");
+  expect("server2", "plugin ias-zone-server set-enrollment-mode 1 0",
+          "IAS Zone Server Enrollment Mode: 0");
+  joinNode("server1");
+  joinNode("server2");
+
+  expect("server1", "plugin ias-zone-server info 1", "Zone State:.*\\(NOT Enrolled.*");
+  expect("server2", "plugin ias-zone-server info 1", "Zone State:.*\\(NOT Enrolled.*");
+
+  // Now trip sensor, and server should enroll.
+  send("server1", "plugin ias-zone-server changeStatus 0x0003 1 1");
+  verifyEnrollment("server1", "0x00");
+
+  send("server2", "plugin ias-zone-server changeStatus 0x0003 1 1");
+  verifyEnrollment("server2", "0x01");
+}
+
+void testEnrollmentModeAutoEnrollResponse(){
+  dbg.println("=== Testing Enrollment - Auto Enroll Response ===");
+  resetNetwork();
+
+  expect("server1", "plugin ias-zone-server set-enrollment-mode 1 1",
+          "IAS Zone Server Enrollment Mode: 1");
+  expect("server2", "plugin ias-zone-server set-enrollment-mode 1 1",
+          "IAS Zone Server Enrollment Mode: 1");
+  joinNode("server1");
+  joinNode("server2");
+
+  expect("server1", "plugin ias-zone-server info 1", "Zone State:.*\\(NOT Enrolled.*");
+  expect("server2", "plugin ias-zone-server info 1", "Zone State:.*\\(NOT Enrolled.*");
+
+  // Now trip sensor, and server should NOT enroll.
+  send("server1", "plugin ias-zone-server changeStatus 0x0003 1 1");
+  send("server2", "plugin ias-zone-server changeStatus 0x0003 1 1");
+
+  expect("server1", "plugin ias-zone-server info 1", "Zone State:.*\\(NOT Enrolled.*");
+  expect("server2", "plugin ias-zone-server info 1", "Zone State:.*\\(NOT Enrolled.*");
+}
+
+
+void testEnrollmentModeInvalidCases(){
+  dbg.println("=== Testing Enrollment - Invalid Cases ===");
+  resetNetwork();
+
+  // Set the enrollment mode to an invalid value - 3.
+  expect("server1", "plugin ias-zone-server set-enrollment-mode 1 3",
+          "Invalid IAS Zone Server Enrollment Mode: 3");
+
+  // Now setup trip-to-pair enrollment mode.
+  // The server should not enroll until the sensor status changes.
+  expect("server1", "plugin ias-zone-server set-enrollment-mode 1 0",
+          "IAS Zone Server Enrollment Mode: 0");
+
+  networkWait(DEFAULT_TIMEOUT);
+  joinNode("server1");
+  joinNode("server2");
+
+  // Now trip sensor, and server should enroll.
+  send("server1", "plugin ias-zone-server changeStatus 0x0003 1 1");
+  verifyEnrollment("server1", "0x00");
+
+  // Try to set the enrollment mode after enrolling - should fail.
+  expect("server1", "plugin ias-zone-server set-enrollment-mode 1 0",
+          "Error: Already enrolled");
+
+}
+
+
+// Setup for remaining tests
+powerUpNetwork();
+testEnrollmentModeTripToPair();
+testEnrollmentModeAutoEnrollResponse();
+testEnrollmentModeInvalidCases();

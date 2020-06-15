@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-standalone-bootloader-server" name="Plugin Commands: Standalone Bootloader Server">
+    <description>
+      The Standalone Bootloader Server contributes commands to tell client's to launch their standalone bootloader and send them a new application image.
+    </description>
+  </group>
+  <command cli="plugin standalone-bootloader-server status" functionName="emAfStandaloneBootloaderServerPrintStatus" group="plugin-standalone-bootloader-server">
+    <description>
+      Print the standalone bootload server's current status.
+    </description>
+  </command>
+  <command cli="plugin standalone-bootloader-server query" functionName="emberAfPluginStandaloneBootloaderServerBroadcastQuery" group="plugin-standalone-bootloader-server">n
+    <description>
+      Send a broadcast standalone bootloader query to all nearby nodes.
+    </description>
+  </command>
+  <command cli="plugin standalone-bootloader-server print-target" functionName="emAfStandaloneBootloaderServerPrintTargetClientInfoCommand" group="plugin-standalone-bootloader-server">
+    <description>
+      Print the cached info about the current bootload target.
+    </description>
+  </command>
+  <command cli="plugin standalone-bootloader-server bootload target" functionName="sendLaunchRequestToTarget" group="plugin-standalone-bootloader-server">
+    <description>
+      Starts the process for bootloading a device using the currently cached target info.
+    </description>
+    <arg name="index" type="INT8U" description="The index of the image being sent to the target"/>
+    <arg name="tag"   type="INT8U" description="The tag ID within the image, which will be sent to the target."/>
+  </command>
+  <command cli="plugin standalone-bootloader-server bootload eui" functionName="sendLaunchRequestToEui" group="plugin-standalone-bootloader-server">
+    <description>
+      Starts the process for bootloading a device using the passed EUI64.
+    </description>
+    <arg name="eui64" type="IEEE_ADDRESS" description="The EUI64 of the target of the bootload."/>
+    <arg name="index" type="INT8U" description="The index of the image being sent to the target"/>
+    <arg name="tag"   type="INT8U" description="The tag ID within the image, which will be sent to the target."/>
+  </command>
+</cli>

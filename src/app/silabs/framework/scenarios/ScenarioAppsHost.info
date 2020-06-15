@@ -1,0 +1,75 @@
+# NOT Auto-generated.
+
+# Lovingly hand-crafted for any ISC files that live outside the purview of the
+# sample-apps-regenerate.pl auto-generation.
+SeSampleCommsHub {
+  name=SeSampleCommsHub 
+  dir=zse/SeSampleCommsHub
+  isc=zse/SeSampleCommsHub/SeSampleCommsHubHost.isc
+  include=SeSampleCommsHub_callbacks.c
+  EmberZNet: This is a Communications Hub application for a GBCS Smart Energy 1.4 network.
+}
+
+SeSampleHHT {
+  name=SeSampleHHT
+  dir=zse/SeSampleHHT
+  isc=zse/SeSampleHHT/SeSampleHHTHost.isc
+  include=SeSampleHHT_callbacks.c
+  EmberZNet: This is a Handheld Terminal application for a GBCS Smart Energy 1.2a network.
+}
+
+SeSample12bEsi {
+  name=SeSample12bEsi
+  dir=zse/SeSample12bEsi
+  isc=zse/SeSample12bEsi/SeSample12bEsiHost.isc
+  include=SeSample12bEsi_callbacks.c
+  EmberZNet: This is an Energy Service Interface application for a ZigBee Smart Energy 1.2b network.
+}
+
+Rf4ceDemo {
+  name=Rf4ceDemo 
+  dir=rf4ce/Rf4ceDemo
+  isc=rf4ce/Rf4ceDemo/Rf4ceDemoHost.isc
+  include=Rf4ceDemo_callbacks.c
+  EmberZNet: This is a demonstration of an RF4CE/HA dual network device.
+}
+
+XncpLed {
+  name=XncpLed
+  dir=xncp/XncpLed
+  isc=xncp/XncpLed/XncpLedHost.isc
+  include=XncpLed_callbacks.c
+  EmberZNet: This is a demonstration of a UNIX HOST controlling an LED on an NCP.
+}
+
+XncpHostSpi {
+  name=XncpHostSpi
+  dir=xncp/XncpHost
+  isc=xncp/XncpHost/XncpHost.isc
+  include=XncpHost_callbacks.c
+  EmberZNet: This is a demonstration of a host application that utilizes the features of the XNCP.
+}
+
+Z3Gateway {
+  name=Z3Gateway
+  dir=z3/Z3Gateway
+  isc=z3/Z3Gateway/Z3GatewayHost.isc
+  include=Z3Gateway_callbacks.c
+  EmberZNet: This is a Zigbee 3.0 gateway application for a Unix host.  Plugins described in the application configuration description may be enabled to provide MQTT and CoAP interfaces to the application.
+}
+
+Z3GatewayWithWwah {
+  name=Z3GatewayWithWwah
+  dir=z3/Z3GatewayWithWwah
+  isc=z3/Z3GatewayWithWwah/Z3GatewayWithWwahHost.isc
+  include=Z3GatewayWithWwah_callbacks.c
+  EmberZNet: This is a fork of the Zigbee 3.0 gateway application for a Unix host. It additionally enables the Works With All Hubs client cluster.
+}
+
+SecureEzsp {
+  name=SecureEzsp 
+  dir=secure-ezsp/SecureEzsp
+  isc=secure-ezsp/SecureEzsp/SecureEzspHost.isc
+  include=SecureEzsp_callbacks.c
+  EmberZNet: This is a demonstration of a host application that securely communicates with the NCP.
+}

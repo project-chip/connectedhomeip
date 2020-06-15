@@ -1,0 +1,64 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  // This tests find and joining the right network, which is always 1-hop.
+  // No real point in testing multi-hop.
+  std.print("**** Multihop doesn't make sense, skipping. ");
+  return;
+}
+
+if (runArgument.runUsingHostApps) {
+  std.print("**** Host not supported (requires special stack code to limit beacons)");
+  return;
+ }
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[] {"coordinator1", "coordinator2", "joiner"};
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 11;
+int power = 0;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+networkForm("coordinator1");
+network.sleep(2000);
+
+expect("coordinator1",
+       "network pjoin 254",
+       ".*pJoin for 254 sec: 0x00");
+
+debugPrintln("*** Testing Bug fix for 13913 ***");
+
+expectNoResponse("coordinator1", 
+                 "plugin test-harness stack limit-beacons on");
+
+expectNoResponse("joiner",
+                 "plugin test-harness channel-mask all");
+
+expect("joiner", 
+       "network find joinable",
+       ".*EMBER_JOIN_FAILED");
+expect("joiner",
+       "",
+       "Network find complete .*",
+       5000);
+

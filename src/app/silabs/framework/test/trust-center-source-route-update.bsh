@@ -1,0 +1,90 @@
+//this is to test for item 4 in emzigbee-241
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps || !runArgument.runUsingMultihop) {          
+    System.out.print("**** Only runs for SoC multi-hop configuration ****");   
+    return;                                                                     
+} 
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+//no host code
+
+TestNode[] allNodes = {                                                         
+    new TestNode("full1",
+                 "build/af-test-apps/FullTh-simulation/FullTh",
+                 "", // no host image
+                 "", // no NCP image
+                 gridLocations[0]),
+    new TestNode("full2",                                            
+                 "build/af-test-apps/FullTh-simulation/FullTh",
+                 "", // no host image
+                 "", // no NCP image
+                 gridLocations[1]),
+    new TestNode("full3",                                            
+                 "build/af-test-apps/FullTh-simulation/FullTh",
+                 "", // no host image
+                 "", // no NCP image
+                 gridLocations[4]),
+    new TestNode("sleepy",                                            
+                 "build/af-test-apps/SeMeterGasSleepy-simulation/SeMeterGasSleepy",
+                 "", // no host image
+                 "", // no NCP image       
+                 gridLocations[5]),
+}; 
+
+String[] devices = addAndLoadDevicesWithLocation(allNodes, false); // no host
+
+// original Network topology:                                                            
+                                                                                
+//          full1 (coordinator)                                                 
+//             |                                                                
+//          full2                                                                        
+//          /                                                            
+//        full3
+//          |
+//        sleepy                                           
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+String full2NodeId = nodeId("full2");
+String full3NodeId = nodeId("full3");
+String sleepyNodeId = nodeId("sleepy");
+
+send("full1","plugin stack-diagnostic child-table");                 
+expect("full1",".*0 of 6 entries used.*");
+
+send("full2","plugin stack-diagnostic child-table");                            
+expect("full2",".*0 of 6 entries used.*");
+
+send("full3","plugin stack-diagnostic child-table");                            
+expect("full3",".*1 of 6 entries used.*");  
+
+expect("full1",                                                                 
+       "plugin concentrator print-table",                                       
+       ".*" + sleepyNodeId +" -> " + full3NodeId + " -> " + full2NodeId + " -> 0x0000.*");
+
+power("full3", false);  // our sleepy node was originally child of this
+
+power("sleepy", false);
+networkWait(2000);
+power("sleepy", true); 
+expect("sleepy", "network rejoin 1 0", ".*EMBER_NETWORK_UP.*");
+
+// Sleepy should rejoin full2 and routing table should be updated
+
+send("full1","plugin stack-diagnostic child-table"); 
+expect("full1",".*0 of 6 entries used.*"); 
+send("full2","plugin stack-diagnostic child-table"); 
+expect("full2",".*1 of 6 entries used.*");
+//updated source-route table
+expect("full1",
+       "plugin concentrator print-table",
+       ".*" + nodeId("sleepy") +" -> " + nodeId("full2")+ " -> 0x0000.*");

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ota-storage-simple-eeprom" name="Plugin Commands: OTA Simple Storage EEPROM">
+    <description>
+      These commands are specific to the OTA Simple Storage EEPROM plugin.
+    </description>
+  </group>
+  <command cli="plugin ota-storage-eeprom wipe" functionName="emAfOtaWipeStorageDevice" group="plugin-ota-storage-simple-eeprom" restriction="defined(EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM) &amp;&amp; (EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_READ_MODIFY_WRITE_SUPPORT == FALSE)">
+    <description>
+      Wipes all data in the storage device.
+    </description>
+  </command>
+</cli>

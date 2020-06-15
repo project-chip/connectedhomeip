@@ -1,0 +1,54 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****Nothing to test for Multi-Hop****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"full1", "full2"};
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Lookup for an entry when the table is empty
+expect("full1", "plugin address-table lookup {AAAAAAAAAAAAAAAA}", ".*Entry not found.*");
+// Add two entries
+expect("full1", "plugin address-table add {AAAAAAAAAAAAAAAA}", ".*Entry added at position 0x00.*");
+expect("full1", "plugin address-table add {BBBBBBBBBBBBBBBB}", ".*Entry added at position 0x01.*");
+// Full-th sample app address table size is 2
+expect("full1", "plugin address-table add {CCCCCCCCCCCCCCCC}", ".*Table full.*");
+// Lookup for a non existent entry
+expect("full1", "plugin address-table lookup {CCCCCCCCCCCCCCCC}", ".*Entry not found.*");
+// Lookup for existent entries
+expect("full1", "plugin address-table lookup {AAAAAAAAAAAAAAAA}", ".*Found entry at position 0x00.*");
+expect("full1", "plugin address-table lookup {BBBBBBBBBBBBBBBB}", ".*Found entry at position 0x01.*");
+// Remove a non existent entry
+expect("full1", "plugin address-table remove {CCCCCCCCCCCCCCCC}", ".*Entry removal failed.*");
+// Remove an entry
+expect("full1", "plugin address-table remove {AAAAAAAAAAAAAAAA}", ".*Entry removed.*");
+// Verify that the removed entry is not there anymore
+expect("full1", "plugin address-table lookup {AAAAAAAAAAAAAAAA}", ".*Entry not found.*");
+// Verify that previously used locations get recycled
+expect("full1", "plugin address-table add {CCCCCCCCCCCCCCCC}", ".*Entry added at position 0x00.*");

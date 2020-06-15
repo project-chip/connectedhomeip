@@ -1,0 +1,696 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"esi", "router", "ihd"};
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/Se12Ihd-simulation/Se12Ihd"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12Ihd-simulation-ezsp/Se12Ihd"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Let registration complete so the network quiets down.
+networkWait(100000);
+
+String esiId = nodeId("esi");
+String ihdId = nodeId("ihd");
+
+boolean SERVER_MESSAGE = true;
+boolean CLIENT_MESSAGE = false;
+
+String checkLocalMessage(String node,
+                         boolean server,
+                         boolean valid,
+                         boolean active,
+                         boolean now,  // server only
+                         String idInHex,
+                         String durationInHex,
+                         String message)
+{
+  String serverClientString = new String(server ? "Server" : "Client");
+  return _expectMultiline(node,
+                          "plugin messaging-" + serverClientString.toLowerCase() + " print 0x01",
+                          new String[] {
+                            ".*= " + serverClientString + " Message =",
+                            " vld: " + (valid  ? "YES" : "NO"),
+                            " act: " + (active ? "YES" : "NO"),
+                            "  id: " + idInHex,
+                            "  mc: 0x[0-9a-fA-F]{2}", // message control
+                            "  st: 0x[0-9a-fA-F]{8}",       // start time
+                            ( server
+                              ? (" now: " + ( now ? "YES" : "NO"))
+                              : "  et: 0x[0-9a-fA-F]{8}"), // end time
+                            "time: 0x[0-9a-fA-F]{8}",
+                            " dur: " + durationInHex,
+                            " mes: \"" + message + "\"",
+                          },
+                          DEFAULT_TIMEOUT,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+}
+
+// The message structures on the client and server should be uninitialized.
+checkLocalMessage("esi",
+                  SERVER_MESSAGE,
+                  false,          // valid?
+                  false,          // active?
+                  false,          // now? (server only)
+                  "0x00000000",   // id
+                  "0x0000",       // duration
+                  "");            // message
+
+checkLocalMessage("ihd",
+                  CLIENT_MESSAGE,
+                  false,          // valid?
+                  false,          // active?
+                  false,          // now? (server only)
+                  "0x00000000",   // id
+                  "0x0000",       // duration
+                  "");            // message
+
+// Ensure that confirmation of an invalid message does not fail silently
+expect("ihd", 
+       "plugin messaging-client confirm 0x01",
+       ".*confirm 0x8B");
+
+// Send a Get Last Message command from the client to the server.  This should
+// fail because the server has not set up the message yet.
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+// Set up the message on the server and mark it as valid.
+send("esi", "plugin messaging-server message \"smart_grid\"");
+send("esi", "plugin messaging-server id 0x01020304");
+send("esi", "plugin messaging-server transmission normal");
+send("esi", "plugin messaging-server importance med");
+send("esi", "plugin messaging-server confirm not");
+send("esi", "plugin messaging-server time 0x00000000 0x0001");
+send("esi", "plugin messaging-server valid 0x01");
+networkWait(timeout); 
+
+// The server message structure should now be set up.
+checkLocalMessage("esi",
+                  SERVER_MESSAGE,
+                  true,           // valid?
+                  true,           // active?
+                  true,           // now? (server only)
+                  "0x01020304",   // id
+                  "0x0001",       // duration
+                  "smart_grid");  // message
+
+// The client should still not have the message yet.
+checkLocalMessage("ihd",
+                  CLIENT_MESSAGE,
+                  false,          // valid?
+                  false,          // active?
+                  false,          // now? (server only)
+                  "0x00000000",   // id
+                  "0x0000",       // duration
+                  "");            // message
+
+// Push the message from the server to the client.
+send("esi", "plugin messaging-server display " + nodeId("ihd") + " 0x01 0x01");
+expect("ihd", "RX: DisplayMessage 0x01020304, 0x04, 0x00000000, 0x0001, \"smart_grid\"");
+expect("esi", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+
+// The client should now have the message.
+checkLocalMessage("ihd",
+                  CLIENT_MESSAGE,
+                  true,           // valid?
+                  true,           // active?
+                  true,           // now? (server only)
+                  "0x01020304",   // id
+                  "0x0001",       // duration
+                  "smart_grid");  // message
+
+// Now that the message is valid, that should be reflected in confirmation
+expect("ihd", 
+       "plugin messaging-client confirm 0x01",
+       ".*confirm 0x00");
+
+// Ensure that zcl msg get gives us the same message after publishing with display
+send("ihd", "zcl msg get");
+send("ihd", "send " + nodeId("ihd") + " 1 1");
+
+String output = checkLocalMessage("ihd",
+                                  CLIENT_MESSAGE,
+                                  true,           // valid?
+                                  true,           // active?
+                                  true,           // now? (server only)
+                                  "0x01020304",   // id
+                                  "0x0001",       // duration
+                                  "smart_grid");  // message
+
+// The special start time of "now" should get translated to the current time,
+// so "st" should not be zero and "time" should be at least "st."
+
+int i, startTime, endTime, duration;
+
+assert((i = output.indexOf("st: 0x")) != -1);
+assert((startTime = Integer.parseInt(output.substring(i + 6, i + 14), 16)) != 0);
+assert((i = output.indexOf("et: 0x")) != -1);
+assert((endTime = Integer.parseInt(output.substring(i + 6, i + 14), 16)) != 0);
+assert((i = output.indexOf("dur: 0x")) != -1);
+assert((duration = Integer.parseInt(output.substring(i + 7, i + 11), 16)) != 0);
+assert(startTime < endTime);
+assert((startTime + (duration * 60)) == endTime);
+
+// The message should expire in one minute.
+sleep("esi", 60, timeout);
+send("esi", "plugin messaging-server print 0x01");
+expect("esi", " vld: YES");
+expect("esi", " act: NO");
+send("ihd", "plugin messaging-client print 0x01");
+expect("ihd", " vld: YES");
+expect("ihd", " act: NO");
+
+// Send a Get Last Message command from the client to the server.  This should
+// fail because the message has expired.
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+// Enable message confirmation and have the client ask for the message again.
+send("esi", "plugin messaging-server confirm req");
+send("esi", "plugin messaging-server valid 0x01");
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", "RX: DisplayMessage 0x01020304, 0x84, 0x00000000, 0x0001, \"smart_grid\"");
+expect("esi", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+
+// The message should expire normally (CCB 996).
+sleep("esi", 60, timeout);
+send("esi", "plugin messaging-server print 0x01");
+expect("esi", " vld: YES");
+expect("esi", " act: NO");
+send("ihd", "plugin messaging-client print 0x01");
+expect("ihd", " vld: YES");
+expect("ihd", " act: NO");
+
+// Request the same message again.
+send("esi", "plugin messaging-server valid 0x01");
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", "RX: DisplayMessage 0x01020304, 0x84, 0x00000000, 0x0001, \"smart_grid\"");
+expect("esi", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+
+// Confirm the message from the CLI on the client.
+send("ihd", "plugin messaging-client confirm 0x01");
+expect("esi", "RX: MessageConfirmation 0x01020304, 0x[0-9a-fA-F]{8}");
+expect("ihd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]");
+
+// After confirming, the message should still be active and expire normally.
+send("esi", "plugin messaging-server print 0x01");
+expect("esi", " vld: YES");
+expect("esi", " act: YES");
+send("ihd", "plugin messaging-client print 0x01");
+expect("ihd", " vld: YES");
+expect("ihd", " act: YES");
+sleep("esi", 60, timeout);
+send("esi", "plugin messaging-server print 0x01");
+expect("esi", " vld: YES");
+expect("esi", " act: NO");
+send("ihd", "plugin messaging-client print 0x01");
+expect("ihd", " vld: YES");
+expect("ihd", " act: NO");
+
+// Set up a message with a long duration.
+send("esi", "plugin messaging-server time 0x00000000 0x0FFF");
+send("esi", "plugin messaging-server confirm not");
+send("esi", "plugin messaging-server valid 0x01");
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", "RX: DisplayMessage 0x01020304, 0x04, 0x00000000, 0x0FFF, \"smart_grid\"");
+expect("esi", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+
+// Wait a few minutes and make sure the message didn't expire.
+sleep("esi", 120, timeout);
+send("esi", "plugin messaging-server print 0x01");
+expect("esi", " vld: YES");
+expect("esi", " act: YES");
+send("ihd", "plugin messaging-client print 0x01");
+expect("ihd", " vld: YES");
+expect("ihd", " act: YES");
+
+// Confirm the message from the CLI on the client.
+send("ihd", "plugin messaging-client confirm 0x01");
+expect("esi", "RX: MessageConfirmation 0x01020304, 0x[0-9a-fA-F]{8}");
+expect("ihd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]");
+
+// After confirming, the message should still be active.
+send("esi", "plugin messaging-server print 0x01");
+expect("esi", " vld: YES");
+expect("esi", " act: YES");
+send("ihd", "plugin messaging-client print 0x01");
+expect("ihd", " vld: YES");
+expect("ihd", " act: YES");
+
+// Cancel the message from the server and make sure the client is notified.
+networkWait(timeout);
+send("esi", "plugin messaging-server cancel " + nodeId("ihd") + " 0x01 0x01");
+expect("ihd", "RX: CancelMessage 0x01020304, 0x04");
+expect("esi", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[01 00 \\]");
+send("esi", "plugin messaging-server print 0x01");
+expect("esi", " vld: YES");
+expect("esi", " act: NO");
+send("ihd", "plugin messaging-client print 0x01");
+expect("ihd", " vld: YES");
+expect("ihd", " act: NO");
+
+// Send a Get Last Message command from the client to the server.  This should
+// fail because the server has cancelled the message.
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+// Set up a "now" message with a reasonable duration.
+send("esi", "plugin messaging-server time 0x00000000 0x0002");
+send("esi", "plugin messaging-server confirm not");
+send("esi", "plugin messaging-server valid 0x01");
+networkWait(timeout); assert(true);
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", "RX: DisplayMessage 0x01020304, 0x04, 0x00000000, 0x0002, \"smart_grid\"");
+expect("esi", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+
+// Wait a minute, ask again, and make sure the duration is adjusted.
+sleep("esi", 60, timeout);
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", "RX: DisplayMessage 0x01020304, 0x04, 0x00000000, 0x0001, \"smart_grid\"");
+expect("esi", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+
+// Wait another minute, ask again, and make sure the message is expired.
+sleep("esi", 60, timeout);
+send("ihd", "zcl msg get");
+send("ihd", "send 0 1 1");
+expect("esi", "RX: GetLastMessage");
+expect("ihd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]", 2000);
+
+
+////////   TESTS FOR GOLDEN UNIT STATUS - IHD, ESI
+String timeNow    = timeSinceZigBeeEpoch( 0 );
+String timeIn1Min = timeSinceZigBeeEpoch( 1 );
+
+void ResyncTime(){
+  // Update time on all devices to current time.
+  send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+  networkWait(100);
+  send("ihd", "timesync 0 1 1");
+
+  timeNow = timeSinceZigBeeEpoch( 0 );
+  timeIn1Min = timeSinceZigBeeEpoch( 1 );
+  networkWait( 2000 );
+}
+
+void SendMessage( String node, String msgId, int msgControl, String startTime, String durationMins, String message ){
+  int msgControlTx;
+  int msgControlImportance;
+  int msgControlEnhCfmReq;
+  int msgControlMsgCfm;
+  int msgLen;
+
+  String destNodeId = nodeId(node);
+  int x, msgLength;
+
+  send("esi", "plugin messaging-server id " + msgId);
+  send("esi", "plugin messaging-server transmission normal");
+  send("esi", "plugin messaging-server importance med");
+
+  // Parse msgControl
+  msgControlTx = msgControl & 0x03;
+  msgControlImportance = ( (msgControl & 0x0C) >> 2);
+  msgControlEnhCfmReq = ( (msgControl & 0x20) >> 5);
+  msgControlMsgCfm = ( (msgControl & 0x80) >> 7);
+
+  if( msgControlMsgCfm > 0 ){
+    send("esi", "plugin messaging-server confirm req");
+  }
+  else{
+    send("esi", "plugin messaging-server confirm not");
+  }
+  if( msgControlTx == 0 ){
+    send("esi", "plugin messaging-server transmission normal");
+  }
+  else if( msgControlTx == 1 ){
+    send("esi", "plugin messaging-server transmission both");
+  }
+  else{
+    send("esi", "plugin messaging-server transmission ipan");
+  }
+  if( msgControlImportance == 0 ){
+    send("esi", "plugin messaging-server importance low");
+  }
+  else if( msgControlImportance == 1 ){
+    send("esi", "plugin messaging-server importance medium");
+  }
+  else if( msgControlImportance == 2 ){
+    send("esi", "plugin messaging-server importance high");
+  }
+  else if( msgControlImportance == 3 ){
+    send("esi", "plugin messaging-server importance critical");
+  }
+
+  send("esi", "plugin messaging-server time " + startTime + " " + durationMins);
+
+  // Insert message string
+  send("esi", "plugin messaging-server message \"\"" );
+  msgLength = message.length();
+  while( msgLength > 0 ){
+    if( msgLength > 30 ){
+      send("esi", "plugin messaging-server append \"" + message.substring(x, x+30) + "\"" );
+      msgLength -= 30;
+      x += 30;
+    }
+    else{
+      send("esi", "plugin messaging-server append \"" + message.substring(x, x+msgLength) + "\"" );
+      msgLength = 0;
+    }
+  }
+  networkWait( 100 );
+  send("esi", "plugin messaging-server valid 0x01");
+  
+  send("esi", "plugin messaging-server display " + destNodeId + " 1 1");
+  expect(node, ".*RX: DisplayMessage.*");
+}
+
+
+
+
+void VerifyMsgDisplayed( String node,
+                         String msgIdInHex,
+                         String msgControl,
+                         String durationInHex,
+                         String message )
+{
+  _expectMultiline(node,
+                   "plugin messaging-client print 0x01",
+                   new String[] {
+                    ".*= Client Message =",
+                    " vld: YES",
+                    " act: YES",
+                    "  id: " + msgIdInHex,
+                    "  mc: " + msgControl,
+                    " dur: " + durationInHex,
+                    " mes: \"" + message + "\"",
+                   },
+                   DEFAULT_TIMEOUT,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+}
+
+void VerifyMsgNotDisplayed( String node )
+{
+  // NOTE:   "vld" may not be needed in this verification.  Possibly just check "act".
+  _expectMultiline( node, 
+                    "plugin messaging-client print 0x01",
+                  new String[] {
+                    ".*= Client Message =.*",
+                    ".*vld: YES.*",
+                    ".*act: NO.*"
+                  },
+                  DEFAULT_TIMEOUT,
+                  getSourceFileInfo(),
+                  this.namespace.getInvocationLine());
+}
+
+
+//  TEST 13.3 - DISPLAY MESSAGE EXCHANGES
+// =======================================================
+
+ResyncTime();
+
+// Item 1 - Server sends "Display Message".  Start=NOW, dur=0xFFFF
+SendMessage( "ihd", "0x00030001", 0, "0x00000000", "0xFFFF", "trhED Message");
+
+// Item 2 - Validate the message is displayed on the IHD
+VerifyMsgDisplayed( "ihd", "0x00030001", "0x00", "0xFFFF", "trhED Message" );
+
+// Item 3 - Server sends "Display Message", msgCtrl=1, start=NOW+1min, dur=2
+SendMessage( "ihd", "0x00030003", 1, timeIn1Min, "2", "trhED Message, display for 2 minutes");
+
+// Item 4 - Verify message is displayed after 1 minute, for 2 minutes.
+VerifyMsgNotDisplayed( "ihd" );
+networkWait( 58000 );
+VerifyMsgDisplayed( "ihd", "0x00030003", "0x01", "0x0002", "trhED Message, display for 2 minutes" );
+networkWait( 113 * 1000 );
+VerifyMsgDisplayed( "ihd", "0x00030003", "0x01", "0x0002", "trhED Message, display for 2 minutes" );
+networkWait( 6000 );
+VerifyMsgNotDisplayed("ihd");
+
+
+// Item 5 - Server sends DM, ctrl=0x01, start=NOW-5mins, dur=7mins
+ResyncTime();
+String time5MinsAgo = timeSinceZigBeeEpoch( -5 );
+SendMessage( "ihd", "0x00030005", 1, time5MinsAgo, "7", "trhED Message");
+
+
+// Item 6 - Verify msg displayed for 2 mins
+VerifyMsgDisplayed( "ihd", "0x00030005", "0x01", "0x0007", "trhED Message" );
+networkWait( 113 * 1000 );
+VerifyMsgDisplayed( "ihd", "0x00030005", "0x01", "0x0007", "trhED Message" );
+networkWait( 6000 );
+VerifyMsgNotDisplayed("ihd");
+
+
+// Item 7 - Server sends DM, ctrl=0x01, start=NOW, dur=1min, msg=""
+SendMessage( "ihd", "0x00030007", 1, "0x00000000", "1", "");
+
+// Item 8 - Validate no message text displayed for 1 min.
+VerifyMsgDisplayed( "ihd", "0x00030007", "0x01", "0x0001", "" );
+networkWait( 57000 );
+VerifyMsgDisplayed( "ihd", "0x00030007", "0x01", "0x0001", "" );
+networkWait( 6000 );
+VerifyMsgNotDisplayed("ihd");
+
+// Item 9 - Server sends DM, ctrl=0x01, start=0, dur=1, msg=AAAAA...
+SendMessage("ihd", "0x00030009", 1, "0x00000000", "1", "AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA AAAAAAAAAA");
+
+//send("esi", "zcl msg disp 0x00030009 0x01 0x00000000 1 \"AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA AAAAAAAAAA\" 0x00");
+//send("esi", "send " + ihdId + " 1 1");
+
+// Item 10 - Validate msg displayed for 1 min
+VerifyMsgDisplayed( "ihd", "0x00030009", "0x01", "0x0001", "AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA AAAAAAAAAA" );
+networkWait( 57000 );
+VerifyMsgDisplayed( "ihd", "0x00030009", "0x01", "0x0001", "AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA  AAAAAAAAAA AAAAAAAAAA" );
+networkWait( 6000 );
+VerifyMsgNotDisplayed("ihd");
+
+
+
+//  TEST 13.4 - DISPLAY MESSAGE WITH CONFIRMATION
+// =======================================================
+
+// Item 1 - Server sends DM, ctrl=0x80, start=0, dur=0x0F
+SendMessage( "ihd", "0x00040001", 0x80, "0x00000000", "0x000F", "Confirm Message");
+
+// Item 2 - Client displays message, waits for user to confirm or accept message.
+VerifyMsgDisplayed( "ihd", "0x00040001", "0x80", "0x000F", "Confirm Message" );
+
+// Item 3 - User confirms and client sends confirmation to server.
+send("ihd", "plugin messaging-client confirm 0x01");
+expect("esi", ".*RX: MessageConfirmation.*");
+
+
+//
+//
+//
+// Item 4 - TODO:   COME BACK AND FINISH OUT THIS ONE IF WE EVER SUPPORT EXTENDED MSG CONTROL
+//
+//
+//
+
+
+
+// Item 5 - Server sends DM cmd, ctrl=0x80, start=0, dur=2mins
+SendMessage( "ihd", "0x00040005", 0x80, "0x00000000", "0x0002", "Don't Confirm Message");
+
+// Item 6 - Client displays message, but doesn't confirm.
+VerifyMsgDisplayed( "ihd", "0x00040005", "0x80", "0x0002", "Don't Confirm Message" );
+networkWait( 117 * 1000 );
+VerifyMsgDisplayed( "ihd", "0x00040005", "0x80", "0x0002", "Don't Confirm Message" );
+networkWait( 6000 );
+VerifyMsgNotDisplayed( "ihd" );
+
+// Item 7 - Client sends Confirm Message after message expired.
+send("ihd", "plugin messaging-client confirm 0x01");
+expect("ihd", ".*Err: No Valid Msg.*");
+
+
+
+
+//  TEST 13.5 - CANCEL MESSAGE
+// =======================================================
+
+// Item 1 - Server sends DM, ctrl=0, start=0, dur=0x0F
+SendMessage( "ihd", "0x00050001", 0x00, "0x00000000", "0x000F", "trhED Message to be cancelled");
+
+// Item 2 - Validate message is displayed on client.
+VerifyMsgDisplayed( "ihd", "0x00050001", "0x00", "0x000F", "trhED Message to be cancelled");
+
+// Item 3 - Server sends cancel message, ctrl=0.
+send("esi", "zcl msg cancel 0x00050001 0");
+send("esi", "send " + ihdId + " 1 1");
+expect("ihd", ".*RX: CancelMessage.*");
+
+// Item 4 - Validate message removed from client
+VerifyMsgNotDisplayed( "ihd" );
+
+
+
+
+//  TEST 13.6 - GET LAST MESSAGE
+// =======================================================
+
+// Item 1 - Server clears messages from queue.
+
+// Item 2 - Server sends DM to client.
+SendMessage( "ihd", "0x00060002", 0x00, "0x00000000", "0x0005", "trhED Get Last Message test");
+
+// Item 3 - Validate message is displayed on client.
+VerifyMsgDisplayed( "ihd", "0x00060002", "0x00", "0x0005", "trhED Get Last Message test");
+
+// Item 4 - Clear client display
+send("ihd", "plugin messaging-client clear 0x01");
+networkWait( 100 );
+
+// Item 5 - Client sends Get Last Msg to server.
+//   First delay 1 min, then make sure duration = 4.
+networkWait( 63000 );
+send("ihd", "zcl msg get");
+send("ihd", "send " + esiId + " 1 1");
+
+// Item 6 - Server sends DM to client, remaining duration.
+expect("ihd", ".*RX: DisplayMessage.*");
+VerifyMsgDisplayed( "ihd", "0x00060002", "0x00", "0x0004", "trhED Get Last Message test" );
+
+// Item 7 - Clear client display.  Wait for end of message duration.
+send("ihd", "plugin messaging-client clear 0x01");
+networkWait( 248 * 1000 );
+
+// Item 8 - Client sends Get Last Msg to server.
+send("ihd", "zcl msg get");
+send("ihd", "send " + esiId + " 1 1");
+
+// Item 9 - Server responds with NOT FOUND default response.
+expect("ihd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+// Item 10 - Server sends DM, ctrl=0, start=0, dur=0x0F
+SendMessage( "ihd", "0x0006000A", 0x00, "0x00000000", "0x000F", "trhED Message to be cancelled");
+
+// Item 11 - Validate msg displayed
+VerifyMsgDisplayed( "ihd", "0x0006000A", "0x00", "0x000F", "trhED Message to be cancelled" );
+
+// Item 12 - Server sends Cancel Msg
+send("esi", "plugin messaging-server cancel " + ihdId + " 1 1");
+expect("ihd", ".*RX: CancelMessage.*");
+
+// Item 13 - Validate message is removed from Client
+VerifyMsgNotDisplayed( "ihd" );
+
+// Item 14 - Client sends Get Last Message to Server.
+send("ihd", "zcl msg get");
+send("ihd", "send " + esiId + " 1 1");
+
+// Item 15 - Server sends Def Response - Not found
+expect("ihd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+
+
+//  TEST 13.9 - DISPLAY MESSAGE WITH ENHANCED CONFIRMATION
+// =======================================================
+// SKIP - Enhanced Confirmation not supported
+
+
+//  TEST 13.10 - DISPLAY PROTECTED MESSAGE TEST
+// =======================================================
+// SKIP - Protected Msg not supported
+
+
+//  TEST 13.11 - DISPLAY PROTECTED MESSAGE WITH CONFIRMATION
+// =======================================================
+// SKIP - Protected Msg not supported
+
+
+//  TEST 13.12 - DISPLAY PROTECTED MESSAGE WITH ENHANCED CONFIRMATION
+// =======================================================
+// SKIP - Protected Msg not supported
+
+
+//  TEST 13.13 - DISPLAY PROTECTED MESSAGE WITH EXTENDED MESSAGE CONTROL
+// =======================================================
+// SKIP - Protected Msg not supported
+
+
+//  TEST 13.14 - RESEND DISPLAY PROTECTED MSG WTIH EXT MSG CTRL
+// =======================================================
+// SKIP - Protected Msg not supported
+
+
+//  TEST 13.15 - GET LAST MESSAGE (PROTECTED)
+// =======================================================
+// SKIP - Protected Msg not supported
+
+
+//  TEST 13.17 - CANCEL ALL MESSAGES
+// =======================================================
+// SKIP - See 7.1 of test spec.
+
+
+//  TEST 13.18 - SENDING GET MESSAGE CANCELLATION
+// =======================================================
+// SKIP - Get Msg Cancellation not supported.
+
+
+//  TEST 13.19 - RECEIVING GET MESSAGE CANCELLATION
+// =======================================================
+// SKIP - Get Msg Cancellation not supported.
+
+
+
+//  TEST 13.20 - REJECTION OF INTER-PAN DISPLAY MESSAGE
+// =======================================================
+
+// Item 1 - Server sends DM, ctrl=0x02, start=0, dur=0xFF
+SendMessage( "ihd", "0x00140001", 0x02, "0x00000000", "0x00FF", "trhED Message to be cancelled");
+VerifyMsgNotDisplayed( "ihd" );
+
+// Client sends Def Rsp, stat=INVALID_FIELD
+expect("esi", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 85 \\]");
+
+
+
+//  TEST 13.21 - REJECTION OF INTER-PAN DISPLAY PROTECTED MSG
+// =======================================================
+// SKIP - Protected Msg not supported
+
+

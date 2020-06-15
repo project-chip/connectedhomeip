@@ -1,0 +1,243 @@
+import java.lang.Math;
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if(!runArgument.runUsingHostApps || !runArgument.runUsingMultihop) {
+  std.print("****Only runs in host and multi hop  model****");
+  return;
+}
+
+// This test to verify devices joining over radio as well as over alternate MAC interface.
+// This test load ncp as well as soc devices.
+
+/*
+------------------------------------------------------------------------------
+Topology:
+
+    commshub
+        |\                                                     ihd
+        | \ SubGhz                                              |
+        |  \                                                    |
+ 2.4Ghz |   gmeter                                              | 2.4Ghz
+        |                                                       |
+        |                                                       |
+    emeterAltMac1 -----------Alt-MAC-Interface------------- emeterAltMac2
+------------------------------------------------------------------------------
+*/
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+
+TestNode[] allNodes;
+
+boolean noEcc = shouldSkipEccTest();
+
+//Two SoCs and Two NCPs
+if (noEcc) {
+  allNodes = new  TestNode[] {
+    new TestNode ("commshub",
+        "",
+        "build/af-test-apps/Se14CommsHub-simulation-ezsp/Se14CommsHub",
+        "app/ncp/sample-app/xncp-commshub-spi-dual_simulation/simulation/build/exe/xncp-commshub-spi-dual",
+        "build/transceiver-simulator-unix-simulation_trx/transceiver-simulator",
+        gridLocations[0]),
+    new TestNode ("emeterAltMac1",
+        "build/af-test-apps/Se12MeterElectricAltMac-simulation/Se12MeterElectricAltMac",
+        "",
+        "",
+        "",
+        gridLocations[1]),
+    new TestNode ("gmeter",
+        "build/af-test-apps/Se14MeterGas-simulation/Se14MeterGas",
+        "",
+        "",
+        "",
+        gridLocations[2]),
+    new TestNode ("emeterAltMac2",
+        "build/af-test-apps/Se12MeterElectricAltMac-simulation/Se12MeterElectricAltMac",
+        "",
+        "",
+        "",
+        gridLocations[7]),    // not hear from any of the above devices.
+    new TestNode ("ihd",
+        "build/af-test-apps/Se12Ihd-simulation/Se12Ihd",
+        "",
+        "",
+        "",
+        gridLocations[8]),  // only hear from emeterAltMac2
+  };
+} else {
+  allNodes = new  TestNode[] {
+    new TestNode ("commshub",
+        "",
+        "build/af-test-apps/Se14CommsHub-simulation-ezsp/Se14CommsHub",
+        "app/ncp/sample-app/xncp-commshub-spi-dual_simulation-real_ecc/simulation/build/exe/xncp-commshub-spi-dual",
+        "build/transceiver-simulator-unix-simulation_trx/transceiver-simulator",
+        gridLocations[0]),
+    new TestNode ("emeterAltMac1",
+        "build/af-test-apps/Se12MeterElectricAltMac-simulation-REAL_ECC/Se12MeterElectricAltMac",
+        "",
+        "",
+        "",
+        gridLocations[1]),
+    new TestNode ("gmeter",
+        "build/af-test-apps/Se14MeterGas-simulation-REAL_ECC/Se14MeterGas",
+        "",
+        "",
+        "",
+        gridLocations[2]),
+    new TestNode ("emeterAltMac2",
+        "build/af-test-apps/Se12MeterElectricAltMac-simulation-REAL_ECC/Se12MeterElectricAltMac",
+        "",
+        "",
+        "",
+        gridLocations[7]),
+    new TestNode ("ihd",
+        "build/af-test-apps/Se12Ihd-simulation-REAL_ECC/Se12Ihd",
+        "",
+        "",
+        "",
+        gridLocations[8]),
+  };
+}
+
+TestNode[] ncpNodes = Arrays.copyOfRange(allNodes,0,1);
+TestNode[] socNodes = Arrays.copyOfRange(allNodes,1,5);
+
+// Load ncp devices.
+addAndLoadDevicesWithLocationSim(ncpNodes,true);
+//addAndLoadDevicesWithLocationSim(socNodes,false);
+
+// Load all SoC devices and connect PLC connection between emeterAltMac1 and emeterAltMac1.
+addAndLoadDevicesWihPlc(socNodes, "emeterAltMac1"/*bridge device 1*/, "emeterAltMac2"/*bridge device 2*/, false /*use host*/);
+
+
+// emeterAltMac2 intend to join over alternate MAC interface to emeterAltMac1
+// and ihd to emeterAltMac2.
+String[] someDevices = new String[]{"commshub", "emeterAltMac1", "gmeter"};
+boolean[] onSubGhz = {true, false, true} ;
+
+int timeout = 3000;
+
+// Form and join a network and set up encryption.
+int channel = 15;
+int power = 2;
+int panId = 0xDEAD;
+int subGhzPage = 28;
+int subGhzChannel = 1;
+int altMacPage  = 25;
+int altMacChannel = 0;
+// Stack uses the predefined radio channel for its radio interface while
+// associating over alternate MAC interface. So when a device joins
+// a zigbee network over alternate MAC, it configure its radio network
+// on this channel.
+int altMacRadioChannel = 20;
+
+setNetworkParams(channel, power, panId);
+setupEncryption();
+//formAndJoinDevicesWithSubGhz(someDevices, !noEcc, 24000, onSubGhz, 28, 1);
+
+networkForm("commshub");
+
+expect("commshub",
+                  "network multi-phy-start " + subGhzPage + " " + subGhzChannel + " 0 0" /*power, options*/,
+                  "Started multi-phy interface");
+
+// Joining on 2.4Ghz
+networkJoinTo("emeterAltMac1", "commshub", false, subGhzPage, subGhzChannel, !noEcc);
+// Add a little extra delay to let the network broadcasts time out and
+// other registration steps complete.
+networkWait(20000);
+
+// Joining on SubGhz
+networkJoinTo("gmeter", "commshub", true, subGhzPage, subGhzChannel, !noEcc);
+// Add a little extra delay to let the network broadcasts time out and
+// other registration steps complete.
+networkWait(30000);
+
+// Joining over PLC interfce and configures its radio network on altMacRadioChannel
+// Note: join onSubGhz flag is true just to create encoded page channel while sending join request.
+networkJoinTo("emeterAltMac2", "emeterAltMac1", true, altMacPage, altMacChannel, !noEcc);
+// Add a little extra delay to let the network broadcasts time out and
+// other registration steps complete.
+networkWait(20000);
+
+// Joining on 2.4Ghz via emeterAltMac2 plc interface.
+// Note: Again join onSubGhz flag is true just to give altMacRadioChannel which different than formed channel.
+networkJoinTo("ihd", "emeterAltMac2", true, 0, altMacRadioChannel, !noEcc);
+// Add a little extra delay to let the network broadcasts time out and
+// other registration steps complete.
+networkWait(20000);
+
+
+String commshubNodeId = nodeId("commshub");
+String emeterAltMac1NodeId = nodeId("emeterAltMac1");
+String gmeterNodeId = nodeId("gmeter");
+String emeterAltMac2NodeId = nodeId("emeterAltMac2");
+String ihdNodeId = nodeId("ihd");
+
+std.print("commshubNodeId " + commshubNodeId + "\n");
+std.print("emeterAltMac1NodeId " + emeterAltMac1NodeId + "\n");
+std.print("gmeterNodeId " + gmeterNodeId + "\n");
+std.print("emeterAltMac2NodeId " + emeterAltMac2NodeId + "\n");
+std.print("ihdNodeId " + ihdNodeId + "\n");
+networkWait(timeout);
+
+
+// Run few tests to make sure nodes can communicate with each other
+
+// Test 1: Read basic attribute from different hops
+
+send("ihd", "zcl global read 0x0000 0");
+expect("ihd", "send " + emeterAltMac2NodeId + " 1 1",  ".*RX .* clus 0x0000 \\(Basic\\) .* cmd 01 payload\\[.* \\]");
+networkWait(1000);
+
+send("ihd", "zcl global read 0x0000 0");
+expect("ihd", "send " + emeterAltMac1NodeId + " 1 1",  ".*RX .* clus 0x0000 \\(Basic\\) .* cmd 01 payload\\[.* \\]");
+networkWait(1000);
+
+send("ihd", "zcl global read 0x0000 0");
+expect("ihd", "send " + commshubNodeId + " 1 1",  ".*RX .* clus 0x0000 \\(Basic\\) .* cmd 01 payload\\[.* \\]");
+networkWait(1000);
+
+// Test 2: Channel change
+expect("commshub", "network change-channel 25 ", ".*Changing to channel 25: 0x00");
+networkWait(10000); // takes 9 seconds to perform channel change as per spec
+// See all 2.4Ghz devices are on same channel now.
+assertSameNetwork("commshub", "emeterAltMac1");
+assertSameNetwork("commshub", "emeterAltMac2");
+assertSameNetwork("commshub", "ihd");
+networkWait(timeout);
+
+// Test 3: Send rejoin and make sure joins over plc.
+// Channel mask does not matter as emeterAltMac2 is associated over alternate MAC interface. So
+// when it tries to rejoin, stack would detect that by checking parent mac index, update channel mask
+// to alt mac, scan over alternate MAC interface and eventually send rejoin request.
+// Secure rejoin
+expect("emeterAltMac2", "net rejoin 1 0", ".*Device Announce: " + emeterAltMac2NodeId, timeout);
+networkWait(timeout);
+
+// TC rejoin
+expect("emeterAltMac2", "net rejoin 0 0", ".*Device Announce: " + emeterAltMac2NodeId, timeout);
+networkWait(timeout);
+
+// Test 4: Leave the network
+expect("emeterAltMac2", "net leave", ".*EMBER_NETWORK_DOWN", timeout);
+networkWait(timeout);
+
+// At this point emeterAltMac2 is left the network, associating it again if we ended up adding more tests
+// further down.
+socReboot("emeterAltMac2");
+networkWait(timeout);
+// Delete link key for emeterAltMac2 node before association so that commshub uses preconfig key
+// for that node.
+send("commshub", "keys delete 2");
+networkWait(2000);
+networkJoinTo("emeterAltMac2", "emeterAltMac1", true, altMacPage, altMacChannel, !noEcc);
+// Add a little extra delay to let the network broadcasts time out and
+// other registration steps complete.
+networkWait(20000);
+// Rejoining ihd as its parent left the network to have correct topology for future tests.
+expect("ihd", "net rejoin 0 0", ".*Device Announce: " + ihdNodeId, timeout);
+networkWait(timeout);

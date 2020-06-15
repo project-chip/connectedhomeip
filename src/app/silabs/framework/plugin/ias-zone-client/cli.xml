@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ias-zone-client" name="Plugin Commands: IAS Zone Client">
+    <description>This plugin provides a set of CLI commands for managing the servers known to the IAS Zone client.</description>
+  </group>
+
+  <command cli="plugin ias-zone-client print-servers" functionName="emAfPluginIasZoneClientPrintServersCommand" group="plugin-ias-zone-client">
+    <description>
+      Print the known IAS Zone Servers.
+    </description>
+  </command>
+
+  <command cli="plugin ias-zone-client clear-all" functionName="emAfPluginIasZoneClientClearAllServersCommand" group="plugin-ias-zone-client">
+    <description>
+      Clear all known IAS Zone Servers from local device.
+    </description>
+  </command>
+
+</cli>

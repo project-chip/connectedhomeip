@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-simple-metering-client" name="Plugin Commands: Simple Metering Client">
+    <description>
+      The simple-metering-client plugin contributes CLI commands to the application framework to be used in conjunction with the Simple Metering cluster in a client context.
+    </description>
+  </group>
+  <command cli="plugin simple-metering-client sch-snapshot" functionName="emAfPluginSimpleMeteringClientCliSchSnapshot" group="plugin-simple-metering-client">
+    <description>
+      Schedule a snapshot.
+    </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+    <arg name="issuerId" type="INT32U" description="The issuerId." />
+    <arg name="commandIndex" type="INT8U" description="The commandIndex." />
+    <arg name="numberofCommands" type="INT8U" description="The total number of commands"/>
+    <arg name="snapshotScheduleId" type="INT8U" description="The snapshot schedule Id."/>
+    <arg name="snapshotStartDate" type="INT32U" description="The start time."/>
+    <arg name="snapshotSchedule" type="INT32U" description="The snapshot schedule. 3 bytes"/>
+    <arg name="snapshotType" type="INT8U" description="The snapshot Type."/>
+    <arg name="snapshotCause" type="INT32U" description="The snapshot schedule cause."/>
+  </command>
+ <command cli="plugin simple-metering-client start-sampling" functionName="emAfPluginSimpleMeteringClientCliStartSampling" group="plugin-simple-metering-client">
+  <description>
+    Send a start sampling command to a metering server.
+  </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+    <arg name="issuerId" type="INT32U" description="The issuerId." />
+    <arg name="startTime" type="INT32U" description="The time to start sampling" />
+    <arg name="sampleType" type="INT8U" description="An 8 bit enumeration that identifies the type of data being sampled" />
+    <arg name="SampleRequestInterval" type="INT16U" description="An unsigned 16-bit field representing the interval or time in seconds between samples." />
+    <arg name="maxNumberOfSamples" type="INT16U" description="A 16 bit unsigned integer that represents the number of samples to be taken." />
+  </command>
+ <command cli="plugin simple-metering-client get-sampled-data" functionName="emAfPluginSimpleMeteringClientCliGetSampledData" group="plugin-simple-metering-client">
+  <description>
+    Send a start sampling command to a metering server.
+  </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+    <arg name="sampleId" type="INT16U" description="The sample id as received in a previous startSamplingResponse" />
+    <arg name="startTime" type="INT32U" description="The earliest start time sampling" />
+    <arg name="sampleType" type="INT8U" description="An 8 bit enumeration that identifies the required type of sampled data" />
+    <arg name="numberOfSamples" type="INT16U" description="The total number of samples." />
+  </command>
+  <command cli="plugin simple-metering-client local-change-supply" functionName="emAfPluginSimpleMeteringClientCliLocalChangeSupply" group="plugin-simple-metering-client">
+  <description>
+    Send a start sampling command to a metering server.
+  </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+    <arg name="proposedSupplyStatus" type="INT8U" description="The proposed supply status: either ON(2) or OFF/ARMED(1)" />
+  </command>
+  
+</cli>

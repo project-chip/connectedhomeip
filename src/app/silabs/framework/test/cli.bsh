@@ -1,0 +1,113 @@
+// This test contains sanity checks for the AFV2 CLI.
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"node"};
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices,
+                  socImages,
+                  hostImages,
+                  ncpImage,
+                  runArgument.runUsingHostApps,
+                  runArgument.runUsingMultihop,
+                  runArgument.runUsingSpiNcp);
+
+lazyExpect = true;
+
+networkWait(1000); // Wait for SE stuff to finish.
+
+String nBytes(int n)
+{
+  StringBuilder builder = new StringBuilder("");
+  while (n-- > 0) {
+    String hexString = Integer.toHexString(n).toUpperCase();
+    if (hexString.length() == 1)
+      builder.append('0');
+    builder.append(hexString);
+    if (n > 0)
+      builder.append(' ');
+  }
+  return builder.toString();
+}
+
+// EMAPPFWKV2-1280: test to make sure we can write global commands longer than
+// 16 bytes. At one time, the call to zclBufferAddLengthAndStringFromArgument
+// meant a hardcoded string length of 16 bytes. Let's make sure we can write
+// more than that.
+int zclHeaderLength = 1 + 1 + 1; // frame control + seq number + command id 
+int writeAttributeHeaderLength = 2 + 1; // attribute id + attribute data type
+int stringBytes = 17; // testing that this value can be more than 16
+int expectLength = zclHeaderLength
+                   + writeAttributeHeaderLength
+                   + stringBytes + 1; // string plus length byte
+expect("node",
+       "zcl global write 0x0000 0x0010 0x42 {" + nBytes(stringBytes) + "}",
+       "Msg: clus 0x0000, cmd 0x02, len " + expectLength);
+expect("node",
+       "buffer: 00 00 02 10 00 42 11 10 0F 0E 0D 0C 0B 0A 09 08 07 06 05 04 03 02 01 00");
+
+// Make sure the user gets notified if their string argument was
+// too long.
+expect("node",
+       "zcl global write 0x0000 0x0010 0x42 {" + nBytes(100) + "}",
+       "Too long");
+
+// Make sure that we can still write long strings though.
+stringBytes = 50;
+expectLength = zclHeaderLength
+               + writeAttributeHeaderLength
+               + stringBytes + 1; // string plus length byte
+expect("node",
+       "zcl global write 0x0000 0x0010 0x42 {" + nBytes(stringBytes) + "}",
+       "Msg: clus 0x0000, cmd 0x02, len " + expectLength);
+expect("node",
+       ("buffer: 00 [0-9A-Z]{2} 02 10 00 42 "
+        + Integer.toHexString(stringBytes)
+        + " "
+        + nBytes(stringBytes)));
+
+// EMAPPFWKV2-1317: make sure we can successfully pass signed 16 bit integers
+// to CLI commands.
+expectMultiline("node",
+                "zcl color-control movecolor -32 0x1234 0x00 0x00",
+                new String[] {
+                  "Msg: clus 0x0300, cmd 0x08, len 9",
+                  "buffer: 01 [0-9A-Z]{2} 08 E0 FF 34 12 00 00",
+                });
+
+// Test partial command for a command with optional args
+expect("node", "zcl color-control stephue 0x01 0x02 0x0A ", "buffer: 01 [0-9a-fA-F]{2} 02 01 02 0A ");
+network.sleep(1000);
+
+// Test all args for command with optional args
+expect("node", "zcl color-control stephue 0x03 0x02 0x0A 0x00 0x00", "buffer: 01 [0-9a-fA-F]{2} 02 03 02 0A 00 00 ");
+network.sleep(1000);
+
+
+// Test enough args to go past the first endstate, but not enough to actually reach next end state
+expect("node", "zcl color-control stephue 0x03 0x02 0x0A 0x00 ", ".*Wrong number of args");
+network.sleep(1000);
+
+// Test enough args to not even make the first valid endstate
+expect("node", "zcl color-control stephue 0x03 0x02 ", ".*Wrong number of args");
+
+network.sleep(1000);
+// Test enough args to not even make the endstate due to end of typeString
+expect("node", "zcl color-control stephue 0x03 0x02 0x0A 0x00 ", ".*Wrong number of args");
+
+network.sleep(1000);
+// Test argument validation
+expect("node", "zcl color-control stephue 0x03 0x02 0x0A 256 0x00", ".*Arg out of range");

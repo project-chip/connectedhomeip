@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ble-custom-ezsp" name="Plugin Commands: Ble Custom Ezsp">
+    <description>
+      This plugin provides an implementation of Ble CLIs over custom EZSP protocol to communicate with dynamic multi-protocol (DMP) Zigbee-BLE NCP from Zigbee host application.
+    </description>
+  </group>
+  <command cli="plugin ble-custom-ezsp set_adv_params" functionName="emberAfPluginBleCustomEzspSetAdvertisementParamsCommand" group="plugin-ble-custom-ezsp">
+    <description>
+      Set the GAP advertisement parameters.
+    </description>
+    <arg name="min-interval" type="INT16U" description = "minimum connection interval" />
+    <arg name="max-interval" type="INT16U" description = "maximum connection interval" />
+    <arg name="channel-map" type="INT8U" description = "Channel map indicating which of three channels will be used" />
+  </command>
+  <command cli="plugin ble-custom-ezsp set_conn_params" functionName="emberAfPluginBleCustomEzspSetConnectionParamsCommand" group="plugin-ble-custom-ezsp">
+    <description>
+      Set the GAP connection parameters.
+    </description>
+    <arg name="min-interval" type="INT16U" description = "minimum connection event interval" />
+    <arg name="max-interval" type="INT16U" description = "maximum connection event interval" />
+    <arg name="slave-latency" type="INT16U" description = "number of connection intervals the slave can skip" />
+    <arg name="supervision-timeout" type="INT16U" description = "time before the connection is dropped" />
+  </command>
+  <command cli="plugin ble-custom-ezsp set_mode" functionName="emberAfPluginBleCustomEzspSetGapModeCommand" group="plugin-ble-custom-ezsp">
+    <description>
+      Set the GAP mode.
+    </description>
+    <arg name="discoverable-mode" type="INT8U" description = "The GAP discoverable mode: 0=non discoverable, 1=limited discoverable, 2=general discoverable, 3=broadcast, 4=user data" />
+    <arg name="connectable-mode" type="INT8U" description = "The GAP connectable mode: 0=non connectable, 1=directed connectable, 2=undirected connectable, 3=scannable non connectable" />
+  </command>
+  <command cli="plugin ble-custom-ezsp conn_open" functionName="emberAfPluginBleCustomEzspGapConnectionOpenCommand" group="plugin-ble-custom-ezsp">
+    <description>
+      Open a GAP connection.
+    </description>
+    <arg name="address" type="OCTET_STRING" description = "The BLE address of the target device" />
+    <arg name="address-type" type="INT8U" description = "The address type: 0=public, 1=random, 2=public resolved by the stack, 3=public resolved by the stack, 16=classic bluetooth" />
+  </command>
+  <command cli="plugin ble-custom-ezsp print_connections" functionName="emberAfPluginBleCustomEzspPrintConnectionTableCommand" group="plugin-ble-custom-ezsp">
+    <description>
+      Print Ble connections table.
+    </description>
+  </command>
+</cli>

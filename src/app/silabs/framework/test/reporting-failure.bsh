@@ -1,0 +1,217 @@
+// File: reporting-failure.bsh
+
+// EMZIGBEE-1204 - assert at packet-buffer.c
+// Regression test for EMZIGBEE-1204
+// Assert triggers when sending frequent reports to a non-responsive device
+
+import com.ember.peek.SimulatedNetwork;
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  // The Z3 Gateway can only be compiled as a host
+  std.print("** this test uses a mixture of Host/SoC devices, so only run in host mode ** ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+
+TestNode[] myNodes = {
+  new TestNode("gateway",
+      "",
+      "build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+      "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+      gridLocations[0]),
+  new TestNode("light",
+      "build/af-test-apps/Z3Light-simulation/Z3Light",
+      "",
+      "",
+      gridLocations[0]),
+  new TestNode("switch",
+      "build/af-test-apps/Z3Switch-simulation/Z3Switch",
+      "",
+      "",
+      gridLocations[0])
+};
+
+TestNode[] gatewayNodes = Arrays.copyOfRange(myNodes,0,1);
+TestNode[] otherNodes = Arrays.copyOfRange(myNodes,1,3);
+
+lazyExpect = true;
+
+addAndLoadDevicesWithLocation(gatewayNodes,true);
+addAndLoadDevicesWithLocation(otherNodes,false);
+
+void RESET(String node)
+{
+  send(node, "option binding-table clear");
+  send(node, "keys clear");
+  expect(node, "net leave", "EMBER_NETWORK_DOWN");
+  reboot(node);
+  networkWait(DEFAULT_TIMEOUT);
+}
+
+void testJoiningAndKeyUpdate(String device)
+{
+  dbg.println("=== Testing join from line " + this.namespace.getInvocationLine() + " ===");
+
+  // Make sure the device joins.
+  expect(device,
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT << 4);
+
+  // Since this is a centralized network, the device should update the trust
+  // center link key with the gateway.
+  // The device should find that the gateway is an R21 device.
+  expect(device,
+         "Starting update trust center link key process: 0x00",
+         DEFAULT_TIMEOUT << 1);
+  expect(device,
+         "RX: Node Desc Resp, Matches: 0x0000",
+         DEFAULT_TIMEOUT << 1);
+
+  // Make sure the trust center link key was successfully established...
+  expectMultiline(device,
+                  new String[] {
+                    "New key established: 0x03",
+                    "Partner: 00 00 00 00 00 00 00 0[12]",
+                  });
+  expect(device,
+         "Trust center link key update status: 0x03",
+         DEFAULT_TIMEOUT << 1);
+
+  // ...and make sure the trust center link key was successfully verified.
+  expectMultiline(device,
+                  new String[] {
+                    "New key established: 0x65",
+                    "Partner: 00 00 00 00 00 00 00 0[12]",
+                  });
+  expect(device,
+         "Trust center link key update status: 0x65");
+
+  // The device should then extend the network by broadcasting permit join.
+  expect(device,
+         "Broadcasting permit join: 0x00",
+         DEFAULT_TIMEOUT << 1);
+
+  // Make sure we are not using the ZigbeeAlliance09 or distributed key.
+  nexpect(device,
+          "keys print",
+          "5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39",
+          1000);
+  nexpect(device,
+          "keys print",
+          "D0 D1 D2 D3 D4 D5 D6 D7  D8 D9 DA DB DC DD DE DF",
+          1000);
+}
+
+void spamButton(int times) {
+  for (int i=0; i<times; i++) {
+    network.pressButton("switch","0");
+    network.releaseButton("switch","0");
+    networkWait(1000);
+  }
+}
+
+
+
+// Wait for the nodes to reset
+networkWait(DEFAULT_TIMEOUT);
+
+network.power("light",false);
+// Turn off the light so that it doesn't start looking for a network to join.
+
+// The gateway forms a centralized network.
+send("gateway", "plugin network-creator start 1");
+expect("gateway",
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+
+// Make sure the gateway didn't send itself a node descriptor request to begin
+// the TCLK update process.
+nexpect("gateway",
+        "RX: Node Desc Resp, Matches: 0x0000");
+
+// Make sure the gateway forms on 12 with a short address of 0 since it formed
+// a centralized network.
+assert(nodeId("gateway").equals("0x0000"));
+
+// Make sure we are not using the ZigbeeAlliance09 or distributed key.
+nexpect("gateway",
+        "keys print",
+        "5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39");
+nexpect("gateway",
+        "keys print",
+        "D0 D1 D2 D3 D4 D5 D6 D7  D8 D9 DA DB DC DD DE DF");
+
+// Open the network for joining using the gateway.
+send("gateway", "plugin network-creator-security open-network");
+expect("gateway", "Open network: 0x00");
+
+// Turn on the light.
+//power("light", true);
+network.power("light",true);
+setupEncryption();
+
+// The light should automatically join the gateway's network.
+testJoiningAndKeyUpdate("light");
+
+// The light should be identifying.
+send("gateway", "zcl identify query");
+send("gateway", "send " + nodeId("light") + " 1 1");
+expect("light", "RX len 3, ep 01, clus 0x0003 \\(Identify\\) FC 01 seq .. cmd 01 payload\\[\\]");
+expect("gateway", "RX len 5, ep 01, clus 0x0003 \\(Identify\\) FC 09 seq .. cmd 00 payload\\[.. .. \\]");
+
+// Join with the switch. Make sure the switch joins at the light so we have
+// a P3 network.
+send("gateway", "network pjoin 0");
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+networkWait(timeout);       // there was a beacon collision hence adding a delay to avoid it.
+testJoiningAndKeyUpdate("switch");
+
+// The switch should perform finding and binding with the light.
+networkWait(DEFAULT_TIMEOUT);
+expect("switch",
+       "option binding-table print",
+       "UNICA.*0x0006.*" + nodeId("light"));
+
+// We should be able to turn the light ON...
+send("switch", "zcl on-off on");
+send("switch", "bsend 1");
+networkWait(1000); // wait
+expect("light", "read 1 6 0 1", "^01 $");
+
+// ...and we should be able to turn the light OFF.
+send("switch", "zcl on-off off");
+send("switch", "bsend 1");
+networkWait(1000); // wait
+expect("light", "read 1 6 0 1", "^00 $");
+
+send("light", "plugin reporting add 1 3 0 1 4 8 2");
+send("light", "plugin reporting add 1 4 0 1 4 8 2");
+send("light", "plugin reporting add 1 5 0 1 4 8 2");
+
+send("light", "option bind set 0 3 1 1 {" + eui64("gateway") + "}");
+send("light", "option bind set 1 4 1 1 {" + eui64("gateway") + "}");
+send("light", "option bind set 2 5 1 1 {" + eui64("gateway") + "}");
+
+expect("switch",
+       "option binding-table print",
+       ".*UNICA .* " + nodeId("light"));
+
+networkWait(10000);
+
+power("gateway",false);
+
+// observe light for a bit, should see "tx66" errors
+networkWait(10000);
+expect("light","","ERROR: tx 66");
+// We're just gonna mash the button a lot
+spamButton(20);
+
+network.power("light",false);
+network.power("light",true);
+
+networkWait(5000);
+
+spamButton(20);

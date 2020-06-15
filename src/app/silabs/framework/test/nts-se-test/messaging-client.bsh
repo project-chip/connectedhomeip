@@ -1,0 +1,762 @@
+
+// ***************************************************
+// TEST SCRIPT
+// ***************************************************
+cd(dirname(pathToFile(getSourceFileInfo()).getAbsolutePath()));
+source("util.bsh");
+
+System.setOut(System.err);
+
+String appName = "se-ipd-afv2";
+
+String dut = runArgument.dut;
+String[] nodes = new String[] {
+  dut,
+};
+
+String sourceEndpoint = "1"; // Default value of Ember App Framework.
+String destEndpoint = "10"; // Default value of the Test Harness
+String thAddr = "0x0000"; //TH is coordinator here.
+
+int parsingFinger = 0;
+
+boolean dutMessagingClientInfoSetup()
+{
+  printTestMessage("Messaging client Test Harness setup", true);
+  thAddr = getTHShortID();
+  if (thAddr == null) {
+    print("TH id can not be loaded, run the test with the -f option.");
+    return false;
+  }
+  tymeSync(dut, thAddr, sourceEndpoint, destEndpoint);
+
+  return true;
+}
+
+void dutMessagingClientInterpanSetup()
+{
+  printTestMessage("Setting up for inter-PAN testing", true);
+  print("Please wait...");
+  send(dut, "network leave");
+  sleep(2000);
+  send(dut, "reset");
+  sleep(2000);
+  clearKeysTable(dut);
+
+  form(dut, runArgument.channel, runArgument.power, runArgument.interPanId);
+  sleep(2000);
+
+  print("Network formed.");
+  print("* In Network tab (\"Set IPD PAN\") please set the interPAN panId to " + runArgument.interPanId);
+  pause("Press ENTER when done...");
+}
+
+boolean messagingParseMessageDisplay(String message) {
+  outputFile.flush();
+  ArrayList outputFile = outputFileToArrayList(true);
+
+  for(int j=outputFile.size() - 1; j >=parsingFinger; j--) {
+    String strLine = (String)outputFile.get(j);
+    for(int i=0; i<strLine.length()-13; i++) {
+      if (strLine.substring(i, i+12).equals("MSG DISPLAY:")) {
+        if (message.length() == 0) {
+          parsingFinger = j+1;
+          return true;
+        }
+        if (strLine.substring(i+13, strLine.length()-1).equals(message)) {
+          parsingFinger = j+1;
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+// Returns the line number if the parse was successful, otherwise it returns -1.
+boolean messagingParseMessageCancel(String message) {
+  outputFile.flush();
+  ArrayList outputFile = outputFileToArrayList(true);
+
+  for(int j=outputFile.size() - 1; j >=parsingFinger; j--) {
+    String strLine = (String)outputFile.get(j);
+    for(int i=0; i<strLine.length()-12; i++) {
+      if (strLine.substring(i, i+11).equals("MSG CANCEL:")) {
+        if (message.length() == 0) {
+          parsingFinger = j+1;
+          return true;
+        }
+        if (strLine.substring(i+12, strLine.length()-1).equals(message)) {
+          parsingFinger = j+1;
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+void test13_3_3_item1()
+{
+  String group = "MESSAGING";
+  String section = "13.3.3";
+  String item = "1";
+  String message = "ED Message";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+
+  parsingFinger = 0;
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (messagingParseMessageDisplay(message)) {
+    print("TEST PASSED!");
+  } else {
+    print("TEST FAILED!");
+  }
+  pause("Press ENTER to continue...");
+}
+
+void test13_3_3_item3()
+{
+  String group = "MESSAGING";
+  String section = "13.3.3";
+  String item = "3";
+  String message = "trhED Message,display for 1 minute";
+
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+
+  parsingFinger = 0;
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(1000);
+  if (messagingParseMessageDisplay(message)) {
+    print("* Message displayed to soon: TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Waiting for message to be displayed after 1 minute...");
+  // Message should be displayed after 1 minute.
+  sleep(60000);
+
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed after 1 minute: TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  } else {
+    print("* Message correctly displayed after 1 minute. Waiting for message to be canceled after 1 more minute...");
+  }
+
+  // Message should be canceled after 1 minute.
+  sleep(60000);
+
+  if (messagingParseMessageCancel(message)) {
+    print("* Message canceled after 1 minute: TEST PASSED!");
+  } else {
+    print("* Message not canceled after 1 minute: TEST FAILED!");
+  }
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_3_3_item5()
+{
+  String group = "MESSAGING";
+  String section = "13.3.3";
+  String item = "5";
+  String message = "trhED Message";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  } else {
+    print("* Message correctly displayed, waiting for message to be canceled after 1 minute...");
+  }
+
+  // After one minute the message should be canceled.
+  sleep(60000);
+
+  if (messagingParseMessageCancel(message)) {
+    print("* Message canceled after 1 minute: TEST PASSED!");
+  } else {
+    print("* Message not canceled after 1 minute: TEST FAILED!");
+  }
+
+  pause("Press ENTER to continue...");
+}
+
+// CCB 1484 filed for this test.
+void test13_3_3_item7()
+{
+  String group = "MESSAGING";
+  String section = "13.3.3";
+  String item = "7";
+  String message = "";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  } else {
+    print("* Message correctly displayed, waiting for message to be canceled after 1 minute...");
+  }
+
+  // After one minute the message should be canceled.
+  sleep(60000);
+
+  if (messagingParseMessageCancel(message)) {
+    print("* Message canceled after 1 minute: TEST PASSED!");
+  } else {
+    print("* Message not canceled after 1 minute: TEST FAILED!");
+  }
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_3_3_item9()
+{
+  String group = "MESSAGING";
+  String section = "13.3.3";
+  String item = "9";
+  String message = "AAAABBBBCCCCDDDDAAAABBBBCCCCDDDDAAAABBBBCCCCDDDDAAAABBBBCCCCDDDD";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed correctly. TEST FAILED!");
+  } else {
+    print("* Message correctly displayed. TEST PASSED!");
+  }
+
+  pause("Press ENTER to continue...");
+}
+
+
+void test13_4_3_items1_3()
+{
+  String group = "MESSAGING";
+  String section = "13.4.3";
+  String item = "1-3";
+  String message = "Confirm Message";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly displayed, sending confirm. Wait for response from Test Harness GUI.");
+
+  send(dut, "zcl msg confirm");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Press ENTER to continue...");
+}
+
+
+void test13_4_3_item4()
+{
+  String group = "MESSAGING";
+  String section = "13.4.3";
+  String item = "4";
+  String message = "Don't Confirm Message";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly displayed. Wait for response from Test Harness GUI.");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_5_3_item1()
+{
+  String group = "MESSAGING";
+  String section = "13.5.3";
+  String item = "1";
+  String message = "trhED Message to be cancelled";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly displayed. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_5_3_item3()
+{
+  String group = "MESSAGING";
+  String section = "13.5.3";
+  String item = "3";
+  String message = "trhED Message to be cancelled";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageCancel(message)) {
+    print("* Message not cancelled. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly cancelled. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_5_3_item5()
+{
+  String group = "MESSAGING";
+  String section = "13.5.3";
+  String item = "5";
+  String message = "trhED Message Cancel to be confirmed";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly displayed. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_5_3_item7()
+{
+  String group = "MESSAGING";
+  String section = "13.5.3";
+  String item = "7";
+  String message = "trhED Message to be cancelled";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (messagingParseMessageCancel(message)) {
+    print("* Message cancelled without asking for confirmation. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly not canceled, sending confirm. Wait for response from Test Harness GUI.");
+
+  send(dut, "zcl msg confirm");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_6_3_item1()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "1";
+  String message = "GetLastMessage";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly displayed. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_6_3_item5()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "5";
+  String message = "GetLastMessage";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl msg get");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  print("* GetLastMessage sent. Wait for response from Test Harness GUI.");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_6_3_item9()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "9";
+  String message = "GetLastMessage";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl msg get");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  print("* GetLastMessage sent. Wait for response from Test Harness GUI.");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_6_3_item10()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "10";
+  String message = "trhEDMessageTobeCancelled";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message displayed correctly. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_6_3_item12()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "12";
+  String message = "trhEDMessageTobeCancelled";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  sleep(2000);
+  if (!messagingParseMessageCancel(message)) {
+    print("* Message not canceled right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message canceled correctly. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_6_3_item15()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "15";
+  String message = "trhEDMessageTobeCancelled";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl msg get");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  print("* GetLastMessage sent. Wait for response from Test Harness GUI.");
+
+  pause("Press ENTER to continue...");
+}
+
+void test13_6_3_item16()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "16";
+  String message = "trhIPDGetLastMessagetest";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly displayed. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+// TODO: file a CCB?
+void test13_6_3_item20()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "20";
+  String message = "trhIPDGetLastMessagetest";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("Test disabled, GetLastMessage is not a inter-PAN allowed message");
+  pause("Press ENTER to continue...");
+  return;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!messagingParseMessageDisplay(message)) {
+    print("* Message not displayed right away. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Message correctly displayed. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+// TODO: file a CCB?
+void test13_6_3_item22()
+{
+  String group = "MESSAGING";
+  String section = "13.6.3";
+  String item = "22";
+  String message = "trhIPDGetLastMessagetest";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("Test disabled, GetLastMessage is not a inter-PAN allowed message");
+  pause("Press ENTER to continue...");
+  return;
+}
+
+TestNetwork t = new TestNetwork();
+setTestNetwork(t);
+setOutputFile(runArgument.outputFile);
+setOutputFilename(runArgument.currentOutputFile);
+
+for (int i = 0; i < nodes.length; i++) {
+  t.add(nodes[i]);
+}
+
+void test13_7_3_item1()
+{
+  String group = "MESSAGING";
+  String section = "13.7.3";
+  String item = "1";
+  String message = "";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  pause("Press ENTER to continue...");
+  return;
+}
+
+void test13_7_3_item3()
+{
+  String group = "MESSAGING";
+  String section = "13.7.3";
+  String item = "3";
+  String message = "";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("");
+  pause("Press ENTER to continue...");
+  return;
+}
+
+void test13_7_3_item5()
+{
+  String group = "MESSAGING";
+  String section = "13.7.3";
+  String item = "5";
+  String message = "";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("");
+  pause("Press ENTER to continue...");
+  return;
+}
+
+void test13_7_3_item7()
+{
+  String group = "MESSAGING";
+  String section = "13.7.3";
+  String item = "7";
+  String message = "";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("");
+  pause("Press ENTER to continue...");
+  return;
+}
+
+TestNetwork t = new TestNetwork();
+setTestNetwork(t);
+setOutputFile(runArgument.outputFile);
+setOutputFilename(runArgument.currentOutputFile);
+
+for (int i = 0; i < nodes.length; i++) {
+  t.add(nodes[i]);
+}
+
+t.connect(4901);
+t.echo(true);
+
+printTestMessage("MESSAGING - CLIENT", true);
+print("NOTE: These tests assume that the sample app " + appName + " is running on the DUT");
+
+if (runArgument.formNetwork) {
+  networkSetupDutJoin(nodes,
+                      dut,
+                      runArgument.channel,
+                      runArgument.power,
+                      runArgument.panId);
+  dutNetworkInfoSetup(dut);
+}
+if (!dutMessagingClientInfoSetup())
+  return;
+
+test13_3_3_item1();
+test13_3_3_item3();
+test13_3_3_item5();
+test13_3_3_item7();
+test13_3_3_item9();
+test13_4_3_items1_3();
+test13_4_3_item4();
+test13_5_3_item1();
+test13_5_3_item3();
+test13_5_3_item5();
+test13_5_3_item7();
+test13_6_3_item1();
+test13_6_3_item5();
+test13_6_3_item9();
+test13_6_3_item10();
+test13_6_3_item12();
+test13_6_3_item15();
+test13_6_3_item16();
+test13_6_3_item20();
+test13_6_3_item22();
+dutMessagingClientInterpanSetup();
+test13_7_3_item1();
+test13_7_3_item3();
+test13_7_3_item5();
+test13_7_3_item7();
+

@@ -1,0 +1,437 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "server", "router", "client" };
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+formAndJoinDevices(allDevices,
+                   false);   // wait for key establishment to complete?
+
+String clientNodeId = nodeId("client");
+
+// Let registration complete.
+networkWait(15000);
+
+// Disable keep-alive as it periodically prints READ_ATTR messages on the
+// coordinator, killing the expectNoResponse calls
+send("client", "plugin test-harness tc-keepalive stop");
+networkWait(2000);
+
+// Disable page request.  It is enabled by default when the OTA client
+// plugin is configured to use it.  We want to test the normal
+// block request stuff here.
+expectNoResponse("client", "plugin ota-client page-request 0");
+
+expect("server",
+       "option print-rx-msgs disable",
+       ".*disabled print");
+expect("client",
+       "option print-rx-msgs disable",
+       ".*disabled print");
+
+// Have the server say "no new file" when the client asks.
+send("server", "plugin ota-server policy query 3");
+
+// If the client has a previously downloaded file it will use that
+// to upgrade rather than start a new download.  So deleting it
+// will cause a fresh download.
+send("client", "plugin ota-storage-common delete 0");
+
+network.sleep(1000);
+
+send("client", "keys print");
+send("client", "libs");
+
+// A simple test where the server has no new image for the client.
+expect("client",
+       "plugin ota-client start",
+       8000,          // timeout
+       "Query next image response returned 0x98.  No new image to download.");
+
+network.sleep(10000);
+
+// Global Notify with 100% jitter (everyone should respond)
+// Server still responds with "no new image"
+expect("server",
+       "plugin ota-server notify 0xFFFF 0xFF 0 100 0 0 0",
+       "QueryNextImageRequest.*");
+// let the broadcast clear
+network.sleep(2000);
+
+// Global Notify with 1% jitter (no one should respond)
+// Server still responds with "no new image"
+send("server",
+     "plugin ota-server notify 0xFFFF 0xFF 0 1 0 0 0");
+expect("client",
+       "",
+       ".*Ignoring Image notify command, Rx'd Jitter.*");
+// let the broadcast clear
+network.sleep(2000);
+
+// Unicast should cause client to always respond.
+send("server",
+     "plugin ota-server notify " + clientNodeId + " 1 0 1 0 0 0");
+expect("client",
+       "",
+       // Add a '.*' prefix because the expect() call picks up the prompt.
+       ".*Query next image response returned 0x98.  No new image to download.");
+
+// Broadcast notify with exactly the same version number should illict no
+// response.
+send("server",
+     "plugin ota-server notify 0xFFFF 0xFF 3 100 0x1002 0x5678 0x00000001");
+expect("client",
+       "",
+       ".*Ignoring Image notify command due to matching firmware version");
+// let the broadcast clear
+network.sleep(2000);
+
+// Print out the client's info just to have it in the script output.
+send("client",
+     "plugin ota-client info");
+network.sleep(1000);
+
+// Check that the server has at least one image (and so we can see it
+// the script output)
+expect("server",
+       "plugin ota-storage-common printimages",
+       ".*1 images in OTA storage.");
+
+// Now have the server change its answer to "reinstall"
+// when the client asks again for an upgrade file.
+send("server",
+     "plugin ota-server policy query 0");
+network.sleep(1000);
+
+// Test that OTA Image Header's downloadedZigbeeStackVersion attribute defaults to 0xFFFF if there is no image
+expect("client", "read 1 0x0019 0x0005 0", "FF FF ", 10000);
+// Test that OTA ImageTypeId correctly indicates that we have not begun an OTA process
+expect("client", "read 1 0x0019 0x0008 0", "FF FF ", 10000);
+
+// New notify specific to the manufacturer ID
+// (0x1002 is Ember's manufacturer ID, specified in App. Builder)
+expect("server",
+       "plugin ota-server notify 0xFFFF 0xFF 1 100 0x1002 0 0",
+       "QueryNextImageRequest.*");
+
+expect("client",
+       "",
+       ".*Applying upgrade",
+       10000);         // timeout
+
+// Test that OTA Image Header's downloadedZigbeeStackVersion attribute reads the correctly downloaded value
+expect("client", "read 1 0x0019 0x0005 0", "02 00 ", 10000);
+// Test that OTA ImageTypeId correctly indicates that we are in the middle of an OTA process (downloaded but not upgraded)
+expect("client", "read 1 0x0019 0x0008 0", "78 56 ", 10000);
+
+// Let the network quite down and OTA retried messages die out.
+network.sleep(10000);
+
+// This script expect's the client does NOT reboot at this point.
+
+// Change the server's upgrade policy to be "wait 2 minutes"
+send("server",
+     "plugin ota-server policy upgrade 1");
+expect("server",
+       "plugin ota-server notify 0xFFFF 0xFF 1 100 0x1002 0 0",
+       "QueryNextImageRequest.*");
+expect("client",
+       "",
+       7000,          // timeout
+       "OTA Cluster: wait for 120 s");
+
+// Note:  Simulation time may not be exact so as long as we get the
+// command in some amount of time in the future, it will pass, and
+// that is okay.
+expect("client",
+       "",
+       ".*Applying upgrade",
+       (2 << 16));  // minutes to milliseconds. (the amount of time the server said to wait)
+
+// Again, we expect that the client does NOT reboot.  If it does,
+// it will forget all its OTA information and need an 'plugin ota-client start'.
+
+network.sleep(3000);
+
+// Change the server's policy to 'wait forever'.
+send("server",
+     "plugin ota-server policy upgrade 2");
+expect("server",
+       "plugin ota-server notify 0xFFFF 0xFF 1 100 0x1002 0 0",
+       "QueryNextImageRequest.*");
+expect("client",
+       "",
+       "Bootload state: Waiting for Upgrade message",
+       7000);          // timeout
+
+network.sleep(10000);
+
+// Assume endpoint 1 is the OTA client's endpoint.
+send("server",
+     "plugin ota-server upgrade " + clientNodeId + " 1 0xFFFF 0xFFFF 0xFFFFFFFF");
+expect("client",
+       "",
+       ".*Applying upgrade",
+       4000);       // An immediate upgrade still has a 2 second delay
+                    // to allow for the network messages to propagate
+network.sleep(2000);
+
+// Set the Image Block request policy to delay once
+// And upgrade policy to "immediately"
+send("server",
+     "plugin ota-server policy block-request 1");
+network.sleep(1000);
+send("server",
+     "plugin ota-server policy upgrade 0");
+network.sleep(12000);
+
+// Unicast notify should cause client to always respond.
+send("server",
+     "plugin ota-server notify " + clientNodeId + " 1 0 1 0 0 0");
+
+expect("client",
+       "",
+       "Download delay by server .*",
+       5000);
+expect("client",
+       "",
+       ".*Applying upgrade",
+       // 2 minute delay
+       // + 2 second delay for upgrade (built into client)
+       // + 7 second fudge factor
+       (120 + 3 + 7) * 1000);
+
+// Set the image block request policy to abort
+send("server",
+     "plugin ota-server policy block-request 2");
+network.sleep(10000);
+
+// Unicast should cause client to always respond.
+send("server",
+     "plugin ota-server notify " + clientNodeId + " 1 0 1 0 0 0");
+expect("client",
+       "",
+       "Download aborted by server.",
+       3000);
+
+// Test that OTA ImageTypeId correctly indicates that we are not in the middle of an OTA process after ABORT
+expect("client", "read 1 0x0019 0x0008 0", "FF FF ", 10000);
+
+// Full download with abort by server at the very end.
+
+send("server",
+     "plugin ota-server policy upgrade 3");
+network.sleep(1000);
+send("server",
+     "plugin ota-server policy block-request 0");
+network.sleep(2000);
+
+// Unicast should cause client to always respond.
+send("server",
+     "plugin ota-server notify " + clientNodeId + " 1 0 1 0 0 0");
+expect("client",
+       "",
+       "Server aborted upgrade, status.*",
+       4000);
+
+network.sleep(3000);
+
+debugPrintln("*** Testing HA 1.2 Minimum Block Request Period");
+
+expectNoResponse("server",
+                 "plugin ota-server policy upgrade 0");
+// Tell client there should be 5 second delay between image block request
+// packets (HA 1.2 rate limiting)
+int delayMs = 5000;
+expectNoResponse("server",
+                 "plugin ota-server policy image-req-min-period " + delayMs);
+
+// If the client has a previously downloaded file it will use that
+// to upgrade rather than start a new download.  So deleting it
+// will cause a fresh download.
+send("client", "plugin ota-storage-common delete 0");
+
+expectNoResponse("server",
+                 "plugin ota-server policy upgrade 0");
+
+// Unicast should cause client to always respond.
+expect("client",
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+networkWait(2000);
+expect("client",
+       "plugin ota-client start",
+       "Updating Min Block Request Period to " + delayMs + " ms",
+       delayMs + 5000);
+
+// Immediately expect the client to have downloaded something within 2 seconds.
+// This should not be the case, since the block delay is set the 5 seconds.
+assert(network.expect("client", port, null, "Download: [0-9]+% complete", 2000, true) == null);
+
+// However, the client should download something after 2 + 3 + 1 (buffer) = 6 seconds pass.
+expect("client", "Download: [0-9]+% complete", 2000 + 3000 + 1000);
+
+networkWait(3000);
+// Set the block delay to 10 seconds now.
+delayMs = 10000;
+expectNoResponse("server",
+                 "plugin ota-server policy image-req-min-period " + delayMs);
+expect("client", "Updating Min Block Request Period to " + delayMs + " ms", 6000);
+
+// The client should not be able to download anything for at least 6 seconds,
+// since the delay is 10 seconds.
+assert(network.expect("client", port, null, "Download: [0-9]+% complete", 2000, true) == null);
+
+// However, the client should download something after 6 + 4 + 1 (buffer) = 11 seconds pass.
+expect("client", "Download: [0-9]+% complete", 6000 + 4000 + 1000);
+
+// Again, the client should not be able to download anything for at least 6 seconds,
+// since the delay is 10 seconds.
+assert(network.expect("client", port, null, "Download: [0-9]+% complete", 2000, true) == null);
+
+// However, the client should download something after 6 + 4 + 1 (buffer) = 11 seconds pass.
+expect("client", "Download: [0-9]+% complete", 6000 + 4000 + 1000);
+
+// Test that OTA ImageTypeId correctly indicates that we are absolutely dead in the middle of an OTA download right now
+expect("client", "read 1 0x0019 0x0008 0", "78 56 ", 10000);
+
+// This is tough to test because the server sends a command and we want
+// to see the client reflect the change.
+if (0 == 1) {
+  int delay = 5000;
+  expectNoResponse("server",
+                   "plugin ota-server policy image-req-min-period " + delay);
+  expect("client",
+         "",
+         "Updating Min Block Request Period to " + delay * 1000 + " ms",
+         delay);
+}
+
+networkWait(2000);
+// Download will be slower but will complete
+expect("client",
+       "",
+       ".*Applying upgrade",
+       50000);
+
+networkWait(2000); // let additional CLI messages due to the 'upgrade' clear
+
+
+// Testing OTA Downgrade options
+debugPrint("*** Testing OTA Downgrade options.\n");
+
+send("server", "plugin ota-storage-common delete 0");
+networkWait(20000);
+
+downgradeFile="app/framework/plugin/ota-client/test-file-downgrade-v0.ota";
+
+expect("server",
+       "plugin ota-server load-file \"" + downgradeFile + "\"",
+       ".*Loaded image successfully.",
+       5000);
+
+send("server", "plugin ota-server policy query 1");
+
+expect("client",
+       "plugin ota-client disable-downgrades",
+       ".*OTA Downgrades: Disabled");
+
+// reset the client and wait for images to be deleted before restarting
+send("client","plugin ota-client stop");
+send("client","plugin ota-storage-common delete 0");
+networkWait(40000);
+
+expect("client",
+       "plugin ota-client start",
+       ".*OTA Downgrades Disabled: FileVersion behind current installation",
+       30000);
+expect("server",
+       "",
+       "Client " + clientNodeId + " indicated upgrade status: 0x96",
+       15000);
+
+// re-enable and try again
+expect("client",
+       "plugin ota-client enable-downgrades",
+       ".*OTA Downgrades: Enabled");
+
+send("server",
+     "plugin ota-server policy upgrade 3");
+network.sleep(1000);
+send("server",
+     "plugin ota-server policy block-request 0");
+network.sleep(2000);
+
+// Unicast should cause client to always respond.
+send("server",
+     "plugin ota-server notify " + clientNodeId + " 1 0 1 0x1002 0x5678 0");
+expect("client",
+       "",
+       "Server aborted upgrade, status.*",
+       30000);
+
+// server re-discovery
+debugPrint("*** Powering off server node to force client to re-discover.\n");
+power("server", false);
+
+// This part of the test can take a long time to run, even in simulation.
+// I wouldn't dream of running it on real hardware, it can take upwards of 50 minutes.
+
+// These are configured per the OTA Client plugin
+int queryTimeSeconds = 5 * 60;
+int queryErrorThreshold = 10;
+expect("client",
+       "",
+       "Maximum query errors hit.*",
+       queryTimeSeconds * 1000 * queryErrorThreshold);
+
+// otaPrintln("Setting OTA Server to 0x%2X", serverNodeId);
+// Restart the server and send an image notify command
+expect("client",
+       "plugin ota-client status",
+       ".*Discovering OTA Server");
+
+power("server", true);
+networkWait(10000);
+
+send("server",
+     "plugin ota-server notify 0xFFFF 1 0 1 0 0 0");
+
+expect("client",
+       "",
+       ".*Got unexpected Image Notify.  Start discovery.");
+networkWait(10000);
+
+// Test that OTA Image Header's downloadedZigbeeStackVersion post-install & reset yields 0xFFFF for its attribute
+power("client",false);
+networkWait(1000);
+power("client",true);
+networkWait(5000);
+expect("client", "read 1 0x0019 0x0005 0", "FF FF ", 10000); 

@@ -1,0 +1,252 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"full1", "router", "full2"};
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+expect("full2", "Registration (failed|complete)", timeout * 100);
+
+// Smart Energy registration fills the binding table, which prevents the node
+// from adding groups.  The bindings created for registration are not used for
+// this test, so clear them all before starting.
+send("full1", "option binding-table clear");
+networkWait(timeout);
+
+// Send a Get Group Membership command asking for all groups.  Because the Group
+// Count field is zero, this should get a response with the available capacity
+// but no matching group ids (bug 12290).
+send("full2", "zcl groups get 0x00");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x00,");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x00,");
+
+// Send a Get Group Membership command asking for a specific group.  This should
+// fail because the server has no groups yet, so there are no matches.
+send("full2", "zcl groups get 0x01 0x0001");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x01, \\[0x0001\\]");
+expect("full2", "DEFAULT_RESP: \\(Groups\\) cmd 02 status 8B");
+
+// Add a group...
+send("full2", "zcl groups add 0x0001 \"group1\"");
+send("full2", "send 0 1 1");
+expect("full1", "RX: AddGroup 0x0001, \"group1\"");
+expect("full2", "RX: AddGroupResponse 0x00, 0x0001");
+
+// ... and check the membership by asking for all groups...
+send("full2", "zcl groups get 0x00");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x00,");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0001\\]");
+
+// ... and by asking for a one specific group...
+send("full2", "zcl groups get 0x01 0x0001");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x01, \\[0x0001\\]");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0001\\]");
+
+// ... and by asking for a few specific groups...
+send("full2", "zcl groups get 0x02 0x0001 0x0002");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x02, \\[0x0001\\] \\[0x0002\\]");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0001\\]");
+
+// Send a Get Group Membership command asking for a group that exists on a
+// different endpoint.  This should fail (bug 12607).
+send("full2", "zcl groups get 0x01 0x0001");
+send("full2", "send 0 1 2");
+expect("full1", "RX: GetGroupMembership 0x01, \\[0x0001\\]");
+expect("full2", "DEFAULT_RESP: \\(Groups\\) cmd 02 status 8B");
+
+// Add a group that already exists and make sure we get an error.
+send("full2", "zcl groups add 0x0001 \"duplicate\"");
+send("full2", "send 0 1 1");
+expect("full1", "RX: AddGroup 0x0001, \"duplicate\"");
+expect("full2", "RX: AddGroupResponse 0x8A, 0x0001");
+
+// Add a group to one endpoint that already exists on another.  This should not
+// fail (bug 12607).
+send("full2", "zcl groups add 0x0001 \"duplicate\"");
+send("full2", "send 0 1 2");
+expect("full1", "RX: AddGroup 0x0001, \"duplicate\"");
+expect("full2", "RX: AddGroupResponse 0x00, 0x0001");
+
+// Get Group Membership should now work on that endpoint (bug 12607).
+send("full2", "zcl groups get 0x01 0x0001");
+send("full2", "send 0 1 2");
+expect("full1", "RX: GetGroupMembership 0x01, \\[0x0001\\]");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0001\\]");
+
+// Add another group and check the membership in those same ways.
+send("full2", "zcl groups add 0x0002 \"group2\"");
+send("full2", "send 0 1 1");
+expect("full1", "RX: AddGroup 0x0002, \"group2\"");
+expect("full2", "RX: AddGroupResponse 0x00, 0x0002");
+send("full2", "zcl groups get 0x00");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x00,");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x02, \\[0x0001\\] \\[0x0002\\]");
+send("full2", "zcl groups get 0x01 0x0002");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x01, \\[0x0002\\]");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0002\\]");
+send("full2", "zcl groups get 0x02 0x0001 0x0002");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x02, \\[0x0001\\] \\[0x0002\\]");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x02, \\[0x0001\\] \\[0x0002\\]");
+
+// Check the membership for a specific group that doesn't exist.
+send("full2", "zcl groups get 0x01 0x0003");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x01, \\[0x0003\\]");
+expect("full2", "DEFAULT_RESP: \\(Groups\\) cmd 02 status 8B");
+
+// Check the membership for one group that exists and one that does not.
+send("full2", "zcl groups get 0x02 0x0001 0x0003");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x02, \\[0x0001\\] \\[0x0003\\]");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0001\\]");
+
+// View a group that exists...
+send("full2", "zcl groups view 0x0002");
+send("full2", "send 0 1 1");
+expect("full1", "RX: ViewGroup 0x0002");
+expect("full2", "RX: ViewGroupResponse 0x00, 0x0002, \"\"");
+
+// ... and one that does not.
+send("full2", "zcl groups view 0x0003");
+send("full2", "send 0 1 1");
+expect("full1", "RX: ViewGroup 0x0003");
+expect("full2", "RX: ViewGroupResponse 0x8B, 0x0003, \"\"");
+
+// Try to view a group on one endpoint when it exists on another (bug 12607).
+send("full2", "zcl groups view 0x0002");
+send("full2", "send 0 1 2");
+expect("full1", "RX: ViewGroup 0x0002");
+expect("full2", "RX: ViewGroupResponse 0x8B, 0x0002, \"\"");
+
+// Remove a group...
+send("full2", "zcl groups remove 0x0001");
+send("full2", "send 0 1 1");
+expect("full1", "RX: RemoveGroup 0x0001");
+expect("full2", "RX: RemoveGroupResponse 0x00, 0x0001");
+
+// ... and make sure it's gone.
+send("full2", "zcl groups get 0x01 0x0001");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x01, \\[0x0001\\]");
+expect("full2", "DEFAULT_RESP: \\(Groups\\) cmd 02 status 8B");
+
+// The group should still exist on the other endpoint (bug 12607).
+send("full2", "zcl groups get 0x01 0x0001");
+send("full2", "send 0 1 2");
+expect("full1", "RX: GetGroupMembership 0x01, \\[0x0001\\]");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0001\\]");
+
+// Try to remove it again.
+send("full2", "zcl groups remove 0x0001");
+send("full2", "send 0 1 1");
+expect("full1", "RX: RemoveGroup 0x0001");
+expect("full2", "RX: RemoveGroupResponse 0x8B, 0x0001");
+
+// Remove all the groups and make sure they are gone.
+send("full2", "zcl groups rmall");
+send("full2", "send 0 1 1");
+expect("full1", "RX: RemoveAllGroups");
+expect("full2", "DEFAULT_RESP: \\(Groups\\) cmd 04 status 00");
+send("full2", "zcl groups get 0x00");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x00,");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x00,");
+send("full1", "plugin groups-server print");
+assert(network.expect("full1", port, null, "ep\\[01\\] id\\[0001\\]") == null);
+
+// The group should still exist on the other endpoint (bug 12607).
+send("full2", "zcl groups get 0x00");
+send("full2", "send 0 1 2");
+expect("full1", "RX: GetGroupMembership 0x00,");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0001\\]");
+
+// Try to add a group "if identifying" and make sure it is ignored (not identifying, group not added).
+networkWait(timeout);
+send("full2", "zcl groups add-if-id 0x0001 \"group1\"");
+send("full2", "send 0 1 1");
+expect("full1", "RX: AddGroupIfIdentifying 0x0001, \"group1\"");
+expect("full2", "DEFAULT_RESP: \\(Groups\\) cmd 05 status 00");
+send("full2", "zcl groups get 0x00");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x00,");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x00,");
+networkWait(timeout);
+send("full2", "zcl groups view 0x0001");
+send("full2", "send 0 1 1");
+expect("full1", "RX: ViewGroup 0x0001");
+expect("full2", "RX: ViewGroupResponse 0x8B, 0x0001, \"\"");
+send("full1", "plugin groups-server print");
+assert(network.expect("full1", port, null, "ep\\[01\\] id\\[0001\\]") == null);
+
+// Turn on identifying, try again, and make sure it passes (identifying, group added).
+send("full1", "zcl identify on 0x01 0x000F");
+send("full2", "zcl groups add-if-id 0x0001 \"group1\"");
+send("full2", "send 0 1 1");
+expect("full1", "RX: AddGroupIfIdentifying 0x0001, \"group1\"");
+expect("full2", "DEFAULT_RESP: \\(Groups\\) cmd 05 status 00");
+send("full2", "zcl groups get 0x00");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetGroupMembership 0x00,");
+expect("full2", "RX: GetGroupMembershipResponse 0xFF, 0x01, \\[0x0001\\]");
+send("full2", "zcl groups view 0x0001");
+send("full2", "send 0 1 1");
+expect("full1", "RX: ViewGroup 0x0001");
+expect("full2", "RX: ViewGroupResponse 0x00, 0x0001, \"\"");
+send("full1", "plugin groups-server print");
+expect("full1", "ep\\[01\\] id\\[0001\\]");
+
+// Try to send a group multicast message (both endpoints have group 0x0001)
+send("full1", "zcl global read 0x0004 0x0000");
+send("full1", "send_multicast 0x0001 0x01");
+expect("full1", "READ_ATTR_RESP: \\(Groups\\)");
+expect("full1", "READ_ATTR_RESP: \\(Groups\\)");
+
+// Now try to send a group multicast message to an unknown group
+send("full1", "zcl global read 0x0004 0x0000");
+send("full1", "send_multicast 0x0003 0x01");
+assert(network.expect("full1", port, null, "READ_ATTR_RESP: \\(Groups\\)") == null);
+
+// EMAPPFWKV2-1414: if we remove a group, we should remove any scene associated
+// with it. ZCL6: 3.6.2.3.5: "Note that if a group is removed the scenes
+// associated with that group SHOULD be removed."
+send("full2", "zcl scenes add 0x00001 0x01 0x00FF \"scene1\"");
+send("full2", "send 0 1 1");
+expect("full1", "RX: AddScene 0x0001, 0x01, 0x00FF, \"scene1\", ");
+expect("full2", "RX: AddSceneResponse 0x00, 0x0001, 0x01");
+expect("full1", "plugin scenes print", "using 0x01 out of 0x03 table slots");
+
+send("full2", "zcl groups rmall");
+send("full2", "send 0 1 1");
+expect("full1", "RX: RemoveAllGroups");
+expect("full1", "plugin scenes print", "using 0x00 out of 0x03 table slots");

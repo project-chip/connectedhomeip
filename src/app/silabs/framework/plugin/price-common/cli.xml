@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-price-common" name="Plugin Commands: Price Common">
+    <description>
+      Utility functions common to both Price Client / Server.
+    </description>
+  </group>
+  <command cli="plugin price-common adj-st-t"  functionName="emAfPluginPriceCommonClusterGetAdjustedStartTimeCli" group="plugin-price-common">
+    <description>
+      Calculates a new UTC start time value based on the duration type parameter.
+    </description>
+    <arg name="startTimeUtc" type="INT32U" />
+    <arg name="durationType" type="INT8U"  />
+  </command>
+
+  <command cli="plugin price-common cnvrt-durn-to-sec"  functionName="emAfPluginPriceCommonClusterConvertDurationToSecondsCli" group="plugin-price-common">
+    <description>
+      Converts the duration to a number of seconds based on the duration type parameter.
+    </description>
+    <arg name="startTimeUtc" type="INT32U" />
+    <arg name="duration"     type="INT32U" />
+    <arg name="durationType" type="INT8U" />
+  </command>
+</cli>

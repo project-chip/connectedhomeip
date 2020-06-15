@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-power-consumption-model" name="Plugin Commands: Power Consumption Model CLI">
+    <description>
+      CLI for generic power consumption model.
+    </description>
+  </group>
+  <command cli="plugin power-consumption-model read-all" functionName="emberAfPowerConsumptionModelPrintAttributes" group="plugin-power-consumption-model">
+    <description>
+      Read all power attributes.
+    </description>
+  </command>
+</cli>

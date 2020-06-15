@@ -1,0 +1,128 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multihop****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "server", "router", "client" };
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+formAndJoinDevices(allDevices,
+                   false);  // wait for devices to finish key-establishment?
+
+String clientNodeId = nodeId("client");
+
+// Let registration complete.
+network.sleep(10000);
+
+send("server", "option print-rx-msgs disable");
+send("client", "option print-rx-msgs disable");
+
+// Have the server set its answer to "reinstall"
+// when the client asks for an upgrade file.
+send("server",
+     "plugin ota-server policy query 0");
+network.sleep(1000);
+send("client", "plugin ota-storage-common delete 0");
+
+network.sleep(1000);
+
+expect("client", "plugin ota-client info", ".*Use Page Request: yes");
+
+expect("client",
+       "plugin ota-client start",
+       ".*Applying upgrade.*",
+       15000);
+
+// Test Page Request with delay (EMZIGBEE-2199)
+// Set the server to induce artificially missed blocks on the responses to the page request
+// Every other block should be missed.
+send("server", "plugin ota-server policy page-req-miss 2");
+
+// Unicast should cause client to always respond.
+send("server",
+     "plugin ota-server notify " + clientNodeId + " 1 0 1 0 0 0");
+expect("client",
+       ".*Page request timer expired.  Checking for missed blocks.*",
+       8000);
+expect("client",
+       ".*Applying upgrade.*",
+       10000);
+network.sleep(3000);
+
+
+// Server will lie and say it doesn't support page request (even though support
+// is compiled in).
+send("server", "plugin ota-server policy page-req-sup 0");
+expect("server",
+       "plugin ota-server policy print",
+       ".*Page Request Runtime Status Code: 0x81.*"); // 81 = unsupported cluster command
+
+// Client should try page request, get a response of "unsupported cluster command"
+// and then switch to using only block request.
+send("server",
+     "plugin ota-server notify " + clientNodeId + " 1 0 1 0 0 0");
+expect("client",
+       ".*Server doesn't support page request, only using block request.",
+       8000);
+expect("client",
+       ".*Applying upgrade.*",
+       6000);
+network.sleep(3000);
+
+// Restore page request support, do not miss blocks
+send("server", "plugin ota-server policy page-req-sup 1");
+send("server", "plugin ota-server policy page-req-miss 0");
+send("client", "plugin ota-client page-request 1");
+
+// Have server tell client to delay when it asks for a piece of the image
+send("server", "plugin ota-server policy block-request 1");
+
+send("server",
+     "plugin ota-server notify " + clientNodeId + " 1 0 1 0 0 0");
+
+expect("client",
+       ".*Download delay by server 120000 ms",
+       5000);
+
+// Make sure the client respects the delay and then follows up with another
+// Image Page Request
+networkWait(100000);
+expect("server",
+       "RX ImagePageReq .*",
+       30000);
+
+// All OTA file checks should pass and we should eventually try to boot the
+// image
+expect("client",
+       ".*Applying upgrade",
+       5000);

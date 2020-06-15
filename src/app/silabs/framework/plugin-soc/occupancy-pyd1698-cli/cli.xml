@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-occupancy-pyd1698-cli" name="Plugin Commands: PYD-1698 Occupancy Sensor CLI">
+    <description>
+      Command line interface for changing operational parameters of the PYD-1698 occupancy sensor at runtime.
+    </description>
+  </group>
+  <command cli="plugin occupancy-pyd1698-cli read" functionName="emberAfPluginOccupancyPyd1698CliReadCommand" group="plugin-occupancy-pyd1698-cli">
+    <description>
+      Read and print the configuration status of the occupancy sensor.
+    </description>
+  </command>
+  <command cli="plugin occupancy-pyd1698-cli set-threshold" functionName="emberAfPluginOccupancyPyd1698CliSetThresholdCommand" group="plugin-occupancy-pyd1698-cli">
+    <description>
+      Set the threshold configuration bits to the given value
+    </description>
+    <arg name="value"         type="INT8U" />
+  </command>
+  <command cli="plugin occupancy-pyd1698-cli set-blind-time" functionName="emberAfPluginOccupancyPyd1698CliSetBlindTimeCommand" group="plugin-occupancy-pyd1698-cli">
+    <description>
+      Set the blind time configuration bits to the given value
+    </description>
+    <arg name="value"         type="INT8U" />
+  </command>
+  <command cli="plugin occupancy-pyd1698-cli set-pulse-counter" functionName="emberAfPluginOccupancyPyd1698CliSetPulseCounterCommand" group="plugin-occupancy-pyd1698-cli">
+    <description>
+      Set the pulse counter configuration bits to the given value
+    </description>
+    <arg name="value"         type="INT8U" />
+  </command>
+  <command cli="plugin occupancy-pyd1698-cli set-window-time" functionName="emberAfPluginOccupancyPyd1698CliSetWindowTimeCommand" group="plugin-occupancy-pyd1698-cli">
+    <description>
+      Set the window time configuration bits to the given value
+    </description>
+    <arg name="value"         type="INT8U" />
+  </command>
+  <command cli="plugin occupancy-pyd1698-cli set-operation-mode" functionName="emberAfPluginOccupancyPyd1698CliSetOperationModeCommand" group="plugin-occupancy-pyd1698-cli">
+    <description>
+      Set the operation mode configuration bits to the given value
+    </description>
+    <arg name="value"         type="INT8U" />
+  </command>
+  <command cli="plugin occupancy-pyd1698-cli set-filter-source" functionName="emberAfPluginOccupancyPyd1698CliSetFilterSourceCommand" group="plugin-occupancy-pyd1698-cli">
+    <description>
+      Set the filter source configuration bits to the given value
+    </description>
+    <arg name="value"         type="INT8U" />
+  </command>
+  <command cli="plugin occupancy-pyd1698-cli newState" functionName="emberAfPluginOccupancyPyd1698CliGenerateOccupancyCallback" group="plugin-occupancy-pyd1698-cli">
+    <description>
+      Simulate a transition to a new occupancy state
+    </description>
+    <arg name="newState"         type="INT8U" />
+  </command>
+</cli>
+

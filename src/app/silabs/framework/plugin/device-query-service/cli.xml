@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-device-query-service" name="Plugin Commands: Device Query Service">
+    <description>This plugin provides a set of CLI commands for printing and manipulating the device database.</description>
+  </group>
+  <command cli="plugin device-query-service status" functionName="emAfPluginDeviceQueryServiceStatusCommand" group="plugin-device-query-service">
+    <description>
+      Print the current status of the device query service.
+    </description>
+  </command>
+  <command cli="plugin device-query-service enable" functionName="emAfPluginDeviceQueryServiceEnableDisableCommand" group="plugin-device-query-service">
+    <description>
+      Enable the Device Query Service.
+    </description>
+  </command>
+  <command cli="plugin device-query-service disable" functionName="emAfPluginDeviceQueryServiceEnableDisableCommand" group="plugin-device-query-service">
+    <description>
+      Disable the Device Query Service.
+    </description>
+  </command>
+</cli>

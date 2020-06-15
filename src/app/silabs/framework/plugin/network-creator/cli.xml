@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-network-creator"
+         name="Plugin Commands: Network Creator">
+    <description>
+      Commands pertaining to network creation with the Network Creator plugin.
+    </description>
+  </group>
+
+  <command cli="plugin network-creator start"
+           functionName="emberAfPluginNetworkCreatorStartCommand"
+           group="plugin-network-creator">
+    <description>
+      Starts the network formation process.
+    </description>
+    <arg name="useCentralizedSecurity"
+         type="BOOLEAN"
+         description="Whether or not to form a centralized network. If this value is false, the device will attempt to join a distributed network." />
+  </command>
+
+  <command cli="plugin network-creator stop"
+           functionName="emberAfPluginNetworkCreatorStop"
+           group="plugin-network-creator">
+    <description>
+      Stops the network formation process.
+    </description>
+  </command>
+
+  <command cli="plugin network-creator form"
+           functionName="emberAfPluginNetworkCreatorFormCommand"
+           group="plugin-network-creator">
+    <description>
+      Form a network with specified parameters.
+    </description>
+    <arg name="useCentralizedSecurity"
+         type="BOOLEAN"
+         description="Whether or not to form a centralized network. If this value is false, the device will attempt to join a distributed network." />
+    <arg name="panId"
+         type="INT16U"
+         description="PanID of the network to be formed" />
+    <arg name="radioTxPower"
+         type="INT8S"
+         description="Tx power of the network to be formed" />
+    <arg name="channel"
+         type="INT8U"
+         description="channel of the network to be formed" />
+  </command>
+
+  <command cli="plugin network-creator mask add"
+           functionName="emberAfPluginNetworkCreatorChannelMaskCommand"
+           group="plugin-network-creator">
+    <description>
+      Add a channel to the channel mask of choice.
+    </description>
+    <arg name="mask"
+         type="INT8U"
+         description="The mask of choice to which to add the channel. Entering an argument of '1' will choose the primary channel mask. Any other argument will choose the secondary channel mask." />
+    <arg name="channel"
+         type="INT32U"
+         description="The channel to add to the channel mask." />
+  </command>
+
+  <command cli="plugin network-creator mask subtract"
+           functionName="emberAfPluginNetworkCreatorChannelMaskCommand"
+           group="plugin-network-creator">
+    <description>
+      Subtract a channel from the channel mask of choice.
+    </description>
+    <arg name="mask"
+         type="INT8U"
+         description="The mask of choice from which to subtract the channel. Entering an argument of '1' will choose the primary channel mask. Any other argument will choose the secondary channel mask." />
+    <arg name="channel"
+         type="INT32U"
+         description="The channel to subtract from the channel mask." />
+  </command>
+
+  <command cli="plugin network-creator mask set"
+           functionName="emberAfPluginNetworkCreatorChannelMaskCommand"
+           group="plugin-network-creator">
+    <description>
+      Set a channel mask.
+    </description>
+    <arg name="mask"
+         type="INT8U"
+         description="The mask of choice to set. Entering an argument of '1' will choose the primary channel mask. Any other argument will choose the secondary channel mask." />
+    <arg name="newChannelMask"
+         type="INT32U"
+         description="The bit mask to which to set the chosen channel mask." />
+  </command>
+    
+  <command cli="plugin network-creator status"
+           functionName="emberAfPluginNetworkCreatorStatusCommand"
+           group="plugin-network-creator">
+    <description>
+      Print the status of the network-creator plugin.
+    </description>
+  </command>
+  
+</cli>

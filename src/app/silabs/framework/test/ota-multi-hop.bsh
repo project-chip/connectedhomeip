@@ -1,0 +1,84 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingMultihop) {
+  std.print("**** Won't run unless multi-hop");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "server",
+                        "router1",
+                        "router2",
+                        "router3",
+                        "router4",
+                        "client" };
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+networkWait(timeout);
+
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Disable page request.  It is enabled by default when the OTA client
+// plugin is configured to use it.  We want to test the normal
+// block request stuff here.
+expectNoResponse("client", "plugin ota-client page-request 0");
+
+expectMultipleHosts(allDevices,  
+                    "option print-rx-msgs disable",
+                    ".*disabled print");
+
+// Begin
+
+// Sleeping for anything less than 968632 ms here completely breaks joining for
+// router3 when running on hosts.  Change 100685 is the culprit, although it is
+// totally unrelated to joining and doesn't actually result in a different
+// configuration on the NCP.
+//network.sleep(968632);
+formAndJoinDevices(allDevices, 
+                   false);   // wait for Key establishment to complete?
+
+String clientNodeId = nodeId("client");
+
+// Let registration complete.  The 30 second delay accounts for a collision
+// in key establishment attempts.  The first guy will be accepted but
+// the second device that attempts KE while the first KE is still in
+// process will be told to back off for 30 seconds.
+network.sleep(30000);
+
+// If the client has a previously downloaded file it will use that
+// to upgrade rather than start a new download.  So deleting it
+// will cause a fresh download.
+expect("client", "plugin ota-storage-common delete 0", "Image deleted.");
+
+expect("client",
+       "plugin ota-client start",
+       15000,      // An immediate upgrade still has a 3 second delay
+                  // to allow for the network messages to propagate
+       ".*Applying upgrade");

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-gbcs-gas-meter" name="Plugin Commands: GBCS Gas Meter">
+    <description>
+      The GBCS gas meter plugin contributes several CLI commands to the application framework to be used in configuring and managing the GSME.
+    </description>
+  </group>
+
+  <command cli="plugin gbcs-gas-meter report-attributes" functionName="emAfPluginGbcsGasMeterCliReportAttributes" group="plugin-gbcs-gas-meter">
+    <description>
+      Report the gas meter attributes to the mirror.
+    </description>
+  </command>
+
+</cli>

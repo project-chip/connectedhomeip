@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-em4" name="Plugin Commands: em4">
+    <description>
+      The EM4 plugin contributes a command to the application framework's CLI.  This commands is used to show EM4 plugin status. 
+    </description>
+  </group>
+  <command cli="plugin em4 status" functionName="emberAfPluginEm4StatusCommand" group="plugin-em4">
+    <description>
+      Display the status of EM4 activation mode.
+    </description>
+  </command>
+</cli>

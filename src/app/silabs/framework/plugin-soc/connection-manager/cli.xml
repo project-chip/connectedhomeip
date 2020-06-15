@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-connection-manager" name="Plugin Commands: Connection Manager">
+    <description>
+      Runtime configuration CLI commands for Connection Manager
+    </description>
+  </group>
+  <command cli="plugin connection-manager set-force-short-poll" functionName="emAfPluginConnectionManagerSetForceShortPollCommand" group="plugin-connection-manager">
+    <description>
+      Can be used to force the device to permanently poll on a short interval (must enabled for HA testing).
+    </description>
+    <arg name="sleepyEnable" type="INT8U" description = "1 to permanently force short polling, 0 to behave as normal (default)." />
+   </command>
+</cli>

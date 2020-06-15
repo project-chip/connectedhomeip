@@ -1,0 +1,431 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"full1", "full2", "full3"};
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// test debug printing
+send("full1", "debugprint all_off");
+
+// does it turn off?
+expect("full1", "debugprint status", ".*Core : no.*");
+
+// turn core on and check if it works
+send("full1", "debugprint on 0");
+expect("full1", "debugprint status", ".*Core : YES.*");
+
+// turn core off again and check if it's off
+send("full1", "debugprint off 0");
+expect("full1", "debugprint status", ".*Core : no.*");
+
+// Leave full debugging on full1
+send("full1", "debugprint all_on");
+
+networkWait(timeout);
+
+networkWait(10000);
+
+// Test correct defaults of strings, bug 12090
+send("full2", "zcl global read 0x0700 0x0000");
+expect("full2", "send 0 1 1", ".*Tier 1.*");
+
+networkWait(5000);
+
+// Test the Identify cluster.
+expect("full2", "zcl identify query", ".*01 .. 01.*");
+expect("full2", "send 0 1 1", ".*TX.*");
+expect("full1", "RX identify:QUERY");
+expect("full2", ".*cmd 0B payload\\[01 00 \\].*");
+expect("full2", "zcl identify id 0x00FF", ".*01 .. 00 FF 00.*");
+expect("full2", "send 0 1 1", ".*TX.*");
+expect("full1", "RX identify:IDENTIFY 0x00FF");
+expect("full2", ".*cmd 0B payload\\[00 00 \\].*");
+expect("full2", "zcl identify query", ".*01 .. 01.*");
+expect("full2", "send 0 1 1", ".*TX.*");
+expect("full1", "RX identify:QUERY");
+expect("full2", ".*cmd 00 payload\\[F. 00 \\].*");
+
+// Test some attributes with a purpose of testing the attribute changed callback
+expect("full2", "zcl global read 0x0402 0x0000", ".*buffer.*");
+expect("full2", "send 0 1 1", ".*val:0000.*");
+
+networkWait(5000);
+
+// Test reading and writing of int16u (type 0x21), write it to 0042 first...
+checkAttributeWrite("full2",   // transmitter
+                    "0x0000",  // receiver
+                    "Color Control",
+                    "0x0300",  // cluster
+                    "0x0030",  // attribute
+                    "0x21",    // attribute type
+                    "00 42",   // data
+                    "00",      // status
+                     getSourceFileInfo(),
+                     this.namespace.getInvocationLine());
+
+checkAttributeRead("full2",   // transmitter
+                   "0x0000",  // receiver
+                   "Color Control",
+                   "0x0300",  // cluster
+                   "0x0030",  // attribute
+                   "0x21",    // attribute type
+                   "0042",    // value
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+
+networkWait(5000);
+
+
+// ... and now to 2929
+checkAttributeWrite("full2",   // transmitter
+                    "0x0000",  // receiver
+                    "Color Control",
+                    "0x0300",  // cluster
+                    "0x0030",  // attribute
+                    "0x21",    // attribute type
+                    "29 29",   // data
+                    "00",      // status
+                    getSourceFileInfo(),
+                    this.namespace.getInvocationLine());
+
+checkAttributeRead("full2",   // transmitter
+                   "0x0000",  // receiver
+                   "Color Control",
+                   "0x0300",  // cluster
+                   "0x0030",  // attribute
+                   "0x21",    // attribute type
+                   "2929",    // value
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+
+// ... and now try writing an int16u to an int8u attribute.  This should fail.
+checkAttributeWrite("full2",   // transmitter
+                    "0x0000",  // receiver
+                    "Color Control",
+                    "0x0300",  // cluster
+                    "0x0000",  // attribute
+                    "0x21",    // attribute type
+                    "29 29",   // data
+                    "8D",      // status
+                    getSourceFileInfo(),
+                    this.namespace.getInvocationLine());
+
+// Simple metering tests
+expect("full1", "plugin simple-metering-server rate 123 1", "TM: set consumption rate 007B");
+expect("full1", "plugin simple-metering-server variance 123", ".*TM: set consumption variance 007B");
+expect("full1", "plugin simple-metering-server profiles 1", ".*TM: profiles 01");
+networkWait(timeout);
+send("full1", "plugin simple-metering-server print");
+expect("full1", "mode:04\\s*meterConsumptionRate:007B\\s*meterConsumptionVariance:007B", timeout, true);
+expect("full1", "plugin simple-metering-server profiles 3", ".*TM: profiles 03");
+
+//Testing metering.bsh
+// expect("full2", "zcl metering get-profile 1 2 3", ".*buffer.*");
+// expect("full2", "send 0 1 1", ".*TX.*");
+// expect("full2", "RX: GetProfileResponse 0x[0-9a-fA-F]{8}, 0x00, 0x03, 0x03.*");
+
+// Level Control tests
+//expect("full2", "zcl level-control mv-to-level 5 200", ".*");
+//expect("full2", "send 0 1 1", ".*TX.*");
+//expect("full1", ".*RX level-control:MOVE_TO_LEVEL 05 00C8.*");
+//expect("full1", ".*move from 04 to 0005.*", timeout * 10, true);
+
+// Test short string reads
+send("full1", "write 1 0x0000 0x004 1 0x42 \"Hello String\"");
+expect("full1", "Read attribute,short buffer,status=00:Hello");
+expect("full1", "Read attribute,long buffer,status=00:Hello String");
+
+// Test that the default value of attribute F001 is 0A 00. This tests for bug 12263
+send("full2", "raw 0x0702 {04 02 10 00 00 01 f0}");
+send("full2", "send 0 1 1");
+// expect("full2", ".*type:21, val:0A00.*");
+
+
+//Test mf specific commands, attributes and clusters.
+// Test read of on/off attribute in on off cluster attribute id 0000
+networkWait(5000);
+
+send("full2", "zcl global read 0x0006 0x0000");
+expect("full2", "send 0 1 1", ".*type:10, val:00.*");
+
+// Test write to int16U mfg specific transition time in on/off cluster att id 0000,
+// mfg code 0x1002
+send("full2", "raw 0x0006 {04 02 10 00 02 00 00 21 ab ba}");
+send("full2", "send 0 1 1");
+expect("full1", ".*WRITE: clus 0006 attr 0000 OK.*");
+
+
+// Test write to mfg specific transition time in on/off cluster att id 0000,
+// mfg code 0x1049
+send("full2", "raw 0x0006 {04 49 10 00 02 00 00 20 ba}");
+send("full2", "send 0 1 1");
+expect("full1", ".*WRITE: clus 0006 attr 0000 OK.*");
+
+// Test write to mfg specific transition time in on/off cluster att id 0000,
+// mfg code 0x1003 (not supported)
+send("full2", "raw 0x0006 {04 03 10 00 02 00 00 21 ab ba}");
+send("full2", "send 0 1 1");
+expect("full1", ".*WRITE ERR: ep 01 clus 0006 attr 0000 not supported.*");
+
+// Test read of mfg specific transition time in on/off cluster to make sure 
+// it now has the right value. Att id 0000 MfgCode 1002
+send("full2", "raw 0x0006 {04 02 10 00 00 00 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:21, val:ABBA.*");
+
+// Test read of mfg specific transition time in on/off cluster to make sure 
+// it now has the right value. Att id 0000 MfgCode 1049
+send("full2", "raw 0x0006 {04 49 10 00 00 00 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:20, val:BA.*");
+
+// Test make sure non mfg specific attribute has not been affected.
+send("full2", "zcl global read 0x0006 0x0000");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:10, val:00.*");
+
+
+// Test read of mfg specific transition time in on/off cluster with wrong
+// mfg code, 0x1003 (not supported), make sure it fails.
+send("full2", "raw 0x0006 {04 03 10 00 00 00 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*attr:0000, status:86.*");
+networkWait(timeout);
+
+// Test write to mfg specific att in mfg spec cluster att id 0000,
+// mfg code 0x1002
+send("full2", "raw 0xfc00 {04 02 10 00 02 00 00 20 ab}");
+send("full2", "send 0 1 1");
+expect("full1", ".*WRITE: clus FC00 attr 0000 OK.*");
+networkWait(timeout);
+
+
+// Test write to mfg specific att in mfg spec cluster att id 0000,
+// mfg code 0x1049
+send("full2", "raw 0xfc00 {04 49 10 00 02 00 00 21 ba ab}");
+send("full2", "send 0 1 1");
+expect("full1", ".*WRITE: clus FC00 attr 0000 OK.*");
+networkWait(timeout);
+
+// Test read of mfg specific transition time in on/off cluster to make sure 
+// it now has the right value.
+send("full2", "raw 0xfc00 {04 02 10 00 00 00 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:20, val:AB.*");
+
+// Test read of mfg specific transition time in on/off cluster to make sure 
+// it now has the right value.
+send("full2", "raw 0xfc00 {04 49 10 00 00 00 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:21, val:BAAB.*");
+
+// Test write to mfg specific transition time in on/off cluster att id 0000,
+// mfg code 0x1003 (not supported)
+send("full2", "raw 0xfc00 {04 03 10 00 02 00 00 20 ab}");
+send("full2", "send 0 1 1");
+expect("full1", ".*WRITE ERR: ep 01 clus FC00 attr 0000 not supported.*");
+
+// Test read of mfg specific transition time in on/off cluster with wrong
+// mfg code, 0x1003 (not supported), make sure it fails.
+send("full2", "raw 0xfc00 {04 03 10 00 00 00 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*attr:0000, status:86.*");
+networkWait(timeout*5);
+
+// Test send mfg specific cluster 0xfc00 cmd 00 for mfg id 0x1002
+send("full2", "raw 0xfc00 {05 02 10 00 00 ab}");
+send("full2", "send 0 1 1");
+expect("full1", ".*Rx Sample Mfg Specific Cluster Custom One Command: AB.*");
+
+// Test send mfg specific cluster 0xfc00 cmd 00 for mfg id 0x1049
+send("full2", "raw 0xfc00 {05 49 10 00 00 ba}");
+send("full2", "send 0 1 1");
+expect("full1", ".*Rx Sample Mfg Specific Cluster Custom Two Command: BA,BA.*");
+
+// Test send mfg specific cluster 0xfc00 cmd 00 for mfg id 0x1003, expect fail
+send("full2", "raw 0xfc00 {05 03 10 00 00 ab}");
+send("full2", "send 0 1 1");
+expect("full2", "DEFAULT_RESP: \\(Unknown clus. \\[0xFC00\\]\\) cmd 00 status 83");
+
+// Test send mfg specific cluster 0x0006 cmd 00 for mfg id 0x1002
+send("full2", "raw 0x0006 {05 02 10 00 00}");
+send("full2", "send 0 1 1");
+expect("full1", ".*Rx Sample Mfg Specific Off With Transition.*");
+
+// Test send mfg specific cluster 0xfc00 cmd 00 for mfg id 0x1003, expect fail
+send("full2", "raw 0x0006 {05 03 10 00 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*On/off.*cmd 00 status 83.*");
+
+// Test send mfg specific cluster 0x0006 cmd 01 for mfg id 0x1002
+send("full2", "raw 0x0006 {05 02 10 00 01}");
+send("full2", "send 0 1 1");
+expect("full1", ".*Rx Sample Mfg Specific On With Transition.*");
+
+// Test send mfg specific cluster 0x0006 cmd 01 for mfg id 0x1049
+send("full2", "raw 0x0006 {05 49 10 00 01}");
+send("full2", "send 0 1 1");
+expect("full1", ".*Rx Sample Mfg Specific 2 On With Transition.*");
+
+// Test send mfg specific cluster 0x0006 cmd 01 for mfg id 0x1003, expect fail
+send("full2", "raw 0x0006 {05 03 10 00 01}");
+send("full2", "send 0 1 1");
+expect("full2", ".*On/off.*cmd 01 status 83.*");
+
+// Test send mfg specific cluster 0x0006 cmd 02 for mfg id 0x1002
+send("full2", "raw 0x0006 {05 02 10 00 02}");
+send("full2", "send 0 1 1");
+expect("full1", ".*Rx Sample Mfg Specific Toggle With Transition.*");
+
+// Test send mfg specific cluster 0x0006 cmd 02 for mfg id 0x1003, expect fail
+send("full2", "raw 0x0006 {05 03 10 00 02}");
+send("full2", "send 0 1 1");
+expect("full2", ".*On/off.*cmd 02 status 83.*");
+
+networkWait(timeout);
+
+// Discover full1's client to server commands generated for the door lock cluster
+send("full2", "zcl global disc-com-gen 0x0101 0x00 0xff");
+send("full2", "send 0 1 1");
+//It should only generate two client to server commands: lock and unlock
+expect("full1", ".*08 .. 14 01 00 01.*");
+
+networkWait(timeout);
+
+// Discover full1's client to server commands received for the door lock cluster
+send("full2", "zcl global disc-com-rec 0x0101 0x00 0xff");
+send("full2", "send 0 1 1");
+//full 1 receives many commands as a server lock, unlock, setPin, getPin, clearAllPins, etc...
+expect("full1", ".*08 .. 12 01 00 01 03 04 05 06 07 08 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 18 19.*");
+networkWait(timeout);
+
+// I can never remember how the CLI maps these.
+String serverToClient = "1";
+String clientToServer = "0";
+
+// add delay due to errors with "Failed to determine authoritative time source"
+networkWait(10000);
+
+// Discover full1's client to server commands generated for the window covering cluster
+send("full2", "zcl global direction " + serverToClient);
+expect("full2", "zcl global disc-com-gen 0x0102 0x00 0xff",
+       "buffer.*");
+expect("full2", 
+       "send 0 1 1",
+// There should be 3 client->server commands generated: open, close, stop
+       "Discover Commands response.*Generated IDs: 0x00 0x01 0x02.*");
+
+networkWait(timeout);
+
+//These test the ability to set a threshold to a counter and react using emberAfCounterRolloverHandler
+//These commands use the counters-plugin. 
+expect("full2","plugin counters print",".*Mac Rx Bcast.*",1000);
+networkWait(7000);
+send("full2","plugin counters reset-thresholds");
+send("full2","plugin counters clear");
+expect("full2","plugin counters simple-print",".*Mac Rx Bcast: 0.*",1000);
+networkWait(7000);
+expect("full2","plugin counters print-thresholds",".*Mac Rx Bcast: 65535.*",1000);
+networkWait(7000);
+send("full2","plugin counters clear");
+
+// Counter 3 is EMBER_COUNTER_MAC_TX_UNICAST_SUCCESS. The full2 node should be sending
+// reports for the simple metering cluster about every 10 seconds or so, so we should
+// hit our counter threshold after about 30 seconds.
+send("full2","plugin counters set-threshold 3 1");
+expect("full2", ".*Counter 3 rolled over.*", 30000);
+
+//This tests that the counter rollover handler is called only once
+//when a counter exceeds it's threshold as opposed to each time the counter
+//event occurs after it's exceeded the threshold
+send("full2", "zcl global read 0x0700 0x0000");
+nexpect("full2","send 0 1 1", ".*Counter 3 rolled over.*");
+
+//Replace the threshold to it's maximum value so the counter doesn't overflow
+networkWait(10000);
+
+// Discover full1's client to server commands received for the window covering cluster
+send("full2", "zcl global direction " + clientToServer);
+expect("full2", 
+       "zcl global disc-com-rec 0x0102 0x00 0xff",
+       "buffer.*");
+expect("full2",
+       "send 0 1 1",
+// There should be 10 client->server commands received open, close, stop, goto lift %, goto tilt %,
+// lift setpoint, lift value, tilt setpoint, tilt value, program setpoint.
+        "Discover Commands response.*Received IDs: 0x00 0x01 0x02 0x04 0x05 0x07 0x08.*");
+networkWait(timeout);
+
+
+// Test write to mfg specific transition time in on/off cluster att id 0001,
+// mfg code 0x1002
+send("full2", "raw 0x0006 {04 02 10 00 02 01 00 20 ac}");
+send("full2", "send 0 1 1");
+expect("full1", ".*WRITE: clus 0006 attr 0001 OK.*");
+
+
+// Test write to mfg specific transition time in on/off cluster att id 0001,
+// mfg code 0x1049
+send("full2", "raw 0x0006 {04 49 10 00 02 01 00 21 ca ac}");
+send("full2", "send 0 1 1");
+expect("full1", ".*WRITE: clus 0006 attr 0001 OK.*");
+
+
+// Test read of mfg specific transition time in on/off cluster to make sure 
+// it now has the right value. Att id 0001 MfgCode 1002
+send("full2", "raw 0x0006 {04 02 10 01 00 01 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:20, val:AC.*");
+
+// Test read of mfg specific transition time in on/off cluster to make sure 
+// it now has the right value. Att id 0001 MfgCode 1049
+send("full2", "raw 0x0006 {04 49 10 01 00 01 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:21, val:CAAC.*");
+
+// Test for if tokenized mfg specific attributes are preserved across reboot. 
+reboot("full2");
+
+networkWait(timeout);
+
+send("full2", "zcl mfg-code 0x1002");
+send("full2", "zcl global read 0x0006 0x0001");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:20, val:AC.*");
+
+// Test read of mfg specific transition time in on/off cluster to make sure 
+// it now has the right value. Att id 0001 MfgCode 1049
+send("full2", "raw 0x0006 {04 49 10 01 00 01 00}");
+send("full2", "send 0 1 1");
+expect("full2", ".*type:21, val:CAAC.*");
+
+// Settle down so that generated stack trace will be complete. Without that, the generated radio-trace.log file
+// has a broken group at the end.
+send("full2", "network leave");
+send("full1", "network leave");
+networkWait(timeout);

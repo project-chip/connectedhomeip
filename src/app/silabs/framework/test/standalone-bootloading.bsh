@@ -1,0 +1,45 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"gateway", "light"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation-ezsp/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+int timeout = 50000;
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+networkWait(timeout);
+formAndJoinDevices(devices);
+
+String nodeIdLight = nodeId("light");
+networkWait(2000);
+
+// Have the gateway send a bootload query to the light
+expect("gateway",
+       "plugin standalone-bootloader-server query",
+       ".*Received Standalone Bootloader message \\(82\\): Query Response",
+       5000);
+networkWait(2000);
+
+// Placeholder to add more tests once we get standalone bootloading working in
+// simulation

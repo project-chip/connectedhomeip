@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-tunneling-server" name="Plugin Commands: Tunneling Server">
+    <description>
+      The Tunneling Server Plugin contributes several commands to the application framework CLI. These commands are used for the transfer of data over an opened tunnel.
+    </description>
+  </group>
+  <command cli="plugin tunneling-server transfer" functionName="emAfPluginTunnelingServerCliTransfer" group="plugin-tunneling-server">
+    <description>
+      Transfer data to a client through a Tunneling cluster tunnel.
+    </description>
+    <arg name="tunnelIndex" type="INT16U" description="The identifier of the tunnel through which to send the data." />
+    <arg name="data"        type="OCTET_STRING"  description="The data to send through the tunnel." />
+  </command>
+  <command cli="plugin tunneling-server busy" functionName="emberAfPluginTunnelingServerToggleBusyCommand" group="plugin-tunneling-server">
+    <description>
+      This command can be used as a test harness for testing a client's handling of a server that returns busy.
+    </description>
+  </command>
+  <command cli="plugin tunneling-server print" functionName="emAfPluginTunnelingServerCliPrint" group="plugin-tunneling-server">
+    <description>
+      Print out the status of active tunnels.
+    </description>
+  </command>
+</cli>

@@ -1,0 +1,14 @@
+/** @brief Get Password
+ *
+ * This callback will be implemented by an esi to provide device specific
+ * password information.
+ *
+ * @param senderNodeId   Ver.: always
+ * @param passwordType   Ver.: always
+ * @param passwordInfo   Ver.: always
+ */
+void emberAfPluginDeviceManagementServerGetPasswordCallback(EmberNodeId senderNodeId,
+                                                            EmberAfDeviceManagementPasswordType passwordType,
+                                                            EmberAfDeviceManagementPassword passwordInfo)
+{
+}

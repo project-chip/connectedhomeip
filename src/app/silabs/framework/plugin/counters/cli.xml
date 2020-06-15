@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-counters" name="Plugin Commands: Counters">
+    <description>This plugin provides APIs and CLI commands for reading and manipulating counters that record different events in the stack.</description>
+  </group>
+  <command cli="plugin counters print" functionName="emberAfPluginCountersPrintCommand" group="plugin-counters">
+    <description>
+      Print all counter values and clear them.
+    </description>
+  </command>
+  <command cli="plugin counter print-counter-type" functionName="emberAfPluginCounterPrintCounterTypeCommand" group="plugin-counters">
+    <description>
+      Print value of this particular counter.
+    </description>
+    <arg name="type" type="INT8U" description="The counter type
+      to print." />
+  </command>
+  <command cli="plugin counters simple-print" functionName="emberAfPluginCountersSimplePrintCommand" group="plugin-counters">
+    <description>
+      Print all counter values.
+    </description>
+  </command>  
+  <command cli="plugin counters clear" functionName="emberAfPluginCountersClear" group="plugin-counters">
+    <description>
+      Clear all counter values.
+    </description>
+  </command>
+  <command cli="plugin counters print-thresholds" functionName="emberAfPluginCountersPrintThresholdsCommand" group="plugin-counters">
+    <description>
+      Prints the thresholds of all the counters.
+    </description>
+  </command>  
+  <command cli="plugin counters set-threshold" functionName="emberAfPluginCountersSetThresholdCommand" group="plugin-counters">
+    <description>
+      Set a threshold value for a particular type of counter.
+    </description>
+    <arg name="type" type="INT8U" description="type of counter" />
+    <arg name="threshold" type="INT16U" description="Threshold Value" />
+  </command>
+  <command cli="plugin counters reset-threshold" functionName="emberAfPluginCountersResetThresholds" group="plugin-counters">
+    <description>
+      Resets all thresholds values to 0xFFFF.
+    </description>
+  </command>
+  <command cli="plugin counters send-request" functionName="emberAfPluginCountersSendRequestCommand" group="plugin-counters">
+    <description>
+      Sends a request for ota counters
+    </description>
+  </command>  
+</cli>

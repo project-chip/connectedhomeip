@@ -1,0 +1,9 @@
+/** @brief Erase Complete
+ *
+ * This is called when an EEPROM erase operation has completed.
+ *
+ * @param success The result of the erase operation. Ver.: always
+ */
+void emberAfPluginOtaStorageSimpleEepromEraseCompleteCallback(bool success)
+{
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-device-table" name="Plugin Commands: Device Table">
+    <description>
+      The device table plugin demonstrates tracking devices as they join the
+	  gateway's ZigBee network.
+    </description>
+  </group>
+  <command cli="plugin device-table disc" functionName="emAfDeviceTableDiscoverPresentNodeCommand" group="plugin-device-table">
+    <description>
+      Force a (re)discovery of the device based on the node ID.
+    </description>
+    <arg name="nodeId" type="INT16U" description = "Node ID to discover." />
+  </command>
+  <command cli="plugin device-table isend" functionName="emAfDeviceTableIndexSendCommand" group="plugin-device-table">
+    <description>
+      Send to device in device table.
+    </description>
+    <arg name="index"   type="INT16U"  description = "Device table index." />
+  </command>
+  <command cli="plugin device-table send" functionName="emAfDeviceTableSendCommand" group="plugin-device-table">
+    <description>
+      Send to device in device table.
+    </description>
+    <arg name="eui64"   type="IEEE_ADDRESS"  description = "EUI64 of device." />
+    <arg name="endpoint"   type="INT8U"  description = "Endpoint of device." />
+  </command>
+  <command cli="plugin device-table irepair" functionName="emAfDeviceTableIndexRouteRepairCommand" group="plugin-device-table">
+    <description>
+      Kick off device route repair.
+    </description>
+    <arg name="index"   type="INT16U"  description = "Device table index." />
+  </command>
+  <command cli="plugin device-table repair" functionName="emAfDeviceTableRouteRepairCommand" group="plugin-device-table">
+    <description>
+      Kick off device route repair.
+    </description>
+    <arg name="eui64"   type="IEEE_ADDRESS"  description = "EUI64 of device." />
+  </command>
+  <command cli="plugin device-table iremove" functionName="emAfDeviceTableIndexRemoveCommand" group="plugin-device-table">
+    <description>
+      Remove device from device table.
+    </description>
+    <arg name="index"   type="INT16U"  description = "Device table index." />
+  </command>
+  <command cli="plugin device-table remove" functionName="emAfDeviceTableRemoveCommand" group="plugin-device-table">
+    <description>
+      Remove device from device table.
+    </description>
+    <arg name="eui64"   type="IEEE_ADDRESS"  description = "EUI64 of device." />
+  </command>
+  <command cli="plugin device-table save" functionName="emAfDeviceTableSaveCommand" group="plugin-device-table">
+    <description>
+      Save the file.
+    </description>
+  </command>
+  <command cli="plugin device-table load" functionName="emAfDeviceTableLoadCommand" group="plugin-device-table">
+    <description>
+      Load the file.
+    </description>
+  </command>
+  <command cli="plugin device-table leave" functionName="emAfPluginDeviceTableSendLeaveCommand" group="plugin-device-table">
+    <description>
+      Remove device from device table.
+    </description>
+    <arg name="eui64"   type="IEEE_ADDRESS"  description = "EUI64 of device." />
+  </command>
+  <command cli="plugin device-table clear" functionName="emberAfDeviceTableClear" group="plugin-device-table">
+    <description>
+      Clear the device table
+    </description>
+  </command>
+  <command cli="plugin device-table print" functionName="emberAfDeviceTablePrintDeviceTable" group="plugin-device-table">
+    <description>
+      Print the device table.
+    </description>
+  </command>
+</cli>

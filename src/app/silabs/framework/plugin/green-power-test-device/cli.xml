@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-green-power-test-device" name="Plugin Commands: Green Power Test Device">
+    <description>
+      The Green Power Test Device plugin contributes CLI commands to the application framework to be used for generating commands from a GPD
+    </description>
+  </group>
+  <command cli="plugin green-power-test-device send-test" functionName="emberAfPluginGreenPowerTestDeviceSendTest" group="plugin-green-power-test-device">
+    <description>
+      Send a test GPD command
+    </description>
+    <arg name="gpdCommandId" type="INT8U" description="gpd command ID" />
+    <arg name="gpdCommandPayload" type="OCTET_STRING" description="gpd command payload" />
+  </command>
+  <command cli="plugin green-power-test-device send-ieee-test" functionName="emberAfPluginGreenPowerTestDeviceSendTestIeee" group="plugin-green-power-test-device">
+    <description>
+      Send a test GPD command
+    </description>
+    <arg name="gpdCommandId" type="INT8U" description="gpd command ID" />
+    <arg name="gpdCommandPayload" type="OCTET_STRING" description="gpd command payload" />
+  </command>
+  <command cli="plugin green-power-test-device send-comm" functionName="emberAfPluginGreenPowerTestDeviceSendCommission" group="plugin-green-power-test-device">
+    <description>
+      Send a test GPD command
+    </description>
+    <arg name ="type" type="INT8U" description="0 for tx only, 1 for bidir" />
+  </command>
+  <command cli="plugin green-power-test-device send-channel-request" functionName="emberAfPluginGreenPowerTestDeviceSendChannelRequest" group="plugin-green-power-test-device">
+    <description>
+      Send a test GPD command
+    </description>
+    <arg name="channel"    type="INT8U"       description="Channel to set"       />
+  </command>
+  <command cli="plugin green-power-test-device set-phy-channel" functionName="emberAfPluginGreenPowerTestDeviceSetRadioChannel" group="plugin-green-power-test-device">
+    <description>
+      set the phy channel
+    </description>
+    <arg name="channel"    type="INT8U"       description="Channel to set"       />
+   </command>
+   <command cli="plugin green-power-test-device setup-gpd" functionName="emberAfPluginGreenPowerTestDeviceSetupGpd" group="plugin-green-power-test-device">
+     <description>
+       init a GPD
+     </description>
+     <arg name="srcId" type="INT32U" description="gpd src ID" />
+     <arg name="key" type="OCTET_STRING" description="the key" />
+     </command>
+   <command cli="plugin green-power-test-device setup-ieee-gpd" functionName="emberAfPluginGreenPowerTestDeviceSetupGpdIeee" group="plugin-green-power-test-device">
+     <description>
+       init a Ieee GPD
+     </description>
+     <arg name="eui" type="OCTET_STRING" description="gpd Ieee ID" />
+     <arg name="key" type="OCTET_STRING" description="the key" />
+     </command>
+</cli>

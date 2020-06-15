@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-aps-link-key-authorization" name="Plugin Commands: APS Link Key Authorization">
+    <description>This plugin provides a set of APIs and CLI commands for managing APS link key authorization</description>
+  </group>
+  <command cli="plugin aps-link-key-auth info" functionName="emberAfPluginApsLinkKeyAuthorizationCliInfo" group="plugin-aps-link-key-authorization">
+    <description>
+      List information on the current state of APS link key authorization.
+    </description>
+  </command>
+  <command cli="plugin aps-link-key-auth enable" functionName="emberAfPluginApsLinkKeyAuthorizationCliEnable" group="plugin-aps-link-key-authorization">
+    <description>
+      Enable or disable APS link key authorization for all clusters.
+    </description>
+    <arg name="enable" type="INT8U" description="Set the enable state of the APS link key security." />
+  </command>
+  <command cli="plugin aps-link-key-auth clear-exempt-list" functionName="emberAfPluginApsLinkKeyAuthorizationCliClear" group="plugin-aps-link-key-authorization">
+    <description>
+      Clears the exempt list.
+    </description>
+  </command>
+  <command cli="plugin aps-link-key-auth enable-with-exempt-list" functionName="emberAfPluginApsLinkKeyAuthorizationCliEnableWithExemptList" group="plugin-aps-link-key-authorization">
+    <description>
+      Enables or disables APS link key authorization and setup the exempt list.
+    </description>
+    <arg name="enable" type="INT8U" description="Set the enable state of the APS link key security." />
+    <arg name="exemptClusterList" type="INT16U" array="true" description="List of exempted clusters." />
+  </command>
+  <command cli="plugin aps-link-key-auth add-cluster-exempted" functionName="emberAfPluginApsLinkKeyAuthorizationCliAddClusterExempted" group="plugin-aps-link-key-authorization">
+    <description>
+      Adds an entry to the cluster exempt list.
+    </description>
+    <arg name="cluster" type="INT16U" description="Cluster to be added to the exempt list." />
+  </command>
+</cli>

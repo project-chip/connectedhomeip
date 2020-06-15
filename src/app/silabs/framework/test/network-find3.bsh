@@ -1,0 +1,38 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[] {"coordinator1", "joiner", "coordinator2"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+networkFindUnused("coordinator1", 5000);
+expect("coordinator1", "network pjoin 0xFF", ".*pJoin for 255 sec: 0x00");
+
+networkFindUnused("coordinator2", 5000);
+expect("coordinator2", "network pjoin 0xFF", ".*pJoin for 255 sec: 0x00");
+
+networkFindJoinable("joiner", 5000);
+expectMultiline("joiner",
+                "network leave", 
+                new String[] { 
+                  ".*EMBER_NETWORK_DOWN",
+                  "Continue joinable network search",
+                  "Nwk found, ch [0-9]{2}, panId 0x[0-9a-fA-F]{4}, joining",
+                },
+                4000);
+expectNetworkUp("joiner", 5000);
+expect("joiner", "Network find complete", 66000); // 1 binary minute plus some wiggle room

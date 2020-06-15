@@ -1,0 +1,169 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("*** 2 nodes, no need for multihop.");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "switch"};
+String[] socImages = new String[] {
+  "build/af-test-apps/Z3Light-simulation/Z3Light",
+  "build/af-test-apps/Z3Switch-simulation/Z3Switch",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Z3Light-simulation-ezsp/Z3Light",
+  "build/af-test-apps/Z3Switch-simulation-ezsp/Z3Switch",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+lazyExpect = true;
+
+void RESET(String node)
+{
+  send(node, "option binding-table clear");
+  send(node, "keys clear");
+  expect(node, "net leave", "EMBER_NETWORK_DOWN");
+  reboot(node);
+  networkWait(DEFAULT_TIMEOUT);
+}
+
+void testJoining(String device)
+{
+  dbg.println("=== Testing join from line " + this.namespace.getInvocationLine() + " ===");
+
+  // Try to join with the device.
+  expect(device,
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT << 5);
+  
+  // The device should extend the network by broadcasting permit join.
+  expect(device,
+         "Broadcasting permit join: 0x00",
+         DEFAULT_TIMEOUT << 1);
+
+  // Make sure the device used that distributed key.
+  expect(device,
+         "keys print",
+         "D0 D1 D2 D3 D4 D5 D6 D7  D8 D9 DA DB DC DD DE DF");
+
+  // Wait a second for thing to die down.
+  networkWait(DEFAULT_TIMEOUT);
+}
+
+void testFindingAndBinding()
+{
+  // EMAPPFWKV2-1617: a button press will put the light back in find and bind
+  // target mode. This means when we trigger finding and binding on the switch,
+  // it will create bindings to the light this time.
+  network.pressButton("light", "0");
+  network.releaseButton("light", "0");
+  expect("light", "Find and bind target start: 0x00");
+
+  expect("switch",
+         "plugin find-and-bind initiator 1",
+         "Find and bind initiator complete: 0x00",
+         DEFAULT_TIMEOUT << 2);
+  expect("switch",
+         "option binding-table print",
+         "UNICA.*0x0006.*" + nodeId("light"));
+}
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices,
+                  socImages,
+                  hostImages,
+                  ncpImage);
+setupEncryption();
+
+// Wait for the nodes to reset.
+networkWait(DEFAULT_TIMEOUT);
+
+// The light will perform network steering on boot. Since there are no
+// other networks to join, it will form its own distributed network.
+// The light will open its network.
+nexpect("light", "Open network for joining: 0x00", DEFAULT_TIMEOUT << 5);
+expect("light", "net pjoin 255", "f");
+
+// Make sure the light didn't send itself a node descriptor request.
+nexpect("light",
+        "RX: Node Desc Resp, Matches: 0x0000");
+
+// The short address of the light should not be 0.
+assert(!nodeId("light").equals("0x0000"));
+
+// Check to make sure it is using the correct security key (distributed).
+expect("light",
+       "keys print",
+       "D0 D1 D2 D3 D4 D5 D6 D7  D8 D9 DA DB DC DD DE DF");
+
+// Join with the switch.
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+testJoining("switch");
+
+// The switch should perform finding and binding with the light.
+// The light started identifying as soon as it brought its network up.
+expect("switch",
+       "option binding-table print",
+       "UNICA.*0x0006.*" + nodeId("light"));
+
+// We should be able to turn the light ON...
+send("switch", "zcl on-off on");
+send("switch", "bsend 1");
+networkWait(1000); // wait
+expect("light", "read 1 6 0 1", "^01 $");
+
+// ...and we should be able to turn the light OFF.
+send("switch", "zcl on-off off");
+send("switch", "bsend 1");
+networkWait(1000); // wait
+expect("light", "read 1 6 0 1", "^00 $");
+
+// Reset the switch to factory new so that we make sure we can rejoin.
+RESET("switch");
+
+// Open the network and wait for over 5 minutes. The network should no longer
+// be open, and the switch should not be able to join.
+expect("light",
+       "plugin network-creator-security open-network",
+       ".*: Open network: 0x00");
+networkWait(5 * 60 * 10000); // 5 minutes * 60 seconds * 1000 milliseconds
+nexpect("switch",
+        "plugin network-steering start 0",
+        "EMBER_NETWORK_UP",
+        DEFAULT_TIMEOUT << 5);
+
+// Now reopen the network. The network should be open for 5 minutes, so
+// let's wait for at least one permit join timeout to make sure the
+// network-creator-security plugin keeps the network open.
+expect("light",
+       "plugin network-creator-security open-network",
+       ".*: Open network: 0x00");
+expect("light",
+       ".*: Open network: 0x00",
+       0xFE * 1000); // 254 seconds (max permit join timeout) to milliseconds
+
+// The switch should be able to join again.
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+testJoining("switch");
+
+// Wait for commissioning to finish. Since the light is no longer identifying
+// that means the switch should not form any bindings.
+expect("light", "read 1 0x0003 0x0000 1", "00 00");
+networkWait(DEFAULT_TIMEOUT << 2);
+nexpect("switch",
+        "option binding-table print",
+        "UNICA.*0x0006.*" + nodeId("light"));
+
+// Run finding and binding.
+testFindingAndBinding();
+
+// EMZIGBEE-1294: make sure that we can successfully run finding and binding
+// repeatedly with the switch and light for the purpose of demonstration.
+for (int i = 0; i < 5; i++) {
+  testFindingAndBinding();
+}

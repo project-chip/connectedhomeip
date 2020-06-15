@@ -1,0 +1,544 @@
+#ISD afv6
+# Simplicity Studio version: 5.8.0.qualifier
+FrameworkDirectory:app/framework
+
+appId: znet
+
+frameworkVariant: simulation
+
+#  Output directory which is used as a root for all generated files. The actual
+#  files relative to that directory are defined by individual file name.
+GenerationDirectory:__SAMPLE_APPLICATION__
+
+
+#  Unique identifier for this device. This string should be in a form of a C
+#  identifier, as it will be used in both generated variable, macros, as well as
+#  file names. You should generally not use characters which are not valid
+#  characters in a C identifier here.
+DeviceName:ZllSampleController
+
+#  In case of a network coprocessor, this lists a host processor used.
+
+
+
+#  Ember network processor targeted for this application.
+Platform:simulation
+
+
+# Setup configurations
+{setupId:additionalFiles
+}
+{setupId:boardHeader
+allowMissingHeader:false
+useHeaderInPlace:false
+}
+{setupId:bookkeeping
+}
+{setupId:bootloader
+em357=application,
+}
+{setupId:callbackConfiguration
+}
+{setupId:commandLineConfiguration
+on
+}
+{setupId:debugConfiguration
+on
+area name off
+appSerial=1
+}
+{setupId:eventConfiguration
+buttonEventControl,buttonEventHandler
+identifyEventControl,identifyEventHandler
+}
+{setupId:halOptions
+}
+{setupId:hwConfig
+featureLevel=1
+active=true
+}
+{setupId:information
+\{key:description
+ZigBee Light Link Sample Applications
+
+These sample applications demonstrate basic ZigBee Light Link functionality
+between a light and a sleepy controller.
+
+At startup, the light will automatically perform an energy scan in order to
+find an available channel and will then form a network on that channel.  Once
+it has formed a network, the light will wait for a touch link from a
+controller.  Once touch linked, the light will toggle its LED in response to
+on/off commands from a controller.
+
+The controller will sleep until button 0 is pressed.  If the controller is not
+joined to a network, a button press will cause the controller to wake up and
+perform a touch link.  If joined, a button press will cause the controller to
+wake up and broadcast an on/off command to all nodes in the network.  If the
+controller has slept long enough to have aged out of its parent's child table,
+the controller will automatically attempt to rejoin the network prior to
+broadcasting the on/off command.  Once an action completes, the controller will
+return to deep sleep.
+
+Both the controller and the light provide feedback during touch linking by
+flashing an LED and playing a tune.  A rising two-tone tune indicates a
+successful operation while a falling two-tone tune indicates a failure.  A
+brief tone indicates that the device has performed a long-running action and is
+waiting for a result.
+
+All application code is contained in the _callbacks.c files within each
+application directory.
+
+To use each application:
+
+1. Load the included application configuration file (i.e., the .isc file)
+into Simplicity Studio.
+
+2. Enter a new name for the application in the pop-up window.
+
+3. Generate the application's header and project/workspace files by
+clicking on the "Generate" button in Simplicity Studio.  The application
+files will be generated in the app/builder/<name> directory in the stack
+installation location.
+
+4. Load the generated project file into the appropriate compiler and build
+the project.
+
+5. Load the binary image onto a device using Simplicity Studio.
+\}
+}
+{setupId:macros
+}
+{setupId:mpsi
+- mappings
+- custom messages
+}
+{setupId:pluginService
+}
+{setupId:quizz
+}
+{setupId:serial
+}
+{setupId:template
+--version:2
+--backupValues:
+simeepromSize=8192
+headerSize=256
+}
+{setupId:token
+}
+{setupId:zclAfv2
+intMap:ManufacturingCode = 4098
+intMap:ReportTableSize = 5
+intMap:Endpoint = 10
+intMap:DeviceVersion = 0
+intMap:DefaultDestinationEndpoint = 10
+intMap:ProfileId = -1
+intMap:DeviceId = -1
+
+intMap:DefaultResponsePolicy = 0
+boolMap:EnableStandardReporting = false
+boolMap:EnableInterPanSend = false
+boolMap:EnableInterPanReceive = false
+boolMap:SupportCommandDiscovery = true
+boolMap:EnableKeySwitch = false
+boolMap:LowRamConcentrator = true
+boolMap:EnableAttributeRangeChecking = false
+boolMap:ReceiveSupportedZdoRequests = false
+boolMap:HandleUnsupportedZdoRequests = false
+boolMap:HandleEndpointZdoRequests = false
+boolMap:HandleBindingZdoRequests = false
+boolMap:LegacyCli = false
+boolMap:AddCustomCli = false
+boolMap:IncludeCommandDescriptions = true
+boolMap:GenerateCallbacksFile = true
+boolMap:ManufacturerCodeDefaultIsZero = true
+beginAttrList:BOUNDED
+cl:0x0000, at:0x0007, di:server, mf:0x0000
+cl:0x0000, at:0x0003, di:server, mf:0x0000
+cl:0x0000, at:0x0002, di:server, mf:0x0000
+cl:0x0000, at:0x0001, di:server, mf:0x0000
+cl:0x0000, at:0x0000, di:server, mf:0x0000
+endAttrList:BOUNDED
+configuredNetwork:*type:ZIGBEE_PRO, name:Primary
+beginEndpointType:Primary
+device:ZLL-noncolorremote
+deviceId:2080
+profileId:260
+endEndpointType
+configuredEndpoint:*ep:1,pi: -1,di:-1,dv:2,ept:Primary,nwk:Primary
+callbacks:emberAfHalButtonIsrCallback
+callbacks:emberAfPluginEndDeviceSupportPollCompletedCallback
+callbacks:emberAfPluginIdleSleepOkToSleepCallback
+callbacks:emberAfPluginIdleSleepWakeUpCallback
+callbacks:emberAfPluginIdleSleepOkToIdleCallback
+callbacks:emberAfPluginIdleSleepActiveCallback
+callbacks:emberAfPluginZllCommissioningCommonInitialSecurityStateCallback
+callbacks:emberAfPluginZllCommissioningCommonTouchLinkCompleteCallback
+callbacks:emberAfPluginZllCommissioningClientTouchLinkFailedCallback
+callbacks:emberAfPluginZllCommissioningServerGroupIdentifierCountCallback
+callbacks:emberAfPluginZllCommissioningServerGroupIdentifierCallback
+callbacks:emberAfPluginZllCommissioningServerEndpointInformationCountCallback
+callbacks:emberAfPluginZllCommissioningServerEndpointInformationCallback
+callbacks:emberAfPluginZllCommissioningServerIdentifyCallback
+callbacks:emberAfPluginZllCommissioningCommonResetToFactoryNewCallback
+}
+{setupId:zclCustomizer
+}
+{setupId:zigbeeStack
+boolMap:EnableZdoSerialCommands = false
+boolMap:EnableBindings = true
+boolMap:EnableEndDeviceBind = false
+boolMap:EnableReceiveStatistics = false
+boolMap:UseEcc163k1 = false
+boolMap:UseEcc283k1 = false
+boolMap:PreconfiguredKeyEnabled = false
+boolMap:NetworkKeyEnabled = false
+boolMap:FragmentationEnable = false
+boolMap:EnableConcentrator = true
+boolMap:UseSeInstallCodes = false
+boolMap:TxPowerModeUseToken = true
+boolMap:BoostMode = false
+boolMap:AlternatePowerMode = false
+byteArrayMap:PreconfiguredKey = 56 77 77 77 77 77 77 77 77 77 77 77 77 77 77 77
+byteArrayMap:NetworkKey = 12 33 33 33 33 33 33 33 33 33 33 33 33 33 33 33
+byteArrayMap:NetworkKey2 = AB CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC
+intMap:NumberOfBindings = 2
+intMap:AddressTableSize = 2
+intMap:TrustCenterCacheSize = 2
+intMap:LinkKeyMode = 2
+intMap:FragmentationMaxSize = 255
+intMap:KeySwitchType = 0
+intMap:KeySwitchInterval = 604800
+intMap:KeyGenerationType = 0
+intMap:HeartbeatLed = 0
+intMap:FirstButton = 1
+intMap:SecondButton = 2
+configuredNetworkSecurity:Primary|ZIGBEE_PRO=HA
+configuredNetworkZigbeeDeviceType:Primary|ZIGBEE_PRO=ZA_SLEEPY_END_DEVICE
+CliCommandSet:Full
+}
+appPlugin:adc,true
+
+appPlugin:address-table,false
+appPlugin:aes-cmac,false
+appPlugin:antenna,false
+appPlugin:antenna-cli,false
+appPlugin:antenna-stub,true
+
+appPlugin:aps-link-key-authorization,false
+appPlugin:barrier-control-server,false
+appPlugin:basic,false
+appPlugin:battery-monitor,false
+appPlugin:battery-monitor-stub,false
+appPlugin:binding-table-library,true
+
+appPlugin:ble,false
+appPlugin:ble-psstore-library,false
+appPlugin:bulb-pwm-cli,false
+appPlugin:bulb-pwm-driver,false
+appPlugin:bulb-ui,false
+appPlugin:button-interface,false
+appPlugin:button-interface-stub,false
+appPlugin:button-joining,false
+appPlugin:calendar-client,false
+appPlugin:calendar-common,false
+appPlugin:calendar-server,false
+appPlugin:cbke-163k1-library,false
+appPlugin:cbke-283k1-library,false
+appPlugin:cbke-library-core,false
+appPlugin:cbke-library-dsa-sign,false
+appPlugin:cbke-library-dsa-verify,false
+appPlugin:cbke-library-dsa-verify-283k1,false
+appPlugin:ccm-encryption,true
+
+appPlugin:cjson,false
+appPlugin:cli-password-protection,false
+appPlugin:coexistence,false
+appPlugin:coexistence-cli,false
+appPlugin:coexistence-stub,true
+
+appPlugin:color-control,false
+appPlugin:color-control-server,false
+appPlugin:command-relay,false
+appPlugin:comms-hub-function,false
+appPlugin:comms-hub-function-sub-ghz,false
+appPlugin:compact-logger,false
+appPlugin:concentrator,false
+appPlugin:configuration-server,false
+appPlugin:connection-manager,false
+appPlugin:coulomb-counter,false
+appPlugin:counters,false
+appPlugin:critical-message-queue,false
+appPlugin:debug-basic-library,true
+
+appPlugin:debug-extended-library,false
+appPlugin:debug-jtag,true
+
+appPlugin:debug-jtag-stub,false
+appPlugin:delayed-join,false
+appPlugin:device-database,false
+appPlugin:device-management-client,false
+appPlugin:device-management-server,false
+appPlugin:device-query-service,false
+appPlugin:device-table,false
+appPlugin:diagnostic-server,false
+appPlugin:dido,false
+appPlugin:dmp-demo-ui,false
+appPlugin:dmp-tuning,false
+appPlugin:dmp-ui-demo,false
+appPlugin:dmp-ui-demo-stub,false
+appPlugin:door-lock-server,false
+appPlugin:dotdot-mfg-certs,false
+appPlugin:drlc,false
+appPlugin:drlc-server,false
+appPlugin:ecc-library-163k1,false
+appPlugin:ecc-library-283k1,false
+appPlugin:eeprom,false
+appPlugin:eeprom-powerdown,false
+appPlugin:electrical-measurement-server,false
+appPlugin:em4,false
+appPlugin:ember-minimal-printf,true
+
+appPlugin:end-device-bind-library,false
+appPlugin:end-device-support,true
+
+appPlugin:esi-management,false
+appPlugin:events-client,false
+appPlugin:events-server,false
+appPlugin:exosite-demo,false
+appPlugin:extdev,false
+appPlugin:ezmode-commissioning,false
+appPlugin:ezradiopro,false
+appPlugin:fem-control,false
+appPlugin:find-and-bind-initiator,false
+appPlugin:find-and-bind-target,false
+appPlugin:form-and-join,true
+
+appPlugin:fragmentation,false
+appPlugin:gas-proxy-function,false
+appPlugin:gbcs-compatibility,false
+appPlugin:gbcs-device-log,false
+appPlugin:gbcs-gas-meter,false
+appPlugin:gbz-message-controller,false
+appPlugin:general-response-commands,false
+appPlugin:generic-interrupt-control,false
+appPlugin:generic-interrupt-control-stub,false
+appPlugin:glib,false
+appPlugin:gp-library,false
+appPlugin:source-route-library,true
+appPlugin:gpio-sensor,false
+appPlugin:gpio-sensor-stub,false
+appPlugin:green-power-client,false
+appPlugin:green-power-common,false
+appPlugin:green-power-server,false
+appPlugin:green-power-test-device,false
+appPlugin:groups-client,false
+appPlugin:groups-server,false
+appPlugin:hal-library,true
+
+appPlugin:hal-library-rtos,false
+appPlugin:hc-11073-tunnel,false
+appPlugin:heartbeat,false
+appPlugin:humidity-si7021,false
+appPlugin:humidity-si7021-stub,false
+appPlugin:i2c-driver,false
+appPlugin:i2c-driver-stub,false
+appPlugin:ias-zone-client,false
+appPlugin:ias-zone-server,false
+appPlugin:identify,false
+appPlugin:identify-feedback,false
+appPlugin:idle-sleep,true
+
+appPlugin:illuminance-measurement-server,false
+appPlugin:illuminance-si1141,false
+appPlugin:illuminance-si1141-stub,false
+appPlugin:install-code-library,false
+appPlugin:install-code-read,false
+appPlugin:interpan,true
+
+appPlugin:key-establishment,false
+appPlugin:led-blink,false
+appPlugin:led-blink-stub,false
+appPlugin:led-dim-pwm,false
+appPlugin:led-rgb-pwm,false
+appPlugin:led-temp-pwm,false
+appPlugin:level-control,false
+appPlugin:libcoap,false
+appPlugin:linked-list,false
+appPlugin:low-voltage-shutdown,false
+appPlugin:lqi-override,false
+appPlugin:lwip,false
+appPlugin:lwip-callback-tests,false
+appPlugin:lwip-interface,false
+appPlugin:lwip-stats,false
+appPlugin:mac-address-filtering,false
+appPlugin:manufacturing-library,false
+appPlugin:manufacturing-library-cli,false
+appPlugin:manufacturing-library-ota,false
+appPlugin:mbedtls,true
+
+appPlugin:mbedtls-multiprotocol,false
+appPlugin:messaging-client,false
+appPlugin:messaging-server,false
+appPlugin:meter-mirror,false
+appPlugin:meter-snapshot-client,false
+appPlugin:meter-snapshot-server,false
+appPlugin:meter-snapshot-storage,false
+appPlugin:metering-server,false
+appPlugin:micrium-rtos,false
+appPlugin:mn-price-passthrough,false
+appPlugin:mpsi,false
+appPlugin:mpsi-ipc,false
+appPlugin:mpsi-storage,false
+appPlugin:multi-network-library,false
+appPlugin:network-creator,false
+appPlugin:network-creator-security,false
+appPlugin:network-find,false
+appPlugin:network-find-sub-ghz,false
+appPlugin:network-steering,false
+appPlugin:nvm3,false
+appPlugin:nvm3-extflash,false
+appPlugin:nvm3-simulation,false
+appPlugin:occupancy-pyd1698,false
+appPlugin:occupancy-pyd1698-cli,false
+appPlugin:occupancy-pyd1698-stub,false
+appPlugin:occupancy-sensor-server,false
+appPlugin:on-off,false
+appPlugin:ota-bootload,false
+appPlugin:ota-client,false
+appPlugin:ota-client-policy,false
+appPlugin:ota-common,false
+appPlugin:ota-server,false
+appPlugin:ota-server-policy,false
+appPlugin:ota-storage-common,false
+appPlugin:ota-storage-posix-filesystem,false
+appPlugin:ota-storage-simple,false
+appPlugin:ota-storage-simple-eeprom,false
+appPlugin:ota-storage-simple-ram,false
+appPlugin:pa,true
+
+appPlugin:packet-handoff,false
+appPlugin:packet-validate-library,true
+
+appPlugin:paho.mqtt.c,false
+appPlugin:partner-link-key-exchange,false
+appPlugin:permit-join-manager,false
+appPlugin:poll-control-client,false
+appPlugin:poll-control-server,false
+appPlugin:power-configuration-server,false
+appPlugin:power-consumption-model,false
+appPlugin:power-meter-cs5463,false
+appPlugin:power-meter-cs5463-stub,false
+appPlugin:prepayment-client,false
+appPlugin:prepayment-server,false
+appPlugin:prepayment-snapshot-storage,false
+appPlugin:price-client,false
+appPlugin:price-common,false
+appPlugin:price-server,false
+appPlugin:psstore,false
+appPlugin:pti,true
+
+appPlugin:rail-library,true
+
+appPlugin:rail-library-mp,false
+appPlugin:relative-humidity-measurement-server,false
+appPlugin:reporting,false
+appPlugin:ring-buffer,false
+appPlugin:sb1-gesture-sensor,false
+appPlugin:sb1-gesture-sensor-stub,false
+appPlugin:scan-dispatch,false
+appPlugin:scenes,false
+appPlugin:scenes-client,false
+appPlugin:security-library-core,true
+
+appPlugin:security-link-keys-library,false
+appPlugin:security-sensor,false
+appPlugin:serial,true
+
+appPlugin:silabs-device-ui,false
+appPlugin:sim-eeprom1,true
+
+appPlugin:sim-eeprom2,false
+appPlugin:sim-eeprom2-1to2-upgrade,false
+appPlugin:sim-eeprom2-1to2-upgrade-stub,false
+appPlugin:sim-eeprom2-to-nvm3-upgrade,false
+appPlugin:sim-eeprom2-to-nvm3-upgrade-stub,false
+appPlugin:simple-clock,false
+appPlugin:simple-main,true
+
+appPlugin:simple-metering-client,false
+appPlugin:simple-metering-server,false
+appPlugin:sleepy-message-queue,false
+appPlugin:slot-manager,false
+appPlugin:smart-energy-registration,false
+appPlugin:stack-diagnostics,false
+appPlugin:stack-protection-iar,false
+appPlugin:standalone-bootloader-client,false
+appPlugin:standalone-bootloader-common,false
+appPlugin:standalone-bootloader-server,false
+appPlugin:standard-printf-support,false
+appPlugin:strong-random,true
+
+appPlugin:sub-ghz-client,false
+appPlugin:sub-ghz-server,false
+appPlugin:tamper-switch,false
+appPlugin:tamper-switch-stub,false
+appPlugin:temperature-measurement-server,false
+appPlugin:temperature-si7021,false
+appPlugin:temperature-si7021-stub,false
+appPlugin:temperature-si7053,false
+appPlugin:temperature-si7053-stub,false
+appPlugin:test-harness,false
+appPlugin:test-harness-z3,false
+appPlugin:throughput,false
+appPlugin:throughput-legacy,false
+appPlugin:time-server,false
+appPlugin:transport-mqtt,false
+appPlugin:trust-center-backup,false
+appPlugin:trust-center-keepalive,false
+appPlugin:trust-center-nwk-key-update-broadcast,false
+appPlugin:trust-center-nwk-key-update-periodic,false
+appPlugin:trust-center-nwk-key-update-unicast,false
+appPlugin:tunneling-client,false
+appPlugin:tunneling-server,false
+appPlugin:update-ha-tc-link-key,false
+appPlugin:update-tc-link-key,false
+appPlugin:wstk-display,false
+appPlugin:wwah-app-event-retry-manager,false
+appPlugin:wwah-client-silabs,false
+appPlugin:wwah-connectivity-manager,false
+appPlugin:wwah-end-device-extension,false
+appPlugin:wwah-server-silabs,false
+appPlugin:xmodem-sender,false
+appPlugin:zcl-framework-core,true
+
+appPlugin:zcl-ip,false
+appPlugin:zigbee-event-logger,false
+appPlugin:zigbee-event-logger-stub,false
+appPlugin:zigbee-pro-leaf-library,true
+
+appPlugin:zigbee-pro-library,false
+appPlugin:zigbee-r22-support-library,false
+appPlugin:zll-commissioning-client,true
+
+appPlugin:zll-commissioning-common,true
+
+appPlugin:zll-commissioning-network,false
+appPlugin:zll-commissioning-server,true
+
+appPlugin:zll-identify-server,false
+appPlugin:zll-level-control-server,false
+appPlugin:zll-library,true
+
+appPlugin:zll-on-off-server,false
+appPlugin:zll-scenes-client,false
+appPlugin:zll-scenes-server,false
+appPlugin:zll-utility-client,true
+
+appPlugin:zll-utility-server,true
+
+AppPluginOption(em357+iar):EMBER_AF_PLUGIN_END_DEVICE_SUPPORT_LONG_POLL_INTERVAL_SECONDS,86400
+AppPluginOption(em357+iar):EMBER_AF_PLUGIN_INTERPAN_ALLOW_REQUIRED_SMART_ENERGY_MESSAGES,false
+AppPluginOption(em357+iar):EMBER_BINDING_TABLE_SIZE,2
+AppPluginOption(em357+iar):EMBER_END_DEVICE_POLL_TIMEOUT_SHIFT,4
+AppPluginOption(em357+iar):EMBER_END_DEVICE_POLL_TIMEOUT,Minutes-64

@@ -1,0 +1,22 @@
+#include "rtos_bluetooth.h"
+
+/** @brief
+ *
+ * This function is called at init time. The following fields will be
+ * overwritten by the framework:
+ *  - max_connections
+ *  - heap
+ *  - heap_size
+ */
+void emberAfPluginBleGetConfigCallback(gecko_configuration_t* config)
+{
+}
+
+/** @brief
+ *
+ * This function is called from the BLE stack to notify the application of a
+ * stack event.
+ */
+void emberAfPluginBleEventCallback(struct gecko_cmd_packet* evt)
+{
+}

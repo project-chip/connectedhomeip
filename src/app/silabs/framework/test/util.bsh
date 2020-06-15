@@ -1,0 +1,2590 @@
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashTable;
+import com.ember.peek.app.ezsp.Em260Util;
+import com.ember.simulator.Location;
+import com.ember.util.Ansi;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+source("af-test-util.bsh");
+
+// NOTE: System.out and System.err are remapped in af-test.bsh.  System.out is
+// always redirected to stderr.  If debugging is enabled, System.err is mapped
+// to stderr; otherwise, System.err is turned off completely.  In this file,
+// and files that include it, use std.print(...) or std.println(...) for output
+// that should always appear and dbg.print(...) or dbg.println(...) for
+// debugging output.
+PrintStream std = System.out;
+PrintStream dbg = System.err;
+
+boolean debug = (debug != void && debug)
+                 || (runArgument != void
+                     && runArgument.debug != void
+                     && runArgument.debug);
+
+if (runArgument != void
+    && runArgument.coloredDebugMsg != void
+    && runArgument.coloredDebugMsg) {
+  Ansi.SUPPORTED = true;
+}
+
+String thisFile = "util.bsh";
+
+final int DEFAULT_PORT = 1;
+final int UART_APP_PORT = 0;
+int port = (port == void ? DEFAULT_PORT : port);
+final int DEFAULT_TIMEOUT = 3100; // ms.
+int timeout = (timeout == void ? DEFAULT_TIMEOUT : timeout);
+final boolean DEFAULT_COLLECT = SimulatedNetwork.DEFAULT_COLLECT;
+boolean collect = (collect == void ? DEFAULT_COLLECT : collect);
+final boolean DEFAULT_LAZY_EXPECT = false;
+boolean lazyExpect = (lazyExpect == void ? DEFAULT_LAZY_EXPECT : lazyExpect);
+
+SimulatedNetwork createNetwork()
+{
+  SimulatedNetwork sim = new SimulatedNetwork("real",
+                                              runArgument.currentTestPath);
+  return sim;
+}
+
+String networkUpNodeIdSuffix = " 0x";
+String networkUpString = "EMBER_NETWORK_UP";
+String networkUpRegex = ".*" + networkUpString + networkUpNodeIdSuffix + "....$";
+
+String ncpSuffix = "-ncp";
+String trxSuffix = "-trx";
+
+Location[] gridLocations = {
+  // 0
+  new Location(0,0),
+  // 1, 2, 3
+  new Location(100, 10), new Location(100, 20),  new Location(100, 30),
+  // 4, 5, 6
+  new Location(200, 10), new Location(200, 20), new Location(200, 30),
+  // 7, 8, 9
+  new Location(300, 10), new Location(300, 20), new Location(300, 30),
+  // 10
+  new Location(400, 10), 
+};
+
+public class TestNode {
+  public String name;
+  public String executablePathSoc;
+  public String executablePathHost;
+  public String executablePathNcp;
+  public String executablePathTrx;
+  public Location nodeLocation;
+  public String nodeIdHex;
+  public int defaultEndpoint = 1;
+
+  public TestNode(String newName, 
+                  String newSocPath,
+                  String newHostPath,
+                  String newNcpPath,
+                  Location newLocation) {
+    name = newName;
+    executablePathSoc = newSocPath;
+    executablePathHost = newHostPath;
+    executablePathNcp = newNcpPath;
+    executablePathTrx = "null";
+    nodeLocation = newLocation;
+    nodeIdHex = "???";
+  }
+
+  public TestNode(String newName,
+                  String newSocPath,
+                  String newHostPath,
+                  String newNcpPath,
+                  String newTrxPath,
+                  Location newLocation) {
+    name = newName;
+    executablePathSoc = newSocPath;
+    executablePathHost = newHostPath;
+    executablePathNcp = newNcpPath;
+    executablePathTrx = newTrxPath;
+    nodeLocation = newLocation;
+    nodeIdHex = "???";
+  }
+};
+
+TestNode[] allNodes;
+Hashtable appPortMap;
+
+TestNode findNodeByName(String name)
+{
+  int i;
+  for (i = 0; i < allNodes.length; i++) {
+    if (allNodes[i].name.equals(name)) {
+      return allNodes[i];
+    }
+  }
+  _assertInternal(false,
+                  thisFile,
+                  this.namespace.getInvocationLine());
+}
+
+TestNode findNodeById(String nodeIdHex)
+{
+  int i;
+  for (i = 0; i < allNodes.length; i++) {
+    if (allNodes[i].nodeIdHex.equals(nodeIdHex)) {
+      return allNodes[i];
+    }
+  }
+  _assertInternal(false,
+                  thisFile,
+                  this.namespace.getInvocationLine());
+}
+
+int nodeAppPort(String nodeName) {
+  if (appPortMap != null && appPortMap.containsKey(nodeName)) {
+    return appPortMap.get(nodeName);
+  } else {
+    return DEFAULT_PORT;
+  }
+}
+
+String[] addAndLoadDevicesWithLocation(TestNode[] nodesToAdd,
+                                       boolean useHost,
+                                       boolean useSpi)
+{
+  String[] deviceNames = new String[nodesToAdd.length];
+
+  // Resize allNodes based on how many nodes we're adding
+  if (allNodes == null) {
+    allNodes = new TestNode[nodesToAdd.length];
+    appPortMap = new Hashtable(nodesToAdd.length);
+    nodesIndexOffset = 0;
+  } else {
+    Integer oldLength = allNodes.length;
+    allNodes = Arrays.copyOf(allNodes, oldLength + nodesToAdd.length);
+    nodesIndexOffset = oldLength;
+    if (appPortMap == null) {
+      appPortMap = new Hashtable(allNodes.length);
+    }
+  }
+
+  int i;
+  int appPort;
+  for (i = 0; i < nodesToAdd.length; i++) {
+    allNodes[nodesIndexOffset+i] = nodesToAdd[i];
+    deviceNames[i] = nodesToAdd[i].name;
+    String nodeNameWithLocation = nodesToAdd[i].name;
+    if (useHost) {
+      // It doesn't matter where the host is located.  It only matters
+      // the location of the NCP, which has the actually radio.
+      network.add(nodesToAdd[i].name);
+      String ncpName = nodesToAdd[i].name + ncpSuffix;
+      nodeNameWithLocation = ncpName;
+    }
+
+    network.add(nodeNameWithLocation,
+                nodesToAdd[i].nodeLocation,
+                null);  // IFramer
+    String[] executablePaths = removePlus(new String[]{ nodesToAdd[i].executablePathNcp,
+                                nodesToAdd[i].executablePathHost,
+                                nodesToAdd[i].executablePathSoc });
+    if (useHost) {
+      Em260Util.connectHostAndEm260(network,
+                                    nodesToAdd[i].name,
+                                    nodeNameWithLocation,
+                                    null,
+                                    useSpi);
+      network.bootload(nodeNameWithLocation,
+                       executablePaths[0]);
+      appPort = useSpi ? DEFAULT_PORT : UART_APP_PORT;
+    } else {
+      appPort = DEFAULT_PORT;
+    }
+
+    network.bootload(nodesToAdd[i].name,
+                     (useHost
+                      ? executablePaths[1]
+                      : executablePaths[2]));
+    appPortMap.put(nodesToAdd[i].name,appPort);
+  }
+  networkWait(2000);  // The devices sometimes need more time to come up after boot
+  return deviceNames;
+}
+
+String[] addAndLoadDevicesWithLocation(TestNode[] nodesToAdd,
+                                       boolean useHost)
+{
+  return addAndLoadDevicesWithLocation(nodesToAdd, useHost, true);
+}
+
+String[] addAndLoadDevicesWithLocationSim(TestNode[] nodesToAdd,
+                                          boolean useHost)
+{
+  String[] deviceNames = new String[nodesToAdd.length];
+
+  // Resize allNodes based on how many nodes we're adding
+  if (allNodes == null) {
+    allNodes = new TestNode[nodesToAdd.length];
+    nodesIndexOffset = 0;
+  } else {
+    Integer oldLength = allNodes.length;
+    allNodes = Arrays.copyOf(allNodes, oldLength + nodesToAdd.length);
+    nodesIndexOffset = oldLength;
+  }
+
+  for (int i = 0; i < nodesToAdd.length; i++) {
+    allNodes[nodesIndexOffset+i] = nodesToAdd[i];
+    deviceNames[i] = nodesToAdd[i].name;
+
+    String device = nodesToAdd[i].name;
+    Location nodeLocation = nodesToAdd[i]. nodeLocation;
+
+    String[] executablePaths = removePlus(new String[]{ nodesToAdd[i].executablePathHost,
+                                nodesToAdd[i].executablePathNcp,
+                                nodesToAdd[i].executablePathSoc});
+    String hostImage = executablePaths[0];
+    String ncpImage = executablePaths[1];
+    String socImage = executablePaths[2];
+    if (useHost) {
+      String trxImage = nodesToAdd[i].executablePathTrx;
+
+      network.add(device);
+      network.add(device + ncpSuffix, nodeLocation, null);
+      if (trxImage != "") {
+        debugPrintln(" found trxImage " + deviceNames[i] + "trxImage " + trxImage);
+        network.add(device + trxSuffix, nodeLocation, null);
+        Em260Util.connectHostAndEm260(network, device, device + ncpSuffix, device + trxSuffix, true);
+      } else {
+        Em260Util.connectHostAndSpiEm260(network, device, device + ncpSuffix);
+      }
+      network.bootload(device, hostImage);
+      network.bootload(device + ncpSuffix, ncpImage);
+      if (trxImage != "") {
+        network.bootload(device + trxSuffix, trxImage);
+        network.setHostNcpReferences(device, device + ncpSuffix, device + trxSuffix);
+      } else {
+        network.setHostNcpReferences(device, device + ncpSuffix);
+      }
+    } else {
+      network.add(device, nodeLocation, null);
+      network.bootload(device, socImage);
+    }
+  }
+
+  return deviceNames;
+}
+
+String[] addAndLoadDevicesWihPlc(TestNode[] nodesToAdd, String plcEnd1, String plcEnd2, boolean useHost)
+{
+  String[] deviceNames = addAndLoadDevicesWithLocationSim(nodesToAdd, useHost);
+  Em260Util.connectOverPlc(network, plcEnd1, plcEnd2);
+  return deviceNames;
+}
+
+void printNodeIds(TestNode[] nodes)
+{
+  int i;
+  for (i = 0; i < nodes.length; i++) {
+    debugPrintln("Name '" + nodes[i].name + "' = " + nodes[i].nodeIdHex);
+  }
+}
+
+/**
+ * Check whether a given condition is true or false.  If false, the test will
+ * halt and the file, line number, and invocation text (e.g., "assert(false)")
+ * will be printed.
+ *
+ * @param condition Boolean condition to check.
+ */
+void assert(boolean condition) {
+  _assertInternal(condition, 
+                  getSourceFileInfo(),
+                  this.namespace.getInvocationLine());
+}
+
+void _assertInternal(boolean condition, String file, int line)
+{
+  if (condition) {
+    hashPrint();
+  } else {
+    throw new Exception(this.namespace.getInvocationText() + " failed"
+                        + ": file " + file
+                        + ", line " + line
+                        + ", multihop="+ runArgument.runUsingMultihop
+                        + ", host=" + runArgument.runUsingHostApps);
+  }  
+}
+
+/**
+ * Returns the current time (in seconds since the ZigBee epoch) on a given node
+ * according to the "print time" CLI command.
+ *
+ * @param node The node name (e.g., "esp") on which to retrieve the time.
+ * @return Seconds since the ZigBee epoch.
+ */
+int utcTime(String node)
+{
+  return utcTime(node, nodeAppPort(node));
+}
+
+/**
+ * Returns the current time (in seconds since the ZigBee epoch) on a given node
+ * according to the "print time" CLI command.
+ *
+ * @param node The node name (e.g., "esp") on which to retrieve the time.
+ * @param port The port on which to send the message.
+ * @return Seconds since the ZigBee epoch.
+ */
+int utcTime(String node, int port)
+{
+  return Integer.parseInt(hexTime(node, port), 16);
+}
+
+/**
+ * Returns the current time (in seconds since the ZigBee epoch) as a hex string
+ * (without the leading "0x") on a given node according to the "print time" CLI
+ * command.
+ *
+ * @param node The node name (e.g., "esp") on which to retrieve the time.
+ * @return String containing the hex representation of seconds since the ZigBee
+ *         epoch.
+ */
+String hexTime(String node)
+{
+  return hexTime(node, nodeAppPort(node));
+}
+
+/**
+ * Returns the current time (in seconds since the ZigBee epoch) as a hex string
+ * (without the leading "0x") on a given node according to the "print time" CLI
+ * command.
+ *
+ * @param node The node name (e.g., "esp") on which to retrieve the time.
+ * @param port The port on which to send the message.
+ * @return String containing the hex representation of seconds since the ZigBee
+ *         epoch.
+ */
+String hexTime(String node, int port)
+{
+  String time;
+  int i;
+  assert((time = network.expect(node, port, "print time", ".*UTC time.*\\([0-9a-fA-F]{8}\\)")) != null);
+  assert((i = time.lastIndexOf('(')) != -1);
+  return time.substring(i + 1, i + 9);
+}
+
+/**
+ * Sleep for a duration (in seconds) using a given node as the time keeper.
+ *
+ * @param node The node name (e.g., "esp") on which time will be tracked.
+ * @param duration Duration in seconds to sleep.
+ * @param sleep How long to sleep the network between checks.
+ */
+void sleep(String node, int duration, int sleep)
+{
+  sleep(node, nodeAppPort(node), duration, sleep);
+}
+
+/**
+ * Sleep for a duration (in seconds) using a given node as the time keeper.
+ *
+ * @param node The node name (e.g., "esp") on which time will be tracked.
+ * @param port The port on which to send the message.
+ * @param duration Duration in seconds to sleep.
+ * @param sleep How long to sleep the network between checks.
+ */
+void sleep(String node, int port, int duration, int sleep)
+{
+  int start = utcTime(node, port);
+  while (utcTime(node, port) <= start + duration) {
+    network.sleep(sleep);
+  }
+}
+
+/**
+ * Sleep until a particular ZigBee time using a given node as the time keeper.
+ *
+ * @param node The node name (e.g., "esp") on which time will be tracked.
+ * @param utcTime ZigBee time to sleep until.
+ * @param sleep How long to sleep the network between checks.
+ */
+void sleepUntil(String node, int utcTime, int sleep)
+{
+  sleepUntil(node, nodeAppPort(node), utcTime, sleep);
+}
+
+/**
+ * Sleep until a particular ZigBee time using a given node as the time keeper.
+ *
+ * @param node The node name (e.g., "esp") on which time will be tracked.
+ * @param port The port on which to send the message.
+ * @param utcTime ZigBee time to sleep until.
+ * @param sleep How long to sleep the network between checks.
+ */
+void sleepUntil(String node, int port, int utcTime, int sleep)
+{
+  while (utcTime(node, port) <= utcTime) {
+    network.sleep(sleep);
+  }
+}
+
+/**
+ * Returns the node id on a given node according to the "info" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @return String containing the node id of the given node.
+ */
+String nodeId(String node)
+{
+  return nodeId(node, nodeAppPort(node));
+}
+
+/**
+ * Returns the node id on a given node according to the "info" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @param port The port on which to send the message.
+ * @return String containing the node id of the given node.
+ */
+String nodeId(String node, int port)
+{
+  String info;
+  int i;
+  info = _expect(node,
+                 port,
+                 "info",
+                 ".*nodeID \\[0x[0-9a-fA-F]{4}\\].*",
+                 DEFAULT_TIMEOUT,
+                 DEFAULT_COLLECT,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+  assert(info != null);
+  assert((i = info.indexOf("nodeID [")) != -1);
+  networkWait(3000);
+  String nodeId = info.substring(i + 8, i + 14);
+  findNodeByName(node).nodeIdHex = nodeId;
+  return nodeId;
+}
+
+/**
+ * Returns the pan id on a given node according to the "info" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @return String containing the pan id of the given node.
+ */
+String panId(String node)
+{
+  return panId(node, nodeAppPort(node));
+}
+
+/**
+ * Returns the pan id on a given node according to the "info" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @param port The port on which to send the message.
+ * @return String containing the pan id of the given node.
+ */
+String panId(String node, int port)
+{
+  String info;
+  int i;
+  network.send(node, port, "info");
+  assert((info = network.expect(node, port, null, ".*panID \\[0x[0-9a-fA-F]{4}\\].*")) != null);
+  assert((i = info.indexOf("panID [")) != -1);
+  return info.substring(i + 7, i + 13);
+}
+
+/**
+ * Returns the extended pan id on a given node according to the "info" CLI
+ * command.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @return String containing the extended pan id of the given node.
+ */
+String extendedPanId(String node)
+{
+  return extendedPanId(node, nodeAppPort(node));
+}
+
+/**
+ * Returns the extended pan id on a given node according to the "info" CLI
+ * command.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @param port The port on which to send the message.
+ * @return String containing the extended pan id of the given node.
+ */
+String extendedPanId(String node, int port)
+{
+  String info;
+  int i;
+  network.send(node, port, "info");
+  assert((info = network.expect(node, port, null, ".*xpan \\[0x\\(>\\)[0-9a-fA-F]{16}\\].*",5000,DEFAULT_COLLECT)) != null);
+  assert((i = info.indexOf("xpan [0x(>)")) != -1);
+  return info.substring(i + 11, i + 27);
+}
+
+/**
+ * Returns the channel on a given node according to the "info" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @return String containing the channel of the given node.
+ */
+String channel(String node)
+{
+  return channel(node, nodeAppPort(node));
+}
+
+/**
+ * Returns the channel on a given node according to the "info" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @param port The port on which to send the message.
+ * @return String containing the channel of the given node.
+ */
+String channel(String node, int port)
+{
+  String info;
+  int i;
+  network.send(node, port, "info");
+  assert((info = network.expect(node, port, null, ".*chan \\[[0-9]{2}\\].*")) != null);
+  assert((i = info.indexOf("chan [")) != -1);
+  return info.substring(i + 6, i + 8);
+}
+
+/**
+ * Returns a channel mask for a given channel.
+ *
+ * @param channel The channel to convert.
+ * @return String containing the channel mask of the given channel.
+ */
+String channelMask(String channel)
+{
+  return String.format("0x%08X", new Object[]{(1 << Integer.parseInt(channel))});
+}
+
+/**
+ * Returns the EUI64, in big-endian format, of a given node.
+ *
+ * @param node The node name (e.g., "esp") to check.
+ * @return String containing the EUI64 of the given node.
+ */
+String eui64(String node)
+{
+  return getEui64BigEndian(node);
+}
+
+String getEui64BigEndian(String node)
+{
+  String big = "";
+  String little = getEui64LittleEndian(node);
+  for (int i = 16; i > 0; i -= 2) {
+    big += little.substring(i - 2, i);
+  }
+  return big;
+}
+
+String getEui64LittleEndian(String node)
+{
+  String em260 = Em260Util.getEm260(node);
+  if (em260 != null) {
+    node = em260;
+  }
+  String little = String.format("%1$016X", new Object[]{network.getConnection(node).localId});
+  return little;
+}
+
+/**
+ * Disables a print area on the given node using the "debugprint" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to use.
+ * @return String containing the name of the print area (e.g., "Debug").
+ */
+void debugprintOff(String node, String area)
+{
+  debugprintOff(node, nodeAppPort(node), area);
+}
+
+/**
+ * Disables a print area on the given node using the "debugprint" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to use.
+ * @param port The port on which to send the message.
+ * @return String containing the name of the print area (e.g., "Debug").
+ */
+void debugprintOff(String node, int port, String area)
+{
+  String area = network.expect(node, port, "debugprint status", "\\[[0-9]+\\] " + area + " : YES");
+  if (area != null) {
+    int i;
+    assert((i = area.indexOf("[")) != -1);
+    area = area.substring(i + 1);
+    assert((i = area.indexOf("]")) != -1);
+    area = area.substring(0, i);
+    send(node, port, "debugprint off " + area);
+  }
+}
+
+/**
+ * Enables a print area on the given node using the "debugprint" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to use.
+ * @return String containing the name of the print area (e.g., "Debug").
+ */
+void debugprintOn(String node, String area)
+{
+  debugprintOn(node, nodeAppPort(node), area);
+}
+
+/**
+ * Enables a print area on the given node using the "debugprint" CLI command.
+ *
+ * @param node The node name (e.g., "esp") to use.
+ * @param port The port on which to send the message.
+ * @return String containing the name of the print area (e.g., "Debug").
+ */
+void debugprintOn(String node, int port, String area)
+{
+  String area = network.expect(node, port, "debugprint status", "\\[[0-9]+\\] " + area + " : no");
+  if (area != null) {
+    int i;
+    assert((i = area.indexOf("[")) != -1);
+    area = area.substring(i + 1);
+    assert((i = area.indexOf("]")) != -1);
+    area = area.substring(0, i);
+    send(node, port, "debugprint on " + area);
+  }
+}
+
+String networkParams = "";
+String networkPanId = "";
+
+void setNetworkParams(int channel, int power, int panId)
+{
+  networkParams = channel + " " + power + " " + panId;
+  networkPanId = "" + panId;
+}
+
+void printCommand(String node, int port, String command)
+{
+  printData(node, "SERIAL" + port, "[" + Ansi.debugCmdTxt.colorize(command) + "]");
+}
+
+void printData(String node, String type, String data)
+{
+  NumberFormat format = NumberFormat.getInstance();
+  format.setMaximumFractionDigits(6);
+  format.setMinimumFractionDigits(6);
+  format.setGroupingUsed(false);
+  String time = format.format(network.currentTimeSeconds());
+  int localId = 0;
+  if (node != null) {
+    localId = network.getConnection(node).localId;
+  }
+  dbg.println("[" + Ansi.debugTime.colorize(time) + " "
+              + (node != null
+                 ? node + " " + Ansi.debugLocalId.colorize("" + localId) + " "
+                 : "")
+                 + Ansi.debugSerial.colorize(type) + "] " + data);
+}
+
+void hashPrint()
+{
+  std.print(!debug ? "." : "\n.\n\n");
+}
+
+/**
+ * Sends a message to the given node.
+ *
+ * @param node The node name (e.g., "esp") to which the message will be sent.
+ * @param message The message to send.
+ */
+void send(String node, String message)
+{
+  send(node, nodeAppPort(node), message);
+}
+
+/**
+ * Sends a message to the given node.
+ *
+ * @param node The node name (e.g., "esp") to which the message will be sent.
+ * @param port The port on which to send the message.
+ * @param message The message to send.
+ */
+void send(String node, int port, String message)
+{
+  printCommand(node, port, message);
+  network.send(node, port, message);
+}
+
+String _expect(String node,
+               String command,
+               String regex,
+               String file,
+               int lineNumberOfCaller)
+{
+  _expect(node,
+          nodeAppPort(node),
+          command,
+          regex,
+          DEFAULT_TIMEOUT,
+          DEFAULT_COLLECT,
+          file,
+          lineNumberOfCaller);
+}
+
+String _expect(String node,
+               String command,
+               String regex,
+               int timeout,
+               String file,
+               int lineNumberOfCaller)
+{
+  _expect(node,
+          nodeAppPort(node),
+          command,
+          regex,
+          timeout,
+          DEFAULT_COLLECT,
+          file,
+          lineNumberOfCaller);
+}
+
+String _expect(String node,
+               int port,
+               String message,
+               String regex,
+               int timeout,
+               boolean collect,
+               String file,
+               int lineNumberOfCaller)
+{
+  return _expectOrNexpect(node,
+                          port,
+                          message,
+                          regex,
+                          timeout,
+                          collect,
+                          file,
+                          lineNumberOfCaller,
+                          true); // do expect
+}
+
+String _expectOrNexpect(String node,
+                        int port,
+                        String message,
+                        String regex,
+                        int timeout,
+                        boolean collect,
+                        String file,
+                        int lineNumberOfCaller,
+                        boolean doExpect)
+{
+  if (message != null) {
+    printCommand(node, port, message);
+  }
+  if (lazyExpect) {
+    regex = ".*" + regex + ".*";
+  }
+  String match = network.expect(node,
+                                port,
+                                message,
+                                regex,
+                                timeout,
+                                collect);
+  if ((match == null && doExpect) || (match != null && !doExpect)) {
+    // This forces the current time to be printed out.  It helps
+    // discern how much time has passed waiting for the expect
+    // statement.
+    printData(node,
+              (doExpect ? "EXPECT" : "NEXPECT"),
+              Ansi.debugError.colorize(doExpect ? "(Expect" : "(Nexpect") +  " failure)");
+
+    String error = (doExpect ?
+                    "Failed to get \"" + regex + "\" from " + node
+                    : "Got \"" + regex + "\" from " + node);
+    if (message != null) {
+      error += " to command \"" + message + "\"";
+    }
+    error += ": file " + file
+             + ", line " + lineNumberOfCaller
+             + ", multihop="+ runArgument.runUsingMultihop
+             + ", host=" + runArgument.runUsingHostApps;
+    throw new Exception(Ansi.debugError.colorize(error));
+  }
+  dbg.println(Ansi.debugMatchExpected.colorize("  (Matched "
+                                               + (doExpect ? "" : "n")
+                                               + "expect for "
+                                               + file
+                                               + ":"
+                                               + lineNumberOfCaller
+                                               + ")"));
+  hashPrint();
+  return match;
+}
+
+String _expectMultiline(String node,
+                        String message,
+                        String[] regex,
+                        int myTimeout,
+                        String file,
+                        int lineNumberOfCaller)
+{
+  return _expectOrNexpectMutiline(node,
+                                  nodeAppPort(node),
+                                  message,
+                                  regex,
+                                  myTimeout,
+                                  file,
+                                  lineNumberOfCaller,
+                                  true);
+}
+
+String _expectOrNexpectMutiline(String node,
+                                int port,
+                                String message,
+                                String[] regex,
+                                int myTimeout,
+                                String file,
+                                int lineNumberOfCaller,
+                                boolean doExpect)
+{
+  if (message != null) {
+    printCommand(node, port, message);
+  }
+
+  int i;
+  String fullRegex = "";
+  for (i = 0; i < regex.length; i++) {
+    if (i != 0) {
+      // Append an end of line character to the regex to stop the pattern matching.
+      // Add a '.*' to match any lines between this line and the next regex.
+      // Add a beginning of line marker '^' to indicate the next line.
+      // This is to prevent a regex line that itself has a .* pattern from
+      // consuming beyond its line.
+      fullRegex += "$.*^";
+    }
+    if (lazyExpect) {
+      regex[i] = ".*" + regex[i] + ".*";
+    }
+    fullRegex += regex[i];
+  }
+  // To end any pattern matching that might be embedded in the passed-in regex,
+  // we add an end of line character to match.
+  fullRegex += "$";
+  dbg.println(Ansi.debugMatchExpected.colorize("  (timeout is " + myTimeout + ")"));
+
+  String verb = (doExpect ? "Expect" : "Nexpect");
+  String match = network.expect(node,
+                                port,
+                                message,
+                                fullRegex,
+                                myTimeout,
+                                true);   // collect?
+  if ((match == null && doExpect) || (match != null && !doExpect)) {
+    // This forces the current time to be printed out.  It helps
+    // discern how much time has passed waiting for the expect
+    // statement.
+    printData(node,
+              verb.toUpperCase(),
+              Ansi.debugError.colorize("(" + verb + " failure)"));
+
+    String error = ((doExpect ? "Failed to get " : "Got ")
+                    + "multi-line output \"" + fullRegex + "\" from " + node);
+    if (message != null) {
+      error += " to command \"" + message + "\"";
+    }
+    error += ": file " + file
+             + ", line " + lineNumberOfCaller
+             + ", multihop="+ runArgument.runUsingMultihop
+             + ", host=" + runArgument.runUsingHostApps;
+    throw new Exception(Ansi.debugError.colorize(error));
+  }
+  dbg.println(Ansi.debugMatchExpected.colorize(("  (Matched multi-line "
+                                                + verb.toLowerCase() + " "
+                                                + "for " + file + ":"
+                                                + lineNumberOfCaller + ")")));
+  hashPrint();
+  return match;
+}
+
+String expectMultiline(String node,
+                       String message,
+                       String[] regex,
+                       int timeout)
+{
+  return _expectMultiline(node,
+                          message,
+                          regex,
+                          timeout,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+}
+
+String expectMultiline(String node,
+                       String message,
+                       String[] regex)
+{
+  return _expectMultiline(node,
+                          message,
+                          regex,
+                          DEFAULT_TIMEOUT,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+}
+
+String expectMultiline(String node, String[] regex)
+{
+  return _expectMultiline(node,
+                          null,
+                          regex,
+                          DEFAULT_TIMEOUT,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+}
+
+String expectMultiline(String node, String[] regex, int timeout)
+{
+  return _expectMultiline(node,
+                          null,
+                          regex,
+                          timeout,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+}
+
+void throwException(String error)
+{
+  String file = getSourceFileInfo();
+  error += ": file " + file
+    + ", line " + this.namespace.getInvocationLine()
+    + ", multihop="+ runArgument.runUsingMultihop
+    + ", host=" + runArgument.runUsingHostApps;
+  throw new Exception(error);
+}
+
+/**
+ * Expect a response matching a regular expression
+ * The expect is called from this local file.
+ */
+String _expectInternal(String node,
+                       String message,
+                       String regex)
+{
+  _expect(node,
+          port,
+          message,
+          regex,
+          timeout,
+          DEFAULT_COLLECT,
+          thisFile,
+          this.namespace.getInvocationLine());
+}
+
+
+String _expectInternal(String node,
+                       String message,
+                       String regex,
+                       int myTimeout)
+{
+  _expect(node,
+          port,
+          message,
+          regex,
+          myTimeout,
+          DEFAULT_COLLECT,
+          thisFile,
+          this.namespace.getInvocationLine());
+}
+
+/**
+ * Expect a response matching a regular expression from the given node.
+ *
+ * @param node The node name (e.g., "esp") from which to expect the response.
+ * @param regex The regular expression against which the response will be
+ * matched.
+ * @return String containing the matched text.
+ */
+String expect(String node, String regex)
+{
+  return _expect(node,
+                 nodeAppPort(node),
+                 null, // no message
+                 regex,
+                 DEFAULT_TIMEOUT,
+                 DEFAULT_COLLECT,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+/**
+ * Expect a response matching a regular expression from the given node.
+ *
+ * @param node The node name (e.g., "esp") from which to expect the response.
+ * @param regex The regular expression against which the response will be
+ * matched.
+ * @param timeout The duration, in milliseconds, to wait for a matching
+ * response.
+ * @return String containing the matched text.
+ */
+String expect(String node, String regex, int timeout)
+{
+  return _expect(node,
+                 nodeAppPort(node),
+                 null, // no message
+                 regex,
+                 timeout,
+                 DEFAULT_COLLECT,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+/**
+ * Expect a response matching a regular expression from the given node.
+ *
+ * @param node The node name (e.g., "esp") from which to expect the response.
+ * @param regex The regular expression against which the response will be
+ * matched.
+ * @param timeout The duration, in milliseconds, to wait for a matching
+ * response.
+ * @param collect False if the regular expression must match a single line of
+ * output or true if it can match across multiple lines.
+ * @return String containing the matched text.
+ */
+String expect(String node, String regex, int timeout, boolean collect)
+{
+  return _expect(node,
+                 nodeAppPort(node),
+                 null, // no message
+                 regex,
+                 timeout,
+                 collect,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+/**
+ * Expect a response matching a regular expression from the given node.
+ *
+ * @param node The node name (e.g., "esp") from which to expect the response.
+ * @param port The port on which to send the message.
+ * @param regex The regular expression against which the response will be
+ * matched.
+ * @param timeout The duration, in milliseconds, to wait for a matching
+ * response.
+ * @param collect False if the regular expression must match a single line of
+ * output or true if it can match across multiple lines.
+ * @return String containing the matched text.
+ */
+String expect(String node, int port, String regex, int timeout, boolean collect)
+{
+  return _expect(node,
+                 port,
+                 null, // no message
+                 regex,
+                 timeout,
+                 collect,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+/**
+ * Sends a message to the given node and expect a response matching a regular
+ * expression.
+ *
+ * @param node The node name (e.g., "esp") to which the message will be sent.
+ * @param message The message to send.
+ * @param regex The regular expression against which the response will be
+ * matched.
+ * @return String containing the matched text.
+ */
+String expect(String node, String message, String regex)
+{
+  return _expect(node,
+                 nodeAppPort(node),
+                 message,
+                 regex,
+                 DEFAULT_TIMEOUT,
+                 DEFAULT_COLLECT,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+/**
+ * Sends a message to the given node and expect a response matching a regular
+ * expression.
+ *
+ * @param node The node name (e.g., "esp") to which the message will be sent.
+ * @param message The message to send.
+ * @param regex The regular expression against which the response will be
+ * matched.
+ * @param timeout The duration, in milliseconds, to wait for a matching
+ * response.
+ * @return String containing the matched text.
+ */
+String expect(String node, String message, String regex, int timeout)
+{
+  return _expect(node,
+                 nodeAppPort(node),
+                 message,
+                 regex,
+                 timeout,
+                 DEFAULT_COLLECT,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+/**
+ * Sends a message to the given node and expect a response matching a regular
+ * expression.
+ *
+ * @param node The node name (e.g., "esp") to which the message will be sent.
+ * @param message The message to send.
+ * @param regex The regular expression against which the response will be
+ * matched.
+ * @param timeout The duration, in milliseconds, to wait for a matching
+ * response.
+ * @param collect False if the regular expression must match a single line of
+ * output or true if it can match across multiple lines.
+ * @return String containing the matched text.
+ */
+String expect(String node, String message, String regex, int timeout, boolean collect)
+{
+  return _expect(node,
+                 nodeAppPort(node),
+                 message,
+                 regex,
+                 timeout,
+                 collect,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+/**
+ * Sends a message to the given node and expect a response matching a regular
+ * expression.
+ *
+ * @param node The node name (e.g., "esp") to which the message will be sent.
+ * @param port The port on which to send the message.
+ * @param message The message to send.
+ * @param regex The regular expression against which the response will be
+ * matched.
+ * @param timeout The duration, in milliseconds, to wait for a matching
+ * response.
+ * @param collect False if the regular expression must match a single line of
+ * output or true if it can match across multiple lines.
+ * @return String containing the matched text.
+ */
+String expect(String node, int port, String message, String regex, int timeout, boolean collect)
+{
+  return _expect(node,
+                 port,
+                 message,
+                 regex,
+                 timeout,
+                 collect,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+void nexpect(String node, String message, int timeout )
+{
+  _expectOrNexpect(node,
+                   nodeAppPort(node),
+                   null, // no message
+                   message,
+                   timeout,
+                   DEFAULT_COLLECT,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine(),
+                   false); // don't expect
+}
+
+void nexpect(String node, String command, String message, int timeout )
+{
+  _expectOrNexpect(node,
+                   nodeAppPort(node),
+                   command,
+                   message,
+                   timeout,
+                   DEFAULT_COLLECT,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine(),
+                   false); // don't expect
+}
+
+void nexpect(String node, String message)
+{
+  _expectOrNexpect(node,
+                   nodeAppPort(node),
+                   null, // no message
+                   message,
+                   DEFAULT_TIMEOUT,
+                   DEFAULT_COLLECT,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine(),
+                   false); // don't expect
+}
+
+void nexpect(String node, String command, String message)
+{
+  _expectOrNexpect(node,
+                   nodeAppPort(node),
+                   command,
+                   message,
+                   DEFAULT_TIMEOUT,
+                   DEFAULT_COLLECT,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine(),
+                   false); // don't expect
+}
+
+void nexpectMultiline(String node,
+                      String[] message,
+                      int timeoutMs)
+{
+  _expectOrNexpectMutiline(node,
+                           nodeAppPort(node),
+                           null,
+                           message,
+                           timeoutMs,
+                           getSourceFileInfo(),
+                           this.namespace.getInvocationLine(),
+                           false); // don't expect
+}
+
+// Deprecated - use expect(String, String, String, int).
+String expect(String node, String command, int timeout, String expectedOutput)
+{
+  dbg.println(Ansi.debugWarning.colorize("expect(String, String, int, String) is deprecated, line " + this.namespace.getInvocationLine() + ".  Use \"expect(String, String, String, int)\"."));
+  return _expect(node,
+                 nodeAppPort(node),
+                 command,
+                 expectedOutput,
+                 timeout,
+                 DEFAULT_COLLECT,
+                 getSourceFileInfo(),
+                 this.namespace.getInvocationLine());
+}
+
+void networkForm(String device)
+{
+  if (networkParams == "") {
+    throw new Exception("Script Error: setNetworkParams() has not been called.");
+  }
+  _expectInternal(device, "network form " + networkParams, ".*EMBER_NETWORK_UP.*", 5000);
+  network.sleep(DEFAULT_TIMEOUT);
+}
+
+void networkCreatorStart(String device, boolean isCentralized)
+{
+  expect(device, "plugin network-creator start "+ (isCentralized ? "1":"0"),
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+  network.sleep(DEFAULT_TIMEOUT);
+}
+
+void permitJoin(String device, boolean on)
+{
+  int time = (on ? 255 : 0);
+  expect(device,
+            "network pjoin " + time,
+            ".*pJoin for " + time + " sec: 0x00.*",
+            DEFAULT_TIMEOUT);
+}
+
+void networkCreatorSecurityOpenNetwork(String device)
+{
+  expect (device, 
+    "plugin network-creator-security open-network",
+    ".*NWK Creator Security: Open network: 0x00.*",
+    DEFAULT_TIMEOUT);
+}
+
+void networkCreatorSecurityCloseNetwork(String device)
+{
+  expect (device, 
+    "plugin network-creator-security close-network",
+    ".*NWK Creator Security: Close network: 0x00.*",
+    DEFAULT_TIMEOUT);
+}
+
+
+String parseNetworkUpNodeId(String nodeName, String networkUpMessage)
+{
+  String nodeId;
+
+  i = networkUpMessage.indexOf(networkUpNodeIdSuffix);
+  if (i == -1) {
+    debugPrintln("*** Note:  Encountered bug EMASTACK-2704, Performing workaround");
+    // See bug: EMSTACK-2704
+    // Peek has an issue where the expect() call returns a collected output line that is
+    // different than the line that matched the expect().  This is the very
+    // ugly workaround.
+    String text = "Short ID: 0x";
+    String match = expect(nodeName, "network id", text + ".*");
+    i = match.indexOf(text);
+    assert(i != -1);
+    i += text.length();
+    nodeId = "0x" + match.substring(i, i + 4);
+
+  } else {
+    i += networkUpNodeIdSuffix.length();
+    nodeId = "0x" + networkUpMessage.substring(i, i + 4);
+  }
+  findNodeByName(nodeName).nodeIdHex = nodeId;
+  return nodeId;
+}
+
+String networkJoinTo(String joiningDevice, String parentDevice)
+{
+  permitJoin(parentDevice, true);
+  String result = _expectInternal(joiningDevice,
+                                  "network join " + networkParams,
+                                  networkUpRegex,
+                                  timeout);
+  String nodeId = parseNetworkUpNodeId(joiningDevice, result);
+
+  // Allow time for any joining messages to flush
+  networkWait(timeout);
+  permitJoin(parentDevice, false);
+  return nodeId;
+}
+
+void networkZ3JoinDeviceViaParent(String trustCenter, String joiningDevice, String parentDevice)
+{
+  //Open network for joining
+  networkCreatorSecurityOpenNetwork(trustCenter);
+  if ( !trustCenter.equals(parentDevice)) {
+    permitJoin(trustCenter, false);
+    permitJoin(parentDevice, true);
+  }
+
+  //Note that the additional delay is necessary for the network up message
+  expect(joiningDevice,
+            "plugin network-steering start 0",
+            ".*EMBER_NETWORK_UP.*",
+            DEFAULT_TIMEOUT<<2);
+
+  // Allow time for any joining messages to flush
+  permitJoin(parentDevice, false);
+  networkWait(DEFAULT_TIMEOUT);
+  permitJoin(trustCenter, false);
+  networkWait(DEFAULT_TIMEOUT);
+  networkCreatorSecurityCloseNetwork(trustCenter);
+  networkWait(DEFAULT_TIMEOUT);
+}
+
+String networkJoinToWithTimeout(String joiningDevice, String parentDevice, int ourTimeout)
+{
+  permitJoin(parentDevice, true);
+  String result = _expectInternal(joiningDevice,
+                                  "network join " + networkParams,
+                                  networkUpRegex,
+                                  ourTimeout);
+  String nodeId = parseNetworkUpNodeId(joiningDevice, result);
+
+  // Allow time for any joining messages to flush
+  networkWait(ourTimeout);
+  permitJoin(parentDevice, false);
+  return nodeId;
+}
+
+// Assumes the first device in the list is the Coordinator/TC
+// (device that forms the network)
+void formAndJoinDevices(String[] deviceList, boolean waitForKeyEstablishmentToComplete)
+{
+  formAndJoinDevicesWithAddedDelay(deviceList, waitForKeyEstablishmentToComplete, 0);
+}
+
+String subGhzChannelMask(int channel, int page)
+{
+  byte pageMask = (byte)(page << 5);
+  byte channelMask = (byte) (channel & 31);
+  byte newMask = (pageMask | channelMask);
+  return String.format("0x%02X", new Object[]{(newMask)});
+}
+
+String networkJoinTo(String joiningDevice, String parentDevice,boolean onSubGhz,int subGhzPage, int subGhzChannel, boolean waitForKeyEstablishmentToComplete)
+{
+  permitJoin(parentDevice, true);
+  String result = _expectInternal(joiningDevice,
+                                  "network join " + (onSubGhz ? subGhzChannelMask(subGhzChannel, subGhzPage) + " 0 " + networkPanId : networkParams),
+                                  networkUpRegex,
+                                  timeout);
+
+  String nodeId = parseNetworkUpNodeId(joiningDevice, result);
+
+  // Allow time for any joining messages to flush
+  networkWait(timeout);
+  permitJoin(parentDevice, false);
+
+  if (waitForKeyEstablishmentToComplete) {
+    // Due to retry failuers for things such as discovery, it may
+    // take longer for Key establishment to complete than normal in multihop
+    _expectInternal(joiningDevice,
+                    "",
+                    "Initiator: Key Establish Success: Link key verified.*",
+                    onSubGhz ? 50000: 30000);
+    // Add a little extra delay to let the network broadcasts time out and
+    // other registration steps complete.
+    networkWait(20000);
+  }
+
+  return nodeId;
+}
+
+String networkJoinTo(String joiningDevice, String parentDevice,boolean onSubGhz,int subGhzPage, int subGhzChannel)
+{
+  permitJoin(parentDevice, true);
+  String result = _expectInternal(joiningDevice,
+                                  "network join " + (onSubGhz ? subGhzChannelMask(subGhzChannel, subGhzPage) + " 0 " + networkPanId : networkParams),
+                                  networkUpRegex,
+                                  timeout);
+
+
+  String nodeId = parseNetworkUpNodeId(joiningDevice, result);
+
+  // Allow time for any joining messages to flush
+  networkWait(timeout);
+  permitJoin(parentDevice, false);
+
+  return nodeId;
+}
+
+void formAndJoinDevicesWithSubGhz(String[] deviceList, boolean waitForKeyEstablishmentToComplete, int delayBetweenJoins, boolean[] onSubGhz, int subGhzPage, int subGhzChannel)
+{
+  networkForm(deviceList[0]);
+  //send(deviceList[0],"network multi-phy-start " + subGhzPage + " " + subGhzChannel + " 0" /*power*/);
+  _expectInternal(deviceList[0],
+                  "network multi-phy-start " + subGhzPage + " " + subGhzChannel + " 0 0" /*power, options*/,
+                  "Started multi-phy interface");
+  allNodes[0].nodeIdHex = "0x0000";
+
+  for (int i = 1; i < deviceList.length; i++) {
+    allNodes[i].nodeIdHex = networkJoinTo(deviceList[i], (runArgument.runUsingMultihop
+                                          ? deviceList[i - 1]
+                                          : deviceList[0]),onSubGhz[i],subGhzPage,subGhzChannel);
+    debugPrintln("Node '" + deviceList[i] + "' has node ID: 0x" + allNodes[i].nodeIdHex);
+    if (waitForKeyEstablishmentToComplete) {
+      // Due to retry failuers for things such as discovery, it may
+      // take longer for Key establishment to complete than normal in multihop
+      _expectInternal(deviceList[i],
+                      "",
+                      "Initiator: Key Establish Success: Link key verified.*",
+                      30000);
+      // Add a little extra delay to let the network broadcasts time out and
+      // other registration steps complete.
+      networkWait(20000);
+    }
+    networkWait(DEFAULT_TIMEOUT);
+
+    _expect(deviceList[0],
+            nodeAppPort(deviceList[0]),
+           "plugin concentrator print-table", 
+           ".* total entries.*",
+           DEFAULT_TIMEOUT,
+           DEFAULT_COLLECT,
+           getSourceFileInfo(),
+           this.namespace.getInvocationLine());
+
+    networkWait(delayBetweenJoins);
+  }
+}
+
+void formAndJoinDevicesWithSubGhz(String[] deviceList, boolean waitForKeyEstablishmentToComplete, boolean[] onSubGhz, int subGhzPage, int subGhzChannel)
+{
+  formAndJoinDevicesWithSubGhz(deviceList,
+                               waitForKeyEstablishmentToComplete,
+                               0,
+                               onSubGhz,
+                               subGhzPage,
+                               subGhzChannel);
+}
+
+void formAndJoinDevices(String[] deviceList)
+{
+  formAndJoinDevices(deviceList,
+                     false);     // waitForKeyEstablishmentToComplete?
+}
+
+// Assumes the first device in the list is the Coordinator/TC
+// (device that forms the network)
+void formAndJoinDevicesWithAddedDelay(String[] deviceList, boolean waitForKeyEstablishmentToComplete, int delayBetweenJoins)
+{
+  networkForm(deviceList[0]);
+  allNodes[0].nodeIdHex = "0x0000";
+
+  for (int i = 1; i < deviceList.length; i++) {
+    allNodes[i].nodeIdHex = networkJoinTo(deviceList[i], (runArgument.runUsingMultihop
+                                          ? deviceList[i - 1]
+                                          : deviceList[0]));
+    debugPrintln("Node '" + deviceList[i] + "' has node ID: 0x" + allNodes[i].nodeIdHex);
+    if (waitForKeyEstablishmentToComplete) {
+      // Due to retry failuers for things such as discovery, it may
+      // take longer for Key establishment to complete than normal in multihop
+      _expectInternal(deviceList[i],
+                      "",
+                      "Initiator: Key Establish Success: Link key verified.*",
+                      30000);
+      // Add a little extra delay to let the network broadcasts time out and
+      // other registration steps complete.
+      networkWait(20000);
+    }
+    networkWait(DEFAULT_TIMEOUT);
+
+    _expect(deviceList[0],
+            port,
+           "plugin concentrator print-table", 
+           ".* total entries.*",
+           DEFAULT_TIMEOUT,
+           DEFAULT_COLLECT,
+           getSourceFileInfo(),
+           this.namespace.getInvocationLine());
+
+    networkWait(delayBetweenJoins);
+  }
+}
+
+void setupEncryption()
+{
+  // We sleep a little here to allow time for the Simulator to bring
+  // up the nodes so we can tell them what the encryption type is.
+  network.sleep(500);
+  network.setEncryption(network.hosts());
+}
+
+void expectNoResponse(String device, String command)
+{
+  if (command != null) {
+    printCommand(device, nodeAppPort(device), command);
+  }
+  String match = network.expect(device,
+                                port,
+                                command,
+                                ".*",
+                                2000,
+                                DEFAULT_COLLECT);
+  if (match != null
+      // This is an EZSP message which is sent over the STDIO
+      // and happens to be caught by our expect(). Ignore it.
+      // EZSP messages always start with 'FE' but the payload may differ.
+      // For now I am leaving this as regex.
+      // This is a hack, I know.  The real solution is to make
+      // EZSP messages NOT use 'serial out' as the message type for
+      // the child -> parent simulator messages.
+      // See 'tool/simulator/child/child-main.c:writeEzspSerialOutput()'
+      // That change is a pain because it will likely break a lot of other
+      // scripted tests, but it is the right thing to do.
+      && match.matches("^FE [ A-F0-9]+$") != true) {
+//       && match.compareTo("FE 08 5C 00 AB 0F 03 01 00 00") != 0
+//       && match.compareTo("FE 08 41 00 AB 0F 03 01 00 00") != 0
+//       && match.compareTo("FE 08 5E 00 AB 0F 03 01 00 00") != 0
+//       && match.compareTo("FE 08 68 00 AB 0F 03 01 00 00") != 0) {
+    throw new Exception("Got unexpected response: \n  "
+                        + match + "\n"
+                        + "to command: \n  "
+                        + command
+                        + "\nfrom device \""
+                        + device
+                        + "\""
+                        + ": file " + getSourceFileInfo()
+                        + ", line " + this.namespace.getInvocationLine()
+                        + ", multihop="+ runArgument.runUsingMultihop
+                        + ", host=" + runArgument.runUsingHostApps);
+  }
+}
+
+void reboot(String device)
+{
+  _expect(device,
+          nodeAppPort(device),
+          "reset",
+          (runArgument.runUsingHostApps
+           ? ".*ezsp ver .*"
+           : ".*Reset info:.*"),
+          DEFAULT_TIMEOUT,
+          DEFAULT_COLLECT,
+          getSourceFileInfo(),
+          this.namespace.getInvocationLine());
+
+  // The simulator needs to inform the nodes on every reboot what kind
+  // of encryption is being used in the network so that they will encrypt
+  // their packets correctly (i.e. with pseudo-encryption or real encryption)
+  setupEncryption();
+}
+
+//this is same as normal reboot, but does not look for ezsp reboot message even if the script flags using hosts
+void socReboot(String device)
+{
+  _expect(device,
+    DEFAULT_PORT,
+    "reset",
+    ".*Reset info:.*",
+    DEFAULT_TIMEOUT,
+    DEFAULT_COLLECT,
+    getSourceFileInfo(),
+    this.namespace.getInvocationLine());
+
+  // The simulator needs to inform the nodes on every reboot what kind
+  // of encryption is being used in the network so that they will encrypt
+  // their packets correctly (i.e. with pseudo-encryption or real encryption)
+  setupEncryption();
+}
+
+void createMultihopChain(String[] hosts)
+{
+  for (int i = 0; i < hosts.length; i++) {
+    // It is assumed that 100 is the max radio range for 2 nodes to hear each other
+    // such nodes that are 200 apart have no connectivity whatsoever.
+    network.add(hosts[i],
+                new Location(0, i * 100),
+                null);
+  }
+}
+
+void expectMultipleHosts(String[] hosts, String command, String regex)
+{
+  for (int i = 0; i < hosts.length; i++) {
+    _expect(hosts[i],
+            nodeAppPort(hosts[i]),
+            command,
+            regex,
+            DEFAULT_TIMEOUT,
+            DEFAULT_COLLECT,
+            getSourceFileInfo(),
+            this.namespace.getInvocationLine());
+  }
+}
+
+void expectNoResponseMultipleHosts(String[] hosts, String command)
+{
+  for (int i = 0; i < hosts.length; i++) {
+    expectNoResponse(hosts[i], command);
+  }
+}
+
+void addAndLoadDevices(String[] devices,
+                       String[] socImages,
+                       String[] hostImages,
+                       String ncpImage,
+                       String trxImage)
+{
+  if (runArgument.runUsingAfNcp)
+    ncpImage = "build/af-test-apps/ncp-spi/ncp-spi";
+
+  String[] ncpImages = new String[devices.length];
+  String[] trxImages = new String[devices.length];
+  for (int i = 0; i < devices.length; i++) {
+    ncpImages[i] = ncpImage;
+    trxImages[i] = trxImage;
+  }
+  addAndLoadDevices(devices,
+                    socImages,
+                    hostImages,
+                    ncpImages,
+                    trxImages,
+                    runArgument.runUsingHostApps,
+                    runArgument.runUsingMultihop,
+                    runArgument.runUsingSpiNcp);
+  return;
+}
+
+void addAndLoadDevices(String[] devices,
+                       String[] socImages,
+                       String[] hostImages,
+                       String ncpImage)
+{
+  if (runArgument.runUsingAfNcp)
+    ncpImage = "build/af-test-apps/ncp-spi/ncp-spi";
+  
+  String[] ncpImages = new String[devices.length];
+  for (int i = 0; i < devices.length; i++) {
+    ncpImages[i] = ncpImage;
+  }
+  addAndLoadDevices(devices,
+                    socImages,
+                    hostImages,
+                    ncpImages,
+                    runArgument.runUsingHostApps,
+                    runArgument.runUsingMultihop,
+                    runArgument.runUsingSpiNcp);
+  return;
+}
+
+void addAndLoadDevices(String[] devices,
+                       String[] socImages,
+                       String[] hostImages,
+                       String[] ncpImages)
+{
+  addAndLoadDevices(devices,
+                    socImages,
+                    hostImages,
+                    ncpImages,
+                    runArgument.runUsingHostApps,
+                    runArgument.runUsingMultihop,
+                    runArgument.runUsingSpiNcp);
+  return;
+}
+
+// Creates a network according to the preferences provided.
+// If useHost is true, the devices will be added as hosts and the
+// host images will be used.
+// If useMultihop is true, the devices will be arranged in a network
+// for multihop.
+void addAndLoadDevices(String[] devices,
+                       String[] socImages,
+                       String[] hostImages,
+                       String ncpImage,
+                       boolean useHost,
+                       boolean useMultihop,
+                       boolean useSpi)
+{
+  String[] ncpImages = new String[devices.length];
+  for (int i = 0; i < devices.length; i++) {
+    ncpImages[i] = ncpImage;
+  }
+  addAndLoadDevices(devices, socImages, hostImages, ncpImages, useHost, useMultihop, useSpi);
+  return;
+}
+
+void addAndLoadDevices(String[] devices,
+                       String[] socImages,
+                       String[] hostImages,
+                       String[] ncpImages,
+                       boolean useHost,
+                       boolean useMultihop,
+                       boolean useSpi)
+{
+  // Do a little argument validation
+  if (devices.length != socImages.length
+      || devices.length != hostImages.length
+      || devices.length != ncpImages.length) {
+    throw new Exception("Error in addAndLoadDevices(), String arrays devices,"
+                        + " socImages, hostImages, and ncpImages must all have"
+                        + " the same length.  Currently, devices.length = "
+                        + devices.length + ", socImages.length = "
+                        + socImages.length + ", hostImages.length = "
+                        + hostImages.length + ", ncpImages.length = "
+                        + ncpImages.length);
+  }
+  allNodes = new TestNode[devices.length];
+  appPortMap = new Hashtable(devices.length);
+  for (int i = 0; i < devices.length; i++) {
+    Location nodeLocation = new Location(1, (useMultihop?i*100:i));
+    allNodes[i] = new TestNode(devices[i],
+                               socImages[i],
+                               hostImages[i],
+                               ncpImages[i],
+                               nodeLocation);
+    String device = devices[i];
+    String[] executablePaths = removePlus(new String[]{ hostImages[i],
+                                socImages[i],
+                                ncpImages[i] });
+    String hostImage = executablePaths[0];
+    String socImage = executablePaths[1];
+    String ncpImage = executablePaths[2];
+    if (useHost) {
+      network.add(device);
+      network.add(device + ncpSuffix, nodeLocation, null);
+      Em260Util.connectHostAndEm260(network, device, device + ncpSuffix, null, useSpi);
+      network.bootload(device, hostImage);
+      network.bootload(device + ncpSuffix, ncpImage);
+      network.setHostNcpReferences(device, device + ncpSuffix);
+      int appPort = useSpi ? DEFAULT_PORT : UART_APP_PORT;
+      appPortMap.put(device,appPort);
+    } else {
+      network.add(device, new Location(1, (useMultihop?i*100:i)), null);
+      network.bootload(device, socImage);
+      appPortMap.put(device,DEFAULT_PORT);
+    }
+  }
+  networkWait(5000);  // sometimes devices need extra time to come up after boot
+}
+
+void addAndLoadDevices(String[] devices,
+                       String[] socImages,
+                       String[] hostImages,
+                       String[] ncpImages,
+                       String[] trxImages,
+                       boolean useHost,
+                       boolean useMultihop,
+                       boolean useSpi)
+{
+  // Do a little argument validation
+  if (devices.length != socImages.length
+      || devices.length != hostImages.length
+      || devices.length != ncpImages.length
+      || devices.length != trxImages.length) {
+    throw new Exception("Error in addAndLoadDevices(), String arrays devices,"
+                        + " socImages, hostImages, ncpImages and trxImages must all have"
+                        + " the same length.  Currently, devices.length = "
+                        + devices.length + ", socImages.length = "
+                        + socImages.length + ", hostImages.length = "
+                        + hostImages.length + ", ncpImages.length = "
+                        + ncpImages.length + ", trxImages.length = "
+                        + trxImages.length);
+  }
+  allNodes = new TestNode[devices.length];
+  appPortMap = new Hashtable(devices.length);
+  for (int i = 0; i < devices.length; i++) {
+    Location nodeLocation = new Location(1, (useMultihop?i*100:i));
+    allNodes[i] = new TestNode(devices[i], 
+                               socImages[i],
+                               hostImages[i],
+                               ncpImages[i],
+                               trxImages[i],
+                               nodeLocation);
+    String[] executablePaths = removePlus(new String[]{ hostImages[i],
+                                socImages[i],
+                                ncpImages[i] });
+    String device = devices[i];
+    String hostImage = executablePaths[0];
+    String socImage = executablePaths[1];
+    String ncpImage = executablePaths[2];
+    String trxImage = trxImages[i];
+    if (useHost) {
+      network.add(device);
+      network.add(device + ncpSuffix, nodeLocation, null);
+      network.add(device + trxSuffix, nodeLocation, null);
+      Em260Util.connectHostAndEm260(network, device, device + ncpSuffix, device + trxSuffix, useSpi);
+      network.bootload(device, hostImage);
+      network.bootload(device + ncpSuffix, ncpImage);
+      network.bootload(device + trxSuffix, trxImage);
+      network.setHostNcpReferences(device, device + ncpSuffix, device + trxSuffix);
+      int appPort = useSpi ? DEFAULT_PORT : UART_APP_PORT;
+      appPortMap.put(device,appPort);
+    } else {
+      network.add(device, new Location(1, (useMultihop?i*100:i)), null);
+      network.bootload(device, socImage);
+      appPortMap.put(device, DEFAULT_PORT);
+    }
+  }
+  networkWait(5000);  // sometimes devices need extra time to come up after boot
+}
+
+String networkGenericCommandAttempt(String nodeName,
+                                    String command,
+                                    int timeout,
+                                    boolean rescanAllowed)
+{
+  // Wait for either the network up prompt or a rescan on all channels
+  String regexToMatch = rescanAllowed
+                        ? ".*(" + networkUpString + "|" + "no suitable primary channel found" + ").*"
+                        : networkUpRegex;
+  String result = _expect(nodeName,
+                          nodeAppPort(nodeName),
+                          command,
+                          regexToMatch,
+                          timeout,
+                          DEFAULT_COLLECT,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+  if (rescanAllowed && !result.matches(networkUpRegex)) {
+    // Must be the rescan, wait a bit more
+    String result = _expect(nodeName,
+                            "",
+                            networkUpRegex,
+                            timeout * 10, // rescan on all channels takes longer, especially on sub-GHz
+                            getSourceFileInfo(),
+                            this.namespace.getInvocationLine());
+  }
+  return result;
+}
+
+void debugPrintln(String text)
+{
+  debugPrint(text);
+  debugPrint("\n");
+}
+
+void debugPrint(String text)
+{
+  dbg.print(text);
+}
+
+class LinkKeyBackup
+{
+  String eui64BigEndian;
+  String key;
+};
+
+class TrustCenterBackup
+{
+  String extendedPanId;
+  LinkKeyBackup[] keyList;
+};
+
+TrustCenterBackup exportTrustCenterBackupData(String nodeName)
+{
+  debugPrintln("Getting Extended PAN ID for backup");
+  String data = expect(nodeName,
+                       "plugin trust-center-backup print-export",
+                       ".*Extended PAN ID:.*");
+  int index = data.indexOf("(>)") + 3;
+  TrustCenterBackup backup = new TrustCenterBackup();
+  backup.extendedPanId = data.substring(index, index + 16);
+
+  debugPrintln("Retrieving number of keys in backup");
+  data = expect(nodeName,
+                       "plugin trust-center-backup print-export",
+                       ".*keys in backup");
+  index = data.indexOf(" keys");
+  int keyListLength = Integer.parseInt(data.substring(0, index));
+  backup.keyList = new LinkKeyBackup[keyListLength];
+
+  // Unfortunately since we don't have multi-line expect statements,
+  // we must re-execute the backup routine for each entry there is.
+  for (int i = 0; i < keyListLength; i++) {
+    debugPrintln("Obtaining key backup for index " + i);
+    data = expect(nodeName,
+                  "plugin trust-center-backup print-export",
+                  i + ".*(>).*");
+    index = data.indexOf("(>)") + 3;
+    backup.keyList[i] = new LinkKeyBackup();
+    backup.keyList[i].eui64BigEndian = data.substring(index, index + 16);
+    backup.keyList[i].key = data.substring(index + 16 + 2, // +2 for spaces
+                                           index + 16 + 2 + (3*16));
+    backup.keyList[i].key = backup.keyList[i].key.replace(" ", "");
+    debugPrintln("Index " + i
+                 + " deviceID: (>)" + backup.keyList[i].eui64BigEndian
+                 + " key: " + backup.keyList[i].key);
+  }
+  return backup;
+}
+
+void importTrustCenterBackup(String nodeName, TrustCenterBackup backup)
+{
+  int i;
+
+  debugPrintln("Setting extended PAN ID from backup");
+  _expect(nodeName,
+          port,
+          "plugin trust-center-backup set-ext-pan "
+          + "{" + backup.extendedPanId + "}",
+          null,  // no response
+          timeout,
+          DEFAULT_COLLECT,
+          thisFile,
+          this.namespace.getInvocationLine());
+
+  for (i = 0; i < backup.keyList.length; i++) {
+    debugPrintln("Importing key for index " + i + " from backup");
+    _expect(nodeName,
+            port,
+            "plugin trust-center-backup import-key "
+            + i
+            + " {" + backup.keyList[i].eui64BigEndian + "} "
+            + " {" + backup.keyList[i].key + "} ",
+            null, // no response
+            timeout,
+            DEFAULT_COLLECT,
+            thisFile,
+            this.namespace.getInvocationLine());
+  }
+
+  networkGenericCommandAttempt(nodeName,
+                               "plugin trust-center-backup restore",
+                               timeout,
+                               true);
+}
+
+String getCurrentNetworkKey(String nodeName)
+{
+  debugPrintln("Getting current NWK key");
+  String prefix = "NWK Key: ";
+  String data = _expectInternal(nodeName,
+                                "keys print",
+                                prefix + ".*");
+
+  data = data.substring(prefix.length());
+  data = data.trim();
+  debugPrintln("Retrieved NWK Key: '" + data + "'");
+  return data;
+}
+
+void buttonPress(String nodeName,
+                 int buttonNum)
+{
+  buttonPress(nodeName, buttonNum, null, null);
+}
+
+void buttonPressAndHold(String nodeName,
+                        int buttonNum,
+                        String buttonPressExpectString)
+{
+  String buttonString = "0";
+  if (buttonNum == 1) {
+    buttonString = "1";
+  } else if (buttonNum != 0) {
+    assert("Invalid button number " + buttonNum);
+  }
+  printData(nodeName, "HW", "(Press button " + buttonString + ")");
+  network.pressButton(nodeName, buttonString);
+  if (buttonPressExpectString != null) {
+    _expectInternal(nodeName, "", buttonPressExpectString, timeout * 10);
+  }
+}
+
+void buttonRelease(String nodeName, int buttonNum)
+{
+  buttonRelease(nodeName, buttonNum, null);
+}
+
+void buttonRelease(String nodeName,
+                   int buttonNum,
+                   String buttonReleaseExpectString)
+{
+  String buttonString = "0";
+  if (buttonNum == 1) {
+    buttonString = "1";
+  } else if (buttonNum != 0) {
+    assert("Invalid button number " + buttonNum);
+  }
+  printData(nodeName, "HW", "(Release button " + buttonString +  ")");
+  network.releaseButton(nodeName, buttonString);
+  if (buttonReleaseExpectString != null) {
+    _expectInternal(nodeName, "", buttonReleaseExpectString, timeout * 10);
+  }
+}
+
+
+void buttonPress(String nodeName,
+                 int buttonNum,
+                 String buttonPressExpectString,
+                 String buttonReleaseExpectString)
+{
+  buttonPressAndHold(nodeName, buttonNum, buttonPressExpectString);
+  buttonRelease(nodeName, buttonNum, buttonReleaseExpectString);
+}
+
+void networkWait(int sleepTimeMs)
+{
+  printData(null, "NETWORK", "(Wait " + sleepTimeMs + " ms)");
+  network.sleep(sleepTimeMs);
+  printData(null, "NETWORK", "(Finished Wait)");
+}
+
+void power(String nodeName, boolean on)
+{
+  printData(nodeName, "HW", "(Power " + (on ? "ON": "OFF") + ")");
+  // first power up the ncp image (ncpNodeName) and then host-app (nodeName),
+  // otherwise it won't form/join a network.
+  if (runArgument.runUsingHostApps) {
+    String ncpNodeName = nodeName + "-ncp";
+    printData(ncpNodeName, "HW", "(Power " + (on ? "ON": "OFF") + ")");
+    network.power(ncpNodeName, on);
+  }
+  network.power(nodeName, on);
+  if (on) {
+    if (runArgument.runUsingHostApps) {
+      networkWait(1000);
+    }
+    setupEncryption();
+  }
+}
+
+void readBasicClusterTest(String sendingNodeName,
+                          String receivingNodeId)
+{
+  checkAttributeRead(sendingNodeName,
+                     receivingNodeId,
+                     "Basic",
+                     "0x0000",
+                     "0x0000",
+                     "0x00",
+                     "00",
+                     10000,
+                     getSourceFileInfo(),
+                     this.namespace.getInvocationLine());
+}
+
+void checkAttributeRead(String sendingNodeName,
+                        String receivingNodeId,
+                        String clusterName,
+                        String clusterInHex,
+                        String attrInHex,
+                        String attrTypeInHex,
+                        String attrReturnValueInHex, // no 0x prefix
+                        int timeout,
+                        String file,
+                        int lineNumberOfCaller)
+{
+  // This assumes the attribute exists and receiving node returns SUCCESS
+  // to the global read.  The most common case.
+  expect(sendingNodeName,
+         "zcl global read " + clusterInHex + " " + attrInHex,
+         "buffer: .*");
+  
+  // This is why consistency is king.  The command-line input requires arguments
+  // in hex, so that it can distinguish decimal vs hex.  The output is always
+  // in hex but doesn't prefix 0x.  Ridiculous.  All hex numbers should be prefixed
+  // in 0x to make it clear.  It just causes problems (like this) otherwise.
+  // This removes the 0x prefix.
+  String attrInHexNoPrefix = new String(attrInHex.substring(2));
+  String attrTypeInHexNoPrefix = new String(attrTypeInHex.substring(2));
+
+  int sourceEndpoint = 1;
+  TestNode sourceNode = findNodeByName(sendingNodeName);
+  if (sourceNode.defaultEndpoint != 0) {
+    sourceEndpoint = sourceNode.defaultEndpoint;
+  }
+  int destEndpoint = 1;
+  TestNode destNode = findNodeById(receivingNodeId);
+  if (destNode.defaultEndpoint != 0) {
+    destEndpoint = destNode.defaultEndpoint;
+  }
+  _expect(sendingNodeName,
+          port,
+          "send " + receivingNodeId + " " + sourceEndpoint + " " + destEndpoint,
+          ".*RX len \\d+, ep 0" + sourceEndpoint + ", clus " + clusterInHex + " \\(" + clusterName + "\\).*",
+          timeout,
+          DEFAULT_COLLECT,
+          file,
+          lineNumberOfCaller);
+}
+
+// Same as above, no timeout passed in.
+void checkAttributeRead(String sendingNodeName,
+                        String receivingNodeId,
+                        String clusterName,
+                        String clusterInHex,
+                        String attrInHex,
+                        String attrTypeInHex,
+                        String attrReturnValueInHex, // no 0x prefix
+                        String file,
+                        int lineNumberOfCaller)
+{
+  checkAttributeRead(sendingNodeName,
+                     receivingNodeId,
+                     clusterName,
+                     clusterInHex,
+                     attrInHex,
+                     attrTypeInHex,
+                     attrReturnValueInHex,
+                     DEFAULT_TIMEOUT,
+                     file,
+                     lineNumberOfCaller);
+}
+
+
+void checkAttributeWrite(String sendingNodeName,
+                         String receivingNodeId,
+                         String clusterName,
+                         String clusterInHex,
+                         String attrInHex,
+                         String attrTypeInHex,
+                         String attrDataInHex,
+                         String returnStatusInHex,  // no 0x prefix
+                         String file,
+                         int lineNumberOfCaller)
+{
+  send(sendingNodeName,
+       "zcl global write "
+       + clusterInHex + " "
+       + attrInHex + " "
+       + attrTypeInHex
+       + " {"
+       + attrDataInHex
+       + "}");
+
+  // This assumes source and dest endpoints are both 1 (the default for our apps).
+  _expectMultiline(sendingNodeName,
+                   "send " + receivingNodeId + " 1 1",
+                   new String[] {
+                     "WRITE_ATTR_RESP: \\(" + clusterName + "\\)",
+                     " - status:" + returnStatusInHex,
+                   },
+                   DEFAULT_TIMEOUT,
+                   file,
+                   lineNumberOfCaller);
+}
+
+/**
+* Returns the network frame counter on a given node according to the
+* "keys print" CLI command.
+*
+* @param node The node name (e.g., "esp") to check.
+* @return int containing the network frame counter of the given node.
+*/
+int nwkFrameCounter(String node)
+{
+  return _nwkFrameCounter(node,
+                          nodeAppPort(node),
+                          this.namespace.getInvocationLine());
+}
+
+/**
+* Returns the network frame counter on a given node according to the
+* "keys print" CLI command.
+*
+* @param node The node name (e.g., "esp") to check.
+* @param port The port on which to send the message.
+* @return int containing the network frame counter of the given node.
+*/
+int nwkFrameCounter(String node, int port)
+{
+  return _nwkFrameCounter(node, port, this.namespace.getInvocationLine());
+}
+
+int _nwkFrameCounter(String node, int port, int line)
+{
+  String data = _expect(node,
+                        port,
+                        "keys print",
+                        "NWK Key out FC: [0-9a-fA-F]{8}",
+                        DEFAULT_TIMEOUT,
+                        DEFAULT_COLLECT,
+                        getSourceFileInfo(),
+                        line);
+  assert(data != null);
+  return Integer.parseInt(data.substring(16), 16);
+}
+
+/**
+* Checks if two nodes are on the same network. Errors out if other wise. 
+*
+* @param node1 
+* @param node2
+*/
+
+void assertSameNetwork(String node1, String node2){
+  assert(channel(node1).equals(channel(node2)));
+  assert(panId(node1).equals(panId(node2)));
+  assert(extendedPanId(node1).equals(extendedPanId(node2)));
+}
+
+/**
+ * Return attribute value according to the "print attr" CLI command.
+ *
+ * @param clusterId 
+ * @param attributeId
+ */
+String getAttribute(String node, String clusterId, String attributeId)
+{
+  return _getAttribute(node,
+                       clusterId,
+                       attributeId,
+                       nodeAppPort(node),
+                       this.namespace.getInvocationLine());
+}
+
+String _getAttribute(String node,
+                     String clusterId,
+                     String attributeId,
+                     int port,
+                     int line)
+{
+  String data = _expect(node,
+                        port,
+                        "print attr",
+                        clusterId + " / srvr / " + attributeId + " / ---- / [\\d]+ \\([\\d]+\\) / RO /   RAM   / .*",
+                        DEFAULT_TIMEOUT,
+                        DEFAULT_COLLECT,
+                        getSourceFileInfo(),
+                        line);
+  int start = data.lastIndexOf('/');
+  int end = data.lastIndexOf('(');
+  assert(data != null && (start < end));
+  return data.substring(start+1, end).trim();
+}
+
+void checkBindingTable(String nodeName,
+                       String[] bindingList)
+{
+  String[] expectList = new String[bindingList.length + 1];
+  int i;
+  for (i = 0; i < bindingList.length; i++) {
+    expectList[i] = bindingList[i];
+  }
+  expectList[i] = i + " of \\d+ bindings used";
+  _expectMultiline(nodeName,
+                   "option binding-table print",
+                   expectList,
+                   DEFAULT_TIMEOUT,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+}
+
+void printRxMessages(String deviceName, boolean enabled)
+{
+  expect(deviceName,
+         "option print-rx-msgs " + (enabled ? "enable" : "disable"),
+         ".*" + (enabled ? "enabled" : "disabled") + " print");
+}
+
+String expectNetworkUp(String nodeName, int timeout)
+{
+  String result = _expect(nodeName,
+                          "",
+                          networkUpRegex,
+                          timeout,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+
+  return parseNetworkUpNodeId(nodeName, result);
+}
+
+String expectNetworkUp(String nodeName)
+{
+  return expectNetworkUp(nodeName, timeout);
+}
+
+String startZllNetwork(String nodeName, String chan, String power, String panId, int timeout)
+{
+  // Really form a distributed ZLL network!
+  String result = _expect(nodeName,
+                          "plugin zll-commissioning form " + chan + " " + power + " " + panId,
+                          networkUpRegex,
+                          timeout,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+
+  // Ugly workaround to flush the CLI prompts from the output.
+  networkWait(5000);
+  send(nodeName, "network id");
+  send(nodeName, "network id");
+  return parseNetworkUpNodeId(nodeName, result);
+}
+
+String zllJoin(String nodeName, int timeout)
+{
+  String result = _expect(nodeName,
+                          "plugin zll-commissioning joinable",
+                          networkUpRegex,
+                          timeout,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+  return parseNetworkUpNodeId(nodeName, result);
+}
+
+String networkFindAttempt(String nodeName,
+                          String command,
+                          int timeout,
+                          boolean rescanAllowed)
+{
+  String result = networkGenericCommandAttempt(nodeName,
+                                               command,
+                                               timeout,
+                                               rescanAllowed);
+  return parseNetworkUpNodeId(nodeName, result);
+}
+
+String networkFindUnused(String nodeName, int timeout, boolean rescanAllowed)
+{
+  return networkFindAttempt(nodeName, "network find unused", timeout, rescanAllowed);
+}
+
+String networkFindUnused(String nodeName, int timeout)
+{
+  return networkFindAttempt(nodeName, "network find unused", timeout, false);
+}
+
+String networkFindJoinable(String nodeName, int timeout, boolean rescanAllowed)
+{
+  return networkFindAttempt(nodeName, "network find joinable", timeout, rescanAllowed);
+}
+
+String networkFindJoinable(String nodeName, int timeout)
+{
+  return networkFindAttempt(nodeName, "network find joinable", timeout, false);
+}
+
+String touchlinkZllDevices(String nodeInitiator, String nodeResponder )
+{
+  send(nodeInitiator, "plugin zll-commissioning link");
+  // To avoid message collision, we will not test for "RX: IdentifyRequest" here
+  expectNetworkUp(nodeResponder, timeout * 10);
+  expect(nodeResponder, "Touch link with 0x.... \\(\\(>\\)" + eui64(nodeInitiator) + "\\) complete");
+  expectNetworkUp(nodeInitiator, timeout * 10);
+  expect(nodeInitiator, "Touch link with 0x.... \\(\\(>\\)" + eui64(nodeResponder) + "\\) complete");
+}
+
+String epochTimeInFuture(int minutes){
+  return "0x" + Long.toHexString(System.currentTimeMillis()/1000 + 60*minutes);
+}
+
+String timeSinceZigBeeEpoch(int offsetInMinutes) {
+  // get the current time, convert it to seconds, then subtract the offset to the zigbee epoch
+  long zigbeeTime = System.currentTimeMillis()/1000 - 946684800;
+  // now factor in the offset given
+  zigbeeTime += (60 * offsetInMinutes);
+  return "0x" + Long.toHexString(zigbeeTime).toUpperCase();
+}
+
+public class NeighborInfo {
+  public String nodeIdHex;
+  public int incomingCost;
+  public int outgoingCost;
+  public boolean foundInNeighborTable = false;
+
+  public NeighborInfo(String newNodeId,
+                      int newIncomingCost,
+                      int newOutgoingCost)
+  {
+    nodeIdHex = newNodeId;
+    incomingCost = newIncomingCost;
+    outgoingCost = newOutgoingCost;
+    foundInNeighborTable = false;
+  }
+};
+
+void verifyStringOfPearls(String[] devices, boolean allDevicesPresentInNeighborTable)
+{
+  int i, j;
+  for (i = 0; i < devices.length; i++) {
+    NeighborInfo[] neighbors = new NeighborInfo[devices.length - 1];
+    int neighborIndex = 0;
+    for (j = 0; j < devices.length; j++) {
+      if (j == i) {
+        // The device should not be in its own neighbor table.
+        continue;
+      }
+
+      int incomingCost = 1;
+      int outgoingCost = 1;
+
+      if (j > i && ((i + 1) < j)) {
+        // The neighbor is more than 1-hop away
+        outgoingCost = 0;
+      } else if (i > j && ((j+1) < i)) {
+        // The neighbor is more than 1-hop away
+        outgoingCost = 0;
+      }
+
+      if (allDevicesPresentInNeighborTable || outgoingCost == 1) {
+        String nodeIdHex = findNodeByName(devices[j]).nodeIdHex;
+        neighbors[neighborIndex] = new NeighborInfo(nodeIdHex,
+                                                    incomingCost,
+                                                    outgoingCost);
+        neighborIndex++;
+      }
+    }
+
+    verifyNeighborTable(devices[i], neighbors);
+  }
+}
+
+void verifyNeighborTable(String device, NeighborInfo[] neighbors)
+{
+  String neighborTable = expectMultiline(device,
+                                         "plugin stack-diagnostics neighbor-table",
+                                         new String[] {
+                                           "#.*",
+                                           Integer.toString(neighbors.length)
+                                           + " of 16 entries used.",
+                                         });
+
+  String[] lines = neighborTable.split("\n");
+
+  String file = getSourceFileInfo();
+  int line = this.namespace.getInvocationLine();
+
+  debugPrintln("Device " + device + " expected to have neighbors");
+  for (int i = 0; i < neighbors.length; i++) {
+    debugPrintln("  " + Integer.toString(i) 
+                 + " nodeID: " + neighbors[i].nodeIdHex
+                 + " in:" + Integer.toString(neighbors[i].incomingCost)
+                 + " out: " + Integer.toString(neighbors[i].outgoingCost));
+  }
+
+  Pattern p = Pattern.compile("\\d+:.*");
+
+  // Start i at 1 because that is the first non-header line.
+  for (int i = 1; i < lines.length; i++) {
+    // Strip newline characters as that completely screws-up our
+    // regex call to "matches()", which requires a match of the complete
+    // string.
+    lines[i] = lines[i].replace("\n", "").replace("\r", "");
+
+    String lineToTest = lines[i];
+    Matcher m = p.matcher(lineToTest);
+    boolean neighborEntryLine = m.matches();
+
+    if (!neighborEntryLine) { 
+      continue;
+    }
+
+    // Format of line is '0: 0x000E 255  1   1    3    (>)0200000000000000'
+    String[] neighborItems = lines[i].split("\\s+", 7);
+    String nodeIdHex = neighborItems[1];
+    String incomingCostAsString = neighborItems[3];
+    String outgoingCostAsString = neighborItems[4];
+
+    boolean found = false;
+    for (int neighborIndex = 0; neighborIndex < neighbors.length; neighborIndex++) {
+      if (neighbors[neighborIndex].nodeIdHex.equals(nodeIdHex)) {
+        found = true;
+        neighbors[neighborIndex].foundInNeighborTable = true;
+
+        if (!incomingCostAsString.equals(Integer.toString(neighbors[neighborIndex].incomingCost))) {
+          String error = this.namespace.getInvocationText() + " failed\nError: Expected node ID "
+                         + neighbors[neighborIndex].nodeIdHex
+                         + " in neighbor table to have incomingCost of "
+                         + Integer.toString(neighbors[neighborIndex].incomingCost)
+                         + " but got cost of "
+                         + incomingCostAsString
+                         + ". File " + file
+                         + ", line " + line
+                         + ", multihop="+ runArgument.runUsingMultihop
+                         + ", host=" + runArgument.runUsingHostApps;
+          throw new Exception(error);
+        }
+
+        if (!outgoingCostAsString.equals(Integer.toString(neighbors[neighborIndex].outgoingCost))) {
+          String error = this.namespace.getInvocationText() + " failed\nError: Expected node ID "
+                         + neighbors[neighborIndex].nodeIdHex
+                         + " of neighbor table to have outgoingCost of "
+                         + Integer.toString(neighbors[neighborIndex].outgoingCost)
+                         + " but got cost of "
+                         + outgoingCostAsString
+                         + ". File " + file
+                         + ", line " + line
+                         + ", multihop="+ runArgument.runUsingMultihop
+                         + ", host=" + runArgument.runUsingHostApps;
+          throw new Exception(error);
+        }      
+      }
+    }
+
+    if (!found) {
+      String error = this.namespace.getInvocationText() + " failed\nError: Unexpected "
+                     + " node ID '" + nodeIdHex + "'' in neighbor table of device " + device
+                     + ". File " + file
+                     + ", line " + line
+                     + ", multihop="+ runArgument.runUsingMultihop
+                     + ", host=" + runArgument.runUsingHostApps;
+      throw new Exception(error);
+    }
+  }
+
+  for (int neighborIndex = 0; neighborIndex < neighbors.length; neighborIndex++) {
+    if (!neighbors[neighborIndex].foundInNeighborTable) {
+       String error = this.namespace.getInvocationText() + " failed\nError: Did not find "
+                      + neighbors[neighborIndex].nodeIdHex
+                      + " in neighbor table for device " + device;
+       throw new Exception(error);
+     }
+  }
+}
+
+/** *
+ Given: An array of Strings which are paths to executables.
+ Returns: An array of strings which are paths to executables without +.
+ Description: This has been done to remove the '+' while looking for paths of
+              executables(socImage,ncpImage and hostImage) since + is being
+              removed from directory paths while creating them.
+ Example: TestNode gateway = new TestNode("gateway",
+                                "", // no SoC image
+                                "build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+                                "build/em260-spi-unix-simulation-+legacy_compliance_revision/em260-spi",
+                                gatewayLocation);
+*/
+public String[] removePlus(String[] paths) {
+  String[] newPaths = new String[paths.length];
+  for (int i = 0; i < paths.length; i++) {
+    if ( paths[i] != null ) {
+      newPaths[i] = paths[i].replace("+", "");
+    } else {
+      newPaths[i] = paths[i];
+    }
+  }
+  return newPaths;
+}

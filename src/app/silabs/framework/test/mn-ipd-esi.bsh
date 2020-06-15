@@ -1,0 +1,171 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// This test is largely a copy of mn-esi-ipd.bsh, with the difference being that
+// the multinetwork device tested here is a sleepy on network 0 and a trust
+// center on network 1. We have received at least one customer bug arising from
+// this configuration (EMZIGBEE-1015 and EMAPPFWKV2-1230) and we also discovered
+// a different bug when testing this configuration (EMZIGBEE-2513), so we're
+// providing this beanshell to test this scenario and ensure no bugs are present
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multi-hop and host****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = {"ed0", "mn1", "coord2"};
+String[] socImages;
+String ncpImage;
+if (shouldSkipEccTest()) {
+  socImages = new String[] {
+    "build/af-test-apps/SeIpd-simulation/SeIpd",
+    "build/af-test-apps/MnIpdEsi-simulation/MnIpdEsi",
+    "build/af-test-apps/SeEsp-simulation/SeEsp",
+  };
+  ncpImage = "app/ncp/sample-app/mn-ncp-spi/simulation/build/exe/mn-ncp-spi";
+} else {
+  socImages = new String[] {
+    "build/af-test-apps/SeIpd-simulation-REAL_ECC/SeIpd",
+    "build/af-test-apps/MnIpdEsi-simulation-REAL_ECC/MnIpdEsi",
+    "build/af-test-apps/SeEsp-simulation-REAL_ECC/SeEsp",
+  };
+  ncpImage = "app/ncp/sample-app/mn-ncp-spi-real_ecc/simulation/build/exe/mn-ncp-spi";
+}
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeIpd-simulation-ezsp/SeIpd",
+  "build/af-test-apps/MnIpdEsi-simulation-ezsp/MnIpdEsi",
+  "build/af-test-apps/SeEsp-simulation-ezsp/SeEsp",
+};
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+// Debug print is compiled in but disabled by default in the multi-network
+// application.
+debugprintOn("mn1", "Debug");
+networkWait(5000);
+
+// The status of the multi-network library is not yet in the "libs" output.
+//expect("mn1", "libs", "Multi-network library present");
+
+// Check that the end device and coordinator have one network and that the
+// multi-network node has two.
+expect("ed0",
+       "info",
+       ("Nwk cnt: 1.*"
+        + "nwk 0 \\[Primary \\(pro\\)\\].*"
+        + "  nodeType \\[0x03\\]"),
+       timeout,
+       true);
+networkWait(2000);
+expect("mn1",
+       "info",
+       ("Nwk cnt: 2.*"
+        + "nwk 0 \\[SleepyEndDevice \\(pro\\)\\].*"
+        + "  nodeType \\[0x04\\].*"
+        + "nwk 1 \\[Coordinator \\(pro\\)\\].*"
+        + "  nodeType \\[0x01\\]"),
+       timeout,
+       true);
+networkWait(2000);
+expect("coord2",
+       "info",
+       ("Nwk cnt: 1.*"
+        + "nwk 0 \\[Primary \\(pro\\)\\].*"
+        + "  nodeType \\[0x01\\]"),
+       timeout,
+       true);
+networkWait(2000);
+
+// Set up the coordinator-side of the multi-network device.
+send("mn1", "network set 1");
+networkFindUnused("mn1", 5000, true);
+expect("mn1", ".*Registration complete");
+expect("mn1", "network pjoin 0xFF", ".*pJoin for 255 sec: 0x00");
+networkFindJoinable("ed0", 2000, true);
+expect("ed0", "Registration complete", 90000);
+// Reboot does not work in simulation on the host because the NCP does not
+// actually reset.
+if (!runArgument.runUsingHostApps) {
+  reboot("ed0");
+  expect("ed0", "Registration complete", 30000);
+}
+assert(nodeId("mn1").equals("0x0000"));
+String ed0 = findNodeByName("ed0").nodeIdHex;
+
+// Set up the end device-side of the multi-network device.
+expect("coord2", "network form 20 0 0xBBBB", ".*EMBER_NETWORK_UP.*");
+findNodeByName("coord2").nodeIdHex = "0000";
+
+expect("coord2", ".*Registration complete");
+expect("coord2", "network pjoin 0xFF", ".*pJoin for 255 sec: 0x00");
+send("mn1", "network set 0");
+send("mn1", "network find joinable");
+String mn1 = expect("coord2", ".*New node joined, shortID=0x[0-9a-fA-F]{4}", 2000);
+mn1 = mn1.substring(mn1.indexOf("shortID=") + 8);
+assert(!mn1.equals("0x0000"));
+// Depending on how the test is configured to run, this message sometimes comes
+// before the one we just waited for on coord2, so just don't bother with this
+// one.  If the node doesn't come up, the "Registration complete" will never
+// happen and we'll die there.
+//expect("mn1", ".*EMBER_NETWORK_UP");
+expect("mn1", "Registration complete", 60000);
+
+
+// Extract the NWK key and link keys from both networks, reboot, then verify
+// that they are all restored
+String[] lines;
+String n0NetworkKey, n1NetworkKey, n0TcLinkKey, n1Ed0LinkKey;
+
+send("mn1", "network set 0");
+
+// Extract network 0's network key
+n0NetworkKey = expect("mn1", "keys print", "NWK Key: .*");
+lines = n0NetworkKey.split("\n");
+n0NetworkKey = lines[0];
+networkWait(2000);
+
+// No CBKE on Macs, so no link key establishment
+if (shouldSkipEccTest() == false) {
+  // Extract network 0's TC link key
+  n0TcLinkKey = expect("mn1", "keys print", ".*" + eui64("coord2") + ".*");
+  n0TcLinkKey = n0TcLinkKey.substring(37);  // includes key type (L=link) and authorized state (y=yes)
+  networkWait(2000);
+}
+
+send("mn1", "network set 1");
+
+// Extract network 1's network key
+n1NetworkKey = expect("mn1", "keys print", "NWK Key: .*");
+lines = n1NetworkKey.split("\n");
+n1NetworkKey = lines[0];
+networkWait(2000);
+
+// No CBKE on Macs, so no link key establishment
+if (shouldSkipEccTest() == false) {
+  // Extract network 1's link key for ed0
+  n1Ed0LinkKey = expect("mn1", "keys print", ".*" + eui64("ed0") + ".*");
+  n1Ed0LinkKey = n1Ed0LinkKey.substring(37);  // includes key type (L=link) and authorized state (y=yes)
+  networkWait(2000);
+}
+
+reboot("mn1");
+networkWait(2000);
+
+// Now ensure that the keys are persisted after reboot
+
+send("mn1", "network set 0");
+expect("mn1", "keys print", n0NetworkKey);
+if (shouldSkipEccTest() == false) {
+  expect("mn1", "keys print", ".*" + eui64("coord2") + ".*" + n0TcLinkKey);
+}
+networkWait(2000);
+send("mn1", "network set 1");
+expect("mn1", "keys print", n1NetworkKey);
+if (shouldSkipEccTest() == false) {
+  expect("mn1", "keys print", ".*" + eui64("ed0") + ".*" + n1Ed0LinkKey);
+}
+networkWait(2000);

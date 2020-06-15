@@ -1,0 +1,284 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "server", "router", "client", "client2" };
+
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeOtaEepromTest-simulation-REAL_ECC/SeOtaEepromTest",
+  "build/af-test-apps/Se12MeterElectric-simulation-REAL_ECC/Se12MeterElectric",
+  "build/af-test-apps/SeOtaEepromTest-simulation-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS-REAL_ECC/SeOtaEepromTest",
+  // This image tests OTA resumes with a nonzero EEPROM start address. Only
+  // those using page erases exercise the resume code
+  "build/af-test-apps/SeOtaEepromTest-simulation-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS-EMBER_TEST_OTA_EEPROM_NONZERO_START_OFFSET-EMBER_TEST_OTA_EEPROM_PAGE_ERASE-REAL_ECC/SeOtaEepromTest"
+};
+
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeOtaEepromTest-simulation-ezsp/SeOtaEepromTest",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/SeOtaEepromTest-simulation-ezsp-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS/SeOtaEepromTest",
+  // This image tests OTA resumes with a nonzero EEPROM start address. Only
+  // those using page erases exercise the resume code
+  "build/af-test-apps/SeOtaEepromTest-simulation-ezsp-EMBER_TEST_OTA_CLIENT_IGNORE_NON_TRUST_CENTERS-EMBER_TEST_OTA_EEPROM_NONZERO_START_OFFSET-EMBER_TEST_OTA_EEPROM_PAGE_ERASE/SeOtaEepromTest",
+};
+
+String ncpImage = "app/ncp/sample-app/ncp-spi-real_ecc/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Let EZSP boot-up messages clear.
+networkWait(3000);
+
+if (runArgument.runUsingMfgSecurityToken) {
+  for (i = 0; i < allDevices.length; i++) {
+    expectNoResponse(allDevices[i],
+                   "security mfg-token set 0xCABAD11F 0");
+    networkWait(2000);
+    expect(allDevices[i], 
+           "security mfg-token get",
+           "  Permissions: NONE");
+    networkWait(2000);
+  }
+}
+
+formAndJoinDevices(allDevices,
+                   true);  // wait for Key establishment to complete?
+
+networkWait(60000);
+send("server", "keys print");
+networkWait(1000);
+
+send("client", "plugin ota-storage-common storage-info");
+networkWait(1000);
+
+// Verify that with the security token set, the CLI
+// doesn't have access to see key data.
+if (runArgument.runUsingMfgSecurityToken) {
+  for (i = 0; i < allDevices.length; i++) {
+    expect(allDevices[i],
+           "keys print",
+           "WARNING:  READING OF KEY VALUES DISABLED BY MFG TOKEN");
+    networkWait(2000);
+  }
+}
+
+expect("server", 
+       "plugin ota-storage-common printImages",
+       "0 images in OTA storage.");
+
+String file = "app/framework/plugin/ota-storage-simple/test-file.ota";
+String corruptFile = "app/framework/plugin/ota-storage-simple/test-file-BAD-SIGNATURE.ota";
+String file283 = "app/framework/plugin/ota-storage-simple/test-283-file.ota";
+String corruptFile283 = "app/framework/plugin/ota-storage-simple/test-283-file-BAD-SIGNATURE.ota";
+
+expect("server", 
+       "plugin ota-server load-file \"" + file + "\"",
+       ".*Loaded image successfully.",
+       5000);
+
+String clientNodeId = nodeId("client");
+
+// Disable page request.  It is enabled by default when the OTA client
+// plugin is configured to use it.  We want to test the normal
+// block request stuff here.
+expectNoResponse("client", "plugin ota-client page-request 0");
+
+expectMultipleHosts(allDevices,
+                    "option print-rx-msgs disable",
+                    ".*disabled print");
+
+// If the client has a previously downloaded file it will use that
+// to upgrade rather than start a new download.  So deleting it
+// will cause a fresh download.
+send("client", "plugin ota-storage-common delete 0");
+//A delay lets the next except work. This needs investigating in the future.
+networkWait(2000);
+
+// A simple test where the server has no new image for the client.
+expect("client",
+       "plugin ota-client start",
+       "Custom verification passed: 0x00",
+       80000);
+networkWait(10000);
+
+// This corrupt file was created by taking the valid file and
+// changing the header string via a Hex editor.
+expect("server", 
+       "plugin ota-server load-file \"" + corruptFile + "\"",
+       ".*Loaded image successfully.",
+       5000);
+
+
+expect("client", 
+       "plugin ota-storage-common delete 0", 
+       "Image deleted.");
+expect("client", 
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+//The server seems to have some difficulty getting an image across in one shot here.
+//A delay lets the next except work. This needs investigating in the future.
+networkWait(1000);
+expect("client",
+       "plugin ota-client start",
+       "DSA Verify returned.*Invalid Signature.*",
+       70000);
+networkWait(2000);
+
+
+// Now try the 283 curve
+expect("server", 
+       "plugin ota-server load-file \"" + file283 + "\"",
+       ".*Loaded image successfully.",
+       5000);
+
+expect("client", 
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+
+//The server seems to have some difficulty getting an image across in one shot here.
+//A delay lets the next except work. This needs investigating in the future.
+networkWait(1000);
+expect("client",
+       "plugin ota-client start",
+       ".*Custom verification passed: 0x00",
+       70000);
+networkWait(10000);
+
+// This corrupt file was created by taking the valid file and
+// changing the signature via a Hex editor.
+expect("server", 
+       "plugin ota-server load-file \"" + corruptFile283 + "\"",
+       ".*Loaded image successfully.",
+       5000);
+
+
+expect("client", 
+       "plugin ota-storage-common delete 0", 
+       "Image deleted.");
+expect("client", 
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+//The server seems to have some difficulty getting an image across in one shot here.
+//A delay lets the next except work. This needs investigating in the future.
+networkWait(1000);
+expect("client",
+       "plugin ota-client start",
+       "DSA Verify returned.*Invalid Signature.*",
+       70000);
+// Give it time to go through the upgrade process
+networkWait(10000);
+
+// Now we try a resume test
+
+expect("server",
+       "plugin ota-server load-file \"" + file + "\"",
+       ".*Loaded image successfully.",
+       5000);
+
+// Now delete the file, start again, and reboot in between
+send("client",
+     "plugin ota-storage-common delete 0");
+
+expect("client",
+       "plugin ota-client stop",
+       ".*stopping OTA client state machine");
+
+// Give time for the eeprom to wipe the storage area clean
+networkWait(20000);
+
+send("client",
+     "reset");
+networkWait(1000);
+
+// Restore the OTA, print, and encryption settings
+send("client",
+     "plugin ota-client page-request 0");
+expect("client",
+       "option print-rx-msgs disable",
+       ".*disabled print");
+setupEncryption();
+networkWait(2000);
+
+expect("client",
+       "plugin ota-client start",
+       ".*Custom verification passed: 0x00",
+       140000);
+
+// Now onto client2 tests (download resumes with nonzero EEPROM start offset)
+// The tests below seem to be fragile when run with host and multihop
+// While I've only been able to reproduce it on Jenkins, I see that when client2
+// reboots and searches for the OTA servers, it finds itself and client1, but
+// not server. Since these tests are realistically applicable to SoC and are
+// tested for SoC, we can skip these for host
+
+if (!runArgument.runUsingHostApps) {
+  // Disable page requests, which are default
+  // Delete any potential image in storage
+  send("client2",
+       "plugin ota-client page-request 0");
+  send("client2",
+       "plugin ota-storage-common delete 0");
+
+  expect("server",
+         "plugin ota-server load-file \"" + file + "\"",
+         ".*Loaded image successfully.",
+         5000);
+
+  expect("client2",
+         "plugin ota-client start",
+         ".*Custom verification passed: 0x00",
+         140000);
+  // Give it time to go through the upgrade process
+  networkWait(10000);
+
+  // Now delete the file, start again, and reboot in between
+  send("client2",
+       "plugin ota-storage-common delete 0");
+
+  expect("client2",
+         "plugin ota-client stop",
+         ".*stopping OTA client state machine");
+
+  // Give time for the eeprom to wipe the storage area clean
+  networkWait(20000);
+
+  expect("client2",
+         "plugin ota-client start",
+         "Download: 15% complete",
+         140000);
+
+  send("client2",
+       "reset");
+  networkWait(1000);
+
+  // Restore the OTA, print, and encryption settings
+  send("client2",
+       "plugin ota-client page-request 0");
+  expect("client2",
+         "option print-rx-msgs disable",
+         ".*disabled print");
+  setupEncryption();
+  networkWait(2000);
+
+  expect("client2",
+         "plugin ota-client start",
+         ".*Custom verification passed: 0x00",
+         200000);
+
+}

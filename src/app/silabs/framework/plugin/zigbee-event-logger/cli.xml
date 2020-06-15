@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-zigbee-event-logger" name="Plugin Commands: Zigbee Event Logger">
+    <description>
+      The zigbee-event-logger plugin contributes CLI commands to the application framework to be used for printing stored event information.
+    </description>
+  </group>
+  <command cli="plugin zigbee-event-logger print" functionName="emAfZigbeeEventLoggerPrintEvents" group="plugin-zigbee-event-logger">
+    <description>
+      Print all stored events.
+    </description>
+  </command>
+</cli>

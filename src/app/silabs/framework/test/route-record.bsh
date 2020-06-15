@@ -1,0 +1,90 @@
+import com.ember.peek.SimulatedNetwork;
+source("util.bsh");
+
+if (!runArgument.runUsingMultihop) {
+  System.out.print("**** Only runs for multi-hop configuration ****");
+  return;
+}
+
+if (runArgument.runUsingHostApps) {
+  System.out.print("** SoC only test ** ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+
+
+TestNode[] networkNodes = {
+  new TestNode("light",
+              "build/af-test-apps/Z3CoordSoc-simulation/Z3CoordSoc",
+               "",
+               "",
+              gridLocations[0]),
+  new TestNode("range-extender-1",
+              "build/af-test-apps/Z3CoordSoc-simulation/Z3CoordSoc",
+               "",
+               "",
+              gridLocations[1]),
+  new TestNode("switch",
+             "build/af-test-apps/Z3Switch-simulation/Z3Switch",
+               "",
+               "",
+              gridLocations[2])
+};
+
+String[] deviceNames;
+deviceNames = addAndLoadDevicesWithLocation(networkNodes, false);
+
+
+// Get all nodes to a "factory new" (OR) not joined state
+// Wait for the nodes to reset. The Z3 Light will automatically start a network on boot
+// if its network steering fails. Since it starts this process before we form our centralized
+// network, we need to wait for all the the steering to end, leave all the formed networks,
+// create a centralized network, and then restart the steering process on each node.
+void setInitialState( String[] deviceList )
+{
+  int i;
+  for (i=0; i < deviceList.length; i++) {
+    expect(deviceList[i],
+        "plugin network-steering stop",
+        "NWK Steering: Stop",
+        DEFAULT_TIMEOUT);
+  }
+  
+  networkWait(300000);
+
+  for (i=0; i < deviceList.length; i++) {
+    expect(deviceList[i],
+        "network leave",
+        "leave",
+        DEFAULT_TIMEOUT);
+  }
+
+  networkWait(300000);
+}
+
+
+//Main test
+lazyExpect = true;
+setupEncryption();
+setInitialState(deviceNames);
+
+//Forrm network, Join devices
+networkCreatorStart(deviceNames[0], true);
+networkZ3JoinDeviceViaParent(deviceNames[0], deviceNames[1], deviceNames[0]);
+networkZ3JoinDeviceViaParent(deviceNames[0], deviceNames[2], deviceNames[1]);
+
+
+//Get NODE IDs
+int i;
+for (i=0; i < deviceNames.length; i++) {
+  networkNodes[i].nodeIdHex = nodeId(deviceNames[i]);
+}
+
+networkWait(1000000);
+
+send ("light", "custom sendRouteRecord " + 
+  networkNodes[0].nodeIdHex + " " + networkNodes[1].nodeIdHex + " 0xFFFF 0");
+nexpect("switch", "",  "EVENT: stackStatus 0x99", DEFAULT_TIMEOUT);
+
+networkWait(100000);

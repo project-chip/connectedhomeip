@@ -1,0 +1,11 @@
+/** @brief Finished
+ *
+ * This callback is fired when the bulb-ui plugin is finished with the forming
+ * or joining process. The result of the operation will be returned in the
+ * status parameter.
+ *
+ * @param status   Ver.: always
+ */
+void emberAfPluginBulbUiFinishedCallback(EmberStatus status)
+{
+}

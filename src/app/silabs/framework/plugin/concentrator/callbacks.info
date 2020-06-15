@@ -1,0 +1,9 @@
+/** @brief Broadcast Sent
+ *
+ * This function is called when a new MTORR broadcast has been successfully
+ * sent by the concentrator plugin.
+ *
+ */
+void emberAfPluginConcentratorBroadcastSentCallback(void)
+{
+}

@@ -1,0 +1,105 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  std.print("****TEST only for HOST, nothing to test on SoC****");
+  return;
+} else if (runArgument.runUsingMultihop) {
+  std.print("****2 Nodes, no need to run multi-hop****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"xncp-host", "switch"};
+
+String[] socImages = new String[] {
+  "PLACE_HOLDER", 
+  "PLACE_HOLDER"
+};
+
+String[] hostImages = new String[] {
+  "build/af-test-apps/XncpHost-simulation-ezsp/XncpHost",
+  "build/af-test-apps/HaSwitch-simulation/HaSwitch",
+};
+
+//String ncpImage = "build/em260-spi-unix-simulation/em260-spi";
+String ncpImage = "build/xncp-spi-sample-app-unix-simulation/xncp-spi-sample-app";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+int timeout = 10000;
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Verify that the library is present and that manufacturer ID and version number are correctly set
+expect("xncp-host", "plugin custom-ezsp get_info", ".*XNCP library present, manufacturer ID:0x1002 version:0xBEEF.*");
+
+// Verify that by default the power mode is set to normal
+expect("xncp-host", "plugin custom-ezsp get_mode", ".*Power mode: NORMAL.*");
+// Set power mode to low-power and verify
+expect("xncp-host", "plugin custom-ezsp set_mode 1", ".*");
+expect("xncp-host", "plugin custom-ezsp get_mode", ".*Power mode: LOW_POWER.*");
+// Set power mode to normal and verify
+expect("xncp-host", "plugin custom-ezsp set_mode 0", ".*");
+expect("xncp-host", "plugin custom-ezsp get_mode", ".*Power mode: NORMAL.*");
+
+// Verify that the cluster filtering list is initially empty
+expect("xncp-host", "plugin custom-ezsp print_list", ".*Cluster filtering list, size=0x00");
+// Add a cluster
+expect("xncp-host", "plugin custom-ezsp add_cluster 0xABCD", ".*Cluster ADD success.*");
+// Verify that the cluster has been added to the filtering list
+expect("xncp-host", "plugin custom-ezsp print_list", ".*Cluster filtering list, size=0x01");
+expect("xncp-host", "", ".*Cluster filtering entry -> Cluster ID 0xABCD.*");
+// Remove a non-existant cluster
+expect("xncp-host", "plugin custom-ezsp rem_cluster 0xBEEF", ".*Cluster REMOVE failed, status:0x70.*");
+expect("xncp-host", "plugin custom-ezsp rem_cluster 0xABCD", ".*Cluster REMOVE success.*");
+
+// Enable reports every 2 seconds
+expect("xncp-host", "plugin custom-ezsp reports_on 2", ".*Reports enabled.*");
+// Check that the reports are arriving.
+expect("xncp-host", "", ".*Got report, count=0x00.*", timeout);
+expect("xncp-host", "", ".*Got report, count=0x01.*", timeout);
+expect("xncp-host", "", ".*Got report, count=0x02.*", timeout);
+expect("xncp-host", "", ".*Got report, count=0x03.*", timeout);
+// Disable reports
+expect("xncp-host", "plugin custom-ezsp reports_off", ".*Reports disabled.*");
+
+//Testing reading/writing of custom token
+expect("xncp-host", "plugin custom-ezsp set_token 0x03 0x1234 0xABCD", ".*Custom token set.*");
+expect("xncp-host", "plugin custom-ezsp get_token", ".*Custom token - nodeType:0x03 nodeId:0x1234 panId:0xABCD.*");
+
+// Send ON command to the XNCP node (verify no filtering)
+send("switch", "zcl on-off on");
+send("switch", "send 0 1 6");
+expect("xncp-host", "", ".*RX.*clus 0x0006.*", timeout);
+
+send("xncp-host","print attr");
+// Light should be on (last number)
+expect("xncp-host", 
+       "print attr",
+       "0006 / srvr / 0000 / ---- / 10 \\(01\\) / RO /   RAM   / 01 \\(On/off\\)");
+// Let rest of output clear
+networkWait(200);
+
+// Enabling filtering on On/Off cluster. Verify filtering
+expect("xncp-host", "plugin custom-ezsp add_cluster 0x0006", ".*Cluster ADD success.*");
+send("switch", "zcl on-off off");
+send("switch", "send 0 1 6");
+// This default response is sent by the XNCP app code. Status code: INVALID_CALL (0x01).
+expect("switch", "", ".*RX.*clus 0x0006.*cmd 0B.*payload.*01 \\].*", timeout);
+
+// Light should stay on (last number).  Host should not have been told about On/off command.
+expect("xncp-host", 
+       "print attr",
+       "0006 / srvr / 0000 / ---- / 10 \\(01\\) / RO /   RAM   / 01 \\(On/off\\)");
+// Let rest of output clear
+networkWait(200);

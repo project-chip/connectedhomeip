@@ -1,0 +1,73 @@
+import com.ember.peek.SimulatedNetwork;
+
+// Testing for the bug fix to bug 14778.  
+
+// 1. Touchlink factory new and non factory-new remotes.
+// 2. Abort the touchlink on the non factory-new remote.
+// 3. Factory-new device times out.
+// 4. Touchlink factory new and non-factory new remotes, again.
+//    a. The bug showed up as a failure to complete the second touch-link.
+//    b. The fix allowed this second touch link to succeed.
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multi-hop****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "remote1", "remote2"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/ZllColorLight-simulation/ZllColorLight",
+  "build/af-test-apps/ZllColorSceneRemoteSleepy-simulation/ZllColorSceneRemoteSleepy",
+  "build/af-test-apps/ZllColorSceneRemoteSleepy-simulation/ZllColorSceneRemoteSleepy",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/ZllColorLight-simulation-ezsp/ZllColorLight",
+  "build/af-test-apps/ZllColorSceneRemoteSleepy-simulation-ezsp/ZllColorSceneRemoteSleepy",
+  "build/af-test-apps/ZllColorSceneRemoteSleepy-simulation-ezsp/ZllColorSceneRemoteSleepy",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Set up encryption and touch link the network.
+setupEncryption();
+startZllNetwork("light", "15", "0", "0x1234", timeout * 10);
+send("remote2", "plugin zll-commissioning disable");
+send("remote1", "plugin zll-commissioning link");
+expect("light", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", 10000); // allow for sec ch scan
+expect("light", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0x0000", 10000);
+expectNetworkUp("light", 5000);
+expectNetworkUp("remote1", 5000);
+
+network.sleep(10000);
+send("light", "plugin zll-commissioning disable");
+send("remote2", "plugin zll-commissioning enable");
+
+// Touch link from both remotes. 
+network.pressButton("remote2", "1");
+network.pressButton("remote1", "1");
+expect("remote2", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", 10000);
+network.releaseButton("remote1", "1");
+network.releaseButton("remote2", "1");
+expect("remote1", "Aborting touch link");
+expect("remote1", "Error: Touch linking failed: aborted by application");
+expect("remote2", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0x0000");
+
+network.sleep(10000);
+
+// Repeat touch link from both remotes.
+network.pressButton("remote2", "1");
+network.pressButton("remote1", "1");
+
+expect("remote2", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", 10000);
+expect("remote2", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0x0000", 10000);
+expectNetworkUp("remote2", 5000);
+expect("remote2", "Touch link with 0xFFFF \\(\\(>\\)" + eui64("remote1") + "\\) complete");
+expectNetworkUp("remote1", 5000);
+expect("remote1", "Touch link with 0x0003 \\(\\(>\\)" + eui64("remote2") + "\\) complete");

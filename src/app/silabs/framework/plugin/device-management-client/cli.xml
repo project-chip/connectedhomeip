@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-device-management-client" name="Plugin Commands: Device Management Client">
+    <description>
+      The device management client plugin contributes CLI commands to the application framework to be used for getting, setting, and displaying information relevant to the Smart Energy 1.2 Device Management Cluster.
+    </description>
+  </group>
+  <command cli="plugin device-management-client print" functionName="emAfDeviceManagementClientCliPrint" group="plugin-device-management-client">
+    <description>
+      Print the info relevant to device management.
+    </description>
+  </command>
+</cli>

@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ble" name="Plugin Commands: BLE">
+    <description>
+      The BLE plugin contributes CLI commands to the application framework to be used for initiating actions at the BLE stack.
+    </description>
+  </group>
+  <command cli="plugin ble hello" functionName="emberAfPluginBleHelloCommand" group="plugin-ble">
+    <description>
+      Can be used to check that Bluetooth stack is functional
+    </description>
+  </command>
+  <command cli="plugin ble get address" functionName="emberAfPluginBleGetAddressCommand" group="plugin-ble">
+    <description>
+      Read the Bluetooth address
+    </description>
+  </command>
+  <command cli="plugin ble gap set-mode" functionName="emberAfPluginBleSetGapModeCommand" group="plugin-ble">
+    <description>
+      Set the GAP mode
+    </description>
+    <arg name="discoverable-mode" type="INT8U" description = "The GAP discoverable mode: 0=non discoverable, 1=limited discoverable, 2=general discoverable, 3=broadcast, 4=user data" />
+    <arg name="connectable-mode" type="INT8U" description = "The GAP connectable mode: 0=non connectable, 1=directed connectable, 2=undirected connectable, 3=scannable non connectable" />
+  </command>
+  <command cli="plugin ble gap set-bt5-mode" functionName="emberAfPluginBleSetBt5GapModeCommand" group="plugin-ble">
+    <description>
+      Set the BT5 GAP mode
+    </description>
+	<arg name="advertisement-handle" type="INT8U" description = "The handle index of advertisement" />
+    <arg name="discoverable-mode" type="INT8U" description = "The GAP discoverable mode: 0=non discoverable, 1=limited discoverable, 2=general discoverable, 3=broadcast, 4=user data" />
+    <arg name="connectable-mode" type="INT8U" description = "The GAP connectable mode: 0=non connectable, 1=directed connectable, 2=undirected connectable, 3=scannable non connectable" />
+	<arg name="max-events" type="INT16U" description = "The maximum number of events" />
+	<arg name="address-type" type="INT8U" description = "Address type: 0=public, 1=random, 2=public identity, 3=random identity, 16=classic bluetooth" />
+  </command>
+  <command cli="plugin ble gap discover" functionName="emberAfPluginBleGapDiscoverCommand" group="plugin-ble">
+    <description>
+      Start a GAP discovery procedure
+    </description>
+    <arg name="discovery-mode" type="INT8U" description = "The GAP discovery mode: 0=only limited discoverable devices, 1=limited and generic discoverable devices, 2=all devices" />
+  </command>
+  <command cli="plugin ble gap conn-open" functionName="emberAfPluginBleGapConnectionOpenCommand" group="plugin-ble">
+    <description>
+      Open a GAP connection
+    </description>
+    <arg name="address" type="OCTET_STRING" description = "The BLE address of the target device" />    
+    <arg name="address-type" type="INT8U" description = "The address type: 0=public, 1=random, 2=public resolved by the stack, 3=public resolved by the stack, 16=classic bluetooth" />
+  </command>
+  <command cli="plugin ble gap set-adv-params" functionName="emberAfPluginBleSetAdvertisementParamsCommand" group="plugin-ble">
+    <description>
+      Set the GAP advertisement parameters
+    </description>
+    <arg name="min-interval" type="INT16U" description = "minimum connection interval" />
+    <arg name="max-interval" type="INT16U" description = "maximum connection interval" />
+    <arg name="channel-map" type="INT8U" description = "Channel map indicating which of three channels will be used" />
+  </command>
+  <command cli="plugin ble gap set-conn-params" functionName="emberAfPluginBleGapSetConnectionParamsCommand" group="plugin-ble">
+    <description>
+      Set the GAP connection parameters
+    </description>
+    <arg name="min-interval" type="INT16U" description = "minimum connection event interval" />
+    <arg name="max-interval" type="INT16U" description = "maximum connection event interval" />
+    <arg name="slave-latency" type="INT16U" description = "number of connection intervals the slave can skip" />
+    <arg name="supervision-timeout" type="INT16U" description = "time before the connection is dropped" />
+  </command>
+  <command cli="plugin ble gap update-conn-params" functionName="emberAfPluginBleConnectionSetParamsCommand" group="plugin-ble">
+    <description>
+      Set the GAP connection parameters for connection
+    </description>
+    <arg name="connection-handle" type="INT16U" description = "connection handle" />
+	<arg name="min-interval" type="INT16U" description = "minimum connection event interval" />
+    <arg name="max-interval" type="INT16U" description = "maximum connection event interval" />
+    <arg name="slave-latency" type="INT16U" description = "number of connection intervals the slave can skip" />
+    <arg name="supervision-timeout" type="INT16U" description = "time before the connection is dropped" />
+  </command>
+  <command cli="plugin ble sm increase-security" functionName="emberAfPluginBleSecurityManagerIncreaseSecurityCommand" group="plugin-ble">
+    <description>
+      Increase the security level
+    </description>
+    <arg name="connection-handle" type="INT8U" description = "the connection handle for which we want to increase the security level" />
+  </command>
+  <command cli="plugin ble sm list-all-bondings" functionName="emberAfPluginBleSecurityManagerListAllBondingsCommand" group="plugin-ble">
+    <description>
+      Send a command to get all the current bondings
+    </description>
+  </command>
+  <command cli="plugin ble sm delete-bonding" functionName="emberAfPluginBleSecurityManagerDeleteBondingCommand" group="plugin-ble">
+    <description>
+      Delete bonding
+    </description>
+    <arg name="boning-handle" type="INT8U" description = "the bonding handle to be deleted" />
+  </command>
+  <command cli="plugin ble sm delete-all-bondings" functionName="emberAfPluginBleSecurityManagerDeleteAllBondingsCommand" group="plugin-ble">
+    <description>
+      Delete all bondings
+    </description>
+  </command>
+  <command cli="plugin ble sm set-bondable-mode" functionName="emberAfPluginBleSecurityManagerSetBondableModeCommand" group="plugin-ble">
+    <description>
+      Set the bondable mode
+    </description>
+    <arg name="bondable-mode" type="INT8U" description = "The bondable mode: 0=new bondings not accepted, 1=bondings allowed" />    
+  </command>
+  <command cli="plugin ble gatt discover-primary-services" functionName="emberAfPluginBleGattDiscoverPrimaryServicesCommand" group="plugin-ble">
+    <description>
+      GATT discovery of primary services
+    </description>
+    <arg name="connection-handle" type="INT8U" description = "the connection handle on which discovery should be performed" />
+  </command>
+  <command cli="plugin ble gatt discover-characteristics" functionName="emberAfPluginBleGattDiscoverCharacteristicsCommand" group="plugin-ble">
+    <description>
+      GATT discovery of characteristics
+    </description>
+    <arg name="connection-handle" type="INT8U" description = "the connection handle on which discovery should be performed" />
+    <arg name="serice-handle" type="INT32U" description = "the service handle on which discovery should be performed" />
+  </command>
+  <command cli="plugin ble gatt set-characteristic-notification" functionName="emberAfPluginBleGattSetCharacteristicNotificationCommand" group="plugin-ble">
+    <description>
+      GATT set characteristic notification
+    </description>
+    <arg name="connection-handle" type="INT8U" description = "the connection handle for which the notification should be set" />
+    <arg name="characteristic-handle" type="INT16U" description = "the characteristic handle to set notification for" />
+    <arg name="flags" type="INT8U" description = "0=disable, 1=notification, 2=indication" />    
+  </command>
+  <command cli="plugin ble gatt write-characteristic" functionName="emberAfPluginBleGattWriteCharacteristicValueCommand" group="plugin-ble">
+    <description>
+      GATT write characteristic value
+    </description>
+    <arg name="connection-handle" type="INT8U" description = "the connection handle" />
+	<arg name="characteristic-handle" type="INT16U" description = "the characteristic handle" />
+	<arg name="value-len" type="INT8U" description = "the lenght of data" />
+	<arg name="value-data" type="OCTET_STRING" description = "data to write" />
+  </command>
+  <command cli="plugin ble connection close" functionName="emberAfPluginBleConnectionCloseCommand" group="plugin-ble">
+    <description>
+      Close BLE connection
+    </description>
+    <arg name="connection-handle" type="INT8U" description = "the connection handle which should be closed" />
+  </command>
+  <command cli="plugin ble system set-tx-power" functionName="emberAfPluginBleSetTxPowerCommand" group="plugin-ble">
+    <description>
+      Set the TX power
+    </description>
+    <arg name="tx-power" type="INT16S" description = "tx power to be set in 0.1dBm steps" />
+  </command>
+</cli>

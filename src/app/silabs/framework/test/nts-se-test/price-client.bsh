@@ -1,0 +1,366 @@
+
+// ***************************************************
+// TEST SCRIPT
+// ***************************************************
+cd(dirname(pathToFile(getSourceFileInfo()).getAbsolutePath()));
+source("util.bsh");
+
+System.setOut(System.err);
+
+String appName = "se-ipd-afv2";
+
+String dut = runArgument.dut;
+String[] nodes = new String[] {
+  dut,
+};
+
+String sourceEndpoint = "1"; // Default value of Ember App Framework.
+String destEndpoint = "10"; // Default value of the Test Harness
+String thAddr = "0x0000"; //TH is coordinator here.
+
+int parsingFinger = 0;
+
+boolean dutPriceClientInfoSetup()
+{
+  printTestMessage("Price client Test Harness setup", true);
+  thAddr = getTHShortID();
+  if (thAddr == null) {
+    print("TH id can not be loaded, run the test with the -f option.");
+    return false;
+  }
+
+  tymeSync(dut, thAddr, sourceEndpoint, destEndpoint);
+  return true;
+}
+
+void dutPriceClientInterpanSetup()
+{
+  printTestMessage("Setting up for inter-PAN testing", true);
+  print("Please wait...");
+  send(dut, "network leave");
+  sleep(2000);
+  send(dut, "reset");
+  sleep(2000);
+  clearKeysTable(dut);
+
+  form(dut, runArgument.channel, runArgument.power, runArgument.interPanId);
+  sleep(2000);
+
+  print("Network formed.");
+  print("* In Network tab (\"Set IPD PAN\") please set the interPAN panId to " + runArgument.interPanId);
+  pause("Press ENTER when done...");
+}
+
+boolean priceParsePriceStart() {
+  outputFile.flush();
+  ArrayList outputFile = outputFileToArrayList(true);
+
+  for(int j=outputFile.size() - 1; j >=parsingFinger; j--) {
+    String strLine = (String)outputFile.get(j);
+    for(int i=0; i<strLine.length()-5 ; i++) {
+      if (strLine.substring(i, i+5).equals("Price")) {
+        for(int k=i+6; k<strLine.length()-11; k++) {
+          if (strLine.substring(k, k+11).equals("has started")) {
+            parsingFinger = j+1;
+            return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
+
+void test12_3_4_item1()
+{
+  String group = "PRICE";
+  String section = "12.3.4";
+  String item = "1";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+  sleep(2000);
+  if (!priceParsePriceStart()) {
+    print("* Price not received and/or started correctly. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* Price received and correctly started. TEST PASSED!");
+
+  pause("Press ENTER to continue...");
+}
+
+void test12_4_3_item2()
+{
+  String group = "PRICE";
+  String section = "12.4.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl price current");
+  send(dut, "interpan short " + thAddr + " " + runArgument.panId + " " + SEProfileId);
+
+  print("WARNING: seems that the regex is wrong in this test. Test fails even if it should pass.");
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test12_5_3_item2()
+{
+  String group = "PRICE";
+  String section = "12.5.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl price current");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test12_6_3_item2()
+{
+  String group = "PRICE";
+  String section = "12.6.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl price current");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  sleep(1000);
+
+  send(dut, "zcl price current");
+  send(dut, "interpan short " + thAddr + " " + runArgument.panId + " " + SEProfileId);
+
+  print("WARNING: seems that the regex is wrong in this test. Test fails even if it should pass.");
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test12_7_3_item2()
+{
+  String group = "PRICE";
+  String section = "12.7.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl price scheduled 0x00000000 0x2");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test12_7_3_item5()
+{
+  String group = "PRICE";
+  String section = "12.7.3";
+  String item = "5";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl price scheduled 0x00000000 0x1");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test12_7_3_item7()
+{
+  String group = "PRICE";
+  String section = "12.7.3";
+  String item = "7";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  // TODO: here we should send a time in the future (i.e., read the time and add
+  // 2 days), however NTS doesn't check whether the time is really in the future
+  // so for now I just leave it as it is.
+  send(dut, "zcl price scheduled 0x00000000 0x2");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test12_8_3_item1()
+{
+  String group = "PRICE";
+  String section = "12.8.3";
+  String item = "1";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  printTestMessage("1. In Price Tab -> \"Set Price Digit & Tier Values\" enter values 11 41");
+  printTestMessage("2. Send a Publish Price (Price tab -> Select \"Publish Price\" -> Enter/Send button)");
+  pause("Press ENTER to continue...");
+  if (!priceParsePriceStart()) {
+    print("* Price not received and/or started correctly. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  printTestMessage("1. In Price Tab -> \"Set Price Digit & Tier Values\" enter values 12 42");
+  printTestMessage("2. Send a Publish Price (Price tab -> Select \"Publish Price\" -> Enter/Send button)");
+  pause("Press ENTER to continue...");
+  if (!priceParsePriceStart()) {
+    print("* Price not received and/or started correctly. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  printTestMessage("1. In Price Tab -> \"Set Price Digit & Tier Values\" enter values 13 43");
+  printTestMessage("2. Send a Publish Price (Price tab -> Select \"Publish Price\" -> Enter/Send button)");
+  pause("Press ENTER to continue...");
+  if (!priceParsePriceStart()) {
+    print("* Price not received and/or started correctly. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  printTestMessage("1. In Price Tab -> \"Set Price Digit & Tier Values\" enter values 14 44");
+  printTestMessage("2. Send a Publish Price (Price tab -> Select \"Publish Price\" -> Enter/Send button)");
+  pause("Press ENTER to continue...");
+  if (!priceParsePriceStart()) {
+    print("* Price not received and/or started correctly. TEST FAILED!");
+    pause("Press ENTER to continue...");
+    return;
+  }
+
+  print("* All prices received and/or started correctly. TEST PASSED!");
+}
+
+void test12_9_3_item2()
+{
+  String group = "PRICE";
+  String section = "12.9.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  // TODO: here we should send a time in the future (i.e., read the time and add
+  // 2 days), however NTS doesn't check whether the time is really in the future
+  // so for now I just leave it as it is.
+  send(dut, "zcl price current");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test12_18_3_item1_3()
+{
+  String group = "PRICE";
+  String section = "12.18.3";
+  String item = "1&3";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("* START the test in the SETest GUI. Check response from Test Harness GUI.");
+  pause("Press ENTER to continue...");
+}
+
+void test12_21_3_item1_6()
+{
+  String group = "PRICE";
+  String section = "12.21.3";
+  String item = "1-6";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("* START the test in the SETest GUI. Check response from Test Harness GUI.");
+  pause("Press ENTER to continue...");
+}
+
+
+TestNetwork t = new TestNetwork();
+setTestNetwork(t);
+setOutputFile(runArgument.outputFile);
+setOutputFilename(runArgument.currentOutputFile);
+
+for (int i = 0; i < nodes.length; i++) {
+  t.add(nodes[i]);
+}
+
+t.connect(4901);
+t.echo(true);
+
+printTestMessage("PRICE - CLIENT", true);
+print("NOTE: These tests assume that the sample app " + appName + " is running on the DUT");
+
+if (runArgument.formNetwork) {
+  networkSetupDutJoin(nodes,
+                      dut,
+                      runArgument.channel,
+                      runArgument.power,
+                      runArgument.panId);
+  dutNetworkInfoSetup(dut);
+}
+if (!dutPriceClientInfoSetup())
+  return;
+
+test12_3_4_item1();
+test12_4_3_item2();
+test12_5_3_item2();
+test12_6_3_item2();
+test12_7_3_item2();
+test12_7_3_item5();
+test12_7_3_item7();
+test12_8_3_item1();
+test12_9_3_item2();
+test12_18_3_item1_3();
+test12_21_3_item1_6();
+
+
+

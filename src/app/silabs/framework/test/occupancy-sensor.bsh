@@ -1,0 +1,339 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to verify as much of the functionality of the
+// IST-a49 occupancy sensor as possible.  For the moment, this includes:
+//  Network join behavior
+//  Network leave behavior
+//  Button short press behavior
+//  Button long press behavior
+//  Attribute reporting
+//  Network orphan state handling
+
+source("util.bsh");
+
+if (!runArgument.debug) {
+  std.print("*** This test is failing because a ZigBee 3.0 device is trying to"
+            + " join a network on which there is no ZigBee 3.0 support. An"
+            + " email has been sent regarding this issue. ***");
+  return;
+}
+
+if (runArgument.runUsingHostApps || runArgument.runUsingMultihop) {
+  std.print("Only runs single hop SoC (P2 network)");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "controller", "sensor"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaCombinedInterface-simulation/HaCombinedInterface",
+  "build/af-test-apps/Z3OccupancySensor-simulation/Z3OccupancySensor",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+};
+
+String[] ncpImages = new String[] {
+  "",
+  "",
+};
+
+// Note: the following call creates a flat network (i.e. every node can
+// hear every other node.
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImages,
+                  false, false, false);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0xdc04;
+int i;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Coodinator is device [0]
+networkForm(allDevices[0]);
+send(allDevices[0], "network pjoin 150");
+
+// Let registration complete.
+networkWait(30000);
+
+// Verify that holding the button for > 1 second will cause a network leave,
+// then attempt to rejoin (and succeed, since pjoin is still active)
+
+buttonPressAndHold("sensor", 0, null);
+networkWait(2000);
+buttonRelease("sensor", 0, ".*EMBER_NETWORK_DOWN");
+expect("sensor", ".*NWK Steering State: Scan Primary Channels and use Install Code*", 15000);
+expect("sensor", ".*EMBER_NETWORK_UP.*", 30000);
+
+// Verify that a button press of < 1 second will not cause a network leave
+buttonPressAndHold("sensor", 0, null);
+networkWait(999);
+buttonRelease("sensor", 0, null);
+nexpect("sensor", ".*EMBER_NETWORK_DOWN", 10000);
+
+// Verify that two short button presses will cause an identify for 3 minutes
+for(i=0;i<2;i++) {
+  buttonPressAndHold("sensor", 0, null);
+  networkWait(100);
+  buttonRelease("sensor", 0, null);
+  networkWait(100);
+}
+expect("sensor", ".*Beginning identify blink pattern", 1000);
+nexpect("sensor", ".*Identify has finished", 179999);
+expect("sensor", ".*Identify has finished", 5000);
+
+// Verify that three button short presses will cause the network status to blink
+for(i=0;i<3;i++) {
+  buttonPressAndHold("sensor", 0, null);
+  networkWait(100);
+  buttonRelease("sensor", 0, null);
+  networkWait(100);
+}
+expect("sensor", "Blinking user requested network status", 10000);
+
+// Verify that four button short presses will cause a proactive rejoin
+for(i=0;i<4;i++) {
+  buttonPressAndHold("sensor", 0, null);
+  networkWait(100);
+  buttonRelease("sensor", 0, null);
+  networkWait(100);
+}
+expect("sensor", ".*EMBER_JOINED_NETWORK_NO_PARENT EMBER_NETWORK_DOWN.*", 10000);
+expect("sensor", "EMBER_NETWORK_UP.*", 30000);
+
+// Rejoin timeout test.  Verify that if the sensor is unable to rejoin the
+// network after leaving, it will stop attempting to join after 10 attempts in
+// order to preserve battery life
+send("controller", "network pjoin 0");
+buttonPressAndHold("sensor", 0, null);
+networkWait(2000);
+buttonRelease("sensor", 0, null);
+
+// wait for 10 connect attempts
+for(i=0; i< 10; i++) {
+  expect("sensor", ".*NWK Steering State: Scan Primary Channels and use Install Code*");
+  networkWait(3000);
+  expect("sensor","*NWK Steering State: Scan Secondary Channels and use Install Code*");
+  networkWait(7000);
+  expect("sensor", ".*NWK Steering State: Scan Primary Channels and Use Centralized Key*");
+  networkWait(3000);
+  expect("sensor", ".*NWK Steering State: Scan Secondary Channels and Use Centralized Key*");
+  networkWait(7000);
+  expect("sensor", ".*NWK Steering State: Scan Primary Channels and Use Distributed Key*");
+  networkWait(3000);
+  expect("sensor", ".*NWK Steering State: Scan Secondary Channels and Use Distributed Key*");
+  networkWait(7000);
+  expect("sensor", ".*Connection Manager:  Network Find status 94*");
+  networkWait(5000);
+}
+expect("sensor", ".*Failed to find network to join within .*", 10000);
+
+// Verify that the device will start searching again after a > 1 second button
+// press, and rejoin a network after the attempt timeout
+send("controller", "network pjoin 150");
+buttonPressAndHold("sensor", 0, null);
+networkWait(2000);
+buttonRelease("sensor", 0, null);
+expect("sensor", ".*NWK Steering State: Scan Primary Channels and use Install Code*");
+expect("sensor", ".*EMBER_NETWORK_UP.*", 30000);
+
+// Test occupancy reporting.  To start, add binding entries for all reporting
+// attributes:
+//   Occupancy Sensor (0x0406)
+//   Temperature Measurement (0x0402)
+//   Humidity Measurement (0x0405)
+//   Illuminance Measurement (0x0400)
+expect("sensor", "option binding-table set 0 0x0406 0x01 0x01 {" + eui64("controller") + "}",
+       "*set bind 0: 0x00", 3000);
+expect("sensor", "option binding-table set 1 0x0402 0x01 0x01 {" + eui64("controller") + "}",
+       "*set bind 1: 0x00", 3000);
+expect("sensor", "option binding-table set 2 0x0405 0x01 0x01 {" + eui64("controller") + "}",
+       "*set bind 2: 0x00", 3000);
+expect("sensor", "option binding-table set 3 0x0400 0x01 0x01 {" + eui64("controller") + "}",
+       "*set bind 3: 0x00", 3000);
+
+// Next, set up reporting for each of the four reportable attributes
+send("controller", "zcl global send-me-a-report 0x0406 0x0000 0x18 0x0001 0x012c {00 01}");
+expectMultiline("controller",
+                 "send " + nodeId("sensor") + " 1 1",
+                 new String[] {
+                   "CFG_RPT_RESP: \\(Unknown clus. \\[0x0406\\]\\)",
+                   " - status:00",
+                   }, 3000);
+send("controller", "zcl global send-me-a-report 0x0402 0x0000 0x29 0x0001 0x012c {00 01}");
+expectMultiline("controller",
+                "send " + nodeId("sensor") + " 1 1",
+                new String[] {
+                   "CFG_RPT_RESP: \\(Unknown clus. \\[0x0402\\]\\)",
+                   " - status:00",
+                }, 3000);
+
+send("controller", "zcl global send-me-a-report 0x0405 0x0000 0x21 0x0001 0x012c {00 01}");
+expectMultiline("controller",
+                "send " + nodeId("sensor") + " 1 1",
+                new String[] {
+                   "CFG_RPT_RESP: \\(Unknown clus. \\[0x0405\\]\\)",
+                   " - status:00",
+                }, 3000);
+networkWait(5000);
+send("controller", "zcl global send-me-a-report 0x0400 0x0000 0x21 0x0001 0x012c {00 01}");
+expectMultiline("controller",
+                "send " + nodeId("sensor") + " 1 1",
+                new String[] {
+                   "CFG_RPT_RESP: \\(Unknown clus. \\[0x0400\\]\\)",
+                   " - status:00",
+                }, 3000);
+
+// Generate occupancy events and verify they cause attribute reports
+send("sensor", "plugin occupancy-pyd1698-cli newState 1");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0406\\]\\)",
+                  " - attr:0000",
+                  "   type:18, val:01",
+                },
+                3000);
+send("sensor", "plugin occupancy-pyd1698-cli newState 0");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0406\\]\\)",
+                  " - attr:0000",
+                  "   type:18, val:00",
+                },
+                3000);
+// Send one more change state to 1, so that when we reboot later there will be
+// a non-default value stored in the attribute to check for flash storage
+send("sensor", "plugin occupancy-pyd1698-cli newState 1");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0406\\]\\)",
+                  " - attr:0000",
+                  "   type:18, val:01",
+                },
+                3000);
+
+// Verify new temperature, humidity, and illuminance data causes attr reports
+send("sensor", "write 1 0x0402 0 1 0x29 {12 34}");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0402\\]\\)",
+                  " - attr:0000",
+                  "   type:29, val:1234",
+                },
+                1000);
+send("sensor", "write 1 0x0405 0 1 0x21 {FE ED}");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0405\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:FEED",
+                },
+                1000);
+send("sensor", "write 1 0x0400 0 1 0x21 {BE EF}");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0400\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:BEEF",
+                },
+                1000);
+
+// Verify that when the maximum reporting interval expires, the attributes will
+// be reported.  0x012c is about 5 minutes, or 300000 mS.
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0405\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:E110", // 4321 decimal
+                },
+                310000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0400\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:EFBE",
+                },
+                10000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0406\\]\\)",
+                  " - attr:0000",
+                  "   type:18, val:01",
+                },
+                10000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0402\\]\\)",
+                  " - attr:0000",
+                  "   type:29, val:1234",
+                },
+                10000);
+
+// Power cycle the device.  This should cause an attribute report for each
+// reportable attribute in the system.  They should come in the order in which
+// they were set up in the report table: occupancy, temperature, humidity, illu
+// Also, occupancy state should be in the same pre-power cycle level, but all
+// other sensors should default to the values returned in the stub hal drivers.
+reboot("sensor");
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0400\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:EFBE",
+                },
+                3000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0406\\]\\)",
+                  " - attr:0000",
+                  "   type:18, val:01",
+                },
+                7000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0405\\]\\)",
+                  " - attr:0000",
+                  "   type:21, val:E110", // 4321 decimal
+                },
+                3000);
+expectMultiline("controller", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Unknown clus. \\[0x0402\\]\\)",
+                  " - attr:0000",
+                  "   type:29, val:1234",
+                },
+                3000);
+networkWait(5000);
+
+// Verify that after the coordinator goes down, the device detects it gets to
+// the orphan state
+send("controller", "network leave");
+
+expect("sensor", ".*EMBER_NETWORK_DOWN.*", 375000);
+expect("sensor", ".*Schedule move nwk.*1.*", 15000);
+expect("sensor", ".*Schedule move nwk.*2.*", 15000);
+expect("sensor", ".*Max move limit reached.*3.*", 15000);
+
+// Make sure that another check gets scheduled after a bit more than 15 minutes  
+expect("sensor", ".*Schedule move nwk.*0.*", 1000000);

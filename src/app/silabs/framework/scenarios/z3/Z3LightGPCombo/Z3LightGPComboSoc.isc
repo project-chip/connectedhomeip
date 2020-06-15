@@ -1,0 +1,585 @@
+#ISD afv6
+# Simplicity Studio version: 5.16.1.qualifier
+
+FrameworkDirectory:app/framework
+
+appId: znet
+frameworkVariant: em35x
+GenerationDirectory:__SAMPLE_APPLICATION__
+
+DeviceName:Z3LightGPCombo
+
+Host:unknown
+
+Platform:EFR32MG12P433F1024GL125+BRD4164A+iar
+
+
+# Setup configurations
+{setupId:additionalFiles
+}
+{setupId:boardHeader
+allowMissingHeader:false
+useHeaderInPlace:false
+em357=BOARD,em35x/dev0680,,
+}
+{setupId:bookkeeping
+}
+{setupId:bootloader
+}
+{setupId:callbackConfiguration
+}
+{setupId:commandLineConfiguration
+on
+}
+{setupId:debugConfiguration
+on
+area name off
+appSerial=1
+remove,ATTRIBUTES
+compile,GREEN_POWER_CLUSTER
+compile,ZDO
+enable,GREEN_POWER_CLUSTER
+enable,ZDO
+}
+{setupId:eventConfiguration
+commissioningLedEventControl,commissioningLedEventHandler
+findingAndBindingEventControl,findingAndBindingEventHandler
+}
+{setupId:halOptions
+}
+{setupId:hwConfig
+lastArchitectureId=EFR32MG12P433F1024GL125+BRD4164A+iar
+featureLevel=1
+active=true
+}
+{setupId:information
+\{key:description
+Z3 Light Gp Combo
+
+Appart from being a Z3 Light, this application demonstrates functionality of a Green Power combo device that has proxy and sink instances together in one application.
+
+A Green Power Combo (GPC) has a device id = 0x66, the green power endpoint(242), profile Id = 0xA1E0 in this application confiluration The Green Power Cluster Id = 0x0021 holds both server and client instances. The configuration includes green power plugins for server, client and the common to handle the required combo functionality.
+
+GPD Commissioning:
+The Green Power commissioning is invoked by either an user action locally (CLI comand or button press) or by a remote commissioning tool with Green Power ZCL command Sink Commissioning Mode with action Enter. This command specefies if proxies in the network need to participate, if set, the the sink will generate Proxy commissioning Mode with action = Enter, Exit criteria , commissioning communication mode etc. to the proxies inthe network. In a combo scenario, the proxy on the combo node will participate. Once the sink and proxy are in  commissiong mode, then the GPD starts to send the commission frames and completes the commissiong process. At the end of successfull commissioning, the proxy and sink tables are populated.
+
+Commissiong Tool Commissioning
+A commissioning tool using GpPairingConfiguration command can be used to commission a GPD.
+
+Sink and Proxy Tables:
+Both of these tables are used by green power server and client respectively. T These tables are representaed as attributes of respective green power cluster side which can be read with ZCL read attribute command.
+
+GpNotification:
+The proxy table is used by the green power client to validate an incoming GPDF and generate a GP Notification based on communication mode. It could happen that the proxy side (client) will generate a Gp Notification for the sink (server) on the same node. The GpNotification when received by the server side, uses sink table to validate the source GPD address and sink destination and forwards.
+
+Command Translation:
+The combo has ability to execute a GPD operational command such as toggle or accept a report from a GPD when it is paired to a GPD that has sent the GPDF and it has a translation available for the command for a Zigbee Cluster Command and endpoint. The green power server plugin considers both the configured application endpoints 1 and 2 for translation purpose.For example if the commissiong endpoint = 0xFF in SinkCommissioningModeEnter command it puts both the end points into commissiong, and creats translation table for both endpoints.
+
+Using this application :
+1. Either by green power plugin CLI or by pushing the button PB0, the SinkCommisisoningModeEnter coammnd puts the combo into commissiong. While using Button press to put the sink in commissioning mode, endpoint 1 is considered for GP commissioning endpoint. Sink is in commissioning mode is indicated by the LED1 is ON and
+2. Use the GPD Switch (GPD DeviceId = 2) sample application to start the commissioning.
+3. Once the commissiong is successfull the LED1 will turn off, indicating a successfull pairing.
+4. Use the GPD operational command to see the LED0 indicate the execution of ON/OFF Cluster command on endpoint 1.
+
+Note:
+Bidirectional commissiong process has a rx off sent and a rx window to receive the channel configuration and commissioning reply. These windows are affected by the debug prints. Hence it is recomended to turn the debug printing off for the green power cluster.
+The current debug printing settings in these applications are only for the purpose of aiding users in understanding and debugging this sample scenario.Debug printing should be turned off in order to save code size on a final
+product.
+\}
+}
+{setupId:macros
+COMMISSIONING_STATUS_LED=BOARDLED2
+ON_OFF_LIGHT_LED=BOARDLED2
+LED_BLINK_PERIOD_MS=2000
+-DNO_LED=1
+}
+{setupId:mpsi
+- mappings
+- custom messages
+}
+{setupId:pluginService
+}
+{setupId:quizz
+}
+{setupId:serial
+}
+{setupId:template
+--version:2
+--backupValues:
+headerSize=256
+}
+{setupId:token
+}
+{setupId:zclAfv2
+intMap:ManufacturingCode = 4098
+intMap:ReportTableSize = 5
+intMap:Endpoint = 10
+intMap:DeviceVersion = 0
+intMap:DefaultDestinationEndpoint = 10
+intMap:ProfileId = -1
+intMap:DeviceId = -1
+intMap:DefaultResponsePolicy = 0
+boolMap:EnableStandardReporting = false
+boolMap:EnableInterPanSend = false
+boolMap:EnableInterPanReceive = false
+boolMap:SupportCommandDiscovery = true
+boolMap:EnableKeySwitch = false
+boolMap:LowRamConcentrator = true
+boolMap:EnableAttributeRangeChecking = false
+boolMap:ReceiveSupportedZdoRequests = false
+boolMap:HandleUnsupportedZdoRequests = false
+boolMap:HandleEndpointZdoRequests = false
+boolMap:HandleBindingZdoRequests = false
+boolMap:LegacyCli = false
+boolMap:AddCustomCli = false
+boolMap:IncludeCommandDescriptions = false
+boolMap:GenerateCallbacksFile = false
+boolMap:ManufacturerCodeDefaultIsZero = true
+beginAttrList:OPTIONAL
+  cl:0x0021, at:0x0020, di:server, mf:0x0000
+  cl:0x0021, at:0x0021, di:server, mf:0x0000
+  cl:0x0021, at:0x0004, di:server, mf:0x0000
+endAttrList:OPTIONAL
+beginAttributeDefaults
+cl:0x0021, at:0xFFFD, di:server, mf:0x0000 => 0x0002
+cl:0x0021, at:0x0006, di:server, mf:0x0000 => 0x0FAE2F
+cl:0x0021, at:0x0005, di:server, mf:0x0000 => 0x06
+cl:0x0021, at:0x0002, di:server, mf:0x0000 => 0x03
+cl:0x0021, at:0x0003, di:server, mf:0x0000 => 0x01
+cl:0x0021, at:0x0004, di:server, mf:0x0000 => 0x00FF
+endAttributeDefaults
+configuredNetwork:*type:ZIGBEE_PRO, name:Primary
+beginEndpointType:Primary
+device:HA-onoff
+deviceId:0
+profileId:260
+endEndpointType
+beginEndpointType:Centralized
+device:LO-dimmablelight
+deviceId:257
+profileId:260
+overrideClientCluster:0x0406,yes
+endEndpointType
+beginEndpointType:Touchlink
+device:ZLL-colorlight
+deviceId:512
+profileId:260
+endEndpointType
+beginEndpointType:GreenPower
+device:GP-combo-basic
+deviceId:102
+profileId:41440
+endEndpointType
+configuredEndpoint:*ep:1,pi: -1,di:-1,dv:1,ept:Centralized,nwk:Primary
+configuredEndpoint:ep:2,pi: -1,di:-1,dv:1,ept:Touchlink,nwk:Primary
+configuredEndpoint:ep:242,pi: -1,di:-1,dv:1,ept:GreenPower,nwk:Primary
+optionalOutCommand:cl:0x0021, cm:0x000B, di:CLIENT_TO_SERVER, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x000A, di:CLIENT_TO_SERVER, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0009, di:CLIENT_TO_SERVER, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0008, di:CLIENT_TO_SERVER, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0007, di:CLIENT_TO_SERVER, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0005, di:CLIENT_TO_SERVER, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0004, di:CLIENT_TO_SERVER, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0000, di:SERVER_TO_CLIENT, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0001, di:SERVER_TO_CLIENT, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0002, di:SERVER_TO_CLIENT, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0006, di:SERVER_TO_CLIENT, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x000A, di:SERVER_TO_CLIENT, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x000B, di:SERVER_TO_CLIENT, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0000, di:CLIENT_TO_SERVER, mf:0x0000
+optionalOutCommand:cl:0x0021, cm:0x0001, di:CLIENT_TO_SERVER, mf:0x0000
+callbacks:emberAfMainInitCallback
+callbacks:emberAfStackStatusCallback
+callbacks:emberAfOnOffClusterServerAttributeChangedCallback
+callbacks:emberAfPluginOnOffClusterServerPostInitCallback
+callbacks:emberAfPluginNetworkSteeringCompleteCallback
+callbacks:emberAfPluginNetworkCreatorCompleteCallback
+callbacks:emberAfHalButtonIsrCallback
+callbacks:emberAfGreenPowerServerCommissioningTimeoutCallback
+callbacks:emberAfGreenPowerServerPairingCompleteCallback
+}
+{setupId:zclCustomizer
+}
+{setupId:zigbeeStack
+boolMap:EnableZdoSerialCommands = false
+boolMap:EnableBindings = true
+boolMap:EnableEndDeviceBind = false
+boolMap:EnableReceiveStatistics = false
+boolMap:UseEcc163k1 = false
+boolMap:UseEcc283k1 = false
+boolMap:PreconfiguredKeyEnabled = false
+boolMap:NetworkKeyEnabled = false
+boolMap:FragmentationEnable = false
+boolMap:EnableConcentrator = false
+boolMap:UseSeInstallCodes = false
+boolMap:TxPowerModeUseToken = true
+boolMap:BoostMode = false
+boolMap:AlternatePowerMode = false
+byteArrayMap:PreconfiguredKey = 56 77 77 77 77 77 77 77 77 77 77 77 77 77 77 77
+byteArrayMap:NetworkKey = 12 33 33 33 33 33 33 33 33 33 33 33 33 33 33 33
+byteArrayMap:NetworkKey2 = AB CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC
+intMap:NumberOfBindings = 2
+intMap:AddressTableSize = 2
+intMap:TrustCenterCacheSize = 2
+intMap:LinkKeyMode = 2
+intMap:FragmentationMaxSize = 255
+intMap:HeartbeatLed = 1
+configuredNetworkSecurity:Primary|ZIGBEE_PRO=Z3
+configuredNetworkZigbeeDeviceType:Primary|ZIGBEE_PRO=ZA_ROUTER
+CliCommandSet:Full
+}
+appPlugin:adc,true
+
+appPlugin:address-table,false
+appPlugin:aes-cmac,true
+
+appPlugin:antenna,false
+appPlugin:antenna-cli,false
+appPlugin:antenna-stub,true
+
+appPlugin:aps-link-key-authorization,false
+appPlugin:barrier-control-server,false
+appPlugin:basic,true
+
+appPlugin:battery-monitor,false
+appPlugin:battery-monitor-stub,false
+appPlugin:binding-table-library,true
+
+appPlugin:ble,false
+appPlugin:bulb-pwm-cli,false
+appPlugin:bulb-pwm-driver,false
+appPlugin:bulb-ui,false
+appPlugin:button-interface,false
+appPlugin:button-interface-stub,false
+appPlugin:button-joining,false
+appPlugin:calendar-client,false
+appPlugin:calendar-common,false
+appPlugin:calendar-server,false
+appPlugin:cbke-163k1-library,false
+appPlugin:cbke-283k1-library,false
+appPlugin:cbke-library-core,false
+appPlugin:cbke-library-dsa-sign,false
+appPlugin:cbke-library-dsa-verify,false
+appPlugin:cbke-library-dsa-verify-283k1,false
+appPlugin:ccm-encryption,true
+
+appPlugin:cjson,false
+appPlugin:cli-password-protection,false
+appPlugin:coexistence,false
+appPlugin:coexistence-cli,false
+appPlugin:coexistence-stub,true
+
+appPlugin:color-control,false
+appPlugin:color-control-server,false
+appPlugin:command-relay,false
+appPlugin:comms-hub-function,false
+appPlugin:comms-hub-function-sub-ghz,false
+appPlugin:compact-logger,false
+appPlugin:concentrator,false
+appPlugin:configuration-server,false
+appPlugin:connection-manager,false
+appPlugin:coulomb-counter,false
+appPlugin:counters,true
+
+appPlugin:critical-message-queue,false
+appPlugin:debug-basic-library,true
+
+appPlugin:debug-extended-library,false
+appPlugin:debug-jtag,true
+
+appPlugin:debug-jtag-stub,false
+appPlugin:delayed-join,false
+appPlugin:device-database,false
+appPlugin:device-management-client,false
+appPlugin:device-management-server,false
+appPlugin:device-query-service,false
+appPlugin:device-table,false
+appPlugin:diagnostic-server,false
+appPlugin:dido,false
+appPlugin:dmp-demo-ui,false
+appPlugin:dmp-tuning,false
+appPlugin:dmp-ui-demo,false
+appPlugin:dmp-ui-demo-stub,false
+appPlugin:door-lock-server,false
+appPlugin:dotdot-mfg-certs,false
+appPlugin:drlc,false
+appPlugin:drlc-server,false
+appPlugin:ecc-library-163k1,false
+appPlugin:ecc-library-283k1,false
+appPlugin:eeprom,false
+appPlugin:eeprom-powerdown,false
+appPlugin:electrical-measurement-server,false
+appPlugin:em4,false
+appPlugin:ember-minimal-printf,true
+
+appPlugin:end-device-bind-library,false
+appPlugin:end-device-support,false
+appPlugin:esi-management,false
+appPlugin:events-client,false
+appPlugin:events-server,false
+appPlugin:exosite-demo,false
+appPlugin:extdev,false
+appPlugin:ezmode-commissioning,false
+appPlugin:ezradiopro,false
+appPlugin:fem-control,false
+appPlugin:find-and-bind-initiator,false
+appPlugin:find-and-bind-target,true
+
+appPlugin:flash-data,false
+appPlugin:form-and-join,false
+appPlugin:fragmentation,false
+appPlugin:gas-proxy-function,false
+appPlugin:gbcs-compatibility,false
+appPlugin:gbcs-device-log,false
+appPlugin:gbcs-gas-meter,false
+appPlugin:gbz-message-controller,false
+appPlugin:general-response-commands,false
+appPlugin:generic-interrupt-control,false
+appPlugin:generic-interrupt-control-stub,false
+appPlugin:glib,false
+appPlugin:gp-library,true
+
+appPlugin:gpio-sensor,false
+appPlugin:gpio-sensor-stub,false
+appPlugin:green-power-client,true
+
+appPlugin:green-power-common,true
+
+appPlugin:green-power-server,true
+
+appPlugin:green-power-test-device,false
+appPlugin:green-power-translation-table,true
+
+appPlugin:groups-client,false
+appPlugin:groups-server,true
+
+appPlugin:hal-library,true
+
+appPlugin:hal-library-rtos,false
+appPlugin:hc-11073-tunnel,false
+appPlugin:heartbeat,false
+appPlugin:humidity-si7021,false
+appPlugin:humidity-si7021-stub,false
+appPlugin:i2c-driver,false
+appPlugin:i2c-driver-stub,false
+appPlugin:ias-zone-client,false
+appPlugin:ias-zone-server,false
+appPlugin:identify,true
+
+appPlugin:identify-feedback,false
+appPlugin:idle-sleep,false
+appPlugin:illuminance-measurement-server,false
+appPlugin:illuminance-si1141,false
+appPlugin:illuminance-si1141-stub,false
+appPlugin:install-code-library,true
+
+appPlugin:install-code-read,false
+appPlugin:interpan,true
+
+appPlugin:key-establishment,false
+appPlugin:led-blink,false
+appPlugin:led-blink-stub,false
+appPlugin:led-dim-pwm,false
+appPlugin:led-rgb-pwm,false
+appPlugin:led-temp-pwm,false
+appPlugin:level-control,true
+
+appPlugin:libcoap,false
+appPlugin:linked-list,false
+appPlugin:low-voltage-shutdown,false
+appPlugin:lqi-override,false
+appPlugin:lwip,false
+appPlugin:lwip-callback-tests,false
+appPlugin:lwip-interface,false
+appPlugin:lwip-stats,false
+appPlugin:mac-address-filtering,false
+appPlugin:manufacturing-library,false
+appPlugin:manufacturing-library-cli,false
+appPlugin:manufacturing-library-ota,false
+appPlugin:mbedtls,true
+
+appPlugin:mbedtls-multiprotocol,false
+appPlugin:messaging-client,false
+appPlugin:messaging-server,false
+appPlugin:meter-mirror,false
+appPlugin:meter-snapshot-client,false
+appPlugin:meter-snapshot-server,false
+appPlugin:meter-snapshot-storage,false
+appPlugin:metering-server,false
+appPlugin:micrium-rtos,false
+appPlugin:mn-price-passthrough,false
+appPlugin:mpsi,false
+appPlugin:mpsi-ipc,false
+appPlugin:mpsi-storage,false
+appPlugin:multi-network-library,false
+appPlugin:network-creator,true
+
+appPlugin:network-creator-security,true
+
+appPlugin:network-find,false
+appPlugin:network-find-sub-ghz,false
+appPlugin:network-steering,true
+
+appPlugin:nvm3,true
+
+appPlugin:nvm3-extflash,false
+appPlugin:nvm3-simulation,false
+appPlugin:occupancy-pyd1698,false
+appPlugin:occupancy-pyd1698-cli,false
+appPlugin:occupancy-pyd1698-stub,false
+appPlugin:occupancy-sensor-server,false
+appPlugin:on-off,true
+
+appPlugin:ota-bootload,false
+appPlugin:ota-client,false
+appPlugin:ota-client-policy,false
+appPlugin:ota-common,false
+appPlugin:ota-server,false
+appPlugin:ota-server-policy,false
+appPlugin:ota-storage-common,false
+appPlugin:ota-storage-posix-filesystem,false
+appPlugin:ota-storage-simple,false
+appPlugin:ota-storage-simple-eeprom,false
+appPlugin:ota-storage-simple-ram,false
+appPlugin:pa,true
+
+appPlugin:packet-handoff,false
+appPlugin:packet-validate-library,false
+appPlugin:paho.mqtt.c,false
+appPlugin:partner-link-key-exchange,false
+appPlugin:permit-join-manager,false
+appPlugin:poll-control-client,false
+appPlugin:poll-control-server,false
+appPlugin:power-configuration-server,false
+appPlugin:power-consumption-model,false
+appPlugin:power-meter-cs5463,false
+appPlugin:power-meter-cs5463-stub,false
+appPlugin:prepayment-client,false
+appPlugin:prepayment-server,false
+appPlugin:prepayment-snapshot-storage,false
+appPlugin:price-client,false
+appPlugin:price-common,false
+appPlugin:price-server,false
+appPlugin:psstore,false
+appPlugin:pti,true
+
+appPlugin:rail-library,true
+
+appPlugin:rail-library-internal,false
+appPlugin:rail-library-mp,false
+appPlugin:rail-library-mp-internal,false
+appPlugin:relative-humidity-measurement-server,false
+appPlugin:relay-control-client,false
+appPlugin:relay-control-server,false
+appPlugin:reporting,true
+
+appPlugin:ring-buffer,false
+appPlugin:sb1-gesture-sensor,false
+appPlugin:sb1-gesture-sensor-stub,false
+appPlugin:scan-dispatch,true
+
+appPlugin:scenes,true
+
+appPlugin:scenes-client,false
+appPlugin:security-link-keys-library,false
+appPlugin:security-sensor,false
+appPlugin:serial,true
+
+appPlugin:silabs-device-ui,false
+appPlugin:sim-eeprom1,false
+appPlugin:sim-eeprom2,false
+appPlugin:sim-eeprom2-1to2-upgrade,false
+appPlugin:sim-eeprom2-1to2-upgrade-stub,true
+
+appPlugin:sim-eeprom2-to-nvm3-upgrade,false
+appPlugin:sim-eeprom2-to-nvm3-upgrade-stub,true
+
+appPlugin:simple-clock,false
+appPlugin:simple-main,true
+
+appPlugin:simple-metering-client,false
+appPlugin:simple-metering-server,false
+appPlugin:sleepy-message-queue,false
+appPlugin:slot-manager,false
+appPlugin:smart-energy-registration,false
+appPlugin:source-route-library,true
+
+appPlugin:stack-diagnostics,false
+appPlugin:stack-protection-iar,false
+appPlugin:standalone-bootloader-client,false
+appPlugin:standalone-bootloader-common,false
+appPlugin:standalone-bootloader-server,false
+appPlugin:standard-printf-support,false
+appPlugin:strong-random,true
+
+appPlugin:sub-ghz-client,false
+appPlugin:sub-ghz-server,false
+appPlugin:tamper-switch,false
+appPlugin:tamper-switch-stub,false
+appPlugin:temperature-measurement-server,false
+appPlugin:temperature-si7021,false
+appPlugin:temperature-si7021-stub,false
+appPlugin:temperature-si7053,false
+appPlugin:temperature-si7053-stub,false
+appPlugin:test-harness,false
+appPlugin:test-harness-z3,false
+appPlugin:throughput,false
+appPlugin:throughput-legacy,false
+appPlugin:time-server,false
+appPlugin:transport-mqtt,false
+appPlugin:trust-center-backup,false
+appPlugin:trust-center-keepalive,false
+appPlugin:trust-center-nwk-key-update-broadcast,false
+appPlugin:trust-center-nwk-key-update-periodic,false
+appPlugin:trust-center-nwk-key-update-unicast,false
+appPlugin:tunneling-client,false
+appPlugin:tunneling-server,false
+appPlugin:update-ha-tc-link-key,false
+appPlugin:update-tc-link-key,true
+
+appPlugin:wstk-display,false
+appPlugin:wwah-app-event-retry-manager,false
+appPlugin:wwah-client-silabs,false
+appPlugin:wwah-connectivity-manager,false
+appPlugin:wwah-end-device-extension,false
+appPlugin:wwah-server-silabs,false
+appPlugin:xmodem-sender,false
+appPlugin:zcl-framework-core,true
+
+appPlugin:zcl-ip,false
+appPlugin:zigbee-event-logger,false
+appPlugin:zigbee-event-logger-stub,false
+appPlugin:zigbee-pro-leaf-library,false
+appPlugin:zigbee-pro-library,true
+
+appPlugin:zigbee-pro-stack-alt-mac-library,false
+appPlugin:zigbee-r22-support-library,false
+appPlugin:zll-commissioning-client,false
+appPlugin:zll-commissioning-common,true
+
+appPlugin:zll-commissioning-network,false
+appPlugin:zll-commissioning-server,true
+
+appPlugin:zll-identify-server,true
+
+appPlugin:zll-level-control-server,false
+appPlugin:zll-library,true
+
+appPlugin:zll-on-off-server,true
+
+appPlugin:zll-scenes-client,false
+appPlugin:zll-scenes-server,true
+
+appPlugin:zll-utility-client,false
+appPlugin:zll-utility-server,true
+
+AppPluginOption:EMBER_GP_SINK_TABLE_SIZE,30
+AppPluginOption:EMBER_AF_PLUGIN_GREEN_POWER_CLIENT_GPP_COMMISSIONING_WINDOW,180
+AppPluginOption:EMBER_BINDING_TABLE_SIZE,10
+AppPluginOption:EMBER_AF_PLUGIN_SIM_EEPROM2_PASSWORD,!spoon
+AppPluginOption:EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_TRUST_CENTER_SUPPORT,FALSE
+AppPluginOption:EMBER_AF_PLUGIN_GREEN_POWER_SERVER_CUSTOMIZED_GPD_TRANSLATION_TABLE_SIZE,20
+AppPluginOption:EMBER_BROADCAST_TABLE_SIZE,21
+AppPluginOption:EMBER_AF_PLUGIN_INTERPAN_ALLOW_REQUIRED_SMART_ENERGY_MESSAGES,FALSE
+AppPluginOption:EMBER_AF_PLUGIN_NVM3_CACHE_SIZE,1000
+AppPluginOption:EMBER_GP_PROXY_TABLE_SIZE,30

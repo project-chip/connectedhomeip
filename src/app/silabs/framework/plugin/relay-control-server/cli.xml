@@ -1,0 +1,24 @@
+<cli>
+  <group id="plugin-relay-control-server" name="Plugin Commands: Relay Control Server">
+    <description>
+      The relay control plugin provides the functionality to enable or disable the stack's relay capabilities, and also to view the relay state.
+    </description>
+  </group>
+  <command cli="plugin relay-control-server get" functionName="get" group="plugin-relay-control-server">
+    <description>
+      Get the relay state
+    </description>
+    <arg name="nodeId" type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint" type="INT8U" description="the source endpoint" />
+    <arg name="dstEndpoint" type="INT8U" description="the destination endpoint" />
+  </command>
+  <command cli="plugin relay-control-server set" functionName="set" group="plugin-relay-control-server">
+    <description>
+      Set the relay state
+    </description>
+    <arg name="nodeId" type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint" type="INT8U" description="the source endpoint" />
+    <arg name="dstEndpoint" type="INT8U" description="the destination endpoint" />
+    <arg name="isEnabled"    type="INT8U" description="state value to be set" />
+  </command>
+</cli>

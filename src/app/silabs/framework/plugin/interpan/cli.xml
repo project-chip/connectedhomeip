@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-interpan" name="Plugin Commands: Interpan">
+    <description>
+      The Interpan commands provide commands to set global interpan state and test interpan fragmentation.
+    </description>
+  </group>
+  <command cli="plugin interpan enable" functionName="emAfInterpanEnableCommand" group="plugin-interpan">
+    <description>
+      Enables inter-PAN globally.
+    </description>
+  </command>
+  <command cli="plugin interpan disable" functionName="emAfInterpanDisableCommand" group="plugin-interpan">
+    <description>
+      Disables inter-PAN globally.
+    </description>
+  </command>
+  <command cli="plugin interpan fragment-test" functionName="emAfInterpanFragmentTestCommand" group="plugin-interpan">
+    <description>
+      Sends a message of specified length of random values to target device over inter-PAN.
+    </description>
+    <arg name="panId" type="INT16U" description="The PAN ID that the target is located on"/>
+    <arg name="eui64" type="IEEE_ADDRESS" description="The target's EUI64 (big endian)"/>
+    <arg name="clusterId" type="INT16U" description="The cluster ID that the sample message should contain"/>
+    <arg name="msgLen" type="INT16U" description="The length of the randomly-filled message to be sent across inter-PAN"/>
+  </command>
+  <command cli="plugin interpan set-msg-timeout" functionName="emAfInterpanSetMessageTimeoutCommand" group="plugin-interpan">
+    <description>
+      Sets the timeout for inter-PAN messages sent and received.
+    </description>
+    <arg name="timeout" type="INT8U" description="Message timeout in seconds."/>
+  </command>
+</cli>

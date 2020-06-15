@@ -1,0 +1,913 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("*** 2 nodes, no need for multihop.");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{ "server", "client" };
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// I hate setting this, but some of my expect()'s were failing because of those
+// nasty "FullTh>" line prefixes that pop up before the actual stuff that I want.
+lazyExpect = true;
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+// Wait for the nodes to reset.
+networkWait(DEFAULT_TIMEOUT);
+
+// Setup network.
+setNetworkParams(11, 2, 0x1234);
+formAndJoinDevices(devices);
+
+// Wait for the network to quiet down.
+networkWait(DEFAULT_TIMEOUT << 2);
+
+// Turn on barrier control cluster debug printing.
+send("server", "debugprint on 36");
+
+String serverNodeId = nodeId("server");
+String serverEui64 = eui64("server");
+String clientNodeId = nodeId("client");
+String clientEui64 = eui64("client");
+
+void checkAttributeRead(String id, String value)
+{
+  String idNo0x = id.substring(2);
+  send("client", "zcl global read 0x0103 " + id);
+  _expectMultiline("client",
+                   "send " + serverNodeId + " 1 1",
+                   new String[] {
+                     "READ_ATTR_RESP: \\(Barrier Control\\)",
+                     " - attr:" + idNo0x + ", status:00",
+                     "   type:[0-9A-Z]{2}, val:" + value,
+                   },
+                   DEFAULT_TIMEOUT,
+                   getSourceFileInfo(),
+                   this.namespace.getInvocationLine());
+}
+
+void checkAttributeWrite(String id, String type, String value)
+{
+  checkAttributeWrite("client",          // sendingNodeName
+                      serverNodeId,      // receivingNodeId
+                      "Barrier Control", // clusterName
+                      "0x0103",          // clusterInHex
+                      id,                // attrInHex
+                      type,              // attrTypeInHex
+                      value,             // attrDataInHex
+                      "00",              // returnStatusInHex (no 0x prefix)
+                      getSourceFileInfo(),
+                      this.namespace.getInvocationLine());
+}
+
+void sendGoToPercent(String percent)
+{
+  send("client", "zcl barrier-control go-to-percent " + percent);
+  expect("client",
+         "send " + serverNodeId + " 1 1",
+         "DEFAULT_RESP: \\(Barrier Control\\) cmd 00 status 00");
+}
+
+String[] makeReportExpect(String id, String value)
+{
+  return new String[] {
+    "RPT_ATTR: \\(Barrier Control\\)",
+    " - attr:" + id,
+    "   type:[A-Z0-9]{2}, val:" + value,
+  };
+}
+
+// These test cases are from
+// 17-02866-009-0x0103-Barrier-Control-Cluster-Test-Specification-Editors.docx.
+
+//
+// BC-TC-01G (Global attributes)
+//
+
+// Global attributes are pretty boring. I am going to skip this test because the
+// functionality that it tests exists in other beanshell tests.
+
+//
+// BC-TC-01S (Attributes with server as DUT)
+//
+
+// Regular attribute read/writes are pretty boring. I am going to skip this test
+// because the functionality that it tests exists below.
+
+//
+// BC-TC-02S (Primary functionality with server as DUT (No Partial Barrier Support))
+//
+
+// P5: make sure that the server has its barrier all the way open.
+sendGoToPercent("100");
+networkWait(DEFAULT_TIMEOUT << 1);
+expectMultiline("server",
+                "plugin barrier-control-server status 1",
+                new String[] {
+                  "BarrierPosition: 100% \\(open\\)",
+                  "SafetyStatus: 0x0000 \\(OK\\)",
+                });
+
+// Item 1.A: read the MovingState attribute and make sure it is set to 0x00
+// (stopped).
+checkAttributeRead("0x0001", "00");
+
+// Item 1.B: read the SafetyStatus attribute.
+checkAttributeRead("0x0002", "0000");
+
+// Item 1.C: read the Capabilities attribute.
+checkAttributeRead("0x0003", "00");
+
+// Item 1.D: write the OpenEvents attribute to 0xFFFC.
+checkAttributeWrite("0x0004", "0x21", "FCFF");
+
+// Item 1.E: write the CloseEvents attribute to 0xFFFC.
+checkAttributeWrite("0x0005", "0x21", "FCFF");
+
+// Item 1.F: write the CommandOpenEvents attribute to 0xFFFD.
+checkAttributeWrite("0x0006", "0x21", "FDFF");
+
+// Item 1.G: write the CommandCloseEvents attribute to 0xFFFD.
+checkAttributeWrite("0x0007", "0x21", "FDFF");
+
+// Item 1.H: write the OpenPeriod attribute to the maximum time in which the
+// barrier will move from 0% opened to 100% opened.
+checkAttributeWrite("0x0008", "0x21", "0A00");
+
+// Item 1.I: write the ClosePeriod attribute to the maximum time in which the
+// barrier will move from 100% opened to 0% opened.
+checkAttributeWrite("0x0009", "0x21", "0A00");
+
+// Item 2.A: send a GoToPercent command to the server with a percent value of
+// 0% opened.
+sendGoToPercent("0");
+
+// Item 2.B: while the barrier is moving, check that the MovingState attribute
+// is set to 0x01 (closing).
+checkAttributeRead("0x0001", "01");
+
+// Item 2.C: after the barrier has stopped moving, check that the MovingState
+// attribute is set to 0x00 (stopped).
+networkWait(DEFAULT_TIMEOUT << 1);
+checkAttributeRead("0x0001", "00");
+
+// Item 2.D: read the BarrierPosition attribute and make sure it is set to 0%
+// opened.
+checkAttributeRead("0x000A", "00");
+
+// Item 2.E: read the CommandCloseEvents attribute and make sure it has been
+// increased.
+checkAttributeRead("0x0007", "FEFF");
+
+// Item 2.F: read the CloseEvents attribute and make sure it has been
+// increased.
+checkAttributeRead("0x0005", "FDFF");
+
+// Item 3.A: send a GoToPercent command to the server with a percent value of
+// 100% opened.
+sendGoToPercent("100");
+
+// Item 3.B: while the barrier is moving, check that the MovingState attribute
+// is set to 0x02 (opening).
+checkAttributeRead("0x0001", "02");
+
+// Item 3.C: after the barrier has stopped moving, check that the MovingState
+// attribute is set to 0x00 (stopped).
+networkWait(DEFAULT_TIMEOUT << 1);
+checkAttributeRead("0x0001", "00");
+
+// Item 3.D: read the BarrierPosition attribute and make sure it is set to 100%
+// opened.
+checkAttributeRead("0x000A", "64");
+
+// Item 3.E: read the CommandOpenEvents attribute and make sure it has been
+// increased.
+checkAttributeRead("0x0006", "FEFF");
+
+// Item 3.F: read the OpenEvents attribute and make sure it has been
+// increased.
+checkAttributeRead("0x0004", "FDFF");
+
+// Item 4.A: locally move the barrier to the 0% opened position.
+expect("server",
+       "plugin barrier-control-server close 1",
+       "Barrier is now closed");
+
+// Item 4.B: read the CloseEvents attribute and make sure it has been
+// incremented.
+checkAttributeRead("0x0005", "FEFF");
+
+// Item 5.A: locally move the barrier to the 100% opened position.
+expect("server",
+       "plugin barrier-control-server open 1",
+       "Barrier is now open");
+
+// Item 5.B: read the OpenEvents attribute and make sure it has been
+// incremented.
+checkAttributeRead("0x0004", "FEFF");
+
+// Note: there is an issue in the test spec here. The event counts are not
+// correct, and there is no mention in the test spec of waiting until the barrier
+// opens/closes completely. I am changing the steps here, but we should make sure
+// that they are changed in the actual test spec.
+
+// Item 6.A: send a GoToPercent command to the server with a percent value of
+// 0% opened. Wait for the door to close.
+sendGoToPercent("0");
+networkWait(DEFAULT_TIMEOUT);
+
+// Item 6.B: read the CommandCloseEvents attribute and make sure it has not rolled
+// over (Zigbee's maximum value for a 16-bit unsigned value is 0xFFFE).
+checkAttributeRead("0x0007", "FEFF");
+
+// Item 6.C: read the CloseEvents attribute and make sure it has not rolled over
+// (Zigbee's maximum value for a 16-bit unsigned value is 0xFFFE).
+checkAttributeRead("0x0005", "FEFF");
+
+// Item 7.A: send a GoToPercent command to the server with a percent value of
+// 100% opened. Wait for the door to open.
+sendGoToPercent("100");
+networkWait(DEFAULT_TIMEOUT);
+
+// Item 7.B: read the CommandOpenEvents attribute and make sure it has not rolled
+// over (Zigbee's maximum value for a 16-bit unsigned value is 0xFFFE).
+checkAttributeRead("0x0006", "FEFF");
+
+// Item 7.C: read the OpenEvents attribute and make sure it has not rolled over
+// (Zigbee's maximum value for a 16-bit unsigned value is 0xFFFE).
+checkAttributeRead("0x0004", "FEFF");
+
+// Item 8.A: send a GoToPercent command with a percent value of 0% opened.
+sendGoToPercent("0");
+
+// Item 8.B: while barrier is moving, read MovingState attribute. It should be
+// 0x01 (closing).
+checkAttributeRead("0x0001", "01");
+
+// Item 8.C: before the barrier has stopped, send a Stop command to the server.
+send("client", "zcl barrier-control stop");
+expect("client",
+       "send " + serverNodeId + " 1 1",
+       "DEFAULT_RESP: \\(Barrier Control\\) cmd 01 status 00");
+
+// Item 8.D: make sure the barrier has stopped by reading the MovingState
+// attribute and making sure it is 0x00 (stopped).
+checkAttributeRead("0x0001", "00");
+
+// Item 8.E: send a GoToPercent command with a percent value of 50% opened, which is an
+// invalid value, since partialBarrier is not supported per capabilities setting.
+send("client", "zcl barrier-control go-to-percent 50");
+expect("client",
+       "send " + serverNodeId + " 1 1",
+       "DEFAULT_RESP: \\(Barrier Control\\) cmd 00 status 87");
+
+//
+// BC-TC-03S (Primary functionality with server as DUT (Partial Barrier Support))
+//
+
+// P4: make sure that the barrier has the PartialBarrier bit set on its
+// Capabilities attribute..
+expect("server", "write 1 0x0103 0x0003 1 0x18 {01}", "Success: write");
+
+// P5: make sure that the server has its barrier all the way open.
+sendGoToPercent("100");
+networkWait(DEFAULT_TIMEOUT << 1);
+expect("server",
+       "plugin barrier-control-server status 1",
+       "BarrierPosition: 100% \\(open\\)");
+
+// Item 1.A: read the MovingState attribute and make sure that it is 0x00
+// (stopped).
+checkAttributeRead("0x0001", "00");
+
+// Item 1.B: read the SafeyStatus attribute and make sure that it is 0x00.
+checkAttributeRead("0x0002", "0000");
+
+// Item 1.C: read the Capabilities attribute and make sure that the
+// PartialBarrier bit is set.
+checkAttributeRead("0x0003", "01");
+
+// Item 1.D: write the OpenEvents attribute value to 0.
+checkAttributeWrite("0x0004", "0x21", "0000");
+
+// Item 1.E: write the CloseEvents attribute value to 0.
+checkAttributeWrite("0x0005", "0x21", "0000");
+
+// Item 1.F: write the CommandOpenEvents attribute value to 0.
+checkAttributeWrite("0x0006", "0x21", "0000");
+
+// Item 1.G: write the CommandCloseEvents attribute value to 0.
+checkAttributeWrite("0x0007", "0x21", "0000");
+
+// Item 1.H: write the OpenPeriod attribute to the maximum time in which the
+// barrier will move from 0% opened to 100% opened.
+checkAttributeWrite("0x0008", "0x21", "0A00");
+
+// Item 1.I: write the ClosePeriod attribute to the maximum time in which the
+// barrier will move from 100% opened to 0% opened.
+checkAttributeWrite("0x0009", "0x21", "0A00");
+
+// Item 2.A: send a GoToPercent command with the percent set to 50.
+sendGoToPercent("50");
+
+// Item 2.B: while the barrier is moving, check that the MovingState attribute
+// is set to 0x01 (closing).
+checkAttributeRead("0x0001", "01");
+
+// Item 2.C: when the barrier stops, check that the MovingState attribute is set
+// 0x00 (stopped).
+networkWait(DEFAULT_TIMEOUT);
+checkAttributeRead("0x0001", "00");
+
+// Item 2.D: read the BarrierPosition attribute and make sure it is 0x32 (or 50%)
+// open.
+checkAttributeRead("0x000A", "32");
+
+// Item 2.E: read the CommandCloseEvents attribute and make sure it is 1.
+checkAttributeRead("0x0007", "0100");
+
+// Item 2.F: read the CloseEvents attribute and make sure it is 0 - the barrier
+// has not closed all the way yet, so it doesn't get incremented.
+checkAttributeRead("0x0005", "0000");
+
+// Item 3.A: send a GoToPercent command with a percent set to 0.
+sendGoToPercent("0");
+
+// Item 3.B: once the barrier has stopped, read the BarrierPosition attribute. It
+// should be set to 0.
+networkWait(DEFAULT_TIMEOUT << 1);
+checkAttributeRead("0x000A", "00");
+
+// Item 3.C: read the CommandCloseEvents attribute and make sure it is 2.
+checkAttributeRead("0x0007", "0200");
+
+// Item 3.D: read the CloseEvents attribute and make sure it is 1.
+checkAttributeRead("0x0005", "0100");
+
+// Item 4.A: send a GoToPercent command with the percent set to 50.
+sendGoToPercent("50");
+
+// Item 4.B: while the barrier is moving, check that the MovingState attribute
+// is set to 0x02 (opening).
+checkAttributeRead("0x0001", "02");
+
+// Item 4.C: when the barrier stops, check that the MovingState attribute is set
+// 0x00 (stopped).
+networkWait(DEFAULT_TIMEOUT);
+checkAttributeRead("0x0001", "00");
+
+// Item 4.D: read the BarrierPosition attribute and make sure it is 0x32 (or 50%)
+// open.
+checkAttributeRead("0x000A", "32");
+
+// Item 4.E: read the CommandOpenEvents attribute and make sure it is 1.
+checkAttributeRead("0x0006", "0100");
+
+// Item 4.F: read the OpenEvents attribute and make sure it is 1.
+checkAttributeRead("0x0004", "0100");
+
+// Item 5.A: send a GoToPercent command with an argument of 100%.
+sendGoToPercent("100");
+
+// Item 5.B: once the barrier has stopped, check that the barrier position is set
+// to 100%.
+networkWait(DEFAULT_TIMEOUT << 1);
+checkAttributeRead("0x000A", "64");
+
+// Item 5.C: read the CommandOpenEvents attribute and expect it to be 2.
+checkAttributeRead("0x0006", "0200");
+
+// Item 5.D: read the OpenEvents attribute and expect it to be 1.
+checkAttributeRead("0x0004", "0100");
+
+//
+// BC-TC-04S (Safety Status functionality with server as DUT)
+//
+
+// P4: make sure that the barrier has the PartialBarrier bit set on its
+// Capabilities attribute..
+expect("server", "write 1 0x0103 0x0003 1 0x18 {01}", "Success: write");
+
+// P5: make sure that the server has its barrier all the way open.
+sendGoToPercent("100");
+networkWait(DEFAULT_TIMEOUT << 1);
+expect("server",
+       "plugin barrier-control-server status 1",
+       "BarrierPosition: 100% \\(open\\)");
+
+// Item 1.A: read the MovingState attribute and make sure that it is 0x00
+// (stopped).
+checkAttributeRead("0x0001", "00");
+
+// Item 1.B: read the SafeyStatus attribute and make sure that it is 0x00.
+checkAttributeRead("0x0002", "0000");
+
+// Item 1.C: read the Capabilities attribute and make sure that the
+// PartialBarrier bit is set.
+checkAttributeRead("0x0003", "01");
+
+// Item 1.D: write the OpenEvents attribute value to 0.
+checkAttributeWrite("0x0004", "0x21", "0000");
+
+// Item 1.E: write the CloseEvents attribute value to 0.
+checkAttributeWrite("0x0005", "0x21", "0000");
+
+// Item 1.F: write the CommandOpenEvents attribute value to 0.
+checkAttributeWrite("0x0006", "0x21", "0000");
+
+// Item 1.G: write the CommandCloseEvents attribute value to 0.
+checkAttributeWrite("0x0007", "0x21", "0000");
+
+// Item 1.H: write the OpenPeriod attribute to 0.
+checkAttributeWrite("0x0008", "0x21", "0000");
+
+// Item 1.I: write the ClosePeriod attribute to 0.
+checkAttributeWrite("0x0009", "0x21", "0000");
+
+// Item 2.A: on the DUT, cause a tamper.
+expect("server",
+       "plugin barrier-control-server tamper-detected 1 1",
+       "SafetyStatus: 0x0002 \\(tamper,\\)");
+
+// Item 2.B: read the SafetyStatus attribute and make sure the TamperDetected bit
+// has been set.
+checkAttributeRead("0x0002", "0200");
+
+// Item 2.C: clear the tamper state on the DUT.
+expect("server",
+       "plugin barrier-control-server tamper-detected 1 0",
+       "SafetyStatus: 0x0000 \\(OK\\)");
+
+// Item 2.D: read the SafetyStatus attribute and make sure the TamperDetected bit
+// has been cleared.
+checkAttributeRead("0x0002", "0000");
+
+// Item 3.A: on the DUT, cause a communication failure.
+expect("server",
+       "plugin barrier-control-server failed-communication 1 1",
+       "SafetyStatus: 0x0004 \\(communication,\\)");
+
+// Item 3.B: read the SafetyStatus attribute and make sure the
+// FailedCommunication bit has been set.
+checkAttributeRead("0x0002", "0400");
+
+// Item 3.C: clear the failed communication state on the DUT.
+expect("server",
+       "plugin barrier-control-server failed-communication 1 0",
+       "SafetyStatus: 0x0000 \\(OK\\)");
+
+// Item 3.D: read the SafetyStatus attribute and make sure the
+// FailedCommunication bit has been cleared.
+checkAttributeRead("0x0002", "0000");
+
+// Item 4.A: send a GoToPercent command with an argument of 0 to close the
+// barrier.
+sendGoToPercent("0");
+
+// Item 4.B: read the MovingState attribute and make sure it is set to 0x01
+// (closing).
+checkAttributeRead("0x0001", "01");
+
+// Item 4.C: after the barrier has closed, read the MovingState attribute and
+// make sure it is set to 0x00 (stopped).
+networkWait(DEFAULT_TIMEOUT << 1);
+checkAttributeRead("0x0001", "00");
+
+// Item 4.D: on the DUT, cause a position failure.
+expect("server",
+       "plugin barrier-control-server position-failure 1 1",
+       "SafetyStatus: 0x0008 \\(position,\\)");
+
+// Item 4.E: read the SafetyStatus attribute and make sure the
+// PositionFailure bit has been set.
+checkAttributeRead("0x0002", "0800");
+
+// Item 4.F: clear the failed position state on the DUT.
+expect("server",
+       "plugin barrier-control-server position-failure 1 0",
+       "SafetyStatus: 0x0000 \\(OK\\)");
+
+// Item 4.G: read the SafetyStatus attribute and make sure the
+// PositionFailure bit has been cleared.
+checkAttributeRead("0x0002", "0000");
+
+// Item 5.A: cause a remote lockout on the server.
+expect("server",
+       "plugin barrier-control-server remote-lockout 1 1",
+       "SafetyStatus: 0x0001 \\(lockout,\\)");
+
+// Item 5.B: read the SafetyStatus attribute and make sure the
+// RemoteLockout bit has been set.
+checkAttributeRead("0x0002", "0100");
+
+// Item 5.C: send a GoToPercent command with a percent value of 100%. Should be rejected
+// because remote lockout is in effect.
+send("client", "zcl barrier-control go-to-percent 100");
+expect("client",
+       "send " + serverNodeId + " 1 1",
+       "DEFAULT_RESP: \\(Barrier Control\\) cmd 00 status 01");
+
+// Item 5.D: read the MovingState attribute. It should be set to 0x00 (stopped)
+// since the RemoteLockout bit is set in the SafetyStatus attribute.
+checkAttributeRead("0x0001", "00");
+
+// End of BC-TC-04S, but...
+// Clear the SafetyStatus attribute for the next test.
+expect("server",
+       "plugin barrier-control-server remote-lockout 1 0",
+       "SafetyStatus: 0x0000 \\(OK\\)");
+
+/*
+//
+// BC-TC-05S (Reporting functionality with server as DUT)
+//
+
+// P6: create a binding from the server to the client.
+send("server", "option binding-table clear");
+send("server", "option binding-table set 0 0x0103 1 1 {" + clientEui64 + "}");
+expect("server",
+       "option binding-table print",
+       "0: UNICA  0    0x01  0x01  0x0103.*" + clientEui64);
+
+// P8: send a GoToPercent command with a position of 0x64 (100% open) and
+// make sure the barrier is in the appropriate position.
+sendGoToPercent("100");
+networkWait(DEFAULT_TIMEOUT);
+checkAttributeRead("0x000A", "64");
+
+// Item 1: send a ReadReportingConfiguration command to the server for the
+// MovingState attribute.
+send("client", "zcl global report-read 0x0103 0x0001 0");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "READ_RPT_CFG_RESP: \\(Barrier Control\\)",
+                  " - status:00, direction:00, attr:0001",
+                  "   type:30, min:0001, max:FFFE",
+                });
+
+// Item 2.A: send a ConfigureReporting command to the server configuring the
+// MovingState attribute to be reported with a minimum interval of 0x001E
+// (30 seconds), the maximum interval of 0x0078 (120 seconds) and the reportable
+// change field set to 0x0A.
+//
+// Note, reportable change is irrelevant since MovingState is an enum8 (discrete) type.
+send("client",
+     "zcl global send-me-a-report 0x0103 0x0001 0x30 0x001E 0x0078 {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+networkWait(DEFAULT_TIMEOUT); // wait for the server to get out its first report
+
+// Item 2.B: the server should start reporting the MovingState attribute
+// after 30 seconds but before 120 seconds.
+String[] reportExpectMovingStateStopped = makeReportExpect("0001", "00");
+//nexpectMultiline("client", reportExpectMovingStateStopped, 30000 - (DEFAULT_TIMEOUT << 1));
+//expectMultiline("client", reportExpectMovingStateStopped, 90000 + (DEFAULT_TIMEOUT << 1));
+//nexpectMultiline("client", reportExpectMovingStateStopped, 30000 - (DEFAULT_TIMEOUT << 1));
+nexpectMultiline("client", reportExpectMovingStateStopped, 30000);
+expectMultiline("client", reportExpectMovingStateStopped, 90000);
+nexpectMultiline("client", reportExpectMovingStateStopped, 30000);
+
+// Item 2.C: Cause a change in MovingState.
+sendGoToPercent("0");
+//networkWait(30000);
+
+// Item 2.D: Wait for report at minimum reporting interval (30 seconds).
+// TODO: move should trigger report, but what value will be reported if movement stops
+// before report is sent?
+expectMultiline("client", reportExpectMovingStateStopped, 30000);
+
+// Item 3: send a ReadReportingConfiguration command to the server for the
+// BarrierPosition attribute.
+send("client", "zcl global report-read 0x0103 0x000A 0");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "READ_RPT_CFG_RESP: \\(Barrier Control\\)",
+                  " - status:00, direction:00, attr:000A",
+                  "   type:20, min:0001, max:FFFE",
+                });
+
+// Item 4.A: send a ConfigureReporting command to the server configuring the
+// BarrierPosition attribute to be reported with a minimum interval of 0x001E
+// (30 seconds), the maximum interval of 0x0078 (120 seconds) and the reportable
+// change field set to 0x0A.
+send("client",
+     "zcl global send-me-a-report 0x0103 0x000A 0x20 0x001E 0x0078 {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+networkWait(DEFAULT_TIMEOUT); // wait for the server to get out its first report
+
+// Item 4.B: the server should start reporting the BarrierPosition attribute
+// after 30 seconds but before 120 seconds.
+String[] reportExpectBarrierPositionOpen = makeReportExpect("000A", "64");
+nexpectMultiline("client", reportExpectBarrierPositionOpen, 30000 - (DEFAULT_TIMEOUT << 1));
+expectMultiline("client", reportExpectBarrierPositionOpen, 90000 + (DEFAULT_TIMEOUT << 1));
+nexpectMultiline("client", reportExpectBarrierPositionOpen, 30000 - (DEFAULT_TIMEOUT << 1));
+
+// Item 5.A: the client sends a GoToPercent command to the server for 100%.
+networkWait(30000);
+sendGoToPercent("100");
+
+// Item 5.B: The server should send a ReportAttributes command to the client because the
+// BarrierPosition attribute changed. After it does so, make sure it reaches the
+// open position.
+// Note: I think the test spec should say "wait until the minimum reporting
+// interval has passed" in here, because otherwise the barrier may close before
+// the minimum interval has passed and the server would report an attribute
+// value that is 0x00 even though the test spec wants a non-0x00 value reported.
+expectMultiline("client", makeReportExpect("000A", "[^0]{2}"), 30000);
+networkWait(DEFAULT_TIMEOUT << 1);
+expect("server",
+       "plugin barrier-control-server status 1",
+       "BarrierPosition: 100% \\(open\\)");
+
+// Item 6.A: the server should report its MovingState attribute
+expectMultiline("client", reportExpectMovingStateStopped, 120000 + (DEFAULT_TIMEOUT << 1));
+expectMultiline("client", reportExpectMovingStateStopped, 120000 + (DEFAULT_TIMEOUT << 1));
+
+
+// Item 6.B: the server should periodically report its BarrierPosition attribute
+// at least every 120 seconds or so.
+String[] reportExpectBarrierPositionClosed = makeReportExpect("000A", "00");
+expectMultiline("client", reportExpectBarrierPositionClosed, 60000 + (DEFAULT_TIMEOUT << 1));
+expectMultiline("client", reportExpectBarrierPositionClosed, 60000 + (DEFAULT_TIMEOUT << 1));
+
+// Item 7.A: send a ReadReportingConfiguration command to the server for the
+// SafetyStatus attribute.
+send("client", "zcl global report-read 0x0103 0x0002 0");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "READ_RPT_CFG_RESP: \\(Barrier Control\\)",
+                  " - status:00, direction:00, attr:0002",
+                  "   type:19, min:0001, max:FFFE",
+                });
+
+// Item 7.B: send a ConfigureReporting command to the server configuring the
+// SafetyStatus attribute to be reported with a minimum interval of 0x001E
+// (30 seconds), the maximum interval of 0x0078 (120 seconds) and the reportable
+// change field set to 0x0A.
+send("client",
+     "zcl global send-me-a-report 0x0103 0x0002 0x19 0x001E 0x0078 {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+networkWait(DEFAULT_TIMEOUT); // wait for the server to get out its first report
+
+// Item 7.C: the server should periodically report its SafetyStatus attribute
+// at least every 120 seconds or so.
+String[] reportExpectSafetyStatusClear = makeReportExpect("0002", "0000");
+nexpectMultiline("client", reportExpectSafetyStatusClear, 30000 - (DEFAULT_TIMEOUT << 1));
+expectMultiline("client", reportExpectSafetyStatusClear, 90000 + (DEFAULT_TIMEOUT << 1));
+nexpectMultiline("client", reportExpectSafetyStatusClear, 30000 - (DEFAULT_TIMEOUT << 1));
+
+// Item 8.A: on the DUT, cause a tamper.
+expect("server",
+       "plugin barrier-control-server tamper-detected 1 1",
+       "SafetyStatus: 0x0002 \\(tamper,\\)");
+
+// Item 8.B: read the SafetyStatus attribute and check that the TamperDetected bit is set.
+checkAttributeRead("0x0002", "0200");
+
+// Item 8.C: Expect report for SafetyStatus within 30 seconds.
+String[] reportExpectSafetyStatusTamper = makeReportExpect("0002", "0200");
+expectMultiline("client", reportExpectSafetyStatusTamper, 30000);
+
+// Item 8.D:
+nexpectMultiline("client", reportExpectSafetyStatusTamper, 90000);
+expectMultiline("client", reportExpectSafetyStatusTamper, 30000);
+
+// Item 8.E: Clear the tamper condition.
+expect("server",
+       "plugin barrier-control-server tamper-detected 1 0",
+        "SafetyStatus: 0x0000 \\(OK\\)");
+
+// Item 8.F: Check that SafetyStatus tamper bit is cleared.
+checkAttributeRead("0x0002", "0000");
+
+// Item 9.A: on the DUT, cause a failed communication.
+expect("server",
+       "plugin barrier-control-server failed-communication 1 1",
+       "SafetyStatus: 0x0004 \\(communication,\\)");
+
+// Item 9.B: read the SafetyStatus attribute and check that the FailedCommuncation bit is set.
+checkAttributeRead("0x0002", "0400");
+
+// Item 9.C: Expect report for SafetyStatus within 30 seconds.
+String[] reportExpectSafetyStatusFailedComm = makeReportExpect("0002", "0400");
+expectMultiline("client", reportExpectSafetyStatusFailedComm, 30000);
+
+// Item 9.D:
+nexpectMultiline("client", reportExpectSafetyStatusFailedComm, 90000);
+expectMultiline("client", reportExpectSafetyStatusFailedComm, 30000);
+
+// Item 9.E: Clear the failed communication condition.
+expect("server",
+       "plugin barrier-control-server failed-communication 1 0",
+        "SafetyStatus: 0x0000 \\(OK\\)");
+
+// Item 9.F: Check that SafetyStatus FailedCommunication bit is cleared.
+checkAttributeRead("0x0002", "0000");
+
+// Item 10.A: send a ConfigureReporting command to the server for the
+// BarrierPosition attribute with the maximum reporting interval set to 0xFFFF
+// (i.e., stop sending reports).
+send("client",
+     "zcl global send-me-a-report 0x0103 0x000A 0x20 0x001E 0xFFFF {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+// Item 10.B: send a ConfigureReporting command to the server for the
+// MovingState attribute with the maximum reporting interval set to 0xFFFF
+// (i.e., stop sending reports).
+send("client",
+     "zcl global send-me-a-report 0x0103 0x0001 0x30 0x001E 0xFFFF {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+
+// Item 10.C: send a ConfigureReporting command to the server for the
+// SafetyStatus attribute with the maximum reporting interval set to 0xFFFF
+// (i.e., stop sending reports).
+send("client",
+     "zcl global send-me-a-report 0x0103 0x0002 0x19 0x001E 0xFFFF {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+
+// Item 11: the reportable attributes should not be reported.
+nexpectMultiline("client",
+                 makeReportExpect("000A", "00"),
+                 120000 + (DEFAULT_TIMEOUT << 1));
+nexpectMultiline("client",
+                 makeReportExpect("0001", "00"),
+                 120000 + (DEFAULT_TIMEOUT << 1));
+nexpectMultiline("client",
+                 makeReportExpect("0002", "0000"),
+                 120000 + (DEFAULT_TIMEOUT << 1));
+*/
+
+//ORIGINAL 05S
+// P6: create a binding from the server to the client.
+send("server", "option binding-table clear");
+send("server", "option binding-table set 0 0x0103 1 1 {" + clientEui64 + "}");
+expect("server",
+       "option binding-table print",
+       "0: UNICA  0    0x01  0x01  0x0103.*" + clientEui64);
+
+// Item 1: send a GoToPercent command with a position of 0x64 (100% open) and
+// make sure the barrier is in the appropriate position.
+sendGoToPercent("100");
+networkWait(DEFAULT_TIMEOUT);
+checkAttributeRead("0x000A", "64");
+
+// Item 2: send a ReadReportingConfiguration command to the server for the
+// MovingState attribute.
+// Item 3.A: send a ConfigureReporting command to the server for the MovingState
+// attribute. Hold up! The test spec doesn't make any sense here. It says to set
+// the reportable change to 0x0A (10%), but that is more than the MovingState
+// attribute would ever change. I think the test spec is confused. Skipping these
+// steps.
+// Item 3.B: make sure the server does the right reporting blah blah blah.
+// Skipping this step because the previous 2 are not right.
+
+// Item 4: send a ReadReportingConfiguration command to the server for the
+// BarrierPosition attribute.
+send("client", "zcl global report-read 0x0103 0x000A 0");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "READ_RPT_CFG_RESP: \\(Barrier Control\\)",
+                  " - status:00, direction:00, attr:000A",
+                  "   type:20, min:0001, max:FFFE",
+                });
+
+// Item 5.A: send a ConfigureReporting command to the server configuring the
+// BarrierPosition attribute to be reported with a minimum interval of 0x001E
+// (30 seconds), the maximum interval of 0x003C (60 seconds) and the reportable
+// change field set to 0x0A.
+send("client",
+     "zcl global send-me-a-report 0x0103 0x000A 0x20 0x001E 0x003C {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+networkWait(DEFAULT_TIMEOUT); // wait for the server to get out its first report
+
+// Item 5.B: the server should start reporting the BarrierPosition attribute
+// after 30 seconds but before 60 seconds.
+String[] reportExpect = makeReportExpect("000A", "64");
+nexpectMultiline("client", reportExpect, 30000 - (DEFAULT_TIMEOUT << 1));
+expectMultiline("client", reportExpect, 30000 + (DEFAULT_TIMEOUT << 1));
+nexpectMultiline("client", reportExpect, 30000 - (DEFAULT_TIMEOUT << 1));
+
+// Item 6: the client sends a GoToPercent command to the server for 0%. The
+// server should send a ReportAttributes command to the client because the
+// BarrierPosition attribute changed. After it does so, make sure it reaches the
+// closed position.
+// Note: I think the test spec should say "wait until the minimum reporting
+// interval has passed" in here, because otherwise the barrier may close before
+// the minimum interval has passed and the server would report an attribute
+// value that is 0x00 even though the test spec wants a non-0x00 value reported.
+networkWait(30000);
+sendGoToPercent("0");
+expectMultiline("client", makeReportExpect("000A", "[^0]{2}"), 30000);
+networkWait(DEFAULT_TIMEOUT << 1);
+expect("server",
+       "plugin barrier-control-server status 1",
+       "BarrierPosition: 0% \\(closed\\)");
+
+// Item 7.A: the server should report its MovingPosition attribute...this isn't
+// even a thing! See note about steps 2 and 3 above.
+
+// Item 7.B: the server should periodically report its BarrierPosition attribute
+// at least every 60 seconds or so.
+reportExpect = makeReportExpect("000A", "00");
+expectMultiline("client", reportExpect, 60000 + (DEFAULT_TIMEOUT << 1));
+expectMultiline("client", reportExpect, 60000 + (DEFAULT_TIMEOUT << 1));
+
+// Steps 8-13 deal with the SafetyStatus attribute. We don't have that attribute,
+// so we are going to skip these steps.
+
+// Step 14.A: send a ConfigureReporting command to the server for the
+// BarrierPosition attribute with the maximum reporting interval set to 0xFFFF
+// (i.e., stop sending reports).
+send("client",
+     "zcl global send-me-a-report 0x0103 0x000A 0x20 0x001E 0xFFFF {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+
+// Step 14.B: send a ConfigureReporting command to the server for the
+// MovingState attribute with the maximum reporting interval set to 0xFFFF
+// (i.e., stop sending reports).
+send("client",
+     "zcl global send-me-a-report 0x0103 0x0001 0x30 0x001E 0xFFFF {0A}");
+expectMultiline("client",
+                "send " + serverNodeId + " 1 1",
+                new String[] {
+                  "CFG_RPT_RESP: \\(Barrier Control\\)",
+                  " - status:00",
+                });
+
+// Step 14.C: send a ConfigureReporting command to the server for the
+// SafetyStatus attribute with the maximum reporting interval set to 0xFFFF
+// (i.e., stop sending reports).
+
+// Step 15: the reportable attributes should not be reported.
+nexpectMultiline("client",
+                 makeReportExpect("000A", "00"),
+                 60000 + (DEFAULT_TIMEOUT << 1));
+nexpectMultiline("client",
+                 makeReportExpect("0001", "00"),
+                 60000 + (DEFAULT_TIMEOUT << 1));
+
+//
+// BC-TC-01C (Functionality with client as DUT)
+//
+
+// This test just verifies that a client can send the Barrier Control cluster
+// client commands. This is more important for a real product, and we have tested
+// our ability to send these commands using "zcl barrier-control ..." CLI
+// commands, so we will skip this test.

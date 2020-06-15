@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-comms-hub-function" name="Plugin Commands: Comms Hub Function">
+    <description>
+      The comms-hub-function plugin contributes several CLI commands to the application framework to be used in configuring and managing the CHF.
+    </description>
+  </group>
+  <command cli="plugin comms-hub-function simulate-gbz-msg" functionName="emAfPluginCommsHubFunctionCliSimulateGbzMsg" group="plugin-comms-hub-function">
+    <description>
+      Simulate transmission of a GBZ message to the Comms Hub Function.
+    </description>
+    <arg name="dstEUI64"      type="IEEE_ADDRESS" />
+    <arg name="useCase"       type="INT16U" />
+  </command>
+
+  <command cli="plugin comms-hub-function print-supported-use-cases" functionName="emAfPluginCommsHubFunctionCliPrintSupportedUseCases" group="plugin-comms-hub-function">
+    <description>
+      Print the list of supported use cases.  The message code printed should be used with the simulate-gbz-msg command.
+    </description>
+  </command>
+
+  <command cli="plugin comms-hub-function send" functionName="emAfPluginCommsHubFunctionCliSend" group="plugin-comms-hub-function">
+    <description>
+      Send a message.
+    </description>
+    <arg name="dstEUI64"       type="IEEE_ADDRESS" />
+    <arg name="payload"        type="OCTET_STRING" />
+  </command>
+
+  <command cli="plugin comms-hub-function timeout" functionName="emAfPluginCommsHubFunctionCliTimeout" group="plugin-comms-hub-function">
+    <description>
+      Set the default sleepy message timeout.
+    </description>
+    <arg name="timeout"       type="INT32U" />
+  </command>
+
+  <command cli="plugin comms-hub-function get-tunnel-endpoint" functionName="emAfPluginCommsHubFunctionCliGetTunnelEndpoint" group="plugin-comms-hub-function">
+    <description>
+      Retrieve the tunneling endpoint for a given nodeId.
+    </description>
+    <arg name="nodeId"       type="INT16U" />
+  </command>
+
+  <command cli="plugin comms-hub-function close-tunnel" functionName="emAfPluginCommsHubFunctionCliCloseTunnel" group="plugin-comms-hub-function">
+    <description>
+      Remove the tunnel for a given device.
+    </description>
+    <arg name="dstEUI64"       type="IEEE_ADDRESS" />
+  </command>
+
+  <command cli="plugin comms-hub-function create-tunnel" functionName="emAfPluginCommsHubFunctionCliCreateTunnel" group="plugin-comms-hub-function">
+    <description>
+      Create tunnel for the given device and endpoint.
+    </description>
+    <arg name="dstEUI64"       type="IEEE_ADDRESS" />
+    <arg name="endpoint"       type="INT8U" />
+  </command>
+
+  <command cli="plugin comms-hub-function print" functionName="emAfPluginCommsHubFunctionCliPrint" group="plugin-comms-hub-function">
+    <description>
+      Prints the comms hub tunnel table.
+    </description>
+  </command>
+
+</cli>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-stack-diagnostics" name="Plugin Commands: Stack Diagnostics">
+    <description>
+      These commands give more information about the status of the status of the stack, such as routing tables, neighbor tables, and child tables.
+    </description>
+  </group>
+  <command cli="plugin stack-diagnostics info" functionName="printInfo" group="plugin-stack-diagnostics">
+    <description>
+      Prints out general information about the state of the stack.
+    </description>
+  </command>
+  <command cli="plugin stack-diagnostics child-table" functionName="printChildTable" group="plugin-stack-diagnostics">
+    <description>
+      Prints out the entries in the stack's child table.
+    </description>
+  </command>
+  <command cli="plugin stack-diagnostics neighbor-table" functionName="printNeighborTable" group="plugin-stack-diagnostics">
+    <description>
+      Prints out the entries in the stack's neighbor table.
+    </description>
+  </command>
+  <command cli="plugin stack-diagnostics route-table" functionName="printRouteTable" group="plugin-stack-diagnostics">
+    <description>
+      Prints out the entries in the stack's route table.
+    </description>
+  </command>
+</cli>

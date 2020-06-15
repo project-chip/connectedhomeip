@@ -1,0 +1,190 @@
+#include  <stdlib.h>
+#include  "app/framework/plugin/gas-proxy-function/gas-proxy-function.h"
+#include  "app/framework/plugin/gbz-message-controller/gbz-message-controller.h"
+
+/** @brief Non Tap Off Message Handler Completed
+ *
+ * Notify the application that the Non Tap Off Message (Non-TOM) have been
+ * handled by the mirror endpoint. This callback is invoked when the the Non
+ * Tap Off Message have been processed. The first argument is a pointer to the
+ * gbz commands response buffer. The application is responsible for freeing
+ * this buffer.
+ *
+ * @param gbzCommandsResponse   Ver.: always
+ * @param gbzCommandsResponseLength   Ver.: always
+ */
+void emberAfPluginGasProxyFunctionNonTapOffMessageHandlerCompletedCallback(uint8_t *gbzCommandsResponse,
+                                                                           uint16_t gbzCommandsResponseLength)
+{
+  emberAfAppPrintln("GBCS emberAfPluginGasProxyFunctionNonTapOffMessageHandlerCompletedCallback: gbzCommandsResponseLength=0x%2x", gbzCommandsResponseLength);
+  free(gbzCommandsResponse);
+  gbzCommandsResponse = NULL;
+}
+
+/** @brief Alert WAN
+ *
+ * Notify the application of an Alert that should be sent to the WAN. The
+ * second argument is a pointer to the gbz alert buffer. The application is
+ * responsible for freeing this buffer.
+ *
+ * @param alertCode The 16 bit allert code as defined by GBCS Ver.: always
+ * @param gbzAlert Buffer continaing the GBZ formatted Alert Ver.: always
+ * @param gbzAlertLength The length in octets of the GBZ formatted Alert
+ * Ver.: always
+ */
+void emberAfPluginGasProxyFunctionAlertWANCallback(uint16_t alertCode,
+                                                   uint8_t *gbzAlert,
+                                                   uint16_t gbzAlertLength)
+{
+  emberAfAppPrintln("GBCS emberAfPluginGasProxyFunctionAlertWANCallback: alertCode=0x%2x, gbzAlertLength=0x%2x", alertCode, gbzAlertLength);
+  free(gbzAlert);
+  gbzAlert = NULL;
+}
+
+/** @brief Tap Off Message Future Command Ignored
+ *
+ * Notify the application that an elemental ZCL command, embedded within the
+ * Tap Off Message (TOM), has been ignored by the GPF as it is a future dated
+ * command. The application can utilize the callback to store the discarded
+ * command for later retrieval. When the future dated command becomes active on
+ * the GSME, it will inform the CommsHub about the activation via an Alert
+ * message. The CommsHub should be able to correlate the matching messages and
+ * pass the previously stored ZCL commands to the TOM message handler for
+ * processing.
+ *
+ * @param gpfMessage   Ver.: always
+ * @param zclClusterCommand   Ver.: always
+ */
+void emberAfPluginGasProxyFunctionTapOffMessageFutureCommandIgnoredCallback(const EmberAfGpfMessage * gpfMessage,
+                                                                            const EmberAfClusterCommand * zclClusterCommand)
+{
+}
+
+/** @brief Data Log Access Request
+ *
+ * Query the application regarding the processing of the current GBCS specific
+ * command. Depending on the vendor specific information, such as the Tenancy
+ * attribute in the Device Management Cluster, the callback's return value
+ * determines whether the current command gets processed or not. With a return
+ * value of true, the plugin will process the message. Otherwise, the plugin
+ * will reject the message.
+ *
+ * @param gpfMessage   Ver.: always
+ * @param zclClusterCommand   Ver.: always
+ */
+bool emberAfPluginGasProxyFunctionDataLogAccessRequestCallback(const EmberAfGpfMessage * gpfMessage,
+                                                               const EmberAfClusterCommand * zclClusterCommand)
+{
+}
+
+/** @brief Validate Incoming Zcl Command
+ *
+ * Query the application to check if a specific ZCL command should be processed
+ * given the UseCase # and ZCL command payload information. This function
+ * should capture the behavior detailed by the GBCS Use Case documentation.
+ * Please refer to EmberAfGpfZclCommandPermission enum for specific return data
+ * types.
+ *
+ * @param cmd   Ver.: always
+ * @param messageCode   Ver.: always
+ */
+EmberAfGpfZclCommandPermission emberAfPluginGasProxyFunctionValidateIncomingZclCommandCallback(const EmberAfClusterCommand * cmd,
+                                                                                               uint16_t messageCode)
+{
+  if ((messageCode == TEST_ENCRYPTED_MESSAGE_CODE)
+      || (messageCode == TEST_MESSAGE_CODE)) {
+    return EMBER_AF_GPF_ZCL_COMMAND_PERMISSION_ALLOWED;
+  }
+
+  if (cmd->direction == ZCL_DIRECTION_SERVER_TO_CLIENT) {
+    if (cmd->apsFrame->clusterId == ZCL_CALENDAR_CLUSTER_ID) {
+      if ((cmd->commandId == ZCL_PUBLISH_CALENDAR_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_DAY_PROFILE_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_WEEK_PROFILE_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_SEASONS_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_SPECIAL_DAYS_COMMAND_ID)) {
+        return EMBER_AF_GPF_ZCL_COMMAND_PERMISSION_ALLOWED;
+      }
+    } else if (cmd->apsFrame->clusterId == ZCL_PRICE_CLUSTER_ID) {
+      if ((cmd->commandId == ZCL_PUBLISH_TARIFF_INFORMATION_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_BLOCK_THRESHOLDS_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_PRICE_MATRIX_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_CONVERSION_FACTOR_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_CALORIFIC_VALUE_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_BILLING_PERIOD_COMMAND_ID)
+          || (cmd->commandId == ZCL_PUBLISH_BLOCK_PERIOD_COMMAND_ID)) {
+        return EMBER_AF_GPF_ZCL_COMMAND_PERMISSION_ALLOWED;
+      }
+    } else if (cmd->apsFrame->clusterId == ZCL_MESSAGING_CLUSTER_ID) {
+      if (cmd->commandId == ZCL_DISPLAY_MESSAGE_COMMAND_ID) {
+        return EMBER_AF_GPF_ZCL_COMMAND_PERMISSION_ALLOWED;
+      }
+    } else if (cmd->apsFrame->clusterId == ZCL_DEVICE_MANAGEMENT_CLUSTER_ID) {
+      if (cmd->commandId == ZCL_PUBLISH_CHANGE_OF_SUPPLIER_COMMAND_ID) {
+        return EMBER_AF_GPF_ZCL_COMMAND_PERMISSION_ALLOWED;
+      }
+    }
+  } else {   // client to server
+    if (cmd->apsFrame->clusterId == ZCL_EVENTS_CLUSTER_ID) {
+      if (cmd->commandId == ZCL_CLEAR_EVENT_LOG_REQUEST_COMMAND_ID) {
+        return EMBER_AF_GPF_ZCL_COMMAND_PERMISSION_ALLOWED;
+      }
+    } else if (cmd->apsFrame->clusterId == ZCL_PREPAYMENT_CLUSTER_ID) {
+      if ((cmd->commandId == ZCL_EMERGENCY_CREDIT_SETUP_COMMAND_ID)
+          || (cmd->commandId == ZCL_SET_OVERALL_DEBT_CAP_COMMAND_ID)
+          || (cmd->commandId == ZCL_SET_LOW_CREDIT_WARNING_LEVEL_COMMAND_ID)
+          || (cmd->commandId == ZCL_SET_MAXIMUM_CREDIT_LIMIT_COMMAND_ID)) {
+        return EMBER_AF_GPF_ZCL_COMMAND_PERMISSION_IGNORED;
+      }
+    }
+  }
+
+  return EMBER_AF_GPF_ZCL_COMMAND_PERMISSION_NOT_ALLOWED;
+}
+
+/** @brief Unknown Season Week Id
+ *
+ * This callback is called when the GPF receives a PublishSeasons command with
+ * an unknown week ID in one of the seasons. The callback contains a mask,
+ * unknownWeekIdSeasonsMask, with bits set corresponding to season entries that
+ * were not published because of an unknown week ID reference.
+ *
+ * @param issuerCalendarId The calendar ID associated with these seasons.
+ * Ver.: always
+ * @param seasonEntries The season entries for this publish command.
+ * Ver.: always
+ * @param seasonEntriesLength The length of the season entries. Ver.: always
+ * @param unknownWeekIdSeasonsMask A mask where bit N indicates that the Nth
+ * season entry contains an unknown week ID reference. Ver.: always
+ */
+void emberAfPluginGasProxyFunctionUnknownSeasonWeekIdCallback(uint32_t issuerCalendarId,
+                                                              uint8_t *seasonEntries,
+                                                              uint8_t seasonEntriesLength,
+                                                              uint8_t unknownWeekIdSeasonsMask)
+{
+  emberAfAppPrintln("GBCS: emberAfPluginGasProxyFunctionUnknownSeasonWeekIdCallback: 0x%X", unknownWeekIdSeasonsMask);
+}
+
+/** @brief Unknown Special Days Day Id
+ *
+ * This callback is called when the GPF receives a PublishSpecialDays command
+ * with an unknown day ID for one of the special days. The callback contains a
+ * mask, unknownDayIdMask, with bits set corresponding to special day entries
+ * that were not published because of an unknown day ID reference.
+ *
+ * @param issuerCalendarId The calendar ID associated with these special days.
+ * Ver.: always
+ * @param specialDayEntries The special day entries for this publish command.
+ * Ver.: always
+ * @param specialDayEntriesLength The length of the special day entries.
+ * Ver.: always
+ * @param unknownDayIdMask A mask where bit N indicates that the Nth special
+ * day entry contains an unknown day ID reference. Ver.: always
+ */
+void emberAfPluginGasProxyFunctionUnknownSpecialDaysDayIdCallback(uint32_t issuerCalendarId,
+                                                                  uint8_t *specialDayEntries,
+                                                                  uint8_t specialDayEntriesLength,
+                                                                  uint8_t unknownDayIdMask)
+{
+  emberAfAppPrintln("GBCS: emberAfPluginGasProxyFunctionUnknownSpecialDaysDayIdCallback: 0x%X", unknownDayIdMask);
+}

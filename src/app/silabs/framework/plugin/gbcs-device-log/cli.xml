@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-gbcs-device-log" name="Plugin Commands: GBCS Device Log">
+    <description>
+      The gbcs-device-log plugin contributes several CLI commands to the application framework to be used in configuring and managing the GBCS Device Log.
+    </description>
+  </group>
+
+  <command cli="plugin gbcs-device-log clear" functionName="emAfPluginGbcsDeviceLogCliClear" group="plugin-gbcs-device-log">
+    <description>
+      Clear all entries from the GBCS Device Log.
+    </description>
+  </command>
+
+  <command cli="plugin gbcs-device-log reset" functionName="emAfPluginGbcsDeviceLogCliReset" group="plugin-gbcs-device-log">
+    <description>
+      Reset the GBCS Device Log to include just those entries configured with the plugin.
+    </description>
+  </command>
+
+  <command cli="plugin gbcs-device-log count" functionName="emAfPluginGbcsDeviceLogCliCount" group="plugin-gbcs-device-log">
+    <description>
+      Get the number of entries in the GBCS Device Log.
+    </description>
+  </command>
+
+  <command cli="plugin gbcs-device-log store" functionName="emAfPluginGbcsDeviceLogCliStore" group="plugin-gbcs-device-log">
+    <description>
+      Add or update an entry within the GBCS Device Log.
+    </description>
+    <arg name="deviceId"       type="IEEE_ADDRESS"          description="The EUI64 of the device to be added or updated"/>
+    <arg name="deviceType"     type="INT8U"                 description="The GBCS device type of the device to be added or updated"/>
+  </command>
+
+  <command cli="plugin gbcs-device-log remove" functionName="emAfPluginGbcsDeviceLogCliRemove" group="plugin-gbcs-device-log">
+    <description>
+      Remove an entry from the GBCS Device Log.
+    </description>
+    <arg name="deviceId"       type="IEEE_ADDRESS"          description="The EUI64 of the device to be removed"/>
+  </command>
+
+  <command cli="plugin gbcs-device-log get" functionName="emAfPluginGbcsDeviceLogCliGet" group="plugin-gbcs-device-log">
+    <description>
+      Get device info about an entry in the GBCS Device Log
+    </description>
+    <arg name="deviceId"       type="IEEE_ADDRESS"          description="The EUI64 of the device for which information is requested"/>
+  </command>
+
+  <command cli="plugin gbcs-device-log exists" functionName="emAfPluginGbcsDeviceLogCliExists" group="plugin-gbcs-device-log">
+    <description>
+      Check to see if a device exists in the GBCS Device Log.
+    </description>
+    <arg name="deviceId"       type="IEEE_ADDRESS"          description="The EUI64 of the device in question"/>
+    <arg name="deviceType"     type="INT8U"                 description="The GBCS device type of the device in question"/>
+  </command>
+
+  <command cli="plugin gbcs-device-log print" functionName="emAfPluginGbcsDeviceLogCliPrint" group="plugin-gbcs-device-log">
+    <description>
+      Print all entries in the GBCS Device log.
+    </description>
+  </command>
+
+  <command cli="plugin gbcs-device-log is-sleepy" functionName="emAfPluginGbcsDeviceLogCliIsSleepy" group="plugin-gbcs-device-log">
+    <description>
+      Is the given device type a sleepy device.
+    </description>
+    <arg name="deviceType"     type="INT8U"                 description="The GBCS device type to be checked"/>
+  </command>
+  
+  <command cli="plugin gbcs-device-log fill" functionName="emAfPluginGbcsDeviceLogCliFill" group="plugin-gbcs-device-log">
+    <description>
+      Helper command to fill the GBCS Device Log with random info.
+    </description>
+  </command>
+  
+</cli>

@@ -1,0 +1,13 @@
+/** @brief Secure Ezsp Init
+ *
+ * This function is called when the Secure EZSP initializes.
+ *
+ * @param ncpSecurityKeyStatus Status of the NCP key: SET or UNSET Ver.: always
+ * @param hostSecurityKeyStatus Status of the Host key: SET or UNSET Ver.: always
+ * @param ncpSecurityType Type of NCP key: Temporary or Permanent Ver.: always
+ */
+void emberSecureEzspInitCallback(EzspStatus ncpSecurityKeyStatus,
+                                 EzspStatus hostSecurityKeyStatus,
+                                 SecureEzspSecurityType ncpSecurityType)
+{
+}

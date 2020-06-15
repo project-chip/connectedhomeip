@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-events-server" name="Plugin Commands: Events Server">
+    <description>
+      The events-server plugin contributes several commands to the application framework's CLI. These commands are be used for adding, clearing, and printing events. 
+    </description>
+  </group>
+  <command cli="plugin events-server clear" functionName="emAfEventsServerCliClear" group="plugin-events-server">
+    <description>
+      Clear out the specified event log for the provided endpoint.
+    </description>
+    <arg name="endpoint" type="INT8U" description="the relevant endpoint" />
+    <arg name="logId"    type="INT8U" description="the log to be cleared" />
+  </command>
+  <command cli="plugin events-server print" functionName="emAfEventsServerCliPrint" group="plugin-events-server">
+    <description>
+      Print the specified event log for the provided endpoint.
+    </description>
+    <arg name="endpoint" type="INT8U" description="the relevant endpoint" />
+    <arg name="logId"    type="INT8U" description="the log to be printed" />
+  </command>
+  <command cli="plugin events-server eprint" functionName="emAfEventsServerCliPrintEvent" group="plugin-events-server">
+    <description>
+      Print the event at the given index in the specified event log for the provided endpoint.
+    </description>
+    <arg name="endpoint" type="INT8U" description="the relevant endpoint" />
+    <arg name="logId"    type="INT8U" description="the relevant log" />
+    <arg name="index"    type="INT8U" description="the index within the event log to print" />
+  </command>
+  <command cli="plugin events-server set" functionName="emAfEventsServerCliSet" group="plugin-events-server">
+    <description>
+      Set the event at the specified index in the event log for the provided endpoint.
+    </description>
+    <arg name="endpoint"     type="INT8U"  description="the relevant endpoint" />
+    <arg name="logId"        type="INT8U"  description="the relevant log" />
+    <arg name="index"        type="INT8U"  description="the index within the event log to set" />
+    <arg name="eventId"      type="INT16U" description="the event id" />
+    <arg name="eventTime"    type="INT32U" description="the event time" />
+    <arg name="eventData"    type="OCTET_STRING" description="additional event data" />
+  </command>
+  <command cli="plugin events-server add" functionName="emAfEventsServerCliAdd" group="plugin-events-server">
+    <description>
+      Append the event to the event log for the provided endpoint. Once the event
+      log is full, new events will start overwriting old events at the beginning of the table.
+    </description>
+    <arg name="endpoint"     type="INT8U"  description="the relevant endpoint" />
+    <arg name="logId"        type="INT8U"  description="the relevant log" />
+    <arg name="eventId"      type="INT16U" description="the event id" />
+    <arg name="eventTime"    type="INT32U" description="the event time" />
+    <arg name="eventData"    type="OCTET_STRING" description="additional event data" />
+  </command>
+
+  <command cli="plugin events-server publish" functionName="emAfEventsServerCliPublish" group="plugin-events-server">
+    <description>
+      Publish an event. 
+    </description>
+    <arg name="nodeId"       type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint"  type="INT8U"  description="the source endpoint" />
+    <arg name="dstEndpoint"  type="INT8U"  description="the destination endpoint" />
+    <arg name="logId"        type="INT8U"  description="the relevant log" />
+    <arg name="index"        type="INT8U"  description="the index within the event log to set" />
+    <arg name="eventControl" type="INT8U"  description="the event control" />
+  </command>
+</cli>

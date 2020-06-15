@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ota-server" name="Plugin Commands: OTA Server">
+    <description>
+      The OTA Server plugin provides Over-the-air commands for upgrading firmware and downloading specific files on the server side.
+    </description>
+  </group>
+  <command cli="plugin ota-server notify" functionName="otaImageNotifyCommand" group="plugin-ota-server">
+    <description>
+      Sends an OTA Image Notify message to the specified destination indicating a new version of an image is available for download. 
+    </description>
+    <arg name="destination" type="INT16U" description="The node ID (can be a broadcast address) to which this OTA Notify message should be sent" />
+    <arg name="endpoint" type="INT8U" description="Target endpoint for the OTA Notify message (only really meaningful for non-broadcast target destination)." />
+    <arg name="payloadType" type="INT8U" description="Used to specify which parameters you want included in the OTA Notify cluster command payload (0 = jitter value only; 1 = jitter and manufacturer id; 2 = jitter, mfr id, and device id; 3 = jitter, mfr id, device id, and firmware version)" />
+    <arg name="jitter" type="INT8U" description="Corresponds to QueryJitter parameter in the OTA Upgrade cluster specification. The parameter indicates whether the client receiving Image Notify Command should send in Query Next Image Request command or not." />
+    <arg name="manuf-id" type="INT16U" description="Manufacturer ID for the image being advertised (should match the mfr ID in the OTA file's header)" />
+    <arg name="imageTypeId" type="INT16U" description="Image type ID for the image being advertised (should match the image type ID from the OTA file's header)" />
+    <arg name="version" type="INT32U" description="Firmware version of the image being advertised (should match the version from the OTA file's header)" />
+  </command>
+  <command cli="plugin ota-server upgrade" functionName="otaSendUpgradeCommand" group="plugin-ota-server">
+    <description>
+      Instruct a device to upgrade now.
+    </description>
+    <arg name="nodeId" type="INT16U" description="Short destination to send message" />
+    <arg name="endpoint" type="INT8U" description="Endpoint destination to send message" />
+    <arg name="mfrId" type="INT16U" description="Manufacturer ID for the image (0xFFFF for wildcard)" />
+    <arg name="imageType" type="INT16U" description="Image type for the image (0xFFFF for wildcard)" />
+    <arg name="fileVersion" type="INT32U" description="File version for the image (0xFFFFFFFF for wildcard)" />
+  </command>
+  <command cli="plugin ota-server policy print" functionName="emAfOtaServerPolicyPrint" group="plugin-ota-server">
+    <description>
+      Prints the polices used by the OTA Server Policy Plugin
+    </description>
+  </command>
+  <command cli="plugin ota-server policy query" functionName="setPolicy" group="plugin-ota-server">
+    <description>
+      Sets the policy used by the OTA Server Policy Plugin when it receives a query request from the client.
+    </description>
+    <arg name="policyValue" type="INT8U" description="0: Upgrade if server has newer (default), 1: Downgrade if server has older, 2:
+      Reinstall if server has same, 3: No next version (no next image is available for download)" />
+  </command>
+  <command cli="plugin ota-server policy upgrade" functionName="setPolicy" group="plugin-ota-server">
+    <description>
+      Sets the policy used by the OTA Server Policy Plugin when it receives an upgrade end request
+    </description>
+    <arg name="policyValue" type="INT8U" description="0: Upgrade Now (default), 1: Upgrade in 2
+      minutes, 2: Ask me later to upgrade, 3: Abort Upgrade (send default response)" />
+  </command>
+  <command cli="plugin ota-server policy page-req-miss" functionName="setPolicy"
+    group="plugin-ota-server">
+    <description>
+      Sets the modulus number of blocks to not respond to. This is used in testing to simulate a device that fails to receive certain blocks from an Image Page Request message.
+    </description>
+    <arg name="modulus" type="INT8U" description="The block modulus number to skip sending when responding to an Image Page Request. E.g. if 2, every other block will not be sent. 0 turns the feature off." />
+  </command>
+  <command cli="plugin ota-server policy page-req-sup"
+    functionName="setPolicy"
+    group="plugin-ota-server">
+    <description>
+      Sets whether the Page Request feature is supported or not.
+    </description>
+    <arg name="pageRequestSupported" type="INT8U" description="1 if Page Request is supported, 0 if unsupported"/>
+  </command>
+  <command cli="plugin ota-server policy block-request" functionName="setPolicy" group="plugin-ota-server">
+    <description>
+      Sets the policy used by the ota-server Policy Plugin when it receives an image block request.
+    </description>
+    <arg name="policyValue" type="INT8U" description="0: Send block (default), 1: Delay download once for 2 minutes, 2: Always abort download after first block" />
+  </command>
+  <command cli="plugin ota-server policy image-req-min-period"
+    functionName="setPolicy"
+    group="plugin-ota-server">
+    <description>
+    </description>
+    <arg name="period" type="INT16U" description="The minimum block period in milliseconds." />
+  </command>
+  <command cli="plugin ota-server policy client-delay-units" functionName="otaServerSetClientDelayUnits" group="plugin-ota-server" restriction="defined(EMBER_TEST)">
+    <description>
+      For testing, force the server to treat the Minimum Block Period in a certain unit (see ota-server-policy.h for values).
+    </description>
+    <arg name="clientDelayUnits" type="INT8U" description="The unit to treat the minimum block period field."/>
+  </command>
+  <command cli="plugin ota-server load-file" functionName="emAfOtaLoadFileCommand" group="plugin-ota-server" restriction="defined(EMBER_TEST)">
+    <description>
+      Load file.
+    </description>
+    <arg name="fileName" type="OCTET_STRING" description="The file name." />
+  </command>
+</cli>

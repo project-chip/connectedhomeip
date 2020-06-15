@@ -1,0 +1,15 @@
+#include PLATFORM_HEADER
+
+/** @brief Pre-Bootload Callback
+ *
+ * Called shortly before installing the downloaded image.
+ *
+ * @param srcEndpoint     Ver.: always
+ * @param serverEndpoint  Ver.: always
+ * @param serverNodeId    Ver.: always
+ */
+void emberAfPluginOtaClientPreBootloadCallback(uint8_t srcEndpoint,
+                                               uint8_t serverEndpoint,
+                                               EmberNodeId serverNodeId)
+{
+}

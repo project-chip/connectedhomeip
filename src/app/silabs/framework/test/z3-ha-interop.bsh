@@ -1,0 +1,231 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  std.print("** This test uses a mixture of HOST/SoC devices, so only run it with -h ** ");
+  return;
+}
+
+// This test uses a mixture of (simulated) HOST and SoC apps, so we place 2
+// calls to addAndLoadDevicesWithLocation. The network is a P3 graph that looks
+// like this.
+//   gateway <-> halight <-> enddevice
+SimulatedNetwork network = createNetwork();
+
+// Load Z3Gateway app as HOST.
+Location gatewayLocation = gridLocations[(runArgument.runUsingMultihop ? 1 : 0)];
+TestNode gateway = new TestNode("gateway",
+                                "", // no SoC image
+                                "build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+                                "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+                                gatewayLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { gateway }, true); // useHost
+
+// Load HaLight and Z3Switch app as SoC devices.
+Location halightLocation = gridLocations[(runArgument.runUsingMultihop ? 4 : 0)];
+TestNode halight = new TestNode("halight",
+                                "build/af-test-apps/HaLight-simulation/HaLight",
+                                "", // no HOST image
+                                "", // no NCP image
+                                halightLocation);
+Location enddeviceLocation = gridLocations[(runArgument.runUsingMultihop ? 7 : 0)];
+TestNode enddevice = new TestNode("enddevice",
+                                  "build/af-test-apps/Z3Switch-simulation/Z3Switch",
+                                  "", // no HOST image
+                                  "", // no NCP image
+                                  enddeviceLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { halight, enddevice }, false); // useHost
+
+setupEncryption();
+
+// The gateway forms a centralized network.
+send("gateway", "plugin network-creator start 1");
+expect("gateway",
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+
+String channel = channel("gateway");
+String power = "3";
+String panId = panId("gateway");
+
+networkWait(2000);
+
+// Join the HA light
+expect("gateway",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+
+// For decrypting in Network Analyzer
+send("gateway",
+     "keys print");
+networkWait(1000);
+
+expect("halight",
+       "network join " + channel + " " + power + " " + panId,
+       ".*EMBER_NETWORK_UP.*");
+
+// The HA device should be using the ZA09 key, because that is all that it knows.
+expect("halight",
+       "keys print",
+       "*5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39.*");
+networkWait(1000);
+
+// Rejoining within the 5-minute key timeout window should not work because
+// TC rejoins using the well-known key is not allowed
+expect("halight",
+       "network rejoin 0 0",  // unsecured, all channels
+       ".*EMBER_JOIN_FAILED.*",
+       10000);
+
+// Now tell the trust center to allow rejoins using the well-known key
+send("gateway",
+     "option security set-allow-trust-center-rejoin-using-well-known-key 1");
+
+networkWait(2000);
+
+// And joining will work
+expect("halight",
+       "network rejoin 0 0",  // unsecured, all channels
+       ".*EMBER_NETWORK_UP.*");
+
+// Let 5 minutes expire so that the transient key is removed
+networkWait(6 * 60 * 1000);
+
+// Trigger a rejoin. This should fail because the ZA09 key is purged
+expect("halight",
+       "network rejoin 0 0",  // unsecured, all channels
+       ".*EMBER_JOIN_FAILED.*",
+       10000);
+
+networkWait(5000);
+
+// Put the transient link key back in for the HA device
+String euiHaLight = eui64("halight");
+send("gateway",
+     "plugin network-creator-security set-joining-link-key {" + euiHaLight + "} {5A6967426565416C6C69616E63653039}");
+
+networkWait(2000);
+
+// Now tell the trust center to deny rejoins using the well-known key
+send("gateway",
+     "option security set-allow-trust-center-rejoin-using-well-known-key 0");
+
+networkWait(2000);
+
+// Rejoining now will still fail because the TC's policy is to deny rejoins
+// using the well-known key
+expect("halight",
+       "network rejoin 0 0",  // unsecured, all channels
+       ".*EMBER_JOIN_FAILED.*",
+       10000);
+
+// Now tell the trust center to allow rejoins using the well-known key
+send("gateway",
+     "option security set-allow-trust-center-rejoin-using-well-known-key 1");
+
+// Trigger a rejoin. This should work because the key is back in and the TC has
+// been told to allow TC rejoins with the well-known key
+// It may seem silly that we're testing for a lack of EMBER_JOIN_FAILED, but the
+// issue is that EMBER_NETWORK_UP is printed whether the rejoin succeeds or not,
+// so we rely on the presence of another EmberStatus to tell if it actually
+// worked (EMBER_JOIN_FAILED is printed if no network key was received or it
+// couldn't be decrypted correctly)
+nexpect("halight",
+        "network rejoin 0 0",  // unsecured, all channels
+        ".*EMBER_JOIN_FAILED.*",
+        10000);
+
+// Let 5 minutes expire so that the TC rejoin policy goes back to deny
+networkWait(6 * 60 * 1000);
+
+// Join with a third device. The third device will join through the halight,
+// forcing the halight to send an UpdateDevice APS command. The UpdateDevice APS
+// command will be sent with both NWK and NWK+APS security. The trust center will
+// only respond to the UpdateDevice command sent with NWK security. See
+// EMZIGBEE-936.
+expect("gateway",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+expect("enddevice",
+       "plugin network-steering start 0",
+       ".*EMBER_NETWORK_UP.*",
+       DEFAULT_TIMEOUT << 3);
+networkWait(DEFAULT_TIMEOUT << 2); // wait for the enddevice to shut up
+
+// The halight should exist in the gateway's device database.
+expect("gateway",
+       "plugin device-database print-all",
+       ".*" + getEui64LittleEndian("halight") + ".*Stack Revision: 22");
+
+// Leave with the HA device and the third device so that we can test joining
+// with the HA device update link key functionality turned on.
+expect("halight", "network leave", ".*EMBER_NETWORK_DOWN.*");
+expect("enddevice", "network leave", ".*EMBER_NETWORK_DOWN.*");
+
+// After the halight leaves, remove it from our device database.
+send("gateway", "plugin device-database device erase {" + getEui64LittleEndian("halight") + "}");
+nexpect("gateway",
+        "plugin device-database print-all",
+        ".*" + getEui64LittleEndian("halight") + ".*Stack Revision: 22");
+
+// Turn on the HA device update link key functionality and join the network again
+// with the HA device as a R20 device.
+expect("halight",
+       "custom set-stack-compliance-revision 20",
+       "Set stack compliance revision to 20");
+expect("gateway",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+expect("halight",
+       "network join " + channel + " " + power + " " + panId,
+       ".*EMBER_NETWORK_UP.*");
+
+// The gateway should send the joining HA device a new link key.
+expect("gateway",
+       "Updating trust center link key of joining device \\(>\\)" + eui64("halight") + ": 0x00",
+       DEFAULT_TIMEOUT << 3);
+networkWait(DEFAULT_TIMEOUT); // wait for the key to get to the HA device
+
+// Make sure the light is using the new link key (i.e., not the ZA09 key).
+nexpect("halight",
+        "keys print",
+        "*5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39.*");
+networkWait(1000);
+
+// Send an APS encrypted ZCL ReadAttribute request from the light to the gateway
+// and make sure we get an expected response.
+send("halight", "zcl global read 0x0000 0x0000");
+expect("halight",
+       "send 0x0000 6 1",
+       ".*RX len 8, ep 06, clus 0x0000.*payload\\[00 00 00 20 03 \\]");
+networkWait(1000); // wait for the halight to quiet down
+
+// Wait for the transient joining key to be removed and disallow trust center
+// rejoins with the well-known key on the gateway and then do a trust center
+// rejoin with the HA device - we should be able to rejoin successfully since
+// we know the real APS key.
+networkWait(6 * 60 * 1000);
+send("gateway",
+     "option security set-allow-trust-center-rejoin-using-well-known-key 0");
+nexpect("halight",
+       "network rejoin 0 0",  // unsecured, all channels
+       ".*EMBER_JOIN_FAILED.*",
+       10000);
+
+// Join with the enddevice so that we can ensure that the HA device can send an
+// APS Update Device command.
+expect("gateway",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+expect("enddevice",
+       "plugin network-steering start 0",
+       ".*EMBER_NETWORK_UP.*",
+       DEFAULT_TIMEOUT << 3);
+networkWait(DEFAULT_TIMEOUT << 2); // wait for the enddevice to shut up
+
+// Make sure the enddevice can talk to the gateway.
+send("enddevice", "zcl global read 0x0000 0x0000");
+expect("enddevice",
+       "send 0x0000 1 1",
+       ".*RX len 8, ep 01, clus 0x0000.*payload\\[00 00 00 20 03 \\]");

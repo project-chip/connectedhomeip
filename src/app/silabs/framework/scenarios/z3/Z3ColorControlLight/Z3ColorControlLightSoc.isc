@@ -1,0 +1,875 @@
+#ISD afv6
+# Simplicity Studio version: 5.16.1.qualifier
+
+FrameworkDirectory:app/framework
+
+appId: znet
+frameworkVariant: em35x
+GenerationDirectory:__SAMPLE_APPLICATION__
+
+DeviceName:Z3ColorControlLight
+
+Host:unknown
+
+Platform:efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]~!module+RD-0098-0401+iar
+
+
+# Setup configurations
+{setupId:additionalFiles
+}
+{setupId:boardHeader
+allowMissingHeader:false
+useHeaderInPlace:false
+em3585+RD-0035-0501=BOARD,em35x/ist-a22-rgb,PATH(STACK_RELATIVE):app/framework/scenarios/z3/Z3ColorControlLight/Z3ColorControlLight_board.h,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,efr32/ist_a0085,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,efr32/ist_a0085,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[632]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,efr32/ist_a0085,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[632]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[632]~flash[256K]~temp[I]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,efr32/ist_a0085,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[632]~flash[256K]~temp[I]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[232]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[I]~package[M]~pins[32]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[133]~flash[256K]~temp[G]~package[M]~pins[48]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[233]~flash[256K]~temp[G]~package[M]~pins[48]=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]+RD-0085-0201=DEFAULT,efr32/ist_a0085,,
+efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[G]~package[M]~pins[48]+RD-0098-0401=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]+RD-0098-0401=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]+RD-0098-0401+iar=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]+RD-0098-0401+gcc=USE_HARDWARE_CONFIGURATOR,,,
+efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]~!module+RD-0098-0401+iar=USE_HARDWARE_CONFIGURATOR,,,
+}
+{setupId:bookkeeping
+}
+{setupId:bootloader
+em3585=local-storage,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[632]~flash[256K]~temp[G]~package[M]~pins[32]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[632]~flash[256K]~temp[G]~package[M]~pins[32]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[632]~flash[256K]~temp[I]~package[M]~pins[32]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[632]~flash[256K]~temp[I]~package[M]~pins[32]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[32]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]=application,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[232]~flash[256K]~temp[G]~package[M]~pins[32]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[I]~package[M]~pins[32]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[133]~flash[256K]~temp[G]~package[M]~pins[48]=null,
+efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[233]~flash[256K]~temp[G]~package[M]~pins[48]=null,
+efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[G]~package[M]~pins[48]+RD-0098-0401=local-storage,
+efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]+RD-0098-0401=local-storage,
+}
+{setupId:callbackConfiguration
+}
+{setupId:commandLineConfiguration
+on
+}
+{setupId:debugConfiguration
+on
+area name off
+appSerial=1
+remove,ATTRIBUTES
+remove,COLOR_CONTROL_CLUSTER
+enable,COLOR_CONTROL_CLUSTER
+}
+{setupId:eventConfiguration
+}
+{setupId:halOptions
+}
+{setupId:hwConfig
+lastArchitectureId=efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]~!module+RD-0098-0401+iar
+featureLevel=1
+active=true
+}
+{setupId:information
+\{key:description
+Color Control Light Sample Application
+
+Quality: Experimental - Useful for demonstration only.
+
+This is a Zigbee 3.0 light application.  The application provides pwm control for dimming, and pwm mixing for color functions.  It is intended to be used with the Z3Gateway sample application, or with the Zigbee gateway reference designs RD-0001-0201 and RD-0002-0201.  Use the application with kits RD-0035-0601 (EM3585), RD-0085-0401 (EFR32MG1P732F256IM32) and RD-0098-0401 (EFR32MG12P432F1024IM32).
+
+For further information on these topics:
+Architecture
+Operation
+Programming instructions
+Command line interface descriptions and examples
+
+Refer to documents:
+UG129 - Zigbee Gateway Add-On Kit (RD-0001-0201, RD-0002-0201)
+UG252 - Lighting Reference Design Kit User's Guide (RD-0035-0601, RD-0085-0401, RD-0098-0401)
+\}
+}
+{setupId:macros
+-DEMDRV_RTCDRV_USE_LFRCO=1
+}
+{setupId:mpsi
+- mappings
+- custom messages
+}
+{setupId:pluginService
+}
+{setupId:quizz
+}
+{setupId:serial
+em3585=*0,*,*,*,*,*,*
+useHwConfigurator=true
+}
+{setupId:template
+--version:2
+}
+{setupId:token
+}
+{setupId:zclAfv2
+intMap:ManufacturingCode = 4098
+intMap:ReportTableSize = 5
+intMap:Endpoint = 10
+intMap:DeviceVersion = 0
+intMap:DefaultDestinationEndpoint = 10
+intMap:ProfileId = -1
+intMap:DeviceId = -1
+intMap:DefaultResponsePolicy = 1
+boolMap:EnableStandardReporting = false
+boolMap:EnableInterPanSend = false
+boolMap:EnableInterPanReceive = false
+boolMap:SupportCommandDiscovery = true
+boolMap:EnableKeySwitch = false
+boolMap:LowRamConcentrator = true
+boolMap:EnableAttributeRangeChecking = false
+boolMap:ReceiveSupportedZdoRequests = false
+boolMap:HandleUnsupportedZdoRequests = false
+boolMap:HandleEndpointZdoRequests = false
+boolMap:HandleBindingZdoRequests = false
+boolMap:LegacyCli = false
+boolMap:AddCustomCli = false
+boolMap:IncludeCommandDescriptions = false
+boolMap:GenerateCallbacksFile = true
+boolMap:ManufacturerCodeDefaultIsZero = true
+beginAttrList:OPTIONAL
+  cl:0x0300, at:0x0000, di:server, mf:0x0000
+  cl:0x0300, at:0x0001, di:server, mf:0x0000
+  cl:0x0300, at:0x0007, di:server, mf:0x0000
+  cl:0x0300, at:0x0008, di:server, mf:0x0000
+  cl:0x0B05, at:0x011B, di:server, mf:0x0000
+  cl:0x0B05, at:0x011C, di:server, mf:0x0000
+  cl:0x0B05, at:0x011D, di:server, mf:0x0000
+  cl:0x0019, at:0x0007, di:client, mf:0x0000
+  cl:0x0019, at:0x0008, di:client, mf:0x0000
+  cl:0x0019, at:0x0002, di:client, mf:0x0000
+  cl:0x0300, at:0x0010, di:server, mf:0x0000
+  cl:0x0300, at:0x0002, di:server, mf:0x0000
+  cl:0x0300, at:0x4001, di:server, mf:0x0000
+  cl:0x0300, at:0x400B, di:server, mf:0x0000
+  cl:0x0300, at:0x400C, di:server, mf:0x0000
+  cl:0x0000, at:0x0004, di:server, mf:0x0000
+  cl:0x0000, at:0x0005, di:server, mf:0x0000
+  cl:0x0000, at:0x0001, di:server, mf:0x0000
+  cl:0x0000, at:0x0002, di:server, mf:0x0000
+  cl:0x0000, at:0x0003, di:server, mf:0x0000
+  cl:0x0008, at:0x0011, di:server, mf:0x0000
+  cl:0x0019, at:0x0004, di:client, mf:0x0000
+  cl:0x0019, at:0x0009, di:client, mf:0x0000
+  cl:0x0019, at:0x000A, di:client, mf:0x0000
+  cl:0x0300, at:0x400A, di:server, mf:0x0000
+  cl:0x0008, at:0x000F, di:server, mf:0x0000
+  cl:0x0006, at:0x4003, di:server, mf:0x0000
+  cl:0x0008, at:0x4000, di:server, mf:0x0000
+endAttrList:OPTIONAL
+beginAttrList:SAVED_TO_FLASH
+  cl:0x0300, at:0x0000, di:server, mf:0x0000
+  cl:0x0300, at:0x0001, di:server, mf:0x0000
+  cl:0x0300, at:0x0003, di:server, mf:0x0000
+  cl:0x0300, at:0x0004, di:server, mf:0x0000
+  cl:0x0300, at:0x0007, di:server, mf:0x0000
+  cl:0x0300, at:0x0008, di:server, mf:0x0000
+  cl:0x0300, at:0x4010, di:server, mf:0x0000
+  cl:0x0006, at:0x0000, di:server, mf:0x0000
+  cl:0x0008, at:0x0000, di:server, mf:0x0000
+  cl:0x0008, at:0x0011, di:server, mf:0x0000
+  cl:0x0008, at:0x000F, di:server, mf:0x0000
+  cl:0x0006, at:0x4003, di:server, mf:0x0000
+  cl:0x0008, at:0x4000, di:server, mf:0x0000
+endAttrList:SAVED_TO_FLASH
+beginAttributeDefaults
+cl:0x0008, at:0x0000, di:server, mf:0x0000 => 0xfe
+cl:0x0006, at:0x0000, di:server, mf:0x0000 => 0x01
+cl:0x0019, at:0x0007, di:client, mf:0x0000 => 0x1002
+cl:0x0019, at:0x0008, di:client, mf:0x0000 => 0xa002
+cl:0x0019, at:0x0002, di:client, mf:0x0000 => 0x00000030
+cl:0x0300, at:0x0010, di:server, mf:0x0000 => 0
+cl:0x0300, at:0x400B, di:server, mf:0x0000 => 200
+cl:0x0300, at:0x400C, di:server, mf:0x0000 => 454
+cl:0x0300, at:0x400D, di:server, mf:0x0000 => 200
+cl:0x0000, at:0x0004, di:server, mf:0x0000 => SiliconLabs
+cl:0x0000, at:0x0005, di:server, mf:0x0000 => Z3ColorControlLight
+cl:0x0300, at:0x400A, di:server, mf:0x0000 => 0x0019
+cl:0x0008, at:0x0011, di:server, mf:0x0000 => 0xFF
+cl:0x0300, at:0x0007, di:server, mf:0x0000 => 278
+cl:0x0300, at:0x0001, di:server, mf:0x0000 => 254
+cl:0x0006, at:0x4003, di:server, mf:0x0000 => 0xFF
+cl:0x0008, at:0x4000, di:server, mf:0x0000 => 0xFF
+cl:0x0300, at:0x4010, di:server, mf:0x0000 => 0xFFFF
+endAttributeDefaults
+configuredNetwork:*type:ZIGBEE_PRO, name:Primary
+beginEndpointType:Primary
+device:zcustom
+deviceId:-1
+profileId:-1
+overrideClientCluster:0x0000,no
+overrideClientCluster:0x0001,no
+overrideClientCluster:0x0002,no
+overrideClientCluster:0x0003,no
+overrideClientCluster:0x0004,no
+overrideClientCluster:0x0005,no
+overrideClientCluster:0x0006,no
+overrideClientCluster:0x0007,no
+overrideClientCluster:0x0008,no
+overrideClientCluster:0x0009,no
+overrideClientCluster:0x000A,no
+overrideClientCluster:0x000B,no
+overrideClientCluster:0x000F,no
+overrideClientCluster:0x0015,no
+overrideClientCluster:0x0016,no
+overrideClientCluster:0x0019,yes
+overrideClientCluster:0x001A,no
+overrideClientCluster:0x001B,no
+overrideClientCluster:0x0020,no
+overrideClientCluster:0x0100,no
+overrideClientCluster:0x0101,no
+overrideClientCluster:0x0102,no
+overrideClientCluster:0x0200,no
+overrideClientCluster:0x0201,no
+overrideClientCluster:0x0202,no
+overrideClientCluster:0x0203,no
+overrideClientCluster:0x0204,no
+overrideClientCluster:0x0300,no
+overrideClientCluster:0x0301,no
+overrideClientCluster:0x0400,no
+overrideClientCluster:0x0401,no
+overrideClientCluster:0x0402,no
+overrideClientCluster:0x0403,no
+overrideClientCluster:0x0404,no
+overrideClientCluster:0x0405,no
+overrideClientCluster:0x0406,no
+overrideClientCluster:0x0500,no
+overrideClientCluster:0x0501,no
+overrideClientCluster:0x0502,no
+overrideClientCluster:0x0600,no
+overrideClientCluster:0x0601,no
+overrideClientCluster:0x0614,no
+overrideClientCluster:0x0615,no
+overrideClientCluster:0x0700,no
+overrideClientCluster:0x0701,no
+overrideClientCluster:0x0702,no
+overrideClientCluster:0x0703,no
+overrideClientCluster:0x0704,no
+overrideClientCluster:0x0705,no
+overrideClientCluster:0x0706,no
+overrideClientCluster:0x0707,no
+overrideClientCluster:0x0708,no
+overrideClientCluster:0x0709,no
+overrideClientCluster:0x070A,no
+overrideClientCluster:0x0800,no
+overrideClientCluster:0x0900,no
+overrideClientCluster:0x0901,no
+overrideClientCluster:0x0902,no
+overrideClientCluster:0x0903,no
+overrideClientCluster:0x0904,no
+overrideClientCluster:0x0905,no
+overrideClientCluster:0x0A01,no
+overrideClientCluster:0x0A02,no
+overrideClientCluster:0x0B00,no
+overrideClientCluster:0x0B01,no
+overrideClientCluster:0x0B02,no
+overrideClientCluster:0x0B03,no
+overrideClientCluster:0x0B04,no
+overrideClientCluster:0x0B05,no
+overrideClientCluster:0x1000,no
+overrideMfgClientCluster:0xFC00,0x1002,no
+overrideServerCluster:0x0000,yes
+overrideServerCluster:0x0001,no
+overrideServerCluster:0x0002,no
+overrideServerCluster:0x0003,yes
+overrideServerCluster:0x0004,yes
+overrideServerCluster:0x0005,yes
+overrideServerCluster:0x0006,yes
+overrideServerCluster:0x0007,no
+overrideServerCluster:0x0008,yes
+overrideServerCluster:0x0009,no
+overrideServerCluster:0x000A,no
+overrideServerCluster:0x000B,no
+overrideServerCluster:0x000F,no
+overrideServerCluster:0x0015,no
+overrideServerCluster:0x0016,no
+overrideServerCluster:0x0019,no
+overrideServerCluster:0x001A,no
+overrideServerCluster:0x001B,no
+overrideServerCluster:0x0020,no
+overrideServerCluster:0x0100,no
+overrideServerCluster:0x0101,no
+overrideServerCluster:0x0102,no
+overrideServerCluster:0x0200,no
+overrideServerCluster:0x0201,no
+overrideServerCluster:0x0202,no
+overrideServerCluster:0x0203,no
+overrideServerCluster:0x0204,no
+overrideServerCluster:0x0300,yes
+overrideServerCluster:0x0301,no
+overrideServerCluster:0x0400,no
+overrideServerCluster:0x0401,no
+overrideServerCluster:0x0402,no
+overrideServerCluster:0x0403,no
+overrideServerCluster:0x0404,no
+overrideServerCluster:0x0405,no
+overrideServerCluster:0x0406,no
+overrideServerCluster:0x0500,no
+overrideServerCluster:0x0501,no
+overrideServerCluster:0x0502,no
+overrideServerCluster:0x0600,no
+overrideServerCluster:0x0601,no
+overrideServerCluster:0x0614,no
+overrideServerCluster:0x0615,no
+overrideServerCluster:0x0700,no
+overrideServerCluster:0x0701,no
+overrideServerCluster:0x0702,no
+overrideServerCluster:0x0703,no
+overrideServerCluster:0x0704,no
+overrideServerCluster:0x0705,no
+overrideServerCluster:0x0706,no
+overrideServerCluster:0x0707,no
+overrideServerCluster:0x0708,no
+overrideServerCluster:0x0709,no
+overrideServerCluster:0x070A,no
+overrideServerCluster:0x0800,no
+overrideServerCluster:0x0900,no
+overrideServerCluster:0x0901,no
+overrideServerCluster:0x0902,no
+overrideServerCluster:0x0903,no
+overrideServerCluster:0x0904,no
+overrideServerCluster:0x0905,no
+overrideServerCluster:0x0A01,no
+overrideServerCluster:0x0A02,no
+overrideServerCluster:0x0B00,no
+overrideServerCluster:0x0B01,no
+overrideServerCluster:0x0B02,no
+overrideServerCluster:0x0B03,no
+overrideServerCluster:0x0B04,no
+overrideServerCluster:0x0B05,yes
+overrideServerCluster:0x1000,no
+overrideMfgServerCluster:0xFC00,0x1002,no
+overrideMfgServerCluster:0xFC01,0x1002,yes
+overrideMfgServerCluster:0xFC02,0x1002,yes
+endEndpointType
+configuredEndpoint:*ep:1,pi: 260,di:258,dv:1,ept:Primary,nwk:Primary
+callbacks:emberAfPluginBasicResetToFactoryDefaultsCallback
+callbacks:emberAfPluginIdentifyStartFeedbackCallback
+callbacks:emberAfPluginIdentifyStopFeedbackCallback
+}
+{setupId:zclCustomizer
+}
+{setupId:zigbeeStack
+boolMap:EnableZdoSerialCommands = false
+boolMap:EnableBindings = true
+boolMap:EnableEndDeviceBind = false
+boolMap:EnableReceiveStatistics = false
+boolMap:UseEcc163k1 = false
+boolMap:UseEcc283k1 = false
+boolMap:PreconfiguredKeyEnabled = false
+boolMap:NetworkKeyEnabled = false
+boolMap:FragmentationEnable = false
+boolMap:EnableConcentrator = true
+boolMap:UseSeInstallCodes = false
+boolMap:TxPowerModeUseToken = true
+boolMap:BoostMode = false
+boolMap:AlternatePowerMode = false
+byteArrayMap:PreconfiguredKey = 56 77 77 77 77 77 77 77 77 77 77 77 77 77 77 77
+byteArrayMap:NetworkKey = 12 33 33 33 33 33 33 33 33 33 33 33 33 33 33 33
+byteArrayMap:NetworkKey2 = AB CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC
+intMap:NumberOfBindings = 2
+intMap:AddressTableSize = 2
+intMap:TrustCenterCacheSize = 2
+intMap:LinkKeyMode = 2
+intMap:FragmentationMaxSize = 255
+intMap:HeartbeatLed = 0
+configuredNetworkSecurity:Primary|ZIGBEE_PRO=Z3
+configuredNetworkZigbeeDeviceType:Primary|ZIGBEE_PRO=ZA_END_DEVICE
+CliCommandSet:Full
+CliCommands:remove,changekey link
+CliCommands:remove,changekey network
+CliCommands:remove,debugprint all_off
+CliCommands:remove,debugprint all_on
+CliCommands:remove,debugprint off
+CliCommands:remove,debugprint on
+CliCommands:remove,debugprint status
+CliCommands:remove,endpoint disable
+CliCommands:remove,endpoint enable
+CliCommands:remove,endpoint print
+CliCommands:remove,keys clear
+CliCommands:remove,keys delete
+CliCommands:remove,keys print
+CliCommands:remove,libs
+CliCommands:remove,option install-code
+CliCommands:remove,option link
+CliCommands:remove,option print-rx-msgs disable
+CliCommands:remove,option print-rx-msgs enable
+CliCommands:remove,option register
+CliCommands:remove,option security aps off
+CliCommands:remove,option security aps on
+CliCommands:remove,option security set-allow-trust-center-rejoin
+CliCommands:remove,plugin address-table add
+CliCommands:remove,plugin address-table lookup
+CliCommands:remove,plugin address-table print
+CliCommands:remove,plugin address-table remove
+CliCommands:remove,plugin address-table set
+CliCommands:remove,plugin eeprom data-print
+CliCommands:remove,plugin eeprom info
+CliCommands:remove,plugin eeprom status
+CliCommands:remove,plugin end-device-support force-short-poll
+CliCommands:remove,plugin end-device-support poll-completed-callback
+CliCommands:remove,plugin end-device-support status
+CliCommands:remove,plugin find-and-bind target
+CliCommands:remove,plugin groups-server clear
+CliCommands:remove,plugin groups-server print
+CliCommands:remove,plugin identify print
+CliCommands:remove,plugin network-steering mask add
+CliCommands:remove,plugin network-steering mask set
+CliCommands:remove,plugin network-steering mask subtract
+CliCommands:remove,plugin network-steering start
+CliCommands:remove,plugin network-steering status
+CliCommands:remove,plugin network-steering stop
+CliCommands:remove,plugin ota-storage-eeprom wipe
+CliCommands:remove,plugin reporting add
+CliCommands:remove,plugin reporting clear
+CliCommands:remove,plugin reporting clear-last-report-time
+CliCommands:remove,plugin reporting print
+CliCommands:remove,plugin reporting remove
+CliCommands:remove,plugin scenes clear
+CliCommands:remove,plugin scenes print
+CliCommands:remove,print time
+CliCommands:remove,security mfg-token get
+CliCommands:remove,security mfg-token set
+CliCommands:remove,zcl basic glsr
+CliCommands:remove,zcl mfg-code
+CliCommands:remove,zcl time
+CliCommands:remove,zcl x-default-resp
+}
+appPlugin:adc,true
+
+appPlugin:address-table,true
+
+appPlugin:aes-cmac,false
+appPlugin:antenna,false
+appPlugin:antenna-cli,false
+appPlugin:antenna-stub,true
+
+appPlugin:aps-link-key-authorization,false
+appPlugin:barrier-control-server,false
+appPlugin:basic,true
+
+appPlugin:battery-monitor,false
+appPlugin:battery-monitor-stub,false
+appPlugin:binding-table-library,true
+
+appPlugin:ble,false
+appPlugin:bulb-pwm-cli,true
+
+appPlugin:bulb-pwm-driver,true
+
+appPlugin:bulb-ui,true
+
+appPlugin:button-interface,false
+appPlugin:button-interface-stub,false
+appPlugin:button-joining,false
+appPlugin:calendar-client,false
+appPlugin:calendar-common,false
+appPlugin:calendar-server,false
+appPlugin:cbke-163k1-library,false
+appPlugin:cbke-283k1-library,false
+appPlugin:cbke-library-core,false
+appPlugin:cbke-library-dsa-sign,false
+appPlugin:cbke-library-dsa-verify,false
+appPlugin:cbke-library-dsa-verify-283k1,false
+appPlugin:ccm-encryption,true
+
+appPlugin:cjson,false
+appPlugin:cli-password-protection,false
+appPlugin:coexistence,false
+appPlugin:coexistence-cli,false
+appPlugin:coexistence-stub,true
+
+appPlugin:color-control,false
+appPlugin:color-control-server,true
+
+appPlugin:command-relay,false
+appPlugin:comms-hub-function,false
+appPlugin:comms-hub-function-sub-ghz,false
+appPlugin:compact-logger,false
+appPlugin:concentrator,false
+appPlugin:configuration-server,true
+
+appPlugin:connection-manager,false
+appPlugin:coulomb-counter,false
+appPlugin:counters,false
+appPlugin:critical-message-queue,false
+appPlugin:debug-basic-library,true
+
+appPlugin:debug-extended-library,false
+appPlugin:debug-jtag,true
+
+appPlugin:debug-jtag-stub,false
+appPlugin:delayed-join,false
+appPlugin:device-database,false
+appPlugin:device-management-client,false
+appPlugin:device-management-server,false
+appPlugin:device-query-service,false
+appPlugin:device-table,false
+appPlugin:diagnostic-server,false
+appPlugin:dido,false
+appPlugin:dmp-demo-ui,false
+appPlugin:dmp-tuning,false
+appPlugin:dmp-ui-demo,false
+appPlugin:dmp-ui-demo-stub,false
+appPlugin:door-lock-server,false
+appPlugin:dotdot-mfg-certs,false
+appPlugin:drlc,false
+appPlugin:drlc-server,false
+appPlugin:ecc-library-163k1,false
+appPlugin:ecc-library-283k1,false
+appPlugin:eeprom,true
+
+appPlugin:eeprom-powerdown,false
+appPlugin:electrical-measurement-server,false
+appPlugin:em4,false
+appPlugin:ember-minimal-printf,true
+
+appPlugin:end-device-bind-library,false
+appPlugin:end-device-support,true
+
+appPlugin:esi-management,false
+appPlugin:events-client,false
+appPlugin:events-server,false
+appPlugin:exosite-demo,false
+appPlugin:extdev,false
+appPlugin:ezmode-commissioning,false
+appPlugin:ezradiopro,false
+appPlugin:fem-control,false
+appPlugin:find-and-bind-initiator,false
+appPlugin:find-and-bind-target,true
+
+appPlugin:flash-data,false
+appPlugin:form-and-join,false
+appPlugin:fragmentation,false
+appPlugin:gas-proxy-function,false
+appPlugin:gbcs-compatibility,false
+appPlugin:gbcs-device-log,false
+appPlugin:gbcs-gas-meter,false
+appPlugin:gbz-message-controller,false
+appPlugin:general-response-commands,false
+appPlugin:generic-interrupt-control,false
+appPlugin:generic-interrupt-control-stub,false
+appPlugin:glib,false
+appPlugin:gp-library,false
+appPlugin:gpio-sensor,false
+appPlugin:gpio-sensor-stub,false
+appPlugin:green-power-client,false
+appPlugin:green-power-common,false
+appPlugin:green-power-server,false
+appPlugin:green-power-test-device,false
+appPlugin:green-power-translation-table,false
+appPlugin:groups-client,false
+appPlugin:groups-server,true
+
+appPlugin:hal-library,true
+
+appPlugin:hal-library-rtos,false
+appPlugin:hc-11073-tunnel,false
+appPlugin:heartbeat,false
+appPlugin:humidity-si7021,false
+appPlugin:humidity-si7021-stub,false
+appPlugin:i2c-driver,false
+appPlugin:i2c-driver-stub,false
+appPlugin:ias-zone-client,false
+appPlugin:ias-zone-server,false
+appPlugin:identify,true
+
+appPlugin:identify-feedback,false
+appPlugin:idle-sleep,false
+appPlugin:illuminance-measurement-server,false
+appPlugin:illuminance-si1141,false
+appPlugin:illuminance-si1141-stub,false
+appPlugin:install-code-library,true
+
+appPlugin:install-code-read,true
+
+appPlugin:interpan,false
+appPlugin:key-establishment,false
+appPlugin:led-blink,false
+appPlugin:led-blink-stub,false
+appPlugin:led-dim-pwm,false
+appPlugin:led-rgb-pwm,true
+
+appPlugin:led-temp-pwm,false
+appPlugin:level-control,true
+
+appPlugin:libcoap,false
+appPlugin:linked-list,false
+appPlugin:low-voltage-shutdown,false
+appPlugin:lqi-override,false
+appPlugin:lwip,false
+appPlugin:lwip-callback-tests,false
+appPlugin:lwip-interface,false
+appPlugin:lwip-stats,false
+appPlugin:mac-address-filtering,false
+appPlugin:manufacturing-library,true
+
+appPlugin:manufacturing-library-cli,true
+
+appPlugin:manufacturing-library-ota,true
+
+appPlugin:mbedtls,true
+
+appPlugin:mbedtls-multiprotocol,false
+appPlugin:messaging-client,false
+appPlugin:messaging-server,false
+appPlugin:meter-mirror,false
+appPlugin:meter-snapshot-client,false
+appPlugin:meter-snapshot-server,false
+appPlugin:meter-snapshot-storage,false
+appPlugin:metering-server,false
+appPlugin:micrium-rtos,false
+appPlugin:mn-price-passthrough,false
+appPlugin:mpsi,false
+appPlugin:mpsi-ipc,false
+appPlugin:mpsi-storage,false
+appPlugin:multi-network-library,false
+appPlugin:network-creator,false
+appPlugin:network-creator-security,false
+appPlugin:network-find,false
+appPlugin:network-find-sub-ghz,false
+appPlugin:network-steering,true
+
+appPlugin:nvm3,false
+appPlugin:nvm3-extflash,false
+appPlugin:nvm3-simulation,false
+appPlugin:occupancy-pyd1698,false
+appPlugin:occupancy-pyd1698-cli,false
+appPlugin:occupancy-pyd1698-stub,false
+appPlugin:occupancy-sensor-server,false
+appPlugin:on-off,true
+
+appPlugin:ota-bootload,true
+
+appPlugin:ota-client,true
+
+appPlugin:ota-client-policy,true
+
+appPlugin:ota-common,true
+
+appPlugin:ota-server,false
+appPlugin:ota-server-policy,false
+appPlugin:ota-storage-common,true
+
+appPlugin:ota-storage-posix-filesystem,false
+appPlugin:ota-storage-simple,true
+
+appPlugin:ota-storage-simple-eeprom,true
+
+appPlugin:ota-storage-simple-ram,false
+appPlugin:pa,true
+
+appPlugin:packet-handoff,false
+appPlugin:packet-validate-library,true
+
+appPlugin:paho.mqtt.c,false
+appPlugin:partner-link-key-exchange,false
+appPlugin:permit-join-manager,false
+appPlugin:poll-control-client,false
+appPlugin:poll-control-server,false
+appPlugin:power-configuration-server,false
+appPlugin:power-consumption-model,false
+appPlugin:power-meter-cs5463,false
+appPlugin:power-meter-cs5463-stub,false
+appPlugin:prepayment-client,false
+appPlugin:prepayment-server,false
+appPlugin:prepayment-snapshot-storage,false
+appPlugin:price-client,false
+appPlugin:price-common,false
+appPlugin:price-server,false
+appPlugin:psstore,false
+appPlugin:pti,true
+
+appPlugin:rail-library,true
+
+appPlugin:rail-library-internal,false
+appPlugin:rail-library-mp,false
+appPlugin:rail-library-mp-internal,false
+appPlugin:relative-humidity-measurement-server,false
+appPlugin:relay-control-client,false
+appPlugin:relay-control-server,false
+appPlugin:reporting,true
+
+appPlugin:ring-buffer,false
+appPlugin:sb1-gesture-sensor,false
+appPlugin:sb1-gesture-sensor-stub,false
+appPlugin:scan-dispatch,true
+
+appPlugin:scenes,true
+
+appPlugin:scenes-client,false
+appPlugin:security-link-keys-library,false
+appPlugin:security-sensor,false
+appPlugin:serial,true
+
+appPlugin:silabs-device-ui,false
+appPlugin:sim-eeprom1,false
+appPlugin:sim-eeprom2,true
+
+appPlugin:sim-eeprom2-1to2-upgrade,false
+appPlugin:sim-eeprom2-1to2-upgrade-stub,true
+
+appPlugin:sim-eeprom2-to-nvm3-upgrade,false
+appPlugin:sim-eeprom2-to-nvm3-upgrade-stub,false
+appPlugin:simple-clock,false
+appPlugin:simple-main,true
+
+appPlugin:simple-metering-client,false
+appPlugin:simple-metering-server,false
+appPlugin:sleepy-message-queue,false
+appPlugin:slot-manager,false
+appPlugin:smart-energy-registration,false
+appPlugin:source-route-library,true
+
+appPlugin:stack-diagnostics,false
+appPlugin:stack-protection-iar,false
+appPlugin:standalone-bootloader-client,false
+appPlugin:standalone-bootloader-common,false
+appPlugin:standalone-bootloader-server,false
+appPlugin:standard-printf-support,false
+appPlugin:strong-random,true
+
+appPlugin:sub-ghz-client,false
+appPlugin:sub-ghz-server,false
+appPlugin:tamper-switch,false
+appPlugin:tamper-switch-stub,false
+appPlugin:temperature-measurement-server,false
+appPlugin:temperature-si7021,false
+appPlugin:temperature-si7021-stub,false
+appPlugin:temperature-si7053,false
+appPlugin:temperature-si7053-stub,false
+appPlugin:test-harness,false
+appPlugin:test-harness-z3,false
+appPlugin:throughput,false
+appPlugin:throughput-legacy,false
+appPlugin:time-server,false
+appPlugin:transport-mqtt,false
+appPlugin:trust-center-backup,false
+appPlugin:trust-center-keepalive,false
+appPlugin:trust-center-nwk-key-update-broadcast,false
+appPlugin:trust-center-nwk-key-update-periodic,false
+appPlugin:trust-center-nwk-key-update-unicast,false
+appPlugin:tunneling-client,false
+appPlugin:tunneling-server,false
+appPlugin:update-ha-tc-link-key,false
+appPlugin:update-tc-link-key,true
+
+appPlugin:wstk-display,false
+appPlugin:wwah-app-event-retry-manager,false
+appPlugin:wwah-client-silabs,false
+appPlugin:wwah-connectivity-manager,false
+appPlugin:wwah-end-device-extension,false
+appPlugin:wwah-server-silabs,false
+appPlugin:xmodem-sender,false
+appPlugin:zcl-framework-core,true
+
+appPlugin:zcl-ip,false
+appPlugin:zigbee-event-logger,false
+appPlugin:zigbee-event-logger-stub,false
+appPlugin:zigbee-pro-leaf-library,true
+
+appPlugin:zigbee-pro-library,false
+appPlugin:zigbee-pro-stack-alt-mac-library,false
+appPlugin:zigbee-r22-support-library,false
+appPlugin:zll-commissioning-client,false
+appPlugin:zll-commissioning-common,false
+appPlugin:zll-commissioning-network,false
+appPlugin:zll-commissioning-server,false
+appPlugin:zll-identify-server,false
+appPlugin:zll-level-control-server,false
+appPlugin:zll-library,false
+appPlugin:zll-on-off-server,false
+appPlugin:zll-scenes-client,false
+appPlugin:zll-scenes-server,false
+appPlugin:zll-utility-client,false
+appPlugin:zll-utility-server,false
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_BINDING_TABLE_SIZE,12
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_END_DEVICE_SUPPORT_LONG_POLL_INTERVAL_SECONDS,150
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE,12
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_IMAGE_TYPE_ID,0xa002
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER,-3
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_CALLBACK,true
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_INCLUDE_HARDWARE_VERSION,true
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[632]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[632]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[632]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[632]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[232]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[232]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[132]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[V]~radio[132]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[132]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[133]~flash[256K]~temp[G]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,732
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,432
+AppPluginOption(em3585):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_HARDWARE_VERSION,3585
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_COLOR_SERVER_HSV,true
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_COLOR_SERVER_TEMP,true
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_COLOR_SERVER_XY,true
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START,0
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_END,237568
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START,540672
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[2]~performance[P]~radio[432]~flash[1024K]~temp[I]~package[M]~pins[48]):EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_END,786432
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION,0x30
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_SCENES_TABLE_SIZE,16
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[B]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_BINDING_TABLE_SIZE,16
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_SCENES_TABLE_SIZE,8
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_SIM_EEPROM2_PASSWORD,!spoon
+AppPluginOption(em3585):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER,-3
+AppPluginOption(em3585):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER25,-3
+AppPluginOption(em3585):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER26,-3
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER,19
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER25,19
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[I]~package[M]~pins[32]):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER26,2
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER,19
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER25,19
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_CONFIGURATION_SERVER_TX_POWER26,2
+AppPluginOption(efr32~family[M]~series[1]~device_configuration[1]~performance[P]~radio[732]~flash[256K]~temp[G]~package[M]~pins[32]):EMBER_AF_PLUGIN_NETWORK_STEERING_RADIO_TX_CALLBACK,true
+AppPluginOption(efr32):EMBER_AF_PLUGIN_HAL_CONFIG_USART0_FLOW_CONTROL,HAL_USART_FLOW_CONTROL_NONE
+AppPluginOption:EMBER_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_READ_MODIFY_WRITE_SUPPORT,false
+AppPluginOption:EMBER_AF_PLUGIN_END_DEVICE_SUPPORT_ENHANCED_SLEEP_SUPPORT,true

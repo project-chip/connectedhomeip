@@ -1,0 +1,601 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-test-harness-z3" name="Plugin Commands: ZigBee 3.0 Test Harness">
+    <description>
+      The test harness commands are used to test various unusual functionality or behavior of a remote device.
+    </description>
+  </group>
+
+  <!-- Printing -->
+  <command cli="plugin test-harness packet-printing beacon-printing enable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Enable the printing of beacon requests and received beacons.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing beacon-printing disable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Disable the printing of beacon requests and received beacons.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing zdo-printing enable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Enable the printing of ZDO commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing zdo-printing disable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Disable the printing of ZDO commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing nwk-printing enable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Enable the printing of network commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing nwk-printing disable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Disable the printing of network commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing aps-printing enable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Enable the printing of APS commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing aps-printing disable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Disable the printing of APS commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing raw-printing enable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Enable the printing of raw MAC commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness packet-printing raw-printing disable" functionName="emAfPluginTestHarnessZ3PrintingCommand" group="plugin-test-harness-z3">
+    <description>
+      Disable the printing of raw MAC commands.
+    </description>
+  </command>
+
+  <!-- Beacon Commands -->
+  <command cli="plugin test-harness z3 beacon beacon-req" functionName="emAfPluginTestHarnessZ3BeaconBeaconReqCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a beacon request.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 beacon beacons-config" functionName="emAfPluginTestHarnessZ3BeaconBeaconsConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a beacon.
+    </description>
+    <arg name="options" type="INT32U" description="The negative behavior options for this command. " />
+  </command>
+
+  <!-- NWK Commands -->
+  <command cli="plugin test-harness z3 nwk nwk-rejoin-request" functionName="emAfPluginTestHarnessZ3NwkNwkRejoinRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a Rejoin Request command.
+    </description>
+    <arg name="destination" type="INT16U" description="The destination address of the command." />
+  </command>
+  <command cli="plugin test-harness z3 nwk nwk-rejoin-response" functionName="emAfPluginTestHarnessZ3NwkNwkRejoinResponseCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a Rejoin Response command.
+    </description>
+    <arg name="newAddress"  type="INT16U" description="The new short address of the destination node." />
+    <arg name="status"      type="INT8U"  description="The status of the rejoin." />
+    <arg name="destination" type="INT16U" description="The destination address of the command." />
+  </command>
+  <command cli="plugin test-harness z3 nwk nwk-leave" functionName="emAfPluginTestHarnessZ3NwkNwkLeaveCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a Network Leave command.
+    </description>
+    <arg name="rejoin"         type="BOOLEAN" description="Whether or not the device should rejoin." />
+    <arg name="request"        type="BOOLEAN" description="Whether or not this command is a request." />
+    <!-- CCB 2047 is a step towards deprecating removeChildren, hence this parameter is ignored and targeted to be deprecated -->
+    <arg name="removeChildren" type="BOOLEAN" description="Whether or not the leaving device should remove its children." />
+    <arg name="destination"    type="INT16U"  description="The destination address of the command." />
+    <arg name="options"        type="INT32U"  description="The negative behavior options for this command. " />
+  </command>
+  <command cli="plugin test-harness z3 nwk nwk-leave-supression on" functionName="emAfPluginTestHarnessZ3NwkNwkLeaveSupression" group="plugin-test-harness-z3">
+    <description>
+      Supress network leave commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 nwk nwk-leave-supression off" functionName="emAfPluginTestHarnessZ3NwkNwkLeaveSupression" group="plugin-test-harness-z3">
+    <description>
+      Do not supress network leave commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 nwk nwk-key-supression on" functionName="emAfPluginTestHarnessZ3NwkNwkKeySupression" group="plugin-test-harness-z3">
+    <description>
+      Supress network leave commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 nwk nwk-key-supression off" functionName="emAfPluginTestHarnessZ3NwkNwkKeySupression" group="plugin-test-harness-z3">
+    <description>
+      Do not supress network leave commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 nwk get-network-update-id" functionName="emAfPluginTestHarnessZ3NwkGetNetworkUpdateId" group="plugin-test-harness-z3">
+    <description>
+      Get the current network update id.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 nwk set-network-update-id" functionName="emAfPluginTestHarnessZ3NwkSetNetworkUpdateId" group="plugin-test-harness-z3">
+    <description>
+      Set the network update id in the current network parameters block.
+    </description>
+    <arg name="updateId"                type="INT8U"       description="The new network update id. " />
+  </command>
+
+  <!-- APS Commands -->
+  <command cli="plugin test-harness z3 aps aps-remove-device" functionName="emAfPluginTestHarnessZ3ApsApsRemoveDevice" group="plugin-test-harness-z3">
+    <description>
+      Send an APS remove device command.
+    </description>
+    <arg name="parentLongAddress"      type="OCTET_STRING" description="The long address of the parent whose child will be removed." />
+    <arg name="destinationLongAddress" type="OCTET_STRING" description="The long address of the node which will be removed." />
+    <arg name="options"                type="INT32U"       description="The negative behavior options for this command. " />
+  </command>
+  <command cli="plugin test-harness z3 aps aps-remove-device-config" functionName="emAfPluginTestHarnessZ3ApsApsRemoveDeviceConfig" group="plugin-test-harness-z3">
+    <description>
+      Configures the APS remove device command handling.
+    </description>
+    <arg name="options"                type="INT32U"       description="The negative behavior options for this command. " />
+  </command>
+  <command cli="plugin test-harness z3 aps aps-request-key" functionName="emAfPluginTestHarnessZ3ApsApsRequestKeyCommand" group="plugin-test-harness-z3">
+    <description>
+      Send an APS request key command.
+    </description>
+    <arg name="destination"    type="INT16U"       description="The short address destination of the command." />
+    <arg name="keyType"        type="INT8U"        description="The key type in the command payload." />
+    <arg name="partnerAddress" type="OCTET_STRING" description="The partner address for the requested link key." />
+    <arg name="options"        type="INT32U"       description="The negative behavior options for this command." />
+  </command>
+
+  <!-- Touchlink Commands -->
+  <command cli="plugin test-harness z3 touchlink scan-request-process" functionName="emAfPluginTestHarnessZ3TouchlinkScanRequestProcessCommand" group="plugin-test-harness-z3">
+    <description>
+      Start the scan request process.
+    </description>
+    <arg name="linkInitiator" type="INT8U"  description="The link initiator bit in scan requests." />
+    <arg name="unused"        type="INT16U" description="This argument is unsed." />
+    <arg name="options"       type="INT32U"       description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink start-as-router" functionName="emAfPluginTestHarnessZ3TouchlinkStartAsRouterCommand" group="plugin-test-harness-z3">
+    <description>
+      Start a distributed network on which to perform ZLL operations.
+    </description>
+    <arg name="panId" type="INT16U" description="The PAN ID that will be used." />
+    <arg name="options" type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink is-scanning" functionName="emAfPluginTestHarnessZ3TouchlinkIsScanningCommand" group="plugin-test-harness-z3">
+    <description>
+      Print out whether or not the device is currently performing the scan process for touchlinking.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 touchlink device-information-request" functionName="emAfPluginTestHarnessZ3TouchlinkDeviceInformationRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Send an device information request to the target found in the scan request process.
+    </description>
+    <arg name="startIndex" type="INT8U"  description="The start index in the device information request command" />
+    <arg name="options"    type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink device-information-request-w-target" functionName="emAfPluginTestHarnessZ3TouchlinkDeviceInformationRequestWTargetCommand" group="plugin-test-harness-z3">
+    <description>
+      Send an device information request to the target specefied with the short address in the command.
+    </description>
+    <arg name="startIndex" type="INT8U"  description="The start index in the device information request command" />
+    <arg name="shortAddress" type="INT16U"  description="The short address of the target" />
+    <arg name="options"    type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink identify-request" functionName="emAfPluginTestHarnessZ3TouchlinkIdentifyRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Send an identify request to the target found in the scan request process.
+    </description>
+    <arg name="duration"   type="INT16U" description="The duration length of the identify state." />
+    <arg name="options"    type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink reset-to-factory-new-request" functionName="emAfPluginTestHarnessZ3TouchlinkRTFNRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a reset to factory new request to the target found in the scan request process.
+    </description>
+    <arg name="options"    type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink network-start-request" functionName="emAfPluginTestHarnessZ3TouchlinkNetworkCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a network start request to the target found in the scan request process.
+    </description>
+    <arg name="networkAddress" type="INT16U" description="The designated node ID for the target node." />
+    <arg name="freeAddrBegin"  type="INT16U" description="The free address range begin." />
+    <arg name="freeAddrEnd"    type="INT16U" description="The free address range end." />
+    <arg name="freeGroupBegin" type="INT16U" description="The free group range begin." />
+    <arg name="freeGroupEnd"   type="INT16U" description="The free group range end." />
+    <arg name="options"        type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink network-join-router-request" functionName="emAfPluginTestHarnessZ3TouchlinkNetworkCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a network router join request to the target found in the scan request process.
+    </description>
+    <arg name="networkAddress" type="INT16U" description="The designated node ID for the target node." />
+    <arg name="freeAddrBegin"  type="INT16U" description="The free address range begin." />
+    <arg name="freeAddrEnd"    type="INT16U" description="The free address range end." />
+    <arg name="freeGroupBegin" type="INT16U" description="The free group range begin." />
+    <arg name="freeGroupEnd"   type="INT16U" description="The free group range end." />
+    <arg name="options"        type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink network-join-end-device-request" functionName="emAfPluginTestHarnessZ3TouchlinkNetworkCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a network end device join request to the target found in the scan request process.
+    </description>
+    <arg name="networkAddress" type="INT16U" description="The designated node ID for the target node." />
+    <arg name="freeAddrBegin"  type="INT16U" description="The free address range begin." />
+    <arg name="freeAddrEnd"    type="INT16U" description="The free address range end." />
+    <arg name="freeGroupBegin" type="INT16U" description="The free group range begin." />
+    <arg name="freeGroupEnd"   type="INT16U" description="The free group range end." />
+    <arg name="options"        type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink network-update-request" functionName="emAfPluginTestHarnessZ3TouchlinkNetworkUpdateRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a network update request.
+    </description>
+    <arg name="options" type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink get-group-identifiers-request" functionName="emAfPluginTestHarnessZ3TouchlinkGetGroupIdentifiersRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a get group identifiers request.
+    </description>
+    <arg name="startIndex" type="INT8U" description="The start index in the command payload." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink get-endpoint-list-request" functionName="emAfPluginTestHarnessZ3TouchlinkGetEndpointListRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a get endpoint list request.
+    </description>
+    <arg name="startIndex" type="INT8U" description="The start index in the command payload." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink scan-response-config" functionName="emAfPluginTestHarnessZ3TouchlinkScanResponseConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Configure the next scan response.
+    </description>
+    <arg name="options" type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink network-start-response-config" functionName="emAfPluginTestHarnessZ3TouchlinkNetworkStartResponseConfig" group="plugin-test-harness-z3">
+    <description>
+      Configure the next outgoing network start response command.
+    </description>
+    <arg name="options" type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink network-join-router-response-config" functionName="emAfPluginTestHarnessZ3TouchlinkNetworkJoinRouterResponseConfig" group="plugin-test-harness-z3">
+    <description>
+      Configure the next outgoing network join router response command.
+    </description>
+    <arg name="options" type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 touchlink device-information-response-config" functionName="emAfPluginTestHarnessZ3TouchlinkDeviceInformationResponseConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Configure the next device information response.
+    </description>
+    <arg name="options" type="INT32U" description="The negative behavior options for this command." />
+  </command>
+
+  <!-- ZDO Commands -->
+  <command cli="plugin test-harness z3 mgmt permit-joining-req" functionName="emAfPluginTestHarnessZ3MgmtPermitJoiningReqCommand" group="plugin-test-harness-z3">
+    <description>
+      Unicast a permit joining command.
+    </description>
+    <arg name="permitDurationS" type="INT16U" description="The permit duration, in seconds." />
+    <arg name="destination"     type="INT16U" description="The destination address of the command." />
+    <arg name="options"         type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 mgmt leave" functionName="emAfPluginTestHarnessZ3MgmtLeaveCommand" group="plugin-test-harness-z3">
+    <description>
+      Unicast a permit joining command.
+    </description>
+    <arg name="destination"    type="INT16U"  description="The destination address of the command." />
+    <!-- CCB 2047 is a step towards deprecating removeChildren, hence this parameter is ignored and targeted to be deprecated -->
+    <arg name="removeChildren" type="BOOLEAN" description="Whether or not the leaving device should remove its children." />
+    <arg name="rejoin"         type="BOOLEAN" description="Whether or not the destination node should rejoin the network." />
+    <arg name="options"        type="INT32U"  description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 mgmt nwk-update-request" functionName="emAfPluginTestHarnessZ3MgmtNwkUpdateRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Unicast a network update command.
+    </description>
+    <arg name="scanChannel"  type="INT16U" description="The scan channel for the command." />
+    <arg name="scanDuration" type="INT16U" description="The scan duration for the command." />
+    <arg name="scanCount"    type="INT8U"  description="The scan count for the command." />
+    <arg name="destination"  type="INT16U" description="The scan destination." />
+    <arg name="options"      type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo zdo-reset" functionName="emAfPluginTestHarnessZ3ZdoZdoResetCommand" group="plugin-test-harness-z3">
+    <description>
+      Reset any pending negative ZDO behavior.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 zdo node-desc-req" functionName="emAfPluginTestHarnessZ3ZdoNodeDescReqCommand" group="plugin-test-harness-z3">
+    <description>
+      Unicast a node descriptor request.
+    </description>
+    <arg name="destination"              type="INT16U" description="The destination address of the command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo zdo-node-desc-rsp-config" functionName="emAfPluginTestHarnessZ3ZdoZdoNodeDescRspConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Configure the next outgoing node descriptor response.
+    </description>
+    <arg name="options" type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo active-endpoint-request" functionName="emAfPluginTestHarnessZ3ZdoActiveEndpointRequestCommand" group="plugin-test-harness-z3">
+    <description>
+      Unicast an active endpoint request.
+    </description>
+    <arg name="destination"              type="INT16U" description="The destination address of the command." />
+    <arg name="networkAddressOfInterest" type="INT16U" description="The network address of interest." />
+    <arg name="options"                  type="INT32U"  description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo match-desc-req" functionName="emAfPluginTestHarnessZ3ZdoMatchDescReqCommand" group="plugin-test-harness-z3">
+    <description>
+      Unicast a match descriptor request.
+    </description>
+    <arg name="destination"              type="INT16U" description="The destination address of the command." />
+    <arg name="networkAddressOfInterest" type="INT16U" description="The network address of interest." />
+    <arg name="profileId"                type="INT16U" description="The profile id in the APS header of the command." />
+    <arg name="options"                  type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo match-desc-rsp-config" functionName="emAfPluginTestHarnessZ3ZdoMatchDescRspConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Configure the next outgoing match descriptor response.
+    </description>
+    <arg name="networkAddressOfInterest" type="INT16U" description="The network address of interest." />
+    <arg name="status"                   type="INT8U"  description="The status for the response command." />
+    <arg name="options"                  type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo simple-desc-req" functionName="emAfPluginTestHarnessZ3ZdoSimpleDescReqCommand" group="plugin-test-harness-z3">
+    <description>
+      Unicast a simple descriptor request.
+    </description>
+    <arg name="destination"              type="INT16U" description="The destination address of the command." />
+    <arg name="endpoint"                 type="INT8U"  description="The endpoint for the simple descriptor request." />
+    <arg name="networkAddressOfInterest" type="INT16U" description="The network address of interest." />
+    <arg name="options"                  type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo simple-desc-rsp-config" functionName="emAfPluginTestHarnessZ3ZdoSimpleDescRspConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Configure the next outgoing simple descriptor response.
+    </description>
+    <arg name="networkAddressOfInterest" type="INT16U" description="The network address of interest." />
+    <arg name="status"                   type="INT8U"  description="The status for the response command." />
+    <arg name="length"                   type="INT8U"  description="The trimmed length of the command." />
+    <arg name="options"                  type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo unbind unicast" functionName="zdoUnbindUnicastCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Sends an unbind request for a unicast binding to the target device.
+    </description>
+    <arg name="target" type="INT16U" description="Target node ID"/>
+    <arg name="source eui64" type="IEEE_ADDRESS" description="The source EUI64 of the binding (the remote device's EUI64)"/>
+    <arg name="source endpoint" type="INT8U" description="The source endpoint of the binding."/>
+    <arg name="clusterID" type="INT16U" description="The cluster ID to unbind."/>
+    <arg name="destinationEUI64" type="IEEE_ADDRESS" description="The destination EUI64 in the binding (usually the local node's EUI64"/>
+    <arg name="destEndpoint" type="INT8U" description="The destination endpoint of the binding"/>
+  </command>
+  <command cli="plugin test-harness z3 zdo unbind group" functionName="zdoUnbindGroupCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Sends an unbind request for a multicast binding to the target device.
+    </description>
+    <arg name="target" type="INT16U" description="Target node ID"/>
+    <arg name="source eui64" type="IEEE_ADDRESS" description="The source EUI64 of the binding (the remote device's EUI64)"/>
+    <arg name="source endpoint" type="INT8U" description="The source endpoint of the binding."/>
+    <arg name="clusterID" type="INT16U" description="The cluster ID to unbind."/>
+    <arg name="groupAddress" type="INT16U" description="The group address in the binding"/>
+  </command>
+  <command cli="plugin test-harness z3 zdo in-cl-list add" functionName="zdoAddClusterCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Add clusters to the known server (in) clusters on this device.
+    </description>
+    <arg name="clusterId" type="INT16U" description="Server cluster id" />
+  </command>
+  <command cli="plugin test-harness z3 zdo in-cl-list clear" functionName="zdoClearClusterCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Clear the ZDO list of server (in) clusters.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 zdo out-cl-list add" functionName="zdoAddClusterCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Add clusters to the known client (out) clusters on this device.
+    </description>
+    <arg name="clusterId" type="INT16U" description="Client cluster ids" />
+  </command>
+  <command cli="plugin test-harness z3 zdo out-cl-list clear" functionName="zdoClearClusterCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Clear the ZDO list of client (out) clusters.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 zdo node" functionName="zdoNodeCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Sends a node descriptor request to a given target device
+    </description>
+    <arg name="target" type="INT16U" description="Two byte address for the target device." />
+  </command>
+  <command cli="plugin test-harness z3 zdo leave" functionName="zdoLeaveRequestCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Send a ZDO Management Leave command to the target device.
+    </description>
+    <arg name="target" type="INT16U" description="Target node ID"/>
+    <!-- CCB 2047 is a step towards deprecating removeChildren, hence this parameter is ignored and targeted to be deprecated -->
+    <arg name="removeChildren" type="BOOLEAN" description="Remove children"/>
+    <arg name="rejoin" type="BOOLEAN" description="Rejoin after leave"/>
+  </command>
+  <command cli="plugin test-harness z3 zdo route" functionName="zdoRouteRequestCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Send a ZDO route request command to the target.
+    </description>
+    <arg name="target" type="INT16U" description="Target node ID"/>
+    <arg name="index"  type="INT8U"  description="The index of the remote node's routing table to request."/>
+  </command>
+  <command cli="plugin test-harness z3 zdo power" functionName="zdoPowerDescriptorRequestCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Send a ZDO Power Descriptor Request to the target device.
+    </description>
+    <arg name="target" type="INT16U" description="Target node ID"/>
+  </command>
+  <command cli="plugin test-harness z3 zdo bind" functionName="zdoBindCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Send a ZDO Bind command to a device specified in the command arguments.
+    </description>
+    <arg name="destination" type="INT16U" description="Two byte destination node id" />
+    <arg name="source Endpoint" type="INT8U" description="Remote device's source endpoint to bind" />
+    <arg name="destEndpoint" type="INT8U" description="Remote endpoint to bind" />
+    <arg name="cluster" type="INT16U" description="Cluster on which to bind" />
+    <arg name="remoteEUI64" type="IEEE_ADDRESS" description="Remote node EUI64" />
+    <arg name="destEUI64" type="IEEE_ADDRESS" description="Binding's dest EUI64.  Usually the local node's EUI64" />
+  </command>
+  <command cli="plugin test-harness z3 zdo bind-group" functionName="emAfPluginTestHarnessZ3ZdoBindGroupCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a ZDO bind command to a device specified to create a groupcast binding.
+    </description>
+    <arg name="shortAddress" type="INT16U" description="The destination of the ZDO command" />
+    <arg name="sourceEndpoint" type="INT8U" description="Remote device's source endpoint to bind" />
+    <arg name="destEndpoint" type="INT8U" description="Remote endpoint to bind" />
+    <arg name="destination" type="INT16U" description="Two byte destination address for the binding" />
+    <arg name="cluster" type="INT16U" description="Cluster on which to bind" />
+    <arg name="srcAddress" type="IEEE_ADDRESS" description="The source IEEE address for the binding" />
+  </command>
+  <command cli="plugin test-harness z3 zdo nwk-addr-req" functionName="emAfPluginTestHarnessZ3ZdoNwkAddrReqCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a ZDO address request.
+    </description>
+    <arg name="ieeeAddress" type="IEEE_ADDRESS" description="The long address of the destination." />
+    <arg name="type"        type="INT8U"        description="The type of the rejoin request." />
+    <arg name="startIndex"  type="INT8U"        description="The start index for the requested elements of the associated devices list if the type of this command is Extended response." />
+    <arg name="destination" type="INT16U"       description="The destination address of the command." />
+    <arg name="options"     type="INT32U"       description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo ieee-addr-req" functionName="emAfPluginTestHarnessZ3ZdoIeeeAddrReqCommand" group="plugin-test-harness-z3">
+    <description>
+      Send an IEEE address request.
+    </description>
+    <arg name="addrOfInterest" type="INT16U" description="The short address of interest" />
+    <arg name="type"           type="INT8U"  description="The request type." />
+    <arg name="startIndex"     type="INT8U"  description="The start index for the requested elements of the associated devices list if the type of this command is Extended response." />
+    <arg name="destination"    type="INT16U" description="The destination address of the command." />
+    <arg name="options"        type="INT32U" description="The negative behavior options for this command." />
+  </command>
+  <command cli="plugin test-harness z3 zdo mgmt-bind" functionName="zdoMgmtBindCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Send a ZDO MGMT-Bind (Binding Table) Request to the target device.
+    </description>
+    <arg name="target" type="INT16U" description="Target node ID"/>
+    <arg name="startIndex" type="INT8U" description="Starting index into table query"/>
+  </command>
+  <command cli="plugin test-harness z3 zdo mgmt-lqi" functionName="zdoMgmtLqiCommand" group="plugin-test-harness-z3" namingLevels="3">
+    <description>
+      Send a ZDO MGMT-LQI (LQI Table) Request to the target device.
+    </description>
+    <arg name="target" type="INT16U" description="Target node ID"/>
+    <arg name="startIndex" type="INT8U" description="Starting index into table query"/>
+  </command>
+  <command cli="plugin test-harness z3 nwk ieee-addr-rsp-config reset" functionName="emAfPluginTestHarnessZ3ZdoIeeeAddrRspConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Configure the next outgoing IEEE address request.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 nwk ieee-addr-rsp-config issuer-nwk-address-remote-dev" functionName="emAfPluginTestHarnessZ3ZdoIeeeAddrRspConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Configure the next outgoing IEEE address request.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 nwk ieee-addr-rsp-config status-device-not-found" functionName="emAfPluginTestHarnessZ3ZdoIeeeAddrRspConfigCommand" group="plugin-test-harness-z3">
+    <description>
+      Configure the next outgoing IEEE address request.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 zdo bc-device-announce" functionName="emAfPluginTestHarnessZ3ZdoBcDeviceAnnounceCommand" group="plugin-test-harness-z3">
+    <description>
+      Rebroadcast a "fake" ZDO device announce. The device sets random frame counter values to appear as though the DeviceAnnounce has been rebroadcasted from another device on the network out of range of the DUT.
+    </description>
+    <arg name="shortAddress" type="INT16U"       description="Short address of the fake device announce" />
+    <arg name="ieeeAddress"  type="IEEE_ADDRESS" description="IEEE address of the fake device announce" />
+  </command>
+  <!-- OTA-Server Commands -->
+  <command cli="plugin test-harness z3 ota-server activate" functionName="emAfPluginTestHarnessZ3OtaServerActivateCommand" group="plugin-test-harness-z3">
+    <description>
+      Configuration command to set up OTA server.
+    </description>
+    <arg name="shortAddress"   type="INT16U" description="Short Address " />
+    <arg name="destinationEndpoint"   type="INT8U" description="Destination Endpoint " />
+    <arg name="manufacturerCode" type="INT16U" description="Manufacturer Code." />
+    <arg name="imageType" type="INT16U" description="Image Type." />
+    <arg name="fileVersion" type="INT32U"  description="File Version" />
+    <arg name="fileSize" type="INT32U"  description="File Size" />
+  </command>
+  <command cli="plugin test-harness z3 ota-server deactivate" functionName="emAfPluginTestHarnessZ3OtaServerDeActivateCommand" group="plugin-test-harness-z3">
+    <description>
+      Configuration command to set up OTA server.
+    </description>
+  </command>
+  <!-- ZCL Commands -->
+  <command cli="plugin test-harness z3 zcl read" functionName="emAfPluginTestHarnessZ3ZclReadCommand" group="plugin-test-harness-z3">
+    <description>
+      Send a ZCL ReadAttribute command.
+    </description>
+    <arg name="clusterId"   type="INT16U" description="The cluster ID in the command." />
+    <arg name="attributeId" type="INT16U" description="The attribute ID in the command." />
+    <arg name="destination" type="INT16U" description="The destination of the command." />
+    <arg name="srcEndpoint" type="INT8U"  description="The source endpoint of the command." />
+    <arg name="dstEndpoint" type="INT8U"  description="The destination endpoint of the command." />
+    <arg name="profileId"   type="INT16U" description="The profile ID in the command." />
+  </command>
+  <command cli="plugin test-harness z3 reset" functionName="emAfPluginTestHarnessZ3ResetCommand" group="plugin-test-harness-z3">
+    <description>
+      Resets the device to a factory new state (empty tables, attributes at default values, no events queued etc) without resetting the any of the physical hardware that could cause the device to not operate on the same serial connection.
+    </description>
+  </command>
+
+  <!-- Z3 Commands -->
+  <command cli="plugin test-harness z3 platform" functionName="emAfPluginTestHarnessZ3PlatformCommand" group="plugin-test-harness-z3">
+    <description>
+      Print the platform information for this device.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 set-pan-id" functionName="emAfPluginTestHarnessSetNetworkCreatorPanId" group="plugin-test-harness-z3">
+    <description>
+      Set the PAN ID to be used by the Network Creator plugin.
+    </description>
+    <arg name="panId" type="INT16U" description="The PAN ID for the Network Creator plugin to use." />
+  </command>
+  <command cli="plugin test-harness z3 set-short-address" functionName="emAfPluginTestHarnessZ3SetShortAddressCommand" group="plugin-test-harness-z3">
+    <description>
+      Set the node ID to be used on the device.
+    </description>
+    <arg name="nodeId" type="INT16U" description="The node ID to use as this device's short ID." />
+  </command>
+  <command cli="plugin test-harness z3 legacy-profile enable" functionName="emAfPluginTestHarnessZ3LegacyProfileCommand" group="plugin-test-harness-z3">
+    <description>
+      Enable using the legacy profile of 0xC05E for ZLL commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 legacy-profile disable" functionName="emAfPluginTestHarnessZ3LegacyProfileCommand" group="plugin-test-harness-z3">
+    <description>
+      Disable using the legacy profile of 0xC05E for ZLL commands.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 set-device-mode" functionName="emAfPluginTestHarnessZ3SetDeviceModeCommand" group="plugin-test-harness-z3">
+    <description>
+      Set the node ID to be used on the device.
+    </description>
+    <arg name="mode" type="INT8U" description="The device mode." />
+  </command>
+  <command cli="plugin test-harness z3 install-code clear" functionName="emAfPluginTestHarnessZ3InstallCodeClearOrSetCommand" group="plugin-test-harness-z3">
+    <description>
+      Clear the install code from the device.
+    </description>
+  </command>
+  <command cli="plugin test-harness z3 install-code set" functionName="emAfPluginTestHarnessZ3InstallCodeClearOrSetCommand" group="plugin-test-harness-z3">
+    <description>
+      Clear the install code from the device.
+    </description>
+    <arg name="installCode" type="OCTET_STRING" description="The install code for this device to use." />
+  </command>
+
+ </cli>

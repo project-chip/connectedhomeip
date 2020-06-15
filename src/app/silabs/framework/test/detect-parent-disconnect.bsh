@@ -1,0 +1,247 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  // The Z3 Gateway can only be compiled as a host
+  std.print("** This test uses a mixture of HOST/SoC devices, so only run it with -h ** ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+// Load Z3GatewayWithWwah app as HOST.
+Location gatewayLocation = gridLocations[1];
+TestNode gateway = new TestNode("gateway",
+                                "", // no SoC image
+                                "build/af-test-apps/Z3GatewayWithWwah-simulation-ezsp/Z3GatewayWithWwah",
+                                "app/ncp/sample-app/ncp-uart-sw/simulation/build/exe/ncp-uart-sw",
+                                gatewayLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { gateway }, true, false); // useHost, don't useSpi
+
+// Load Z3DoorLockWithWwah app as a SoC device.
+Location enddeviceLocation = gridLocations[6];
+TestNode enddevice = new TestNode("enddevice",
+                                  "build/af-test-apps/Z3DoorLockWithWwah-simulation/Z3DoorLockWithWwah",
+                                  "", // no HOST image
+                                  "", // no NCP image
+                                  enddeviceLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { enddevice }, false); // useHost
+
+// Load Z3Light app as a SoC device to act as a router.
+Location lightLocation = gridLocations[4];
+TestNode light = new TestNode("light",
+                              "build/af-test-apps/Z3Light-simulation/Z3Light",
+                              "", // no HOST image
+                              "", // no NCP image
+                              lightLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { light }, false); // useHost
+
+setupEncryption();
+
+// Starting a centralized network between gateway, light and  end device
+// with no tclk update after network steering.
+void startNetworkWithNoTCLKUpdate() {
+  // The gateway forms a centralized network.
+  expect("gateway",
+         "plugin network-creator start 1",
+         "NWK Creator: Form. Channel.*Status: 0x00",
+         DEFAULT_TIMEOUT << 1);
+
+  String channel = channel("gateway");
+  String power = "3";
+  String panId = panId("gateway");
+
+  networkWait(2000);
+  expect("gateway",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+  networkWait(1000);
+  //Network steering with no tclk update
+  expect("light",
+         "plugin network-steering start 1",
+         ".*EMBER_NETWORK_UP.*",
+         50000);
+  networkWait(40000);
+  expect("gateway",
+        "network pjoin 0",
+        "pJoin for 0 sec: 0x00");
+  expect("light",
+        "network pjoin 0xFF",
+        "pJoin for 255 sec: 0x00");
+  networkWait(2000);
+  //Network steering with no tclk update
+  expect("enddevice",
+         "plugin network-steering start 1",
+         ".*EMBER_NETWORK_UP.*",
+         50000);
+  networkWait(40000);
+}
+
+// Starting a centralized network between gateway, light and  end device
+void startNetwork() {
+  // The gateway forms a centralized network.
+  expect("gateway",
+         "plugin network-creator start 1",
+         "NWK Creator: Form. Channel.*Status: 0x00",
+         DEFAULT_TIMEOUT << 1);
+
+  String channel = channel("gateway");
+  String power = "3";
+  String panId = panId("gateway");
+
+  networkWait(2000);
+  expect("gateway",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+  networkWait(1000);
+  send("light",
+         "plugin update-tc-link-key timer 5000");
+  expect("light",
+         "plugin network-steering start 0",
+         ".*EMBER_NETWORK_UP.*",
+         50000);
+  networkWait(5000);
+  expect("gateway",
+        "network pjoin 0",
+        "pJoin for 0 sec: 0x00");
+  expect("light",
+        "network pjoin 0xFF",
+        "pJoin for 255 sec: 0x00");
+  networkWait(2000);
+  expect("enddevice",
+         "plugin network-steering start 0",
+         ".*EMBER_NETWORK_UP.*",
+         50000);
+  networkWait(5000);
+}
+
+void leaveNetwork() {
+  expect("gateway", "network leave", ".*EMBER_NETWORK_DOWN.*", 2000);
+  expect("enddevice", "network leave", ".*EMBER_NETWORK_DOWN.*", 2000);
+}
+
+
+// The light starts network steering upon bootup and starts its own
+// distributed network upon steering failure. Catch the network up and make it
+// leave
+expect("light", ".*EMBER_NETWORK_UP.*", 60000);
+expect("light", "network leave", ".*EMBER_NETWORK_DOWN.*", 2000);
+
+
+// -------------------------- Testing Lost Parent Connectivity -------------------------
+// Test case 1: Have enddevice attempt to talk to the gateway while the parent of the
+// end device has left the network. The end device will attempt to poll until the max
+// poll limit before searching for a new parent. Also if parent(light) is down then
+// the end device has a poll failure which results in the end device short(fast)
+// polling.
+startNetwork();
+
+// Enable rejoin algorithm
+send("gateway", "zcl mfg-code 0x1217");
+send("gateway", "zcl sl-wwah enable-rejoin-alg 10 120 20 30 15");
+send("gateway", "send " + nodeId("enddevice") + " 1 1");
+expect("enddevice", ".*RX len 15, ep 01, clus 0xFC57" +
+           " \\(SL Works With All Hubs\\) mfgId 1217 FC 05 seq .* cmd 07 payload\\[.*\\]",5000);
+
+expect("light", "network leave", ".*EMBER_NETWORK_DOWN.*", 2000);
+// Upon three poll failures, the end device's connectivity recovery procedure
+// kicks in. The first failure occurs after a long poll, 300 seconds or so
+expect("enddevice",
+       "",
+       "Number of short poll attempts made to resolve parent connectivity: 1",
+       320000);
+// Now the end device figures out that the parent isn't responding, so it should
+// switch to short poll
+// EMZIGBEE-4404 & EMZIGBEE-4407: we increase the short poll interval of
+// Z3DoorLockWithWwah from 1 second to 20 seconds to accommodate
+// the time unit change of the MACPollFailureWaitTime.
+expect("enddevice",
+       "",
+       "Number of short poll attempts made to resolve parent connectivity: 2",
+       28000);
+expect("enddevice",
+       "",
+       "Number of short poll attempts made to resolve parent connectivity: 3",
+       28000);
+// Finally, 3 errors ping the WWAH Connectivity Manager to come in and fix the
+// situation by doing a TC rejoin on the channel
+expectMultiline("enddevice",
+                "",
+                new String[] {
+                  "WWAH Connectivity Mgr: lost connection to parent",
+                  ".*EMBER_NETWORK_UP 0x....",
+                },
+                10000);
+networkWait(14000);
+
+// Making sure that the new parent that is found is the gateway.
+send("enddevice", "zcl global read 0x0000 0x0000");
+send("enddevice", "send 0x0000 1 1");
+expect("gateway", ".*[T00000083:RX len .*, ep .*, clus .* payload[.*]]", 1500);
+networkWait(50000);
+
+// Test case 2: Have the end device power off, Switch the network key using the TC(gateway)
+// and bring the end device back on. The end device will face a network down and attempt
+// to move to a different network because it does not have the nwk key.
+leaveNetwork();
+startNetwork();
+network.power("enddevice", false);
+expect("gateway",
+       "plugin test-harness key-update now",
+       "Starting NWK Key update, status: 0x00");
+networkWait(30000);
+network.power("enddevice", true);
+setupEncryption();
+// The device goes into a joined network with no parent state in 
+// end-device-move#emberAfPluginEndDeviceSupportStackStatusCallback
+// which results in a search for new parent.
+expect("enddevice",
+       "WWAH Connectivity Mgr: lost connection to parent",
+       20000);
+expect("enddevice", ".*EMBER_NETWORK_UP.*", 5000);
+
+// Test case 3: Have enddevice attempt to talk to the gateway while the parent of the
+// end device has left the network. The end device will attempt to poll until the max
+// poll limit before searching for a new parent. Also if parent(light) is down then
+// the end device has a poll failure which results in the end device short(fast)
+// polling.
+
+expect("gateway", "network leave", ".*EMBER_NETWORK_DOWN.*", 2500);
+expect("enddevice", "network leave", ".*EMBER_NETWORK_DOWN.*", 2000);
+expect("light", "network leave", ".*EMBER_NETWORK_DOWN.*", 2000);
+startNetworkWithNoTCLKUpdate();
+send("enddevice", "keys print");
+networkWait(3000);
+expect("light", "network leave", ".*EMBER_NETWORK_DOWN.*", 2000);
+
+// Upon three poll failures, the end device's connectivity recovery procedure
+// kicks in. The first failure occurs after a long poll, 300 seconds or so
+expect("enddevice",
+       "",
+       "Number of short poll attempts made to resolve parent connectivity: 1",
+       320000);
+// Now the end device figures out that the parent isn't responding, so it should
+// switch to short poll
+// EMZIGBEE-4404 & EMZIGBEE-4407: we increase the short poll interval of
+// Z3DoorLockWithWwah from 1 second to 20 seconds to accommodate
+// the time unit change of the MACPollFailureWaitTime.
+expect("enddevice",
+       "",
+       "Number of short poll attempts made to resolve parent connectivity: 2",
+       28000);
+expect("enddevice",
+       "",
+       "Number of short poll attempts made to resolve parent connectivity: 3",
+       28000);
+// Finally, 3 errors ping the WWAH Connectivity Manager to come in and fix the
+// situation by doing a TC rejoin on the channel. However the TC rejoin should
+// not pass when using the well known key.
+expectMultiline("enddevice",
+                "",
+                new String[] {
+                  ".*WWAH Connectivity Mgr: Cancelling TC rejoin attempt with well known key.*"
+                },
+                50000);
+expect("enddevice",
+                  ".*EMBER_NETWORK_DOWN.*",1000000);
+

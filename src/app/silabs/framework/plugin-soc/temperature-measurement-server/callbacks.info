@@ -1,0 +1,21 @@
+/** @brief Over temperature state changed
+ *
+ * This callback is generated when the temperature rises over the assert
+ * thresholds (warning and critical) or drops below the deassert thresholds
+ * (warning and critical)
+ *
+ * @param previousState, the state prior to the state change
+ *
+ * @param newState, the new state of the state change
+ *
+ *  EMBER_TEMPERATURE_MEASUREMENT_SERVER_OVER_TEMPERATURE_NORMAL : normal state
+ *  EMBER_TEMPERATURE_MEASUREMENT_SERVER_OVER_TEMPERATURE_WARNING : warning state
+ *  EMBER_TEMPERATURE_MEASUREMENT_SERVER_OVER_TEMPERATURE_CRITICAL : critical state
+ *
+ *  Ver.: always
+ */
+void emberAfPluginTemperatureMeasurementServerOverTemperatureCallback(
+  uint8_t previousState,
+  uint8_t newState)
+{
+}

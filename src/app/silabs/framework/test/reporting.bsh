@@ -1,0 +1,408 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "router", "combIf"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaCombinedInterface-simulation/HaCombinedInterface"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaCombinedInterface-simulation-ezsp/HaCombinedInterface"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+boolean DIRECTION_RECEIVED = true;
+boolean DIRECTION_REPORTED = false;
+
+String expectReadReportConfigResponse(String node,
+                                      String clusterName,
+                                      String statusInHex,
+                                      boolean directionReceived,
+                                      String attributeInHex,
+                                      String[] dataLines)
+{
+  String attributeInHexNoPrefix = new String(attributeInHex.substring(2));
+  String statusInHexNoPrefix = new String(statusInHex.substring(2));
+
+  String[] regexLines = new String[2 + dataLines.length];
+  regexLines[0] = new String("READ_RPT_CFG_RESP: \\(" + clusterName + "\\)");
+  regexLines[1] = new String(" - status:" + statusInHexNoPrefix
+                             + ", direction:" + (directionReceived ? "01" : "00") 
+                             + ", attr:" + attributeInHexNoPrefix);
+  for (i = 0; i < dataLines.length; i++) {
+    regexLines[i + 2] = new String(dataLines[i]);
+  }
+
+
+  return _expectMultiline(node,
+                          "",  // command
+                          regexLines,
+                          DEFAULT_TIMEOUT,
+                          getSourceFileInfo(),
+                          this.namespace.getInvocationLine());
+}
+
+
+// Reports are sent to bindings, so clear all of the bindings on the light
+// before starting.
+send("light", "option binding-table clear");
+
+// Request reports of the ZCL version (cluster 0x0000, attribute 0x0000) from
+// the light for the combIf.  Before starting, read the reporting configuration
+// and check that nothing is set up yet. We should get NOT_FOUND status.
+send("combIf", "zcl global report-read 0x0000 0x0000 0x00");
+send("combIf", "send 0 1 6");
+expect("light", "READ_RPT_CFG: \\(Basic\\)");
+
+expectReadReportConfigResponse("combIf",
+                               "Basic",
+                               "0x8B",
+                               DIRECTION_REPORTED,
+                               "0x0000",  // attribute id
+                               // Report data
+                               new String[] {});
+
+send("combIf", "zcl global report-read 0x0000 0x0000 0x01");
+send("combIf", "send 0 1 6");
+expect("light", "READ_RPT_CFG: \\(Basic\\)");
+
+expectReadReportConfigResponse("combIf",
+                               "Basic",
+                               "0x8B",
+                               DIRECTION_RECEIVED,
+                               "0x0000",  // attribute id
+                               // Report data
+                               new String[] {});
+
+// BUGZID: 11407 Test that we return proper value for unconfigured signed
+// attribute.
+send("combIf", "zcl global report-read 0x000A 0x0002 0x00");
+send("combIf", "send 0 1 12");
+expect("light", "READ_RPT_CFG: \\(Time\\)");
+
+expectReadReportConfigResponse("combIf",
+                               "Unknown clus\\. \\[0x000A\\]",
+                               "0x8B",
+                               DIRECTION_REPORTED,
+                               "0x0002",
+                               new String[] {});
+
+// For attribute 0x0001, which does not exist, the request to read the
+// configuration should fail.
+send("combIf", "zcl global report-read 0x0000 0x0001 0x00");
+expectMultiline("combIf", "send 0 1 6",
+                 new String [] {
+                ".*READ_RPT_CFG_RESP: \\(Basic\\)",
+                ".* - status:86, direction:00, attr:0001"
+              });
+send("combIf", "zcl global report-read 0x0000 0x0001 0x01");
+send("combIf", "send 0 1 6");
+expect("light", "READ_RPT_CFG: \\(Basic\\)");
+
+expectReadReportConfigResponse("combIf",
+                               "Basic",
+                               "0x86",
+                               DIRECTION_RECEIVED,
+                               "0x0001",
+                               new String[] {});
+
+// Request reports of the application version (cluster 0x0000, attribute 0x0001)
+// for the light for the combIf.  The light does not have this attribute, so the
+// request should fail.
+send("combIf", "zcl global send-me-a-report 0x0000 0x0001 0x20 10 20 {00}");
+send("combIf", "send 0 1 6");
+expectMultiline("light",
+                "",       // command
+                new String[] {
+                  "CFG_RPT: \\(Basic\\)",
+                  " - direction:00, attr:0001",
+                  "   type:20, min:000A, max:0014",
+                  "   change:00",
+                });
+expectMultiline("combIf",
+                "",    // command
+                new String[] {
+                  "CFG_RPT_RESP: \\(Basic\\)",
+                  " - status:86",
+                  "   direction:00, attr:0001",
+                });
+
+// Request the report and check that it gets set up in the right direction.
+send("combIf", "zcl global send-me-a-report 0x0000 0x0000 0x20 10 20 {00}");
+send("combIf", "send 0 1 6");
+expectMultiline("light",
+                "",   // command
+                new String[] {
+                  "CFG_RPT: \\(Basic\\)",
+                  " - direction:00, attr:0000",
+                  "   type:20, min:000A, max:0014",
+                  "   change:00",
+                });
+expectMultiline("combIf",
+                "",   // command
+                new String[] {
+                  "CFG_RPT_RESP: \\(Basic\\)",
+                  " - status:00",
+                });
+
+send("combIf", "zcl global report-read 0x0000 0x0000 0x00");
+send("combIf", "send 0 1 6");
+expect("light", "READ_RPT_CFG: \\(Basic\\)");
+
+expectMultiline("combIf",
+                "",     /// command
+                new String[] {
+                  "READ_RPT_CFG_RESP: \\(Basic\\)",
+                  " - status:00, direction:00, attr:0000",
+                  "   type:20, min:000A, max:0014",
+                  "   change:00",
+                });
+
+send("combIf", "zcl global report-read 0x0000 0x0000 0x01");
+send("combIf", "send 0 1 6");
+expect("light", "READ_RPT_CFG: \\(Basic\\)");
+
+expectReadReportConfigResponse("combIf",
+                               "Basic",
+                               "0x8B",
+                               DIRECTION_RECEIVED,
+                               "0x0000",
+                               new String[] {});
+
+// Wait a while and make sure no reports are received by the combined interface.
+// No bindings exist on the light yet, so it should not send reports.
+assert(network.expect("combIf", port, null, "RPT_ATTR: \\(Basic\\)", timeout * 25, true) == null);
+
+// Wait for MTORR to be sent out.
+networkWait(20000);
+
+// Now create a binding and watch for a series of automatic reports.  The
+// timeout is increased beyond the default because reports come in
+// infrequently.
+expect("light", 
+       "option binding-table set 0 0x0000 0x06 0x01 {" + eui64("combIf") + "}",
+       "set bind 0: 0x00");
+for (int i = 0; i < 5; ++i) {
+  expectMultiline("combIf", 
+                  "",   // command
+                  new String[] {
+                    "RPT_ATTR: \\(Basic\\)",
+                    " - attr:0000",
+                    "   type:20, val:03",
+                  },
+                  60000); // timeout
+}
+
+// Cancel the report (by setting the maximum interval to 0xFFFF) and make sure
+// the reports stop.
+send("combIf", "zcl global send-me-a-report 0x0000 0x0000 0x20 0x0000 0xFFFF {00}");
+send("combIf", "send 0 1 6");
+expectMultiline("light",
+                "",       // command
+                new String[] {
+                  "CFG_RPT: \\(Basic\\)",
+                  " - direction:00, attr:0000",
+                  "   type:20, min:0000, max:FFFF",
+                  "   change:00",
+                });
+expectMultiline("combIf", 
+                "",        // command
+                new String[] {
+                  "CFG_RPT_RESP: \\(Basic\\)",
+                  " - status:00",
+                });
+assert(network.expect("combIf", port, null, "RPT_ATTR: \\(Basic\\)", timeout * 25, true) == null);
+
+// Set up reports manually on the light through the CLI and make sure they come
+// through to the combIf.
+send("light", "plugin reporting add 0x06 0x0000 0x0000 1 10 20 0x00");
+for (int i = 0; i < 5; ++i) {
+  expectMultiline("combIf", 
+                  "",   // command
+                  new String[] {
+                    "RPT_ATTR: \\(Basic\\)",
+                    " - attr:0000",
+                    "   type:20, val:03",
+                  },
+                  60000); // timeout
+}
+
+//-------------------------------------------------------------------------------------
+// EMZIGBEE-1957: Reporting plugin does not properly detect/report differences in
+// discrete char and octet string values.
+String s0   = "{}"; // zero-length string
+String s1   = "{31}";
+String s1a  = "{41}";
+String s8   = "{31 32 33 34 35 36 37 38}";
+String s16  = "{31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36}";
+String s32  = "{31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32}";
+String s32a = "{41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A 61 62 63 64 65 66}";
+
+// CHAR string attribute ManufacturerName.
+// Configure for very long max interval so that any reports must be triggered by value changes.
+send("light", "plugin reporting add 0x06 0x0000 0x0004 1 5 0xfff0 0x00");
+
+// Write w/ 1-length string.
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s1);
+expectMultiline("combIf",
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:1",
+                },
+                5500); // timeout
+
+// Write w/ same 1-length string...no change, should not trigger report. (nexpect)
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s1);
+nexpectMultiline("combIf",
+               // "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:1",
+                },
+                5500); // timeout
+
+// Write w/ different 1-length string.
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s1a);
+expectMultiline("combIf",
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:A",
+                },
+                5500); // timeout
+
+// Write w/ zero-length string.
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s0);
+expectMultiline("combIf",
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:",
+                },
+                5500); // timeout
+
+// Write w/ 8-length string.
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s8);
+expectMultiline("combIf",
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:12345678",
+                },
+                5500); // timeout
+
+// Write w/ 16-length string.
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s16);
+expectMultiline("combIf",
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:1234567890123456",
+                },
+                5500); // timeout
+
+// Write w/ 32-length string.
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s32);
+expectMultiline("combIf",
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:12345678901234567890123456789012",
+                },
+                5500); // timeout
+
+// Write w/ same 32-length string...no change, should not trigger report. (nexpect)
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s32);
+nexpectMultiline("combIf",
+               // "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:12345678901234567890123456789012",
+                },
+                5500); // timeout
+
+// Write w/ different 32-length string.
+send("light", "write 0x06 0x0000 0x0004 1 0x42 " + s32a);
+expectMultiline("combIf",
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0004",
+                  "   type:42, val:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef",
+                },
+                5500); // timeout
+
+//-------------------------------------------------------------------------------------
+// EMAPPFWKV2-1327: Reporting plugin does not account for reporting too many attributes 
+//                  in the same ZCL:ReportAttributes message
+// add test reports
+send("light", "plugin reporting add 0x06 0x0000 0x0004 1 1 5 0x00");
+send("light", "plugin reporting add 0x06 0x0000 0x0005 1 1 5 0x00");
+send("light", "plugin reporting add 0x06 0x0000 0x0006 1 1 5 0x00");
+send("light", "plugin reporting add 0x06 0x0000 0x4000 1 1 5 0x00");
+network.sleep(timeout * 2);
+
+// write data in attributes to ensure the size exceeds the limit that a single report can handle
+String testString = "74 68 69 73 20 69 73 20 61 20 74 65 73 74 20 73 74 72 69 6e 67";
+send("light", "write 0x06 0x0000 0x0004 1 0x42 {" + testString + "}");
+send("light", "write 0x06 0x0000 0x0005 1 0x42 {" + testString + "}");
+send("light", "write 0x06 0x0000 0x0006 1 0x42 {" + testString + "}");
+send("light", "write 0x06 0x0000 0x4000 1 0x42 {" + testString + "}");
+network.sleep(timeout * 2);
+
+//ensure all reports are received
+expectMultiline("combIf", 
+                "",   // command
+                new String[] {
+                  "RPT_ATTR: \\(Basic\\)",
+                  " - attr:0000",
+                  " - attr:0004",
+                  " - attr:0005",
+                  " - attr:0006",
+                  " - attr:4000"
+                },
+                60000); // timeout
+
+// sync the reports to go together
+send("light", "plugin reporting clear-last-report-time");
+
+expectMultiline("light", 
+                "",   // command
+                new String[] {
+                  "Reporting Entry Full - creating new report"
+                },
+                60000); // timeout
+network.sleep(timeout * 10);
+//-------------------------------------------------------------------------------------
+
+// Remove the bindings and make sure reports stop.
+send("light", "option binding-table clear");
+assert(network.expect("combIf", port, null, "RPT_ATTR: \\(Basic\\)", timeout * 25, true) == null);

@@ -1,0 +1,12 @@
+/** @brief UTC Time Set
+ *
+ * This function is called when the UTC time has been set. It returns the
+ * current UTC time. This callback is fired after all applicable compact-logger
+ * events have had their UTC time updated.
+ *
+ * @param currentUtcTimeSeconds The current UTC time in seconds.
+ * Ver.: always
+ */
+void emberAfPluginCompactLoggerUtcTimeSetCallback(uint32_t currentUtcTimeSeconds)
+{
+}

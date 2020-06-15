@@ -1,0 +1,387 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to verify the bulb-ui functionality:  joining,
+// leaving, etc.  
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop
+    || runArgument.runUsingHostApps) {
+  // Multi-hop is disabled due to many weird failures due to timing issue.
+
+  // I am disabling host because it is failing in a very bizarre
+  // way in the Key Establishment.  I would love to debug this issue,
+  // but do not currently have time.  The IHD is failing to succeed on
+  // key establishment on host, the confirm key is seeing a different value
+  // on both sides.  In theory this should not happen under idealized
+  // (simulation) circumstances.  So my suspicion is that it is memory
+  // corruption.
+  std.print("****Multi-hop and Host disabled****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "controller", "bulb", "bulb-rgb", "bulb-temp" };
+//String[] allDevices = { "controller", "bulb" };
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/Z3DimmableLight-simulation/Z3DimmableLight",
+  "build/af-test-apps/Z3ColorControlLight-simulation/Z3ColorControlLight",
+  "build/af-test-apps/Z3ColorTempLight-simulation/Z3ColorTempLight",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+  "",
+  "",
+};
+
+String[] ncpImages = new String[] {
+  "",
+  "",
+  "",
+  "",
+};
+
+// Note: the following call creates a flat network (i.e. every node can
+// hear every other node.
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImages,
+                  false, false, false);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0xdc04;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Note: reference designs can not use the formAndJoinDevices() API
+// because they will all try to join on their own.  As such, calls
+// beyond the first to attempt to join to a network will fail (devices
+// already joined).
+
+// Coodinator is device [0]
+networkForm(allDevices[0]);
+networkWait(1000);
+send(allDevices[0], "network pjoin 150");
+
+// Allow TC and link key requests on the trust center
+send("controller", "option security set-key-request-policy 1 1");
+
+// Let registration complete.
+networkWait(60000);
+
+// leave test.  Verify that the bulb can rejoin the network.
+send("controller", "network pjoin 150");
+send("bulb", "network leave");
+expect("bulb", "*EMBER_NETWORK_DOWN");
+expect("bulb", "*PWM DRIVE:  1 6000"); // 6000 means full on.
+//networkWait(25000);
+expect("bulb", "*EMBER_NETWORK_UP ......",750000);
+networkWait(15000);
+send("controller", "network pjoin 0");
+networkWait(30000);
+
+if(true) {
+  int i;
+  
+  for(i=0; i< 10; i++) {
+    networkWait(1000);
+
+    reboot("bulb");
+  }
+} else {
+  send("bulb", "network leave");
+}
+
+int i;
+
+if(true) {
+// Verify that the connection manager will attempt to rejoin 19 times, then stop
+// attempting to rejoin
+  for(i=0; i< 19; i++) {
+    expect("bulb", ".*NWK Steering: Start: 0x00.*", 40000);
+    expect("bulb", ".*Network Steering Completed: FAILED.*",60000);
+    dbg.print(i);
+  }
+  send("controller", "network pjoin 150");
+  reboot("bulb");
+}
+
+networkWait(30000);
+
+// temporarily disable on/off and level tests
+if(true) {
+  // set up node ID for the bulb
+  String bulb = nodeId("bulb");
+
+  send("bulb", "info");
+  networkWait(1500);
+
+  // send on/off commands
+  send("controller", "zcl on-off on");
+  send("controller", "send " + bulb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl on-off off");
+  send("controller", "send " + bulb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl on-off on");
+  send("controller", "send " + bulb + " 1 1");
+  expect("bulb", ".*PWM DRIVE:  1 6000.*");
+
+  networkWait(1500);
+
+  // send level control commands
+  send("controller", "zcl level-control mv-to-level 0x01 0x0001");
+  send("controller", "send " + bulb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl level-control mv-to-level 0xff 0x0001");
+  send("controller", "send " + bulb + " 1 1");
+  networkWait(1500);
+}
+
+// run tests for the temperature control bulb
+if(true) {
+  // set up node ID for the color temperature bulb
+  String bulbTemp = nodeId("bulb-temp");
+  send("controller", "zcl color-control movetocolortemp 200 0x05 0x00 0x00");
+  send("controller", "send " + bulbTemp + " 1 1");
+
+  expect("bulb-temp", ".*Color Temperature 200");
+  // for color temperature of 200, we are expecting PWM values of 6000 for the
+  // high temperature (1) LED and 0 for the low temperature (5?/2?) led.
+  expect("bulb-temp", ".*PWM DRIVE:  1 6000");
+  expect("bulb-temp", ".*PWM DRIVE:  5 0");
+
+  networkWait(1500);
+  send("controller", "zcl color-control movetocolortemp 300 0x05 0x00 0x00");
+  send("controller", "send " + bulbTemp + " 1 1");
+  // As the color temperature changes, we need to make sure we are driving the
+  // high temperature (1) LED and the low temperautre (5?/2?) LED with the
+  // appropriate values.  The actual color temperature reported is MIRED, which
+  // is 10^6 / temp (K).  So 200 translates to 5000 Kelvin.  We have two LEDs 
+  // on the reference board, 5000 K and 2200 K.  And we need to linearly 
+  // interpolate between the two (i.e. 3600k would mean driving both LEDs at 
+  // 50% or 3000 PWM ticks)
+  expect("bulb-temp", ".*Color Temperature 220");
+  expect("bulb-temp", ".*(1 5024)");
+  expect("bulb-temp", ".*(5 975)");
+  expect("bulb-temp", ".*Color Temperature 240");
+  expect("bulb-temp", ".*1 4211");
+  expect("bulb-temp", ".*5 1788");
+  expect("bulb-temp", ".*Color Temperature 260");
+  expect("bulb-temp", ".*1 3525");
+  expect("bulb-temp", ".*5 2474");
+  expect("bulb-temp", ".*Color Temperature 280");
+  expect("bulb-temp", ".*1 2935");
+  expect("bulb-temp", ".*5 3064");
+  expect("bulb-temp", ".*Color Temperature 300");
+  expect("bulb-temp", ".*5 3574");
+  networkWait(1500);
+
+}
+
+// run test for the color control bulb
+if(true) {
+  // set up node ID for the color temperature bulb
+  String bulbRgb = nodeId("bulb-rgb");
+  send("controller", "zcl color-control movetocolortemp 200 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  // For an RGB bulb, color temperature is much more complicated.  We are
+  // driving the white (1), red (2) green (3) and blue (4) PWMs based on a 
+  // complicated algorithm from the color perception literature.  In fact, the
+  // values are pre-compiled and stored in a static array.  Note:  the RGB bulb 
+  // never drives the white PWM.
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 5976");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 5343");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 4828");
+  networkWait(1500);
+  send("controller", "zcl color-control movetocolortemp 300 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 5976 4406 3070");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 5976");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 4406");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 3070");
+  networkWait(1500);
+
+  // color XY:  I recommend looking up on Wikipedia what color XY means.  Search
+  // for the term "CIE1931".
+  // ZigBee maps the X and Y values of 0..1 to 0..65279 (0xfeff).  Specific
+  // colors were chosen, the XY values obtained from the internet.  The RGB
+  // drive values are computed based on an algorithm from the color perception
+  // literature.  
+  // white
+  send("controller", "zcl color-control movetocolor 20316 21627 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 1595 2035 2143");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 1809");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 2113");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 2143");
+  networkWait(1500);
+  // yellow
+  send("controller", "zcl color-control movetocolor 26870 32768 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 2851 3030 506");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 2595");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 2762");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 506");
+  networkWait(1500);
+  // cyan
+  send("controller", "zcl color-control movetocolor 14418 21627 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 77 2363 2678");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 77");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 2363");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 2678");
+  networkWait(1500);
+  // green
+  send("controller", "zcl color-control movetocolor 19005 39322 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 571 4262 619");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 571");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 4262");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 619");
+  networkWait(1500);
+  // purple
+  send("controller", "zcl color-control movetocolor 20972 9830 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 2226 571 3178");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 1893");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 1285");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 3178");
+  networkWait(1500);
+  // red
+  send("controller", "zcl color-control movetocolor 41943 21627 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 6000 851 166");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 851");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 166");
+  networkWait(1500);
+  // blue
+  send("controller", "zcl color-control movetocolor 9830 3932 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 0 464 4744");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 464");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 4744");
+  networkWait(1500);
+
+  // HUE and SAT tests.
+  // For details on HUE and SAT meanings, please look to wikipedia:"HSL".  
+  // ZigBee maps the 0..360 degrees of hue to 0..254, where 255 is reserved as
+  // an invalid value.  Saturation maps from 0..255 for 0%..100% saturation.  
+  // Level comes from the level control cluster.  
+  send("controller", "zcl color-control movetohueandsat 0 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 6000 0 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 0");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 40 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 6000 5692 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 5692");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 0");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 80 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 566 6000 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 566");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 0");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 120 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 0 6000 5007");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 5007");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 160 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 0 1275 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 1275");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 6000");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 200 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 4417 0 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 4417");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 6000");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 240 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 6000 0 1984");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 1984");
+  networkWait(1500);
+}
+
+// force rejoin test
+// power cycling the bulb 5-9 times should force it to do a rejoin.
+if(true) {
+  dbg.print("DEBUG:  line 354:  about to reboot");
+  int i;
+  
+  for(i=0; i< 5; i++) {
+    networkWait(2000);
+
+    reboot("bulb");
+  }
+  expect("bulb", ".*EMBER_NETWORK_DOWN*", 100000);
+}
+
+networkWait(10000);
+
+// Identify test
+// power cycling the bulb 4 times should force identify mode
+if(true) {
+  int i;
+  
+  for(i=0; i< 4; i++) {
+    networkWait(1000);
+
+    reboot("bulb");
+  }
+
+// These beanshell lines are too unreliable. They need to be re-written in
+// a way that test the functionality, explain the use of the 92 constant
+// and the last expect after the for loop, use correct spacing, and provide
+// a robust expectation of the PWM print timing.
+//  networkWait(10000);
+//
+//  for(i=0; i<92 ; i++) {
+//    expect("bulb", ".*PWM DRIVE:  1 0");
+//    expect("bulb", ".*PWM DRIVE:  1 6000");
+//
+//  }
+//
+//  expect("bulb", ".*PWM DRIVE:  1 6000"); 
+
+}

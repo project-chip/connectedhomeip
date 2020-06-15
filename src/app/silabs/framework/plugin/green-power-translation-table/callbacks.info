@@ -1,0 +1,59 @@
+/** @brief Gpd Commissioning
+ *
+ * This function is called by the Green Power Sink Plugin to notify the
+ * application of a Green Power Gp Notification without translation(endpoint is 0xFC).
+ *
+ * @param appInfo   Ver.: always
+ */
+void emberAfGreenPowerClusterPassFrameWithoutTranslationCallback(EmberGpAddress * addr,
+                                                                 uint8_t gpdCommandId,
+                                                                 uint8_t * gpdCommandPayload)
+{
+}
+
+/** @brief Remove Gpd entries From Translation Table
+ *
+ * This function is called by the Green Power Sink Plugin to notify the
+ * application of a Green Power Device to remove translation table entries of
+ * this gpd. Return true on suceess, false on failure.
+ *
+ * @param gpdAddr   Ver.: always
+ */
+bool emberAfGreenPowerClusterGpTransTableDeleteTranslationTableEntryCallback(EmberGpAddress *gpdAddr)
+{
+  return false;
+}
+
+/** @brief Request Translation Table
+ *
+ * This function is called by the Green Power Sink Plugin to request the
+ * application of a Green Power Device to send response with the GPD Command
+ * translation table. Return true on suceess, false on failure.
+ *
+ * @param startIndex   Ver.: always
+ */
+bool emberAfGreenPowerClusterGpRequestTranslationTableCallback(uint8_t startIndex)
+{
+  return false;
+}
+
+/** @brief Update Translation Table
+ *
+ * This function is called by the Green Power Sink Plugin to request the
+ * application of a Green Power Device to add, remove or replace the requested
+ * translation table entries. Return true on suceess, false on failure.
+ *
+ * @param options      Ver.: always
+ * @param gpdSrcId     Ver.: always
+ * @param gpdIeee      Ver.: always
+ * @param gpdEndpoint  Ver.: always
+ * @param translations Ver.: always
+ */
+bool emberAfGreenPowerClusterGpUpdateTranslationTableCallback(uint16_t options,
+                                                              uint32_t gpdSrcId,
+                                                              uint8_t* gpdIeee,
+                                                              uint8_t gpdEndpoint,
+                                                              uint8_t* translations)
+{
+  return false;
+}

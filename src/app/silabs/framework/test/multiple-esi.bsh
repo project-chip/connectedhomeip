@@ -1,0 +1,128 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create three nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"esi2", "esi1", "ipd"};
+String[] socImages;
+if (shouldSkipEccTest()) {
+  socImages = new String[] {
+    "build/af-test-apps/SeEsp-simulation/SeEsp",
+    "build/af-test-apps/SeEsp-simulation/SeEsp",
+    "build/af-test-apps/SeIpd-simulation/SeIpd"
+  };
+} else {
+  socImages = new String[] {
+    "build/af-test-apps/SeEsp-simulation-REAL_ECC/SeEsp",
+    "build/af-test-apps/SeEsp-simulation-REAL_ECC/SeEsp",
+    "build/af-test-apps/SeIpd-simulation-REAL_ECC/SeIpd"
+  };
+}
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeEsp-simulation-ezsp/SeEsp",
+  "build/af-test-apps/SeEsp-simulation-ezsp/SeEsp",
+  "build/af-test-apps/SeIpd-simulation-ezsp/SeIpd",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network.  The utility methods are not used here because they
+// use sleeps that would cause us to miss the registration process.
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("esi1", ".*Registration complete", 20000);
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout * 5);
+expect("esi2", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("esi2", "Registration complete", 30000);
+send("esi2", "network pjoin 0xFF");
+networkWait(timeout * 5);
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Registration complete", 40000);
+networkWait(timeout * 5);
+
+checkBindingTable("esi1", 
+                  new String[] {
+                    "\\d+: UNICA  0    0x01  0x01  0x070[0123] 0x.... \\(>\\)" + eui64("ipd"),
+                    "\\d+: UNICA  0    0x01  0x01  0x070[0123] 0x.... \\(>\\)" + eui64("ipd"),
+                    "\\d+: UNICA  0    0x01  0x01  0x070[0123] 0x.... \\(>\\)" + eui64("ipd"),
+                    "\\d+: UNICA  0    0x01  0x01  0x070[0123] 0x.... \\(>\\)" + eui64("ipd"),
+                  });
+// For some reason there exists an actual binding on the Key Establishment cluster
+// but ONLY for host apps.  I think this is due to a bug in the stack.  
+String[] expectedBindings = new String[(runArgument.runUsingHostApps ? 5 : 4)];
+int i = 0;
+if (runArgument.runUsingHostApps) {
+  expectedBindings[i++] = "\\d+: UNICA  0    0x01  0x01  0x0800 0x.... \\(>\\)" + eui64("ipd");
+}
+expectedBindings[i++] = "\\d+: UNICA  0    0x01  0x01  0x070[0123] 0x.... \\(>\\)" + eui64("ipd");
+expectedBindings[i++] = "\\d+: UNICA  0    0x01  0x01  0x070[0123] 0x.... \\(>\\)" + eui64("ipd");
+expectedBindings[i++] = "\\d+: UNICA  0    0x01  0x01  0x070[0123] 0x.... \\(>\\)" + eui64("ipd");
+expectedBindings[i++] = "\\d+: UNICA  0    0x01  0x01  0x070[0123] 0x.... \\(>\\)" + eui64("ipd");
+checkBindingTable("esi2", expectedBindings);
+
+// Check that the nodes have address table entries for each other.
+String esi1NodeId = nodeId("esi1");
+String esi2NodeId = nodeId("esi2");
+String ipdNodeId = nodeId("ipd");
+// The NCP handles incoming partner link key requests, so the plugin on the
+// host will not get a chance to add an address table entry for the requestor.
+if (!runArgument.runUsingHostApps) {
+  send("esi2", "plugin address-table print");
+  expect("esi2", "\\d+: " + ipdNodeId + " \\(>\\)" + eui64("ipd"));
+}
+for (String esi : new String[]{"esi1", "esi2"}) {
+  String nid = nodeId(esi);
+  send("ipd",  "plugin address-table print");
+  expect("ipd", "\\d+: " + nid + " \\(>\\)" + eui64(esi));
+}
+
+// Manually add some address table entries on the trust center.  The application
+// should only have access to two entries even though the true size is larger
+// because of the address cache.
+send("esi1", "plugin address-table set 0 {" + eui64("esi2") + "} " + esi2NodeId);
+expect("esi1", ".*set address 0: 0x00");
+send("esi1", "plugin address-table set 1 {" + eui64("ipd") + "} " + ipdNodeId);
+expect("esi1", ".*set address 1: 0x00");
+send("esi1", "plugin address-table set 2 {" + eui64("esi1") + "} " + esi1NodeId);
+expect("esi1", ".*set address 2: 0x6A");
+send("esi1", "plugin address-table print");
+expect("esi1", "0: " + esi2NodeId + " \\(>\\)" + eui64("esi2"));
+expect("esi1", "1: " + ipdNodeId + " \\(>\\)" + eui64("ipd"));
+assert(network.expect("esi1", port, null, "02:.*") == null);
+
+// Send a message from the first ESI to the IPD, confirm it, and make sure the
+// confirmation comes back to first ESI.
+network.sleep(timeout * 10); assert(true);
+send("esi1", "plugin messaging-server message \"esi1\"");
+send("esi1", "plugin messaging-server id 0x01020304");
+send("esi1", "plugin messaging-server transmission normal");
+send("esi1", "plugin messaging-server importance med");
+send("esi1", "plugin messaging-server confirm req");
+send("esi1", "plugin messaging-server time 0x00000000 0x0001");
+send("esi1", "plugin messaging-server valid 0x01");
+send("esi1", "plugin messaging-server display " + nodeId("ipd") + " 0x01 0x01");
+expect("ipd", "RX: DisplayMessage 0x01020304, 0x84, 0x00000000, 0x0001, \"esi1\"");
+expect("esi1", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+send("ipd", "plugin messaging-client confirm 0x01");
+expect("esi1", "RX: MessageConfirmation 0x01020304, 0x[0-9a-fA-F]{8}");
+expect("ipd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]");
+
+// Send a message from the second ESI to the IPD, confirm it, and make sure the
+// confirmation comes back to second ESI.
+send("esi2", "plugin messaging-server message \"esi2\"");
+send("esi2", "plugin messaging-server id 0x05060708");
+send("esi2", "plugin messaging-server transmission normal");
+send("esi2", "plugin messaging-server importance med");
+send("esi2", "plugin messaging-server confirm req");
+send("esi2", "plugin messaging-server time 0x00000000 0x0001");
+send("esi2", "plugin messaging-server valid 0x01");
+send("esi2", "plugin messaging-server display " + nodeId("ipd") + " 0x01 0x01");
+expect("ipd", "RX: DisplayMessage 0x05060708, 0x84, 0x00000000, 0x0001, \"esi2\"");
+expect("esi2", ".*clus 0x0703 \\(Messaging\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+send("ipd", "plugin messaging-client confirm 0x01");
+expect("esi2", "RX: MessageConfirmation 0x05060708, 0x[0-9a-fA-F]{8}");
+expect("ipd", ".*clus 0x0703 \\(Messaging\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]", 15000);

@@ -1,0 +1,20 @@
+/** @brief Coulomb Counter Initializtion Callback
+ *
+ * Called when Coulomb Counter is initialized. Should be used to configure
+ * additional additive modes
+ *
+ * @param nbAdditiveModes           number of additive modes
+ * @param additiveModeConsumption   location to store current consumption for each mode
+ */
+void emberAfPluginCoulombCounterInitCallback(uint8_t *nbAdditiveModes, uint16_t *additiveModeConsumption)
+{
+}
+
+/** @brief Coulomb Counter Threshold Callback
+ *
+ * Called when Coulomb Counter threshold has been reached.
+ *
+ */
+void emberAfPluginCoulombCounterThresholdReachedCallback(uint32_t recordedEnergyConsumption)
+{
+}

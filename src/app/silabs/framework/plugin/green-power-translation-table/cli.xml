@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-green-power-translation-table" name="Plugin Commands: Green Power Translation Table">
+    <description>
+      The Green Power Server plugin contributes CLI commands to the application framework to be used for getting, setting, and displaying information relevant to the Green Power Server cluster.
+    </description>
+  </group>
+  <command cli="plugin green-power-server table-clear" functionName="emberAfPluginGreenPowerServerCliClearTranslationTranslationTable" group="plugin-green-power-translation-table">
+    <description>
+      Clear all entries within the translation table.
+    </description>
+  </command>
+  <command cli="plugin green-power-server table-set" functionName="emberAfPluginGreenPowerServerCliSetTranslationTable" group="plugin-green-power-translation-table">
+    <description>
+      Set  entry at index within the translation table.
+    </description>
+    <arg name="index"                      type="INT8U"       description="index to translation table" />
+    <arg name="options"                    type="INT16U"        />
+    <arg name="gpdIeeeAddr"                type="IEEE_ADDRESS" />
+    <arg name="gpdEndpoint"                type="INT8U"        />
+    <arg name="sourceId"                   type="INT32U"       />
+    <arg name="gpdCommandId"               type="INT8U"        />
+    <arg name="zbEndpoint"                 type="INT8U"       description="the endpoint for which the translation is valid." />
+    <arg name="zigbeeProfile"              type="INT16U"       />
+    <arg name="zigbeeCluster"              type="INT16U"       />
+    <arg name="zigbeeCommandId"            type="INT16U"       />
+    <arg name="payloadLength"              type="INT8U" />
+    <arg name="zclPayload"                 type="OCTET_STRING" />
+    <arg name="additionalInfoLength"       type="INT8U" />
+    <arg name="additionalInfoBlockIn"      type="OCTET_STRING" />
+  </command>
+   <command cli="plugin green-power-server table-remove-endpoint" functionName="emberAfPluginGreenPowerServerCliRemoveGpdEndpoint" group="plugin-green-power-translation-table">
+    <description>
+        remove Gpd  entry from the translation table for the specified endpoint.
+    </description>
+    <arg name="applicationId"               type="INT8U"        />
+    <arg name="sourceId"                   type="INT32U"       />
+    <arg name="gpdIeeeAddr"                type="IEEE_ADDRESS" />
+    <arg name="gpdEndpoint"                type="INT8U"        />
+    <arg name="zbEndpoint"                 type="INT8U"       description="the endpoint for which the translation is valid." />
+  </command>
+  <command cli="plugin green-power-server table-print" functionName="emberAfPluginGreenPowerServerCliTranslationTablePrint" group="plugin-green-power-translation-table">
+    <description>
+      Print all entries of the translation table.
+    </description>
+  </command>
+  <command cli="plugin green-power-server additionalInfoTable-clearAll" functionName="emberAfPluginGreenPowerServerCliClearAdditionalInfoBlockTable" group="plugin-green-power-translation-table">
+    <description>
+      Clear all entries within the additionalInfoTable.
+    </description>
+ </command>
+
+  <command cli="plugin green-power-server additionalInfoTable-setEntry" functionName="emberAfPluginGreenPowerServerCliSetAdditionalInfoBlockTableEntry" group="plugin-green-power-translation-table">
+    <description>
+      Set  entry at index within the additionalInfoTable.
+    </description>
+    <arg name="index"                      type="INT8U"       description="index to additionalInfoBlock table" />
+    <arg name="gpdCommandId"               type="INT8U"        />
+    <arg name="additionalInfoLength"       type="INT8U" />
+    <arg name="additionalInfoBlockIn"      type="OCTET_STRING" />
+  </command>
+  <command cli="plugin green-power-server additionalInfoTable-clearEntry" functionName="emberAfPluginGreenPowerServerCliClearAdditionalInfoBlockTableEntry" group="plugin-green-power-translation-table">
+    <description>
+      Clear  entry at index within the additionalInfoTable.
+    </description>
+    <arg name="index"                      type="INT8U"       description="index to additionalInfoBlock table" />
+  </command>
+
+  <command cli="plugin green-power-server additionalInfoTable-print" functionName="emberAfPluginGreenPowerServerCliAdditionalInfoBlockTablePrint" group="plugin-green-power-translation-table">
+    <description>
+      Print all entries of the additionalInfoTable.
+    </description>
+  </command>
+
+  <command cli="plugin green-power-server customizedTable-clearAll" functionName="emberAfPluginGreenPowerServerCliClearCustomizedTable" group="plugin-green-power-translation-table">
+    <description>
+      Clear all entries within the customizedTable.
+    </description>
+ </command>
+
+  <command cli="plugin green-power-server customizedTable-setEntry" functionName="emberAfPluginGreenPowerServerCliSetCustomizedTableEntry" group="plugin-green-power-translation-table">
+    <description>
+      Set  entry at index within the customizedTable.
+    </description>
+    <arg name="index"                      type="INT8U"       description="index to customized table" />
+    <arg name="gpdCommandId"               type="INT8U"        />
+    <arg name="zbEndpoint"                 type="INT8U"       description="the endpoint for which the translation is valid." />
+    <arg name="zigbeeProfile"              type="INT16U"       />
+    <arg name="zigbeeCluster"              type="INT16U"       />
+    <arg name="ServerOrClient"             type="INT8U"       />
+    <arg name="zigbeeCommandId"            type="INT16U"       />
+    <arg name="payloadLength"              type="INT8U"        />
+    <arg name="zclPayloadsrc"              type="INT8U"        />
+    <arg name="zclPayload"                 type="OCTET_STRING" />
+  </command>
+  <command cli="plugin green-power-server customizedTable-clearEntry" functionName="emberAfPluginGreenPowerServerCliClearCustomizedTableEntry" group="plugin-green-power-translation-table">
+    <description>
+      Clear  entry at index within the customizedTable.
+    </description>
+    <arg name="index"                      type="INT8U"       description="index to customized table" />
+  </command>
+  <command cli="plugin green-power-server customizedTable-print" functionName="emberAfPluginGreenPowerServerCliCustomizedTablePrint" group="plugin-green-power-translation-table">
+    <description>
+      Print all entries of the customizedTable.
+    </description>
+  </command>
+</cli>

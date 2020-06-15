@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ezmode-commissioning" name="Plugin Commands: EZ-Mode Commissioning">
+    <description>
+      The EZ-Mode Commissioning plugin contributes several commands to the application framework's CLI.
+    </description>
+  </group>
+  <command cli="plugin ezmode-commissioning client" functionName="emberAfPluginEzModeCommissioningClientCommand" group="plugin-ezmode-commissioning">
+    <description>
+      Start EZ-Mode client commissioning.
+    </description>
+    <arg name="endpoint"   type="INT8U"               description="The local endpoint." />
+    <arg name="direction"  type="INT8U"               description="::EMBER_AF_EZMODE_COMMISSIONING_SERVER_TO_CLIENT or ::EMBER_AF_EZMODE_COMMISSIONING_CLIENT_TO_SERVER." />
+    <arg name="clusterIds" type="INT16U" array="true" description="A list of cluster ids." />
+  </command>
+  <command cli="plugin ezmode-commissioning server" functionName="emberAfPluginEzModeCommissioningServerCommand" group="plugin-ezmode-commissioning">
+    <description>
+      Start EZ-Mode server commissioning.
+    </description>
+    <arg name="endpoint"      type="INT8U"  description="The local endpoint." />
+    <arg name="identifyTimeS" type="INT16U" description="The identify time in seconds." />
+  </command>
+</cli>

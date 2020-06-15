@@ -1,0 +1,272 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"gateway", "light", "lock"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaDoorLock-simulation/HaDoorLock"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation-ezsp/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaDoorLock-simulation-ezsp/HaDoorLock",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+lazyExpect = true;
+
+expect("gateway", "network find unused", "EMBER_NETWORK_UP", 5000);
+permitJoin("gateway", true);
+expect("light", "network find joinable", "EMBER_NETWORK_UP");
+permitJoin("light", true);
+networkWait(1000); //Delay to workaround collision
+expect("lock", "network find joinable", "EMBER_NETWORK_UP");
+permitJoin("light", false);
+permitJoin("gateway", false);
+
+// Wake up the door lock so the CLI works and grab its node id.
+buttonPress("lock", 0);
+buttonRelease("lock", 0);
+String lockNodeId = nodeId("lock");
+
+// EMAPPFWKV2-694: The long and short poll attributes from the cluster should
+// override the long and short poll intervals in the End Device Support plugin.
+// 0x0000014 and 0x0002 are the default attribute values and should appear in
+// End Device Support plugin status output.
+expect("lock", "read 1 0x0020 0x0001 1", "14 00 00 00");
+expect("lock", "read 1 0x0020 0x0002 1", "02 00");
+expectMultiline("lock",
+                "plugin end-device-support status",
+                new String[] {
+                  "Long Poll Interval \\(qs\\):      20",
+                  "Short Poll Interval \\(qs\\):     2",
+                });
+
+// EMAPPFWKV2-847: The plugin should enforce the following constraints:
+//   ShortPollInterval <= LongPollInterval <= CheckInInterval
+//   CheckInIntervalMin <= CheckInInterval
+//   LongPollIntervalMin <= LongPollInterval
+//   FastPollTimeout <= FastPollTimeoutMax
+
+// Set CheckInIntervalMin, LongPollIntervalMin, and FastPollTimeoutMax to the
+// extreme limits to keep them out of the way for now.
+expect("lock", "write 1 0x0020 0x0004 1 0x23 {00}", "Success: write");
+expect("lock", "write 1 0x0020 0x0005 1 0x23 {00}", "Success: write");
+expect("lock", "write 1 0x0020 0x0006 1 0x21 {FF FF}", "Success: write");
+
+// Set CheckInInterval and check that LongPollInterval <= CheckInInterval.
+expect("lock", "write 1 0x0020 0x0000 1 0x23 {13}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0000 1 0x23 {14}", "Success: write");
+expect("lock", "write 1 0x0020 0x0000 1 0x23 {40 38}", "Success: write");
+
+// Set LongPollInterval and check that LongPollInterval <= CheckInInterval.
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {41 38}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {40 38}", "Success: write");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      14400");
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {14}", "Success: write");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      20");
+send("gateway", "zcl poll-control long 0x00003841");
+send("gateway", "send " + lockNodeId + " 1 1");
+expectMultiline("lock",
+                new String[] {
+                  "RX: SetLongPollInterval 0x00003841",
+                  "ERR: writing long poll interval 0x87",
+                }, 10000);
+send("gateway", "zcl poll-control long 0x00003840");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: SetLongPollInterval 0x00003840");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      14400");
+send("gateway", "zcl poll-control long 0x00000014");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: SetLongPollInterval 0x00000014");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      20");
+
+// Set LongPollInterval and check that ShortPollInterval <= LongPollInterval.
+// Bumping ShortPollInterval in order to test above condition
+expect("lock", "write 1 0x0020 0x0002 1 0x21 {05}", "Success: write");
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {04}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {06}", "Success: write");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      6");
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {14}", "Success: write");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      20");
+send("gateway", "zcl poll-control long 0x00000004");
+send("gateway", "send " + lockNodeId + " 1 1");
+expectMultiline("lock",
+                new String[] {
+                  "RX: SetLongPollInterval 0x00000004",
+                  "ERR: writing long poll interval 0x87",
+                });
+send("gateway", "zcl poll-control long 0x00000006");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: SetLongPollInterval 0x00000006");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      6");
+send("gateway", "zcl poll-control long 0x00000014");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: SetLongPollInterval 0x00000014");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      20");
+
+// Set ShortPollInterval and check that ShortPollInterval <= LongPollInterval.
+expect("lock", "write 1 0x0020 0x0002 1 0x21 {15}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0002 1 0x21 {14}", "Success: write");
+expect("lock", "plugin end-device-support status", "Short Poll Interval \\(qs\\):     20");
+expect("lock", "write 1 0x0020 0x0002 1 0x21 {02}", "Success: write");
+expect("lock", "plugin end-device-support status", "Short Poll Interval \\(qs\\):     2");
+send("gateway", "zcl poll-control short 0x0015");
+send("gateway", "send " + lockNodeId + " 1 1");
+expectMultiline("lock",
+                new String[] {
+                  "RX: SetShortPollInterval 0x0015",
+                  "ERR: writing short poll interval 0x87",
+                });
+send("gateway", "zcl poll-control short 0x0014");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: SetShortPollInterval 0x0014");
+expect("lock", "plugin end-device-support status", "Short Poll Interval \\(qs\\):     20");
+send("gateway", "zcl poll-control short 0x0002");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: SetShortPollInterval 0x0002", 10000);
+expect("lock", "plugin end-device-support status", "Short Poll Interval \\(qs\\):     2");
+
+// Set CheckInIntervalMin and check that CheckInIntervalMin <= CheckInInterval.
+expect("lock", "write 1 0x0020 0x0004 1 0x23 {41 38}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0004 1 0x23 {40 38}", "Success: write");
+
+// Set CheckInInterval and check that CheckInIntervalMin <= CheckInInterval.
+expect("lock", "write 1 0x0020 0x0000 1 0x23 {3F 38}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0000 1 0x23 {40 38}", "Success: write");
+send("gateway", "zcl global write 0x0020 0x0000 0x23 {3F 38 00 00}");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "WRITE: clus 0020 attr 0000 FAIL 87");
+send("gateway", "zcl global write 0x0020 0x0000 0x23 {40 38 00 00}");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "WRITE: clus 0020 attr 0000 OK");
+expect("lock", "write 1 0x0020 0x0004 1 0x23 {00}", "Success: write");
+
+// Set LongPollIntervalMin and check that LongPollIntervalMin <= LongPollInterval.
+expect("lock", "write 1 0x0020 0x0005 1 0x23 {15}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0005 1 0x23 {14}", "Success: write");
+
+// Set LongPollInterval and check that LongPollIntervalMin <= LongPollInterval.
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {13}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {14}", "Success: write");
+expect("lock", "plugin end-device-support status", "Long Poll Interval \\(qs\\):      20");
+
+// Set FastPollTimeoutMax and check that FastPollTimeout <= FastPollTimeoutMax.
+expect("lock", "write 1 0x0020 0x0006 1 0x21 {27}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0006 1 0x21 {28}", "Success: write");
+
+// Set FastPollTimeout and check that FastPollTimeout <= FastPollTimeoutMax.
+expect("lock", "write 1 0x0020 0x0003 1 0x21 {29}", "Error: write: 0x87");
+expect("lock", "write 1 0x0020 0x0003 1 0x21 {28}", "Success: write");
+send("gateway", "zcl global write 0x0020 0x0003 0x21 {29 00}");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "WRITE: clus 0020 attr 0003 FAIL 87");
+send("gateway", "zcl global write 0x0020 0x0003 0x21 {28 00}");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "WRITE: clus 0020 attr 0003 OK");
+expect("lock", "read 1 0x0020 0x0003 1", "28 00");
+
+// TODO: Check that the FastPollTimeout field of the CheckInResponse command is
+// validated.
+
+// The lock should be long polling (i.e. hibernating) in the steady state.
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_LONG_POLL");
+
+// Change the check-in interval to something reasonable (30 seconds) and create
+// bindings so the lock has someone to talk to, but tell the gateway and light
+// ignore the requests for now.
+expect("lock", "write 1 0x0020 0x0000 1 0x23 {78}", "Success: write");
+expect("gateway", "plugin poll-control-client respond 0", "respond 0x00");
+expect("light", "plugin poll-control-client respond 0", "respond 0x00");
+expect("lock", "option binding-table set 0 0x0020 0x01 0x01 {" + eui64("gateway") + "}", "set bind 0: 0x00");
+expect("lock", "option binding-table set 1 0x0020 0x01 0x06 {" + eui64("light") + "}", "set bind 1: 0x00");
+
+// The lock will temporarily short poll (i.e., nap) while waiting for the
+// responses (which will never arrive).  After the timeout (8 seconds), the
+// lock will long poll (i.e., hibernate) again.
+assert(network.expect(new String[] {"gateway", "light"}, port, "RX: CheckIn", 60000, false, true).length == 0);
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_SHORT_POLL");
+sleep("gateway", 2, 100);
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_SHORT_POLL");
+sleep("gateway", 6, 100);
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_LONG_POLL");
+
+// Set up the gateway and light to respond.
+expect("gateway", "plugin poll-control-client respond 1", "respond 0x01");
+expect("light", "plugin poll-control-client respond 1", "respond 0x01");
+
+// The lock will stop short polling after both responses are received.
+expectMultiline("lock",
+                new String[] {
+                  "RX: CheckInResponse 0x00, 0x[0-9a-fA-F]{4}",
+                  "RX: CheckInResponse 0x00, 0x[0-9a-fA-F]{4}",
+                },
+                60000);
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_LONG_POLL");
+
+// Set up the gateway and light to request the lock to fast poll.
+expect("gateway", "plugin poll-control-client mode 1", "mode 0x01");
+expect("gateway", "plugin poll-control-client timeout 40", "timeout 0x0028");
+expect("light", "plugin poll-control-client mode 1", "mode 0x01");
+expect("light", "plugin poll-control-client timeout 20", "timeout 0x0014");
+
+// The lock will continue short polling after receiving the responses.
+expectMultiline("lock",
+                new String[] {
+                  "RX: CheckInResponse 0x01, 0x00(14|28)",
+                  "RX: CheckInResponse 0x01, 0x00(14|28)",
+                },
+                60000);
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_SHORT_POLL");
+
+// Wait two seconds and then have the gateway tell the lock that it is okay to
+// stop fast polling.  The light is not finished and its duration has not
+// expired, so fast polling continues, but for a shorter amount of time.
+sleep("gateway", 2, 100);
+send("gateway", "zcl poll-control stop");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: FastPollStop");
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_SHORT_POLL");
+sleep("gateway", 2, 100);
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_LONG_POLL");
+
+// Now wait seven seconds after the CheckInResponses and have the gateway tell
+// the lock to stop fast poll.  The light has finished because its duration has
+// expired, so fast polling should stop right away.
+expectMultiline("lock",
+                new String[] {
+                  "RX: CheckInResponse 0x01, 0x00(14|28)",
+                  "RX: CheckInResponse 0x01, 0x00(14|28)",
+                },
+                60000);
+sleep("gateway", 7, 100);
+send("gateway", "zcl poll-control stop");
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: FastPollStop");
+expect("lock", "plugin end-device-support status", "Current Poll Control          EMBER_AF_LONG_POLL");
+
+// Bug EMAPPFWKV2-882: Set the check-in interval to zero and make sure the lock
+// stops checking in.
+expect("lock", "write 1 0x0020 0x0000 1 0x23 {00}", "Success: write");
+assert(network.expect(new String[] {"gateway", "light"}, port, "RX: CheckIn", 60000, false, true).length == 2);
+
+// EMAPPFWKV2-1437: reset poll control state on RTFD.
+expect("lock", "write 1 0x0020 0x0000 1 0x21 {16}", "Success: write"); // CHECK_IN_INTERVAL
+expect("lock", "write 1 0x0020 0x0002 1 0x21 {03}", "Success: write"); // SHORT_POLL_INTERVAL
+expect("lock", "write 1 0x0020 0x0001 1 0x23 {15}", "Success: write"); // LONG_POLL_INTERVAL
+send("gateway", "raw 0 {01 00 00}"); // ResetToFactoryDefault command
+send("gateway", "send " + lockNodeId + " 1 1");
+expect("lock", "RX: ResetToFactoryDefaultsCallback", DEFAULT_TIMEOUT << 2);
+expectMultiline("lock",
+                "plugin end-device-support status",
+                new String[] {
+                  "Long Poll Interval.*20",
+                  "Short Poll Interval.*2",
+                });

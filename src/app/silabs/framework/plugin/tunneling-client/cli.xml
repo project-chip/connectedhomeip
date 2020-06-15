@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-tunneling-client" name="Plugin Commands: Tunneling Client">
+    <description>
+      The Tunneling Client Plugin contributes several commands to the application framework's CLI. These commands may be used to create messages related to opening and closing a tunnel between two devices.
+    </description>
+  </group>
+  <command cli="plugin tunneling-client request" functionName="emAfPluginTunnelingClientCliRequest" group="plugin-tunneling-client">
+    <description>
+      Request a Tunneling cluster tunnel with a server.
+    </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+    <arg name="protocolId"         type="INT8U"   description="The protocol id of the requested tunnel." />
+    <arg name="manufacturerCode"   type="INT16U"  description="The manufacturer code of the requested tunnel." />
+    <arg name="flowControlSupport" type="BOOLEAN" description="1 if flow control support is requested or 0 if not." />
+  </command>
+  <command cli="plugin tunneling-client transfer" functionName="emAfPluginTunnelingClientCliTransfer" group="plugin-tunneling-client">
+    <description>
+      Transfer data to a server through a Tunneling cluster tunnel.
+    </description>
+    <arg name="tunnelIndex" type="INT8U" description="The index of the tunnel through which to send the data." />
+    <arg name="data"        type="OCTET_STRING" description="The data to send through the tunnel." />
+  </command>
+  <command cli="plugin tunneling-client close" functionName="emAfPluginTunnelingClientCliClose" group="plugin-tunneling-client">
+    <description>
+      Close a Tunneling cluster tunnel.
+    </description>
+    <arg name="tunnelIndex" type="INT8U" description="The index of the tunnel to close." />
+  </command>
+  <command cli="plugin tunneling-client print" functionName="emAfPluginTunnelingClientCliPrint" group="plugin-tunneling-client">
+    <description>
+      Print out the status of active tunnels.
+    </description>
+  </command>
+</cli>

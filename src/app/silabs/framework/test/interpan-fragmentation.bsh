@@ -1,0 +1,67 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// There is no need to perform key-establishment, so ECC is not needed
+SimulatedNetwork network = createNetwork();
+String[] devices   = new String[]{"node1", "node2"};
+String[] socImages = new String[] {
+    "build/af-test-apps/Se12CommsHub-simulation/Se12CommsHub",
+    "build/af-test-apps/Se12CommsHub-simulation/Se12CommsHub",
+};
+String[] hostImages = new String[] {
+    "build/af-test-apps/Se12CommsHub-simulation-ezsp/Se12CommsHub",
+    "build/af-test-apps/Se12CommsHub-simulation-ezsp/Se12CommsHub",
+};
+String   ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+String channel = "26";
+String power   = "3";
+String panId1  = "0x0001";
+String panId2  = "0x0002";
+
+// Form two separate networks (no src/dst PAN ID 0xFFFF in inter-PAN msgs)
+expect("node1",
+       "network form " + channel + " " + power + " " + panId1,
+       ".*EMBER_NETWORK_UP.*");
+expect("node2",
+       "network form " + channel + " " + power + " " + panId2,
+       ".*EMBER_NETWORK_UP.*");
+
+network.sleep(1000);
+
+String euiNode1 = eui64("node1");
+String euiNode2 = eui64("node2");
+
+// Send a randomized inter-PAN message to be split up over fragments
+String clusterId = "0x0025";
+String messageLen = "200";    // If you change this value, update the # of expect "Receiving inter-PAN fragment .." statements below
+String output = expect("node1",
+                       "plugin interpan fragment-test " + panId2 + " {" + euiNode2 + "} " + clusterId + " " + messageLen,
+                       ".*], 0x00",
+                       6000,
+                       true);
+
+// Extract the payload sent
+int startPayloadIndex, endPayloadIndex;
+assert((startPayloadIndex = output.indexOf("[")) != -1);
+assert((endPayloadIndex = output.indexOf("]")) != -1);
+
+String payloadTx = output.substring(startPayloadIndex+1, endPayloadIndex-1);
+
+// Make sure all fragments received
+// NOTE: on host, node2 can receive a fragment before the big TX statement
+// on node1 is printed out (after 'plugin interpan fragment-test' is executed).
+// To account for this, we omit the first fragment received expect
+expect("node2", "Receiving inter-PAN fragment [0-9]{1} of [0-9]{1}", 2000);
+expect("node2", "Receiving inter-PAN fragment [0-9]{1} of [0-9]{1}", 2000);
+
+// Make sure the payload received equals the payload sent
+output = expect("node2",
+                null,
+                ".*" + payloadTx + ".*",//".*], 0x00",
+                6000,
+                true);

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-temperature-measurement-server" name="Plugin Commands: Temperature Measurement Server commands">
+    <description>
+      Example sensor code for reading the temperature sensor.  Currently reads it from the EM357 dev kit board.
+    </description>
+  </group>
+  <command cli="plugin temperature-measurement-server read" functionName="emAfTemperatureMeasurementServerReadCommand" group="plugin-temperature-measurement-server">
+    <description>
+	Read the temperature sensor.
+    </description>
+   </command>
+</cli>

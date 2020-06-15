@@ -1,0 +1,76 @@
+/** @brief Send
+ *
+ * This callback is called by the Comms Hub Function (CHF) plugin to report the
+ * status of a message that was previously sent.
+ *
+ * @param status The status of the message that was sent Ver.: always
+ * @param destinationDeviceId The EUI64 of the destination device to which the
+ * data was sent Ver.: always
+ * @param dataLen The length in octets of the data that was sent Ver.: always
+ * @param data Buffer containing the raw octets of the data that was sent
+ * Ver.: always
+ */
+void emberAfPluginCommsHubFunctionSendCallback(uint8_t status,
+                                               EmberEUI64 destinationDeviceId,
+                                               uint16_t dataLen,
+                                               uint8_t *data)
+{
+  emberAfAppPrint("GBCS emberAfPluginCommsHubFunctionSendCallback: status=0x%x, destinationDeviceId=", status);
+  emberAfAppDebugExec(emberAfPrintBigEndianEui64(destinationDeviceId));
+  emberAfAppPrintln(" dataLen=0x%2x", dataLen);
+}
+
+/** @brief Received
+ *
+ * This callback is called by the Comms Hub Function (CHF) plugin whenever a
+ * message is received.
+ *
+ * @param senderDeviceId The EUI64 of the sending device Ver.: always
+ * @param dataLen The length in octets of the data Ver.: always
+ * @param data Buffer containing the raw octets of the data Ver.: always
+ */
+void emberAfPluginCommsHubFunctionReceivedCallback(EmberEUI64 senderDeviceId,
+                                                   uint16_t dataLen,
+                                                   uint8_t *data)
+{
+  emberAfAppPrint("GBCS emberAfPluginCommsHubFunctionDataReceivedCallback: senderDeviceId=");
+  emberAfAppDebugExec(emberAfPrintBigEndianEui64(senderDeviceId));
+  emberAfAppPrint(", dataLen=0x%2x, data=0x", dataLen);
+  emberAfAppPrintBuffer(data, dataLen, false);
+  emberAfAppPrintln("");
+}
+
+/** @brief Alert WAN
+ *
+ * Notify the application of an Alert that should be sent to the WAN. The
+ * second argument is a pointer to the gbz alert buffer. The application is
+ * responsible for freeing this buffer.
+ *
+ * @param alertCode The 16 bit allert code as defined by GBCS Ver.: always
+ * @param gbzAlert Buffer continaing the GBZ formatted Alert Ver.: always
+ * @param gbzAlertLength The length in octets of the GBZ formatted Alert
+ * Ver.: always
+ */
+void emberAfPluginCommsHubFunctionAlertWANCallback(uint16_t alertCode,
+                                                   uint8_t *gbzAlert,
+                                                   uint16_t gbzAlertLength)
+{
+  emberAfAppPrintln("GBCS emberAfPluginCommsHubFunctionAlertWANCallback: alertCode=0x%2x, gbzAlertLength=0x%2x", alertCode, gbzAlertLength);
+  free(gbzAlert);
+  gbzAlert = NULL;
+}
+
+/** @brief Tunnel Opened
+ *
+ * This function is called by the Comms Hub Function (CHF) plugin when a tunnel
+ * is opened.
+ *
+ * @param remoteDeviceId The EUI64 of the remote device for which a tunnel is
+ * opened Ver.: always
+ */
+void emberAfPluginCommsHubFunctionTunnelOpenedCallback(EmberEUI64 remoteDeviceId)
+{
+  emberAfAppPrint("GBCS emberAfPluginCommsHubFunctionTunnelOpenedCallback: remoteDeviceId=");
+  emberAfAppDebugExec(emberAfPrintBigEndianEui64(remoteDeviceId));
+  emberAfAppPrintln("");
+}

@@ -1,0 +1,11 @@
+/** @brief Client Complete
+ *
+ * This function is called by the EZ-Mode Commissioning plugin when client
+ * commissioning completes.
+ *
+ * @param bindingIndex The binding index that was created or
+ * ::EMBER_NULL_BINDING if an error occurred. Ver.: always
+ */
+void emberAfPluginEzmodeCommissioningClientCompleteCallback(uint8_t bindingIndex)
+{
+}

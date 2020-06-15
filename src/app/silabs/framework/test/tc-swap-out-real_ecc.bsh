@@ -1,0 +1,148 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+
+if (runArgument.runUsingHostApps) {
+  System.out.print("****TODO: FIX for host ****");
+  return;
+}
+
+// NOTE:  We do NOT use the normal se-full-th target.  We use a slightly modified target
+// that will not automatically call emberNetworkInit() on reboot.
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "tc", "node", "tc2" };
+String[] oldNetworkDevices = { "tc", "node" };
+String[] newNetworkDevices = { "tc2", "node" };
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+};
+
+String [] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi-real_ecc/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+expectMultipleHosts(allDevices,
+                    "option print-rx-msgs disable",
+                    "disabled print");
+
+formAndJoinDevices(oldNetworkDevices);
+// the rest of this test path works properly, I wonder why this line does not
+// show up
+/*
+expect("tc",
+       "",
+       ".*Key Establish Success.*",
+       40000);
+*/
+// A little extra sleep to let registration (bindings and such) finish.
+network.sleep(5000);
+
+String nodeId = nodeId("node");
+
+// Print out the keys in case we want to use them to decrypt the ISD trace.
+send("tc", "keys print");
+network.sleep(1000);
+
+send("tc", "info");
+network.sleep(2000);
+
+// The Trust Center goes away (temporarily)
+reboot("tc");
+
+// TC keepalive is every 1 minute and waits for 3 sequential failures.  So after
+// 3 minutes (plus some fudge factor) the device should try to rejoin.
+
+// Check for a single keepalive failure
+expect("node",
+       "plugin test-harness tc-keepalive send",
+       ".*ERR: Trust center did not acknowledge previous keep-alive signal.*",
+       6000);
+
+// Device should attempt a rejoin after 3 failures.  This will cause the stack
+// to go down and then after the rejoin fails, to come back up (because it is a router).
+//this line does not get printed out with current debug mode
+/*expect("node",
+       "",
+       (2 * 60 * 1000) + 15000,
+       ".*Initiating trust center search.*");
+*/
+networkWait(100000);
+// Registration will kick off again but fail.  Allow it time to complete.
+network.sleep(10000);
+
+// TC comes back online.  Node should get a successful keepalive.
+expect("tc", "network init", ".*Network Init returned: 0x00.*");
+
+send("tc", "keys print");
+network.sleep(1000);
+/*
+expect("node",
+       "",
+       "Trust center acknowledged keep-alive signal",
+        180000);//(3 * 60 * 1000), 
+*/
+
+network.sleep(1000);
+
+expectNoResponse("tc",
+                 "plugin trust-center-backup clear-import");
+TrustCenterBackup backup = exportTrustCenterBackupData("tc");
+
+send("node", "keys print");
+network.sleep(1000);
+
+reboot("tc");
+
+importTrustCenterBackup("tc2",
+                        backup);
+
+expect("tc2", "keys print",".*entries used.*");
+
+for(i=2;i<=3;i++) {
+// The timeout here should be larger than
+// KEEPALIVE_DEFAULT_BASE_PERIOD_MINUTES + KEEPALIVE_DEFAULT_JITTER_PERIOD_SECONDS
+// (2 minutes + 60 seconds) = 180 seconds
+expect("node",
+       "",
+       ".*ERR: Trust center did not acknowledge previous keep-alive signal.*timeout " + i +".*",
+       200000);
+}
+
+// Device should attempt a rejoin after 3 failures.  This will cause the stack
+// to go down and then after the rejoin fails, to come back up (because it is a router).
+expect("node",
+       "",
+       "Initiating trust center search",
+       200000);
+
+expect("node",
+       "",
+       "Trust Center EUI has changed.",
+       5000);
+
+expect("node",
+       "",
+       "Initiator: Key Establish Success: Link key verified .*",
+       20000);
+
+network.sleep(7000);

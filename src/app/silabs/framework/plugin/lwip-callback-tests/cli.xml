@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<cli>
+	<group id="plugin-lwip-callback-tests" name="Plugin Commands: lwip-callback-tests">
+    <description>
+      Callback tests.
+    </description>
+  </group>
+  <command cli="plugin lwip-callback-tests reset" functionName="emberAfPluginLwipCallbackTestsReset" group="plugin-lwip-callback-tests"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description
+      >Erases current callback registrations</description>
+  </command>
+  <command cli="plugin lwip-callback-tests callback1" functionName="emberAfPluginLwipCallbackTestsCB1" group="plugin-lwip-callback-tests"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>Add  mock callback</description>
+   </command>
+    <command cli="plugin lwip-callback-tests callback2" functionName="emberAfPluginLwipCallbackTestsCB2" group="plugin-lwip-callback-tests"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>Add mock callback</description>
+   </command>
+    <command cli="plugin lwip-callback-tests callback3" functionName="emberAfPluginLwipCallbackTestsCB3" group="plugin-lwip-callback-tests"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>Add mock callback</description>
+   </command>
+    <command cli="plugin lwip-callback-tests callback4" functionName="emberAfPluginLwipCallbackTestsCB4" group="plugin-lwip-callback-tests"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>Add mock callback</description>
+   </command>
+    <command cli="plugin lwip-callback-tests badID" functionName="emberAfPluginLwipCallbackTestsbad" group="plugin-lwip-callback-tests"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>A series of invalid callback registrations.</description>
+   </command>
+</cli>

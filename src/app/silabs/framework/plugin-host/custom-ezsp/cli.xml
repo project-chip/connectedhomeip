@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-custom-ezsp" name="Plugin Commands:  Custom Ezsp">
+     <description>This plugin provides a set of CLI commands for sending custom EZSP c</description>
+  </group>
+  <command cli="plugin custom-ezsp set_mode" functionName="emberAfPluginCustomEzspSetPowerModeCommand" group="plugin-custom-ezsp">
+    <description>
+      Modify the entry in the clients load control event table to opt in for a scheduled load control event.
+    </description>
+    <arg name="mode" type="INT8U" description = "The power mode." />
+  </command>
+  <command cli="plugin custom-ezsp get_mode" functionName="emberAfPluginCustomEzspGetPowerModeCommand" group="plugin-custom-ezsp">
+    <description>
+      Print the XNCP's current power mode.
+    </description>
+  </command>
+  <command cli="plugin custom-ezsp add_cluster" functionName="emberAfPluginCustomEzspAddClusterToFilteringListCommand" group="plugin-custom-ezsp">
+    <description>
+      Add a cluster to the list that will be filtered by the XNCP.
+    </description>
+    <arg name="clusterId" type="INT16U" description="The cluster id." />
+  </command>
+  <command cli="plugin custom-ezsp rem_cluster" functionName="emberAfPluginCustomEzspRemoveClusterToFilteringListCommand" group="plugin-custom-ezsp">
+    <description>
+      Remove a cluster from the list that is be filtered by the XNCP.
+    </description>
+    <arg name="clusterId" type="INT16U" description="The cluster id." />
+  </command>
+  <command cli="plugin custom-ezsp print_list" functionName="emberAfPluginCustomEzspPrintClusterFilteringListCommand" group="plugin-custom-ezsp">
+    <description>
+      Print the list of clusters filtered by the XNCP.
+    </description>
+  </command>
+  <command cli="plugin custom-ezsp reports_on" functionName="emberAfPluginCustomEzspEnableReportsCommand" group="plugin-custom-ezsp">
+    <description>
+    </description>
+    <arg name="time" type="INT16U" description="The time." />
+  </command>
+  <command cli="plugin custom-ezsp reports_off" functionName="emberAfPluginCustomEzspDisableReportsCommand" group="plugin-custom-ezsp">
+    <description>
+    </description>
+  </command>
+  <command cli="plugin custom-ezsp set_token" functionName="emberAfPluginCustomEzspSetCustomTokenCommand" group="plugin-custom-ezsp">
+    <description>
+    </description>
+    <arg name="nodeType" type="INT8U" description="The node type." />
+    <arg name="nodeId" type="INT16U" description="The node id." />
+    <arg name="panId" type="INT16U" description="The pan id." />
+  </command>
+  <command cli="plugin custom-ezsp get_token" functionName="emberAfPluginCustomEzspGetCustomTokenCommand" group="plugin-custom-ezsp">
+    <description>
+    </description>
+  </command>
+  <command cli="plugin custom-ezsp get_info" functionName="emberAfPluginCustomEzspGetXNcpInfoCommand" group="plugin-custom-ezsp">
+    <description>
+      Print the current info about the XNCP.
+    </description>
+  </command>
+</cli>

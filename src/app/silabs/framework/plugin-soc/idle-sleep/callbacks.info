@@ -1,0 +1,72 @@
+/** @brief Ok To Sleep
+ *
+ * This function is called by the Idle/Sleep plugin before sleeping. It is
+ * called with interrupts disabled. The application should return true if the
+ * device may sleep or false otherwise.
+ *
+ * @param durationMs The maximum duration in milliseconds that the device will
+ * sleep. Ver.: always
+ */
+bool emberAfPluginIdleSleepOkToSleepCallback(uint32_t durationMs)
+{
+  return true;
+}
+
+/** @brief Wake Up
+ *
+ * This function is called by the Idle/Sleep plugin after sleeping.
+ *
+ * @param durationMs The duration in milliseconds that the device slept.
+ * Ver.: always
+ */
+void emberAfPluginIdleSleepWakeUpCallback(uint32_t durationMs)
+{
+}
+
+/** @brief Ok To Idle
+ *
+ * This function is called by the Idle/Sleep plugin before idling. It is called
+ * with interrupts disabled. The application should return true if the device
+ * may idle or false otherwise.
+ *
+ */
+bool emberAfPluginIdleSleepOkToIdleCallback(void)
+{
+  return true;
+}
+
+/** @brief Active
+ *
+ * This function is called by the Idle/Sleep plugin after idling.
+ *
+ */
+void emberAfPluginIdleSleepActiveCallback(void)
+{
+}
+
+/** @brief RTOS idle/sleep
+ *
+ * This function is called by the Idle/Sleep plugin before idling or sleeping.
+ * If it returns true, the RTOS is handling the MCU idling/sleeping, if it
+ * returns false the idle/sleep shall manage the actual MCU idling/sleeping.
+ *
+ * @param durationMs   A pointer to the allowed idle/sleep duration in
+ * milliseconds. Ver.: always
+ *
+ * @param sleepOk  A boolean indicating whether sleep is allowed.
+ */
+bool emberAfPluginIdleSleepRtosCallback(uint32_t *durationMs, bool sleepOk)
+{
+  return false;
+}
+
+/** @brief Active
+ *
+ * This function is called by the Idle/Sleep plugin before em4 reset,
+ * and it is implemented by EM4 plugin.
+ *
+ */
+bool emberAfPluginIdleSleepPreEm4ResetCallback(uint32_t* sleepDurationMs)
+{
+  return false;//prepration for em4 reset was not successful
+}

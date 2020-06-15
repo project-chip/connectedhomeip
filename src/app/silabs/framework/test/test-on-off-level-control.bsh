@@ -1,0 +1,158 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "router", "switch"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaSwitch-simulation/HaSwitch",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaSwitch-simulation-ezsp/HaSwitch",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+lazyExpect = true;
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Set the ExecuteIfOff bit in the Options attribute so that we continue to run
+// with the normal behavior that this test originally tested.
+expect("light", "write 6 0x0008 0x000F 1 0x18 {01}", "Success: write");
+
+// Set up level control attributes:
+//   On/Off Transition Time = 5 ds = 0.5 seconds
+//   On Level = BE
+expect("light", "write 6 0x0008 0x0010 1 0x21 {05 00}", "Success: write");
+expect("light", "write 6 0x0008 0x0011 1 0x20 {BE}", "Success: write");
+
+// Turn the light on.
+send("switch", "zcl on-off on");
+send("switch", "send 0 1 6");
+
+// Make sure the switch only gets one default response - EMAPPFWKV2-1289.
+expect("switch",  "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]");
+nexpect("switch", "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]");
+
+// Make sure the attribute flipped.
+expect("light", "read 6 0x0006 0x0000 1", "01");
+
+// Sleep for the on/off transition time
+networkWait(1000);
+
+// Ensure the on-level has been reached
+expect("light", "read 6 0x0008 0x0000 1", "BE", 100000);
+
+// Set the level
+send("light", "write 6 0x0008 0x0000 1 0x20 {AE}");
+
+// Turn the light off.
+send("switch", "zcl on-off off");
+send("switch", "send 0 1 6");
+
+// Make sure the switch only gets one default response - EMAPPFWKV2-1289.
+expect("switch",  "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[00 00 \\]");
+nexpect("switch", "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[00 00 \\]");
+
+// Make sure the attribute flipped.
+expect("light", "read 6 0x0006 0x0000 1", "00");
+
+// Sleep for the on/off transition time
+networkWait(1000);
+
+// The ZCL spec (07-5123-04) says in table 3.46 that when we turn the light
+// off, we should:
+//   1. Store the CurrentLevel in storedLevel.
+//   2. Move CurrentLevel to the minimum level allowed for the device over
+//      OnOffTransitionTime.
+//   3. If the OnLevel is not defined, set the CurrentLevel to the storedLevel
+//      in step 1.
+// Since the OnLevel has been defined (to BE), then we should have
+// moved to the minimum level allowed for the device.
+expect("light", "read 6 0x0008 0x0000 1", "00");
+
+// Toggle the light on.
+send("switch", "zcl on-off toggle");
+send("switch", "send 0 1 6");
+
+// Make sure the switch only gets one default response - EMAPPFWKV2-1289.
+expect("switch",  "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[02 00 \\]");
+nexpect("switch", "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[02 00 \\]");
+
+// Make sure the attribute flipped.
+expect("light", "read 6 0x0006 0x0000 1", "01");
+
+// Sleep for the on/off transition time
+networkWait(1000);
+
+// Because the OnLevel attribute is set, the level should be
+// BE rather than the previously-set AE
+expect("light", "read 6 0x0008 0x0000 1", "BE");
+
+// Invalidate the OnLevel attribute
+send("light", "write 6 0x0008 0x0011 1 0x20 {FF}");
+
+// Set the level
+send("switch", "zcl level-control mv-to-level 0xAE 0x01 0x00 0x00");
+send("switch", "send 0 1 6");
+
+// Sleep for the on/off transition time
+networkWait(1000);
+
+// Check that the light reached that level
+expect("light", "read 6 0x0008 0x0000 1", "AE");
+
+// Sleep for the on/off transition time
+networkWait(1000);
+
+// Toggle the light off.
+send("switch", "zcl on-off toggle");
+send("switch", "send 0 1 6");
+
+// Make sure the switch only gets one default response - EMAPPFWKV2-1289.
+expect("switch",  "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[02 00 \\]");
+nexpect("switch", "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[02 00 \\]");
+
+// Make sure the attribute flipped.
+expect("light", "read 6 0x0006 0x0000 1", "00");
+
+//Sleep for the on/off transition time (+ multihop leeway)
+networkWait(2000);
+
+// Above, we just toggled the light. The light turned off.
+// Since we have invalidated the OnLevel attribute, then we should
+// set the CurrentLevel to the stored value, i.e., AE.
+expect("light", "read 6 0x0008 0x0000 1", "AE");
+
+// Toggle the light on.
+send("switch", "zcl on-off toggle");
+send("switch", "send 0 1 6");
+
+// Make sure the switch only gets one default response - EMAPPFWKV2-1289.
+expect("switch",  "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[02 00 \\]");
+nexpect("switch", "T........:RX len 5, ep 01, clus 0x0006 \\(On/off\\) FC 08 seq .. cmd 0B payload\\[02 00 \\]");
+
+// Make sure the attribute flipped.
+expect("light", "read 6 0x0006 0x0000 1", "01");
+
+//Sleep for the on/off transition time
+networkWait(1000);
+
+// Ensure the level is set to the last level (AE)
+expect("light", "read 6 0x0008 0x0000 1", "AE");

@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-price-client" name="Plugin Commands: Price Client">
+    <description>
+      The identify plugin contributes a CLI command to the application framework to be used for printing information related to identification. 
+    </description>
+  </group>
+  <command cli="plugin price-client init" functionName="emAfPriceClientCliInit" group="plugin-price-client">
+    <description>
+      Initialize the price info for the provided endpoint.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The relevant endpoint" />
+  </command>
+  <command cli="plugin price-client print" functionName="emAfPriceClientCliPrint" group="plugin-price-client">
+    <description>
+      Print the price info for the provided endpoint.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The relevant endpoint" />
+  </command>
+  <command cli="plugin price-client printEvent" functionName="emAfPriceClientCliPrintEvent" group="plugin-price-client">
+    <description>
+      Print the price info for the provided endpoint and event ID.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The relevant endpoint" />
+    <arg name="issuerEventId" type="INT32U" description="The event ID that should be printed if found in the price table" />
+  </command>
+  <command cli="plugin price-client conv-factor printEvent" functionName="emAfPriceClientCliConversionFactorPrintByEventId" group="plugin-price-client">
+    <description>
+      Prints the conversion factor table entry with a matching event ID.
+    </description>
+    <arg name="endpoint"      type="INT8U" description="The relevant endpoint" />
+    <arg name="issuerEventId" type="INT32U" description="The event ID that should be printed if found in the conversion factor table" />
+  </command>
+  <command cli="plugin price-client calf-value printEvent" functionName="emAfPriceClientCliCalorificValuePrintByEventId" group="plugin-price-client">
+    <description>
+      Prints the calorific value table entry with a matching event ID.
+    </description>
+    <arg name="endpoint"      type="INT8U" description="The relevant endpoint" />
+    <arg name="issuerEventId" type="INT32U" description="The event ID that should be printed if found in the calorific value table" />
+  </command>
+  <command cli="plugin price-client co2-value printCurrent" functionName="emAfPriceClientCliCo2ValueTablePrintCurrent" group="plugin-price-client">
+    <description>
+      Prints the active CO2 value.
+    </description>
+    <arg name="endpoint"      type="INT8U" description="The relevant endpoint" />
+  </command>
+  <command cli="plugin price-client bill-period printCurrent" functionName="emAfPriceClientCliBillingPeriodPrintCurrent" group="plugin-price-client">
+    <description>
+      Prints the billing period table entry that is currently active.
+    </description>
+    <arg name="endpoint"      type="INT8U" description="The relevant endpoint" />
+  </command>
+
+  <command cli="plugin price-client block-period printEvent" functionName="emAfPriceClientCliBlockPeriodPrintEntryByEventId" group="plugin-price-client">
+    <description>
+      Prints the entry of the Block Period table with a matching event ID.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The relevant endpoint." />
+    <arg name="issuerEventId" type="INT32U" description="The event ID whose information in the block period table should be printed." />
+  </command>
+  <!--command cli="plugin price-client tier-label print" functionName="emAfPriceClientCliTierLabelTablePrint" group="plugin-price-client">
+    <description>
+      Prints the tier label table.
+    </description>
+  </command -->
+  <command cli="plugin price-client tier-label printTariff" functionName="emAfPriceClientCliTierLabelTablePrintTariffId" group="plugin-price-client">
+    <description>
+      Prints the tier label table entry with a matching tariff ID.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The relevant endpoint." />
+    <arg name="issuerTariffId" type="INT32U" description="The issuer tariff ID that should be looked for in the tier label table" />
+  </command>
+  <command cli="plugin price-client table-clear" functionName="emAfPriceClientCliTableClear" group="plugin-price-client">
+    <description>
+      Clears out the currently set price for the supplied endpoint.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The relevant endpoint" />
+  </command>
+  <command cli="plugin price-client consol-bill print" functionName="emAfPriceClientCliConsolidatedBillTablePrint" group="plugin-price-client">
+    <description>
+      Prints the entry of the consolidated bill table.
+    </description>
+    <arg name="endpoint"  type="INT8U"  description="The relevant endpoint." />
+    <arg name="index" type="INT8U" description="The index of the consolidated bill table that should be printed." />
+  </command>
+  <command cli="plugin price-client consol-bill printCurrent" functionName="emAfPriceClientCliConsolidatedBillPrintCurrentEntry" group="plugin-price-client">
+    <description>
+      Prints the entry of the active consolidated bill in the consolidated bills table.
+    </description>
+    <arg name="endpoint"  type="INT8U"  description="The relevant endpoint." />
+  </command>
+  <command cli="plugin price-client consol-bill printEvent" functionName="emAfPriceClientCliConsolidatedBillPrintEntryByEventId" group="plugin-price-client">
+    <description>
+      Prints the entry of the consolidated bill table with a matching event ID.
+    </description>
+    <arg name="endpoint"      type="INT8U"  description="The relevant endpoint." />
+    <arg name="issuerEventId" type="INT32U" description="The event ID whose information in the consolidated bill table should be printed." />
+  </command>
+  <command cli="plugin price-client cpp-event setAuth" functionName="emAfPriceClientCliSetCppEventAuth" group="plugin-price-client">
+    <description>
+      Sets the authorization status for future CPP events.
+    </description>
+    <arg name="cppEventAuth" type="INT8U" description="The authorization status for future CPP events." />
+  </command>
+  <command cli="plugin price-client cpp-event print" functionName="emAfPriceClientCliCppEventPrint" group="plugin-price-client">
+    <description>
+      Prints the entry of the cpp event table.
+    </description>
+    <arg name="endpoint" type="INT8U" />
+  </command>
+  <command cli="plugin price-client credit-pmt print" functionName="emAfPriceClientCliCreditPaymentTablePrint" group="plugin-price-client">
+    <description>
+      Prints the entry of the credit payment table.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The relevant endpoint." />
+    <arg name="index" type="INT8U" description="The index of the credit payment table entry that should be printed." />
+  </command>
+  <command cli="plugin price-client credit-pmt printEvent" functionName="emAfPriceClientCliCreditPaymentPrintEntryByEventId" group="plugin-price-client">
+    <description>
+      Prints the entry of the credit payment table with a matching issuer event ID.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The relevant endpoint." />
+    <arg name="issuerEventId" type="INT32U" description="The issuerEventId of the credit payment table entry that should be printed." />
+  </command>
+  <command cli="plugin price-client currency-convers printEvent" functionName="emAfPriceClientCliCurrencyConversionPrintByEventId" group="plugin-price-client">
+    <description>
+      Prints the entry of the currency conversion table with a matching issuer event ID.
+    </description>
+    <arg name="endpoint"  type="INT8U" description="The relevant endpoint." />
+    <arg name="issuerEventId" type="INT32U" description="The issuerEventId of the currency conversion table entry that should be printed." />
+  </command>
+  <command cli="plugin price-client currency-convers printCurrent" functionName="emAfPriceClientClieCurrencyConversionPrintCurrentCurrency" group="plugin-price-client">
+    <description>
+      Prints the active entry of the currency conversion table.
+    </description>
+    <arg name="endpoint"  type="INT8U" description="The relevant endpoint." />
+  </command>
+
+</cli>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-relative-humidity-measurement-server" name="Plugin Commands: Relative Humidity Measurement Server commands">
+    <description>
+      Run time CLI command to read the humidity sensor.
+    </description>
+  </group>
+  <command cli="plugin relative-humidity-measurement-server read" functionName="emAfRelativeHumidityMeasurementServerReadCommand" group="plugin-relative-humidity-measurement-server">
+    <description>
+      Read the humidity sensor.
+    </description>
+   </command>
+</cli>

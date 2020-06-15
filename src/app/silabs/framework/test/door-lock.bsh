@@ -1,0 +1,255 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Sleep doesn't work yet in simulation for the host so
+// we warn and return.
+if (runArgument.runUsingHostApps && runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for host / multihop****");
+  return;
+}
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"controller", "router", "lock1"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaDoorLock-simulation/HaDoorLock"
+};
+String[] hostImages = new String[] {    
+  "build/af-test-apps/HaHomeGateway-simulation-ezsp/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaDoorLock-simulation-ezsp/HaDoorLock"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+int timeout = 50000;
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+String lock1 = nodeId("lock1");
+String controller = nodeId("controller");
+
+network.sleep(2000);
+
+// Sync time with the controller.
+send("lock1", "timesync " + controller + " 1 1");
+
+network.sleep(2000);
+
+// test proceedure 5.38 Item  1
+// test harness sends read attribute for lock state, lock type, actuator enabled
+send("controller", "zcl global read 0x0101 0x0000");
+send("controller", "send " + lock1 + " 1 1");
+networkWait(1000);
+send("controller", "zcl global read 0x0101 0x0001");
+send("controller", "send " + lock1 + " 1 1");
+networkWait(1000);
+send("controller", "zcl global read 0x0101 0x0002");
+send("controller", "send " + lock1 + " 1 1");
+networkWait(1000);
+
+// test proceedure 5.38 Item  2
+// test harness sends read attribute for door state, num door open events, num door closed events, number min open
+send("controller", "zcl global read 0x0101 0x0003");
+send("controller", "send " + lock1 + " 1 1");
+networkWait(1000);
+send("controller", "zcl global read 0x0101 0x0004");
+send("controller", "send " + lock1 + " 1 1");
+networkWait(1000);
+send("controller", "zcl global read 0x0101 0x0005");
+send("controller", "send " + lock1 + " 1 1");
+networkWait(1000);
+send("controller", "zcl global read 0x0101 0x0006");
+send("controller", "send " + lock1 + " 1 1");
+
+// Create a binding to coordinator for event reporting
+dbg.println("\n*** Setup 1: Create a binding to coordinator for event reporting ***\n");
+send("lock1", "option binding-table set 0 0x0101 0x01 0x01 {" + eui64("controller") + "}");
+
+// Turn on event reporting 
+dbg.println("\n*** Setup 2: Turn on event reporting ***\n");
+send("controller", "zcl global write 0x0101 0x0041 0x19 {ff ff}");
+send("controller", "send " + lock1 + " 1 1");
+send("controller", "zcl global write 0x0101 0x0042 0x19 {ff ff}");
+send("controller", "send " + lock1 + " 1 1");
+send("controller", "zcl global write 0x0101 0x0043 0x19 {ff ff}");
+send("controller", "send " + lock1 + " 1 1");
+send("controller", "zcl global write 0x0101 0x0045 0x19 {ff ff}");
+send("controller", "send " + lock1 + " 1 1");
+send("controller", "zcl global write 0x0101 0x0046 0x19 {ff ff}");
+send("controller", "send " + lock1 + " 1 1");
+
+networkWait(5000);
+
+// Send a lock command without pin
+dbg.println("\n*** Test 0.1: Send a lock command without pin ***\n");
+send("controller", "raw 0x0101 {01 00 00}");
+send("controller", "send " + lock1 + " 1 1");
+
+// Check that door successfully locks
+dbg.println("\n*** Test 0.2: Check that door successfully locks ***\n");
+expect("lock1", ".*OCK DOOR SUCCESS.*", 50000);
+
+
+// Set send pin OTA true
+dbg.println("\n*** Setup 3: Set send pin OTA true ***\n");
+send("controller", "zcl global write 0x0101 0x0032 0x10 {01}");
+send("controller", "send " + lock1 + " 1 1");
+
+// Set require pin for operation true
+dbg.println("\n*** Setup 4: Set require pin for operation true ***\n");
+send("controller", "zcl global write 0x0101 0x0033 0x10 {01}");
+send("controller", "send " + lock1 + " 1 1");
+
+networkWait(10000);
+
+// Send a lock command without pin [should fail]
+dbg.println("\n*** Test 0.3: Send a lock command without pin ***\n");
+send("controller", "raw 0x0101 {01 00 00}");
+send("controller", "send " + lock1 + " 1 1");
+
+// Check that door fails to lock
+dbg.println("\n*** Test 0.4: Check that door fails to lock ***\n");
+expect("lock1", ".*OCK DOOR FAILURE.*", 50000);
+
+networkWait(20000);
+
+
+// Set PIN for user 00 with pin of length 4, 0123
+dbg.println("\n*** Setup 5: Set PIN for user 00 with pin of length 4, 0123 ***\n");
+send("controller", "raw 0x0101 {01 00 05 00 00 01 03 04 30 31 32 33}");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*st ty.*", 50000);
+networkWait(5000);
+
+// Get PIN for user 00
+dbg.println("\n*** Test 1: Get PIN for user 00 ***\n");
+send("controller", "raw 0x0101 {01 00 06 00 00}");
+send("controller", "send " + lock1 + " 1 1");
+expect("controller", ".*04 30 31 32 33.*", 50000);
+networkWait(5000);
+
+// Set Weekday Schedule for user 00
+dbg.println("\n*** Test 2: Set Weekday Schedule for user 00 ***\n");
+send("controller", "raw 0x0101 {01 00 0b 00 00 00 ff 00 00 16 3b}");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*uid dm strth strtm stp.*", 50000);
+networkWait(5000);
+
+// Get WeekdaySchedule for schedule 00, user 00
+dbg.println("\n*** Test 3: Get WeekdaySchedule for schedule 00, user 00 ***\n");
+send("controller", "raw 0x0101 {01 00 0c 00 00 00}");
+send("controller", "send " + lock1 + " 1 1");
+expect("controller", ".*00 00 FF 00 00 16 3B.*", 50000);
+networkWait(5000);
+
+//Send a lock command
+dbg.println("\n*** Test 4: Send a lock command ***\n");
+send("controller", "raw 0x0101 {01 00 00 04 30 31 32 33}");
+send("controller", "send " + lock1 + " 1 1");
+
+// Check that door successfully locks
+dbg.println("\n*** Test 5: Check that door successfully locks ***\n");
+expect("lock1", ".*OCK DOOR SUCCESS.*", 50000);
+
+// Check that event is reported
+
+networkWait(5000);
+
+// Send lock with bad PIN
+dbg.println("\n*** Test 6: Send lock with bad PIN ***\n");
+send("controller", "raw 0x0101 {01 00 00 04 31 32 33 34}");
+send("controller", "send " + lock1 + " 1 1");
+
+// Check that door fails to lock
+dbg.println("\n*** Test 6.5: Check that door fails to lock ***\n");
+expect("lock1", ".*OCK DOOR FAILUR.*", 50000);
+networkWait(5000);
+
+// Send an unlock command
+dbg.println("\n*** Test 7: Send an unlock command ***\n");
+send("controller", "raw 0x0101 {01 00 01 04 30 31 32 33}");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*UNLOCK DOOR SUCCESS.*", 50000);
+
+// Check that event is reported
+dbg.println("\n*** Test 8: Check that event is reported ***\n");
+expect("controller", ".*01 02 00 00 04 30 31 32 33 00 00 00 00.*", 50000); 
+networkWait(5000);
+
+// clear the user
+dbg.println("\n*** Test 9: Clear the user ***\n");
+send("controller", "raw 0x0101 {01 00 07 00 00}");
+send("controller", "send " + lock1 + " 1 1");
+expect("controller", ".*01 03 00 00 00 00 00 00 00 00 00.*", 50000);
+networkWait(5000);
+
+//send an unlock command [should fail]
+dbg.println("\n*** Test 10: Send an unlock command [should fail] ***\n");
+send("controller", "raw 0x0101 {01 00 01 04 30 31 32 33}");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*UNLOCK DOOR FAILURE.*", 50000);
+
+//sleep to allow all to finish
+networkWait(5000);
+
+// Set PIN for user 00 with pin of length 4, 0123
+dbg.println("\n*** Test 11: Set PIN for user 00 with pin of length 4, 0123 ***\n");
+send("controller", "raw 0x0101 {01 00 05 00 00 01 03 04 30 31 32 33}");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*st ty.*", 50000);
+networkWait(5000);
+
+// Send an unlock command
+dbg.println("\n*** Test 12: Send an unlock command ***\n");
+send("controller", "raw 0x0101 {01 00 01 04 30 31 32 33}");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*UNLOCK DOOR SUCCESS.*", 50000);
+networkWait(5000);
+
+// clear all pins
+dbg.println("\n*** Test 13: Clear all pins ***\n");
+send("controller", "raw 0x0101 {01 00 08}");
+send("controller", "send " + lock1 + " 1 1");
+networkWait(5000);
+
+// Send an unlock command [should fail]
+dbg.println("\n*** Test 14: Send an unlock command [should fail] ***\n");
+send("controller", "raw 0x0101 {01 00 01 04 30 31 32 33}");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*UNLOCK DOOR FAILURE.*", 50000);
+networkWait(5000);
+
+//read electrical measurement information
+dbg.println("\n*** Test 15: Read electrical measurement information ***\n");
+send("controller", "zcl global read 0x0b04 0x0101");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*clus 0B04, attr 0101, dataLen: 02, OK.*", 50000);
+networkWait(5000);
+
+
+if (runArgument.runUsingHostApps) {
+  std.print("****TODO: No diagnostic information for host****");
+  return;
+}
+
+// read diagnostic information
+dbg.println("\n*** Test 16: Read diagnostic information ***\n");
+send("controller", "zcl global read 0x0b05 0x0101");
+send("controller", "send " + lock1 + " 1 1");
+expect("lock1", ".*clus 0B05, attr 0101, dataLen: 04, OK.*", 50000);
+networkWait(5000);
+

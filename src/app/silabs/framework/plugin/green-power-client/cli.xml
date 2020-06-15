@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-green-power-client" name="Plugin Commands: Green Power Client">
+    <description>
+      The Green Power Client plugin contributes CLI commands to the application framework to be used for getting, setting, and displaying information relevant to the Green Power Client cluster.
+    </description>
+  </group>
+  <command cli="plugin green-power-client set-proxy-entry" functionName="emberAfPluginGreenPowerClientSetProxyEntry" group="plugin-green-power-client">
+    <description>
+      Set a proxy table entry
+    </description>
+    <arg name="index"       type="INT8U"        description="index to proxy table"/>
+    <arg name="sourceID"    type="INT32U"       description="GPD Source ID"       />
+    <arg name="sinkNodeId"  type="INT16U"       description="Sink's node address" />
+    <arg name="options"     type="INT32U"       />
+  </command>
+  <command cli="plugin green-power-client add-sink" functionName="emberAfPluginGreenPowerClientAddSink" group="plugin-green-power-client">
+    <description>
+      Add a sink for a given GPD
+    </description>
+    <arg name="sourceID"    type="INT32U"       description="GPD Source ID"       />
+    <arg name="sinkIeee"    type="IEEE_ADDRESS" description="Sink's IEEE address" />
+  </command>
+  <command cli="plugin green-power-client add-group-sink" functionName="emberAfPluginGreenPowerClientAddGroupcastSink" group="plugin-green-power-client">
+    <description>
+      Add a groupcast sink for a given GPD
+    </description>
+    <arg name="sourceID"    type="INT32U"       description="GPD Source ID"       />
+    <arg name="sinkGroup"    type="INT16U"      description="Sink group" />
+  </command>
+  <command cli="plugin green-power-client rm-gpd" functionName="emberAfPluginGreenPowerClientRemoveProxyTableEntry" group="plugin-green-power-client">
+    <description>
+      Remove a given GPD from the proxy table
+    </description>
+    <arg name="sourceID"    type="INT32U"       description="GPD Source ID"       />
+  </command>
+  <command cli="plugin green-power-client rm-sink" functionName="emberAfPluginGreenPowerClientAddSink" group="plugin-green-power-client">
+    <description>
+      remove a sink for a given GPD.  If that's the last sink, remove the proxy table entry
+    </description>
+    <arg name="sourceID"    type="INT32U"       description="GPD Source ID"       />
+    <arg name="sinkIeee"    type="IEEE_ADDRESS" description="Sink's IEEE address" />
+  </command>
+  <command cli="plugin green-power-client print-proxy-table" functionName="emberAfPluginGreenPowerClientPrintProxyTable" group="plugin-green-power-client">
+    <description>
+      Print the proxy table
+    </description>
+  </command>
+  <command cli="plugin green-power-client clear-proxy-table" functionName="emberAfPluginGreenPowerClientClearProxyTable" group="plugin-green-power-client">
+    <description>
+      clear the proxy table
+    </description>
+  </command>
+  <command cli="plugin green-power-client duplicate-filter-test" functionName="emberAfPluginGreenPowerClientDuplicateFilteringTest" group="plugin-green-power-client">
+    <description>
+      This is used to instrument the current device receiving a message in order to test the duplicate message filtering functionality.
+    </description>
+    <arg name="endpoint"        type="INT8U"   />
+    <arg name="sourceId"        type="INT32U"  description="source Id of the fake incoming message" />
+    <arg name="sequenceNumber"  type="INT8U"   />
+  </command>
+  <command cli="plugin green-power-client set-key" functionName="emberAfPluginGreenPowerClientSetKey" group="plugin-green-power-client">
+    <description>
+      This is used to set the key for a proxy table entry
+    </description>
+    <arg name="index"        type="INT8U"   />
+    <arg name="key"        type="SECURITY_KEY"  description="source Id of the fake incoming message" />
+  </command>
+</cli>

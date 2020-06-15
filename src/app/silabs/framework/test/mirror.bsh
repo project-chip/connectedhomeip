@@ -1,0 +1,141 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create four nodes in the network.
+SimulatedNetwork network = createNetwork();
+ String[] devices = new String[]{"mirror1", "meter2", "meter3", "meter4"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeMeterMirror-simulation/SeMeterMirror",
+  "build/af-test-apps/SeMeterGas-simulation/SeMeterGas",
+  "build/af-test-apps/SeMeterGas-simulation/SeMeterGas",
+  "build/af-test-apps/SeMeterGas-simulation/SeMeterGas"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeMeterMirror-simulation-ezsp/SeMeterMirror",
+  "build/af-test-apps/SeMeterGas-simulation-ezsp/SeMeterGas",
+  "build/af-test-apps/SeMeterGas-simulation-ezsp/SeMeterGas",
+  "build/af-test-apps/SeMeterGas-simulation-ezsp/SeMeterGas"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 20;
+int power = -1;
+int panId = 0xABBA;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Initialize the metering device type on all devices.
+int MIRRORED_GAS_METER     = 0x80;
+int MIRRORED_WATER_METER   = 0x81;
+int MIRRORED_THERMAL_METER = 0x82;
+int UNDEFINED_MIRROR_METER = 0xFE;
+
+// Where Mirror request, mirror remove commands are sent to.  This is a Meter Client Cluster
+int MIRROR_CLIENT_ENDPOINT = 1;
+
+send("mirror1", "write 1 0x0702 0x0306 1 0x18 {" + Integer.toHexString(UNDEFINED_MIRROR_METER) + "}");
+send("meter2", "write 1 0x0702 0x0306 1 0x18 {" + Integer.toHexString(MIRRORED_GAS_METER) + "}");
+send("meter3", "write 1 0x0702 0x0306 1 0x18 {" + Integer.toHexString(MIRRORED_WATER_METER) + "}");
+send("meter4", "write 1 0x0702 0x0306 1 0x18 {" + Integer.toHexString(MIRRORED_THERMAL_METER) + "}");
+
+// Make sure mirror endpoint is disabled at startup.
+expect("meter2",
+       "zdo simple " + nodeId("mirror1") + " 3",
+       ".*RX: ZDO, command 0x8004, status: 0x83");
+
+debugPrintln("*** TEST: Print out the Mirror Plugin status to make sure it has entries.");
+// NOTE:  Manufacturer Specific attributes are being deprecated.
+expect("mirror1", "plugin meter-mirror status", ".*0 of 1 mirrors used.*");
+
+debugPrintln("*** TEST: Gas Meter 2 adds itself to the mirror.  EXPECT: SUCCESS.");
+send("meter2", "zcl metering request-mirror");
+send("meter2", "send 0 1 " + MIRROR_CLIENT_ENDPOINT);
+expect("meter2", ".*Mirror ADDED on 03.*");
+expect("mirror1", ".*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]");
+
+debugPrintln("*** TEST: Gas Meter 2 adds itself to the mirror a second time.  EXPECT: SUCCESS.");
+send("meter2", "zcl metering request-mirror");
+send("meter2", "send 0 1 " + MIRROR_CLIENT_ENDPOINT);
+expect("meter2", ".*Mirror ADDED on 03.*");
+expect("mirror1", ".*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]");
+
+debugPrintln("*** TEST: Gas Meter 2 reports to the mirror.  EXPECT: SUCCESS.");
+send("meter2", "zcl global report 1 0x0702 0x0306 1");
+send("meter2", "send 0 1 " + MIRROR_CLIENT_ENDPOINT);
+//expect("mirror1", ".*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 0A payload\\[06 03 18 .. \\]");
+expect("mirror1", "Mirror attribute 0x0306: 0x00");
+expect("meter2", ".*clus 0x0702 \\(Simple Metering\\) FC 00 seq .. cmd 0B payload\\[0A 00 \\]");
+send("mirror1", "read 3 0x0702 0x0306 1");
+String result = expect("mirror1", "[0-9a-fA-F]{2} ");
+assert(Integer.valueOf(result.trim(), 16).intValue() == MIRRORED_GAS_METER);
+
+debugPrintln("*** TEST: Gas Meter 3 reports to the mirror.  EXPECT: FAILURE.");
+send("meter3", "zcl global report 1 0x0702 0x0306 1");
+send("meter3", "send 0 1 " + MIRROR_CLIENT_ENDPOINT);
+expect("mirror1", ".*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 0A payload\\[06 03 18 .. \\]");
+// 0A 7E = Default Response: Not authorized
+expect("meter3", ".*clus 0x0702 \\(Simple Metering\\) FC 00 seq .. cmd 0B payload\\[0A 7E \\]");
+send("mirror1", "read 3 0x0702 0x0306 1");
+result = expect("mirror1", "[0-9a-fA-F]{2} ");
+assert(Integer.valueOf(result.trim(), 16).intValue() != MIRRORED_WATER_METER);
+
+debugPrintln("*** TEST: Gas Meter 4 reports to different mirror endpoint but hasn't registered.  EXPECT: FAILURE.");
+send("meter4", "zcl global report 1 0x0702 0x0306 1");
+send("meter4", "send 0 1 " + MIRROR_CLIENT_ENDPOINT);
+expect("mirror1", ".*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 0A payload\\[06 03 18 .. \\]");
+send("mirror1", "read 3 0x0702 0x0306 1");
+result = expect("mirror1", "[0-9a-fA-F]{2} ");
+assert(Integer.valueOf(result.trim(), 16).intValue() != MIRRORED_THERMAL_METER);
+
+debugPrintln("*** TEST: Gas Meter 3 reports to the mirror with MFG specific bit set.  EXPECT: FAILURE");
+expect("meter2", "zcl mfg-code 0x1234", "MFG Code Set for next command: 0x1234");
+send("meter2", "zcl global report 1 0x0702 0x0306 1");
+send("meter2", "send 0 1 " + MIRROR_CLIENT_ENDPOINT);
+expect("mirror1", "Error: Unknown MFG Code for mirror: 0x1234");
+
+debugPrintln("*** TEST: Gas Meter 2 removes itself from the mirror.  EXPECT: SUCCESS.");
+send("meter2", "zcl metering remove-mirror");
+send("meter2", "send 0 1 1");
+expect("meter2", ".*Mirror REMOVED from 03.*");
+
+debugPrintln("*** TEST: Gas Meter 2 reports to the mirror.  EXPECT: FAILURE.");
+//The mirror endpoint is disabled (because it is unused). 
+//Attempts to read from it should fail.  
+expect("mirror1", 
+       "read 1 0x0702 0x0306 1",
+       "Error: read: 0x86");
+
+debugPrintln("*** TEST: Gas meter re-registers.");
+send("meter2", "zcl metering request-mirror");
+expect("meter2", "send 0 1 1",".*Mirror ADDED on 03.*");
+expect("mirror1", ".*clus 0x0702 \\(Simple Metering\\) FC 08 seq .. cmd 0B payload\\[01 00 \\]");
+  
+debugPrintln("*** TEST:  Gas metere reports data again.");
+send("meter2", "zcl global report 1 0x0702 0x0306 1");
+expect("meter2",
+       "send 0 1 " + MIRROR_CLIENT_ENDPOINT,
+       ".*clus 0x0702 \\(Simple Metering\\) FC 00 seq .. cmd 0B payload\\[0A 00 \\]");
+send("mirror1", "read 3 0x0702 0x0306 1");
+String result = expect("mirror1", "[0-9a-fA-F]{2} ");
+assert(Integer.valueOf(result.trim(), 16).intValue() == MIRRORED_GAS_METER);
+
+debugPrintln("*** TEST:  Mirror manually removes the meter.");
+expect("mirror1", "plugin meter-mirror remove 3", ".*Removed meter mirror at endpoint 3");
+expect("mirror1", "plugin meter-mirror status",   "0 of 1 mirrors used.");
+
+debugPrintln("*** TEST:  Meter reports to the mirror.   EXPECT: FAILURE.");
+send("meter2", "zcl global report 1 0x0702 0x0306 1");
+expect("meter2",
+       "send 0 1 " + MIRROR_CLIENT_ENDPOINT,
+       ".*clus 0x0702 \\(Simple Metering\\) FC 00 seq .. cmd 0B payload\\[0A 7E \\]");
+// The mirror endpoint is disabled (because it is unused). 
+// Attempts to read from it should fail.  
+expect("mirror1", "read 1 0x0702 0x0306 1", "Error: read: 0x86");

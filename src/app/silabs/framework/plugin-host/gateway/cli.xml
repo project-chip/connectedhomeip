@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-gateway" name="Plugin Commands: Gateway Support">
+    <description>
+      The gateway support commands provide functionality specific to running a PC host application connected to an Ember chip via EZSP.
+    </description>
+  </group>
+  <command cli="plugin gateway time-sync-local" functionName="emberAfPluginGatewaySupportTimeSyncLocal" group="plugin-gateway">
+    <description>
+      This command will sync the ZCL device's local time attribute with the local PC clock.
+    </description>
+  </command>
+</cli>

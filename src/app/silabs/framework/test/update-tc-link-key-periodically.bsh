@@ -1,0 +1,305 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  // The Z3 Gateway can only be compiled as a host
+  std.print("** This test uses a mixture of HOST/SoC devices, so only run it with -h ** ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+// Load Z3Gateway app as HOST.
+Location gatewayLocation = gridLocations[1];
+TestNode gateway = new TestNode("gateway",
+                                "", // no SoC image
+                                "build/af-test-apps/Z3GatewayWithWwah-simulation-ezsp/Z3GatewayWithWwah",
+                                "app/ncp/sample-app/ncp-uart-sw/simulation/build/exe/ncp-uart-sw",
+                                gatewayLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { gateway }, true, false); // useHost, don't useSpi
+
+Location gatewayLocationWellKnownRejoin = gridLocations[2];
+TestNode gatewayWellKnownRejoin = new TestNode("gatewayWellKnownRejoin",
+                                               "", // no SoC image
+                                               "build/af-test-apps/Z3GatewayWithWwah-simulation-ezsp-EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_ALLOW_TC_REJOIN_WITH_WELL_KNOWN_KEY/Z3GatewayWithWwah",
+                                               "app/ncp/sample-app/ncp-uart-sw/simulation/build/exe/ncp-uart-sw",
+                                               gatewayLocationWellKnownRejoin);
+addAndLoadDevicesWithLocation(new TestNode[] { gatewayWellKnownRejoin }, true, false); // useHost, don't useSpi
+
+
+// Load Z3DoorLockWithWwah app as a SoC device.
+Location enddeviceLocation = gridLocations[4];
+TestNode enddevice = new TestNode("enddevice",
+                                  "build/af-test-apps/Z3DoorLockWithWwah-simulation-EMBER_AF_PLUGIN_END_DEVICE_SUPPORT_ALLOW_REJOINS_WITH_WELL_KNOWN_LINK_KEY/Z3DoorLockWithWwah",
+                                  "", // no HOST image
+                                  "", // no NCP image
+                                  enddeviceLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { enddevice }, false); // useHost
+
+setupEncryption();
+
+// Changing the compliance revsion of the gateway to 0 inorder to test
+// the periodic TC link key attempts.
+expect("gateway",
+    "plugin test-harness set-compliance-revision 0",
+    "The compliance revision of the device has been changed to R0.*");
+
+// The gateway forms a centralized network.
+expect("gateway",
+       "plugin network-creator start 1",
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+
+String channel = channel("gateway");
+String power = "3";
+String panId = panId("gateway");
+
+networkWait(2000);
+
+// Starting a network between gateway and end device
+expect("gateway",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+send("enddevice",
+       "plugin update-tc-link-key timer 5000");
+send("enddevice",
+       "plugin network-steering start 1");
+String nodeId = expectNetworkUp("enddevice", DEFAULT_TIMEOUT << 5);
+expectMultiline("enddevice",
+       new String[] {
+                  "RX: ZDO, command.*, status: 0x00",
+                  "Device Announce: " + nodeId,
+       });
+networkWait(1000);
+// power cycling the end device to satisfy C-2 & OT-2 from WWAH Requirements specification.
+// This should leed to attempts for tc link key updates periodically even though we did
+// plugin network-steering start 1 on the end device instead of plugin network-steering start 0.
+network.power("enddevice", false);
+network.power("enddevice", true);
+setupEncryption();
+networkWait(2000);
+send("enddevice",
+     "plugin update-tc-link-key timer 5000");
+
+// Since this is a centralized network, the device should update the trust
+// center link key with the gateway. However if the gateway is pre-R21 then
+// the device periodically request for a trust center link key update. This
+// will continue untill the gateway is upgraded to a R21+ device. Once the
+// gateway is an a R21+ device the trust center link key would be updated.
+// The device should find that the gateway is an R21 device.
+expect("enddevice",
+       ".*Starting update trust center link key process: 0x00",
+       40000);
+expect("enddevice",
+       ".*Update TC Link Key: Error: 0x1E.*");  // 1E = Pre R21
+
+expect("enddevice",
+       ".*Starting update trust center link key process: 0x00",
+       6000);
+expect("enddevice",
+       ".*Update TC Link Key: Error: 0x1E.*");  // 1E = Pre R21
+
+expect("enddevice",
+       ".*Starting update trust center link key process: 0x00",
+       6000);
+expect("enddevice",
+       ".*Update TC Link Key: Error: 0x1E.*");  // 1E = Pre R21
+
+// Enable rejoin algorithm
+send("gateway", "zcl mfg-code 0x1217");
+send("gateway", "zcl sl-wwah enable-rejoin-alg 10 120 20 30 15");
+send("gateway", "send " + nodeId + " 1 1");
+expect("enddevice", ".*RX len 15, ep 01, clus 0xFC57" +
+           " \\(SL Works With All Hubs\\) mfgId 1217 FC 05 seq .* cmd 07 payload\\[.*\\]",5000);
+
+// Powering off the TC and powering it back on to make sure
+// that the end device does not leave the network while the TC
+// is offline
+power("gateway", false);
+// During this wait time end device discovers that the parent is gone and begins
+// attempting rejoins per the WWAH rejoin algorithm
+// The "moving state after" message is printed after a number of rejoins is made
+// and the device may enter a waiting state, which can be lengthy. We want to
+// record that wait and finally insert the well-known key into the trust center
+// just before the time expires so that the enddevice can successfully rejoin
+expectMultiline("enddevice",
+                "",
+                new String[] {
+                  "WWAH Connectivity Mgr: running state TC Rejoin on All Channels \\(connection error mask 0x01, fast rejoin: Y\\)",
+                  "EMBER_JOIN_FAILED"
+                },
+                360000);
+String message = expectMultiline("enddevice",
+                                 "",
+                                 new String[] {
+                                   ".*WWAH Connectivity Mgr: running state Wait for Trigger \\(connection error mask 0x01, fast rejoin: N\\)",
+                                   ".*WWAH Connectivity Mgr: moving state after .* ms",
+                                 },
+                                 120000);
+String[] lines = message.split("\n");
+String backOffMsString = lines[lines.length-1].replaceAll("[\\D]", "");
+int msUntilRejoin = Integer.parseInt(backOffMsString);
+power("gateway", true);
+networkWait(500);
+// Setting the compliance to 0 again to be certain that the gateway did
+// not go back to r21+ after power on so as to continue it's previous
+// behaviour as before.
+expect("gateway",
+    "plugin test-harness set-compliance-revision 0",
+    "The compliance revision of the device has been changed to R0.*",
+    10000);
+
+if (msUntilRejoin > 10000) {
+  networkWait(msUntilRejoin - 10000);
+}
+
+expect("gateway",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+String euiEndDevice = eui64("enddevice");
+send("gateway",
+     "plugin network-creator-security set-joining-link-key {" + euiEndDevice + "} {5A6967426565416C6C69616E63653039}");
+send("gateway",
+     "option security set-allow-trust-center-rejoin-using-well-known-key 1");
+expect("enddevice",
+       "EMBER_NETWORK_UP 0x....",
+       20000);
+networkWait(10000);
+
+// Changing the compliance revsion of the gateway to 22 inorder to test
+// that the trust center link key update is happening now.
+expect("gateway",
+    "plugin test-harness set-compliance-revision 22",
+    ".*The compliance revision of the device has been changed to R22.*",
+    1000);
+expect("enddevice",
+      ".*Starting update trust center link key process: 0x00",
+      40000);
+expectMultiline("enddevice",
+       new String[] {
+                  "RX: ZDO, command.*, status: 0x00",
+                  "RX: Node Desc Resp, Matches: 0x0000"
+       });
+
+expect("enddevice",
+      ".*New key established: 0x65",
+      40000);
+
+//Test: Process only network key rotation commands sent via unicast and encrypted by Trust Center Link Key.
+// This should lead to a successful nwk key update
+send("enddevice", "keys print");
+String tcLinkKey1 = expect("enddevice", ".*0200000000000000  .{8}  L     y     .*");
+networkWait(2000);
+send("gateway","plugin test-harness key-update now");
+networkWait(27100);
+send("enddevice", "keys print");
+String newNwkKey = expect("enddevice", "NWK Key: .*");
+networkWait(2000);
+//Setting the attribute:SL_TC_SECURITY_ON_NTWK_KEY_ROTATION_ENABLED
+send("gateway", "zcl mfg-code 0x1217");
+send("gateway","zcl sl-wwah enable-tc-sec-ntwk-key-rot");
+String deviceId =  nodeId("enddevice");
+send("gateway", "send " + deviceId + " 1 1 ");
+networkWait(15000);
+// This should not lead to a nwk key update since it is a broadcast and the 
+// SL_TC_SECURITY_ON_NTWK_KEY_ROTATION_ENABLED attribute has been enabled.
+expect("gateway",
+       "plugin test-harness key-update now",
+       "Starting NWK Key update, status: 0x00",
+       25000);
+expect("enddevice",
+       "keys print",
+       newNwkKey,
+       1000);
+
+// The end device will figure out there's a new key and attempt to rejoin to get
+// the new key
+expect("enddevice",
+       "",
+       ".*EMBER_NETWORK_UP 0x....",
+       30000);
+networkWait(5000);
+
+// Unicast nwk key update is attempted upon a rejoin with encryption when the broadcast nwk key update fails
+// The unicast nwk key update should be successful if attempted via TC link key encryption.
+send("enddevice", "keys print");
+String unicastNwkKey = expect("enddevice", "NWK Key: .*");
+if (unicastNwkKey.equals(newNwkKey)) {
+  throw new Exception("Unicast Nwk key update was unsuccessful");
+}
+
+// Testing Trigger device to request a new APS link key from the Trust Center.
+send("gateway", "zcl mfg-code 0x1217");
+send("gateway","zcl sl-wwah request-new-aps-link-key");
+String deviceId =  nodeId("enddevice");
+send("gateway", "send " + deviceId + " 1 1 ");
+expect("enddevice",
+      ".*New key established: 0x65",
+      2000);
+send("enddevice", "keys print");
+String tcLinkKey2 = expect("enddevice", ".*0200000000000000  .{8}  L     y     .*");
+networkWait(2000);
+if (tcLinkKey1.equals(tcLinkKey2)) {
+  throw new Exception("A new unique TC link key was not generated");
+}
+
+
+// Testing allow TC rejoin with well known key plugin option under network creater security plugin
+expect("gateway", "network leave", ".*EMBER_NETWORK_DOWN.*", 3000);
+expect("enddevice", "network leave", ".*EMBER_NETWORK_DOWN.*", 1000);
+
+// Setting the compliance to 0 again to be certain that the gateway so
+// that the tc link key update is prevented for the end device.
+expect("gatewayWellKnownRejoin",
+    "plugin test-harness set-compliance-revision 0",
+    "The compliance revision of the device has been changed to R0.*",
+    10000);
+// The gateway forms a centralized network.
+expect("gatewayWellKnownRejoin",
+       "plugin network-creator start 1",
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+
+expect("gatewayWellKnownRejoin",
+       "plugin network-creator-security open-network",
+       ".*Open network: 0x00");
+networkWait(2000);
+expect("enddevice",
+       "plugin network-steering start 1",
+       ".*EMBER_NETWORK_UP.*",
+       30000);
+networkWait(10000);
+expect("enddevice", "keys print", ".*5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39.*", 2000);
+networkWait(10000);
+expect("enddevice", "network rejoin 0 0", ".*EMBER_NETWORK_UP.*");
+networkWait(5000);
+
+// Test: make the coordinator stop answering the Request Key messages
+// The joining device should call the zigbeeKeyEstablishmentHandler after three
+// failed attempts (1 + 2 retries)
+send("gatewayWellKnownRejoin", "option security set-key-request-policy 0 0");
+expect("gatewayWellKnownRejoin",
+       "plugin test-harness set-compliance-revision 21",
+       "The compliance revision of the device has been changed to R21.*",
+       10000);
+
+// There should be a timeout (status 0x04)
+expectMultiline("enddevice",
+                new String[] {
+                  ".*Starting update trust center link key process: 0x00",
+                  ".*Update TC Link Key: Error: 0x04.*"
+                },
+                60000);
+
+// Tell the coordinator to accept TC key requests now
+send("gatewayWellKnownRejoin", "option security set-key-request-policy 1 0");
+
+// And now a key should be established
+expectMultiline("enddevice",
+                new String[] {
+                  ".*Starting update trust center link key process: 0x00",
+                  ".*Update TC Link Key: New key established: 0x65.*"
+                },
+                60000);
+
+

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-ias-zone-server" name="Plugin Commands: IAS Zone Server">
+    <description>
+  This plugin provides a set of CLI commands for managing the local IAS Zone server.
+    </description>
+  </group>
+  <command cli="plugin ias-zone-server info" functionName="emberAfPluginIasZoneServerInfoCommand" group="plugin-ias-zone-server">
+    <description>
+  Print current value of the following cluster attributes: zone type, zone state, zone status, zone id
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The endpoint whose IAS Zone Cluster information is to be printed" />
+  </command>
+  <command cli="plugin ias-zone-server changeStatus" functionName="emberAfPluginIasZoneServerChangeStatusCommand" group="plugin-ias-zone-server">
+    <description>
+  Update the zone status attribute of a given endpoint's IAS Zone cluster to the given value
+    </description>
+    <arg name="newStatus" type="INT16U" description = "The new status to be written" />
+    <arg name="timeSinceOccurredSeconds" type="INT8U" description = "The amount time that has passed since the last update occurred (seconds)" />
+    <arg name="endpoint" type="INT8U" description = "The endpoint whose zone status attribute is to be updated" />
+  </command>
+  <command cli="plugin ias-zone-server set-enrollment-mode" functionName="emberAfPluginIasZoneServerSetEnrollmentMethodCommand" group="plugin-ias-zone-server">
+    <description>
+  Update the IAS Zone server's enrollment method to the specified value
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The endpoint whose enrollment mode is to be updated" />
+    <arg name="enrollmentMode" type="INT8U" description = "The new enrollment mode" />
+  </command>
+  <command cli="plugin ias-zone-server change-backoff-config" functionName="emberAfPluginIasZoneServerChangeBackoffConfiguration" group="plugin-ias-zone-server">
+    <description>
+  Update the IAS Zone server's backoff configuration parameters.
+    </description>
+    <arg name="firstBackoff" type="INT8U" description = "First backoff time in seconds." />
+    <arg name="commonRatio" type="INT8U" description = "Backoff increase common ratio." />
+    <arg name="maxBackoff" type="INT32U" description = "Maximum backoff time in seconds." />
+    <arg name="unlimitedRetries" type="BOOLEAN" description = "Unlimited retires." />
+    <arg name="maxRetryAttempts" type="INT16U" description = "Maximum retry attempts." />
+  </command>
+  <command cli="plugin ias-zone-server print-queue" functionName="emberAfPluginIasZoneServerCliPrintQueue" group="plugin-ias-zone-server">
+    <description>
+  Prints information on the status queue.
+    </description>
+  </command>
+  <command cli="plugin ias-zone-server print-queue-config" functionName="emberAfPluginIasZoneServerCliPrintQueueConfig" group="plugin-ias-zone-server">
+    <description>
+  Prints the status queue config.
+    </description>
+  </command>
+</cli>

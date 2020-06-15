@@ -1,0 +1,677 @@
+#ISD afv6
+# Simplicity Studio version: 5.16.1.qualifier
+
+FrameworkDirectory:app/framework
+
+appId: znet
+frameworkVariant: em35xezsp
+GenerationDirectory:__SAMPLE_APPLICATION__
+
+DeviceName:Z3Gateway
+
+Host:pc
+
+Platform:pc
+
+
+# Setup configurations
+{setupId:additionalFiles
+}
+{setupId:boardHeader
+allowMissingHeader:false
+useHeaderInPlace:false
+}
+{setupId:bookkeeping
+}
+{setupId:bootloader
+}
+{setupId:callbackConfiguration
+}
+{setupId:commandLineConfiguration
+on
+}
+{setupId:debugConfiguration
+on
+area name off
+appSerial=1
+compile,OTA_BOOTLOAD_CLUSTER
+compile,SECURITY
+enable,OTA_BOOTLOAD_CLUSTER
+enable,SECURITY
+}
+{setupId:eventConfiguration
+}
+{setupId:halOptions
+}
+{setupId:hwConfig
+featureLevel=1
+active=false
+}
+{setupId:information
+\{key:description
+ZigBee 3.0 Gateway, Light and Switch
+
+ZigBee 3.0 provides a foundation of commissioning and network management
+mechanisms to be used in all ZigBee applications. The sample scenario
+presented here demonstrates the flexibility that the ZigBee 3.0 specification
+provides to applications. They also act as an excellent starting point for users
+wishing to build their own ZigBee 3.0 applications.
+
+These applications can take on three possible roles.
+1. Z3Gateway, the gateway can form a centralized network, and the light and the switch
+can join the centralized network by performing network steering.
+2. Z3Light, acting as a router, can form a distributed network, and the
+Z3Switch, acting as an end device, can join the distributed network.
+3. Z3Light, acting as a touchlink target, can touchlink with the
+switch, acting as a touchlink initiator.
+
+The gateway provides CLI commands application interface to the user. The
+CLI command "plugin network-creator start 1" can be issued in order to form
+a centralized network. The gateway application can then be triggered to allow
+other devices onto the network with the CLI command  "plugin network-creator-security
+open-network". Devices can then join the network using the ZigBeeAlliance09
+link key, or by manually entering the install code derived link key into the gateway
+using the CLI command "plugin network-creator-security set-joining-link-key".
+The CLI command "plugin network-creator-security close-network" will close the
+network and no longer allow devices onto the gateway's network.
+
+The light provides a very simplistic user interface. On power up, the light will
+perform network steering automatically. If the light does not find a suitable
+network to join, it forms its own distributed network. The light will not open
+its network for joining as soon as the network comes up, so this must be done
+manually. Once a distributed network is formed and opened, the switch may join
+its network by performing network steering itself or through touchlink
+commissioning.  Once the light is on a network, it will set its
+COMMISSIONING_STATUS_LED. When the light starts identifying as a find and bind
+target, it will blink its COMMISSIONING_STATUS_LED. The light will start
+identifying as a find and bind target automatically when it brings its network
+up, but users can reopen the find and bind target window by pushing either button
+on the light at any time when it is on a network.
+
+The switch provides a simple application interface to the user. When the switch
+is not on a network, it can initiate network steering to join a network using
+button 0. The switch can also initiate touchlink commissioning using button 1.
+After the switch has successfully joining a network, it will perform the finding
+and binding procedure for an initiator. After this takes place, the switch
+should have at least two bindings to the light in its binding table: one for the
+On/Off cluster and one for the Level Control cluster. While the switch is
+performing its network commissioning, it will blink its
+COMMISSIONING_STATUS_LED. When the switch is active on the network, it will
+set its COMMISSIONING_STATUS_LED. Once the switch has finished finding and
+binding, users can use buttons 0 and 1 to send On/Off Toggle and Level Control
+Move to Level commands to the light, respectively.
+
+This application also demonstrates functionality of a Green Power proxy
+application.
+
+The current debug printing settings in these applications are only for the
+purpose of aiding users in understanding and debugging this sample scenario.
+Debug printing should be turned off in order to save code size on a final
+product.
+
+DEPRECATION NOTICE: Z3 Gateway support for MQTT and CoAP
+
+The following Z3 Gateway functional extensions are deprecated. Support
+for them is expected to be removed in a future release. They pertain to an
+obsolete reference design. Customers who do not have prior experience with
+that reference design are advised not to attempt to use these extensions.
+
+Z3Gateway with MQTT
+
+This extension allows a Z3Gateway to communicate with an MQTT broker.
+It involves the use of the following plugins:
+
+- Paho MQTT
+- cJSON
+- Gateway MQTT transport
+- Gateway Relay Mqtt
+- Device Table
+- Command Relay
+
+
+Z3Gateway with CoAP
+
+This extension allows a Z3Gateway to communicate with a CoAP client.
+It involves the use of the following plugins:
+
+- libcoap
+- Coap Server
+- Gateway Relay Coap
+- Device Table
+- Command Relay
+
+
+\}
+}
+{setupId:macros
+-DEM_AF_TEST_HARNESS_CODE
+-DEM_AF_LINK_M
+-DEM_AF_LINK_PTHREAD
+}
+{setupId:pluginService
+}
+{setupId:quizz
+}
+{setupId:serial
+em317=0,false,*,*,*,*,*
+em346=0,false,*,*,*,*,*
+em351=0,false,*,*,*,*,*
+em355=0,false,*,*,*,*,*
+em3555=0,false,*,*,*,*,*
+em357=0,false,*,*,*,*,*
+em357p2p=0,false,*,*,*,*,*
+em3581=0,false,*,*,*,*,*
+em3582=0,false,*,*,*,*,*
+em3585=0,false,*,*,*,*,*
+em3586=0,false,*,*,*,*,*
+em3587=0,false,*,*,*,*,*
+em3588=0,false,*,*,*,*,*
+em3591=0,false,*,*,*,*,*
+em3592=0,false,*,*,*,*,*
+em3595=0,false,*,*,*,*,*
+em3596=0,false,*,*,*,*,*
+em3597=0,false,*,*,*,*,*
+em3598=0,false,*,*,*,*,*
+sky66107=0,false,*,*,*,*,*
+simulation=0,false,*,*,*,*,*
+efr32=0,false,*,*,*,*,*
+}
+{setupId:template
+--version:2
+}
+{setupId:token
+}
+{setupId:zclAfv2
+intMap:ManufacturingCode = 4098
+intMap:ReportTableSize = 5
+intMap:Endpoint = 10
+intMap:DeviceVersion = 0
+intMap:DefaultDestinationEndpoint = 10
+intMap:ProfileId = -1
+intMap:DeviceId = -1
+intMap:DefaultResponsePolicy = 1
+boolMap:EnableStandardReporting = false
+boolMap:EnableInterPanSend = false
+boolMap:EnableInterPanReceive = false
+boolMap:SupportCommandDiscovery = true
+boolMap:EnableKeySwitch = false
+boolMap:LowRamConcentrator = false
+boolMap:EnableAttributeRangeChecking = false
+boolMap:ReceiveSupportedZdoRequests = false
+boolMap:HandleUnsupportedZdoRequests = false
+boolMap:HandleEndpointZdoRequests = false
+boolMap:HandleBindingZdoRequests = false
+boolMap:LegacyCli = false
+boolMap:AddCustomCli = true
+boolMap:IncludeCommandDescriptions = true
+boolMap:GenerateCallbacksFile = false
+boolMap:ManufacturerCodeDefaultIsZero = true
+beginAttrList:OPTIONAL
+  cl:0x0300, at:0x0001, di:server, mf:0x0000
+  cl:0x0300, at:0x0000, di:server, mf:0x0000
+  cl:0x0300, at:0x0002, di:server, mf:0x0000
+  cl:0x0300, at:0x0008, di:server, mf:0x0000
+  cl:0x0300, at:0x4001, di:server, mf:0x0000
+  cl:0x0300, at:0x0007, di:server, mf:0x0000
+  cl:0x0300, at:0x400B, di:server, mf:0x0000
+  cl:0x0300, at:0x400C, di:server, mf:0x0000
+  cl:0x0300, at:0x400A, di:server, mf:0x0000
+  cl:0x0300, at:0x0010, di:server, mf:0x0000
+endAttrList:OPTIONAL
+beginAttributeDefaults
+cl:0x0300, at:0x0010, di:server, mf:0x0000 => 0
+cl:0x0300, at:0x400A, di:server, mf:0x0000 => 0x0019
+endAttributeDefaults
+configuredNetwork:*type:ZIGBEE_PRO, name:Primary
+beginEndpointType:Primary
+device:zcustom
+deviceId:-1
+profileId:-1
+overrideClientCluster:0x0000,yes
+overrideClientCluster:0x0001,no
+overrideClientCluster:0x0002,no
+overrideClientCluster:0x0003,yes
+overrideClientCluster:0x0004,yes
+overrideClientCluster:0x0005,yes
+overrideClientCluster:0x0006,yes
+overrideClientCluster:0x0007,no
+overrideClientCluster:0x0008,yes
+overrideClientCluster:0x0009,no
+overrideClientCluster:0x000A,no
+overrideClientCluster:0x000B,no
+overrideClientCluster:0x000F,no
+overrideClientCluster:0x0015,no
+overrideClientCluster:0x0019,no
+overrideClientCluster:0x001A,no
+overrideClientCluster:0x001B,no
+overrideClientCluster:0x0020,yes
+overrideClientCluster:0x0100,no
+overrideClientCluster:0x0101,no
+overrideClientCluster:0x0102,no
+overrideClientCluster:0x0200,no
+overrideClientCluster:0x0201,no
+overrideClientCluster:0x0202,no
+overrideClientCluster:0x0203,no
+overrideClientCluster:0x0204,no
+overrideClientCluster:0x0300,yes
+overrideClientCluster:0x0301,no
+overrideClientCluster:0x0400,yes
+overrideClientCluster:0x0401,no
+overrideClientCluster:0x0402,yes
+overrideClientCluster:0x0403,no
+overrideClientCluster:0x0404,no
+overrideClientCluster:0x0405,yes
+overrideClientCluster:0x0406,yes
+overrideClientCluster:0x0500,yes
+overrideClientCluster:0x0501,no
+overrideClientCluster:0x0502,no
+overrideClientCluster:0x0600,no
+overrideClientCluster:0x0601,no
+overrideClientCluster:0x0614,no
+overrideClientCluster:0x0700,no
+overrideClientCluster:0x0701,no
+overrideClientCluster:0x0702,yes
+overrideClientCluster:0x0703,no
+overrideClientCluster:0x0704,no
+overrideClientCluster:0x0800,no
+overrideClientCluster:0x0B00,no
+overrideClientCluster:0x0B01,yes
+overrideClientCluster:0x0B02,no
+overrideClientCluster:0x0B03,yes
+overrideClientCluster:0x0B04,yes
+overrideClientCluster:0x0B05,no
+overrideClientCluster:0x1000,no
+overrideMfgClientCluster:0xFC00,0x1002,no
+overrideMfgClientCluster:0xFC01,0x1002,yes
+overrideMfgClientCluster:0xFC02,0x1002,yes
+overrideServerCluster:0x0000,yes
+overrideServerCluster:0x0001,no
+overrideServerCluster:0x0002,no
+overrideServerCluster:0x0003,yes
+overrideServerCluster:0x0004,no
+overrideServerCluster:0x0005,no
+overrideServerCluster:0x0006,yes
+overrideServerCluster:0x0007,no
+overrideServerCluster:0x0008,yes
+overrideServerCluster:0x0009,no
+overrideServerCluster:0x000A,yes
+overrideServerCluster:0x000B,no
+overrideServerCluster:0x000F,no
+overrideServerCluster:0x0015,no
+overrideServerCluster:0x0019,yes
+overrideServerCluster:0x001A,yes
+overrideServerCluster:0x001B,no
+overrideServerCluster:0x0020,no
+overrideServerCluster:0x0100,no
+overrideServerCluster:0x0101,no
+overrideServerCluster:0x0102,no
+overrideServerCluster:0x0200,no
+overrideServerCluster:0x0201,no
+overrideServerCluster:0x0202,no
+overrideServerCluster:0x0203,no
+overrideServerCluster:0x0204,no
+overrideServerCluster:0x0300,yes
+overrideServerCluster:0x0301,no
+overrideServerCluster:0x0400,no
+overrideServerCluster:0x0401,no
+overrideServerCluster:0x0402,no
+overrideServerCluster:0x0403,no
+overrideServerCluster:0x0404,no
+overrideServerCluster:0x0405,no
+overrideServerCluster:0x0406,no
+overrideServerCluster:0x0500,no
+overrideServerCluster:0x0501,no
+overrideServerCluster:0x0502,no
+overrideServerCluster:0x0600,no
+overrideServerCluster:0x0601,no
+overrideServerCluster:0x0614,no
+overrideServerCluster:0x0700,no
+overrideServerCluster:0x0701,no
+overrideServerCluster:0x0702,no
+overrideServerCluster:0x0703,no
+overrideServerCluster:0x0704,no
+overrideServerCluster:0x0800,no
+overrideServerCluster:0x0B00,no
+overrideServerCluster:0x0B01,no
+overrideServerCluster:0x0B02,no
+overrideServerCluster:0x0B03,no
+overrideServerCluster:0x0B04,no
+overrideServerCluster:0x0B05,no
+overrideServerCluster:0x1000,no
+overrideMfgServerCluster:0xFC00,0x1002,no
+endEndpointType
+beginEndpointType:GreenPower
+device:GP-proxy-basic
+deviceId:97
+profileId:41440
+endEndpointType
+beginEndpointType:Second
+device:zcustom
+deviceId:-1
+profileId:-1
+endEndpointType
+configuredEndpoint:*ep:1,pi: 260,di:7,dv:1,ept:Primary,nwk:Primary
+configuredEndpoint:ep:242,pi: 260,di:7,dv:1,ept:GreenPower,nwk:Primary
+callbacks:emberAfIasAceClusterArmCallback
+callbacks:emberAfIasAceClusterArmResponseCallback
+callbacks:emberAfIasAceClusterGetZoneIdMapResponseCallback
+callbacks:emberAfIasAceClusterZoneStatusChangedCallback
+callbacks:emberAfIasAceClusterPanelStatusChangedCallback
+callbacks:emberAfIasAceClusterBypassCallback
+callbacks:emberAfIasAceClusterEmergencyCallback
+callbacks:emberAfIasAceClusterFireCallback
+callbacks:emberAfIasAceClusterPanicCallback
+callbacks:emberAfIasAceClusterGetZoneIdMapCallback
+callbacks:emberAfIasAceClusterGetZoneInformationCallback
+callbacks:emberAfIasAceClusterGetZoneInformationResponseCallback
+}
+{setupId:zclCustomizer
+}
+{setupId:zigbeeStack
+boolMap:EnableZdoSerialCommands = true
+boolMap:EnableBindings = true
+boolMap:EnableEndDeviceBind = false
+boolMap:EnableReceiveStatistics = false
+boolMap:UseEcc163k1 = false
+boolMap:UseEcc283k1 = false
+boolMap:PreconfiguredKeyEnabled = false
+boolMap:NetworkKeyEnabled = false
+boolMap:FragmentationEnable = false
+boolMap:EnableConcentrator = true
+boolMap:UseSeInstallCodes = false
+boolMap:TxPowerModeUseToken = true
+boolMap:BoostMode = false
+boolMap:AlternatePowerMode = false
+byteArrayMap:PreconfiguredKey = 56 77 77 77 77 77 77 77 77 77 77 77 77 77 77 77
+byteArrayMap:NetworkKey = 12 33 33 33 33 33 33 33 33 33 33 33 33 33 33 33
+byteArrayMap:NetworkKey2 = AB CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC
+intMap:NumberOfBindings = 2
+intMap:AddressTableSize = 2
+intMap:TrustCenterCacheSize = 2
+intMap:LinkKeyMode = 2
+intMap:FragmentationMaxSize = 255
+intMap:HeartbeatLed = 2
+configuredNetworkSecurity:Primary|ZIGBEE_PRO=Z3
+configuredNetworkZigbeeDeviceType:Primary|ZIGBEE_PRO=ZA_COORDINATOR
+CliCommandSet:Full
+CliCommands:compile,plugin ota-bootload info
+}
+appPlugin:address-table,true
+
+appPlugin:aes-cmac,false
+appPlugin:aes-software,false
+appPlugin:antenna-cli,false
+appPlugin:aps-link-key-authorization,false
+appPlugin:barrier-control-server,false
+appPlugin:basic,true
+
+appPlugin:battery-monitor,false
+appPlugin:battery-monitor-stub,false
+appPlugin:ble-custom-ezsp,false
+appPlugin:bulb-pwm-driver,false
+appPlugin:button-interface,false
+appPlugin:button-interface-stub,false
+appPlugin:button-joining,false
+appPlugin:calendar-client,false
+appPlugin:calendar-common,false
+appPlugin:calendar-server,false
+appPlugin:ccm-encryption,false
+appPlugin:cjson,false
+appPlugin:coap-server,false
+appPlugin:coexistence-cli,false
+appPlugin:color-control,false
+appPlugin:color-control-server,true
+
+appPlugin:command-relay,false
+appPlugin:comms-hub-function,false
+appPlugin:comms-hub-function-sub-ghz,false
+appPlugin:compact-logger,false
+appPlugin:concentrator,true
+
+appPlugin:coulomb-counter,false
+appPlugin:counters,true
+
+appPlugin:critical-message-queue,false
+appPlugin:custom-ezsp,false
+appPlugin:delayed-join,false
+appPlugin:device-database,false
+appPlugin:device-management-client,false
+appPlugin:device-management-server,false
+appPlugin:device-query-service,false
+appPlugin:device-table,false
+appPlugin:diagnostic-server,false
+appPlugin:dido,false
+appPlugin:dido-storage-posix-filesystem,false
+appPlugin:dmp-demo-ui,false
+appPlugin:dmp-ui-demo,false
+appPlugin:dmp-ui-demo-stub,false
+appPlugin:door-lock-server,false
+appPlugin:drlc,false
+appPlugin:drlc-server,false
+appPlugin:eeprom,false
+appPlugin:eeprom-powerdown,false
+appPlugin:ember-minimal-printf,false
+appPlugin:end-device-support,false
+appPlugin:esi-management,false
+appPlugin:events-client,false
+appPlugin:events-server,false
+appPlugin:exosite-demo,false
+appPlugin:ezmode-commissioning,true
+
+appPlugin:ezsp,true
+
+appPlugin:ezsp-spi,false
+appPlugin:ezsp-uart,true
+
+appPlugin:ezsp-usb,false
+appPlugin:fem-control,false
+appPlugin:file-descriptor-dispatch,true
+
+appPlugin:find-and-bind-initiator,false
+appPlugin:find-and-bind-target,false
+appPlugin:form-and-join,false
+appPlugin:fragmentation,false
+appPlugin:gas-proxy-function,false
+appPlugin:gateway,true
+
+appPlugin:gateway-relay-coap,false
+appPlugin:gateway-relay-mqtt,false
+appPlugin:gbcs-compatibility,false
+appPlugin:gbcs-device-log,false
+appPlugin:gbcs-gas-meter,false
+appPlugin:gbz-message-controller,false
+appPlugin:general-response-commands,false
+appPlugin:generic-interrupt-control,false
+appPlugin:generic-interrupt-control-stub,false
+appPlugin:gpio-sensor,false
+appPlugin:gpio-sensor-stub,false
+appPlugin:green-power-client,true
+
+appPlugin:green-power-common,true
+
+appPlugin:green-power-server,false
+appPlugin:green-power-test-device,false
+appPlugin:green-power-translation-table,false
+appPlugin:groups-client,false
+appPlugin:groups-server,false
+appPlugin:hc-11073-tunnel,false
+appPlugin:heartbeat,true
+
+appPlugin:ias-zone-client,true
+
+appPlugin:ias-zone-server,false
+appPlugin:identify,true
+
+appPlugin:identify-feedback,true
+
+appPlugin:install-code-read,false
+appPlugin:interpan,false
+appPlugin:key-establishment,false
+appPlugin:led-blink,false
+appPlugin:led-blink-stub,false
+appPlugin:level-control,true
+
+appPlugin:libcoap,false
+appPlugin:linked-list,true
+
+appPlugin:lwip,false
+appPlugin:lwip-callback-tests,false
+appPlugin:lwip-interface,false
+appPlugin:lwip-stats,false
+appPlugin:manufacturing-library-cli,false
+appPlugin:mbedtls,true
+
+appPlugin:messaging-client,false
+appPlugin:messaging-server,false
+appPlugin:meter-mirror,false
+appPlugin:meter-snapshot-client,false
+appPlugin:meter-snapshot-server,false
+appPlugin:meter-snapshot-storage,false
+appPlugin:mn-price-passthrough,false
+appPlugin:mpsi,false
+appPlugin:mpsi-ipc,false
+appPlugin:mpsi-storage,false
+appPlugin:ncp-configuration,true
+
+appPlugin:network-creator,true
+
+appPlugin:network-creator-security,true
+
+appPlugin:network-find,false
+appPlugin:network-find-sub-ghz,false
+appPlugin:network-steering,true
+
+appPlugin:occupancy-pyd1698,false
+appPlugin:occupancy-pyd1698-stub,false
+appPlugin:on-off,true
+
+appPlugin:ota-bootload,false
+appPlugin:ota-client,false
+appPlugin:ota-client-policy,false
+appPlugin:ota-common,true
+
+appPlugin:ota-server,true
+
+appPlugin:ota-server-policy,true
+
+appPlugin:ota-storage-common,true
+
+appPlugin:ota-storage-posix-filesystem,true
+
+appPlugin:ota-storage-simple,false
+appPlugin:ota-storage-simple-eeprom,false
+appPlugin:ota-storage-simple-ram,false
+appPlugin:paho.mqtt.c,false
+appPlugin:partner-link-key-exchange,false
+appPlugin:permit-join-manager,false
+appPlugin:poll-control-client,true
+
+appPlugin:poll-control-server,false
+appPlugin:power-consumption-model,false
+appPlugin:power-meter-cs5463,false
+appPlugin:power-meter-cs5463-stub,false
+appPlugin:prepayment-client,false
+appPlugin:prepayment-server,false
+appPlugin:prepayment-snapshot-storage,false
+appPlugin:price-client,false
+appPlugin:price-common,false
+appPlugin:price-server,false
+appPlugin:relay-control-client,false
+appPlugin:relay-control-server,false
+appPlugin:reporting,true
+
+appPlugin:ring-buffer,false
+appPlugin:sb1-gesture-sensor,false
+appPlugin:sb1-gesture-sensor-stub,false
+appPlugin:scan-dispatch,true
+
+appPlugin:scenes,false
+appPlugin:scenes-client,false
+appPlugin:secure-ezsp,false
+appPlugin:secure-ezsp-stub,true
+
+appPlugin:security-support,false
+appPlugin:simple-clock,false
+appPlugin:simple-main,true
+
+appPlugin:simple-metering-client,true
+
+appPlugin:simple-metering-server,false
+appPlugin:sleepy-message-queue,false
+appPlugin:slot-manager,false
+appPlugin:smart-energy-registration,false
+appPlugin:stack-diagnostics,true
+
+appPlugin:stack-protection-iar,false
+appPlugin:standalone-bootloader-client,false
+appPlugin:standalone-bootloader-common,false
+appPlugin:standalone-bootloader-server,false
+appPlugin:standard-printf-support,false
+appPlugin:strong-random,false
+appPlugin:sub-ghz-client,false
+appPlugin:sub-ghz-server,false
+appPlugin:tamper-switch,false
+appPlugin:tamper-switch-stub,false
+appPlugin:test-harness,true
+
+appPlugin:test-harness-z3,false
+appPlugin:throughput,false
+appPlugin:throughput-legacy,false
+appPlugin:time-server,true
+
+appPlugin:transport-mqtt,false
+appPlugin:trust-center-backup,false
+appPlugin:trust-center-keepalive,false
+appPlugin:trust-center-nwk-key-update-broadcast,true
+
+appPlugin:trust-center-nwk-key-update-periodic,true
+
+appPlugin:trust-center-nwk-key-update-unicast,true
+
+appPlugin:tunneling-client,false
+appPlugin:tunneling-server,false
+appPlugin:unix-library,true
+
+appPlugin:unix-printf,true
+
+appPlugin:update-ha-tc-link-key,false
+appPlugin:update-tc-link-key,true
+
+appPlugin:wwah-app-event-retry-manager,false
+appPlugin:wwah-client-silabs,false
+appPlugin:wwah-connectivity-manager,false
+appPlugin:wwah-end-device-extension,false
+appPlugin:wwah-server-silabs,false
+appPlugin:xmodem-sender,false
+appPlugin:zcl-framework-core,true
+
+appPlugin:zcl-ip,false
+appPlugin:zigbee-event-logger,false
+appPlugin:zigbee-event-logger-stub,false
+appPlugin:zll-commissioning-client,false
+appPlugin:zll-commissioning-common,false
+appPlugin:zll-commissioning-network,false
+appPlugin:zll-commissioning-server,false
+appPlugin:zll-identify-server,false
+appPlugin:zll-level-control-server,false
+appPlugin:zll-on-off-server,false
+appPlugin:zll-scenes-client,false
+appPlugin:zll-scenes-server,false
+appPlugin:zll-utility-client,false
+appPlugin:zll-utility-server,false
+AppPluginOption:EMBER_AF_PLUGIN_TEST_HARNESS_AUTO_REGISTRATION_START,FALSE
+AppPluginOption:EMBER_AF_PLUGIN_CONCENTRATOR_CONCENTRATOR_TYPE,HIGH_RAM_CONCENTRATOR
+AppPluginOption:EMBER_AF_PLUGIN_CONCENTRATOR_MIN_TIME_BETWEEN_BROADCASTS_SECONDS,5
+AppPluginOption:EMBER_AF_PLUGIN_CONCENTRATOR_DELIVERY_FAILURE_THRESHOLD,3
+AppPluginOption:EMBER_SOURCE_ROUTE_TABLE_SIZE,100
+AppPluginOption:EMBER_AF_PLUGIN_CONCENTRATOR_NCP_SUPPORT,true
+AppPluginOption:EMBER_KEY_TABLE_SIZE,4
+AppPluginOption:EMBER_MAX_END_DEVICE_CHILDREN,32
+AppPluginOption:EMBER_AF_PLUGIN_OTA_SERVER_MIN_BLOCK_REQUEST_SUPPORT,TRUE
+AppPluginOption:EMBER_AF_PLUGIN_IAS_ZONE_CLIENT_MAX_DEVICES,40
+AppPluginOption:EMBER_BINDING_TABLE_SIZE,16
+AppPluginOption:EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE,10
+AppPluginOption:EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_CALLBACK,false
+AppPluginOption:EMBER_AF_PLUGIN_NETWORK_CREATOR_RADIO_POWER,-2
+AppPluginOption:EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_NETWORK_OPEN_TIME_S,180
+AppPluginOption:EMBER_TRANSIENT_KEY_TIMEOUT_S,180

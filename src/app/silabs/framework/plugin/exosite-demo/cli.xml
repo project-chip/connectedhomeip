@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-exosite-demo" name="Plugin Commands: exosite-demo">
+    <description>This plugin provides functionality to send or retrieve the status of a light configured on the Exosite cloud service.</description>
+  </group>
+  <command cli="plugin exosite-demo light status" functionName="emberAfPluginExositeDemoPrintStatusCommand" group="plugin-exosite-demo"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Retrieve the state of the light from the Exosite cloud service.
+    </description>
+  </command>
+  <command cli="plugin exosite-demo light on" functionName="emberAfPluginExositeDemoSetStatusCommand" group="plugin-exosite-demo"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Set the state of the light to ON in the Exosite cloud service.
+    </description>
+  </command>
+  <command cli="plugin exosite-demo light off" functionName="emberAfPluginExositeDemoSetStatusCommand" group="plugin-exosite-demo"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Set the state of the light to OFF in the Exosite cloud service.
+    </description>
+  </command>
+</cli>

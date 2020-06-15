@@ -1,0 +1,63 @@
+import java.lang.Math;
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"esp", "router", "ipd"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeEsp-simulation/SeEsp",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/SePct-simulation/SePct"
+};
+
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeEsp-simulation-ezsp/SeEsp",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/SeIpd-simulation-ezsp/SeIpd"
+};
+
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Allow for a little bit of drift in the clocks.
+int tolerance = 3;
+
+// Form and join a network and set up encryption.
+int channel = 21;
+int power = 2;
+int panId = 0xDEAD;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Verify that time moves forward...
+for (int time, espTime = 0, ipdTime = 0, i = 0; i < 10; ++i) {
+  // ... on time servers...
+  assert((time = utcTime("esp")) > espTime);
+  espTime = time;
+
+  // ... and time clients...
+  assert((time = utcTime("ipd")) > ipdTime);
+  ipdTime = time;
+
+  // ... and that they keep accurate time relative to each other.
+  assert(Math.abs(espTime - ipdTime) <= tolerance);
+
+  network.sleep(timeout * 2); assert(true);
+}
+
+// Reset time on the client and then verify that it can sync with the server.
+send("ipd", port, "zcl time 0");
+assert(utcTime("ipd") == 0);
+networkWait(timeout); assert(true);
+assert(utcTime("esp") != utcTime("ipd"));
+send("ipd", port, "timesync 0 1 1");
+expect("esp", "READ_ATTR: clus 000A");
+expect("ipd", ".*clus 0x000A \\(Time\\) FC 08 seq .. cmd 01 payload\\[([0-9a-fA-F]{2} ){8}\\]");
+assert(Math.abs(utcTime("esp") - utcTime("ipd")) <= tolerance);

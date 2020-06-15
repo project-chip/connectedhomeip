@@ -1,0 +1,31 @@
+// Coulomb-Counter plugin basic functionality tests.
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create one node in the network.
+SimulatedNetwork network = createNetwork();
+String dut = new String("DUT");
+network.add(dut);
+network.bootload(dut, "build/af-test-apps/CoulombCounterTest-simulation/CoulombCounterTest");
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 1000;
+
+//-----------------------------------------------------------------------------
+
+// Test custom command line
+
+send(dut, "plugin coulomb-counter current-core-mode");
+expect(dut, "Current EM mode: Awake");
+
+network.sleep(5000);    // Sleep 5 seconds
+
+//send(dut, "plugin coulomb-counter current-core-mode");
+//expect(dut, "Current core mode: Awake");
+
+//send(dut, "plugin coulomb-counter energy-usage");
+//expect(dut, "Current energy usage: 123");
+

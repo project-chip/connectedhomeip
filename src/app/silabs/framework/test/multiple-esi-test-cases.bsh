@@ -1,0 +1,425 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create three nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"esi2", "esi1", "ipd"};
+String[] socImages = new String[] {
+  "build/af-test-apps/SeEsp-simulation/SeEsp",
+  "build/af-test-apps/SeEsp-simulation/SeEsp",
+  "build/af-test-apps/SeIpd-simulation/SeIpd"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeEsp-simulation-ezsp/SeEsp",
+  "build/af-test-apps/SeEsp-simulation-ezsp/SeEsp",
+  "build/af-test-apps/SeIpd-simulation-ezsp/SeIpd",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// TEST 20.4 - Single ESI Case - Item 1
+// Setting superseding, master, synchronized bits to 0
+// Endpont 0x1, cluster 0xA, attribute 0x1 (timeStatus), 0x1 (server),
+// attribute time: bitmap8 (0x18).
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {00}", "Success: write");
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Registration failed", timeout * 100);
+networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+// TEST 20.4 - Single ESI Case - Item 2
+// Setting superseding, synchronized bits to 0, master bit to 1
+// Endpont 0x1, cluster 0xA, attribute 0x1 (timeStatus), 0x1 (server),
+// attribute time: bitmap8 (0x18).
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {01}", "Success: write");
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+// TEST 20.4 - Single ESI Case - Item 3
+// Setting master and superseding bits to 0, synchronized bit to 1
+// Endpont 0x1, cluster 0xA, attribute 0x1 (timeStatus), 0x1 (server),
+// attribute time: bitmap8 (0x18).
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {02}", "Success: write");
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+// TEST 20.4 - Single ESI Case - Item 4
+// Setting master and superseding bits to 1, synchronized bit to 0
+// Endpont 0x1, cluster 0xA, attribute 0x1 (timeStatus), 0x1 (server),
+// attribute time: bitmap8 (0x18).
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {09}", "Success: write");
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+// TEST 20.5 - Multiple ESI Case 1
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("esi2", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+networkWait(timeout); 
+// Setting superseding, master and synchronized bits to 0
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {00}", "Success: write");
+// Setting time
+expect("esi1", "write 0x01 0x000A 0x0000 0x01 0xE2 {00000F00}", "Success: write");
+// Setting superseding, master and synchronized bits to 0
+expect("esi2", "write 0x01 0x000A 0x0001 0x01 0x18 {00}", "Success: write");
+// Setting time (one hour difference with esi1)
+expect("esi2", "write 0x01 0x000A 0x0000 0x01 0xE2 {100E0F00}", "Success: write");
+networkWait(5000);
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Registration failed", timeout * 100);
+networkWait(timeout); 
+
+// We should verify the fact that the ipd didn't choose any esi as time server
+// by sending a DRLC message. However, our app framework does not prevent the  
+// DRLC client to respond if the time has not been set. In other words, the 
+// node time is always assumed to be valid. 
+//Get the ipd short address.
+// ipdShortId = nodeId("ipd");
+// networkWait(timeout); 
+// esi1 sends out a Load Control Event (that starts in a minute from now).
+// send("esi1", "zcl drlc lce 0x1 0x00 0x00F0003C 0x0020 0x00"); 
+// send("esi1", "send " + ipdShortId + " 1 1");
+// networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+
+// TEST 20.6 - Multiple ESI Case 2 - ESI 1 is Authoritative Time Server - Master Bit
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("esi2", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+networkWait(timeout); 
+// Setting superseding and synchronized bits to 0, master bit to 1
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {01}", "Success: write");
+// Setting time
+expect("esi1", "write 0x01 0x000A 0x0000 0x01 0xE2 {00000F00}", "Success: write");
+// Setting superseding, master and synchronized bits to 0
+expect("esi2", "write 0x01 0x000A 0x0001 0x01 0x18 {00}", "Success: write");
+// Setting time (one hour difference with esi1)
+expect("esi2", "write 0x01 0x000A 0x0000 0x01 0xE2 {100E0F00}", "Success: write");
+networkWait(timeout); 
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Determined authoritative time source, node 0x0000", timeout * 100);
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+// TEST 20.7 - Multiple ESI Case 3 - ESI 2 is Authoritative Time Server - Master Bit
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("esi2", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+networkWait(timeout); 
+// Setting superseding, master and synchronized bits to 0
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {00}", "Success: write");
+// Setting time
+expect("esi1", "write 0x01 0x000A 0x0000 0x01 0xE2 {00000F00}", "Success: write");
+// Setting superseding and synchronized bits to 0, master bit to 1
+expect("esi2", "write 0x01 0x000A 0x0001 0x01 0x18 {01}", "Success: write");
+// Setting time (one hour difference with esi1)
+expect("esi2", "write 0x01 0x000A 0x0000 0x01 0xE2 {100E0F00}", "Success: write");
+networkWait(timeout); 
+esi2ShortId = nodeId("esi2");
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Determined authoritative time source, node " + esi2ShortId, timeout * 100);
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+// TEST 20.8 - Multiple ESI Case 4 - One superseding bit - two masters  
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("esi2", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+networkWait(timeout); 
+// Setting superseding and synchronized bits to 0, master bit to 1
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {01}", "Success: write");
+// Setting time
+expect("esi1", "write 0x01 0x000A 0x0000 0x01 0xE2 {00000F00}", "Success: write");
+// Setting synchronized bit to 0, superseding and master bits to 1
+expect("esi2", "write 0x01 0x000A 0x0001 0x01 0x18 {09}", "Success: write");
+// Setting time (one hour difference with esi1)
+expect("esi2", "write 0x01 0x000A 0x0000 0x01 0xE2 {100E0F00}", "Success: write");
+networkWait(timeout*10); 
+esi2ShortId = nodeId("esi2");
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Determined authoritative time source, node " + esi2ShortId, timeout * 100);
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+// TEST 20.9 - Multiple ESI Case 5 - Two superseding bits - two masters - Coordinator wins  
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+expect("esi2", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+networkWait(timeout); 
+// Setting synchronized bit to 0, superseding and master bits to 1
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {09}", "Success: write");
+// Setting time
+expect("esi1", "write 0x01 0x000A 0x0000 0x01 0xE2 {00000F00}", "Success: write");
+// Setting synchronized bit to 0, superseding and master bits to 1
+expect("esi2", "write 0x01 0x000A 0x0001 0x01 0x18 {09}", "Success: write");
+// Setting time (one hour difference with esi1)
+expect("esi2", "write 0x01 0x000A 0x0000 0x01 0xE2 {100E0F00}", "Success: write");
+networkWait(timeout); 
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Determined authoritative time source, node 0x0000", timeout * 100);
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout); 
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");
+networkWait(timeout);
+
+// TEST 20.10 - Multiple ESI Case 6 - New Time Server Added to PAN  
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout); 
+// Setting synchronized and superseding bits to 0,  master bit to 1
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {01}", "Success: write");
+// Setting time
+expect("esi1", "write 0x01 0x000A 0x0000 0x01 0xE2 {00000F00}", "Success: write");
+// Setting synchronized bit to 0, superseding and master bits to 1
+expect("esi2", "write 0x01 0x000A 0x0001 0x01 0x18 {09}", "Success: write");
+// Setting time (one hour difference with esi1)
+expect("esi2", "write 0x01 0x000A 0x0000 0x01 0xE2 {100E0F00}", "Success: write");
+networkWait(timeout); 
+// Reducing the discovery period to speed up the test (period is now 100 secs).
+send("ipd", "plugin smart-energy-registration set-period 0x64");
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Determined authoritative time source, node 0x0000", timeout * 100);
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout * 2); 
+expect("esi2", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+networkWait(timeout); 
+esi2ShortId = nodeId("esi2");
+networkWait(timeout); 
+expect("ipd", "Determined authoritative time source, node " + esi2ShortId, timeout * 1000);
+expect("ipd", "Registration complete", timeout * 100);
+
+send("esi1", "network leave");
+send("esi2", "network leave");
+send("ipd", "network leave");
+networkWait(timeout);
+send("esi1", "keys clear");
+send("esi2", "keys clear");
+send("ipd", "keys clear");
+networkWait(timeout);
+reboot("esi1");
+reboot("esi2");
+reboot("ipd");	
+networkWait(timeout);
+
+// TEST 20.11 - Events from Multiple ESIs  
+// Form and join a network.  	
+setupEncryption();
+expect("esi1", "network form 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+send("esi1", "network pjoin 0xFF");
+networkWait(timeout);
+// Setting synchronized and superseding bits to 0, master bit to 1
+expect("esi1", "write 0x01 0x000A 0x0001 0x01 0x18 {01}", "Success: write");
+// Setting time
+expect("esi1", "write 0x01 0x000A 0x0000 0x01 0xE2 {00000F00}", "Success: write");
+esi1ShortId = nodeId("esi1");
+networkWait(timeout);
+
+expect("esi2", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("esi2", "Determined authoritative time source, node " + esi1ShortId, timeout * 100);
+expect("esi2", "Registration complete", timeout * 100);
+networkWait(timeout);
+// Setting synchronized bit to 0, superseding and master bits to 1
+expect("esi2", "write 0x01 0x000A 0x0001 0x01 0x18 {09}", "Success: write");
+// Setting time (one hour difference with esi1)
+expect("esi2", "write 0x01 0x000A 0x0000 0x01 0xE2 {100E0F00}", "Success: write");
+esi2ShortId = nodeId("esi2");
+networkWait(timeout); 
+
+expect("ipd", "network join 21 2 0xDEAD", ".*EMBER_NETWORK_UP.*");
+expect("ipd", "Determined authoritative time source, node " + esi2ShortId, timeout * 100);
+expect("ipd", "Registration complete", timeout * 100);
+networkWait(timeout); 
+ipdShortId = nodeId("ipd");
+networkWait(timeout);
+
+send("esi1", "zcl drlc lce 0x0100 0x00 0x000F0E4C 0x0002 0x00");
+send("esi1", "send " + ipdShortId + " 1 1");
+
+expectMultiline("esi1",
+                "",    // command
+                new String[] {
+                  "= RX Event Status =",
+                  "  eid: 00000100",
+                  "   es: 01",
+                  "= RX Event Status =",
+                  "  eid: 00000100",
+                  "   es: 02",
+                  "= RX Event Status =",
+                  "  eid: 00000100",
+                  "   es: 03",
+                },
+                200000);
+
+send("esi2", "zcl drlc lce 0x0100 0x00 0x000F0EE0 0x0002 0x00"); 
+send("esi2", "send " + ipdShortId + " 1 1");
+expectMultiline("esi2",
+                "",    // command
+                new String[] {
+                  "= RX Event Status =",
+                  "  eid: 00000100",
+                  "   es: 01",
+                  "= RX Event Status =",
+                  "  eid: 00000100",
+                  "   es: 02",
+                  "= RX Event Status =",
+                  "  eid: 00000100",
+                  "   es: 03",
+                },
+                200000);

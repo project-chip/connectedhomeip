@@ -1,0 +1,178 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {
+  // This test case already has a set SoC/host images in place, so running with
+  // -h really isn't needed
+  return;
+}
+
+// This test uses a mixture of (simulated) HOST and SoC apps, so we place 2
+// calls to addAndLoadDevicesWithLocation
+SimulatedNetwork network = createNetwork();
+
+// Load Z3Gateway app as HOST
+Location z3GatewayLocation = gridLocations[0];
+TestNode z3Gateway = new TestNode("gateway",
+                                  "", // no SoC image
+                                  "build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+                                  "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+                                  z3GatewayLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { z3Gateway }, true); // useHost
+
+// Load Z3Light and Z3SwitchWithNvm3 app as SoC devices
+Location z3LlightLocation = gridLocations[1];
+TestNode z3Light = new TestNode("light",
+                                "build/af-test-apps/Z3Light-simulation/Z3Light",
+                                "", // no HOST image
+                                "", // no NCP image
+                                z3LlightLocation);
+Location z3switchlocation = gridLocations[4];
+TestNode z3switch = new TestNode("switch",
+                                 "build/af-test-apps/Z3Switch-simulation/Z3Switch",
+                                 "", // no HOST image
+                                 "", // no NCP image
+                                 z3switchlocation);
+addAndLoadDevicesWithLocation(new TestNode[] { z3Light, z3switch }, false); // useHost
+
+setupEncryption();
+
+// Wait for the nodes to reset
+networkWait(DEFAULT_TIMEOUT);
+
+// Stop the light from trying to join a network. It tries to do so upon startup
+// If it doesn't find a network to join, it forms its own distributed network by
+// default, so have it leave that network
+expect("light",
+       "plugin network-steering stop",
+       "EMBER_NETWORK_UP.*",
+       20000);
+networkWait(10000);
+expect("light",
+       "network leave",
+       ".*EMBER_NETWORK_DOWN");
+networkWait(2000);
+
+// The gateway forms a centralized network
+send("gateway", "plugin network-creator start 1");
+expect("gateway",
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+
+String gatewayChannel = channel("gateway");
+networkWait(1000);
+String gatewayPanId = panId("gateway");
+networkWait(1000);
+
+// Open the network for joining using the gateway
+expect("gateway",
+       "plugin network-creator-security open-network",
+       "NWK Creator Security: Open network: 0x00");
+
+// Now have the z3light join
+expect("light",
+       "plugin network-steering start 0",
+       ".*EMBER_NETWORK_UP.*",
+       30000);
+
+// Give time for the light to establish a new link key
+networkWait(20000);
+
+// Reboot the light
+power("light", false);
+networkWait(2000);
+power("light", true);
+networkWait(2000);
+
+// Make sure our network state is restored by NVM3 tokens
+// (STACK_NETWORK_MANAGEMENT)
+assert(channel("light").equals(gatewayChannel));
+assert(panId("light").equals(gatewayPanId));
+networkWait(2000);
+
+// Ensure our node data is persisted (tests TOKEN_STACK_NODE_DATA)
+expect("light",
+       "info",
+       ".*nodeType \\[0x02\\]");  // router
+
+// Make sure our frame counter token is restored and our key is persisted
+// This tests (I think) the following tokens
+//   TOKEN_STACK_TRUST_CENTER
+//   TOKEN_STACK_NOONCE_COUNTER
+//   TOKEN_STACK_APS_FRAME_COUNTER
+send("light",
+     "zcl global read 0 0");  // cluster 0 (basic), attribute 0 (ZCL version)
+expect("light",
+       "send 0x0000 1 1",     // dest 0000, src ep 1, dst ep 1
+       ".*RX.*clus 0x0000.*");
+networkWait(2000);
+
+// Join the child to the light
+send("gateway",
+     "network pjoin 0");
+send("light",
+     "network pjoin 60");
+expect("switch",
+       "plugin network-steering start 0",
+       ".*EMBER_NETWORK_UP.*",
+       30000);
+
+// Give time for the switch to establish a new link key
+networkWait(20000);
+
+// Reboot the switch
+power("switch", false);
+networkWait(2000);
+power("switch", true);
+networkWait(2000);
+
+// Make sure our network state is restored by NVM3 tokens
+// (STACK_NETWORK_MANAGEMENT)
+assert(channel("switch").equals(gatewayChannel));
+assert(panId("switch").equals(gatewayPanId));
+networkWait(2000);
+
+// Make sure our frame counter token is restored; make sure our parent token is
+// restored (TOKEN_STACK_PARENT_INFO and TOKEN_STACK_PARENT_ADDITIONAL_INFO);
+// make sure our network key works (TOKEN_STACK_KEYS)
+send("switch",
+     "zcl global read 0 0");  // cluster 0 (basic), attribute 0 (ZCL version)
+expect("switch",
+       "send 0x0000 1 1",     // dest 0000, src ep 1, dst ep 1
+       ".*RX.*clus 0x0000.*");
+networkWait(2000);
+
+String switchNodeId = nodeId("switch");
+String switchEui = eui64("switch");
+
+// Configure some bindings
+String euiGateway = eui64("gateway");
+expect("light",
+       "option binding-table set 0 0x1234 0x01 0x01 {" + euiGateway + "}",
+       ".*set bind 0: 0x00");
+expect("light",
+       "option binding-table set 1 0x789A 0x01 0x01 {" + euiGateway + "}",
+       ".*set bind 1: 0x00");
+
+// Reboot the light
+power("light", false);
+networkWait(2000);
+power("light", true);
+networkWait(2000);
+
+// Make sure the child table is restored with tokens (TOKEN_STACK_CHILD_TABLE)
+expect("light",
+       "plugin stack-diagnostic child-table",
+       ".*" + switchNodeId + ".*" + switchEui + ".*");
+
+// Make sure binding table is persisted (STACK_BINDING_TABLE)
+expect("light",
+       "option binding-table print",
+       "0: UNICA  0    0x01  0x01  0x1234.*" + euiGateway);
+expect("light",
+       "option binding-table print",
+       "1: UNICA  0    0x01  0x01  0x789A.*" + euiGateway);
+
+networkWait(5000);
+

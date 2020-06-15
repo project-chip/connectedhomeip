@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-drlc-server" name="Plugin Commands: Demand Response and Load Control Server">
+    <description>
+      The drlc-server plugin contributes CLI commands to the application framework to be used for constructing demand response load control commands on the server side.
+    </description>
+  </group>
+  <command cli="plugin drlc-server print" functionName="emberAfPluginDrlcServerPrintCommand" group="plugin-drlc-server">
+    <description>
+      Print the Demand Response Load Control Table.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+  </command>
+  <command cli="plugin drlc-server slce" functionName="emberAfPluginDrlcServerSlceCommand" group="plugin-drlc-server">
+    <description>
+      Schedule a load control event in the load control event table on a load control server.
+      load control event bytes are expected as 23 raw bytes in the form
+      {&lt;eventId:4&gt; &lt;deviceClass:2&gt; &gt;ueg:1&gt; &gt;startTime:4&gt; &gt;duration:2&gt; &lt;criticalityLevel:1&gt;
+      &gt;coolingTempOffset:1&gt; &gt;heatingTempOffset:1&gt; &gt;coolingTempSetPoint:2&gt; &gt;heatingTempSetPoint:2&gt;
+      &gt;afgLoadPercentage:1&gt; &lt;dutyCycle:1&gt; &lt;eventControl:1&gt; } all multibyte values should be
+      little endian as though they were coming over the air.
+      Example: plugin drlc-server slce 0 23 { ab 00 00 00 ff 0f 00 00 00 00 00 01 00 01 00 00 09 1a 09 1a 0a 00 }
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+    <arg name="index" type="INT8U" description="Location in the load control event table for the event to be scheduled" />
+    <arg name="length" type="INT8U" description="The length in the number of bytes" />
+    <arg name="event" type="OCTET_STRING" description="Byte array value for the load control event" />
+  </command>
+  <command cli="plugin drlc-server lce-schedule-mand" functionName="emberAfPluginDrlcServerScheduleMandatoryLce" group="plugin-drlc-server">
+    <description>
+      Schedules a load control event on the server.
+    </description>
+    <arg name="endpoint"                type="INT8U"   description="The relevant endpoint." />
+    <arg name="index"                   type="INT8U"   description="Index of the load control event table that will be configured." />
+    <arg name="eventId"                 type="INT32U"  description="The issuer event ID for this load control event." />
+    <arg name="deviceClass"             type="INT16U"  description="The device class bitfield this event applies to." />
+    <arg name="utilityEnrollmentGroup"  type="INT8U"   description="The UEG of the load control event." />
+    <arg name="startTime"               type="INT32U"  description="Time when the load control event should start." />
+    <arg name="duration"                type="INT16U"  description="Duration, in minutes, of the event." />
+    <arg name="criticalityLevel"        type="INT8U"   description="The level of criticality of the event.  Higher values are more critical." />
+    <arg name="eventControl"            type="INT8U"   description="Bitmask that identifies other control options for the event." />
+  </command>
+  <command cli="plugin drlc-server sslce" functionName="emberAfPluginDrlcServerSslceCommand" group="plugin-drlc-server">
+    <description>
+      Command used on a DRLC server to send a scheduled load control event out of the load control event table.
+    </description>
+    <arg name="nodeId" type="INT16U" description = "The destination node ide." />
+    <arg name="srcEndpoint" type="INT8U" description = "The source endpoint." />
+    <arg name="dstEndpoint" type="INT8U" description = "The destination endpoint." />
+    <arg name="index" type="INT8U" description="index of the load control event in the server's load control event table." />
+  </command>
+  <command cli="plugin drlc-server cslce" functionName="emberAfPluginDrlcServerCslceCommand" group="plugin-drlc-server">
+    <description>
+      Clear the scheduled load control events table.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+  </command>
+</cli>

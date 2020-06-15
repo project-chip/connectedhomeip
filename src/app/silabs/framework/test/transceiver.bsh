@@ -1,0 +1,85 @@
+// This test intend to verify initial functionality of transceiver
+// mainly Address filtering, Rx/Tx packets and Auto mac-ack.
+
+import com.ember.peek.SimulatedNetwork;
+
+// This test was initially created while implementing simulated transceiver image
+// to test basic features mainly rx/tx packets, address filtering and phy-ack but
+// workflow has been changed when integrated with MCU/NCP specailly for sending
+// phy-ack, hence this test workflow is not valid anymore. Intention of keeping
+// this file is that we may reuse this .bsh by modifying some of the tests
+// and/or adding new tests while adding new features for transceiver in future.
+  return;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"transceiver1", "transceiver2"};
+
+String[] socImages = new String[] {
+  "build/transceiver-simulator-unix-simulation/transceiver-simulator",
+  "build/transceiver-simulator-unix-simulation/transceiver-simulator"
+};
+
+String[] hostImages = new String[] {
+  "build/transceiver-simulator-unix-simulation/transceiver-simulator",
+  "build/transceiver-simulator-unix-simulation/transceiver-simulator",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+int timeout = 1000;
+
+// Set network parameters on transceiver
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+int chpg = 0;
+int nodeId = 0x1234;
+
+//To verify that we are able to communicate over CLI
+send("transceiver1", "version");
+
+send("transceiver1", "nwkparams " + chpg + " " + channel + " " + power + " 0x0001 " + panId);
+
+send("transceiver2", "nwkparams " + chpg + " " + channel + " " + power + " 0x0002 " + panId);
+networkWait(timeout);
+
+//Tx/Rx tests with ack and no-ack required for short and long addressing modes
+debugPrintln("*****Test: send packet with short addr mode no-ack required*****");
+send("transceiver1", "send {0B 41 88 9E 12 12 02 00 01 00}");
+networkWait(timeout);
+
+debugPrintln("*****Test: send packet with short addr mode ack required*****");
+send("transceiver1", "send {0B 61 88 9E 12 12 02 00 01 00}");
+networkWait(timeout);
+
+debugPrintln("*****Test: send packet with long dst addr mode ack required*****");
+send("transceiver1", "send {11 61 8C 9E 12 12 02 00 00 00 00 00 00 00 01 00}");
+networkWait(timeout);
+
+//address filetering tests
+debugPrintln("*****Test: drop a packet due to wrong panId*****");
+send("transceiver2", "send {0B 61 88 9E 12 22 01 00 02 00}");
+networkWait(timeout);
+
+debugPrintln("*****Test: drop a packet due to wrong NodeId*****");
+send("transceiver2", "send {0B 61 88 9E 12 12 11 00 02 00}");
+networkWait(timeout);
+
+debugPrintln("*****Test: drop a packet due to wrong longId*****");
+send("transceiver1", "send {11 61 8C 9E 12 12 02 00 10 00 00 00 00 00 01 00}");
+networkWait(timeout);
+
+//make sure transceiver allow beacon requests and beacons
+debugPrintln("*****Test: allow beacon requests*****");
+send("transceiver1", "send {0A 03 08 9B FF FF FF FF 07}");
+networkWait(timeout);
+
+debugPrintln("*****Test: allow beacon*****");
+send("transceiver2", "send {18 00 80 56 12 12 00 00 FF CF 00 00 00 22 84 01 00 00 00 FF FF FF 00}");
+networkWait(timeout);

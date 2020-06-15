@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-coulomb-counter" name="Plugin Commands: Coulomb Counter">
+    <description>
+      The Coulomb Counter plugin contributes several commands to the application framework's CLI.  These commands are used to control the plugin's behavior.
+    </description>
+  </group>
+  <command cli="plugin coulomb-counter current-core-mode" functionName="emberAfPluginCoulombCounterCurrentCoreModeCommand" group="plugin-coulomb-counter" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Displays the current core mode.
+    </description>
+  </command>
+  <command cli="plugin coulomb-counter additive-modes" functionName="emberAfPluginCoulombCounterAdditiveModesCommand" group="plugin-coulomb-counter" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Displays the current status of all additive modes.
+    </description>
+  </command>
+  <command cli="plugin coulomb-counter energy-usage" functionName="emberAfPluginCoulombCounterEnergyUsageCommand" group="plugin-coulomb-counter" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Displays the currently stored energy usage value.
+    </description>
+  </command>
+  <command cli="plugin coulomb-counter reset-energy-usage" functionName="emberAfPluginCoulombCounterResetEnergyUsageCommand" group="plugin-coulomb-counter" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>
+      Resets the currently stored energy usage value.
+    </description>
+  </command>
+</cli>

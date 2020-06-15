@@ -1,0 +1,16 @@
+/** @brief Security sensor state changed
+ *
+ * This callback is generated when the status of security sensor is changed
+ *
+ * @param newStatus, 16 bit new status
+ *
+ * bit0: 1 - opened or alarmed, 0 - closed or not alarmed
+ * bit2: 1 - tampered, 0 - not tampered
+ * other bits: reserved.
+ *
+ *  Ver.: always
+ */
+void emberAfPluginSecuritySensorStatusChangedCallback(uint16_t status)
+{
+  emberAfCorePrintln("Security sensor status changed: 0x%x", status);
+}

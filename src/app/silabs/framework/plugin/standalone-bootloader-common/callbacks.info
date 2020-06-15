@@ -1,0 +1,16 @@
+/** @brief Incoming Message
+ *
+ * Indicates an Ember Bootload message has been received by the Standalone
+ * Bootloader Common plugin.
+ *
+ * @param longId The sender's EUI64 address Ver.: always
+ * @param length The length of the incoming message. Ver.: always
+ * @param message The array of bytes for the message. Ver.: always
+ */
+bool emberAfPluginStandaloneBootloaderCommonIncomingMessageCallback(EmberEUI64 longId,
+                                                                    uint8_t length,
+                                                                    uint8_t*message)
+{
+  // Return true to indicate the message was handled, false otherwise.
+  return false;
+}

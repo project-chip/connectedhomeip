@@ -1,0 +1,54 @@
+// This test is a beanshell test if an em4 enabled sleepy end-device actually goes to em4 sleep
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {                                             
+  std.print("**** Sleep mode is broken for host NCP mode");
+  return;                                                                       
+ } 
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"gateway","door-lock"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaDoorLockEm4-simulation/HaDoorLockEm4",
+};
+String[] hostImages = new String[] {
+  "",
+  "",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+int fc1, fc2 = 16;
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 1000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+expect("door-lock",".*WARNING: Undefined behavior.*",25000);
+networkWait(20000); //going to em4 and coming back twice before there is any network, make sure there are no crashes
+
+networkForm("gateway");
+networkWait(5000);
+
+setupEncryption(); //after reset we need to setup the correct simulation encryption type
+networkJoinToWithTimeout("door-lock", "gateway", 5000); 
+expect("door-lock",".*EMBER_NETWORK_UP.*",20000);
+
+fc1 = nwkFrameCounter("door-lock");
+assert(fc1 < fc2); //nwk frame counter should not reset
+
+networkWait(20000);
+
+
+//-----------------------------------------------------------------------------
+                                                       

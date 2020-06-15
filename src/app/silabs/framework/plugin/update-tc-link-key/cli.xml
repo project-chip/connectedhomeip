@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-update-tc-link-key"
+         name="Plugin Commands: Update TC Link Key">
+    <description>
+      The update trust center link key commands are used to manipulate the behavior of the joining device to attempt the trust center link key updates in a certain fashion.
+    </description>
+  </group>
+
+  <command cli="plugin update-tc-link-key timer"
+           functionName="emberAfPluginSetTCLinkKeyUpdateTimerCommand"
+           group="plugin-update-tc-link-key">
+    <description>
+      This sets the the amount of time between subsequent trust center link key updates in milliseconds.
+    </description>
+    <arg name="timeInMilliseconds"
+         type="INT32U"
+         description="The amount of time between subsequent trust center link key updates in milliseconds" />
+  </command>
+</cli>

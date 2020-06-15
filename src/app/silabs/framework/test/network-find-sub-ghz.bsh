@@ -1,0 +1,382 @@
+/*
+// NOTE: Some 'expect' statements are commented out to cover for a known bug
+// in the test infrastructure: if two or more prompts come with the same time
+// stamp, then the infrastructure registers only the last one, causing the
+// earlier 'expect' statements fail.
+//
+// This bug also imposes some small changes to the test code.
+//
+// For example, we expect prompt A with a timeout T, followed immediately
+// by prompt B without a timeout. Due to the bug, prompt A may be missed, so
+// we comment out 'expect(A)'. But prompt A was with a timeout, which we now
+// have to reallocate to prompt B, like this:
+//
+// What we want:            What we have to do:
+//   expect(A, T);            // expect(A, T);  <-- comment out or delete
+//   expect(B);               expect(B, T);     <-- move the timeout here
+*/
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  // This tests find and joining the right network, which is always 1-hop.
+  // No real point in testing multi-hop.
+  std.print("**** Multihop doesn't make sense, skipping");
+  return;
+}
+
+// Create network and load devices.
+SimulatedNetwork network = createNetwork();
+boolean noEcc = shouldSkipEccTest();
+
+TestNode[] ncpNodes = noEcc
+  ? new TestNode[] {
+      new TestNode ("coordinator",
+          "",
+          "build/af-test-apps/Se14CommsHub-simulation-ezsp/Se14CommsHub",
+          "app/ncp/sample-app/xncp-commshub-spi-dual_simulation/simulation/build/exe/xncp-commshub-spi-dual",
+          "build/transceiver-simulator-unix-simulation_trx/transceiver-simulator",
+          new Location(1, 0))
+    }
+  : new TestNode[] {
+      new TestNode ("coordinator",
+          "",
+          "build/af-test-apps/Se14CommsHub-simulation-ezsp/Se14CommsHub",
+          "app/ncp/sample-app/xncp-commshub-spi-dual_simulation-real_ecc/simulation/build/exe/xncp-commshub-spi-dual",
+          "build/transceiver-simulator-unix-simulation_trx/transceiver-simulator",
+          new Location(1, 0))
+    };
+addAndLoadDevicesWithLocationSim(ncpNodes, true);
+
+//Two SoCs and Two NCPs
+TestNode[] socNodes = noEcc
+  ? new TestNode[] {
+      new TestNode ("joiner_2_4_ghz",
+          "build/af-test-apps/Se12Ihd-simulation/Se12Ihd",
+          "",
+          "",
+          "",
+          new Location(1, 1)),
+      new TestNode ("joiner_dual",
+          "build/af-test-apps/Se14MeterGas-simulation/Se14MeterGas",
+          "",
+          "",
+          "",
+          new Location(1, 2))
+    }
+  : new TestNode[] {
+      new TestNode ("joiner_2_4_ghz",
+          "build/af-test-apps/Se12Ihd-simulation-REAL_ECC/Se12Ihd",
+          "",
+          "",
+          "",
+          new Location(1, 2)),
+      new TestNode ("joiner_dual",
+          "build/af-test-apps/Se14MeterGas-simulation-REAL_ECC/Se14MeterGas",
+          "",
+          "",
+          "",
+          new Location(1, 2))
+    };
+addAndLoadDevicesWithLocationSim(socNodes, false);
+
+// Form and join a network and set up encryption.
+// Note this will form on 2.4 GHz, with the sub-GHz interface initially disabled.
+int channel = 11;
+int power = 0;
+int panId = 0xABBA;
+String panIdString = Integer.toHexString(panId).toUpperCase();
+
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+networkForm("coordinator");
+network.sleep(2000);
+expect("coordinator",
+       "network pjoin 255",
+       ".*pJoin for 255 sec: 0x00");
+
+// -- TEST 1 --
+// Join the 2.4 GHz joiner. This should succeed easily.
+expect("joiner_2_4_ghz",
+       "network find joinable",
+       "Joining on ch " + channel + ", panId 0x" + panIdString);
+expect("joiner_2_4_ghz",
+       "",
+       ".*EMBER_NETWORK_UP 0x.*",
+       2000);
+expect("joiner_2_4_ghz",
+       "",
+       "Network find complete",
+       80000);
+
+// -- TEST 2 --
+// Try joining the dual-band joiner in the default configuration.
+// This should also succeed as the joiner starts with 2.4 GHz first.
+expect("joiner_dual",
+       "network find joinable",
+       "Joining on ch " + channel + ", panId 0x" + panIdString);
+expect("joiner_dual",
+       "",
+       ".*EMBER_NETWORK_UP 0x.*",
+       2000);
+expect("joiner_dual",
+       "",
+       "Network find complete",
+       80000);
+
+// -- TEST 3 --
+// Leave the dual joiner and clear its key from the table
+// in preparation for the next join.
+expect("joiner_dual",
+       "network leave",
+       ".*EMBER_NETWORK_DOWN");
+send("joiner_dual",
+     "keys clear");
+send("coordinator",
+     "keys delete 1");
+
+// Try joining again, forcing a 2.4 GHz-only join.
+// This should have the same effect as the default configuration (2.4 + sub-GHz).
+send("joiner_dual",
+     "network find mode 1");    // switch network find mode to 2.4 GHz only
+
+expect("joiner_dual",
+       "network find joinable",
+       "Joining on ch " + channel + ", panId 0x" + panIdString);
+expect("joiner_dual",
+       "",
+       ".*EMBER_NETWORK_UP 0x.*",
+       2000);
+expect("joiner_dual",
+       "",
+       "Network find complete",
+       80000);
+
+// -- TEST 4 --
+// Leave the dual joiner and clear its key from the table
+// otherwise the next join would fail for the wrong reason.
+expect("joiner_dual",
+       "network leave",
+       ".*EMBER_NETWORK_DOWN");
+send("joiner_dual",
+     "keys clear");
+send("coordinator",
+     "keys delete 1");
+
+// Try joining the dual joiner again, on sub-GHz only.
+// This should fail since the sub-GHz interface has not been open yet.
+send("joiner_dual",
+     "network find mode 2");    // switch network find mode to sub-GHz only
+
+expect("joiner_dual",
+       "network find joinable",
+       ".*Form and join scan done on page 28",
+       30000);
+expect("joiner_dual",
+       "",
+       ".*Form and join scan done on page 29",
+       10000);
+expect("joiner_dual",
+       "",
+       ".*Form and join scan done on page 30",
+       20000);
+/* expect("joiner_dual",
+       "",
+       ".*Form and join scan done on page 31",
+       20000);*/  // <-- See the top-of-the-file comment for why this is commented out...
+expect("joiner_dual",
+       "",
+       ".*Scanning again, using all channels.",
+       20000);    // <-- ...as well as why there is a timeout here.
+expect("joiner_dual",
+       "network find joinable",
+       ".*Form and join scan done on page 28",
+       30000);
+expect("joiner_dual",
+       "",
+       ".*Form and join scan done on page 29",
+       10000);
+expect("joiner_dual",
+       "",
+       ".*Form and join scan done on page 30",
+       20000);
+/*expect("joiner_dual",
+       "",
+       ".*Form and join scan done on page 31",
+       20000);*/  // <-- See the top-of-the-file comment for why this is commented out...
+expect("joiner_dual",
+       "",
+       ".*Network find complete \\(scan error\\)\\.",
+       20000);    // <-- ...as well as why there is a timeout here.
+
+// -- TEST 5 --
+// Enable the sub-GHz interface.
+// All tests from now on will be done with both interfaces enabled.
+int subGhzPage = 29;
+int subGhzChannel = 6;
+int subGhzPower = 0;
+int subGhzOptions = 0;
+int subGhzChannel8bitEncoded = ((subGhzPage << 5) & 255) + subGhzChannel;
+
+expect("coordinator",
+       "network multi-phy-start " + subGhzPage + " " + subGhzChannel + " " + subGhzPower + " " + subGhzOptions,
+       "Started multi-phy interface");
+
+// Retry joining the dual joiner on sub-GHz.
+// This time it should succeed.
+expect("joiner_dual",
+       "network find joinable",
+       ".*Form and join scan done on page 28",
+       30000);
+expect("joiner_dual",
+       "",
+       ".*EMBER_NETWORK_UP 0x.*",
+       30000);
+expect("joiner_dual",
+       "",
+       "Network find complete",
+       80000);
+
+// -- TEST 6 --
+// Leave the dual joiner and clear its key from the table
+// in preparation for the next join.
+expect("joiner_dual",
+       "network leave",
+       ".*EMBER_NETWORK_DOWN");
+send("joiner_dual",
+     "keys clear");
+send("coordinator",
+     "keys delete 1");
+
+// Try joining in a forced 2.4 GHz-only mode again.
+// We have done that in TEST 3 but this time the coordinator has both PHYs enabled.
+// This test case checks that enabling sub-GHz did not mess up the 2.4 GHz interface.
+send("joiner_dual",
+     "network find mode 1");    // switch network find mode to 2.4 GHz only
+
+expect("joiner_dual",
+       "network find joinable",
+       "Joining on ch " + channel + ", panId 0x" + panIdString);
+expect("joiner_dual",
+       "",
+       ".*EMBER_NETWORK_UP 0x.*",
+       2000);
+expect("joiner_dual",
+       "",
+       "Network find complete",
+       80000);
+
+// -- TEST 7 --
+// Leave the dual joiner and clear its key from the table
+// in preparation for the next join.
+expect("joiner_dual",
+       "network leave",
+       ".*EMBER_NETWORK_DOWN");
+send("joiner_dual",
+     "keys clear");
+send("coordinator",
+     "keys delete 1");
+
+// Join again, this time in the 2.4 + sub-GHz find mode.
+// It is the same as the default which we have already tested in TEST 2,
+// but there are two subtle differences:
+// 1) This time the "combined" mode is set explicitly
+// 2) The sub-GHz interface is enabled on the coordinator
+// The joiner should join on either interface, but since it tried 2.4 GHz first,
+// it is more likely to join in that band.
+send("joiner_dual",
+     "network find mode 3");    // switch network find mode to 2.4 + sub-GHz
+
+expect("joiner_dual",
+       "network find joinable",
+       "Joining on ch " + channel + ", panId 0x" + panIdString);
+expect("joiner_dual",
+       "",
+       ".*EMBER_NETWORK_UP 0x.*",
+       2000);
+expect("joiner_dual",
+       "",
+       "Network find complete",
+       80000);
+
+// The key table stuff below doesn't work without ECC, so just end the test here
+if(noEcc) {
+  return;
+}
+// -- TEST 8 --
+// Leave the dual joiner but do NOT clear its key from the table.
+// The following join should fail due to the leftover key entry.
+expect("joiner_dual",
+       "network leave",
+       ".*EMBER_NETWORK_DOWN");
+
+expect("joiner_dual",
+       "network find joinable",
+       "Joining on ch " + channel + ", panId 0x" + panIdString);
+expect("joiner_dual",
+       "",
+       ".*EMBER_JOIN_FAILED");
+
+// Device failed to join on 2.4 Ghz, proceeds on sub-GHz and finds an open channel again
+expect("joiner_dual",
+       "",
+       "Joining on ch " + subGhzChannel8bitEncoded + ", panId 0x" + panIdString,
+       60000);
+expect("joiner_dual",
+       "",
+       ".*EMBER_JOIN_FAILED");
+
+// Device failed to join again, starts re-scanning on all channels
+// when the same thing shoul happen again.
+expect("joiner_dual",
+       "",
+       ".*Scanning again, using all channels.",
+       50000);
+expect("joiner_dual",
+       "",
+       "Joining on ch " + channel + ", panId 0x" + panIdString);
+expect("joiner_dual",
+       "",
+       ".*EMBER_JOIN_FAILED");
+expect("joiner_dual",
+       "",
+       "Joining on ch " + subGhzChannel8bitEncoded + ", panId 0x" + panIdString,
+       60000);
+expect("joiner_dual",
+       "",
+       ".*EMBER_JOIN_FAILED");
+
+// After the re-scan, the join fails for good.
+expect("joiner_dual",
+       "",
+       ".*Network find complete \\(scan error\\)\\.",
+       50000);
+
+// -- TEST 9 --
+// Repeat TEST 8 but this time clear the leftover key entry
+// half way through the joining process, during the re-scan.
+// That should cause the join to succeed.
+expect("joiner_dual",
+       "network find joinable",
+       "Joining on ch " + channel + ", panId 0x" + panIdString);
+expect("joiner_dual",
+       "",
+       ".*Scanning again, using all channels.",
+       90000);
+
+send("joiner_dual",
+     "keys clear");
+send("coordinator",
+     "keys delete 1");
+
+expect("joiner_dual",
+       "",
+       ".*EMBER_NETWORK_UP 0x.*",
+       2000);
+expect("joiner_dual",
+       "",
+       "Network find complete",
+       80000);

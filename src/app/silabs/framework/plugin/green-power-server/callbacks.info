@@ -1,0 +1,172 @@
+#include EMBER_AF_API_GREEN_POWER_SERVER
+/** @brief Gpd Commissioning Notification
+ *
+ * This function is called by the Green Power Sink Plugin to notify the
+ * application about Green Power Device commissioning notification received
+ * by the sink. Return false if callback not handled, true if callback is
+ * handled.
+ *
+ * @param commandId                    Ver.: always
+ * @param commNotificationOptions      Ver.: always
+ * @param gpdAddr                      Ver.: always
+ * @param gpdSecurityFrameCounte       Ver.: always
+ * @param gpdCommandId                 Ver.: always
+ * @param gpdCommandPayload            Ver.: always
+ * @param gppShortAddress              Ver.: always
+ * @param rssi                         Ver.: always
+ * @param linkQuality                  Ver.: always
+ * @param gppDistance                  Ver.: always
+ * @param commissioningNotificationMic Ver.: always
+ * @param errorReturn                  Ver.: always
+ */
+bool emberAfPluginGreenPowerServerGpdCommissioningNotificationCallback(uint8_t commandId,
+                                                                       uint16_t commNotificationOptions,
+                                                                       EmberGpAddress *gpdAddr,
+                                                                       uint32_t gpdSecurityFrameCounter,
+                                                                       uint8_t gpdCommandId,
+                                                                       uint8_t* gpdCommandPayload,
+                                                                       uint16_t gppShortAddress,
+                                                                       int8_t rssi,
+                                                                       uint8_t linkQuality,
+                                                                       uint8_t gppDistance,
+                                                                       uint32_t commissioningNotificationMic)
+{
+  return false;
+}
+
+/** @brief Gpd Commissioning
+ *
+ * This function is called by the Green Power Sink Plugin to notify the
+ * application of a Green Power Device that has requested commissioning with
+ * this sink. Returns false if callback is not handled, true if callback is handled.
+ * When the callback is handled, it must set the matchFound argument appropriately
+ * to indicate if the matching functionality is found or not.
+ *
+ * @param appInfo   Application information of the commissioning GPD. Ver.: always
+ * @param matchFound Output flag to notify matching functionality. Ver.: always
+ */
+bool emberAfPluginGreenPowerServerGpdCommissioningCallback(EmberGpApplicationInfo * appInfo,
+                                                           bool* matchFound)
+{
+  bool handled = false;
+  // When this is implemented by the user :
+  // iterate through the sink commissioning endpoints to process the matching of the
+  // cluster functionality based on the gpd application information and set the supplied
+  // matchFound flag.
+  *matchFound = false;
+  return handled;
+}
+
+/** @brief Gpd Commissioning
+ *
+ * This function is called by the Green Power Sink Plugin to notify the
+ * application of a Green Power Security Processing failed for an incomming notification.
+ *
+ * @param appInfo   Ver.: always
+ */
+void emberAfPluginGreenPowerServerGpdSecurityFailureCallback(EmberGpAddress *gpdAddr)
+{
+}
+
+/** @brief Gp Notification
+ *
+ * This function is called by the Green Power Sink Plugin to notify the
+ * application of a Green Power Gp Notification of an incomming gpd command.
+ * Return true to handle in application.
+ *
+ * @param options from the incoming Gp Notification Command Ver.: always
+ * @param addr GPD address        Ver.: always
+ * @param gpdSecurityFrameCounter Ver.: always
+ * @param gpdCommandId            Ver.: always
+ * @param gpdCommandPayload first byte is length of the payload Ver.: always
+ * @param gppShortAddress         Ver.: always
+ * @param gppDistance             Ver.: always
+ */
+bool emberAfGreenPowerClusterGpNotificationForwardCallback(uint16_t options,
+                                                           EmberGpAddress * addr,
+                                                           uint32_t gpdSecurityFrameCounter,
+                                                           uint8_t gpdCommandId,
+                                                           uint8_t * gpdCommandPayload,
+                                                           uint16_t gppShortAddress,
+                                                           uint8_t  gppDistance)
+{
+  return false;
+}
+
+/** @brief Gpd Commissioning
+ *
+ * This function is called by the Green Power Server upon the completion of the pairing
+ * and to indicate the closure of the pairing session.
+ *
+ * @param appInfo   Ver.: always
+ */
+void emberAfGreenPowerServerPairingCompleteCallback(uint8_t numberOfEndpoints,
+                                                    uint8_t * endpoints)
+{
+}
+
+/** @brief Gpd Commissioning
+ *
+ * This function is called by the Green Power Server upon expiry of either the switch commissioning
+ * or multisensor commissioning timer.
+ *
+ * @param appInfo   Ver.: always
+ */
+void emberAfGreenPowerServerCommissioningTimeoutCallback(uint8_t commissioningTimeoutType,
+                                                         uint8_t numberOfEndpoints,
+                                                         uint8_t * endpoints)
+{
+}
+
+/** @brief Gpd Commissioning
+ *
+ * This function is called by the Green Power Server to proceed with updating the InvolveTC bit
+ * of the security level attribute.
+ *
+ * @param appInfo   Ver.: always
+ */
+bool emberAfGreenPowerServerUpdateInvolveTCCallback(EmberStatus status)
+{
+  bool handled = false;
+  return handled;
+}
+
+/** @brief Green Power Cluster Gp Pairing Search
+ * Retruns true if this callback is handled.
+ *
+ * @param options   Ver.: since gp-1.0-09-5499-24
+ * @param gpdSrcId   Ver.: since gp-1.0-09-5499-24
+ * @param gpdIeee   Ver.: since gp-1.0-09-5499-24
+ * @param endpoint   Ver.: always
+ *
+ */
+bool emberAfGreenPowerClusterGpPairingSearchCallback(uint16_t options,
+                                                     uint32_t gpdSrcId,
+                                                     uint8_t* gpdIeee,
+                                                     uint8_t endpoint)
+{
+  // Retruns true if handled else return false for a default response
+  // to be generated by application framework cluster command handler
+  return false;
+}
+
+/** @brief Sink Table Access Notification
+*
+* This function is called by the Green Power Sink Plugin to notify the
+* application about Green Power Device addition or removal
+* by the green power server to the Sink Table. If returned false, the sink table remains un accessed.
+*
+* @param data void pointer to the data Ver.: always
+* @param accessType accessType         Ver.: always
+*/
+bool  emberAfPluginGreenPowerServerSinkTableAccessNotificationCallback(void* data,
+                                                                       EmberAfGpServerSinkTableAccessType accessType)
+{
+  // The data is a void pointer must be typecaste to required type based on the access type for correct access.
+  // Example :
+  // if accessType is GREEN_POWER_SERVER_SINK_TABLE_ACCESS_TYPE_REMOVE_GPD
+  //                   or GREEN_POWER_SERVER_SINK_TABLE_ACCESS_TYPE_ADD_GPD
+  // The data must be typecast to (EmberGpAddress *) e.g. and access
+  //      EmberGpAddress * addr = (EmberGpAddress *) data;
+  return true;
+}

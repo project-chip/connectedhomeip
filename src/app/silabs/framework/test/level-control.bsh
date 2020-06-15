@@ -1,0 +1,488 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "router", "switch"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaSwitch-simulation/HaSwitch",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaSwitch-simulation-ezsp/HaSwitch",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+lazyExpect = true;
+
+public static final int UP = 0x00;
+public static final int DOWN = 0x01;
+
+String format8(int data)
+{
+  return String.format("%02X", new Object[] { data });
+}
+
+String formatLevel(int level)
+{
+  return format8(level);
+}
+
+String formatTransitionTime(int transitionTimeS)
+{
+  int transitionTimeDs = transitionTimeS * 10;
+  return String.format("%02X %02X",
+                       new Object[] {
+                         transitionTimeDs & 0xFF,
+                         (transitionTimeDs >> 8) & 0xFF,
+                       });
+}
+
+String formatMoveMode(int moveMode)
+{
+  return format8(moveMode);
+}
+
+String formatRate(int rate)
+{
+  return format8(rate);
+}
+
+String formatOnOff(boolean onOff)
+{
+  return (onOff ? "01" : "00");
+}
+
+String formatStepSize(int stepSize)
+{
+  return format8(stepSize);
+}
+
+void setState(int currentLevel, boolean onOff)
+{
+  dbg.println("setState() called from line " + this.namespace.getInvocationLine());
+  expect("light", "write 6 0x0008 0x0000 1 0x20 {" + formatLevel(currentLevel) + "}", "Success: write");
+  expect("light", "write 6 0x0006 0x0000 1 0x10 {" + formatOnOff(onOff) + "}", "Success: write");
+}
+
+void moveToLevelOverride(int level, int transitionTimeS, int mask, int override)
+{
+  dbg.println("moveToLevel() called from line " + this.namespace.getInvocationLine());
+  String payload = formatLevel(level) + " " + formatTransitionTime(transitionTimeS) + " " + format8(mask) + " " + format8(override);
+  expectMultiline("switch",
+                  "zcl level-control mv-to-level " + level + " " + (transitionTimeS * 10) + " 0x" + format8(mask) + " 0x" + format8(override),
+                  new String[] {
+                    "Msg: clus 0x0008, cmd 0x00, len 8",
+                    "buffer: 01 [0-9a-fA-F]{2} 00 " + payload,
+                  });
+  send("switch", "send 0 1 6");
+  expect("light",  "T[0-9a-fA-F]{8}:RX len 8, ep 06, clus 0x0008 \\(Level Control\\) FC 01 seq [0-9a-fA-F]{2} cmd 00 payload\\[" + payload + " \\]");
+  expect("switch", "T[0-9a-fA-F]{8}:RX len 5, ep 01, clus 0x0008 \\(Level Control\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[00 00 \\]");
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void moveToLevel(int level, int transitionTimeS)
+{
+  moveToLevelOverride(level, transitionTimeS, 0x00, 0x00);
+}
+
+void moveToLevelWithOnOff(int level, int transitionTimeS)
+{
+  dbg.println("moveToLevelWithOnOff() called from line " + this.namespace.getInvocationLine());
+  String payload = formatLevel(level) + " " + formatTransitionTime(transitionTimeS);
+  expectMultiline("switch",
+                  "zcl level-control o-mv-to-level " + level + " " + (transitionTimeS * 10),
+                  new String[] {
+                    "Msg: clus 0x0008, cmd 0x04, len 6",
+                    "buffer: 01 [0-9a-fA-F]{2} 04 " + payload,
+                  });
+  send("switch", "send 0 1 6");
+  expect("light",  "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0008 \\(Level Control\\) FC 01 seq [0-9a-fA-F]{2} cmd 04 payload\\[" + payload + " \\]");
+  expect("switch", "T[0-9a-fA-F]{8}:RX len 5, ep 01, clus 0x0008 \\(Level Control\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[04 00 \\]");
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void move(int moveMode, int rate)
+{
+  dbg.println("move() called from line " + this.namespace.getInvocationLine());
+  String payload = formatMoveMode(moveMode) + " " + formatRate(rate) + " 00 00";
+  expectMultiline("switch",
+                  "zcl level-control move " + moveMode + " " + rate + " 00 00",
+                  new String[] {
+                    "Msg: clus 0x0008, cmd 0x01, len 7",
+                    "buffer: 01 [0-9a-fA-F]{2} 01 " + payload,
+                  });
+  send("switch", "send 0 1 6");
+  expect("light",  "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0008 \\(Level Control\\) FC 01 seq [0-9a-fA-F]{2} cmd 01 payload\\[" + payload + " \\]");
+  expect("switch", "T[0-9a-fA-F]{8}:RX len 5, ep 01, clus 0x0008 \\(Level Control\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[01 00 \\]");
+  networkWait(7500); // TODO: calculate the real time
+}
+
+void moveWithOnOff(int moveMode, int rate)
+{
+  dbg.println("moveWithOnOff() called from line " + this.namespace.getInvocationLine());
+  String payload = formatMoveMode(moveMode) + " " + formatRate(rate);
+  expectMultiline("switch",
+                  "zcl level-control o-move " + moveMode + " " + rate,
+                  new String[] {
+                    "Msg: clus 0x0008, cmd 0x05, len 5",
+                    "buffer: 01 [0-9a-fA-F]{2} 05 " + payload,
+                  });
+  send("switch", "send 0 1 6");
+  expect("light",  "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0008 \\(Level Control\\) FC 01 seq [0-9a-fA-F]{2} cmd 05 payload\\[" + payload + " \\]");
+  expect("switch", "T[0-9a-fA-F]{8}:RX len 5, ep 01, clus 0x0008 \\(Level Control\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[05 00 \\]");
+  networkWait(7500); // TODO: calculate the real time
+}
+
+void stop()
+{
+  dbg.println("stop() called from line " + this.namespace.getInvocationLine());
+  expectMultiline("switch",
+                  "zcl level-control stop" + " 00 00",
+                  new String[] {
+                    "Msg: clus 0x0008, cmd 0x03, len 5",
+                    "buffer: 01 [0-9a-fA-F]{2} 03" + " 00 00",
+                  });
+  send("switch", "send 0 1 6");
+  expect("light",  "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0008 \\(Level Control\\) FC 01 seq [0-9a-fA-F]{2} cmd 03 payload\\[00 00 \\]");
+  expect("switch", "T[0-9a-fA-F]{8}:RX len 5, ep 01, clus 0x0008 \\(Level Control\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[03 00 \\]");
+  networkWait(7500); // TODO: calculate the real time
+}
+
+void stopWithOnOff()
+{
+  dbg.println("stopWithOnOff() called from line " + this.namespace.getInvocationLine());
+  expectMultiline("switch",
+                  "zcl level-control o-stop",
+                  new String[] {
+                    "Msg: clus 0x0008, cmd 0x07, len 3",
+                    "buffer: 01 [0-9a-fA-F]{2} 07 ",
+                  });
+  send("switch", "send 0 1 6");
+  expect("light",  "T[0-9a-fA-F]{8}:RX len 3, ep 06, clus 0x0008 \\(Level Control\\) FC 01 seq [0-9a-fA-F]{2} cmd 07 payload\\[\\]");
+  expect("switch", "T[0-9a-fA-F]{8}:RX len 5, ep 01, clus 0x0008 \\(Level Control\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[07 00 \\]");
+  networkWait(7500); // TODO: calculate the real time
+}
+
+void step(int stepMode, int stepSize, int transitionTimeS)
+{
+  dbg.println("step() called from line " + this.namespace.getInvocationLine());
+  String payload = formatMoveMode(stepMode) + " " + formatStepSize(stepSize) + " " + formatTransitionTime(transitionTimeS) + " 00 00";
+  expectMultiline("switch",
+                  "zcl level-control step " + stepMode + " " + stepSize + " " + (transitionTimeS * 10) + " 00 00",
+                  new String[] {
+                    "Msg: clus 0x0008, cmd 0x02, len 9",
+                    "buffer: 01 [0-9a-fA-F]{2} 02 " + payload,
+                  });
+  send("switch", "send 0 1 6");
+  expect("light",  "T[0-9a-fA-F]{8}:RX len 9, ep 06, clus 0x0008 \\(Level Control\\) FC 01 seq [0-9a-fA-F]{2} cmd 02 payload\\[" + payload + " \\]");
+  expect("switch", "T[0-9a-fA-F]{8}:RX len 5, ep 01, clus 0x0008 \\(Level Control\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[02 00 \\]");
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void stepWithOnOff(int stepMode, int stepSize, int transitionTimeS)
+{
+  dbg.println("stepWithOnOff() called from line " + this.namespace.getInvocationLine());
+  String payload = formatMoveMode(stepMode) + " " + formatStepSize(stepSize) + " " + formatTransitionTime(transitionTimeS);
+  expectMultiline("switch",
+                  "zcl level-control o-step " + stepMode + " " + stepSize + " " + (transitionTimeS * 10),
+                  new String[] {
+                    "Msg: clus 0x0008, cmd 0x06, len 7",
+                    "buffer: 01 [0-9a-fA-F]{2} 06 " + payload,
+                  });
+  send("switch", "send 0 1 6");
+  expect("light",  "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0008 \\(Level Control\\) FC 01 seq [0-9a-fA-F]{2} cmd 06 payload\\[" + payload + " \\]");
+  expect("switch", "T[0-9a-fA-F]{8}:RX len 5, ep 01, clus 0x0008 \\(Level Control\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[06 00 \\]");
+  networkWait(transitionTimeS * 1500); // timing fudge
+}
+
+void checkState(int currentLevel, boolean onOff)
+{
+  dbg.println("checkState() from line " + this.namespace.getInvocationLine());
+  expect("light", "read 6 0x0008 0x0000 1", "^" + formatLevel(currentLevel) + " $");
+  expect("light", "read 6 0x0006 0x0000 1", "^" + formatOnOff(onOff) + " $");
+}
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Set the ExecuteIfOff bit in the Options attribute so that we continue to run
+// with the normal behavior that this test originally tested.
+expect("light", "write 6 0x0008 0x000F 1 0x18 {01}", "Success: write");
+
+// 05-3520-29 --- Table 7.2 --- Move Commands without On/Off
+//0 0 Off Move to level 128 over 2 sec 128 0 Off Light stays off, level is changed
+setState(0, false);
+moveToLevel(128, 2);
+checkState(128, false);
+
+//128 0 Off Move to level 128 over 2 sec 128 0 Off Light stays off
+setState(128, false);
+moveToLevel(128, 2);
+checkState(128, false);
+
+//255 0 Off Move to level 128 over 2 sec 128 0 Off Light stays off, level is changed
+setState(255, false);
+moveToLevel(128, 2);
+checkState(128, false);
+
+//0 1 Off (on at 0%) Move to level 128 over 2 sec 128 1 On 50% Light is on, so physical level adjusts up to half on
+setState(0, true);
+moveToLevel(128, 2);
+checkState(128, true);
+
+//128 1 On 50% Move to level 128 over 2 sec 128 1 On 50% Same level so no changes
+setState(128, true);
+moveToLevel(128, 2);
+checkState(128, true);
+
+//255 1 On full Move to level 128 over 2 sec 128 1 On 50% Light is on, so physical level adjusts down to half on
+setState(255, true);
+moveToLevel(128, 2);
+checkState(128, true);
+
+//0 0 Off Move rate = up 64 per second 255 0 Off Light stays off, level is changed
+setState(0, false);
+move(UP, 64);
+checkState(255, false);
+
+//128 0 Off Move rate = up 64 per second 255 0 Off Light stays off
+setState(128, false);
+move(UP, 64);
+checkState(255, false);
+
+//255 0 Off Move rate = up 64 per second 255 0 Off Light stays off, level is changed
+setState(255, false);
+move(UP, 64);
+checkState(255, false);
+
+//0 1 Off (on at 0%) Move rate = up 64 per second255 1 On full Light is on, so physical level adjusts up to full on
+setState(0, true);
+move(UP, 64);
+checkState(255, true);
+
+//128 1 On 50% Move rate = up 64 per second255 1 On full Light is on, so physical level adjusts up to full on
+setState(128, true);
+move(UP, 64);
+checkState(255, true);
+
+//255 1 On full Move rate   = up 64 per   second  255 1 On full Light is on   already at   full, so no   changes
+setState(255, true);
+move(UP, 64);
+checkState(255, true);
+
+//0 0 Off Move rate = down 64 per second0 0 Off Light stays off
+setState(0, false);
+move(DOWN, 64);
+checkState(0, false);
+
+//128 0 Off Move rate = down 64 per second 0 0 Off Light stays off, level is changed
+setState(128, false);
+move(DOWN, 64);
+checkState(0, false);
+
+//255 0 Off Move rate = down 64 per second 0 0 Off Light stays off, level is changed
+setState(255, false);
+move(DOWN, 64);
+checkState(0, false);
+
+//0 1 Off (on at 0%) Move rate = down 64 per second 0 1 Off (on at 0%) Level is already at 0 -- no changes to level or physical light
+setState(0, true);
+move(DOWN, 64);
+checkState(0, true);
+
+//128 1 On 50% Move rate = down 64 per second 0 1 Off (on at 0%) Level moves down to zero, leaving the physical light off (0% on) and on/off attribute at 1
+setState(128, true);
+move(DOWN, 64);
+checkState(0, true);
+
+//255 1 On full Move rate = down 64 per second0 1 Off (on at 0%) Level moves down to zero, leaving the physical light off (0% on) and on/off attribute at 1
+setState(255, true);
+move(DOWN, 64);
+checkState(0, true);
+
+// 05-3520-29 --- Table 7.3 --- Move Commands with On/Off
+//0 0 Off Move to level 128 over 2 sec 128 1 On 50% Physical light changes to ON, on/off attr is also adjusted
+setState(0, false);
+moveToLevelWithOnOff(128, 2);
+checkState(128, true);
+
+//128 0 Off Move to level 128 over 2 sec 128 1 On 50% Physical light changes to ON, on/off attribute is also adjusted
+setState(128, false);
+moveToLevelWithOnOff(128, 2);
+checkState(128, true);
+
+//255 0 Off Move to level 128 over 2 sec 128 1 On 50% Physical light changes to ON, on/off attr is also adjusted
+setState(255, false);
+moveToLevelWithOnOff(128, 2);
+checkState(128, true);
+
+//0 1 off (on at 0%) Move to level 128 over 2 sec 128 1 On 50% Physical light goes from off to half on
+setState(0, true);
+moveToLevelWithOnOff(128, 2);
+checkState(128, true);
+
+//128 1 On 50% Move to level 128 over 2 sec 128 1 On 50% Light is already half on, no change
+setState(128, true);
+moveToLevelWithOnOff(128, 2);
+checkState(128, true);
+
+//255 1 On full Move to level 128 over 2 sec 128 1 On 50% Physical light goes from full on to half on
+setState(255, true);
+moveToLevelWithOnOff(128, 2);
+checkState(128, true);
+
+//0 0 Off Move rate = up 64 per second 255 1 On full Physical light changes to ON, on/off attr is also adjusted
+setState(0, false);
+moveWithOnOff(UP, 64);
+checkState(255, true);
+
+//128 0 Off Move rate = up 64 per second 255 1 On full Physical light changes to ON, on/off attr is also adjusted
+setState(128, false);
+moveWithOnOff(UP, 64);
+checkState(255, true);
+
+//255 0 Off Move rate = up 64 per second 255 1 On full Physical light changes to ON, on/off attr is also adjusted
+setState(255, false);
+moveWithOnOff(UP, 64);
+checkState(255, true);
+
+//0 1 Off (on at 0%) Move rate = up 64 per second 255 1 On full Physical level adjusts from off to full on
+setState(0, true);
+moveWithOnOff(UP, 64);
+checkState(255, true);
+
+//128 1 On 50% Move rate = up 64 per second 255 1 On full Physical level adjusts from half on to full on
+setState(128, true);
+moveWithOnOff(UP, 64);
+checkState(255, true);
+
+//255 1 On full Move rate = up 64 per second 255 1 On full Light is already on at full level, no changes
+setState(255, true);
+moveWithOnOff(UP, 64);
+checkState(255, true);
+
+//0 0 Off Move rate = down 64 per second 0 0 Off Light stays off, level is also at 0
+setState(0, false);
+moveWithOnOff(DOWN, 64);
+checkState(0, false);
+
+//128 0 Off Move rate = down 64 per second 0 0 Off Light stays off, level is also at 0
+setState(128, false);
+moveWithOnOff(DOWN, 64);
+checkState(0, false);
+
+//255 0 Off Move rate = down 64 per second 0 0 Off Light stays off, level is also at 0
+setState(255, false);
+moveWithOnOff(DOWN, 64);
+checkState(0, false);
+
+//0 1 Off (on at 0%) Move rate = down 64 per second 0 0 Off Physical light is already off, on/off attr is also adjusted
+setState(0, true);
+moveWithOnOff(DOWN, 64);
+checkState(0, false);
+
+//128 1 On 50% Move rate = down 64 per second 0 0 Off Light physically turns off, on/off attr is also adjusted
+setState(128, true);
+moveWithOnOff(DOWN, 64);
+checkState(0, false);
+
+//255 1 On full Move rate = down 64 per second 0 0 Off Light physically turns off, on/off attr is also adjusted
+setState(255, true);
+moveWithOnOff(DOWN, 64);
+checkState(0, false);
+
+// ------------------------------------------------------------------------------
+// EMZIGBEE-1423: test the ExecuteIfOff bit of the Options attribute.
+
+// Clear the ExecuteIfOff bit of the Options attribute so that we can test what
+// happens when this ridiculous bit is off.
+expect("light", "write 6 0x0008 0x000F 1 0x18 {00}", "Success: write");
+
+// When we are off, we ignore the Move, Move to Level, Stop, and Step commands.
+setState(0, false);
+move(UP, 64);
+checkState(0, false);
+moveToLevel(128, 64);
+checkState(0, false);
+stop();
+checkState(0, false);
+step(UP, 10, 64);
+checkState(0, false);
+
+// When we are on, we do NOT ignore the Move, Move to Level, Stop, and Stop
+// commands.
+setState(0, true);
+move(UP, 64);
+checkState(255, true);
+moveToLevel(128, 64);
+checkState(128, true);
+stop();
+checkState(128, true);
+step(UP, 10, 64);
+checkState(138, true);
+
+// We always do NOT ignore the Move with On/off, Move to Level with On/off, Stop
+// with On/off, and Stop with On/off commands.
+setState(0, false);
+moveWithOnOff(UP, 64);
+checkState(255, true);
+moveToLevelWithOnOff(128, 64);
+checkState(128, true);
+stopWithOnOff();
+checkState(128, true);
+stepWithOnOff(UP, 10, 10);
+checkState(138, true);
+
+// ------------------------------------------------------------------------------
+// EMZIGBEE-2743: test the ExecuteIfOff override fields in level commands.
+
+// Clear the ExecuteIfOff bit of the Options attribute to test that override
+// fields can allow movement when off.
+expect("light", "write 6 0x0008 0x000F 1 0x18 {00}", "Success: write");
+
+// ExecuteIfOff false, no override: level SHOULD NOT change.
+setState(0x66, false);
+moveToLevel(0x44, 2);
+checkState(0x66, false);
+
+// ExecuteIfOff false, override ALSO to false: level SHOULD NOT change.
+setState(0x66, false);
+moveToLevelOverride(0x44, 2, 0x01, 0x00);
+checkState(0x66, false);
+
+// ExecuteIfOff false, override to true: level SHOULD change.
+setState(0x66, false);
+moveToLevelOverride(0x44, 2, 0x01, 0x01);
+checkState(0x44, false);
+
+// Set the ExecuteIfOff bit of the Options attribute to test that override
+// fields can prevent movement when off.
+expect("light", "write 6 0x0008 0x000F 1 0x18 {01}", "Success: write");
+
+// ExecuteIfOff true, no override: level SHOULD change.
+setState(0x66, false);
+moveToLevel(0x44, 2);
+checkState(0x44, false);
+
+// ExecuteIfOff true, override ALSO to true: level SHOULD change.
+setState(0x66, false);
+moveToLevelOverride(0x44, 2, 0x01, 0x01);
+checkState(0x44, false);
+
+// ExecuteIfOff true, override to false: level SHOULD NOT change.
+setState(0x66, false);
+moveToLevelOverride(0x44, 2, 0x01, 0x00);
+checkState(0x66, false);
+

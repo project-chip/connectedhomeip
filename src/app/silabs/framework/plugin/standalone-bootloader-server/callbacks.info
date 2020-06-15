@@ -1,0 +1,26 @@
+/** @brief Query Response
+ *
+ * Allows the application to control whether the plugin can respond to incoming
+ * bootload messages.
+ *
+ * @param queryWasBroadcast Boolean indicating whether the query was broadcast
+ * or unicast Ver.: always
+ * @param queryData A data structure providing the details about the local
+ * device's bootloader. Ver.: always
+ */
+void emberAfPluginStandaloneBootloaderServerQueryResponseCallback(bool queryWasBroadcast,
+                                                                  const EmberAfStandaloneBootloaderQueryResponseData*queryData)
+{
+}
+
+/** @brief Finished
+ *
+ * Notifies the application when the standalone bootload has completed,
+ * successfully or otherwise.
+ *
+ * @param success Boolean indicating the success or failure of the bootload.
+ * Ver.: always
+ */
+void emberAfPluginStandaloneBootloaderServerFinishedCallback(bool success)
+{
+}

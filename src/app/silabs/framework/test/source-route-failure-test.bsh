@@ -1,0 +1,214 @@
+// This script helps verify the fixes for bug: EMSTACK-2690, EMSTACK-2691
+
+// When a child switches parents, the TC (acting as concentrator)
+// may have a broken source route back to the child.  Any attempt
+// to send to the child will fail and trigger a source route error.
+// The concentrator will re-broadcast an MTORR and fix the network's
+// routes but the concentrator's local source routes are still broken.
+// The solution is to broadcast an IEEE Address discovery request as
+// well.
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (! runArgument.runUsingMultihop) {
+	System.out.print("**** Only runs for host multi-hop configuration ****");
+	return;
+}
+
+// Network topology:
+
+//          light (coordinator)
+//             |
+//      range-extender-1
+//             |
+//      range-extender-2
+//          /          \
+//  range-extender-3   range-extender-4
+//              \
+//               switch
+
+SimulatedNetwork network = createNetwork();
+
+TestNode[] allNodes = {
+	new TestNode("light",
+		           "build/af-test-apps/HaLight-simulation/HaLight", // SOC image (unused) 
+		          "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+		          "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+		          gridLocations[0]),
+
+	new TestNode("range-extender-1",
+		           "build/af-test-apps/HaLight-simulation/HaLight", // SOC image (unused)
+		           "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+                            "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+		           gridLocations[1]),
+
+	new TestNode("range-extender-2",
+		           "build/af-test-apps/HaLight-simulation/HaLight", // SOC image (unused)
+		           "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+                           "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+		           gridLocations[4]),
+
+	new TestNode("range-extender-3",
+		           "build/af-test-apps/HaLight-simulation/HaLight", // SOC image (unused)
+		           "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+		           "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+		           gridLocations[7]),
+
+	new TestNode("range-extender-4",
+		           "build/af-test-apps/HaLight-simulation/HaLight", // SOC image (unused)
+		           "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+		           "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+		           gridLocations[8]),
+
+  new TestNode("switch",
+  	           "build/af-test-apps/HaSwitch-simulation/HaSwitch", // SOC image (unused)
+		           "build/af-test-apps/HaSwitch-simulation-ezsp/HaSwitch",
+		           "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+		           gridLocations[10]),
+};
+
+String[] allDevices;
+if (runArgument.runUsingHostApps ){
+allDevices = addAndLoadDevicesWithLocation(allNodes, 
+	                                                  true);   // use host?
+}
+else {
+allDevices = addAndLoadDevicesWithLocation(allNodes,                            
+                                                      false);   // use host?     
+
+}
+
+int timeout = 50000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(allDevices);
+
+printNodeIds(allNodes);
+
+networkWait(2000);
+networkWait(2000);
+
+expect("light",
+       "plugin concentrator print-table", 
+       ".* total entries.*");
+
+printRxMessages("light", true);
+printRxMessages("range-extender-1", true);
+
+// Ideally we should automatically 
+allNodes[0].defaultEndpoint = 6;
+
+// For EMZIGBEE-937, we changed the default behavior of HA apps to not allow
+// unsecured rejoins. This is because an unsecured rejoin requires the trust
+// center to send the network key to the rejoining node encrypted with the
+// preconfigured key. If this preconfigured key is the global ZigBeeAlliance09
+// key, then this is a huge security hole. This change caused this test to
+// start failing because the trust center (light) ignored the switch's unsecured
+// rejoin below. Therefore, the switch didn't repair its route to the trust
+// center, and then he got sad. I added a janky custom command into the
+// ha-light sample application to manually override the NCP's TC policy
+// that indicates whether or not a trust center should allow unsecured rejoins
+// so that this test could run smoothly as it once did.
+send("light",
+     "option security set-allow-trust-center-rejoin-using-well-known-key 1");
+
+// Bug: EMSTACK-2691
+// Disable the range-extender-4 and then trigger a rejoin.
+// range-extender-3 already has a route back to light.
+// Source route to switch should be magically fixed during rejoin and 
+// all should be well.
+power("range-extender-4", false);
+
+// Verify power off
+expectNoResponse("range-extender-4", "info");
+expect("switch", "network rejoin 0 0", ".*EMBER_NETWORK_UP.*");
+networkWait(2000);
+
+expect("light",
+       "plugin concentrator print-table", 
+       ".* total entries.*");
+
+readBasicClusterTest("light",
+	                   allNodes[5].nodeIdHex);
+// Allow default response and APS acks to finish.
+networkWait(5000);
+
+// Bug: EMSTACK-2690
+// Now let's break the source routes and not tell the Light to see if it
+// can eventually recover.
+// Disabling range-extender-1 prevents the rejoin fix in bug: EMSTACK-2691
+// from fixing the problem.
+// Disabling range-extender-3 and re-enabling range-extender-4 will
+// cause us to go back to routing via range-extender-3.
+power("range-extender-1", false);
+power("range-extender-3", false);
+power("range-extender-4", true);
+
+// Let things stabilize with neighbor tables.
+networkWait(16000); 
+
+// NOTE:  EMSTACK-2695 may also come to play here.  A secure rejoin
+// will leave the existing trust center route on the switch broken
+// and routing via the non-available range-extender-3 device. 
+expect("switch", "network rejoin 1 0", ".*EMBER_NETWORK_UP.*");
+
+// Let the network calm down since there may be multiple route failures
+// triggered.
+networkWait(40000);
+
+power("range-extender-1", true);
+networkWait(12000);	//to avoid packet collision.
+
+expect("light",
+       "plugin concentrator print-table", 
+       ".* total entries.*");
+expect("light",
+       "zcl global read 0x0000 0x0000",
+       "buffer: .*");
+
+
+//Light receives a network status packet with a source route error (0x0B)
+//This is received 3 times - the network status handler has a simple printf
+//implementation that should see the error code get printed 3 times
+expectMultiline("light",
+                "send " + allNodes[5].nodeIdHex + " " + allNodes[0].defaultEndpoint + " " + allNodes[5].defaultEndpoint,
+                new String[]  {
+                  ".*ErrorCode : 0x0B, Target : "+allNodes[5].nodeIdHex +" ]*",
+                  ".*ErrorCode : 0x0B, Target : "+allNodes[5].nodeIdHex +" ]*",
+                  ".*ErrorCode : 0x0B, Target : "+allNodes[5].nodeIdHex +" ]*",
+
+                  ".*ERROR: tx 66, Profile: HA \\(0x0104\\), Cluster: 0x0000, 5 bytes, ZCL Global Cmd ID: 0",
+                }, 8000);
+
+// Worst case scenario it should take ~11 seconds to recover.  
+// 10 seconds is the minimum MTORR broadcast, plus < 500 ms to to send
+// a network address request to the failed target of the message.
+networkWait(12000);
+
+readBasicClusterTest("light",
+	                   allNodes[5].nodeIdHex);
+
+// EMZIGBEE-4725: Testing the end device is able to
+// receive a notification when a message could not be routed
+power("light", false);
+expect("switch",
+       "zcl global read 0x0000 0x0000",
+       "buffer: .*");
+expectMultiline("switch",
+                "send " + allNodes[0].nodeIdHex + " " + allNodes[5].defaultEndpoint + " " + allNodes[0].defaultEndpoint,
+                new String[]  {
+                  ".*ErrorCode : 0x0C, Target : "+allNodes[0].nodeIdHex +" ]*",
+                  ".*ERROR: tx 66, Profile: HA \\(0x0104\\), Cluster: 0x0000, 5 bytes, ZCL Global Cmd ID: 0",
+                }, 8000);
+
+// Recover the network
+power("light", true);
+networkWait(12000);
+readBasicClusterTest("light",
+                     allNodes[5].nodeIdHex);

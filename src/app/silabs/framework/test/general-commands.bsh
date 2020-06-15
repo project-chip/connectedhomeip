@@ -1,0 +1,281 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"node1", "router", "node2"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Read a valid, supported attribute in a cluster that is implemented.
+send("node2", "zcl global read 0x0000 0x0000");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 00 payload\\[00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 8, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[00 00 00 20 03 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[01 00 \\]");
+
+// Read a valid, unsupported attribute in a cluster that is implemented.
+send("node2", "zcl global read 0x0000 0x0002");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 00 payload\\[02 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[02 00 86 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[01 00 \\]");
+
+// Read an invalid attribute in a cluster that is implemented.
+send("node2", "zcl global read 0x0000 0xFFFF");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 00 payload\\[FF FF \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[FF FF 86 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[01 00 \\]");
+
+// Read a valid attribute in a cluster that is not implemented.
+send("node2", "zcl global read 0x0001 0x0000");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 00 payload\\[00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[00 00 86 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[01 00 \\]");
+
+// Read an invalid attribute in a cluster that is not implemented.
+send("node2", "zcl global read 0x0001 0xFFFF");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 00 payload\\[FF FF \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[FF FF 86 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[01 00 \\]");
+network.sleep(timeout * 10);
+
+// Write a valid, supported attribute in a cluster that is implemented.
+send("node2", "zcl global write 0x0003 0x0000 0x21 {00 00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 8, ep 06, clus 0x0003 \\(Identify\\) FC 00 seq [0-9a-fA-F]{2} cmd 02 payload\\[00 00 21 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 4, ep 06, clus 0x0003 \\(Identify\\) FC 08 seq [0-9a-fA-F]{2} cmd 04 payload\\[00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0003 \\(Identify\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[04 00 \\]");
+
+// Write a valid, supported attribute in a cluster that is implemented using the
+// Write Attributes No Response command. Node2 should not get any response to
+// the write command including default response.
+send("node2", "zcl global nwrite 0x0003 0x0000 0x21 {00 00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 8, ep 06, clus 0x0003 \\(Identify\\) FC 00 seq [0-9a-fA-F]{2} cmd 05 payload\\[00 00 21 00 00 \\]");
+// Wait a while to make sure absolutely no response is received.
+assert(network.expect("node2", port, null,
+                      "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0003 \\(Identify\\) FC 08 seq [0-9a-fA-F]{2} cmd [0-9a-fA-F]{2} payload\\[05 00 \\]",
+                      3000, true) == null);
+
+// Write a valid, supported attribute in a cluster that is implemented using
+// the wrong data type.
+send("node2", "zcl global write 0x0003 0x0000 0x20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0003 \\(Identify\\) FC 00 seq [0-9a-fA-F]{2} cmd 02 payload\\[00 00 20 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0003 \\(Identify\\) FC 08 seq [0-9a-fA-F]{2} cmd 04 payload\\[8D 00 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0003 \\(Identify\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[04 00 \\]");
+
+// Write a valid, supported, read-only attribute that is implemented.
+send("node2", "zcl global write 0x0000 0x0000 0x20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 02 payload\\[00 00 20 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 04 payload\\[88 00 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[04 00 \\]");
+
+// Write a valid, unsupported attribute in a cluster that is implemented.
+send("node2", "zcl global write 0x0000 0x0001 0x20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 02 payload\\[01 00 20 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 04 payload\\[86 01 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[04 00 \\]");
+
+// Write an invalid attribute in a cluster that is implemented.
+send("node2", "zcl global write 0x0000 0xFFFF 0x20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 02 payload\\[FF FF 20 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 04 payload\\[86 FF FF \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[04 00 \\]");
+
+// Write a valid attribute in a cluster that is not implemented.
+send("node2", "zcl global write 0x0000 0x0010 0x42 {}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 02 payload\\[10 00 42 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 04 payload\\[86 10 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[04 00 \\]");
+
+// Write an invalid attribute in a cluster is not implemented.
+send("node2", "zcl global write 0x0000 0xFFFF 0x20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 02 payload\\[FF FF 20 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 04 payload\\[86 FF FF \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[04 00 \\]");
+
+// Configure reporting for a valid, supported attribute in a cluster that is
+// implemented.
+send("node2", "zcl global send-me-a-report 0x0000 0x0000 0x20 10 20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 12, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 06 payload\\[00 00 00 20 0A 00 14 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 4, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 07 payload\\[00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[07 00 \\]");
+
+// Configure reporting for a valid, supported attribute in a cluster that is
+// implemented using the wrong data type.
+send("node2", "zcl global send-me-a-report 0x0000 0x0000 0x21 10 20 {00 00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 13, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 06 payload\\[00 00 00 21 0A 00 14 00 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 07 payload\\[8D 00 00 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[07 00 \\]");
+
+// Configure reporting for a valid, unsupported attribute in a cluster that is
+// implemented.
+send("node2", "zcl global send-me-a-report 0x0000 0x0001 0x20 10 20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 12, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 06 payload\\[00 01 00 20 0A 00 14 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 07 payload\\[86 00 01 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[07 00 \\]");
+
+// Configure reporting for an invalid attribute in a cluster that is
+// implemented.
+send("node2", "zcl global send-me-a-report 0x0000 0xFFFF 0x20 10 20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 12, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 06 payload\\[00 FF FF 20 0A 00 14 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 07 payload\\[86 00 FF FF \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[07 00 \\]");
+
+// Configure reporting for a valid attribute in a cluster is not implemented.
+send("node2", "zcl global send-me-a-report 0x0001 0x0000 0x21 10 20 {00 00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 13, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 06 payload\\[00 00 00 21 0A 00 14 00 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 08 seq [0-9a-fA-F]{2} cmd 07 payload\\[86 00 00 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[07 00 \\]");
+
+// Configure reporting for an invalid attribute in a cluster is not implemented.
+send("node2", "zcl global send-me-a-report 0x0001 0xFFFF 0x20 10 20 {00}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 12, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 06 payload\\[00 FF FF 20 0A 00 14 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 08 seq [0-9a-fA-F]{2} cmd 07 payload\\[86 00 FF FF \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[07 00 \\]");
+
+// Read the reporting configuration for a valid, supported attribute in a
+// cluster that is implemented.
+send("node2", "zcl global report-read 0x0000 0x0000 0x00");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 08 payload\\[00 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 13, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 09 payload\\[00 00 00 00 20 0A 00 14 00 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[09 00 \\]");
+
+// Read the reporting configuration for a valid, unsupported attribute in a
+// cluster that is implemented.
+send("node2", "zcl global report-read 0x0000 0x0001 0x00");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 08 payload\\[00 01 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 09 payload\\[86 00 01 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[09 00 \\]");
+
+// Read the reporting configuration for an invalid attribute in a cluster that
+// is implemented.
+send("node2", "zcl global report-read 0x0000 0xFFFF 0x00");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 08 payload\\[00 FF FF \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 09 payload\\[86 00 FF FF \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[09 00 \\]");
+send("node2", "zcl global report-read 0x0000 0xFFFF 0x00");
+send("node2", "send 0 6 6");
+
+// Read the reporting configuration for a valid attribute in a cluster that is
+// not implemented.
+send("node2", "zcl global report-read 0x0001 0x0000 0x00");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 08 payload\\[00 00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 08 seq [0-9a-fA-F]{2} cmd 09 payload\\[86 00 00 00 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[09 00 \\]");
+
+// Read the reporting configuration for an invalid unsupported attribute in a
+// cluster that is not implemented.
+send("node2", "zcl global report-read 0x0001 0xFFFF 0x00");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 08 payload\\[00 FF FF \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 08 seq [0-9a-fA-F]{2} cmd 09 payload\\[86 00 FF FF \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[09 00 \\]");
+
+// Discover attributes in a cluster that is implemented.
+send("node2", "zcl global discover 0x0000 0x0000 0x01");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0C payload\\[00 00 01 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 7, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 0D payload\\[00 00 00 20 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0000 \\(Basic\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[0D 00 \\]");
+
+// Discover attributes in a cluster that is not implemented.
+send("node2", "zcl global discover 0x0001 0x0000 0x01");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 0C payload\\[00 00 01 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 4, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 08 seq [0-9a-fA-F]{2} cmd 0D payload\\[01 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0001 \\(Unknown clus. \\[0x0001\\]\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[0D 00 \\]");
+
+// Bug 14495: Send a command for a cluster that is implemented on the device
+// but not on the destination endpoint.
+// ZCL6 2.5.12.2: if a device receives a unicast cluster command to an endpoint
+// that does not have that cluster, we send back the error code
+// UNSUPPORTED_CLUSTER (0xC3).
+send("node2", "raw 0x0006 {01 00 00}");
+send("node2", "send 0 6 12");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 3, ep 0C, clus 0x0006 \\(On/off\\) FC 01 seq [0-9a-fA-F]{2} cmd 00 payload\\[\\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0006 \\(On/off\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[00 C3 \\]");
+
+// Send a command for a cluster that is implemented on a device but the command
+// id is not supported.
+send("node2", "raw 0x0006 {01 00 80}");
+send("node2", "send 0 6 6");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 3, ep 06, clus 0x0006 \\(On/off\\) FC 01 seq [0-9a-fA-F]{2} cmd 80 payload\\[\\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 5, ep 06, clus 0x0006 \\(On/off\\) FC 08 seq [0-9a-fA-F]{2} cmd 0B payload\\[80 81 \\]");
+
+// Read an attribute in a cluster that is implemented on the device but not on
+// the destination endpoint.
+send("node2", "zcl global read 0x0006 0x0000");
+send("node2", "send 0 6 12");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 0C, clus 0x0006 \\(On/off\\) FC 00 seq [0-9a-fA-F]{2} cmd 00 payload\\[00 00 \\]");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0006 \\(On/off\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[00 00 86 \\]");
+expect("node1", "T[0-9a-fA-F]{8}:RX len 5, ep 0C, clus 0x0006 \\(On/off\\) FC 00 seq [0-9a-fA-F]{2} cmd 0B payload\\[01 00 \\]");
+
+// ZCL6 2.3.2.1.1: only process a ZCL command on endpoints that contain the
+// cluster in the APS header.
+send("node2", "zcl global read 0x0007 0x0000");
+send("node2", "send 0 6 0xFF");
+nexpect("node1", "READ: clus 0007, attr 0000 failed 86");
+
+// ZCL6: read global attributes.
+// Read it, make sure we can't write it, and read it again.
+send("node2", "zcl global read 0x0000 0xFFFD");
+send("node2", "send 0 6 12");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 9, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[FD FF 00 21 01 00 \\]");
+
+send("node2", "zcl global write 0x0000 0xFFFD 0x21 {AC AC}");
+send("node2", "send 0 6 12");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 6, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 04 payload\\[88 FD FF \\]");
+
+send("node2", "zcl global read 0x0000 0xFFFD");
+send("node2", "send 0 6 12");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 9, ep 06, clus 0x0000 \\(Basic\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[FD FF 00 21 01 00 \\]");
+
+// Every cluster should have the same global attributes.
+send("node2", "zcl global read 0x0003 0xFFFD");
+send("node2", "send 0 6 6");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 9, ep 06, clus 0x0003 \\(Identify\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[FD FF 00 21 01 00 \\]");
+
+send("node2", "zcl global read 0x0006 0xFFFD");
+send("node2", "send 0 6 6");
+expect("node2", "T[0-9a-fA-F]{8}:RX len 9, ep 06, clus 0x0006 \\(On/off\\) FC 08 seq [0-9a-fA-F]{2} cmd 01 payload\\[FD FF 00 21 01 00 \\]");

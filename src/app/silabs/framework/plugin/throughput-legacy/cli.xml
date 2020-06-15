@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-throughput-legacy" name="Plugin Commands: Throughput Legacy">
+    <description>
+      The throughput commands allow you to test your application's network throughput by measuring how many packets are able to be sent.
+    </description>
+  </group>
+  <command cli="plugin throughput inflight" functionName="emAfPluginThroughputSetInFlightCount" group="plugin-throughput-legacy">
+    <description>
+      Set the number of packets in flight during the test.
+    </description>
+    <arg name="Count" type="INT8U" description="Number of packets" />
+  </command>
+  <command cli="plugin throughput duration" functionName="emAfPluginThroughputSetDuration" group="plugin-throughput-legacy">
+    <description>
+      Set the duration in ms for the test.
+    </description>
+    <arg name="Time" type="INT32U" description="Duration in ms" />
+  </command>
+  <command cli="plugin throughput start" functionName="emAfPluginThroughputStartTest" group="plugin-throughput-legacy">
+    <description>
+      Start the throughput test.
+    </description>
+  </command>
+  <command cli="plugin throughput end" functionName="emAfPluginThroughputEndTest" group="plugin-throughput-legacy">
+    <description>
+      Abort the test while running.
+    </description>
+  </command>
+  <command cli="plugin throughput result" functionName="emAfPluginThroughputPrintResult" group="plugin-throughput-legacy">
+    <description>
+      Show the results of the last test.
+    </description>
+  </command>
+</cli>

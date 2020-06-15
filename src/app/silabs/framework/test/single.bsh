@@ -1,0 +1,15 @@
+// This unit test doesn't even form a network, it just loads a single image
+// and checks some basic things.
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+network.add("1");
+network.bootload("1", "build/af-test-apps/FullTh-simulation/FullTh");
+
+// Test custom command line
+
+expect("1", ".*Long string status: 00.*");

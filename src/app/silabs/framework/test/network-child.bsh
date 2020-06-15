@@ -1,0 +1,144 @@
+// This test is a beanshell test to be used for testing child aging on app
+// framework host and SoC applications.
+//
+// It should be extended to test multiple timeouts for different children
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"gateway","gas-meter"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+  "build/af-test-apps/SeMeterGasSleepy-simulation/SeMeterGasSleepy",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/SeMeterGasSleepy-simulation-ezsp/SeMeterGasSleepy",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 1000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+networkForm("gateway");
+networkWait(5000);
+ 
+networkJoinTo("gas-meter", "gateway");
+
+networkWait(5000);
+
+
+//-----------------------------------------------------------------------------
+
+String nodeIdMeter = findNodeByName("gas-meter").nodeIdHex;
+
+//make sure the node is in the child table
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0: Sleepy.*");
+
+//get rid of the sleepy
+power("gas-meter",false);
+networkWait(255 * 60 * 1000);
+
+//make sure they're still there
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0: Sleepy.*");
+
+//wait for them to timeout
+networkWait(65*1000);
+
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0 of 6 entries used.*");
+
+// EMZIGBEE-3733 EMZIGBEE-3975:checking the change in keep-alive mode, and timeout options mask
+/*
+ * {
+ * EMBER_KEEP_ALIVE_SUPPORT_UNKNOWN     = 0x00,
+ * EMBER_MAC_DATA_POLL_KEEP_ALIVE       = 0x01,
+ * EMBER_END_DEVICE_TIMEOUT_KEEP_ALIVE  = 0x02,
+ * EMBER_KEEP_ALIVE_SUPPORT_ALL         = 0x03,
+ *	};
+ */
+
+expect("gateway", "net change-keep-alive-mode 1",".*Keep alive support enabled.*");
+
+power("gas-meter",true);
+networkWait(5000);
+//make sure the node is in the child table
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0: Sleepy.*");
+
+//get rid of the sleepy
+power("gas-meter",false);
+networkWait(255 * 60 * 1000);
+
+//make sure they're still there
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0: Sleepy.*");
+
+//wait for them to timeout
+networkWait(65*1000);
+
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0 of 6 entries used.*");
+
+
+power("gas-meter",true);
+networkWait(10000);
+
+expect("gateway", "net change-keep-alive-mode 2",".*Keep alive support enabled.*");
+
+
+networkWait(260 * 60 * 1000);
+
+//make sure they're still there
+send("gateway","plugin stack-diagnostic child-table");// there were timeout requests sent to keep the node alive
+expect("gateway",".*0: Sleepy.*");
+
+//get rid of the sleepy
+power("gas-meter",false);
+networkWait(251 * 60 * 1000);
+
+//make sure they're still there
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0: Sleepy.*");
+
+//wait for them to timeout
+networkWait(3 * 60 * 1000);
+
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0 of 6 entries used.*");
+
+
+expect("gateway","net timeout-option-mask 0xFEFF",".*successfully set the child timeout option mask.*");
+
+networkWait(1000);
+
+power("gas-meter",true);
+networkWait(10000); // we somehow have to check this value, why would this fail?
+
+//get rid of the sleepy
+power("gas-meter",false);
+
+networkWait(255 * 60 *1000);
+
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0: Sleepy.*");
+
+// with the new mask child's timeoutOptions 8 is invalid, we will leave the index at parents emberEndDevicePollTimeout value which is again 8
+networkWait(65 * 1000); 
+
+send("gateway","plugin stack-diagnostic child-table");
+expect("gateway",".*0 of 6 entries used.*"); 
+

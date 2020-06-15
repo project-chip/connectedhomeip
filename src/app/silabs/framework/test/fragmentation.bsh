@@ -1,0 +1,357 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"full1", "full2", "full3", "sleepy"};
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/SleepyGeneric-simulation/SleepyGeneric"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/SleepyGeneric-simulation-ezsp/SleepyGeneric"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+if (runArgument.runUsingHostApps) {
+  // Wait for boot-up messages to clear.
+  networkWait(10000);
+
+  // Check that the incoming and outgoing sizes get set correctly (bug 12838).
+
+  // In order to properly catch output we need to examine each device one at a time.
+  // Previously the expect calls for the nodes were interspersed and assumed
+  // output would be flushed in a certain way.  The software no longer calls
+  // flush.
+  // Since this output only appears at boot, we need to reset each device.
+  int i;
+  for (i = 0; i < devices.length; i++) {
+    String mtu = "05DC";
+    if (0 == devices[i].compareTo("sleepy")) {
+      mtu = "00FF";
+    }
+    expectMultiline(devices[i],
+                    "reset",
+                    new String[] {
+                      "Ezsp Value : set maximum incoming transfer size to 0x0000" + mtu + ":Success: set",
+                      "Ezsp Value : set maximum outgoing transfer size to 0x0000" + mtu + ":Success: set",
+                    });
+  }
+}
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Set up at least one device as Master clock, then form and join devices one by one
+// with enough delay to complete the registration before joining the next device
+expect("full2", "write 1 0x000A 0x01 1 0x18 {01}", "Success: write");
+formAndJoinDevicesWithAddedDelay(devices, false, 50000);
+
+// Leave full debugging on full1
+send("full1", "debugprint all_on");
+networkWait(timeout);
+
+// Set a basic message and test that messaging itself works.
+send("full1", "plugin messaging-server message \"dalek is here\"");
+send("full1", "plugin messaging-server time 0x00000000 0xFFFF");
+send("full1", "plugin messaging-server valid 0x01");
+networkWait(timeout);
+send("full2", "zcl msg get");
+expect("full2", "Msg: clus 0x0703, cmd 0x00, len 3");
+
+// Let's check if 1 got the 'get last message'
+expect("full2", "send 0 1 1", ".*dalek is here.*");
+
+// and then 1 got the default response
+expect("full1", ".*DEFAULT_RESP.*");
+
+
+// -----------------------------------------------------------------------------
+// A node sends out a very long message, 200 bytes
+send("full1", "plugin messaging-server message \"1234567890\"");
+send("full1", "plugin messaging-server append \"----5---20\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"----5---30\"");
+send("full1", "plugin messaging-server append \"----5---40\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"----5---50\"");
+send("full1", "plugin messaging-server append \"----5---60\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"----5---70\"");
+send("full1", "plugin messaging-server append \"-[dalek]80\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"----5---90\"");
+send("full1", "plugin messaging-server append \"----5--100\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"----5--110\"");
+send("full1", "plugin messaging-server append \"----5--120\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"[another d\"");
+send("full1", "plugin messaging-server append \"alek]--140\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"----5--150\"");
+send("full1", "plugin messaging-server append \"----5--160\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"----5--170\"");
+send("full1", "plugin messaging-server append \"----5--180\"");
+networkWait(timeout);
+send("full1", "plugin messaging-server append \"----5--190\"");
+send("full1", "plugin messaging-server append \"----5--200\"");
+networkWait(timeout);
+
+send("full1", "plugin messaging-server valid 0x01");
+
+send("full2", "zcl msg get");
+send("full2", "send 0 1 1");
+
+//Source Route Overheads are checked when the host checks the maximum available payload.
+//When a cached value is available on the host, it is returned instead of sending a ezsp
+//command to retreive this value.
+//Part of the concentrator plugin.
+if(runArgument.runUsingHostApps){
+  if(runArgument.runUsingMultihop){
+    expect("full1", ".*ValidSourceRouteFound 2 .*",timeout*10);
+  }
+}
+
+// start the 215 bytes long fragmented message
+expect("full1", ".*Fragmentation:start:len=216.*");
+
+// did we receive 215 long message
+expect("full2", ".*len=216.*");
+
+// Is the end of the message here?
+expect("full2", ".*5--200.*");
+
+// and then 1 got the default response
+expect("full1", ".*DEFAULT_RESP.*");
+
+// -----------------------------------------------------------------------------
+// A sleepy node sends out a very long message, 200 bytes
+
+String sleepyShortId = nodeId("sleepy", port);
+networkWait(timeout * 10);
+
+send("sleepy", "plugin messaging-server message \"1234567890\"");
+send("sleepy", "plugin messaging-server append \"----5---20\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"----5---30\"");
+send("sleepy", "plugin messaging-server append \"----5---40\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"----5---50\"");
+send("sleepy", "plugin messaging-server append \"----5---60\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"----5---70\"");
+send("sleepy", "plugin messaging-server append \"-[dalek]80\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"----5---90\"");
+send("sleepy", "plugin messaging-server append \"----5--100\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"----5--110\"");
+send("sleepy", "plugin messaging-server append \"----5--120\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"[another d\"");
+send("sleepy", "plugin messaging-server append \"alek]--140\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"----5--150\"");
+send("sleepy", "plugin messaging-server append \"----5--160\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"----5--170\"");
+send("sleepy", "plugin messaging-server append \"----5--180\"");
+networkWait(timeout);
+send("sleepy", "plugin messaging-server append \"----5--190\"");
+send("sleepy", "plugin messaging-server append \"----5--200\"");
+networkWait(timeout);
+
+send("sleepy", "plugin messaging-server time 0x00000000 0xFFFF");
+send("sleepy", "plugin messaging-server valid 0x01");
+
+// Make the sleepy short poll so that it can actually receive the request from
+// the other device.
+send("sleepy", "plugin end-device-support force-short-poll 1");
+
+send("full1", "zcl msg get");
+send("full1", "send " + sleepyShortId + " 1 1");
+
+// start the 215 bytes long fragmented message (this can take a while since the
+// sleepy is probably doing long poll).
+expect("sleepy", ".*Fragmentation:start:len=216.*", timeout*100);
+
+// did we receive 215 long message
+expect("full1", ".*len=216.*", timeout*100);
+// Is the end of the message here?
+expect("full1", ".*5--200.*");
+networkWait(timeout*10);
+
+// Let the device go back to its normal polling schedule.
+send("sleepy", "plugin end-device-support force-short-poll 0");
+
+// -----------------------------------------------------------------------------
+// A node sends out two fragmented messages at the same time to two different
+// destinations.
+send("full2", "zcl msg get");
+send("full3", "zcl msg get");
+networkWait(timeout);
+send("full1", "plugin messaging-server valid 0x01");
+send("full2", "send 0 1 1");
+send("full1", "plugin messaging-server valid 0x01");
+send("full3", "send 0 1 1");
+// I only check one of the two are transmitted to destination since I have no 
+// control on which one will be delivered first. 
+//expect("full2", ".*5--200.*", timeout*10);
+expect("full3", ".*RX len 216.*", timeout*10);
+expect("full3", ".*5--200.*", timeout*10);
+networkWait(timeout*10);
+
+// -----------------------------------------------------------------------------
+// A node receives two fragmented messages at the same time from two different
+// sources.
+String full2ShortId = nodeId("full2", port);
+networkWait(timeout * 10);
+
+String full3ShortId = nodeId("full3", port);
+networkWait(timeout * 10);
+
+send("full2", "plugin messaging-server message \"1234567890\"");
+send("full2", "plugin messaging-server append \"----5---20\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"----5---30\"");
+send("full2", "plugin messaging-server append \"----5---40\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"----5---50\"");
+send("full2", "plugin messaging-server append \"----5---60\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"----5---70\"");
+send("full2", "plugin messaging-server append \"-[dalek]80\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"----5---90\"");
+send("full2", "plugin messaging-server append \"----5--100\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"----5--110\"");
+send("full2", "plugin messaging-server append \"----5--120\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"[another d\"");
+send("full2", "plugin messaging-server append \"alek]--140\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"----5--150\"");
+send("full2", "plugin messaging-server append \"----5--160\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"----5--170\"");
+send("full2", "plugin messaging-server append \"----5--180\"");
+networkWait(timeout);
+send("full2", "plugin messaging-server append \"----5--190\"");
+send("full2", "plugin messaging-server append \"----5--200\"");
+networkWait(timeout);
+
+
+send("full3", "plugin messaging-server message \"1234567890\"");
+send("full3", "plugin messaging-server append \"----5---20\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"----5---30\"");
+send("full3", "plugin messaging-server append \"----5---40\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"----5---50\"");
+send("full3", "plugin messaging-server append \"----5---60\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"----5---70\"");
+send("full3", "plugin messaging-server append \"-[dalek]80\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"----5---90\"");
+send("full3", "plugin messaging-server append \"----5--100\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"----5--110\"");
+send("full3", "plugin messaging-server append \"----5--120\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"[another d\"");
+send("full3", "plugin messaging-server append \"alek]--140\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"----5--150\"");
+send("full3", "plugin messaging-server append \"----5--160\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"----5--170\"");
+send("full3", "plugin messaging-server append \"----5--180\"");
+networkWait(timeout);
+send("full3", "plugin messaging-server append \"----5--190\"");
+send("full3", "plugin messaging-server append \"----5--200\"");
+networkWait(timeout);
+
+send("full2", "plugin messaging-server time 0x00000000 0xFFFF");
+send("full3", "plugin messaging-server time 0x00000000 0xFFFF");
+send("full2", "plugin messaging-server valid 0x01");
+send("full3", "plugin messaging-server valid 0x01");
+networkWait(timeout);
+send("full1", "zcl msg get");
+send("full1", "send " + full2ShortId + " 1 1");
+send("full1", "zcl msg get");
+send("full1", "send " + full3ShortId + " 1 1");
+expect("full1", ".*RX len 216.*", timeout*10);
+expect("full1", ".*5--200.*", timeout*10);
+expect("full1", ".*RX len 216.*", timeout*10);
+expect("full1", ".*5--200.*", timeout*10);
+networkWait(timeout*10);
+
+if (runArgument.runUsingHostApps) {
+  std.print("****TODO: Fix for host, can not set the RX window size****");
+  return;
+}
+
+// -----------------------------------------------------------------------------
+// Setting the RX window size to 2
+send("full1", "plugin fragmentation set-rx-window-size 0x2");
+send("full2", "plugin fragmentation set-rx-window-size 0x2");
+send("full3", "plugin fragmentation set-rx-window-size 0x2");
+networkWait(timeout);
+
+// -----------------------------------------------------------------------------
+// A node sends out a very long message, 200 bytes
+send("full1", "plugin messaging-server valid 0x01");
+send("full2", "zcl msg get");
+send("full2", "send 0 1 1");
+expect("full2", ".*RX len 216.*", timeout*10);
+expect("full2", ".*5--200.*", timeout*10);
+networkWait(timeout*20);
+
+send("full1", "option print-rx enable");
+
+// -----------------------------------------------------------------------------
+// A node sends out two fragmented messages at the same time to two different
+// destinations.
+send("full1", "plugin messaging-server valid 0x01");
+send("full2", "zcl msg get");
+send("full2", "send 0 1 1");
+send("full3", "zcl msg get");
+send("full3", "send 0 1 1");
+assert(network.expect(new String[]{"full2", "full3"}, port, ".*5--200.*", timeout * 10, false, true).length == 0);
+networkWait(timeout*10); 
+
+
+// -----------------------------------------------------------------------------
+// A node receives two fragmented messages at the same time from two different
+// sources.
+send("full2", "plugin messaging-server valid 0x01");
+send("full3", "plugin messaging-server valid 0x01");
+networkWait(timeout);
+send("full1", "zcl msg get");
+send("full1", "send " + full2ShortId + " 1 1");
+send("full1", "zcl msg get");
+send("full1", "send " + full3ShortId + " 1 1");
+expect("full1", ".*RX len 216.*", timeout*10);
+expect("full1", ".*5--200.*", timeout*10);
+expect("full1", ".*RX len 216.*", timeout*10);
+expect("full1", ".*5--200.*", timeout*10);
+networkWait(timeout);

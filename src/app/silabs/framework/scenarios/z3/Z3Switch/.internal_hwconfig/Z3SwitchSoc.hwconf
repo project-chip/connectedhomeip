@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<device:XMLDevice xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:device="http://www.silabs.com/ss/hwconfig/document/device.ecore">
+  <mode name="DefaultMode">
+    <property object="BUTTON" propertyId="ABPeripheral.included" value="true" />
+    <property object="GPIO" propertyId="ABPeripheral.included" value="true" />
+    <property object="LED" propertyId="ABPeripheral.included" value="true" />
+    <property object="SERIAL" propertyId="ABPeripheral.included" value="true" />
+    <property object="VCOM" propertyId="ABPeripheral.included" value="true" />
+    <property object="PTI" propertyId="ABPeripheral.included" value="true" />
+  </mode>
+</device:XMLDevice>

@@ -1,0 +1,109 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"full1", "router", "full2"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Try to remove all scenes and check for INVALID_FIELD because the endpoint is
+// not in the 0xDEAD group yet.
+send("full2", "zcl scenes rmall 0xDEAD");
+send("full2", "send 0 1 1");
+expect("full1", "RX: RemoveAllScenes 0xDEAD");
+expect("full2", "RX: RemoveAllScenesResponse 0x85, 0xDEAD");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 03 status 00");
+
+// Add endpoint 1 to the 0xDEAD group and try again.  The second endpoint should
+// still fail becaues it isn't in the group.
+send("full2", "zcl groups add 0xDEAD \"dead\"");
+expect("full2",
+       "send 0 1 1",
+       "RX: AddGroupResponse 0x00, 0xDEAD");
+expect("full1", "DEFAULT_RESP: \\(Groups\\) cmd 00 status 00");
+send("full2", "zcl scenes rmall 0xDEAD");
+send("full2", "send 0 1 1");
+expect("full1", "RX: RemoveAllScenes 0xDEAD");
+expect("full2", "RX: RemoveAllScenesResponse 0x00, 0xDEAD");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 03 status 00");
+send("full2", "zcl scenes rmall 0xDEAD");
+send("full2", "send 0 2 2");
+expect("full1", "RX: RemoveAllScenes 0xDEAD");
+expect("full2", "RX: RemoveAllScenesResponse 0x85, 0xDEAD");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 03 status 00");
+
+// Add endpoint 2 to the 0xDEAD group.
+send("full2", "zcl groups add 0xDEAD \"dead\"");
+send("full2", "send 0 2 2");
+expect("full1", "RX: AddGroup 0xDEAD, \"dead\"");
+expect("full2", "RX: AddGroupResponse 0x00, 0xDEAD");
+expect("full1", "DEFAULT_RESP: \\(Groups\\) cmd 00 status 00");
+
+// Add a scene to endpoint 1 and endpoint 2.
+send("full2", "zcl scenes add 0xDEAD 0xAB 40 \"lala\"");
+send("full2", "send 0 1 1");
+expect("full1", "RX: AddScene 0xDEAD, 0xAB, 0x0028, \"lala\", [0-9a-fA-F]*");
+expect("full2", "RX: AddSceneResponse 0x00, 0xDEAD, 0xAB");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 00 status 00");
+send("full2", "zcl scenes add 0xDEAD 0xAB 40 \"blah\"");
+send("full2", "send 0 2 2");
+expect("full1", "RX: AddScene 0xDEAD, 0xAB, 0x0028, \"blah\", [0-9a-fA-F]*");
+expect("full2", "RX: AddSceneResponse 0x00, 0xDEAD, 0xAB");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 00 status 00");
+
+// Now get the scenes back, first from endpoint 1, then from endpoint 2.
+send("full2", "zcl scenes view 0xDEAD 0xAB");
+send("full2", "send 0 1 1");
+expect("full1", "RX: ViewScene 0xDEAD, 0xAB");
+expect("full2", "RX: ViewSceneResponse 0x00, 0xDEAD, 0xAB, 0x0028, \"lala\",.*");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 01 status 00");
+send("full2", "zcl scenes view 0xDEAD 0xAB");
+send("full2", "send 0 2 2");
+expect("full1", "RX: ViewScene 0xDEAD, 0xAB");
+expect("full2", "RX: ViewSceneResponse 0x00, 0xDEAD, 0xAB, 0x0028, \"blah\",.*");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 01 status 00");
+
+// Check that scene membership for a known group.  Two scenes were added
+// previously, so the table capacity should be one (table size is three).
+send("full2", "zcl scenes get 0xDEAD");
+send("full2", "send 0 1 1");
+expect("full1", "RX: GetSceneMembership 0xDEAD");
+expect("full2", "RX: GetSceneMembershipResponse 0x00, 0x01, 0xDEAD, 0x01, \\[0xAB\\]");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 06 status 00");
+
+// Store a scene and then view it to make sure the extension field sets are
+// behaving correctly.
+send("full2", "zcl scenes store 0x0000 0x00");
+send("full2", "send 0 1 1");
+expect("full1", "RX: StoreScene 0x0000, 0x00");
+expect("full2", "RX: StoreSceneResponse 0x00, 0x0000, 0x00");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 04 status 00");
+send("full2", "zcl scenes view 0x0000 0x00");
+send("full2", "send 0 1 1");
+expect("full1", "RX: ViewScene 0x0000, 0x00");
+expect("full2", "RX: ViewSceneResponse 0x00, 0x0000, 0x00, 0x0000, \"\", \\[0x0006 0x01 [0-9a-fA-F]{2}\\] \\[0x0008 0x01 [0-9a-fA-F]{2}\\] \\[0x0201 0x05 [0-9a-fA-F]{10}\\] \\[0x0300 0x04 [0-9a-fA-F]{8}\\] \\[0x0101 0x01 [0-9a-fA-F]{2}\\] \\[0x0102 0x02 [0-9a-fA-F]{4}\\]");
+expect("full1", "DEFAULT_RESP: \\(Scenes\\) cmd 01 status 00");

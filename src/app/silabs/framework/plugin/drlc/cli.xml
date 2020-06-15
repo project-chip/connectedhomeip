@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-drlc" name="Plugin Commands: Demand Response and Load Control">
+    <description>
+      The drlc plugin contributes CLI commands to the application framework to be used for constructing demand response load control commands.
+    </description>
+  </group>
+  <command cli="plugin drlc opt in" functionName="emberAfPluginDrlcOptCommand" group="plugin-drlc">
+    <description>
+      Modify the entry in the clients load control event table to opt in for a scheduled load control event.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+    <arg name="eventId" type="INT32U" description="The event id of the event that the user is opting in or out of." />
+  </command>
+  <command cli="plugin drlc opt out" functionName="emberAfPluginDrlcOptCommand" group="plugin-drlc">
+    <description>
+      Modify the entry in the clients load control event table to opt out of a scheduled load control event.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+    <arg name="eventId" type="INT32U" description="The event id of the event that the user is opting in or out of." />
+  </command>
+  <command cli="plugin drlc print" functionName="emberAfPluginDrlcPrintCommand" group="plugin-drlc">
+    <description>
+      Print the Demand Response Load Control Table.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+  </command>
+  <command cli="plugin drlc clear" functionName="emberAfPluginDrlcClearCommand" group="plugin-drlc">
+    <description>
+      Clear the load control event table.
+    </description>
+    <arg name="endpoint" type="INT8U" description = "The relevant endpoint." />
+  </command>
+</cli>

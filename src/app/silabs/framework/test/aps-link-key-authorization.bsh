@@ -1,0 +1,379 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  // The Z3 Gateway can only be compiled as a host
+  std.print("** this test is only run in host mode ** ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+// Load Z3Gateway app as HOST.
+Location gatewayLocation = gridLocations[1];
+TestNode gateway = new TestNode("gateway",
+                                "", // no SoC image
+                                "build/af-test-apps/Z3GatewayWithWwah-simulation-ezsp/Z3GatewayWithWwah",
+                                "app/ncp/sample-app/ncp-uart-sw/simulation/build/exe/ncp-uart-sw",
+                                gatewayLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { gateway }, true, false); // useHost, don't useSpi
+
+// Load Z3Switch app as a SoC device.
+Location enddeviceLocation = gridLocations[4];
+TestNode doorlock = new TestNode("door-lock",
+                                  "build/af-test-apps/Z3DoorLockWithWwah-simulation/Z3DoorLockWithWwah",
+                                  "", // no HOST image
+                                  "", // no NCP image
+                                  enddeviceLocation);
+addAndLoadDevicesWithLocation(new TestNode[] { doorlock }, false); // don't useHost
+
+lazyExpect = true;
+
+void testSendClusterQuery(int cluster)
+{
+  send("gateway", "zcl mfg-code 0x1217" );
+  send("gateway", "zcl sl-wwah query-aps-link-key-auth 0x" + Integer.toHexString(cluster));
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+}
+
+void testClusterQuery(int cluster1En, int cluster2En, int cluster3En)
+{
+  testSendClusterQuery(0x0003);
+  expect("gateway", "RX len 8, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0D seq [0-9A-F]{2} cmd 00 payload\\[03 00 0" 
+    + String.valueOf(cluster1En) + " \\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testSendClusterQuery(0x0004);
+  expect("gateway", "RX len 8, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0D seq [0-9A-F]{2} cmd 00 payload\\[04 00 0"
+    + String.valueOf(cluster2En) + " \\]");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testSendClusterQuery(0x0005);
+  expect("gateway", "RX len 8, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0D seq [0-9A-F]{2} cmd 00 payload\\[05 00 0"
+    + String.valueOf(cluster3En) + " \\]");
+  networkWait(DEFAULT_TIMEOUT);
+}
+
+void testGlobalRead(boolean dropCluster1, boolean dropCluster2, boolean dropCluster3)
+{
+  // Switch on APS security in gateway for those clusters where we enabled it in the door-lock device
+  // send("gateway", "option security aps on");
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "zcl global read 0x0003 0x0000");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  if (dropCluster1) {
+    expect("gateway", "DEFAULT_RESP: \\(Identify\\) .* status 7E");
+  } else {
+    expect("gateway", "READ_ATTR_RESP: \\(Identify\\)");
+  }
+
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "zcl global read 0x0004 0x0000");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  if (dropCluster2) {
+    expect("gateway", "DEFAULT_RESP: \\(Groups\\) .* status 7E");
+  } else {
+    expect("gateway", "READ_ATTR_RESP: \\(Groups\\)");
+  }
+
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "zcl global read 0x0005 0x0000");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  if (dropCluster3) {
+    expect("gateway", "DEFAULT_RESP: \\(Scenes\\) .* status 7E");
+  } else {
+    expect("gateway", "READ_ATTR_RESP: \\(Scenes\\)");
+  }
+  networkWait(DEFAULT_TIMEOUT);
+  
+}
+
+void runApsLinkKeyAuthorizationCliAndTokensTest() 
+{
+  // Wait for the nodes to reset.
+  networkWait(DEFAULT_TIMEOUT);
+
+  // Test APS link key authorization CLI and tokens
+  dbg.println("=== Testing APS link key authorization CLI and tokens from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+
+  //Test 'info' command
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is disabled.");
+  expect("door-lock", "actual length: 0");
+  networkWait(DEFAULT_TIMEOUT);
+
+  //Test enabled with exempt list: 'enable-with-exempt-list 1 ...' command
+  send("door-lock", "plugin aps-link-key-auth enable-with-exempt-list 1 0x0003 0x0005 0xFC57");
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is enabled.");
+  expect("door-lock", "actual length: 3");
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "clusters: 0xFC57 0x0005 0x0003");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // Test if configuration is persistently stored
+  network.power("door-lock", false);
+  network.power("door-lock", true);
+  setupEncryption();
+
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is enabled.");
+  expect("door-lock", "actual length: 3");
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "clusters: 0xFC57 0x0005 0x0003");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // Test disabled with exempt list: 'enable-with-exempt-list 0 ...' and 'add-cluster-exempted ...' commands 
+  // with adding the max number of exempt clusters to the list.
+  send("door-lock", "plugin aps-link-key-auth enable-with-exempt-list 0 0000");
+  for (int cluster = 1; cluster < 127; cluster++) {
+    send("door-lock", "plugin aps-link-key-auth add-cluster-exempted 0x" 
+      + String.format("%04X", new Object[] {new Integer(cluster)} ) );
+    networkWait(100);
+  }
+
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is disabled.");
+  expect("door-lock", "actual length: 127");
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "clusters: 0x0000 0x0001 .* 0x007C 0x007D 0x007E");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // Test if configuration is persistently stored
+  network.power("door-lock", false);
+  network.power("door-lock", true);
+  setupEncryption();
+
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is disabled.");
+  expect("door-lock", "actual length: 127");
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "clusters: 0x0000 0x0001 .* 0x007C 0x007D 0x007E");
+  networkWait(DEFAULT_TIMEOUT);
+
+  //Test enable ('enable 1') and 'clear-exempt-list' commands
+  send("door-lock", "plugin aps-link-key-auth enable 1");
+  send("door-lock", "plugin aps-link-key-auth clear-exempt-list");
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is enabled.");
+  expect("door-lock", "actual length: 0");
+
+  //Test disble ('enable 0') command
+  send("door-lock", "plugin aps-link-key-auth enable 0");
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is disabled.");
+  expect("door-lock", "actual length: 0");
+
+  // Test if configuration is persistently stored
+  network.power("door-lock", false);
+  network.power("door-lock", true);
+  setupEncryption();
+
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is disabled.");
+  expect("door-lock", "actual length: 0");
+}
+
+void runApsLinkKeyAuthorizationNetworkTest() 
+{
+  setupEncryption();
+
+  // Wait for the nodes to reset.
+  networkWait(DEFAULT_TIMEOUT);
+
+  // Check inital base device masks.
+  expectMultiline("gateway",
+                  "plugin network-creator status",
+                  new String[]  {
+                    "(1).*[11, 15, 20, 25]",
+                    "(2).*[12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26]",
+                  });
+
+  // The gateway forms a centralized network.
+  send("gateway", "plugin network-creator start 1");
+  expect("gateway",
+         "NWK Creator: Form. Channel.*Status: 0x00",
+         DEFAULT_TIMEOUT << 1);
+
+  // Open the network for joining using the gateway.
+  send("gateway", "plugin network-creator-security open-network");
+  expect("gateway", "Open network: 0x00");
+
+  dbg.println("=== Testing keys print from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "keys print");
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "keys print");
+  networkWait(DEFAULT_TIMEOUT);
+
+  // Join with the door-lock. 
+  network.pressButton("door-lock", "0");
+  network.releaseButton("door-lock", "0");
+  networkWait(timeout);       // there was a beacon collision hence adding a delay to avoid it.
+
+  // Wait for joining and stuff.
+  expect("door-lock", "Trust center link key update status: 0x65", 30000);
+
+  networkWait(DEFAULT_TIMEOUT);
+  networkWait(DEFAULT_TIMEOUT);
+
+  dbg.println("=== Testing keys print from line " + this.namespace.getInvocationLine() + " ===");
+  send("gateway", "keys print");
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "keys print");
+  networkWait(DEFAULT_TIMEOUT);
+/*
+
+  // Test ZCL globals wo/ APS security
+  dbg.println("=== Testing ZCL global read from line " + this.namespace.getInvocationLine() + " ===");
+  // Make sure no APS security is not used for reading the arguments
+  send("gateway", "option security aps off");
+  networkWait(DEFAULT_TIMEOUT);*/
+
+  // Test WWAH query APS link key authorization command
+  dbg.println("=== Testing WWAH query APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testClusterQuery(0, 0, 0);
+
+  testGlobalRead(false, false, false);
+
+  // Test WWAH enable APS link key authorization (with exempt list) command - #1
+  dbg.println("=== Testing WWAH enable APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "zcl mfg-code 0x1217");
+  send("gateway", "zcl sl-wwah enable-aps-link-key-auth 3 0x0003 0x0005 0xFC57");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  expect("door-lock", "RX len 12, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 05 seq [0-9A-F]{2} cmd 00 payload\\[03 03 00 05 00 57 FC \\]");
+  expect("gateway", "RX len 7, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0C seq [0-9A-F]{2} cmd 0B payload\\[00 00 \\]");
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is enabled.");
+  expect("door-lock", "clusters: 0xFC57 0x0005 0x0003");
+
+  // Test WWAH query APS link key authorization command
+  dbg.println("=== Testing WWAH query APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testClusterQuery(0, 1, 0);
+
+  testGlobalRead(false, true, false);
+
+  // Test WWAH enable APS link key authorization (with exempt list) command - #2
+  dbg.println("=== Testing WWAH enable APS link key authorization command from line  " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "zcl mfg-code 0x1217");
+  send("gateway", "zcl sl-wwah enable-aps-link-key-auth 2 0x0004 0xFC57");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  expect("door-lock", "RX len 10, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 05 seq [0-9A-F]{2} cmd 00 payload\\[02 04 00 57 FC \\]");
+  expect("gateway", "RX len 7, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0C seq [0-9A-F]{2} cmd 0B payload\\[00 00 \\]");
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is enabled.");
+  expect("door-lock", "clusters: 0xFC57 0x0004");
+
+  // Test WWAH query APS link key authorization command
+  dbg.println("=== Testing WWAH query APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testClusterQuery(1, 0, 1);
+
+  testGlobalRead(true, false, true);
+
+  // Test WWAH disable APS link key authorization (with exempt list) command - #1
+  dbg.println("=== Testing WWAH disable APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "zcl mfg-code 0x1217");
+  send("gateway", "zcl sl-wwah disable-aps-link-key-auth 1 0x0004");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  expect("door-lock", "RX len 8, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 05 seq [0-9A-F]{2} cmd 01 payload\\[01 04 00 \\]");
+  expect("gateway", "RX len 7, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0C seq [0-9A-F]{2} cmd 0B payload\\[01 00 \\]");
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is disabled.");
+  expect("door-lock", "clusters: 0x0004");
+
+  //TODO: Test error respnose for overloaded exempt list for enable and disable commands
+
+  // Test WWAH query APS link key authorization command
+  dbg.println("=== Testing WWAH query APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testClusterQuery(0, 1, 0);
+
+  testGlobalRead(false, true, false);
+
+  // Test WWAH disable APS link key authorization (with exempt list) command - #2
+  dbg.println("=== Testing WWAH disable APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "zcl mfg-code 0x1217");
+  send("gateway", "zcl sl-wwah disable-aps-link-key-auth 2 0x0003 0x0004");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  expect("door-lock", "RX len 10, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 05 seq [0-9A-F]{2} cmd 01 payload\\[02 03 00 04 00 \\]");
+  expect("gateway", "RX len 7, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0C seq [0-9A-F]{2} cmd 0B payload\\[01 00 \\]");
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is disabled.");
+  expect("door-lock", "clusters: 0x0004 0x0003");
+
+  //TODO: Test error respnose for overloaded exempt list for enable and disable commands
+
+  // Test WWAH query APS link key authorization command
+  dbg.println("=== Testing WWAH query APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testClusterQuery(1, 1, 0);
+
+  testGlobalRead(true, true, false);
+
+  // Test WWAH disable APS link key authorization (wo/ exempt list) command
+  dbg.println("=== Testing WWAH disable APS link key authorization  for all clusters from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "zcl mfg-code 0x1217");
+  send("gateway", "zcl sl-wwah disable-aps-link-key-auth 0");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  expect("door-lock", "RX len 6, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 05 seq [0-9A-F]{2} cmd 01 payload\\[00 \\]");
+  expect("gateway", "RX len 7, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0C seq [0-9A-F]{2} cmd 0B payload\\[01 00 \\]");
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is disabled.");
+  expect("door-lock", "actual length: 0");
+
+  // Test WWAH query APS link key authorization command
+  dbg.println("=== Testing WWAH query APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testClusterQuery(0, 0, 0);
+
+  testGlobalRead(false, false, false);
+
+  // Test WWAH enable APS link key authorization (wo/ exempt list) command
+  dbg.println("=== Testing WWAH enable APS link key authorization for all clusters from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+  send("gateway", "option security aps on");
+  send("gateway", "zcl mfg-code 0x1217");
+  send("gateway", "zcl sl-wwah enable-aps-link-key-auth 0");
+  send("gateway", "send " + nodeId("door-lock") + " 1 1");
+  expect("door-lock", "RX len 6, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 05 seq [0-9A-F]{2} cmd 00 payload\\[00 \\]");
+  expect("gateway", "RX len 7, ep 01, clus 0xFC57 \\(SL Works With All Hubs\\) mfgId 1217 FC 0C seq [0-9A-F]{2} cmd 0B payload\\[00 00 \\]");
+  networkWait(DEFAULT_TIMEOUT);
+  send("door-lock", "plugin aps-link-key-auth info");
+  expect("door-lock", "APS link key authorization is enabled.");
+  expect("door-lock", "actual length: 0");
+
+  // Test WWAH query APS link key authorization command
+  dbg.println("=== Testing WWAH query APS link key authorization command from line " + this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);
+
+  testClusterQuery(1, 1, 1);
+
+  testGlobalRead(false, false, false);
+
+}
+
+
+runApsLinkKeyAuthorizationCliAndTokensTest();
+
+runApsLinkKeyAuthorizationNetworkTest();

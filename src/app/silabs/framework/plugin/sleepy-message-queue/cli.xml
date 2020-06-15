@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-sleepy-message-queue" name="Plugin Commands: Sleepy Message Queue">
+    <description>
+      The sleepy-message-queue plugin provides a means to store packets up to a specified period of time.
+    </description>
+  </group>
+  <command cli="plugin sleepy-message-queue init" functionName="emberAfPluginSleepyMessageQueueInitCallback" group="plugin-sleepy-message-queue">
+    <description>
+      Initialize the sleepy message queue.
+    </description>
+  </command>
+  <command cli="plugin sleepy-message-queue store" functionName="emAfSleepyMessageQueueCliStore" group="plugin-sleepy-message-queue">
+    <description>
+      Store a message into the sleepy message queue.
+    </description>
+    <arg name="timeoutSec"    type="INT32U" description="Message timeout, in seconds" />
+    <arg name="payloadPtr"    type="INT32U" description="Pointer to (address of) the message payload" />
+    <arg name="payloadLength" type="INT16U" description="The length of the message payload" />
+    <arg name="payloadId"     type="INT16U" description="The payload ID of this message" />
+    <arg name="dstEui64"      type="OCTET_STRING" description="The EUI64 of the device to which the message is being sent" />
+  </command>
+  <command cli="plugin sleepy-message-queue getPendingMsgId" functionName="emAfSleepyMessageQueueCliGetPendingMsgId" group="plugin-sleepy-message-queue">
+    <description>
+      Get the first pending message ID for a given destination EUI64.
+    </description>
+    <arg name="dstEui64" type="OCTET_STRING" description="The EUI64 of the device for which the first pending message ID is being queried" />
+  </command>
+  <command cli="plugin sleepy-message-queue getPendingMsg" functionName="emAfSleepyMessageQueueCliGetPendingMsg" group="plugin-sleepy-message-queue">
+    <description>
+      Get the first pending message ID for a given destination EUI64.
+    </description>
+    <arg name="msgId"    type="INT8U" description="The messageID of the message to be retrieved." />
+  </command>
+  
+  <command cli="plugin sleepy-message-queue getNumMsg" functionName="emAfSleepyMessageQueueCliGetNumPendingMsg" group="plugin-sleepy-message-queue">
+    <description>
+      Get the number of pending messages for a given destination EUI64.
+    </description>
+    <arg name="dstEui64" type="OCTET_STRING" description="The EUI64 of the device for which the number of pending messages is being queried" />
+  </command>
+  <command cli="plugin sleepy-message-queue remove" functionName="emAfSleepyMessageQueueCliRemoveMsgId" group="plugin-sleepy-message-queue">
+    <description>
+      Remove the message from the queue with the given messageID.
+    </description>
+    <arg name="msgId"    type="INT8U" description="The messageID of the message to be removed." />
+  </command>
+  <command cli="plugin sleepy-message-queue removeAll" functionName="emAfSleepyMessageQueueCliRemoveAllMsg" group="plugin-sleepy-message-queue">
+    <description>
+      Remove all messages from the queue with the given EUI64.
+    </description>
+    <arg name="dstEui64" type="OCTET_STRING" description="The EUI64 of the device whose messages should be removed." />
+  </command>
+  <command cli="plugin sleepy-message-queue unusedCnt" functionName="emAfSleepyMessageQueueCliGetNumUnusedEntries" group="plugin-sleepy-message-queue">
+    <description>
+      Reads the number of unused queue entries.
+    </description>
+  </command>
+  <command cli="plugin sleepy-message-queue remainTime" functionName="emAfSleepyMessageQueueCliGetNextMessageEventTimeoutMs" group="plugin-sleepy-message-queue">
+    <description>
+      Report the remaining timeout on the message specified by the message ID.
+    </description>
+    <arg name="msgId"    type="INT8U" description="The messageID of the message whose remaining time will be reported." />
+  </command>
+  <command cli="plugin sleepy-message-queue timestamp" functionName="emAfSleepyMessageQueueCliGetCurrentInt32uMillisecondTick" group="plugin-sleepy-message-queue">
+    <description>
+      Retrieve the current value of halCommonGetInt32uMillisecondTick().
+    </description>
+  </command>
+</cli>

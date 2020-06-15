@@ -1,0 +1,55 @@
+// This test is a sanity check to make sure we do not send
+// default responses to ZCL commands that are already responses.
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"zc", "zr"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaCombinedInterface-simulation/HaCombinedInterface",
+  "build/af-test-apps/HaCombinedInterface-simulation/HaCombinedInterface",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaCombinedInterface-simulation-ezsp/HaCombinedInterface",
+  "build/af-test-apps/HaCombinedInterface-simulation-ezsp/HaCombinedInterface",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices,
+                  socImages,
+                  hostImages,
+                  ncpImage,
+                  runArgument.runUsingHostApps,
+                  runArgument.runUsingMultihop,
+                  runArgument.runUsingSpiNcp);
+
+networkWait(3000);
+
+// Form.
+expect("zc", "network form 11 2 0x1234", ".*EMBER_NETWORK_UP 0x0000");
+expect("zc", "network pjoin 123", ".*pJoin for 123 sec: 0x00");
+
+// Join.
+expect("zr", "network join 11 2 0x1234", ".*EMBER_NETWORK_UP 0x....");
+
+// Wait for the CLI to quiet down.
+networkWait(3000);
+
+// Read ZCL version state.
+send("zr", "zcl global read 0 0");
+send("zr", "send 0 1 1");
+
+// The zr will receive a response from the zc...
+expect("zr", ".*RX.*clus 0x0000.*Basic.*");
+
+// ...but the zc should not receive a response from the zr,
+// as this would be the default response from the response. We do
+// not want to send these default responses to responses by default
+// since this is kinda a waste of bandwidth.
+nexpect("zc", ".*RX.*");

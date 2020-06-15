@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-calendar-server" name="Plugin Commands: Calendar Server">
+    <description>
+      The calendar-server plugin contributes several commands to the application framework's CLI. These commands are be used for adding, clearing, and printing calendars. 
+    </description>
+  </group>
+
+  <command cli="plugin calendar-server publish-calendar" functionName="emAfCalendarServerCliPublishCalendar" group="plugin-calendar-server">
+    <description>
+      Publish an calendar. 
+    </description>
+    <arg name="nodeId"        type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint"   type="INT8U"  description="the source endpoint" />
+    <arg name="dstEndpoint"   type="INT8U"  description="the destination endpoint" />
+    <arg name="calendarIndex" type="INT8U"  description="the index of the calendar within the calendar table" />
+  </command>
+
+  <command cli="plugin calendar-server publish-day-profiles" functionName="emAfCalendarServerCliPublishDayProfiles" group="plugin-calendar-server">
+    <description>
+      Publish the day profiles of the specified day in the specified calendar.
+    </description>
+    <arg name="nodeId"        type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint"   type="INT8U"  description="the source endpoint" />
+    <arg name="dstEndpoint"   type="INT8U"  description="the destination endpoint" />
+    <arg name="calendarIndex" type="INT8U"  description="the index of the calendar within the calendar table" />
+    <arg name="dayIndex"      type="INT8U"  description="the index of the day in the calendar" />
+  </command>
+
+  <command cli="plugin calendar-server publish-week-profile" functionName="emAfCalendarServerCliPublishWeekProfile" group="plugin-calendar-server">
+    <description>
+      Publish the week profile of the specified week in the specified calendar.
+    </description>
+    <arg name="nodeId"        type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint"   type="INT8U"  description="the source endpoint" />
+    <arg name="dstEndpoint"   type="INT8U"  description="the destination endpoint" />
+    <arg name="calendarIndex" type="INT8U"  description="the index of the calendar within the calendar table" />
+    <arg name="weekIndex"      type="INT8U"  description="the index of the week in the calendar" />
+  </command>
+
+  <command cli="plugin calendar-server publish-seasons" functionName="emAfCalendarServerCliPublishSeasons" group="plugin-calendar-server">
+    <description>
+      Publish the seasons in the specified calendar.
+    </description>
+    <arg name="nodeId"        type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint"   type="INT8U"  description="the source endpoint" />
+    <arg name="dstEndpoint"   type="INT8U"  description="the destination endpoint" />
+    <arg name="calendarIndex" type="INT8U"  description="the index of the calendar within the calendar table" />
+  </command>
+
+  <command cli="plugin calendar-server publish-special-days" functionName="emAfCalendarServerCliPublishSpecialDays" group="plugin-calendar-server">
+    <description>
+      Publish the special days for the specified calendar. 
+    </description>
+    <arg name="nodeId"        type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint"   type="INT8U"  description="the source endpoint" />
+    <arg name="dstEndpoint"   type="INT8U"  description="the destination endpoint" />
+    <arg name="calendarIndex" type="INT8U"  description="the index of the calendar within the calendar table" />
+  </command>
+
+  <command cli="plugin calendar-server cancel-calendar" functionName="emberAfCalendarServerCliCancelCalendar" group="plugin-calendar-server">
+    <description>
+      Invalidates the specified calendar and sends a cancel calendar.
+    </description>
+    <arg name="nodeId"        type="INT16U" description="the destination node id" />
+    <arg name="srcEndpoint"   type="INT8U"  description="the source endpoint" />
+    <arg name="dstEndpoint"   type="INT8U"  description="the destination endpoint" />
+    <arg name="calendarIndex" type="INT8U"  description="the index of the calendar within the calendar table" />
+  </command>
+</cli>

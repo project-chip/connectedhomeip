@@ -1,0 +1,369 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-test-harness" name="Plugin Commands: Test Harness">
+    <description>
+      The test harness commands are used to test various unusual functionality or behavior of a remote device.
+    </description>
+  </group>
+  <command cli="plugin test-harness status" functionName="emberAfPluginTestHarnessStatusCommand" group="plugin-test-harness">
+    <description>
+      Display the current status of the test harness.
+    </description>
+  </command>
+  <command cli="plugin test-harness aps-sec-for-cluster on" functionName="emberAfPluginTestHarnessSetApsSecurityForClusterCommand" group="plugin-test-harness">
+    <description>
+      Turns on automatic APS security for the specified cluster.
+    </description>
+    <arg name="clusterId" type="INT16U" description="The cluster ID to add APS security to automatically."/>
+  </command>
+  <command cli="plugin test-harness aps-sec-for-cluster off" functionName="emberAfPluginTestHarnessSetApsSecurityForClusterCommand" group="plugin-test-harness">
+    <description>
+      Turns off automatic APS security for the previously specified cluster.
+    </description>
+  </command>
+  <command cli="plugin test-harness attr options" functionName="setOptionsCommand" group="plugin-test-harness">
+    <description>
+      Set the options for the attributes tests.
+    </description>
+    <arg name="type"    type="INT8U"  />
+    <arg name="timeout" type="INT16U" />
+  </command>
+  <command cli="plugin test-harness attr set-dest" functionName="setDestinationCommand" group="plugin-test-harness">
+    <description>
+      Set the destination for the attributes tests.
+    </description>
+    <arg name="addr"     type="INT16U" />
+    <arg name="endpoint" type="INT8U"  />
+  </command>
+  <command cli="plugin test-harness attr start-test" functionName="startTestCommand" group="plugin-test-harness">
+    <description>
+      Start the attributes test.
+    </description>
+    <arg name="clusterId"      type="INT16U"  />
+    <arg name="attrStartId"    type="INT16U"  />
+    <arg name="attrEndId"      type="INT16U"  />
+    <arg name="clientToServer" type="BOOLEAN" />
+  </command>
+  <command cli="plugin test-harness hash-the-flash" functionName="emAfTestHarnessStartImageStampCalculation" group="plugin-test-harness">
+    <description>
+      Runs the AES-CCM algorithm over the contents of the software image to calcalute the image stamp.
+    </description>
+  </command>
+  <command cli="plugin test-harness registration on" functionName="emberAfPluginTestHarnessSetRegistrationCommand" group="plugin-test-harness">
+    <description>
+      Turns on automatic SE registration.
+    </description>
+  </command>
+  <command cli="plugin test-harness registration off" functionName="emberAfPluginTestHarnessSetRegistrationCommand" group="plugin-test-harness">
+    <description>
+      Turns off automatic SE registration.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-establishment normal-mode" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      Sets the key establishment mode to normal.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-establishment no-resources" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      All received KE requests will be responded with 'no resources'.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-establishment out-of-sequence" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      All received KE requests will be responded with 'no resources'.
+    </description>
+    <arg name="commandId" type="INT8U" description="The out-of-sequence command ID to send."/>
+  </command>
+
+  <command cli="plugin test-harness key-establishment timeout" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      Artificially creates a timeout by delaying an outgoing message.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-establishment delay-cbke" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      Changes the advertised delays by the local device for CBKE.
+    </description>
+    <arg name="actualDelay" type="INT16U" description="Set the actual delay that occurs."/>
+    <arg name="advertisedDelay" type="INT16U" description="Sets the advertised delay sent to the partner of key establishment"/>
+  </command>
+
+  <command cli="plugin test-harness key-establishment default-resp" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      Sends a default response error message in response to initate KE.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-establishment new-key-policy" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      Sets the policy of whether the TC allows new KE requests.
+    </description>
+    <arg name="allowKeyEstablishmentPolicy" type="INT8U" description="Allows / disallows new key establishment requests."/>
+  </command>
+  
+  <command cli="plugin test-harness key-establishment reset-aps-fc" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      Forces the local device to reset its outgoing APS FC.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-establishment adv-aps-fc" functionName="emberAfPluginTestHarnessKeyEstablishmentSetModeCommand" group="plugin-test-harness">
+    <description>
+      Advances the local device's outgoing APS FC by 4096.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-establishment cert-mangle length" functionName="emberAfPluginTestHarnessCertMangleCommand" group="plugin-test-harness">
+    <description>
+      Mangles the length of the certificate
+    </description>
+    <arg name="lengthModifier" type="INT8S" description="The positive or negative change in length."/>
+  </command>
+
+  <command cli="plugin test-harness key-establishment cert-mangle issuer" functionName="emberAfPluginTestHarnessCertMangleCommand" group="plugin-test-harness">
+    <description>
+      Changes the issuer in the certificate.
+    </description>
+    <arg name="issuer" type="OCTET_STRING" description="The EUI64 of the issuer (big endian)."/>
+  </command>
+
+  <command cli="plugin test-harness key-establishment cert-mangle corrupt" functionName="emberAfPluginTestHarnessCertMangleCommand" group="plugin-test-harness">
+    <description>
+      Corrupts a single byte in the cert
+    </description>
+    <arg name="corruptionIndex" type="INT8U" description="The index of the certificate byte to corrupt"/>
+  </command>
+
+  <command cli="plugin test-harness key-establishment cert-mangle change-byte" functionName="emberAfPluginTestHarnessCertMangleCommand" group="plugin-test-harness">
+    <description>
+      Changes a single byte in the cert
+    </description>
+    <arg name="byteIndex" type="INT8U" description="The index of the certificate byte to change"/>
+    <arg name="byteValue" type="INT8U" description="The new value of the certificate byte"/>
+  </command>
+
+  <command cli="plugin test-harness key-establishment cert-mangle subject" functionName="emberAfPluginTestHarnessCertMangleCommand" group="plugin-test-harness">
+    <description>
+      Changes the subject (EUI64) of the cert
+    </description>
+    <arg name="subject" type="OCTET_STRING" description="The EUI64 of the subject (big endian)."/>
+  </command>
+
+  <command cli="plugin test-harness key-establishment suite" functionName="emberAfPluginTestHarnessKeyEstablishmentSelectSuiteCommand" group="plugin-test-harness">
+      <description>
+        Selects between the CBKE 163k1 and 283k1 suites.
+      </description>
+      <arg name="suite" type="INT16U" description="This field holds the type
+       of key establishment suite. It can be EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1,
+       EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1, or
+       EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE"/>
+  </command>
+
+ <command cli="plugin test-harness key-establishment set-available-suite" functionName="emberAfPluginTestHarnessKeyEstablishmentSetAvailableSuiteCommand " group="plugin-test-harness">
+      <description>
+        Selects between the CBKE 163k1 and 283k1 suites.
+      </description>
+      <arg name="suite" type="INT16U" description="This field holds the type
+       of key establishment suite. It can be EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1,
+       EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1, or
+       EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE"/>
+  </command>
+
+  <command cli="plugin test-harness key-establishment key-mangle" functionName="emberAfPluginTestHarnessKeyEstablishmentKeyMangleCommand" group="plugin-test-harness">
+    <description>
+      Mangles the length of the empheral key.
+    </description>
+    <arg name="lengthModifier" type="INT8S" description="The positive or negative change in length."/>
+  </command>
+
+
+  <command cli="plugin test-harness price send-new-fields" functionName="emberAfPluginTestHarnessPriceSendNewFieldsCommand" group="plugin-test-harness">
+    <description>
+      Controls whether the new SE 1.1 price fields are included.
+    </description>
+    <arg name="sendNewFields" type="INT8U" description="Boolean indicating whether to send new fields."/>
+  </command> 
+
+  <command cli="plugin test-harness price send-se10-fields" functionName="emberAfPluginTestHarnessPriceSendNewFieldsCommand" group="plugin-test-harness">
+    <description>
+      Controls whether the new SE 1.1 price fields are included.
+    </description>
+    <arg name="sendNewFields" type="INT8U" description="Boolean indicating whether to send new fields."/>
+  </command> 
+
+  <command cli="plugin test-harness tc-keepalive send" functionName="emberAfPluginTestHarnessTcKeepaliveSendCommand" group="plugin-test-harness">
+    <description>
+      Sends a Trust Center Keepalive.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness tc-keepalive start" functionName="emberAfPluginTestHarnessTcKeepaliveStartStopCommand" group="plugin-test-harness">
+    <description>
+      Starts the TC keepalive state machine.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness tc-keepalive stop" functionName="emberAfPluginTestHarnessTcKeepaliveStartStopCommand" group="plugin-test-harness">
+    <description>
+      Stops the TC keepalive state machine.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness ota image-mangle" functionName="emberAfPluginTestHarnessOtaImageMangleCommand" group="plugin-test-harness">
+    <description>
+      Mangles the Simple Storage RAM OTA image.
+    </description>
+    <arg name="index" type="INT16U" description="The byte index into the OTA image that will be mangled."/>
+  </command>
+
+  <command cli="plugin test-harness concentrator start" functionName="emberAfPluginTestHarnessConcentratorStartStopCommand" group="plugin-test-harness">
+    <description>
+      Starts the concentrator's periodic broadcasts.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness concentrator stop" functionName="emberAfPluginTestHarnessConcentratorStartStopCommand" group="plugin-test-harness">
+    <description>
+      Starts the concentrator's periodic broadcasts.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-update unicast" functionName="emberAfPluginTestHarnessKeyUpdateCommand" group="plugin-test-harness">
+    <description>
+      Changes TC NWK key update mechanism to unicast with APS security.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-update broadcast" functionName="emberAfPluginTestHarnessKeyUpdateCommand" group="plugin-test-harness">
+    <description>
+      Changes TC NWK key update mechanism to broadcast.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness key-update now" functionName="emberAfPluginTestHarnessKeyUpdateCommand" group="plugin-test-harness">
+    <description>
+      Starts a TC NWK key update now
+    </description>
+  </command>
+
+  <command cli="plugin test-harness stack limit-beacons on" functionName="emberAfPluginTestHarnessLimitBeaconsOnOffCommand" group="plugin-test-harness">
+    <description>
+      Enables a limit to the max number of outgoing beacons.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness stack limit-beacons off" functionName="emberAfPluginTestHarnessLimitBeaconsOnOffCommand" group="plugin-test-harness">
+    <description>
+      Disables a limit to the max number of outgoing beacons.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness channel-mask clear" functionName="emberAfPluginTestHarnessChannelMaskResetClearAllCommand" group="plugin-test-harness" restriction="defined(EMBER_AF_PLUGIN_NETWORK_FIND)">
+    <description>
+      Clears the channel mask used by network find.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness channel-mask reset" functionName="emberAfPluginTestHarnessChannelMaskResetClearAllCommand" group="plugin-test-harness" restriction="defined(EMBER_AF_PLUGIN_NETWORK_FIND)">
+    <description>
+      Resets the channel mask back to the app default.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness channel-mask all" functionName="emberAfPluginTestHarnessChannelMaskResetClearAllCommand" group="plugin-test-harness" restriction="defined(EMBER_AF_PLUGIN_NETWORK_FIND)">
+    <description>
+      Sets the channel mask to all channels
+    </description>
+  </command>
+
+  <command cli="plugin test-harness channel-mask add" functionName="emberAfPluginTestHarnessChannelMaskAddOrRemoveCommand" group="plugin-test-harness" restriction="defined(EMBER_AF_PLUGIN_NETWORK_FIND)">
+    <description>
+      Add a channel to the mask
+    </description>
+    <arg name="channel" type="INT8U" description="The 802.15.4 chanel to add."/>
+  </command>
+
+  <command cli="plugin test-harness channel-mask remove" functionName="emberAfPluginTestHarnessChannelMaskAddOrRemoveCommand" group="plugin-test-harness" restriction="defined(EMBER_AF_PLUGIN_NETWORK_FIND)">
+    <description>
+      Remove a channel from the mask
+    </description>
+    <arg name="channel" type="INT8U" description="The 802.15.4 chanel to remove."/>
+  </command>
+
+  <command cli="plugin test-harness endpoint enable" functionName="emberAfPluginTestHarnessEnableDisableEndpointCommand" group="plugin-test-harness">
+    <description>
+      Enables the endpont to receive messages and be discovered
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint number."/>
+  </command>
+
+  <command cli="plugin test-harness endpoint disable" functionName="emberAfPluginTestHarnessEnableDisableEndpointCommand" group="plugin-test-harness">
+    <description>
+      Disables the endpont to receive messages and be discovered
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint number."/>
+  </command>
+
+  <command cli="plugin test-harness endpoint status" functionName="emberAfPluginTestHarnessEndpointStatusCommand" group="plugin-test-harness">
+    <description>
+      Disables the endpont to receive messages and be discovered
+    </description>
+  </command>
+
+  <command cli="plugin test-harness endpoint cluster-endpoint-index" functionName="emberAfPluginTestHarnessClusterEndpointIndexCommand" group="plugin-test-harness">
+    <description>
+      Get cluster endpoint index
+    </description>
+    <arg name="endpoint"         type="INT8U"  description="The local endpoint of the cluster." />
+    <arg name="clusterId"        type="INT16U" description="The cluster whose index is needed." />
+    <arg name="mask"             type="INT8U"  description="0 for client-side attributes or 1 for server-side attributes." />
+  </command>
+
+  <command cli="plugin test-harness radio on" functionName="emberAfPluginTestHarnessRadioOnOffCommand" group="plugin-test-harness">
+    <description>
+      Turns on the radio if it was previously turned off
+    </description>
+  </command>
+
+  <command cli="plugin test-harness radio off" functionName="emberAfPluginTestHarnessRadioOnOffCommand" group="plugin-test-harness">
+    <description>
+      Turns off the radio so that no messages are sent.
+    </description>
+  </command>
+
+  <command cli="plugin test-harness set-radio-power" functionName="emberAfPluginTestHarnessSetRadioPower" group="plugin-test-harness">
+    <description>
+      Sets the radio power.
+    </description>
+    <arg name="power"         type="INT8U"  description="The radio power to set." />
+  </command>
+
+  <command cli="plugin test-harness add-child" functionName="emberAfPluginTestHarnessAddChildCommand" group="plugin-test-harness">
+    <description>
+      Adds a child to the child table.
+    </description>
+    <arg name="ShortId" type="INT16U" description="The shortId of the child device."/>
+    <arg name="EUI" type="OCTET_STRING" description="The EUI64 of the child (big endian)."/>
+    <arg name="nodeType" type="INT8U" description="The node type of the child device."/>
+  </command>
+
+  <command cli="plugin test-harness set-compliance-revision" functionName="emberAfPluginTestHarnessSetNodeDescriptorComplianceRevision" group="plugin-test-harness">
+    <description>
+      Setting a compliance revision for a device such that the device can act as pre-R21 or R21+ for testing purposes. The reason for doing this is because the end device may send a node descriptor request and the hub will respond with the node descriptor response which will include the hub's compliance revision. If the compliance revision of the hub is R21+, only then will the TC link key request be made by the end device.
+    </description>
+    <arg name="version" type="INT8U" description="The compliance version"/>
+  </command>
+
+  <command cli="plugin test-harness set-max-children" functionName="emberAfPluginTestHarnessSetMaxChildren" group="plugin-test-harness">
+    <description>
+      Sets the maximum children supported by the local node.
+    </description>
+    <arg name="version" type="INT8U" description="The maximum number of children to support"/>
+  </command>
+
+ </cli>

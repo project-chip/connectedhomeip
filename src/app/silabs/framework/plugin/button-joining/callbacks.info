@@ -1,0 +1,15 @@
+/** @brief Button Event
+ *
+ * This allows another module to get notification when a button is pressed and
+ * released but the button joining plugin did not handle it. This callback is
+ * NOT called in ISR context so there are no restrictions on what code can
+ * execute.
+ *
+ * @param buttonNumber The button number that was pressed. Ver.: always
+ * @param buttonPressDurationMs The length of time button was held down before
+ * it was released. Ver.: always
+ */
+void emberAfPluginButtonJoiningButtonEventCallback(uint8_t buttonNumber,
+                                                   uint32_t buttonPressDurationMs)
+{
+}

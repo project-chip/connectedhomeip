@@ -1,0 +1,272 @@
+
+// ***************************************************
+// TEST SCRIPT
+// ***************************************************
+cd(dirname(pathToFile(getSourceFileInfo()).getAbsolutePath()));
+source("util.bsh");
+
+System.setOut(System.err);
+
+String appName = "se-ipd-afv2";
+
+String dut = runArgument.dut;
+String[] nodes = new String[] {
+  dut,
+};
+
+String sourceEndpoint = "1"; // Default value of Ember App Framework.
+String destEndpoint = "10"; // Default value of the Test Harness
+String thAddr = "0x0000"; //TH is coordinator here.
+
+int parsingFinger = 0;
+
+boolean dutMeterClientInfoSetup()
+{
+  printTestMessage("Meter client Test Harness setup", true);
+  thAddr = getTHShortID();
+  if (thAddr == null) {
+    print("TH id can not be loaded, run the test with the -f option.");
+    return false;
+  }
+
+  tymeSync(dut, thAddr, sourceEndpoint, destEndpoint);
+
+  return true;
+}
+
+void test11_3_3_item2()
+{
+  String group = "METER";
+  String section = "11.3.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl metering get-profile 0x00 0x00000000 0x01");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test11_4_3_item2()
+{
+  String group = "METER";
+  String section = "11.4.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl metering get-profile 0x00 0x00000000 0x01");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test11_8_3_item2()
+{
+  String group = "METER";
+  String section = "11.8.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl global read 0x0702 0x0000");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test11_10_3_item2()
+{
+  String group = "METER";
+  String section = "11.10.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl global read 0x0702 0x0200");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test11_11_3_item2()
+{
+  String group = "METER";
+  String section = "11.11.3";
+  String item = "2";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl global read 0x0702 0x0300");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test11_11_3_item8()
+{
+  String group = "METER";
+  String section = "11.11.3";
+  String item = "8";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl global read 0x0702 0x0303");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+void test11_11_3_item14()
+{
+  String group = "METER";
+  String section = "11.11.3";
+  String item = "14";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl global read 0x0702 0x0306");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  pause("Check response from Test Harness GUI. Press ENTER to continue...");
+}
+
+// TODO: we need to check the attributes with "print attr" which btw now seems not working.
+void test11_37_3_item2_4()
+{
+  String group = "METER";
+  String section = "11.37.3";
+  String item = "2&4";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl global read 0x0702 0x0300");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+  sleep(500);
+  send(dut, "zcl global read 0x0702 0x0301");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+  sleep(500);
+  send(dut, "zcl global read 0x0702 0x0302");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+  sleep(500);
+  send(dut, "zcl global read 0x0702 0x0303");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+  sleep(500);
+  send(dut, "zcl global read 0x0702 0x0000");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  printTestMessage("We don't have callback for displaying the metering attributes. it should show on the display as \"48735 kWh\". PASS by default.");
+  pause("Press ENTER to continue...");
+}
+
+// TODO: we need to check the attributes with "print attr" which btw now seems not working.
+void test11_38_3_item2_4()
+{
+  String group = "METER";
+  String section = "11.38.3";
+  String item = "2&4";
+  printTestTitle(group, section, item);
+  if (skipThisTest())
+      return;
+  parsingFinger = 0;
+
+  printTestMessage("- START the test in the SETest GUI. Press ENTER **AFTER** you started the test.");
+  pause("");
+
+  send(dut, "zcl global read 0x0702 0x0300");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+  sleep(500);
+  send(dut, "zcl global read 0x0702 0x0301");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+  sleep(500);
+  send(dut, "zcl global read 0x0702 0x0302");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+  sleep(500);
+  send(dut, "zcl global read 0x0702 0x0303");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+  sleep(500);
+  send(dut, "zcl global read 0x0702 0x0000");
+  send(dut, "send " + thAddr + " " + sourceEndpoint + " " + destEndpoint);
+
+  printTestMessage("We don't have callback for displaying the metering attributes. it should show on the display as \"10476 kWh\". PASS by default.");
+  pause("Press ENTER to continue...");
+}
+
+
+TestNetwork t = new TestNetwork();
+setTestNetwork(t);
+setOutputFile(runArgument.outputFile);
+setOutputFilename(runArgument.currentOutputFile);
+
+for (int i = 0; i < nodes.length; i++) {
+  t.add(nodes[i]);
+}
+
+t.connect(4901);
+t.echo(true);
+
+printTestMessage("METER - CLIENT", true);
+print("NOTE: These tests assume that the sample app " + appName + " is running on the DUT");
+
+if (runArgument.formNetwork) {
+  networkSetupDutJoin(nodes,
+                      dut,
+                      runArgument.channel,
+                      runArgument.power,
+                      runArgument.panId);
+  dutNetworkInfoSetup(dut);
+}
+dutMeterClientInfoSetup();
+
+
+//test11_3_3_item2(); // Optional
+//test11_4_3_item2(); // Optional
+test11_8_3_item2();
+test11_10_3_item2();
+test11_11_3_item2();
+test11_11_3_item8();
+test11_11_3_item14();
+test11_37_3_item2_4();
+test11_38_3_item2_4();
+

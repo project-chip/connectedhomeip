@@ -1,0 +1,153 @@
+// this is mainly to test if parent_annopunce message gets processed properly
+// EMZIGBEE-3295
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  std.print("** This test uses a mixture of HOST/SoC devices, so only run it with -h ** ");
+  return;
+}
+
+// This test uses a mixture of (simulated) HOST and SoC apps, so we place 2
+// calls to addAndLoadDevicesWithLocation. The network is a P3 graph that looks
+// like this.
+SimulatedNetwork network = createNetwork();
+// 1 gateway, 2 routers, 2 sleepy nodes
+// Load Z3Gateway app as HOST.
+Location gatewayLocation = gridLocations[(runArgument.runUsingMultihop ? 1 : 0)];
+TestNode gateway = new TestNode("gateway",
+                                "", // no SoC image
+                                "build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+                                "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+                                gridLocations[0]);
+addAndLoadDevicesWithLocation(new TestNode[] { gateway }, true); // useHost
+
+
+TestNode light = new TestNode("light",                                      
+                                "build/af-test-apps/Z3Light-simulation/Z3Light", // no SoC image                             
+                                "",//"build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+                                "",//"app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+                                gridLocations[1]);
+
+addAndLoadDevicesWithLocation(new TestNode[] { light }, false); // useHost 
+
+
+TestNode light1 = new TestNode("light1",                                          
+                                "build/af-test-apps/Z3Light-simulation/Z3Light",
+// no SoC image
+                                "",//"build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+                                "",//"app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi",
+                                gridLocations[2]);                              
+                                                                                
+addAndLoadDevicesWithLocation(new TestNode[] { light1 }, false); // useHost  
+
+
+// Load HaLight and Z3Switch app as SoC devices.                                
+Location halightLocation = gridLocations[(runArgument.runUsingMultihop ? 4 :
+0)];
+
+
+TestNode cs = new TestNode("cs",                                      
+                                "build/af-test-apps/Z3ContactSensor-simulation/Z3ContactSensor",
+                                "", // no HOST image                            
+                                "", // no NCP image                             
+                                gridLocations[4]);                               
+addAndLoadDevicesWithLocation(new TestNode[] { cs }, false); // useHost    
+
+                                                                                
+// Load Z3SleepyDoorLockWithWwah app as a SoC device.                           
+Location sleepyEndDeviceLocation = gridLocations[6];                            
+TestNode cs1 = new TestNode("cs1",                       
+                                  "build/af-test-apps/Z3ContactSensor-simulation/Z3ContactSensor",
+                                  "", // no HOST image                          
+                                  "", // no NCP image                           
+                                  sleepyEndDeviceLocation);                     
+addAndLoadDevicesWithLocation(new TestNode[] { cs1 }, false); 
+                                                                                
+lazyExpect = true;  
+void startNetwork()                                                             
+{                                                                               
+  setupEncryption();                                                            
+                                                                                
+  // Wait for the nodes to reset.                                               
+  networkWait(DEFAULT_TIMEOUT);                                                 
+                                                                                
+  // Check inital base device masks.                                            
+  expectMultiline("gateway",                                                    
+                  "plugin network-creator status",                              
+                  new String[]  {                                               
+                    "(1).*\\[11, 15, 20, 25\\]",                                
+                    "(2).*\\[12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26\\]",
+                  });                                                           
+                                                                                
+  // The gateway forms a centralized network.                                   
+  send("gateway", "plugin network-creator start 1");                            
+  expect("gateway",                                                             
+         "NWK Creator: Form. Channel.*Status: 0x00",                            
+         DEFAULT_TIMEOUT << 1);                                                 
+                                                                                
+  // Open the network for joining using the gateway.                            
+  send("gateway", "plugin network-creator-security open-network"); 
+  expect("gateway", "Open network: 0x00");                                      
+                                                                                
+  dbg.println("=== Testing keys print from line " +
+               this.namespace.getInvocationLine() + " ===");
+  networkWait(DEFAULT_TIMEOUT);                                                 
+  send("gateway", "keys print");                                                
+  networkWait(DEFAULT_TIMEOUT);                                                 
+  send("light", "keys print");                                                  
+  networkWait(DEFAULT_TIMEOUT);  
+  send("light1", "keys print");                                                  
+  networkWait(DEFAULT_TIMEOUT);                                                
+  send("cs", "keys print");                                               
+  networkWait(DEFAULT_TIMEOUT);                                                 
+  send("cs1", "keys print");                                        
+  networkWait(DEFAULT_TIMEOUT);                                                 
+                                                                                
+  send("light", "plugin network-steering start 0");                             
+  send("gateway", "info");                                                      
+  networkWait(1000);                                                            
+  send("light", "info");                                                        
+  networkWait(1000);                                                            
+  
+  send("light1", "plugin network-steering start 0");                             
+  send("gateway", "info");                                                      
+  networkWait(1000);                                                            
+  send("light1", "info");                                                        
+  networkWait(1000);                                                                                
+   networkWait(5000);                                                                               
+  // Join with the sleepy end device.         
+                    
+  network.pressButton("cs", "0");   
+  network.releaseButton("cs", "0");                                       
+  networkWait(timeout);       // there was a beacon
+  networkWait(18000);                                                           
+                                                                                
+  // Join with the sleepy end device.                                             
+  network.pressButton("cs1", "0");                                  
+  network.releaseButton("cs1", "0");                                
+  networkWait(timeout);       // there was a beacon collision hence adding a
+  networkWait(18000);                                                           
+                                                                                
+  send("gateway", "info");                                                      
+  networkWait(DEFAULT_TIMEOUT);                                                 
+  send("light", "info");                                                        
+  networkWait(DEFAULT_TIMEOUT);  
+  send("light1", "info");                                                        
+  networkWait(DEFAULT_TIMEOUT);                                                
+  send("cs", "info");                                                     
+  networkWait(DEFAULT_TIMEOUT);                                                 
+  send("cs1", "info");                                              
+  networkWait(DEFAULT_TIMEOUT);                                                 
+}   
+
+startNetwork();
+networkWait(5000);
+network.power("light", false);
+networkWait(10000);
+network.power("light", true);
+setupEncryption();
+networkWait(50000); 
+
+ 

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-network-creator-security"
+         name="Plugin Commands: Network Creator Security">
+    <description>
+      Commands pertaining to network creation with the Network Creator plugin.
+    </description>
+  </group>
+
+  <command cli="plugin network-creator-security set-joining-link-key"
+           functionName="emAfPluginNetworkCreatorSecuritySetJoiningLinkKeyCommand"
+           group="plugin-network-creator-security">
+    <description>
+      Set the link key that a specific joining device will use when joining the network. This command can be also used to add install code derived link keys. If all FF's are entered for the EUI64 for the joining device, then this link key will be used for all joining devices without a joining key entry.
+    </description>
+    <arg name="eui64"
+         type="IEEE_ADDRESS"
+         description="The EUI64 of the joining device." />
+    <arg name="joiningLinkKey"
+         type="OCTET_STRING"
+         description="The link key that the joining device will use to enter the network." />
+  </command>
+
+  <command cli="plugin network-creator-security clear-joining-link-keys"
+           functionName="emAfPluginNetworkCreatorSecurityClearJoiningLinkKeyCommand"
+           group="plugin-network-creator-security">
+    <description>
+      Clear all of the joining link keys stored in the stack.
+    </description>
+  </command>
+
+  <command cli="plugin network-creator-security open-network"
+           functionName="emAfPluginNetworkCreatorSecurityOpenOrCloseNetworkCommand"
+           group="plugin-network-creator-security">
+    <description>
+      Open the network for joining.
+    </description>
+  </command>
+
+  <command cli="plugin network-creator-security close-network"
+           functionName="emAfPluginNetworkCreatorSecurityOpenOrCloseNetworkCommand"
+           group="plugin-network-creator-security">
+    <description>
+      Close the network for joining.
+    </description>
+  </command>
+
+  <command cli="plugin network-creator-security open-with-key"
+           functionName="emAfPluginNetworkCreatorSecurityOpenNetworkWithKeyCommand"
+           group="plugin-network-creator-security">
+    <description>
+      Open the network that would only allow the node with specified EUI and link key pair to join.
+    </description>
+    <arg name="eui64"
+         type="IEEE_ADDRESS"
+         description="The EUI64 of the joining device." />
+    <arg name="joiningLinkKey"
+         type="OCTET_STRING"
+         description="The link key that the joining device will use to enter the network." />
+  </command>
+  <command cli="plugin network-creator-security set-distributed-key"
+           functionName="emAfPluginNetworkCreatorSecurityConfigureDistributedKey"
+           group="plugin-network-creator-security">
+    <description>
+      Set the TC Link key for a distributed network
+    </description>
+    <arg name="joiningDistributedKey"
+         type="OCTET_STRING"
+         description="The preconfigured distributed key that the joining device will use to enter the network." />
+  </command>
+</cli>

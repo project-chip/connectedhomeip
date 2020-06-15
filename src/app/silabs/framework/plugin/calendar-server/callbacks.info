@@ -1,0 +1,19 @@
+/** @brief Publish Info
+ *
+ * This function is called by the calendar-server plugin after receiving any of
+ * the following commands and just before it starts publishing the response:
+ * GetCalendar, GetDayProfiles, GetSeasons, GetSpecialDays, and
+ * GetWeekProfiles.
+ *
+ * @param publishCommandId ZCL command to be published Ver.: always
+ * @param clientNodeId Destination nodeId Ver.: always
+ * @param clientEndpoint Destination endpoint Ver.: always
+ * @param totalCommands Total number of publish commands to be sent
+ * Ver.: always
+ */
+void emberAfPluginCalendarServerPublishInfoCallback(uint8_t publishCommandId,
+                                                    EmberNodeId clientNodeId,
+                                                    uint8_t clientEndpoint,
+                                                    uint8_t totalCommands)
+{
+}

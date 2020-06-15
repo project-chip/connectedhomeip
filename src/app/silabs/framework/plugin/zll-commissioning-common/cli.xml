@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-zll-commissioning" name="Plugin Commands: ZigBee Light Link (ZLL) Commissioning">
+    <description>
+      The ZigBee Light Link (ZLL) Commissioning Plugin contributes several commands to the application framework's CLI. These commands are used for forming and managing a ZLL network.
+    </description>
+  </group>
+  <command cli="plugin zll-commissioning form" functionName="formNetwork" group="plugin-zll-commissioning">
+    <description>
+      Form a ZLL network.
+    </description>
+    <arg name="channel" type="INT8U"  description="The channel on which to form the network." />
+    <arg name="power"   type="INT8S"  description="The power setting for network transmissions." />
+    <arg name="panId"   type="INT16U" description="The PAN identifier for the network." />
+  </command>
+  <command cli="plugin zll-commissioning scan device" functionName="scanTouchLink" group="plugin-zll-commissioning">
+    <description>
+      Initiate a touch link for the purpose of retrieving information about a target device.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning scan identify" functionName="scanTouchLink" group="plugin-zll-commissioning">
+    <description>
+      Initiate a touch link for the purpose of causing a target device to identify itself.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning scan reset" functionName="scanTouchLink" group="plugin-zll-commissioning">
+    <description>
+      Initiate a touch link for the purpose of resetting a target device.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning abort" functionName="abortTouchLink" group="plugin-zll-commissioning">
+    <description>
+      Abort the touch link procedure.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning link" functionName="initiateTouchLink" group="plugin-zll-commissioning">
+    <description>
+      Initiate the touch link procedure.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning identify" functionName="setIdentifyDuration" group="plugin-zll-commissioning">
+    <description>
+      Set the duration that a target device should remain in identify mode during touch linking.
+    </description>
+    <arg name="identifyDurationDs" type="INT16U" description="The duration (in tenths of a second) of identify mode or 0xFFFF to indicate that the target should use its own application-specific duration." />
+  </command>
+  <command cli="plugin zll-commissioning info" functionName="endpointInformation" group="plugin-zll-commissioning">
+    <description>
+      Send an EndpointInformationRequest to a client.
+    </description>
+    <arg name="destination"         type="INT16U" description="The network address of the device to which the request will be sent." />
+    <arg name="sourceEndpoint"      type="INT8U"  description="The source endpoint from which the request will be sent." />
+    <arg name="destinationEndpoint" type="INT8U"  description="The destination endpoint to which the request will be sent." />
+  </command>
+  <command cli="plugin zll-commissioning groups" functionName="getGroupIdentifiersRequest" group="plugin-zll-commissioning">
+    <description>
+      Send a GroupIdentifiersRequest to a server.
+    </description>
+    <arg name="destination"         type="INT16U" description="The network address of the device to which the request will be sent." />
+    <arg name="sourceEndpoint"      type="INT8U"  description="The source endpoint from which the request will be sent." />
+    <arg name="destinationEndpoint" type="INT8U"  description="The destination endpoint to which the request will be sent." />
+    <arg name="startIndex"          type="INT8U"  description="The group table index at which to start retreiving data." />
+  </command>
+  <command cli="plugin zll-commissioning endpoints" functionName="getEndpointListRequest" group="plugin-zll-commissioning">
+    <description>
+      Send a GetEndpointListRequest to a server.
+    </description>
+    <arg name="destination"         type="INT16U" description="The network address of the device to which the request will be sent." />
+    <arg name="sourceEndpoint"      type="INT8U"  description="The source endpoint from which the request will be sent." />
+    <arg name="destinationEndpoint" type="INT8U"  description="The destination endpoint to which the request will be sent." />
+    <arg name="startIndex"          type="INT8U"  description="The endpoint index at which to start retreiving data." />
+  </command>
+  <command cli="plugin zll-commissioning tokens" functionName="printZllTokens" group="plugin-zll-commissioning">
+    <description>
+      Print the ZLL tokens.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning channel" functionName="setScanChannel" group="plugin-zll-commissioning">
+    <description>
+      Set the scan channel used by the ZLL Commissioning plugin.
+    </description>
+    <arg name="channel" type="INT8U" description="The primary channel to be used." />
+  </command>
+  <command cli="plugin zll-commissioning secondary-channel" functionName="setSecondaryScanChannel" group="plugin-zll-commissioning">
+    <description>
+      Set the scan channel used by the ZLL Commissioning plugin.
+    </description>
+    <arg name="channel" type="INT8U" description="The secondary channel to be used." />
+  </command>
+  <command cli="plugin zll-commissioning mask" functionName="setScanMask" group="plugin-zll-commissioning">
+    <description>
+      Set the scan channel set used by the ZLL Commissioning plugin.  An index of 0 sets the primary ZLL channel set, 1 is the +1 channel set, 2 is the +2 channel set, 3 is the +3 channel set, and 4 is all ZigBee channels.
+    </description>
+    <arg name="index" type="INT8U" description="The index of the channel mask to be used." />
+  </command>
+  <command cli="plugin zll-commissioning status" functionName="statusCommand" group="plugin-zll-commissioning">
+    <description>
+      Print the ZLL channel set and tokens.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning joinable" functionName="joinable" group="plugin-zll-commissioning">
+    <description>
+      Scan for joinable networks and attempt to join if a network is found.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning unused" functionName="unused" group="plugin-zll-commissioning">
+    <description>
+      Scan for an unused PAN identifier and form a new ZLL network.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning reset" functionName="emberAfZllResetToFactoryNew" group="plugin-zll-commissioning">
+    <description>
+      Reset the local device to factory new.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning notouchlink-nfn" functionName="noTouchlinkForNFN" group="plugin-zll-commissioning">
+    <description>
+      Disable touchlinking (stealing) for an NFN device.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning noreset-nfn" functionName="noResetForNFN" group="plugin-zll-commissioning">
+    <description>
+      Disable reset for an NFN device on a centralized security network.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning disable" functionName="disable" group="plugin-zll-commissioning">
+    <description>
+      Disable touchlinking. This will override the notouchlink-nfn and noreset-nfn commands.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning enable" functionName="enable" group="plugin-zll-commissioning">
+    <description>
+      Enable touchlinking. This will override the notouchlink-nfn and noreset-nfn commands.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning set-rx-on" functionName="setRxOn" group="plugin-zll-commissioning">
+    <description>
+      Set Rx On When Idle duration.
+    </description>
+    <arg name="duration" type="INT32U" description="The duration for the Rx On period." />
+  </command>
+  <command cli="plugin zll-commissioning cancel-rx-on" functionName="cancelRxOn" group="plugin-zll-commissioning">
+    <description>
+      Cancel Rx On When Idle.
+    </description>
+  </command>
+  <command cli="plugin zll-commissioning rx-on-active" functionName="rxOnStatus" group="plugin-zll-commissioning">
+    <description>
+      Get Rx On When Idle status.
+    </description>
+  </command>
+</cli>

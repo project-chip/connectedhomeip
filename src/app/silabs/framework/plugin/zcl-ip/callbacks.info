@@ -1,0 +1,12 @@
+/** @brief SendPacket
+ *
+ * The low-level primitive for sending a ZCL-IP message.
+ *
+ * @param payload   Ver.: always
+ * @param payloadLength   Ver.: always
+ */
+EmberStatus emberAfPluginZclIpSendPacketCallback(uint8_t*payload,
+                                                 uint16_t payloadLength)
+{
+  return EMBER_LIBRARY_NOT_PRESENT;
+}

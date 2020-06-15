@@ -1,0 +1,84 @@
+#include "app/framework/util/util.h"    // emberAfGetPageFrom8bitEncodedChanPg()
+
+/** @brief Finished
+ *
+ * This callback is fired when the network-find plugin is finished with the
+ * forming or joining process. The result of the operation will be returned in
+ * the status parameter.
+ *
+ * @param status   Ver.: always
+ */
+void emberAfPluginNetworkFindFinishedCallback(EmberStatus status)
+{
+}
+
+/** @brief Get Radio Power For Channel
+ *
+ * This callback is called by the framework when it is setting the radio power
+ * during the discovery process. The framework will set the radio power
+ * depending on what is returned by this callback.
+ *
+ * @param pgChan   Ver.: always
+ */
+int8_t emberAfPluginNetworkFindGetRadioPowerForChannelCallback(uint8_t pgChan)
+{
+  return EMBER_AF_PLUGIN_NETWORK_FIND_RADIO_TX_POWER;
+}
+
+/** @brief Join
+ *
+ * This callback is called by the plugin when a joinable network has been
+ * found. If the application returns true, the plugin will attempt to join the
+ * network. Otherwise, the plugin will ignore the network and continue
+ * searching. Applications can use this callback to implement a network
+ * blacklist.
+ *
+ * @param networkFound   Ver.: always
+ * @param lqi   Ver.: always
+ * @param rssi   Ver.: always
+ */
+bool emberAfPluginNetworkFindJoinCallback(EmberZigbeeNetwork *networkFound,
+                                          uint8_t lqi,
+                                          int8_t rssi)
+{
+  return true;
+}
+
+/** @brief Get Energy Threshold For Channel
+ *
+ * This callback is called during the energy scan when forming the network.
+ * Should the energy level exceed the value returned by this callback, the
+ * current channel will not be considered a suitable candidate for forming.
+ * Should none of the channels in the channel mask be considered suitable,
+ * the scan will fall back on all channels, including those not on the
+ * channel mask. The return value is RSSI, in dBm.
+ * This callback is called only when the fallback functionality is enabled.
+ *
+ * @param pgChan   Ver.: always
+ */
+int8_t emberAfPluginNetworkFindGetEnergyThresholdForChannelCallback(uint8_t pgChan)
+{
+#if defined(EMBER_AF_PLUGIN_NETWORK_FIND_SUB_GHZ)
+  return emberAfGetPageFrom8bitEncodedChanPg(pgChan) == 0
+         ? EMBER_AF_PLUGIN_NETWORK_FIND_CUT_OFF_VALUE
+         : EMBER_AF_PLUGIN_NETWORK_FIND_SUB_GHZ_CUT_OFF_VALUE;
+#elif defined(EMBER_AF_PLUGIN_NETWORK_FIND)
+  return EMBER_AF_PLUGIN_NETWORK_FIND_CUT_OFF_VALUE;
+#else
+  return 127;   // Highest possible int8_t (the return type). The value does not matter anyway but we need to return _something_.
+#endif
+}
+
+/** @brief Get Enable Scanning All Channels
+ *
+ * Returns true is the fallback on scanning all channels is enabled,
+ * false if not.
+ */
+bool emberAfPluginNetworkFindGetEnableScanningAllChannelsCallback(void)
+{
+#ifdef EMBER_AF_PLUGIN_NETWORK_FIND_ENABLE_ALL_CHANNELS
+  return true;
+#else
+  return false;
+#endif
+}

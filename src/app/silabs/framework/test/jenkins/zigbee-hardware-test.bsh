@@ -1,0 +1,165 @@
+/** 
+ * This hardware test is used in the "Gecko SDK Suite - EmberZNet HW CI" CI job.
+ * Test Description: 
+   There 3 devices in this test network, Host(Raspi)-Ncp(Z3Gateway), SoC(Z3Light) 
+   and Soc(Z3SleepyDoorLockWithWwah). The Z3Gateway will form a network and open 
+   the network for the Z3Light. After the Z3Light have joined the network, the 
+   Z3Light will open the network for Z3SleepyDoorLockWithWwah. Finally, the 
+   Z3SleepyDoorLockWithWwah will join the network via Z3Light.
+ */
+
+cd(dirname(pathToFile(getSourceFileInfo()).getAbsolutePath()));
+
+
+source("util.bsh");
+source("util-raspi.bsh");
+
+
+String host = null;
+String soc_Z3Light = null;
+String soc_Z3SleepyDoorLockWithWwah = null;
+
+
+ArrayList args = new ArrayList();
+if (bsh.args != void) {
+  args.addAll(Arrays.asList(bsh.args));
+}
+
+
+for (int i=0; i<args.size(); i++) {
+  String arg = args.get(i);
+  if (arg.contains("-host")) {
+    host = args.get(++i);
+  }
+  if (arg.contains("-soc_Z3Light")) {
+    soc_Z3Light = args.get(++i);
+  }
+  if (arg.contains("-soc_Z3SleepyDoorLockWithWwah")) {
+    soc_Z3SleepyDoorLockWithWwah = args.get(++i);
+ }
+}
+
+
+if (host == null) {
+  System.out.println("host IP address not set!");
+  System.exit(-1);
+}
+if (soc_Z3Light == null) {
+  System.out.println("soc_Z3Light IP address not set!");
+  System.exit(-1);
+}
+if (soc_Z3SleepyDoorLockWithWwah == null) {
+  System.out.println("soc_Z3SleepyDoorLockWithWwah IP address not set!");
+  System.exit(-1);
+}
+
+
+String[] nodes = new String[] {
+  soc_Z3Light, soc_Z3SleepyDoorLockWithWwah 
+};
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------------
+/* test functions*/
+
+int timeout = 50000;
+
+/*Raspi info*/
+String user = "pi";
+String pwd = "slsi2019";
+
+/* ZigBee parameters */
+String panID;
+String soc_Z3Light_nodeID;
+
+String euiZ3Light = "D0 CF 5E FF FE 0A 22 D3";
+String euiZ3SleepyDoorLockWithWwah = "D0 CF 5E FF FE 0A 23 09";
+
+String keyZ3Light = "FA 80 81 CA AA 41 D5 AD E9 B5 65 87 99 26 8B 88";
+String keyZ3SleepyDoorLockWithWwah = "FA 80 81 CA AA 41 D5 AD E9 B5 65 87 99 26 8B 88";
+
+/* form & join network test function */
+void testFormJoin()
+{
+  /*Raspi setup*/
+  setupRaspi(host, user, pwd, timeout);
+
+  /*Soc setup*/
+  initNetwork(nodes);
+
+  //------------------------------------------------------------------------------------
+  try 
+  {
+    /*Raspi form and open network for Z3Light*/
+    raspi.send("network leave");
+    sleep(5000);
+    raspi.expect("plugin network-creator start 1",
+                 "EMBER_NETWORK_UP 0x0000",
+                 timeout);
+
+    raspi.expect("plugin network-creator-security open-with-key" + " {" + euiZ3Light + "}" + " {" + keyZ3Light + "}",
+                 "Ezsp Policy: set Trust Center Policy to \"Allow preconfigured key joins\":Success: set",
+                 timeout);
+
+    /*Z3Light join the network */
+    send(soc_Z3Light, "network leave");
+    sleep(5000); 
+    expectX(soc_Z3Light, 
+           "plugin network-steering start 0",
+           "Join network complete: 0x00",
+           timeout);
+
+    //-------------------------------------------------------------------------------------
+    /*Raspi open network for Z3SleepyDoorLockWithWwah, but only Z3Light permit join*/
+    raspi.expect("plugin network-creator-security open-with-key" + " {" + euiZ3SleepyDoorLockWithWwah + "}" + " {" + keyZ3SleepyDoorLockWithWwah + "}",
+                 "Ezsp Policy: set Trust Center Policy to \"Allow preconfigured key joins\":Success: set",
+                 timeout);
+    raspi.expect("network pjoin 0",
+                 "pJoin for 0 sec: 0x00",
+                 timeout);
+
+    expect(soc_Z3Light, 
+           "network pjoin 180",
+           "pJoin for 180 sec: 0x00",
+           timeout);
+   
+    /*Z3SleepyDoorLockWithWwah join the network via Z3Light*/
+    send(soc_Z3SleepyDoorLockWithWwah, "network leave");
+    send(soc_Z3SleepyDoorLockWithWwah, "plugin idle-sleep force-awake 1");
+    expectX(soc_Z3SleepyDoorLockWithWwah, 
+           "plugin network-steering start 0",
+           "Join network complete: 0x00",
+           timeout);
+
+    //-------------------------------------------------------------------------------------
+    /*check the Z3SleepyDoorLockWithWwah join the network via Z3Light using parentID*/
+    soc_Z3Light_nodeID = getZigbeeShortId(soc_Z3Light);
+    expect(soc_Z3SleepyDoorLockWithWwah,
+           "info",
+           ".*parentID \\[" + soc_Z3Light_nodeID + "\\].*",
+           timeout);
+
+    /*check all of the devices join the same network using Pan ID */
+    panID = getZigbeePanId(soc_Z3SleepyDoorLockWithWwah);
+    //send(soc_Z3SleepyDoorLockWithWwah, "plugin idle-sleep force-awake 0");
+    expect(soc_Z3Light,
+           "network id",
+           ".*Pan ID: " + panID + ".*",
+           timeout);
+    raspi.expect("network id",
+                 ".*Pan ID: " + panID + ".*",
+                 timeout);
+
+  }
+  catch (Exception e) 
+  {
+    e.printStackTrace();
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+/* The actual test*/
+
+testFormJoin();
+
+System.exit(0);

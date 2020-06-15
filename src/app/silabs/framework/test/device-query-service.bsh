@@ -1,0 +1,83 @@
+// This script tests the ability for the device-query-service plugin to correctly
+// discover devices in the network and all their clusters and endpoints.
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"gateway", "light", "range-extender", "lock"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaDoorLock-simulation/HaDoorLock"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation-ezsp/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaDoorLock-simulation-ezsp/HaDoorLock",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+expectNoResponse("gateway", "plugin device-query-service enable");
+
+networkForm("gateway");
+networkJoinTo("light", "gateway");
+
+expect("gateway", ".*Device-Query-Service All known devices discovered.", 200000);
+
+lightEui64 = getEui64LittleEndian("light");
+expectMultiline("gateway", "plugin device-database device print {" + lightEui64 + "} ", 
+                new String[] {
+                  "EP: 6 - Profile ID: 0x0104 - Device ID: 0x0003 - Clusters: 8",
+                  "EP: 12 - Profile ID: 0x0104 - Device ID: 0x0777 - Clusters: 2",
+                  "2 total endpoints",
+                });
+
+send("light", "info");
+networkWait(5000);
+                
+networkJoinTo("range-extender", "light");
+
+networkWait(5000);
+
+rangeExtenderEui64 = getEui64LittleEndian("range-extender");
+expectMultiline("gateway", "plugin device-database device print {" + rangeExtenderEui64 + "}", 
+                new String[] {
+                  "EP: 6 - Profile ID: 0x0104 - Device ID: 0x0003 - Clusters: 8",
+                  "2 total endpoints",
+                });
+
+networkJoinTo("lock", "range-extender");
+
+networkWait(5000);
+
+lockEui64 = getEui64LittleEndian("lock");
+// Because the device is sleepy, we cannot query its endpoints and clusters reliably.
+// The service skips it.
+expect("gateway", "plugin device-database device print {" + lockEui64 + "}", 
+       "0 total endpoints");
+
+// Make sure the light and range extender show a stack version of R21
+// The sleepy should not be probed and should say 255 (0xFF)
+expectMultiline("gateway",
+                "plugin device-database print-all",
+                new String[] {
+                  ".*" + lightEui64 + ".*Status: Done.*Stack Revision: 22",
+                  ".*" + rangeExtenderEui64 + ".*Status: Done.*Stack Revision: 22",
+                  ".*" + lockEui64 + ".*Status: Done.*Stack Revision: 255",
+                });

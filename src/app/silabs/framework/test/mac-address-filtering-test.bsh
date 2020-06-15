@@ -1,0 +1,184 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// The whole purpose of the mac-address-filtering plugin is to artificially
+// restrict what the stack can hear to enforce a multi-hop technology.
+
+
+if (runArgument.runUsingHostApps) {
+  // The plugin only works for SOC since it requires a callback fired at the MAC
+  // to block packets.  
+  std.print("*** No support for host.***");
+  return;
+}
+
+if (runArgument.runUsingMultihop) {
+  // The whole point of this plugin is to artificially create hops.
+  // Using the simulator to do that is much more effecient but
+  // doesn't work on real hardware.  So there is no point in
+  // running this in a multi-hop simulation.
+  std.print("*** No point in running multi-hop.****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"full1", "full2", "full3", "full4", "full5"};
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+};
+
+// NCP Not supported
+String[] hostImages = new String[] {
+  "",
+  "",
+  "",
+  "",
+  "",
+};
+
+// NCP not supported
+String ncpImage = "";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+int channel = 11;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// The first goal is to verify that the whitelist of PAN IDs works correctly.
+// This can be validated by forming on multiple PANs, changing the empty
+// list to a whitelist, and trying to join.  Then we can
+// add PANs to the list and verify we can find and join them.
+
+String[] filteredPanIds = new String[devices.length - 1];
+
+for (int i = 0; i < filteredPanIds.length; i++) {
+  panId = i + 1;
+  filteredPanIds[i] = Integer.toString(panId);
+  setNetworkParams(channel, power, Integer.parseInt(filteredPanIds[i]));
+  networkForm(devices[i]);
+  permitJoin(devices[i], true);
+}
+
+expect(devices[4], 
+       "plugin mac-address-filtering pan-id-list set-whitelist",
+       "PAN ID list changed to whitelist.");
+
+// With no PANs on the whitelist, we should join no networks.
+expect(devices[4],
+       "network find joinable",
+       ".*Form and join scan done");
+
+// We don't really need to do this 4 times, but it adds enough variation
+// with random ordering of beacons that could help catch problems.
+for (int i = 0; i < filteredPanIds.length; i++) {
+  expect(devices[4],
+         "plugin mac-address-filtering pan-id-list add " + filteredPanIds[i],
+         ".*Added PAN ID to list.");
+  expect(devices[4],
+         "network find joinable",
+         ".*EMBER_NETWORK_UP .*");
+
+  actualPanId = panId(devices[4]);
+  // The "info" command takes a while on the full-th because there
+  // are a TON of clusters enabled and the printing takes time.
+  // The PAN ID is one of the first things printed and so we need
+  // to let it 
+  networkWait(9000);
+
+  debugPrintln("Expected PAN ID: " + Integer.parseInt(filteredPanIds[i]));
+  debugPrintln("Actual PAN ID:   " + Integer.parseInt(actualPanId.substring(2), 16));
+  assert(Integer.parseInt(filteredPanIds[i]) == Integer.parseInt(actualPanId.substring(2), 16));
+
+  expect(devices[4],
+         "network leave",
+         ".*EMBER_NETWORK_DOWN");
+  expect(devices[4],
+         "plugin mac-address-filtering pan-id-list delete 0",
+         ".*Entry deleted.");
+
+  // Let the device settle down with its output before joining anew.
+  networkWait(10 * 2 * 1000);  
+}
+
+for (int i = 0; i < filteredPanIds.length; i++) {
+  expect(devices[i],
+         "network leave",
+         ".*EMBER_NETWORK_DOWN");
+}
+
+expect(devices[4],
+       "plugin mac-address-filtering reset",
+       "All filter data cleared.");
+
+// Let the print outs flush out.  
+networkWait(30000);
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+
+formAndJoinDevicesWithAddedDelay(devices, 
+                                 false, // wait for key establishment to complete?
+                                 2000); // added ms delay between joins
+
+networkWait(120 * 1000);
+
+send("full1", "plugin stack-diagnostics neighbor-table");
+
+networkWait(1 * 1000);
+
+send("full1", "plugin mac-address-filtering print-config");
+
+networkWait(10 * 1000);
+
+void addNodesToShortAddressList(String targetNode, String[] nodeList)
+{
+  for (int i = 0; i < nodeList.length && nodeList[i] != null; i++) {
+    expect(targetNode,
+           "plugin mac-address-filtering short-address-list add "
+            + findNodeByName(nodeList[i]).nodeIdHex,
+           ".*Added short address to list.");
+  }
+}
+
+void createStringOfPearlsUsingFiltering(String[] nodeList)
+{
+  for (int i = 0; i < nodeList.length; i++) {
+    String[] neighborList = new String[2];
+    neighborIndex = 0;
+    if (i != 0 ) {
+      neighborList[neighborIndex] = nodeList[i-1];
+      neighborIndex++;
+    }
+    if (i + 1 < nodeList.length) {
+      neighborList[neighborIndex] = nodeList[i+1];
+    }
+
+    addNodesToShortAddressList(nodeList[i], neighborList);
+    expect(nodeList[i],
+           "plugin mac-address-filtering short-address-list set-whitelist",
+           ".*Short address list changed to whitelist.");
+  }
+}
+
+createStringOfPearlsUsingFiltering(devices);
+
+// Now wait for neighbor table entries to age out.
+// After 3 missed link status messages 15 seconds apart (45 seconds)
+// they should be gone.  Add one more as a "fudge" factor.
+
+networkWait(60 * 1000);
+
+verifyStringOfPearls(devices, 
+                     true);    // all nodes in neighbor table?
+

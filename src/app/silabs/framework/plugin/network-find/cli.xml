@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="network-find" name="Plugin Commands: Network Find">
+    <description>This plugin provides additional commands for forming and joining the network.</description>
+  </group>
+
+  <command cli="network find mask" functionName="findMaskCommand" group="network-find">
+    <description>
+      Set a channel mask for a given channel page for 'find joinable' and 'find unused'.
+    </description>
+    <arg name="page" type="INT8U" description="channel page (0 and 28-31, if sub-GHz support is included)" />
+    <arg name="mask" type="INT32U" description="channel mask" />
+  </command>
+  <command cli="network find mode" functionName="findModeCommand" group="network-find">
+    <description>
+      Set a search mode for 'find joinable' and 'find unused'.
+    </description>
+    <arg name="mode" type="BITMAP8" description="Bit 0 = enable 2.4GHz, Bit 1 = enable sub-GHz" />
+  </command>
+  <command cli="network find print" functionName="findPrintCommand" group="network-find">
+    <description>
+      Print network search parameters (mode and channel masks).
+    </description>
+  </command>
+</cli>

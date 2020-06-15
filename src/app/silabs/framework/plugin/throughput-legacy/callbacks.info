@@ -1,0 +1,10 @@
+/** @brief Send Packet
+ *
+ * This function is called by the Throughput plugin to indicate that one more
+ * packet should be sent over the air. This should contain the code to create
+ * and send the packet of your choice.
+ *
+ */
+void emberAfPluginThroughputSendPacketCallback(void)
+{
+}

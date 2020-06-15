@@ -1,0 +1,294 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"full1", "router", "full2"};
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+formAndJoinDevices(devices);
+
+// The Basic cluster has thirteen server attributes.  Try to discover three and
+// make sure the server says not done.
+send("full2", "zcl global discover 0x0000 0x0000 0x03");
+expectMultiline("full2",
+                "send 0 1 1",
+                new String[] {
+                "DISC_ATTR_RESP: \\(Basic\\) comp NOT_DONE",
+                " - attr:0000, type:20",
+                " - attr:0001, type:20",
+                " - attr:0002, type:20",
+              });
+
+// Discover five starting from attribute 0x0010 and make sure the server obeys
+// the start id. The server should report that it is not done because there
+// is one more attribute (0xFFFD).
+send("full2", "zcl global discover 0x0000 0x0010 0x05");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0000");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(Basic\\) comp NOT_DONE",
+                  " - attr:0010, type:42",
+                  " - attr:0011, type:30",
+                  " - attr:0012, type:10",
+                  " - attr:0013, type:18",
+                  " - attr:0014, type:18",
+                });
+
+// Try to discover all of the attributes, we should return them all since we can
+// fit them all in the buffer.
+send("full2", "zcl global discover 0x0000 0x0000 0xFF");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0000");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(Basic\\) comp DONE",
+                  " - attr:0000, type:20",
+                  " - attr:0001, type:20",
+                  " - attr:0002, type:20",
+                  " - attr:0003, type:20",
+                  " - attr:0004, type:42",
+                  " - attr:0005, type:42",
+                  " - attr:0006, type:42",
+                  " - attr:0007, type:30",
+                  " - attr:0010, type:42",
+                  " - attr:0011, type:30",
+                  " - attr:0012, type:10",
+                  " - attr:0013, type:18",
+                  " - attr:0014, type:18",
+                  " - attr:FFFD, type:21",
+                });
+
+// Discover attributes on the client.  Because there are none, the client should
+// just say that it is done.
+send("full2", "zcl global direction 1");
+send("full2", "zcl global discover 0x0000 0x0000 0xFF");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0000");
+expect("full2", "DISC_ATTR_RESP: \\(Basic\\) comp DONE");
+
+// The Key Establishment cluster has one client attribute and one server
+// attribute.  Make sure the server and client both report attributes.
+send("full2", "zcl global direction 0");
+send("full2", "zcl global discover 0x0800 0x0000 0xFF");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0800");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(Key Establishment\\) comp DONE",
+                  " - attr:0000, type:31",
+                });
+
+send("full2", "zcl global direction 1");
+send("full2", "zcl global discover 0x0800 0x0000 0xFF");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0800");
+expectMultiline("full2", 
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(Key Establishment\\) comp DONE",
+                  " - attr:0000, type:31",
+                });
+
+// Discover attributes from a cluster that has more attributes than will fit
+// in one response message and make sure the framework says it is NOT done.
+send("full2", "zcl global direction 0");
+send("full2", "zcl global discover 0x0700 0x0000 0xFF");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0700");
+expect("full2", "DISC_ATTR_RESP: \\(Price\\) comp NOT_DONE", timeout*2);
+
+// Discover attributes starting from an attribute greater than 0x00FF and make
+// sure the framework says it is done (bug 12715).
+send("full2", "zcl global direction 0");
+send("full2", "zcl global discover 0x0700 0x04FC 0x29");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0700");
+expect("full2", "DISC_ATTR_RESP: \\(Price\\) comp DONE", timeout*2);
+
+// Discover attributes from a standard ZCL cluster that has a manufacturer-
+// specific attribute and make sure only the standard ZCL attribute is
+// discovered.
+networkWait(2000);
+send("full2", "zcl global discover 0x0006 0x0000 0x02");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0006");
+
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(On/off\\) comp DONE",
+                  " - attr:0000, type:10",
+                  " - attr:FFFD, type:21",
+                });
+
+// Discover attributes from a standard ZCL cluster that has a manufacturer-
+// specific attribute using the manufacturer code and make sure only the
+// manufacturer-specific attributes are discovered. [0x1002]
+send("full2", "raw 0x0006 {04 02 10 00 0C 00 00 02}");
+send("full2", "send 0 1 1");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0006");
+expectMultiline("full2", 
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(On/off\\) comp DONE",
+                  " - attr:0000, type:21",
+                  " - attr:0001, type:20",
+                });
+
+// Discover attributes from a standard ZCL cluster that has a manufacturer-
+// specific attribute using the manufacturer code and make sure only the
+// manufacturer-specific attribute are discovered. [0x1049]
+send("full2", "raw 0x0006 {04 49 10 00 0C 00 00 02}");
+send("full2", "send 0 1 1");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus 0006");
+expectMultiline("full2", 
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(On/off\\) comp DONE",
+                  " - attr:0000, type:20",
+                  " - attr:0001, type:21",
+                });
+
+
+// Discover attributes from a mfg specific ZCL cluster and make
+// sure that the cluster is the one that we are interested in [0x1002]
+send("full2", "raw 0xFC00 {04 02 10 00 0C 00 00 04}");
+send("full2", "send 0 1 1");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus FC00");
+expectMultiline("full2", 
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(Sample Mfg Specific Cluster\\) comp DONE",
+                  " - attr:0000, type:20",
+                  " - attr:FFFD, type:21",
+                });
+
+// Discover attributes from a mfg specific ZCL cluster and make
+// sure that the cluster is the one that we are interested in [0x1049]
+send("full2", "raw 0xFC00 {04 49 10 00 0C 00 00 05}");
+send("full2", "send 0 1 1");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus FC00");
+expectMultiline("full2", 
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(Sample Mfg Specific Cluster 2\\) comp DONE",
+                });
+
+// Discover attributes from a manufacturer-specific cluster and make sure no
+// attributes are discovered. [when we don't have a affiliated mfgId]
+send("full2", "zcl mfg-code 0x1005");
+send("full2", "zcl global discover 0xFC00 0x0000 0xFF");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus FC00");
+expect("full2", "DISC_ATTR_RESP: \\(Unknown clus. \\[0xFC00\\]\\) comp DONE");
+assert(network.expect("full2", port, null, " - attr:[0-9a-fA-F]{4}, type:[0-9a-fA-F]{2}", timeout, true) == null);
+
+// Discover attributes from a manufacturer-specific cluster and make sure
+// attributes are discovered. [when we do have an affiliated mfgId]
+send("full2", "zcl mfg-code 0x1002");
+send("full2", "zcl global discover 0xFC00 0x0000 0xFF");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR: clus FC00");
+expectMultiline("full2", 
+                "",
+                new String[] {
+                  "DISC_ATTR_RESP: \\(Sample Mfg Specific Cluster\\) comp DONE",
+                  " - attr:0000, type:20",
+                  " - attr:FFFD, type:21",
+                });
+
+// Discover attributes using extended attribute discovery command.
+send("full2", "raw 0x0000 {00 00 15 00 00 ff}");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR_EXT: clus 0000");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "DISC_ATTR_EXT_RESP: \\(Basic\\) comp DONE",
+                  " - attr:0000, type:20 ac:05",
+                  " - attr:0001, type:20 ac:05",
+                  " - attr:0002, type:20 ac:05",
+                  " - attr:0003, type:20 ac:05",
+                  " - attr:0004, type:42 ac:05",
+                  " - attr:0005, type:42 ac:05",
+                  " - attr:0006, type:42 ac:05",
+                  " - attr:0007, type:30 ac:05",
+                  " - attr:0010, type:42 ac:07",
+                  " - attr:0011, type:30 ac:07",
+                  " - attr:0012, type:10 ac:07",
+                  " - attr:0013, type:18 ac:07",
+                  " - attr:0014, type:18 ac:07",
+                  " - attr:FFFD, type:21 ac:05",
+                });
+
+// EMAPPFWKV2-1401: make sure a discover extended will return optional
+// attributes.
+networkWait(DEFAULT_TIMEOUT << 1);
+send("full2", "raw 0x0020 {00 00 15 00 00 ff}");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR_EXT: clus 0020");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "DISC_ATTR_EXT_RESP: \\(Poll Control\\) comp DONE",
+                  " - attr:0000, type:23 ac:07",
+                  " - attr:0001, type:23 ac:05",
+                  " - attr:0002, type:21 ac:05",
+                  " - attr:0003, type:21 ac:07",
+                  " - attr:0004, type:23 ac:05",
+                  " - attr:0005, type:23 ac:05",
+                  " - attr:0006, type:21 ac:05",
+                  " - attr:FFFD, type:21 ac:05",
+                });
+
+// EMAPPFWKV2-1401: turn on APS security and make sure that we can still fit
+// all the optional attributes from above in the payload.
+networkWait(DEFAULT_TIMEOUT << 1);
+send("full2", "option security aps on");
+send("full2", "raw 0x0020 {00 00 15 00 00 ff}");
+send("full2", "send 0 1 1");
+expect("full1", "DISC_ATTR_EXT: clus 0020");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "DISC_ATTR_EXT_RESP: \\(Poll Control\\) comp DONE",
+                  " - attr:0000, type:23 ac:07",
+                  " - attr:0001, type:23 ac:05",
+                  " - attr:0002, type:21 ac:05",
+                  " - attr:0003, type:21 ac:07",
+                  " - attr:0004, type:23 ac:05",
+                  " - attr:0005, type:23 ac:05",
+                  " - attr:0006, type:21 ac:05",
+                  " - attr:FFFD, type:21 ac:05",
+                });

@@ -1,0 +1,132 @@
+// This tests whether we can enable/disable endpoints
+// on the device.  This is necessary for mirroring, since unused
+// mirror endpoints should be hidden.  But is also useful for devices
+// that may have multiple device types (endpoints configured) 
+// and only turn on a certain device as appropriate.  
+// See bugzid: 13453, which is really a feature request.
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  System.out.print("**** Nothing to test for multihop. ");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { 
+  "server", 
+  "client" 
+};
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation/SeFullTh"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+network.sleep(5000);
+
+formAndJoinDevices(allDevices);
+
+network.sleep(20000);
+
+send("server",
+     "info");
+
+network.sleep(3000);
+
+// Assume endpoint 1 exists as the main ESI endpoint.
+expect("server",
+       "info",
+       "ep 1 \\[endpoint enabled,.*");
+networkWait(1000);  // wait for rest of info command to print out
+
+
+
+// ------------------------------------------------------------------------------------
+// EMAPPFWKV2-1248 cluster endpoint index should not be affected by disabled endpoints
+
+// disable an endpoint for testing
+expectNoResponse("server",
+                 "endpoint disable 2");
+
+// check endpoints indices
+expect("server", "plugin test-harness endpoint cluster-endpoint-index 2 0x0800 1",
+        ".*endpoint: 0x0002 cluster: 0x0800 clusterEndpointIndex: 0x00FF \\(server\\).*",
+        timeout);
+expect("server", "plugin test-harness endpoint cluster-endpoint-index 3 0x0800 0",
+        ".*endpoint: 0x0003 cluster: 0x0800 clusterEndpointIndex: 0x0002 \\(client\\).*",
+        timeout);
+expect("server", "plugin test-harness endpoint cluster-endpoint-index 3 0x0000 1",
+        ".*endpoint: 0x0003 cluster: 0x0000 clusterEndpointIndex: 0x0001 \\(server\\).*",
+        timeout);
+expect("server", "plugin test-harness endpoint cluster-endpoint-index 4 0x0000 1",
+        ".*endpoint: 0x0004 cluster: 0x0000 clusterEndpointIndex: 0x0002 \\(server\\).*",
+        timeout);
+
+// disable newly added endpoints so the old test is not influenced
+expectNoResponse("server",
+                 "endpoint disable 3");
+expectNoResponse("server",
+                 "endpoint disable 4");
+// ------------------------------------------------------------------------------------
+
+// Endpoint should be discoverable.
+
+// The Price cluster is only on 1 endpoint for FullTh.isc
+send("client",
+     "zdo in-cl-list add 0x0700");
+expect("client",
+       "zdo match 0x0000 0x0109",
+       "RX: Match Desc Resp, Matches: 1");
+send("client",
+     "zdo in-cl-list clear");
+
+expect("client",
+       "zdo active 0x0000",
+       ".*RX: Active EP Response, Count: 1");
+
+expect("client",
+       "zdo simple 0x0000 1",
+       ".*RX: ZDO, command 0x8004, status: 0x00");
+
+send("server", "events");
+networkWait(2000);
+
+expectNoResponse("server",
+                 "endpoint disable 1");
+
+expect("server",
+       "info",
+       "ep 1 \\[endpoint disabled,.*");
+networkWait(1000);  // wait for rest of info command to print out
+
+// Endpoint should not be discoverable
+
+expect("client",
+       "zdo match 0x0000 0x0109",
+       "RX: Match Desc Resp, Matches: 0");
+
+expect("client",
+       "zdo active 0x0000",
+       ".*RX: Active EP Response, Count: 0");
+
+expect("client",
+       "zdo simple 0x0000 1",
+       ".*RX: ZDO, command 0x8004, status: 0x83");

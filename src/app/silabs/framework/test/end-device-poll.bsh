@@ -1,0 +1,96 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create four nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "esi", "router", "sleepy" };
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeEsp-simulation/SeEsp",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/SeIpd-simulation/SeIpd"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeEsp-simulation-ezsp/SeEsp",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/SeIpd-simulation-ezsp/SeIpd"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(allDevices);
+
+// On the host we don't see this poll information, we only hear from the NCP if the
+// poll results in data or the parent goes away.
+if (!runArgument.runUsingHostApps) {
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+} else {
+  // if we're not running the poll test, we need to wait for the network to complete registration.
+  network.sleep(50*timeout);
+}
+
+// Testing poll completed callback functionality
+dbg.println("*** Enabling poll completed callback ***");
+send("sleepy", "plugin end-device-support poll-completed-callback 1");
+
+expectMultiline("sleepy",
+                "",
+                new String[] {
+                ".*Poll Completed Callback.*",
+                ".*poll nwk 0: no data.*"},
+                timeout * 100);
+expectMultiline("sleepy",
+                "",
+                new String[] {
+                ".*Poll Completed Callback.*",
+                ".*poll nwk 0: no data.*"},
+                timeout * 100);
+
+
+dbg.println("*** Disabling poll completed callback ***");
+send("sleepy", "plugin end-device-support poll-completed-callback 0");
+if (!runArgument.runUsingHostApps) {
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+  expect("sleepy", ".*poll nwk 0: no data.*", timeout * 100);
+}
+
+// TEST: If the meter's parent router leaves the network, the child should find
+// another parent and should be able to continue as if nothing happened.  This
+// does not work in multihop networks because potential parents are not within
+// range.
+if (!runArgument.runUsingMultihop) {
+  // Take out the coordinator.  The child should look for a parent and find the
+  // router.
+  dbg.println("*** KILL ESI ***");
+  power("esi", false);
+  expect("sleepy", ".*Schedule move nwk 0: 0", timeout * 800);
+  expectNetworkUp("sleepy", timeout * 50);
+
+  // let rejoin join settle.
+  networkWait(10*timeout);
+
+  // Now take out the router.  The child will fail to find a new parent.
+  dbg.println("*** KILL ROUTER ***");
+
+  power("router", false);
+  expect("sleepy", ".*Schedule move nwk 0: 0", timeout * 800);
+  expect("sleepy", ".*Schedule move nwk 0: 1", timeout * 200);
+  expect("sleepy", ".*Schedule move nwk 0: 2", timeout * 200);
+}

@@ -1,0 +1,97 @@
+// This script tests the network-find plugin
+
+import com.ember.peek.SimulatedNetwork;
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  // This tests find and joining the right network, which is always 1-hop.
+  // No real point in testing multi-hop.
+  std.print("**** Multihop doesn't make sense, skipping. ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+
+// We have 8 nodes that will form on the 7 preferred channels, with 1 extra joining node.
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+};
+
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// The list of 'preferred' channels
+int[] channelList = { 11, 14, 15, 19, 20, 24, 25 } ;
+
+String[] allDevices = new String[channelList.length + 1];
+int i;
+
+for (i = 0; i < channelList.length; i++) {
+  allDevices[i] = "channel-" + channelList[i] + "-node";
+}
+allDevices[i] = "joiner";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int power = 2;
+int panId = 0x1212;
+
+setupEncryption();
+
+for (i = 0; i < channelList.length; i++) {
+  setNetworkParams(channelList[i], power, panId);
+  networkForm(allDevices[i]);
+}
+
+// We change the link key the joiner uses to prevent it from being able to
+// join any devices.  We want to ultimately test the device iterating through
+// all networks, trying to join, and failing.
+expectNoResponse("joiner", "changekey link {000102030405060708090a0b0c0d0e0f}");
+
+debugPrintln(" *** Testing no networks permitting join");
+
+expect("joiner", 
+       "network find joinable",
+       // NOTE:  This is a regex, so rather than escape the '(' and ')' we put '.'
+       "Network find complete .scan error.*",
+       2000);
+
+
+debugPrintln("*** All networks permitting join but none with the correct key.");
+
+for (i = 0; i < channelList.length; i++) {
+  setNetworkParams(channelList[i], power, panId);
+  permitJoin(allDevices[i], true);
+}
+
+send("joiner", 
+     "network find joinable");
+
+for (i = 0; i < channelList.length; i++) {
+  expect("joiner", 
+         "network find joinable",
+         "EMBER_JOIN_FAILED",
+         4000);
+}

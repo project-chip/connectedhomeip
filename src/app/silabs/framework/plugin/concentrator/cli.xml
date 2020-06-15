@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-concentrator" name="Plugin Commands: Concentrator">
+    <description>
+      The Concentrator plugin contributes several CLI commands to the application framework for controlling the sending of MTORRs.
+    </description>
+  </group>
+  <command cli="plugin concentrator status" functionName="emberAfPluginConcentratorStatus" group="plugin-concentrator">
+    <description>
+      Prints current status and configured parameters of the concentrator
+    </description>
+  </command>
+  <command cli="plugin concentrator start" functionName="emberAfPluginConcentratorStartDiscovery" group="plugin-concentrator">
+    <description>
+      Starts the periodic broadcast of MTORRs
+    </description>
+  </command>
+  <command cli="plugin concentrator stop" functionName="emberAfPluginConcentratorStopDiscovery" group="plugin-concentrator">
+    <description>
+      Stops the periodic broadcast of MTORRs
+    </description>
+  </command>
+  <command cli="plugin concentrator agg" functionName="emberAfPluginConcentratorAggregationCommand" group="plugin-concentrator">
+    <description>
+      (Requires Concentrator Support to be enabled on this device.) Schedules a ZigBee PRO Many To One Route Request (MTORR) to be sent out at next opportunity, which will cause aggregation (many-to-one) routes to be created towards this concentrator.
+    </description>
+  </command>
+  <command cli="plugin concentrator print-table" functionName="emberAfPluginConcentratorPrintSourceRouteTable" group="plugin-concentrator">
+    <description>
+      Print the SOC/NCP source route table.
+    </description>
+  </command>
+  <command cli="plugin concentrator set-router-behavior" functionName="emberAfPluginConcentratorSetRouterBehaviorCommand" group="plugin-concentrator">
+    <description>
+      This command allows the user to set the router behavior for this plugin. The argument values come from concentrator-support.h in the enum with members starting with EMBER_AF_PLUGIN_CONCENTRATOR_ROUTER_BEHAVIOR_.
+    </description>
+    <arg name="behavior" type="INT8U" description="The value of a EMBER_AF_PLUGIN_CONCENTRATOR_ROUTER_BEHAVIOR_ enum member." />
+  </command>
+</cli>

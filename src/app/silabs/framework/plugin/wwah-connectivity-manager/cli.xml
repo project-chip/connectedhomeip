@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-wwah-connectivity-manager" name="Plugin Commands: Wwah Connectivity Manager">
+    <description>
+      The wwah-connectivity-manager plugin CLI contains commands to interact with the connectivity manager.
+    </description>
+  </group>
+  <command cli="plugin wwah-connectivity-manager info" functionName="emAfPluginWwahConnectivityManagerInfoCommand" group="plugin-wwah-connectivity-manager">
+    <description>
+      Print information about the WWAH Connectivity Manager state.
+    </description>
+  </command>
+  <command cli="plugin wwah-connectivity-manager enable" functionName="emAfPluginWwahConnectivityManagerEnableCommand" group="plugin-wwah-connectivity-manager">
+    <description>
+      Enable the WWAH Connectivity Manager rejoin algorithm.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint which contains WWAH cluster" />
+  </command>
+  <command cli="plugin wwah-connectivity-manager disable" functionName="emAfPluginWwahConnectivityManagerDisableCommand" group="plugin-wwah-connectivity-manager">
+    <description>
+      Disable the WWAH Connectivity Manager rejoin algorithm.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint which contains WWAH cluster" />
+  </command>
+  <command cli="plugin wwah-connectivity-manager show" functionName="emAfPluginWwahConnectivityManagerShowCommand" group="plugin-wwah-connectivity-manager">
+    <description>
+      Shows the WWAH Connectivity Manager rejoin algorithm's parameters.
+    </description>
+  </command>
+  <command cli="plugin wwah-connectivity-manager parent-recovery" functionName="emAfPluginWwahConnectivityManagerBadParentRecoveryCommand" group="plugin-wwah-connectivity-manager">
+      <description>
+          Disable/enable the WWAH bad parent recovery. And set the bad parent check and rejoin period (min), if enabled.
+      </description>
+      <arg name="enabled" type="INT8U" description="Disable ==0, enable == 1, the WWAH bad parent recovery" />
+      <arg name="badParentRejoinPeriod" type="INT16U" description="the Period of time after which, we check if a parent is bad and try rejoin if so. 0 means use the default value of 24 * 60 mins." />
+  </command>
+  <command cli="plugin wwah-connectivity-manager min-rssi" functionName="emAfPluginWwahConnectivityManagerSetMinRssiCommand" group="plugin-wwah-connectivity-manager">
+      <description>
+          Sets minimum acceptable RSSI for receiving packets on a SoC WWAH-enabled device
+      </description>
+      <arg name="rssi" type="INT8S" description="min acceptable Rssi value for receiving packets" />
+  </command>
+</cli>

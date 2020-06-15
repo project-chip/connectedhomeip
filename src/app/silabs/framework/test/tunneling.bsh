@@ -1,0 +1,364 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"full1", "router", "full2", "full3"};
+String[] socImages = new String[] {
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+  "build/af-test-apps/FullTh-simulation/FullTh",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+  "build/af-test-apps/FullTh-simulation-ezsp/FullTh",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Make the first node a master time server.
+network.sleep(timeout); assert(true);
+send("full1", "write 0x01 0x000A 0x0001 1 0x18 {01}");
+network.sleep(timeout); assert(true);
+
+// Form and join a network and set up encryption.
+int channel = 21;
+int power = 2;
+int panId = 0xDEAD;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+expect("full2", "Registration complete", timeout * 100, true);
+
+// Perform partner link key exchange again as sometime earlier app key request fails due to
+// absence of 'full3' entry in address table at TC/full1. Sometime it works if 'full3'
+// start cbke discovery before 'full2' request app key for 'full3' as route record
+// to TC/coordinator before sending match descriptor request causes to cache 'full3' entry
+// via securityAddToAddressCache.
+expect("full2", "plugin partner-link-key-exchange partner " + nodeId("full3") + " 1", "Key established: 1");
+networkWait(timeout);
+
+// Get the node id of the client and then wait a bit.  On the full test harness,
+// the "info" command dumps a ton of output.
+String nid = nodeId("full2");
+network.sleep(timeout * 10); assert(true);
+
+// Try to open a tunnel from the client for each of the known protocols and make
+// sure all the plugin and application callbacks get triggered.
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x00 0xFFFF 0x00");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0x00, 0xFFFF, 0x00, 0x0080",
+                  "IsProtocolSupported:00,FFFF",
+                  "ServerTunnelOpened:0000,00,FFFF,00,0080",
+                });
+expectMultiline("full2",
+                "",
+                new String[] {
+                  ".*RX: RequestTunnelResponse 0x0000, 0x00, 0x0080",
+                  ".*ClientTunnelOpened:00,00,0080",
+                });
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x01 0xFFFF 0x00");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0x01, 0xFFFF, 0x00, 0x0080",
+                  "IsProtocolSupported:01,FFFF",
+                  "ServerTunnelOpened:0001,01,FFFF,00,0080",
+                });
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0001, 0x00, 0x0080",
+                  "ClientTunnelOpened:01,00,0080"
+                },
+                timeout * 10);
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x02 0xFFFF 0x00");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0x02, 0xFFFF, 0x00, 0x0080",
+                  "IsProtocolSupported:02,FFFF",
+                  "ServerTunnelOpened:0002,02,FFFF,00,0080"
+                });
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0002, 0x00, 0x0080",
+                  "ClientTunnelOpened:02,00,0080",
+                });
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x03 0xFFFF 0x00");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0x03, 0xFFFF, 0x00, 0x0080",
+                  "IsProtocolSupported:03,FFFF",
+                  "ServerTunnelOpened:0003,03,FFFF,00,0080"
+                });
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0003, 0x00, 0x0080",
+                  "ClientTunnelOpened:03,00,0080"
+                });
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x04 0xFFFF 0x00");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0x04, 0xFFFF, 0x00, 0x0080",
+                  "IsProtocolSupported:04,FFFF",
+                  "ServerTunnelOpened:0004,04,FFFF,00,0080",
+                });
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0004, 0x00, 0x0080",
+                  "ClientTunnelOpened:04,00,0080",
+                });
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x05 0xFFFF 0x00");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0x05, 0xFFFF, 0x00, 0x0080",
+                  "IsProtocolSupported:05,FFFF",
+                  "ServerTunnelOpened:0005,05,FFFF,00,0080"
+                });
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0005, 0x00, 0x0080",
+                  "ClientTunnelOpened:05,00,0080"
+                });
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+
+// Try opening a tunnel for an unknown protocl and make sure the tunnel is not
+// opened.  The test harness will reject unknown protocols unless it is a
+// manufacturer-specific protocol (>=200) and the manufacturer code matches its
+// code.
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x06 0xFFFF 0x00");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0x06, 0xFFFF, 0x00, 0x0080",
+                  "IsProtocolSupported:06,FFFF"
+                });
+expect("full2", "RX: RequestTunnelResponse 0xFFFF, 0x03, 0x0080");
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+
+// Even though the tunnel was not opened on the server, the client will not
+// immediately free up the pending tunnel on its side.  It delays slightly to
+// allow the stack to continue using the address table entry created for the
+// server.  Wait a bit here to allow that process to happen.
+network.sleep(timeout * 10);
+
+// Set the manufacturer code and try again.  The tunnel should now be opened.
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0xC8 0xFEED 0x00");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0xC8, 0xFEED, 0x00, 0x0080",
+                  "IsProtocolSupported:C8,FEED",
+                  "ServerTunnelOpened:0006,C8,FEED,00,0080",
+                });
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0006, 0x00, 0x0080",
+                  "ClientTunnelOpened:06,00,0080",
+                });
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+
+// Try opening two more tunnels and make sure the last one doesn't open.  The
+// server should be out of resources at this point.  The second one is opened
+// outside of the client plugin to bypass its own capacity check.  The client
+// will send a default response with "failure" because it didn't know about the
+// request and therefore rejects the response.
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0xC9 0xFEED 0x00");
+
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0xC9, 0xFEED, 0x00, 0x0080",
+                  "IsProtocolSupported:C9,FEED",
+                  "ServerTunnelOpened:0007,C9,FEED,00,0080",
+                });
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0007, 0x00, 0x0080",
+                  "ClientTunnelOpened:07,00,0080"
+                });
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 00");
+send("full2", "zcl tunneling request 0xCA 0xFEED 0x00 0x0080");
+send("full2", "send 0 1 1");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: RequestTunnel 0xCA, 0xFEED, 0x00, 0x0080",
+                  "IsProtocolSupported:CA,FEED",
+                });
+expect("full2", "RX: RequestTunnelResponse 0xFFFF, 0x02, 0x0080");
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 01");
+
+// Try opening a tunnel with flow control support.  The server plugin does not
+// support this yet.  Again, this is done outside of the client plugin.
+send("full2", "zcl tunneling request 0xCB 0xFEED 0x01 0x0080");
+send("full2", "send 0 1 1");
+expect("full1", "RX: RequestTunnel 0xCB, 0xFEED, 0x01, 0x0080");
+expect("full2", "RX: RequestTunnelResponse 0xFFFF, 0x04, 0x0080");
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 00 status 01");
+
+// Close one of the tunnels and make sure the callbacks fire.
+send("full2", "plugin tunneling-client close 0x07");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: CloseTunnel 0x0007",
+                  "ServerTunnelClosed:0007,CLIENT",
+                });
+expect("full2", "DEFAULT_RESP: \\(Tunneling\\) cmd 01 status 00");
+
+// Try to send data from the client and then from the server through the closed
+// tunnel.  Each side will reject the message with a Transfer Data Error.  Once
+// again, the plugins are bypassed.
+send("full2", "zcl tunneling transfer-to-server 0x0007 {01 02 03 04 05}");
+send("full2", "send 0 1 1");
+expect("full1", "RX: TransferData 0x0007, \\[0102030405\\]");
+expect("full2", "RX: TransferDataError 0x0007, 0x00", timeout*10);
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 02 status 8B");
+send("full1", "zcl tunneling transfer-to-client 0x0007 {06 07 08 09 0A}");
+send("full1", "send " + nid + " 1 1");
+expect("full2", "RX: TransferData 0x0007, \\[060708090A\\]");
+expect("full1", "RX: TransferDataError 0x0007, 0x00");
+expect("full2", "DEFAULT_RESP: \\(Tunneling\\) cmd 03 status 8B");
+
+// Try to send data from the client through one of the opened tunnel.
+send("full2", "plugin tunneling-client transfer 0x00 {0B 0C 0D 0E 0F}");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: TransferData 0x0000, \\[0B0C0D0E0F\\]",
+                  "ServerDataReceived:0000,\\[0B0C0D0E0F\\]"
+                });
+expect("full2", "DEFAULT_RESP: \\(Tunneling\\) cmd 02 status 00");
+
+// Try to send data from the server through one of the opened tunnel.
+send("full1", "plugin tunneling-server transfer 0x0000 {10 11 12 13 14}");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: TransferData 0x0000, \\[1011121314\\]",
+                  "ClientDataReceived:00,\\[1011121314\\]"
+                });
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 01 status 00");
+
+// ------------------------------------------------------------------------------------------
+// EMAPPFWKV2-1300
+// Try to send data from a second "server" (full3) to the client on client's active tunnel
+// with real server (full1). Client should indicate TransferDataError WRONG_DEVICE.
+send("full3", "zcl tunneling transfer-to-client 0x0000 {0F 0A 0C 0E}");
+send("full3", "send " + nid + " 1 1");
+expect("full2", "RX: TransferData 0x0000, \\[0F0A0C0E\\]");
+expect("full3", "RX: TransferDataError 0x0000, 0x01"); // 0x01 -> WRONG_DEVICE
+expect("full2", "DEFAULT_RESP: \\(Tunneling\\) cmd 03 status 8B");
+// ------------------------------------------------------------------------------------------
+
+// Try to send a lot of random data from the client to the server up to the max
+// supported by the plugin.  128 of data plus three bytes of ZCL overhead and
+// two bytes for the tunnel id.
+String data;
+int length = 128;
+send("full2", "zcl tunneling random-to-server 0x0000 " + length);
+send("full2", "send 0 1 1");
+data = expect("full1",
+              "RX: TransferData 0x0000, \\[[0-9a-fA-F]{" + length * 2 + "}\\]",
+              timeout * 100,
+              true);
+data = data.substring(data.lastIndexOf('[') + 1, data.lastIndexOf(']'));
+expect("full1", "ServerDataReceived:0000,\\[" + data + "\\]", timeout * 100, true);
+expect("full2", "DEFAULT_RESP: \\(Tunneling\\) cmd 02 status 00", timeout * 100, true);
+
+// Delay briefly to let the stack settle.
+network.sleep(timeout * 10);
+
+// Try to send a lot of random data from the server to the client.
+send("full1", port, "zcl tunneling random-to-client 0x0000 " + length);
+send("full1", port, "send " + nid + " 1 1");
+data = expect("full2",
+              "RX: TransferData 0x0000, \\[[0-9a-fA-F]{" + length * 2 + "}\\]",
+              timeout * 100);
+data = data.substring(data.lastIndexOf('[') + 1, data.lastIndexOf(']'));
+
+expect("full2", "ClientDataReceived:00,\\[" + data + "\\]", timeout * 100, true);
+
+expect("full1", "DEFAULT_RESP: \\(Tunneling\\) cmd 01 status 00", timeout * 100, true);
+
+// Try to send too much data from server to client.  We expect an error
+send("full1", "zcl tunneling random-to-client 0x0000 " + (length + 1));
+expect("full1",
+       "send " + nid + " 1 1",
+       // status 0x02 = overflow
+       "RX: TransferDataError 0x0000, 0x02",
+       3000);
+
+// Try to send too much data from client to server.  We expect an error
+send("full2", "zcl tunneling random-to-server 0x0000 " + (length + 1));
+expect("full2",
+       "send 0x0000 1 1",
+       // status 0x02 = overflow
+       "RX: TransferDataError 0x0000, 0x02",
+       3000);
+
+// ------------------------------------------------------------------------------------------
+// EMZIGBEE-1395 (old EMAPPFWKV2-1350) If a client reboots and requests a new tunnel, the server should return the
+// old tunnel and should not create one
+
+// Without rebooting the client -
+// re-requesting tunnel for 0x02 should return the old server tunnel (id=2) but the index is 1 because tunnel Id1 is closed up
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x02 0xFFFF 0x00");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0002, 0x00, 0x0080",
+                  "ClientTunnelOpened:07,00,0080",
+                });
+
+// workaround (reboot failing for host apps): close tunnel (id=1) to make space for testing;
+// reboot closes all tunnels on client
+send("full2", "plugin tunneling-client close 0x01");
+expectMultiline("full1",
+                "",
+                new String[] {
+                  "RX: CloseTunnel 0x0001",
+                  "ServerTunnelClosed:0001,CLIENT",
+                });
+expect("full2", "DEFAULT_RESP: \\(Tunneling\\) cmd 01 status 00");
+network.sleep(timeout * 10);
+
+// re-requesting tunnel for 0x02 should return the old server tunnel (id=2) but the index is 1 because tunnel Id1 is closed up
+send("full2", "plugin tunneling-client request 0x0000 0x01 0x01 0x02 0xFFFF 0x00");
+expectMultiline("full2",
+                "",
+                new String[] {
+                  "RX: RequestTunnelResponse 0x0002, 0x00, 0x0080",
+                  "ClientTunnelOpened:01,00,0080",
+                });
+network.sleep(timeout * 10);
+// ------------------------------------------------------------------------------------------

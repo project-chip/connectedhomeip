@@ -1,0 +1,217 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to make sure our Z3 sample apps can
+// be used for a TRaC test harness. This means that the sample-apps
+// not only conform to the latest ZigBee Base Device specification,
+// but also that the TRaC stack hooks are working.
+
+// There are a couple of payload expect() calls where the switch node id
+// is hardcoded to be 0x1234. I have done this as a shortcut, but they can
+// be changed to use something like nodeId("switch") if need be.
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {
+  std.print("*** HOSTs do not have access to emberIncomingCommandHandler ***");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[] { "light", "gateway", "switch", "sleepy_switch" };
+
+String[] socImages = new String[] {
+  "build/af-test-apps/TRaC_TestHarnessZ3-simulation/TRaC_TestHarnessZ3",
+  "build/af-test-apps/TRaC_TestHarnessZ3-simulation/TRaC_TestHarnessZ3",
+  "build/af-test-apps/TRaC_TestHarnessZ3EndDevice-simulation/TRaC_TestHarnessZ3EndDevice",
+  "build/af-test-apps/TRaC_TestHarnessZ3SleepyEndDevice-simulation/TRaC_TestHarnessZ3SleepyEndDevice",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+  "",
+  "",
+};
+String ncpImage = "";
+
+lazyExpect = true;
+
+// There are some places that we need to nexpect a message, but we need to do
+// so quickly so that we can catch other messages. A lot of over the air
+// commands happen less than 10 milliseconds after a CLI command, so we will
+// use this amount for the time being.
+int NEXPECT_TIMING_SLOP_MS = 10;
+
+String extendedPanIdLE(String node)
+{
+  String eidBE = extendedPanId(node);
+  int length = eidBE.length();
+  char[] eidLE = new char[length];
+  for (int i = 0; i < length; i += 2) {
+    eidLE[i + 0] = eidBE.charAt(length - i - 2);
+    eidLE[i + 1] = eidBE.charAt(length - i - 1);
+  }
+  return new String(eidLE);
+}
+
+String networkKey(String node)
+{
+  String key = getCurrentNetworkKey(node);
+  key = key.replaceAll("  ", " ");
+}
+
+String nwkUpdateId(String node)
+{
+  send(node,
+       "plugin test-harness z3 nwk get-network-update-id");
+  String info = expect(node, "Network Update Id:");
+  int i = info.indexOf("Id:");
+  return info.substring(i + 4, i + 8);
+}
+
+void enablePrinting(String device, String type)
+{
+  dbg.println("enablePrinting():" + this.namespace.getInvocationLine());
+  expect(device,
+         "plugin test-harness packet-printing " + type + "-printing enable",
+         "Successfully enabled printing.");
+}
+void disablePrinting(String device, String type)
+{
+  dbg.println("disablePrinting():" + this.namespace.getInvocationLine());
+  expect(device,
+         "plugin test-harness packet-printing " + type + "-printing disable",
+         "Successfully disabled printing.");
+}
+
+// global data
+String nodeIdLight;
+String nodeIdSwitch;
+String nodeIdGateway;
+
+// -----------------------------------------------------------------------------
+// Reset device
+
+void reset_device(String device)
+{
+  // plugin test-harness z3 reset
+  expect(device,
+         "plugin test-harness z3 reset",
+         "TestHarnessZ3: Reset: 0x00");
+
+  // allow time for NETWORK DOWN, but don't 'expect' it
+  networkWait(6000);
+}
+
+// ----------------------------------------------------------------------------
+// Start the test
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+networkWait(3000);
+
+expect("light",
+       "plugin test-harness z3 set-pan-id 0x1234",
+       "Network Creator PAN ID = 0x1234");
+send("light",
+     "network extpanid {0102030405060708}");
+enablePrinting("light", "nwk");
+
+//-----------------------------------------------------------------------------
+// Test that a network leave request correctly updates the child status, by
+// checking that a subsequent aps remove does not result in a rejoin. The
+// test is performed multi-hop here, in order that the trust centre is not
+// the parent of the child. (The case where the trust centre is the parent
+// is covered in the regular single-hop script, test-harness-z3.bsh)
+
+// Form a centralized network with the light.
+expect("light",
+       "plugin network-creator start 1",
+       "EMBER_NETWORK_UP 0x0000");
+
+// Enable permit joining on the light.
+expect("light",
+       "net pjoin 180",
+       "pJoin for 180 sec: 0x00");
+       
+// Join the gateway to the light.
+send("switch", "plugin test-harness radio off");
+expect("gateway",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP",
+       DEFAULT_TIMEOUT << 3);
+       
+expect("light",
+       "net pjoin 0",
+       "pJoin for 0 sec: 0x00");
+
+expect("gateway", "Network Steering Completed: Join Success \\(0x00\\)",
+       DEFAULT_TIMEOUT << 3);
+       
+// Next, join the end-device switch to the network, but ensuring
+// that the gateway will be its parent.
+expect("gateway",
+       "net pjoin 180",
+       "pJoin for 180 sec: 0x00");
+
+send("switch", "plugin test-harness radio on");
+
+// Ensure the switch favours the gateway over the light.
+expect("gateway", "plugin test-harness set-radio-power 8", "radio power 8");
+expect("light", "plugin test-harness set-radio-power 0", "radio power 0");
+
+expect("switch",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP",
+       DEFAULT_TIMEOUT << 5);
+       
+expect("switch", "Network Steering Completed: Join Success \\(0x00\\)",
+       DEFAULT_TIMEOUT << 5);
+       
+expect("gateway",
+       "net pjoin 0",
+       "pJoin for 0 sec: 0x00");
+
+// Since we rejoined, we probably need to find routes again or whatever.
+expect("light",
+       "plugin concentrator start",
+       "sec until next MTORR broadcast");
+networkWait(DEFAULT_TIMEOUT << 2);
+
+// Check that the network topography is exatly what we want.
+expect("gateway", "plugin stack-diagnostics child-table", "1 of 6 entries used.");
+expect("gateway", "plugin stack-diagnostics neighbor-table", "1 of 16 entries used.");
+expect("light", "plugin stack-diagnostics neighbor-table", "1 of 16 entries used.");
+
+expect("light", "plugin test-harness set-radio-power 3", "radio power 3");
+expect("gateway", "plugin test-harness set-radio-power 3", "radio power 3");
+
+// Now send a network leave with rejoin from the gateway to the switch.
+nodeIdSwitch = nodeId("switch");
+expect("gateway",
+       "plugin test-harness z3 nwk nwk-leave 1 1 0 " + nodeIdSwitch + " 0",
+       "Leave: 0x00");
+expect("switch",
+       "EMBER_NETWORK_DOWN");
+expect("switch",
+       "EMBER_NETWORK_UP");
+
+// Wait for device announces to go out and network to quiet down.
+networkWait(DEFAULT_TIMEOUT << 2);
+
+// Now, send an aps remove device command to the non-TC parent, to instruct
+// it to remove the switch. If the status of the switch in the gateway's
+// child table is correct, then the switch will be asked to leave, and will
+// therefore not try to rejoin (as would have been the case had it been
+// booted off).
+expect("light",
+       ("plugin test-harness z3 aps aps-remove-device "
+        + "{" + eui64("gateway") + "} "
+        + "{" + eui64("switch") + "} "
+        + "0"),
+       "Remove device: 0x00");
+       
+expect("switch",
+       "EMBER_NETWORK_DOWN");
+nexpect("switch",
+       "EMBER_NETWORK_UP");

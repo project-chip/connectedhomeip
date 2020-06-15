@@ -1,0 +1,397 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+use File::Basename;
+
+###############################################################################
+# GLOBALS
+###############################################################################
+
+my $THIS=$0; $THIS=~s%./%%;
+
+my $SCRIPT_COMMAND_LINE = $0 . " " . join(" ", @ARGV);
+
+my $DEFAULT_OUTPUT_FILE = "cli.xml";
+
+my $SCRIPT_ID_TAG = "generate-cli-xml";
+
+my $USAGE =<<END_OF_TEXT;
+
+  $THIS [ parameters ]
+
+    This script will examine a source file in a plugin directory and generate
+    the appropriate cli.xml for AppBuilder to consume.
+  
+    It expects that the source code is documented as follows:
+  
+      // <$SCRIPT_ID_TAG> Plugin CLI Description: This is the general description of all plugin commands.
+
+      // Individual commands are documented as follows:
+  
+      // <$SCRIPT_ID_TAG> Command: plugin foo-bar config-item <enable>
+      // <$SCRIPT_ID_TAG> Description: I configure the plugin.  The next non-comment line is expected to be the C function.
+      // <$SCRIPT_ID_TAG> Arg: enable | boolean | True does one thing, false does another.
+  
+      void emberAfPluginFooBarConfigItem(void)
+      {
+        ...
+      }
+  
+    It then creates code as follows:
+  
+      <?xml version="1.0"?>
+      <cli>
+        <group id="plugin-foo-bar" name="Plugin Commands: Foo Bar">
+          <description>This is the general description of the plugin commands.</description>
+        </group>
+        <command cli="plugin foo-bar config-item" functionName="emberAfPluginFooBarConfigItem" group="plugin-foo-bar">
+          <description>
+            I configure the plugin.  The next non-comment line is expected to be the C function.
+          </description>
+          <arg name="enable" type="BOOLEAN" description="The description"/>
+        </command>
+      </cli>
+  
+    It generates the plugin name from the Plugin's directory name.  By default when
+    given a directory it looks for a '.c' file in the directory with the same name.
+    It will write the output to the same directory with 'cli.xml.generated'
+
+  PARAMETERS:
+
+  -p, --plugin <directory or source file>
+    If passed a directory, it will parse a source file in the directory with
+    the name '<directory-name>.c'.  Required.
+
+  -o, --output <file>
+    The name and location of the output file.  If not specified, will generate a
+    '$DEFAULT_OUTPUT_FILE' file in the same directory as the input file.  
+
+  -f, --force
+    Force overwriting of an existing output file.  By default the script will
+    not overwrite existing filenames.
+
+  -d, --debug
+    Print additional script debug messages.
+
+  EXAMPLE:
+    cd \$ZNET
+    ./app/framework/generate-cli-xml.pl --plugin app/framework/plugin-soc/mac-address-filtering/ --force
+
+END_OF_TEXT
+
+my $DEBUG_ENABLED = 0;
+
+my $PluginCliDescriptionPrefix = "\\s*\\/\\/\\s*<$SCRIPT_ID_TAG>\\s*Plugin CLI Description:";
+my $PluginCommandPrefix = "\\s*\\/\\/\\s*<$SCRIPT_ID_TAG>\\s*Command:";
+my $PluginCommandDescriptionPrefix = "\\s*\\/\\/\\s*<$SCRIPT_ID_TAG>\\s*Description:";
+my $PluginArgDescriptionPrefix = "\\s*\\/\\/\\s*<$SCRIPT_ID_TAG>\\s*Arg:";
+
+# Some helpful conversions from the actual C code defintions to the 
+# ones AppBuilder knows.
+my %TYPE_CONVERSIONS = (
+  "uint8_t"     => "INT8U",
+  "uint16_t"    => "INT16U",
+  "uint32_t"    => "INT32U",
+  "int8_t"      => "INT8S",
+  "int16_t"     => "INT16S",
+  "int32_t"     => "INT32S",
+  "EmberEUI64"  => "IEEE_ADDRESS",
+  "EmberNodeId" => "INT16U",
+);
+
+##############################################################################
+
+exit Main();
+
+##############################################################################
+
+sub debugPrint
+{
+  my ($Message) = @_;
+
+  print $Message if ($DEBUG_ENABLED);
+}
+
+sub ProcessInputFile
+{
+  my ($Output, $Input, $PluginName) = @_;
+
+  my $LineNumber = 0;
+  my $PrettyName = $PluginName;
+  my $PluginDescription;
+  my $PluginDescriptionLineNumber;
+  my $PluginId = "plugin-$PluginName";
+  $PrettyName =~ s/\-/ /g;
+  $PrettyName = ucfirst($PrettyName);
+  my $CommandCount = 0;
+  my %Hash = ();
+
+  # This hash above will be populated as follows:
+
+  # FullCommand => Scalar describing the parsed "// Command: plugin foo-bar <argument>" line
+  #
+  # Command => Array of tokens of non-argument values
+  #
+  # ArgList => Array of tokens of argument values
+  #
+  # CommandLineNume => line number where command was found
+  #
+  # FunctionName => the name of the next function assumed to be associated with the command
+  #
+  # ArgDetails => Hash of arguments with their name as keys
+  #   Type => Type of argument parsed from '// Arg: name - type - description' line
+  #   Description => Description parsed from '// Arg: name - type - description' line
+  #
+  # NextLineShouldBeFunctionName => indicates we have parsed enough elements to write the XML for the command
+
+  print $Output <<END_OF_TEXT;
+<?xml version="1.0"?>
+<!-- This file was autogenerated by the script: $SCRIPT_COMMAND_LINE -->
+<cli>
+  <group id="$PluginId" name="Plugin Commands: $PrettyName">
+    <description>
+END_OF_TEXT
+
+  while (my $Line = <$Input>) {
+    $LineNumber++;
+
+    # Ignore empty lines up-front as it makes the code easier to read.
+    next if ( $Line =~ /^\s*$/);
+
+    # Use 'm%%' so we can match '/' without escaping it
+    if ($Line =~ m%$PluginCliDescriptionPrefix(.*)% ) {
+      my $NewPluginDescription = $1;
+      debugPrint("Found Plugin CLI description on line $LineNumber\n");
+
+      if ($PluginDescription) {
+        die "Error: Encountered second plugin description on line $LineNumber.  First one is on line $PluginDescriptionLineNumber\n";
+      }
+      $PluginDescription = $NewPluginDescription;
+      $PluginDescriptionLineNumber = $LineNumber;
+      print $Output "      $PluginDescription\n    </description>\n  </group>\n";
+      print "Wrote XML for plugin general CLI description.\n";
+
+    } elsif ($Line =~ m%$PluginCommandPrefix(.*)%) {
+      $Hash{FullCommand} = $1;
+      $Hash{FullCommand} =~ s/^\s*//;
+      $Hash{FullCommand} =~ s/\s*$//;
+
+      die "Error: Missing plugin general description of '// Plugin CLI Description' before first command on line $LineNumber.\n"
+        unless ($PluginDescription);
+
+      die "Error: Empty command on line $LineNumber\n" unless ($Hash{FullCommand});
+
+      $Hash{CommandLineNum} = $LineNumber;
+
+      my ($CommandWithoutArgs, $Args) = split/</, $Hash{FullCommand}, 2;
+
+      my @Tokens = split /\s+/, $CommandWithoutArgs;
+      debugPrint("Found command on line $LineNumber: $Hash{FullCommand}\n");
+
+      if (exists($Hash{FunctionName}) && $Hash{FunctionName}) {
+        die "Error: Encountered new command on line $LineNumber but previous command "
+      }
+
+      foreach my $Token ( @Tokens ) {
+        # Strip leading and trailing whitespace
+        $Token =~ s/^\s+//;
+        $Token =~ s/\s+$//;
+
+        if ($Token !~ /^[\w\-]+$/) {
+          die "Error: Invalid character for non-argument token '$Token' for command on line $LineNumber\n";
+        }
+
+        debugPrint("Found command item '$Token' on line $LineNumber\n");
+        push (@{$Hash{Command}}, $Token);
+      }
+
+      next unless $Args;
+
+      # Remove the last '>' from the arguments so all argument items are transformed
+      # from '<name>' to 'name'.  Our split below will remove all the other '<' and '>''
+      $Args =~ s/>\s*$//;
+
+      @Tokens = split/>\s+</, $Args;
+
+      # Process args
+      foreach my $Token (@Tokens) {
+        # Strip leading and trailing whitespace
+        $Token =~ s/^\s+//;
+        $Token =~ s/\s+$//;
+
+        if ($Token =~ /^[\w\-_ ]+$/) {
+          debugPrint("Found argument on line $LineNumber: '$Token'\n");
+          # It is important to put the arguments in a list, which is ordered.
+          # Later we will need to create a separate hash for the argument details.
+          push @{$Hash{ArgList}}, $Token;
+        } else {
+          die "Error: Invalid character for argument item '$Token' on line $LineNumber\n";
+        }
+      }
+
+    } elsif ($Line =~ m%$PluginCommandDescriptionPrefix(.*)%) {
+      $Hash{Description} = $1;
+      die "Error: Description for command on line $LineNumber but no previous command was detected.\n"
+        unless ($Hash{FullCommand});
+      debugPrint("Found command description on line $LineNumber\n");
+
+      unless (exists($Hash{ArgList}) && scalar($Hash{ArgList})) {
+        # No arguments, so now we just need the function name.
+        $Hash{NextLineShouldBeFunctionName} = 1;
+      }
+
+    } elsif ($Line =~ m%$PluginArgDescriptionPrefix(.*)%) {
+      my $ArgLine = $1;
+      unless(exists($Hash{ArgList}) && scalar($Hash{ArgList})) {
+        die "Error: Not expecting argument on line $LineNumber.  No existing command is being processed.\n";
+      }
+
+      unless (exists($Hash{Description})) {
+        die "Error: Arguments encountered on line $LineNumber before 'Description:' line for command: $Hash{FullCommand}\n";
+      }
+
+      # Expect: name | type | description
+      if ($ArgLine !~ m%\s*[\w\- ]+\s*\|\s*[\w\- ]+\s*|.*%) {
+        die "Error: Unexpected format for argument on line $LineNumber.  Expected: name - type - description\n";
+      }
+
+      my ($Name, $Type, $Description) = split /\s*\|\s*/, $ArgLine, 3;
+      $Name =~ s/^\s*//;
+      debugPrint("Found argument details for '$Name' on line $LineNumber\n");
+
+      die "Error: Argument '$Name' on line $LineNumber doesn't match command-line on $Hash{CommandLineNum}\n"
+        unless grep /$Name/, @{$Hash{ArgList}};
+
+      $Hash{ArgDetails}{$Name}{Type} = $Type;
+      $Hash{ArgDetails}{$Name}{Description} = $Description;
+      $Hash{ArgDetails}{$Name}{LineNumber} = $LineNumber;
+
+      # Next line *could* be a function, or another argument.
+      $Hash{NextLineShouldBeFunctionName} = 1;
+
+    } elsif ($Hash{NextLineShouldBeFunctionName}) {
+      if ($Line =~ /\s*void\s+(\w+)\s*\(\s*void\s*\)/) {
+        $Hash{FunctionName} = $1;
+        debugPrint("Found function name '" . $Hash{FunctionName} . "' on line $LineNumber\n");
+
+        my $ConcatenatedCommand = join(" ", @{$Hash{Command}});
+
+        print $Output <<END_OF_TEXT;
+  <command cli="$ConcatenatedCommand" functionName="$Hash{FunctionName}" group="$PluginId">
+    <description>
+      $Hash{Description}
+    </description>
+END_OF_TEXT
+        
+        foreach my $Arg ( @{$Hash{ArgList}} ) {
+          unless (exists($Hash{ArgDetails}{$Arg})) {
+            die "Error: No argument details about '$Arg'.  Missing '// Arg: ' definition for command '$Hash{FullCommand}'?\n";
+          }
+          my $Type = $Hash{ArgDetails}{$Arg}{Type};
+          debugPrint("Parsing argument '$Arg' of type '$Type'\n");
+          if (exists($TYPE_CONVERSIONS{$Type})) {
+            debugPrint("Converted '$Type' to " . $TYPE_CONVERSIONS{$Type} . "\n");
+            $Type = $TYPE_CONVERSIONS{$Type};
+          }
+          $Type = uc($Type);
+          my $Description = $Hash{ArgDetails}{$Arg}{Description};
+
+          print $Output <<END_OF_TEXT;
+    <arg name="$Arg" type="$Type" description="$Description"/>
+END_OF_TEXT
+        }
+
+        print $Output <<END_OF_TEXT;
+  </command>
+END_OF_TEXT
+        print("Wrote XML for: $Hash{FullCommand}\n");
+        $CommandCount++;
+
+        # Reset the hash so we can process the next command with a clean slate.
+        %Hash = ();
+      }
+    } elsif ($Line !~ m%\s*//% && exists($Hash{FullCommand})) {
+      # If the line is not a comment line, it means we encountered some code line.
+      # This doesn't fit with our format and possibly means an incomplete
+      # CLI definition.
+
+      die "Error: Unexpected non-comment item on line $LineNumber without finishing previous command: $Hash{FullCommand}\n";
+    }
+  }
+
+  if (exists($Hash{FullCommand})) {
+    die "Error: Reached end of file.  Incomplete definition for command: $Hash{FullCommand}\n";
+  }
+
+  print $Output "</cli>\n";
+
+  print "Found $CommandCount commands.\n";
+
+  close $Output;
+  close $Input;
+
+}
+
+sub Main
+{
+  my $PluginDirOrSource;
+  my $OutputFile;
+  my $PluginDir;
+  my $InputFile;
+  my $ForceEnabled;
+
+  Getopt::Long::config("bundling");
+  GetOptions
+  (
+    'p|plugin=s' => \$PluginDirOrSource,
+    'o|output=s' => \$OutputFile,
+    'd|debug'    => \$DEBUG_ENABLED,
+    'f|force'    => \$ForceEnabled,
+  ) or die $USAGE;
+
+  die "Error: Must specify a directory or file with '-p'.\n" 
+    unless ($PluginDirOrSource);
+
+  die "Error: Plugin directory/file doesn't exist.\n"
+    unless (-e $PluginDirOrSource);
+
+  if (-f $PluginDirOrSource) {
+    $PluginDir = dirname($PluginDirOrSource);
+    $InputFile = $PluginDirOrSource;
+  } elsif (-d $PluginDirOrSource) {
+    $PluginDirOrSource =~ s%/$%%; # Remove trailing slash
+    my $File = basename($PluginDirOrSource);
+    $PluginDir = $PluginDirOrSource;
+    $InputFile = $PluginDirOrSource . "/$File" . ".c";
+  } else {
+    die "Error: Unknown filesystem type for plugin dir/file: $PluginDirOrSource\n";
+  }
+
+  $OutputFile = $PluginDir . "/" . $DEFAULT_OUTPUT_FILE unless ($OutputFile);
+
+  my $PluginName = basename($PluginDir);
+
+  debugPrint("Plugin name:      $PluginName\n");
+  debugPrint("Plugin Directory: $PluginDir\n");
+  debugPrint("Input file:       $InputFile\n");
+  debugPrint("Output file:      $OutputFile\n");
+
+  die "Error: Input file '$InputFile' does not exist.\n" unless (-e $InputFile);
+
+  if (-e $OutputFile) {
+    die "Error: Won't overwrite output file '$OutputFile' without '-f' option.\n"
+      unless ($ForceEnabled);
+  }
+
+  my $Status = open(INPUT_HANDLE, "$InputFile");
+  die "Error: Could not open input file '$InputFile'\n"
+    unless ($Status);
+
+  $Status = open(OUTPUT_HANDLE, ">$OutputFile");
+  die "Error: Could not open output file '$OutputFile' for writing: $!\n"
+    unless ($Status);
+
+  return ProcessInputFile(\*OUTPUT_HANDLE, \*INPUT_HANDLE, $PluginName);
+}
+

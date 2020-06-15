@@ -1,0 +1,432 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to exercise startup control of:
+// - OnOff cluster OnOff attribute, via StartUpOnOff attribute setting
+// - LevelControl cluster CurrentLevel attribute, via StartUpCurrentLevel
+//   attribute setting.
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop
+    || runArgument.runUsingHostApps) {
+  // Multi-hop is disabled due to many weird failures due to timing issue.
+
+  dbg.print("****Multi-hop and Host disabled****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "controller", "light"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/Z3Light-simulation/Z3Light",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+};
+
+String[] ncpImages = new String[] {
+  "",
+  "",
+};
+
+// Note: the following call creates a flat network (i.e. every node can
+// hear every other node.
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImages,
+                  false, false, false);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int txpower = 2;
+int panId = 0xdc04;
+setNetworkParams(channel, txpower, panId);
+setupEncryption();
+
+// Note: reference designs can not use the formAndJoinDevices() API
+// because they will all try to join on their own.  As such, calls
+// beyond the first to attempt to join to a network will fail (devices
+// already joined).
+
+// Coodinator is device [0]
+networkForm(allDevices[0]);
+send(allDevices[0], "network pjoin 150");
+
+// Let registration complete.
+networkWait(75000);
+
+lazyExpect = true;
+
+public static final String EP1 = "1";
+public static final String EP2 = "2";
+
+public static final int ON_OFF_STARTUP_OFF = 0x00;
+public static final int ON_OFF_STARTUP_ON = 0x01;
+public static final int ON_OFF_STARTUP_TOGGLE = 0x02;
+public static final int ON_OFF_STARTUP_PREVIOUS = 0xFF;
+
+public static final int LEVEL_MIN = 0x01;
+public static final int LEVEL_HALF = 0x7F;
+public static final int LEVEL_MAX = 0xFE;
+public static final int LEVEL_STARTUP_MIN = 0x00;
+public static final int LEVEL_STARTUP_VALUE = 0x80;
+public static final int LEVEL_STARTUP_PREVIOUS = 0xFF;
+
+public static final int MIREDS_MIN = 0x00C8;
+public static final int MIREDS_HALF = 0x0147;
+public static final int MIREDS_MAX = 0x01C6;
+public static final int MIREDS_STARTUP_PREVIOUS = 0xFFFF;
+
+public static final int COLOR_MODE_HUESAT = 0x00;
+public static final int COLOR_MODE_XY = 0x01;
+public static final int COLOR_MODE_TEMP = 0x02;
+
+
+String formatBool(boolean onOff)
+{
+  return (onOff ? "01" : "00");
+}
+
+String format8(int value8)
+{
+  return String.format("%02X", new Object[] { value8 });
+}
+
+String format16(int value16)
+{
+  return String.format("%02X %02X",
+                       new Object[] {
+                         value16 & 0xFF,
+                         (value16 >> 8) & 0xFF,
+                       });
+}
+
+void setOnOff(String endpoint, boolean onOff)
+{
+  expect("light", "write " + endpoint + " 0x0006 0x0000 1 0x10 {" + formatBool(onOff) + "}", "Success: write");
+}
+
+void setOnOffStartUp(String endpoint, int start)
+{
+  expect("light", "write " + endpoint + " 0x0006 0x4003 1 0x20 {" + format8(start) + "}", "Success: write");
+}
+
+void checkOnOffState(String endpoint, boolean onOff, int start)
+{
+  expect("light", "read " + endpoint + " 0x0006 0x0000 1", "^" + formatBool(onOff) + " $");
+  expect("light", "read " + endpoint + " 0x0006 0x4003 1", "^" + format8(start) + " $");
+}
+
+void setLevel(String endpoint, int level)
+{
+  expect("light", "write " + endpoint + " 0x0008 0x0000 1 0x20 {" + format8(level) + "}", "Success: write");
+}
+
+void setLevelStartUp(String endpoint, int start)
+{
+  expect("light", "write " + endpoint + " 0x0008 0x4000 1 0x20 {" + format8(start) + "}", "Success: write");
+}
+
+void checkLevelState(String endpoint, int level, int start)
+{
+  expect("light", "read " + endpoint + " 0x0008 0x0000 1", "^" + format8(level) + " $");
+  expect("light", "read " + endpoint + " 0x0008 0x4000 1", "^" + format8(start) + " $");
+}
+
+void setColorTemp(String endpoint, int mireds)
+{
+  expect("light", "write " + endpoint + " 0x0300 0x0007 1 0x21 {" + format16(mireds) + "}", "Success: write");
+}
+
+void setColorTempStartUp(String endpoint, int start)
+{
+  expect("light", "write " + endpoint + " 0x0300 0x4010 1 0x21 {" + format16(start) + "}", "Success: write");
+}
+
+void checkColorTempState(String endpoint, int mireds, int start)
+{
+  expect("light", "read " + endpoint + " 0x0300 0x0007 1", "^" + format16(mireds) + " $");
+  expect("light", "read " + endpoint + " 0x0300 0x4010 1", "^" + format16(start) + " $");
+}
+
+void setColorMode(String endpoint, int mode)
+{
+  expect("light", "write " + endpoint + " 0x0300 0x0008 1 0x30 {" + format8(mode) + "}", "Success: write");
+}
+
+void checkColorMode(String endpoint, int mode)
+{
+  expect("light", "read " + endpoint + " 0x0300 0x0008 1", "^" + format8(mode) + " $");
+}
+
+void powerCycle()
+{
+  power("light", false);
+  power("light", true);
+}
+
+// -----------------------------------------------------------------------------
+// OnOff Test Cases
+// Apply initial setting of OnOff and StartupOnOff(off, on, toggle, previous).
+// Cycle power twice and confirm expected post-init results.
+
+// off/off -> off/off
+setOnOff(EP1, false);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_OFF);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_OFF);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_OFF);
+
+// off/on -> on/on
+setOnOff(EP1, false);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_ON);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_ON);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_ON);
+
+// off/toggle -> on/toggle
+setOnOff(EP1, false);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_TOGGLE);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_TOGGLE);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_TOGGLE);
+
+// off/previous -> off/previous
+setOnOff(EP1, false);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_PREVIOUS);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_PREVIOUS);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_PREVIOUS);
+
+// on/off -> off/off
+setOnOff(EP1, true);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_OFF);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_OFF);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_OFF);
+
+// on/on -> on/on
+setOnOff(EP1, true);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_ON);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_ON);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_ON);
+
+// on/toggle -> off/toggle
+setOnOff(EP1, true);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_TOGGLE);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_TOGGLE);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_TOGGLE);
+
+// on/previous -> on/previous
+setOnOff(EP1, true);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_PREVIOUS);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_PREVIOUS);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_PREVIOUS);
+
+// Independence of endpoint settings
+setOnOff(EP1, false);
+setOnOffStartUp(EP1, ON_OFF_STARTUP_TOGGLE);
+setOnOff(EP2, true);
+setOnOffStartUp(EP2, ON_OFF_STARTUP_OFF);
+powerCycle();
+checkOnOffState(EP1, true, ON_OFF_STARTUP_TOGGLE);
+checkOnOffState(EP2, false, ON_OFF_STARTUP_OFF);
+powerCycle();
+checkOnOffState(EP1, false, ON_OFF_STARTUP_TOGGLE);
+checkOnOffState(EP2, false, ON_OFF_STARTUP_OFF);
+
+// -----------------------------------------------------------------------------
+// Level Test Cases
+// Apply initial setting of CurrentLevel (min, half, max) and
+// StartupCurrentLevel (min, value, previous).
+// Cycle power twice and confirm expected post-init results.
+
+// min/min -> min/min
+setLevel(EP2, LEVEL_MIN);
+setLevelStartUp(EP2, LEVEL_STARTUP_MIN);
+powerCycle();
+checkLevelState(EP2, LEVEL_MIN, LEVEL_STARTUP_MIN);
+powerCycle();
+checkLevelState(EP2, LEVEL_MIN, LEVEL_STARTUP_MIN);
+
+// half/min -> min/min
+setLevel(EP2, LEVEL_HALF);
+setLevelStartUp(EP2, LEVEL_STARTUP_MIN);
+powerCycle();
+checkLevelState(EP2, LEVEL_MIN, LEVEL_STARTUP_MIN);
+powerCycle();
+checkLevelState(EP2, LEVEL_MIN, LEVEL_STARTUP_MIN);
+
+// max/min -> min/min
+setLevel(EP2, LEVEL_MAX);
+setLevelStartUp(EP2, LEVEL_STARTUP_MIN);
+powerCycle();
+checkLevelState(EP2, LEVEL_MIN, LEVEL_STARTUP_MIN);
+powerCycle();
+checkLevelState(EP2, LEVEL_MIN, LEVEL_STARTUP_MIN);
+
+// min/val -> val/val
+setLevel(EP2, LEVEL_MIN);
+setLevelStartUp(EP2, LEVEL_STARTUP_VALUE);
+powerCycle();
+checkLevelState(EP2, LEVEL_STARTUP_VALUE, LEVEL_STARTUP_VALUE);
+powerCycle();
+checkLevelState(EP2, LEVEL_STARTUP_VALUE, LEVEL_STARTUP_VALUE);
+
+// half/val -> val/val
+setLevel(EP2, LEVEL_HALF);
+setLevelStartUp(EP2, LEVEL_STARTUP_VALUE);
+powerCycle();
+checkLevelState(EP2, LEVEL_STARTUP_VALUE, LEVEL_STARTUP_VALUE);
+powerCycle();
+checkLevelState(EP2, LEVEL_STARTUP_VALUE, LEVEL_STARTUP_VALUE);
+
+// max/val -> val/val
+setLevel(EP2, LEVEL_MAX);
+setLevelStartUp(EP2, LEVEL_STARTUP_VALUE);
+powerCycle();
+checkLevelState(EP2, LEVEL_STARTUP_VALUE, LEVEL_STARTUP_VALUE);
+powerCycle();
+checkLevelState(EP2, LEVEL_STARTUP_VALUE, LEVEL_STARTUP_VALUE);
+
+// min/prev -> min/prev
+setLevel(EP2, LEVEL_MIN);
+setLevelStartUp(EP2, LEVEL_STARTUP_PREVIOUS);
+powerCycle();
+checkLevelState(EP2, LEVEL_MIN, LEVEL_STARTUP_PREVIOUS);
+powerCycle();
+checkLevelState(EP2, LEVEL_MIN, LEVEL_STARTUP_PREVIOUS);
+
+// half/prev -> half/prev
+setLevel(EP2, LEVEL_HALF);
+setLevelStartUp(EP2, LEVEL_STARTUP_PREVIOUS);
+powerCycle();
+checkLevelState(EP2, LEVEL_HALF, LEVEL_STARTUP_PREVIOUS);
+powerCycle();
+checkLevelState(EP2, LEVEL_HALF, LEVEL_STARTUP_PREVIOUS);
+
+// max/prev -> max/prev
+setLevel(EP2, LEVEL_MAX);
+setLevelStartUp(EP2, LEVEL_STARTUP_PREVIOUS);
+powerCycle();
+checkLevelState(EP2, LEVEL_MAX, LEVEL_STARTUP_PREVIOUS);
+powerCycle();
+checkLevelState(EP2, LEVEL_MAX, LEVEL_STARTUP_PREVIOUS);
+
+// Independence of endpoints
+setLevel(EP1, LEVEL_HALF);
+setLevelStartUp(EP1, LEVEL_STARTUP_MIN);
+setLevel(EP2, LEVEL_HALF);
+setLevelStartUp(EP2, LEVEL_STARTUP_VALUE);
+powerCycle();
+checkLevelState(EP1, LEVEL_MIN, LEVEL_STARTUP_MIN);
+checkLevelState(EP2, LEVEL_STARTUP_VALUE, LEVEL_STARTUP_VALUE);
+powerCycle();
+checkLevelState(EP1, LEVEL_MIN, LEVEL_STARTUP_MIN);
+checkLevelState(EP2, LEVEL_STARTUP_VALUE, LEVEL_STARTUP_VALUE);
+
+// -----------------------------------------------------------------------------
+// ColorTemp Test Cases
+// Apply initial setting of ColorTempMireds (min, half, max) and
+// StartUpColorTempMireds (min, value, previous).
+// Cycle power twice and confirm expected post-init results.
+
+// min/min -> min/min
+// In this first one, also test the ColorMode is set to ColorTemperature.
+setColorTemp(EP2, MIREDS_MIN);
+setColorTempStartUp(EP2, MIREDS_MIN);
+setColorMode(EP2, COLOR_MODE_HUESAT);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MIN, MIREDS_MIN);
+checkColorMode(EP2, COLOR_MODE_TEMP);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MIN, MIREDS_MIN);
+checkColorMode(EP2, COLOR_MODE_TEMP);
+
+// half/min -> min/min
+// In this first one, also test the ColorMode is set to ColorTemperature.
+setColorTemp(EP2, MIREDS_HALF);
+setColorTempStartUp(EP2, MIREDS_MIN);
+setColorMode(EP2, COLOR_MODE_XY);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MIN, MIREDS_MIN);
+checkColorMode(EP2, COLOR_MODE_TEMP);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MIN, MIREDS_MIN);
+checkColorMode(EP2, COLOR_MODE_TEMP);
+
+// max/min -> min/min
+setColorTemp(EP2, MIREDS_MAX);
+setColorTempStartUp(EP2, MIREDS_MIN);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MIN, MIREDS_MIN);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MIN, MIREDS_MIN);
+
+// min/val -> val/val
+setColorTemp(EP2, MIREDS_MIN);
+setColorTempStartUp(EP2, MIREDS_HALF);
+powerCycle();
+checkColorTempState(EP2, MIREDS_HALF, MIREDS_HALF);
+powerCycle();
+checkColorTempState(EP2, MIREDS_HALF, MIREDS_HALF);
+
+// half/val -> val/val
+setColorTemp(EP2, MIREDS_HALF);
+setColorTempStartUp(EP2, MIREDS_HALF);
+powerCycle();
+checkColorTempState(EP2, MIREDS_HALF, MIREDS_HALF);
+powerCycle();
+checkColorTempState(EP2, MIREDS_HALF, MIREDS_HALF);
+
+// max/val -> val/val
+setColorTemp(EP2, MIREDS_MAX);
+setColorTempStartUp(EP2, MIREDS_HALF);
+powerCycle();
+checkColorTempState(EP2, MIREDS_HALF, MIREDS_HALF);
+powerCycle();
+checkColorTempState(EP2, MIREDS_HALF, MIREDS_HALF);
+
+// min/prev -> min/prev
+// Assume PREVIOUS startup setting should not cause ColorMode to change?
+setColorTemp(EP2, MIREDS_MIN);
+setColorTempStartUp(EP2, MIREDS_STARTUP_PREVIOUS);
+setColorMode(EP2, COLOR_MODE_XY);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MIN, MIREDS_STARTUP_PREVIOUS);
+checkColorMode(EP2, COLOR_MODE_XY);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MIN, MIREDS_STARTUP_PREVIOUS);
+checkColorMode(EP2, COLOR_MODE_XY);
+
+// half/prev -> half/prev
+setColorTemp(EP2, MIREDS_HALF);
+setColorTempStartUp(EP2, MIREDS_STARTUP_PREVIOUS);
+powerCycle();
+checkColorTempState(EP2, MIREDS_HALF, MIREDS_STARTUP_PREVIOUS);
+powerCycle();
+checkColorTempState(EP2, MIREDS_HALF, MIREDS_STARTUP_PREVIOUS);
+
+// max/prev -> max/prev
+setColorTemp(EP2, MIREDS_MAX);
+setColorTempStartUp(EP2, MIREDS_STARTUP_PREVIOUS);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MAX, MIREDS_STARTUP_PREVIOUS);
+powerCycle();
+checkColorTempState(EP2, MIREDS_MAX, MIREDS_STARTUP_PREVIOUS);
+

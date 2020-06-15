@@ -1,0 +1,58 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// This is a throughput test that measure the throughput of the ZigBee stack 
+// while we are introducing temporary communication blackouts which are 
+// simulating activity on another stack (BLE for instance) with higher priority.
+//
+// We don't run this test during make test.
+return;
+
+if (runArgument.runUsingHostApps) {
+  std.print("****Nothing to test for Host****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"node1", "node2"};
+String[] socImages = new String[] {
+  "build/pro-compliance-unix-simulation/pro-compliance",
+  "build/pro-compliance-unix-simulation/pro-compliance",
+};
+String[] hostImages = new String[] {
+  "",
+  "",
+};
+String ncpImage = "";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network (channel 15, panID 0xABCD, power 2).
+expect("node1", "form 15 0xABCD 2", "Stack up id:0x0000");
+expect("node1", "permit_joins 60", "permitJoining.*0x00");
+expect("node2", "join 15 0xABCD 2", "Stack up id:.*");
+network.sleep(1000);
+
+// Disable noting incoming packets to prevent serial to eat up all the buffers
+// and hose the receiving node.
+expect("node1", "note_incoming 0", "Note incoming disabled");
+expect("node2", "note_incoming 0", "Note incoming disabled");
+
+expect("node1", "multiprotocol_sim_start 0 24000 6000 0 0", "Starting simple ON/OFF duty cycle test");
+
+//expect("node1", "multiprotocol_sim_start 1 3 1 1456 31000", "Starting BLE non-connectable advertisement event test");
+
+// - packet size (with no security 96 is the maximum achievable without 
+//   fragmenting)
+// - # of total packets
+// - packet interval
+// - max # of packets in flight
+// - source endpoint
+// - destination short ID
+// - destination endpoint
+// - packet options (retry = 0x40, discovery = 0x80, force discovery = 0x20)
+expect("node2", "send_packets 96 1000 0 3 2 0x0000 2 0x00", "Throughput:.*", 1000000);

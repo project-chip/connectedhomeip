@@ -1,0 +1,305 @@
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import com.ember.util.Ansi;
+import java.util.Map;
+
+String tempDir = "tmp/af-scripts";
+
+String[] excludedBeanshellFiles = new String[] {
+  // Framework.
+  "af-test",
+    
+  // Utility.
+  "util",
+  
+  // Included by dido.bsh
+  "zigbee-event-logger-events",
+  
+  // Tests that we don't want run.
+  "endPointBroadcast",
+  "z3-stress-testing",
+  "cli-password-protection",
+  "delayed-join",
+};
+
+String[] singleHopBeanshellFiles = new String[] {
+"address-table",
+"barrier-control",
+"color-control",
+"color-server",
+"color-server-executeifoff",
+"color-server-couple-level",
+"commshub-dual-phy",
+"contact-sensor",
+"custom-ezsp",
+"device-management",
+"dimmer-switch",
+"door-lock",
+"door-lock2",
+"drlc",
+"endpoint",
+"gateway-reference",
+"gbcs",
+"interpan-cbke-real_ecc",
+"key-establishment-283k1-real_ecc",
+"key-establishment-real_ecc",
+"light-ui",
+"mac-address-filtering-test",
+"mirror-sleepy",
+"mn-esi-ipd",
+"mn-ipd-esi",
+"mn-z3-tc-se-ipd",
+"network-child",
+"network-find",
+"network-find-sub-ghz",
+"network-find2",
+"network-tests",
+"ota-dynamic-block-period",
+"ota-eeprom-test-real_ecc",
+"ota-page-request-test",
+"prepayment",
+"reporting-failure",
+"secure-ezsp",
+"smart-outlet",
+"standalone-bootloading",
+"startup-onoff-level-colortemp",
+"sub-ghz",
+"test-harness-z3",
+"test-harness-z3-zll",
+"time",
+"wwah-silabs",
+"wwah-survey",
+"z3-distributed",
+"z3-stress-testing",
+"zigbee-event-logger",
+"zigbee-minimal-app",
+"zll-14778",
+"zll-abort",
+"zll-commissioning",
+"zll-end-device",
+"zll-frame-counter",
+"zll-identify",
+"zll-multiple-lights",
+"zll-network-interoperability",
+"zll-network-interop2",
+"zll-network-update",
+"zll-policy",
+"zll-reset",
+"zll-router-initiator",
+"zll-rx-on-when-idle",
+"zll-scenes",
+"zll-sleepy",
+"em4-sleep",
+};
+
+// NOTE: The simulator uses System.err for output and is much too noisy for
+// automated use.  When debugging is disabled, System.err is redirected to
+// /dev/null to quiet things down.  Because of this redirection, System.err
+// cannot be used for messages that should always appear (e.g., error messages).
+// In addition, so that output from the tests appears on the same stream as
+// ouput from the simulator, System.out is redirected to stderr.  For clarity,
+// use std.print(...) or std.println(...) for output that should always appear
+// and dbg.print(...) or dbg.println(...) for debugging output.
+PrintStream std = System.out;
+PrintStream dbg = System.err;
+
+cd(dirname(pathToFile(getSourceFileInfo()).getAbsolutePath()));
+
+source("af-test-util.bsh");
+
+// Pull in all scripts in test directory, except the framework, the utility,
+// and the beanshell tests we want excluded.
+String extension = ".bsh";
+List exclude = Arrays.asList(excludedBeanshellFiles);
+List singleHop = Arrays.asList(singleHopBeanshellFiles);
+ArrayList tests = new ArrayList();
+ArrayList singleHopTests = new ArrayList();
+String[] files = new File(bsh.cwd).list();
+Arrays.sort(files);
+for (String file : files) {
+  if (file.endsWith(extension)) {
+    file = file.substring(0, file.length() - extension.length());
+    if (!exclude.contains(file)) {
+      tests.add(file);
+    }
+    if (singleHop.contains(file)) {
+      singleHopTests.add(file);
+    }
+  }
+}
+
+exec("mkdir -p " + tempDir);
+
+// Populate a list with the command line arguments.
+ArrayList args = new ArrayList();
+if (bsh.args != void) {
+  args.addAll(Arrays.asList(bsh.args));
+}
+
+// One or more "-d" flags will turn on debugging output.
+boolean debug = args.contains("-d");
+boolean coloredDebugMsg = false;
+
+while (args.contains("-d")) {
+  args.remove("-d");
+}
+
+while (args.contains("-color")) {
+  args.remove("-color");
+  coloredDebugMsg = true;
+}
+
+// "-h" flag performs tests for host processors
+boolean runUsingHostApps = args.contains("-h");
+while(args.contains("-h")) {
+  args.remove("-h");
+}
+
+// Always use SPI in these tests.
+boolean runUsingSpiNcp = true;
+
+// "-m" flag performs tests for multihop
+boolean runUsingMultihop = args.contains("-m");
+while(args.contains("-m")) {
+  args.remove("-m");
+}
+
+// "-m" flag performs tests for multihop
+boolean runUsingMfgSecurityToken = args.contains("-s");
+while(args.contains("-s")) {
+  args.remove("-s");
+}
+
+// "--af-ncp" tells the tests to use the NCP framework ncp-spi sample-app
+boolean runUsingAfNcp = args.contains("--af-ncp");
+while (args.contains("--af-ncp")) {
+  args.remove("--af-ncp");
+}
+
+// Replace any "-a" flags in the argument list with a list of all test names.
+for (int i; (i = args.indexOf("-a")) != -1;) {
+  args.remove(i);
+  args.addAll(i, tests);
+}
+
+// Redirect System.out and System.err (cf. detailed description above).
+System.setOut(System.err);
+if (!debug) {
+  System.setErr(new PrintStream(new ByteArrayOutputStream()));
+}
+
+// At least one test is required for execution.
+if (args.size() == 0) {
+  std.println("usage: af-test.bsh [-d] {-a|test}...");
+  std.println("  -d     display output from simulator while test runs");
+  std.println("  -a     run all tests in suite");
+  std.println("  -m     run test(s) over multiple hops");
+  std.println("  -h     run test(s) using host apps");
+  std.println("  -s     run test(s) and enable the MFG security config token.");
+  std.println("  -color output debug messages in color");
+  std.println("  test   run the named test");
+  for (String test : tests) {
+    std.println("          " + test);
+  }
+  System.exit(-1);
+}
+
+String currentTest;
+String currentTestPath;
+String currentRadioTrace;
+String currentOutputFile;
+PrintStream debugOutput = dbg;
+
+// Execute each test individually.
+ArrayList errors = new ArrayList();
+for (String arg : args) {
+  try {
+    currentTest = arg;
+    currentTestPath = 
+      tempDir
+      + "/"
+      + currentTest
+      + (runUsingHostApps == true
+         ? "-host"
+         : "")
+      + (runUsingMultihop == true
+         ? "-multi-hop"
+         : "")
+      + (runUsingMfgSecurityToken == true
+         ? "-mfg-security-token"
+         : "");
+//    System.out.println("currentTestPath: " + currentTestPath);
+    exec("mkdir -p " + currentTestPath);
+
+    currentOutputFile = currentTestPath + "/output.txt";
+    currentRadioTrace = currentTestPath + "/radio-trace.log";
+
+    if (shouldSkipTest(arg)) {
+      std.println("[Skipped test " + arg + "]");
+    } else if( (singleHopTests.contains(arg) && (runUsingMultihop == true))
+      || (!singleHopTests.contains(arg) && (runUsingMultihop == false))){
+             //skip the test
+    } else if (tests.contains(arg)) {
+      if (!debug) {
+        // Print to file
+        debugOutput = new PrintStream(currentOutputFile);
+        System.setErr(debugOutput);
+      }
+      
+      if (debug){
+        std.println("[Testing application framework: " + arg + "]");
+        run(arg + extension, this);
+        std.println("[done]");
+      } else {
+        std.print("[Testing application framework: " + arg + " ");
+        run(arg + extension, this);
+        std.println(" done]");
+      }
+
+      if (!debug) {
+        debugOutput.println("\n\ndone");
+        debugOutput.flush();
+        debugOutput.close();
+      } else {
+        std.println("Radio-trace file: " + currentRadioTrace);
+      }
+    } else {
+      std.println("Invalid test name: " + arg + "!");
+      std.println("Valid options are:");
+      for (String test : tests) {
+        std.println("  - " + test);
+      }
+    }
+  } catch (Exception e) {
+    std.println();
+    String errorMessage = e.getMessage();
+    if (e instanceof bsh.TargetError) {
+      errorMessage = e.getTarget().getMessage();
+    } else if (e instanceof bsh.ParseException) {
+      errorMessage = e.getMessage() + " in " + e.getErrorSourceFile();
+    } else if (e instanceof bsh.EvalError) {
+      errorMessage = e.getMessage() + " in " + e.getErrorSourceFile() + " at " + e.getErrorLineNumber();
+    } 
+    if (errorMessage == null) {
+      errorMessage = "<UNKNOWN ERROR MESSAGE>";
+    }
+    if (!debug) {
+      // Print to file
+      debugOutput.println(errorMessage);
+    }
+    std.println(Ansi.debugError.colorize(errorMessage));
+    std.println("  Radio-trace file: " + currentRadioTrace);
+    if (!debug) {
+      std.println("  Full output:      " + currentOutputFile);
+    }
+    errors.add(arg);
+  }
+}
+
+if (!errors.isEmpty()) {
+  std.println(Ansi.debugError.colorize("\nFailed tests: " + errors));
+  System.exit(-1);
+}

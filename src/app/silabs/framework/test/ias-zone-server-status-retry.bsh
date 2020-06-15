@@ -1,0 +1,142 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to verify the status queue retry functionality 
+// of the ias-zone-server plugin. Queue lenght, backoff parameters (first backoff time,
+// common ratio, max backoff time, max retyr attempt) and backoff behavior are tested.
+
+source("util.bsh");
+
+if (!runArgument.runUsingMultihop
+    || runArgument.runUsingHostApps) {
+  std.print("****Host disabled****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "controller", "router", "contact"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaSampleGateway-simulation/HaSampleGateway",
+  "build/af-test-apps/Z3ContactSensorWithWwah-simulation/Z3ContactSensorWithWwah",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+  "",
+};
+
+String[] ncpImages = new String[] {
+  "",
+  "",
+  "",
+};
+
+int i;
+
+void printInfoLine(String description)
+{
+  dbg.println("\n=== " + description + " from line " + this.namespace.getInvocationLine() + " ===\n");
+}
+
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImages,
+                  false, true, false);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0xdc04;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Shut contact temprarily down, so we can build up a multi-hop network.
+// Join router first.
+printInfoLine("Form the network");
+power("contact", false);
+networkForm("controller");
+send("controller", "network pjoin 150");
+
+// Allow TC and link key requests on the trust center
+send("controller", "option security set-key-request-policy 1 1");
+
+networkJoinTo("router", "controller");
+
+// Let registration complete.
+networkWait(30000);
+
+// Have controller join through the router.
+send("controller", "network pjoin 0");
+send("router", "network pjoin 150");
+power("contact", true);
+
+// Backoff parameter CLI config error test
+printInfoLine("Testing backoff parameter configuration");
+send("contact", "plugin ias-zone-server change-backoff-config 0 0 0 0 0");
+expect("contact", ".*Parameter error! Valid parameters:.*");
+
+// Set valid backoff parameters with limited retires
+send("contact", "plugin ias-zone-server change-backoff-config 3 2 12 0 5");
+
+// Wait until contact is enrolled properly.
+networkWait(50000);
+
+// Verify that after the coordinator goes down, contact device remains on the network
+// and queues any status changes per the configured retry parameters.
+printInfoLine("Testing status update transfer error and status queueing");
+
+power("controller", false);
+
+// Try to send 7 status updates, only 5 of these should be stored to the queue
+// (ie. default queue lenght)
+for (i=1; i<8; i++) {
+  send("contact", "plugin ias-zone-server changeStatus "+i+" 2 1");
+}
+
+// Test dropped status report for limited retries.
+printInfoLine("Test dropped status report for limited retries");
+
+expect("contact", ".*Attempting to resend a queued zone status update \\(status: 0x0001.* Retry count: 5.*",60000);
+expect("contact", ".*Zone update unsuccessful, max retry attempts reached, remove entry from queue.*");
+
+// Set valid backoff parameters with limited retires
+send("contact", "plugin ias-zone-server change-backoff-config 3 2 12 0 20");
+
+// Test that the zone server periodically tries to resend the older
+// status update from the queue. Also, verify that a new message to the queue 
+printInfoLine("Testing status update periodic retries");
+
+for (; i<10; i++) {
+  // Try to send two new status updates. This is to test immediate retries.
+  if (i>8) {
+    send("contact", "plugin ias-zone-server changeStatus "+ i +" 2 1");
+  }
+  expect("contact", ".*Status command update failed to send... Retrying in 3 seconds...*", 10000);
+  expect("contact", ".*Status command update failed to send... Retrying in 12 seconds...*", 15000);
+  expect("contact", ".*Attempting to resend a queued zone status update \\(status: 0x0002.* Retry count: 11.*",180000);
+}
+
+// Bring the network alive again
+power("controller", true);
+
+// Make sure that all status updates are resent from the status queue.
+// Test if the first four elements are the oldest ones (ie. 0x0001 - 0x0004).
+// Also, test if the first retry attempt (ie. 0x0001) is after a number (10) of retries,
+// but all the others goes through for first shot.
+printInfoLine("Testing status update transfer after controller device is back");
+
+expect("contact", ".*Attempting to resend a queued zone status update \\(status: 0x0002.* Retry count: 12.*", 16000);
+
+for (i=3; i<5; i++) {
+  expect("contact", ".*Zone update successful, remove entry from queue.*");
+  expect("contact", ".*Attempting to resend a queued zone status update \\(status: 0x000" 
+    + String.valueOf(i) + ".* Retry count: 0.*");
+}
+
+expect("contact", ".*Zone update successful, remove entry from queue.*");
+
+// Test if the last element is the newest one (ie. 0x0009).
+printInfoLine("Testing proper queuing of old status vs. most recent status");
+expect("contact", ".*Attempting to resend a queued zone status update \\(status: 0x0009.* Retry count: 0.*");

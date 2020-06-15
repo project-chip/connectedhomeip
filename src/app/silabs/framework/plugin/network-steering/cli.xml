@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-network-steering"
+         name="Plugin Commands: Network Steering">
+    <description>
+      The Network Steering plugin commands are currently being used for the Profile Interop event.
+    </description>
+  </group>
+
+  <command cli="plugin network-steering mask add"
+           functionName="emberAfPluginNetworkSteeringChannelAddOrSubtractCommand" 
+           group="plugin-network-steering">
+    <description>
+      Adds a channel to either the primary or secondary channel mask of the network-steering plugin.
+    </description>
+    <arg name="whichMask"
+         type="INT8U"
+         description="The channel mask to add a channel to."/>
+    <arg name="channel"
+         type="INT8U"
+         description="The channel to add to the mask."/>
+  </command>
+
+  <command cli="plugin network-steering mask subtract"
+           functionName="emberAfPluginNetworkSteeringChannelAddOrSubtractCommand"
+           group="plugin-network-steering">
+    <description>
+      Subtracts a channel from either the primary or secondary channel mask of the network-steering plugin.
+    </description>
+    <arg name="whichMask"
+         type="INT8U"
+         description="The channel mask to subtract the channel from."/>
+    <arg name="channel"
+         type="INT8U"
+         description="The channel to subtract the mask from."/>
+  </command>
+
+  <command cli="plugin network-steering mask set"
+           functionName="emberAfPluginNetworkSteeringChannelSetCommand"
+           group="plugin-network-steering">
+    <description>
+      Set either the primary or secondary channel mask.
+    </description>
+    <arg name="whichMask"
+         type="INT8U"
+         description="The channel mask to subtract the channel from."/>
+    <arg name="mask"
+         type="INT32U"
+         description="The value to set the channel mask to."/>
+  </command>
+
+  <command cli="plugin network-steering status"
+           functionName="emberAfPluginNetworkSteeringStatusCommand"
+           group="plugin-network-steering">
+    <description>
+      Displays the current status of the network steering process.
+    </description>
+  </command>    
+
+  <command cli="plugin network-steering start"
+           functionName="emberAfPluginNetworkSteeringStartCommand"
+           group="plugin-network-steering">
+    <description>
+      Starts the network steering process.
+    </description>
+    <arg name="options"
+         type="INT8U"
+         description="A mask of options for indicating specific behavior within the network-steering process." />
+  </command>
+
+  <command cli="plugin network-steering stop"
+           functionName="emberAfPluginNetworkSteeringStopCommand"
+           group="plugin-network-steering">
+    <description>
+      Stops the network steering process.
+    </description>
+  </command>
+
+  <command cli="plugin network-steering pre-configured-key-set"
+           functionName="emberAfPluginNetworkSteeringSetPreconfiguredKeyCommand"
+           group="plugin-network-steering">
+    <description>
+      Set the pre-configured key
+    </description>
+    <arg name="preconfiguredkey"
+         type="OCTET_STRING"
+         description="Set the preconfigured key so that the joining device can enter the network." />
+  </command>
+    
+</cli>

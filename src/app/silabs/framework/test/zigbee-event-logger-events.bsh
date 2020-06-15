@@ -1,0 +1,140 @@
+
+
+int getNumHexBytes( String rawData ){
+  String noSpaceData = rawData.replaceAll("\\s","");
+  numHexBytes = noSpaceData.length() / 2;
+  return numHexBytes;
+}
+
+int LOG_ENTRY_BASE_OVERHEAD = 6;  // length+bitmask+timeValue.
+// The msgId is not included in the BASE_OVERHEAD size.
+String getZigBeeEventLogMessageWithOptions( int timestamp, int timeSync, int msPrecision,
+                                            int bootCount, String eventData ){
+
+  len = getNumHexBytes( eventData ) + LOG_ENTRY_BASE_OVERHEAD;
+  bitmask = 0;
+  logMessage = "";
+  if (timeSync > 0){
+    bitmask |= 0x01;
+  }
+  if (msPrecision > 0){
+    bitmask |= 0x02;
+    logMessage = logMessage + String.format("%02X %02X ",
+                new Object[]{
+                  (msPrecision & 0xFF),
+                  ((msPrecision >> 8) & 0xFF)
+                });
+    len = len + 2;
+  }
+  if (bootCount > 0){
+    bitmask |= 0x04;
+    logMessage = logMessage + String.format("%02X %02X %02X %02X ",
+                new Object[]{
+                  (bootCount & 0xFF),
+                  ((bootCount >> 8) & 0xFF),
+                  ((bootCount >> 16) & 0xFF),
+                  ((bootCount >> 24) & 0xFF),
+                });
+    len = len + 4;
+  }
+  logMessage = String.format("%02X %02X .. %02X %02X %02X ", 
+                      new Object[]{
+                        len,
+                        bitmask,
+                        //(timestamp & 0xFF),   // Cannot guarantee timestamp.
+                        ((timestamp >> 8) & 0xFF),
+                        ((timestamp >> 16) & 0xFF),
+                        ((timestamp >> 24) & 0xFF),
+                       } ) + logMessage + eventData;
+  return logMessage;
+}
+
+String getZigBeeEventLogMessage( int timestamp, int timeSync, String eventData ){
+  return getZigBeeEventLogMessageWithOptions( timestamp, timeSync, 0, 0, eventData );
+}
+
+String formatU16String( String u16Str ){
+  if( u16Str.contains("0x") ){
+    u16Str = u16Str.substring(2,6);
+  }
+  if( u16Str.length() == 4 ){
+    u16Str = u16Str.substring(2,4) + " " + u16Str.substring(0,2);
+  }
+  return u16Str;
+}
+
+String formatU64String( String u64String, boolean flipByteOrder ){
+  if( u64String.length() == 16 ){
+    if( flipByteOrder ){
+      u64String = u64String.substring(0,2) + " " + u64String.substring(2,4) + " " +
+            u64String.substring(4,6) + " " + u64String.substring(6,8) + " " +
+            u64String.substring(8,10) + " " + u64String.substring(10,12) + " " +
+            u64String.substring(12,14) + " " + u64String.substring(14,16);
+    }
+    else{
+      u64String = u64String.substring(14,16) + " " + u64String.substring(12,14) + " " +
+            u64String.substring(10,12) + " " + u64String.substring(8,10) + " " +
+            u64String.substring(6,8) + " " + u64String.substring(4,6) + " " +
+            u64String.substring(2,4) + " " + u64String.substring(0,2);
+    }
+  }
+  return u64String;
+}
+
+
+// TODO:  Auto-generate this from the compact-logger script.
+int ZIGBEE_BOOT_EVENT_ID = 0;
+int ZIGBEE_JOIN_NETWORK_ID = 1;
+int ZIGBEE_TRUST_CENTER_LINK_KEY_CHANGE_ID = 6;
+int ZIGBEE_RESET_ID = 8;
+int ZIGBEE_PARENT_CHANGE_ID = 10;
+int ZIGBEE_STACK_STATUS_ID = 15;
+
+String getEventDataBoot( int bootCount, int resetType ){
+  return String.format("%02X 00 %02X %02X %02X %02X %02X %02X",
+                new Object[]{
+                  ZIGBEE_BOOT_EVENT_ID,
+                  (bootCount & 0xFF),
+                  ((bootCount >> 8) & 0xFF),
+                  ((bootCount >> 16) & 0xFF),
+                  ((bootCount >> 24) & 0xFF),
+                  (resetType & 0xFF),
+                  ((resetType >> 8) & 0xFF)
+                });
+}
+
+
+String getEventDataJoinNetwork( String panId, String channel, String page, String extendedPanId ){
+  String cmd = String.format("%02X 00 ", new Object[]{ZIGBEE_JOIN_NETWORK_ID});
+  int chan = Integer.parseInt(channel);
+
+  // channel is a string of the "decimal" channel.
+  // We need to convert this to the hex value.
+  channel = String.format("%02X ", new Object[]{chan});
+  panId = formatU16String( panId );
+  
+
+  extendedPanId = formatU64String( extendedPanId, false );
+  return cmd + panId + " " + channel + page + " " + extendedPanId;
+}
+
+String getEventDataTrustCenterLinkKeyChange(){
+  return String.format("%02X 00", new Object[]{ZIGBEE_TRUST_CENTER_LINK_KEY_CHANGE_ID});
+}
+
+String getEventDataReset( int resetCode, int extendedReset ){
+  return String.format("%02X 00 %02X %02X", new Object[]{
+                ZIGBEE_RESET_ID,
+                (resetCode & 0xFF),
+                (extendedReset & 0xFF)});
+}
+
+String getEventDataParentChange( String nodeId, String eui64 ){
+  nodeId = formatU16String( nodeId );
+  eui64 = formatU64String( eui64, true );
+  return String.format("%02X 00 ", new Object[]{ZIGBEE_PARENT_CHANGE_ID}) + nodeId + " " + eui64;
+}
+
+String getEventDataStackStatus( String stackStatus ){
+  return String.format("%02X 00 ", new Object[]{ZIGBEE_STACK_STATUS_ID}) + stackStatus;
+}

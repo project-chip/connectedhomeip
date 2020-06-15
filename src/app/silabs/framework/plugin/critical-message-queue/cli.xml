@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin critical-message-queue" name="Plugin Commands: Critical Message Queue">
+    <description>This plugin provides commands for the CMQ</description>
+  </group>
+
+  <command cli="plugin critical-message-queue print-queue" functionName="printQueue" group="plugin critical-message-queue">
+    <description>
+      Prints the CMQ
+    </description>
+  </command>
+  <command cli="plugin critical-message-queue print-config" functionName="printConfig" group="plugin critical-message-queue">
+    <description>
+      Prints the config
+    </description>
+  </command>
+</cli>

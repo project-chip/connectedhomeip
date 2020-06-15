@@ -1,0 +1,1118 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to make sure our Z3 sample apps can
+// be used for a TRaC test harness. This means that the sample-apps
+// not only conform to the latest ZigBee Base Device specification,
+// but also that the TRaC stack hooks are working.
+
+// There are a couple of payload expect() calls where the switch node id
+// is hardcoded to be 0x1234. I have done this as a shortcut, but they can
+// be changed to use something like nodeId("switch") if need be.
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {
+  std.print("*** HOSTs do not have access to emberIncomingCommandHandler ***");
+  return;
+}
+
+if (runArgument.runUsingMultihop) {
+  std.print("*** P2 network, multihop doesn't make sense ***");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[] { "light", "gateway", "switch", "zed_switch", "zed_light" };
+
+String[] socImages = new String[] {
+  "build/af-test-apps/TRaC_TestHarnessZ3-simulation/TRaC_TestHarnessZ3",
+  "build/af-test-apps/TRaC_TestHarnessZ3-simulation/TRaC_TestHarnessZ3",
+  "build/af-test-apps/TRaC_TestHarnessZ3-simulation/TRaC_TestHarnessZ3",
+  "build/af-test-apps/TRaC_TestHarnessZ3EndDevice-simulation/TRaC_TestHarnessZ3EndDevice",
+  "build/af-test-apps/TRaC_TestHarnessZ3EndDevice-simulation/TRaC_TestHarnessZ3EndDevice"
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+  "",
+  "",
+  "",
+};
+String ncpImage = "";
+
+lazyExpect = true;
+
+// There are some places that we need to nexpect a message, but we need to do
+// so quickly so that we can catch other messages. A lot of over the air
+// commands happen less than 10 milliseconds after a CLI command, so we will
+// use this amount for the time being.
+int NEXPECT_TIMING_SLOP_MS = 10;
+
+String extendedPanIdLE(String node)
+{
+  String eidBE = extendedPanId(node);
+  int length = eidBE.length();
+  char[] eidLE = new char[length];
+  for (int i = 0; i < length; i += 2) {
+    eidLE[i + 0] = eidBE.charAt(length - i - 2);
+    eidLE[i + 1] = eidBE.charAt(length - i - 1);
+  }
+  return new String(eidLE);
+}
+
+String networkKey(String node)
+{
+  String key = getCurrentNetworkKey(node);
+  key = key.replaceAll("  ", " ");
+}
+
+String nwkUpdateId(String node)
+{
+  send(node,
+       "plugin test-harness z3 nwk get-network-update-id");
+  String info = expect(node, "Network Update Id:");
+  int i = info.indexOf("Id:");
+  return info.substring(i + 4, i + 8);
+}
+
+void enablePrinting(String device, String type)
+{
+  dbg.println("enablePrinting():" + this.namespace.getInvocationLine());
+  expect(device,
+         "plugin test-harness packet-printing " + type + "-printing enable",
+         "Successfully enabled printing.");
+}
+void disablePrinting(String device, String type)
+{
+  dbg.println("disablePrinting():" + this.namespace.getInvocationLine());
+  expect(device,
+         "plugin test-harness packet-printing " + type + "-printing disable",
+         "Successfully disabled printing.");
+}
+
+// global data
+final String ZR = "0x00";
+final String ZR_AA = "0x01";
+final String ZED = "0x02";
+final String ZED_AA = "0x03";
+final String SED = "0x04";
+final String SED_AA = "0x05";
+
+final String CHANNEL = "11";
+
+// -----------------------------------------------------------------------------
+// Touchlink Commands
+
+void scan_target(String initiator, String target)
+{
+  expect(initiator,
+         "plugin test-harness z3 touchlink scan-request-process 1 0 0",
+         "Scan request process");
+
+  // We can't really check either the zigbee info or the touchlink info
+  // fields, since we don't know who the initiator is...we just check that
+  // the target has heard the broadcast.
+  expect(target,
+         ("t........:rx len 9, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 00"
+          + " payload\\[.. .. .. .. .. .. \\]"));
+  expect(initiator,
+          "t........:rx len 32, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 01"
+          + " payload\\[.. .. .. .. 00 .. .. 00 80 .* \\]");   // key bitmask = 0x8000
+  expect(initiator,
+         "plugin test-harness z3 touchlink is-scanning",
+         "scanning:true");
+  networkWait(6000);
+  expect(initiator,
+         "plugin test-harness z3 touchlink is-scanning",
+         "scanning:false");
+}
+
+void reset_device(String device)
+{
+  // Do a ZLL reset to factory new for the device, to make it leave the network
+  // if joined, and clear tables.
+  expect(device,
+         "plugin test-harness z3 reset",
+         "TestHarnessZ3: Reset: 0x00");
+
+  // allow time for NETWORK DOWN, but don't 'expect' it - we may not be joined
+  networkWait(6000);
+  
+  // Do a processor reset, in order to re-initialize the ZLL Commissioning plugin,
+  // and hence switch the radio on for the startup duration
+  send(device, "reset");
+  networkWait(6000);
+}
+
+void prepare_test(String initiator, String initiatorMode, String target, String targetMode)
+{
+  // Note, we don't need to switch the radios on since we are resetting anyway.
+  networkWait(6000);
+  
+  // reset the initiator, in case it has scan data from the previous test
+  reset_device(initiator);
+  
+  // reset the target to factory new
+  reset_device(target);
+  
+  // set device modes
+  expect(initiator,
+        "plugin test-harness z3 set-device-mode " + initiatorMode,
+        "Set device mode: 0x00");
+  expect(target,
+        "plugin test-harness z3 set-device-mode " + targetMode,
+        "Set device mode: 0x00");
+}     
+  
+void post_test(String initiator, String target)
+{
+  // can cause problems, e.g. if join-end-device-request target isn't killed
+  reset_device(initiator);
+  reset_device(target);
+  send(initiator, "plugin test-harness radio off");
+  send(target, "plugin test-harness radio off");
+  networkWait(6000);
+}
+
+void start_network(String initiator, String target)
+{
+  // Start network on a known channel - set channel on both initiator and
+  // target, since either may form the network, depending on device type.
+  expect(initiator, 
+         "plugin zll-commissioning channel " + CHANNEL,
+         "Primary channels: " + CHANNEL);
+  expect(target, 
+         "plugin zll-commissioning channel " + CHANNEL,
+         "Primary channels: " + CHANNEL);
+  
+  // We'll use the plugin here to handle the various router/end-device combos,
+  // since we're just setting things up for other tests.
+  expect(initiator,
+         "plugin zll-commissioning link",
+         "touch link 0x00");
+         
+  // The target should come up first.
+  expect(target,
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT << 3);
+  expect(initiator,
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT << 1);
+}
+
+//==================================
+// Device Information Request tests
+//==================================
+
+void device_info_tests(String initiator, String initiatorMode, String target, String targetMode)
+{
+  prepare_test(initiator, initiatorMode, target, targetMode);
+
+  //-------------------------------
+  // device-information-request -
+  // negative test
+  //-------------------------------
+  
+  // Non-network ZLL commands cannot be called unless we have *just*
+  // found a target in the scan request
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink device-information-request 0x00 0",
+                  new String[] {
+    "Device information request: 0x70",
+  });
+  
+  //----------------------
+  // scan-request-process
+  //----------------------
+
+  // plugin test-harness z3 touchlink scan-request-process <linkInitiator:1>
+  // <unused:1> <options:4>
+  // plugin test-harness z3 touchlink is-scanning
+  
+  expect(initiator,
+         "plugin test-harness z3 touchlink scan-request-process 1 0 0",
+         "Scan request process");
+  expect(target,
+         ("t........:rx len 9, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 00"
+          + " payload\\[.. .. .. .. 0. 9. \\]"));  // t/l info - initiator + interop must be set
+  expect(initiator,
+          "t........:rx len 32, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 01"
+          + " payload\\[.. .. .. .. 00 .. .. 00 80 .* \\]");   // key bitmask = 0x8000
+  expect(initiator,
+         "plugin test-harness z3 touchlink is-scanning",
+         "scanning:true");
+  networkWait(6000); // should be inside 8 second transaction timeout
+  expect(initiator,
+         "plugin test-harness z3 touchlink is-scanning",
+         "scanning:false");
+         
+  //-------------------------------
+  // device-information-request,
+  // legacy-profile enable/disable
+  //-------------------------------
+
+  // plugin test-harness z3 touchlink device-information-request
+  // <startIndex:1> <options:4>
+
+  // first, check the error case where we attempt to send the Inter-PAN
+  // with the HA profile, rather than the (correct) 'legacy' profile
+  send(initiator,
+       "plugin test-harness z3 legacy-profile disable");
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink device-information-request 0x00 0",
+                  new String[] {
+    "Inter-PAN TX \\(.*\\) \\[11 .. 02 .. .. .. .. 00 \\]",
+    "Device information request: 0x00",
+  });
+  expect(target,
+         "ERR: Inter-PAN profile 0x0104, cluster 0x1000, command 0x02 not permitted");
+
+  // from now on we use the correct profile id - this is the valid case
+  send(initiator,
+       "plugin test-harness z3 legacy-profile enable");
+
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink device-information-request 0x00 0",
+                  new String[] {
+    "Inter-PAN TX \\(.*\\) \\[11 .. 02 .. .. .. .. 00 \\]",
+  });
+  expect(target,
+         ("t........:rx len 8, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 02"
+          + " payload\\[.. .. .. .. 00 \\]"));
+  expect(initiator,
+         "Device information request: 0x00",
+          "t........:rx len 42, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 03"
+          + " payload\\[.. .. .. .. 02 00 02"
+          + " 00 00 00 00 00 00 00 .. 01 5E C0 00 01 01 00 00"       // ZLL profile
+          + " 00 00 00 00 00 00 00 .. 02 5E C0 01 01 01 00 01 \\]"); // dev info fields
+          
+  // silly start index, but we still expect a reply
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink device-information-request 0xDD 0",
+                  new String[] {
+    "Inter-PAN TX \\(.*\\) \\[11 .. 02 .. .. .. .. DD \\]",
+    "Device information request: 0x00",
+  });
+  expect(target,
+  "Inter-PAN TX \\(.*\\) \\[19 .. 03 .* \\]");
+
+  // negative case - bad transaction id (option bit 0)
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink device-information-request 0x00 1",
+                  new String[] {
+    "Inter-PAN TX \\(.*\\) \\[11 .. 02 .. .. .. .. 00 \\]",
+    "Device information request: 0x00",
+  });
+  nexpect(target,
+          "Inter-PAN TX .* \\]");
+          
+  //-------------------------------------
+  // device-information-response-config
+  //-------------------------------------
+  
+  // plugin test-harness z3 touchlink device-information-response-config
+  // <options:4>
+  expect(target,
+         "plugin test-harness z3 touchlink device-information-response-config 1",
+         "Device information response config: 0x00");
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink device-information-request 0x00 0",
+                  new String[] {
+    "Inter-PAN TX \\(.*\\) \\[11 .. 02 .. .. .. .. 00 \\]",
+    "Device information request: 0x00",
+  });
+  nexpect(initiator,
+          "clus 0x1000 \\(ZLL Commissioning\\) .* cmd 03");
+
+  post_test(initiator, target);
+}
+
+//=============================
+// Network Start Request tests
+//=============================
+
+void network_start_request_tests(String initiator, String initiatorMode, String target, String targetMode)
+{
+  String nodeIdInitiator;
+  String nodeIdTarget;
+
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  //-------------------------------
+  // network-start-request,
+  // network-start-response-config
+  //-------------------------------
+
+  // plugin test-harness z3 touchlink network-start-request <dstAddress:2>
+  // <freeAddrBegin:2> <freeAddrEnd:2> <groupIdBegin:2> <groupIdEnd:2> <options:4>
+  // plugin test-harness z3 touchlink network-start-response-config <options:4>
+  
+  // first, find our target
+  scan_target(initiator, target);
+  // we'll run through the negative behaviour options, then the valid one.
+  // options = 0x0001 (suppress response)
+  expect(target,
+         "plugin test-harness z3 touchlink network-start-response-config 0x0001",
+         "Network start response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-start-request 2 0x0010 0x0012 0x1000 0x1200 0",
+         "Network start request: 0x00");
+         
+  // NOTE - a factory-new target will now by default specify a PAN id in the scan response,
+  // which will be used by the initiator in its network request.
+  expect(target,
+         ("t........:rx len 59, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 10"
+          + " payload\\[.* 0B .. .. 02 00 00 00 00 00 10 00 12 00 00 10 00 12 00 00 00 00 00 00 00 04 01 00 \\]"));
+  nexpect(initiator,
+          "t........:rx len 20, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 11"
+          + " payload\\[.. .. .. .. 00 .* \\]");
+          
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  scan_target(initiator, target);
+  
+  // options = 0x0002 (bad command id)
+  expect(target,
+         "plugin test-harness z3 touchlink network-start-response-config 0x0002",
+         "Network start response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-start-request 2 0x0010 0x0012 0x1000 0x1200 0",
+         "Network start request: 0x00");
+  expect(target,
+         ("t........:rx len 59, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 10"
+          + " payload\\[.* 0B .. .. 02 00 00 00 00 00 10 00 12 00 00 10 00 12 00 00 00 00 00 00 00 04 01 00 \\]"));
+
+  // expecting cmd = 0x15 (join end device response)
+  expect(initiator,
+         "t........:rx len 20, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 15"
+         + " payload\\[.. .. .. .. 00 .* \\]");
+  
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  scan_target(initiator, target);
+  
+  // options = 0x0004 (bad transaction id)
+  expect(target,
+         "plugin test-harness z3 touchlink network-start-response-config 0x0004",
+         "Network start response config: 0x00");
+
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-start-request 2 0x0010 0x0012 0x1000 0x1200 0",
+         "Network start request: 0x00");
+  expect(target,
+         ("t........:rx len 59, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 10"
+          + " payload\\[.* 0B .. .. 02 00 00 00 00 00 10 00 12 00 00 10 00 12 00 00 00 00 00 00 00 04 01 00 \\]"));
+
+  // we're expecting a bad transaction id in the interpan payload
+  expect(initiator,
+         "t........:rx len 20, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 11"
+         + " payload\\[.. .. .. .. 00 .* \\]");
+  
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  scan_target(initiator, target);
+
+  // options = 0x0008 (bad long source address)
+  expect(target,
+         "plugin test-harness z3 touchlink network-start-response-config 0x0008",
+         "Network start response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-start-request 2 0x0010 0x0012 0x1000 0x1200 0",
+         "Network start request: 0x00");
+  expect(target,
+         ("t........:rx len 59, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 10"
+          + " payload\\[.* 0B .. .. 02 00 00 00 00 00 10 00 12 00 00 10 00 12 00 00 00 00 00 00 00 04 01 00 \\]"));
+
+  // we're expecting a bad source address in the MAC header...
+  expect(initiator,
+         "t........:rx len 20, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 11"
+         + " payload\\[.. .. .. .. 00 .* \\]");
+  expect(initiator, "sourceEui64: DE ED DD DE ED DD DE DD");
+  
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  scan_target(initiator, target);
+  
+  // options = 0x0010 (bad status)
+  expect(target,
+         "plugin test-harness z3 touchlink network-start-response-config 0x0010",
+         "Network start response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-start-request 2 0x0010 0x0012 0x1000 0x1200 0",
+         "Network start request: 0x00");
+  expect(target,
+         ("t........:rx len 59, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 10"
+          + " payload\\[.* 0B .. .. 02 00 00 00 00 00 10 00 12 00 00 10 00 12 00 00 00 00 00 00 00 04 01 00 \\]"));
+
+  // we're expecting a bad status in the payload
+  expect(initiator,
+         "t........:rx len 20, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 11"
+         + " payload\\[.. .. .. .. 01 .* \\]");
+  
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  scan_target(initiator, target);
+  
+  // no negative behaviour options
+  // options = 0x0000
+  //--------------------------------------------------------
+  // this is the fn case (i.e. not joined)
+  
+  // Generally, here we are testing this scenario in the beanshell test, since
+  // this is what most of the test cases for factory-new seem to assume - or at
+  // least, the ZTT application isn't going to start a network for us...
+
+  expect(target,
+         "plugin test-harness z3 touchlink network-start-response-config 0x0000",
+         "Network start response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-start-request 2 0x0010 0x0012 0x1000 0x1200 0",
+         "Network start request: 0x00");
+  expect(target,
+         ("t........:rx len 59, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 10"
+          + " payload\\[.* 0B .. .. 02 00 00 00 00 00 10 00 12 00 00 10 00 12 00 00 00 00 00 00 00 04 01 00 \\]"));
+  expect(initiator,
+         "t........:rx len 20, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 11"
+         + " payload\\[.. .. .. .. 00 .* \\]");
+  expect(target,
+         "EMBER_NETWORK_UP");
+  expect(initiator,
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT<<1);
+
+  nodeIdTarget = nodeId(target);
+  nodeIdInitiator = nodeId(initiator);
+  dbg.println("");
+  dbg.println("nodeIdTarget = " + nodeIdTarget);
+  dbg.println("nodeIdInitiator = " + nodeIdInitiator);
+  dbg.println("");
+  
+  //--------------------------------------------------------
+  // this is the 'non-fn' case
+  
+  expect(initiator,
+         "network leave",
+         "EMBER_NETWORK_DOWN");
+  expect(target,
+         "network leave",
+         "EMBER_NETWORK_DOWN");
+         
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  expect(target,
+         "plugin zll-commissioning form 11 0 0x1234",
+         "EMBER_NETWORK_UP");
+  scan_target(initiator, target);
+  expect(target,
+         "plugin test-harness z3 touchlink network-start-response-config 0x0000",
+         "Network start response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-start-request 2 0x0010 0x0012 0x1000 0x1200 0",
+         "Network start request: 0x00");
+  expect(target,
+         ("t........:rx len 59, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 10"
+          + " payload\\[.* 0B 00 00 02 00 00 00 00 00 10 00 12 00 00 10 00 12 00 00 00 00 00 00 00 04 01 00 \\]"));
+  expect(initiator,
+         "t........:rx len 20, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 11"
+         + " payload\\[.. .. .. .. 00 .* \\]");
+  expect(target,
+         "EMBER_NETWORK_UP");
+  expect(initiator,
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT<<1);
+
+  nodeIdTarget = nodeId(target);
+  nodeIdInitiator = nodeId(initiator);
+  dbg.println("");
+  dbg.println("nodeIdTarget = " + nodeIdTarget);
+  dbg.println("nodeIdInitiator = " + nodeIdInitiator);
+  dbg.println("");
+  
+  // tidy up
+  post_test(initiator, target);
+}
+
+//=======================================
+// Network Join End Device Request tests
+//=======================================
+
+void network_join_end_device_request_tests(String initiator, String initiatorMode, String target, String targetMode)
+{
+  String nodeIdInitiator;
+  String nodeIdTarget;
+
+  prepare_test(initiator, initiatorMode, target, targetMode);
+
+  //-------------------------------------
+  // network-join-end-device-request
+  //-------------------------------------
+
+  // plugin test-harness z3 touchlink network-join-end-device-request <dstAddress:2>
+  // <freeAddrBegin:2> <freeAddrEnd:2> <groupIdBegin:2> <groupIdEnd:2> <options:4>
+
+  // for this test, we need an NFN router, e.g. "switch", with a ZLL network, and
+  // a factory-new end-device, e.g. "zed_light"
+
+  expect(initiator,
+         "plugin zll-commissioning form 11 0 0x1234",
+         "EMBER_NETWORK_UP");
+         
+  // let's do another scan here, to get the sleepy-lights's EUI
+  expect(initiator,
+         "plugin test-harness z3 touchlink scan-request-process 1 0 0",
+         "Scan request process");
+  expect(target,
+         ("t........:rx len 9, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 00"
+          + " payload\\[.. .. .. .. 05 92 \\]"));  // now NFN
+  networkWait(6000); // don't wait past the 8 second transaction ID timeout
+  
+  // now, join the zed light to the switch
+  nodeIdLight = "0xabab";
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-join-end-device-request "
+         + nodeIdLight
+         + " 0x0010 0x0012 0x1000 0x1200 0",
+         "Network join end device request: 0x00");
+         
+  // TODO: check payload properly?
+  expect(target,
+         ("t........:rx len 50, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 14"
+          + " payload\\[.* \\]"));
+
+  expect(initiator,
+         "EMBER_NETWORK_UP");
+  expect(target,
+         "EMBER_NETWORK_UP");
+         
+  nodeIdTarget = nodeId(target);
+  nodeIdInitiator = nodeId(initiator);
+  dbg.println("");
+  dbg.println("nodeIdTarget = " + nodeIdTarget);
+  dbg.println("nodeIdInitiator = " + nodeIdInitiator);
+  dbg.println("");
+
+  // tidy up
+  post_test(initiator, target);
+}
+
+//===================================
+// Network Join Router Request tests
+//===================================
+
+void network_join_router_request_tests(String initiator, String initiatorMode, 
+                                       String target1, String target1Mode,
+                                       String target2, String target2Mode)
+{
+  String nodeIdInitiator;
+  String nodeIdTarget1;
+  String nodeIdTarget2;
+
+  prepare_test(initiator, initiatorMode, target1, target1Mode);
+
+  //-------------------------------------
+  // network-join-router-request,
+  // network-join-router-response-config
+  //-------------------------------------
+
+  // plugin test-harness z3 touchlink network-join-router-request <dstAddress:2>
+  // <freeAddrBegin:2> <freeAddrEnd:2> <groupIdBegin:2> <groupIdEnd:2> <options:4>
+  // plugin test-harness z3 touchlink network-start-response-config <options:4>
+  
+  // First, we need to join initiator to target1, so we have a network
+  start_network(initiator, target1);
+
+  // now, initiator will try to join a second router, target2, to the network. 
+  // (PAN id is prob still 0x1234, dep if we've added any cases since, so we
+  // won't insist)
+
+  // we need to disable touchlinking on target1, to stop it responding to scan
+  // requests, but leave it switched on to parent the initiator if necessary.
+  send(target1, "plugin zll-commissioning disable");
+  
+  // reset the second target to factory new (this will switch its radio back on)
+  reset_device(target2);
+  
+  // set device mode for target2
+  expect(target2,
+        "plugin test-harness z3 set-device-mode " + target2Mode,
+        "Set device mode: 0x00");
+
+  //-----------------------
+  // target2 FN, not joined
+  
+  // (Note, the timing is too tight to reliably get the expects for both
+  // the join router request and the join router response in all cases.)
+  
+  // let's do a scan here, to get target2's EUI
+  scan_target(initiator, target2);
+  
+  // chose a random node id for target2
+  nodeIdTarget2 = "0xcaca";
+
+  // we'll run through the negative behaviour options, then the valid one
+  // options = 0x0001 (suppress response)
+  expect(target2,
+         "plugin test-harness z3 touchlink network-join-router-response-config 0x0001",
+         "Network join router response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-join-router-request "
+         + nodeIdTarget2
+         + " 0x0010 0x0012 0x1000 0x1200 0",
+         "Network join router request: 0x00");
+  expect(target2,
+         ("t........:rx len 50, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 12"
+          + " payload\\[.* 0B .. .. 03 00 00 00 00 00 10 00 12 00 00 10 00 12 \\]"));
+  nexpect(initiator,
+          "t........:rx len 8, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 13"
+          + " payload\\[.. .. .. .. 00 \\]");
+  
+  // the delay in these tests is sensitive in case the initiator
+  // is trying to rejoin - i.e. don't make it too long...
+  networkWait(DEFAULT_TIMEOUT << 1);
+  
+  // NOTE, we can't do a FN reset here for the initiator!!
+  reset_device(target2);
+  scan_target(initiator, target2);
+
+  // options = 0x0002 (bad command id)
+  expect(target2,
+         "plugin test-harness z3 touchlink network-join-router-response-config 0x0002",
+         "Network join router response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-join-router-request "
+         + nodeIdTarget2
+         + " 0x0010 0x0012 0x1000 0x1200 0",
+         "Network join router request: 0x00");
+
+  // expecting cmd = 0x15 (join end device response)
+  expect(initiator,
+         "t........:rx len 8, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 15"
+         + " payload\\[.. .. .. .. 00 \\]");
+  networkWait(DEFAULT_TIMEOUT << 1);
+  reset_device(target2);
+  scan_target(initiator, target2);
+
+  // options = 0x0004 (bad transaction id)
+  expect(target2,
+         "plugin test-harness z3 touchlink network-join-router-response-config 0x0004",
+         "Network join router response config: 0x00");
+
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-join-router-request "
+         + nodeIdTarget2
+         + " 0x0010 0x0012 0x1000 0x1200 0",
+         "Network join router request: 0x00");
+
+  // we're expecting a bad transaction id in the interpan payload
+  expect(initiator,
+         "t........:rx len 8, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 13"
+         + " payload\\[.. .. .. .. 00 \\]");
+  networkWait(DEFAULT_TIMEOUT << 1);
+  reset_device(target2);
+  scan_target(initiator, target2);
+
+  // options = 0x0008 (bad long source address)
+  expect(target2,
+         "plugin test-harness z3 touchlink network-join-router-response-config 0x0008",
+         "Network join router response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-join-router-request "
+         + nodeIdTarget2
+         + " 0x0010 0x0012 0x1000 0x1200 0",
+         "Network join router request: 0x00");
+
+  // we're expecting a bad source address in the MAC header...
+  expectMultiline(initiator,
+                  new String[] {
+    "t........:rx len 8, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 13"
+    + " payload\\[.. .. .. .. 00 \\]",
+    "sourceEui64: DE ED DD DE ED DD DE DD"
+  });
+
+  networkWait(DEFAULT_TIMEOUT << 1);
+  reset_device(target2);
+  scan_target(initiator, target2);
+
+  // options = 0x0010 (bad status)
+  expect(target2,
+         "plugin test-harness z3 touchlink network-join-router-response-config 0x0010",
+         "Network join router response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-join-router-request "
+         + nodeIdTarget2
+         + " 0x0010 0x0012 0x1000 0x1200 0",
+         "Network join router request: 0x00");
+
+  // we're expecting a bad status in the payload
+  expect(initiator,
+         "t........:rx len 8, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 13"
+         + " payload\\[.. .. .. .. 01 \\]");
+ 
+  networkWait(2000);
+  reset_device(target2);
+  scan_target(initiator, target2);
+
+  // no negative behaviour options
+  expect(target2,
+         "plugin test-harness z3 touchlink network-join-router-response-config 0x0000",
+         "Network join router response config: 0x00");
+  networkWait(1500);
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-join-router-request "
+         + nodeIdTarget2
+         + " 0x0010 0x0012 0x1000 0x1200 0",
+         "Network join router request: 0x00");
+  expect(initiator,
+         "t........:rx len 8, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 13"
+         + " payload\\[.. .. .. .. 00 \\]");
+  expect(target2,
+         "EMBER_NETWORK_UP");
+  expect(initiator,
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT<<1);
+
+  nodeIdTarget1 = nodeId(target1);
+  nodeIdTarget2 = nodeId(target2);
+  nodeIdInitiator = nodeId(initiator);
+  dbg.println("");
+  dbg.println("nodeIdTarget1 = " + nodeIdTarget1);
+  dbg.println("nodeIdTarget2 = " + nodeIdTarget2);
+  dbg.println("nodeIdInitiator = " + nodeIdInitiator);
+  dbg.println("");
+
+  // tidy up
+  post_test(initiator, target1);
+  post_test(initiator, target2);
+}
+
+//========================
+// Identify Request tests
+//========================
+
+void identify_request_tests(String initiator, String initiatorMode, String target, String targetMode)
+{
+  String nodeIdInitiator;
+  String nodeIdTarget;
+
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  
+  //-------------------------------------
+  // identify-request
+  //-------------------------------------
+  
+  // plugin test-harness z3 touchlink identify-request <duration:2> <options:4>
+
+  // First, we need to join initiator to target, so we have a network
+  start_network(initiator, target);
+  
+  // Do an extra scan for the benefit of the Test Harness plugin, since we
+  // used the regular plugin for the initial touchlink
+  scan_target(initiator, target);
+
+  // now we can send the identify request
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink identify-request 0x4321 0",
+                  new String[] {
+    "Inter-PAN TX \\(.*\\) \\[11 .. 06 .. .. .. .. 21 43 \\]",
+    "Identify request: 0x00",
+  });
+  expect(target,
+         "RX inter-PAN message");
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink identify-request 0xDCBA 0",
+                  new String[] {
+    "Inter-PAN TX \\(.*\\) \\[11 .. 06 .. .. .. .. BA DC \\]",
+    "Identify request: 0x00",
+  });
+  expect(target,
+         "RX inter-PAN message");
+
+  // options = 0x0001 (bad transaction id)
+  expectMultiline(initiator,
+                  "plugin test-harness z3 touchlink identify-request 0x4321 1",
+                  new String[] {
+    "Inter-PAN TX \\(.*\\) \\[11 .. 06 .. .. .. .. 21 43 \\]",
+    "Identify request: 0x00",
+  });
+  nexpect(target,
+          "RX inter-PAN message");
+
+  // tidy up
+  post_test(initiator, target);
+}
+
+//==============================
+// Network Update Request tests
+//==============================
+
+void network_update_request_tests(String initiator, String initiatorMode, String target, String targetMode)
+{
+  String nodeIdInitiator;
+  String nodeIdTarget;
+
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  
+  //-------------------------------------
+  // network-update-request
+  //-------------------------------------
+
+  // plugin test-harness z3 touchlink network-update-request <options:4>
+
+  // First, we need to join initiator to target, so we have a network
+  start_network(initiator, target);
+
+  // Do an extra scan for the benefit of the Test Harness plugin, since we
+  // used the regular plugin for the initial touchlink
+  scan_target(initiator, target);
+
+  // set the switch's network update id to a known value
+  expect(initiator,
+         "plugin test-harness z3 nwk set-network-update-id 0x30",
+         "Set network update id: 0x30");
+  expect(target,
+         "plugin test-harness z3 nwk set-network-update-id 0x20",
+         "Set network update id: 0x20");
+  dbg.println("nwkUpdateId zed_switch: " + nwkUpdateId(initiator));
+  dbg.println("nwkUpdateId gateway: " + nwkUpdateId(target));
+
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-update-request 0",
+         "Network update request: 0x00");
+  expect(target, "t........:rx len \\d+, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11"
+     + " seq .. cmd 16 payload\\[.* \\]");
+  
+  assert(nwkUpdateId(target).equals(nwkUpdateId(initiator)));
+  dbg.println("nwkUpdateId zed_switch: " + nwkUpdateId(initiator));
+  dbg.println("nwkUpdateId gateway: " + nwkUpdateId(target));
+  
+  // options = 0x0001 (update id automatically set 5 higher)
+  expect(initiator,
+         "plugin test-harness z3 touchlink network-update-request 1",
+         "Network update request: 0x00");
+  expect(target, "t........:rx len \\d+, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11"
+     + " seq .. cmd 16 payload\\[.* \\]");
+  
+  dbg.println("nwkUpdateId(target) = " + nwkUpdateId(target));
+  dbg.println("nwkUpdateId(initiator) = " + nwkUpdateId(initiator));
+  assert(nwkUpdateId(target).equals("0x35"));
+  assert(nwkUpdateId(initiator).equals("0x30")); // initiator is not updated
+
+  // tidy up
+  post_test(initiator, target);
+}
+
+//=====================
+// Miscellaneous tests
+//=====================
+
+void miscellaneous_tests(String initiator, String initiatorMode, String target, String targetMode)
+{
+  String nodeIdInitiator;
+  String nodeIdTarget;
+
+  prepare_test(initiator, initiatorMode, target, targetMode);
+  
+  //-------------------------------------
+  // device-information-request-w-target
+  //-------------------------------------
+
+  // plugin test-harness z3 touchlink device-information-request-w-target
+  // <startIndex:1> <shortAddress:2> <options:4>
+  // - this command has an explicit target, so we can call it here
+
+  // First, we need to join initiator to target, so we have a network
+  start_network(initiator, target);
+
+  // Do an extra scan for the benefit of the Test Harness plugin, since we
+  // used the regular plugin for the initial touchlink
+  scan_target(initiator, target);
+
+  // make sure the last scan has timed-out
+  networkWait(2000);  // add to original 6 seconds
+  
+  send(initiator,
+         "plugin test-harness z3 touchlink device-information-request-w-target 0x00 "
+         + nodeId(target)
+         + " 0");
+  expect(target,
+         "RX inter-PAN message",10000);
+         
+  // why don't we see this? because the message is not processed by the stack,
+  // but by the framework's interpan plugin - incoming messages are sorted by
+  // the MAC layer in mac-header.c
+  // expect(target,
+         // ("t........:rx len 8, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 11 seq .. cmd 02"
+          // + " payload\\[.. .. .. .. 00 \\]"));
+  expect(initiator,
+         "t........:rx len 42, ep 01, clus 0x1000 \\(ZLL Commissioning\\) FC 19 seq .. cmd 03"
+          + " payload\\[.. .. .. .. 02 00 02 00 00 00 00 00 00 00 01 .* \\]");
+
+  //-------------------------------------
+  // get-group-identifiers-request
+  //-------------------------------------
+
+  // plugin test-harness z3 touchlink get-group-identifiers-request
+  // <startIndex:1>
+  expect(initiator,
+         "plugin test-harness z3 touchlink get-group-identifiers-request 0",
+         "Get group identifiers request: 0x00");
+  expect(target,
+         "clus 0x1000 \\(ZLL Commissioning\\) .* cmd 41 payload\\[00 \\]");
+
+  //-------------------------------------
+  // get-endpoint-list-request
+  //-------------------------------------
+
+  // plugin test-harness z3 touchlink get-endpoint-list-request
+  // <startIndex:1>
+  expect(initiator,
+         "plugin test-harness z3 touchlink get-endpoint-list-request 2",
+         "Get endpoint list request: 0x00");
+  expect(target,
+         "clus 0x1000 \\(ZLL Commissioning\\) .* cmd 42 payload\\[02 \\]");
+
+  // tidy up
+  post_test(initiator, target);
+}
+
+//============================
+// Scan Response Config tests
+//============================
+
+void scan_response_config_tests(String initiator, String initiatorMode, String target, String targetMode)
+{
+  String nodeIdInitiator;
+  String nodeIdTarget;
+
+  prepare_test(initiator, initiatorMode, target, targetMode);
+
+  //-------------------------------------
+  // scan-response-config
+  //-------------------------------------
+  
+  // For this test, we'll join initiator to target (we don't actually need to...)
+  start_network(initiator, target);
+
+  // plugin test-harness z3 touchlink scan-response-config <options:4>
+  expect(target,
+         "plugin test-harness z3 touchlink scan-response-config 4", // delay scan response
+         "Scan response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink scan-request-process 1 0 0",
+         "Scan request process: 0x00");
+  expect(target,
+         "ZLL event handler \\(0x00\\): 0x00", // (0x00) means ZLL_STUFF_EVENT_CONTROL_ACTION_SCAN_RESPONSE
+         8000 + DEFAULT_TIMEOUT);              // 8 seconds is the transaction ID timeout
+         
+  // target sends a scan response, but initiator ignores it...
+  expect(initiator,
+         "clus 0x1000 \\(ZLL Commissioning\\) .* cmd 01");
+         
+  expect(target,
+         "plugin test-harness z3 touchlink scan-response-config 0x10", // key bitmask is 0x0000
+         "Scan response config: 0x00");
+  expect(target,
+         "plugin test-harness z3 set-device-mode 0x02", // ZED, not address assignable
+         "Set device mode: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink scan-request-process 1 0 0",
+         "Scan request process: 0x00");
+  expect(target,
+         "ZLL event handler \\(0x00\\): 0x00"); // (0x00) means ZLL_STUFF_EVENT_CONTROL_ACTION_SCAN_RESPONSE
+  expect(initiator,
+         ("clus 0x1000 \\(ZLL Commissioning\\) .* cmd 01 payload\\["
+          + ".. .. .. .. " // transaction ID
+          + "00 "          // rssi correction
+          + "05 "          // zigbee information, ZR
+          + "80 "          // ZLL info - NFN, no address assignment, no touchlink initiator, yes profile interop
+          + "01 00 "       // key bitmask
+          + ".*"));        // whatever
+  networkWait(DEFAULT_TIMEOUT << 2);
+  
+  expect(target,
+         "plugin test-harness z3 touchlink scan-response-config 0x20", // set reserved info fields
+         "Scan response config: 0x00");
+  expect(target,
+         "plugin test-harness z3 set-device-mode 0x01", // ZR, address assignable
+         "Set device mode: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink scan-request-process 1 0 0",
+         "Scan request process: 0x00");
+  expect(target,
+         "ZLL event handler \\(0x00\\): 0x00"); // (0x00) means ZLL_STUFF_EVENT_CONTROL_ACTION_SCAN_RESPONSE
+  expect(initiator,
+         ("clus 0x1000 \\(ZLL Commissioning\\) .* cmd 01 payload\\["
+          + ".. .. .. .. " // transaction ID
+          + "00 "          // rssi correction
+          + "FD "          // zigbee information, ZR
+          + "F2 "          // ZLL info - NFN, yes address assignment, no touchlink initiator, yes profile interop
+          + "00 80 "       // key bitmask (certification)
+          + ".*"));        // whatever
+  networkWait(DEFAULT_TIMEOUT << 2);
+
+  expect(target,
+         "plugin test-harness z3 touchlink scan-response-config 0x80", // network update id = 0x50
+         "Scan response config: 0x00");
+  expect(initiator,
+         "plugin test-harness z3 touchlink scan-request-process 1 0 0",
+         "Scan request process: 0x00");
+  expect(target,
+         "ZLL event handler \\(0x00\\): 0x00"); // (0x00) means ZLL_STUFF_EVENT_CONTROL_ACTION_SCAN_RESPONSE
+  expect(initiator,
+         ("clus 0x1000 \\(ZLL Commissioning\\) .* cmd 01 payload\\["
+          + ".. .. .. .. " // transaction ID
+          + "00 "          // rssi correction
+          + "05 "          // zigbee information, ZR
+          + "82 "          // ZLL info - NFN, yes address assignment, no touchlink initiator, yes profile interop
+          + "00 80 "       // key bitmask (certification)
+          + ".. .. .. .. " // response ID
+          + "(.. ){8}"     // extended PAN ID
+          + "50 "          // network update ID
+          + ".*"));        // whatever
+  networkWait(DEFAULT_TIMEOUT << 2);
+
+  // tidy up
+  post_test(initiator, target);
+}
+
+// -----------------------------------------------------------------------------
+// Start the test
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+networkWait(3000);
+
+// plugin test-harness z3 platform
+expect("light",
+       "plugin test-harness z3 platform",
+       "EmberZNet stack ver. \\[\\d.\\d.\\d");
+
+// switch off the devices we're not using, in case they respond to our scan requests
+send("light", "plugin test-harness radio off");
+send("gateway", "plugin test-harness radio off");
+send("switch", "plugin test-harness radio off");
+send("zed_switch", "plugin test-harness radio off");
+send("zed_light", "plugin test-harness radio off");
+
+networkWait(6000);
+
+// all tests are independent, and may be run in any order
+
+// NOTE, for all touchlink requests, the initiator must be address assignment
+// capable, otherwise the target will drop the scan request.
+device_info_tests("zed_switch", ZED_AA, "light", ZR_AA);
+device_info_tests("zed_switch", ZED_AA, "zed_light", ZED_AA);
+device_info_tests("gateway", ZR_AA, "light", ZR);
+device_info_tests("light", ZR_AA, "zed_switch", ZED);
+
+network_start_request_tests("zed_switch", ZED_AA, "light", ZR);
+network_join_end_device_request_tests("switch", ZR_AA, "zed_light", ZED_AA);
+network_join_router_request_tests("zed_switch", ZED_AA, "gateway", ZR_AA, "switch", ZR_AA);
+network_join_router_request_tests("switch", ZR_AA, "gateway", ZR, "light", ZR);
+
+identify_request_tests("zed_switch", ZR_AA, "gateway", ZED_AA);
+identify_request_tests("zed_switch", ZED_AA, "gateway", ZR);
+
+network_update_request_tests("zed_switch", ZED_AA, "gateway", ZR_AA);
+network_update_request_tests("switch", ZR_AA, "gateway", ZR);
+
+miscellaneous_tests("zed_switch", ZED_AA, "light", ZR);
+
+// NOTE, for this test the target device mode and type are fixed, so we can
+// easily check the zigbee and touchlink info fields
+scan_response_config_tests("switch", ZR_AA, "gateway", ZR);
+

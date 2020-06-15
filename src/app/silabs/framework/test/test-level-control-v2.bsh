@@ -1,0 +1,304 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create a light, a switch and a combined interface in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"light", "router", "switch"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+  "build/af-test-apps/HaSwitch-simulation/HaSwitch",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+  "build/af-test-apps/HaSwitch-simulation-ezsp/HaSwitch",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+lazyExpect = true;
+
+void fudgeWait(int waitMs)
+{
+  networkWait((int)(waitMs * 1.5));
+}
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+// Set the ExecuteIfOff bit in the Options attribute so that we continue to run
+// with the normal behavior that this test originally tested.
+expect("light", "write 6 0x0008 0x000F 1 0x18 {01}", "Success: write");
+
+// Set up level control attributes:
+//   On/Off Transition Time = 10 ds = 1 second
+//   On Level = 10
+expect("light", "write 6 0x0008 0x0010 1 0x21 {0A 00}", "Success: write");
+expect("light", "write 6 0x0008 0x0011 1 0x20 {0A}", "Success: write");
+
+// Turn the light on and make sure the attribute flips.
+expect("switch", "zcl on-off on", "Msg: clus 0x0006, cmd 0x01, len 3");
+send("switch", "send 0 1 6");
+expect("light", "Light.*0x06.*ON");
+expect("light", "read 6 0x0006 0x0000 1", "01");
+
+// Sleep for the on/off transition time plus some fudge factor.
+fudgeWait(1000);
+
+// Ensure the on-level has been reached
+expect("light", "read 6 0x0008 0x0000 1", "0A");
+
+// Set the level
+expect("light", "write 6 0x0008 0x0000 1 0x20 {14}", "Success: write");
+
+// Turn the light off and make sure the attribute flips.
+expect("switch", "zcl on-off off", "Msg: clus 0x0006, cmd 0x00, len 3");
+send("switch", "send 0 1 6");
+expect("light", "Light.*0x06.*OFF");
+expect("light", "read 6 0x0006 0x0000 1", "00");
+
+// Sleep for the on/off transition time plus some fudge factor.
+fudgeWait(1000);
+
+// The ZCL spec (07-5123-04) says in table 3.46 that when we turn the light
+// off, we should:
+//   1. Store the CurrentLevel in storedLevel.
+//   2. Move CurrentLevel to the minimum level allowed for the device over
+//      OnOffTransitionTime.
+//   3. If the OnLevel is not defined, set the CurrentLevel to the storedLevel
+//      in step 1.
+// Since the OnLevel has been defined (to 0A), then we should have
+// moved to the minimum level allowed for the device.
+expect("light", "read 6 0x0008 0x0000 1", "00");
+
+// Toggle the light on and make sure the attribute flips.
+expect("switch", "zcl on-off toggle", "Msg: clus 0x0006, cmd 0x02, len 3");
+send("switch", "send 0 1 6");
+expect("light", "Light.*0x06.*ON");
+expect("light", "read 6 0x0006 0x0000 1", "01");
+
+// Sleep for the on/off transition time plus some fudge factor.
+fudgeWait(1000);
+
+// Because the OnLevel attribute is set, the level should be
+// 0A rather than the previously-set 14
+expect("light", "read 6 0x0008 0x0000 1", "0A");
+
+// Move to level 0x14 from on-level (0x0A) in 100ms
+expect("switch", "zcl level-control mv-to-level 0x14 0x01 0x00 0x00", "Msg: clus 0x0008, cmd 0x00, len 8");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 00");
+
+// Sleep for the transition time, plus a bit of event-related wiggle room
+fudgeWait(100);
+
+// Ensure we've reached the new level
+expect("light", "read 6 0x0008 0x0000 1", "14");
+
+// Move to 0x0A from 0x14 in 100ms
+expect("switch", "zcl level-control mv-to-level 0x0A 0x01 0x00 0x00", "Msg: clus 0x0008, cmd 0x00, len 8");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 00");
+
+// Sleep for the transition time, plus a bit of event-related wiggle room
+fudgeWait(100);
+
+// Ensure we've reached the new level
+expect("light", "read 6 0x0008 0x0000 1", "0A");
+
+// Move up at a rate of 10 units / second
+expect("switch", "zcl level-control move 0x00 0x0A 0x00 0x00", "Msg: clus 0x0008, cmd 0x01, len 7");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 01");
+
+// Sleep for the at least two seconds so two jumps happen.
+fudgeWait(2000);
+
+// Stop moving
+expect("switch", "zcl level-control stop 0x00 0x00", "Msg: clus 0x0008, cmd 0x03, len 5");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 03");
+
+// Ensure we've reached a higher level
+lazyExpect = false; // we get two lines of output; we want the second
+String level = expect("light", "read 6 0x0008 0x0000 1", "[0-9a-fA-F]{2} ");
+lazyExpect = true;
+int currentLevel = Integer.parseInt(level.trim(), 16);
+assert(0x0A * 3 <= currentLevel && currentLevel <= 0x0A * 4);
+
+// Move down at a rate of 10 units / second
+expect("switch", "zcl level-control move 0x01 0x0A 0x00 0x00", "Msg: clus 0x0008, cmd 0x01, len 7");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 01");
+
+// Sleep for the at least two seconds so two jumps happen.
+fudgeWait(2000);
+
+// Stop moving
+expect("switch", "zcl level-control stop 0x00 0x00", "Msg: clus 0x0008, cmd 0x03, len 5");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 03");
+
+// Ensure we've reached a lower level
+lazyExpect = false; // we get two lines of output; we want the second
+String level = expect("light", "read 6 0x0008 0x0000 1", "[0-9a-fA-F]{2} ");
+lazyExpect = true;
+int currentLevel = Integer.parseInt(level.trim(), 16);
+assert(0x0A <= currentLevel && currentLevel <= 0x0A * 2);
+
+// Step up 10 steps in 1000ms
+expect("light", "write 6 0x0008 0x0000 1 0x20 {0A}", "Success: write");
+expect("switch", "zcl level-control step 0x00 0x0A 0x0A 0x00 0x00", "Msg: clus 0x0008, cmd 0x02, len 9");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 02");
+
+// Sleep for the transition time, plus a bit of event-related wiggle room
+fudgeWait(1000);
+
+// Ensure we've reached the new level
+expect("light", "read 6 0x0008 0x0000 1", "14");
+
+// Step down 10 steps in 1000ms
+expect("switch", "zcl level-control step 0x01 0x0A 0x0A 0x00 0x00", "Msg: clus 0x0008, cmd 0x02, len 9");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 02");
+
+// Sleep for the transition time, plus a bit of event-related wiggle room
+fudgeWait(1000);
+
+// Ensure we've reached the new level
+expect("light", "read 6 0x0008 0x0000 1", "00");
+
+// Move to level with on-off
+expect("switch", "zcl level-control o-mv-to-level 0x0A 0x0A", "Msg: clus 0x0008, cmd 0x04, len 6");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 04");
+
+// Sleep for the transition time, plus a bit of event-related wiggle room
+fudgeWait(1000);
+
+// Ensure we've reached the new level
+expect("light", "read 6 0x0008 0x0000 1", "0A");
+
+// Did the light turn on?
+expect("light", "read 6 0x0006 0x0000 1", "01");
+
+// Move to level with on-off, move downward and ensure light turns off
+expect("switch", "zcl level-control o-mv-to-level 0x00 0x0A", "Msg: clus 0x0008, cmd 0x04, len 6");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 04");
+
+// Sleep for the transition time, plus a bit of event-related wiggle room
+fudgeWait(1000);
+
+// Ensure we've reached the new level
+expect("light", "read 6 0x0008 0x0000 1", "00");
+
+// Did the light turn off?
+expect("light", "read 6 0x0006 0x0000 1", "00");
+
+// Move with on-off up at a rate of 10 units / second
+expect("switch", "zcl level-control o-move 0x00 0x0A", "Msg: clus 0x0008, cmd 0x05, len 5");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 05");
+
+// Sleep for the at least two seconds so two jumps happen.
+fudgeWait(2000);
+
+// Stop moving
+expect("switch", "zcl level-control o-stop", "Msg: clus 0x0008, cmd 0x07, len 3");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 07");
+
+// Ensure we've reached a higher level
+lazyExpect = false; // we get two lines of output; we want the second
+String level = expect("light", "read 6 0x0008 0x0000 1", "[0-9a-fA-F]{2} ");
+lazyExpect = true;
+int currentLevel = Integer.parseInt(level.trim(), 16);
+assert(0x0A * 2 <= currentLevel && currentLevel <= 0x0A * 4);
+
+// Did the light turn on?
+expect("light", "read 6 0x0006 0x0000 1", "01");
+
+// Move withon-off down at a rate of 10 units / second
+expect("switch", "zcl level-control o-move 0x01 0x0A", "Msg: clus 0x0008, cmd 0x05, len 5");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 05");
+
+// Sleep for the at least three seconds so three jumps happen.
+fudgeWait(3000);
+
+// Stop moving
+expect("switch", "zcl level-control o-stop", "Msg: clus 0x0008, cmd 0x07, len 3");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 07");
+
+// Ensure we've reached the lowest level
+expect("light", "read 6 0x0008 0x0000 1", "00");
+
+// Did the light turn off?
+expect("light", "read 6 0x0006 0x0000 1", "00");
+
+// Step with on-off up 10 steps in 1000ms
+expect("light", "write 6 0x0008 0x0000 1 0x20 {00}", "Success: write");
+send("switch", "zcl level-control o-step 0x00 0x0A 0x0A");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 06");
+
+// Sleep for the transition time, plus a bit of event-related wiggle room
+fudgeWait(1000);
+
+// Ensure we've reached the new level
+expect("light", "read 6 0x0008 0x0000 1", "0A");
+
+// Did the light turn on?
+expect("light", "read 6 0x0006 0x0000 1", "01");
+
+// Step with on-off down 10 steps in 1000ms
+send("switch", "zcl level-control o-step 0x01 0x0A 0x0A");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 06");
+
+// Sleep for the transition time, plus a bit of event-related wiggle room
+fudgeWait(1000);
+
+// Ensure we've reached the new level
+expect("light", "read 6 0x0008 0x0000 1", "00");
+
+// Did the light turn off?
+expect("light", "read 6 0x0006 0x0000 1", "00");
+
+// Step up with step size > maximum level - current level
+expect("light", "write 6 0x0008 0x0000 1 0x20 {F5}", "Success: write");
+send("switch", "zcl level-control step 0x00 0x14 0x14 0x00 0x00");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 02");
+
+// Sleep for half the transition time, plus a bit of event-related wiggle room
+fudgeWait(1000);
+
+// We should still see the maximum level
+expect("light", "read 6 0x0008 0x0000 1", "FF");
+
+// Step down with step size > current level - minimum level
+expect("light", "write 6 0x0008 0x0000 1 0x20 {0A}", "Success: write");
+send("switch", "zcl level-control step 0x01 0x14 0x14 0x00 0x00");
+send("switch", "send 0 1 6");
+expect("light", "Level Control.*cmd 02");
+
+// Sleep for half the transition time, plus a bit of event-related wiggle room
+fudgeWait(1000);
+
+// We should still see the minimum level
+expect("light", "read 6 0x0008 0x0000 1", "00");

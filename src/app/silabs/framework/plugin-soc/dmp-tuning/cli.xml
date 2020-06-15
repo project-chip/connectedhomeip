@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-dmp-tuning" name="Plugin Commands: DMP Tuning and Testing">
+    <description>
+      The DMP Tuning and Testing plugin contributes CLI commands to the application framework to be used for initiating actions related to DMP tuning or testing.
+    </description>
+  </group>
+
+  <command cli="plugin dmp-tuning zigbee set-scheduler-priorities" functionName="emberAfPluginDmpTuningSetZigbeeSchedulerPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Set scheduler priorities for zigbee.
+    </description>
+    <arg name="background-rx" type="INT8U" description = "Background RX priority." />
+    <arg name="active-rx" type="INT8U" description = "Active RX priority." />
+    <arg name="active-tx" type="INT8U" description = "Active TX priority." />
+  </command>
+
+  <command cli="plugin dmp-tuning zigbee get-scheduler-priorities" functionName="emberAfPluginDmpTuningGetZigbeeSchedulerPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Get scheduler priorities for zigbee.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning zigbee set-slip-time" functionName="emberAfPluginDmpTuningSetZigbeeSlipTimeCommand" group="plugin-dmp-tuning">
+    <description>
+      Set slip time for zigbee.
+    </description>
+    <arg name="slip-time" type="INT32U" description = "Slip time." />
+  </command>
+
+  <command cli="plugin dmp-tuning zigbee get-slip-time" functionName="emberAfPluginDmpTuningGetZigbeeSlipTimeCommand" group="plugin-dmp-tuning">
+    <description>
+      Get slip time for zigbee.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning ble set-advertisement-priorities" functionName="emberAfPluginDmpTuningSetBleAdvertisementPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Set BLE advertisement scheduler priorities.
+    </description>
+    <arg name="adv_min" type="INT8U" description = "Advertisement scheduler pritority - Min." />
+    <arg name="adv_max" type="INT8U" description = "Advertisement scheduler pritority - Max" />
+  </command>
+
+  <command cli="plugin dmp-tuning ble get-advertisement-priorities" functionName="emberAfPluginDmpTuningGetBleAdvertisementPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Get BLE advertisement scheduler priorities.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning ble set-scan-priorities" functionName="emberAfPluginDmpTuningSetBleScanPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Set BLE scan scheduler priorities.
+    </description>
+    <arg name="scan_min" type="INT8U" description = "Scan scheduler pritority - Min." />
+    <arg name="scan_max" type="INT8U" description = "Scan scheduler pritority - Max." />
+  </command>
+
+  <command cli="plugin dmp-tuning ble get-scan-priorities" functionName="emberAfPluginDmpTuningGetBleScanPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Get BLE scan scheduler priorities.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning ble set-connection-init-priorities" functionName="emberAfPluginDmpTuningSetBleConnectionInitPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Set BLE connection init scheduler priorities.
+    </description>
+    <arg name="init_min" type="INT8U" description = "Connection init scheduler pritority - Min." />
+    <arg name="init_max" type="INT8U" description = "Connection init scheduler pritority - Max." />
+  </command>
+
+  <command cli="plugin dmp-tuning ble get-connection-init-priorities" functionName="emberAfPluginDmpTuningGetBleConnectionInitPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Get BLE connection init scheduler priorities.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning ble set-connection-priorities" functionName="emberAfPluginDmpTuningSetBleConnectionPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Set BLE connection scheduler priorities.
+    </description>
+    <arg name="conn_min" type="INT8U" description = "Connection scheduler pritority - Min." />
+    <arg name="conn_max" type="INT8U" description = "Connection scheduler pritority - Max." />
+  </command>
+
+  <command cli="plugin dmp-tuning ble get-connection-priorities" functionName="emberAfPluginDmpTuningGetBleConnectionPrioritiesCommand" group="plugin-dmp-tuning">
+    <description>
+      Get BLE connection scheduler priorities.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning ble set-rail-priority-mapping" functionName="emberAfPluginDmpTuningSetBleRailMappingCommand" group="plugin-dmp-tuning">
+    <description>
+      Set BLE RAIL priority mapping.
+    </description>
+    <arg name="rail_mapping_offset" type="INT8U" description = "RAIL mapping offset." />
+    <arg name="rail_mapping_range" type="INT8U" description = "RAIL mapping range." />
+  </command>
+
+  <command cli="plugin dmp-tuning ble get-rail-priority-mapping" functionName="emberAfPluginDmpTuningGetBleRailMappingCommand" group="plugin-dmp-tuning">
+    <description>
+      Get BLE RAIL priority mapping.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning rail get-scheduled-event-counters" functionName="emberAfPluginDmpTuningGetRailScheduledEventCounters" group="plugin-dmp-tuning">
+    <description>
+      Get the RAIL config (un)scheduled event counters.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning rail enable-config-scheduler-events" functionName="emberAfPluginDmpTuningEnableRailConfigSchedulerEvents" group="plugin-dmp-tuning">
+    <description>
+      Enable the RAIL config scheduler events.
+    </description>
+  </command>
+
+  <command cli="plugin dmp-tuning rail disable-config-scheduler-events" functionName="emberAfPluginDmpTuningDisableRailConfigSchedulerEvents" group="plugin-dmp-tuning">
+    <description>
+      Disable the RAIL config scheduler events.
+    </description>
+  </command>
+
+<command cli="plugin dmp-tuning rail get-config-scheduler-events-enabled" functionName="emberAfPluginDmpTuningGetRailConfigSchedulerEventsEnabled" group="plugin-dmp-tuning">
+    <description>
+      Get the enable state of the RAIL config scheduler events.
+    </description>
+  </command>
+
+</cli>

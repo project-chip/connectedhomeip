@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-find-and-bind-initiator"
+         name="Plugin Commands: Find and Bind Initiator">
+    <description>
+      Commands for the finding and binding initiator process from the Base Device Behavior spec.
+    </description>
+  </group>
+
+  <command cli="plugin find-and-bind initiator"
+           functionName="emberAfPluginFindAndBindInitiatorStartCommand"
+           group="plugin-find-and-bind-initiator">
+    <arg name="endpoint"
+         type="INT8U"
+         description="The endpoint on which to begin the Finding and Binding initiator process." />
+    <description>
+      Makes this node start the initiator part of the finding and binding process.
+    </description>
+  </command>
+           
+</cli>

@@ -1,0 +1,82 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {
+  System.out.print("**** Since we moved most of the code to teh stack, the expect statements do not work for host app.  ****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"zc", "zr"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation/HaLight",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation-ezsp/HaHomeGateway",
+  "build/af-test-apps/HaLight-simulation-ezsp/HaLight",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+setNetworkParams(11, 2, 0x1234); // channel, power, PAN ID
+
+networkForm("zc");
+networkWait(DEFAULT_TIMEOUT);
+ 
+networkJoinTo("zr", "zc");
+networkWait(DEFAULT_TIMEOUT);
+
+//-----------------------------------------------------------------------------
+// EMINSIGHT-2484 - allow application to decide if routers should send MTORRs.
+
+void expectMtorr(String device, boolean expect)
+{
+  expect(device,
+         "plugin concentrator start",
+         ".* sec until next MTORR broadcast");
+  if (expect) {
+    expect(device,
+           ".*send MTORR",
+           10000 + DEFAULT_TIMEOUT);
+  } else { // nexpect
+    nexpect(device,
+            ".*send MTORR",
+            10000 + DEFAULT_TIMEOUT);
+  }
+}
+
+// First, make sure coordinators continue to send MTORRs regardless of
+// router behavior.
+expectMtorr("zc", true); // expect
+
+// First, make sure router  send MTORRs by default, unless it is compiled otherwise
+expectMtorr("zr", true); // expect
+
+/* We do not have support to change the behavior at run-time. if still needed, we must add ezsp support for this.
+expect("zc",
+       "plugin concentrator set-router-behavior 0",
+       ".*Set concentrator router behavior to: 0x00");
+expectMtorr("zc", true); // expect
+
+
+// Next make sure router MTORR behavior depends on the setting.
+// If we set the router behavior to FULL, then the router should send MTORRs.
+expect("zr",
+       "plugin concentrator set-router-behavior 1",
+       ".*Set concentrator router behavior to: 0x01");
+expectMtorr("zr", true); // expect
+// If we set the router behavior to NONE, then the router should not send MTORRs.
+expect("zr",
+       "plugin concentrator set-router-behavior 0",
+       ".*Set concentrator router behavior to: 0x00");
+expectMtorr("zr", false); // nexpect
+
+// Sanity check for bad router behavior values...
+expect("zr",
+       "plugin concentrator set-router-behavior 2",
+       ".*Illegal concentrator router behavior: 0x02");
+*/

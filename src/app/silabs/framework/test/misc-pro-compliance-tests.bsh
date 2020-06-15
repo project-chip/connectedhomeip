@@ -1,0 +1,98 @@
+/*
+ * original purgpose of this test is to test EMZIGBEE-3433, but it can be used
+ * to perfrom any test that might use pro-compliance
+ */
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingHostApps) {
+  // pro-compliance is only used as an SOC device
+  std.print("** this test is soc only **");
+  return;
+}
+
+lazyExpect = true;
+SimulatedNetwork network;
+
+String socImage = "build/pro-compliance-unix-simulation/pro-compliance";
+String hostImage = "";
+String ncpImage = "";
+
+String setSecurityCommandString = "set_security 0x0304 {abcdef01234567890000000000000000} {aaaaaaaaaaaaaaaabbbbbbbbbbbbbbbb} 0";
+
+// ----------------------------------------------------------------------------
+// Helper Functions
+
+void startNetworkAndAddDevices(String[] deviceNames) {
+  network = createNetwork();
+  int deviceNum = deviceNames.length;
+  String[] socImageList = new String[deviceNum];
+  String[] hostImageList = new String[deviceNum];
+  String[] ncpImageList = new String[deviceNum];
+  for (int i = 0; i < deviceNum; i++) {
+    socImageList[i] = socImage;
+    hostImageList[i] = hostImage;
+    ncpImageList[i] = ncpImage;
+  }
+  addAndLoadDevices(deviceNames, socImageList, hostImageList, ncpImageList);
+  setupEncryption();
+}
+
+void formNetwork(String device, int channel, String pan, int power) {
+  send(device, setSecurityCommandString);
+  networkWait(500);
+  expect(device, "form " + channel + " " + pan + " " + power, "Formed");
+  expect(device, "permit_joins 0xff", "permitJoining.*");
+}
+
+void joinNetwork(String device, int channel, String pan, int power) {
+  send(device, setSecurityCommandString);
+  networkWait(500);
+  expect(device, "join " + channel + " " + pan + " " + power, "Stack up id");
+}
+
+void joinNetworkEndDevice(String device, int channel, String pan, int power) {
+  send(device, setSecurityCommandString);
+  networkWait(500);
+  expect(device, "join_end " + channel + " " + pan + " " + power, "Stack up id");
+}
+
+// ----------------------------------------------------------------------------
+// Test Functions
+
+// Test for EMZIGBEE-3433
+// 
+// Issue: Leave Announces not being handled correctly when 
+// EMBER_NWK_LEAVE_WITHOUT_REJOIN_NOT_ALLOWED is set.  When handling a leave
+// announce the device should be removed from the table
+// 
+// Requires 1 router, 1 End Device as child
+// The extended security bitmask should have EMBER_NWK_LEAVE_WITHOUT_REJOIN_NOT_ALLOWED
+// bit set
+// 1) child leaves network, sends leave announce
+// 2) router *should* remove child from tables
+void test_networkLeaveAnnounceHandledCorrectly()
+{
+  String[] names = {"parent", "child"};
+  startNetworkAndAddDevices(names);
+  int channel = 15;
+  String panId = "0x0416";
+  int power = 1;
+  // Desired extended security settings on TC
+  // EMBER_NWK_LEAVE_WITHOUT_REJOIN_NOT_ALLOWED = 0x0040
+  int extBitmask = 0x0040;
+  // Form a network and have the child join as an end device
+  formNetwork("parent", channel, panId, power);
+  send("parent", "set_ext_bmask " + extBitmask);
+  joinNetworkEndDevice("child", channel, panId, power);
+  networkWait(1000);
+  // Check the child table for a corresponding entry
+  expect("parent", "children", "Entries in use: 1");
+  // Have the child leave and verify the entry has been removed
+  expect("child", "leave", "Stack down status:");
+  expect("parent", "children", "Entries in use: 0");
+}
+
+test_networkLeaveAnnounceHandledCorrectly();

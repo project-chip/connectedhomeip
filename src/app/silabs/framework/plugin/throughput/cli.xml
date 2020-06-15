@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-throughput" name="Plugin Commands: Throughput">
+    <description>
+      The throughput commands allow you to test your application's network throughput 
+    </description>
+  </group>
+  <command cli="plugin throughput start" functionName="emAfPluginThroughputCliStartTest" group="plugin-throughput">
+    <description>
+      Start the throughput test.
+    </description>
+  </command>
+  <command cli="plugin throughput stop" functionName="emAfPluginThroughputCliStopTest" group="plugin-throughput">
+    <description>
+      Abort the test while running.
+    </description>
+  </command>
+  <command cli="plugin throughput print-result" functionName="emAfPluginThroughputCliPrintResult" group="plugin-throughput">
+    <description>
+      Show the results of the last test.
+    </description>
+  </command>
+  <command cli="plugin throughput set-destination" functionName="emAfPluginThroughputCliSetDestination" group="plugin-throughput">
+    <description>
+      Set the destination nodeId
+    </description>
+	<arg name="nodeId" type="INT16U" description="Destination nodeId" />
+  </command>
+  <command cli="plugin throughput set-interval" functionName="emAfPluginThroughputCliSetInterval" group="plugin-throughput">
+    <description>
+      Set the interval 
+    </description>
+	<arg name="interval" type="INT16U" description="Interval in ms" />
+  </command> 
+  <command cli="plugin throughput set-timeout" functionName="emAfPluginThroughputCliSetTestTimeout" group="plugin-throughput">
+    <description>
+      Set the test timeout 
+    </description>
+	<arg name="timeout" type="INT32U" description="Timeout in ms" />
+  </command>   
+  <command cli="plugin throughput set-count" functionName="emAfPluginThroughputCliSetTestCount" group="plugin-throughput">
+    <description>
+      Set the number of packets to send 
+    </description>
+	<arg name="count" type="INT16U" description="Packets to send" />
+  </command>
+  <command cli="plugin throughput set-inflight" functionName="emAfPluginThroughputCliSetInFlightCount" group="plugin-throughput">
+    <description>
+      Set the number of packets in flight during the test.
+    </description>
+    <arg name="inflight_count" type="INT8U" description="Packets in flight" />
+  </command>
+  <command cli="plugin throughput set-packet-size" functionName="emAfPluginThroughputCliSetPacketSize" group="plugin-throughput">
+    <description>
+      Set the packet length
+    </description>
+	<arg name="packet" type="INT8U" description="Packet length in bytes" />
+  </command>
+  <command cli="plugin throughput set-all" functionName="emAfPluginThroughputCliSetAllParameters" group="plugin-throughput">
+    <description>
+      Set all parameters: Destination Count Interval packetLength maxInFlight testTimeout
+    </description>
+  <arg name="nodeId" type="INT16U" description="Destination nodeId" />
+  <arg name="count" type="INT16U" description="Packets to send" />
+  <arg name="interval" type="INT16U" description="Interval in ms" />
+  <arg name="packet" type="INT8U" description="Packet length in bytes" />
+  <arg name="inflight_count" type="INT8U" description="Packets in flight" />
+  <arg name="apsOptions" type="INT16U" description="APS Options" />
+  <arg name="timeout" type="INT32U" description="Timeout in ms" />
+  </command>
+  <command cli="plugin throughput set-aps-ack-off" functionName="emAfPluginThroughputCliSetApsAckOff" group="plugin-throughput">
+    <description>
+      Turn off APS acks
+    </description>
+  </command>  
+  <command cli="plugin throughput set-aps-ack-on" functionName="emAfPluginThroughputCliSetApsAckOn" group="plugin-throughput">
+    <description>
+      Turn on APS acks
+    </description>
+  </command> 
+  <command cli="plugin throughput print-parameters" functionName="emAfPluginThroughputCliPrintParameters" group="plugin-throughput">
+    <description>
+      Print all the test parameters
+    </description>
+  </command>
+  <command cli="plugin throughput print-counters" functionName="emAfPluginThroughputCliPrintCounters" group="plugin-throughput">
+    <description>
+      Print the stack counters
+    </description>
+  </command>
+  <command cli="plugin throughput clear-counters" functionName="emAfPluginThroughputCliClearCounters" group="plugin-throughput">
+    <description>
+      Clear all the stack counters 
+    </description>
+  </command>
+</cli>

@@ -1,0 +1,65 @@
+/** @brief
+ *
+ * This function is called from the Micrium RTOS plugin before the
+ * Application (1) task is created.
+ */
+void emberAfPluginMicriumRtosAppTask1InitCallback(void)
+{
+}
+
+/** @brief
+ *
+ * This function implements the Application (1) task main loop.
+ *
+ * @param p_arg Ver.: always
+ */
+void emberAfPluginMicriumRtosAppTask1MainLoopCallback(void *p_arg)
+{
+  while (true) {
+    // Main loop
+  }
+}
+
+/** @brief
+ *
+ * This function is called from the Micrium RTOS plugin before the
+ * Application (2) task is created.
+ */
+void emberAfPluginMicriumRtosAppTask2InitCallback(void)
+{
+}
+
+/** @brief
+ *
+ * This function implements the Application (2) task main loop.
+ *
+ * @param p_arg Ver.: always
+ */
+void emberAfPluginMicriumRtosAppTask2MainLoopCallback(void *p_arg)
+{
+  while (true) {
+    // Main loop
+  }
+}
+
+/** @brief
+ *
+ * This function is called from the Micrium RTOS plugin before the
+ * Application (3) task is created.
+ */
+void emberAfPluginMicriumRtosAppTask3InitCallback(void)
+{
+}
+
+/** @brief
+ *
+ * This function implements the Application (3) task main loop.
+ *
+ * @param p_arg Ver.: always
+ */
+void emberAfPluginMicriumRtosAppTask3MainLoopCallback(void *p_arg)
+{
+  while (true) {
+    // Main loop
+  }
+}

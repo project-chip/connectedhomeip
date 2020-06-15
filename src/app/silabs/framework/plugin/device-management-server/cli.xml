@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-device-management-server" name="Plugin Commands: Device Management Server">
+    <description>
+      The device management server plugin contributes CLI commands to the application framework to be used for getting, setting, and displaying information relevant to the Smart Energy 1.2 Device Management Cluster.
+    </description>
+  </group>
+  <command cli="plugin device-management-server print" functionName="emAfDeviceManagementServerCliPrint" group="plugin-device-management-server">
+    <description>
+      Print the info relevant to device management.
+    </description>
+  </command>
+  <command cli="plugin device-management-server provider-id" functionName="emAfDeviceManagementServerCliProviderId" group="plugin-device-management-server">
+    <description>
+      Set the provider id.
+    </description>
+    <arg name="providerId"        type="INT32U"   />
+  </command>
+  <command cli="plugin device-management-server issuer-event-id" functionName="emAfDeviceManagementServerCliIssuerEventId" group="plugin-device-management-server">
+    <description>
+      Set the issuer event id.
+    </description>
+    <arg name="issuerEventId"     type="INT32U"   />
+  </command>
+  <command cli="plugin device-management-server tariff-type" functionName="emAfDeviceManagementServerCliTariffType" group="plugin-device-management-server">
+    <description>
+      Set the tariff type.
+    </description>
+    <arg name="tariffType"        type="INT8U"   />
+  </command>
+  
+  <command cli="plugin device-management-server tenancy" functionName="emAfDeviceManagementServerCliTenancy" group="plugin-device-management-server">
+    <description>
+      Set the tenancy information.
+    </description>
+    <arg name="implementationDateTime" type="UTC_TIME" />
+    <arg name="tenancy"                type="INT32U"   />
+  </command>
+  <command cli="plugin device-management-server supplier" functionName="emAfDeviceManagementServerCliSupplier" group="plugin-device-management-server">
+    <description>
+      Set the supplier information.
+    </description>
+    <arg name="endpoint"                       type="INT8U"        />
+    <arg name="proposedProviderId"             type="INT32U"       />
+    <arg name="implementationDateTime"         type="UTC_TIME"     />
+    <arg name="providerChangeControl"          type="BITMAP32"     />
+    <arg name="proposedProviderName"           type="OCTET_STRING" />
+    <arg name="proposedProviderContactDetails" type="OCTET_STRING" />
+
+  </command>
+  <command cli="plugin device-management-server site-id" functionName="emAfDeviceManagementServerCliSiteId" group="plugin-device-management-server">
+    <description>
+      Set the site id information.
+    </description>
+    <arg name="siteId"     type="OCTET_STRING" />
+    <arg name="implementationDateTime" type="UTC_TIME"     />
+  </command>
+  <command cli="plugin device-management-server cin" functionName="emAfDeviceManagementServerCliCIN" group="plugin-device-management-server">
+    <description>
+      Set the customer id number information.
+    </description>
+    <arg name="cin"                type="OCTET_STRING" />
+    <arg name="implementationDateTime" type="UTC_TIME"     />
+  </command>
+  <command cli="plugin device-management-server password" functionName="emAfDeviceManagementServerCliPassword" group="plugin-device-management-server">
+    <description>
+      Set the specified password.
+    </description>
+    <arg name="password"               type="OCTET_STRING" />
+    <arg name="implementationDateTime" type="UTC_TIME"     />
+    <arg name="durationInMinutes"      type="INT16U"       />
+    <arg name="passwordType"           type="INT8U"        />
+  </command>
+  <command cli="plugin device-management-server pub-chg-of-tenancy" functionName="emAfDeviceManagementServerCliPublishChangeOfTenancy" group="plugin-device-management-server">
+    <description>
+      Send PublishChangeOfTenancy command
+    </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+  </command>
+  <command cli="plugin device-management-server pub-chg-of-supplier" functionName="emAfDeviceManagementServerCliPublishChangeOfSupplier" group="plugin-device-management-server">
+    <description>
+      Send PublishChangeOfSupplier command
+    </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+  </command>
+  <command cli="plugin device-management-server update-site-id" functionName="emAfDeviceManagementServerCliUpdateSiteId" group="plugin-device-management-server">
+    <description>
+      Send UpdateSiteId command
+    </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+  </command>
+  <command cli="plugin device-management-server update-cin" functionName="emAfDeviceManagementServerCliUpdateCIN" group="plugin-device-management-server">
+    <description>
+      Send UpdateCIN command
+    </description>
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+  </command>
+  <command cli="plugin device-management-server pending-updates" functionName="emAfDeviceManagementServerCliPendingUpdates" group="plugin-device-management-server">
+    <description>
+      Set appropriate flag for pending updates. Details for each pending flag can be found via definition of EmberAfDeviceManagementChangePendingFlags.
+    </description>
+    <arg name="pendingUpdatesMask"             type="INT8U"  description="A bitmask that determines if there's a valid pending update for different actions" />
+  </command>
+  <command cli="plugin device-management-server send-req-new-pass-resp" functionName="emAfDeviceManagementServerCliSendRequestNewPasswordResponse" group="plugin-device-management-server">
+    <description>
+      Send unsolicited request new password response.
+    </description>
+    <arg name="passwordType"       type="INT8U"   description="Service Producer or Consumer." />
+    <arg name="server"             type="INT16U"  description="The network address of the server to which the response will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+  </command>
+</cli>

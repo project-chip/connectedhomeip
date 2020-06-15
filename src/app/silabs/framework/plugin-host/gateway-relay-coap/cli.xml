@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-gateway-relay-coap" name="Plugin Commands: Gateway Relay Coap">
+    <description>
+      Gateway relay coap commands support communicating with the gateway using dotdot.
+    </description>
+  </group>
+  <command cli="plugin gateway-relay-coap parse" functionName="emberAfPluginGatewayRelayCoapParseCommand" group="plugin-gateway-relay-coap">
+    <description>
+      Take a dotdot command string and parse it.
+    </description>
+    <arg name="dotdotString"  type="OCTET_STRING" description="dotdot string"/>
+  </command>
+  <command cli="plugin gateway-relay-coap set-server" functionName="emberAfPluginGatewayRelayCoapSetServerCommand" group="plugin-gateway-relay-coap">
+    <description>
+      Set the server to which the Gatweay will send responses.
+    </description>
+    <arg name="serverAddress"  type="OCTET_STRING" description="Server Address"/>
+    <arg name="serverPort"  type="INT16U" description="Server Port"/>
+  </command>
+  <command cli="plugin gateway-relay-coap send" functionName="emberAfPluginGatewayRelayCoapSendCommand" group="plugin-gateway-relay-coap">
+    <description>
+      Send message to the server.
+    </description>
+    <arg name="testString"  type="OCTET_STRING" description="Test string"/>
+  </command>
+  <command cli="plugin gateway-relay-coap sendp" functionName="emberAfPluginGatewayRelayCoapSendPortCommand" group="plugin-gateway-relay-coap">
+    <description>
+      Send a test message to the server on the port specified.
+    </description>
+    <arg name="testString"  type="OCTET_STRING" description="Test string"/>
+    <arg name="port"  type="INT16U" description="Port"/>
+  </command>
+  <command cli="plugin gateway-relay-coap hbstart" functionName="emberAfPluginGatewayRelayCoapStartHeartbeatCommand" group="plugin-gateway-relay-coap">
+    <description>
+      Start sending the heartbeat messages to the gateway server.
+    </description>
+    <arg name="period"  type="INT16U" description="Period (seconds)"/>
+  </command>
+  <command cli="plugin gateway-relay-coap hbstop" functionName="emberAfPluginGatewayRelayCoapStopHeartbeatCommand" group="plugin-gateway-relay-coap">
+    <description>
+      Stop sending the heartbeat messages to the gateway server.
+    </description>
+  </command>
+</cli>

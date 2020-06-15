@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-metering-server" name="Plugin Commands: Simple Metering Server">
+    <description>
+      The metering-server plugin contributes CLI commands to the application framework to be used in conjunction with the Simple Metering cluster in a server context.
+    </description>
+  </group>
+  <command cli="plugin metering-server profiles" functionName="emberAfPluginMeteringServerCliProfiles" group="plugin-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Turn on and off profiles on the test meter server.
+    </description>
+    <arg name="profileType" type="INT8U" description="The profile to set" />
+  </command>
+  <command cli="plugin metering-server toggle-fast-poll-mode" functionName="emberAfPluginMeteringServerCliDisableFastPolling" group="plugin-metering-server">
+    <description>
+      Disable fast polling mode for testing.
+    </description>
+    <arg name="enableFastPolling"     type="BOOLEAN"   description="0 to disable fast polling mode and any other value to enable it" />
+  </command>
+</cli>

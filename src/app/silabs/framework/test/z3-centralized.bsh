@@ -1,0 +1,660 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (!runArgument.runUsingHostApps) {
+  // The Z3 Gateway can only be compiled as a host
+  std.print("** this test is only run in host mode ** ");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"gateway", "light", "switch", "gateway2", "switch2", "gateway3", "light2", "switch3"};
+String[] socImages = new String[] {
+  // The Z3 Gateway can only be compiled as a host
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+  "build/af-test-apps/Z3Light-simulation-ezsp/Z3Light",
+  "build/af-test-apps/Z3Switch-simulation-ezsp/Z3Switch",
+  "build/af-test-apps/Z3Gateway-simulation-ezsp-EMBER_AF_PLUGIN_NETWORK_CREATOR_SECURITY_BDB_JOIN_USES_INSTALL_CODE_KEY/Z3Gateway",
+  "build/af-test-apps/Z3Switch-simulation-ezsp/Z3Switch",
+  "build/af-test-apps/Z3Gateway-simulation-ezsp/Z3Gateway",
+  "build/af-test-apps/Z3Light-simulation-ezsp/Z3Light",
+  "build/af-test-apps/Z3Switch-simulation-ezsp-EMBER_AF_PLUGIN_NETWORK_STEERING_TRY_ALL_KEYS/Z3Switch",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+lazyExpect = true;
+
+void RESET(String node)
+{
+  send(node, "option binding-table clear");
+  send(node, "keys clear");
+  expect(node, "net leave", "EMBER_NETWORK_DOWN");
+  reboot(node);
+  networkWait(DEFAULT_TIMEOUT);
+}
+
+void testJoiningAndKeyUpdate(String device)
+{
+  dbg.println("=== Testing join from line " + this.namespace.getInvocationLine() + " ===");
+
+  // Make sure the device joins.
+  expect(device,
+         "EMBER_NETWORK_UP",
+         DEFAULT_TIMEOUT << 4);
+
+  // Since this is a centralized network, the device should update the trust
+  // center link key with the gateway.
+  // The device should find that the gateway is an R21 device.
+  expect(device,
+         "Starting update trust center link key process: 0x00",
+         DEFAULT_TIMEOUT << 1);
+  expect(device,
+         "RX: Node Desc Resp, Matches: 0x0000",
+         DEFAULT_TIMEOUT << 1);
+
+  // Make sure the trust center link key was successfully established...
+  expectMultiline(device,
+                  new String[] {
+                    "New key established: 0x03",
+                    "Partner: 00 00 00 00 00 00 00 0[12]",
+                  });
+  expect(device,
+         "Trust center link key update status: 0x03",
+         DEFAULT_TIMEOUT << 1);
+
+  // ...and make sure the trust center link key was successfully verified.
+  expectMultiline(device,
+                  new String[] {
+                    "Update TC Link Key: New key established: 0x65",
+                    "Partner: 00 00 00 00 00 00 00 0[12]",
+                  });
+  expect(device,
+         "Trust center link key update status: 0x65");
+
+  // The device should then extend the network by broadcasting permit join.
+  expect(device,
+         "Broadcasting permit join: 0x00",
+         DEFAULT_TIMEOUT << 1);
+
+  // Make sure we are not using the ZigbeeAlliance09 or distributed key.
+  nexpect(device,
+          "keys print",
+          "5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39",
+          1000);
+  nexpect(device,
+          "keys print",
+          "D0 D1 D2 D3 D4 D5 D6 D7  D8 D9 DA DB DC DD DE DF",
+          1000);
+}
+
+// Get the frame counter value of a child from the child table
+String getFrameCounterVal(String childTableString) {
+  String frameCounter;
+  Pattern p = Pattern.compile("0x[A-Z0-9]{8}$");
+  Matcher m = p.matcher(childTableString.replaceAll("\\s",""));
+
+  if (m.find()) {
+    frameCounter = m.group();
+  }
+  return frameCounter;
+}
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices,
+                  socImages,
+                  hostImages,
+                  ncpImage);
+setupEncryption();
+
+// Turn off the light so that it doesn't start looking for a network to join.
+power("light", false);
+
+// Check inital base device masks.
+expectMultiline("gateway",
+                "plugin network-creator status",
+                new String[]  {
+                  "(1).*[11, 15, 20, 25]",
+                  "(2).*[12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26]",
+                });
+
+// Check channel mask manipulators.
+// Make the gateway form a network on a secondary channel, 12.
+expect("gateway",
+       "plugin network-creator mask add 1 26",
+       ".* channel mask now:.*\\[11, 15, 20, 25, 26\\]");
+expect("gateway",
+       "plugin network-creator mask subtract 1 20",
+       ".* channel mask now:.*\\[11, 15, 25, 26\\]");
+expect("gateway",
+       "plugin network-creator mask add 2 11",
+       ".* channel mask now:.*\\[11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26\\]");
+expect("gateway",
+       "plugin network-creator mask subtract 2 14",
+       ".* channel mask now:.*\\[11, 12, 13, 16, 17, 18, 19, 21, 22, 23, 24, 26\\]");
+expect("gateway",
+       "plugin network-creator mask set 1 0x00000000",
+       "Primary channel mask now:.*\\[\\]");
+expect("gateway",
+       "plugin network-creator mask set 2 0x00001000",
+       "Secondary channel mask now:.*\\[12\\]");
+
+// The gateway forms a centralized network.
+send("gateway", "plugin network-creator start 1");
+expect("gateway",
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+
+// Make sure the gateway didn't send itself a node descriptor request to begin
+// the TCLK update process.
+nexpect("gateway",
+        "RX: Node Desc Resp, Matches: 0x0000");
+
+// Make sure the gateway forms on 12 with a short address of 0 since it formed
+// a centralized network.
+assert(channel("gateway").equals("12"));
+assert(nodeId("gateway").equals("0x0000"));
+
+// Make sure we are not using the ZigbeeAlliance09 or distributed key.
+nexpect("gateway",
+        "keys print",
+        "5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39");
+nexpect("gateway",
+        "keys print",
+        "D0 D1 D2 D3 D4 D5 D6 D7  D8 D9 DA DB DC DD DE DF");
+
+// Open the network for joining using the gateway.
+expect("gateway",
+       "plugin network-creator-security open-network",
+       "Open network: 0x00");
+
+// Turn on the light.
+power("light", true);
+
+// The light should automatically join the gateway's network.
+testJoiningAndKeyUpdate("light");
+
+// The light should be identifying.
+send("gateway", "zcl identify query");
+send("gateway", "send " + nodeId("light") + " 1 1");
+expect("light", "RX len 3, ep 01, clus 0x0003 \\(Identify\\) FC 01 seq .. cmd 01 payload\\[\\]");
+expect("gateway", "RX len 5, ep 01, clus 0x0003 \\(Identify\\) FC 09 seq .. cmd 00 payload\\[.. .. \\]");
+
+// Join with the switch. Make sure the switch joins at the light so we have
+// a P3 network.
+send("gateway", "network pjoin 0");
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+networkWait(timeout);       // there was a beacon collision hence adding a delay to avoid it.
+testJoiningAndKeyUpdate("switch");
+
+// The switch should perform finding and binding with the light.
+networkWait(DEFAULT_TIMEOUT);
+expect("switch",
+       "option binding-table print",
+       "UNICA.*0x0006.*" + nodeId("light"));
+
+// We should be able to turn the light ON...
+send("switch", "zcl on-off on");
+send("switch", "bsend 1");
+networkWait(1000); // wait
+expect("light", "read 1 6 0 1", "^01 $");
+
+// ...and we should be able to turn the light OFF.
+send("switch", "zcl on-off off");
+send("switch", "bsend 1");
+networkWait(1000); // wait
+expect("light", "read 1 6 0 1", "^00 $");
+
+// EMSTACK-2801 - make sure that the trust center doesn't leave when it receives
+// a zdo leave.
+send("switch", "zdo leave " + nodeId("gateway") + " 0 0");
+nexpect("gateway", "EMBER_NETWORK_DOWN");
+
+// Reset the switch to factory new so that we make sure we can rejoin.
+RESET("switch");
+
+// Broadcast permit join to open the network.
+expect("gateway", "network broad-pjoin 180", "pJoin for 180 sec: 0x00");
+
+// Clear the transient link keys.
+expect("gateway",
+       "plugin network-creator-security clear-joining-link-keys",
+       "Clear joining link keys: 0x00");
+
+// We should not be able to join with the switch since the gateway does not have
+// any transient keys in the stack.
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+nexpect("switch", "EMBER_NETWORK_UP", DEFAULT_TIMEOUT << 5);
+
+// Add a transient key just for the switch.
+String euiSwitch = eui64("switch");
+networkWait(2000);
+
+expect("gateway",
+       ("plugin network-creator-security set-joining-link-key "
+        + "{" + euiSwitch + "} "
+        + "{5A6967426565416C6C69616E63653039}"),
+       "Set joining link key: 0x00");
+
+// Stop the light from identifying. This will help us test the case where
+// finding and binding does not happen because the light is no longer in
+// target mode.
+expect("light", "write 1 0x0003 0x0000 1 0x21 {0000}", "Success: write");
+
+// The switch should be able to join now since we re-added a transient key for
+// it to use during joining. Again, make the switch join at the light.
+send("gateway", "network pjoin 0");
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+testJoiningAndKeyUpdate("switch");
+
+// Wait for commissioning to finish. Since the light is no longer identifying
+// that means the switch should not form any bindings.
+expect("light", "read 1 0x0003 0x0000 1", "00 00");
+networkWait(DEFAULT_TIMEOUT << 2);
+nexpect("switch",
+        "option binding-table print",
+        "UNICA.*0x0006.*" + nodeId("light"));
+
+// EMAPPFWKV2-1617: a button press will put the light back in find and bind
+// target mode. This means when we trigger finding and binding on the switch,
+// it will create bindings to the light this time.
+network.pressButton("light", "0");
+network.releaseButton("light", "0");
+expect("light", "Find and bind target start: 0x00");
+send("switch", "plugin find-and-bind initiator 1");
+networkWait(DEFAULT_TIMEOUT << 2);
+expect("switch",
+       "option binding-table print",
+       "UNICA.*0x0006.*" + nodeId("light"));
+
+// Reset the switch again so we can rejoin.
+RESET("switch");
+
+// Reboot the gateway to test functionality after reset.
+reboot("gateway");
+
+// EMSTACK-2801: try to make the trust center leave again, testing that
+// it retains its extended security bitmask EMBER_NWK_LEAVE_REQUEST_NOT_ALLOWED
+// bit across reboot.
+send("light", "zdo leave " + nodeId("gateway") + " 0 0");
+nexpect("gateway", "EMBER_NETWORK_DOWN");
+
+// Set up the gateway so that the switch should be able to happily join.
+expect("gateway",
+       ("plugin network-creator-security set-joining-link-key "
+        + "{" + euiSwitch + "} "
+        + "{5A6967426565416C6C69616E63653039}"),
+       "Set joining link key: 0x00");
+expect("gateway", "network broad-pjoin 180", "pJoin for 180 sec: 0x00");
+networkWait(5000);
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+testJoiningAndKeyUpdate("switch");
+
+// EMZIGBEE-662 Make sure joining with a wildcard transient key works
+expect("gateway", "plugin network-creator-security open-network", ".*Open network: 0x00");
+RESET("light");
+// Insert 5 transient keys on the light, with the last one being the one needed
+// to join
+send("light", "plugin network-creator-security set-joining-link-key {FFFFFFFFFFFFFFFF} {d0d1d2d3d4d5d6d7d8d9d0d1d2d3d4d5}");
+send("light", "plugin network-creator-security set-joining-link-key {FFFFFFFFFFFFFFFF} {deadbeefdeadbeefdeadbeefdeadbeef}");
+send("light", "plugin network-creator-security set-joining-link-key {FFFFFFFFFFFFFFFF} {cabba0789feedfeed0612948abcdef09}");
+send("light", "plugin network-creator-security set-joining-link-key {FFFFFFFFFFFFFFFF} {aabbccddeeff00112233445566778899}");
+send("light", "plugin network-creator-security set-joining-link-key {FFFFFFFFFFFFFFFF} {5A6967426565416C6C69616E63653039}");
+
+// The light should automatically join the gateway's network.
+
+// The light should join on the first network-steering state (Use Install Code)
+// because we've given it the well-known key via the transient key table
+// It should never reach the Use Centralized Key state
+nexpect("light", ".*and Use Centralized Key.*", 10000);
+
+// To make sure the light joined successfully, we compare network params to the
+// coordinator
+assert(channel("light").equals("12"));
+assert(panId("light").equals(panId("gateway")));
+
+// Give time for Light to complete network steering and turn pjoin on
+// so that we can turn it off later. 
+networkWait(10000);
+
+// Have the light leave and try to join gateway2
+// gateway2 only allows joins where the device has an entry in the transient
+// key table
+
+expect("gateway",
+       "network pjoin 0",
+       "pJoin for 0 sec: 0x00");
+
+expect("gateway",
+       "plugin network-creator-security close-network",
+       "Close network: 0x00");
+
+expect("light",
+       "network pjoin 0",
+       "pJoin for 0 sec: 0x00");
+
+// A later test wants a reduced child table. Make that change now before we go
+// network up because after we won't be able to
+expect("gateway2",
+       "plugin test-harness set-max-children 2",
+       ".*Set maximum children to 2");
+networkWait(2000);
+
+expect("gateway2",
+       "plugin network-creator start 1",
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+
+networkWait(2000);
+
+expect("gateway2",
+       "network pjoin 254",
+       "pJoin for 254 sec: 0x00");
+
+// Have the switch leave, reboot, then try to join again
+RESET("switch");
+
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+
+expect("gateway2",
+       "Trust Center Join Handler: status = UNsecured join, decision = deny join",
+       10000);
+
+// Let network steering complete, then let's add a transient key and make sure
+// that it joins successfully when run again
+networkWait(60000);
+
+// Add a transient key just for the switch.
+expect("gateway2",
+       ("plugin network-creator-security set-joining-link-key "
+        + "{" + euiSwitch + "} "
+        + "{5A6967426565416C6C69616E63653039}"),
+       "Set joining link key: 0x00");
+
+// Let's make sure the transient key display works correctly with "keys print"
+expectMultiline("gateway2",
+                "keys print",
+                new String[] {
+                  "Transient Key Table",
+                  // EUI         FC        TTL    flags   key
+                  euiSwitch + "  00000000  0x00B4 0x0000  5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39"
+                });
+
+networkWait(40000);
+
+// Let's make sure the transient key TTL update works correctly with "keys print"
+expectMultiline("gateway2",
+                "keys print",
+                new String[] {
+                  "Transient Key Table",
+                  // EUI         FC        TTL    flags   key
+                  euiSwitch + "  00000000  0x008C 0x0000  5A 69 67 42 65 65 41 6C  6C 69 61 6E 63 65 30 39"
+                });
+
+reboot("switch");
+
+network.pressButton("switch", "0");
+network.releaseButton("switch", "0");
+
+expect("gateway2",
+       "Trust Center Join Handler: status = UNsecured join, decision = use preconfigured key",
+       100000);
+
+networkWait(50000);
+
+assert(channel("switch").equals(channel("gateway2")));
+assert(panId("switch").equals(panId("gateway2")));
+
+
+// Have switch2 join. This validates
+// EMZIGBEE-2639, since we only have one child table entry available. Old
+// steering would fail because the first association would take the last child
+// entry and fail to join because of using the wrong key. On the second attempt
+// using ZA09, the device would not event associate because the beacon received
+// would show capacity=false, since the child table is full. New steering does
+// not encounter this because it only scans for beacons once and caches them.
+// The subsequent join attempts send an association directly without doing
+// another scan
+expect("gateway2",
+       "plugin network-creator-security open-network",
+       "Open network: 0x00");
+networkWait(20000); //beacon hearing issues
+expect("switch2",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP",
+       30000);
+
+String switch2PanId = panId("switch2");
+networkWait(1000);
+String gateway2PanId = panId("gateway2");
+networkWait(1000);
+String switch2Channel = channel("switch2");
+networkWait(1000);
+String gateway2Channel = channel("gateway2");
+networkWait(1000);
+
+assert(switch2Channel.equals(gateway2Channel));
+assert(switch2PanId.equals(gateway2PanId));
+
+// Test for EMZIGBEE-3645. Verify that child joins and receives a temporary,
+// short timeout, which then is updated to the default timeout after sending a
+// network encrypted message, and then further updated to whatever the End
+// Device Timeout Request message says
+
+String switch2NodeId = nodeId("switch2");
+networkWait(1000);
+
+expect("switch2",
+       "network leave",
+       "EMBER_NETWORK_DOWN");
+
+expect("gateway2",
+       "plugin network-creator-security close-network",
+       "Close network: 0x00");
+
+nexpect("gateway2",
+        "plugin stack-diagnostics child-table",
+        ".*" + switch2NodeId + ".*");
+
+expect("gateway2",
+       "network pjoin 255",
+       "pJoin for 255 sec: 0x00");
+
+// Have the child join and fail. It will occupy a child entry with a short
+// timeout on the parent
+
+expect("switch2",
+       "plugin network-steering start 0",
+       "EMBER_JOIN_FAILED",
+       30000);
+
+expect("switch2",
+       "plugin network-steering stop",
+       "NWK Steering: Stop: 0x00");
+
+// EMBER_SHORT_CHILD_TIMEOUT is 2 minutes
+expect("gateway2",
+       "plugin stack-diagnostics child-table",
+       ".*" + switch2NodeId + ".*" + "2 min");
+
+// Age the child out
+networkWait(120000 + 2000);
+
+nexpect("gateway2",
+        "plugin stack-diagnostics child-table",
+        ".*" + switch2NodeId + ".*");
+
+// Have him join again, this time getting the EMBER_END_DEVICE_POLL_TIMEOUT
+// timeout
+expect("gateway2",
+       "plugin network-creator-security open-network",
+       "Open network: 0x00");
+
+expect("switch2",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP",
+       30000);
+networkWait(10000);
+// EMBER_END_DEVICE_POLL_TIMEOUT is 256 minutes
+expect("gateway2",
+       "plugin stack-diagnostics child-table",
+       ".*" + switch2NodeId + ".*" + "256 min");
+
+networkWait(2000);
+
+// Test for EMZIGBEE-3563. Verify that Z3Gateway only add 
+// the key derived by an install code into the transient key table 
+// by using "option install-code" CLI command and 
+// Z3Light can join the network by using its install code.
+
+// Get the EUI64 of the light
+String euiLight = eui64("light2");
+String lightInstallCode = "83 FE D3 40 7A 93 97 23 A5 C6 39 B2 69 16 D5 05 C3 B5";
+String lightInstallCodeDerivedKey = "66 B6 90 09 81 E1 EE 3C  A4 20 6B 6B 86 1C 02 BB";
+
+expect("light2", "network leave", "EMBER_NETWORK_DOWN");
+
+networkWait(2000);
+
+// The gateway forms a centralized network.
+expect("gateway3",
+       "plugin network-creator start 1",
+       "NWK Creator: Form. Channel.*Status: 0x00",
+       DEFAULT_TIMEOUT << 1);
+
+networkWait(2000);
+
+expect("gateway3",
+       ("option install-code 0 "
+        + "{" + euiLight + "} "
+        + "{" + lightInstallCode.replaceAll("\\s","") +"}"),
+       "Success: Set joining link key");
+
+// To make sure "option install-code" doesn't add the derived key
+// into the link key table
+expect("gateway3",
+        "keys print",
+        "0/4 entries used",
+        1000);
+
+// Open the network for the joining device with 
+// correct EUI61 and transient key.
+expect("gateway3",
+       ("plugin network-creator-security open-with-key "
+        + "{" + euiLight + "} "
+        + "{" + lightInstallCodeDerivedKey.replaceAll("\\s","") +"}"),
+       "Open network: 0x00");
+
+expect("light2",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP",
+       30000);
+
+networkWait(2000);
+
+// To make sure the light joined successfully, we compare 
+// network params to the coordinator
+assert(channel("light2").equals(channel("gateway3")));
+assert(panId("light2").equals(panId("gateway3")));
+
+// Test the Frame counter value for a child in the child table
+
+send("switch2", "zcl identify query");
+send("switch2", "send " + nodeId("gateway2") + " 1 1");
+
+// Check the initial frame counter value
+String childTable = expect("gateway2",
+       "plugin stack-diagnostics child-table",
+       ".*" + switch2NodeId + ".*");
+
+String frameCounter1 = getFrameCounterVal(childTable);
+
+// Increment the frame counter by sending a packet
+send("switch2", "zcl identify query");
+send("switch2", "send " + nodeId("gateway2") + " 1 1");
+
+childTable = expect("gateway2",
+       "plugin stack-diagnostics child-table",
+       ".*" + switch2NodeId + ".*");
+
+String frameCounter2 = getFrameCounterVal(childTable);
+
+// Check that the frame counter value has incremented
+if ((frameCounter2.compareTo(frameCounter1)) <= 0) {
+  throw new Exception ("The frame counter for " + switch2NodeId + " did not increment");
+}
+
+networkWait(1000);
+
+// Test EMBER_AF_PLUGIN_NETWORK_STEERING_TRY_ALL_KEYS
+// We'll start by joining with the distributed key
+
+String euiSwitch3 = eui64("switch3");
+
+expect("gateway3",
+       "plugin network-creator-security open-with-key {" + euiSwitch3 + "} {d0d1d2d3d4d5d6d7d8d9dadbdcdddedf}",
+       "Open network: 0x00");
+
+send("light2",
+     "network pjoin 255");
+
+expect("switch3",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP",
+       30000);
+
+// Leave and join with centralized key
+expect("switch3",
+       "network leave",
+       "EMBER_NETWORK_DOWN",
+       2000);
+networkWait(5000);
+
+// Delete any existing transient keys, add the well known key
+expect("gateway3",
+       "plugin network-creator-security close-network",
+       "Close network: 0x00");
+expect("gateway3",
+       "plugin network-creator-security open-network",
+       "Open network: 0x00");
+
+expect("switch3",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP",
+       30000);
+
+// Leave and join with install code key
+expect("switch3",
+       "network leave",
+       "EMBER_NETWORK_DOWN",
+       2000);
+networkWait(5000);
+
+// Delete any existing transient keys
+expect("gateway3",
+       "plugin network-creator-security close-network",
+       "Close network: 0x00");
+// All simulation install codes are the same, so lightInstallCodeDerivedKey == switch3 install code key
+expect("gateway3",
+       "plugin network-creator-security open-with-key {" + euiSwitch3 + "} {" + lightInstallCodeDerivedKey + "}",
+       "Open network: 0x00");
+
+expect("switch3",
+       "plugin network-steering start 0",
+       "EMBER_NETWORK_UP",
+       30000);

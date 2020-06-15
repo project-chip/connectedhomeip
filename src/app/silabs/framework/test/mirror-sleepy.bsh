@@ -1,0 +1,96 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Sleep doesn't work yet in simulation for the host so
+// we warn and return. We are not expecting this since
+// simulation does not yet support sleeping.
+if (runArgument.runUsingHostApps) {
+  std.print("****TODO: Fix for host****");
+  return;
+} else if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multihop****");
+  return;
+}
+
+// Create four nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "mirror", "router", "meter" };
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeMeterMirror-simulation/SeMeterMirror",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/SeMeterGasSleepy-simulation/SeMeterGasSleepy"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeMeterMirror-simulation-ezsp/SeMeterMirror",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/SeMeterGasSleepy-simulation-ezsp/SeMeterGasSleepy"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(allDevices);
+
+// Check that we add the mirror properly
+expect("meter", ".*Mirror ADDED.*", 100 * 1000);
+
+// Check that we begin writing updates to the mirror
+expect("mirror", ".*Mirror attribute 0x[0-9a-fA-F]{4}: 0x00", timeout * 200);
+expect("meter", ".*poll nwk 0: no data.*", 5000);
+
+
+debugPrintln("*** TEST: leave network and reform using same pan ID ***");
+expect("meter", "network leave", ".*EMBER_NETWORK_DOWN", 2000);
+send("meter", "keys clear");
+networkWait(10*timeout);
+expect("router", "network leave", ".*EMBER_NETWORK_DOWN", 2000);
+send("router", "keys clear");
+networkWait(10*timeout);
+expect("mirror", "network leave", ".*EMBER_NETWORK_DOWN");
+send("mirror", "keys clear");
+networkWait(10*timeout);
+
+formAndJoinDevices(allDevices);
+expect("meter", ".*Mirror ADDED.*", 85 * 1000);
+expect("mirror", ".*Mirror attribute 0x[0-9a-fA-F]{4}: 0x00", 200 * 1000);
+
+// TEST: If the meter's parent router leaves the network, the child should find
+// another parent and should be able to continue as if nothing happened.  This
+// does not work in multihop networks because potential parents are not within
+// range.
+if (runArgument.runUsingMultihop) {
+  // Take out the coordinator.  The child should look for a parent and find the
+  // router.
+  debugPrintln("*** KILL ESI ***");
+  power("mirror", false);
+  expect("meter", "", ".*Schedule move: 0", 200 * 1000);
+  expect("meter", "", ".*EMBER_NETWORK_DOWN", 800 * 1000);
+  expect("meter", "", ".*EMBER_NETWORK_UP", 50 * 1000);
+
+  // let rejoin join settle.
+  networkWait(10*timeout);
+
+  // Now take out the router.  The child will fail to find a new parent.
+  debugPrintln("*** KILL ROUTER ***");
+  power("router", false);
+  expect("meter", ".*Schedule move: 0", 200 * 1000);
+  expect("meter", ".*EMBER_NETWORK_DOWN", 800 * 1000);
+  expect("meter", ".*Schedule move: 1", 200 * 1000);
+  expect("meter", ".*Schedule move: 2", 200 * 1000);
+  expect("meter", ".*Schedule move: 3", 200 * 1000);
+}
+//make sure that when we leave the network, we stop trying to move.
+expect("meter", "network leave", ".*EMBER_NETWORK_DOWN"); //take the light off the network
+
+networkWait(20 * 1000);

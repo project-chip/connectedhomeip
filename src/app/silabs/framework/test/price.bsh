@@ -1,0 +1,3393 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = { "esi", "router", "esiClient" };
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12MeterElectric-simulation/Se12MeterElectric",
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12MeterElectric-simulation-ezsp/Se12MeterElectric",
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+
+int PUBLISH_PRICE_LEN=54;
+
+networkWait(timeout * 10); 
+String esiClientId = nodeId("esiClient");
+//String meterId = nodeId("meter");
+
+String esiId   = nodeId("esi");
+
+String DURATION_TYPE_MINS          = new String("0x00");
+String DURATION_TYPE_DAYS_START    = new String("0x01");
+String DURATION_TYPE_DAYS_END      = new String("0x11");
+String DURATION_TYPE_WEEKS_START   = new String("0x02");
+String DURATION_TYPE_WEEKS_END     = new String("0x12");
+String DURATION_TYPE_MONTHS_START  = new String("0x03");
+String DURATION_TYPE_MONTHS_END    = new String("0x13");
+String UTC_SEC_MON_APR30_2001_00_00_00 = new String("0x027F6780");
+String UTC_SEC_TUE_MAY01_2001_00_00_00 = new String("0x0280B900");
+String UTC_SEC_SUN_MAY06_2001_23_59_59 = new String("0x0288A1FF");
+String UTC_SEC_WED_MAY16_2001_00_00_00 = new String("0x02947F80");
+String UTC_SEC_WED_MAY16_2001_04_35_17 = new String("0x0294C005");
+String UTC_SEC_WED_MAY16_2001_23_59_59 = new String("0x0295D0FF");
+String UTC_SEC_THU_MAY31_2001_23_59_59 = new String("0x02A9977F");
+
+// Leap year test, and much bigger UTC timestamps
+String  UTC_SEC_TUE_FEB01_2056_00_00_00 = new String("0x697E9780");
+String  UTC_SEC_MON_FEB28_2056_00_00_00 = new String("0x69A23000");
+String  UTC_SEC_TUE_FEB29_2056_23_59_59 = new String("0x69A4D2FF");
+String  UTC_SEC_WED_MAR01_2056_00_00_00 = new String("0x69A4D300");
+String  UTC_SEC_WED_MAR01_2056_17_23_37 = new String("0x69A5C799");
+String  UTC_SEC_SUN_MAR05_2056_23_59_59 = new String("0x69AB6A7F");
+String  UTC_SEC_FRI_MAR31_2056_23_59_59 = new String("0x69CDB17F");
+
+int SECONDS_IN_365_DAY_YEAR  = (365*24*3600);
+int SECONDS_IN_29_DAY_MONTH  = (29 * 24 * 60 * 60);
+int SECONDS_IN_30_DAY_MONTH  = (30 * 24 * 60 * 60);
+int SECONDS_IN_31_DAY_MONTH  = (31 * 24 * 60 * 60);
+
+
+int SECONDS_IN_MINUTE  = 60;
+int SECONDS_IN_HOUR = 3600;
+int SECONDS_IN_DAY = (SECONDS_IN_MINUTE * 60 * 24);
+int SECONDS_IN_WEEK = (SECONDS_IN_DAY * 7);
+
+// Turn off the repeated billing feature from EMAPPFWKV2-1469. We will manually
+// test adding repeating billing periods.
+send("esi", "plugin price-server billing-period repeat 0");
+
+// Price Common function unit test.
+// 1) Adjust start time day test
+expect("esi",
+       "plugin price-common adj-st-t 1 " + DURATION_TYPE_MINS, 
+       ".*adjustedStartTime: 0x00000001");
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_TUE_MAY01_2001_00_00_00 + " " + DURATION_TYPE_MINS, 
+       ".*adjustedStartTime: " + UTC_SEC_TUE_MAY01_2001_00_00_00);
+// No change for start of day, month
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_TUE_MAY01_2001_00_00_00 + " " + DURATION_TYPE_DAYS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_TUE_MAY01_2001_00_00_00);
+// Check start/end of day
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_WED_MAY16_2001_04_35_17 + " " + DURATION_TYPE_DAYS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_WED_MAY16_2001_00_00_00);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_WED_MAY16_2001_04_35_17 + " " + DURATION_TYPE_DAYS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_WED_MAY16_2001_23_59_59);
+
+// 2) Adjust start time week test
+// Check that start / end of week work correctly.
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_MON_APR30_2001_00_00_00 + " " + DURATION_TYPE_WEEKS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_MON_APR30_2001_00_00_00);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_MON_APR30_2001_00_00_00 + " " + DURATION_TYPE_WEEKS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_SUN_MAY06_2001_23_59_59);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_SUN_MAY06_2001_23_59_59 + " " + DURATION_TYPE_WEEKS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_SUN_MAY06_2001_23_59_59);
+// Again for the advanced timestamps
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_WED_MAR01_2056_17_23_37 + " " + DURATION_TYPE_WEEKS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_MON_FEB28_2056_00_00_00);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_WED_MAR01_2056_17_23_37 + " " + DURATION_TYPE_WEEKS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_SUN_MAR05_2056_23_59_59);
+// 3) Adjust start time month test
+// Check that start / end of week work correctly.
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_TUE_MAY01_2001_00_00_00 + " " + DURATION_TYPE_MONTHS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_TUE_MAY01_2001_00_00_00);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_THU_MAY31_2001_23_59_59 + " " + DURATION_TYPE_MONTHS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_THU_MAY31_2001_23_59_59);
+
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_SUN_MAY06_2001_23_59_59 + " " + DURATION_TYPE_MONTHS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_TUE_MAY01_2001_00_00_00);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_SUN_MAY06_2001_23_59_59 + " " + DURATION_TYPE_MONTHS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_THU_MAY31_2001_23_59_59);
+
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_WED_MAY16_2001_04_35_17 + " " + DURATION_TYPE_MONTHS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_TUE_MAY01_2001_00_00_00);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_WED_MAY16_2001_04_35_17 + " " + DURATION_TYPE_MONTHS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_THU_MAY31_2001_23_59_59);
+
+// Again for the advanced timestamps
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_MON_FEB28_2056_00_00_00 + " " + DURATION_TYPE_MONTHS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_TUE_FEB01_2056_00_00_00);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_MON_FEB28_2056_00_00_00 + " " + DURATION_TYPE_MONTHS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_TUE_FEB29_2056_23_59_59);
+
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_WED_MAR01_2056_17_23_37 + " " + DURATION_TYPE_MONTHS_START, 
+       ".*adjustedStartTime: " + UTC_SEC_WED_MAR01_2056_00_00_00);
+expect("esi",
+       "plugin price-common adj-st-t " + UTC_SEC_WED_MAR01_2056_17_23_37 + " " + DURATION_TYPE_MONTHS_END, 
+       ".*adjustedStartTime: " + UTC_SEC_FRI_MAR31_2056_23_59_59);
+
+// 4) Convert Mins duration to seconds test
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_MON_APR30_2001_00_00_00 + " 10 " + DURATION_TYPE_MINS, 
+       ".*seconds: " + 10*SECONDS_IN_MINUTE);
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_WED_MAR01_2056_00_00_00 + " 1000 " + DURATION_TYPE_MINS, 
+       ".*seconds: " + 1000*SECONDS_IN_MINUTE);
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_WED_MAR01_2056_17_23_37 + " 9876543 " + DURATION_TYPE_MINS, 
+       ".*seconds: " + 9876543*SECONDS_IN_MINUTE);
+// 5) Convert weeks duration to seconds test
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_MON_APR30_2001_00_00_00 + " 10 " + DURATION_TYPE_WEEKS_START, 
+       ".*seconds: " + 10*SECONDS_IN_WEEK);
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_TUE_FEB29_2056_23_59_59 + " 100 " + DURATION_TYPE_WEEKS_START, 
+       ".*seconds: " + 100*SECONDS_IN_WEEK);
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_WED_MAY16_2001_04_35_17 + " 572 " + DURATION_TYPE_WEEKS_START, 
+       ".*seconds: " + 572*SECONDS_IN_WEEK);
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_WED_MAY16_2001_04_35_17 + " 572 " + DURATION_TYPE_WEEKS_END, 
+       ".*seconds: " + 572*SECONDS_IN_WEEK);
+// 6) Convert months duration to seconds test
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_MON_APR30_2001_00_00_00 + " 1 " + DURATION_TYPE_MONTHS_START, 
+       ".*seconds: " + SECONDS_IN_30_DAY_MONTH);
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_MON_APR30_2001_00_00_00 + " 1 " + DURATION_TYPE_MONTHS_END, 
+       ".*seconds: " + SECONDS_IN_31_DAY_MONTH);
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_MON_FEB28_2056_00_00_00 + " 4 " + DURATION_TYPE_MONTHS_START, 
+       ".*seconds: " + (SECONDS_IN_29_DAY_MONTH + SECONDS_IN_31_DAY_MONTH + SECONDS_IN_30_DAY_MONTH + SECONDS_IN_31_DAY_MONTH));
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_MON_FEB28_2056_00_00_00 + " 4 " + DURATION_TYPE_MONTHS_END, 
+       ".*seconds: " + (SECONDS_IN_31_DAY_MONTH + SECONDS_IN_30_DAY_MONTH + SECONDS_IN_31_DAY_MONTH + SECONDS_IN_30_DAY_MONTH));
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_MON_FEB28_2056_00_00_00 + " 12 " + DURATION_TYPE_MONTHS_START, 
+       ".*seconds: " + (SECONDS_IN_365_DAY_YEAR + SECONDS_IN_DAY));
+expect("esi",
+       "plugin price-common cnvrt-durn-to-sec " + UTC_SEC_MON_FEB28_2056_00_00_00 + " 12 " + DURATION_TYPE_MONTHS_START, 
+       ".*seconds: " + (SECONDS_IN_365_DAY_YEAR + SECONDS_IN_DAY));
+
+// Wipe out the default pricing information that the server plugin provides.
+send("esi", "plugin price-server clear 0x01");
+networkWait(timeout); 
+
+// Set up two prices on the server and make sure they look okay.
+send("esi", "plugin price-server who 0x01020304 \"price00\" 0x00000001");
+send("esi", "plugin price-server what 0x00 0x0000 0x00 0x00 0x00");
+send("esi", "plugin price-server when 0x00000001 0x0002");
+send("esi", "plugin price-server price 0x0000000A 0x01 0x00000005 0x00");
+send("esi", "plugin price-server alternate 0xFFFFFFFF 0xFF 0xFF");
+send("esi", "plugin price-server valid 0x01 0");
+networkWait(timeout); 
+send("esi", "plugin price-server who 0x01020304 \"price01\" 0x00000002");
+send("esi", "plugin price-server what 0x00 0x0000 0x00 0x00 0x00");
+send("esi", "plugin price-server when 0x12896F40 0x00FF");
+send("esi", "plugin price-server price 0x0000000A 0x01 0x00000005 0x00");
+send("esi", "plugin price-server alternate 0xFFFFFFFF 0xFF 0xFF");
+send("esi", "plugin price-server valid 0x01 1");
+networkWait(timeout); 
+send("esi", "plugin price-server print 0x01");
+expect("esi", "= PRICE 00 = \\(Current Price\\)");
+expect("esi", "  label: price00\\(07\\)");
+expect("esi", "  uom/cur: 0x00/0x0000");
+expect("esi", "  pid/eid: 0x01020304/0x00000001");
+expect("esi", "  ct/st/dur: 0x[0-9a-fA-F]{8}/0x00000001/0x0002");
+expect("esi", "  ptdt/ptrt: 0x00/0x00");
+expect("esi", "  p/pr: 0x0000000A/0x01");
+expect("esi", "  gp/gpr: 0x00000005/0x00");
+expect("esi", "  acd/acu/actd: 0xFFFFFFFF/0xFF/0xFF");
+expect("esi", "  price is valid from time 0x00000001 until 0x00000079");
+expect("esi", "= PRICE 01 =");
+expect("esi", "  label: price01\\(07\\)");
+expect("esi", "  uom/cur: 0x00/0x0000");
+expect("esi", "  pid/eid: 0x01020304/0x00000002");
+expect("esi", "  ct/st/dur: 0x[0-9a-fA-F]{8}/0x12896F40/0x00FF");
+expect("esi", "  ptdt/ptrt: 0x00/0x00");
+expect("esi", "  p/pr: 0x0000000A/0x01");
+expect("esi", "  gp/gpr: 0x00000005/0x00");
+expect("esi", "  acd/acu/actd: 0xFFFFFFFF/0xFF/0xFF");
+expect("esi", "  price is valid from time 0x12896F40 until 0x1289AB04");
+
+// The client shouldn't have any prices yet.
+send("esiClient", "plugin price-client print 0x01");
+expectMultiline("esiClient",
+                new String[] {
+                   ".*= Price 0 =",
+                   "    vld: NO",
+                   "= Price 1 =",
+                   "    vld: NO"
+});
+
+// Send an unsolicited PublishPrice to the client (bug 12700) and make sure the
+// application is notified that the price has started.
+
+send("esi", "plugin price-server publish " + nodeId("esiClient") + " 0x01 0x01 0");
+expectMultiline("esiClient",
+                new String[] {
+                "RX: PublishPrice 0x01020304, \"price00\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0000, 0x00, 0x00, 0x00000001, 0x0002, 0x0000000A, 0x01, 0x00000005, 0x00, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x00",
+                "Price \"price00\" \\(0x00000001\\) has started"
+                });
+expect("esi", ".*clus 0x0700 \\(Price\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+networkWait(timeout);
+
+// Request the current price.  The client will reject it as a duplicate.
+send("esiClient", "zcl price current 0x00");
+send("esiClient", "send 0 1 1");
+// You can't count on output being interspersed correctly from different hosts!
+//expect("esiClient", "RX: PublishPrice 0x01020304, \"price00\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0000, 0x00, 0x00, 0x00000001, 0x0002, 0x0000000A, 0x01, 0x00000005, 0x00, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x00");
+
+expectMultiline("esi",
+                "",
+                new String[] {
+                  "checking price 00, currTime [0-9a-fA-F]{8}, start 00000001, end 00000079 valid",
+                  ".*clus 0x0700 \\(Price\\) FC 00 seq .. cmd 0B payload\\[00 8A \\]",
+                });
+
+// Request all scheduled prices.  The client will reject the first one as a
+// duplicate and save the second one.
+send("esiClient", "zcl price scheduled 0x00000000 0x00");
+send("esiClient", "send 0 1 1");
+
+
+expectMultiline("esi",
+                "",
+                new String[] {
+                  "TX price at index 00",
+                  "TX price at index 01",
+                  ".*clus 0x0700 \\(Price\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]",
+                });
+
+// The application should get notified when the first price expires.
+expect("esiClient", "Price \"price00\" \\(0x00000001\\) has expired", timeout * 150, true);
+
+// Request all prices for a time after the first one ends.  The first price
+// should not be sent.
+send("esiClient", "zcl price scheduled 0x0000FFFF 0x00");
+send("esiClient", "send 0 1 1");
+assert(network.expect("esi", port, null, "TX price at index 00") == null);
+
+// Request all prices for the same time.  The client will reject the second one
+// as a duplicate.
+send("esiClient", "zcl price scheduled 0x0000FFFF 0x00");
+send("esiClient", "send 0 1 1");
+expectMultiline("esi",
+                "",
+                new String[] {
+                  "TX price at index 01",
+                  ".*clus 0x0700 \\(Price\\) FC 00 seq .. cmd 0B payload\\[00 8A \\]",
+                });
+
+// Request all prices for a time after all prices end.  The server shouldn't
+// have any prices after this time.
+send("esiClient", "zcl price scheduled 0xEEEEEEEE 0x00");
+send("esiClient", "send 0 1 1");
+assert(network.expect("esi", port, null, "TX price at index ..") == null);
+
+// Set up a price that overlaps with the previous ones.
+send("esi", "plugin price-server who 0x01020304 \"price03\" 0x00000003");
+send("esi", "plugin price-server what 0x00 0x0000 0x00 0x00 0x00");
+send("esi", "plugin price-server when 0x00000001 0xFFFF");
+send("esi", "plugin price-server price 0x0000000A 0x01 0x00000005 0x00");
+send("esi", "plugin price-server alternate 0xFFFFFFFF 0xFF 0xFF");
+send("esi", "plugin price-server valid 0x01 0");
+networkWait(timeout); 
+
+// Request all scheduled prices.  The client remove the other saved prices in
+// favor of this one.
+send("esiClient", "zcl price scheduled 0x00000000 0x00");
+send("esiClient", "send 0 1 1");
+expect("esi", "TX price at index 00");
+expect("esiClient", "RX: PublishPrice 0x01020304, \"price03\", 0x00000003, 0x[0-9a-fA-F]{8}, 0x00, 0x0000, 0x00, 0x00, 0x00000001, 0xFFFF, 0x0000000A, 0x01, 0x00000005, 0x00, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x00");
+expect("esi", ".*clus 0x0700 \\(Price\\) FC 00 seq .. cmd 0B payload\\[00 00 \\]");
+send("esiClient", "plugin price-client print 0x01");
+expect("esiClient", "= Price 0 =");
+expect("esiClient", "    vld: YES");
+expect("esiClient", "   ieid: 0x00000003");
+expect("esiClient", "= Price 1 =");
+expect("esiClient", "    vld: NO");
+
+// Set up a price that requires acknowledgement.
+send("esi", "plugin price-server who 0x01020304 \"price04\" 0x00000004");
+send("esi", "plugin price-server what 0x00 0x0000 0x00 0x00 0x00");
+send("esi", "plugin price-server when 0x00000001 0xFFFF");
+send("esi", "plugin price-server price 0x0000000A 0x01 0x00000005 0x00");
+send("esi", "plugin price-server alternate 0xFFFFFFFF 0xFF 0xFF");
+send("esi", "plugin price-server ack 1");
+send("esi", "plugin price-server valid 0x01 0");
+networkWait(timeout); 
+
+// Request all scheduled prices.  The client should respond with an
+// acknowledgement instead of a default response.
+send("esiClient", "zcl price current 0x00");
+send("esiClient", "send 0 1 1");
+expect("esi", "checking price 00, currTime [0-9a-fA-F]{8}, start 00000001, end FFFFFFFF valid");
+expectMultiline("esiClient",
+                "",
+                new String[] {
+                ".*RX: PublishPrice 0x01020304, \"price04\", 0x00000004, 0x[0-9a-fA-F]{8}, 0x00, 0x0000, 0x00, 0x00, 0x00000001, 0xFFFF, 0x0000000A, 0x01, 0x00000005, 0x00, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x01",
+                "Price \"price04\" \\(0x00000004\\) has started",
+                });
+expect("esi", "RX: PriceAcknowledgement 0x01020304, 0x00000004, 0x[0-9a-fA-F]{8}, 0x01");
+
+// Set up test tariffs
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff1\" 0x00000001 0x00000001");
+send("esi", "plugin price-server tariff what 0x00 0x00 0x0000 0x00 0x02 0x00 0xFF");
+send("esi", "plugin price-server tariff when 0x00000000");
+send("esi", "plugin price-server tariff set 0x00000000 0x00000001 0x00000001");
+send("esi", "plugin price-server tariff add 0x01 0x00");
+
+// Unsolicited PublishTariffInfo
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 0");
+
+// Set up test price matrices
+send("esi", "plugin price-server pm set-metadata 0x01 0x00000001 0x00000001 0x00000001 0x00000000 0x01");
+send("esi", "plugin price-server pm put 0x01 0x00 0x00 0x00000001");
+send("esi", "plugin price-server pm put 0x01 0x01 0x00 0x00000002");
+send("esi", "plugin price-server pm add 0x01");
+
+// Send GetPriceMatrix command
+send("esiClient", "raw 0x0700 {01 00 07 01 00 00 00}");
+send("esiClient", "send 0 1 1");
+network.sleep(1000);
+
+// Tests from SE 1.2 Test Specification (13-0400-7b)
+
+// Test 12.3 from Test Spec
+//===========================================================
+//To check the correct behavior when an update to pricing information is send to the trhLCD from the commodity provider.
+// NOTE: This test case is to verify that a DUT handles older SE 1.0 devices that send 
+// messages without the new fields.
+
+send("esi", "plugin price-server clear 0x01");
+send("esi","plugin test-harness price send-new-fields 0");
+networkWait(timeout); 
+
+// Set up two prices on the server and make sure they look okay.
+send("esi", "plugin price-server who 0x00000001 \"BASE\" 0x00000001");
+send("esi", "plugin price-server what 0x00 0x0348 0x10 0x40 0x00");
+send("esi", "plugin price-server when 0x00000000 0xFFFF");
+send("esi", "plugin price-server price 0x00000012 0x12 0x00000015 0x25");
+send("esi", "plugin price-server valid 0x01 1");
+networkWait(timeout); 
+
+networkWait(timeout); 
+send("esi", "plugin price-server print 0x01");
+networkWait(timeout); 
+
+networkWait(5000); 
+
+send("esi", "plugin price-server publish " + nodeId("esiClient") + " 0x01 0x01 1");
+
+//41 bytes in the SE 1.0 publish Price packet
+//54 bytes in the SE 1.2 publish price packet
+//expect("esiClient",".*RX len 54.*");
+expect("esiClient",".*RX len " + PUBLISH_PRICE_LEN + ".*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"BASE\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x10, 0x40, 0x00000000, 0xFFFF, 0x00000012, 0x12, 0x00000015, 0x25.*");
+
+
+// Test 12.5 from Test Spec
+//===========================================================
+// SE Network GetCurrentPrice and PublishPriceResponse
+// Checks for correct behavior when an ipd requres the current pricing from the esp.
+// NOTE: This test case is to verify that a DUT handles older SE 1.0 devices that send 
+// messages without the new fields.
+
+send("esi", "plugin price-server who 0x00000001 \"BASE\" 0x00000001");
+send("esi", "plugin price-server what 0x00 0x0348 0x10 0x40 0x00");
+send("esi", "plugin price-server when 0x00000000 0xFFFF");
+send("esi", "plugin price-server price 0x00000012 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server alternate 0xFFFFFFFF 0xFF 0xFF");
+send("esi", "plugin price-server valid 0x01 1");
+
+networkWait(timeout); 
+
+send("esi", "plugin price-server print 0x01");
+networkWait(timeout); 
+
+networkWait(5000); 
+send("esiClient", "zcl price current 0x00");
+send("esiClient", "send 0 1 1");
+
+//expect("esiClient",".*RX len 41.*");
+expect("esiClient",".*RX len " + PUBLISH_PRICE_LEN + ".*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"BASE\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x10, 0x40, 0x00000000, 0xFFFF, 0x00000012, 0xFF, 0xFFFFFFFF, 0xFF.*");
+
+networkWait(10000);
+
+
+//Test 12.6 from Test Spec
+//Deleted from Spec
+
+
+//Test 12.7 from Test Spec - Get Scheduled Prices
+
+//send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+//networkWait(1000);
+//send("esiClient", "timesync 0 1 1");
+//networkWait(2000);
+
+// INIT #1 - Config price:  pid=1, label="BASE", unit=0, currency=$ (840), trailDig&Tier=0x11,
+//    NumTiersRegTier=0x21, start=NOW + 1 day, Duration=60mins, price=0x0018, priceRatio=0xFF, genPrice=0xFFFFFFFF, genRat=0xFF
+String time1Day  = timeSinceZigBeeEpoch( 1440 );
+String time3Days = timeSinceZigBeeEpoch( (3 * 1440) );
+
+send("esi", "plugin price-server who 0x00000001 \"BASE\" 0x00000001");
+send("esi", "plugin price-server what 0x00 0x0348 0x11 0x21 0x00");
+send("esi", "plugin price-server when " + time1Day + " 60");
+send("esi", "plugin price-server price 0x00000018 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server alternate 0xFFFFFFFF 0xFF 0xFF");
+send("esi", "plugin price-server valid 0x01 0");
+
+// INIT #2 - Config price:  pid=1, label="TAR1", evt=2, unit=0, currency=$ (840), trailDig&Tier=0x12,
+//    NumTiersRegTier=0x22, start=NOW + 3 days, Duration=0xFFFF, price=0x0012, priceRatio=0xFF, genPrice=0xFFFFFFFF, genRat=0xFF
+send("esi", "plugin price-server who 0x00000001 \"TAR1\" 0x00000002");
+send("esi", "plugin price-server what 0x00 0x0348 0x12 0x22 0x00");
+send("esi", "plugin price-server when " + time3Days + " 0xFFFF");
+send("esi", "plugin price-server price 0x00000012 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server alternate 0xFFFFFFFF 0xFF 0xFF");
+send("esi", "plugin price-server valid 0x01 1");
+
+// NOW RUN THE TEST
+
+// Item 2 - Server sends first publish price to client.
+send("esi", "plugin price-server publish " + nodeId("esiClient") + " 0x01 0x01 0");
+
+//54 bytes in the SE 1.2 publish Price packet
+expect("esiClient",".*RX len 54.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"BASE\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x11, 0x21, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000018, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x01.*");
+//expect("esi", "RX: PriceAcknowledgement.*");
+//networkWait(5000);
+
+
+// Item 3 - Server sends second price to client.
+send("esi", "plugin price-server publish " + nodeId("esiClient") + " 0x01 0x01 1");
+
+//54 bytes in the SE 1.2 publish Price packet
+expect("esiClient",".*RX len 54.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"TAR1\", 0x00000002, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x12, 0x22, 0x[0-9a-fA-F]{8}, 0xFFFF, 0x00000012, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x01.*");
+
+// Item 4-5 - Client sends a Get Scheduled Prices command to Server, start=0, numEvents=1.  Gets "BASE" price back.
+send("esiClient", "zcl price scheduled 0x00000000 1");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 54.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"BASE\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x11, 0x21, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000018, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x01.*");
+
+
+// Item 6-7 - Client sends a Get Scheduled Prices command to Server, start= 2 days, numEvents=2.  Gets "TAR1" price back.
+send("esiClient", "zcl price scheduled " + time3Days + " 2");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 54.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"TAR1\", 0x00000002, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x12, 0x22, 0x[0-9a-fA-F]{8}, 0xFFFF, 0x00000012, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x01.*");
+networkWait(5000);
+
+send("esiClient", "zcl price scheduled " + time3Days + " 1");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 54.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"TAR1\", 0x00000002, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x12, 0x22, 0x[0-9a-fA-F]{8}, 0xFFFF, 0x00000012, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0x00, 0x01.*");
+
+
+
+// Test 12.8 from Test Spec - Display of Tier usage
+//=========================================================
+
+
+
+// Test 12.9 from Test Spec - Publish Price with optional fields
+// Test 12.18 - Publish Price with Price ACK   -- This is also tested here.
+//=========================================================
+//PublishPrice Response with additional optional fields
+send("esi","plugin test-harness price send-new-fields 2");
+send("esiClient","plugin price-client table-clear 0x01");
+send("esi", "plugin price-server who 0x00000001 \"BASE\" 0x00000001");
+send("esi", "plugin price-server what 0x00 0x0348 0x10 0x40 0xFF");
+send("esi", "plugin price-server when 0x00000000 0xFFFF");
+send("esi", "plugin price-server price 0x00000012 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server valid 0x01 1");
+send("esi", "plugin price-server ack 1");
+networkWait(timeout); 
+
+send("esi", "plugin price-server print 0x01");
+networkWait(timeout); 
+
+networkWait(5000); 
+
+send("esi", "plugin price-server publish " + nodeId("esiClient") + " 0x01 0x01 1");
+
+//54 bytes in the SE 1.2 publish Price packet
+expect("esiClient",".*RX len 54.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"BASE\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x10, 0x40, 0x00000000, 0xFFFF, 0x00000012, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+
+expect("esi", "RX: PriceAcknowledgement.*");
+networkWait(5000);
+
+
+// Test 12.10  Get Block Threshold Attribute Set
+
+// Test 12.11 
+
+// Test 12.12
+
+// Test 12.14 - Publish Block Period (Server)
+// ===========================================================================
+
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+String timeIn1Min = timeSinceZigBeeEpoch( 1 );
+String timeIn1Day = timeSinceZigBeeEpoch( (60*24) );
+String timeIn2Days = timeSinceZigBeeEpoch( (60*48) );
+
+// Ensure no block periods exist on server
+send("esi", "plugin price-server init 1");
+send("esiClient","plugin price-client table-clear 0x01");
+
+send("esi", "plugin price-server clear 0x01");
+send("esi", "plugin price-server who 0x11223344 \"BLOCK1\" 0x00000001");
+send("esi", "plugin price-server what 0x00 0x0348 0x10 0x00 0x02");
+send("esi", "plugin price-server when 0x00000000 0xFFFF");
+send("esi", "plugin price-server price 0x00000012 0x12 0x00000015 0x25");
+send("esi", "plugin price-server valid 0x01 1");
+send("esi", "plugin price-server ack 0");
+
+// Item 1 - Client sends GetBlockPeriod to server, start=now, num=0, type=Delivered (0x00).
+send("esiClient", "zcl price get-block-periods 0 0 0");
+send("esiClient", "send " + esiId + " 1 1");
+
+// Item 2 - Server responds with NOT FOUND.
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[03 8B \\]");
+
+
+// Item 3 - Configure server with Block Period:  start=NOW+1min, eventId='A', type=Delivered (0x00).
+// ep,pid,evtId, stTime,duration, ctrl, durationType, mult,divis, type, resPeriod
+send("esi", "plugin price-server block-period add 1 11223344 0x0000000A " + timeIn1Min + " 0xFFFFFF 0x00 0x00 1 1 0 0");
+
+// Item 4 - Server sends Publish Block Period to Client
+expect("esiClient", ".*RX: PublishBlockPeriod, 0x00AB4130, 0x0000000A, 0x.*, 0x..FFFFFF, 0x00, 0x00, 0x00, 0x00");
+
+// Item 5/6 - Wait 1 minute. / Server sends Pulish Price to client with Duration=0xFFFF.
+expect("esiClient",
+       "RX: PublishPrice.*",
+       65000);
+
+// Item 7 - Configure Server with Block Period:  start=NOW+1Day, eventId='B', type=Delivered (0x00)
+send("esi", "plugin price-server block-period add 1 11223344 0x0000000B " + timeIn1Day + " 0xFFFFFFFF 0x00 0x00 1 1 0 0");
+
+// Item 8 - Server sends Publish Block Period command to Client
+//send("esi", "zcl price pub-block-period 11223344 0x0000000B " + timeIn1Day + " 0xFFFFFFFF 0  0x00 0x00 0 0");
+send("esi", "plugin price-server block-period pub " + esiClientId + " 1 1 1");
+//send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishBlockPeriod.*");
+
+// Item 9 - Client sends GetBlockPeriods command to server, startTime=NOW, numEvents=0, type=Delivered
+send("esiClient", "zcl price get-block-periods 0 0 0");
+send("esiClient", "send " + esiId + " 1 1");
+
+// Item 10-11 - Server sends 2 Publish Block Period commands, with params from the 2 created cmds.
+expectMultiline("esiClient", null,
+                new String[] {
+                  ".*RX: PublishBlockPeriod.*",
+                  ".*RX: PublishBlockPeriod.*"
+                });
+
+expectMultiline("esiClient",
+                "plugin price-client block-period printEvent 1 0x0A", 
+                new String[] {
+                  ".*Print Block Period.*",
+                  ".*issuerEventId=10.*",
+                  ".*tariffType=0.*"
+                });
+
+expectMultiline("esiClient",
+                "plugin price-client block-period printEvent 1 0x0B", 
+                new String[] {
+                  ".*Print Block Period.*",
+                  ".*issuerEventId=11.*",
+                  ".*tariffType=0.*"
+                });
+
+
+// Item 12 - Client sends GetBlockPeriod with start=NOW, numEvents=1, type=Delivered
+send("esiClient", "plugin price-client init 1");
+networkWait( 100 );
+send("esiClient", "zcl price get-block-periods 0 1 0");
+send("esiClient", "send " + esiId + " 1 1");
+
+// Item 13 - Server sends 1 Publish Block Period, eventId=0x0A
+networkWait( 3000 );
+expectMultiline("esiClient",
+                "plugin price-client block-period printEvent 1 0x0A", 
+                new String[] {
+                  ".*Print Block Period.*",
+                  ".*issuerEventId=10.*",
+                  ".*tariffType=0.*"
+                });
+send("esiClient", "plugin price-client block-period printEvent 1 0x0B");
+
+// Item 14 - Client sends GetBlockPeriod with start=NOW+2days, numEvents=1, type=Delivered
+send("esiClient", "plugin price-client init 1");
+networkWait( 100 );
+send("esiClient", "zcl price get-block-periods " + timeIn2Days + " 1 0");
+send("esiClient", "send " + esiId + " 1 1");
+
+// Item 15 - Server sends Publish Block Period command (from #7) to client
+networkWait( 3000 );
+expectMultiline("esiClient",
+                "plugin price-client block-period printEvent 1 0x0B", 
+                new String[] {
+                  ".*Print Block Period.*",
+                  ".*issuerEventId=11.*",
+                  ".*tariffType=0.*"
+                });
+send("esiClient", "plugin price-client block-period printEvent 1 0x0A");
+expect("esiClient", ".*Error: Block Period NOT FOUND.*");
+
+// Item 16 - Client sends Get Block Period with start=NOW, numEvents=0, tariff=Received (0x01)
+send("esiClient", "zcl price get-block-periods 0 0 1");
+send("esiClient", "send " + esiId + " 1 1");
+
+// Item 17 - Server responds with NOT FOUND.
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[03 8B \\]");
+ 
+
+
+
+// Test 12.15 - Get Block Period Attribute Set
+// ========================================================
+
+void VerifyPriceAttrib( String srcNodeName, String dstNodeName, String dstNodeId, String clusterIdHex, String attrIdHex, String expResponseHex, int expResponseSize ){
+  send( srcNodeName, "zcl global read " + clusterIdHex + " " + attrIdHex );
+  send( srcNodeName, "send " + dstNodeId + " 1 1");
+
+  String clusterIdHexNoPrefix = new String(clusterIdHex.substring(2));
+  String attrIdHexNoPrefix = new String(attrIdHex.substring(2));
+  String expResponseHexNoPrefix = new String(expResponseHex.substring(2));
+
+  String attrIdInRespData = new String(attrIdHexNoPrefix.substring(2,4) + " " + attrIdHexNoPrefix.substring(0,2));
+
+  _expectMultiline( dstNodeName, null,
+    new String[] {
+      ".*RX len 5, ep 01, clus 0x0700 \\(Price\\) FC 00 seq .. cmd 00 payload\\[" + attrIdHexNoPrefix.substring(2)  + " " + attrIdHexNoPrefix.substring(0,2) + " \\].*",
+      ".*READ_ATTR: clus " + clusterIdHexNoPrefix + ".*",
+      ".*READ: clus " + clusterIdHexNoPrefix + ", attr " + attrIdHexNoPrefix + ", dataLen: .., OK.*",
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+
+  if( expResponseSize == 1 ){
+    //expect( srcNodeName, ".*RX len 8, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[00 02 00 .. " + expResponseHexNoPrefix + ".*");
+    expect( srcNodeName, ".*RX len 8, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[" + attrIdHexNoPrefix.substring(2,4) + " " + attrIdHexNoPrefix.substring(0,2) + " 00 .. " + expResponseHexNoPrefix + ".*");
+  }
+
+  else if( expResponseSize == 2 ){
+    expect( srcNodeName, ".*RX len 9, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[00 02 00 .. " + expResponseHexNoPrefix.substring(2) + " " + expResponseHexNoPrefix.substring(0,2) + ".*");
+  }
+  else if( expResponseSize == 3 ){
+    //expect( srcNodeName, ".*RX len 10, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[00 02 00 .. " + expResponseHexNoPrefix.substring(4) + " " + expResponseHexNoPrefix.substring(2,4) + " " + expResponseHexNoPrefix.substring(0,2) + ".*");
+    //expect( srcNodeName, ".*RX len 10, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[" + attrIdHexNoPrefix.substring(2,4) + " " + attrIdHexNoPrefix.substring(0,2) + " 00 .. " + expResponseHexNoPrefix.substring(4) + " " + expResponseHexNoPrefix.substring(2,4) + " " + expResponseHexNoPrefix.substring(0,2) + ".*");
+    expect( srcNodeName, ".*RX len 10, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[" + attrIdInRespData + " 00 .. " + expResponseHexNoPrefix.substring(4) + " " + expResponseHexNoPrefix.substring(2,4) + " " + expResponseHexNoPrefix.substring(0,2) + ".*");
+  }
+  else if( expResponseSize == 4 ){
+    //expect( srcNodeName, ".*RX len 11, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[00 02 00 .. " + expResponseHexNoPrefix.substring(6) + " " + expResponseHexNoPrefix.substring(4,6) + " " + expResponseHexNoPrefix.substring(2,4) + " " + expResponseHexNoPrefix.substring(0,2) + ".*");
+    //expect( srcNodeName, ".*RX len 11, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[" + attrIdHexNoPrefix.substring(2,4) + " " + attrIdHexNoPrefix.substring(0,2) + " 00 .. " + expResponseHexNoPrefix.substring(6) + " " + expResponseHexNoPrefix.substring(4,6) + " " + expResponseHexNoPrefix.substring(2,4) + " " + expResponseHexNoPrefix.substring(0,2) + ".*");
+    expect( srcNodeName, ".*RX len 11, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[" + attrIdInRespData + " 00 .. " + expResponseHexNoPrefix.substring(6) + " " + expResponseHexNoPrefix.substring(4,6) + " " + expResponseHexNoPrefix.substring(2,4) + " " + expResponseHexNoPrefix.substring(0,2) + ".*");
+  }
+}
+
+// From zll/scenes.bsh, line 591-601:
+// Local Read
+//assert( getAttribute( "esiClient", "0xxx", "xxxx").equals(" 00 00") );
+
+// From util.bsh, line 1528
+// checkAttributeRead( sendingNodeName, rxNodeId, clusterName, cidHex, attrHex, attrTypeHex,
+//       attrReturnHex, file, lineNumOfCaller );
+//   NOTE:  checkAttribRead() does a poor job of validating the response.
+//          Given that, I must write my own validation function.
+
+
+// INITIAL Item 1 - Configure ESI to support block pricing with 2 blocks with following:
+//        start=NOW, duration=5, mult=0x0A, divis=2
+
+// To make the test easier, so we can verify the start time, set TIME to a fixed value.
+
+send("esi", "zcl time 0x16458027" );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+send("esi", "plugin price-server init 1");
+send("esi", "plugin price-server block-period add 1 11223344 0x00000001 0x16458027 0x05 0x00 0x01  0x0A 2  0x00 0x01" );
+networkWait( 2000 );
+
+// Item 1-2 - Client sends read attrib cmd to read Start of Block Period, verify response
+
+//checkAttributeRead( "esiClient", esiId, "Price", "0x0700", "0x0200", "0xE2", "1C458027", 
+  //          getSourceFileInfo(), this.namespace.getInvocationLine() );
+
+VerifyPriceAttrib( "esiClient", "esi", esiId, "0x0700", "0x0200",   "0x16458027", 4 );
+networkWait(timeout*5);
+
+
+// Item 3-4 - Client sends read attrib cmd to read Block Period Duration, verify response
+VerifyPriceAttrib( "esiClient", "esi", esiId, "0x0700", "0x0201",   "0x000005", 3 );
+
+// Item 5-6 - Client sends read attrib cmd to read Threshold Multiplier, verify response
+VerifyPriceAttrib( "esiClient", "esi", esiId, "0x0700", "0x0202",   "0x00000A", 3 );
+
+// Item 7-8 - Client sends read attrib cmd to read Threshold Divisor, verify response
+VerifyPriceAttrib( "esiClient", "esi", esiId, "0x0700", "0x0203",   "0x000002", 3 );
+
+
+// INTERNAL - Send future block period, verify it kicks in at the right time + 0x100 seconds (256).
+send("esi", "plugin price-server block-period add 1 11223344 0x00000002 0x16458127 0x05 0x00 0x00  0x0A 2  0x00 0x01" );
+networkWait( 200000 );    // Wait 200 seconds
+VerifyPriceAttrib( "esiClient", "esi", esiId, "0x0700", "0x0200",   "0x16458027", 4 );
+
+networkWait( 100000 );    // Wait 100 seconds
+VerifyPriceAttrib( "esiClient", "esi", esiId, "0x0700", "0x0200",   "0x16458127", 4 );
+
+// FINAL - Now restore time back to the current time.
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+
+// Test 12.16 - Publish Block Period (Client)
+// ===========================================================================
+// Since our IHD doesn't send "GetPriceMatrix", the events in this test
+// were already performed in 12.14.
+
+
+// Test 12.25 - GET BLOCK PERIOD REQUEST
+// ===========================================================================
+
+String VerifyBlockPeriod( String node, int providerId, int eventId, String time ){
+
+  networkWait( timeout );
+  // Construct string to store what the time should look like.
+  // Skip leading "0x", reverse bytes, add space between each
+  // String timeInRespData = new String(time.substring(8,10) + " " + attrIdHexNoPrefix.substring(0,2));
+
+  return _expectMultiline( node, 
+    "plugin price-client block-period printEvent 1 " + eventId,
+    new String[] {
+      ".*Print Block Period.*",
+      ".* valid=1.*",
+      ".* providerId=" + providerId + ".*",
+      ".* issuerEventId=" + eventId + ".*",
+      ".* rawStartTime=" + time + ".*",
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+// Re-sync time
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+timeNow = timeSinceZigBeeEpoch( 0 );
+String timeIn1Min = timeSinceZigBeeEpoch(1);
+String timeIn3Days = timeSinceZigBeeEpoch( 60*24*3 );
+
+// INIT - Configure 2 block periods
+send("esi", "plugin price-server init 1");
+send("esiClient", "plugin price-client init 1");
+
+send("esi", "plugin price-server block-period add 1 0x00000001 0x00000020 " +     timeNow + " 0x0FFF 0x00 0x00  0x0A 0x02  0 0x01" );
+send("esi", "plugin price-server block-period add 1 0x00000001 0x00000021 " + timeIn3Days + " 0x0FFF 0x00 0x00  0x0A 0x02  0 0x01" );
+networkWait( 2000 );
+
+// Item 1 - Client sends Get Block Period, startTime=0, numEvents=2.
+// Items 2-3 - Server sends back 2 Publish Block Period commands.
+send("esiClient", "plugin price-client init 1");
+networkWait( 1000 );
+send("esiClient", "zcl price get-block-periods 0x00000000 2 0x00" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: Get Block Period.*");
+expect("esiClient", ".*RX: PublishBlockPeriod.*");
+
+VerifyBlockPeriod( "esiClient", 0x00000001, 0x00000020, timeNow );
+VerifyBlockPeriod( "esiClient", 0x00000001, 0x00000021, timeIn3Days );
+
+
+
+// Item 4 - Client sends Get Block Period, startTime=0, numEvents=1.
+// Item 5 - Server sends back 1 Publish Block Period command.
+send("esiClient", "plugin price-client init 1");
+networkWait( 1000 );
+send("esiClient", "zcl price get-block-periods 0x00000000 1 0x00" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: Get Block Period.*");
+expect("esiClient", ".*RX: PublishBlockPeriod.*");
+VerifyBlockPeriod( "esiClient", 0x00000001, 0x00000020, timeNow );
+
+
+
+// Item 6 - Client sends Get Block Period, startTime=2 days, numEvents=2.
+send("esiClient", "plugin price-client init 1");
+networkWait( 1000 );
+send("esiClient", "zcl price get-block-periods " + timeIn3Days + " 2 0x00" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: Get Block Period.*");
+expect("esiClient", ".*RX: PublishBlockPeriod.*");
+// networkWait( timeout );
+// send("esiClient", "plugin price-client block-period printEvent 1 0x00000020");
+VerifyBlockPeriod( "esiClient", 0x00000001, 0x00000021, timeIn3Days );
+
+
+
+//exit( 0 );
+
+
+// GET SCHEDULED PRICES - no entries on ESI, ESI should reply with not found.
+send("esi", "plugin price-server clear 1");
+send("esiClient", "zcl price scheduled 0x00000000 0");
+expect("esiClient",
+       "send " + esiId + " 1 1", 
+       ".*RX len 5, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[01 8B \\]");
+
+send("esiClient", "zcl price scheduled 0x00000000 2");
+expect("esiClient",
+       "send " + esiId + " 1 1", 
+       ".*RX len 5, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[01 8B \\]");
+
+// Test 12.26 - GET SCHEDULED PRICES WITH END TIMES
+// ===========================================================================
+
+// INIT Item 1 - Configure prices 1,2,3 on ESI
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+String time1Day  = timeSinceZigBeeEpoch(1440); // Time since Jan-1 2000.  Param is in units of MINUTES
+String time2Days = timeSinceZigBeeEpoch(2880); // Time since Jan-1 2000.  Param is in units of MINUTES
+String time3Days = timeSinceZigBeeEpoch(4320); // Time since Jan-1 2000.  Param is in units of MINUTES
+
+send("esi", "plugin price-server clear 1");
+
+send("esi", "plugin price-server who 0x00000001 \"PRICE1\" 0x00000001");
+send("esi", "plugin price-server what 0x00 0x0348 0x11 0x31 0xFF");
+send("esi", "plugin price-server when " + time1Day + " 0x003C");
+send("esi", "plugin price-server price 0x00000010 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server ack 1");
+send("esi", "plugin price-server valid 0x01 0");
+
+send("esi", "plugin price-server who 0x00000001 \"PRICE2\" 0x00000002");
+send("esi", "plugin price-server what 0x00 0x0348 0x12 0x32 0xFF");
+send("esi", "plugin price-server when " + time2Days + " 0x003C");
+send("esi", "plugin price-server price 0x00000016 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server valid 0x01 1");
+
+send("esi", "plugin price-server who 0x00000001 \"PRICE3\" 0x00000003");
+send("esi", "plugin price-server what 0x00 0x0348 0x13 0x33 0xFF");
+send("esi", "plugin price-server when " + time3Days + " 0x05A0");
+send("esi", "plugin price-server price 0x0000001C 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server valid 0x01 2");
+send("esi", "plugin price-server ack 1");
+
+// Item 1-2 - Client sends Get Scheduled Prices, start NOW, 1 event, expect PRICE1
+networkWait( 1000 );
+send("esiClient", "zcl price scheduled 0x00000000 1");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 56.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"PRICE1\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x11, 0x31, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000010, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+networkWait(5000);
+
+// Item 3-5 - Client sends Get Scheduled Prices, start NOW, 2 events, expect PRICE1 and PRICE2
+send("esiClient", "zcl price scheduled 0x00000000 2");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 56.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"PRICE1\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x11, 0x31, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000010, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+networkWait(5000);
+
+send("esiClient", "plugin price-client printEvent 1 0x00000001" );
+expect("esiClient", ".*Matching Price .*");
+
+send("esiClient", "plugin price-client printEvent 1 0x00000002" );
+expect("esiClient", ".*Matching Price .*");
+
+
+
+// Item 6-7 - Send Get ScheduledPrice start=NOW + 1day, 1 event, expect PRICE1
+send("esiClient", "plugin price-client table-clear 0x01");
+send("esiClient", "zcl price scheduled " + time1Day + " 1");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 56.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"PRICE1\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x11, 0x31, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000010, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+networkWait(5000);
+
+send("esiClient", "plugin price-client printEvent 1 0x00000001" );
+expect("esiClient", ".*Matching Price .*");
+send("esiClient", "plugin price-client printEvent 1 0x00000002" );
+expect("esiClient", ".*Error: Event ID 2 not in price table.*");
+
+
+// Item 8-10 - Send Get ScheduledPrice start=NOW + 1day, 2 events, expect PRICE1 & PRICE2
+send("esiClient", "plugin price-client table-clear 0x01");
+send("esiClient", "zcl price scheduled " + time1Day + " 2");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 56.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"PRICE1\", 0x00000001, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x11, 0x31, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000010, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+networkWait(5000);
+
+send("esiClient", "plugin price-client printEvent 1 0x00000001" );
+expect("esiClient", ".*Matching Price .*");
+send("esiClient", "plugin price-client printEvent 1 0x00000002" );
+expect("esiClient", ".*Matching Price .*");
+
+
+// Item 11-12 - Send Get ScheduledPrice start=NOW + 2days, 1 event, expect PRICE2
+send("esiClient", "plugin price-client table-clear 0x01");
+send("esiClient", "zcl price scheduled " + time2Days + " 1");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 56.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"PRICE2\", 0x00000002, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x12, 0x32, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000016, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+networkWait(5000);
+
+send("esiClient", "plugin price-client printEvent 1 0x00000001" );
+expect("esiClient", ".*Error: Event ID 1 not in price table.*");
+send("esiClient", "plugin price-client printEvent 1 0x00000002" );
+expect("esiClient", ".*Matching Price .*");
+
+
+// Item 13-15 - Send Get ScheduledPrice start=NOW + 2days, 2 event, expect PRICE2, PRICE3
+send("esiClient", "plugin price-client table-clear 0x01");
+send("esiClient", "zcl price scheduled " + time2Days + " 2");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 56.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"PRICE2\", 0x00000002, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x12, 0x32, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000016, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+networkWait(5000);
+
+send("esiClient", "plugin price-client printEvent 1 0x00000001" );
+expect("esiClient", ".*Error: Event ID 1 not in price table.*");
+send("esiClient", "plugin price-client printEvent 1 0x00000002" );
+expect("esiClient", ".*Matching Price .*");
+send("esiClient", "plugin price-client printEvent 1 0x00000003" );
+expect("esiClient", ".*Matching Price .*");
+
+
+
+// Test 12.27 - GET SCHEDULED PRICES WITH CURRENT PRICE
+// ===========================================================================
+
+// INIT Item 1 - Configure prices 1,2 on ESI
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+String timeNow   = timeSinceZigBeeEpoch(0);
+String time1Hr   = timeSinceZigBeeEpoch(60);
+//time1Day  = timeSinceZigBeeEpoch(1440); // Time since Jan-1 2000.  Param is in units of MINUTES
+//time2Days = timeSinceZigBeeEpoch(2880); // Time since Jan-1 2000.  Param is in units of MINUTES
+//time3Days = timeSinceZigBeeEpoch(4320); // Time since Jan-1 2000.  Param is in units of MINUTES
+
+send("esi", "plugin price-server clear 1");
+send("esiClient", "plugin price-client table-clear 0x01");
+
+send("esi", "plugin price-server who 0x00000001 \"PRICE1\" 0x00000010");
+send("esi", "plugin price-server what 0x00 0x0348 0x11 0x21 0xFF");
+send("esi", "plugin price-server when " + timeNow + " 0x003C");
+send("esi", "plugin price-server price 0x00000030 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server valid 0x01 0");
+
+send("esi", "plugin price-server who 0x00000001 \"PRICE2\" 0x00000032");
+send("esi", "plugin price-server what 0x00 0x0348 0x12 0x22 0xFF");
+send("esi", "plugin price-server when " + time1Hr + " 0x003C");
+send("esi", "plugin price-server price 0x00000016 0xFF 0xFFFFFFFF 0xFF");
+send("esi", "plugin price-server valid 0x01 1");
+networkWait( 100 );
+
+// Item 1-2 - Server sends Get Scheduled Prices, time=0, numEvents=1.  Expect PRICE1
+send("esiClient", "zcl price scheduled 0 1");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 56.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"PRICE1\", 0x00000010, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x11, 0x21, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000030, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+
+send("esiClient", "plugin price-client printEvent 1 0x00000010" );
+expect("esiClient", ".*Matching Price .*");
+send("esiClient", "plugin price-client printEvent 1 0x00000032" );
+expect("esiClient", ".*Error: Event ID 50 not in price table.*");
+
+// Item 3-4 - Server sends Get Scheduled Prices, time=currUtc, numEvents=1.  Expect PRICE1
+send("esiClient", "zcl price scheduled " + timeNow + " 1");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient",".*RX len 56.*");
+expect("esiClient", "RX: PublishPrice 0x00000001, \"PRICE1\", 0x00000010, 0x[0-9a-fA-F]{8}, 0x00, 0x0348, 0x11, 0x21, 0x[0-9a-fA-F]{8}, 0x003C, 0x00000030, 0xFF, 0xFFFFFFFF, 0xFF, 0xFFFFFFFF, 0xFF, 0xFF, 0xFF, 0x01.*");
+
+send("esiClient", "plugin price-client printEvent 1 0x00000010" );
+expect("esiClient", ".*Matching Price .*");
+send("esiClient", "plugin price-client printEvent 1 0x00000032" );
+expect("esiClient", ".*Error: Event ID 50 not in price table.*");
+
+
+
+
+
+// Test 12.43 from Test Spec
+// ===============================================================
+
+String VerifyConversionFactor( String node, int eventId, int convFactor, int convFactTrailDig ){
+  return _expectMultiline( node, 
+    "plugin price-client conv-factor printEvent 1 " + eventId,
+    new String[] {
+      ".*Print Conversion Factor.*",
+      ".* issuerEventId=" + eventId + ".*",
+      ".* conversionFactor=" + convFactor + ".*",
+      ".* conversionFactorTrailingDigit=" + convFactTrailDig + ".*",
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+//std.print("===   SET CURRENCY CONVERSION   ====");
+send("esi", "plugin price-server init 1" );
+// Initial Conditions
+send("esi", "plugin price-server conversion-factor clear 1");
+String timeNow = epochTimeInFuture(0);
+String timeInFuture12Hr = epochTimeInFuture(12*60);
+String timeInFuture24Hr  = epochTimeInFuture(24*60);
+String timeInFuture48Hr  = epochTimeInFuture(48*60);
+String timeInPast12Hr  = epochTimeInFuture(-12*60);
+
+// Item 1 - Send Get Conversion Factor, start=currTime, numCmds=0
+send("esiClient", "zcl price get-conversion-factor " + timeNow + " 0x00000000 0x0"); 
+send("esiClient", "send 0 1 1");
+
+// Item 2 - Expect NOT FOUND
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[04 8B \\]");
+
+// Item 3 - Configure 2 conversion factors, 1 NOW (ID=A), 1 currTime + 1 day (ID=B)
+send("esi", "plugin price-server conversion-factor add 1 0x0A " + timeNow + " 0x0AAAAAAA 0x0A");
+send("esi", "plugin price-server conversion-factor add 1 0x0B " + timeInFuture24Hr + " 0x0BBBBBBB 0x0B");
+send("esi", "plugin price-server conversion-factor print 1");
+
+// Item 4 - Client sends Get Conversion Factor, startTime=currTime, numCnds=0
+send("esiClient", "zcl price get-conversion-factor " + timeNow + " 0xFFFFFFFF 0x0"); 
+send("esiClient", "send 0 1 1");
+
+// Item 5/6 - Server sends 2 conversion factors
+expectMultiline("esiClient",
+                "send 0 1 1", 
+                new String[] {
+// There is NO GUARANATEEE OF ORDERING !!!!! So this often fails.       
+//                  ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 0A 0A \\]",
+                  ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0B 00 00 00 .. .. .. .. BB BB BB 0B 0B \\]"
+                });
+networkWait(timeout * 10); 
+VerifyConversionFactor( "esiClient", 10, 178956970, 10 );
+VerifyConversionFactor( "esiClient", 11, 196852667, 11 );
+
+
+// Item 7 - Client sends Get Conversion Factor, start=currTime, numCmds=1
+send("esiClient", "zcl price get-conversion-factor " + timeNow + " 0xFFFFFFFF 0x1"); 
+send("esiClient", "send 0 1 1");
+
+// Item 8 - Expect eventID A
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 0A 0A \\]");
+
+// Item 9 - Client sends Get Conversion Factor, start=currTime, numCmds=2
+send("esiClient", "zcl price get-conversion-factor " + timeNow + " 0xFFFFFFFF 0x2"); 
+send("esiClient", "send 0 1 1");
+
+// Item 10/11 - publish
+//expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0A 00 00 00 .. .. .. .. AA AA AA AA 0A \\]");
+//expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0B 00 00 00 .. .. .. .. BB BB BB BB 0B \\]");
+VerifyConversionFactor( "esiClient", 10, 178956970, 10 );
+VerifyConversionFactor( "esiClient", 11, 196852667, 11 );
+
+// Item 12-14 - Client sends Get Conversion Factor, start=currTime, numCmds=3.  Expect 2 responses
+send("esiClient", "zcl price get-conversion-factor " + timeNow + " 0xFFFFFFFF 0x3"); 
+expectMultiline("esiClient",
+                "send 0 1 1",
+                new String[] {
+                  ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 0A 0A \\]",
+// There is NO GUARANATEEE OF ORDERING !!!!! So this often fails.       
+//                  ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0B 00 00 00 .. .. .. .. BB BB BB 0B 0B \\]"
+                });
+VerifyConversionFactor( "esiClient", 10, 178956970, 10 );
+VerifyConversionFactor( "esiClient", 11, 196852667, 11 );
+
+
+
+// Item 15 - Client sends Get Conversion Factor, start=currTime - 1 day,  numCmds=1
+send("esiClient", "zcl price get-conversion-factor " + timeInPast12Hr + " 0xFFFFFFFF 0x1"); 
+send("esiClient", "send 0 1 1");
+
+// Item 16 - Expect Event ID A
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 0A 0A \\]");
+
+// Item 17
+send("esiClient", "zcl price get-conversion-factor " + timeInFuture12Hr + " 0xFFFFFFFF 0x1"); 
+send("esiClient", "send 0 1 1");
+
+// Item 18
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 0A 0A \\]");
+
+// Item 19
+send("esiClient", "zcl price get-conversion-factor " + timeInFuture48Hr + " 0xFFFFFFFF 0x1"); 
+send("esiClient", "send 0 1 1");
+
+// Item 20
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0B 00 00 00 .. .. .. .. BB BB BB 0B 0B \\]");
+
+// Item 21
+send("esiClient", "zcl price get-conversion-factor " + timeNow + " 0x0B 0x0"); 
+send("esiClient", "send 0 1 1");
+
+// Item 22
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0B 00 00 00 .. .. .. .. BB BB BB 0B 0B \\]");
+
+
+
+
+
+// INTERNAL TEST #1 - Server sorts responses by start time.
+// Check that the server correctly sorts events.
+send("esi", "plugin price-server init 1");
+networkWait(100);
+send("esi", "plugin price-server conversion-factor add 1 0x00000001 " + timeNow          + " 0x0AAAAAAA 0x0A");
+send("esi", "plugin price-server conversion-factor add 1 0x00000002 " + timeInFuture48Hr + " 0x0BBBBBBB 0x0B");
+
+//because of teh changes introduced by deactivating routes that look failed, we
+//need to resend the same messages after some time, so that the routes are
+//re-inserted and stabilized
+networkWait( 8000 );
+
+send("esi", "plugin price-server conversion-factor add 1 0x00000001 " + timeNow
++ " 0x0AAAAAAA 0x0A");
+send("esi", "plugin price-server conversion-factor add 1 0x00000002 " +
+timeInFuture48Hr + " 0x0BBBBBBB 0x0B");
+
+networkWait(4000);
+
+send("esiClient", "zcl price get-conversion-factor 0x00000001 0xFFFFFFFF 0"); 
+send("esiClient", "send 0 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+//      ".*Sending conversion factor: table\\[0\\].*",
+//      ".*Sending conversion factor: table\\[1\\].*"
+      ".*TX buffer: \\[09 .. 02 01 00 00 00 .. .. .. .. AA AA AA 0A 0A.*",
+      ".*TX buffer: \\[09 .. 02 02 00 00 00 .. .. .. .. BB BB BB 0B 0B.*",
+    });
+
+send("esi", "plugin price-server init 1");
+networkWait(100);
+send("esi", "plugin price-server conversion-factor add 1 0x00000001 " + timeInFuture48Hr + " 0x0AAAAAAA 0x0A");
+send("esi", "plugin price-server conversion-factor add 1 0x00000002 " + timeNow          + " 0x0BBBBBBB 0x0B");
+networkWait( 100 );
+send("esiClient", "zcl price get-conversion-factor 0x00000001 0xFFFFFFFF 0"); 
+send("esiClient", "send 0 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+//      ".*Sending conversion factor: table\\[1\\].*",
+//      ".*Sending conversion factor: table\\[0\\].*"
+      ".*TX buffer: \\[09 .. 02 02 00 00 00 .. .. .. .. BB BB BB 0B 0B.*",
+      ".*TX buffer: \\[09 .. 02 01 00 00 00 .. .. .. .. AA AA AA 0A 0A.*",
+    });
+
+
+// INTERNAL TEST #2 - Server applies event ID filtering
+// Ensure the server filters responses based on the min event ID specified in the request.
+networkWait(5000);
+send("esiClient", "plugin price-client init 1");
+networkWait(1000);
+send("esiClient", "zcl price get-conversion-factor 0x00000001 0x00000002 0"); 
+send("esiClient", "send 0 1 1");
+
+networkWait( 3000 );
+expectMultiline( "esiClient",
+    "plugin price-client conv-factor printEvent 1 2",
+    new String[] {
+      ".*Print Conversion Factor.*",
+      ".* issuerEventId=2.*"
+    });
+send("esiClient", "plugin price-client conv-factor printEvent 1 1");
+expect("esiClient", ".*NOT FOUND.*");
+
+
+
+// INTERNAL TEST #3
+//  - Set multiple conversion factor values on server.  Make sure the attributes update at the expected time.
+String time15Min = timeSinceZigBeeEpoch(15);
+String timeNow = timeSinceZigBeeEpoch(0);
+networkWait( 1000 );
+send("esi", "plugin price-server init 1");
+networkWait( 100 );
+send("esi", "plugin price-server conversion-factor add 1 0x00000101 " + timeNow +  "  0x1AAAAAAA 0x0A");
+send("esi", "plugin price-server conversion-factor add 1 0x00000102 " + time15Min + "  0x1BBBBBBB 0x03");
+networkWait( 1000 );
+
+send( "esiClient", "zcl global read 0x0700 0x0302" );
+send( "esiClient", "send " + esiId + " 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+      ".*RX len 5, ep 01, clus 0x0700 \\(Price\\) FC 00 seq .. cmd 00 payload\\[02 03 \\].*",
+      ".*READ_ATTR: clus 0700.*",
+      ".*READ: clus 0700, attr 0302, dataLen: 04, OK.*",
+    });
+
+expect( "esiClient", ".*RX len 11, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[02 03 00 .. AA AA AA 1A.*");
+networkWait( 60000 * 16 );
+send( "esiClient", "zcl global read 0x0700 0x0302" );
+send( "esiClient", "send " + esiId + " 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+      ".*RX len 5, ep 01, clus 0x0700 \\(Price\\) FC 00 seq .. cmd 00 payload\\[02 03 \\].*",
+      ".*READ_ATTR: clus 0700.*",
+      ".*READ: clus 0700, attr 0302, dataLen: 04, OK.*",
+    });
+expect( "esiClient", ".*RX len 11, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[02 03 00 .. BB BB BB 1B.*");
+
+
+
+
+// Test 12.44 from Test Spec
+// ===============================================================
+
+// Initial Conditions
+networkWait( 3000 );
+send("esi", "plugin price-server init 1");
+send("esiClient", "plugin price-client init 1");
+networkWait( 100 );
+
+send("esi", "plugin price-server conversion-factor add 1 0x0E " + timeNow + " 0xAAAAAAAA 0x0A");
+send("esi", "plugin price-server conversion-factor add 1 0x0F " + timeInFuture24Hr + " 0xBBBBBBBB 0x0B");
+networkWait( 100 );
+
+// Item 1
+send("esiClient", "zcl price get-conversion-factor " + timeNow + " 0xFFFFFFFF 0x0"); 
+expectMultiline("esiClient", "send 0 1 1",
+                new String[] {
+                  // order of the replies can't be guaranteed
+                  //".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0E 00 00 00 .. .. .. .. AA AA AA AA 0A \\]",
+                  ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[0F 00 00 00 .. .. .. .. BB BB BB BB 0B \\]",
+                });
+network.sleep(2000);
+
+// Test 12.45 from Test Spec
+// NOTE: this can be done via zcl commands.
+
+// Item 1
+send("esi", "plugin price-server init 1");
+networkWait( 100 );
+send("esi", "plugin price-server conversion-factor add 1 0xCC " + timeInFuture24Hr + " 0xCCCCCCCC 0x0C");
+send("esi", "plugin price-server conversion-factor pub 0 " + esiClientId + " 1 1 ");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 02 payload\\[CC 00 00 00 .. .. .. .. CC CC CC CC 0C \\]");
+
+// Expect client to send default response, status=SUCCESS, back to server
+expect("esi", ".*clus 0x0700 \\(Price\\) FC 00 seq .. cmd 0B payload\\[02 00 \\].*");
+
+
+// Test 12.46 from Test Spec
+// =======================================================
+
+String VerifyCalorificValue( String node, int eventId, int calorValue, int calValueUnit, calValueTrailDigit ){
+  return _expectMultiline( node, 
+    "plugin price-client calf-value printEvent 1 " + eventId,
+    new String[] {
+      ".*Print Calorific Value.*",
+      ".* issuerEventId=" + eventId + ".*",
+      ".* calorificValue=" + calorValue + ".*",
+      ".* calorificValueUnit=" + calValueUnit + ".*",
+      ".* calorificValueTrailingDigit=" + calValueTrailDigit + ".*",
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+
+// Initial Conditions
+send("esi", "plugin price-server calorific-value clear 1");
+String timeNow = timeSinceZigBeeEpoch(0);   // epochTimeInFuture(0);
+String timeInFuture12Hr = timeSinceZigBeeEpoch(12*60);  // epochTimeInFuture(12*60);
+String timeInFuture24Hr  = timeSinceZigBeeEpoch(24*60); // epochTimeInFuture(24*60);
+String timeInFuture48Hr  = timeSinceZigBeeEpoch(48*60); // epochTimeInFuture(48*60);
+String timeInPast12Hr  = timeSinceZigBeeEpoch(-12*60);  // epochTimeInFuture(-12*60);
+
+// Item 1 - Client sends Get Calorific Value to server
+send("esiClient", "zcl price get-cal-val " + timeNow + " 0x00000000 0x0"); 
+send("esiClient", "send 0 1 1");
+
+// Item 2 - Expect NOT FOUND.
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[05 8B \\]");
+
+// Item 3 - Create 2 calorific values on the server, eventId=A, and B.
+send("esi", "plugin price-server calorific-value add 1 0x0A " + timeNow + " 0x1AAAAAAA 0x0A 0x0A");
+send("esi", "plugin price-server calorific-value add 1 0x0B " + timeInFuture24Hr + " 0x1BBBBBBB 0x0B 0x0B");
+send("esi", "plugin price-server calorific-value print 1");
+network.sleep(1000);
+
+// Item 4 - Client sends Get Calorific Value to Server, start=currTime, numCmds=0
+send("esiClient", "zcl price get-cal-val " + timeNow + " 0xFFFFFFFF 0x0");
+send("esiClient", "send 0 1 1");
+
+// Item 5/6 - Server sends both events back to client.
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 1A 0A 0A \\]");
+//expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0B 00 00 00 .. .. .. .. BB BB BB 1B 0B 0B \\]");
+
+networkWait(timeout*5);
+VerifyCalorificValue( "esiClient", 10, 447392426, 10, 10 );
+VerifyCalorificValue( "esiClient", 11, 465288123, 11, 11 );
+
+
+// Item 7 - Client sends GetCalorificValue to server, start=currTime, numCmds=1
+send("esiClient", "plugin price-client init 1");
+send("esiClient", "zcl price get-cal-val " + timeNow + " 0xFFFFFFFF 0x1");
+send("esiClient", "send 0 1 1");
+
+// Item 8 - Server sends 1 response
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 1A 0A 0A \\]");
+
+// Item 9 - Client sends GetCalorificValue to Server with startTime=currTime, numCmds=2
+send("esiClient", "plugin price-client init 1");
+networkWait( 1000 );
+send("esiClient", "zcl price get-cal-val " + timeNow + " 0xFFFFFFFF 0x02");
+send("esiClient", "send 0 1 1");
+
+// Item 10-11 - Server sends 2 Publish Calorific Value responses
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 1A 0A 0A \\]");
+networkWait(timeout*5);
+VerifyCalorificValue( "esiClient", 10, 447392426, 10, 10 );
+VerifyCalorificValue( "esiClient", 11, 465288123, 11, 11 );
+
+// Item 12 - Client sends GetCalorificValue to server, startTime=currTime, numCmds=3.
+send("esiClient", "plugin price-client init 1");
+send("esiClient", "zcl price get-cal-val " + timeNow + " 0xFFFFFFFF 0x02");
+send("esiClient", "send 0 1 1");
+
+// Item 13-14 - Server sends 2 Publish Calorific value responses
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 1A 0A 0A \\]");
+networkWait(3000);
+VerifyCalorificValue( "esiClient", 10, 447392426, 10, 10 );
+VerifyCalorificValue( "esiClient", 11, 465288123, 11, 11 );
+
+// Item 15 - Client sends GetCalorificValue to server, startTime=currTime - 1 day, numCmds=1.
+send("esiClient", "plugin price-client init 1");
+send("esiClient", "zcl price get-cal-val " + timeInPast12Hr + " 0xFFFFFFFF 0x01");
+send("esiClient", "send 0 1 1");
+
+// Item 16 - Server sends 1 Publish Calorific value responses
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 1A 0A 0A \\]");
+VerifyCalorificValue( "esiClient", 10, 447392426, 10, 10 );
+
+// Item 17 - Client sends GetCalorificValue to server, startTime=currTime + 12 hrs, numCmds=1.
+send("esiClient", "plugin price-client init 1");
+send("esiClient", "zcl price get-cal-val " + timeInFuture12Hr + " 0xFFFFFFFF 0x01");
+send("esiClient", "send 0 1 1");
+
+// Item 18 - Server sends 1 Publish Calorific value responses
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0A 00 00 00 .. .. .. .. AA AA AA 1A 0A 0A \\]");
+VerifyCalorificValue( "esiClient", 10, 447392426, 10, 10 );
+send("esiClient", "plugin price-client calf-value printEvent 1 11");
+expect("esiClient", ".*NOT FOUND.*");
+
+// Item 19 - Client sends GetCalorificValue to server, startTime=currTime + 48 hrs, numCmds=1.
+send("esiClient", "plugin price-client init 1");
+send("esiClient", "zcl price get-cal-val " + timeInFuture48Hr + " 0xFFFFFFFF 0x01");
+send("esiClient", "send 0 1 1");
+
+// Item 20 - Server sends 1 Publish Calorific value responses
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0B 00 00 00 .. .. .. .. BB BB BB 1B 0B 0B \\]");
+VerifyCalorificValue( "esiClient", 11, 465288123, 11, 11 );
+send("esiClient", "plugin price-client calf-value printEvent 1 10");
+expect("esiClient", ".*NOT FOUND.*");
+
+// Item 21 - Client sends GetCalorificValue to server, startTime=currTime, minEvent=B, numCmds=0
+send("esiClient", "plugin price-client init 1");
+send("esiClient", "zcl price get-cal-val " + timeNow + " 0x0000000B 0x00");
+send("esiClient", "send 0 1 1");
+
+// Item 22 - Server sends 1 Publish Calorific value responses
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 03 payload\\[0B 00 00 00 .. .. .. .. BB BB BB 1B 0B 0B \\]");
+VerifyCalorificValue( "esiClient", 11, 465288123, 11, 11 );
+send("esiClient", "plugin price-client calf-value printEvent 1 10");
+expect("esiClient", ".*NOT FOUND.*");
+
+
+
+
+// INTERNAL TEST #1 - Server sorts responses by start time.
+// Check that the server correctly sorts events.
+send("esi", "plugin price-server init 1");
+send("esiClient", "plugin price-client init 1");
+networkWait(1000);
+
+send("esi", "plugin price-server calorific-value add 1 0x00000001 " + timeNow          + " 0x1AAAAAAA 0x0A 0x0A");
+send("esi", "plugin price-server calorific-value add 1 0x00000002 " + timeInFuture24Hr + " 0x1BBBBBBB 0x0B 0x0B");
+networkWait( 1000 );
+send("esiClient", "zcl price get-cal-val 0x00000001 0xFFFFFFFF 0");
+send("esiClient", "send 0 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+//      ".*Sending calorific value: table\\[0\\].*",
+//      ".*Sending calorific value: table\\[1\\].*"
+      ".*TX buffer: \\[09 .. 03 01 00 00 00 .. .. .. .. AA AA AA 1A 0A 0A.*",
+      ".*TX buffer: \\[09 .. 03 02 00 00 00 .. .. .. .. BB BB BB 1B 0B 0B.*",
+    });
+
+send("esi", "plugin price-server calorific-value add 1 0x00000003 " + timeInFuture24Hr + " 0x1AAAAAAA 0x0A 0x0A");
+send("esi", "plugin price-server calorific-value add 1 0x00000004 " + timeNow +          " 0x1BBBBBBB 0x0B 0x0B");
+networkWait( 1000 );
+send("esiClient", "zcl price get-cal-val 0x00000001 0xFFFFFFFF 0");
+send("esiClient", "send 0 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+//      ".*Sending calorific value: table\\[1\\].*",
+//      ".*Sending calorific value: table\\[0\\].*"
+      ".*TX buffer: \\[09 .. 03 04 00 00 00 .. .. .. .. BB BB BB 1B 0B 0B.*",
+      ".*TX buffer: \\[09 .. 03 03 00 00 00 .. .. .. .. AA AA AA 1A 0A 0A.*",
+    });
+
+
+// INTERNAL TEST #2 - Server applies event ID filtering
+// Ensure the server filters responses based on the min event ID specified in the request.
+networkWait( 5000 );
+send("esiClient", "plugin price-client init 1");
+networkWait(1000);
+send("esiClient", "zcl price get-cal-val 0x00000001 0x00000004 0");
+send("esiClient", "send 0 1 1");
+
+networkWait( 3000 );
+expectMultiline( "esiClient",
+    "plugin price-client calf-value printEvent 1 4",
+    new String[] {
+      ".*Print Calorific Value.*",
+      ".* issuerEventId=4.*"
+    });
+send("esiClient", "plugin price-client calf-value printEvent 1 3");
+expect("esiClient", ".*NOT FOUND.*");
+
+
+
+
+// Test 12.47 - CALORIFIC VALUE (CLIENT)
+// ===========================================================
+// Items 1-2 were tested in the previous test.
+
+
+// Test 12.48 - UNSOLICITED PUBLISH CALORIFIC VALUE
+// ===========================================================
+// Items 1-2 - Send calorific value to client.  Ensure client sends default response back.
+
+send("esi", "zcl price pub-cal-val 2000 0 222 3 23" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishCalorificValue.*");
+expect("esi", ".*clus 0x0700 \\(Price\\) FC 00 seq .. cmd 0B payload\\[03 00 \\].*");
+
+
+// INTERNAL TEST #1
+//  - Set multiple calorific values on server.  Make sure the attributes update at the expected time.
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+timeNow   = timeSinceZigBeeEpoch(0);
+time15Min = timeSinceZigBeeEpoch(15);
+networkWait( 1000 );
+send("esi", "plugin price-server init 1");
+networkWait( 100 );
+send("esi", "plugin price-server calorific-value add 1 0x00000101 " + timeNow +  "  0x1AAAAAAA 0x0A 0x0A");
+send("esi", "plugin price-server calorific-value add 1 0x00000102 " + time15Min + "  0x1BBBBBBB 0x0B 0x03");
+networkWait( 1000 );
+
+send( "esiClient", "zcl global read 0x0700 0x0304" );
+send( "esiClient", "send " + esiId + " 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+      ".*RX len 5, ep 01, clus 0x0700 \\(Price\\) FC 00 seq .. cmd 00 payload\\[04 03 \\].*",
+      ".*READ_ATTR: clus 0700.*",
+      ".*READ: clus 0700, attr 0304, dataLen: 04, OK.*",
+    });
+
+expect( "esiClient", ".*RX len 11, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[04 03 00 .. AA AA AA 1A.*");
+networkWait( 60000 * 16 );
+send( "esiClient", "zcl global read 0x0700 0x0304" );
+send( "esiClient", "send " + esiId + " 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+      ".*RX len 5, ep 01, clus 0x0700 \\(Price\\) FC 00 seq .. cmd 00 payload\\[04 03 \\].*",
+      ".*READ_ATTR: clus 0700.*",
+      ".*READ: clus 0700, attr 0304, dataLen: 04, OK.*",
+    });
+expect( "esiClient", ".*RX len 11, ep 01, clus 0x0700 \\(Price\\) FC 08 seq .. cmd 01 payload\\[04 03 00 .. BB BB BB 1B.*");
+
+
+// Test 12.49 from Test Spec
+// ==================================================================
+// Initial Conditions
+send("esi", "plugin price-server tariff clear 1");
+
+// Item 1
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff1\" 0x00000001 0x00000001");
+send("esi", "plugin price-server tariff when " + timeNow);
+send("esi", "plugin price-server tariff what  0x20 0x00 840 80 0x04 0x03 0x01");
+send("esi", "plugin price-server tariff add 1 1"); // purposely putting this in second slot to test ordering
+
+send("esi", "plugin price-server pm set-metadata 0x01 0x00000001 0x00000002 0x00000001 " + timeNow + " 0x01");
+send("esi", "plugin price-server pm put 0x01 0x00 0x00 0x00010000");
+send("esi", "plugin price-server pm put 0x01 0x01 0x00 0x00010100");
+send("esi", "plugin price-server pm put 0x01 0x02 0x00 0x00010200");
+send("esi", "plugin price-server pm put 0x01 0x03 0x00 0x00010300");
+send("esi", "plugin price-server pm put 0x01 0x00 0x01 0x00010001");
+send("esi", "plugin price-server pm put 0x01 0x01 0x01 0x00010101");
+send("esi", "plugin price-server pm put 0x01 0x02 0x01 0x00010201");
+send("esi", "plugin price-server pm put 0x01 0x03 0x01 0x00010301");
+send("esi", "plugin price-server pm put 0x01 0x00 0x02 0x00010002");
+send("esi", "plugin price-server pm put 0x01 0x01 0x02 0x00010102");
+send("esi", "plugin price-server pm put 0x01 0x02 0x02 0x00010202");
+send("esi", "plugin price-server pm put 0x01 0x03 0x02 0x00010302");
+send("esi", "plugin price-server pm put 0x01 0x00 0x03 0x00010003");
+send("esi", "plugin price-server pm put 0x01 0x01 0x03 0x00010103");
+send("esi", "plugin price-server pm put 0x01 0x02 0x03 0x00010203");
+send("esi", "plugin price-server pm put 0x01 0x03 0x03 0x00010303");
+send("esi", "plugin price-server pm add 0x01");
+
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 0");
+
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x00000001, 0x00000001, 0x.*, 0x20, \"tariff1\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001");
+// PUBLISH TARIFF INFO
+//   [providerId:4] + [eventId:4] + [tariffId:4] + [startTime:4] + [tariffType:1] + [label:1-25] + [numTiers:1] + [numThresholds:1] +
+//   [unitOfMeas:1] + [currency:2] + [trailDigit:1] + [standingCharge:4] + [blockmode:1] + [thresholdMult:3] + [thresholdDivis:3]
+//expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 04 payload\\[44 33 22 11 03 00 00 00 .. .. .. .. 08 00 00 01 02 ED 0C 00 00 01 00 01 \\]");
+//exit (1)
+
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff2\" 0x00000003 0x00000002");
+send("esi", "plugin price-server tariff when " + timeInFuture24Hr);
+send("esi", "plugin price-server tariff what 00x20 0x00 840 80 0x04 0x03 0x02");
+send("esi", "plugin price-server tariff add 1 2"); // this goes in first slot
+
+send("esi", "plugin price-server pm set-metadata 0x01 0x00000001 0x00000004 0x00000002 " + timeInFuture24Hr + " 0x02");
+send("esi", "plugin price-server pm put 0x01 0x00 0x00 0x00020000");
+send("esi", "plugin price-server pm put 0x01 0x01 0x00 0x00020100");
+send("esi", "plugin price-server pm put 0x01 0x02 0x00 0x00020200");
+send("esi", "plugin price-server pm put 0x01 0x03 0x00 0x00020300");
+send("esi", "plugin price-server pm put 0x01 0x00 0x01 0x00020001");
+send("esi", "plugin price-server pm put 0x01 0x01 0x01 0x00020101");
+send("esi", "plugin price-server pm put 0x01 0x02 0x01 0x00020201");
+send("esi", "plugin price-server pm put 0x01 0x03 0x01 0x00020301");
+send("esi", "plugin price-server pm put 0x01 0x00 0x02 0x00020002");
+send("esi", "plugin price-server pm put 0x01 0x01 0x02 0x00020102");
+send("esi", "plugin price-server pm put 0x01 0x02 0x02 0x00020202");
+send("esi", "plugin price-server pm put 0x01 0x03 0x02 0x00020302");
+send("esi", "plugin price-server pm put 0x01 0x00 0x03 0x00020003");
+send("esi", "plugin price-server pm put 0x01 0x01 0x03 0x00020103");
+send("esi", "plugin price-server pm put 0x01 0x02 0x03 0x00020203");
+send("esi", "plugin price-server pm put 0x01 0x03 0x03 0x00020303");
+send("esi", "plugin price-server pm add 0x01");
+
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 1");
+
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x00000003, 0x00000002, 0x.*, 0x20, \"tariff2\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x02, 0x00000001, 0x00000001");
+
+// Item 2
+// Item 3
+
+send("esi", "plugin price-server tariff print 0x01");
+networkWait(timeout*5);
+
+send("esiClient", "zcl price get-tariff-info 0x00000001 0xFFFFFFFF 0x00 0x00");
+send("esiClient", "send 0 1 1");
+
+// Item 4
+expectMultiline("esiClient",
+                new String[] {
+                   ".*RX: PublishTariffInformation 0x00000001, 0x0000000[13], 0x0000000[12], 0x........, 0x20, \"tariff[12]\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x0[12], 0x00000001, 0x00000001",
+                   ".*RX: PublishTariffInformation 0x00000001, 0x0000000[13], 0x0000000[12], 0x........, 0x20, \"tariff[12]\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x0[12], 0x00000001, 0x00000001",
+                });
+
+// Item 5
+send("esiClient", "zcl price get-tariff-info 0xFFFFFFFE 0xFFFFFFFF 0x00 0xF0");
+send("esiClient", "send 0 1 1");
+// Item 6
+// make sure we don't receive the 1st tariff.
+
+nexpect("esiClient",
+        ".*RX: PublishTariffInformation 0x00000001, 0x00000001, 0x00000001, 0x.*, 0x20, \"tariff1\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001", 
+        100);
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x00000003, 0x00000002, 0x.*, 0x20, \"tariff2\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x02, 0x00000001, 0x00000001");
+
+// Item 7
+send("esiClient", "zcl price get-tariff-info 0x00000001 0xFFFFFFFE 0x00 0x00");
+send("esiClient", "send 0 1 1");
+
+// Item 8
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[06 8B \\]");
+
+// Item 9
+send("esiClient", "zcl price get-tariff-info 0x00000001 0xFFFFFFFF 0x01 0x00");
+send("esiClient", "send 0 1 1");
+
+// Item 10
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x00000001, 0x00000001, 0x.*, 0x20, \"tariff1\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001");
+
+// Item 11
+send("esiClient", "zcl price get-tariff-info " + timeInFuture48Hr + " 0xFFFFFFFF 0x00 0x00");
+send("esiClient", "send 0 1 1");
+
+// Item 12
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x00000003, 0x00000002, 0x.*, 0x20, \"tariff2\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x02, 0x00000001, 0x00000001");
+
+// Item 13
+send("esiClient", "zcl price get-price-matrix 0x00000001");
+send("esiClient", "send 0 1 1");
+
+// Item 14
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 05 payload\\[01 00 00 00 02 00 00 00 .. .. .. .. 01 00 00 00 00 01 00 00 00 00 01 00 01 01 00 01 00 02 02 00 01 00 03 03 00 01 00 10 00 01 01 00 11 01 01 01 00 12 02 01 01 00 13 03 01 01 00 20 00 02 01 00 21 01 02 01 00 22 02 02 01 00 23 03 02 01 00 30 00 03 01 00 31 01 03 01 00 32 02 03 01 00 33 03 03 01 00 \\]");
+networkWait(timeout);
+
+// Item 15
+send("esiClient", "zcl price get-price-matrix 0x00000002");
+send("esiClient", "send 0 1 1");
+
+// Item 16
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 05 payload\\[01 00 00 00 04 00 00 00 .. .. .. .. 02 00 00 00 00 01 00 00 00 00 02 00 01 01 00 02 00 02 02 00 02 00 03 03 00 02 00 10 00 01 02 00 11 01 01 02 00 12 02 01 02 00 13 03 01 02 00 20 00 02 02 00 21 01 02 02 00 22 02 02 02 00 23 03 02 02 00 30 00 03 02 00 31 01 03 02 00 32 02 03 02 00 33 03 03 02 00 \\]");
+networkWait(timeout);
+
+// Item 17
+send("esiClient", "zcl price get-price-matrix 0x00000003");
+send("esiClient", "send 0 1 1");
+
+// Item 18
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[07 8B \\]");
+
+// Item 19
+send("esi", "plugin price-server bt set-metadata 0x01 0x00000001 0x00000006 0x00000002 " + timeInFuture24Hr + " 0x02");
+send("esi", "plugin price-server bt put 0x01 0x00 0x00 {01 02 03 00 00 00}");
+send("esi", "plugin price-server bt put 0x01 0x00 0x01 {07 08 09 00 00 00}");
+send("esi", "plugin price-server bt put 0x01 0x00 0x02 {0D 0E 0F 00 00 00}");
+send("esi", "plugin price-server bt put 0x01 0x01 0x00 {01 02 03 01 01 01}");
+send("esi", "plugin price-server bt put 0x01 0x01 0x01 {07 08 09 01 01 01}");
+send("esi", "plugin price-server bt put 0x01 0x01 0x02 {0D 0E 0F 01 01 01}");
+send("esi", "plugin price-server bt put 0x01 0x02 0x00 {01 02 03 02 02 02}");
+send("esi", "plugin price-server bt put 0x01 0x02 0x01 {07 08 09 02 02 02}");
+send("esi", "plugin price-server bt put 0x01 0x02 0x02 {0D 0E 0F 02 02 02}");
+send("esi", "plugin price-server bt put 0x01 0x03 0x00 {01 02 03 03 03 03}");
+send("esi", "plugin price-server bt put 0x01 0x03 0x01 {07 08 09 03 03 03}");
+send("esi", "plugin price-server bt put 0x01 0x03 0x02 {0D 0E 0F 03 03 03}");
+send("esi", "plugin price-server bt set 0x01 0x00");
+
+send("esi", "plugin price-server bt set-metadata 0x01 0x00000001 0x00000005 0x00000001 " + timeNow + " 0x01");
+send("esi", "plugin price-server bt put 0x01 0x00 0x00 {01 02 03 04 05 06}");
+send("esi", "plugin price-server bt put 0x01 0x00 0x01 {07 08 09 0A 0B 0C}");
+send("esi", "plugin price-server bt put 0x01 0x00 0x02 {0D 0E 0F 00 00 00}");
+send("esi", "plugin price-server bt set 0x01 0x01");
+networkWait(5000);
+
+send("esiClient", "zcl price get-block-thresholds 0x00000001");
+send("esiClient", "send 0 1 1");
+
+// Item 20
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 06 payload\\[01 00 00 00 05 00 00 00 .. .. .. .. 01 00 00 00 00 01 01 03 06 05 04 03 02 01 0C 0B 0A 09 08 07 00 00 00 0F 0E 0D \\]");
+networkWait(timeout);
+
+// Item 21
+send("esiClient", "zcl price get-block-thresholds 0x00000002");
+send("esiClient", "send 0 1 1");
+
+// Item 22
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 06 payload\\[01 00 00 00 06 00 00 00 .. .. .. .. 02 00 00 00 00 01 00 03 00 00 00 03 02 01 00 00 00 09 08 07 00 00 00 0F 0E 0D 13 01 01 01 03 02 01 01 01 01 09 08 07 01 01 01 0F 0E 0D 23 02 02 02 03 02 01 02 02 02 09 08 07 02 02 02 0F 0E 0D 33 03 03 03 03 02 01 03 03 03 09 08 07 03 03 03 0F 0E 0D \\]");
+networkWait(timeout);
+
+// Item 23
+send("esiClient", "zcl price get-block-thresholds 0x00000003");
+send("esiClient", "send 0 1 1");
+
+// Item 24
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[08 8B \\]");
+
+//Item 25
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff3\" 0x00000007 0x00000003");
+send("esi", "plugin price-server tariff when " + timeNow);
+send("esi", "plugin price-server tariff what  0xF1 0x00 840 80 0x04 0x03 0x01");
+send("esi", "plugin price-server tariff add 1 1");
+
+
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 1");
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x00000007, 0x00000003, 0x.*, 0xF1, \"tariff3\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001");
+
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff4\" 0x00000008 0x00000004");
+send("esi", "plugin price-server tariff when " + timeInFuture24Hr);
+send("esi", "plugin price-server tariff what 00xF1 0x00 840 80 0x04 0x03 0x02");
+send("esi", "plugin price-server tariff add 1 2");
+
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 3");
+
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x00000008, 0x00000004, 0x.*, 0xF1, \"tariff4\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x02, 0x00000001, 0x00000001");
+
+// Item 26
+networkWait(timeout);
+send("esi", "plugin price-server tariff print 0x01");
+networkWait(timeout);
+send("esiClient", "zcl price get-tariff-info 0x00000001 0xFFFFFFFF 0x00 0x01");
+send("esiClient", "send 0 1 1");
+
+// Item 27 - Can't guarantee order of these two.
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x0000000[78], 0x0000000[34], 0x.*, 0xF1, \"tariff[34]\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x0[12], 0x00000001, 0x00000001");
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x0000000[78], 0x0000000[34], 0x.*, 0xF1, \"tariff[34]\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x0[12], 0x00000001, 0x00000001");
+
+//Item 28
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff5\" 0x00000009 0x00000005");
+send("esi", "plugin price-server tariff when " + timeNow);
+send("esi", "plugin price-server tariff what  0xF2 0x00 840 80 0x04 0x03 0x01");
+send("esi", "plugin price-server tariff add 1 1");
+
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 2");
+
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x00000009, 0x00000005, 0x.*, 0xF2, \"tariff5\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001");
+
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff6\" 0x0000000A 0x00000006");
+send("esi", "plugin price-server tariff when " + timeInFuture24Hr);
+send("esi", "plugin price-server tariff what 00xF2 0x00 840 80 0x04 0x03 0x02");
+send("esi", "plugin price-server tariff add 1 2");
+
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 5");
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x0000000A, 0x00000006, 0x.*, 0xF2, \"tariff6\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x02, 0x00000001, 0x00000001");
+
+// Item 29
+send("esiClient", "zcl price get-tariff-info 0x00000001 0xFFFFFFFF 0x00 0x02");
+send("esiClient", "send 0 1 1");
+
+// Item 30
+expect("esiClient", ".*RX: PublishTariffInformation 0x00000001, 0x0000000A, 0x00000006, 0x.*, 0xF2, \"tariff6\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x02, 0x00000001, 0x00000001");
+
+// TEST 12.50
+// Initial Conditions
+send("esi", "plugin price-server tariff clear 0x01");
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff5\" 0x00000009 0x00000005");
+send("esi", "plugin price-server tariff when " + timeNow);
+send("esi", "plugin price-server tariff what  0xF2 0x00 840 80 0x04 0x03 0x01");
+send("esi", "plugin price-server tariff add 1 1");
+
+// ===============================================
+// Item 1
+networkWait( 100 );
+send("esiClient", "zcl price get-tariff-info 0x00000001 0xFFFFFFFF 0x00 0x02");
+send("esiClient", "send 0 1 1");
+// Item 2
+expect("esiClient", "RX: PublishTariffInformation 0x00000001, 0x00000009, 0x00000005, 0x........, 0xF2, \"tariff5\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001");
+networkWait(timeout*5);
+// Item 3 - increase issuer event id and Publish
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff5\" 0x0000000B 0x00000005");
+send("esi", "plugin price-server tariff when " + timeNow);
+send("esi", "plugin price-server tariff what  0xF2 0x00 840 80 0x04 0x03 0x01");
+send("esi", "plugin price-server tariff update 1 0 1");
+send("esi", "plugin price-server tariff print 0x01");
+networkWait(timeout*10);
+
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 0");
+expect("esiClient", "RX: PublishTariffInformation 0x00000001, 0x0000000B, 0x00000005, 0x........, 0xF2, \"tariff5\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001");
+
+// Item 4 - increase issuer event id and Publish
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff5\" 0x0000000A 0x00000005");
+send("esi", "plugin price-server tariff when " + timeNow);
+send("esi", "plugin price-server tariff what  0xF2 0x00 840 80 0x04 0x03 0x01");
+send("esi", "plugin price-server tariff update 1 0 1");
+send("esi", "plugin price-server tariff print 0x01");
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 0");
+expectMultiline("esiClient",
+       new String[] {
+       "RX: PublishTariffInformation 0x00000001, 0x0000000A, 0x00000005, 0x........, 0xF2, \"tariff5\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001",
+       "Rejected command due to old issuer event id .*"
+});
+// Item 5 
+send("esi", "plugin price-server tariff who 0x00000001 \"tariff6\" 0x0000000B 0x00000005");
+send("esi", "plugin price-server tariff when " + timeNow);
+send("esi", "plugin price-server tariff what  0xF2 0x00 841 81 0x05 0x04 0x02");
+send("esi", "plugin price-server tariff update 1 0 1");
+send("esi", "plugin price-server tariff print 0x01");
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 0");
+// Item 6/7 - we don't support updating optional attr. we do nothing.
+
+
+// TEST 12.53 - PUBLISH CO2 VALUE
+// ===============================================
+// Item 1 - Create 2 new CO2 values, start=NOW & NOW+1day
+send("esi", "plugin price-server co2-val add 1 0x00000001 " + timeNow +  " 0xAAAAAAAA 0xF0 0xAAAAAAAA 0xEE 0xFF");
+send("esi", "plugin price-server co2-val add 1 0x00000001 " + timeInFuture24Hr + " 0xBBBBBBBB 0xF0 0xBBBBBBBB 0xEE 0xFF");
+send("esi", "plugin price-server co2-val print 1");
+
+send("esi", "plugin price-server co2-val pub " + esiClientId + " 1 1 0");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[AA AA AA AA 01 00 00 00 .. .. .. .. .0 AA AA AA AA EE FF \\]");
+
+send("esi", "plugin price-server co2-val pub " + esiClientId + " 1 1 1");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[BB BB BB BB 01 00 00 00 .. .. .. .. .0 BB BB BB BB EE FF \\]");
+
+// Item 2 - Client sends Get CO2 Value
+send("esiClient", "zcl price get-co2-value 0x00000001 0xFFFFFFFF 0x00 0xFF");
+expectMultiline("esiClient",
+                "send 0 1 1",
+                new String[] {
+// There is NO GUARANATEEE OF ORDERING !!!!! So this often fails.       
+//                  ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[AA AA AA AA 01 00 00 00 .. .. .. .. F0 AA AA AA AA EE FF \\]",
+                  ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[BB BB BB BB 01 00 00 00 .. .. .. .. .0 BB BB BB BB EE FF \\]"
+                });
+
+// Item 4 - Client sends Get CO2 value, start time = 0xFFFFFFFE
+send("esiClient", "zcl price get-co2-value 0xFFFFFFFE 0xFFFFFFFF 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+
+// Item 5 - Server sends Publish CO2 value for "Now+1day" value
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[BB BB BB BB 01 00 00 00 .. .. .. .. .0 BB BB BB BB EE FF \\]");
+
+// Item 6 - Client sends Get CO2 value, minEventId=0xFFFFFFFE
+send("esiClient", "zcl price get-co2-value 0x00000001 0xFFFFFFFE 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+
+// Item 7 - not found
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[09 8B \\]");
+
+// Item 8 - Client sends Get CO2 with minEventId=0xFFFFFFFF, numCmds=1
+send("esiClient", "zcl price get-co2-value 0x00000001 0xFFFFFFFF 0x01 0xFF");
+send("esiClient", "send 0 1 1");
+
+// Item 9 - Get the active Publish CO2 value.
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[AA AA AA AA 01 00 00 00 .. .. .. .. .0 AA AA AA AA EE FF \\]");
+
+// Item 10 - Client sends Get CO2 value, start now+2 days, minEventId=0xFFFFFFFF
+send("esiClient", "zcl price get-co2-value " + timeInFuture48Hr + " 0xFFFFFFFF 0x01 0xFF");
+send("esiClient", "send 0 1 1");
+
+// Item 11 - Server sends 1 Publish CO2 value - next scheduled.
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[BB BB BB BB 01 00 00 00 .. .. .. .. .0 BB BB BB BB EE FF \\]");
+
+// Item 12 - Create new CO2 factor to be available, start time = NOW, Now+1day, tariffType=RX
+send("esi", "plugin price-server co2-val add 0x01 0x00000003 " + timeNow +          " 0xCCCCCCCC 0xF1 0xCCCCCCCC 0xEE 0xFF");
+send("esi", "plugin price-server co2-val add 0x01 0x00000004 " + timeInFuture24Hr + " 0xDDDDDDDD 0xF1 0xDDDDDDDD 0xEE 0xFF");
+send("esi", "plugin price-server co2-val print 1");
+
+// Item 13 - Client sends Get CO2 value, start=1, minEventId=0xFFFFFFFF
+// Item 14 - Rx two publish CO2 value commands.
+send("esiClient", "zcl price get-co2-value 0x00000001 0xFFFFFFFF 0x00 0x01");
+send("esiClient", "send 0 1 1");
+// Item 17 - Server sends Publish CO2 value, sorted by ascending start time.
+// FIXME: this expect fails at times.
+// expectMultiline("esiClient", 
+//                 new String[] {
+//                   ".*RX len 22, ep 01, clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[CC CC CC CC 03 00 00 00 .. .. .. .. .1 CC CC CC CC EE FF \\]",
+//                   ".*RX len 22, ep 01, clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[DD DD DD DD 04 00 00 00 .. .. .. .. .1 DD DD DD DD EE FF \\]",
+// });
+
+// Item 15 - Create 2 CO2 conversion factors, tariffType=RX & TX
+send("esi", "plugin price-server co2-val add 1 0x00000005 " + timeNow + " 0xEEEEEEEE 0xF2 0xEEEEEEEE 0xEE 0xFF");
+send("esi", "plugin price-server co2-val add 1 0x00000006 " + timeInFuture24Hr + " 0xFFFFFFFA 0xF2 0xFFFFFFFA 0xEE 0xFF");
+send("esi", "plugin price-server co2-val print 1");
+
+// Item 16 - Client sends Get CO2 Value command, startTime=1, minEventId=0xFFFFFFFF, numCmds=0
+send("esiClient", "zcl price get-co2-value 0x00000001 0xFFFFFFFF 0x00 0x02");
+send("esiClient", "send 0 1 1");
+
+// Item 17 - Server sends Publish CO2 value, sorted by ascending start time.
+expectMultiline( "esi", null, 
+    new String[] {
+      ".*Sending Co2 value: table\\[0\\].*",
+      ".*Sending Co2 value: table\\[1\\].*"
+    });
+
+// INTERNAL TEST #1 - Server sorts responses by start time.
+// Check that the server correctly sorts events.
+send("esi", "plugin price-server init 1");
+networkWait(1000);
+send("esi", "plugin price-server co2-val add 1 0x00000007 " + timeNow          + " 11223344 0xF2 1001 0x0E 0xFF");
+send("esi", "plugin price-server co2-val add 1 0x00000008 " + timeInFuture24Hr + " 11223344 0xF0 2201 0xE0 0x01");
+networkWait( 1000 );
+send("esiClient", "zcl price get-co2-value 0x00000001 0xFFFFFFFF 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+
+if (!runArgument.runUsingMultihop) {
+  expectMultiline("esiClient",
+                  new String[] {
+                    ".*RX len 22, ep 01, clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[30 41 AB 00 07 00 00 00 .. .. .. .. .2 E9 03 00 00 0E FF \\]",
+                    ".*RX len 22, ep 01, clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[30 41 AB 00 08 00 00 00 .. .. .. .. .0 99 08 00 00 E0 01 \\]",
+  });
+} else {
+  expectMultiline("esiClient",
+                  new String[] {
+                    ".*RX len 22, ep 01, clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[30 41 AB 00 0[78] 00 00 00 .. .. .. .. .. .. .. .. .. .. .. \\]",
+                    ".*RX len 22, ep 01, clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[30 41 AB 00 0[78] 00 00 00 .. .. .. .. .. .. .. .. .. .. .. \\]",
+  });
+}
+
+send("esi", "plugin price-server init 1");
+networkWait(1000);
+send("esi", "plugin price-server co2-val print 1");
+networkWait(1000);
+send("esi", "plugin price-server co2-val add 1 0x00000009 " + timeNow          + " 11223344 0xF0 2201 0xE0 0x01");
+send("esi", "plugin price-server co2-val add 1 0x0000000A " + timeInFuture24Hr + " 11223344 0xF2 1001 0x0E 0xFF");
+networkWait(1000);
+send("esi", "plugin price-server co2-val print 1");
+networkWait( 1000 );
+send("esiClient", "zcl price get-co2-value 0x00000001 0xFFFFFFFF 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+if (!runArgument.runUsingMultihop) {
+  expectMultiline( "esiClient",
+      new String[] {
+        ".*RX len 22, ep 01, clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[30 41 AB 00 09 00 00 00 .. .. .. .. .0 99 08 00 00 E0 01 \\]",
+        ".*RX len 22, ep 01, clus 0x0700 \\(Price\\) FC 09 seq .. cmd 07 payload\\[30 41 AB 00 0A 00 00 00 .. .. .. .. .2 E9 03 00 00 0E FF \\]",
+      });
+}
+
+// INTERNAL TEST #2 - Server applies event ID filtering
+// Ensure the server filters responses based on the min event ID specified in the request.
+send("esiClient", "plugin price-client init 1");
+networkWait(1000);
+send("esiClient", "zcl price get-co2-value 0x0000000B 0x00000002 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+networkWait( 3000 );
+expectMultiline( "esiClient",
+    "plugin price-client co2-value printCurrent 1",
+    new String[] {
+      ".*Print CO2 Value.*",
+      ".* issuerEventId=0x00000009"
+    });
+
+
+
+// TEST 12.54 - GET CO2 VALUE
+// ===============================================
+
+String VerifyCurrentCo2( String node, int providerId, int eventId, int tariffType, int cO2Value, int cO2ValueUnit, int cO2ValueTrailingDigit ){
+  networkWait(100);
+  return _expectMultiline( node, 
+    "plugin price-client co2-value printCurrent 1",
+    new String[] {
+      ".*Print CO2 Value.*",
+      ".* providerId=0x[0]*" + Integer.toHexString(providerId).toUpperCase() + ".*",
+      ".* issuerEventId=0x[0]*" + Integer.toHexString(eventId).toUpperCase() + ".*",
+      ".* tariffType=0x[0]*" + Integer.toHexString(tariffType).toUpperCase() + ".*",
+      ".* cO2Value=0x[0]*" + Integer.toHexString(cO2Value).toUpperCase() + ".*",
+      ".* cO2ValueUnit=0x[0]*" + Integer.toHexString(cO2ValueUnit).toUpperCase() + ".*",
+      ".* cO2ValueTrailingDigit=0x[0]*" + Integer.toHexString(cO2ValueTrailingDigit).toUpperCase() + ".*" 
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+//String myTimeNow = epochTimeInFuture(0);    // Time since 1970.
+String myZbTimeOld = timeSinceZigBeeEpoch(-5); // Time since Jan-1 2000.  Param is in units of MINUTES
+String myZbTimeOlder = timeSinceZigBeeEpoch(-10);
+
+// Initialize server with at least 2 CO2 values.
+send("esi", "plugin price-server co2-val add 1 0x00000001 " + myZbTimeOld +  " 0xAAAAAAAA 0xF0 0xAAAAAAAA 0xEE 0xFF");
+send("esi", "plugin price-server co2-val add 1 0x00000001 " + myZbTimeOlder + " 0xBBBBBBBB 0xF0 0xBBBBBBBB 0xEE 0xFF");
+
+
+// Item 1-2 - Client sends Get CO2 value, server publishes the CO2 value.
+send("esiClient", "zcl price get-co2-value 0x00000001 0xFFFFFFFF 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+expect("esiClient", ".*RX: Publish CO2 Value.*");
+expect("esiClient", ".*RX: Publish CO2 Value.*");
+
+// Item 3 - Server sends Publish CO2 value with greater event ID than in #2.  Ensure Client applies it.
+send("esi", "zcl price pub-co2-val 11223355 100 0 0xF0 7867860 2 1");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Publish CO2 Value.*");
+
+VerifyCurrentCo2( "esiClient", 11223355, 100, 240, 7867860, 2, 1 );
+
+
+// Item 4 - Server sends Publish CO2 Value, smaller event ID.  Ensure client does not apply it.
+networkWait(1000);
+send("esi", "zcl price pub-co2-val 11223355 52 0 0xF0 7867999 3 2");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Publish CO2 Value.*");
+
+VerifyCurrentCo2( "esiClient", 11223355, 100, 240, 7867860, 2, 1 );
+
+
+// Item 5-6 - Server sends Publish CO2 Value, larger event ID, start in 30 seconds.  Ensure client applies after 30 seconds.
+
+String time1Min = timeSinceZigBeeEpoch( 1 );
+
+send("esi", "zcl price pub-co2-val 11223355 152 " + time1Min + " 0xF0 786819 0 2");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Publish CO2 Value.*");
+
+VerifyCurrentCo2( "esiClient", 11223355, 100, 240, 7867860, 2, 1 );
+networkWait(65000);
+VerifyCurrentCo2( "esiClient", 11223355, 152, 240, 786819, 0, 2 );
+
+
+// Item 7 - Server sends Publish CO2 Value with start=0xFFFFFFFF.  Ensure client cancels.
+send("esi", "zcl price pub-co2-val 11223355 152 0xFFFFFFFF 0xF0 786819 0 2");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Publish CO2 Value.*");
+VerifyCurrentCo2( "esiClient", 11223355, 100, 240, 7867860, 2, 1 );
+
+
+// Item 8 - Server sends Publish CO2 Value with startTime= -30 sec, greater event ID.  Ensure Client applies immediately.
+// In 30 seconds "time1Min" will be 30 seconds ago.
+networkWait(30000);
+send("esi", "zcl price pub-co2-val 11223355 230 " + time1Min + " 0xF0 112345 1 4");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Publish CO2 Value.*");
+VerifyCurrentCo2( "esiClient", 11223355, 230, 240, 112345, 1, 4 );
+
+
+
+
+// TEST 12.55 - PUBLISH TIER LABELS
+//========================================================
+send("esi", "plugin price-server init 1");
+send("esi", "plugin price-server tier-label set 1 0 1 0xAAAAAAAA 0x00000001 0x54415249 0x1 \"derry\"");
+send("esi", "plugin price-server tier-label print 1");
+expect("esi", ".*= Tier Labels =.*");
+networkWait(5000);
+
+// Item 1-2 - Dev sends Get Tier Labels command with existing tariff ID, receives Publish Tier Labels command.
+send("esiClient", "zcl price get-tier-labels 0x54415249" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*Sending tier labels.*");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 08 payload\\[AA AA AA AA 01 00 00 00 .. .. .. .. 00 00 01 01 05 64 65 72 72 79 \\]");
+
+
+
+// Item 3-4 - Dev sends Get Tier Labels command with tariffId that does not exist.  Expect NOT_FOUND response.
+send("esiClient", "zcl price get-tier-labels 0x55667788" );
+send("esiClient", "send " + esiId + " 1 1");
+// Expect default response, NOT_FOUND status
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[0A 8B \\]");
+
+// INTERNAL TEST - Configure server with multiple tiers.  Make sure publish sends both.
+send("esi", "plugin price-server init 1");
+networkWait( 100 );
+send("esi", "plugin price-server tier-label set 1 0 1 0xAAAAAAAA 0x00000001 0x54415249 0x1 \"derry\"");
+send("esi", "plugin price-server tier-label add-label 1 0x54415249 0x2 \"harry&jerry\"");
+networkWait( 100 );
+
+send("esiClient", "zcl price get-tier-labels 0x54415249" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 08 payload\\[AA AA AA AA 01 00 00 00 .. .. .. .. 00 00 02 01 05 64 65 72 72 79 02 0B 68 61 72 72 79 26 6A 65 72 72 79 \\]");
+
+
+
+
+
+// TEST 12.56 - GET TIER LABELS
+//========================================================
+String VerifyTierLabel( String node, int tariffId, int providerId, int eventId, int numLabels ){
+  networkWait(100);
+  return _expectMultiline( node, 
+    "plugin price-client tier-label printTariff 1 " + tariffId,
+    new String[] {
+      ".*= CLIENT TIER LABEL TABLE.*",
+      ".* providerId=" + providerId + ".*",
+      ".* issuerEventId=" + eventId + ".*",
+      ".* issuerTariffId=" + tariffId + ".*",
+      ".* numberOfLabels=" + numLabels + ".*",
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+send("esi", "plugin price-server init 1");
+send("esiClient", "plugin price-client init 1");
+send("esi", "plugin price-server tier-label set 1 0 1 11223344 0x00000004 54413232 0x1 \"derry\"");
+networkWait( 100 );
+
+
+// Item 1-2 - Client sends Get Tier Labels, server sends Publish Tier Labels response
+send("esiClient", "zcl price get-tier-labels 54413232" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient", ".*RX: PublishTierLabels.*");
+VerifyTierLabel( "esiClient", 54413232, 11223344, 4, 1 );
+
+// Item 3 - Server sends unsolicited Publish Tier Labels with greater event ID, ensure client receives it.
+//send("esi", "zcl price pub-tier-labels 11223344 0x0000000A 54413232 0 0 1 {04 06 31 32 33 34 35 36}" );
+  send("esi", "zcl price pub-tier-labels 11223344 0x0000000A 54413232 0 0 1 02 06 08" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishTierLabels.*");
+VerifyTierLabel( "esiClient", 54413232, 11223344, 10, 1 );
+
+
+// Item 4 - Server sends unsolicited Publish Tier Labels with smaller event ID.  Ensure client discards it
+  send("esi", "zcl price pub-tier-labels 11223344 0x00000003 54413232 0 0 1 02 06 08" );
+send("esi", "send " + esiClientId + " 1 1");
+VerifyTierLabel( "esiClient", 54413232, 11223344, 10, 1 );
+
+
+// INTERNAL TEST - Add second tier label
+send("esi", "plugin price-server tier-label set 1 0 1 11226644 00000404 12123232 0x1 \"derry\"");
+send("esiClient", "zcl price get-tier-labels 12123232" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient", ".*RX: PublishTierLabels.*");
+VerifyTierLabel( "esiClient", 54413232, 11223344, 10, 1 );
+VerifyTierLabel( "esiClient", 12123232, 11226644, 404, 1 );
+
+
+
+// Test 12.57 from Test Spec
+// ============================================================
+// Item 1 / 2
+// NOTE: the test spec doesn't call for scheduling of two events but the steps
+// seem to require so (step 12)
+//String timeInPast12Hr  = timeSinceZigBeeEpoch(-12*60);  // epochTimeInFuture(-12*60);
+//String timeInFuture48Hr  = timeSinceZigBeeEpoch(48*60); // epochTimeInFuture(48*60);
+
+   send("esi", "plugin price-server init 1");
+   networkWait( 100 );
+   send("esi", "plugin price-server billing-period add 1 " + timeInFuture48Hr + " 0x00112233 0x00445566 0x000000AA 0x01 0x02");
+   networkWait( 100 );
+   send("esi", "plugin price-server billing-period add 1 " + timeNow + " 0x001122FF 0x004455FF 0x000000AA 0x01 0x02");
+   send("esi", "plugin price-server billing-period pub " + esiClientId + " 1 1 0");
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[FF 55 44 00 FF 22 11 00 .. .. .. .. AA 00 00 01 02 \\]");
+   
+// Item 3/4 - order is not guaranteed!
+   networkWait( 100 );
+   send("esiClient", "zcl price get-billing-period 0x00000001 0x0000000 0x00 0xFF");
+   send("esiClient", "send 0 1 1");
+   //expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[66 55 44 00 33 22 11 00 .. .. .. .. AA 00 00 01 02 \\]");
+   //expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[FF 55 44 00 FF 22 11 00 .. .. .. .. AA 00 00 01 02 \\]");
+//   
+   //expect("esi", ".*TX buffer: \\[09 .. 09 66 55 44 00 33 22 11 00 00 00 00 00 AA 00 00 01 02.*");
+   //expect("esi", ".*TX buffer: \\[09 .. 09 FF 55 44 00 FF 22 11 00 80 33 3F 1C AA 00 00 01 02.*");
+   expectMultiline( "esi", null,
+       new String[] {
+         ".*TX buffer: \\[09 .. 09 FF 55 44 00 FF 22 11 00 .. .. .. .. AA 00 00 01 02.*",
+         ".*TX buffer: \\[09 .. 09 66 55 44 00 33 22 11 00 .. .. .. .. AA 00 00 01 02.*",
+       });
+  
+   
+// Can't expect a fixed order of arrival on client, but make sure at least 1 is received.
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[66 55 44 00 33 22 11 00 .. .. .. .. AA 00 00 01 02 \\]");
+   
+// Item 5 - Client sends Get Billing Period, start=0xFFFFFFFE, minEventId=0.
+   send("esiClient", "zcl price get-billing-period 0xFFFFFFFE 0x0000000 0x00 0xFF");
+   send("esiClient", "send 0 1 1");
+
+// Item 6 - Server sends back DEFAULT RESPONSE - NOT FOUND
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[0B 8B \\]");
+
+// Item 7 - Client sends Get Billing Period, startTime=NOW, minEventId=0xFFFFFFFE
+   send("esiClient", "zcl price get-billing-period " + timeNow + " 0xFFFFFFFE 0x00 0xFF");
+   send("esiClient", "send 0 1 1");
+
+// Item 8 - Server sends back DEFAULT RESPONSE - NOT FOUND
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[0B 8B \\]");
+
+// Item 9 - Client sends Get Billing Period, start=0x01, minEventId=1, numCmds=1
+   send("esiClient", "zcl price get-billing-period 0x00000001 0x00000000 0x01 0xFF");
+   send("esiClient", "send 0 1 1");
+
+// Item 10 - Server sends active instance back
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[FF 55 44 00 FF 22 11 00 .. .. .. .. AA 00 00 01 02 \\]");
+
+// Item 11 - Client sends Get Billing Period, start>= time of current, numCmds=1
+   send("esiClient", "zcl price get-billing-period " + timeNow + " 0x00000000 0x01 0xFF");
+   send("esiClient", "send 0 1 1");
+
+// Item 12 - Server sends 1 response
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[FF 55 44 00 FF 22 11 00 .. .. .. .. AA 00 00 01 02 \\]");
+
+///   -- Internal - change billing periods in order to add some with tariffType=0, 1.
+///   -- Use larger event IDs to overwrite old data if necessary.
+   send("esi", "plugin price-server billing-period add 1 " + timeInFuture48Hr + " 0x00113301 0x00445566 0x000000AA 0x01 0x00");
+   send("esi", "plugin price-server billing-period add 1 " + timeNow + " 0x00113302 0x004455FF 0x000000AA 0x01 0x01");
+   networkWait( 100 );
+   
+// Item 13 - Client sends Get Billing Period, start=1, tariffType=0
+   send("esiClient", "zcl price get-billing-period 0x00000001 0x00000000 0x00 0x00");
+   send("esiClient", "send 0 1 1");
+
+// Item 14 - Server sends Publish Billing Period
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[66 55 44 00 01 33 11 00 .. .. .. .. AA 00 00 01 00 \\]");
+
+// Item 15 - Client sends Get Billing Period, start=1, tariffType=1 
+   send("esiClient", "zcl price get-billing-period 0x00000001 0x00000000 0x00 0x01");
+   send("esiClient", "send 0 1 1");
+// Item 16
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[FF 55 44 00 02 33 11 00 .. .. .. .. AA 00 00 01 01 \\]");
+   
+   send("esi", "plugin price-server billing-period add 1 " + timeNow + " 0x00113303 0x004455FF 0x000000AA 0x01 0x01");
+   
+// Item 17 - Client sends Get Billing Period, start=0x00001, tariffType=2.
+   send("esiClient", "zcl price get-billing-period 0x00000001 0x00000000 0x00 0x02");
+   send("esiClient", "send 0 1 1");
+// Item 18 - Server has none with tariff=2, send default response
+//   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 09 payload\\[FF 55 44 00 FF 22 11 00 .. .. .. .. AA 00 00 01 01 \\]");
+   expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[0B 8B.*");
+
+
+
+// INTERNAL TEST #1 - Server sorts responses by start time.
+// Check that the server correctly sorts events.
+send("esi", "plugin price-server init 1");
+networkWait(1000);
+
+send("esi", "plugin price-server billing-period add 1 " + timeNow + " 0x00000001 11223344 20 1 0 ");
+send("esi", "plugin price-server billing-period add 1 " + timeInFuture48Hr + " 0x00000002 11223344 22 0 1 ");
+networkWait( 1000 );
+send("esiClient", "zcl price get-billing-period 0x00000001 0xFFFFFFFF 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+      ".*Sending billing period: table\\[0\\].*",
+      ".*Sending billing period: table\\[1\\].*"
+    });
+
+send("esi", "plugin price-server billing-period add 1 " + timeInFuture48Hr + " 0x00000003 11223344 20 1 0 ");
+send("esi", "plugin price-server billing-period add 1 " + timeNow + " 0x00000004 11223344 22 0 1 ");
+networkWait( 1000 );
+send("esiClient", "zcl price get-billing-period 0x00000001 0xFFFFFFFF 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+//      ".*Sending billing period: table\\[1\\].*",
+ //     ".*Sending billing period: table\\[0\\].*"
+       ".*TX buffer: \\[09 .. 09 30 41 AB 00 04 00 00 00 .. .. .. .. 16.*",
+       ".*TX buffer: \\[09 .. 09 30 41 AB 00 03 00 00 00 .. .. .. .. 14.*",
+    });
+
+
+// INTERNAL TEST #2 - Server applies event ID filtering
+// Ensure the server filters responses based on the min event ID specified in the request.
+networkWait( 5000 );
+send("esiClient", "plugin price-client init 1");
+networkWait(1000);
+send("esiClient", "zcl price get-billing-period 0x00000001 0x00000004 0x00 0xFF");
+send("esiClient", "send 0 1 1");
+networkWait( 3000 );
+expectMultiline( "esiClient",
+    "plugin price-client bill-period printCurrent 1",
+    new String[] {
+      ".*Print Billing Period.*",
+      ".* issuerEventId=4.*"
+    });
+
+networkWait(timeout * 50); 
+
+
+
+// TEST 12.58 - GET BILLING PERIOD
+// =======================================================
+
+String VerifyBillingPeriod( String node, int providerId, int eventId, int duration, int durationType, int tariffType ){
+  return _expectMultiline( node, 
+    "plugin price-client bill-period printCurrent 1",
+    new String[] {
+      ".*Print Billing Period Table.*",
+      ".* providerId=" + providerId + ".*",
+      ".* issuerEventId=" + eventId + ".*",
+      ".* duration=" + duration + ".*",
+      ".* durationType=" + durationType + ".*",
+      ".* tariffType=" + tariffType + ".*",
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+send("esi", "plugin price-server init 1");
+send("esiClient", "plugin price-client init 1");
+
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(3000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+timeNow = timeSinceZigBeeEpoch(0);
+String timeInFuture1Min  = timeSinceZigBeeEpoch( 1 );
+timeInFuture24Hr  = timeSinceZigBeeEpoch(24*60);
+timeInFuture48Hr  = timeSinceZigBeeEpoch(48*60);
+networkWait(3000);
+
+send("esi", "plugin price-server billing-period add 1 " + timeNow + " 0x00000020  11223344 20 1 1 ");
+send("esi", "plugin price-server billing-period add 1 " + timeInFuture48Hr + " 0x00000021  11223344 60 4 2 ");
+networkWait( 100 );
+
+// Item 1 - Client sends Get Billing Period to server.
+// Item 2 - Server sends Publish Billing Period to client
+send("esiClient", "zcl price get-billing-period 0x0001 1 0 0xFF");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetBillingPeriod.*");
+//expect("esiClient", ".*RX: PublishBillingPeriod.*");
+//expect("esiClient", ".*RX: PublishBillingPeriod.*");
+expectMultiline( "esiClient", null,
+    new String[] {
+      ".*RX: PublishBillingPeriod.*",
+      ".*RX: PublishBillingPeriod.*",
+    });
+networkWait( 1000 );
+
+VerifyBillingPeriod( "esiClient", 11223344, 32, 20, 1, 1 );
+
+// Item 3 - Server sends unsolicited Publish Billing period, eventId > last, start=NOW.
+//          Ensure client applies new billing period.
+send("esi", "zcl price pub-billing-period 11223344 100 0 \"40\" 2 1" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishBillingPeriod.*");
+VerifyBillingPeriod( "esiClient", 11223344, 100, 3159042, 2, 1 );
+
+
+// Item 4 - Server sends unsolicited Publish Billing period, eventId < last, start NOW.
+//          Ensure client does NOT apply.
+send("esi", "zcl price pub-billing-period 11223344 10 0 \"45\" 1 1" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishBillingPeriod.*");
+VerifyBillingPeriod( "esiClient", 11223344, 100, 3159042, 2, 1 );
+
+
+// Item 5 - Server sends Publish Billing period, event > last, start=NOW + 30 sec.
+//send("esi", "zcl price pub-billing-period 11223344 210 " + timeInFuture1Min + " \"02\" 0 1" );
+send("esi", "zcl price pub-billing-period 11223344 210 " + timeInFuture1Min + " \"10\" 0 1" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishBillingPeriod.*");
+networkWait( 1000 );
+VerifyBillingPeriod( "esiClient", 11223344, 100, 3159042, 2, 1 );
+
+
+// Item 6 - Wait 35 seconds, ensure new billing period applied.
+networkWait( 70000 );
+//    NOTE:  A duration of  "02" maps somehow to 3289094  (0x32 30 06)
+//           A duration of "100" maps somehow to 3158275  (0x30 31 03),  and screws up the next field
+//           A duration of  "10" maps somehow to 3158274  (0x30 31 02)
+//           A duration of  "87" maps somehow to 3618818  (0x37 38 02)
+VerifyBillingPeriod( "esiClient", 11223344, 210, 3158274, 0, 1 );
+
+
+
+// Item 7 - Server sends Publish Billing period, eventId = last, start=0xFFFFFFFF (cancel)
+//          Ensure client cancels event.
+send("esi", "zcl price pub-billing-period 11223344 210 0xFFFFFFFF \"56\" 2 1" );
+send("esi", "send " + esiClientId + " 1 1");
+//expect("esiClient", ".*RX: PublishBillingPeriod.*");
+expect("esiClient", ".*Canceling eventId=210.*");
+
+// Item 8 - Server sends Publish Billing period, eventId > last, start= NOW - 30 sec
+//          Ensure client applies
+networkWait( 20000 );
+send("esi", "zcl price pub-billing-period 11223344 215 " + timeNow + " \"87\" 3 1" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishBillingPeriod.*");
+VerifyBillingPeriod( "esiClient", 11223344, 215, 3618818, 3, 1 );
+
+
+
+
+// TEST 12.59 from Test Spec - PUBLISH CONSOLIDATED BILL
+//========================================================
+
+int TARIFF_TYPE_DELIVERED=0;
+int TARIFF_TYPE_RECEIVED=1;
+int TARIFF_TYPE_DELIV_AND_RECV=2;
+
+String timeInFuture72Hr  = epochTimeInFuture(72*60);
+
+String timeInPast5Days = timeSinceZigBeeEpoch( -5*24*60 );
+String timeInPast10Days = timeSinceZigBeeEpoch( -10*24*60 );
+String timeInPast18Days = timeSinceZigBeeEpoch( -18*24*60 );
+
+send("esi", "plugin price-server init 1");
+networkWait( 100 );
+
+// Item 1 - Cause new consolidated bill to be available.
+// CLI set:  index,valid,startTime,eventId,providerId, billDuration,durationType,tariffType, bill,currency,trailDigit
+send("esi", "plugin price-server consol-bill add 1 " + timeInPast5Days + " 0x00000001 0x11223344 4 " + DURATION_TYPE_DAYS_START + " " + TARIFF_TYPE_DELIVERED + " 1001 0 2" );
+
+send("esi", "plugin price-server consol-bill add 1 " + timeInPast10Days + " 0x00000002 0x11223344 4 " + DURATION_TYPE_DAYS_START + " " + TARIFF_TYPE_DELIVERED + " 2205 0 2" );
+
+networkWait(2000);
+
+send("esi", "plugin price-server consol-bill add 1 " + timeInPast18Days + " 0x00000003 0x11223344 8 " + DURATION_TYPE_DAYS_START + " " + TARIFF_TYPE_DELIV_AND_RECV + " 3309 1 1" );
+
+
+// Item 3 - Client sends GetConsolidatedBill to Server.
+send("esiClient", "zcl price get-con-bill 0x00000001 0 0 0xFF");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetConsolidatedBill.*");
+
+// Item 4 - Make sure ESI sends Publish Consolidated Bill for each bill.
+//    Payload:  [provId:4] + [eventId:4] + [startTime:4] + [duration:3] + [durationType:1] + [tariff:1] + [bill:4] + [currency:2] + [trailingDig:1]
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0A payload\\[44 33 22 11 03 00 00 00 .. .. .. .. 08 00 00 01 02 ED 0C 00 00 01 00 01 \\]");
+if (!runArgument.runUsingMultihop) {
+  expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0A payload\\[44 33 22 11 02 00 00 00 .. .. .. .. 04 00 00 01 00 9D 08 00 00 00 00 02 \\]");
+  expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0A payload\\[44 33 22 11 01 00 00 00 .. .. .. .. 04 00 00 01 00 E9 03 00 00 00 00 02 \\]");
+}
+
+// Item 5-6 - Send GetConsolidatedBill with startTime=0xFFFFFFFE, expect defaultResponse
+send("esiClient", "zcl price get-con-bill 0xFFFFFFFE 0 0 0xFF");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetConsolidatedBill.*");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[0C 8B \\]");
+
+// Item 7-8 - Send GetConsolidatedBill with eventId=0xFFFFFFFE, expect defaultResponse
+send("esiClient", "zcl price get-con-bill 0x00000000 0xFFFFFFFE 0 0xFF");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetConsolidatedBill.*");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[0C 8B \\]");
+
+// Item 9-10 - Send GetConsolidatedBill with numCmds=1, get 1 response
+send("esiClient", "zcl price get-con-bill 0x00000001 0 1 0xFF");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetConsolidatedBill.*");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0A payload\\[44 33 22 11 03 00 00 00 .. .. .. .. 08 00 00 01 02 ED 0C 00 00 01 00 01 \\]");
+
+// Item 11-12 - Send GetConsolidatedBill with startTime >= first start time, numCmds=1
+send("esiClient", "zcl price get-con-bill " + timeInPast5Days + " 0 1 0xFF");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetConsolidatedBill.*");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0A payload\\[44 33 22 11 01 00 00 00 .. .. .. .. 04 00 00 01 00 E9 03 00 00 00 00 02 \\]");
+
+// Item 13-14 - Send GetConsolidatedBill,  tariff=0
+send("esiClient", "zcl price get-con-bill 0x00000001 0 0 0x00");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetConsolidatedBill.*");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0A payload\\[44 33 22 11 02 00 00 00 .. .. .. .. 04 00 00 01 00 9D 08 00 00 00 00 02 \\]");
+if (!runArgument.runUsingMultihop) {
+  expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0A payload\\[44 33 22 11 01 00 00 00 .. .. .. .. 04 00 00 01 00 E9 03 00 00 00 00 02 \\]");
+}
+
+// Item 15-16 - Send GetConsolidatedBill,  tariff=1
+send("esiClient", "zcl price get-con-bill 0x00000001 0 0 0x01");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetConsolidatedBill.*");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[0C 8B \\]");
+
+
+// Item 17-18 - Send GetConsolidatedBill,  tariff=2
+send("esiClient", "zcl price get-con-bill 0x00000001 0 0 0x02");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*RX: GetConsolidatedBill.*");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0A payload\\[44 33 22 11 03 00 00 00 .. .. .. .. 08 00 00 01 02 ED 0C 00 00 01 00 01 \\]");
+
+
+
+// INTERNAL TEST
+// Setup 2 consolidated bills, out of order.
+// Ensure bills are sent with correct start time & duration, and in order.
+
+
+networkWait(3000);
+send("esi", "plugin price-server init 1");
+networkWait(1000);
+
+send("esi", "plugin price-server consol-bill add 1 8100000  0x00000001 11223344 100 0 0 220 3 1" );
+send("esi", "plugin price-server consol-bill add 1 81000000 0x00000002 11223344 200 0 1 441 2 2" );
+networkWait( 1000 );
+send("esiClient", "zcl price get-con-bill 0x00000001 0xFFFFFFFF 0 0xFF");
+send("esiClient", "send 0 1 1");
+
+
+expectMultiline( "esi", null,
+    new String[] {
+//      ".*Sending Consolidated Bill: table\\[0\\].*",
+//      ".*Sending Consolidated Bill: table\\[1\\].*"
+      ".*TX buffer: \\[09 .. 0A 30 41 AB 00 01 00 00 00 A0 98 7B 00 64 00 00 00 00 DC 00 00 00 03 00 01.*",
+      ".*TX buffer: \\[09 .. 0A 30 41 AB 00 02 00 00 00 40 F6 D3 04 C8 00 00 00 01 B9 01 00 00 02 00 02.*",
+    });
+
+send("esi", "plugin price-server init 1");
+networkWait( 100 );
+send("esi", "plugin price-server consol-bill add 1 81000000 0x00000001 11223344 100 0 0 220 3 1" );
+send("esi", "plugin price-server consol-bill add 1 8100000  0x00000002 11223344 200 0 1 441 2 2" );
+networkWait( 1000 );
+send("esiClient", "zcl price get-con-bill 0x00000001 0xFFFFFFFF 0 0xFF");
+send("esiClient", "send 0 1 1");
+expectMultiline( "esi", null,
+    new String[] {
+//      ".*Sending Consolidated Bill: table\\[1\\].*",
+//      ".*Sending Consolidated Bill: table\\[0\\].*"
+      ".*TX buffer: \\[09 .. 0A 30 41 AB 00 02 00 00 00 A0 98 7B 00 C8 00 00 00 01 B9 01 00 00 02 00 02.*",
+      ".*TX buffer: \\[09 .. 0A 30 41 AB 00 01 00 00 00 40 F6 D3 04 64 00 00 00 00 DC 00 00 00 03 00 01.*",
+    });
+
+
+// INTERNAL TEST #2 - Server applies event ID filtering
+// Ensure the server filters responses based on the min event ID specified in the request.
+networkWait( 5000 );
+send("esiClient", "plugin price-client init 1");
+networkWait(1000);
+send("esiClient", "zcl price get-con-bill 0x00000001 0x00000002 0 0xFF");
+send("esiClient", "send 0 1 1");
+networkWait( 3000 );
+expectMultiline( "esiClient",
+    "plugin price-client consol-bill printCurrent 1",
+    new String[] {
+      ".*Print PublishConsolidatedBill.*",
+      ".* issuerEventId=2.*"
+    });
+
+networkWait( 1000 );
+
+// TEST 12.60 from Test Spec - GET CONSOLIDATED BILL
+//========================================================
+
+String VerifyConsolBill(String node,
+                        String reqStartTime,
+                        int reqMinEventId,
+                        int numCmds,
+                        int tariffType,
+                        int valid,
+                        int providerId,
+                        int eventId,
+                        int duration,
+                        String durationType,
+                        int tariffType,
+                        int bill,
+                        int currency,
+                        int trailDigit){
+    send( node, "zcl price get-con-bill " + reqStartTime + " " + reqMinEventId + " " + numCmds + " " + tariffType);
+    send( node, "send " + esiId + " 1 1" );
+  return _expectMultiline( node, null,
+    new String[] {
+      ".*Print PublishConsolidatedBill.*",
+      ".* isValid=.*" + valid + ".*",
+      ".* providerId=.*" + providerId + ".*",
+      ".* issuerEventId=.*" + eventId + ".*",
+      ".* billingPeriodDuration=.*" + duration + ".*",
+      ".* billingPeriodDurationType=" + durationType + ".*",
+      ".* tariffType=" + tariffType + ".*",
+      ".* consolidatedBill=" + bill + ".*",
+      ".* currency=" + currency + ".*",
+      ".* billTrailingDigit=" + trailDigit + ".*"
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+String PrintConsolBill( String node, int valid, int providerId, int eventId, int duration, String durationType, int tariffType, int bill, int currency, int trailDigit ){
+  networkWait(100);
+  send( node, "plugin price-client consol-bill printEvent 1 " + eventId);
+  return _expectMultiline( node, null,
+    new String[] {
+      ".*Print PublishConsolidatedBill.*",
+      ".* isValid=.*" + valid + ".*",
+      ".* providerId=.*" + providerId + ".*",
+      ".* issuerEventId=.*" + eventId + ".*",
+      ".* billingPeriodDuration=.*" + duration + ".*",
+      ".* billingPeriodDurationType=.*" + durationType + ".*",
+      ".* tariffType=.*" + tariffType + ".*",
+      ".* consolidatedBill=.*" + bill + ".*",
+      ".* currency=.*" + currency + ".*",
+      ".* billTrailingDigit=.*" + trailDigit + ".*"
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+String PrintCurrentConsolBill( String node, int valid, int providerId, int eventId, int duration, String durationType, int tariffType, int bill, int currency, int trailDigit ){
+  networkWait(100);
+  send( node, "plugin price-client consol-bill printCurrent 1");
+  return _expectMultiline( node, null,
+    new String[] {
+      ".*Print PublishConsolidatedBill.*",
+      ".* isValid=.*" + valid + ".*",
+      ".* providerId=.*" + providerId + ".*",
+      ".* issuerEventId=.*" + eventId + ".*",
+      ".* billingPeriodDuration=.*" + duration + ".*",
+      ".* billingPeriodDurationType=.*" + durationType + ".*",
+      ".* tariffType=.*" + tariffType + ".*",
+      ".* consolidatedBill=.*" + bill + ".*",
+      ".* currency=.*" + currency + ".*",
+      ".* billTrailingDigit=.*" + trailDigit + ".*"
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+ 
+// CLEAR OUT ALL CONSOLIDATED BILLS
+// Re-sync time back to current time.
+send("esiClient", "plugin price-client init 1");
+send("esi", "zcl time " + timeSinceZigBeeEpoch( 0 ) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+// CLI set:  index,valid,startTime,eventId,providerId, billDuration,durationType,tariffType, bill,currency,trailDigit
+//send("esi", "plugin price-server consol-bill add 0 0x00000000 0x00000000 0x00000000 0 0 0 0 0 0" );
+//send("esi", "plugin price-server consol-bill set 1 0 0x00000000 0x00000000 0x00000000 0 0 0 0 0 0" );
+//send("esi", "plugin price-server consol-bill set 2 0 0x00000000 0x00000000 0x00000000 0 0 0 0 0 0" );
+//send("esi", "plugin price-server consol-bill set 3 0 0x00000000 0x00000000 0x00000000 0 0 0 0 0 0" );
+//send("esi", "plugin price-server consol-bill set 4 0 0x00000000 0x00000000 0x00000000 0 0 0 0 0 0" );
+send("esi", "plugin price-server init 1");
+networkWait( 100 );
+
+// Since Item #1 requests a consolidated bill and expects a response, create one consolidated bill on the server.
+String timeInPast52Days = timeSinceZigBeeEpoch( -52*24*60 );
+
+
+send("esi", "plugin price-server consol-bill add 1 " + timeInPast52Days + " 0x00000005 0x11223344 1000 " + DURATION_TYPE_WEEKS_START + " 0 200 10 2" );
+
+networkWait( 50 * timeout ); 
+
+// Item 1-2 - Client sends GetConsolidatedBill to Server, ensure client stores consolidated bill.
+
+// 0x11223344 == 287454020
+VerifyConsolBill( "esiClient", "0x00000000", 0x00000001, 0, 0xFF, 1, 287454020, 5, 1000, DURATION_TYPE_WEEKS_START, 0, 200, 10, 2 );
+
+// Print:  valid, pid, eid, duration, durationType, tariff, bill, currency, trailDigit
+PrintConsolBill( "esiClient", 1, 287454020, 5, 1000, DURATION_TYPE_WEEKS_START, 0, 200, 10, 2 );
+
+send("esiClient", "plugin price-client consol-bill printEvent 1 2");
+expect("esiClient", ".*NOT FOUND.*");
+
+
+// Item 3 - Server sends another Publish Consolidated Bill with greater event ID, ensure client accepts.
+send("esi", "zcl price pub-consolidated-bill 287454020 6 0x00000000 {20 00} " + DURATION_TYPE_WEEKS_START + " 0 400 5 1" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishConsolidatedBill.*");
+send("esiClient", "plugin price-client consol-bill printEvent 1 6");
+// Print:  valid, pid, eid, duration, durationType, tariff, bill, currency, trailDigit
+PrintConsolBill( "esiClient", 1, 287454020, 6, 8194, DURATION_TYPE_WEEKS_START, 0, 400, 5, 1 );
+
+
+// Item 4 - Send a bill with a lower event ID, overlapping time.
+//network.sleep(3000);
+send("esi", "zcl price pub-consolidated-bill 287454020 2 0x00000000 {20 01} " + DURATION_TYPE_WEEKS_START + " 0 111 4 3" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishConsolidatedBill.*");
+send("esiClient", "plugin price-client consol-bill printEvent 1 2");
+expect("esiClient", ".*NOT FOUND.*");
+
+
+// Item 5 - Send another Publish Consol Bill command with greater event ID, start in 30 seconds.
+String timeInFuture30Sec = timeSinceZigBeeEpoch(30);
+send("esi", "zcl price pub-consolidated-bill 287454020 8 " + timeInFuture30Sec + " {20 01} " + DURATION_TYPE_WEEKS_END + " 0 228 7 0" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishConsolidatedBill.*");
+
+// Item 6 - wait 30 seconds, verify this one is NOT applied
+// TODO:  Not sure why this is not applied!!
+//PrintConsolBill( "esiClient", 1, 287454020, 6, 8194, DURATION_TYPE_WEEKS_START, 0, 400, 5, 1 );
+PrintCurrentConsolBill( "esiClient", 1, 287454020, 6, 8194, DURATION_TYPE_WEEKS_START, 0, 400, 5, 1 );
+
+
+// Item 7 - Cancel bill from step #5
+send("esi", "zcl price pub-consolidated-bill 287454020 8 0xFFFFFFFF {20 01} " + DURATION_TYPE_WEEKS_END + " 0 228 7 0" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishConsolidatedBill.*");
+send("esiClient", "plugin price-client consol-bill printEvent 1 8");
+expect("esiClient", ".*NOT FOUND.*");
+
+// Item 8 - Send Publish Consol Bill with start time = NOW - 30 seconds
+network.sleep(1000);
+String timeMinus30Sec = epochTimeInFuture( -30 );
+send("esi", "zcl price pub-consolidated-bill 287454020 9 " + timeMinus30Sec + " {20 01} " + DURATION_TYPE_WEEKS_END + " 0 228 7 1" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishConsolidatedBill.*");
+// Print:  valid, pid, eid, duration, durationType, tariff, bill, currency, trailDigit
+PrintConsolBill( "esiClient", 1, 287454020, 9, 73730, DURATION_TYPE_WEEKS_END, 0, 228, 7, 1 );
+
+
+
+// TEST 12.61 from Test Spec - PUBLISH CREDIT PAYMENT
+//========================================================
+// Push at least 5 credit payments onto the server.
+// Set:  index,valid, provider, eventId, nextDueDate, overdueAmount, status, payment, LastPmtDate, ref#
+send("esiClient", "plugin price-client init 1");
+send("esi", "plugin price-server credit-pmt set 1 0 1 11223344 10 56000000 22 1 47 54600000 \"REF-Init0004-abcd\"");
+send("esi", "plugin price-server credit-pmt set 1 1 1 22223344 20 56700000 01 1 54 54300000 \"REF-Init0003-abcd\"");
+send("esi", "plugin price-server credit-pmt set 1 2 1 11223344 30 56200000 34 2 65 54100000 \"REF-Init0002-abcd\"");
+send("esi", "plugin price-server credit-pmt set 1 3 1 22223344 40 56500000 97 1 76 54900000 \"REF-Init0005-abcd\"");
+send("esi", "plugin price-server credit-pmt set 1 4 1 11223344 50 56100000 00 0 88 54000000 \"REF-Init0001-abcd\"");
+
+String VerifyCreditPayment( String node, int providerId, int eventId, int dueDate, int overDueAmount, int status, int payment, int paymentDate ){
+  return _expectMultiline( node, 
+    "plugin price-client credit-pmt printEvent 1 " + eventId,
+    new String[] {
+      ".*Print Credit Payment.*",
+      ".* providerId=" + providerId + ".*",
+      ".* issuerEventId=" + eventId + ".*",
+      ".* dueDate=" + dueDate + ".*",
+      ".* overDueAmount=" + overDueAmount + ".*",
+      ".* status=" + status + ".*",
+      ".* payment=" + payment + ".*",
+      ".* paymentDate=" + paymentDate + ".*",
+//      ".* paymentRef=" + paymentRef + ".*"
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+// Item 1-2 - Client sends Get Credit Payment, receives credit payment.
+send("esiClient", "zcl price get-credit-payment 60000000 1");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*Rx: GetCreditPayment.*" );
+
+networkWait(10 * timeout); 
+
+// Redo - this time request all credit payments
+send("esiClient", "zcl price get-credit-payment 60000000 0");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*Rx: GetCreditPayment.*" );
+
+networkWait(10 * timeout); 
+
+// This test assumes the CLIENT_CREDIT_PAYMENT_TABLE_SIZE is >=5.
+// Verify:  pid, eid, nextDueDate, overdueAmt, status, pmt, lastPmtDate
+VerifyCreditPayment( "esiClient", 11223344, 10, 56000000, 22, 1, 47, 54600000 );
+VerifyCreditPayment( "esiClient", 22223344, 20, 56700000, 01, 1, 54, 54300000 );
+VerifyCreditPayment( "esiClient", 11223344, 30, 56200000, 34, 2, 65, 54100000 );
+VerifyCreditPayment( "esiClient", 22223344, 40, 56500000, 97, 1, 76, 54900000 );
+VerifyCreditPayment( "esiClient", 11223344, 50, 56100000,  0, 0, 88, 54000000 );
+
+
+// Item 3 - Server sends Publish Credit Payment with greater issuer event ID.  Client receives.
+// Publish Credit Payment:  provider + eventId + nextDueDate + overdueAmt + status + amount + LastPmtDate + ref#
+send("esi", "zcl price pub-credit-payment 11223344 1000 60000000 0 0x00 1358 800000 \"REF-String0001-ABCD\"" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+VerifyCreditPayment( "esiClient", 11223344, 1000, 60000000,  0, 0, 1358, 800000 );
+
+
+// Item 4 - Server sends Publish Credit Payment with smaller issuer event ID.  Client discards.
+send("esi", "zcl price pub-credit-payment 11223344 1 60000000 22200 0x01 2467 800000 \"REF-String0002-EFGH\"" );
+send("esi", "send " + esiClientId + " 1 1");
+//expect("esiClient", ".*Error: Discarding Overlapping Credit Payment Event.*");
+VerifyCreditPayment( "esiClient", 11223344, 1000, 60000000,  0, 0, 1358, 800000 );
+
+send("esiClient", "plugin price-client credit-pmt printEvent 1 1" );
+expect("esiClient", ".*NOT FOUND.*");
+
+
+
+// INTERNAL TEST #1 - Ensure the client table entry with the smallest event ID is replaced 
+// when new credit payment commands are received.
+send("esiClient", "plugin price-client init 1");    // Clear client table so no older entries exist.
+
+// Publish Credit Payment:  provider + eventId + nextDueDate + overdueAmt + status + amount + LastPmtDate + ref#
+send("esi", "zcl price pub-credit-payment 11223344 1000 65000000 03 0x01 1358 807000 \"REF-String0001-ABCD\"" );
+send("esi", "send " + esiClientId + " 1 1");
+send("esi", "zcl price pub-credit-payment 11223344 1001 63000000 02 0x03 1058 805000 \"REF-String0002-ABCD\"" );
+send("esi", "send " + esiClientId + " 1 1");
+send("esi", "zcl price pub-credit-payment 11223344 1002 61000000 07 0x00 0030 809000 \"REF-String0003-ABCD\"" );
+send("esi", "send " + esiClientId + " 1 1");
+send("esi", "zcl price pub-credit-payment 11223344 1003 69000000 06 0x02 1058 000010 \"REF-String0004-ABCD\"" );
+send("esi", "send " + esiClientId + " 1 1");
+send("esi", "zcl price pub-credit-payment 11223344 1004 67000000 00 0x00 0000 800000 \"REF-String0005-ABCD\"" );
+send("esi", "send " + esiClientId + " 1 1");
+
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+networkWait(10 * timeout); 
+
+//String VerifyCreditPayment( String node, int providerId, int eventId, int dueDate, int overDueAmount, int status, int payment, int paymentDate ){
+VerifyCreditPayment( "esiClient", 11223344, 1000, 65000000, 03, 1, 1358, 807000 );
+VerifyCreditPayment( "esiClient", 11223344, 1001, 63000000, 02, 3, 1058, 805000 );
+VerifyCreditPayment( "esiClient", 11223344, 1002, 61000000, 07, 0,   30, 809000 );
+VerifyCreditPayment( "esiClient", 11223344, 1003, 69000000, 06, 2, 1058,     10 );
+VerifyCreditPayment( "esiClient", 11223344, 1004, 67000000, 00, 0,    0, 800000 );
+
+networkWait(10 * timeout); 
+send("esi", "zcl price pub-credit-payment 11223344 1005 60000000 00 0x00 0000 700000 \"REF-String0006-ABCD\"" );
+send("esi", "send " + esiClientId + " 1 1");
+send("esi", "zcl price pub-credit-payment 11223344 1006 80000000 00 0x00 0000 900000 \"REF-String0007-ABCD\"" );
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+networkWait(10 * timeout); 
+
+VerifyCreditPayment( "esiClient", 11223344, 1005, 60000000, 00, 0,    0, 700000 );
+VerifyCreditPayment( "esiClient", 11223344, 1006, 80000000, 00, 0,    0, 900000 );
+VerifyCreditPayment( "esiClient", 11223344, 1002, 61000000, 07, 0,   30, 809000 );
+VerifyCreditPayment( "esiClient", 11223344, 1003, 69000000, 06, 2, 1058,     10 );
+VerifyCreditPayment( "esiClient", 11223344, 1004, 67000000, 00, 0,    0, 800000 );
+
+
+
+
+// TEST 12.62 from Test Spec - GET CREDIT PAYMENT
+//========================================================
+
+timeNow = timeSinceZigBeeEpoch( 0 );
+timeNowMinus1Year = timeSinceZigBeeEpoch( (-60*24*365) );
+
+// Push at least 5 credit payments onto the server, none of which have CreditPaymentDate < 0x00000002
+// Set:  index,valid, provider, eventId, nextDueDate, overdueAmount, status, payment, CreditPmtDate, ref#
+send("esiClient", "plugin price-client init 1");
+send("esi", "plugin price-server credit-pmt set 1 0 1 11223344 12 56000000 22 1 47 14600000 \"REF-Init0004-abcd\"");
+send("esi", "plugin price-server credit-pmt set 1 1 1 22223344 22 56700000 01 1 54 74300000 \"REF-Init0003-abcd\"");
+send("esi", "plugin price-server credit-pmt set 1 2 1 11223344 32 56200000 34 2 65 24100000 \"REF-Init0002-abcd\"");
+send("esi", "plugin price-server credit-pmt set 1 3 1 22223344 42 56500000 97 1 76 34900000 \"REF-Init0005-abcd\"");
+send("esi", "plugin price-server credit-pmt set 1 4 1 22223344 52 56100000 14 3 12 44000000 \"REF-Init0005-abcd\"");
+networkWait(10 * timeout); 
+
+// Item 1-2 - Client sends Get Credit Payment, receives credit payment.
+//send("esiClient", "zcl price get-credit-payment 90000000 0");
+send("esiClient", "zcl price get-credit-payment 0x00000000 0");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*Rx: GetCreditPayment.*" );
+
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+
+networkWait(10 * timeout); 
+
+VerifyCreditPayment( "esiClient", 11223344, 12, 56000000, 22, 1, 47, 14600000 );
+VerifyCreditPayment( "esiClient", 22223344, 22, 56700000, 01, 1, 54, 74300000 );
+VerifyCreditPayment( "esiClient", 11223344, 32, 56200000, 34, 2, 65, 24100000 );
+VerifyCreditPayment( "esiClient", 22223344, 42, 56500000, 97, 1, 76, 34900000 );
+VerifyCreditPayment( "esiClient", 22223344, 52, 56100000, 14, 3, 12, 44000000 );
+
+// Item 3-4 - Client sends Get Credit Payment, latest=NOW, numRec=1, get 1 publish cmd
+send("esiClient", "plugin price-client init 1");    // Clear client table so no older entries exist.
+send("esiClient", "zcl price get-credit-payment 0x00000000 0");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*Rx: GetCreditPayment.*" );
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+
+networkWait( 5000 );
+// Should have event with greatest event ID.
+VerifyCreditPayment( "esiClient", 22223344, 52, 56100000, 14, 3, 12, 44000000 );
+
+networkWait( 5000 );
+// Item 5-6 - Client sends Get Credit Payment, latest=1 yr ago, numRec=1
+send("esiClient", "plugin price-client init 1");    // Clear client table so no older entries exist.
+networkWait( 5000 );
+send("esiClient", "zcl price get-credit-payment " + timeNowMinus1Year + " 1");
+networkWait( 5000 );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*Rx: GetCreditPayment.*" );
+expect("esiClient", ".*RX: PublishCreditPayment.*" );
+networkWait( timeout );
+VerifyCreditPayment( "esiClient", 11223344, 12, 56000000, 22, 1, 47, 14600000 );
+
+
+// Item 7 - Client sends Get Credit Payment, end time=1.  Server sends no response.
+send("esiClient", "plugin price-client init 1");    // Clear client table so no older entries exist.
+networkWait( 1000 );
+send("esiClient", "zcl price get-credit-payment 0x00000001 1");
+send("esiClient", "send " + esiId + " 1 1");
+
+expectMultiline("esi",
+                "",
+                new String[] {
+                  ".*Rx: GetCreditPayment.*",
+                  ".*No matching credit payments.*"
+                });
+
+
+
+// TEST 12.63 - PUBLISH CURRENCY CONVERSION
+//========================================================
+//   Publish Currency Conversion:
+
+// Item 1 - Client sends Get Currency Conversion - server responds back with publish.
+send("esi", "plugin price-server currency-conv set 1 0x01 0x11223344 0x00002222 0 0x0021 0x0022 0x05 1 0x03");
+expect("esi", ".*Set Currency.*");
+
+//networkWait( timeout );
+
+send("esiClient", "zcl price get-cur-conv-cmd");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0D payload\\[44 33 22 11 22 22 00 00 00 00 00 00 21 00 22 00 05 00 00 00 01 03 00 00 00 \\]");
+
+
+
+// TEST 12.64 - GET CURRENCY CONVERSION
+//========================================================
+
+String VerifyCurrencyConversion( String node, int providerId, int eventId, int currency, int convFact, int convFactTrailDig, int currencyFlags ){
+  return _expectMultiline( node, 
+    "plugin price-client currency-convers printEvent 1 " + eventId,
+    new String[] {
+      ".*Print Currency Conversion.*",
+      ".* providerId=" + providerId + ".*",
+      ".* issuerEventId=" + eventId + ".*",
+      ".* newCurrency=" + currency + ".*",
+      ".* conversionFactor=" + convFact + ".*",
+      ".* conversionFactorTrailingDigit=" + convFactTrailDig + ".*",
+      ".* currencyChangeControlFlags=" + currencyFlags + ".*"
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+String VerifyCurrentCurrency( String node, int providerId, int eventId, int currency, int convFact, int convFactTrailDig, int currencyFlags ){
+  return _expectMultiline( node, 
+    "plugin price-client currency-convers printCurrent 1",
+    new String[] {
+      ".*Print Currency Conversion.*",
+      ".* providerId=" + providerId + ".*",
+      ".* issuerEventId=" + eventId + ".*",
+      ".* newCurrency=" + currency + ".*",
+      ".* conversionFactor=" + convFact + ".*",
+      ".* conversionFactorTrailingDigit=" + convFactTrailDig + ".*",
+      ".* currencyChangeControlFlags=" + currencyFlags + ".*"
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+//std.print("===   SET CURRENCY CONVERSION   ====");
+send("esi", "plugin price-server init 1" );
+send("esiClient", "plugin price-client init 1" );
+send("esi", "plugin price-server currency-conv set 1 0x01 0x11223344 0x1213 0 0x0021 0x0022 0x05 1 0x03");
+expect("esi", ".*Set Currency.*");
+
+
+
+// Item 1-2 - Client sends Get Currency Conversion, gets Publish response.
+send("esiClient", "zcl price get-cur-conv-cmd");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 09 seq .. cmd 0D payload\\[44 33 22 11 13 12 00 00 00 00 00 00 21 00 22 00 05 00 00 00 01 03 00 00 00 \\]");
+
+
+// Item 3 - Server sends unsolicited Publish Currency Conversion command, start NOW.
+
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait(2000);
+
+timeNow = timeSinceZigBeeEpoch( 0 );
+send("esi", "zcl price pub-currency-conversion 11223344 5002 " + timeNow + " 0x0023 0x0024 56 2 0x07");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Currency Conversion.*");
+networkWait( timeout );
+
+VerifyCurrencyConversion( "esiClient", 11223344, 5002, 36, 56, 2, 7 );
+
+
+// Item 4 - Server sends unsolicited Publish Currency Conversion command, smaller eventId.  Client rejects.
+send("esi", "zcl price pub-currency-conversion 11223344 3002 " + timeNow + " 0x0027 0x0028 57 3 0x07");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Currency Conversion.*");
+send("esiClient", "plugin price-client currency-convers printEvent 1 3002" );
+expect("esiClient", ".*NOT FOUND.*");
+
+
+// Item 5-6 - Server sends unsolicited, start NOW+30 seconds.  Wait 30 sec, ensure client applies currency.
+send("esiClient", "plugin price-client init 1" );
+time1Min = timeSinceZigBeeEpoch( 1 );
+String timeMinus1Min = timeSinceZigBeeEpoch( 0 );
+send("esi", "zcl price pub-currency-conversion 11223344 6001 " + time1Min + " 0x0027 0x0028 30 2 0x03");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Currency Conversion.*");
+
+send("esiClient", "plugin price-client currency-convers printCurrent 1" );
+expect("esiClient", ".*NO CURRENT CURRENCY.*");
+
+//networkWait( 60 );
+network.sleep(61000);
+//send("esiClient", "plugin price-client currency-convers printCurrent 1" );
+VerifyCurrentCurrency( "esiClient", 11223344, 6001, 40, 30, 2, 3 );
+
+// Item 7 - Send unsolicited Publish Currency Conversion, start=0xFFFFFFFF to cancel previous.
+send("esi", "zcl price pub-currency-conversion 11223344 6001 0xFFFFFFFF 0x0127 0x0128 130 1 0x1");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Currency Conversion.*");
+send("esiClient", "plugin price-client currency-convers printCurrent 1" );
+expect("esiClient", ".*NO CURRENT CURRENCY.*");
+
+// Item 8 - Send Publish Currency Conversion, start time = NOW - 30 sec
+// timeNowEpoch is now 1 minute old.
+send("esi", "zcl price pub-currency-conversion 11223344 6201 " + timeMinus1Min + " 0x0027 0x002A 33 2 0x03");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Currency Conversion.*");
+VerifyCurrentCurrency( "esiClient", 11223344, 6201, 42, 33, 2, 3 );
+
+
+// INTERNAL TEST - Ensure oldest event ID is removed when full.
+send("esiClient", "plugin price-client init 1" );
+
+send("esi", "zcl price pub-currency-conversion 11112222 1001 0x29223456 0x0027 0x002A 33 2 0x03");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Currency Conversion.*");
+
+send("esi", "zcl price pub-currency-conversion 11112222 1002 0x00112233 0x0021 0x0030 35 1 0x01");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Currency Conversion.*");
+
+VerifyCurrencyConversion( "esiClient", 11112222, 1001, 42, 33, 2, 3 );
+VerifyCurrencyConversion( "esiClient", 11112222, 1002, 48, 35, 1, 1 );
+
+send("esi", "zcl price pub-currency-conversion 11112222 1003 0x00012233 0x0021 0x0020 15 1 0x02");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Currency Conversion.*");
+VerifyCurrencyConversion( "esiClient", 11112222, 1003, 32, 15, 1, 2 );
+VerifyCurrencyConversion( "esiClient", 11112222, 1002, 48, 35, 1, 1 );
+
+
+// INTERNAL TEST - Server sends NOT FOUND if no events.
+send("esi", "plugin price-server init 1" );
+send("esiClient", "zcl price get-cur-conv-cmd");
+send("esiClient", "send " + esiId + " 1 1");
+expect("esiClient", ".*clus 0x0700 \\(Price\\) FC 08 seq .. cmd 0B payload\\[0F 8B \\]");
+
+
+// TEST 12.65 - CANCEL TARIFF
+// ==========================================================
+
+// Item 0 - Server sends Publish Tariff Information to client.
+timeNow = timeSinceZigBeeEpoch( 0 );
+send("esi", "plugin price-server tariff who 0x11223344 \"tariff5\" 0x00000009 0x00000005");
+send("esi", "plugin price-server tariff when " + timeNow);
+send("esi", "plugin price-server tariff what  0xF2 0x00 840 80 0x04 0x03 0x01");
+send("esi", "plugin price-server tariff add 1 1");
+
+send("esi", "plugin price-server pub-tariff-info " + esiClientId + " 1 1 0");
+
+expect("esiClient", ".*RX: PublishTariffInformation 0x11223344, 0x00000009, 0x00000005, 0x.*, 0xF2, \"tariff5\", 0x04, 0x03, 0x00, 0x0348, 0x50, 0x00000000, 0x01, 0x00000001, 0x00000001");
+
+
+// Item 1 - Server sends Cancel Tariff to client.  Client cancells tariff data.
+// Cancel Tariff <providerId> <issuerTariffId> <tariffType>
+send("esi", "zcl price cancel-tariff 0x11223344 0x00000005 0xF2");
+send("esi", "send " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Cancel Tariff.*");
+
+// TODO:  Verify the client discards tariff data.
+
+expect("esi", ".*clus 0x0700 \\(Price\\) FC 00 seq .. cmd 0B payload\\[0E 00 \\]");
+
+
+// TEST 12.66 - SENDING GET TARIFF CANCELLATION
+//===========================================================
+// 12.66 - Item 1 - Client sends Get Tariff Cancellation to server, ensure it's formatted correctly
+send("esiClient", "zcl price get-tariff-cancellation" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*Rx: GetTariffCancellation.*" );
+
+
+
+// TEST 12.67 - RECEIVING GET TARIFF CANCELLATION
+//===========================================================
+// 12.67 - Item 1 - Server sends Cancel Tariff to Client.
+send("esi", "plugin price-server tariff-cancel set 1 1 11223344 81817272 26" );
+send("esi", "plugin price-server tariff-cancel pub " + esiClientId + " 1 1");
+expect("esiClient", ".*RX: Cancel Tariff, providerId=11223344, issuerTariffId=81817272, tariffType=26.*");
+
+// 12.67 - Item 2 - Client sends Get Tariff Cancellation
+send("esiClient", "zcl price get-tariff-cancellation" );
+send("esiClient", "send " + esiId + " 1 1");
+expect("esi", ".*Rx: GetTariffCancellation.*" );
+
+// 12.67 - Item 3 - Server sends Cancel Tariff with same params as step #1
+expect("esiClient", ".*RX: Cancel Tariff, providerId=11223344, issuerTariffId=81817272, tariffType=26.*");
+
+
+
+
+// TEST 12.68 from Test Spec - CPP EVENT
+//========================================================
+//   Publish Cpp Event:  providerId, eventId, startTime, durationMins, tariffType, cppPriceTier, cppAuth
+int CPP_AUTH_PENDING=0;
+int CPP_AUTH_ACCEPTED=1;
+int CPP_AUTH_REJECTED=2;
+int CPP_AUTH_FORCED=3;
+
+// INIT - Configure IHD to reject CPP event
+send("esiClient", "plugin price-client cpp-event setAuth " + CPP_AUTH_REJECTED);
+//send("emeter", "plugin price-client cpp-event setAuth " + CPP_AUTH_ACCEPTED);
+
+// Item 1 - Server sends Publish CPP event to clients, start NOW, auth=PENDING
+// Pub-Cpp-Event <provId> <eventId> <startTime> <duratMin> <tariffType =0,1,2> <cppTier =0,1> <cppAuth>
+send("esi", "zcl price pub-cpp-event 11223344 0x00000001 0x00000000 20 1 0x00 " + CPP_AUTH_PENDING);
+send("esi", "send " + esiClientId + " 1 1");
+//send("esi", "send " + emeterId + " 1 1");
+
+// Item 2-4 - Client chooses to REJECT event, sends response to server.
+expect("esiClient", ".*Pending CPP Event, status=" + CPP_AUTH_REJECTED + ".*");
+expect("esi", ".*Rx: Cpp Event Response, issuerEventId=0x00000001, auth=" + CPP_AUTH_REJECTED + ".*");
+
+// Item 5-7 - Server sends Publish CPP event, greater eventId, auth=REJECTED
+expect("esiClient", ".*CPP Event Rejected.*");
+
+
+// Item 8-10 - Send Publish CPP Event to both devices, at least one should accept.
+// Update IHD policy to accept CPP events.
+send("esiClient", "plugin price-client cpp-event setAuth " + CPP_AUTH_ACCEPTED);
+
+send("esi", "zcl price pub-cpp-event 11223344 0x00000003 0x00000000 10 0 0 " + CPP_AUTH_PENDING);
+send("esi", "send " + esiClientId + " 1 1" );
+//expect("esiClient", ".*RX: PublishCppEvent.*");
+//expect("esiClient", ".*Pending CPP Event, status=" + CPP_AUTH_ACCEPTED + ".*");
+expectMultiline("esiClient",
+                "",
+                new String[] {
+                  ".*RX: PublishCppEvent.*",
+                  ".*Pending CPP Event, status=" + CPP_AUTH_ACCEPTED + ".*"
+                });
+
+
+
+
+//send("esi", "zcl price pub-cpp-event 11223344 0x00000003 0x00000000 10 0 0 " + CPP_AUTH_PENDING);
+//send("esi", "send " + emeterId + " 1 1" );
+//expect("emeter", ".*RX: PublishCppEvent.*");
+//expect("emeter", ".*Pending CPP Event, status=" + CPP_AUTH_ACCEPTED + ".*");
+
+// Item 11-13 - Client sends CPP response to server.  Server sends Publish Cpp event, status=ACCEPTED.
+// Item 14 - Client performs CPP event.
+expectMultiline("esi",
+                "",
+                new String[] {
+                  ".*Rx: Cpp Event Response, issuerEventId=0x00000003, auth=" + CPP_AUTH_ACCEPTED + ".*",
+                  ".*Send CPP Event.*"
+                });
+
+//expect("esi", ".*Rx: Cpp Event Response, issuerEventId=0x00000003, auth=" + CPP_AUTH_ACCEPTED + ".*" );
+//expect("esi", ".*Send CPP Event.*");
+expect("esiClient", ".*CPP Event Accepted.*");
+
+
+
+
+
+// TEST 12.69 from Test Spec - ACTIONING CPP EVENT
+//========================================================
+//   Publish Cpp Event:  providerId, eventId, startTime, durationMins, tariffType, cppPriceTier, cppAuth
+
+
+String CppEventInProgress( String node, int cppEventActive, int valid, int issuerEventId, int tariffType, int cppTier, int cppAuth ){
+  return _expectMultiline( node,
+    "plugin price-client cpp-event print 1",
+    new String[] {
+      ".*= CPP Event =.*",
+      ".* active=" + cppEventActive + ".*",
+      ".* valid=" + valid + ".*",
+      ".* issuerEventId=" + issuerEventId + ".*",
+      ".* tariffType=" + tariffType + ".*",
+      ".* cppPriceTier=" + cppTier + ".*",
+      ".* cppAuth=" + cppAuth + ".*"
+    },
+    DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("esiClient", "timesync 0 1 1");
+networkWait( 2000 );
+
+// Since event will be FORCED, set auth status to reject/accept on both devices.  Both should accept
+send("esiClient", "plugin price-client cpp-event setAuth " + CPP_AUTH_REJECTED);
+//send("emeter", "plugin price-client cpp-event setAuth " + CPP_AUTH_ACCEPTED);
+
+// Item 1 - Send Publish CPP Event to both devices, at least one should accept.
+send("esi", "zcl price pub-cpp-event 11223344 0x00000020 0x00000000 1 0 0 " + CPP_AUTH_FORCED);
+//send("esi", "send " + emeterId + " 1 1" );
+send("esi", "send " + esiClientId + " 1 1" );
+//expect("emeter", ".*RX: PublishCppEvent.*");
+//expect("esiClient", ".*RX: PublishCppEvent.*");
+
+// Item 2 - Wait 1 minute for CPP event to complete.
+networkWait( 5000 );
+CppEventInProgress( "esiClient", 1, 1, 32, 0, 0, CPP_AUTH_FORCED );
+networkWait( 61000 );
+CppEventInProgress( "esiClient", 0, 1, 32, 0, 0, CPP_AUTH_FORCED );
+
+
+
+// Item 3 - Send another Publish CPP event, start now, duration=10, auth=FORCED
+send("esi", "zcl price pub-cpp-event 11223344 0x00000022 0x00000000 10 0 0 " + CPP_AUTH_FORCED);
+//send("esi", "send " + emeterId + " 1 1" );
+send("esi", "send " + esiClientId + " 1 1" );
+
+// Items 4-5 - Wait 1 minute.  Send another Publish CPP event, start 0xFFFFFFFF, wrong eventId, FORCED
+networkWait( 63000 );
+CppEventInProgress( "esiClient", 1, 1, 34, 0, 0, CPP_AUTH_FORCED );
+send("esi", "zcl price pub-cpp-event 11223344 0x00001442 0xFFFFFFFF 1 0 0 " + CPP_AUTH_FORCED);
+//send("esi", "send " + emeterId + " 1 1" );
+send("esi", "send " + esiClientId + " 1 1" );
+networkWait( 5000 );
+// Make sure current event still active.
+CppEventInProgress( "esiClient", 1, 1, 34, 0, 0, CPP_AUTH_FORCED );
+
+
+
+// Items 6-7 - Wait 1 minute.  Send another Publish CPP event, start=0xFFFFFFFF, wrong providerId, FORCED
+networkWait( 63000 );
+send("esi", "zcl price pub-cpp-event 11225677 0x00000022 0xFFFFFFFF 1 0 0 " + CPP_AUTH_FORCED);
+//send("esi", "send " + emeterId + " 1 1" );
+send("esi", "send " + esiClientId + " 1 1" );
+networkWait( 5000 );
+// Make sure current event still active.
+CppEventInProgress( "esiClient", 1, 1, 34, 0, 0, CPP_AUTH_FORCED );
+
+// Items 8-9 - Wait 1 minute.  Send another Publish CPP event, start=0xFFFFFFFF, duration=1, FORCED
+networkWait( 63000 );
+send("esi", "zcl price pub-cpp-event 11223344 0x00000022 0xFFFFFFFF 1 0 0 " + CPP_AUTH_FORCED);
+//send("esi", "send " + emeterId + " 1 1" );
+send("esi", "send " + esiClientId + " 1 1" );
+
+// Item 10 - Wait 1 minute.  Verify the CPP event completes on both clients.
+networkWait( 60000 );
+CppEventInProgress( "esiClient", 0, 0, 34, 0, 0, CPP_AUTH_FORCED );
+
+
+
+// TEST 12.70 - PUBLISH CPP EVENT and CPP EVENT RESPONSE
+// ================================================================
+
+// Item 1 - Server sends Publish CPP event, start Now, duration>1, FORCED
+send("esi", "zcl price pub-cpp-event 11223344 0x00000030 0x00000000 5 0 0 " + CPP_AUTH_FORCED);
+//send("esi", "send " + emeterId + " 1 1" );
+send("esi", "send " + esiClientId + " 1 1" );
+//expect("emeter", ".*RX: PublishCppEvent.*");
+
+// Item 2 - Device begins CPP event
+//expect("emeter", ".*CPP Event Accepted.*");
+
+
+// Item 3 - IHD sends CPP Event Response, REJECTED.
+// Since original event was FORCED, the meter should continue with the event.
+networkWait( 2000 );
+CppEventInProgress( "esiClient", 1, 1, 48, 0, 0, CPP_AUTH_FORCED );
+send("esiClient", "zcl price cpp-event-resp 0x00000030 " + CPP_AUTH_REJECTED);
+send("esiClient", "send " + esiId + " 1 1");
+
+// Item 5 - Meter continues with CPP event
+// TODO:  Need CLI to determine if the CPP is still active on both client devices!!!
+CppEventInProgress( "esiClient", 1, 1, 48, 0, 0, CPP_AUTH_FORCED );
+
+
+// INTERNAL TEST #1 - Verify event expires after timeout
+networkWait( 4 * 60000 );
+CppEventInProgress( "esiClient", 1, 1, 48, 0, 0, CPP_AUTH_FORCED );
+networkWait( 80000 );
+CppEventInProgress( "esiClient", 0, 1, 48, 0, 0, CPP_AUTH_FORCED );
+
+// -----------------------------------------------------------------------------
+// EMAPPFWKV2-1469 - make sure we are automatically repeating billing periods,
+// per the SE spec.
+
+// Turn on the billing-period repeat feature.
+send("esi", "plugin price-server billing-period repeat 1");
+
+// Makes sure there are no valid billing periods.
+expectMultiline("esi",
+                "plugin price-server billing-period print 1",
+                new String[] {
+                  "  \\[0\\]: valid: 0x00",
+                  "  \\[1\\]: valid: 0x00",
+                });
+
+// Add a billing period on endpoint 1 with a start time of now and a duration
+// of 1 minute. There should be a "next" billing-period already scheduled.
+send("esi", "plugin price-server billing-period add 1 0 0xAAAAAAAA 0xBBBBBBBB 1 0 0");
+expectMultiline("esi",
+                "plugin price-server billing-period print 1",
+                new String[] {
+                  "  \\[0\\]: valid: 0x01",
+                  "  \\[0\\]: billingPeriodDuration: 0x00000001",
+                  "  \\[0\\]: billingPeriodDurationType: 0x00",
+                  "  \\[1\\]: valid: 0x01",
+                  "  \\[1\\]: billingPeriodDuration: 0x00000001",
+                  "  \\[1\\]: billingPeriodDurationType: 0x00",
+                });
+
+// If we wait for a minute (plus some wiggle room), the first billing period
+// will expire.
+expect("esi", "Price Tick:  Billing Period", (60 * 1000) + DEFAULT_TIMEOUT);
+
+// The former "next" billing period is now the "current" period. We should have
+// scheduled a new "next" billing period already.
+expectMultiline("esi",
+                "plugin price-server billing-period print 1",
+                new String[] {
+                  "  \\[0\\]: valid: 0x01",
+                  "  \\[0\\]: billingPeriodDuration: 0x00000001",
+                  "  \\[0\\]: billingPeriodDurationType: 0x00",
+                  "  \\[1\\]: valid: 0x01",
+                  "  \\[1\\]: billingPeriodDuration: 0x00000001",
+                  "  \\[1\\]: billingPeriodDurationType: 0x00",
+                });
+
+// If we turn off the billing period repeat, then the billing periods will
+// stop automatically repeating.
+send("esi", "plugin price-server billing-period repeat 0");
+expect("esi", "Price Tick:  Billing Period", (60 * 1000) + DEFAULT_TIMEOUT);
+expectMultiline("esi",
+                "plugin price-server billing-period print 1",
+                new String[] {
+                  "  \\[0\\]: valid: 0x01",
+                  "  \\[1\\]: valid: 0x00",
+                });
+
+// EMAPPFWKV2-1469
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// EMAPPFWKV2-1469 - make sure we are automatically repeating block periods,
+// whenever the current block period control says to, per the SE spec.
+
+// Clear all the block periods to start fresh.
+// Makes sure there are no valid block periods.
+send("esi", "plugin price-server block-period clear 1");
+expect("esi", "plugin price-server block-period print 1 0", "  valid=0");
+expect("esi", "plugin price-server block-period print 1 1", "  valid=0");
+
+// Add a block period on endpoint 1 that starts now and lasts for 1 minute.
+// Make sure we set the block period control to request that the block period
+// gets repeated. We should make sure that the issuer event id is greater in
+// the second period, since it is a different period.
+send("esi",
+     ("plugin price-server block-period add "
+      + "0x01 0xAA 0xBB " // endpoint, provider id, issuer event id
+      + "0x00 0x01 0x02 " // start time (now), duration (1 minute), control (repeat)
+      + "0x00 0x00 0x00 " // duration type (minutes), threshold multiplier, threshold divisor
+      + "0x00 0x00"));    // tariff type, tariff resolution period
+networkWait(DEFAULT_TIMEOUT << 2);
+expectMultiline("esi",
+                "plugin price-server block-period print 1 0",
+                new String[] {
+                  "  valid=1",
+                  "  issuerEventId=0x000000BB",
+                  "  duration=0x0000003C", // 60 seconds
+                });
+expectMultiline("esi",
+                "plugin price-server block-period print 1 1",
+                new String[] {
+                  "  valid=1",
+                  "  issuerEventId=0x000000BC",
+                  "  duration=0x0000003C", // 60 seconds
+                });
+
+// After 60 seconds (plus some fudge time), the "current" block period will be
+// done, and then we should switch to the "next" block period.
+expect("esi", "Price Tick:  Block Period", (60 * 1000) + DEFAULT_TIMEOUT);
+
+// The previous "next" block period should become the "current" one.
+// We should also have a new entry for the new "next" block period.
+networkWait(DEFAULT_TIMEOUT);
+expectMultiline("esi",
+                "plugin price-server block-period print 1 0",
+                new String[] {
+                  "  valid=1",
+                  "  issuerEventId=0x000000BC",
+                  "  duration=0x0000003C", // 60 seconds
+                });
+expectMultiline("esi",
+                "plugin price-server block-period print 1 1",
+                new String[] {
+                  "  valid=1",
+                  "  issuerEventId=0x000000BD",
+                  "  duration=0x0000003C", // 60 seconds
+                });
+
+// EMAPPFWKV2-1469
+// -----------------------------------------------------------------------------

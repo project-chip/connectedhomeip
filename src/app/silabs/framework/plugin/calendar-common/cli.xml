@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-calendar-common" name="Plugin Commands: Calendar Common">
+    <description>
+      The calendar common plugin commands provide commands to view and manipulate the local copy of the calendar.
+    </description>
+  </group>
+  <command cli="plugin calendar-common select" functionName="emberAfPluginCalendarCommonSelectCommand" group="plugin-calendar-common">
+    <description>
+      Selects a calendar to be printed.
+    </description>
+    <arg name="index" type="INT8U" description="The index of the calendar to be selected." />
+  </command>
+  <command cli="plugin calendar-common print summary" functionName="emberAfPluginCalendarCommonPrintSummaryCommand" group="plugin-calendar-common">
+    <description>
+      Prints the local calendar summary at the previously selected index.
+    </description>
+  </command>
+  <command cli="plugin calendar-common print weeks" functionName="emberAfPluginCalendarCommonPrintWeeksCommand" group="plugin-calendar-common">
+    <description>
+      Prints the local calendar's weeks.
+    </description>
+  </command>
+  <command cli="plugin calendar-common print days" functionName="emberAfPluginCalendarCommonPrintDaysCommand" group="plugin-calendar-common">
+    <description>
+      Prints the local calendar's days
+    </description>
+  </command>
+  <command cli="plugin calendar-common print special-days" functionName="emberAfPluginCalendarCommonPrintDaysCommand" group="plugin-calendar-common">
+    <description>
+      Prints the local calendar's special days.
+    </description>
+  </command>
+  <command cli="plugin calendar-common print seasons" functionName="emberAfPluginCalendarCommonPrintSeasonsCommand" group="plugin-calendar-common">
+    <description>
+      Prints the local calendar's seasons.
+    </description>
+  </command>
+  <command cli="plugin calendar-common test-init" functionName="emberAfPluginCalendarCommonSetupTestCalendarsCommand" group="plugin-calendar-common">
+    <description>
+      Initializes test calendars with dummy data.
+    </description>
+  </command>
+  <command cli="plugin calendar-common clear" functionName="emberAfPluginCalendarCommonClearCalendarsCommand" group="plugin-calendar-common">
+    <description>
+      Clear the calendars.
+    </description>
+  </command>
+
+  <command cli="plugin calendar-common load-simple-calendar" functionName="emberAfPluginCalendarCommonLoadSimpleCalendarCommand" group="plugin-calendar-common">
+    <description>
+      Loads the Simple Calendar defined in Appendix D.1 in the SE 1.2 Test specification.
+    </description>
+    <arg name="index"            type="INT8U"        description="The index in the internal calendar table where this calendar is to be stored" />
+    <arg name="providerId"       type="INT32U"       description="The provider ID" />
+    <arg name="issuerEventId"    type="INT32U"       description="The issuer event ID" />
+    <arg name="issuerCalendarId" type="INT32U"       description="The issuer calendar ID" />
+    <arg name="startTime"        type="INT32U"       description="The time when this calendar is to be considered active" />
+    <arg name="type"             type="INT8U"        description="The type: Del=0x00, Rec=0x01, DelAndRec=0x02, Friendly=0x03, Aux=0x04" />
+    <arg name="name"             type="OCTET_STRING" description="The calendar name" />
+  </command>
+
+  <command cli="plugin calendar-common load-enhanced-calendar" functionName="emberAfPluginCalendarCommonLoadEnhancedCalendarCommand" group="plugin-calendar-common">
+    <description>
+      Loads the Enhanced Calendar defined in Appendix D.2 in the SE 1.2 Test specification.
+    </description>
+    <arg name="index"            type="INT8U"        description="The index in the internal calendar table where this calendar is to be stored" />
+    <arg name="providerId"       type="INT32U"       description="The provider ID" />
+    <arg name="issuerEventId"    type="INT32U"       description="The issuer event ID" />
+    <arg name="issuerCalendarId" type="INT32U"       description="The issuer calendar ID" />
+    <arg name="startTime"        type="INT32U"       description="The time when this calendar is to be considered active" />
+    <arg name="type"             type="INT8U"        description="The type: Del=0x00, Rec=0x01, DelAndRec=0x02, Friendly=0x03, Aux=0x04" />
+    <arg name="name"             type="OCTET_STRING" description="The calendar name" />
+  </command>
+
+  <command cli="plugin calendar-common load-flat-calendar" functionName="emberAfPluginCalendarCommonLoadFlatCalendarCommand" group="plugin-calendar-common">
+    <description>
+      Loads the Flat Calendar defined in Appendix D.3 in the SE 1.2 Test specification.
+    </description>
+    <arg name="index"            type="INT8U"        description="The index in the internal calendar table where this calendar is to be stored" />
+    <arg name="providerId"       type="INT32U"       description="The provider ID" />
+    <arg name="issuerEventId"    type="INT32U"       description="The issuer event ID" />
+    <arg name="issuerCalendarId" type="INT32U"       description="The issuer calendar ID" />
+    <arg name="startTime"        type="INT32U"       description="The time when this calendar is to be considered active" />
+    <arg name="type"             type="INT8U"        description="The type: Del=0x00, Rec=0x01, DelAndRec=0x02, Friendly=0x03, Aux=0x04" />
+    <arg name="name"             type="OCTET_STRING" description="The calendar name" />
+  </command>
+
+  <command cli="plugin calendar-common load-simple-special-days" functionName="emberAfPluginCalendarCommonLoadSimpleSpecialDaysCommand" group="plugin-calendar-common">
+    <description>
+      Loads the Simple Special Days defined in Appendix D.4 in the SE 1.2 Test specification.
+    </description>
+    <arg name="index"            type="INT8U"        description="The index in the internal calendar table where the speical days are to be stored" />
+  </command>
+
+  <command cli="plugin calendar-common load-enhanced-special-days" functionName="emberAfPluginCalendarCommonLoadEnhancedSpecialDaysCommand" group="plugin-calendar-common">
+    <description>
+      Loads the Simple Special Days defined in Appendix D.5 in the SE 1.2 Test specification.
+    </description>
+    <arg name="index"            type="INT8U"        description="The index in the internal calendar table where the speical days are to be stored" />
+  </command>
+
+  <command cli="plugin calendar-common set-cal-info" functionName="emberAfCalendarCommonCliSetCalInfo" group="plugin-calendar-common">
+    <description>
+      Manually set local calendar information.
+    </description>
+    <arg name="index"                type="INT8U" />
+    <arg name="providerId"           type="INT32U" />
+    <arg name="issuerEventId"        type="INT32U" />
+    <arg name="calId"                type="INT32U" />
+    <arg name="startTime"            type="INT32U" />
+    <arg name="calType"              type="INT8U" />
+    <arg name="calName"              type="OCTET_STRING" />
+    <arg name="numberOfSeasons"      type="INT8U" />
+    <arg name="numberOfWeekProfiles" type="INT8U" />
+    <arg name="numberOfDayProfiles"  type="INT8U" />
+  </command>
+
+  <command cli="plugin calendar-common add-cal-info" functionName="emberAfCalendarCommonCliAddCalInfo" group="plugin-calendar-common">
+    <description>
+      Adding calendar information.
+    </description>
+    <arg name="providerId"           type="INT32U" />
+    <arg name="issuerEventId"        type="INT32U" />
+    <arg name="calId"                type="INT32U" />
+    <arg name="startTime"            type="INT32U" />
+    <arg name="calType"              type="INT8U" />
+    <arg name="calName"              type="OCTET_STRING" />
+    <arg name="numberOfSeasons"      type="INT8U" />
+    <arg name="numberOfWeekProfiles" type="INT8U" />
+    <arg name="numberOfDayProfiles"  type="INT8U" />
+  </command>
+
+  <command cli="plugin calendar-common set-day-prof-info" functionName="emberAfCalendarCommonCliSetDayProfInfo" group="plugin-calendar-common">
+    <description>
+      Manually set local calendar's day profiles information.
+    </description>
+    <arg name="index"               type="INT8U"  />
+    <arg name="dayId"               type="INT8U"  />
+    <arg name="entryId"             type="INT8U"  />
+    <arg name="minutesFromMidnight" type="INT16U" />
+    <arg name="data"                type="INT8U"  />
+  </command>
+  <command cli="plugin calendar-common set-week-prof-info" functionName="emberAfCalendarCommonCliSetWeekProfInfo" group="plugin-calendar-common">
+    <description>
+      Manually set local calendar's week profiles information.
+    </description>
+    <arg name="index"            type="INT8U"  />
+    <arg name="weekId"           type="INT8U"  />
+    <arg name="dayIdRefMon"      type="INT8U"  />
+    <arg name="dayIdRefTue"      type="INT8U"  />
+    <arg name="dayIdRefWed"      type="INT8U"  />
+    <arg name="dayIdRefThu"      type="INT8U"  />
+    <arg name="dayIdRefFri"      type="INT8U"  />
+    <arg name="dayIdRefSat"      type="INT8U"  />
+    <arg name="dayIdRefSun"      type="INT8U"  />
+  </command>
+
+  <command cli="plugin calendar-common set-seasons-info" functionName="emberAfCalendarCommonCliSetSeasonsInfo" group="plugin-calendar-common">
+    <description>
+      Manually set local calendar's seasons information.
+    </description>
+    <arg name="index"          type="INT8U"  />
+    <arg name="weekId"         type="INT8U"  />
+    <arg name="startDate"      type="DATE"   />
+    <arg name="weekIdRef"      type="INT8U"  />
+  </command>
+</cli>

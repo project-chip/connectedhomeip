@@ -1,0 +1,319 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  System.out.print("****TODO: FIX for multihop ****");
+  return;
+}
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] allDevices = {
+  "server",
+  "client1",
+  "client2",
+  "client3"
+};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-EMBER_AF_TC_SWAP_OUT_TEST-REAL_ECC/SeFullTh"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh",
+  "build/af-test-apps/SeFullTh-simulation-ezsp/SeFullTh"
+};
+String ncpImage = "app/ncp/sample-app/xncp-test-harness-ecc-spi/simulation/build/exe/xncp-test-harness-ecc-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+expect("client1",
+       "option print-rx-msgs disable",
+       "disabled print");
+expect("client2",
+       "option print-rx-msgs disable",
+       "disabled print");
+expect("client3",
+       "option print-rx-msgs disable",
+       "disabled print");
+expect("server",
+       "option print-rx-msgs disable",
+       "disabled print");
+
+// Disable auto-registration to test initial bring up.
+expectNoResponse("server", "plugin test-harness registration off");
+expectNoResponse("client1", "plugin test-harness registration off");
+expectNoResponse("client2", "plugin test-harness registration off");
+expectNoResponse("client3", "plugin test-harness registration off");
+
+send("server", "libs");
+send("client1", "info");
+
+formAndJoinDevices(allDevices);
+
+network.sleep(2000);
+
+// Disable keep-alive as it periodically prints READ_ATTR messages on the
+// coordinator, killing the expectNoResponse calls
+send("client1", "plugin test-harness tc-keepalive stop");
+send("client2", "plugin test-harness tc-keepalive stop");
+send("client3", "plugin test-harness tc-keepalive stop");
+networkWait(2000);
+
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("client1", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("client2", "plugin test-harness key-establishment normal-mode");
+expectNoResponse("client3", "plugin test-harness key-establishment normal-mode");
+
+networkWait(1000);
+
+// Test that client and server attributes are kept in sync.
+
+// Write server attribute, check client.
+send("client2", "write 1 0x0800 0x0000 1 0x31 {00 00}");
+networkWait(1000);
+expect("client2",
+       "print attr",
+       "0800 / clnt / 0000 / ---- / 31 \\(02\\) / RO /   RAM   / 00 00 \\(Key Establishment\\)");
+networkWait(1000);
+
+// Write Client attribute, check server.
+networkWait(1000);
+send("client2", "write 1 0x0800 0x0000 1 0x31 {03 00}");
+expect("client2",
+       "print attr",
+       "0800 / srvr / 0000 / ---- / 31 \\(02\\) / RO /   RAM   / 03 00 \\(Key Establishment\\)");
+networkWait(1000);
+
+
+// Test 15.5 - the canonical case
+debugPrintln("*** Test Case 15.43 Canonical Case ***");
+//Test the canonical case of joining the server
+expect("client2",
+       "plugin key-establishment start 0 1",
+       20000,
+       "Initiator: Key Establish Success: Link key verified .*");
+networkWait(1000);
+
+// Test the server initiating the key establishment
+debugPrintln("*** Test Case 15.43 Canonical Case Server Initiating KE***");
+String clientId = nodeId("client1");
+expect("server",
+       "plugin key-establishment start " + clientId + " 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");
+networkWait(30000);
+
+// Test 15.12 - 2 non-TC devices (updated in ZSE 1.4)
+debugPrintln("*** Test Case 15.12 Key Establishment 2 non-TC devices***");
+expect("client2",
+       "plugin partner-link-key-exchange partner " + clientId + " 1",
+       "Key established: 1");
+networkWait(3000);
+
+// Added in ZSE 1.4 - direct CBKE between 2 non-TC devices
+// NB: For a more thorough test including expected failure cases,
+//   see Test 15.12 in key-establishment-real_ecc.bsh.
+// This test is purely a staright-forward case to check it also works with long certs.
+String client2Id = nodeId("client2");
+expect("client1",
+       "plugin key-establishment start " + client2Id + " 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");
+networkWait(30000);
+
+expect("client2",
+       "plugin key-establishment start " + clientId + " 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");
+networkWait(30000);
+
+// The test spec dictates that the device with both the suites shall be the suites
+// DUT and the other device shall be the golden unit.
+
+// To do this, we manipulate a key establishment state variable "emAfAvailableCbkeSuite"
+// to hold only EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1 despite SeFullTh being compiled
+// with both suites.
+
+debugPrintln("*** Test Case 15.44 Device that supports Crypto Suite 1 & 2 talking to a device that only supports crypto Suite 1.");
+
+send("client3", "plugin test-harness key-establishment set-available-suite 1");
+send("server", "plugin test-harness key-establishment set-available-suite 3");
+
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");
+
+networkWait(30000);
+
+debugPrintln("*** Test Case 15.45 Device that supports Crypto Suite 1 & 2 talking to a device that only supports crypto Suite 1. Server Test");
+
+send("client3", "plugin test-harness key-establishment set-available-suite 3");
+send("server", "plugin test-harness key-establishment set-available-suite 1");
+
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       "Initiator: Key Establish Success: Link key verified .*");
+
+networkWait(30000);
+
+debugPrintln("*** Test case 15.46 Invalid Key Usage bit Corrupt Client");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("server","plugin test-harness key-establishment set-available-suite 3");
+expectNoResponse("client3", "plugin test-harness key-establishment cert-mangle change-byte 36 0x80");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       ".*Terminate Received, Status.*Invalid certificate");
+
+networkWait(30000);
+
+debugPrintln("*** Test case 15.47 Invalid Key Usage bit Corrupt Server");
+expectNoResponse("server", "plugin test-harness key-establishment cert-mangle change-byte 36 0x80");
+expectNoResponse("client3", "plugin test-harness key-establishment normal-mode");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       "Initiator: Key Establish Error: Invalid Key Usage.*");
+expect("server",
+       "",
+       1000,
+       ".*Terminate Received, Status.*Invalid certificate");
+networkWait(30000);
+
+debugPrintln("*** Test case 15.48 Corrupt Certificate Server Test");
+String clientId = nodeId("client3");
+//send("client3","plugin test-harness key-establishment set-available-suite 3");
+//write 01 0x0800 0 1 0x31 {01 00}
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("server","plugin test-harness key-establishment set-available-suite 3");
+expectNoResponse("client3", "plugin test-harness key-establishment cert-mangle corrupt 19");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       ".*Terminate Received, Status.*Bad Key Confirm.*");
+
+networkWait(30000);
+
+debugPrintln("*** Test case 15.49 KeyEstablishment with Corrupt Certificate 283k1 Client Test");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("server","plugin test-harness key-establishment set-available-suite 3");
+//write 01 0x0800 0 1 0x31 {01 00}
+expect("client3","write 1 0x0800 0x0000 1 0x31 {03 00}","Success: write");
+expectNoResponse("server", "plugin test-harness key-establishment cert-mangle corrupt 19");
+expectNoResponse("client3", "plugin test-harness key-establishment normal-mode");
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       ".*Initiator: Key Establish Error: Key confirm failure.*");
+
+networkWait(30000);
+
+debugPrintln("*** Test case 15.50 Key Establishment with Short Certificate 283k1 Client Test");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("server","plugin test-harness key-establishment set-available-suite 3");
+expectNoResponse("server","plugin test-harness key-establishment cert-mangle length -10");
+expectNoResponse("client3", "plugin test-harness key-establishment normal-mode");
+send("client3","plugin key-establishment start 0 1");
+expect("client3",
+       "",
+       ".*Invalid length for KE command: 0 .*");
+
+networkWait(30000);
+
+debugPrintln("*** Test case 15.51 Key Establishment with Short Certificate 283k1 Server Test");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("server","plugin test-harness key-establishment set-available-suite 3");
+expectNoResponse("client3","plugin test-harness key-establishment cert-mangle length -10");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+send("client3","plugin key-establishment start 0 1");
+expect("server",
+       "",
+       ".*Invalid length for KE command: 0 .*");
+
+networkWait(30000);
+
+debugPrintln("*** Test case 15.52 Short Empheral Key Corrupt Client Test");
+expectNoResponse("server", "plugin test-harness key-establishment key-mangle -10");
+expectNoResponse("client3", "plugin test-harness key-establishment normal-mode");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       ".*Invalid length for KE command: 1 .*");
+expect("server",
+       "",
+       1000,
+       ".*Key Establish Error: Partner sent terminate.*");
+networkWait(30000);
+
+debugPrintln("*** Test case 15.53 Short Empheral Key Corrupt Server Test");
+expectNoResponse("client3", "plugin test-harness key-establishment key-mangle -10");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("client3","plugin key-establishment start 0 1");
+expect("server",
+       "",
+       10000,
+       ".*Invalid length for KE command: 1 .*");
+expect("client3",
+       "",
+       1000,
+       ".*Key Establish Error: Partner sent terminate.*");
+networkWait(30000);
+
+debugPrintln("*** Test case 15.54 Invalid Certificate Fields Client Test: Invalid Type byte");
+expectNoResponse("client3", "plugin test-harness key-establishment cert-mangle change-byte 0 0xFF");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("server","plugin test-harness key-establishment set-available-suite 3");
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       ".*Terminate Received, Status.*Invalid certificate");
+
+networkWait(30000);
+
+debugPrintln("*** Test case 15.54 Invalid Certificate Fields Client Test: Invalid Curve byte");
+expectNoResponse("client3", "plugin test-harness key-establishment cert-mangle change-byte 9 0xFF");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("server","plugin test-harness key-establishment set-available-suite 3");
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       ".*Terminate Received, Status.*Invalid certificate");
+networkWait(30000);
+
+debugPrintln("*** Test case 15.54 Invalid Certificate Fields Client Test: Invalid Hash byte");
+expectNoResponse("client3", "plugin test-harness key-establishment cert-mangle change-byte 10 0xFF");
+expectNoResponse("server", "plugin test-harness key-establishment normal-mode");
+send("client3","plugin test-harness key-establishment set-available-suite 3");
+send("server","plugin test-harness key-establishment set-available-suite 3");
+expect("client3",
+       "plugin key-establishment start 0 1",
+       10000,
+       ".*Terminate Received, Status.*Invalid certificate");
+

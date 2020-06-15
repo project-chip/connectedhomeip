@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-simple-metering-server" name="Plugin Commands: Simple Metering Server">
+    <description>
+      The simple-metering-server plugin contributes CLI commands to the application framework to be used in conjunction with the Simple Metering cluster in a server context
+    </description>
+  </group>
+  <command cli="plugin simple-metering-server print" functionName="emAfPluginSimpleMeteringServerCliPrint" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Prints the test meters
+    </description>
+  </command>
+  <command cli="plugin simple-metering-server rate" functionName="emAfPluginSimpleMeteringServerCliRate" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Used to change the rate argument
+    </description>
+    <arg name="rate" type="INT16U" description="The rate at which the test meter generates test data" />
+    <arg name="endpoint" type="INT8U" description="The endpoint." />
+  </command>
+  <command cli="plugin simple-metering-server variance" functionName="emAfPluginSimpleMeteringServerCliVariance" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Used to change the variance in the test data created by the test meter.
+    </description>
+    <arg name="rate" type="INT16U" description="" />
+  </command>
+  <command cli="plugin simple-metering-server adjust" functionName="emAfPluginSimpleMeteringServerCliAdjust" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Used to adjust the test meter.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint of the test meter." />
+  </command>
+  <command cli="plugin simple-metering-server off" functionName="emAfPluginSimpleMeteringServerCliOff" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Turn off output from the test meter.
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint of the test meter" />
+  </command>
+  <command cli="plugin simple-metering-server electric" functionName="emAfPluginSimpleMeteringServerCliElectric" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Turns test meter into an electric meter
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint of the test meter" />
+  </command>
+  <command cli="plugin simple-metering-server gas" functionName="emAfPluginSimpleMeteringServerCliGas" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Turns test meter into a gas meter
+    </description>
+    <arg name="endpoint" type="INT8U" description="The endpoint of the test meter" />
+  </command>
+  <command cli="plugin simple-metering-server rnd_error" functionName="emAfPluginSimpleMeteringServerCliRandomError" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ERRORS)">
+    <description>
+      Sets the random error to the value provided which is the chance in 256 of an error occurring.
+    </description>
+    <arg name="chanceIn255" type="INT8U" description="The chance of an error occurring in 255" />
+  </command>
+  <command cli="plugin simple-metering-server set_error" functionName="emAfPluginSimpleMeteringServerCliSetError" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ERRORS)">
+    <description>
+      Sets the meter's status attribute id to the passed error value.
+    </description>
+    <arg name="error" type="INT8U" description="The chance of an error occurring in 255" />
+    <arg name="endpoint" type="INT8U" description="The endpoint affected" />
+  </command>
+  <command cli="plugin simple-metering-server profiles" functionName="emAfPluginSimpleMeteringServerCliProfiles" group="plugin-simple-metering-server" restriction="defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER_TEST_METER_ENABLE)">
+    <description>
+      Turn on and off profiles on the test meter server..
+    </description>
+    <arg name="profileType" type="INT8U" description="The profile to set" />
+  </command>
+  <command cli="plugin simple-metering-server configure-mirror" functionName="emAfPluginSimpleMeteringServerCliConfigureMirror" group="plugin-simple-metering-server">
+    <description>
+      Send configure mirror command to Metering client.
+    </description>
+    <arg name="client"             type="INT16U"  description="The network address of the server to which the request will be sent." />
+    <arg name="serverEndpoint"     type="INT8U"   description="The local endpoint from which the request will be sent." />
+    <arg name="clientEndpoint"     type="INT8U"   description="The remote endpoint to which the request will be sent." />
+    <arg name="IssuerEventId" type="INT32U" description="The issuer event Id as specified by the device." />
+    <arg name="ReportingInterval" type="INT32U" description="3 bytes of Reporting Interval value." />
+    <arg name="mirrorNotificationReporting" type="INT8U" description="Mirror Notification Reporting value" />
+    <arg name="NotificationScheme" type="INT8U" description="Mirror Notification Reporting value" />
+  </command>
+  <command cli="plugin simple-metering-server toggle-fast-poll-mode" functionName="emAfPluginSimpleMeteringCliDisableFastPolling" group="plugin-simple-metering-server">
+    <description>
+      Disable fast polling mode for testing.
+    </description>
+    <arg name="enableFastPolling"     type="INT8U"   description="1 to enable, 0 to disable fast polling mode." />
+  </command>
+</cli>

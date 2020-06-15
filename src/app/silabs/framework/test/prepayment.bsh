@@ -1,0 +1,1168 @@
+// This test file tests functionality in the prepayment-server and prepayment-snapshot-storage plugins.
+
+
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = { "esi", "meter" };
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12MeterGas-simulation/Se12MeterGas"
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12MeterGas-simulation-ezsp/Se12MeterGas"
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices,
+                  socImages,
+                  hostImages,
+                  ncpImage,
+                  runArgument.runUsingHostApps,
+                  runArgument.runUsingMultihop,
+                  runArgument.runUsingSpiNcp);
+
+
+// Set up a network.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+
+//formAndJoinDevices(devices, true);   // wait for Key establishment to complete?
+formAndJoinDevices(devices);   // wait for Key establishment to complete?
+networkWait(timeout * 10);
+
+String esiId = nodeId("esi");
+String meterId = nodeId("meter");
+
+//std.print("  === CH Addr=0x" + esiId + ", Meter Addr=0x" + meterId + "\n" );
+
+//////////////////////////////////////////////////////////////////////////////
+// SANITY CHECK TESTS
+
+
+int ESI_ENDPOINT = 1;
+int METER_ENDPOINT = 1;
+
+// ChangePaymentMode() --> meter
+// esi   <--  ChangePaymentModeResponse()
+send("esi", "zcl prepayment chg-pmt-mode 1 1 0 7 12");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*RX: ChangePaymentMode.*");
+expect("esi", ".*RX: Change Payment Mode Response Callback.*");
+//expect("esi", ".*RX CHANGE.*");
+
+
+// GetPrepaySnapshot() --> meter
+// esi   <--   PublishPrepaySnapshot()
+send("esi", "zcl prepayment get-pp-ss 0 123456 0 0xFFFFFFFF");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*RX: GetPrepaySnapshot.*");
+expect("esi", ".*RX: Publish Prepay Snapshot Callback.*");
+
+// GetTopUpLog() --> meter
+// esi  <--- PublishTopUpLog()
+send("esi", "zcl prepayment get-top-up-log 12345678 2");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*RX: GetTopUpLog.*");
+expect("meter", ".*Send Publish Top Up Log.*");
+
+
+
+// GetDebtLog() --> meter
+// esi  <--  PublishDebtLog()
+
+send("esi", "zcl prepayment get-debt-repmt-log 98769876 1 2");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*RX: GetDebtLog.*");
+
+
+// Add Snapshot
+send("meter", "plugin prepayment-server init 1");
+expect("meter", ".*Init Snapshot Table.*");
+
+
+// Test Emergency Credit Setup
+// [eventId] + [startTime] + [creditLimit] + [creditThreshold]
+send("esi", "zcl prepayment em-cred-setup 1 0x00000000 12345 67890");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*Rx: Emergency Credit Setup.*");
+
+
+int ZCL_PAYMENT_CONTROL_CONFIGURATION_ATTRIBUTE_ID = 0x0000;
+int ZCL_CREDIT_REMAINING_ATTRIBUTE_ID = 0x0001;
+int ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID = 0x0010;
+int ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID = 0x0011;
+int ZCL_CUT_OFF_VALUE_ATTRIBUTE_ID = 0x0040;
+
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID + " 4 12345");
+expect("meter", ".*Attribute Read Match Success.*");
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID + " 4 67890");
+expect("meter", ".*Attribute Read Match Success.*");
+
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID + " 4 12344");
+expect("meter", ".*Attribute Read Failed Match.*");
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID + " 4 67888");
+expect("meter", ".*Attribute Read Failed Match.*");
+
+
+// Test Credit Adjustment
+// [eventId] + [startTime] + [creditAdjType] + [creditAdjValue]
+send("esi", "zcl prepayment cred-adj 1 0x00000000 0x01 1234567");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*Rx: Credit Adjustment.*");
+
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_CREDIT_REMAINING_ATTRIBUTE_ID + " 4 1234567");
+expect("meter", ".*Attribute Read Match Success.*");
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST UTC-TO-CALENDAR CONVERSION
+
+// Verify conversion between UTC times and calendar dates is working correctly.
+// These are used by the prepayment server for debt collection scheduling.
+
+String checkCalendar( String node, int utcTime, int year, int month, int day, int hour, int minutes, int seconds )
+{
+  return _expectMultiline( node, 
+      "plugin prepayment-server checkCalendar " + utcTime,
+      new String[] {
+        ".*= AF TIME.*",
+        ".* Year=" + year + ".*",
+        ".* Month=" + month + ".*",
+        ".* Day=" + day + ".*",
+        ".* Hour=" + hour + ".*",
+        ".* Min=" + minutes + ".*",
+        ".* Sec=" + seconds + ".*",
+        ".* UTC Times Match.*"
+      },
+      DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+void checkWeekday( String node, int utcTime, int expectedWeekday )
+{
+  send( node, "plugin prepayment-server getWeekdayFromUtc " + utcTime );
+  expect( node, ".*Weekday=" + expectedWeekday + ".*" );
+}
+
+
+// UTC 0x00000000 == JAN 1st, 2000, 00:00:00
+// 1970 to 2000 = 946684800 seconds
+
+int UTC_TIME1 = 0x00000000;
+int UTC_TIME1_YEAR  = 2000;
+int UTC_TIME1_MONTH = 1;
+int UTC_TIME1_DAY   = 1;
+int UTC_TIME1_HOUR  = 0;
+int UTC_TIME1_MINS  = 0;
+int UTC_TIME1_SEC   = 0;
+int UTC_TIME1_WKDAY = 5;
+
+
+// UTC 0x12CFF780 == Jan 1st, 2010, 00:00:00
+int UTC_TIME2 = 0x12CFF780;
+int UTC_TIME2_YEAR  = 2010;
+int UTC_TIME2_MONTH = 1;
+int UTC_TIME2_DAY   = 1;
+int UTC_TIME2_HOUR  = 0;
+int UTC_TIME2_MINS  = 0;
+int UTC_TIME2_SEC   = 0;
+int UTC_TIME2_WKDAY = 4;
+
+// UTC 0x16E024A8 == Feb 28th, 2012, 23:50:00
+int UTC_TIME3 = 0x16E024A8;
+int UTC_TIME3_YEAR  = 2012;
+int UTC_TIME3_MONTH = 2;
+int UTC_TIME3_DAY   = 28;
+int UTC_TIME3_HOUR  = 23;
+int UTC_TIME3_MINS  = 50;
+int UTC_TIME3_SEC   = 0;
+int UTC_TIME3_WKDAY = 1;
+
+
+// UTC 0x16E17628 == Feb 29th, 2012, 23:50:00
+int UTC_TIME4 = 0x16E17628;
+int UTC_TIME4_YEAR  = 2012;
+int UTC_TIME4_MONTH = 2;
+int UTC_TIME4_DAY   = 29;
+int UTC_TIME4_HOUR  = 23;
+int UTC_TIME4_MINS  = 50;
+int UTC_TIME4_SEC   = 0;
+int UTC_TIME4_WKDAY = 2;
+
+
+// UTC 0x16E17881 == Mar  1st, 2012, 00:00:01
+int UTC_TIME5 = 0x16E17881;
+int UTC_TIME5_YEAR  = 2012;
+int UTC_TIME5_MONTH = 3;
+int UTC_TIME5_DAY   = 1;
+int UTC_TIME5_HOUR  = 0;
+int UTC_TIME5_MINS  = 0;
+int UTC_TIME5_SEC   = 1;
+int UTC_TIME5_WKDAY = 3;
+
+// UTC 0x1C00B63B == Nov 20th, 2014, 14:24:59
+int UTC_TIME6 = 0x1C00B63B;
+int UTC_TIME6_YEAR  = 2014;
+int UTC_TIME6_MONTH = 11;
+int UTC_TIME6_DAY   = 20;
+int UTC_TIME6_HOUR  = 14;
+int UTC_TIME6_MINS  = 24;
+int UTC_TIME6_SEC   = 59;
+int UTC_TIME6_WKDAY = 3;
+
+// UTC 0x677485A3 == Jan  1st, 2055, 00:00:35
+int UTC_TIME7 = 0x677485A3;
+int UTC_TIME7_YEAR  = 2055;
+int UTC_TIME7_MONTH = 1;
+int UTC_TIME7_DAY   = 1;
+int UTC_TIME7_HOUR  = 0;
+int UTC_TIME7_MINS  = 0;
+int UTC_TIME7_SEC   = 35;
+int UTC_TIME7_WKDAY = 4;
+
+// UTC 0x7FFFFFFF == Jan 19th, 2068, 03:14:07
+int UTC_TIME8 = 0x7FFFFFFF;
+int UTC_TIME8_YEAR  = 2068;
+int UTC_TIME8_MONTH = 1;
+int UTC_TIME8_DAY   = 19;
+int UTC_TIME8_HOUR  = 3;
+int UTC_TIME8_MINS  = 14;
+int UTC_TIME8_SEC   = 7;
+int UTC_TIME8_WKDAY = 3;
+
+
+
+checkCalendar( "meter", UTC_TIME1, UTC_TIME1_YEAR, UTC_TIME1_MONTH, UTC_TIME1_DAY, UTC_TIME1_HOUR, UTC_TIME1_MINS, UTC_TIME1_SEC );
+checkCalendar( "meter", UTC_TIME2, UTC_TIME2_YEAR, UTC_TIME2_MONTH, UTC_TIME2_DAY, UTC_TIME2_HOUR, UTC_TIME2_MINS, UTC_TIME2_SEC );
+checkCalendar( "meter", UTC_TIME3, UTC_TIME3_YEAR, UTC_TIME3_MONTH, UTC_TIME3_DAY, UTC_TIME3_HOUR, UTC_TIME3_MINS, UTC_TIME3_SEC );
+checkCalendar( "meter", UTC_TIME4, UTC_TIME4_YEAR, UTC_TIME4_MONTH, UTC_TIME4_DAY, UTC_TIME4_HOUR, UTC_TIME4_MINS, UTC_TIME4_SEC );
+
+checkCalendar( "meter", UTC_TIME5, UTC_TIME5_YEAR, UTC_TIME5_MONTH, UTC_TIME5_DAY, UTC_TIME5_HOUR, UTC_TIME5_MINS, UTC_TIME5_SEC );
+checkCalendar( "meter", UTC_TIME6, UTC_TIME6_YEAR, UTC_TIME6_MONTH, UTC_TIME6_DAY, UTC_TIME6_HOUR, UTC_TIME6_MINS, UTC_TIME6_SEC );
+checkCalendar( "meter", UTC_TIME7, UTC_TIME7_YEAR, UTC_TIME7_MONTH, UTC_TIME7_DAY, UTC_TIME7_HOUR, UTC_TIME7_MINS, UTC_TIME7_SEC );
+checkCalendar( "meter", UTC_TIME8, UTC_TIME8_YEAR, UTC_TIME8_MONTH, UTC_TIME8_DAY, UTC_TIME8_HOUR, UTC_TIME8_MINS, UTC_TIME8_SEC );
+
+
+checkWeekday( "meter", UTC_TIME1, UTC_TIME1_WKDAY );
+checkWeekday( "meter", UTC_TIME2, UTC_TIME2_WKDAY );
+checkWeekday( "meter", UTC_TIME3, UTC_TIME3_WKDAY );
+checkWeekday( "meter", UTC_TIME4, UTC_TIME4_WKDAY );
+
+checkWeekday( "meter", UTC_TIME5, UTC_TIME5_WKDAY );
+checkWeekday( "meter", UTC_TIME6, UTC_TIME6_WKDAY );
+checkWeekday( "meter", UTC_TIME7, UTC_TIME7_WKDAY );
+checkWeekday( "meter", UTC_TIME8, UTC_TIME8_WKDAY );
+
+// Values used in tests below.
+String[] euis = {
+  // NOTE:  These should be upper case for remove-all test to work.
+  "{00 0D 6F 00 40 01 24 4B}", 
+  "{00 0D 6F 00 40 11 23 3C}", 
+  "{00 0D 6F 00 40 21 24 2B}", 
+  "{00 0D 6F 00 40 31 23 1C}", 
+  "{00 0D 6F 00 40 41 24 0B}", 
+  "{00 0D 6F 00 40 51 23 FC}" };
+
+int[] msgTmout = { 20, 30, 40, 50, 60 };
+int[] msgPtr   = { 0x00008000, 0x1111F111, 0x22223222, 0x33335333, 0x4444A444 };
+int[] msgLen   = { 10, 100, 1000, 10000, 50000 };
+int[] msgPlid  = { 23234, 45454, 56654, 112, 0 };
+
+int[] expMsgIds = { 0,1,2,3,4 };
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #1 - Read some attributes
+//std.print("========  RUNNING TEST #19.x -- Configure PAYG & Credit Mode\n");
+int PREPAYMENT_CID = 0x0705;
+int PREPAY_ATTRIB_CTRL_CONFIG=0x0000;
+int PREPAY_ATTRIB_CRED_REMAIN=0x0001;
+
+send("esi", "zcl global read " + PREPAYMENT_CID + " " + PREPAY_ATTRIB_CTRL_CONFIG );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*clus.*" );
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #2 - Pay As You Go & Credit Mode
+// System.out.print("");
+
+// Send "Change Payment Mode" command with:
+//  date/time=0x00000000
+//  cutoff value = 0x00000000
+int CFG_PREPAYMENT_MODE = 0x02;
+int CFG_CREDIT_MODE = 0x04;
+
+//int PAYMENT_MODE = CFG_PREPAYMENT_MODE;
+
+// chg-pmt-mode [provId] + [issuerId] + [implDateTime] + [pmtCtrlConfig] + [cutOffValue]
+
+// 19.8.5 #1 - Send Change Payment Mode, implementationDateTime=0x00000000 (now)
+//            paymtCtrlConfig= xxxxx  (prepayment mode),   (0bxxxx1x is prepayment enabled)
+//            cutOffValue=0x00000000
+
+send("esi", "zcl prepayment chg-pmt-mode 1 1 0x00000000 " + CFG_PREPAYMENT_MODE + " 0x00000000" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: ChangePaymentMode.*");
+network.sleep( 5 * 1024 );
+
+// Receive Change Payment Mode Response
+//  Read payment control configuration attribute.   Make sure it matches prepayment mode.
+
+//send("esi", "zcl global read " + PREPAYMENT_CID + " " + PREPAY_ATTRIB_CTRL_CONFIG );
+//send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+//expect("meter", ".*clus.*" );
+//network.sleep( 10 * 1024 );   // Delay for all network traffic to settle out.
+
+
+send("meter", "plugin prepayment-server verifyPaymentMode " + METER_ENDPOINT + " " + CFG_PREPAYMENT_MODE );
+expect("meter", ".*Payment Mode Match Success.*" );
+
+// Sanity check to make sure a non-matching value really doesn't match.
+send("meter", "plugin prepayment-server verifyPaymentMode " + METER_ENDPOINT + " " + CFG_PREPAYMENT_MODE + "1" );
+expect("meter", ".*Payment Mode Failed Match.*" );
+
+
+
+// 19.8.5 #4 - Send Change Payment Mode, implementationDateTime = {future time}
+//            paymtCtrlConfig= xxxxx  (credit mode),   (0bxxx10x is credit enabled)
+//            cutOffValue=0x00000000
+
+// Sync time on server & client.  This will help us schedule out the payment mode.
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("meter", "timesync 0 1 1");
+networkWait(2000);
+
+// changePmtMode [provId] + [issuerId] + [delaySec] + [pmtCtrlConfig] + [cutOffValue]
+send("esi", "zcl prepayment chg-pmt-mode 1 2 " + timeSinceZigBeeEpoch(2) + " " + CFG_CREDIT_MODE + " 0x00000000" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: ChangePaymentMode.*");
+
+// Cfg Mode should be same as before until delay has elapsed
+send("meter", "plugin prepayment-server verifyPaymentMode " + METER_ENDPOINT + " " + CFG_PREPAYMENT_MODE );
+expect("meter", ".*Payment Mode Match Success.*" );
+
+
+networkWait( 130000 );
+send("meter", "plugin prepayment-server verifyPaymentMode " + METER_ENDPOINT + " " + CFG_CREDIT_MODE );
+expect("meter", ".*Payment Mode Match Success.*" );
+
+
+
+// 19.8.5 #7 - Send Change Payment Mode, implementationDateTime = {future time}
+//            paymtCtrlConfig= xxxxx  (prepayment mode),   (0bxxxx1x is prepayment enabled)
+//            cutOffValue=0x00000000
+
+// Sync time on server & client.  This will help us schedule out the payment mode.
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("meter", "timesync 0 1 1");
+networkWait(2000);
+
+send("esi", "zcl prepayment chg-pmt-mode 1 1 " + timeSinceZigBeeEpoch(2) + " " + CFG_PREPAYMENT_MODE + " 0x00000000" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: ChangePaymentMode.*");
+expect("meter", ".*Adding prepayment mode.*");
+
+// Ensure mode is still credit.
+send("meter", "plugin prepayment-server verifyPaymentMode " + METER_ENDPOINT + " " + CFG_CREDIT_MODE );
+expect("meter", ".*Payment Mode Match Success.*" );
+
+
+// Before future time is reached, send another Change Payment Mode command with dateTime = 0xFFFFFFFF
+// which should cancel the previous command.
+
+send("esi", "zcl prepayment chg-pmt-mode 1 1 0xFFFFFFFF " + CFG_PREPAYMENT_MODE + " 0x00000000" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: ChangePaymentMode.*");
+expect("meter", ".*Cancelling scheduled prepayment mode.*");
+
+// Wait for future time to timeout, ensure mode stays the same.
+networkWait( 130000 );
+send("meter", "plugin prepayment-server verifyPaymentMode " + METER_ENDPOINT + " " + CFG_CREDIT_MODE );
+expect("meter", ".*Payment Mode Match Success.*" );
+
+
+// INTERNAL TEST
+// Make sure Change Payment Mode has the expected friendly credit and emergency credit threshold values we expect
+
+// Configure no friendly credit calendar.
+send("meter", "plugin calendar-client clear 1");
+networkWait( 100 );
+// Configure prepayment attribs - Limit/Allowance (0x0010) and Threshold (0x0011)  (type=U32=0x23)
+send("meter", "plugin prepayment-server writeAttribute 1 0x0010 0x23 4 0x01020304");
+send("meter", "plugin prepayment-server writeAttribute 1 0x0011 0x23 4 0xA1B2C3D4");
+networkWait( 100 );
+
+send("esi", "zcl prepayment chg-pmt-mode 1 1 " + timeSinceZigBeeEpoch(2) + " " + CFG_PREPAYMENT_MODE + " 0x00000000" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+
+expect("esi", ".*RX len 16, ep 01, clus 0x0705 \\(Prepayment\\) FC 19 seq .. cmd 02 payload\\[00 FF FF FF FF 04 03 02 01 D4 C3 B2 A1.*");
+
+// Now add friendly credit calendar and change prepayment attribs
+send("esi", "plugin calendar-common load-simple-calendar 0 0x11223344 0x00000001 0x1D1D2D2D " + timeSinceZigBeeEpoch(2) + " 0x03 \"FRIEND-CAL1\"");
+send("esi", "plugin calendar-server publish-calendar " + meterId + " 1 1 0");
+networkWait( 5000 );
+
+send("meter", "plugin prepayment-server writeAttribute 1 0x0010 0x23 4 0xE1E28082");
+send("meter", "plugin prepayment-server writeAttribute 1 0x0011 0x23 4 0x02040608");
+networkWait( 100 );
+send("esi", "zcl prepayment chg-pmt-mode 1 1 " + timeSinceZigBeeEpoch(2) + " " + CFG_PREPAYMENT_MODE + " 0x00000000" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+
+expect("esi", ".*RX len 16, ep 01, clus 0x0705 \\(Prepayment\\) FC 19 seq .. cmd 02 payload\\[01 2D 2D 1D 1D 82 80 E2 E1 08 06 04 02.*");
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #3 - Emergency Credit Setup
+// System.out.print("");
+
+// Test Emergency Credit Setup
+
+//int ZCL_PAYMENT_CONTROL_CONFIGURATION_ATTRIBUTE_ID = 0x0000;
+//int ZCL_CREDIT_REMAINING_ATTRIBUTE_ID = 0x0001;
+//int ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID = 0x0010;
+//int ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID = 0x0011;
+//int ZCL_CUT_OFF_VALUE_ATTRIBUTE_ID = 0x0040;
+
+send("esi", "zcl prepayment em-cred-setup 1 0x00000000 12345 67890");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*Rx: Emergency Credit Setup.*");
+
+//send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID + " 4 12345");
+//expect("meter", ".*Attribute Read Match Success.*");
+//send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID + " 4 67890");
+//expect("meter", ".*Attribute Read Match Success.*");
+
+//send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID + " 4 12344");
+//expect("meter", ".*Attribute Read Failed Match.*");
+//send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID + " 4 67888");
+//expect("meter", ".*Attribute Read Failed Match.*");
+
+
+// 19.9.5 #1 - Send Emergency Credit Setup, implementationDateTime = {future time}
+//            creditLimit = Value_A 
+//            creditThreshold = Value_B
+
+// Sync time on server & client.  This will help us schedule out the emergency credit.
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("meter", "timesync 0 1 1");
+networkWait(2000);
+
+// [eventId] + [startTime] + [creditLimit] + [creditThreshold]
+//send("esi", "zcl prepayment em-cred-setup 1 " + timeSinceZigBeeEpoch( 2 ) + " 0xA2A3A4 0xB5B6B7");
+//send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+//expect("meter", ".*Rx: Emergency Credit Setup.*");
+
+// 19.9.5 #2 - Verify the read values match initial values
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID + " 4 12345");
+expect("meter", ".*Attribute Read Match Success.*");
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID + " 4 67890");
+expect("meter", ".*Attribute Read Match Success.*");
+
+
+// 19.9.5 #4 - After start time reached, read the attributes to make sure they have been updated.
+//send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID + " 4 0xA2A3A4");
+//expect("meter", ".*Attribute Read Match Success.*");
+//send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID + " 4 0xB5B6B7");
+//expect("meter", ".*Attribute Read Match Success.*");
+
+
+// 19.9.5 #5 - Send emergency credit setup command, startTime=NOW, greater eventId than before.
+send("esi", "zcl prepayment em-cred-setup 3 0x00000000 0x7778 0x6565");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*Rx: Emergency Credit Setup.*");
+
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID + " 4 0x7778");
+expect("meter", ".*Attribute Read Match Success.*");
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID + " 4 0x6565");
+expect("meter", ".*Attribute Read Match Success.*");
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #4 - Credit Adjustment
+// System.out.print("");
+
+// Test Credit Adjustment
+// [eventId] + [startTime] + [creditAdjType] + [creditAdjValue]
+
+//int ZCL_PAYMENT_CONTROL_CONFIGURATION_ATTRIBUTE_ID = 0x0000;
+//int ZCL_CREDIT_REMAINING_ATTRIBUTE_ID = 0x0001;
+//int ZCL_EMERGENCY_CREDIT_LIMIT_ALLOWANCE_ATTRIBUTE_ID = 0x0010;
+//int ZCL_EMERGENCY_CREDIT_THRESHOLD_ATTRIBUTE_ID = 0x0011;
+//int ZCL_CUT_OFF_VALUE_ATTRIBUTE_ID = 0x0040;
+
+
+// 19.10.5 #1 - Send credit adjustment command.  Start NOW, type=1 (absolute), value=Value_A
+send("esi", "zcl prepayment cred-adj 1 0x00000000 0x01 12345");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*Rx: Credit Adjustment.*");
+
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_CREDIT_REMAINING_ATTRIBUTE_ID + " 4 12345");
+expect("meter", ".*Attribute Read Match Success.*");
+
+
+
+
+//String[] euis = {
+  // NOTE:  These should be upper case for remove-all test to work.
+//  "{00 0D 6F 00 40 51 23 FC}" };
+
+//int[] msgTmout = { 20, 30, 40, 50, 60 };
+//int[] msgPtr   = { 0x00008000, 0x1111F111, 0x22223222, 0x33335333, 0x4444A444 };
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #5 - Get Top Up Log
+
+String checkPublishTopUpLog( String node, int index, String code, int amount )
+{
+  return _expectMultiline( node, null,
+      new String[] {
+        ".*= Top Up Payload " + index,
+        ".*" + code + ".*",
+        ".* Amount=" + amount
+      },
+      DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+String checkPublishTopUpLog2( String node, int index1, String code1, int amount1, int index2, String code2, int amount2 )
+{
+  return _expectMultiline( node, null,
+      new String[] {
+        ".*= Top Up Payload " + index1,
+        ".*" + code1 + ".*",
+        ".* Amount=" + amount1,
+        ".*= Top Up Payload " + index2,
+        ".*" + code2 + ".*",
+        ".* Amount=" + amount2,
+      },
+      DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+String checkPublishTopUpLog3( String node, int index1, String code1, int amount1, int index2, String code2, int amount2,
+                              int index3, String code3, int amount3 )
+{
+  return _expectMultiline( node, null,
+      new String[] {
+        ".*= Top Up Payload " + index1,
+        ".*" + code1 + ".*",
+        ".* Amount=" + amount1,
+        ".*= Top Up Payload " + index2,
+        ".*" + code2 + ".*",
+        ".* Amount=" + amount2,
+        ".*= Top Up Payload " + index3,
+        ".*" + code3 + ".*",
+        ".* Amount=" + amount3,
+      },
+      DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+
+// Ensure meter in prepayment mode.
+send("esi", "zcl prepayment chg-pmt-mode 1 1 0x00000000 " + CFG_PREPAYMENT_MODE + " 0x00000000" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: ChangePaymentMode.*");
+
+// Init with 3 UTRNs
+int ORIG_DEVICE_ESI = 0x00;
+
+String TOP_UP_CODE1 = "{31 31 32 33 34 35 36 00 00}";
+String TOP_UP_CODE2 = "{32 46 41 43 45 46 41 43 45 46 41 00 00}";
+String TOP_UP_CODE3 = "{33 44 43 42 41 00 00}";
+
+String TOP_UP_CODE1_STR = "1123456";
+String TOP_UP_CODE2_STR = "2FACEFACEFA";
+String TOP_UP_CODE3_STR = "3DCBA";
+
+// Sync time on server & client.
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("meter", "timesync 0 1 1");
+networkWait(2000);
+
+send("esi", "zcl prepayment cons-top-up " + ORIG_DEVICE_ESI + " " + TOP_UP_CODE3 );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: Consumer Top Up Callback.*");
+
+String TopUpTime1 = timeSinceZigBeeEpoch( 3 );  // A time between 3rd & 2nd top ups 
+String TopUpTime2 = timeSinceZigBeeEpoch( 8 );  // A time between 2nd & 1st top ups
+String TopUpTime3 = timeSinceZigBeeEpoch( 12);  // A time after all top ups
+
+
+networkWait( 5 * 60 * 1000);    // Delay 5 minutes
+send("esi", "zcl prepayment cons-top-up " + ORIG_DEVICE_ESI + " " + TOP_UP_CODE2 );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: Consumer Top Up Callback.*");
+
+
+networkWait( 5 * 60 * 1000);    // Delay 5 minutes
+send("esi", "zcl prepayment cons-top-up " + ORIG_DEVICE_ESI + " " + TOP_UP_CODE1 );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: Consumer Top Up Callback.*");
+
+
+// 19.12.5 #1 - Sent Get Top Up Log, date/time = time between #2 & #1, #records=1
+
+send("esi", "zcl prepayment get-top-up-log " + TopUpTime2 + " 1");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: GetTopUpLog, endTime.*" );
+expect("meter", ".*Sent Publish Top Up Log, 1 top ups.*");
+expect("esi", ".*");
+
+
+
+//String checkPublishTopUpLog2( String node, int index1, String code1, int amount1, int index2, String code2, int amount2 )
+
+// 19.12.5 #3 - Sent Get Top Up Log, date/time = time between #2 & #1, #records=2.
+send("esi", "zcl prepayment get-top-up-log " + TopUpTime2 + " 2");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: GetTopUpLog, endTime.*" );
+
+checkPublishTopUpLog2( "meter", 0, TOP_UP_CODE2_STR, 0,   1, TOP_UP_CODE3_STR, 0 );
+expect("meter", ".*Sent Publish Top Up Log, 2 top ups.*");
+expect("esi", ".*");
+
+
+// 19.12.5 #5 - Sent Get Top Up Log, date/time = CURRENT TIME1, #records=1.
+send("esi", "zcl prepayment get-top-up-log " + timeSinceZigBeeEpoch(11) + " 1");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: GetTopUpLog, endTime.*" );
+checkPublishTopUpLog( "meter", 0, TOP_UP_CODE1_STR, 0 );
+expect("meter", ".*Sent Publish Top Up Log, 1 top ups.*");
+expect("esi", ".*");
+
+
+// 19.12.5 #7 - Sent Get Top Up Log, date/time = CURRENT TIME1, #records=2.
+send("esi", "zcl prepayment get-top-up-log " + timeSinceZigBeeEpoch(11) + " 2");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: GetTopUpLog, endTime.*" );
+
+checkPublishTopUpLog2( "meter", 0, TOP_UP_CODE1_STR, 0,   1, TOP_UP_CODE2_STR, 0 );
+expect("meter", ".*Sent Publish Top Up Log, 2 top ups.*");
+expect("esi", ".*");
+
+
+/// INTERNAL TEST #1 - Get all 3 entries
+
+send("esi", "zcl prepayment get-top-up-log " + timeSinceZigBeeEpoch(11) + " 3");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: GetTopUpLog, endTime.*" );
+
+checkPublishTopUpLog3( "meter", 0, TOP_UP_CODE1_STR, 0,   1, TOP_UP_CODE2_STR, 0,
+                       2, TOP_UP_CODE3_STR, 0 );
+expect("meter", ".*Sent Publish Top Up Log, 3 top ups.*");
+expect("esi", ".*");
+
+
+
+/// INTERNAL TEST #2 - No entries
+//send("esi", "zcl prepayment get-top-up-log " + timeSinceZigBeeEpoch(0) + " 3");
+send("esi", "zcl prepayment get-top-up-log 0x00112233 3");
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX: GetTopUpLog, endTime.*" );
+
+expect("meter", ".*No Matching Top Up Log Entries.*");
+expect("esi", ".*");
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #5 - Get Prepay Snapshot 
+// System.out.print("");
+
+// Add Prepay Snapshot
+// [endpoint] + [snapshotCause]
+String checkPrepaySnapshot( String node,
+                            int snapshotId, String snapshotTime,
+                            int totalSnapshotsFound, String snapshotCause, 
+                            int snapshotType, int accumDebt,
+                            int type1DebtRem, int type2DebtRem,
+                            int type3DebtRem, int emergencyCreditRem,
+                            int creditRem )
+{
+  return _expectMultiline( node, null,
+      new String[] {
+        ".*id=" + snapshotId,
+        " bitmap=" + snapshotCause,
+//        " time=" + snapshotTime,
+        " type=" + snapshotType,
+        " accumDebt=" + accumDebt,
+        " type1Debt=" + type1DebtRem,
+        " type2Debt=" + type2DebtRem,
+        " type3Debt=" + type3DebtRem,
+        " emergCredit=" + emergencyCreditRem,
+        " credit=" + creditRem
+      },
+      DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+
+// 19.3.4 Init -- Create 2 snapshots, one for each of 2 different causes.  Also set credit to known value.
+
+send("meter", "plugin prepayment-server init 1");
+
+int CREDIT_VALUE = 12334;
+String Cause1 = "0x0371";
+String Cause2 = "0x0C81";
+
+// Sync time on server & client.
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("meter", "timesync 0 1 1");
+networkWait(2000);
+
+send("esi", "zcl prepayment cred-adj 1 0x00000000 0x01 " + CREDIT_VALUE );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*Rx: Credit Adjustment.*");
+send("meter", "plugin prepayment-server verifyAttribute 1 " + ZCL_CREDIT_REMAINING_ATTRIBUTE_ID + " 4 " + CREDIT_VALUE );
+expect("meter", ".*Attribute Read Match Success.*");
+
+String CurrTime1 = timeSinceZigBeeEpoch( 0 );
+send("meter", "plugin prepayment-server addSnapshotEvent " + METER_ENDPOINT + " " + Cause1 );
+
+String CurrTime2 = timeSinceZigBeeEpoch( 5 );
+
+networkWait( (5 * 60 * 1000) );  // Delay 5 minutes
+
+send("meter", "plugin prepayment-server addSnapshotEvent " + METER_ENDPOINT + " " + Cause2 );
+
+networkWait( (5 * 60 * 1000) );  // Delay 5 minutes
+
+
+// 19.13.5 #1 - Send get prepay snapshot with offset=0, cause=0xFFFFFFFF.  Ensure first snapshot is returned.
+ESI_ENDPOINT = 1;
+//send("esi", "zcl prepayment get-pp-ss 0x00000000 " + timeSinceZigBeeEpoch(0) + " 0 0xFFFFFFFF" );
+send("esi", "zcl prepayment get-pp-ss " + CurrTime1 + " " + timeSinceZigBeeEpoch(10) + " 0 0xFFFFFFFF" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*RX: GetPrepaySnapshot,.*" );
+
+checkPrepaySnapshot( "meter",
+                     1, CurrTime1,
+                     2, Cause1,
+                     0, 0,//       int snapshotType, int accumDebt,
+                     0,0, //       int type1DebtRem, int type2DebtRem,
+                     0,0, //       int type3DebtRem, int emergencyCreditRem,
+                     CREDIT_VALUE ); //       int creditRem )
+
+expect("esi", ".*RX: Publish Prepay Snapshot Callback.*" );
+
+
+// 19.13.5 #3 - Send get prepay snapshot with offset=1, cause=0xFFFFFFFF.   Ensure second snapshot is returned.
+send("esi", "zcl prepayment get-pp-ss " + CurrTime1 + " " + timeSinceZigBeeEpoch(10) + " 1 0xFFFFFFFF" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*RX: GetPrepaySnapshot,.*" );
+
+// checkPrepaySnapshot() not working!!
+checkPrepaySnapshot( "meter",
+                     2, CurrTime2,
+                     1, Cause2,
+                     0, 0,//       int snapshotType, int accumDebt,
+                     0,0, //       int type1DebtRem, int type2DebtRem,
+                     0,0, //       int type3DebtRem, int emergencyCreditRem,
+                     CREDIT_VALUE ); //       int creditRem )
+
+
+// 19.13.5 #5 - Send get prepay snapshot with offset=0, cause=2nd Cause.   Ensure second snapshot is returned.
+send("esi", "zcl prepayment get-pp-ss " + CurrTime1 + " " + timeSinceZigBeeEpoch(10) + " 0 " + Cause2 );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+
+expect("meter", ".*RX: GetPrepaySnapshot,.*" );
+checkPrepaySnapshot( "meter", 2, CurrTime2, 0, "0x0C81", 0,0,0,0,0,0, CREDIT_VALUE );
+
+
+// INTERNAL SNAPSHOT TEST #1
+// Fill snapshot array, make sure an additional add fails gracefully.
+send("meter", "plugin prepayment-server init 1");
+
+int i;
+int EMBER_AF_PLUGIN_PREPAYMENT_SNAPSHOT_STORAGE_SNAPSHOT_CAPACITY = 5;
+
+for( i=0; i<EMBER_AF_PLUGIN_PREPAYMENT_SNAPSHOT_STORAGE_SNAPSHOT_CAPACITY; i++ ){
+  send("meter", "plugin prepayment-server addSnapshotEvent " + METER_ENDPOINT + " " + (i+200) );
+  expect("meter", ".*Storing Snapshot,.*" );
+}
+// Now that table is full, try adding one more.  It should be 
+// added, overwriting one of the earlier snapshots.
+send("meter", "plugin prepayment-server addSnapshotEvent " + METER_ENDPOINT + " " + (i+200) );
+  expect("meter", ".*Storing Snapshot,.*" );
+
+// INTERNAL SNAPSHOT TEST #2
+// Ensure the Get Snapshot returns gracefully if no match found.
+
+send("esi", "zcl prepayment get-pp-ss " + CurrTime1 + " " + timeSinceZigBeeEpoch(10) + " 0 0xF0F0F0FF" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+expect("meter", ".*RX: GetPrepaySnapshot,.*" );
+expect("meter", ".*Snapshot not found.*");
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #n - Select Available Emergency Credit
+// For now:  cmdDateTime + originatingDevice + siteId[] + meterSN[]
+
+// Sync time on server & client.  This will help us schedule out the emergency credit.
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("meter", "timesync 0 1 1");
+networkWait(2000);
+
+//send("esi", "zcl prepayment sel-av-em-cred " + timeSinceZigBeeEpoch(0) + " 0x02" );
+//send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT);
+//expect("meter", ".*Rx: Select Available Emergency Credit.*" );
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #N - Change Debt Command
+
+String checkPrepayDebtAttribs( String node, int endpoint, int index,
+                            String debtLabel, int debtAmount, int recovMethod,   // skip startTime
+                            int recovCollectionTime, int recovFreq, int recovAmount, int recovPercent )
+{
+  return _expectMultiline( node, 
+      "plugin prepayment-server readDebtAttribs " + endpoint + " " + index,
+      new String[] {
+        ".*= Debt Attribute Set #" + index + ".*",
+        ".* DebtLabel status=0x00, val=0x" + debtLabel + ".*",
+        ".* DebtAmount status=0x00, val=" + debtAmount,
+        ".* RecovMethod status=0x00, val=" + recovMethod,
+        ".* RecovCollectTime status=0x00, val=" + recovCollectionTime,
+        ".* RecovFreq status=0x00, val=" + recovFreq,
+        ".* RecovAmount status=0x00, val=" + recovAmount,
+        ".* RecovPercent status=0x00, val=" + recovPercent
+      },
+      DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+// 19.18.5 #1 - Send Change Debt command, VAL_1, Start NOW, %, hourly, amt=0
+
+//String DebtLabel1 = "ZigBee Debt1";
+//String DebtLabel1= "{'Z' 'i' 'g' 'B' 'e' 'e' ' ' 'D' 'e' 'b' 't' '1'}";
+String DebtLabel1= "{ 5A 69 67 62 65 65 20 44 65 62 74 31 }";
+String DebtLabel1_Compare= "0C 5A 69 67 62 65 65 20 44 65 62 74 31";
+int DebtAmount1 = 0x1012;
+int DebtRecovBalancePercent1 = 20;
+
+send("esi", "zcl time " + timeSinceZigBeeEpoch(0) );
+networkWait(1000);
+send("meter", "timesync 0 1 1");
+networkWait(2000);
+
+// eventId + label + amount + recovMethod + amtType + startTime + collectTime + freq + recovAmt + balancePercent
+// Percent Method (0x01), Amount Type Abs-T1 (0x00), Start NOW
+send("esi", "zcl prepayment chg-debt 0x00000001 " + DebtLabel1 + " " + DebtAmount1 + " 1 0 " + timeSinceZigBeeEpoch(0) +
+          " 0 0 0 " + DebtRecovBalancePercent1 );
+
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*" );
+
+// VERIFY:  index, label, debtAmt, recovMethod, recovCollectTime, recovFreq, recovAmt, recovPerc
+checkPrepayDebtAttribs( "meter", 1, 0, DebtLabel1_Compare, DebtAmount1, 1, 0, 0, 0, DebtRecovBalancePercent1 );
+
+
+// 19.18.5 #3 - Send Change Debt command, VAL_2, Start NOW, abs-T2, daily, amt=Val3
+
+String DebtLabel2= "{ 5A 69 67 62 65 65 20 44 65 62 74 32 }";
+String DebtLabel2_Compare= "0C 5A 69 67 62 65 65 20 44 65 62 74 32";
+int DebtAmount2 = 0xC3D0;
+int RecovAmount3 = 30;
+
+// SEND:  eventId, label, debtAmt, recovMethod, amtType, startTime, collectTime, freq, recovAmt, balancePercent
+send("esi", "zcl prepayment chg-debt 0x00000002 " + DebtLabel2 + " " + DebtAmount2 + " 0 2 " + timeSinceZigBeeEpoch(0) +
+          " 20 1 " + RecovAmount3 + " 0" );
+
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*" );
+
+// VERIFY:  index, label, debtAmt, recovMethod, recovCollectTime, recovFreq, recovAmt, recovPerc
+checkPrepayDebtAttribs( "meter", 1, 1, DebtLabel2_Compare, DebtAmount2, 0, 20, 1, RecovAmount3, 0 );
+
+
+
+// 19.18.5 #5 - Send Change Debt command, VAL_4, Start NOW, abs-T2, daily, amt=Val3
+
+String DebtLabel3= "{ 5A 69 67 62 65 65 20 44 65 62 74 33 }";
+String DebtLabel3_Compare= "0C 5A 69 67 62 65 65 20 44 65 62 74 33";
+int DebtAmount4 = 0xE1E0;
+int RecovAmount5 = 0x1113;
+
+// SEND:  eventId, label, debtAmt, recovMethod, amtType, startTime, collectTime, freq, recovAmt, balancePercent
+send("esi", "zcl prepayment chg-debt 0x00000003 " + DebtLabel3 + " " + DebtAmount4 + " 0 5 " + timeSinceZigBeeEpoch(0) +
+          " 42 2 " + RecovAmount5 +" 0" );
+
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*" );
+
+// VERIFY:  index, label, debtAmt, recovMethod, recovCollectTime, recovFreq, recovAmt, recovPerc
+checkPrepayDebtAttribs( "meter", 1, 2, DebtLabel3_Compare, DebtAmount4, 0, 42, 2, RecovAmount5, 0 );
+
+
+
+// INTERNAL TEST #1 - 0xFFFFFFFF values don't change attributes.
+
+// SEND:  eventId, label, debtAmt, recovMethod, amtType, startTime, collectTime, freq, recovAmt, balancePercent
+send("esi", "zcl prepayment chg-debt 0x00000004 " + DebtLabel3 + " 0xFFFFFFFF 0xFF 5 " + timeSinceZigBeeEpoch(0) +
+          " 0xFFFF 0xFF 0xFFFFFFFF 0xFFFF" );
+
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*" );
+// VERIFY:  index, label, debtAmt, recovMethod, recovCollectTime, recovFreq, recovAmt, recovPerc
+checkPrepayDebtAttribs( "meter", 1, 2, DebtLabel3_Compare, DebtAmount4, 0, 42, 2, RecovAmount5, 0 );
+
+
+// INTERNAL TEST #2 - Increment vs Absolute Types
+// Adjust debt with incremental value +0x12
+
+// SEND:  eventId, label, debtAmt, recovMethod, amtType, startTime, collectTime, freq, recovAmt, balancePercent
+send("esi", "zcl prepayment chg-debt 0x00000004 " + DebtLabel3 + " 0x12 0xFF 5 " + timeSinceZigBeeEpoch(0) +
+          " 0xFFFF 0xFF 0xFFFFFFFF 0xFFFF" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*" );
+// VERIFY:  index, label, debtAmt, recovMethod, recovCollectTime, recovFreq, recovAmt, recovPerc
+checkPrepayDebtAttribs( "meter", 1, 2, DebtLabel3_Compare, (DebtAmount4 + 0x12), 0, 42, 2, RecovAmount5, 0 );
+
+
+// Adjust debt with absolute value +0x12
+
+// SEND:  eventId, label, debtAmt, recovMethod, amtType, startTime, collectTime, freq, recovAmt, balancePercent
+send("esi", "zcl prepayment chg-debt 0x00000004 " + DebtLabel3 + " 0x12 0xFF 4 " + timeSinceZigBeeEpoch(0) +
+          " 0xFFFF 0xFF 0xFFFFFFFF 0xFFFF" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*" );
+// VERIFY:  index, label, debtAmt, recovMethod, recovCollectTime, recovFreq, recovAmt, recovPerc
+checkPrepayDebtAttribs( "meter", 1, 2, DebtLabel3_Compare, 0x12, 0, 42, 2, RecovAmount5, 0 );
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// TEST #N - Debt Repayment Log
+
+
+
+// Sanity check on debt repayment
+// endpoint, issuerEvtId, debtType, collectTime, startTime, collFreq
+send("meter", "plugin prepayment-server schedDebtRepay 1 1 0 1400 0x60112233 1" );
+expect("meter", ".*Valid Debt Schedule.*");
+
+send("meter", "plugin prepayment-server schedDebtRepay 1 2 0 20 0x60112233 1" );
+expect("meter", ".*Valid Debt Schedule.*");
+
+
+
+
+String checkPrepayDebtLog( String node, int index, int amountCollected, int outstandingDebt, int debtType )
+{
+  return _expectMultiline( node, 
+      "plugin prepayment-server readDebtLog " + index,
+      new String[] {
+        ".*= Debt Log Entry " + index + ":",
+        ".*  collectionTime=.*",
+        ".*  amountCollected=" + amountCollected,
+        ".*  outstandingDebt=" + outstandingDebt,
+        ".*  debtType=" + debtType
+      },
+      DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+
+int RecovMethod_Time_Based = 0;
+int RecovMethod_Percentage = 1;
+int RecovMethod_Catch_Up   = 2;
+
+int AmountType1_Abs = 0;
+int AmountType1_Inc = 1;
+int AmountType2_Abs = 2;
+int AmountType2_Inc = 3;
+int AmountType3_Abs = 4;
+int AmountType3_Inc = 5;
+
+int RecovFreq_Hourly = 0;
+int RecovFreq_Daily = 1;
+int RecovFreq_Weekly = 2;
+int RecovFreq_Monthly = 3;
+int RecovFreq_Quarterly = 4;
+
+int MS_PER_10MINS = (1000 * 60 * 10);
+int MS_PER_HOUR = (1000 * 60 * 60);
+int MS_PER_DAY = (24 * MS_PER_HOUR);
+
+send("meter", "plugin prepayment-server init 1");
+
+// Ensure debt log is cleared correctly.
+// index + amountCollected + outstandingDebt + debtType
+int MAX_DEBT_LOG_TABLE_SIZE = 10;
+
+for( i=0; i<MAX_DEBT_LOG_TABLE_SIZE; i++ ){
+  checkPrepayDebtLog( "meter", i, 0, 0, 0xFE );
+}
+send("meter", "plugin prepayment-server readDebtLog " + i );
+expect("meter", ".*ERROR: Debt Log index " + i + " out of bounds.*");
+
+
+int FEB28_2012_000000_UTC = 0x16DED580;
+
+// Ensure ESI and meter are synched up.
+send("esi", "zcl time " + FEB28_2012_000000_UTC );
+networkWait(1000);
+send("meter", "timesync 0 1 1");
+networkWait(10000);
+
+// Send a couple debt collection events into the future.
+// Set start time at midnight, collection time for 1am (60 mins later). 
+
+// EVENT #1 - 10,000 Debt#1, -100 hourly
+send("esi", "zcl prepayment chg-debt 0x00000001 " + DebtLabel1 + " 10000 " + RecovMethod_Time_Based + " " + 
+       AmountType1_Abs + " " + FEB28_2012_000000_UTC + " 60 " + RecovFreq_Hourly + " 100 0" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+
+// EVENT #2 - 2,000 Debt#2, -200 hourly
+send("esi", "zcl prepayment chg-debt 0x00000002 " + DebtLabel2 + " 2000 " + RecovMethod_Time_Based + " " + 
+       AmountType2_Abs + " " + FEB28_2012_000000_UTC + " 60 " + RecovFreq_Hourly + " 200 0" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+
+// EVENT #3 - 5,000 Debt#3, -500 weekly
+send("esi", "zcl prepayment chg-debt 0x00000003 " + DebtLabel3 + " 5000 " + RecovMethod_Time_Based + " " + 
+       AmountType3_Abs + " " + FEB28_2012_000000_UTC + " 60 " + RecovFreq_Weekly + " 500 0" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+
+networkWait( MS_PER_10MINS );
+networkWait( MS_PER_HOUR );     // This should cause debt #1 and #2 to trigger collection events.
+
+checkPrepayDebtLog( "meter", 0, 100, 9900, 0 );
+checkPrepayDebtLog( "meter", 1, 200, 1800, 1 );
+checkPrepayDebtLog( "meter", 2, 500, 4500, 2 );
+
+checkPrepayDebtAttribs( "meter", 1, 0, DebtLabel1_Compare, 9900, 0, 60, RecovFreq_Hourly, 100, 0 );
+checkPrepayDebtAttribs( "meter", 1, 1, DebtLabel2_Compare, 1800, 0, 60, RecovFreq_Hourly, 200, 0 );
+checkPrepayDebtAttribs( "meter", 1, 2, DebtLabel3_Compare, 4500, 0, 60, RecovFreq_Weekly, 500, 0 );
+
+
+String GetDebtRepaymentLog( String srcNode, String dstNode, String latestEndTimeUtc, int numberOfDebts, int debtType ){
+  send(srcNode, "zcl prepayment get-debt-repmt-log " + latestEndTimeUtc + " " + numberOfDebts + " " + debtType);
+  send(srcNode, "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+  expect(dstNode, ".*RX: GetDebtLog, endTime=" + latestEndTimeUtc + ", numDebts=" + numberOfDebts + ", debtType=" + debtType + ".*");
+  //expect(srcNode, ".*RX: Publish Debt Log Callback.*");
+  return _expectMultiline(srcNode, null,
+                        new String[]{
+                          ".* commandIndex=254.*",
+                          ".* totalNumberOfCommands=1.*"
+                        },
+                        DEFAULT_TIMEOUT, getSourceFileInfo(), this.namespace.getInvocationLine() );
+}
+
+// 19.19.1 - Send Get Debt Repayment Log to dev, latestTime=NOW, numDebts=1
+GetDebtRepaymentLog( "esi", "meter", "0x16DFFFFF", 1, 0 );
+
+
+// Now delay 2 hours and ensure the values match expected
+
+networkWait( 2 * MS_PER_HOUR );     // This should cause debt #1 and #2 to trigger collection events.
+checkPrepayDebtLog( "meter", 0, 100, 9900, 0 );
+checkPrepayDebtLog( "meter", 1, 200, 1800, 1 );
+checkPrepayDebtLog( "meter", 2, 500, 4500, 2 );
+checkPrepayDebtLog( "meter", 3, 100, 9800, 0 );
+checkPrepayDebtLog( "meter", 4, 200, 1600, 1 );
+checkPrepayDebtLog( "meter", 5, 100, 9700, 0 );
+checkPrepayDebtLog( "meter", 6, 200, 1400, 1 );
+
+checkPrepayDebtAttribs( "meter", 1, 0, DebtLabel1_Compare, 9700, 0, 60, RecovFreq_Hourly, 100, 0 );
+checkPrepayDebtAttribs( "meter", 1, 1, DebtLabel2_Compare, 1400, 0, 60, RecovFreq_Hourly, 200, 0 );
+checkPrepayDebtAttribs( "meter", 1, 2, DebtLabel3_Compare, 4500, 0, 60, RecovFreq_Weekly, 500, 0 );
+
+GetDebtRepaymentLog( "esi", "meter", "0x7FFFFFFF", 2, 0 );
+
+GetDebtRepaymentLog( "esi", "meter", "0x7FFFFFFF", 2, 0xFF );
+
+
+
+
+// INTERNAL #1 - Test Top Up Percentage
+//   Do we correctly compute the percentage of a top up that should be applied to debt reduction?
+
+// Initialize debts to 0 percentage -- TIME BASED, CATCHUP modes, or PERCENTAGE with 0%
+
+// SEND:  eventId, label, debtAmt, recovMethod, amtType, startTime, collectTime, freq, recovAmt, balancePercent
+
+
+//  recovMethod == 0 for time based
+//  recovMethod == 1 for percentage
+//  recovMethod == 2 for catch-up
+
+// Debt type1 = TIME_BASED, 10% (N/A since time based)
+send("esi", "zcl prepayment chg-debt 0x00000010 " + DebtLabel1 + " 10000 " + RecovMethod_Time_Based + " " + 
+            AmountType1_Abs + " " + timeSinceZigBeeEpoch(0) + " 0 2 1000 10" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*");
+
+// Debt type2 = CATCH_UP_BASED, 20% (N/A since time based)
+send("esi", "zcl prepayment chg-debt 0x00000011 " + DebtLabel2 + " 20000 " + RecovMethod_Catch_Up + " " + 
+            AmountType2_Abs + " " + timeSinceZigBeeEpoch(0) + " 0 2 2000 20" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*");
+
+// Debt type3 = PERCENT_BASED, 0%
+send("esi", "zcl prepayment chg-debt 0x00000012 " + DebtLabel3 + " 30000 " + RecovMethod_Percentage + " " + 
+            AmountType3_Abs + " " + timeSinceZigBeeEpoch(0) + " 0 2 2000 0" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*");
+
+// Wait for responses
+networkWait(6000);
+
+send("meter", "plugin prepayment-server getTopUpPercent 1 1000" );
+expect("meter", ".*No Top Up Debt Recovery found.*" );
+
+
+// Now change debt 3 to 10%, or 1000
+send("esi", "zcl prepayment chg-debt 0x00000013 " + DebtLabel3 + " 30000 " + RecovMethod_Percentage + " " + 
+            AmountType3_Abs + " " + timeSinceZigBeeEpoch(0) + " 0 2 2000 1000" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*");
+
+send("meter", "plugin prepayment-server getTopUpPercent 1 1000" );
+expect("meter", ".*Appying Debt Recovery to Top Up 10 percent, or 100.*" );
+
+send("meter", "plugin prepayment-server getTopUpPercent 1 1234" );
+expect("meter", ".*Appying Debt Recovery to Top Up 10 percent, or 123.*" );
+
+send("meter", "plugin prepayment-server getTopUpPercent 1 9998" );
+expect("meter", ".*Appying Debt Recovery to Top Up 10 percent, or 999.*" );
+
+
+// Now change debt 3 to 15.61%, or 1561, and change debt 1 to 11.23%
+send("esi", "zcl prepayment chg-debt 0x00000014 " + DebtLabel3 + " 30000 " + RecovMethod_Percentage + " " + 
+            AmountType3_Abs + " " + timeSinceZigBeeEpoch(0) + " 0 2 2000 1561" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*");
+
+send("esi", "zcl prepayment chg-debt 0x00000015 " + DebtLabel1 + " 10000 " + RecovMethod_Percentage + " " + 
+            AmountType1_Abs + " " + timeSinceZigBeeEpoch(0) + " 0 2 1000 1123" );
+send("esi", "send " + meterId + " " + ESI_ENDPOINT + " " + METER_ENDPOINT );
+expect("meter", ".*RX Change Debt.*");
+
+send("meter", "plugin prepayment-server getTopUpPercent 1 1000" );
+expect("meter", ".*Appying Debt Recovery to Top Up 26 percent, or 268.*" );
+
+
+
+
+
+

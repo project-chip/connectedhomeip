@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-sub-ghz-client" name="Plugin Commands: Sub-GHz Client">
+    <description>
+      The Sub-GHz commands provide commands for sub-GHz duty cycle, power management and frequency agility.
+    </description>
+  </group>
+  <command cli="plugin sub-ghz get-suspend-status" functionName="emAfSubGhzClientCliGetSuspendStatus" group="plugin-sub-ghz-client">
+    <description>
+      Send the GetSuspendZCLMessagesStatus command to the Sub-GHz server.
+    </description>
+    <arg name="nodeId" type="INT16U" description="Server's node ID"/>
+    <arg name="ep" type="INT8U" description="Server's endpoint"/>
+  </command>
+  <command cli="plugin sub-ghz ignore-suspend-status" functionName="emAfSubGhzClientCliIgnoreSuspendStatus" group="plugin-sub-ghz-client">
+    <description>
+      Ignore the suspend status when sending ZCL messages (for testing purposes only).
+    </description>
+    <arg name="ignore" type="BOOLEAN" description="Whether or not the suspend status should be ignored"/>
+  </command>
+  <command cli="plugin sub-ghz request-channel-change" functionName="emAfSubGhzClientCliRequestChannelChange" group="plugin-sub-ghz-client">
+    <description>
+      Send the Mgmt_NWK_Unsolicited_Enhanced_Update_notify command to the Sub-GHz server.
+    </description>
+    <arg name="nodeId" type="INT16U" description="Server's node ID"/>
+    <arg name="page" type="INT8U" description="Current channel page"/>
+    <arg name="channel" type="INT8U" description="Current channel"/>
+    <arg name="macTxUcastTotal" type="INT16U" description="Total number of Mac Tx transaction attempts"/>
+    <arg name="macTxUcastFailures" type="INT16U" description="Total number of Mac Tx transaction failures"/>
+    <arg name="macTxUcastRetries" type="INT16U" description="Total number of Mac Tx transaction retries"/>
+    <arg name="period" type="INT8U" description="Time in minutes over which the Mac Tx counts were measured"/>
+  </command>
+</cli>

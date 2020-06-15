@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-gas-proxy-function" name="Plugin Commands: Gas Proxy Function">
+    <description>
+      The reporting plugin contributes several CLI commands to the application framework to be used in creating and managing Gas Proxy Function functionality on the device.
+    </description>
+  </group>
+
+  <command cli="plugin gas-proxy-function simulate-gbz-msg" functionName="emAfPluginGasProxyFunctionCliSimulateGbzMsg" group="plugin-gas-proxy-function">
+    <description>
+      Simulate transmission of a GBZ message to the Gas Proxy Function.
+    </description>
+    <arg name="useCase"       type="INT16U" />
+  </command>
+
+  <command cli="plugin gas-proxy-function simulate-gbz-msg-creation" functionName="emAfPluginGasProxyFunctionCliSimulateGbzMsgCreation" group="plugin-gas-proxy-function">
+    <description>
+      Testing of GBZ message controller API.
+    </description>
+  </command>
+
+  <command cli="plugin gas-proxy-function print-supported-use-cases" functionName="emAfPluginGasProxyFunctionCliPrintSupportedUseCases" group="plugin-gas-proxy-function">
+    <description>
+      Print the list of supported use cases.  The message code printed should be used with the simulate-gbz-msg command.
+    </description>
+  </command>
+
+  <command cli="plugin gas-proxy-function print-log-catchups-in-progress" functionName="emAfPrintLogCatchupsInProgress" group="plugin-gas-proxy-function">
+    <description>
+      Print the number of logs that are currently catching up with missed entries.
+    </description>
+  </command>
+
+  <command cli="plugin gas-proxy-function simulate-future-dated-msg" functionName="emAfPluginGasProxyFunctionCliSimulateFutureDatedMsg" group="plugin-gas-proxy-function">
+    <description>
+      Simulate transmission of a GBZ message to the Gas Proxy Function.
+    </description>
+  </command>
+
+</cli>

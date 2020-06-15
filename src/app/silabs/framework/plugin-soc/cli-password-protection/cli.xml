@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-cli-password-protection" name="Plugin Commands: CLI password protection">
+    <description>
+      The CLI-password-protection plugin contributes one command to the application framework's CLI.
+    </description>
+  </group>
+  <command cli="plugin cli-password-protection changePassword" functionName="emberAfPluginCliPasswordProtectionChangeCommand" group="plugin-cli-password-protection">
+    <description>
+      This command is used to change the current password.
+    </description>
+    <arg name="newPass"      type="INT32U"  description="The new password needs to be a number between 1 and 0xFFFFFFFE" />
+  </command>
+</cli>

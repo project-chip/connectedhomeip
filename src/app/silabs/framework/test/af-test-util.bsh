@@ -1,0 +1,29 @@
+// This is a separate file so it can be sourced from both af-test.bsh and 
+// util.bsh.  Af-test.bsh cannot include util.bsh because util.bsh references items
+// that are defined in af-test.bsh later.
+
+import java.util.Map;
+
+Map environmentMap = System.getenv();
+
+boolean shouldSkipEccTest()
+{
+  String noRealEcc = environmentMap.get("NO_REAL_ECC");
+  // ECC targets cannot be built on the Mac, so these tests must be skipped.
+  // Windows also fails for ECC 283k1 targets because the library wasn't integrated
+  // into our simulation environment.  Ideally we should fix that.
+  // So Windows user can manually disable with NO_REAL_ECC = 1 in their environment.
+  if (System.getProperty("os.name").contains("Mac")
+      || (noRealEcc != null && noRealEcc.equals("1"))) {
+    return true;
+  }
+  return false;
+}
+
+boolean shouldSkipTest(String test)
+{
+  if (test.contains("real_ecc")) {
+    return shouldSkipEccTest();
+  }
+  return false;
+}

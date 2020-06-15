@@ -1,0 +1,31 @@
+/** @brief Network join finished
+ *
+ * This callback is fired when the Connection Manager plugin is finished with
+ * the network search process. The result of the operation will be returned as
+ * the status parameter.
+ *
+ * @param status   Ver.: always
+ */
+void emberAfPluginConnectionManagerFinishedCallback(EmberStatus status)
+{
+}
+
+/** @brief Begin searching for network to join
+ *
+ * This function is called by the Connection Manager Plugin when it starts
+ * to search for a new network.  It is normally used to trigger a UI event to
+ * notify the user that the device is currently searching for a network.
+ */
+void emberAfPluginConnectionManagerStartNetworkSearchCallback(void)
+{
+}
+
+/** @brief Leave the currently joined network
+ *
+ * This function is called by the Connection Manager Plugin when the device
+ * is about to leave the network.  It is normally used to trigger a UI event to
+ * notify the user of a network leave.
+ */
+void emberAfPluginConnectionManagerLeaveNetworkCallback(void)
+{
+}

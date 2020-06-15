@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-button-joining" name="Plugin Commands: Button Joining">
+    <description>
+      The Button Joining plugin contributes CLI commands to simulate button presses for the purposes of joining networks.
+    </description>
+  </group>
+  <command cli="plugin button-joining button0" functionName="emberAfPluginButtonJoiningButton0Command" group="plugin-button-joining">
+    <description>
+      Simulate a depression of button 0.
+    </description>
+  </command>
+  <command cli="plugin button-joining button1" functionName="emberAfPluginButtonJoiningButton1Command" group="plugin-button-joining">
+    <description>
+      Simulate a depression of button 1.
+    </description>
+  </command>
+</cli>

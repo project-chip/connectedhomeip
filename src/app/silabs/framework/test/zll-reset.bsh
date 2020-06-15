@@ -1,0 +1,287 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multi-hop****");
+  return;
+}
+
+// Create some nodes in the network.
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{"remote1", "remote2", "light1", "light2", "bridge"};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/ZllColorSceneRemote-simulation/ZllColorSceneRemote",
+  "build/af-test-apps/ZllColorSceneRemote-simulation/ZllColorSceneRemote",
+  "build/af-test-apps/ZllColorLight-simulation/ZllColorLight",
+  "build/af-test-apps/ZllColorLight-simulation/ZllColorLight",
+  "build/af-test-apps/ZllControlBridge-simulation/ZllControlBridge",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/ZllColorSceneRemote-simulation-ezsp/ZllColorSceneRemote",
+  "build/af-test-apps/ZllColorSceneRemote-simulation-ezsp/ZllColorSceneRemote",
+  "build/af-test-apps/ZllColorLight-simulation-ezsp/ZllColorLight",
+  "build/af-test-apps/ZllColorLight-simulation-ezsp/ZllColorLight",
+  "build/af-test-apps/ZllControlBridge-simulation-ezsp/ZllControlBridge",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+power("remote2", false); // not required for now
+power("bridge", false); // not required for now
+
+// ----------------------------------------------------------------------------
+// Test 1 - touchlink from client to FN SED server within rx-on-duration
+// Form a network on the first light and touch link from the remote1.
+expect("remote1", "plugin zll-commissioning mask 1", "Primary channels: 12, 16, 21, 26 \\(0x04211000\\)");
+expect("light1", "plugin zll-commissioning mask 1", "Primary channels: 12, 16, 21, 26 \\(0x04211000\\)");
+
+euiRemote1 = eui64("remote1");
+networkWait(5000);
+euiLight1 = eui64("light1");
+networkWait(5000);
+
+startZllNetwork("light1", "16", "0", "0x1234", timeout * 10);
+send("light2", "plugin zll-commissioning disable");
+send("remote1", "plugin zll-commissioning link");
+expect("light1", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", timeout * 10);
+expect("light1", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0x0000", timeout * 10);
+expectNetworkUp("light1", timeout * 10);
+expect("light1", "Touch link with 0x0001 \\(\\(>\\)" + euiRemote1 + "\\) complete");
+expectNetworkUp("remote1", timeout * 10);
+expect("remote1", "Touch link with 0x0002 \\(\\(>\\)" + euiLight1 + "\\) complete");
+String channel1 = channel("remote1");
+networkWait(5000);
+
+// Add some bindings to remote1's binding table, to check that a local reset clears
+// the binding table (EMZIGBEE-4215)
+expect("light1", "zdo bind 0x0001 1 1 0x0000 {" + euiRemote1 + "} {" + euiLight1 + "}", ".*ZDO bind req 00");
+networkWait(500);
+expect("light1", "zdo bind 0x0001 1 1 0x0003 {" + euiRemote1 + "} {" + euiLight1 + "}", ".*ZDO bind req 00");
+networkWait(500);
+
+// Check remote1's binding table.
+expect("remote1", "option binding-table print", "2 of . bindings used");
+networkWait(5000);
+
+// Reset remote1.
+expect("remote1", "plugin zll-commissioning reset", ".*EMBER_NETWORK_DOWN", timeout * 10);
+if (!runArgument.runUsingHostApps) {
+  reboot("remote1");
+}
+
+// Check remote1's binding table again.
+expect("remote1", "option binding-table print", "0 of . bindings used");
+networkWait(5000);
+
+// ----------------------------------------------------------------------------
+// Test 2 - form a network on the second light and touch link from remote1.  To test
+// channel switching (bug 14467), we want the channel of this new network to
+// be different from that of the first network.
+
+// We'll repeat the binding table check here for a remote reset (EMZIGBEE-4215).
+// Add some bindings first to light1's binding table, this time via itself, since
+// it is now by itself on the first network.
+expect("light1", "zdo bind 0x0002 1 1 0x0000 {" + euiLight1 + "} {" + euiRemote1 + "}", ".*ZDO bind req 00");
+networkWait(500);
+expect("light1", "zdo bind 0x0002 1 1 0x0003 {" + euiLight1 + "} {" + euiRemote1 + "}", ".*ZDO bind req 00");
+networkWait(500);
+
+// Check light1's binding table.
+expect("light1", "option binding-table print", "2 of . bindings used");
+networkWait(5000);
+
+send("light1", "plugin zll-commissioning disable");
+send("light2", "plugin zll-commissioning enable");
+expect("remote1", "plugin zll-commissioning mask 2", ".*Primary channels: 13, 17, 19, 22 \\(0x004A2000\\)");
+expect("light2", "plugin zll-commissioning mask 2", ".*Primary channels: 13, 17, 19, 22 \\(0x004A2000\\)");
+startZllNetwork("light2", "17", "0", "0x5678", timeout * 10);
+send("remote1", "plugin zll-commissioning link");
+expect("light2", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", timeout * 10);
+expect("light2", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0x0000", timeout * 10);
+expectNetworkUp("light2", timeout * 10);
+expect("light2", "Touch link with 0x0001 \\(\\(>\\)" + eui64("remote1") + "\\) complete");
+expectNetworkUp("remote1", timeout * 10);
+expect("remote1", "Touch link with 0x0002 \\(\\(>\\)" + eui64("light2") + "\\) complete");
+String channel2 = channel("remote1");
+assert(!channel1.equals(channel2));
+
+// Turn off the second light and reset the first light over the air.  After
+// resetting the light on channel1, we should end up back on channel2 again.
+power("light2", false);
+send("light1", "plugin zll-commissioning enable");
+expect("remote1", "plugin zll-commissioning mask 0", "Primary channels: 11, 15, 20, 25 \\(0x02108800\\)");
+
+send("remote1", "plugin zll-commissioning scan reset");
+expect("light1", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0xFFFF", timeout * 10);
+expect("remote1", "Touch link with 0x0002 \\(\\(>\\)" + eui64("light1") + "\\) complete", timeout * 10);
+expect("light1", "RX: IdentifyRequest 0x[0-9a-fA-F]{8}, 0x0000");
+expect("light1", "RX: ResetToFactoryNewRequest 0x[0-9a-fA-F]{8}");
+expect("light1", "EMBER_NETWORK_DOWN", timeout * 10);
+String channel3 = channel("remote1");
+assert(channel2.equals(channel3));
+
+// Check light1's binding table again.
+expect("light1", "option binding-table print", "0 of . bindings used");
+networkWait(5000);
+
+// Bring the second light back and make sure we can still talk to it.
+power("light2", true);
+setupEncryption();
+networkWait(1000);
+
+send("remote1", "zcl global read 0x0000 0x0000");
+send("remote1", "send 0x0002 0x01 0x01");
+expect("light2", "READ_ATTR: clus 0000");
+expectMultiline("light2",
+                "",
+                new String[] {
+                "OTA READ: ep:01 cid:0000 attid:0000 msk:40 mfcode:0000",
+                "READ: clus 0000, attr 0000, dataLen: 01, OK",
+                });
+expectMultiline("remote1",
+                "",
+                new String[] {
+                "READ_ATTR_RESP: \\(Basic\\)",
+                " - attr:0000, status:00",
+                "   type:20, val:03",
+                });
+                
+// The first light should now be factory new, but the second is still joined.
+expect("light1", "plugin zll-commissioning status", "Bitmask: 0x00000081");
+networkWait(1000);
+expect("light2", "plugin zll-commissioning status", "Bitmask: 0x00000080");
+networkWait(1000);
+
+// ----------------------------------------------------------------------------
+// Test 3 - make the second light leave, and reset local device to factory new immediately
+// so it can set factory new bit before network goes down as it also
+// set that bit (there is delay after leave announcement during the leave).
+expect("light2", "network leave", ".*leave 0x00");
+
+expect("light2", "plugin zll-commissioning status", "Bitmask: 0x00000080");
+
+// Now reset it locally, and check that the factory new bit gets set.
+// (A remote reset won't work here, because the second light will not
+// respond to scan requests, because its radio was not switched on
+// in initFactoryNew(), because its factory new bit was unset.)
+expectMultiline("light2", "plugin zll-commissioning reset",
+          new String[]{
+           ".*Error: Failed to leave network, status: 0x70",
+           "Resetting to factory new"
+         });
+expect("light2", "plugin zll-commissioning status", "Bitmask: 0x00000081");
+// Make sure network goes down later as it also set factory new bit.
+// Why is there delay while leaving? It is to allow network leave announcement
+// broadcast goes out before shutting down the local network.
+expect("light2", "", ".*EMBER_NETWORK_DOWN");
+
+// ----------------------------------------------------------------------------
+// Test 4 - check we can reset a remote or local device while touchlink is
+// still in progress, for example, if the initiator is orphaned and can't
+// rejoin (EMZIGBEE-4211).
+
+power("light2", false);  // not required any more - keep debug output tidy
+
+// ----------------------------------------------------------------------------
+// Part 1 - local reset
+
+// Join remote1 to light1
+send("remote1", "plugin zll-commissioning link");
+expectNetworkUp("light1", timeout * 10);
+expect("light1", "Touch link with 0xFFFF \\(\\(>\\)" + eui64("remote1") + "\\) complete");
+expectNetworkUp("remote1", timeout * 10);
+expect("remote1", "Touch link with 0x0003 \\(\\(>\\)" + eui64("light1") + "\\) complete");
+
+// Turn light1 off, so remote1 will be orphaned
+power("light1", false);
+
+// Try to touchlink remote2
+power("remote2", true);
+setupEncryption();
+networkWait(1000);
+
+send("remote1", "plugin zll-commissioning link");
+expect("remote2", "EMBER_JOIN_FAILED", timeout*10);  // can't find a parent
+expect("remote1", "EMBER_JOIN_FAILED");  // can't find a parent
+
+// remote1 should be orphaned now, but touchlinking is still in progress
+expect("remote1", "plugin zll-commissioning link", "Error: Touch linking in progress");
+
+// Do a local reset
+expect("remote1", "plugin zll-commissioning reset", "Resetting to factory new");
+networkWait(1000);
+
+// Retry the touchlink - this should fail with error 0x03, since both
+// remotes are now factory new (remote2 never joined in the first place)
+send("remote1", "plugin zll-commissioning link");
+expect("remote1", "Touch link failed: 0x03", timeout*10);  // no networks
+
+// ----------------------------------------------------------------------------
+// Part 2 - remote reset
+
+// Power on light1 (but with touchlinking disabled), and retry the touchlink
+power("light1", true);
+setupEncryption();
+networkWait(1000);
+
+// Retry the touchlink, in order to join remote1 to light1
+// Join remote1 to light1
+send("remote1", "plugin zll-commissioning link");
+expectNetworkUp("light1", timeout * 10);
+expect("light1", "Touch link with 0x0001 \\(\\(>\\)" + eui64("remote1") + "\\) complete");
+expectNetworkUp("remote1", timeout * 10);
+expect("remote1", "Touch link with 0x0002 \\(\\(>\\)" + eui64("light1") + "\\) complete");
+
+// Add bridge to the PAN
+power("bridge", true);
+setupEncryption();
+networkWait(1000);
+
+send("light1", "plugin zll-commissioning disable");
+send("remote2", "plugin zll-commissioning disable");
+send("remote1", "plugin zll-commissioning link");
+expectNetworkUp("bridge", timeout * 10);
+expect("bridge", "Touch link with 0xFFFF \\(\\(>\\)" + eui64("remote1") + "\\) complete");
+expectNetworkUp("remote1", timeout * 10);
+expect("remote1", "Touch link with 0x0003 \\(\\(>\\)" + eui64("bridge") + "\\) complete");
+
+// Turn both routers off, so remote1 will be orphaned again, and unable
+// to find a new parent
+power("light1", false);
+power("bridge", false);
+
+// Try to touchlink remote2
+send("remote2", "plugin zll-commissioning enable");
+send("remote1", "plugin zll-commissioning link");
+expect("remote2", "EMBER_JOIN_FAILED", timeout*10);  // can't find a parent
+expect("remote1", "EMBER_JOIN_FAILED");  // can't find a parent
+
+// remote1 should be orphaned now, but touchlinking is still in progress
+expect("remote1", "plugin zll-commissioning link", "Error: Touch linking in progress");
+
+// power on bridge, and remotely reset remote1 (we can't use light1 to
+// do this, since it doesn't have a touchlink client-side cluster/plugin)
+power("bridge", true);
+setupEncryption();
+networkWait(1000);
+
+send("remote2", "plugin zll-commissioning disable");
+send("bridge", "plugin zll-commissioning scan reset");
+expect("remote1", "Resetting to factory new", timeout*10);
+
+// Retry the touchlink - this time, remote1 should link to bridge
+send("remote1", "plugin zll-commissioning link");
+expectNetworkUp("bridge", timeout * 10);
+expect("bridge", "Touch link with 0x0001 \\(\\(>\\)" + eui64("remote1") + "\\) complete");
+expectNetworkUp("remote1", timeout * 10);
+expect("remote1", "Touch link with 0x0002 \\(\\(>\\)" + eui64("bridge") + "\\) complete");
+
+// End of test
+
+
+

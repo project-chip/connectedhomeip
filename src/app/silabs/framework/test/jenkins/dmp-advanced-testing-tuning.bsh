@@ -1,0 +1,552 @@
+cd(dirname(pathToFile(getSourceFileInfo()).getAbsolutePath()));
+source("util.bsh");
+
+//-----------------------------
+// Easy setup for test parameters
+isRunAllThroughput = true;
+zigbeeLowerPacketCount = true;
+
+isBleDebug = false;
+isBleDoNotReConnect = false;
+isUpdateBleConnectionParams = false;
+isUpdateBleAdvertisementParams = false;
+//-----------------------------
+
+String dmp_coord  = "10.4.176.100";
+String dmp1       = "10.4.176.101";
+String dmp2       = "10.4.176.102";
+String dmp3       = "10.4.176.103";
+String dmp4       = "10.4.176.104";
+String dmp5       = "10.4.176.105";
+
+
+String dmp5       = "10.4.176.105";
+
+
+// TODO: Figure out if auto image download can be done from beanshell
+
+ArrayList args = new ArrayList();
+if (bsh.args != void) {
+  args.addAll(Arrays.asList(bsh.args));
+}
+
+for (int i=0; i<args.size(); i++) {
+  String arg = args.get(i);
+  if (arg.contains("-dmp_coord")) {
+    dmp_coord = args.get(++i);
+  }
+  if (arg.contains("-dmp1")) {
+    dmp1 = args.get(++i);
+  }
+  if (arg.contains("-dmp2")) {
+    dmp2 = args.get(++i);
+  }
+  if (arg.contains("-dmp3")) {
+    dmp3 = args.get(++i);
+  }
+  if (arg.contains("-dmp4")) {
+    dmp4 = args.get(++i);
+  }
+  if (arg.contains("-dmp5")) {
+    dmp5 = args.get(++i);
+  }
+}
+
+if (dmp_coord == null) {
+  System.out.println("dmp_coord IP address not set!");
+  System.exit(-1);
+}
+
+if (dmp1 == null) {
+  System.out.println("dmp1 IP address not set!");
+  System.exit(-1);
+}
+
+if (dmp2 == null) {
+  System.out.println("dmp2 IP address not set!");
+  System.exit(-1);
+}
+
+if (dmp3 == null) {
+  System.out.println("dmp3 IP address not set!");
+  System.exit(-1);
+}
+
+if (dmp4 == null) {
+  System.out.println("dmp4 IP address not set!");
+  System.exit(-1);
+}
+
+if (dmp5 == null) {
+  System.out.println("dmp5 IP address not set!");
+  System.exit(-1);
+}
+
+String[] nodes = new String[] {
+  dmp_coord, dmp1, dmp2, dmp3, dmp4, dmp5
+};
+
+// ZigBee radio parameters
+String PAN_ID = "0xBABE";
+String CHANNEL = "22";
+String TX_POWER = "10";
+String APS_OPTIONS = "0x0040"; //EMBER_APS_OPTION_RETRY - for ACK
+String PKT_LEN = "70";
+String TX_DELAY_MS = "0";
+
+String MAX_IN_FLIGHT_PKT = "1";
+
+int ZIGBEE_TX_TEST_PACKET_COUNT = (zigbeeLowerPacketCount) ? 32 : 160;
+
+if (isUpdateBleConnectionParams) {
+  String CONN_MIN_INT = "0x00C8"; // 1.25 ms * 0x00C8 = 250 ms
+  String CONN_MAX_INT = "0x00C8"; // 1.25 ms * 0x0640 = 2 sec
+  String CONN_SLAVE_LATENCY = "0x0000";
+  String CONN_SUPERVISION_TIMEOUT = "0x0640"; // 10 ms * 0x0640 = 16 sec (must be > (1+latency) * max_int * 2)  
+  // Test data for really long advartisement and connection interval parameters.
+  // String CONN_MIN_INT = "0x0640"; // 1.25 ms * 0x0640 = 2 sec
+  // String CONN_MAX_INT = "0x0640"; // 1.25 ms * 0x0640 = 2 sec
+  // String CONN_SLAVE_LATENCY = "0x0001";
+}
+
+if (isUpdateBleAdvertisementParams) {
+  // Test data for really long advartisement and connection interval parameters.
+  String ADV_MIN_INT  = "0x0640"; // 0.0625 ms * 0x0640 = 1 sec
+  String ADV_MAX_INT  = "0x0640"; // 0.0625 ms * 0x0640 = 1 sec
+  String ADV_CH_MAP   = "7"; // Advertise on all channels (2.10.1.11 - cmd_le_gap_set_adv_parameters (deprecated))
+}
+
+String dmp_coord_zigbeeId = "0x0000";
+String dmp1_zigbeeId = "0xFFFF";
+String dmp2_zigbeeId = "0xFFFF";
+String dmp3_zigbeeId = "0xFFFF";
+String dmp4_zigbeeId = "0xFFFF";
+String dmp5_zigbeeId = "0xFFFF";
+
+String dmp_coord_bleAddr;
+String dmp1_bleAddr;
+String dmp2_bleAddr;
+String dmp3_bleAddr;
+String dmp4_bleAddr;
+String dmp5_bleAddr;
+
+// These are not separate nodes, used to alias specific nodes used to 
+// crate the BLE connections.
+String bleSingle1_bleAddr;
+String bleSingle2_bleAddr;
+String bleDmp1_bleAddr;
+String bleDmp2_bleAddr;
+
+String bleSingle1;
+String bleSingle2;
+String bleDmp1;
+String bleDmp2;
+
+void testZigBeeCommunication(int packetCount, boolean log, String logPrefix)
+{
+  String match;
+  int timeout = 4000 + packetCount*100;
+
+  sleep(1000);
+
+  if (!isBleDebug) {
+    // Test communication dmp_coord -> dmp2
+    expect(dmp_coord, "custom start-z " + PKT_LEN + " " + packetCount + " " + TX_DELAY_MS + " " + MAX_IN_FLIGHT_PKT + " " + dmp2_zigbeeId + " " + APS_OPTIONS, "ZigBee TX test started", timeout);
+    match = expect(dmp_coord, "", "Throughput:", timeout);   
+    if (log) {
+      logToFile(logPrefix + " - dmp_coord -> dmp2:");
+      logToFile(match);
+    }
+
+    // Test communication dmp2 -> dmp_coord
+    expect(dmp2, "custom start-z " + PKT_LEN + " " + packetCount + " " + TX_DELAY_MS + " " + MAX_IN_FLIGHT_PKT + " " + dmp_coord_zigbeeId + " " + APS_OPTIONS, "ZigBee TX test started", timeout);
+    match = expect(dmp2, "", "Throughput:", timeout);   
+    if (log) {
+      logToFile(logPrefix + " - dmp2 -> dmp_coord:");
+      logToFile(match);
+    }
+  }
+  
+  sleep(1000);
+}
+
+initNetwork(nodes);
+
+//------------------------------------------------------------------------------
+// The actual test
+dbg.println("\n=== Startup ===\n");
+
+if (!isBleDoNotReConnect) {
+  // Reset dmp_coord
+  expect(dmp_coord, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp_coord, "reset", "BLE address: ");
+
+  // Reset dmp1
+  expect(dmp1, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp1, "reset", "BLE address: ");
+
+  // Reset dmp2
+  expect(dmp2, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp2, "reset", "BLE address: ");
+
+  // Reset dmp2
+  expect(dmp3, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp3, "reset", "BLE address: ");
+
+  // Reset dmp2
+  expect(dmp4, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp4, "reset", "BLE address: ");
+
+  // Reset dmp2
+  expect(dmp5, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp5, "reset", "BLE address: ");
+
+  if (isUpdateBleConnectionParams) {
+    // dmp1 fix BLE connection parameters, we do this in order to make the throughput test be independent
+    // of any default value changes, so that we don't false trigger on such updates
+    // See EMZIGBEE-2487 for more info.
+    expect(dmp_coord, "plugin ble gap set-conn-params " + CONN_MIN_INT + " " + CONN_MAX_INT + " " + CONN_SLAVE_LATENCY + " " + CONN_SUPERVISION_TIMEOUT, "success");
+    expect(dmp1,      "plugin ble gap set-conn-params " + CONN_MIN_INT + " " + CONN_MAX_INT + " " + CONN_SLAVE_LATENCY + " " + CONN_SUPERVISION_TIMEOUT, "success");
+    expect(dmp2,      "plugin ble gap set-conn-params " + CONN_MIN_INT + " " + CONN_MAX_INT + " " + CONN_SLAVE_LATENCY + " " + CONN_SUPERVISION_TIMEOUT, "success");
+    expect(dmp3,      "plugin ble gap set-conn-params " + CONN_MIN_INT + " " + CONN_MAX_INT + " " + CONN_SLAVE_LATENCY + " " + CONN_SUPERVISION_TIMEOUT, "success");
+    expect(dmp4,      "plugin ble gap set-conn-params " + CONN_MIN_INT + " " + CONN_MAX_INT + " " + CONN_SLAVE_LATENCY + " " + CONN_SUPERVISION_TIMEOUT, "success");
+    expect(dmp5,      "plugin ble gap set-conn-params " + CONN_MIN_INT + " " + CONN_MAX_INT + " " + CONN_SLAVE_LATENCY + " " + CONN_SUPERVISION_TIMEOUT, "success");
+  }
+
+  if (isUpdateBleAdvertisementParams) {
+    expect(dmp_coord, "plugin ble gap set-adv-params " + ADV_MIN_INT + " " + ADV_MAX_INT + " " + ADV_CH_MAP, "success");
+    expect(dmp1,      "plugin ble gap set-adv-params " + ADV_MIN_INT + " " + ADV_MAX_INT + " " + ADV_CH_MAP, "success");
+    expect(dmp2,      "plugin ble gap set-adv-params " + ADV_MIN_INT + " " + ADV_MAX_INT + " " + ADV_CH_MAP, "success");
+    expect(dmp3,      "plugin ble gap set-adv-params " + ADV_MIN_INT + " " + ADV_MAX_INT + " " + ADV_CH_MAP, "success");
+    expect(dmp4,      "plugin ble gap set-adv-params " + ADV_MIN_INT + " " + ADV_MAX_INT + " " + ADV_CH_MAP, "success");
+    expect(dmp5,      "plugin ble gap set-adv-params " + ADV_MIN_INT + " " + ADV_MAX_INT + " " + ADV_CH_MAP, "success");
+  }
+}
+
+if (!isBleDebug) {
+
+  dbg.println("\n=== Form ===\n");
+
+  expect(dmp_coord, "plugin network-creator form 1 " + PAN_ID + " " + TX_POWER + " " + CHANNEL, "NWK Creator: Form: 0x00"); 
+  expect(dmp_coord, "plugin network-creator-security open-net", "pJoin for 254 sec: 0x00");
+
+  sleep(1000);
+
+  dbg.println("\n=== Join DMP1 ===\n");
+
+  // dmp1 joins (try multiple times)
+  expectX(dmp1, "net join " + CHANNEL + " " + TX_POWER + " " + PAN_ID, "EMBER_NETWORK_UP");
+
+  // Retrieve ZigBee short IDs of dmp_coord and dmp1
+  dmp_coord_zigbeeId  = getZigbeeShortId(dmp_coord);
+  dmp1_zigbeeId       = getZigbeeShortId(dmp1);
+
+  // Set up MAC address filtering, so that nodes can hear each other only in the following chain:
+  // dmp_coord <-> dmp1 <-> dmp2 <-> dmp3
+  // Step 1: Make dmp_coord deaf for others than dmp1
+  expect(dmp_coord, 
+         "plugin mac-address-filtering short-address-list set-whitelist", 
+         "Short address list changed to whitelist.");
+
+  expect(dmp_coord, 
+         "plugin mac-address-filtering short-address-list add " + dmp1_zigbeeId,
+         "Added short address to list.");
+
+  dbg.println("\n=== Join DMP2 ===\n");
+
+  // Have dmp2 to join to dmp1 with deny join to coordinator and permit joint to dmp1
+  expect(dmp_coord, "net pjoin 0", "pJoin for 0 sec: 0x00");
+  expect(dmp1, "net pjoin 0xFF", "pJoin for 255 sec: 0x00");
+
+  expect(dmp2, 
+         "plugin mac-address-filtering short-address-list set-blacklist", 
+         "Short address list changed to blacklist.");
+
+  expect(dmp2, 
+         "plugin mac-address-filtering short-address-list add " + dmp_coord_zigbeeId,
+         "Added short address to list.");
+
+  // dmp2 joins (try multiple times)
+  expectX(dmp2, "net join " + CHANNEL + " " + TX_POWER + " " + PAN_ID, "EMBER_NETWORK_UP");
+
+  // Retrieve ZigBee short IDs of dmp_coord and dmp2
+  dmp2_zigbeeId       = getZigbeeShortId(dmp2);
+
+  // Set up MAC address filtering, so that nodes can hear each other only in the following chain:
+  // dmp_coord <-> dmp1 <-> dmp2 <-> dmp3
+  // Step 2: Make dmp_1 deaf for others than dmp_coord and dmp2
+  expect(dmp1, 
+         "plugin mac-address-filtering short-address-list set-whitelist", 
+         "Short address list changed to whitelist.");
+
+  expect(dmp1, 
+         "plugin mac-address-filtering short-address-list add " + dmp_coord_zigbeeId,
+         "Added short address to list.");
+
+  expect(dmp1, 
+         "plugin mac-address-filtering short-address-list add " + dmp2_zigbeeId,
+         "Added short address to list.");
+
+  dbg.println("\n=== Join DMP3 ===\n");
+
+  // Have dmp3 to join to dmp2 with deny join to coordinator and permit joint to dmp2
+  expect(dmp1, "net pjoin 0", "pJoin for 0 sec: 0x00");
+  expect(dmp2, "net pjoin 0xFF", "pJoin for 255 sec: 0x00");
+
+  // dmp2 joins (try multiple times)
+  expectX(dmp3, "net join " + CHANNEL + " " + TX_POWER + " " + PAN_ID, "EMBER_NETWORK_UP", 10000);
+
+
+  // Retrieve ZigBee short IDs of dmp_coord and dmp2
+  dmp3_zigbeeId       = getZigbeeShortId(dmp3);
+
+  // Set up MAC address filtering, so that nodes can hear each other only in the following chain:
+  // dmp_coord <-> dmp1 <-> dmp2 <-> dmp3
+  // Step 3: Make dmp_2 deaf for others than dmp_1 and dmp3
+  expect(dmp2, 
+         "plugin mac-address-filtering short-address-list clear", 
+         "Short address list cleared.");
+
+  expect(dmp2, 
+         "plugin mac-address-filtering short-address-list set-whitelist", 
+         "Short address list changed to whitelist.");
+
+  expect(dmp2, 
+         "plugin mac-address-filtering short-address-list add " + dmp1_zigbeeId,
+         "Added short address to list.");
+
+  expect(dmp2, 
+         "plugin mac-address-filtering short-address-list add " + dmp3_zigbeeId,
+         "Added short address to list.");
+
+  // Set up MAC address filtering, so that nodes can hear each other only in the following chain:
+  // dmp_coord <-> dmp1 <-> dmp2 <-> dmp3
+  // Step 4: Make dmp_3 deaf for others than dmp2
+  expect(dmp3, 
+         "plugin mac-address-filtering short-address-list set-whitelist", 
+         "Short address list changed to whitelist.");
+
+  expect(dmp3, 
+         "plugin mac-address-filtering short-address-list add " + dmp2_zigbeeId,
+         "Added short address to list.");
+
+} // if (!isBleDebug)
+
+dbg.println("\n=== Get BLE addresses ===\n");
+
+// Retrieve BLE addresses of all nodes
+dmp_coord_bleAddr = getBleAddress(dmp_coord);
+dmp1_bleAddr      = getBleAddress(dmp1);
+dmp2_bleAddr      = getBleAddress(dmp2);
+dmp3_bleAddr      = getBleAddress(dmp3);
+dmp4_bleAddr      = getBleAddress(dmp4);
+dmp5_bleAddr      = getBleAddress(dmp5);
+
+// Disable printing RX messages.
+expect(dmp_coord, "option print-rx-msgs disable", "disabled print");
+expect(dmp1,      "option print-rx-msgs disable", "disabled print");
+expect(dmp2,      "option print-rx-msgs disable", "disabled print");
+expect(dmp3,      "option print-rx-msgs disable", "disabled print");
+expect(dmp4,      "option print-rx-msgs disable", "disabled print");
+expect(dmp5,      "option print-rx-msgs disable", "disabled print");
+
+// bleSingle1_bleAddr = dmp_coord_bleAddr;
+// bleSingle2_bleAddr = dmp2_bleAddr;
+// bleDmp1_bleAddr = dmp1_bleAddr;
+// bleDmp2_bleAddr = dmp1_bleAddr;
+
+// bleSingle1 = dmp_coord;
+// bleSingle2 = dmp2;
+// bleDmp1 = dmp1;
+bleDmp2 = dmp1;
+
+bleSingle1_bleAddr = dmp4_bleAddr;
+bleSingle2_bleAddr = dmp5_bleAddr;
+bleDmp1_bleAddr = dmp1_bleAddr;
+bleDmp2_bleAddr = dmp1_bleAddr;
+
+bleSingle1 = dmp4;
+bleSingle2 = dmp5;
+bleDmp1 = dmp1;
+bleDmp2 = dmp1;
+
+if (isBleDebug) {
+  if (!isBleDoNotReConnect) {
+    expect(dmp2, "plugin ble gap set-mode 2 2", "success");
+    expect(dmp_coord, "plugin ble gap conn-open {" + dmp2_bleAddr + "} 0", "BLE connection opened");
+    sleep(1000);
+
+    expect(dmp2, "plugin ble gap set-mode 2 2", "success");
+    expect(dmp1, "plugin ble gap conn-open {" + dmp2_bleAddr + "} 0", "BLE connection opened");
+    sleep(1000);
+
+    expect(dmp2, "plugin ble gap set-mode 2 2", "success");
+    expect(dmp3, "plugin ble gap conn-open {" + dmp2_bleAddr + "} 0", "BLE connection opened");
+    sleep(1000);
+
+    expect(dmp2, "plugin ble gap set-mode 2 2", "success");
+    expect(dmp4, "plugin ble gap conn-open {" + dmp2_bleAddr + "} 0", "BLE connection opened");
+    sleep(1000);
+
+    expect(dmp1, "plugin ble gap set-mode 2 2", "success");
+    expect(dmp5, "plugin ble gap conn-open {" + dmp1_bleAddr + "} 0", "BLE connection opened");
+    sleep(1000);
+  }
+
+  sleep(10000);
+} else {
+
+  dbg.println("\n=== Test with no BLE activity ===\n");
+
+  // Check and enable RAIL scheduled event counters
+  expect(bleDmp1, "plugin dmp-tuning rail enable-config-scheduler-events", "success");
+  expect(bleDmp1, "plugin dmp-tuning rail get-scheduled-event-counters", "Scheduled event counter");
+
+  // Test ZigBee communication with no BLE activity
+  if (isRunAllThroughput) testZigBeeCommunication(ZIGBEE_TX_TEST_PACKET_COUNT, true, "no BLE activity");
+
+  dbg.println("\n=== Test with BLE advertisement ===\n");
+
+  // Check RAIL scheduled event counters
+  expect(bleDmp1, "plugin dmp-tuning rail get-scheduled-event-counters", "Scheduled event counter");
+
+  // dmpX starts BLE advertising
+  expect(bleDmp1, "plugin ble gap set-mode 2 2", "success");
+
+  // // Test ZigBee communication with dmp1 BLE advertising
+  if (isRunAllThroughput) testZigBeeCommunication(ZIGBEE_TX_TEST_PACKET_COUNT, true, "BLE advertising (dmp1)");
+
+  dbg.println("\n=== Test with BLE connected ===\n");
+
+  // Check RAIL scheduled event counters
+  expect(bleDmp1, "plugin dmp-tuning rail get-scheduled-event-counters", "Scheduled event counter");
+
+  // dmp2 establishes a BLE connection with dmp1
+  expect(bleSingle1, "plugin ble gap conn-open {" + bleDmp1_bleAddr + "} 0", "BLE connection opened");
+
+  sleep(1000);
+
+  // Check the BLE connection is open on both sides
+  expect(bleSingle1, "custom print-ble-connections", "remote address.*" + bleDmp1_bleAddr);
+  expect(bleDmp1, "custom print-ble-connections", "remote address.*" + bleSingle1_bleAddr);
+
+  // // Test ZigBee communication while a BLE connection is open
+  if (isRunAllThroughput) testZigBeeCommunication(ZIGBEE_TX_TEST_PACKET_COUNT, true, "BLE connection");
+
+  dbg.println("\n=== Test with BLE double connected ===\n");
+
+  // Check RAIL scheduled event counters
+  expect(bleDmp1, "plugin dmp-tuning rail get-scheduled-event-counters", "Scheduled event counter");
+
+  // dmpX starts BLE advertising
+  expect(bleDmp2, "plugin ble gap set-mode 2 2", "success");
+
+  sleep(1000);
+
+  // dmp2 establishes a BLE connection with dmp1
+  expect(bleSingle2, "plugin ble gap conn-open {" + bleDmp2_bleAddr + "} 0", "BLE connection opened");
+
+  sleep(1000);
+
+  // Check the BLE connection is open on both sides
+  expect(bleSingle2, "custom print-ble-connections", "remote address.*" + bleDmp2_bleAddr);
+  expect(bleDmp2, "custom print-ble-connections", "remote address.*" + bleSingle2_bleAddr);
+
+  expect(bleSingle1, "custom print-ble-connections", "remote address.*" + bleDmp1_bleAddr);
+  expect(bleDmp1, "custom print-ble-connections", "remote address.*" + bleSingle1_bleAddr);
+
+  testZigBeeCommunication(ZIGBEE_TX_TEST_PACKET_COUNT, true, "BLE double connection");
+
+  dbg.println("\n=== Test BLE double connected + advertising ===\n");
+
+  // Check RAIL scheduled event counters
+  expect(bleDmp1, "plugin dmp-tuning rail get-scheduled-event-counters", "Scheduled event counter");
+
+  // dmpX starts BLE advertising
+  expect(bleDmp1, "plugin ble gap set-mode 2 2", "success");
+  expect(bleDmp2, "plugin ble gap set-mode 2 2", "success");
+
+  sleep(1000);
+  
+  testZigBeeCommunication(ZIGBEE_TX_TEST_PACKET_COUNT, true, "BLE double connection and BLE advertisement");
+
+  dbg.println("\n=== Test BLE double connected + advertising + tx_data ===\n");
+
+  // Check RAIL scheduled event counters
+  expect(bleDmp1, "plugin dmp-tuning rail get-scheduled-event-counters", "Scheduled event counter");
+
+  // Note: the assumption here is that all devices run the same firmware, so regardless of the
+  // actual connection the serviceId and characteristicId values are just gonna be the same for all.
+  String connection = "1";
+  // Note: these are going to be read in LSByte first order
+  String serviceUuid = 
+    "0x6C 0xCE 0x98 0x91 0xB9 0xB3 0x11 0x87 0x9E 0x47 0xF5 0x67 0x01 0x00 0x4B 0xE5";
+  String writeCharacteristicUuid =
+    "0x6C 0xCE 0x98 0x91 0xB9 0xB3 0x11 0x87 0x9E 0x47 0xF5 0x67 0x03 0x00 0x4B 0xE5";
+  String readCharacteristicUuid =
+    "0x6C 0xCE 0x98 0x91 0xB9 0xB3 0x11 0x87 0x9E 0x47 0xF5 0x67 0x04 0x00 0x4B 0xE5";
+
+  String serviceId = getBleServiceId(dmp1, connection, serviceUuid);  
+  sleep(100);
+  String writeCharacteristicId = getBleCharacteristicId(dmp1, connection, serviceId, writeCharacteristicUuid);
+  sleep(500);
+  String readCharacteristicId = getBleCharacteristicId(dmp1, connection, serviceId, readCharacteristicUuid);
+
+  String txDealyMs = "10";
+  expect(bleSingle1, 
+    "custom start-ble-tx-test " + connection + " " + writeCharacteristicId + " " + txDealyMs,
+    "CLI Finished");
+  expect(bleSingle2, 
+    "custom start-ble-tx-test " + connection + " " + writeCharacteristicId + " " + txDealyMs,
+    "CLI Finished");
+
+  testZigBeeCommunication(ZIGBEE_TX_TEST_PACKET_COUNT, true, "BLE double connection and BLE advertisement and BLE double tx");
+
+  dbg.println("\n=== Test BLE double connected + advertising + rx_data ===\n");
+
+  // Check RAIL scheduled event counters
+  expect(bleDmp1, "plugin dmp-tuning rail get-scheduled-event-counters", "Scheduled event counter");
+
+  expect(bleDmp1, 
+    "custom start-ble-rx-test " + connection + " " + readCharacteristicId,
+    "CLI Finished");
+  // expect(bleSingle2, 
+  //   "custom start-ble-rx-test " + connection + " " + readCharacteristicId,
+  //   "CLI Finished");
+
+  testZigBeeCommunication(ZIGBEE_TX_TEST_PACKET_COUNT, true, "BLE double connection and BLE advertisement and BLE double TX + BLE rx");
+
+  // Check RAIL scheduled event counters
+  expect(bleDmp1, "plugin dmp-tuning rail get-scheduled-event-counters", "Scheduled event counter");
+
+}
+
+if (!isBleDoNotReConnect) {
+  dbg.println("\n=== Finish up: Leave and Reset ===\n");
+
+  // Reset dmp_coord
+  expect(dmp_coord, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp_coord, "reset", "BLE address: ");
+
+  // Reset dmp1
+  expect(dmp1, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp1, "reset", "BLE address: ");
+
+  // Reset dmp2
+  expect(dmp2, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp2, "reset", "BLE address: ");
+
+  // Reset dmp2
+  expect(dmp3, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp3, "reset", "BLE address: ");
+
+  // Reset dmp2
+  expect(dmp4, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp4, "reset", "BLE address: ");
+
+  // Reset dmp2
+  expect(dmp5, "net leave", "(?:EMBER_NETWORK_DOWN|leave 0x70)");
+  expect(dmp5, "reset", "BLE address: ");
+}
+
+System.exit(0);

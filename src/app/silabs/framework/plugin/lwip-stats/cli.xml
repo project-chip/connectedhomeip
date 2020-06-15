@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-lwip-stats" name="Plugin Commands: lwip-stats">
+    <description>
+      This plugin provides an implementation of lwip using FreeRTOS.
+    </description>
+  </group>
+  <command cli="plugin lwip-stats link" functionName="emberAfPluginLwipLINKStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>Ethernet link statistics</description>
+  </command>
+  <command cli="plugin lwip-stats etharp" functionName="emberAfPluginLwipETHARPStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>ARP statistics</description>
+    </command>
+   <command cli="plugin lwip-stats mem" functionName="emberAfPluginLwipMEMStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>memory statistics</description>
+  </command>
+ 
+  <command cli="plugin lwip-stats sys" functionName="emberAfPluginLwipSYSStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>system statistics</description>
+    </command>
+  <command cli="plugin lwip-stats ip" functionName="emberAfPluginLwipIPStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>IP statistics</description>
+    </command>
+   <command cli="plugin lwip-stats tcp" functionName="emberAfPluginLwipTCPStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>TCP statistics</description>
+    </command>
+  <command cli="plugin lwip-stats udp" functionName="emberAfPluginLwipUDPStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>UDP statistics</description>
+    </command>
+  <command cli="plugin lwip-stats icmp" functionName="emberAfPluginLwipICMPStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>ICMP statistics</description>
+    </command>
+  <command cli="plugin lwip-stats ipfrag" functionName="emberAfPluginLwipIPFRAGStatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>IP fragmentation statistics</description>
+  </command>
+  <command cli="plugin lwip-stats memp arp" functionName="emberAfPluginLwipMEMP1StatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>ARP queue pool statistics</description>
+  </command>
+  <command cli="plugin lwip-stats memp netconn" functionName="emberAfPluginLwipMEMP2StatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>netconn pool statistics</description>
+  </command>
+    <command cli="plugin lwip-stats memp netbuf" functionName="emberAfPluginLwipMEMP3StatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>netbuf pool statistics</description>
+  </command>
+  <command cli="plugin lwip-stats memp raw" functionName="emberAfPluginLwipMEMP4StatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>Raw API pool statistics</description>
+  </command>
+  <command cli="plugin lwip-stats memp sys" functionName="emberAfPluginLwipMEMP5StatsCommand" group="plugin-lwip-stats" restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>timer pool statistics</description>
+  </command>
+  <command cli="plugin lwip-stats memp tcp" functionName="emberAfPluginLwipMEMP6StatsCommand" group="plugin-lwip-stats"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>TCP pool statistics</description>
+  </command>
+  <command cli="plugin lwip-stats memp tcplisten" functionName="emberAfPluginLwipMEMP7StatsCommand" group="plugin-lwip-stats"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>TCP listen pool statistics</description>
+  </command>
+  <command cli="plugin lwip-stats memp tcpseg" functionName="emberAfPluginLwipMEMP8StatsCommand" group="plugin-lwip-stats"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>TCP segment pbuf pool statistics</description>
+  </command>
+  <command cli="plugin lwip-stats memp udp" functionName="emberAfPluginLwipMEMP9StatsCommand" group="plugin-lwip-stats"  restriction="!defined(DOXYGEN_SHOULD_SKIP_THIS)">
+    <description>UDP pool statistics</description>
+  </command>
+</cli>

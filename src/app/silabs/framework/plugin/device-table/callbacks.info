@@ -1,0 +1,81 @@
+/** @brief StateChange
+ *
+ * This callback is called when a device's state changes.
+ *
+ * @param nodeId   Ver.: always
+ * @param state   Ver.: always
+ */
+void emberAfPluginDeviceTableStateChangeCallback(EmberNodeId nodeId,
+                                                 uint8_t state)
+{
+}
+
+/** @brief Cleared
+ *
+ * This callback is called when a device table has been cleared.
+ *
+ */
+void emberAfPluginDeviceTableClearedCallback(void)
+{
+}
+
+/** @brief NewDevice
+ *
+ * This callback is called when a new device joins the gateway.
+ *
+ * @param uui64   Ver.: always
+ */
+void emberAfPluginDeviceTableNewDeviceCallback(EmberEUI64 eui64)
+{
+}
+
+/** @brief Rejoin device
+ *
+ * Called when a device rejoins.
+ *
+ *@param newNodeEui64:  EUI64 of the rejoined device.
+ */
+void emberAfPluginDeviceTableRejoinDeviceCallback(EmberEUI64 newNodeEui64)
+{
+}
+
+/*
+ *
+ * Called when a device leaves.
+ *
+ *@param newNodeEui64:  EUI64 of the device that left.
+ */
+void emberAfPluginDeviceTableDeviceLeftCallback(EmberEUI64 newNodeEui64)
+{
+}
+
+/*
+ *
+ * Called when the device table has been initialized.
+ *
+ */
+void emberAfPluginDeviceTableInitialized(void)
+{
+}
+
+/*
+ *
+ * Called when the device has been removed from the table.
+ *
+ *@param currentIndex:  Index of the removed device.
+ *
+ */
+void emberAfPluginDeviceTableIndexRemovedCallback(uint16_t currentIndex)
+{
+}
+
+/*
+ *
+ * Called when the device table has been initialized.
+ *
+ *@param index:  Index of the removed device.
+ *
+ */
+void emberAfPluginDeviceTableIndexAddedCallback(uint16_t index)
+{
+}

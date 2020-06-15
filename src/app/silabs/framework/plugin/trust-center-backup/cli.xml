@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-trust-center-backup" name="Plugin Commands: Trust Center Backup">
+    <description>
+      The Trust Center Backup plugin contributes several CLI commands to the application framework to be used in creating and managing reporting table entries directly on the device.
+    </description>
+  </group>
+  <command cli="plugin trust-center-backup print-export" functionName="printExportDataCommand" group="plugin-trust-center-backup">
+    <description>
+      Print the set of export data that a TC must backup.
+    </description>
+  </command>
+  <command cli="plugin trust-center-backup import-key" functionName="importKeyCommand" group="plugin-trust-center-backup">
+    <description>
+      Set a key in the import data set.
+    </description>
+    <arg name="index"        type="INT8U"        description="" />
+    <arg name="partnerEUI64" type="IEEE_ADDRESS" description="" />
+    <arg name="newKey"       type="OCTET_STRING" description="" />
+  </command>
+  <command cli="plugin trust-center-backup set-ext-pan" functionName="setExtendedPanIdCommand" group="plugin-trust-center-backup">
+    <description>
+      Set the extended PAN ID in the import data set.
+    </description>
+    <arg name="extendedPanId" type="IEEE_ADDRESS" description="" />
+  </command>
+  <command cli="plugin trust-center-backup print-import" functionName="printImportDataCommand" group="plugin-trust-center-backup">
+    <description>
+      Print the import data set.
+    </description>
+  </command>
+  <command cli="plugin trust-center-backup clear-import" functionName="importClearCommand" group="plugin-trust-center-backup">
+    <description>
+      Clear the import data set.
+    </description>
+  </command>
+  <command cli="plugin trust-center-backup restore" functionName="restoreFromBackupCommand" group="plugin-trust-center-backup">
+    <description>
+      Use the import data set in a restore operation to bring the TC back online.
+    </description>
+  </command>
+  <command cli="plugin trust-center-backup file-export" functionName="emAfTcExportCommand" group="plugin-trust-center-backup" restriction="defined(EMBER_AF_PLUGIN_TRUST_CENTER_BACKUP_POSIX_FILE_BACKUP_SUPPORT)">
+    <description>
+      Write the TC backup data to a file.
+    </description>
+    <arg name="path" type="OCTET_STRING" description="" />
+  </command>
+  <command cli="plugin trust-center-backup file-import" functionName="emAfTcImportCommand" group="plugin-trust-center-backup" restriction="defined(EMBER_AF_PLUGIN_TRUST_CENTER_BACKUP_POSIX_FILE_BACKUP_SUPPORT)">
+    <description>
+      Read the TC Backup data from a file and bring the TC back online.
+    </description>
+    <arg name="path" type="OCTET_STRING" description="" />
+  </command>
+</cli>

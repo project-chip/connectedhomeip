@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-idle-sleep" name="Plugin Commands: Idle/Sleep">
+    <description>
+      The Sleep plugin contributes several commands to the application framework's CLI.  These commands are used to control the idling and sleeping behavior of the device.
+    </description>
+  </group>
+  <command cli="plugin idle-sleep status" functionName="emberAfPluginIdleSleepStatusCommand" group="plugin-idle-sleep">
+    <description>
+      Display the status of the sleeping behavior.
+    </description>
+  </command>
+  <command cli="plugin idle-sleep force-awake" functionName="emberAfPluginIdleSleepStayAwakeCommand" group="plugin-idle-sleep">
+    <description>
+      Sets whether the device is forced to stay awake.
+    </description>
+    <arg name="stayAwake" type="BOOLEAN" description="The value indicating whether the device should stay awake."/>
+  </command>
+  <command cli="plugin idle-sleep awake-when-not-joined" functionName="emberAfPluginIdleSleepAwakeWhenNotJoinedCommand" group="plugin-idle-sleep">
+    <description>
+      Sets whether the device stays awake when not joined to a ZigBee network.
+    </description>
+    <arg name="stayAwakeWhenNotJoined" type="BOOLEAN" description="The value indicating whether the device should stay awake when not joined to a ZigBee network."/>
+  </command>
+</cli>

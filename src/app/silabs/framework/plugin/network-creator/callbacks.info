@@ -1,0 +1,38 @@
+/** @brief Complete
+ *
+ * This callback notifies the user that the network creation process has
+ * completed successfully.
+ *
+ * @param network The network that the network creator plugin successfully
+ * formed. Ver.: always
+ * @param usedSecondaryChannels Whether or not the network creator wants to
+ * form a network on the secondary channels Ver.: always
+ */
+void emberAfPluginNetworkCreatorCompleteCallback(const EmberNetworkParameters *network,
+                                                 bool usedSecondaryChannels)
+{
+}
+
+/** @brief Get Pan Id
+ *
+ * This callback is called when the Network Creator plugin needs the PAN ID for
+ * the network it is about to create. By default, the callback will return a
+ * random 16-bit value.
+ *
+ */
+EmberPanId emberAfPluginNetworkCreatorGetPanIdCallback(void)
+{
+  return emberGetPseudoRandomNumber();
+}
+
+/** @brief Get Power For Radio Channel
+ *
+ * This callback is called when the Network Creator plugin needs the radio power for
+ * the network it is about to create. By default, the callback will use the radio
+ * power specified in the relevant plugin option.
+ *
+ */
+int8_t emberAfPluginNetworkCreatorGetRadioPowerCallback(void)
+{
+  return EMBER_AF_PLUGIN_NETWORK_CREATOR_RADIO_POWER;
+}

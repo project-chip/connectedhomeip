@@ -1,0 +1,130 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to be able to verify GBCS functionality
+// with real ECC security. Please see gbcs-no_ecc.bsh for a unit test
+// that can be run on Mac OS X.
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop
+    || runArgument.runUsingHostApps) {
+  // Multi-hop is disabled due to many weird failures due to timing issue.
+
+  // I am disabling host because it is failing in a very bizarre
+  // way in the Key Establishment.  I would love to debug this issue,
+  // but do not currently have time.  The IHD is failing to succeed on
+  // key establishment on host, the confirm key is seeing a different value
+  // on both sides.  In theory this should not happen under idealized
+  // (simulation) circumstances.  So my suspicion is that it is memory
+  // corruption.
+  std.print("****Multi-hop and Host disabled****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "controller", "contact"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/Z3ContactSensor-simulation/Z3ContactSensor",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+};
+
+String[] ncpImages = new String[] {
+  "",
+  "",
+};
+
+// Note: the following call creates a string of pearls network, which
+// is not OK if we are using end devices.
+
+// addAndLoadDevices(allDevices, socImages, hostImages, ncpImage);
+// Note: the following call creates a flat network (i.e. every node can
+// hear every other node.
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImages,
+                  false, false, false);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0xdc04;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Note: reference designs can not use the formAndJoinDevices() API
+// because they will all try to join on their own.  As such, calls
+// beyond the first to attempt to join to a network will fail (devices
+// already joined).
+//formAndJoinDevices(allDevices, 
+//                   false);   // wait for key establishment to complete?
+
+// Coodinator is device [0]
+networkForm(allDevices[0]);
+send(allDevices[0], "network pjoin 150");
+
+// Allow TC and link key requests on the trust center
+send("controller", "option security set-key-request-policy 1 1");
+
+// Let registration complete.
+networkWait(30000);
+
+// leave test.  Verify that the bulb can rejoin the network.
+send("contact", "network leave");
+send("controller", "network pjoin 150");
+expect("contact", ".*EMBER_NETWORK_DOWN");
+expect("contact", ".*EMBER_NETWORK_UP.*",50000);
+networkWait(5000);
+send("contact", "network leave");
+send("controller", "network pjoin 0");
+
+int i;
+
+if(true) {
+// Verify that the connection manager will attempt to rejoin 10 times, then stop
+// attempting to rejoin
+  for(i=0; i< 10; i++) {
+    expect("contact", ".*NWK Steering: Start: 0x00.*", 15000);
+    // Old network steering will go through the states and fail to find any
+    // networks, yielding an error of 0x94, EMBER_JOIN_FAILED. New network
+    // steering is more accurate and returns 0xAB, EMBER_NO_BEACONS. New network
+    // steering is also smarter and doesn't transition through the steering
+    // states since no beacons were heard
+    expect("contact", ".*Connection Manager:  Network Find status ..*", 60000);
+  }
+
+  expect("contact", ".*Failed to find network to join within .*", 15000);
+  
+  send("controller", "network pjoin 150");
+  reboot("contact");
+  
+  networkWait(100000);
+
+// Verify that after the coordinator goes down, the device detects it gets to
+// the orphan state
+
+  send("controller", "network leave");
+  
+  // AGK: originally, there was a networkWait above this expect() call.
+  // The network was waiting for too long and missing the EMBER_NETWORK_DOWN
+  // here. I put the wait right in the expect call so we wouldn't miss the
+  // the EMBER_NETWORK_DOWN print.
+  expect("contact", ".*EMBER_NETWORK_DOWN.*", 500000);
+  expect("contact", ".*Schedule move nwk.*1.*");
+  
+  networkWait(10000);
+  expect("contact", ".*Schedule move nwk.*2.*");
+  
+  networkWait(10000);
+  expect("contact", ".*Max move limit reached.*3.*");
+
+// Make sure that another check gets scheduled after a bit more than 15 minutes  
+  networkWait(980000);
+  expect("contact", ".*Schedule move nwk.*0.*");
+}
+

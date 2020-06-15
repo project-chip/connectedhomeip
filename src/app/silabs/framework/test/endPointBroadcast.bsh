@@ -1,0 +1,241 @@
+//Initiated to address EMSTACK-2990
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+String proComplianceNodeId(String node)
+{
+  String state;
+  int i;
+
+  state = expect(node, "state", ".*Router id=.*");
+  assert(state != null);
+  assert((i = state.indexOf("Router id=")) != -1);
+  networkWait(3000);
+  String routerNodeId = state.substring(i + 10, i + 16);
+  return routerNodeId;
+}
+
+String proComplianceEndId(String node)
+{
+String state;
+int i;
+
+state = expect(node, "state", ".*End device id=.*");
+assert(state != null);
+assert((i = state.indexOf("End device id=")) != -1);
+networkWait(3000);
+String endNodeId = state.substring(i + 14, i + 20);
+return endNodeId;
+}
+
+
+//##################### Initializations
+
+final int NETWORK_SIZE = 3;
+final int ENDPOINT_COUNTS = 1;
+// when you updtes the varibale below, you also need to update the corresponding
+// variable in the Jamfile (for the target image used in this simulation)
+final int BROADCAST_TABLE_SIZE = 23;//NEEDS UPDATING JAMFILE
+final int MAX_BC_PACKETS_PER_TIME_WINDOW = BROADCAST_TABLE_SIZE - 6 - 1;
+final int NUMBER_OF_TESTS = 2;
+
+int numPacketsSent = 0;
+
+//############# Tests specific initializations                                  
+                                                                                
+                                                                                
+// In Jamfile&here 22 is initially BC limit(16 sourced limit)                   
+int[] numBroadcasts= new int[NUMBER_OF_TESTS];                                  
+int[] txIntervalMs= new int[NUMBER_OF_TESTS];                                   
+int sourceEndpoint  = 1;                                                        
+int destEndpoint    = 240;                                                      
+                                                                                
+//steady strem                                                                  
+numBroadcasts[1] = 160;                                                         
+// The time interval is actually a 15360ms window, because of the 256 ms bucket 
+// size in zigbee stack implementation                                          
+txIntervalMs[1] = (256 * 4 * 15) / MAX_BC_PACKETS_PER_TIME_WINDOW;              
+                                                                                
+//Bursts                                                                        
+numBroadcasts[0]   = 20;  // in Jam file 22 is BC limit (16 sourced limit)      
+txIntervalMs[0]    = 200;                                                        
+                               
+
+
+//###################### Form our set of devices for simulations
+
+SimulatedNetwork network = createNetwork();
+
+String[] devices = new String[NETWORK_SIZE];
+devices[0] = "coordinator";
+for (int n = 1; n < NETWORK_SIZE - ENDPOINT_COUNTS; n++) {
+  devices[n] = "router" + n;
+}
+
+for (int n = NETWORK_SIZE - ENDPOINT_COUNTS; n < NETWORK_SIZE; n++) {
+devices[n] = "end" + n;
+}
+
+
+//######################## Load images of the apps(/stacks) we built with Jam
+
+String[] socImages = new String[NETWORK_SIZE];
+for (int n = 0; n < NETWORK_SIZE - ENDPOINT_COUNTS; n++) {
+  socImages[n] = "build/pro-compliance-BC-table-unix-simulation/pro-compliance-BC-table";
+}
+//currently they are both the same, but ultimately we might want end-devices to have different images
+for (int n = NETWORK_SIZE - ENDPOINT_COUNTS; n < NETWORK_SIZE; n++) {
+  socImages[n] = "build/pro-compliance-leaf-BC-table-unix-simulation/pro-compliance-leaf-BC-table";
+}
+
+
+
+String ncpImage;
+ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+String[] hostImages = new String[NETWORK_SIZE];
+for (int n = 0; n < NETWORK_SIZE - ENDPOINT_COUNTS; n++) {
+  hostImages[n] = "build/pro-compliance-BC-table-unix-simulation/pro-compliance-BC-table";
+}
+//currently they are both the same, but ultimately we might want end-devices to have different images
+for (int n = NETWORK_SIZE - ENDPOINT_COUNTS; n < NETWORK_SIZE; n++) {
+  hostImages[n] = "build/pro-compliance-leaf-BC-table-unix-simulation/pro-compliance-leaf-BC-table";
+}
+
+
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+//############# Form the network
+
+int channel = 15;
+int power = 8;
+int panId = 0x1212;
+
+send("coordinator", "form " + channel + " 0x" + Integer.toHexString(panId) + 
+      " " + power);
+send("coordinator", "permit_joins 255");
+
+networkWait(5000);
+
+//############Join the Network
+
+for (int r = 1; r < NETWORK_SIZE - ENDPOINT_COUNTS; r++) {
+  expect("router" + r, 
+         "join " + channel + " 0x" + Integer.toHexString(panId) + " " + power,
+         ".*Stack up.*",
+         5000);
+  // Can't join too fast or else the routers don't hear beacons
+  networkWait(5000);
+}
+
+for (int r = NETWORK_SIZE - ENDPOINT_COUNTS; r < NETWORK_SIZE; r++) {
+  expect("end" + r,
+         "join_sleepy " + channel + " 0x" + Integer.toHexString(panId) + " " + 
+          power,
+         ".*Stack up.*",
+         5000);
+  // Can't join too fast or else the routers don't hear beacons
+  networkWait(5000);
+}
+
+// Let the network settle, especially the device announcements, which consume
+// broadcast buffers
+networkWait(100000);
+
+//############### Build the list of node IDs
+
+String[] nodeIds = new String[NETWORK_SIZE];
+nodeIds[0] = proComplianceNodeId("coordinator");
+for (int r = 1; r < NETWORK_SIZE - ENDPOINT_COUNTS; ++r) {
+  nodeIds[r] = proComplianceNodeId("router" + r);
+}
+for (int r = NETWORK_SIZE - ENDPOINT_COUNTS; r < NETWORK_SIZE; ++r) {
+  nodeIds[r] = proComplianceEndId("end" + r);
+}
+
+//###############Openning some files for temporary logging
+//these and also references to them need to be removed for actual chip runs                            
+
+//f = new FileOutputStream("tmp.log", false);                                     
+//file = new PrintStream(f);   
+
+//#########################################
+//#############Tests#######################
+//########################################
+// TEST2: steadily stream packets within the 15-second time window
+// TEST1: bursts in 15 secs
+ 
+
+
+//################## Send broadcast Packets
+//max test value = NUMBER_OF_TESTS -1
+for(int test = 0; test < 1; ++test ){
+
+//file.println("################## Test "+test);
+
+for (int r = NETWORK_SIZE - ENDPOINT_COUNTS; r < NETWORK_SIZE; ++r) {
+for (int p = 0; p < numBroadcasts[test]; p++) {
+  expect("end" + r,
+         "send_packet 10 1 " + destEndpoint + " 0xFFFF 0",
+         "Counter " + (p + numPacketsSent),
+         2000);
+  //send("end" + r,                                                           
+    //     "send_packet 10 1 " + destEndpoint + " 0xFFFF 0");
+  networkWait(txIntervalMs[test] );
+}
+
+
+numPacketsSent += numBroadcasts[test];
+
+// Give time for the broadcasts and replays to settle
+networkWait(80000);
+
+//################### Check the counts
+
+for (int r = 1; r < NETWORK_SIZE - ENDPOINT_COUNTS; ++r) {
+//  file.println("Router" + r+"#############get_count " + sourceEndpoint + " " + 
+//                nodeIds[r] + " " + destEndpoint + " 0x0100");
+  expect("router" + r,
+         "get_count " + sourceEndpoint + " " + nodeIds[r] + " " + destEndpoint 
+         + " 0x0100",".*Packet count response: " + numBroadcasts[test] + 
+         " packets", 2000);
+ /* send("router" + r,                                                        
+         "get_count " + sourceEndpoint + " " + nodeIds[r] + " " + destEndpoint  
+         + " 0x0100");*/
+  networkWait(1000);
+}
+
+//file.println("Coordinator"+"$$$$$$$$$$$$get_count " + sourceEndpoint + " " + 
+//                nodeIds[0] + " " + destEndpoint + " 0x0100");
+expect("coordinator",
+         "get_count " + sourceEndpoint + " " + nodeIds[0] + " " + destEndpoint 
+         + " 0x0100",".*Packet count response: " + numBroadcasts[test] + 
+         " packets", 2000);
+//send("coordinator",                                                         
+//         "get_count " + sourceEndpoint + " " + nodeIds[0] + " " + destEndpoint  
+//         + " 0x0100");
+networkWait(1000);
+
+
+
+//################### Reset the counts
+expect("coordinator",
+       "reset_count " + sourceEndpoint + " " + nodeIds[0] + " " + destEndpoint 
+        + " 0x0100",".*Reset packet count",
+       1000);
+
+for (int r = 1; r < NETWORK_SIZE - ENDPOINT_COUNTS; ++r) {
+  expect("router" + r,
+         "reset_count " + sourceEndpoint + " " + nodeIds[r] + " " + 
+         destEndpoint + " 0x0100",".*Reset packet count",
+         1000);
+}
+for (int r = NETWORK_SIZE - ENDPOINT_COUNTS; r < NETWORK_SIZE; ++r) {
+  expect("end" + r,
+         "reset_count " + sourceEndpoint + " " + nodeIds[r] + " " + 
+          destEndpoint + " 0x0100",".*Reset packet count",
+         1000);
+}
+}//end of send_broadcast loop
+}//end of TESTs loops 

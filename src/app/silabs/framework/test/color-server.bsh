@@ -1,0 +1,374 @@
+import com.ember.peek.SimulatedNetwork;
+
+// The purpose of this test is to verify the color control server plugin and
+// its interaction with the different plugins.  
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop
+    || runArgument.runUsingHostApps) {
+  // Multi-hop is disabled due to many weird failures due to timing issue.
+
+  // I am disabling host because it is failing in a very bizarre
+  // way in the Key Establishment.  I would love to debug this issue,
+  // but do not currently have time.  The IHD is failing to succeed on
+  // key establishment on host, the confirm key is seeing a different value
+  // on both sides.  In theory this should not happen under idealized
+  // (simulation) circumstances.  So my suspicion is that it is memory
+  // corruption.
+  dbg.print("****Multi-hop and Host disabled****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] allDevices = { "controller", "bulb-rgb"};
+String[] socImages = new String[] {
+  "build/af-test-apps/HaHomeGateway-simulation/HaHomeGateway",
+  "build/af-test-apps/Z3ColorControlLight-simulation/Z3ColorControlLight",
+};
+
+String[] hostImages = new String[] {
+  "",
+  "",
+};
+
+String[] ncpImages = new String[] {
+  "",
+  "",
+};
+
+// Note: the following call creates a flat network (i.e. every node can
+// hear every other node.
+addAndLoadDevices(allDevices, socImages, hostImages, ncpImages,
+                  false, false, false);
+
+// All commands will be on the same port and have the same timeout.
+int port = 1;
+int timeout = 10000;
+
+int channel = 12;
+int power = 2;
+int panId = 0xdc04;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+
+// Note: reference designs can not use the formAndJoinDevices() API
+// because they will all try to join on their own.  As such, calls
+// beyond the first to attempt to join to a network will fail (devices
+// already joined).
+
+// Coodinator is device [0]
+networkForm(allDevices[0]);
+send(allDevices[0], "network pjoin 150");
+
+// Allow TC and link key requests on the trust center
+send("controller", "option security set-key-request-policy 1 1");
+
+// Let registration complete.
+networkWait(15000);
+
+  String bulbRgb = nodeId("bulb-rgb");
+
+if (true) {
+  dbg.print("*****COLOR HSV MOVE TO******\r\n");
+  send("controller", "zcl color-control movetohueandsat 0 0 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 100 100 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 0 200 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 100 100 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+  dbg.print("*****COLOR HSV MOVE HUE******\r\n");
+  send("controller", "zcl color-control movehue 1 100 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control movehue 3 100 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control movehue 0 100 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  
+  dbg.print("*****COLOR HSV MOVE SAT******\r\n");
+  send("controller", "zcl color-control movesat 1 100 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control movesat 3 100 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control movesat 0 100 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+
+  dbg.print("*****COLOR HSV MOVE TO HUE******\r\n");
+  send("controller", "zcl color-control movetohue 200 1 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control movetohue 50 1 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control movetohue 200 3 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control movetohue 100 3 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+
+  dbg.print("*****COLOR HSV MOVE TO SAT******\r\n");
+  send("controller", "zcl color-control movetosat 200 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control movetosat 100 0x0a 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+
+  dbg.print("*****COLOR HSV STEP HUE******\r\n");
+  send("controller", "zcl color-control stephue 1 200 0x0a 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control stephue 3 200 0x0a 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control stephue 1 50 0x0a 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control stephue 3 50 0x0a 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+
+  dbg.print("*****COLOR HSV STEP SAT******\r\n");
+  send("controller", "zcl color-control stepsat 1 100 0x0a 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  send("controller", "zcl color-control stepsat 3 100 0x0a 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(3000);
+  
+}
+
+// move to color temperature tests
+if (true) {
+  dbg.print("*****COLOR TEMPERATURE MOVE TO******\r\n");
+  send("controller", "zcl color-control movetocolortemp 100 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  
+  send("controller", "zcl color-control movetocolortemp 400 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+  send("controller", "zcl color-control movetocolortemp 200 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+  dbg.print("*****COLOR TEMPERATURE MOVE******\r\n"); // 1 is up, 3 is down, 0 is stop 
+  send("controller", "zcl color-control movecolortemp 1 20 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control movecolortemp 3 20 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control movecolortemp 0 20 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control movecolortemp 1 200 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(4000);
+  send("controller", "zcl color-control movecolortemp 3 200 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(8000);
+
+  dbg.print("*****COLOR TEMPERATURE STEP******\r\n");
+  send("controller", "zcl color-control movetocolortemp 200 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control stepcolortemp 1 100 0x05 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control stepcolortemp 3 100 0x05 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  send("controller", "zcl color-control stepcolortemp 1 100 0x20 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1000);
+  send("controller", "zcl color-control stepcolortemp 0 100 0x20 50 400 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+}
+
+// move to color tests
+if (true) {
+  dbg.print("****SEND WHITE****\r\n");
+  // white
+  send("controller", "zcl color-control movetocolor 20316 21627 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+  // now let's do some up/down combinations.
+  send("controller", "zcl color-control stepcolor 1000 1000 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+  // now let's do some up/down combinations.
+  send("controller", "zcl color-control stepcolor -1000 -1000 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+  // now let's do some up/down combinations.
+  send("controller", "zcl color-control stepcolor -1000 1000 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+  // now let's do some up/down combinations.
+  send("controller", "zcl color-control stepcolor 1000 -1000 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+}
+
+// move color tests
+if (true) {
+  dbg.print("***MOVE UP***\r\n");
+  send("controller", "zcl color-control movecolor 100 100 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(2000);
+
+  send("controller", "zcl color-control movecolor -100 -100 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(2000);
+
+  send("controller", "zcl color-control stopmovestep 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(4000);
+  
+  send("controller", "zcl color-control movecolor 1000 1000 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(20000);
+
+  send("controller", "zcl color-control movecolor -1000 -1000 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(50000);
+}
+
+// move to color tests
+if(true) {
+  dbg.print("****SEND WHITE****");
+  // white
+  send("controller", "zcl color-control movetocolor 20316 21627 0x20 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(4000);
+  // yellow
+  dbg.print("****SEND YELLOW****");
+  send("controller", "zcl color-control movetocolor 26870 32768 0x9 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  // cyan
+  dbg.print("****SEND CYAN****");
+  send("controller", "zcl color-control movetocolor 14418 21627 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  // green
+  dbg.print("****SEND GREEN****");
+  send("controller", "zcl color-control movetocolor 19005 39322 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  // purple
+  send("controller", "zcl color-control movetocolor 20972 9830 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  // red
+  send("controller", "zcl color-control movetocolor 41943 21627 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+  // blue
+  send("controller", "zcl color-control movetocolor 9830 3932 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  networkWait(1500);
+
+}
+
+// run test for the color control bulb
+if(true) {
+  // set up node ID for the color temperature bulb
+  String bulbRgb = nodeId("bulb-rgb");
+  send("controller", "zcl color-control movetocolortemp 200 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 5976 5343 4828");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 5976");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 5343");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 4828");
+  networkWait(1500);
+  send("controller", "zcl color-control movetocolortemp 300 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 5976 4406 3070");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 5976");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 4406");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 3070");
+  networkWait(1500);
+
+  send("controller", "zcl color-control movetohueandsat 0 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 6000 0 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 0");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 40 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 6000 5692 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 5692");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 0");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 80 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 566 6000 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 566");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 0");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 120 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 0 6000 5007");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 5007");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 160 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 0 1275 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 1275");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 6000");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 200 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 4417 0 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 4417");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 6000");
+  networkWait(1500);
+  send("controller", "zcl color-control movetohueandsat 240 254 0x05 0x00 0x00");
+  send("controller", "send " + bulbRgb + " 1 1");
+  //expect("bulb-rgb", "PWM RGB:  0 6000 0 1984");
+  expect("bulb-rgb", ".*PWM DRIVE:  1 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  2 6000");
+  expect("bulb-rgb", ".*PWM DRIVE:  3 0");
+  expect("bulb-rgb", ".*PWM DRIVE:  4 1984");
+  networkWait(1500);
+}

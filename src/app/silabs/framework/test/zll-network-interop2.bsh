@@ -1,0 +1,120 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+if (runArgument.runUsingMultihop) {
+  std.print("****TODO: Fix for multi-hop****");
+  return;
+}
+
+SimulatedNetwork network = createNetwork();
+String[] devices = new String[]{
+                                "switch",
+                                "remote1",
+                                "bridge1",
+                                "bridge2",
+};
+
+String[] socImages = new String[] {
+  "build/af-test-apps/Z3Switch-simulation/Z3Switch",
+  "build/af-test-apps/ZllColorSceneRemote-simulation/ZllColorSceneRemote",
+  "build/af-test-apps/ZllControlBridgeZ3-simulation/ZllControlBridgeZ3",
+  "build/af-test-apps/ZllControlBridgeZ3-simulation/ZllControlBridgeZ3",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Z3Switch-simulation-ezsp/Z3Switch",
+  "build/af-test-apps/ZllColorSceneRemote-simulation-ezsp/ZllColorSceneRemote",
+  "build/af-test-apps/ZllControlBridgeZ3-simulation-ezsp/ZllControlBridgeZ3",
+  "build/af-test-apps/ZllControlBridgeZ3-simulation-ezsp/ZllControlBridgeZ3",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according to the runArguments provided.
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+setupEncryption();
+
+if (runArgument.runUsingMfgSecurityToken) {
+  for (i = 0; i < devices.length; i++) {
+    expectNoResponse(devices[i],
+                   "security mfg-token set 0xCABAD11F 0");
+    networkWait(2000);
+    expect(devices[i], 
+           "security mfg-token get",
+           "  Permissions: NONE");
+    networkWait(2000);
+  }
+}
+
+// Testing initiator functionality with initiator classically joined
+// to a distributed network.
+
+// THr1 forms distrib nwk, DUT (THc1) joins using nwk steering,
+// then attempts to touchlink THe1.
+// (testing DN-MAX-TC-03A, t/l to ZED by node in centralized nwk)
+
+// Make bridge1 form distrib nwk on ch 15.
+// NOTE - it will curr get random node and pan id's!
+send("bridge1", "plugin network-creator mask set 1 0");
+send("bridge1", "plugin network-creator mask set 2 0");
+send("bridge1", "plugin network-creator mask add 1 15");
+
+expect("bridge1", "plugin network-creator start 0", "EMBER_NETWORK_UP 0x....");
+networkWait(1000);
+
+// DUT (bridge2) joins on ch 15 - long timeout, cos it has to do centralized first
+send("bridge1", "plugin network-steering start 0");
+send("bridge2", "plugin network-steering start 0");
+expect("bridge2", "EMBER_NETWORK_UP 0x....", timeout * 20);
+expect("bridge2", "Network Steering Completed: Join Success \\(0x00\\)", timeout * 5);
+expect("bridge2", "Join Attempts: .");
+send("bridge1", "plugin zll-commissioning disable");
+
+// DUT (bridge2) attempts to touchlink remote1
+send("switch", "plugin zll-commissioning disable");
+send("bridge2", "plugin zll-commissioning link");
+expect("remote1", "EMBER_NETWORK_UP 0x....", timeout * 5);
+
+// DUT2 (switch) joins on ch 15 - long timeout, cos it has to do centralized first
+send("switch", "plugin zll-commissioning enable");
+send("switch", "plugin network-steering start 0");
+send("switch", "plugin network-steering start 0");
+expect("switch", "EMBER_NETWORK_UP 0x....", timeout * 20);
+expect("switch", "Find and bind initiator complete: 0x01", timeout * 10);
+
+// DUT2 (switch) attempts to touchlink remote1 - but remote1 is already joined,
+// with the same network id.
+send("bridge2", "plugin zll-commissioning disable");  // leave radio on - will parent remote1
+send("switch", "plugin zll-commissioning link");
+expect("switch", "Touchlink network complete: 0x00", timeout * 5);
+expect("switch", "Find and bind initiator complete: 0x01", timeout * 10);
+
+// Repeat, but kick remote1 off first
+expect("remote1", "plugin zll-commissioning reset", ".*EMBER_NETWORK_DOWN");   // make sure radio on
+expect("remote1", "ZllCommInit - device is not joined to a network");
+send("switch", "plugin zll-commissioning link");
+expect("remote1", "EMBER_NETWORK_UP 0x....", timeout * 5);
+expect("switch", "EMBER_NETWORK_UP 0x....", timeout * 5);
+expect("switch", "Touchlink network complete: 0x00");
+send("switch", "network id");
+send("remote1", "network id");
+networkWait(5000);
+
+// Repeat with a router target: 
+// DUT2 (switch) attempts to touchlink bridge1 - but 'bridge1' is already joined,
+// with the same network id.
+send("bridge1", "plugin zll-commissioning enable");
+send("remote1", "plugin zll-commissioning disable");
+send("switch", "plugin zll-commissioning link");
+expect("switch", "Touchlink network complete: 0x00", timeout * 5);
+expect("switch", "Find and bind initiator complete: 0x01", timeout * 10);
+
+// Repeat, but kick bridge1 off first (remote1 is parented by bridge2)
+expect("bridge1", "network leave", ".*EMBER_NETWORK_DOWN");
+send("bridge1", "plugin zll-commissioning reset");   // make sure radio on
+expect("bridge1", "ZllCommInit - device is not joined to a network");
+send("switch", "plugin zll-commissioning link");
+expect("bridge1", "EMBER_NETWORK_UP 0x....", timeout * 5);
+expect("switch", "EMBER_NETWORK_UP 0x....", timeout * 5);
+send("bridge1", "network id");
+send("switch", "network id");
+networkWait(5000);

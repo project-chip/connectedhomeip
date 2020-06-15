@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<cli>
+  <group id="plugin-manufacturing-library-cli" name="Plugin Commands: Manufacturing Library CLI">
+    <description>CLI commands related to the manufacturing library.</description>
+  </group>
+  <command cli="plugin mfglib start" functionName="emAfMfglibStartCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Start the mfglib test mode.      
+    </description>
+    <arg name="useCallback" type="BOOLEAN" description="Use the Rx callback."/>
+  </command>
+  <command cli="plugin mfglib stop" functionName="emAfMfglibStopCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Stop the mfglib test mode.
+    </description>
+  </command>
+  <command cli="plugin mfglib tone start" functionName="emAfMfglibToneStartCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Starts a tone test.
+    </description>
+  </command>
+  <command cli="plugin mfglib tone stop" functionName="emAfMfglibToneStopCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Stops the tone test.
+    </description>
+  </command>
+  <command cli="plugin mfglib status" functionName="emAfMfglibStatusCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Prints the current status of the manufacturing library.
+    </description>
+  </command>
+  <command cli="plugin mfglib set-channel" functionName="emAfMfglibSetChannelCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Sets the channel used by the manufacturing library for testing.
+    </description>
+    <arg name="channel" type="INT8U" description="The 802.15.4 channel number."/>
+  </command>
+  <command cli="plugin mfglib set-power" functionName="emAfMfglibSetPowerAndModeCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Set the power level and mode for the manufacturing test.
+    </description>
+    <arg name="powerLevel" type="INT8S" description="The power level"/>
+    <arg name="powerMode"  type="INT16U" description="The power mode"/>
+  </command>
+  <command cli="plugin mfglib stream start" functionName="emAfMfglibStreamStartCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Start the stream test.
+    </description>
+  </command>
+  <command cli="plugin mfglib stream stop" functionName="emAfMfglibStreamStopCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Stop the stream test.
+    </description>
+  </command>
+  <command cli="plugin mfglib send random" functionName="emAfMfglibSendCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Send a series of test packets with random data..
+    </description>
+    <arg name="numPackets" type="INT16U" description="The number of packets to send."/>
+    <arg name="length"     type="INT8U"  description="The length of the packet to send."/>
+  </command>
+  <command cli="plugin mfglib send test" functionName="emAfMfglibSendCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Send a series of test packets with fixed data.
+    </description>
+    <arg name="numPackets" type="INT16U" description="The number of packets to send."/>
+    <arg name="length"     type="INT8U"  description="The length of the packet to send."/>
+  </command>
+  <command cli="plugin mfglib send message" functionName="emAfMfglibSendMessageCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Send a test message with the specified data in it.
+    </description>
+    <arg name="data"  type="OCTET_STRING" description="The hex data to send, up to 16 bytes."/>
+    <arg name="numPackets" type="INT16U"  description="The number of packets to send."/>
+  </command>
+  <command cli="plugin mfglib sleep" functionName="emAfMfglibSleepCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Sleep.
+    </description>
+    <arg name="duration" type="INT16U" description = "Sleep duration (mS)." />
+  </command>
+  <command cli="plugin mfglib programEui" functionName="emAfMfglibProgramEuiCommand" group="plugin-manufacturing-library-cli">
+    <description>
+      Program EUI.
+    </description>
+    <arg name="duration" type="IEEE_ADDRESS" description = "IEEE address to program." />
+  </command>
+  <command cli="plugin mfglib mfgenable" functionName="emAfMfglibEnableMfglib" group="plugin-manufacturing-library-cli">
+    <description>
+      Enable mfglib.
+    </description>
+    <arg name="enabled" type="INT8U" description = "1 = enable, 0 = disable." />
+  </command>
+  <command cli="plugin mfglib set-options" functionName="emAfMfglibSetOptions" group="plugin-manufacturing-library-cli">
+    <description>
+      Sets options in the manufacturing library for testing.
+    </description>
+    <arg name="options" type="INT8U" description="The options bitmask (0 = normal transmit, 1 = CSMA transmit)."/>
+  </command>
+</cli>

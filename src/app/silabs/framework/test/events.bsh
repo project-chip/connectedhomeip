@@ -1,0 +1,182 @@
+import com.ember.peek.SimulatedNetwork;
+
+source("util.bsh");
+
+// Create two nodes in the network.
+SimulatedNetwork network = createNetwork();
+// esi: events client, meter: events server
+String[] devices = { "esi", "meter" };
+String[] socImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation/Se12Esi",
+  "build/af-test-apps/Se12Ihd-simulation/Se12Ihd",
+};
+String[] hostImages = new String[] {
+  "build/af-test-apps/Se12Esi-simulation-ezsp/Se12Esi",
+  "build/af-test-apps/Se12Ihd-simulation-ezsp/Se12Ihd",
+};
+String ncpImage = "app/ncp/sample-app/ncp-spi/simulation/build/exe/ncp-spi";
+
+// Create network and load devices according
+// to the runArguments provided
+addAndLoadDevices(devices, socImages, hostImages, ncpImage);
+
+// Form and join a network and set up encryption.
+int channel = 12;
+int power = 2;
+int panId = 0x1212;
+setNetworkParams(channel, power, panId);
+setupEncryption();
+formAndJoinDevices(devices);
+networkWait(timeout * 10); 
+
+String esiNodeId = nodeId("esi");
+String meterNodeId = nodeId("meter");
+
+// make sure event log is empty to begin while testing the ClearEventLog command
+send("esi", "zcl events clear-event-log 0x00");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: ClearEventLogRequest 0x00");
+expect("esi", "RX: ClearEventLogResponse 0x01");
+expect("meter", ".*clus 0x0709 \\(Events\\) FC 00 seq .. cmd 0B payload\\[02 00 \\]");
+
+send("meter", "plugin events-server print 0x01 0x00");
+expectMultiline("meter",
+                "", 
+                new String[] {
+                  ".*Log: 0x01 Total 0x00",
+                  "Log: 0x02 Total 0x00",
+                  "Log: 0x03 Total 0x00",
+                  "Log: 0x04 Total 0x00",
+                  "Log: 0x05 Total 0x00",
+                });
+
+// Add test Vectors - these are from the SE 1.2 Test Spec
+// NOTE: the order in which the events are added below does not match the order
+// from the test specification. All the data for each event is the same it's
+// just that I reordered them to that they are added in time sequence which should
+// be how applications add them anyway.
+send("meter", "plugin events-server add 0x01 0x01 0xFF01 0x00010000 \"Event 01 Log 01\"");
+expect("meter", ".*Event added to log 0x01 at index 0x00");
+send("meter", "plugin events-server add 0x01 0x01 0xFF02 0x00020000 \"Event 02 Log 01\"");
+expect("meter", ".*Event added to log 0x01 at index 0x01");
+send("meter", "plugin events-server add 0x01 0x02 0xFF01 0x00020000 \"Event 01 Log 02\"");
+expect("meter", ".*Event added to log 0x02 at index 0x00");
+send("meter", "plugin events-server add 0x01 0x02 0xFF03 0x00030000 \"Event 03 Log 02\"");
+expect("meter", ".*Event added to log 0x02 at index 0x01");
+send("meter", "plugin events-server add 0x01 0x02 0xFF04 0x00040000 \"Event 04 Log 02\"");
+expect("meter", ".*Event added to log 0x02 at index 0x02");
+
+send("meter", "plugin events-server print 0x01 0x00");
+expectMultiline("meter",
+                "", 
+                new String[] {
+                  ".*Log: 0x01 Total 0x02",
+                  "Log: 0x02 Total 0x03",
+                  "Log: 0x03 Total 0x00",
+                  "Log: 0x04 Total 0x00",
+                  "Log: 0x05 Total 0x00",
+                });
+
+// Read a Specific Event Log
+send("esi", "zcl events get-event-log 0x01 0x0000 0x00000000 0x0002FFFF 0x02 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x01, 0x0000, 0x00000000, 0x0002FFFF, 0x02, 0x0000");
+expect("esi", "RX: PublishEventLog 0x0002, 0x00, 0x01, 0x20 \\[0x01, 0xFF02, 0x00020000, 0x00\\] \\[0x01, 0xFF01, 0x00010000, 0x00\\]");
+
+// Read a Specific Event Log using Offset Mechanism
+send("esi", "zcl events get-event-log 0x01 0x0000 0x00000000 0x0002FFFF 0x01 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x01, 0x0000, 0x00000000, 0x0002FFFF, 0x01, 0x0000");
+expect("esi", "RX: PublishEventLog 0x0002, 0x00, 0x01, 0x10 \\[0x01, 0xFF02, 0x00020000, 0x00\\]");
+send("esi", "zcl events get-event-log 0x01 0x0000 0x00000000 0x0002FFFF 0x01 0x0001");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x01, 0x0000, 0x00000000, 0x0002FFFF, 0x01, 0x0001");
+expect("esi", "RX: PublishEventLog 0x0002, 0x00, 0x01, 0x10 \\[0x01, 0xFF01, 0x00010000, 0x00\\]");
+
+// Retrieve a Specific Event 1 (Minimal Information only)
+send("esi", "zcl events get-event-log 0x00 0xFF01 0x00000000 0x0004FFFF 0x00 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x00, 0xFF01, 0x00000000, 0x0004FFFF, 0x00, 0x0000");
+expect("esi", "RX: PublishEventLog 0x0002, 0x00, 0x01, 0x20 \\[0x02, 0xFF01, 0x00020000, 0x00\\] \\[0x01, 0xFF01, 0x00010000, 0x00\\]");
+
+// Retrieve a Specific Event 2 (Minimal Information only)
+send("esi", "zcl events get-event-log 0x00 0xFF01 0x00000000 0x00020000 0x00 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x00, 0xFF01, 0x00000000, 0x00020000, 0x00, 0x0000");
+expect("esi", "RX: PublishEventLog 0x0001, 0x00, 0x01, 0x10 \\[0x01, 0xFF01, 0x00010000, 0x00\\]");
+
+// Retrieve a Specific Event (All Information)
+send("esi", "zcl events get-event-log 0x12 0xFF04 0x00000000 0x0004FFFF 0x01 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x12, 0xFF04, 0x00000000, 0x0004FFFF, 0x01, 0x0000");
+expect("esi", "RX: PublishEventLog 0x0001, 0x00, 0x01, 0x10 \\[0x02, 0xFF04, 0x00040000, 0x0F, Event 04 Log 02\\]");
+
+// Retrieve Multiple Events across Multiple Logs (Minimal Information)
+send("esi", "zcl events get-event-log 0x00 0x0000 0x00000000 0x0004FFFF 0x04 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x00, 0x0000, 0x00000000, 0x0004FFFF, 0x04, 0x0000");
+expect("esi", "RX: PublishEventLog 0x0005, 0x00, 0x01, 0x40 \\[0x02, 0xFF04, 0x00040000, 0x00\\] \\[0x02, 0xFF03, 0x00030000, 0x00\\] \\[0x01, 0xFF02, 0x00020000, 0x00\\] \\[0x02, 0xFF01, 0x00020000, 0x00\\]");
+
+// Retrieve Multiple Events across Multiple Logs (All Information)
+send("esi", "zcl events get-event-log 0x10 0x0000 0x00000000 0x00040000 0x04 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x10, 0x0000, 0x00000000, 0x00040000, 0x04, 0x0000");
+expect("esi", "RX: PublishEventLog 0x0004, 0x00, 0x01, 0x40 \\[0x02, 0xFF03, 0x00030000, 0x0F, Event 03 Log 02\\] \\[0x01, 0xFF02, 0x00020000, 0x0F, Event 02 Log 01\\] \\[0x02, 0xFF01, 0x00020000, 0x0F, Event 01 Log 02\\] \\[0x01, 0xFF01, 0x00010000, 0x0F, Event 01 Log 01\\]");
+
+// Clear Event Log
+send("esi", "zcl events clear-event-log 0x01");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: ClearEventLogRequest 0x01");
+expect("esi", "RX: ClearEventLogResponse 0x02");
+expect("meter", ".*clus 0x0709 \\(Events\\) FC 00 seq .. cmd 0B payload\\[02 00 \\]");
+send("esi", "zcl events get-event-log 0x01 0x0000 0x00000000 0x0004FFFF 0x02 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x01, 0x0000, 0x00000000, 0x0004FFFF, 0x02, 0x0000");
+expect("esi", ".*clus 0x0709 \\(Events\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+// Publish Unsolicited "HAN" Event from the Events Cluster Server Device
+send("meter", "plugin events-server publish " + esiNodeId + " 0x01 0x01 0x02 0x00 0x01");
+expect("esi", "RX: PublishEvent 0x02, 0xFF01, 0x00020000, 0x01, 0x0F, Event 01 Log 02");
+
+// Publish Unsolicited "WAN" Event from the Events Cluster Server Device
+send("meter", "plugin events-server publish " + esiNodeId + " 0x01 0x01 0x02 0x00 0x02");
+expect("esi", "RX: PublishEvent 0x02, 0xFF01, 0x00020000, 0x02, 0x0F, Event 01 Log 02");
+
+// Client Device Attempts to Retrieve a Non-existent Event
+send("esi", "zcl events get-event-log 0x00 0xFF0F 0x00000000 0x0004FFFF 0x01 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x00, 0xFF0F, 0x00000000, 0x0004FFFF, 0x01, 0x0000");
+expect("esi", ".*clus 0x0709 \\(Events\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+// Client Device Attempts to Retrieve an Event from a Non-existent Log
+send("esi", "zcl events get-event-log 0x0F 0xFF01 0x00000000 0x0004FFFF 0x01 0x0000");
+send("esi", "send " + meterNodeId + " 0x01 0x01");
+expect("meter", ".*RX: GetEventLog 0x0F, 0xFF01, 0x00000000, 0x0004FFFF, 0x01, 0x0000");
+expect("esi", ".*clus 0x0709 \\(Events\\) FC 08 seq .. cmd 0B payload\\[00 8B \\]");
+
+// Test other miscellaneous commands
+send("meter", "plugin events-server clear 0x01 0x02");
+send("meter", "plugin events-server print 0x01 0x00");
+expectMultiline("meter",
+                "", 
+                new String[] {
+                  ".*Log: 0x01 Total 0x00",
+                  "Log: 0x02 Total 0x00",
+                  "Log: 0x03 Total 0x00",
+                  "Log: 0x04 Total 0x00",
+                  "Log: 0x05 Total 0x00",
+                });
+send("meter", "plugin events-server set 0x01 0x01 0x02 0xFF01 0x00010000 \"Event 01 Log 01\"");
+expect("meter", ".*Event added to log 0x01 at index 0x02");
+send("meter", "plugin events-server eprint 0x01 0x01 0x02");
+expectMultiline("meter",
+                "", 
+                new String[] {
+                  ".*Event at index 0x02 in log 0x01",
+                  "       eventId: 0xFF01",
+                  "     eventTime: 0x00010000",
+                  "  eventDataLen: 0x0F",
+                  "     eventData: Event 01 Log 01",
+                });
+
+networkWait(timeout * 10); 
