@@ -155,13 +155,16 @@ protected:
 protected:
     nw_connection_t mConnection;
     dispatch_queue_t mDispatchQueue;
+    dispatch_semaphore_t mDispatchSemaphore;
 
     INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters);
     INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
+    INET_ERROR StartListener(nw_listener_t aListener);
+    INET_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     void GetPacketInfo(nw_connection_t aConnection, IPPacketInfo * aPacketInfo);
     void HandleDataReceived(nw_connection_t aConnection);
-    INET_ERROR GetConnection(const IPPacketInfo * aPktInfo, nw_connection_t * aConnection);
-    void ReleaseConnection(nw_connection_t connection);
+    void StartConnection(nw_connection_t aConnection);
+    void ReleaseConnection(nw_connection_t aConnection);
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 private:

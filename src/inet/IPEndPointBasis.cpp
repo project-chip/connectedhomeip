@@ -1158,6 +1158,7 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
     nw_release(endpoint);
 
     mDispatchQueue = dispatch_queue_create("inet", DISPATCH_QUEUE_CONCURRENT);
+    mDispatchSemaphore = dispatch_semaphore_create(0);
     mAddrType = aAddressType;
 
     return INET_NO_ERROR;
@@ -1167,7 +1168,7 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 {
     INET_ERROR res = INET_NO_ERROR;
     dispatch_data_t content;
-    __block int send_error_code;
+    __block int send_error_code = 0;
     dispatch_semaphore_t send_semaphore = dispatch_semaphore_create(0);
 
     // Ensure the destination address type is compatible with the endpoint address type.
@@ -1176,7 +1177,7 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     // For now the entire message must fit within a single buffer.
     VerifyOrExit(aBuffer->Next() == NULL, res = INET_ERROR_MESSAGE_TOO_LONG);
 
-    res = GetConnection(aPktInfo, &mConnection);
+    res = GetConnection(aPktInfo);
     SuccessOrExit(res);
 
     content = dispatch_data_create(aBuffer->Start(), aBuffer->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
@@ -1250,7 +1251,7 @@ void IPEndPointBasis::GetPacketInfo(nw_connection_t aConnection, IPPacketInfo * 
     aPacketInfo->DestPort = nw_endpoint_get_port(local_endpoint);
 }
 
-INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo, nw_connection_t * aConnection)
+INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
 {
     INET_ERROR res = INET_NO_ERROR;
     nw_endpoint_t endpoint;
@@ -1285,7 +1286,6 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo, nw_conn
 
         if (aPktInfo->DestPort == remote_port && aPktInfo->DestAddress == remote_address)
         {
-            aConnection = &mConnection;
             goto exit;
         }
         else
@@ -1298,39 +1298,105 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo, nw_conn
     VerifyOrExit(endpoint != NULL, res = INET_ERROR_INCORRECT_STATE);
 
     connection = nw_connection_create(endpoint, mParameters);
+    nw_release(endpoint);
+
     if (connection == NULL)
     {
-        nw_release(endpoint);
         res = INET_ERROR_INCORRECT_STATE;
         goto exit;
     }
 
-    nw_connection_set_queue(connection, mDispatchQueue);
-    nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
-        if (state == nw_connection_state_waiting)
+    StartConnection(connection);
+exit:
+    return res;
+}
+
+INET_ERROR IPEndPointBasis::StartListener(nw_listener_t aListener)
+{
+    INET_ERROR res = INET_NO_ERROR;
+
+    __block int listener_error_code = 0;
+
+    nw_listener_set_queue(aListener, mDispatchQueue);
+
+    nw_retain(aListener);
+
+    nw_listener_set_new_connection_handler(aListener, ^(nw_connection_t connection) {
+        ReleaseConnection(mConnection);
+        StartConnection(connection);
+    });
+
+    nw_listener_set_state_changed_handler(aListener, ^(nw_listener_state_t state, nw_error_t error) {
+        if (state == nw_listener_state_waiting)
         {
-            printf("State: Waiting\n");
+            printf("Listener: Waiting (port: %u)\n", nw_listener_get_port(aListener));
         }
-        else if (state == nw_connection_state_failed)
+        else if (state == nw_listener_state_failed)
         {
-            printf("State: Failed\n");
+            listener_error_code = nw_error_get_error_code(error);
+            printf("Listener: Failed (%d)\n", listener_error_code);
+            nw_listener_cancel(aListener);
+            dispatch_semaphore_signal(mDispatchSemaphore);
         }
-        else if (state == nw_connection_state_ready)
+        else if (state == nw_listener_state_ready)
         {
-            printf("State: Ready\n");
+            printf("Listener: Ready (port: %u)\n", nw_listener_get_port(aListener));
+            dispatch_semaphore_signal(mDispatchSemaphore);
         }
-        else if (state == nw_connection_state_cancelled)
+        else if (state == nw_listener_state_cancelled)
         {
-            printf("State: Cancelled\n");
+            printf("Listener: Cancelled\n");
+            nw_release(aListener);
         }
     });
 
-    *aConnection = connection;
-    HandleDataReceived(connection);
-    nw_connection_start(connection);
-    nw_release(endpoint);
+    nw_listener_start(aListener);
+    dispatch_semaphore_wait(mDispatchSemaphore, DISPATCH_TIME_FOREVER);
+
+    // TODO Be more specific on the encountered error
+    VerifyOrExit(listener_error_code == 0, res = INET_ERROR_INCORRECT_STATE);
+
 exit:
     return res;
+}
+
+void IPEndPointBasis::StartConnection(nw_connection_t aConnection)
+{
+    nw_connection_set_queue(aConnection, mDispatchQueue);
+
+    nw_retain(aConnection);
+    nw_connection_set_state_changed_handler(aConnection, ^(nw_connection_state_t state, nw_error_t error) {
+        nw_endpoint_t endpoint = nw_connection_copy_endpoint(aConnection);
+        uint16_t port = nw_endpoint_get_port(endpoint);
+
+        if (state == nw_connection_state_waiting)
+        {
+            printf("State: Waiting (%u)\n", port);
+        }
+        else if (state == nw_connection_state_failed)
+        {
+            printf("State: Failed (%u)\n", port);
+            dispatch_semaphore_signal(mDispatchSemaphore);
+        }
+        else if (state == nw_connection_state_ready)
+        {
+            printf("State: Ready (%u)\n", port);
+            dispatch_semaphore_signal(mDispatchSemaphore);
+        }
+        else if (state == nw_connection_state_cancelled)
+        {
+            printf("State: Cancelled (%u)\n", port);
+            nw_release(aConnection);
+            dispatch_semaphore_signal(mDispatchSemaphore);
+        }
+    });
+
+    nw_connection_start(aConnection);
+
+    dispatch_semaphore_wait(mDispatchSemaphore, DISPATCH_TIME_FOREVER);
+
+    mConnection = aConnection;
+    HandleDataReceived(aConnection);
 }
 
 void IPEndPointBasis::ReleaseConnection(nw_connection_t aConnection)
@@ -1338,6 +1404,7 @@ void IPEndPointBasis::ReleaseConnection(nw_connection_t aConnection)
     if (aConnection)
     {
       nw_connection_cancel(aConnection);
+      dispatch_semaphore_wait(mDispatchSemaphore, DISPATCH_TIME_FOREVER);
       aConnection = NULL;
     }
 }
