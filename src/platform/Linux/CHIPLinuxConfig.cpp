@@ -57,7 +57,7 @@ CHIP_ERROR ChipLinuxConfig::GetDefaultSession(std::map<std::string, std::string>
         retval = CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    return retval; 
+    return retval;
 }
 
 CHIP_ERROR ChipLinuxConfig::AddConfig(const char * configFile)
@@ -121,7 +121,7 @@ CHIP_ERROR ChipLinuxConfig::GetUIntValue(const char * key, uint32_t & val)
         else
         {
             retval = CHIP_ERROR_KEY_NOT_FOUND;
-        }  
+        }
     }
 
     return retval;
