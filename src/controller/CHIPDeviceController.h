@@ -32,7 +32,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
-#include <transport/SecureTransport.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
 namespace chip {
@@ -159,7 +159,7 @@ private:
 
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
-    SecureTransport * mDeviceCon;
+    SecureSessionMgr * mDeviceCon;
 
     ConnectionState mConState;
     void * mAppReqState;

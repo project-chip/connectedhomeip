@@ -18,14 +18,14 @@
 
 /**
  *    @file
- *      This file implements the CHIP Secure Channel object.
+ *      This file implements the CHIP Secure Session object.
  *
  */
 
 #include <core/CHIPEncoding.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CodeUtils.h>
-#include <transport/CHIPSecureChannel.h>
+#include <transport/SecureSession.h>
 
 #include <string.h>
 
@@ -40,12 +40,11 @@ typedef struct
     uint64_t tag;
 } security_header_t;
 
-ChipSecureChannel::ChipSecureChannel() : mKeyAvailable(false), mNextIV(0) {}
+SecureSession::SecureSession() : mKeyAvailable(false), mNextIV(0) {}
 
-CHIP_ERROR ChipSecureChannel::Init(const unsigned char * remote_public_key, const size_t public_key_length,
-                                   const unsigned char * local_private_key, const size_t private_key_length,
-                                   const unsigned char * salt, const size_t salt_length, const unsigned char * info,
-                                   const size_t info_length)
+CHIP_ERROR SecureSession::Init(const unsigned char * remote_public_key, const size_t public_key_length,
+                               const unsigned char * local_private_key, const size_t private_key_length, const unsigned char * salt,
+                               const size_t salt_length, const unsigned char * info, const size_t info_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t secret[kMax_ECDH_Secret_Length];
@@ -77,14 +76,13 @@ exit:
     return error;
 }
 
-void ChipSecureChannel::Close(void)
+void SecureSession::Close(void)
 {
     mKeyAvailable = false;
     mNextIV       = 0;
 }
 
-CHIP_ERROR ChipSecureChannel::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output,
-                                      size_t output_length)
+CHIP_ERROR SecureSession::Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t output_length)
 {
     security_header_t header;
 
@@ -118,8 +116,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR ChipSecureChannel::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output,
-                                      size_t & output_length)
+CHIP_ERROR SecureSession::Decrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t & output_length)
 {
     security_header_t header;
 
@@ -153,7 +150,7 @@ exit:
     return error;
 }
 
-size_t ChipSecureChannel::EncryptionOverhead(void)
+size_t SecureSession::EncryptionOverhead(void)
 {
     return sizeof(security_header_t);
 }

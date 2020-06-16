@@ -140,7 +140,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     mDeviceAddr     = deviceAddr;
     mDevicePort     = devicePort;
     mAppReqState    = appReqState;
-    mDeviceCon      = new SecureTransport();
+    mDeviceCon      = new SecureSessionMgr();
 
     err = mDeviceCon->Init(mLocalDeviceId, mInetLayer, Transport::UdpListenParameters().SetAddressType(deviceAddr.Type()));
     SuccessOrExit(err);
