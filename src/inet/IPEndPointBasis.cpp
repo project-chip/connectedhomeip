@@ -1122,12 +1122,45 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+INET_ERROR IPEndPointBasis::ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters)
+{
+    INET_ERROR res = INET_NO_ERROR;
+
+    nw_protocol_stack_t protocolStack = nw_parameters_copy_default_protocol_stack(aParameters);
+    nw_protocol_options_t ipOptions   = nw_protocol_stack_copy_internet_protocol(protocolStack);
+
+    switch (aAddressType)
+    {
+
+    case kIPAddressType_IPv6:
+        nw_ip_options_set_version(ipOptions, nw_ip_version_6);
+        break;
+
+#if INET_CONFIG_ENABLE_IPV4
+    case kIPAddressType_IPv4:
+        nw_ip_options_set_version(ipOptions, nw_ip_version_4);
+        break;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    default:
+        res = INET_ERROR_WRONG_ADDRESS_TYPE;
+        break;
+    }
+    nw_release(ipOptions);
+    nw_release(protocolStack);
+
+    return res;
+}
+
 INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters)
 {
     INET_ERROR res         = INET_NO_ERROR;
     nw_endpoint_t endpoint = nullptr;
 
     VerifyOrExit(aParameters != NULL, res = INET_ERROR_BAD_ARGS);
+
+    res = ConfigureProtocol(aAddressType, aParameters);
+    SuccessOrExit(res);
 
     res = GetEndPoint(endpoint, aAddress, aPort);
     SuccessOrExit(res);

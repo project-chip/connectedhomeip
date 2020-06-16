@@ -158,6 +158,7 @@ protected:
     dispatch_semaphore_t mDispatchSemaphore;
 
     INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, nw_parameters_t aParameters);
+    INET_ERROR ConfigureProtocol(IPAddressType aAddressType, nw_parameters_t aParameters);
     INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
     INET_ERROR StartListener(nw_listener_t aListener);
     INET_ERROR GetConnection(const IPPacketInfo * aPktInfo);
