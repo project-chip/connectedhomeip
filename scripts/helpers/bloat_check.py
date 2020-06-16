@@ -140,8 +140,11 @@ def main():
         'Required arguments missing. Please specify at least job and token.')
     return
 
-  ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
-                                          args.artifact_download_dir)
+  try:
+    ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
+                                            args.artifact_download_dir)
+  except Exception as e:
+    logging.warning('Failed to fetch artifacts: %r', e)
 
   generateBloatReport(
       args.report_file,
