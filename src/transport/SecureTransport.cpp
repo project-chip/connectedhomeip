@@ -166,7 +166,7 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
     SecureTransport * connection = (SecureTransport *) udpEndPoint->AppState;
 
     // TODO this is where messages should be decoded
-    if (connection->StateAllowsReceive() && msg != NULL)
+    if (connection->StateAllowsReceive() && msg != nullptr)
     {
         uint8_t * encryptedText = msg->Start();
         uint16_t encryptedLen   = msg->TotalLength();
@@ -178,7 +178,7 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
             return;
         }
 
-        chip::System::PacketBuffer * origMsg = NULL;
+        chip::System::PacketBuffer * origMsg = nullptr;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not allocated
            as an inline buffer to PacketBuffer structure */
@@ -192,7 +192,7 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
 
         CHIP_ERROR err = connection->mSecureChannel.Decrypt(encryptedText, encryptedLen, plainText, plainTextlen);
 
-        if (origMsg != NULL)
+        if (origMsg != nullptr)
         {
             PacketBuffer::Free(origMsg);
         }
@@ -208,6 +208,11 @@ void SecureTransport::HandleDataReceived(IPEndPointBasis * endPoint, chip::Syste
             PacketBuffer::Free(msg);
             ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err);
         }
+    }
+    else if (msg != nullptr)
+    {
+        PacketBuffer::Free(msg);
+        ChipLogProgress(Inet, "Secure transport failed: state not allows receive");
     }
 }
 
