@@ -41,7 +41,7 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureTransport.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
 #include "DataModelHandler.h"
@@ -86,7 +86,7 @@ exit:
     return isPrintable;
 }
 
-void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & packet_info, SecureTransport * transport)
+void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & packet_info, SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
 
@@ -107,7 +107,7 @@ exit:
 
 // Transport Callbacks
 void echo(const MessageHeader & header, const IPPacketInfo & packet_info, System::PacketBuffer * buffer,
-          SecureTransport * transport)
+          SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
     const size_t data_len = buffer->DataLength();
@@ -163,7 +163,7 @@ exit:
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void setupTransport(IPAddressType type, SecureTransport * transport)
+void setupTransport(IPAddressType type, SecureSessionMgr * transport)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     struct netif * netif = NULL;
@@ -191,7 +191,7 @@ exit:
 }
 
 // The echo server assumes the platform's networking has been setup already
-void startServer(SecureTransport * transport_ipv4, SecureTransport * transport_ipv6)
+void startServer(SecureSessionMgr * transport_ipv4, SecureSessionMgr * transport_ipv6)
 {
     setupTransport(kIPAddressType_IPv6, transport_ipv6);
     setupTransport(kIPAddressType_IPv4, transport_ipv4);

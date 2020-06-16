@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef __SECURETRANSPORT_H__
-#define __SECURETRANSPORT_H__
+#ifndef __SECURESESSIONMGR_H__
+#define __SECURESESSIONMGR_H__
 
 #include <utility>
 
@@ -32,15 +32,15 @@
 #include <core/ReferenceCounted.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
-#include <transport/CHIPSecureChannel.h>
 #include <transport/PeerConnectionState.h>
+#include <transport/SecureSession.h>
 #include <transport/UDP.h>
 
 namespace chip {
 
 using namespace System;
 
-class DLL_EXPORT SecureTransport : public ReferenceCounted<SecureTransport>
+class DLL_EXPORT SecureSessionMgr : public ReferenceCounted<SecureSessionMgr>
 {
 public:
     /**
@@ -99,8 +99,8 @@ public:
      */
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
 
-    SecureTransport();
-    virtual ~SecureTransport() {}
+    SecureSessionMgr();
+    virtual ~SecureSessionMgr() {}
 
     /**
      * Sets the message receive handler and associated argument
@@ -152,7 +152,7 @@ private:
     Transport::PeerConnectionState mConnectionState;
     NodeId mLocalNodeId;
     State mState;
-    ChipSecureChannel mSecureChannel;
+    SecureSession mSecureChannel;
 
     bool StateAllowsSend(void) const { return mState != State::kNotReady; }
     bool StateAllowsReceive(void) const { return mState == State::kSecureConnected; }
@@ -175,9 +175,9 @@ private:
     void * mNewConnectionArgument        = nullptr; ///< Argument for callback
 
     static void HandleDataReceived(const MessageHeader & header, const Inet::IPPacketInfo & source, System::PacketBuffer * msgBuf,
-                                   SecureTransport * transport);
+                                   SecureSessionMgr * transport);
 };
 
 } // namespace chip
 
-#endif // __SECURETRANSPORT_H__
+#endif // __SECURESESSIONMGR_H__

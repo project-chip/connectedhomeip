@@ -35,12 +35,12 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
-#include <transport/SecureTransport.h>
+#include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(SecureTransport * transportIPv4, SecureTransport * transportIPv6);
+extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
 extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
@@ -170,7 +170,7 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    SecureTransport sTransportIPv4, sTransportIPv6;
+    SecureSessionMgr sTransportIPv4, sTransportIPv6;
     startServer(&sTransportIPv4, &sTransportIPv6);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();

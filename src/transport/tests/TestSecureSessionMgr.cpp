@@ -18,14 +18,14 @@
 
 /**
  *    @file
- *      This file implements unit tests for the SecureTransport implementation.
+ *      This file implements unit tests for the SecureSessionMgr implementation.
  */
 
 #include "TestTransportLayer.h"
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
-#include <transport/SecureTransport.h>
+#include <transport/SecureSessionMgr.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -136,7 +136,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    SecureTransport conn;
+    SecureSessionMgr conn;
     CHIP_ERROR err;
 
     err = conn.Init(kSourceNodeId, &ctx.mInetLayer, Transport::UdpListenParameters());
@@ -157,7 +157,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SecureTransport conn;
+    SecureSessionMgr conn;
 
     err = conn.Init(kSourceNodeId, &ctx.mInetLayer, Transport::UdpListenParameters().SetAddressType(addr.Type()));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -252,7 +252,7 @@ static int Finalize(void * aContext)
 /**
  *  Main
  */
-int TestSecureTransport()
+int TestSecureSessionMgr()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);

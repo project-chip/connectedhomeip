@@ -27,7 +27,7 @@
 #include <string.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/SecureTransport.h>
+#include <transport/SecureSessionMgr.h>
 
 #include <inttypes.h>
 
@@ -39,12 +39,12 @@ namespace chip {
 static const size_t kMax_SecureSDU_Length         = 1024;
 static const char * kManualKeyExchangeChannelInfo = "Manual Key Exchanged Channel";
 
-SecureTransport::SecureTransport() : mConnectionState(Transport::PeerAddress::Uninitialized()), mState(State::kNotReady)
+SecureSessionMgr::SecureSessionMgr() : mConnectionState(Transport::PeerAddress::Uninitialized()), mState(State::kNotReady)
 {
     OnMessageReceived = NULL;
 }
 
-CHIP_ERROR SecureTransport::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
+CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
@@ -60,7 +60,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureTransport::Connect(NodeId peerNodeId, const Transport::PeerAddress & peerAddress)
+CHIP_ERROR SecureSessionMgr::Connect(NodeId peerNodeId, const Transport::PeerAddress & peerAddress)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -75,8 +75,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureTransport::ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
-                                              const unsigned char * local_private_key, const size_t private_key_length)
+CHIP_ERROR SecureSessionMgr::ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
+                                               const unsigned char * local_private_key, const size_t private_key_length)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     size_t info_len = strlen(kManualKeyExchangeChannelInfo);
@@ -92,7 +92,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureTransport::SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -146,8 +146,8 @@ exit:
     return err;
 }
 
-void SecureTransport::HandleDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
-                                         SecureTransport * connection)
+void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
+                                          SecureSessionMgr * connection)
 {
     // TODO: actual key exchange should happen here
     if (!connection->StateAllowsReceive())
