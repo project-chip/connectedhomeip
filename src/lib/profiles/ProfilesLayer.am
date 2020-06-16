@@ -1,7 +1,5 @@
 #
 #    Copyright (c) 2020 Project CHIP Authors
-#    Copyright (c) 2018 Nest Labs, Inc.
-#    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -15,22 +13,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
+#
 #    Description:
-#      Some useful defaults for the demo app configuration.
+#      This file is the GNU automake template for the CHIP Support library.
+#
+#      These sources are shared by other SDK makefiles and consequently
+#      must be anchored relative to the top build directory.
 #
 
 
-# Default to 921600 baud when flashing and monitoring device
-CONFIG_ESPTOOLPY_BAUD_921600B=y
-CONFIG_ESPTOOLPY_BAUD=921600
-CONFIG_ESPTOOLPY_COMPRESSED=y
-CONFIG_MONITOR_BAUD_115200B=y
-CONFIG_MONITOR_BAUD=115200
-
-#enable lwip ipv6 autoconfig
-CONFIG_LWIP_IPV6_AUTOCONFIG=y
-
-# Use a custom partition table
-CONFIG_PARTITION_TABLE_CUSTOM=y
-CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
-
+CHIP_BUILD_PROFILES_LAYER_HEADER_FILES                        = \
+    @top_builddir@/src/lib/profiles/CHIPProfiles.h              \
+    $(NULL)

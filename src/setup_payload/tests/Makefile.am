@@ -49,8 +49,9 @@ libSetupPayloadTests_a_SOURCES                 = \
 libSetupPayloadTests_adir                      = $(includedir)/setup_payload
 
 dist_libSetupPayloadTests_a_HEADERS            = \
-    TestQRCode.h                                 \
+    TestHelpers.h                                \
     TestManualCode.h                             \
+    TestQRCode.h                                 \
     TestQRCodeTLV.h                              \
     $(NULL)
 

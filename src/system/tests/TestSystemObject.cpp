@@ -39,11 +39,14 @@
 
 #include <system/SystemLayer.h>
 
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/init.h>
 #include <lwip/tcpip.h>
 #include <lwip/sys.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -490,7 +493,7 @@ static int Initialize(void * aContext)
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
     void * lLayerContext   = NULL;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     if (sLwIPEventQueue == NULL)
@@ -530,4 +533,9 @@ int TestSystemObject(void)
     nlTestRunner(&sTestSuite, &chip::System::sContext);
 
     return nlTestRunnerStats(&sTestSuite);
+}
+
+static void __attribute__((constructor)) TestSystemObjectCtor(void)
+{
+    VerifyOrDie(chip::RegisterUnitTests(&TestSystemObject) == CHIP_NO_ERROR);
 }

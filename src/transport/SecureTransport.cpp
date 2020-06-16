@@ -118,7 +118,7 @@ void SecureTransport::HandleDataReceived(const MessageHeader & header, const IPP
                                          SecureTransport * connection)
 {
     // TODO this is where messages should be decoded
-    if (connection->StateAllowsReceive() && msg != NULL)
+    if (connection->StateAllowsReceive() && msg != nullptr)
     {
         uint8_t * encryptedText = msg->Start();
         uint16_t encryptedLen   = msg->TotalLength();
@@ -130,7 +130,7 @@ void SecureTransport::HandleDataReceived(const MessageHeader & header, const IPP
             return;
         }
 
-        chip::System::PacketBuffer * origMsg = NULL;
+        chip::System::PacketBuffer * origMsg = nullptr;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not allocated
            as an inline buffer to PacketBuffer structure */
@@ -144,7 +144,7 @@ void SecureTransport::HandleDataReceived(const MessageHeader & header, const IPP
 
         CHIP_ERROR err = connection->mSecureChannel.Decrypt(encryptedText, encryptedLen, plainText, plainTextlen);
 
-        if (origMsg != NULL)
+        if (origMsg != nullptr)
         {
             PacketBuffer::Free(origMsg);
         }
@@ -159,6 +159,11 @@ void SecureTransport::HandleDataReceived(const MessageHeader & header, const IPP
             PacketBuffer::Free(msg);
             ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err);
         }
+    }
+    else if (msg != nullptr)
+    {
+        PacketBuffer::Free(msg);
+        ChipLogProgress(Inet, "Secure transport failed: state not allows receive");
     }
 }
 

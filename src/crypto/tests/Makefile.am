@@ -92,7 +92,7 @@ check_SCRIPTS                                  = \
 TESTS_ENVIRONMENT                              = \
     $(NULL)
 
-if CHIP_TARGET_STYLE_EMBEDDED
+if CHIP_DEVICE_LAYER_TARGET_ESP32
 
 check_SCRIPTS                                 += \
     qemu_crypto_tests.sh                         \
@@ -104,13 +104,13 @@ TESTS_ENVIRONMENT                             += \
     QEMU_TEST_TARGET=libCryptoLayerTests.a       \
     $(NULL)
 
-else # CHIP_TARGET_STYLE_EMBEDDED
+else # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 check_PROGRAMS                                += \
     TestCryptoPAL                                \
     $(NULL)
 
-endif # CHIP_TARGET_STYLE_EMBEDDED
+endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
