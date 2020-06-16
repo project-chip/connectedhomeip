@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/tests.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/tests.gni")
 import("system.gni")
 
 declare_args() {
@@ -32,7 +34,7 @@ declare_args() {
 }
 
 config("system_config") {
-  configs = [ "//src:includes" ]
+  configs = [ "${chip_root}/src:includes" ]
 
   defines = []
   if (chip_project_config_include != "") {
@@ -107,7 +109,7 @@ source_set("system_config_header") {
   public_deps = []
 
   if (chip_system_config_use_lwip) {
-    public_deps += [ "//src/lwip" ]
+    public_deps += [ "${chip_root}/src/lwip" ]
   }
 }
 
@@ -138,12 +140,12 @@ source_set("system") {
   ]
 
   public_deps = [
-    "//src/lib/support",
-    "//third_party/nlassert",
+    "${chip_root}/src/lib/support",
+    "${nlassert_root}:nlassert",
   ]
 
   if (chip_with_nlfaultinjection) {
     sources += [ "SystemFaultInjection.cpp" ]
-    public_deps += [ "//third_party/nlfaultinjection" ]
+    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 }

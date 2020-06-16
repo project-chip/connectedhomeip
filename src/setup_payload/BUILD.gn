@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 config("setup_payload_config") {
   include_dirs = [ "." ]
 }
@@ -35,8 +37,8 @@ static_library("setup_payload") {
   ]
 
   public_deps = [
-    "//src/lib/core",
-    "//src/lib/support",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 
   public_configs = [ ":setup_payload_config" ]

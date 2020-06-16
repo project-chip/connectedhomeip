@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 import("crypto.gni")
 
 config("crypto_config") {
@@ -41,15 +43,15 @@ source_set("crypto") {
   sources = [ "CHIPCryptoPAL.h" ]
 
   public_deps = [
-    "//src/lib/core",
-    "//third_party/nlassert",
+    "${chip_root}/src/lib/core",
+    "${nlassert_root}:nlassert",
   ]
 
   public_configs = [":crypto_config"]
 
   if (chip_crypto == "mbedtls") {
     sources += [ "CHIPCryptoPALmbedTLS.cpp" ]
-    public_deps += [ "//third_party/mbedtls" ]
+    public_deps += [ "${mbedtls_root}:mbedtls" ]
   } else if (chip_crypto == "openssl") {
     sources += [ "CHIPCryptoPALOpenSSL.cpp" ]
     public_configs += [ ":openssl_config" ]

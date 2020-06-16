@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/device.gni")
-import("//third_party/nrf5_sdk/nrf5_sdk.gni")
+import("//build_overrides/nrf5_sdk.gni")
 
-assert(device_platform == "nrf5")
+import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
 
 declare_args() {
   # Build target to use for nRF5 SDK. Use this to set global SDK defines.

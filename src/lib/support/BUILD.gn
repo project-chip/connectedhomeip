@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/chip_version.gni")
-import("//build/tests.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip_version.gni")
+import("${chip_root}/build/tests.gni")
 
 action("gen_chip_version") {
-  script = "//scripts/gen_chip_version.py"
+  script = "${chip_root}/scripts/gen_chip_version.py"
 
   version_file = "${target_gen_dir}/CHIPVersion.h"
   outputs = [ version_file ]
@@ -37,9 +39,9 @@ source_set("chip_version_header") {
 
 config("support_config") {
   configs = [
-    "//src:includes",
-    "//src/lib:includes",
-    "//src/system:system_config",
+    "${chip_root}/src:includes",
+    "${chip_root}/src/lib:includes",
+    "${chip_root}/src/system:system_config",
   ]
 
   include_dirs = [ target_gen_dir ]
@@ -79,8 +81,8 @@ static_library("support") {
 
   public_deps = [
     ":chip_version_header",
-    "//src/lib/core:chip_config_header",
-    "//third_party/nlassert",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${nlassert_root}:nlassert",
   ]
 
   public_configs = [ ":support_config" ]
@@ -90,6 +92,6 @@ static_library("support") {
       "CHIPFaultInjection.cpp",
       "CHIPFaultInjection.h",
     ]
-    public_deps += [ "//third_party/nlfaultinjection" ]
+    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 }

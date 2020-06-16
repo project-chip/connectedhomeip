@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/chip_test_suite.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   common_sources = [
@@ -28,10 +30,10 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
-    "//src/app/plugin:mock",
-    "//src/inet",
-    "//src/system",
-    "//third_party/nlunit-test",
+    "${chip_root}/src/app/plugin:mock",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/system",
+    "${nlunit_test_root}:nlunit-test",
   ]
 
   c_tests = [ "ChipZclUnitTests" ]
