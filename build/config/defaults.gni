@@ -18,6 +18,9 @@ import("//build/config/compiler/compiler.gni")
 import("//build/config/custom_toolchain.gni")
 
 declare_args() {
+  # Default configs for abi.
+  default_configs_abi = [ "${chip_root}/build/config/compiler:abi_default" ]
+
   # Default configs for debugging.
   default_configs_debug = [ "${chip_root}/build/config/compiler:debug_default" ]
 
@@ -80,6 +83,7 @@ declare_args() {
 }
 
 default_configs = []
+default_configs += default_configs_abi
 default_configs += default_configs_debug
 default_configs += default_configs_optimize
 default_configs += default_configs_std
