@@ -33,6 +33,12 @@ extern "C" {
 using namespace ::chip;
 using namespace ::chip::Inet;
 
+// NOTE: Remote device ID is in sync with the echo server device id
+//       At some point, we may want to add an option to connect to a device without
+//       knowing its id, because the ID can be learned on the first response that is received.
+constexpr NodeId kLocalDeviceId  = 112233;
+constexpr NodeId kRemoteDeviceId = 12344321;
+
 static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
 
 // Device Manager Callbacks
@@ -297,6 +303,7 @@ int main(int argc, char * argv[])
     IPAddress host_addr;
     uint16_t port;
     Command command;
+    CHIP_ERROR err;
     CommandArgs commandArgs;
     if (!DetermineAddress(argc, argv, &host_addr, &port) || !DetermineCommand(argc, argv, &command) ||
         !DetermineCommandArgs(argc, argv, command, &commandArgs))
@@ -306,10 +313,14 @@ int main(int argc, char * argv[])
     }
 
     auto * controller = new DeviceController::ChipDeviceController();
-    controller->Init();
+    err               = controller->Init(kLocalDeviceId);
+    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to initialize the device controller"));
 
-    controller->ConnectDevice(1, host_addr, NULL, EchoResponse, ReceiveError, port);
-    controller->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    err = controller->ConnectDevice(kRemoteDeviceId, host_addr, NULL, EchoResponse, ReceiveError, port);
+    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to connect to the device"));
+
+    err = controller->ManualKeyExchange(remote_public_key, sizeof(remote_public_key), local_private_key, sizeof(local_private_key));
+    VerifyOrExit(err == CHIP_NO_ERROR, fprintf(stderr, "Failed to exchange keys"));
 
     if (command == Command::Echo)
     {
@@ -320,10 +331,15 @@ int main(int argc, char * argv[])
         DoOnOff(controller, command, commandArgs.endpointId);
     }
 
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        fprintf(stderr, "ERROR: %s\n", ErrorStr(err));
+    }
     controller->Shutdown();
     delete controller;
 
-    return 0;
+    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 extern "C" {

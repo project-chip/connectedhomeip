@@ -55,7 +55,7 @@ public:
 
     void * AppState;
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(NodeId localDeviceId);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
@@ -63,7 +63,7 @@ public:
      * @brief
      *   Connect to a CHIP device at a given address and an optional port
      *
-     * @param[in] deviceId              A device identifier. Currently unused and can be set to any value
+     * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] deviceAddr            The IPAddress of the requested Device
      * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
      * @param[in] onMessageReceived     Callback for when a message is received
@@ -71,8 +71,8 @@ public:
      * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
      * @return CHIP_ERROR           The connection status
      */
-    CHIP_ERROR ConnectDevice(uint64_t deviceId, IPAddress deviceAddr, void * appReqState, MessageReceiveHandler onMessageReceived,
-                             ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
+    CHIP_ERROR ConnectDevice(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
+                             MessageReceiveHandler onMessageReceived, ErrorHandler onError, uint16_t devicePort = CHIP_PORT);
 
     /**
      * @brief
@@ -88,16 +88,6 @@ public:
      */
     CHIP_ERROR ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
                                  const unsigned char * local_private_key, const size_t private_key_length);
-
-    /**
-     * @brief
-     *   Get the address and port of a connected device
-     *
-     * @param[out] deviceAddr   The IPAddress of the connected device
-     * @param[out] devicePort   The port of the econnected device
-     * @return CHIP_ERROR   An error if there's no active connection
-     */
-    CHIP_ERROR GetDeviceAddress(IPAddress * deviceAddr, uint16_t * devicePort);
 
     /**
      * @brief
@@ -183,7 +173,7 @@ private:
     ErrorHandler mOnError;
     System::PacketBuffer * mCurReqMsg;
 
-    NodeId mDeviceId;
+    NodeId mLocalDeviceId;
     IPAddress mDeviceAddr;
     uint16_t mDevicePort;
     Optional<NodeId> mRemoteDeviceId;
