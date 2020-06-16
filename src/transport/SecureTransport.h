@@ -33,6 +33,7 @@
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <transport/CHIPSecureChannel.h>
+#include <transport/PeerConnectionState.h>
 #include <transport/UDP.h>
 
 namespace chip {
@@ -43,16 +44,13 @@ class DLL_EXPORT SecureTransport : public ReferenceCounted<SecureTransport>
 {
 public:
     /**
-     *  @enum State
-     *
-     *  @brief
-     *    The State of the CHIP connection object.
-     *
+     *    The State of a secure transport object.
      */
     enum class State
     {
         kNotReady,        /**< State before initialization. */
-        kInitialized,     /**< State when the connection has been established. */
+        kInitialized,     /**< State when the object is ready to connect. */
+        kConnected,       /**< State when the remte peer is connected. */
         kSecureConnected, /**< State when the security of the connection has been established. */
     };
 
@@ -67,7 +65,7 @@ public:
      * separate Transports (UDP, BLE, TCP, optional ipv4 for testing etc.). This API is currently
      * UDP-specific and that will change.
      */
-    CHIP_ERROR Init(Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams);
+    CHIP_ERROR Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams);
 
     /**
      * @brief
@@ -85,14 +83,21 @@ public:
                                  const unsigned char * local_private_key, const size_t private_key_length);
 
     /**
+     * Establishes a connection to the given peer node.
+     *
+     * A connection needs to be established before SendMessage can be called.
+     */
+    CHIP_ERROR Connect(NodeId peerNodeId, const Transport::PeerAddress & peerAddress);
+
+    /**
      * @brief
-     *   Send a message to the currently connected peer
+     *   Send a message to a currently connected peer
      *
      * @details
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
      */
-    CHIP_ERROR SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
 
     SecureTransport();
     virtual ~SecureTransport() {}
@@ -112,18 +117,40 @@ public:
         OnMessageReceived        = reinterpret_cast<MessageReceiveHandler>(handler);
     }
 
+    /**
+     * Sets the new connection handler and associated argument
+     *
+     * @param[in] handler The callback to call when a message is received
+     * @param[in] param   The argument to pass in to the handler function
+     *
+     */
+    template <class T>
+    void SetNewConnectionHandler(void (*handler)(const MessageHeader &, const Inet::IPPacketInfo &, T *), T * param)
+    {
+        mNewConnectionArgument = param;
+        OnNewConnection        = reinterpret_cast<NewConnectionHandler>(handler);
+    }
+
+    /**
+     * TEMPORARY method for current connection until multi-session handling support
+     * is added to this class.
+     */
+    NodeId GetPeerNodeId() const { return mConnectionState.GetPeerNodeId(); };
+
 private:
     // TODO: settings below are single-transport and single-peer. Long term
     // intent for the class is to do session management and there will be
     // multiple transports and multiple peers supported.
     // Expected changes:
     //    - Transports including UDP, TCP, BLE as needed
-    //    - Multiple peers with separate states (encryption settings and handshak state)
+    //    - Multiple peers with separate states (encryption settings and handshake state)
     //    - Global state is only a ready/notready and connection state is deferred into
     //      individual connections.
 
     Transport::UDP mTransport;
 
+    Transport::PeerConnectionState mConnectionState;
+    NodeId mLocalNodeId;
     State mState;
     ChipSecureChannel mSecureChannel;
 
@@ -141,6 +168,11 @@ private:
 
     MessageReceiveHandler OnMessageReceived = nullptr; ///< Callback on message receiving
     void * mMessageReceivedArgument         = nullptr; ///< Argument for callback
+
+    typedef void (*NewConnectionHandler)(const MessageHeader & header, const Inet::IPPacketInfo & source, void * param);
+
+    NewConnectionHandler OnNewConnection = nullptr; ///< Callback for new connection received
+    void * mNewConnectionArgument        = nullptr; ///< Argument for callback
 
     static void HandleDataReceived(const MessageHeader & header, const Inet::IPPacketInfo & source, System::PacketBuffer * msgBuf,
                                    SecureTransport * transport);

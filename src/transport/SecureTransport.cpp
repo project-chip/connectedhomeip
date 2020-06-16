@@ -39,12 +39,12 @@ namespace chip {
 static const size_t kMax_SecureSDU_Length         = 1024;
 static const char * kManualKeyExchangeChannelInfo = "Manual Key Exchanged Channel";
 
-SecureTransport::SecureTransport() : mState(State::kNotReady)
+SecureTransport::SecureTransport() : mConnectionState(Transport::PeerAddress::Uninitialized()), mState(State::kNotReady)
 {
     OnMessageReceived = NULL;
 }
 
-CHIP_ERROR SecureTransport::Init(Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
+CHIP_ERROR SecureTransport::Init(NodeId localNodeId, Inet::InetLayer * inet, const Transport::UdpListenParameters & listenParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
@@ -53,7 +53,23 @@ CHIP_ERROR SecureTransport::Init(Inet::InetLayer * inet, const Transport::UdpLis
     SuccessOrExit(err);
 
     mTransport.SetMessageReceiveHandler(HandleDataReceived, this);
-    mState = State::kInitialized;
+    mState       = State::kInitialized;
+    mLocalNodeId = localNodeId;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR SecureTransport::Connect(NodeId peerNodeId, const Transport::PeerAddress & peerAddress)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mConnectionState.SetPeerNodeId(peerNodeId);
+    mConnectionState.SetPeerAddress(peerAddress);
+
+    mState = State::kConnected;
 
 exit:
     return err;
@@ -65,21 +81,24 @@ CHIP_ERROR SecureTransport::ManualKeyExchange(const unsigned char * remote_publi
     CHIP_ERROR err  = CHIP_NO_ERROR;
     size_t info_len = strlen(kManualKeyExchangeChannelInfo);
 
-    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::kConnected, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = mSecureChannel.Init(remote_public_key, public_key_length, local_private_key, private_key_length, NULL, 0,
                               (const unsigned char *) kManualKeyExchangeChannelInfo, info_len);
     SuccessOrExit(err);
     mState = State::kSecureConnected;
+
 exit:
     return err;
 }
 
-CHIP_ERROR SecureTransport::SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf)
+CHIP_ERROR SecureTransport::SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(StateAllowsSend(), err = CHIP_ERROR_INCORRECT_STATE);
+
+    VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == NULL, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -97,16 +116,29 @@ CHIP_ERROR SecureTransport::SendMessage(const MessageHeader & header, Inet::IPAd
 
         msgBuf->SetStart(encryptedText);
 
-        ChipLogProgress(Inet, "Secure transport transmitting msg %d after encryption", header.GetMessageId());
+        ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", mConnectionState.GetSendMessageIndex());
     }
 
-    err    = mTransport.SendMessage(header, address, msgBuf);
-    msgBuf = NULL;
+    {
+        MessageHeader header;
+
+        header
+            .SetSourceNodeId(mLocalNodeId)    //
+            .SetDestinationNodeId(peerNodeId) //
+            .SetMessageId(mConnectionState.GetSendMessageIndex());
+
+        err    = mTransport.SendMessage(header, mConnectionState.GetPeerAddress(), msgBuf);
+        msgBuf = NULL;
+    }
+    SuccessOrExit(err);
+
+    mConnectionState.IncrementSendMessageIndex();
 
 exit:
     if (msgBuf != NULL)
     {
-        ChipLogProgress(Inet, "Secure transport failed to encrypt msg %d: %s", header.GetMessageId(), ErrorStr(err));
+        ChipLogProgress(Inet, "Secure transport failed to encrypt msg %u: %s", mConnectionState.GetSendMessageIndex(),
+                        ErrorStr(err));
         PacketBuffer::Free(msgBuf);
         msgBuf = NULL;
     }
@@ -117,6 +149,15 @@ exit:
 void SecureTransport::HandleDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
                                          SecureTransport * connection)
 {
+    // TODO: actual key exchange should happen here
+    if (!connection->StateAllowsReceive())
+    {
+        if (connection->OnNewConnection)
+        {
+            connection->OnNewConnection(header, pktInfo, connection->mNewConnectionArgument);
+        }
+    }
+
     // TODO this is where messages should be decoded
     if (connection->StateAllowsReceive() && msg != nullptr)
     {
@@ -152,7 +193,10 @@ void SecureTransport::HandleDataReceived(const MessageHeader & header, const IPP
         if (err == CHIP_NO_ERROR)
         {
             msg->Consume(CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE);
-            connection->OnMessageReceived(header, pktInfo, msg, connection->mMessageReceivedArgument);
+            if (connection->OnMessageReceived)
+            {
+                connection->OnMessageReceived(header, pktInfo, msg, connection->mMessageReceivedArgument);
+            }
         }
         else
         {
@@ -164,6 +208,10 @@ void SecureTransport::HandleDataReceived(const MessageHeader & header, const IPP
     {
         PacketBuffer::Free(msg);
         ChipLogProgress(Inet, "Secure transport failed: state not allows receive");
+    }
+    else
+    {
+        ChipLogError(Inet, "Not ready to process new messages");
     }
 }
 

@@ -33,6 +33,8 @@ namespace chip {
 /// Convenience type to make it clear a number represents a node id.
 typedef uint64_t NodeId;
 
+constexpr NodeId kUndefinedNodeId = 0xFFFFFFFFFFFFFFFFll;
+
 /** Handles encoding/decoding of CHIP message headers */
 class MessageHeader
 {

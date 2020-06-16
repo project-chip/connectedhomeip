@@ -81,20 +81,21 @@ exit:
     return err;
 }
 
-CHIP_ERROR UDP::SendMessage(const MessageHeader & header, Inet::IPAddress address, System::PacketBuffer * msgBuf)
+CHIP_ERROR UDP::SendMessage(const MessageHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
 {
     const size_t headerSize = header.EncodeSizeBytes();
     size_t actualEncodedHeaderSize;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(address.GetTransportType() == Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mUDPEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     IPPacketInfo addrInfo;
     addrInfo.Clear();
 
-    addrInfo.DestAddress = address;
-    addrInfo.DestPort    = mSendPort;
+    addrInfo.DestAddress = address.GetIPAddress();
+    addrInfo.DestPort    = address.GetPort();
 
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
