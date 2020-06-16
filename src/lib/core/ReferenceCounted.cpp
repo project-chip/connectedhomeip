@@ -21,36 +21,39 @@
  *   all references to it have been removed.
  */
 
-#ifndef REFERENCE_COUNTED_H_
-#define REFERENCE_COUNTED_H_
-
 #include <type_traits>
+
+#include <support/CodeUtils.h>
 
 namespace chip {
 
-/**
- * A reference counted object maintains a count of usages and when the usage
- * count drops to 0, it deletes itself.
- */
+/** Adds one to the usage count of this class */
 template <class SUBCLASS>
-class ReferenceCounted
+SUBCLASS * ReferenceCounted<SUBCLASS>::Retain(void)
 {
-public:
-    virtual ~ReferenceCounted() {}
+    VerifyOrDie(mRefCount < UINT8_MAX);
+    ++mRefCount;
 
-    /** Adds one to the usage count of this class */
-    SUBCLASS * Retain(void);
+    return reinterpret_cast<SUBCLASS *>(this);
+}
 
-    /** Release usage of this class */
-    void Release(void);
+/** Release usage of this class */
+template <class SUBCLASS>
+void ReferenceCounted<SUBCLASS>::Release(void)
+{
+    VerifyOrDie(mRefCount != 0);
 
-    /** Get the current reference counter value */
-    uint8_t GetReferenceCount() const { return mRefCount; }
+    if (--mRefCount == 0)
+    {
+        delete this;
+    }
+}
 
-private:
-    uint8_t mRefCount = 1;
-};
+/** Get the current reference counter value */
+template <class SUBCLASS>
+uint8_t ReferenceCounted<SUBCLASS>::GetReferenceCount() const
+{
+    return mRefCount;
+}
 
 } // namespace chip
-
-#endif // REFERENCE_COUNTED_H_

@@ -38,6 +38,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureTransport.h>

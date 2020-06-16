@@ -91,6 +91,16 @@ public:
 
     /**
      * @brief
+     *   Get the address and port of a connected device
+     *
+     * @param[out] deviceAddr   The IPAddress of the connected device
+     * @param[out] devicePort   The port of the econnected device
+     * @return CHIP_ERROR   An error if there's no active connection
+     */
+    CHIP_ERROR GetDeviceAddress(IPAddress * deviceAddr, uint16_t * devicePort);
+
+    /**
+     * @brief
      *   Disconnect from a connected device
      *
      * @return CHIP_ERROR   If the device was disconnected successfully
