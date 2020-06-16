@@ -34,6 +34,12 @@ extern "C" {
 static const char * const CHIP_WORK_QUEUE = "com.zigbee.chip.work";
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
+// NOTE: Remote device ID is in sync with the echo server device id
+//       At some point, we may want to add an option to connect to a device without
+//       knowing its id, because the ID can be learned on the first response that is received.
+constexpr chip::NodeId kLocalDeviceId = 112233;
+constexpr chip::NodeId kRemoteDeviceId = 12344321;
+
 @implementation AddressInfo
 - (instancetype)initWithIP:(NSString *)ip
 {
@@ -89,7 +95,7 @@ static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
             return nil;
         }
 
-        if (CHIP_NO_ERROR != _cppController->Init()) {
+        if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId)) {
             CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
             delete _cppController;
             _cppController = NULL;
@@ -161,7 +167,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
        peer_key:(NSData *)peer_key
           error:(NSError * __autoreleasing *)error
 {
-    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // TODO maybe refactor
     // the work queue is being used for atomic access to chip's cpp controller
@@ -204,13 +210,13 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (AddressInfo *)getAddressInfo
 {
-    __block CHIP_ERROR err = CHIP_NO_ERROR;
-    __block chip::IPAddress ipAddr;
-    __block uint16_t port;
-
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Transport::PeerAddress peerAddr = chip::Transport::PeerAddress::Uninitialized();
     [self.lock lock];
-    err = self.cppController->GetDeviceAddress(&ipAddr, &port);
+    err = self.cppController->PopulatePeerAddress(peerAddr);
     [self.lock unlock];
+    chip::IPAddress ipAddr = peerAddr.GetIPAddress();
+    uint16_t port = peerAddr.GetPort();
 
     if (err != CHIP_NO_ERROR) {
         return nil;
@@ -227,7 +233,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error
 {
-    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
     size_t messageLen = [message length];
@@ -252,7 +258,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (BOOL)sendCHIPCommand:(ChipZclClusterId_t)cluster command:(ChipZclCommandId_t)command
 {
-    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     [self.lock lock];
     // FIXME: This needs a better buffersizing setup!
     static const size_t bufferSize = 1024;
@@ -288,7 +294,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (BOOL)disconnect:(NSError * __autoreleasing *)error
 {
-    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
 
@@ -307,7 +313,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (BOOL)isConnected
 {
-    __block bool isConnected = false;
+    bool isConnected = false;
 
     [self.lock lock];
     isConnected = self.cppController->IsConnected();

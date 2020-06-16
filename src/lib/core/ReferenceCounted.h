@@ -24,9 +24,7 @@
 #ifndef REFERENCE_COUNTED_H_
 #define REFERENCE_COUNTED_H_
 
-#include <type_traits>
-
-#include <support/CodeUtils.h>
+#include <stdlib.h>
 
 namespace chip {
 
@@ -43,7 +41,10 @@ public:
     /** Adds one to the usage count of this class */
     SUBCLASS * Retain(void)
     {
-        VerifyOrDie(mRefCount < UINT8_MAX);
+        if (mRefCount < UINT8_MAX)
+        {
+            abort();
+        }
         ++mRefCount;
 
         return reinterpret_cast<SUBCLASS *>(this);
@@ -52,7 +53,10 @@ public:
     /** Release usage of this class */
     void Release(void)
     {
-        VerifyOrDie(mRefCount != 0);
+        if (mRefCount != 0)
+        {
+            abort();
+        }
 
         if (--mRefCount == 0)
         {
