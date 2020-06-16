@@ -1,0 +1,116 @@
+# Copyright 2020 The Pigweed Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+
+# gn-format disable
+import("//build_overrides/pigweed.gni")
+declare_args() {
+  # Sets the sanitizer to pass to clang. Valid values are those for "-fsanitize"
+  # listed in https://clang.llvm.org/docs/UsersManual.html#id9.
+  pw_toolchain_SANITIZER = ""
+
+  # Indicates if this build is a part of OSS-Fuzz, which needs to be able to
+  # provide its own compiler and flags. This violates the build hermeticisim and
+  # should only be used for OSS-Fuzz.
+  pw_toolchain_OSS_FUZZ_ENABLED = false
+}
+
+# Specifies the tools used by host Clang toolchains.
+_host_clang_toolchain = {
+  # Note: On macOS, there is no "llvm-ar", only "ar", which happens to be LLVM
+  # ar. This should get updated for linux systems.
+  ar = "ar"
+
+  if (pw_toolchain_OSS_FUZZ_ENABLED) {
+    cc = getenv("CC")
+    cxx = getenv("CXX")
+  } else {
+    cc = "clang"
+    cxx = "clang++"
+  }
+
+  is_host_toolchain = true
+  link_group = true
+}
+
+# Common default scope shared by all host Clang toolchains.
+_defaults = {
+  if (pw_toolchain_SANITIZER != "") {
+    configs +=
+        [ "$dir_pw_toolchain/host_clang:sanitize_$pw_toolchain_SANITIZER" ]
+  }
+  if (pw_toolchain_OSS_FUZZ_ENABLED) {
+    default_configs_fuzzing = oss_fuzz_added_configs
+    default_configs_fuzzing += [ "$dir_pw_fuzzer:oss_fuzz_extra" ]
+
+    # Add the configs to be removed. They will be de-duplicated, and this
+    # ensures they are present to be removed.
+    default_configs += oss_fuzz_removed_configs
+    remove_configs = oss_fuzz_removed_configs
+  }
+}
+
+pw_toolchain_host_clang = {
+  default = {
+    name = "${host_os}_${host_cpu}_clang"
+    forward_variables_from(_host_clang_toolchain, "*")
+    defaults = {
+      forward_variables_from(_defaults, "*")
+      current_os = host_os
+      is_clang = true
+    }
+  }
+
+  debug = {
+    name = "${host_os}_${host_cpu}_clang_debug"
+    forward_variables_from(_host_clang_toolchain, "*")
+    defaults = {
+      forward_variables_from(_defaults, "*")
+      current_os = host_os
+      is_clang = true
+      is_debug = true
+    }
+  }
+
+  speed_optimized = {
+    name = "${host_os}_${host_cpu}_clang_speed_optimized"
+    forward_variables_from(_host_clang_toolchain, "*")
+    defaults = {
+      forward_variables_from(_defaults, "*")
+      current_os = host_os
+      is_clang = true
+      is_debug = false
+      optimize_for_size = false
+    }
+  }
+
+  size_optimized = {
+    name = "${host_os}_${host_cpu}_clang_size_optimized"
+    forward_variables_from(_host_clang_toolchain, "*")
+    defaults = {
+      forward_variables_from(_defaults, "*")
+      current_os = host_os
+      is_clang = true
+      is_debug = false
+      optimize_for_size = true
+    }
+  }
+}
+
+# Describes host clang toolchains.
+pw_toolchain_host_clang_list = [
+  pw_toolchain_host_clang.default,
+  pw_toolchain_host_clang.debug,
+  pw_toolchain_host_clang.speed_optimized,
+  pw_toolchain_host_clang.size_optimized,
+]
