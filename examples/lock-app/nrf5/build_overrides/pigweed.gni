@@ -12,13 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/nrf5_lock_app.gni")
-import("${nrf5_lock_app_root}/common_args.gni")
+declare_args() {
+  # Location of the Pigweed repository.
+  dir_pigweed = "//third_party/pigweed"
+}
 
-# These values help set up the default toolchain in standalone sample app
-# builds. They must be in a separate file to avoid namespace conflicts in
-# multi target builds.
-custom_toolchain = "${nrf5_lock_app_root}/toolchain:nrf5_lock_app"
-target_cpu = "arm"
-target_os = "freertos"
-# Don't add more args here, add them to common_args.gni.
+import("$dir_pigweed/modules.gni")
