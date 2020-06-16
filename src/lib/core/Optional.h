@@ -64,8 +64,11 @@ public:
     /** Comparison operator, hadling missing values. */
     bool operator==(const Optional & other) const
     {
-        return (mHasValue == other.mHasValue) && (!mHasValue || (mValue == other.mValue));
+        return (mHasValue == other.mHasValue) && (!other.mHasValue || (mValue == other.mValue));
     }
+
+    /** Comparison operator, hadling missing values. */
+    bool operator!=(const Optional & other) const { return !(*this == other); }
 
     /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing(void) { return Optional<T>(); }
