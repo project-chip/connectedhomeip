@@ -91,13 +91,12 @@ public:
 
     /**
      * @brief
-     *   Get the address and port of a connected device
+     *   Get the PeerAddress of a connected peer
      *
-     * @param[out] deviceAddr   The IPAddress of the connected device
-     * @param[out] devicePort   The port of the econnected device
+     * @param[inout] peerAddress  The PeerAddress object which will be populated with the details of the connected peer
      * @return CHIP_ERROR   An error if there's no active connection
      */
-    CHIP_ERROR GetDeviceAddress(IPAddress * deviceAddr, uint16_t * devicePort);
+    CHIP_ERROR PopulatePeerAddress(Transport::PeerAddress & peerAddress);
 
     /**
      * @brief

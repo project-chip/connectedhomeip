@@ -24,6 +24,7 @@
 #ifndef REFERENCE_COUNTED_H_
 #define REFERENCE_COUNTED_H_
 
+#include <stdlib.h>
 #include <type_traits>
 
 namespace chip {

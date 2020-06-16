@@ -187,20 +187,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16_t * devicePort)
+CHIP_ERROR ChipDeviceController::PopulatePeerAddress(Transport::PeerAddress & peerAddress)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (deviceAddr)
-    {
-        *deviceAddr = mDeviceAddr;
-    }
-    if (devicePort)
-    {
-        *devicePort = mDevicePort;
-    }
+    peerAddress.SetIPAddress(mDeviceAddr);
+    peerAddress.SetPort(mDevicePort);
+    peerAddress.SetTransportType(Transport::Type::kUdp);
 
 exit:
     return err;
