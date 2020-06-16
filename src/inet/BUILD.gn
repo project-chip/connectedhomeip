@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/tests.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/tests.gni")
 import("inet.gni")
 
 declare_args() {
@@ -24,7 +26,7 @@ declare_args() {
 }
 
 config("inet_config") {
-  configs = [ "//src:includes" ]
+  configs = [ "${chip_root}/src:includes" ]
 
   defines = []
   if (inet_project_config_include != "") {
@@ -81,7 +83,7 @@ source_set("inet_config_header") {
 
   public_configs = [ ":inet_config" ]
 
-  public_deps = [ "//src/system:system_config_header" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
 source_set("inet") {
@@ -123,9 +125,9 @@ source_set("inet") {
 
   public_deps = [
     ":inet_config_header",
-    "//src/lib/support",
-    "//src/system",
-    "//third_party/nlio",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+    "${nlio_root}:nlio",
   ]
 
   if (inet_config_enable_dns_resolver) {
@@ -144,6 +146,6 @@ source_set("inet") {
 
   if (chip_with_nlfaultinjection) {
     sources += [ "InetFaultInjection.cpp" ]
-    public_deps += [ "//third_party/nlfaultinjection" ]
+    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 }

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/nrf5_sdk.gni")
+
 declare_args() {
   # Location of the nRF5 SDK.
   nrf5_sdk_root = ""

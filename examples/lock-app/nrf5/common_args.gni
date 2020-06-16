@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 build_nrf5_lock_app = true
 
 device_platform = "nrf5"
@@ -30,7 +32,7 @@ inet_config_enable_ipv4 = false
 inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
-nrf5_sdk_target = "//examples/lock-app/nrf5:sdk"
+nrf5_sdk_target = "${nrf5_lock_app_root}:sdk"
 
 ble_platform_config_include = "<platform/nRF5/BlePlatformConfig.h>"
 ble_project_config_include = "<CHIPProjectConfig.h>"

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 import("ble.gni")
 
 declare_args() {
@@ -23,7 +25,7 @@ declare_args() {
 }
 
 config("ble_config") {
-  configs = [ "//src:includes" ]
+  configs = [ "${chip_root}/src:includes" ]
 
   defines = []
   if (ble_project_config_include != "") {
@@ -45,7 +47,7 @@ source_set("ble_config_header") {
 
   public_configs = [ ":ble_config" ]
 
-  public_deps = [ "//src/system:system_config_header" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
 source_set("ble") {
@@ -69,7 +71,7 @@ source_set("ble") {
 
   public_deps = [
     ":ble_config_header",
-    "//src/inet",
-    "//src/lib/support",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
   ]
 }

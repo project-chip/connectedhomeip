@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/tools.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/tools.gni")
 
 assert(chip_build_tools)
 
@@ -25,7 +27,7 @@ executable("qrcodetool") {
   ]
 
   public_deps = [
-    "//src/lib/support",
-    "//src/setup_payload",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/setup_payload",
   ]
 }

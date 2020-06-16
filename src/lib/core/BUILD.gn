@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/tests.gni")
-import("//src/inet/inet.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/tests.gni")
+import("${chip_root}/src/inet/inet.gni")
 import("core.gni")
 
 config("chip_config") {
@@ -89,8 +91,8 @@ config("chip_config") {
   include_dirs = [ target_gen_dir ]
 
   configs = [
-    "//src:includes",
-    "//src/lib:includes",
+    "${chip_root}/src:includes",
+    "${chip_root}/src/lib:includes",
   ]
 }
 
@@ -104,7 +106,7 @@ source_set("chip_config_header") {
 
   public_configs = [ ":chip_config" ]
 
-  public_deps = [ "//src/system:system_config_header" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
 source_set("core") {
@@ -130,19 +132,19 @@ source_set("core") {
 
   public_deps = [
     ":chip_config_header",
-    "//src/ble",
-    "//src/inet",
-    "//src/lib/support",
-    "//src/platform",
-    "//src/system",
-    "//third_party/nlio",
+    "${chip_root}/src/ble",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/system",
+    "${nlio_root}:nlio",
   ]
 
   allow_circular_includes_from = [
-    "//src/ble",
-    "//src/lib/support",
-    "//src/inet",
-    "//src/system",
-    "//src/platform",
+    "${chip_root}/src/ble",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/system",
   ]
 }

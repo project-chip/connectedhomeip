@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/device.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/device.gni")
 
 if (device_platform != "none") {
   declare_args() {
@@ -24,7 +26,7 @@ if (device_platform != "none") {
   }
 
   config("platform_config") {
-    configs = [ "//src:includes" ]
+    configs = [ "${chip_root}/src:includes" ]
 
     defines = []
     if (chip_device_project_config_include != "") {
@@ -54,10 +56,10 @@ if (device_platform != "none") {
     ]
 
     public_deps = [
-      "//src/ble",
-      "//src/lib/core:chip_config_header",
-      "//src/lib/support",
-      "//third_party/nlio",
+      "${chip_root}/src/ble",
+      "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/lib/support",
+      "${nlio_root}:nlio",
     ]
 
     public_configs = [ ":platform_config" ]

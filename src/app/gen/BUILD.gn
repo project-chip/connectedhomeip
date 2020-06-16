@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 config("gen_config") {
   include_dirs = [ "." ]
 }
@@ -38,5 +40,5 @@ static_library("gen") {
 
   public_configs = [ ":gen_config" ]
 
-  public_deps = [ "//src/app/chip-zcl" ]
+  public_deps = [ "${chip_root}/src/app/chip-zcl" ]
 }

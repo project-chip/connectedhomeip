@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//third_party/lwip/lwip.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nrf5_sdk.gni")
+
+import("${lwip_root}/lwip.gni")
 
 declare_args() {
   # Enable lwIP debugging.
@@ -70,7 +73,7 @@ lwip_target("lwip") {
 
   public_deps = []
   if (lwip_platform == "nrf5") {
-    public_deps += [ "//third_party/nrf5_sdk" ]
+    public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
   }
 
   public_configs = [ ":lwip_config" ]

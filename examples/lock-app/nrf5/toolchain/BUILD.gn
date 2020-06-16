@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 import("//build/toolchain/arm_gcc/arm_toolchain.gni")
 
 arm_toolchain("nrf5_lock_app") {
-  toolchain_args_file = "../common_args.gni"
+  toolchain_args_file = "${nrf5_lock_app_root}/common_args.gni"
   current_os = "freertos"
 }

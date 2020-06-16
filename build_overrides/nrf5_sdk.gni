@@ -12,28 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-import("${chip_root}/build/chip_test_suite.gni")
-
-chip_test_suite("tests") {
-  common_sources = [
-    "TestCHIPCallback.cpp",
-    "TestCHIPErrorStr.cpp",
-    "TestCHIPTLV.cpp",
-    "TestCore.h",
-    "TestReferenceCounted.cpp",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestCHIPErrorStr",
-    "TestReferenceCounted",
-    "TestCHIPTLV",
-    "TestCHIPCallback",
-  ]
+declare_args() {
+  # Root directory for nRF5 SDK build files.
+  nrf5_sdk_build_root = "//third_party/nrf5_sdk"
 }
