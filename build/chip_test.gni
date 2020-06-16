@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/tests.gni")
-import("//third_party/pigweed/pw_unit_test/test.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/tests.gni")
+import("${dir_pw_unit_test}/test.gni")
 
 assert(chip_build_tests)
 

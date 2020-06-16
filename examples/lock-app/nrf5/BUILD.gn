@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//third_party/nrf5_sdk/nrf5_sdk.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nrf5_sdk.gni")
+
+import("${nrf5_sdk_build_root}/nrf5_sdk.gni")
 
 assert(current_os == "freertos")
 
@@ -20,7 +23,7 @@ nrf5_sdk("sdk") {
   include_dirs = [
     "main/include",
     "main",
-    "//src/include",
+    "${chip_root}/src/include",
   ]
 
   sources = [
@@ -45,8 +48,8 @@ nrf5_sdk("sdk") {
 executable("lock_app") {
   public_deps = [
     ":sdk",
-    "//src:chip",
-    "//src/platform",
+    "${chip_root}/src:chip",
+    "${chip_root}/src/platform",
   ]
 
   sources = [

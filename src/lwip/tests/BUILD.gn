@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/chip_test.gni")
-import("//build/chip_test_group.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip_test.gni")
+import("${chip_root}/build/chip_test_group.gni")
 
 chip_test("TestLwIP") {
   sources = [ "tests.c" ]
-  deps = [ "//src/lwip" ]
+  deps = [ "${chip_root}/src/lwip" ]
 }
 
 chip_test_group("tests") {

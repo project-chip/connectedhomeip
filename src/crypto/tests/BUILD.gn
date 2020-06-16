@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/chip_test_suite.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   common_sources = [
@@ -25,9 +27,9 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
-    "//src/crypto",
-    "//src/lib/core",
-    "//third_party/nlunit-test",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/core",
+    "${nlunit_test_root}:nlunit-test",
   ]
 
   tests = [ "CHIPCryptoPALTest" ]

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/nlassert.gni")
+
 config("nlfaultinjection_config") {
   include_dirs = [ "repo/include" ]
 }
@@ -22,7 +24,7 @@ static_library("nlfaultinjection") {
     "repo/src/nlfaultinjection.cpp",
   ]
 
-  deps = [ "//third_party/nlassert" ]
+  deps = [ "${nlassert_root}:nlassert" ]
 
   public_configs = [ ":nlfaultinjection_config" ]
 }
