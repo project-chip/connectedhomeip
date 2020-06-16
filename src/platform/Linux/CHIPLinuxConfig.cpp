@@ -265,7 +265,7 @@ CHIP_ERROR ChipLinuxConfig::AddEntry(const char * key, const char * value)
     if ((key != NULL) && (value != NULL))
     {
         std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
-        section[key] = std::string(value);
+        section[key]                                 = std::string(value);
     }
     else
     {
