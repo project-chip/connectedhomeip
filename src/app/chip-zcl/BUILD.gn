@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/tests.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/tests.gni")
 
 config("chip-zcl_config") {
   include_dirs = [

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 source_set("transport") {
   sources = [
     "Base.h",
@@ -29,9 +31,9 @@ source_set("transport") {
   ]
 
   public_deps = [
-    "//src/crypto",
-    "//src/inet",
-    "//src/lib/core",
-    "//src/lib/support",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }

@@ -12,22 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-
-import("${chip_root}/build/tools.gni")
-
-assert(chip_build_tools)
-
-executable("qrcodetool") {
-  sources = [
-    "qrcodetool.cpp",
-    "qrcodetool_command_manager.h",
-    "setup_payload_commands.cpp",
-    "setup_payload_commands.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/setup_payload",
-  ]
+declare_args() {
+  # Root directory for nRF5 SDK build files.
+  nrf5_sdk_build_root = "//third_party/nrf5_sdk"
 }
