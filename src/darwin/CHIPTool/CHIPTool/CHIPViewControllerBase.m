@@ -84,8 +84,8 @@ static NSString * const ipKey = @"ipk";
     }
     [self.serverIPTextField setHidden:shouldHide];
     [self.IPLabel setHidden:shouldHide];
-    self.useCorrectKey = YES;
-    self.useCorrectKeyStateChanged = NO;
+    self.useIncorrectKey = NO;
+    self.useIncorrectKeyStateChanged = NO;
 }
 
 - (void)_appEnteredBackground:(NSNotification *)notification
@@ -122,7 +122,7 @@ static NSString * const ipKey = @"ipk";
 
     NSData * peer_key = [NSData dataWithBytes:peer_key_bytes length:sizeof(peer_key_bytes)];
     NSData * local_key = NULL;
-    if (self.useCorrectKey) {
+    if (!self.useIncorrectKey) {
         NSLog(@"Using correct key");
         local_key = [NSData dataWithBytes:local_key_bytes length:sizeof(local_key_bytes)];
     } else {
@@ -143,13 +143,13 @@ static NSString * const ipKey = @"ipk";
 - (IBAction)encryptionKey:(id)sender
 {
     if ([self.encryptionKeySwitch isOn]) {
-        self.useCorrectKey = YES;
+        self.useIncorrectKey = YES;
         [self postResult:@"App will use correct key"];
     } else {
-        self.useCorrectKey = NO;
+        self.useIncorrectKey = NO;
         [self postResult:@"App will use incorrect key"];
     }
-    self.useCorrectKeyStateChanged = YES;
+    self.useIncorrectKeyStateChanged = YES;
 }
 
 - (void)dismissKeyboard
@@ -180,9 +180,9 @@ static NSString * const ipKey = @"ipk";
         }
     }
 
-    if (!addrInfo || needsReconnect || self.useCorrectKeyStateChanged) {
+    if (!addrInfo || needsReconnect || self.useIncorrectKeyStateChanged) {
         [self _connect];
-        self.useCorrectKeyStateChanged = NO;
+        self.useIncorrectKeyStateChanged = NO;
     }
 }
 
