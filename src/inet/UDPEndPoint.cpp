@@ -265,10 +265,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
     }
 
     configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
-    parameters = nw_parameters_create_secure_udp(
-        configure_tls,
-        NW_PARAMETERS_DEFAULT_CONFIGURATION
-    );
+    parameters    = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
 
     res = IPEndPointBasis::Bind(addrType, addr, port, parameters);
     SuccessOrExit(res);

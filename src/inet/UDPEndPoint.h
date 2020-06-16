@@ -84,13 +84,11 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    uint16_t mBoundPort;
+
     INET_ERROR GetSocket(IPAddressType addrType);
     SocketEvents PrepareIO(void);
     void HandlePendingIO(void);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    uint16_t mBoundPort;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 
