@@ -1138,15 +1138,15 @@ INET_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, IPAddress aAddress,
     mDispatchSemaphore = dispatch_semaphore_create(0);
     mAddrType          = aAddressType;
     nw_release(endpoint);
+
 exit:
     return res;
 }
 
 INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags)
 {
-    INET_ERROR res = INET_NO_ERROR;
+    __block INET_ERROR res = INET_NO_ERROR;
     dispatch_data_t content;
-    __block int send_error_code         = 0;
     dispatch_semaphore_t send_semaphore = dispatch_semaphore_create(0);
 
     // Ensure the destination address type is compatible with the endpoint address type.
@@ -1161,15 +1161,13 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     // Send a message, and wait for it to be dispatched.
     content = dispatch_data_create(aBuffer->Start(), aBuffer->DataLength(), mDispatchQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
     nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
-        send_error_code = nw_error_get_error_code(error);
+        res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
         dispatch_semaphore_signal(send_semaphore);
     });
     dispatch_release(content);
 
     dispatch_semaphore_wait(send_semaphore, DISPATCH_TIME_FOREVER);
 
-    // TODO Map error codes to INET_ERROR codes
-    VerifyOrExit(send_error_code == 0, res = INET_ERROR_INCORRECT_STATE);
 exit:
     return res;
 }
@@ -1191,10 +1189,10 @@ void IPEndPointBasis::HandleDataReceived(nw_connection_t aConnection)
                                   else if (receive_error != NULL && OnReceiveError != NULL)
                                   {
                                       nw_error_domain_t error_domain = nw_error_get_error_domain(receive_error);
-                                      int error_code                 = nw_error_get_error_code(receive_error);
-                                      if (!(error_domain == nw_error_domain_posix && error_code == ECANCELED))
+                                      errno                          = nw_error_get_error_code(receive_error);
+                                      if (!(error_domain == nw_error_domain_posix && errno == ECANCELED))
                                       {
-                                          INET_ERROR error = INET_ERROR_UNEXPECTED_EVENT;
+                                          INET_ERROR error = chip::System::MapErrorPOSIX(errno);
                                           IPPacketInfo packetInfo;
                                           GetPacketInfo(aConnection, &packetInfo);
                                           OnReceiveError((IPEndPointBasis *) this, error, &packetInfo);
@@ -1249,6 +1247,7 @@ INET_ERROR IPEndPointBasis::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddre
     VerifyOrExit(endpoint != NULL, res = INET_ERROR_BAD_ARGS);
 
     aEndPoint = endpoint;
+
 exit:
     return res;
 }
@@ -1281,14 +1280,14 @@ INET_ERROR IPEndPointBasis::GetConnection(const IPPacketInfo * aPktInfo)
     VerifyOrExit(connection != NULL, res = INET_ERROR_INCORRECT_STATE);
 
     res = StartConnection(connection);
+
 exit:
     return res;
 }
 
 INET_ERROR IPEndPointBasis::StartListener(nw_listener_t aListener)
 {
-    INET_ERROR res                  = INET_NO_ERROR;
-    __block int listener_error_code = 0;
+    __block INET_ERROR res = INET_NO_ERROR;
 
     nw_listener_set_queue(aListener, mDispatchQueue);
 
@@ -1306,8 +1305,8 @@ INET_ERROR IPEndPointBasis::StartListener(nw_listener_t aListener)
         }
         else if (state == nw_listener_state_failed)
         {
-            listener_error_code = nw_error_get_error_code(error);
-            printf("Listener: Failed (%d)\n", listener_error_code);
+            printf("Listener: Failed\n");
+            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
             nw_listener_cancel(aListener);
             dispatch_semaphore_signal(mDispatchSemaphore);
         }
@@ -1326,16 +1325,13 @@ INET_ERROR IPEndPointBasis::StartListener(nw_listener_t aListener)
     nw_listener_start(aListener);
     dispatch_semaphore_wait(mDispatchSemaphore, DISPATCH_TIME_FOREVER);
 
-    // TODO Map error codes to INET_ERROR codes
-    VerifyOrExit(listener_error_code == 0, res = INET_ERROR_INCORRECT_STATE);
 exit:
     return res;
 }
 
 INET_ERROR IPEndPointBasis::StartConnection(nw_connection_t aConnection)
 {
-    INET_ERROR res                 = INET_NO_ERROR;
-    __block int connect_error_code = 0;
+    __block INET_ERROR res = INET_NO_ERROR;
 
     nw_connection_set_queue(aConnection, mDispatchQueue);
 
@@ -1343,7 +1339,6 @@ INET_ERROR IPEndPointBasis::StartConnection(nw_connection_t aConnection)
     nw_connection_set_state_changed_handler(aConnection, ^(nw_connection_state_t state, nw_error_t error) {
         nw_endpoint_t endpoint = nw_connection_copy_endpoint(aConnection);
         uint16_t port          = nw_endpoint_get_port(endpoint);
-        connect_error_code     = nw_error_get_error_code(error);
 
         if (state == nw_connection_state_waiting)
         {
@@ -1352,6 +1347,7 @@ INET_ERROR IPEndPointBasis::StartConnection(nw_connection_t aConnection)
         else if (state == nw_connection_state_failed)
         {
             printf("State: Failed (%u)\n", port);
+            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
             dispatch_semaphore_signal(mDispatchSemaphore);
         }
         else if (state == nw_connection_state_ready)
@@ -1369,12 +1365,11 @@ INET_ERROR IPEndPointBasis::StartConnection(nw_connection_t aConnection)
 
     nw_connection_start(aConnection);
     dispatch_semaphore_wait(mDispatchSemaphore, DISPATCH_TIME_FOREVER);
+    SuccessOrExit(res);
 
     mConnection = aConnection;
     HandleDataReceived(aConnection);
 
-    // TODO Map error codes to INET_ERROR codes
-    VerifyOrExit(connect_error_code == 0, res = INET_ERROR_INCORRECT_STATE);
 exit:
     return res;
 }
