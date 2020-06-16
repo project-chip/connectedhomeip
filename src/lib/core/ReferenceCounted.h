@@ -39,10 +39,30 @@ public:
     virtual ~ReferenceCounted() {}
 
     /** Adds one to the usage count of this class */
-    SUBCLASS * Retain(void);
+    SUBCLASS * Retain(void)
+    {
+        if (mRefCount < UINT8_MAX)
+        {
+            abort();
+        }
+        ++mRefCount;
+
+        return reinterpret_cast<SUBCLASS *>(this);
+    }
 
     /** Release usage of this class */
-    void Release(void);
+    void Release(void)
+    {
+        if (mRefCount != 0)
+        {
+            abort();
+        }
+
+        if (--mRefCount == 0)
+        {
+            delete this;
+        }
+    }
 
     /** Get the current reference counter value */
     uint8_t GetReferenceCount() const { return mRefCount; }

@@ -191,10 +191,7 @@ CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (!IsSecurelyConnected())
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (deviceAddr)
     {
@@ -205,6 +202,7 @@ CHIP_ERROR ChipDeviceController::GetDeviceAddress(IPAddress * deviceAddr, uint16
         *devicePort = mDevicePort;
     }
 
+exit:
     return err;
 }
 
