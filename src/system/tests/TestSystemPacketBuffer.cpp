@@ -34,6 +34,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -1206,4 +1208,9 @@ int TestSystemPacketBuffer(void)
     nlTestRunner(&theSuite, &sContext);
 
     return (nlTestRunnerStats(&theSuite));
+}
+
+static void __attribute__((constructor)) TestSystemPacketBufferCtor(void)
+{
+    VerifyOrDie(chip::RegisterUnitTests(&TestSystemPacketBuffer) == CHIP_NO_ERROR);
 }
