@@ -144,7 +144,7 @@ def main():
     ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
                                             args.artifact_download_dir)
   except Exception as e:
-    logging.warning('Failed to fetch artifacts: %r', e)
+    logging.warning('Failed to fetch artifacts: %r' % e)
 
   generateBloatReport(
       args.report_file,
