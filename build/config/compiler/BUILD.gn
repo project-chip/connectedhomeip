@@ -17,6 +17,10 @@ import("//build_overrides/pigweed.gni")
 
 import("//build/config/compiler/compiler.gni")
 
+if (current_cpu == "arm") {
+  import("${chip_root}/build/config/arm.gni")
+}
+
 config("release") {
   defines = [ "NDEBUG" ]
 }
@@ -25,6 +29,34 @@ config("debug_default") {
   if (!is_debug) {
     configs = [ ":release" ]
   }
+}
+
+config("abi_default") {
+  cflags = []
+  if (current_cpu == "arm") {
+    if (arm_arch != "") {
+      cflags += [ "-march=${arm_arch}" ]
+    }
+    if (arm_cpu != "") {
+      cflags += [ "-mcpu=${arm_cpu}" ]
+    }
+    if (arm_tune != "") {
+      cflags += [ "-mtune=${arm_tune}" ]
+    }
+    if (arm_abi != "") {
+      cflags += [ "-mabi=${arm_abi}" ]
+    }
+    if (arm_fpu != "") {
+      cflags += [ "-mfpu=${arm_fpu}" ]
+    }
+    if (arm_float_abi != "") {
+      cflags += [ "-mfloat-abi=${arm_float_abi}" ]
+    }
+    if (arm_use_thumb) {
+      cflags += [ "-mthumb" ]
+    }
+  }
+  ldflags = cflags
 }
 
 config("optimize_zero") {
@@ -200,6 +232,8 @@ config("specs_default") {
       "--specs=nosys.specs",
       "--specs=nano.specs",
     ]
+
+    libs = [ "nosys" ]
 
     ldflags = cflags
   }
