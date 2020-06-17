@@ -144,10 +144,10 @@ static NSString * const ipKey = @"ipk";
 {
     if ([self.encryptionKeySwitch isOn]) {
         self.useIncorrectKey = YES;
-        [self postResult:@"App will use correct key"];
+        [self postResult:@"App will use incorrect key"];
     } else {
         self.useIncorrectKey = NO;
-        [self postResult:@"App will use incorrect key"];
+        [self postResult:@"App will use correct key"];
     }
     self.useIncorrectKeyStateChanged = YES;
 }
