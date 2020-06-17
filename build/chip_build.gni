@@ -12,7 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Enable nRF5 lock app example.
-  build_nrf5_lock_app = false
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/tests.gni")
+
+template("chip_build") {
+  _build_name = target_name
+  _toolchain = invoker.toolchain
+
+  group("all_${_build_name}") {
+    deps = [ ":all(${_toolchain})" ]
+  }
+
+  if (chip_build_tests) {
+    group("check_${_build_name}") {
+      deps = [ ":check(${_toolchain})" ]
+    }
+  }
 }
