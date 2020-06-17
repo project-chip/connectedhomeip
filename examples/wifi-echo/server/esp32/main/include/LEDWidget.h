@@ -38,19 +38,23 @@ public:
     void BlinkOnError();
     void Animate();
 #if CONFIG_HAVE_DISPLAY
-    void Display();
+    void SetVLED(int id1, int id2);
 #endif
-    bool mError;
-    TimerHandle_t errorTimer;
 
 private:
     int64_t mLastChangeTimeUS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
     gpio_num_t mGPIONum;
+    int mVLED1;
+    int mVLED2;
     bool mState;
+    bool mError;
+    TimerHandle_t errorTimer;
 
     void DoSet(bool state);
+
+    friend void ClearErrorState(TimerHandle_t);
 };
 
 #endif // TITLE_WIDGET_H
