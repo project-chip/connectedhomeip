@@ -68,22 +68,28 @@ const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 
                                             0x44, 0x72, 0x1b, 0xcd, 0xb9, 0x02, 0x53, 0xd9, 0xaf, 0xcc, 0x1a, 0xcd, 0xae,
                                             0xe8, 0x87, 0x2e, 0x52, 0x3b, 0x98, 0xf0, 0xa1, 0x88, 0x4a, 0xe3, 0x03, 0x75 };
 
-/// A printable string has all characters printable and ends with a '\0'
-bool ContentIsAPrintableString(System::PacketBuffer * buffer)
+/**
+ * A data model message has nonzero length and always has a first byte whose
+ * value is one of: 0x00, 0x01, 0x02, 0x03.  See chipZclEncodeZclHeader for the
+ * construction of the message and in particular the first byte.
+ *
+ * Echo messages should generally not have a first byte with those values, so we
+ * can use that to try to distinguish between the two.
+ */
+static bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
 {
     const size_t data_len = buffer->DataLength();
     const uint8_t * data  = buffer->Start();
-    bool isPrintable      = true;
+    bool mayBeDataModelMessage = true;
 
-    // Has to end with a 0 terminator
-    VerifyOrExit(data_len > 0, isPrintable = false);
-    VerifyOrExit(data[data_len - 1] == 0, isPrintable = false);
+    // Has to have nonzero length.
+    VerifyOrExit(data_len > 0, mayBeDataModelMessage = false);
 
-    // all other characters are printable
-    isPrintable = std::all_of(data, data + data_len - 1, isprint);
+    // Has to have a valid first byte value.
+    VerifyOrExit(data[0] < 0x04, mayBeDataModelMessage = false);
 
 exit:
-    return isPrintable;
+    return mayBeDataModelMessage;
 }
 
 void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & packet_info, SecureSessionMgr * transport)
@@ -127,9 +133,8 @@ void echo(const MessageHeader & header, const IPPacketInfo & packet_info, System
                  packet_info.DestPort, static_cast<size_t>(data_len));
     }
 
-    if (!ContentIsAPrintableString(buffer))
+    if (ContentMayBeADataModelMessage(buffer))
     {
-        // Non-ACII; assume it's a data model message.
         HandleDataModelMessage(buffer);
         buffer = NULL;
     }
