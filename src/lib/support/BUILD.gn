@@ -23,7 +23,7 @@ import("${chip_root}/build/tests.gni")
 action("gen_chip_version") {
   script = "${chip_root}/scripts/gen_chip_version.py"
 
-  version_file = "${target_gen_dir}/CHIPVersion.h"
+  version_file = "${target_gen_dir}/include/CHIPVersion.h"
   outputs = [ version_file ]
   args = [
     "--output_file=" + rebase_path(version_file, root_build_dir),
@@ -47,43 +47,49 @@ config("support_config") {
     "${chip_root}/src/system:system_config",
   ]
 
-  include_dirs = [ target_gen_dir ]
+  include_dirs = [ "${target_gen_dir}/include" ]
 }
+
+support_headers = [
+  "Base64.h",
+  "CHIPCounter.h",
+  "CodeUtils.h",
+  "DLLUtil.h",
+  "ErrorStr.h",
+  "FibonacciUtils.h",
+  "PersistedCounter.h",
+  "RandUtils.h",
+  "TestUtils.h",
+  "TimeUtils.h",
+  "logging/CHIPLogging.h",
+  "verhoeff/Verhoeff.h",
+]
 
 static_library("support") {
   sources = [
     "Base64.cpp",
-    "Base64.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
-    "CHIPCounter.h",
-    "CodeUtils.h",
-    "DLLUtil.h",
     "ErrorStr.cpp",
-    "ErrorStr.h",
     "FibonacciUtils.cpp",
-    "FibonacciUtils.h",
     "PersistedCounter.cpp",
-    "PersistedCounter.h",
     "RandUtils.cpp",
-    "RandUtils.h",
     "TestUtils.cpp",
-    "TestUtils.h",
     "TimeUtils.cpp",
-    "TimeUtils.h",
     "logging/CHIPLogging.cpp",
-    "logging/CHIPLogging.h",
     "logging/CHIPLoggingLogV.cpp",
     "verhoeff/Verhoeff.cpp",
-    "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
     "verhoeff/Verhoeff16.cpp",
     "verhoeff/Verhoeff32.cpp",
     "verhoeff/Verhoeff36.cpp",
   ]
 
+  public = support_headers
+
   public_deps = [
     ":chip_version_header",
+    ":support_headers",
     "${chip_root}/src/lib/core:chip_config_header",
     "${nlassert_root}:nlassert",
   ]
@@ -91,10 +97,14 @@ static_library("support") {
   public_configs = [ ":support_config" ]
 
   if (chip_with_nlfaultinjection) {
-    sources += [
-      "CHIPFaultInjection.cpp",
-      "CHIPFaultInjection.h",
-    ]
+    sources += [ "CHIPFaultInjection.cpp" ]
+    public += [ "CHIPFaultInjection.h" ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
+}
+
+copy("support_headers") {
+  sources = support_headers
+
+  outputs = [ "${target_gen_dir}/include/support/{{source_file_part}}" ]
 }
