@@ -149,6 +149,8 @@ exit:
 void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
                                           SecureSessionMgr * connection)
 {
+    System::PacketBuffer * origMsg = nullptr;
+
     // TODO: actual key exchange should happen here
     if (!connection->StateAllowsReceive())
     {
@@ -156,22 +158,22 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IP
         {
             connection->OnNewConnection(header, pktInfo, connection->mNewConnectionArgument);
         }
+        ExitNow(ChipLogProgress(Inet, "Secure transport failed: state does not allow receive"));
     }
 
+    VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
+
     // TODO this is where messages should be decoded
-    if (connection->StateAllowsReceive() && msg != nullptr)
     {
+        CHIP_ERROR err          = CHIP_NO_ERROR;
         uint8_t * encryptedText = msg->Start();
         uint16_t encryptedLen   = msg->TotalLength();
+        uint8_t * plainText     = nullptr;
+        size_t plainTextlen     = encryptedLen - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
 
-        if (encryptedLen < CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE)
-        {
-            PacketBuffer::Free(msg);
-            ChipLogProgress(Inet, "Secure transport received smaller than encryption header, discarding");
-            return;
-        }
+        VerifyOrExit(encryptedLen >= CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE,
+                     ChipLogError(Inet, "Secure transport received smaller than encryption header, discarding"));
 
-        chip::System::PacketBuffer * origMsg = nullptr;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not allocated
            as an inline buffer to PacketBuffer structure */
@@ -180,42 +182,34 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IP
         msg->SetDataLength(encryptedLen, msg);
 #endif
 
-        uint8_t * plainText = msg->Start() + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-        size_t plainTextlen = encryptedLen - CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
-
-        CHIP_ERROR err = connection->mSecureChannel.Decrypt(encryptedText, encryptedLen, plainText, plainTextlen);
-
-        if (origMsg != nullptr)
-        {
-            PacketBuffer::Free(origMsg);
-        }
-
-        if (err == CHIP_NO_ERROR)
-        {
-            msg->Consume(CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE);
-            if (connection->OnMessageReceived)
-            {
-                connection->OnMessageReceived(header, pktInfo, msg, connection->mMessageReceivedArgument);
-            }
-        }
-        else
+        plainText = msg->Start() + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
+        err       = connection->mSecureChannel.Decrypt(encryptedText, encryptedLen, plainText, plainTextlen);
+        if (err != CHIP_NO_ERROR)
         {
             if (connection->OnReceiveError)
             {
                 connection->OnReceiveError(CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE_FROM_PEER, pktInfo);
             }
-            PacketBuffer::Free(msg);
-            ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err);
+            ExitNow(ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
+        }
+
+        if (connection->OnMessageReceived)
+        {
+            msg->Consume(CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE);
+            connection->OnMessageReceived(header, pktInfo, msg, connection->mMessageReceivedArgument);
+            msg = nullptr;
         }
     }
-    else if (msg != nullptr)
+
+exit:
+    if (origMsg != nullptr)
+    {
+        PacketBuffer::Free(origMsg);
+    }
+
+    if (msg != nullptr)
     {
         PacketBuffer::Free(msg);
-        ChipLogProgress(Inet, "Secure transport failed: state not allows receive");
-    }
-    else
-    {
-        ChipLogError(Inet, "Not ready to process new messages");
     }
 }
 
