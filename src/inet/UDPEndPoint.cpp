@@ -306,10 +306,6 @@ INET_ERROR UDPEndPoint::Listen(void)
     chip::System::Layer & lSystemLayer = SystemLayer();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    nw_listener_t listener;
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
     if (mState == kState_Listening)
     {
         res = INET_NO_ERROR;
@@ -350,10 +346,7 @@ INET_ERROR UDPEndPoint::Listen(void)
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-    listener = nw_listener_create(mParameters);
-    VerifyOrExit(listener != NULL, res = INET_ERROR_INCORRECT_STATE);
-
-    res = StartListener(listener);
+    res = StartListener();
     SuccessOrExit(res);
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -419,16 +412,7 @@ void UDPEndPoint::Close(void)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-        if (mParameters)
-        {
-            nw_release(mParameters);
-            mParameters = NULL;
-            dispatch_release(mDispatchQueue);
-            mDispatchQueue = NULL;
-        }
-
-        ReleaseConnection(mConnection);
+        IPEndPointBasis::ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
         mState = kState_Closed;
