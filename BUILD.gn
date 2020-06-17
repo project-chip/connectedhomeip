@@ -14,63 +14,99 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/build/examples.gni")
+# This build file should not be used in superproject builds.
+assert(chip_root == "//")
+
 import("${chip_root}/build/tests.gni")
 import("${chip_root}/build/tools.gni")
 
-group("default") {
-  deps = [
-    "${chip_root}/src",
-    "${chip_root}/src/app",
-    "${chip_root}/src/ble",
-    "${chip_root}/src/controller",
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/inet",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/lwip:all",
-    "${chip_root}/src/system",
-    "${chip_root}/src/transport",
-    "${mbedtls_root}:mbedtls",
-    "${nlassert_root}:nlassert",
-    "${nlio_root}:nlio",
-    "${nlunit_test_root}:nlunit-test",
-  ]
+if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
+  # This is a real toolchain. Build CHIP.
+  group("default") {
+    deps = [ ":all" ]
+  }
+
+  group("all") {
+    deps = [
+      "${chip_root}/src",
+      "${chip_root}/src/app",
+      "${chip_root}/src/ble",
+      "${chip_root}/src/controller",
+      "${chip_root}/src/crypto",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/lwip:all",
+      "${chip_root}/src/system",
+      "${chip_root}/src/transport",
+      "${mbedtls_root}:mbedtls",
+      "${nlassert_root}:nlassert",
+      "${nlio_root}:nlio",
+      "${nlunit_test_root}:nlunit-test",
+    ]
+
+    if (chip_build_tests) {
+      deps += [ ":tests" ]
+    }
+
+    if (chip_build_tools) {
+      deps += [
+        "${chip_root}/src/qrcodetool",
+        "${chip_root}/src/setup_payload",
+      ]
+    }
+  }
 
   if (chip_build_tests) {
-    deps += [ ":tests" ]
+    import("${chip_root}/build/chip_test_group.gni")
+
+    chip_test_group("tests") {
+      deps = [
+        "${chip_root}/src/app/plugin/tests",
+        "${chip_root}/src/ble/tests",
+        "${chip_root}/src/crypto/tests",
+        "${chip_root}/src/inet/tests",
+        "${chip_root}/src/lib/core/tests",
+        "${chip_root}/src/lib/support/tests",
+        "${chip_root}/src/lwip/tests",
+        "${chip_root}/src/setup_payload/tests",
+        "${chip_root}/src/system/tests",
+      ]
+    }
+
+    group("check") {
+      deps = [ ":tests_run" ]
+    }
+  }
+} else {
+  # This is the dummy toolchain. Configure various real toolchains.
+  import("//build/chip_build.gni")
+
+  import("//build/toolchain/host_clang/toolchains.gni")
+  import("//build/toolchain/host_gcc/toolchains.gni")
+  chip_build("host_clang") {
+    toolchain = "//build/toolchain/host_clang:${host_os}_${host_cpu}_clang"
   }
 
-  if (chip_build_tools) {
-    deps += [
-      "${chip_root}/src/qrcodetool",
-      "${chip_root}/src/setup_payload",
-    ]
+  chip_build("host_gcc") {
+    toolchain = "//build/toolchain/host_gcc:${host_os}_${host_cpu}_gcc"
   }
 
-  if (build_nrf5_lock_app) {
-    deps += [ "${nrf5_lock_app_root}:nrf5(${nrf5_lock_app_root}/toolchain:nrf5_lock_app)" ]
-  }
-}
-
-if (chip_build_tests) {
-  import("${chip_root}/build/chip_test_group.gni")
-
-  chip_test_group("tests") {
+  group("default") {
     deps = [
-      "${chip_root}/src/app/plugin/tests",
-      "${chip_root}/src/ble/tests",
-      "${chip_root}/src/crypto/tests",
-      "${chip_root}/src/inet/tests",
-      "${chip_root}/src/lib/core/tests",
-      "${chip_root}/src/lib/support/tests",
-      "${chip_root}/src/lwip/tests",
-      "${chip_root}/src/setup_payload/tests",
-      "${chip_root}/src/system/tests",
+      ":all_host_clang",
+      ":all_host_gcc",
+      "${nrf5_lock_app_root}:nrf5(${nrf5_lock_app_root}/toolchain:nrf5_lock_app)",
     ]
   }
 
-  group("check") {
-    deps = [ ":tests_run" ]
+  if (chip_build_tests) {
+    group("check") {
+      deps = [
+        ":check_host_clang",
+        ":check_host_gcc",
+        ":default",
+      ]
+    }
   }
 }
