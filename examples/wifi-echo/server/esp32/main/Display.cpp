@@ -38,7 +38,7 @@
 #if CONFIG_HAVE_DISPLAY
 
 // Brightness picked such that it's easy for cameras to focus on
-#define DEFFAULT_BRIGHTNESS_PERCENT 10
+#define DEFAULT_BRIGHTNESS_PERCENT 10
 
 // 8MHz is the recommended SPI speed to init the driver with
 // It later gets set to the preconfigured defaults within the driver
@@ -58,6 +58,8 @@ extern const char * TAG;
 
 uint16_t DisplayHeight = 0;
 uint16_t DisplayWidth  = 0;
+
+bool awake = false;
 
 #if CONFIG_DISPLAY_AUTO_OFF
 // FreeRTOS timer used to turn the display off after a short while
@@ -152,13 +154,16 @@ void SetBrightness(uint16_t brightness_percent)
     }
 }
 
-void WakeDisplay()
+bool WakeDisplay()
 {
-    SetBrightness(DEFFAULT_BRIGHTNESS_PERCENT);
+    bool woken = !awake;
+    awake      = true;
+    SetBrightness(DEFAULT_BRIGHTNESS_PERCENT);
 #if CONFIG_DISPLAY_AUTO_OFF
     xTimerStart(displayTimer, 0);
     ESP_LOGI(TAG, "Display awake but will switch off automatically in %d seconds", DISPLAY_TIMEOUT_MS / 1000);
 #endif
+    return woken;
 }
 
 void ClearDisplay()
@@ -195,6 +200,7 @@ void TimerCallback(TimerHandle_t xTimer)
 {
     ESP_LOGI(TAG, "Display going to sleep...");
     SetBrightness(0);
+    awake = false;
 }
 
 void SetupBrightnessControl()
