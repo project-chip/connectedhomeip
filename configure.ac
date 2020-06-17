@@ -133,13 +133,14 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_SILENT_RULES([yes])
 
 #
-# Enable maintainer mode to prevent the package from constantly trying
-# to rebuild configure, Makefile.in, etc. Rebuilding such files rarely,
-# if ever, needs to be done "in the field".
+# Disable maintainer mode to enable the package to automatically rebuild
+# configure, Makefile.in, etc. when the files on which they depend change (for
+# example, configure.ac, Makefile.am, etc).
 #
-# Use the included 'bootstrap' script instead when necessary.
+# For those that do not desire this behavior, run configure with
+# `--enable-maintainer-mode` and run the top-level `bootstrap` script manually.
 #
-#AM_MAINTAINER_MODE
+AM_MAINTAINER_MODE([disable])
 
 #
 # Check for the target style
