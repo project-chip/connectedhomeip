@@ -160,6 +160,12 @@ exit:
     }
 }
 
+void error(CHIP_ERROR error, const IPPacketInfo & pi)
+{
+    ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
+    statusLED.BlinkOnError();
+}
+
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
@@ -177,6 +183,7 @@ void setupTransport(IPAddressType type, SecureSessionMgr * transport)
     SuccessOrExit(err);
 
     transport->SetMessageReceiveHandler(echo, transport);
+    transport->SetReceiveErrorHandler(error);
     transport->SetNewConnectionHandler(newConnectionHandler, transport);
 
 exit:
