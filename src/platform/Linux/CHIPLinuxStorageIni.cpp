@@ -219,7 +219,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetStringValue(const char * key, char * buf, siz
 }
 
 CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key, char *& encodedData, size_t & encodedDataLen,
-                                                        size_t & decodedDataLen)
+                                                            size_t & decodedDataLen)
 {
     CHIP_ERROR retval            = CHIP_NO_ERROR;
     size_t encodedDataPaddingLen = 0;

@@ -402,7 +402,7 @@ bool PosixConfig::ConfigValueExists(Key key)
 
 CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
+    CHIP_ERROR err             = CHIP_NO_ERROR;
     ChipLinuxStorage * storage = NULL;
 
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
@@ -430,7 +430,7 @@ exit:
 
 CHIP_ERROR PosixConfig::ClearNamespace(const char * ns)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
+    CHIP_ERROR err             = CHIP_NO_ERROR;
     ChipLinuxStorage * storage = NULL;
 
     if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
