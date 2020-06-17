@@ -32,7 +32,6 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPError.h>
-#include <core/CHIPTLV.h>
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
 #include <profiles/CHIPProfiles.h>
@@ -83,77 +82,168 @@ exit:
     return err;
 }
 
-static CHIP_ERROR retrieveStringOptionalInfo(TLVReader & reader, OptionalQRCodeInfo & info)
+static CHIP_ERROR retrieveOptionalInfoString(TLVReader & reader, OptionalQRCodeInfo & info)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    uint64_t tag       = reader.GetTag();
     uint32_t valLength = reader.GetLength();
-    unique_ptr<char[]> val(new char[valLength + 1]);
-    err = reader.GetString(val.get(), valLength + 1);
+    unique_ptr<char[]> value(new char[valLength + 1]);
 
+    CHIP_ERROR err = reader.GetString(value.get(), valLength + 1);
     SuccessOrExit(err);
 
-    VerifyOrExit(IsContextTag(tag) == true || IsProfileTag(tag) == true, err = CHIP_ERROR_INVALID_TLV_TAG);
     info.type = optionalQRCodeInfoTypeString;
-    info.tag  = (uint8_t) TagNumFromTag(tag);
-    info.data = string(val.get());
+    info.data = string(value.get());
 
 exit:
     return err;
 }
 
-static CHIP_ERROR retrieveIntegerOptionalInfo(TLVReader & reader, OptionalQRCodeInfo & info)
+static CHIP_ERROR retrieveOptionalInfoInt32(TLVReader & reader, OptionalQRCodeInfo & info)
+{
+    int32_t value;
+    CHIP_ERROR err = reader.Get(value);
+    SuccessOrExit(err);
+
+    info.type  = optionalQRCodeInfoTypeInt32;
+    info.int32 = value;
+
+exit:
+    return err;
+}
+
+static CHIP_ERROR retrieveOptionalInfoInt64(TLVReader & reader, OptionalQRCodeInfoExtension & info)
+{
+    int64_t value;
+    CHIP_ERROR err = reader.Get(value);
+    SuccessOrExit(err);
+
+    info.type  = optionalQRCodeInfoTypeInt64;
+    info.int64 = value;
+
+exit:
+    return err;
+}
+
+static CHIP_ERROR retrieveOptionalInfoUInt32(TLVReader & reader, OptionalQRCodeInfoExtension & info)
+{
+    uint32_t value;
+    CHIP_ERROR err = reader.Get(value);
+    SuccessOrExit(err);
+
+    info.type   = optionalQRCodeInfoTypeUInt32;
+    info.uint32 = value;
+
+exit:
+    return err;
+}
+
+static CHIP_ERROR retrieveOptionalInfoUInt64(TLVReader & reader, OptionalQRCodeInfoExtension & info)
+{
+    uint64_t value;
+    CHIP_ERROR err = reader.Get(value);
+    SuccessOrExit(err);
+
+    info.type   = optionalQRCodeInfoTypeUInt64;
+    info.uint64 = value;
+
+exit:
+    return err;
+}
+
+static CHIP_ERROR retrieveOptionalInfo(TLVReader & reader, OptionalQRCodeInfo & info, optionalQRCodeInfoType type)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint64_t tag   = reader.GetTag();
-    int64_t storedInteger;
-    err = reader.Get(storedInteger);
-    SuccessOrExit(err);
-    VerifyOrExit(IsContextTag(tag) == true || IsProfileTag(tag) == true, err = CHIP_ERROR_INVALID_TLV_TAG);
-    info.type    = optionalQRCodeInfoTypeInt;
-    info.tag     = (uint8_t) TagNumFromTag(tag);
-    info.integer = storedInteger;
-exit:
-    return err;
-}
 
-static void populatePayloadTLVField(SetupPayload & outPayload, OptionalQRCodeInfo info)
-{
-    if (info.tag == kSerialNumberTag)
+    if (type == optionalQRCodeInfoTypeString)
     {
-        outPayload.serialNumber = info.data;
+        err = retrieveOptionalInfoString(reader, info);
+    }
+    else if (type == optionalQRCodeInfoTypeInt32)
+    {
+        err = retrieveOptionalInfoInt32(reader, info);
     }
     else
     {
-        outPayload.addVendorOptionalData(info);
+        err = CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    return err;
 }
 
-static CHIP_ERROR retrieveOptionalInfos(SetupPayload & outPayload, TLVReader & reader)
+static CHIP_ERROR retrieveOptionalInfo(TLVReader & reader, OptionalQRCodeInfoExtension & info, optionalQRCodeInfoType type)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (type == optionalQRCodeInfoTypeString || type == optionalQRCodeInfoTypeInt32)
+    {
+        err = retrieveOptionalInfo(reader, static_cast<OptionalQRCodeInfo &>(info), type);
+    }
+    else if (type == optionalQRCodeInfoTypeInt64)
+    {
+        err = retrieveOptionalInfoInt64(reader, info);
+    }
+    else if (type == optionalQRCodeInfoTypeUInt32)
+    {
+        err = retrieveOptionalInfoUInt32(reader, info);
+    }
+    else if (type == optionalQRCodeInfoTypeUInt64)
+    {
+        err = retrieveOptionalInfoUInt64(reader, info);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return err;
+}
+
+CHIP_ERROR QRCodeSetupPayloadParser::retrieveOptionalInfos(SetupPayload & outPayload, TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVType type;
+    uint8_t tag;
     while (err == CHIP_NO_ERROR)
     {
-        OptionalQRCodeInfo info;
-
         type = reader.GetType();
-        if (type != kTLVType_UTF8String && type != kTLVType_SignedInteger)
+        if (type != kTLVType_UTF8String && type != kTLVType_SignedInteger && type != kTLVType_UnsignedInteger)
         {
             err = reader.Next();
             continue;
         }
+
+        tag = (uint8_t) TagNumFromTag(reader.GetTag());
+        VerifyOrExit(IsContextTag(tag) == true || IsProfileTag(tag) == true, err = CHIP_ERROR_INVALID_TLV_TAG);
+
+        optionalQRCodeInfoType elemType = optionalQRCodeInfoTypeUnknown;
         if (type == kTLVType_UTF8String)
         {
-            err = retrieveStringOptionalInfo(reader, info);
+            elemType = optionalQRCodeInfoTypeString;
         }
-        else if (type == kTLVType_SignedInteger)
+        if (type == kTLVType_SignedInteger || type == kTLVType_UnsignedInteger)
         {
-            err = retrieveIntegerOptionalInfo(reader, info);
+            elemType = outPayload.getNumericTypeFor(tag);
         }
-        SuccessOrExit(err);
 
-        populatePayloadTLVField(outPayload, info);
+        if (IsCHIPTag(tag))
+        {
+            OptionalQRCodeInfoExtension info;
+            info.tag = tag;
+            err      = retrieveOptionalInfo(reader, info, elemType);
+            SuccessOrExit(err);
+
+            err = outPayload.addOptionalExtensionData(info);
+            SuccessOrExit(err);
+        }
+        else
+        {
+            OptionalQRCodeInfo info;
+            info.tag = tag;
+            err      = retrieveOptionalInfo(reader, info, elemType);
+            SuccessOrExit(err);
+
+            err = outPayload.addOptionalVendorData(info);
+            SuccessOrExit(err);
+        }
         err = reader.Next();
     }
     if (err == CHIP_END_OF_TLV)
@@ -165,7 +255,8 @@ exit:
     return err;
 }
 
-static CHIP_ERROR parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t tlvDataLengthInBytes)
+CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataStart,
+                                                    uint32_t tlvDataLengthInBytes)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVReader rootReader;
@@ -197,7 +288,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR populateTLV(SetupPayload & outPayload, const vector<uint8_t> & buf, int & index)
+CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, const vector<uint8_t> & buf, int & index)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t bitsLeftToRead = (buf.size() * 8) - index;

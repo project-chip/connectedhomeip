@@ -182,7 +182,7 @@ static NSString * const ipKey = @"ipk";
 
     NSLog(@"Payload vendorID %@", payload.vendorID);
     if ([payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]]) {
-        NSArray * optionalInfo = [payload getAllOptionalData:nil];
+        NSArray * optionalInfo = [payload getAllOptionalVendorData:nil];
         NSLog(@"Count of payload info %@", @(optionalInfo.count));
         for (CHIPOptionalQRCodeInfo * info in optionalInfo) {
             NSNumber * tag = info.tag;
@@ -282,7 +282,7 @@ static NSString * const ipKey = @"ipk";
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_captureSession stopRunning];
     });
-    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase45Representation:qrCode];
+    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:qrCode];
     NSError * error;
     CHIPSetupPayload * payload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{

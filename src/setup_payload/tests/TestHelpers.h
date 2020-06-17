@@ -25,6 +25,15 @@
 const uint16_t kSmallBufferSizeInBytes   = 1;
 const uint16_t kDefaultBufferSizeInBytes = 512;
 
+const uint8_t kOptionalDefaultStringTag  = 2;
+const string kOptionalDefaultStringValue = "myData";
+
+const uint8_t kOptionalDefaultIntTag    = 3;
+const uint32_t kOptionalDefaultIntValue = 12;
+
+const char * kSerialNumberDefaultStringValue   = "123456789";
+const uint32_t kSerialNumberDefaultUInt32Value = 123456789;
+
 SetupPayload GetDefaultPayload()
 {
     SetupPayload payload;
@@ -43,40 +52,17 @@ SetupPayload GetDefaultPayload()
 SetupPayload GetDefaultPayloadWithSerialNumber()
 {
     SetupPayload payload = GetDefaultPayload();
-    payload.serialNumber = "123456789QWDHANTYUIOP";
+    payload.addSerialNumber(kSerialNumberDefaultStringValue);
 
     return payload;
-}
-
-OptionalQRCodeInfo GetOptionalDefaultString()
-{
-    OptionalQRCodeInfo info;
-    info.tag  = 2;
-    info.type = optionalQRCodeInfoTypeString;
-    info.data = "myData";
-
-    return info;
-}
-
-OptionalQRCodeInfo GetOptionalDefaultInt()
-{
-    OptionalQRCodeInfo info;
-    info.tag     = 3;
-    info.type    = optionalQRCodeInfoTypeInt;
-    info.integer = 12;
-
-    return info;
 }
 
 SetupPayload GetDefaultPayloadWithOptionalDefaults()
 {
     SetupPayload payload = GetDefaultPayloadWithSerialNumber();
 
-    OptionalQRCodeInfo stringInfo = GetOptionalDefaultString();
-    OptionalQRCodeInfo intInfo    = GetOptionalDefaultInt();
-
-    payload.addVendorOptionalData(stringInfo);
-    payload.addVendorOptionalData(intInfo);
+    payload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue);
+    payload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue);
 
     return payload;
 }
