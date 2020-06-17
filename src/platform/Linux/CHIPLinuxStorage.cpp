@@ -41,7 +41,7 @@ namespace Internal {
 
 ChipLinuxStorage::ChipLinuxStorage()
 {
-    mDirty    = false;
+    mDirty = false;
 }
 
 ChipLinuxStorage::~ChipLinuxStorage() {}
