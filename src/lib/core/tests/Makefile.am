@@ -41,6 +41,7 @@ lib_LIBRARIES                                         = \
     $(NULL)
 
 libCoreTests_a_SOURCES                                = \
+    TestAllocationPool.cpp                              \
     TestCHIPErrorStr.cpp                                \
     TestCHIPTLV.cpp                                     \
     $(NULL)
@@ -85,6 +86,7 @@ COMMON_LDADD                                          =  \
 # Test applications that should be run when the 'check' target is run.
 
 check_PROGRAMS                                        = \
+    TestAllocationPool                                  \
     TestCHIPErrorStr                                    \
     TestCHIPTLV                                         \
     $(NULL)
@@ -103,6 +105,9 @@ TESTS_ENVIRONMENT                                     = \
     $(NULL)
 
 # Source, compiler, and linker options for test programs.
+
+TestAllocationPool_SOURCES                            = TestAllocationPoolDriver.cpp
+TestAllocationPool_LDADD                              = $(COMMON_LDADD)
 
 TestCHIPErrorStr_SOURCES                              = TestCHIPErrorStrDriver.cpp
 TestCHIPErrorStr_LDADD                                = $(COMMON_LDADD)

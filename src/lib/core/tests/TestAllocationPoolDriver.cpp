@@ -17,24 +17,21 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP core library
- *      unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP Allocation pool unit tests.
  *
  */
 
-#ifndef TESTCORE_H
-#define TESTCORE_H
+#include "TestCore.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <core/CHIPConfig.h>
 
-int TestCHIPErrorStr(void);
-int TestCHIPTLV(void);
-int TestAllocationPool(void);
+#include <nlunit-test.h>
 
-#ifdef __cplusplus
+int main(void)
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestAllocationPool());
 }
-#endif
-
-#endif // TESTCORE_H
