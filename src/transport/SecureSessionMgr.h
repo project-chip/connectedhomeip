@@ -118,6 +118,17 @@ public:
     }
 
     /**
+     * Sets the receive error handler and associated argument
+     *
+     * @param[in] handler The callback to call on receive error
+     *
+     */
+    void SetReceiveErrorHandler(void (*handler)(CHIP_ERROR, const Inet::IPPacketInfo &))
+    {
+        OnReceiveError = reinterpret_cast<ReceiveErrorHandler>(handler);
+    }
+
+    /**
      * Sets the new connection handler and associated argument
      *
      * @param[in] handler The callback to call when a message is received
@@ -168,6 +179,10 @@ private:
 
     MessageReceiveHandler OnMessageReceived = nullptr; ///< Callback on message receiving
     void * mMessageReceivedArgument         = nullptr; ///< Argument for callback
+
+    typedef void (*ReceiveErrorHandler)(CHIP_ERROR error, const Inet::IPPacketInfo & source);
+
+    ReceiveErrorHandler OnReceiveError = nullptr; ///< Callback on error in message receiving
 
     typedef void (*NewConnectionHandler)(const MessageHeader & header, const Inet::IPPacketInfo & source, void * param);
 
