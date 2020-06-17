@@ -78,8 +78,8 @@ const unsigned char remote_public_key[] = { 0x04, 0x30, 0x77, 0x2c, 0xe7, 0xd4, 
  */
 static bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
 {
-    const size_t data_len = buffer->DataLength();
-    const uint8_t * data  = buffer->Start();
+    const size_t data_len      = buffer->DataLength();
+    const uint8_t * data       = buffer->Start();
     bool mayBeDataModelMessage = true;
 
     // Has to have nonzero length.
