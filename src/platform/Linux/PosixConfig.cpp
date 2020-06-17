@@ -20,7 +20,7 @@
 
 /**
  *    @file
- *          Utilities for interacting with multiple file partitions and maps 
+ *          Utilities for interacting with multiple file partitions and maps
  *          key-value config calls to the correct partition.
  */
 
