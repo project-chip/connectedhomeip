@@ -14,8 +14,7 @@ save-persistent-ci-cache:
             type: string
     steps:
         - save_cache:
-              key:
-                  build-environment-{{ arch
+              key: build-environment-{{ arch
                   }}-<<parameters.builder>>-persistent-cache
               paths:
                   - ./ci-cache-persistent
@@ -26,8 +25,7 @@ load-persistent-ci-cache:
             type: string
     steps:
         - restore_cache:
-              key:
-                  build-environment-{{ arch
+              key: build-environment-{{ arch
                   }}-<<parameters.builder>>-persistent-cache
 save-build-environment:
     description: Save the build environment
@@ -36,8 +34,7 @@ save-build-environment:
             type: string
     steps:
         - save_cache:
-              key:
-                  build-environment-{{ arch }}-{{
+              key: build-environment-{{ arch }}-{{
                   .Branch}}-{{.Environment.CIRCLE_SHA1 }}-<<
                   parameters.builder>>-built
               paths:
@@ -49,8 +46,7 @@ save-bootstrapped-tree:
             type: string
     steps:
         - save_cache:
-              key:
-                  bootstrapped-tree-{{ arch }}-{{
+              key: bootstrapped-tree-{{ arch }}-{{
                   .Branch}}-{{.Environment.CIRCLE_SHA1 }}-<<
                   parameters.builder>>-built
               paths:
@@ -62,8 +58,7 @@ load-bootstrapped-tree:
             type: string
     steps:
         - restore_cache:
-              key:
-                  bootstrapped-tree-{{ arch }}-{{
+              key: bootstrapped-tree-{{ arch }}-{{
                   .Branch}}-{{.Environment.CIRCLE_SHA1 }}-<<
                   parameters.builder>>-built
 save-built-tree:
@@ -73,8 +68,7 @@ save-built-tree:
             type: string
     steps:
         - save_cache:
-              key:
-                  built-tree-{{ arch }}-{{
+              key: built-tree-{{ arch }}-{{
                   .Branch}}-{{.Environment.CIRCLE_SHA1}}-<<
                   parameters.builder>>-built
               paths:
@@ -86,8 +80,7 @@ load-build-environment:
             type: string
     steps:
         - restore_cache:
-              key:
-                  build-environment-{{ arch }}-{{
+              key: build-environment-{{ arch }}-{{
                   .Branch}}-{{.Environment.CIRCLE_SHA1 }}-<<
                   parameters.builder>>-built
 load-built-tree:
@@ -97,8 +90,7 @@ load-built-tree:
             type: string
     steps:
         - restore_cache:
-              key:
-                  built-tree-{{ arch }}-{{
+              key: built-tree-{{ arch }}-{{
                   .Branch}}-{{.Environment.CIRCLE_SHA1}}-<<
                   parameters.builder>>-built
 setup-environment:
@@ -112,3 +104,28 @@ setup-environment:
               command:
                   scripts/tools/run_if.sh "ubuntu-16-lts" "$BUILD_TYPE" sudo
                   scripts/setup/linux/install_packages.sh
+bloat-check:
+    description: Bloat check against master branch
+    parameters:
+        job_name:
+            type: string
+        baseline_download_dir:
+            type: string
+        build_output_dir:
+            type: string
+    steps:
+        - run:
+              name: Generate bloat report
+              command: |
+                  mkdir -p "<<parameters.baseline_download_dir>>"
+                  scripts/helpers/bloat_check.py                                             \
+                     --token "$CIRCLECI_API_TOKEN"                                           \
+                     --job "<<parameters.job_name>>"                                         \
+                     --artifact-download-dir "<<parameters.baseline_download_dir>>"          \
+                     --build-output-dir "<<parameters.build_output_dir>>"                    \
+                     --report-file bloat_report.txt                                          \
+                     --github-repository "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME" \
+                     --github-comment-pr-number "$CIRCLE_PR_NUMBER"                          \
+                     --github-api-token "$GITHUB_BLOAT_API_TOKEN"
+        - store_artifacts:
+              path: bloat_report.txt

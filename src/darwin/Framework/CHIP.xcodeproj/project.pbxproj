@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DF09D248B2C60009307CB /* libmbedtls.a */; };
 		515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */; };
 		515C401D2486BF43004C4DB3 /* CHIPOnOff.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C401B2486BF43004C4DB3 /* CHIPOnOff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		991DC0852475F45400C13860 /* CHIPEchoClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0832475F45400C13860 /* CHIPEchoClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		991DC0882475F47D00C13860 /* CHIPEchoClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0862475F47D00C13860 /* CHIPEchoClient.mm */; };
 		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
 		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
 		B20252972459E34F00F97062 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B202528D2459E34F00F97062 /* CHIP.framework */; };
@@ -42,11 +41,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2C4DF09D248B2C60009307CB /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		515C401A2486BF43004C4DB3 /* CHIPOnOff.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPOnOff.mm; sourceTree = "<group>"; };
 		515C401B2486BF43004C4DB3 /* CHIPOnOff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPOnOff.h; sourceTree = "<group>"; };
 		991DC0822475F45400C13860 /* CHIPDeviceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceController.h; sourceTree = "<group>"; };
-		991DC0832475F45400C13860 /* CHIPEchoClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPEchoClient.h; sourceTree = "<group>"; };
-		991DC0862475F47D00C13860 /* CHIPEchoClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPEchoClient.mm; sourceTree = "<group>"; };
 		991DC0872475F47D00C13860 /* CHIPDeviceController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceController.mm; sourceTree = "<group>"; };
 		991DC08A247704DC00C13860 /* CHIPLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPLogging.h; sourceTree = "<group>"; };
 		B202528D2459E34F00F97062 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,6 +73,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */,
+				2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */,
 				BA09EB44247477BC00605257 /* libSetupPayload.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -124,8 +123,6 @@
 				B2E0D7AE245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm */,
 				B2E0D7AF245B0B5C003C5B48 /* CHIPSetupPayload.h */,
 				B2E0D7B0245B0B5C003C5B48 /* CHIPSetupPayload.mm */,
-				991DC0832475F45400C13860 /* CHIPEchoClient.h */,
-				991DC0862475F47D00C13860 /* CHIPEchoClient.mm */,
 				991DC0822475F45400C13860 /* CHIPDeviceController.h */,
 				991DC0872475F47D00C13860 /* CHIPDeviceController.mm */,
 				515C401B2486BF43004C4DB3 /* CHIPOnOff.h */,
@@ -147,6 +144,7 @@
 		BA09EB3E2474762900605257 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2C4DF09D248B2C60009307CB /* libmbedtls.a */,
 				BA09EB3F2474762900605257 /* libCHIP.a */,
 				BA09EB402474762900605257 /* libSetupPayload.a */,
 			);
@@ -161,7 +159,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */,
-				991DC0852475F45400C13860 /* CHIPEchoClient.h in Headers */,
 				B2E0D7B2245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* CHIP.h in Headers */,
 				B2E0D7B8245B0B5C003C5B48 /* CHIPSetupPayload.h in Headers */,
@@ -293,7 +290,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */,
-				991DC0882475F47D00C13860 /* CHIPEchoClient.mm in Sources */,
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
 				C4C222C02475A38700984173 /* CHIPLogging.mm in Sources */,

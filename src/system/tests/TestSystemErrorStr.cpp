@@ -39,7 +39,9 @@
 #include <string.h>
 
 #include <inet/InetError.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
@@ -117,4 +119,9 @@ int TestSystemErrorStr(void)
     nlTestRunner(&theSuite, &sContext);
 
     return (nlTestRunnerStats(&theSuite));
+}
+
+static void __attribute__((constructor)) TestSystemErrorStrCtor(void)
+{
+    VerifyOrDie(RegisterUnitTests(&TestSystemErrorStr) == CHIP_NO_ERROR);
 }

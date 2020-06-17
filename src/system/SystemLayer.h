@@ -43,18 +43,6 @@
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-namespace chip {
-namespace Inet {
-
-class InetLayer;
-
-} // namespace Inet
-} // namespace chip
-
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 namespace chip {
 namespace System {
 
@@ -219,11 +207,6 @@ private:
     Layer & operator=(const Layer &);
 
     friend class Timer;
-
-#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-    friend class Inet::InetLayer;
-    void CancelAllMatchingInetTimers(Inet::InetLayer & aInetLayer, void * aOnCompleteInetLayer, void * aAppState);
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
 };
 
 /**

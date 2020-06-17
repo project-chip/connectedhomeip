@@ -35,24 +35,6 @@
 namespace chip {
 namespace Inet {
 
-#if INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-/**
- *  @typedef The basic type for all InetLayer events.
- *
- *  This is defined to a platform- or system-specific type.
- *
- */
-typedef INET_CONFIG_EVENT_TYPE InetEventType;
-
-/**
- *  @typedef The basic object for all InetLayer events.
- *
- *  This is defined to a platform- or system-specific type.
- *
- */
-typedef INET_CONFIG_EVENT_OBJECT_TYPE InetEvent;
-#endif // INET_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 /**
  *   The Inet layer event type definitions.
  *

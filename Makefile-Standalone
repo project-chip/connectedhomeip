@@ -165,6 +165,11 @@ else
 configure_OPTIONS              +=
 endif
 
+# Allow openssl installation selection
+ifneq ($(OPENSSL),)
+configure_OPTIONS              += --with-openssl=$(OPENSSL)
+endif
+
 # If the user has asserted USE_LWIP, alter the configuration and
 # target tuple to use LwIP rather than the expected BSD sockets.
 
@@ -454,15 +459,6 @@ command line or in the environment:
                           directory. Note that the directory is expected to contain 
                           include and lib subdirectories containing the necessary header 
                           and libraries. 
-
-  OPENSSL=internal        Build the internal copy of OpenSSL as part of the CHIP
-                          build.
-
-  OPENSSL=no              Build an alternate configuration that does not depend
-  NO_OPENSSL=1            on the use of OpenSSL (default: '$(NO_OPENSSL)'.  Note
-                          that the various command line tools that depend on
-                          OpenSSL (e.g., the CHIP tool) will not be built in
-                          this configuration.
 
   TUNNEL_FAILOVER=[1|0]   Enable/disabled support for redundant VPN to the CHIP service
                           (default: '$(TUNNEL_FAILOVER)').

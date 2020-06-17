@@ -30,6 +30,11 @@
 
 namespace chip {
 
+/// Convenience type to make it clear a number represents a node id.
+typedef uint64_t NodeId;
+
+constexpr NodeId kUndefinedNodeId = 0xFFFFFFFFFFFFFFFFll;
+
 /** Handles encoding/decoding of CHIP message headers */
 class MessageHeader
 {
@@ -39,14 +44,14 @@ public:
      *
      * NOTE: the source node id is optional and may be missing.
      */
-    const Optional<uint64_t> & GetSourceNodeId() const { return mSourceNodeId; }
+    const Optional<NodeId> & GetSourceNodeId() const { return mSourceNodeId; }
 
     /**
      * Gets the destination node id in the current message.
      *
      * NOTE: the destination node id is optional and may be missing.
      */
-    const Optional<uint64_t> & GetDestinationNodeId() const { return mDestinationNodeId; }
+    const Optional<NodeId> & GetDestinationNodeId() const { return mDestinationNodeId; }
 
     /**
      * Gets the message id set in the header.
@@ -65,9 +70,17 @@ public:
     }
 
     /** Set the source node id for this header. */
-    MessageHeader & SetSourceNodeId(uint64_t id)
+    MessageHeader & SetSourceNodeId(NodeId id)
     {
         mSourceNodeId.SetValue(id);
+
+        return *this;
+    }
+
+    /** Set the source node id for this header. */
+    MessageHeader & SetSourceNodeId(Optional<NodeId> id)
+    {
+        mSourceNodeId = id;
 
         return *this;
     }
@@ -81,10 +94,17 @@ public:
     }
 
     /** Set the destination node id for this header. */
-    MessageHeader & SetDestinationNodeId(uint64_t id)
+    MessageHeader & SetDestinationNodeId(NodeId id)
     {
         mDestinationNodeId.SetValue(id);
 
+        return *this;
+    }
+
+    /** Set the destination node id for this header. */
+    MessageHeader & SetDestinationNodeId(Optional<NodeId> id)
+    {
+        mDestinationNodeId = id;
         return *this;
     }
 
@@ -132,7 +152,7 @@ public:
      * Possible failures:
      *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
      */
-    CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size);
+    CHIP_ERROR Encode(uint8_t * data, size_t size, size_t * encode_size) const;
 
 private:
     /// Represents the current encode/decode header version
@@ -142,10 +162,10 @@ private:
     uint32_t mMessageId = 0;
 
     /// What node the message originated from
-    Optional<uint64_t> mSourceNodeId;
+    Optional<NodeId> mSourceNodeId;
 
     /// Intended recipient of the message.
-    Optional<uint64_t> mDestinationNodeId;
+    Optional<NodeId> mDestinationNodeId;
 };
 
 } // namespace chip

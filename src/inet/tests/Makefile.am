@@ -46,9 +46,7 @@ lib_LIBRARIES                                         = \
 
 libInetLayerTests_a_SOURCES                           = \
     TestInetAddress.cpp                                 \
-    TestInetBuffer.cpp                                  \
     TestInetErrorStr.cpp                                \
-    TestInetTimer.cpp                                   \
     $(NULL)
 
 libInetLayerTests_adir                                = $(includedir)/inet
@@ -125,7 +123,7 @@ check_SCRIPTS                                         = \
 TESTS_ENVIRONMENT                                     = \
     $(NULL)
 
-if CHIP_TARGET_STYLE_EMBEDDED
+if CHIP_DEVICE_LAYER_TARGET_ESP32
 
 check_SCRIPTS                                        += \
     qemu_inet_tests.sh                                  \
@@ -137,7 +135,7 @@ TESTS_ENVIRONMENT                                    += \
     QEMU_TEST_TARGET=libInetLayerTests.a                \
     $(NULL)
 
-else # CHIP_TARGET_STYLE_EMBEDDED
+else # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 # Test executables that should be built but not installed and should
 # always be built to ensure overall "build sanity".
@@ -162,12 +160,10 @@ noinst_PROGRAMS                                       = \
 
 check_PROGRAMS                                       += \
     TestInetAddress                                     \
-    TestInetBuffer                                      \
     TestInetErrorStr                                    \
-    TestInetTimer                                       \
     $(NULL)
 
-endif # CHIP_TARGET_STYLE_EMBEDDED
+endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
 # Test applications and scripts that should be built and run when the
 # 'check' target is run.
@@ -184,10 +180,6 @@ TestLwIPDNS_LDADD                                     = libTestInetCommon.a $(CO
 
 TestInetAddress_SOURCES                               = TestInetAddressDriver.cpp
 TestInetAddress_LDADD                                 = $(COMMON_LDADD)
-
-TestInetBuffer_SOURCES                                = TestInetBufferDriver.cpp      \
-                                                        $(NULL)
-TestInetBuffer_LDADD                                  = $(COMMON_LDADD)
 
 TestInetEndPoint_SOURCES                              = TestInetEndPoint.cpp    \
                                                         $(NULL)
@@ -207,10 +199,6 @@ TestInetLayer_LDADD                                   = libTestInetCommon.a $(CO
 TestInetLayerMulticast_SOURCES                        = TestInetLayerMulticast.cpp    \
                                                         $(NULL)
 TestInetLayerMulticast_LDADD                          = libTestInetCommon.a $(COMMON_LDADD)
-
-TestInetTimer_SOURCES                                 = TestInetTimerDriver.cpp       \
-                                                        $(NULL)
-TestInetTimer_LDADD                                   = $(COMMON_LDADD)
 
 #
 # Foreign make dependencies

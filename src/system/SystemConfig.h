@@ -105,16 +105,6 @@
 // clang-format off
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
- *
- *  @brief
- *    This boolean configuration option is (1) if the obsolescent features of the CHIP System Layer are provided.
- */
-#ifndef CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-#define CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES 0
-#endif //  CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
-/**
  *  @def CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
  *
  *  @brief
@@ -127,23 +117,6 @@
 
 #if CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
 #ifdef INET_PROJECT_CONFIG_INCLUDE
-#if CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-/*
- * NOTE WELL: the `INET_LWIP` and `INET_SOCKETS` configuration parameters used to be generated directly by the `autoconf` system.
- * Historically, those definitions appeared in `$CHIP/src/include/BuildConfig.h` and the build configuration logic in some systems
- * that have `InetProjectConfig.h` may still be relying on these definitions already being present in the logic prior to the
- * inclusion of <InetProjectConfig.h> and they must accordingly be defined here to provide for transferring the contents of the
- * INET layer configuration properly.
- */
-#ifndef INET_LWIP
-#define INET_LWIP CHIP_SYSTEM_CONFIG_USE_LWIP
-#endif // !defined(INET_LWIP)
-
-#ifndef INET_SOCKETS
-#define INET_SOCKETS CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#endif // !defined(INET_SOCKETS)
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES
-
 #include INET_PROJECT_CONFIG_INCLUDE
 #endif // INET_PROJECT_CONFIG_INCLUDE
 
@@ -300,6 +273,26 @@
  *
  *      This number was calculated as follows:
  *
+ *      CHIP Crypto Header:
+ *
+ *          4 -- Length of encrypted block
+ *          4 -- Reserve
+ *          8 -- Initialization Vector
+ *          8 -- Encryption Tag
+ */
+#ifndef CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE
+#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 24
+#endif
+
+/**
+ *  @def CHIP_SYSTEM_HEADER_RESERVE_SIZE
+ *
+ *  @brief
+ *      The number of bytes to reserve in a network packet buffer to contain
+ *      the CHIP message and exchange headers.
+ *
+ *      This number was calculated as follows:
+ *
  *      CHIP Message Header:
  *
  *          2 -- Frame Length
@@ -320,7 +313,7 @@
  *    @note A number of these fields are optional or not presently used. So most headers will be considerably smaller than this.
  */
 #ifndef CHIP_SYSTEM_HEADER_RESERVE_SIZE
-#define CHIP_SYSTEM_HEADER_RESERVE_SIZE 38
+#define CHIP_SYSTEM_HEADER_RESERVE_SIZE (38 + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE)
 #endif /* CHIP_SYSTEM_HEADER_RESERVE_SIZE */
 
 /**

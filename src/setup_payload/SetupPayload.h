@@ -49,6 +49,7 @@ const int kPaddingFieldLengthInBits                  = 5;
 const int kRendezvousInfoReservedFieldLengthInBits = 4;
 const int kRawVendorTagLengthInBits                = 7;
 const uint16_t kSerialNumberTag                    = 128;
+const uint32_t kTag_QRCodeExensionDescriptor       = 0x00;
 
 const int kManualSetupShortCodeCharLength = 10;
 const int kManualSetupLongCodeCharLength  = 20;

@@ -65,6 +65,7 @@ extern esp_err_t InitDisplay();
  *  Clear the display by setting the whole screen to black
  */
 extern void ClearDisplay();
+
 /**
  * @brief
  *  Clear a portion of the display by drawing a black rectangle based on the given arguments

@@ -35,12 +35,10 @@
 
 #define EXAMPLE_VENDOR_TAG_IP 2
 #define MAX_IP_LEN 46
-#define EXAMPLE_VENDOR_TAG_PORT 3
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
 static NSString * const ipKey = @"ipk";
-static NSString * const portKey = @"pk";
 
 @interface QRCodeViewController ()
 
@@ -59,6 +57,8 @@ static NSString * const portKey = @"pk";
 
     _doneManualCodeButton.layer.cornerRadius = 5;
     _doneManualCodeButton.clipsToBounds = YES;
+    _resetButton.layer.cornerRadius = 5;
+    _resetButton.clipsToBounds = YES;
     _manualCodeTextField.keyboardType = UIKeyboardTypeNumberPad;
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
@@ -90,6 +90,8 @@ static NSString * const portKey = @"pk";
     if ([_activityIndicator isAnimating]) {
         [_activityIndicator stopAnimating];
     }
+    // show the reset button if there's scanned data saved
+    _resetButton.hidden = ![self hasScannedConnectionInfo];
     _qrCodeButton.hidden = NO;
     _doneQrCodeButton.hidden = YES;
     _activityIndicator.hidden = YES;
@@ -144,6 +146,10 @@ static NSString * const portKey = @"pk";
     [self->_activityIndicator stopAnimating];
     self->_activityIndicator.hidden = YES;
     self->_errorLabel.hidden = YES;
+    // reset the view and remove any preferences that were stored from a previous scan
+    if ([self hasScannedConnectionInfo]) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
+    }
 
     if (decimalString) {
         self->_manualCodeLabel.hidden = NO;
@@ -172,6 +178,7 @@ static NSString * const portKey = @"pk";
         self->_productID.text = [NSString stringWithFormat:@"%@", payload.productID];
     }
     self->_setupPayloadView.hidden = NO;
+    self->_resetButton.hidden = NO;
 
     NSLog(@"Payload vendorID %@", payload.vendorID);
     if ([payload.vendorID isEqualToNumber:[NSNumber numberWithInt:EXAMPLE_VENDOR_ID]]) {
@@ -201,12 +208,6 @@ static NSString * const portKey = @"pk";
                         }
                     }
                     break;
-                case EXAMPLE_VENDOR_TAG_PORT:
-                    if ([info.infoType isEqualToNumber:[NSNumber numberWithInt:kOptionalQRCodeInfoTypeInt]]) {
-                        NSLog(@"Got Port number... %@", info.integerValue);
-                        [[NSUserDefaults standardUserDefaults] setInteger:info.integerValue.integerValue forKey:portKey];
-                    }
-                    break;
                 }
             }
         }
@@ -223,6 +224,12 @@ static NSString * const portKey = @"pk";
     UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel handler:nil];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (BOOL)hasScannedConnectionInfo
+{
+    NSString * ipAddress = [[NSUserDefaults standardUserDefaults] stringForKey:ipKey];
+    return (ipAddress.length > 0);
 }
 
 // MARK: QR Code
@@ -323,6 +330,14 @@ static NSString * const portKey = @"pk";
 
 - (IBAction)stopScanningQRCode:(id)sender
 {
+    [self qrCodeInitialState];
+}
+
+- (IBAction)resetView:(id)sender
+{
+    // reset the view and remove any preferences that were stored from scanning the QRCode
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:ipKey];
+    [self manualCodeInitialState];
     [self qrCodeInitialState];
 }
 

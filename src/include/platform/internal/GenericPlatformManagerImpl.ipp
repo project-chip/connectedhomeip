@@ -25,15 +25,15 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_IPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_IPP
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl.h>
-#include <platform/internal/EventLogging.h>
-#include <platform/internal/BLEManager.h>
 #include <new>
+#include <platform/PlatformManager.h>
+#include <platform/internal/BLEManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/EventLogging.h>
+#include <platform/internal/GenericPlatformManagerImpl.h>
 
-#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

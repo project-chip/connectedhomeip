@@ -6,7 +6,7 @@ version: 2
 jobs:
   Run Tests [mbedtls-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build:0.2.14
     environment:
     - BOOTSTRAP_ARGUMENTS: ' --with-crypto=mbedtls'
     - BUILD_TYPE: mbedtls-build
@@ -46,7 +46,7 @@ jobs:
         path: /tmp/test_logs
   Build Examples [nRF]:
     docker:
-    - image: connectedhomeip/chip-build-nrf-platform:0.2.11
+    - image: connectedhomeip/chip-build-nrf-platform:0.2.14
     environment:
     - BUILD_TYPE: nrf-build
     steps:
@@ -60,11 +60,26 @@ jobs:
           cp examples/lock-app/nrf5/build/chip-nrf52840-lock-example.out \
              example_binaries/nrf-build/chip-nrf52840-lock-example.out
         name: Preserve artifacts
+    - run:
+        command: |
+          mkdir -p "master_binaries/nrf-build"
+          scripts/helpers/bloat_check.py                                             \
+             --token "$CIRCLECI_API_TOKEN"                                           \
+             --job "Build Examples [nRF]"                                         \
+             --artifact-download-dir "master_binaries/nrf-build"          \
+             --build-output-dir "example_binaries/nrf-build"                    \
+             --report-file bloat_report.txt                                          \
+             --github-repository "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME" \
+             --github-comment-pr-number "$CIRCLE_PR_NUMBER"                          \
+             --github-api-token "$GITHUB_BLOAT_API_TOKEN"
+        name: Generate bloat report
+    - store_artifacts:
+        path: bloat_report.txt
     - store_artifacts:
         path: example_binaries/nrf-build
   Deploy [main-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build-openssl:0.2.14
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -82,7 +97,7 @@ jobs:
         name: Deployment Check
   Build Examples [main-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build-openssl:0.2.14
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -99,16 +114,34 @@ jobs:
         command: scripts/examples/standalone_echo_client.sh
         name: Build example Standalone Echo Client
     - run:
+        command: scripts/examples/standalone_shell.sh
+        name: Build example Standalone Shell
+    - run:
         command: |
           mkdir -p example_binaries/main-build
           cp examples/chip-tool/build/chip-standalone-demo.out \
              example_binaries/main-build/chip-standalone-demo.out
         name: Preserve artifacts
+    - run:
+        command: |
+          mkdir -p "master_binaries/main-build"
+          scripts/helpers/bloat_check.py                                             \
+             --token "$CIRCLECI_API_TOKEN"                                           \
+             --job "Build Examples [main-build]"                                         \
+             --artifact-download-dir "master_binaries/main-build"          \
+             --build-output-dir "example_binaries/main-build"                    \
+             --report-file bloat_report.txt                                          \
+             --github-repository "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME" \
+             --github-comment-pr-number "$CIRCLE_PR_NUMBER"                          \
+             --github-api-token "$GITHUB_BLOAT_API_TOKEN"
+        name: Generate bloat report
+    - store_artifacts:
+        path: bloat_report.txt
     - store_artifacts:
         path: example_binaries/main-build
   Run Tests [ESP32-QEMU]:
     docker:
-    - image: connectedhomeip/chip-build-esp32-qemu:0.2.11
+    - image: connectedhomeip/chip-build-esp32-qemu:0.2.14
     environment:
     - BUILD_TYPE: esp32-qemu-build
     steps:
@@ -118,7 +151,7 @@ jobs:
         name: Build ESP32 QEMU and Run Tests
   Build CHIP [mbedtls-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build:0.2.14
     environment:
     - BOOTSTRAP_ARGUMENTS: ' --with-crypto=mbedtls'
     - BUILD_TYPE: mbedtls-build
@@ -153,7 +186,7 @@ jobs:
         - build/downloads
   Run Tests [linux-embedded]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build:0.2.14
     environment:
     - BOOTSTRAP_ARGUMENTS: ' --with-device-layer=linux'
     - BUILD_TYPE: linux-embedded
@@ -193,7 +226,7 @@ jobs:
         path: /tmp/test_logs
   Build CHIP [linux-embedded]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build:0.2.14
     environment:
     - BOOTSTRAP_ARGUMENTS: ' --with-device-layer=linux'
     - BUILD_TYPE: linux-embedded
@@ -228,7 +261,7 @@ jobs:
         - build/downloads
   Build CHIP [main-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build-openssl:0.2.14
     environment:
     - BUILD_TYPE: main-build
     steps:
@@ -262,7 +295,7 @@ jobs:
         - build/downloads
   Build Examples [ESP32]:
     docker:
-    - image: connectedhomeip/chip-build-esp32:0.2.11
+    - image: connectedhomeip/chip-build-esp32:0.2.14
     environment:
     - BUILD_TYPE: esp32-build
     steps:
@@ -276,11 +309,26 @@ jobs:
           cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
              example_binaries/esp32-build/chip-wifi-echo.elf
         name: Preserve artifacts
+    - run:
+        command: |
+          mkdir -p "master_binaries/esp32-build"
+          scripts/helpers/bloat_check.py                                             \
+             --token "$CIRCLECI_API_TOKEN"                                           \
+             --job "Build Examples [ESP32]"                                         \
+             --artifact-download-dir "master_binaries/esp32-build"          \
+             --build-output-dir "example_binaries/esp32-build"                    \
+             --report-file bloat_report.txt                                          \
+             --github-repository "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME" \
+             --github-comment-pr-number "$CIRCLE_PR_NUMBER"                          \
+             --github-api-token "$GITHUB_BLOAT_API_TOKEN"
+        name: Generate bloat report
+    - store_artifacts:
+        path: bloat_report.txt
     - store_artifacts:
         path: example_binaries/esp32-build
   Run Tests [clang-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build:0.2.14
     environment:
     - BOOTSTRAP_ARGUMENTS: ' CC=clang-9 CXX=clang++-9'
     - BUILD_TYPE: clang-build
@@ -320,7 +368,7 @@ jobs:
         path: /tmp/test_logs
   Build CHIP [clang-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build:0.2.14
     environment:
     - BOOTSTRAP_ARGUMENTS: ' CC=clang-9 CXX=clang++-9'
     - BUILD_TYPE: clang-build
@@ -355,7 +403,7 @@ jobs:
         - build/downloads
   Run Tests [main-build]:
     docker:
-    - image: connectedhomeip/chip-build:0.2.11
+    - image: connectedhomeip/chip-build-openssl:0.2.14
     environment:
     - BUILD_TYPE: main-build
     steps:

@@ -274,6 +274,15 @@ sys_thread_t sys_thread_new(const char * name, lwip_thread_fn thread, void * arg
     return taskH;
 }
 
+err_t sys_thread_finish(sys_thread_t t)
+{
+#if INCLUDE_vTaskDelete
+    TaskHandle_t taskH = (TaskHandle_t) t;
+    vTaskDelete(taskH);
+#endif
+    return ERR_OK;
+}
+
 u32_t sys_now(void)
 {
     return TicksToMS(xTaskGetTickCount());

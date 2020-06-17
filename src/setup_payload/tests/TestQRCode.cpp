@@ -23,97 +23,21 @@
  */
 
 #include "TestQRCode.h"
-
-#include <assert.h>
-#include <bitset>
-#include <stdio.h>
-#include <unistd.h>
+#include "TestHelpers.h"
 
 #include <iostream>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include "Base41.cpp"
-#include "QRCodeSetupPayloadGenerator.cpp"
-#include "QRCodeSetupPayloadParser.cpp"
-#include "SetupPayload.cpp"
-
 using namespace chip;
 using namespace std;
-
-SetupPayload GetDefaultPayload()
-{
-    SetupPayload payload;
-
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = 1;
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
-
-    return payload;
-}
-
-string toBinaryRepresentation(string base41Result)
-{
-    // Remove the kQRCodePrefix
-    base41Result.erase(0, strlen(kQRCodePrefix));
-
-    // Decode the base41 encoded string
-    vector<uint8_t> buffer;
-    base41Decode(base41Result, buffer);
-
-    // Convert it to binary
-    string binaryResult;
-    for (int i = buffer.size() - 1; i >= 0; i--)
-    {
-        binaryResult += bitset<8>(buffer[i]).to_string();
-    }
-
-    // Insert spaces after each block
-    size_t pos = binaryResult.size();
-
-    pos -= kVersionFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kVendorIDFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kProductIDFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kCustomFlowRequiredFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kRendezvousInfoFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kPayloadDiscriminatorFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kSetupPINCodeFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    pos -= kPaddingFieldLengthInBits;
-    binaryResult.insert(pos, " ");
-
-    return binaryResult;
-}
 
 void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
 
-    QRCodeSetupPayloadGenerator generator(payload);
-    string result;
-    CHIP_ERROR err  = generator.payloadBase41Representation(result);
-    bool didSucceed = err == CHIP_NO_ERROR;
-    NL_TEST_ASSERT(inSuite, didSucceed == true);
-
     string expected = " 00000 000000000000000100000000000 000010000000 00000001 0 0000000000000001 0000000000001100 101";
-    NL_TEST_ASSERT(inSuite, toBinaryRepresentation(result) == expected);
+    NL_TEST_ASSERT(inSuite, CompareBinary(payload, expected));
 }
 
 void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
@@ -134,12 +58,10 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t input[] = { 10, 10, 10 };
 
+    // basic stuff
     NL_TEST_ASSERT(inSuite, base41Encode(input, 0).compare("") == 0);
-
     NL_TEST_ASSERT(inSuite, base41Encode(input, 1).compare("A") == 0);
-
     NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("SL1") == 0);
-
     NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL1A") == 0);
 
     // test single odd byte corner conditions
@@ -152,6 +74,25 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     input[2] = 255;
     NL_TEST_ASSERT(inSuite, base41Encode(input, 3).compare("SL196") == 0);
 
+    // testing optimized encoding
+    // verify that we can't optimize a low value, need 3 chars
+    input[0] = 255;
+    input[1] = 0;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("960") == 0);
+    // smallest optimized encoding, 256
+    input[0] = 256 % 256;
+    input[1] = 256 / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("A6") == 0);
+    // largest optimizated encoding value
+    input[0] = ((kRadix * kRadix) - 1) % 256;
+    input[1] = ((kRadix * kRadix) - 1) / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("..") == 0);
+    // can't optimize
+    input[0] = ((kRadix * kRadix)) % 256;
+    input[1] = ((kRadix * kRadix)) / 256;
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2).compare("001") == 0);
+
+    // fun with strings
     NL_TEST_ASSERT(inSuite,
                    base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1).compare("GHF.KGL+48-G5LGK35") == 0);
 
@@ -204,7 +145,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, decoded.size() == 1 && decoded[0] == 255);
     NL_TEST_ASSERT(inSuite, base41Decode("A6", decoded) == CHIP_NO_ERROR); // this is 256, needs 2 output bytes
     NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == 256);
-    NL_TEST_ASSERT(inSuite, base41Decode("..", decoded) == CHIP_NO_ERROR); // this is 41^2-1, or 1680, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, base41Decode("..", decoded) == CHIP_NO_ERROR); // this is (41*41)-1, or 1680, needs 2 output bytes
     NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == (kRadix * kRadix) - 1);
 }
 

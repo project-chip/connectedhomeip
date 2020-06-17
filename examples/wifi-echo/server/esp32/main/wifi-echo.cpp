@@ -35,11 +35,12 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
+#include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer(UDPEndPoint *& endpoint);
+extern void startServer(SecureSessionMgr * transportIPv4, SecureSessionMgr * transportIPv6);
 extern void startClient(void);
 
 #if CONFIG_DEVICE_TYPE_M5STACK
@@ -68,6 +69,10 @@ extern void startClient(void);
 
 static QRCodeWidget sQRCodeWidget;
 
+// Where to draw the connection status message
+#define CONNECTION_MESSAGE 75
+// Where to draw the IPv6 information
+#define IPV6_INFO 85
 #endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED;
@@ -165,8 +170,8 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    UDPEndPoint * sEndpoint = NULL;
-    startServer(sEndpoint);
+    SecureSessionMgr sTransportIPv4, sTransportIPv6;
+    startServer(&sTransportIPv4, &sTransportIPv6);
 #if CONFIG_USE_ECHO_CLIENT
     startClient();
 #endif
@@ -230,12 +235,20 @@ void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             {
                 char ipAddrStr[INET_ADDRSTRLEN];
                 IPAddress::FromIPv4(ipInfo.ip).ToString(ipAddrStr, sizeof(ipAddrStr));
-                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CONFIG_ECHO_PORT);
+                ESP_LOGI(TAG, "Server ready at: %s:%d", ipAddrStr, CHIP_PORT);
             }
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
         {
-            ESP_LOGE(TAG, "Lost IPv4 address...");
+            ESP_LOGE(TAG, "Lost IPv4 connectivity...");
+        }
+        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+        {
+            ESP_LOGI(TAG, "IPv6 Server ready...");
+        }
+        else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
+        {
+            ESP_LOGE(TAG, "Lost IPv6 connectivity...");
         }
     }
     if (event->Type == DeviceEventType::kSessionEstablished && event->SessionEstablished.IsCommissioner)

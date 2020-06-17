@@ -31,12 +31,30 @@ RUN set -x \
     libusb-1.0 \
     libncurses5-dev \
     libncursesw5-dev \
+    libnspr4-dev \
+    libxml2-dev \
     flex \
     bison \
     gperf \
     zlib1g-dev \
     libglib2.0-dev \
     libpixman-1-dev \
+    cmake \
     && rm -rf /var/lib/apt/lists/ \
-    && pip3 install circleci attrs coloredlogs \
+    && : # last line
+
+RUN set -x \
+    && pip3 install circleci attrs coloredlogs PyGithub \
+    && : # last line
+
+# Install bloat comparison tools
+RUN set -x \
+    && git clone https://github.com/google/bloaty.git \
+    && mkdir -p bloaty/build \
+    && cd bloaty/build \
+    && cmake ../ \
+    && make -j \
+    && make install \
+    && cd ../.. \
+    && rm -rf bloaty \
     && : # last line
