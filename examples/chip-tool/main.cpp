@@ -208,7 +208,7 @@ bool DetermineCommandArgs(int argc, char * argv[], Command command, CommandArgs 
 // Handle the echo case, where we just send a string and expect to get it back.
 void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress & host_addr, uint16_t port)
 {
-    size_t payload_len = strlen(PAYLOAD) + 1;
+    size_t payload_len = strlen(PAYLOAD);
 
     // Run the client
     char host_ip_str[40];
@@ -218,7 +218,7 @@ void DoEcho(DeviceController::ChipDeviceController * controller, const IPAddress
         // Reallocate buffer on each run, as the secure transport encrypts and
         // overwrites the buffer from previous iteration.
         auto * buffer = System::PacketBuffer::NewWithAvailableSize(payload_len);
-        snprintf((char *) buffer->Start(), payload_len, "%s", PAYLOAD);
+        memcpy(buffer->Start(), PAYLOAD, payload_len);
         buffer->SetDataLength(payload_len);
 
         controller->SendMessage(NULL, buffer);
