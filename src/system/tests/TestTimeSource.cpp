@@ -94,5 +94,5 @@ int TestTimeSource(void)
 
 static void __attribute__((constructor)) TestTimeSourceCtor(void)
 {
-    VerifyOrDie(chip::RegisterUnitTests(&TestSystemPacketBuffer) == CHIP_NO_ERROR);
+    VerifyOrDie(chip::RegisterUnitTests(&TestTimeSource) == CHIP_NO_ERROR);
 }
