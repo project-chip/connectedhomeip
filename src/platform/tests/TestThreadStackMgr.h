@@ -26,4 +26,4 @@
 
 int TestThreadStackManager(void);
 
-#endif // CHIP_TEST_THREAD_STACK_MGR_H 
+#endif // CHIP_TEST_THREAD_STACK_MGR_H
