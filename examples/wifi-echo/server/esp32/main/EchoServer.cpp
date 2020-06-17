@@ -38,9 +38,10 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureTransport.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
 #include "DataModelHandler.h"
@@ -85,7 +86,7 @@ exit:
     return isPrintable;
 }
 
-void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & packet_info, SecureTransport * transport)
+void newConnectionHandler(const MessageHeader & header, const IPPacketInfo & packet_info, SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
 
@@ -106,7 +107,7 @@ exit:
 
 // Transport Callbacks
 void echo(const MessageHeader & header, const IPPacketInfo & packet_info, System::PacketBuffer * buffer,
-          SecureTransport * transport)
+          SecureSessionMgr * transport)
 {
     CHIP_ERROR err;
     const size_t data_len = buffer->DataLength();
@@ -159,10 +160,16 @@ exit:
     }
 }
 
+void error(CHIP_ERROR error, const IPPacketInfo & pi)
+{
+    ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
+    statusLED.BlinkOnError();
+}
+
 } // namespace
 
 // The echo server assumes the platform's networking has been setup already
-void setupTransport(IPAddressType type, SecureTransport * transport)
+void setupTransport(IPAddressType type, SecureSessionMgr * transport)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     struct netif * netif = NULL;
@@ -176,6 +183,7 @@ void setupTransport(IPAddressType type, SecureTransport * transport)
     SuccessOrExit(err);
 
     transport->SetMessageReceiveHandler(echo, transport);
+    transport->SetReceiveErrorHandler(error);
     transport->SetNewConnectionHandler(newConnectionHandler, transport);
 
 exit:
@@ -190,7 +198,7 @@ exit:
 }
 
 // The echo server assumes the platform's networking has been setup already
-void startServer(SecureTransport * transport_ipv4, SecureTransport * transport_ipv6)
+void startServer(SecureSessionMgr * transport_ipv4, SecureSessionMgr * transport_ipv6)
 {
     setupTransport(kIPAddressType_IPv6, transport_ipv6);
     setupTransport(kIPAddressType_IPv4, transport_ipv4);

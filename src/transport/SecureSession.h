@@ -18,19 +18,19 @@
 
 /**
  *    @file
- *      This file defines the CHIP Secure Channel object that provides
+ *      This file defines the CHIP Secure Session object that provides
  *      APIs for encrypting/decryting data using cryptographic keys.
  *
  */
 
-#ifndef __CHIPSECURECHANNEL_H__
-#define __CHIPSECURECHANNEL_H__
+#ifndef __SECURESESSION_H__
+#define __SECURESESSION_H__
 
 #include <core/CHIPCore.h>
 
 namespace chip {
 
-class DLL_EXPORT ChipSecureChannel
+class DLL_EXPORT SecureSession
 {
 public:
     /**
@@ -83,7 +83,7 @@ public:
 
     void Close(void);
 
-    ChipSecureChannel(void);
+    SecureSession(void);
 
 private:
     static const size_t kAES_CCM128_Key_Length = 16;
@@ -95,4 +95,4 @@ private:
 
 } // namespace chip
 
-#endif // __CHIPSECURECHANNEL_H__
+#endif // __SECURESESSION_H__

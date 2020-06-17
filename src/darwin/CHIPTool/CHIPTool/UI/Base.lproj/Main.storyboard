@@ -384,13 +384,13 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Use Correct Encryption Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="778-me-ArK">
-                                <rect key="frame" x="16" y="273" width="219.66666666666666" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Use Incorrect Encryption Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="778-me-ArK">
+                                <rect key="frame" x="16" y="273" width="231" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN9-8p-BcA">
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="dN9-8p-BcA">
                                 <rect key="frame" x="310" y="268" width="51" height="31"/>
                                 <connections>
                                     <action selector="encryptionKey:" destination="NR6-8N-IDd" eventType="valueChanged" id="Ggg-GX-tuM"/>
@@ -418,7 +418,6 @@
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="fdf-Mv-mqP"/>
                             <constraint firstItem="6Z1-j3-AvT" firstAttribute="top" secondItem="lvN-Eg-W6F" secondAttribute="bottom" constant="40" id="keR-8B-8EU"/>
                             <constraint firstItem="Tzm-Xh-QOZ" firstAttribute="leading" secondItem="UPn-Qe-uvu" secondAttribute="leading" constant="16" id="oFI-15-MgQ"/>
-                            <constraint firstItem="dN9-8p-BcA" firstAttribute="leading" secondItem="778-me-ArK" secondAttribute="trailing" constant="74.333333333333343" id="vAd-2E-26Q"/>
                             <constraint firstItem="778-me-ArK" firstAttribute="centerY" secondItem="dN9-8p-BcA" secondAttribute="centerY" id="vRO-8x-KDG"/>
                             <constraint firstItem="tC3-Jk-Opv" firstAttribute="top" secondItem="7aI-Vo-UyO" secondAttribute="bottom" constant="8" id="xkI-6e-Plp"/>
                         </constraints>
@@ -610,14 +609,14 @@
                                     <action selector="offButtonTapped:" destination="UgW-Ob-0KX" eventType="touchUpInside" id="JJt-5D-6pb"/>
                                 </connections>
                             </button>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kmC-Kl-vj2">
-                                <rect key="frame" x="312" y="255" width="49" height="31"/>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="kmC-Kl-vj2">
+                                <rect key="frame" x="310" y="255" width="51" height="31"/>
                                 <connections>
                                     <action selector="encryptionKey:" destination="UgW-Ob-0KX" eventType="valueChanged" id="WaE-yH-elT"/>
                                 </connections>
                             </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" text="Use Correct Encryption Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HeR-1a-hjt">
-                                <rect key="frame" x="16" y="260" width="220" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" text="Use Incorrect Encryption Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HeR-1a-hjt">
+                                <rect key="frame" x="16" y="260" width="231" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -625,8 +624,6 @@
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="kG5-yT-GzM" firstAttribute="trailing" secondItem="kmC-Kl-vj2" secondAttribute="trailing" constant="16" id="0xy-jd-RXB"/>
-                            <constraint firstItem="kmC-Kl-vj2" firstAttribute="leading" secondItem="HeR-1a-hjt" secondAttribute="trailing" constant="76" id="1IU-FQ-Yaf"/>
                             <constraint firstItem="cwX-vi-vgG" firstAttribute="width" secondItem="1XM-cR-Y6o" secondAttribute="width" id="582-Pj-QoZ"/>
                             <constraint firstItem="XIj-Oo-qmz" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="16" id="6o4-kh-TOw"/>
                             <constraint firstItem="HeR-1a-hjt" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="16" id="9XA-y5-9Om"/>
@@ -636,6 +633,7 @@
                             <constraint firstItem="XIj-Oo-qmz" firstAttribute="leading" secondItem="c45-FF-oLb" secondAttribute="leadingMargin" id="KLq-hK-kli"/>
                             <constraint firstItem="ERS-fv-Yhs" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="16" id="LVO-tn-vpG"/>
                             <constraint firstItem="eg3-7c-7WS" firstAttribute="leading" secondItem="kG5-yT-GzM" secondAttribute="leading" constant="77" id="LyU-T1-mwz"/>
+                            <constraint firstItem="kG5-yT-GzM" firstAttribute="trailing" secondItem="kmC-Kl-vj2" secondAttribute="trailing" constant="16" id="O1w-nm-0Or"/>
                             <constraint firstItem="1XM-cR-Y6o" firstAttribute="top" secondItem="kmC-Kl-vj2" secondAttribute="bottom" constant="23" id="OOf-aG-laS"/>
                             <constraint firstItem="1XM-cR-Y6o" firstAttribute="centerY" secondItem="cwX-vi-vgG" secondAttribute="centerY" id="PIV-cB-jxE"/>
                             <constraint firstItem="ERS-fv-Yhs" firstAttribute="top" secondItem="jhI-Pt-QaG" secondAttribute="bottom" constant="30" id="SfK-C8-ojg"/>

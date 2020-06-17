@@ -140,7 +140,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, IPAddress 
     mDeviceAddr     = deviceAddr;
     mDevicePort     = devicePort;
     mAppReqState    = appReqState;
-    mDeviceCon      = new SecureTransport();
+    mDeviceCon      = new SecureSessionMgr();
 
     err = mDeviceCon->Init(mLocalDeviceId, mInetLayer, Transport::UdpListenParameters().SetAddressType(deviceAddr.Type()));
     SuccessOrExit(err);
@@ -182,6 +182,20 @@ CHIP_ERROR ChipDeviceController::ManualKeyExchange(const unsigned char * remote_
     err = mDeviceCon->ManualKeyExchange(remote_public_key, public_key_length, local_private_key, private_key_length);
     SuccessOrExit(err);
     mConState = kConnectionState_SecureConnected;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ChipDeviceController::PopulatePeerAddress(Transport::PeerAddress & peerAddress)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
+
+    peerAddress.SetIPAddress(mDeviceAddr);
+    peerAddress.SetPort(mDevicePort);
+    peerAddress.SetTransportType(Transport::Type::kUdp);
 
 exit:
     return err;

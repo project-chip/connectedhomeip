@@ -32,7 +32,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
-#include <transport/SecureTransport.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/UDP.h>
 
 namespace chip {
@@ -88,6 +88,15 @@ public:
      */
     CHIP_ERROR ManualKeyExchange(const unsigned char * remote_public_key, const size_t public_key_length,
                                  const unsigned char * local_private_key, const size_t private_key_length);
+
+    /**
+     * @brief
+     *   Get the PeerAddress of a connected peer
+     *
+     * @param[inout] peerAddress  The PeerAddress object which will be populated with the details of the connected peer
+     * @return CHIP_ERROR   An error if there's no active connection
+     */
+    CHIP_ERROR PopulatePeerAddress(Transport::PeerAddress & peerAddress);
 
     /**
      * @brief
@@ -159,7 +168,7 @@ private:
 
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
-    SecureTransport * mDeviceCon;
+    SecureSessionMgr * mDeviceCon;
 
     ConnectionState mConState;
     void * mAppReqState;
