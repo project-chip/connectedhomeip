@@ -149,6 +149,8 @@ exit:
 void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IPPacketInfo & pktInfo, System::PacketBuffer * msg,
                                           SecureSessionMgr * connection)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     System::PacketBuffer * origMsg = nullptr;
 
     // TODO: actual key exchange should happen here
@@ -161,11 +163,11 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IP
         ExitNow(ChipLogProgress(Inet, "Secure transport failed: state does not allow receive"));
     }
 
+    err = CHIP_ERROR_INVALID_ARGUMENT;
     VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     // TODO this is where messages should be decoded
     {
-        CHIP_ERROR err          = CHIP_NO_ERROR;
         uint8_t * encryptedText = msg->Start();
         uint16_t encryptedLen   = msg->TotalLength();
         uint8_t * plainText     = nullptr;
@@ -184,14 +186,7 @@ void SecureSessionMgr::HandleDataReceived(const MessageHeader & header, const IP
 
         plainText = msg->Start() + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE;
         err       = connection->mSecureChannel.Decrypt(encryptedText, encryptedLen, plainText, plainTextlen);
-        if (err != CHIP_NO_ERROR)
-        {
-            if (connection->OnReceiveError)
-            {
-                connection->OnReceiveError(CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE_FROM_PEER, pktInfo);
-            }
-            ExitNow(ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
-        }
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
         if (connection->OnMessageReceived)
         {
@@ -210,6 +205,14 @@ exit:
     if (msg != nullptr)
     {
         PacketBuffer::Free(msg);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        if (connection->OnReceiveError)
+        {
+            connection->OnReceiveError(err, pktInfo);
+        }
     }
 }
 
