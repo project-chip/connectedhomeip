@@ -48,22 +48,22 @@ using otbr::DBus::ThreadApiDBus;
 
 struct DBusConnectionDeleter
 {
-    void operator()(DBusConnection *aConnection) { dbus_connection_unref(aConnection); }
+    void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
 };
 
 using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
 
-static bool operator==(const otbr::DBus::Ip6Prefix &aLhs, const otbr::DBus::Ip6Prefix &aRhs)
+static bool operator==(const otbr::DBus::Ip6Prefix & aLhs, const otbr::DBus::Ip6Prefix & aRhs)
 {
-    bool prefixDataEquality = (aLhs.mPrefix.size() == aRhs.mPrefix.size()) &&
-                              (memcmp(&aLhs.mPrefix[0], &aRhs.mPrefix[0], aLhs.mPrefix.size()) == 0);
+    bool prefixDataEquality =
+        (aLhs.mPrefix.size() == aRhs.mPrefix.size()) && (memcmp(&aLhs.mPrefix[0], &aRhs.mPrefix[0], aLhs.mPrefix.size()) == 0);
 
     return prefixDataEquality && aLhs.mLength == aRhs.mLength;
 }
 
-static void CheckExternalRoute(ThreadApiDBus *aApi, const Ip6Prefix &aPrefix)
+static void CheckExternalRoute(ThreadApiDBus * aApi, const Ip6Prefix & aPrefix)
 {
-    ExternalRoute              route;
+    ExternalRoute route;
     std::vector<ExternalRoute> externalRouteTable;
 
     route.mPrefix     = aPrefix;
@@ -82,10 +82,10 @@ static void CheckExternalRoute(ThreadApiDBus *aApi, const Ip6Prefix &aPrefix)
 
 int main()
 {
-    DBusError                      error;
-    UniqueDBusConnection           connection;
+    DBusError error;
+    UniqueDBusConnection connection;
     std::unique_ptr<ThreadApiDBus> api;
-    uint64_t                       extpanid = 0xdead00beaf00cafe;
+    uint64_t extpanid = 0xdead00beaf00cafe;
 
     dbus_error_init(&error);
     connection = UniqueDBusConnection(dbus_bus_get(DBUS_BUS_SYSTEM, &error));
@@ -96,13 +96,12 @@ int main()
 
     api = std::unique_ptr<ThreadApiDBus>(new ThreadApiDBus(connection.get()));
 
-    api->AddDeviceRoleHandler(
-        [](DeviceRole aRole) { printf("Device role changed to %d\n", static_cast<uint8_t>(aRole)); });
+    api->AddDeviceRoleHandler([](DeviceRole aRole) { printf("Device role changed to %d\n", static_cast<uint8_t>(aRole)); });
 
-    api->Scan([&api, extpanid](const std::vector<ActiveScanResult> &aResult) {
-        LinkModeConfig cfg = {true, true, false, true};
+    api->Scan([&api, extpanid](const std::vector<ActiveScanResult> & aResult) {
+        LinkModeConfig cfg = { true, true, false, true };
 
-        for (auto &&result : aResult)
+        for (auto && result : aResult)
         {
             printf("%s channel %d rssi %d\n", result.mNetworkName.c_str(), result.mChannel, result.mRssi);
         }
@@ -119,23 +118,23 @@ int main()
             uint64_t extpanidCheck;
             if (aError == OTBR_ERROR_NONE)
             {
-                std::string                           name;
-                uint64_t                              extAddress = 0;
-                uint16_t                              rloc16     = 0xffff;
-                uint8_t                               routerId;
-                std::vector<uint8_t>                  networkData;
-                std::vector<uint8_t>                  stableNetworkData;
-                otbr::DBus::LeaderData                leaderData;
-                uint8_t                               leaderWeight;
-                int8_t                                rssi;
-                int8_t                                txPower;
-                std::vector<otbr::DBus::ChildInfo>    childTable;
+                std::string name;
+                uint64_t extAddress = 0;
+                uint16_t rloc16     = 0xffff;
+                uint8_t routerId;
+                std::vector<uint8_t> networkData;
+                std::vector<uint8_t> stableNetworkData;
+                otbr::DBus::LeaderData leaderData;
+                uint8_t leaderWeight;
+                int8_t rssi;
+                int8_t txPower;
+                std::vector<otbr::DBus::ChildInfo> childTable;
                 std::vector<otbr::DBus::NeighborInfo> neighborTable;
-                uint32_t                              partitionId;
-                Ip6Prefix                             prefix;
-                OnMeshPrefix                          onMeshPrefix = {};
+                uint32_t partitionId;
+                Ip6Prefix prefix;
+                OnMeshPrefix onMeshPrefix = {};
 
-                prefix.mPrefix = {0xfd, 0xcd, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+                prefix.mPrefix = { 0xfd, 0xcd, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
                 prefix.mLength = 64;
 
                 onMeshPrefix.mPrefix     = prefix;
@@ -172,8 +171,7 @@ int main()
             {
                 exit(-1);
             }
-            api->Attach("Test", 0x3456, extpanid, {}, {}, UINT32_MAX,
-                        [](ClientError aErr) { exit(static_cast<uint8_t>(aErr)); });
+            api->Attach("Test", 0x3456, extpanid, {}, {}, UINT32_MAX, [](ClientError aErr) { exit(static_cast<uint8_t>(aErr)); });
         });
     });
 

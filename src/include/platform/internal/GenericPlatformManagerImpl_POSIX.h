@@ -57,7 +57,7 @@ class GenericPlatformManagerImpl_POSIX : public GenericPlatformManagerImpl<ImplC
 {
 public:
     // ===== Public methods
-    DBusConnection &GetSystemDBusConnection();
+    DBusConnection & GetSystemDBusConnection();
 
 protected:
     // Members for select loop
@@ -100,16 +100,16 @@ private:
 
     static void * EventLoopTaskMain(void * arg);
 
-    static dbus_bool_t AddDBusWatch(struct DBusWatch *aWatch, void *aContext);
-    static void        RemoveDBusWatch(struct DBusWatch *aWatch, void *aContext);
-    static void        ToggleDBusWatch(struct DBusWatch *aWatch, void *aContext);
+    static dbus_bool_t AddDBusWatch(struct DBusWatch * aWatch, void * aContext);
+    static void RemoveDBusWatch(struct DBusWatch * aWatch, void * aContext);
+    static void ToggleDBusWatch(struct DBusWatch * aWatch, void * aContext);
 
     void UpdateDBusFdSet();
     void ProcessDBus();
 
     struct DBusConnectionDeleter
     {
-        void operator()(DBusConnection *aConnection) { dbus_connection_unref(aConnection); }
+        void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
     };
     using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
     UniqueDBusConnection mDBusConnection;

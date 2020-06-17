@@ -1,7 +1,7 @@
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
-#include "platform/ThreadStackManager.h"
 #include "platform/PlatformManager.h"
+#include "platform/ThreadStackManager.h"
 
 int TestThreadStackManager(void)
 {
@@ -26,7 +26,7 @@ int TestThreadStackManager(void)
 
     printf("Start Thread task done\n");
 
-    //chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+    // chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
 
     return 0;
 }
