@@ -1,12 +1,11 @@
 version: 3
 groups:
-    # required-reviewers:
-    #     type: required
-    #     conditions:
-    #         - len(groups.approved.include('reviewer-groups-*')) >= 3
-    #     reviews:
-    #         required: 0
-
+    required-reviewers:
+        type: required
+        conditions:
+            - len(groups.approved.include('reviewer-groups-*')) >= 3
+        reviews:
+            required: 0
     # reviewer-groups-amazon:
     #     type: optional
     #     conditions:
@@ -14,15 +13,15 @@ groups:
     #     reviewers:
     #         teams:
     #             - reviewers-amazon
-
-    # reviewer-groups-groups-apple:
-    #     type: optional
-    #     conditions:
-    #         - files.include('*')
-    #     reviewers:
-    #         teams:
-    #             - reviewers-apple
-
+    reviewer-groups-groups-apple:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams:
+                - reviewers-apple
+            users:
+                - woody-apple
     # reviewer-groups-comcast:
     #     type: optional
     #     conditions:
@@ -30,7 +29,6 @@ groups:
     #     reviewers:
     #         teams:
     #             - reviewers-comcast
-
     # reviewer-groups-google:
     #     type: optional
     #     conditions:
@@ -38,11 +36,10 @@ groups:
     #     reviewers:
     #         teams:
     #             - reviewers-google
-
-    reviewers-samsung:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
-                - reviewers-samsung
+    # reviewers-samsung:
+    #     type: optional
+    #     conditions:
+    #         - files.include('*')
+    #     reviewers:
+    #         teams:
+    #             - reviewers-samsung
