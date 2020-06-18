@@ -4,41 +4,41 @@ groups:
   required-reviewers:
     type: required
     conditions:
-      - len(groups.approved.include('reviewer-groups-*')) >= 3
+    - len(groups.approved.include('reviewer-groups-*')) >= 3
     reviews:
       required: 0
   reviewer-groups-amazon:
     type: optional
     conditions:
-      - files.include('*')
+    - files.include('*')
     reviewers:
       teams:
-        - reviewers-amazon
+      - reviewers-amazon
   reviewer-groups-apple:
     type: optional
     conditions:
-      - files.include('*')
+    - files.include('*')
     reviewers:
       teams:
-        - reviewers-apple
+      - reviewers-apple
   reviewer-groups-comcast:
     type: optional
     conditions:
-      - files.include('*')
+    - files.include('*')
     reviewers:
       teams:
-        - reviewers-comcast
+      - reviewers-comcast
   reviewer-groups-google:
     type: optional
     conditions:
-      - files.include('*')
+    - files.include('*')
     reviewers:
       teams:
-        - reviewers-google
+      - reviewers-google
   reviewers-samsung:
     type: optional
     conditions:
-      - files.include('*')
+    - files.include('*')
     reviewers:
       teams:
-        - reviewers-samsung
+      - reviewers-samsung
