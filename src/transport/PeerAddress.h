@@ -85,7 +85,7 @@ public:
 
     bool operator==(const PeerAddress & other)
     {
-        return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress);
+        return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort);
     }
 
     /****** Factory methods for convenience ******/
