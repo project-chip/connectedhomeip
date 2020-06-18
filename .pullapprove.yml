@@ -7,37 +7,37 @@ groups:
         reviews:
             required: 0
 
-    reviewer-groups-amazon:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
-                - reviewers-amazon
+    # reviewer-groups-amazon:
+    #     type: optional
+    #     conditions:
+    #         - files.include('*')
+    #     reviewers:
+    #         teams:
+    #             - reviewers-amazon
 
-    reviewer-groups-groups-apple:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
-                - reviewers-apple
+    # reviewer-groups-groups-apple:
+    #     type: optional
+    #     conditions:
+    #         - files.include('*')
+    #     reviewers:
+    #         teams:
+    #             - reviewers-apple
 
-    reviewer-groups-comcast:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
-                - reviewers-comcast
+    # reviewer-groups-comcast:
+    #     type: optional
+    #     conditions:
+    #         - files.include('*')
+    #     reviewers:
+    #         teams:
+    #             - reviewers-comcast
 
-    reviewer-groups-google:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
-                - reviewers-google
+    # reviewer-groups-google:
+    #     type: optional
+    #     conditions:
+    #         - files.include('*')
+    #     reviewers:
+    #         teams:
+    #             - reviewers-google
 
     reviewers-samsung:
         type: optional
