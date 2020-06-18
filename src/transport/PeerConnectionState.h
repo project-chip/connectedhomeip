@@ -31,14 +31,26 @@ namespace Transport {
 /**
  * Defines state of a peer connection at a transport layer.
  *
- * Examples of connection specific state includes: message counters and ack,
- * timeouts, addressing information and encryption data.
+ * Information contained within the state:
+ *   - PeerAddress represents how to talk to the peer
+ *   - PeerNodeId is the unique ID of the peer
+ *   - SendMessageIndex is an ever increasing index for sending messages
+ *   - LastActivityTimeMs is a monotonic timestamp of when this connection was
+ *     last used. Inactive connections can expire.
+ *
+ * TODO: to add encryption data and any message ACK information
  */
 class PeerConnectionState
 {
 public:
+    PeerConnectionState() : mPeerAddress(PeerAddress::Uninitialized()) {}
     PeerConnectionState(const PeerAddress & addr) : mPeerAddress(addr) {}
     PeerConnectionState(PeerAddress && addr) : mPeerAddress(addr) {}
+
+    PeerConnectionState(PeerConnectionState &&)      = default;
+    PeerConnectionState(const PeerConnectionState &) = default;
+    PeerConnectionState & operator=(const PeerConnectionState &) = default;
+    PeerConnectionState & operator=(PeerConnectionState &&) = default;
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     PeerAddress & GetPeerAddress() { return mPeerAddress; }
@@ -50,10 +62,20 @@ public:
     uint32_t GetSendMessageIndex() const { return mSendMessageIndex; }
     void IncrementSendMessageIndex() { mSendMessageIndex++; }
 
+    uint64_t GetLastActivityTimeMs() const { return mLastActityTimeMs; }
+    void SetLastActivityTimeMs(uint64_t value) { mLastActityTimeMs = value; }
+
+    template <class TimeSource>
+    void SetLastActivityTimeMs(TimeSource source)
+    {
+        mLastActityTimeMs = source.GetCurrentMonotonicTimeMs();
+    }
+
 private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId         = kUndefinedNodeId;
     uint32_t mSendMessageIndex = 0;
+    uint64_t mLastActityTimeMs = 0;
 };
 
 } // namespace Transport

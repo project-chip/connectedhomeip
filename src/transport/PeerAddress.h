@@ -81,9 +81,16 @@ public:
         return *this;
     }
 
+    bool IsInitialized() const { return mTransportType != Type::kUndefined; }
+
+    bool operator==(const PeerAddress & other)
+    {
+        return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress);
+    }
+
     /****** Factory methods for convenience ******/
 
-    static PeerAddress Uninitialized() { return PeerAddress(IPAddress::Any, Type::kUndefined); }
+    static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
 
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
