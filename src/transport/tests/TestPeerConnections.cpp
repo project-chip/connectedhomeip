@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file implements a process to effect a functional test for
- *      the Message Header class within the transport layer
+ *      the PeerConnections class within the transport layer
  *
  */
 #include "TestTransportLayer.h"

@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file implements a standalone/native program executable
- *      test driver for the CHIP Transport Layer Message header unit
+ *      test driver for the CHIP Transport Layer PeerConnections class unit
  *      tests.
  *
  */
