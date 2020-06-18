@@ -1,11 +1,11 @@
 version: 3
 groups:
-    required-reviewers:
-        type: required
-        conditions:
-            - len(groups.approved.include('reviewer-groups-*')) >= 3
-        reviews:
-            required: 0
+    # required-reviewers:
+    #     type: required
+    #     conditions:
+    #         - len(groups.approved.include('reviewer-groups-*')) >= 3
+    #     reviews:
+    #         required: 0
 
     # reviewer-groups-amazon:
     #     type: optional
