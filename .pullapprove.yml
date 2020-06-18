@@ -7,45 +7,13 @@ groups:
     required-reviewers:
         type: required
         conditions:
-            - len(groups.approved.include('reviewer-groups-*')) >= 3
+            - files.include('*')
         reviews:
             required: 3
-
-    ############################################################
-    #  Reviewer Groups
-    ############################################################
-    reviewer-groups-amazon:
-        type: optional
-        conditions:
-            - files.include('*')
         reviewers:
             teams:
                 - reviewers-amazon
-    reviewer-groups-apple:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
                 - reviewers-apple
-    reviewer-groups-comcast:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
                 - reviewers-comcast
-    reviewer-groups-google:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
                 - reviewers-google
-    reviewers-samsung:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams:
                 - reviewers-samsung
