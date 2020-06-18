@@ -9,7 +9,7 @@ groups:
         conditions:
             - len(groups.approved.include('reviewer-groups-*')) >= 3
         reviews:
-            required: 0
+            required: 3
 
     ############################################################
     #  Reviewer Groups
