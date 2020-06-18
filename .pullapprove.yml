@@ -1,4 +1,5 @@
 version: 3
+
 groups:
     required-reviewers:
         type: required
