@@ -1,45 +1,50 @@
 version: 3
-groups:
-    required-reviewers:
-        type: required
-        conditions:
-            - len(groups.approved.include('reviewer-groups-*')) >= 3
-        reviews:
-            required: 0
-    # reviewer-groups-amazon:
-    #     type: optional
-    #     conditions:
-    #         - files.include('*')
-    #     reviewers:
-    #         teams:
-    #             - reviewers-amazon
-    reviewer-groups-groups-apple:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            # teams:
-            #     - reviewers-apple
-            users:
-                - woody-apple
-    # reviewer-groups-comcast:
-    #     type: optional
-    #     conditions:
-    #         - files.include('*')
-    #     reviewers:
-    #         teams:
-    #             - reviewers-comcast
-    # reviewer-groups-google:
-    #     type: optional
-    #     conditions:
-    #         - files.include('*')
-    #     reviewers:
-    #         teams:
-    #             - reviewers-google
-    # reviewers-samsung:
-    #     type: optional
-    #     conditions:
-    #         - files.include('*')
-    #     reviewers:
-    #         teams:
-    #             - reviewers-samsung
+pullapprove_conditions:
+    - condition: "base.ref == 'master'"
+      unmet_status: success
+      explanation: "Review not required unless merging to master"
+# version: 3
+# groups:
+#     required-reviewers:
+#         type: required
+#         conditions:
+#             - len(groups.approved.include('reviewer-groups-*')) >= 3
+#         reviews:
+#             required: 0
+#     # reviewer-groups-amazon:
+#     #     type: optional
+#     #     conditions:
+#     #         - files.include('*')
+#     #     reviewers:
+#     #         teams:
+#     #             - reviewers-amazon
+#     reviewer-groups-groups-apple:
+#         type: optional
+#         conditions:
+#             - files.include('*')
+#         reviewers:
+#             # teams:
+#             #     - reviewers-apple
+#             users:
+#                 - woody-apple
+#     # reviewer-groups-comcast:
+#     #     type: optional
+#     #     conditions:
+#     #         - files.include('*')
+#     #     reviewers:
+#     #         teams:
+#     #             - reviewers-comcast
+#     # reviewer-groups-google:
+#     #     type: optional
+#     #     conditions:
+#     #         - files.include('*')
+#     #     reviewers:
+#     #         teams:
+#     #             - reviewers-google
+#     # reviewers-samsung:
+#     #     type: optional
+#     #     conditions:
+#     #         - files.include('*')
+#     #     reviewers:
+#     #         teams:
+#     #             - reviewers-samsung
