@@ -25,17 +25,17 @@
 #   include this module and configure `app` build target properly. E.g.:
 #
 #   cmake_minimum_required(VERSION 3.13.1)
-#   
+#
 #   set(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip)
 #   get_filename_component(CHIP_ROOT ${CHIP_ROOT} REALPATH)
 #   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrf5_ncs/)
-#   
+#
 #   include(nrf5-app)
-#   
+#
 #   project(chip-nrf52840-lock-example)
 #   target_sources(app PRIVATE main/main.cpp ...)
 #   target_link_libraries(app PRIVATE ${CHIP_OUTPUT_DIR}/lib/libCHIP.a ...)
-# 
+#
 
 # ==================================================
 # Load NCS/Zephyr build system
@@ -121,7 +121,7 @@ set(NRF5_SDK_INCLUDE_DIRS
     -I$ENV{NRF5_SDK_ROOT}/modules/nrfx/hal
     -I$ENV{NRF5_SDK_ROOT}/modules/nrfx/mdk)
 
-set(CHIP_OUTPUT_LIBRARIES 
+set(CHIP_OUTPUT_LIBRARIES
     ${CHIP_OUTPUT_DIR}/lib/libDeviceLayer.a
     ${CHIP_OUTPUT_DIR}/lib/libCHIP.a
     ${CHIP_OUTPUT_DIR}/lib/libInetLayer.a
@@ -149,7 +149,9 @@ list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*) # CHIP adds gnu++11 anyway...
 set(CHIP_COMMON_FLAGS
     ${CHIP_INCLUDE_DIRS}
     ${NRF5_SDK_INCLUDE_DIRS}
-    -DUSE_APP_CONFIG)
+    -DUSE_APP_CONFIG
+    -D_SYS__PTHREADTYPES_H_
+    "-I${ZEPHYR_BASE}/include/posix")
 
 set(CHIP_CFLAGS ${CHIP_CFLAGS} ${CHIP_COMMON_FLAGS} --specs=nosys.specs)
 set(CHIP_CXXFLAGS ${CHIP_CXXFLAGS} ${CHIP_COMMON_FLAGS})
@@ -171,10 +173,10 @@ set(CHIP_CONFIGURE_ARGS
     --prefix=${CHIP_OUTPUT_DIR}
     --exec-prefix=${CHIP_OUTPUT_DIR}
     --host=${CHIP_HOST_ARCH}
-    --with-device-layer=nrf5    # TODO: change to NCS
+    --with-device-layer=nrfconnect
     --with-network-layer=all
-    --with-target-network=lwip  # TODO: use zephyr network stack
-    --with-lwip=internal       
+    --with-target-network=sockets
+    --with-lwip=internal
     --with-lwip-target=nrf5
     --with-inet-endpoint=tcp,udp
     --with-logging-style=external
@@ -206,4 +208,5 @@ ExternalProject_Add(
     BUILD_COMMAND       make --no-print-directory all V=${CMAKE_AUTOGEN_VERBOSE}
     INSTALL_COMMAND     make --no-print-directory install V=${CMAKE_AUTOGEN_VERBOSE}
     BUILD_BYPRODUCTS    ${CHIP_OUTPUT_LIBRARIES}
+    BUILD_ALWAYS        TRUE
 )

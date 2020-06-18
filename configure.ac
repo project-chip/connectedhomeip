@@ -996,11 +996,11 @@ AC_DEFINE_UNQUOTED([CONFIG_NETWORK_LAYER_INET],[${CONFIG_NETWORK_LAYER_INET}],[D
 AC_MSG_CHECKING([device layer])
 AC_ARG_WITH(device-layer,
     [AS_HELP_STRING([--with-device-layer=LAYER],
-        [Specify the target environment for the CHIP Device Layer.  Choose one of: efr32, esp32, nrf5, linux, or none @<:@default=none@:>@.])],
+        [Specify the target environment for the CHIP Device Layer.  Choose one of: efr32, esp32, nrf5, nrfconnect, linux, or none @<:@default=none@:>@.])],
     [
         case "${with_device_layer}" in
 
-        efr32|esp32|nrf5|linux|none)
+        efr32|esp32|nrf5|nrfconnect|linux|none)
             ;;
 
         *)
@@ -1017,6 +1017,7 @@ CHIP_DEVICE_LAYER_TARGET_LINUX=0
 CHIP_DEVICE_LAYER_TARGET_ESP32=0
 CHIP_DEVICE_LAYER_TARGET_NRF5=0
 CHIP_DEVICE_LAYER_TARGET_EFR32=0
+CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=0
 
 case "${with_device_layer}" in
 linux)
@@ -1035,6 +1036,12 @@ nrf5)
       CONFIG_DEVICE_LAYER=1
       CHIP_DEVICE_LAYER_TARGET=nRF5
       CHIP_DEVICE_LAYER_TARGET_NRF5=1
+      ;;
+
+nrfconnect)
+      CONFIG_DEVICE_LAYER=1
+      CHIP_DEVICE_LAYER_TARGET=nrfconnect
+      CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=1
       ;;
 
 efr32)
@@ -1067,6 +1074,10 @@ AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_ESP32],[${CHIP_DEVICE_LAYER_TARGET_
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRF5)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRF5],    [test "${CHIP_DEVICE_LAYER_TARGET_NRF5}" = 1])
 AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRF5],[${CHIP_DEVICE_LAYER_TARGET_NRF5}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF5* platforms.])
+
+AC_SUBST(CHIP_DEVICE_LAYER_TARGET_NRFCONNECT)
+AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_NRFCONNECT],    [test "${CHIP_DEVICE_LAYER_TARGET_NRFCONNECT}" = 1])
+AC_DEFINE_UNQUOTED([CHIP_DEVICE_LAYER_TARGET_NRFCONNECT],[${CHIP_DEVICE_LAYER_TARGET_NRFCONNECT}],[Define to 1 if you want to build the CHIP Device Layer for Nordic nRF Connect platforms.])
 
 AC_SUBST(CHIP_DEVICE_LAYER_TARGET_LINUX)
 AM_CONDITIONAL([CHIP_DEVICE_LAYER_TARGET_LINUX],    [test "${CHIP_DEVICE_LAYER_TARGET_LINUX}" = 1])
