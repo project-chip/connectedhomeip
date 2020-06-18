@@ -35,6 +35,10 @@
 
 #include <support/DLLUtil.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#include <Network/Network.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
 //--- Declaration of LWIP protocol control buffer structure names
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
@@ -68,6 +72,11 @@ public:
         kBasisState_Closed = 0 /**< Encapsulated descriptor is not valid. */
     };
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    /** Test whether endpoint is a Network.framework endpoint */
+    bool IsNetworkFrameworkEndPoint(void) const;
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     /** Test whether endpoint is a POSIX socket */
     bool IsSocketsEndPoint(void) const;
@@ -82,6 +91,11 @@ public:
     bool IsOpenEndPoint(void) const;
 
 protected:
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    nw_parameters_t mParameters;
+    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     int mSocket;             /**< Encapsulated socket descriptor. */
     IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
@@ -125,6 +139,13 @@ protected:
     void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = NULL);
 };
 
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+inline bool EndPointBasis::IsNetworkFrameworkEndPoint(void) const
+{
+    return mParameters != NULL;
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 inline bool EndPointBasis::IsSocketsEndPoint(void) const
 {
@@ -150,6 +171,10 @@ inline bool EndPointBasis::IsOpenEndPoint(void) const
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     lResult = (lResult || IsSocketsEndPoint());
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    lResult = (lResult || IsNetworkFrameworkEndPoint());
+#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     return lResult;
 }
