@@ -23,6 +23,7 @@
 
 #include "ManualSetupPayloadGenerator.h"
 
+#include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
 using namespace chip;
@@ -49,7 +50,7 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(strin
 {
     if (!mSetupPayload.isValidManualCode())
     {
-        fprintf(stderr, "\nFailed encoding invalid payload\n");
+        ChipLogError(SetupPayload, "Failed encoding invalid payload");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
