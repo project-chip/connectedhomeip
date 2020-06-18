@@ -1361,29 +1361,29 @@ INET_ERROR IPEndPointBasis::StartListener()
         {
 
         case nw_listener_state_invalid:
-            printf("Listener: Invalid\n");
+            ChipLogDetail(Inet, "Listener: Invalid");
             res = INET_ERROR_INCORRECT_STATE;
             nw_listener_cancel(listener);
             break;
 
         case nw_listener_state_waiting:
-            printf("Listener: Waiting\n");
+            ChipLogDetail(Inet, "Listener: Waiting");
             break;
 
         case nw_listener_state_failed:
-            printf("Listener: Failed\n");
+            ChipLogDetail(Inet, "Listener: Failed");
             res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
             nw_listener_cancel(listener);
             break;
 
         case nw_listener_state_ready:
-            printf("Listener: Ready\n");
+            ChipLogDetail(Inet, "Listener: Ready");
             res = INET_NO_ERROR;
             dispatch_semaphore_signal(mListenerSemaphore);
             break;
 
         case nw_listener_state_cancelled:
-            printf("Listener: Cancelled\n");
+            ChipLogDetail(Inet, "Listener: Cancelled");
             if (res == INET_NO_ERROR)
                 res = INET_ERROR_CONNECTION_ABORTED;
 
@@ -1413,35 +1413,35 @@ INET_ERROR IPEndPointBasis::StartConnection(nw_connection_t & aConnection)
         {
 
         case nw_connection_state_invalid:
-            printf("Connection: Invalid\n");
+            ChipLogDetail(Inet, "Connection: Invalid");
             res = INET_ERROR_INCORRECT_STATE;
             nw_connection_cancel(aConnection);
             break;
 
         case nw_connection_state_preparing:
-            printf("Connection: Preparing\n");
+            ChipLogDetail(Inet, "Connection: Preparing");
             res = INET_ERROR_INCORRECT_STATE;
             break;
 
         case nw_connection_state_waiting:
-            printf("Connection: Waiting\n");
+            ChipLogDetail(Inet, "Connection: Waiting");
             nw_connection_cancel(aConnection);
             break;
 
         case nw_connection_state_failed:
-            printf("Connection: Failed\n");
+            ChipLogDetail(Inet, "Connection: Failed");
             res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
             nw_connection_cancel(aConnection);
             break;
 
         case nw_connection_state_ready:
-            printf("Connection: Ready\n");
+            ChipLogDetail(Inet, "Connection: Ready");
             res = INET_NO_ERROR;
             dispatch_semaphore_signal(mConnectionSemaphore);
             break;
 
         case nw_connection_state_cancelled:
-            printf("Connection: Cancelled\n");
+            ChipLogDetail(Inet, "Connection: Cancelled");
             if (res == INET_NO_ERROR)
                 res = INET_ERROR_CONNECTION_ABORTED;
 
