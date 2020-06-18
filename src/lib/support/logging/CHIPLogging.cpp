@@ -65,7 +65,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "TLV"   // TLV
                                   "ASN"   // ASN1
                                   "CR\0"  // Crypto
-                                  "CTL\0" // Controller
+                                  "CTL"   // Controller
                                   "AL\0"  // Alarm
                                   "BDX"   // BulkDataTransfer
                                   "DMG"   // DataManagement
@@ -79,11 +79,16 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SWU"   // SoftwareUpdate
                                   "TP\0"  // TokenPairing
                                   "TS\0"  // TimeServices
-                                  "WT\0"  // chipTunnel
+                                  "TUN"   // chipTunnel
                                   "HB\0"  // Heartbeat
-                                  "WSL"   // chipSystemLayer
+                                  "CSL"   // chipSystemLayer
                                   "EVL"   // Event Logging
                                   "SPT"   // Support
+                                  "TOO"   // chipTool
+                                  "ZCL"   // Zcl
+                                  "SH\0"  // Shell
+                                  "DL\0"  // DeviceLayer
+                                  "SPL"   // SetupPayload
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / ChipLoggingModuleNameLen)
