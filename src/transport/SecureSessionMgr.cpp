@@ -115,6 +115,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
         SuccessOrExit(err);
 
         msgBuf->SetStart(encryptedText);
+        msgBuf->SetDataLength(encryptedLen);
 
         ChipLogProgress(Inet, "Secure transport transmitting msg %u after encryption", mConnectionState.GetSendMessageIndex());
     }

@@ -58,7 +58,7 @@ public:
      * @param output_length Length of the output buffer
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t output_length);
+    CHIP_ERROR Encrypt(const unsigned char * input, size_t input_length, unsigned char * output, size_t & output_length);
 
     /**
      * @brief
