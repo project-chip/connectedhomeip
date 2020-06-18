@@ -156,6 +156,15 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     int numberOffset = 1;
     uint64_t setUpPINCode;
     size_t maxShortCodeBitsLength = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
+
+    uint64_t discriminator;
+    result = readBitsFromNumber(shortCode, numberOffset, discriminator, kManualSetupDiscriminatorFieldLengthInBits,
+                                maxShortCodeBitsLength);
+    if (result != CHIP_NO_ERROR)
+    {
+        return result;
+    }
+
     result = readBitsFromNumber(shortCode, numberOffset, setUpPINCode, kSetupPINCodeFieldLengthInBits, maxShortCodeBitsLength);
     if (result != CHIP_NO_ERROR)
     {
@@ -165,14 +174,6 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     {
         fprintf(stderr, "\nFailed decoding base10. SetUpPINCode was 0.\n");
         return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    uint64_t discriminator;
-    result = readBitsFromNumber(shortCode, numberOffset, discriminator, kManualSetupDiscriminatorFieldLengthInBits,
-                                maxShortCodeBitsLength);
-    if (result != CHIP_NO_ERROR)
-    {
-        return result;
     }
 
     if (isLongCode)
