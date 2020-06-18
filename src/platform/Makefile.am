@@ -271,6 +271,19 @@ libDeviceLayer_a_SOURCES               +=       \
 
 endif # CHIP_DEVICE_LAYER_TARGET_ESP32
 
+if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+
+libDeviceLayer_a_SOURCES               +=       \
+    nrfconnect/BLEManagerImpl.cpp               \
+    nrfconnect/ConnectivityManagerImpl.cpp      \
+    nrfconnect/Logging.cpp                      \
+    nrfconnect/ZephyrConfig.cpp                 \
+    nrfconnect/PlatformManagerImpl.cpp          \
+    Zephyr/SystemTimeSupport.cpp                \
+    $(NULL)
+
+endif # CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+
 endif # CONFIG_DEVICE_LAYER
 
 include $(abs_top_nlbuild_autotools_dir)/automake/post.am

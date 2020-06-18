@@ -73,18 +73,6 @@ inline PlatformManager & PlatformMgr(void)
 {
     return PlatformManagerImpl::sInstance;
 }
-
-/**
- * Returns the platform-specific implementation of the PlatformManager singleton object.
- *
- * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the nRF Connect SDK platform.
- */
-inline PlatformManagerImpl & PlatformMgrImpl(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
-
 } // namespace DeviceLayer
 } // namespace chip
 

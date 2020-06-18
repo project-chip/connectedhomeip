@@ -15,37 +15,42 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the PlatformManager object
- *          for nRF Connect SDK platforms.
- */
-
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/BLEManager.h>
 
+#include <new>
+
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#endif
+
+using namespace ::chip;
+using namespace ::chip::TLV;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
 
-static K_THREAD_STACK_DEFINE(sChipThreadStack, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE);
+ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
-PlatformManagerImpl PlatformManagerImpl::sInstance{ sChipThreadStack };
-
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-    CHIP_ERROR err;
+    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
+    return CHIP_NO_ERROR;
+}
 
-    // Call _InitChipStack() on the generic implementation base class
-    // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
+{
+    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
 }
 
 } // namespace DeviceLayer
