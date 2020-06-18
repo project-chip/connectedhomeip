@@ -1,0 +1,5 @@
+version: 3
+pullapprove_conditions:
+    - condition: "base.ref == 'master'"
+      unmet_status: success
+      explanation: "Review not required unless merging to master"
