@@ -12,32 +12,32 @@ groups:
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-amazon]
+                teams: [reviewers-amazon]
 
     reviewers-apple:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-apple]
+                teams: [reviewers-apple]
 
     reviewers-comcast:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-comcast]
+                teams: [reviewers-comcast]
 
     reviewers-google:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-google]
+                teams: [reviewers-google]
 
     reviewers-samsung:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
-            teams: [reviewers-samsung]
+                teams: [reviewers-samsung]
