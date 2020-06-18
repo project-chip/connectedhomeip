@@ -1,0 +1,19 @@
+version: 3
+
+groups:
+    ############################################################
+    #  Base Required Reviewers
+    ############################################################
+    required-reviewers:
+        type: required
+        conditions:
+            - files.include('*')
+        reviews:
+            required: 3
+        reviewers:
+            teams:
+                - reviewers-amazon
+                - reviewers-apple
+                - reviewers-comcast
+                - reviewers-google
+                - reviewers-samsung
