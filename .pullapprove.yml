@@ -18,8 +18,8 @@ groups:
         conditions:
             - files.include('*')
         reviewers:
-            teams:
-                - reviewers-apple
+            # teams:
+            #     - reviewers-apple
             users:
                 - woody-apple
     # reviewer-groups-comcast:
