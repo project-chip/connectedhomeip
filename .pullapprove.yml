@@ -1,12 +1,19 @@
 version: 3
 
 groups:
+    ############################################################
+    #  Base Required Reviewers
+    ############################################################
     required-reviewers:
         type: required
         conditions:
             - len(groups.approved.include('reviewer-groups-*')) >= 3
         reviews:
             required: 0
+
+    ############################################################
+    #  Reviewer Groups
+    ############################################################
     reviewer-groups-amazon:
         type: optional
         conditions:
