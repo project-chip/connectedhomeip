@@ -86,8 +86,13 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number):
   repo = api.get_repo(gh_repo)
   pull = repo.get_pull(gh_pr_number)
 
+  for comment in pull.get_issue_comments():
+     if not comment.body.startswith(titleHeading):
+       continue
+
+     comment.delete()
+
   # TODO: 
-  #   - close out obsolete comments (no more duplication). Use title to search through things.
   #   - Add a clear summary of size increase, by parsing the rawReportText
 
   # NOTE: PRs are issues with attached patches, hence the API naming
