@@ -77,17 +77,28 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number):
 
   logging.info('Uploading report to "%s", PR %d' % (gh_repo, gh_pr_number))
 
+  rawText = open(filename, 'rt').read()
+
+  # a consistent title to help identify obsolete comments
+  titleHeading = 'Size increase report for "{jobName}"'.format(jobName = job_name)
+
   api = github.Github(gh_token)
   repo = api.get_repo(gh_repo)
   pull = repo.get_pull(gh_pr_number)
 
-  # NOTE: PRs are issues with attached patches, hence the API naming
-  pull.create_issue_comment('''Bloat report for job "%s":
+  # TODO: 
+  #   - close out obsolete comments (no more duplication). Use title to search through things.
+  #   - Add a clear summary of size increase, by parsing the rawReportText
 
-  ```
-  %s
-  ```
-  ''' % (job_name, open(filename, 'rt').read()))
+  # NOTE: PRs are issues with attached patches, hence the API naming
+  pull.create_issue_comment('''{title}
+<details>
+  <summary>Detailed report for {jobName}</summary>
+```
+{rawReportText}
+```
+</details>
+'''.format(title=titleHeading, jobName=job_name, rawReportText=rawText))
 
 
 def main():
