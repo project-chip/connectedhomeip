@@ -29,7 +29,7 @@ namespace chip {
 namespace Transport {
 
 /**
- * Handles a set of peer connection states.
+ * Handles a set of Peer connection states.
  *
  * Intended for:
  *   - handle connection active time and expiration
