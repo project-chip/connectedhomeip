@@ -43,7 +43,7 @@ template <class>
 class GenericPlatformManagerImpl;
 template <class>
 class GenericPlatformManagerImpl_POSIX;
-}
+} // namespace Internal
 
 /**
  * Provides access to runtime and build-time configuration information for a chip device.
