@@ -8,8 +8,16 @@ import logging
 import os
 import stat
 import subprocess
+from dataclasses import dataclass
 
 import ci_fetch_artifacts
+
+@dataclass
+class ComparisonResult:
+  fileName: str
+  fileSizeChange: str
+  vmSizeChange: str
+
 
 
 def filesInDirectory(dirName):
@@ -20,13 +28,13 @@ def filesInDirectory(dirName):
       yield name
 
 
-def writeFileBloatReport(f, baselineName, buildName):
+def writeFileBloatReport(f, baselineName, buildName) -> ComparisonResult:
   """Generate a bloat report diffing a baseline file with a build output file."""
   logging.info('Running bloaty diff between %s and %s', baselineName, buildName)
-  f.write('Bloat difference between %s and %s:\n\n' % (baselineName, buildName))
+  f.write('Comparing %s and %s:\n\n' % (baselineName, buildName))
 
   result = subprocess.run(
-      ['bloaty', buildName, '--', baselineName],
+      ['bloaty', '--csv', buildName, '--', baselineName],
       stdout=subprocess.PIPE,
       stderr=subprocess.STDOUT,
   )
@@ -34,9 +42,23 @@ def writeFileBloatReport(f, baselineName, buildName):
   if result.returncode != 0:
     logging.warning('Bloaty execution failed: %d', result.returncode)
     f.write('BLOAT EXECUTION FAILED WITH CODE %d:\n' % result.returncode)
+  
+  content = result.stdout.decode('utf8'))
 
-  f.write(result.stdout.decode('utf8'))
+  f.write(content)
   f.write('\n')
+
+  result = ComparisonResult()
+  result.fileName = os.path.basename(buildName)
+  result.fileSizeChange = 'UNKNOWN'
+  result.fileSizeChange = 'UNKNOWN'
+  try:
+    totalLine = next(filter(lambda l: l.endswith(',TOTAL'), a.split('\n')))
+  except:
+    pass
+
+  return result
+
 
 
 def generateBloatReport(outputFileName,
@@ -89,6 +111,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number):
   for comment in pull.get_issue_comments():
      if not comment.body.startswith(titleHeading):
        continue
+     logging.info('Removing obsolete comment with heading "%s"' % (titleHeading))
 
      comment.delete()
 
