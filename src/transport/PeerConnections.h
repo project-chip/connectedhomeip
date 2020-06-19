@@ -29,7 +29,7 @@ namespace chip {
 namespace Transport {
 
 /**
- * Handles a set of Peer connection states.
+ * Handles a set of peer connection states.
  *
  * Intended for:
  *   - handle connection active time and expiration
@@ -61,7 +61,7 @@ public:
     CHIP_ERROR CreateNewPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state);
 
     /**
-     * Get a peer connection state given a Peer address.
+     * Get a peer connection state given a peer address.
      *
      * @param address is the connection to find (based on address)
      * @param state [out] the connection if found, null otherwise. MUST not be null.
