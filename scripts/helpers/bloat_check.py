@@ -151,7 +151,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number, com
 ```
 
 </details>
-'''.format(title=titleHeading, table=compareTable jobName=job_name, rawReportText=rawText))
+'''.format(title=titleHeading, table=compareTable, jobName=job_name, rawReportText=rawText))
 
 
 def main():
