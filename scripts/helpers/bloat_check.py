@@ -8,16 +8,14 @@ import logging
 import os
 import stat
 import subprocess
-from dataclasses import dataclass
 
 import ci_fetch_artifacts
 
-@dataclass
 class ComparisonResult:
-  fileName: str
-  fileSizeChange: str
-  vmSizeChange: str
-
+  def __init__(self, name):
+    self.fileName = name
+    self.fileSizeChange = 'UNKNOWN'
+    self.vmSizeChange = 'UNKNOWN'
 
 
 def filesInDirectory(dirName):
@@ -28,7 +26,7 @@ def filesInDirectory(dirName):
       yield name
 
 
-def writeFileBloatReport(f, baselineName, buildName) -> ComparisonResult:
+def writeFileBloatReport(f, baselineName, buildName):
   """Generate a bloat report diffing a baseline file with a build output file."""
   logging.info('Running bloaty diff between %s and %s', baselineName, buildName)
   f.write('Comparing %s and %s:\n\n' % (baselineName, buildName))
@@ -48,8 +46,7 @@ def writeFileBloatReport(f, baselineName, buildName) -> ComparisonResult:
   f.write(content)
   f.write('\n')
 
-  result = ComparisonResult()
-  result.fileName = os.path.basename(buildName)
+  result = ComparisonResult(os.path.basename(buildName))
   result.fileSizeChange = 'UNKNOWN'
   result.fileSizeChange = 'UNKNOWN'
   try:
