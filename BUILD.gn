@@ -13,6 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nlassert.gni")
+import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
@@ -81,6 +86,25 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 } else {
   # This is the dummy toolchain. Configure various real toolchains.
   import("//build/chip_build.gni")
+  declare_args() {
+    # Set this to false to disable all builds by default.
+    enable_default_builds = true
+  }
+
+  declare_args() {
+    # Enable building chip with clang.
+    enable_host_clang_build = enable_default_builds
+
+    # Enable building chip with gcc.
+    enable_host_gcc_build = enable_default_builds
+
+    # Build the nRF5 lock app example.
+    enable_nrf5_lock_app_build = false
+  }
+
+  if (enable_nrf5_lock_app_build) {
+    import("//build_overrides/nrf5_lock_app.gni")
+  }
 
   import("//build/toolchain/host_clang/toolchains.gni")
   import("//build/toolchain/host_gcc/toolchains.gni")
@@ -93,20 +117,30 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   }
 
   group("default") {
-    deps = [
-      ":all_host_clang",
-      ":all_host_gcc",
-      "${nrf5_lock_app_root}:nrf5(${nrf5_lock_app_root}/toolchain:nrf5_lock_app)",
-    ]
+    deps = []
+    if (enable_host_clang_build) {
+      deps += [ ":all_host_clang" ]
+    }
+    if (enable_host_gcc_build) {
+      deps += [ ":all_host_gcc" ]
+    }
+    if (enable_nrf5_lock_app_build) {
+      deps += [ "${nrf5_lock_app_root}:nrf5(${nrf5_lock_app_root}/toolchain:nrf5_lock_app)" ]
+    }
   }
 
   if (chip_build_tests) {
     group("check") {
-      deps = [
-        ":check_host_clang",
-        ":check_host_gcc",
-        ":default",
-      ]
+      deps = []
+      if (enable_host_clang_build) {
+        deps += [ ":check_host_clang" ]
+      }
+      if (enable_host_gcc_build) {
+        deps += [ ":check_host_gcc" ]
+      }
+      if (enable_nrf5_lock_app_build) {
+        deps += [ ":default" ]
+      }
     }
   }
 }

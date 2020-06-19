@@ -13,5 +13,6 @@
 # limitations under the License.
 
 declare_args() {
+  # Root directory for nlfaultinjection.
   nlfaultinjection_root = "//third_party/nlfaultinjection"
 }

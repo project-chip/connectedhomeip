@@ -16,12 +16,3 @@ declare_args() {
   # Root directory for CHIP.
   chip_root = "//third_party/connectedhomeip"
 }
-
-import("lwip.gni")
-import("mbedtls.gni")
-import("nlassert.gni")
-import("nlfaultinjection.gni")
-import("nlio.gni")
-import("nlunit_test.gni")
-import("pigweed.gni")
-import("nrf5_lock_app.gni")

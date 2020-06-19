@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/nrf5_lock_app.gni")
 import("${nrf5_lock_app_root}/common_args.gni")
 
 # These values help set up the default toolchain in standalone sample app
