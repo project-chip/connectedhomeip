@@ -404,4 +404,12 @@ inline void chipDie(void)
 
 #endif // defined(__cplusplus) && (__cplusplus >= 201103L)
 
+#if defined(__GNUC__) && (__GNUC__ >= 4)
+#define CHECK_RETURN_VALUE __attribute__((warn_unused_result))
+#elif defined(_MSC_VER) && (_MSC_VER >= 1700)
+#define CHECK_RETURN_VALUE _Check_return_
+#else
+#define CHECK_RETURN_VALUE
+#endif
+
 #endif /* CODEUTILS_H_ */
