@@ -31,7 +31,7 @@ class ComparisonResult:
     self.sectionChanges = []
 
 
-SECTIONS_TO_WATCH = set(['.rodata', '.text', 'flash.rodata', 'flash.text'])
+SECTIONS_TO_WATCH = set(['.rodata', '.text', '.flash.rodata', '.flash.text'])
 
 
 def filesInDirectory(dirName):
@@ -137,7 +137,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
   compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
   for file in compare_results:
     for change in file.sectionChanges:
-      compareTable += '{0} | {1} | {2} | {3}' % (
+      compareTable += '{0} | {1} | {2} | {3}'.format(
           file.fileName, change.section, change.fileChange, change.vmChange)
 
   # NOTE: PRs are issues with attached patches, hence the API naming
