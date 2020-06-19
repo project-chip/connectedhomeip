@@ -13,26 +13,25 @@ import subprocess
 
 import ci_fetch_artifacts
 
+
 class SectionChange:
   """Describes delta changes to a specific section"""
+
   def __init__(self, section, fileChange, vmChange):
     self.section = section
     self.fileChange = fileChange
     self.vmChange = vmChange
 
+
 class ComparisonResult:
   """Comparison results for an entire file"""
+
   def __init__(self, name):
     self.fileName = name
     self.sectionChanges = []
 
 
-SECTIONS_TO_WATCH = set(
-  '.rodata',
-  '.text',
-  'flash.rodata',
-  'flash.text',
-)
+SECTIONS_TO_WATCH = set(['.rodata', '.text', 'flash.rodata', 'flash.text'])
 
 
 def filesInDirectory(dirName):
@@ -57,7 +56,7 @@ def writeFileBloatReport(f, baselineName, buildName):
   if result.returncode != 0:
     logging.warning('Bloaty execution failed: %d', result.returncode)
     f.write('BLOAT EXECUTION FAILED WITH CODE %d:\n' % result.returncode)
-  
+
   content = result.stdout.decode('utf8')
 
   f.write(content)
@@ -75,7 +74,6 @@ def writeFileBloatReport(f, baselineName, buildName):
     pass
 
   return result
-
 
 
 def generateBloatReport(outputFileName,
@@ -108,38 +106,42 @@ def generateBloatReport(outputFileName,
 
     results = []
     for name in (baselineNames & outputNames):
-      results.append(writeFileBloatReport(f, os.path.join(baselineDir, name), os.path.join(buildOutputDir, name)))
+      results.append(
+          writeFileBloatReport(f, os.path.join(baselineDir, name),
+                               os.path.join(buildOutputDir, name)))
     return results
 
 
-def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number, compare_results):
+def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
+                        compare_results):
   """Generates a PR comment conaining the specified file content."""
 
-  logging.info('Uploading report to "%s", PR %d' % (gh_repo, gh_pr_number))
+  logging.info('Uploading report to "%s", PR %d', gh_repo, gh_pr_number)
 
   rawText = open(filename, 'rt').read()
 
   # a consistent title to help identify obsolete comments
-  titleHeading = 'Size increase report for "{jobName}"'.format(jobName = job_name)
+  titleHeading = 'Size increase report for "{jobName}"'.format(jobName=job_name)
 
   api = github.Github(gh_token)
   repo = api.get_repo(gh_repo)
   pull = repo.get_pull(gh_pr_number)
 
   for comment in pull.get_issue_comments():
-     if not comment.body.startswith(titleHeading):
-       continue
-     logging.info('Removing obsolete comment with heading "%s"' % (titleHeading))
+    if not comment.body.startswith(titleHeading):
+      continue
+    logging.info('Removing obsolete comment with heading "%s"', (titleHeading))
 
-     comment.delete()
+    comment.delete()
 
-  compareTable='File | Section | File | VM\n---- | ---- | ----- | ---- \n'
+  compareTable = 'File | Section | File | VM\n---- | ---- | ----- | ---- \n'
   for file in compare_results:
     for change in file.sectionChanges:
-      compareTable += '{0} | {1} | {2} | {3}' % (file.fileName, change.section, change.fileChange, change.vmChange)
+      compareTable += '{0} | {1} | {2} | {3}' % (
+          file.fileName, change.section, change.fileChange, change.vmChange)
 
   # NOTE: PRs are issues with attached patches, hence the API naming
-  pull.create_issue_comment('''{title}
+  pull.create_issue_comment("""{title}
 
   {table}
 
@@ -151,7 +153,11 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number, com
 ```
 
 </details>
-'''.format(title=titleHeading, table=compareTable, jobName=job_name, rawReportText=rawText))
+""".format(
+    title=titleHeading,
+    table=compareTable,
+    jobName=job_name,
+    rawReportText=rawText))
 
 
 def main():
@@ -208,19 +214,19 @@ def main():
     ci_fetch_artifacts.fetchArtifactsForJob(args.token, args.job,
                                             args.artifact_download_dir)
   except Exception as e:
-    logging.warning('Failed to fetch artifacts: %r' % e)
+    logging.warning('Failed to fetch artifacts: %r', e)
 
-  compareResults = generateBloatReport( args.report_file, args.artifact_download_dir, args.build_output_dir, title="Bloat report for job '%s'" % args.job)
+  compareResults = generateBloatReport(
+      args.report_file,
+      args.artifact_download_dir,
+      args.build_output_dir,
+      title="Bloat report for job '%s'" % args.job)
 
   if args.github_api_token and args.github_repository and args.github_comment_pr_number:
-    sendFileAsPrComment(
-       args.job,
-       args.report_file,
-       args.github_api_token,
-       args.github_repository,
-       int(args.github_comment_pr_number),
-       compareResults
-    )
+    sendFileAsPrComment(args.job, args.report_file, args.github_api_token,
+                        args.github_repository,
+                        int(args.github_comment_pr_number), compareResults)
+
 
 if __name__ == '__main__':
   # execute only if run as a script
