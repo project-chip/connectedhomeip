@@ -7,7 +7,7 @@
 # This script must run from the root of the branch!
 
 # NOTE:  This dumb check will not catch all cases of how the script can be run.
-# It only catches running the script from the immediate parent directory that 
+# It only catches running the script from the immediate parent directory that
 # contains it.
 /bin/pwd | grep app/framework/cluster
 STATUS=$?
@@ -16,12 +16,12 @@ if [ $STATUS == 0 ]; then
 fi
 
 OTA_FILE=app/framework/plugin/ota-storage-simple-ram/ota-static-sample.ota
-OTA_HEADER_FILE=app/framework/plugin/ota-storage-simple-ram/ota-static-file-data.h 
+OTA_HEADER_FILE=app/framework/plugin/ota-storage-simple-ram/ota-static-file-data.h
 OTA_HEADER_SCRIPT=app/framework/plugin/ota-storage-simple-ram/ota-static-file.pl
 
 echo ""
 
-if [ "$CYGWIN" = 1 ]; then 
+if [ "$CYGWIN" = 1 ]; then
   IMAGE_BUILDER_EXE=./build/image-builder/build.windows/image-builder-ecc.exe
 else
   IMAGE_BUILDER_EXE=./build/image-builder/build.linux/image-builder-ecc
@@ -63,4 +63,3 @@ fi
 
 echo -e "\nScript Success!"
 exit 0
-
