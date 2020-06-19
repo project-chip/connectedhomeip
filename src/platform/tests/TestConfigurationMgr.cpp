@@ -91,7 +91,7 @@ static void TestConfigurationMgr_ManufacturingDate(nlTestSuite * inSuite, void *
 
     const char * mfgDate = "2008/09/20";
     uint16_t year;
-    uint8_t month; 
+    uint8_t month;
     uint8_t dayOfMonth;
 
     err = ConfigurationMgr().StoreManufacturingDate(mfgDate, strlen(mfgDate));
@@ -432,7 +432,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::ServiceConfig", TestConfigurationMgr_ServiceConfig),
     NL_TEST_DEF("Test ConfigurationMgr::PairedAccountId", TestConfigurationMgr_PairedAccountId),
     NL_TEST_DEF("Test ConfigurationMgr::ServiceProvisioningData", TestConfigurationMgr_ServiceProvisioningData),
-    NL_TEST_DEF("Test ConfigurationMgr::ClearServiceProvisioningData", TestConfigurationMgr_ClearServiceProvisioningData), NL_TEST_SENTINEL()    
+    NL_TEST_DEF("Test ConfigurationMgr::ClearServiceProvisioningData", TestConfigurationMgr_ClearServiceProvisioningData), NL_TEST_SENTINEL()
 };
 
 int TestConfigurationMgr(void)
