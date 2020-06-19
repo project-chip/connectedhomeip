@@ -13,5 +13,6 @@
 # limitations under the License.
 
 declare_args() {
+  # Root directory for lwIP.
   lwip_root = "//third_party/lwip"
 }

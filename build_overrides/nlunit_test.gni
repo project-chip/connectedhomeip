@@ -13,5 +13,6 @@
 # limitations under the License.
 
 declare_args() {
+  # Root directory for nlunit-test.
   nlunit_test_root = "//third_party/nlunit-test"
 }
