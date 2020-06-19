@@ -17,8 +17,6 @@
 #ifndef PEER_CONNECTIONS_H_
 #define PEER_CONNECTIONS_H_
 
-#include <array>
-
 #include <core/CHIPConfig.h>
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
