@@ -11,7 +11,7 @@
 # contains it.
 /bin/pwd | grep app/framework/cluster
 STATUS=$?
-if [ $STATUS == 0 ]; then
+if [ "$STATUS" == 0 ]; then
   echo "Error:  This script must be run from the root of the branch"
 fi
 
@@ -33,32 +33,32 @@ IMAGE_ID=0x5678
 STRING="The latest and greatest upgrade."
 
 echo "Creating $OTA_FILE"
-$IMAGE_BUILDER_EXE     \
-  --create $OTA_FILE   \
-  --version $VERSION   \
-  --manuf-id $MANUF_ID \
-  --image-type $IMAGE_ID \
+"$IMAGE_BUILDER_EXE"     \
+  --create "$OTA_FILE"   \
+  --version "$VERSION"   \
+  --manuf-id "$MANUF_ID" \
+  --image-type "$IMAGE_ID" \
   --string "$STRING"     \
   --tag-id 0xF000        \
   --tag-length 10        \
   --test-sign 1
 
 STATUS=$?
-if [ $STATUS != 0 ]; then
+if [ "$STATUS" != 0 ]; then
   echo "Error: Image-builder failed."
-  exit $STATUS
+  exit "$STATUS"
 fi
 
 echo -e "Creating $OTA_HEADER_FILE"
-$OTA_HEADER_SCRIPT \
-  --input $OTA_FILE \
-  --output $OTA_HEADER_FILE \
-  --extra-comments $IMAGE_BUILDER_EXE
+"$OTA_HEADER_SCRIPT" \
+  --input "$OTA_FILE" \
+  --output "$OTA_HEADER_FILE" \
+  --extra-comments "$IMAGE_BUILDER_EXE"
 
 STATUS=$?
-if [ $STATUS != 0 ]; then
+if [ "$STATUS" != 0 ]; then
   echo "Error: Header generation script failed."
-  exit $STATUS
+  exit "$STATUS"
 fi
 
 echo -e "\nScript Success!"
