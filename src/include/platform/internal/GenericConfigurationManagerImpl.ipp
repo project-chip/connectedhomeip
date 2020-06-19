@@ -61,7 +61,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
 template<class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ConfigureChipStack()
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     size_t pairingCodeLen;
 
     static char sPairingCodeBuf[ConfigurationManager::kMaxPairingCodeLength + 1];
@@ -949,6 +949,15 @@ exit:
 #endif // CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
 
     return err;
+}
+
+template<class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunPrimitiveUnitTest()
+{
+    ChipLogProgress(DeviceLayer, "Running configuration unit test");
+    Impl()->RunConfigUnitTest();
+
+    return CHIP_NO_ERROR;
 }
 
 #if CHIP_PROGRESS_LOGGING
