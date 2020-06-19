@@ -92,11 +92,14 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number):
 
   # NOTE: PRs are issues with attached patches, hence the API naming
   pull.create_issue_comment('''{title}
+
 <details>
-  <summary>Detailed report for {jobName}</summary>
+  <summary>Full report output</summary>
+
 ```
 {rawReportText}
 ```
+
 </details>
 '''.format(title=titleHeading, jobName=job_name, rawReportText=rawText))
 
