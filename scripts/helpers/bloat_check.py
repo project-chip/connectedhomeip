@@ -5,11 +5,11 @@ import attr
 import coloredlogs
 import csv
 import github
+import io
 import logging
 import os
 import stat
 import subprocess
-import StringIO
 
 import ci_fetch_artifacts
 
@@ -65,7 +65,7 @@ def writeFileBloatReport(f, baselineName, buildName):
 
   result = ComparisonResult(os.path.basename(buildName))
   try:
-    reader = csv.reader(StringIO.StringIO(content))
+    reader = csv.reader(io.StringIO(content))
 
     for row in reader:
       section, vm, f = row
