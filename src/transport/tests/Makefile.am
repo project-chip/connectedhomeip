@@ -87,10 +87,7 @@ COMMON_LDADD                                          = \
 
 check_PROGRAMS             = \
     TestMessageHeader        \
-<<<<<<< HEAD
     TestPeerConnections      \
-=======
->>>>>>> Address review comments
     TestSecureSessionMgr     \
     TestSecureSession        \
     TestUDP                  \
