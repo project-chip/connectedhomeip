@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <memory>
 #include <string.h>
 #include <vector>
 
@@ -87,15 +88,17 @@ static CHIP_ERROR retrieveStringOptionalInfo(TLVReader & reader, OptionalQRCodeI
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint64_t tag       = reader.GetTag();
     uint32_t valLength = reader.GetLength();
-    char * val         = new char[valLength + 1];
-    err                = reader.GetString(val, valLength + 1);
+    unique_ptr<char[]> val(new char[valLength + 1]);
+    err = reader.GetString(val.get(), valLength + 1);
+
     SuccessOrExit(err);
+
     VerifyOrExit(IsContextTag(tag) == true || IsProfileTag(tag) == true, err = CHIP_ERROR_INVALID_TLV_TAG);
     info.type = optionalQRCodeInfoTypeString;
     info.tag  = (uint8_t) TagNumFromTag(tag);
-    info.data = string(val);
+    info.data = string(val.get());
+
 exit:
-    delete[] val;
     return err;
 }
 
@@ -196,13 +199,14 @@ exit:
 
 static CHIP_ERROR populateTLV(SetupPayload & outPayload, const vector<uint8_t> & buf, int & index)
 {
-    if (buf.size() * 8 == (uint) index)
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t bitsLeftToRead = (buf.size() * 8) - index;
     size_t tlvBytesLength = ceil(double(bitsLeftToRead) / 8);
-    uint8_t * tlvArray    = new uint8_t[tlvBytesLength];
+    unique_ptr<uint8_t[]> tlvArray;
+
+    SuccessOrExit(tlvBytesLength == 0);
+
+    tlvArray = unique_ptr<uint8_t[]>(new uint8_t[tlvBytesLength]);
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest;
@@ -210,7 +214,11 @@ static CHIP_ERROR populateTLV(SetupPayload & outPayload, const vector<uint8_t> &
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
 
-    return parseTLVFields(outPayload, tlvArray, tlvBytesLength);
+    err = parseTLVFields(outPayload, tlvArray.get(), tlvBytesLength);
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
 static string extractPayload(string inString)
